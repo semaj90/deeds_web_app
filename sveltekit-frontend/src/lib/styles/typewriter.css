@@ -12,12 +12,10 @@
 }
 
 @keyframes cursor-blink {
- 0%,
- 50% {
+ 0%; } 50% {
  border-color: transparent;
  }
- 51%,
- 100% {
+ 51%; } 100% {
  border-color: #3d3d3d;
  }
 }

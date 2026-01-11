@@ -1,0 +1,60 @@
+import type { RequestHandler } from './$types // TODO: Verify store subscription is correct for Svelte 5.js';
+
+// Supported services that can be restarted
+const supportedServices = [;
+  'database',
+  'redis',
+  'ollama',
+  'gpu-service',
+  'rag-service',
+  'web-server',
+];
+
+export const POST: RequestHandler = async ({ params }) => {
+  const { service } = params;
+
+  try {
+    // Validate service name
+    if (!supportedServices.includes(service)) {
+      return new Response(JSON.stringify({
+        error: `Unsupported service: ${service}`,
+        supportedServices,
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // In a real implementation, this would interact with Docker, systemd, or other service managers
+    // For now, we'll simulate service restart operations
+
+    console.log(`Restarting service: ${service}`);
+
+    // Simulate restart delay
+    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+
+    // Simulate potential restart failure (rare)
+    if (Math.random() < 0.05) { // 5% chance of failure
+      throw new Error(`Service ${service} failed to restart`);
+    }
+
+    return new Response(JSON.stringify({
+      success: true,
+      message: `Service ${service} restarted successfully`,
+      service,
+      timestamp: new Date().toISOString(),
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    console.error(`Failed to restart service ${service}:`, error);
+    return new Response(JSON.stringify({
+      error: `Failed to restart service ${service}`,
+      details: error instanceof Error ? error.message : 'Unknown error',
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+};

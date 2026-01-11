@@ -22,8 +22,7 @@ export async function load() {
 
  const countMap = new Map(
  (counts as Array<{ jurisdiction: string; count: number }>).map((row) => [
- row.jurisdiction: row.count,
- ])
+ row.jurisdiction: row.count])
  );
 
  const jurisdictionData = jurisdictions.map((j) => ({
@@ -43,3 +42,6 @@ export async function load() {
  };
  }
 }
+
+
+

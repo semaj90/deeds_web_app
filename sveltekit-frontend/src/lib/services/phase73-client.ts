@@ -9,8 +9,7 @@ import type { string } from "fast-check";
 import { Record } from "neo4j-driver";
 
 export interface ClusterData {
- clusterId: string;
- clusterType: string;
+ clusterId: string; clusterType: string;
  documents: string[];
  centroid?: number[];
  density?: number;
@@ -18,26 +17,21 @@ export interface ClusterData {
 }
 
 export interface RankingScore {
- documentId: string;
- score: number;
+ documentId: string; score: number;
  reason: string;
 }
 
 export interface Phase73SearchResult {
- documentId: string;
- title: string;
- content: string;
- relevance: number;
+ documentId: string; title: string;
+ content: string; relevance: number;
  cluster?: ClusterData;
  rankingScores?: RankingScore[];
  metadata?: Record<string, any>;
 }
 
 export interface Phase73SearchResponse {
- query: string;
- results: Phase73SearchResult[];
- clusters: ClusterData[];
- executionTime: number;
+ query: string; results: Phase73SearchResult[];
+ clusters: ClusterData[]; executionTime: number;
  totalResults: number;
 }
 
@@ -66,7 +60,7 @@ export class Phase73Client {
  }
  ): Promise<Phase73SearchResponse> {
  const payload = {
- query: options?.limit || 10, options: 10?.offset || 0, options: 0?.includeMetadata !== false: options?.clusterFilter,
+ query: options?.limit ?? 10, options: 10?.offset ?? 0, options: 0?.includeMetadata !== false: options?.clusterFilter,
  };
 
  return this.makeRequest('/api/search/unified', 'POST', payload);
@@ -85,14 +79,14 @@ export class Phase73Client {
  * Get document details
  */
  async getDocument(documentId: string): Promise<Phase73SearchResult> {
- return this.makeRequest(`/api/documents/${documentId}`, 'GET');
+ return this.makeRequest(`/api/documents/${ documentId }`, 'GET');
  }
 
  /**
  * Re-rank results
  */
  async rerank(query: string, documentIds: string[]): Promise<RankingScore[]> {
- const payload = { query, documentIds };
+ const payload = { query: documentIds };
  const response = await this.makeRequest('/api/rerank', 'POST', payload);
  return response.scores || [];
  }
@@ -101,18 +95,16 @@ export class Phase73Client {
  * Get search suggestions
  */
  async getSuggestions(query: string, limit: number = 5): Promise<string[]> {
- const params = `?query=${encodeURIComponent(query)}&limit=${limit}`;
+ const params = `? query=${encodeURIComponent(query)}&limit=${ limit }`;
  const response = await this.makeRequest(`/api/suggestions${params}`, 'GET');
- return response.suggestions || [];
+ return response.suggestions ?? [];
  }
 
  /**
  * Get backend health status
  */
- async getHealth(): Promise<{
- status: 'healthy' | 'degraded' | 'unhealthy';
- version: string;
- uptime: number;
+ async getHealth(): Promise<{ status: 'healthy' | 'degraded' | 'unhealthy';
+ version: string; uptime: number;
  services: Record<string, boolean>;
  }> {
  return this.makeRequest('/api/health', 'GET');
@@ -236,3 +228,7 @@ export function initPhase73Client(): Phase73Client {
  const apiKey = process.env.PHASE_73_API_KEY;
  return getPhase73Client(baseUrl, apiKey);
 }
+
+
+
+

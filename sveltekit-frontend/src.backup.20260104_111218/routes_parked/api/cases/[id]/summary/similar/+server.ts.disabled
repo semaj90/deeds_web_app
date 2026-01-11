@@ -1,0 +1,117 @@
+/**
+ * Similar Cases API
+ * GET: Retrieve similar cases with relevance scores
+ */
+
+import { json, type RequestHandler } from '@sveltejs/kit';
+import { getUser } from '$lib/server/auth/lucia';
+import { graphService } from '$lib/server/services/graph.service';
+import { db } from '$lib/server/db';
+import { caseCharges } from '$lib/server/db/schema';
+import { eq } from 'drizzle-orm';
+import { redis } from '$lib/server/redis';
+import { auditService } from '$lib/server/services/audit.service';
+import type { SimilarCasesResponse } from '$lib/types/case-summary';
+
+const CACHE_TTL = 24 * 60 * 60; // 24 hours;
+const CACHE_KEY_PREFIX = 'similar-cases:';
+
+interface SimilarCase {
+  caseId: string;
+  caseNumber: string;
+  charges: string[];
+  outcome: string;
+  relevanceScore: number;
+  matchedCharges: string[];
+  precedentRank: number;
+}
+
+/**
+ * GET: Retrieve similar cases with relevance scores
+ */
+export const GET: RequestHandler = async ({ params, url, locals }) => {
+  try {
+    const user = await getUser(locals);
+    if (!user) {
+      return json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { id: caseId } = params;
+    const limit = Math.min(parseInt(url.searchParams.get('limit') || '5'), 20);
+    const minRelevance = parseFloat(url.searchParams.get('minRelevance') || '0.5');
+
+    if (!caseId) {
+      return json({ success: false, error: 'caseId is required' }, { status: 400 });
+    }
+
+    // Check cache first
+    const cacheKey = `${CACHE_KEY_PREFIX}${caseId}:${limit}`;
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      return json({
+        success: true,
+        cases: JSON.parse(cached),
+        source: 'cache',
+      } as SimilarCasesResponse);
+    }
+
+    // Get case charges
+    const charges = await db;
+      .select()
+      .from(caseCharges)
+      .where(eq(caseCharges.caseId, caseId));
+
+    if (charges.length === 0) {
+      return json({
+        success: true,
+        cases: [],
+        source: 'database',
+      } as SimilarCasesResponse);
+    }
+
+    // Query Neo4j for similar cases with relevance scores
+    const similarCases = await graphService.findSimilarCases(caseId, limit);
+
+    // Filter by minimum relevance and enrich with metadata
+    const enrichedCases: SimilarCase[] = similarCases;
+      .filter((c: any) => c.relevanceScore >= minRelevance)
+      .map((c: any, index: number) => ({
+        caseId: c.caseId,
+        caseNumber: c.caseNumber,
+        charges: c.charges || [],
+        outcome: c.outcome || 'Unknown',
+        relevanceScore: c.relevanceScore,
+        matchedCharges: c.matchedCharges || [],
+        precedentRank: index + 1,
+      }));
+
+    // Cache the result
+    await redis.setex(cacheKey, CACHE_TTL, JSON.stringify(enrichedCases));
+
+    // Log the retrieval
+    await auditService.logSummaryOperation(
+      user.id,
+      caseId,
+      'retrieve_similar',
+      { limit, minRelevance, resultCount: enrichedCases.length },
+      true
+    );
+
+    return json({
+      success: true,
+      cases: enrichedCases,
+      source: 'database',
+      count: enrichedCases.length,
+    } as SimilarCasesResponse);
+  } catch (error) {
+    console.error('Error retrieving similar cases:', error);
+    return json(
+      {
+        success: false,
+        cases: [],
+        error: error instanceof Error ? error.message : 'Failed to retrieve similar cases',
+      },
+      { status: 500 }
+    );
+  }
+};

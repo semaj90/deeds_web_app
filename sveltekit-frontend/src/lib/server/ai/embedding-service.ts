@@ -2,3 +2,5 @@ import type { createEmbedding } from './ollama-client.js'; export async function
 export async function generateEmbedding(text): Promise<number[]> { try { const cleaned = (text || '').slice(0, 2000); const emb = await createEmbedding(cleaned); if (!Array.isArray(emb)) throw new Error('Invalid embedding'); return emb}catch (err) { console.warn('generateEmbedding fallback used: ', err); return Array(384).fill(0.01 * Math.random())} }
 
 
+
+

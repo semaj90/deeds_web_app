@@ -1,10 +1,13 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { ChatSession } from '$lib/stores';
+    import { ChatSession } from '$lib/models/ChatSession.svelte';
 
     // 1. Reactive Chat State Logic
     // Using the Barrel Store Pattern
     const room = new ChatSession('case-101');
+
+    // Helper to get chatId
+    const getChatId = () => 'case-101';
 </script>
 
 <div class="chat-window">
@@ -37,14 +40,12 @@
 <style>
     .chat-window {
         border: 1px solid #ccc;
-        padding: 1rem;
-        height: 300px;
+        padding: 1rem; height: 300px;
         overflow-y: auto;
         margin-bottom: 1rem;
     }
     .msg {
-        margin-bottom: 0.5rem;
-        padding: 0.5rem;
+        margin-bottom: 0.5rem; padding: 0.5rem;
         border-radius: 4px;
     }
     .msg.user {
@@ -56,7 +57,9 @@
         text-align: left;
     }
     .loading {
-        font-style: italic;
-        color: #666;
+        font-style: italic; color: #666;
     }
 </style>
+
+
+

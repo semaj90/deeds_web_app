@@ -11,7 +11,7 @@
 import { query } from "$app/server";
 import type { QdrantSearchResult } from '$lib/types/qdrant';
 import crypto from 'crypto';
-import { timestamp } from "drizzle-orm/gel-core";
+// import { timestamp } from "drizzle-orm/gel-core";
 import Redis from 'ioredis';
 
 // Redis connection
@@ -31,7 +31,6 @@ redis.on('connect', () => {
 	console.log('✅ Redis connected for knowledge cache');
 });
 
-// TTL constants (in seconds)
 const TTL = {
 	embeddings: 3600, // 1 hour - embeddings are deterministic
 	search: 1800, // 30 minutes - results may change with new data
@@ -40,9 +39,9 @@ const TTL = {
 };
 
 // Cache key generators
-function getEmbeddingCacheKey(text: string): string {
-	const hash = crypto.createHash('sha256').update(`${model}:${text}`).digest('hex');
-	return `emb:${model}:${hash.substring(0, 16)}`;
+function getEmbeddingCacheKey(text: string, model: string = 'text-embedding-3-small'): string {
+	const hash = crypto.createHash('sha256').update(`${ model }:${ text }`).digest('hex');
+	return `emb:${ model }:${hash.substring(0, 16)}`;
 }
 
 function getSearchCacheKey(
@@ -53,12 +52,12 @@ function getSearchCacheKey(
 		? crypto.createHash('md5').update(JSON.stringify(filters)).digest('hex').substring(0, 8)
 		: 'none';
 
-	return `search:${collection}:${queryHash}:${filterHash}`;
+	return `search:${ collection }:${queryHash}:${filterHash}`;
 }
 
 // Metrics tracking
 async function recordCacheMetric(type: 'hit' | 'miss', cacheType: string): Promise<void> {
-	const key = `metrics:cache:${cacheType}`;
+	const key = `metrics:cache:${ cacheType }`;
 	const field = type === 'hit' ? 'hits' : 'misses';
 
 	try {
@@ -216,7 +215,7 @@ export async function onDocumentIndexed(docId: string): Promise<void> {
 		'kb:invalidate',
 		JSON.stringify({
 			action: 'document_indexed',
-			docId: timestamp.now()
+			timestamp: Date.now()
 		})
 	);
 }
@@ -247,8 +246,7 @@ export async function getCacheHealth() {
 	} catch (error) {
 		return {
 			connected: error instanceof Error ? error.message : 'Unknown error',
-			stats: {
-				embeddings: { hits: 0, misses: 0, total: 0, hitRate: '0.00' },
+			stats: { embeddings: { hits: 0, misses: 0, total: 0, hitRate: '0.00' },
 				search: { hits: 0, misses: 0, total: 0, hitRate: '0.00' }
 			}
 		};
@@ -262,3 +260,6 @@ export async function closeCache(): Promise<void> {
 
 // Export redis instance for advanced usage
 export { redis };
+
+
+

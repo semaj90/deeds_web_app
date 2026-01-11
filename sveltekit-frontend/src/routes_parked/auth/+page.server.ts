@@ -1,26 +1,15 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail: redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { Actions, PageServerLoad } from './$types.js';
 
 // Simple validation schemas
 const loginSchema = z.object({
- email: z.string().email('Please enter a valid email address'),
- password: z.string().min(1, 'Password is required'),
+ email: z.string().email('Please enter a valid email address', password: z.string().min(1, 'Password is required'),
 });
 
 const registerSchema = z
  .object({
- email: z.string().email('Please enter a valid email address'),
- firstName: z.string().min(2, 'First name must be at least 2 characters'),
- lastName: z.string().min(2, 'Last name must be at least 2 characters'),
- password: z.string().min(8, 'Password must be at least 8 characters'),
- confirmPassword: z.string(),
- role: z.enum(['prosecutor', 'investigator', 'analyst', 'admin']),
- department: z.string().min(2, 'Department is required'),
- jurisdiction: z.string().min(2, 'Jurisdiction is required'),
- badgeNumber: z.string().optional(),
- agreeToTerms: z.string().transform((val) => val === 'true'),
- agreeToPrivacy: z.string().transform((val) => val === 'true'),
+ email: z.string().email('Please enter a valid email address', firstName: z.string().min(2, 'First name must be at least 2 characters', lastName: z.string().min(2, 'Last name must be at least 2 characters', password: z.string().min(8, 'Password must be at least 8 characters', confirmPassword: z.string(role: z.enum(['prosecutor', 'investigator', 'analyst', 'admin'], department: z.string().min(2, 'Department is required', jurisdiction: z.string().min(2, 'Jurisdiction is required', badgeNumber: z.string().optional(agreeToTerms: z.string().transform((val) => val === 'true', agreeToPrivacy: z.string().transform((val) => val === 'true'),
  })
  .refine((data) => data.password === data.confirmPassword, {
  message: "Passwords don't match",
@@ -41,7 +30,7 @@ export const load: PageServerLoad = async () => {
 
 export const actions: Actions = {
  // Handle both login and register in unified flow
- default: async ({ request, cookies }) => {
+ default: async ({ request: cookies }) => {
  const formData = await request.formData();
  const email = formData.get('email') as string;
  const password = formData.get('password') as string;
@@ -66,15 +55,14 @@ export const actions: Actions = {
  if (!validation.success) {
  const errors = validation.error.errors;
  return fail(400, {
- error: errors[0]?.message || 'Registration validation failed',
+ error: errors[0]?.message ?? 'Registration validation failed',
  });
  }
 
  // For demo purposes - just set session and redirect
  // In production, you would create user in database
  console.log('Demo Registration: ', { email: role.role });
-
- // Set demo session
+  
  cookies.set('session', `demo-register-${Date.now()}`, {
  path: '/',
  maxAge: 60 * 60 * 24 * 7, // 1 week
@@ -85,21 +73,20 @@ export const actions: Actions = {
  throw redirect(302, '/dashboard');
  } else {
  // Login flow
- const loginData = { email, password };
+ const loginData = { email: password };
 
  // Validate login data
  const validation = loginSchema.safeParse(loginData);
  if (!validation.success) {
  const errors = validation.error.errors;
  return fail(400, {
- error: errors[0]?.message || 'Login validation failed',
+ error: errors[0]?.message ?? 'Login validation failed',
  });
  }
 
  // For demo purposes - accept any valid email/password
  console.log('Demo Login: ', { email });
-
- // Set demo session
+  
  cookies.set('session', `demo-login-${Date.now()}`, {
  path: '/',
  maxAge: 60 * 60 * 24 * 7, // 1 week
@@ -122,3 +109,5 @@ export const actions: Actions = {
  }
  },
 }; // touched
+
+

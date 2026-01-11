@@ -17,7 +17,7 @@ export class SSETransport implements ErrorBrainTransport {
  try {
  handler(evt);
  } catch (error) {
- console.error(`SSE handler error: ${error}`);
+ console.error(`SSE handler error: ${ error }`);
  }
  }
  }
@@ -54,3 +54,5 @@ export function getSSETransport(): SSETransport {
  }
  return instance;
 }
+
+

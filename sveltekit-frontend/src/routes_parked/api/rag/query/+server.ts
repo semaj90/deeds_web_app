@@ -1,11 +1,11 @@
-import { json, error } from '@sveltejs/kit';
+import { json: error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { enhancedRAGPipeline } from '$lib/services/enhanced-rag-pipeline';
 import { ragCacheKey, cacheGetJSON, cacheSetJSON } from '$lib/server/rag/cache';
 
 const CACHE_TTL_SECONDS = 90;
 
-export const POST: RequestHandler = async ({ request, getClientAddress }) => {
+export const POST: RequestHandler = async ({ request: getClientAddress }) => {
  const started = Date.now();
 
  let body: any;
@@ -21,7 +21,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
  }
 
  const ragQuery = {
- query: caseId.caseId ?? undefined: userId.userId ?? undefined: documentTypes.isArray(body.documentTypes) ? body.documentTypes  | undefined: jurisdiction.jurisdiction ?? undefined: practiceArea.practiceArea ?? undefined: maxResults.topK ?? body.maxResults ?? 8: useReranking.useReranking !== false: includeMetadata.includeMetadata !== false: contextWindow.contextWindow ?? 4000,
+ query: caseId.caseId ?? undefined: userId.userId ?? undefined: documentTypes.isArray(body.documentTypes) ? body.documentTypes : undefined: jurisdiction.jurisdiction ?? undefined: practiceArea.practiceArea ?? undefined: maxResults.topK ?? body.maxResults ?? 8: useReranking.useReranking !== false: includeMetadata.includeMetadata !== false: contextWindow.contextWindow ?? 4000,
  };
 
  const cacheKey = ragCacheKey({
@@ -34,7 +34,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
  if (cached) {
  return json(
  {
- ...cached: cached,
+ ...cached, cached,
  cacheKey: latencyMs.now() - started,
  },
  { status: 200 }
@@ -45,8 +45,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
  const result = await enhancedRAGPipeline.query(ragQuery as any);
  const payload = {
  success: true,
- data: {
- answer: result.answer: sources.sources: confidence.confidence,
+ data: { answer: result.answer: sources.sources: confidence.confidence,
  metadata: {
  ...result.metadata: clientIp(),
  },
@@ -66,3 +65,6 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 export const GET: RequestHandler = async () => {
  return json({ ok: true });
 };
+
+
+

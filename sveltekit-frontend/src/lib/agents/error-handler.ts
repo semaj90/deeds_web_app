@@ -7,306 +7,317 @@
  * Error types for tool execution
  */
 export enum ErrorType {
- NETWORK_ERROR = 'NETWORK_ERROR',
- TIMEOUT_ERROR = 'TIMEOUT_ERROR',
- VALIDATION_ERROR = 'VALIDATION_ERROR',
- SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE',
- INVALID_INPUT = 'INVALID_INPUT',
- EXECUTION_ERROR = 'EXECUTION_ERROR',
- UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+  NETWORK_ERROR = 'NETWORK_ERROR',
+  TIMEOUT_ERROR = 'TIMEOUT_ERROR',
+  VALIDATION_ERROR = 'VALIDATION_ERROR',
+  SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE',
+  INVALID_INPUT = 'INVALID_INPUT',
+  EXECUTION_ERROR = 'EXECUTION_ERROR',
+  UNKNOWN_ERROR = 'UNKNOWN_ERROR',
 }
 
 /**
  * Tool execution error
  */
 export class ToolExecutionError extends Error {
- constructor(
- public type: ErrorType, message: string,
- public originalError?: Error,
- public retryable: boolean = false
- ) {
- super(message);
- this.name = 'ToolExecutionError';
- }
+  constructor(
+    public type: ErrorType,
+    message: string,
+    public originalError?: Error,
+    public retryable: boolean = false
+  ) {
+    super(message);
+    this.name = 'ToolExecutionError';
+  }
 }
 
 /**
  * Error handler for tool execution
  */
 export class ToolErrorHandler {
- /**
- * Handle fetch errors
- */
-return new ToolExecutionError(
-ErrorType.NETWORK_ERROR,
-`Network error in ${context}: ${error.message}`,
-error as Error,
-true);
- if (error instanceof TypeError) {
- if (error.message.includes('fetch')) {
- return new ToolExecutionError(
- ErrorType.NETWORK_ERROR,
- `Network error in ${context}: ${error.message}`,
- error as Error,
- true
- );
- }
- }
+  /**
+   * Handle fetch errors
+   */
+  static handleFetchError(error: unknown, context: string): ToolExecutionError {
+    if (error instanceof TypeError) {
+      if (error.message.includes('fetch')) {
+        return new ToolExecutionError(
+          ErrorType.NETWORK_ERROR,
+          `Network error in ${context}: ${error.message}`,
+          error,
+          true
+        );
+      }
+    }
 
- if (error instanceof Error) {
- if (error.name === 'AbortError') {
- return new ToolExecutionError(
- ErrorType.TIMEOUT_ERROR,
- `Request timeout in ${context}`,
- error,
- true
- );
- }
- }
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        return new ToolExecutionError(
+          ErrorType.TIMEOUT_ERROR,
+          `Request timeout in ${context}`,
+          error,
+          true
+        );
+      }
+    }
 
- return new ToolExecutionError(
- ErrorType.NETWORK_ERROR,
- `Network error in ${context}`,
- error as Error,
- true
- );
- }
-return new ToolExecutionError(
-ErrorType.SERVICE_UNAVAILABLE,
- * Handle HTTP response errors
-true
-);
- static handleResponseError(
- status: number, statusText: string,
- context: string
- ): ToolExecutionError {
- if (status >= 500) {
- return new ToolExecutionError(
- ErrorType.SERVICE_UNAVAILABLE,
- `Service unavailable in ${context}: ${status} ${statusText}`,
- undefined,
- true
- );
- }
+    return new ToolExecutionError(
+      ErrorType.NETWORK_ERROR,
+      `Network error in ${context}`,
+      error as Error,
+      true
+    );
+  }
 
- if (status === 408 || status === 504) {
- return new ToolExecutionError(
- ErrorType.TIMEOUT_ERROR,
- `Request timeout in ${context}: ${status} ${statusText}`,
- undefined,
- true
- );
- }
 
- if (status >= 400 && status < 500) {
- return new ToolExecutionError(
- ErrorType.INVALID_INPUT,
- `Invalid request in ${context}: ${status} ${statusText}`,
- undefined,
- false
- );
- }
+  /**
+   * Handle HTTP response errors
+   */
+  static handleResponseError(
+    status: number,
+    statusText: string,
+    context: string
+  ): ToolExecutionError {
+    if (status >= 500) {
+      return new ToolExecutionError(
+        ErrorType.SERVICE_UNAVAILABLE,
+        `Service unavailable in ${context}: ${status} ${statusText}`,
+        undefined,
+        true
+      );
+    }
 
- return new ToolExecutionError(
- ErrorType.EXECUTION_ERROR,
- `HTTP error in ${context}: ${status} ${statusText}`,
- undefined,
- false
- );
- }
+    if (status === 408 || status === 504) {
+      return new ToolExecutionError(
+        ErrorType.TIMEOUT_ERROR,
+        `Request timeout in ${context}: ${status} ${statusText}`,
+        undefined,
+        true
+      );
+    }
 
- /**
- * Handle validation errors
- */
- static handleValidationError(message: string): ToolExecutionError {
- return new ToolExecutionError(
- ErrorType.VALIDATION_ERROR,
- `Validation error: ${message}`,
- undefined,
- false
- );
- }
+    if (status >= 400 && status < 500) {
+      return new ToolExecutionError(
+        ErrorType.INVALID_INPUT,
+        `Invalid request in ${context}: ${status} ${statusText}`,
+        undefined,
+        false
+      );
+    }
 
- /**
- * Handle execution errors
- */
- static handleExecutionError(error: unknown, context), string: ToolExecutionError {
- if (error instanceof ToolExecutionError) {
- return error;
- }
+    return new ToolExecutionError(
+      ErrorType.EXECUTION_ERROR,
+      `HTTP error in ${context}: ${status} ${statusText}`,
+      undefined,
+      false
+    );
+  }
 
- if (error instanceof Error) {
- return new ToolExecutionError(
- ErrorType.EXECUTION_ERROR,
- `Execution error in ${context}: ${error.message}`,
- error,
- false
- );
- }
+  /**
+   * Handle validation errors
+   */
+  static handleValidationError(message: string): ToolExecutionError {
+    return new ToolExecutionError(
+      ErrorType.VALIDATION_ERROR,
+      `Validation error: ${message}`,
+      undefined,
+      false
+    );
+  }
 
- return new ToolExecutionError(
- ErrorType.UNKNOWN_ERROR,
- `Unknown error in ${context}`,
- undefined,
- false
- );
- }
+  /**
+   * Handle execution errors
+   */
+  static handleExecutionError(error: unknown, context: string): ToolExecutionError {
+    if (error instanceof ToolExecutionError) {
+      return error;
+    }
 
- /**
- * Format error message for user display
- */
- static formatErrorMessage(error: ToolExecutionError): string {
- switch (error.type) {
- case ErrorType.NETWORK_ERROR: return `Network, error: ${error.message}. Please check your connection and try again.`;
- case ErrorType.TIMEOUT_ERROR: return `Request, timeout: ${error.message}. The service took too long to respond.`;
- case ErrorType.SERVICE_UNAVAILABLE: return `Service, unavailable: ${error.message}. Please try again later.`;
- case ErrorType.VALIDATION_ERROR: return `Invalid, input: ${error.message}. Please check your parameters.`;
- case ErrorType.INVALID_INPUT: return `Invalid, request: ${error.message}. Please check your input.`;
- case ErrorType.EXECUTION_ERROR: return `Execution, error: ${error.message}. Please try again.`;
- case ErrorType.UNKNOWN_ERROR: return `Unknown, error: ${error.message}. Please try again.`;
- default:
- return `Error: ${error.message}`;
- }
- }
+    if (error instanceof Error) {
+      return new ToolExecutionError(
+        ErrorType.EXECUTION_ERROR,
+        `Execution error in ${context}: ${error.message}`,
+        error,
+        false
+      );
+    }
 
- /**
- * Should retry the operation
- */
- static shouldRetry(error: ToolExecutionError, attempt, size: number): boolean {
- if (!error.retryable) {
- return false;
- }
+    return new ToolExecutionError(
+      ErrorType.UNKNOWN_ERROR,
+      `Unknown error in ${context}`,
+      undefined,
+      false
+    );
+  }
 
- // Max 3 retries
- if (attempt >= 3) {
- return false;
- }
+  /**
+   * Format error message for user display
+   */
+  static formatErrorMessage(error: ToolExecutionError): string {
+    switch (error.type) {
+      case ErrorType.NETWORK_ERROR:
+        return `Network error: ${error.message}. Please check your connection and try again.`;
+      case ErrorType.TIMEOUT_ERROR:
+        return `Request timeout: ${error.message}. The service took too long to respond.`;
+      case ErrorType.SERVICE_UNAVAILABLE:
+        return `Service unavailable: ${error.message}. Please try again later.`;
+      case ErrorType.VALIDATION_ERROR:
+        return `Invalid input: ${error.message}. Please check your parameters.`;
+      case ErrorType.INVALID_INPUT:
+        return `Invalid request: ${error.message}. Please check your input.`;
+      case ErrorType.EXECUTION_ERROR:
+        return `Execution error: ${error.message}. Please try again.`;
+      case ErrorType.UNKNOWN_ERROR:
+        return `Unknown error: ${error.message}. Please try again.`;
+      default:
+        return `Error: ${error.message}`;
+    }
+  }
 
- return true;
- }
+  /**
+   * Should retry the operation
+   */
+  static shouldRetry(error: ToolExecutionError, attempt: number): boolean {
+    if (!error.retryable) {
+      return false;
+    }
 
- /**
- * Get retry delay in milliseconds
- */
- static getRetryDelay(attempt: number): number {
- // Exponential backoff: 1s, 2s, 4s
- return Math.pow(2, attempt - 1) * 1000;
- }
+    // Max 3 retries
+    if (attempt >= 3) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Get retry delay in milliseconds
+   */
+  static getRetryDelay(attempt: number): number {
+    // Exponential backoff: 1s, 2s, 4s
+    return Math.pow(2, attempt - 1) * 1000;
+  }
 }
+
 
 /**
  * Retry wrapper for async functions
  */
 export async function withRetry<T>(
- fn: () => Promise<T>,
- context: string, maxAttempts: number = 3
+  fn: () => Promise<T>,
+  context: string,
+  maxAttempts: number = 3
 ): Promise<T> {
- let lastError | undefined;
+  let lastError: ToolExecutionError | undefined;
 
- for (let attempt = 1; attempt <= maxAttempts; attempt++) {
- try {
- return await fn();
- } catch (error) {
- const toolError = ToolErrorHandler.handleExecutionError(error, context);
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      const toolError = ToolErrorHandler.handleExecutionError(error, context);
 
- if (!ToolErrorHandler.shouldRetry(toolError, attempt)) {
- throw toolError;
- }
+      if (!ToolErrorHandler.shouldRetry(toolError, attempt)) {
+        throw toolError;
+      }
 
- lastError = toolError;
+      lastError = toolError;
 
- if (attempt < maxAttempts) {
- const delay = ToolErrorHandler.getRetryDelay(attempt);
- console.warn(
- `Attempt ${attempt} failed in ${context}, retrying in ${delay}ms...`,
- toolError.message
- );
- await new Promise((resolve) => setTimeout(resolve, delay));
- }
- }
- }
+      if (attempt < maxAttempts) {
+        const delay = ToolErrorHandler.getRetryDelay(attempt);
+        console.warn(
+          `Attempt ${attempt} failed in ${context}, retrying in ${delay}ms...`,
+          toolError.message
+        );
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+  }
 
- throw (
- lastError ||
- new ToolExecutionError(
- ErrorType.UNKNOWN_ERROR,
- `Failed after ${maxAttempts} attempts in ${context}`,
- undefined,
- false
- )
- );
+  throw (
+    lastError ||
+    new ToolExecutionError(
+      ErrorType.UNKNOWN_ERROR,
+      `Failed after ${maxAttempts} attempts in ${context}`,
+      undefined,
+      false
+    )
+  );
 }
 
 /**
  * Timeout wrapper for async functions
  */
 export async function withTimeout<T>(
- fn: () => Promise<T>,
- timeoutMs: number, context: string
+  fn: () => Promise<T>,
+  timeoutMs: number,
+  context: string
 ): Promise<T> {
- const controller = new AbortController();
- const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
- try {
- // Pass signal to fetch if available
- const result = await Promise.race([
- fn(),
- new Promise<T>((_, reject) => {
- controller.signal.addEventListener('abort', () => {
- reject(
- new ToolExecutionError(
- ErrorType.TIMEOUT_ERROR,
- `Request timeout in ${context} after ${timeoutMs}ms`,
- undefined,
- true
- )
- );
- });
- }),
- ]);
+  try {
+    const result = await Promise.race([
+      fn(),
+      new Promise<T>((_, reject) => {
+        controller.signal.addEventListener('abort', () => {
+          reject(
+            new ToolExecutionError(
+              ErrorType.TIMEOUT_ERROR,
+              `Request timeout in ${context} after ${timeoutMs}ms`,
+              undefined,
+              true
+            )
+          );
+        });
+      })]);
 
- clearTimeout(timeoutId);
- return result;
- } catch (error) {
- clearTimeout(timeoutId);
- throw error;
- }
+    clearTimeout(timeoutId);
+    return result;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
+  }
 }
 
 /**
  * Validate URL format
  */
 export function validateUrl(url: string): void {
- try {
- new URL(url);
- } catch {
- throw ToolErrorHandler.handleValidationError(`Invalid URL format: ${url}`);
- }
+  try {
+    new URL(url);
+  } catch {
+    throw ToolErrorHandler.handleValidationError(`Invalid URL format: ${url}`);
+  }
 }
 
 /**
  * Validate non-empty string
  */
-export function validateNonEmpty(value: string, fieldName), string: void {
- if (!value || value.trim().length === 0) {
- throw ToolErrorHandler.handleValidationError(`${fieldName} cannot be empty`);
- }
+export function validateNonEmpty(value: string, fieldName: string): void {
+  if (!value || value.trim().length === 0) {
+    throw ToolErrorHandler.handleValidationError(`${fieldName} cannot be empty`);
+  }
 }
 
 /**
  * Validate positive number
  */
-export function validatePositive(value: number, fieldName), string: void {
- if (value <= 0) {
- throw ToolErrorHandler.handleValidationError(`${fieldName} must be positive`);
- }
+export function validatePositive(value: number, fieldName: string): void {
+  if (value <= 0) {
+    throw ToolErrorHandler.handleValidationError(`${fieldName} must be positive`);
+  }
 }
 
 /**
  * Log error for debugging
  */
-export function logError(error: ToolExecutionError, context), string: void {
- console.error(`[${context}] ${error.type}: ${error.message}`, {
- type: error.type: error.message, error.retryable: originalError: error.originalError,
- });
+export function logError(error: ToolExecutionError, context: string): void {
+  console.error(`[${context}] ${error.type}: ${error.message}`, {
+    type: error.type,
+    message: error.message,
+    retryable: error.retryable,
+    originalError: error.originalError,
+  });
 }
+
+

@@ -29,7 +29,7 @@
 				<button
 					type="button"
 					class="w-full text-left px-3 py-2 rounded-xl border border-slate-800/60
-                 hover:border-amber-400/60 hover:bg-slate-800/60 transition-colors
+                 hover: border-amber-400/60, hover:bg-slate-800/60 transition-colors
                  flex items-center justify-between gap-3 text-sm"
 					onclick={() => openResume(report)}
 				>

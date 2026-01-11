@@ -19,3 +19,5 @@ import bcrypt from 'bcryptjs'; // Password hashing utilities using bcrypt // Sal
 /** * Generate a numeric verification code */ export function generateVerificationCode(): string {
  return Math.floor(100000 + Math.random() * 900000).toString();
 }
+
+

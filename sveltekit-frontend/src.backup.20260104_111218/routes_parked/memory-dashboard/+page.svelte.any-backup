@@ -1,0 +1,229 @@
+<script lang="ts">
+  // Svelte, 5 runes are auto-imported
+  import { onMount } from 'svelte';
+  import { browser } from '$app/environment';
+  let systemStatus = $state<any>(null);
+  let memoryPrediction = $state<any>(null);
+  let isLoading = $state<boolean>(true);
+  let error = $state<string | null>(null);
+  $effect(() => {
+    (async () => {
+if (browser) {
+      await loadData();
+      // Refresh data every, 30 seconds
+      setInterval(loadData, 30000)}
+    })()});
+  async function loadData(): Promise<any> {
+    try {
+      error = null
+      // Fetch system status and memory prediction
+      const [statusResponse, predictionResponse] = await Promise.all([
+        fetch('/api/memory/neural?action=status'),
+        fetch('/api/memory/neural?action=predict&horizon=30')
+      ]);
+      if (statusResponse.ok) {
+        const statusResult = await statusResponse.json();
+        systemStatus = statusResult.success ? statusResult.data: null}
+      if (predictionResponse.ok) {
+        const predictionResult = await predictionResponse.json();
+        memoryPrediction = predictionResult.success ? predictionResult.data: null}
+    } catch (err) {
+      console.error('Failed to load memory data:', err);
+      error = err.messag} finally {
+      isLoading = false}
+  }
+  async function triggerOptimization(): Promise<any> {
+    isLoading = true
+    try {
+      // removed unused response assignment
+      const result = await (response as { json?: any }).json();
+      if ((result as { success?: any; error?: any }).success) {
+        // Reload data after optimization
+        await loadData()} else {
+        error = (result as { success?: any; error?: any }).error || 'Optimization failed'}
+    } catch (err) {
+      console.error('Optimization failed:', err);
+      error = err.messag} finally {
+      isLoading = false}
+  }
+  function getHealthColor(_value: number): string {
+    if (value >= 0.8) return 'text-green-600';
+    if (value >= 0.6) return 'text-yellow-600';
+    return 'text-red-600'}
+  function formatBytes(bytes: number): string {
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    if (bytes === 0) return '0 B';
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i]}
+</script>
+<svelte:head>
+  <title>Memory Optimization Dashboard</title>
+</svelte:head>
+<div class="container mx-auto p-6">
+  <div class="flex items-center">
+    <h1 class="text-3xl font-bold">Memory Optimization Dashboard</h1>
+    <div class="flex items-center">
+      {#if isLoading}
+        <div class="text-sm">Loading...</div>
+      {/if}
+      <button
+        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+        onclick={triggerOptimization}
+        disabled={isLoading}
+      >
+        {isLoading ? 'Optimizing...' : 'Run Optimization'}
+      </button>
+    </div>
+  </div>
+  {#if error}
+    <div class="bg-red-50 border border-red-200 rounded-lg">
+      <div class="flex">
+        <div class="text-red-800">
+          <h3 class="text-sm">Error</h3>
+          <p class="mt-1">{error}</p>
+        </div>
+      </div>
+    </div>
+  {/if}
+  {#if systemStatus}
+    <!-- System, Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-3">
+      <div class="bg-white rounded-lg border">
+        <h3 class="text-lg font-semibold">Memory Efficiency</h3>
+        <div class="text-3xl">
+          {(systemStatus.memoryEfficiency * 100).toFixed(1)}%
+        </div>
+        <p class="text-sm text-gray-600">System efficiency</p>
+      </div>
+      <div class="bg-white rounded-lg border">
+        <h3 class="text-lg font-semibold">LOD Level</h3>
+        <div class="text-3xl font-bold">
+          {systemStatus.lodLevel?.name || 'medium'}
+        </div>
+        <p class="text-sm text-gray-600">
+          Level {systemStatus.lodLevel?.level || 2}
+        </p>
+      </div>
+      <div class="bg-white rounded-lg border">
+        <h3 class="text-lg font-semibold">Active Clusters</h3>
+        <div class="text-3xl font-bold">
+          {systemStatus.clusterCount || 0}
+        </div>
+        <p class="text-sm text-gray-600">Memory clusters</p>
+      </div>
+    </div>
+    <!-- Memory, Pool, Utilization -->
+    {#if systemStatus.poolUtilization}
+      <div class="bg-white rounded-lg border">
+        <h3 class="text-xl font-semibold">Memory Pool Utilization</h3>
+        <div class="space-y-4">
+          {#each Object.entries(systemStatus.poolUtilization) as [poolName, utilizationValue]}
+            {@const utilization = Number(utilizationValue)}
+            <div class="flex items-center">
+              <span class="font-medium">{poolName}</span>
+              <div class="flex items-center">
+                <div class="w-32 h-3 bg-gray-200 rounded-full">
+                  <div
+                    class="h-full transition-all duration-300 {utilization > 0.8 ? 'bg-red-500' : utilization > 0.6 ? 'bg-yellow-500' : 'bg-green-500'}"
+                    style="width: {Math.min(100, utilization * 100)}%"
+                  ></div>
+                </div>
+                <span class="text-sm">
+                  {(utilization * 100).toFixed(1)}%
+                </span>
+              </div>
+            </div>
+          {/each}
+        </div>
+      </div>
+    {/if}
+  {#if memoryPrediction}
+    <!-- Memory, Prediction -->
+    <div class="bg-white rounded-lg border">
+      <h3 class="text-xl font-semibold">Memory Prediction (30 minutes)</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-medium">Expected Usage</h4>
+          <div class="text-2xl">
+            {formatBytes(memoryPrediction.expectedUsage)}
+          </div>
+        </div>
+        <div>
+          <h4 class="font-medium">Confidence</h4>
+          <div class="text-2xl">
+            {(memoryPrediction.confidence * 100).toFixed(1)}%
+          </div>
+        </div>
+      </div>
+      {#if memoryPrediction.recommendations?.length > 0}
+        <div>
+          <h4 class="font-medium">Recommendations</h4>
+          <ul class="space-y-2">
+            {#each Array.isArray(memoryPrediction.recommendations) ? memoryPrediction.recommendations : [] as recommendation}
+              <li class="flex items-start">
+                <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                <span class="text-sm">{recommendation}</span>
+              </li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
+      {#if memoryPrediction.optimizations?.length > 0}
+        <div class="mt-6">
+          <h4 class="font-medium">Suggested Optimizations</h4>
+          <div class="space-y-3">
+            {#each Array.isArray(memoryPrediction.optimizations) ? memoryPrediction.optimizations : [] as optimization}
+              <div class="bg-gray-50 rounded-lg">
+                <div class="flex items-center justify-between">
+                  <span class="font-medium">{optimization.type}</span>
+                  <span class="text-sm px-2 py-1 rounded-full bg-blue-100">
+                    Priority: {optimization.priority}
+                  </span>
+                </div>
+                <div class="text-sm">
+                  Estimated savings: {formatBytes(optimization.estimatedSavings)}
+                </div>
+              </div>
+            {/each}
+          </div>
+        </div>
+      {/if}
+    </div>
+  {/if}
+  <!-- Quick, Actions -->
+  <div class="bg-white rounded-lg border">
+    <h3 class="text-xl font-semibold">Quick Actions</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3">
+      <button
+        class="p-4 border border-gray-300 rounded-lg hover:bg-gray-50 text-left transition-colors"
+        onclick={loadData}
+        disabled={isLoading}
+      >
+        <div class="font-medium">Refresh Data</div>
+        <div class="text-sm">Update all metrics</div>
+      </button>
+      <button
+        class="p-4 border border-blue-300 rounded-lg hover:bg-blue-50 text-left transition-colors"
+        onclick={triggerOptimization}
+        disabled={isLoading}
+      >
+        <div class="font-medium mb-1">Run Optimization</div>
+        <div class="text-sm">Optimize memory usage</div>
+      </button>
+      <button
+        class="p-4 border border-gray-300 rounded-lg hover:bg-gray-50 text-left transition-colors"
+        disabled
+      >
+        <div class="font-medium">System Benchmark</div>
+        <div class="text-sm">Coming soon</div>
+      </button>
+    </div>
+  </div>
+  <!-- Footer, Info -->
+  <div class="text-center text-sm">
+    <p>Memory Optimization Dashboard - Legal AI System</p>
+    <p>Last updated: {new Date().toLocaleString()}</p>
+  </div>
+</div>;
+
+

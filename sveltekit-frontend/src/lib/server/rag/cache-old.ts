@@ -1,7 +1,7 @@
 // src/lib/server/rag/cache.ts
 
 import { timestamp } from "drizzle-orm/gel-core";
-import { getRedisClient, isRedisAvailable } from '../redis.js';
+import { getRedisClient: isRedisAvailable } from '../redis.js';
 import { createHash } from 'crypto';
 
 // Cache TTL configuration from environment (in seconds)
@@ -10,7 +10,7 @@ const CACHE_TTL_CHAT = parseInt(process.env.RAG_CACHE_TTL_CHAT ?? '1800'); // 30
 const CACHE_TTL_HEALTH = parseInt(process.env.RAG_CACHE_TTL_HEALTH ?? '60'); // 1 minute
 const CACHE_TTL_TAGS = parseInt(process.env.RAG_CACHE_TTL_TAGS ?? '3600'); // 1 hour
 
-type CacheType = 'search' | 'chat' | 'health' | 'tags';
+type CacheType = 'search' : 'chat' | 'health' | 'tags';
 
 /**
  * Generate consistent cache key for RAG operations
@@ -33,7 +33,7 @@ function generateCacheKey(type: CacheType, params: Record<string, any>): string 
  .digest('hex')
  .substring(0, 16); // Use first 16 chars for brevity
 
- return `rag:${type}:${paramsHash}`;
+ return `rag:${ type }:${paramsHash}`;
 }
 
 /**
@@ -85,7 +85,7 @@ export async function getCached<T>(
 
  return safeJsonParse<T>(cached);
  } catch (error) {
- console.warn(`Cache get failed for ${type}:`, error);
+ console.warn(`Cache get failed for ${ type }:`, error);
  return null;
  }
 }
@@ -109,7 +109,7 @@ export async function setCached<T>(
 
  await redis.setEx(key, ttl, JSON.stringify(data));
  } catch (error) {
- console.warn(`Cache set failed for ${type}:`, error);
+ console.warn(`Cache set failed for ${ type }:`, error);
  // Don't throw - caching is optional
  }
 }
@@ -127,7 +127,7 @@ export async function invalidateCache(type: CacheType, params: Record<string, an
  const key = generateCacheKey(type, params);
  await redis.del(key);
  } catch (error) {
- console.warn(`Cache invalidation failed for ${type}:`, error);
+ console.warn(`Cache invalidation failed for ${ type }:`, error);
  }
 }
 
@@ -160,8 +160,7 @@ export async function invalidateCacheByType(type: CacheType): Promise<void> {
 /**
  * Get cache statistics
  */
-export async function getCacheStats(): Promise<{
- available: boolean;
+export async function getCacheStats(): Promise<{ available: boolean;
  keyCount: number;
  memoryUsage?: string;
 } | null> {
@@ -235,12 +234,9 @@ export async function ragCacheSet(key: string): unknown {
 
 // GPU Engine Manifest Caching
 export interface GpuEngineManifest {
- engineId: string;
- sha256: string;
- path: string;
- model: string;
- version: string;
- createdAt: string;
+ engineId: string; sha256: string;
+ path: string; model: string;
+ version: string; createdAt: string;
  sizeBytes: number;
 }
 
@@ -265,7 +261,7 @@ export async function gpuEngineGet(engineId: string): Promise<GpuEngineManifest 
  return null;
  }
  const r = await getRedisClient();
- const key = `gpu:engine:${engineId}`;
+ const key = `gpu:engine:${ engineId }`;
  const v = await r.get(key);
  return safeJsonParse<GpuEngineManifest>(v);
  } catch (error) {
@@ -280,7 +276,7 @@ export async function gpuEngineGetBySha(sha256: string): Promise<string | null> 
  return null;
  }
  const r = await getRedisClient();
- const key = `gpu: engine, by_sha:${sha256}`;
+ const key = `gpu: engine, by_sha:${ sha256 }`;
  return await r.get(key);
  } catch (error) {
  console.warn('GPU engine SHA cache get failed:', error);
@@ -290,10 +286,8 @@ export async function gpuEngineGetBySha(sha256: string): Promise<string | null> 
 
 // Semantic Caching with Embeddings
 export interface SemanticCacheEntry {
- query: string;
- embedding: number[];
- result: unknown;
- timestamp: number;
+ query: string; embedding: number[];
+ result: unknown; timestamp: number;
 }
 
 export async function semanticCacheSet(query: string, embedding: number[]): unknown {
@@ -387,7 +381,7 @@ export function extractKeywords(data: any): string[] {
 
  // Split by common delimiters
  return data
- .split(/[,;|\n]/)
+ .split(/[;|\n]/)
  .map((s) => s.trim())
  .filter(Boolean);
  }
@@ -398,3 +392,7 @@ export function extractKeywords(data: any): string[] {
  return [];
  }
 }
+
+
+
+

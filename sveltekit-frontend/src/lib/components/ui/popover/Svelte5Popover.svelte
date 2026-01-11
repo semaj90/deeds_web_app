@@ -1,4 +1,6 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+
 /**
  * Svelte 5 Popover Component
  * Native HTML with Svelte 5 runes and accessible floating panel
@@ -142,3 +144,5 @@ $effect(() => {
 		animation: fade-in 0.15s ease-out;
 	}
 </style>
+
+

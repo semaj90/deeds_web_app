@@ -44,7 +44,8 @@ if (browser) {
  db = new Loki('rerank_cache.db'); // Use a distinct database name
  candidatesCollection = db.addCollection<Candidate>('rerank_candidates', {
  unique: ['id', 'rerankedScore'],
- }); // Ensure unique by id and score for reranked results
+ });
+  
  // Load database from IndexedDB if available
  db.loadDatabase({}, (err) => {
  if (err) console.error('Error loading Loki.js database: ', err);
@@ -74,7 +75,7 @@ async function webgpuRerank(
  const rerankedScore = base * 0.7 + overlap * 0.3;
  return { ...c, rerankedScore };
  });
- // simple async boundary to mimic heavier computation
+  
  await Promise.resolve();
  return scored.sort((a, b) => (b.rerankedScore ?? 0) - (a.rerankedScore ?? 0));
 }
@@ -88,7 +89,7 @@ export async function rerank(
  if (browser && candidatesCollection) {
  // Check if all candidates for this query are already cached
  // This is a simplified cache check. A more robust one would involve hashing the query and candidate IDs.
- cacheKey = `rerank:${query}:${candidates.map((c) => c.id).join(',')}`;
+ cacheKey = `rerank:${ query }:${candidates.map((c) => c.id).join(',')}`;
  const cachedResult = candidatesCollection.findOne({ 'metadata.cacheKey': cacheKey });
  if (cachedResult) {
  console.log('Cache hit for rerank: ', cacheKey);
@@ -116,7 +117,7 @@ export async function rerank(
  }
  } catch (err) {
  console.warn('Rerank API call or WebGPU fallback failed: ', err);
- // If API fails and fallback also fails, throw an error
+ // If API fails and fallback also fails; throw an error
  throw new Error('Failed to rerank candidates');
  }
 
@@ -151,3 +152,5 @@ export async function rerank(
  }
  return reranked;
 }
+
+

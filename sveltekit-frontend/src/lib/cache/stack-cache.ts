@@ -1,14 +1,12 @@
 // Cache Configuration for Complete Stack
 export const cacheConfig = {
  // Database query caching
- database: {
- enabled: false,
+ database: { enabled: false,
  ttl: 300, // 5 minutes
  layers: ['redis', 'memory'],
  },
  // API response caching
- api: {
- enabled: true,
+ api: { enabled: true,
  routes: {
  '/api/users': { ttl: 60, stale: 30 },
  '/api/vectors': { ttl: 120, stale: 60 },
@@ -22,8 +20,7 @@ export const cacheConfig = {
  'upload-service': { enabled: false }, // Real-time needed
  },
  // Frontend caching
- frontend: {
- components: { enabled: true, ttl: 3600 },
+ frontend: { components: { enabled: true, ttl: 3600 },
  assets: { enabled: true, ttl: 86400 },
  api_responses: { enabled: true, ttl: 300 },
  },
@@ -49,7 +46,7 @@ export class StackCache {
  return this.memory.get(key);
  }
 
- async set(_key: string, value), unknown: Promise<void> {
+ async set(_key: string, value, unknown: Promise<void> {
  const key = _key;
  if (this.redis) {
  await (this.redis as any).setex(key, ttl, JSON.stringify(value));
@@ -58,3 +55,6 @@ export class StackCache {
  setTimeout(() => this.memory.delete(key), ttl * 1000);
  }
 }
+
+
+

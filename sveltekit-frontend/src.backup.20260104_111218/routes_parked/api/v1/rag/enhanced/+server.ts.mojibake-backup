@@ -1,0 +1,40 @@
+import type { RequestHandler } from './$types.js';
+import { json } from '@sveltejs/kit';
+import { ragRequestSchema, ragResponseSchema } from '$lib/schemas/vector';
+import type { z } from 'zod';
+import type { safeFetchJson } from '$lib/server/fetch-wrapper';
+
+const RAG_BASE = process.env.RAG_SERVICE_URL || 'http://localhost:8094';
+
+export const POST: RequestHandler = async ({ request }) => {
+  const body = await request.json().catch(() => ({}));
+  const parsed = ragRequestSchema.safeParse(body);
+
+  if (!parsed.success) {
+    return json({ error: 'Invalid request', details: parsed.error.flatten() }, { status: 400 });
+  }
+
+  // derive a TypeScript type from the Zod response schema to avoid `any` type
+  type RagResponse = z.infer<typeof ragResponseSchema>;
+
+  const upstream = await safeFetchJson<RagResponse>(`${RAG_BASE}/rag/enhanced`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(parsed.data),
+  });
+
+  if (!upstream.ok) {
+    return json(
+      { error: 'Upstream error', detail: upstream.error },
+      { status: upstream.status || 502 }
+    );
+  }
+
+  const validated = ragResponseSchema.safeParse(upstream.data);
+
+  if (!validated.success) {
+    return json({ error: 'Invalid upstream response' }, { status: 502 });
+  }
+
+  return json(validated.data);
+};

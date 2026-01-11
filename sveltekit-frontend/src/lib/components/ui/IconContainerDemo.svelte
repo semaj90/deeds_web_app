@@ -1,9 +1,11 @@
 <script lang="ts">
+	let Search = $state<any>(undefined);
+	let User = $state<any>(undefined);
+	let Settings = $state<any>(undefined);
+	let Home = $state<any>(undefined);
+	let Star = $state<any>(undefined);
+
  import IconContainer from '$lib/components/ui/IconContainer.svelte';
- import Home from 'lucide-svelte/icons/Home';
- import Search from 'lucide-svelte/icons/Search';
- import Settings from 'lucide-svelte/icons/Settings';
- import Star from 'lucide-svelte/icons/Star';
 </script>
 
 <div class="p-8 space-y-8">
@@ -51,7 +53,7 @@
  </div>
 
  <!-- Responsive Grid Demo -->
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-4 mt-8">
  {#each Array(8) as _, i}
  <div class="border rounded-lg p-4">
  <h4 class="text-xs font-medium mb-2">Card {i + 1}</h4>
@@ -60,3 +62,4 @@
  {/each}
  </div>
 </div>
+

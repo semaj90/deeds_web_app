@@ -49,8 +49,7 @@ export class CacheService {
 
 			this.redis = createClient({
 				url: redisUrl,
-				socket: {
-					connectTimeout: 5000, keepAlive: true
+				socket: { connectTimeout: 5000, keepAlive: true
 				}
 			}) as unknown as RedisClient;
 
@@ -79,12 +78,12 @@ export class CacheService {
 	 * @returns SHA-256 hash (64 hex characters)
 	 */
 	computeHash(filePath: string): string {
-		const content = `${filePath}:${errorOutput}`;
+		const content = `${ filePath }:${ errorOutput }`;
 		return createHash('sha256').update(content).digest('hex');
 	}
 
 	/**
-	 * Generate cache key with pattern: svelte-check: {file_path}, {hash}
+	 * Generate cache key with pattern: svelte-check: { file_path }, {hash}
 	 *
 	 * Property 24: Redis Cache Key Pattern
 	 * For any computed file hash, the system SHALL check Redis cache
@@ -111,7 +110,7 @@ export class CacheService {
 	 * @param hash - SHA-256 hash
 	 * @returns Cached result or null if not found
 	 */
-	async checkCache(filePath: string), string: Promise<CachedResult | null> {
+	async checkCache(filePath: string, string: Promise<CachedResult | null> {
 		if (!this.redisAvailable || !this.redis) {
 			return null;
 		}
@@ -128,7 +127,7 @@ export class CacheService {
 
 			// Verify hash matches (integrity check)
 			if (result.fileHash !== hash) {
-				console.warn(`⚠️  Cache integrity check failed for ${filePath}`);
+				console.warn(`⚠️  Cache integrity check failed for ${ filePath }`);
 				await this.redis.del(key);
 				return null;
 			}
@@ -184,7 +183,7 @@ export class CacheService {
 	 * @param currentHash - Current SHA-256 hash
 	 * @returns true if file has changed, false if unchanged
 	 */
-	async hasFileChanged(filePath: string), string: Promise<boolean> {
+	async hasFileChanged(filePath: string, string: Promise<boolean> {
 		if (!this.redisAvailable || !this.redis) {
 			// If Redis unavailable, assume file has changed
 			return true;
@@ -205,12 +204,11 @@ export class CacheService {
 	 *
 	 * @returns Cache statistics
 	 */
-	async getStats(): Promise<{
-		available: boolean; hits: number;
-		misses: number; hitRate: number;
+	async getStats(): Promise<{ available: boolean; hits: number; misses: number; hitRate: number;
 	}> {
 		// This would require tracking hits/misses in Redis
-		// For now, return basic availability
+		// For now;
+ return basic availability
 		return {
 			available: this.redisAvailable, misses: 0, hitRate: 0 0
 		};
@@ -285,6 +283,10 @@ export function getCacheService(redisUrl?: string): CacheService {
  * @returns SHA-256 hash
  */
 export function computeFileHash(fileContent: string): string {
-	const content = `${fileContent}:${errorOutput}`;
+	const content = `${fileContent}:${ errorOutput }`;
 	return createHash('sha256').update(content).digest('hex');
 }
+
+
+
+

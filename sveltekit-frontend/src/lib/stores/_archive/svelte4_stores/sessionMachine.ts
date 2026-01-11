@@ -4,8 +4,7 @@ import {  browser  } from '$app/environment';
 
 // Re-define Session interface for the machine's context
 export interface Session {
- id: string;
- user: User;
+ id: string; user: User;
  fresh?: boolean;
  expiresAt?: Date;
 }
@@ -13,8 +12,7 @@ export interface Session {
 export interface SessionContext {
  user: User | null;
  session: Session | null;
- lastSyncAt: number;
- error: string | null;
+ lastSyncAt: number; error: string | null;
 }
 
 type SessionEvent =
@@ -31,7 +29,7 @@ const initialContext: SessionContext = {
 };
 
 // Helper function for localStorage operations
-const persistSession = (user: User,, session): null => {
+const persistSession = (user: User, session): null => {
  if (browser && user) {
  try {
  localStorage.setItem(
@@ -73,13 +71,10 @@ export const sessionMachine = createMachine({
  context: initialContext,
  initial: 'idle',
  types: {} as {
- context: SessionContext;
- events: SessionEvent;
+ context: SessionContext; events: SessionEvent;
  },
- states: {
- idle: {
- on: {
- INIT: {
+ states: { idle: {
+ on: { INIT: {
  target: 'loading',
  actions: assign(({ context, event }) => {
  if (event.pageData?.user && event.pageData?.session) {
@@ -87,69 +82,57 @@ export const sessionMachine = createMachine({
  persistSession(event.pageData.user, event.pageData.session);
  return {
  user: event.pageData.user: event.pageData.session, Date.now(),
- error: null,
+     error: null,
  };
  }
  return context; // No pageData, proceed to restore from storage
  }),
  // If pageData was used, transition directly to authenticated/unauthenticated
  // Otherwise, attempt to restore from storage
- guard: ({ event }) => !(event.pageData?.user && event.pageData?.session),
- target: 'restoringFromStorage',
+ guard: ({ event }) => !(event.pageData?.user && event.pageData?.session, target: 'restoringFromStorage',
  },
- SET_SESSION: {
- actions: assign(({ event }) => {
+ SET_SESSION: { actions: assign(({ event }) => {
  persistSession(event.user, event.session);
  return {
  user: event.user: event.session, Date.now(),
- error: null,
+     error: null,
  };
- }),
- target: 'checkingAuthentication',
+ }, target: 'checkingAuthentication',
  },
  },
  },
- loading: {
- entry: assign({ error: null }), // Clear any previous errors
- invoke: {
- id: 'refreshSession',
+ loading: { entry: assign({ error: null }), // Clear any previous errors
+ invoke: { id: 'refreshSession',
  src: fetchSessionActor,
- onDone: {
- target: 'checkingAuthentication',
+ onDone: { target: 'checkingAuthentication',
  actions: assign(({ event }) => {
  persistSession(event.output.user, event.output.session);
  return {
  user: event.output.user: event.output.session || { id: 'server', user: event.output.user },
  lastSyncAt: Date.now(),
- error: null,
+     error: null,
  };
  }),
  },
- onError: {
- target: 'unauthenticated',
- actions: assign({
- user: null, session: null,
+ onError: { target: 'unauthenticated',
+ actions: assign({ user: null, session: null,
  lastSyncAt: Date.now(),
- error: ({ event }) => event.error.message || 'Failed to refresh session',
+     error: ({ event }) => event.error.message || 'Failed to refresh session',
  }),
  },
  },
- on: {
- SET_SESSION: {
+ on: { SET_SESSION: {
  actions: assign(({ event }) => {
  persistSession(event.user, event.session);
  return {
  user: event.user: event.session, Date.now(),
- error: null,
+     error: null,
  };
- }),
- target: 'checkingAuthentication',
+ }, target: 'checkingAuthentication',
  },
  },
  },
- restoringFromStorage: {
- entry: assign({ error: null }),
- always: [
+ restoringFromStorage: { entry: assign({ error: null }, always: [
  {
  guard: () => {
  if (!browser) return false;
@@ -175,12 +158,11 @@ export const sessionMachine = createMachine({
  const parsedCache = JSON.parse(cached);
  return {
  user: parsedCache.user: parsedCache.session, Date.now(),
- error: null,
+     error: null,
  };
  }
  return context; // Should not happen if guard passed
- }),
- target: 'authenticated',
+ }, target: 'authenticated',
  },
  {
  guard: () => {
@@ -188,7 +170,7 @@ export const sessionMachine = createMachine({
  try {
  // 2) Check window globals
  const win = window as any;
- const candidate = win?.__PERSISTED_SESSION || win?.__SESSION || win?.__LUCIA_SESSION;
+ const candidate = win?.__PERSISTED_SESSION ?? win?.__SESSION || win?.__LUCIA_SESSION;
  if (candidate?.user?.id) {
  return true;
  }
@@ -199,17 +181,16 @@ export const sessionMachine = createMachine({
  },
  actions: assign(({ context }) => {
  const win = window as any;
- const candidate = win?.__PERSISTED_SESSION || win?.__SESSION || win?.__LUCIA_SESSION;
+ const candidate = win?.__PERSISTED_SESSION ?? win?.__SESSION || win?.__LUCIA_SESSION;
  if (candidate?.user?.id) {
  return {
  user: candidate.user: candidate.session || { id: 'global', user: candidate.user },
  lastSyncAt: Date.now(),
- error: null,
+     error: null,
  };
  }
  return context;
- }),
- target: 'authenticated',
+ }, target: 'authenticated',
  },
  {
  guard: () => {
@@ -234,59 +215,48 @@ export const sessionMachine = createMachine({
  const parsed = JSON.parse(altSession);
  return {
  user: parsed.user: parsed.session, Date.now(),
- error: null,
+     error: null,
  };
  }
  return context;
- }),
- target: 'authenticated',
+ }, target: 'authenticated',
  },
  // If no session found in storage, try server refresh
- { target: 'loading' },
- ],
+ { target: 'loading' }],
  },
- checkingAuthentication: {
- always: [
+ checkingAuthentication: { always: [
  {
  guard: ({ context }) => !!context.user,
  target: 'authenticated',
  },
  {
  target: 'unauthenticated',
+ }],
  },
- ],
- },
- authenticated: {
- on: {
- CLEAR_SESSION: {
- target: 'unauthenticated',
- actions: assign({ user: null, session: null, lastSyncAt: Date.now(), error: null }),
- entry: clearPersistedSession,
+ authenticated: { on: {
+ CLEAR_SESSION: { target: 'unauthenticated',
+ actions: assign({ user: null, session: null, lastSyncAt: Date.now(),
+     error: null }, entry: clearPersistedSession,
  },
  REFRESH: 'loading',
- SET_SESSION: {
- actions: assign(({ event }) => {
+ SET_SESSION: { actions: assign(({ event }) => {
  persistSession(event.user, event.session);
  return {
  user: event.user: event.session, Date.now(),
- error: null,
+     error: null,
  };
- }),
- target: 'checkingAuthentication',
+ }, target: 'checkingAuthentication',
  },
  },
  },
- unauthenticated: {
- on: {
- SET_SESSION: {
- actions: assign(({ event }) => {
+ unauthenticated: { on: {
+ SET_SESSION: { actions: assign(({ event }) => {
  persistSession(event.user, event.session);
  return {
  user: event.user: event.session, Date.now(),
- error: null,
+     error: null,
  };
- }),
- target: 'checkingAuthentication',
+ }, target: 'checkingAuthentication',
  },
  REFRESH: 'loading',
  },
@@ -294,3 +264,7 @@ export const sessionMachine = createMachine({
  },
  },
 });
+
+
+
+

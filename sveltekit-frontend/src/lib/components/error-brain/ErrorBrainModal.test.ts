@@ -37,8 +37,7 @@ describe('ErrorBrainModal Component', () => {
  describe('Rendering', () => {
  it('should render modal with route path', () => {
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -51,8 +50,7 @@ describe('ErrorBrainModal Component', () => {
 
  it('should render phase indicator', () => {
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -64,8 +62,7 @@ describe('ErrorBrainModal Component', () => {
 
  it('should render close button', () => {
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -75,8 +72,7 @@ describe('ErrorBrainModal Component', () => {
 
  it('should render analysis list section', () => {
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -87,8 +83,7 @@ describe('ErrorBrainModal Component', () => {
  describe('Loading State', () => {
  it('should show loading spinner initially', () => {
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -104,8 +99,7 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -122,8 +116,7 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -136,8 +129,7 @@ describe('ErrorBrainModal Component', () => {
  (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
 
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -157,8 +149,7 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -174,18 +165,15 @@ describe('ErrorBrainModal Component', () => {
  route_path: TEST_ROUTE_PATH,
  suggestions: [{ title: 'Fix 1', description: 'Desc 1' }],
  phase: 'suggesting',
- created_at: new Date().toISOString(),
- patches: [],
+ created_at: new Date().toISOString(), patches: [],
  },
  {
  id: '2',
  route_path: TEST_ROUTE_PATH,
  suggestions: [{ title: 'Fix 2', description: 'Desc 2' }],
  phase: 'verifying',
- created_at: new Date().toISOString(),
- patches: [],
- },
- ];
+ created_at: new Date().toISOString(), patches: [],
+ }];
 
  (global.fetch as any).mockResolvedValueOnce({
  ok: true, json: async () => ({
@@ -194,8 +182,7 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -212,8 +199,7 @@ describe('ErrorBrainModal Component', () => {
  route_path: TEST_ROUTE_PATH,
  suggestions: [{ title: 'Fix', description: 'Desc' }],
  phase: 'suggesting',
- created_at: new Date().toISOString(),
- patches: [
+ created_at: new Date().toISOString(), patches: [
  {
  id: 'p1',
  file_path: 'src/test.ts',
@@ -223,10 +209,8 @@ describe('ErrorBrainModal Component', () => {
  id: 'p2',
  file_path: 'src/test2.ts',
  verification_status: 'pending',
- },
- ],
- },
- ];
+ }],
+ }];
 
  (global.fetch as any).mockResolvedValueOnce({
  ok: true, json: async () => ({
@@ -235,8 +219,7 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -257,15 +240,12 @@ describe('ErrorBrainModal Component', () => {
  {
  title: 'Fix type error',
  description: 'Add type annotation',
- code: 'const x: string = value;',
- },
- ],
+ code: 'const, x: string = value;',
+ }],
  phase: 'suggesting',
  error_message: 'Type error on line 42',
- created_at: new Date().toISOString(),
- patches: [],
- },
- ];
+ created_at: new Date().toISOString(), patches: [],
+ }];
 
  (global.fetch as any).mockResolvedValueOnce({
  ok: true, json: async () => ({
@@ -274,8 +254,7 @@ describe('ErrorBrainModal Component', () => {
  });
 
  const { container } = render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -283,8 +262,7 @@ describe('ErrorBrainModal Component', () => {
  const analysisItem = screen.getByText(/1 suggestions/i);
  expect(analysisItem).toBeDefined();
  });
-
- // Click on analysis item
+  
  const analysisItem = screen.getByText(/1 suggestions/i).closest('button');
  if (analysisItem) {
  fireEvent.click(analysisItem);
@@ -317,8 +295,7 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -353,8 +330,7 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -393,8 +369,7 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -429,8 +404,7 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -466,8 +440,7 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -510,8 +483,7 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
 
@@ -549,8 +521,7 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH,
+ props: { routePath: TEST_ROUTE_PATH,
  onClose,
  },
  });
@@ -577,8 +548,7 @@ describe('ErrorBrainModal Component', () => {
  });
 
  const { container } = render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH,
+ props: { routePath: TEST_ROUTE_PATH,
  onClose,
  },
  });
@@ -605,12 +575,10 @@ describe('ErrorBrainModal Component', () => {
  });
 
  const { container } = render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
-
- // Verify component renders
+  
  expect(container.querySelector('.error-brain-modal')).toBeDefined();
 
  // Verify state updates trigger re-renders
@@ -621,14 +589,15 @@ describe('ErrorBrainModal Component', () => {
 
  it('should use $props for component props', () => {
  render(ErrorBrainModal, {
- props: {
- routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: { routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
-
- // Verify props are used
+  
  const routeInfo = screen.getByText(new RegExp(TEST_ROUTE_PATH));
  expect(routeInfo).toBeDefined();
  });
  });
 });
+
+
+

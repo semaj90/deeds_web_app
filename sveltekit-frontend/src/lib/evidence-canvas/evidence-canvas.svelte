@@ -7,6 +7,8 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
+	let item = $state<any>(undefined);
+
  import { onDestroy, onMount } from 'svelte';
  import type { AISuggestion, SuggestionContext } from './ai-suggestions-service';
  import { aiSuggestionsService } from './ai-suggestions-service';
@@ -17,7 +19,7 @@ https://svelte.dev/e/js_parse_error -->
  import GraphControlPanel from './graph-control-panel.svelte';
  import { graphLayoutGPU } from './graph-layout-gpu';
  import { webgpuInitService } from './webgpu-init-service';
- type EvidenceEdge = { source: string, target: string: string };
+ type EvidenceEdge = { source: string, target: string };
 
  let { caseId, caseType = 'general', jurisdiction = 'general', initialNodes = [], initialEdges = [] } = $props<{ caseId: string; caseType?: string; jurisdiction?: string; initialNodes?: EvidenceNode[]; initialEdges?: EvidenceEdge[]; }>();
 
@@ -227,30 +229,24 @@ https://svelte.dev/e/js_parse_error -->
 
 <style>
  .evidence-canvas-container {
- display: flex;
- height: 100vh;
- background: #1a1a1a;
- color: #ffffff;
+ display: flex; height: 100vh;
+ background: #1a1a1a; color: #ffffff;
  }
 
  .canvas-main {
- flex: 1;
- position: relative;
+ flex: 1; position: relative;
  }
 
  .control-panel {
- width: 300px;
- background: #2a2a2a;
+ width: 300px; background: #2a2a2a;
  border-left: 1px solid #444;
  padding: 1rem;
  overflow-y: auto;
  }
 
  .suggestions-panel {
- position: absolute;
- bottom: 0;
- left: 0;
- right: 300px;
+ position: absolute; bottom: 0;
+ left: 0; right: 300px;
  background: rgba(42, 42, 42, 0.95);
  border-top: 1px solid #444;
  padding: 1rem;
@@ -266,17 +262,13 @@ https://svelte.dev/e/js_parse_error -->
 
  .suggestions-list {
  display: flex;
- flex-direction: column;
- gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .suggestion-item {
- background: #333;
- border: 1px solid #555;
- border-radius: 8px;
- padding: 1rem;
- cursor: pointer;
- transition: all 0.2s ease;
+ background: #333; border: 1px solid #555;
+ border-radius: 8px; padding: 1rem;
+ cursor: pointer; transition: all 0.2s ease;
  }
 
  .suggestion-item:hover {
@@ -291,8 +283,7 @@ https://svelte.dev/e/js_parse_error -->
 
  .suggestion-header {
  display: flex;
- align-items: center;
- gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  margin-bottom: 0.5rem;
  }
 
@@ -324,8 +315,7 @@ https://svelte.dev/e/js_parse_error -->
  .priority-critical { background: #d32f2f; color: white; }
 
  .suggestion-confidence {
- font-size: 0.75rem;
- color: #4fc3f7;
+ font-size: 0.75rem; color: #4fc3f7;
  font-weight: bold;
  }
 
@@ -351,3 +341,6 @@ https://svelte.dev/e/js_parse_error -->
  margin-bottom: 0.25rem;
  }
 </style>
+
+
+

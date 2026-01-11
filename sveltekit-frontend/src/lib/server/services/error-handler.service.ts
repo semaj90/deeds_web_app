@@ -15,8 +15,7 @@ export interface RetryOptions {
 export interface ErrorContext {
  operation: string;
  caseId?: string;
- userId?: string;
- error: Error;
+ userId?: string; error: Error;
  attempt?: number;
 }
 
@@ -54,7 +53,7 @@ export class ErrorHandlerService {
  );
 
  console.warn(
- `${operationName} failed (attempt ${attempt + 1}/${config.maxRetries! + 1}), retrying in ${delay}ms:`,
+ `${ operationName } failed (attempt ${attempt + 1}/${config.maxRetries! + 1}), retrying in ${delay}ms:`,
  lastError.message
  );
 
@@ -63,7 +62,7 @@ export class ErrorHandlerService {
  }
  }
 
- throw lastError || new Error(`${operationName} failed after ${config.maxRetries} retries`);
+ throw lastError || new Error(`${ operationName } failed after ${config.maxRetries} retries`);
  }
 
  /**
@@ -77,12 +76,12 @@ export class ErrorHandlerService {
  try {
  return await primary();
  } catch (error) {
- console.warn(`${operationName} primary operation failed, using fallback:`, error);
+ console.warn(`${ operationName } primary operation failed, using fallback:`, error);
 
  try {
  return await fallback();
  } catch (fallbackError) {
- console.error(`${operationName} fallback also failed:`, fallbackError);
+ console.error(`${ operationName } fallback also failed:`, fallbackError);
  throw fallbackError;
  }
  }
@@ -102,8 +101,7 @@ export class ErrorHandlerService {
  () => reject(new Error(`${operationName} timed out after ${timeoutMs}ms`)),
  timeoutMs
  )
- ),
- ]);
+ )]);
  }
 
  /**
@@ -184,8 +182,7 @@ export class ErrorHandlerService {
  'EHOSTUNREACH',
  'timeout',
  'temporarily unavailable',
- 'service unavailable',
- ];
+ 'service unavailable'];
 
  const errorMessage = error.message.toLowerCase();
  return transientPatterns.some((pattern) => errorMessage.includes(pattern.toLowerCase()));
@@ -201,8 +198,7 @@ export class ErrorHandlerService {
  'not found',
  'invalid',
  'malformed',
- 'syntax error',
- ];
+ 'syntax error'];
 
  const errorMessage = error.message.toLowerCase();
  return permanentPatterns.some((pattern) => errorMessage.includes(pattern.toLowerCase()));
@@ -210,3 +206,6 @@ export class ErrorHandlerService {
 }
 
 export const errorHandlerService = new ErrorHandlerService();
+
+
+

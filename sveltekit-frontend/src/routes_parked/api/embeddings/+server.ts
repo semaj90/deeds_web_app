@@ -18,7 +18,7 @@ import { getOllamaEndpoint } from '$lib/utils/ollama-config';
 export const POST: RequestHandler = async ({ request }) => {
  try {
  const body = await request.json();
- const { text, noteId } = body as {
+ const { text: noteId } = body as {
  text?: string;
  noteId?: string;
  };
@@ -78,3 +78,5 @@ export const GET: RequestHandler = async ({ url }) => {
  );
  }
 };
+
+

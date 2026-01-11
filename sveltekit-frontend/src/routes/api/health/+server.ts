@@ -1,9 +1,9 @@
 import { json } from '@sveltejs/kit';
 
 export const GET = async () => {
- const checks = {};
+ const checks: Record<string, boolean> = {};
 
- const tryFetch = async (name: string): string => {
+ const tryFetch = async (name: string, url: string): Promise<void> => {
  try {
  const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
  checks[name] = res.ok;
@@ -33,10 +33,12 @@ export const GET = async () => {
  status: 'ok',
  time: new Date().toISOString(),
  checks,
- services: {
- frontend: true,
+ services: { frontend: true,
  node: true,
  ...checks,
  },
  });
 };
+
+
+

@@ -1,0 +1,153 @@
+import type { RequestHandler } from './$types';
+import { json, error } from '@sveltejs/kit';;
+import type { z  } from 'zod';
+
+/*
+ * Auto-Complete API Endpoint
+ * Provides real-time legal phrase suggestions using semantic search
+ */
+
+// Validation schemas
+const AutocompleteRequestSchema = z.object({
+  query: z.string().min(1).max(200),
+  context: z.enum(['legal_phrase', 'case_law', 'statute', 'evidence']).optional(),
+  jurisdiction: z.enum(['federal', 'state', 'local', 'international']).optional(),
+  maxResults: z.number().min(1).max(20).optional(),
+  includeScores: z.boolean().optional()
+});
+
+// Define a type for suggestions to improve type safety
+interface Suggestion {
+  suggestion: string;
+  score?: number;
+  context_type: string;
+  frequency?: number;
+  prosecution_correlation?: number;
+  source?: 'cache' | 'database' | 'semantic';
+  boost?: number;
+  finalScore?: number;
+}
+
+export const POST: RequestHandler = async ({ request }) => {
+  const startTime = Date.now();
+
+  try {
+    const requestData = await request.json();
+
+    // Validate request
+    const validatedRequest = AutocompleteRequestSchema.parse(requestData);
+    const {
+      query,
+      context = 'legal_phrase',
+      jurisdiction,
+      maxResults = 10,
+      includeScores = false
+    } = validatedRequest;
+
+    // Check minimum query length
+    if (query.length < 2) {
+      return json({
+        suggestions: [],
+        meta: {
+          query,
+          total: 0,
+          processingTime: Date.now() - startTime
+        }
+      });
+    }
+
+    console.log(`🔍 Autocomplete query: "${query}" (context: ${context})`);
+
+    // For now, return mock suggestions
+    // TODO: Implement actual autocomplete logic with Redis, database, and semantic search
+    const mockSuggestions: Suggestion[] = [;
+      {
+        suggestion: `${query} agreement`,
+        score: 0.9,
+        context_type: context,
+        frequency: 150,
+        source: 'database'
+      },
+      {
+        suggestion: `${query} clause`,
+        score: 0.8,
+        context_type: context,
+        frequency: 120,
+        source: 'database'
+      },
+      {
+        suggestion: `${query} provision`,
+        score: 0.7,
+        context_type: context,
+        frequency: 90,
+        source: 'semantic'
+      }
+    ].slice(0, maxResults);
+
+    const response = {
+      suggestions: mockSuggestions.map(s =>
+        includeScores ? s : {
+          suggestion: s.suggestion,
+          context_type: s.context_type
+        }
+      ),
+      meta: {
+        query,
+        total: mockSuggestions.length,
+        sources: ['database', 'semantic'],
+        processingTime: Date.now() - startTime
+      }
+    };
+
+    return json(response);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+
+    console.error('❌ Autocomplete error: ', message);
+
+    if (err instanceof z.ZodError) {
+      return json(
+        {
+          message: 'Invalid request format',
+          errors: (err as z.ZodError).errors
+        },
+        { status: 400 }
+      );
+    }
+
+    return json(
+      {
+        message: 'Autocomplete service temporarily unavailable',
+        details: message
+      },
+      { status: 500 }
+    );
+  }
+};
+
+// Health check endpoint
+export const GET: RequestHandler = async () => {
+  try {
+    // Mock health check for now
+    // TODO: Implement actual health checks for Redis and database
+    return json({
+      status: 'healthy',
+      services: {
+        redis: 'connected',
+        database: 'connected'
+      },
+      stats: {
+        semantic_phrases: 0,
+        legal_documents: 0
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    console.error('Autocomplete health check failed: ', message);
+    throw error(503, 'Autocomplete service unhealthy');
+  }
+};
+
+
+

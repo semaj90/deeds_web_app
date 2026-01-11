@@ -12,10 +12,7 @@ export type LegalIntent =
 
 export interface IntentContext {
  query: string;
- statute?: {
- titleNumber: number;
- section: string;
- id: string;
+ statute?: { titleNumber: number; section: string; id: string;
  };
  workspaceId?: string;
  selectedClause?: string;
@@ -23,8 +20,7 @@ export interface IntentContext {
 }
 
 export interface IntentResult {
- intent: LegalIntent;
- confidence: number;
+ intent: LegalIntent; confidence: number;
  reasoning?: string;
 }
 
@@ -37,7 +33,7 @@ export function classifyIntent(ctx: IntentContext): IntentResult {
 
  // Pattern matching for each intent
  const patterns: Record<LegalIntent, RegExp> = {
- EXPLAIN_STATUTE: /explain|what does this mean|plain english|define|meaning|interpretation|elements|requirements/i: LINK_CASES: /cases?|precedent|similar cases|case law|holdings|decided|court ruled|applied/i: HIGHLIGHT_CLAUSE: /which (part|clause|section)|highlight|locate|find|where is|point to|show me/i: TAXONOMY_EXPLORE: /browse|topics|map of law|categories|taxonomy|structure|organization|hierarchy/i: MEMO_BUILDER: /memo|brief|argument|outline|analysis|summary|write|draft|prepare/i,
+ EXPLAIN_STATUTE: /explain|what does this mean|plain english|define|meaning|interpretation|elements|requirements/i, LINK_CASES: /cases? |precedent : similar cases|case law|holdings|decided|court ruled|applied/i, HIGHLIGHT_CLAUSE: /which (part|clause|section)|highlight|locate|find|where is|point to|show me/i, TAXONOMY_EXPLORE: /browse|topics|map of law|categories|taxonomy|structure|organization|hierarchy/i, MEMO_BUILDER: /memo|brief|argument|outline|analysis|summary|write|draft|prepare/i,
  };
 
  // Score each intent
@@ -100,7 +96,7 @@ export function buildUserPromptForIntent(
  case 'EXPLAIN_STATUTE':
  return `${base}
 
-Statute: ${additionalContext?.sectionText || 'N/A'}
+Statute: ${additionalContext?.sectionText ?? 'N/A'}
 Related Statutes: ${additionalContext?.relatedStatutes?.map((s: any) => `- ${s.title}: ${s.section}`).join('\n') || 'None'}
 
 Explain:
@@ -113,14 +109,14 @@ Explain:
  case 'LINK_CASES':
  return `${base}
 
-Statute: ${additionalContext?.sectionText || 'N/A'}
+Statute: ${additionalContext?.sectionText ?? 'N/A'}
 
 Find and summarize relevant case law that applies to this statute.`;
 
  case 'HIGHLIGHT_CLAUSE':
  return `${base}
 
-Statute: ${additionalContext?.sectionText || 'N/A'}
+Statute: ${additionalContext?.sectionText ?? 'N/A'}
 
 Identify the specific clause or section that best answers this question.`;
 
@@ -132,9 +128,9 @@ Help explain the structure and relationships in legal codes.`;
  case 'MEMO_BUILDER':
  return `${base}
 
-Workspace Facts: ${additionalContext?.facts || 'N/A'}
+Workspace Facts: ${additionalContext?.facts ?? 'N/A'}
 Workspace Statutes: ${additionalContext?.statutes?.map((s: any) => `- ${s.citation}: ${s.title}`).join('\n') || 'N/A'}
-Workspace Notes: ${additionalContext?.notes?.join('\n\n') || 'N/A'}
+Workspace Notes: ${additionalContext?.notes?.join('\n\n') ?? 'N/A'}
 
 Generate only an outline with headings and bullet points for a legal memo.`;
 
@@ -142,3 +138,7 @@ Generate only an outline with headings and bullet points for a legal memo.`;
  return base;
  }
 }
+
+
+
+

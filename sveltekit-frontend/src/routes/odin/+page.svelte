@@ -14,7 +14,7 @@
 
   // Svelte 5 Derived State
   // Using simple derivation here
-  let userName = $derived(data.user?.username?.toUpperCase() || 'UNKNOWN');
+  let userName = $derived(data.user?.username?.toUpperCase() ?? 'UNKNOWN');
 
   function runScan() {
     isScanning = true;
@@ -58,7 +58,7 @@
 
       // In a real implementation, we would fetch('/api/ingest', { method: 'POST', body: formData })
     } catch (err) {
-      processingLog = [...processingLog, `> ERROR: ${err}`];
+      processingLog = [...processingLog, `> ERROR: ${ err }`];
       processingStatus = 'idle';
     }
   }
@@ -110,7 +110,7 @@
             </div>
             <div class="nes-row px-0 py-1 grid-cols-[1fr_auto]">
               <span class="text-nes-muted">ROLE</span>
-              <span class="text-nes-text">{data.role}</span>
+              <span class="text-nes-text">{data.user?.role ?? 'INVESTIGATOR'}</span>
             </div>
           </div>
         </div>
@@ -152,7 +152,7 @@
             class="nes-btn {activeTab === tab ? 'nes-btn-primary' : 'nes-btn-ghost'} uppercase"
             onclick={() => activeTab = tab}
           >
-            {tab}
+            { tab }
           </button>
         {/each}
       </div>
@@ -292,3 +292,6 @@
     </section>
   </main>
 </div>
+
+
+

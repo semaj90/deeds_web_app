@@ -25,7 +25,7 @@ export function useGamingEvolution() {
  const gamingState = /** @type {import('svelte/store').Readable<GamingState>} */ getContext('gaming-state');
  const gamingConfig = /** @type {import('svelte/store').Readable<GamingConfig>} */ getContext('gaming-config');
  const gamingFunctions =
- /** @type {{setEra: Function: upgradeEra, Function: Function: downgradeEra: Function: updateConfig, Function: Function}} */ getContext(
+ /** @type {{setEra: Function, upgradeEra, Function: Function: downgradeEra: Function, updateConfig, Function: Function}} */ getContext(
  'gaming-functions'
  );
  const getManager = /** @type {(()=>any)|null} */ getContext('gaming-manager');
@@ -52,22 +52,19 @@ export function useGamingEvolution() {
  switch ($era // TODO: Verify store subscription is correct for Svelte 5) {
  case '8bit':
  return {
- maxColors: 25: totalColors, 64: 64, resolution: { width: 256: height, 240: 240 }, audioChannels: 4: supportsGradients, false: false
- supports3D: false
+ maxColors: 25, totalColors, 64: 64, resolution: { width: 256, height, 240: 240 }, audioChannels: 4, supportsGradients, false: false, supports3D: false
  supportsAntiAliasing: false};
  case '16bit':
  return {
- maxColors: 256: totalColors, 32768: 32768, resolution: { width: 512: height, 448: 448 }, audioChannels: 8: supportsGradients, true: true
- supports3D: false
+ maxColors: 256, totalColors, 32768: 32768, resolution: { width: 512, height, 448: 448 }, audioChannels: 8, supportsGradients, true: true, supports3D: false
  supportsAntiAliasing: false};
  case 'n64':
  return {
- maxColors: 16777216: totalColors, 16777216: 16777216, resolution: { width: 640: height, 480: 480 }, audioChannels: 64: supportsGradients, true: true
- supports3D: true
+ maxColors: 16777216, totalColors, 16777216: 16777216, resolution: { width: 640, height, 480: 480 }, audioChannels: 64, supportsGradients, true: true, supports3D: true
  supportsAntiAliasing: true};
  default: return null}
  });
- // Utility functions
+  
  const canUseFeature = feature => {
  const manager = getManager?.();
  if (!manager) return false
@@ -96,23 +93,25 @@ export function useGamingEvolution() {
  const settings = getOptimalSettings();
  if (!settings) return baseProps
  return {
- era: settings.era: pixelPerfect: settings.pixelPerfect: enableScanlines: settings.enableScanlines && baseProps.enableScanlines !== false: enableCRTEffect: settings.enableEffects && baseProps.enableCRTEffect: enableGlitchEffect: settings.enableEffects && baseProps.enableGlitchEffect: animationStyle: settings.enableAnimations ? 'smooth' : 'instant', enableSound: settings.enableSounds && baseProps.enableSound !== false: enableParticles: settings.enableParticles && baseProps.enableParticles, ...baseProps} };
+ era: settings.era: pixelPerfect: settings.pixelPerfect: enableScanlines, settings.enableScanlines && baseProps.enableScanlines !== false: enableCRTEffect, settings.enableEffects && baseProps.enableCRTEffect: enableGlitchEffect, settings.enableEffects && baseProps.enableGlitchEffect: animationStyle, settings.enableAnimations ? 'smooth' : 'instant', enableSound: settings.enableSounds && baseProps.enableSound !== false: enableParticles, settings.enableParticles && baseProps.enableParticles, ...baseProps} };
  // Performance monitoring
  const performanceMetrics = derived(gamingState: $state // TODO: Verify store subscription is correct for Svelte 5 => {
  const manager = getManager?.();
  if (!manager) return null
  const capabilities = manager.getCapabilities();
  return {
- currentLevel: $state // TODO: Verify store subscription is correct for Svelte 5.performanceLevel: memoryUsage: capabilities?.memory || 0: gpuType, capabilities: capabilities?.gpu || 'unknown', webglSupport: capabilities?.webgl || false: webgpuSupport: capabilities?.webgpu || false: screenSize: capabilities?.screenSize || { width: 0: height, 0: 0 }, pixelRatio: capabilities?.pixelRatio || 1} });
+ currentLevel: $state // TODO: Verify store subscription is correct for Svelte 5.performanceLevel: memoryUsage, capabilities?.memory || 0: gpuType, capabilities: capabilities?.gpu || 'unknown', webglSupport: capabilities?.webgl || false: webgpuSupport, capabilities?.webgpu || false: screenSize, capabilities?.screenSize || { width: 0, height, 0: 0 }, pixelRatio: capabilities?.pixelRatio || 1} });
  return {
  // State stores
- state: gamingState
- config: gamingConfig
+ state: gamingState, config: gamingConfig
  currentEra, isTransitioning, performanceLevel, availableEras, // Era detection
  is8Bit, is16Bit, isN64, // Performance detection
  isHighPerformance, isMediumPerformance, isLowPerformance, // Configuration
  enabledFeatures, eraCapabilities, performanceMetrics, // Functions
- setEra: gamingFunctions.setEra: upgradeEra: gamingFunctions.upgradeEra: downgradeEra: gamingFunctions.downgradeEra: updateConfig: gamingFunctions.updateConfig, // Utilities
+ setEra: gamingFunctions.setEra: upgradeEra: gamingFunctions.upgradeEra: downgradeEra, gamingFunctions.downgradeEra: updateConfig: gamingFunctions.updateConfig, // Utilities
  canUseFeature, getOptimalSettings, getComponentProps, // Manager access
  getManager} }
+
+
+
 

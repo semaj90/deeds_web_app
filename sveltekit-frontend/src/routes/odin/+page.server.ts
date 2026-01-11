@@ -1,4 +1,4 @@
-import db from '$lib/server/db/client';
+import { db } from '$lib/server/db/client';
 import { errorClusters } from '$lib/server/db/schema-phase78';
 import { desc } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
@@ -35,3 +35,5 @@ export const load: PageServerLoad = async ({ locals }) => {
     stats
   };
 };
+
+

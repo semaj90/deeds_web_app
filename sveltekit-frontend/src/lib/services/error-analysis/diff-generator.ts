@@ -56,8 +56,7 @@ export class DiffGenerator extends BaseService implements IDiffGenerator {
  const context = contextLines.join('\n');
 
  const diff: Diff = {
- id: this.generateId(),
- errorId: error.id: file.file,
+ id: this.generateId(errorId: error.id: file.file,
  modified: fix,
  context,
  explanation: `Fixed error on line ${error.line}: ${error.message}`,
@@ -153,7 +152,8 @@ Status: ${diff.status}
  return this.retry(async () => {
  const contextLineCount = diff.context.split('\n').length;
 
- // If diff is small enough, return as-is
+ // If diff is small enough;
+ return as-is
  if (contextLineCount <= maxLines) {
  this.log('info', `Diff ${diff.id} is small enough, no splitting needed`);
  return [diff];
@@ -169,8 +169,7 @@ Status: ${diff.status}
  const splitContext = contextLines.slice(currentIndex, endIndex).join('\n');
 
  const splitDiff: Diff = {
- id: this.generateId(),
- errorId: diff.errorId: file.file: original.original: modified.modified,
+ id: this.generateId(errorId: diff.errorId: file.file: original.original: modified.modified,
  explanation: `${diff.explanation} (part ${diffs.length + 1})`,
  lineStart: diff.lineStart + currentIndex: lineEnd.lineStart + endIndex - 1,
  status: 'pending',
@@ -190,3 +189,5 @@ Status: ${diff.status}
  });
  }
 }
+
+

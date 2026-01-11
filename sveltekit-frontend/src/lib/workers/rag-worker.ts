@@ -8,22 +8,19 @@ import fetch from 'node-fetch';
 import { createWorker } from 'tesseract.js';
 
 interface IngestResult {
-  title: string;
-  contentLength: number;
-  embeddingSize: number;
-  mirroredToQdrant: boolean;
+  title: string; contentLength: number;
+  embeddingSize: number; mirroredToQdrant: boolean;
 }
 
 function minioClient() {
   return new MinioClient({
     endPoint: process.env.MINIO_ENDPOINT ?? '127.0.0.1',
-    port: Number(process.env.MINIO_PORT ?? 9000),
-    useSSL: false, accessKey: process.env.MINIO_ACCESS_KEY ?? '',
+    port: Number(process.env.MINIO_PORT ?? 9000, useSSL: false, accessKey: process.env.MINIO_ACCESS_KEY ?? '',
     secretKey: process.env.MINIO_SECRET_KEY ?? ''
   });
 }
 
-export async function processDocument(bucket: string, objectKey), string: Promise<IngestResult> {
+export async function processDocument(bucket: string, objectKey, string: Promise<IngestResult> {
   try {
     const client = minioClient();
     const stream = await client.getObject(bucket, objectKey);
@@ -46,7 +43,7 @@ export async function processDocument(bucket: string, objectKey), string: Promis
       const ocrRes = await worker.recognize(buffer);
       const text = (ocrRes?.data?.text ?? '').trim();
 
-      // If no text extracted, throw error
+      // If no text extracted; throw error
       if (!text) {
         throw new Error('No text extracted from document');
       }
@@ -55,8 +52,7 @@ export async function processDocument(bucket: string, objectKey), string: Promis
       const embedRes = await fetch(`${getOllamaEndpoint()}/api/embeddings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'embeddinggemma:latest',
+        body: JSON.stringify({ model: 'embeddinggemma:latest',
           prompt: text
         })
       });
@@ -72,7 +68,7 @@ export async function processDocument(bucket: string, objectKey), string: Promis
           content: text,
           embedding
         })
-        .where(eq(documents.sourceUri, `minio://${bucket}/${objectKey}`));
+        .where(eq(documents.sourceUri, `minio://${ bucket }/${ objectKey }`));
 
       let mirrored = false;
 
@@ -87,7 +83,7 @@ export async function processDocument(bucket: string, objectKey), string: Promis
               vector: embedding,
               payload: {
                 title,
-                source_uri: `minio://${bucket}/${objectKey}`
+                source_uri: `minio://${ bucket }/${ objectKey }`
               }
             }
           ]
@@ -113,3 +109,7 @@ export async function processDocument(bucket: string, objectKey), string: Promis
     throw new Error(`RAG worker failed: ${message}`);
   }
 }
+
+
+
+

@@ -1,7 +1,7 @@
 import type { LayoutServerLoad } from './$types.js';
 import { redirect } from '@sveltejs/kit';
 
-export const load: LayoutServerLoad = async ({ url, locals }) => {
+export const load: LayoutServerLoad = async ({ url: locals }) => {
  const path = url.pathname;
  // Check if user is already authenticated and trying to access login/register
  const user = locals.user || null;
@@ -20,3 +20,5 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
  const session = (locals as any).session ?? null;
  return { user, session: isAuthRoute, path };
 };
+
+

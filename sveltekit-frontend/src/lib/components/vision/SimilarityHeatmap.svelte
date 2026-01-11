@@ -1,7 +1,6 @@
 <script lang="ts">
  interface SimilarityData {
- id: string;
- score: number;
+ id: string; score: number;
  thumbUrl: string;
  }
 
@@ -83,3 +82,6 @@
  </div>
  {/if}
 </div>
+
+
+

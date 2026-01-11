@@ -6,3 +6,6 @@ declare module 'pgvector/drizzle' {
  ): import('drizzle-orm/pg-core').AnyColumn;
  export default vector;
 }
+
+
+

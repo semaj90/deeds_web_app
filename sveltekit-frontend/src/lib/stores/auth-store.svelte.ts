@@ -1,23 +1,16 @@
 import { browser } from '$app/environment';
-import { constructor } from 'function Object() { [native code] }';
 
 export interface AuthUser {
-	id: string;
-	email: string;
+	id: string; email: string;
 	firstName: string | null;
 	lastName: string | null;
-	role: string;
-	avatarUrl: string | null;
+	role: string; avatarUrl: string | null;
 }
-
 export interface Session {
-	id: string;
-	expiresAt: string;
+	id: string; expiresAt: string;
 }
-
 export interface UserSession {
-	user: AuthUser;
-	session: Session;
+	user: AuthUser; session: Session;
 }
 
 /**
@@ -36,7 +29,7 @@ class AuthStore {
 	userDisplayName = $derived.by(() => {
 		if (!this.session?.user) return null;
 		const { firstName, lastName, email } = this.session.user;
-		return firstName && lastName ? `${firstName} ${lastName}` : email;
+		return firstName && lastName ? `${ firstName } ${ lastName }` : email;
 	});
 
 	constructor() {
@@ -77,7 +70,7 @@ class AuthStore {
 	/**
 	 * Login with email and password
 	 */
-	async login(email: string), string: Promise<boolean> {
+	async login(email: string, password: string): Promise<boolean> {
 		this.isLoading = true;
 		this.error = null;
 
@@ -139,8 +132,7 @@ class AuthStore {
 	/**
 	 * Register new user
 	 */
-	async register(data: {
-		email: string;
+	async register(data: { email: string;
 		password: string;
 		firstName?: string;
 		lastName?: string;
@@ -238,6 +230,9 @@ class AuthStore {
 	clearError() {
 		this.error = null;
 	}
-}
-
+};
 export const authStore = new AuthStore();
+
+
+
+

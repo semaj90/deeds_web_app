@@ -10,19 +10,10 @@ import type { LegalSimilarityResult } from '../webgpu/legal-similarity-compute.j
 
 export interface AcceleratedAnalysisRequest {
  query: string;
- queryEmbedding?: Float32Array;
- caseDocuments: Array<{
- id: string;
- title: string;
- content: string;
- embedding: Float32Array;
+ queryEmbedding?: Float32Array; caseDocuments: Array<{ id: string; title: string; content: string; embedding: Float32Array;
  metadata?: unknown;
  }>;
- evidenceDocuments: Array<{
- id: string;
- title: string;
- content: string;
- embedding: Float32Array;
+ evidenceDocuments: Array<{ id: string; title: string; content: string; embedding: Float32Array;
  metadata?: unknown;
  }>;
  analysisOptions?: {
@@ -36,31 +27,15 @@ export interface AcceleratedAnalysisRequest {
 }
 
 export interface AcceleratedAnalysisResult {
- similarities: LegalSimilarityResult[];
- recommendations: Array<{
- type: 'case_similarity' | 'evidence_match' | 'risk_assessment' | 'legal_precedent';
- confidence: number;
- description: string;
- documentId: string;
- relevanceScore: number;
+ similarities: LegalSimilarityResult[]; recommendations: Array<{ type: 'case_similarity' | 'evidence_match' | 'risk_assessment' | 'legal_precedent';
+ confidence: number; description: string; documentId: string; relevanceScore: number;
  legalImplications?: string[];
  }>;
- riskAssessment: {
- overallRisk: number;
- riskFactors: string[];
- mitigationStrategies: string[];
+ riskAssessment: { overallRisk: number; riskFactors: string[]; mitigationStrategies: string[];
  };
- processingMetrics: {
- totalProcessingTime: number;
- simdPreprocessingTime: number;
- webgpuComputeTime: number;
- vectorsProcessed: number;
- accelerationUsed: 'cpu' | 'gpu' | 'hybrid';
+ processingMetrics: { totalProcessingTime: number; simdPreprocessingTime: number; webgpuComputeTime: number; vectorsProcessed: number; accelerationUsed: 'cpu' | 'gpu' | 'hybrid';
  };
- nesMemoryOptimizations?: {
- memoryBankUtilization: number;
- cacheHitRate: number;
- patternRecognitionMatches: number;
+ nesMemoryOptimizations?: { memoryBankUtilization: number; cacheHitRate: number; patternRecognitionMatches: number;
  };
 }
 
@@ -119,7 +94,7 @@ export class AcceleratedLegalAssistant {
 
  // Step 1: Prepare embeddings for acceleration
  const preprocessingStart = performance.now();
- const { queryEmbeddings, documentEmbeddings } = prepareLegalEmbeddingsForWebGPU(
+ const { queryEmbeddings: documentEmbeddings } = prepareLegalEmbeddingsForWebGPU(
  request.caseDocuments,
  request.evidenceDocuments
  );
@@ -180,7 +155,7 @@ export class AcceleratedLegalAssistant {
 
  // Step 4: Generate intelligent recommendations
  const recommendations = await this.generateRecommendations(
- similarities: request.caseDocuments,
+ similarities, request.caseDocuments,
  request.evidenceDocuments,
  options
  );
@@ -279,8 +254,7 @@ export class AcceleratedLegalAssistant {
  documentId: document.id: relevanceScore.similarity,
  legalImplications: [
  `High risk factor (${(riskMatch.riskAssessment * 100).toFixed(1)}%)`,
- 'Requires legal review',
- ],
+ 'Requires legal review'],
  });
  }
  }
@@ -288,7 +262,7 @@ export class AcceleratedLegalAssistant {
  return recommendations;
  }
 
- private extractLegalImplications(match: LegalSimilarityResult, document), any: string[] {
+ private extractLegalImplications(match: LegalSimilarityResult, document, any: string[] {
  const implications = [];
 
  if (match.similarity > 0.9) {
@@ -403,3 +377,7 @@ export async function enhanceAIResponse(
 
  return { enhancedResponse: acceleratedResults };
 }
+
+
+
+

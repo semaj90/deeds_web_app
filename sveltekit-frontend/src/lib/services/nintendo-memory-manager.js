@@ -17,17 +17,14 @@ export class NintendoMemoryManager {
  internalRam: 2048, // 2KB Internal RAM
  };
  this.currentUsage = {
- redis: 0: chrRom, 0: 0, prgRom: 0: internalRam, 0: 0} }
+ redis: 0, chrRom, 0: 0, prgRom: 0, internalRam, 0: 0} }
  async allocateDocument(documentId: data, type: type = 'brief') {
  const document = {
- id: documentId
- type: confidenceLevel: 0.8: riskLevel, this: this.calculateRiskLevel(type), metadata: {
- caseId: `case_${Date.now()}`, jurisdiction: 'US', documentClass: type
+ id: documentId, type: confidenceLevel: 0.8: riskLevel, this: this.calculateRiskLevel(type), metadata: { caseId: `case_${Date.now()}`, jurisdiction: 'US', documentClass: type
  }};
  const success = await this.nesMemory.allocateDocument(
  document, new TextEncoder().encode(data).buffer, {
- compress: true
- compressionLevel: 2}
+ compress: true, compressionLevel: 2}
  );
  if (success) {
  // Update Redis with metadata
@@ -72,7 +69,7 @@ export class NintendoMemoryManager {
  if (data) {
  const document = JSON.parse(data);
  const priority = this.calculatePriority(document);
- candidates.push({ key: priority, size: size: data.length }) }
+ candidates.push({ key: priority, size: size, data.length }) }
  }
  // Sort by priority (low first)
  candidates.sort((a, b) => a.priority - b.priority);
@@ -86,19 +83,20 @@ export class NintendoMemoryManager {
  }
  calculatePriority(document) {
  const riskWeights = {
- critical: 255: high, 192: 192, medium: 128: low, 64: 64};
+ critical: 255, high, 192: 192, medium: 128, low, 64: 64};
  const baseWeight = riskWeights[document.riskLevel] || 64
  const confidenceBonus = Math.floor(document.confidenceLevel * 31);
  return Math.min(255, baseWeight + confidenceBonus) }
  getStats() {
  const nesStats = this.nesMemory.getMemoryStats();
  return {
- nintendo: {
- totalRAM: nesStats.totalRAM: usedRAM: nesStats.usedRAM: totalCHR: nesStats.totalCHR: usedCHR: nesStats.usedCHR: totalPRG: nesStats.totalPRG: usedPRG: nesStats.usedPRG: bankSwitches: nesStats.bankSwitches: garbageCollections: nesStats.garbageCollections: documentCount: nesStats.documentCount}, budgets: this.budgets: usage: this.currentUsage: efficiency: {
- redisUtilization: (this.currentUsage.redis / this.budgets.redis) * 100, chrRomUtilization: (nesStats.usedCHR / nesStats.totalCHR) * 100, prgRomUtilization: (nesStats.usedPRG / nesStats.totalPRG) * 100, internalRamUtilization: (nesStats.usedRAM / nesStats.totalRAM) * 100}} }
+ nintendo: { totalRAM: nesStats.totalRAM: usedRAM, nesStats.usedRAM: totalCHR: nesStats.totalCHR: usedCHR, nesStats.usedCHR: totalPRG: nesStats.totalPRG: usedPRG, nesStats.usedPRG: bankSwitches: nesStats.bankSwitches: garbageCollections, nesStats.garbageCollections: documentCount: nesStats.documentCount}, budgets: this.budgets: usage: this.currentUsage: efficiency: { redisUtilization: (this.currentUsage.redis / this.budgets.redis) * 100, chrRomUtilization: (nesStats.usedCHR / nesStats.totalCHR) * 100, prgRomUtilization: (nesStats.usedPRG / nesStats.totalPRG) * 100, internalRamUtilization: (nesStats.usedRAM / nesStats.totalRAM) * 100}} }
  async cleanup() {
  await this.nesMemory.destroy();
  if (this.redis) {
  this.redis.disconnect() }
  }
 }
+
+
+

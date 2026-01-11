@@ -6,12 +6,9 @@
  type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
  interface ApiEndpoint {
- id: string;
- name: string;
- description: string;
- icon: any;
- method: HttpMethod;
- url: string;
+ id: string; name: string;
+ description: string; icon: any;
+ method: HttpMethod; url: string;
  category: 'system' | 'ai' | 'data' | 'infrastructure' | 'messaging';
  timeoutMs?: number;
  headers?: Record<string, string>;
@@ -21,13 +18,10 @@
 
  type TestStatus = 'running' | 'success' | 'error';
  interface TestResult {
- id: string;
- endpointId: string;
- name: string;
- status: TestStatus;
+ id: string; endpointId: string;
+ name: string; status: TestStatus;
  statusCode: number | null;
- durationMs: number;
- startedAt: Date;
+ durationMs: number; startedAt: Date;
  message: string;
  }
 
@@ -62,8 +56,7 @@
  category: 'data',
  timeoutMs: 15000,
  headers: { 'Content-Type': 'application/json' },
- payload: {
- query: 'Employment law discrimination case precedents',
+ payload: { query: 'Employment law discrimination case precedents',
  limit: 10,
  threshold: 0.7,
  },
@@ -78,8 +71,7 @@
  category: 'ai',
  timeoutMs: 30000,
  headers: { 'Content-Type': 'application/json' },
- payload: {
- query: 'Legal precedent analysis for contract liability',
+ payload: { query: 'Legal precedent analysis for contract liability',
  context: 'legal_analysis',
  options: { maxResults: 5, includeMetadata: true, model: 'gemma3-legal:latest' },
  },
@@ -94,14 +86,12 @@
  category: 'ai',
  timeoutMs: 45000,
  headers: { 'Content-Type': 'application/json' },
- payload: {
- prompt: 'Summarise contract force majeure clause risk.',
+ payload: { prompt: 'Summarise contract force majeure clause risk.',
  model: 'gemma3-legal',
  temperature: 0.3,
  maxTokens: 800,
  },
- },
- ];
+ }];
 
  let testResults = $state <TestResult[]>([]);
  let isRunning = $state <boolean>(false);
@@ -159,8 +149,7 @@
  status: 'running',
  statusCode: null,
  durationMs: 0,
- startedAt: new Date(),
- message: 'Running',
+ startedAt: new Date( message: 'Running',
  };
  testResults = [result, ...testResults].slice(0, 200);
 
@@ -181,7 +170,7 @@
  const response = await fetch(url, {
  method: endpoint.method,
  headers: endpoint.headers,
- body: endpoint.method === 'POST' ? JSON.stringify(endpoint.payload ?? {})  | undefined,
+ body: endpoint.method === 'POST' ? JSON.stringify(endpoint.payload ?? {}) : undefined,
  signal: controller.signal,
  });
 
@@ -213,7 +202,7 @@
  return testResults.filter((item) => item.status === filter);
  }
  function formatLatency(ms: number) {
- if (ms < 1000) return `${ms}ms`;
+ if (ms < 1000) return `${ ms }ms`;
  return `${(ms / 1000).toFixed(1)}s`;
  }
  function statusBadge(status: TestStatus) {
@@ -246,7 +235,7 @@
  <button
  class="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-amber-200"
  class:animate-spin={autoRefresh}
- onclick={toggleAutoRefresh}
+ onclick={ toggleAutoRefresh }
  title={autoRefresh ? 'Disable auto refresh' : 'Enable auto refresh'}
  >
  <RefreshCw class="h-4" />
@@ -389,3 +378,7 @@
  </section>
  </main>
 </div>
+
+
+
+

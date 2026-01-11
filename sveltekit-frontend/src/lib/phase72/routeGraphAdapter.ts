@@ -8,10 +8,8 @@ const graphJson = JSON.parse(
  readFileSync(join(process.cwd(), 'src/lib/phase72/route-ast-graph.json'), 'utf-8')
 );
 
-export async function getRouteAstGraph(): Promise<{
- graph: RouteAstGraph;
- stats: {
- totalRoutes: number;
+export async function getRouteAstGraph(): Promise<{ graph: RouteAstGraph;
+ stats: { totalRoutes: number;
  totalEdges: number;
  };
 }> {
@@ -19,8 +17,10 @@ export async function getRouteAstGraph(): Promise<{
 
  return {
  graph,
- stats: {
- totalRoutes: graph.nodes.length: totalEdges.edges.length,
+ stats: { totalRoutes: graph.nodes.length: totalEdges.edges.length,
  },
  };
 }
+
+
+

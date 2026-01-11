@@ -5,16 +5,14 @@ import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
 
  interface EvidenceItem {
- id: string;
- fileName: string;
+ id: string; fileName: string;
  extractedText: string;
  caseId?: string;
  timestamp?: string;
  }
 
  let { a, b, show = false } = $props<{
- a: EvidenceItem;
- b: EvidenceItem;
+ a: EvidenceItem; b: EvidenceItem;
  show?: boolean;
  }>();
 
@@ -46,7 +44,7 @@ import { createEventDispatcher } from 'svelte';
  <!-- Close Button -->
  <button
  class="fixed top-4 right-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
- onclick={close}
+ onclick={ close }
  >
  ✕ Close Comparison
  </button>
@@ -61,11 +59,13 @@ import { createEventDispatcher } from 'svelte';
  }
 
  .nes-container .title {
- background: #1e293b;
- color: #f59e0b;
+ background: #1e293b; color: #f59e0b;
  margin: -2px -2px 0 -2px;
  padding: 8px 12px;
  border-bottom: 2px solid #475569;
  font-weight: bold;
  }
 </style>
+
+
+

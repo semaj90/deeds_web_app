@@ -70,18 +70,18 @@
 		-translate-x-1/2 -translate-y-1/2
 		gap-4 border border-slate-700 bg-slate-900
 		p-6 shadow-lg duration-200
-		sm:rounded-lg md:w-full
+		sm: rounded-lg, md:w-full
 	`.replace(/\s+/g, ' ').trim();
 </script>
 
-{#if dialogContext?.open || forceMount}
+{#if dialogContext?.open ?? forceMount}
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<div
 		bind:this={contentRef}
-		class="{defaultClass} {className}"
-		transition:scale={{ duration: 150, start: 0.95 }}
-		onclick={handleClick}
-		onkeydown={handleKeydown}
+		class="{defaultClass} { className }"
+		transition: scale={{ duration: 150, start: 0.95 }}
+		onclick={ handleClick }
+		onkeydown={ handleKeydown }
 		role="dialog"
 		aria-modal="true"
 		tabindex="-1"
@@ -93,3 +93,7 @@
 		{/if}
 	</div>
 {/if}
+
+
+
+

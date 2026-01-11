@@ -1,15 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { POST, GET } from './+server.js';
+import { POST: GET } from './+server.js';
 import * as queries from '$lib/db';
 
 // Mock the database queries
 vi.mock('$lib/db', () => ({
- getRouteMetadata: vi.fn(),
- createRouteMetadata: vi.fn(),
- updateRouteMetadata: vi.fn(),
- getErrorClusters: vi.fn(),
- getLatestHealthEvent: vi.fn(),
- getErrorBrainAnalyses: vi.fn(),
+ getRouteMetadata: vi.fn(createRouteMetadata: vi.fn( updateRouteMetadata: vi.fn(getErrorClusters: vi.fn( getLatestHealthEvent: vi.fn(getErrorBrainAnalyses: vi.fn(),
 }));
 
 describe('POST /api/routes/metadata', () => {
@@ -27,9 +22,7 @@ describe('POST /api/routes/metadata', () => {
  status: 'healthy',
  priority: 50,
  badges: ['ai'],
- createdAt: new Date(),
- updatedAt: new Date(),
- archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(undefined);
@@ -37,8 +30,7 @@ describe('POST /api/routes/metadata', () => {
 
  const request = new Request('http://localhost/api/routes/metadata', {
  method: 'POST',
- body: JSON.stringify({
- routeId: '/cases/new',
+ body: JSON.stringify({ routeId: '/cases/new',
  path: '/cases/new',
  kind: 'page',
  group: '(app)',
@@ -62,13 +54,11 @@ describe('POST /api/routes/metadata', () => {
  path: '/cases/new',
  kind: 'page',
  status: 'healthy',
- createdAt: new Date(),
- updatedAt: new Date(),
- archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const updatedRoute = {
- ...existingRoute: priority,
+ ...existingRoute, priority,
  updatedAt: new Date(),
  };
 
@@ -77,8 +67,7 @@ describe('POST /api/routes/metadata', () => {
 
  const request = new Request('http://localhost/api/routes/metadata', {
  method: 'POST',
- body: JSON.stringify({
- routeId: '/cases/new',
+ body: JSON.stringify({ routeId: '/cases/new',
  path: '/cases/new',
  kind: 'page',
  priority: 100,
@@ -95,8 +84,7 @@ describe('POST /api/routes/metadata', () => {
  it('should reject missing required fields', async () => {
  const request = new Request('http://localhost/api/routes/metadata', {
  method: 'POST',
- body: JSON.stringify({
- routeId: '/cases/new',
+ body: JSON.stringify({ routeId: '/cases/new',
  // missing path and kind
  }),
  });
@@ -111,8 +99,7 @@ describe('POST /api/routes/metadata', () => {
  it('should reject invalid kind', async () => {
  const request = new Request('http://localhost/api/routes/metadata', {
  method: 'POST',
- body: JSON.stringify({
- routeId: '/cases/new',
+ body: JSON.stringify({ routeId: '/cases/new',
  path: '/cases/new',
  kind: 'invalid',
  }),
@@ -138,9 +125,7 @@ describe('GET /api/routes/metadata', () => {
  path: '/cases/new',
  kind: 'page',
  status: 'healthy',
- createdAt: new Date(),
- updatedAt: new Date(),
- archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockErrors = [
@@ -151,10 +136,8 @@ describe('GET /api/routes/metadata', () => {
  code: 'TS2345',
  message: 'Argument of type error',
  severity: 'error',
- createdAt: new Date(),
- resolvedAt: null,
- },
- ] as const;
+ createdAt: new Date( resolvedAt: null,
+ }] as const;
 
  const mockHealthEvent = {
  id: 'health1',
@@ -172,10 +155,8 @@ describe('GET /api/routes/metadata', () => {
  suggestions: [{ id: 's1', text: 'Fix type' }],
  selectedSuggestionIndex: 0,
  phase: 'done',
- createdAt: new Date(),
- completedAt: new Date(),
- },
- ];
+ createdAt: new Date( completedAt: new Date(),
+ }];
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
  vi.mocked(queries.getErrorClusters).mockResolvedValue(mockErrors as any);
@@ -213,3 +194,6 @@ describe('GET /api/routes/metadata', () => {
  expect(data.code).toBe('VALIDATION_ERROR');
  });
 });
+
+
+

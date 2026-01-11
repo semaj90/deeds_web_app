@@ -54,8 +54,7 @@ export const GET: RequestHandler = async (event) => {
  }, 1000);
  }
  });
-
- // Cleanup on client disconnect
+  
  event.request.signal.addEventListener('abort', () => {
  unsubscribe();
  controller.close();

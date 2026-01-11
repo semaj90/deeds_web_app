@@ -1,34 +1,27 @@
 <script lang="ts">
-	import { Button, Dialog } from 'bits-ui';
+	import Button from '$lib/components/ui/button/Button.svelte';
+	import { Close as DialogClose, Content as DialogContent, Overlay as DialogOverlay, Portal as DialogPortal, Root as DialogRoot, Title as DialogTitle } from '$lib/components/ui/dialog';
 	import { onMount } from 'svelte';
 
 	interface VectorCluster {
-		id: number;
-		cluster_id: number;
-		pattern: string;
-		error_count: number;
-		avg_similarity: number;
-		file_paths: string[];
-		summary: string;
-		tags: string[];
+		id: number; cluster_id: number;
+		pattern: string; error_count: number;
+		avg_similarity: number; file_paths: string[];
+		summary: string; tags: string[];
 		embedding: number[];
 	}
 
 	interface GraphNode {
-		id: string;
-		label: string;
+		id: string; label: string;
 		type: 'file' | 'error' | 'cluster' | 'fix';
 		cluster_id?: number;
-		similarity?: number;
-		tags: string[];
+		similarity?: number; tags: string[];
 		fix_status?: 'pending' | 'in-progress' | 'applied' | 'failed';
 	}
 
 	interface GraphEdge {
-		source: string;
-		target: string;
-		weight: number;
-		type: 'similarity' | 'dependency' | 'fix-attempt';
+		source: string; target: string;
+		weight: number; type: 'similarity' | 'dependency' | 'fix-attempt';
 	}
 
 	let clusters = $state<VectorCluster[]>([]);
@@ -75,7 +68,6 @@
 				tags: cluster.tags || []
 			});
 
-			// Create error nodes for files
 			for (const filePath of cluster.file_paths || []) {
 				const fileId = `file-${filePath.replace(/[^a-zA-Z0-9]/g, '-')}`;
 				if (!nodes.find((n) => n.id === fileId)) {
@@ -107,8 +99,7 @@
 			const response = await fetch('/api/phase89/vector-search', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					query: searchQuery,
+				body: JSON.stringify({ query: searchQuery,
 					limit: 10,
 					threshold: 0.7
 				})
@@ -127,8 +118,7 @@
 			const response = await fetch('/api/phase89/similar-clusters', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					cluster_id: cluster.cluster_id,
+				body: JSON.stringify({ cluster_id: cluster.cluster_id,
 					embedding: cluster.embedding,
 					limit: 5
 				})
@@ -150,12 +140,10 @@
 			const response = await fetch('/api/phase89/agentic-fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					cluster_id: cluster.cluster_id,
+				body: JSON.stringify({ cluster_id: cluster.cluster_id,
 					pattern: cluster.pattern,
 					file_paths: cluster.file_paths,
-					context: {
-						summary: cluster.summary,
+					context: { summary: cluster.summary,
 						tags: cluster.tags,
 						similar_clusters: similarClusters.map((c) => c.pattern)
 					}
@@ -224,16 +212,16 @@
 					bind:value={searchQuery}
 					placeholder="Search errors, patterns, or tags..."
 					class="flex-1 px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white
-					       placeholder-gray-500 focus:border-purple-500 focus:outline-none"
+					       placeholder-gray-500 focus: border-purple-500, focus:outline-none"
 					onkeydown={(e) => e.key === 'Enter' && performVectorSearch()}
 				/>
-				<Button.Root
+				<Button
 					class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
-					       font-medium transition-colors"
-					onclick={performVectorSearch}
+					       font-medium transition-colors bits-btn"
+					onclick={ performVectorSearch }
 				>
 					Search
-				</Button.Root>
+				</Button>
 			</div>
 
 			{#if searchResults.length > 0}
@@ -285,7 +273,7 @@
 					Loading clusters...
 				</div>
 			{:else}
-				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+				<div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-3 gap-4">
 					{#each clusters as cluster}
 						<button
 							class="p-6 bg-gray-800/50 hover:bg-gray-800 rounded-xl border border-gray-700
@@ -342,18 +330,18 @@
 		</div>
 
 		<!-- Cluster Details Dialog -->
-		<Dialog.Root bind:open={detailsOpen}>
-			<Dialog.Portal>
-				<Dialog.Overlay class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
-				<Dialog.Content
+		<DialogRoot bind:open={detailsOpen}>
+			<DialogPortal>
+				<DialogOverlay class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
+				<DialogContent
 					class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50
 					       w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 bg-gray-800 rounded-xl
 					       shadow-2xl border border-gray-700"
 				>
 					{#if selectedCluster}
-						<Dialog.Title class="text-2xl font-bold text-white mb-4">
+						<DialogTitle class="text-2xl font-bold text-white mb-4">
 							Cluster #{selectedCluster.cluster_id} - {selectedCluster.pattern}
-						</Dialog.Title>
+						</DialogTitle>
 
 						<div class="space-y-6">
 							<!-- Summary -->
@@ -377,7 +365,7 @@
 							<!-- Affected Files -->
 							<div>
 								<h3 class="text-lg font-semibold text-white mb-2">
-									Affected Files ({selectedCluster.file_paths?.length || 0})
+									Affected Files ({selectedCluster.file_paths?.length ?? 0})
 								</h3>
 								<div class="space-y-1 max-h-40 overflow-y-auto">
 									{#each selectedCluster.file_paths || [] as filePath}
@@ -413,45 +401,45 @@
 
 							<!-- Actions -->
 							<div class="flex gap-3 pt-4 border-t border-gray-700">
-								<Button.Root
+								<Button
 									class="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
-									       font-medium transition-colors flex items-center justify-center gap-2"
+									       font-medium transition-colors flex items-center justify-center gap-2 bits-btn"
 									onclick={() => initiateAgenticFix(selectedCluster)}
 								>
 									<div class="i-carbon-machine-learning"></div>
 									Agentic Fix
-								</Button.Root>
-								<Button.Root
+								</Button>
+								<Button
 									class="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
-									       transition-colors"
+									       transition-colors bits-btn"
 									onclick={() => (detailsOpen = false)}
 								>
 									Close
-								</Button.Root>
+								</Button>
 							</div>
 						</div>
 					{/if}
 
-					<Dialog.Close
+					<DialogClose
 						class="absolute top-4 right-4 p-2 hover:bg-gray-700 rounded-lg transition-colors"
 					>
 						<div class="i-carbon-close text-xl text-gray-400"></div>
-					</Dialog.Close>
-				</Dialog.Content>
-			</Dialog.Portal>
-		</Dialog.Root>
+					</DialogClose>
+				</DialogContent>
+			</DialogPortal>
+		</DialogRoot>
 
 		<!-- Agentic Fix Status Dialog -->
-		<Dialog.Root bind:open={fixDialogOpen}>
-			<Dialog.Portal>
-				<Dialog.Overlay class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
-				<Dialog.Content
+		<DialogRoot bind:open={fixDialogOpen}>
+			<DialogPortal>
+				<DialogOverlay class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
+				<DialogContent
 					class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50
 					       w-full max-w-2xl p-6 bg-gray-800 rounded-xl shadow-2xl border border-gray-700"
 				>
-					<Dialog.Title class="text-2xl font-bold text-white mb-4">
+					<DialogTitle class="text-2xl font-bold text-white mb-4">
 						🤖 Agentic Fix Pipeline
-					</Dialog.Title>
+					</DialogTitle>
 
 					<div class="mb-6">
 						<pre
@@ -460,15 +448,19 @@
 						>{agenticFixStatus}</pre>
 					</div>
 
-					<Button.Root
+					<Button
 						class="w-full px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
-						       transition-colors"
+						       transition-colors bits-btn"
 						onclick={() => (fixDialogOpen = false)}
 					>
 						Close
-					</Button.Root>
-				</Dialog.Content>
-			</Dialog.Portal>
-		</Dialog.Root>
+					</Button>
+				</DialogContent>
+			</DialogPortal>
+		</DialogRoot>
 	</div>
 </div>
+
+
+
+

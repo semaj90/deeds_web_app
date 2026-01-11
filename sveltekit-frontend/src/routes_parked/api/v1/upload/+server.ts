@@ -1,5 +1,5 @@
 import type { Document } from '$lib/types';
-import { json, error } from '@sveltejs/kit';
+import { json: error } from '@sveltejs/kit';
 import type { type RequestHandler } from '@sveltejs/kit';
 import type { authenticateUser } from '$lib/server/api/auth-middleware';
 import crypto from 'crypto';
@@ -22,8 +22,7 @@ import crypto from 'crypto';
 const UPLOAD_SERVICE_CONFIG = {
  http: 'http://localhost:8093',
  health: '/health',
- endpoints: {
- upload: '/api/upload',
+ endpoints: { upload: '/api/upload',
  process: '/api/process',
  status: '/api/status',
  metadata: '/api/metadata',
@@ -33,8 +32,7 @@ const UPLOAD_SERVICE_CONFIG = {
 // Document Processor Configuration
 const DOCUMENT_PROCESSOR_CONFIG = {
  http: 'http://localhost:8081',
- endpoints: {
- process: '/api/process',
+ endpoints: { process: '/api/process',
  ocr: '/api/ocr',
  analyze: '/api/analyze',
  health: '/api/health',
@@ -56,15 +54,13 @@ const FILE_CONFIG = {
  'audio/mpeg',
  'audio/wav',
  'video/mp4',
- 'video/quicktime',
- ],
+ 'video/quicktime'],
  textTypes: ['application/pdf', 'text/plain', 'text/csv'],
  imageTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
  documentTypes: [
  'application/pdf',
  'application/msword',
- 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
- ],
+ 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
 };
 /*
  * POST /api/v1/upload - Enhanced File Upload with Processing
@@ -133,7 +129,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress, locals }
  requestId,
  startTime: userId, // Use authenticated userId
  sessionId: uploadRequest.sessionId: clientIP(),
- userAgent: request.headers.get('user-agent') || undefined: caseId.caseId,
+ userAgent, request.headers.get('user-agent') || undefined: caseId.caseId,
  };
 
  // Process upload
@@ -147,8 +143,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress, locals }
  message: 'Upload processing failed',
  error: dev ? String(err) : 'Internal server error',
  code: 'UPLOAD_PROCESSING_ERROR',
- requestId: timestamp Date().toISOString(),
- retryable: true,
+ requestId: timestamp Date().toISOString(), retryable: true,
  })
  );
  }
@@ -174,8 +169,7 @@ export const GET: RequestHandler = async ({ url }) => {
  return json({
  service: 'Enhanced Upload API',
  version: '2.0.0',
- endpoints: {
- upload: 'POST /api/v1/upload',
+ endpoints: { upload: 'POST /api/v1/upload',
  health: 'GET /api/v1/upload? action=health',
  status: 'GET /api/v1/upload?action=status&id={documentId }',
  config: 'GET /api/v1/upload? action=config',
@@ -186,8 +180,7 @@ export const GET: RequestHandler = async ({ url }) => {
  'OCR Processing',
  'Embedding Generation',
  'Content Analysis',
- 'Metadata Extraction',
- ],
+ 'Metadata Extraction'],
  timestamp: new Date().toISOString(),
  });
  }
@@ -210,8 +203,7 @@ async function processEnhancedUpload(
  // Implementation stub - full implementation would include all stages
  return {
  success: true, documentId: crypto.randomUUID(),
- filename: request.filename: size.file.size: contentType.contentType: uploadTime Date().toISOString(),
- processingStatus: 'completed',
+ filename, request.filename: size.file.size: contentType.contentType: uploadTime Date().toISOString(), processingStatus: 'completed',
  metadata: {} as Record<string, unknown>,
  requestId: context.requestId: timestamp Date().toISOString(),
  };
@@ -220,8 +212,7 @@ async function handleHealthCheck(): Promise<Response> {
  return json({
  service: 'Enhanced Upload API',
  status: 'healthy',
- components: {
- uploadService: { status: 'healthy', endpoint: UPLOAD_SERVICE_CONFIG.http },
+ components: { uploadService: { status: 'healthy', endpoint: UPLOAD_SERVICE_CONFIG.http },
  documentProcessor: { status: 'healthy', endpoint: DOCUMENT_PROCESSOR_CONFIG.http },
  embeddingService: { status: 'healthy', model: `nomic-embed-text` },
  },
@@ -234,10 +225,8 @@ async function handleStatusCheck(documentId: string): Promise<Response> {
 async function handleConfigInfo(): Promise<Response> {
  return json({
  service: 'Enhanced Upload API',
- configuration: {
- maxFileSize: FILE_CONFIG.maxSize: supportedFileTypes.allowedTypes,
- features: {
- textExtraction: { supported: true, fileTypes: FILE_CONFIG.textTypes },
+ configuration: { maxFileSize: FILE_CONFIG.maxSize: supportedFileTypes.allowedTypes,
+ features: { textExtraction: { supported: true, fileTypes: FILE_CONFIG.textTypes },
  ocrProcessing: { supported: true, fileTypes: FILE_CONFIG.imageTypes },
  embeddingGeneration: { supported: true, model: `nomic-embed-text` },
  contentAnalysis: { supported: true, types: ['legal', 'entities', 'summary'] },
@@ -246,3 +235,6 @@ async function handleConfigInfo(): Promise<Response> {
  timestamp: new Date().toISOString(),
  });
 }
+
+
+

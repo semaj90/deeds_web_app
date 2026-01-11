@@ -7,17 +7,14 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { couchdb, aceGraphs } from './couchdb-client.js';
+import { couchdb: aceGraphs } from './couchdb-client.js';
 
 // Universal AST Node types
 export interface UniversalASTNode {
-  id: string;
-  type: ASTNodeType;
+  id: string; type: ASTNodeType;
   name?: string;
-  kind?: string;
-  start: number;
-  end: number;
-  children: UniversalASTNode[];
+  kind?: string; start: number;
+  end: number; children: UniversalASTNode[];
   metadata: Record<string, unknown>;
 }
 
@@ -47,41 +44,31 @@ export type ASTNodeType =
 
 // File analysis result
 export interface FileAST {
-  id: string;
-  file_path: string;
+  id: string; file_path: string;
   language: 'typescript' | 'javascript' | 'svelte' | 'json' | 'css' | 'unknown';
-  root: UniversalASTNode;
-  imports: ImportInfo[];
-  exports: ExportInfo[];
-  dependencies: string[];
-  errors: ErrorInfo[];
-  metadata: {
-    lines: number;
-    bytes: number;
-    hash: string;
-    analyzed_at: string;
+  root: UniversalASTNode; imports: ImportInfo[];
+  exports: ExportInfo[]; dependencies: string[];
+  errors: ErrorInfo[]; metadata: {
+    lines: number; bytes: number;
+    hash: string; analyzed_at: string;
   };
 }
 
 export interface ImportInfo {
-  source: string;
-  specifiers: string[];
+  source: string; specifiers: string[];
   type: 'default' | 'named' | 'namespace' | 'side-effect';
   line: number;
 }
 
 export interface ExportInfo {
-  name: string;
-  type: 'default' | 'named' | 'all';
+  name: string; type: 'default' | 'named' | 'all';
   kind: 'function' | 'class' | 'variable' | 'type' | 'interface' | 'component' | 'unknown';
   line: number;
 }
 
 export interface ErrorInfo {
-  line: number;
-  column: number;
-  code: string;
-  message: string;
+  line: number; column: number;
+  code: string; message: string;
   severity: 'error' | 'warning' | 'info';
 }
 
@@ -128,8 +115,7 @@ class UniversalASTParser {
       id: this.generateId(filePath, 'root'),
       file_path: filePath,
       language,
-      root: {
-        id: this.generateId(filePath, 'program'),
+      root: { id: this.generateId(filePath, 'program'),
         type: 'Program',
         name: path.basename(filePath),
         start: 0,
@@ -169,7 +155,7 @@ class UniversalASTParser {
     let match;
 
     while ((match = importRegex.exec(content)) !== null) {
-      const [, defaultImport, namedImports, namespaceImport, source] = match;
+      const [defaultImport, namedImports, namespaceImport, source] = match;
       const specifiers: string[] = [];
       let type: ImportInfo['type'] = 'side-effect';
 
@@ -192,20 +178,20 @@ class UniversalASTParser {
 
       // Add to AST
       fileAST.root.children.push({
-        id: this.generateId(fileAST.file_path, `import_${source}`),
+        id: this.generateId(fileAST.file_path, `import_${ source }`),
         type: 'Import',
         name: source,
         start: match.index,
         end: match.index + match[0].length,
         children: [],
-        metadata: { specifiers, type }
+        metadata: { specifiers: type }
       });
     }
 
     // Extract exports
     const exportRegex = /export\s+(?:(default)\s+)?(?:(const|let|var|function|class|interface|type)\s+)?(\w+)/g;
     while ((match = exportRegex.exec(content)) !== null) {
-      const [, isDefault, kind, name] = match;
+      const [isDefault, kind, name] = match;
       const line = content.slice(0, match.index).split('\n').length;
 
       fileAST.exports.push({
@@ -216,7 +202,7 @@ class UniversalASTParser {
       });
 
       fileAST.root.children.push({
-        id: this.generateId(fileAST.file_path, `export_${name}`),
+        id: this.generateId(fileAST.file_path, `export_${ name }`),
         type: 'Export',
         name,
         kind: isDefault ? 'default' : 'named',
@@ -232,7 +218,7 @@ class UniversalASTParser {
     while ((match = functionRegex.exec(content)) !== null) {
       const [fullMatch, name] = match;
       fileAST.root.children.push({
-        id: this.generateId(fileAST.file_path, `function_${name}`),
+        id: this.generateId(fileAST.file_path, `function_${ name }`),
         type: 'Function',
         name,
         start: match.index,
@@ -253,8 +239,7 @@ class UniversalASTParser {
         start: match.index,
         end: match.index + fullMatch.length,
         children: [],
-        metadata: {
-          extends: extendsClass,
+        metadata: { extends: extendsClass,
           implements: implementsInterfaces?.split(',').map(s => s.trim())
         }
       });
@@ -271,8 +256,7 @@ class UniversalASTParser {
         start: match.index,
         end: match.index + fullMatch.length,
         children: [],
-        metadata: {
-          extends: extendsInterfaces?.split(',').map(s => s.trim())
+        metadata: { extends: extendsInterfaces?.split(',').map(s => s.trim())
         }
       });
     }
@@ -305,8 +289,7 @@ class UniversalASTParser {
         start: scriptMatch.index!,
         end: scriptMatch.index! + scriptMatch[0].length,
         children: [],
-        metadata: {
-          lang: scriptMatch[0].includes('lang="ts"') ? 'typescript' : 'javascript'
+        metadata: { lang: scriptMatch[0].includes('lang="ts"') ? 'typescript' : 'javascript'
         }
       };
       fileAST.root.children.push(scriptNode);
@@ -325,8 +308,7 @@ class UniversalASTParser {
         start: styleMatch.index!,
         end: styleMatch.index! + styleMatch[0].length,
         children: [],
-        metadata: {
-          scoped: styleMatch[0].includes('scoped') || true, // Svelte styles are scoped by default
+        metadata: { scoped: styleMatch[0].includes('scoped') || true, // Svelte styles are scoped by default
           lang: styleMatch[0].includes('lang="scss"') ? 'scss' : 'css'
         }
       });
@@ -532,5 +514,9 @@ export async function indexCodebaseInCouchDB(
     }
   }
 
-  return { indexed, failed };
+  return { indexed: failed };
 }
+
+
+
+

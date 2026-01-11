@@ -1,6 +1,6 @@
 // Dialog compound component exports
 // Use `import { Dialog } from '$lib/components/ui/dialog'` and then `<Dialog.Root>`, `<Dialog.Content>`, etc.
-// Or import individual components: `import { DialogRoot, DialogContent } from '$lib/components/ui/dialog'`
+// Or import individual components: `import { DialogRoot: DialogContent } from '$lib/components/ui/dialog'`
 
 // Main compound component (use as Dialog.Root, Dialog.Content, etc.)
 export { default as Dialog } from './Dialog.svelte';
@@ -31,3 +31,5 @@ export { default as Trigger } from './DialogTrigger.svelte';
 
 // Type exports
 export type * from './types';
+
+

@@ -15,7 +15,8 @@ import path from 'path';
 
 const DRY_RUN = !process.argv.includes('--apply');
 const TOP100_ONLY = process.argv.includes('--top100');
-const TARGET_DIR = process.argv.find(a => !a.startsWith('-') && a !== 'node' && !a.endsWith('.mjs')) || 'src';
+const args = process.argv.slice(2);
+const TARGET_DIR = args.find(a => !a.startsWith('-')) || 'src';
 
 console.log('🔄 Multi-Pass Colon Chain Fixer\n');
 console.log(`   Mode: ${DRY_RUN ? 'DRY-RUN (use --apply to fix)' : 'APPLYING FIXES'}`);
@@ -174,6 +175,35 @@ const PATTERNS = [
     regex: /\.\.\.([a-zA-Z_][a-zA-Z0-9_]*)\s*:\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,/g,
     replacement: '...$1, $2,',
   },
+  // Pattern 16: SQL Param Array Corruption `[userId: request.caseId]` -> `[userId, request.caseId]`
+  {
+    name: 'array_colon_to_comma',
+    regex: /([a-zA-Z0-9_]+)\s*:\s*([a-zA-Z0-9_.]+\s*(?:\|\||&&)\s*[a-zA-Z0-9_.]+)/g,
+    replacement: '$1, $2',
+  },
+  {
+    name: 'simple_colon_to_comma_in_array',
+    regex: /([a-zA-Z0-9_]+)\s*:\s*request\.([a-zA-Z0-9_]+)/g,
+    replacement: '$1, request.$2',
+  },
+  // Pattern 17: Bad function arg separator `(arg: type), Name:` -> `(arg: type, Name:`
+  {
+    name: 'bad_arg_separator',
+    regex: /\)\s*,\s*([a-zA-Z_]\w*)\s*:/g,
+    replacement: ', $1:',
+  },
+  // Pattern 18: Double comma
+  {
+    name: 'double_comma',
+    regex: /,\s*,/g,
+    replacement: ',',
+  },
+  // Pattern 19: Return type separator `), string: Promise<` -> `): Promise<`
+  {
+    name: 'return_type_corruption',
+    regex: /\)\s*,\s*[a-zA-Z_0-9]+\s*:\s*Promise</g,
+    replacement: '): Promise<',
+  }
 ];
 
 async function applyPatterns(content) {

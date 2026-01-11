@@ -50,8 +50,7 @@ const GPU_MAP_MODE = { READ: 1 } as const;
 type GPUAdapterLike = { requestDevice?: () => Promise<GPUDeviceLike | undefined> };
 type GPUDeviceLike = {
  createBuffer: (desc: { size: number, usage: number }) => unknown;
- queue: {
- writeBuffer: (, buffer: unknown, bufferOffset: number,
+ queue: { writeBuffer: (buffer: unknown, bufferOffset: number,
  data: ArrayBuffer | SharedArrayBuffer | Uint8Array,
  dataOffset?: number,
  size?: number
@@ -59,16 +58,14 @@ type GPUDeviceLike = {
  submit: (commandBuffers: unknown[]) => void;
  };
  createShaderModule: (opts: { code: string }) => unknown;
- createComputePipeline: (opts: {
- layout: 'auto' | unknown, compute: { module: unknown, entryPoint: string };
+ createComputePipeline: (opts: { layout: 'auto' | unknown, compute: { module: unknown, entryPoint: string };
  }) => unknown;
- getBindGroupLayout: (idx: number) => unknown, createBindGroup: (opts: {
- layout: unknown, entries: Array<{ binding: number, resource: { buffer: unknown } }>;
+ getBindGroupLayout: (idx: number) => unknown, createBindGroup: (opts: { layout: unknown, entries: Array<{ binding: number, resource: { buffer: unknown } }>;
  }) => unknown;
  createCommandEncoder: () => unknown;
 };
 type ComputePassLike = {
- setPipeline: (pipeline: unknown) => void, setBindGroup: (index: number):, unknown: unknown => void;
+ setPipeline: (pipeline: unknown) => void, setBindGroup: (index: number), unknown: unknown => void;
  dispatchWorkgroups: (x: number) => void, end: () => void;
 };
 
@@ -83,7 +80,7 @@ interface WebGPUNavigator {
 const embedLocally = (text: string, dim: number = FALLBACK_EMBED_DIM): Float32Array => {
  const vec = new Float32Array(dim);
  const lower = (text ?? '').toLowerCase();
- const len = lower.length || 1;
+ const len = lower.length ?? 1;
  for (let i = 0; i < dim; i++) {
  const ch = lower.charCodeAt(i % len) || 0;
  vec[i] = Math.sin((ch + i) * 0.13) * 0.5 + 0.5;
@@ -91,7 +88,7 @@ const embedLocally = (text: string, dim: number = FALLBACK_EMBED_DIM): Float32Ar
  return vec;
 };
 
-const cosine = (a: Float32Array):, Float32Array: number => {
+const cosine = (a: Float32Array), Float32Array: number => {
  let dot = 0;
  let na = 0;
  let nb = 0;
@@ -103,7 +100,7 @@ const cosine = (a: Float32Array):, Float32Array: number => {
  na += va * va;
  nb += vb * vb;
  }
- const denom = Math.sqrt(na) * Math.sqrt(nb) || 1;
+ const denom = Math.sqrt(na) * Math.sqrt(nb) ?? 1;
  return dot / denom;
 };
 
@@ -133,7 +130,7 @@ async function fetchEmbeddings(
  };
  const response = await fetch('/api/embeddings/generate?action=batch', {
  method: 'POST',
- headers: reqHeaders, body: JSON.stringify({ texts, model }),
+ headers: reqHeaders, body: JSON.stringify({ texts: model }),
  });
 
  if (!response.ok) {
@@ -144,7 +141,7 @@ async function fetchEmbeddings(
  const arrays: number[][] | undefined =
  payload?.data?.embeddings ??
  payload?.embeddings ??
- (Array.isArray(payload?.data) ? payload.data  | undefined);
+ (Array.isArray(payload?.data) ? payload.data : undefined);
 
  if (!arrays || !Array.isArray(arrays[0])) return null;
 
@@ -193,8 +190,8 @@ self.addEventListener('message', async (event: MessageEvent) => {
 
  const adapter = await (navigator as unknown as WebGPUNavigator).gpu?.requestAdapter?.();
  // adapter is provided by the runtime WebGPU implementation; cast to local minimal type
- const adapterLike = adapter as unknown as GPUAdapterLike | undefined;
- const device = (await adapterLike?.requestDevice?.()) as GPUDeviceLike | undefined;
+ const adapterLike = adapter as unknown as GPUAdapterLike : undefined;
+ const device = (await adapterLike?.requestDevice?.()) as GPUDeviceLike : undefined;
 
  if (!device) {
  throw new Error('WebGPU device unavailable');
@@ -256,19 +253,16 @@ self.addEventListener('message', async (event: MessageEvent) => {
  layout: 'auto',
  compute: { module, entryPoint: 'main' },
  });
-
- // some runtimes/types are not present in TS build; cast pipeline to: unknown for these calls
+  
  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
  const bindGroup = device.createBindGroup({
  layout: (
  pipeline as unknown as { getBindGroupLayout: (n: number) => unknown }
- ).getBindGroupLayout(0),
- entries: [
+ ).getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: queryBuffer } },
  { binding: 1, resource: { buffer: candidatesBuffer } },
  { binding: 2, resource: { buffer: scoresBuffer } },
- { binding: 3, resource: { buffer: metaBuffer } },
- ],
+ { binding: 3, resource: { buffer: metaBuffer } }],
  });
 
  const encoder = device.createCommandEncoder();
@@ -282,7 +276,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
 
  (
  encoder as unknown as {
- copyBufferToBuffer: (, src: unknown, srcOffset: number,
+ copyBufferToBuffer: (src: unknown, srcOffset: number,
  dst: unknown, dstOffset: number,
  size: number
  ) => void;
@@ -313,8 +307,10 @@ self.addEventListener('message', async (event: MessageEvent) => {
  const fallbackCandidateVecs =
  candidateVecs ?? labels.map((label) => embedLocally(label, fallbackQueryVec.length));
  self.postMessage({
- error: String(err),
- data: cpuRerank(fallbackQueryVec, fallbackCandidateVecs, suggestions),
+ error: String(err, data: cpuRerank(fallbackQueryVec, fallbackCandidateVecs, suggestions),
  });
  }
 });
+
+
+

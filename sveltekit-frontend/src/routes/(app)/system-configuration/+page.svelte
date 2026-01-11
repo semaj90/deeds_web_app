@@ -5,46 +5,40 @@
 
  // Configuration settings
  let config = $state({
- general: {
- theme: 'yorha',
+ general: { theme: 'yorha',
  language: 'en',
  timezone: 'UTC',
  autoSave: true,
  notifications: true
  },
- ai: {
- model: 'gemma3-legal',
+ ai: { model: 'gemma3-legal',
  temperature: 0.7,
  maxTokens: 2048,
  ollamaEndpoint: 'http://localhost:11434',
  embeddingModel: 'embeddinggemma',
  enableFallback: true
  },
- database: {
- type: 'postgresql',
+ database: { type: 'postgresql',
  host: 'localhost',
  port: 5432,
  database: 'legal_ai_db',
  ssl: false,
  connectionPool: 10
  },
- gpu: {
- enableWebGPU: true,
+ gpu: { enableWebGPU: true,
  enableCUDA: true,
  memoryLimit: 80,
  batchSize: 32,
  precision: 'fp16'
  },
- security: {
- encryption: 'AES256',
+ security: { encryption: 'AES256',
  sessionTimeout: 3600,
  twoFactor: false,
  auditLogging: true,
  backupFrequency: 'daily'
  }
  });
-
- // System information
+  
  let systemInfo = $state({
  version: '2.0.0',
  uptime: '0d 0h 0m',
@@ -79,38 +73,33 @@
  function resetToDefaults() {
  // Reset to default values
  config = {
- general: {
- theme: 'yorha',
+ general: { theme: 'yorha',
  language: 'en',
  timezone: 'UTC',
  autoSave: true,
  notifications: true
  },
- ai: {
- model: 'gemma3-legal',
+ ai: { model: 'gemma3-legal',
  temperature: 0.7,
  maxTokens: 2048,
  ollamaEndpoint: 'http://localhost:11434',
  embeddingModel: 'embeddinggemma',
  enableFallback: true
  },
- database: {
- type: 'postgresql',
+ database: { type: 'postgresql',
  host: 'localhost',
  port: 5432,
  database: 'legal_ai_db',
  ssl: false,
  connectionPool: 10
  },
- gpu: {
- enableWebGPU: true,
+ gpu: { enableWebGPU: true,
  enableCUDA: true,
  memoryLimit: 80,
  batchSize: 32,
  precision: 'fp16'
  },
- security: {
- encryption: 'AES256',
+ security: { encryption: 'AES256',
  sessionTimeout: 3600,
  twoFactor: false,
  auditLogging: true,
@@ -579,13 +568,13 @@
           📥 IMPORT CONFIG
           <input id="import-config" type="file" accept=".json" onchange={importConfig} style="display: none;" />
         </label>
-        <button class="quick-action" onclick={exportConfig}>
+        <button class="quick-action" onclick={ exportConfig }>
           📤 EXPORT CONFIG
         </button>
- <button class="quick-action" onclick={restartServices}>
+ <button class="quick-action" onclick={ restartServices }>
  🔄 RESTART SERVICES
  </button>
- <button class="quick-action" onclick={backupDatabase}>
+ <button class="quick-action" onclick={ backupDatabase }>
  💾 BACKUP DATABASE
  </button>
  </div>
@@ -596,19 +585,15 @@
 <style>
  .system-config {
  background: linear-gradient(135deg, #0d1117, #161b22);
- min-height: 100vh;
- color: #f0f6fc;
+ min-height: 100vh; color: #f0f6fc;
  font-family: 'JetBrains Mono', monospace;
  position: relative;
  }
 
  .system-config::before {
- content: '';
- position: fixed;
- top: 0;
- left: 0;
- width: 100%;
- height: 100%;
+ content: ''; position: fixed;
+ top: 0; left: 0;
+ width: 100%; height: 100%;
  background:
  linear-gradient(90deg, rgba(16, 185, 129, 0.1) 1px, transparent 1px),
  linear-gradient(rgba(16, 185, 129, 0.1) 1px, transparent 1px);
@@ -630,14 +615,12 @@
  .header-title h1 {
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
- font-size: 2rem;
- margin: 0;
+ font-size: 2rem; margin: 0;
  text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
  }
 
  .system-info {
- display: flex;
- gap: 1rem;
+ display: flex; gap: 1rem;
  align-items: center;
  }
 
@@ -651,29 +634,24 @@
 
  .version {
  background: rgba(16, 185, 129, 0.2);
- color: #10b981;
- border: 1px solid #10b981;
+ color: #10b981; border: 1px solid #10b981;
  }
 
  .uptime {
  background: rgba(6, 182, 212, 0.2);
- color: #06b6d4;
- border: 1px solid #06b6d4;
+ color: #06b6d4; border: 1px solid #06b6d4;
  }
 
  .config-actions {
- display: flex;
- gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  }
 
  .action-btn {
  padding: 0.5rem 1rem;
- border-radius: 4px;
- border: 1px solid transparent;
+ border-radius: 4px; border: 1px solid transparent;
  cursor: pointer;
  font-size: 0.875rem;
- font-weight: bold;
- transition: all 0.3s ease;
+ font-weight: bold; transition: all 0.3s ease;
  }
 
  .action-btn.primary {
@@ -694,27 +672,23 @@
  display: grid;
  grid-template-columns: 200px 1fr 300px;
  height: calc(100vh - 120px);
- gap: 1rem;
- padding: 1rem;
+ gap: 1rem; padding: 1rem;
  }
 
  .config-tabs {
  display: flex;
- flex-direction: column;
- gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .tab-btn {
  display: flex;
  flex-direction: column;
- align-items: center;
- gap: 0.25rem;
+ align-items: center; gap: 0.25rem;
  padding: 1rem 0.5rem;
  background: rgba(30, 41, 59, 0.8);
  border: 1px solid #6b7280;
  color: #f0f6fc;
- border-radius: 8px;
- cursor: pointer;
+ border-radius: 8px; cursor: pointer;
  transition: all 0.3s ease;
  font-size: 0.75rem;
  text-align: center;
@@ -734,8 +708,7 @@
  .config-content {
  background: rgba(13, 17, 23, 0.9);
  border: 2px solid #10b981;
- border-radius: 8px;
- padding: 1.5rem;
+ border-radius: 8px; padding: 1.5rem;
  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
  overflow-y: auto;
  }
@@ -743,8 +716,7 @@
  .config-section h2 {
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
- font-size: 1.25rem;
- margin: 0 0 1.5rem 0;
+ font-size: 1.25rem; margin: 0 0 1.5rem 0;
  text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
  }
 
@@ -756,8 +728,7 @@
 
  .setting-group {
  display: flex;
- flex-direction: column;
- gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .setting-label {
@@ -768,37 +739,29 @@
 
  .setting-input,
  .setting-slider {
- padding: 0.5rem;
- background: rgba(30, 41, 59, 0.8);
+ padding: 0.5rem; background: rgba(30, 41, 59, 0.8);
  border: 1px solid #6b7280;
- border-radius: 4px;
- color: #f0f6fc;
+ border-radius: 4px; color: #f0f6fc;
  font-family: 'JetBrains Mono', monospace;
  }
 
  .setting-slider {
- -webkit-appearance: none;
- appearance: none;
+ -webkit-appearance: none; appearance: none;
  height: 6px;
- border-radius: 3px;
- background: rgba(107, 114, 128, 0.5);
+ border-radius: 3px; background: rgba(107, 114, 128, 0.5);
  outline: none;
  }
  .setting-slider {
- -webkit-appearance: none;
- appearance: none;
+ -webkit-appearance: none; appearance: none;
  height: 6px;
- border-radius: 3px;
- background: rgba(107, 114, 128, 0.5);
+ border-radius: 3px; background: rgba(107, 114, 128, 0.5);
  outline: none;
  }
 
  .setting-slider::-webkit-slider-thumb {
- -webkit-appearance: none;
- width: 16px;
+ -webkit-appearance: none; width: 16px;
  height: 16px;
- border-radius: 50%;
- background: #10b981;
+ border-radius: 50%; background: #10b981;
  cursor: pointer;
  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
  }
@@ -811,40 +774,29 @@
  }
 
  .toggle {
- position: relative;
- display: inline-block;
- width: 50px;
- height: 24px;
+ position: relative; display: inline-block;
+ width: 50px; height: 24px;
  }
 
  .toggle input {
- opacity: 0;
- width: 0;
+ opacity: 0; width: 0;
  height: 0;
  }
 
  .toggle-slider {
- position: absolute;
- cursor: pointer;
- top: 0;
- left: 0;
- right: 0;
- bottom: 0;
+ position: absolute; cursor: pointer;
+ top: 0; left: 0;
+ right: 0; bottom: 0;
  background: rgba(107, 114, 128, 0.5);
- border-radius: 24px;
- transition: 0.3s;
+ border-radius: 24px; transition: 0.3s;
  }
 
  .toggle-slider:before {
- position: absolute;
- content: "";
- height: 18px;
- width: 18px;
- left: 3px;
- bottom: 3px;
+ position: absolute; content: "";
+ height: 18px; width: 18px;
+ left: 3px; bottom: 3px;
  background: #f0f6fc;
- border-radius: 50%;
- transition: 0.3s;
+ border-radius: 50%; transition: 0.3s;
  }
 
  .toggle input:checked + .toggle-slider {
@@ -865,15 +817,13 @@
  .status-card {
  background: rgba(30, 41, 59, 0.5);
  border: 1px solid #6b7280;
- border-radius: 8px;
- padding: 1rem;
+ border-radius: 8px; padding: 1rem;
  text-align: center;
  }
 
  .status-card h3 {
  color: #f0f6fc;
- font-size: 0.875rem;
- margin: 0 0 0.5rem 0;
+ font-size: 0.875rem; margin: 0 0 0.5rem 0;
  }
 
  .status.active {
@@ -889,8 +839,7 @@
  .system-panel {
  background: rgba(13, 17, 23, 0.9);
  border: 2px solid #10b981;
- border-radius: 8px;
- padding: 1rem;
+ border-radius: 8px; padding: 1rem;
  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
  overflow-y: auto;
  }
@@ -902,50 +851,42 @@
  .panel-section h3 {
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
- font-size: 0.875rem;
- margin: 0 0 1rem 0;
+ font-size: 0.875rem; margin: 0 0 1rem 0;
  text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
  }
 
  .metrics-grid {
- display: grid;
- gap: 1rem;
+ display: grid; gap: 1rem;
  }
 
  .metric-card {
  background: rgba(30, 41, 59, 0.5);
  border: 1px solid #6b7280;
- border-radius: 8px;
- padding: 1rem;
+ border-radius: 8px; padding: 1rem;
  }
 
  .metric-label {
  color: #9ca3af;
- font-size: 0.75rem;
- display: block;
+ font-size: 0.75rem; display: block;
  margin-bottom: 0.25rem;
  }
 
  .metric-value {
  color: #f0f6fc;
  font-weight: bold;
- font-size: 1rem;
- display: block;
+ font-size: 1rem; display: block;
  margin-bottom: 0.5rem;
  }
 
  .metric-bar {
- width: 100%;
- height: 8px;
+ width: 100%; height: 8px;
  background: rgba(107, 114, 128, 0.3);
- border-radius: 4px;
- overflow: hidden;
+ border-radius: 4px; overflow: hidden;
  }
 
  .metric-fill {
  height: 100%;
- border-radius: 4px;
- transition: width 0.3s ease;
+ border-radius: 4px; transition: width 0.3s ease;
  }
 
  .metric-fill.cpu {
@@ -961,12 +902,10 @@
  }
 
  .quick-action {
- padding: 0.75rem;
- background: rgba(30, 41, 59, 0.8);
+ padding: 0.75rem; background: rgba(30, 41, 59, 0.8);
  border: 1px solid #6b7280;
  color: #f0f6fc;
- border-radius: 4px;
- cursor: pointer;
+ border-radius: 4px; cursor: pointer;
  transition: all 0.3s ease;
  font-size: 0.875rem;
  text-align: center;
@@ -981,3 +920,7 @@
  cursor: pointer;
  }
 </style>
+
+
+
+

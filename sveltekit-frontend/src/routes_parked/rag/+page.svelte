@@ -14,7 +14,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  let submitting = $state (false);
  let loadingDocuments = $state (false);
  let documents: any[] = $state ([]);
- let selectedFile: File: null = null;
+ let selectedFile: null = null;
  let tags = $state ('');
  let uploading = $state (false);
  let uploadResult: any = $state (null);
@@ -52,7 +52,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  return;
  deletingId = id;
  try {
- const res = await fetch(`/api/v1/rag/documents/${id}`, { method: 'DELETE' });
+ const res = await fetch(`/api/v1/rag/documents/${ id }`, { method: 'DELETE' });
  const json = await res.json();
  if (json?.success) {
  documents = documents.filter((d) => d.id !== id);
@@ -106,7 +106,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement: null;
  if (fileInput) fileInput.value = '';
  } else {
- uploadResult = { success: false, error: json, json: json?.error ?? 'Upload failed' };
+ uploadResult = { success: false, error, json, json: json?.error ?? 'Upload failed' };
  }
  } catch (err: any) {
  uploadResult = { success: false, error: err, err: err?.message ?? 'Unknown error' };
@@ -126,7 +126,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  .split(',')
  .map((t) => t.trim())
  .filter(Boolean);
- const body = { query: searchQuery, searchType: tags: tags, searchTagsArray: searchTagsArray, limit: 10: 10 };
+ const body = { query: searchQuery, searchType: tags, searchTagsArray, limit: 10 };
  const res = await fetch('/api/v1/rag', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
@@ -175,7 +175,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <label>Tags (comma separated)</label>
  <input type="text" bind:value={tags} placeholder="contracts, NDA, evidence" />
  <div style="margin-top:0.75rem;">
- <button onclick={uploadFile} disabled={uploading}
+ <button onclick={ uploadFile } disabled={uploading}
  >{uploading ? 'Uploading…' : 'Upload'}</button
  >
  </div>
@@ -185,7 +185,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  {#if uploadResult.success}
  <p>Upload succeeded.</p>
  {:else}
- <p style="color:var(--error)">Upload failed: {uploadResult.error}</p>
+ <p style="color: var(--error)">Upload, failed: {uploadResult.error}</p>
  {/if}
  </div>
  {/if}
@@ -230,7 +230,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <option value="fuzzy">Fuzzy</option>
  </select>
  <div style="margin-top:0.75rem;">
- <button onclick={searchDocuments} disabled={searching}
+ <button onclick={ searchDocuments } disabled={searching}
  >{searching ? 'Searching…' : 'Search'}</button
  >
  </div>
@@ -254,34 +254,29 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <style>
  @import 'nes.css/css/nes.min.css';
  :global(body) {
- background: #212529;
- color: #d4af37;
+ background: #212529; color: #d4af37;
  font-family: 'Press Start 2P', 'Courier New', monospace;
  }
 
  .rag-page {
- max-width: 980px;
- margin: 2rem auto;
+ max-width: 980px; margin: 2rem auto;
  padding: 1rem;
  }
 
  .tabs {
- display: flex;
- gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  margin-bottom: 1rem;
  }
 
  .panel {
- background: #fff;
- color: #000;
+ background: #fff; color: #000;
  padding: 1rem;
  border-radius: 8px;
  }
 
  .doc-list,
  .results {
- list-style: none;
- padding: 0;
+ list-style: none; padding: 0;
  margin: 0;
  }
 
@@ -289,8 +284,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  .results li {
  display: flex;
  justify-content: space-between;
- align-items: center;
- padding: 0.6rem 0;
+ align-items: center; padding: 0.6rem 0;
  border-bottom: 1px solid #eee;
  }
 
@@ -300,3 +294,6 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 </style>
  }
 </style>
+
+
+

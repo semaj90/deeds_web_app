@@ -25,3 +25,6 @@ export function logError(event: string, error: Error | unknown, fields: LogField
  // eslint-disable-next-line no-console
  console.error(JSON.stringify({ level: 'error', event, ...base(), ...fields, error: errObj }));
 }
+
+
+

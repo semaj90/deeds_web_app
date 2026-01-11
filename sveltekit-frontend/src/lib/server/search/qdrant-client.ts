@@ -35,3 +35,6 @@ export async function qdrantSearch(
 
  return res.json();
 }
+
+
+

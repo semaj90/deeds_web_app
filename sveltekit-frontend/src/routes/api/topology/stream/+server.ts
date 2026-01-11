@@ -10,13 +10,12 @@ const pgPool = new Pool({
 	user: 'user',
 	password: 'pass'
 });
-
-// Track connected clients
+  
 const clients = new Set<ReadableStreamDefaultController>();
 
 // Notify all clients of updates
 export function broadcastUpdate(event: string, data: any) {
-	const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+	const message = `event: ${ event }\ndata: ${JSON.stringify(data)}\n\n`;
 	clients.forEach(controller => {
 		try {
 			controller.enqueue(new TextEncoder().encode(message));
@@ -66,8 +65,7 @@ export const GET: RequestHandler = async () => {
 							const component = extractComponent(row.file_path);
 							controller.enqueue(
 								new TextEncoder().encode(
-									`event: node_updated\ndata: ${JSON.stringify({
-										id: component,
+									`event: node_updated\ndata: ${JSON.stringify({ id: component,
 										errors: row.error_count,
 										timestamp: row.last_updated
 									})}\n\n`
@@ -118,3 +116,6 @@ function extractComponent(filePath: string): string {
 
 	return parts.slice(-2).join('/');
 }
+
+
+

@@ -3,10 +3,8 @@
  import { onMount } from 'svelte';
 
  interface Query {
- id: string;
- query: string;
- response: string;
- timestamp: Date;
+ id: string; query: string;
+ response: string; timestamp: Date;
  functionCalls: Array<{ name: string; result: any }>;
  }
 
@@ -46,11 +44,9 @@
  queryHistory = [
  {
  id: `query-${Date.now()}`,
- query: response, data: data.response: timestamp, new: new Date(),
- functionCalls: data.functionCalls || [],
+ query: response, data: data.response: timestamp, new: new Date( functionCalls: data.functionCalls || [],
  },
- ...queryHistory,
- ];
+ ...queryHistory];
  } catch (err) {
  error = err instanceof Error ? err.message : 'Failed to process query';
  } finally {
@@ -80,7 +76,7 @@
  />
  <a
  href="/dashboard"
- class="px-3 py-2 bg-black border border-[#00FF00] text-[#00FF00] rounded hover:bg-[#00FF00] hover:text-black font-mono text-sm transition"
+ class="px-3 py-2 bg-black border border-[#00FF00] text-[#00FF00] rounded hover: bg-[#00FF00], hover:text-black font-mono text-sm transition"
  >
  BACK
  </a>
@@ -127,3 +123,7 @@
  border-radius: 4px;
  }
 </style>
+
+
+
+

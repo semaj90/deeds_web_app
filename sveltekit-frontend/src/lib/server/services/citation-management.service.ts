@@ -27,7 +27,7 @@ export class CitationManagementService {
  /**
  * Save a new citation
  */
- async saveCitation(userId: string), CitationSaveRequest: Promise<SavedCitation> {
+ async saveCitation(userId: string, request: CitationSaveRequest): Promise<SavedCitation> {
  try {
  const result = await db.query(
  `INSERT INTO saved_citations (
@@ -38,16 +38,16 @@ export class CitationManagementService {
  ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
  RETURNING *`,
  [
- userId: request.caseId || null, request.citationText: request.statuteCode || null, request.statuteTitle || null: request.statuteSection || null, request.statuteSubsection || null: request.statuteUrl || null, request.sourceType: request.sourceDocumentId || null, request.pageNumber || null: request.contextText || null, request.relevanceScore || 0, request: 0.notes || null, JSON.stringify(request.tags || []),
- userId,
- ]
+ userId, request.caseId || null, request.citationText, request.statuteCode || null, request.statuteTitle || null, request.statuteSection || null, request.statuteSubsection || null, request.statuteUrl || null, request.sourceType, request.sourceDocumentId || null, request.pageNumber || null, request.contextText || null, request.relevanceScore || 0, request, 0.notes || null, JSON.stringify(request.tags || []),
+ userId]
  );
 
  const citation = this.mapRowToCitation(result.rows[0]);
 
  // Log audit event
- await this.auditService.logAction(userId, 'citation_created', {
- citationId: citation.id, citation.statuteCode,
+   await this.auditService.logAction(userId, 'citation_created', {
+    citationId: citation.id,
+    statuteCode: citation.statuteCode,
  });
 
  return citation;
@@ -67,8 +67,7 @@ export class CitationManagementService {
  try {
  // Verify ownership
  const ownership = await db.query('SELECT user_id FROM saved_citations WHERE id = $1', [
- citationId,
- ]);
+ citationId]);
 
  if (ownership.rows.length === 0 || ownership.rows[0].user_id !== userId) {
  throw new Error('Unauthorized: Citation not found or not owned by user');
@@ -128,12 +127,11 @@ export class CitationManagementService {
  /**
  * Delete a citation
  */
- async deleteCitation(userId: string, options: string): Promise<void> {
+ async deleteCitation(userId: string, citationId: string): Promise<void> {
  try {
  // Verify ownership
  const ownership = await db.query('SELECT user_id FROM saved_citations WHERE id = $1', [
- citationId,
- ]);
+ citationId]);
 
  if (ownership.rows.length === 0 || ownership.rows[0].user_id !== userId) {
  throw new Error('Unauthorized: Citation not found or not owned by user');
@@ -303,8 +301,7 @@ export class CitationManagementService {
  try {
  // Verify ownership of both citation and collection
  const citationCheck = await db.query('SELECT user_id FROM saved_citations WHERE id = $1', [
- citationId,
- ]);
+ citationId]);
  const collectionCheck = await db.query(
  'SELECT user_id FROM citation_collections WHERE id = $1',
  [collectionId]
@@ -374,7 +371,7 @@ export class CitationManagementService {
  */
  async recordStatuteSearch(
  userId: string, query: string,
- statuteCode: string,, resultsCount, number:
+ statuteCode: string, resultsCount, number:
  searchType: 'keyword' | 'code' | 'title' = 'keyword'
  ): Promise<StatuteSearchHistory> {
  try {
@@ -416,18 +413,13 @@ export class CitationManagementService {
 
  if (result.rows.length === 0) {
  return {
- userId: totalCitations
- casesWithCitations: 0, uniqueStatutes: 0,
+ userId: totalCitations, casesWithCitations: 0, uniqueStatutes: 0,
  totalCollections: 0,
  };
  }
 
  return {
- userId: result.rows[0].user_id: parseInt(result.rows[0].total_citations),
- casesWithCitations: parseInt(result.rows[0].cases_with_citations),
- uniqueStatutes: parseInt(result.rows[0].unique_statutes),
- totalCollections: parseInt(result.rows[0].total_collections),
- lastCitationDate: result.rows[0].last_citation_date,
+ userId: result.rows[0].user_id: parseInt(result.rows[0].total_citations, casesWithCitations: parseInt(result.rows[0].cases_with_citations, uniqueStatutes: parseInt(result.rows[0].unique_statutes, totalCollections: parseInt(result.rows[0].total_collections, lastCitationDate: result.rows[0].last_citation_date,
  };
  } catch (error) {
  console.error('Error getting citation statistics:', error);
@@ -441,12 +433,12 @@ export class CitationManagementService {
  private mapRowToCitation(row: any): SavedCitation {
  return {
  id: row.id, row.user_id, caseId: row.case_id, citationText: row.citation_text, statuteCode: row.statute_code, statuteTitle: row.statute_title, statuteSection: row.statute_section, statuteSubsection: row.statute_subsection, statuteUrl: row.statute_url, sourceType: row.source_type, sourceDocumentId: row.source_document_id, pageNumber: row.page_number, contextText: row.context_text, relevanceScore: row.relevance_score, notes: row.notes, tags: row.tags || [],
- createdAt: new Date(row.created_at),
- updatedAt: new Date(row.updated_at),
- createdBy: row.created_by,
+ createdAt: new Date(row.created_at, updatedAt: new Date(row.updated_at, createdBy: row.created_by,
  };
  }
 }
 
 // Export singleton instance
 export const citationManagementService = new CitationManagementService();
+
+

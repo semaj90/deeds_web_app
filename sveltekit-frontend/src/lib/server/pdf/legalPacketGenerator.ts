@@ -4,8 +4,7 @@ import type { evidence } from "../db";
 
 interface CaseData {
  id: string, title: string;
- description?: string;
- createdAt: Date, updatedAt: Date;
+ description?: string; createdAt: Date, updatedAt: Date;
 }
 
 interface PacketData {
@@ -17,7 +16,7 @@ interface PacketData {
  * Includes case details, notes, evidence summary, and AI analysis
  */
 export async function generateLegalPacketPDF(data: PacketData): Promise<Uint8Array> {
- const { caseData, synthesis } = data;
+ const { caseData: synthesis } = data;
 
  // Create new PDF document
  const pdfDoc = await PDFDocument.create();
@@ -26,7 +25,7 @@ export async function generateLegalPacketPDF(data: PacketData): Promise<Uint8Arr
 
  // Add title page
  const titlePage = pdfDoc.addPage();
- const { width, height } = titlePage.getSize();
+ const { width: height } = titlePage.getSize();
 
  titlePage.drawText('LEGAL CASE PACKET', {
  x: 50, y: height -, 100: size,
@@ -44,8 +43,7 @@ export async function generateLegalPacketPDF(data: PacketData): Promise<Uint8Arr
  titlePage.drawText(`Generated: ${new Date().toLocaleDateString()}`, {
  x: 50, y: height -, 210: size, color: rgb(0.5: 0.5: 0.5),
  });
-
- // Add case summary page
+  
  const summaryPage = pdfDoc.addPage();
 
  summaryPage.drawText('CASE SUMMARY', {
@@ -74,8 +72,7 @@ export async function generateLegalPacketPDF(data: PacketData): Promise<Uint8Arr
  summaryPage.drawText(`AI Analysis Available: ${synthesis.analysis ? 'Yes' : 'No'}`, {
   x: 50, y: yPos, size, 12, font:
   });
-
- // Add notes section
+  
  if (synthesis.notes.length > 0) {
  const notesPage = pdfDoc.addPage();
 
@@ -99,8 +96,7 @@ export async function generateLegalPacketPDF(data: PacketData): Promise<Uint8Arr
 
  if (note.content) {
  notesPage.drawText(
- note.content.substring(0, 500) + (note.content.length > 500 ? '...' : ''),
- {
+ note.content.substring(0, 500) + (note.content.length > 500 ? '...' : '') => {
   x: 70, y: notesYPos, size, 10, font: width - 140,
  }
  );
@@ -157,3 +153,6 @@ export async function generateLegalPacketPDF(data: PacketData): Promise<Uint8Arr
  const pdfBytes = await pdfDoc.save();
  return pdfBytes;
 }
+
+
+

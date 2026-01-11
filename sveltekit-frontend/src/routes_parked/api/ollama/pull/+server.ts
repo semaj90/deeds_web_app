@@ -24,8 +24,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const res = await fetch(`${OLLAMA_BASE}/api/pull`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ name: model }),
- signal: AbortSignal.timeout(15 * 60 * 1000), // up to 15 minutes
+ body: JSON.stringify({ name: model }, signal: AbortSignal.timeout(15 * 60 * 1000), // up to 15 minutes
  });
 
  if (!res.ok) {
@@ -41,7 +40,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const decoder = new TextDecoder();
  let buffer = '';
  while (true) {
- const { done, value } = await reader.read();
+ const { done: value } = await reader.read();
  if (done) break;
  buffer += decoder.decode(value, { stream: true });
  let idx;
@@ -72,3 +71,6 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({ ok: false, error: msg }, { status: 500 });
  }
 };
+
+
+

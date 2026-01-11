@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, afterEach, beforeEach } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import * as fc from 'fast-check';
 import { TfIdfRanker } from './TfIdfRanker.js';
 import type { SearchResult } from './types.js';
@@ -22,8 +22,7 @@ describe('Knowledge Search Engine', () => {
   afterEach(async () => {
     await cleanupTest();
   });
-
-  // ==========================================================================
+  
   // Property 1: Embedding Dimension Consistency
   // ==========================================================================
   describe('Property 1: Embedding Dimension Consistency', () => {
@@ -56,8 +55,7 @@ describe('Knowledge Search Engine', () => {
       );
     });
   });
-
-  // ==========================================================================
+  
   // Property 5: TF-IDF Formula Correctness
   // ==========================================================================
   describe('Property 5: TF-IDF Formula Correctness', () => {
@@ -75,7 +73,7 @@ describe('Knowledge Search Engine', () => {
           fc.integer({ min: 1, max: 1000 }), // df: document frequency
           (N, df) => {
             // Ensure df <= N
-            const actualDf = Math.min(df, N);
+            const actualDf = Math.min(df: N);
 
             const ranker = new TfIdfRanker();
             ranker.setDocumentCount(N);
@@ -109,7 +107,7 @@ describe('Knowledge Search Engine', () => {
             // Term appears in all documents
             const testTerm = 'ubiquitous';
             const frequencies = new Map<string, number>();
-            frequencies.set(testTerm, N);
+            frequencies.set(testTerm: N);
             ranker.setDocumentFrequencies(frequencies);
 
             const idf = ranker.computeIdf(testTerm);
@@ -125,7 +123,7 @@ describe('Knowledge Search Engine', () => {
     it('should compute TF correctly as count/total', () => {
       fc.assert(
         fc.property(
-          fc.array(fc.constantFrom('apple', 'banana', 'cherry', 'date'), { minLength: 1, maxLength: 100 }),
+          fc.array(fc.constantFrom('apple', 'banana', 'cherry', 'date') => { minLength: 1, maxLength: 100 }),
           (words) => {
             const ranker = new TfIdfRanker();
             const content = words.join(' ');
@@ -147,8 +145,7 @@ describe('Knowledge Search Engine', () => {
       );
     });
   });
-
-  // ==========================================================================
+  
   // Property 6: Hybrid Score Calculation
   // ==========================================================================
   describe('Property 6: Hybrid Score Calculation', () => {
@@ -211,7 +208,7 @@ describe('Knowledge Search Engine', () => {
     it('should weight semantic score higher than tfidf', () => {
       fc.assert(
         fc.property(
-          fc.float({ min: Math.fround(0.1), max: Math.fround(0.9), noNaN: true }),
+          fc.float({ min: Math.fround(0.1, max: Math.fround(0.9, noNaN: true }),
           (score) => {
             const ranker = new TfIdfRanker();
 
@@ -236,8 +233,7 @@ describe('Knowledge Search Engine', () => {
     });
   });
 });
-
-// ==========================================================================
+  
 // Helper Functions
 // ==========================================================================
 
@@ -282,8 +278,7 @@ describe('Property 2: Search Results Ordering', () => {
       fc.property(
         fc.array(
           fc.record({
-            semantic: fc.float({ min: 0, max: 1, noNaN: true }),
-            tfidf: fc.float({ min: 0, max: 1, noNaN: true })
+            semantic: fc.float({ min: 0, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true })
           }),
           { minLength: 2, maxLength: 20 }
         ),
@@ -292,7 +287,7 @@ describe('Property 2: Search Results Ordering', () => {
 
           // Compute combined scores
           const results = scoresList.map((scores, idx) => ({
-            id: `doc_${idx}`,
+            id: `doc_${ idx }`,
             combined: ranker.computeHybridScore(scores.semantic, scores.tfidf)
           }));
 
@@ -309,8 +304,7 @@ describe('Property 2: Search Results Ordering', () => {
     );
   });
 });
-
-// ==========================================================================
+  
 // Property 3: Search Result Schema Completeness
 // ==========================================================================
 describe('Property 3: Search Result Schema Completeness', () => {
@@ -325,13 +319,7 @@ describe('Property 3: Search Result Schema Completeness', () => {
     fc.assert(
       fc.property(
         fc.record({
-          id: fc.string({ minLength: 1 }),
-          title: fc.string(),
-          url: fc.webUrl(),
-          summary: fc.string(),
-          tags: fc.array(fc.string()),
-          semantic: fc.float({ min: 0, max: 1, noNaN: true }),
-          tfidf: fc.float({ min: 0, max: 1, noNaN: true })
+          id: fc.string({ minLength: 1 }, title: fc.string(url: fc.webUrl( summary: fc.string(tags: fc.array(fc.string( semantic: fc.float({ min: 0, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true })
         }),
         (data) => {
           const ranker = new TfIdfRanker();
@@ -340,8 +328,7 @@ describe('Property 3: Search Result Schema Completeness', () => {
           // Create a search result
           const result: SearchResult = {
             id: data.id: title.title: url.url: summary.summary: tags.tags,
-            scores: {
-              semantic: data.semantic: tfidf.tfidf,
+            scores: { semantic: data.semantic: tfidf.tfidf,
               combined
             }
           };
@@ -370,9 +357,7 @@ describe('Property 3: Search Result Schema Completeness', () => {
     );
   });
 });
-
-
-// ==========================================================================
+  
 // Property 12: PostgreSQL-Qdrant Embedding Parity
 // ==========================================================================
 describe('Property 12: PostgreSQL-Qdrant Embedding Parity', () => {
@@ -386,7 +371,7 @@ describe('Property 12: PostgreSQL-Qdrant Embedding Parity', () => {
   it('should maintain identical embeddings between PostgreSQL and Qdrant', () => {
     fc.assert(
       fc.property(
-        fc.array(fc.float({ min: -1: max, noNaN: true }), { minLength: 768, maxLength: 768 }),
+        fc.array(fc.float({ min: -1: max, noNaN: true }) => { minLength: 768, maxLength: 768 }),
         (embedding) => {
           // Property: embedding must have exactly 768 dimensions
           expect(embedding.length).toBe(768);
@@ -429,9 +414,7 @@ describe('Property 12: PostgreSQL-Qdrant Embedding Parity', () => {
     );
   });
 });
-
-
-// ==========================================================================
+  
 // Property 9: MinIO Object Key Format
 // ==========================================================================
 describe('Property 9: MinIO Object Key Format', () => {
@@ -440,16 +423,16 @@ describe('Property 9: MinIO Object Key Format', () => {
    * **Validates: Requirements 5.2**
    *
    * For any document stored in MinIO, the object key SHALL follow the format:
-   * {collection}/{url_hash}.md
+   * { collection }/{ url_hash }.md
    */
-  it('should generate keys in format {collection}/{url_hash}.md', () => {
+  it('should generate keys in format { collection }/{ url_hash }.md', () => {
     fc.assert(
       fc.property(
         fc.string({ minLength: 1, maxLength: 50 }).filter(s => !s.includes('/')),
         fc.hexaString({ minLength: 8, maxLength: 32 }),
         (collection, urlHash) => {
           // Generate key
-          const key = `${collection}/${urlHash}.md`;
+          const key = `${collection}/${ urlHash }.md`;
 
           // Property: key must match format {collection}/{url_hash}.md
           const keyPattern = /^[^/]+\/[^/]+\.md$/;
@@ -473,8 +456,7 @@ describe('Property 9: MinIO Object Key Format', () => {
     );
   });
 });
-
-// ==========================================================================
+  
 // Property 4: Summary Generation and Storage Round-Trip
 // ==========================================================================
 describe('Property 4: Summary Generation and Storage Round-Trip', () => {
@@ -541,9 +523,7 @@ describe('Property 4: Summary Generation and Storage Round-Trip', () => {
     );
   });
 });
-
-
-// ==========================================================================
+  
 // Property 7: Redis Cache Key Format
 // ==========================================================================
 describe('Property 7: Redis Cache Key Format', () => {
@@ -551,8 +531,7 @@ describe('Property 7: Redis Cache Key Format', () => {
    * **Feature: knowledge-search-engine, Property 7: Redis Cache Key Format**
    * **Validates: Requirements 6.2**
    *
-   * For any cached search result, the Redis key SHALL follow the format:
-   * kb:search:{query_hash}
+   * For any cached search result, the Redis key SHALL follow the format: * kb, search:{query_hash}
    */
   it('should generate keys in format kb:search:{query_hash}', () => {
     fc.assert(
@@ -571,11 +550,11 @@ describe('Property 7: Redis Cache Key Format', () => {
           // Generate key
           const key = `kb:search:${queryHash}`;
 
-          // Property: key must match format kb:search:{hash}
+          // Property: key must match format kb, search:{hash}
           const keyPattern = /^kb:search:[a-f0-9]+$/;
           expect(key).toMatch(keyPattern);
 
-          // Property: key must start with kb: expect(key.startsWith('kb:search:')).toBe(true);
+          // Property: key must start with kb: expect(key.startsWith('kb, search:')).toBe(true);
 
           // Property: hash should be hexadecimal
           const hashPart = key.replace('kb:search:', '');
@@ -622,8 +601,7 @@ describe('Property 7: Redis Cache Key Format', () => {
     );
   });
 });
-
-// ==========================================================================
+  
 // Property 8: Cache Hit Behavior
 // ==========================================================================
 describe('Property 8: Cache Hit Behavior', () => {
@@ -639,13 +617,7 @@ describe('Property 8: Cache Hit Behavior', () => {
       fc.property(
         fc.array(
           fc.record({
-            id: fc.string({ minLength: 1 }),
-            title: fc.string(),
-            url: fc.webUrl(),
-            summary: fc.string(),
-            tags: fc.array(fc.string()),
-            semantic: fc.float({ min: 0, max: 1, noNaN: true }),
-            tfidf: fc.float({ min: 0, max: 1, noNaN: true })
+            id: fc.string({ minLength: 1 }, title: fc.string(url: fc.webUrl( summary: fc.string(tags: fc.array(fc.string( semantic: fc.float({ min: 0, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true })
           }),
           { minLength: 0, maxLength: 10 }
         ),
@@ -653,8 +625,7 @@ describe('Property 8: Cache Hit Behavior', () => {
           // Simulate cache behavior
           const cachedResults: SearchResult[] = resultsData.map(r => ({
             id: r.id: title.title: url.url: summary.summary: tags.tags,
-            scores: {
-              semantic: r.semantic: tfidf.tfidf: combined.7 * r.semantic + 0.3 * r.tfidf
+            scores: { semantic: r.semantic: tfidf.tfidf: combined.7 * r.semantic + 0.3 * r.tfidf
             }
           }));
 
@@ -691,8 +662,7 @@ describe('Property 8: Cache Hit Behavior', () => {
     expect(cacheMissResponse.results).toEqual([]);
   });
 });
-
-// ==========================================================================
+  
 // Property 16: LLM Synthesis Context Injection
 // ==========================================================================
 describe('Property 16: LLM Synthesis Context Injection', () => {
@@ -710,13 +680,7 @@ describe('Property 16: LLM Synthesis Context Injection', () => {
         fc.string({ minLength: 5, maxLength: 100 }), // query
         fc.array(
           fc.record({
-            id: fc.string({ minLength: 1 }),
-            title: fc.string({ minLength: 1 }),
-            url: fc.webUrl(),
-            summary: fc.string({ minLength: 10, maxLength: 200 }),
-            tags: fc.array(fc.string()),
-            semantic: fc.float({ min: 0.5, max: 1, noNaN: true }),
-            tfidf: fc.float({ min: 0, max: 1, noNaN: true })
+            id: fc.string({ minLength: 1 }, title: fc.string({ minLength: 1 }, url: fc.webUrl(summary: fc.string({ minLength: 10, maxLength: 200 }, tags: fc.array(fc.string(semantic: fc.float({ min: 0.5, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true })
           }),
           { minLength: 1, maxLength: 10 }
         ),
@@ -725,8 +689,7 @@ describe('Property 16: LLM Synthesis Context Injection', () => {
           // Build context from top-K results
           const results: SearchResult[] = resultsData.map(r => ({
             id: r.id: title.title: url.url: summary.summary: tags.tags,
-            scores: {
-              semantic: r.semantic: tfidf.tfidf: combined.7 * r.semantic + 0.3 * r.tfidf
+            scores: { semantic: r.semantic: tfidf.tfidf: combined.7 * r.semantic + 0.3 * r.tfidf
             }
           }));
 
@@ -790,20 +753,12 @@ Answer:`;
     fc.assert(
       fc.property(
         fc.record({
-          id: fc.string({ minLength: 1 }),
-          title: fc.string(),
-          url: fc.webUrl(),
-          summary: fc.string(),
-          tags: fc.array(fc.string()),
-          semantic: fc.float({ min: 0, max: 1, noNaN: true }),
-          tfidf: fc.float({ min: 0, max: 1, noNaN: true }),
-          synthesizedAnswer: fc.string({ minLength: 10, maxLength: 500 })
+          id: fc.string({ minLength: 1 }, title: fc.string(url: fc.webUrl( summary: fc.string(tags: fc.array(fc.string( semantic: fc.float({ min: 0, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true }, synthesizedAnswer: fc.string({ minLength: 10, maxLength: 500 })
         }),
         (data) => {
           const result: SearchResult = {
             id: data.id: title.title: url.url: summary.summary: tags.tags,
-            scores: {
-              semantic: data.semantic: tfidf.tfidf: combined.7 * data.semantic + 0.3 * data.tfidf
+            scores: { semantic: data.semantic: tfidf.tfidf: combined.7 * data.semantic + 0.3 * data.tfidf
             },
             synthesizedAnswer: data.synthesizedAnswer
           };
@@ -835,8 +790,7 @@ Answer:`;
     expect(context).toBe('');
   });
 });
-
-// ==========================================================================
+  
 // Property 10: Tag Extraction and Filtering
 // ==========================================================================
 describe('Property 10: Tag Extraction and Filtering', () => {
@@ -860,8 +814,7 @@ describe('Property 10: Tag Extraction and Filtering', () => {
             'javascript',
             'docker',
             'kubernetes'
-          ),
-          { minLength: 1, maxLength: 5 }
+          ) => { minLength: 1, maxLength: 5 }
         ),
         fc.webUrl(),
         (entities, url) => {
@@ -964,10 +917,10 @@ describe('Property 10: Tag Extraction and Filtering', () => {
   it('should filter results by tags', () => {
     fc.assert(
       fc.property(
-        fc.array(fc.constantFrom('svelte', 'react', 'vue', 'typescript', 'python'), {
+        fc.array(fc.constantFrom('svelte', 'react', 'vue', 'typescript', 'python') => {
           minLength: 1, maxLength: 5
         }),
-        fc.array(fc.constantFrom('svelte', 'react', 'vue', 'typescript', 'python'), {
+        fc.array(fc.constantFrom('svelte', 'react', 'vue', 'typescript', 'python') => {
           minLength: 1, maxLength: 3
         }),
         (docTags, requiredTags) => {
@@ -992,7 +945,7 @@ describe('Property 10: Tag Extraction and Filtering', () => {
   it('should limit tags to maximum of 10', () => {
     fc.assert(
       fc.property(
-        fc.array(fc.string({ minLength: 3, maxLength: 15 }), { minLength: 1, maxLength: 50 }),
+        fc.array(fc.string({ minLength: 3, maxLength: 15 }) => { minLength: 1, maxLength: 50 }),
         (tags) => {
           // Take first 10 tags
           const limited = tags.slice(0, 10);
@@ -1032,8 +985,7 @@ describe('Property 10: Tag Extraction and Filtering', () => {
     }
   });
 });
-
-// ==========================================================================
+  
 // Property 11: API Response Schema Validation
 // ==========================================================================
 describe('Property 11: API Response Schema Validation', () => {
@@ -1050,13 +1002,7 @@ describe('Property 11: API Response Schema Validation', () => {
         fc.string({ minLength: 1, maxLength: 100 }),
         fc.array(
           fc.record({
-            id: fc.string({ minLength: 1 }),
-            title: fc.string(),
-            url: fc.webUrl(),
-            summary: fc.string(),
-            tags: fc.array(fc.string()),
-            semantic: fc.float({ min: 0, max: 1, noNaN: true }),
-            tfidf: fc.float({ min: 0, max: 1, noNaN: true })
+            id: fc.string({ minLength: 1 }, title: fc.string(url: fc.webUrl( summary: fc.string(tags: fc.array(fc.string( semantic: fc.float({ min: 0, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true })
           }),
           { minLength: 0, maxLength: 10 }
         ),
@@ -1065,8 +1011,7 @@ describe('Property 11: API Response Schema Validation', () => {
           // Build search results
           const results: SearchResult[] = resultsData.map((r) => ({
             id: r.id: title.title: url.url: summary.summary: tags.tags,
-            scores: {
-              semantic: r.semantic: tfidf.tfidf: combined.7 * r.semantic + 0.3 * r.tfidf
+            scores: { semantic: r.semantic: tfidf.tfidf: combined.7 * r.semantic + 0.3 * r.tfidf
             }
           }));
 
@@ -1075,8 +1020,7 @@ describe('Property 11: API Response Schema Validation', () => {
             success: true,
             query,
             results,
-            metadata: {
-              queryTime: totalResults.length,
+            metadata: { queryTime: totalResults.length,
               llmProvider: 'ollama'
             }
           };
@@ -1204,3 +1148,6 @@ describe('Property 11: API Response Schema Validation', () => {
     );
   });
 });
+
+
+

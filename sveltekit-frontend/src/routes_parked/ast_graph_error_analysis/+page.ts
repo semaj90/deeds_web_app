@@ -1,6 +1,6 @@
 import type { PageLoad } from './$types.js';
 
-export const load: PageLoad = async ({ fetch, url }) => {
+export const load: PageLoad = async ({ fetch: url }) => {
  const route = url.searchParams.get('route');
 
  // Fetch error summary
@@ -21,3 +21,6 @@ export const load: PageLoad = async ({ fetch, url }) => {
  timestamp: new Date().toISOString(),
  };
 };
+
+
+

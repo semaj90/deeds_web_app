@@ -26,18 +26,12 @@ export interface PostgresConfig {
 }
 
 export interface PostgresDocument {
-  id: number;
-  qdrant_id: number;
-  url: string;
-  url_hash: string;
-  title: string;
-  summary: string | null;
-  entities: string[];
-  tags: string[];
-  source: string;
-  scraped_at: Date;
-  content_length: number;
-  minio_key: string | null;
+  id: number; qdrant_id: number;
+  url: string; url_hash: string;
+  title: string; summary: string | null;
+  entities: string[]; tags: string[];
+  source: string; scraped_at: Date;
+  content_length: number; minio_key: string | null;
   embedding: number[] | null;
   tfidf_vector: Record<string, number>;
 }
@@ -85,20 +79,13 @@ export class PostgresKnowledgeStore {
    *
    * @param doc - Document data including embedding
    */
-  async upsertDocument(doc: {
-    qdrantId: number;
-    url: string;
-    urlHash: string;
-    title: string;
-    summary: string;
-    entities: string[];
-    tags: string[];
-    source: string;
-    scrapedAt: Date;
-    contentLength: number;
-    minioKey: string;
-    embedding: number[];
-    tfIdfVector: Map<string, number>;
+  async upsertDocument(doc: { qdrantId: number;
+    url: string; urlHash: string;
+    title: string; summary: string;
+    entities: string[]; tags: string[];
+    source: string; scrapedAt: Date;
+    contentLength: number; minioKey: string;
+    embedding: number[]; tfIdfVector: Map<string, number>;
   }): Promise<number> {
     // Property 12: Ensure embedding has same dimension Qdrant (768)
     if (doc.embedding.length !== 768) {
@@ -135,7 +122,8 @@ export class PostgresKnowledgeStore {
     ];
 
     // In a real implementation, this would execute the query
-    // For now, return a placeholder
+    // For now;
+ return a placeholder
     console.log('📦 PostgreSQL upsert:', doc.title);
     return doc.qdrantId;
   }
@@ -308,3 +296,7 @@ export function getPostgresKnowledgeStore(config?: Partial<PostgresConfig>): Pos
   }
   return postgresStoreInstance;
 }
+
+
+
+

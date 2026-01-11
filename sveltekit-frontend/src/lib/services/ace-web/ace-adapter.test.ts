@@ -13,13 +13,11 @@ describe('AceAdapter', () => {
 
   beforeEach(() => {
     adapter = new AceAdapter({
-      llmConfig: {
-        provider: 'gemma3',
+      llmConfig: { provider: 'gemma3',
         temperature: 0.1, maxTokens: 1000
       },
     });
-
-    // Mock fetch for API calls
+  
     global.fetch = vi.fn();
   });
 
@@ -69,8 +67,7 @@ describe('AceAdapter', () => {
 
       const request: AceRequest = {
         userRequest: 'Fix this obscure error that has no documentation',
-        errorContext: {
-          message: 'Property does not exist',
+        errorContext: { message: 'Property does not exist',
           filePath: 'src/test.ts',
           lineNumber: 42,
         },
@@ -92,11 +89,10 @@ describe('AceAdapter', () => {
 
       const request: AceRequest = {
         userRequest: 'Fix this error',
-        errorContext: {
-          message: 'Type error',
+        errorContext: { message: 'Type error',
           filePath: 'src/component.svelte',
           lineNumber: 10,
-          code: 'const x: string = 123;',
+          code: 'const, x: string = 123;',
         },
       };
 
@@ -220,3 +216,6 @@ describe('AceAdapter', () => {
     });
   });
 });
+
+
+

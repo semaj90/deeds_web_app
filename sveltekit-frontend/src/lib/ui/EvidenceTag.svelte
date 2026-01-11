@@ -9,3 +9,5 @@
  'bg-frame/10 text-ink border-frame/20'}">
  {type.toUpperCase()}
 </span>
+
+

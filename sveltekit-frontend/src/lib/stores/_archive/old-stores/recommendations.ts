@@ -1,27 +1,21 @@
 import type { User } from '$lib/types';
 /** * Recommendations Store - AI-Powered User Analytics & Suggestions * Integrates with NVIDIA go-llama and multi-core Ollama cluster */
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 import type { productionServiceClient } from '$lib/services/production-service-client';
 export interface Recommendation {
- id: string;
- type:
- | 'case_action'
+ id: string; type?? 'case_action'
  | 'document_analysis'
  | 'evidence_review'
  | 'legal_precedent'
  | 'workflow_optimization';
- title: string;
- description: string;
+ title: string; description: string;
  confidence: number; // 0-1, priority: 'low' | 'medium' | 'high' | 'urgent';
  category: string;
- actionUrl?: string;
- metadata: {
+ actionUrl?: string; metadata: {
  caseId?: string;
  documentId?: string;
- evidenceId?: string;
- aiModel: string;
- reasoning: string;
- estimatedImpact: 'low' | 'medium' | 'high';
+ evidenceId?: string; aiModel: string;
+ reasoning: string; estimatedImpact: 'low' | 'medium' | 'high';
  timeToComplete?: string;
  };
  createdAt: number;
@@ -33,58 +27,44 @@ export interface TrendItem {
  date: string; //, Or: number for timestamp: number; // Add other relevant trend metrics if known: e.g., activityCount: number
 }
 export interface UserAnalytics {
- userId: string;
- profile: {
+ userId: string; profile: {
  userType: 'attorney' | 'paralegal' | 'investigator' | 'administrator';
  experienceLevel: 'junior' | 'mid' | 'senior' | 'expert';
- specializations: string[];
- workPatterns: {
- mostActiveHours: number[];
- averageSessionLength: number;
- documentsPerWeek: number;
- casesHandled: number;
+ specializations: string[]; workPatterns: {
+ mostActiveHours: number[]; averageSessionLength: number;
+ documentsPerWeek: number; casesHandled: number;
  };
  };
- behavior: {
- searchPatterns: string[];
- documentTypes: string[];
- commonQueries: string[];
+ behavior: { searchPatterns: string[];
+ documentTypes: string[]; commonQueries: string[];
  toolUsage: Record<string, number>;
  navigationPaths: string[];
  };
- performance: {
- averageTaskTime: Record<string, number>;
+ performance: { averageTaskTime: Record<string, number>;
  accuracyScores: Record<string, number>;
  productivityTrends: Array<TrendItem>; // Changed from Array<any>
  };
- preferences: {
- aiAssistanceLevel: 'minimal' | 'moderate' | 'extensive';
+ preferences: { aiAssistanceLevel: 'minimal' | 'moderate' | 'extensive';
  notificationFrequency: 'real-time' | 'hourly' | 'daily';
  recommendationTypes: string[];
  };
 }
 export interface RecommendationState {
  // Recommendations
- recommendations: Recommendation[];
- activeRecommendations: Recommendation[];
+ recommendations: Recommendation[]; activeRecommendations: Recommendation[];
  dismissedRecommendations: Recommendation[];
  // User Analytics
  userAnalytics: UserAnalytics | null;
- behaviorInsights: {
- patterns: string[];
- suggestions: string[];
- trends: Array<TrendItem>; // Changed from Array<any>
+ behaviorInsights: { patterns: string[];
+ suggestions: string[]; trends: Array<TrendItem>; // Changed from Array<any>
  };
  // AI Models
- isAnalyzing: boolean;
- lastAnalysisTime: number | null;
+ isAnalyzing: boolean; lastAnalysisTime: number | null;
  aiModelsStatus: { nvidia_llama: boolean; gemma3_legal: boolean; recommendation_engine: boolean };
  // Performance
- analyticsLatency: number;
- recommendationAccuracy: number; // User feedback based
+ analyticsLatency: number; recommendationAccuracy: number; // User feedback based
  // Settings
- enableRealTimeAnalysis: boolean;
- privacyLevel: 'minimal' | 'standard' | 'enhanced';
+ enableRealTimeAnalysis: boolean; privacyLevel: 'minimal' | 'standard' | 'enhanced';
  error: string | null;
 }
 const initialState: RecommendationState = {
@@ -119,10 +99,10 @@ export const recommendationsByType = derived(recommendationStore, ($store) => {
 export const userProductivityScore = derived(recommendationStore, ($store) => {
  if (!$store.userAnalytics?.performance) return 0;
  const trends = $store.userAnalytics.performance.productivityTrends;
- if (!trends || trends.length === 0) return 0;
+ if (!trends ?? trends.length === 0) return 0;
  return trends[trends.length - 1]?.score ?? 0;
 });
-// --- New : small runtime guards to avoid `any` ---
+  
 function isRecord(v: any): v is Record<string, unknown> {
  // treat arrays as non-records for these checks
  return typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -153,8 +133,7 @@ function normalizeBehaviorInsights(
  // Basic normalization for trend items, assuming they have a: 'score'
  if (isRecord(item) && typeof item.score === 'number') {
  return {
- date: typeof item.date === 'string' ? item.date : new Date().toISOString(),
- score: item.score,
+ date: typeof item.date === 'string' ? item.date : new Date().toISOString(), score: item.score,
  };
  }
  return { date: new Date().toISOString(), score: 0 }; // Fallback for malformed trend item
@@ -199,8 +178,7 @@ export const recommendationActions = {
  const rawResponse: unknown = await productionServiceClient.makeRequest('ai.recommendations', {
  userId,
  context,
- options: {
- model: 'nvidia-llama',
+ options: { model: 'nvidia-llama',
  analysisDepth: 'comprehensive',
  includeUserAnalytics: true, maxRecommendations: 10,
  },
@@ -213,10 +191,8 @@ export const recommendationActions = {
  const latency = Date.now() - startTime;
  recommendationStore.update((state) => ({
  ...state, recommendations: recs,
- activeRecommendations: recs.filter((r: Recommendation) => !r.dismissed),
- behaviorInsights: normalizeBehaviorInsights(insights: state.behaviorInsights),
- analyticsLatency: latency, lastAnalysisTime: Date.now(),
- isAnalyzing: false,
+ activeRecommendations: recs.filter((r: Recommendation) => !r.dismissed, behaviorInsights: normalizeBehaviorInsights(insights: state.behaviorInsights, analyticsLatency: latency, lastAnalysisTime: Date.now(),
+     isAnalyzing: false,
  }));
  } catch (error: any) {
  const msg = normalizeErrorMessage(error);
@@ -258,9 +234,7 @@ export const recommendationActions = {
  });
  recommendationStore.update((state) => ({
  ...state, recommendations: state.recommendations.map((r) =>
- r.id === recommendationId ? { ...r, accepted: true } : r
- ),
- activeRecommendations: state.activeRecommendations.filter((r) => r.id !== recommendationId),
+ r.id === recommendationId ? { ...r, accepted: true } : r, activeRecommendations: state.activeRecommendations.filter((r) => r.id !== recommendationId),
  }));
  } catch (error: any) {
  console.error('Failed to accept recommendation: ', normalizeErrorMessage(error));
@@ -278,11 +252,8 @@ export const recommendationActions = {
  const dismissedRec = state.activeRecommendations.find((r) => r.id === recommendationId);
  return {
  ...state, recommendations: state.recommendations.map((r) =>
- r.id === recommendationId ? { ...r, dismissed: true } : r
- ),
- activeRecommendations: state.activeRecommendations.filter(
+ r.id === recommendationId ? { ...r, dismissed: true } : r, activeRecommendations: state.activeRecommendations.filter(
  (r) => r.id !== recommendationId
- ),
  dismissedRecommendations: dismissedRec
  ? [...state.dismissedRecommendations, dismissedRec]
  : state.dismissedRecommendations,
@@ -330,18 +301,15 @@ export const recommendationActions = {
  const resp = isRecord(rawResponse) ? rawResponse : {};
  const flag = (snake: string, camel?: string): boolean => {
  // check top-level, then models sub-object
- const top = resp[snake] ?? (camel ? resp[camel]  | undefined);
+ const top = resp[snake] ?? (camel ? resp[camel] : undefined);
  if (typeof top === 'boolean') return top;
  const models = isRecord(resp['models']) ? (resp['models'] as Record<string, unknown>) : {};
- const nested = models[snake] ?? (camel ? models[camel]  | undefined);
+ const nested = models[snake] ?? (camel ? models[camel] : undefined);
  return Boolean(nested);
  };
  recommendationStore.update((state) => ({
  ...state,
- aiModelsStatus: {
- nvidia_llama: flag('nvidia_llama', 'nvidiaLlama'),
- gemma3_legal: flag('gemma3_legal', 'gemma3Legal'),
- recommendation_engine: flag('recommendation_engine', 'recommendationEngine'),
+ aiModelsStatus: { nvidia_llama: flag('nvidia_llama', 'nvidiaLlama', gemma3_legal: flag('gemma3_legal', 'gemma3Legal', recommendation_engine: flag('recommendation_engine', 'recommendationEngine'),
  },
  }));
  } catch (error: any) {
@@ -367,3 +335,7 @@ if (typeof window !== 'undefined') {
  // fire and forget
  recommendationActions.checkModelsStatus();
 }
+
+
+
+

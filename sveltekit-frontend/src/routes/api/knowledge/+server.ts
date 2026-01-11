@@ -1,5 +1,5 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
-import { json, type, RequestHandler } from '@sveltejs/kit';
+import { json, type RequestHandler } from '@sveltejs/kit';
 import { JSDOM } from 'jsdom';
 import pdfParse from 'pdf-parse';
 import postgres from 'postgres';
@@ -25,7 +25,7 @@ async function extractDocumentText(file: File): Promise<string> {
     return pdf.text;
   } else if (ext === 'txt') {
     return new TextDecoder().decode(buffer);
-  } else if (ext === 'html' || ext === 'htm') {
+  } else if (ext === 'html' ?? ext === 'htm') {
     const html = new TextDecoder().decode(buffer);
     const dom = new JSDOM(html);
     return dom.window.document.body.textContent || '';
@@ -55,8 +55,8 @@ async function generateEmbedding(text: string): Promise<number[]> {
     const response = await fetch(`${OLLAMA_URL_VAR}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: EMBEDDING_MODEL, prompt: text.substring(0, 8000)
+      body: JSON.stringify({ model: EMBEDDING_MODEL,
+        prompt: text.substring(0, 8000)
       })
     });
 
@@ -76,8 +76,7 @@ async function ensureQdrantCollection() {
     await (qdrant as any).getCollection('knowledge_base');
   } catch {
     await qdrant.createCollection('knowledge_base', {
-      vectors: {
-        size: 768,
+      vectors: { size: 768,
         distance: 'Cosine'
       }
     });
@@ -124,7 +123,8 @@ export const POST: RequestHandler = async ({ request }) => {
           const payload = {
             document_name: file.name,
             content: chunk,
-            source: uploaded_at Date().toISOString(),
+            source,
+            uploaded_at: new Date().toISOString(),
             chunk_count: chunks.length
           };
 
@@ -132,7 +132,8 @@ export const POST: RequestHandler = async ({ request }) => {
           await (qdrant as any).upsert('knowledge_base', {
             points: [
               {
-                id: pointId, vector: embedding, embedding:
+                id: pointId,
+                vector: embedding,
                 payload
               }
             ]
@@ -151,7 +152,7 @@ export const POST: RequestHandler = async ({ request }) => {
         results.push({
           file: file.name,
           chunks: chunks.length,
-          points: points.length,
+          points: pointIds.length,
           status: 'success'
         });
 
@@ -199,7 +200,8 @@ export const GET: RequestHandler = async ({ url }) => {
     // Search Qdrant
     const results = await (qdrant as any).search('knowledge_base', {
       vector: queryEmbedding,
-      limit: score_threshold.6
+      limit,
+      score_threshold: 0.6
     });
 
     const matches = (results as any[]).map(r => ({
@@ -250,7 +252,9 @@ export const PATCH: RequestHandler = async ({ request }) => {
     // 1. Search knowledge base for context
     const queryEmbedding = await generateEmbedding(prompt);
     const searchResults = await (qdrant as any).search('knowledge_base', {
-      vector: queryEmbedding, limit: max_context_chunks, max_context_chunks: 0.6
+      vector: queryEmbedding,
+      limit: max_context_chunks,
+      score_threshold: 0.6
     });
 
     const context = (searchResults as any[])
@@ -270,7 +274,7 @@ ${context || 'No matching documents found in knowledge base.'}
 ---
 
 USER QUESTION:
-${prompt}
+${ prompt }
 
 ---
 
@@ -287,21 +291,21 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: augmentedPrompt }] }]
+          body: JSON.stringify({ contents: [{ parts: [{ text: augmentedPrompt }] }]
           })
         }
       );
 
       const geminiData = await geminiRes.json();
-      response = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      response = geminiData.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
     } else {
       llmUsed = 'gemma3-legal:latest';
       const ollamaRes = await fetch(`${OLLAMA_URL_VAR}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: LOCAL_LLM, prompt: augmentedPrompt, augmentedPrompt: false
+        body: JSON.stringify({ model: LOCAL_LLM,
+          prompt: augmentedPrompt,
+          stream: false
         })
       });
 
@@ -311,9 +315,10 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
 
     return json({
       success: true,
-      response: llm,
-      rag_context: {
-        matches: (searchResults as any[]).length: avg_similarity.toFixed(2),
+      response,
+      llm_used: llmUsed,
+      rag_context: { matches: (searchResults as any[]).length,
+        avg_similarity: avgSimilarity.toFixed(2),
         documents: (searchResults as any[]).map(r => r.payload?.document_name)
       }
     });
@@ -325,3 +330,6 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
     );
   }
 };
+
+
+

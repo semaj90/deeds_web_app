@@ -18,8 +18,7 @@ export const CaseStatusEnum = z.enum([
  'trial',
  'post_trial',
  'closed',
- 'archived',
-]);
+ 'archived']);
 export const CasePriorityEnum = z.enum(['low', 'medium', 'high', 'critical', 'urgent']);
 export const CaseTypeEnum = z.enum([
  'felony',
@@ -28,8 +27,7 @@ export const CaseTypeEnum = z.enum([
  'infraction',
  'civil',
  'traffic',
- 'other',
-]);
+ 'other']);
 export const JurisdictionEnum = z.enum(['state', 'federal', 'county', 'municipal', 'tribal']);
 export const EvidenceStatusEnum = z.enum([
  'available',
@@ -37,8 +35,7 @@ export const EvidenceStatusEnum = z.enum([
  'lost',
  'destroyed',
  'sealed',
- 'unavailable',
-]);
+ 'unavailable']);
 
 // ============================================================================
 // PERSON OF INTEREST SCHEMA
@@ -79,8 +76,7 @@ export const EvidenceItemSchema = z.object({
  'physical',
  'digital',
  'forensic',
- 'witness_statement',
- ]),
+ 'witness_statement']),
  status: EvidenceStatusEnum.default('available'),
  collectionDate: z.string().datetime().optional(),
  collectedBy: z.string().optional(),
@@ -262,10 +258,11 @@ export function estimateCaseCompleteness(form: Partial<ProsecutionCaseForm>): nu
  'narrative',
  'defendants',
  'evidence',
- 'charges',
- ];
+ 'charges'];
  const filled = fields.filter(
  (f) => form[f] && (Array.isArray(form[f]) ? (form[f] as any[]).length > 0 : true)
  ).length;
  return Math.round((filled / fields.length) * 100);
 }
+
+

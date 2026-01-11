@@ -1,7 +1,7 @@
 <script lang="ts">
  import { Badge } from '$lib/components/ui/badge';
- import { Button } from '$lib/components/ui/button';
- import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
+ import { Button } from '$lib/components/ui/enhanced-bits';
+ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '$lib/components/ui/enhanced-bits';
  import { onMount } from 'svelte';
 
  let status = $state<any>(null);
@@ -63,7 +63,7 @@
  Automated TypeScript error analysis and correction system
  </p>
  </div>
- <Button onclick={createRun}>Create New Run</Button>
+ <Button class="bits-btn" onclick={createRun}>Create New Run</Button>
  </div>
 
  {#if error}
@@ -148,7 +148,7 @@
  {/if}
  </div>
  </div>
- <Button variant="outline" size="sm">View Details</Button>
+ <Button class="bits-btn" variant="outline" size="sm">View Details</Button>
  </div>
  {/each}
  </div>
@@ -157,3 +157,5 @@
  </Card>
  {/if}
 </div>
+
+

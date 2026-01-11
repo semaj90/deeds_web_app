@@ -7,14 +7,10 @@ import { analyzeImageWithVision, generateText, embedText } from './ollama-servic
 import type { VisionAnalysisResponse } from './ollama-service.js';
 
 export interface DocumentAnalysisResult {
- documentId: string;
- documentType: string;
- summary: string;
- keyEntities: string[];
- legalConcepts: string[];
- visionAnalysis: VisionAnalysisResponse;
- embedding: number[];
- confidence: number;
+ documentId: string; documentType: string;
+ summary: string; keyEntities: string[];
+ legalConcepts: string[]; visionAnalysis: VisionAnalysisResponse;
+ embedding: number[]; confidence: number;
  timestamp: Date;
 }
 
@@ -81,7 +77,7 @@ function buildVisionQuery(documentType: string): string {
 3. Obligations and rights
 4. Termination clauses
 5. Dispute resolution mechanisms
-${context ? `Context: ${context}` : ''}`,
+${context ? `Context: ${ context }` : ''}`,
 
  evidence: `Analyze this evidence document. Extract:
 1. Type of evidence (document, photo, video, etc.)
@@ -89,7 +85,7 @@ ${context ? `Context: ${context}` : ''}`,
 3. Relevant dates and times
 4. Parties or individuals mentioned
 5. Relevance to legal proceedings
-${context ? `Context: ${context}` : ''}`,
+${context ? `Context: ${ context }` : ''}`,
 
  statute: `Analyze this statute/law document. Extract:
 1. Statute number and title
@@ -124,10 +120,8 @@ ${context ? `Context: ${context}` : ''}`,
  */
 async function extractDocumentInfo(
  visionAnalysis: string, _documentType: string
-): Promise<{
- summary: string;
- entities: string[];
- concepts: string[];
+): Promise<{ summary: string;
+ entities: string[]; concepts: string[];
 }> {
  const extractionPrompt = `Given this document analysis:
 
@@ -154,8 +148,7 @@ Return ONLY valid JSON, no markdown.`;
  } catch (err) {
  console.error('❌ Extraction error:', err);
  return {
- summary: visionAnalysis.substring(0, 200),
- entities: [],
+ summary: visionAnalysis.substring(0, 200, entities: [],
  concepts: [],
  };
  }
@@ -183,8 +176,7 @@ function computeConfidence(analysis: string): number {
  'statute',
  'court',
  'evidence',
- 'claim',
- ];
+ 'claim'];
  const foundTerms = legalTerms.filter((term) => analysis.toLowerCase().includes(term)).length;
  confidence += (foundTerms / legalTerms.length) * 0.1;
 
@@ -195,22 +187,18 @@ function computeConfidence(analysis: string): number {
  * Enrich contextual chat with VLM analysis
  * Called from enhanced-rag endpoint
  */
-export async function enrichChatWithVLMAnalysis(chatContext: {
- query: string;
+export async function enrichChatWithVLMAnalysis(chatContext: { query: string;
  ragResults: Array<{ text: string; evidence_id: string }>;
  imageData?: string;
-}): Promise<{
- enrichedContext: string;
- visionInsights: string[];
- confidence: number;
+}): Promise<{ enrichedContext: string;
+ visionInsights: string[]; confidence: number;
 }> {
  const { query, ragResults, imageData } = chatContext;
 
  try {
  if (!imageData) {
  return {
- enrichedContext: ragResults.map((r) => r.text).join('\n'),
- visionInsights: [],
+ enrichedContext: ragResults.map((r) => r.text).join('\n'), visionInsights: [],
  confidence: 0.8,
  };
  }
@@ -219,8 +207,7 @@ export async function enrichChatWithVLMAnalysis(chatContext: {
  const analysis = await analyzeDocumentImage({
  imageBase64: imageData, context: query,
  });
-
- // Combine RAG results with VLM analysis
+  
  const enrichedContext = `
 VLM Analysis:
 ${analysis.summary}
@@ -238,15 +225,13 @@ ${ragResults.map((r) => r.text).join('\n')}
  `Document Type: ${analysis.documentType}`,
  `Summary: ${analysis.summary}`,
  `Key Entities: ${analysis.keyEntities.join(', ')}`,
- `Legal Concepts: ${analysis.legalConcepts.join(', ')}`,
- ],
+ `Legal Concepts: ${analysis.legalConcepts.join(', ')}`],
  confidence: analysis.confidence,
  };
  } catch (err) {
  console.error('❌ VLM enrichment error:', err);
  return {
- enrichedContext: ragResults.map((r) => r.text).join('\n'),
- visionInsights: [],
+ enrichedContext: ragResults.map((r) => r.text).join('\n'), visionInsights: [],
  confidence: 0.5,
  };
  }
@@ -273,3 +258,7 @@ export async function analyzeDocumentBatch(
  })
  .filter((r): r is DocumentAnalysisResult => r !== null);
 }
+
+
+
+

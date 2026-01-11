@@ -1,12 +1,12 @@
 <script lang="ts">
+	let caseId = $state<any>(undefined);
+
  import Button from './Button.svelte';
  import Tag from './Tag.svelte';
 
  type TimelineEvent = {
- id: string;
- timestamp: Date;
- title: string;
- description: string;
+ id: string; timestamp: Date;
+ title: string; description: string;
  type: 'evidence' | 'person' | 'location' | 'action';
  evidenceIds?: string[];
  personIds?: string[];
@@ -21,45 +21,39 @@
  const demoEvents: TimelineEvent[] = [
  {
  id: 'T-001',
- timestamp: new Date('2024-12-05T20:00:00'),
- title: 'Suspect Arrives at Building',
+ timestamp: new Date('2024-12-05T20:00:00', title: 'Suspect Arrives at Building',
  description: 'Security footage shows suspect entering lobby',
  type: 'evidence',
  evidenceIds: ['EV-001'],
  },
  {
  id: 'T-002',
- timestamp: new Date('2024-12-05T21:15:00'),
- title: 'Badge Access to Server Room',
+ timestamp: new Date('2024-12-05T21:15:00', title: 'Badge Access to Server Room',
  description: 'Stolen credentials used to access restricted area',
  type: 'action',
  evidenceIds: ['EV-003'],
  },
  {
  id: 'T-003',
- timestamp: new Date('2024-12-05T21:34:00'),
- title: 'Physical Evidence Created',
+ timestamp: new Date('2024-12-05T21:34:00', title: 'Physical Evidence Created',
  description: 'Forced entry marks photographed',
  type: 'evidence',
  evidenceIds: ['EV-004'],
  },
  {
  id: 'T-004',
- timestamp: new Date('2024-12-05T21:45:00'),
- title: 'Witness Observation',
+ timestamp: new Date('2024-12-05T21:45:00', title: 'Witness Observation',
  description: 'K. Ito hears suspicious activity',
  type: 'person',
  personIds: ['POI-002'],
  },
  {
  id: 'T-005',
- timestamp: new Date('2024-12-05T22:10:00'),
- title: 'Suspect Exits Building',
+ timestamp: new Date('2024-12-05T22:10:00', title: 'Suspect Exits Building',
  description: 'Final security camera footage',
  type: 'evidence',
  evidenceIds: ['EV-001'],
- },
- ];
+ }];
 
  // Use demo data if events is empty
  const viewEvents = $derived(events.length > 0 ? events : demoEvents);
@@ -94,11 +88,11 @@
  <div class="flex items-center justify-between mb-4">
  <div class="heading-sub">Case Timeline – {caseId}</div>
  <div class="flex gap-2">
- <Button variant="secondary">
+ <Button class="bits-btn" variant="secondary">
  <span class="i-heroicons-funnel mr-1" ></span>
  Filter
  </Button>
- <Button variant="primary">
+ <Button class="bits-btn" variant="primary">
  <span class="i-heroicons-plus-20-solid mr-1" ></span>
  Add Event
  </Button>
@@ -152,7 +146,7 @@
  <div class="flex gap-1 mt-2">
  <span class="text-[10px] font-mono text-black/60">Evidence:</span>
  {#each event.evidenceIds as evidId}
- <span class="tag">{evidId}</span>
+ <span class="tag">{ evidId }</span>
  {/each}
  </div>
  {/if}
@@ -161,7 +155,7 @@
  <div class="flex gap-1 mt-2">
  <span class="text-[10px] font-mono text-black/60">Persons:</span>
  {#each event.personIds as personId}
- <span class="tag">{personId}</span>
+ <span class="tag">{ personId }</span>
  {/each}
  </div>
  {/if}
@@ -199,3 +193,6 @@
  </div>
  </div>
 </div>
+
+
+

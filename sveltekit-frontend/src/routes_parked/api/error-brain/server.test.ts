@@ -7,30 +7,22 @@ import { POST, PATCH, GET } from './+server.js';
 
 // Mock the middleware and services
 vi.mock('$lib/middleware/featureFlagEnforcer', () => ({
- FeatureFlagEnforcer: {
- checkRequest: vi.fn(),
- createErrorResponse: vi.fn(),
+ FeatureFlagEnforcer: { checkRequest: vi.fn( createErrorResponse: vi.fn(),
  },
 }));
 
 vi.mock('$lib/middleware/authSeparation', () => ({
- AuthSeparation: {
- extractToken: vi.fn(),
- extractUserId: vi.fn(),
- checkAuth: vi.fn(),
- createAuthErrorResponse: vi.fn(),
+ AuthSeparation: { extractToken: vi.fn( extractUserId: vi.fn(checkAuth: vi.fn( createAuthErrorResponse: vi.fn(),
  },
 }));
 
 vi.mock('$lib/services/dataIsolation', () => ({
- DataIsolationLayer: {
- checkAccess: vi.fn(),
+ DataIsolationLayer: { checkAccess: vi.fn(),
  },
 }));
 
 vi.mock('$lib/services/featureLogger', () => ({
- featureLogger: {
- logErrorBrain: vi.fn(),
+ featureLogger: { logErrorBrain: vi.fn(),
  },
 }));
 
@@ -55,8 +47,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(AuthSeparation.extractUserId).mockReturnValue('user-123');
  vi.mocked(AuthSeparation.checkAuth).mockReturnValue({
  authenticated: true,
- context: {
- feature: 'errorBrain',
+ context: { feature: 'errorBrain',
  requiresAuth: false,
  authType: 'development',
  userId: 'user-123',
@@ -67,8 +58,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/error-brain/analyze', {
  method: 'POST',
  headers: {
@@ -76,14 +66,12 @@ describe('Error-Brain API Endpoints', () => {
  Authorization: 'Bearer test-token',
  'X-User-ID': 'user-123',
  },
- body: JSON.stringify({
- errorMessage: 'Type error in component',
+ body: JSON.stringify({ errorMessage: 'Type error in component',
  errorType: 'TypeError',
  filePath: 'src/lib/component.svelte',
  }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -106,7 +94,7 @@ describe('Error-Brain API Endpoints', () => {
 
  it('should return 403 when feature flag is disabled', async () => {
  // Setup mocks
- const errorResponse = new Response(JSON.stringify({ error: 'Feature is not available' }), {
+ const errorResponse = new Response(JSON.stringify({ error: 'Feature is not available' }) => {
  status: 403,
  });
 
@@ -121,8 +109,7 @@ describe('Error-Brain API Endpoints', () => {
  method: 'POST',
  body: JSON.stringify({ errorMessage: 'Test error' }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -139,8 +126,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(AuthSeparation.extractUserId).mockReturnValue(undefined);
  vi.mocked(AuthSeparation.checkAuth).mockReturnValue({
  authenticated: false, status: 401, message: 'development authentication required',
- context: {
- feature: 'errorBrain',
+ context: { feature: 'errorBrain',
  requiresAuth: false,
  authType: 'development',
  isAuthenticated: false,
@@ -148,8 +134,7 @@ describe('Error-Brain API Endpoints', () => {
  });
 
  const errorResponse = new Response(
- JSON.stringify({ error: 'development authentication required' }),
- { status: 401 }
+ JSON.stringify({ error: 'development authentication required' }) => { status: 401 }
  );
 
  vi.mocked(AuthSeparation.createAuthErrorResponse).mockReturnValue(errorResponse);
@@ -159,8 +144,7 @@ describe('Error-Brain API Endpoints', () => {
  method: 'POST',
  body: JSON.stringify({ errorMessage: 'Test error' }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -177,8 +161,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(AuthSeparation.extractUserId).mockReturnValue('user-123');
  vi.mocked(AuthSeparation.checkAuth).mockReturnValue({
  authenticated: true,
- context: {
- feature: 'errorBrain',
+ context: { feature: 'errorBrain',
  requiresAuth: false,
  authType: 'development',
  userId: 'user-123',
@@ -189,8 +172,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: false,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/error-brain/analyze', {
  method: 'POST',
  headers: {
@@ -200,8 +182,7 @@ describe('Error-Brain API Endpoints', () => {
  },
  body: JSON.stringify({ errorMessage: 'Test error' }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -220,8 +201,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(AuthSeparation.extractUserId).mockReturnValue('user-123');
  vi.mocked(AuthSeparation.checkAuth).mockReturnValue({
  authenticated: true,
- context: {
- feature: 'errorBrain',
+ context: { feature: 'errorBrain',
  requiresAuth: false,
  authType: 'development',
  userId: 'user-123',
@@ -232,8 +212,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/error-brain/analyze', {
  method: 'POST',
  headers: {
@@ -243,8 +222,7 @@ describe('Error-Brain API Endpoints', () => {
  },
  body: JSON.stringify({}),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -258,14 +236,12 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(FeatureFlagEnforcer.checkRequest).mockImplementation(() => {
  throw new Error('Test error');
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/error-brain/analyze', {
  method: 'POST',
  body: JSON.stringify({ errorMessage: 'Test error' }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -286,8 +262,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(AuthSeparation.extractUserId).mockReturnValue('user-123');
  vi.mocked(AuthSeparation.checkAuth).mockReturnValue({
  authenticated: true,
- context: {
- feature: 'errorBrain',
+ context: { feature: 'errorBrain',
  requiresAuth: false,
  authType: 'development',
  userId: 'user-123',
@@ -298,8 +273,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/error-brain/patch', {
  method: 'PATCH',
  headers: {
@@ -307,13 +281,11 @@ describe('Error-Brain API Endpoints', () => {
  Authorization: 'Bearer test-token',
  'X-User-ID': 'user-123',
  },
- body: JSON.stringify({
- analysisId: 'analysis_123',
+ body: JSON.stringify({ analysisId: 'analysis_123',
  selectedFix: 0,
  }),
  });
-
- // Call endpoint
+  
  const response = await PATCH({ request } as any);
 
  // Verify response
@@ -344,8 +316,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(AuthSeparation.extractUserId).mockReturnValue('user-123');
  vi.mocked(AuthSeparation.checkAuth).mockReturnValue({
  authenticated: true,
- context: {
- feature: 'errorBrain',
+ context: { feature: 'errorBrain',
  requiresAuth: false,
  authType: 'development',
  userId: 'user-123',
@@ -356,8 +327,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/error-brain/patch', {
  method: 'PATCH',
  headers: {
@@ -367,8 +337,7 @@ describe('Error-Brain API Endpoints', () => {
  },
  body: JSON.stringify({ selectedFix: 0 }),
  });
-
- // Call endpoint
+  
  const response = await PATCH({ request } as any);
 
  // Verify response
@@ -389,8 +358,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(AuthSeparation.extractUserId).mockReturnValue('user-123');
  vi.mocked(AuthSeparation.checkAuth).mockReturnValue({
  authenticated: true,
- context: {
- feature: 'errorBrain',
+ context: { feature: 'errorBrain',
  requiresAuth: false,
  authType: 'development',
  userId: 'user-123',
@@ -401,17 +369,14 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/error-brain/history?limit=10&offset=0', {
  method: 'GET',
- headers: {
- Authorization: 'Bearer test-token',
+ headers: { Authorization: 'Bearer test-token',
  'X-User-ID': 'user-123',
  },
  });
-
- // Call endpoint
+  
  const response = await GET({ request } as any);
 
  // Verify response
@@ -442,8 +407,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(AuthSeparation.extractUserId).mockReturnValue('user-123');
  vi.mocked(AuthSeparation.checkAuth).mockReturnValue({
  authenticated: true,
- context: {
- feature: 'errorBrain',
+ context: { feature: 'errorBrain',
  requiresAuth: false,
  authType: 'development',
  userId: 'user-123',
@@ -454,17 +418,14 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request with custom pagination
+  
  const request = new Request('http://localhost/api/error-brain/history?limit=5&offset=10', {
  method: 'GET',
- headers: {
- Authorization: 'Bearer test-token',
+ headers: { Authorization: 'Bearer test-token',
  'X-User-ID': 'user-123',
  },
  });
-
- // Call endpoint
+  
  const response = await GET({ request } as any);
 
  // Verify response
@@ -475,3 +436,6 @@ describe('Error-Brain API Endpoints', () => {
  });
  });
 });
+
+
+

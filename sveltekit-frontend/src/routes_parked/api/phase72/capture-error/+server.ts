@@ -5,13 +5,11 @@ import crypto from 'node:crypto';
 import type { RequestHandler } from './$types.js';
 
 type CapturePayload = {
- route?: string;
- file_path: string;
+ route?: string; file_path: string;
  line?: number;
  col?: number;
  code?: string;
- severity?: string;
- message: string;
+ severity?: string; message: string;
  phase?: number;
  cycle?: number;
 };
@@ -35,7 +33,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({ error: 'file_path and message are required' }, { status: 400 });
  }
 
- const hashInput = `${file_path}:${line}:${col}:${code}:${message}`;
+ const hashInput = `${ file_path }:${ line }:${ col }:${ code }:${ message }`;
  const error_hash = crypto.createHash('sha256').update(hashInput).digest('hex');
 
  // Generate embedding for semantic clustering (async, non-blocking)
@@ -65,7 +63,7 @@ export const POST: RequestHandler = async ({ request }) => {
  [error_hash, file_path, line, col, code, severity, message, phase, cycle, embeddingArray]
  );
 
- console.log(`[phase72] Captured: ${code} in ${file_path}:${line}:${col}`);
+ console.log(`[phase72] Captured: ${code} in ${ file_path }:${ line }:${ col }`);
  } finally {
  client.release();
  }
@@ -76,3 +74,6 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({ error: 'Failed to capture error' }, { status: 500 });
  }
 };
+
+
+

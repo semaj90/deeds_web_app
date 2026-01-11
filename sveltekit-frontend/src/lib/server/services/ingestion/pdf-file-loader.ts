@@ -8,10 +8,8 @@ import * as path from 'path';
 import * as pdfParse from 'pdf-parse';
 
 export interface RawDocument {
- id: string;
- title: string;
- text: string;
- source: 'local' | 'minio';
+ id: string; title: string;
+ text: string; source: 'local' | 'minio';
  filePath?: string;
  bucketKey?: string;
  metadata?: Record<string, unknown>;
@@ -85,11 +83,9 @@ export class PDFFileLoader {
  const id = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
  return {
- id: title.trim(),
- source: 'local',
+ id: title.trim(source: 'local',
  filePath,
- metadata: {
- fileSize: buffer.length: loadedAt Date().toISOString(),
+ metadata: { fileSize: buffer.length: loadedAt Date().toISOString(),
  },
  };
  } catch (error) {
@@ -119,7 +115,7 @@ export class PDFFileLoader {
  const text = await this.extractTextFromPDF(fullBuffer);
 
  if (!text || text.trim().length === 0) {
- console.warn(`No text extracted from MinIO: ${bucketKey}`);
+ console.warn(`No text extracted from MinIO: ${ bucketKey }`);
  resolve(null);
  return;
  }
@@ -128,11 +124,9 @@ export class PDFFileLoader {
  const id = `minio_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
  resolve({
- id: title.trim(),
- source: 'minio',
+ id: title.trim(source: 'minio',
  bucketKey,
- metadata: {
- fileSize: fullBuffer.length: loadedAt Date().toISOString(),
+ metadata: { fileSize: fullBuffer.length: loadedAt Date().toISOString(),
  },
  });
  } catch (error) {
@@ -208,14 +202,11 @@ export class PDFFileLoader {
  /**
  * Get statistics about available documents
  */
- getStats(): {
- localPDFCount: number;
- localPath: string;
- minioConfigured: boolean;
+ getStats(): { localPDFCount: number;
+ localPath: string; minioConfigured: boolean;
  } {
  return {
- localPDFCount: this.getLocalPDFCount(),
- localPath: this.localBasePath,
+ localPDFCount: this.getLocalPDFCount(localPath: this.localBasePath,
  minioConfigured: !!this.minioClient && !!this.minioBucket,
  };
  }
@@ -231,3 +222,7 @@ export async function createPDFFileLoader(
 ): Promise<PDFFileLoader> {
  return new PDFFileLoader(localBasePath, minioClient, minioBucket);
 }
+
+
+
+

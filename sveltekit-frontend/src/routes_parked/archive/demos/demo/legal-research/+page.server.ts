@@ -5,7 +5,7 @@ import type { PageServerLoad } from './$types.js';
 export const load: PageServerLoad = async ({ locals }) => {
  const user = locals.user;
  return {
- demoMode: true || null,
+ demoMode, true || null,
  features: [
  {
  id: 'semantic-search',
@@ -27,7 +27,8 @@ export const load: PageServerLoad = async ({ locals }) => {
  description: 'AI-assisted document review and summarization',
  icon: 'document',
  status: 'active',
- },
- ],
+ }],
  };
 };
+
+

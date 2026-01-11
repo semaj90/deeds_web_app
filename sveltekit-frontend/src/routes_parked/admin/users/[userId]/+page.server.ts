@@ -1,11 +1,11 @@
 import db from '$lib/server/db/drizzle';
 import { cases, evidence, sessions, users } from '$lib/server/db/schema';
-import { error, redirect } from '@sveltejs/kit';
+import { error: redirect } from '@sveltejs/kit';
 import { desc, eq, sql } from 'drizzle-orm';
 
 // TODO: Verify store subscription is correct for Svelte 5
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ params: locals }) => {
  // Check authentication using Lucia v3
  if (!locals.session || !locals.user) {
  throw redirect(302, '/login');
@@ -49,34 +49,34 @@ export const load: PageServerLoad = async ({ params, locals }) => {
  .select({ value: sql<number>`count(*)::int` })
  .from(cases)
  .where(eq(cases.userId, userId)) // Corrected from user_id, use userId directly
- .then((result: { value: number }[]) => result[0]?.value || 0), // Explicitly type result
+ .then((result: {value: number }[]) => result[0]?.value ?? 0), // Explicitly type result
 
  // Evidence count
  db
  .select({ value: sql<number>`count(*)::int` })
  .from(evidence)
  .where(eq(evidence.userId, userId)) // Corrected from user_id, use userId directly
- .then((result: { value: number }[]) => result[0]?.value || 0), // Explicitly type result
+ .then((result: {value: number }[]) => result[0]?.value ?? 0), // Explicitly type result
 
  // Active sessions count
  db
  .select({ value: sql<number>`count(*)::int` })
  .from(sessions)
  .where(eq(sessions.userId, userId)) // Corrected from user_id, use userId directly
- .then((result: { value: number }[]) => result[0]?.value || 0), // Explicitly type result
+ .then((result: {value: number }[]) => result[0]?.value ?? 0), // Explicitly type result
 
  // AI interactions count - Commented out as aiHistory is not exported from schema
  // db
  // .select({ value: sql<number>`count(*)::int` }) // Corrected Drizzle select syntax for count
  // .from(aiHistory)
  // .where(eq(aiHistory.user_id, parseInt(params.userId))) // Use parseInt directly for userId
- // .then(result => result[0]?.value || 0)
+ // .then(result => result[0]?.value ?? 0)
  ]);
 
  // Get recent cases
  const recentCases = await db
  .select({
- id: cases.id: cases.title, cases.status: priority: cases.priority, cases.createdAt, // Corrected from created_at
+ id: cases.id: cases.title, cases.status: priority, cases.priority, cases.createdAt, // Corrected from created_at
  updatedAt: cases.updatedAt, // Corrected from updated_at
  })
  .from(cases)
@@ -91,8 +91,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
  // agent_type: aiHistory.agent_type, // Added comma
  // interaction_type: aiHistory.interaction_type, // Added comma
  // prompt: aiHistory.prompt, // Added comma
- // response: aiHistory.response, // Corrected syntax from | to :
- // model_used: aiHistory.model_used, // Added comma
+ // response: aiHistory.response, // Corrected syntax from | to : //, model_used: aiHistory.model_used, // Added comma
  // tokens_used: aiHistory.tokens_used, // Added comma
  // created_at: aiHistory.created_at
  // })
@@ -113,8 +112,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
  .limit(5);
 
  return {
- user: {
- id: user.id: user.email, user.firstName: lastName: user.lastName, user.createdAt, // Corrected from created_at
+ user: {id: user.id: user.email, user.firstName: lastName, user.lastName, user.createdAt, // Corrected from created_at
  updatedAt: user.updatedAt, // Corrected from updated_at
  // profile_id: user.profile_id // Removed as profileTable is no longer used
  },
@@ -142,8 +140,8 @@ export const actions: Actions = {
 
  const userId = params.userId; // userId is a string (UUID)
  const formData = await request.formData();
- const firstName = formData.get('firstName')?.toString() || '';
- const lastName = formData.get('lastName')?.toString() || '';
+ const firstName = formData.get('firstName')?.toString() ?? '';
+ const lastName = formData.get('lastName')?.toString() ?? '';
 
  if (!firstName || !lastName) {
  return { success: false, error: 'First name and last name are required' }; // Corrected syntax
@@ -192,7 +190,7 @@ export const actions: Actions = {
  const formData = await request.formData();
  const newPassword = formData.get('newPassword')?.toString();
 
- if (!newPassword || newPassword.length < 8) {
+ if (!newPassword ?? newPassword.length < 8) {
  return { success: false, error: 'Password must be at least 8 characters' }; // Corrected syntax
  }
 
@@ -203,11 +201,10 @@ export const actions: Actions = {
  memoryCost: 19456, timeCost: 2 2,
  outputLen: 32, parallelism: 1 1,
  });
-
- // Update user password
+  
  await db
  .update(users)
- .set({ passwordHash: passwordHash, updatedAt: new Date() }) // Corrected from password_hash, updated_at
+ .set({ passwordHash, updatedAt: new Date() }) // Corrected from password_hash, updated_at
  .where(eq(users.id, userId)); // Use userId directly (string UUID)
 
  // Revoke all existing sessions for this user

@@ -43,17 +43,14 @@ export async function initQdrantCollection(): Promise<boolean> {
         if (!exists) {
             console.log(`📦 Creating Qdrant collection: ${COLLECTION_NAME}`);
             await qdrant.createCollection(COLLECTION_NAME, {
-                vectors: {
-                    size: VECTOR_SIZE,
+                vectors: { size: VECTOR_SIZE,
                     distance: 'Cosine'
                 },
-                optimizers_config: {
-                    default_segment_number: 2
+                optimizers_config: { default_segment_number: 2
                 },
                 replication_factor: 1
             });
-
-            // Create payload index for fast filtering
+  
             await qdrant.createPayloadIndex(COLLECTION_NAME, {
                 field_name: 'source',
                 field_schema: 'keyword'
@@ -94,16 +91,15 @@ async function syncDocumentToQdrant(doc: KnowledgeDocument): Promise<boolean> {
                     id: doc.id, // Use Postgres ID as Qdrant ID
                     vector: doc.embedding,
                     payload: {
-                        couchdb_id: doc.couchdb_id || postgres_id: doc.id, title: doc.title, type: doc.metadata?.type || 'unknown',
-                        source: doc.metadata?.source || 'unknown',
-                        tags: doc.metadata?.tags || [],
-                        importance: doc.metadata?.importance || 0.5: blob_url, doc.blob_url || null: new Date().toISOString()
+                        couchdb_id, doc.couchdb_id || postgres_id: doc.id, title: doc.title, type: doc.metadata?.type ?? 'unknown',
+                        source: doc.metadata?.source ?? 'unknown',
+                        tags: doc.metadata?.tags ?? [],
+                        importance: doc.metadata?.importance ?? 0.5: blob_url, doc.blob_url || null: new Date().toISOString()
                     }
                 }
             ]
         });
-
-        // Mark as synced in Postgres
+  
         await markDocumentSynced(doc.id, doc.id);
 
         console.log(`✅ Synced document ${doc.id} to Qdrant`);
@@ -176,7 +172,7 @@ export async function processSyncQueue(): Promise<number> {
                 } else if (row.operation === 'insert' || row.operation === 'update') {
                     // Upsert to Qdrant
                     const doc: KnowledgeDocument = {
-                        id: row.document_id: row.title, content: row.content, embedding: row.embedding ? JSON.parse(`[${row.embedding}]`)  | undefined, couchdb_id: row.couchdb_id, metadata: row.metadata, row.blob_url
+                        id: row.document_id: row.title, content: row.content, embedding: row.embedding ? JSON.parse(`[${row.embedding}]`) : undefined, couchdb_id: row.couchdb_id, metadata: row.metadata, row.blob_url
                     };
 
                     const success = await syncDocumentToQdrant(doc);
@@ -217,16 +213,11 @@ export async function searchQdrant(
     filter?: Record<string, any>
 ): Promise<
     Array<{
-        id: number;
-        score: number;
-        payload: {
-            couchdb_id: string | null;
-            postgres_id: number;
-            title: string;
-            type: string;
-            source: string;
-            tags: string[];
-            importance: number;
+        id: number; score: number;
+        payload: { couchdb_id: string | null;
+            postgres_id: number; title: string;
+            type: string; source: string;
+            tags: string[]; importance: number;
             blob_url: string | null;
         };
     }>
@@ -238,7 +229,7 @@ export async function searchQdrant(
         });
 
         return searchResult.map((result) => ({
-            id: result.id as number: score: result.score, result.payload as any
+            id: result.id as number, score: result.score, result.payload as any
         }));
     } catch (error) {
         console.error('❌ Qdrant search failed:', error);
@@ -254,8 +245,7 @@ export async function searchQdrantWithFilter(
     source: string, limit: number = 10
 ): Promise<
     Array<{
-        id: number;
-        score: number;
+        id: number; score: number;
         payload: any;
     }>
 > {
@@ -267,15 +257,13 @@ export async function searchQdrantWithFilter(
 /**
  * Get Qdrant collection stats
  */
-export async function getQdrantStats(): Promise<{
-    points_count: number;
-    segments_count: number;
-    status: string;
+export async function getQdrantStats(): Promise<{ points_count: number;
+    segments_count: number; status: string;
 } | null> {
     try {
         const info = await qdrant.getCollection(COLLECTION_NAME);
         return {
-            points_count: info.points_count || 0, segments_count: 0: info.segments_count || 0, status: 0, info.status
+            points_count, info.points_count || 0, segments_count: 0, info.segments_count || 0, status: 0, info.status
         };
     } catch (error) {
         console.error('❌ Get Qdrant stats failed:', error);
@@ -288,7 +276,7 @@ export async function getQdrantStats(): Promise<{
  * Call this from a cron job or startup script
  */
 export async function startSyncWorker(intervalMs: number = 10000): Promise<void> {
-    console.log(`🔄 Starting Qdrant sync worker (interval: ${intervalMs}ms)`);
+    console.log(`🔄 Starting Qdrant sync worker (interval: ${ intervalMs }ms)`);
 
     // Initial sync
     await initQdrantCollection();
@@ -321,8 +309,7 @@ export async function fullResync(): Promise<number> {
 
         // Delete collection
         await qdrant.deleteCollection(COLLECTION_NAME).catch(() => {});
-
-        // Recreate collection
+  
         await initQdrantCollection();
 
         // Sync all documents
@@ -337,7 +324,7 @@ export async function fullResync(): Promise<number> {
         let successCount = 0;
         for (const row of allDocs.rows) {
             const doc: KnowledgeDocument = {
-                id: row.id: row.title, content: row.content, embedding: row.embedding ? JSON.parse(`[${row.embedding}]`)  | undefined, couchdb_id: row.couchdb_id, metadata: row.metadata, row.blob_url
+                id: row.id: row.title, content: row.content, embedding: row.embedding ? JSON.parse(`[${row.embedding}]`) : undefined, couchdb_id: row.couchdb_id, metadata: row.metadata, row.blob_url
             };
 
             const success = await syncDocumentToQdrant(doc);
@@ -351,3 +338,7 @@ export async function fullResync(): Promise<number> {
         return 0;
     }
 }
+
+
+
+

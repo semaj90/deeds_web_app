@@ -46,3 +46,5 @@ export function draggable(
   element.style.position = 'absolute';
   element.style.cursor = 'grab';
 }
+
+

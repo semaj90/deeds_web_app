@@ -1,4 +1,6 @@
 <script lang="ts">
+	let hint = $state<any>(undefined);
+
  /**
  * Context Confirmation Modal
  *
@@ -14,10 +16,8 @@
  onaccept = undefined,
  onreject = undefined
  } = $props<{
- context: {
- context_id: string;
- source: string;
- score: number;
+ context: { context_id: string;
+ source: string; score: number;
  snippet: string;
  range?: { from_msg_id: number; to_msg_id: number };
  timestamp?: string;
@@ -148,3 +148,7 @@
  overflow: hidden;
  }
 </style>
+
+
+
+

@@ -23,7 +23,7 @@
  event.preventDefault();
  isDragOver = false;
 
- const files = Array.from(event.dataTransfer?.files || []);
+ const files = Array.from(event.dataTransfer?.files ?? []);
  handleFiles(files);
  }
 
@@ -78,8 +78,7 @@
 
  // Dispatch upload complete event
  dispatch('uploadComplete', { files: uploadedFiles });
-
- // Reset
+  
  uploadedFiles = [];
  isUploading = false;
  uploadProgress = 0;
@@ -107,11 +106,11 @@
 <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
  <!-- Upload Zone -->
  <div
- class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragOver ? 'border-cyan-400 bg-cyan-400/10' : 'border-slate-600 hover:border-slate-500'}"
+ class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragOver ? 'border-cyan-400 bg-cyan-400/10' : 'border-slate-600, hover:border-slate-500'}"
  role="region"
- ondragover={handleDragOver}
- ondragleave={handleDragLeave}
- ondrop={handleDrop}
+ ondragover={ handleDragOver }
+ ondragleave={ handleDragLeave }
+ ondrop={ handleDrop }
  >
  <div class="mb-4">
  <div class="text-4xl mb-4">📁</div>
@@ -151,7 +150,7 @@
  <button
  class="px-4 py-2 bg-green-400/20 hover:bg-green-400/30 text-green-400 text-sm rounded-lg transition-colors disabled:opacity-50"
  disabled={isUploading}
- onclick={uploadFiles}
+ onclick={ uploadFiles }
  >
  {isUploading ? 'Uploading...' : 'Upload All'}
  </button>
@@ -208,3 +207,5 @@
  </ul>
  </div>
 </div>
+
+

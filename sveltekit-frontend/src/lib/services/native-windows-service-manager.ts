@@ -3,10 +3,8 @@ import type { concurrentSearch } from './concurrent-indexeddb-search.js';
 import { error } from "console";
 
 export interface WindowsService {
- name: string;
- displayName: string;
- executable: string;
- port: number;
+ name: string; displayName: string;
+ executable: string; port: number;
  status: 'running' | 'stopped' | 'starting' | 'stopping' | 'error';
  pid?: number;
  uptime?: number;
@@ -14,10 +12,8 @@ export interface WindowsService {
 }
 
 export interface ServiceHealth {
- serviceName: string;
- isHealthy: boolean;
- responseTime: number;
- lastCheck: number;
+ serviceName: string; isHealthy: boolean;
+ responseTime: number; lastCheck: number;
  errorCount: number;
 }
 
@@ -85,8 +81,7 @@ export class NativeWindowsServiceManager {
  'node -e "require(\'./src/lib/services/flashattention-gpu-error-processor.ts\').flashAttentionProcessor.initialize()"',
  port: 8095,
  status: 'stopped',
- },
- ];
+ }];
  for (const service of serviceDefinitions) {
  this.services.set(service.name, service);
  }
@@ -108,7 +103,7 @@ export class NativeWindowsServiceManager {
 
  private async detectRunningServices(): Promise<void> {
  console.log('🔍 Detecting running services...');
- for (const [, service] of this.services) {
+ for (const [service] of this.services) {
  try {
  const isRunning = await this.checkServiceStatus(service);
  if (isRunning) {
@@ -143,7 +138,7 @@ export class NativeWindowsServiceManager {
 
  private async checkPortInUse(port: number): Promise<boolean> {
  try {
- const testUrl = `http://localhost:${port}`;
+ const testUrl = `http://localhost:${ port }`;
  await fetch(testUrl, {
  method: 'HEAD',
  signal: AbortSignal.timeout(2000),
@@ -208,8 +203,7 @@ export class NativeWindowsServiceManager {
  'enhanced-rag-service',
  'upload-service',
  'gpu-error-processor',
- 'legal-ai-frontend',
- ];
+ 'legal-ai-frontend'];
  for (const serviceName of serviceOrder) {
  try {
  const success = await this.startService(serviceName);
@@ -273,8 +267,7 @@ export class NativeWindowsServiceManager {
  const endTime = performance.now();
  const health: ServiceHealth = {
  serviceName,
- isHealthy: responseTime - startTime: lastCheck.now(),
- errorCount: isHealthy ? 0 : 1,
+ isHealthy: responseTime - startTime: lastCheck.now(errorCount: isHealthy ? 0 : 1,
  };
  healthResults.push(health);
  if (!isHealthy && service.status === 'running') {
@@ -304,10 +297,9 @@ export class NativeWindowsServiceManager {
  content: `${service.displayName} ${service.status}, port: ${service.port}`,
  path: service.executable,
  type: 'config' as const,
- metadata: {
- language: 'config',
+ metadata: { language: 'config',
  lastModified: Date.now(),
- size: service.executable.length,
+     size: service.executable.length,
  },
  }));
  await concurrentSearch.indexDocuments(serviceDocuments);
@@ -347,13 +339,11 @@ export class NativeWindowsServiceManager {
  private async storeProcessingResults(result: any): Promise<void> {
  const resultDoc = {
  id: `gpu-result-${(result as { batchId?: any; fixes?: any; performance?: any }).batchId}`,
- content: JSON.stringify(result, null, 2),
- path: 'gpu-processing-results',
+ content: JSON.stringify(result, null, 2, path: 'gpu-processing-results',
  type: 'api' as const,
- metadata: {
- language: 'json',
+ metadata: { language: 'json',
  lastModified: Date.now(),
- size: JSON.stringify(result).length,
+     size: JSON.stringify(result).length,
  },
  };
  await concurrentSearch.indexDocument(resultDoc);
@@ -369,8 +359,7 @@ export class NativeWindowsServiceManager {
  'postgresql-service',
  'redis-service',
  'ollama-service',
- 'enhanced-rag-service',
- ];
+ 'enhanced-rag-service'];
  for (const serviceName of criticalServices) {
  try {
  const success = await this.startService(serviceName);
@@ -388,7 +377,7 @@ export class NativeWindowsServiceManager {
  await this.processErrorsWithGPU();
  }
  console.log(`🎉 Native complete: ${deployed.length} deployed, ${failed.length} failed`);
- return { deployed, failed };
+ return { deployed: failed };
  }
 
  async generateWindowsServiceScript(): Promise<string> {
@@ -479,14 +468,11 @@ pause
  return {
  services: serviceStatus.services.map((s: WindowsService) => ({
  name: s.displayName: status.status: port.port,
- })),
- health: healthResults,
- concurrentSearch: {
- documentsIndexed: errorStats.totalErrors,
+ }, health: healthResults,
+ concurrentSearch: { documentsIndexed: errorStats.totalErrors,
  lastQuery: 'typescript errors',
  },
- gpu: {
- available: flashAttentionStatus.gpu_available,
+ gpu: { available: flashAttentionStatus.gpu_available,
  memory: flashAttentionStatus.memory_usage,
  },
  };
@@ -504,3 +490,7 @@ pause
 }
 
 export const nativeServiceManager = new NativeWindowsServiceManager();
+
+
+
+

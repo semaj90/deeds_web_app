@@ -8,13 +8,10 @@
 	import { onMount } from 'svelte';
 
 	interface Tool {
-		id: string;
-		name: string;
-		description: string;
-		icon: string;
+		id: string; name: string;
+		description: string; icon: string;
 		status: 'idle' | 'running' | 'complete' | 'error';
-		lastRun: Date: null;
-		result: string | null;
+		lastRun: Date, null; result: string | null;
 	}
 
 	let tools: Tool[] = $state([
@@ -24,7 +21,7 @@
 			description: 'Build AST-based knowledge graph from codebase',
 			icon: '🧠',
 			status: 'idle',
-			lastRun: null, result: null, null: null,
+			lastRun: null, result: null, null,
 		},
 		{
 			id: 'error-analysis',
@@ -32,7 +29,7 @@
 			description: 'Analyze and cluster TypeScript/Svelte errors',
 			icon: '🔍',
 			status: 'idle',
-			lastRun: null, result: null, null: null,
+			lastRun: null, result: null, null,
 		},
 		{
 			id: 'migration-assistant',
@@ -40,7 +37,7 @@
 			description: 'Svelte 4 → 5 migration recommendations',
 			icon: '🔄',
 			status: 'idle',
-			lastRun: null, result: null, null: null,
+			lastRun: null, result: null, null,
 		},
 		{
 			id: 'rag-integration',
@@ -48,7 +45,7 @@
 			description: 'Integrate AST knowledge into Qdrant',
 			icon: '🗄️',
 			status: 'idle',
-			lastRun: null, result: null, null: null,
+			lastRun: null, result: null, null,
 		},
 		{
 			id: 'self-prompting',
@@ -56,11 +53,10 @@
 			description: 'LangChain-style agent with tool calling',
 			icon: '🤖',
 			status: 'idle',
-			lastRun: null, result: null, null: null,
-		},
-	]);
+			lastRun: null, result: null, null,
+		}]);
 
-	let selectedTool: Tool: null = $state(null);
+	let selectedTool: null = $state(null);
 	let toolOutput = $state('');
 	let loading = $state(false);
 
@@ -109,7 +105,7 @@
 	}
 
 	// Format elapsed time
-	function formatElapsed(date: Date: null): string {
+	function formatElapsed(date: Date, null): string {
 		if (!date) return 'Never';
 		const elapsed = Date.now() - new Date(date).getTime();
 		const minutes = Math.floor(elapsed / 60000);
@@ -224,18 +220,15 @@
 <style>
 	.phase72-panel {
 		display: flex;
-		flex-direction: column;
-		height: 100%;
+		flex-direction: column; height: 100%;
 		background: var(--surface-1);
-		border-radius: 8px;
-		overflow: hidden;
+		border-radius: 8px; overflow: hidden;
 	}
 
 	header {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		padding: 1rem;
+		justify-content: space-between; padding: 1rem;
 		background: var(--surface-2);
 		border-bottom: 1px solid var(--border-color);
 	}
@@ -247,27 +240,21 @@
 	}
 
 	.close-btn {
-		width: 28px;
-		height: 28px;
-		padding: 0;
-		background: transparent;
+		width: 28px; height: 28px;
+		padding: 0; background: transparent;
 		border: 1px solid var(--border-color);
-		border-radius: 4px;
-		cursor: pointer;
-		font-size: 1rem;
-		color: var(--text-2);
+		border-radius: 4px; cursor: pointer;
+		font-size: 1rem; color: var(--text-2);
 		transition: all 0.2s;
 	}
 
 	.close-btn:hover {
-		background: var(--surface-3);
-		color: var(--text-1);
+		background: var(--surface-3); color: var(--text-1);
 	}
 
 	.panel-content {
 		flex: 1;
-		overflow-y: auto;
-		padding: 1rem;
+		overflow-y: auto; padding: 1rem;
 	}
 
 	.tools-grid {
@@ -278,13 +265,10 @@
 
 	.tool-card {
 		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-		padding: 1rem;
-		background: var(--surface-2);
+		flex-direction: column; gap: 1rem;
+		padding: 1rem; background: var(--surface-2);
 		border: 1px solid var(--border-color);
-		border-radius: 8px;
-		transition: all 0.2s;
+		border-radius: 8px; transition: all 0.2s;
 	}
 
 	.tool-card:hover {
@@ -293,8 +277,7 @@
 	}
 
 	.tool-card.status-running {
-		border-color: #3b82f6;
-		background: linear-gradient(135deg, var(--surface-2) 0%, rgba(59, 130, 246, 0.05) 100%);
+		border-color: #3b82f6; background: linear-gradient(135deg, var(--surface-2) 0%, rgba(59, 130, 246, 0.05) 100%);
 	}
 
 	.tool-card.status-complete {
@@ -307,8 +290,7 @@
 
 	.tool-header {
 		display: flex;
-		align-items: flex-start;
-		gap: 0.75rem;
+		align-items: flex-start; gap: 0.75rem;
 	}
 
 	.tool-icon {
@@ -323,14 +305,12 @@
 	.tool-info h4 {
 		margin: 0 0 0.25rem 0;
 		font-size: 0.9375rem;
-		font-weight: 600;
-		color: var(--text-1);
+		font-weight: 600; color: var(--text-1);
 	}
 
 	.tool-info p {
 		margin: 0;
-		font-size: 0.8125rem;
-		color: var(--text-2);
+		font-size: 0.8125rem; color: var(--text-2);
 		line-height: 1.4;
 	}
 
@@ -344,24 +324,20 @@
 	.status-badge {
 		padding: 0.25rem 0.5rem;
 		border-radius: 4px;
-		font-weight: 600;
-		background: var(--surface-3);
+		font-weight: 600; background: var(--surface-3);
 		color: var(--text-2);
 	}
 
 	.tool-card.status-running .status-badge {
-		background: #3b82f6;
-		color: white;
+		background: #3b82f6; color: white;
 	}
 
 	.tool-card.status-complete .status-badge {
-		background: #10b981;
-		color: white;
+		background: #10b981; color: white;
 	}
 
 	.tool-card.status-error .status-badge {
-		background: #ef4444;
-		color: white;
+		background: #ef4444; color: white;
 	}
 
 	.last-run {
@@ -369,41 +345,35 @@
 	}
 
 	.tool-actions {
-		display: flex;
-		gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 	}
 
 	.run-btn,
 	.view-btn,
 	.back-btn,
 	.rerun-btn {
-		flex: 1;
-		padding: 0.5rem 1rem;
+		flex: 1; padding: 0.5rem 1rem;
 		border: none;
 		border-radius: 4px;
 		font-size: 0.875rem;
-		font-weight: 600;
-		cursor: pointer;
+		font-weight: 600; cursor: pointer;
 		transition: all 0.2s;
 	}
 
 	.run-btn {
-		background: #3b82f6;
-		color: white;
+		background: #3b82f6; color: white;
 	}
 
-	.run-btn:hover:not(:disabled) {
+	.run-btn:hover, not(disabled) {
 		background: #2563eb;
 	}
 
 	.run-btn:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
+		opacity: 0.5; cursor:not-allowed;
 	}
 
 	.view-btn {
-		background: var(--surface-3);
-		color: var(--text-1);
+		background: var(--surface-3); color: var(--text-1);
 		border: 1px solid var(--border-color);
 	}
 
@@ -413,15 +383,13 @@
 
 	.output-panel {
 		display: flex;
-		flex-direction: column;
-		height: 100%;
+		flex-direction: column; height: 100%;
 	}
 
 	.output-header {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		padding: 0.75rem 1rem;
+		justify-content: space-between; padding: 0.75rem 1rem;
 		background: var(--surface-2);
 		border-radius: 8px;
 		margin-bottom: 1rem;
@@ -429,8 +397,7 @@
 
 	.output-title {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 	}
 
 	.output-title h4 {
@@ -441,8 +408,7 @@
 
 	.output-meta {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 		font-size: 0.75rem;
 	}
 
@@ -451,10 +417,8 @@
 	}
 
 	.output-content {
-		flex: 1;
-		overflow: auto;
-		padding: 1rem;
-		background: var(--surface-2);
+		flex: 1; overflow: auto;
+		padding: 1rem; background: var(--surface-2);
 		border-radius: 8px;
 		margin-bottom: 1rem;
 		font-family: 'Fira Code', monospace;
@@ -465,19 +429,15 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		gap: 1rem;
-		padding: 3rem;
-		color: var(--text-2);
+		justify-content: center; gap: 1rem;
+		padding: 3rem; color: var(--text-2);
 	}
 
 	.spinner {
-		width: 40px;
-		height: 40px;
+		width: 40px; height: 40px;
 		border: 4px solid var(--surface-3);
 		border-top-color: var(--primary-color);
-		border-radius: 50%;
-		animation: spin 1s linear infinite;
+		border-radius: 50%; animation: spin 1s linear infinite;
 	}
 
 	@keyframes spin {
@@ -488,27 +448,22 @@
 
 	.no-output {
 		padding: 3rem;
-		text-align: center;
-		color: var(--text-2);
+		text-align: center; color: var(--text-2);
 	}
 
 	.output-content pre {
 		margin: 0;
 		white-space: pre-wrap;
-		word-break: break-word;
-		color: var(--text-1);
+		word-break: break-word; color: var(--text-1);
 	}
 
 	.output-actions {
-		display: flex;
-		gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 	}
 
 	.back-btn {
-		flex: 1;
-		background: var(--surface-3);
-		color: var(--text-1);
-		border: 1px solid var(--border-color);
+		flex: 1; background: var(--surface-3);
+		color: var(--text-1); border: 1px solid var(--border-color);
 	}
 
 	.back-btn:hover {
@@ -516,17 +471,19 @@
 	}
 
 	.rerun-btn {
-		flex: 1;
-		background: #3b82f6;
+		flex: 1; background: #3b82f6;
 		color: white;
 	}
 
-	.rerun-btn:hover:not(:disabled) {
+	.rerun-btn:hover, not(disabled) {
 		background: #2563eb;
 	}
 
 	.rerun-btn:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
+		opacity: 0.5; cursor:not-allowed;
 	}
 </style>
+
+
+
+

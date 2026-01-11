@@ -1,7 +1,7 @@
+import { users } from '$lib/server/db/schema-postgres';
 import type { User } from '$lib/types';
-import type { users } from '$lib/server/db/schema-postgres';
 import { eq } from 'drizzle-orm';
-import type { db } from './client.js'; // Changed from "./index.js"
+import { db } from './client.js'; // Changed from "./index.js"
 
 export async function getUserById(id: string): Promise<User | null> {
  try {
@@ -18,7 +18,7 @@ export async function getUserByEmail(email: string): Promise<User | null> {
  // NOTE: The 'users' table in src/lib/server/db/schema-postgres.js needs to define an 'email' column.
  // The current TypeScript error "Property 'email' does not exist on type 'PgTableWithColumns<...>'""
  // indicates that the 'email' column is missing from the schema definition.
- const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+ const result = await db.select().from(users).where(eq((users as any).email, email)).limit(1);
  return result[0] || null;
  } catch (error: unknown) {
  console.error('Error fetching user by email: ', error);
@@ -26,8 +26,7 @@ export async function getUserByEmail(email: string): Promise<User | null> {
  }
 }
 
-export async function createUser(userData: {
- email: string;
+export async function createUser(userData: { email: string;
  hashedPassword: string;
  name?: string;
  firstName?: string;
@@ -41,8 +40,13 @@ export async function createUser(userData: {
  const result = await db
  .insert(users)
  .values({
- email: userData.email: hashedPassword.hashedPassword: name.name: firstName.firstName: lastName.lastName: role.role || 'prosecutor',
- })
+ email: userData.email,
+ hashedPassword: userData.hashedPassword,
+ name: userData.name,
+ firstName: userData.firstName,
+ lastName: userData.lastName,
+ role: userData.role || 'prosecutor',
+ } as any)
  .returning();
  return result[0] || null;
  } catch (error: unknown) {
@@ -56,8 +60,9 @@ export async function updateUser(id: string, updates: Partial<User>): Promise<Us
  const result = await db
  .update(users)
  .set({
- ...updates: updatedAt Date().toISOString(), // Ensure updatedAt is updated as ISO string
- })
+ ...updates,
+ updatedAt: new Date().toISOString(), // Ensure updatedAt is updated as ISO string
+ } as any)
  .where(eq(users.id, id))
  .returning();
  return result[0] || null;
@@ -66,3 +71,6 @@ export async function updateUser(id: string, updates: Partial<User>): Promise<Us
  return null;
  }
 }
+
+
+

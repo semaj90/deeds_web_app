@@ -4,54 +4,40 @@
 
  // Type definitions
  interface PhoenixWrightSearchRequest {
- caseId: string;
- query: string;
- jurisdiction?: string;
- detectContradictions: boolean;
- includeTestimony: boolean;
- maxResults: number;
+ caseId: string; query: string;
+ jurisdiction?: string; detectContradictions: boolean;
+ includeTestimony: boolean; maxResults: number;
  searchScope: string;
  }
 
  interface Precedent {
- title: string;
- citation: string;
- court: string;
- date: string;
- outcome: string;
- relevanceScore: number;
+ title: string; citation: string;
+ court: string; date: string;
+ outcome: string; relevanceScore: number;
  }
 
  interface Contradiction {
- type: string;
- severity: string;
- description: string;
- location: string;
+ type: string; severity: string;
+ description: string; location: string;
  parties: string[];
  }
 
  interface EvidenceMatch {
- type: string;
- strength: string;
- description: string;
- relevanceScore: number;
+ type: string; strength: string;
+ description: string; relevanceScore: number;
  legalWeight: number;
  }
 
  interface PhoenixWrightSearchResult {
  id: string;
  query?: string;
- jurisdiction?: string;
- precedents: Precedent[];
- contradictions: Contradiction[];
- evidenceMatches: EvidenceMatch[];
- confidence: number;
- rankingExplanation: string;
+ jurisdiction?: string; precedents: Precedent[];
+ contradictions: Contradiction[]; evidenceMatches: EvidenceMatch[];
+ confidence: number; rankingExplanation: string;
  }
 
  const dispatch = createEventDispatcher<{
- search: PhoenixWrightSearchRequest;
- result: PhoenixWrightSearchResult;
+ search: PhoenixWrightSearchRequest; result: PhoenixWrightSearchResult;
  persist: { caseId: string; result: PhoenixWrightSearchResult };
  timeline: { caseId: string; event: string; data: any };
  }>();
@@ -100,9 +86,8 @@
 
  try {
  const request: PhoenixWrightSearchRequest = {
- caseId: query, searchQuery: searchQuery: searchQuery,
- jurisdiction: jurisdiction || undefined: detectContradictions, true: true, true:
- includeTestimony: true, maxResults: 10 10,
+ caseId: query, searchQuery,
+ jurisdiction, jurisdiction || undefined: detectContradictions, true, true: includeTestimony, true, maxResults: 10 10,
  searchScope: 'broad'
  };
 
@@ -140,8 +125,7 @@
  dispatch('timeline', {
  caseId,
  event: 'phoenix_wright_search',
- data: {
- query: searchQuery, jurisdiction: resultCount: resultCount, result: result.precedents.length + result.contradictions.length + result.evidenceMatches.length: confidence, result: result.confidence
+ data: { query: searchQuery, jurisdiction: resultCount, result: result.precedents.length + result.contradictions.length + result.evidenceMatches.length: confidence, result: result.confidence
  }
  });
 
@@ -194,8 +178,7 @@
  const response = await fetch('/api/legal/phoenix-wright-export', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- caseId: result, searchResult: searchResult: searchResult,
+ body: JSON.stringify({ caseId: result, searchResult,
  format: 'pdf'
  })
  });
@@ -340,7 +323,7 @@
  <textarea
  bind:value={searchQuery}
  placeholder="Describe the legal case, evidence, or question..."
- class="w-full h-24 p-3 bg-[#2a2a2a] border border-gray-600 rounded text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none resize-none"
+ class="w-full h-24 p-3 bg-[#2a2a2a] border border-gray-600 rounded text-white placeholder-gray-500 focus: border-blue-400, focus:outline-none resize-none"
  disabled={isSearching}
  ></textarea>
  </div>
@@ -352,7 +335,7 @@
  <input
  bind:value={jurisdiction}
  placeholder="e.g., California, Federal, etc."
- class="w-full p-3 bg-[#2a2a2a] border border-gray-600 rounded text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none"
+ class="w-full p-3 bg-[#2a2a2a] border border-gray-600 rounded text-white placeholder-gray-500 focus: border-blue-400, focus:outline-none"
  disabled={isSearching}
  />
  </div>
@@ -361,7 +344,7 @@
  <button
  onclick={performPhoenixWrightSearch}
  disabled={isSearching || !searchQuery.trim()}
- class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded font-medium transition-colors"
+ class="flex-1 px-4 py-2 bg-blue-600 hover: bg-blue-700, disabled:bg-gray-600 text-white rounded font-medium transition-colors"
  >
  {#if isSearching}
  <span class="flex items-center justify-center">
@@ -374,7 +357,7 @@
  </button>
 
  <button
- onclick={resetSearch}
+ onclick={ resetSearch }
  class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded font-medium transition-colors"
  >
  Reset
@@ -399,7 +382,7 @@
  <button
  onclick={() => exportResults('json')}
  disabled={isExporting}
- class="px-3 py-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white text-sm rounded transition-colors"
+ class="px-3 py-1 bg-green-600 hover: bg-green-700, disabled:bg-gray-600 text-white text-sm rounded transition-colors"
  >
  {#if isExporting}
  <div class="animate-spin rounded-full h-3 w-3 border-b border-white mr-1"></div>
@@ -411,7 +394,7 @@
  <button
  onclick={() => exportResults('pdf')}
  disabled={isExporting}
- class="px-3 py-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white text-sm rounded transition-colors"
+ class="px-3 py-1 bg-red-600 hover: bg-red-700, disabled:bg-gray-600 text-white text-sm rounded transition-colors"
  >
  {#if isExporting}
  <div class="animate-spin rounded-full h-3 w-3 border-b border-white mr-1"></div>
@@ -423,7 +406,7 @@
  <button
  onclick={() => addToFavorites(searchResult)}
  disabled={favorites.some(fav => fav.id === searchResult.id)}
- class="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 text-white text-sm rounded transition-colors"
+ class="px-3 py-1 bg-yellow-600 hover: bg-yellow-700, disabled:bg-gray-600 text-white text-sm rounded transition-colors"
  >
  ⭐ Favorite
  </button>
@@ -540,3 +523,7 @@
  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
  }
 </style>
+
+
+
+

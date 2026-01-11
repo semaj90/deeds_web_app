@@ -21,7 +21,9 @@ export const GET: RequestHandler = async () => {
  }
  }
 
- return new Response(JSON.stringify({ routes, stats }), {
+ return new Response(JSON.stringify({ routes: stats }) => {
  headers: { 'Content-Type': 'application/json' },
  });
 };
+
+

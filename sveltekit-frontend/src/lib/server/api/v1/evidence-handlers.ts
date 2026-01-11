@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { eq, and } from 'drizzle-orm';
+import { eq: and } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { EvidenceDetectiveService } from '$lib/server/evidence-detective';
 import type { getRedisClient } from '$lib/server/cache/redis';
@@ -7,10 +7,8 @@ import type { db } from '$lib/server/db/client';
 import ollamaService from '$lib/server/services/ollama-service';
 
 interface UserType {
- id: string;
- email: string;
- firstName: string;
- lastName: string;
+ id: string; email: string;
+ firstName: string; lastName: string;
  role: string;
 }
 
@@ -94,7 +92,7 @@ export async function handleEvidenceDetective(
  user: UserType, request: Request, EvidenceDetectiveService
 ) {
  try {
- const { evidenceId, query } = await request.json();
+ const { evidenceId: query } = await request.json();
  if (!evidenceId || !query) {
  return json({ success: false, error: 'Evidence ID and query are required' }, { status: 400 });
  }
@@ -124,11 +122,10 @@ export async function analyzeEvidence(item: EvidenceItem) {
  }
 
  // Prepare AI prompt for analysis
- const analysisPrompt = `You are a legal AI assistant analyzing evidence. Provide a detailed analysis based on the following:
-EVIDENCE ID: ${item.id}
+ const analysisPrompt = `You are a legal AI assistant analyzing evidence. Provide a detailed analysis based on the following: EVIDENCE, ID: ${item.id}
 TITLE: ${item.title || 'Untitled'}
 DESCRIPTION: ${item.description || 'No description provided.'}
-TAGS: ${item.tags?.join(', ') || 'No tags'}
+TAGS: ${item.tags?.join(', ') ?? 'No tags'}
 METADATA: ${JSON.stringify(item.metadata || {})}
 
 REQUIRED: Provide your analysis as a structured JSON object with keys: 'summary', 'key_points', 'legal_implications', 'confidence_score' (0-1), 'recommendations'.`;
@@ -141,8 +138,7 @@ REQUIRED: Provide your analysis as a structured JSON object with keys: 'summary'
  } catch (parseError) {
  console.error('Failed to parse AI analysis JSON:', parseError);
  analysis = {
- summary: aiResponse.substring(0, 500),
- key_points: [],
+ summary: aiResponse.substring(0, 500, key_points: [],
  legal_implications: [],
  confidence_score: 0.5,
  recommendations: ['AI response parsing failed - manual review recommended'],
@@ -171,3 +167,6 @@ REQUIRED: Provide your analysis as a structured JSON object with keys: 'summary'
  throw new Error('Failed to analyze evidence');
  }
 }
+
+
+

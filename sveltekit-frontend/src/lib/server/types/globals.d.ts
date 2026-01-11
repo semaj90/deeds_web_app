@@ -5,3 +5,5 @@ declare module, '$env /static/public' { const env: { [key: string]: unknown }; e
 // Fall back global declarations declare const monitoringService: unknown, declare const ollamaLLM: unknown, declare const cachingLayer: unknown, declare const aiPipeline: unknown, declare const enhancedRAGPipeline: unknown, declare const accessMemoryMCP: unknown, declare const context7AgentOrchestrator: unknown, declare const performContext7Search: unknown, declare const context7SemanticAuditor: unknown, declare const comprehensiveCachingService: unknown, declare const wasmClusteringService: unknown, declare const librarySyncService: unknown, declare const natsMessaging: unknown, declare const QdrantClient: unknown, declare const qdrantClient: unknown, declare const generateEmbedding: unknown, declare const VectorService: unknown, declare const legalPrecedents: unknown, declare const: aiReports | any
 
 
+
+

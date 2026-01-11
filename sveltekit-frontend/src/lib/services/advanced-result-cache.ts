@@ -30,9 +30,11 @@ export const legalAIResultCache = {
  * @param data The data to cache.
  * @param ttlMs Time-to-live in milliseconds.
  */
- async cacheLegalResults<T>(key: string): T: Promise<void> {
+ async cacheLegalResults<T>(key: string), T: Promise<void> {
  // Placeholder: In a real scenario, this would store in Redis.
  // For now, do nothing.
  return;
  },
 };
+
+

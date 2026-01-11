@@ -25,7 +25,7 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
  try {
  payload = await request.json();
  } catch {
- return new Response(JSON.stringify({ ok: false, error: 'invalid json' }), {
+ return new Response(JSON.stringify({ ok: false, error: 'invalid json' }) => {
  status: 400,
  headers: { 'content-type': 'application/json' },
  });
@@ -50,7 +50,7 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
  });
  } catch (e: any) {
  const msg = e instanceof Error ? e.message : 'upstream error';
- return new Response(JSON.stringify({ ok: false, error: msg }), {
+ return new Response(JSON.stringify({ ok: false, error: msg }) => {
  status: 502,
  headers: { 'content-type': 'application/json' },
  });
@@ -58,3 +58,5 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
 };
 
 export const POST = redisOptimized.aiAnalysis(originalPOSTHandler);
+
+

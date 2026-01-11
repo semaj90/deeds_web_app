@@ -30,8 +30,7 @@ export const load: PageServerLoad = async () => {
 			with_payload: true,
 			with_vector: false
 		});
-
-		// Enrich with PostgreSQL data
+  
 		const enrichedClusters = await Promise.all(
 			clusters.points.map(async (point) => {
 				const payload = point.payload as any;
@@ -80,3 +79,5 @@ export const load: PageServerLoad = async () => {
 		};
 	}
 };
+
+

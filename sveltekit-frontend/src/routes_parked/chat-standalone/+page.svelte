@@ -39,7 +39,7 @@
 				...messages,
 				{
 					id: `msg_${Date.now()}`,
-					role: userRole, content: messageInput: messageInput,
+					role: userRole, content: messageInput,
 					timestamp: new Date().toISOString()
 				}
 			];
@@ -51,14 +51,13 @@
 			await chatService.streamResponse(response.stream_url, (token) => {
 				streamingResponse += token;
 			});
-
-			// Add assistant message
+  
 			messages = [
 				...messages,
 				{
 					id: `msg_${Date.now()}`,
 					role: 'assistant',
-					content: streamingResponse, timestamp: new: new Date().toISOString()
+					content: streamingResponse, timestamp: new, new Date().toISOString()
 				}
 			];
 
@@ -95,14 +94,14 @@
 			return;
 		}
 
-		if (confirm('Are you sure you want to delete this conversation?')) {
+		if (confirm('Are you sure you want to delete this conversation? ')) {
 			try {
 				await chatService.deleteHistory(caseId);
 				messages = [];
 				evidenceMemory = [];
 				error = '';
 			} catch (e) {
-				error = e.message || 'Failed to delete history';
+				error = e.message ?? 'Failed to delete history';
 			}
 		}
 	}
@@ -212,27 +211,21 @@
 <style>
 	.chat-container {
 		display: flex;
-		flex-direction: column;
-		height: 100vh;
+		flex-direction: column; height: 100vh;
 		background: #f5f4f0;
 	}
 
 	.chat-layout {
-		display: flex;
-		flex: 1;
-		gap: 1rem;
-		padding: 1rem;
+		display: flex; flex: 1;
+		gap: 1rem; padding: 1rem;
 		overflow: hidden;
 	}
 
 	.sidebar {
-		background: white;
-		border: 1px solid #e0ddd8;
-		border-radius: 4px;
-		display: flex;
+		background: white; border: 1px solid #e0ddd8;
+		border-radius: 4px; display: flex;
 		flex-direction: column;
-		overflow-y: auto;
-		padding: 1rem;
+		overflow-y: auto; padding: 1rem;
 	}
 
 	.left-sidebar {
@@ -245,30 +238,26 @@
 
 	.sidebar h2 {
 		margin: 0 0 1rem 0;
-		font-size: 1rem;
-		color: #2d2d2d;
+		font-size: 1rem; color: #2d2d2d;
 		border-bottom: 1px solid #e0ddd8;
 		padding-bottom: 0.75rem;
 	}
 
 	.config-section {
 		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
+		flex-direction: column; gap: 0.5rem;
 		margin-bottom: 1rem;
 	}
 
 	.config-section label {
 		font-size: 0.85rem;
-		font-weight: 600;
-		color: #2d2d2d;
+		font-weight: 600; color: #2d2d2d;
 		text-transform: uppercase;
 	}
 
 	.config-section input,
 	.config-section select {
-		padding: 0.5rem;
-		border: 1px solid #d0ccc7;
+		padding: 0.5rem; border: 1px solid #d0ccc7;
 		border-radius: 4px;
 		font-size: 0.9rem;
 		font-family: 'Source Sans 3', sans-serif;
@@ -276,8 +265,7 @@
 
 	.actions {
 		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
+		flex-direction: column; gap: 0.5rem;
 		margin-top: 1rem;
 		padding-top: 1rem;
 		border-top: 1px solid #e0ddd8;
@@ -285,80 +273,65 @@
 
 	.actions button {
 		padding: 0.5rem 1rem;
-		background: #f0f0f0;
-		border: 1px solid #d0ccc7;
-		border-radius: 4px;
-		cursor: pointer;
-		font-size: 0.9rem;
-		transition: background 0.2s;
+		background: #f0f0f0; border: 1px solid #d0ccc7;
+		border-radius: 4px; cursor: pointer;
+		font-size: 0.9rem; transition: background 0.2s;
 	}
 
-	.actions button:hover:not(:disabled) {
+	.actions button:hover, not(disabled) {
 		background: #e8e8e8;
 	}
 
 	.actions button:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
+		opacity: 0.5; cursor:not-allowed;
 	}
 
 	.actions button.danger {
 		background: #fee;
-		border-color: #fcc;
-		color: #c33;
+		border-color: #fcc; color: #c33;
 	}
 
-	.actions button.danger:hover:not(:disabled) {
+	.actions button.danger:hover, not(disabled) {
 		background: #fdd;
 	}
 
 	.chat-main {
-		flex: 1;
-		background: white;
+		flex: 1; background: white;
 		border: 1px solid #e0ddd8;
-		border-radius: 4px;
-		display: flex;
-		flex-direction: column;
-		overflow: hidden;
+		border-radius: 4px; display: flex;
+		flex-direction: column; overflow: hidden;
 	}
 
 	.messages-container {
 		flex: 1;
-		overflow-y: auto;
-		padding: 1rem;
+		overflow-y: auto; padding: 1rem;
 		display: flex;
-		flex-direction: column;
-		gap: 1rem;
+		flex-direction: column; gap: 1rem;
 	}
 
 	.empty-state {
 		display: flex;
 		align-items: center;
-		justify-content: center;
-		height: 100%;
+		justify-content: center; height: 100%;
 		color: #999;
 		font-size: 1.1rem;
 	}
 
 	.error-message {
-		padding: 1rem;
-		background: #fee;
+		padding: 1rem; background: #fee;
 		border: 1px solid #fcc;
-		border-radius: 4px;
-		color: #c33;
+		border-radius: 4px; color: #c33;
 		margin: 0 1rem;
 	}
 
 	.message-input-area {
 		padding: 1rem;
 		border-top: 1px solid #e0ddd8;
-		display: flex;
-		gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 	}
 
 	.message-input-area textarea {
-		flex: 1;
-		padding: 0.75rem 1rem;
+		flex: 1; padding: 0.75rem 1rem;
 		border: 1px solid #d0ccc7;
 		border-radius: 4px;
 		font-size: 0.95rem;
@@ -374,24 +347,21 @@
 
 	.message-input-area button {
 		padding: 0.75rem 1.5rem;
-		background: #8b3a3a;
-		color: white;
+		background: #8b3a3a; color: white;
 		border: none;
 		border-radius: 4px;
 		font-size: 0.95rem;
-		font-weight: 600;
-		cursor: pointer;
+		font-weight: 600; cursor: pointer;
 		transition: background 0.2s;
 		align-self: flex-end;
 	}
 
-	.message-input-area button:hover:not(:disabled) {
+	.message-input-area button:hover, not(disabled) {
 		background: #6b2a2a;
 	}
 
 	.message-input-area button:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
+		opacity: 0.6; cursor:not-allowed;
 	}
 
 	@media (max-width: 1200px) {
@@ -409,3 +379,7 @@
 		}
 	}
 </style>
+
+
+
+

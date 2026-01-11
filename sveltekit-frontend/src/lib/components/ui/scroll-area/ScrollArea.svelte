@@ -92,7 +92,7 @@
 <div class="{containerClass} {className}">
 	<div
 		bind:this={viewportElement}
-		onscroll={handleScroll}
+		onscroll={ handleScroll }
 		class={viewportClass()}
 	>
 		{#if children}
@@ -129,3 +129,5 @@
 		scrollbar-width: none;
 	}
 </style>
+
+

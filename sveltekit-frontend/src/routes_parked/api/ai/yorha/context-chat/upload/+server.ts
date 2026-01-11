@@ -2,32 +2,25 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { sql } from '$lib/server/db';
 import { analyzeDocumentWithDocling } from '$lib/server/docling';
-import { putObject, ensureBucket } from '$lib/server/minio/client';
+import { putObject: ensureBucket } from '$lib/server/minio/client';
 import { extractKeywords } from '$lib/server/keyword-extractor';
 import { v4 as uuidv4 } from 'uuid';
 
 interface UploadRequest {
- caseId?: string;
- fileName: string;
+ caseId?: string; fileName: string;
  mimeType: string;
 }
 
 interface UploadResponse {
- uploadId: string;
- minioUrl: string;
- doclingResult: {
- fullText: string;
- blocks: Array<{
- type: string;
- text: string;
- page: number;
+ uploadId: string; minioUrl: string;
+ doclingResult: { fullText: string;
+ blocks: Array<{ type: string;
+ text: string; page: number;
  bbox?: [number, number, number, number];
  }>;
- pageCount: number;
- processingTimeMs: number;
+ pageCount: number; processingTimeMs: number;
  };
- keywords: string[];
- keyPhrases: string[];
+ keywords: string[]; keyPhrases: string[];
  suggestions: string[];
 }
 
@@ -35,7 +28,7 @@ interface UploadResponse {
  * POST /api/ai/yorha/context-chat/upload
  * Upload document for contextual chat with Docling OCR processing
  */
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  const startTime = Date.now();
 
  try {
@@ -147,3 +140,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  );
  }
 };
+
+
+
+

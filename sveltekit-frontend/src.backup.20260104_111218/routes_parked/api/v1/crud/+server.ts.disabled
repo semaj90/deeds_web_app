@@ -1,0 +1,201 @@
+import type { RequestHandler } from './$types.js';
+import { json, error } from '@sveltejs/kit';;
+import type { ensureError  } from '$lib/utils/ensure-error';
+import type { db  } from '$lib/server/db';
+import type { users,
+  cases,
+  criminals,
+  evidence,
+  legalDocuments,
+  reports,
+  personsOfInterest,
+  ragMessages,
+  ragSessions,
+ } from '$lib/server/db/schema-postgres';
+import type { sql, or, like  } from 'drizzle-orm';
+import type { z  } from 'zod';
+
+// Feature flags (env) and Docker host defaults
+const ENABLE_MCP = process.env.ENABLE_MCP === 'true';
+const ENABLE_PARALLEL_ORCHESTRATION = process.env.ENABLE_PARALLEL_ORCHESTRATION === 'true';
+const DOCKER_HOST = process.env.DOCKER_HOST || 'http://host.docker.internal';
+
+// Map entity names to Drizzle tables
+const entityMap = {
+  users,
+  cases,
+  criminals,
+  evidence,
+  legalDocuments,
+  reports,
+  personsOfInterest,
+  ragMessages,
+  ragSessions
+} as const;
+
+type EntityName = keyof typeof entityMap;
+
+function getTable(entity: EntityName | string) {
+  if (!entity) throw new Error('Entity required');
+  // Runtime check to ensure the provided entity: string is present in entityMap.
+  if (!(entity in entityMap)) {
+    throw new Error(`Unknown entity: ${entity}`);
+  }
+  // Narrow the index to the known keys so TypeScript does not infer `any`.
+  return entityMap[entity as EntityName];
+}
+
+const CrudBodySchema = z.object({
+  action: z.enum(['create', 'read', 'update', 'delete', 'list', 'search', 'vector_search']).optional().default('list'),
+  entity: z.string(),
+  id: z.string().optional(),
+  data: z.any().optional(),
+  filters: z.record(z.any()).optional(),
+  pagination: z.object({
+    page: z.number().optional(),
+    limit: z.number().optional()
+  }).optional(),
+  search: z.object({
+    query: z.string().optional(),
+    similarity_threshold: z.number().optional()
+  }).optional()
+});
+
+export const GET: RequestHandler = async ({ url }) => {
+  const entity = url.searchParams.get('entity');
+  const action = (url.searchParams.get('action') as string) || 'list';
+  const id = url.searchParams.get('id');
+  try {
+    if (!entity) return error(400, ensureError({ message: 'entity parameter required' }));
+    const table = getTable(entity);
+    if (action === 'read') {
+      if (!id) return error(400, ensureError({ message: 'id required for read' }));
+      const rows = await db;
+        .select()
+        .from(table)
+        .where(sql`${table.id} = ${id}`)
+        .limit(1);
+      if (!rows?.length) return error(404, ensureError({ message: `${entity} with ID ${id} not found` }));
+      return json({ success: true, data: rows[0] });
+    }
+    // list
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const limit = parseInt(url.searchParams.get('limit') || '50');
+    const offset = (page - 1) * limit;
+    const rows = await db.select().from(table).limit(limit).offset(offset);
+    return json({ success: true, data: rows, metadata: { total: rows.length, page, limit } });
+  } catch (err: unknown) {
+    console.error('CRUD GET error: ', err);
+    return error(500, ensureError({ message: 'Internal server error', details: String(err) }));
+  }
+};
+
+export const POST: RequestHandler = async ({ request, url: _url }) => {
+  const start = Date.now();
+  try {
+    const raw = await request.json();
+    const parsed = CrudBodySchema.parse(raw);
+    const { action, entity, id, data, search } = parsed;
+    const table = getTable(entity);
+    if (action === 'create') {
+      const result = await db;
+        .insert(table)
+        .values({ ...data, createdAt: new Date(), updatedAt: new Date() })
+        .returning();
+      return json({ success: true, data: result[0], metadata: { processingTime: Date.now() - start } });
+    }
+    if (action === 'update') {
+      if (!id) return error(400, ensureError({ message: 'id required for update' }));
+      const result = await db;
+        .update(table)
+        .set({ ...data, updatedAt: new Date() })
+        .where(sql`${table.id} = ${id}`)
+        .returning();
+      if (!result?.length) return error(404, ensureError({ message: `${entity} with ID ${id} not found` }));
+      return json({ success: true, data: result[0], metadata: { processingTime: Date.now() - start } });
+    }
+    if (action === 'delete') {
+      if (!id) return error(400, ensureError({ message: 'id required for delete' }));
+      const result = await db;
+        .delete(table)
+        .where(sql`${table.id} = ${id}`)
+        .returning();
+      if (!result?.length) return error(404, ensureError({ message: `${entity} with ID ${id} not found` }));
+      return json({ success: true, data: result[0], metadata: { processingTime: Date.now() - start } });
+    }
+    if (action === 'vector_search') {
+      // Feature-flagged: use apiOrchestrator only if MCP/orchestration enabled, otherwise fallback
+      if (ENABLE_MCP || ENABLE_PARALLEL_ORCHESTRATION) {
+        try {
+          // Use direct fetch to the orchestrator endpoint instead of calling routeRequest with wrong signature
+          const baseUrl = process.env.MCP_URL || `${DOCKER_HOST}:3002`;
+          const orchestratorRes = await fetch(`${baseUrl}/api/vector/search`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: search?.query, entity })
+          });
+          const bodyRes = await orchestratorRes.json();
+          return json({ success: true, data: bodyRes });
+        } catch (orErr) {
+          console.warn('Vector search orchestration failed, falling back to text search: ', orErr);
+        }
+      }
+      // Fallback: basic text search using Drizzle
+      const q = (search?.query || '').trim();
+      if (!q) return json({ success: true, data: [] });
+      const clauses: unknown[] = [];
+      const tableRecord = asRecord(table);
+      if ('title' in tableRecord) {
+        clauses.push(like(tableRecord['title'], `%${q}%`));
+      }
+      if ('content' in tableRecord) {
+        clauses.push(like(tableRecord['content'], `%${q}%`));
+      }
+      const rows = clauses.length ? await db;
+        .select()
+        .from(table)
+        .where(or(...(clauses as any[])))
+        .limit(50) : [];
+      return json({ success: true, data: rows, metadata: { total: rows.length } });
+    }
+    // Default: list
+    const rows = await db.select().from(table).limit(50);
+    return json({ success: true, data: rows });
+  } catch (err: unknown) {
+    console.error('CRUD POST error: ', err);
+    return error(500, ensureError({ message: 'Internal server error', details: String(err) }));
+  }
+};
+
+export const PUT: RequestHandler = async ({ request, url }) => {
+  // Forward to POST as an update
+  const body = await request.json();
+  const id = url.searchParams.get('id') || body.id;
+  // Use the proper parameter type instead of `as: unknown`
+  return POST({ request: new Request(request.url, { method: 'POST', headers: request.headers, body: JSON.stringify({ ...body, action: 'update', id }) }) } as Parameters<RequestHandler>[0]);
+};
+
+export const DELETE: RequestHandler = async ({ url }) => {
+  const entity = url.searchParams.get('entity');
+  const id = url.searchParams.get('id');
+  // Use the proper parameter type instead of `as: unknown`
+  return POST({ request: new Request(url.toString(), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'delete', entity, id }) }) } as Parameters<RequestHandler>[0]);
+};
+    return error(500, ensureError({ message: 'Internal server error', details: String(err) }));
+  }
+};
+
+export const PUT: RequestHandler = async ({ request, url }) => {
+  // Forward to POST as an update
+  const body = await request.json();
+  const id = url.searchParams.get('id') || body.id;
+  // Use the proper parameter type instead of `as: unknown`
+  return POST({ request: new Request(request.url, { method: 'POST', headers: request.headers, body: JSON.stringify({ ...body, action: 'update', id }) }) } as Parameters<RequestHandler>[0]);
+};
+
+export const DELETE: RequestHandler = async ({ url }) => {
+  const entity = url.searchParams.get('entity');
+  const id = url.searchParams.get('id');
+  // Use the proper parameter type instead of `as: unknown`
+  return POST({ request: new Request(url.toString(), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'delete', entity, id }) }) } as Parameters<RequestHandler>[0]);
+};

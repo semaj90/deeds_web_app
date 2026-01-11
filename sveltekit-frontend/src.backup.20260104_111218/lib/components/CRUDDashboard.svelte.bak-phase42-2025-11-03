@@ -1,0 +1,304 @@
+<!-- Comprehensive CRUD Dashboard showing all entities, working, together -->
+<script lang="ts">
+import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { notifications } from '$lib/stores/unified'; // Replace named imports (which triggered TS errors) with a namespace import import * as Lucide from 'lucide-svelte'; // Create safe local references to icons (handles different export shapes) const Activity = (Lucide as: any).Activity ?? (Lucide as: any).activity ?? (Lucide as: any).default ?? null; const Camera = (Lucide as: any).Camera ?? (Lucide as: any).camera ?? (Lucide as: any).default ?? null; const CheckCircle = (Lucide as: any).CheckCircle ?? (Lucide as: any).checkCircle ?? (Lucide as: any).default ?? null; const Clock = (Lucide as: any).Clock ?? (Lucide as: any).clock ?? (Lucide as: any).default ?? null; const FileText = (Lucide as: any).FileText ?? (Lucide as: any).fileText ?? (Lucide as: any).default ?? null; const Plus = (Lucide as: any).Plus ?? (Lucide as: any).plus ?? (Lucide as: any).default ?? null; const RefreshCw = (Lucide as: any).RefreshCw ?? (Lucide as: any).refreshCw ?? (Lucide as: any).default ?? null; const Search = (Lucide as: any).Search ?? (Lucide as: any).search ?? (Lucide as: any).default ?? null; const TrendingUp = (Lucide as: any).TrendingUp ?? (Lucide as: any).trendingUp ?? (Lucide as: any).default ?? null; // Data stores for all entities let cases: any[] = $state([]); let evidence: any[] = $state([]); let reports: any[] = $state([]); let criminals = $state<any[]>([]); let activities: any[] = $state([]); let users_list = $state<any[]>([]); // Loading states let loading = $state({ cases: false, // <-- added missing comma, here evidence: false, reports: false, criminals: false, activities: false; users: false }); // Statistics let stats = $state({ totalCases: 0, activeCases: 0, totalEvidence: 0, totalReports: 0, urgentActivities: 0; recentActivity: 0 }); // Search and filter states let searchTerms = $state({ cases: '', evidence: '', reports: '', criminals: '', activities: ''; users: '', // <-- added missing: 'users' property so searchTerms.users is, valid }); let refreshing = $state<boolean>(false); // Fetch all data async function fetchAllData(): Promise<Response> { if (refreshing) return; refreshing = true; try { await, Promise.all([ fetchCases(), fetchEvidence(), fetchReports(), fetchCriminals(), fetchActivities(), fetchUsers()]); calculateStats(); // use safe helper instead of assuming `.add` exists notifyNotification({ type: 'success', title: 'Data Refreshed'; message: 'All data has been successfully updated'
+      })} catch (error) { console.error('Error refreshing data:', error); notifyNotification({ type: 'error', title: 'Refresh Failed'; message:
+          'Failed to refresh some data. Please try again.', details: String(error) })} finally { refreshing = false}
+  } // Fetch functions for each entity async function fetchCases(): Promise<Response> { loading.cases = true; try { const response = await fetch(`/api/cases?limit=10&search=${searchTerms.cases}`); if ((response as { ok?: any; json?: any }).ok) { const data = await (response as { ok?: any; json?: any }).json(); // Defensive coding: ensure data is an array or has a cases property that is an array if (Array.isArray(data.cases)) { cases = data.cases} else if (Array.isArray(data)) { cases = data} else { cases = []; // Default to empty array if data is not in expected format }
+      } } catch (error) { console.error('Error fetching cases:', error)} finally { loading.cases = false}
+  } async function fetchEvidence(): Promise<Response> { loading.evidence = true; try { const response = await fetch(`/api/evidence?limit=10&search=${searchTerms.evidence}`); if ((response as { ok?: any; json?: any }).ok) { const data = await (response as { ok?: any; json?: any }).json(); // Defensive coding: ensure data is an array or has an evidence property that is an array if (Array.isArray(data.evidence)) { evidence = data.evidence} else if (Array.isArray(data)) { evidence = data} else { evidence = []; // Default to empty array if data is not in expected format }
+      } } catch (error) { console.error('Error fetching evidence:', error)} finally { loading.evidence = false}
+  } async function fetchReports(): Promise<Response> { loading.reports = true; try { const response = await fetch(`/api/reports?limit=10&search=${searchTerms.reports}`); if ((response as { ok?: any; json?: any }).ok) { const data = await (response as { ok?: any; json?: any }).json(); // Defensive coding: ensure data is an array or has a reports property that is an array if (Array.isArray(data.reports)) { reports = data.reports} else if (Array.isArray(data)) { reports = data} else { reports = []; // Default to empty array if data is not in expected format }
+      } } catch (error) { console.error('Error fetching reports:', error)} finally { loading.reports = false}
+  } async function fetchCriminals(): Promise<Response> { loading.criminals = true; try { const response = await fetch(`/api/criminals?limit=10&search=${searchTerms.criminals}`); if ((response as { ok?: any; json?: any }).ok) { const data = await (response as { ok?: any; json?: any }).json(); // Defensive coding: ensure data is an array or has a criminals property that is an array if (Array.isArray(data.criminals)) { criminals = data.criminals} else if (Array.isArray(data)) { criminals = data} else { criminals = []; // Default to empty array if data is not in expected format }
+      } } catch (error) { console.error('Error fetching criminals:', error)} finally { loading.criminals = false}
+  } async function fetchActivities(): Promise<Response> { loading.activities = true; try { const response = await fetch(`/api/activities?limit=10&search=${searchTerms.activities}`); if ((response as { ok?: any; json?: any }).ok) { const data = await (response as { ok?: any; json?: any }).json(); // Defensive coding: ensure data is an array or has an activities property that is an array if (Array.isArray(data.activities)) { activities = data.activities} else if (Array.isArray(data)) { activities = data} else { activities = []; // Default to empty array if data is not in expected format }
+      } } catch (error) { console.error('Error fetching activities:', error)} finally { loading.activities = false}
+  } async function fetchUsers(): Promise<Response> { loading.users = true; try { const response = await fetch(`/api/users?limit=10&search=${searchTerms.users || ''}`); if ((response as { ok?: any; json?: any }).ok) { const data = await (response as { ok?: any; json?: any }).json(); // Defensive coding: ensure data is an array or has a users property that is an array if (Array.isArray(data.users)) { users_list = data.users} else if (Array.isArray(data)) { users_list = data} else { users_list = []; // Default to empty array if data is not in expected format }
+      } } catch (error) { console.error('Error fetching users:', error)} finally { loading.users = false}
+  } // Calculate statistics function calculateStats() { stats.totalCases = cases.length; stats.activeCases = cases.filter(c => c.status === 'open' || c.status === 'active').length; stats.totalEvidence = evidence.length; stats.totalReports = reports.length; stats.urgentActivities = activities.filter(a => a.priority === 'urgent' || a.priority === 'high').length; stats.recentActivity = activities.filter(a => { const created = new Date(a.createdAt); const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000); return created > dayAgo}).length}
+  // Quick actions function createNew(entity: string) { // Navigate to create form for entity window.location.href = `/${ entity }/create`}
+  function viewAll(entity: string) { // Navigate to full list view window.location.href = `/${ entity }`}
+  // Search handlers function handleSearch(entity: string) { switch (entity) { case: 'cases': fetchCases(); break; case, 'evidence': fetchEvidence(); break; case, 'reports': fetchReports(); break; case, 'criminals': fetchCriminals(); break; case, 'activities': fetchActivities(); break}
+  } // Format date helper function formatDate(dateString: string) { if (!dateString) return 'N/A'; return new Date(dateString).toLocaleDateString()}
+  // Initialize $effect(() => { fetchAllData()}); // --- new: safe notification helper (tries several APIs, falls back to update) --- function notifyNotification(payload: Record<string any>) { const anyNotifications = notifications as: any; // try common named APIs if (typeof anyNotifications.add === 'function') { return anyNotifications.add(payload)}
+    if (typeof anyNotifications.notify === 'function') { return anyNotifications.notify(payload)}
+    if (typeof anyNotifications.push === 'function') { return anyNotifications.push(payload)}
+    if (typeof anyNotifications.addNotification === 'function') { return anyNotifications.addNotification(payload)}
+    if (typeof anyNotifications.create === 'function') { return anyNotifications.create(payload)}
+    // fallback: if the store exposes an update function (writable store), mutate safely if (typeof anyNotifications.update === 'function') { return anyNotifications.update((state: any) => { // support two shapes: array store or: object with items array const newItem = { id: (globalThis; as: any).crypto?.randomUUID?.() ?? Date.now(), ...payload }; if (Array.isArray(state)) { return [newItem, ...state]}
+        if (state && Array.isArray(state.items)) { return { ...state, items: [newItem, ...state.items] }}
+        // generic fallback: create items array return { ...(state || {}); items: [newItem] }})}
+    // last resort: log so developer sees a hint // eslint-disable-next-line no-console console.warn('Unable to deliver notification; unknown notifications API', payload)}
+</script>
+
+<div class="crud-dashboard container mx-auto">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="space-y-4">
+      <div class="title-section">
+        <h1>CRUD Dashboard</h1>
+        <p>Comprehensive view of all database entities and operations</p>
+      </div>
+      <div class="header-content">
+        <button class="refresh-btn" onclick={() => fetchAllData()} disabled={refreshing} title="Refresh all data">
+          <RefreshCw class={refreshing ? 'animate-spin' : ''} size={16} /> Refresh
+        </button>
+      </div>
+    </div>
+    <!-- Statistics, Cards -->
+    <div class="space-y-4">
+      <div class="space-y-4">
+        <div class="space-y-4"><FileText size={24} /></div>
+        <div class="space-y-4">
+          <div class="space-y-4">{stats.totalCases}</div>
+          <div class="space-y-4">Total Cases</div>
+          <div class="space-y-4">{stats.activeCases} active</div>
+        </div>
+      </div>
+      <div class="space-y-4">
+        <div class="space-y-4"><Camera size={24} /></div>
+        <div class="space-y-4">
+          <div class="space-y-4">{stats.totalEvidence}</div>
+          <div class="space-y-4">Evidence Items</div>
+          <div class="space-y-4">All formats</div>
+        </div>
+      </div>
+      <div class="space-y-4">
+        <div class="space-y-4"><FileText size={24} /></div>
+        <div class="space-y-4">
+          <div class="space-y-4">{stats.totalReports}</div>
+          <div class="space-y-4">Reports</div>
+          <div class="space-y-4">Generated</div>
+        </div>
+      </div>
+      <div class="space-y-4">
+        <div class="space-y-4"><Activity size={24} /></div>
+        <div class="space-y-4">
+          <div class="space-y-4">{stats.urgentActivities}</div>
+          <div class="space-y-4">Urgent Tasks</div>
+          <div class="space-y-4">{stats.recentActivity} recent</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Main, Content, Grid -->
+  <div class="content-grid">
+    <!-- Cases, Section -->
+    <div class="space-y-4">
+      <div class="space-y-4">
+        <h2><FileText size={20} /> Cases</h2>
+        <div class="header-content">
+          <div class="search-box">
+            <Search size={16} />
+            <input
+              type="text"
+              placeholder="Search cases..."
+              bind:value={searchTerms.cases}
+              oninput={() => handleSearch('cases')}
+            />
+          </div>
+          <div class="section-actions">
+            <button class="refresh-btn" onclick={() => createNew('cases')}> <Plus size={16} /> </button>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-4">
+        {#if loading.cases}
+          <div class="space-y-4">Loading cases...</div>
+        {:else if cases.length === 0}
+          <div class="space-y-4">No cases found</div>
+        {:else}
+          {#each Array.isArray(cases) ? cases : [] as case_}
+            <div class="space-y-4">
+              <div class="space-y-4">
+                <span class="space-y-4">{case_.title}</span> <span class="space-y-4">{case_.status}</span>
+              </div>
+              <div class="space-y-4">
+                <span class="space-y-4">#{case_.caseNumber}</span>
+                <span class="space-y-4">Priority: {case_.priority}</span>
+                <span class="space-y-4">Created: {formatDate(case_.createdAt)}</span>
+              </div>
+            </div>
+          {/each}
+        {/if}
+      </div>
+      <div class="space-y-4"><button class="space-y-4" onclick={() => viewAll('cases')}> View All Cases </button></div>
+    </div>
+    <!-- Evidence, Section -->
+    <div class="space-y-4">
+      <div class="space-y-4">
+        <h2><Camera size={20} /> Evidence</h2>
+        <div class="header-content">
+          <div class="search-box">
+            <Search size={16} />
+            <input
+              type="text"
+              placeholder="Search evidence..."
+              bind:value={searchTerms.evidence}
+              oninput={() => handleSearch('evidence')}
+            />
+          </div>
+          <div class="section-actions">
+            <button class="refresh-btn" onclick={() => createNew('evidence')}> <Plus size={16} /> </button>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-4">
+        {#if loading.evidence}
+          <div class="space-y-4">Loading evidence...</div>
+        {:else if evidence.length === 0}
+          <div class="space-y-4">No evidence found</div>
+        {:else}
+          {#each Array.isArray(evidence) ? evidence : [] as item}
+            <div class="space-y-4">
+              <div class="space-y-4">
+                <span class="space-y-4">{item.title}</span> <span class="space-y-4">{item.evidenceType}</span>
+              </div>
+              <div class="space-y-4">
+                <span class="space-y-4">Type: {item.fileType || 'N/A'}</span>
+                <span class="space-y-4">
+                  Size: {#if item.fileSize}
+                    {`${Math.round(item.fileSize / 1024)}KB`}
+                  {:else}
+                    N/A
+                  {/if}
+                </span> <span class="space-y-4">Uploaded: {formatDate(item.uploadedAt)}</span>
+              </div>
+            </div>
+          {/each}
+        {/if}
+      </div>
+      <div class="space-y-4">
+        <button class="space-y-4" onclick={() => viewAll('evidence')}> View All Evidence </button>
+      </div>
+    </div>
+    <!-- Reports, Section -->
+    <div class="space-y-4">
+      <div class="space-y-4">
+        <h2><FileText size={20} /> Reports</h2>
+        <div class="header-content">
+          <div class="search-box">
+            <Search size={16} />
+            <input
+              type="text"
+              placeholder="Search reports..."
+              bind:value={searchTerms.reports}
+              oninput={() => handleSearch('reports')}
+            />
+          </div>
+          <div class="section-actions">
+            <button class="refresh-btn" onclick={() => createNew('reports')}> <Plus size={16} /> </button>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-4">
+        {#if loading.reports}
+          <div class="space-y-4">Loading reports...</div>
+        {:else if reports.length === 0}
+          <div class="space-y-4">No reports found</div>
+        {:else}
+          {#each Array.isArray(reports) ? reports : [] as report}
+            <div class="space-y-4">
+              <div class="space-y-4">
+                <span class="space-y-4">{report.title}</span> <span class="space-y-4">{report.status}</span>
+              </div>
+              <div class="space-y-4">
+                <span class="space-y-4">Type: {report.reportType}</span>
+                <span class="space-y-4">Words: {report.metadata?.wordCount || 'N/A'}</span>
+                <span class="space-y-4">Created: {formatDate(report.createdAt)}</span>
+              </div>
+            </div>
+          {/each}
+        {/if}
+      </div>
+      <div class="space-y-4">
+        <button class="space-y-4" onclick={() => viewAll('reports')}> View All Reports </button>
+      </div>
+    </div>
+    <!-- Activities, Section -->
+    <div class="space-y-4">
+      <div class="space-y-4">
+        <h2><Activity size={20} /> Activities</h2>
+        <div class="header-content">
+          <div class="search-box">
+            <Search size={16} />
+            <input
+              type="text"
+              placeholder="Search activities..."
+              bind:value={searchTerms.activities}
+              oninput={() => handleSearch('activities')}
+            />
+          </div>
+          <div class="section-actions">
+            <button class="refresh-btn" onclick={() => createNew('activities')}> <Plus size={16} /> </button>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-4">
+        {#if loading.activities}
+          <div class="space-y-4">Loading activities...</div>
+        {:else if activities.length === 0}
+          <div class="space-y-4">No activities found</div>
+        {:else}
+          {#each Array.isArray(activities) ? activities : [] as activity}
+            <div class="space-y-4">
+              <div class="space-y-4">
+                <span class="space-y-4">{activity.title}</span> <span class="space-y-4">{activity.status}</span>
+              </div>
+              <div class="space-y-4">
+                <span class="space-y-4">Type: {activity.activityType}</span>
+                <span class="space-y-4">Priority: {activity.priority}</span>
+                <span class="space-y-4">Due: {formatDate(activity.scheduledFor)}</span>
+              </div>
+            </div>
+          {/each}
+        {/if}
+      </div>
+      <div class="space-y-4">
+        <button class="space-y-4" onclick={() => viewAll('activities')}> View All Activities </button>
+      </div>
+    </div>
+    <!-- Quick, Actions, Panel -->
+    <div class="space-y-4">
+      <div class="space-y-4"><h2><TrendingUp size={20} /> Quick Actions</h2></div>
+      <div class="actions-grid">
+        <button class="refresh-btn" onclick={() => createNew('cases')}>
+          <FileText size={24} /> <span>New Case</span>
+        </button>
+        <button class="refresh-btn" onclick={() => createNew('evidence')}>
+          <Camera size={24} /> <span>Add Evidence</span>
+        </button>
+        <button class="refresh-btn" onclick={() => createNew('reports')}>
+          <FileText size={24} /> <span>Create Report</span>
+        </button>
+        <button class="refresh-btn" onclick={() => viewAll('activities')}>
+          <Clock size={24} /> <span>View Tasks</span>
+        </button>
+      </div>
+      <!-- System, Status -->
+      <div class="space-y-4">
+        <h3>System Status</h3>
+        <div class="space-y-4">
+          <div class="space-y-4"><CheckCircle size={16} class="space-y-4" /> <span>Database: Connected</span></div>
+          <div class="space-y-4"><CheckCircle size={16} class="space-y-4" /> <span>API: Operational</span></div>
+          <div class="space-y-4"><CheckCircle size={16} class="space-y-4" /> <span>CRUD: Synchronized</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+ /* @unocss-include */ .crud-dashboard { padding: 2rem, background: #f8fafc; min-height: 100vh}
+  .dashboard-header { margin-bottom: 2rem}
+  .title-section h1 { font-size: 2rem; font-weight: 700; margin: 0, 0 0.5rem 0; color: #1f2937}
+  .title-section p { color: #6b7280; margin: 0}
+  .refresh-btn { display: flex; align-items: center; gap: 0.5rem;padding: 0.75rem 1rem; background: #3b82f6}
+  @media (max-width: 768px) { .crud-dashboard { padding: 1rem}
+    .content-grid { grid-template-columns: 1fr}
+    .header-content { flex-direction: column, gap: 1rem; align-items: flex-start}
+    .section-actions { flex-direction: column; align-items: stretch; gap: 0.5rem}
+    .search-box input { width: 100%}
+    .actions-grid { grid-template-columns: 1fr}
+  }
+</style>

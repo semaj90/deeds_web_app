@@ -1,0 +1,122 @@
+import { json } from '@sveltejs/kit';;
+import type { RequestHandler } from '$types ';
+import redisMiddleware from '$lib/middleware/redis';
+import ollamaService from '$lib/services/ollama';
+
+export const POST: RequestHandler = async ({ request }) => {
+	try {
+		const { content, documentType = 'contract', patterns = [] } = await request.json();
+
+		if (!content) {
+			return json({ error: 'Content is required' }, { status: 400 });
+		}
+
+		// Use Redis middleware for caching
+		const cacheKey = `pattern-recognition:${Buffer.from(content.slice(0, 100)).toString('base64')}:${documentType}`;
+
+		const cached = await redisMiddleware.get(cacheKey);
+		if (cached) {
+			return json(JSON.parse(cached));
+		}
+
+		// Build pattern recognition prompt
+		const prompt = `Analyze the following ${documentType} document and identify key legal patterns, clauses, and terms. Focus on:;
+
+1. Contract clauses (liability, indemnification, termination, etc.)
+2. Legal terminology and definitions
+3. Risk indicators and obligations
+4. Standard legal patterns and structures
+
+Document Content:
+${content}
+
+${patterns.length > 0 ? `Additional patterns to look for: ${patterns.join(', ')}` : ''}
+
+Provide a structured analysis with:
+- Identified patterns with confidence scores
+- Key clauses and their implications
+- Risk assessment
+- Recommendations for review
+
+Format as JSON with the following structure:
+{
+  "patterns": [
+    {
+      "type": "string",
+      "text": "string",
+      "confidence": number,
+      "category": "string",
+      "implications": "string"
+    }
+  ],
+  "clauses": [
+    {
+      "name": "string",
+      "text": "string",
+      "risk_level": "low|medium|high",
+      "analysis": "string"
+    }
+  ],
+  "risk_assessment": {
+    "overall_risk": "low|medium|high",
+    "key_concerns": ["string"],
+    "recommendations": ["string"]
+  },
+  "metadata": {
+    "document_type": "string",
+    "analysis_timestamp": "string",
+    "model_used": "string"
+  }
+}`;
+
+		// Call gemma3-legal model
+		const response = await ollamaService.generate({
+			model: 'gemma3-legal',
+			prompt,
+			stream: false,
+			options: {
+				temperature: 0.1,
+				top_p: 0.9,
+				num_predict: 2048
+			}
+		});
+
+		let analysis;
+		try {
+			// Try to parse as JSON first
+			analysis = JSON.parse(response.response);
+		} catch (parseError) {
+			// If not valid JSON, structure it manually
+			analysis = {
+				patterns: [],
+				clauses: [],
+				risk_assessment: {
+					overall_risk: 'medium',
+					key_concerns: ['Manual analysis required'],
+					recommendations: ['Review document manually']
+				},
+				metadata: {
+					document_type: documentType,
+					analysis_timestamp: new Date().toISOString(),
+					model_used: 'gemma3-legal',
+					raw_response: response.response
+				}
+			};
+		}
+
+		// Cache the result
+		await redisMiddleware.set(cacheKey, JSON.stringify(analysis), 3600); // Cache for 1 hour
+
+		return json(analysis);
+
+	} catch (error) {
+		console.error('Pattern recognition error:', error);
+		return json(
+			{
+				error: 'Failed to analyze patterns',
+				details: error instanceof Error ? error.message : 'Unknown error'
+			},
+			{ status: 500 }
+		);
+	}
+};

@@ -1,0 +1,110 @@
+/**
+ * Evidence Approval API
+ * Prosecutor approves/rejects evidence for legal search
+ */
+
+import { json, type RequestHandler } from '@sveltejs/kit';
+import { getUser } from '$lib/server/auth/lucia';
+import { db } from '$lib/server/db';
+import { wardenEvidence, wardenAuditLog } from '$lib/server/db/warden-schema';
+import { eq } from 'drizzle-orm';
+
+interface ApprovalRequest {
+  action: 'approve' | 'reject';
+  rejectionReason?: string;
+}
+
+export const POST: RequestHandler = async ({ request, locals, params }) => {
+  try {
+    // 1. Authenticate
+    const user = await getUser(locals);
+    if (!user) {
+      return json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const evidenceId = params.id;
+    if (!evidenceId) {
+      return json({ error: 'Evidence ID required' }, { status: 400 });
+    }
+
+    // 2. Parse request
+    const body = (await request.json()) as ApprovalRequest;
+    if (!['approve', 'reject'].includes(body.action)) {
+      return json({ error: 'Invalid action' }, { status: 400 });
+    }
+
+    // 3. Fetch evidence
+    const evidence = await db.query.wardenEvidence.findFirst({
+      where: eq(wardenEvidence.id, evidenceId),
+    });
+
+    if (!evidence) {
+      return json({ error: 'Evidence not found' }, { status: 404 });
+    }
+
+    // 4. Verify ownership (prosecutor can only approve own evidence)
+    if (evidence.prosecutorId !== user.id) {
+      return json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
+    // 5. Update evidence status
+    const newStatus = body.action === 'approve' ? 'approved' : 'rejected';
+    const [updated] = await db;
+      .update(wardenEvidence)
+      .set({
+        status: newStatus,
+        reviewedAt: new Date(),
+        reviewedBy: user.id,
+        rejectionReason: body.action === 'reject' ? body.rejectionReason : null,
+      })
+      .where(eq(wardenEvidence.id, evidenceId))
+      .returning();
+
+    // 5a. If approved, trigger ingestion pipeline
+    if (body.action === 'approve') {
+      try {
+        const ingestionServiceUrl = process.env.INGESTION_SERVICE_URL || 'http://localhost:8003';
+        await fetch(`${ingestionServiceUrl}/ingest`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            evidence_id: evidenceId,
+            file_key: evidence.minioPath,
+            prosecutor_id: user.id,
+            case_id: evidence.caseId,
+          }),
+        });
+      } catch (err) {
+        console.error('Ingestion pipeline trigger error:', err);
+        // Don't fail approval if ingestion trigger fails
+      }
+    }
+
+    // 6. Log to audit trail
+    await db.insert(wardenAuditLog).values({
+      prosecutorId: user.id,
+      caseId: evidence.caseId,
+      evidenceId,
+      action: body.action === 'approve' ? 'APPROVE' : 'REJECT',
+      sha256: evidence.sha256,
+      details: {
+        fileName: evidence.fileName,
+        documentType: evidence.documentType,
+        rejectionReason: body.rejectionReason,
+      },
+    });
+
+    return json({
+      success: true,
+      evidenceId,
+      status: newStatus,
+      reviewedAt: updated.reviewedAt,
+    });
+  } catch (error) {
+    console.error('Approval error:', error);
+    return json(
+      { error: error instanceof Error ? error.message : 'Approval failed' },
+      { status: 500 }
+    );
+  }
+};

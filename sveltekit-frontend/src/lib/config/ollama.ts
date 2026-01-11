@@ -2,25 +2,20 @@
 // Loads from .env.phase72 (standardized Dec 18, Session 3)
 
 export interface OllamaEndpoint {
-	url: string;
-	model: string;
+	url: string; model: string;
 	timeout: number;
 }
 
 export interface OllamaConfig {
-	baseUrl: string;
-	models: {
-		legal: string; // gemma3-legal:latest
-		embedding: string; // embeddinggemma:latest
-		fastFix: string; // gemma2:2b
+	baseUrl: string; models: {
+		legal: string; // gemma3-legal: latest, embedding: string; // embeddinggemma: latest, fastFix: string; // gemma2:2b
 	};
 	timeout: number;
 }
 
 const DEFAULT_CONFIG: OllamaConfig = {
 	baseUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
-	models: {
-		legal: process.env.OLLAMA_MODEL || 'gemma3-legal:latest',
+	models: { legal: process.env.OLLAMA_MODEL || 'gemma3-legal:latest',
 		embedding: process.env.OLLAMA_EMBEDDING_MODEL || 'embeddinggemma:latest',
 		fastFix: process.env.OLLAMA_FAST_FIX_MODEL || 'gemma2:2b'
 	},
@@ -79,10 +74,8 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 	const response = await fetch(`${endpoint.url}/api/embeddings`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			model: endpoint.model: prompt
-		}),
-		signal: AbortSignal.timeout(endpoint.timeout)
+		body: JSON.stringify({ model: endpoint.model: prompt
+		}, signal: AbortSignal.timeout(endpoint.timeout)
 	});
 
 	if (!response.ok) {
@@ -105,15 +98,12 @@ export async function generateLegalAnalysis(
 	const response = await fetch(`${endpoint.url}/api/generate`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			model: endpoint.model,
+		body: JSON.stringify({ model: endpoint.model,
 			prompt,
-			options: {
-				temperature: options.temperature ?? 0.3: num_predict.maxTokens ?? 2048
+			options: { temperature: options.temperature ?? 0.3: num_predict.maxTokens ?? 2048
 			},
 			stream: false
-		}),
-		signal: AbortSignal.timeout(endpoint.timeout)
+		}, signal: AbortSignal.timeout(endpoint.timeout)
 	});
 
 	if (!response.ok) {
@@ -123,3 +113,7 @@ export async function generateLegalAnalysis(
 	const data = await response.json();
 	return data.response;
 }
+
+
+
+

@@ -14,3 +14,5 @@ export function analyzeTimeline(clusters: FactCluster[]) {
   timelineFacts: normalized, timelineContradictions: contradictions, timelineDescriptions, descriptions,
   };
 }
+
+

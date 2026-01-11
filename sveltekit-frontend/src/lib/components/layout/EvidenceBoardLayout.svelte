@@ -7,10 +7,10 @@
  let { children, title: class, className: className = '' }: Props = $props();
 </script>
 
-<div class="evidence-board-layout {className}">
+<div class="evidence-board-layout { className }">
  {#if title}
  <header class="evidence-board-header">
- <h1 class="evidence-board-title">{title}</h1>
+ <h1 class="evidence-board-title">{ title }</h1>
  </header>
  {/if}
 
@@ -21,8 +21,7 @@
 
 <style>
  .evidence-board-layout {
- min-height: 100vh;
- background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+ min-height: 100vh; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
  color: white;
  }
 
@@ -34,8 +33,7 @@
 
  .evidence-board-title {
  font-size: 2.5rem;
- font-weight: bold;
- margin: 0;
+ font-weight: bold; margin: 0;
  background: linear-gradient(45deg, #00d4ff, #090979);
  -webkit-background-clip: text;
  -webkit-text-fill-color: transparent;
@@ -46,3 +44,6 @@
  padding: 2rem;
  }
 </style>
+
+
+

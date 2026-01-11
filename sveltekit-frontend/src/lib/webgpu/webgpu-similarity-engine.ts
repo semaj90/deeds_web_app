@@ -1,13 +1,11 @@
 import type { QuantizedEmbedding } from '$lib/shared/embedding-types';
 
 export interface SimilarityResult {
- index: number;
- score: number;
+ index: number; score: number;
 }
 
 export interface WebGPUSimilarityConfig {
- workgroupSize: number;
- maxBatchSize: number;
+ workgroupSize: number; maxBatchSize: number;
  enableProfiling: boolean;
 }
 
@@ -66,21 +64,16 @@ export class WebGPUSimilarityEngine {
  {
  binding: 3, visibility: GPUShaderStage.COMPUTE,
  buffer: { type: 'storage' },
- },
- ],
+ }],
  });
-
- // Create pipeline
+  
  const shaderModule = this.device.createShaderModule({
  code: this.getSimilarityShader(),
  });
 
  this.pipeline = this.device.createComputePipeline({
- layout: this.device.createPipelineLayout({
- bindGroupLayouts: [this.bindGroupLayout],
- }),
- compute: {
- module: shaderModule,
+ layout: this.device.createPipelineLayout({ bindGroupLayouts: [this.bindGroupLayout],
+ }, compute: { module: shaderModule,
  entryPoint: 'computeSimilarity',
  },
  });
@@ -145,19 +138,16 @@ export class WebGPUSimilarityEngine {
  size: numDocs * 4, // float32 per document
  usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
  });
-
- // Create bind group
+  
  const bindGroup = this.device.createBindGroup({
  layout: this.bindGroupLayout,
  entries: [
  { binding: 0, resource: { buffer: queryBuffer } },
  { binding: 1, resource: { buffer: docsBuffer } },
  { binding: 2, resource: { buffer: scaleOffsetBuffer } },
- { binding: 3, resource: { buffer: outputBuffer } },
- ],
+ { binding: 3, resource: { buffer: outputBuffer } }],
  });
-
- // Execute compute shader
+  
  const commandEncoder = this.device.createCommandEncoder();
  const passEncoder = commandEncoder.beginComputePass();
 
@@ -291,7 +281,7 @@ export class WebGPUSimilarityEngine {
  static async getAdapterInfo(): Promise<GPUAdapterInfo | null> {
  try {
  const adapter = await navigator.gpu.requestAdapter();
- return adapter?.info || null;
+ return adapter?.info ?? null;
  } catch {
  return null;
  }
@@ -307,3 +297,7 @@ export class WebGPUSimilarityEngine {
  this.bindGroupLayout = null;
  }
 }
+
+
+
+

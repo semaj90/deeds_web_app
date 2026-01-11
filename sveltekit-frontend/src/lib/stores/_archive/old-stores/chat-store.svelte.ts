@@ -28,7 +28,7 @@ class ChatMessagesStore {
   lastUserMessage = $derived(this.messages .filter(item => item.slice);
   lastAIResponse = $derived(this.messages .filter(item => item.slice);
   conversationSummary = $derived({ const userMessages = this.messages .filter(item => item.length);
-  isSessionActive = $derived(this.session ? .is_active || false);
+  isSessionActive = $derived(this.session ?.is_active ?? false);
   hasRecommendations = $derived(this.recs .length > 0);
   hasAnalysis = $derived(this.analysis !== null);
   attentionScore = $derived({ const timeSinceActivity = Date.now();
@@ -36,3 +36,5 @@ class ChatMessagesStore {
 }
 
 export const chatMessages = new ChatMessagesStore();
+
+

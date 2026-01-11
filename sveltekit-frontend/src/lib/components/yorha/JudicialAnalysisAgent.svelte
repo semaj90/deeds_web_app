@@ -1,10 +1,13 @@
 import { createEventDispatcher } from 'svelte';
 <script lang="ts">
+	let charge = $state<any>(undefined);
+	let rec = $state<any>(undefined);
+	let risk = $state<any>(undefined);
+
  // Migrated from createEventDispatcher to callback props;
 
  interface Evidence {
- id: string;
- title: string;
+ id: string; title: string;
  description?: string;
  content?: string;
  fileName?: string;
@@ -12,31 +15,22 @@ import { createEventDispatcher } from 'svelte';
 
  interface JudicialAnalysis {
  id: string;
- caseId?: string;
- generatedAt: string;
- admissibility: Array<{
- evidence: string;
+ caseId?: string; generatedAt: string;
+ admissibility: Array<{ evidence: string;
  ruling: 'admissible' | 'inadmissible' | 'conditional';
- reasoning: string;
- legalBasis: string;
+ reasoning: string; legalBasis: string;
  }>;
- probableCause: {
- assessment: 'strong' | 'moderate' | 'weak' | 'none';
- reasoning: string;
- factors: string[];
+ probableCause: { assessment: 'strong' | 'moderate' | 'weak' | 'none';
+ reasoning: string; factors: string[];
  };
- caseStrength: {
- overall: number; // 0-100
- prosecution: number;
- defense: number;
- keyFactors: Array<{
- factor: string;
+ caseStrength: { overall: number; // 0-100
+ prosecution: number; defense: number;
+ keyFactors: Array<{ factor: string;
  impact: 'positive' | 'negative' | 'neutral';
  weight: number;
  }>;
  };
- recommendations: string[];
- risks: string[];
+ recommendations: string[]; risks: string[];
  summary: string;
  }
 
@@ -193,8 +187,8 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  Jurisdiction
  </label>
  <select
- bind:value={jurisdiction}
- class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+ bind:value={ jurisdiction }
+ class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white focus: outline-none, focus:ring-2 focus:ring-cyan-500"
  >
  <option value="federal">Federal</option>
  <option value="state">State</option>
@@ -248,7 +242,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  <button
  onclick={performAnalysis}
  disabled={isAnalyzing || evidence.length === 0}
- class="w-full bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 disabled:from-slate-600 disabled:to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+ class="w-full bg-gradient-to-r from-cyan-600 to-cyan-700 hover: from-cyan-500, hover:to-cyan-600 disabled: from-slate-600, disabled:to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
  >
  {#if isAnalyzing}
  <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -267,7 +261,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  {#each ['overview', 'admissibility', 'probable-cause', 'case-strength', 'recommendations'] as tab}
  <button
  onclick={() => activeTab = tab}
- class="flex-1 px-4 py-2 rounded text-sm font-medium transition-colors {activeTab === tab ? 'bg-cyan-600 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-700'}"
+ class="flex-1 px-4 py-2 rounded text-sm font-medium transition-colors {activeTab === tab ? 'bg-cyan-600 text-white' : 'text-slate-400, hover:text-white hover:bg-slate-700'}"
  >
  {tab.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
  </button>
@@ -287,7 +281,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  💾
  </button>
  <button
- onclick={clearAnalysis}
+ onclick={ clearAnalysis }
  class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-sm"
  title="Clear analysis"
  >
@@ -471,3 +465,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  to { transform: rotate(360deg); }
  }
 </style>
+
+
+
+

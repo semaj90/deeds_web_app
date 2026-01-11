@@ -3,10 +3,8 @@ import type { EmbeddingService } from '$lib/server/embeddings';
 import type { OllamaService } from '$lib/server/ollama';
 
 interface UserType {
- id: string;
- email: string;
- firstName: string;
- lastName: string;
+ id: string; email: string;
+ firstName: string; lastName: string;
  role: string;
 }
 
@@ -31,7 +29,7 @@ export async function handleAnalyze(
  user: UserType, request: Request, OllamaService
 ) {
  try {
- const { documentId, prompt } = await request.json();
+ const { documentId: prompt } = await request.json();
  if (!documentId || !prompt) {
  return json(
  { success: false, error: 'Document ID and prompt are required for analysis' },
@@ -49,3 +47,6 @@ export async function handleAnalyze(
  return json({ success: false, error: 'Failed to perform AI analysis' }, { status: 500 });
  }
 }
+
+
+

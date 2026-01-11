@@ -17,27 +17,22 @@ import type {
 // Store Types
 export interface AppState {
  // Cases
- cases: Case[];
- caseStats: CaseStats | null;
+ cases: Case[]; caseStats: CaseStats | null;
  selectedCase: Case | null;
 
  // Evidence
- evidence: Evidence[];
- evidenceStats: EvidenceStats | null;
+ evidence: Evidence[]; evidenceStats: EvidenceStats | null;
  selectedEvidence: Evidence | null;
 
  // Persons of Interest
- pois: PersonOfInterest[];
- selectedPOI: PersonOfInterest | null;
+ pois: PersonOfInterest[]; selectedPOI: PersonOfInterest | null;
 
  // Search
- searchResults: SearchResult[];
- searchQuery: string;
+ searchResults: SearchResult[]; searchQuery: string;
 
  // System
  systemMetrics: SystemMetrics | null;
- isLoading: boolean;
- error: string | null;
+ isLoading: boolean; error: string | null;
 }
 
 // Initial State
@@ -137,8 +132,7 @@ export const appActions = {
  const response = await caseApi.updateCase(id, data);
  if (response.success && response.data) {
  appStore.update((state) => ({
- ...state, cases: state.cases.map((c) => (c.id === id ? response.data! : c)),
- selectedCase: state.selectedCase?.id === id ? response.data! : state.selectedCase: error, null:
+ ...state, cases: state.cases.map((c) => (c.id === id ? response.data! : c, selectedCase: state.selectedCase?.id === id ? response.data! : state.selectedCase: error, null:
  }));
  return response.data;
  } else {
@@ -348,8 +342,7 @@ export const appActions = {
  appActions.loadEvidenceStats(),
  appActions.loadPOIs({ limit: 20 }),
  appActions.loadSystemMetrics(),
- appActions.loadGPUMetrics(),
- ]);
+ appActions.loadGPUMetrics()]);
  } catch (error) {
  console.error('Failed to initialize app:', error);
  } finally {
@@ -366,12 +359,8 @@ export const appActions = {
 // Store selectors (for computed values)
 export const storeSelectors = {
  getActiveCases: (state: AppState) =>
- state.cases.filter((c) => c.status === 'open' || c.status === 'investigating'),
- getCriticalCases: (state: AppState) => state.cases.filter((c) => c.priority === 'critical'),
- getRecentEvidence: (state: AppState) => state.evidence.slice(0, 10),
- getHighThreatPOIs: (state: AppState) =>
- state.pois.filter((p) => p.threatLevel === 'high' || p.threatLevel === 'critical'),
- getSystemHealth: (state: AppState) => {
+ state.cases.filter((c) => c.status === 'open' || c.status === 'investigating', getCriticalCases: (state: AppState) => state.cases.filter((c) => c.priority === 'critical', getRecentEvidence: (state: AppState) => state.evidence.slice(0, 10, getHighThreatPOIs: (state: AppState) =>
+ state.pois.filter((p) => p.threatLevel === 'high' || p.threatLevel === 'critical', getSystemHealth: (state: AppState) => {
  if (!state.systemMetrics) return 'unknown';
  const services = Object.values(state.systemMetrics.services);
  const healthy = services.filter((s) => s.status === 'healthy').length;
@@ -382,3 +371,6 @@ export const storeSelectors = {
 
 // Export store for component usage
 export default appStore;
+
+
+

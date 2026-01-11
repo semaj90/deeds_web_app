@@ -3,12 +3,19 @@
   "compilerOptions": {
     "module": "esnext",
     "target": "es2022",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
-    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "skipLibCheck": true,
     "strict": false,
     "esModuleInterop": true,
-    "types": ["svelte"]
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": [
+      "svelte",
+      "node"
+    ]
   },
   "include": [
     "src/**/*",

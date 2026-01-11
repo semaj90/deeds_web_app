@@ -1,0 +1,44 @@
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types.js';
+import fs from 'fs';
+import path from 'path';
+
+export const GET: RequestHandler = async () => {
+ const routesDir = path.resolve(process.cwd(), 'src/routes');
+
+ const getRoutes = (dir: string, prefix: string = ''): string[] => {
+ const entries = fs.readdirSync(dir, { withFileTypes: true });
+ let routes: string[] = [];
+
+ for (const entry of entries) {
+ const fullPath = path.join(dir, entry.name);
+ if (entry.isDirectory()) {
+ if (
+ entry.name.includes('_disabled') ||
+ entry.name.startsWith('(') ||
+ entry.name.startsWith('.') ||
+ entry.name === 'api'
+ ) {
+ continue;
+ }
+ routes.push(path.join(prefix, entry.name));
+ routes = routes.concat(getRoutes(fullPath, path.join(prefix, entry.name)));
+ } else {
+ if (entry.name.startsWith('+page')) {
+ const route = prefix === '' ? '/' : `/${prefix}`;
+ if (!routes.includes(route)) {
+ routes.push(route);
+ }
+ }
+ }
+ }
+ return routes;
+ };
+
+ try {
+ const routes = getRoutes(routesDir);
+ return json(routes);
+ } catch (error) {
+ return json({ error: 'Failed to read routes' }, { status: 500 });
+ }
+};

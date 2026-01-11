@@ -50,10 +50,8 @@ describe('Phase 10.6: Message Batching', () => {
  // This test verifies the concept - actual implementation
  // would need to simulate message batching
  const maxHistory = 100;
- const messages: Array<{
- type: 'health_update';
- route_path: string;
- new_status: 'healthy';
+ const messages: Array<{ type: 'health_update';
+ route_path: string; new_status: 'healthy';
  timestamp: string;
  }> = [];
 
@@ -170,8 +168,7 @@ describe('Phase 10.6: Message Batching', () => {
  const messages: Array<{ type: 'health_update'; route_path: string }> = [
  { type: 'health_update', route_path: 'route-1' },
  { type: 'health_update', route_path: 'route-2' },
- { type: 'health_update', route_path: 'route-3' },
- ];
+ { type: 'health_update', route_path: 'route-3' }];
 
  expect(messages.length).toBe(3);
  });
@@ -192,8 +189,7 @@ describe('Phase 10.6: Message Batching', () => {
  const messages = [
  { id: 1, timestamp: '2025-12-15T00Z' },
  { id: 2, timestamp: '2025-12-15T01Z' },
- { id: 3, timestamp: '2025-12-15T02Z' },
- ];
+ { id: 3, timestamp: '2025-12-15T02Z' }];
 
  const sorted = messages.sort(
  (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
@@ -253,3 +249,7 @@ describe('Phase 10.6: Message Batching', () => {
  });
  });
 });
+
+
+
+

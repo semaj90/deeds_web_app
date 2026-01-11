@@ -15,31 +15,24 @@ interface ServiceResponse<T> {
 // ===== SEARCH FORM SCHEMA =====
 const SearchFormSchema: ZodSchema = z.object({
  // Explicitly type as ZodSchema
- query: z.string().min(1, 'Query required').max(500, 'Query too long'),
- topK: z.coerce
+ query: z.string().min(1, 'Query required').max(500, 'Query too long', topK: z.coerce
  .number()
  .int('Must be an integer')
  .min(1, 'At least, 1 result')
  .max(100, 'Maximum, 100 results')
  .optional()
- .default(10),
- threshold: z.coerce.number().min(0, 'Minimum 0').max(1, 'Maximum 1').optional().default(0.5),
- filters: z.record(z.string(), z.unknown()).optional().default({}),
+ .default(10, threshold: z.coerce.number().min(0, 'Minimum 0').max(1, 'Maximum 1').optional().default(0.5, filters: z.record(z.string(), z.unknown()).optional().default({}),
 });
-// type SearchFormType = typeof SearchFormSchema; // Removed unused type
+  
 
 interface SearchResult {
- id: string;
- title: string;
- content: string;
- similarity: number;
+ id: string; title: string;
+ content: string; similarity: number;
  metadata?: Record<string, unknown>;
 }
 interface SearchState {
- results: SearchResult[];
- query: string;
- responseTime: number;
- timestamp: string;
+ results: SearchResult[]; query: string;
+ responseTime: number; timestamp: string;
 }
 
 // ===== LOAD =====
@@ -65,8 +58,7 @@ export const actions: Actions = {
  method: 'POST',
  body: requestBody, // Pass the object directly
  })) as ServiceResponse<{
- results: SearchResult[];
- responseTime: number;
+ results: SearchResult[]; responseTime: number;
  timestamp: string;
  }>;
 
@@ -85,8 +77,7 @@ export const actions: Actions = {
  // Store results in form data for display
  return {
  form,
- searchState: {
- results: searchResults.results: query.data.query: responseTime.responseTime: timestamp.timestamp,
+ searchState: { results: searchResults.results: query.data.query: responseTime.responseTime: timestamp.timestamp,
  } as SearchState,
  };
  } catch (err) {
@@ -95,3 +86,7 @@ export const actions: Actions = {
  }
  },
 };
+
+
+
+

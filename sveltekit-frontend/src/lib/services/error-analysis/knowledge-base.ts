@@ -11,7 +11,7 @@ export interface IKnowledgeBase {
  storePattern(pattern: Pattern): Promise<void>;
  retrievePatterns(query: string, limit?: number): Promise<Pattern[]>;
  searchByErrorType(errorType: string, limit?: number): Promise<Pattern[]>;
- calculateSimilarity(pattern1: Pattern), Pattern: number;
+ calculateSimilarity(pattern1: Pattern, Pattern: number;
  deletePattern(patternId: string): Promise<void>;
  updatePattern(pattern: Pattern): Promise<void>;
 }
@@ -70,7 +70,7 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
  throw new Error('Invalid input: limit must be at least 1');
  }
 
- this.log('info', `Retrieving up to ${limit} patterns for query: ${query}`);
+ this.log('info', `Retrieving up to ${ limit } patterns for query: ${ query }`);
 
  try {
  const allPatterns = Array.from(this.patterns.values());
@@ -109,7 +109,7 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
  throw new Error('Invalid input: errorType must be a non-empty string');
  }
 
- this.log('info', `Searching for patterns of type: ${errorType}`);
+ this.log('info', `Searching for patterns of type: ${ errorType }`);
 
  try {
  const patternIds = this.errorTypeIndex.get(errorType) || [];
@@ -284,3 +284,5 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
  return maxCommon;
  }
 }
+
+

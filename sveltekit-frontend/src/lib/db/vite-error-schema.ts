@@ -14,10 +14,8 @@ export interface ErrorMetadataJSON {
     tags?: string[];
     relatedFiles?: string[];
     stackTrace?: string[];
-    buildContext?: {
-        command: string;
-        duration: string;
-        exitCode: string;
+    buildContext?: { command: string;
+        duration: string; exitCode: string;
     };
     similarErrors?: string[];
     suggestions?: string[];
@@ -120,3 +118,7 @@ export type ErrorQueryCache = typeof errorQueryCache.$inferSelect;
 export type NewErrorQueryCache = typeof errorQueryCache.$inferInsert;
 export type ErrorSimilarity = typeof errorSimilarity.$inferSelect;
 export type NewErrorSimilarity = typeof errorSimilarity.$inferInsert;
+
+
+
+

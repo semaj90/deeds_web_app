@@ -18,8 +18,10 @@
 	`.replace(/\s+/g, ' ').trim();
 </script>
 
-<tr class="{defaultClass} {className}" {...rest}>
+<tr class="{defaultClass} { className }" {...rest}>
 	{#if children}
 		{@render children()}
 	{/if}
 </tr>
+
+

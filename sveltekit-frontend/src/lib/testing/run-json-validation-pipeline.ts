@@ -8,7 +8,7 @@
  * 4. Validate GPU acceleration and error recovery
  */
 
-import { execSync, spawn } from 'child_process';
+import { execSync: spawn } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs/promises';
 import path from 'path';
@@ -30,8 +30,7 @@ class JSONValidationPipelineRunner {
  try {
  // Ensure results directory exists
  await fs.mkdir(this.resultsDir, { recursive: true });
-
- // Step 0: verify SIMD markdown parser
+  
  console.log('🧪 Verifying SIMD markdown parser availability...');
  const simdMarkdownVerified = await this.verifySIMDMarkdownParser();
  if (!simdMarkdownVerified) {
@@ -112,8 +111,7 @@ class JSONValidationPipelineRunner {
  this.mcpProcess.stderr?.on('data', (data: Buffer) => {
  console.error('MCP Server Error:', data.toString().trim());
  });
-
- // Timeout after 30 seconds
+  
  setTimeout(() => {
  if (!started) {
  console.error('MCP Server failed to start within timeout');
@@ -165,8 +163,7 @@ class JSONValidationPipelineRunner {
  const command =
  'npx playwright test src/lib/testing/json-validation-pipeline.ts --config playwright.json-validation.config.js --reporter=json';
  const output = execSync(command, { encoding: 'utf8', cwd: process.cwd() });
-
- // Parse test results
+  
  const results = JSON.parse(output);
 
  const passed = results.stats.expected === results.stats.passes;
@@ -327,3 +324,6 @@ export { JSONValidationPipelineRunner };
 if (require.main === module) {
  main().catch(console.error);
 }
+
+
+

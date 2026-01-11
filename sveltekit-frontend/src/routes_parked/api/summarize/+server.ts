@@ -5,9 +5,8 @@ async function generateSummary(content: string): Promise<string> {
  const response = await fetch(getOllamaEndpoint(), {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: 'gemma3-legal:latest',
- prompt: `Summarize this legal document:\n\n${content}`,
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
+ prompt: `Summarize this legal document:\n\n${ content }`,
  stream: false,
  }),
  });
@@ -17,7 +16,7 @@ async function generateSummary(content: string): Promise<string> {
  const data = await response.json();
  return data.response;
 }
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  if (!locals.user) return new Response('Unauthorized', { status: 401 });
  try {
  const { content } = await request.json();
@@ -34,3 +33,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  return json({ error: 'Failed to generate summary.' }, { status: 500 });
  }
 };
+
+
+

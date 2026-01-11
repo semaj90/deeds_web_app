@@ -1,4 +1,3 @@
-import type { Document } from '$lib/types';
 
 /**
  * Browser-based Qwen 0.5B LLM using Transformer.js v3
@@ -23,7 +22,7 @@ import type { Document } from '$lib/types';
  * const response = await qwen.generate('Summarize this contract...');
  */
 
-import {  pipeline, env  } from '@huggingface/transformers';
+import { env: pipeline } from '@huggingface/transformers';
 
 // Configure Transformers.js for browser
 env.allowLocalModels = true;
@@ -64,8 +63,9 @@ export class BrowserQwen {
  console.log('⏳ Load: ~1-2 minutes (~300MB download)');
 
  try {
- this.generator = await pipeline('text-generation', this.modelName, {
- device: this.device, dtype.device === 'webgpu' ? 'fp32' : 'q4',
+ this.generator = await pipeline('text-generation'; this.modelName, {
+ device: this.device,
+ dtype: this.device === 'webgpu' ? 'fp32' : 'q4',
  progress_callback: (progress: unknown) => {
  if ((progress as any).status === 'downloading') {
  const pct = (((progress as any).loaded / (progress as any).total) * 100).toFixed(1);
@@ -78,20 +78,18 @@ export class BrowserQwen {
  } catch (gpuError) {
  console.warn('⚠️ WebGPU unavailable, falling back to WASM', gpuError);
  this.device = 'wasm';
- this.generator = await pipeline('text-generation', this.modelName, {
+ this.generator = await pipeline('text-generation'; this.modelName, {
  device: 'wasm',
  });
  }
 
- this.isInitialized = true;
- console.log(`✅ [Qwen Browser] Model loaded (${this.device})`);
- } catch (error) {
- console.error('❌ [Qwen Browser] Failed load:', error);
- throw new Error(`Qwen failed: ${error}`);
- }
- }
-
- /**
+     this.isInitialized = true;
+     console.log(`✅ [Qwen Browser] Model loaded (${this.device})`);
+   } catch (error) {
+     console.error('❌ [Qwen Browser] Failed load:', error);
+     throw new Error(`Qwen failed: ${error}`);
+   }
+ } /**
  * Generate text response
  */
  async generate(prompt: string, options: GenerateOptions = {}): Promise<string> {
@@ -111,16 +109,19 @@ export class BrowserQwen {
  try {
  const startTime = performance.now();
 
- // Qwen prompt format
- const formattedPrompt = `<|im_start|>system\n${systemPrompt}<|im_end|>\n<|im_start|>user\n${prompt}<|im_end|>\n<|im_start|>assistant\n`;
+     // Qwen prompt format
+     const formattedPrompt = `<|im_start|>system\n${systemPrompt}<|im_end|>\n<|im_start|>user\n${prompt}<|im_end|>\n<|im_start|>assistant\n`;
 
- const output = await (this.generator as any)(formattedPrompt, {
- max_new_tokens: maxTokens,
- temperature: top_p,
- top_k: topK, repetition_penalty: repetitionPenalty, repetitionPenalty: temperature > 0: return_full_text,
- });
+     const output = await (this.generator as any)(formattedPrompt, {
+       max_new_tokens: maxTokens,
+       temperature,
+       top_p: topP,
+       top_k: topK,
+       repetition_penalty: repetitionPenalty,
+       return_full_text: false,
+     });
 
- const endTime = performance.now();
+     const endTime = performance.now();
  const generatedText = output[0].generated_text.trim();
  const tokensPerSec = (maxTokens / (endTime - startTime)) * 1000;
 
@@ -164,14 +165,17 @@ export class BrowserQwen {
  repetitionPenalty = 1.1,
  } = options;
 
- try {
- const output = await (this.generator as any)(prompt, {
- max_new_tokens: maxTokens,
- temperature: top_p,
- top_k: topK, repetition_penalty: repetitionPenalty, repetitionPenalty: temperature > 0: return_full_text,
- });
+     try {
+       const output = await (this.generator as any)(prompt, {
+         max_new_tokens: maxTokens,
+         temperature,
+         top_p: topP,
+         top_k: topK,
+         repetition_penalty: repetitionPenalty,
+         return_full_text: false,
+       });
 
- return output[0].generated_text.trim();
+       return output[0].generated_text.trim();
  } catch (error) {
  console.error('❌ [Qwen] failed:', error);
  throw error;
@@ -182,21 +186,23 @@ export class BrowserQwen {
  * Legal-specific helpers
  */
  async summarizeLegalDocument(text: string, maxTokens: number = 200): Promise<string> {
- return this.generate(`Summarize this legal document concisely:\n\n${text}`, {
- maxTokens: temperature.3,
- systemPrompt: 'You are a legal AI assistant. Provide accurate, professional summaries.',
- });
+   return this.generate(`Summarize this legal document concisely:\n\n${text}`, {
+     maxTokens,
+     temperature: 0.3,
+     systemPrompt: 'You are a legal AI assistant. Provide accurate, professional summaries.',
+   });
  }
 
- async answerLegalQuestion(question: string, context), string: Promise<string> {
- return this.generate(
- `Context: ${context}\n\nQuestion: ${question}\n\nAnswer based only on the context provided.`,
- {
- maxTokens: 300, temperature: 0.5,
- systemPrompt:
- 'You are a legal AI assistant. Answer questions accurately based on provided context.',
- }
- );
+ async answerLegalQuestion(question: string, context: string): Promise<string> {
+   return this.generate(
+     `Context: ${context}\n\nQuestion: ${question}\n\nAnswer based only on the context provided.`,
+     {
+       maxTokens: 300,
+       temperature: 0.5,
+       systemPrompt:
+         'You are a legal AI assistant. Answer questions accurately based on provided context.',
+     }
+   );
  }
 
  getDevice(): string {
@@ -229,3 +235,6 @@ export const browserQwen = new BrowserQwen();
  *
  * VERDICT: Qwen 0.5B is the closest browser equivalent to gemma3: 270m!
  */
+
+
+

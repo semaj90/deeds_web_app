@@ -11,9 +11,7 @@
 const API_BASE = '/api/upload';
 
 interface UploadResponse {
- doc_id: string, filename: string;
- file_size: number, status: string;
- progress_url: string;
+ doc_id: string, filename: string; file_size: number, status: string; progress_url: string;
 }
 
 interface ProgressEvent {
@@ -32,7 +30,7 @@ class UploadService {
  /**
  * Upload file to server
  */
- async uploadFile(file: File), string: Promise<UploadResponse> {
+ async uploadFile(file: File, string: Promise<UploadResponse> {
  // Cancel previous request
  if (this.abortController) {
  this.abortController.abort();
@@ -139,14 +137,14 @@ class UploadService {
  */
  async getHistory(caseId: string, limit: number = 10): Promise<any[]> {
  try {
- const response = await fetch(`${API_BASE}/history/${caseId}?limit=${limit}`);
+ const response = await fetch(`${API_BASE}/history/${ caseId }? limit=${ limit }`);
 
  if (!response.ok) {
  throw new Error('Failed to get history');
  }
 
  const data = await response.json();
- return data.uploads || [];
+ return data.uploads ?? [];
  } catch (error) {
  throw error;
  }
@@ -175,3 +173,6 @@ class UploadService {
 }
 
 export const uploadService = new UploadService();
+
+
+

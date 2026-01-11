@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import {
  NamespaceRouter,
  createNamespaceContext,
@@ -42,8 +42,7 @@ describe('NamespaceRouter', () => {
  const paths = [
  '/api/error-brain/analyze',
  '/api/error-brain/patch',
- '/api/error-brain/history',
- ];
+ '/api/error-brain/history'];
  paths.forEach((path) => {
  expect(NamespaceRouter.getFeatureFromPath(path)).toBe('errorBrain');
  });
@@ -53,8 +52,7 @@ describe('NamespaceRouter', () => {
  const paths = [
  '/api/legal-ai/citations',
  '/api/legal-ai/authorities',
- '/api/legal-ai/reports',
- ];
+ '/api/legal-ai/reports'];
  paths.forEach((path) => {
  expect(NamespaceRouter.getFeatureFromPath(path)).toBe('legalAi');
  });
@@ -270,3 +268,5 @@ describe('NamespaceRouter', () => {
  });
  });
 });
+
+

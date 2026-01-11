@@ -8,6 +8,8 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
+	let message = $state<any>(undefined);
+
  // Migrated from createEventDispatcher to callback props;
 
  const dispatch = createEventDispatcher();
@@ -71,7 +73,7 @@ https://svelte.dev/e/js_parse_error -->
  <!-- Action Button -->
  <button
  class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-8 rounded-lg transition-colors animate-pulse"
- onclick={dismiss}
+ onclick={ dismiss }
  >
  REVIEW EVIDENCE
  </button>
@@ -87,8 +89,7 @@ https://svelte.dev/e/js_parse_error -->
 
  @keyframes bounce-in {
  0% {
- transform: scale(0.3);
- opacity: 0;
+ transform: scale(0.3); opacity: 0;
  }
  50% {
  transform: scale(1.05);
@@ -97,8 +98,7 @@ https://svelte.dev/e/js_parse_error -->
  transform: scale(0.9);
  }
  100% {
- transform: scale(1);
- opacity: 1;
+ transform: scale(1); opacity: 1;
  }
  }
 
@@ -117,7 +117,9 @@ https://svelte.dev/e/js_parse_error -->
 
  .animate-typing {
  overflow: hidden;
- white-space: nowrap;
- animation: typing 2s steps(10, end);
+ white-space: nowrap; animation: typing 2s steps(10, end);
  }
 </style>
+
+
+

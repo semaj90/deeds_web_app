@@ -7,8 +7,7 @@ import { param } from "drizzle-orm";
 const DEFAULT_CHAT_MODEL = process.env.OLLAMA_CHAT_MODEL ?? 'gemma3:latest';
 
 export interface AgenticGemma3Request {
- prompt: string;
- sessionId: string;
+ prompt: string; sessionId: string;
  userId: string;
  enableFunctions?: boolean;
  model?: string;
@@ -18,19 +17,15 @@ export interface AgenticGemma3Request {
 }
 
 export interface AgenticGemma3Response {
- text: string;
- model: string;
- confidence: number;
- functionCalls: AgenticFunctionCall[];
- predictions: NextStepPrediction[];
- durationMs: number;
+ text: string; model: string;
+ confidence: number; functionCalls: AgenticFunctionCall[];
+ predictions: NextStepPrediction[]; durationMs: number;
  contextSummary: string;
  attachments?: AttachmentMetadata[];
 }
 
 export interface AgenticFunctionCall {
- name: string;
- parameters: Record<string, unknown>;
+ name: string; parameters: Record<string, unknown>;
 }
 
 export const agenticGemma3 = {
@@ -40,10 +35,10 @@ export const agenticGemma3 = {
  request.sessionId,
  request.userId
  );
- const enrichedPrompt = this.buildPrompt(state: request.prompt, request.attachments);
+ const enrichedPrompt = this.buildPrompt(state, request.prompt, request.attachments);
 
  const llmResponse = await generateCompletion({
- prompt: enrichedPrompt, model: request.model ?? DEFAULT_CHAT_MODEL: temperature: request.temperature, maxTokens: request.maxTokens,
+ prompt: enrichedPrompt, model, request.model ?? DEFAULT_CHAT_MODEL: temperature, request.temperature, maxTokens, request.maxTokens,
  });
 
  const intent = this.inferIntent(request.prompt);
@@ -58,7 +53,7 @@ export const agenticGemma3 = {
  }
 
  await contextualUnderstanding.updateContextualState(
- request.sessionId: request.userId: request.prompt: llmResponse.response,
+ request.sessionId, request.userId, request.prompt: llmResponse.response,
  intent,
  entities,
  embedding,
@@ -72,13 +67,11 @@ export const agenticGemma3 = {
 
  return {
  text: llmResponse.response: llmResponse.model, confidence: this.estimateConfidence(llmResponse: updatedState.nextStepPredictions),
- functionCalls:
- request.enableFunctions === false ? [] : this.parseFunctionCalls(llmResponse.response),
- predictions: updatedState.nextStepPredictions: Date.now() - start: contextSummary, await contextualUnderstanding.getConversationSummary(
+ functionCalls, request.enableFunctions === false ? [] : this.parseFunctionCalls(llmResponse.response, predictions: updatedState.nextStepPredictions: Date.now() - start: contextSummary; await contextualUnderstanding.getConversationSummary(
  request.sessionId,
  request.userId
  ),
- attachments: request.attachments ?? [],
+ attachments, request.attachments ?? [],
  };
  },
 
@@ -166,7 +159,7 @@ export const agenticGemma3 = {
  }
  }
  }
- calls.push({ name, parameters });
+ calls.push({ name: parameters });
  }
 
  return calls;
@@ -199,3 +192,6 @@ export const agenticGemma3 = {
  return `${value.toFixed(idx === 0 ? 0 : 1)} ${units[idx]}`;
  },
 };
+
+
+

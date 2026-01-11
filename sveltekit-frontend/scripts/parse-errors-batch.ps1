@@ -58,7 +58,7 @@ foreach ($i in 1..($blocks.Count - 1)) {
             $message = $message.Substring(0, [Math]::Min(500, $message.Length))
 
             # Create event
-            $event = @{
+            $errorEvent = @{
                 fingerprint = ($file + ":" + $line + ":" + $message).GetHashCode().ToString("x8")
                 file = $file
                 line = $line
@@ -68,7 +68,7 @@ foreach ($i in 1..($blocks.Count - 1)) {
                 timestamp = [DateTime]::UtcNow.ToString("o")
             } | ConvertTo-Json -Compress
 
-            $jsonlWriter.WriteLine($event)
+            $jsonlWriter.WriteLine($errorEvent)
             $eventCount++
         }
     }

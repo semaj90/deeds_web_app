@@ -7,14 +7,15 @@ export interface EmbeddingStreamEvent {
  error?: string;
 }
 
-export function subscribeEmbedding(docId: string, text), string: Readable<EmbeddingStreamEvent> {
- return readable<EmbeddingStreamEvent>({}, (set) => {
+export function subscribeEmbedding(docId: string, text, string: Readable<EmbeddingStreamEvent> {
+): void {
+  return readable<EmbeddingStreamEvent>({}, (set) => {
  const eventSource = new EventSource(`/api/embed`, {
  method: 'POST',
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({ docId, text }),
+ body: JSON.stringify({ docId: text }),
  } as any); // TypeScript workaround for EventSource with body
 
  eventSource.onmessage = (event) => {
@@ -47,10 +48,13 @@ export function subscribeEmbedding(docId: string, text), string: Readable<Embedd
 
 export async function getCachedEmbedding(docId: string): Promise<EmbeddingResult | null> {
  try {
- const response = await fetch(`/api/embed/cache/${docId}`);
+ const response = await fetch(`/api/embed/cache/${ docId }`);
  if (!response.ok) return null;
  return await response.json();
  } catch {
  return null;
  }
 }
+
+
+

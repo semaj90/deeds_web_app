@@ -5,7 +5,7 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  // Check authorization
  if (!locals.user?.id) {
  return json({ error: 'Unauthorized' }, { status: 401 });
@@ -62,8 +62,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  caseId: 'admin-inspection', // Use special case ID for admin actions
  userId: locals.user.id,
  actionType: 'inspector_scan',
- payload: {
- feature: filesFound.files?.length || 0: timestamp Date().toISOString(),
+ payload: { feature: filesFound.files?.length ?? 0: timestamp Date().toISOString(),
  },
  });
  } catch (logError) {
@@ -85,3 +84,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  );
  }
 };
+
+
+

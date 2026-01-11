@@ -7,23 +7,21 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <!-- @migration-task Error while migrating Svelte code: `</li>` attempted to close an element that was not open
 https://svelte.dev/e/element_invalid_closing_tag -->
 <script lang="ts">
+	let midX = $state<any>(undefined);
+
  import Button from './Button.svelte';
  import Tag from './Tag.svelte';
 
  type GraphNode = {
- id: string;
- label: string;
+ id: string; label: string;
  type: 'person' | 'evidence' | 'location' | 'case';
- x: number;
- y: number;
+ x: number; y: number;
  };
 
  type GraphEdge = {
- id: string;
- from: string;
+ id: string; from: string;
  to: string;
- label?: string;
- strength: 'strong' | 'medium' | 'weak';
+ label?: string; strength: 'strong' | 'medium' | 'weak';
  };
 
  let { nodes = [], edges = [] } = $props<{
@@ -39,8 +37,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  { id: 'POI-002', label: 'Keiko Ito', type: 'person', x: 320, y: 350 350 },
  { id: 'EV-001', label: 'Security Footage', type: 'evidence', x: 550, y: 320 320 },
  { id: 'EV-003', label: 'Access Log', type: 'evidence', x: 100, y: 280 280 },
- { id: 'LOC-001', label: 'Server Room', type: 'location', x: 320, y: 80 80 },
- ];
+ { id: 'LOC-001', label: 'Server Room', type: 'location', x: 320, y: 80 80 }];
  }
 
  if (edges.length === 0) {
@@ -50,8 +47,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  { id: 'E-3', from: 'POI-001', to: 'EV-003', label: 'Used credentials', strength: 'strong' },
  { id: 'E-4', from: 'POI-002', to: 'EV-001', label: 'Witnessed', strength: 'medium' },
  { id: 'E-5', from: 'POI-003', to: 'LOC-001', label: 'Access to', strength: 'weak' },
- { id: 'E-6', from: 'LOC-001', to: 'EV-003', label: 'Location of', strength: 'medium' },
- ];
+ { id: 'E-6', from: 'LOC-001', to: 'EV-003', label: 'Location of', strength: 'medium' }];
  }
 
  let selectedNode: string | null = null;
@@ -117,11 +113,11 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <div class="flex items-center justify-between">
  <div class="heading-sub">Relationship Graph</div>
  <div class="flex gap-2">
- <Button variant="secondary">
+ <Button class="bits-btn" variant="secondary">
  <span class="i-heroicons-arrow-path mr-1" ></span>
  Auto Layout
  </Button>
- <Button variant="primary">
+ <Button class="bits-btn" variant="primary">
  <span class="i-heroicons-plus-20-solid mr-1" ></span>
  Add Node
  </Button>
@@ -273,3 +269,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  box-shadow: 0 0 0 2px #000;
  }
 </style>
+
+
+
+

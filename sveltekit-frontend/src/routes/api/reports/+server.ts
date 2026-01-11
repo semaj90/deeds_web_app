@@ -1,7 +1,7 @@
-import db from '$lib/server/db/client';
+import { db } from '$lib/server/db/client';
 import { reports } from '$lib/server/db/schema';
 import { error, json } from '@sveltejs/kit';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
 /**
@@ -21,14 +21,17 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	try {
 		let query = db.select().from(reports);
 
-	if (caseId) {
-		// Fetch reports for specific case
-		const userReports = await query
-			.where(eq(reports.caseId, caseId))
-			.orderBy(desc(reports.createdAt))
-			.limit(limit)
-			.offset(offset);			return json({
-				success: true, data: userReports.length
+		if (caseId) {
+			// Fetch reports for specific case
+			const userReports = await query
+				.where(eq(reports.caseId, caseId))
+				.orderBy(desc(reports.createdAt))
+				.limit(limit)
+				.offset(offset);
+
+			return json({
+				success: true,
+				data: userReports
 			});
 		} else {
 			// Fetch all reports created by user
@@ -39,7 +42,8 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 				.offset(offset);
 
 			return json({
-				success: true, data: userReports.length
+				success: true,
+				data: userReports
 			});
 		}
 	} catch (err) {
@@ -67,18 +71,21 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		const newReport = await db
 			.insert(reports)
 			.values({
-				caseId: body.caseId, content: body.content, title: body.title || 'Untitled Report',
-				metadata: {
-					reportType: body.reportType || 'general'
+				caseId: body.caseId,
+				content: body.content,
+				title: body.title || 'Untitled Report',
+				metadata: { reportType: body.reportType || 'general'
 				},
-				createdBy: locals.user.id, createdAt: new Date(),
+				createdBy: locals.user.id,
+				createdAt: new Date(),
 				updatedAt: new Date()
 			})
 			.returning();
 
 		return json(
 			{
-				success: true, data: newReport[0],
+				success: true,
+				data: newReport[0],
 				message: 'Report created successfully'
 			},
 			{ status: 201 }
@@ -121,14 +128,14 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 			.where(
 				and(
 					eq(reports.createdBy, locals.user.id),
-					// @ts-expect-error - Drizzle inArray typing issue
-					reports.id.in(body.ids)
+					inArray(reports.id, body.ids)
 				)
 			)
 			.returning();
 
 		return json({
-			success: true, data: updated.length,
+			success: true,
+			data: updated.length,
 			message: `Updated ${updated.length} reports`
 		});
 	} catch (err) {
@@ -161,14 +168,14 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 			.where(
 				and(
 					eq(reports.createdBy, locals.user.id),
-					// @ts-expect-error - Drizzle inArray typing issue
-					reports.id.in(body.ids)
+					inArray(reports.id, body.ids)
 				)
 			)
 			.returning();
 
 		return json({
-			success: true, count: deleted.length,
+			success: true,
+			count: deleted.length,
 			message: `Deleted ${deleted.length} reports`
 		});
 	} catch (err) {
@@ -179,3 +186,6 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 		throw error(500, 'Failed to delete reports');
 	}
 };
+
+
+

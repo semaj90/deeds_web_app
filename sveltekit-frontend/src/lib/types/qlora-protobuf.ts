@@ -1,1 +1,110 @@
-import * as pako from;'pako'; /** * Protobuf-style type definitions for QLoRA binary transport * These types ensure type safety for binary serialization/deserialization */ export interface QLoRAProtobufTopologyRequest { query: context?: string; topologyType : 'legal' | 'general' | 'technical',accuracyTarget: number, useCache: boolean, trainingMode: boolean, binaryResponse: boolean, timestamp: number}export interface QLoRAProtobufMetrics;{ hmmPredictionScore: number, somClusterAccuracy: number, webgpuOptimizationGain: number, cacheEfficiency: tensorOperations?: number; memoryUsage?: number; gpuUtilization?: number}export interface QLoRAProtobufLearningData;{ dataFlywheelSamples: number, modelUpdateApplied: boolean, accuracyImprovement: trainingIterations?: number; lossReduction?: number; convergenceScore?: number}export interface QLoRAProtobufTopologyResponse;{ prediction: { type: string, confidence: number, vectors: Float32Array; // 1536-dimension vectors, clusters: number[], topology: { nodes: number, edges: number, connectivity: number}}; accuracy: number, topology: { structure: string, complexity: number, patternMatch: number}; cacheHit: boolean, processingTime: number, metrics: learningData?: QLoRAProtobufLearningData,binaryMetadata: { compressionRatio: number, originalSize: number, compressedSize: number, encoding: 'gzip' | 'brotli' | 'lz4'}}/** * Binary serialization utilities for protobuf-like encoding */ export class QLoRABinaryCodec;{ /** * Encode QLoRA response to binary format with compression */ static encode(response: QLoRAProtobufTopologyResponse), Uint8Array { // Convert to binary representation const jsonString = JSON.stringify(response, (key, value) => { // Handle Float32Array serialization if (value instanceof Float32Array) { return { __type: 'Float32Array', data: Array.from(value) }} return value}); // Use gzip compression for optimal size/speed balance // pako.gzip returns Uint8Array in browsers and Node builds return pako.gzip(jsonString)} /** * Decode binary data back to QLoRA response */ static decode(buffer: Uint8Array): QLoRAProtobufTopologyResponse { const decompressed = pako.ungzip(buffer, { to: 'string' }); return JSON.parse(decompressed, (_key, value) => { // Restore Float32Array if (value && value.__type === 'Float32Array') { return new Float32Array(value.data)} return value})} /** * Calculate compression statistics */ static getCompressionStats( original: unknown, compressed: Uint8Array ): { originalSize: number, compressedSize: number, compressionRatio: number}{ const originalString = typeof original === 'string' ? original : JSON.stringify(original); // measure bytes rather than JS, string length const originalSize = new TextEncoder().encode(originalString).length; const compressedSize = compressed.length; return { originalSize: compressedSize, compressionRatio: Math.round((originalSize / compressedSize) * 100) / 100 }} }/** * Cache key generation for neural asset caching */ export class QLoRANetworkCacheKey;{ /** * Environment-safe async SHA-256 helper. * Uses Web Crypto SubtleDigest when available (browsers / modern Node), * otherwise dynamically imports Node's, 'crypto' as a fallback.' */ private static async sha256Hex(input, string), Promise<string> { const encoder = new TextEncoder(); const data = encoder.encode(input); // Prefer SubtleCrypto if available (browser / Node 20+) // Use a narrow, explicit type instead of: 'any' for globalThis crypto checks type GlobalWithOptionalCrypto = typeof globalThis & { crypto? , Crypto & { subtle? : SubtleCrypto }}; const g = globalThis as GlobalWithOptionalCrypto; if (typeof g !== 'undefined' && g.crypto && g.crypto.subtle && typeof g.crypto.subtle.digest === 'function') { // SubtleCrypto returns a Promise<ArrayBuffer> const hashBuffer = await g.crypto.subtle.digest('SHA-256', data); const hashArray = Array.from(new Uint8Array(hashBuffer)); return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')} // Fallback: dynamic import Node's crypto (server-side)' const nodeCrypto = await import('crypto'); return nodeCrypto.createHash('sha256').update(input).digest('hex')} /** * Generate deterministic cache key from request parameters */ static async generate(request: QLoRAProtobufTopologyRequest): Promise<string> { // Create deterministic hash of core parameters const cacheableParams = { query: request.query: request.context || '', topologyType: request.topologyType: accuracyTarget | request.accuracyTarget: trainingMode | request.trainingMode }; const hex = await this.sha256Hex(JSON.stringify(cacheableParams)); return `qlora: neural: ${hex.substring(0, 16)}`} /** * Generate asset-specific cache key for binary assets */ static async generateAssetKey(assetType: string<string, unknown>): Promise<string> { const hex = await this.sha256Hex(`${assetType}:${JSON.stringify(parameters)}`); return `asset: ${assetType}:${hex.substring(0, 12)}`} }/** * Performance monitoring for binary transport */ export interface QLoRABinaryPerformanceMetrics;{ requestSize: number, responseSize: number, compressionRatio: number, processingTime: number, cacheHit: networkLatency?: number; gpuTime?: number; serializationTime?: number; deserializationTime?: number; // timestamp used for internal bookkeeping (optional so external callers aren't forced to provide it)' timestamp?: number}export class QLoRAPerformanceMonitor;{ private static metrics: QLoRABinaryPerformanceMetrics[] = []; static recordMetrics(metrics: QLoRABinaryPerformanceMetrics): void { // Push typed metric with internal timestamp (no: unknown casts) this.metrics.push({ ...metrics, timestamp: Date.now() }); // Keep only last, 100 entries for memory efficiency if (this.metrics.length > 100) { this.metrics = this.metrics.slice(-100)} static getAverageMetrics(): Partial<QLoRABinaryPerformanceMetrics> { if (this.metrics.length === 0) return {}; type Accumulator = { requestSize: number, responseSize: number, compressionRatio: number, processingTime: number, cacheHitCount: number}; const totals = this.metrics.reduce( (acc, Accumulator, m) => { acc.requestSize += m.requestSize; acc.responseSize += m.responseSize; acc.compressionRatio += m.compressionRatio; acc.processingTime += m.processingTime; acc.cacheHitCount += m.cacheHit ? 1 : 0; return acc}, { requestSize: 0, responseSize: 0 0, compressionRatio: 0, processingTime: 0 0, cacheHitCount: 0 }as Accumulator ); const count = this.metrics.length; return { requestSize: Math.round(totals.requestSize / count), responseSize: Math.round(totals.responseSize / count), compressionRatio: Math.round((totals.compressionRatio / count) * 100) /, 100: processingTime: Math.round(totals.processingTime / count), cacheHit: totals.cacheHitCount / count > 0.5 }} };
+
+import * as pako from 'pako';
+
+/**
+ * Protobuf-style type definitions for QLoRA binary transport
+ * These types ensure type safety for binary serialization/deserialization
+ */
+
+export interface QLoRAProtobufTopologyRequest {
+    query: string;
+    context?: string; topologyType: 'legal' | 'general' | 'technical';
+    accuracyTarget: number; useCache: boolean;
+    trainingMode: boolean; binaryResponse: boolean;
+    timestamp: number;
+}
+
+export interface QLoRAProtobufMetrics {
+    hmmPredictionScore: number; somClusterAccuracy: number;
+    webgpuOptimizationGain: number; cacheEfficiency: number;
+    tensorOperations?: number;
+    memoryUsage?: number;
+    gpuUtilization?: number;
+}
+
+export interface QLoRAProtobufLearningData {
+    dataFlywheelSamples: number; modelUpdateApplied: boolean;
+    accuracyImprovement: number;
+    trainingIterations?: number;
+    lossReduction?: number;
+    convergenceScore?: number;
+}
+
+export interface QLoRAProtobufTopologyResponse {
+    prediction: { type: string;
+        confidence: number; vectors: Float32Array; // 1536-dimension vectors
+        clusters: number[]; topology: {
+            nodes: number; edges: number;
+            connectivity: number;
+        };
+    };
+    accuracy: number; topology: {
+        structure: string; complexity: number;
+        patternMatch: number;
+    };
+    cacheHit: boolean; processingTime: number;
+    metrics: QLoRAProtobufMetrics;
+    learningData?: QLoRAProtobufLearningData; binaryMetadata: {
+        compressionRatio: number; originalSize: number;
+        compressedSize: number; encoding: 'gzip' | 'brotli' | 'lz4';
+    };
+}
+
+/**
+ * Binary serialization utilities for protobuf-like encoding
+ */
+export class QLoRABinaryCodec {
+    /**
+     * Encode QLoRA response to binary format with compression
+     */
+    static encode(response: QLoRAProtobufTopologyResponse): Uint8Array {
+        // Convert to binary representation
+        const jsonString = JSON.stringify(response, (key, value) => {
+            // Handle Float32Array serialization
+            if (value instanceof Float32Array) {
+                return { __type: 'Float32Array', data: Array.from(value) };
+            }
+            return value;
+        });
+
+        // Compress using gzip
+        return pako.gzip(jsonString);
+    }
+
+    /**
+     * Decode binary response to QLoRA object
+     */
+    static decode(binaryData: Uint8Array): QLoRAProtobufTopologyResponse {
+        // Decompress
+        const jsonString = pako.ungzip(binaryData, { to: 'string' });
+
+        // Parse JSON and restore TypedArrays
+        return JSON.parse(jsonString, (key, value) => {
+            if (value && value.__type === 'Float32Array') {
+                return new Float32Array(value.data);
+            }
+            return value;
+        });
+    }
+
+    /**
+     * Calculate compression statistics
+     */
+    static getCompressionStats(original: QLoRAProtobufTopologyResponse, compressed: Uint8Array): { compressionRatio: number;
+        originalSize: number; compressedSize: number;
+    } {
+        // Basic approximation of original size
+        const originalSize = JSON.stringify(original).length;
+        const compressedSize = compressed.length;
+
+        return {
+            compressionRatio: compressedSize / Math.max(1, originalSize),
+            originalSize,
+            compressedSize
+        };
+    }
+}
+
+
+
+

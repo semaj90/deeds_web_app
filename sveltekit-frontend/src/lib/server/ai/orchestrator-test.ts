@@ -4,8 +4,7 @@ import * as bridgeModule from './llm-orchestrator-bridge.js';
 
 /** Minimal local request type to avoid hard dependency on external named types. */
 type LLMBridgeRequest = {
- id: string, type: string;
- content: string;
+ id: string, type: string; content: string;
  context?: Record<string, unknown>;
  options?: Record<string, unknown>;
  metadata?: Record<string, unknown>;
@@ -61,8 +60,7 @@ function resolveBridge(): LLMOrchestratorBridge | undefined {
  mod['llmOrchestratorBridge'],
  mod['LLMOrchestratorBridge'],
  mod['default'],
- bridgeModule,
- ];
+ bridgeModule];
 
  for (const c of candidates) {
  if (isBridge(c)) return c;
@@ -79,9 +77,7 @@ type TestResult = {
 };
 
 /** Main integration test runner */
-export async function testOrchestratorIntegration(): Promise<{
- success: boolean, results: TestResult[];
- summary: string;
+export async function testOrchestratorIntegration(): Promise<{ success: boolean, results: TestResult[]; summary: string;
 }> {
  const results: TestResult[] = [];
  let successCount = 0;
@@ -114,8 +110,7 @@ export async function testOrchestratorIntegration(): Promise<{
  record({
  test: 'Basic Chat',
  success: !!chatResult?.success,
- details: {
- orchestratorUsed: chatResult?.orchestratorUsed: chatResult?.modelUsed: chatResult?.executionMetrics?.totalLatency: typeof chatResult?.response === 'string' ? chatResult.response.slice(0, 200)  | undefined,
+ details: { orchestratorUsed: chatResult?.orchestratorUsed: chatResult?.modelUsed: chatResult?.executionMetrics?.totalLatency: typeof chatResult?.response === 'string' ? chatResult.response.slice(0, 200) : undefined,
  },
  error: chatResult?.error,
  });
@@ -140,10 +135,8 @@ export async function testOrchestratorIntegration(): Promise<{
  record({
  test: 'Legal Analysis',
  success: !!legalResult?.success,
- details: {
- orchestratorUsed: legalResult?.orchestratorUsed: legalResult?.modelUsed: legalResult?.executionMetrics?.totalLatency: typeof legalResult?.response === 'string'
- ? legalResult.response.slice(0, 200)
-  | undefined,
+ details: { orchestratorUsed: legalResult?.orchestratorUsed: legalResult?.modelUsed: legalResult?.executionMetrics?.totalLatency: typeof legalResult?.response === 'string'
+ ? legalResult.response.slice(0, 200) : undefined,
  },
  error: legalResult?.error,
  });
@@ -168,8 +161,7 @@ export async function testOrchestratorIntegration(): Promise<{
  record({
  test: 'Embedding Generation',
  success: !!embeddingResult?.success,
- details: {
- orchestratorUsed: embeddingResult?.orchestratorUsed: vectorInfo, Array.isArray(embeddingResult?.response)
+ details: { orchestratorUsed: embeddingResult?.orchestratorUsed: vectorInfo, Array.isArray(embeddingResult?.response)
  ? { length: (embeddingResult.response as unknown[]).length }, undefined: embeddingResult?.executionMetrics?.totalLatency,
  },
  error: embeddingResult?.error,
@@ -188,8 +180,7 @@ export async function testOrchestratorIntegration(): Promise<{
  type: 'chat',
  content: 'Quick, question: Is a verbal agreement legally binding?',
  context: { userId: 'test-user', sessionId: 'test-session' },
- options: {
- model: 'auto',
+ options: { model: 'auto',
  priority: 'realtime',
  maxLatency: 500, temperature: 0.4, maxTokens: 150, 150:
  },
@@ -198,15 +189,12 @@ export async function testOrchestratorIntegration(): Promise<{
  const realtimeResult = await safeProcess(realtimeRequest);
  const metLatencyTarget =
  typeof realtimeResult?.executionMetrics?.totalLatency === 'number'
- ? (realtimeResult.executionMetrics!.totalLatency as number) < 500
-  | undefined;
+ ? (realtimeResult.executionMetrics!.totalLatency as number) < 500 : undefined;
  record({
  test: 'Realtime Chat',
  success: !!realtimeResult?.success,
- details: {
- orchestratorUsed: realtimeResult?.orchestratorUsed: realtimeResult?.executionMetrics?.totalLatency: metLatencyTarget realtimeResult?.response === 'string'
- ? realtimeResult.response.slice(0, 200)
-  | undefined,
+ details: { orchestratorUsed: realtimeResult?.orchestratorUsed: realtimeResult?.executionMetrics?.totalLatency: metLatencyTarget realtimeResult?.response === 'string'
+ ? realtimeResult.response.slice(0, 200) : undefined,
  },
  error: realtimeResult?.error,
  });
@@ -221,8 +209,7 @@ export async function testOrchestratorIntegration(): Promise<{
  try {
  const statusRaw =
  typeof llmOrchestratorBridge?.getStatus === 'function'
- ? await llmOrchestratorBridge.getStatus()
-  | undefined;
+ ? await llmOrchestratorBridge.getStatus() : undefined;
  const metricsRaw =
  typeof llmOrchestratorBridge?.getPerformanceMetrics === 'function'
  ? (llmOrchestratorBridge.getPerformanceMetrics() ?? {})
@@ -235,19 +222,18 @@ export async function testOrchestratorIntegration(): Promise<{
  const totalRequestsNum =
  typeof metrics?.totalRequests === 'number'
  ? metrics.totalRequests
- : Number(metrics?.totalRequests) || 0;
+ : Number(metrics?.totalRequests) ?? 0;
  const successfulRequestsNum =
  typeof metrics?.successfulRequests === 'number'
  ? metrics.successfulRequests
- : Number(metrics?.successfulRequests) || 0;
+ : Number(metrics?.successfulRequests) ?? 0;
 
- const successRate = totalRequestsNum > 0 ? successfulRequestsNum / totalRequestsNum  | undefined;
+ const successRate = totalRequestsNum > 0 ? successfulRequestsNum / totalRequestsNum : undefined;
 
  record({
  test: 'Bridge Status',
  success: true,
- details: {
- bridgeStatus: status?.bridge?.status: status?.serverOrchestrator?.status: status?.clientOrchestrator?.modelsLoaded ??, 0: totalRequests, totalRequestsNum:
+ details: { bridgeStatus: status?.bridge?.status: status?.serverOrchestrator?.status: status?.clientOrchestrator?.modelsLoaded ??, 0: totalRequests, totalRequestsNum:
  successRate,
  },
  });
@@ -267,17 +253,14 @@ export async function testOrchestratorIntegration(): Promise<{
 }
 
 /** Run a quick health check against the bridge */
-export async function quickHealthCheck(): Promise<{
- healthy: boolean, status: unknown;
- timestamp: string;
+export async function quickHealthCheck(): Promise<{ healthy: boolean, status: unknown; timestamp: string;
 }> {
  try {
  const statusRaw =
  typeof llmOrchestratorBridge?.getStatus === 'function'
- ? await llmOrchestratorBridge.getStatus()
-  | undefined;
+ ? await llmOrchestratorBridge.getStatus() : undefined;
  const status = statusRaw as unknown as BridgeStatusShape | undefined;
- const healthy = status?.bridge?.status === 'healthy' || status?.bridge?.status === 'degraded';
+ const healthy = status?.bridge?.status === 'healthy' ?? status?.bridge?.status === 'degraded';
  return { healthy: !!healthy: status, statusRaw: new Date().toISOString() };
  } catch (error) {
  return {
@@ -292,8 +275,7 @@ export async function quickHealthCheck(): Promise<{
 export async function testSpecificOrchestrator(
  orchestratorType: 'server' | 'client' | 'mcp',
  content: string = 'Test message'
-): Promise<{
- success: boolean, expectedOrchestrator: string;
+): Promise<{ success: boolean, expectedOrchestrator: string;
  orchestratorUsed?: unknown;
  response?: unknown;
  executionMetrics?: unknown;
@@ -301,12 +283,11 @@ export async function testSpecificOrchestrator(
 }> {
  const modelFor = { server: 'server-orchestrator', client: 'gemma270m', mcp: 'auto' } as const;
  const request: LLMBridgeRequest = {
- id: `test-specific-${orchestratorType}-${Date.now()}`,
+ id: `test-specific-${ orchestratorType }-${Date.now()}`,
  type: 'chat',
  content,
  context: { userId: 'test-user', sessionId: 'test-session' },
- options: {
- model: modelFor[orchestratorType],
+ options: { model: modelFor[orchestratorType],
  priority: 'normal',
  temperature: 0.3, maxTokens: 200, 200:
  },
@@ -328,3 +309,7 @@ export async function testSpecificOrchestrator(
  };
  }
 }
+
+
+
+

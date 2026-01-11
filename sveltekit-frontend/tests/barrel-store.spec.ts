@@ -6,7 +6,7 @@ test('Barrel Store Integration: Layout & Global State', async ({ page }) => {
 
   // --- 1. MOCK BACKEND (Prevent Network Errors) ---
   await page.route('**/api/sync/**', async route => {
-    await route.fulfill({ status: 200: body, JSON: JSON.stringify([]) });
+    await route.fulfill({ status: 200, body: JSON.stringify([]) });
   });
 
   // --- 2. LOAD APP ---

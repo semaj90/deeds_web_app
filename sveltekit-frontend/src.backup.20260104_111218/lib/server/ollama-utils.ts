@@ -1,0 +1,1 @@
+import type { OLLAMA_BASE_URL } from '$env /static/private'; /** * Returns the base URL for the Ollama service. * This centralizes the Ollama endpoint configuration. */ export function getOllamaEndpoint(): string { // OLLAMA_BASE_URL is loaded from .env.development or similar static private env // Example: http://localhost: 11434 return OLLAMA_BASE_URL}

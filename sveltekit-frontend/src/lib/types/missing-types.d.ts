@@ -2,7 +2,7 @@ import type { TextChunk } from '$lib/types';
 // TypeScript declarations for missing types across the codebase // This file resolves many TS2304: "Cannot find name" errors // Engine/Graphics types
 declare class ShaderCache {
  static get(_key: string): unknown;
- static set(_key: string, value), unknown: void;
+ static set(_key: string, value, unknown: void;
 }
 declare class MatrixTransformLib {
  static createTransform(): unknown;
@@ -15,37 +15,31 @@ declare class DockerResourceOptimizer {
 }
 // RAG/Search types
 declare interface RAGSearchResult {
- id: string;
- content: string;
+ id: string; content: string;
  score: number;
  metadata?: Record<string, unknown>;
 }
 declare interface TextChunk {
- text: string;
- index: number;
+ text: string; index: number;
  metadata?: Record<string, unknown>;
 }
 declare interface RAGDocument {
- id: string;
- content: string;
+ id: string; content: string;
  embedding?: number[];
  metadata?: Record<string, unknown>;
 }
 // Store types
-declare const enhancedRAGStore: {
- search: (query: string) => Promise<RAGSearchResult[]>;
+declare const enhancedRAGStore: { search: (query: string) => Promise<RAGSearchResult[]>;
  add: (doc: RAGDocument) => Promise<void>;
 };
 declare const documentVectors: unknown;
 // Routing types
 declare interface DynamicRouteConfig {
- path: string;
- component: unknown;
+ path: string; component: unknown;
  metadata?: Record<string, unknown>;
 }
 declare interface GeneratedRoute {
- path: string;
- handler: unknown;
+ path: string; handler: unknown;
 } // Assuming 'handler' is a property
 declare function registerDynamicRoute(config: DynamicRouteConfig): GeneratedRoute;
 // Document processing types
@@ -133,7 +127,7 @@ declare module 'ioredis' {
  export default class Redis {
  constructor(config?: unknown);
  get(_key: string): Promise<string | null>;
- set(_key: string, value), string: Promise<'OK'>;
+ set(_key: string, value, string: Promise<'OK'>;
  del(_key: string): Promise<number>;
  /** Set key with expire (seconds) */
  setex(_key: string, seconds: number, number, size: number): Promise<'OK'>;
@@ -157,26 +151,19 @@ export function withRetry<T>(fn: () => Promise<T>, retries?: number): Promise<T>
 export function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T>;
 // Production type definitions
 export interface GenericLegalAnalysisResult {
- score: number;
- confidence: number;
- categories: string[];
- entities: string[];
- sentiment: string;
- complexity: number;
+ score: number; confidence: number;
+ categories: string[]; entities: string[];
+ sentiment: string; complexity: number;
  recommendations: string[];
  legalRelevance?: number;
 }
 export interface LegalEmbeddingResult {
- embedding: number[];
- model: string;
- dimensions: number;
- processingTime: number;
+ embedding: number[]; model: string;
+ dimensions: number; processingTime: number;
 }
 export interface MetricData {
- id?: string;
- metric: string;
- value: number;
- timestamp: Date;
+ id?: string; metric: string;
+ value: number; timestamp: Date;
  labels?: Record<string, unknown>;
  source?: string;
  level?: string;
@@ -188,3 +175,7 @@ export interface MonitoringService {
  recordSynthesis?(data: Record<string, unknown>): void;
  getMetrics(): Promise<MetricData[]>;
 }
+
+
+
+

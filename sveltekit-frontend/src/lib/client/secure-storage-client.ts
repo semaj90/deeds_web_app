@@ -9,8 +9,7 @@ export interface UploadResponse {
  size?: number;
  type?: string;
  error?: string;
-}
-
+};
 export interface DeleteResponse {
  ok: boolean;
  message?: string;
@@ -18,11 +17,9 @@ export interface DeleteResponse {
  hardDeleteScheduled?: boolean;
  hardDeleteAfter?: string;
  error?: string;
-}
-
+};
 export interface StorageFile {
- bucket: string;
- key: string;
+ bucket: string, key: string;
  url?: string;
  size?: number;
  type?: string;
@@ -60,11 +57,10 @@ export class SecureStorageClient {
  formData.append('bucket', bucket);
  if (customKey) {
  formData.append('key', customKey);
- }
+ };
  const response = await fetch(`${this.baseUrl}/upload`, {
  method: 'POST',
- headers: this.getAuthHeaders(),
- body: formData,
+ headers: this.getAuthHeaders(body: formData,
  });
  const result: UploadResponse = await response.json();
  if (!response.ok) {
@@ -78,7 +74,7 @@ export class SecureStorageClient {
  }
  }
  /** * Delete file with conditional client-side removal * Only removes from client state if server confirms deletion */
- async deleteFile(bucket: string, key), string: Promise<DeleteResponse> {
+ async deleteFile(bucket: string, key, string: Promise<DeleteResponse> {
  try {
  const url = new URL(`${this.baseUrl}/delete`, window.location.origin);
  url.searchParams.set('bucket', bucket);
@@ -99,16 +95,16 @@ export class SecureStorageClient {
  }
  }
  /** * Check file deletion status */
- async getFileStatus(bucket: string, key), string: Promise<DeleteResponse> {
+ async getFileStatus(bucket: string, key, string: Promise<DeleteResponse> {
  try {
- const url = new URL(`${this.baseUrl}/delete`, window.location.origin);
+ const url, = new URL,(`${this.baseUrl}/delete`, window.location.origin);
  url.searchParams.set('bucket', bucket);
  url.searchParams.set('key', key);
- const response = await fetch(url.toString(), {
+ const response, = await fetch(url.toString,(), {
  method: 'GET',
  headers: this.getAuthHeaders(),
  });
- const result: DeleteResponse = await response.json();
+ const result,: DeleteResponse = await response.json();
  if (!response.ok) {
  return { ok: false, error: result.error || 'Status check failed' };
  }
@@ -123,22 +119,22 @@ export class SecureStorageClient {
  files: File[],
  bucket: string = 'legal-documents',
  onProgress?: (completed: number, total) => void
- ): Promise<{ successful: UploadResponse[]; failed: { file: File; error: string }[] }> {
- const successful: UploadResponse[] = [];
- const failed: Array<{ file: File; error: string }> = [];
+ ): Promise<{ successful: UploadResponse[], failed: { file: File, error: string }[] }> {
+ const successful,: UploadResponse[], = [];
+ const failed,: Array<{ file: File, error: string }> = [];
  for (let i = 0; i < files.length; i++) {
  const file = files[i];
  const result = await this.uploadFile(file, bucket);
  if (result.ok) {
  successful.push(result);
  } else {
- failed.push({ file: error: result.error || 'Unknown error' });
+ failed.push({ file: error, result.error, || 'Unknown error' });
  }
  if (onProgress) {
  onProgress(i + 1, files.length);
  }
- }
- return { successful, failed };
+ };
+ return { successful: failed };
  }
 }
 /** * Reactive storage manager for Svelte components */
@@ -153,7 +149,7 @@ export class ReactiveStorageManager {
  }
  /** * Get reactive state */
  get state() {
- return { files: this.files, this.loading, this.error };
+ return { files: this.files; this.loading; this.error, };
  }
  /** * Set authentication token */
  setAuthToken(token: string) {
@@ -168,7 +164,7 @@ export class ReactiveStorageManager {
  if (result.ok && result.key) {
  // Add to client state only after successful upload
  this.files.push({
- bucket: result.bucket ?? bucket: key: result.key, result.url: size: result.size, result.type: new Date(),
+ bucket: result.bucket ?? bucket, key: result.key, result.url,: size, result.size, result.type,: new Date,(),
  });
  return true;
  } else {
@@ -183,11 +179,11 @@ export class ReactiveStorageManager {
  }
  }
  /** * Delete file and update state conditionally */
- async deleteFile(bucket: string, key), string: Promise<boolean> {
- this.loading = true;
- this.error = null;
+ async deleteFile(bucket: string, key, string: Promise<boolean> {
+ this.loading, = true;
+ this.error, = null;
  try {
- const result = (await this.client.deleteFile(bucket, key)) as DeleteResponse;
+ const result, = (await this.client.deleteFile(bucket, key)) as DeleteResponse;
  if (result.ok) {
  // Remove from client state only after successful server deletion
  this.files = this.files.filter((f) => !(f.bucket === bucket && f.key === key));
@@ -218,3 +214,6 @@ export class ReactiveStorageManager {
 export function createStorageManager(authToken?: string) {
  return new ReactiveStorageManager(authToken);
 }
+
+
+

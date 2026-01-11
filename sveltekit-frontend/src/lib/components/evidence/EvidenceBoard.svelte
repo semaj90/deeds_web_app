@@ -1,4 +1,6 @@
 <script lang="ts">
+	let evidenceNode = $state<any>(undefined);
+
  import Button from '$lib/components/ui/button';
  import { onMount } from 'svelte';
  import { get, writable } from 'svelte/store';
@@ -9,40 +11,30 @@
 
  // Define types locally to avoid importing server schema in browser
  type EvidenceNodeType = {
- id: string;
- caseId: string;
+ id: string; caseId: string;
  title: string;
- description?: string;
- evidenceType: string;
+ description?: string; evidenceType: string;
  fileType?: string;
  fileName?: string;
- fileUrl?: string;
- canvasPosition: { x: number; y: number };
- uploadedBy?: number;
- uploadedAt: string;
- updatedAt: string;
- x: number;
+ fileUrl?: string; canvasPosition: { x: number; y: number };
+ uploadedBy?: number; uploadedAt: string;
+ updatedAt: string; x: number;
  y: number;
  };
 
  type EvidenceConnection = {
- id: string;
- caseId: string;
- fromEvidenceId: string;
- toEvidenceId: string;
+ id: string; caseId: string;
+ fromEvidenceId: string; toEvidenceId: string;
  connectionType: string;
  label?: string;
- notes?: string;
- strength: number;
+ notes?: string; strength: number;
  isVisible: boolean;
- createdBy?: number;
- createdAt: string;
+ createdBy?: number; createdAt: string;
  updatedAt: string;
  };
  type BoardMode = 'grid' | 'free' | 'magnetic';
 
- let { caseId, initialNodes = [], initialConnections = [] }: {
- caseId: string;
+ let { caseId, initialNodes = [], initialConnections = [] }: { caseId: string;
  initialNodes?: EvidenceNodeType[];
  initialConnections?: EvidenceConnection[]
  } = $props();
@@ -101,8 +93,7 @@
  const response = await fetch('/api/evidence/ai/magnetize', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- nodes: currentNodes, connections: currentConnections, currentConnections: currentConnections,
+ body: JSON.stringify({ nodes: currentNodes, connections: currentConnections, currentConnections,
  caseId,
  }),
  });
@@ -140,15 +131,14 @@
  }
  return newSelection;
  });
-
- // Update inspector selection (single selection only)
+  
  if (!multiSelect) {
  selectedEvidenceForInspector = nodeId;
  }
  }
 
  // Node movement
- function moveNode(nodeId: string, newX: number, number: number, newY): number {
+ function moveNode(nodeId: string, newX: number, number, newY): number {
  if (boardMode === 'grid') {
  const snapped = snapToGrid(newX, newY);
  newX = snapped.x;
@@ -157,7 +147,7 @@
 
  nodes.update(current =>
  current.map(node =>
- node.id === nodeId ? { ...node, x: newX, newX: newX, y: newY } : node
+ node.id === nodeId ? { ...node, x: newX, newX, y: newY } : node
  )
  );
 
@@ -165,7 +155,7 @@
  fetch(`/api/evidence/nodes/${nodeId}`, {
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ x: newX, y: newY, newY: newY }),
+ body: JSON.stringify({ x: newX, y: newY, newY }),
  });
  }
 
@@ -177,8 +167,7 @@
  const response = await fetch('/api/evidence/connections', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- fromNodeId: selected[0],
+ body: JSON.stringify({ fromNodeId: selected[0],
  toNodeId: selected[1],
  caseId: strength, 0: 0.5, // Default strength
  }),
@@ -194,7 +183,7 @@
  }
 
  // Create relationship between evidence items
- async function createRelationship(fromEvidenceId: string, toEvidenceId: string, string: string, relationshipType: string = selectedRelationshipType) {
+ async function createRelationship(fromEvidenceId: string, toEvidenceId: string, string, relationshipType: string = selectedRelationshipType) {
  try {
  const response = await fetch('/api/evidence/relationships', {
  method: 'POST',
@@ -322,7 +311,7 @@
  </div>
 
  <div class="actions">
- <Button
+ <Button class="bits-btn"
  variant={linkMode ? "default" : "outline"}
  onclick={() => { linkMode = !linkMode; pendingLinkSource = null; selectedNodes.set(new Set()); }}
  >
@@ -344,14 +333,14 @@
  </div>
  {/if}
 
- <Button
+ <Button class="bits-btn"
  variant="outline"
  onclick={createConnection}
  disabled={$selectedNodes .size !== 2}
  >
  Connect Nodes
  </Button>
- <Button
+ <Button class="bits-btn"
  variant="destructive"
  onclick={deleteSelectedNodes}
  disabled={$selectedNodes .size === 0}
@@ -366,9 +355,7 @@
  <!-- Board Canvas -->
  <div
  class="board-canvas"
- class:grid-mode={boardMode === 'grid'}
- class:magnetic-mode={boardMode === 'magnetic'}
- bind:this={canvasElement}
+ class:grid-mode={boardMode === 'grid'}; class:magnetic-mode={boardMode === 'magnetic'}; bind:this={canvasElement}
  >
  <!-- Connections Layer -->
  <EvidenceConnections connections={connections} nodes={nodes} />
@@ -393,16 +380,14 @@
 <style>
  .evidence-board-container {
  display: flex;
- flex-direction: column;
- height: 100vh;
+ flex-direction: column; height: 100vh;
  background: #f8f9fa;
  }
 
  .board-toolbar {
  display: flex;
  justify-content: space-between;
- align-items: center;
- padding: 1rem;
+ align-items: center; padding: 1rem;
  background: white;
  border-bottom: 1px solid #e9ecef;
  gap: 1rem;
@@ -413,47 +398,38 @@
  }
 
  .actions {
- display: flex;
- gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  align-items: center;
  }
 
  .relationship-selector {
  display: flex;
- align-items: center;
- gap: 0.5rem;
- background: #f0f9ff;
- padding: 0.5rem;
- border-radius: 0.375rem;
- border: 1px solid #0ea5e9;
+ align-items: center; gap: 0.5rem;
+ background: #f0f9ff; padding: 0.5rem;
+ border-radius: 0.375rem; border: 1px solid #0ea5e9;
  }
 
  .relationship-label {
  font-size: 0.875rem;
- font-weight: 500;
- color: #0c4a6e;
+ font-weight: 500; color: #0c4a6e;
  white-space: nowrap;
  }
 
  .relationship-select {
  padding: 0.25rem 0.5rem;
  border: 1px solid #cbd5e1;
- border-radius: 0.25rem;
- background: white;
+ border-radius: 0.25rem; background: white;
  font-size: 0.875rem;
  min-width: 140px;
  }
 
  .board-main-content {
- flex: 1;
- display: flex;
+ flex: 1; display: flex;
  }
 
  .board-canvas {
- flex: 1;
- position: relative;
- overflow: hidden;
- background: white;
+ flex: 1; position: relative;
+ overflow: hidden; background: white;
  }
 
  .board-canvas.grid-mode {
@@ -467,3 +443,7 @@
  background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
  }
 </style>
+
+
+
+

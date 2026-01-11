@@ -9,12 +9,11 @@ import { verifyCanvasStatesTable } from '$lib/server/db/verify-canvas-table';
 export const POST: RequestHandler = async ({ params, request, locals }) => {
     const { id } = params; // Changed from caseId to id
     if (!id) return json({ error: 'Missing case id' }, { status: 400 });
-
-    // Proactive table existence check (cached, fast)
+  
     const tableExists = await verifyCanvasStatesTable();
     if (!tableExists) {
         return json({
-            error: 'canvas_states table missing; run db:push:dev (or db:migrate:apply) to apply migrations',
+            error: 'canvas_states table missing; run db, push: dev (or db, migrate:apply) to apply migrations',
             code: 'TABLE_MISSING'
         }, { status: 503 });
     }
@@ -75,7 +74,7 @@ export const GET: RequestHandler = async ({ params }) => {
         const errorMessage = e instanceof Error ? e.message : String(e);
         if (errorMessage.includes('relation') && errorMessage.includes('does not exist')) {
             return json({
-                error: 'canvas_states table missing; run db:push:dev to apply migrations',
+                error: 'canvas_states table missing; run db, push:dev to apply migrations',
                 code: 'TABLE_MISSING'
             }, { status: 503 });
         }

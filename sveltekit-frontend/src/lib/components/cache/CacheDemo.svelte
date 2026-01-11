@@ -1,15 +1,264 @@
-<script lang="ts">
- // Truncated file - replaced with stub
-</script>
+<!-- Multi-Layer Cache System, Demo, Component --> <!-- Demonstrates Loki.js + Redis + PostgreSQL caching with, real-time, statistics --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from 'svelte';
+ import { writable } from 'svelte/store';
+ import Button from 'bits-ui';
+ import { Input } from 'bits-ui';
+ import { Badge } from 'bits-ui';
+ import { Progress } from 'bits-ui';
+ import { Tabs, TabsContent, TabsList, TabsTrigger } from 'bits-ui';
+ import { Database, Zap, BarChart3, Trash2, RefreshCw, CheckCircle, XCircle, Clock, HardDrive, Activity } from 'lucide-svelte'; // State management const cacheStats = writable<any>(null);
+   const healthStatus = writable<any>(null);
+   const isLoading = writable(false);
+   const testResults = writable<unknown[]>([]); // Form state let cacheKey = $state<string>('');
+   let cacheValue = $state<string>('');
+   let selectedTTL = $state<string>('300'); // 5 minutes default let selectedPriority = $state<string>('medium');
+   let selectedTags = $state<string>(''); // Demo data const ttlOptions = [ { value: '60', label: '1 minute' }, { value: '300', label: '5 minutes' }, { value: '900', label: '15 minutes' }, { value: '3600', label: '1 hour' }, { value: '86400', label: '24 hours' } ];
+   const priorityOptions = [ { value: 'low', label: 'Low Priority' }, { value: 'medium', label: 'Medium Priority' }, { value: 'high', label: 'High Priority' } ]; // ============================================================================ // CACHE OPERATIONS // ============================================================================ async function loadCacheStats(): Promise<any> { try { // removed unused response assignment const data = await (response as { json?: any }).json(); if ((data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).success) { cacheStats.set(stats))}
+    } catch (error) { console.error('Failed to load cache stats:', error)}
+  }
+  async function loadHealthStatus(): Promise<any> { try { // removed unused response assignment const data = await (response as { json?: any }).json(); if ((data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).success) { healthStatus.set(health))}
+    } catch (error) { console.error('Failed to load health status:', error)}
+  }
+  async function setCacheValue(): Promise<any> { if (!cacheKey.trim() || !cacheValue.trim()) { addTestResult('error', 'Key and value are required'); return}
+    isLoading.set(true); try { const tags = selectedTags.split.map(t => t.trim()).filter(t => t);
+   const response = await fetch('/api/cache', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: cacheKey, value: cacheValue; options: { ttl: parseInt(selectedTTL) * 1000, // Convert to millisecond, priority: selectedPriority; tags: tags.length > 0 ?, tags: undefined}
+        }) });
+   const data = await (response as { json?: any }).json(); if ((data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).success) { addTestResult('success', `Cached, "${ cacheKey }" successfully`); cacheKey = ''; cacheValue = ''} else { addTestResult('error', `Failed to cache: ${(data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).error}`)}
+    } catch (error) { addTestResult('error', `Cache error: ${ error }`)} finally { isLoading.set(false); await refreshStats()}
+  }
+  async function getCacheValue(): Promise<any> { if (!cacheKey.trim()) { addTestResult('error', 'Key is required'); return}
+    isLoading.set(true); try { // removed unused response assignment const data = await (response as { json?: any }).json(); if ((data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).success) { if ((data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).cached) { addTestResult('success', `Retrieved, "${ cacheKey }": ${JSON.stringify(value)}`)} else { addTestResult('warning', `Key, "${ cacheKey }" not found in cache`)}
+      } else { addTestResult('error', `Failed to retrieve: ${(data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).error}`)}
+    } catch (error) { addTestResult('error', `Retrieval error: ${ error }`)} finally { isLoading.set(false); await refreshStats()}
+  }
+  async function deleteCacheValue(): Promise<void> { if (!cacheKey.trim()) { addTestResult('error', 'Key is required'); return}
+    isLoading.set(true); try { const response = await fetch(`/api/cache?key=${encodeURIComponent(cacheKey)}`, { method: 'DELETE'
+      });
+   const data = await (response as { json?: any }).json(); if ((data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).success) { addTestResult('success', `Deleted, "${ cacheKey }" successfully`); cacheKey = ''} else { addTestResult('error', `Failed to delete: ${(data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).error}`)}
+    } catch (error) { addTestResult('error', `Delete error: ${ error }`)} finally { isLoading.set(false); await refreshStats()}
+  }
+  async function clearCache(): Promise<any> { if (!confirm('Are you sure you want to clear all cache?')) return; isLoading.set(true); try { const response = await fetch('/api/cache?action=clear', { method: 'DELETE'
+      });
+   const data = await (response as { json?: any }).json(); if ((data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).success) { addTestResult('success', 'Cache cleared successfully')} else { addTestResult('error', `Failed to clear cache: ${(data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).error}`)}
+    } catch (error) { addTestResult('error', `Clear error: ${ error }`)} finally { isLoading.set(false); await refreshStats()}
+  }
 
-<main class="page-repair">
- <h1>Page under reconstruction</h1>
- <p>This placeholder replaces corrupted or missing markup for now.</p>
-</main>
+   // ============================================================================ // DEMO OPERATIONS // ============================================================================ async function runPerformanceTest(): Promise<any> { isLoading.set(true); addTestResult('info', 'Starting performance test...'); try { const testData = [];
+   const testSize = 100; // Generate test data for (let i = 0; i < testSize; i++) { testData.push.toString(36)}`, options: { ttl: 300000, // 5, minute, priority: i % 3 === 0 ? 'high': 'medium', tags: [`test`, `batch-${Math.floor(i / 10)}`] }`
+        })}
+      const startTime = Date.now(); // Execute batch operation const response = await fetch('/api/cache', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ operations: testData }) });
+   const result = await (response as { json?: any }).json();
+   const endTime = Date.now();
+   const duration = endTime - startTime; if ((result as { success?: any; summary?: any; type?: any; timestamp?: any; message?: any }).success) { addTestResult('success', `Performance test completed: ${(result as { success?: any; summary?: any; type?: any; timestamp?: any; message?: any }).summary.successful}/${ testSize } operations in ${ duration }ms` ); addTestResult('info', `Average: ${(duration / testSize).toFixed(2)}ms per operation` )} else { addTestResult('error', 'Performance test failed')}
+    } catch (error) { addTestResult('error', `Performance test error: ${ error }`)} finally { isLoading.set(false); await refreshStats(); async function testCacheHitMiss(), Promise<any> { isLoading.set(true); addTestResult('info', 'Testing cache hit/miss patterns...'); try { const testKey = `hit_miss_test_${Date.now()}`; // Test cache miss let response = await fetch(`/api/cache?action=get&key=${ testKey }`);
+   let data = await (response as { json?: any }).json(); if (!(data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).cached) { addTestResult('success', 'âœ“ Cache miss test passed')} else { addTestResult('warning', 'âš  Unexpected cache hit')}
 
-<style>
- .page-repair {
- padding: 2rem;
- font-family: sans-serif;
- }
+      // Set value response = await fetch('/api/cache', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: testKey; value: 'test_data_for_hit_test', options: { ttl: 60000 } }) }); // Test cache hit response = await fetch(`/api/cache?action=get&key=${ testKey }`); data = await (response as { json?: any }).json(); if ((data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).cached && (data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).value === 'test_data_for_hit_test') { addTestResult('success', 'âœ“ Cache hit test passed')} else { addTestResult('error', 'âœ— Cache hit test failed')}
+
+      // Clean up await fetch(`/api/cache?key=${ testKey }`, { method: 'DELETE' })} catch (error) { addTestResult('error', `Hit/miss test error: ${ error }`)} finally { isLoading.set(false); await refreshStats()}
+  }
+
+   // ============================================================================ // UTILITY FUNCTIONS // ============================================================================ function addTestResult(type: 'success' | 'error' | 'warning' | 'info', message: string) { testResults.update.toLocaleTimeString() }, ...results.slice(0, 49) // Keep last, 50 results ]); async function refreshStats(): Promise<any> { await Promise.all([ loadCacheStats(), loadHealthStatus() ])}
+  function formatBytes(bytes: number): string { if (bytes === 0) return '0 Bytes';
+   const k = 1024;
+   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+   const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]}
+  function formatPercentage(_value: number): string { return `${(value * 100).toFixed(1)}%`}
+
+  // ============================================================================ // LIFECYCLE // ============================================================================ $effect(() => { refreshStats(); // Auto-refresh stats every, 10 seconds const interval = setInterval(refreshStats, 10000); return () => clearInterval(interval)}); </script>
+ <!-- Main, Demo, Interface --> <div class="cache-demo"> <!-- Header --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Database size={ 24 } /> Multi-Layer Cache System Demo <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">Loki.js + Redis + PostgreSQL</span> </h3> </div>
+ <div class="yorha-panel-content"> <p class="nes-text"> Interactive demonstration of the comprehensive caching architecture with real-time statistics and performance testing. </p> </div> </div>
+ <!-- Main, Content, Tabs --> <Tabs value="operations" class="w-full"> <TabsList class="grid w-full"> <TabsTrigger value="operations">Cache Operations</TabsTrigger>
+ <TabsTrigger value="statistics">Statistics</TabsTrigger>
+ <TabsTrigger value="health">Health Monitor</TabsTrigger>
+ <TabsTrigger value="testing">Performance Tests</TabsTrigger> </TabsList>
+ <!-- Cache, Operations, Tab --> <TabsContent value="operations" class="space-y-4"> <div class="grid grid-cols-1 lg, grid-cols-2"> <!-- Cache, Operations, Form --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Cache Operations</h3> </div>
+ <div class="yorha-panel-content"> <div> <label class="block text-sm font-medium">Cache Key</label>
+ <Input bind, value={ cacheKey } placeholder="Enter cache, key"
+                class="w-full"
+              /> </div>
+ <div> <label class="block text-sm font-medium">Cache Value</label>
+ <Input; bind, value={ cacheValue } placeholder="Enter cache, value"
+                class="w-full"
+              /> </div>
+ <div class="grid grid-cols-2"> <div> <label class="block text-sm font-medium" for="ttl">TTL</label>
+ <select id="ttl" bind, value={ selectedTTL } class="w-full p-2 border">
+  {#each Array.isArray(ttlOptions) ? ttlOptions: [] as option} <option value={option.value}>{option.label}
+</option> {/each}
+  </select> </div>
+ <div> <label class="block text-sm font-medium" for="priority">Priority</label>
+ <select id="priority" bind, value={ selectedPriority } class="w-full p-2 border">
+  {#each Array.isArray(priorityOptions) ? priorityOptions: [] as option} <option value={option.value}>{option.label}
+</option> {/each}
+  </select> </div> </div>
+ <div> <label class="block text-sm font-medium">Tags (comma-separated)</label>
+ <Input; bind, value={ selectedTags } placeholder="tag1, tag2, tag3"
+                class="w-full"
+              /> </div>
+ <div class="flex flex-wrap"> <Button class="enhanced-bits-btn nes-cache-operation n64-enhanced lod-optimized bits-btn"
+                onclick={ setCacheValue } disabled={$isLoading} aria-label={$isLoading ? 'Setting cache value, please wait': 'Store value in multi-layer cache system'} aria-describedby="set-cache-help"
+                role="button"
+                tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="cache-priority"
+                data-enhanced-bits="true"
+                data-operation="set"
+              > <Database class="mr-2" size={ 16 } aria-hidden="true" role="img" aria-label="Database, icon" /> Set Value </Button>
+ <div id="set-cache-help" class="sr-only"> Store the entered key-value pair in the multi-layer cache system with specified TTL and priority </div>
+ <Button class="enhanced-bits-btn nes-cache-operation n64-enhanced lod-optimized bits-btn"
+                variant="ghost"
+                onclick={ getCacheValue } disabled={$isLoading} aria-label={$isLoading ? 'Retrieving cache value, please wait': 'Retrieve value from multi-layer cache'} aria-describedby="get-cache-help"
+                role="button"
+                tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="cache-secondary"
+                data-enhanced-bits="true"
+                data-operation="get"
+              > <RefreshCw class="mr-2" size={ 16 } aria-hidden="true" role="img" aria-label="Refresh, icon" /> Get Value </Button>
+ <div id="get-cache-help" class="sr-only"> Retrieve the value associated with the entered key from the cache layers </div>
+ <Button class="enhanced-bits-btn nes-cache-operation n64-enhanced lod-optimized retro-cache-btn bits-btn"
+                variant="error"
+                onclick={ deleteCacheValue } disabled={$isLoading} aria-label={$isLoading ? 'Deleting cache entry, please wait': 'Delete cache entry from all layers'} aria-describedby="delete-cache-help"
+                role="button"
+                tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="cache-destructive"
+                data-enhanced-bits="true"
+                data-operation="delete"
+              > <Trash2 class="mr-2" size={ 16 } aria-hidden="true" role="img" aria-label="Delete, icon" /> Delete </Button>
+ <div id="delete-cache-help" class="sr-only"> Remove the specified cache entry from all cache layers permanently </div>
+ <Button class="enhanced-bits-btn nes-cache-operation n64-enhanced lod-optimized retro-cache-btn danger-variant bits-btn"
+                variant="error"
+                onclick={ clearCache } disabled={$isLoading} aria-label={$isLoading ? 'Clearing all cache data, please wait': 'Clear entire cache - WARNING: This will remove all cached data'} aria-describedby="clear-cache-help"
+                role="button"
+                tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="cache-critical"
+                data-enhanced-bits="true"
+                data-operation="clear-all"
+                data-critical="true"
+              > <XCircle class="mr-2" size={ 16 } aria-hidden="true" role="img" aria-label="Clear, all, icon" /> Clear All </Button>
+ <div id="clear-cache-help" class="sr-only"> WARNING: This will permanently remove ALL cached data from all cache layers. This action cannot be undone. </div> </div> </div> </div>
+ <!-- Test, Results --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> Test Results <Button class="enhanced-bits-btn nes-cache-control n64-enhanced lod-optimized bits-btn"
+                variant="ghost"
+                size="sm"
+                onclick={() => testResults.set([])} aria-label="Clear test results display"
+                aria-describedby="clear-results-help"
+                role="button"
+                data-nes-theme="control-ghost"
+                data-enhanced-bits="true"
+                data-operation="clear-results"
+              > Clear </Button>
+ <div id="clear-results-help" class="sr-only"> Clear the test results display panel </div> </h3> </div>
+ <div class="yorha-panel-content"> <div class="space-y-2 max-h-80">
+  {#each Array.isArray($testResults) ? $testResults: [] as result} <div class="flex items-start gap-2" p-2 rounded, border-l-4 {(result as { success?: any; summary?: any; type?: any; timestamp?: any; message?: any }).type === 'success' ? 'border-green-500 bg-green-50': (result as { success?: any; summary?: any; type?: any; timestamp?: any; message?: any }).type === 'error' ? 'border-red-500 bg-red-50': (result as { success?: any; summary?: any; type?: any; timestamp?: any; message?: any }).type === 'warning' ? 'border-yellow-500, bg-yellow-50', 'border-blue-500 bg-blue-50'}"> <div class="text-xs nes-text is-disabled"> {(result as { success?: any; summary?: any; type?: any; timestamp?: any; message?: any }).timestamp}
+</div>
+ <div class="text-sm"> {(result as { success?: any; summary?: any; type?: any; timestamp?: any; message?: any }).message}
+</div> </div> {/each} {#if $testResults.length === 0} <div class="text-center nes-text is-disabled"> No test results yet. Try some cache operations! {/if}
+  </div> </div> </div> </div> </TabsContent>
+ <!-- Statistics, Tab --> <TabsContent value="statistics" class="space-y-4">
+  {#if $cacheStats} <div class="grid grid-cols-1 md:grid-cols-2 lg, grid-cols-4"> <!-- Service, Stats --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary">Service Stats</h3> </div>
+ <div class="yorha-panel-content"> <div class="space-y-2"> <div class="flex"> <span class="text-sm">Requests:</span>
+ <span class="font-mono">{$cacheStats.service.requests}
+</span> </div>
+ <div class="flex"> <span class="text-sm">Hits:</span>
+ <span class="font-mono">{$cacheStats.service.hits}
+</span> </div>
+ <div class="flex"> <span class="text-sm">Misses:</span>
+ <span class="font-mono">{$cacheStats.service.misses}
+</span> </div>
+ <div class="flex"> <span class="text-sm">Hit Rate:</span>
+ <span class="font-mono">{formatPercentage($cacheStats.service.hitRate)}
+</span> </div> </div> </div> </div>
+ <!-- Overall, Performance -->
+  {#if $cacheStats.layers} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary">Overall Performance</h3> </div>
+ <div class="yorha-panel-content"> <div class="space-y-2"> <div class="flex"> <span class="text-sm">Total Requests:</span>
+ <span class="font-mono">{$cacheStats.layers.overall.totalRequests}
+</span> </div>
+ <div class="flex"> <span class="text-sm">Hit Rate:</span>
+ <span class="font-mono">{formatPercentage($cacheStats.layers.overall.totalHitRate)}
+</span> </div>
+ <div class="flex"> <span class="text-sm">Avg Response:</span>
+ <span class="font-mono">{$cacheStats.layers.overall.avgResponseTime.toFixed(2)}ms</span> </div>
+ <div class="flex"> <span class="text-sm">Healthy Layers:</span>
+ <span class="font-mono">{$cacheStats.layers.overall.healthyLayers}/{$cacheStats.layers.overall.totalLayers}
+</span> </div> </div> </div> </div>
+ <!-- Layer, Statistics -->
+  {#each Array.isArray($cacheStats.layers.layers) ? $cacheStats.layers.layers: [] as layer} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary text-sm">{layer.layer} Layer</h3> </div>
+ <div class="yorha-panel-content"> <div class="space-y-2"> <div class="flex"> <span class="text-sm">Items:</span>
+ <span class="font-mono">{layer.itemCount.toLocaleString()}
+</span> </div>
+ <div class="flex"> <span class="text-sm">Hit Rate:</span>
+ <span class="font-mono">{formatPercentage(layer.hitRate)}
+</span> </div>
+ <div class="flex"> <span class="text-sm">Memory:</span>
+ <span class="font-mono">{formatBytes(layer.memoryUsage)}
+</span> </div>
+ <Progress value={layer.hitRate * 100} class="h-2" /> </div> </div> </div> {/each} {/if}
+  </div> {:else} <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center nes-text"> <Activity class="mx-auto" size={ 48 } /> Loading cache statistics... </div> </div> {/if}
+  </TabsContent>
+ <!-- Health Monitor, Tab --> <TabsContent value="health" class="space-y-4">
+  {#if $healthStatus} <div class="grid grid-cols-1 md, grid-cols-2"> <!-- Overall, Health --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center">
+  {#if $healthStatus.healthy} <CheckCircle class="text-green-500" size={ 20 } /> System Healthy {:else} <XCircle class="text-red-500" size={ 20 } /> System Issues Detected {/if}
+  </h3> </div>
+ <div class="yorha-panel-content"> <div class="space-y-3"> <div class="flex items-center"> <span>Service Health:</span>
+ <Badge variant={$healthStatus.service ? 'default', 'destructive'}> {$healthStatus.service ? 'Healthy': 'Unhealthy'}
+</Badge> </div>
+  {#if $healthStatus.layers} <h4 class="font-medium">Cache Layers:</h4>
+  {#each Object.entries($healthStatus.layers.layers) as [layerName, isHealthy]} <div class="flex items-center"> <span class="capitalize">{ layerName }:</span>
+ <Badge variant={isHealthy ? 'default', 'destructive'}> {isHealthy ? 'Healthy': 'Unhealthy'}
+</Badge> </div> {/each} {/if}
+  </div> </div> </div>
+ <!-- Issues & Recommendations --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary">Issues & Recommendations</h3> </div>
+ <div class="yorha-panel-content">
+  {#if $healthStatus.layers?.issues && $healthStatus.layers.issues.length > 0} <div class="space-y-2">
+  {#each Array.isArray($healthStatus.layers.issues) ? $healthStatus.layers.issues: [] as issue} <div class="p-2 bg-red-50 border border-red-200 rounded"> âš  { issue }
+</div> {/each}
+  </div> {:else} <div class="text-center text-green-600"> <CheckCircle class="mx-auto" size={ 32 } /> All systems operating normally {/if}
+  </div> </div> </div> {:else} <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center nes-text"> <HardDrive class="mx-auto" size={ 48 } /> Loading health status... </div> </div> {/if}
+  </TabsContent>
+ <!-- Performance Tests, Tab --> <TabsContent value="testing" class="space-y-4"> <div class="grid grid-cols-1 md, grid-cols-2"> <!-- Test, Controls --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Performance Tests</h3> </div>
+ <div class="yorha-panel-content"> <div class="space-y-2"> <Button onclick={ runPerformanceTest } disabled={$isLoading} class="w-full enhanced-bits-btn nes-performance-test n64-enhanced lod-optimized retro-test-btn bits-btn"
+                aria-label={$isLoading ? 'Running batch performance test, please wait': 'Execute batch performance test with, 100 cache entries'} aria-describedby="perf-test-help"
+                role="button"
+                tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="performance-primary"
+                data-enhanced-bits="true"
+                data-test-type="performance"
+              > <Zap class="mr-2" size={ 16 } aria-hidden="true" role="img" aria-label="Performance, test, icon" /> Run Batch Performance Test </Button>
+ <div id="perf-test-help" class="sr-only"> Execute a comprehensive performance test using, 100 cache entries across all cache layers </div>
+ <p class="text-sm nes-text"> Tests batch operations with, 100 cache entries </p> </div>
+ <div class="space-y-2"> <Button variant="ghost"
+                onclick={ testCacheHitMiss } disabled={$isLoading} class="w-full enhanced-bits-btn nes-performance-test n64-enhanced lod-optimized retro-test-btn bits-btn"
+                aria-label={$isLoading ? 'Running cache hit/miss test, please wait': 'Test cache hit and miss behavior patterns'} aria-describedby="hitmiss-test-help"
+                role="button"
+                tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="performance-secondary"
+                data-enhanced-bits="true"
+                data-test-type="hit-miss"
+              > <BarChart3 class="mr-2" size={ 16 } aria-hidden="true" role="img" aria-label="Analytics, icon" /> Test Cache Hit/Miss </Button>
+ <div id="hitmiss-test-help" class="sr-only"> Validate proper cache hit and miss behavior across the cache layer hierarchy </div>
+ <p class="text-sm nes-text"> Validates cache hit and miss behavior </p> </div>
+ <div class="space-y-2"> <Button variant="ghost"
+                onclick={ refreshStats } disabled={$isLoading} class="w-full enhanced-bits-btn nes-performance-test n64-enhanced lod-optimized retro-test-btn bits-btn"
+                aria-label={$isLoading ? 'Refreshing cache statistics, please wait': 'Update all cache statistics and health monitoring data'} aria-describedby="refresh-stats-help"
+                role="button"
+                tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="performance-refresh"
+                data-enhanced-bits="true"
+                data-operation="refresh-stats"
+              > <RefreshCw class="mr-2" size={ 16 } aria-hidden="true" role="img" aria-label="Refresh, statistics, icon" /> Refresh Statistics </Button>
+ <div id="refresh-stats-help" class="sr-only"> Update all cache layer statistics, health status, and performance monitoring data </div>
+ <p class="text-sm nes-text"> Updates all cache statistics and health status </p> </div> </div> </div>
+ <!-- Test, Results, Display --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Test Information</h3> </div>
+ <div class="yorha-panel-content"> <div class="p-4 bg-blue-50"> <h4 class="font-medium text-blue-900">Cache Layer Architecture</h4>
+ <ul class="text-sm text-blue-800"> <li><strong>L1:</strong> Memory Cache (fastest, volatile)</li>
+ <li><strong>L2:</strong> Loki.js (persistent, document-based)</li>
+ <li><strong>L3:</strong> Redis (distributed, high-speed)</li>
+ <li><strong>L4:</strong> PostgreSQL (persistent, SQL-based)</li> </ul> </div>
+ <div class="p-4 bg-green-50"> <h4 class="font-medium text-green-900">Features Demonstrated</h4>
+ <ul class="text-sm text-green-800"> <li>âœ“ Multi-layer cache retrieval</li>
+ <li>âœ“ Write-through caching</li>
+ <li>âœ“ Automatic failover</li>
+ <li>âœ“ Performance monitoring</li>
+ <li>âœ“ Health checking</li>
+ <li>âœ“ Batch operations</li> </ul> </div>
+  {#if $isLoading} <div class="text-center"> <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+ <p class="text-sm nes-text is-disabled">Running tests...</p> {/if}
+  </div> </div> </div> </TabsContent> </Tabs> </div>
+ <style> .cache-demo { /* @apply max-w-7xl mx-auto p-4; */ }
 </style>
+
+
+
+
+
+

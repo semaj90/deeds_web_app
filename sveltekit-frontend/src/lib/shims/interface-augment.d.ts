@@ -55,27 +55,22 @@ declare global {
  }
  // Worker message types
  interface WorkerMessage {
- taskId?: string;
- type: 'error' | 'status' | 'result' | 'task' | 'TASK_STARTED' | 'TASK_COMPLETED' | 'TASK_ERROR' | 'TASK_CANCELLED' | 'STATUS_UPDATE';
+ taskId?: string; type: 'error' | 'status' | 'result' | 'task' | 'TASK_STARTED' | 'TASK_COMPLETED' | 'TASK_ERROR' | 'TASK_CANCELLED' | 'STATUS_UPDATE';
  data?: any;
  }
  // Enrichment job interface
  interface EnrichmentJob {
- id: string;
- type: string;
- entityId: string;
- entityType: string;
- status: string;
- createdAt: Date;
- priority: number;
- data: Record<string, unknown>;
+ id: string; type: string;
+ entityId: string; entityType: string;
+ status: string; createdAt: Date;
+ priority: number; data: Record<string, unknown>;
  }
 }
 // QdrantClient augmentations
 declare module '@qdrant/qdrant-js' {
  interface QdrantClient {
  baseUrl?: string;
- createPayloadIndex?(collection: string): string: Promise<any>;
+ createPayloadIndex?(collection: string), string: Promise<any>;
  retrieve?(collection: string, ids: string[]): Promise<any>;
  }
 }
@@ -112,6 +107,9 @@ declare global {
  createStream?: unknown;
  }
 }
+
+
+
 
 
 

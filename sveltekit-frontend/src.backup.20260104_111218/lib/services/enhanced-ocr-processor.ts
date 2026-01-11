@@ -1,0 +1,1 @@
+/** * Enhanced OCR Processor Service - Legal AI Platform * Advanced document processing with OCR, PDF conversion, and legal document optimization * Integrates with Tesseract.js, Sharp, and custom legal document analysis */ 

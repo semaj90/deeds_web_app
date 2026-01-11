@@ -62,8 +62,7 @@ declare module 'lokijs' {
  update(doc: T): T;
  remove(doc: T): void;
  removeWhere(query: unknown): void;
- count(query?: unknown): number;
- data: T[];
+ count(query?: unknown): number; data: T[];
  chain(): {
  find(query?: unknown): unknown;
  where(filter: (obj: T) => boolean): unknown;
@@ -97,7 +96,7 @@ declare module '@tauri-apps/api/fs' {
  children?: FileEntry[];
  }
  export function readTextFile(filePath: string): Promise<string>;
- export function writeTextFile(filePath: string, data), string: Promise<void>;
+ export function writeTextFile(filePath: string, data, string: Promise<void>;
  export function readDir(dir: string, options?: { recursive?: boolean }): Promise<FileEntry[]>;
  export function createDir(dir: string, options?: { recursive?: boolean }): Promise<void>;
  export function removeFile(file: string): Promise<void>;
@@ -106,3 +105,6 @@ declare module '@tauri-apps/api/fs' {
 declare module '@tauri-apps/api/core' {
  export function invoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T>;
 }
+
+
+

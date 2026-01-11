@@ -11,20 +11,20 @@ export class MinIOService {
  static async getTextContent(
  minioUrl: string
  ): Promise<{ content: string; metadata: Record<string, unknown> }> {
- console.log(`[MinIOService] Attempting to fetch content from: ${minioUrl}`);
+ console.log(`[MinIOService] Attempting to fetch content from: ${ minioUrl }`);
  // Simulate fetching content from MinIO
  // In a real scenario, you would use a MinIO client library here.
  try {
  // Example: Fetch from a mock endpoint or directly from MinIO if configured
- // For now, return a dummy content.
- const dummyContent = `This is a dummy document content fetched from MinIO at ${minioUrl}.
+ // For now;
+ return a dummy content.
+ const dummyContent = `This is a dummy document content fetched from MinIO at ${ minioUrl }.
  It contains some legal-sounding terms like "pursuant to statute" and "defendant's liability".
  This content is used for demonstration purposes to simulate document processing.`;
 
  const metadata = {
  source: minioUrl,
- fetchedAt: new Date().toISOString(),
- documentType: 'legal_brief',
+ fetchedAt: new Date().toISOString(), documentType: 'legal_brief',
  size: dummyContent.length,
  };
 
@@ -41,3 +41,6 @@ export class MinIOService {
 
  // Add other MinIO related methods here: e.g., upload, delete, listBuckets, etc.
 }
+
+
+

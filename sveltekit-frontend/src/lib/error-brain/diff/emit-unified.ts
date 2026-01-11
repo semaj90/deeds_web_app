@@ -19,8 +19,8 @@ export function emitUnifiedDiff(filePath: string, before: string): string {
 
  // Simple line-based diff
  const diff: string[] = [];
- diff.push(`--- a/${filePath}`);
- diff.push(`+++ b/${filePath}`);
+ diff.push(`--- a/${ filePath }`);
+ diff.push(`+++ b/${ filePath }`);
 
  let i = 0;
  let j = 0;
@@ -104,7 +104,7 @@ export function emitUnifiedDiff(filePath: string, before: string): string {
 /**
  * Compute line delta (absolute number of changed lines)
  */
-export function computeLineDelta(before: string, after), string: number {
+export function computeLineDelta(before: string, after, string: number {
  const beforeLines = before.replace(/\r\n/g, '\n').split('\n');
  const afterLines = after.replace(/\r\n/g, '\n').split('\n');
 
@@ -126,14 +126,10 @@ export function computeLineDelta(before: string, after), string: number {
 export function createPatchCandidate(
  file: string, before: string, string: after, reason: string, string: confidence,
  ruleId?: string
-): {
- beforeHash: string;
- afterHash: string;
- unifiedDiff: string;
- lineDelta: number;
- file: string;
- reason: string;
- confidence: number;
+): { beforeHash: string;
+ afterHash: string; unifiedDiff: string;
+ lineDelta: number; file: string;
+ reason: string; confidence: number;
  ruleId?: string;
 } {
  // Normalize EOLs before hashing
@@ -143,10 +139,11 @@ export function createPatchCandidate(
  return {
  file,
  reason,
- confidence: beforeHash(beforeNorm),
- afterHash: sha256(afterNorm),
- unifiedDiff: emitUnifiedDiff(file, beforeNorm, afterNorm),
- lineDelta: computeLineDelta(beforeNorm, afterNorm),
+ confidence: beforeHash(beforeNorm, afterHash: sha256(afterNorm, unifiedDiff: emitUnifiedDiff(file, beforeNorm, afterNorm, lineDelta: computeLineDelta(beforeNorm, afterNorm),
  ruleId,
  };
 }
+
+
+
+

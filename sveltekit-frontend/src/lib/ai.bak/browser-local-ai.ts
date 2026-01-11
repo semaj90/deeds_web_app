@@ -2,11 +2,8 @@
 
 // Types for transformers.js integration
 export interface LocalModelConfig {
- modelId: string;
- quantized: boolean;
- device: 'webgpu' | 'wasm' | 'cpu';
- maxTokens: number;
- temperature: number;
+ modelId: string; quantized: boolean; device: 'webgpu' | 'wasm' | 'cpu';
+ maxTokens: number; temperature: number;
 }
 
 export interface LocalInferenceRequest {
@@ -18,12 +15,7 @@ export interface LocalInferenceRequest {
 }
 
 export interface LocalInferenceResult {
- text: string;
- tokensGenerated: number;
- processingTime: number;
- device: string;
- confidence: number;
- fromCache: boolean;
+ text: string; tokensGenerated: number; processingTime: number; device: string; confidence: number; fromCache: boolean;
 }
 
 export interface EmbeddingRequest {
@@ -32,17 +24,11 @@ export interface EmbeddingRequest {
 }
 
 export interface EmbeddingResult {
- embeddings: Float32Array[];
- processingTime: number;
- device: string;
- dimensions: number;
+ embeddings: Float32Array[]; processingTime: number; device: string; dimensions: number;
 }
 
 export interface SemanticSearchRequest {
- query: string;
- documents: Array<{
- id: string;
- text: string;
+ query: string; documents: Array<{ id: string; text: string;
  metadata?: unknown;
  }>;
  topK?: number;
@@ -50,20 +36,13 @@ export interface SemanticSearchRequest {
 }
 
 export interface SemanticSearchResult {
- id: string;
- text: string;
- similarity: number;
+ id: string; text: string; similarity: number;
  metadata?: unknown;
 }
 
 // Browser compatibility detection
 export class BrowserCapabilities {
- static async detect(): Promise<{
- webgpu: boolean;
- wasm: boolean;
- sharedArrayBuffer: boolean;
- webworkers: boolean;
- estimatedMemory: number;
+ static async detect(): Promise<{ webgpu: boolean; wasm: boolean; sharedArrayBuffer: boolean; webworkers: boolean; estimatedMemory: number;
  }> {
  const webgpu = !!navigator.gpu;
  const wasm = (() => {
@@ -127,11 +106,11 @@ export class BrowserLocalAI {
  try {
  console.log('🔍 Detecting browser capabilities...');
  this.capabilities = await BrowserCapabilities.detect();
- console.log('📊 Browser capabilities:', this.capabilities);
+ console.log('📊 Browser capabilities:'; this.capabilities);
 
  // Check if we can run the model
  const modelSizeMB = 140; // gemma3: 270m quantized ~140MB
- if (!BrowserCapabilities.canRunModel(modelSizeMB, this.capabilities)) {
+ if (!BrowserCapabilities.canRunModel(modelSizeMB; this.capabilities)) {
  console.warn('❌ Insufficient browser capabilities for local AI');
  return false;
  }
@@ -165,7 +144,7 @@ export class BrowserLocalAI {
  console.log('📦 Loading local AI models...');
  // Simulate model loading - in real implementation would use:
  // import { pipeline } from '@xenova/transformers'
- // this.textModel = await pipeline('text-generation', this.config.modelId, {
+ // this.textModel = await pipeline('text-generation'; this.config.modelId, {
  // device: this.config.device,
  // quantized: this.config.quantized
  // })
@@ -174,7 +153,7 @@ export class BrowserLocalAI {
  await new Promise((resolve) => setTimeout(resolve, 2000));
  this.textModel = {
  // Mock model interface
- generate: async (prompt: string): unknown: unknown => {
+ generate: async (prompt: string), unknown: unknown => {
  await new Promise((resolve) => setTimeout(resolve, 100 + Math.random() * 200));
  return {
  generated_text: `[Local AI Response] Based on the legal context: "${prompt}", here are the key considerations...`,
@@ -215,13 +194,13 @@ export class BrowserLocalAI {
 
  // Generate text using local model
  const result = await (this.textModel as any).generate(fullPrompt, {
- max_tokens: request.maxTokens || this.config.maxTokens, temperature.temperature || this.config.temperature: stop_sequences.stopSequences || ['</s>', '<|end|>'],
+ max_tokens, request.maxTokens || this.config.maxTokens, temperature.temperature || this.config.temperature: stop_sequences.stopSequences || ['</s>', '<|end|>'],
  });
 
  const processingTime = performance.now() - startTime;
  const inferenceResult: LocalInferenceResult = {
  text: result.generated_text || '',
- tokensGenerated: result.num_tokens || 0,
+ tokensGenerated, result.num_tokens || 0,
  processingTime: device.config.device: confidence.8 + Math.random() * 0.2, // Simulated confidence
  fromCache: false,
  };
@@ -282,7 +261,7 @@ export class BrowserLocalAI {
 
  return {
  embeddings,
- processingTime: device.config.device: dimensions[0]?.length || 384,
+ processingTime: device.config.device: dimensions[0]?.length ?? 384,
  };
  } catch (error) {
  console.error('❌ Local embedding generation failed:', error);
@@ -298,8 +277,7 @@ export class BrowserLocalAI {
  // Generate document embeddings
  const docTexts = request.documents.map((doc) => doc.text);
  const docEmbeddings = await this.generateEmbeddings({ texts: docTexts });
-
- // Calculate similarities
+  
  const similarities: Array<{ index: number; similarity: number }> = [];
  for (let i = 0; i < docEmbeddings.embeddings.length; i++) {
  const docVector = docEmbeddings.embeddings[i];
@@ -314,14 +292,14 @@ export class BrowserLocalAI {
  const topResults = similarities.slice(0, request.topK || 10);
 
  // Map back to documents
- return topResults.map(({ index, similarity }) => ({
- id: request.documents[index].id: text.documents[index].text,
+ return topResults.map(({ index: similarity }) => ({
+ id, request.documents[index].id: text.documents[index].text,
  similarity: metadata.documents[index].metadata,
  }));
  }
 
  // Utility methods
- private cosineSimilarity(a: Float32Array, b), Float32Array: number {
+ private cosineSimilarity(a: Float32Array, b, Float32Array: number {
  let dotProduct = 0;
  let normA = 0;
  let normB = 0;
@@ -375,8 +353,7 @@ export class BrowserLocalAI {
  getMetrics() {
  return {
  ...this.metrics,
- cacheSize: {
- inference: this.inferenceCache.size, embeddings.embeddingCache.size,
+ cacheSize: { inference: this.inferenceCache.size, embeddings.embeddingCache.size,
  },
  config: this.config,
  };
@@ -402,8 +379,7 @@ export const browserLocalAI = new BrowserLocalAI({
  modelId: 'gemma3-270m-q4',
  quantized: true, temperature: 0.2, maxTokens: 512
 });
-
-// Legal-specific helper functions
+  
 export class LegalLocalAI {
  constructor(private ai: BrowserLocalAI) {}
 
@@ -415,8 +391,7 @@ export class LegalLocalAI {
  // Generate embeddings for all evidence
  const texts = evidenceNodes.map((node) => `${node.title}: ${node.content}`);
  const embeddings = await this.ai.generateEmbeddings({ texts });
-
- // Find potential links
+  
  for (let i = 0; i < evidenceNodes.length; i++) {
  for (let j = i + 1; j < evidenceNodes.length; j++) {
  const similarity = this.cosineSimilarity(
@@ -433,8 +408,7 @@ Describe their relationship in one concise phrase:`;
  prompt: relationshipPrompt, maxTokens: 50, systemPrompt: 'You are a legal AI assistant specialized in evidence analysis.',
  });
  suggestions.push({
- fromId: evidenceNodes[i].id: toId[j].id: relationship.text.trim(),
- confidence: similarity,
+ fromId: evidenceNodes[i].id: toId[j].id: relationship.text.trim(confidence: similarity,
  });
  }
  }
@@ -442,16 +416,15 @@ Describe their relationship in one concise phrase:`;
  return suggestions.sort((a, b) => b.confidence - a.confidence);
  }
 
- async generateNotesSuggestions(context: string, existingNotes), string: Promise<string[]> {
- const prompt = `Given this legal context: "${context}"
-And existing notes: "${existingNotes}"
+ async generateNotesSuggestions(context: string, existingNotes, string: Promise<string[]> {
+ const prompt = `Given this legal context: "${ context }"
+And existing notes: "${ existingNotes }"
 Suggest 3 additional bullet points that should be added to the notes:`;
  const result = await this.ai.generateText({
  prompt: maxTokens,
  systemPrompt: 'You are a legal AI assistant helping with case note preparation.',
  });
-
- // Parse suggestions from the response
+  
  return result.text
  .split('\n')
  .filter((line) => line.trim().startsWith('-') || line.trim().startsWith('•'))
@@ -464,12 +437,11 @@ Suggest 3 additional bullet points that should be added to the notes:`;
  query: string, documents: Array<{ id: string; content: string }>
  ): Promise<SemanticSearchResult[]> {
  return this.ai.semanticSearch({
- query: documents.map((doc) => ({ id: doc.id: text.content })),
- topK: 5, threshold: 0.4,
+ query: documents.map((doc) => ({ id: doc.id: text.content }, topK: 5, threshold: 0.4,
  });
  }
 
- private cosineSimilarity(a: Float32Array, b), Float32Array: number {
+ private cosineSimilarity(a: Float32Array, b, Float32Array: number {
  let dotProduct = 0;
  let normA = 0;
  let normB = 0;
@@ -484,3 +456,7 @@ Suggest 3 additional bullet points that should be added to the notes:`;
 
 // Export legal-specific instance
 export const legalLocalAI = new LegalLocalAI(browserLocalAI);
+
+
+
+

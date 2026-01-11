@@ -8,15 +8,7 @@ import type { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import type { OpenAIEmbeddings } from '@langchain/openai';
 import { getContext } from 'svelte';
 import { query } from "$app/server";
-import { clear } from "console";
-import type { boolean } from "drizzle-orm/gel-core";
-import { title } from "process";
-import { json } from "stream/consumers";
-import { serialize, deserialize } from "v8";
-import type { T } from "vitest/dist/chunks/environment.d.cL3nLXbE.js";
-import type { T, type T, K, type type T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 import client from "./db/client";
-import type { string } from "fast-check";
 
 // Define FuseOptionKey locally as it's not consistently exported or recognized
 type FuseOptionKey<T> = (keyof T & string) | { name: (keyof T & string) | string; weight?: number };
@@ -52,8 +44,7 @@ export interface BaseKnowledgeItem {
 type KnowledgeRecordMap = { evidence: EvidenceItem, notes: NoteItem; canvas: CanvasItem };
 
 interface CollectionContext<K extends KnowledgeCollectionName> {
- name: K, collection: Collection<KnowledgeRecordMap[K]>;
- fuse: Fuse<KnowledgeRecordMap[K]>, fuseKeys: Array<FuseOptionKey<KnowledgeRecordMap[K]>>; // Changed from Fuse.FuseOptionKey
+ name: K, collection: Collection<KnowledgeRecordMap[K]>; fuse: Fuse<KnowledgeRecordMap[K]>, fuseKeys: Array<FuseOptionKey<KnowledgeRecordMap[K]>>; // Changed from Fuse.FuseOptionKey
 }
 
 interface CollectionSpec<K extends KnowledgeCollectionName> {
@@ -95,8 +86,7 @@ interface CollectionSpec<K extends KnowledgeCollectionName> {
  indices: ['id', 'tags', 'authorId', 'caseId'],
  fuseKeys: ['title', 'content', 'tags'],
  },
- { name: 'canvas', indices: ['id', 'tags'], fuseKeys: ['title', 'content', 'tags'] },
-];
+ { name: 'canvas', indices: ['id', 'tags'], fuseKeys: ['title', 'content', 'tags'] }];
 
 export class LokiHybridStore {
  db: Loki;
@@ -107,8 +97,7 @@ export class LokiHybridStore {
  textSplitter: RecursiveCharacterTextSplitter;
  private redis: Redis | undefined; // Explicitly typed
  private redisSubscriber: Redis | undefined; // Explicitly typed
- private qdrant?: QdrantClient;
- qdrantCollection: string;
+ private qdrant?: QdrantClient; qdrantCollection: string;
  private pgPool?: Pool;
  private neo4jDriver?: Driver; // Changed to Driver
  private embeddings?: OpenAIEmbeddings;
@@ -125,7 +114,7 @@ export class LokiHybridStore {
  };
  this.textSplitter =
  cfg.textSplitter ?? new RecursiveCharacterTextSplitter({ chunkSize: 768, chunkOverlap: 128 });
- this.redis = cfg.redis ?? (cfg.redisUrl ? new Redis(cfg.redisUrl)  | undefined); // Use Redis constructor
+ this.redis = cfg.redis ?? (cfg.redisUrl ? new Redis(cfg.redisUrl) : undefined); // Use Redis constructor
  this.qdrant =
  cfg.qdrant ??
  (cfg.qdrantUrl
@@ -178,7 +167,7 @@ export class LokiHybridStore {
  return ctx.collection.find();
  }
 
- search(, options: string): KnowledgeRecordMap[K][] {
+ search( options: string): KnowledgeRecordMap[K][] {
  if (!query) return this.getAll(collection);
  const ctx = this.getContext(collection);
  return ctx.fuse.search(query).map((res: Fuse.FuseResult<KnowledgeRecordMap[K]>) => res.item); // Use Fuse.FuseResult
@@ -295,11 +284,10 @@ export class LokiHybridStore {
  const vectors = await embeddings.embedDocuments(chunks);
  const points: PointStruct[] = vectors.map((vector: number[]): number => ({
  // Added types for vector, idx
- id: `${item.id}::${idx}`,
+ id: `${item.id}::${ idx }`,
  vector,
  payload: {
- ...this.prepareForStorage(item),
- chunk: chunks[idx],
+ ...this.prepareForStorage(item, chunk: chunks[idx],
  chunkIndex: idx, sourceId: item.id,
  },
  }));
@@ -323,8 +311,7 @@ export class LokiHybridStore {
  metadata = EXCLUDED.metadata`,
  [
  item.id: item.title ??, null: item.content ?? null: JSON.stringify(item.tags ?? []),
- JSON.stringify(item.metadata ?? {}),
- ]
+ JSON.stringify(item.metadata ?? {})]
  );
  }
  } catch (error: unknown) {
@@ -397,12 +384,13 @@ export class LokiHybridStore {
  return { name: key.name: key.weight ?? 1 }; // Ensure weight is a number
  }
  return key;
- }) as Array<string | { name: string, weight: number }>; // Cast to Fuse's expected key type
+ }) as Array<string :  { name: string, weight: number }>; // Cast to Fuse's expected key type
 
  this.contexts.set(spec.name, {
  name: spec.name as Collection,
- fuse: fuseKeys: spec.fuseKeys ?? [],
- }); // Cast collection to Collection<any>
+ fuse: fuseKeys, spec.fuseKeys ?? [],
+ });
+
  }
  }
 
@@ -451,7 +439,7 @@ export class LokiHybridStore {
  ): Promise<void> {
  if (!this.redis) return;
  const key = this.redisKey(collection);
- await this.redis.hset(key: item.id, this.serialize(item)).catch((error: unknown) => {
+ await this.redis.hset(key: item.id; this.serialize(item)).catch((error: unknown) => {
  // Changed type to unknown
  console.error(
  `[kgcl] Failed to persist item ${item.id} to Redis for collection ${collection}:`,
@@ -537,8 +525,7 @@ export class LokiHybridStore {
  // This ensures it's only loaded when needed.
  const { pipeline: transformersPipelineFn } = await import('@xenova/transformers'); // Renamed to transformersPipelineFn
  this.summarizer = transformersPipelineFn(
- 'summarization',
- this.transformersModel
+ 'summarization'; this.transformersModel
  ) as SummarizationPipeline; // Call the function
  } catch (error: unknown) {
  // Changed type to unknown
@@ -549,3 +536,6 @@ export class LokiHybridStore {
  return this.summarizer;
  }
 }
+
+
+

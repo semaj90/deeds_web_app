@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { render, screen, fireEvent, waitFor } from '@testing-library/svelte';
 import AttachToCaseModal from '../AttachToCaseModal.svelte';
 
@@ -27,8 +27,7 @@ describe('AttachToCaseModal Component', () => {
  title: 'People v. Jones',
  number: 'CR-2023-002',
  status: 'active',
- },
- ] as const;
+ }] as const;
 
  beforeEach(() => {
  vi.clearAllMocks();
@@ -162,3 +161,6 @@ describe('AttachToCaseModal Component', () => {
  });
  });
 });
+
+
+

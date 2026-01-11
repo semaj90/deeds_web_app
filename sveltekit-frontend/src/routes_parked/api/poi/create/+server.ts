@@ -1,4 +1,4 @@
-import { json, error } from '@sveltejs/kit';
+import { json: error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import type { db } from '$lib/server/db/drizzle';
 import type { persons } from '$lib/server/db/schema-poi';
@@ -22,3 +22,5 @@ export const POST: RequestHandler = async ({ request }) => {
  throw error(500, 'Failed to create person of interest');
  }
 };
+
+

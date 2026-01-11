@@ -34,8 +34,7 @@ import { AlertCircle } from "lucide-svelte";;
  content:
  'Federal law requires all employment contracts to comply with minimum wage requirements under the Fair Labor Standards Act (FLSA). Exempt employees must meet specific salary and duties tests.',
  metadata: { type: 'statute', jurisdiction: 'Federal', topic: 'Labor Law' },
- },
- ]);
+ }]);
 
  // Query input
  let query = $state <string>('What are the requirements for employment contracts in California?');
@@ -147,10 +146,8 @@ import { AlertCircle } from "lucide-svelte";;
 
 <style>
  .demo-container {
- min-height: 100vh;
- background: #212529;
- color: #d4af37;
- padding: 2rem;
+ min-height: 100vh; background: #212529;
+ color: #d4af37; padding: 2rem;
  font-family: 'Press Start 2P', 'Courier New', monospace;
  }
 
@@ -160,17 +157,14 @@ import { AlertCircle } from "lucide-svelte";;
  }
 
  .subtitle {
- font-size: 0.75rem;
- color: #9ca3af;
+ font-size: 0.75rem; color: #9ca3af;
  }
 
  .privacy-badge {
  display: inline-flex;
- align-items: center;
- gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  padding: 0.5rem 1rem;
- background: #16a34a;
- color: white;
+ background: #16a34a; color: white;
  border-radius: 4px;
  margin-top: 1rem;
  font-size: 0.75rem;
@@ -179,13 +173,11 @@ import { AlertCircle } from "lucide-svelte";;
  .stats-grid {
  display: grid;
  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
- gap: 1rem;
- margin: 1.5rem 0;
+ gap: 1rem; margin: 1.5rem 0;
  }
 
  .answer-box {
- background: #1a1d20;
- padding: 1rem;
+ background: #1a1d20; padding: 1rem;
  border-radius: 4px;
  margin-top: 0.5rem;
  }
@@ -270,3 +262,7 @@ import { AlertCircle } from "lucide-svelte";;
  display: inline;
  }
 </style>
+
+
+
+

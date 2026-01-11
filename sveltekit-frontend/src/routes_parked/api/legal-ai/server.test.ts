@@ -7,30 +7,22 @@ import { POST, PUT, GET } from './+server.js';
 
 // Mock the middleware and services
 vi.mock('$lib/middleware/featureFlagEnforcer', () => ({
- FeatureFlagEnforcer: {
- checkRequest: vi.fn(),
- createErrorResponse: vi.fn(),
+ FeatureFlagEnforcer: { checkRequest: vi.fn( createErrorResponse: vi.fn(),
  },
 }));
 
 vi.mock('$lib/middleware/authSeparation', () => ({
- AuthSeparation: {
- extractToken: vi.fn(),
- extractUserId: vi.fn(),
- checkAuth: vi.fn(),
- createAuthErrorResponse: vi.fn(),
+ AuthSeparation: { extractToken: vi.fn( extractUserId: vi.fn(checkAuth: vi.fn( createAuthErrorResponse: vi.fn(),
  },
 }));
 
 vi.mock('$lib/services/dataIsolation', () => ({
- DataIsolationLayer: {
- checkAccess: vi.fn(),
+ DataIsolationLayer: { checkAccess: vi.fn(),
  },
 }));
 
 vi.mock('$lib/services/featureLogger', () => ({
- featureLogger: {
- logLegalAi: vi.fn(),
+ featureLogger: { logLegalAi: vi.fn(),
  },
 }));
 
@@ -55,8 +47,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(AuthSeparation.extractUserId).mockReturnValue('user-123');
  vi.mocked(AuthSeparation.checkAuth).mockReturnValue({
  authenticated: true,
- context: {
- feature: 'legalAi',
+ context: { feature: 'legalAi',
  requiresAuth: true,
  authType: 'production',
  userId: 'user-123',
@@ -67,8 +58,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/legal-ai/citations', {
  method: 'POST',
  headers: {
@@ -76,14 +66,12 @@ describe('Legal-AI API Endpoints', () => {
  Authorization: 'Bearer test-token',
  'X-User-ID': 'user-123',
  },
- body: JSON.stringify({
- documentId: 'doc-123',
+ body: JSON.stringify({ documentId: 'doc-123',
  documentContent: 'This contract cites 42 U.S.C. § 1983 and Miranda v. Arizona',
  documentType: 'contract',
  }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -108,7 +96,7 @@ describe('Legal-AI API Endpoints', () => {
 
  it('should return 403 when feature flag is disabled', async () => {
  // Setup mocks
- const errorResponse = new Response(JSON.stringify({ error: 'Feature is not available' }), {
+ const errorResponse = new Response(JSON.stringify({ error: 'Feature is not available' }) => {
  status: 403,
  });
 
@@ -121,13 +109,11 @@ describe('Legal-AI API Endpoints', () => {
  // Create request
  const request = new Request('http://localhost/api/legal-ai/citations', {
  method: 'POST',
- body: JSON.stringify({
- documentId: 'doc-123',
+ body: JSON.stringify({ documentId: 'doc-123',
  documentContent: 'Test content',
  }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -144,8 +130,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(AuthSeparation.extractUserId).mockReturnValue(undefined);
  vi.mocked(AuthSeparation.checkAuth).mockReturnValue({
  authenticated: false, status: 401, message: 'production authentication required',
- context: {
- feature: 'legalAi',
+ context: { feature: 'legalAi',
  requiresAuth: true,
  authType: 'production',
  isAuthenticated: false,
@@ -153,8 +138,7 @@ describe('Legal-AI API Endpoints', () => {
  });
 
  const errorResponse = new Response(
- JSON.stringify({ error: 'production authentication required' }),
- { status: 401 }
+ JSON.stringify({ error: 'production authentication required' }) => { status: 401 }
  );
 
  vi.mocked(AuthSeparation.createAuthErrorResponse).mockReturnValue(errorResponse);
@@ -162,13 +146,11 @@ describe('Legal-AI API Endpoints', () => {
  // Create request
  const request = new Request('http://localhost/api/legal-ai/citations', {
  method: 'POST',
- body: JSON.stringify({
- documentId: 'doc-123',
+ body: JSON.stringify({ documentId: 'doc-123',
  documentContent: 'Test content',
  }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -185,8 +167,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(AuthSeparation.extractUserId).mockReturnValue('user-123');
  vi.mocked(AuthSeparation.checkAuth).mockReturnValue({
  authenticated: true,
- context: {
- feature: 'legalAi',
+ context: { feature: 'legalAi',
  requiresAuth: true,
  authType: 'production',
  userId: 'user-123',
@@ -197,8 +178,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: false,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/legal-ai/citations', {
  method: 'POST',
  headers: {
@@ -206,13 +186,11 @@ describe('Legal-AI API Endpoints', () => {
  Authorization: 'Bearer test-token',
  'X-User-ID': 'user-123',
  },
- body: JSON.stringify({
- documentId: 'doc-123',
+ body: JSON.stringify({ documentId: 'doc-123',
  documentContent: 'Test content',
  }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -231,8 +209,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(AuthSeparation.extractUserId).mockReturnValue('user-123');
  vi.mocked(AuthSeparation.checkAuth).mockReturnValue({
  authenticated: true,
- context: {
- feature: 'legalAi',
+ context: { feature: 'legalAi',
  requiresAuth: true,
  authType: 'production',
  userId: 'user-123',
@@ -243,8 +220,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/legal-ai/citations', {
  method: 'POST',
  headers: {
@@ -254,8 +230,7 @@ describe('Legal-AI API Endpoints', () => {
  },
  body: JSON.stringify({ documentContent: 'Test content' }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -269,17 +244,14 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(FeatureFlagEnforcer.checkRequest).mockImplementation(() => {
  throw new Error('Test error');
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/legal-ai/citations', {
  method: 'POST',
- body: JSON.stringify({
- documentId: 'doc-123',
+ body: JSON.stringify({ documentId: 'doc-123',
  documentContent: 'Test content',
  }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -300,8 +272,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(AuthSeparation.extractUserId).mockReturnValue('user-123');
  vi.mocked(AuthSeparation.checkAuth).mockReturnValue({
  authenticated: true,
- context: {
- feature: 'legalAi',
+ context: { feature: 'legalAi',
  requiresAuth: true,
  authType: 'production',
  userId: 'user-123',
@@ -312,8 +283,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/legal-ai/authorities', {
  method: 'PUT',
  headers: {
@@ -321,12 +291,10 @@ describe('Legal-AI API Endpoints', () => {
  Authorization: 'Bearer test-token',
  'X-User-ID': 'user-123',
  },
- body: JSON.stringify({
- citationIds: ['citation_1', 'citation_2'],
+ body: JSON.stringify({ citationIds: ['citation_1', 'citation_2'],
  }),
  });
-
- // Call endpoint
+  
  const response = await PUT({ request } as any);
 
  // Verify response
@@ -359,8 +327,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(AuthSeparation.extractUserId).mockReturnValue('user-123');
  vi.mocked(AuthSeparation.checkAuth).mockReturnValue({
  authenticated: true,
- context: {
- feature: 'legalAi',
+ context: { feature: 'legalAi',
  requiresAuth: true,
  authType: 'production',
  userId: 'user-123',
@@ -371,8 +338,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/legal-ai/authorities', {
  method: 'PUT',
  headers: {
@@ -382,8 +348,7 @@ describe('Legal-AI API Endpoints', () => {
  },
  body: JSON.stringify({ citationIds: [] }),
  });
-
- // Call endpoint
+  
  const response = await PUT({ request } as any);
 
  // Verify response
@@ -404,8 +369,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(AuthSeparation.extractUserId).mockReturnValue('user-123');
  vi.mocked(AuthSeparation.checkAuth).mockReturnValue({
  authenticated: true,
- context: {
- feature: 'legalAi',
+ context: { feature: 'legalAi',
  requiresAuth: true,
  authType: 'production',
  userId: 'user-123',
@@ -416,17 +380,14 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/legal-ai/reports?limit=10&offset=0', {
  method: 'GET',
- headers: {
- Authorization: 'Bearer test-token',
+ headers: { Authorization: 'Bearer test-token',
  'X-User-ID': 'user-123',
  },
  });
-
- // Call endpoint
+  
  const response = await GET({ request } as any);
 
  // Verify response
@@ -457,8 +418,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(AuthSeparation.extractUserId).mockReturnValue('user-123');
  vi.mocked(AuthSeparation.checkAuth).mockReturnValue({
  authenticated: true,
- context: {
- feature: 'legalAi',
+ context: { feature: 'legalAi',
  requiresAuth: true,
  authType: 'production',
  userId: 'user-123',
@@ -469,17 +429,14 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request with custom pagination
+  
  const request = new Request('http://localhost/api/legal-ai/reports?limit=5&offset=10', {
  method: 'GET',
- headers: {
- Authorization: 'Bearer test-token',
+ headers: { Authorization: 'Bearer test-token',
  'X-User-ID': 'user-123',
  },
  });
-
- // Call endpoint
+  
  const response = await GET({ request } as any);
 
  // Verify response
@@ -499,8 +456,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(AuthSeparation.extractUserId).mockReturnValue(undefined);
  vi.mocked(AuthSeparation.checkAuth).mockReturnValue({
  authenticated: false, status: 401, message: 'production authentication required',
- context: {
- feature: 'legalAi',
+ context: { feature: 'legalAi',
  requiresAuth: true,
  authType: 'production',
  isAuthenticated: false,
@@ -508,8 +464,7 @@ describe('Legal-AI API Endpoints', () => {
  });
 
  const errorResponse = new Response(
- JSON.stringify({ error: 'production authentication required' }),
- { status: 401 }
+ JSON.stringify({ error: 'production authentication required' }) => { status: 401 }
  );
 
  vi.mocked(AuthSeparation.createAuthErrorResponse).mockReturnValue(errorResponse);
@@ -518,8 +473,7 @@ describe('Legal-AI API Endpoints', () => {
  const request = new Request('http://localhost/api/legal-ai/reports', {
  method: 'GET',
  });
-
- // Call endpoint
+  
  const response = await GET({ request } as any);
 
  // Verify response
@@ -527,3 +481,6 @@ describe('Legal-AI API Endpoints', () => {
  });
  });
 });
+
+
+

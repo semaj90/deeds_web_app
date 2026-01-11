@@ -19,18 +19,13 @@ const RAW_ENV = {
 };
 
 export interface EnvConfig {
-	OLLAMA_URL: string;
-	OLLAMA_MODEL: string;
-	OPENAI_API_KEY: string;
-	DATABASE_URL: string;
-	PUBLIC_APP_URL: string;
-	GPU_ACCELERATION: boolean;
-	WEBGPU_ENABLED: boolean;
-	NES_QUANTIZATION: boolean;
+	OLLAMA_URL: string; OLLAMA_MODEL: string;
+	OPENAI_API_KEY: string; DATABASE_URL: string;
+	PUBLIC_APP_URL: string; GPU_ACCELERATION: boolean;
+	WEBGPU_ENABLED: boolean; NES_QUANTIZATION: boolean;
 	GPU_MEMORY_LIMIT: number; // MB
 	PERFORMANCE_PROFILE: 'auto' | 'mobile' | 'desktop' | 'high-end';
-	GPU_DEBUG: boolean;
-	SHADER_DEBUG: boolean;
+	GPU_DEBUG: boolean; SHADER_DEBUG: boolean;
 	REDUCTION_MODE: 'auto' | 'gpu' | 'cpu';
 }
 function coerceBoolean(_value: string | undefined, defaultValue: boolean): boolean {
@@ -47,10 +42,7 @@ function validateAndBuildEnv(): EnvConfig {
 		OPENAI_API_KEY: RAW_ENV.OPENAI_API_KEY || '',
 		DATABASE_URL: RAW_ENV.DATABASE_URL || '',
 		PUBLIC_APP_URL: RAW_ENV.PUBLIC_APP_URL || 'http://localhost:5173',
-		GPU_ACCELERATION: coerceBoolean(RAW_ENV.VITE_GPU_ACCELERATION, true),
-		WEBGPU_ENABLED: coerceBoolean(RAW_ENV.VITE_WEBGPU_ENABLED, true),
-		NES_QUANTIZATION: coerceBoolean(RAW_ENV.VITE_NES_QUANTIZATION, true),
-		GPU_MEMORY_LIMIT: memoryMB,
+		GPU_ACCELERATION: coerceBoolean(RAW_ENV.VITE_GPU_ACCELERATION, true, WEBGPU_ENABLED: coerceBoolean(RAW_ENV.VITE_WEBGPU_ENABLED, true, NES_QUANTIZATION: coerceBoolean(RAW_ENV.VITE_NES_QUANTIZATION, true, GPU_MEMORY_LIMIT: memoryMB,
 		PERFORMANCE_PROFILE: profile,
 		GPU_DEBUG: RAW_ENV.VITE_GPU_DEBUG === 'true',
 		SHADER_DEBUG: RAW_ENV.VITE_SHADER_DEBUG === 'true',
@@ -78,7 +70,8 @@ export const CLIENT_ENV = Object.freeze({
 	GPU_DEBUG: ENV_CONFIG.GPU_DEBUG,
 	SHADER_DEBUG: ENV_CONFIG.SHADER_DEBUG,
 	REDUCTION_MODE: ENV_CONFIG.REDUCTION_MODE
-}); // GPU Context Configuration based on environment
+});
+  
 export const GPU_CONFIG = Object.freeze({
 	// Context preferences
 	preferWebGPU: CLIENT_ENV.WEBGPU_ENABLED,
@@ -110,5 +103,8 @@ export const GPU_CONFIG = Object.freeze({
 });
 
 export default ENV_CONFIG;
+
+
+
 
 

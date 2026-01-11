@@ -18,7 +18,7 @@ export class EvidenceFastAPIBridge {
  fileData?: { buffer: Buffer; filename: string; mimeType: string }
  ) {
  try {
- console.log(`🔄 Processing evidence ${evidenceId} with FastAPI RAG pipeline`);
+ console.log(`🔄 Processing evidence ${ evidenceId } with FastAPI RAG pipeline`);
 
  // Get evidence record
  const evidenceRecord = await db
@@ -28,7 +28,7 @@ export class EvidenceFastAPIBridge {
  .limit(1);
 
  if (!evidenceRecord.length) {
- throw new Error(`Evidence ${evidenceId} not found`);
+ throw new Error(`Evidence ${ evidenceId } not found`);
  }
 
  const record = evidenceRecord[0];
@@ -47,10 +47,10 @@ export class EvidenceFastAPIBridge {
  })
  .where(eq(evidence.id, evidenceId));
 
- console.log(`✅ Evidence ${evidenceId} processing completed`);
+ console.log(`✅ Evidence ${ evidenceId } processing completed`);
  return { success: true, evidenceId };
  } catch (error) {
- console.error(`❌ Evidence processing failed for ${evidenceId}:`, error);
+ console.error(`❌ Evidence processing failed for ${ evidenceId }:`, error);
 
  // Update evidence record with error status
  await db
@@ -113,7 +113,7 @@ export class EvidenceFastAPIBridge {
  }
 
  const result = await response.json();
- console.log(`📋 Found ${result.sources?.length || 0} relevant evidence chunks`);
+ console.log(`📋 Found ${result.sources?.length ?? 0} relevant evidence chunks`);
 
  return result;
  } catch (error) {
@@ -147,7 +147,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
  const { evidenceId } = await request.json();
 
  if (!evidenceId) {
- return new Response(JSON.stringify({ error: 'Missing evidenceId' }), {
+ return new Response(JSON.stringify({ error: 'Missing evidenceId' }) => {
  status: 400,
  headers: { 'Content-Type': 'application/json' },
  });
@@ -155,13 +155,13 @@ export const POST: RequestHandler = async ({ params, request }) => {
 
  const result = await EvidenceFastAPIBridge.processEvidence(evidenceId);
 
- return new Response(JSON.stringify(result), {
+ return new Response(JSON.stringify(result) => {
  status: 200,
  headers: { 'Content-Type': 'application/json' },
  });
  } catch (error) {
  console.error('Evidence processing API error:', error);
- return new Response(JSON.stringify({ error: error.message }), {
+ return new Response(JSON.stringify({ error: error.message }) => {
  status: 500,
  headers: { 'Content-Type': 'application/json' },
  });
@@ -177,7 +177,7 @@ export const GET: RequestHandler = async ({ url }) => {
  const limit = parseInt(url.searchParams.get('limit') || '5');
 
  if (!query) {
- return new Response(JSON.stringify({ error: 'Missing query parameter "q"' }), {
+ return new Response(JSON.stringify({ error: 'Missing query parameter "q"' }) => {
  status: 400,
  headers: { 'Content-Type': 'application/json' },
  });
@@ -185,15 +185,20 @@ export const GET: RequestHandler = async ({ url }) => {
 
  const result = await EvidenceFastAPIBridge.searchEvidence(query, limit);
 
- return new Response(JSON.stringify(result), {
+ return new Response(JSON.stringify(result) => {
  status: 200,
  headers: { 'Content-Type': 'application/json' },
  });
  } catch (error) {
  console.error('Evidence search API error:', error);
- return new Response(JSON.stringify({ error: error.message }), {
+ return new Response(JSON.stringify({ error: error.message }) => {
  status: 500,
  headers: { 'Content-Type': 'application/json' },
  });
  }
 };
+
+
+
+
+

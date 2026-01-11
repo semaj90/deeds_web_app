@@ -1,15 +1,11 @@
 <script lang="ts">
 	interface Tag {
-		id: string;
-		name: string;
-		jurisdiction: string;
+		id: string; name: string; jurisdiction: string;
 		description?: string;
 	}
 
 	interface TagSelectorProps {
-		selectedTags: string[];
-		jurisdiction: string;
-		onChange: (tagIds: string[]) => void;
+		selectedTags: string[]; jurisdiction: string; onChange: (tagIds: string[]) => void;
 		disabled?: boolean;
 	}
 
@@ -44,10 +40,10 @@
 			const params = new URLSearchParams({ jurisdiction });
 			if (searchQuery) params.set('search', searchQuery);
 
-			const res = await fetch(`/api/tags?${params}`);
+			const res = await fetch(`/api/tags? ${params}`);
 			if (res.ok) {
 				const data = await res.json();
-				availableTags = data.tags || [];
+				availableTags = data.tags ?? [];
 			}
 		} catch (error) {
 			console.error('Failed to load tags:', error);
@@ -64,8 +60,7 @@
 			const res = await fetch('/api/tags', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					name: newTagName.trim().toLowerCase().replace(/\s+/g, '-'),
+				body: JSON.stringify({ name: newTagName.trim().toLowerCase().replace(/\s+/g, '-'),
 					jurisdiction
 				})
 			});
@@ -163,7 +158,7 @@
 							type="text"
 							placeholder="Search tags..."
 							bind:value={searchQuery}
-							oninput={loadTags}
+							oninput={ loadTags }
 						/>
 					</div>
 
@@ -218,8 +213,7 @@
 <style>
 	.tag-selector {
 		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
+		flex-direction: column; gap: 0.75rem;
 	}
 
 	.tag-selector.disabled {
@@ -229,22 +223,18 @@
 
 	.selector-label {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 		font-size: 0.9rem;
-		font-weight: 500;
-		color: #ddd;
+		font-weight: 500; color: #ddd;
 	}
 
 	.tag-count {
-		font-size: 0.8rem;
-		color: #999;
+		font-size: 0.8rem; color: #999;
 		font-weight: normal;
 	}
 
 	.boost-indicator {
-		font-size: 0.75rem;
-		padding: 0.15rem 0.4rem;
+		font-size: 0.75rem; padding: 0.15rem 0.4rem;
 		background: rgba(153, 221, 255, 0.2);
 		color: #9df;
 		border-radius: 3px;
@@ -254,12 +244,8 @@
 	/* Selected Tags */
 	.selected-tags {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-		min-height: 36px;
-		padding: 0.5rem;
-		background: #16161a;
-		border: 1px solid #333;
+		flex-wrap: wrap; gap: 0.5rem;
+		min-height: 36px; padding: 0.5rem; background: #16161a; border: 1px solid #333;
 		border-radius: 4px;
 	}
 
@@ -271,25 +257,17 @@
 
 	.tag-chip {
 		display: inline-flex;
-		align-items: center;
-		gap: 0.25rem;
-		padding: 0.25rem 0.5rem;
+		align-items: center; gap: 0.25rem; padding: 0.25rem 0.5rem;
 		background: rgba(153, 221, 255, 0.15);
 		border: 1px solid rgba(153, 221, 255, 0.3);
-		border-radius: 3px;
-		color: #9df;
+		border-radius: 3px; color: #9df;
 		font-size: 0.85rem;
 	}
 
 	.remove-btn {
-		background: none;
-		border: none;
-		color: #9df;
-		cursor: pointer;
-		padding: 0;
+		background: none; border: none; color: #9df; cursor: pointer; padding: 0;
 		font-size: 1rem;
-		line-height: 1;
-		opacity: 0.7;
+		line-height: 1; opacity: 0.7;
 	}
 
 	.remove-btn:hover {
@@ -302,35 +280,24 @@
 	}
 
 	.dropdown-trigger {
-		width: 100%;
-		padding: 0.5rem 0.75rem;
-		background: #16161a;
-		border: 1px solid #333;
-		border-radius: 4px;
-		color: #999;
-		font-size: 0.85rem;
-		cursor: pointer;
+		width: 100%; padding: 0.5rem 0.75rem;
+		background: #16161a; border: 1px solid #333;
+		border-radius: 4px; color: #999;
+		font-size: 0.85rem; cursor: pointer;
 		text-align: left;
 	}
 
 	.dropdown-trigger:hover {
-		border-color: #9df;
-		color: #ddd;
+		border-color: #9df; color: #ddd;
 	}
 
 	.dropdown-panel {
-		position: absolute;
-		top: 100%;
-		left: 0;
-		right: 0;
-		margin-top: 0.25rem;
-		background: #111;
-		border: 1px solid #333;
+		position: absolute; top: 100%; left: 0; right: 0;
+		margin-top: 0.25rem; background: #111; border: 1px solid #333;
 		border-radius: 4px;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 		z-index: 100;
-		max-height: 300px;
-		display: flex;
+		max-height: 300px; display: flex;
 		flex-direction: column;
 	}
 
@@ -340,12 +307,8 @@
 	}
 
 	.search-box input {
-		width: 100%;
-		padding: 0.5rem;
-		background: #16161a;
-		border: 1px solid #333;
-		border-radius: 3px;
-		color: #ddd;
+		width: 100%; padding: 0.5rem; background: #16161a; border: 1px solid #333;
+		border-radius: 3px; color: #ddd;
 		font-size: 0.85rem;
 	}
 
@@ -363,22 +326,17 @@
 	.loading,
 	.empty {
 		padding: 1rem;
-		text-align: center;
-		color: #666;
+		text-align: center; color: #666;
 		font-size: 0.85rem;
 	}
 
 	.tag-option {
 		display: flex;
-		flex-direction: column;
-		width: 100%;
-		padding: 0.5rem 0.75rem;
-		background: none;
-		border: none;
+		flex-direction: column; width: 100%; padding: 0.5rem 0.75rem;
+		background: none; border: none;
 		border-bottom: 1px solid #222;
 		color: #ddd;
-		text-align: left;
-		cursor: pointer;
+		text-align: left; cursor: pointer;
 	}
 
 	.tag-option:hover {
@@ -390,52 +348,43 @@
 	}
 
 	.tag-desc {
-		font-size: 0.75rem;
-		color: #666;
+		font-size: 0.75rem; color: #666;
 		margin-top: 0.15rem;
 	}
 
 	/* Create Tag */
 	.create-tag {
-		display: flex;
-		gap: 0.5rem;
-		padding: 0.5rem;
+		display: flex; gap: 0.5rem; padding: 0.5rem;
 		border-top: 1px solid #222;
 		background: #0d0d0f;
 	}
 
 	.create-tag input {
-		flex: 1;
-		padding: 0.5rem;
-		background: #16161a;
-		border: 1px solid #333;
-		border-radius: 3px;
-		color: #ddd;
+		flex: 1; padding: 0.5rem; background: #16161a; border: 1px solid #333;
+		border-radius: 3px; color: #ddd;
 		font-size: 0.85rem;
 	}
 
 	.create-tag button {
 		padding: 0.5rem 0.75rem;
-		background: #9df;
-		border: none;
-		border-radius: 3px;
-		color: #000;
-		font-weight: 600;
-		cursor: pointer;
+		background: #9df; border: none;
+		border-radius: 3px; color: #000;
+		font-weight: 600; cursor: pointer;
 	}
 
 	.create-tag button:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
+		opacity: 0.5; cursor:not-allowed;
 	}
 
 	.no-jurisdiction {
-		padding: 0.75rem;
-		background: rgba(255, 204, 0, 0.1);
+		padding: 0.75rem; background: rgba(255, 204, 0, 0.1);
 		border: 1px solid rgba(255, 204, 0, 0.3);
-		border-radius: 4px;
-		color: #fc0;
+		border-radius: 4px; color: #fc0;
 		font-size: 0.85rem;
 		text-align: center;
 	}
 </style>
+
+
+
+

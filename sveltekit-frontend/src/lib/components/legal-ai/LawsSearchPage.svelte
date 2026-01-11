@@ -5,8 +5,7 @@
  import StatuteSearchBar from './StatuteSearchBar.svelte';
 
  interface Statute {
- id: string;
- code: string;
+ id: string; code: string;
  title?: string;
  jurisdiction?: string;
  severity?: string;
@@ -15,7 +14,7 @@
  }
 
  let statutes: Statute[] = $state([]);
- let selectedStatute: Statute: null = $state(null);
+ let selectedStatute: null = $state(null);
  let isSearching = $state(false);
  let searchError: string | null = $state(null);
 
@@ -37,11 +36,11 @@
  if (severity) params.set('severity', severity);
  if (category) params.set('category', category);
 
- const response = await fetch(`/api/laws/search?${params}`);
+ const response = await fetch(`/api/laws/search? ${params}`);
  if (response.ok) {
  const data = await response.json();
  if (data.success) {
- statutes = data.statutes || [];
+ statutes = data.statutes ?? [];
  selectedStatute = null;
  } else {
  searchError = data.error || 'Search failed';
@@ -119,8 +118,7 @@
 <style>
  .laws-search-page {
  display: flex;
- flex-direction: column;
- gap: 2rem;
+ flex-direction: column; gap: 2rem;
  }
 
  .search-section {
@@ -133,18 +131,14 @@
 
  .detail-view {
  display: flex;
- flex-direction: column;
- gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
 
  .back-btn {
- align-self: flex-start;
- padding: 0.5rem 1rem;
- background-color: #e0d5c7;
- border: 1px solid #d4a574;
+ align-self: flex-start; padding: 0.5rem 1rem;
+ background-color: #e0d5c7; border: 1px solid #d4a574;
  border-radius: 4px;
- font-size: 0.9rem;
- cursor: pointer;
+ font-size: 0.9rem; cursor: pointer;
  transition: all 0.2s;
  }
 
@@ -164,3 +158,6 @@
  }
  }
 </style>
+
+
+

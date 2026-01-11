@@ -6,8 +6,7 @@
 import type { Snippet } from 'svelte';
 
 interface SelectOption {
-	value: string;
-	label: string;
+	value: string; label: string;
 	disabled?: boolean;
 }
 
@@ -54,9 +53,7 @@ const baseClasses = `
 	rounded-lg
 	cursor-pointer
 	transition-all duration-150
-	hover:border-blue-500
-	focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-	disabled:opacity-50 disabled:cursor-not-allowed
+	hover: border-blue-500, focus:outline-none focus: ring-2, focus:ring-blue-500 focus: border-blue-500, disabled:opacity-50 disabled:cursor-not-allowed
 `.replace(/\s+/g, ' ').trim();
 
 const dropdownClasses = `
@@ -125,13 +122,13 @@ function handleBlur() {
 		{name}
 		{id}
 		{required}
-		{disabled}
+		{ disabled }
 		class="sr-only"
 		bind:value
 		aria-hidden="true"
 		tabindex="-1"
 	>
-		<option value="">{placeholder}</option>
+		<option value="">{ placeholder }</option>
 		{#each options as opt}
 			<option value={opt.value} disabled={opt.disabled}>{opt.label}</option>
 		{/each}
@@ -143,7 +140,7 @@ function handleBlur() {
 		class="{baseClasses}"
 		class:ring-2={isOpen}
 		class:ring-blue-500={isOpen}
-		{disabled}
+		{ disabled }
 		aria-haspopup="listbox"
 		aria-expanded={isOpen}
 		onclick={() => isOpen = !isOpen}
@@ -171,7 +168,7 @@ function handleBlur() {
 		<ul
 			class={dropdownClasses}
 			role="listbox"
-			aria-activedescendant={focusedIndex >= 0 ? `option-${focusedIndex}`  | undefined}
+			aria-activedescendant={focusedIndex >= 0 ? `option-${focusedIndex}` : undefined}
 		>
 			{#each options as opt, i}
 				<li
@@ -205,14 +202,15 @@ function handleBlur() {
 
 <style>
 	.sr-only {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		padding: 0;
-		margin: -1px;
-		overflow: hidden;
+		position: absolute; width: 1px;
+		height: 1px; padding: 0;
+		margin: -1px; overflow: hidden;
 		clip: rect(0, 0, 0, 0);
 		white-space: nowrap;
 		border-width: 0;
 	}
 </style>
+
+
+
+

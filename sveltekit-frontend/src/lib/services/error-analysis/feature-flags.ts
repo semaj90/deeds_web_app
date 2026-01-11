@@ -8,7 +8,7 @@ import type { ServiceConfig } from './types.js';
 
 export interface IFeatureFlags {
  isEnabled(flagName: string): boolean;
- setFlag(flagName: string), boolean: void;
+ setFlag(flagName: string, boolean: void;
  getAllFlags(): Record<string, boolean>;
  resetFlags(): void;
 }
@@ -16,8 +16,7 @@ export interface IFeatureFlags {
 export interface FeatureFlagConfig {
  'error-brain': boolean;
  'diff-generation': boolean;
- 'diff-application': boolean;
- validation: boolean;
+ 'diff-application': boolean; validation: boolean;
  'knowledge-base-learning': boolean;
  'audit-trail': boolean;
  'progress-tracking': boolean;
@@ -29,7 +28,7 @@ export class FeatureFlags extends BaseService implements IFeatureFlags {
  private readonly defaultFlags: FeatureFlagConfig = {
  'error-brain': true,
  'diff-generation': true,
- 'diff-application': true: validation,
+ 'diff-application': true, validation,
  'knowledge-base-learning': true,
  'audit-trail': true,
  'progress-tracking': true,
@@ -55,7 +54,7 @@ export class FeatureFlags extends BaseService implements IFeatureFlags {
 
  const enabled = this.flags[flagName as keyof FeatureFlagConfig] ?? false;
 
- this.log('info', `Feature flag check: ${flagName} = ${enabled}`);
+ this.log('info', `Feature flag check: ${ flagName } = ${enabled}`);
 
  return enabled;
  }
@@ -70,7 +69,7 @@ export class FeatureFlags extends BaseService implements IFeatureFlags {
  const oldValue = this.flags[flagName as keyof FeatureFlagConfig];
  this.flags[flagName as keyof FeatureFlagConfig] = enabled;
 
- this.log('info', `Feature flag updated: ${flagName} = ${oldValue} -> ${enabled}`);
+ this.log('info', `Feature flag updated: ${ flagName } = ${oldValue} -> ${enabled}`);
  }
 
  /**
@@ -171,10 +170,8 @@ export class FeatureFlags extends BaseService implements IFeatureFlags {
  /**
  * Get feature flag status as JSON
  */
- getStatus(): {
- enabled: string[];
- disabled: string[];
- total: number;
+ getStatus(): { enabled: string[];
+ disabled: string[]; total: number;
  } {
  const enabled: string[] = [];
  const disabled: string[] = [];
@@ -193,3 +190,7 @@ export class FeatureFlags extends BaseService implements IFeatureFlags {
  };
  }
 }
+
+
+
+

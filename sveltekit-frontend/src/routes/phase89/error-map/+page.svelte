@@ -52,8 +52,7 @@
 		const res = await fetch('/api/phase89/graph/expand', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				seed_uris: [nodeUri],
+			body: JSON.stringify({ seed_uris: [nodeUri],
 				depth: expandDepth
 			})
 		});
@@ -131,8 +130,7 @@
 			ctx.lineTo(link.target.x, link.target.y);
 			ctx.stroke();
 		});
-
-		// Draw nodes
+  
 		nodes.forEach((node: any) => {
 			const color = getNodeColor(node.kind);
 			const radius = getNodeSize(node);
@@ -294,7 +292,7 @@
 					bind:this={canvas}
 					width={width}
 					height={height}
-					onclick={handleCanvasClick}
+					onclick={ handleCanvasClick }
 					class="graph-canvas"
 				></canvas>
 				<p class="hint">Click nodes to expand • Drag to pan</p>
@@ -348,15 +346,13 @@
 <style>
 	.error-map-container {
 		width: 100%;
-		min-height: 100vh;
-		background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+		min-height: 100vh; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
 		color: #e2e8f0;
 		font-family: system-ui, -apple-system, sans-serif;
 	}
 
 	.header {
-		padding: 2rem;
-		background: #1e293bb0;
+		padding: 2rem; background: #1e293bb0;
 		border-bottom: 1px solid #334155;
 	}
 
@@ -367,8 +363,7 @@
 	}
 
 	.header p {
-		margin: 0;
-		color: #94a3b8;
+		margin: 0; color: #94a3b8;
 	}
 
 	.loading, .error-message {
@@ -376,17 +371,14 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		min-height: 60vh;
-		gap: 1rem;
+		min-height: 60vh; gap: 1rem;
 	}
 
 	.spinner {
-		width: 48px;
-		height: 48px;
+		width: 48px; height: 48px;
 		border: 4px solid #334155;
 		border-top-color: #3b82f6;
-		border-radius: 50%;
-		animation: spin 1s linear infinite;
+		border-radius: 50%; animation: spin 1s linear infinite;
 	}
 
 	@keyframes spin {
@@ -396,22 +388,19 @@
 	.main-layout {
 		display: grid;
 		grid-template-columns: 280px 1fr 320px;
-		gap: 1rem;
-		padding: 1rem;
+		gap: 1rem; padding: 1rem;
 		min-height: calc(100vh - 120px);
 	}
 
 	.left-panel, .right-panel {
 		background: #1e293bb0;
-		border-radius: 8px;
-		padding: 1.5rem;
+		border-radius: 8px; padding: 1.5rem;
 		border: 1px solid #334155;
 	}
 
 	.center-panel {
 		background: #1e293bb0;
-		border-radius: 8px;
-		padding: 1.5rem;
+		border-radius: 8px; padding: 1.5rem;
 		border: 1px solid #334155;
 		display: flex;
 		flex-direction: column;
@@ -423,8 +412,7 @@
 
 	section h2 {
 		font-size: 1rem;
-		font-weight: 600;
-		margin: 0 0 1rem;
+		font-weight: 600; margin: 0 0 1rem;
 		color: #cbd5e1;
 	}
 
@@ -442,17 +430,13 @@
 	.stats dd {
 		margin: 0;
 		font-weight: 600;
-		text-align: right;
-		color: #3b82f6;
+		text-align: right; color: #3b82f6;
 	}
 
 	.search-input {
-		width: 100%;
-		padding: 0.5rem;
-		background: #0f172a;
-		border: 1px solid #334155;
-		border-radius: 4px;
-		color: #e2e8f0;
+		width: 100%; padding: 0.5rem;
+		background: #0f172a; border: 1px solid #334155;
+		border-radius: 4px; color: #e2e8f0;
 		font-size: 0.875rem;
 		margin-bottom: 0.5rem;
 	}
@@ -463,14 +447,10 @@
 	}
 
 	.search-btn, .expand-btn {
-		width: 100%;
-		padding: 0.5rem;
-		background: #3b82f6;
-		border: none;
-		border-radius: 4px;
-		color: white;
-		font-weight: 500;
-		cursor: pointer;
+		width: 100%; padding: 0.5rem;
+		background: #3b82f6; border: none;
+		border-radius: 4px; color: white;
+		font-weight: 500; cursor: pointer;
 		transition: background 0.2s;
 	}
 
@@ -480,8 +460,7 @@
 
 	.controls label {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 		font-size: 0.875rem;
 	}
 
@@ -490,22 +469,19 @@
 	}
 
 	.legend ul {
-		list-style: none;
-		padding: 0;
+		list-style: none; padding: 0;
 		margin: 0;
 		font-size: 0.875rem;
 	}
 
 	.legend li {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 		margin-bottom: 0.5rem;
 	}
 
 	.dot {
-		width: 12px;
-		height: 12px;
+		width: 12px; height: 12px;
 		border-radius: 50%;
 	}
 
@@ -515,19 +491,15 @@
 	.dot.doc { background: #8b5cf6; }
 
 	.graph-canvas {
-		width: 100%;
-		height: 100%;
+		width: 100%; height: 100%;
 		background: #0f172a;
-		border-radius: 4px;
-		cursor: crosshair;
+		border-radius: 4px; cursor: crosshair;
 		flex: 1;
 	}
 
 	.hint {
-		text-align: center;
-		color: #64748b;
-		font-size: 0.75rem;
-		margin: 0.5rem 0 0;
+		text-align: center; color: #64748b;
+		font-size: 0.75rem; margin: 0.5rem 0 0;
 	}
 
 	.node-details h3 {
@@ -550,14 +522,12 @@
 	}
 
 	.node-details dd {
-		margin: 0;
-		color: #e2e8f0;
+		margin: 0; color: #e2e8f0;
 	}
 
 	.node-details .uri, .node-details .message {
 		font-family: 'Courier New', monospace;
-		font-size: 0.75rem;
-		background: #0f172a;
+		font-size: 0.75rem; background: #0f172a;
 		padding: 0.25rem 0.5rem;
 		border-radius: 4px;
 		word-break: break-all;
@@ -565,8 +535,11 @@
 
 	.placeholder {
 		color: #64748b;
-		text-align: center;
-		padding: 2rem;
+		text-align: center; padding: 2rem;
 		font-style: italic;
 	}
 </style>
+
+
+
+

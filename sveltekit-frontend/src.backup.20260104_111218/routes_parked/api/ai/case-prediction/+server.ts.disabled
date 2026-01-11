@@ -1,0 +1,226 @@
+import { json } from '@sveltejs/kit';;
+import type { RequestHandler } from './$types';
+import type { redisMiddleware  } from '$lib/middleware/redis';
+import type { ollamaService  } from '$lib/services/ollama';
+
+export const POST: RequestHandler = async ({ request }) => {
+	try {
+		const {
+			caseFacts,
+			caseType = 'civil',
+			jurisdiction = 'general',
+			partyType = 'plaintiff',
+			historicalData = [],
+			similarCases = []
+		} = await request.json();
+
+		if (!caseFacts) {
+			return json({ error: 'Case facts are required' }, { status: 400 });
+		}
+
+		// Use Redis middleware for caching
+		const cacheKey = `case-prediction:${Buffer.from(caseFacts.slice(0, 200)).toString('base64')}:${caseType}:${jurisdiction}:${partyType}`;
+
+		const cached = await redisMiddleware.get(cacheKey);
+		if (cached) {
+			return json(JSON.parse(cached));
+		}
+
+		// Build comprehensive case outcome prediction prompt
+		const prompt = `Analyze the following legal case and predict the likely outcome based on legal principles, precedents, and factual analysis.;
+
+Case Facts:
+${caseFacts}
+
+Case Details:
+- Case Type: ${caseType}
+- Jurisdiction: ${jurisdiction}
+- Party Type: ${partyType}
+
+${historicalData.length > 0 ? `Historical Data:\n${historicalData.map((item, i) => `${i + 1}. ${item}`).join('\n')}\n\n` : ''}
+${similarCases.length > 0 ? `Similar Cases:\n${similarCases.map((item, i) => `${i + 1}. ${item}`).join('\n')}\n\n` : ''}
+
+Provide a comprehensive case outcome prediction including:
+
+1. **Case Assessment**
+   - Overall case strength (weak/strong)
+   - Key factual strengths and weaknesses
+   - Legal merits evaluation
+
+2. **Outcome Prediction**
+   - Likelihood of success (percentage)
+   - Most probable outcome
+   - Alternative outcomes and their probabilities
+
+3. **Legal Analysis**
+   - Applicable legal standards and tests
+   - Critical legal issues
+   - Favorable and unfavorable precedents
+
+4. **Strategic Considerations**
+   - Settlement recommendations
+   - Trial strategy suggestions
+   - Risk assessment and mitigation
+
+5. **Timeline and Costs**
+   - Estimated case duration
+   - Projected legal costs
+   - Critical deadlines
+
+Format your response as structured JSON with the following schema:
+{
+  "case_assessment": {
+    "overall_strength": "weak|moderate|strong",
+    "strength_score": number,
+    "key_strengths": ["string"],
+    "key_weaknesses": ["string"],
+    "legal_merits": "string"
+  },
+  "outcome_prediction": {
+    "success_probability": number,
+    "most_likely_outcome": "string",
+    "alternative_outcomes": [
+      {
+        "outcome": "string",
+        "probability": number,
+        "conditions": "string"
+      }
+    ],
+    "confidence_level": "low|medium|high"
+  },
+  "legal_analysis": {
+    "applicable_standards": ["string"],
+    "critical_issues": ["string"],
+    "favorable_precedents": ["string"],
+    "unfavorable_precedents": ["string"],
+    "key_legal_questions": ["string"]
+  },
+  "strategic_considerations": {
+    "settlement_recommendation": "string",
+    "trial_strategy": "string",
+    "risk_mitigation": ["string"],
+    "negotiation_strategy": "string"
+  },
+  "timeline_costs": {
+    "estimated_duration": "string",
+    "projected_costs": {
+      "low_range": "string",
+      "high_range": "string",
+      "contingency_factors": ["string"]
+    },
+    "critical_deadlines": ["string"]
+  },
+  "metadata": {
+    "analysis_timestamp": "string",
+    "model_used": "string",
+    "disclaimer": "string",
+    "factors_considered": ["string"]
+  }
+}
+
+Ensure your analysis is balanced, evidence-based, and considers both favorable and unfavorable aspects. Base predictions on legal principles rather than speculation.`;
+
+		// Call gemma3-legal model with extended context for case analysis
+		const response = await ollamaService.generate({
+			model: 'gemma3-legal',
+			prompt,
+			stream: false,
+			options: {
+				temperature: 0.1, // Lower temperature for legal analysis accuracy
+				top_p: 0.9,
+				num_predict: 4096 // Extended response for comprehensive analysis
+			}
+		});
+
+		let prediction;
+		try {
+			// Try to parse as JSON first
+			prediction = JSON.parse(response.response);
+		} catch (parseError) {
+			// If not valid JSON, structure it manually
+			console.warn('Failed to parse AI response as JSON for case prediction:', parseError);
+			prediction = {
+				case_assessment: {
+					overall_strength: 'moderate',
+					strength_score: 0.5,
+					key_strengths: ['Case requires individual analysis'],
+					key_weaknesses: ['Automated analysis limitations'],
+					legal_merits: 'Requires detailed case-specific legal review'
+				},
+				outcome_prediction: {
+					success_probability: 50,
+					most_likely_outcome: 'Case-specific determination required',
+					alternative_outcomes: [{
+						outcome: 'Settlement',
+						probability: 60,
+						conditions: 'Parties willing to negotiate'
+					}],
+					confidence_level: 'low'
+				},
+				legal_analysis: {
+					applicable_standards: ['Case-specific legal standards apply'],
+					critical_issues: ['Requires detailed legal analysis'],
+					favorable_precedents: [],
+					unfavorable_precedents: [],
+					key_legal_questions: ['What are the specific facts and applicable law?']
+				},
+				strategic_considerations: {
+					settlement_recommendation: 'Consider mediation or settlement conference',
+					trial_strategy: 'Prepare thorough case analysis first',
+					risk_mitigation: ['Consult with experienced legal counsel'],
+					negotiation_strategy: 'Gather all relevant facts and legal authorities'
+				},
+				timeline_costs: {
+					estimated_duration: 'Varies by case complexity',
+					projected_costs: {
+						low_range: 'Case-specific',
+						high_range: 'Case-specific',
+						contingency_factors: ['Case complexity', 'Jurisdictional requirements']
+					},
+					critical_deadlines: ['Consult legal counsel for specific deadlines']
+				},
+				metadata: {
+					analysis_timestamp: new Date().toISOString(),
+					model_used: 'gemma3-legal',
+					disclaimer: 'This is an AI-generated analysis and should not be considered legal advice. Please consult with a qualified attorney for case-specific guidance.',
+					factors_considered: ['General legal principles', 'Case type analysis'],
+					raw_response: response.response
+				}
+			};
+		}
+
+		// Cache the result (shorter cache for case predictions as facts may change)
+		await redisMiddleware.set(cacheKey, JSON.stringify(prediction), 1800); // Cache for 30 minutes
+
+		return json(prediction);
+
+	} catch (error) {
+		console.error('Case prediction error:', error);
+		return json(
+			{
+				error: 'Failed to analyze case outcome',
+				details: error instanceof Error ? error.message : 'Unknown error',
+				case_assessment: {
+					overall_strength: 'unknown',
+					strength_score: 0,
+					key_strengths: [],
+					key_weaknesses: ['Analysis failed'],
+					legal_merits: 'Unable to complete analysis'
+				},
+				outcome_prediction: {
+					success_probability: 0,
+					most_likely_outcome: 'Analysis failed',
+					alternative_outcomes: [],
+					confidence_level: 'low'
+				},
+				metadata: {
+					analysis_timestamp: new Date().toISOString(),
+					model_used: 'gemma3-legal',
+					disclaimer: 'Analysis failed. Please consult a qualified attorney.',
+					factors_considered: []
+				}
+			},
+			{ status: 500 }
+		);
+	}
+};

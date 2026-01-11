@@ -14,14 +14,10 @@ const process.env.QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333'
 const COLLECTION_NAME = 'ai_repair_suggestions';
 
 interface RepairSuggestion {
- id: string;
- file: string;
- line: number;
- error_code: string;
- error_message: string;
- suggested_fix: string;
- confidence: number;
- status: 'pending' | 'applied' | 'rejected';
+ id: string; file: string;
+ line: number; error_code: string;
+ error_message: string; suggested_fix: string;
+ confidence: number; status: 'pending' | 'applied' | 'rejected';
  created_at: string;
 }
 
@@ -29,8 +25,7 @@ interface RepairSuggestion {
 export const GET: RequestHandler = async ({ url }) => {
  try {
  const qdrant = new QdrantClient({ url: process.env.QDRANT_URL });
-
- // Parse query parameters
+  
  const status = url.searchParams.get('status') || 'pending';
  const limit = parseInt(url.searchParams.get('limit') || '50', 10);
  const minConfidence = parseFloat(url.searchParams.get('min_confidence') || '0.5');
@@ -38,8 +33,7 @@ export const GET: RequestHandler = async ({ url }) => {
  // Query Qdrant for repair suggestions
  const searchResult = await qdrant.scroll(COLLECTION_NAME, {
  limit,
- filter: {
- must: [
+ filter: { must: [
  {
  key: 'status',
  match: { value: status },
@@ -47,8 +41,7 @@ export const GET: RequestHandler = async ({ url }) => {
  {
  key: 'confidence',
  range: { gte: minConfidence },
- },
- ],
+ }],
  },
  with_payload: true, with_vector: false, fromCache: false,
  });
@@ -77,12 +70,10 @@ export const POST: RequestHandler = async ({ request }) => {
  }
 
  const qdrant = new QdrantClient({ url: process.env.QDRANT_URL });
-
- // Update the point payload
+  
  await qdrant.setPayload(COLLECTION_NAME, {
  points: [id],
- payload: {
- status: updated_at Date().toISOString(),
+ payload: { status: updated_at Date().toISOString(),
  ...(applied_diff && { applied_diff }),
  },
  });
@@ -122,3 +113,7 @@ export const DELETE: RequestHandler = async ({ url }) => {
  return json({ error: 'Failed to delete repair suggestion' }, { status: 500 });
  }
 };
+
+
+
+

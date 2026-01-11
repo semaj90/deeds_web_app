@@ -10,7 +10,7 @@ import { statuteSearchService } from '$lib/server/services/statute-search.servic
 /**
  * GET: Get search history
  */
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url: locals }) => {
  try {
  const user = await getUser(locals);
  if (!user) {
@@ -36,3 +36,5 @@ export const GET: RequestHandler = async ({ url, locals }) => {
  );
  }
 };
+
+

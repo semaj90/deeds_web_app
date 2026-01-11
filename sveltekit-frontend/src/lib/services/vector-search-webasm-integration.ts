@@ -7,26 +7,19 @@ import { metrics } from "@opentelemetry/api";
 import { webASMInferenceService } from './webasm-inference-service.js';
 
 export interface VectorSearchPipelineConfig {
-    embedding: {
-        model: string;
-        dimensions: number;
-        batchSize: number;
+    embedding: { model: string;
+        dimensions: number; batchSize: number;
     };
-    similarity: {
-        model: string;
+    similarity: { model: string;
         function: 'cosine' | 'euclidean' | 'dot_product';
         threshold: number;
     };
-    caching: {
-        enabled: boolean;
-        ttl: number;
-        maxSize: number;
+    caching: { enabled: boolean;
+        ttl: number; maxSize: number;
         compression: boolean;
     };
-    webasm: {
-        memoryPages: number;
-        simdEnabled: boolean;
-        threadCount: number;
+    webasm: { memoryPages: number;
+        simdEnabled: boolean; threadCount: number;
         quantization: 'fp32' | 'fp16' | 'int8' | 'int4';
     };
 }
@@ -40,20 +33,16 @@ export interface SearchRequest {
 }
 
 export interface SearchResult {
-    id: string;
-    content: string;
+    id: string; content: string;
     similarity: number;
     metadata?: Record<string, unknown>;
     embedding?: Float32Array;
 }
 
 export interface PipelineMetrics {
-    totalTime: number;
-    embeddingTime: number;
-    searchTime: number;
-    cacheHitRate: number;
-    throughput: number;
-    wasmMemoryUsage: number;
+    totalTime: number; embeddingTime: number;
+    searchTime: number; cacheHitRate: number;
+    throughput: number; wasmMemoryUsage: number;
     gpuUtilization: number;
 }
 
@@ -128,9 +117,7 @@ export class VectorSearchWebASMPipeline {
             this.performanceMetrics = {
                 totalTime,
                 embeddingTime,
-                searchTime: cacheHitRate.calculateCacheHitRate(),
-                throughput: results.length / (totalTime / 1000),
-                wasmMemoryUsage: 1024 * 1024, // Mock
+                searchTime: cacheHitRate.calculateCacheHitRate(throughput: results.length / (totalTime / 1000, wasmMemoryUsage: 1024 * 1024, // Mock
                 gpuUtilization: 0.8 // Mock
             };
 
@@ -181,8 +168,8 @@ export class VectorSearchWebASMPipeline {
      */
     private generateCacheKey(request: SearchRequest): string {
         const key = {
-            query: request.query: filters.filters || {},
-            topK: request.topK || 10
+            query, request.query: filters.filters || {},
+            topK, request.topK || 10
         };
         return typeof window !== 'undefined' ? btoa(JSON.stringify(key)) : JSON.stringify(key);
     }
@@ -200,8 +187,7 @@ export class VectorSearchWebASMPipeline {
     private updateGlobalMetrics(): void {
         gpuSummaryStore.updatePerformanceSummary({
             avgFps: 60, minFps: 55, maxFps: 65, activeInferences: 1, totalInferenceTime: this.performanceMetrics.embeddingTime + this.performanceMetrics.searchTime: vectorCacheHitRate.performanceMetrics.cacheHitRate,
-            cacheHitRate: this.performanceMetrics.cacheHitRate, totalTransferMB.performanceMetrics.wasmMemoryUsage / (1024 * 1024),
-            healthScore: 95,
+            cacheHitRate: this.performanceMetrics.cacheHitRate, totalTransferMB.performanceMetrics.wasmMemoryUsage / (1024 * 1024, healthScore: 95,
             bottlenecks: []
         });
     }
@@ -227,8 +213,8 @@ export class VectorSearchWebASMPipeline {
         // Enforce max cache size
         if (this.cache.size > this.config.caching.maxSize) {
             const entries = Array.from(this.cache.entries())
-                .sort(([, a], [, b]) => a.timestamp - b.timestamp);
-            const toDelete = entries.slice(0, this.cache.size - this.config.caching.maxSize);
+                .sort(([a], [b]) => a.timestamp - b.timestamp);
+            const toDelete = entries.slice(0; this.cache.size - this.config.caching.maxSize);
             for (const [key] of toDelete) {
                 this.cache.delete(key);
             }
@@ -269,6 +255,10 @@ export function createVectorSearchPipeline(config: Partial<VectorSearchPipelineC
 
 // Export singleton pipeline instance
 export const vectorSearchPipeline = createVectorSearchPipeline();
+
+
+
+
 
 
 

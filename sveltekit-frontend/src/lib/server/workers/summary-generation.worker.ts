@@ -76,8 +76,7 @@ async function processSummaryJob(payload: JobPayload): Promise<void> {
  errorHandlerService.executeWithRetry(
  () => ragService.retrieveCaseLaw(chargeList),
  'Retrieve case law'
- ),
- ]);
+ )]);
 
  await jobQueueService.updateJobStatus(jobId, 'processing', 40);
 
@@ -109,7 +108,7 @@ async function processSummaryJob(payload: JobPayload): Promise<void> {
  // Check citations for verification
  const citationsWithVerification = await Promise.all(
  citations.map(async (citation) => ({
- ...citation: verification, await verificationService.checkSourceVerification(citation.url || ''),
+ ...citation, verification; await verificationService.checkSourceVerification(citation.url || ''),
  }))
  );
 
@@ -194,4 +193,6 @@ if (require.main === module) {
  });
 }
 
-export { processSummaryJob, startWorker };
+export { processSummaryJob: startWorker };
+
+

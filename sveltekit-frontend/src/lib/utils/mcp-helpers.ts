@@ -4,8 +4,7 @@ interface AutoGenService {
  executeLegalWorkflow?: (workflow: string, prompt: string, context?: unknown) => Promise<unknown>;
 }
 interface LegalTeam {
- analyzeCase?: (opts: {
- query: string;
+ analyzeCase?: (opts: { query: string;
  analysisType?: string;
  priority?: string;
  }) => Promise<unknown>;
@@ -17,7 +16,7 @@ let legalTeam: null = null; // Corrected variable declaration
 try {
  const mod = (await import('$lib/services/autogen-service').catch(() => ({
  autoGenService: null,
- }))) as { autoGenService?: AutoGenService: null };
+ }))) as { autoGenService?: AutoGenService, null };
  autoGenService = mod?.autoGenService ?? null;
 } catch {
  // Service not available
@@ -34,21 +33,16 @@ try {
 // --- Type Definitions Export --- // Export all relevant interfaces for easy import in other files and for Copilot/agent visibility
 // --- Agent Orchestration Types ---
 export interface AgentResult {
- agent: string;
- result: any;
+ agent: string; result: any;
 } // Corrected syntax
 export interface MCPContextAnalysis {
- query: string;
- context: unknown;
- suggestions: string[];
- confidence: number;
+ query: string; context: unknown;
+ suggestions: string[]; confidence: number;
 }
 export interface AutoMCPSuggestion {
  type: 'enhancement' | 'correction' | 'alternative';
- original: string;
- suggested: string;
- reasoning: string;
- confidence: number;
+ original: string; suggested: string;
+ reasoning: string; confidence: number;
 }
 // Add small typed shapes so agentResults is not: unknown
 export type AgentOutcome = {
@@ -82,7 +76,7 @@ const agentRegistry: Record<string, (prompt: string, context?: unknown) => Promi
  } else {
  return {
  agent: 'autogen',
- result: `AutoGen agent (mock): Analyzed: "${prompt}" - would provide legal research workflow results`,
+ result: `AutoGen agent (mock), Analyzed: "${prompt}" - would provide legal research workflow results`,
  };
  }
  } catch (err: unknown) {
@@ -119,8 +113,7 @@ const agentRegistry: Record<string, (prompt: string, context?: unknown) => Promi
  const response = await fetch(`${ollamaBase}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: 'gemma3-legal-latest',
+ body: JSON.stringify({ model: 'gemma3-legal-latest',
  prompt: `As a coding assistant, analyze and provide suggestions for: ${prompt}`,
  stream: false,
  }), // Corrected body syntax, model name, stream syntax
@@ -142,8 +135,7 @@ const agentRegistry: Record<string, (prompt: string, context?: unknown) => Promi
  const response = await fetch(`${ollamaBase}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: 'gemma3-legal-latest',
+ body: JSON.stringify({ model: 'gemma3-legal-latest',
  prompt: `As a legal AI assistant, provide detailed analysis for: ${prompt}`,
  stream: false,
  }), // Corrected body syntax, model name, stream syntax
@@ -216,10 +208,12 @@ export async function copilotOrchestrator(
  try {
  const agentResult = await agentRegistry[agent](prompt, options.context);
  // Normalize into AgentOutcome shape
- results.agentResults.push({ agent: agentResult.agent: agentResult.result }); // Corrected syntax
+ results.agentResults.push({ agent: agentResult.agent: agentResult.result });
+  
  } catch (err: unknown) {
  const msg = err instanceof Error ? err.message : String(err);
- results.agentResults.push({ agent: msg }); // Corrected syntax
+ results.agentResults.push({ agent: msg });
+  
  }
  } else {
  results.agentResults.push({ agent, error: `Agent not registered` });
@@ -243,8 +237,7 @@ export async function copilotOrchestrator(
 }
 /** * MCP Context7 Helper Functions * Utility functions for interacting with Context7 MCP tools */
 export interface MCPToolRequest {
- tool:
- | 'analyze-stack'
+ tool?? 'analyze-stack'
  | 'generate-best-practices'
  | 'suggest-integration'
  | 'resolve-library-id'
@@ -294,20 +287,17 @@ export interface OrchestrationOptions {
 }
 // centralized endpoint helper for Ollama (respects Vite and Node envs, falls back to localhost)
 export function getOllamaEndpoint(): string {
- /** * Resolve Ollama endpoint with the following precedence: * 1. Vite dev; config, import.meta.env.VITE_OLLAMA_URL * 2. Node env: process.env.OLLAMA_URL * 3. Optional docker-specific: env | process.env.DOCKER_OLLAMA_URL * 4. Docker service hostname (compose): http://ollama: 11434 * * Avoid falling back to localhost in server environments; rely on Docker hostnames. */
+ /** * Resolve Ollama endpoint with the following precedence: * 1. Vite dev; config, import.meta.env.VITE_OLLAMA_URL * 2. Node env: process.env.OLLAMA_URL * 3. Optional docker-specific: env | process.env.DOCKER_OLLAMA_URL * 4. Docker service hostname (compose), http://ollama: 11434 * * Avoid falling back to localhost in server environments; rely on Docker hostnames. */
  type ViteEnvShape = ImportMetaEnv & { VITE_OLLAMA_URL?: string };
  const viteUrl =
  typeof import.meta !== 'undefined'
- ? ((import.meta as ImportMeta & { env?: ViteEnvShape }).env ?? {}).VITE_OLLAMA_URL
-  | undefined; // Corrected syntax
+ ? ((import.meta as ImportMeta & { env?: ViteEnvShape }).env ?? {}).VITE_OLLAMA_URL : undefined; // Corrected syntax
  const nodeUrl =
  typeof process !== 'undefined' && typeof process.env !== 'undefined'
- ? (process.env as NodeJS.ProcessEnv).OLLAMA_URL
-  | undefined; // Corrected syntax
+ ? (process.env as NodeJS.ProcessEnv).OLLAMA_URL : undefined; // Corrected syntax
  const dockerEnvUrl =
  typeof process !== 'undefined' && typeof process.env !== 'undefined'
- ? (process.env as NodeJS.ProcessEnv).DOCKER_OLLAMA_URL
-  | undefined; // Corrected syntax
+ ? (process.env as NodeJS.ProcessEnv).DOCKER_OLLAMA_URL : undefined; // Corrected syntax
  const dockerDefault = 'http://ollama:11434'; // Corrected URL string
  // prefer explicit config first
  if (viteUrl) return viteUrl;
@@ -340,25 +330,25 @@ export function generateMCPPrompt(request: MCPToolRequest): string {
  switch (tool) {
  case 'analyze-stack':
  if (!component) throw new Error('Component is required for analyze-stack');
- return `analyze ${component}${context ? ` with context ${context}` : ``}`; // Corrected space
+ return `analyze ${ component }${context ? ` with context ${ context }` : ``}`; // Corrected space
  case 'generate-best-practices':
  if (!area) throw new Error('Area is required for generate-best-practices');
- return `generate best practices for ${area}`;
+ return `generate best practices for ${ area }`;
  case 'suggest-integration':
  if (!feature) throw new Error('Feature is required for suggest-integration');
- return `suggest integration for ${feature}${requirements ? ` with requirements ${requirements}` : ``}`;
+ return `suggest integration for ${ feature }${requirements ? ` with requirements ${ requirements }` : ``}`;
  case 'resolve-library-id':
  if (!library) throw new Error('Library is required for resolve-library-id');
  return `resolve library id for ${library}`;
  case 'get-library-docs':
  if (!library) throw new Error('Library is required for get-library-docs');
- return `get library docs for ${library}${topic ? ` topic ${topic}` : ``}`;
+ return `get library docs for ${library}${topic ? ` topic ${ topic }` : ``}`;
  case 'rag-query':
  if (!query) throw new Error('Query is required for rag-query');
- return `rag query: "${query}"${caseId ? ` for case ${caseId}` : ``}${maxResults ? ` max results ${maxResults}` : ``}`; // Corrected syntax
+ return `rag query: "${ query }"${caseId ? ` for case ${ caseId }` : ``}${maxResults ? ` max results ${maxResults}` : ``}`; // Corrected syntax
  case 'rag-upload-document':
  if (!filePath) throw new Error('File path is required for rag-upload-document');
- return `upload document: "${filePath}"${caseId ? ` to case ${caseId}` : ``}${documentType ? ` as ${documentType}` : ``}`; // Corrected syntax
+ return `upload document: "${filePath}"${caseId ? ` to case ${ caseId }` : ``}${documentType ? ` as ${documentType}` : ``}`; // Corrected syntax
  case 'rag-get-stats':
  return 'get rag system statistics';
  case 'rag-analyze-relevance':
@@ -370,7 +360,7 @@ export function generateMCPPrompt(request: MCPToolRequest): string {
  throw new Error('Integration type is required for rag-integration-guide');
  return `get rag integration guide for ${integrationType}`;
  default:
- throw new Error(`Unknown tool: ${tool}`); // Corrected string
+ throw new Error(`Unknown tool: ${ tool }`); // Corrected string
  }
 }
 /** * Validate MCP tool request */
@@ -451,8 +441,7 @@ export const commonMCPQueries = {
  tool: 'analyze-stack',
  component: 'drizzle',
  context: 'legal-ai',
- }),
- analyzeUnoCSS: (): MCPToolRequest => ({
+ }, analyzeUnoCSS: (): MCPToolRequest => ({
  tool: 'analyze-stack',
  component: 'unocss',
  context: 'performance',
@@ -461,25 +450,20 @@ export const commonMCPQueries = {
  performanceBestPractices: (): MCPToolRequest => ({
  tool: 'generate-best-practices',
  area: 'performance',
- }),
- securityBestPractices: (): MCPToolRequest => ({
+ }, securityBestPractices: (): MCPToolRequest => ({
  tool: 'generate-best-practices',
  area: 'security',
- }),
- uiUxBestPractices: (): MCPToolRequest => ({ tool: 'generate-best-practices', area: 'ui-ux' }),
- unslothBestPractices: (): MCPToolRequest => ({ tool: 'unsloth-best-practices' }),
+ }, uiUxBestPractices: (): MCPToolRequest => ({ tool: 'generate-best-practices', area: 'ui-ux' }, unslothBestPractices: (): MCPToolRequest => ({ tool: 'unsloth-best-practices' }),
  // Integration Suggestions
  aiChatIntegration: (): MCPToolRequest => ({
  tool: 'suggest-integration',
  feature: 'AI chat component',
  requirements: 'legal compliance and audit trails',
- }),
- documentUploadIntegration: (): MCPToolRequest => ({
+ }, documentUploadIntegration: (): MCPToolRequest => ({
  tool: 'suggest-integration',
  feature: 'document upload system',
  requirements: 'security and virus scanning',
- }),
- gamingUIIntegration: (): MCPToolRequest => ({
+ }, gamingUIIntegration: (): MCPToolRequest => ({
  tool: 'suggest-integration',
  feature: 'gaming-style UI components',
  requirements: 'professional legal interface',
@@ -489,37 +473,32 @@ export const commonMCPQueries = {
  tool: 'get-library-docs',
  library: 'sveltekit',
  topic: 'routing',
- }),
- bitsUIDialog: (): MCPToolRequest => ({
+ }, bitsUIDialog: (): MCPToolRequest => ({
  tool: 'get-library-docs',
  library: 'bits-ui',
  topic: 'dialog',
- }),
- drizzleSchema: (): MCPToolRequest => ({
+ }, drizzleSchema: (): MCPToolRequest => ({
  tool: 'get-library-docs',
  library: 'drizzle',
  topic: 'schema',
  }),
  // RAG System Queries
- ragStats: (): MCPToolRequest => ({ tool: 'rag-get-stats' }),
- ragLegalQuery: (query: string, caseId?: string): MCPToolRequest => ({
+ ragStats: (): MCPToolRequest => ({ tool: 'rag-get-stats' }, ragLegalQuery: (query: string, caseId?: string): MCPToolRequest => ({
  tool: 'rag-query',
  query: caseId, confidenceThreshold: 0.7,
  documentTypes: ['contract', 'case_law', 'statute', 'evidence'],
  }), // Corrected syntax
  ragContractAnalysis: (query: string): MCPToolRequest => ({
  tool: 'rag-query',
- query: maxResults
- confidenceThreshold: 0.8,
+ query: maxResults, confidenceThreshold: 0.8,
  documentTypes: ['contract', 'agreement'],
  }), // Corrected syntax
  ragCaseLawSearch: (query: string): MCPToolRequest => ({
  tool: 'rag-query',
- query: maxResults
- confidenceThreshold: 0.75,
+ query: maxResults, confidenceThreshold: 0.75,
  documentTypes: ['case_law', 'judgment', 'precedent'],
  }), // Corrected syntax
- ragEvidenceSearch: (query: string): string: MCPToolRequest => ({
+ ragEvidenceSearch: (query: string), string: MCPToolRequest => ({
  tool: 'rag-query',
  query: caseId, confidenceThreshold: 0.6,
  documentTypes: ['evidence', 'exhibit', 'testimony'],
@@ -527,8 +506,7 @@ export const commonMCPQueries = {
  ragApiIntegration: (): MCPToolRequest => ({
  tool: 'rag-integration-guide',
  integrationType: 'api-integration',
- }),
- ragComponentIntegration: (): MCPToolRequest => ({
+ }, ragComponentIntegration: (): MCPToolRequest => ({
  tool: 'rag-integration-guide',
  integrationType: 'component-integration',
  }), // Corrected backticks
@@ -591,7 +569,7 @@ function formatContentItem(item: any): string {
 function tryGetStringProp(obj: Record<string, unknown>, prop: string): string | undefined {
  // Added type
  const val = obj[prop];
- return typeof val === 'string' ? val  | undefined;
+ return typeof val === 'string' ? val : undefined;
 }
 /** * Quick access to MCP resources */
 export const mcpResources = {
@@ -643,8 +621,7 @@ export async function mcpMemoryReadGraph(): Promise<unknown[]> {
  node: 'legal-workflow-memory',
  relations: ['case-evidence', 'document-analysis'],
  value: `Context7 memory graph integration ready`,
- },
- ];
+ }];
  } catch (err: unknown) {
  const msg = err instanceof Error ? err.message : String(err); // Corrected comma
  return [{ error: msg } as unknown];
@@ -662,10 +639,8 @@ export async function mcpCodebaseAnalyze(prompt: string): Promise<unknown[]> {
  recommendations: [
  'Use SvelteKit file-based routing for legal document workflows',
  'Implement API routes for AI agent integration',
- 'Consider server-side rendering for legal compliance',
- ],
- },
- ];
+ 'Consider server-side rendering for legal compliance'],
+ }];
  } catch (err: unknown) {
  const msg = err instanceof Error ? err.message : String(err); // Corrected comma
  return [{ error: msg } as unknown];
@@ -714,8 +689,7 @@ export async function mcpReadErrorLog(): Promise<unknown[]> {
  message: 'Sample error from MCP',
  severity: 'low',
  timestamp: new Date().toISOString(),
- },
- ]; // Corrected syntax
+ }]; // Corrected syntax
  } catch (err: unknown) {
  const msg = err instanceof Error ? err.message : String(err); // Corrected comma
  return [{ error: msg }];
@@ -791,7 +765,8 @@ export async function mcpSuggestBestPractices(results: any): Promise<AutoMCPSugg
  'Run multi-agent analysis with agents: ["autogen","crewai","copilot"] and enable synthesizeOutputs',
  reasoning: 'Gather broader diagnostics and synthesized insights',
  confidence: 0.6,
- }); // Corrected string
+ });
+  
  }
  return suggestions;
  } catch (err: unknown) {
@@ -802,7 +777,10 @@ export async function mcpSuggestBestPractices(results: any): Promise<AutoMCPSugg
  original: 'mcpSuggestBestPractices failed',
  suggested: 'Check MCP connectivity and input results',
  reasoning: msg, confidence: 0 0.1,
- },
- ];
+ },];
  }
 }
+
+
+
+

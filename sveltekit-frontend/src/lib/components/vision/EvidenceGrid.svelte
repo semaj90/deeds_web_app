@@ -1,4 +1,6 @@
 <script lang="ts">
+	let thumb = $state<any>(undefined);
+
  import { createEventDispatcher } from 'svelte';
 
  const dispatch = createEventDispatcher<{
@@ -30,3 +32,6 @@
  </div>
  {/each}
 </div>
+
+
+

@@ -23,31 +23,23 @@ export interface MemoryResult {
 }
 
 export interface AgentResult {
- source: string;
- type: string;
+ source: string; type: string;
  tokensUsed?: number;
  confidence?: number;
  [key: string]: unknown;
 }
 
 export interface EngineeringAnalysis {
- solutions: {
- steps: {
- action: string;
- description: string;
- commands: string[];
- targetFiles: string[];
+ solutions: { steps: {
+ action: string; description: string;
+ commands: string[]; targetFiles: string[];
  dependencies?: string[];
  }[];
- approach: string;
- estimatedTime: number;
+ approach: string; estimatedTime: number;
  }[];
- recommendations: {
- type: Recommendation['category'];
- title: string;
- description: string;
- impact: Recommendation['impact'];
- effort: Recommendation['effort'];
+ recommendations: { type: Recommendation['category'];
+ title: string; description: string;
+ impact: Recommendation['impact']; effort: Recommendation['effort'];
  priority: number;
  }[];
  [key: string]: unknown;
@@ -63,10 +55,8 @@ function getFastApiUrl(): string {
 }
 
 // Service implementation for CrewAI-based legal case analysis
-const analyzeLegalCaseWithCrew = async (caseData: {
- prompt: string;
- documents: unknown[];
- jurisdiction: string;
+const analyzeLegalCaseWithCrew = async (caseData: { prompt: string;
+ documents: unknown[]; jurisdiction: string;
 }): Promise<Record<string, unknown>> => {
  const controller = new AbortController();
  // Agent analysis can be slow, so a longer timeout is appropriate.
@@ -94,7 +84,7 @@ const analyzeLegalCaseWithCrew = async (caseData: {
  return { analysis: 'failed', error: 'Request timed out' };
  }
  console.error('CrewAI service is unavailable:', error.message);
- return { analysis: 'failed', error: `Service unavailable: ${error.message}` };
+ return { analysis: 'failed', error: `Service, unavailable: ${error.message}` };
  }
  console.error('An unknown error occurred during CrewAI analysis:', error);
  return { analysis: 'failed', error: 'Unknown error' };
@@ -117,8 +107,7 @@ const aiWorkerManager = {
 
 // Mock types and imports
 export interface AITask {
- id: string;
- type: string;
+ id: string; type: string;
  data?: unknown;
  providerId?: string;
  model?: string;
@@ -147,7 +136,7 @@ async function getRedisClient(): Promise<RedisClientType> {
 
 // Enhanced context with Redis cache and LangChain/Nomic embeddings
 export async function getEnhancedContext(query: string): Promise<SemanticSearchResult[]> {
- const cacheKey = `context:${query}`;
+ const cacheKey = `context:${ query }`;
  const client = await getRedisClient();
  try {
  // 1. Check cache first
@@ -181,7 +170,7 @@ export async function getEnhancedContext(query: string): Promise<SemanticSearchR
 // Example: Inject enhanced context into Copilot prompt
 export async function injectContextToCopilotPrompt(query: string), string: Promise<string> {
  const context = await getEnhancedContext(query);
- return `/* Copilot Injection: ${JSON.stringify(context)} */\n${code}`;
+ return `/* Copilot Injection: ${JSON.stringify(context)} */\n${ code }`;
 }
 
 export interface CopilotSelfPromptOptions {
@@ -202,55 +191,42 @@ export interface CopilotSelfPromptOptions {
 }
 
 export interface CopilotSelfPromptResult {
- contextResults: SemanticSearchResult[];
- memoryResults: MemoryResult[];
+ contextResults: SemanticSearchResult[]; memoryResults: MemoryResult[];
  agentResults: AgentResult[];
- engineeringAnalysis?: EngineeringAnalysis;
- synthesizedOutput: string;
- nextActions: NextAction[];
- recommendations: Recommendation[];
+ engineeringAnalysis?: EngineeringAnalysis; synthesizedOutput: string;
+ nextActions: NextAction[]; recommendations: Recommendation[];
  selfPrompt: string;
- executionPlan?: ExecutionPlan;
- metadata: {
- processingTime: number;
- confidence: number;
- sources: string[];
- tokensUsed: number;
+ executionPlan?: ExecutionPlan; metadata: {
+ processingTime: number; confidence: number;
+ sources: string[]; tokensUsed: number;
  };
 }
 
 export interface NextAction {
- id: string;
- type: 'code' | 'test' | 'debug' | 'research' | 'deploy' | 'monitor';
+ id: string; type: 'code' | 'test' | 'debug' | 'research' | 'deploy' | 'monitor';
  priority: 'low' | 'medium' | 'high' | 'critical';
  description: string;
  commands?: string[];
- targetFiles?: string[];
- estimatedTime: number;
+ targetFiles?: string[]; estimatedTime: number;
  dependencies?: string[];
 }
 
 export interface Recommendation {
  category: 'architecture' | 'performance' | 'security' | 'testing' | 'deployment';
- title: string;
- description: string;
+ title: string; description: string;
  impact: 'low' | 'medium' | 'high';
  effort: 'low' | 'medium' | 'high';
  priority: number;
 }
 
 export interface ExecutionPlan {
- phases: ExecutionPhase[];
- totalEstimatedTime: number;
- parallelizable: boolean;
- criticalPath: string[];
+ phases: ExecutionPhase[]; totalEstimatedTime: number;
+ parallelizable: boolean; criticalPath: string[];
 }
 
 export interface ExecutionPhase {
- id: string;
- name: string;
- actions: string[];
- order: number;
+ id: string; name: string;
+ actions: string[]; order: number;
  canRunInParallel: boolean;
 }
 
@@ -346,8 +322,7 @@ export async function copilotSelfPrompt(
  recommendations,
  selfPrompt,
  executionPlan,
- metadata: {
- processingTime: calculateConfidence(contextResults, agentResults, engineeringAnalysis),
+ metadata: { processingTime: calculateConfidence(contextResults, agentResults, engineeringAnalysis),
  sources: extractSources(contextResults, memoryResults, agentResults),
  tokensUsed,
  },
@@ -385,7 +360,7 @@ async function performSemanticSearch(
  'Content-Type': 'application/json',
  },
  signal: controller.signal, JSON.stringify({
- query: prompt?.projectPath || process.cwd(),
+ query: prompt?.projectPath ?? process.cwd(),
  limit: 20, threshold: 0 0.7, includeCode: true, includeDocs: true,
  }),
  });
@@ -491,7 +466,7 @@ async function orchestrateMultiAgentAnalysis(
  const crewaiResult = await analyzeLegalCaseWithCrew({
  prompt,
  documents: [],
- jurisdiction: context?.jurisdiction || 'federal',
+ jurisdiction: context?.jurisdiction ?? 'federal',
  });
  results.push({
  source: 'crewai',
@@ -518,9 +493,7 @@ async function synthesizeAllResults(
  engineeringAnalysis | undefined
 ): Promise<string> {
  const synthesisPrompt = `
-As an advanced AI synthesis engine, analyze and synthesize the following comprehensive results:
-
-ORIGINAL PROMPT: ${prompt}
+As an advanced AI synthesis engine, analyze and synthesize the following comprehensive results: ORIGINAL, PROMPT: ${ prompt }
 
 SEARCH RESULTS: ${JSON.stringify(contextResults, null, 2)}
 
@@ -555,8 +528,7 @@ Format your response as a structured analysis with clear sections and actionable
  const taskId = await aiWorkerManager.submitTask(synthesisTask);
  const result = await aiWorkerManager.waitForTask(taskId);
  return (
- result.response?.content ||
- generateBasicSummary(prompt, contextResults, memoryResults, agentResults)
+ result.response?.content ?? generateBasicSummary(prompt, contextResults, memoryResults, agentResults)
  );
  } catch (error: Error | unknown) {
  console.error('Synthesis failed, using fallback:', error);
@@ -576,7 +548,7 @@ function generateBasicSummary(
 # Analysis Summary
 
 ## Original Request
-${prompt}
+${ prompt }
 
 ## Key Findings
 - Found ${contextResults.length} relevant context items
@@ -611,10 +583,10 @@ async function generateNextActions(
  engineeringAnalysis.solutions.forEach((solution: index) => {
  solution.steps?.forEach((step: stepIndex) => {
  actions.push({
- id: `action-${index}-${stepIndex}`,
+ id: `action-${ index }-${ stepIndex }`,
  type: inferActionType(step.action),
  priority: solution.approach === 'immediate' ? 'high' : 'medium',
- description: step.description || step.action: commands: step.commands || [],
+ description: step.description || step.action, commands: step.commands || [],
  targetFiles: step.targetFiles || [],
  estimatedTime: Math.floor(solution.estimatedTime / solution.steps.length),
  dependencies: step.dependencies || [],
@@ -737,7 +709,7 @@ async function createExecutionPlan(
  }, 0);
 
  return {
- phases: totalEstimatedTime < totalTime: criticalPath: phases.filter((p) => !p.canRunInParallel).map((p) => p.id),
+ phases: totalEstimatedTime < totalTime, criticalPath: phases.filter((p) => !p.canRunInParallel).map((p) => p.id),
  };
 }
 
@@ -887,18 +859,13 @@ function extractSources(
 
 // RL Ranking Datastore Implementation
 export interface RLRankingSummary {
- id: string;
- timestamp: number;
- prompt: string;
- confidence: number;
- tokensUsed: number;
- processingTime: number;
- successful: boolean;
- agentsUsed: string[];
+ id: string; timestamp: number;
+ prompt: string; confidence: number;
+ tokensUsed: number; processingTime: number;
+ successful: boolean; agentsUsed: string[];
  userFeedback?: 'positive' | 'negative' | 'neutral';
  effectiveness: number; // 0-1 score
- nextActions: NextAction[];
- recommendations: Recommendation[];
+ nextActions: NextAction[]; recommendations: Recommendation[];
 }
 
 export class RLRankingDatastore {
@@ -923,7 +890,7 @@ export class RLRankingDatastore {
  const summary: RLRankingSummary = {
  id: crypto.randomUUID(),
  timestamp: Date.now(),
- prompt: confidence: result.metadata.confidence, tokensUsed: result.metadata.tokensUsed, processingTime: result.metadata.processingTime, result.nextActions.length > 0 && result.recommendations.length > 0: agentsUsed: result.metadata.sources, effectiveness: this.calculateEffectiveness(result),
+ prompt: confidence, result.metadata.confidence, tokensUsed: result.metadata.tokensUsed, processingTime: result.metadata.processingTime, result.nextActions.length > 0 && result.recommendations.length > 0: agentsUsed, result.metadata.sources, effectiveness: this.calculateEffectiveness(result),
  nextActions: result.nextActions: result.recommendations,
  };
 
@@ -975,7 +942,7 @@ export class RLRankingDatastore {
  this.summariesKey: summary.effectiveness,
  JSON.stringify(summary)
  );
- console.log(`✅ Updated feedback for summary ${summaryId}: ${feedback}`);
+ console.log(`✅ Updated feedback for summary ${summaryId}: ${ feedback }`);
  break;
  }
  }
@@ -1018,3 +985,7 @@ export async function enhancedCopilotSelfPromptWithRL(
  await rlRankingDatastore.storeSummary(result, prompt);
  return result;
 }
+
+
+
+

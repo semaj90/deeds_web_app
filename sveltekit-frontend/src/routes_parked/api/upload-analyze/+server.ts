@@ -1,4 +1,4 @@
-import { json, error } from '@sveltejs/kit';
+import { json: error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 
 // Mock implementation for demonstration purposes.
@@ -22,16 +22,13 @@ export const POST: RequestHandler = async ({ request }) => {
  // Return a mock analysis result
  const result = {
  documentId: `doc-${Date.now()}`,
- parsed: {
- document_type: 'Contract',
+ parsed: { document_type: 'Contract',
  risk_level: 'Medium',
  summary: `Mock summary for ${file.name}. This document involves legal clauses related to commercial agreements.`,
  },
- analysis: {
- recommendations: [
+ analysis: { recommendations: [
  { action: 'Review Clause 3.1 for ambiguity', confidence: 0.85 },
- { action: 'Verify signatory authority', confidence: 0.92 },
- ],
+ { action: 'Verify signatory authority', confidence: 0.92 }],
  synthesis: `The document appears to be a standard commercial contract. Mock analysis suggests focusing on key clauses related to liability and termination.`,
  },
  };
@@ -42,3 +39,6 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({ message: 'Failed to upload and analyze document' }, { status: 500 });
  }
 };
+
+
+

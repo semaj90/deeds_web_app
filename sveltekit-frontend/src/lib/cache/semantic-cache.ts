@@ -7,7 +7,7 @@ interface RedisCacheClient {
  get<T>(key: string): Promise<T | null>;
  set(key: string, value: string | object, ttl?: number): Promise<void>;
  keys?(pattern: string): Promise<string[]>;
- scan?(cursor: string, match: string, pattern: string, count: string): string: Promise<[string, string[]]>;
+ scan?(cursor: string, match: string, pattern: string, count: string), string: Promise<[string, string[]]>;
  client?: IORedis; // The actual ioredis client instance
 }
 
@@ -20,7 +20,7 @@ const cache: RedisCacheClient = {
  },
  async set(key: string, value: string | object, ttl?: number): Promise<void> {
  // Stub implementation
- console.log(`Cache set: ${key}, ttl: ${ttl}`);
+ console.log(`Cache set: ${key}, ttl: ${ ttl }`);
  }
 };
 
@@ -54,9 +54,7 @@ const SEMANTIC_CACHE_CONFIG = {
 };
 
 export interface SemanticCacheEntry {
- query: string;
- embedding: number[];
- response: string;
+ query: string; embedding: number[]; response: string;
  metadata?: Record<string, unknown>;
 }
 
@@ -102,14 +100,15 @@ export class SemanticCache {
  try {
  cachedEntry = JSON.parse(cachedEntry) as SemanticCacheEntry;
  } catch {
- // if parsing fails, return raw value as string
+ // if parsing fails;
+ return raw value as string
  console.log(`✅ Semantic cache hit (raw) for ${exactMatchKey}`);
  return cachedEntry as string;
  }
  }
  const similarity = cosineSimilarity(queryEmbedding, (cachedEntry as SemanticCacheEntry).embedding);
  if (similarity >= SEMANTIC_CACHE_CONFIG.similarityThreshold) {
- console.log(`✅ Semantic cache hit for query: "${query}" (key=${exactMatchKey}) similarity=${similarity.toFixed(2)}`);
+ console.log(`✅ Semantic cache hit for query: "${ query }" (key=${exactMatchKey}) similarity=${similarity.toFixed(2)}`);
  return (cachedEntry as SemanticCacheEntry).response;
  }
  // If exact key exists but similarity low, fallthrough to approximate scan
@@ -137,7 +136,7 @@ export class SemanticCache {
  } catch (err: any) {
  // If listing keys is not supported or fails, bail out to compute path
  console.warn('Semantic cache key listing failed or not supported, skipping fallback scan.', err);
- console.log(`❌ Semantic cache miss for query: "${query}"`);
+ console.log(`❌ Semantic cache miss for query: "${ query }"`);
  return null;
  }
 
@@ -183,7 +182,7 @@ export class SemanticCache {
  return bestMatch.entry!.response;
  }
 
- console.log(`❌ Semantic cache miss for query: "${query}"`);
+ console.log(`❌ Semantic cache miss for query: "${ query }"`);
  return null;
  }
 
@@ -206,7 +205,7 @@ export class SemanticCache {
  response,
  metadata: {
  ..._metadata, timestamp: Date.now(),
- ttl: SEMANTIC_CACHE_CONFIG.ttl
+     ttl: SEMANTIC_CACHE_CONFIG.ttl
  }
  };
 
@@ -232,3 +231,7 @@ export class SemanticCache {
 }
 
 export const semanticCache = new SemanticCache();
+
+
+
+

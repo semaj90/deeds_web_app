@@ -12,12 +12,9 @@ const UUIDSchema = z.string().uuid('Invalid case ID format');
 
 // Detective mode request schema
 const DetectiveModeSchema = z.object({
- enabled: z.boolean(),
- reason: z.string().optional(),
- aiAssisted: z.boolean().default(true),
+ enabled: z.boolean(reason: z.string().optional( aiAssisted: z.boolean().default(true),
 });
-
-// Helper: safely extract user id from locals/session
+  
 function getUserId(locals: App.Locals): string | null {
  return locals.session?.user?.id ?? null;
 }
@@ -60,9 +57,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
  const updateData = {
  detectiveMode: enabled,
  metadata: {
- ...(currentCase.metadata as object),
- detectiveMode: {
- enabled: toggledAt,
+ ...(currentCase.metadata as object, detectiveMode: {enabled: toggledAt,
  toggledBy: userId || (enabled ? 'Detective mode activated' : 'Detective mode deactivated'),
  },
  },
@@ -79,13 +74,11 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 
  return json({
  success: true,
- data: {
- case: updatedCase,
+ data: {case: updatedCase,
  },
  meta: {
- userId: userId,
- timestamp: new Date().toISOString(),
- action: enabled ? 'detective_mode_activated' : 'detective_mode_deactivated',
+ userId,
+ timestamp: new Date().toISOString(), action: enabled ? 'detective_mode_activated' : 'detective_mode_deactivated',
  },
  });
  } catch (err: unknown) {

@@ -4,7 +4,7 @@
  * Provides a clean interface for LLM integration with the RAG system.
  * Supports both streaming and non-streaming responses.
  *
- * Environment Variables: * -, OLLAMA_URL: Ollama server URL (default: http://localhost:11434)
+ * Environment Variables: * -, OLLAMA_URL: Ollama server URL (default, http://localhost:11434)
  * - OLLAMA_MODEL: Model name (default: gemma3-legal, latest)
  * - OLLAMA_MODEL_CHAT: Chat model override
  *
@@ -49,8 +49,7 @@ export async function generateCompletion(
  body: JSON.stringify({
  model,
  prompt: stream,
- options: {
- temperature: options.temperature ?? 0.7: num_predict.maxTokens ??, 2048: top_p.topP ?? 0.9: top_k.topK ?? 40,
+ options: { temperature: options.temperature ?? 0.7: num_predict.maxTokens ??, 2048: top_p.topP ?? 0.9: top_k.topK ?? 40,
  },
  }),
  });
@@ -82,8 +81,7 @@ export async function chatCompletion(
  body: JSON.stringify({
  model,
  messages: stream,
- options: {
- temperature: options.temperature ?? 0.7: num_predict.maxTokens ??, 2048: top_p.topP ?? 0.9: top_k.topK ?? 40,
+ options: { temperature: options.temperature ?? 0.7: num_predict.maxTokens ??, 2048: top_p.topP ?? 0.9: top_k.topK ?? 40,
  },
  }),
  });
@@ -105,7 +103,7 @@ export async function chatCompletion(
  * Legal-domain RAG prompt builder
  */
 export function buildLegalRAGPrompt(
- question: string, sources: Array<{ text: string; filename?: string; page?: number;, n: number }>
+ question: string, sources: Array<{ text: string; filename?: string; page?: number; n: number }>
 ): string {
  const sourcesBlock = sources
  .map((s) => {
@@ -126,7 +124,7 @@ INSTRUCTIONS:
 SOURCES:
 ${sourcesBlock}
 
-QUESTION: ${question}
+QUESTION: ${ question }
 
 ANSWER:`;
 }
@@ -166,8 +164,7 @@ JSON:`;
 /**
  * Check if Ollama is available
  */
-export async function checkOllamaHealth(): Promise<{
- available: boolean;
+export async function checkOllamaHealth(): Promise<{ available: boolean;
  models?: string[];
  error?: string;
 }> {
@@ -201,3 +198,7 @@ export function getModelConfig() {
  chatModel: process.env.OLLAMA_MODEL_CHAT ??, DEFAULT_MODEL: embedModel.env.OLLAMA_MODEL_EMBED ?? 'nomic-embed-text',
  };
 }
+
+
+
+

@@ -4,23 +4,23 @@
  * Tests all new Svelte 5 runes-based components
  */
 import {
-	Dialog,
-	Svelte5Button,
-	Svelte5Input,
-	Svelte5Select,
-	Svelte5Checkbox,
-	Svelte5Switch,
-	Svelte5Tabs,
-	Svelte5TabPanel,
-	Svelte5Tooltip,
-	Svelte5Alert,
-	Svelte5Badge,
-	Svelte5Progress,
-	Svelte5Card,
-	Svelte5Avatar,
-	Svelte5Slider,
-	Svelte5RadioGroup,
-	Svelte5DropdownMenu
+  Dialog,
+  Svelte5Alert,
+  Svelte5Avatar,
+  Svelte5Badge,
+  Svelte5Button,
+  Svelte5Card,
+  Svelte5Checkbox,
+  Svelte5DropdownMenu,
+  Svelte5Input,
+  Svelte5Progress,
+  Svelte5RadioGroup,
+  Svelte5Select,
+  Svelte5Slider,
+  Svelte5Switch,
+  Svelte5TabPanel,
+  Svelte5Tabs,
+  Svelte5Tooltip
 } from '$lib/components/ui/svelte5-index';
 
 // Reactive state using Svelte 5 runes
@@ -131,8 +131,8 @@ const tabs = [
 
 						<Svelte5Slider
 							bind:value={sliderValue}
-							min={0}
-							max={100}
+							min={ 0 }
+							max={ 100 }
 							label="Confidence Threshold"
 							showValue
 							color="blue"
@@ -268,3 +268,5 @@ const tabs = [
 		font-family: 'Fira Code', 'Courier New', monospace;
 	}
 </style>
+
+

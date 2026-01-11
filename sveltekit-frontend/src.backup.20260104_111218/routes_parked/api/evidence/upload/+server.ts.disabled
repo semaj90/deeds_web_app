@@ -1,0 +1,245 @@
+/**
+ * Evidence Upload API
+ * Auto-creates case if missing, routes to MinIO, logs chain-of-custody
+ */
+
+import { json, type RequestHandler } from '@sveltejs/kit';
+import { getUser } from '$lib/server/auth/lucia';
+import { db } from '$lib/server/db';
+import {
+  wardenCases,
+  wardenEvidence,
+  wardenAuditLog,
+  wardenFileLocks,
+} from '$lib/server/db/warden-schema';
+import { eq } from 'drizzle-orm';
+import crypto from 'crypto';
+import { redis } from '$lib/server/cache/redis';
+
+interface UploadRequest {
+  caseId?: string;
+  file: File;
+}
+
+/**
+ * Auto-create case for prosecutor if missing
+ */
+async function autoCreateCase(prosecutorId: string): Promise<string> {
+  const [newCase] = await db;
+    .insert(wardenCases)
+    .values({
+      prosecutorId,
+      title: `Case ${new Date().toISOString().split('T')[0]}`,
+    })
+    .returning({ id: wardenCases.id });
+
+  return newCase.id;
+}
+
+/**
+ * Calculate SHA-256 hash
+ */
+function calculateSHA256(buffer: Buffer): string {
+  return crypto.createHash('sha256').update(buffer).digest('hex');
+}
+
+/**
+ * Route upload to Python worker
+ */
+async function routeUpload(
+  fileBuffer: Buffer,
+  fileName: string,
+  caseId: string,
+  prosecutorId: string
+): Promise<{
+  bucket: string;
+  objectPath: string;
+  sha256: string;
+  documentType: string;
+  confidence: number;
+}> {
+  const pythonWorkerUrl = process.env.PYTHON_WORKER_URL || 'http://localhost:8000';
+
+  try {
+    const response = await fetch(`${pythonWorkerUrl}/route`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: prosecutorId,
+        case_id: caseId,
+        file_name: fileName,
+        file: fileBuffer.toString('base64'),
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Python worker error: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Routing error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Log to Loki (chain-of-custody)
+ */
+async function logToLoki(
+  prosecutorId: string,
+  caseId: string,
+  evidenceId: string,
+  action: string,
+  details: Record<string, unknown>
+): Promise<void> {
+  const lokiUrl = process.env.LOKI_URL || 'http://localhost:3100';
+
+  try {
+    await fetch(`${lokiUrl}/loki/api/v1/push`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        streams: [
+          {
+            stream: {
+              job: 'warden-evidence',
+              prosecutor_id: prosecutorId,
+              case_id: caseId,
+              action,
+            },
+            values: [
+              [
+                Date.now().toString() + '000000',
+                JSON.stringify({
+                  evidence_id: evidenceId,
+                  action,
+                  ...details,
+                }),
+              ],
+            ],
+          },
+        ],
+      }),
+    });
+  } catch (error) {
+    console.error('Loki logging error:', error);
+    // Don't fail upload if logging fails
+  }
+}
+
+export const POST: RequestHandler = async ({ request, locals }) => {
+  try {
+    // 1. Authenticate
+    const user = await getUser(locals);
+    if (!user) {
+      return json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // 2. Parse form data
+    const formData = await request.formData();
+    const file = formData.get('file') as File;
+    let caseId = formData.get('caseId') as string | null;
+
+    if (!file) {
+      return json({ error: 'No file provided' }, { status: 400 });
+    }
+
+    // 3. Auto-create case if missing
+    if (!caseId) {
+      caseId = await autoCreateCase(user.id);
+    }
+
+    // 4. Verify case belongs to prosecutor
+    const caseRecord = await db.query.wardenCases.findFirst({
+      where: eq(wardenCases.id, caseId),
+    });
+
+    if (!caseRecord || caseRecord.prosecutorId !== user.id) {
+      return json({ error: 'Case not found or unauthorized' }, { status: 403 });
+    }
+
+    // 5. Read file and calculate hash
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    const sha256 = calculateSHA256(fileBuffer);
+
+    // 6. Check file lock (prevent double-ingest)
+    const existingLock = await redis.get(`file-lock:${sha256}`);
+    if (existingLock) {
+      return json({ error: 'File is being processed' }, { status: 409 });
+    }
+
+    // 7. Acquire lock (5 minute TTL)
+    await redis.setex(`file-lock:${sha256}`, 300, user.id);
+
+    // 8. Route to Python worker
+    const routeResult = await routeUpload(fileBuffer, file.name, caseId, user.id);
+
+    // 9. Store evidence record
+    const [evidence] = await db;
+      .insert(wardenEvidence)
+      .values({
+        caseId,
+        prosecutorId: user.id,
+        fileName: file.name,
+        sha256,
+        mimeType: file.type,
+        fileSize: fileBuffer.length,
+        minioPath: routeResult.objectPath,
+        minioBucket: routeResult.bucket,
+        documentType: routeResult.documentType,
+        inferenceConfidence: routeResult.confidence,
+        status: 'pending',
+        metadata: {
+          uploadedAt: new Date().toISOString(),
+          fileSize: fileBuffer.length,
+        },
+      })
+      .returning({ id: wardenEvidence.id });
+
+    // 10. Log to audit trail
+    await db.insert(wardenAuditLog).values({
+      prosecutorId: user.id,
+      caseId,
+      evidenceId: evidence.id,
+      action: 'UPLOAD',
+      sha256,
+      details: {
+        fileName: file.name,
+        bucket: routeResult.bucket,
+        documentType: routeResult.documentType,
+        confidence: routeResult.confidence,
+      },
+    });
+
+    // 11. Log to Loki
+    await logToLoki(user.id, caseId, evidence.id, 'UPLOAD', {
+      file_name: file.name,
+      bucket: routeResult.bucket,
+      document_type: routeResult.documentType,
+      confidence: routeResult.confidence,
+      sha256,
+    });
+
+    // 12. Release lock
+    await redis.del(`file-lock:${sha256}`);
+
+    return json({
+      success: true,
+      evidenceId: evidence.id,
+      caseId,
+      sha256,
+      bucket: routeResult.bucket,
+      objectPath: routeResult.objectPath,
+      documentType: routeResult.documentType,
+      confidence: routeResult.confidence,
+      status: 'pending',
+    });
+  } catch (error) {
+    console.error('Upload error:', error);
+    return json(
+      { error: error instanceof Error ? error.message : 'Upload failed' },
+      { status: 500 }
+    );
+  }
+};

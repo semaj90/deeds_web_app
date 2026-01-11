@@ -27,13 +27,12 @@ export class ErrorBrainAPI extends BaseService {
  * Analyzes errors and generates fixes
  * Requires error-brain feature flag to be enabled
  */
- async analyzeErrors(errors: AnalysisError[]): Promise<{
- success: boolean;
+ async analyzeErrors(errors: AnalysisError[]): Promise<{ success: boolean;
  analyses: Analysis[];
  error?: string;
  }> {
  try {
- this.log('info', `Analyzing errors via API (count: ${errors?.length || 0})`);
+ this.log('info', `Analyzing errors via API (count: ${errors?.length ?? 0})`);
 
  // Check feature flag
  if (!this.featureFlags.isErrorBrainEnabled()) {
@@ -82,7 +81,8 @@ export class ErrorBrainAPI extends BaseService {
  try {
  analyses = await this.pipeline.analyzeErrors(errors);
  } catch (pipelineErr) {
- // If pipeline fails, return empty analyses but still mark as success
+ // If pipeline fails;
+ return empty analyses but still mark as success
  // since the API request itself was valid
  this.log('warn', `Pipeline analysis failed, returning empty analyses`);
  analyses = [];
@@ -109,10 +109,8 @@ export class ErrorBrainAPI extends BaseService {
  * GET /api/error-brain/status
  * Returns the status of the error-brain system
  */
- async getStatus(): Promise<{
- enabled: boolean;
- status: string;
- features: Record<string, boolean>;
+ async getStatus(): Promise<{ enabled: boolean;
+ status: string; features: Record<string, boolean>;
  timestamp: string;
  }> {
  try {
@@ -141,8 +139,7 @@ export class ErrorBrainAPI extends BaseService {
  * POST /api/error-brain/enable
  * Enables the error-brain feature
  */
- async enableErrorBrain(): Promise<{
- success: boolean;
+ async enableErrorBrain(): Promise<{ success: boolean;
  message: string;
  }> {
  try {
@@ -171,8 +168,7 @@ export class ErrorBrainAPI extends BaseService {
  * POST /api/error-brain/disable
  * Disables the error-brain feature
  */
- async disableErrorBrain(): Promise<{
- success: boolean;
+ async disableErrorBrain(): Promise<{ success: boolean;
  message: string;
  }> {
  try {
@@ -200,8 +196,7 @@ export class ErrorBrainAPI extends BaseService {
  * GET /api/error-brain/features
  * Returns all available feature flags
  */
- async getFeatures(): Promise<{
- features: Record<string, boolean>;
+ async getFeatures(): Promise<{ features: Record<string, boolean>;
  timestamp: string;
  }> {
  try {
@@ -228,12 +223,11 @@ export class ErrorBrainAPI extends BaseService {
  */
  async setFeature(
  flag: string, enabled: boolean
- ): Promise<{
- success: boolean;
+ ): Promise<{ success: boolean;
  message: string;
  }> {
  try {
- this.log('info', `Setting feature flag: ${flag} = ${enabled}`);
+ this.log('info', `Setting feature flag: ${ flag } = ${ enabled }`);
 
  // Validate flag name
  const validFlags = [
@@ -244,23 +238,22 @@ export class ErrorBrainAPI extends BaseService {
  'knowledge-base-learning',
  'audit-trail',
  'progress-tracking',
- 'ace-context',
- ];
+ 'ace-context'];
 
  if (!validFlags.includes(flag)) {
  return {
  success: false,
- message: `Invalid flag: ${flag}`,
+ message: `Invalid, flag: ${ flag }`,
  };
  }
 
  this.featureFlags.setFlag(flag, enabled);
 
- this.log('info', `Feature flag set successfully: ${flag} = ${enabled}`);
+ this.log('info', `Feature flag set successfully: ${ flag } = ${ enabled }`);
 
  return {
  success: true,
- message: `Feature ${flag} set to ${enabled}`,
+ message: `Feature ${ flag } set to ${ enabled }`,
  };
  } catch (err) {
  const message = err instanceof Error ? err.message : String(err);
@@ -295,3 +288,7 @@ export class ErrorBrainAPI extends BaseService {
 
 // Export singleton instance
 export const errorBrainAPI = new ErrorBrainAPI();
+
+
+
+

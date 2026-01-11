@@ -1,4 +1,20 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+	let id = $state<any>(undefined);
+	let label = $state<any>(undefined);
+	let type = $state<any>(undefined);
+	let name = $state<any>(undefined);
+	let disabled = $state<any>(undefined);
+	let readonly = $state<any>(undefined);
+	let required = $state<any>(undefined);
+	let autocomplete = $state<any>(undefined);
+	let min = $state<any>(undefined);
+	let max = $state<any>(undefined);
+	let step = $state<any>(undefined);
+	let pattern = $state<any>(undefined);
+	let maxlength = $state<any>(undefined);
+	let minlength = $state<any>(undefined);
+
 /**
  * Svelte 5 Input Component
  * Native HTML with Svelte 5 runes and accessible input
@@ -79,8 +95,7 @@ let variantClasses = $derived({
 	default: `
 		bg-slate-800 text-white
 		border-2 border-slate-600
-		hover:border-slate-500
-		focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20
+		hover: border-slate-500, focus:border-blue-500 focus: ring-2, focus:ring-blue-500/20
 		placeholder:text-slate-400
 	`,
 	nes: `
@@ -92,15 +107,14 @@ let variantClasses = $derived({
 	ghost: `
 		bg-transparent text-white
 		border-b-2 border-slate-600
-		hover:border-slate-500
-		focus:border-blue-500
+		hover: border-slate-500, focus:border-blue-500
 		placeholder:text-slate-400
 		rounded-none
 	`
 }[variant].replace(/\s+/g, ' ').trim());
 
 let errorClasses = $derived(
-	error ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''
+	error ? 'border-red-500 focus: border-red-500, focus:ring-red-500/20' : ''
 );
 
 function handleInput(e: Event) {
@@ -161,15 +175,15 @@ function handleBlur() {
 			bind:value
 			class="w-full rounded-lg outline-none transition-all duration-150
 				   {sizeClasses} {variantClasses} {errorClasses}
-				   disabled:opacity-50 disabled:cursor-not-allowed
+				   disabled: opacity-50, disabled:cursor-not-allowed
 				   {prefix ? 'pl-10' : ''}
 				   {suffix ? 'pr-10' : ''}"
-			oninput={handleInput}
-			onchange={handleChange}
-			onfocus={handleFocus}
-			onblur={handleBlur}
+			oninput={ handleInput }
+			onchange={ handleChange }
+			onfocus={ handleFocus }
+			onblur={ handleBlur }
 			aria-invalid={!!error}
-			aria-describedby={error ? `${id}-error`  | undefined}
+			aria-describedby={error ? `${id}-error` : undefined}
 		/>
 
 		{#if suffix}
@@ -185,3 +199,5 @@ function handleBlur() {
 		</p>
 	{/if}
 </div>
+
+

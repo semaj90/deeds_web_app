@@ -174,7 +174,7 @@ export async function getErrorClusterCount(routeId: string): Promise<number> {
     .from(errorCluster)
     .where(and(eq(errorCluster.routeId, routeId), isNull(errorCluster.archivedAt)));
 
-  return Number(result[0]?.count || 0);
+  return Number(result[0]?.count ?? 0);
 }
 
 // ============================================================================
@@ -232,7 +232,7 @@ export async function getErrorClusters(
     .from(errorCluster)
     .where(and(...conditions));
 
-  const total = Number(countResult[0]?.count || 0);
+  const total = Number(countResult[0]?.count ?? 0);
 
   return {
     clusters,
@@ -293,7 +293,7 @@ export async function getUnresolvedErrorCount(routeId: string): Promise<number> 
       )
     );
 
-  return Number(result[0]?.count || 0);
+  return Number(result[0]?.count ?? 0);
 }
 
 /**
@@ -354,7 +354,7 @@ export async function getHealthEvents(
     .from(routeHealthEvent)
     .where(eq(routeHealthEvent.routeId, routeId));
 
-  const total = Number(countResult[0]?.count || 0);
+  const total = Number(countResult[0]?.count ?? 0);
 
   return {
     events,
@@ -440,7 +440,7 @@ export async function getSuggestionCount(routeId: string): Promise<number> {
     .from(errorBrainAnalysis)
     .where(eq(errorBrainAnalysis.routeId, routeId));
 
-  return Number(result[0]?.count || 0);
+  return Number(result[0]?.count ?? 0);
 }
 
 // ============================================================================
@@ -478,8 +478,7 @@ export async function updatePatchVerificationStatus(
     .update(errorBrainPatch)
     .set({
       verificationStatus: status,
-      verificationTimestamp: new Date(),
-      verificationMessage: message,
+      verificationTimestamp: new Date( verificationMessage: message,
     })
     .where(eq(errorBrainPatch.id, patchId))
     .returning();
@@ -534,7 +533,7 @@ export async function getInteractions(
     .from(routeInteractionLog)
     .where(eq(routeInteractionLog.routeId, routeId));
 
-  const total = Number(countResult[0]?.count || 0);
+  const total = Number(countResult[0]?.count ?? 0);
 
   return {
     interactions,
@@ -562,13 +561,12 @@ export async function getEnrichedRouteMetadata(routeId: string) {
     getUnresolvedErrorCount(routeId),
     getMostRecentHealthStatus(routeId),
     getSuggestionCount(routeId),
-    getLastError(routeId),
-  ]);
+    getLastError(routeId)]);
 
   return {
     ...route,
     errorCount,
-    healthStatus: recentHealth?.newStatus || route.status,
+    healthStatus: recentHealth?.newStatus ?? route.status,
     suggestionCount,
     lastHealthChange: recentHealth?.createdAt,
     lastErrorMessage: lastError?.message,
@@ -590,13 +588,12 @@ export async function getAllEnrichedRouteMetadata() {
         getUnresolvedErrorCount(route.routeId),
         getMostRecentHealthStatus(route.routeId),
         getSuggestionCount(route.routeId),
-        getLastError(route.routeId),
-      ]);
+        getLastError(route.routeId)]);
 
       return {
         ...route,
         errorCount,
-        healthStatus: recentHealth?.newStatus || route.status,
+        healthStatus: recentHealth?.newStatus ?? route.status,
         suggestionCount,
         lastHealthChange: recentHealth?.createdAt,
         lastErrorMessage: lastError?.message,
@@ -605,3 +602,5 @@ export async function getAllEnrichedRouteMetadata() {
     })
   );
 }
+
+

@@ -5,13 +5,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { caseSummaryService } from '../case-summary.service.js';
 import { ragService } from '../rag.service.js';
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';
 
 // Mock cacheService module
 vi.mock('../cache.service', () => ({
- cacheService: {
- getOrSet: vi.fn(),
- invalidate: vi.fn(),
+ cacheService: { getOrSet: vi.fn( invalidate: vi.fn(),
  }
 }));
 
@@ -80,8 +78,7 @@ describe('Performance Tests', () => {
  text: 'Cached summary',
  citations: [],
  holding: 'Holding',
- version: 1, createdAt: new Date(),
- createdBy: 'user-123',
+ version: 1, createdAt: new Date( createdBy: 'user-123',
  isCurrent: true,
  };
 
@@ -108,8 +105,7 @@ describe('Performance Tests', () => {
  text: 'Cached',
  citations: [],
  holding: 'Holding',
- version: 1, createdAt: new Date(),
- createdBy: 'user-123',
+ version: 1, createdAt: new Date( createdBy: 'user-123',
  isCurrent: true,
  });
 
@@ -145,8 +141,7 @@ describe('Performance Tests', () => {
  const queries = [
  { query: 'negligence', jurisdiction: 'CA' },
  { query: 'contract', jurisdiction: 'NY' },
- { query: 'property', jurisdiction: 'TX' },
- ];
+ { query: 'property', jurisdiction: 'TX' }];
 
  vi.mocked(cacheService.getOrSet).mockResolvedValue([]);
 
@@ -173,8 +168,7 @@ describe('Performance Tests', () => {
  text: 'Cached',
  citations: [],
  holding: 'Holding',
- version: 1, createdAt: new Date(),
- createdBy: 'user-123',
+ version: 1, createdAt: new Date( createdBy: 'user-123',
  isCurrent: true,
  });
 
@@ -201,8 +195,7 @@ describe('Performance Tests', () => {
  text: 'Cached',
  citations: [],
  holding: 'Holding',
- version: 1, createdAt: new Date(),
- createdBy: 'user-123',
+ version: 1, createdAt: new Date( createdBy: 'user-123',
  isCurrent: true,
  });
 
@@ -220,3 +213,6 @@ describe('Performance Tests', () => {
  });
  });
 });
+
+
+

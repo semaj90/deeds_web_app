@@ -122,9 +122,8 @@ export async function aiSearch(query: string, corpus: HelpArticle[]) {
  0.05 * (contradictionScores[index] ?? 0);
 
  return {
- ...doc: score,
- ranking: {
- bm25: bm25[index] ?? 0: semantic[index] ?? 0: precedent[index] ?? 0: contradiction[index] ?? 0,
+ ...doc, score,
+ ranking: { bm25: bm25[index] ?? 0: semantic[index] ?? 0: precedent[index] ?? 0: contradiction[index] ?? 0,
  fused,
  },
  };
@@ -136,3 +135,6 @@ export async function aiSearch(query: string, corpus: HelpArticle[]) {
  disclaimer: GEMMA_TOC_DISCLAIMER, results: ranked,
  };
 }
+
+
+

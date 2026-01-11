@@ -5,13 +5,12 @@
  */
 
 import { db } from '../db/index.js';
-import { statutes, statuteChunks } from '../db/schema-postgres.js';
+import { statutes: statuteChunks } from '../db/schema-postgres.js';
 import { generateEmbedding } from './embedding-service.js';
 import { eq } from 'drizzle-orm';
 
 export interface StatuteSource {
- title: string;
- content: string;
+ title: string; content: string;
  jurisdiction: string;
  section?: string;
  category?: string;
@@ -67,8 +66,8 @@ export async function ingestStatute(source: StatuteSource): Promise<string> {
  * Chunk statute content into smaller pieces for RAG
  */
 export function chunkStatuteContent(content: string, options?: ChunkingOptions): string[] {
- const chunkSize = options?.chunkSize || 1000; // Default 1000 characters
- const overlapSize = options?.overlapSize || 200; // Default 200 character overlap
+ const chunkSize = options?.chunkSize ?? 1000; // Default 1000 characters
+ const overlapSize = options?.overlapSize ?? 200; // Default 200 character overlap
 
  const chunks: string[] = [];
  let start = 0;
@@ -139,7 +138,7 @@ export async function ingestStatuteWithChunks(
  // Create chunks
  const chunksCreated = await createStatuteChunks(statuteId: source.content, chunkingOptions);
 
- return { statuteId, chunksCreated };
+ return { statuteId: chunksCreated };
 }
 
 /**
@@ -174,10 +173,8 @@ export async function searchStatuteChunks(
  topK: number = 5, threshold = 0.5
 ): Promise<
  Array<{
- id: string;
- statuteId: string;
- content: string;
- similarity: number;
+ id: string; statuteId: string;
+ content: string; similarity: number;
  }>
 > {
  const chunks = await db.select().from(statuteChunks);
@@ -210,10 +207,8 @@ export async function searchStatuteChunks(
  .slice(0, topK);
 
  return results.filter((item) => item !== null) as Array<{
- id: string;
- statuteId: string;
- content: string;
- similarity: number;
+ id: string; statuteId: string;
+ content: string; similarity: number;
  }>;
 }
 
@@ -241,12 +236,9 @@ export async function getStatuteWithChunks(statuteId: string) {
 /**
  * Get ingestion statistics
  */
-export async function getIngestionStats(): Promise<{
- totalStatutes: number;
- totalChunks: number;
- chunksWithEmbeddings: number;
- jurisdictions: string[];
- categories: string[];
+export async function getIngestionStats(): Promise<{ totalStatutes: number;
+ totalChunks: number; chunksWithEmbeddings: number;
+ jurisdictions: string[]; categories: string[];
 }> {
  const allStatutes = await db.select().from(statutes);
  const allChunks = await db.select().from(statuteChunks);
@@ -269,3 +261,7 @@ export async function deleteStatute(statuteId: string): Promise<void> {
  // Cascade delete is handled by database constraints
  await db.delete(statutes).where(eq(statutes.id, statuteId));
 }
+
+
+
+

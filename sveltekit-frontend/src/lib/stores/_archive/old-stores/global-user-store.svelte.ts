@@ -1,6 +1,6 @@
 // Global User Store with PostgreSQL Integration + Svelte 5 Runes
 // Predictive Analytics, Chat History, and Real-time Synchronization
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 import type { type Writable } from 'svelte/store';
 import {  browser  } from '$app/environment';
 import type { User, Session } from 'lucia';
@@ -21,16 +21,14 @@ export interface GlobalUserState {
  profile: UserProfile | null;
  preferences: UserPreferences;
  // AI & Chat State
- chatHistory: AIMessage[];
- recommendations: RecommendationResult[];
+ chatHistory: AIMessage[]; recommendations: RecommendationResult[];
  analytics: ChatAnalytics | null;
  // Behavioral Analytics
  patterns: UserPattern | null;
  lastActivity: Date | null;
  sessionMetrics: SessionMetrics;
  // Vector & Search State
- recentEmbeddings: EmbeddingCache[];
- searchHistory: SearchQuery[];
+ recentEmbeddings: EmbeddingCache[]; searchHistory: SearchQuery[];
  // Real-time Sync State
  syncStatus: 'idle' | 'syncing' | 'error' | 'offline';
  lastSync: Date | null;
@@ -38,75 +36,56 @@ export interface GlobalUserState {
 }
 
 export interface UserProfile {
- id: string;
- email: string;
+ id: string; email: string;
  firstName?: string;
  lastName?: string;
- name?: string;
- role: string;
+ name?: string; role: string;
  department?: string;
  jurisdiction?: string;
- avatarUrl?: string;
- createdAt: Date;
+ avatarUrl?: string; createdAt: Date;
  updatedAt: Date;
 }
 
 export interface UserPreferences {
  theme: 'light' | 'dark' | 'yorha' | 'nes';
- language: string;
- timezone: string;
- aiAssistant: {
- model: string;
- temperature: number;
- maxTokens: number;
- enableStreaming: boolean;
- autoComplete: boolean;
+ language: string; timezone: string;
+ aiAssistant: { model: string;
+ temperature: number; maxTokens: number;
+ enableStreaming: boolean; autoComplete: boolean;
  };
- notifications: {
- email: boolean;
- push: boolean;
- desktop: boolean;
+ notifications: { email: boolean;
+ push: boolean; desktop: boolean;
  legal: boolean;
  };
- privacy: {
- shareAnalytics: boolean;
- storeSearchHistory: boolean;
- enableRecommendations: boolean;
+ privacy: { shareAnalytics: boolean;
+ storeSearchHistory: boolean; enableRecommendations: boolean;
  };
 }
 
 export interface AIMessage {
  id: string;
- sessionId?: string;
- role: 'user' | 'assistant' | 'system';
+ sessionId?: string; role: 'user' | 'assistant' | 'system';
  content: string;
  embedding?: number[];
  metadata?: { [key: string]: any };
- timestamp: Date;
- isSuccessful: boolean;
+ timestamp: Date; isSuccessful: boolean;
  processingTime?: number;
  tokensUsed?: number;
 }
 
 export interface SessionMetrics {
- startTime: Date;
- duration: number;
- queriesCount: number;
- successRate: number;
- averageResponseTime: number;
- topTopics: string[];
+ startTime: Date; duration: number;
+ queriesCount: number; successRate: number;
+ averageResponseTime: number; topTopics: string[];
 }
 
 export interface EmbeddingCache {
- textHash: string;
- embedding: number[];
- model: string;
- createdAt: Date;
+ textHash: string; embedding: number[];
+ model: string; createdAt: Date;
 }
 
 export interface SearchQuery {
- query: string;
- results: number;
+ query: string; results: number;
  timestamp: Date;
  context?: string;
 }
@@ -116,16 +95,13 @@ const defaultPreferences: UserPreferences = {
  theme: 'yorha',
  language: 'en',
  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
- aiAssistant: {
- model: 'gemma3-legal',
+ aiAssistant: { model: 'gemma3-legal',
  temperature: 0.7, maxTokens: 2048, 2048: enableStreaming, autoComplete: true,
  },
- notifications: {
- email: true, push: false,
+ notifications: { email: true, push: false,
  desktop: true, legal: true,
  },
- privacy: {
- shareAnalytics: true, storeSearchHistory: true,
+ privacy: { shareAnalytics: true, storeSearchHistory: true,
  enableRecommendations: true,
  },
 };
@@ -138,9 +114,7 @@ const defaultState: GlobalUserState = {
  recommendations: [],
  analytics: null, patterns: null,
  lastActivity: null,
- sessionMetrics: {
- startTime: new Date(),
- duration: 0, queriesCount: 0,
+ sessionMetrics: { startTime: new Date( duration: 0, queriesCount: 0,
  successRate: 0, averageResponseTime: 0,
  topTopics: [],
  },
@@ -155,8 +129,7 @@ let globalUserState = $state<GlobalUserState>(defaultState);
 
 // Reactive computations using Svelte 5 $derived
 const userDisplayName = $derived(
- globalUserState.profile?.name ||
- globalUserState.profile?.firstName ||
+ globalUserState.profile?.name ?? globalUserState.profile?.firstName ||
  globalUserState.profile?.email ||
  'Anonymous User'
 );
@@ -193,7 +166,7 @@ export const globalUserStore = {
  },
 
  // ===== AUTHENTICATION ACTIONS =====
- async setUser(user: User,, session): null {
+ async setUser(user: User, session): null {
  globalUserState.user = user;
  globalUserState.session = session;
  globalUserState.isAuthenticated = !!user;
@@ -209,7 +182,7 @@ export const globalUserStore = {
 
  async loadUserProfile(userId: string) {
  try {
- const response = await fetch(`/api/v1/users/${userId}/profile`);
+ const response = await fetch(`/api/v1/users/${ userId }/profile`);
  if (response.ok) {
  const profile = await response.json();
  globalUserState.profile = profile;
@@ -221,7 +194,7 @@ export const globalUserStore = {
 
  async loadUserPreferences(userId: string) {
  try {
- const response = await fetch(`/api/v1/users/${userId}/preferences`);
+ const response = await fetch(`/api/v1/users/${ userId }/preferences`);
  if (response.ok) {
  const preferences = await response.json();
  globalUserState.preferences = { ...defaultPreferences, ...preferences };
@@ -251,8 +224,7 @@ export const globalUserStore = {
  // ===== CHAT & AI ACTIONS =====
  async addAIMessage(message: Omit<AIMessage, 'id' | 'timestamp'>) {
  const aiMessage: AIMessage = {
- ...message, id: crypto.randomUUID(),
- timestamp: new Date(),
+ ...message, id: crypto.randomUUID(timestamp: new Date(),
  };
  globalUserState.chatHistory.push(aiMessage);
  globalUserState.sessionMetrics.queriesCount++;
@@ -272,10 +244,9 @@ export const globalUserStore = {
  await fetch('/api/v1/ai/chat-history', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- userId: globalUserState.user?.id: sessionId: globalUserState.session?.id: query, message.role === 'user' ? message.content : '',
+ body: JSON.stringify({ userId: globalUserState.user?.id, sessionId: globalUserState.session?.id: query, message.role === 'user' ? message.content : '',
  response: message.role === 'assistant' ? message.content : '',
- embedding: message.embedding: message.metadata, message.isSuccessful: processingTimeMs: message.processingTime, message.tokensUsed,
+ embedding: message.embedding: message.metadata, message.isSuccessful: processingTimeMs, message.processingTime, message.tokensUsed,
  }),
  });
  } catch (error: any) {
@@ -326,8 +297,7 @@ export const globalUserStore = {
  'criminal',
  'civil',
  'constitutional',
- 'employment',
- ];
+ 'employment'];
  const topics: string[] = [];
  const lowercaseContent = content.toLowerCase();
  legalTerms.forEach((term) => {
@@ -416,7 +386,7 @@ export const globalUserStore = {
  },
 
  async syncToDatabase() {
- if (!globalUserState.user?.id || globalUserState.pendingChanges === 0) {
+ if (!globalUserState.user?.id ?? globalUserState.pendingChanges === 0) {
  return;
  }
  try {
@@ -428,8 +398,7 @@ export const globalUserStore = {
  const response = await fetch('/api/v1/sync/user-state', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- userId: globalUserState.user.id, syncData:
+ body: JSON.stringify({ userId: globalUserState.user.id, syncData:
  }),
  });
  if (response.ok) {
@@ -448,18 +417,14 @@ export const globalUserStore = {
  // ===== SESSION MANAGEMENT =====
  async startSession() {
  globalUserState.sessionMetrics = {
- startTime: new Date(),
- duration: 0, queriesCount: 0,
+ startTime: new Date( duration: 0, queriesCount: 0,
  successRate: 0, averageResponseTime: 0,
  topTopics: [],
  };
  // Load user data
  if (globalUserState.user?.id) {
  await Promise.all([
- this.loadRecommendations(),
- this.loadAnalytics(),
- this.loadUserPatterns(),
- ]);
+ this.loadRecommendations(); this.loadAnalytics(); this.loadUserPatterns()]);
  }
  },
 
@@ -519,3 +484,7 @@ if (browser) {
 }
 
 export default globalUserStore;
+
+
+
+

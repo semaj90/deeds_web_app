@@ -7,29 +7,21 @@
 import { cacheService } from './cache.service.js';
 
 export interface Statute {
- id: string;
- code: string;
- title: string;
- text: string;
- jurisdiction: string;
- relevanceScore: number;
+ id: string; code: string;
+ title: string; text: string;
+ jurisdiction: string; relevanceScore: number;
 }
 
 export interface CaseLaw {
- id: string;
- caseNumber: string;
- title: string;
- summary: string;
- court: string;
- year: number;
+ id: string; caseNumber: string;
+ title: string; summary: string;
+ court: string; year: number;
  relevanceScore: number;
 }
 
 export interface RAGResult {
- statutes: Statute[];
- caseLaw: CaseLaw[];
- totalResults: number;
- executionTimeMs: number;
+ statutes: Statute[]; caseLaw: CaseLaw[];
+ totalResults: number; executionTimeMs: number;
 }
 
 export class RAGService {
@@ -45,9 +37,7 @@ export class RAGService {
  try {
  // Execute statute and case law queries in parallel
  const [statutes, caseLaw] = await Promise.all([
- this.retrieveStatutes(query, jurisdiction, limit),
- this.retrieveCaseLaw(query, jurisdiction, limit),
- ]);
+ this.retrieveStatutes(query, jurisdiction, limit); this.retrieveCaseLaw(query, jurisdiction, limit)]);
 
  const executionTime = Date.now() - startTime;
 
@@ -68,7 +58,7 @@ export class RAGService {
  query: string, jurisdiction: string, number
  ): Promise<Statute[]> {
  try {
- const cacheKey = `${jurisdiction}:${query}`;
+ const cacheKey = `${ jurisdiction }:${ query }`;
 
  return await cacheService.getOrSet(
  cacheKey,
@@ -94,7 +84,7 @@ export class RAGService {
  query: string, jurisdiction: string, number
  ): Promise<CaseLaw[]> {
  try {
- const cacheKey = `${jurisdiction}:${query}`;
+ const cacheKey = `${ jurisdiction }:${ query }`;
 
  return await cacheService.getOrSet(
  cacheKey,
@@ -160,7 +150,7 @@ export class RAGService {
  */
  async retrieveStatuteContext(code: string, limit: number = 5): Promise<string[]> {
  try {
- const cacheKey = `statute_context:${code}`;
+ const cacheKey = `statute_context:${ code }`;
 
  return await cacheService.getOrSet(
  cacheKey,
@@ -228,3 +218,6 @@ export class RAGService {
 }
 
 export const ragService = new RAGService();
+
+
+

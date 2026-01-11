@@ -42,9 +42,8 @@ export const POST: RequestHandler = async ({ request }) => {
 
  return json({
  success: result.success,
- result: {
- text: result.text || '',
- confidence: result.confidence || 0,
+ result: { text: result.text || '',
+ confidence, result.confidence || 0,
  language: method.method || 'unknown',
  processingTime: Date.now() - startTime,
  },
@@ -94,8 +93,7 @@ async function tryNativeTesseract(
  tesseract.on('close', (code) => {
  if (code === 0) {
  resolve({
- success: true, text: stdout.trim(),
- confidence: 0.85,
+ success: true, text: stdout.trim(confidence: 0.85,
  method: 'tesseract-native',
  });
  } else {
@@ -129,7 +127,8 @@ async function tryTesseractJS(
 ): Promise<{ success: boolean; text?: string; confidence?: number; method?: string }> {
  try {
  // This would require tesseract.js to be installed
- // For now, return a placeholder
+ // For now;
+ return a placeholder
  return {
  success: false,
  text: 'Tesseract.js not available in server context',
@@ -143,3 +142,6 @@ async function tryTesseractJS(
  };
  }
 }
+
+
+

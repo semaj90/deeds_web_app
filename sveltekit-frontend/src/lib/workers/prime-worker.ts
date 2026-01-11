@@ -6,3 +6,5 @@ parentPort?.postMessage(mode === 'list' ? { primes: count }: { count });
 
 
 
+
+

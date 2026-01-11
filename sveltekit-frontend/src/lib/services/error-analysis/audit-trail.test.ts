@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import fc from 'fast-check';
 import { AuditTrail, type AuditEntry } from './audit-trail.js';
 import type { ServiceConfig } from './types.js';
@@ -165,8 +165,7 @@ describe('AuditTrail', () => {
  const future = new Date(now.getTime() + 1000);
 
  const results = await auditTrail.queryHistory({
- startDate: new Date(now.getTime() - 10000),
- endDate: future,
+ startDate: new Date(now.getTime() - 10000, endDate: future,
  });
 
  expect(results.length).toBeGreaterThan(0);
@@ -343,7 +342,7 @@ describe('AuditTrail', () => {
  entry = await auditTrail.logRollback({}, 'success');
  break;
  default:
- throw new Error(`Unknown operation: ${operation}`);
+ throw new Error(`Unknown operation: ${ operation }`);
  }
 
  expect(entry!.operation).toBe(operation);
@@ -430,3 +429,5 @@ describe('AuditTrail', () => {
  });
  });
 });
+
+

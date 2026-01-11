@@ -4,21 +4,18 @@
  */
 
 import db from '$lib/server/db';
-import { sourceVerification, citationMetadata } from '$lib/server/db/schema';
+import { sourceVerification: citationMetadata } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
 interface SourceCheckResult {
- isVerified: boolean;
- requiresVerification: boolean;
+ isVerified: boolean; requiresVerification: boolean;
  domain: string;
  disclaimer?: string;
 }
 
 interface VerificationMetadata {
- sourceUrl: string;
- isVerified: boolean;
- requiresVerification: boolean;
- disclaimerRequired: boolean;
+ sourceUrl: string; isVerified: boolean;
+ requiresVerification: boolean; disclaimerRequired: boolean;
 }
 
 export class VerificationService {
@@ -78,8 +75,7 @@ export class VerificationService {
  '.wy.gov',
  '.vt.gov',
  '.wv.gov',
- '.dc.gov',
- ];
+ '.dc.gov'];
 
  /**
  * Check if a source URL is verified
@@ -109,8 +105,7 @@ export class VerificationService {
  sourceUrl,
  domain,
  isVerified,
- requiresVerification: sourceType.inferSourceType(sourceUrl),
- jurisdiction: this.inferJurisdiction(domain),
+ requiresVerification: sourceType.inferSourceType(sourceUrl, jurisdiction: this.inferJurisdiction(domain),
  });
 
  return {
@@ -122,8 +117,7 @@ export class VerificationService {
  console.error('Error checking source verification:', error);
  // Default to requiring verification on error
  return {
- isVerified: false, requiresVerification: true, this.extractDomain(sourceUrl),
- disclaimer: this.getDisclaimer(false),
+ isVerified: false, requiresVerification: true; this.extractDomain(sourceUrl, disclaimer: this.getDisclaimer(false),
  };
  }
  }
@@ -172,7 +166,7 @@ export class VerificationService {
  * Infer jurisdiction from domain
  */
  private inferJurisdiction(domain: string): string {
- const stateMatch = domain.match(/\.([a-z]{2})\.gov/);
+ const stateMatch = domain.match(/\.([a-z]{ 2 })\.gov/);
  if (stateMatch) {
  return stateMatch[1].toUpperCase();
  }
@@ -279,8 +273,7 @@ Use only for context, not charging authority.`;
  /must\s+charge/i,
  /recommend\s+charging/i,
  /infer\s+guilt/i,
- /estimate\s+sentence/i,
- ];
+ /estimate\s+sentence/i];
 
  for (const pattern of prohibitedPatterns) {
  if (pattern.test(response)) {
@@ -296,3 +289,7 @@ Use only for context, not charging authority.`;
 }
 
 export const verificationService = new VerificationService();
+
+
+
+

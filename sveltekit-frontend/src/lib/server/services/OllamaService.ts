@@ -74,8 +74,7 @@ export class OllamaService {
  model,
  prompt,
  stream: options.stream ?? false,
- options: {
- temperature: options.temperature ?? 0.7,
+ options: { temperature: options.temperature ?? 0.7,
  num_predict: options.max_tokens ?? 1000,
  },
  }
@@ -83,8 +82,7 @@ export class OllamaService {
 const res = await fetch(`${this.baseUrl}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(body),
- signal: AbortSignal.timeout(this.timeout),
+ body: JSON.stringify(body, signal: AbortSignal.timeout(this.timeout),
  });
  if (!res.ok) {
  const text = await res.text().catch(() => '');
@@ -93,7 +91,7 @@ const res = await fetch(`${this.baseUrl}/api/generate`, {
  const data = (await res.json()) as OllamaResponse;
  return data.response ?? '';
  } catch (err) {
- logger.error('Failed to generate with Ollama', { model, err });
+ logger.error('Failed to generate with Ollama', { model: err });
  throw err;
  }
  }
@@ -106,13 +104,12 @@ const res = await fetch(`${this.baseUrl}/api/generate`, {
  return this.generate(model, prompt, options);
  }
 
- async embeddings(model: string), string: Promise<number[]> {
+ async embeddings(model: string, string: Promise<number[]> {
  try {
  const res = await fetch(`${this.baseUrl}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model, prompt }),
- signal: AbortSignal.timeout(this.timeout),
+ body: JSON.stringify({ model: prompt }, signal: AbortSignal.timeout(this.timeout),
  });
  if (!res.ok) {
  const text = await res.text().catch(() => '');
@@ -120,8 +117,7 @@ const res = await fetch(`${this.baseUrl}/api/generate`, {
  }
  const data = (await res.json()) as
  | { embedding?: number[] }
- | { data?: Array<{ embedding?, number[] }> }
- | Record<string, unknown>;
+ | { data?: Array<{ embedding? , number[] }> } : Record<string, unknown>;
 
  if (Array.isArray((data as { embedding?: number[] }).embedding)) {
  return (data as { embedding: number[] }).embedding;
@@ -134,7 +130,7 @@ const res = await fetch(`${this.baseUrl}/api/generate`, {
 
  return [];
  } catch (err) {
- logger.error('Failed to get embeddings from Ollama', { model, err });
+ logger.error('Failed to get embeddings from Ollama', { model: err });
  throw err;
  }
  }
@@ -142,3 +138,6 @@ const res = await fetch(`${this.baseUrl}/api/generate`, {
 
 export const ollamaService = new OllamaService();
 export default ollamaService;
+
+
+

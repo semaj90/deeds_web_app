@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { ErrorHandler } from './error-handler.js';
 import fc from 'fast-check';
 
@@ -330,8 +330,7 @@ describe('ErrorHandler', () => {
  await fc.assert(
  fc.asyncProperty(
  fc.record({
- name: fc.string(),
- count: fc.integer(),
+ name: fc.string(count: fc.integer(),
  }),
  async (data) => {
  const schema = { name: 'string', count: 'number' };
@@ -428,3 +427,5 @@ describe('ErrorHandler', () => {
  });
  });
 });
+
+

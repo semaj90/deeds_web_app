@@ -1,5 +1,5 @@
 /**
- * API: GET /api/phase89/node/{id}/docs
+ * API: GET /api/phase89/node/{ id }/docs
  * Retrieves relevant documentation for a graph node (error/symbol/file)
  */
 
@@ -15,8 +15,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
   const response = await fetch('http://127.0.0.1:11434/api/embeddings', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'embeddinggemma:latest',
+    body: JSON.stringify({model: 'embeddinggemma:latest',
       prompt: text,
     }),
   });
@@ -56,8 +55,7 @@ export const GET: RequestHandler = async ({ params }) => {
     const response = await fetch(`${QDRANT_URL}/collections/${KNOWLEDGE_COLLECTION}/points/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        vector: embedding,
+      body: JSON.stringify({vector: embedding,
         limit: 5,
         with_payload: true,
       }),
@@ -66,13 +64,13 @@ export const GET: RequestHandler = async ({ params }) => {
     const searchResults = await response.json();
 
     const results = (searchResults.result || []).map((hit: any) => ({
-      title: hit.payload?.title || hit.payload?.source || 'Unknown',
-      snippet: hit.payload?.content?.substring(0, 200) || hit.payload?.text?.substring(0, 200) || '',
+      title: hit.payload?.title ?? hit.payload?.source || 'Unknown',
+      snippet: hit.payload?.content?.substring(0, 200) ?? hit.payload?.text?.substring(0, 200) || '',
       score: hit.score,
-      tags: hit.payload?.tags || [],
+      tags: hit.payload?.tags ?? [],
     }));
 
-    return json({ results, query });
+    return json({ results: query });
   } catch (error) {
     console.error('Error retrieving docs:', error);
     return json({ error: error.message }, { status: 500 });

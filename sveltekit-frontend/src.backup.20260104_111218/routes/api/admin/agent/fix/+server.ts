@@ -1,0 +1,243 @@
+import { json } from '@sveltejs/kit';
+import { broadcastAgentProgress } from '../routes/stream/+server.js';
+import type { RequestHandler } from './$types';
+
+const OLLAMA_URL = 'http://127.0.0.1:11434';
+const QDRANT_URL = 'http://127.0.0.1:6333';
+
+interface FixRequest {
+	file_path: string;
+	errors?: string[];
+	auto_apply?: boolean;
+}
+
+interface AgentProgress {
+	status: 'analyzing' | 'fixing' | 'testing' | 'complete' | 'failed';
+	file_path: string;
+	progress: number;
+	message: string;
+	fixes?: string[];
+}
+
+async function queryKnowledgeBase(filePath: string, errorContext: string): Promise<string> {
+	try {
+		// Generate embedding for the error context
+		const embedResponse = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model: 'embeddinggemma:latest',
+				prompt: errorContext
+			})
+		});
+
+		if (!embedResponse.ok) {
+			console.error('Embedding generation failed');
+			return '';
+		}
+
+		const embedData = await embedResponse.json();
+		const vector = embedData.embedding;
+
+		// Search Qdrant for similar fixes
+		const searchResponse = await fetch(`${QDRANT_URL}/collections/phase76_knowledge_base/points/search`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				vector,
+				limit: 5,
+				with_payload: true,
+				filter: {
+					should: [
+						{
+							key: 'file_path',
+							match: { value: filePath }
+						},
+						{
+							key: 'type',
+							match: { value: 'fix' }
+						}
+					]
+				}
+			})
+		});
+
+		if (!searchResponse.ok) {
+			return '';
+		}
+
+		const searchData = await searchResponse.json();
+		const results = searchData.result || [];
+
+		// Concatenate relevant knowledge
+		const knowledge = results
+			.map((r: any) => r.payload?.content || r.payload?.text || '')
+			.filter(Boolean)
+			.join('\n\n');
+
+		return knowledge;
+	} catch (error) {
+		console.error('KB query error:', error);
+		return '';
+	}
+}
+
+async function generateFix(
+	filePath: string,
+	errors: string[],
+	knowledge: string,
+	onProgress: (progress: AgentProgress) => void
+): Promise<string[]> {
+	const fixes: string[] = [];
+
+	// Broadcast initial status
+	onProgress({
+		status: 'analyzing',
+		file_path: filePath,
+		progress: 0,
+		message: 'Analyzing errors and retrieving context...'
+	});
+
+	// Build prompt with KB context
+	const prompt = `You are an expert TypeScript/Svelte developer fixing errors in: ${filePath}
+
+ERRORS TO FIX:
+${errors.map((e, i) => `${i + 1}. ${e}`).join('\n')}
+
+RELEVANT KNOWLEDGE BASE CONTEXT:
+${knowledge || 'No specific context found. Use general best practices.'}
+
+INSTRUCTIONS:
+1. Analyze each error
+2. Provide specific fixes (code snippets)
+3. Explain why the fix works
+4. Ensure Svelte 5 compatibility (use runes: $state, $derived, $effect)
+
+Return fixes in JSON format:
+{
+  "fixes": [
+    {
+      "error": "...",
+      "solution": "...",
+      "code": "...",
+      "explanation": "..."
+    }
+  ]
+}`;
+
+	onProgress({
+		status: 'fixing',
+		file_path: filePath,
+		progress: 30,
+		message: 'Generating fixes with LLM...'
+	});
+
+	try {
+		const response = await fetch(`${OLLAMA_URL}/api/generate`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model: 'gemma3-legal:latest',
+				prompt,
+				stream: false,
+				options: {
+					temperature: 0.3,
+					top_p: 0.9,
+					num_predict: 2048
+				}
+			})
+		});
+
+		if (!response.ok) {
+			throw new Error('LLM generation failed');
+		}
+
+		const data = await response.json();
+		const text = data.response || '';
+
+		onProgress({
+			status: 'testing',
+			file_path: filePath,
+			progress: 70,
+			message: 'Parsing and validating fixes...'
+		});
+
+		// Try to extract JSON
+		const jsonMatch = text.match(/\{[\s\S]*"fixes"[\s\S]*\}/);
+		if (jsonMatch) {
+			const parsed = JSON.parse(jsonMatch[0]);
+			fixes.push(
+				...parsed.fixes.map(
+					(f: any) => `
+**Error:** ${f.error}
+**Solution:** ${f.solution}
+\`\`\`typescript
+${f.code}
+\`\`\`
+**Explanation:** ${f.explanation}
+`
+				)
+			);
+		} else {
+			// Fallback: use raw text
+			fixes.push(text);
+		}
+
+		onProgress({
+			status: 'complete',
+			file_path: filePath,
+			progress: 100,
+			message: `Generated ${fixes.length} fixes`,
+			fixes
+		});
+
+		return fixes;
+	} catch (error) {
+		onProgress({
+			status: 'failed',
+			file_path: filePath,
+			progress: 100,
+			message: error instanceof Error ? error.message : 'Unknown error'
+		});
+		throw error;
+	}
+}
+
+export const POST: RequestHandler = async ({ request }) => {
+	try {
+		const body: FixRequest = await request.json();
+		const { file_path, errors = [], auto_apply = false } = body;
+
+		if (!file_path) {
+			return json({ error: 'file_path is required' }, { status: 400 });
+		}
+
+		// Query KB for context
+		const errorContext = errors.join('\n');
+		const knowledge = await queryKnowledgeBase(file_path, errorContext);
+
+		// Generate fixes
+		const fixes = await generateFix(file_path, errors, knowledge, (progress) => {
+			broadcastAgentProgress(progress);
+		});
+
+		return json({
+			success: true,
+			file_path,
+			fixes,
+			auto_applied: auto_apply,
+			kb_context_used: knowledge.length > 0,
+			timestamp: new Date().toISOString()
+		});
+	} catch (error) {
+		console.error('Agent fix error:', error);
+		return json(
+			{
+				success: false,
+				error: 'Failed to generate fixes',
+				details: error instanceof Error ? error.message : String(error)
+			},
+			{ status: 500 }
+		);
+	}
+};

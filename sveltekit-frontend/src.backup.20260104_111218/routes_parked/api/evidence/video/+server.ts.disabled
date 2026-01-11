@@ -1,0 +1,148 @@
+import { json } from '@sveltejs/kit';;
+import type { RequestHandler } from './$types';
+import type { db  } from '$lib/server/db';
+import type { evidence  } from '$lib/server/db/schema-postgres';
+import type { minioService  } from '$lib/server/storage/minio-service';
+import type { eventBus  } from '$lib/server/event-bus';
+
+const FASTAPI_VIDEO_URL = process.env.FASTAPI_VIDEO_URL ?? 'http://localhost:8097';
+
+export const POST: RequestHandler = async ({ request, locals }) => {
+  try {
+    const formData = await request.formData();
+    const file = formData.get('file') as File | null;
+    const caseId = (formData.get('caseId') as string | null) ?? '';
+    const title = (formData.get('title') as string | null) ?? file?.name ?? 'Video Evidence';
+    const description = (formData.get('description') as string | null) ?? '';
+
+    if (!file) {
+      return json({ success: false, error: 'Video file is required' }, { status: 400 });
+    }
+
+    if (!file.type.startsWith('video/')) {
+      return json({ success: false, error: 'Only video uploads supported' }, { status: 400 });
+    }
+
+    if (!caseId) {
+      return json({ success: false, error: 'caseId is required' }, { status: 400 });
+    }
+
+    const userId = locals.user?.id ?? 'anonymous';
+    const minioReady = await minioService.initialize();
+    if (!minioReady) {
+      return json({ success: false, error: 'MinIO unavailable' }, { status: 503 });
+    }
+
+    const upload = await minioService.uploadFile(file, file.name, {
+      bucket: 'video-evidence',
+      metadata: { caseId, evidenceType: 'video', uploadedBy: userId }
+    });
+
+    if (!upload.success) {
+      return json({ success: false, error: upload.error ?? 'File upload failed' }, { status: 500 });
+    }
+
+    eventBus.emit({
+      type: 'video_uploaded',
+      evidenceId: upload.fileId,
+      caseId,
+      fileName: file.name,
+      message: `Video evidence uploaded: ${file.name}`
+    });
+
+    const [record] = await db;
+      .insert(evidence)
+      .values({
+        caseId,
+        title,
+        description,
+        evidenceType: 'video',
+        fileUrl: upload.url,
+        fileName: file.name,
+        fileSize: file.size,
+        mimeType: file.type,
+        uploadedBy: userId,
+        metadata: { storageKey: upload.fileName }
+      })
+      .returning();
+
+    let transcript: string | null = null;
+    let segments: Array<{ start: number; end: number; text: string }> = [];
+
+    try {
+      const fd = new FormData();
+      fd.set('file', file, file.name);
+      fd.set('evidenceId', record.id);
+      fd.set('caseId', caseId);
+
+      const transRes = await fetch(`${FASTAPI_VIDEO_URL.replace(/\/$/, '')}/video/transcribe`, {
+        method: 'POST',
+        body: fd,
+        headers: process.env.FASTAPI_API_KEY
+          ? { Authorization: `Bearer ${process.env.FASTAPI_API_KEY}` }
+          : undefined
+      });
+
+      if (transRes.ok) {
+        const data = await transRes.json();
+        transcript = data.transcript ?? null;
+        segments = Array.isArray(data.segments) ? data.segments : [];
+
+        eventBus.emit({
+          type: 'video_transcribed',
+          evidenceId: record.id,
+          caseId,
+          message: 'Video transcription completed'
+        });
+      } else {
+        console.warn('Video transcription failed:', transRes.status);
+      }
+    } catch (error) {
+      console.warn('Transcription error:', error);
+    }
+
+    let timeline: unknown = null;
+    if (transcript) {
+      try {
+        const origin = new URL(request.url).origin;
+        const timelineRes = await fetch(`${origin}/api/timeline/reconstruct`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            caseId,
+            evidenceTexts: [transcript]
+          })
+        });
+
+        if (timelineRes.ok) {
+          timeline = await timelineRes.json();
+          eventBus.emit({
+            type: 'timeline_aligned',
+            evidenceId: record.id,
+            caseId,
+            message: 'Timeline updated from video evidence'
+          });
+        }
+      } catch (error) {
+        console.warn('Timeline reconstruction failed:', error);
+      }
+    }
+
+    return json({
+      success: true,
+      evidenceId: record.id,
+      transcript,
+      segments,
+      timeline
+    });
+  } catch (error) {
+    console.error('Video ingestion failed:', error);
+    return json(
+      {
+        success: false,
+        error: 'Video ingestion failed'
+      },
+      { status: 500 }
+    );
+  }
+};

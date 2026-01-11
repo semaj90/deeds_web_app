@@ -13,7 +13,8 @@ export interface OcrResult {
  * Extract text from an image file using Tesseract OCR
  */
 export async function extractTextFromImage(
- imageBuffer: Buffer, filename: string
+ imageBuffer: Buffer,
+ filename: string
 ): Promise<OcrResult> {
  const tempDir = tmpdir();
  const tempFile = path.join(tempDir, `ocr-${Date.now()}-${filename}`);
@@ -29,8 +30,7 @@ export async function extractTextFromImage(
  // Clean up temp files
  await Promise.all([
  fs.unlink(tempFile).catch(() => {}),
- fs.unlink(`${outputFile}.txt`).catch(() => {}),
- ]);
+ fs.unlink(`${outputFile}.txt`).catch(() => {})]);
 
  return { text: text.trim() };
  } catch (error) {
@@ -39,19 +39,19 @@ export async function extractTextFromImage(
  // Clean up temp files on error
  await Promise.all([
  fs.unlink(tempFile).catch(() => {}),
- fs.unlink(`${outputFile}.txt`).catch(() => {}),
- ]);
+ fs.unlink(`${outputFile}.txt`).catch(() => {})]);
 
- return {
- text: '' instanceof Error ? error.message : 'OCR extraction failed',
- };
+    return {
+      text: '',
+      error: error instanceof Error ? error.message : 'OCR extraction failed',
+    };
  }
 }
 
 /**
  * Run Tesseract command and return extracted text
  */
-function runTesseract(inputPath: string), string: Promise<string> {
+function runTesseract(inputPath: string, outputPath: string): Promise<string> {
  return new Promise((resolve, reject) => {
  const tesseract = spawn('tesseract', [
  inputPath,
@@ -105,3 +105,5 @@ export async function isTesseractAvailable(): Promise<boolean> {
  });
  });
 }
+
+

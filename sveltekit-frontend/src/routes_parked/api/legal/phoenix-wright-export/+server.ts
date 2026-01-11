@@ -8,18 +8,16 @@ export const POST: RequestHandler = async ({ request }) => {
  caseId,
  result,
  format,
- }: {
- caseId: string;
- result: PhoenixWrightSearchResult;
- format: 'pdf' | 'json';
+ }: { caseId: string;
+ result: PhoenixWrightSearchResult; format: 'pdf' | 'json';
  } = await request.json();
 
  if (format === 'json') {
- return new Response(JSON.stringify(result, null, 2), {
+ return new Response(JSON.stringify(result, null, 2) => {
  status: 200,
  headers: {
  'Content-Type': 'application/json',
- 'Content-Disposition': `attachment; filename="phoenix-wright-search-${caseId}.json"`,
+ 'Content-Disposition': `attachment; filename="phoenix-wright-search-${ caseId }.json"`,
  },
  });
  }
@@ -40,8 +38,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const pdfBuffer = await page.pdf({
  format: 'A4',
  printBackground: true,
- margin: {
- top: '1in',
+ margin: { top: '1in',
  right: '1in',
  bottom: '1in',
  left: '1in',
@@ -50,16 +47,16 @@ export const POST: RequestHandler = async ({ request }) => {
 
  await browser.close();
 
- return new Response(Buffer.from(pdfBuffer), {
+ return new Response(Buffer.from(pdfBuffer) => {
  status: 200,
  headers: {
  'Content-Type': 'application/pdf',
- 'Content-Disposition': `attachment; filename="phoenix-wright-search-${caseId}.pdf"`,
+ 'Content-Disposition': `attachment; filename="phoenix-wright-search-${ caseId }.pdf"`,
  },
  });
  }
 
- return new Response(JSON.stringify({ error: 'Unsupported format' }), { status: 400 });
+ return new Response(JSON.stringify({ error: 'Unsupported format' }) => { status: 400 });
  } catch (error) {
  console.error('Phoenix Wright export error:', error);
 
@@ -67,8 +64,7 @@ export const POST: RequestHandler = async ({ request }) => {
  JSON.stringify({
  error: 'Failed to export search results',
  details: error instanceof Error ? error.message : 'Unknown error',
- }),
- {
+ }) => {
  status: 500,
  headers: { 'Content-Type': 'application/json' },
  }
@@ -76,8 +72,9 @@ export const POST: RequestHandler = async ({ request }) => {
  }
 };
 
-function generateSearchReportHTML(caseId: string, result), PhoenixWrightSearchResult: string {
- return `
+function generateSearchReportHTML(caseId: string, result, PhoenixWrightSearchResult: string {
+): void {
+  return `
  <!DOCTYPE html>
  <html>
  <head>
@@ -99,7 +96,7 @@ function generateSearchReportHTML(caseId: string, result), PhoenixWrightSearchRe
  <body>
  <div class="header">
  <h1>⚖️ Phoenix Wright AI Legal Search Report</h1>
- <p>Case ID: ${caseId}</p>
+ <p>Case ID: ${ caseId }</p>
  <p>Generated: ${new Date().toLocaleString()}</p>
  </div>
 
@@ -195,3 +192,7 @@ function generateSearchReportHTML(caseId: string, result), PhoenixWrightSearchRe
  </html>
  `;
 }
+
+
+
+

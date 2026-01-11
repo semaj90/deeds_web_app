@@ -1,0 +1,46 @@
+/* Local shim for bits-ui "enhanced-bits-ui.css".
+ Some environments (monorepos / older package versions) don't include
+ the dist/enhanced-bits-ui.css file. Import this shim from app pages
+ instead to avoid Vite import-analysis failures during development.
+
+ Keep this file minimal; add more styles from the real bits-ui package
+ as needed. These rules provide safe defaults used by a few bits-ui
+ components in the frontend.
+*/
+
+:root {
+ --bits-ui-accent: #0ea5e9;
+ --bits-ui-bg: transparent;
+ --bits-ui-border: rgba(0, 0, 0, 0.08);
+}
+
+.bits-ui-button,
+.bits-ui-btn,
+.enhanced-bits-btn {
+ background: var(--bits-ui-accent);
+ color: white;
+ border: 1px solid var(--bits-ui-border);
+ padding: 0.4rem 0.8rem;
+ border-radius: 6px;
+ font-weight: 600;
+}
+
+.bits-ui-tooltip {
+ background: rgba(17, 24, 39, 0.95);
+ color: #fff;
+ padding: 0.4rem 0.6rem;
+ border-radius: 4px;
+ font-size: 0.85rem;
+}
+
+/* minimal layout helpers */
+.bits-ui-row {
+ display: flex;
+ gap: 0.5rem;
+ align-items: center;
+}
+.bits-ui-col {
+ display: flex;
+ flex-direction: column;
+ gap: 0.25rem;
+}

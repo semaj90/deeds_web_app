@@ -1,4 +1,5 @@
 <script lang="ts">
+
  let { children, prompt = ">" } = $props();
 </script>
 
@@ -6,3 +7,5 @@
  <div class="mb-2 text-neon/70">{prompt}</div>
  {@render children?.()}
 </div>
+
+

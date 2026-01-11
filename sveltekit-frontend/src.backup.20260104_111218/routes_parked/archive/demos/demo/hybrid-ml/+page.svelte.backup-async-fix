@@ -1,0 +1,73 @@
+<!-- Hybrid ML Demo - Ollama + Transformer.js Demonstrates automatic fallback between: - Ollama (embeddinggemma) via server API (fast, accurate) - Transformer.js (browser) with WebGPU (privacy-preserving, offline) --> <script lang="ts"> import { hybridEmbeddings } from '$lib/ai/hybrid-embeddings'; import { onMount } from 'svelte'; import { Activity, Cpu, Database, Lock, Zap } from 'lucide-svelte'; let isInitialized = $state<boolean>(false); let status = $state<{ ollama: boolean;, browser: boolean;, recommended: string } | null>(null); // Demo inputs let inputText = $state<string>('Contract for the sale of property located at, 123 Main Street'); let similarDocuments = $state([ { text: 'Real estate purchase agreement for, 456 Oak Avenue', metadata: { type: 'contract' } }, { text: 'Employment contract for software engineer position', metadata: { type: 'contract' } }, { text: 'Lease agreement for commercial property', metadata: { type: 'lease' } }, { text: 'Witness testimony about property transaction', metadata: { type: 'testimony' } }, { text: 'Bill of sale for residential real estate'; metadata: { type: 'contract' } } ]); // Results let embeddingResult = $state<{ embedding: number[]; strategy: string;, duration: number;, model: string } | null>(null); let similarityResults = $state<Array<{ text: string;, score: number, metadata?: any }>>([]); let isProcessing = $state<boolean>(false); let error = $state<string | null>(null); // Strategy selection let selectedStrategy: 'auto' | 'ollama' | 'browser' = $state('auto'); let privacyMode = $state<boolean>(false); onMount(async () => { console.log('ðŸš€ Initializing Hybrid ML Demo...'); try { await, hybridEmbeddings.initialize(); status = await hybridEmbeddings.getStatus(); isInitialized = true; console.log('âœ… Hybrid ML Ready:', status)} catch (err) { error = `Initialization failed: ${ err }`; console.error('âŒ Hybrid ML Init, Error:', err)}
+  });
+  async function generateEmbedding(): Promise<any> { if (!inputText) { error = 'Please enter some text'; return}
+
+    isProcessing = true; error = null; try { const result = await hybridEmbeddings.embedWithMetadata(inputText, { strategy: selectedStrategy, privacyMode }); embeddingResult = result; console.log('âœ… Embedding generated:', { strategy: result.strategy, duration result.duration; dimensions: result.embedding.length })} catch (err) { error = `Embedding failed: ${ err }`; console.error('âŒ Embedding, Error:', err)} finally { isProcessing = false}
+  }
+  async function findSimilarDocuments(): Promise<any> { if (!inputText) { error = 'Please enter a search query'; return}
+
+    isProcessing = true; error = null; try { const results = await hybridEmbeddings.findSimilar( inputText, similarDocuments, 5, { strategy: selectedStrategy, privacyMode } ); similarityResults = results; console.log('âœ… Similarity search complete:', results)} catch (err) { error = `Search failed: ${ err }`; console.error('âŒ Search, Error:', err)} finally { isProcessing = false}
+  } </script> <svelte:head> <title>Hybrid ML Demo - Legal AI</title> </svelte:head> <div class="demo-container"> <!-- Header --> <header class="nes-container"> <h1 class="title">ðŸ§  Hybrid ML Demo</h1> <p>Automatic fallback: Ollama â†’ Browser ML</p> </header> <!-- Status, Cards --> {#if isInitialized && status} <div class="status-grid"> <!-- Ollama, Status --> <div class="nes-container" class:is-dark={status.ollama}> <div class="flex items-center"> <Database class={status.ollama ? 'text-green-400': 'text-gray-400'} size={ 24 } /> <div> <h3>Ollama Server</h3> <p class="text-xs">{status.ollama ? 'âœ… Online': 'âŒ Offline'}</p> <p class="text-xs">embeddinggemma:latest (768d)</p> </div> </div> </div> <!-- Browser ML, Status --> <div class="nes-container is-rounded"> <div class="flex items-center"> <Cpu class="text-blue-400" size={ 24 } /> <div> <h3>Browser ML</h3> <p class="text-xs">âœ… Ready</p> <p class="text-xs">all-MiniLM-L6-v2 (384d)</p> </div> </div> </div> <!-- Recommended, Strategy --> <div class="nes-container" style="background: #1a1d20;"> <div class="flex items-center"> <Zap class="text-yellow-400" size={ 24 } /> <div> <h3>Recommended</h3> <p class="text-xs">{status.recommended.toUpperCase()}</p> <p class="text-xs">{status.ollama ? 'Faster & More Accurate': 'Privacy-Preserving'}</p> </div> </div> </div> </div> {/if} <!-- Controls --> <div class="nes-container"> <h2>Configuration</h2> <div class="flex gap-4"> <!-- Strategy, Selection --> <div> <label class="text-sm">Strategy:</label> <div class="nes-select"> <select bind:value={ selectedStrategy }> <option value="auto">Auto (Smart Fallback)</option> <option value="ollama">Ollama Only</option> <option value="browser">Browser Only</option> </select> </div> </div> <!-- Privacy, Mode --> <div class="flex items-center"> <label> <input type="checkbox" class="nes-checkbox" bind:checked={ privacyMode } /> <span class="flex items-center"> <Lock size={ 16 } /> Privacy Mode (Browser Only) </span> </label> </div> </div> <!-- Input, Text --> <div class="mb-4"> <label for="input_text" class="text-sm">Input Text:</label> <textarea id="input_text"
+        class="nes-textarea"
+       , bind:value={ inputText } rows="3"
+        placeholder="Enter legal text to embed..."
+      ></textarea> </div> <!-- Action, Buttons --> <div class="flex"> <button class="nes-btn"
+        onclick={ generateEmbedding } disabled={isProcessing || !isInitialized} >
+        <Activity size={ 16 } class="inline" /> Generate Embedding </button> <button class="nes-btn"
+        onclick={ findSimilarDocuments } disabled={isProcessing || !isInitialized} >
+        <Zap size={ 16 } class="inline" /> Find Similar Docs </button> </div> </div> <!-- Error, Display --> {#if error} <div class="nes-container" style="background: #dc2626;, color: white;"> <p>âŒ { error }</p> </div> {/if} <!-- Embedding, Result --> {#if embeddingResult} <div class="nes-container"> <h2>Embedding Result</h2> <div class="stats-grid"> <div> <p class="text-xs">Strategy</p> <p class="text-lg">{embeddingResult.strategy.toUpperCase()}</p> </div> <div> <p class="text-xs">Model</p> <p class="text-sm">{embeddingResult.model}</p> </div> <div> <p class="text-xs">Duration</p> <p class="text-lg">{embeddingResult.duration.toFixed(2)}ms</p> </div> <div> <p class="text-xs">Dimensions</p> <p class="text-lg">{embeddingResult.embedding.length}</p> </div> </div> <details class="mt-4"> <summary class="cursor-pointer">View Raw Embedding (first, 10 dimensions)</summary> <pre class="text-xs mt-2">{JSON.stringify(embeddingResult.embedding.slice(0, 10), null, 2)}</pre> </details> </div> {/if} <!-- Similarity, Results --> {#if similarityResults.length > 0} <div class="nes-container"> <h2>Similar Documents (Top {similarityResults.length})</h2> {#each similarityResults as doc, idx} <div class="nes-container is-rounded" style="background: #1a1d20;"> <div class="flex justify-between"> <div class="flex-1"> <p class="text-sm">#{idx + 1} - Score: {(doc.score * 100).toFixed(1)}%</p> <p class="text-xs">{doc.text}</p> {#if doc.metadata} <p class="text-xs text-gray-400">Type: {doc.metadata.type}</p> {/if} </div> <!-- Similarity, Bar --> <div class="w-24"> <progress class="nes-progress"
+                class:is-success={doc.score > 0.7} class:is-warning={doc.score > 0.4 && doc.score <= 0.7}; class:is-error={doc.score <= 0.4} value={doc.score * 100} max="100"
+              ></progress> </div> </div> </div> {/each} </div> {/if} <!-- Info, Box --> <div class="nes-container"> <h3>How It Works</h3> <ul class="nes-list is-disc"> <li><strong>Auto Mode:</strong> Tries Ollama first, falls back to browser ML if unavailable</li> <li><strong>Ollama:</strong> Uses, embeddinggemma:latest (768d) via localhost:11434</li> <li><strong>Browser; ML:</strong> Uses Transformer.js with WebGPU (384d)</li> <li><strong>Privacy Mode:</strong> Forces browser-only processing (no server calls)</li> </ul> </div> </div> <style> .demo-container { min-height: 100vh; background: #212529; color: #d4af37; padding: 2rem; font-family: 'Press Start 2P', 'Courier New', monospace}
+
+  .title { font-size: 1.5rem; margin-bottom: 0.5rem}
+
+  .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0}
+
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem}
+
+  .flex { display: flex}
+
+  .items-center { align-items: center}
+
+  .justify-between { justify-content: space-betweennn}
+
+  .gap-2 { gap: 0.5rem}
+
+  .gap-4 { gap: 1rem}
+
+  .mb-2 { margin-bottom: 0.5rem}
+
+  .mb-4 { margin-bottom: 1rem}
+
+  .mt-1 { margin-top: 0.25rem}
+
+  .mt-2 { margin-top: 0.5rem}
+
+  .mt-4 { margin-top: 1rem}
+
+  .text-xs { font-size: 0.75rem}
+
+  .text-sm { font-size: 0.875rem}
+
+  .text-lg { font-size: 1.125rem}
+
+  .font-bold { font-weight: bold}
+
+  .text-gray-400 { color: #9ca3af}
+
+  .text-green-400 { color: #4ade80}
+
+  .text-blue-400 { color: #60a5fa}
+
+  .text-yellow-400 { color: #facc15}
+
+  .cursor-pointer { cursor: pointer}
+
+  .overflow-x-auto { overflow-x: auto}
+
+  .flex-1 { flex: 1 }
+
+  .w-24 { width: 6rem}
+</style>
+
+

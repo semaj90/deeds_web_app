@@ -12,8 +12,7 @@ function generateValidUUID(): string {
 
 // Mock crypto with valid UUIDs
 Object.defineProperty(global, 'crypto', {
-	value: {
-		randomUUID: generateValidUUID,
+	value: { randomUUID: generateValidUUID,
 		getRandomValues: (arr: Uint8Array) => {
 			for (let i = 0; i < arr.length; i++) {
 				arr[i] = Math.floor(Math.random() * 256);
@@ -23,7 +22,6 @@ Object.defineProperty(global, 'crypto', {
 	}
 });
 
-// Mock environment variables
 vi.mock('$env/static/private', () => ({
 	QDRANT_URL: 'http://localhost:6333',
 	QDRANT_COLLECTION: 'test_collection',
@@ -34,8 +32,7 @@ vi.mock('$env/static/private', () => ({
 }));
 
 vi.mock('$env/dynamic/private', () => ({
-	env: {
-		QDRANT_URL: 'http://localhost:6333',
+	env: { QDRANT_URL: 'http://localhost:6333',
 		DATABASE_URL: 'postgres://test:test@localhost:5432/test_db'
 	}
 }));
@@ -70,10 +67,9 @@ vi.mock('$app/stores', () => {
 			return () => {};
 		})
 	};
-	return { page, navigating };
+	return { page: navigating };
 });
 
-// Mock fetch for tests
 if (typeof global.fetch === 'undefined') {
 	global.fetch = vi.fn(() =>
 		Promise.resolve({
@@ -97,3 +93,6 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
 	unobserve: vi.fn(),
 	disconnect: vi.fn()
 }));
+
+
+

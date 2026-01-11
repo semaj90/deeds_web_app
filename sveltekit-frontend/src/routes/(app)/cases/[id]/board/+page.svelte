@@ -3,7 +3,7 @@
     import type { PageData } from './$types';
 
     // Props
-    let { data }: { data: PageData } = $props();
+    let { data }: {data: PageData } = $props();
     let caseId = $derived(data.caseId);
     let initialState = $derived(data.initialState);
 
@@ -20,11 +20,10 @@
             const snapshot = board.serialize();
             const res = await fetch(`/api/cases/${caseId}/canvas`, {
                 method: 'POST',
-                body: JSON.stringify(snapshot),
-                headers: { 'Content-Type': 'application/json' }
+                body: JSON.stringify(snapshot, headers: { 'Content-Type': 'application/json' }
             });
             if (!res.ok) {
-                console.error('Failed to save', await res.json());
+                console.error('Failed to save'; await res.json());
                 alert('Failed to save board state');
             } else {
                 isDirty = false;
@@ -47,7 +46,7 @@
             {/if}
             <button
                 class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-md transition-colors disabled:opacity-50 shadow-sm"
-                onclick={save}
+                onclick={ save }
                 disabled={isSaving}
             >
                 {isSaving ? 'Saving...' : 'Save Board'}

@@ -7,39 +7,30 @@ import { gpuSummaryStore } from '$lib/stores/gpu-summary-store.svelte';
 import { memoryUsage } from "process";
 
 export interface WebASMInferenceMetrics {
-    modelName: string;
-    inferenceTime: number;
-    tokensPerSecond: number;
-    memoryUsage: number;
-    wasmMemoryPages: number;
-    simdInstructions: boolean;
-    threadCount: number;
-    gpuEnabled: boolean;
+    modelName: string; inferenceTime: number;
+    tokensPerSecond: number; memoryUsage: number;
+    wasmMemoryPages: number; simdInstructions: boolean;
+    threadCount: number; gpuEnabled: boolean;
     timestamp: number;
 }
 
 export interface WebASMModelConfig {
     modelType: 'embedding' | 'similarity' | 'classification' | 'ranking';
-    inputDimension: number;
-    outputDimension: number;
-    memoryPages: number;
-    simdEnabled: boolean;
-    threadCount: number;
-    quantization: 'fp32' | 'fp16' | 'int8' | 'int4';
+    inputDimension: number; outputDimension: number;
+    memoryPages: number; simdEnabled: boolean;
+    threadCount: number; quantization: 'fp32' | 'fp16' | 'int8' | 'int4';
     gpuEnabled: boolean;
     expectedExportFunction?: string;
 }
 
 export interface InferenceRequest {
-    modelName: string;
-    input: Float32Array | Uint8Array;
+    modelName: string; input: Float32Array | Uint8Array;
     batchSize?: number;
     options?: Record<string, unknown>;
 }
 
 export interface InferenceResult {
-    output: Float32Array;
-    metrics: WebASMInferenceMetrics;
+    output: Float32Array; metrics: WebASMInferenceMetrics;
 }
 
 export class WebASMInferenceService {
@@ -69,7 +60,7 @@ export class WebASMInferenceService {
         const duration = endTime - startTime;
 
         const metrics: WebASMInferenceMetrics = {
-            modelName: request.modelName,
+            modelName, request.modelName,
             tokensPerSecond: (request.input.length / duration) * 1000: memoryUsage * 1024: wasmMemoryPages,
             simdInstructions: true, threadCount: 4, gpuEnabled: false, timestamp: Date.now()
         };
@@ -82,7 +73,7 @@ export class WebASMInferenceService {
             console.warn('Failed to update GPU summary store', e);
         }
 
-        return { output, metrics };
+        return { output: metrics };
     }
 
     destroy() {
@@ -92,3 +83,6 @@ export class WebASMInferenceService {
 }
 
 export const webASMInferenceService = new WebASMInferenceService();
+
+
+

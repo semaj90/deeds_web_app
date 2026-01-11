@@ -17,7 +17,7 @@ let currentConfig = { ...defaultConfig };
 export const GET: RequestHandler = async () => {
  try {
  // In a real implementation, load from database or environment
- return new Response(JSON.stringify(currentConfig), {
+ return new Response(JSON.stringify(currentConfig) => {
  status: 200,
  headers: {
  'Content-Type': 'application/json',
@@ -26,7 +26,7 @@ export const GET: RequestHandler = async () => {
  });
  } catch (error) {
  console.error('Failed to load config:', error);
- return new Response(JSON.stringify({ error: 'Failed to load configuration' }), {
+ return new Response(JSON.stringify({ error: 'Failed to load configuration' }) => {
  status: 500,
  headers: { 'Content-Type': 'application/json' },
  });
@@ -39,7 +39,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  // Validate configuration
  if (typeof newConfig !== 'object' || newConfig === null) {
- return new Response(JSON.stringify({ error: 'Invalid configuration format' }), {
+ return new Response(JSON.stringify({ error: 'Invalid configuration format' }) => {
  status: 400,
  headers: { 'Content-Type': 'application/json' },
  });
@@ -88,17 +88,18 @@ export const POST: RequestHandler = async ({ request }) => {
  success: true,
  message: 'Configuration saved successfully',
  config: currentConfig,
- }),
- {
+ }) => {
  status: 200,
  headers: { 'Content-Type': 'application/json' },
  }
  );
  } catch (error) {
  console.error('Failed to save config:', error);
- return new Response(JSON.stringify({ error: 'Failed to save configuration' }), {
+ return new Response(JSON.stringify({ error: 'Failed to save configuration' }) => {
  status: 500,
  headers: { 'Content-Type': 'application/json' },
  });
  }
 };
+
+

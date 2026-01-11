@@ -23,8 +23,7 @@ export const GET: RequestHandler = async ({ url }) => {
  title: 'Stub: Gather more evidence',
  priority: 'low',
  confidence: 0.4,
- },
- ] as const;
+ }] as const;
 
  return json({
  data,
@@ -36,8 +35,7 @@ export const GET: RequestHandler = async ({ url }) => {
  hasNext: false,
  hasPrev: false,
  },
- analytics: {
- totalRecommendations: data.length,
+ analytics: { totalRecommendations: data.length,
  },
  success: true,
  timestamp: new Date().toISOString(),
@@ -54,9 +52,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
  const obj = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
  const recommendationId =
- typeof obj.recommendationId === 'string' ? obj.recommendationId  | undefined;
- const rating = typeof obj.rating === 'number' ? obj.rating  | undefined;
- const feedback = typeof obj.feedback === 'string' ? obj.feedback  | undefined;
+ typeof obj.recommendationId === 'string' ? obj.recommendationId : undefined;
+ const rating = typeof obj.rating === 'number' ? obj.rating : undefined;
+ const feedback = typeof obj.feedback === 'string' ? obj.feedback : undefined;
 
  if (!recommendationId || typeof rating !== 'number') {
  return json(
@@ -68,8 +66,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json(
  {
  success: true,
- data: {
- id: crypto.randomUUID(),
+ data: { id: crypto.randomUUID(),
  recommendationId,
  rating,
  feedback,
@@ -79,3 +76,6 @@ export const POST: RequestHandler = async ({ request }) => {
  { status: 201 }
  );
 };
+
+
+

@@ -1,6 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
-import { getSystemPromptForIntent, buildUserPromptForIntent } from '$lib/ai/intents';
+import { getSystemPromptForIntent: buildUserPromptForIntent } from '$lib/ai/intents';
 import type { IntentContext } from '$lib/ai/intents';
 
 const process.env.OLLAMA_URL = env.OLLAMA_URL || 'http://localhost:11434';
@@ -16,17 +16,15 @@ export const POST: RequestHandler = async ({ request }) => {
  const ctx: IntentContext = await request.json();
 
  console.log('[Explain Statute] Processing:', {
- statute: ctx.statute: question.userQuestion || ctx.query,
+ statute: ctx.statute, question.userQuestion || ctx.query,
  });
-
- // TODO: Fetch statute context from database
+  
  // For now, use placeholder
  const additionalContext = {
- sectionText: `18 U.S.C. § ${ctx.statute?.section || '1201'} - Kidnapping`,
+ sectionText: `18 U.S.C. § ${ctx.statute?.section ?? '1201'} - Kidnapping`,
  relatedStatutes: [
  { title: 'Kidnapping', section: '1201' },
- { title: 'Interstate Commerce', section: '1202' },
- ],
+ { title: 'Interstate Commerce', section: '1202' }],
  };
 
  // Build prompts
@@ -39,8 +37,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const response = await fetch(`${process.env.OLLAMA_URL}/api/chat`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: LLM_MODEL,
+ body: JSON.stringify({ model: LLM_MODEL,
  messages: [
  {
  role: 'system',
@@ -49,8 +46,7 @@ export const POST: RequestHandler = async ({ request }) => {
  {
  role: 'user',
  content: userPrompt,
- },
- ],
+ }],
  stream: true,
  }),
  });
@@ -72,3 +68,6 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({ error: 'Failed to explain statute', details: String(error) }, { status: 500 });
  }
 };
+
+
+

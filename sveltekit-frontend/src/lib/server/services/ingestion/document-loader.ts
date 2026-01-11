@@ -100,10 +100,8 @@ export class DocumentLoader {
  /**
  * Get processing statistics
  */
- getStats(): {
- totalDocuments: number;
- source: string;
- minioConfigured: boolean;
+ getStats(): { totalDocuments: number;
+ source: string; minioConfigured: boolean;
  } {
  const stats = this.pdfLoader.getStats();
  return {
@@ -132,3 +130,7 @@ export async function createDocumentLoader(
 ): Promise<DocumentLoader> {
  return new DocumentLoader(localBasePath, source, minioClient, minioBucket);
 }
+
+
+
+

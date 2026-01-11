@@ -1,4 +1,4 @@
-import { writable, get } from 'svelte/store';
+import { writable: get } from 'svelte/store';
 
 /**
  * Loki-style mock service for Sidebar
@@ -33,8 +33,7 @@ export const lokiStore = writable<{ evidence: Item[]; notes: Item[]; canvasState
  notes: [],
  canvasStates: [],
 });
-
-// --- Helper: create mock data for dev preview --- //
+  
 function createMockData(): { evidence: Item[]; notes: Item[]; canvasStates: Item[] } {
  return {
  evidence: [
@@ -50,16 +49,13 @@ function createMockData(): { evidence: Item[]; notes: Item[]; canvasStates: Item
  fileName: 'email.txt',
  description: 'Client email thread',
  tags: ['email', 'client'],
- },
- ],
+ }],
  notes: [
  { id: 'n1', title: 'Case summary', content: 'Important points...', tags: ['summary'] },
- { id: 'n2', title: 'Todo list', content: 'Follow up with witness...', tags: ['task'] },
- ],
+ { id: 'n2', title: 'Todo list', content: 'Follow up with witness...', tags: ['task'] }],
  canvasStates: [
  { id: 'c1', title: 'Scene Diagram', content: 'Canvas layout v1', tags: ['canvas'] },
- { id: 'c2', title: 'Relationship Map', content: 'Linked suspects', tags: ['map'] },
- ],
+ { id: 'c2', title: 'Relationship Map', content: 'Linked suspects', tags: ['map'] }],
  };
 }
 
@@ -100,7 +96,9 @@ export const loki = {
  lokiStore.set(mock);
  console.log('[loki] initialized mock data');
  },
- evidence: makeCollection('evidence'),
- notes: makeCollection('notes'),
- canvasStates: makeCollection('canvasStates'),
+ evidence: makeCollection('evidence', notes: makeCollection('notes', canvasStates: makeCollection('canvasStates'),
 };
+
+
+
+

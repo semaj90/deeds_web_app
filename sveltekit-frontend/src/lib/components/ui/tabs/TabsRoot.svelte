@@ -23,7 +23,6 @@
 		}
 	});
 
-	// Track registered tabs for keyboard navigation
 	let tabs = $state<string[]>([]);
 
 	function registerTab(tabValue: string) {
@@ -46,8 +45,8 @@
 </script>
 
 <div
-	class="tabs-root {className}"
-	data-orientation={orientation}
+	class="tabs-root { className }"
+	data-orientation={ orientation }
 	role="tablist"
 	aria-orientation={orientation}
 >
@@ -59,10 +58,12 @@
 <style>
 	.tabs-root {
 		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
+		flex-direction: column; gap: 0.5rem;
 	}
 	.tabs-root[data-orientation="vertical"] {
 		flex-direction: row;
 	}
 </style>
+
+
+

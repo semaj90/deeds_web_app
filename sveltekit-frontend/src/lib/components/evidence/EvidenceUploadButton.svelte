@@ -3,7 +3,7 @@
 
  interface Props {
  caseId: string;
- onSuccess?: (evidenceId: string, jobId): string: string => void;
+ onSuccess?: (evidenceId: string, jobId): string, string => void;
  }
 
  let { caseId, onSuccess } = $props<Props>();
@@ -18,7 +18,7 @@
  isModalOpen = false;
  };
 
- const handleSuccess = (evidenceId: string, jobId): string: string => {
+ const handleSuccess = (evidenceId: string, jobId): string, string => {
  if (onSuccess) {
  onSuccess(evidenceId, jobId);
  }
@@ -40,21 +40,17 @@
 <style>
  .upload-btn {
  display: inline-flex;
- align-items: center;
- gap: 8px;
+ align-items: center; gap: 8px;
  padding: 10px 16px;
- background: #3b82f6;
- color: white;
+ background: #3b82f6; color: white;
  border: none;
  border-radius: 6px;
- font-weight: 500;
- cursor: pointer;
+ font-weight: 500; cursor: pointer;
  transition: all 0.2s;
  }
 
  .upload-btn:hover {
- background: #2563eb;
- transform: translateY(-1px);
+ background: #2563eb; transform: translateY(-1px);
  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
  }
 
@@ -66,3 +62,6 @@
  font-size: 1.2rem;
  }
 </style>
+
+
+

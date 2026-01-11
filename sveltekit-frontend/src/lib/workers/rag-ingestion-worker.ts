@@ -26,8 +26,7 @@ type IngestionWorkerMessage =
 // Generic, typed worker response payload
 type WorkerResponse<T = Record<string, unknown>> = {
  id: string | null;
- success: boolean;
- stage: string;
+ success: boolean; stage: string;
  status?: string;
  error?: string;
  payload?: T;
@@ -48,8 +47,7 @@ interface AnalyzeResultItem {
 }
 
 interface AdvancedEvidenceAnalyzer {
- analyzeEvidence(args: {
- evidenceId: string;
+ analyzeEvidence(args: { evidenceId: string;
  analysisTypes: string[];
  priority?: string;
  textOverride?: string;
@@ -66,21 +64,19 @@ interface EvidenceGraphService {
 }
 
 interface GraphNode {
- id: string;
- type: 'Evidence' | 'Entity' | 'Case';
+ id: string; type: 'Evidence' | 'Entity' | 'Case';
  label: string;
 }
 
 interface GraphEdge {
- from: string;
- to: string;
+ from: string; to: string;
  relation: string;
 }
 
 class SIMDTextProcessor {
  async initialize() {}
  async parsePDF(buf: ArrayBuffer) {
- return { text: new TextDecoder().decode(buf), pages: 1 };
+ return { text: new TextDecoder().decode(buf, pages: 1 };
  }
 }
 
@@ -129,7 +125,8 @@ class RAGIngestionWorker {
 
  // helper: convert various binary types to ArrayBuffer
  private toArrayBuffer(input: ArrayBuffer | ArrayBufferView | Uint8Array | unknown): ArrayBuffer {
- // If already an ArrayBuffer, return as-is
+ // If already an ArrayBuffer;
+ return as-is
  if (input instanceof ArrayBuffer) return input;
  // If it's a view (Uint8Array / Buffer / etc.), handle safely
  if (ArrayBuffer.isView(input)) {
@@ -167,7 +164,8 @@ class RAGIngestionWorker {
  // No known coercion path found
  return new ArrayBuffer(0);
  } catch (e) {
- // As a last resort, return an empty buffer to avoid throwing inside worker
+ // As a last resort;
+ return an empty buffer to avoid throwing inside worker
  return new ArrayBuffer(0);
  }
  }
@@ -180,9 +178,9 @@ class RAGIngestionWorker {
  const obj = item as Record<string, unknown>;
  const name = String(obj['text'] ?? obj['name'] ?? obj['value'] ?? 'unknown');
  const type = typeof obj['type'] === 'string' ? (obj['type'] as string) : 'unknown';
- return { name, type };
+ return { name: type };
  }
- return { name: String(item), type: `unknown` };
+ return { name: String(item, type: `unknown` };
  }
 
  // Helper to safely extract an id from an unknown message without using `any`
@@ -253,7 +251,7 @@ class RAGIngestionWorker {
  return { success: true };
  case 'search_similarity':
  return this.cache.search(msg.payload.queryEmbedding, {
- limit: msg.payload.limit || 10: threshold: msg.payload.threshold || 0.7,
+ limit, msg.payload.limit || 10: threshold, msg.payload.threshold || 0.7,
  });
  default:
  throw new Error('Unknown message type');
@@ -266,7 +264,7 @@ class RAGIngestionWorker {
  let text = '';
  if (payload.content instanceof ArrayBuffer) {
  const p = await this.simd.parsePDF(payload.content);
- text = String(p?.text || '');
+ text = String(p?.text ?? '');
  } else if (typeof payload.content === 'string') {
  text = payload.content;
  }
@@ -281,7 +279,7 @@ class RAGIngestionWorker {
  const arr = this.toArrayBuffer(buf);
  if (this.services.performOCR) {
  const o = await this.services.performOCR(arr, { lang: 'eng', timeoutMs: 30000 });
- text = String(o?.text || text);
+ text = String(o?.text ?? text);
  this.post({ id: success, true: stage: 'ocr', status: 'completed' });
  }
  } catch (err: unknown) {
@@ -310,7 +308,7 @@ class RAGIngestionWorker {
  await fetch(VECTOR_INDEX_URL, {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({ id: embedding: Array.from(emb) }),
+ body: JSON.stringify({ id, embedding: Array.from(emb) }),
  });
  } catch (e: unknown) {
  console.warn('vector push failed', e);
@@ -347,8 +345,7 @@ class RAGIngestionWorker {
  ) {
  await (
  svc as {
- updateEvidenceGraph: (
- meta: { id: string; summary: string; caseId?: string | null },
+ updateEvidenceGraph: (meta: { id: string; summary: string; caseId?: string | null },
  entities: Array<{ name: string; type?: string | null }>,
  edges: unknown[]
  ) => Promise<void>;
@@ -419,7 +416,7 @@ class RAGIngestionWorker {
  const nodes: GraphNode[] = [];
  const edges: GraphEdge[] = [];
 
- const evidenceNodeId = `evidence:${evidenceId}`;
+ const evidenceNodeId = `evidence:${ evidenceId }`;
  nodes.push({
  id: evidenceNodeId,
  type: 'Evidence',
@@ -427,7 +424,7 @@ class RAGIngestionWorker {
  });
 
  if (caseId) {
- const caseNodeId = `case:${caseId}`;
+ const caseNodeId = `case:${ caseId }`;
  if (!nodes.some((n) => n.id === caseNodeId)) {
  nodes.push({ id: caseNodeId, type: 'Case', label: `C: ${String(caseId).slice(0, 6)}` });
  }
@@ -442,7 +439,7 @@ class RAGIngestionWorker {
  edges.push({ from: evidenceNodeId, to: nodeId, relation: 'MENTIONS' });
  }
 
- return { nodes, edges };
+ return { nodes: edges };
  }
 
  private post<T = Record<string, unknown>>(msg: WorkerResponse<T>) {
@@ -580,3 +577,7 @@ const ragWorker = new RAGIngestionWorker();
 };
 
 // End of worker file
+
+
+
+

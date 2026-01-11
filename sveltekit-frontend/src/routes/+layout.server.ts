@@ -27,3 +27,5 @@ export const load: LayoutServerLoad = async ({ locals, setHeaders }) => {
 		session: locals.session,
 	};
 };
+
+

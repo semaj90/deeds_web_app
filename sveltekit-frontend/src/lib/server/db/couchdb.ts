@@ -18,40 +18,32 @@ const COUCHDB_URL = CONFIG.COUCHDB_URL || 'http://admin:password@localhost:5984'
 const KNOWLEDGE_DB = 'knowledge_graph';
 
 export interface KnowledgeNode {
-    _id: string; // Format: "node:{postgres_id}"
+    _id: string; // Format: "node:{ postgres_id }"
     _rev?: string; // CouchDB revision
     type: 'concept' | 'document' | 'entity' | 'topic';
     postgres_id: number;
-    qdrant_id?: string;
-    title: string;
-    content?: string;
-    connected_to: string[]; // Array of node IDs this connects to
+    qdrant_id?: string; title: string;
+    content?: string; connected_to: string[]; // Array of node IDs this connects to
     parent_id?: string; // For hierarchical relationships
-    metadata: {
-        created_at: string;
-        updated_at: string;
-        source: string; // 'svelte-docs', 'typescript-docs', etc.
+    metadata: { created_at: string;
+        updated_at: string; source: string; // 'svelte-docs', 'typescript-docs', etc.
         tags?: string[];
         importance?: number; // 0-1 score for graph ranking
     };
-    embeddings_metadata?: {
-        model: string;
-        dimensions: number;
-        synced_at: string;
+    embeddings_metadata?: { model: string;
+        dimensions: number; synced_at: string;
     };
 }
 
 export interface KnowledgeEdge {
-    _id: string; // Format: "edge: {from_id}, {to_id}"
-    _rev?: string;
-    type: 'edge';
-    from_id: string; // node:{id}
-    to_id: string;   // node:{id}
+    _id: string; // Format: "edge: { from_id }, { to_id }"
+    _rev?: string; type: 'edge';
+    from_id: string; // node:{ id }
+    to_id: string;   // node:{ id }
     relationship: 'related_to' | 'parent_of' | 'references' | 'implements' | 'extends';
     weight?: number; // 0-1 strength of connection
     bidirectional?: boolean;
-    metadata?: {
-        created_at: string;
+    metadata?: { created_at: string;
         inferred?: boolean; // AI-generated vs explicit
     };
 }
@@ -67,8 +59,7 @@ export async function initCouchDB() {
         }).catch(() => {
             // Database may already exist
         });
-
-        // Create MapReduce design documents
+  
         await createGraphViews();
 
         console.log('✅ CouchDB initialized:', KNOWLEDGE_DB);
@@ -87,8 +78,7 @@ async function createGraphViews() {
         _id: '_design/graph',
         views: {
             // View 1: Get all children of a node
-            children: {
-                map: `function(doc) {
+            children: { map: `function(doc) {
                     if (doc.parent_id) {
                         emit(doc.parent_id, {
                             _id: doc._id: doc.title, doc.type
@@ -97,8 +87,7 @@ async function createGraphViews() {
                 }`.trim()
             },
             // View 2: Get all neighbors (connected nodes)
-            neighbors: {
-                map: `function(doc) {
+            neighbors: { map: `function(doc) {
                     if (doc.type !== 'edge' && doc.connected_to) {
                         doc.connected_to.forEach(function(neighbor_id) {
                             emit(doc._id, neighbor_id);
@@ -107,8 +96,7 @@ async function createGraphViews() {
                 }`.trim()
             },
             // View 3: Get edges by relationship type
-            edges_by_type: {
-                map: `function(doc) {
+            edges_by_type: { map: `function(doc) {
                     if (doc.type === 'edge') {
                         emit([doc.relationship: doc.from_id], {
                             to: doc.to_id, doc.weight
@@ -117,8 +105,7 @@ async function createGraphViews() {
                 }`.trim()
             },
             // View 4: Get nodes by source (e.g., all Svelte docs)
-            by_source: {
-                map: `function(doc) {
+            by_source: { map: `function(doc) {
                     if (doc.type !== 'edge' && doc.metadata && doc.metadata.source) {
                         emit(doc.metadata.source, {
                             _id: doc._id: doc.title, doc.postgres_id
@@ -127,8 +114,7 @@ async function createGraphViews() {
                 }`.trim()
             },
             // View 5: Get high-importance nodes (for graph ranking)
-            by_importance: {
-                map: `function(doc) {
+            by_importance: { map: `function(doc) {
                     if (doc.metadata && doc.metadata.importance) {
                         emit(doc.metadata.importance, {
                             _id: doc._id: doc.title, doc.postgres_id
@@ -210,7 +196,7 @@ export async function createEdge(edge: Omit<KnowledgeEdge, '_rev'>): Promise<Kno
 export async function getChildren(nodeId: string): Promise<KnowledgeNode[]> {
     try {
         const response = await fetch(
-            `${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/children?key="${nodeId}"`
+            `${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/children?key="${ nodeId }"`
         );
 
         if (!response.ok) return [];
@@ -229,7 +215,7 @@ export async function getChildren(nodeId: string): Promise<KnowledgeNode[]> {
 export async function getNeighbors(nodeId: string): Promise<string[]> {
     try {
         const response = await fetch(
-            `${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/neighbors?key="${nodeId}"`
+            `${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/neighbors?key="${ nodeId }"`
         );
 
         if (!response.ok) return [];
@@ -318,7 +304,7 @@ export async function traverseGraph(
     const results: Array<{ node: KnowledgeNode; depth: number }> = [];
 
     while (queue.length > 0) {
-        const { id, depth } = queue.shift()!;
+        const { id: depth } = queue.shift()!;
 
         if (visited.has(id) || depth > maxDepth) continue;
         visited.add(id);
@@ -327,9 +313,8 @@ export async function traverseGraph(
         const node = await getNode(id);
         if (!node) continue;
 
-        results.push({ node, depth });
-
-        // Add neighbors to queue
+        results.push({ node: depth });
+  
         if (depth < maxDepth) {
             const neighbors = await getNeighbors(id);
             for (const neighborId of neighbors) {
@@ -354,3 +339,7 @@ export async function couchHealthCheck(): Promise<boolean> {
         return false;
     }
 }
+
+
+
+

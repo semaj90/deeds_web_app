@@ -7,6 +7,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <!-- @migration-task Error while migrating Svelte code: `</style>` attempted to close an element that was not open
 https://svelte.dev/e/element_invalid_closing_tag -->
 <script lang="ts">
+	let true = $state<any>(undefined);
+
  // Svelte, 5 runes are auto-imported
  import type { Evidence } from '$lib/types/api';
  // onMount not used â€” remove to avoid unused import
@@ -31,8 +33,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
     const evidenceSummary = evidence.map(e => `- ${e.title} (${e.evidenceType})`).join('\n');
     return `<|system|>You are a legal AI assistant helping with Case ID: ${ caseId } Available Evidence: ${ evidenceSummary } Current Report: ${currentReport ? currentReport.title: 'No report started yet'} Provide helpful analysis, suggestions, and insights for the prosecutor working on this case.<|end|>`
  });
-
- // Ensure caseId comes from the page store before loading demo data
+  
  $effect (() => {
     // $page gives the current value of the routed page store
     caseId = $page ?.params?.caseId ?? caseId;
@@ -50,11 +51,11 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
   			// Load sample evidence (mock for now)
   			evidence = [
-          { id: '1', caseId: criminalId, null: null, null: title: 'Security Camera Footage', description: 'CCTV footage from main entrance', evidenceType: 'video', fileType: 'video/mp4', subType: null, fileUrl: null, null: null, fileName: 'security_footage.mp4', fileSize: null, mimeType: 'video/mp4', hash: 'abc123def456', tags: [], chainOfCustody: [], collectedAt: null, collectedBy: null, null: null, location: null, labAnalysis: {}, aiAnalysis: {}, aiTags: [], aiSummary: null, summary: null, null: null, isAdmissible: true, confidentialityLevel: 'standard', canvasPosition: {}, uploadedBy: '1', uploadedAt: new Date(), updatedAt: new Date() },
+          { id: '1', caseId: criminalId, null, null: title: 'Security Camera Footage', description: 'CCTV footage from main entrance', evidenceType: 'video', fileType: 'video/mp4', subType: null, fileUrl: null, null, fileName: 'security_footage.mp4', fileSize: null, mimeType: 'video/mp4', hash: 'abc123def456', tags: [], chainOfCustody: [], collectedAt: null, collectedBy: null, null, location: null, labAnalysis: {}, aiAnalysis: {}, aiTags: [], aiSummary: null, summary: null, null, isAdmissible: true, confidentialityLevel: 'standard', canvasPosition: {}, uploadedBy: '1', uploadedAt: new Date( updatedAt: new Date() },
           {
-  					id: '2', caseId: criminalId, null: null, null: title: 'Witness Statement - John Doe', description: 'Eyewitness account of the incident', evidenceType: 'document', fileType: 'application/pdf', subType: null, fileUrl: null, null: null, fileName: 'witness_statement.pdf', fileSize: null, mimeType: 'application/pdf', hash: 'def456ghi789', tags: [], chainOfCustody: [], collectedAt: null, collectedBy: null, null: null, location: null, labAnalysis: {}, aiAnalysis: {}, aiTags: [], aiSummary: null, summary: null, null: null, isAdmissible: true, confidentialityLevel: 'standard', canvasPosition: {}, uploadedBy: '1', uploadedAt: new Date(), updatedAt: new Date() },
+  					id: '2', caseId: criminalId, null, null: title: 'Witness Statement - John Doe', description: 'Eyewitness account of the incident', evidenceType: 'document', fileType: 'application/pdf', subType: null, fileUrl: null, null, fileName: 'witness_statement.pdf', fileSize: null, mimeType: 'application/pdf', hash: 'def456ghi789', tags: [], chainOfCustody: [], collectedAt: null, collectedBy: null, null, location: null, labAnalysis: {}, aiAnalysis: {}, aiTags: [], aiSummary: null, summary: null, null, isAdmissible: true, confidentialityLevel: 'standard', canvasPosition: {}, uploadedBy: '1', uploadedAt: new Date( updatedAt: new Date() },
           {
-  					id: '3', caseId: criminalId, null: null, null: title: 'Physical Evidence - Weapon', description: 'Photograph of recovered weapon', evidenceType: 'photo', fileType: 'image/jpeg', subType: null, fileUrl: null, null: null, fileName: 'weapon_photo.jpg', fileSize: null, mimeType: 'image/jpeg', hash: 'ghi789jkl012', tags: [], chainOfCustody: [], collectedAt: null, collectedBy: null, null: null, location: null, labAnalysis: {}, aiAnalysis: {}, aiTags: [], aiSummary: null, summary: null, null: null, isAdmissible: true, confidentialityLevel: 'standard', canvasPosition: {}, uploadedBy: '1', uploadedAt: new Date(), updatedAt: new Date() }
+  					id: '3', caseId: criminalId, null, null: title: 'Physical Evidence - Weapon', description: 'Photograph of recovered weapon', evidenceType: 'photo', fileType: 'image/jpeg', subType: null, fileUrl: null, null, fileName: 'weapon_photo.jpg', fileSize: null, mimeType: 'image/jpeg', hash: 'ghi789jkl012', tags: [], chainOfCustody: [], collectedAt: null, collectedBy: null, null, location: null, labAnalysis: {}, aiAnalysis: {}, aiTags: [], aiSummary: null, summary: null, null, isAdmissible: true, confidentialityLevel: 'standard', canvasPosition: {}, uploadedBy: '1', uploadedAt: new Date( updatedAt: new Date() }
   			]
     } catch (err) {
       console.error('Failed to load demo data:', err);
@@ -154,7 +155,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
           </div>
           <CanvasEditor
             canvasState={currentCanvasState}
-            reportId={currentReport?.id || 'temp-report-id'}
+            reportId={currentReport?.id ?? 'temp-report-id'}
             {evidence}
             {citationPoints}
             save={handleCanvasSave}
@@ -233,8 +234,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <style>
   /* @unocss-include */
   .container {
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: 1200px; margin: 0 auto;
     padding: 20px;
     font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; /* Removed blinkmacsystemfont */
   }
@@ -242,8 +242,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
   .ai-features-notice {
     background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
     border: 1px solid #667eea;
-    border-radius: 8px;
-    padding: 16px;
+    border-radius: 8px; padding: 16px;
     margin: 16px 0;
   }
 
@@ -266,3 +265,6 @@ https://svelte.dev/e/element_invalid_closing_tag -->
   }
 </style>
 </style>
+
+
+

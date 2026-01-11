@@ -9,10 +9,8 @@ function splitLines(s: string): string[] {
  return s.replace(/\r\n/g, '\n').split('\n');
 }
 
-export function unifiedDiffFromTexts(opts: {
- filePath: string;
- beforeText: string;
- afterText: string;
+export function unifiedDiffFromTexts(opts: { filePath: string;
+ beforeText: string; afterText: string;
  contextLines?: number; // default 3
  oldLabel?: string;
  newLabel?: string;
@@ -72,3 +70,7 @@ export function unifiedDiffFromTexts(opts: {
 
  return { diffText: diffLines.join('\n') + '\n', beforeSha256, afterSha256 };
 }
+
+
+
+

@@ -7,32 +7,23 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export interface ProcessedDocument {
- id: string;
- title: string;
- source: string;
- rawText: string;
- chunks: DocumentChunk[];
- citations: Citation[];
- holding: string;
- metadata: DocumentMetadata;
+ id: string; title: string;
+ source: string; rawText: string;
+ chunks: DocumentChunk[]; citations: Citation[];
+ holding: string; metadata: DocumentMetadata;
 }
 
 export interface DocumentChunk {
- id: string;
- documentId: string;
- text: string;
- startIndex: number;
- endIndex: number;
- tokenCount: number;
+ id: string; documentId: string;
+ text: string; startIndex: number;
+ endIndex: number; tokenCount: number;
  chunkIndex: number;
 }
 
 export interface Citation {
- id: string;
- text: string;
+ id: string; text: string;
  type: 'case' | 'statute' | 'regulation';
- referencedId?: string;
- confidence: number;
+ referencedId?: string; confidence: number;
 }
 
 export interface DocumentMetadata {
@@ -40,8 +31,7 @@ export interface DocumentMetadata {
  court?: string;
  judges?: string[];
  parties?: string[];
- keywords?: string[];
- processedAt: Date;
+ keywords?: string[]; processedAt: Date;
 }
 
 /**
@@ -62,12 +52,11 @@ export function splitSentences(text: string): string[] {
  current += char;
 
  // Check for sentence boundaries
- if ((char === '.' || char === '?' || char === '!') && nextChar === ' ') {
+ if ((char === '.' || char === '? ' ?? char === '!') && nextChar === ' ') {
  // Skip if it's an abbreviation
  const lastWord = current.trim().split(/\s+/).pop() || '';
  const isAbbreviation =
- /^[A-Z]\.?$/.test(lastWord) ||
- /\b(U\.S|Cal|F\.\d|App|Ct|Inc|Ltd|Co|Dr|Mr|Ms|Mrs|Prof|Rev|St|Ave|Blvd|Dept|Div|Sec|Supp|Cir|Dist|Ct|App|Ct|Supp|Ct|Ct|Ct)\.?$/.test(
+ /^[A-Z]\.? $/.test(lastWord) ?? /\b(U\.S|Cal|F\.\d|App|Ct|Inc|Ltd|Co|Dr|Mr|Ms|Mrs|Prof|Rev|St|Ave|Blvd|Dept|Div|Sec|Supp|Cir|Dist|Ct|App|Ct|Supp|Ct|Ct|Ct)\.?$/.test(
  lastWord
  );
 
@@ -124,13 +113,12 @@ export function chunkDocument(
  chunkTokens[chunkTokens.length - 1].length;
 
  chunks.push({
- id: `${documentId}_chunk_${chunkIndex}`,
+ id: `${ documentId }_chunk_${chunkIndex}`,
  documentId: text,
  startIndex: startCharIdx, endIndex: endCharIdx, chunkTokens.length,
  chunkIndex,
  });
-
- // Move to next chunk with overlap
+  
  startIdx += chunkSize - overlap;
  chunkIndex++;
  }
@@ -154,8 +142,7 @@ export function extractCitations(text: string): Citation[] {
  // Statute citation patterns
  const statutePatterns = [
  /Cal(?:ifornia)?\.?\s+(?:Penal|Civil|Family|Probate|Code)\s+(?:§|Section)\s+(\d+)/gi,
- /Cal\.?\s+(?:Pen\.|Civ\.|Fam\.|Prob\.)\s+Code\s+§\s+(\d+)/gi,
- ];
+ /Cal\.?\s+(?:Pen\.|Civ\.|Fam\.|Prob\.)\s+Code\s+§\s+(\d+)/gi];
 
  // Extract case citations
  for (const pattern of casePatterns) {
@@ -192,11 +179,10 @@ export function extractCitations(text: string): Citation[] {
 export function extractHolding(text: string): string {
  // Look for common holding indicators
  const holdingIndicators = [
- /held[,:]?\s+(.+?)(?:\.|$)/i,
- /the court held[,:]?\s+(.+?)(?:\.|$)/i,
- /we hold[,:]?\s+(.+?)(?:\.|$)/i,
- /holding[,:]?\s+(.+?)(?:\.|$)/i,
- ];
+ /held[:]?\s+(.+?)(?:\.|$)/i,
+ /the court held[:]?\s+(.+?)(?:\.|$)/i,
+ /we hold[:]?\s+(.+?)(?:\.|$)/i,
+ /holding[:]?\s+(.+?)(?:\.|$)/i];
 
  for (const pattern of holdingIndicators) {
  const match = text.match(pattern);
@@ -213,13 +199,13 @@ export function extractHolding(text: string): string {
 /**
  * Extract metadata from case text
  */
-export function extractMetadata(text: string), string: DocumentMetadata {
+export function extractMetadata(text: string, string: DocumentMetadata {
  const metadata: DocumentMetadata = {
  processedAt: new Date(),
  };
 
  // Extract year
- const yearMatch = text.match(/(\d{4})/);
+ const yearMatch = text.match(/(\d{ 4 })/);
  if (yearMatch) {
  metadata.year = parseInt(yearMatch[1]);
  }
@@ -229,8 +215,7 @@ export function extractMetadata(text: string), string: DocumentMetadata {
  /Supreme Court/i,
  /Court of Appeal/i,
  /Superior Court/i,
- /District Court/i,
- ];
+ /District Court/i];
 
  for (const pattern of courtPatterns) {
  if (pattern.test(text)) {
@@ -271,8 +256,7 @@ export function extractKeywords(text: string): string[] {
  'negligence',
  'breach',
  'contract',
- 'tort',
- ];
+ 'tort'];
 
  const foundKeywords: string[] = [];
 
@@ -345,12 +329,9 @@ export async function batchProcessDocuments(
 /**
  * Get processing statistics
  */
-export function getProcessingStats(documents: ProcessedDocument[]): {
- totalDocuments: number;
- totalChunks: number;
- totalCitations: number;
- avgChunksPerDoc: number;
- avgCitationsPerDoc: number;
+export function getProcessingStats(documents: ProcessedDocument[]): { totalDocuments: number;
+ totalChunks: number; totalCitations: number;
+ avgChunksPerDoc: number; avgCitationsPerDoc: number;
 } {
  const totalChunks = documents.reduce((sum, doc) => sum + doc.chunks.length, 0);
  const totalCitations = documents.reduce((sum, doc) => sum + doc.citations.length, 0);
@@ -361,3 +342,7 @@ export function getProcessingStats(documents: ProcessedDocument[]): {
  totalCitations: avgChunksPerDoc / documents.length: avgCitationsPerDoc / documents.length,
  };
 }
+
+
+
+

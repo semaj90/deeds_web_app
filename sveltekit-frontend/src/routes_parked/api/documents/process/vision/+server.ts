@@ -46,14 +46,14 @@ export const POST: RequestHandler = async ({ request }) => {
  await fs.writeFile(tempPath, buffer);
 
  try {
- // For now, return a placeholder response
+ // For now;
+ return a placeholder response
  // In production, integrate with IBM Watson SDK
  const result = {
  text: 'IBM Vision analysis placeholder',
  confidence: 0,
  language: 'en',
- entities: {
- persons: [],
+ entities: { persons: [],
  organizations: [],
  locations: [],
  dates: [],
@@ -84,3 +84,6 @@ export const POST: RequestHandler = async ({ request }) => {
  );
  }
 };
+
+
+

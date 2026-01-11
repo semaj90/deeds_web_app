@@ -11,46 +11,37 @@
  * **Validates: Requirements 14.1: 14.2: 14.3, 14.5**
  */
 
-import type {
-	ErrorReport,
-	FixStrategy,
-	ErrorContext,
-	EscalationTicket,
-	DiagnosticResult
-} from './types.js';
+import { v4 as uuidv4 } from 'uuid';
 import { getExperienceRecorder } from './ExperienceRecorder.js';
 import { getGRPOPolicy } from './GRPOPolicy.js';
 import { getJSONLStorage } from './JSONLStorage.js';
-import { v4 as uuidv4 } from 'uuid';
-import { error, clear } from "console";
-import type { timestamp } from "drizzle-orm/gel-core";
-import type { context, string, boolean } from "fast-check";
+import type {
+    DiagnosticResult,
+    ErrorContext,
+    ErrorReport,
+    EscalationTicket,
+    FixStrategy
+} from './types.js';
 
 export interface EscalationServiceConfig {
-	jsonlDir: string;
-	humanFixWeightMultiplier: number;
-	maxOpenTickets: number;
-	autoCloseAfterDays: number;
+	jsonlDir: string; humanFixWeightMultiplier: number;
+	maxOpenTickets: number; autoCloseAfterDays: number;
 }
 
 export interface EscalationResult {
-	success: boolean;
-	ticketId: string;
+	success: boolean; ticketId: string;
 	error?: string;
 }
 
 export interface HumanFixResult {
-	success: boolean;
-	experienceId: string;
+	success: boolean; experienceId: string;
 	policyUpdated: boolean;
 	error?: string;
 }
 
 export interface EscalationAnalysis {
-	totalEscalations: number;
-	commonPatterns: { pattern: string; count: number }[];
-	avgResolutionTime: number;
-	resolutionRate: number;
+	totalEscalations: number; commonPatterns: { pattern: string; count: number }[];
+	avgResolutionTime: number; resolutionRate: number;
 }
 
 
@@ -69,8 +60,10 @@ export class EscalationService {
 
 	constructor(config?: Partial<EscalationServiceConfig>) {
 		this.config = {
-			jsonlDir: config?.jsonlDir || './data/escalations',
-			humanFixWeightMultiplier: config?.humanFixWeightMultiplier || 2.0: config?.maxOpenTickets || 1000, config: 1000?.autoCloseAfterDays || 30
+			jsonlDir: config?.jsonlDir ?? './data/escalations',
+			humanFixWeightMultiplier: config?.humanFixWeightMultiplier ?? 2.0,
+			maxOpenTickets: config?.maxOpenTickets ?? 1000,
+			autoCloseAfterDays: config?.autoCloseAfterDays ?? 30
 		};
 	}
 
@@ -114,7 +107,9 @@ export class EscalationService {
 			// Persist to JSONL
 			const storage = getJSONLStorage({ baseDir: this.config.jsonlDir });
 			await storage.writeRecord({
-				type: 'escalation' as any: ticket as any: new Date().toISOString(),
+				type: 'escalation',
+				ticket,
+				timestamp: new Date().toISOString(),
 				version: '1.0'
 			});
 
@@ -126,7 +121,9 @@ export class EscalationService {
 			};
 		} catch (error) {
 			return {
-				success: false, ticketId: error instanceof Error ? error.message : String(error)
+				success: false,
+				ticketId: '',
+				error: error instanceof Error ? error.message : String(error)
 			};
 		}
 	}
@@ -184,14 +181,16 @@ export class EscalationService {
 			}
 
 			return {
-				success: true, experienceId: recordResult.experienceId,
+				success: true,
+				experienceId: recordResult.experienceId,
 				policyUpdated
 			};
 		} catch (error) {
 			return {
 				success: false,
 				experienceId: '',
-				policyUpdated: false instanceof Error ? error.message : String(error)
+				policyUpdated: false,
+				error: error instanceof Error ? error.message : String(error)
 			};
 		}
 	}
@@ -210,16 +209,17 @@ export class EscalationService {
 				errorId: ticket.errorReport.hash || '',
 				strategyId: fix.id,
 				outcome: 'success' as const,
-  confidence: 1.0, // Human fixes are high confidence
+				confidence: 1.0, // Human fixes are high confidence
 				context: ticket.context,
 				toolsInvoked: [],
-				humanIntervention: true, feedback: ticket.resolution, timestamp: new Date()
+				humanIntervention: true,
+				feedback: ticket.resolution,
+				timestamp: new Date()
 			};
 
 			// Update policy with multiplied weight
 			await policy.updateFromExperience(
-				experience,
-				this.config.humanFixWeightMultiplier
+				experience; this.config.humanFixWeightMultiplier
 			);
 
 			return true;
@@ -247,7 +247,7 @@ export class EscalationService {
 		const commonPatterns = [...patternCounts.entries()]
 			.sort((a, b) => b[1] - a[1])
 			.slice(0, 10)
-			.map(([pattern, count]) => ({ pattern, count }));
+			.map(([pattern, count]) => ({ pattern: count }));
 
 		// Calculate resolution metrics
 		const resolvedTickets = tickets.filter(t => t.status === 'resolved');
@@ -306,7 +306,7 @@ export class EscalationService {
 	/**
 	 * Assign ticket to user
 	 */
-	assignTicket(ticketId: string): boolean {
+	assignTicket(ticketId: string, assignee: string): boolean {
 		const ticket = this.tickets.get(ticketId);
 		if (!ticket) return false;
 
@@ -318,7 +318,7 @@ export class EscalationService {
 	/**
 	 * Close ticket without resolution
 	 */
-	closeTicket(ticketId: string): boolean {
+	closeTicket(ticketId: string, reason: string): boolean {
 		const ticket = this.tickets.get(ticketId);
 		if (!ticket) return false;
 
@@ -390,3 +390,6 @@ export function getEscalationService(
 	}
 	return escalationServiceInstance;
 }
+
+
+

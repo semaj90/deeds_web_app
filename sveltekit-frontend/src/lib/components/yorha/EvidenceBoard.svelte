@@ -14,7 +14,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  let nodes: YoRHaEvidenceNode[] = [];
  let connections: YoRHaEvidenceConnection[] = [];
- let selectedNode: YoRHaEvidenceNode: null = null;
+ let selectedNode: YoRHaEvidenceNode, null = null;
  let isLoading = true;
  let error: string | null = null;
  let svgElement: SVGSVGElement;
@@ -33,10 +33,9 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  const [nodesRes, connectionsRes] = await Promise.all([
  fetch(`/api/yorha/evidence/nodes?case_id=${caseId}`),
- fetch(`/api/yorha/evidence/connections?case_id=${caseId}`),
- ]);
+ fetch(`/api/yorha/evidence/connections? case_id=${caseId}`)]);
 
- if (!nodesRes.ok || !connectionsRes.ok) {
+ if (!nodesRes.ok ?? !connectionsRes.ok) {
  throw new Error('Failed to load evidence');
  }
 
@@ -100,8 +99,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  await fetch(`/api/yorha/evidence/nodes/${node.id}`, {
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- position_x: node.position_x: position_y, node: node.position_y,
+ body: JSON.stringify({ position_x: node.position_x: position_y, node: node.position_y,
  }),
  });
  } catch (err) {
@@ -254,62 +252,50 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <style>
  .evidence-board {
  display: flex;
- flex-direction: column;
- height: 100%;
- background: #1a1a2e;
- color: #e0e0e0;
+ flex-direction: column; height: 100%;
+ background: #1a1a2e; color: #e0e0e0;
  }
 
  .board-header {
  display: flex;
  justify-content: space-between;
- align-items: center;
- padding: 1rem;
+ align-items: center; padding: 1rem;
  border-bottom: 2px solid #00d4ff;
  }
 
  .board-header h2 {
- margin: 0;
- color: #00d4ff;
+ margin: 0; color: #00d4ff;
  }
 
  .refresh-btn {
  padding: 0.5rem 1rem;
- background: #00d4ff;
- color: #1a1a2e;
+ background: #00d4ff; color: #1a1a2e;
  border: none;
- border-radius: 4px;
- cursor: pointer;
+ border-radius: 4px; cursor: pointer;
  font-weight: bold;
  }
 
- .refresh-btn:hover:not(:disabled) {
+ .refresh-btn:hover, not(disabled) {
  background: #00a8cc;
  }
 
  .error-message {
- padding: 1rem;
- background: #8b0000;
- color: #ff6b6b;
- border: 1px solid #ff6b6b;
+ padding: 1rem; background: #8b0000;
+ color: #ff6b6b; border: 1px solid #ff6b6b;
  margin: 1rem;
  border-radius: 4px;
  }
 
  .board-container {
- display: flex;
- flex: 1;
- gap: 1rem;
- padding: 1rem;
+ display: flex; flex: 1;
+ gap: 1rem; padding: 1rem;
  overflow: hidden;
  }
 
  .evidence-canvas {
- flex: 1;
- background: rgba(0, 212, 255, 0.05);
+ flex: 1; background: rgba(0, 212, 255, 0.05);
  border: 1px solid #00d4ff;
- border-radius: 4px;
- cursor: grab;
+ border-radius: 4px; cursor: grab;
  }
 
  .evidence-canvas:active {
@@ -317,8 +303,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
 
  .connection-line {
- stroke: #00d4ff;
- opacity: 0.6;
+ stroke: #00d4ff; opacity: 0.6;
  }
 
  .connection-label {
@@ -328,19 +313,16 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
 
  .node {
- cursor: pointer;
- transition: all 0.2s;
+ cursor: pointer; transition: all 0.2s;
  }
 
  .node:hover circle {
- opacity: 1;
- filter: drop-shadow(0 0 8px currentColor);
+ opacity: 1; filter: drop-shadow(0 0 8px currentColor);
  }
 
  .node.selected circle {
  stroke: #ffff00;
- stroke-width: 2;
- filter: drop-shadow(0 0 10px #ffff00);
+ stroke-width: 2; filter: drop-shadow(0 0 10px #ffff00);
  }
 
  .node-label {
@@ -351,11 +333,9 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
 
  .node-details {
- width: 300px;
- background: rgba(0, 212, 255, 0.05);
+ width: 300px; background: rgba(0, 212, 255, 0.05);
  border: 1px solid #00d4ff;
- border-radius: 4px;
- padding: 1rem;
+ border-radius: 4px; padding: 1rem;
  overflow-y: auto;
  }
 
@@ -369,29 +349,24 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
 
  .details-header h3 {
- margin: 0;
- color: #00d4ff;
+ margin: 0; color: #00d4ff;
  font-size: 1.1rem;
  }
 
  .close-btn {
- background: none;
- border: none;
- color: #00d4ff;
- cursor: pointer;
+ background: none; border: none;
+ color: #00d4ff; cursor: pointer;
  font-size: 1.2rem;
  }
 
  .details-content {
  display: flex;
- flex-direction: column;
- gap: 0.75rem;
+ flex-direction: column; gap: 0.75rem;
  }
 
  .detail-item {
  display: flex;
- flex-direction: column;
- gap: 0.25rem;
+ flex-direction: column; gap: 0.25rem;
  }
 
  .detail-item .label {
@@ -407,8 +382,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
 
  .board-legend {
- display: flex;
- gap: 1rem;
+ display: flex; gap: 1rem;
  padding: 1rem;
  border-top: 1px solid #00d4ff;
  flex-wrap: wrap;
@@ -416,14 +390,16 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  .legend-item {
  display: flex;
- align-items: center;
- gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  font-size: 0.9rem;
  }
 
  .legend-color {
- width: 16px;
- height: 16px;
+ width: 16px; height: 16px;
  border-radius: 50%;
  }
 </style>
+
+
+
+

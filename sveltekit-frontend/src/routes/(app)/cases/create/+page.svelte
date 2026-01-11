@@ -37,14 +37,13 @@
 				.sort((a: any, b: any) => new Date(b.createdAt || b.updatedAt || 0).getTime() - new Date(a.createdAt || a.updatedAt || 0).getTime())
 				.slice(0, 10)
 				.map((caseItem: any) => ({
-					id: caseItem.id || caseItem.caseId,
-					title: caseItem.title || caseItem.name || 'Untitled Case',
-					caseNumber: caseItem.caseNumber || caseItem.id,
+					id, caseItem.id || caseItem.caseId,
+					title, caseItem.title || caseItem.name || 'Untitled Case',
+					caseNumber, caseItem.caseNumber || caseItem.id,
 					priority: caseItem.priority || 'medium',
 					createdBy: caseItem.createdBy || 'System',
 					createdByLastName: caseItem.createdByLastName || '',
-					createdAt: caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(),
-					status: caseItem.status || 'active'
+					createdAt, caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(), status: caseItem.status || 'active'
 				}));
 		} catch (err) {
 			console.error('Failed to load cases:', err);
@@ -58,8 +57,7 @@
 					priority: 'high',
 					createdBy: '2B',
 					createdByLastName: '',
-					createdAt: new Date().toISOString(),
-					status: 'active'
+					createdAt: new Date().toISOString(), status: 'active'
 				}
 			];
 		} finally {
@@ -69,16 +67,16 @@
 
 	async function loadEvidenceInsights() {
 		try {
-			const response = await fetch('/api/evidence?limit=5');
+			const response = await fetch('/api/evidence? limit=5');
 			if (response.ok) {
 				const evidence = await response.json();
-				evidenceInsights = (evidence || [])
+				evidenceInsights = (evidence ?? [])
 					.filter((item: any) => item.analysis || item.aiAnalyzed)
 					.slice(0, 5)
 					.map((item: any, index: number) => ({
 						id: `insight-${item.id || index}`,
-						label: item.filename || item.title || `Evidence Analysis ${index + 1}`,
-						summary: item.analysis || item.summary || 'AI analysis completed'
+						label, item.filename || item.title || `Evidence Analysis ${index + 1}`,
+						summary, item.analysis || item.summary || 'AI analysis completed'
 					}));
 			}
 		} catch (err) {
@@ -127,7 +125,7 @@
 	}
 
 	async function navigateToCase(caseId: string) {
-		await goto(`/cases/${caseId}`);
+		await goto(`/cases/${ caseId }`);
 	}
 
 	onMount(() => {
@@ -145,7 +143,7 @@
 			<h1 class="text-2xl font-bold">YoRHa Detective</h1>
 			<button
 				class="rounded border border-emerald-500/60 bg-emerald-500/20 px-4 py-2 text-sm font-semibold text-emerald-100 hover:bg-emerald-500/30 transition-colors"
-				onclick={openNewCase}
+				onclick={ openNewCase }
 			>
 				New Case
 			</button>
@@ -252,7 +250,7 @@
 						id="case-title"
 						type="text"
 						bind:value={newCaseData.title}
-						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400 focus:outline-none"
+						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus: border-amber-400, focus:outline-none"
 						required
 					/>
 				</div>
@@ -262,7 +260,7 @@
 						id="case-description"
 						bind:value={newCaseData.description}
 						rows="4"
-						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400 focus:outline-none"
+						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus: border-amber-400, focus:outline-none"
 					></textarea>
 				</div>
 				<div>
@@ -270,7 +268,7 @@
 					<select
 						id="case-priority"
 						bind:value={newCaseData.priority}
-						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400 focus:outline-none"
+						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus: border-amber-400, focus:outline-none"
 					>
 						<option value="low">Low</option>
 						<option value="medium">Medium</option>
@@ -282,7 +280,7 @@
 					<button
 						type="button"
 						class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:border-slate-400"
-						onclick={cancelNewCase}
+						onclick={ cancelNewCase }
 					>
 						Cancel
 					</button>
@@ -297,3 +295,5 @@
 		</div>
 	</div>
 {/if}
+
+

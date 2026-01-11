@@ -12,97 +12,70 @@ export const API_CONFIG = {
 export interface ApiResponse<T> {
  success: boolean;
  data?: T;
- error?: string;
- timestamp: string;
+ error?: string; timestamp: string;
  requestId: string;
 }
 
 export interface PaginatedResponse<T> {
- items: T[];
- total: number;
- page: number;
- pageSize: number;
+ items: T[]; total: number;
+ page: number; pageSize: number;
  hasMore: boolean;
 }
 
 // Case Management API
 export interface Case {
- id: string;
- title: string;
- description: string;
- status: 'open' | 'investigating' | 'pending' | 'closed' | 'archived';
+ id: string; title: string;
+ description: string; status: 'open' | 'investigating' | 'pending' | 'closed' | 'archived';
  priority: 'low' | 'medium' | 'high' | 'critical';
- createdAt: string;
- updatedAt: string;
- assignedTo?: string;
- tags: string[];
- evidenceCount: number;
- poiCount: number;
+ createdAt: string; updatedAt: string;
+ assignedTo?: string; tags: string[];
+ evidenceCount: number; poiCount: number;
 }
 
 export interface CaseStats {
- total: number;
- open: number;
- investigating: number;
- pending: number;
- closed: number;
- critical: number;
- high: number;
- medium: number;
+ total: number; open: number;
+ investigating: number; pending: number;
+ closed: number; critical: number;
+ high: number; medium: number;
  low: number;
 }
 
 // Evidence API
 export interface Evidence {
- id: string;
- title: string;
- description: string;
- type: 'document' | 'image' | 'video' | 'audio' | 'other';
+ id: string; title: string;
+ description: string; type: 'document' | 'image' | 'video' | 'audio' | 'other';
  status: 'pending' | 'processing' | 'analyzed' | 'archived';
- fileSize: number;
- mimeType: string;
+ fileSize: number; mimeType: string;
  uploadedAt: string;
- analyzedAt?: string;
- tags: string[];
+ analyzedAt?: string; tags: string[];
  metadata: Record<string, any>;
  caseId?: string;
  confidence?: number;
 }
 
 export interface EvidenceStats {
- total: number;
- documents: number;
- images: number;
- videos: number;
- audio: number;
- pending: number;
- processing: number;
- analyzed: number;
+ total: number; documents: number;
+ images: number; videos: number;
+ audio: number; pending: number;
+ processing: number; analyzed: number;
 }
 
 // Person of Interest API
 export interface PersonOfInterest {
- id: string;
- name: string;
- aliases: string[];
- description: string;
+ id: string; name: string;
+ aliases: string[]; description: string;
  threatLevel: 'low' | 'medium' | 'high' | 'critical';
  status: 'active' | 'inactive' | 'archived';
  createdAt: string;
- lastSeen?: string;
- associatedCases: string[];
- tags: string[];
- metadata: Record<string, any>;
+ lastSeen?: string; associatedCases: string[];
+ tags: string[]; metadata: Record<string, any>;
 }
 
 // Search API
 export interface SearchResult {
- id: string;
- title: string;
- content: string;
- type: 'case' | 'evidence' | 'poi' | 'document';
- relevance: number;
- tags: string[];
+ id: string; title: string;
+ content: string; type: 'case' | 'evidence' | 'poi' | 'document';
+ relevance: number; tags: string[];
  metadata: Record<string, any>;
 }
 
@@ -117,27 +90,20 @@ export interface SearchFilters {
 
 // System Metrics API
 export interface SystemMetrics {
- cpu: {
- usage: number;
+ cpu: { usage: number;
  cores: number;
  temperature?: number;
  };
- memory: {
- used: number;
- total: number;
- percentage: number;
+ memory: { used: number;
+ total: number; percentage: number;
  };
- gpu?: {
- usage: number;
- memoryUsed: number;
- memoryTotal: number;
+ gpu?: { usage: number;
+ memoryUsed: number; memoryTotal: number;
  temperature?: number;
  };
  services: {
- [serviceName: string]: {
- status: 'healthy' | 'degraded' | 'unhealthy';
- uptime: number;
- responseTime: number;
+ [serviceName: string]: { status: 'healthy' | 'degraded' | 'unhealthy';
+ uptime: number; responseTime: number;
  };
  };
  timestamp: string;
@@ -145,10 +111,8 @@ export interface SystemMetrics {
 
 // AI Analysis API
 export interface AnalysisResult {
- id: string;
- type: 'entity_extraction' | 'sentiment' | 'classification' | 'similarity' | 'summary';
- confidence: number;
- result: any;
+ id: string; type: 'entity_extraction' | 'sentiment' | 'classification' | 'similarity' | 'summary';
+ confidence: number; result: any;
  metadata: Record<string, any>;
  timestamp: string;
 }
@@ -169,9 +133,9 @@ class ApiClient {
  endpoint: string, options: RequestInit = {},
  retryCount = 0
  ): Promise<ApiResponse<T>> {
- const url = `${this.baseURL}${endpoint}`;
+ const url = `${this.baseURL}${ endpoint }`;
  const controller = new AbortController();
- const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+ const timeoutId = setTimeout(() => controller.abort(); this.timeout);
 
  try {
  const response = await fetch(url, {
@@ -191,8 +155,7 @@ class ApiClient {
  const data = await response.json();
  return {
  success: true,
- data: timestamp Date().toISOString(),
- requestId: Math.random().toString(36).substring(2, 15),
+ data: timestamp Date().toISOString(), requestId: Math.random().toString(36).substring(2, 15),
  };
  } catch (error) {
  clearTimeout(timeoutId);
@@ -209,28 +172,27 @@ class ApiClient {
 
  return {
  success: error instanceof Error ? error.message : 'Unknown error',
- timestamp: new Date().toISOString(),
- requestId: Math.random().toString(36).substring(2, 15),
+ timestamp: new Date().toISOString(), requestId: Math.random().toString(36).substring(2, 15),
  };
  }
  }
 
  async get<T>(endpoint: string, params?: Record<string, any>): Promise<ApiResponse<T>> {
- const url = params ? `${endpoint}?${new URLSearchParams(params)}` : endpoint;
+ const url = params ? `${ endpoint }?${new URLSearchParams(params)}` : endpoint;
  return this.request<T>(url);
  }
 
  async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
  return this.request<T>(endpoint, {
  method: 'POST',
- body: data ? JSON.stringify(data)  | undefined,
+ body: data ? JSON.stringify(data) : undefined,
  });
  }
 
  async put<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
  return this.request<T>(endpoint, {
  method: 'PUT',
- body: data ? JSON.stringify(data)  | undefined,
+ body: data ? JSON.stringify(data) : undefined,
  });
  }
 
@@ -255,7 +217,7 @@ export const caseApi = {
  },
 
  async getCase(id: string): Promise<ApiResponse<Case>> {
- return apiClient.get<Case>(`/api/cases/${id}`);
+ return apiClient.get<Case>(`/api/cases/${ id }`);
  },
 
  async createCase(data: Omit<Case, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Case>> {
@@ -263,11 +225,11 @@ export const caseApi = {
  },
 
  async updateCase(id: string, data: Partial<Case>): Promise<ApiResponse<Case>> {
- return apiClient.put<Case>(`/api/cases/${id}`, data);
+ return apiClient.put<Case>(`/api/cases/${ id }`, data);
  },
 
  async deleteCase(id: string): Promise<ApiResponse<void>> {
- return apiClient.delete<void>(`/api/cases/${id}`);
+ return apiClient.delete<void>(`/api/cases/${ id }`);
  },
 
  async getCaseStats(): Promise<ApiResponse<CaseStats>> {
@@ -289,7 +251,7 @@ export const evidenceApi = {
  },
 
  async getEvidenceItem(id: string): Promise<ApiResponse<Evidence>> {
- return apiClient.get<Evidence>(`/api/evidence/${id}`);
+ return apiClient.get<Evidence>(`/api/evidence/${ id }`);
  },
 
  async uploadEvidence(formData: FormData): Promise<ApiResponse<Evidence>> {
@@ -302,16 +264,14 @@ export const evidenceApi = {
  return {
  success: false,
  error: `HTTP ${response.status}: ${response.statusText}`,
- timestamp: new Date().toISOString(),
- requestId: Math.random().toString(36).substring(2, 15),
+ timestamp: new Date().toISOString(), requestId: Math.random().toString(36).substring(2, 15),
  };
  }
 
  const data = await response.json();
  return {
  success: true,
- data: timestamp Date().toISOString(),
- requestId: Math.random().toString(36).substring(2, 15),
+ data: timestamp Date().toISOString(), requestId: Math.random().toString(36).substring(2, 15),
  };
  },
 
@@ -395,7 +355,7 @@ export const aiApi = {
  text: string,
  type: 'sentiment' | 'entities' | 'summary' | 'classification'
  ): Promise<ApiResponse<AnalysisResult>> {
- return apiClient.post<AnalysisResult>('/api/ai/analyze', { text, type });
+ return apiClient.post<AnalysisResult>('/api/ai/analyze', { text: type });
  },
 
  async generateEmbeddings(texts: string[]): Promise<ApiResponse<number[][]>> {
@@ -406,7 +366,7 @@ export const aiApi = {
  message: string,
  context?: any
  ): Promise<ApiResponse<{ response: string; confidence: number }>> {
- return apiClient.post('/api/ai/chat', { message, context });
+ return apiClient.post('/api/ai/chat', { message: context });
  },
 };
 
@@ -421,14 +381,15 @@ export const apiUtils = {
 
  createMockData: <T>(data: T): ApiResponse<T> => ({
  success: true,
- data: timestamp Date().toISOString(),
- requestId: Math.random().toString(36).substring(2, 15),
- }),
-
- isApiError: (response: ApiResponse<any>): response is ApiResponse<any> & { success: false } => {
+ data: timestamp Date().toISOString(), requestId: Math.random().toString(36).substring(2, 15),
+ }, isApiError: (response: ApiResponse<any>): response is ApiResponse<any> & { success: false } => {
  return !response.success;
  },
 };
 
 // Export default API client for advanced usage
 export default apiClient;
+
+
+
+

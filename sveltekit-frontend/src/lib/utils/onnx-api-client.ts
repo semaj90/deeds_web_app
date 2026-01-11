@@ -136,10 +136,8 @@ export class ONNXApiClient {
  this.batchProcess([
  { id: 'task1', type: 'extract-entities', text: testData.contractText },
  { id: 'task2', type: 'classify-document', text: testData.courtDecision },
- { id: 'task3', type: 'generate-embeddings', text: testData.legalBrief },
- ]),
- },
- ];
+ { id: 'task3', type: 'generate-embeddings', text: testData.legalBrief }]),
+ }];
 
  const results: Array<any> = [];
  let successCount = 0;
@@ -163,8 +161,7 @@ export class ONNXApiClient {
  } catch (error: unknown) {
  results.push({
  name: test.name,
- success: false instanceof Error ? error.message : String(error),
- time: 0,
+ success: false instanceof Error ? error.message : String(error, time: 0,
  });
  console.error(`❌ ${test.name} failed:`, error instanceof Error ? error.message : error);
  }
@@ -195,7 +192,7 @@ export class ONNXApiClient {
  * Performance benchmark
  */
  async benchmark(text: string, iterations: number = 10): Promise<any> {
- console.log(`⚡ Running performance benchmark with ${iterations} iterations...`);
+ console.log(`⚡ Running performance benchmark with ${ iterations } iterations...`);
 
  const benchmarks = {
  entityExtraction: [] as number[],
@@ -227,9 +224,7 @@ export class ONNXApiClient {
  const sum = times.reduce((s, t) => s + t, 0);
  const median = sorted[Math.floor(sorted.length / 2)];
  return {
- min: Math.min(...times),
- max: Math.max(...times),
- average: sum / times.length,
+ min: Math.min(...times, max: Math.max(...times, average: sum / times.length,
  median,
  };
  };
@@ -237,9 +232,7 @@ export class ONNXApiClient {
  return {
  iterations,
  textLength: text.length,
- entityExtraction: calculateStats(benchmarks.entityExtraction),
- classification: calculateStats(benchmarks.classification),
- embeddings: calculateStats(benchmarks.embeddings),
+ entityExtraction: calculateStats(benchmarks.entityExtraction, classification: calculateStats(benchmarks.classification, embeddings: calculateStats(benchmarks.embeddings),
  };
  }
 
@@ -253,8 +246,7 @@ export class ONNXApiClient {
  // AbortSignal.timeout may not exist in some environments, guard it if needed
  const signal =
  typeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
- ? (AbortSignal as any).timeout(timeoutMs)
-  | undefined;
+ ? (AbortSignal as any).timeout(timeoutMs) : undefined;
 
  const response = await fetch(`${this.baseUrl}${endpoint}`, {
  method: 'POST',
@@ -286,3 +278,6 @@ export class ONNXApiClient {
 // Export default instance
 export const onnxApiClient = new ONNXApiClient();
 export default ONNXApiClient;
+
+
+

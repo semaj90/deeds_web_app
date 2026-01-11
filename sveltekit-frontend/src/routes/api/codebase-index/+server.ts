@@ -5,30 +5,22 @@ const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const COLLECTION_NAME = 'fastmcp_file_profiles';
 
 interface FileProfile {
-	file_path: string;
-	role: string;
-	surface: string[];
-	dependencies: string[];
-	exports: string[];
-	imports: string[];
-	comments: string[];
-	risk: string;
-	change_frequency: string;
-	related_routes: string[];
-	tags: string[];
-	summary: string;
+	file_path: string; role: string;
+	surface: string[]; dependencies: string[];
+	exports: string[]; imports: string[];
+	comments: string[]; risk: string;
+	change_frequency: string; related_routes: string[];
+	tags: string[]; summary: string;
 	generated_at: string;
 }
 
 interface QdrantPoint {
-	id: number;
-	payload: FileProfile;
+	id: number; payload: FileProfile;
 	vector?: number[];
 }
 
 interface QdrantScrollResponse {
-	result: {
-		points: QdrantPoint[];
+	result: { points: QdrantPoint[];
 		next_page_offset?: number;
 	};
 	status: string;
@@ -83,11 +75,12 @@ export const GET: RequestHandler = async ({ url }) => {
 				files: [],
 				stats: { totalFiles: 0, byRole: {}, byRisk: {}, bySurface: {} },
 				error: `Qdrant request failed: ${response.status}`
-			}, { status: 200 }); // Return 200 with empty data for UI fallback
+			}, { status: 200 });
+  
 		}
 
 		const data = await response.json() as QdrantScrollResponse;
-		let files = data.result?.points || [];
+		let files = data.result?.points ?? [];
 
 		// Client-side search if query provided
 		if (search) {
@@ -144,8 +137,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const embedResponse = await fetch('http://localhost:11434/api/embeddings', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: 'embeddinggemma:latest',
+			body: JSON.stringify({ model: 'embeddinggemma:latest',
 				prompt: query
 			})
 		});
@@ -185,3 +177,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		}, { status: 500 });
 	}
 };
+
+
+
+

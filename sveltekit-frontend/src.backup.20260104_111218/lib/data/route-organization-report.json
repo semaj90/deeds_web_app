@@ -1,0 +1,190 @@
+{
+ "metadata": {
+ "generated": "2025-12-02T00:00:00Z",
+ "totalRoutes": 477,
+ "functionalRoutes": 132,
+ "emptyStubs": 344,
+ "emptyApiEndpoints": 333,
+ "navigationReferences": 12
+ },
+ "categories": {
+ "AI": {
+ "priority": "high",
+ "description": "AI features, RAG, semantic search",
+ "routes": [
+ { "path": "/ai", "functional": true, "status": "active" },
+ { "path": "/aiassistant", "functional": true, "status": "active" },
+ { "path": "/context7-demo", "functional": true, "status": "active" },
+ { "path": "/context7-demo-advanced", "functional": true, "status": "active" },
+ { "path": "/rag-demo", "functional": true, "status": "active" },
+ { "path": "/semantic-search-demo", "functional": true, "status": "active" },
+ { "path": "/api/ai/chat", "functional": true, "status": "active" },
+ { "path": "/api/ai/embeddings", "functional": true, "status": "active" },
+ { "path": "/api/rag/search", "functional": true, "status": "active" },
+ { "path": "/api/semantic/search", "functional": true, "status": "active" },
+ { "path": "/api/context7/query", "functional": true, "status": "active" },
+ { "path": "/api/gemma/inference", "functional": true, "status": "active" }
+ ]
+ },
+ "Core": {
+ "priority": "high",
+ "description": "Core application: cases, evidence, legal documents, search",
+ "routes": [
+ { "path": "/cases", "functional": true, "status": "active" },
+ { "path": "/cases/[id]", "functional": true, "status": "active" },
+ { "path": "/evidence", "functional": true, "status": "active" },
+ { "path": "/evidence/[id]", "functional": true, "status": "active" },
+ { "path": "/legal/documents", "functional": true, "status": "active" },
+ { "path": "/legal/documents/[id]", "functional": true, "status": "active" },
+ { "path": "/legal-ai-suite", "functional": true, "status": "active" },
+ { "path": "/search", "functional": true, "status": "active" },
+ { "path": "/api/cases", "functional": true, "status": "active" },
+ { "path": "/api/evidence", "functional": true, "status": "active" },
+ { "path": "/api/legal/documents", "functional": true, "status": "active" },
+ { "path": "/api/search", "functional": true, "status": "active" },
+ { "path": "/api/search/advanced", "functional": true, "status": "active" },
+ { "path": "/api/search/semantic", "functional": true, "status": "active" },
+ { "path": "/api/search/vector", "functional": true, "status": "active" },
+ { "path": "/api/legal/analysis", "functional": true, "status": "active" },
+ { "path": "/api/legal/recommendations", "functional": true, "status": "active" },
+ { "path": "/api/legal/citations", "functional": true, "status": "active" }
+ ]
+ },
+ "Auth": {
+ "priority": "high",
+ "description": "Authentication and user management",
+ "routes": [
+ { "path": "/login", "functional": true, "status": "active" },
+ { "path": "/logout", "functional": true, "status": "active" },
+ { "path": "/register", "functional": true, "status": "active" },
+ { "path": "/profile", "functional": true, "status": "active" },
+ { "path": "/api/auth/login", "functional": true, "status": "active" },
+ { "path": "/api/auth/logout", "functional": true, "status": "active" },
+ { "path": "/api/auth/register", "functional": true, "status": "active" },
+ { "path": "/api/auth/session", "functional": true, "status": "active" },
+ { "path": "/api/auth/verify", "functional": true, "status": "active" },
+ { "path": "/api/auth/refresh", "functional": true, "status": "active" }
+ ]
+ },
+ "Utility": {
+ "priority": "high",
+ "description": "Core utilities: dashboard, settings, import/export, upload",
+ "routes": [
+ { "path": "/dashboard", "functional": true, "status": "active" },
+ { "path": "/settings", "functional": true, "status": "active" },
+ { "path": "/import", "functional": true, "status": "active" },
+ { "path": "/export", "functional": true, "status": "active" },
+ { "path": "/upload", "functional": true, "status": "active" },
+ { "path": "/help", "functional": true, "status": "active" },
+ { "path": "/api/settings", "functional": true, "status": "active" },
+ { "path": "/api/import", "functional": true, "status": "active" },
+ { "path": "/api/export", "functional": true, "status": "active" },
+ { "path": "/api/upload", "functional": true, "status": "active" }
+ ]
+ },
+ "Demo": {
+ "priority": "medium",
+ "description": "Demo and test routes",
+ "routes": [
+ { "path": "/demo", "functional": true, "status": "active" },
+ { "path": "/demo/ai-test", "functional": true, "status": "active" },
+ { "path": "/test", "functional": true, "status": "active" },
+ { "path": "/test-gemma3", "functional": true, "status": "active" },
+ { "path": "/test-simple", "functional": true, "status": "active" },
+ { "path": "/api/demo", "functional": true, "status": "active" },
+ { "path": "/api/test", "functional": true, "status": "active" },
+ { "path": "/api/ai/test", "functional": true, "status": "active" },
+ { "path": "/api/ai/test-gemma3", "functional": true, "status": "active" },
+ { "path": "/api/test-simple", "functional": true, "status": "active" }
+ ]
+ },
+ "Legacy": {
+ "priority": "low",
+ "description": "Legacy routes, kept for backward compatibility",
+ "routes": [
+ { "path": "/original-home", "functional": true, "status": "legacy" }
+ ]
+ },
+ "Uncategorized": {
+ "priority": "low",
+ "description": "Empty stubs and placeholder routes",
+ "routes": []
+ }
+ },
+ "consolidationClusters": [
+ {
+ "name": "AI Test",
+ "canonical": "/demo/ai-test",
+ "duplicates": ["/ai-test"],
+ "action": "redirect"
+ },
+ {
+ "name": "Test Hub",
+ "canonical": "/test",
+ "duplicates": ["/api/test", "/api/ai/test", "/api/simd/test"],
+ "action": "consolidate"
+ },
+ {
+ "name": "Gemma 3 Lab",
+ "canonical": "/test-gemma3",
+ "duplicates": ["/api/ai/test-gemma3"],
+ "action": "consolidate"
+ },
+ {
+ "name": "Simple Test",
+ "canonical": "/test-simple",
+ "duplicates": ["/api/test-simple"],
+ "action": "consolidate"
+ }
+ ],
+ "safeToRemove": [
+ {
+ "path": "/dev",
+ "reason": "Empty directory, no navigation references",
+ "status": "pending_review"
+ }
+ ],
+ "needsManualReview": [
+ {
+ "path": "/admin/copilot/logs",
+ "reason": "Empty, unclear purpose",
+ "status": "pending_decision"
+ },
+ {
+ "path": "/logs/svelte-suggestions.json",
+ "reason": "Artifact, not a real route",
+ "status": "pending_decision"
+ },
+ {
+ "path": "/ws",
+ "reason": "WebSocket placeholder, unclear if needed",
+ "status": "pending_decision"
+ },
+ {
+ "path": "/ws/precedents",
+ "reason": "WebSocket placeholder, unclear if needed",
+ "status": "pending_decision"
+ }
+ ],
+ "phase82Targets": {
+ "priority": [
+ "/cases",
+ "/evidence",
+ "/legal/documents",
+ "/search",
+ "/dashboard",
+ "/login"
+ ],
+ "secondary": [
+ "/demo",
+ "/test",
+ "/api/cases",
+ "/api/evidence"
+ ],
+ "tertiary": [
+ "/admin",
+ "/settings",
+ "/help"
+ ]
+ }
+}

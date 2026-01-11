@@ -1,0 +1,521 @@
+/* YoRHa Design System - NieR: Automata Inspired Legal AI Interface */
+
+:root {
+  /* YoRHa Core Colors */
+  --yorha-black: #000000;
+  --yorha-white: #ffffff;
+  --yorha-gray-dark: #1a1a1a;
+  --yorha-gray-medium: #333333;
+  --yorha-gray-light: #666666;
+  --yorha-gray-muted: #999999;
+
+  /* Strategic Accent Colors */
+  --yorha-accent-blue: #00d4ff;
+  --yorha-accent-amber: #ffcc00;
+  --yorha-accent-red: #ff4444;
+  --yorha-accent-green: #44ff44;
+
+  /* Golden Ratio Values */
+  --golden-ratio: 1.618;
+  --golden-ratio-inv: 0.618;
+
+  /* Typography */
+  --font-mono: 'JetBrains Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+  --font-display: 'Orbitron', 'JetBrains Mono', monospace;
+
+  /* Spacing Golden Ratio Scale */
+  --space-xs: 0.25rem; /* 4px */
+  --space-sm: 0.5rem; /* 8px */
+  --space-md: 0.75rem; /* 12px */
+  --space-lg: 1.25rem; /* 20px */
+  --space-xl: 2rem; /* 32px */
+  --space-2xl: 3.25rem; /* 52px */
+  --space-3xl: 5.25rem; /* 84px */
+
+  /* Component Sizing */
+  --border-width: 2px;
+  --border-radius: 0; /* Sharp, angular design */
+  --shadow-yorha: 0 0 20px rgba(0, 212, 255, 0.3);
+  --shadow-yorha-strong: 0 0 40px rgba(0, 212, 255, 0.5);
+}
+
+/* Global Reset with YoRHa Aesthetics */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-mono);
+  background: var(--yorha-black);
+  color: var(--yorha-white);
+  line-height: 1.5;
+  font-size: 14px;
+  overflow-x: hidden;
+}
+
+/* YoRHa Container System - Golden Ratio Based */
+.yorha-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--yorha-black);
+}
+
+.yorha-main {
+  display: flex;
+  flex: 1;
+  position: relative;
+}
+
+.yorha-sidebar {
+  flex: 0 0 calc(100vw / var(--golden-ratio));
+  background: var(--yorha-gray-dark);
+  border-right: var(--border-width) solid var(--yorha-accent-blue);
+  position: relative;
+}
+
+.yorha-content {
+  flex: var(--golden-ratio);
+  background: var(--yorha-black);
+  position: relative;
+  overflow: auto;
+}
+
+/* YoRHa Typography System */
+.yorha-text-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--yorha-accent-blue);
+}
+
+.yorha-text-mono {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+.yorha-text-accent {
+  color: var(--yorha-accent-amber);
+  font-weight: 600;
+}
+
+/* YoRHa Component Base Styles */
+.yorha-panel {
+  background: var(--yorha-gray-dark);
+  border: var(--border-width) solid var(--yorha-gray-medium);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.yorha-panel::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(
+    45deg,
+    var(--yorha-accent-blue),
+    transparent,
+    var(--yorha-accent-blue)
+  );
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.yorha-panel:hover::before {
+  opacity: 0.3;
+}
+
+.yorha-panel.active::before {
+  opacity: 0.6;
+}
+
+/* YoRHa Button System */
+.yorha-btn {
+  font-family: var(--font-mono);
+  background: transparent;
+  color: var(--yorha-white);
+  border: var(--border-width) solid var(--yorha-gray-medium);
+  padding: var(--space-sm) var(--space-lg);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.yorha-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--yorha-accent-blue), transparent);
+  transition: left 0.3s ease;
+}
+
+.yorha-btn:hover {
+  border-color: var(--yorha-accent-blue);
+  color: var(--yorha-accent-blue);
+  box-shadow: var(--shadow-yorha);
+}
+
+.yorha-btn:hover::before {
+  left: 100%;
+}
+
+.yorha-btn:active {
+  background: var(--yorha-accent-blue);
+  color: var(--yorha-black);
+}
+
+/* YoRHa Button Variants */
+.yorha-btn--primary {
+  border-color: var(--yorha-accent-blue);
+  color: var(--yorha-accent-blue);
+}
+
+.yorha-btn--danger {
+  border-color: var(--yorha-accent-red);
+  color: var(--yorha-accent-red);
+}
+
+.yorha-btn--success {
+  border-color: var(--yorha-accent-green);
+  color: var(--yorha-accent-green);
+}
+
+.yorha-btn--warning {
+  border-color: var(--yorha-accent-amber);
+  color: var(--yorha-accent-amber);
+}
+
+/* YoRHa Input System */
+.yorha-input {
+  font-family: var(--font-mono);
+  background: var(--yorha-black);
+  color: var(--yorha-white);
+  border: var(--border-width) solid var(--yorha-gray-medium);
+  padding: var(--space-sm) var(--space-md);
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.yorha-input:focus {
+  outline: none;
+  border-color: var(--yorha-accent-blue);
+  box-shadow: var(--shadow-yorha);
+}
+
+.yorha-input::placeholder {
+  color: var(--yorha-gray-muted);
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+
+/* YoRHa Evidence Board - Enhanced Drag & Drop */
+.yorha-evidence-board {
+  position: relative;
+  background: var(--yorha-black);
+  border: var(--border-width) solid var(--yorha-gray-medium);
+  min-height: 70vh;
+  overflow: hidden;
+}
+
+.yorha-evidence-board::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    linear-gradient(rgba(0, 212, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+}
+
+.yorha-evidence-item {
+  position: absolute;
+  background: var(--yorha-gray-dark);
+  border: var(--border-width) solid var(--yorha-gray-medium);
+  padding: var(--space-md);
+  min-width: 200px;
+  cursor: move;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.yorha-evidence-item:hover {
+  border-color: var(--yorha-accent-blue);
+  box-shadow: var(--shadow-yorha);
+  transform: scale(1.02);
+}
+
+.yorha-evidence-item.dragging {
+  opacity: 0.8;
+  transform: rotate(2deg) scale(1.05);
+  z-index: 1000;
+  box-shadow: var(--shadow-yorha-strong);
+}
+
+/* YoRHa Header System */
+.yorha-header {
+  background: var(--yorha-gray-dark);
+  border-bottom: var(--border-width) solid var(--yorha-accent-blue);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.yorha-logo {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--yorha-accent-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.yorha-nav {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+.yorha-nav-item {
+  color: var(--yorha-white);
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.yorha-nav-item:hover {
+  border-color: var(--yorha-accent-blue);
+  color: var(--yorha-accent-blue);
+}
+
+.yorha-nav-item.active {
+  border-color: var(--yorha-accent-amber);
+  color: var(--yorha-accent-amber);
+}
+
+/* YoRHa Table System */
+.yorha-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--yorha-black);
+  font-family: var(--font-mono);
+}
+
+.yorha-table th,
+.yorha-table td {
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--yorha-gray-medium);
+  text-align: left;
+}
+
+.yorha-table th {
+  background: var(--yorha-gray-dark);
+  color: var(--yorha-accent-blue);
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+.yorha-table tr:hover {
+  background: var(--yorha-gray-dark);
+}
+
+/* YoRHa Modal System */
+.yorha-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.yorha-modal {
+  background: var(--yorha-gray-dark);
+  border: var(--border-width) solid var(--yorha-accent-blue);
+  max-width: 80vw;
+  max-height: 80vh;
+  overflow: auto;
+  position: relative;
+  box-shadow: var(--shadow-yorha-strong);
+}
+
+.yorha-modal-header {
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--yorha-gray-medium);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.yorha-modal-title {
+  font-family: var(--font-display);
+  color: var(--yorha-accent-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.yorha-modal-close {
+  background: none;
+  border: none;
+  color: var(--yorha-white);
+  cursor: pointer;
+  font-size: 18px;
+  transition: color 0.2s ease;
+}
+
+.yorha-modal-close:hover {
+  color: var(--yorha-accent-red);
+}
+
+/* YoRHa Status Indicators */
+.yorha-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.yorha-status::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: currentColor;
+  animation: pulse 2s ease-in-out infinite alternate;
+}
+
+.yorha-status--online {
+  color: var(--yorha-accent-green);
+}
+.yorha-status--offline {
+  color: var(--yorha-accent-red);
+}
+.yorha-status--processing {
+  color: var(--yorha-accent-amber);
+}
+.yorha-status--standby {
+  color: var(--yorha-gray-muted);
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* YoRHa Loading Animation */
+.yorha-loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--yorha-gray-medium);
+  border-top: 2px solid var(--yorha-accent-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* YoRHa Responsive Design */
+@media (max-width: 768px) {
+  .yorha-sidebar {
+    flex: 0 0 100%;
+    position: absolute;
+    left: -100%;
+    top: 0;
+    height: 100%;
+    z-index: 999;
+    transition: left 0.3s ease;
+  }
+
+  .yorha-sidebar.open {
+    left: 0;
+  }
+
+  .yorha-content {
+    flex: 1;
+  }
+
+  .yorha-header {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .yorha-nav {
+    gap: var(--space-sm);
+  }
+}
+
+/* YoRHa Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* YoRHa Focus Styles */
+*:focus {
+  outline: 2px solid var(--yorha-accent-blue);
+  outline-offset: 2px;
+}
+
+/* YoRHa Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--yorha-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--yorha-gray-medium);
+  border: 1px solid var(--yorha-gray-light);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--yorha-accent-blue);
+}

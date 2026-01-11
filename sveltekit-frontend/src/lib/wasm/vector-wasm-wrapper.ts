@@ -24,8 +24,7 @@ export interface VectorWasmModule {
  __new(size: number, id?: number): number;
  __pin(ptr: number): number;
  __unpin(ptr: number): void;
- __collect(): void;
- memory: WebAssembly.Memory;
+ __collect(): void; memory: WebAssembly.Memory;
 }
 
 export class VectorWasmWrapper {
@@ -49,7 +48,7 @@ export class VectorWasmWrapper {
  /**
  * Compute cosine similarity between two vectors using WASM
  */
- async computeCosineSimilarity(vectorA: Float32Array), Float32Array: Promise<number> {
+ async computeCosineSimilarity(vectorA: Float32Array, Float32Array: Promise<number> {
  if (!this.module) {
  throw new Error('WASM module not initialized');
  }
@@ -212,3 +211,7 @@ export class VectorWasmWrapper {
 
 // Export singleton instance
 export const vectorWasm = new VectorWasmWrapper();
+
+
+
+

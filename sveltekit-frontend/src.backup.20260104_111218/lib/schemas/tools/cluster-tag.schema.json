@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ace.tools.cluster_tag",
+  "title": "ClusterTagRequest",
+  "description": "CUDA-accelerated clustering and tagging",
+  "type": "object",
+  "required": ["run_id", "collection", "dimensions"],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "minLength": 8,
+      "description": "Unique run identifier"
+    },
+    "collection": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Qdrant collection name"
+    },
+    "dimensions": {
+      "type": "integer",
+      "minimum": 8,
+      "maximum": 4096,
+      "default": 768,
+      "description": "Embedding dimension"
+    },
+    "algorithm": {
+      "type": "string",
+      "enum": ["dbscan", "hdbscan", "kmeans", "som"],
+      "default": "hdbscan"
+    },
+    "options": {
+      "type": "object",
+      "properties": {
+        "min_cluster_size": { "type": "integer", "minimum": 2, "default": 5 },
+        "eps": { "type": "number", "minimum": 0.01, "maximum": 10, "default": 0.3 },
+        "n_clusters": { "type": "integer", "minimum": 2, "maximum": 1000 },
+        "use_gpu": { "type": "boolean", "default": true },
+        "batch_size": { "type": "integer", "minimum": 100, "maximum": 50000, "default": 10000 }
+      },
+      "additionalProperties": false
+    },
+    "tag_config": {
+      "type": "object",
+      "properties": {
+        "generate_summaries": { "type": "boolean", "default": true },
+        "model": { "type": "string", "default": "gemma3-legal:latest" },
+        "update_qdrant": { "type": "boolean", "default": true }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

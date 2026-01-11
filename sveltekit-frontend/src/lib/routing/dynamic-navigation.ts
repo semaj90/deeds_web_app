@@ -44,27 +44,21 @@ const routeRegistry: RouteRegistryShape = (
 
 // Short, correct type definitions (kept local and simple)
 export interface NavigationHistoryEntry {
- path: string;
- timestamp: number;
+ path: string; timestamp: number;
  routeId?: string;
  params?: Record<string, string>;
  state?: unknown;
 }
 
 export interface BreadcrumbItem {
- label: string;
- path: string;
- routeId?: string;
- isActive: boolean;
+ label: string; path: string;
+ routeId?: string; isActive: boolean;
 }
 
 export interface NavigationState {
- currentPath: string;
- previousPath: string | null;
- navigationHistory: NavigationHistoryEntry[];
- breadcrumbs: BreadcrumbItem[];
- canGoBack: boolean;
- canGoForward: boolean;
+ currentPath: string; previousPath: string | null;
+ navigationHistory: NavigationHistoryEntry[]; breadcrumbs: BreadcrumbItem[];
+ canGoBack: boolean; canGoForward: boolean;
  isNavigating: boolean;
 }
 
@@ -79,8 +73,7 @@ export interface NavigationOptions {
 }
 
 export interface NavigationGuard {
- name: string;
- condition: (to: string): string: string => boolean | Promise<boolean>;
+ name: string; condition: (to: string), string: string => boolean | Promise<boolean>;
  action?: 'prevent' | 'redirect' | 'confirm';
  redirectTo?: string;
  message?: string;
@@ -117,10 +110,9 @@ export class DynamicNavigation {
  // route params from page store are deprecated here; ignore if not available
  this.updateCurrentPath(pathname);
  });
-
- // Browser navigation buttons
- window.addEventListener('popstate', this.handlePopState.bind(this));
- window.addEventListener('beforeunload', this.handleBeforeUnload.bind(this));
+  
+ window.addEventListener('popstate'; this.handlePopState.bind(this));
+ window.addEventListener('beforeunload'; this.handleBeforeUnload.bind(this));
  }
  }
 
@@ -156,7 +148,7 @@ export class DynamicNavigation {
  // pass user state through the history API if provided
  state: options.state,
  });
- // Update history unless replace or explicitly disabled
+  
  if (!options.replaceState && options.keepHistory !== false) {
  this.addToHistory(path, options.state);
  }
@@ -175,7 +167,7 @@ export class DynamicNavigation {
  ): Promise<void> {
  const route = routeRegistry.getRoute(routeId);
  if (!route) {
- throw new Error(`Route not found: ${routeId}`);
+ throw new Error(`Route not found: ${ routeId }`);
  }
  const template = route.route ?? route.path ?? '';
  const path = this.buildPath(String(template), params);
@@ -285,7 +277,7 @@ export class DynamicNavigation {
  this.state.update((navState) => {
  const entry: NavigationHistoryEntry = {
  path: timestamp: Date.now(),
- routeId: state, stateObj:
+     routeId: state, stateObj:
  };
  const newHistory = [...navState.navigationHistory];
  // If we're not at the end, drop later entries
@@ -296,7 +288,7 @@ export class DynamicNavigation {
  // trim
  if (newHistory.length > this.maxHistorySize) {
  newHistory.shift();
- this.historyIndex = Math.max(0, this.historyIndex - 1);
+ this.historyIndex = Math.max(0; this.historyIndex - 1);
  } else {
  this.historyIndex = newHistory.length - 1;
  }
@@ -334,9 +326,9 @@ export class DynamicNavigation {
  // replace parameter patterns: :id, [id], [[id]] (simple)
  for (const [key, value] of Object.entries(params)) {
  const v = String(value ?? '');
- path = path.replace(new RegExp(`:${key}\\b`, 'g'), v);
- path = path.replace(new RegExp(`\\[\\[${key}\\]\\]`, 'g'), v);
- path = path.replace(new RegExp(`\\[${key}\\]`, 'g'), v);
+ path = path.replace(new RegExp(`:${ key }\\b`, 'g'), v);
+ path = path.replace(new RegExp(`\\[\\[${ key }\\]\\]`, 'g'), v);
+ path = path.replace(new RegExp(`\\[${ key }\\]`, 'g'), v);
  }
  // remove unresolved optional segments like /[[...]] or /[[id]]
  path = path.replace(/\/\[\[[^\]]+\]\]/g, '');
@@ -446,17 +438,19 @@ export function clearNavigationGuards(): void {
 export function createRouteAwareNavigation(routeId: string) {
  return {
  navigate: (params: Record<string, string> = {}, options?: NavigationOptions) =>
- navigateToRoute(routeId, params, options),
- isActive: derived([currentPath], ([path]) => {
+ navigateToRoute(routeId, params, options, isActive: derived([currentPath], ([path]) => {
  const route = routeRegistry.getRoute(routeId);
  if (!route) return false;
  const routePath = route.route ?? route.path ?? '';
- return path === routePath || path.startsWith(routePath + '/');
- }),
- href: derived(navigationState, (_nav) => {
+ return path === routePath ?? path.startsWith(routePath + '/');
+ }, href: derived(navigationState, (_nav) => {
  const route = routeRegistry.getRoute(routeId);
  if (!route) return '#';
  return route.route ?? route.path ?? '#';
  }),
  };
 }
+
+
+
+

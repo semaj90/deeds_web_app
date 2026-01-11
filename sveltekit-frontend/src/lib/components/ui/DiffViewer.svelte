@@ -1,4 +1,6 @@
 <script lang="ts">
+	let onApply = $state<any>(undefined);
+
  /**
  * DiffViewer Component
  * Side-by-side diff viewer with syntax highlighting
@@ -12,8 +14,7 @@
  }
 
  interface Props {
- original: string;
- modified: string;
+ original: string; modified: string;
  language?: string;
  onApply?: () => void;
  onReject?: () => void;
@@ -29,7 +30,7 @@
  }: Props = $props();
 
  // Simple diff algorithm
- function computeDiff(orig: string, mod): string: string: DiffLine[] {
+ function computeDiff(orig: string, mod): string: DiffLine[] {
  const origLines = orig.split('\n');
  const modLines = mod.split('\n');
  const diff: DiffLine[] = [];
@@ -115,25 +116,21 @@
 <style>
  .diff-viewer {
  display: flex;
- flex-direction: column;
- background: var(--yorha-bg-secondary, #2a2a2a);
+ flex-direction: column; background: var(--yorha-bg-secondary, #2a2a2a);
  border: 1px solid var(--yorha-border, #4a4a4a);
- border-radius: 8px;
- overflow: hidden;
+ border-radius: 8px; overflow: hidden;
  }
 
  .diff-header {
  display: flex;
  justify-content: space-between;
- align-items: center;
- padding: 1rem;
+ align-items: center; padding: 1rem;
  background: var(--yorha-bg, #1a1a1a);
  border-bottom: 1px solid var(--yorha-border, #4a4a4a);
  }
 
  .diff-stats {
- display: flex;
- gap: 1rem;
+ display: flex; gap: 1rem;
  }
 
  .stat {
@@ -150,8 +147,7 @@
  }
 
  .diff-actions {
- display: flex;
- gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  }
 
  .btn {
@@ -159,8 +155,7 @@
  border: none;
  border-radius: 4px;
  font-size: 0.85rem;
- font-weight: 500;
- cursor: pointer;
+ font-weight: 500; cursor: pointer;
  transition: all 0.2s;
  }
 
@@ -185,8 +180,7 @@
  .diff-content {
  display: grid;
  grid-template-columns: 1fr 1fr;
- gap: 0;
- overflow: hidden;
+ gap: 0; overflow: hidden;
  max-height: 600px;
  }
 
@@ -205,8 +199,7 @@
  background: var(--yorha-bg, #1a1a1a);
  border-bottom: 1px solid var(--yorha-border, #4a4a4a);
  font-size: 0.85rem;
- font-weight: 600;
- color: var(--yorha-text-muted, #888);
+ font-weight: 600; color: var(--yorha-text-muted, #888);
  }
 
  .diff-lines {
@@ -218,8 +211,7 @@
 
  .diff-line {
  display: flex;
- align-items: flex-start;
- padding: 0;
+ align-items: flex-start; padding: 0;
  border-bottom: 1px solid var(--yorha-border, #4a4a4a);
  background: var(--yorha-bg-secondary, #2a2a2a);
  }
@@ -237,19 +229,16 @@
  }
 
  .line-number {
- display: inline-block;
- width: 3rem;
+ display: inline-block; width: 3rem;
  padding: 0.25rem 0.5rem;
- text-align: right;
- color: var(--yorha-text-muted, #888);
+ text-align: right; color: var(--yorha-text-muted, #888);
  background: var(--yorha-bg, #1a1a1a);
  border-right: 1px solid var(--yorha-border, #4a4a4a);
  user-select: none;
  }
 
  .line-marker {
- display: inline-block;
- width: 1.5rem;
+ display: inline-block; width: 1.5rem;
  padding: 0.25rem 0.5rem;
  text-align: center;
  font-weight: 600;
@@ -265,8 +254,7 @@
  }
 
  .line-content {
- flex: 1;
- padding: 0.25rem 0.5rem;
+ flex: 1; padding: 0.25rem 0.5rem;
  color: var(--yorha-text, #d4d4d4);
  white-space: pre-wrap;
  word-break: break-all;
@@ -283,3 +271,6 @@
  }
  }
 </style>
+
+
+

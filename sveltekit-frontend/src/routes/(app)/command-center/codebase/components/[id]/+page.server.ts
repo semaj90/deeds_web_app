@@ -1,25 +1,17 @@
 import type { PageServerLoad } from './$types';
 
 interface FileProfile {
-    file_path: string;
-    role: string;
-    surface: string[];
-    dependencies: string[];
-    exports: string[];
-    imports: string[];
-    comments: string[];
-    risk: string;
-    change_frequency: string;
-    related_routes: string[];
-    tags: string[];
-    summary: string;
-    llm_output: string;
-    generated_at: string;
+    file_path: string; role: string;
+    surface: string[]; dependencies: string[];
+    exports: string[]; imports: string[];
+    comments: string[]; risk: string;
+    change_frequency: string; related_routes: string[];
+    tags: string[]; summary: string;
+    llm_output: string; generated_at: string;
 }
 
 interface QdrantPoint {
-    id: number;
-    payload: FileProfile;
+    id: number; payload: FileProfile;
 }
 
 export const load: PageServerLoad = async ({ params, fetch }) => {
@@ -37,8 +29,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
             const scrollResponse = await fetch('http://localhost:6333/collections/fastmcp_file_profiles/points/scroll', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    limit: 1,
+                body: JSON.stringify({limit: 1,
                     with_payload: true
                 })
             });
@@ -57,7 +48,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
         }
 
         const data = await response.json();
-        const profile = data.result?.payload || null;
+        const profile = data.result?.payload ?? null;
 
         // Fetch related errors for this file
         let relatedErrors: Array<Record<string, unknown>> = [];
@@ -66,12 +57,10 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
                 const errorsResponse = await fetch('http://localhost:6333/collections/phase90_error_cards/points/scroll', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        limit: 20,
+                    body: JSON.stringify({limit: 20,
                         with_payload: true,
-                        filter: {
-                            must: [
-                                { key: 'filePath', match: { text: profile.file_path.split('/').pop() } }
+                        filter: {must: [
+                                { key: 'filePath', match: {text: profile.file_path.split('/').pop() } }
                             ]
                         }
                     })

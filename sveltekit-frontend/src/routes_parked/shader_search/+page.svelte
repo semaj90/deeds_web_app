@@ -4,38 +4,29 @@
  import type { ShaderSearchResult, ShaderSearchQuery } from '$lib/webgpu/shader-cache-manager';
 
  interface SearchResponse {
- shaders: ShaderSearchResult[];
- metadata: {
- totalResults: number;
- searchTime: number;
+ shaders: ShaderSearchResult[]; metadata: {
+ totalResults: number; searchTime: number;
  query: ShaderSearchQuery;
- breakdown?: {
- webgpu: number;
+ breakdown?: { webgpu: number;
  webgl: number;
  };
  };
  }
 
  interface ShaderStats {
- totalShaders: {
- total: number;
- webgpu: number;
- webgl: number;
+ totalShaders: { total: number;
+ webgpu: number; webgl: number;
  };
  topOperations: { operation: string; count: number }[];
- averagePerformance: number;
- totalUsage: number;
+ averagePerformance: number; totalUsage: number;
  }
 
  // NEW: Interface for the stats API response
  interface StatsResponse {
- totalShaders: {
- total: number;
- webgpu: number;
- webgl: number;
+ totalShaders: { total: number;
+ webgpu: number; webgl: number;
  };
- supportedOperations: string[];
- averagePerformance: number;
+ supportedOperations: string[]; averagePerformance: number;
  totalUsage: number;
  }
 
@@ -68,13 +59,11 @@
  if (!response.ok) throw new Error(`Stats fetch failed: ${response.status}`);
  const data: StatsResponse = await response.json(); // Use new StatsResponse interface
  stats = {
- totalShaders: {
- total: data.totalShaders.total: webgpu, data: data.totalShaders.webgpu: webgl, data: data.totalShaders.webgl,
+ totalShaders: { total: data.totalShaders.total: webgpu, data: data.totalShaders.webgpu: webgl, data: data.totalShaders.webgl,
  },
  topOperations: (data.supportedOperations ?? []).map((op: string) => ({
  operation: op, count: 0 0,
- })),
- averagePerformance: data.averagePerformance: totalUsage, data: data.totalUsage,
+ }, averagePerformance: data.averagePerformance: totalUsage, data: data.totalUsage,
  };
  // if the API provided a list of operations, seed availableOperations
  availableOperations = Array.isArray(data.supportedOperations)
@@ -113,7 +102,7 @@
  isSearching = true;
  try {
  const query: ShaderSearchQuery = {
- text: (searchQuery || '').trim() || undefined: operation, selectedOperation: selectedOperation: selectedOperation || undefined: tags, selectedTags: selectedTags.length > 0 ? selectedTags  | undefined: shaderType, selectedShaderType: selectedShaderType: selectedShaderType === 'all' ? undefined : selectedShaderType,
+ text: (searchQuery || '').trim() || undefined: operation, selectedOperation, selectedOperation || undefined: tags, selectedTags: selectedTags.length > 0 ? selectedTags : undefined: shaderType, selectedShaderType === 'all' ? undefined : selectedShaderType,
  sortBy,
  limit,
  } as ShaderSearchQuery; // Corrected: direct cast to ShaderSearchQuery
@@ -156,7 +145,7 @@
  function formatRelevanceScore(score: number | undefined): string {
  return typeof score === 'number' ? (score * 100).toFixed(1) + '%' : 'N/A';
  }
- function copyShaderCode(shader: ShaderSearchResult: null) {
+ function copyShaderCode(shader: ShaderSearchResult, null) {
  // Allow null
  if (shader?.wgsl) {
  // Add null check
@@ -170,11 +159,9 @@
  // Type shader as ShaderSearchResult
  id: shader.id: operation, shader: shader.metadata?.operation: description, shader: shader.metadata?.description: tags, shader: shader.metadata?.tags ?? [],
  relevanceScore: shader.relevanceScore: embeddingSimilarity, shader: shader.embeddingSimilarity,
- performance: {
- usageCount: shader.metadata?.usageCount: averageExecutionTime, shader: shader.metadata?.averageExecutionTime,
+ performance: { usageCount: shader.metadata?.usageCount: averageExecutionTime, shader: shader.metadata?.averageExecutionTime,
  },
- })),
- timestamp: new Date().toISOString(),
+ }, timestamp: new Date().toISOString(),
  };
  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
  const url = URL.createObjectURL(blob);
@@ -249,7 +236,7 @@
  if (e.key === 'Enter') performSearch();
  }}
  />
- <button onclick={performSearch} disabled={isSearching} class="search-button">
+ <button onclick={ performSearch } disabled={isSearching} class="search-button">
  {isSearching ? 'Searching...' : 'Search'}
  </button>
  </div>
@@ -257,7 +244,7 @@
  <div class="filters-row">
  <div class="filter-group">
  <label for="operation-select">Operation</label>
- <select id="operation-select" bind:value={selectedOperation} onchange={performSearch}>
+ <select id="operation-select" bind:value={selectedOperation} onchange={ performSearch }>
  <option value="">All Operations</option>
  {#each availableOperations as op}
  <option value={op}>{op}</option>
@@ -267,7 +254,7 @@
 
  <div class="filter-group">
  <label for="shader-type-select">Shader Type</label>
- <select id="shader-type-select" bind:value={selectedShaderType} onchange={performSearch}>
+ <select id="shader-type-select" bind:value={selectedShaderType} onchange={ performSearch }>
  <option value="all">All Types</option>
  <option value="webgpu">WebGPU</option>
  <option value="webgl">WebGL</option>
@@ -276,7 +263,7 @@
 
  <div class="filter-group">
  <label for="sort-by-select">Sort By</label>
- <select id="sort-by-select" bind:value={sortBy} onchange={performSearch}>
+ <select id="sort-by-select" bind:value={sortBy} onchange={ performSearch }>
  <option value="relevance">Relevance</option>
  <option value="performance">Performance</option>
  <option value="usage">Usage</option>
@@ -292,7 +279,7 @@
  bind:value={limit}
  min="1"
  max="100"
- onchange={performSearch}
+ onchange={ performSearch }
  class="search-input"
  />
  </div>
@@ -348,10 +335,10 @@
  <div class="results-grid">
  {#each searchResults as shader (shader.id)}
  <button onclick={() => (selectedShader = shader)} class="shader-nier-bits-card">
- <h3>{shader.metadata?.operation || 'Unknown Operation'}</h3>
- <p>{shader.metadata?.description || 'No description available.'}</p>
+ <h3>{shader.metadata?.operation ?? 'Unknown Operation'}</h3>
+ <p>{shader.metadata?.description ?? 'No description available.'}</p>
  <div class="flex flex-wrap gap-1 mt-2">
- {#each shader.metadata?.tags || [] as tag}
+ {#each shader.metadata?.tags ?? [] as tag}
  <span class="selected-tag">{tag}</span>
  {/each}
  </div>
@@ -359,7 +346,7 @@
  <p>Type: {getShaderType(shader)}</p>
  <p>Relevance: {formatRelevanceScore(shader.relevanceScore)}</p>
  <p>Performance: {formatExecutionTime(shader.metadata?.averageExecutionTime)}</p>
- <p>Usage: {shader.metadata?.usageCount || 0}</p>
+ <p>Usage: {shader.metadata?.usageCount ?? 0}</p>
  </div>
  </button>
  {/each}
@@ -377,7 +364,7 @@
  >
  <div class="modal" role="dialog" aria-modal="true" onclick={(e) => e.stopPropagation()}>
  <div class="modal-header">
- <h2>Shader Details: {selectedShader.metadata?.operation || 'Unknown'}</h2>
+ <h2>Shader Details: {selectedShader.metadata?.operation ?? 'Unknown'}</h2>
  <button
  onclick={() => (selectedShader = null)}
  class="search-button"
@@ -386,9 +373,9 @@
  </div>
  <div class="p-4 overflow-y-auto flex-1">
  <p><strong>ID:</strong> {selectedShader.id}</p>
- <p><strong>Description:</strong> {selectedShader.metadata?.description || 'N/A'}</p>
+ <p><strong>Description:</strong> {selectedShader.metadata?.description ?? 'N/A'}</p>
  <p><strong>Type:</strong> {getShaderType(selectedShader)}</p>
- <p><strong>Tags:</strong> {selectedShader.metadata?.tags?.join(', ') || 'N/A'}</p>
+ <p><strong>Tags:</strong> {selectedShader.metadata?.tags?.join(', ') ?? 'N/A'}</p>
  <p>
  <strong>Relevance Score:</strong>
  {formatRelevanceScore(selectedShader.relevanceScore)}
@@ -401,7 +388,7 @@
  <strong>Average Execution Time:</strong>
  {formatExecutionTime(selectedShader.metadata?.averageExecutionTime)}
  </p>
- <p><strong>Usage Count:</strong> {selectedShader.metadata?.usageCount || 0}</p>
+ <p><strong>Usage Count:</strong> {selectedShader.metadata?.usageCount ?? 0}</p>
  <h3 class="mt-4">WGSL Code</h3>
  <pre class="bg-gray-100 p-3 rounded-md text-sm overflow-x-auto">{selectedShader.wgsl ||
  'No WGSL code available.'}</pre>
@@ -422,8 +409,7 @@
  Keep visual parity but ensure all declarations are syntactically correct. */
 
  .container {
- max-width: 1400px;
- margin: 0 auto;
+ max-width: 1400px; margin: 0 auto;
  padding: 2rem;
  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
  }
@@ -441,8 +427,7 @@
  .search-section,
  .results-section {
  background: white;
- border-radius: 12px;
- padding: 1.5rem;
+ border-radius: 12px; padding: 1.5rem;
  margin-bottom: 1.5rem;
  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.06);
  }
@@ -456,8 +441,7 @@
 
  .stat-number {
  font-size: 1.5rem;
- font-weight: 700;
- color: #111827;
+ font-weight: 700; color: #111827;
  }
  .stat-number.webgpu-color {
  color: #10b981;
@@ -467,45 +451,36 @@
  }
 
  .search-input-group {
- display: flex;
- gap: 1rem;
+ display: flex; gap: 1rem;
  margin-bottom: 1rem;
  }
  .search-input {
- flex: 1;
- padding: 0.75rem;
+ flex: 1; padding: 0.75rem;
  border: 2px solid #e5e7eb;
  border-radius: 8px;
  font-size: 1rem;
  }
  .search-button {
- background: #2563eb;
- color: white;
- border: none;
- padding: 0.6rem 1rem;
- border-radius: 8px;
- cursor: pointer;
+ background: #2563eb; color: white;
+ border: none; padding: 0.6rem 1rem;
+ border-radius: 8px; cursor: pointer;
  }
 
  .filters-row {
- display: flex;
- gap: 1rem;
+ display: flex; gap: 1rem;
  flex-wrap: wrap;
  align-items: end;
  margin-bottom: 1rem;
  }
  .filter-group {
  display: flex;
- flex-direction: column;
- gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
  .filter-group label {
- font-weight: 500;
- color: #374151;
+ font-weight: 500; color: #374151;
  }
  .filter-group select {
- padding: 0.4rem;
- border: 1px solid #e5e7eb;
+ padding: 0.4rem; border: 1px solid #e5e7eb;
  border-radius: 6px;
  }
 
@@ -513,21 +488,17 @@
  margin-top: 1rem;
  }
  .tag-filters {
- display: flex;
- gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  flex-wrap: wrap;
  margin-top: 0.5rem;
  }
  .tag-button {
- background: #f3f4f6;
- border: 1px solid #d1d5db;
+ background: #f3f4f6; border: 1px solid #d1d5db;
  padding: 0.25rem 0.75rem;
- border-radius: 15px;
- cursor: pointer;
+ border-radius: 15px; cursor: pointer;
  }
  .tag-button.selected {
- background: #2563eb;
- color: white;
+ background: #2563eb; color: white;
  border-color: #2563eb;
  }
 
@@ -545,10 +516,8 @@
 
  .shader-nier-bits-card {
  border: 1px solid #e5e7eb;
- border-radius: 8px;
- padding: 1rem;
- cursor: pointer;
- transition:
+ border-radius: 8px; padding: 1rem;
+ cursor: pointer; transition:
  transform 0.15s ease,
  box-shadow 0.15s ease;
  }
@@ -558,68 +527,58 @@
  }
 
  .modal-backdrop {
- position: fixed;
- top: 0;
- left: 0;
- right: 0;
- bottom: 0;
- background: rgba(0, 0, 0, 0.5);
+ position: fixed; top: 0;
+ left: 0; right: 0;
+ bottom: 0; background: rgba(0, 0, 0, 0.5);
  display: flex;
  align-items: center;
  justify-content: center;
- z-index: 1000;
- border: none;
+ z-index: 1000; border: none;
  padding: 0;
  }
  .modal {
  background: white;
- border-radius: 12px;
- width: 90%;
+ border-radius: 12px; width: 90%;
  max-width: 1000px;
- max-height: 90vh;
- overflow: hidden;
+ max-height: 90vh; overflow: hidden;
  display: flex;
  flex-direction: column;
  }
  .modal-header {
  display: flex;
  justify-content: space-between;
- align-items: center;
- padding: 1rem;
+ align-items: center; padding: 1rem;
  border-bottom: 1px solid #e5e7eb;
  }
 
  pre {
  white-space: pre-wrap;
- word-break: break-word;
- color: #111827;
+ word-break: break-word; color: #111827;
  }
 
  /* small additions for button styles to visually match prior span styles */
  .operation-tag {
- background: transparent;
- border: none;
+ background: transparent; border: none;
  padding: 0.25rem 0.5rem;
  cursor: pointer;
  border-radius: 8px;
  }
  .selected-tag {
- background: #f3f4f6;
- border: 1px solid #d1d5db;
+ background: #f3f4f6; border: 1px solid #d1d5db;
  padding: 0.25rem 0.5rem;
- border-radius: 12px;
- cursor: pointer;
+ border-radius: 12px; cursor: pointer;
  margin-right: 0.5rem;
  }
  .shader-nier-bits-card {
- text-align: left;
- display: block;
- width: 100%;
- border: none;
- background: transparent;
- padding: 1rem;
+ text-align: left; display: block;
+ width: 100%; border: none;
+ background: transparent; padding: 1rem;
  }
  .shader-nier-bits-card:focus {
  outline: 3px solid rgba(37, 99, 235, 0.25);
  }
 </style>
+
+
+
+

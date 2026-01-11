@@ -1,0 +1,493 @@
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import { Button, Card, CardHeader, CardTitle, CardContent } from '$lib/components/ui/enhanced-bits';
+  import { cn } from '$lib/utils';
+  import type { ChatMessage, SystemStatus } from '$lib/types/ai';
+
+  // Svelte 5 runes - proper syntax
+  let messages = $state<ChatMessage[]>([]);
+  let currentMessage = $state('');
+  let isStreaming = $state(false);
+  let error = $state('');
+  let conversationId = $state<string | null>(null);
+  let userId = $state('mock-user-id'); // TODO: Get from auth
+  let systemStatus = $state<SystemStatus>({
+    gpu: false,
+    ollama: false,
+    enhancedRAG: false,
+    postgres: false,
+    neo4j: false,
+  });
+
+  async function checkSystemStatus() {
+    try {
+      const res = await fetch('/api/v1/cluster/health');
+      const data = await res.json();
+      systemStatus = {
+        gpu: data?.services?.gpu === 'accelerated',
+        ollama: data?.services?.ollama === 'healthy',
+        enhancedRAG: data?.services?.enhancedRAG === 'running',
+        postgres: data?.services?.postgres === 'connected',
+        neo4j: data?.services?.neo4j === 'active',
+      };
+    } catch (e: any) {
+      error = 'System health check failed';
+      console.error('Health check error:', e);
+    }
+  }
+
+  async function sendMessage() {
+    if (!currentMessage.trim() || isStreaming) return;
+
+    const userMessage: ChatMessage = {
+      id: crypto.randomUUID(),
+      role: 'user',
+      content: currentMessage,
+      timestamp: new Date(),
+    };
+
+    messages = [...messages, userMessage];
+    const messageToSend = currentMessage;
+    currentMessage = '';
+    isStreaming = true;
+    error = '';
+
+    try {
+      // Use proper Server-Sent Events (SSE) endpoint
+      const eventSource = new EventSource('/api/ai/chat-sse');
+
+      // Send message data via POST first to initiate the stream
+      const initResponse = await fetch('/api/ai/chat-sse', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: messageToSend,
+          model: 'gemma3-legal:latest',
+          conversationId,
+          userId,
+          useRAG: true,
+        }),
+      });
+
+      if (!initResponse.ok) {
+        throw new Error(`HTTP ${initResponse.status}`);
+      }
+
+      const aiMessage: ChatMessage = {
+        id: crypto.randomUUID(),
+        role: 'assistant',
+        content: '',
+        timestamp: new Date(),
+      };
+
+      messages = [...messages, aiMessage];
+
+      // Handle SSE streaming with proper event handling
+      if (initResponse.body) {
+        const reader = initResponse.body.getReader();
+        const decoder = new TextDecoder();
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n');
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                try {
+                  const eventData = JSON.parse(line.slice(6));
+
+                  switch (eventData.type) {
+                    case 'connection':
+                      if (eventData.conversationId) {
+                        conversationId = eventData.conversationId;
+                      }
+                      break;
+
+                    case 'token':
+                      aiMessage.content = eventData.fullResponse || aiMessage.content + eventData.content;
+                      // Trigger Svelte 5 reactivity
+                      messages = [...messages];
+                      break;
+
+                    case 'complete':
+                      aiMessage.content = eventData.fullResponse;
+                      messages = [...messages];
+                      isStreaming = false;
+                      break;
+
+                    case 'error':
+                      error = eventData.error;
+                      isStreaming = false;
+                      break;
+
+                    case 'close':
+                      isStreaming = false;
+                      break;
+                  }
+                } catch (parseError) {
+                  console.warn('Failed to parse SSE data:', line);
+                }
+              }
+            }
+          }
+        } catch (streamError) {
+          console.error('SSE streaming error:', streamError);
+          error = 'Stream connection failed';
+        }
+      }
+    } catch (e: any) {
+      error = e?.message ?? 'Failed to send message';
+      console.error('Send message error:', e);
+    } finally {
+      isStreaming = false;
+    }
+  }
+
+  async function handleQuickQuery(query: string) {
+    currentMessage = query;
+    await sendMessage();
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function clearChat() {
+    messages = [];
+    error = '';
+  }
+
+  onMount(() => {
+    checkSystemStatus();
+
+    // Check system status every 30 seconds
+    const interval = setInterval(checkSystemStatus, 30000);
+
+    return () => clearInterval(interval);
+  });
+</script>
+
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 p-6">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
+        Legal AI Assistant
+      </h1>
+      <p class="text-gray-600">Enhanced RAG with PostgreSQL Vector Search & Real-time Chat</p>
+    </div>
+
+    <!-- System Status Card -->
+    <Card class="mb-6 p-6">
+      {#snippet children()}
+        <div class="mb-4">
+          <h2 class="text-xl font-semibold flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
+            </svg>
+            System Status
+          </h2>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {#each Object.entries(systemStatus) as [key, status]}
+            <div class="flex items-center gap-2">
+              <div class={cn('w-3 h-3 rounded-full', status ? 'bg-green-500' : 'bg-red-500')}></div>
+              <span class="text-sm font-medium capitalize">
+                {key}:
+                <span class={status ? 'text-green-600' : 'text-red-600'}>
+                  {status ? 'Active' : 'Offline'}
+                </span>
+              </span>
+            </div>
+          {/each}
+        </div>
+      {/snippet}
+    </Card>
+
+    <!-- Quick Actions -->
+    <Card class="mb-6 p-6">
+      {#snippet children()}
+        <h2 class="text-xl font-semibold mb-4">Quick Legal Queries</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          <Button
+            variant="outline"
+            onclick={() => handleQuickQuery('Explain contract formation requirements')}
+            disabled={isStreaming}
+            class="justify-start"
+          >
+            {#snippet children()}Contract Law{/snippet}
+          </Button>
+          <Button
+            variant="outline"
+            onclick={() => handleQuickQuery('What is the chain of custody for evidence?')}
+            disabled={isStreaming}
+            class="justify-start"
+          >
+            {#snippet children()}Evidence Rules{/snippet}
+          </Button>
+          <Button
+            variant="outline"
+            onclick={() => handleQuickQuery('Explain liability limitations in contracts')}
+            disabled={isStreaming}
+            class="justify-start"
+          >
+            {#snippet children()}Liability{/snippet}
+          </Button>
+          <Button
+            variant="outline"
+            onclick={() => handleQuickQuery('What are the elements of negligence?')}
+            disabled={isStreaming}
+            class="justify-start"
+          >
+            {#snippet children()}Tort Law{/snippet}
+          </Button>
+        </div>
+      {/snippet}
+    </Card>
+
+    <!-- Chat Interface -->
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <!-- Chat Messages -->
+      <div class="xl:col-span-2">
+        <Card class="h-[600px] flex flex-col p-6">
+          {#snippet children()}
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xl font-semibold">Legal AI Chat</h2>
+              <div class="flex gap-2">
+                <span
+                  class="px-2 py-1 rounded text-xs font-medium {isStreaming
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-700'}"
+                >
+                  {isStreaming ? 'Streaming...' : 'Ready'}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  class="bits-btn bits-btn-outline"
+                  onclick={clearChat}
+                  disabled={isStreaming}
+                >
+                  {#snippet children()}Clear{/snippet}
+                </Button>
+              </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="flex-1 overflow-y-auto space-y-4 mb-4 min-h-0 border rounded-lg p-4">
+              {#if messages.length === 0}
+                <div class="text-center text-gray-500 mt-20">
+                  <svg
+                    class="w-12 h-12 mx-auto mb-4 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-2.436-.307l-3.097 1.385a.75.75 0 01-.985-.985l1.385-3.097A8.955 8.955 0 013 12a8 8 0 1118 0z"
+                    ></path>
+                  </svg>
+                  <p class="font-medium mb-2">Start a conversation</p>
+                  <p class="text-sm">Ask me anything about legal topics, contracts, or case law.</p>
+                </div>
+              {:else}
+                {#each messages as message}
+                  <div class={cn('flex', message.role === 'user' ? 'justify-end' : 'justify-start')}>
+                    <div
+                      class={cn(
+                        'max-w-[80%] px-4 py-2 rounded-lg',
+                        message.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100 border'
+                      )}
+                    >
+                      <div class="whitespace-pre-wrap text-sm">
+                        {message.content}
+                      </div>
+                      <div
+                        class={cn(
+                          'text-xs mt-1 opacity-70',
+                          message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
+                        )}
+                      >
+                        {message.timestamp.toLocaleTimeString()}
+                      </div>
+                    </div>
+                  </div>
+                {/each}
+              {/if}
+            </div>
+
+            <!-- Input Area -->
+            <div class="border-t pt-4">
+              {#if error}
+                <div class="mb-3 p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
+                  {error}
+                </div>
+              {/if}
+              <div class="flex gap-2">
+                <input
+                  bind:value={currentMessage}
+                  onkeydown={handleKeydown}
+                  placeholder="Ask a legal question..."
+                  disabled={isStreaming}
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <Button onclick={sendMessage} disabled={!currentMessage.trim() || isStreaming} class="px-6">
+                  {#snippet children()}
+                    {#if isStreaming}
+                      <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        ></path>
+                      </svg>
+                    {:else}
+                      Send
+                    {/if}
+                  {/snippet}
+                </Button>
+              </div>
+            </div>
+          {/snippet}
+        </Card>
+      </div>
+
+      <!-- Sidebar - Features & Controls -->
+      <div class="xl:col-span-1">
+        <div class="space-y-6">
+          <!-- Model Information -->
+          <Card class="p-6">
+            {#snippet children()}
+              <h3 class="font-semibold mb-3">AI Model</h3>
+              <div class="space-y-2">
+                <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700"> Gemma3-Legal </span>
+                <p class="text-xs text-gray-500">
+                  Specialized legal language model with contract analysis capabilities
+                </p>
+              </div>
+            {/snippet}
+          </Card>
+
+          <!-- Features -->
+          <Card class="p-6">
+            {#snippet children()}
+              <h3 class="font-semibold mb-3">Features</h3>
+              <div class="space-y-3">
+                <div class="flex items-center gap-2 text-sm">
+                  <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  Vector Search (pgvector)
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                  <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  Real-time Streaming
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                  <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  Enhanced RAG
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                  <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  PostgreSQL Integration
+                </div>
+              </div>
+            {/snippet}
+          </Card>
+
+          <!-- System Actions -->
+          <Card class="p-6">
+            {#snippet children()}
+              <h3 class="font-semibold mb-3">System Actions</h3>
+              <div class="space-y-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onclick={checkSystemStatus}
+                  class="w-full justify-start"
+                  fullWidth={true}
+                >
+                  {#snippet children()}
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      ></path>
+                    </svg>
+                    Refresh Status
+                  {/snippet}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onclick={() => window.open('/api/v1/cluster/health', '_blank')}
+                  class="w-full justify-start"
+                  fullWidth={true}
+                >
+                  {#snippet children()}
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.665 2.665 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"
+                      ></path>
+                    </svg>
+                    Health Report
+                  {/snippet}
+                </Button>
+              </div>
+            {/snippet}
+          </Card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Custom scrollbar for chat */
+  :global(.overflow-y-auto::-webkit-scrollbar) {
+    width: 6px;
+  }
+
+  :global(.overflow-y-auto::-webkit-scrollbar-track) {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  :global(.overflow-y-auto::-webkit-scrollbar-thumb) {
+    background: #c1c1c1;
+    border-radius: 3px;
+  }
+
+  :global(.overflow-y-auto::-webkit-scrollbar-thumb:hover) {
+    background: #a8a8a8;
+  }
+</style>

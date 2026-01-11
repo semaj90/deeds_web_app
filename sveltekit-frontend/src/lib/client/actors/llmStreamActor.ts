@@ -10,18 +10,13 @@ export function createLLMStreamActor({
  const machine = createMachine({
  id: 'llmStream',
  initial: 'idle',
- states: {
- idle: {
- on: { START: 'streaming' },
+ states: { idle: { on: { START: 'streaming' },
  },
- streaming: {
- invoke: {
- src: fromPromise(async ({ input }, { input: { prompt?: string } }) => {
+ streaming: { invoke: { src: fromPromise(async ({ input }, { input: { prompt?: string } }) => {
  const prompt = input.prompt || '';
  const res = await fetch(url, {
  method: 'POST',
- body: JSON.stringify({ prompt }),
- headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ prompt }, headers: { 'Content-Type': 'application/json' },
  });
 
  if (!res.body) {
@@ -43,12 +38,10 @@ export function createLLMStreamActor({
  }
  isDone = streamDone;
  }
- }),
- onDone: 'idle', // Transition back to idle when streaming is complete
+ }, onDone: 'idle', // Transition back to idle when streaming is complete
  onError: 'idle', // Transition back to idle if an error occurs during streaming
  },
- on: {
- STOP: 'idle',
+ on: { STOP: 'idle',
  },
  },
  },
@@ -57,3 +50,6 @@ export function createLLMStreamActor({
  const service = createActor(machine).start();
  return service;
 }
+
+
+

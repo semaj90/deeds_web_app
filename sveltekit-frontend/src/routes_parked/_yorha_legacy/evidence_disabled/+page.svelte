@@ -25,5 +25,8 @@
 <EvidenceBoard
  items={data.items}
  connections={data.connections}
- onSave={savePositions}
+ onSave={ savePositions }
 />
+
+
+

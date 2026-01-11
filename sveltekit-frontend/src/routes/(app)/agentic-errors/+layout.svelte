@@ -18,7 +18,7 @@
 							class="px-3 py-1.5 rounded-lg text-sm transition-colors {
 								$page.url.pathname === '/agentic-errors'
 									? 'bg-purple-600 text-white'
-									: 'text-gray-400 hover:text-white hover:bg-gray-800'
+									: 'text-gray-400, hover:text-white hover:bg-gray-800'
 							}"
 						>
 							Dashboard
@@ -28,7 +28,7 @@
 							class="px-3 py-1.5 rounded-lg text-sm transition-colors {
 								$page.url.pathname === '/agentic-errors/analysis'
 									? 'bg-purple-600 text-white'
-									: 'text-gray-400 hover:text-white hover:bg-gray-800'
+									: 'text-gray-400, hover:text-white hover:bg-gray-800'
 							}"
 						>
 							AI Analysis
@@ -38,7 +38,7 @@
 							class="px-3 py-1.5 rounded-lg text-sm transition-colors {
 								$page.url.pathname === '/agentic-errors/rag-kag'
 									? 'bg-purple-600 text-white'
-									: 'text-gray-400 hover:text-white hover:bg-gray-800'
+									: 'text-gray-400, hover:text-white hover:bg-gray-800'
 							}"
 						>
 							RAG+KAG
@@ -48,7 +48,7 @@
 							class="px-3 py-1.5 rounded-lg text-sm transition-colors {
 								$page.url.pathname === '/agentic-errors/fastmcp'
 									? 'bg-purple-600 text-white'
-									: 'text-gray-400 hover:text-white hover:bg-gray-800'
+									: 'text-gray-400, hover:text-white hover:bg-gray-800'
 							}"
 						>
 							FastMCP Tools
@@ -68,3 +68,5 @@
 		{@render children()}
 	</main>
 </div>
+
+

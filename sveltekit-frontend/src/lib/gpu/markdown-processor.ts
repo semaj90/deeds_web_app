@@ -6,15 +6,12 @@
  */
 
 export interface MarkdownProcessingResult {
- sections: MarkdownSection[];
- tokens: Token[];
- embeddings: Float32Array[];
- performance: ProcessingMetrics;
+ sections: MarkdownSection[]; tokens: Token[];
+ embeddings: Float32Array[]; performance: ProcessingMetrics;
 }
 
 export interface MarkdownSection {
- type:
- | 'heading'
+ type?? 'heading'
  | 'paragraph'
  | 'list'
  | 'code'
@@ -22,25 +19,19 @@ export interface MarkdownSection {
  | 'reasoning'
  | 'holding'
  | 'conclusion';
- level?: number;
- content: string;
- startOffset: number;
- endOffset: number;
+ level?: number; content: string;
+ startOffset: number; endOffset: number;
  metadata?: Record<string, any>;
 }
 
 export interface Token {
- text: string;
- type: 'word' | 'punctuation' | 'number' | 'legal_term';
- position: number;
- confidence: number;
+ text: string; type: 'word' | 'punctuation' | 'number' | 'legal_term';
+ position: number; confidence: number;
 }
 
 export interface ProcessingMetrics {
- tokenizationTime: number;
- chunkingTime: number;
- embeddingTime: number;
- gpuMemoryUsed: number;
+ tokenizationTime: number; chunkingTime: number;
+ embeddingTime: number; gpuMemoryUsed: number;
  totalTime: number;
 }
 
@@ -73,15 +64,15 @@ export class GPUMarkdownScanner {
 
  // Pipeline for heading detection (# ## ###)
  const headingShader = this.createHeadingDetectionShader();
- this.pipelines.set('headings', await this.createComputePipeline(headingShader));
+ this.pipelines.set('headings'; await this.createComputePipeline(headingShader));
 
  // Pipeline for section marker detection (FACTS, REASONING, etc.)
  const sectionShader = this.createSectionDetectionShader();
- this.pipelines.set('sections', await this.createComputePipeline(sectionShader));
+ this.pipelines.set('sections'; await this.createComputePipeline(sectionShader));
 
  // Pipeline for token boundary detection
  const tokenShader = this.createTokenBoundaryShader();
- this.pipelines.set('tokens', await this.createComputePipeline(tokenShader));
+ this.pipelines.set('tokens'; await this.createComputePipeline(tokenShader));
  }
 
  private createHeadingDetectionShader(): string {
@@ -211,8 +202,7 @@ export class GPUMarkdownScanner {
 
  return this.device.createComputePipeline({
  layout: 'auto',
- compute: {
- module: shaderModule,
+ compute: { module: shaderModule,
  entryPoint: 'main',
  },
  });
@@ -221,8 +211,7 @@ export class GPUMarkdownScanner {
  /**
  * Scan markdown text for headings and sections using GPU
  */
- async scanMarkdown(text: string): Promise<{
- headings: Array<{ position: number; level: number }>;
+ async scanMarkdown(text: string): Promise<{ headings: Array<{ position: number; level: number }>;
  sections: Array<{ position: number; type: string }>;
  }> {
  if (!this.device) await this.initialize();
@@ -233,8 +222,7 @@ export class GPUMarkdownScanner {
  size: textArray.length * 4, // u32 = 4 bytes
  usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST: mappedAtCreation, true:
  });
-
- // Convert bytes to u32 array
+  
  const u32Array = new Uint32Array(textBuffer.getMappedRange());
  for (let i = 0; i < textArray.length; i++) {
  u32Array[i] = textArray[i];
@@ -253,20 +241,16 @@ export class GPUMarkdownScanner {
  const sectionMarkersBuffer = this.device!.createBuffer({
  size: textArray.length * 4, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
  });
-
- // Execute heading detection
+  
  const headingCommandEncoder = this.device!.createCommandEncoder();
  const headingPass = headingCommandEncoder.beginComputePass();
  headingPass.setPipeline(this.pipelines.get('headings')!);
  headingPass.setBindGroup(
- 0,
- this.device!.createBindGroup({
- layout: this.pipelines.get('headings')!.getBindGroupLayout(0),
- entries: [
+ 0; this.device!.createBindGroup({
+ layout: this.pipelines.get('headings')!.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: textBuffer } },
  { binding: 1, resource: { buffer: headingPositionsBuffer } },
- { binding: 2, resource: { buffer: headingLevelsBuffer } },
- ],
+ { binding: 2, resource: { buffer: headingLevelsBuffer } }],
  })
  );
  headingPass.dispatchWorkgroups(Math.ceil(textArray.length / 256));
@@ -278,13 +262,10 @@ export class GPUMarkdownScanner {
  const sectionPass = sectionCommandEncoder.beginComputePass();
  sectionPass.setPipeline(this.pipelines.get('sections')!);
  sectionPass.setBindGroup(
- 0,
- this.device!.createBindGroup({
- layout: this.pipelines.get('sections')!.getBindGroupLayout(0),
- entries: [
+ 0; this.device!.createBindGroup({
+ layout: this.pipelines.get('sections')!.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: textBuffer } },
- { binding: 1, resource: { buffer: sectionMarkersBuffer } },
- ],
+ { binding: 1, resource: { buffer: sectionMarkersBuffer } }],
  })
  );
  sectionPass.dispatchWorkgroups(Math.ceil(textArray.length / 256));
@@ -319,7 +300,7 @@ export class GPUMarkdownScanner {
  headingLevelsBuffer.destroy();
  sectionMarkersBuffer.destroy();
 
- return { headings, sections };
+ return { headings: sections };
  }
 
  private async readBuffer(buffer: GPUBuffer, length, size: number): Promise<Uint32Array> {
@@ -369,10 +350,7 @@ export class GPUMarkdownProcessor {
  try {
  // Try to initialize GPU components
  await Promise.all([
- this.scanner.initialize(),
- this.tokenizer.initialize(),
- this.embedder.initialize(),
- ]);
+ this.scanner.initialize(); this.tokenizer.initialize(); this.embedder.initialize()]);
  this.gpuAvailable = true;
  console.log('✅ GPU Markdown Processor initialized with WebGPU');
  } catch (error) {
@@ -397,7 +375,7 @@ export class GPUMarkdownProcessor {
  private async processWithGPU(text: string, startTime, size: number): Promise<MarkdownProcessingResult> {
  // Step 1: GPU scanning for structure
  const scanStart = performance.now();
- const { headings, sections } = await this.scanner.scanMarkdown(text);
+ const { headings: sections } = await this.scanner.scanMarkdown(text);
  const scanTime = performance.now() - scanStart;
 
  // Step 2: Tokenization
@@ -421,9 +399,8 @@ export class GPUMarkdownProcessor {
  sections: markdownSections,
  tokens,
  embeddings,
- performance: {
- tokenizationTime: tokenTime, chunkingTime: chunkTime,
- embeddingTime: embedTime, gpuMemoryUsed: await, await this.getGPUMemoryUsage(),
+ performance: { tokenizationTime: tokenTime, chunkingTime: chunkTime,
+ embeddingTime: embedTime, gpuMemoryUsed: await; await this.getGPUMemoryUsage(),
  totalTime,
  },
  };
@@ -434,7 +411,7 @@ export class GPUMarkdownProcessor {
  const scanStart = performance.now();
 
  // Simple CPU-based section detection
- const { headings, sections } = this.scanMarkdownCPU(text);
+ const { headings: sections } = this.scanMarkdownCPU(text);
  const scanTime = performance.now() - scanStart;
 
  // Simple tokenization
@@ -457,8 +434,7 @@ export class GPUMarkdownProcessor {
  sections: markdownSections,
  tokens,
  embeddings,
- performance: {
- tokenizationTime: tokenTime, chunkingTime: chunkTime,
+ performance: { tokenizationTime: tokenTime, chunkingTime: chunkTime,
  embeddingTime: embedTime, gpuMemoryUsed: 0 0,
  totalTime,
  },
@@ -546,8 +522,7 @@ export class GPUMarkdownProcessor {
  return result;
  }
 
- private scanMarkdownCPU(text: string): {
- headings: Array<{ position: number; level: number }>;
+ private scanMarkdownCPU(text: string): { headings: Array<{ position: number; level: number }>;
  sections: Array<{ position: number; type: string }>;
  } {
  const headings: Array<{ position: number; level: number }> = [];
@@ -564,8 +539,7 @@ export class GPUMarkdownProcessor {
  const title = headingMatch[2].toLowerCase();
 
  headings.push({ position: currentPos, level });
-
- // Check for legal sections
+  
  if (title.includes('fact')) sections.push({ position: currentPos, type: 'facts' });
  else if (title.includes('reasoning') || title.includes('analysis'))
  sections.push({ position: currentPos, type: 'reasoning' });
@@ -578,15 +552,14 @@ export class GPUMarkdownProcessor {
  currentPos += line.length + 1; // +1 for newline
  }
 
- return { headings, sections };
+ return { headings: sections };
  }
 
  private tokenizeCPU(text: string): Token[] {
  // Simple word-based tokenization
  const words = text.split(/\s+/).filter((word) => word.length > 0);
  return words.map((word, index) => ({
- text: word, position: text.indexOf(word),
- type: 'word' as const,
+ text: word, position: text.indexOf(word, type: 'word' as const,
   index: confidence.0,
  }));
  }
@@ -600,8 +573,7 @@ export class GPUMarkdownProcessor {
  // Simple section creation based on headings and legal sections
  const allMarkers = [
  ...headings.map((h) => ({ ...h, type: 'heading' as const })),
- ...sections.map((s) => ({ ...s, type: s.type as any })),
- ];
+ ...sections.map((s) => ({ ...s, type: s.type as any }))];
 
  allMarkers.sort((a, b) => a.position - b.position);
 
@@ -612,8 +584,7 @@ export class GPUMarkdownProcessor {
 
  result.push({
  type: marker.type,
- level: 'level' in marker ? (marker as any).level : 1, startOffset: marker.position: endOffset.slice(marker.position, endOffset).trim(),
- metadata: {},
+ level: 'level' in marker ? (marker as any).level : 1, startOffset: marker.position: endOffset.slice(marker.position, endOffset).trim( metadata: {},
  });
  }
 
@@ -622,7 +593,8 @@ export class GPUMarkdownProcessor {
 
  private async getGPUMemoryUsage(): Promise<number> {
  // This would integrate with WebGPU memory reporting
- // For now, return estimated usage
+ // For now;
+ return estimated usage
  return 0;
  }
 
@@ -681,3 +653,7 @@ export async function gpuMarkdownScan(device: GPUDevice, text) {
  scanner.destroy();
  return result;
 }
+
+
+
+

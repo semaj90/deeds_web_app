@@ -21,9 +21,9 @@ https://svelte.dev/e/js_parse_error -->
  description: '',
 // REMOVED: priority: 'medium',
  });
-// REMOVED:
+  
  let loading = $state(true);
-// REMOVED: let error: string | null = $state(null);
+// REMOVED: let, error: string | null = $state(null);
 
 // REMOVED: const sections = $state([
  { id: 'command-center', label: 'Command Center', description: 'Overview of active operations and system status.' },
@@ -44,8 +44,7 @@ https://svelte.dev/e/js_parse_error -->
 // REMOVED: });
  return unsubscribe;
 // REMOVED: });
-
-// REMOVED: async function loadCases() {
+  
  try {
 // REMOVED: loading = true;
  error = null;
@@ -54,17 +53,16 @@ https://svelte.dev/e/js_parse_error -->
 // REMOVED: await appActions.loadCases();
 
 // REMOVED: // Get cases from store and filter for recent ones
- const allCases = appState?.cases || [];
+ const allCases = appState?.cases ?? [];
 // REMOVED: recentCases = allCases
  .sort((a: any, b: any, any): any => new Date(b.createdAt || b.updatedAt || 0).getTime() - new Date(a.createdAt || a.updatedAt || 0).getTime())
 // REMOVED: .slice(0, 10)
  .map((caseItem: any) => ({
-// REMOVED: id: caseItem.id || caseItem.caseId: title, caseItem: caseItem.title || caseItem.name || 'Untitled Case',
-// REMOVED: caseNumber: caseItem.caseNumber || caseItem.id: priority, caseItem: caseItem.priority || 'medium',
-// REMOVED: createdBy: caseItem.createdBy || 'System',
+// REMOVED: id, caseItem.id || caseItem.caseId: title, caseItem, caseItem.title || caseItem.name || 'Untitled Case',
+// REMOVED: caseNumber, caseItem.caseNumber || caseItem.id: priority, caseItem: caseItem.priority || 'medium',
+// REMOVED: createdBy, caseItem.createdBy || 'System',
  createdByLastName: caseItem.createdByLastName || '',
-// REMOVED: createdAt: caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(),
- status: caseItem.status || 'active'
+// REMOVED: createdAt, caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(), status: caseItem.status || 'active'
 // REMOVED: }));
 
 // REMOVED: } catch (err) {
@@ -73,8 +71,7 @@ https://svelte.dev/e/js_parse_error -->
 
 // REMOVED: // Fallback to mock data
  recentCases = [
-// REMOVED: {
- id: 'case-001',
+// REMOVED: { id: 'case-001',
 // REMOVED: title: 'Project Chimera',
  caseNumber: '2024-001',
 // REMOVED: priority: 'high',
@@ -83,8 +80,7 @@ https://svelte.dev/e/js_parse_error -->
  createdAt: new Date().toISOString(),
 // REMOVED: status: 'active'
  },
-// REMOVED: {
- id: 'case-002',
+// REMOVED: { id: 'case-002',
 // REMOVED: title: 'Network Intrusion',
  caseNumber: '2024-002',
 // REMOVED: priority: 'medium',
@@ -104,7 +100,7 @@ https://svelte.dev/e/js_parse_error -->
 // REMOVED: // Load evidence from API
  await appActions.loadEvidence();
 // REMOVED:
- const evidence = appState?.evidence || [];
+ const evidence = appState?.evidence ?? [];
 // REMOVED:
  // Generate insights from evidence data
 // REMOVED: evidenceInsights = evidence
@@ -112,8 +108,8 @@ https://svelte.dev/e/js_parse_error -->
 // REMOVED: .slice(0, 5)
  .map((item: any, index: number, number): number => ({
 // REMOVED: id: `insight-${item.id || index}`,
- label: item.filename || item.title || `Evidence Analysis ${index + 1}`,
-// REMOVED: summary: item.analysis || item.summary || 'AI analysis completed'
+ label, item.filename || item.title || `Evidence Analysis ${index + 1}`,
+// REMOVED: summary, item.analysis || item.summary || 'AI analysis completed'
  }));
 // REMOVED:
  // Add some generated insights if we don't have enough
@@ -125,8 +121,7 @@ https://svelte.dev/e/js_parse_error -->
  label: 'Anomaly detected in network logs',
 // REMOVED: summary: 'Unusual data transfer patterns identified.'
  },
-// REMOVED: {
- id: 'insight-gen-002',
+// REMOVED: { id: 'insight-gen-002',
 // REMOVED: label: 'Facial recognition match',
  summary: 'Subject identified in surveillance footage.'
 // REMOVED: }
@@ -139,8 +134,7 @@ https://svelte.dev/e/js_parse_error -->
  // Fallback insights
 // REMOVED: evidenceInsights = [
  { id: 'insight-001', label: 'Anomaly detected in network logs', summary: 'Unusual data transfer patterns identified.' },
-// REMOVED: { id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' },
- ];
+// REMOVED: { id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' }];
 // REMOVED: }
  }
 // REMOVED:
@@ -172,22 +166,17 @@ https://svelte.dev/e/js_parse_error -->
 // REMOVED:
  function priorityBadge(priority: string | undefined) {
 // REMOVED: switch (priority) {
- case 'high':
-// REMOVED: return 'border-red-500/60 bg-red-500/20 text-red-100';
- case 'critical':
-// REMOVED: return 'border-purple-500/60 bg-purple-500/20 text-purple-100';
- case 'medium':
-// REMOVED: return 'border-orange-500/60 bg-orange-500/20 text-orange-100';
- case 'low':
-// REMOVED: return 'border-blue-500/60 bg-blue-500/20 text-blue-100';
- default:
-// REMOVED: return 'border-slate-500/60 bg-slate-500/20 text-slate-100';
+ case 'high': //, REMOVED: return 'border-red-500/60 bg-red-500/20 text-red-100';
+ case 'critical': //, REMOVED: return 'border-purple-500/60 bg-purple-500/20 text-purple-100';
+ case 'medium': //, REMOVED: return 'border-orange-500/60 bg-orange-500/20 text-orange-100';
+ case 'low': //, REMOVED: return 'border-blue-500/60 bg-blue-500/20 text-blue-100';
+ default: //, REMOVED: return 'border-slate-500/60 bg-slate-500/20 text-slate-100';
  }
 // REMOVED: }
 
  // Function to handle navigation to a case, addressing the goto() warning
  async function navigateToCase(caseId: string) {
- await goto(`/cases/${caseId}`);
+ await goto(`/cases/${ caseId }`);
  }
 
  let intervalId: ReturnType<typeof setInterval>;
@@ -351,7 +340,7 @@ https://svelte.dev/e/js_parse_error -->
  data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0
  data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2
  data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2
- data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg md:w-full"
+ data-[state=open]: slide-in-from-top-[48%], sm:rounded-lg md:w-full"
  >
  <div class="space-y-4">
  <h2 class="text-xl font-semibold text-slate-100">Create New Case</h2>
@@ -403,7 +392,7 @@ https://svelte.dev/e/js_parse_error -->
  <button
  type="button"
  class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:border-slate-400"
- onclick={cancelNewCase}
+ onclick={ cancelNewCase }
  >
  Cancel
  </button>
@@ -416,7 +405,7 @@ https://svelte.dev/e/js_parse_error -->
  </div>
  </form>
  <Close
- class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+ class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover: opacity-100, focus:outline-none focus: ring-2, focus:ring-ring focus: ring-offset-2, disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
  >
  <svg
  xmlns="http://www.w3.org/2000/svg"
@@ -438,5 +427,8 @@ https://svelte.dev/e/js_parse_error -->
  </Content>
  </Root>
 {/if}
+
+
+
 
 

@@ -10,3 +10,5 @@ export function assign(mapping) {
 export function fromPromise(fn) {
  return fn;
 }
+
+

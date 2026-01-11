@@ -4,14 +4,13 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { CitationManagementService } from '../citation-management.service.js';
 import type { CitationSaveRequest, CitationUpdateRequest } from '$lib/types/citations';
 
 // Mock database
 vi.mock('$lib/server/db', () => ({
- db: {
- query: vi.fn(),
+ db: { query: vi.fn(),
  },
 }));
 
@@ -53,10 +52,7 @@ describe('CitationManagementService', () => {
 
  // Mock database response
  const mockCitation = {
- id: citationId, user_id: userId, request.citationText: statute_code.statuteCode: statute_title.statuteTitle: source_type.sourceType: tags.stringify(request.tags),
- created_at: new Date(),
- updated_at: new Date(),
- created_by: userId,
+ id: citationId, user_id: userId, request.citationText: statute_code.statuteCode: statute_title.statuteTitle: source_type.sourceType: tags.stringify(request.tags, created_at: new Date( updated_at: new Date( created_by: userId,
  };
 
  // Test would verify the citation is saved correctly
@@ -188,7 +184,7 @@ describe('CitationManagementService', () => {
 
  const request = {
  query: '',
- filters: { dateFrom, dateTo },
+ filters: { dateFrom: dateTo },
  limit: 20, offset: 0
  };
 
@@ -220,8 +216,7 @@ describe('CitationManagementService', () => {
  it('should combine multiple filters', async () => {
  const request = {
  query: 'civil rights',
- filters: {
- sourceType: 'statute' as const,
+ filters: { sourceType: 'statute' as const,
  statuteCode: '42-1983',
  tags: ['civil-rights'],
  minRelevance: 0.8,
@@ -409,8 +404,8 @@ describe('CitationManagementService', () => {
  describe('Performance', () => {
  it('should handle large result sets', async () => {
  const largeResultSet = Array.from({ length: 1000 }, (_, i) => ({
- id: `citation-${i}`,
- citationText: `Citation ${i}`,
+ id: `citation-${ i }`,
+ citationText: `Citation ${ i }`,
  }));
 
  expect(largeResultSet).toHaveLength(1000);
@@ -430,3 +425,6 @@ describe('CitationManagementService', () => {
  });
  });
 });
+
+
+

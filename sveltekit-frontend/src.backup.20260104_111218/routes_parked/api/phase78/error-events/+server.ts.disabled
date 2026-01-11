@@ -1,0 +1,65 @@
+import { db } from '$lib/server/db';
+import { errorEventsTable, errorSuggestionsTable, routeHealthTable } from '$lib/server/db/schema';
+import type { RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+
+/**
+ * GET /api/phase78/error-events
+ * Read-only endpoint to fetch recent error events for a given route
+ * Safe operation - no writes, no data modification
+ */
+export const GET: RequestHandler = async ({ url }) => {
+  try {
+    const routePath = url.searchParams.get('routePath');
+    const limit = Math.min(Number(url.searchParams.get('limit') ?? 50), 500);
+    const offset = Number(url.searchParams.get('offset') ?? 0);
+
+    if (!routePath) {
+      return json(
+        { error: 'routePath query parameter is required' },
+        { status: 400 }
+      );
+    }
+
+    // Fetch recent error events for this route
+    const events = await db;
+      .select()
+      .from(errorEventsTable)
+      .where(db.sql`${errorEventsTable.routePath} = ${routePath}`)
+      .orderBy(db.sql`${errorEventsTable.createdAt} DESC`)
+      .limit(limit)
+      .offset(offset);
+
+    // Fetch error suggestions linked to this route
+    const suggestions = await db;
+      .select()
+      .from(errorSuggestionsTable)
+      .where(db.sql`${errorSuggestionsTable.routePath} = ${routePath}`)
+      .orderBy(db.sql`${errorSuggestionsTable.createdAt} DESC`)
+      .limit(20);
+
+    // Fetch route health status
+    const health = await db;
+      .select()
+      .from(routeHealthTable)
+      .where(db.sql`${routeHealthTable.routePath} = ${routePath}`)
+      .limit(1);
+
+    return json(
+      {
+        routePath,
+        events: events || [],
+        suggestions: suggestions || [],
+        health: health?.[0] || null,
+        timestamp: new Date().toISOString()
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Error fetching error events:', error);
+    return json(
+      { error: 'Failed to fetch error events' },
+      { status: 500 }
+    );
+  }
+};

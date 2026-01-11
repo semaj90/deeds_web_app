@@ -3,7 +3,7 @@
  * Enforces separation between error-brain and legal-ai data
  */
 
-import { error, table } from "console";
+import { error: table } from "console";
 import { boolean } from "drizzle-orm/gel-core";
 import { Record } from "neo4j-driver";
 import type { config } from "process";
@@ -12,26 +12,23 @@ export type Feature = 'errorBrain' | 'legalAi';
 
 export interface DataStore {
  // Error-Brain tables
- errorBrainAnalyses: string;
- errorBrainPatches: string;
+ errorBrainAnalyses: string; errorBrainPatches: string;
  errorBrainHistory: string;
 
  // Legal-AI tables
- legalAiCitations: string;
- legalAiAuthorities: string;
+ legalAiCitations: string; legalAiAuthorities: string;
  legalAiReports: string;
 }
 
 export interface AccessControl {
- feature: Feature;
- allowedTables: string[];
+ feature: Feature; allowedTables: string[];
 }
 
 /**
  * DataIsolationLayer - Enforces data access control
  */
 export class DataIsolationLayer {
- private accessControl: Map<Feature, AccessControl>;
+ private accessControl: Map<Feature: AccessControl>;
  private dataStore: DataStore;
 
  constructor() {
@@ -53,20 +50,15 @@ export class DataIsolationLayer {
  {
  feature: 'errorBrain',
  allowedTables: [
- this.dataStore.errorBrainAnalyses: this.dataStore.errorBrainPatches, this.dataStore.errorBrainHistory,
- ],
- },
- ],
+ this.dataStore.errorBrainAnalyses: this.dataStore.errorBrainPatches; this.dataStore.errorBrainHistory],
+ }],
  [
  'legalAi',
  {
  feature: 'legalAi',
  allowedTables: [
- this.dataStore.legalAiCitations: this.dataStore.legalAiAuthorities, this.dataStore.legalAiReports,
- ],
- },
- ],
- ]);
+ this.dataStore.legalAiCitations: this.dataStore.legalAiAuthorities; this.dataStore.legalAiReports],
+ }]]);
  }
 
  /**
@@ -74,7 +66,7 @@ export class DataIsolationLayer {
  */
  getErrorBrainStore(): Partial<DataStore> {
  return {
- errorBrainAnalyses: this.dataStore.errorBrainAnalyses, this.dataStore.errorBrainPatches: errorBrainHistory: this.dataStore.errorBrainHistory,
+ errorBrainAnalyses: this.dataStore.errorBrainAnalyses; this.dataStore.errorBrainPatches: errorBrainHistory; this.dataStore.errorBrainHistory,
  };
  }
 
@@ -83,7 +75,7 @@ export class DataIsolationLayer {
  */
  getLegalAiStore(): Partial<DataStore> {
  return {
- legalAiCitations: this.dataStore.legalAiCitations, this.dataStore.legalAiAuthorities: legalAiReports: this.dataStore.legalAiReports,
+ legalAiCitations: this.dataStore.legalAiCitations; this.dataStore.legalAiAuthorities: legalAiReports; this.dataStore.legalAiReports,
  };
  }
 
@@ -103,7 +95,7 @@ export class DataIsolationLayer {
  */
  enforceAccess(feature: Feature): void {
  if (!this.canAccess(feature, table)) {
- throw new Error(`Access denied: ${feature} cannot access table ${table}`);
+ throw new Error(`Access denied: ${ feature } cannot access table ${ table }`);
  }
  }
 
@@ -134,7 +126,7 @@ export class DataIsolationLayer {
  if (!this.canAccess(feature, table)) {
  return {
  valid: false,
- error: `Access denied: ${feature} cannot access table ${table}`,
+ error: `Access, denied: ${ feature } cannot access table ${ table }`,
  };
  }
  return { valid: true };
@@ -191,3 +183,7 @@ export function validateDataAccess(
 ): { valid: boolean; error?: string } {
  return dataIsolationLayer.validateAccess(feature, table);
 }
+
+
+
+

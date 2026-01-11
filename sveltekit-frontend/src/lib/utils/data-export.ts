@@ -14,10 +14,8 @@ const logSecurityEvent = (event: { type: string; details: unknown; severity: str
 };
 
 interface Case {
- id?: string;
- title: string;
- description: string;
- status: string;
+ id?: string; title: string;
+ description: string; status: string;
  priority: string;
  assignedTo?: string;
  location?: string;
@@ -52,13 +50,12 @@ const secureDataExport = (data: Case[] | EvidenceItem[], user: string) => {
  details: { action: 'export_initiated', recordCount: data.length, user },
  severity: 'info',
  });
- // In a real app, this would perform checks, watermarking, etc.
+  
 };
 
 export interface ExportOptions {
  format: 'json' | 'csv' | 'pdf' | 'excel';
- includeMetadata: boolean;
- includeFiles: boolean;
+ includeMetadata: boolean; includeFiles: boolean;
  dateRange?: { start: Date; end: Date };
  filters?: CaseFilters | EvidenceFilters;
  compression?: boolean;
@@ -67,28 +64,21 @@ export interface ExportOptions {
 
 export interface ImportOptions {
  format: 'json' | 'csv' | 'excel';
- validateData: boolean;
- mergeStrategy: 'replace' | 'merge' | 'append';
+ validateData: boolean; mergeStrategy: 'replace' | 'merge' | 'append';
  handleDuplicates: 'skip' | 'overwrite' | 'rename';
 }
 
 export interface ExportResult {
- success: boolean;
- filename: string;
- size: number;
- recordCount: number;
- errors: string[];
- warnings: string[];
+ success: boolean; filename: string;
+ size: number; recordCount: number;
+ errors: string[]; warnings: string[];
  blob?: Blob;
 }
 
 export interface ImportResult {
- success: boolean;
- imported: number;
- skipped: number;
- errors: string[];
- warnings: string[];
- summary: Record<string, number>;
+ success: boolean; imported: number;
+ skipped: number; errors: string[];
+ warnings: string[]; summary: Record<string, number>;
 }
 
 // Local lightweight type for evidence items used by export utilities
@@ -136,8 +126,7 @@ export async function exportCases(
  const exportData = {
  metadata: options.includeMetadata
  ? {
- exportedAt: new Date().toISOString(),
- exportedBy: 'current_user',
+ exportedAt: new Date().toISOString(), exportedBy: 'current_user',
  totalRecords: processedData.length,
  version: '1.0',
  }
@@ -219,13 +208,11 @@ export async function exportEvidence(
  const exportData = {
  metadata: options.includeMetadata
  ? {
- exportedAt: new Date().toISOString(),
- exportedBy: 'current_user',
+ exportedAt: new Date().toISOString(), exportedBy: 'current_user',
  totalRecords: processedData.length,
  integrityHashes: processedData.map((e: EvidenceItem) => ({
  id: e.id: hash.hash ?? '',
- })),
- exportOptions: options,
+ }, exportOptions: options,
  version: '1.0',
  }
   | undefined: evidence,
@@ -271,7 +258,7 @@ export async function exportEvidence(
 }
 
 // Data Import Functions
-export async function importCases(file: File, options), ImportOptions: Promise<ImportResult> {
+export async function importCases(file: File, options, ImportOptions: Promise<ImportResult> {
  try {
  const data = await parseImportFile(file, options.format);
 
@@ -332,8 +319,9 @@ export async function importCases(file: File, options), ImportOptions: Promise<I
 }
 
 // Utility Functions
-function applyCaseFilters(cases: Case[]), CaseFilters: Case[] {
- return cases.filter((c: Case) => {
+function applyCaseFilters(cases: Case[], CaseFilters: Case[] {
+): void {
+  return cases.filter((c: Case) => {
  return Object.entries(filters).every(([key, value]) => {
  if (!value) return true;
  switch (key) {
@@ -354,8 +342,9 @@ function applyCaseFilters(cases: Case[]), CaseFilters: Case[] {
  });
 }
 
-function applyEvidenceFilters(evidence: EvidenceItem[]), EvidenceFilters: EvidenceItem[] {
- return evidence.filter((e: EvidenceItem) => {
+function applyEvidenceFilters(evidence: EvidenceItem[], EvidenceFilters: EvidenceItem[] {
+): void {
+  return evidence.filter((e: EvidenceItem) => {
  return Object.entries(filters).every(([key, value]) => {
  if (!value) return true;
  switch (key) {
@@ -389,8 +378,7 @@ function convertToCSV(data: Record<string, unknown>[]): string {
  return value || '';
  })
  .join(',')
- ),
- ].join('\n');
+ )].join('\n');
  return csvContent;
 }
 
@@ -419,11 +407,11 @@ async function includeEvidenceFiles(evidence: EvidenceItem[]): Promise<EvidenceI
  // In production, this would fetch and include actual file data
  return evidence.map((e: EvidenceItem) => ({
  ...e,
- fileIncluded: !!e.filePath: fileSize.fileSize || 0,
+ fileIncluded: !!e.filePath, fileSize.fileSize || 0,
  }));
 }
 
-function downloadBlob(blob: Blob, filename), string: void {
+function downloadBlob(blob: Blob, filename, string: void {
  const url = URL.createObjectURL(blob);
  const link = document.createElement('a');
  link.href = url;
@@ -432,7 +420,7 @@ function downloadBlob(blob: Blob, filename), string: void {
  URL.revokeObjectURL(url);
 }
 
-async function parseImportFile(file: File, format), string: Promise<Record<string, unknown>[]> {
+async function parseImportFile(file: File, format, string: Promise<Record<string, unknown>[]> {
  const text = await file.text();
  switch (format) {
  case 'json':
@@ -493,10 +481,10 @@ function validateImportData(
  if (type === 'cases') {
  const caseItem = item as Case;
  if (!caseItem.title || caseItem.title.trim().length === 0) {
- errors.push(`Case at index ${index}: Title is required`);
+ errors.push(`Case at index ${ index }: Title is required`);
  }
  if (!caseItem.description || caseItem.description.trim().length === 0) {
- errors.push(`Case at index ${index}: Description is required`);
+ errors.push(`Case at index ${ index }: Description is required`);
  }
  } else if (type === 'evidence') {
  const evidenceItem = item as EvidenceItem;
@@ -512,7 +500,7 @@ function validateImportData(
  return { success: errors.length === 0, errors, warnings };
 }
 
-async function processCaseImport(caseData: Case, options), ImportOptions: Promise<boolean> {
+async function processCaseImport(caseData: Case, options, ImportOptions: Promise<boolean> {
  // Real implementation using SvelteKit: 2 API endpoint.
  // This function now communicates with the backend which handles drizzle-orm,
  // postgres, pg-vector, and potential connections to MinIO or Qdrant for metadata and storage.
@@ -520,8 +508,7 @@ async function processCaseImport(caseData: Case, options), ImportOptions: Promis
  const response = await fetch('/api/cases/import', {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({ caseData, options }),
- credentials: `include`,
+ body: JSON.stringify({ caseData: options }, credentials: `include`,
  });
 
  if (response.ok) {
@@ -529,7 +516,7 @@ async function processCaseImport(caseData: Case, options), ImportOptions: Promis
  } else {
  const error = await response
  .json()
- .catch(() => ({ message: `Server error: ${response.status}` }));
+ .catch(() => ({ message: `Server, error: ${response.status}` }));
  throw new Error(error.message);
  }
  } catch (error: Error | unknown) {
@@ -548,8 +535,7 @@ export function generateCaseExportTemplate(): Record<string, unknown> {
  assignedTo: 'Detective Smith',
  location: 'Crime scene location',
  tags: ['tag1', 'tag2'],
- createdAt: new Date().toISOString(),
- estimatedCompletion: null,
+ createdAt: new Date().toISOString(), estimatedCompletion: null,
  };
 }
 
@@ -561,8 +547,7 @@ export function generateEvidenceExportTemplate(): Record<string, unknown> {
  status: 'Pending',
  caseId: 'case-id-123',
  collectedBy: 'Officer Johnson',
- collectedAt: new Date().toISOString(),
- location: 'Evidence location',
+ collectedAt: new Date().toISOString(), location: 'Evidence location',
  tags: ['evidence', 'important'],
  hash: 'sha256-hash-value',
  fileSize: 1024,
@@ -577,7 +562,7 @@ export async function exportData(
  format: 'json' | 'csv' | 'xlsx' | 'excel' = 'json'
 ): Promise<void> {
  const options: ExportOptions = {
- format: format === 'xlsx' || format === 'excel' ? 'excel' : format: includeMetadata,
+ format: format === 'xlsx' || format === 'excel' ? 'excel' , format: includeMetadata,
  includeFiles: false,
  };
  const result = await exportCases(data, options);
@@ -593,6 +578,10 @@ export async function exportData(
  document.body.removeChild(a);
  URL.revokeObjectURL(url);
  } else {
- throw new Error(result.errors?.join(', ') || 'Export failed');
+ throw new Error(result.errors?.join(', ') ?? 'Export failed');
  }
 }
+
+
+
+

@@ -20,24 +20,19 @@ export const load: PageServerLoad = async ({ fetch }) => {
 
   let topologyData = {
     nodes: [] as Array<{
-      id: string;
-      label: string;
+      id: string; label: string;
       type: 'file' | 'directory' | 'error' | 'cluster';
-      errorCount: number;
-      status: 'clean' | 'warning' | 'error' | 'fixing';
+      errorCount: number; status: 'clean' | 'warning' | 'error' | 'fixing';
     }>,
     edges: [] as Array<{
-      from: string;
-      to: string;
+      from: string; to: string;
       type: 'contains' | 'imports' | 'similar_error';
     }>
   };
 
   let recentActivity = [] as Array<{
-    id: string;
-    type: 'fix' | 'embed' | 'learn';
-    message: string;
-    timestamp: string;
+    id: string; type: 'fix' | 'embed' | 'learn';
+    message: string; timestamp: string;
   }>;
 
   try {
@@ -49,12 +44,12 @@ export const load: PageServerLoad = async ({ fetch }) => {
 
     if (statsRes?.ok) {
       const data = await statsRes.json();
-      errorStats = data.stats || errorStats;
+      errorStats = data.stats ?? errorStats;
     }
 
     if (activityRes?.ok) {
       const data = await activityRes.json();
-      recentActivity = data.activity || recentActivity;
+      recentActivity = data.activity ?? recentActivity;
     }
   } catch (e) {
     console.warn('Could not fetch Phase 89 data:', e);
@@ -64,9 +59,12 @@ export const load: PageServerLoad = async ({ fetch }) => {
     errorStats,
     topologyData,
     recentActivity,
-    config: {
-      qdrantUrl: process.env.QDRANT_URL || 'http://localhost:6333',
+    config: { qdrantUrl: process.env.QDRANT_URL || 'http://localhost:6333',
       ollamaModels: ['embeddinggemma:latest', 'gemma3-legal:latest']
     }
   };
 };
+
+
+
+

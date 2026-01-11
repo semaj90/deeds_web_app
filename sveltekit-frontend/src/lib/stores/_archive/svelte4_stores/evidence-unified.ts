@@ -3,8 +3,7 @@ import type { Evidence } from '../types/api.js';
 
 type EvidenceState = {
  /* primary shape used by consumers */
- evidence: Evidence[];
- isLoading: boolean;
+ evidence: Evidence[]; isLoading: boolean;
  error: unknown | null;
  [k: string]: unknown;
 };
@@ -41,3 +40,6 @@ export const evidenceStore = {
  update((s) => ({ ...s, error: err }));
  },
 };
+
+
+

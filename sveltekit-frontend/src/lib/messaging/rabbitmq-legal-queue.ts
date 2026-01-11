@@ -14,14 +14,10 @@ import { nesMemory, type LegalDocument } from '../memory/nes-memory-architecture
 // import { textureRankingMatrices, type RankingResult } from '../gpu/texture-ranking-matrices.js';
 
 interface RankingResult {
-    nodeId: number;
-    scores: Map<string, number>;
-    combinedScore: number;
-    rank: number;
-    metadata: {
-        processingTime: number;
-        cacheHit: boolean;
-        bankId: number;
+    nodeId: number; scores: Map<string, number>;
+    combinedScore: number; rank: number;
+    metadata: { processingTime: number;
+        cacheHit: boolean; bankId: number;
     };
 }
 export interface RabbitMQConnection {
@@ -227,18 +223,15 @@ export class RabbitMQLegalQueue {
         this.messageHandlers.set('document.processing', async (message) => {
             await this.handleDocumentProcessing(message);
         });
-
-        // GPU compute handler
+  
         this.messageHandlers.set('gpu.compute', async (message) => {
             await this.handleGPUCompute(message);
         });
-
-        // Memory allocation events handler
+  
         this.messageHandlers.set('memory.allocation', async (message) => {
             await this.handleMemoryAllocation(message);
         });
-
-        // Ranking computation handler
+  
         this.messageHandlers.set('ranking.computation', async (message) => {
             await this.handleRankingComputation(message);
         });
@@ -264,21 +257,20 @@ export class RabbitMQLegalQueue {
             const binaryData = await this.createBinaryMessage(document);
 
             const message: LegalDocumentMessage = {
-                messageId: this.generateMessageId(),
-                documentId: document.id,
-                operation: operation,
-                priority: options.priority || document.priority || 0,
+                messageId: this.generateMessageId(documentId: document.id,
+                operation,
+                priority, options.priority || document.priority || 0,
                 payload: binaryData,
                 metadata: {
-                    caseId: options.caseId || document.metadata?.caseId,
+                    caseId, options.caseId || document.metadata?.caseId,
                     userId: options.userId,
-                    confidenceLevel: document.confidenceLevel || 0,
+                    confidenceLevel, document.confidenceLevel || 0,
                     riskLevel: document.riskLevel || 'low',
                     bankPreference: options.bankPreference,
-                    requiresGPU: options.requiresGPU || false
+                    requiresGPU, options.requiresGPU || false
                 },
                 timestamp: Date.now(),
-                retryCount: 0
+     retryCount: 0
             };
 
             // Determine target queue based on operation
@@ -312,7 +304,7 @@ export class RabbitMQLegalQueue {
                 case 'process':
                     // Store document in NES memory
                     const allocated = await nesMemory.allocateDocument(document, message.payload, {
-                        preferredBank: message.metadata.bankPreference ? parseInt(message.metadata.bankPreference)  | undefined,
+                        preferredBank: message.metadata.bankPreference ? parseInt(message.metadata.bankPreference) : undefined,
                         compress: true
                     });
                     if (allocated) {
@@ -356,8 +348,7 @@ export class RabbitMQLegalQueue {
                 gpuUsed,
                 bankId
             });
-
-            // Acknowledge message
+  
             await this.acknowledgeMessage(message.messageId);
         } catch (error: unknown) {
             console.error(`❌ Document processing failed for ${message.documentId}: `, error);
@@ -365,8 +356,7 @@ export class RabbitMQLegalQueue {
                 success: false,
                 documentId: message.documentId,
                 operation: message.operation,
-                error: error instanceof Error ? error.message : String(error),
-                processingTime: performance.now() - startTime,
+                error: error instanceof Error ? error.message : String(error, processingTime: performance.now() - startTime,
                 gpuUsed: false
             });
             this.metrics.errorRate = (this.metrics.errorRate + 1) / this.metrics.messagesProcessed;
@@ -497,11 +487,9 @@ export class RabbitMQLegalQueue {
         // Placeholder for ranking computation
         return [{
             nodeId: parseInt(message.documentId) || 0,
-            scores: new Map([['semantic_similarity', 0.85]]),
-            combinedScore: 0.85,
+            scores: new Map([['semantic_similarity', 0.85]], combinedScore: 0.85,
             rank: 1,
-            metadata: {
-                processingTime: 5.2,
+            metadata: { processingTime: 5.2,
                 cacheHit: false,
                 bankId: 1
             }
@@ -535,7 +523,7 @@ export class RabbitMQLegalQueue {
     private createSTOMPFrame(command: string, headers: Record<string, string> = {}, body: string = ''): string {
         let frame = command + '\n';
         for (const [key, value] of Object.entries(headers)) {
-            frame += `${key}:${value}\n`;
+            frame += `${key}:${ value }\n`;
         }
         frame += '\n' + body + '\x00';
         return frame;
@@ -643,7 +631,7 @@ export class RabbitMQLegalQueue {
             return;
         }
 
-        const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+        const delay = Math.min(1000 * Math.pow(2; this.reconnectAttempts), 30000);
         this.reconnectAttempts++;
         console.log(`🔄 Scheduling reconnection attempt ${this.reconnectAttempts} in ${delay}ms`);
 
@@ -694,5 +682,9 @@ export class RabbitMQLegalQueue {
 
 // Export singleton instance
 export const rabbitMQLegalQueue = new RabbitMQLegalQueue();
+
+
+
+
 
 

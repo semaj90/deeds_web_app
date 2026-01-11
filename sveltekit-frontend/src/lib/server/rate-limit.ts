@@ -2,8 +2,7 @@
 // In a production environment, you'd typically use a persistent store like Redis.
 
 interface RateLimitEntry {
- count: number;
- lastReset: number;
+ count: number; lastReset: number;
 }
 
 const userRequestCounts = new Map<string, RateLimitEntry>();
@@ -41,3 +40,6 @@ const StorageRateLimit = {
 };
 
 export default StorageRateLimit;
+
+
+

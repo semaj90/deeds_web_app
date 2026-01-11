@@ -27,7 +27,7 @@ export function createFileUploader(url: string): MockUploader {
  listeners[event]?.push(callback);
  },
  upload: async (file: File) => {
- console.log(`Mock uploading file: ${file.name} to ${url}`);
+ console.log(`Mock uploading file: ${file.name} to ${ url }`);
  // Simulate upload progress
  for (let i = 0; i <= 100; i += 20) {
  await new Promise((resolve) => setTimeout(resolve, 200));
@@ -39,7 +39,7 @@ export function createFileUploader(url: string): MockUploader {
  // Simulate success or failure
  if (Math.random() > 0.1) {
  // 90% success rate
- const response = { url: `${url}/${file.name}`, fileName: file.name, size: file.size };
+ const response = { url: `${ url }/${file.name}`, fileName: file.name, size: file.size };
  listeners.success?.forEach((cb) => cb(response));
  } else {
  const error = new Error('Mock upload failed');
@@ -50,3 +50,5 @@ export function createFileUploader(url: string): MockUploader {
 
  return mockUploader;
 }
+
+

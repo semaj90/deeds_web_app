@@ -29,8 +29,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const submitResponse = await fetch(`${CUDA_SERVER_URL}/api/v1/submit`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- type: 'inference',
+ body: JSON.stringify({ type: 'inference',
  priority: 5,
  payload: { prompt: lastUserMessage.content },
  }),
@@ -87,3 +86,6 @@ export const POST: RequestHandler = async ({ request }) => {
  );
  }
 };
+
+
+

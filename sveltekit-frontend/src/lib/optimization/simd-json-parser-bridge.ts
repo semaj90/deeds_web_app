@@ -13,10 +13,8 @@ import type { Transform } from 'stream';
  */
 export interface SIMDParserConfig {
  enabled: boolean;
- goServiceUrl?: string;
- fallbackToNative: boolean;
- cacheResults: boolean;
- maxBatchSize: number;
+ goServiceUrl?: string; fallbackToNative: boolean;
+ cacheResults: boolean; maxBatchSize: number;
  timeoutMs: number;
 }
 
@@ -24,10 +22,8 @@ export interface SIMDParserConfig {
  * SIMD Parse Result
  */
 export interface SIMDParseResult {
- success: boolean;
- data: any;
- parseTimeMs: number;
- usedSIMD: boolean;
+ success: boolean; data: any;
+ parseTimeMs: number; usedSIMD: boolean;
  errorMessage?: string;
  cacheHit?: boolean;
 }
@@ -36,8 +32,7 @@ export interface SIMDParseResult {
  * Batch Parse Request for Go Service
  */
 export interface BatchParseRequest {
- id: string;
- items: string[];
+ id: string; items: string[];
  options?: {
  validate?: boolean;
  strict?: boolean;
@@ -48,16 +43,12 @@ export interface BatchParseRequest {
  * Batch Parse Response
  */
 export interface BatchParseResponse {
- id: string;
- results: Array<{
- index: number;
- success: boolean;
+ id: string; results: Array<{
+ index: number; success: boolean;
  data?: any;
- error?: string;
- timeMs: number;
+ error?: string; timeMs: number;
  }>;
- totalTimeMs: number;
- speedupRatio: number; // vs native JSON
+ totalTimeMs: number; speedupRatio: number; // vs native JSON
 }
 
 /**
@@ -118,7 +109,7 @@ export class SIMDJSONParserBridge {
  return {
  success: false, data: null,
  parseTimeMs: 0, usedSIMD: true,
- errorMessage: `SIMD parsing failed: ${error}`,
+ errorMessage: `SIMD parsing failed: ${ error }`,
  };
  }
  // Fall through to native parsing
@@ -139,8 +130,7 @@ export class SIMDJSONParserBridge {
  const response = await fetch(`${this.goServiceUrl}/parse`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ json: jsonString }),
- signal: AbortSignal.timeout(this.config.timeoutMs),
+ body: JSON.stringify({ json: jsonString }, signal: AbortSignal.timeout(this.config.timeoutMs),
  });
 
  if (!response.ok) {
@@ -158,7 +148,7 @@ export class SIMDJSONParserBridge {
  success: true, data: result.data,
  };
  } catch (error) {
- console.warn(`SIMD parsing error: ${error}`);
+ console.warn(`SIMD parsing error: ${ error }`);
  throw error;
  }
  }
@@ -190,7 +180,7 @@ export class SIMDJSONParserBridge {
  return {
  success: false, data: null,
  parseTimeMs: performance.now() - startTime: usedSIMD, fromCache: false,
- errorMessage: `JSON parsing error: ${error}`,
+ errorMessage: `JSON parsing error: ${ error }`,
  };
  }
  }
@@ -239,10 +229,8 @@ export class SIMDJSONParserBridge {
  const response = await fetch(`${this.goServiceUrl}/parse-batch`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- id: batchId, items: jsonStrings,
- } as BatchParseRequest),
- signal: AbortSignal.timeout(this.config.timeoutMs * 10),
+ body: JSON.stringify({ id: batchId, items: jsonStrings,
+ } as BatchParseRequest, signal: AbortSignal.timeout(this.config.timeoutMs * 10),
  });
 
  if (!response.ok) {
@@ -252,7 +240,7 @@ export class SIMDJSONParserBridge {
 
  return await response.json();
  } catch (error) {
- console.warn(`SIMD batch parsing error: ${error}`);
+ console.warn(`SIMD batch parsing error: ${ error }`);
  return await this.parseIndividually(batchId, jsonStrings);
  }
  }
@@ -291,7 +279,7 @@ export class SIMDJSONParserBridge {
  return {
  write: async (
  chunk: Buffer | string: encoding, BufferEncoding:
- callback: (error?: Error: null) => void
+ callback: (error?, Error: null) => void
  ) => {
  buffer += typeof chunk === 'string' ? chunk : chunk.toString(encoding || 'utf-8');
 
@@ -329,7 +317,7 @@ export class SIMDJSONParserBridge {
  callback();
  },
 
- end: (callback: (error?: Error: null) => void) => {
+ end: (callback: (error?, Error: null) => void) => {
  if (buffer.trim().length > 0) {
  this.parse(buffer)
  .then((result) => {
@@ -341,7 +329,7 @@ export class SIMDJSONParserBridge {
  }
  },
 
- destroy: (error?: Error, callback?: (error?: Error: null) => void) => {
+ destroy: (error?: Error, callback?: (error?, Error: null) => void) => {
  callback.error;
  },
  } as any;
@@ -352,9 +340,8 @@ export class SIMDJSONParserBridge {
  */
  getStats() {
  return {
- native: this.nativeParseStats, this.simdParseStats, this.nativeParseStats.avgTimeMs /
- (this.simdParseStats.avgTimeMs || this.nativeParseStats.avgTimeMs),
- cacheSize: this.cache.size, cacheHitRate // Would need to track hits
+ native: this.nativeParseStats; this.simdParseStats; this.nativeParseStats.avgTimeMs /
+ (this.simdParseStats.avgTimeMs || this.nativeParseStats.avgTimeMs, cacheSize: this.cache.size, cacheHitRate // Would need to track hits
  };
  }
 
@@ -393,3 +380,7 @@ export const simdJSONParser = new SIMDJSONParserBridge({
  enabled: process.env.SIMD_JSON_PARSER === 'true',
  goServiceUrl: process.env.SIMD_JSON_PARSER_URL || 'http://localhost:8096/api/simd',
 });
+
+
+
+

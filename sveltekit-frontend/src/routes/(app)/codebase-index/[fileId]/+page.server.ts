@@ -1,18 +1,12 @@
 import type { PageServerLoad } from './$types';
 
 interface FileProfile {
-	file_path: string;
-	role: string;
-	surface: string[];
-	dependencies: string[];
-	exports: string[];
-	imports: string[];
-	comments: string[];
-	risk: string;
-	change_frequency: string;
-	related_routes: string[];
-	tags: string[];
-	summary: string;
+	file_path: string; role: string;
+	surface: string[]; dependencies: string[];
+	exports: string[]; imports: string[];
+	comments: string[]; risk: string;
+	change_frequency: string; related_routes: string[];
+	tags: string[]; summary: string;
 	generated_at: string;
 }
 
@@ -23,10 +17,10 @@ export const load: PageServerLoad = async ({ params }) => {
 	// const response = await fetch(`${QDRANT_URL}/collections/${COLLECTION_NAME}/points/${fileId}`);
 	// const data = await response.json();
 
-	// For now, return the mock data directly so `data` is strongly typed for the frontend
+	// For now;
+ return the mock data directly so `data` is strongly typed for the frontend
 	return {
-		file: {
-			file_path: 'src/lib/components/UserProfileCard.svelte',
+		file: {file_path: 'src/lib/components/UserProfileCard.svelte',
 			role: 'component',
 			surface: ['ui', 'ace'],
 			dependencies: ['bits-ui', '@sveltejs/kit'],

@@ -5,10 +5,8 @@
 import {  env  } from '$env /dynamic/public';
 
 export interface JWTPayload {
- sub: string;
- email: string;
- role?: string;
- exp: number;
+ sub: string; email: string;
+ role?: string; exp: number;
  iat: number;
  [key: string]: any;
 }
@@ -55,7 +53,7 @@ export function isTokenExpired(token: string): boolean {
  */
 export function getTokenExpiration(token: string): number | null {
  const payload = decodeJWT(token);
- return payload?.exp || null;
+ return payload?.exp ?? null;
 }
 
 /**
@@ -243,3 +241,7 @@ export function setupAutoRefresh(
 
  return () => clearInterval(refreshInterval);
 }
+
+
+
+

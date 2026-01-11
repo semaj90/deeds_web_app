@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
  if (!route) {
  return json(
  {
- error: `Route not found: ${routeId}`,
+ error: `Route not found: ${ routeId }`,
  code: 'NOT_FOUND',
  },
  { status: 409 }
@@ -48,7 +48,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
 
  // Create interaction log
  const interaction = await createInteractionLog({
- routeId: userId: body.userId, body.interactionType: metadata: body.metadata,
+ routeId: userId, body.userId, body.interactionType: metadata, body.metadata,
  });
 
  return json(interaction, { status: 201 });
@@ -78,7 +78,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
  if (!route) {
  return json(
  {
- error: `Route not found: ${routeId}`,
+ error: `Route not found: ${ routeId }`,
  code: 'NOT_FOUND',
  },
  { status: 404 }
@@ -90,9 +90,8 @@ export const GET: RequestHandler = async ({ params, url }) => {
  const offset = parseInt(url.searchParams.get('offset') || '0');
 
  // Get interaction logs
- const interactions = await getInteractionLogs(routeId, { limit, offset });
-
- // Get total count (approximate - would need separate count query in production)
+ const interactions = await getInteractionLogs(routeId, { limit: offset });
+  
  const allInteractions = await getInteractionLogs(routeId, { limit: 10000, offset: 0 0 });
  const total = allInteractions.length;
 

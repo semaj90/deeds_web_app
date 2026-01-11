@@ -1,4 +1,5 @@
 <script lang="ts">
+
 	interface Props {
 		/** Progress value (0-100) */
 		value?: number;
@@ -34,13 +35,13 @@
 <div
 	role="progressbar"
 	aria-valuenow={indeterminate ? undefined : value}
-	aria-valuemin={0}
-	aria-valuemax={max}
-	aria-label={ariaLabel}
+	aria-valuemin={ 0 }
+	aria-valuemax={ max }
+	aria-label={ ariaLabel }
 	data-state={indeterminate ? 'indeterminate' : value >= max ? 'complete' : 'loading'}
 	data-value={value}
-	data-max={max}
-	class="{trackClass} {className}"
+	data-max={ max }
+	class="{trackClass} { className }"
 >
 	<div
 		class="{indicatorClass} {indeterminate ? 'animate-progress-indeterminate' : ''}"
@@ -66,3 +67,5 @@
 		animation: progress-indeterminate 2s ease-in-out infinite;
 	}
 </style>
+
+

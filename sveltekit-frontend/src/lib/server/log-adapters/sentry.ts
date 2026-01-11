@@ -11,3 +11,5 @@ export function isEnabled(): boolean {
  // Implement logic to check if Sentry is enabled (e.g., based on environment variables)
  return false; // Return true if Sentry is configured and enabled
 }
+
+

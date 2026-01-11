@@ -47,3 +47,5 @@ export const GET: RequestHandler = async ({ url }) => {
  throw error(500, 'Failed to download PDF');
  }
 };
+
+

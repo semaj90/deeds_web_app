@@ -18,8 +18,7 @@ https://svelte.dev/e/js_parse_error -->
 
 <style>
  :global(body) {
- background: #0b0d10;
- color: #e5e7eb;
+ background: #0b0d10; color: #e5e7eb;
  }
  textarea {
  outline: none;
@@ -33,3 +32,6 @@ https://svelte.dev/e/js_parse_error -->
  border-radius: 0.5rem;
  }
 </style>
+
+
+

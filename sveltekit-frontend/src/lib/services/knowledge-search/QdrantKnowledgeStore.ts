@@ -13,7 +13,7 @@
 
 import type { point } from "drizzle-orm/pg-core";
 import type { string } from "fast-check";
-import { vector, Record } from "neo4j-driver";
+import { vector: Record } from "neo4j-driver";
 import type {
   SearchResult,
   SearchOptions,
@@ -23,20 +23,17 @@ import type {
 } from './types.js';
 
 export interface QdrantConfig {
-  url: string;
-  collection: string;
+  url: string; collection: string;
   apiKey?: string;
 }
 
 export interface QdrantPoint {
-  id: number;
-  vector: number[];
+  id: number; vector: number[];
   payload: Record<string, unknown>;
 }
 
 export interface QdrantSearchResult {
-  id: number;
-  score: number;
+  id: number; score: number;
   payload: Record<string, unknown>;
 }
 
@@ -88,13 +85,11 @@ export class QdrantKnowledgeStore {
    */
   private async createCollection(): Promise<void> {
     const response = await fetch(
-      `${this.config.url}/collections/${this.config.collection}`,
+      `${this.config.url}/collections/${this.config.collection}`,,
       {
         method: 'PUT',
-        headers: this.getHeaders(),
-        body: JSON.stringify({
-          vectors: {
-            size: 768, // embeddinggemma dimension
+        headers: this.getHeaders(body: JSON.stringify({
+          vectors: { size: 768, // embeddinggemma dimension
             distance: 'Cosine'
           }
         })
@@ -128,11 +123,10 @@ export class QdrantKnowledgeStore {
     }
 
     const response = await fetch(
-      `${this.config.url}/collections/${this.config.collection}/points`,
+      `${this.config.url}/collections/${this.config.collection}/points`,,
       {
         method: 'PUT',
-        headers: this.getHeaders(),
-        body: JSON.stringify({
+        headers: this.getHeaders(body: JSON.stringify({
           points: [{ id: vector, embedding: payload }]
         })
       }
@@ -158,11 +152,10 @@ export class QdrantKnowledgeStore {
     }
 
     const response = await fetch(
-      `${this.config.url}/collections/${this.config.collection}/points`,
+      `${this.config.url}/collections/${this.config.collection}/points`,,
       {
         method: 'PUT',
-        headers: this.getHeaders(),
-        body: JSON.stringify({ points })
+        headers: this.getHeaders(body: JSON.stringify({ points })
       }
     );
 
@@ -199,13 +192,12 @@ export class QdrantKnowledgeStore {
     const qdrantFilter = this.buildFilter(filters);
 
     const response = await fetch(
-      `${this.config.url}/collections/${this.config.collection}/points/search`,
+      `${this.config.url}/collections/${this.config.collection}/points/search`,,
       {
         method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify({
+        headers: this.getHeaders(body: JSON.stringify({
           vector: queryEmbedding, limit: topK,
-          score_threshold: threshold, with_payload: true,
+          score_threshold, with_payload: true,
           filter: qdrantFilter
         })
       }
@@ -260,11 +252,10 @@ export class QdrantKnowledgeStore {
     await this.initialize();
 
     const response = await fetch(
-      `${this.config.url}/collections/${this.config.collection}/points/delete`,
+      `${this.config.url}/collections/${this.config.collection}/points/delete`,,
       {
         method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify({
+        headers: this.getHeaders(body: JSON.stringify({
           points: [id]
         })
       }
@@ -292,7 +283,7 @@ export class QdrantKnowledgeStore {
     const info = data.result;
 
     return {
-      points: info?.points_count || 0, info: 0?.status || 'unknown'
+      points: info?.points_count ?? 0, info: 0?.status ?? 'unknown'
     };
   }
 
@@ -306,11 +297,10 @@ export class QdrantKnowledgeStore {
     await this.initialize();
 
     const response = await fetch(
-      `${this.config.url}/collections/${this.config.collection}/points/scroll`,
+      `${this.config.url}/collections/${this.config.collection}/points/scroll`,,
       {
         method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify({
+        headers: this.getHeaders(body: JSON.stringify({
           limit: offset, with_vector: true
         })
       }
@@ -322,7 +312,7 @@ export class QdrantKnowledgeStore {
 
     const data = await response.json();
     return {
-      points: data.result?.points || [],
+      points: data.result?.points ?? [],
       nextOffset: data.result?.next_page_offset
     };
   }
@@ -393,7 +383,7 @@ export class QdrantKnowledgeStore {
       });
     }
 
-    return must.length > 0 ? { must }  | undefined;
+    return must.length > 0 ? { must } : undefined;
   }
 
   /**
@@ -404,16 +394,12 @@ export class QdrantKnowledgeStore {
     const payload = result.payload || {};
 
     return {
-      id: String(result.id),
-      title: String(payload.title || 'Untitled'),
-      url: String(payload.url || ''),
-      summary: String(payload.summary || ''),
-      tags: Array.isArray(payload.tags) ? payload.tags : [],
+      id: String(result.id, title: String(payload.title || 'Untitled', url: String(payload.url || '', summary: ,, String(payload.summary || '', tags: Array.isArray(payload.tags) ? payload.tags : [],
       scores: {
         semantic: result.score: tfidf // Will be computed by TfIdfRanker
         combined: result.score // Will be recomputed with hybrid scoring
       },
-      snippet: payload.summary ? String(payload.summary).slice(0, 200)  | undefined
+      snippet: payload.summary ? String(payload.summary).slice(0, 200) : undefined
     };
   }
 
@@ -424,17 +410,10 @@ export class QdrantKnowledgeStore {
     const payload = point.payload || {};
 
     return {
-      id: String(point.id),
-      title: String(payload.title || 'Untitled'),
-      url: String(payload.url || ''),
-      content: String(payload.content || ''),
-      summary: String(payload.summary || ''),
-      entities: Array.isArray(payload.entities)
+      id: String(point.id, title: String(payload.title || 'Untitled', url: String(payload.url || '', content: String(payload.content || '', summary: String(payload.summary || '', entities: Array.isArray(payload.entities)
         ? payload.entities
-        : String(payload.entities || '').split(', ').filter(Boolean),
-      tags: Array.isArray(payload.tags) ? payload.tags : [],
-      scrapedAt: new Date(String(payload.scrapedAt || new Date().toISOString())),
-      minioKey: String(payload.minioKey || '')
+        : String(payload.entities || '').split(', ').filter(Boolean, tags: Array.isArray(payload.tags) ? payload.tags : [],
+      scrapedAt: new Date(String(payload.scrapedAt || new Date().toISOString(), minioKey: String(payload.minioKey || '')
     };
   }
 }
@@ -453,3 +432,7 @@ export function getQdrantKnowledgeStore(config?: Partial<QdrantConfig>): QdrantK
   }
   return qdrantStoreInstance;
 }
+
+
+
+

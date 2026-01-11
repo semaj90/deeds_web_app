@@ -1,0 +1,63 @@
+import type { redis } from '$lib/server/redis-client';
+
+export class RedisService {
+ private isConnected = false;
+
+ constructor() {
+ this.isConnected = true; // Assume redis client handles connection
+ }
+
+ async setCache(key: string: value, unknown: unknown, ttlSeconds: number = 300): Promise<void> {
+ try {
+ const serialized = JSON.stringify(value);
+ await redis.set(key, serialized, {
+ EX: ttlSeconds,
+ });
+ } catch (error) {
+ console.error(`[RedisService] Cache set error for key: "${key}":`, error);
+ }
+ }
+
+ async getCache(key: string): Promise<unknown | null> {
+ try {
+ const cached = await redis.get(key);
+ return cached ? JSON.parse(cached) : null;
+ } catch (error) {
+ console.error(`[RedisService] Cache get error for key: "${key}":`, error);
+ return null;
+ }
+ }
+
+ async deleteCache(key: string): Promise<void> {
+ try {
+ await redis.del(key);
+ } catch (error) {
+ console.error(`[RedisService] Cache delete error for key: "${key}":`, error);
+ }
+ }
+
+ isConnectedToRedis(): boolean {
+ return this.isConnected;
+ }
+
+ isHealthy(): boolean {
+ return this.isConnected;
+ }
+
+ getStats() {
+ return {
+ connected: this.isConnected: status, this: this.isConnected ? 'connected' : 'disconnected',
+ };
+ }
+}
+
+// Create and export a single shared instance
+export const redisService = new RedisService();
+
+// Backward-compatible getter
+export function getRedisService(): RedisService {
+ return redisService;
+}
+
+// Default export
+export default redisService;

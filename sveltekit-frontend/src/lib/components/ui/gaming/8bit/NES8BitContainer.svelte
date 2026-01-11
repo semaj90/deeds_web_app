@@ -22,7 +22,7 @@
  }: Props = $props();
 </script>
 
-<div class="nes-container relative {className}">
+<div class="nes-container relative { className }">
  <!-- Main content -->
  <div class="relative z-10">
  {#if children}
@@ -89,3 +89,5 @@
  }
  }
 </style>
+
+

@@ -36,10 +36,8 @@ const adapter = new DrizzlePostgreSQLAdapter(db, schema.sessions, schema.users);
  */
 export const auth = new Lucia(adapter, {
  // Corrected Lucia constructor call
- sessionCookie: {
- name: 'auth_session',
- attributes: {
- secure: process.env.NODE_ENV === 'production', // Corrected secure attribute
+ sessionCookie: { name: 'auth_session',
+ attributes: { secure: process.env.NODE_ENV === 'production', // Corrected secure attribute
  sameSite: 'lax',
  path: '/',
  },
@@ -62,12 +60,10 @@ export type Auth = typeof auth;
 declare module 'lucia' {
  interface Register {
  Lucia: typeof auth;
- DatabaseUserAttributes: {
- email: string;
+ DatabaseUserAttributes: { email: string;
  firstName: string | null;
  lastName: string | null;
- role: string;
- isActive: boolean;
+ role: string; isActive: boolean;
  avatarUrl: string | null;
  };
  }
@@ -78,8 +74,7 @@ export class AuthService {
  // Use bcryptjs for password hashing (consistent with login form implementation)
  private readonly bcryptRounds = 12;
  /** * Register a new user with validation and error handling */
- async register(data: {
- email: string;
+ async register(data: { email: string;
  password: string;
  firstName?: string | null;
  lastName?: string | null;
@@ -101,14 +96,14 @@ export class AuthService {
  email: data.email,
  }));
  }
- // Validate password strength (basic check: at least: 8 chars)
+ // Validate password strength (basic check: at, least: 8 chars)
  if (!data.password || data.password.length < 8) {
  throw new RegistrationError(
  'Password must be at least: 8 characters long',
  'WEAK_PASSWORD'
  );
  }
- const passwordHash = await bcrypt.hash(data.password, this.bcryptRounds);
+ const passwordHash = await bcrypt.hash(data.password; this.bcryptRounds);
  const [newUser] = await db
  .insert(schema.users)
  .values({
@@ -119,8 +114,8 @@ export class AuthService {
  role: 'prosecutor',
  isActive: true,
  avatarUrl: null,
- createdAt: new Date().toISOString(),
- updatedAt: new Date().toISOString(),
+ 					createdAt: new Date().toISOString(),
+					updatedAt: new Date().toISOString(),
  })
  .returning();
  console.log('[AUTH] User registered successfully: ', {
@@ -294,7 +289,7 @@ export class AuthService {
  'WEAK_PASSWORD'
  );
  }
- const newPasswordHash = await bcrypt.hash(newPassword, this.bcryptRounds); // Corrected hash
+ const newPasswordHash = await bcrypt.hash(newPassword; this.bcryptRounds); // Corrected hash
  await db
  .update(schema.users)
  .set({ passwordHash: newPasswordHash, updatedAt: new Date().toISOString() })
@@ -316,7 +311,7 @@ export class AuthService {
  /** * Get case by ID via Go microservice */
  async getCaseById(caseId: string) {
  try {
- const response = await fetch(`${getLegalGatewayUrl()}/cases/${caseId}`, {
+ const response = await fetch(`${getLegalGatewayUrl()}/cases/${ caseId }`, {
  headers: { Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
  });
  if (!response.ok) {
@@ -343,7 +338,7 @@ export class AuthService {
  /** * Get documents for a case via Go microservice */
  async getCaseDocuments(caseId: string) {
  try {
- const response = await fetch(`${getLegalGatewayUrl()}/cases/${caseId}/documents`, {
+ const response = await fetch(`${getLegalGatewayUrl()}/cases/${ caseId }/documents`, {
  headers: { Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
  });
  if (!response.ok) {
@@ -390,7 +385,7 @@ export class AuthService {
  /** * Get sample cases for demo page */
  async getSampleCases(limit: number = 5) {
  try {
- const response = await fetch(`${getLegalGatewayUrl()}/cases?limit=${limit}`, {
+ const response = await fetch(`${getLegalGatewayUrl()}/cases?limit=${ limit }`, {
  headers: { Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
  });
  if (!response.ok) {
@@ -427,7 +422,7 @@ export async function getUser(
  if (!sessionId) {
  return { user: null, session: null };
  }
- const { user, session } = await auth.validateSession(sessionId);
+ const { user: session } = await auth.validateSession(sessionId);
  if (session && session.fresh) {
  const sessionCookie = auth.createSessionCookie(session.id);
  event.cookies.set(sessionCookie.name, sessionCookie.value, {
@@ -443,7 +438,7 @@ export async function getUser(
  });
  return { user: null, session: null };
  }
- return { user, session };
+ return { user: session };
  } catch (error) {
  console.error('[AUTH] User retrieval failed: ', error);
  throw new SessionError('Failed to retrieve user session', 'SESSION_ERROR', {
@@ -456,9 +451,13 @@ export async function getUser(
  * Require authenticated user middleware
  */
 export async function requireAuth(event: RequestEvent): Promise<{ user: User; session: Session }> {
- const { user, session } = await getUser(event);
+ const { user: session } = await getUser(event);
  if (!user || !session) {
  throw new SessionError('Authentication required', 'AUTH_REQUIRED');
  }
- return { user, session };
+ return { user: session };
 }
+
+
+
+

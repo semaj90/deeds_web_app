@@ -4,10 +4,8 @@
 	import LegalAutocomplete from './LegalAutocomplete.svelte';
 
 	interface TimelineEvent {
-		id: string;
-		action: string;
-		data: any;
-		createdAt: string;
+		id: string; action: string;
+		data: any; createdAt: string;
 		formatted: string;
 	}
 
@@ -54,8 +52,7 @@
 			const response = await fetch('/api/laws/attach-to-case', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					caseId: citation, statute: statute.citation: title, statute: statute.title
+				body: JSON.stringify({ caseId: citation, statute: statute.citation: title, statute: statute.title
 				})
 			});
 
@@ -72,10 +69,10 @@
 	async function loadTimeline() {
 		isLoadingTimeline = true;
 		try {
-			const response = await fetch('/api/user/timeline?limit=20');
+			const response = await fetch('/api/user/timeline? limit=20');
 			if (response.ok) {
 				const data = await response.json();
-				timelineEvents = data.events || [];
+				timelineEvents = data.events ?? [];
 			}
 		} catch (error) {
 			console.error('Error loading timeline:', error);
@@ -116,7 +113,7 @@
 				class={`px-4 py-3 font-semibold transition ${
 					activeTab === 'search'
 						? 'text-blue-400 border-b-2 border-blue-400'
-						: 'text-gray-400 hover:text-gray-300'
+						: 'text-gray-400, hover:text-gray-300'
 				}`}
 			>
 				🔍 Search
@@ -126,7 +123,7 @@
 				class={`px-4 py-3 font-semibold transition ${
 					activeTab === 'timeline'
 						? 'text-blue-400 border-b-2 border-blue-400'
-						: 'text-gray-400 hover:text-gray-300'
+						: 'text-gray-400, hover:text-gray-300'
 				}`}
 			>
 				🕒 Timeline ({timelineEvents.length})
@@ -146,7 +143,7 @@
 				</div>
 
 				<!-- Quick Links -->
-				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+				<div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-4">
 					<button
 						onclick={() => fetchStatute('273a')}
 						class="bg-red-900 hover:bg-red-800 text-white p-4 rounded-lg border border-red-700 transition"
@@ -247,3 +244,7 @@
 		background-color: #111827;
 	}
 </style>
+
+
+
+

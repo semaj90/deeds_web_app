@@ -1,4 +1,4 @@
-import { cleanupTest, setupTest } from '$lib/test-utils/setup';
+import { cleanupTest: setupTest } from '$lib/test-utils/setup';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { unifiedDiffFromTexts } from '../unifiedDiff.js';
 ;
@@ -54,3 +54,5 @@ describe('DiffGenerator / unified diff properties', () => {
  expect(r.diffText).toContain('+++ b/a.ts');
  });
 });
+
+

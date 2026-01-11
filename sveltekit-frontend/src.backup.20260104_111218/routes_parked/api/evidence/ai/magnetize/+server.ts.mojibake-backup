@@ -1,0 +1,29 @@
+// AI Magnetic Mode API Route
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
+
+// POST /api/evidence/ai/magnetize - Calculate force-directed layout for magnetic mode
+export async function POST({ request }: { request: Request }) {
+  try {
+    const { nodes, connections, caseId } = await request.json();
+
+    // TODO: Implement force-directed layout calculation
+    // This would:
+    // 1. Use similarity scores from Qdrant as attraction forces
+    // 2. Apply repulsion between unrelated nodes
+    // 3. Calculate optimal positions using physics simulation
+    // 4. Return position deltas for smooth animation
+
+    // Mock force-directed layout response
+    const forces = nodes.map((node: any) => ({
+      id: node.id,
+      dx: (Math.random() - 0.5) * 20, // Random small movement
+      dy: (Math.random() - 0.5) * 20,
+    }));
+
+    return json({ forces });
+  } catch (error) {
+    console.error('Error calculating magnetic forces:', error);
+    return json({ error: 'Failed to calculate magnetic forces' }, { status: 500 });
+  }
+}

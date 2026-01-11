@@ -1,4 +1,6 @@
 <script lang="ts">
+	let f = $state<any>(undefined);
+
  let { evidence, open = false } = $props();
 </script>
 
@@ -25,3 +27,5 @@
  <span class="nes-badge my-1"><span class="is-success">{f}</span></span>
  {/each}
 </div>
+
+

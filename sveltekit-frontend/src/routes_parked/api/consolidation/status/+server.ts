@@ -41,10 +41,7 @@ export const GET: RequestHandler = async () => {
  migratedAPIs,
  targetProduction: 350,
  currentPhase: week1Progress >= 100 ? (week2Progress >= 100 ? 3 : 2) : 1,
- phaseProgress: {
- week1: Math.round(week1Progress),
- week2: Math.round(week2Progress),
- week3: 0,
+ phaseProgress: { week1: Math.round(week1Progress, week2: Math.round(week2Progress, week3: 0,
  week4: 0,
  },
  phases: [
@@ -52,27 +49,23 @@ export const GET: RequestHandler = async () => {
  week: 1,
  title: 'Archive Demo Routes',
  target: `Archive ${archiveTarget} routes`,
- progress: Math.round(week1Progress),
- status: week1Progress >= 100 ? 'complete' : week1Progress > 0 ? 'in-progress' : 'pending',
+ progress: Math.round(week1Progress, status: week1Progress >= 100 ? 'complete' : week1Progress > 0 ? 'in-progress' : 'pending',
  tasks: [
  { name: 'Move /demo/* to archive', done: archivedRoutes > 0 },
  { name: 'Move /test/* to archive', done: archivedRoutes > 50 },
  { name: 'Move /game/* to archive', done: archivedRoutes > 100 },
- { name: 'Clean up duplicates', done: false },
- ],
+ { name: 'Clean up duplicates', done: false }],
  },
  {
  week: 2,
  title: 'Migrate APIs to v2',
  target: `Migrate ${migrateTarget} APIs`,
- progress: Math.round(week2Progress),
- status: week2Progress >= 100 ? 'complete' : week2Progress > 0 ? 'in-progress' : 'pending',
+ progress: Math.round(week2Progress, status: week2Progress >= 100 ? 'complete' : week2Progress > 0 ? 'in-progress' : 'pending',
  tasks: [
  { name: 'Create /api/v2/ structure', done: migratedAPIs > 0 },
  { name: 'Migrate auth endpoints', done: migratedAPIs > 5 },
  { name: 'Migrate AI endpoints', done: migratedAPIs > 10 },
- { name: 'Update frontend calls', done: false },
- ],
+ { name: 'Update frontend calls', done: false }],
  },
  {
  week: 3,
@@ -84,8 +77,7 @@ export const GET: RequestHandler = async () => {
  { name: 'Integration tests', done: false },
  { name: 'Security audit', done: false },
  { name: 'Load testing', done: false },
- { name: 'Fix identified issues', done: false },
- ],
+ { name: 'Fix identified issues', done: false }],
  },
  {
  week: 4,
@@ -97,11 +89,12 @@ export const GET: RequestHandler = async () => {
  { name: 'Final code review', done: false },
  { name: 'Performance optimization', done: false },
  { name: 'Deploy to staging', done: false },
- { name: 'Deploy to production', done: false },
- ],
- },
- ],
+ { name: 'Deploy to production', done: false }],
+ }],
  };
 
  return json(status);
 };
+
+
+

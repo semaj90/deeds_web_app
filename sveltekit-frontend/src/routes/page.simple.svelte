@@ -12,10 +12,8 @@
 
 <style>
  .page-repair {
- text-align: center;
- padding: 2rem;
- max-width: 600px;
- margin: 0 auto;
+ text-align: center; padding: 2rem;
+ max-width: 600px; margin: 0 auto;
  }
  .page-repair h1 {
  color: #ffd700;
@@ -26,3 +24,6 @@
  color: #b0b0b0;
  }
 </style>
+
+
+

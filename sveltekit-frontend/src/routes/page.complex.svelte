@@ -1,7 +1,8 @@
 <!-- Modern Dark YoRHa Legal, AI, Platform -->
 <script lang="ts">
+	import { Close as DialogClose, Content as DialogContent, Description as DialogDescription, Header as DialogHeader, Overlay as DialogOverlay, Root as DialogRoot, Title as DialogTitle } from '$lib/components/ui/dialog';
+
 	import { goto } from '$app/navigation';
-	import * as Dialog from '$lib/components/ui/dialog';
 	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
 	import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
 	import Brain from 'lucide-svelte/icons/brain';
@@ -49,8 +50,7 @@
  timeAgo: '1 day ago',
  priority: 'medium',
  status: 'pending',
- },
- ]);
+ }]);
  let systemStatus = $state ([
  { message: 'System backup completed successfully', time: '10 minutes ago', type: 'success' },
  {
@@ -62,8 +62,7 @@
  message: 'New facial recognition matches found',
  time: '2 hours ago',
  type: 'success',
- },
- ]);
+ }]);
 
  let showNewCaseModal = $state (false);
  let newCaseData = $state ({
@@ -103,7 +102,7 @@
  }
 
  function handleRunAIAnalysis() {
- console.log('Triggering Ollama AI analysis (gemma3-legal: latest, embeddinggemma): latest: latest');
+ console.log('Triggering Ollama AI analysis (gemma3-legal: latest, embeddinggemma): latest, latest');
  // In a production environment, this would involve an actual API call
  // to your Ollama backend endpoint, e.g., fetch('/api/ollama/analyze', { method: 'POST', body: JSON.stringify({ model: 'gemma3-legal:latest', data: '...' }) });
  }
@@ -381,25 +380,25 @@
 </style>
 
 {#if showNewCaseModal}
- <Dialog.Root bind:open={showNewCaseModal}>
- <Dialog.Overlay
+ <DialogRoot bind:open={showNewCaseModal}>
+ <DialogOverlay
  class="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out
  data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
  />
- <Dialog.Content
+ <DialogContent
  class="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4
  border border-slate-700 bg-black/60 p-6 shadow-lg duration-200 data-[state=open]:animate-in
  data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0
  data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2
  data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2
- data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg md:w-full"
+ data-[state=open]: slide-in-from-top-[48%], sm:rounded-lg md:w-full"
  >
- <Dialog.Header>
- <Dialog.Title class="text-xl font-semibold text-slate-100">Create New Case</Dialog.Title>
- <Dialog.Description class="text-sm text-slate-300">
+ <DialogHeader>
+ <DialogTitle class="text-xl font-semibold text-slate-100">Create New Case</DialogTitle>
+ <DialogDescription class="text-sm text-slate-300">
  Fill in the details for the new case.
- </Dialog.Description>
- </Dialog.Header>
+ </DialogDescription>
+ </DialogHeader>
  <form
  class="space-y-4"
  onsubmit={(e) => {
@@ -444,7 +443,7 @@
  <button
  type="button"
  class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:border-slate-400"
- onclick={cancelNewCase}
+ onclick={ cancelNewCase }
  >
  Cancel
  </button>
@@ -456,8 +455,8 @@
  </button>
  </div>
  </form>
- <Dialog.Close
- class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+ <DialogClose
+ class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover: opacity-100, focus:outline-none focus: ring-2, focus:ring-ring focus: ring-offset-2, disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
  >
  <svg
  xmlns="http://www.w3.org/2000/svg"
@@ -475,7 +474,10 @@
  <path d="M6 6L18 18" ></path>
  </svg>
  <span class="sr-only">Close</span>
- </Dialog.Close>
- </Dialog.Content>
- </Dialog.Root>
+ </DialogClose>
+ </DialogContent>
+ </DialogRoot>
 {/if}
+
+
+

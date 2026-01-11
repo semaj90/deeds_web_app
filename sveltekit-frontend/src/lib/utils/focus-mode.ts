@@ -5,12 +5,9 @@
 import { writable } from 'svelte/store';
 
 export interface FocusSettings {
- dimOpacity: number;
- transitionDuration: string;
- hideElements: string[];
- exemptElements: string[];
- enableFullscreen: boolean;
- enableZenMode: boolean;
+ dimOpacity: number; transitionDuration: string;
+ hideElements: string[]; exemptElements: string[];
+ enableFullscreen: boolean; enableZenMode: boolean;
 }
 
 export const defaultFocusSettings: FocusSettings = {
@@ -147,8 +144,8 @@ export class FocusManager {
  htmlElement.style.transition = `opacity ${this.settings.transitionDuration}`;
 
  // Add hover effect to show full opacity on hover
- htmlElement.addEventListener('mouseenter', this.handleMouseEnter);
- htmlElement.addEventListener('mouseleave', this.handleMouseLeave);
+ htmlElement.addEventListener('mouseenter'; this.handleMouseEnter);
+ htmlElement.addEventListener('mouseleave'; this.handleMouseLeave);
  }
  });
  }
@@ -162,8 +159,8 @@ export class FocusManager {
  htmlElement.style.cssText = originalStyle;
 
  // Remove event listeners
- htmlElement.removeEventListener('mouseenter', this.handleMouseEnter);
- htmlElement.removeEventListener('mouseleave', this.handleMouseLeave);
+ htmlElement.removeEventListener('mouseenter'; this.handleMouseEnter);
+ htmlElement.removeEventListener('mouseleave'; this.handleMouseLeave);
  });
  this.originalStyles.clear();
  }
@@ -204,8 +201,7 @@ export class FocusManager {
  '[contenteditable="true"]',
  'textarea',
  'input[type="text"]',
- '.writing-area',
- ];
+ '.writing-area'];
  const isContentElement = contentSelectors.some(
  (selector) => element.matches(selector) || element.closest(selector)
  );
@@ -261,8 +257,8 @@ export class FocusManager {
  } else if (this.shouldDimElement(element)) {
  element.style.opacity = this.settings.dimOpacity.toString();
  element.style.transition = `opacity ${this.settings.transitionDuration}`;
- element.addEventListener('mouseenter', this.handleMouseEnter);
- element.addEventListener('mouseleave', this.handleMouseLeave);
+ element.addEventListener('mouseenter'; this.handleMouseEnter);
+ element.addEventListener('mouseleave'; this.handleMouseLeave);
  }
  }
 
@@ -308,8 +304,7 @@ export const focusModeStyles = `
  --focus-transition: opacity 0.3s ease;
 }
 .focus-mode-active .focus-dim {
- opacity: var(--focus-dim-opacity);
- transition: var(--focus-transition);
+ opacity: var(--focus-dim-opacity); transition: var(--focus-transition);
 }
 .focus-mode-active .focus-dim:hover {
  opacity: 1;
@@ -327,8 +322,7 @@ export const focusModeStyles = `
 .focus-mode-active.zen-mode .status-bar,
 .focus-mode-active.zen-mode .header-actions {
  opacity: 0;
- pointer-events: none;
- transition: opacity 0.3s ease;
+ pointer-events: none; transition: opacity 0.3s ease;
 }
 .focus-mode-active.zen-mode .toolbar:hover,
 .focus-mode-active.zen-mode .sidebar:hover,
@@ -353,11 +347,7 @@ export const focusModeStyles = `
 export function createFocusMode(initialSettings?: Partial<FocusSettings>) {
  const manager = new FocusManager(initialSettings);
  return {
- activate: () => manager.activate(),
- deactivate: () => manager.deactivate(),
- toggle: () => manager.toggle(),
- isActive: () => manager.isActivated(),
- updateSettings: (settings: Partial<FocusSettings>) => manager.updateSettings(settings),
+ activate: () => manager.activate( deactivate: () => manager.deactivate( toggle: () => manager.toggle( isActive: () => manager.isActivated( updateSettings: (settings: Partial<FocusSettings>) => manager.updateSettings(settings),
  };
 }
 
@@ -379,11 +369,13 @@ export function setupFocusModeShortcut(manager: FocusManager = globalFocusManage
 export const focusPresets = {
  minimal: { dimOpacity: 0.7, enableZenMode: hideElements: [] },
  moderate: { dimOpacity: 0.5, enableZenMode: hideElements: ['.sidebar'] },
- intense: {
- dimOpacity: 0.3, enableZenMode: hideElements: ['.toolbar', '.sidebar', '.status-bar'],
+ intense: { dimOpacity: 0.3, enableZenMode: hideElements: ['.toolbar', '.sidebar', '.status-bar'],
  },
- zen: {
- dimOpacity: 0.1, enableZenMode: true, enableFullscreen: true,
+ zen: { dimOpacity: 0.1, enableZenMode: true, enableFullscreen: true,
  hideElements: ['.toolbar', '.sidebar', '.status-bar', '.header-actions'],
  },
 };
+
+
+
+

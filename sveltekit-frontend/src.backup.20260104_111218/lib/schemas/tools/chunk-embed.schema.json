@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ace.tools.chunk_embed",
+  "title": "ChunkEmbedRequest",
+  "description": "Chunk documents and generate embeddings",
+  "type": "object",
+  "required": ["run_id", "documents"],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "minLength": 8,
+      "description": "Unique run identifier"
+    },
+    "documents": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "required": ["id", "content"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "content": { "type": "string", "minLength": 1 },
+          "metadata": { "type": "object" },
+          "source": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "chunking": {
+      "type": "object",
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "enum": ["fixed", "semantic", "recursive", "sentence"],
+          "default": "recursive"
+        },
+        "chunk_size": { "type": "integer", "minimum": 50, "maximum": 8000, "default": 512 },
+        "overlap": { "type": "integer", "minimum": 0, "maximum": 500, "default": 50 },
+        "separators": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "embedding": {
+      "type": "object",
+      "properties": {
+        "model": { "type": "string", "default": "embeddinggemma:latest" },
+        "dimensions": { "type": "integer", "minimum": 8, "maximum": 4096, "default": 768 },
+        "batch_size": { "type": "integer", "minimum": 1, "maximum": 100, "default": 32 },
+        "normalize": { "type": "boolean", "default": true }
+      },
+      "additionalProperties": false
+    },
+    "storage": {
+      "type": "object",
+      "properties": {
+        "collection": { "type": "string", "default": "embeddings" },
+        "upsert": { "type": "boolean", "default": true },
+        "include_metadata": { "type": "boolean", "default": true }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

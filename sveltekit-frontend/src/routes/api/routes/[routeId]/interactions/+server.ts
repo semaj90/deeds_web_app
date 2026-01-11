@@ -8,14 +8,14 @@
  * Phase 7: Client-Side Integration - Interaction Logging
  */
 
-import { json, error } from '@sveltejs/kit';
-import type { RequestHandler } from './$types.js';
 import {
-  logInteraction,
-  getInteractions,
-  getRouteMetadata,
-  type NewRouteInteractionLog,
+    getInteractions,
+    getRouteMetadata,
+    logInteraction,
+    type NewRouteInteractionLog,
 } from '$lib/db/queries/nes-command-center';
+import { error, json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types.js';
 
 /**
  * POST /api/routes/:routeId/interactions
@@ -49,7 +49,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
     const route = await getRouteMetadata(routeId);
     if (!route) {
       return error(409, {
-        message: `Route ${routeId} not found in route_metadata`,
+        message: `Route ${ routeId } not found in route_metadata`,
       });
     }
 
@@ -65,7 +65,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
 
     return json(interaction, { status: 201 });
   } catch (err) {
-    console.error('[POST /api/routes/:routeId/interactions] Error:', err);
+    console.error('[POST /api/routes/: routeId/interactions], Error:', err);
     return error(500, {
       message: 'Failed to log interaction',
     });
@@ -102,7 +102,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
     const route = await getRouteMetadata(routeId);
     if (!route) {
       return error(404, {
-        message: `Route ${routeId} not found`,
+        message: `Route ${ routeId } not found`,
       });
     }
 
@@ -113,12 +113,11 @@ export const GET: RequestHandler = async ({ params, url }) => {
       const { getCombinedInteractions } = await import(
         '$lib/db/queries/nes-command-center-archive.js'
       );
-      result = await getCombinedInteractions(routeId, { limit, offset });
+      result = await getCombinedInteractions(routeId, { limit: offset });
 
       return json({
         interactions: result.data,
-        pagination: {
-          total: result.total,
+        pagination: {total: result.total,
           limit: result.limit,
           offset: result.offset,
           hasMore: result.hasMore,
@@ -127,12 +126,11 @@ export const GET: RequestHandler = async ({ params, url }) => {
       });
     } else {
       // Query only main table
-      result = await getInteractions(routeId, { limit, offset });
+      result = await getInteractions(routeId, { limit: offset });
 
       return json({
         interactions: result.interactions,
-        pagination: {
-          total: result.total,
+        pagination: {total: result.total,
           limit: result.limit,
           offset: result.offset,
           hasMore: result.offset + result.limit < result.total,
@@ -141,7 +139,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
       });
     }
   } catch (err) {
-    console.error('[GET /api/routes/:routeId/interactions] Error:', err);
+    console.error('[GET /api/routes/: routeId/interactions], Error:', err);
     return error(500, {
       message: 'Failed to fetch interactions',
     });

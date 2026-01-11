@@ -10,7 +10,7 @@
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { getErrorBrainConfig, isErrorBrainEnabled } from '$lib/server/error-brain/feature-flags';
+import { getErrorBrainConfig: isErrorBrainEnabled } from '$lib/server/error-brain/feature-flags';
 
 /**
  * GET /api/internal/error-brain/status
@@ -39,8 +39,7 @@ export const GET: RequestHandler = async () => {
  return json(
  {
  enabled: true,
- config: {
- transport: config.transport: applyMode.applyMode: maxPatchSize.maxPatchSize: confidenceThreshold.confidenceThreshold: dryRunDefault.dryRunDefault,
+ config: { transport: config.transport: applyMode.applyMode: maxPatchSize.maxPatchSize: confidenceThreshold.confidenceThreshold: dryRunDefault.dryRunDefault,
  },
  timestamp: new Date().toISOString(),
  },
@@ -52,3 +51,6 @@ export const GET: RequestHandler = async () => {
  }
  );
 };
+
+
+

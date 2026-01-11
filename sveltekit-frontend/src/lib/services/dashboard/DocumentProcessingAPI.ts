@@ -9,8 +9,7 @@ export interface ProcessingCommand {
 }
 
 export interface ProcessingResponse {
- success: boolean;
- message: string;
+ success: boolean; message: string;
  data?: unknown;
 }
 
@@ -112,12 +111,9 @@ export class DocumentProcessingAPI {
  /**
  * Get processing status
  */
- async getStatus(documentId: string): Promise<{
- documentId: string;
- status: string;
- progress: number;
- currentPage: number;
- totalPages: number;
+ async getStatus(documentId: string): Promise<{ documentId: string;
+ status: string; progress: number;
+ currentPage: number; totalPages: number;
  stage: string;
  }> {
  try {
@@ -143,10 +139,8 @@ export class DocumentProcessingAPI {
  */
  async getHistory(documentId: string): Promise<
  Array<{
- timestamp: string;
- stage: string;
- status: string;
- page: number;
+ timestamp: string; stage: string;
+ status: string; page: number;
  percent: number;
  }>
  > {
@@ -177,10 +171,8 @@ export class DocumentProcessingAPI {
  async uploadDocument(
  file: File,
  metadata?: Record<string, string>
- ): Promise<{
- documentId: string;
- fileName: string;
- fileSize: number;
+ ): Promise<{ documentId: string;
+ fileName: string; fileSize: number;
  uploadedAt: string;
  }> {
  try {
@@ -213,13 +205,10 @@ export class DocumentProcessingAPI {
  /**
  * Get processing results
  */
- async getResults(documentId: string): Promise<{
- documentId: string;
+ async getResults(documentId: string): Promise<{ documentId: string;
  status: 'processing' | 'completed' | 'failed';
- results: {
- text: string;
- tables: Array<{
- rows: string[][];
+ results: { text: string;
+ tables: Array<{ rows: string[][];
  confidence: number;
  }>;
  metadata: Record<string, unknown>;
@@ -265,3 +254,7 @@ export class DocumentProcessingAPI {
 export const documentProcessingAPI = new DocumentProcessingAPI();
 
 export default DocumentProcessingAPI;
+
+
+
+

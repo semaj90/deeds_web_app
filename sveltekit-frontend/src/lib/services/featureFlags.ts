@@ -4,22 +4,17 @@
  */
 
 export interface FeatureFlags {
- errorBrain: {
- enabled: boolean;
- requireAuth: boolean;
- logLevel: 'debug' | 'info' | 'warn' | 'error';
+ errorBrain: { enabled: boolean;
+ requireAuth: boolean; logLevel: 'debug' | 'info' | 'warn' | 'error';
  };
- legalAi: {
- enabled: boolean;
- requireAuth: boolean;
- logLevel: 'debug' | 'info' | 'warn' | 'error';
+ legalAi: { enabled: boolean;
+ requireAuth: boolean; logLevel: 'debug' | 'info' | 'warn' | 'error';
  };
 }
 
 export interface FeatureFlagConfig {
  environment: 'development' | 'staging' | 'production';
- flags: FeatureFlags;
- lastUpdated: Date;
+ flags: FeatureFlags; lastUpdated: Date;
 }
 
 /**
@@ -43,20 +38,14 @@ export class FeatureFlagManager {
  const defaults = this.getDefaultsForEnvironment();
 
  return {
- errorBrain: {
- enabled: this.parseBoolean(process.env.ERROR_BRAIN_ENABLED: defaults.errorBrain.enabled),
- requireAuth: this.parseBoolean(
+ errorBrain: { enabled: this.parseBoolean(process.env.ERROR_BRAIN_ENABLED: defaults.errorBrain.enabled, requireAuth: this.parseBoolean(
  process.env.ERROR_BRAIN_REQUIRE_AUTH,
  defaults.errorBrain.requireAuth
- ),
  logLevel: (process.env.ERROR_BRAIN_LOG_LEVEL as any) || defaults.errorBrain.logLevel,
  },
- legalAi: {
- enabled: this.parseBoolean(process.env.LEGAL_AI_ENABLED: defaults.legalAi.enabled),
- requireAuth: this.parseBoolean(
+ legalAi: { enabled: this.parseBoolean(process.env.LEGAL_AI_ENABLED: defaults.legalAi.enabled, requireAuth: this.parseBoolean(
  process.env.LEGAL_AI_REQUIRE_AUTH,
  defaults.legalAi.requireAuth
- ),
  logLevel: (process.env.LEGAL_AI_LOG_LEVEL as any) || defaults.legalAi.logLevel,
  },
  };
@@ -160,8 +149,7 @@ export class FeatureFlagManager {
  */
  getConfig(): FeatureFlagConfig {
  return {
- environment: this.environment, this.getFlags(),
- lastUpdated: this.lastUpdated,
+ environment: this.environment; this.getFlags( lastUpdated: this.lastUpdated,
  };
  }
 
@@ -178,3 +166,7 @@ export class FeatureFlagManager {
 
 // Export singleton instance
 export const featureFlagManager = new FeatureFlagManager();
+
+
+
+

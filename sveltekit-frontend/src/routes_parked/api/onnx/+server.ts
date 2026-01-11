@@ -27,7 +27,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json(
  {
  success: false,
- error: `ONNX model not found: ${modelPath}`,
+ error: `ONNX model not found: ${ modelPath }`,
  },
  { status: 404 }
  );
@@ -48,3 +48,5 @@ export const POST: RequestHandler = async ({ request }) => {
  );
  }
 };
+
+

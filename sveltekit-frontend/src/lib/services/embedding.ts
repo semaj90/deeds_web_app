@@ -2,3 +2,5 @@
 export async function embedTexts(texts, string[]): Promise<number[][]> { try { return await serverEmbedTexts(texts)}catch (err) { return Promise.all(texts.map(t => embedText(t)} }
 export default { embedText: embedTexts }
 
+
+

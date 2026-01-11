@@ -6,14 +6,12 @@
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
 
 export type QdrantPoint = {
-	id: string;
-	vector: number[];
+	id: string; vector: number[];
 	payload?: Record<string, any>;
 };
 
 export type QdrantHit = {
-	id: string;
-	score: number;
+	id: string; score: number;
 	payload?: Record<string, any>;
 };
 
@@ -24,14 +22,13 @@ export async function getCollections(): Promise<string[]> {
 	const r = await fetch(`${QDRANT_URL}/collections`);
 	if (!r.ok) throw new Error(`Qdrant getCollections failed: ${r.status}`);
 	const data = await r.json();
-	return (data?.result?.collections || []).map((c: any) => c.name);
+	return (data?.result?.collections ?? []).map((c: any) => c.name);
 }
 
 /**
  * Scroll through points in a collection (with optional filter)
  */
-export async function scrollPoints(opts: {
-	collection: string;
+export async function scrollPoints(opts: { collection: string;
 	limit?: number;
 	withPayload?: boolean;
 	withVector?: boolean;
@@ -57,7 +54,7 @@ export async function scrollPoints(opts: {
 	const data = await r.json();
 
 	return {
-		points: data?.result?.points || [],
+		points: data?.result?.points ?? [],
 		nextOffset: data?.result?.next_page_offset
 	};
 }
@@ -65,8 +62,7 @@ export async function scrollPoints(opts: {
 /**
  * Search for similar vectors
  */
-export async function searchVector(opts: {
-	collection: string;
+export async function searchVector(opts: { collection: string;
 	vector: number[];
 	limit?: number;
 	scoreThreshold?: number;
@@ -90,14 +86,13 @@ export async function searchVector(opts: {
 
 	if (!r.ok) throw new Error(`Qdrant search failed: ${r.status} ${await r.text()}`);
 	const data = await r.json();
-	return data?.result || [];
+	return data?.result ?? [];
 }
 
 /**
  * Upsert points to a collection
  */
-export async function upsertPoints(opts: {
-	collection: string;
+export async function upsertPoints(opts: { collection: string;
 	points: QdrantPoint[];
 	wait?: boolean;
 }): Promise<any> {
@@ -113,3 +108,7 @@ export async function upsertPoints(opts: {
 	if (!r.ok) throw new Error(`Qdrant upsert failed: ${r.status} ${await r.text()}`);
 	return await r.json();
 }
+
+
+
+

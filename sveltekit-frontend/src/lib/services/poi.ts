@@ -45,7 +45,7 @@ export const poiService = {
  * Get POI details
  */
  async getPOI(poiId: string): Promise<PersonOfInterest> {
- const response = await fetch(`${API_BASE}/${poiId}`);
+ const response = await fetch(`${API_BASE}/${ poiId }`);
  if (!response.ok) throw new Error('Failed to get POI');
  return response.json();
  },
@@ -54,7 +54,7 @@ export const poiService = {
  * Update a POI
  */
  async updatePOI(poiId: string): Promise<PersonOfInterest> {
- const response = await fetch(`${API_BASE}/${poiId}`, {
+ const response = await fetch(`${API_BASE}/${ poiId }`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify(data),
@@ -67,7 +67,7 @@ export const poiService = {
  * Delete a POI
  */
  async deletePOI(poiId: string): Promise<void> {
- const response = await fetch(`${API_BASE}/${poiId}`, {
+ const response = await fetch(`${API_BASE}/${ poiId }`, {
  method: 'DELETE',
  });
  if (!response.ok) throw new Error('Failed to delete POI');
@@ -77,7 +77,7 @@ export const poiService = {
  * Add a known associate
  */
  async addAssociate(poiId: string): Promise<KnownAssociate> {
- const response = await fetch(`${API_BASE}/${poiId}/associates`, {
+ const response = await fetch(`${API_BASE}/${ poiId }/associates`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify(data),
@@ -90,7 +90,7 @@ export const poiService = {
  * List known associates
  */
  async listAssociates(poiId: string): Promise<KnownAssociate[]> {
- const response = await fetch(`${API_BASE}/${poiId}/associates`);
+ const response = await fetch(`${API_BASE}/${ poiId }/associates`);
  if (!response.ok) throw new Error('Failed to list associates');
  const data = await response.json();
  return data.associates || [];
@@ -100,7 +100,7 @@ export const poiService = {
  * Remove a known associate
  */
  async removeAssociate(poiId: string): Promise<void> {
- const response = await fetch(`${API_BASE}/${poiId}/associates/${associateId}`, {
+ const response = await fetch(`${API_BASE}/${ poiId }/associates/${ associateId }`, {
  method: 'DELETE',
  });
  if (!response.ok) throw new Error('Failed to remove associate');
@@ -120,3 +120,5 @@ export const poiService = {
  return data.results || [];
  },
 };
+
+

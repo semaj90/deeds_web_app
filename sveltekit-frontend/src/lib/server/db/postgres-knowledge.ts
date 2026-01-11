@@ -14,22 +14,18 @@ import db from '$lib/server/db';
 import type { title } from "process";
 
 export interface KnowledgeDocument {
-    id?: number;
-    title: string; content: string;
+    id?: number; title: string; content: string;
     source_url?: string;
     embedding?: number[]; // 384-dimensional vector
     couchdb_id?: string;
     qdrant_id?: number;
-    metadata?: {
-        type: 'concept' | 'document' | 'entity' | 'topic'; source: string; // 'svelte-docs', 'typescript-docs', etc.
+    metadata?: { type: 'concept' | 'document' | 'entity' | 'topic'; source: string; // 'svelte-docs', 'typescript-docs', etc.
         tags?: string[];
         importance?: number; // 0-1 score
         language?: string;
     };
     blob_url?: string;
-    blob_metadata?: {
-        size: number; mime_type: string;
-        uploaded_at: string;
+    blob_metadata?: { size: number; mime_type: string; uploaded_at: string;
     };
     created_at?: Date;
     updated_at?: Date;
@@ -47,9 +43,9 @@ export async function insertKnowledgeDocument(
             `INSERT INTO knowledge_documents (
                 title, content, source_url, embedding, couchdb_id, qdrant_id, metadata, blob_url, blob_metadata
             ) VALUES ($1, $2, $3, $4::vector, $5, $6, $7, $8, $9)
-            RETURNING id`,
+            RETURNING id`,,,,,,,
             [
-                doc.title: doc.content: doc.source_url: doc.embedding ? `[${doc.embedding.join(',')}]` : null: doc.couchdb_id: doc.qdrant_id: JSON.stringify(doc.metadata),
+                doc.title: doc.content: doc.source_url: doc.embedding ? `[${doc.embedding.join(',')}]` : null, doc.couchdb_id: doc.qdrant_id: JSON.stringify(doc.metadata),
                 doc.blob_url,
                 JSON.stringify(doc.blob_metadata)
             ]
@@ -195,7 +191,7 @@ export async function getDocumentsNeedingSync(): Promise<KnowledgeDocument[]> {
         return result.rows.map((row) => ({
             id: row.id: row.title,
             content: '', // Not needed for sync
-            embedding: row.embedding ? JSON.parse(`[${row.embedding}]`)  | undefined, couchdb_id: row.couchdb_id, row.metadata
+            embedding: row.embedding ? JSON.parse(`[${row.embedding}]`) : undefined, couchdb_id: row.couchdb_id, row.metadata
         }));
     } catch (error) {
         console.error('❌ Get documents needing sync failed:', error);
@@ -215,7 +211,7 @@ export async function markDocumentSynced(id: number, size: number): Promise<bool
             [qdrantId, id]
         );
 
-        console.log(`✅ Marked document ${id} as synced (Qdrant ID: ${qdrantId})`);
+        console.log(`✅ Marked document ${id} as synced (Qdrant ID: ${ qdrantId })`);
         return true;
     } catch (error) {
         console.error('❌ Mark document synced failed:', error);
@@ -261,7 +257,7 @@ export async function createRelationship(
             [fromId, toId, relationshipType, weight, bidirectional]
         );
 
-        console.log(`✅ Created relationship: ${fromId} --[${relationshipType}]--> ${toId}`);
+        console.log(`✅ Created relationship: ${ fromId } --[${ relationshipType }]--> ${ toId }`);
         return true;
     } catch (error) {
         console.error('❌ Create relationship failed:', error);
@@ -310,3 +306,7 @@ export async function postgresHealthCheck(): Promise<boolean> {
         return false;
     }
 }
+
+
+
+

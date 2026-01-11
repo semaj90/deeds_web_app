@@ -58,8 +58,7 @@ const AI_CHAT_IMAGES_BUCKET = process.env.MINIO_AI_CHAT_IMAGES_BUCKET ?? 'ai-cha
  * Upload evidence file from FormData for AI chat
  */
 export async function uploadEvidenceFile(opts: {
- caseId?: string;
- chatTurnId: string;
+ caseId?: string; chatTurnId: string;
  file: File;
 }) {
  const { caseId, chatTurnId, file } = opts;
@@ -140,3 +139,6 @@ export async function getChatImageUrl(objectName: string): Promise<string> {
  return `minio://${AI_CHAT_IMAGES_BUCKET}/${objectName}`;
  }
 }
+
+
+

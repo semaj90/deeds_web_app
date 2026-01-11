@@ -1,1 +1,2 @@
 /** * Documents Schema with pgvector for Legal AI Platform * Supports vector embeddings for semantic search and RAG */ 
+

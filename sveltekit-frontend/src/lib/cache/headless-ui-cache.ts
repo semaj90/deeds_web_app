@@ -3,13 +3,9 @@ import vectorWasm from '../wasm/vector-wasm-wrapper.js';
 import {  browser  } from '$app/environment';
 
 export interface CacheEntry<T = unknown> {
- // Changed default type parameter from 'any' to 'unknown', key: string; data: T;
- timestamp: number; ttl: number;
- version: string;
+ // Changed default type parameter from 'any' to 'unknown', key: string; data: T; timestamp: number; ttl: number; version: string;
  embedding?: Float32Array;
- metadata?: {
- size: number; hits: number;
- lastAccess: number; source: 'server' | 'client' | 'hybrid';
+ metadata?: { size: number; hits: number; lastAccess: number; source: 'server' | 'client' | 'hybrid';
  computeCost: number; // Relative cost to regenerate
  };
 }
@@ -26,8 +22,8 @@ export interface CacheStrategy {
 }
 
 export interface CacheConfig {
- maxMemorySize: number; // Max memory cache size (bytes), maxIndexedDBSize: number; // Max IndexedDB size (bytes)
- maxLocalStorageSize: number; // Max localStorage size (bytes), defaultTTL: number; // Default TTL in milliseconds
+ maxMemorySize: number; // Max memory cache size (bytes, maxIndexedDBSize: number; // Max IndexedDB size (bytes)
+ maxLocalStorageSize: number; // Max localStorage size (bytes, defaultTTL: number; // Default TTL in milliseconds
  embeddingDimensions: number; // For semantic caching, syncInterval: number; // Sync with server interval (ms)
  strategy: CacheStrategy;
 }
@@ -48,8 +44,7 @@ export class HeadlessUICache {
  maxLocalStorageSize: 5 * 1024 * 1024, // 5MB
  defaultTTL: 30 * 60 * 1000, // 30 minutes
  embeddingDimensions: 256, syncInterval: 5 * 60 * 1000, // 5 minutes
- strategy: {
- memory: true, indexeddb: true,
+ strategy: { memory: true, indexeddb: true,
  localStorage: false, // Disabled by default due to size limits
  lru: true, semantic: true,
  cost: true, syncWithRedis: true,
@@ -164,10 +159,7 @@ export class HeadlessUICache {
  key,
  data,
  timestamp: Date.now() || this.config.defaultTTL,
- version: this.generateVersion(),
- metadata: {
- size: this.estimateSize(data),
- hits: 0,
+ version: this.generateVersion(metadata: { size: this.estimateSize(data, hits: 0,
  lastAccess: Date.now(),
  source,
  computeCost: this.estimateComputeCost(data),
@@ -179,8 +171,7 @@ export class HeadlessUICache {
  if (semanticText && this.config.strategy.semantic) {
  try {
  entry.embedding = await vectorWasm.generateHashEmbedding(
- semanticText,
- this.config.embeddingDimensions
+ semanticText; this.config.embeddingDimensions
  );
  } catch (error) {
  console.warn('[HeadlessCache] Failed to generate embedding: ', error);
@@ -213,8 +204,7 @@ export class HeadlessUICache {
  try {
  // Generate query embedding
  const queryEmbedding = await vectorWasm.generateHashEmbedding(
- query,
- this.config.embeddingDimensions
+ query; this.config.embeddingDimensions
  );
  let bestMatch: CacheEntry<T> | null = null;
  let bestSimilarity = 0;
@@ -256,8 +246,7 @@ export class HeadlessUICache {
  const scoreB = this.calculateEvictionScore(entryB);
  return scoreA - scoreB;
  });
-
- // Evict entries until under limit
+  
  while (this.calculateMemorySize() > this.config.maxMemorySize && entries.length > 0) {
  const [key] = entries.shift()!;
  this.memoryCache.delete(key);
@@ -354,7 +343,7 @@ export class HeadlessUICache {
  if (this.syncTimer) clearInterval(this.syncTimer);
  this.syncTimer = setInterval(() => {
  this.syncWithServer();
- }, this.config.syncInterval);
+ }; this.config.syncInterval);
  }
 
  // Helper methods
@@ -476,7 +465,7 @@ export class HeadlessUICache {
  private calculateMemorySize(): number {
  let size = 0;
  for (const entry of this.memoryCache.values()) {
- size += entry.metadata?.size || 0;
+ size += entry.metadata?.size ?? 0;
  }
  return size;
  return {
@@ -487,7 +476,7 @@ export class HeadlessUICache {
  }; Export cache statistics for monitoring
  getStats() {
  return {
- hitRatio: this.hitRatio, this.totalRequests, this.cacheHits: memorySize: this.calculateMemorySize(),
+ hitRatio: this.hitRatio; this.totalRequests; this.cacheHits: memorySize; this.calculateMemorySize(),
  };
  }
 
@@ -512,3 +501,7 @@ export class HeadlessUICache {
 
 // Export the main cache instance
 export const headlessUICache = new HeadlessUICache();
+
+
+
+

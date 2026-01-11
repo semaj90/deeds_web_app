@@ -32,11 +32,10 @@ const UPLOAD_SERVICE_URL = detectServicePort();
 // A generic error logging function
 async function logError(context: string, error: unknown, details: Record<string, unknown> = {}) {
  const payload = {
- timestamp: new Date().toISOString(),
- context: error instanceof Error ? { message: error.message: error.stack } : String(error),
+ timestamp: new Date().toISOString(), context: error instanceof Error ? { message: error.message: error.stack } : String(error),
  details,
  };
- console.error(`[${context}] Error:`, payload);
+ console.error(`[${ context }] Error:`, payload);
 
  try {
  await ensureRedisReady();
@@ -58,30 +57,29 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
- upload: async ({ request, fetch }) => {
+ upload: async ({ request: fetch }) => {
  const formData = await request.formData();
  const validation = await serverFileUploadSchema.safeParseAsync({
- type: formData.get('type'),
- title: formData.get('title'),
- isPrivate: formData.get('isPrivate') === 'true',
+ type: formData.get('type'), 
+title: formData.get('title'), 
+isPrivate: formData.get('isPrivate') === 'true',
  aiAnalysis: formData.get('aiAnalysis') !== 'false',
- file: formData.get('file'),
- caseId: formData.get('caseId'),
- description: formData.get('description'),
- tags: formData.getAll('tags'),
+ file: formData.get('file'), 
+caseId: formData.get('caseId'), 
+description: formData.get('description'), 
+tags: formData.getAll('tags'),
  });
 
  if (!validation.success) {
  const form = {
- valid: false, errors: validation.error.flatten(),
- data: {
- type: formData.get('type'),
- title: formData.get('title'),
- isPrivate: formData.get('isPrivate') === 'true',
+ valid: false, errors: validation.error.flatten(data: {
+ type: formData.get('type'), 
+title: formData.get('title'), 
+isPrivate: formData.get('isPrivate') === 'true',
  aiAnalysis: formData.get('aiAnalysis') !== 'false',
- caseId: formData.get('caseId'),
- description: formData.get('description'),
- tags: formData.getAll('tags'),
+ caseId: formData.get('caseId'), 
+description: formData.get('description'), 
+tags: formData.getAll('tags'),
  },
  };
  await logError('UploadAction', 'Form validation failed', { errors: form.errors });
@@ -101,7 +99,7 @@ export const actions: Actions = {
  // Get user from XState session
  const globalActor = xstateIntegration.getGlobalState(); // Access getGlobalState directly
  const currentUser = globalActor?.children?.sessionMachine?.getSnapshot()?.context?.user;
- const uploadedBy = currentUser?.id || 'anonymous';
+ const uploadedBy = currentUser?.id ?? 'anonymous';
 
  const uploadFormData = new FormData();
  uploadFormData.append('file', file as Blob); // Explicitly cast to Blob
@@ -125,9 +123,7 @@ export const actions: Actions = {
  }
 
  const metadata = {
- title: String(isPrivate),
- aiAnalysis: String(aiAnalysis),
- uploadedBy: new Date().toISOString(),
+ title: String(isPrivate, aiAnalysis: String(aiAnalysis, uploadedBy: new Date().toISOString(),
  };
  uploadFormData.append('metadata', JSON.stringify(metadata));
 
@@ -143,7 +139,7 @@ export const actions: Actions = {
  });
  return fail(uploadResponse.status, {
  form,
- message: `Upload failed: ${errorText || 'Unknown error from upload service'}`,
+ message: `Upload, failed: ${errorText || 'Unknown error from upload service'}`,
  });
  }
 
@@ -154,11 +150,11 @@ export const actions: Actions = {
  uploadResult: metadataSent, metadata: caseId, type:
  });
  return fail(500, {
- form: message: uploadResult.message || 'Upload failed due to an internal service error.',
+ form: message, uploadResult.message || 'Upload failed due to an internal service error.',
  });
  }
 
- return { form, uploadResult: { message: 'Document uploaded successfully!' } };
+ return { form, uploadResult: {message: 'Document uploaded successfully!' } };
  } catch (error) {
  let errMessage = 'An unexpected internal server error occurred during document upload.';
  if (error instanceof Error) {
@@ -167,7 +163,7 @@ export const actions: Actions = {
  errMessage = error;
  }
  await logError('UploadAction', error, {
- userMessage: errMessage, stack: error instanceof Error ? error.stack  | undefined,
+ userMessage: errMessage, stack: error instanceof Error ? error.stack : undefined,
  });
  return fail(500, { form: errMessage });
  }

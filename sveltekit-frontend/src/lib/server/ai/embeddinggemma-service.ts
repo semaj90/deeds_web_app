@@ -13,16 +13,13 @@ export interface EmbeddingOptions {
 }
 
 export interface EmbeddingResult {
- embedding: number[];
- model: string;
- dimensions: number;
- cached: boolean;
+ embedding: number[]; model: string;
+ dimensions: number; cached: boolean;
  processingTimeMs: number;
 }
 
 export interface BatchEmbeddingResult {
- embeddings: EmbeddingResult[];
- totalProcessingTimeMs: number;
+ embeddings: EmbeddingResult[]; totalProcessingTimeMs: number;
  cacheHitRatio: number;
 }
 
@@ -42,14 +39,14 @@ export class EmbeddingGemmaService {
  return {
  embedding: cached,
  model,
- dimensions: cached.length || DEFAULT_DIMENSIONS,
+ dimensions, cached.length || DEFAULT_DIMENSIONS,
  cached: true,
  processingTimeMs: Date.now() - start,
  };
  }
  }
 
- const response = await requestEmbedding({ text, model });
+ const response = await requestEmbedding({ text: model });
  const embedding = response.embedding;
 
  if (useCache) {
@@ -59,7 +56,7 @@ export class EmbeddingGemmaService {
  return {
  embedding,
  model: response.model ?? model,
- dimensions: embedding.length || DEFAULT_DIMENSIONS,
+ dimensions, embedding.length ?? DEFAULT_DIMENSIONS,
  cached: false,
  processingTimeMs: Date.now() - start,
  };
@@ -90,3 +87,6 @@ export class EmbeddingGemmaService {
 }
 
 export const embeddingGemma = new EmbeddingGemmaService();
+
+
+

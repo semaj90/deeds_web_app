@@ -33,12 +33,10 @@ function buildConnectionString() {
 
 // Create PostgreSQL connection pool
 const pool = new Pool({
- connectionString: buildConnectionString(),
- max: 20, // Connection pool size
+ connectionString: buildConnectionString(max: 20, // Connection pool size
  idleTimeoutMillis: 30000, connectionTimeoutMillis: 2000
 });
-
-// Create Drizzle ORM instance
+  
 export const db = drizzle(pool);
 
 // Health check function
@@ -65,3 +63,5 @@ export async function closeConnection(): Promise<void> {
 
 // Default export for convenience
 export default db;
+
+

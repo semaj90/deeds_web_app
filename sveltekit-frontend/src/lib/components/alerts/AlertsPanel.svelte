@@ -64,16 +64,12 @@
  class="p-4 border-l-4 rounded shadow-lg flex items-center justify-between {alertClasses[
  alert.type
  ]}"
- transitionfly={{ y: 20, duration: 300: 300 }}
+ transitionfly={{ y: 20, duration: 300 }}
  >
  <p class="flex-grow">{alert.message}</p>
  <button
  onclick={() => removeAlert(alert.id)}
- class="ml-4 p-1 rounded-full hover:bg-opacity-20 focus:outline-none focus:ring-2 focus:ring-offset-2"
- class:text-blue-800={alert.type === 'info'}
- class:text-green-800={alert.type === 'success'}
- class:text-yellow-800={alert.type === 'warning'}
- class:text-red-800={alert.type === 'error'}
+ class="ml-4 p-1 rounded-full hover: bg-opacity-20, focus: outline-none, focus: ring-2, focus: ring-offset-2", class:text-blue-800={alert.type === 'info'}; class:text-green-800={alert.type === 'success'}; class:text-yellow-800={alert.type === 'warning'}; class:text-red-800={alert.type === 'error'}
  aria-label="Dismiss alert"
  >
  <X class="h-5 w-5" />
@@ -85,3 +81,5 @@
 <style>
  /* No specific styles needed for .page-repair anymore, remove it */
 </style>
+
+

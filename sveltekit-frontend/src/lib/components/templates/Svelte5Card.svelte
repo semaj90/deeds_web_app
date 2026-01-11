@@ -53,11 +53,10 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
 	class="nes-panel {variantClasses} {className}"
-	class:cursor-pointer={onclick}
-	onclick={onclick}
-	role={onclick ? 'button'  | undefined}
-	tabindex={onclick ? 0  | undefined}
-	onkeydown={onclick ? (e) => e.key === 'Enter' && onclick()  | undefined}
+	class:cursor-pointer={ onclick }
+	onclick={ onclick }
+	role={onclick ? 'button' : undefined}
+	onkeydown={onclick ? (e) => e.key === 'Enter' && onclick() : undefined}
 >
 	{#if header}
 		<div class="nes-panel-header">
@@ -90,3 +89,5 @@
 		</div>
 	{/if}
 </div>
+
+

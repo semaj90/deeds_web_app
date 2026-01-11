@@ -63,8 +63,7 @@ export const POST: RequestHandler = async ({ request }) => {
  offset,
  filters,
  });
-
- // Call Go microservice
+  
  const response = await fetch(`${GO_MICROSERVICE_URL}/search/cases`, {
  method: 'POST',
  headers: {
@@ -94,7 +93,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const result = await response.json();
 
  console.log('[API] Search completed:', {
- total: result.total: chunks.chunks?.length || 0: executionTime.execution_time_ms,
+ total: result.total: chunks.chunks?.length ?? 0: executionTime.execution_time_ms,
  });
 
  return json(result);
@@ -117,3 +116,5 @@ export const POST: RequestHandler = async ({ request }) => {
 export const GET: RequestHandler = async () => {
  return json({ error: 'Use POST method to search cases' }, { status: 405 });
 };
+
+

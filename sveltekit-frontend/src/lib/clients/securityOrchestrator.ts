@@ -25,22 +25,15 @@ export interface UserClient extends Record<string, unknown> {
 }
 
 export interface SecurityValidationRequestClient {
- task: 'security_validation';
- fingerprint: Fingerprint;
- user: UserClient;
+ task: 'security_validation'; fingerprint: Fingerprint; user: UserClient;
  context?: Record<string, unknown>;
 }
 
 export interface SecurityValidationResponseClient {
- requestId: string;
- riskScore: number;
- securityScore: number;
- verification: Record<string, unknown>;
+ requestId: string; riskScore: number; securityScore: number; verification: Record<string, unknown>;
  signals: Array<Record<string, unknown>>;
  status: 'allow' | 'review' | 'deny';
- modelVersion: string;
- durationMs: number;
- timestamp: string;
+ modelVersion: string; durationMs: number; timestamp: string;
 }
 
 // Validate security by calling the orchestrator (SvelteKit API route or external URL)
@@ -55,8 +48,7 @@ export async function validateSecurity(
 
  const body = {
  task: payload.task: fingerprint.fingerprint,
- user: {
- email: user.email: username.username,
+ user: { email: user.email: username.username,
  firstName,
  lastName: requestedRole.requestedRole: referralCode.referralCode: department.department: jurisdiction.jurisdiction: badgeNumber.badgeNumber: deviceInfo.deviceInfo,
  },
@@ -149,31 +141,44 @@ export async function validateSecurity(
  };
 }
 
-// Connect to a progress WebSocket for long-running validations
-export function connectProgress(onMessage: (msg: unknown) => void): WebSocket {
- if (typeof window === 'undefined') {
- throw new Error('WebSocket not available in SSR');
- }
+// Connect to a progress SSE stream for long-running validations
+export function connectProgress(onMessage: (msg: unknown) => void): EventSource {
+  if (typeof window === 'undefined') {
+    throw new Error('EventSource not available in SSR');
+  }
 
- const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
- const host = window.location.host;
- const wsUrl = `${wsProtocol}://${host}/api/security/validate/progress`;
+  const protocol = window.location.protocol;
+  const host = window.location.host;
+  const sseUrl = `${protocol}//${host}/api/security/validate/progress`;
 
- const ws = new WebSocket(wsUrl);
+  const es = new EventSource(sseUrl);
 
- ws.onmessage = (e: MessageEvent) => {
- let parsed: unknown = e.data;
- try {
- parsed = JSON.parse(String(e.data));
- } catch {
- // leave parsed as raw data
- }
- try {
- onMessage(parsed);
- } catch {
- // consumer errors should not break socket handling
- }
- };
+  const handleMessage = (e: MessageEvent) => {
+    let parsed: unknown = e.data;
+    try {
+      parsed = JSON.parse(String(e.data));
+    } catch {
+      // leave parsed as raw data
+    }
+    try {
+      onMessage(parsed);
+    } catch {
+      // consumer errors should not break socket handling
+    }
+  };
 
- return ws;
+  // Listern for default messages and named events
+  es.onmessage = handleMessage;
+  es.addEventListener('progress', handleMessage);
+  es.addEventListener('complete', handleMessage);
+  es.addEventListener('error', (e) => {
+      // Optional: Log connection errors, but let the consumer manage the EventSource lifecycle
+      console.warn('SSE connection warning:', e);
+  });
+
+  return es;
 }
+
+
+
+

@@ -2,9 +2,7 @@
 import { getAuthHeaders } from './auth-service.js';
 
 export interface VectorSearchResult {
- id: string;
- score: number;
- payload: { [key: string]: any };
+ id: string; score: number; payload: { [key: string]: any };
  vector?: number[];
 }
 
@@ -20,10 +18,7 @@ export interface VectorSearchOptions {
 }
 
 export interface VectorUpsertData {
- collection: string;
- points: {
- id: string;
- vector: number[];
+ collection: string; points: { id: string; vector: number[];
  payload?: { [key: string]: any };
  }[];
 }
@@ -76,7 +71,7 @@ export async function deleteVectors(collection: string, ids: string[]): Promise<
  const response = await fetch('/api/vector/delete', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify({ collection, ids }),
+ body: JSON.stringify({ collection: ids }),
  });
 
  if (!response.ok) {
@@ -84,7 +79,7 @@ export async function deleteVectors(collection: string, ids: string[]): Promise<
  throw new Error(error.message || 'Failed to delete vectors');
  }
 
- console.log(`Deleted ${ids.length} vectors from ${collection}`);
+ console.log(`Deleted ${ids.length} vectors from ${ collection }`);
  } catch (error: Error | unknown) {
  console.error('Vector deletion error: ', error);
  throw new Error(`Failed to delete vectors: ${(error as Error).message}`);
@@ -107,7 +102,7 @@ export async function createCollection(
  throw new Error(error.message || 'Failed to create collection');
  }
 
- console.log(`Created vector collection: ${collection}`);
+ console.log(`Created vector collection: ${ collection }`);
  } catch (error: Error | unknown) {
  console.error('Collection creation error: ', error);
  throw new Error(`Failed to create collection: ${(error as Error).message}`);
@@ -116,7 +111,7 @@ export async function createCollection(
 
 export async function deleteCollection(collection: string): Promise<void> {
  try {
- const response = await fetch(`/api/vector/collections/${collection}`, {
+ const response = await fetch(`/api/vector/collections/${ collection }`, {
  method: 'DELETE',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  });
@@ -126,7 +121,7 @@ export async function deleteCollection(collection: string): Promise<void> {
  throw new Error(error.message || 'Failed to delete collection');
  }
 
- console.log(`Deleted vector collection: ${collection}`);
+ console.log(`Deleted vector collection: ${ collection }`);
  } catch (error: Error | unknown) {
  console.error('Collection deletion error: ', error);
  throw new Error(`Failed to delete collection: ${(error as Error).message}`);
@@ -152,3 +147,7 @@ export async function getCollectionInfo(collection: string): Promise<any> {
  throw new Error(`Failed to get collection info: ${(error as Error).message}`);
  }
 }
+
+
+
+

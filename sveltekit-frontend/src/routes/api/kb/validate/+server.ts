@@ -5,24 +5,22 @@
  * POST /api/kb/validate
  */
 
+import { couchdb } from '$lib/services/couchdb-client.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { couchdb } from '$lib/services/couchdb-client.js';
 
 const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 
 interface ValidateSourcesRequest {
   query_id: string;
-  case_id?: string;
-  selected_chunk_ids: string[];
+  case_id?: string; selected_chunk_ids: string[];
   rejected_chunk_ids?: string[];
   user_notes?: string;
   pin_to_canvas?: boolean;
 }
 
 interface ValidatedSource {
-  chunk_id: string;
-  content: string;
+  chunk_id: string; content: string;
   metadata: Record<string, unknown>;
   selected: boolean;
 }
@@ -153,3 +151,7 @@ export const GET: RequestHandler = async ({ url }) => {
     });
   }
 };
+
+
+
+

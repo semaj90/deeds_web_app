@@ -16,11 +16,10 @@ import {
  evidence,
  statutes,
 } from './schema-postgres.js';
-import { eq, desc } from 'drizzle-orm';
+import { eq: desc } from 'drizzle-orm';
 
 export interface WorkspaceContext {
- workspaceId: string;
- evidence: (typeof evidence.$inferSelect)[];
+ workspaceId: string; evidence: (typeof evidence.$inferSelect)[];
  statutes: (typeof statutes.$inferSelect)[];
  notes: (typeof workspaceNotes.$inferSelect)[];
  recentMessages: (typeof ragMessages.$inferSelect)[];
@@ -215,7 +214,7 @@ export function buildRAGContext(context: WorkspaceContext): string {
  if (context.statutes.length > 0) {
  parts.push('## Relevant Statutes and Laws:');
  context.statutes.forEach((statute) => {
- parts.push(`- ${statute.title || 'Statute'}: ${statute.content?.substring(0, 200) || ''}`);
+ parts.push(`- ${statute.title || 'Statute'}: ${statute.content?.substring(0, 200) ?? ''}`);
  });
  }
 
@@ -223,7 +222,7 @@ export function buildRAGContext(context: WorkspaceContext): string {
  if (context.evidence.length > 0) {
  parts.push('\n## Relevant Evidence:');
  context.evidence.forEach((ev) => {
- parts.push(`- ${ev.title}: ${ev.description?.substring(0, 200) || ''}`);
+ parts.push(`- ${ev.title}: ${ev.description?.substring(0, 200) ?? ''}`);
  });
  }
 
@@ -295,3 +294,6 @@ export async function deleteWorkspace(workspaceId: string) {
 
  return result[0];
 }
+
+
+

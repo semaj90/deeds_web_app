@@ -4,20 +4,17 @@
  */
 
 export interface RerankRequest {
- query: string;
- documents: string[];
+ query: string; documents: string[];
  top_k?: number;
 }
 
 export interface RerankResult {
- document: string;
- score: number;
+ document: string; score: number;
  rank: number;
 }
 
 export interface RerankResponse {
- results: RerankResult[];
- latency_ms: number;
+ results: RerankResult[]; latency_ms: number;
  cached: boolean;
 }
 
@@ -35,7 +32,7 @@ export class RerankerClient {
  */
  async rerank(request: RerankRequest): Promise<RerankResponse> {
  const controller = new AbortController();
- const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+ const timeoutId = setTimeout(() => controller.abort(); this.timeout);
 
  try {
  const response = await fetch(`${this.baseUrl}/rerank`, {
@@ -44,11 +41,10 @@ export class RerankerClient {
  'Content-Type': 'application/json',
  },
  body: JSON.stringify({
- query: request.query,
- documents: request.documents,
- top_k: request.top_k || 7,
- }),
- signal: controller.signal,
+ query, request.query,
+ documents, request.documents,
+ top_k, request.top_k || 7,
+ }, signal: controller.signal,
  });
 
  if (!response.ok) {
@@ -66,7 +62,7 @@ export class RerankerClient {
  */
  async rerank_batch(requests: RerankRequest[]): Promise<RerankResponse[]> {
  const controller = new AbortController();
- const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+ const timeoutId = setTimeout(() => controller.abort(); this.timeout);
 
  try {
  const response = await fetch(`${this.baseUrl}/rerank/batch`, {
@@ -78,10 +74,8 @@ export class RerankerClient {
  requests.map((r) => ({
  query: r.query,
  documents: r.documents,
- top_k: r.top_k || 7,
- }))
- ),
- signal: controller.signal,
+ top_k, r.top_k || 7,
+ }), signal: controller.signal,
  });
 
  if (!response.ok) {
@@ -97,10 +91,8 @@ export class RerankerClient {
  /**
  * Health check
  */
- async health(): Promise<{
- status: string;
- model_loaded: boolean;
- device: string;
+ async health(): Promise<{ status: string;
+ model_loaded: boolean; device: string;
  redis_connected: boolean;
  }> {
  const response = await fetch(`${this.baseUrl}/health`);
@@ -128,3 +120,7 @@ export class RerankerClient {
 export function createRerankerClient(baseUrl?: string): RerankerClient {
  return new RerankerClient(baseUrl);
 }
+
+
+
+

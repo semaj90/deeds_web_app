@@ -3,9 +3,8 @@
  * Returns file-error topology for visualization
  */
 
-import { json } from '@sveltejs/kit';
+import { json, type RequestHandler } from '@sveltejs/kit';
 import pg from 'pg';
-import type { RequestHandler } from './$types';
 
 const { Pool } = pg;
 
@@ -74,8 +73,7 @@ export const GET: RequestHandler = async () => {
       topology: {
         nodes,
         edges,
-        summary: {
-          totalFiles: nodes.length,
+        summary: { totalFiles: nodes.length,
           totalErrors: nodes.reduce((sum, n) => sum + n.errorCount, 0),
           totalEmbedded: nodes.reduce((sum, n) => sum + n.embeddedCount, 0)
         }
@@ -84,8 +82,7 @@ export const GET: RequestHandler = async () => {
   } catch (error: any) {
     console.error('Topology error:', error);
     return json({
-      topology: {
-        nodes: [],
+      topology: { nodes: [],
         edges: [],
         summary: { totalFiles: 0, totalErrors: 0, totalEmbedded: 0 }
       },
@@ -93,3 +90,7 @@ export const GET: RequestHandler = async () => {
     });
   }
 };
+
+
+
+

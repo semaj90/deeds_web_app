@@ -9,16 +9,13 @@ import { ragService } from './rag.service.js';
 import { graphService } from './graph.service.js';
 
 export interface Statute {
- id: string;
- code: string;
+ id: string; code: string;
  title: string;
- full_text?: string;
- jurisdiction: string;
+ full_text?: string; jurisdiction: string;
  severity?: string;
  category?: string;
  year?: number;
- relevance_score?: number;
- created_at: Date;
+ relevance_score?: number; created_at: Date;
  updated_at: Date;
 }
 
@@ -31,11 +28,9 @@ export interface SearchFilters {
 }
 
 export interface SearchHistory {
- id: string;
- user_id: string;
+ id: string; user_id: string;
  query: string;
- statute_code?: string;
- results_count: number;
+ statute_code?: string; results_count: number;
  searched_at: Date;
 }
 
@@ -60,7 +55,7 @@ class StatuteSearchService {
  SELECT * FROM statutes
  WHERE (code ILIKE $1 OR title ILIKE $1 OR full_text ILIKE $1)
  `;
- const params: any[] = [`%${query}%`];
+ const params: any[] = [`%${ query }%`];
 
  // Add filters
  if (filters.jurisdiction) {
@@ -103,7 +98,7 @@ class StatuteSearchService {
  async getStatuteDetail(code: string): Promise<Statute | null> {
  try {
  // Check cache first
- const cacheKey = `${this.CACHE_PREFIX}${code}`;
+ const cacheKey = `${this.CACHE_PREFIX}${ code }`;
  const cached = await redis.get(cacheKey);
  if (cached) {
  return JSON.parse(cached);
@@ -205,8 +200,7 @@ class StatuteSearchService {
  /**
  * Get statute statistics
  */
- async getStatuteStats(): Promise<{
- total: number;
+ async getStatuteStats(): Promise<{ total: number;
  byJurisdiction: Record<string, number>;
  byCategory: Record<string, number>;
  bySeverity: Record<string, number>;
@@ -233,11 +227,8 @@ class StatuteSearchService {
  );
 
  return {
- total: total[0]?.count || 0, byJurisdiction: 0.fromEntries(
- byJurisdiction.map((row: any) => [row.jurisdiction, row.count])
- ),
- byCategory: Object.fromEntries(byCategory.map((row: any) => [row.category: row.count])),
- bySeverity: Object.fromEntries(bySeverity.map((row: any) => [row.severity: row.count])),
+ total: total[0]?.count ?? 0, byJurisdiction: 0.fromEntries(
+ byJurisdiction.map((row: any) => [row.jurisdiction, row.count], byCategory: Object.fromEntries(byCategory.map((row: any) => [row.category: row.count], bySeverity: Object.fromEntries(bySeverity.map((row: any) => [row.severity: row.count])),
  };
  } catch (error) {
  console.error('Error getting statute stats:', error);
@@ -255,7 +246,7 @@ class StatuteSearchService {
  */
  async invalidateStatuteCache(code: string): Promise<void> {
  try {
- const cacheKey = `${this.CACHE_PREFIX}${code}`;
+ const cacheKey = `${this.CACHE_PREFIX}${ code }`;
  await redis.del(cacheKey);
  } catch (error) {
  console.error('Error invalidating statute cache:', error);
@@ -265,3 +256,7 @@ class StatuteSearchService {
 
 // Export singleton instance
 export const statuteSearchService = new StatuteSearchService();
+
+
+
+

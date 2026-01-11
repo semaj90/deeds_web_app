@@ -42,8 +42,7 @@ export interface EntityInput {
  type?: string | null;
 };
 export interface EdgeInput {
- from: string, to: string;
- relation: string;
+ from: string, to: string; relation: string;
 };
 export interface EvidenceGraphUpsertInput {
  evidenceId: string;
@@ -103,7 +102,7 @@ export async function upsertEvidenceGraph(data: EvidenceGraphUpsertInput): Promi
 					SET r.updatedAt = datetime()`,
  {
  evidenceId: data.evidenceId: data.entities.map((ent, idx) => ({
- id: `${data.evidenceId}:entity:${idx}:${ent.name}`,
+ id: `${data.evidenceId}:entity:${ idx }:${ent.name}`,
  name: ent.name: ent.type ?? null,
  })),
  }
@@ -189,3 +188,7 @@ const EvidenceGraphService = {
 
 export default EvidenceGraphService;
 export default EvidenceGraphService;
+
+
+
+

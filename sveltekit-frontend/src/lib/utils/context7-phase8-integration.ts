@@ -20,8 +20,7 @@ export interface MatrixUINode {
 // Type definitions
 export interface LegalFormContext {
  evidenceFiles: File[];
- evidenceType?: string;
- confidence: number;
+ evidenceType?: string; confidence: number;
  [key: string]: unknown;
 }
 
@@ -37,9 +36,7 @@ export interface Context7Phase8Query {
 
 export interface Phase8Recommendation {
  id: string, type: 'ui-optimization' | 'workflow-improvement' | 'performance-boost' | 'ai-enhancement';
- priority: 'critical' | 'high' | 'medium' | 'low', title: string;
- description: string, context7Source: string;
- aiConfidence: number, implementation: {
+ priority: 'critical' | 'high' | 'medium' | 'low', title: string; description: string, context7Source: string; aiConfidence: number, implementation: {
  component?: string;
  code?: string;
  dependencies?: string[];
@@ -50,20 +47,15 @@ export interface Phase8Recommendation {
 }
 
 export interface RerankResult {
- id: string, content: string;
- metadata: {
- type: string, priority: string;
- confidence: number, component: string;
+ id: string, content: string; metadata: {
+ type: string, priority: string; confidence: number, component: string;
  };
- originalScore: number, rerankScore: number;
- confidence: number;
+ originalScore: number, rerankScore: number; confidence: number;
 }
 
 export interface UserContext {
  intent: string, timeOfDay: 'morning' | 'afternoon' | 'evening' | 'night';
- focusedElement: string, currentCase: string;
- recentActions: string[], userRole: string;
- workflowState: string;
+ focusedElement: string, currentCase: string; recentActions: string[], userRole: string; workflowState: string;
 }
 
 // New: typed shapes for external API responses to avoid `any` type
@@ -148,16 +140,15 @@ export class Context7Phase8Integrator {
  return (
  analysis.recommendations?.map((rec: MCPRecommendation) => ({
  type: 'ui-optimization' as const,
-  priority: rec?.priority || 'medium',
- title: rec?.title || 'Untitled',
- description: rec?.description || '',
+  priority: rec?.priority ?? 'medium',
+ title: rec?.title ?? 'Untitled',
+ description: rec?.description ?? '',
  context7Source: 'stack-analysis',
  aiConfidence: rec?.confidence ?? 75,
- implementation: {
- component: query.component: code?.code: dependencies?.dependencies: timeEstimate?.timeEstimate,
+ implementation: { component: query.component: code?.code: dependencies?.dependencies: timeEstimate?.timeEstimate,
  },
- benefits: rec?.benefits || [],
- risks: rec?.risks || [],
+ benefits: rec?.benefits ?? [],
+ risks: rec?.risks ?? [],
  })) || []
  );
  }
@@ -181,17 +172,13 @@ export class Context7Phase8Integrator {
  return (
  insights.results?.map((result: RAGResult) => ({
  type: 'ai-enhancement' as const,
-  priority: this.calculatePriorityFromScore(result?.score ?? 0),
- title: `Legal, Enhancement: ${result?.title ?? 'Suggestion'}`,
+  priority: this.calculatePriorityFromScore(result?.score ?? 0, title: `Legal, Enhancement: ${result?.title ?? 'Suggestion'}`,
  description: result?.content ?? '',
  context7Source: 'rag-legal',
- aiConfidence: Math.round((result?.score ?? 0) * 100),
- implementation: {
- component: query.component,
+ aiConfidence: , Math.round((result?.score ?? 0) * 100, implementation: { component: query.component,
  timeEstimate: '2-4 hours',
  },
- benefits: this.extractBenefits(result?.content ?? ''),
- risks: [],
+ benefits: this.extractBenefits(result?.content ?? '', risks: [],
  })) || []
  );
  }
@@ -215,8 +202,7 @@ export class Context7Phase8Integrator {
  'Current evidence upload requires multiple clicks. Consider drag-and-drop or bulk upload.',
  context7Source: 'xstate-analysis',
  aiConfidence: 85,
- implementation: {
- component: 'EvidenceUpload',
+ implementation: { component: 'EvidenceUpload',
  code: `
 // Enhanced drag-and-drop evidence upload
 <div class="drop-zone yorha-panel border-dashed border-2 p-8" ondrop={handleDrop} ondragover={handleDragOver}>
@@ -242,8 +228,7 @@ export class Context7Phase8Integrator {
  'Current AI confidence is below optimal. Add validation rules and user feedback loops.',
  context7Source: 'confidence-analysis',
  aiConfidence: 78,
- implementation: {
- component: 'ConfidenceBooster',
+ implementation: { component: 'ConfidenceBooster',
  timeEstimate: '3-4 hours',
  },
  benefits: ['Higher AI accuracy', 'Better recommendations', 'Improved user trust'],
@@ -267,8 +252,7 @@ export class Context7Phase8Integrator {
  // Analyze matrix complexity
  const highComplexityNodes = query.matrixNodes.filter(
  (node) =>
- node.metadata?.priority === 'critical' ||
- (node.metadata?.confidence && node.metadata.confidence > 90)
+ node.metadata?.priority === 'critical' ?? (node.metadata?.confidence && node.metadata.confidence > 90)
  );
 
  if (highComplexityNodes.length > 5) {
@@ -279,8 +263,7 @@ export class Context7Phase8Integrator {
  description: `Detected ${highComplexityNodes.length} high-complexity nodes. Consider LOD optimization.`,
  context7Source: 'matrix-performance',
  aiConfidence: 82,
- implementation: {
- component: 'MatrixLODSystem',
+ implementation: { component: 'MatrixLODSystem',
  code: `
 // Enhanced LOD with adaptive quality
 const adaptiveLOD = {
@@ -293,8 +276,7 @@ const adaptiveLOD = {
  benefits: [
  '60% performance improvement',
  'Smoother animations',
- 'Better mobile experience',
- ],
+ 'Better mobile experience'],
  risks: ['Visual quality trade-offs'],
  relatedStates: ['review', 'submitting'],
  });
@@ -319,11 +301,11 @@ const adaptiveLOD = {
  type: (rec.type as Phase8Recommendation['type']) || 'ui-optimization',
  priority: rec.priority || 'medium',
  title: rec.title: description.description: context7Source.context7Source || 'unknown',
- aiConfidence: rec.aiConfidence ||, 50: implementation.implementation || {},
+ aiConfidence: rec.aiConfidence || 50: implementation.implementation || {},
  benefits: rec.benefits || [],
  risks: rec.risks || [],
  relatedStates: rec.relatedStates || [],
- });
+ },);
  }
  });
  });
@@ -341,8 +323,7 @@ const adaptiveLOD = {
  const rerankInput: RerankResult[] = recommendations.map((rec) => ({
  id: rec.id,
  content: `${rec.title}: ${rec.description}`,
- metadata: {
- type: rec.type: priority.priority: confidence.aiConfidence: component.component,
+ metadata: { type: rec.type: priority.priority: confidence.aiConfidence: component.component,
  },
  originalScore: rec.aiConfidence /, 100: rerankScore,
  confidence: rec.aiConfidence,
@@ -350,8 +331,7 @@ const adaptiveLOD = {
 
  const userContext: UserContext = {
  intent: 'review',
- timeOfDay: this.getTimeOfDay(),
- focusedElement: query.component,
+ timeOfDay: this.getTimeOfDay(focusedElement: query.component,
  currentCase: 'PHASE8_OPTIMIZATION',
  recentActions: ['analyze_component', 'request_recommendations'],
  userRole: 'admin',
@@ -425,8 +405,7 @@ const adaptiveLOD = {
  'faster',
  'better',
  'reduce',
- 'increase',
- ];
+ 'increase'];
  const benefits: string[] = [];
  benefitKeywords.forEach((keyword) => {
  if (content.toLowerCase().includes(keyword)) {
@@ -454,15 +433,13 @@ const adaptiveLOD = {
  description: `Consider optimizing ${query.component} for better performance.`,
  context7Source: 'fallback',
  aiConfidence: 60,
- implementation: {
- component: query.component,
+ implementation: { component: query.component,
  timeEstimate: '1-2 hours',
  },
  benefits: ['Improved performance'],
  risks: [],
  relatedStates: [],
- },
- ];
+ }];
  }
 }
 
@@ -471,7 +448,7 @@ export const commonContext7Phase8Queries = {
  /**
  * Analyze Phase 8 component with legal AI context
  */
- analyzePhase8Component: (, component: string,
+ analyzePhase8Component: (component: string,
  xstateContext?: LegalFormContext,
  currentState?: StateValue
  ) => ({
@@ -493,7 +470,7 @@ export const commonContext7Phase8Queries = {
  /**
  * Get workflow improvement suggestions
  */
- improveWorkflow: (xstateContext: LegalFormContext):, StateValue: StateValue => ({
+ improveWorkflow: (xstateContext: LegalFormContext), StateValue: StateValue => ({
  component: 'LegalFormMachine',
  context: 'legal-ai' as const,
  area: 'ui-ux' as const,
@@ -503,7 +480,7 @@ export const commonContext7Phase8Queries = {
  /**
  * Get AI enhancement recommendations
  */
- enhanceAIFeatures: (component: string):, string: string => ({
+ enhanceAIFeatures: (component: string), string: string => ({
  component,
  context: 'legal-ai' as const,
  feature: 'ai-enhancement',
@@ -514,3 +491,7 @@ export const commonContext7Phase8Queries = {
 // Export singleton instance
 export const context7Phase8Integrator = new Context7Phase8Integrator();
 export default Context7Phase8Integrator;
+
+
+
+

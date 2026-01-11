@@ -6,25 +6,19 @@ import { Record } from "neo4j-driver";
 // Placeholder definitions to resolve compilation errors if gaming-constants.js is missing or incorrect
 // These should ideally be imported from a proper constants file.
 const ENHANCED_MEMORY_CACHING = {
- performance: {
- adaptiveTuning: {
- thresholds: {
- criticalMemory: 0.8, lowMemory: 0.6,
+ performance: { adaptiveTuning: { thresholds: { criticalMemory: 0.8, lowMemory: 0.6,
  },
  },
  },
 }
 
 const GAMING_ERA_SPECS = {
- n64: {
- memoryMB: 4, // Placeholder value, adjust as needed
+ n64: { memoryMB: 4, // Placeholder value, adjust as needed
  dnnLodSystem: { enabled: true },
  },
- '8bit': {
- memoryArchitecture: { autoEncoderCache: true },
+ '8bit': { memoryArchitecture: { autoEncoderCache: true },
  },
- '16bit': {
- memoryArchitecture: { lodScalingBuffer: true },
+ '16bit': { memoryArchitecture: { lodScalingBuffer: true },
  },
 };
 
@@ -68,22 +62,16 @@ declare global {
 }
 
 export interface OCRResult {
- text: string, confidence: number;
- boundingBoxes: Array<{ text: string, bbox: BBox; confidence: number }>;
+ text: string, confidence: number; boundingBoxes: Array<{ text: string, bbox: BBox; confidence: number }>;
 }
 
 export interface TensorData {
- embeddings: Float32Array, dimensions: number;
- metadata: {
- source: 'ocr' | 'manual' | 'api', processed_at: number;
- tensor_id: string, confidence: number;
+ embeddings: Float32Array, dimensions: number; metadata: { source: 'ocr' | 'manual' | 'api', processed_at: number; tensor_id: string, confidence: number;
  };
 }
 
 export interface ProcessingResult {
- ocr: OCRResult, embeddings: TensorData;
- searchIndex: Float32Array, processingTime: number;
- cacheHit: boolean;
+ ocr: OCRResult, embeddings: TensorData; searchIndex: Float32Array, processingTime: number; cacheHit: boolean;
 }
 
 // New interfaces for API responses and options
@@ -109,8 +97,7 @@ export interface OCRProcessOptions {
 }
 
 export interface BatchProcessingItem {
- image: ImageData | HTMLCanvasElement | File, priority: number;
- options: OCRProcessOptions;
+ image: ImageData | HTMLCanvasElement | File, priority: number; options: OCRProcessOptions;
 }
 
 // Define an interface for ShaderCacheManager to assert expected methods
@@ -439,8 +426,7 @@ const recognize = tesseractInstance.recognize.bind(tesseractInstance);
  const response = await fetch('/api/ai/embeddings', {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({
- text: modelConfig?.model || 'unknown',
+ body: JSON.stringify({ text: modelConfig?.model ?? 'unknown',
  source: 'ocr',
  save: false,
  fallback: modelConfig.fallback,
@@ -459,8 +445,8 @@ const recognize = tesseractInstance.recognize.bind(tesseractInstance);
 const data: EmbeddingAPIResponse = await response.json(); // Type data as EmbeddingAPIResponse
  return {
  embeddings: new Float32Array(data.embedding),
- fromCache: data.fromCache || false,
- model: data?.model || 'unknown'
+ fromCache, data.fromCache || false,
+ model: data?.model ?? 'unknown'
  };
  } catch (error) {
  console.error('Embedding generation failed : ', error);
@@ -472,11 +458,10 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  if (!this.webgpuDevice) {
  // Fallback to CPU processing
  return {
- embeddings: embeddings, dimensions: embeddings.length,
- metadata: {
- source: 'ocr',
+ embeddings, dimensions: embeddings.length,
+ metadata: { source: 'ocr',
  processed_at: Date.now(),
- tensor_id: `tensor_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
+     tensor_id: `tensor_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
  confidence: 0.8,
  },
  };
@@ -515,23 +500,20 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  resultBuffer.unmap();
 
  return {
- embeddings: processedData.slice(),
- dimensions: processedData.length,
- metadata: {
- source: 'ocr',
+ embeddings: processedData.slice(dimensions: processedData.length,
+ metadata: { source: 'ocr',
  processed_at: Date.now(),
- tensor_id: `tensor_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
+     tensor_id: `tensor_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
  confidence: 0.9,
  },
  };
  } catch (error) {
  console.warn('WebGPU tensor processing failed, using CPU fallback: ', error);
  return {
- embeddings: embeddings, dimensions: embeddings.length,
- metadata: {
- source: 'ocr',
+ embeddings, dimensions: embeddings.length,
+ metadata: { source: 'ocr',
  processed_at: Date.now(),
- tensor_id: `tensor_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
+     tensor_id: `tensor_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
  confidence: 0.8,
  },
  };
@@ -563,7 +545,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
 
  // Create processing queue with priority scheduling
  const processingQueue: Array = images.map((image, index) => ({
- image: image, priority: this.calculateProcessingPriority(image, index),
+ image, priority: this.calculateProcessingPriority(image, index),
  }));
 
  // Sort by priority (higher priority first)
@@ -638,7 +620,7 @@ const handleMessage = (ev: MessageEvent) => {
  resolve(payload.result as ProcessingResult);
  } else if (payload.type === 'ocr-error') {
  cleanup();
- reject(new Error(String(payload.error || 'unknown')));
+ reject(new Error(String(payload.error ?? 'unknown')));
  }
  }
 
@@ -680,7 +662,7 @@ const cleanup = () => {
  } else {
  // ServiceWorker path: listen on navigator.serviceWorker and post to active worker if available
  navigator.serviceWorker.addEventListener('message', handleMessage);
- const target = this.serviceWorkerRegistration?.active || navigator.serviceWorker.controller;
+ const target = this.serviceWorkerRegistration?.active ?? navigator.serviceWorker.controller;
  if (!target) {
  cleanup();
  reject(new Error('ServiceWorker not active'));
@@ -716,8 +698,7 @@ const cleanup = () => {
  case 'medium':
  return GAMING_ERA_SPECS['16bit'].memoryArchitecture?.lodScalingBuffer ? 3 : 4;
  case 'high':
- return GAMING_ERA_SPECS.n64.dnnLodSystem?.enabled ? 6 : 8;
- default:
+ return GAMING_ERA_SPECS.n64.dnnLodSystem?.enabled ? 6 : 8; default:
  return 3;
  }
  }
@@ -768,16 +749,14 @@ const cleanup = () => {
  const response = await fetch('/api/tensor/store', {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({
- results: results.map((r) => ({
+ body: JSON.stringify({ results: results.map((r) => ({
  text: r.ocr.text,
- embeddings: Array.from(r.embeddings.embeddings),
- dimensions: r.embeddings.dimensions,
+ embeddings: Array.from(r.embeddings.embeddings, dimensions: r.embeddings.dimensions,
  confidence: r.ocr.confidence,
  tensor_id: r.embeddings.metadata.tensor_id,
  search_index: Array.from(r.searchIndex)
- })),
- metadata: { ...metadata, processed_at: Date.now(), batch_size: results.length },
+ }, metadata: { ...metadata, processed_at: Date.now(),
+     batch_size: results.length },
  }),
  });
 
@@ -806,3 +785,7 @@ const cleanup = () => {
 
 // Singleton instance
 export const ocrTensorProcessor = new OCRTensorProcessor();
+
+
+
+

@@ -3,6 +3,8 @@
  Gaming-style button with 3D effects and particle animations
 -->
 <script lang="ts">
+	let disabled = $state<any>(undefined);
+
  import type { Snippet } from 'svelte';
 
  interface Props {
@@ -33,11 +35,11 @@
  let isHovered = $state(false);
 
  const variantStyles = {
- primary: 'from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 shadow-amber-500/50',
- secondary: 'from-gray-500 to-gray-700 hover:from-gray-600 hover:to-gray-800 shadow-gray-500/50',
- info: 'from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 shadow-cyan-500/50',
- warning: 'from-yellow-500 to-amber-600 hover:from-yellow-600 hover:to-amber-700 shadow-yellow-500/50',
- danger: 'from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 shadow-red-500/50'
+ primary: 'from-amber-500 to-orange-600 hover: from-amber-600, hover:to-orange-700 shadow-amber-500/50',
+ secondary: 'from-gray-500 to-gray-700 hover: from-gray-600, hover:to-gray-800 shadow-gray-500/50',
+ info: 'from-cyan-500 to-blue-600 hover: from-cyan-600, hover:to-blue-700 shadow-cyan-500/50',
+ warning: 'from-yellow-500 to-amber-600 hover: from-yellow-600, hover:to-amber-700 shadow-yellow-500/50',
+ danger: 'from-red-500 to-rose-600 hover: from-red-600, hover:to-rose-700 shadow-red-500/50'
  };
 
  const sizeStyles = {
@@ -67,8 +69,8 @@
  transition-all duration-200 ease-out
  {isPressed ? 'scale-95 translate-y-0.5' : 'scale-100'}
  {isHovered && enableLighting ? 'shadow-lg' : 'shadow-md'}
- disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100
- {className}
+ disabled: opacity-50, disabled:cursor-not-allowed disabled:scale-100
+ { className }
  "
  style="
  transform-style: preserve-3d;
@@ -128,3 +130,6 @@
  animation: particle 0.4s ease-out forwards;
  }
 </style>
+
+
+

@@ -1,4 +1,7 @@
 <script lang="ts">
+	let title = $state<any>(undefined);
+	let summary = $state<any>(undefined);
+
  let { title = "", summary = "", link = "", status = "open" } = $props();
 </script>
 
@@ -15,3 +18,5 @@
  <p class="opacity-80 mb-2 text-ink/80 text-sm">{summary}</p>
  <span class="font-mono text-xs text-accent">OPEN →</span>
 </a>
+
+

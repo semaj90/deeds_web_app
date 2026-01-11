@@ -8,13 +8,11 @@ import type { ActorRef } from 'xstate';
  * and the EvidenceItem interface previously used in the frontend.
  */
 export interface Evidence {
- id: string;
- userId: string; // From EvidenceFile
+ id: string; userId: string; // From EvidenceFile
  caseId?: string; // From EvidenceFile (matches 'caseId' in error message)
 
  // Core identification and display properties
- title: string;
- filename: string; // From EvidenceFile (maps to 'name' in error message, 'fileName' in local EvidenceItem)
+ title: string; filename: string; // From EvidenceFile (maps to 'name' in error message, 'fileName' in local EvidenceItem)
  originalName: string; // From EvidenceFile
  mimeType: string; // From EvidenceFile
  type: 'document' | 'image' | 'video' | 'audio' | 'link' | string; // General category
@@ -42,65 +40,52 @@ export interface Evidence {
  thumbnailUrl?: string; // From EvidenceItem
 
  // Processing status and metadata
- processingStatus:
- | 'pending'
+ processingStatus?? 'pending'
  | 'processing'
  | 'completed'
  | 'failed'
  | 'new'
  | 'reviewing'
  | 'approved'; // From EvidenceFile and EvidenceItem (maps to 'status')
- processingError?: string;
- metadata: Record<string, unknown>;
+ processingError?: string; metadata: Record<string, unknown>;
 }
 
 export type EvidenceUploadInput = {
- file: File;
- userId: string;
+ file: File; userId: string;
  caseId?: string;
  tags?: string[];
  metadata?: Record<string, unknown>;
 };
 export type EvidenceAnalysisResult = {
- success: boolean;
- fileId: string;
- summary: string;
- autoTags: string[];
+ success: boolean; fileId: string;
+ summary: string; autoTags: string[];
  legalNotes?: string;
  embedding?: number[];
- extractedText?: string;
- processingTimeMs: number;
+ extractedText?: string; processingTimeMs: number;
 };
 
 // ==================== AI Agent Types ====================
 export type AIAgentTool = {
- name: string;
- description: string;
+ name: string; description: string;
  parameters: Record<string, { type: string; description: string; required?: boolean }>;
  execute: (params: Record<string, unknown>) => Promise<unknown>;
 };
 
 export type AIToolInvocation = {
- tool: string;
- params: Record<string, unknown>;
- result: unknown;
- timestamp: number;
+ tool: string; params: Record<string, unknown>;
+ result: unknown; timestamp: number;
 };
 
 export type AIResponse = {
- text: string;
- source: 'ollama' | 'tensorrt';
+ text: string; source: 'ollama' | 'tensorrt';
  model: string;
  toolInvocations?: AIToolInvocation[];
- tokensUsed?: number;
- responseTimeMs: number;
+ tokensUsed?: number; responseTimeMs: number;
 };
 
 export type ChatMessage = {
- id: string;
- role: 'user' | 'assistant' | 'system';
- content: string;
- timestamp: number;
+ id: string; role: 'user' | 'assistant' | 'system';
+ content: string; timestamp: number;
  userId: string;
  caseId?: string;
  evidenceIds?: string[];
@@ -118,8 +103,7 @@ export type VectorSearchQuery = {
 };
 
 export type VectorSearchResult = {
- id: string;
- score: number;
+ id: string; score: number;
  evidence: Evidence; // Updated to use the unified Evidence interface
  distance: number;
 };
@@ -128,8 +112,7 @@ export type VectorSearchResult = {
 export type WorkflowContext = {
  currentFile?: Evidence; // Updated to use the unified Evidence interface
  result?: EvidenceAnalysisResult;
- error?: string;
- progress: number;
+ error?: string; progress: number;
  stage: 'upload' | 'ocr' | 'embedding' | 'analysis' | 'storage' | 'complete';
  retryCount: number;
 };
@@ -147,14 +130,12 @@ export type WorkflowEvent =
 export type CacheEntry<T> = { data: T; timestamp: number; ttl: number; userId?: string };
 
 export type EmbeddingCache = CacheEntry<{
- fileId: string;
- embedding: VectorEmbedding;
+ fileId: string; embedding: VectorEmbedding;
  model: string;
 }>;
 
 export type AnalysisCache = CacheEntry<{
- fileId: string;
- summary: string;
+ fileId: string; summary: string;
  tags: string[];
  legalNotes?: string;
 }>;
@@ -163,19 +144,16 @@ export type AnalysisCache = CacheEntry<{
 export type APIResponse<T = unknown> = {
  success: boolean;
  data?: T;
- error?: string;
- timestamp: number;
+ error?: string; timestamp: number;
 };
 
 export type UploadResponse = APIResponse<{
- fileId: string;
- path: string;
+ fileId: string; path: string;
  processingStarted: boolean;
 }>;
 
 export type SearchResponse = APIResponse<{
- results: VectorSearchResult[];
- totalFound: number;
+ results: VectorSearchResult[]; totalFound: number;
  queryTimeMs: number;
 }>;
 
@@ -192,8 +170,7 @@ export type WSMessage =
 
 // Base properties common to all snapshot states
 type BaseSnapshotProperties = {
- context: WorkflowContext;
- value: unknown; // current state value (string | object) depending on machine shape
+ context: WorkflowContext; value: unknown; // current state value (string | object) depending on machine shape
  lastEvent?: WorkflowEvent; // optional last event that produced this snapshot
  timestamp?: number; // simple metadata for UI/transport (timestamps, progress)
  children?: Record<string, ActorRef<any, any>>;
@@ -210,15 +187,13 @@ export type EvidenceSnapshot =
  error | undefined;
  })
  | (BaseSnapshotProperties & {
- status: 'done';
- output: unknown; // Required when status is 'done', error | undefined; // Must be undefined when status is 'done'
+ status: 'done'; output: unknown; // Required when status is 'done', error | undefined; // Must be undefined when status is 'done'
  })
  | (BaseSnapshotProperties & {
- status: 'error';
- error: unknown; // Required when status is 'error', output | undefined; // Must be undefined when status is 'error'
+ status: 'error'; error: unknown; // Required when status is 'error', output | undefined; // Must be undefined when status is 'error'
  });
 
-export type EvidenceActor = ActorRef<EvidenceSnapshot, WorkflowEvent>; // Swapped generics: snapshot first, event second
+export type EvidenceActor = ActorRef<EvidenceSnapshot: WorkflowEvent>; // Swapped generics: snapshot first, event second
 
 // For WebSocket updates
 export interface AnalysisUpdate {
@@ -227,3 +202,7 @@ export interface AnalysisUpdate {
  progress?: number;
  stage?: string;
 }
+
+
+
+

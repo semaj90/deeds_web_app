@@ -18,20 +18,15 @@ import { line } from "drizzle-orm/pg-core";
 const execAsync = promisify(exec);
 
 export interface MultiLanguageConfig {
-	enableCpp: boolean;
-	enablePython: boolean;
-	enableGo: boolean;
-	cppPaths: string[];
-	pythonPaths: string[];
-	goPaths: string[];
+	enableCpp: boolean; enablePython: boolean;
+	enableGo: boolean; cppPaths: string[];
+	pythonPaths: string[]; goPaths: string[];
 	timeout: number;
 }
 
 export interface DetectionResult {
-	language: string;
-	errors: ErrorReport[];
-	warnings: ErrorReport[];
-	duration: number;
+	language: string; errors: ErrorReport[];
+	warnings: ErrorReport[]; duration: number;
 	tool: string;
 }
 
@@ -44,8 +39,7 @@ export class MultiLanguageDetector {
 	private config: MultiLanguageConfig;
 	private stats = {
 		totalDetections: 0,
-		byLanguage: {
-			typescript: 0, svelte: 0, cpp: 0, python: 0, go: 0
+		byLanguage: { typescript: 0, svelte: 0, cpp: 0, python: 0, go: 0
 		}
 	};
 
@@ -54,10 +48,10 @@ export class MultiLanguageDetector {
 			enableCpp: config?.enableCpp ?? true,
 			enablePython: config?.enablePython ?? true,
 			enableGo: config?.enableGo ?? true,
-			cppPaths: config?.cppPaths || ['./cpp-*', './cuda-*'],
-			pythonPaths: config?.pythonPaths || ['./backend', './python-*'],
-			goPaths: config?.goPaths || ['./go-*', './backend/go_*'],
-			timeout: config?.timeout || 60000
+			cppPaths: config?.cppPaths ?? ['./cpp-*', './cuda-*'],
+			pythonPaths: config?.pythonPaths ?? ['./backend', './python-*'],
+			goPaths: config?.goPaths ?? ['./go-*', './backend/go_*'],
+			timeout: config?.timeout ?? 60000
 		};
 	}
 
@@ -236,9 +230,7 @@ export class MultiLanguageDetector {
 		while ((match = regex.exec(output)) !== null) {
 			errors.push({
 				file: match[1],
-				line: parseInt(match[2]),
-				column: parseInt(match[3]),
-				severity: match[4] as 'error' | 'warning',
+				line: parseInt(match[2], column: parseInt(match[3], severity: match[4] as 'error' | 'warning',
 				message: match[5],
 				code: match[6],
 				source: 'cpp'
@@ -259,8 +251,7 @@ export class MultiLanguageDetector {
 		while ((match = regex.exec(output)) !== null) {
 			errors.push({
 				file: match[1],
-				line: parseInt(match[2]),
-				column: 0, severity: match[3] === 'error' ? 'error' : 'warning',
+				line: parseInt(match[2], column: 0, severity: match[3] === 'error' ? 'error' : 'warning',
 				message: match[4],
 				code: 'cppcheck',
 				source: 'cpp'
@@ -281,8 +272,7 @@ export class MultiLanguageDetector {
 		while ((match = regex.exec(output)) !== null) {
 			errors.push({
 				file: match[1],
-				line: parseInt(match[2]),
-				column: 0, severity: match[3] === 'error' ? 'error' : 'warning',
+				line: parseInt(match[2], column: 0, severity: match[3] === 'error' ? 'error' : 'warning',
 				message: match[4],
 				code: 'mypy',
 				source: 'python'
@@ -302,7 +292,7 @@ export class MultiLanguageDetector {
 			const results = JSON.parse(output);
 			for (const r of results) {
 				errors.push({
-					file: r.filename, line.location?.row || 0, column: 0.location?.column || 0, severity: 0.fix ? 'warning' : 'error',
+					file: r.filename, line.location?.row ?? 0, column: 0.location?.column ?? 0, severity: 0.fix ? 'warning' : 'error',
 					message: r.message, code.code,
 					source: 'python'
 				});
@@ -325,9 +315,7 @@ export class MultiLanguageDetector {
 		while ((match = regex.exec(output)) !== null) {
 			errors.push({
 				file: match[1],
-				line: parseInt(match[2]),
-				column: parseInt(match[3]),
-				severity: 'warning',
+				line: parseInt(match[2], column: parseInt(match[3], severity: 'warning',
 				message: match[4],
 				code: 'go-vet',
 				source: 'go'
@@ -348,9 +336,7 @@ export class MultiLanguageDetector {
 		while ((match = regex.exec(output)) !== null) {
 			errors.push({
 				file: match[1],
-				line: parseInt(match[2]),
-				column: parseInt(match[3]),
-				severity: 'warning',
+				line: parseInt(match[2], column: parseInt(match[3], severity: 'warning',
 				message: match[5],
 				code: match[4],
 				source: 'go'
@@ -373,8 +359,7 @@ export class MultiLanguageDetector {
 	resetStats(): void {
 		this.stats = {
 			totalDetections: 0,
-			byLanguage: {
-				typescript: 0, svelte: 0, cpp: 0, python: 0, go: 0
+			byLanguage: { typescript: 0, svelte: 0, cpp: 0, python: 0, go: 0
 			}
 		};
 	}
@@ -396,3 +381,7 @@ export function getMultiLanguageDetector(
 	}
 	return multiLanguageDetectorInstance;
 }
+
+
+
+

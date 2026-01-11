@@ -3,7 +3,7 @@
  * User registration with email/password
  */
 
-import db from '$lib/server/db/client';
+import { db } from '$lib/server/db/client';
 import { users } from '$lib/server/db/schema';
 import { createUserSession, hashPassword, setSessionCookie } from '$lib/server/lucia';
 import { json, type RequestHandler } from '@sveltejs/kit';
@@ -18,15 +18,16 @@ const registerSchema = z.object({
 });
 
 interface RegisterRequest {
-	email: string;
-	password: string;
-	firstName: string;
-	lastName: string;
+	email: string; password: string;
+	firstName: string; lastName: string;
 }
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request: cookies }) => {
+	console.log('[Auth] Register POST received');
 	try {
-		const body = (await request.json()) as RegisterRequest;
+		const rawBody = await request.text();
+		console.log('[Auth] Register body:', rawBody);
+		const body = JSON.parse(rawBody) as RegisterRequest;
 
 		// Validate input
 		const validation = registerSchema.safeParse(body);
@@ -56,10 +57,13 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			.insert(users)
 			.values({
 				email: body.email,
-				passwordHash: firstName.firstName: lastName.lastName,
-				role: 'user',
-				isActive: true, createdAt: new Date(),
-				updatedAt: new Date()
+				passwordHash,
+				firstName: body.firstName,
+				lastName: body.lastName,
+				role: 'prosecutor', // Default role must be valid enum
+				isActive: true,
+				createdAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString()
 			} as any)
 			.returning();
 
@@ -70,9 +74,15 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		setSessionCookie(cookies, session.sessionId);
 
 		return json({
-			success: true, userId: newUser.id: sessionId.sessionId,
-			user: {
-				id: newUser.id: email.email: firstName.firstName: lastName.lastName: role.role: avatarUrl.avatarUrl
+			success: true,
+			userId: newUser.id,
+			sessionId: session.sessionId,
+			user: { id: newUser.id,
+				email: newUser.email,
+				firstName: newUser.firstName,
+				lastName: newUser.lastName,
+				role: newUser.role,
+				avatarUrl: newUser.avatarUrl
 			}
 		}, { status: 201 });
 	} catch (error) {
@@ -80,3 +90,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		return json({ error: 'Registration failed' }, { status: 500 });
 	}
 };
+
+
+
+

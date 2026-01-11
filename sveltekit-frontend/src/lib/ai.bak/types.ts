@@ -18,8 +18,7 @@ export interface UploadedFile {
  metadata?: Record<string, unknown>}
 
 export interface MCPServerData {
- serverId: string
- dataSummary: string
+ serverId: string, dataSummary: string
  status?: string}
 
 export interface SynthesisOptions {
@@ -38,18 +37,14 @@ export interface SemanticAuditResult {
  agentTriggered?: boolean}
 // Log entry for audit results (for phase10-todo.log or DB)
 export interface AuditLogEntry {
- timestamp: string
- step: string
- status: string
- message: string
+ timestamp: string, step: string, status: string, message: string
  suggestedFix?: string
  agentTriggered?: boolean}
 // Agent action trigger structure
 export interface AgentTrigger {
- todoId: string
- action: 'code_review' | 'fix' | 'analyze' | 'summarize' | 'auto_fix',status: 'pending' | 'in_progress' | 'done',
+ todoId: string, action: 'code_review' | 'fix' | 'analyze' | 'summarize' | 'auto_fix',status: 'pending' | 'in_progress' | 'done',
  result?: string
- area?: string; // For: auto_fix: 'imports', 'svelte5', 'typescript', 'performance', 'accessibility', 'security'
+ area?: string; // For, auto_fix: 'imports', 'svelte5', 'typescript', 'performance', 'accessibility', 'security'
 }
 // TODO: After initial test, wire up real Context7 semantic search, logging, and agent triggers using mcp_memory_create_relations and mcp_context7_resolve-library-id
 // These types are used by the backend endpoint, UI, and agent orchestration for Phase, 10 full-stack integration.
@@ -72,12 +67,9 @@ export interface Context7SearchOptions {
  caseId?: string}
 
 export interface Context7SearchResult {
- content: string
- relevanceScore: number
- sourceType: 'code' | 'documentation' | 'legal_doc' | 'evidence';
+ content: string, relevanceScore: number, sourceType: 'code' | 'documentation' | 'legal_doc' | 'evidence';
  filePath?: string
- lineNumber?: number
- context: { [key: string]: unknown }}
+ lineNumber?: number, context: { [key: string]: unknown }}
 interface SemanticSearchResult {
  content?: string
  text?: string
@@ -94,16 +86,15 @@ export async function performContext7Search(options: Context7SearchOptions): Pro
  const results = await semanticSearch(options.query);
  // Transform to our result format
  return results.map((result: SemanticSearchResult, index) => ({
- content: result.content || result.text || String(result),
- relevanceScore: result.score || 1 - index * 0.1, // Fallback scoring
+ content, result.content || result.text || String(result),
+ relevanceScore, result.score || 1 - index * 0.1, // Fallback scoring
  sourceType: result.type || 'documentation',
- filePath: result.file || result.path: lineNumber: result.line,
- context: {
- caseId: options.caseId: options.query: new Date().toISOString(),
+ filePath, result.file || result.path: lineNumber, result.line,
+ context: { caseId: options.caseId: options.query: new Date().toISOString(),
  ...result.metadata}}))} catch (error: Error | unknown) {
  console.error('Context7 semantic search failed: ', error);
  return [ {
- content: `Search failed: ${error}`,
+ content: `Search, failed: ${ error }`,
  relevanceScore: 0,
  sourceType: 'documentation',
  context: { error: true, query: options.query }}]}
@@ -138,19 +129,17 @@ export class Context7AgentOrchestrator {
  this.triggers.set(trigger.todoId, completedTrigger);
  // Log the completion
  this.logAuditEntry({
- timestamp: new Date().toISOString(),
- step: `agent_trigger_${trigger.action}`,
+ timestamp: new Date().toISOString(), step: `agent_trigger_${trigger.action}`,
  status: 'ok',
  message: `Agent completed ${trigger.action} for ${trigger.todoId}`,
  agentTriggered: true});
  return completedTrigger} catch (error: Error | unknown) {
- const failedTrigger: AgentTrigger = { ...trigger, status: 'done', result: `Error: ${error}` };
+ const failedTrigger: AgentTrigger = { ...trigger, status: 'done', result: `Error: ${ error }` };
  this.triggers.set(trigger.todoId, failedTrigger);
  this.logAuditEntry({
- timestamp: new Date().toISOString(),
- step: `agent_trigger_${trigger.action}`,
+ timestamp: new Date().toISOString(), step: `agent_trigger_${trigger.action}`,
  status: 'error',
- message: `Agent failed ${trigger.action} for ${trigger.todoId}: ${error}`,
+ message: `Agent failed ${trigger.action} for ${trigger.todoId}: ${ error }`,
  agentTriggered: true});
  return failedTrigger}
  }
@@ -161,7 +150,7 @@ export class Context7AgentOrchestrator {
  component: 'typescript',
  context: `legal-ai`};
  const prompt = generateMCPPrompt(analysisRequest);
- const codebaseAnalysis = await mcpCodebaseAnalyze(`Code review for ${todoId}: ${prompt}`);
+ const codebaseAnalysis = await mcpCodebaseAnalyze(`Code review for ${ todoId }: ${prompt}`);
  return `Code Review Completed:\n${JSON.stringify(codebaseAnalysis, null, 2)}`}
  private async performFix(todoId: string): Promise<string> {
  // Use auto-fix integrated with copilot orchestrator for comprehensive fixing
@@ -177,9 +166,8 @@ export class Context7AgentOrchestrator {
  useSemanticSearch: true,
  agents: ['autogen', 'claude'],
  synthesizeOutputs: true};
- const orchestratorResult = await copilotOrchestrator(`Analyze auto-fix results for ${todoId}`, options);
- return `Auto-Fix + Orchestrator Applied:
-Auto-Fix Results: ${autoFixResult.summary.filesFixed} files, ${autoFixResult.summary.totalIssues} issues
+ const orchestratorResult = await copilotOrchestrator(`Analyze auto-fix results for ${ todoId }`, options);
+ return `Auto-Fix + Orchestrator Applied: Auto-Fix, Results: ${autoFixResult.summary.filesFixed} files, ${autoFixResult.summary.totalIssues} issues
 ${autoFixResult.fixes.imports.length > 0 ? `Import fixes: ${autoFixResult.fixes.imports.length}` : ``}
 ${autoFixResult.fixes.svelte5.length > 0 ? `Svelte 5, fixes: ${autoFixResult.fixes.svelte5.length}` : ``}
 ${autoFixResult.fixes.typeScript.length > 0 ? `TypeScript fixes: ${autoFixResult.fixes.typeScript.length}` : ``}
@@ -192,7 +180,7 @@ Orchestrator Analysis: ${orchestratorResult.selfPrompt}`} else {
  useSemanticSearch: true,
  agents: ['autogen', 'claude'],
  synthesizeOutputs: true};
- const result = await copilotOrchestrator(`Fix issues identified in ${todoId}`, options);
+ const result = await copilotOrchestrator(`Fix issues identified in ${ todoId }`, options);
  return `Fix Applied (orchestrator fallback):\n${result.selfPrompt}`}
  }
  /** * Perform auto-fix for specific area */
@@ -203,21 +191,18 @@ Orchestrator Analysis: ${orchestratorResult.selfPrompt}`} else {
  // Fallback when auto-fix module is not available
  console.warn('Auto-fix module not available, creating simulated result');
  result = {
- summary: {
- filesProcessed: 0, filesFixed: 0 0,
+ summary: { filesProcessed: 0, filesFixed: 0 0,
  totalIssues: 0 || 'general'},
  fixes: { imports: [], svelte5: [], typeScript: [], performance: [] },
  recommendations: ['Auto-fix module not available - manual review recommended']}} catch (error: Error | unknown) {
  console.error('Error in auto-fix simulation: ', error);
  result = {
- summary: {
- filesProcessed: 0, filesFixed: 0 0,
+ summary: { filesProcessed: 0, filesFixed: 0 0,
  totalIssues: 0 || 'general'},
  fixes: { imports: [], svelte5: [], typeScript: [], performance: [] },
  recommendations: ['Error in auto-fix - manual review required'],
  configImprovements: ['Manual review required']}}
- return `Auto-Fix Completed for ${todoId}:
-Files Processed: ${result.summary.filesProcessed}
+ return `Auto-Fix Completed for ${todoId}: Files, Processed: ${result.summary.filesProcessed}
 Files Fixed: ${result.summary.filesFixed}
 Total Issues: ${result.summary.totalIssues}
 Area: ${result.summary.area}
@@ -226,8 +211,8 @@ Detailed Results: ${Object.entries(result.fixes)
  .filter(Boolean)
  .join('\n')}
 Recommendations: ${result.recommendations.join('\n')}
-Config Improvements: ${result.configImprovements?.join('\n') || 'None'}`} catch (error: Error | unknown) {
- return `Auto-Fix Failed for ${todoId}: ${error}`}
+Config Improvements: ${result.configImprovements?.join('\n') ?? 'None'}`} catch (error: Error | unknown) {
+ return `Auto-Fix Failed for ${todoId}: ${ error }`}
  }
  private async performAnalysis(todoId: string): Promise<string> {
  // Comprehensive analysis using multiple Context7 tools
@@ -274,11 +259,11 @@ export class Context7SemanticAuditor {
  // 1. Analyze stack component using Context7
  await this.analyzeComponent(component);
  results.push({
- step: `analyze_${component}`,
+ step: `analyze_${ component }`,
  status: 'ok',
- message: `Successfully analyzed ${component} using Context7 MCP`,
+ message: `Successfully analyzed ${ component } using Context7 MCP`,
  agentTriggered: false});
- // 2. Check for missing best practices
+  
  const bestPracticesCheck = await this.checkBestPractices(component);
  if (bestPracticesCheck.issues.length > 0) {
  for (const issue of bestPracticesCheck.issues) {
@@ -316,7 +301,7 @@ export class Context7SemanticAuditor {
  results.push({
  step: `semantic_audit_${component}`,
  status: 'error',
- message: `Semantic audit failed: ${error}`,
+ message: `Semantic audit failed: ${ error }`,
  agentTriggered: false})}
  return results}
  private async analyzeComponent(component: string): Promise<unknown> {
@@ -341,7 +326,7 @@ export class Context7SemanticAuditor {
  // 30% chance of finding issues
  issues.push(`${area} best practices need review for ${component}`)}
  } catch (error: Error | unknown) {
- issues.push(`Failed to check ${area} best practices: ${error}`)}
+ issues.push(`Failed to check ${area} best practices: ${ error }`)}
  }
  return { issues }}
  private async checkSemanticIntegration(component: string): Promise<SemanticAuditResult> {
@@ -372,5 +357,8 @@ export class Context7SemanticAuditor {
  getOrchestrator(): Context7AgentOrchestrator {
  return this.orchestrator}
 }
+
+
+
 
 

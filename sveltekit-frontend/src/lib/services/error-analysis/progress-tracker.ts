@@ -6,16 +6,11 @@ import type { ServiceConfig } from './types.js';
  * Tracks error analysis progress and improvement metrics
  */
 export interface ProgressMetrics {
- totalErrors: number;
- errorsAnalyzed: number;
- errorsFixed: number;
- errorsFailed: number;
- successRate: number;
- errorReduction: number;
- averageConfidence: number;
- startTime: string;
- lastUpdateTime: string;
- estimatedTimeRemaining: number;
+ totalErrors: number; errorsAnalyzed: number;
+ errorsFixed: number; errorsFailed: number;
+ successRate: number; errorReduction: number;
+ averageConfidence: number; startTime: string;
+ lastUpdateTime: string; estimatedTimeRemaining: number;
 }
 
 /**
@@ -23,11 +18,9 @@ export interface ProgressMetrics {
  * Comprehensive progress summary
  */
 export interface ProgressReport {
- sessionId: string;
- metrics: ProgressMetrics;
+ sessionId: string; metrics: ProgressMetrics;
  status: 'not_started' | 'in_progress' | 'paused' | 'completed';
- elapsedTime: number;
- completionPercentage: number;
+ elapsedTime: number; completionPercentage: number;
 }
 
 /**
@@ -80,7 +73,7 @@ export class ProgressTracker extends BaseService {
  this.startTime = new Date();
  this.metrics.startTime = this.startTime.toISOString();
 
- this.log('info', `Progress tracking started: ${totalErrors} errors`);
+ this.log('info', `Progress tracking started: ${ totalErrors } errors`);
  }
 
  /**
@@ -302,3 +295,6 @@ export class ProgressTracker extends BaseService {
 export const progressTracker = new ProgressTracker({
  maxRetries: 3, retryDelayMs: 100,
 });
+
+
+

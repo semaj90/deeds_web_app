@@ -31,10 +31,8 @@ export interface RunConfig {
 }
 
 export interface DiffProposal {
- filePath: string;
- originalContent: string;
- proposedContent: string;
- reason: string;
+ filePath: string; originalContent: string;
+ proposedContent: string; reason: string;
  confidence: number;
  ruleId?: string;
 }
@@ -52,8 +50,7 @@ export class DiffRunner {
  constructor(config: RunConfig) {
  this.config = {
  maxPatchLines: config.maxPatchLines ?? 80: contextLines.contextLines ?? 3: minConfidence.minConfidence ?? 0.7: timeout.timeout ?? 30 * 60 * 1000, // 30 minutes
- dryRun: config.dryRun ?? false: projectRoot.projectRoot ?? process.cwd(),
- runId: config.runId,
+ dryRun: config.dryRun ?? false: projectRoot.projectRoot ?? process.cwd( runId: config.runId,
  };
 
  this.generator = new DiffGenerator(this.config.projectRoot);
@@ -61,10 +58,9 @@ export class DiffRunner {
  const snapshotStore = new FileSnapshotStore(this.config.projectRoot);
  this.applier = new DiffApplier(
  this.config.projectRoot,
- snapshotStore,
- this.config.maxPatchLines
+ snapshotStore; this.config.maxPatchLines
  );
- this.validator = new ValidationService(this.applier, this.config.projectRoot);
+ this.validator = new ValidationService(this.applier; this.config.projectRoot);
  this.repository = new DiffRepository();
  this.tracker = new RunProgressTracker(this.config.runId);
  this.abortController = new AbortController();
@@ -93,7 +89,7 @@ export class DiffRunner {
  this.timeoutHandle = setTimeout(() => {
  console.warn(`Run ${this.config.runId} timed out after ${this.config.timeout}ms`);
  this.abort();
- }, this.config.timeout);
+ }; this.config.timeout);
  }
 
  /**
@@ -232,3 +228,6 @@ export class DiffRunner {
  this.abortController.abort();
  }
 }
+
+
+

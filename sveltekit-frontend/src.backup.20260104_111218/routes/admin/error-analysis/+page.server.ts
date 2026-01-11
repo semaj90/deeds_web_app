@@ -1,0 +1,82 @@
+/**
+ * Phase 89: Error Analysis Page - Server Load Function
+ *
+ * SSR data from Qdrant + PostgreSQL for RAG+KAG powered error analysis
+ */
+
+import { QdrantClient } from '@qdrant/js-client-rest';
+import pg from 'pg';
+import type { PageServerLoad } from './$types';
+
+const { Pool } = pg;
+
+const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
+
+export const load: PageServerLoad = async () => {
+	const qdrant = new QdrantClient({ url: QDRANT_URL });
+
+	const aiPool = new Pool({
+		host: '127.0.0.1',
+		port: 5434,
+		database: 'legal_ai_db',
+		user: 'legal_admin',
+		password: '123456'
+	});
+
+	try {
+		// Fetch error clusters with embeddings
+		const clusters = await qdrant.scroll('phase89_error_clusters', {
+			limit: 50,
+			with_payload: true,
+			with_vector: false
+		});
+
+		// Enrich with PostgreSQL data
+		const enrichedClusters = await Promise.all(
+			clusters.points.map(async (point) => {
+				const payload = point.payload as any;
+
+				const result = await aiPool.query(`
+					SELECT
+						c.cluster_id,
+						COUNT(*) as error_count,
+						STRING_AGG(DISTINCT i.source, ', ') as files,
+						ARRAY_AGG(DISTINCT unnest(i.tags)) as tags
+					FROM phase89_error_clusters c
+					JOIN phase89_error_instances i ON c.error_instance_id = i.id
+					WHERE c.cluster_id = $1
+					GROUP BY c.cluster_id
+				`, [payload.cluster_id]);
+
+				const data = result.rows[0] || {};
+
+				return {
+					id: point.id,
+					cluster_id: payload.cluster_id,
+					pattern: payload.pattern || 'Unknown',
+					error_count: parseInt(data.error_count) || 0,
+					files: data.files || '',
+					tags: data.tags || [],
+					payload_tags: payload.tags || []
+				};
+			})
+		);
+
+		await aiPool.end();
+
+		return {
+			clusters: enrichedClusters,
+			total: clusters.points.length
+		};
+
+	} catch (err: any) {
+		console.error('SSR load failed:', err);
+		await aiPool.end();
+
+		return {
+			clusters: [],
+			total: 0,
+			error: err.message
+		};
+	}
+};

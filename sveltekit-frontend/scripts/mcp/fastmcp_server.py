@@ -3,7 +3,11 @@ FastMCP Server - Model-Agnostic Tool Router
 Exposes tools for Ollama, Triton, or any LLM with function calling
 """
 import asyncio
+import json
 import os
+import time
+from datetime import datetime
+from pathlib import Path
 from fastmcp import FastMCP
 
 # Import tool implementations
@@ -13,6 +17,50 @@ from tools.graph_upsert import graph_upsert_entities, graph_upsert_edges, graph_
 
 # Initialize FastMCP server
 mcp = FastMCP("Legal AI Tool Server")
+
+# ═══════════════════════════════════════════════════════════════
+# JSONL LOGGING (SIMD JSON Accelerator Compatible)
+# ═══════════════════════════════════════════════════════════════
+
+LOG_DIR = Path(__file__).parent.parent.parent / "logs" / "mcp"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+TRACE_FILE = LOG_DIR / f"llm-traces-{datetime.now().strftime('%Y%m%d')}.jsonl"
+
+def log_llm_call(
+    tool_name: str,
+    provider: str = "ollama",
+    prompt: str = "",
+    response: str = "",
+    tokens_in: int = 0,
+    tokens_out: int = 0,
+    latency_ms: float = 0,
+    success: bool = True,
+    error: str = None,
+    metadata: dict = None
+):
+    """
+    Log LLM/tool calls to JSONL for observability.
+    Compatible with Go SIMD JSON Accelerator parsing.
+    """
+    log_entry = {
+        "ts": datetime.now().isoformat(),
+        "epoch": int(time.time() * 1000),
+        "tool": tool_name,
+        "provider": provider,
+        "tokens_in": tokens_in or len(prompt.split()),
+        "tokens_out": tokens_out or len(response.split()),
+        "latency_ms": latency_ms,
+        "success": success,
+        "error": error,
+        "metadata": metadata or {}
+    }
+
+    try:
+        with open(TRACE_FILE, 'a') as f:
+            f.write(json.dumps(log_entry, default=str) + '\n')
+    except Exception as e:
+        print(f"⚠️ Failed to write log: {e}")
+
 
 # ═══════════════════════════════════════════════════════════════
 # WEB SEARCH TOOLS
@@ -126,6 +174,8 @@ async def kb_vector_search(
     ollama_url = os.getenv('OLLAMA_URL', 'http://localhost:11434')
 
     try:
+        start_time = time.time()
+
         # 1. Generate query embedding
         async with httpx.AsyncClient(timeout=10.0) as client:
             embed_resp = await client.post(
@@ -137,6 +187,8 @@ async def kb_vector_search(
             )
 
             if embed_resp.status_code != 200:
+                log_llm_call("kb_vector_search", "ollama", query, "", 0, 0,
+                           (time.time() - start_time) * 1000, False, "Embedding failed")
                 return {'results': [], 'error': 'Embedding generation failed'}
 
             embedding = embed_resp.json().get('embedding', [])
@@ -153,9 +205,24 @@ async def kb_vector_search(
             )
 
             if search_resp.status_code != 200:
+                log_llm_call("kb_vector_search", "qdrant", query, "", 0, 0,
+                           (time.time() - start_time) * 1000, False, "Search failed")
                 return {'results': [], 'error': 'Vector search failed'}
 
             results = search_resp.json()
+            latency_ms = (time.time() - start_time) * 1000
+
+            # Log successful search
+            log_llm_call(
+                tool_name="kb_vector_search",
+                provider="qdrant",
+                prompt=query,
+                response=f"{len(results)} results",
+                latency_ms=latency_ms,
+                success=True,
+                metadata={"collection": collection, "limit": limit, "threshold": threshold}
+            )
+
             return {
                 'results': results,
                 'query': query,
@@ -164,6 +231,7 @@ async def kb_vector_search(
             }
 
     except Exception as e:
+        log_llm_call("kb_vector_search", "qdrant", query, "", 0, 0, 0, False, str(e))
         return {'results': [], 'error': str(e)}
 
 

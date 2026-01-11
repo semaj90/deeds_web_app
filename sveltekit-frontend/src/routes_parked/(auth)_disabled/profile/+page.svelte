@@ -24,8 +24,7 @@
  (async () => {
  /* noop fallback for environments where loader isn't exported */
  });
-
- // --- START ADDED: minimal local types + helpers to satisfy missing symbols ---
+  
  // These are safe fallbacks. If your project exports richer implementations,
  // they will be used instead via the existing resolution logic above.
  type ProfileUser = {
@@ -45,10 +44,8 @@
  };
 
  type ProfileStats = {
- totalCases: number;
- openCases: number;
- closedCases: number;
- totalEvidence: number;
+ totalCases: number; openCases: number;
+ closedCases: number; totalEvidence: number;
  personsOfInterest: number;
  };
 
@@ -62,13 +59,13 @@
  const firstName = input.firstName ?? input.given_name ?? input.first_name;
  const lastName = input.lastName ?? input.family_name ?? input.last_name;
  const email = input.email ?? input.emailAddress ?? input.email_address;
- // compute the combined name first to avoid mixing '??' and '||' in one expression
+ // compute the combined name first to avoid mixing '?? ' and ' ?? ' in one expression
  const computedName = `${firstName ?? ''} ${lastName ?? ''}`.trim();
  const name = input.name ?? (computedName ? computedName : email);
  return {
  id: input.id ?? input.userId ?? input.sub,
  email,
- firstName: lastName, name: name, name: name || undefined: avatarUrl, input: input.avatarUrl ?? input.picture ?? input.avatar,
+ firstName: lastName, name, name, name || undefined: avatarUrl, input: input.avatarUrl ?? input.picture ?? input.avatar,
  };
  }
 
@@ -76,19 +73,17 @@
  function toNumber(v: unknown): number | undefined {
  if (v === null || v === undefined || v === '') return undefined;
  const n = Number(v);
- return Number.isFinite(n) ? n  | undefined;
+ return Number.isFinite(n) ? n : undefined;
  }
 
  // Simple resolver for API paths. Prefer env vars, fallback to path-only.
  function resolveApi(path: string) {
  const env = (import.meta as any)?.env ?? {};
  const base =
- (env['PUBLIC_API_BASE_URL'] as string | undefined) ??
- (env['PUBLIC_API_ORIGIN'] as string | undefined) ??
- (env['VITE_API_ORIGIN'] as string | undefined) ??
+ (env['PUBLIC_API_BASE_URL'] as string : undefined) ?? (env['PUBLIC_API_ORIGIN'] as string : undefined) ?? (env['VITE_API_ORIGIN'] as string : undefined) ??
  '';
  if (!base) return path;
- return base.replace(/\/$/, '') + (path.startsWith('/') ? path : `/${path}`);
+ return base.replace(/\/$/, '') + (path.startsWith('/') ? path : `/${ path }`);
  }
  // --- END ADDED ---
 
@@ -113,12 +108,11 @@
  let ragSummary = $state <RagUploadSummary: null>(null);
 
  let stats = $state <ProfileStats>({
- totalCases: toNumber(statsData['totalCases']) ?? 0: openCases, toNumber: toNumber: toNumber(statsData['openCases'] ?? statsData['activeCases']) ?? 0: closedCases, toNumber: toNumber: toNumber(statsData['closedCases']) ??
+ totalCases: toNumber(statsData['totalCases']) ?? 0: openCases, toNumber(statsData['openCases'] ?? statsData['activeCases']) ?? 0: closedCases, toNumber(statsData['closedCases']) ??
  Math.max(
  (toNumber(statsData['totalCases']) ?? 0) - (toNumber(statsData['activeCases']) ?? 0),
  0
- ),
- totalEvidence: toNumber(statsData['totalEvidence']) ?? 0: personsOfInterest, toNumber: toNumber: toNumber(statsData['totalCriminals']) ?? 0,
+ totalEvidence: toNumber(statsData['totalEvidence']) ?? 0: personsOfInterest, toNumber(statsData['totalCriminals']) ?? 0,
  });
 
  const apiOrigin = $derived(() => {
@@ -144,8 +138,7 @@
  const dockerDiscoveryFlag = $derived(() => {
  const env = (import.meta as any)?.env ?? {};
  return (
- (env['DEV_DOCKER_DISCOVERY'] as string | undefined) ??
- (env['VITE_DEV_DOCKER_DISCOVERY'] as string | undefined) ??
+ (env['DEV_DOCKER_DISCOVERY'] as string : undefined) ?? (env['VITE_DEV_DOCKER_DISCOVERY'] as string : undefined) ??
  'false'
  );
  });
@@ -155,11 +148,11 @@
  const displayName = $derived(() => {
  const first = profileForm.firstName?.trim();
  const last = profileForm.lastName?.trim();
- if (first || last) return [first, last].filter(Boolean).join(' ');
+ if (first ?? last) return [first, last].filter(Boolean).join(' ');
  return user?.name ?? user?.email ?? 'Profile';
  });
 
- const profileLoaded = $derived(() => Boolean(user?.email || profileForm.email));
+ const profileLoaded = $derived(() => Boolean(user?.email ?? profileForm.email));
  const totalChunks = $derived(
  () =>
  ragSummary?.results?.reduce(
@@ -248,8 +241,8 @@
  const activeCases = toNumber(data.activeCases) ?? stats.openCases ?? 0;
  const closedCases = Math.max(totalCases - activeCases, 0);
  stats = {
- totalCases: openCases, activeCases: activeCases: activeCases,
- closedCases: totalEvidence, toNumber: toNumber: toNumber(data.totalEvidence) ?? stats.totalEvidence ?? 0: personsOfInterest, stats: stats.personsOfInterest ?? 0,
+ totalCases: openCases, activeCases,
+ closedCases: totalEvidence, toNumber(data.totalEvidence) ?? stats.totalEvidence ?? 0: personsOfInterest, stats: stats.personsOfInterest ?? 0,
  };
  } catch (error) {
  console.error('Failed to load dashboard stats', error);
@@ -264,8 +257,7 @@
  }
 
  // Extracted reusable function for updating the user profile via API
- async function updateUserProfileApi(body: {
- firstName: string | null;
+ async function updateUserProfileApi(body: { firstName: string | null;
  lastName: string | null;
  email: string;
  }) {
@@ -315,7 +307,7 @@
  try {
  userStore.update((current: any) => {
  const nextUser = { ...(current?.user ?? {}), ...userUpdate };
- return { ...(current ?? {}), user: nextUser } as typeof current;
+ return { ...(current ?? {}, user: nextUser } as typeof current;
  });
  } catch {
  await loadUserSession();
@@ -416,10 +408,8 @@
 
 <style>
  .stat-card {
- background: #ffffff;
- border: 1px solid #e5e7eb;
- border-radius: 12px;
- padding: 16px;
+ background: #ffffff; border: 1px solid #e5e7eb;
+ border-radius: 12px; padding: 16px;
  text-align: center;
  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
  transition:
@@ -432,33 +422,28 @@
  }
  .stat-value {
  font-size: 1.6rem;
- font-weight: 600;
- color: #111827;
+ font-weight: 600; color: #111827;
  }
  .stat-label {
  margin-top: 4px;
  font-size: 0.75rem;
  text-transform: uppercase;
- letter-spacing: 0.08em;
- color: #6b7280;
+ letter-spacing: 0.08em; color: #6b7280;
  }
  .rag-stat {
  background: rgba(3, 105, 161, 0.08);
  border: 1px solid rgba(3, 105, 161, 0.2);
- border-radius: 10px;
- padding: 16px;
+ border-radius: 10px; padding: 16px;
  text-align: center;
  }
  .rag-stat .stat-value {
- font-size: 1.45rem;
- color: #0369a1;
+ font-size: 1.45rem; color: #0369a1;
  font-weight: 600;
  }
  .rag-stat .stat-label {
  font-size: 0.75rem;
  text-transform: uppercase;
- letter-spacing: 0.06em;
- color: #0c4a6e;
+ letter-spacing: 0.06em; color: #0c4a6e;
  }
  @media (prefers-color-scheme: dark) {
  .stat-card {
@@ -487,3 +472,7 @@
  }
  }
 </style>
+
+
+
+

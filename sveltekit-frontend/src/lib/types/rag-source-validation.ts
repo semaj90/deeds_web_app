@@ -54,20 +54,17 @@ export interface RetrieveCandidatesRequest {
 }
 
 export interface RetrievedChunk {
-  chunk_id: string;
-  text: string;
+  chunk_id: string; text: string;
   snippet: string;
 
   // Scoring
   score: number;
   bm25_score?: number;
   dense_score?: number;
-  rerank_score?: number;
-  confidence: ConfidenceLevel;
+  rerank_score?: number; confidence: ConfidenceLevel;
 
   // Source metadata
-  source_type: SourceType;
-  source_id: string;
+  source_type: SourceType; source_id: string;
   source_title: string;
   source_url?: string;
 
@@ -76,31 +73,20 @@ export interface RetrievedChunk {
   section?: string;
 
   // Multimodal
-  has_image: boolean;
-  has_table: boolean;
+  has_image: boolean; has_table: boolean;
   seal_confidence?: number;
 
   // KAG graph context
-  related_entities: string[];
-  graph_neighbors: string[];
+  related_entities: string[]; graph_neighbors: string[];
 }
 
 export interface RetrieveCandidatesResponse {
-  query_id: string;
-  query: string;
-  case_id?: string;
-
-  chunks: RetrievedChunk[];
-  total_found: number;
-
-  search_time_ms: number;
+  query_id: string; query: string;
+  case_id?: string; chunks: RetrievedChunk[];
+  total_found: number; search_time_ms: number;
   embedding_time_ms: number;
-  rerank_time_ms?: number;
-
-  embedding_model: string;
-  rerank_model?: string;
-
-  timestamp: string;
+  rerank_time_ms?: number; embedding_model: string;
+  rerank_model?: string; timestamp: string;
 }
 
 // =============================================================================
@@ -108,34 +94,26 @@ export interface RetrieveCandidatesResponse {
 // =============================================================================
 
 export interface SourceValidation {
-  chunk_id: string;
-  status: ValidationStatus;
+  chunk_id: string; status: ValidationStatus;
   reason?: string;
   relevance_rating?: number; // 1-5
   trust_rating?: number;     // 1-5
 }
 
 export interface ValidateSourcesRequest {
-  query_id: string;
-  case_id: string;
+  query_id: string; case_id: string;
   validations: SourceValidation[];
   user_id?: string;
   notes?: string;
 }
 
 export interface ApprovedContext {
-  context_id: string;
-  query_id: string;
-  case_id: string;
-
-  approved_chunks: RetrievedChunk[];
-  rejected_chunk_ids: string[];
-
-  combined_context: string;
+  context_id: string; query_id: string;
+  case_id: string; approved_chunks: RetrievedChunk[];
+  rejected_chunk_ids: string[]; combined_context: string;
   total_tokens: number;
 
-  validated_by?: string;
-  validated_at: string;
+  validated_by?: string; validated_at: string;
 
   canvas_pin?: Record<string, unknown>;
 }
@@ -145,8 +123,7 @@ export interface ApprovedContext {
 // =============================================================================
 
 export interface AnswerRequest {
-  context_id: string;
-  query: string;
+  context_id: string; query: string;
   case_id: string;
 
   max_tokens?: number;
@@ -159,40 +136,27 @@ export interface AnswerRequest {
 }
 
 export interface Citation {
-  citation_id: string;
-  chunk_id: string;
+  citation_id: string; chunk_id: string;
   source_title: string;
   source_url?: string;
-  page_num?: number;
-  quote: string;
+  page_num?: number; quote: string;
 }
 
 export interface ActionItem {
-  action_id: string;
-  description: string;
+  action_id: string; description: string;
   priority: 'high' | 'medium' | 'low';
   due_date?: string;
-  assigned_to?: string;
-  related_chunks: string[];
+  assigned_to?: string; related_chunks: string[];
 }
 
 export interface AnswerWithCitations {
-  answer_id: string;
-  context_id: string;
-  case_id: string;
+  answer_id: string; context_id: string;
+  case_id: string; answer: string;
+  summary: string; citations: Citation[];
+  action_items: ActionItem[]; model: string;
+  tokens_used: number; generation_time_ms: number;
 
-  answer: string;
-  summary: string;
-
-  citations: Citation[];
-  action_items: ActionItem[];
-
-  model: string;
-  tokens_used: number;
-  generation_time_ms: number;
-
-  answer_confidence: number;
-  grounding_score: number;
+  answer_confidence: number; grounding_score: number;
 
   timestamp: string;
 }
@@ -202,32 +166,22 @@ export interface AnswerWithCitations {
 // =============================================================================
 
 export interface KAGEntity {
-  entity_id: string;
-  name: string;
-  entity_type: string;
-  properties: Record<string, unknown>;
+  entity_id: string; name: string;
+  entity_type: string; properties: Record<string, unknown>;
   source_chunk_ids: string[];
 }
 
 export interface KAGRelation {
-  relation_id: string;
-  source_entity_id: string;
-  target_entity_id: string;
-  relation_type: string;
-  confidence: number;
-  properties: Record<string, unknown>;
+  relation_id: string; source_entity_id: string;
+  target_entity_id: string; relation_type: string;
+  confidence: number; properties: Record<string, unknown>;
   source_chunk_ids: string[];
 }
 
 export interface KnowledgeGraphUpdate {
-  update_id: string;
-  answer_id: string;
-  case_id: string;
-
-  entities: KAGEntity[];
-  relations: KAGRelation[];
-
-  claims_based_on: string[];
+  update_id: string; answer_id: string;
+  case_id: string; entities: KAGEntity[];
+  relations: KAGRelation[]; claims_based_on: string[];
 
   timestamp: string;
 }
@@ -237,49 +191,32 @@ export interface KnowledgeGraphUpdate {
 // =============================================================================
 
 export interface CanvasPin {
-  pin_id: string;
-  case_id: string;
+  pin_id: string; case_id: string;
 
-  title: string;
-  content: string;
+  title: string; content: string;
   pin_type: 'evidence' | 'research' | 'note' | 'action' | 'source';
 
-  source_query_id?: string;
-  source_chunk_ids: string[];
-  source_answer_id?: string;
+  source_query_id?: string; source_chunk_ids: string[];
+  source_answer_id?: string; x: number;
+  y: number; width: number;
+  height: number; color: string;
 
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  color: string;
-
-  connected_to: string[];
-
-  created_at: string;
+  connected_to: string[]; created_at: string;
   created_by?: string;
-  updated_at?: string;
-
-  is_validated: boolean;
+  updated_at?: string; is_validated: boolean;
   validation_status: ValidationStatus;
 }
 
 export interface CaseCanvasState {
-  case_id: string;
-  canvas_id: string;
+  case_id: string; canvas_id: string;
 
-  pins: CanvasPin[];
+  pins: CanvasPin[]; zoom: number;
+  pan_x: number; pan_y: number;
 
-  zoom: number;
-  pan_x: number;
-  pan_y: number;
-
-  queries: string[];
-  answers: string[];
+  queries: string[]; answers: string[];
 
   created_at: string;
-  updated_at?: string;
-  version: number;
+  updated_at?: string; version: number;
 }
 
 // =============================================================================
@@ -289,15 +226,12 @@ export interface CaseCanvasState {
 export interface APIResponse<T> {
   success: boolean;
   data?: T;
-  error?: string;
-  timestamp: string;
+  error?: string; timestamp: string;
 }
 
 export interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  page_size: number;
+  items: T[]; total: number;
+  page: number; page_size: number;
   has_more: boolean;
 }
 
@@ -385,7 +319,7 @@ export async function updateKnowledgeGraph(
  * Get case canvas state
  */
 export async function getCaseCanvas(caseId: string): Promise<CaseCanvasState> {
-  const response = await fetch(`/api/canvas/${caseId}`);
+  const response = await fetch(`/api/canvas/${ caseId }`);
 
   if (!response.ok) {
     throw new Error(`Failed to get canvas: ${response.statusText}`);
@@ -401,7 +335,7 @@ export async function addCanvasPin(
   caseId: string,
   pin: Omit<CanvasPin, 'pin_id' | 'case_id' | 'created_at'>
 ): Promise<CanvasPin> {
-  const response = await fetch(`/api/canvas/${caseId}/pin`, {
+  const response = await fetch(`/api/canvas/${ caseId }/pin`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(pin),
@@ -431,8 +365,7 @@ export async function ragWithSourceValidation(
     use_hybrid: true,
     use_rerank: true,
   });
-
-  // Step 2: Human-in-the-loop validation
+  
   const approvedIds = await onCandidates(searchResult.chunks);
 
   const validations = searchResult.chunks.map(chunk => ({
@@ -446,8 +379,7 @@ export async function ragWithSourceValidation(
     validations,
     user_id: userId,
   });
-
-  // Step 3: Generate answer
+  
   const answer = await generateAnswer({
     context_id: context.context_id,
     query,
@@ -455,9 +387,11 @@ export async function ragWithSourceValidation(
     include_citations: true,
     include_todos: true,
   });
-
-  // Step 4: Update knowledge graph (async, don't wait)
+  
   updateKnowledgeGraph(answer.answer_id).catch(console.error);
 
   return answer;
 }
+
+
+

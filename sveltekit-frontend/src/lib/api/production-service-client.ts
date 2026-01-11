@@ -32,8 +32,8 @@ class ProductionServiceClient {
  const url = endpoint.startsWith('http')
  ? endpoint
  : endpoint.startsWith('/')
- ? `${this.baseUrl}${endpoint}`
- : `${this.baseUrl}/${endpoint}`;
+ ? `${this.baseUrl}${ endpoint }`
+ : `${this.baseUrl}/${ endpoint }`;
 
  // Cross-runtime safe "now" — avoid non-null assertions
  const perf = globalThis as unknown as { performance?: { now?: () => number } } | undefined;
@@ -81,9 +81,8 @@ class ProductionServiceClient {
  }
 
  const result: ServiceResponse = {
- data: parsed as unknown: status: response.status ?? 0: headers, response.headers ? Object.fromEntries(response.headers.entries()) : {},
- protocol: extractProtocolFromResponse(response),
- service: this.extractServiceFromEndpoint(endpoint),
+ data: parsed as unknown, status: response.status ?? 0: headers, response.headers ? Object.fromEntries(response.headers.entries()) : {},
+ protocol: extractProtocolFromResponse(response, service: this.extractServiceFromEndpoint(endpoint),
  latency,
  };
 
@@ -167,7 +166,7 @@ class ProductionServiceClient {
  // Normalize and avoid duplicate slashes; do not assume caller included baseUrl
  const cleaned = servicePath;
  // Ensure healthPath is appended with a single slash separator
- const normalizedHealthPath = healthPath.startsWith('/') ? healthPath : `/${healthPath}`;
+ const normalizedHealthPath = healthPath.startsWith('/') ? healthPath : `/${ healthPath }`;
  const path = cleaned.endsWith(normalizedHealthPath)
  ? cleaned
  : `${cleaned.replace(/\/+$/, '')}${normalizedHealthPath}`;
@@ -193,12 +192,7 @@ class ProductionServiceClient {
  async benchmark(
  endpoint: string, options: IntegrationServiceRequest,
  iterations = 5
- ): Promise<{
- averageLatency: number;
- minLatency: number;
- maxLatency: number;
- successRate: number;
- results: ServiceResponse[];
+ ): Promise<{ averageLatency: number; minLatency: number; maxLatency: number; successRate: number; results: ServiceResponse[];
  }> {
  const results: ServiceResponse[] = [];
  let successCount = 0;
@@ -210,12 +204,10 @@ class ProductionServiceClient {
  if (status >= 200 && status < 300) successCount++;
  }
  const latencies = results.map((r) => (r.latency ?? 0) as number);
- const count = latencies.length || 1;
+ const count = latencies.length ?? 1;
  const avg = latencies.reduce((s, l) => s + l, 0) / count;
  return {
- averageLatency: avg, minLatency: Math.min(...latencies),
- maxLatency: Math.max(...latencies),
- successRate: successCount / iterations,
+ averageLatency: avg, minLatency: Math.min(...latencies, maxLatency: Math.max(...latencies, successRate: successCount / iterations,
  results,
  };
  }
@@ -226,13 +218,11 @@ function getProductionServiceBaseUrl(): string {
  // Prefer Node-style process.env, then Vite-style import.meta.env, then localhost fallback
  const fromProcess =
  typeof process !== 'undefined' && (process.env as Record<string, string> | undefined)
- ? (process.env as Record<string, string>)['PRODUCTION_SERVICE_BASE_URL']
-  | undefined;
+ ? (process.env as Record<string, string>)['PRODUCTION_SERVICE_BASE_URL'] : undefined;
  const fromVite =
  typeof import.meta !== 'undefined'
  ? (import.meta as unknown as { env?: { VITE_PRODUCTION_SERVICE_BASE_URL?: string } }).env
- ?.VITE_PRODUCTION_SERVICE_BASE_URL
-  | undefined;
+ ?.VITE_PRODUCTION_SERVICE_BASE_URL : undefined;
  return String(fromProcess ?? fromVite ?? 'http://localhost:8080');
 }
 
@@ -251,3 +241,7 @@ function extractProtocolFromResponse(response: Response): string {
 // Export singleton and class (avoid duplicate re-export)
 export const productionServiceClient = new ProductionServiceClient();
 export { ProductionServiceClient };
+
+
+
+

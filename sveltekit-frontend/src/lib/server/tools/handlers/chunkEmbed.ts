@@ -16,18 +16,14 @@ const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
 
 interface ChunkEmbedResult {
-  chunks_created: number;
-  embeddings_generated: number;
-  stored_in_qdrant: number;
-  failed_chunks: number;
+  chunks_created: number; embeddings_generated: number;
+  stored_in_qdrant: number; failed_chunks: number;
 }
 
 interface Chunk {
-  id: string;
-  content: string;
+  id: string; content: string;
   metadata: Record<string, unknown>;
-  start_idx: number;
-  end_idx: number;
+  start_idx: number; end_idx: number;
 }
 
 function chunkText(
@@ -47,8 +43,7 @@ function chunkText(
       if (currentChunk.length + sentence.length > chunkSize && currentChunk) {
         chunks.push({
           id: `chunk_${chunks.length}`,
-          content: currentChunk.trim(),
-          metadata: {},
+          content: currentChunk.trim(metadata: {},
           start_idx: startIdx,
           end_idx: startIdx + currentChunk.length
         });
@@ -62,8 +57,7 @@ function chunkText(
     if (currentChunk.trim()) {
       chunks.push({
         id: `chunk_${chunks.length}`,
-        content: currentChunk.trim(),
-        metadata: {},
+        content: currentChunk.trim(metadata: {},
         start_idx: startIdx,
         end_idx: content.length
       });
@@ -153,8 +147,7 @@ async function chunkEmbedHandler(request: ChunkEmbedRequest): Promise<ToolResult
           allPoints.push({
             id: `${doc.id}_${chunk.id}`,
             vector: embedding,
-            payload: {
-              document_id: doc.id,
+            payload: { document_id: doc.id,
               content: chunk.content,
               start_idx: chunk.start_idx,
               end_idx: chunk.end_idx,
@@ -181,10 +174,9 @@ async function chunkEmbedHandler(request: ChunkEmbedRequest): Promise<ToolResult
 
   return {
     success: true,
-    run_id: request.run_id,
+    run_id, request.run_id,
     tool: 'chunk_embed',
-    data: {
-      chunks_created: chunksCreated,
+    data: { chunks_created: chunksCreated,
       embeddings_generated: embeddingsGenerated,
       stored_in_qdrant: storedInQdrant,
       failed_chunks: failedChunks
@@ -204,3 +196,7 @@ toolRegistry.register({
 });
 
 export { chunkEmbedHandler };
+
+
+
+

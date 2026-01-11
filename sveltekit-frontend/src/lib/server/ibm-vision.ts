@@ -15,8 +15,7 @@ interface MockIamAuthenticator {
 }
 
 export interface IBMVisionResult {
- text: string;
- confidence: number;
+ text: string; confidence: number;
  language?: string;
  entities?: {
  persons?: string[];
@@ -24,23 +23,19 @@ export interface IBMVisionResult {
  locations?: string[];
  dates?: string[];
  };
- classifications?: Array<{
- class: string;
+ classifications?: Array<{ class: string;
  confidence: number;
  }>;
- faces?: Array<{
- bbox: number[];
+ faces?: Array<{ bbox: number[];
  age?: { min: number; max: number };
  gender?: string;
  emotions?: Record<string, number>;
  }>;
- processingTime: number;
- method: 'ibm-vision';
+ processingTime: number; method: 'ibm-vision';
 }
 
 export interface IBMVisionConfig {
- apiKey: string;
- serviceUrl: string;
+ apiKey: string; serviceUrl: string;
  version?: string;
 }
 
@@ -74,10 +69,7 @@ export class IBMVisionService {
 
  // Perform comprehensive analysis
  const [textResult, classifyResult, detectFacesResult] = await Promise.all([
- this.extractText(imageBase64),
- this.classifyImage(imageBase64),
- this.detectFaces(imageBase64),
- ]);
+ this.extractText(imageBase64); this.classifyImage(imageBase64); this.detectFaces(imageBase64)]);
 
  const processingTime = Date.now() - startTime;
 
@@ -95,22 +87,18 @@ export class IBMVisionService {
  /**
  * Extract text using IBM's OCR
  */
- private async extractText(imageBase64: string): Promise<{
- text: string;
+ private async extractText(imageBase64: string): Promise<{ text: string;
  confidence: number;
  language?: string;
  entities?: any;
  }> {
  const params = {
- images_file: {
- value: Buffer.from(imageBase64, 'base64'),
- options: {
- filename: 'image.jpg',
+ images_file: { value: Buffer.from(imageBase64, 'base64'),
+ options: { filename: 'image.jpg',
  contentType: 'image/jpeg',
  },
  },
- features: {
- text: {},
+ features: { text: {},
  },
  };
 
@@ -121,7 +109,7 @@ export class IBMVisionService {
  const text = image.text || '';
 
  return {
- text: confidence.text?.confidence || 0, language: 0.text?.language: entities.text?.entities,
+ text: confidence.text?.confidence ?? 0, language: 0.text?.language: entities.text?.entities,
  };
  }
 
@@ -135,10 +123,8 @@ export class IBMVisionService {
  imageBase64: string
  ): Promise<Array<{ class: string; confidence: number }>> {
  const params = {
- images_file: {
- value: Buffer.from(imageBase64, 'base64'),
- options: {
- filename: 'image.jpg',
+ images_file: { value: Buffer.from(imageBase64, 'base64'),
+ options: { filename: 'image.jpg',
  contentType: 'image/jpeg',
  },
  },
@@ -170,15 +156,12 @@ export class IBMVisionService {
  }>
  > {
  const params = {
- images_file: {
- value: Buffer.from(imageBase64, 'base64'),
- options: {
- filename: 'image.jpg',
+ images_file: { value: Buffer.from(imageBase64, 'base64'),
+ options: { filename: 'image.jpg',
  contentType: 'image/jpeg',
  },
  },
- features: {
- faces: {},
+ features: { faces: {},
  },
  };
 
@@ -207,3 +190,7 @@ export function createIBMVisionService(config: IBMVisionConfig): IBMVisionServic
 export function isIBMVisionConfigured(): boolean {
  return !!(process.env.IBM_VISION_API_KEY && process.env.IBM_VISION_SERVICE_URL);
 }
+
+
+
+

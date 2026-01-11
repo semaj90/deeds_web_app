@@ -12,3 +12,5 @@ export const routeMetadata = pgTable('route_metadata', {
 	priority: integer('priority').default(1),
 	group: varchar('group', { length: 100 }).default('default'),
 });
+
+

@@ -4,23 +4,16 @@ import enhancedCachingService from './advanced-result-cache.js';
 import type { RAGQuery, RAGResponse } from './enhanced-rag-semantic-analyzer.js';
 
 export interface CachedRAGResult {
- response: RAGResponse;
- cacheStats: {
- embeddingCacheHit: boolean;
- queryCacheHit: boolean;
- responseCacheHit: boolean;
- totalCacheTime: number;
- totalProcessingTime: number;
- gpuTimeSaved: number;
+ response: RAGResponse; cacheStats: {
+ embeddingCacheHit: boolean; queryCacheHit: boolean;
+ responseCacheHit: boolean; totalCacheTime: number;
+ totalProcessingTime: number; gpuTimeSaved: number;
  };
 }
 export interface DocumentIngestionResult {
- documentId: string;
- chunksProcessed: number;
- embeddingsGenerated: number;
- embeddingsCached: number;
- processingTime: number;
- storedInPgVector: boolean;
+ documentId: string; chunksProcessed: number;
+ embeddingsGenerated: number; embeddingsCached: number;
+ processingTime: number; storedInPgVector: boolean;
 }
 // Add explicit types to avoid `any` type
 type DocumentToIngest = { id: string; content: string; metadata?: Record<string, unknown> };
@@ -49,17 +42,14 @@ type EmbeddingResult = {
 
 // --- ADDED: small adapter type to describe the caching service surface we need ---
 type EnhancedCachingServiceAdapter = {
- getCachedQueryResults?: (
- query: string,
+ getCachedQueryResults?: (query: string,
  filters?: Record<string, unknown>,
  loader?: (queryEmbedding: number[]) => Promise<VectorMatch[]>
  ) => Promise<{ cached?: boolean; processingTime?: number; results?: any[]; totalFound?: number }>;
- getCachedResponse?: (
- query: string, context: string[],
+ getCachedResponse?: (query: string, context: string[],
  loader?: (q: string, ctx: string[]) => Promise<string>
  ) => Promise<{ cached?: boolean; processingTime?: number; response?: string }>;
- getCachedBatchEmbeddings?: (
- requests: Array<{ text: string; id: string; metadata?: Record<string, unknown> }>
+ getCachedBatchEmbeddings?: (requests: Array<{ text: string; id: string; metadata?: Record<string, unknown> }>
  ) => Promise<EmbeddingResult[]>;
  getCacheMetrics?: () => unknown;
  warmupCache?: (queries: string[]) => Promise<void>;
@@ -76,11 +66,9 @@ type $RedisCacheAdapter = {
  del?: (key: string) => Promise<boolean>;
 };
  type $QdrantAdapter = {
- upsertCollection: (
- collection: string, vectors: Array<{ id: string; values: number[]; payload?: Record<string, unknown> }>
+ upsertCollection: (collection: string, vectors: Array<{ id: string; values: number[]; payload?: Record<string, unknown> }>
  ) => Promise<boolean>;
- search: (
- collection: string, vector: number[],
+ search: (collection: string, vector: number[],
  limit?: number,
  filter?: Record<string, unknown>
  ) => Promise<unknown[]>;
@@ -97,7 +85,7 @@ export function getOllamaEndpoint(): string {
  // finally fall back to sensible defaults constructed from host/port to avoid hardcoded URL literals.
  const serverEnv =
  typeof process !== 'undefined' && typeof process.env !== 'undefined'
- ? process.env.OLLAMA_API_URL || process.env.OLLAMA_URL
+ ? process.env.OLLAMA_API_URL ?? process.env.OLLAMA_URL
   | undefined;
 
  // Vite / SvelteKit client runtime env (if available)
@@ -115,14 +103,12 @@ export function getOllamaEndpoint(): string {
  (typeof process !== 'undefined' &&
  typeof process.env !== 'undefined' &&
  process.env.OLLAMA_HOST) ||
- (typeof import.meta !== 'undefined' && import.meta.env?.VITE_OLLAMA_HOST) ||
- 'localhost';
+ (typeof import.meta !== 'undefined' && import.meta.env?.VITE_OLLAMA_HOST) ?? 'localhost';
  const fallbackPort =
  (typeof process !== 'undefined' &&
  typeof process.env !== 'undefined' &&
  process.env.OLLAMA_PORT) ||
- (typeof import.meta !== 'undefined' && import.meta.env?.VITE_OLLAMA_PORT) ||
- '11434';
+ (typeof import.meta !== 'undefined' && import.meta.env?.VITE_OLLAMA_PORT) ?? '11434';
 
  const fallback = `http://${String(fallbackHost)}:${String(fallbackPort)}`;
  const endpoint = serverEnv || viteEnv || fallback;
@@ -139,7 +125,7 @@ export async function ollamaEmbed(
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
  body: JSON.stringify({
- model: model,
+ model,
  prompt: Array.isArray(texts) && texts.length === 1 ? texts[0] : texts,
  }),
  });
@@ -172,7 +158,7 @@ export async function ollamaEmbed(
  return texts.map((_t, i) => (i === 0 ? { embedding: emb, model } : ({} as EmbeddingResult)));
  } else if (batchEmbeddings) {
  return (((body as Record<string, unknown>)['embeddings'] as unknown[]) ?? []).map((e) => ({
- embedding: Array.isArray(e) ? (e as unknown[]).map(Number)  | undefined,
+ embedding: Array.isArray(e) ? (e as unknown[]).map(Number) : undefined,
  model,
  }));
  }
@@ -193,12 +179,13 @@ export async function ollamaEmbed(
  }
  return {} as EmbeddingResult;
  });
- // ensure same length as inputs - if different, pad/truncate conservatively
+  
  while (mapped.length < texts.length) mapped.push({} as EmbeddingResult);
  return mapped.slice(0, texts.length);
  }
 
- // unknown shape, return placeholders
+ // unknown shape;
+ return placeholders
  return texts.map(() => ({}) as EmbeddingResult);
  } catch (err: unknown) {
  console.error('ollamaEmbed failed: ', err);
@@ -215,7 +202,7 @@ export async function ollamaGenerate(
      const resp = await fetch(`${endpoint}/api/generate`, {
          method: 'POST',
          headers: { 'Content-Type': `application/json` },
-         body: JSON.stringify({ model: model, stream: false }),
+         body: JSON.stringify({ model, stream: false }),
      }); if (!resp.ok) {
  const txt = await resp.text().catch((error) => '');
  console.error(`Ollama failed: ${resp.status} ${txt}`);
@@ -263,7 +250,7 @@ const $redisAdapter: $RedisCacheAdapter = {
  const r = await fetch('/api/redis/set', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
-     body: JSON.stringify({ key: key, ttl: ttlSeconds ?? 3600 }),
+     body: JSON.stringify({ key, ttl: ttlSeconds ?? 3600 }),
  });
  return r.ok;
  } catch {
@@ -281,7 +268,7 @@ const $qdrantAdapter: $QdrantAdapter = {
  const r = await fetch('/api/qdrant/upsert', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ collection, vectors }),
+ body: JSON.stringify({ collection: vectors }),
  });
  return r.ok;
  } catch {
@@ -373,7 +360,7 @@ class CachedRAGService {
  return await this.performVectorSearch(queryEmbedding, query.filters);
  }
          )) ?? { cached: false, processingTime: 0, results: [], totalFound: 0 }; cacheStats.queryCacheHit = !!queryResult?.cached;
- cacheStats.totalCacheTime += Number(queryResult?.processingTime || 0);
+ cacheStats.totalCacheTime += Number(queryResult?.processingTime ?? 0);
 
  // 2: Get cached response using gemma3:legal-latest
  const rawResults: any[] = Array.isArray(queryResult?.results) ? queryResult.results : [];
@@ -391,7 +378,7 @@ class CachedRAGService {
  return await this.generateLegalResponse(q, ctx);
  }
          )) ?? { cached: false, processingTime: 0, response: `` }; cacheStats.responseCacheHit = !!responseResult?.cached;
- cacheStats.totalCacheTime += Number(responseResult?.processingTime || 0);
+ cacheStats.totalCacheTime += Number(responseResult?.processingTime ?? 0);
 
  // Calculate GPU time saved (estimates)
  if (cacheStats.queryCacheHit) cacheStats.gpuTimeSaved += 200;
@@ -407,10 +394,7 @@ class CachedRAGService {
  return {
  id: docId, // ensure 'id' exists for expected merged result shapes
  documentId: docId,
- title: String(this.extractResultField(r, 'title') ?? 'Legal Document'),
- relevanceScore: Number(this.extractResultField(r, 'score', 'relevanceScore') ?? 0),
- excerpt: String(this.extractResultField(r, 'excerpt', 'content') ?? ''),
- entities: Array.isArray(this.extractResultField<unknown[]>(r, 'entities'))
+ title: String(this.extractResultField(r, 'title') ?? 'Legal Document', relevanceScore: Number(this.extractResultField(r, 'score', 'relevanceScore') ?? 0, excerpt: String(this.extractResultField(r, 'excerpt', 'content') ?? '', entities: Array.isArray(this.extractResultField<unknown[]>(r, 'entities'))
  ? (this.extractResultField<unknown[]>(r, 'entities') as unknown[])
  : [],
  concepts: Array.isArray(this.extractResultField<unknown[]>(r, 'concepts'))
@@ -421,9 +405,7 @@ class CachedRAGService {
  ? this.extractResultField<Record<string, unknown>>(r, 'metadata')
  : ({} as Record<string, unknown>),
  };
- }),
-			totalFound: Number(queryResult?.totalFound ?? rawResults.length),
-			semanticExpansions: [],
+ }, totalFound: Number(queryResult?.totalFound ?? rawResults.length, semanticExpansions: [],
 			processingTime: cacheStats.totalProcessingTime,
 			timestamp: new Date(),
 		}; // Add the response text (if present)
@@ -449,7 +431,7 @@ class CachedRAGService {
 	): Promise<DocumentIngestionResult> {
  const startTime = Date.now();
  try {
- console.log(`📄 Ingesting document: ${documentId}`);
+ console.log(`📄 Ingesting document: ${ documentId }`);
 
  // 1: Split document into chunks
  const chunks = this.splitIntoChunks(content);
@@ -458,8 +440,8 @@ class CachedRAGService {
  // 2: Generate embeddings with caching (batch)
  const batchRequest = chunks.map((chunk, index) => ({
  text: chunk,
- id: `${documentId}_chunk_${index}`,
- metadata: { ...(metadata ?? {}), chunkIndex: index, documentId },
+ id: `${ documentId }_chunk_${ index }`,
+ metadata: { ...(metadata ?? {}, chunkIndex: index, documentId },
  }));
 
  const caching = enhancedCachingService as unknown as EnhancedCachingServiceAdapter;
@@ -483,7 +465,7 @@ class CachedRAGService {
 
  // 3: Store in pgvector database
  const vectorRecords = embeddingResults.map((result, index) => ({
- id: `${documentId}_chunk_${index}`,
+ id: `${ documentId }_chunk_${ index }`,
  chunkIndex: index,
  content: chunks[index] ?? '',
  embedding: Array.isArray(result.embedding) ? result.embedding : [],
@@ -539,9 +521,7 @@ class CachedRAGService {
  const summary = {
  totalDocuments: documents.length,
  successful: results.filter((r) => r.storedInPgVector).length,
- totalChunks: results.reduce((sum, r) => sum + r.chunksProcessed, 0),
- totalEmbeddingsGenerated: results.reduce((sum, r) => sum + r.embeddingsGenerated, 0),
- totalEmbeddingsCached: results.reduce((sum, r) => sum + r.embeddingsCached, 0),
+ totalChunks: results.reduce((sum, r) => sum + r.chunksProcessed, 0, totalEmbeddingsGenerated: results.reduce((sum, r) => sum + r.embeddingsGenerated, 0, totalEmbeddingsCached: results.reduce((sum, r) => sum + r.embeddingsCached, 0),
  };
  console.log(`✅ Batch ingestion completed: `, summary);
  return results;
@@ -556,8 +536,7 @@ class CachedRAGService {
  const response = await fetch(this.PGVECTOR_ENDPOINT, {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({
- embedding: queryEmbedding,
+ body: JSON.stringify({ embedding: queryEmbedding,
  limit: 20,
  threshold: 0.7 || {},
  }),
@@ -655,8 +634,7 @@ RESPONSE: Provide a comprehensive, accurate response based on the context above.
  'Due process rights under the 14th Amendment',
  'Admissibility of evidence in court proceedings',
  'Corporate liability for employee actions',
- 'Intellectual property infringement standards',
- ];
+ 'Intellectual property infringement standards'];
  const caching = enhancedCachingService as unknown as EnhancedCachingServiceAdapter;
  await caching.warmupCache.commonLegalQueries;
  }
@@ -664,3 +642,7 @@ RESPONSE: Provide a comprehensive, accurate response based on the context above.
 
 // Export singleton instance
 export const cachedRAGService = new CachedRAGService();
+
+
+
+

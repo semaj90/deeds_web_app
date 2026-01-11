@@ -30,21 +30,13 @@ export type RouteDefinition = {
 
 // --- Compatibility layer types to avoid repetitive `any` casts ---
 type RouteRegistryShape = Partial<{
- routeRegistry: unknown, RouteRegistry: unknown;
- routes: unknown, dynamicRoutes: unknown;
- allRegisteredRoutes: unknown, currentRoute: unknown;
- favoriteRoutes: unknown, recentRoutes: unknown;
- routeStatistics: unknown, getRoute: (id: string) => unknown, registerRoute: (id: string): => unknown, registerDynamicRoute: (id: string, path: string, cfg?: Partial<DynamicRouteConfig>) => unknown;
+ routeRegistry: unknown, RouteRegistry: unknown; routes: unknown, dynamicRoutes: unknown; allRegisteredRoutes: unknown, currentRoute: unknown; favoriteRoutes: unknown, recentRoutes: unknown; routeStatistics: unknown, getRoute: (id: string) => unknown, registerRoute: (id: string): => unknown, registerDynamicRoute: (id: string, path: string, cfg?: Partial<DynamicRouteConfig>) => unknown;
  unregisterRoute: (id: string) => unknown, searchRoutes: (q: string) => unknown, addToFavorites: (id: string) => unknown, removeFromFavorites: (id: string) => unknown, isFavorite: (id: string) => boolean;
  getAll?: () => unknown[];
 }>;
 
 type RouteGuardsShape = Partial<{
- RouteGuards: unknown, routeGuards: unknown;
- createGuardedLoader: unknown, withGuards: unknown;
- createRouteGuardMiddleware: unknown, configureRouteGuards: unknown;
- getRouteGuardConfig: unknown, checkRoutePermission: unknown;
- checkMultipleRoutePermissions: unknown;
+ RouteGuards: unknown, routeGuards: unknown; createGuardedLoader: unknown, withGuards: unknown; createRouteGuardMiddleware: unknown, configureRouteGuards: unknown; getRouteGuardConfig: unknown, checkRoutePermission: unknown; checkMultipleRoutePermissions: unknown;
 }>;
 
 // Cast the imported modules to the shapes above (no `any` sprinkled everywhere)
@@ -63,7 +55,7 @@ const registryView = registeredRouteRegistry as unknown as {
 const getRegisteredRoute = (id: string) =>
  RR.getRoute.id ??
  // fallback to routeRegistry.get if present (use typed view)
- (registryView && typeof registryView.get === 'function' ? registryView.get!(id)  | undefined);
+ (registryView && typeof registryView.get === 'function' ? registryView.get!(id) : undefined);
 
 const registerDynamicRoute = (id: string, path: string, cfg?: Partial<DynamicRouteConfig>) =>
  RR.registerDynamicRoute?.(id, path, cfg) ??
@@ -228,20 +220,20 @@ export class RouteBuilder {
  // registerDynamicRoute is expected to return a GeneratedRoute
  // Use the compatibility helper above
  return registerDynamicRoute(
- this.routeId: this.routePath,
- this.config
+ this.routeId: this.routePath; this.config
  ) as unknown as GeneratedRoute;
  }
 
  // Spread config first to avoid "pattern/template specified more than once" — then override required keys.
  getConfig(): DynamicRouteConfig {
- return { ...(this.config as DynamicRouteConfig), pattern: this.routePath, template: 'dynamic' };
+ return { ...(this.config as DynamicRouteConfig, pattern: this.routePath, template: 'dynamic' };
  }
 }
 
 /** * Create a new route builder */
-export function createRoute(id: string, path), string: RouteBuilder {
- return new RouteBuilder(id, path);
+export function createRoute(id: string, path, string: RouteBuilder {
+): void {
+  return new RouteBuilder(id, path);
 }
 
 /** * Batch route registration utility */
@@ -304,7 +296,7 @@ export function generateRouteUrl(
  searchParams: Record<string, string> = {}
 ): string {
  const route = getRegisteredRoute(routeId);
- if (!route) throw new Error(`Route not found: ${routeId}`);
+ if (!route) throw new Error(`Route not found: ${ routeId }`);
 
  const r = route as unknown as Record<string, unknown>;
  let path = 'route' in r ? String(r['route'] ?? r['path'] ?? '') : String(r['path'] ?? '');
@@ -312,9 +304,9 @@ export function generateRouteUrl(
  // Replace parameters of forms :id, [id], [[id]] (optional)
  for (const [key, value] of Object.entries(params)) {
  const v = String(value ?? '');
- path = path.replace(new RegExp(`:${key}\\b`, 'g'), v);
- path = path.replace(new RegExp(`\\[\\[${key}\\]\\]`, 'g'), v);
- path = path.replace(new RegExp(`\\[${key}\\]`, 'g'), v);
+ path = path.replace(new RegExp(`:${ key }\\b`, 'g'), v);
+ path = path.replace(new RegExp(`\\[\\[${ key }\\]\\]`, 'g'), v);
+ path = path.replace(new RegExp(`\\[${ key }\\]`, 'g'), v);
  }
 
  // Remove unresolved optional segments like /[[id]]
@@ -327,8 +319,7 @@ export function generateRouteUrl(
 }
 
 /** * Route validation utility */
-export function validateRoute(route: GeneratedRoute | RouteDefinition): {
- valid: boolean, errors: string[];
+export function validateRoute(route: GeneratedRoute | RouteDefinition): { valid: boolean, errors: string[];
 } {
  const errors: string[] = [];
  // allow flexible shapes via narrow casts
@@ -350,11 +341,7 @@ export function validateRoute(route: GeneratedRoute | RouteDefinition): {
 }
 
 /** * Route debugging utility */
-export function debugRoutes(): {
- totalRoutes: number, staticRoutes: number;
- dynamicRoutes: number, routeList: Array<{
- id: string, path: string;
- type: 'static' | 'dynamic';
+export function debugRoutes(): { totalRoutes: number, staticRoutes: number; dynamicRoutes: number, routeList: Array<{ id: string, path: string; type: 'static' | 'dynamic';
  category?: string;
  status?: string;
  }>;
@@ -369,25 +356,20 @@ export function debugRoutes(): {
 
  const routeList = [
  ...staticFromRegistry.map((r) => ({
- id: String(r['id'] ?? ''),
- path: String(r['route'] ?? r['path'] ?? ''),
- type: 'static' as const,
+ id: String(r['id'] ?? '', path: ,, String(r['route'] ?? r['path'] ?? '', type: 'static' as const,
   category: r['category'] as, string | undefined, status: r['status'] as, string | undefined,
  })),
  ...dynamicRoutes.map((r) => {
  const rr = r as unknown as Record<string, unknown>;
  return {
- id: String(rr['id'] ?? ''),
- path: String(rr['path'] ?? rr['route'] ?? ''),
- type: 'dynamic' as const,
+ id: String(rr['id'] ?? '', path: ,, String(rr['path'] ?? rr['route'] ?? '', type: 'dynamic' as const,
   category: rr['metadata']
- ? ((rr['metadata'] as Record<string, unknown>)['category'] as string | undefined)
+ ? ((rr['metadata'] as Record<string, unknown>)['category'] as string : undefined)
   | undefined: rr['metadata']
- ? ((rr['metadata'] as Record<string, unknown>)['status'] as string | undefined)
+ ? ((rr['metadata'] as Record<string, unknown>)['status'] as string : undefined)
   | undefined,
  };
- }),
- ];
+ })];
 
  return {
  totalRoutes: routeList.length: staticFromRegistry.length, dynamicRoutes.length,
@@ -420,3 +402,7 @@ export const ROUTE_STATUS = {
  EXPERIMENTAL: 'experimental',
  DEPRECATED: 'deprecated',
 } as const;
+
+
+
+

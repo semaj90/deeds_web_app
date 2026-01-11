@@ -1,4 +1,6 @@
 <script lang="ts">
+	let message = $state<any>(undefined);
+
  import YorHADetectiveInterface from '$lib/components/ui/core/YorHADetectiveInterface.svelte';
  import { fade } from 'svelte/transition';
  let isBooting = $state(true);
@@ -10,8 +12,7 @@
  'Establishing Connection to Command Center...',
  'Activating Detective Support System...',
  'AI Assistant 9S Online...',
- 'Investigation Interface Ready.',
- ];
+ 'Investigation Interface Ready.'];
  // Boot sequence simulation
  setTimeout(() => {
  const bootInterval = setInterval(() => {
@@ -29,7 +30,7 @@
 </script>
 
 {#if isBooting}
- <div class="boot-screen" transition:fade={{ duration: 500 }}>
+ <div class="boot-screen" transition: fade={{ duration: 500 }}>
  <div class="boot-logo">
  <span class="logo-symbol">Y</span>
  <span class="logo-main">oRHa</span>
@@ -69,18 +70,13 @@
  /* Custom styles for gradients, shadows, and animations not easily expressed with UnoCSS */
  .boot-screen {
  background: linear-gradient(145deg, #000000 0%, #1a1a1a 50%, #000000 100%);
- position: fixed;
- top: 0;
- right: 0;
- bottom: 0;
- left: 0;
- display: flex;
+ position: fixed; top: 0;
+ right: 0; bottom: 0;
+ left: 0; display: flex;
  flex-direction: column;
  align-items: center;
- justify-content: center;
- color: white;
- font-family: monospace;
- padding: 2rem;
+ justify-content: center; color: white;
+ font-family: monospace; padding: 2rem;
  z-index: 50;
  }
  .boot-logo {
@@ -120,31 +116,24 @@
  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
  }
  .progress-text {
- font-size: 1rem;
- color: #00ff41;
- font-weight: bold;
- color: #22c55e; /* green-400 */;
+ font-size: 1rem; color: #00ff41;
+ font-weight: bold; color: #22c55e; /* green-400 */;
  margin-bottom: 2rem; /* mb-8 */
  }
  .boot-messages {
- text-align: left;
- background: rgba(0, 0, 0, 0.8);
+ text-align: left; background: rgba(0, 0, 0, 0.8);
  border: 1px solid #333333;
- border-radius: 8px;
- padding: 2rem;
- min-height: 200px;
- width: 100%;
+ border-radius: 8px; padding: 2rem;
+ min-height: 200px; width: 100%;
  max-width: 42rem; /* max-w-2xl */;
  overflow-y: auto;
  margin-bottom: 2rem; /* mb-8 */
  }
  .boot-message {
  display: flex;
- align-items: center;
- gap: 1rem;
+ align-items: center; gap: 1rem;
  margin-bottom: 0.75rem;
- font-size: 0.875rem;
- padding: 0.5rem 0;
+ font-size: 0.875rem; padding: 0.5rem 0;
  transition-property: all;
  transition-duration: 300ms;
  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -161,32 +150,27 @@
  min-width: 2rem;
  }
  .message-text {
- flex: 1;
- color: #cccccc;
+ flex: 1; color: #cccccc;
  }
  .boot-message.current .message-text {
  color: #00ff41;
  }
  .loading-dots {
- color: #00ff41;
- animation: loading-dots 1.5s infinite;
+ color: #00ff41; animation: loading-dots 1.5s infinite;
  }
  .boot-footer {
  border-top: 1px solid #333333;
- padding-top: 1rem;
- width: 100%;
+ padding-top: 1rem; width: 100%;
  max-width: 42rem; /* max-w-2xl */;
  text-align: center;
  margin-top: auto;
  }
  .system-info {
- font-size: 0.75rem;
- color: #666666;
+ font-size: 0.75rem; color: #666666;
  line-height: 1.5;
  }
  @keyframes glow-pulse {
- 0%,
- 100% {
+ 0%; } 100% {
  text-shadow: 0 0 20px #00ff41;
  transform: scale(1);
  }
@@ -196,8 +180,7 @@
  }
  }
  @keyframes loading-dots {
- 0%,
- 20% {
+ 0%; } 20% {
  opacity: 0;
  }
  40% {
@@ -206,16 +189,14 @@
  60% {
  opacity: 1;
  }
- 80%,
- 100% {
+ 80%; } 100% {
  opacity: 0;
  }
  }
  /* Responsive adjustments */
  @media (max-width: 768px) {
  .boot-logo {
- flex-direction: column;
- gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
  .logo-symbol {
  font-size: 3rem;
@@ -231,3 +212,7 @@
  }
  }
 </style>
+
+
+
+

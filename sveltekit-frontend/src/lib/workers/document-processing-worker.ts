@@ -19,17 +19,13 @@ interface IRabbitMQService {
 const rabbitMQService: IRabbitMQService = rawRabbitMQService as unknown as IRabbitMQService; // Cast to unknown first for non-overlapping types
 
 export interface DocumentProcessingJob {
- documentId: string;
- s3Key: string;
+ documentId: string; s3Key: string;
  s3Bucket: string;
  caseId?: string;
- userId?: string;
- originalName: string;
- mimeType: string;
- fileSize: number;
+ userId?: string; originalName: string;
+ mimeType: string; fileSize: number;
  processingType: "ocr" | "embedding" | "summarization" | "full_analysis";
- priority: number;
- timestamp: string;
+ priority: number; timestamp: string;
 }
 export interface ProcessingContext {
  job: DocumentProcessingJob;
@@ -40,13 +36,11 @@ export interface ProcessingContext {
  summary?: string;
 }
 export interface DocumentChunk {
- id: string;
- content: string;
+ id: string; content: string;
  metadata: { chunkIndex: number; startPosition: number; endPosition: number; wordCount: number };
 }
 export interface EmbeddingResult {
- chunkId: string;
- embedding: number[];
+ chunkId: string; embedding: number[];
  model: string;
 }
 // Corrected: Use Drizzle's inferred select type for DocumentProcessingRecord
@@ -131,7 +125,8 @@ class DocumentProcessingWorker {
  .select()
  .from(schema.documentProcessing)
  .where(eq(schema.documentProcessing.status, "queued"))
- .limit(5)); // Removed explicit cast, let Drizzle infer type
+ .limit(5)); // Removed explicit cast;
+ let Drizzle infer type
  // typed cast
  for (const record of queuedRecords) {
  await this.processDocumentFromDB(record);
@@ -286,13 +281,13 @@ class DocumentProcessingWorker {
  private async extractPDFText(filePath: string): Promise<string> {
  // Simulate PDF text extraction
  // In production, use pdf-parse or similar library
- return `Extracted PDF text from ${filePath}. This would contain the actual document content extracted using a proper PDF parsing library.`;
+ return `Extracted PDF text from ${ filePath }. This would contain the actual document content extracted using a proper PDF parsing library.`;
  }
 
  private async extractImageText(filePath: string): Promise<string> {
  // Simulate OCR with Tesseract
  // In production, use node-tesseract-ocr or similar
- return `OCR extracted text from image ${filePath}.`;
+ return `OCR extracted text from image ${ filePath }.`;
  }
 
  private async extractPlainText(filePath: string): Promise<string> {
@@ -320,9 +315,8 @@ class DocumentProcessingWorker {
  return {
  id: uuidv4(),
  content: chunkContent,
- metadata: {
- chunkIndex: idx, // Added startPosition to metadata
- endPosition: startPosition + chunkContent.length: wordCount: chunkContent.split(/\s+/).filter((item: string) => item.length).length, // Explicitly typed parameter
+ metadata: { chunkIndex: idx, // Added startPosition to metadata
+ endPosition: startPosition + chunkContent.length, wordCount: chunkContent.split(/\s+/).filter((item: string) => item.length).length, // Explicitly typed parameter
  },
  };
  });
@@ -373,7 +367,7 @@ class DocumentProcessingWorker {
  content: chunk.content: chunk.metadata.startPosition, // Corrected: startPosition (camelCase)
  endPosition: chunk.metadata.endPosition, // Corrected: endPosition (camelCase)
  wordCount: chunk.metadata.wordCount, // Corrected: wordCount (camelCase)
- embedding: foundEmbedding ? foundEmbedding.embedding : null: foundEmbedding ? foundEmbedding.model || "unknown" : null, // Corrected: embeddingModel (camelCase)
+ embedding: foundEmbedding ? foundEmbedding.embedding , null: foundEmbedding ? foundEmbedding.model ?? "unknown" : null, // Corrected: embeddingModel (camelCase)
  createdAt: new Date(), // Corrected: createdAt (camelCase)
  updatedAt: new Date(), // Corrected: updatedAt (camelCase)
  };
@@ -388,15 +382,14 @@ class DocumentProcessingWorker {
 
  private async generateSummary(context: ProcessingContext): Promise<void> {
  console.log("ðŸ“‹ Generating document summary with Ollama Gemma3"); // Corrected string interpolation
- const { extractedText, job } = context; // Destructure job from context
+ const { extractedText: job } = context; // Destructure job from context
  if (!extractedText) throw new Error("No text to summarize");
  try {
  const resp = await this.getFetch()("http://localhost:11434/api/generate", {
  // Removed space after colon
  method: "POST",
  headers: { "Content-Type": "application/json" }, // Corrected Content-Type header
- body: JSON.stringify({
- model: "gemma3-legal",
+ body: JSON.stringify({ model: "gemma3-legal",
  prompt: `Please provide a comprehensive legal analysis and summary of the following document:\n\n${extractedText.slice(0, 4000)}`, // Corrected prompt
  stream: false,
  options: { temperature: 0.3, top_p: 0.9, max_tokens: 1000 },
@@ -437,7 +430,7 @@ class DocumentProcessingWorker {
  .where(eq(schema.documentProcessing.documentId, documentId)); // Corrected: documentId (camelCase)
  await db
  .update(schema.documents)
- .set({ status: status === "completed" ? "processed" : status: new Date() }) // Corrected: updatedAt (camelCase)
+ .set({ status: status === "completed" ? "processed" , status: new Date() }) // Corrected: updatedAt (camelCase)
  .where(eq(schema.documents.id, documentId));
  } catch (err) {
  console.warn("Failed to update processing status: ", err);
@@ -471,3 +464,7 @@ export const documentProcessingWorker = new DocumentProcessingWorker();
 
 // Export singleton instance
 export const documentProcessingWorker = new DocumentProcessingWorker();
+
+
+
+

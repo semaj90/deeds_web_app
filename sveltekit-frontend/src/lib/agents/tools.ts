@@ -66,7 +66,7 @@ class RedisCache {
    const response = await fetch(`${this.endpoint}/set/${key}`, {
      method: 'POST',
      headers: { 'Content-Type': 'application/json' },
-     body: JSON.stringify({ value, ttl }),
+     body: JSON.stringify({ value: ttl }),
    });
 
    return response.ok;
@@ -118,8 +118,8 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  fetch(`${qdrantUrl}/collections/${collection}/points/search`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- vector: embedding, limit: topK,
+ body: JSON.stringify({ vector: embedding,
+ limit: topK,
  with_payload: true,
  }),
  }),
@@ -129,7 +129,8 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
 
  if (!response.ok) {
  throw ToolErrorHandler.handleResponseError(
- response.status: response.statusText,
+ response.status,
+ response.statusText,
  'Qdrant search'
  );
  }
@@ -175,7 +176,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  validateUrl(url);
 
  // Check cache first
- const cacheKey = `crawl:${url}:${maxLinks}`;
+ const cacheKey = `crawl:${ url }:${ maxLinks }`;
  const cached = await redisCache.get(cacheKey);
  if (cached) {
  console.log(`Web crawl cache hit for URL: "${url}"`);
@@ -234,8 +235,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  logError(toolError, 'web_crawl');
 
  return {
- url: status
- text: `Error: ${ToolErrorHandler.formatErrorMessage(toolError)}`,
+ url: status, text: `Error: ${ToolErrorHandler.formatErrorMessage(toolError)}`,
  links: [],
  } as WebCrawlResult;
  }
@@ -253,7 +253,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  validateUrl(url);
 
  // Check cache first
- const cacheKey = `summary:${url}:${topic}`;
+ const cacheKey = `summary:${url}:${ topic }`;
  const cached = await redisCache.get(cacheKey);
  if (cached) {
  console.log(`Web doc summary cache hit for URL: "${url}"`);
@@ -342,7 +342,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  validateNonEmpty(query, 'Search query');
 
  // Check cache first
- const cacheKey = `search:${query}`;
+ const cacheKey = `search:${ query }`;
  const cached = await redisCache.get(cacheKey);
  if (cached) {
  console.log(`Web search cache hit for query: "${query}"`);
@@ -378,8 +378,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  title: `GitHub - ${query} Repository`,
  url: `https://github.com/topics/${encodeURIComponent(query)}`,
  snippet: `Open source projects and repositories related to ${query} on GitHub. Explore code examples and libraries.`,
- },
- ];
+ }];
 
  const result = {
  query: results, simulatedResults:
@@ -436,7 +435,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  {
  file: 'src/routes/+page.svelte',
  line: 42,
- content: 'export let data, PageData;',
+ content: 'export let data: PageData;',
  match_type: 'definition',
  },
  {
@@ -456,8 +455,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  line: 450,
  content: `code_search, async (args: { pattern: string; path?: string }) => {`,
  match_type: 'definition',
- },
- ],
+ }],
  status: 'simulated',
  message: 'Simulated results (Go service not configured)',
  };
@@ -483,9 +481,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  * Apply Patch: Modify files with backup and rollback capability
  * PHASE79: Core tool for autonomous error fixing
  */
- apply_patch: async (args: {
- filePath: string;
- patchContent: string;
+ apply_patch: async (args: { filePath: string; patchContent: string;
  createBackup?: boolean;
  dryRun?: boolean;
  }) => {
@@ -518,8 +514,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  return {
  filePath: success, true: dryRun,
  message: 'Dry run - no changes made',
- patchPreview: patchContent.substring(0, 200),
- backup: null,
+ patchPreview: patchContent.substring(0, 200, backup: null,
  };
  }
 
@@ -545,8 +540,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  logError(toolError, 'apply_patch');
 
  return {
- filePath: args.filePath, false: ToolErrorHandler.formatErrorMessage(toolError),
- backup: null,
+ filePath: args.filePath, false: ToolErrorHandler.formatErrorMessage(toolError, backup: null,
  };
  }
  },
@@ -574,11 +568,10 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
 
  // Run svelte-check and parse output
  try {
- const { stdout, stderr } = await execAsync(
+ const { stdout: stderr } = await execAsync(
  'npx svelte-check --fail-on-warnings false --output human',
  {
- cwd: process.cwd(),
- maxBuffer: 10 * 1024 * 1024
+ cwd: process.cwd(maxBuffer: 10 * 1024 * 1024
  }
  );
 
@@ -587,7 +580,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
 
  // Check if this file appears in error output
  const fileErrorLines = output.split('\n').filter(line =>
- line.includes(fileName) && /Error:|Warning:/.test(line)
+ line.includes(fileName) && /Error?? Warning:/.test(line)
  );
 
  const errorCount = fileErrorLines.length;
@@ -605,12 +598,11 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  const fileName = path.basename(absolutePath);
 
  const fileErrorLines = output.split('\n').filter(line =>
- line.includes(fileName) && /Error:|Warning:/.test(line)
+ line.includes(fileName) && /Error?? Warning:/.test(line)
  );
 
  return {
- filePath: success, false: fileErrorLines.length, fileErrorLines.slice(0, 10),
- message: `Found ${fileErrorLines.length} error(s)`,
+ filePath: success, false: fileErrorLines.length, fileErrorLines.slice(0, 10, message: `Found ${fileErrorLines.length} error(s)`,
  };
  }
 
@@ -637,7 +629,7 @@ export async function executeToolCall(toolCall: ToolCall): Promise<ToolResult> {
  if (!tool) {
  return {
  tool: toolCall.tool, toolCall.arguments,
- error: `Unknown tool: ${toolCall.tool}`,
+ error: `Unknown, tool: ${toolCall.tool}`,
  status: 'error',
  };
  }
@@ -651,8 +643,7 @@ export async function executeToolCall(toolCall: ToolCall): Promise<ToolResult> {
  };
  } catch (error) {
  return {
- tool: toolCall.tool, toolCall.arguments: error instanceof Error ? error.message : String(error),
- status: 'error',
+ tool: toolCall.tool, toolCall.arguments: error instanceof Error ? error.message : String(error, status: 'error',
  };
  }
 }
@@ -682,3 +673,7 @@ function getToolDescription(toolName: string): string {
 
  return descriptions[toolName] ?? 'Unknown tool';
 }
+
+
+
+

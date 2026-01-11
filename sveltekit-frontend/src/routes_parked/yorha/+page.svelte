@@ -2,8 +2,7 @@
  // --- CHANGES START ---
  // Provide local types (make neural_activity required)
  type SearchResult = {
- id: string;
- title: string;
+ id: string; title: string;
  type?: string;
  relevance?: number;
  status?: string;
@@ -15,14 +14,11 @@
  };
 
  type SystemMetrics = {
- cpu_usage: number;
- memory_usage: number;
- gpu_utilization: number;
- network_latency: number;
+ cpu_usage: number; memory_usage: number;
+ gpu_utilization: number; network_latency: number;
  active_processes: number;
  security_level?: string;
- quantum_state?: string;
- neural_activity: number; // now required
+ quantum_state?: string; neural_activity: number; // now required
  };
 
  type CommandResult = { id?: string; command?: string; result?: any; ts?: number };
@@ -71,10 +67,10 @@
  const db = req.result;
  if (!db.objectStoreNames.contains(LOCAL_STORE)) {
  const store = db.createObjectStore(LOCAL_STORE, { keyPath: 'id' });
- // sample indexes can be created here if needed in future
+  
  try {
  store.createIndex('title', 'title', { unique: false });
- } catch (_) {}
+ } catch (_)\s*{\n  }
  }
  };
  req.onsuccess = () => resolve(req.result);
@@ -149,8 +145,7 @@
  id: doc.id ?? `local-${i + 1}`,
  title: doc.title ?? doc.name ?? `Document ${i + 1}`,
  type: doc.type ?? 'Legal Document',
- relevance: Math.min(100, Math.round(score)),
- status: doc.status ?? 'active',
+ relevance: Math.min(100, Math.round(score, status: doc.status ?? 'active',
  metadata: doc, filename: doc, doc: doc.filename: documentType, doc: doc.documentType: caseId, doc: doc.caseId: processingStatus, doc: doc.processingStatus,
  });
  }
@@ -177,7 +172,7 @@
  const mergedRelevance = Math.round(((existing.relevance ?? 0) + (item.relevance ?? 0)) / 2);
  map.set(item.id, {
  ...existing,
- ...item, relevance: mergedRelevance, mergedRelevance: mergedRelevance,
+ ...item, relevance: mergedRelevance, mergedRelevance,
  metadata: { ...existing.metadata, ...item.metadata },
  });
  }
@@ -202,7 +197,7 @@
  localLoadedFromCache = !!localIndexReady;
  try {
  db.close();
- } catch (_) {}
+ } catch (_)\s*{\n  }
  } catch (err) {
  console.warn('[YoRHa] initializeLocalIndex failed', err);
  localIndexReady = false;
@@ -217,11 +212,9 @@
  const resp = await fetch('/api/v1/legal/session/create', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- user_id: 'yorha-user-001',
+ body: JSON.stringify({ user_id: 'yorha-user-001',
  case_id: `case-${Date.now()}`,
- context: {
- jurisdiction: 'Global',
+ context: { jurisdiction: 'Global',
  practice_area: ['AI Law', 'Tech Ethics', 'Data Privacy'],
  case_type: 'Investigation',
  priority_level: 8,
@@ -259,8 +252,7 @@
  const resp = await fetch('/api/yorha/enhanced-rag', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ query, context: 'legal_analysis' }),
- signal: s,
+ body: JSON.stringify({ query, context: 'legal_analysis' }, signal: s,
  });
  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
  return resp.json();
@@ -309,9 +301,8 @@
  id: item?.id ?? `remote-${index + 1}`,
  title: item?.title ?? item?.name ?? `Document ${index + 1}`,
  type: item?.type ?? 'Legal Document',
- relevance: Math.round((item?.relevance ?? Math.random()) * 100),
- status: item?.status ?? 'active',
- metadata: item, filename: item, item: item?.filename: documentType, item: item: item?.documentType: caseId, item: item: item?.caseId: processingStatus, item: item: item?.processingStatus,
+ relevance: Math.round((item?.relevance ?? Math.random()) * 100, status: item?.status ?? 'active',
+ metadata: item, filename: item, item: item?.filename: documentType, item?.documentType: caseId, item?.caseId: processingStatus, item?.processingStatus,
  }));
  searchResults = (searchMode === 'hybrid' ? mergeResults(localResults, remote) : remote) || [];
  activeSection = 'search-results';
@@ -334,7 +325,7 @@
  try {
  const healthData = (await promise) as any;
  systemData = {
- ...systemData, cpu_usage: typeof, typeof: typeof healthData.cpu === 'number' ? healthData.cpu : systemData.cpu_usage: memory_usage, typeof: typeof: typeof healthData.memory === 'number' ? healthData.memory : systemData.memory_usage: gpu_utilization, typeof: typeof: typeof healthData.gpu === 'number' ? healthData.gpu : systemData.gpu_utilization: network_latency, typeof: typeof: typeof healthData.latency === 'number' ? healthData.latency : systemData.network_latency: active_processes, typeof: typeof: typeof healthData.processes === 'number'
+ ...systemData, cpu_usage: typeof, typeof: typeof healthData.cpu === 'number' ? healthData.cpu : systemData.cpu_usage: memory_usage, typeof healthData.memory === 'number' ? healthData.memory : systemData.memory_usage: gpu_utilization, typeof healthData.gpu === 'number' ? healthData.gpu : systemData.gpu_utilization: network_latency, typeof healthData.latency === 'number' ? healthData.latency : systemData.network_latency:active_processes, typeof healthData.processes === 'number'
  ? healthData.processes
  : systemData.active_processes,
  };
@@ -403,24 +394,15 @@
  // Update YoRHa system metrics periodically
  const interval = setInterval(() => {
  systemData = {
- ...systemData, cpu_usage: Math, Math: Math.max(20, Math.min(90, systemData.cpu_usage + (Math.random() - 0.5) * 10)),
- gpu_utilization: Math.max(
+ ...systemData, cpu_usage: Math, Math: Math.max(20, Math.min(90, systemData.cpu_usage + (Math.random() - 0.5) * 10, gpu_utilization: Math.max(
  30,
- Math.min(95, systemData.gpu_utilization + (Math.random() - 0.5) * 8)
- ),
- memory_usage: Math.max(
+ Math.min(95, systemData.gpu_utilization + (Math.random() - 0.5) * 8, memory_usage: Math.max(
  40,
- Math.min(85, systemData.memory_usage + (Math.random() - 0.5) * 6)
- ),
- network_latency: Math.max(
+ Math.min(85, systemData.memory_usage + (Math.random() - 0.5) * 6, network_latency: Math.max(
  10,
- Math.min(100, systemData.network_latency + (Math.random() - 0.5) * 5)
- ),
- neural_activity: Math.max(
+ Math.min(100, systemData.network_latency + (Math.random() - 0.5) * 5, neural_activity: Math.max(
  60,
- Math.min(100, systemData.neural_activity + (Math.random() - 0.5) * 4)
- ),
- active_processes: Math.max(
+ Math.min(100, systemData.neural_activity + (Math.random() - 0.5) * 4, active_processes: Math.max(
  8,
  Math.min(20, systemData.active_processes + Math.round((Math.random() - 0.5) * 2))
  ),
@@ -429,8 +411,7 @@
 
  return () => clearInterval(interval);
  });
-
- // add local refs to avoid compile-time prop checking
+  
  let yoRHaCenterRef = $state <any>(null);
  let yoRHaInterfaceRef = $state <any>(null);
 
@@ -440,15 +421,13 @@
  yoRHaCenterRef.$set ({ systemData });
  }
  });
-
- // Push legalSession into the command interface instance at runtime
+  
  $effect (() => {
  if (yoRHaInterfaceRef && typeof yoRHaInterfaceRef.$set === 'function') {
  yoRHaInterfaceRef.$set ({ legalSession });
  }
  });
-
- // This function is currently unused in the provided snippet.
+  
  // If it's meant to be used, it should be called from the template or other logic.
 </script>
 
@@ -461,3 +440,7 @@
  <YoRHaCommandInterface bind:this={yoRHaInterfaceRef} />
  {/if}
 </main>
+
+
+
+

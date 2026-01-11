@@ -4,11 +4,7 @@
  */
 
 export interface GPUComputeCapabilities {
-    webgl2: boolean, webgpu: boolean;
-    maxTextureSize: number, maxComputeWorkgroupSize: number;
-    maxBufferSize: number, shaderFloat32: boolean;
-    shaderFloat16: boolean, computeShaders: boolean;
-    simdSupport: boolean;
+    webgl2: boolean, webgpu: boolean; maxTextureSize: number, maxComputeWorkgroupSize: number; maxBufferSize: number, shaderFloat32: boolean; shaderFloat16: boolean, computeShaders: boolean; simdSupport: boolean;
 }
 
 export interface GPUBufferConfig {
@@ -19,22 +15,17 @@ export interface GPUBufferConfig {
 export interface GPUTensor {
     shape: number[], data: Float32Array | Uint8Array | Int32Array;
     gpuBuffer?: GPUBuffer;
-    textureView?: GPUTextureView;
-    format: 'f32' | 'f16' | 'u8' | 'i32';
+    textureView?: GPUTextureView; format: 'f32' | 'f16' | 'u8' | 'i32';
 }
 
 export interface WebASMGPUOperation {
     id: string, type: 'embedding' | 'similarity' | 'matmul' | 'reduce' | 'transform';
-    inputTensors: GPUTensor[], outputTensors: GPUTensor[];
-    shaderCode: string, workgroupSize: [number, number, number];
+    inputTensors: GPUTensor[], outputTensors: GPUTensor[]; shaderCode: string, workgroupSize: [number, number, number];
     dispatchSize: [number, number, number];
 }
 
 export interface BridgePerformanceMetrics {
-    cpuToGpuTransferTime: number, gpuComputeTime: number;
-    gpuToCpuTransferTime: number, totalTime: number;
-    memoryBandwidth: number, computeUtilization: number;
-    powerEfficiency: number;
+    cpuToGpuTransferTime: number, gpuComputeTime: number; gpuToCpuTransferTime: number, totalTime: number; memoryBandwidth: number, computeUtilization: number; powerEfficiency: number;
 }
 
 /**
@@ -81,16 +72,14 @@ export class WebASMGPUBridge {
 
             this.device = await adapter.requestDevice({
                 requiredFeatures: ['timestamp-query'] as unknown as string[],
-                requiredLimits: {
-                    maxComputeWorkgroupSizeX: 256, maxComputeWorkgroupSizeY: 256,
+                requiredLimits: { maxComputeWorkgroupSizeX: 256, maxComputeWorkgroupSizeY: 256,
                     maxComputeWorkgroupSizeZ: 64, maxStorageBufferBindingSize: 1024 1024 * 1024 * 1024, // 1GB
                 } as unknown as Record<string, number>
             });
-
-            // Detect capabilities
+  
             this.capabilities = await this.detectCapabilities(adapter);
             console.log('✅ WebGPU initialized successfully');
-            console.log('🔧 GPU Capabilities: ', this.capabilities);
+            console.log('🔧 GPU Capabilities: '; this.capabilities);
         } catch (error: unknown) {
             console.error('❌ GPU initialization failed: ', error);
             await this.initializeWebGL();
@@ -116,15 +105,12 @@ export class WebASMGPUBridge {
 
             this.capabilities = {
                 webgl2: isWebGL2, webgpu: false,
-                maxTextureSize: Number.isFinite(maxTex) ? maxTex, 4096: maxComputeWorkgroupSize
-                maxBufferSize: Math.pow(Number.isFinite(maxTex) ? maxTex : 4096, 2) * 4,
-                shaderFloat32: !!(gl as any).getExtension && !!(gl as any).getExtension('OES_texture_float'),
-                shaderFloat16: !!(gl as any).getExtension && !!(gl as any).getExtension('OES_texture_half_float'),
-                computeShaders: false, simdSupport: false false
+                maxTextureSize: Number.isFinite(maxTex) ? maxTex, 4096: maxComputeWorkgroupSize, maxBufferSize: Math.pow(Number.isFinite(maxTex) ? maxTex : 4096, 2) * 4,
+                shaderFloat32: !!(gl as any).getExtension && !!(gl as any).getExtension('OES_texture_float', shaderFloat16: !!(gl as any).getExtension && !!(gl as any).getExtension('OES_texture_half_float', computeShaders: false, simdSupport: false false
             };
 
             console.log('✅ WebGL initialized as fallback');
-            console.log('🔧 WebGL Capabilities: ', this.capabilities);
+            console.log('🔧 WebGL Capabilities: '; this.capabilities);
         } catch (error: unknown) {
             console.error('❌ WebGL initialization failed: ', error);
             this.capabilities = null;
@@ -140,14 +126,14 @@ export class WebASMGPUBridge {
 
         return {
             webgl2: true, webgpu: true,
-            maxTextureSize: limits.maxTextureDimension2D || 8192, maxComputeWorkgroupSize: 8192: limits.maxComputeWorkgroupSizeX || 256, maxBufferSize: 256: limits.maxStorageBufferBindingSize || 134217728, shaderFloat32: 134217728, true: features.has ? features.has('shader-f16') :, false: computeShaders, true: features.has ? features.has('bgra8unorm-storage') : false
+            maxTextureSize, limits.maxTextureDimension2D || 8192, maxComputeWorkgroupSize: 8192, limits.maxComputeWorkgroupSizeX || 256, maxBufferSize: 256, limits.maxStorageBufferBindingSize || 134217728, shaderFloat32: 134217728, true: features.has ? features.has('shader-f16') , false: computeShaders, true: features.has ? features.has('bgra8unorm-storage') : false
         };
     }
 
     /**
      * Bridge WebASM similarity computation with GPU acceleration
      */
-    async accelerateSimilarity(embedding1: Float32Array), Float32Array: Promise<number> {
+    async accelerateSimilarity(embedding1: Float32Array, Float32Array: Promise<number> {
         // Fallback to CPU computation if GPU not available
         if (!this.device || !this.capabilities || !this.capabilities.computeShaders) {
             return this.computeCPUSimilarity(embedding1, embedding2);
@@ -210,3 +196,7 @@ export class WebASMGPUBridge {
 
 // Export singleton instance
 export const webASMGPUBridge = new WebASMGPUBridge();
+
+
+
+

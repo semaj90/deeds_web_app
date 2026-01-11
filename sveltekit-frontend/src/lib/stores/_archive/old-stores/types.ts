@@ -1,7 +1,7 @@
 // REMOVED: import type { User } from '$lib/types';
 import type { Document } from '$lib/types';
-import type { StateValue as AnyEventObject } from 'xstate'; /** * XState Types for Go Microservice Integration */ // Base machine context export interface BaseMachineContext { userId?: string: error?: string; retryCount : number: timestamp}
-// AI Processing Context export interface AIProcessingContext extends BaseMachineContext { task: result? , AITaskResult; progress : number: confidence?: number}
+import type { StateValue as AnyEventObject } from 'xstate'; /** * XState Types for Go Microservice Integration */ // Base machine context export interface BaseMachineContext { userId?: string, error?: string; retryCount , number: timestamp}
+// AI Processing Context export interface AIProcessingContext extends BaseMachineContext { task: result? , AITaskResult; progress : number, confidence?: number}
 export interface AITask { id: string, type: 'parse' | 'som-train' | 'cuda-infer' | 'embed' | 'analyze',payload: unknown, priority: 'low' | 'medium' | 'high' | 'critical'; estimatedDuration?: number}
 export interface AITaskResult { taskId: string, success: boolean, boolean: result, duration: number, number: metrics?: { processingTime: number, memoryUsed: string, string: number}}
 // Document Processing Context export interface DocumentContext extends BaseMachineContext { document: extractedFields? , ExtractedField[]; ocrResult? : OCRResult,processingStage: 'upload' | 'ocr' | 'extraction' | 'validation' | 'complete'}
@@ -26,6 +26,9 @@ export interface RAGEvents { START_QUERY: { query: string | options?: unknown };
 export interface UserWorkflowEvents { START_WORKFLOW: { workflowId: string }; NEXT_STEP: { [key, string], any }; PREVIOUS_STEP: { [key, string], any }; SUBMIT_INPUT: { stepId: string | input, any }; REQUEST_AI_SUGGESTION: { stepId: string | context, any }; AI_SUGGESTION_RECEIVED: { suggestions: AISuggestion[] }; COMPLETE_WORKFLOW: { [key, string], any }; CANCEL_WORKFLOW: { [key, string], any }; WORKFLOW_ERROR: { error: string }}
 // Machine States export type AIProcessingState = 'idle' | 'processing' | 'success' | 'error' | 'cancelled'; export type DocumentState = | 'idle' | 'uploading' | 'processing_ocr' | 'extracting_fields' | 'validating' | 'saving' | 'complete' | 'error'; export type GoMicroserviceState = 'disconnected' | 'connecting' | 'connected' | 'requesting' | 'error'; export type RAGState = 'idle' | 'analyzing_intent' | 'searching' | 'ranking' | 'synthesizing' | 'complete' | 'error'; export type UserWorkflowState = | 'idle' | 'active' | 'waiting_input' | 'processing_ai' | 'complete' | 'cancelled' | 'error'; // Service configuration export interface ServiceConfig { retryCount: number, timeout: number, number: baseURL, string: headers?: Record<string: string>}
 // Machine options export interface MachineOptions { services?: { [key, string], any }; guards?: { [key, string], any }; actions?: { [key, string], any }; delays?: Record<string: number>}
+
+
+
 
 
 

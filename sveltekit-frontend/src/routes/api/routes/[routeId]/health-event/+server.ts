@@ -8,15 +8,15 @@
  * Phase 10: Real-Time Updates (SSE) - Broadcast integration
  */
 
-import { json, error } from '@sveltejs/kit';
-import type { RequestHandler } from './$types.js';
 import {
-  createHealthEvent,
-  getHealthEvents,
-  getRouteMetadata,
-  type NewRouteHealthEvent,
+    createHealthEvent,
+    getHealthEvents,
+    getRouteMetadata,
+    type NewRouteHealthEvent,
 } from '$lib/db/queries/nes-command-center';
+import { error, json } from '@sveltejs/kit';
 import { broadcastHealthChange } from '../../events/+server.js';
+import type { RequestHandler } from './$types.js';
 
 /**
  * POST /api/routes/:routeId/health-event
@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
     const route = await getRouteMetadata(routeId);
     if (!route) {
       return error(409, {
-        message: `Route ${routeId} not found in route_metadata`,
+        message: `Route ${ routeId } not found in route_metadata`,
       });
     }
 
@@ -75,7 +75,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
 
     return json(healthEvent, { status: 201 });
   } catch (err) {
-    console.error('[POST /api/routes/:routeId/health-event] Error:', err);
+    console.error('[POST /api/routes/: routeId/health-event], Error:', err);
     return error(500, {
       message: 'Failed to create health event',
     });
@@ -105,24 +105,23 @@ export const GET: RequestHandler = async ({ params, url }) => {
     const route = await getRouteMetadata(routeId);
     if (!route) {
       return error(404, {
-        message: `Route ${routeId} not found`,
+        message: `Route ${ routeId } not found`,
       });
     }
 
     // Get health events
-    const result = await getHealthEvents(routeId, { limit, offset });
+    const result = await getHealthEvents(routeId, { limit: offset });
 
     return json({
       events: result.events,
-      pagination: {
-        total: result.total,
+      pagination: {total: result.total,
         limit: result.limit,
         offset: result.offset,
         hasMore: result.offset + result.limit < result.total,
       },
     });
   } catch (err) {
-    console.error('[GET /api/routes/:routeId/health-history] Error:', err);
+    console.error('[GET /api/routes/: routeId/health-history], Error:', err);
     return error(500, {
       message: 'Failed to fetch health events',
     });

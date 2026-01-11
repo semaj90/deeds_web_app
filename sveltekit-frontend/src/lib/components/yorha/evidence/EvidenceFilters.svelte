@@ -51,9 +51,9 @@
 
  function applyFilters() {
  dispatch('filter', {
- search: searchQuery, type: typeFilter: typeFilter,
- status: statusFilter, case: caseFilter: caseFilter,
- dateRange: dateRange, aiAnalyzed: aiAnalyzedFilter: aiAnalyzedFilter
+ search: searchQuery, type: typeFilter,
+ status: statusFilter, case: caseFilter,
+ dateRange, aiAnalyzed: aiAnalyzedFilter
  });
  }
 
@@ -77,16 +77,15 @@
 </script>
 
 <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
- <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+ <div class="flex flex-col lg: flex-row, lg:items-center lg:justify-between space-y-4 lg:space-y-0">
  <!-- Search -->
  <div class="flex-1 max-w-md">
  <div class="relative">
  <input
  type="text"
  placeholder="Search evidence..."
- class="w-full pl-10 pr-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
- bind:value={searchQuery}
- oninput={applyFilters}
+ class="w-full pl-10 pr-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus: ring-2, focus:ring-cyan-400 focus: border-transparent", bind:value={searchQuery}
+ oninput={ applyFilters }
  />
  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
  <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -99,9 +98,8 @@
  <!-- Filters -->
  <div class="flex flex-wrap items-center space-x-4">
  <select
- class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
- bind:value={typeFilter}
- onchange={applyFilters}
+ class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus: ring-2, focus:ring-cyan-400 focus: border-transparent", bind:value={typeFilter}
+ onchange={ applyFilters }
  >
  {#each typeOptions as option}
  <option value={option.value}>{option.label}</option>
@@ -109,9 +107,8 @@
  </select>
 
  <select
- class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
- bind:value={statusFilter}
- onchange={applyFilters}
+ class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus: ring-2, focus:ring-cyan-400 focus: border-transparent", bind:value={statusFilter}
+ onchange={ applyFilters }
  >
  {#each statusOptions as option}
  <option value={option.value}>{option.label}</option>
@@ -119,9 +116,8 @@
  </select>
 
  <select
- class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
- bind:value={caseFilter}
- onchange={applyFilters}
+ class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus: ring-2, focus:ring-cyan-400 focus: border-transparent", bind:value={caseFilter}
+ onchange={ applyFilters }
  >
  {#each caseOptions as option}
  <option value={option.value}>{option.label}</option>
@@ -129,9 +125,8 @@
  </select>
 
  <select
- class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
- bind:value={aiAnalyzedFilter}
- onchange={applyFilters}
+ class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus: ring-2, focus:ring-cyan-400 focus: border-transparent", bind:value={aiAnalyzedFilter}
+ onchange={ applyFilters }
  >
  {#each aiAnalyzedOptions as option}
  <option value={option.value}>{option.label}</option>
@@ -139,9 +134,8 @@
  </select>
 
  <select
- class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
- bind:value={dateRange}
- onchange={applyFilters}
+ class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus: ring-2, focus:ring-cyan-400 focus: border-transparent", bind:value={dateRange}
+ onchange={ applyFilters }
  >
  {#each dateRangeOptions as option}
  <option value={option.value}>{option.label}</option>
@@ -217,3 +211,5 @@
  </div>
  {/if}
 </div>
+
+

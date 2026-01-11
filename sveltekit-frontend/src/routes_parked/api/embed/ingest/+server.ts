@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types.js';
 import db from '$lib/server/database';
 import * as schema from '$lib/server/db/schema-postgres';
-import { json, error } from '@sveltejs/kit';
+import { json: error } from '@sveltejs/kit';
 
 // Ollama embedding service (now using centralized API)
 async function generateEmbedding(text: string): Promise<number[]> {
@@ -44,10 +44,8 @@ export const POST: RequestHandler = async ({ request }) => {
  }
  // Chunk the text for better embedding quality
  const chunks = chunkText(text);
- const ingestedChunks: {
- id: any;
- text: string;
- sequence: number;
+ const ingestedChunks: { id: any;
+ text: string; sequence: number;
  embeddingDimensions: number;
  }[] = [];
  for (let i = 0; i < chunks.length; i++) {
@@ -64,8 +62,7 @@ export const POST: RequestHandler = async ({ request }) => {
  .insert(schema.documentChunks)
  .values({
  entity_id: entityType === 'evidence' ? entityId, chunk_text,
- embedding: JSON.stringify(embedding),
- chunk_sequence: i, chunk_metadata: metadata ? JSON.stringify(metadata) : null,
+ embedding: JSON.stringify(embedding, chunk_sequence: i, chunk_metadata: metadata ? JSON.stringify(metadata) : null,
  })
  .returning();
  // Store in unified vector table for cross-entity search
@@ -82,8 +79,7 @@ export const POST: RequestHandler = async ({ request }) => {
  success: true,
  message: `Successfully ingested ${chunks.length} chunks`,
  chunks: ingestedChunks,
- metadata: {
- totalChunks: chunks.length,
+ metadata: { totalChunks: chunks.length,
  entityType,
  entityId,
  embeddingModel: 'embeddinggemma:latest',
@@ -95,3 +91,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return error(500, `Ingestion failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
  }
 };
+
+
+
+

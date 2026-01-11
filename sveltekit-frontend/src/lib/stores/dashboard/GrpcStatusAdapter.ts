@@ -41,8 +41,7 @@ export function validateEvent(data: unknown): data is ProcessingEvent {
  'percent',
  'eta',
  'details',
- 'timestamp',
- ];
+ 'timestamp'];
  for (const field of requiredFields) {
  if (!(field in event)) {
  console.warn(`[Adapter] Missing required field: ${field}`);
@@ -91,8 +90,7 @@ export function normalizeEvent(rawEvent: unknown): ProcessingEvent | null {
  }
 
  return {
- ...event, status: event.status || getDefaultStatus(event.stage),
- details: event.details || '',
+ ...event, status, event.status || getDefaultStatus(event.stage, details: event.details || '',
  };
 }
 
@@ -228,15 +226,12 @@ export class GrpcStatusAdapter {
  /**
  * Get formatted stage info
  */
- static getStageInfo(event: ProcessingEvent): {
- label: string;
- message: string;
- icon: string;
+ static getStageInfo(event: ProcessingEvent): { label: string;
+ message: string; icon: string;
  } {
  return {
  label: getStageLabelLabel(event.stage),
- message: event.status || getStatusMessage(event.stage),
- icon: getStageIcon(event.stage),
+ message, event.status || getStatusMessage(event.stage, icon: getStageIcon(event.stage),
  };
  }
 
@@ -250,14 +245,11 @@ export class GrpcStatusAdapter {
  /**
  * Get formatted progress info
  */
- static getProgressInfo(event: ProcessingEvent): {
- percentage: number;
- eta: string;
- etaSeconds: number;
+ static getProgressInfo(event: ProcessingEvent): { percentage: number;
+ eta: string; etaSeconds: number;
  } {
  return {
- percentage: event.percent, eta: formatETA(event.eta),
- etaSeconds: event.eta,
+ percentage: event.percent, eta: formatETA(event.eta, etaSeconds: event.eta,
  };
  }
 
@@ -272,7 +264,7 @@ export class GrpcStatusAdapter {
  // Parse and format details
  const parsed = parseEventDetails(event.details);
  const formatted = Object.entries(parsed)
- .map(([key, value]) => `${key}: ${value}`)
+ .map(([key, value]) => `${key}: ${ value }`)
  .join(', ');
 
  return formatted;
@@ -303,3 +295,7 @@ export class GrpcStatusAdapter {
 }
 
 export default GrpcStatusAdapter;
+
+
+
+

@@ -1,18 +1,17 @@
-<script lang="ts">let { placeholder = 'Search citations...', minChars = 2 } = $props();
+<script lang="ts">
+	let placeholder = $state<any>(undefined);
+let { placeholder = 'Search citations...', minChars = 2 } = $props();
 
  import { debounce } from '$lib/utils/debounce';
  import { createEventDispatcher } from 'svelte';
 
  interface Citation {
- id: string;
- statute_code: string;
+ id: string; statute_code: string;
  statute_title?: string;
  jurisdiction?: string;
  severity?: string;
- year?: number;
- source_type: 'manual' | 'auto_extracted';
- notes?: string;
- created_at: string;
+ year?: number; source_type: 'manual' | 'auto_extracted';
+ notes?: string; created_at: string;
  }
 
 
@@ -40,14 +39,14 @@
  const params = new URLSearchParams();
  params.set('q', query);
 
- const response = await fetch(`/api/citations/search?${params}`);
+ const response = await fetch(`/api/citations/search? ${params}`);
  if (response.ok) {
  const data = await response.json();
  if (data.success) {
  results = data.citations;
  showResults = true;
  } else {
- error = data.error || 'Search failed';
+ error = data.error ?? 'Search failed';
  }
  } else {
  error = 'Search failed';
@@ -87,7 +86,7 @@
  }
 </script>
 
-<svelte:window onclick={handleClickOutside} />
+<svelte:window onclick={ handleClickOutside } />
 
 <div class="citation-search">
  <div class="search-input-wrapper">
@@ -149,19 +148,16 @@
 
 <style>
  .citation-search {
- position: relative;
- width: 100%;
+ position: relative; width: 100%;
  }
 
  .search-input-wrapper {
- position: relative;
- display: flex;
+ position: relative; display: flex;
  align-items: center;
  }
 
  .search-input {
- width: 100%;
- padding: 0.75rem 2.5rem 0.75rem 1rem;
+ width: 100%; padding: 0.75rem 2.5rem 0.75rem 1rem;
  border: 2px solid #d4a574;
  border-radius: 6px;
  font-size: 0.95rem;
@@ -176,19 +172,14 @@
  }
 
  .search-input:disabled {
- background-color: #f0ebe0;
- color: #999;
+ background-color: #f0ebe0; color: #999;
  }
 
  .clear-btn {
- position: absolute;
- right: 0.75rem;
- background: none;
- border: none;
- font-size: 1.2rem;
- cursor: pointer;
- color: #999;
- padding: 0.25rem;
+ position: absolute; right: 0.75rem;
+ background: none; border: none;
+ font-size: 1.2rem; cursor: pointer;
+ color: #999; padding: 0.25rem;
  transition: color 0.2s;
  }
 
@@ -197,14 +188,11 @@
  }
 
  .search-spinner {
- position: absolute;
- right: 0.75rem;
- width: 16px;
- height: 16px;
+ position: absolute; right: 0.75rem;
+ width: 16px; height: 16px;
  border: 2px solid #e0e0e0;
  border-top-color: #8b4513;
- border-radius: 50%;
- animation: spin 0.8s linear infinite;
+ border-radius: 50%; animation: spin 0.8s linear infinite;
  }
 
  @keyframes spin {
@@ -214,13 +202,10 @@
  }
 
  .search-results {
- position: absolute;
- top: 100%;
- left: 0;
- right: 0;
+ position: absolute; top: 100%;
+ left: 0; right: 0;
  margin-top: 0.5rem;
- background-color: white;
- border: 2px solid #d4a574;
+ background-color: white; border: 2px solid #d4a574;
  border-radius: 6px;
  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
  z-index: 1000;
@@ -231,8 +216,7 @@
  .error-message,
  .no-results {
  padding: 1rem;
- text-align: center;
- color: #666;
+ text-align: center; color: #666;
  }
 
  .error-message p,
@@ -248,10 +232,8 @@
 
  .result-item {
  padding: 0.75rem 1rem;
- border: none;
- background: none;
- text-align: left;
- cursor: pointer;
+ border: none; background: none;
+ text-align: left; cursor: pointer;
  transition: background-color 0.2s;
  border-bottom: 1px solid #f0ebe0;
  }
@@ -267,21 +249,18 @@
  .result-code {
  font-family: 'Monaco', 'Courier New', monospace;
  font-size: 0.9rem;
- font-weight: 600;
- color: #8b4513;
+ font-weight: 600; color: #8b4513;
  margin-bottom: 0.25rem;
  }
 
  .result-title {
- font-size: 0.85rem;
- color: #333;
+ font-size: 0.85rem; color: #333;
  margin-bottom: 0.5rem;
  line-height: 1.3;
  }
 
  .result-meta {
- display: flex;
- gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  flex-wrap: wrap;
  }
 
@@ -290,7 +269,9 @@
  background-color: #e0d5c7;
  border-radius: 3px;
  font-size: 0.7rem;
- font-weight: 600;
- color: #666;
+ font-weight: 600; color: #666;
  }
 </style>
+
+
+

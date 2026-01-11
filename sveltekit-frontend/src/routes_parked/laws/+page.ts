@@ -2,23 +2,16 @@ import type { PageLoad } from './$types.js';
 import { error } from '@sveltejs/kit';
 
 export interface QuickLink {
- id: string;
- title: string;
- description: string;
- jurisdiction: 'california' | 'federal';
- category: string;
- url: string;
- fullTextUrl: string;
- code: string;
+ id: string; title: string;
+ description: string; jurisdiction: 'california' | 'federal';
+ category: string; url: string;
+ fullTextUrl: string; code: string;
 }
 
 export interface LawSearchResult {
- id: string;
- title: string;
- code: string;
- section: string;
- summary: string;
- url: string;
+ id: string; title: string;
+ code: string; section: string;
+ summary: string; url: string;
  score: number;
 }
 
@@ -122,8 +115,7 @@ export const load: PageLoad = async ({ fetch, url, depends }) => {
  fullTextUrl:
  'https://leginfo.legislature.ca.gov/faces/codes.xhtml?tocTitle=Health+and+Safety+Code',
  code: 'HSC',
- },
- ];
+ }];
 
  const query = url.searchParams.get('q');
  let laws: LawSearchResult[] = [];
@@ -149,8 +141,7 @@ export const load: PageLoad = async ({ fetch, url, depends }) => {
  quickLinks,
  laws,
  query,
- meta: {
- title: 'Legal Resources - Laws & Regulations',
+ meta: { title: 'Legal Resources - Laws & Regulations',
  description: 'Browse California and state laws with AI-powered search and summaries',
  },
  };
@@ -159,3 +150,7 @@ export const load: PageLoad = async ({ fetch, url, depends }) => {
  throw error(500, 'Failed to load page data');
  }
 };
+
+
+
+

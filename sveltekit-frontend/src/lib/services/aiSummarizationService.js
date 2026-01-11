@@ -22,3 +22,5 @@
  */
 export const aiSummarizationService = {
  analyzeEvidence: async (evidence) => ({ extractedTags: ["stub-tag"], summary: "Stub summary"}), generateAnalysis: async (evidence) => ({ extractedTags: ["stub-tag"], summary: "Stub analysis"}), generateCaseSummary: async (data) => ({ content: "Stub case summary", richTextContent: "", metadata: { [key: string]: any }, canvasElements: []}), generateCaseSummaryReport: async (data) => ({ content: "Stub case summary report", richTextContent: "", metadata: { [key: string]: any }, canvasElements: []}), generateProsecutionStrategy: async (data) => ({ content: "Stub prosecution strategy", richTextContent: "", metadata: { [key: string]: any }, canvasElements: []})};
+
+

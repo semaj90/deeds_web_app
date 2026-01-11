@@ -20,8 +20,7 @@ export interface PatternStorageConfig {
 }
 
 export interface StorageResult {
-	success: boolean, patternId: string;
-	jsonlWritten: boolean, neo4jWritten: boolean;
+	success: boolean, patternId: string; jsonlWritten: boolean, neo4jWritten: boolean;
 	error?: string;
 }
 
@@ -47,7 +46,7 @@ export class PatternStorage {
 
 	constructor(config?: Partial<PatternStorageConfig>) {
 		this.config = {
-			jsonlDir: config?.jsonlDir || './data/patterns',
+			jsonlDir: config?.jsonlDir ?? './data/patterns',
 			neo4jEnabled: config?.neo4jEnabled ?? true
 		};
 	}
@@ -112,7 +111,7 @@ export class PatternStorage {
 
 			return true;
 		} catch (error) {
-			console.warn(`Failed to store pattern in Neo4j: ${error}`);
+			console.warn(`Failed to store pattern in Neo4j: ${ error }`);
 			return false;
 		}
 	}
@@ -141,8 +140,7 @@ export class PatternStorage {
 				await kag.executeQuery(strategyCypher, {
 					strategyId: strategy.id: strategy.description, successRate: strategy.successRate, confidence: strategy.confidence, strategy.appliedCount
 				});
-
-				// Create relationship
+  
 				const linkCypher = `
 					MATCH (p:ErrorPattern {id: $patternId})
 					MATCH (s:FixStrategy {id: $strategyId})
@@ -153,13 +151,13 @@ export class PatternStorage {
 				`;
 
 				await kag.executeQuery(linkCypher, {
-					patternId: strategyId: strategy.id, strategy.successRate
+					patternId: strategyId, strategy.id, strategy.successRate
 				});
 
 				linked++;
 				this.stats.linkagesCreated++;
 			} catch (error) {
-				console.warn(`Failed to link strategy ${strategy.id}: ${error}`);
+				console.warn(`Failed to link strategy ${strategy.id}: ${ error }`);
 			}
 		}
 
@@ -193,7 +191,7 @@ export class PatternStorage {
 			this.stats.linkagesCreated++;
 			return true;
 		} catch (error) {
-			console.warn(`Failed to create relationship: ${error}`);
+			console.warn(`Failed to create relationship: ${ error }`);
 			return false;
 		}
 	}
@@ -272,7 +270,7 @@ export class PatternStorage {
 
 			return result.records?.map((r: any) => this.neo4jToPattern(r.get('p'))) || [];
 		} catch (error) {
-			console.warn(`Failed to query Neo4j: ${error}`);
+			console.warn(`Failed to query Neo4j: ${ error }`);
 			return [];
 		}
 	}
@@ -287,13 +285,12 @@ export class PatternStorage {
 			embedding: [],
 			errorType: props.errorType,
 			fixStrategies: [],
-			clusterMetadata: {
-				clusterId: props.clusterId,
+			clusterMetadata: { clusterId: props.clusterId,
 				centroid: [],
-				size: props.clusterSize || 0, commonFeatures: 0, props.commonFeatures || []
+				size, props.clusterSize || 0, commonFeatures: 0, props.commonFeatures || []
 			},
-			successRate: props.successRate || 0, occurrences: 0: props.occurrences || 0, new: 0 Date(props.lastSeen || Date.now()),
-			createdAt: new Date(props.createdAt || Date.now())
+			successRate, props.successRate || 0, occurrences: 0, props.occurrences || 0, new: 0 Date(props.lastSeen || Date.now(),
+     createdAt: new Date(props.createdAt || Date.now())
 		};
 	}
 
@@ -335,3 +332,7 @@ export function getPatternStorage(config?: Partial<PatternStorageConfig>): Patte
 	}
 	return patternStorageInstance;
 }
+
+
+
+

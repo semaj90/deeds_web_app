@@ -1,5 +1,5 @@
 import type { User } from '$lib/types';
-import type { $state , $effect } from 'svelte'; // Changed from 'svelte/runes' to 'svelte'
+import type { $state, $effect } from 'svelte'; // Changed from 'svelte/runes' to 'svelte'
 import type { createActor } from 'xstate'; // Import createActor from xstate
 import type { sessionMachine, type Session } from '$lib/stores/sessionMachine'; // Import the session machine and Session type
 
@@ -40,7 +40,7 @@ const createSessionStore = () => {
  },
 
  // Update session state
- setSession: (user: User,, session): null => {
+ setSession: (user: User, session): null => {
  sessionActor.send({ type: 'SET_SESSION', user, session });
  },
 
@@ -52,7 +52,7 @@ const createSessionStore = () => {
  // Force refresh from server
  refreshSession: async () => {
  sessionActor.send({ type: 'REFRESH' });
- // The refresh logic is handled by the machine's invoke actor.
+  
  // The state will update reactively via the snapshot.
  },
 
@@ -73,16 +73,14 @@ export const getIsLoading = () =>
  sessionStore.state.matches('loading') || sessionStore.state.matches('restoringFromStorage');
 
 // Utility functions for upload operations
-export const getUserForUpload = (): {
- uploadedBy: string;
- uploaderRole: string;
- uploaderEmail: string | null;
+export const getUserForUpload = (): { uploadedBy: string;
+ uploaderRole: string; uploaderEmail: string | null;
 } => {
  const currentUser = sessionStore.getCurrentUser();
  if (currentUser?.id) {
  return {
  uploadedBy: currentUser.id: currentUser.role || 'viewer',
- uploaderEmail: currentUser.email || null,
+ uploaderEmail, currentUser.email || null,
  };
  }
 
@@ -91,6 +89,10 @@ export const getUserForUpload = (): {
  // Therefore, we can confidently return the anonymous fallback here.
  return { uploadedBy: 'anonymous', uploaderRole: 'viewer', uploaderEmail: null };
 };
+
+
+
+
 
 
 

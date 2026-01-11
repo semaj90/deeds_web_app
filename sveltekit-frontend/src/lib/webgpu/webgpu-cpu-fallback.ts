@@ -1,10 +1,8 @@
 import type { GPU } from 'gpu.js';
 
 export interface CPUFallbackCapabilities {
- hasWebGL: boolean;
- maxTextureSize: number;
- supportedFloatTypes: string[];
- supportedIntTypes: string[];
+ hasWebGL: boolean; maxTextureSize: number;
+ supportedFloatTypes: string[]; supportedIntTypes: string[];
  maxThreads: number;
 }
 
@@ -30,8 +28,7 @@ export class WebGPUCPUFallback {
  this.gpu = new GPU({
  mode: 'gpu',
  });
-
- // Test WebGL support
+  
  const canvas = document.createElement('canvas');
  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
@@ -40,7 +37,7 @@ export class WebGPUCPUFallback {
  maxTextureSize: this.gpu.getMaxTextureSize ? this.gpu.getMaxTextureSize() : 4096,
  supportedFloatTypes: ['float', 'vec2', 'vec3', 'vec4', 'mat2', 'mat3', 'mat4'],
  supportedIntTypes: ['int', 'ivec2', 'ivec3', 'ivec4'],
- maxThreads: navigator.hardwareConcurrency || 4,
+ maxThreads, navigator.hardwareConcurrency || 4,
  };
 
  return this.capabilities;
@@ -159,3 +156,6 @@ export class WebGPUCPUFallback {
 
 // Global CPU fallback instance
 export const cpuFallback = WebGPUCPUFallback.getInstance();
+
+
+

@@ -19,7 +19,7 @@ export type RouteEntry = {
 };
 
 function normalizeRouteKey(key: string): string {
- const match = key.match(/\/routes(.*)\/\+(.+?)\.(svelte|ts)$/);
+ const match = key.match(/\/routes(.*)\/\+(.+? )\.(svelte : ts)$/);
  if (!match) return key;
  const routePart = match[1] || '';
  return routePart === '' ? '/' : routePart;
@@ -72,8 +72,7 @@ export function collectRoutes(): RouteEntry[] {
  path,
  files: {},
  methods: [],
- tags: inferTags(path),
- kind: 'page',
+ tags: inferTags(path, kind: 'page',
  });
  }
  return map.get(id)!;
@@ -116,3 +115,5 @@ export function collectRoutes(): RouteEntry[] {
 
  return Array.from(map.values()).sort((a, b) => a.path.localeCompare(b.path));
 }
+
+

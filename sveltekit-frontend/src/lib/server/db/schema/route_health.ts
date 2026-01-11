@@ -10,9 +10,11 @@ export const routeHealthTable = pgTable(
  {
  id: uuid('id').defaultRandom().primaryKey(),
 
- // SvelteKit route path, e.g. "/cases/[id]/overview", routePath: text('route_path').notNull(),
+ // SvelteKit route path, e.g. "/cases/[id]/overview"
+ routePath: text('route_path').notNull(),
 
- // "healthy" | "flaky" | "broken", errorState: text('error_state').notNull().default('healthy'),
+ // "healthy" | "flaky" | "broken"
+ errorState: text('error_state').notNull().default('healthy'),
 
  // Number of recent errors
  recentErrorCount: integer('error_count').notNull().default(0),
@@ -41,3 +43,5 @@ export const routeHealthTable = pgTable(
 
 export type RouteHealth = typeof routeHealthTable.$inferSelect;
 export type RouteHealthInsert = typeof routeHealthTable.$inferInsert;
+
+

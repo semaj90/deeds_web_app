@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Badge } from '$lib/components/ui/badge';
-	import { Button } from '$lib/components/ui/button';
-	import { Card, CardContent } from '$lib/components/ui/card';
+	import { Button } from '$lib/components/ui/enhanced-bits';
+	import { Card, CardContent } from '$lib/components/ui/enhanced-bits';
 	import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '$lib/components/ui/table';
 	import { onMount } from 'svelte';
 
@@ -57,7 +57,7 @@
 			<h2 class="text-2xl font-bold tracking-tight">Analysis Runs</h2>
 			<p class="text-muted-foreground">History of error analysis and correction runs</p>
 		</div>
-		<Button onclick={createRun}>Create New Run</Button>
+		<Button class="bits-btn" onclick={createRun}>Create New Run</Button>
 	</div>
 
 	<Card>
@@ -67,7 +67,7 @@
 			{:else if runs.length === 0}
 				<div class="text-center py-12">
 					<p class="text-muted-foreground mb-4">No runs yet</p>
-					<Button onclick={createRun}>Create Your First Run</Button>
+					<Button class="bits-btn" onclick={createRun}>Create Your First Run</Button>
 				</div>
 			{:else}
 				<Table>
@@ -100,7 +100,7 @@
 									{new Date(run.startedAt).toLocaleString()}
 								</TableCell>
 								<TableCell>
-									<Button
+									<Button class="bits-btn"
 										variant="ghost"
 										size="sm"
 										onclick={() => window.location.href = `/error-brain/runs/${run.runId}`}
@@ -116,3 +116,5 @@
 		</CardContent>
 	</Card>
 </div>
+
+

@@ -1,0 +1,184 @@
+import { getOllamaEndpoint } from '$lib/utils/ollama-endpoint';
+import { json } from '@sveltejs/kit';
+
+export async function POST({ request }) {
+  try {
+    const { evidenceTexts, existingTimeline, caseId } = await request.json();
+
+    if (!evidenceTexts || !Array.isArray(evidenceTexts)) {
+      return json({ error: 'evidenceTexts array is required' }, { status: 400 });
+    }
+
+    const base = getOllamaEndpoint();
+
+    const evidenceContext = evidenceTexts.map((text: string, index: number) =>;
+      `EVIDENCE ${index + 1}: ${text}`
+    ).join('\n\n');
+
+    const existingContext = existingTimeline ?;
+      `\n\nEXISTING TIMELINE:\n${existingTimeline.map((event: any, index: number) =>
+        `${index + 1}. ${event.timestamp || 'Unknown time'}: ${event.description}`
+      ).join('\n')}` : '';
+
+    const res = await fetch(`${base}/api/chat`, {
+      method: "POST",
+      body: JSON.stringify({
+        model: "gemma3-legal:latest",
+        messages: [
+          {
+            role: "system",
+            content: `You are a forensic timeline reconstruction specialist. Your task is to:
+
+1. **EXTRACT TIMESTAMPS**: Identify all dates, times, and temporal references from the evidence
+2. **NORMALIZE TIMES**: Convert all times to consistent format (ISO 8601 when possible)
+3. **BUILD CHRONOLOGY**: Create a logical sequence of events
+4. **IDENTIFY GAPS**: Find missing time periods or unexplained sequences
+5. **DETECT CONTRADICTIONS**: Flag any timeline conflicts or impossibilities
+6. **PROPOSE MISSING EVENTS**: Suggest what might have happened in gaps
+
+Format your response as structured JSON:
+
+{
+  "events": [
+    {
+      "id": "event_1",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "description": "Detailed description of what happened",
+      "evidence": ["evidence_1", "evidence_2"],
+      "confidence": "high|medium|low",
+      "source": "extracted|inferred|proposed"
+    }
+  ],
+  "gaps": [
+    {
+      "startTime": "2024-01-15T11:00:00Z",
+      "endTime": "2024-01-15T11:30:00Z",
+      "description": "30-minute gap with no documented activity",
+      "significance": "high|medium|low"
+    }
+  ],
+  "contradictions": [
+    {
+      "description": "Event A cannot occur after Event B based on timestamps",
+      "evidence": ["evidence_1", "evidence_2"],
+      "severity": "high|medium|low"
+    }
+  ],
+  "proposedEvents": [
+    {
+      "timestamp": "2024-01-15T11:15:00Z",
+      "description": "Suspect likely traveled from location A to B",
+      "confidence": "medium",
+      "rationale": "Based on distance and typical travel time"
+    }
+  ]
+}
+
+Be precise with timestamps. Use ISO 8601 format when possible. Flag any assumptions.`
+          },
+          {
+            role: "user",
+            content: `Reconstruct the timeline from this evidence:\n\n${evidenceContext}${existingContext}`
+          }
+        ],
+        stream: false
+      }),
+      headers: { "Content-Type": "application/json" }
+    });
+
+    if (!res.ok) {
+      throw new Error(`Ollama API error: ${res.status}`);
+    }
+
+    const result = await res.json();
+    const response = result.message?.content || result.content || '';
+
+    // Parse the JSON response
+    let timelineData;
+    try {
+      // Try to extract JSON from the response
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        timelineData = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('No JSON found in response');
+      }
+    } catch (parseError) {
+      console.error('Failed to parse timeline JSON:', parseError);
+      // Fallback: create basic structure from text
+      timelineData = {
+        events: [],
+        gaps: [],
+        contradictions: [],
+        proposedEvents: [],
+        rawAnalysis: response
+      };
+    }
+
+    // Validate and structure the timeline data
+    const structuredTimeline = {
+      id: `timeline_${Date.now()}`,
+      caseId: caseId || null,
+      generatedAt: new Date().toISOString(),
+      events: validateEvents(timelineData.events || []),
+      gaps: validateGaps(timelineData.gaps || []),
+      contradictions: validateContradictions(timelineData.contradictions || []),
+      proposedEvents: validateProposedEvents(timelineData.proposedEvents || []),
+      metadata: {
+        evidenceCount: evidenceTexts.length,
+        model: 'gemma3-legal:latest',
+        rawAnalysis: timelineData.rawAnalysis || response
+      }
+    };
+
+    return json(structuredTimeline);
+  } catch (error) {
+    console.error('Error reconstructing timeline:', error);
+    return json({ error: 'Failed to reconstruct timeline' }, { status: 500 });
+  }
+}
+
+function validateEvents(events: any[]): any[] {
+  return events.map((event, index) => ({
+    id: event.id || `event_${index + 1}`,
+    timestamp: event.timestamp || null,
+    description: event.description || 'No description provided',
+    evidence: Array.isArray(event.evidence) ? event.evidence : [],
+    confidence: ['high', 'medium', 'low'].includes(event.confidence) ? event.confidence : 'medium',
+    source: ['extracted', 'inferred', 'proposed'].includes(event.source) ? event.source : 'extracted'
+  })).sort((a, b) => {
+    if (!a.timestamp && !b.timestamp) return 0;
+    if (!a.timestamp) return 1;
+    if (!b.timestamp) return -1;
+    return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+  });
+}
+
+function validateGaps(gaps: any[]): any[] {
+  return gaps.map((gap, index) => ({
+    id: `gap_${index + 1}`,
+    startTime: gap.startTime || null,
+    endTime: gap.endTime || null,
+    description: gap.description || 'Timeline gap identified',
+    significance: ['high', 'medium', 'low'].includes(gap.significance) ? gap.significance : 'medium'
+  }));
+}
+
+function validateContradictions(contradictions: any[]): any[] {
+  return contradictions.map((contradiction, index) => ({
+    id: `contradiction_${index + 1}`,
+    description: contradiction.description || 'Timeline contradiction detected',
+    evidence: Array.isArray(contradiction.evidence) ? contradiction.evidence : [],
+    severity: ['high', 'medium', 'low'].includes(contradiction.severity) ? contradiction.severity : 'medium'
+  }));
+}
+
+function validateProposedEvents(events: any[]): any[] {
+  return events.map((event, index) => ({
+    id: `proposed_${index + 1}`,
+    timestamp: event.timestamp || null,
+    description: event.description || 'Proposed event',
+    confidence: ['high', 'medium', 'low'].includes(event.confidence) ? event.confidence : 'low',
+    rationale: event.rationale || 'AI-generated proposal'
+  }));
+}

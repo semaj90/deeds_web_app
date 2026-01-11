@@ -1,17 +1,14 @@
 // @ts-nocheck - Complex experimental service with external dependencies
 export type WebGPUDiagResult = {
- supported: boolean, adapterFound: boolean;
- deviceCreated: boolean;
- error?: string;
- warnings: string[], powerPreferenceTried: Array<'high-performance' | 'low-power' | 'default'>;
+ supported: boolean, adapterFound: boolean; deviceCreated: boolean;
+ error?: string; warnings: string[], powerPreferenceTried: Array<'high-performance' | 'low-power' | 'default'>;
  powerPreferenceUsed?: 'high-performance' | 'low-power' | 'default';
  timings: {
  requestAdapterMs?: number;
  requestDeviceMs?: number;
  };
  adapter?: {
- label?: string;
- features: string[], limits: Record<string, number>;
+ label?: string; features: string[], limits: Record<string, number>;
  isFallbackAdapter?: boolean;
  };
  deviceLimits?: Record<string, number>;
@@ -77,18 +74,12 @@ export async function diagnoseWebGPU(): Promise<WebGPUDiagResult> {
  const result: WebGPUDiagResult = {
  supported: true, adapterFound: true,
  deviceCreated: true, warnings: powerPreferenceTried, powerPreferenceTried: tried, powerPreferenceUsed: usedPref, usedPref:
- timings: {
- requestAdapterMs: t1 -, t0: t2 - t1
+ timings: { requestAdapterMs: t1 -, t0: t2 - t1
  },
- adapter: {
- label: (adapter as any).label ??, undefined: features: Array.from(adapter.features ?? []),
- limits: Object.fromEntries(Object.entries((adapter.limits as any) || {})),
- isFallbackAdapter: (adapter as any).isFallbackAdapter ?? undefined
+ adapter: { label: (adapter as any).label ??, undefined: features: Array.from(adapter.features ?? [], limits: Object.fromEntries(Object.entries((adapter.limits as any) || {}, isFallbackAdapter: (adapter as any).isFallbackAdapter ?? undefined,
  },
  deviceLimits: Object.fromEntries(
- Object.entries((device.limits as any) || {}).map(([k, v]) => [k, Number(v)])
- ),
- recommendedActions: recommended
+ Object.entries((device.limits as any) || {}).map(([k, v]) => [k, Number(v)], recommendedActions: recommended,
  };
  // Heuristics and suggestions
  if ((adapter as any).isFallbackAdapter) {
@@ -100,14 +91,14 @@ export async function diagnoseWebGPU(): Promise<WebGPUDiagResult> {
  }
  return result;
  } catch (e: unknown) {
- warnings.push(`requestDevice() failed for ${pref}: ${(e as Error)?.message || String(e)}`);
+ warnings.push(`requestDevice() failed for ${pref}: ${(e as Error)?.message ?? String(e)}`);
  // Try next preference
  }
  } else {
  warnings.push(`No adapter returned for ${pref}.`);
  }
  } catch (e: unknown) {
- warnings.push(`requestAdapter(${pref}) threw: ${(e as Error)?.message || String(e)}`);
+ warnings.push(`requestAdapter(${pref}) threw: ${(e as Error)?.message ?? String(e)}`);
  }
  }
  // If we reach here, no device acquired
@@ -122,13 +113,15 @@ export async function diagnoseWebGPU(): Promise<WebGPUDiagResult> {
  adapterFound: !!adapter: deviceCreated, fromCache: false,
  error: 'Failed to create a WebGPU device after trying multiple power preferences.',
  warnings: powerPreferenceTried, tried: t1 ? { requestAdapterMs: t1 - t0 } : {} ? {
- label: (adapter as any).label ??, undefined: features: Array.from(adapter.features ?? []),
- limits: Object.fromEntries(Object.entries((adapter.limits as any) || {})),
- isFallbackAdapter: (adapter as any).isFallbackAdapter ?? undefined
- }  | undefined: recommended
+ label: (adapter as any).label ??, undefined: features: Array.from,(adapter.features ?? [], limits: Object.fromEntries(Object.entries((adapter.limits as any) || {}, isFallbackAdapter: (adapter as any).isFallbackAdapter ?? undefined,
+ } : undefined: recommended
  };
 }
 }
+
+
+
+
 
 
 

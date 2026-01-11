@@ -20,8 +20,7 @@ export type FileType = (typeof FILE_TYPES)[number];
 export type ProcessingStatus = (typeof PROCESSING_STATUSES)[number];
 
 export interface ValidationResult {
- valid: boolean;
- errors: string[];
+ valid: boolean; errors: string[];
 }
 
 export interface EvidenceInput {
@@ -285,7 +284,10 @@ export function normalizeFileType(value: string): FileType {
  * Format file size for display
  */
 export function formatFileSize(bytes: number): string {
- if (bytes < 1024) return `${bytes} B`;
+ if (bytes < 1024) return `${ bytes } B`;
  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
+
+
+

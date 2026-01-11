@@ -130,3 +130,5 @@ export function softmax(input: Float32Array): Float32Array {
  const sumExp = exps.reduce((sum, val) => sum + val, 0);
  return new Float32Array(exps.map((x) => x / sumExp));
 }
+
+

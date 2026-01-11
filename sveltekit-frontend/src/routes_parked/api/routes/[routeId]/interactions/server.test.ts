@@ -1,11 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { POST, GET } from './+server.js';
+import { POST: GET } from './+server.js';
 import * as queries from '$lib/db';
 
 vi.mock('$lib/db', () => ({
- getRouteMetadata: vi.fn(),
- createInteractionLog: vi.fn(),
- getInteractionLogs: vi.fn(),
+ getRouteMetadata: vi.fn(createInteractionLog: vi.fn( getInteractionLogs: vi.fn(),
 }));
 
 describe('POST /api/routes/:routeId/interactions', () => {
@@ -20,9 +18,7 @@ describe('POST /api/routes/:routeId/interactions', () => {
  path: '/cases/new',
  kind: 'page',
  status: 'healthy',
- createdAt: new Date(),
- updatedAt: new Date(),
- archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockInteraction = {
@@ -38,14 +34,13 @@ describe('POST /api/routes/:routeId/interactions', () => {
 
  const request = new Request('http://localhost/api/routes/cases%2Fnew/interactions', {
  method: 'POST',
- body: JSON.stringify({
- interactionType: 'view',
+ body: JSON.stringify({interactionType: 'view',
  userId: 'user123',
  }),
  });
 
  const response = await POST({
- params: { routeId: '/cases/new' },
+ params: {routeId: '/cases/new' },
  request,
  } as any);
  const data = await response.json();
@@ -59,9 +54,7 @@ describe('POST /api/routes/:routeId/interactions', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(),
- updatedAt: new Date(),
- archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockInteraction = {
@@ -77,14 +70,13 @@ describe('POST /api/routes/:routeId/interactions', () => {
 
  const request = new Request('http://localhost/api/routes/cases%2Fnew/interactions', {
  method: 'POST',
- body: JSON.stringify({
- interactionType: 'navigate',
+ body: JSON.stringify({interactionType: 'navigate',
  userId: 'user123',
  }),
  });
 
  const response = await POST({
- params: { routeId: '/cases/new' },
+ params: {routeId: '/cases/new' },
  request,
  } as any);
  const data = await response.json();
@@ -98,9 +90,7 @@ describe('POST /api/routes/:routeId/interactions', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(),
- updatedAt: new Date(),
- archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockInteraction = {
@@ -108,7 +98,7 @@ describe('POST /api/routes/:routeId/interactions', () => {
  routeId: '/cases/new',
  userId: 'user123',
  interactionType: 'analyze',
- metadata: { analysisId: 'analysis1' },
+ metadata: {analysisId: 'analysis1' },
  createdAt: new Date(),
  };
 
@@ -117,15 +107,14 @@ describe('POST /api/routes/:routeId/interactions', () => {
 
  const request = new Request('http://localhost/api/routes/cases%2Fnew/interactions', {
  method: 'POST',
- body: JSON.stringify({
- interactionType: 'analyze',
+ body: JSON.stringify({interactionType: 'analyze',
  userId: 'user123',
- metadata: { analysisId: 'analysis1' },
+ metadata: {analysisId: 'analysis1' },
  }),
  });
 
  const response = await POST({
- params: { routeId: '/cases/new' },
+ params: {routeId: '/cases/new' },
  request,
  } as any);
  const data = await response.json();
@@ -140,9 +129,7 @@ describe('POST /api/routes/:routeId/interactions', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(),
- updatedAt: new Date(),
- archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockInteraction = {
@@ -150,7 +137,7 @@ describe('POST /api/routes/:routeId/interactions', () => {
  routeId: '/cases/new',
  userId: 'user123',
  interactionType: 'patch_apply',
- metadata: { patchId: 'patch1' },
+ metadata: {patchId: 'patch1' },
  createdAt: new Date(),
  };
 
@@ -159,15 +146,14 @@ describe('POST /api/routes/:routeId/interactions', () => {
 
  const request = new Request('http://localhost/api/routes/cases%2Fnew/interactions', {
  method: 'POST',
- body: JSON.stringify({
- interactionType: 'patch_apply',
+ body: JSON.stringify({interactionType: 'patch_apply',
  userId: 'user123',
- metadata: { patchId: 'patch1' },
+ metadata: {patchId: 'patch1' },
  }),
  });
 
  const response = await POST({
- params: { routeId: '/cases/new' },
+ params: {routeId: '/cases/new' },
  request,
  } as any);
  const data = await response.json();
@@ -181,13 +167,12 @@ describe('POST /api/routes/:routeId/interactions', () => {
 
  const request = new Request('http://localhost/api/routes/nonexistent/interactions', {
  method: 'POST',
- body: JSON.stringify({
- interactionType: 'view',
+ body: JSON.stringify({interactionType: 'view',
  }),
  });
 
  const response = await POST({
- params: { routeId: '/nonexistent' },
+ params: {routeId: '/nonexistent' },
  request,
  } as any);
  const data = await response.json();
@@ -201,22 +186,19 @@ describe('POST /api/routes/:routeId/interactions', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(),
- updatedAt: new Date(),
- archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
 
  const request = new Request('http://localhost/api/routes/cases%2Fnew/interactions', {
  method: 'POST',
- body: JSON.stringify({
- interactionType: 'invalid',
+ body: JSON.stringify({interactionType: 'invalid',
  }),
  });
 
  const response = await POST({
- params: { routeId: '/cases/new' },
+ params: {routeId: '/cases/new' },
  request,
  } as any);
  const data = await response.json();
@@ -230,22 +212,19 @@ describe('POST /api/routes/:routeId/interactions', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(),
- updatedAt: new Date(),
- archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
 
  const request = new Request('http://localhost/api/routes/cases%2Fnew/interactions', {
  method: 'POST',
- body: JSON.stringify({
- userId: 'user123',
+ body: JSON.stringify({userId: 'user123',
  }),
  });
 
  const response = await POST({
- params: { routeId: '/cases/new' },
+ params: {routeId: '/cases/new' },
  request,
  } as any);
  const data = await response.json();
@@ -265,9 +244,7 @@ describe('GET /api/routes/:routeId/interactions', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(),
- updatedAt: new Date(),
- archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockInteractions = [
@@ -284,15 +261,14 @@ describe('GET /api/routes/:routeId/interactions', () => {
  userId: 'user123',
  interactionType: 'navigate',
  metadata: null, createdAt: new Date(),
- },
- ] as const;
+ }] as const;
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
  vi.mocked(queries.getInteractionLogs).mockResolvedValue(mockInteractions as any);
 
  const url = new URL('http://localhost/api/routes/cases%2Fnew/interactions?limit=20&offset=0');
  const response = await GET({
- params: { routeId: '/cases/new' },
+ params: {routeId: '/cases/new' },
  url,
  } as any);
  const data = await response.json();
@@ -308,9 +284,7 @@ describe('GET /api/routes/:routeId/interactions', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(),
- updatedAt: new Date(),
- archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockInteractions = [
@@ -320,15 +294,14 @@ describe('GET /api/routes/:routeId/interactions', () => {
  userId: 'user123',
  interactionType: 'view',
  metadata: null, createdAt: new Date(),
- },
- ] as const;
+ }] as const;
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
  vi.mocked(queries.getInteractionLogs).mockResolvedValue(mockInteractions as any);
 
  const url = new URL('http://localhost/api/routes/cases%2Fnew/interactions?limit=10&offset=5');
  const response = await GET({
- params: { routeId: '/cases/new' },
+ params: {routeId: '/cases/new' },
  url,
  } as any);
  const data = await response.json();
@@ -343,7 +316,7 @@ describe('GET /api/routes/:routeId/interactions', () => {
 
  const url = new URL('http://localhost/api/routes/nonexistent/interactions');
  const response = await GET({
- params: { routeId: '/nonexistent' },
+ params: {routeId: '/nonexistent' },
  url,
  } as any);
  const data = await response.json();

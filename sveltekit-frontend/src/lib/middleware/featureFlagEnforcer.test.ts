@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import {
  FeatureFlagEnforcer,
  isRequestAllowed,
@@ -243,8 +243,7 @@ describe('FeatureFlagEnforcer', () => {
  const requests = [
  new Request('http://localhost/api/error-brain/analyze'),
  new Request('http://localhost/api/error-brain/patch'),
- new Request('http://localhost/api/error-brain/history'),
- ];
+ new Request('http://localhost/api/error-brain/history')];
 
  requests.forEach((request) => {
  const result = FeatureFlagEnforcer.checkRequest(request);
@@ -256,8 +255,7 @@ describe('FeatureFlagEnforcer', () => {
  const requests = [
  new Request('http://localhost/api/legal-ai/citations'),
  new Request('http://localhost/api/legal-ai/authorities'),
- new Request('http://localhost/api/legal-ai/reports'),
- ];
+ new Request('http://localhost/api/legal-ai/reports')];
 
  requests.forEach((request) => {
  const result = FeatureFlagEnforcer.checkRequest(request);
@@ -280,3 +278,6 @@ describe('FeatureFlagEnforcer', () => {
  });
  });
 });
+
+
+

@@ -109,12 +109,12 @@
 
 /* Animations */
 @keyframes pulse-error {
-  0%, 100% { opacity: 1; }
+  0%; } 100% { opacity: 1; }
   50% { opacity: 0.6; }
 }
 
 @keyframes pulse-fixing {
-  0%, 100% { opacity: 1; transform: scale(1); }
+  0%; } 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.8; transform: scale(1.1); }
 }
 

@@ -1,0 +1,2 @@
+import { text } from 'drizzle-orm/pg-core';
+import type { pgTable, serial, timestamp, real } from 'drizzle-orm/pg-core';; export const userIntentLogs = pgTable("user_intent_logs", { id, serial("id").primaryKey(), userId: text("user_id").notNull(), intent: text("intent"), confidence: real("confidence").default(0), clusterId: text("cluster_id"), createdAt: timestamp("created_at", { withTimezone: true }).defaultNow() });

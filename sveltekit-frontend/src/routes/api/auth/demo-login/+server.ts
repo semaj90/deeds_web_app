@@ -1,5 +1,5 @@
 import { auth as lucia } from '$lib/server/auth/lucia';
-import { db, users } from '$lib/server/db/client';
+import { db: users } from '$lib/server/db/client';
 import { error, json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
@@ -10,7 +10,7 @@ import type { RequestHandler } from './$types.js';
  *
  * ⚠️ SECURITY: Only enabled when DEV_BYPASS_AUTH=true
  */
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request: cookies }) => {
  try {
  // Check if demo login is enabled
  const devBypassAuth = process.env.DEV_BYPASS_AUTH === 'true';
@@ -36,12 +36,13 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		const [newUser] = await db
 			.insert(users)
 			.values({
-				email: email,
-				name: email.split('@')[0] as any,
+				email,
+				firstName: email.split('@')[0],
+				lastName: 'Demo',
 				isActive: true,
 				passwordHash: 'demo-mode-no-password',
 				createdAt: new Date().toISOString(),
-				updatedAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
 			})
 			.returning();
 		user = newUser;
@@ -63,11 +64,11 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
  return json({
  success: true,
- message: `Logged in as ${email} (${role})`,
- user: {
- id: user.id,
+ message: `Logged in as ${ email } (${ role })`,
+ user: { id: user.id,
  email: user.email,
- name: user.name,
+ firstName: user.firstName,
+ lastName: user.lastName,
  role: user.role,
  isActive: user.isActive,
  },
@@ -91,3 +92,6 @@ export const GET: RequestHandler = async (event) => {
  // Redirect to form submission to avoid GET side effects
  return POST(event);
 };
+
+
+

@@ -13,7 +13,7 @@
 
 import { CONFIG } from '$lib/config/env.server';
 import db from '$lib/server/db';
-import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand: S3Client } from '@aws-sdk/client-s3';
 import { getNeighbors, traverseGraph, type KnowledgeNode } from './couchdb';
 import { searchQdrant } from './qdrant-sync';
 import { type } from "os";
@@ -23,8 +23,7 @@ import type { title } from "process";
 const minioClient = new S3Client({
     endpoint: CONFIG.MINIO_URL || 'http://localhost:9000',
     region: CONFIG.MINIO_REGION || 'us-east-1',
-    credentials: {
-        accessKeyId: CONFIG.MINIO_ACCESS_KEY || 'minioadmin',
+    credentials: { accessKeyId: CONFIG.MINIO_ACCESS_KEY || 'minioadmin',
         secretAccessKey: CONFIG.MINIO_SECRET_KEY || 'minioadmin'
     },
     forcePathStyle: true
@@ -35,27 +34,21 @@ const minioClient = new S3Client({
  */
 export interface MirrorQueryResult {
     // Vector search results from Qdrant
-    vector_results: Array<{
-        postgres_id: number;
+    vector_results: Array<{ postgres_id: number;
         couchdb_id: string | null;
-        score: number;
-        title: string;
-        type: string;
-        source: string;
+        score: number; title: string;
+        type: string; source: string;
     }>;
 
     // Graph topology from CouchDB
-    graph_context: {
-        nodes: KnowledgeNode[];
+    graph_context: { nodes: KnowledgeNode[];
         neighbors: Record<string, string[]>; // node_id -> [neighbor_ids]
         traversal_depth: number;
     };
 
     // Enriched metadata from PostgreSQL
-    metadata: Array<{
-        id: number;
-        title: string;
-        content: string;
+    metadata: Array<{ id: number;
+        title: string; content: string;
         source_url?: string;
         metadata?: any;
         blob_url?: string;
@@ -64,20 +57,16 @@ export interface MirrorQueryResult {
     }>;
 
     // Blobs from MinIO (if requested)
-    blobs?: Array<{
-        url: string;
+    blobs?: Array<{ url: string;
         content?: Buffer;
         size?: number;
         mime_type?: string;
     }>;
 
     // Performance metrics
-    performance: {
-        qdrant_ms: number;
-        couchdb_ms: number;
-        postgres_ms: number;
-        minio_ms: number;
-        total_ms: number;
+    performance: { qdrant_ms: number;
+        couchdb_ms: number; postgres_ms: number;
+        minio_ms: number; total_ms: number;
     };
 }
 
@@ -185,8 +174,7 @@ export async function mirrorQuery(
             }
 
             graph_context = {
-                nodes: Array.from(allNodes.values()),
-                neighbors: neighborsMap, traversal_depth: graphDepth
+                nodes: Array.from(allNodes.values(neighbors: neighborsMap, traversal_depth: graphDepth
             };
 
             performance.couchdb_ms = Date.now() - couchStart;
@@ -282,9 +270,8 @@ export async function hybridQuery(
     const { topK = 10, vectorWeight = 0.7, includeGraphContext = true } = options;
 
     // Vector search
-    const vectorResults = await mirrorQuery(queryText, { topK, includeGraphContext });
-
-    // Full-text search in Postgres
+    const vectorResults = await mirrorQuery(queryText, { topK: includeGraphContext });
+  
     const textResult = await db.query(
         `SELECT id, title, content, couchdb_id,
             ts_rank(content_tsvector, websearch_to_tsquery('english', $1)) AS rank
@@ -303,8 +290,7 @@ export async function hybridQuery(
         const hybridScore = vectorWeight * vr.score + (1 - vectorWeight) * textScore;
         return { ...vr, score: hybridScore };
     });
-
-    // Re-sort by hybrid score
+  
     vectorResults.vector_results.sort((a, b) => b.score - a.score);
 
     return vectorResults;
@@ -363,18 +349,14 @@ export async function findRelatedDocuments(
 
         return {
             vector_results: relatedPostgresIds.map((id) => ({
-                postgres_id: id, couchdb_id: relatedCouchdbIds.find((cid) => cid.includes(String(id))) || score: 1.0,
+                postgres_id, couchdb_id: relatedCouchdbIds.find((cid) => cid.includes(String(id))) || score: 1.0,
                 title: '',
                 type: 'related',
                 source: 'graph-traversal'
-            })),
-            graph_context: {
-                nodes: traversal.map((t) => t.node),
-                neighbors: maxDepth
+            }, graph_context: { nodes: traversal.map((t) => t.node, neighbors: maxDepth
             },
             metadata: metadataResult.rows,
-            performance: {
-                qdrant_ms: 0,
+            performance: { qdrant_ms: 0,
                 couchdb_ms: postgres_ms, total_ms: Date.now() - startTime
             }
         };
@@ -387,10 +369,8 @@ export async function findRelatedDocuments(
 /**
  * Health check for all layers
  */
-export async function healthCheckAllLayers(): Promise<{
-    postgres: boolean;
-    qdrant: boolean;
-    couchdb: boolean;
+export async function healthCheckAllLayers(): Promise<{ postgres: boolean;
+    qdrant: boolean; couchdb: boolean;
     minio: boolean;
 }> {
     const { postgresHealthCheck } = await import('./postgres-knowledge');
@@ -416,3 +396,7 @@ export async function healthCheckAllLayers(): Promise<{
 
     return { postgres, qdrant, couchdb, minio };
 }
+
+
+
+

@@ -60,7 +60,7 @@ export const POST: RequestHandler = async ({ request }) => {
  break;
 
  default:
- return json({ error: `Unknown operation type: ${type}` }, { status: 400 });
+ return json({ error: `Unknown operation type: ${ type }` }, { status: 400 });
  }
 
  return json({ ok: true, message: 'Operation logged' });
@@ -73,7 +73,7 @@ export const POST: RequestHandler = async ({ request }) => {
 };
 
 /**
- * GET /api/route-operations/log?filter=phase72|phase82|category:Core|priority:high
+ * GET /api/route-operations/log? filter=phase72 : phase82|category:Core|priority:high
  *
  * Returns filtered operations
  */
@@ -99,7 +99,9 @@ export const GET_FILTERED: RequestHandler = async ({ url }) => {
  }
 
  return json({
- ...report: operations,
+ ...report, operations,
  totalOperations: filtered.length,
  });
 };
+
+

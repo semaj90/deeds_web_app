@@ -1,0 +1,188 @@
+/* themes.css
+    Light / Dark theme tokens and small UI utilities.
+    Drop this into your app root so variables cascade through components.
+*/
+
+/* Base tokens (light defaults) */
+:root {
+  /* palette */
+  --bg: #f8fafc; /* page background */
+  --surface: #ffffff; /* cards, panels */
+  --muted: #f1f5f9; /* subtle surfaces */
+  --border: #e6edf3;
+  --text: #0f172a;
+  --muted-text: #475569;
+  --accent: #0ea5a4; /* teal-ish accent */
+  --accent-foreground: #ffffff;
+  --danger: #ef4444;
+  --success: #10b981;
+  --shadow: 0 6px 18px rgba(2, 6, 23, 0.08);
+
+  /* semantic spacing / sizing */
+  --radius: 0.5rem;
+  --control-padding: 0.5rem 0.75rem;
+
+  /* typography */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+
+  /* transitions */
+  --timing-short: 150ms;
+  --timing-medium: 240ms;
+}
+
+/* Dark theme overrides */
+[data-theme='dark'],
+.theme-dark {
+  --bg: #0b1220;
+  --surface: #0f1724;
+  --muted: #0b1520;
+  --border: #18202b;
+  --text: #e6eef6;
+  --muted-text: #a6b0be;
+  --accent: #2dd4bf;
+  --accent-foreground: #062021;
+  --danger: #f97373;
+  --success: #34d399;
+  --shadow: 0 10px 30px rgba(2, 6, 23, 0.5);
+}
+
+/* Respect OS preference as default (but allow explicit data-theme to override) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #0b1220;
+    --surface: #0f1724;
+    --muted: #0b1520;
+    --border: #18202b;
+    --text: #e6eef6;
+    --muted-text: #a6b0be;
+    --accent: #2dd4bf;
+    --accent-foreground: #062021;
+    --danger: #f97373;
+    --success: #34d399;
+    --shadow: 0 10px 30px rgba(2, 6, 23, 0.5);
+  }
+}
+
+/* Utility: smooth color transitions for theme changes */
+.theme-transition,
+[data-theme] * {
+  transition:
+    background-color var(--timing-medium) ease,
+    color var(--timing-medium) ease,
+    border-color var(--timing-medium) ease,
+    box-shadow var(--timing-medium) ease;
+}
+
+/* Layout primitives */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Card / surface */
+.surface {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: var(--text);
+}
+
+/* Controls */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: var(--control-padding);
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform var(--timing-short) ease,
+    box-shadow var(--timing-short) ease;
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+/* Secondary / ghost button */
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+/* Form inputs */
+.input {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  outline: none;
+}
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+/* Small helpers */
+.text-muted {
+  color: var(--muted-text);
+}
+.border-muted {
+  border-color: var(--border);
+}
+.radius-sm {
+  border-radius: 0.25rem;
+}
+.radius-md {
+  border-radius: var(--radius);
+}
+
+/* Accent utilities */
+.accent {
+  color: var(--accent);
+}
+.accent-bg {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+/* Accessibility:focus visible for keyboard users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Lightweight code / syntax highlight background */
+.code {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--muted) 70%, transparent),
+    transparent
+  );
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+  font-size: 0.9em;
+}
+
+/* Utilities for theme toggling via JS:
+    - Add data-theme="dark" or data-theme="light" to <html> or <body>
+    - Or add class "theme-dark" / "theme-light" to a root element
+*/

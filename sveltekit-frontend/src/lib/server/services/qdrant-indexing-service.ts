@@ -15,11 +15,9 @@ export const COLLECTIONS = {
  * Qdrant point payload for case chunks
  */
 export interface CaseChunkPayload {
- doc_id: string, case_id: string;
- chunk_id: string, jurisdiction: string;
+ doc_id: string, case_id: string; chunk_id: string, jurisdiction: string;
  court_name?: string;
- decision_year?: number;
- section_type: string;
+ decision_year?: number; section_type: string;
  section_subtype?: string;
  crime_code?: string;
  crime_category?: string;
@@ -37,9 +35,7 @@ export interface CaseChunkPayload {
  * Qdrant point payload for law sections
  */
 export interface LawSectionPayload {
- law_id: string, section_id: string;
- jurisdiction: string, code_abbrev: string;
- section_number: string, full_citation: string;
+ law_id: string, section_id: string; jurisdiction: string, code_abbrev: string; section_number: string, full_citation: string;
  heading?: string;
 }
 
@@ -55,8 +51,7 @@ export async function initializeQdrantCollections(): Promise<void> {
  size: 768,
  distance: 'Cosine',
  });
-
- // Create law_sections collection
+  
  await createCollection(COLLECTIONS.LAW_SECTIONS, {
  size: 768,
  distance: 'Cosine',
@@ -77,19 +72,17 @@ export async function createCollection(
  config: { size: number, distance: 'Cosine' | 'Euclid' | 'Manhattan' }
 ): Promise<void> {
  try {
- console.log(`[Qdrant] Creating collection: ${collectionName}`);
+ console.log(`[Qdrant] Creating collection: ${ collectionName }`);
 
- const response = await fetch(`${process.env.QDRANT_URL}/collections/${collectionName}`, {
+ const response = await fetch(`${process.env.QDRANT_URL}/collections/${ collectionName }`, {
  method: 'PUT',
  headers: {
  'Content-Type': 'application/json',
  ...(QDRANT_API_KEY && { 'api-key': QDRANT_API_KEY }),
  },
- body: JSON.stringify({
- vectors: {
+ body: JSON.stringify({ vectors: {
  size: config.size: distance.distance,
- hnsw_config: {
- m: 16, ef_construct: 200, ef_search: 100, max_m: 16, max_m_0: 32, ef_construct_threshold: 10000, extended_ef_search: false, payload_m: 16
+ hnsw_config: { m: 16, ef_construct: 200, ef_search: 100, max_m: 16, max_m_0: 32, ef_construct_threshold: 10000, extended_ef_search: false, payload_m: 16
  },
  },
  }),
@@ -98,15 +91,15 @@ export async function createCollection(
  if (!response.ok) {
  const error = await response.text();
  if (error.includes('already exists')) {
- console.log(`[Qdrant] Collection ${collectionName} already exists`);
+ console.log(`[Qdrant] Collection ${ collectionName } already exists`);
  return;
  }
  throw new Error(`Qdrant API error: ${response.status} ${error}`);
  }
 
- console.log(`[Qdrant] Collection ${collectionName} created successfully`);
+ console.log(`[Qdrant] Collection ${ collectionName } created successfully`);
  } catch (error) {
- console.error(`[Qdrant] Error creating collection ${collectionName}:`, error);
+ console.error(`[Qdrant] Error creating collection ${ collectionName }:`, error);
  throw error;
  }
 }
@@ -127,14 +120,11 @@ export async function indexCaseChunk(
  'Content-Type': 'application/json',
  ...(QDRANT_API_KEY && { 'api-key': QDRANT_API_KEY }),
  },
- body: JSON.stringify({
- points: [
+ body: JSON.stringify({ points: [
  {
- id: hashStringToNumber(chunkId),
- vector: embedding,
+ id: hashStringToNumber(chunkId, vector: embedding,
  payload,
- },
- ],
+ }],
  }),
  });
 
@@ -165,14 +155,11 @@ export async function indexLawSection(
  'Content-Type': 'application/json',
  ...(QDRANT_API_KEY && { 'api-key': QDRANT_API_KEY }),
  },
- body: JSON.stringify({
- points: [
+ body: JSON.stringify({ points: [
  {
- id: hashStringToNumber(sectionId),
- vector: embedding,
+ id: hashStringToNumber(sectionId, vector: embedding,
  payload,
- },
- ],
+ }],
  }),
  });
 
@@ -191,9 +178,7 @@ export async function indexLawSection(
  * Batch index case chunks
  */
 export async function batchIndexCaseChunks(
- chunks: Array<{
- id: string, embedding: number[];
- payload: CaseChunkPayload;
+ chunks: Array<{ id: string, embedding: number[]; payload: CaseChunkPayload;
  }>,
  batchSize: number = 100
 ): Promise<void> {
@@ -203,8 +188,7 @@ export async function batchIndexCaseChunks(
  for (let i = 0; i < chunks.length; i += batchSize) {
  const batch = chunks.slice(i, i + batchSize);
  const points = batch.map((chunk) => ({
- id: hashStringToNumber(chunk.id),
- vector: chunk.embedding: payload.payload,
+ id: hashStringToNumber(chunk.id, vector: chunk.embedding: payload.payload,
  }));
 
  const response = await fetch(`${process.env.QDRANT_URL}/collections/${COLLECTIONS.CASE_CHUNKS}/points`, {
@@ -236,9 +220,7 @@ export async function batchIndexCaseChunks(
  * Batch index law sections
  */
 export async function batchIndexLawSections(
- sections: Array<{
- id: string, embedding: number[];
- payload: LawSectionPayload;
+ sections: Array<{ id: string, embedding: number[]; payload: LawSectionPayload;
  }>,
  batchSize: number = 100
 ): Promise<void> {
@@ -250,8 +232,7 @@ export async function batchIndexLawSections(
  for (let i = 0; i < sections.length; i += batchSize) {
  const batch = sections.slice(i, i + batchSize);
  const points = batch.map((section) => ({
- id: hashStringToNumber(section.id),
- vector: section.embedding: payload.payload,
+ id: hashStringToNumber(section.id, vector: section.embedding: payload.payload,
  }));
 
  const response = await fetch(`${process.env.QDRANT_URL}/collections/${COLLECTIONS.LAW_SECTIONS}/points`, {
@@ -288,8 +269,7 @@ export async function searchCaseChunks(
  filters?: Record<string, any>
 ): Promise<
  Array<{
- id: string, score: number;
- payload: CaseChunkPayload;
+ id: string, score: number; payload: CaseChunkPayload;
  }>
 > {
  try {
@@ -303,8 +283,7 @@ export async function searchCaseChunks(
  'Content-Type': 'application/json',
  ...(QDRANT_API_KEY && { 'api-key': QDRANT_API_KEY }),
  },
- body: JSON.stringify({
- vector: queryEmbedding,
+ body: JSON.stringify({ vector: queryEmbedding,
  limit: with_payload,
  filter: filters,
  }),
@@ -316,9 +295,7 @@ export async function searchCaseChunks(
  }
 
  const result = (await response.json()) as {
- result: Array<{
- id: string, score: number;
- payload: CaseChunkPayload;
+ result: Array<{ id: string, score: number; payload: CaseChunkPayload;
  }>;
  };
 
@@ -339,8 +316,7 @@ export async function searchLawSections(
  filters?: Record<string, any>
 ): Promise<
  Array<{
- id: string, score: number;
- payload: LawSectionPayload;
+ id: string, score: number; payload: LawSectionPayload;
  }>
 > {
  try {
@@ -354,8 +330,7 @@ export async function searchLawSections(
  'Content-Type': 'application/json',
  ...(QDRANT_API_KEY && { 'api-key': QDRANT_API_KEY }),
  },
- body: JSON.stringify({
- vector: queryEmbedding,
+ body: JSON.stringify({ vector: queryEmbedding,
  limit: with_payload,
  filter: filters,
  }),
@@ -367,9 +342,7 @@ export async function searchLawSections(
  }
 
  const result = (await response.json()) as {
- result: Array<{
- id: string, score: number;
- payload: LawSectionPayload;
+ result: Array<{ id: string, score: number; payload: LawSectionPayload;
  }>;
  };
 
@@ -384,9 +357,9 @@ export async function searchLawSections(
 /**
  * Delete a point from Qdrant
  */
-export async function deletePoint(collectionName: string), string: Promise<void> {
+export async function deletePoint(collectionName: string, string: Promise<void> {
  try {
- console.log(`[Qdrant] Deleting point ${pointId} from ${collectionName}`);
+ console.log(`[Qdrant] Deleting point ${pointId} from ${ collectionName }`);
 
  const response = await fetch(
  `${process.env.QDRANT_URL}/collections/${collectionName}/points/${hashStringToNumber(pointId)}`,
@@ -458,3 +431,7 @@ function hashStringToNumber(str: string): number {
  }
  return Math.abs(hash);
 }
+
+
+
+

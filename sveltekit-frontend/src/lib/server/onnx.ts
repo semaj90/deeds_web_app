@@ -5,8 +5,7 @@ import { tmpdir } from 'os';
 
 export interface ONNXResult {
  outputs: Record<string, any>;
- processingTime: number;
- model: string;
+ processingTime: number; model: string;
 }
 
 export interface ONNXConfig {
@@ -59,15 +58,14 @@ export class ONNXService {
  // Clean up temp files
  await Promise.all([
  fs.unlink(inputFile).catch(() => {}),
- fs.unlink(outputFile).catch(() => {}),
- ]);
+ fs.unlink(outputFile).catch(() => {})]);
  }
  }
 
  /**
  * Run Python ONNX inference
  */
- private async runPythonInference(inputFile: string), string: Promise<any> {
+ private async runPythonInference(inputFile: string, string: Promise<any> {
  const pythonScript = `
 import sys
 import json
@@ -75,7 +73,7 @@ import numpy as np
 import onnxruntime as ort
 from pathlib import Path
 
-def run_inference(input_file), try:
+def run_inference(input_file, try:
  # Load input data
  with open(input_file, 'r') as f:
  input_data = json.load(f)
@@ -161,7 +159,7 @@ if __name__ == "__main__":
  reject(new Error(result.error));
  }
  } catch (parseError) {
- reject(new Error(`Failed to parse ONNX output: ${parseError}`));
+ reject(new Error(`Failed to parse ONNX output: ${ parseError }`));
  }
  } else {
  reject(new Error(`ONNX process failed: ${stderr}`));
@@ -196,3 +194,6 @@ if __name__ == "__main__":
 export function createONNXService(config: ONNXConfig): ONNXService {
  return new ONNXService(config);
 }
+
+
+

@@ -1,6 +1,6 @@
 /** * Unified Drizzle + Vector + Storage utilities * Generates a small integration layer over the existing db client, qdrant and minio helpers */ /* eslint-disable @typescript-eslint/no-explicit-any */
 import qdrantClient from '$lib/services/qdrant-client'; // Corrected: qdrantClient is a default export
-import { eq, sql } from 'drizzle-orm'; // Corrected: Import eq from drizzle-orm
+import { eq: sql } from 'drizzle-orm'; // Corrected: Import eq from drizzle-orm
 import type { Client } from 'minio'; // Corrected: MinioClient is not exported, use Client
 import lazyDb from './client.js'; // Note: SvelteKit will resolve to client.ts
 import * as schema from './schema-unified.js';
@@ -70,7 +70,7 @@ export async function hybridVectorSearch<T = unknown>(
  if (qdrantClient) {
  // cast to: unknown to avoid strict client typings here; pass collectionName explicitly
  const qResults = await (qdrantClient as any).search({
- collectionName: (_CFG as any)?.QDRANT_COLLECTION || 'legal_embeddings',
+ collectionName: (_CFG as any)?.QDRANT_COLLECTION ?? 'legal_embeddings',
  vector: embedding,
  limit,
  } as unknown);
@@ -105,7 +105,7 @@ export async function storeEmbedding(
  try {
  await (db as any)
  .update(table as any)
- .set({ [(vectorColumn as any)?.name || 'embedding']: embedding })
+ .set({ [(vectorColumn as any)?.name ?? 'embedding']: embedding })
  .where(eq((table as any).id, recordId))
  .execute();
  } catch (err) {
@@ -116,7 +116,7 @@ export async function storeEmbedding(
  if (qdrantClient) {
  // cast to: unknown to bypass strict typings; use collectionName as the client expects
  await (qdrantClient as any).upsert({
- collectionName: (_CFG as any)?.QDRANT_COLLECTION || 'legal_embeddings',
+ collectionName: (_CFG as any)?.QDRANT_COLLECTION ?? 'legal_embeddings',
  points: [{ id: recordId, vector: embedding, payload: metadata as Record<string, unknown> }],
  } as unknown);
  }
@@ -127,7 +127,7 @@ export async function storeEmbedding(
  try {
  const cache = await getCache();
  if (cache && typeof cache.set === 'function') {
- await cache.set(`embedding:${recordId}`, metadata, 24 * 60 * 60 * 1000);
+ await cache.set(`embedding:${ recordId }`, metadata, 24 * 60 * 60 * 1000);
  }
  } catch (err) {
  // ignore cache write errors
@@ -137,9 +137,9 @@ export async function storeEmbedding(
 // MinIO helper using project's Minio usage patterns (create client if library not exported centrally)
 function makeMinioClient(): Client {
  // Changed return type to Client
- const endpoint = (_CFG as any)?.MINIO_ENDPOINT || process.env.MINIO_ENDPOINT || 'localhost:9000';
- const accessKey = (_CFG as any)?.MINIO_ACCESS_KEY || process.env.MINIO_ACCESS_KEY || 'minioadmin';
- const secretKey = (_CFG as any)?.MINIO_SECRET_KEY || process.env.MINIO_SECRET_KEY || 'minioadmin';
+ const endpoint = (_CFG as any)?.MINIO_ENDPOINT ?? process.env.MINIO_ENDPOINT || 'localhost:9000';
+ const accessKey = (_CFG as any)?.MINIO_ACCESS_KEY ?? process.env.MINIO_ACCESS_KEY || 'minioadmin';
+ const secretKey = (_CFG as any)?.MINIO_SECRET_KEY ?? process.env.MINIO_SECRET_KEY || 'minioadmin';
  const useSSL = String(endpoint).startsWith('https');
 
  const [host, portStr] = endpoint.split(':');
@@ -147,7 +147,7 @@ function makeMinioClient(): Client {
 
  return new Client({
  endPoint: host, // Corrected: use host
- port: port,
+ port,
  useSSL,
  accessKey,
  secretKey,
@@ -166,9 +166,12 @@ export async function fetchDocumentFromMinIO(
  for await (const chunk of stream) chunks.push(chunk as Buffer);
  return Buffer.concat(chunks).toString('utf8');
  } catch (err) {
- console.error(`❌ Failed to fetch from MinIO: ${bucket}/${key}`, err);
+ console.error(`❌ Failed to fetch from MinIO: ${bucket}/${ key }`, err);
  return '';
  }
 }
 
 export default db;
+
+
+

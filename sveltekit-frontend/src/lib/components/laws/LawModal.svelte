@@ -1,16 +1,14 @@
 <script lang="ts">
+	let code = $state<any>(undefined);
+
 	interface BundledCharge {
-		citation: string;
-		title: string;
-		reason: string;
-		frequency: number;
+		citation: string; title: string;
+		reason: string; frequency: number;
 	}
 
 	interface Precedent {
-		caseId: string;
-		title: string;
-		year: number;
-		court: string;
+		caseId: string; title: string;
+		year: number; court: string;
 		relevance: number;
 	}
 
@@ -196,7 +194,7 @@
 					Close
 				</button>
 				<button
-					onclick={handleAttach}
+					onclick={ handleAttach }
 					class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
 				>
 					📎 Attach to Case
@@ -220,3 +218,6 @@
 		}
 	}
 </style>
+
+
+

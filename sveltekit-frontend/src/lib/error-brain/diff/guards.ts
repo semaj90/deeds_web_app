@@ -41,7 +41,7 @@ export async function guardFileExists(filePath: string): Promise<GuardResult> {
 /**
  * Guard: Current content hash must match beforeHash
  */
-export async function guardHashMatch(filePath: string, expectedHash), string: Promise<GuardResult> {
+export async function guardHashMatch(filePath: string, expectedHash, string: Promise<GuardResult> {
  try {
  const content = await readFile(filePath, 'utf8');
  const actualHash = sha256(content);
@@ -49,7 +49,7 @@ export async function guardHashMatch(filePath: string, expectedHash), string: Pr
  if (actualHash !== expectedHash) {
  return {
  ok: false,
- reason: `Hash mismatch: expected ${expectedHash}, got ${actualHash}`,
+ reason: `Hash, mismatch: expected ${ expectedHash }, got ${actualHash}`,
  code: 'HASH_MISMATCH',
  };
  }
@@ -118,3 +118,6 @@ export async function guardAll(
 
  return { ok: true };
 }
+
+
+

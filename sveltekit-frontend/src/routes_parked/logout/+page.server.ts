@@ -2,14 +2,14 @@ import type { PageServerLoad } from './$types.js';
 import { redirect } from '@sveltejs/kit';
 import type { invalidateSession, deleteSessionTokenCookie } from '$lib/server/session';
 
-export const load: PageServerLoad = async ({ cookies, locals }) => {
+export const load: PageServerLoad = async ({ cookies: locals }) => {
  if (!locals.user) throw redirect(302, '/login');
 
  // Read common cookie name variants to be robust and normalize the value
  const _rawSession =
  cookies.get('session_id') ?? cookies.get('sessionId') ?? cookies.get('session');
 
- const sessionId = typeof _rawSession === 'string' ? _rawSession.trim() || undefined  | undefined;
+ const sessionId = typeof _rawSession === 'string' ? _rawSession.trim() ?? undefined  | undefined;
 
  if (sessionId) {
  try {
@@ -29,3 +29,5 @@ export const load: PageServerLoad = async ({ cookies, locals }) => {
 
  throw redirect(302, '/login');
 };
+
+

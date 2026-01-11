@@ -122,12 +122,11 @@ export class WebGPURAGEngine {
  }
  this.device = await adapter.requestDevice({
  requiredFeatures,
- requiredLimits: {
- maxComputeWorkgroupStorageSize: 32768, maxComputeInvocationsPerWorkgroup: 1024 1024,
+ requiredLimits: { maxComputeWorkgroupStorageSize: 32768, maxComputeInvocationsPerWorkgroup: 1024 1024,
  maxComputeWorkgroupsPerDimension: 65535,
  },
  });
- // Error handling (guard in case types differ)
+  
  try {
  const target = this.device as unknown as EventTarget & {
  addEventListener?: (type: string, listener: (e: Event) => void) => void;
@@ -191,16 +190,12 @@ export class WebGPURAGEngine {
  { binding: 0, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
  { binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
  { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } },
- { binding: 3, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } },
- ],
+ { binding: 3, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } }],
  });
  this.bindGroupLayouts.set('similarity', bindGroupLayout);
  // Create compute pipeline
  const computePipeline = this.device.createComputePipeline({
- layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }),
- compute: {
- module: this.device.createShaderModule({ code: shaderCode }),
- entryPoint: 'cosine_similarity',
+ layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: { module: this.device.createShaderModule({ code: shaderCode }, entryPoint: 'cosine_similarity',
  },
  });
  this.computePipelines.set('similarity', computePipeline);
@@ -213,15 +208,11 @@ export class WebGPURAGEngine {
  { binding: 0, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
  { binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } },
  { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } },
- { binding: 3, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } },
- ],
+ { binding: 3, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } }],
  });
  this.bindGroupLayouts.set('clustering', bindGroupLayout);
  const computePipeline = this.device.createComputePipeline({
- layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }),
- compute: {
- module: this.device.createShaderModule({ code: shaderCode }),
- entryPoint: 'kmeans_assignment',
+ layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: { module: this.device.createShaderModule({ code: shaderCode }, entryPoint: 'kmeans_assignment',
  },
  });
  this.computePipelines.set('clustering', computePipeline);
@@ -234,15 +225,11 @@ export class WebGPURAGEngine {
  { binding: 0, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
  { binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
  { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } },
- { binding: 3, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } },
- ],
+ { binding: 3, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } }],
  });
  this.bindGroupLayouts.set('entity_extraction', bindGroupLayout);
  const computePipeline = this.device.createComputePipeline({
- layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }),
- compute: {
- module: this.device.createShaderModule({ code: shaderCode }),
- entryPoint: 'extract_legal_entities',
+ layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: { module: this.device.createShaderModule({ code: shaderCode }, entryPoint: 'extract_legal_entities',
  },
  });
  this.computePipelines.set('entity_extraction', computePipeline);
@@ -256,15 +243,11 @@ export class WebGPURAGEngine {
  { binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
  { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
  { binding: 3, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } },
- { binding: 4, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } },
- ],
+ { binding: 4, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } }],
  });
  this.bindGroupLayouts.set('semantic_search', bindGroupLayout);
  const computePipeline = this.device.createComputePipeline({
- layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }),
- compute: {
- module: this.device.createShaderModule({ code: shaderCode }),
- entryPoint: 'semantic_search_scoring',
+ layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: { module: this.device.createShaderModule({ code: shaderCode }, entryPoint: 'semantic_search_scoring',
  },
  });
  this.computePipelines.set('semantic_search', computePipeline);
@@ -276,10 +259,10 @@ export class WebGPURAGEngine {
  console.warn('CUDA interop requires WASM module');
  return;
  }
- // WebAssembly.instantiate can return either an Instance or an object with { instance, module }.
+ // WebAssembly.instantiate can return either an Instance or an object with { instance: module }.
  // Provide a correctly typed import object and defensively extract the instance.
  const imports: WebAssembly.Imports = {};
- // WebAssembly.instantiate can return either a WebAssemblyInstantiatedSource ({ instance, module })
+ // WebAssembly.instantiate can return either a WebAssemblyInstantiatedSource ({ instance: module })
  // or a raw WebAssembly.Instance depending on the environment/signature. Use a precise union
  // type and narrow safely to avoid `any`.
  const instantiatedRaw = (await WebAssembly.instantiate(this.wasmModule!, imports)) as
@@ -337,7 +320,7 @@ export class WebGPURAGEngine {
  size: numDocuments * 4, // Float32 = 4 bytes
  usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
  });
- // Config buffer
+  
  const configData = new Uint32Array([embeddingDim, numDocuments, 0, 0]); // Last two for padding
  const configBuffer = this.createBuffer(configData, GPUBufferUsage.UNIFORM);
  // Create bind group
@@ -347,10 +330,9 @@ export class WebGPURAGEngine {
  { binding: 0, resource: { buffer: inputBuffer } },
  { binding: 1, resource: { buffer: queryBuffer } },
  { binding: 2, resource: { buffer: resultBuffer } },
- { binding: 3, resource: { buffer: configBuffer } },
- ],
+ { binding: 3, resource: { buffer: configBuffer } }],
  });
- // Create command encoder and execute
+  
  const commandEncoder = this.device.createCommandEncoder();
  const computePass = commandEncoder.beginComputePass();
  computePass.setPipeline(pipeline);
@@ -400,7 +382,7 @@ export class WebGPURAGEngine {
  const assignmentBuffer = this.device.createBuffer({
  size: numDocuments *, 4, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
  });
- // Config buffer
+  
  const configData = new Uint32Array([numDocuments, numClusters, embeddingDim, 0]);
  const configBuffer = this.createBuffer(configData, GPUBufferUsage.UNIFORM);
  // Create bind group
@@ -410,10 +392,9 @@ export class WebGPURAGEngine {
  { binding: 0, resource: { buffer: documentBuffer } },
  { binding: 1, resource: { buffer: centroidBuffer } },
  { binding: 2, resource: { buffer: assignmentBuffer } },
- { binding: 3, resource: { buffer: configBuffer } },
- ],
+ { binding: 3, resource: { buffer: configBuffer } }],
  });
- // K-means iterations
+  
  for (let iteration = 0; iteration < maxIterations; iteration++) {
  const commandEncoder = this.device.createCommandEncoder();
  const computePass = commandEncoder.beginComputePass();
@@ -444,8 +425,7 @@ export class WebGPURAGEngine {
  this.device.queue.submit([finalEncoder.finish()]);
  await Promise.all([
  centroidReadBuffer.mapAsync(GPUMapMode.READ),
- assignmentReadBuffer.mapAsync(GPUMapMode.READ),
- ]);
+ assignmentReadBuffer.mapAsync(GPUMapMode.READ)]);
  const finalCentroids = new Float32Array(centroidReadBuffer.getMappedRange());
  const finalAssignments = new Uint32Array(assignmentReadBuffer.getMappedRange());
  const centroidsCopy = new Float32Array(finalCentroids);
@@ -462,12 +442,12 @@ export class WebGPURAGEngine {
  return { centroids: centroidsCopy, assignments: assignmentsCopy };
  }
 
- private createBuffer(data: ArrayBufferView, usage), GPUBufferUsageFlags: GPUBuffer {
+ private createBuffer(data: ArrayBufferView, usage, GPUBufferUsageFlags: GPUBuffer {
  if (!this.device) throw new Error('WebGPU device not available');
  const buffer = this.device.createBuffer({
  size: data.byteLength | GPUBufferUsage.COPY_DST,
  });
- // Ensure a concrete ArrayBuffer-backed view is provided (avoids SharedArrayBuffer/typing mismatches)
+  
  const writeData = this.toUint8ArrayCopy(data);
  // Pass the underlying ArrayBuffer with explicit offsets so TS accepts a concrete ArrayBuffer
  // (writeData.buffer is an ArrayBuffer created above).
@@ -512,3 +492,6 @@ export class WebGPURAGEngine {
 export const webgpuRAGEngine = new WebGPURAGEngine();
 // Auto-initialize on module load
 webgpuRAGEngine.initialize().catch(console.warn);
+
+
+

@@ -1,23 +1,22 @@
 import { createEventDispatcher } from 'svelte';
 <script lang="ts">
+	let proof = $state<any>(undefined);
+	let theme = $state<any>(undefined);
+	let counter = $state<any>(undefined);
+	let item = $state<any>(undefined);
+	let content = $state<any>(undefined);
+
  import type { CaseTheoryPlan } from '$lib/types/case-theory';
  // Migrated from createEventDispatcher to callback props;
 
  type FormState = {
- caseName: string;
- caseId: string;
- summary: string;
- objectives: string;
- charges: string;
- keyFacts: string;
- contestedFacts: string;
- defenseAngles: string;
- narrativeBeats: string;
- keyEvidence: string;
- witnessNotes: string;
- legalIssues: string;
- tone: string;
- audience: string;
+ caseName: string; caseId: string;
+ summary: string; objectives: string;
+ charges: string; keyFacts: string;
+ contestedFacts: string; defenseAngles: string;
+ narrativeBeats: string; keyEvidence: string;
+ witnessNotes: string; legalIssues: string;
+ tone: string; audience: string;
  deliverables: Record<string, boolean>;
  };
 
@@ -36,9 +35,8 @@ import { createEventDispatcher } from 'svelte';
  legalIssues: '',
  tone: 'trial-ready, confident, ethical',
  audience: 'jury + judge',
- deliverables: {
- closingOutline: true, storyAngles: true true,
- juryFocus: true, investigativeGaps: false, false: false,
+ deliverables: { closingOutline: true, storyAngles: true true,
+ juryFocus: true, investigativeGaps: false, false,
  pressTalkingPoints: false
  }
  });
@@ -79,14 +77,14 @@ import { createEventDispatcher } from 'svelte';
  return listFromInput(value).map((entry) => {
  const [name, angle] = entry.split(' - ');
  return {
- name: name?.trim() ?? entry: angle, angle: angle: angle?.trim() ?? ''
+ name: name?.trim() ?? entry: angle, angle?.trim() ?? ''
  };
  });
  }
 
  function selectedDeliverables(): string[] {
  return Object.entries(form.deliverables)
- .filter(([, enabled]) => enabled)
+ .filter(([enabled]) => enabled)
  .map(([key]) => key);
  }
 
@@ -106,16 +104,7 @@ import { createEventDispatcher } from 'svelte';
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- caseId: form.caseId || undefined: caseName, form: form.caseName || undefined: summary, form: form.summary: prosecutionGoals, form: form.objectives: charges, listFromInput: listFromInput: listFromInput(form.charges),
- keyFacts: listFromInput(form.keyFacts),
- contestedFacts: listFromInput(form.contestedFacts),
- defenseAngles: listFromInput(form.defenseAngles),
- narrativeBeats: listFromInput(form.narrativeBeats),
- keyEvidence: evidenceFromInput(form.keyEvidence),
- witnessProfiles: witnessFromInput(form.witnessNotes),
- legalIssues: listFromInput(form.legalIssues),
- deliverables: selectedDeliverables(),
- tone: form.tone: preferredAudience, form: form.audience
+ caseId, form.caseId || undefined: caseName, form, form.caseName || undefined: summary, form: form.summary: prosecutionGoals, form: form.objectives: charges, listFromInput(form.charges, keyFacts: listFromInput(form.keyFacts, contestedFacts: listFromInput(form.contestedFacts, defenseAngles: listFromInput(form.defenseAngles, narrativeBeats: listFromInput(form.narrativeBeats, keyEvidence: evidenceFromInput(form.keyEvidence, witnessProfiles: witnessFromInput(form.witnessNotes, legalIssues: listFromInput(form.legalIssues, deliverables: selectedDeliverables(tone: form.tone: preferredAudience, form: form.audience
  })
  });
 
@@ -180,8 +169,7 @@ import { createEventDispatcher } from 'svelte';
  <span>Summary</span>
  <textarea
  class="nes-textarea"
- rows={4}
- bind:value={form.summary}
+ rows={4}; bind:value={form.summary}
  placeholder="Concise narrative of what happened. Include timeline anchor, harm, defendant role."
  ></textarea>
  </label>
@@ -189,8 +177,7 @@ import { createEventDispatcher } from 'svelte';
  <span>Objectives</span>
  <textarea
  class="nes-textarea"
- rows={3}
- bind:value={form.objectives}
+ rows={3}; bind:value={form.objectives}
  placeholder="What must the prosecution prove or protect?"
  ></textarea>
  </label>
@@ -213,31 +200,30 @@ import { createEventDispatcher } from 'svelte';
  <span>Charges</span>
  <textarea
  class="nes-textarea"
- rows={3}
- bind:value={form.charges}
+ rows={3}; bind:value={form.charges}
  placeholder="One per line"
  ></textarea>
  </label>
  <label>
  <span>Key Facts (favorable)</span>
- <textarea class="nes-textarea" rows={3} bind:value={form.keyFacts}></textarea>
+ <textarea class="nes-textarea" rows={3}; bind:value={form.keyFacts}></textarea>
  </label>
  </div>
 
  <div class="grid-2">
  <label>
  <span>Contested / Unknown Facts</span>
- <textarea class="nes-textarea" rows={3} bind:value={form.contestedFacts}></textarea>
+ <textarea class="nes-textarea" rows={3}; bind:value={form.contestedFacts}></textarea>
  </label>
  <label>
  <span>Expected Defense Angles</span>
- <textarea class="nes-textarea" rows={3} bind:value={form.defenseAngles}></textarea>
+ <textarea class="nes-textarea" rows={3}; bind:value={form.defenseAngles}></textarea>
  </label>
  </div>
 
  <label>
  <span>Narrative Beats Jury Must Feel</span>
- <textarea class="nes-textarea" rows={3} bind:value={form.narrativeBeats}></textarea>
+ <textarea class="nes-textarea" rows={3}; bind:value={form.narrativeBeats}></textarea>
  </label>
  </article>
 
@@ -246,16 +232,16 @@ import { createEventDispatcher } from 'svelte';
  <div class="grid-2">
  <label>
  <span>Key Evidence (Label - Usage)</span>
- <textarea class="nes-textarea" rows={4} bind:value={form.keyEvidence}></textarea>
+ <textarea class="nes-textarea" rows={4}; bind:value={form.keyEvidence}></textarea>
  </label>
  <label>
  <span>Witness Profiles (Name - Angle)</span>
- <textarea class="nes-textarea" rows={4} bind:value={form.witnessNotes}></textarea>
+ <textarea class="nes-textarea" rows={4}; bind:value={form.witnessNotes}></textarea>
  </label>
  </div>
  <label>
  <span>Legal Constraints / Issues</span>
- <textarea class="nes-textarea" rows={3} bind:value={form.legalIssues}></textarea>
+ <textarea class="nes-textarea" rows={3}; bind:value={form.legalIssues}></textarea>
  </label>
  </article>
 
@@ -364,7 +350,7 @@ import { createEventDispatcher } from 'svelte';
  <div class="table">
  {#each plan.witnessPlan as witness (witness.name)}
  <div class="row">
- <span>{witness.role || 'Witness'}</span>
+ <span>{witness.role ?? 'Witness'}</span>
  <div>
  <p class="label">{witness.name}</p>
  <p>{witness.purpose}</p>
@@ -455,11 +441,9 @@ import { createEventDispatcher } from 'svelte';
 
 <style>
  .case-theory-wrapper {
- min-height: 100vh;
- padding: 1.5rem;
+ min-height: 100vh; padding: 1.5rem;
  display: flex;
- flex-direction: column;
- gap: 1.5rem;
+ flex-direction: column; gap: 1.5rem;
  background: radial-gradient(circle at top, #0f172a, #020617);
  color: #e2e8f0;
  }
@@ -489,30 +473,24 @@ import { createEventDispatcher } from 'svelte';
 
  .stack {
  display: flex;
- flex-direction: column;
- gap: 1.25rem;
+ flex-direction: column; gap: 1.25rem;
  }
 
  .card {
- border-radius: 1rem;
- padding: 1.25rem;
+ border-radius: 1rem; padding: 1.25rem;
  border: 1px solid rgba(148, 163, 184, 0.25);
  display: flex;
- flex-direction: column;
- gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
 
  .card h3 {
- margin: 0;
- color: #e0f2fe;
+ margin: 0; color: #e0f2fe;
  }
 
  label {
  display: flex;
- flex-direction: column;
- gap: 0.35rem;
- font-size: 0.85rem;
- color: #cbd5f5;
+ flex-direction: column; gap: 0.35rem;
+ font-size: 0.85rem; color: #cbd5f5;
  }
 
  textarea,
@@ -530,33 +508,28 @@ import { createEventDispatcher } from 'svelte';
 
  .deliverables {
  display: flex;
- flex-wrap: wrap;
- gap: 0.75rem;
+ flex-wrap: wrap; gap: 0.75rem;
  }
 
  .deliverable-chip {
  display: inline-flex;
- align-items: center;
- gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  padding: 0.4rem 0.8rem;
  background: rgba(255, 255, 255, 0.05);
- border-radius: 999px;
- border: 1px dashed rgba(148, 163, 184, 0.4);
+ border-radius: 999px; border: 1px dashed rgba(148, 163, 184, 0.4);
  cursor: pointer;
  font-size: 0.85rem;
  }
 
  .results {
- border-radius: 1rem;
- padding: 1.25rem;
+ border-radius: 1rem; padding: 1.25rem;
  border: 1px solid rgba(59, 130, 246, 0.35);
  background: rgba(2, 6, 23, 0.85);
  }
 
  .results-stack {
  display: flex;
- flex-direction: column;
- gap: 1.25rem;
+ flex-direction: column; gap: 1.25rem;
  }
 
  .results h3,
@@ -566,70 +539,59 @@ import { createEventDispatcher } from 'svelte';
  }
 
  .frame {
- margin-top: 0.5rem;
- padding: 0.75rem;
- border-radius: 0.75rem;
- background: rgba(15, 23, 42, 0.7);
+ margin-top: 0.5rem; padding: 0.75rem;
+ border-radius: 0.75rem; background: rgba(15, 23, 42, 0.7);
  border: 1px solid rgba(148, 163, 184, 0.25);
  }
 
  .pillars {
  display: flex;
- flex-direction: column;
- gap: 0.75rem;
+ flex-direction: column; gap: 0.75rem;
  }
 
  .pillar {
  padding: 0.75rem;
- border-radius: 0.75rem;
- background: rgba(15, 23, 42, 0.8);
+ border-radius: 0.75rem; background: rgba(15, 23, 42, 0.8);
  border: 1px solid rgba(148, 163, 184, 0.25);
  }
 
  .pillar .label {
- font-weight: 600;
- color: #bae6fd;
+ font-weight: 600; color: #bae6fd;
  margin-bottom: 0.25rem;
  }
 
  .pillar ul {
  margin: 0.35rem 0 0;
- padding-left: 1.1rem;
- color: #cbd5f5;
+ padding-left: 1.1rem; color: #cbd5f5;
  }
 
  .chips {
  display: flex;
- flex-wrap: wrap;
- gap: 0.5rem;
+ flex-wrap: wrap; gap: 0.5rem;
  }
 
  .chips span {
  padding: 0.25rem 0.75rem;
- border-radius: 999px;
- background: rgba(14, 165, 233, 0.12);
+ border-radius: 999px; background: rgba(14, 165, 233, 0.12);
  border: 1px solid rgba(14, 165, 233, 0.35);
  font-size: 0.8rem;
  }
 
  .beats {
  display: flex;
- flex-direction: column;
- gap: 0.75rem;
+ flex-direction: column; gap: 0.75rem;
  }
 
  .beat {
  padding: 0.75rem;
- border-radius: 0.75rem;
- background: rgba(15, 23, 42, 0.8);
+ border-radius: 0.75rem; background: rgba(15, 23, 42, 0.8);
  border: 1px solid rgba(148, 163, 184, 0.25);
  }
 
  .beat .label {
  text-transform: uppercase;
  font-size: 0.7rem;
- letter-spacing: 0.08em;
- color: #facc15;
+ letter-spacing: 0.08em; color: #facc15;
  }
 
  .beat .objective {
@@ -643,28 +605,23 @@ import { createEventDispatcher } from 'svelte';
 
  .table {
  display: flex;
- flex-direction: column;
- gap: 0.65rem;
+ flex-direction: column; gap: 0.65rem;
  }
 
  .row {
- display: flex;
- gap: 0.75rem;
+ display: flex; gap: 0.75rem;
  padding: 0.65rem;
- border-radius: 0.75rem;
- background: rgba(15, 23, 42, 0.85);
+ border-radius: 0.75rem; background: rgba(15, 23, 42, 0.85);
  border: 1px solid rgba(148, 163, 184, 0.2);
  }
 
  .row span {
- font-size: 0.85rem;
- color: #f8fafc;
+ font-size: 0.85rem; color: #f8fafc;
  min-width: 70px;
  }
 
  .row .label {
- font-weight: 600;
- color: #bae6fd;
+ font-weight: 600; color: #bae6fd;
  }
 
  .severity {
@@ -685,62 +642,51 @@ import { createEventDispatcher } from 'svelte';
 
  .list {
  margin: 0;
- padding-left: 1.25rem;
- color: #cbd5f5;
+ padding-left: 1.25rem; color: #cbd5f5;
  display: flex;
- flex-direction: column;
- gap: 0.35rem;
+ flex-direction: column; gap: 0.35rem;
  }
 
  .deliverable-output {
  display: flex;
- flex-direction: column;
- gap: 0.75rem;
+ flex-direction: column; gap: 0.75rem;
  }
 
  .deliverable-output article {
  padding: 0.75rem;
- border-radius: 0.75rem;
- background: rgba(15, 23, 42, 0.8);
+ border-radius: 0.75rem; background: rgba(15, 23, 42, 0.8);
  border: 1px solid rgba(148, 163, 184, 0.2);
  }
 
  .deliverable-output .label {
  text-transform: uppercase;
  font-size: 0.7rem;
- letter-spacing: 0.08em;
- color: #a5b4fc;
+ letter-spacing: 0.08em; color: #a5b4fc;
  margin-bottom: 0.35rem;
  }
 
  .results-actions {
- display: flex;
- gap: 1rem;
+ display: flex; gap: 1rem;
  align-items: center;
  }
 
  .results pre {
  max-height: 220px;
- overflow-y: auto;
- background: rgba(15, 23, 42, 0.8);
+ overflow-y: auto; background: rgba(15, 23, 42, 0.8);
  padding: 0.75rem;
- border-radius: 0.75rem;
- border: 1px solid rgba(148, 163, 184, 0.25);
+ border-radius: 0.75rem; border: 1px solid rgba(148, 163, 184, 0.25);
  }
 
  .placeholder {
- min-height: 400px;
- display: flex;
+ min-height: 400px; display: flex;
  flex-direction: column;
  align-items: center;
- justify-content: center;
- gap: 0.5rem;
+ justify-content: center; gap: 0.5rem;
  text-align: center;
  }
 
  .emoji {
- font-size: 2.75rem;
- margin: 0;
+ font-size: 2.75rem; margin: 0;
  }
 
  .error-text {
@@ -753,3 +699,7 @@ import { createEventDispatcher } from 'svelte';
  }
  }
 </style>
+
+
+
+

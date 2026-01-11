@@ -31,7 +31,7 @@ export class FeatureFlagEnforcer {
 
  // Check if feature is enabled
  if (!context.enabled) {
- const { status, message } = NamespaceRouter.getDisabledFeatureResponse(context.feature);
+ const { status: message } = NamespaceRouter.getDisabledFeatureResponse(context.feature);
 
  // Log the denied request
  this.logDeniedRequest(context, message);
@@ -82,10 +82,8 @@ export class FeatureFlagEnforcer {
  private static logDeniedRequest(context: NamespaceContext): void {
  if (context.feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(),
- operation: 'request_denied',
- details: {
- path: context.path,
+ timestamp: new Date( operation: 'request_denied',
+ details: { path: context.path,
  reason: 'feature_disabled',
  message,
  },
@@ -93,10 +91,8 @@ export class FeatureFlagEnforcer {
  });
  } else {
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'request_denied',
- details: {
- path: context.path,
+ timestamp: new Date( operation: 'request_denied',
+ details: { path: context.path,
  reason: 'feature_disabled',
  message,
  },
@@ -112,19 +108,15 @@ export class FeatureFlagEnforcer {
  if (context.logLevel === 'debug') {
  if (context.feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(),
- operation: 'request_allowed',
- details: {
- path: context.path,
+ timestamp: new Date( operation: 'request_allowed',
+ details: { path: context.path,
  },
  level: 'debug',
  });
  } else {
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'request_allowed',
- details: {
- path: context.path,
+ timestamp: new Date( operation: 'request_allowed',
+ details: { path: context.path,
  },
  level: 'debug',
  });
@@ -135,10 +127,8 @@ export class FeatureFlagEnforcer {
  /**
  * Get feature status for request
  */
- static getFeatureStatus(request: Request): {
- feature: string | null;
- enabled: boolean;
- requiresAuth: boolean;
+ static getFeatureStatus(request: Request): { feature: string | null;
+ enabled: boolean; requiresAuth: boolean;
  } {
  const context = NamespaceRouter.createContext(new URL(request.url).pathname);
 
@@ -229,3 +219,7 @@ export function createDenialResponse(request: Request): Response | null {
 
  return FeatureFlagEnforcer.createErrorResponse(result);
 }
+
+
+
+

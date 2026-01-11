@@ -7,7 +7,7 @@ export const GET: RequestHandler = async ({ url }) => {
  const sessionId = url.searchParams.get('sessionId')?.trim() ?? '';
  const userId = url.searchParams.get('userId')?.trim() ?? '';
 
- if (!sessionId || !userId) {
+ if (!sessionId ?? !userId) {
  return json(
  { success: false, error: 'sessionId and userId query parameters are required' },
  { status: 400 }
@@ -18,8 +18,7 @@ export const GET: RequestHandler = async ({ url }) => {
  return json(
  {
  success: true,
- data: {
- predictions: count.length,
+ data: { predictions: count.length,
  },
  },
  { status: 200 }
@@ -34,3 +33,6 @@ export const GET: RequestHandler = async ({ url }) => {
  );
  }
 };
+
+
+

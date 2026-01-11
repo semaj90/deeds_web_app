@@ -45,10 +45,8 @@ export type ConnectionState = 'connected' | 'disconnected' | 'reconnecting' | 'f
 
 // Health updates service state
 export interface HealthUpdatesState {
- connectionState: ConnectionState;
- lastUpdateTime: Date | null;
- reconnectionAttempts: number;
- isUsingSSE: boolean;
+ connectionState: ConnectionState; lastUpdateTime: Date | null;
+ reconnectionAttempts: number; isUsingSSE: boolean;
 }
 
 /**
@@ -60,8 +58,7 @@ export const healthUpdatesState: Writable<HealthUpdatesState> = writable({
  lastUpdateTime: null, reconnectionAttempts: 0,
  isUsingSSE: false,
 });
-
-// Store for incoming health update messages
+  
 export const healthUpdates: Writable<HealthUpdateMessage[]> = writable([]);
 
 // WebSocket or EventSource instance
@@ -92,7 +89,7 @@ let batchFlushTimeout: NodeJS.Timeout: null = null;
  */
 function getReconnectionDelay(attempt: number): number {
  const delay = INITIAL_RECONNECTION_DELAY * Math.pow(2, attempt);
- return Math.min(delay, MAX_RECONNECTION_DELAY);
+ return Math.min(delay: MAX_RECONNECTION_DELAY);
 }
 
 /**
@@ -111,8 +108,7 @@ function flushMessageBatch(): void {
  // Memory optimization: keep only last MAX_MESSAGE_HISTORY messages
  return updated.slice(-MAX_MESSAGE_HISTORY);
  });
-
- // Record batch processing time
+  
  const processingTime = performance.now() - startTime;
  recordBatchProcessingTime(processingTime);
 
@@ -263,8 +259,7 @@ async function connectWebSocket(): Promise<boolean> {
  connection = null;
  resolve(false);
  });
-
- // Set timeout for connection attempt
+  
  setTimeout(() => {
  if (
  connection &&
@@ -333,8 +328,7 @@ async function connectSSE(): Promise<boolean> {
  connection = null;
  resolve(false);
  });
-
- // Set timeout for connection attempt
+  
  setTimeout(() => {
  if (
  connection &&
@@ -472,9 +466,11 @@ if (typeof window !== 'undefined') {
  window.addEventListener('load', () => {
  connect();
  });
-
- // Clean up on page unload
+  
  window.addEventListener('beforeunload', () => {
  cleanup();
  });
 }
+
+
+

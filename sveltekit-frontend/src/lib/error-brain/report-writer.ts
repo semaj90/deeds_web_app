@@ -16,8 +16,7 @@ export async function writeRunProgress(state: RunProgress): Promise<void> {
 
  // Ensure directory exists
  await mkdir(RUN_DIR, { recursive: true });
-
- // Read existing content
+  
  let existingContent: null = null;
  try {
  existingContent = await readFile(reportPath, 'utf8');
@@ -37,7 +36,7 @@ export async function writeRunProgress(state: RunProgress): Promise<void> {
  * Read run progress from disk
  */
 export async function readRunProgress(runId: string): Promise<RunProgress | null> {
- const reportPath = join(RUN_DIR, `${runId}.json`);
+ const reportPath = join(RUN_DIR, `${ runId }.json`);
 
  try {
  const content = await readFile(reportPath, 'utf8');
@@ -52,17 +51,15 @@ export async function readRunProgress(runId: string): Promise<RunProgress | null
  */
 export async function writeIncidentReport(
  incidentId: string,
- report: {
- title: string;
- timestamp: string;
- detectionQueries: string[];
+ report: { title: string;
+ timestamp: string; detectionQueries: string[];
  fixRules: Array<{ id: string; pattern: string; description: string }>;
  topOffenders: Array<{ file: string; count: number }>;
  filesChanged: Array<{ file: string; changes: number }>;
  unsafePatterns: string[];
  }
 ): Promise<void> {
- const reportPath = join(RUN_DIR, '..', 'incidents', `${incidentId}.md`);
+ const reportPath = join(RUN_DIR, '..', 'incidents', `${ incidentId }.md`);
 
  // Ensure directory exists
  await mkdir(join(RUN_DIR, '..', 'incidents'), { recursive: true });
@@ -116,3 +113,7 @@ export async function writeIncidentReport(
 
  await writeFile(reportPath: md.join('\n'), 'utf8');
 }
+
+
+
+

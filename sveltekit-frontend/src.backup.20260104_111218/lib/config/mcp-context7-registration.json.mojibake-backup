@@ -1,0 +1,12 @@
+{
+  "name": "context7",
+  "baseUrl": "http://localhost:8095",
+  "capabilities": ["som", "hmm", "graph-query"],
+  "functions": ["analyze_cluster", "predict_next_context"],
+  "healthPath": "/health",
+  "endpoints": [
+    { "path": "/api/som/analyze", "method": "POST" },
+    { "path": "/api/hmm/predict", "method": "POST" },
+    { "path": "/api/graph/merge", "method": "POST" }
+  ]
+}

@@ -1,0 +1,549 @@
+/**
+ * Property-based tests for Validation Service
+ * Task 17.1: Write property tests for validation
+ * Property 8: Diff Application Idempotence
+ */
+
+import { describe, it, expect, beforeEach } from 'vitest'
+import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import fc from 'fast-check';
+import { ValidationService } from './validation-service.js';
+import type { Diff, Error, ServiceConfig } from './types.js';
+
+const mockConfig: ServiceConfig = {
+ ollamaUrl: 'http://localhost:11434',
+ qdrantUrl: 'http://localhost:6333',
+ postgresUrl: 'postgresql://localhost/test',
+ maxRetries: 3,
+ retryDelayMs: 100,
+ contextLines: 3,
+};
+
+describe('ValidationService', () => {
+  beforeEach(async () => {
+    await setupTest();
+  });
+
+  afterEach(async () => {
+    await cleanupTest();
+  });
+
+ let validator: ValidationService;
+
+ beforeEach(() => {
+ validator = new ValidationService(mockConfig);
+ });
+
+ describe('validateCode', () => {
+ it('should validate clean code', async () => {
+ const fileContent = `const x: number = 123;
+const y: string = "hello";
+export default { x, y };`;
+
+ const errors = await validator.validateCode(fileContent, 'test.ts');
+
+ expect(Array.isArray(errors)).toBe(true);
+ });
+
+ it('should detect implicit any types', async () => {
+ const fileContent = `const x: any = 123;
+const y: any = "hello";`;
+
+ const errors = await validator.validateCode(fileContent, 'test.ts');
+
+ expect(errors.length).toBeGreaterThan(0);
+ expect(errors.some((e) => e.message.includes('any'))).toBe(true);
+ });
+
+ it('should detect Svelte reactive statement errors', async () => {
+ const fileContent = `$: console.log('reactive');
+$: x = 5;`;
+
+ const errors = await validator.validateCode(fileContent, 'test.svelte');
+
+ expect(Array.isArray(errors)).toBe(true);
+ });
+
+ it('should detect syntax errors', async () => {
+ const fileContent = `const x
+const y: string = "hello";`;
+
+ const errors = await validator.validateCode(fileContent, 'test.ts');
+
+ expect(errors.length).toBeGreaterThan(0);
+ });
+
+ it('should return empty array for valid code', async () => {
+ const fileContent = `const x: number = 123;
+const y: string = "hello";
+function add(a: number, b: number): number {
+ return a + b;
+}`;
+
+ const errors = await validator.validateCode(fileContent, 'test.ts');
+
+ expect(Array.isArray(errors)).toBe(true);
+ });
+
+ it('should throw on missing file content', async () => {
+ await expect(validator.validateCode(null as any, 'test.ts')).rejects.toThrow();
+ });
+
+ it('should throw on missing file path', async () => {
+ const fileContent = 'const x = 123;';
+
+ await expect(validator.validateCode(fileContent, null as any)).rejects.toThrow();
+ });
+ });
+
+ describe('validateDiffApplication', () => {
+ it('should validate successful diff application', async () => {
+ const diff: Diff = {
+ id: 'diff-1',
+ errorId: 'err-1',
+ file: 'test.ts',
+ original: 'const x: any = 123;',
+ modified: 'const x: number = 123;',
+ context: 'context',
+ explanation: 'Fix type',
+ lineStart: 1,
+ lineEnd: 1,
+ status: 'pending',
+ createdAt: new Date(),
+ };
+
+ const modifiedContent = 'const x: number = 123;';
+
+ const result = await validator.validateDiffApplication(diff, modifiedContent);
+
+ expect(typeof result).toBe('boolean');
+ });
+
+ it('should detect errors in modified content', async () => {
+ const diff: Diff = {
+ id: 'diff-1',
+ errorId: 'err-1',
+ file: 'test.ts',
+ original: 'const x: number = 123;',
+ modified: 'const x: any = 123;',
+ context: 'context',
+ explanation: 'Bad fix',
+ lineStart: 1,
+ lineEnd: 1,
+ status: 'pending',
+ createdAt: new Date(),
+ };
+
+ const modifiedContent = 'const x: any = 123;';
+
+ const result = await validator.validateDiffApplication(diff, modifiedContent);
+
+ expect(result).toBe(false);
+ });
+
+ it('should throw on missing diff', async () => {
+ const modifiedContent = 'const x = 123;';
+
+ await expect(
+ validator.validateDiffApplication(null as any, modifiedContent)
+ ).rejects.toThrow();
+ });
+
+ it('should throw on missing modified content', async () => {
+ const diff: Diff = {
+ id: 'diff-1',
+ errorId: 'err-1',
+ file: 'test.ts',
+ original: 'old',
+ modified: 'new',
+ context: 'context',
+ explanation: 'Fix',
+ lineStart: 1,
+ lineEnd: 1,
+ status: 'pending',
+ createdAt: new Date(),
+ };
+
+ await expect(validator.validateDiffApplication(diff, null as any)).rejects.toThrow();
+ });
+ });
+
+ describe('checkForNewErrors', () => {
+ it('should detect new errors', async () => {
+ const originalErrors: Error[] = [
+ {
+ id: 'err-1',
+ file: 'test.ts',
+ line: 1,
+ column: 0,
+ message: 'Error 1',
+ type: 'typescript',
+ severity: 'error',
+ status: 'new',
+ createdAt: new Date(),
+ updatedAt: new Date(),
+ },
+ ];
+
+ const newErrors: Error[] = [
+ {
+ id: 'err-1',
+ file: 'test.ts',
+ line: 1,
+ column: 0,
+ message: 'Error 1',
+ type: 'typescript',
+ severity: 'error',
+ status: 'new',
+ createdAt: new Date(),
+ updatedAt: new Date(),
+ },
+ {
+ id: 'err-2',
+ file: 'test.ts',
+ line: 2,
+ column: 0,
+ message: 'Error 2',
+ type: 'typescript',
+ severity: 'error',
+ status: 'new',
+ createdAt: new Date(),
+ updatedAt: new Date(),
+ },
+ ];
+
+ const introduced = await validator.checkForNewErrors(originalErrors, newErrors);
+
+ expect(introduced.length).toBe(1);
+ expect(introduced[0].message).toBe('Error 2');
+ });
+
+ it('should return empty array if no new errors', async () => {
+ const originalErrors: Error[] = [
+ {
+ id: 'err-1',
+ file: 'test.ts',
+ line: 1,
+ column: 0,
+ message: 'Error 1',
+ type: 'typescript',
+ severity: 'error',
+ status: 'new',
+ createdAt: new Date(),
+ updatedAt: new Date(),
+ },
+ ];
+
+ const newErrors: Error[] = [
+ {
+ id: 'err-1',
+ file: 'test.ts',
+ line: 1,
+ column: 0,
+ message: 'Error 1',
+ type: 'typescript',
+ severity: 'error',
+ status: 'new',
+ createdAt: new Date(),
+ updatedAt: new Date(),
+ },
+ ];
+
+ const introduced = await validator.checkForNewErrors(originalErrors, newErrors);
+
+ expect(introduced.length).toBe(0);
+ });
+
+ it('should throw on missing original errors', async () => {
+ const newErrors: Error[] = [];
+
+ await expect(validator.checkForNewErrors(null as any, newErrors)).rejects.toThrow();
+ });
+
+ it('should throw on missing new errors', async () => {
+ const originalErrors: Error[] = [];
+
+ await expect(validator.checkForNewErrors(originalErrors, null as any)).rejects.toThrow();
+ });
+ });
+
+ describe('validateDiffSafety', () => {
+ it('should validate safe diff', async () => {
+ const diff: Diff = {
+ id: 'diff-1',
+ errorId: 'err-1',
+ file: 'test.ts',
+ original: 'const x: string = 123;',
+ modified: 'const x: number = 123;',
+ context: 'context',
+ explanation: 'Fix type',
+ lineStart: 1,
+ lineEnd: 1,
+ status: 'pending',
+ createdAt: new Date(),
+ };
+
+ const originalContent = 'const x: string = 123;';
+
+ const result = await validator.validateDiffSafety(diff, originalContent);
+
+ expect(result.safe).toBe(true);
+ });
+
+ it('should reject diff with line mismatch', async () => {
+ const diff: Diff = {
+ id: 'diff-1',
+ errorId: 'err-1',
+ file: 'test.ts',
+ original: 'const x: string = 123;',
+ modified: 'const x: number = 123;',
+ context: 'context',
+ explanation: 'Fix type',
+ lineStart: 1,
+ lineEnd: 1,
+ status: 'pending',
+ createdAt: new Date(),
+ };
+
+ const originalContent = 'const x: number = 123;';
+
+ const result = await validator.validateDiffSafety(diff, originalContent);
+
+ expect(result.safe).toBe(false);
+ expect(result.reason).toContain('mismatch');
+ });
+
+ it('should reject diff with no changes', async () => {
+ const diff: Diff = {
+ id: 'diff-1',
+ errorId: 'err-1',
+ file: 'test.ts',
+ original: 'const x: string = 123;',
+ modified: 'const x: string = 123;',
+ context: 'context',
+ explanation: 'No change',
+ lineStart: 1,
+ lineEnd: 1,
+ status: 'pending',
+ createdAt: new Date(),
+ };
+
+ const originalContent = 'const x: string = 123;';
+
+ const result = await validator.validateDiffSafety(diff, originalContent);
+
+ expect(result.safe).toBe(false);
+ expect(result.reason).toContain('no changes');
+ });
+
+ it('should reject diff with empty modified line', async () => {
+ const diff: Diff = {
+ id: 'diff-1',
+ errorId: 'err-1',
+ file: 'test.ts',
+ original: 'const x: string = 123;',
+ modified: '',
+ context: 'context',
+ explanation: 'Empty fix',
+ lineStart: 1,
+ lineEnd: 1,
+ status: 'pending',
+ createdAt: new Date(),
+ };
+
+ const originalContent = 'const x: string = 123;';
+
+ const result = await validator.validateDiffSafety(diff, originalContent);
+
+ expect(result.safe).toBe(false);
+ expect(result.reason).toContain('empty');
+ });
+
+ it('should reject diff with out of bounds line', async () => {
+ const diff: Diff = {
+ id: 'diff-1',
+ errorId: 'err-1',
+ file: 'test.ts',
+ original: 'const x: string = 123;',
+ modified: 'const x: number = 123;',
+ context: 'context',
+ explanation: 'Fix type',
+ lineStart: 100,
+ lineEnd: 100,
+ status: 'pending',
+ createdAt: new Date(),
+ };
+
+ const originalContent = 'const x: string = 123;';
+
+ const result = await validator.validateDiffSafety(diff, originalContent);
+
+ expect(result.safe).toBe(false);
+ expect(result.reason).toContain('out of bounds');
+ });
+ });
+
+ describe('validateCodeQuality', () => {
+ it('should validate code quality', async () => {
+ const fileContent = `const x: number = 123;
+const y: string = "hello";`;
+
+ const result = await validator.validateCodeQuality(fileContent, 'test.ts');
+
+ expect(result.quality).toBeGreaterThanOrEqual(0);
+ expect(result.quality).toBeLessThanOrEqual(100);
+ expect(Array.isArray(result.issues)).toBe(true);
+ });
+
+ it('should detect long lines', async () => {
+ const longLine = 'const x = ' + 'a'.repeat(100) + ';';
+ const fileContent = longLine;
+
+ const result = await validator.validateCodeQuality(fileContent, 'test.ts');
+
+ expect(result.issues.some((i) => i.includes('exceed'))).toBe(true);
+ });
+
+ it('should detect console statements', async () => {
+ const fileContent = `console.log('debug');
+console.warn('warning');
+console.error('error');`;
+
+ const result = await validator.validateCodeQuality(fileContent, 'test.ts');
+
+ expect(result.issues.some((i) => i.includes('console'))).toBe(true);
+ });
+
+ it('should return quality score between 0 and 100', async () => {
+ const fileContent = `const x = 1;
+const y = 2;
+const z = 3;`;
+
+ const result = await validator.validateCodeQuality(fileContent, 'test.ts');
+
+ expect(result.quality).toBeGreaterThanOrEqual(0);
+ expect(result.quality).toBeLessThanOrEqual(100);
+ });
+
+ it('should throw on missing file content', async () => {
+ await expect(validator.validateCodeQuality(null as any, 'test.ts')).rejects.toThrow();
+ });
+
+ it('should throw on missing file path', async () => {
+ const fileContent = 'const x = 123;';
+
+ await expect(validator.validateCodeQuality(fileContent, null as any)).rejects.toThrow();
+ });
+ });
+
+ describe('Property 8: Diff Application Idempotence', () => {
+ it('should validate that validation is consistent', async () => {
+ const fileContent = 'const x: number = 123;';
+
+ const result1 = await validator.validateCode(fileContent, 'test.ts');
+ const result2 = await validator.validateCode(fileContent, 'test.ts');
+
+ expect(result1.length).toBe(result2.length);
+ });
+
+ it('should validate that diff safety is consistent', async () => {
+ const diff: Diff = {
+ id: 'diff-1',
+ errorId: 'err-1',
+ file: 'test.ts',
+ original: 'const x: string = 123;',
+ modified: 'const x: number = 123;',
+ context: 'context',
+ explanation: 'Fix type',
+ lineStart: 1,
+ lineEnd: 1,
+ status: 'pending',
+ createdAt: new Date(),
+ };
+
+ const originalContent = 'const x: string = 123;';
+
+ const result1 = await validator.validateDiffSafety(diff, originalContent);
+ const result2 = await validator.validateDiffSafety(diff, originalContent);
+
+ expect(result1.safe).toBe(result2.safe);
+ expect(result1.reason).toBe(result2.reason);
+ });
+
+ it('should validate that new errors are detected consistently', async () => {
+ const originalErrors: Error[] = [];
+ const newErrors: Error[] = [
+ {
+ id: 'err-1',
+ file: 'test.ts',
+ line: 1,
+ column: 0,
+ message: 'Error 1',
+ type: 'typescript',
+ severity: 'error',
+ status: 'new',
+ createdAt: new Date(),
+ updatedAt: new Date(),
+ },
+ ];
+
+ const result1 = await validator.checkForNewErrors(originalErrors, newErrors);
+ const result2 = await validator.checkForNewErrors(originalErrors, newErrors);
+
+ expect(result1.length).toBe(result2.length);
+ expect(result1[0]?.message).toBe(result2[0]?.message);
+ });
+ });
+
+ describe('Property-based tests', () => {
+ it(
+ 'should validate any code without crashing',
+ fc.asyncProperty(fc.string(), async (code) => {
+ const errors = await validator.validateCode(code, 'test.ts');
+ expect(Array.isArray(errors)).toBe(true);
+ })
+ );
+
+ it(
+ 'should check for new errors consistently',
+ fc.asyncProperty(
+ fc.array(
+ fc.record({
+ message: fc.string(),
+ })
+ ),
+ async (errorMessages) => {
+ const originalErrors: Error[] = errorMessages.map((e, i) => ({
+ id: `err-${i}`,
+ file: 'test.ts',
+ line: i + 1,
+ column: 0,
+ message: e.message,
+ type: 'typescript',
+ severity: 'error',
+ status: 'new',
+ createdAt: new Date(),
+ updatedAt: new Date(),
+ }));
+
+ const newErrors: Error[] = [...originalErrors];
+
+ const result = await validator.checkForNewErrors(originalErrors, newErrors);
+
+ expect(result.length).toBe(0);
+ }
+ )
+ );
+
+ it(
+ 'should validate code quality consistently',
+ fc.asyncProperty(fc.string(), async (code) => {
+ const result = await validator.validateCodeQuality(code, 'test.ts');
+
+ expect(result.quality).toBeGreaterThanOrEqual(0);
+ expect(result.quality).toBeLessThanOrEqual(100);
+ expect(Array.isArray(result.issues)).toBe(true);
+ })
+ );
+ });
+});

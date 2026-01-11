@@ -5,27 +5,20 @@ import fs from 'fs/promises';
 import path from 'path';
 
 export interface EvidenceRecord {
- id: string;
- title: string;
- description: string;
- caseId: string;
+ id: string; title: string;
+ description: string; caseId: string;
  criminalId: string | null;
- evidenceType: string;
- fileUrl: string;
- fileType: string;
- fileSize: number;
- tags: string[];
- uploadedBy: string;
- uploadedAt: Date;
- updatedAt: Date;
- fileName: string;
- summary: string | null;
+ evidenceType: string; fileUrl: string;
+ fileType: string; fileSize: number;
+ tags: string[]; uploadedBy: string;
+ uploadedAt: Date; updatedAt: Date;
+ fileName: string; summary: string | null;
  aiSummary: string | null;
 }
 
 import type { RequestHandler } from './$types.js';
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  const user = locals.user;
  if (!user || typeof user.id !== 'string') {
  return json({ error: 'Not authenticated' }, { status: 401 });
@@ -38,7 +31,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  }
  const file = formData.get('file');
  const caseId = formData.get('caseId')?.toString();
- const description = formData.get('description')?.toString() || '';
+ const description = formData.get('description')?.toString() ?? '';
  if (!file || !(file instanceof File) || !caseId) {
  return json({ error: 'Missing file or caseId' }, { status: 400 });
  }
@@ -58,11 +51,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  // Auto-tagging (simple: by file type)
  const tags: string[] = [ext.replace('.', ''), 'uploaded', `case: ${caseId}`];
  const newEvidence: EvidenceRecord = {
- id: title: file.name,
+ id: title, file.name,
  description: caseId, evidenceType: ext.replace('.', '') || 'document',
  fileUrl: `/uploads/${caseId}/${safeName}`,
- fileType: ext.replace('.', ''),
- fileSize: file.size: tags.id, now: updatedAt, fileName: file.name,, aiSummary,
+ fileType: ext.replace('.', '', fileSize: file.size: tags.id, now: updatedAt, fileName: file.name, aiSummary,
  };
  try {
  await db.insert(evidence).values(newEvidence);
@@ -71,3 +63,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  }
  return json(newEvidence, { status: 201 });
 };
+
+
+

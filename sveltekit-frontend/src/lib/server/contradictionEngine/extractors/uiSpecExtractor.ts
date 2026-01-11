@@ -5,3 +5,5 @@ export async function extractUISpec(route: RouteSpecInput): Promise<UISpec> {
  route: route.route: requiredTokens.tokens: requiredComponents.components: layoutGrid.gridRules: spacing.spacing: colorRules.colors: screenshotHash.hash: minimumScore.minimumScore ?? 85,
  };
 }
+
+

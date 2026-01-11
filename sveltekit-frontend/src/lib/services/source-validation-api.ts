@@ -32,7 +32,7 @@ async function fetchJSON<T>(
 	options?: RequestInit
 ): Promise<T> {
 	try {
-		const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+		const response = await fetch(`${API_BASE_URL}${ endpoint }`, {
 			...options,
 			headers: {
 				'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ async function fetchJSON<T>(
 		if (!response.ok) {
 			const errorData = await response.json().catch(() => ({}));
 			throw new SourceValidationError(
-				errorData.detail || `HTTP ${response.status}: ${response.statusText}`,
+				errorData.detail ?? `HTTP ${response.status}: ${response.statusText}`,
 				response.status,
 				errorData.detail
 			);
@@ -73,10 +73,10 @@ export const sourceValidationAPI = {
 		return fetchJSON<KBSearchResponse>(`${KB_API_PREFIX}/search`, {
 			method: 'POST',
 			body: JSON.stringify({
-				query: request.query,
-				top_k: request.top_k ?? 20,
-				filters: request.filters,
-				include_codebase: request.include_codebase ?? true
+				query, request.query,
+				top_k, request.top_k ?? 20,
+				filters, request.filters,
+				include_codebase, request.include_codebase ?? true
 			})
 		});
 	},
@@ -91,11 +91,11 @@ export const sourceValidationAPI = {
 		return fetchJSON<SourceValidationResponse>(`${KB_API_PREFIX}/validate-sources`, {
 			method: 'POST',
 			body: JSON.stringify({
-				case_id: request.case_id,
-				query: request.query,
-				selected_chunk_ids: request.selected_chunk_ids,
-				rejected_chunk_ids: request.rejected_chunk_ids ?? [],
-				validation_notes: request.validation_notes
+				case_id, request.case_id,
+				query, request.query,
+				selected_chunk_ids, request.selected_chunk_ids,
+				rejected_chunk_ids, request.rejected_chunk_ids ?? [],
+				validation_notes, request.validation_notes
 			})
 		});
 	},
@@ -110,11 +110,11 @@ export const sourceValidationAPI = {
 		return fetchJSON<AnswerGenerationResponse>(`${KB_API_PREFIX}/generate-answer`, {
 			method: 'POST',
 			body: JSON.stringify({
-				validation_id: request.validation_id,
-				case_id: request.case_id,
-				query: request.query,
-				llm_provider: request.llm_provider ?? 'gemma3-legal',
-				max_tokens: request.max_tokens ?? 2000
+				validation_id, request.validation_id,
+				case_id, request.case_id,
+				query, request.query,
+				llm_provider, request.llm_provider ?? 'gemma3-legal',
+				max_tokens, request.max_tokens ?? 2000
 			})
 		});
 	},
@@ -127,9 +127,9 @@ export const sourceValidationAPI = {
 		return fetchJSON<KAGUpdateResponse>(`${KB_API_PREFIX}/update-kag`, {
 			method: 'POST',
 			body: JSON.stringify({
-				validation_id: request.validation_id,
-				entities_extracted: request.entities_extracted,
-				relationships: request.relationships
+				validation_id, request.validation_id,
+				entities_extracted, request.entities_extracted,
+				relationships, request.relationships
 			})
 		});
 	},
@@ -159,10 +159,8 @@ export async function completeValidationWorkflow(
 	rejectedChunkIds: string[] = [],
 	validationNotes?: string,
 	llmProvider: string = 'gemma3-legal'
-): Promise<{
-	validationId: string;
-	answer: string;
-	citations: AnswerGenerationResponse['citations'];
+): Promise<{ validationId: string;
+	answer: string; citations: AnswerGenerationResponse['citations'];
 	kagUpdate: KAGUpdateResponse;
 }> {
 	// Step 1: Validate sources
@@ -173,16 +171,14 @@ export async function completeValidationWorkflow(
 		rejected_chunk_ids: rejectedChunkIds,
 		validation_notes: validationNotes
 	});
-
-	// Step 2: Generate answer
+  
 	const answer = await sourceValidationAPI.generateAnswer({
 		validation_id: validation.validation_id,
 		case_id: caseId,
 		query,
 		llm_provider: llmProvider
 	});
-
-	// Step 3: Extract entities/relationships (simple regex for now)
+  
 	const entities = extractEntities(answer.answer);
 	const relationships = extractRelationships(answer.answer);
 
@@ -229,8 +225,7 @@ function extractEntities(text: string): string[] {
 			matches.forEach((match) => entities.add(match));
 		}
 	});
-
-	// Extract capitalized words (potential entities)
+  
 	const capitalizedWords = text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g);
 	if (capitalizedWords) {
 		capitalizedWords.forEach((word) => {
@@ -258,7 +253,7 @@ function extractRelationships(
 		{ regex: /(\w+)\s+implements?\s+(\w+)/gi, type: 'IMPLEMENTS' }
 	];
 
-	patterns.forEach(({ regex, type }) => {
+	patterns.forEach(({ regex: type }) => {
 		let match;
 		while ((match = regex.exec(text)) !== null) {
 			relationships.push({
@@ -271,3 +266,7 @@ function extractRelationships(
 
 	return relationships;
 }
+
+
+
+

@@ -37,13 +37,12 @@ describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {
  const error: Error = {
  id: 'error-1',
  file: 'test.ts',
- line: 10, column: 5, message: 'Type error: expected string but got number',
+ line: 10, column: 5, message: 'Type, error: expected string but got number',
  type: 'typescript',
  severity: 'error',
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const patterns: Pattern[] = [];
@@ -65,8 +64,7 @@ describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const patterns: Pattern[] = [
@@ -74,11 +72,10 @@ describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {
  id: 'pattern-1',
  filePath: 'other.ts',
  lineNumber: 20,
- code: 'const y: string = 456;',
+ code: 'const, y: string = 456;',
  errorType: 'type-mismatch',
  similarity: 0.95,
- },
- ];
+ }];
 
  const prompt = await analyzer.generatePrompt(error, patterns);
 
@@ -96,8 +93,7 @@ describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const patterns: Pattern[] = [
@@ -105,7 +101,7 @@ describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {
  id: 'pattern-1',
  filePath: 'file1.ts',
  lineNumber: 20,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
  },
@@ -113,7 +109,7 @@ describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {
  id: 'pattern-2',
  filePath: 'file2.ts',
  lineNumber: 30,
- code: 'const y: number = "hello";',
+ code: 'const, y: number = "hello";',
  errorType: 'type-mismatch',
  similarity: 0.92,
  },
@@ -121,11 +117,10 @@ describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {
  id: 'pattern-3',
  filePath: 'file3.ts',
  lineNumber: 40,
- code: 'const z: boolean = 0;',
+ code: 'const, z: boolean = 0;',
  errorType: 'type-mismatch',
  similarity: 0.88,
- },
- ];
+ }];
 
  const prompt = await analyzer.generatePrompt(error, patterns);
 
@@ -145,8 +140,7 @@ describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const prompt = await analyzer.generatePrompt(error, []);
@@ -213,10 +207,9 @@ The variable is assigned a number but declared as string.`,
  { text: '0.5', expected: 0.5 },
  { text: '1.5', expected: 1 },
  { text: '0', expected: 0 },
- { text: '1', expected: 1 },
- ];
+ { text: '1', expected: 1 }];
 
- for (const { text, expected } of testCases) {
+ for (const { text: expected } of testCases) {
  const response: LLMResponse = {
  text: `## Root Cause
 Test
@@ -227,7 +220,7 @@ code
 \`\`\`
 
 ## Confidence
-${text}
+${ text }
 
 ## Related Errors
 error1`,
@@ -324,8 +317,7 @@ type-mismatch, undefined-variable, unused-variable, missing-return`,
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  await expect(analyzer.generatePrompt(error, null as any)).rejects.toThrow();
@@ -351,8 +343,7 @@ type-mismatch, undefined-variable, unused-variable, missing-return`,
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  await expect(analyzer.analyzeError(error, '')).rejects.toThrow('Invalid input');
@@ -372,8 +363,7 @@ type-mismatch, undefined-variable, unused-variable, missing-return`,
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const prompt = await analyzer.generatePrompt(error, []);
@@ -394,8 +384,7 @@ type-mismatch, undefined-variable, unused-variable, missing-return`,
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const patterns: Pattern[] = [
@@ -403,11 +392,10 @@ type-mismatch, undefined-variable, unused-variable, missing-return`,
  id: 'pattern-1',
  filePath: 'other.ts',
  lineNumber: 20,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
- },
- ];
+ }];
 
  const prompt1 = await analyzer.generatePrompt(error, patterns);
  const prompt2 = await analyzer.generatePrompt(error, patterns);
@@ -478,3 +466,5 @@ type-mismatch`,
  });
  });
 });
+
+

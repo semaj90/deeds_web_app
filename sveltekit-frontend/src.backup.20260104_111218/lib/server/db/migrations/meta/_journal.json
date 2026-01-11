@@ -1,0 +1,76 @@
+{
+ "version": "5",
+ "dialect": "postgresql",
+ "entries": [
+ {
+ "idx": 0,
+ "version": "5",
+ "when": 1694000000000,
+ "tag": "001_init_pgvector",
+ "name": "001_init_pgvector"
+ },
+ {
+ "idx": 1,
+ "version": "5",
+ "when": 1694000001000,
+ "tag": "002_enhanced_schema_with_qdrant",
+ "name": "002_enhanced_schema_with_qdrant"
+ },
+ {
+ "idx": 2,
+ "version": "5",
+ "when": 1694000002000,
+ "tag": "003_deploy_enhanced_legal_schema",
+ "name": "003_deploy_enhanced_legal_schema"
+ },
+ {
+ "idx": 3,
+ "version": "5",
+ "when": 1694000003000,
+ "tag": "004_add_missing_api_tables",
+ "name": "004_add_missing_api_tables"
+ },
+ {
+ "idx": 4,
+ "version": "5",
+ "when": 1694000004000,
+ "tag": "005_add_composite_indexes",
+ "name": "005_add_composite_indexes"
+ },
+ {
+ "idx": 5,
+ "version": "5",
+ "when": 1694000005000,
+ "tag": "006_optimize_vector_indexing",
+ "name": "006_optimize_vector_indexing"
+ },
+ {
+ "idx": 6,
+ "version": "5",
+ "when": 1694000006000,
+ "tag": "007_add_embedding_768_and_backfill_instructions",
+ "name": "007_add_embedding_768_and_backfill_instructions"
+ },
+ {
+ "idx": 7,
+ "version": "5",
+ "when": 1694000007000,
+ "tag": "010_add_uploads_table",
+ "name": "010_add_uploads_table"
+ },
+ {
+ "idx": 8,
+ "version": "5",
+ "when": 1694000008000,
+ "tag": "010_standardize_vectors_384",
+ "name": "010_standardize_vectors_384"
+ },
+ {
+ "idx": 9,
+ "version": "5",
+ "when": 1694000009000,
+ "tag": "011_create_case_memories_and_pgvector",
+ "name": "011_create_case_memories_and_pgvector"
+ }
+ ]
+}

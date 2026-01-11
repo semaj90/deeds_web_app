@@ -68,7 +68,7 @@ function getConfidenceColor(confidence: number): string {
 }
 
 function formatTime(ms: number): string {
-  return ms > 1000 ? `${(ms / 1000).toFixed(1)}s` : `${ms}ms`;
+  return ms > 1000 ? `${(ms / 1000).toFixed(1)}s` : `${ ms }ms`;
 }
 </script>
 
@@ -264,7 +264,9 @@ function formatTime(ms: number): string {
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    -webkit-box-orient: vertical; overflow: hidden;
   }
 </style>
+
+
+

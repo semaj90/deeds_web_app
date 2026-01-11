@@ -12,8 +12,7 @@
  { label: 'Analysis Center', href: '/analysis', key: 'analysis' },
  { label: 'Global Search', href: '/search', key: 'search' },
  { label: 'Terminal', href: '/terminal', key: 'terminal' },
- { label: 'System Config', href: '/settings', key: 'settings' },
- ];
+ { label: 'System Config', href: '/settings', key: 'settings' }];
 let currentPath = $state(page.url.pathname);
 </script>
 
@@ -31,7 +30,7 @@ let currentPath = $state(page.url.pathname);
  <a
  href={item.href}
  class="flex items-center justify-between px-4 py-2 text-xs font-mono tracking-[0.16em]
- uppercase border-b border-black/20 hover:bg-panelSoft hover:text-sand
+ uppercase border-b border-black/20 hover: bg-panelSoft, hover:text-sand
  {currentPath === item.href ? 'bg-panel text-accent' : 'text-black'}"
  >
  <span>{item.label}</span>
@@ -44,3 +43,5 @@ let currentPath = $state(page.url.pathname);
  <span>System: Operational</span>
  </div>
 </aside>
+
+

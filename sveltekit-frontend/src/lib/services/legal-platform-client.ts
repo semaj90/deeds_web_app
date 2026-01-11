@@ -1,1 +1,2 @@
 /** * Legal AI Platform Client Service * TypeScript client for interacting with the centralized Legal Platform API v2 * Provides type-safe CRUD operations for cases, evidence, criminals, and documents * Includes comprehensive error handling and logging */ 
+

@@ -1,0 +1,38 @@
+import db from '$lib/server/db';
+import { errorBrainDiffs } from '$lib/server/db/schema/errorBrainDiffs';
+import { eq } from 'drizzle-orm';
+import type { PatchCandidate } from './diffTypes.js';
+
+export class DiffRepository {
+ async insert(patch: PatchCandidate): Promise<void> {
+ await db.insert(errorBrainDiffs).values({
+ runId: patch.runId,
+ filePath: patch.filePath,
+ diffText: patch.diffText,
+ beforeSha256: patch.beforeSha256,
+ afterSha256: patch.afterSha256,
+ afterText: patch.afterText,
+ contextLines: patch.contextLines,
+ confidence: patch.confidence,
+ reason: patch.reason,
+ createdAt: new Date(patch.createdAt),
+ });
+ }
+
+ async listByRun(runId: string): Promise<PatchCandidate[]> {
+ const rows = await db.select().from(errorBrainDiffs).where(eq(errorBrainDiffs.runId, runId));
+
+ return rows.map((row) => ({
+ runId: row.runId,
+ filePath: row.filePath,
+ diffText: row.diffText,
+ beforeSha256: row.beforeSha256,
+ afterSha256: row.afterSha256,
+ afterText: row.afterText,
+ contextLines: row.contextLines,
+ confidence: row.confidence,
+ reason: row.reason,
+ createdAt: row.createdAt.getTime(),
+ }));
+ }
+}

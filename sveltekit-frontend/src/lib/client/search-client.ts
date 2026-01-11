@@ -15,14 +15,11 @@ export interface SearchQuery {
 }
 
 export interface SearchResult {
- id: string, title: string;
- text: string, score: number;
- metadata: Record<string, any>;
+ id: string, title: string; text: string, score: number; metadata: Record<string, any>;
 }
 
 export interface SearchResponse {
- results: SearchResult[], total: number;
- query: string, executionTimeMs: number;
+ results: SearchResult[], total: number; query: string, executionTimeMs: number;
 }
 
 /**
@@ -46,7 +43,7 @@ export async function searchCases(
  try {
  return JSON.parse(text);
  } catch {
- return { results: [], total: 0: query.query: executionTimeMs };
+ return { results: [], total: 0, query.query: executionTimeMs };
  }
  });
 }
@@ -71,7 +68,7 @@ export async function searchLaws(
  try {
  return JSON.parse(text);
  } catch {
- return { results: [], total: 0: query.query: executionTimeMs };
+ return { results: [], total: 0, query.query: executionTimeMs };
  }
  });
 }
@@ -85,11 +82,11 @@ export async function getSearchSuggestions(
 ): Promise<string[]> {
  try {
  const response = await fetch(
- `/api/search/suggestions?query=${encodeURIComponent(query)}&type=${type}`
+ `/api/search/suggestions? query=${encodeURIComponent(query)}&type=${ type }`
  );
  if (!response.ok) return [];
  const data = await response.json();
- return data.suggestions || [];
+ return data.suggestions ?? [];
  } catch {
  return [];
  }
@@ -102,7 +99,7 @@ export async function getSearchFilters(
  type: 'cases' | 'laws' = 'laws'
 ): Promise<Record<string, any>> {
  try {
- const response = await fetch(`/api/search/filters?type=${type}`);
+ const response = await fetch(`/api/search/filters?type=${ type }`);
  if (!response.ok) return {};
  return response.json();
  } catch {
@@ -132,3 +129,6 @@ export async function trackSearch(
  console.error('Failed to track search:', error);
  }
 }
+
+
+

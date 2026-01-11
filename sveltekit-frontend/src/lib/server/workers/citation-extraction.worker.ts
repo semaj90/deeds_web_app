@@ -9,20 +9,15 @@ import { citationService } from '$lib/server/services/citation.service';
 import { auditService } from '$lib/server/services/audit.service';
 
 export interface CitationExtractionJob {
- documentId: string;
- caseId: string;
- content: string;
- userId: string;
+ documentId: string; caseId: string;
+ content: string; userId: string;
 }
 
 export interface ExtractedCitation {
- text: string;
- type: 'statute' | 'case_law' | 'regulation' | 'contract';
+ text: string; type: 'statute' | 'case_law' | 'regulation' | 'contract';
  jurisdiction?: string;
- year?: number;
- confidence: number;
- startIndex: number;
- endIndex: number;
+ year?: number; confidence: number;
+ startIndex: number; endIndex: number;
 }
 
 class CitationExtractionWorker {
@@ -30,8 +25,7 @@ class CitationExtractionWorker {
 
  constructor() {
  this.worker = new Worker(
- 'citation-extraction',
- this.processCitationExtraction.bind(this),
+ 'citation-extraction'; this.processCitationExtraction.bind(this),
  {
  connection: redis, concurrency: 5, removeOnComplete: 100, removeOnFail: 50
  }
@@ -113,13 +107,13 @@ class CitationExtractionWorker {
  },
  // Case citations: 123 F.3d 456 (9th Cir. 2000)
  {
- regex: /(\d+)\s+F\.?\s*(\d+d?)\s+(\d+)\s*\(([^)]+)\s+(\d{4})\)/gi,
+ regex: /(\d+)\s+F\.?\s*(\d+d?)\s+(\d+)\s*\(([^)]+)\s+(\d{ 4 })\)/gi,
  type: 'case_law' as const,
  jurisdiction: 'Federal',
  },
  // State case citations: 123 Cal.App.4th 456 (2000)
  {
- regex: /(\d+)\s+Cal\.?\s*App\.?\s*(\d+\w*)\s+(\d+)\s*\((\d{4})\)/gi,
+ regex: /(\d+)\s+Cal\.?\s*App\.?\s*(\d+\w*)\s+(\d+)\s*\((\d{ 4 })\)/gi,
  type: 'case_law' as const,
  jurisdiction: 'CA',
  },
@@ -128,8 +122,7 @@ class CitationExtractionWorker {
  regex: /(\d+)\s+C\.F\.R\.?\s*§?\s*([\d.]+)/gi,
  type: 'regulation' as const,
  jurisdiction: 'Federal',
- },
- ];
+ }];
 
  for (const pattern of patterns) {
  let match;
@@ -182,8 +175,7 @@ class CitationExtractionWorker {
  async enqueueJob(data: CitationExtractionJob): Promise<any> {
  return this.worker.add('extract', data, {
  attempts: 3,
- backoff: {
- type: 'exponential',
+ backoff: { type: 'exponential',
  delay: 2000,
  },
  removeOnComplete: true,
@@ -193,10 +185,8 @@ class CitationExtractionWorker {
  /**
  * Get extraction statistics
  */
- async getExtractionStats(): Promise<{
- totalJobs: number;
- completedJobs: number;
- failedJobs: number;
+ async getExtractionStats(): Promise<{ totalJobs: number;
+ completedJobs: number; failedJobs: number;
  }> {
  try {
  const waiting = await this.worker.getWaiting();
@@ -225,3 +215,7 @@ class CitationExtractionWorker {
 
 // Export singleton instance
 export const citationExtractionWorker = new CitationExtractionWorker();
+
+
+
+

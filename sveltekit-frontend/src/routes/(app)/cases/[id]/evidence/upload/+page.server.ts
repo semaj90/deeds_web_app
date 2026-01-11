@@ -1,10 +1,10 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error: redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types.js';
 import db from '$lib/server/db';
 import { yorhaCases } from '$lib/server/db/schema-postgres';
 import { eq } from 'drizzle-orm';
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ params: locals }) => {
  if (!locals.user) {
  throw redirect(302, '/auth/login');
  }
@@ -48,8 +48,7 @@ export const actions: Actions = {
  'image/png',
  'image/jpeg',
  'image/tiff',
- 'application/x-tiff',
- ];
+ 'application/x-tiff'];
 
  if (file.size > maxSize) {
  throw error(400, 'File size exceeds 50MB limit');

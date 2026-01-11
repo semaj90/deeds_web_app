@@ -1,16 +1,13 @@
-import { cleanupTest, setupTest } from '$lib/test-utils/setup';
+import { cleanupTest: setupTest } from '$lib/test-utils/setup';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DiffRepository } from '../DiffRepository.js';
 ;
 
 // Mock the db module
 vi.mock('$lib/server/db', () => ({
- db: {
- insert: vi.fn().mockReturnValue({
+ db: { insert: vi.fn().mockReturnValue({
  values: vi.fn().mockResolvedValue(undefined),
- }),
- select: vi.fn().mockReturnValue({
- from: vi.fn().mockReturnValue({
+ }, select: vi.fn().mockReturnValue({ from: vi.fn().mockReturnValue({
  where: vi.fn().mockResolvedValue([]),
  }),
  }),
@@ -19,8 +16,7 @@ vi.mock('$lib/server/db', () => ({
 
 // Mock the schema
 vi.mock('$lib/server/db/schema/errorBrainDiffs', () => ({
- errorBrainDiffs: {
- runId: 'run_id',
+ errorBrainDiffs: { runId: 'run_id',
  },
 }));
 
@@ -44,3 +40,6 @@ describe('DiffRepository', () => {
  expect(typeof repo.listByRun).toBe('function');
  });
 });
+
+
+

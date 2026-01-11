@@ -4,8 +4,7 @@ async function embedWithGemma(texts: string[]): Promise<Vector[]> {
  const response = await fetch(process.env.GEMMA_EMBED_URL ?? 'http://localhost:11434/api/embed', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: process.env.GEMMA_EMBED_MODEL ?? 'embeddinggemma:latest',
+ body: JSON.stringify({ model: process.env.GEMMA_EMBED_MODEL ?? 'embeddinggemma:latest',
  input: texts,
  }),
  });
@@ -51,8 +50,7 @@ export class GemmaVectorStore {
  async similaritySearch(query: string, k = 5): Promise<StoredDoc[]> {
  const [queryVector] = await embedWithGemma([query]);
  const scored = this.vectors.map((vector, index) => ({
- score: cosine(vector, queryVector),
- doc: this.docs[index],
+ score: cosine(vector, queryVector, doc: this.docs[index],
  }));
 
  return scored
@@ -75,8 +73,7 @@ export async function initUIComplianceRAG(): Promise<GemmaVectorStore> {
  'BarnsworthBurning aesthetic: editorial layout, high whitespace, thin borders.',
  'Retro UI: gridlines, terminal panels, low-saturation neutrals, glow outlines.',
  'Required components: Panel, Card, RetroButton, SectionHeader, Terminal panel.',
- 'Evidence Board: draggable notes, semantic wiring, dashed connections.',
- ];
+ 'Evidence Board: draggable notes, semantic wiring, dashed connections.'];
 
  await store.addTexts(docs);
  uiComplianceStore = store;
@@ -85,5 +82,8 @@ export async function initUIComplianceRAG(): Promise<GemmaVectorStore> {
 
 export async function fetchUISpecForRoute(route: string): Promise<StoredDoc[]> {
  const store = await initUIComplianceRAG();
- return store.similaritySearch(`Describe YoRHa compliance requirements for route ${route}`, 5);
+ return store.similaritySearch(`Describe YoRHa compliance requirements for route ${ route }`, 5);
 }
+
+
+

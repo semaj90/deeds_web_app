@@ -1,0 +1,107 @@
+import { simdMarkdownParser } from '$lib/utils/simd-markdown-parser';
+import type { RequestHandler } from './$types';
+
+interface ParseRequestPayload {
+  jsonString?: string;
+  markdownString?: string;
+  iterations?: number;
+  type?: 'json' | 'markdown';
+  prefer?: 'go' | 'native' | 'python' | 'gpu' | 'js' | 'auto';
+  output?: 'html' | 'ast' | 'html-and-ast';
+  includeFrontMatter?: boolean;
+  timeoutMs?: number;
+}
+
+export const POST: RequestHandler = async ({ request }) => {
+  try {
+    const body: ParseRequestPayload = await request.json();
+    const mode: 'json' | 'markdown' =;
+      body.type ?? (body.markdownString ? 'markdown' : 'json');
+
+    if (mode === 'markdown') {
+      if (!body.markdownString || typeof body.markdownString !== 'string') {
+        return new Response(
+          JSON.stringify({ success: false, error: 'Valid markdownString required' }),
+          { status: 400 }
+        );
+      }
+
+      const result = await simdMarkdownParser.parse(body.markdownString, {
+        prefer: body.prefer,
+        output: body.output ?? 'html-and-ast',
+        includeFrontMatter: body.includeFrontMatter ?? true,
+        timeoutMs: body.timeoutMs ?? 5000
+      });
+
+      return new Response(
+        JSON.stringify({
+          success: result.success,
+          strategy: result.strategy,
+          html: result.html,
+          ast: result.ast,
+          tokens: result.tokens,
+          frontMatter: result.frontMatter,
+          extractedText: result.extractedText,
+          diagnostics: result.diagnostics,
+          performance: result.performance,
+          attempts: result.attempts,
+          metadata: {
+            sizeKB: body.markdownString.length / 1024,
+            timestamp: new Date().toISOString()
+          }
+        }),
+        { status: result.success ? 200 : 502 }
+      );
+    }
+
+    const jsonString = body.jsonString;
+    const iterations = Math.min(Math.max(body.iterations ?? 1, 1), 100);
+
+    if (!jsonString || typeof jsonString !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Valid jsonString required' }),
+        { status: 400 }
+      );
+    }
+
+    const parsedResults = [];
+    const times: number[] = [];
+
+    for (let i = 0; i < iterations; i++) {
+      const start = performance.now();
+      const parsed = JSON.parse(jsonString);
+      const end = performance.now();
+      times.push(end - start);
+      if (i === 0) parsedResults.push(parsed);
+    }
+
+    const avgTime = times.reduce((a, b) => a + b, 0) / times.length;
+    const throughput =;
+      (jsonString.length * iterations) / ((avgTime * iterations) / 1000) / (1024 * 1024);
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: parsedResults[0],
+        performance: {
+          iterations,
+          avgTimeMs: avgTime,
+          throughputMBps: throughput,
+          dataSizeKB: jsonString.length / 1024,
+          method: 'native-json-parse'
+        }
+      }),
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('SIMD parse error:', error);
+
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : 'Parse failed'
+      }),
+      { status: 500 }
+    );
+  }
+};

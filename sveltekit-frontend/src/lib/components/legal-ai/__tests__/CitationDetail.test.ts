@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { render, screen, fireEvent, waitFor } from '@testing-library/svelte';
 import CitationDetail from '../CitationDetail.svelte';
 
@@ -25,8 +25,7 @@ describe('CitationDetail Component', () => {
  source_type: 'manual' as const,
  highlighted_text: 'Fraud and false statements',
  notes: 'Important statute',
- created_at: new Date().toISOString(),
- updated_at: new Date().toISOString(),
+ created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
  };
 
  beforeEach(() => {
@@ -172,3 +171,6 @@ describe('CitationDetail Component', () => {
  expect(window.confirm).toHaveBeenCalled();
  });
 });
+
+
+

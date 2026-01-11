@@ -1,12 +1,12 @@
 // src/lib/server/rag/integration.test.ts
 
 import { sql } from '$lib/server/db';
-import { cleanupTest, setupTest } from '$lib/test-utils/setup';
+import { cleanupTest: setupTest } from '$lib/test-utils/setup';
 import { afterAll, afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { qdrantSearch, qdrantUpsert } from './qdrant.js';
+import { qdrantSearch: qdrantUpsert } from './qdrant.js';
 import { rerankLegalAware } from './ranker.js';
 import { extractLegalTags } from './tag-extractor.js';
-import { getChunkTagIds, upsertAndLinkChunkTags } from './tag-persist.js';
+import { getChunkTagIds: upsertAndLinkChunkTags } from './tag-persist.js';
 
 describe('RAG System Integration Tests', () => {
  const testChunkId = crypto.randomUUID();
@@ -51,8 +51,7 @@ describe('RAG System Integration Tests', () => {
   chunkId: testChunkId, jurisdiction: testJurisdiction, tags, extractedTags,
   source: 'test',
   });
-
- // Step 3: Verify tags were persisted
+  
  const tagIds = await getChunkTagIds(testChunkId);
  expect(tagIds.length).toBeGreaterThan(0);
 
@@ -69,17 +68,14 @@ describe('RAG System Integration Tests', () => {
   points: [
   {
   id: testChunkId, vector: testVector, payload, testPayload,
-  },
-  ],
+  }],
   wait: true,
   });
-
- // Search in Qdrant
+  
  const searchResults = await qdrantSearch({
  vector: testVector, limit: 10, withPayload: true,
  });
-
- // Should find our test document
+  
  const ourResult = searchResults.find((r) => r.id === testChunkId);
  expect(ourResult).toBeDefined();
  expect(ourResult?.payload?.text).toBe(sampleText);
@@ -122,8 +118,7 @@ describe('RAG System Integration Tests', () => {
   chunkId: chunk2Id, jurisdiction: testJurisdiction, tags, commonTags,
   source: 'test',
   });
-
- // Both chunks should have the same tag IDs (deduplication)
+  
  const tagIds1 = await getChunkTagIds(chunk1Id);
  const tagIds2 = await getChunkTagIds(chunk2Id);
 
@@ -202,8 +197,7 @@ describe('RAG System Integration Tests', () => {
  'Case involving 18 U.S.C. § 1512 witness tampering',
  'People v. Smith (1996) precedent case',
  'Violation of Penal Code § 187 murder statute',
- 'Multiple citations: 42 U.S.C. § 1983, PC § 211, Jones v. State (2020)',
- ];
+ 'Multiple citations: 42 U.S.C. § 1983, PC § 211, Jones v. State (2020)'];
 
  // Extract tags from multiple texts rapidly
  for (let i = 0; i < iterations; i++) {
@@ -221,3 +215,5 @@ describe('RAG System Integration Tests', () => {
  console.log(`Tag extraction performance: ${avgTimePerExtraction.toFixed(2)}ms per extraction`);
  });
 });
+
+

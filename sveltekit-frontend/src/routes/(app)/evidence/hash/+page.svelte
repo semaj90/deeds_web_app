@@ -19,8 +19,7 @@
  { id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
  { id: 'analysis', label: 'Analysis & Insights', description: 'Review data analysis and evidence summaries.' },
  { id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
- { id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' },
- ]);
+ { id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' }]);
 
  let evidenceInsights = $state([]);
  let recentCases = $state([]);
@@ -43,7 +42,7 @@
  await appActions.loadCases();
 
  // Get cases from store and filter for recent ones
- const allCases = appState?.cases || [];
+ const allCases = appState?.cases ?? [];
  recentCases = allCases
  .sort((a: any, b: any) => new Date(b.createdAt || b.updatedAt || 0).getTime() - new Date(a.createdAt || a.updatedAt || 0).getTime())
  .slice(0, 10)
@@ -54,8 +53,8 @@
  priority: caseItem.priority || 'medium',
  createdBy: caseItem.createdBy || 'System',
  createdByLastName: caseItem.createdByLastName || '',
- createdAt: caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(),
- status: caseItem.status || 'active'
+			createdAt: caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(),
+				status: caseItem.status || 'active'
  }));
 
  } catch (err) {
@@ -71,8 +70,8 @@
  priority: 'high',
  createdBy: '2B',
  createdByLastName: '',
- createdAt: new Date().toISOString(),
- status: 'active'
+		createdAt: new Date().toISOString(),
+		status: 'active'
  },
  {
  id: 'case-002',
@@ -81,8 +80,8 @@
  priority: 'medium',
  createdBy: '9S',
  createdByLastName: '',
- createdAt: new Date(Date.now() - 86400000).toISOString(),
- status: 'active'
+		createdAt: new Date(Date.now() - 86400000).toISOString(),
+		status: 'active'
  }
  ];
  } finally {
@@ -95,7 +94,7 @@
  // Load evidence from API
  await appActions.loadEvidence();
 
- const evidence = appState?.evidence || [];
+ const evidence = appState?.evidence ?? [];
 
  // Generate insights from evidence data
  evidenceInsights = evidence
@@ -103,8 +102,8 @@
  .slice(0, 5)
  .map((item: any, index: number) => ({
  id: `insight-${item.id || index}`,
- label: item.filename || item.title || `Evidence Analysis ${index + 1}`,
- summary: item.analysis || item.summary || 'AI analysis completed'
+			label: item.filename || item.title || `Evidence Analysis ${index + 1}`,
+				summary: item.analysis || item.summary || 'AI analysis completed'
  }));
 
  // Add some generated insights if we don't have enough
@@ -130,8 +129,7 @@
  // Fallback insights
  evidenceInsights = [
  { id: 'insight-001', label: 'Anomaly detected in network logs', summary: 'Unusual data transfer patterns identified.' },
- { id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' },
- ];
+ { id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' }];
  }
  }
 
@@ -178,7 +176,7 @@
 
  // Function to handle navigation to a case, addressing the goto() warning
  async function navigateToCase(caseId: string) {
- await goto(`/cases/${caseId}`);
+ await goto(`/cases/${ caseId }`);
  }
 
  let intervalId: ReturnType<typeof setInterval>;
@@ -334,7 +332,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
  class="fixed inset-0 z-50 bg-black/80 animate-in fade-in-0"
- onclick={cancelNewCase}
+ onclick={ cancelNewCase }
  role="button"
  tabindex="0"
  aria-label="Close dialog"
@@ -342,7 +340,7 @@
  <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
  <div
  class="fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4
- border border-slate-700 bg-slate-900 p-6 shadow-lg duration-200 animate-in fade-in-0 zoom-in-95 sm:rounded-lg md:w-full"
+ border border-slate-700 bg-slate-900 p-6 shadow-lg duration-200 animate-in fade-in-0 zoom-in-95 sm: rounded-lg, md:w-full"
  onclick={(e) => e.stopPropagation()}
  role="dialog"
  aria-modal="true"
@@ -399,7 +397,7 @@
  <button
  type="button"
  class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:border-slate-400"
- onclick={cancelNewCase}
+ onclick={ cancelNewCase }
  >
  Cancel
  </button>
@@ -413,8 +411,8 @@
  </form>
  <button
  type="button"
- class="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-900"
- onclick={cancelNewCase}
+ class="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover: opacity-100, focus:outline-none focus: ring-2, focus:ring-slate-400 focus: ring-offset-2, focus:ring-offset-slate-900"
+ onclick={ cancelNewCase }
  aria-label="Close"
  >
  <svg
@@ -437,5 +435,7 @@
  </div>
 </div>
 {/if}
+
+
 
 

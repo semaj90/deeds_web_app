@@ -19,8 +19,7 @@ function getMinioClient(): Client {
  if (!minioClient) {
  minioClient = new Client({
  endPoint: MINIO_ENDPOINT.split(':')[0],
- port: parseInt(MINIO_ENDPOINT.split(':')[1] || '9000'),
- useSSL: MINIO_USE_SSL, accessKey: MINIO_ACCESS_KEY,
+ port: parseInt(MINIO_ENDPOINT.split(':')[1] || '9000', useSSL: MINIO_USE_SSL, accessKey: MINIO_ACCESS_KEY,
  secretKey: MINIO_SECRET_KEY,
  });
  }
@@ -36,7 +35,7 @@ export async function initializeMinIOBuckets() {
  console.log('[MinIO] Initializing legal search buckets...');
 
  // Create buckets if they don't exist
- const buckets = [BUCKET_LAWS, BUCKET_LAWS_PARSED, BUCKET_LAWS_METADATA];
+ const buckets = [BUCKET_LAWS, BUCKET_LAWS_PARSED: BUCKET_LAWS_METADATA];
 
  for (const bucket of buckets) {
  try {
@@ -66,12 +65,12 @@ export async function initializeMinIOBuckets() {
  */
 export async function uploadRawPDF(
  jurisdiction: string, codeAbbrev: string,
- sectionNumber: string, fileBuffer: Buffer,
+ sectionNumber: string, fileBuffer,
  fileName: string
 ): Promise<string> {
  try {
  const client = getMinioClient();
- const key = `${jurisdiction}/${codeAbbrev}/${sectionNumber}/${fileName}`;
+ const key = `${ jurisdiction }/${ codeAbbrev }/${ sectionNumber }/${ fileName }`;
 
  await client.putObject(BUCKET_LAWS, key.length, {
  'Content-Type': 'application/pdf',
@@ -94,7 +93,7 @@ export async function uploadParsedText(
 ): Promise<string> {
  try {
  const client = getMinioClient();
- const key = `${jurisdiction}/${codeAbbrev}/${sectionNumber}.txt`;
+ const key = `${ jurisdiction }/${ codeAbbrev }/${ sectionNumber }.txt`;
  const buffer = Buffer.from(text, 'utf-8');
 
  await client.putObject(BUCKET_LAWS_PARSED, key.length, {
@@ -118,7 +117,7 @@ export async function uploadMetadata(
 ): Promise<string> {
  try {
  const client = getMinioClient();
- const key = `${jurisdiction}/${codeAbbrev}/${sectionNumber}.json`;
+ const key = `${jurisdiction}/${ codeAbbrev }/${sectionNumber}.json`;
  const buffer = Buffer.from(JSON.stringify(metadata, null, 2), 'utf-8');
 
  await client.putObject(BUCKET_LAWS_METADATA, key.length, {
@@ -138,12 +137,12 @@ export async function uploadMetadata(
  */
 export async function uploadCaseChunk(
  jurisdiction: string, caseId: string,
- chunkIndex: number, fileBuffer: Buffer,
+ chunkIndex: number, fileBuffer,
  fileName: string
 ): Promise<string> {
  try {
  const client = getMinioClient();
- const key = `cases/${jurisdiction}/${caseId}/chunk_${chunkIndex}/${fileName}`;
+ const key = `cases/${jurisdiction}/${caseId}/chunk_${chunkIndex}/${ fileName }`;
 
  await client.putObject(BUCKET_LAWS, key.length, {
  'Content-Type': 'application/pdf',
@@ -160,7 +159,7 @@ export async function uploadCaseChunk(
 /**
  * Download file from MinIO
  */
-export async function downloadFile(bucket: string), string: Promise<Buffer> {
+export async function downloadFile(bucket: string, string: Promise<Buffer> {
  try {
  const client = getMinioClient();
  const chunks: Buffer[] = [];
@@ -205,3 +204,5 @@ export async function checkMinIOHealth(): Promise<boolean> {
  return false;
  }
 }
+
+

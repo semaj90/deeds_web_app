@@ -1,0 +1,111 @@
+/**
+ * Statute Search API Route
+ * Handles semantic search of statute chunks using embeddings
+ */
+
+import { json, type RequestHandler } from '@sveltejs/kit';
+import { generateEmbedding, searchStatuteChunks } from '$lib/server/services/statute-ingestion-service';
+import { db } from '$lib/server/db/index';
+import { statutes } from '$lib/server/db/schema-postgres';
+import { eq } from 'drizzle-orm';
+
+/**
+ * POST /api/statutes/search
+ * Search statute chunks by semantic similarity
+ */
+export const POST: RequestHandler = async ({ request }) => {
+  try {
+    const body = await request.json();
+    const { query, topK = 5, threshold = 0.5 } = body as {
+      query: string;
+      topK?: number;
+      threshold?: number;
+    };
+
+    if (!query) {
+      return json({ error: 'Missing required parameter: query' }, { status: 400 });
+    }
+
+    // Generate embedding for query
+    const queryEmbedding = await generateEmbedding(query);
+
+    // Search statute chunks
+    const results = await searchStatuteChunks(queryEmbedding, topK, threshold);
+
+    // Enrich results with statute information
+    const enrichedResults = await Promise.all(;
+      results.map(async (result) => {
+        const statute = await db;
+          .select()
+          .from(statutes)
+          .where(eq(statutes.id, result.statuteId));
+
+        return {
+          ...result,
+          statute: statute[0] || null,
+        };
+      })
+    );
+
+    return json({
+      query,
+      results: enrichedResults,
+      count: enrichedResults.length,
+    });
+  } catch (error) {
+    console.error('Statute search error:', error);
+    return json(
+      { error: error instanceof Error ? error.message : 'Failed to search statutes' },
+      { status: 500 }
+    );
+  }
+};
+
+/**
+ * GET /api/statutes/search
+ * Search statutes by query string
+ */
+export const GET: RequestHandler = async ({ url }) => {
+  try {
+    const query = url.searchParams.get('q');
+    const topK = parseInt(url.searchParams.get('topK') || '5', 10);
+    const threshold = parseFloat(url.searchParams.get('threshold') || '0.5');
+
+    if (!query) {
+      return json({ error: 'Missing required parameter: q' }, { status: 400 });
+    }
+
+    // Generate embedding for query
+    const queryEmbedding = await generateEmbedding(query);
+
+    // Search statute chunks
+    const results = await searchStatuteChunks(queryEmbedding, topK, threshold);
+
+    // Enrich results with statute information
+    const enrichedResults = await Promise.all(;
+      results.map(async (result) => {
+        const statute = await db;
+          .select()
+          .from(statutes)
+          .where(eq(statutes.id, result.statuteId));
+
+        return {
+          ...result,
+          statute: statute[0] || null,
+        };
+      })
+    );
+
+    return json({
+      query,
+      results: enrichedResults,
+      count: enrichedResults.length,
+    });
+  } catch (error) {
+    console.error('Statute search error:', error);
+    return json(
+      { error: error instanceof Error ? error.message : 'Failed to search statutes' },
+      { status: 500 }
+    );
+  }
+};

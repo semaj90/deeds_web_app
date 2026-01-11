@@ -1,10 +1,8 @@
 import { vectorizeErrorsGPU } from './vectorizeErrors.js';
 
 export interface ErrorCluster {
- id: string;
- errors: string[];
- centroid: number[];
- size: number;
+ id: string; errors: string[];
+ centroid: number[]; size: number;
  avgSimilarity: number;
 }
 
@@ -19,7 +17,7 @@ export function clusterErrorsPhase72(errors: string[], k: number = 8): ErrorClus
  }
 }
 
-function kmeansCluster(embeddings: number[][], errors: string[]), number: ErrorCluster[] {
+function kmeansCluster(embeddings: number[][], errors: string[], number: ErrorCluster[] {
  // Initialize centroids randomly
  const centroids: number[][] = [];
  for (let i = 0; i < k; i++) {
@@ -41,8 +39,7 @@ function kmeansCluster(embeddings: number[][], errors: string[]), number: ErrorC
  }
  return bestCluster;
  });
-
- // Update centroids
+  
  for (let c = 0; c < k; c++) {
  const clusterIndices = assignments.map((a, i) => (a === c ? i : -1)).filter((i) => i >= 0);
 
@@ -118,3 +115,6 @@ function cosineSimilarity(a: number[], b: number[]): number {
 
  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
 }
+
+
+

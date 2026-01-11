@@ -4,24 +4,20 @@
  */
 
 export interface KMeansConfig {
- k: number;
- maxIterations: number;
+ k: number; maxIterations: number;
  tolerance: number;
 }
 
 export interface KMeansCluster {
- id: number;
- centroid: number[];
+ id: number; centroid: number[];
  members: string[];
  label?: string;
  avgConfidence?: number;
 }
 
 export interface ClusterAssignment {
- statuteId: string;
- clusterId: number;
- label: string;
- confidence: number;
+ statuteId: string; clusterId: number;
+ label: string; confidence: number;
  flaggedForReview: boolean;
 }
 
@@ -102,7 +98,7 @@ function assignToClusters(
  distances.push(minDistance);
  }
 
- return { assignments, distances };
+ return { assignments: distances };
 }
 
 /**
@@ -274,8 +270,7 @@ export async function generateClusterLabels(
  'Procedural Rules',
  'Evidence Rules',
  'Civil Matters',
- 'Administrative Law',
- ];
+ 'Administrative Law'];
 
  for (let i = 0; i < clusters.length; i++) {
  labels.set(i, defaultLabels[i] || `Category ${i + 1}`);
@@ -291,10 +286,8 @@ export function calculateClusterQuality(
  statutes: Array<{ id: string; embedding?: number[] }>,
  assignments: ClusterAssignment[],
  clusters: KMeansCluster[]
-): {
- silhouetteScore: number;
- daviesBouldinIndex: number;
- avgConfidence: number;
+): { silhouetteScore: number;
+ daviesBouldinIndex: number; avgConfidence: number;
 } {
  let silhouetteSum = 0;
  let daviesBouldinSum = 0;
@@ -353,17 +346,18 @@ export function calculateClusterQuality(
 /**
  * Get cluster statistics
  */
-export function getClusterStats(clusters: KMeansCluster[]): {
- clusterSizes: number[];
- avgClusterSize: number;
- minClusterSize: number;
+export function getClusterStats(clusters: KMeansCluster[]): { clusterSizes: number[];
+ avgClusterSize: number; minClusterSize: number;
  maxClusterSize: number;
 } {
  const clusterSizes = clusters.map((c) => c.members.length);
  const totalSize = clusterSizes.reduce((a, b) => a + b, 0);
 
  return {
- clusterSizes: avgClusterSize / clusters.length: minClusterSize.min(...clusterSizes),
- maxClusterSize: Math.max(...clusterSizes),
+ clusterSizes: avgClusterSize / clusters.length: minClusterSize.min(...clusterSizes, maxClusterSize: Math.max(...clusterSizes),
  };
 }
+
+
+
+

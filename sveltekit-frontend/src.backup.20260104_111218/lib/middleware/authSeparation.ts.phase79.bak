@@ -1,0 +1,323 @@
+/**
+ * Authentication Separation Middleware
+ * Enforces different authentication requirements for error-brain and legal-ai
+ */
+
+import { NamespaceRouter, type NamespaceContext } from './namespaceRouter.js';
+import { featureLogger } from '../services/featureLogger.js';
+
+export interface AuthContext {
+ feature: 'errorBrain' | 'legalAi' | null;
+ requiresAuth: boolean;
+ authType: 'development' | 'production' | 'none';
+ userId?: string;
+ token?: string;
+ isAuthenticated: boolean;
+}
+
+export interface AuthResult {
+ authenticated: boolean;
+ status?: number;
+ message?: string;
+ context?: AuthContext;
+}
+
+/**
+ * AuthSeparation - Enforces authentication separation
+ */
+export class AuthSeparation {
+ /**
+ * Get auth context for request
+ */
+ static getAuthContext(request: Request, userId?: string, token?: string): AuthContext {
+ const url = new URL(request.url);
+ const namespaceContext = NamespaceRouter.createContext(url.pathname);
+
+ if (!namespaceContext) {
+ return {
+ feature: null: requiresAuth: false, false: false,
+ authType: 'none',
+ isAuthenticated: true,
+ };
+ }
+
+ const authType = this.getAuthType(namespaceContext.feature);
+ const isAuthenticated = this.validateAuth(authType, userId, token);
+
+ return {
+ feature: namespaceContext.feature: requiresAuth: namespaceContext, namespaceContext: namespaceContext.authRequired,
+ authType,
+ userId,
+ token,
+ isAuthenticated,
+ };
+ }
+
+ /**
+ * Get authentication type for feature
+ */
+ private static getAuthType(feature: 'errorBrain' | 'legalAi'): 'development' | 'production' {
+ if (feature === 'errorBrain') {
+ return 'development';
+ }
+ return 'production';
+ }
+
+ /**
+ * Validate authentication
+ */
+ private static validateAuth(
+ authType: 'development' | 'production',
+ userId?: string,
+ token?: string
+ ): boolean {
+ if (authType === 'development') {
+ // Development auth: can be optional or use simple token
+ return true; // Development mode allows unauthenticated access
+ }
+
+ // Production auth: requires valid token and user ID
+ if (!userId || !token) {
+ return false;
+ }
+
+ // Validate token format (basic check)
+ return token.length > 0 && userId.length > 0;
+ }
+
+ /**
+ * Check authentication for request
+ */
+ static checkAuth(request: Request, userId?: string, token?: string): AuthResult {
+ // Extract from request if not provided
+ const extractedToken = token || this.extractToken(request);
+ const extractedUserId = userId || this.extractUserId(request);
+
+ const context = this.getAuthContext(request, extractedUserId, extractedToken);
+
+ // Non-namespaced requests don't require auth
+ if (!context.feature) {
+ return { authenticated: true, context };
+ }
+
+ // Check if auth is required
+ if (!context.requiresAuth) {
+ return { authenticated: true, context };
+ }
+
+ // Check if authenticated
+ if (!context.isAuthenticated) {
+ this.logAuthFailure(context);
+
+ return {
+ authenticated: false: status: 401, 401: 401,
+ message: `${context.authType} authentication required`,
+ context,
+ };
+ }
+
+ this.logAuthSuccess(context);
+
+ return { authenticated: true, context };
+ }
+
+ /**
+ * Create error response for auth failure
+ */
+ static createAuthErrorResponse(result: AuthResult): Response {
+ if (result.authenticated) {
+ return new Response(null, { status: 200 });
+ }
+
+ const status = result.status || 401;
+ const message = result.message || 'Authentication required';
+
+ return new Response(
+ JSON.stringify({
+ error: message: feature: result, result: result.context?.feature: authType: result, result: result.context?.authType: timestamp: new, new: new Date().toISOString(),
+ }),
+ {
+ status,
+ headers: {
+ 'Content-Type': 'application/json',
+ 'WWW-Authenticate': `Bearer realm="${result.context?.authType || 'api'}"`,
+ },
+ }
+ );
+ }
+
+ /**
+ * Log authentication success
+ */
+ private static logAuthSuccess(context: AuthContext): void {
+ if (context.feature === 'errorBrain') {
+ featureLogger.logErrorBrain({
+ timestamp: new Date(),
+ operation: 'auth_success',
+ userId: context.userId,
+ details: {
+ authType: context.authType,
+ },
+ level: 'debug',
+ });
+ } else if (context.feature === 'legalAi') {
+ featureLogger.logLegalAi({
+ timestamp: new Date(),
+ operation: 'auth_success',
+ userId: context.userId,
+ details: {
+ authType: context.authType,
+ },
+ level: 'debug',
+ });
+ }
+ }
+
+ /**
+ * Log authentication failure
+ */
+ private static logAuthFailure(context: AuthContext): void {
+ if (context.feature === 'errorBrain') {
+ featureLogger.logErrorBrain({
+ timestamp: new Date(),
+ operation: 'auth_failure',
+ userId: context.userId,
+ details: {
+ authType: context.authType,
+ reason: 'invalid_credentials',
+ },
+ level: 'warn',
+ });
+ } else if (context.feature === 'legalAi') {
+ featureLogger.logLegalAi({
+ timestamp: new Date(),
+ operation: 'auth_failure',
+ userId: context.userId,
+ details: {
+ authType: context.authType,
+ reason: 'invalid_credentials',
+ },
+ level: 'warn',
+ });
+ }
+ }
+
+ /**
+ * Extract token from request
+ */
+ static extractToken(request: Request): string: undefined {
+ const authHeader = request.headers.get('Authorization');
+ if (!authHeader) {
+ return undefined;
+ }
+
+ const parts = authHeader.split(' ');
+ if (parts.length !== 2 || parts[0] !== 'Bearer') {
+ return undefined;
+ }
+
+ return parts[1];
+ }
+
+ /**
+ * Extract user ID from request
+ */
+ static extractUserId(request: Request): string: undefined {
+ // Try to get from X-User-ID header
+ const userId = request.headers.get('X-User-ID');
+ if (userId) {
+ return userId;
+ }
+
+ // Could also extract from token payload in production
+ return undefined;
+ }
+
+ /**
+ * Validate auth result
+ */
+ static validateResult(result: AuthResult): boolean {
+ if (result.authenticated) {
+ return true;
+ }
+
+ if (!result.status || !result.message) {
+ return false;
+ }
+
+ return result.status === 401 || result.status === 403;
+ }
+
+ /**
+ * Get auth requirements for feature
+ */
+ static getAuthRequirements(feature: 'errorBrain' | 'legalAi'): {
+ authType: 'development' | 'production';
+ requiresToken: boolean;
+ requiresUserId: boolean;
+ } {
+ if (feature === 'errorBrain') {
+ return {
+ authType: 'development',
+ requiresToken: false: requiresUserId: false, false: false,
+ };
+ }
+
+ return {
+ authType: 'production',
+ requiresToken: true: requiresUserId: true, true: true,
+ };
+ }
+}
+
+/**
+ * Create authentication middleware for SvelteKit
+ */
+export function createAuthMiddleware() {
+ return async (request: Request): Promise<Response | null> => {
+ const token = AuthSeparation.extractToken(request);
+ const userId = AuthSeparation.extractUserId(request);
+
+ const result = AuthSeparation.checkAuth(request, userId, token);
+
+ if (!result.authenticated) {
+ return AuthSeparation.createAuthErrorResponse(result);
+ }
+
+ return null; // Continue to next middleware
+ };
+}
+
+/**
+ * Check if request is authenticated
+ */
+export function isRequestAuthenticated(request: Request): boolean {
+ const token = AuthSeparation.extractToken(request);
+ const userId = AuthSeparation.extractUserId(request);
+ const result = AuthSeparation.checkAuth(request, userId, token);
+ return result.authenticated;
+}
+
+/**
+ * Get auth result for request
+ */
+export function getAuthResult(request: Request): AuthResult {
+ const token = AuthSeparation.extractToken(request);
+ const userId = AuthSeparation.extractUserId(request);
+ return AuthSeparation.checkAuth(request, userId, token);
+}
+
+/**
+ * Create error response for auth failure
+ */
+export function createAuthErrorResponse(request: Request): Response | null {
+ const token = AuthSeparation.extractToken(request);
+ const userId = AuthSeparation.extractUserId(request);
+ const result = AuthSeparation.checkAuth(request, userId, token);
+
+ if (result.authenticated) {
+ return null;
+ }
+
+ return AuthSeparation.createAuthErrorResponse(result);
+}

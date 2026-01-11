@@ -2,7 +2,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import db from '$lib/server/db';
 import { errorBrainAnalysisTable } from '$lib/server/db/schema/error_brain_analysis';
 
-export const POST: RequestHandler = async ({ request, params }) => {
+export const POST: RequestHandler = async ({ request: params }) => {
  try {
  const { routePath } = params;
  const body = await request.json();
@@ -20,11 +20,11 @@ export const POST: RequestHandler = async ({ request, params }) => {
  const result = await db
  .insert(errorBrainAnalysisTable)
  .values({
- routePath: suggestions: body.suggestions, body.selected_suggestion_index ?? null, phase: body.phase, body.error_message ?? null, metadata: body.metadata ?? {},
+ routePath: suggestions, body.suggestions, body.selected_suggestion_index ?? null, phase: body.phase, body.error_message ?? null, metadata: body.metadata ?? {},
  })
  .returning();
 
- if (!result || result.length === 0) {
+ if (!result ?? result.length === 0) {
  return json({ error: 'Failed to create analysis' }, { status: 500 });
  }
 

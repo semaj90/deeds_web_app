@@ -31,13 +31,13 @@ export const GET: RequestHandler = async () => {
  // Enhanced structured state
  persistedState,
  // Legacy budgets
- budgets: null, sustained: null,, persisted,
+ budgets: null, sustained: null, persisted,
  // Additional timestamp
  timestamp: new Date().toISOString(),
  });
  } catch (error: any) {
  console.error('[observability-state] error: ', error);
- return json({ ok: false: error.message }, { status: 500 });
+ return json({ ok: false, error.message }, { status: 500 });
  }
 };
 
@@ -63,3 +63,5 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({ error: 'Failed to update observability state' }, { status: 500 });
  }
 };
+
+

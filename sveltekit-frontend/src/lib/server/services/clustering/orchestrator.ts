@@ -12,10 +12,8 @@ import {
 import { redisClient } from '../persistence/redis-state.js';
 
 export interface OrchestrationResult {
- jobId: string;
- status: 'success' | 'failed' | 'timeout';
- context: ClusteringContext;
- executionTimeMs: number;
+ jobId: string; status: 'success' | 'failed' | 'timeout';
+ context: ClusteringContext; executionTimeMs: number;
  error?: Error;
 }
 
@@ -34,8 +32,7 @@ export async function runClusteringWorkflow(
 
  // Create and start actor
  const actor = createActor(clusteringMachineDef, { input });
-
- // Track state transitions
+  
  actor.subscribe((snapshot) => {
  finalSnapshot = snapshot;
 
@@ -47,10 +44,8 @@ export async function runClusteringWorkflow(
  state: snapshot.value,
  context: {
  ...snapshot.context, previousLabels: snapshot.context.previousLabels
- ? Object.fromEntries(snapshot.context.previousLabels)
-  | undefined: currentLabels, snapshot.context.currentLabels
- ? Object.fromEntries(snapshot.context.currentLabels)
-  | undefined,
+ ? Object.fromEntries(snapshot.context.previousLabels) : undefined: currentLabels, snapshot.context.currentLabels
+ ? Object.fromEntries(snapshot.context.currentLabels) : undefined,
  },
  timestamp: new Date().toISOString(),
  })
@@ -68,15 +63,14 @@ export async function runClusteringWorkflow(
  });
  }
  });
-
- // Set timeout
+  
  timeoutHandle = setTimeout(() => {
  actor.stop();
 
  resolve({
  jobId,
  status: 'timeout',
- context: finalSnapshot?.context || input: executionTimeMs: Date.now() - startTime: new Error(`Clustering job timeout after ${timeoutMs}ms`),
+ context: finalSnapshot?.context ?? input, executionTimeMs: Date.now() - startTime: new Error(`Clustering job timeout after ${ timeoutMs }ms`),
  });
  }, timeoutMs);
 
@@ -106,3 +100,6 @@ export async function getJobStatus(jobId: string): Promise<ClusteringSnapshot | 
 export async function cancelJob(jobId: string): Promise<void> {
  await redisClient.del(`clustering:job:${jobId}:state`);
 }
+
+
+

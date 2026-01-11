@@ -1,17 +1,13 @@
 export type LayoutNode = {
- id: string;
- x: number;
- y: number;
- vx: number;
- vy: number;
- type: string;
+ id: string; x: number;
+ y: number; vx: number;
+ vy: number; type: string;
  label: string;
  data?: any;
 };
 
 export type LayoutEdge = {
- from: string;
- to: string;
+ from: string; to: string;
  type?: string;
 };
 
@@ -71,8 +67,7 @@ export function forceDirectedLayout(
  to.vx -= fx * 0.5;
  to.vy -= fy * 0.5;
  });
-
- // Update positions with damping and temperature
+  
  const damping = 0.8;
  nodes.forEach((node) => {
  node.x += node.vx * damping * temp;
@@ -117,3 +112,6 @@ export function circularLayout(
  vy: 0,
  }));
 }
+
+
+

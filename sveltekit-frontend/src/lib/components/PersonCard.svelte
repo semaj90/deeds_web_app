@@ -1,5 +1,5 @@
 <script lang="ts">
- interface Props {
+	interface Props {
  person: any;
  onedit?: (id: string) => void;
  ondelete?: (id: string) => void;
@@ -55,7 +55,7 @@
 
  <div class="info-section">
  <h3 class="person-name">
- {person.aiProfile?.who?.identity || person.name}
+ {person.aiProfile?.who?.identity ?? person.name}
  </h3>
  <p class="person-aliases">
  {#if person.aliases && person.aliases.length > 0}
@@ -66,11 +66,11 @@
  </p>
 
  <div class="badges">
- <span class="badge risk {getRiskColor(person.priority || 'low')}">
- {person.priority?.toUpperCase() || 'LOW'}
+ <span class="badge risk {getRiskColor(person.priority ?? 'low')}">
+ {person.priority?.toUpperCase() ?? 'LOW'}
  </span>
  <span class="badge status {getStatusColor(person.status)}">
- {person.status?.toUpperCase() || 'ACTIVE'}
+ {person.status?.toUpperCase() ?? 'ACTIVE'}
  </span>
  </div>
  </div>
@@ -82,7 +82,7 @@
  <div class="profile-section">
  <h4 class="section-title">WHO</h4>
  <p class="section-content">
- {person.aiProfile.who?.identity || 'Unknown identity'}
+ {person.aiProfile.who?.identity ?? 'Unknown identity'}
  </p>
  {#if person.aiProfile.who?.occupation}
  <p class="section-detail">
@@ -119,7 +119,7 @@
  <div class="profile-section">
  <h4 class="section-title">RISK</h4>
  <p class="section-content">
- {person.aiProfile.risk?.threatLevel?.toUpperCase() || 'UNKNOWN'}
+ {person.aiProfile.risk?.threatLevel?.toUpperCase() ?? 'UNKNOWN'}
  </p>
  {#if person.aiProfile.risk?.riskFactors && person.aiProfile.risk.riskFactors.length > 0}
  <p class="section-detail">
@@ -133,7 +133,7 @@
  <!-- Metadata -->
  <div class="card-footer">
  <div class="metadata">
- <span class="date">Updated {formatDate(person.lastUpdated || person.createdAt)}</span>
+ <span class="date">Updated {formatDate(person.lastUpdated ?? person.createdAt)}</span>
  {#if person.tags && person.tags.length > 0}
  <div class="tags">
  {#each person.tags.slice(0, 3) as tag}
@@ -167,8 +167,7 @@
  .person-card {
  background: rgba(26, 26, 46, 0.95);
  border: 1px solid #333;
- border-radius: 12px;
- overflow: hidden;
+ border-radius: 12px; overflow: hidden;
  transition: all 0.3s ease;
  backdrop-filter: blur(10px);
  }
@@ -180,8 +179,7 @@
  }
 
  .card-header {
- padding: 1.5rem;
- display: flex;
+ padding: 1.5rem; display: flex;
  gap: 1rem;
  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
  }
@@ -191,16 +189,13 @@
  }
 
  .avatar {
- width: 60px;
- height: 60px;
- border-radius: 50%;
- background: linear-gradient(45deg, #00d4ff, #0099cc);
+ width: 60px; height: 60px;
+ border-radius: 50%; background: linear-gradient(45deg, #00d4ff, #0099cc);
  display: flex;
  align-items: center;
  justify-content: center;
  font-size: 1.2rem;
- font-weight: bold;
- color: white;
+ font-weight: bold; color: white;
  }
 
  .info-section {
@@ -209,29 +204,25 @@
 
  .person-name {
  font-size: 1.25rem;
- font-weight: 700;
- color: #e0e0e0;
+ font-weight: 700; color: #e0e0e0;
  margin: 0 0 0.25rem 0;
  }
 
  .person-aliases {
- font-size: 0.9rem;
- color: #b0b0b0;
+ font-size: 0.9rem; color: #b0b0b0;
  margin: 0 0 0.75rem 0;
  font-style: italic;
  }
 
  .badges {
- display: flex;
- gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  }
 
  .badge {
  padding: 0.25rem 0.75rem;
  border-radius: 12px;
  font-size: 0.75rem;
- font-weight: 600;
- color: white;
+ font-weight: 600; color: white;
  text-transform: uppercase;
  }
 
@@ -244,8 +235,7 @@
  }
 
  .profile-summary {
- padding: 1.5rem;
- background: rgba(0, 0, 0, 0.2);
+ padding: 1.5rem; background: rgba(0, 0, 0, 0.2);
  }
 
  .profile-section {
@@ -258,23 +248,20 @@
 
  .section-title {
  font-size: 0.8rem;
- font-weight: 700;
- color: #00d4ff;
+ font-weight: 700; color: #00d4ff;
  margin: 0 0 0.25rem 0;
  text-transform: uppercase;
  letter-spacing: 0.5px;
  }
 
  .section-content {
- font-size: 0.9rem;
- color: #e0e0e0;
+ font-size: 0.9rem; color: #e0e0e0;
  margin: 0 0 0.25rem 0;
  line-height: 1.4;
  }
 
  .section-detail {
- font-size: 0.8rem;
- color: #b0b0b0;
+ font-size: 0.8rem; color: #b0b0b0;
  margin: 0;
  font-style: italic;
  }
@@ -289,32 +276,27 @@
 
  .metadata {
  display: flex;
- flex-direction: column;
- gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .date {
- font-size: 0.8rem;
- color: #888;
+ font-size: 0.8rem; color: #888;
  }
 
  .tags {
- display: flex;
- gap: 0.25rem;
+ display: flex; gap: 0.25rem;
  flex-wrap: wrap;
  }
 
  .tag {
- font-size: 0.7rem;
- color: #00d4ff;
+ font-size: 0.7rem; color: #00d4ff;
  background: rgba(0, 212, 255, 0.1);
  padding: 0.2rem 0.5rem;
  border-radius: 8px;
  }
 
  .actions {
- display: flex;
- gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  }
 
  .action-btn {
@@ -322,8 +304,7 @@
  border: none;
  border-radius: 6px;
  font-size: 0.8rem;
- font-weight: 600;
- cursor: pointer;
+ font-weight: 600; cursor: pointer;
  transition: all 0.2s ease;
  }
 
@@ -351,8 +332,7 @@
  }
 
  .avatar {
- width: 50px;
- height: 50px;
+ width: 50px; height: 50px;
  font-size: 1rem;
  }
 
@@ -366,8 +346,7 @@
 
  .card-footer {
  padding: 0.75rem 1rem;
- flex-direction: column;
- gap: 1rem;
+ flex-direction: column; gap: 1rem;
  align-items: stretch;
  }
 
@@ -376,3 +355,6 @@
  }
  }
 </style>
+
+
+

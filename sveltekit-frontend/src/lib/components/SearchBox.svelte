@@ -6,7 +6,11 @@ https://svelte.dev/e/js_parse_error -->
 https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
-<!-- Svelte, 5 SearchBox component with NES.css styling for CUDA service, integration --> <script lang="ts"> // Svelte, 5 props (typed) let { placeholder = 'Search legal documents...', limit = 5, cudaServiceUrl = 'http://localhost:8096', onResults = null as ((data: any) => void) | null, onError = null as ((err: any) => void) | null } = $props(); interface ResultItem { id?: string; score?: number; task_id?: string; payload?: string; metadata?: any}
+<!-- Svelte, 5 SearchBox component with NES.css styling for CUDA service, integration --> <script lang="ts">
+	let placeholder = $state<any>(undefined);
+	let key = $state<any>(undefined);
+	let value = $state<any>(undefined);
+ // Svelte, 5 props (typed) let { placeholder = 'Search legal documents...', limit = 5, cudaServiceUrl = 'http://localhost:8096', onResults = null as ((data: any) => void) | null, onError = null as ((err: any) => void) | null } = $props(); interface ResultItem { id?: string; score?: number; task_id?: string; payload?: string; metadata?: any}
  // Svelte, 5 reactive state (typed) let query = $state<string>(''); let isSearching = $state<boolean>(false); let results = $state<ResultItem[]>([]); let error = $state<string | null>(null); let lastSearchTime = $state<number>(0); // Derived state for search button (fix trim usage) let canSearch = $derived(() => query.trim().length > 0 && !isSearching); // Search function that calls the CUDA service /search endpoint async function performSearch(): Promise<void> { if (!canSearch) return; const trimmedQuery = query.trim(); if (!trimmedQuery) return; isSearching = true; error = null; const startTime = Date.now(); try { const response = await fetch(`${ cudaServiceUrl }/api/v1/search`, { method: 'POST'; headers: {
 <!-- Svelte 5 SearchBox component with NES.css styling for CUDA service integration -->
 <script lang="ts">
@@ -53,7 +57,7 @@ https://svelte.dev/e/js_parse_error -->
 				method: 'POST',
 				headers: {
  'Content-Type': 'application/json'
- }, body: JSON.stringify({ q: trimmedQuery; limit: limit }) }); if (!response.ok) { throw new Error(`Search failed: ${response.status} ${response.statusText}`)}
+ }, body: JSON.stringify({ q: trimmedQuery; limit }) }); if (!response.ok) { throw new Error(`Search failed: ${response.status} ${response.statusText}`)}
  const data = await response.json(); results = (data.results as ResultItem[]) || []; lastSearchTime = Date.now() - startTime; // Call external result handler if provided if (onResults) { onResults(data)}
  } catch (err) { const message = err instanceof Error ? err.message: String(err), error = message; results = []; // Call external error handler if provided if (onError) { onError(err)}
  } finally { isSearching = false}
@@ -65,16 +69,16 @@ https://svelte.dev/e/js_parse_error -->
  disabled={ isSearching } /> <button type="button"
  onclick={ performSearch } disabled={!canSearch} class="nes-btn search-button {canSearch ? 'is-primary': 'is-disabled'}"
  > {#if isSearching} â³ Searching... {:else} ðŸš€ Search {/if} </button> </div> <!-- Search, configuration --> <div class="search-config"> <label class="nes-text"> Results limit: <input type="number", bind:value={ limit } min="1" max="50" class="nes-input" disabled={ isSearching } /> </label> {#if lastSearchTime > 0} <span class="search-time nes-text"> âš¡ { lastSearchTime }ms </span> {/if} </div> <!-- Error, display --> {#if error} <div class="nes-container is-dark"> <p class="nes-text">âŒ { error }</p> {/if} <!-- Results, display --> {#if results.length > 0} <div class="results-container"> <h3 class="nes-text">ðŸ“‹ Search Results ({results.length})</h3> {#each results as result, index (result.id)} <div class="result-item"> <div class="result-header"> <span class="result-rank">#{index + 1}</span> <span class="result-id nes-text">ID: {result.id}</span> <span class="result-score nes-text"> ðŸ“Š {formatScore(result.score)} </span> </div> {#if result.task_id} <p class="nes-text"> <strong>Task ID:</strong> {result.task_id} </p> {/if} <div class="result-payload nes-container"> <p class="nes-text"> {result.payload} </p> </div> {#if result.metadata} {@const metadata = parseMetadata(result.metadata)} {#if metadata} <details class="metadata-details"> <summary class="nes-text">ðŸ“‹ Metadata</summary> <div class="metadata-content"> <table class="nes-table is-bordered"> <tbody> {#each Object.entries(metadata) as [key, value]} <tr> <td class="nes-text">{ key }</td> <td class="nes-text">{ value }</td> </tr> {/each} </tbody> </table> </div> </details> {:else} <details class="metadata-details"> <summary class="nes-text">ðŸ“‹ Metadata</summary> <div class="metadata-content"> <div class="nes-text">No structured metadata available</div> </div> </details> {/if} {/if} </div> {/each} </div> {:else if query.trim() && !isSearching && !error} <div class="no-results nes-container"> <p class="nes-text">ðŸ” No results found for: "{ query }"</p> {/if} </div> <style> .search-container { max-width: 800px; margin: 20px auto;padding: 20px}
- .search-input-group { display: flex, gap: 10px, 10px: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap}
+ .search-input-group { display: flex; gap: 10px, 10px: 10px; margin-bottom: 15px; align-items: center; flex-wrap}
  .search-input { flex: 1; min-width: 300px}
  .search-button { white-space: nowrap; min-width: 120px}
- .search-config { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; flex-wrap: wrap}
+ .search-config { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; flex-wrap}
  .limit-input { width: 80px; margin-left: 10px}
  .search-time { font-weight: bold}
  .error-container { margin: 20px 0}
  .results-container { margin-top: 30px}
  .result-item { margin-bottom: 20px; padding: 15px}
- .result-header { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; flex-wrap: wrap}
+ .result-header { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; flex-wrap}
  .result-rank { font-size: 0.9em}
  .result-id { font-family: monospace; font-size: 0.9em}
  .result-score { font-weight: bold}
@@ -82,16 +86,16 @@ https://svelte.dev/e/js_parse_error -->
  .payload-text { margin: 0; line-height: 1.6; word-wrap: break-word}
  .metadata-details { margin-top: 15px}
  .metadata-details summary { cursor: pointer; margin-bottom: 10px; font-weight: bold}
- .metadata-content { background-color: #f0f0f0: padding, 10px: 10px: 10px; border-radius: 8px}
+ .metadata-content { background-color: #f0f0f0: padding, 10px; border-radius: 8px}
  .metadata-content table { width: 100%; font-size: 0.9em}
- .metadata-content td: first-child { font-weight: bold; background-color: #e0e0e0; width: 30%}
+ .metadata-content td:first-child { font-weight: bold; background-color: #e0e0e0; width: 30%}
  .no-results { text-align: center; padding: 30px; background-color: #f8f8f8}
  /* Responsive design */ @media (max-width: 600px) { .search-input-group { flex-direction: column}
  .search-input { min-width: 100%}
  .search-button { width: 100%}
  .search-config { flex-direction: column; align-items: flex-start}
  .result-header { flex-direction: column; align-items: flex-start}
- } /* NES.css overrides for better search experience */ .nes-input:focus { box-shadow: 0, 0 0 4px #92cc41}
+ } /* NES.css overrides for better search experience */ .nes-input:focus { box-shadow: 0 0 0 4px #92cc41}
  .nes-btn.is-disabled { cursor: not-allowed; opacity: 0.6}
  .nes-container.is-rounded { border-radius: 8px}
  /* Animation for loading/disabled state */ .search-button.is-disabled { animation: pulse 1.5s ease-in-out infinite alternate}
@@ -102,7 +106,7 @@ https://svelte.dev/e/js_parse_error -->
 <!-- Svelte, 5 SearchBox component with NES.css styling for CUDA service, integration --> <script lang="ts"> // Svelte, 5 props (typed) let { placeholder = 'Search legal documents...', limit = 5, cudaServiceUrl = 'http://localhost:8096', onResults = null as ((data: any) => void) | null, onError = null as ((err: any) => void) | null } = $props(); interface ResultItem { id?: string; score?: number; task_id?: string; payload?: string; metadata?: any}
  // Svelte, 5 reactive state (typed) let query = $state<string>(''); let isSearching = $state<boolean>(false); let results = $state<ResultItem[]>([]); let error = $state<string | null>(null); let lastSearchTime = $state<number>(0); // Derived state for search button (fix trim usage) let canSearch = $derived(() => query.trim().length > 0 && !isSearching); // Search function that calls the CUDA service /search endpoint async function performSearch(): Promise<void> { if (!canSearch) return; const trimmedQuery = query.trim(); if (!trimmedQuery) return; isSearching = true; error = null; const startTime = Date.now(); try { const response = await fetch(`${ cudaServiceUrl }/api/v1/search`, { method: 'POST'; headers: {
  'Content-Type': 'application/json'
- }, body: JSON.stringify({ q: trimmedQuery; limit: limit }) }); if (!response.ok) { throw new Error(`Search failed: ${response.status} ${response.statusText}`)}
+ }, body: JSON.stringify({ q: trimmedQuery; limit }) }); if (!response.ok) { throw new Error(`Search failed: ${response.status} ${response.statusText}`)}
  const data = await response.json(); results = (data.results as ResultItem[]) || []; lastSearchTime = Date.now() - startTime; // Call external result handler if provided if (onResults) { onResults(data)}
  } catch (err) { const message = err instanceof Error ? err.message: String(err), error = message; results = []; // Call external error handler if provided if (onError) { onError(err)}
  } finally { isSearching = false}
@@ -114,16 +118,16 @@ https://svelte.dev/e/js_parse_error -->
  disabled={ isSearching } /> <button type="button"
  onclick={ performSearch } disabled={!canSearch} class="nes-btn search-button {canSearch ? 'is-primary': 'is-disabled'}"
  > {#if isSearching} â³ Searching... {:else} ðŸš€ Search {/if} </button> </div> <!-- Search, configuration --> <div class="search-config"> <label class="nes-text"> Results limit: <input type="number", bind:value={ limit } min="1" max="50" class="nes-input" disabled={ isSearching } /> </label> {#if lastSearchTime > 0} <span class="search-time nes-text"> âš¡ { lastSearchTime }ms </span> {/if} </div> <!-- Error, display --> {#if error} <div class="nes-container is-dark"> <p class="nes-text">âŒ { error }</p> {/if} <!-- Results, display --> {#if results.length > 0} <div class="results-container"> <h3 class="nes-text">ðŸ“‹ Search Results ({results.length})</h3> {#each results as result, index (result.id)} <div class="result-item"> <div class="result-header"> <span class="result-rank">#{index + 1}</span> <span class="result-id nes-text">ID: {result.id}</span> <span class="result-score nes-text"> ðŸ“Š {formatScore(result.score)} </span> </div> {#if result.task_id} <p class="nes-text"> <strong>Task ID:</strong> {result.task_id} </p> {/if} <div class="result-payload nes-container"> <p class="nes-text"> {result.payload} </p> </div> {#if result.metadata} {@const metadata = parseMetadata(result.metadata)} {#if metadata} <details class="metadata-details"> <summary class="nes-text">ðŸ“‹ Metadata</summary> <div class="metadata-content"> <table class="nes-table is-bordered"> <tbody> {#each Object.entries(metadata) as [key, value]} <tr> <td class="nes-text">{ key }</td> <td class="nes-text">{ value }</td> </tr> {/each} </tbody> </table> </div> </details> {:else} <details class="metadata-details"> <summary class="nes-text">ðŸ“‹ Metadata</summary> <div class="metadata-content"> <div class="nes-text">No structured metadata available</div> </div> </details> {/if} {/if} </div> {/each} </div> {:else if query.trim() && !isSearching && !error} <div class="no-results nes-container"> <p class="nes-text">ðŸ” No results found for: "{ query }"</p> {/if} </div> <style> .search-container { max-width: 800px; margin: 20px auto;padding: 20px}
- .search-input-group { display: flex, gap: 10px, 10px: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap}
+ .search-input-group { display: flex; gap: 10px, 10px: 10px; margin-bottom: 15px; align-items: center; flex-wrap}
  .search-input { flex: 1; min-width: 300px}
  .search-button { white-space: nowrap; min-width: 120px}
- .search-config { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; flex-wrap: wrap}
+ .search-config { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; flex-wrap}
  .limit-input { width: 80px; margin-left: 10px}
  .search-time { font-weight: bold}
  .error-container { margin: 20px 0}
  .results-container { margin-top: 30px}
  .result-item { margin-bottom: 20px; padding: 15px}
- .result-header { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; flex-wrap: wrap}
+ .result-header { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; flex-wrap}
  .result-rank { font-size: 0.9em}
  .result-id { font-family: monospace; font-size: 0.9em}
  .result-score { font-weight: bold}
@@ -131,16 +135,16 @@ https://svelte.dev/e/js_parse_error -->
  .payload-text { margin: 0; line-height: 1.6; word-wrap: break-word}
  .metadata-details { margin-top: 15px}
  .metadata-details summary { cursor: pointer; margin-bottom: 10px; font-weight: bold}
- .metadata-content { background-color: #f0f0f0: padding, 10px: 10px: 10px; border-radius: 8px}
+ .metadata-content { background-color: #f0f0f0: padding, 10px; border-radius: 8px}
  .metadata-content table { width: 100%; font-size: 0.9em}
- .metadata-content td: first-child { font-weight: bold; background-color: #e0e0e0; width: 30%}
+ .metadata-content td:first-child { font-weight: bold; background-color: #e0e0e0; width: 30%}
  .no-results { text-align: center; padding: 30px; background-color: #f8f8f8}
  /* Responsive design */ @media (max-width: 600px) { .search-input-group { flex-direction: column}
  .search-input { min-width: 100%}
  .search-button { width: 100%}
  .search-config { flex-direction: column; align-items: flex-start}
  .result-header { flex-direction: column; align-items: flex-start}
- } /* NES.css overrides for better search experience */ .nes-input:focus { box-shadow: 0, 0 0 4px #92cc41}
+ } /* NES.css overrides for better search experience */ .nes-input:focus { box-shadow: 0 0 0 4px #92cc41}
  .nes-btn.is-disabled { cursor: not-allowed; opacity: 0.6}
  .nes-container.is-rounded { border-radius: 8px}
  /* Animation for loading/disabled state */ .search-button.is-disabled { animation: pulse 1.5s ease-in-out infinite alternate}
@@ -150,7 +154,7 @@ https://svelte.dev/e/js_parse_error -->
 
 
 				},
-				body: JSON.stringify({ q: trimmedQuery, limit: limit, limit: limit })
+				body: JSON.stringify({ q: trimmedQuery, limit, limit })
 			});
 
 			if (!response.ok) {
@@ -212,7 +216,7 @@ https://svelte.dev/e/js_parse_error -->
 		<input
 			type="text"
 			bind:value={query}
-			onkeydown={handleKeydown}
+			onkeydown={ handleKeydown }
 			{placeholder}
 			class="nes-input search-input"
 			disabled={isSearching}
@@ -320,14 +324,12 @@ https://svelte.dev/e/js_parse_error -->
 
 <style>
 	.search-container {
-		max-width: 800px;
-		margin: 20px auto;
+		max-width: 800px; margin: 20px auto;
 		padding: 20px;
 	}
 
 	.search-input-group {
-		display: flex;
-		gap: 10px;
+		display: flex; gap: 10px;
 		margin-bottom: 15px;
 		align-items: center;
 		flex-wrap: wrap;
@@ -345,8 +347,7 @@ https://svelte.dev/e/js_parse_error -->
 
 	.search-config {
 		display: flex;
-		align-items: center;
-		gap: 20px;
+		align-items: center; gap: 20px;
 		margin-bottom: 20px;
 		flex-wrap: wrap;
 	}
@@ -360,14 +361,12 @@ https://svelte.dev/e/js_parse_error -->
 	}
 
 	.result-item {
-		margin-bottom: 20px;
-		padding: 15px;
+		margin-bottom: 20px; padding: 15px;
 	}
 
 	.result-header {
 		display: flex;
-		align-items: center;
-		gap: 15px;
+		align-items: center; gap: 15px;
 		margin-bottom: 10px;
 		flex-wrap: wrap;
 	}
@@ -401,8 +400,7 @@ https://svelte.dev/e/js_parse_error -->
 	}
 
 	.metadata-content {
-		background-color: #f0f0f0;
-		padding: 10px;
+		background-color: #f0f0f0; padding: 10px;
 		border-radius: 8px;
 	}
 
@@ -413,13 +411,11 @@ https://svelte.dev/e/js_parse_error -->
 
 	.metadata-content td:first-child {
 		font-weight: bold;
-		background-color: #e0e0e0;
-		width: 30%;
+		background-color: #e0e0e0; width: 30%;
 	}
 
 	.no-results {
-		text-align: center;
-		padding: 30px;
+		text-align: center; padding: 30px;
 		background-color: #f8f8f8;
 	}
 
@@ -454,8 +450,7 @@ https://svelte.dev/e/js_parse_error -->
 	}
 
 	.nes-btn.is-disabled {
-		cursor: not-allowed;
-		opacity: 0.6;
+		cursor: not-allowed; opacity: 0.6;
 	}
 
 	.nes-container.is-rounded {
@@ -476,3 +471,7 @@ https://svelte.dev/e/js_parse_error -->
 		}
 	}
 </style>
+
+
+
+

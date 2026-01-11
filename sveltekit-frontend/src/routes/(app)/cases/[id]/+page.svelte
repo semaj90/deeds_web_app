@@ -11,18 +11,15 @@
  import { onMount } from 'svelte';
 
  interface Evidence {
- id: string;
- fileName: string;
- documentType: string;
- inferenceConfidence: number;
+ id: string; fileName: string;
+ documentType: string; inferenceConfidence: number;
  status: 'pending' | 'approved' | 'rejected';
  createdAt: string;
  metadata?: Record<string, unknown>;
  }
 
  interface Case {
- id: string;
- title: string;
+ id: string; title: string;
  createdAt: string;
  }
 
@@ -158,7 +155,7 @@
  const response = await fetch(`/api/evidence/${selectedEvidence.id}/approve`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ action: 'reject', rejectionReason: 'Rejected by prosecutor' }),
+ body: JSON.stringify({action: 'reject', rejectionReason: 'Rejected by prosecutor' }),
  });
 
  if (!response.ok) throw new Error('Failed to reject evidence');
@@ -237,7 +234,7 @@
  </button>
  </div>
  </div>
- <h1 class="text-3xl font-bold text-gray-900">{caseData?.title || 'Loading...'}</h1>
+ <h1 class="text-3xl font-bold text-gray-900">{caseData?.title ?? 'Loading...'}</h1>
  </div>
  </header>
 
@@ -320,7 +317,7 @@
  class={`w-full text-left p-4 rounded-lg border-2 transition ${
  selectedEvidence?.id === item.id
  ? 'border-blue-500 bg-blue-50'
- : 'border-gray-200 hover:border-gray-300'
+ : 'border-gray-200, hover:border-gray-300'
  }`}
  >
  <div class="flex items-start justify-between">

@@ -1,0 +1,24 @@
+﻿<script lang="ts">
+ import { onMount } from 'svelte'; import { getBitsOverrides } from './bits-overrides'; import type { Snippet } from 'svelte'; interface Props { className?: string; disabled?: boolean; type?: 'button' | 'submit' | 'reset'; ariaLabel?: string; onclick?: (evt: MouseEvent) => void; children?: Snippet}
+  let { className = '', disabled = false, type = 'button', ariaLabel = undefined, onclick = undefined, children }: Props = $props(); let Btn: any = null; const overrides = getBitsOverrides(); if (overrides && overrides.Button) { Btn = overrides.Button}
+  onMount(() => {
+		(async () => {
+ if (Btn) return; try { // Dynamic import for bits-ui Button const mod: any = await import('bits-ui'); Btn = mod?.Button?.Root ?? mod?.Button ?? mod?.default ?? null} catch (err) { // Fallback to native button Btn = null; console.debug('bits-ui not available at runtime for Button wrapper', err)}
+  		})();
+	}); function handleClick(e: MouseEvent) { if (disabled) { e.preventDefault(); e.stopImmediatePropagation(); return}
+    onclick?.(e)}
+</script>
+
+{#if Btn}
+  <Btn class={className} {disabled} {type} aria-label={ariaLabel} onclick={handleClick}>
+    {#if children}
+      {@render children()}
+    {/if}
+  </Btn>
+{:else}
+  <button class={className} {disabled} {type} aria-label={ariaLabel} onclick={handleClick}>
+    {#if children}
+      {@render children()}
+    {/if}
+  </button>
+{/if}

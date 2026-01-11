@@ -86,27 +86,22 @@
 
  .btn-add {
  padding: 0.5rem 1rem;
- background: #3b82f6;
- color: white;
+ background: #3b82f6; color: white;
  border: none;
- border-radius: 4px;
- cursor: pointer;
+ border-radius: 4px; cursor: pointer;
  font-size: 0.875rem;
  }
 
  .btn-primary {
  padding: 0.75rem 1.5rem;
- background: #3b82f6;
- color: white;
+ background: #3b82f6; color: white;
  border: none;
- border-radius: 4px;
- cursor: pointer;
+ border-radius: 4px; cursor: pointer;
  }
 
  .loading,
  .empty-state {
- text-align: center;
- padding: 2rem;
+ text-align: center; padding: 2rem;
  color: #6b7280;
  }
 
@@ -116,15 +111,13 @@
  }
 
  .persons-list {
- display: grid;
- gap: 1rem;
+ display: grid; gap: 1rem;
  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
  }
 
  .person-card {
  border: 1px solid #e5e7eb;
- border-radius: 8px;
- padding: 1rem;
+ border-radius: 8px; padding: 1rem;
  background: #f9fafb;
  }
 
@@ -138,8 +131,7 @@
  }
 
  .person-role {
- font-size: 0.875rem;
- color: #6b7280;
+ font-size: 0.875rem; color: #6b7280;
  }
 
  .person-details {

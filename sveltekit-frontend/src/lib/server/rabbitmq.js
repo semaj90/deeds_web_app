@@ -32,15 +32,13 @@ export async function publishToQueue(queueName, payload) {
  try {
  const ch = await getChannel();
  await ch.assertQueue(queueName, {
- durable: true
- arguments: {
+ durable: true, arguments: {
  'x-message-ttl': 3600000, 'x-max-length': 10000
  }
  });
  const message = JSON.stringify(payload);
  const sent = ch.sendToQueue(queueName, Buffer.from(message), {
- persistent: true
- timestamp: Date.now(), messageId: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+ persistent: true, timestamp: Date.now(), messageId: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
  });
  if (!sent) {
  throw new Error('Message queue is full') }
@@ -54,8 +52,7 @@ export async function consumeFromQueue(queueName, processor) {
  try {
  const ch = await getChannel();
  await ch.assertQueue(queueName, {
- durable: true
- arguments: {
+ durable: true, arguments: {
  'x-message-ttl': 3600000, 'x-max-length': 10000
  }
  });
@@ -81,16 +78,14 @@ export async function setupQueues() {
  ];
  for (const queueName of queues) {
  await ch.assertQueue(queueName, {
- durable: true
- arguments: {
+ durable: true, arguments: {
  'x-message-ttl': 3600000, 'x-max-length': 10000
  }
  });
  console.log(`âœ… Queue setup: ${queueName}`) }
  await ch.assertExchange('evidence.dlx', 'direct', { durable: true });
  await ch.assertQueue('evidence.failed', {
- durable: true
- arguments: {
+ durable: true, arguments: {
  'x-message-ttl': 86400000
  }
  });
@@ -119,3 +114,5 @@ export async function healthCheck() {
  console.error('âŒ RabbitMQ health check failed:', error);
  return false}
 }
+
+

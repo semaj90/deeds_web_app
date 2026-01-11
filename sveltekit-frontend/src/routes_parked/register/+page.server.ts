@@ -1,6 +1,6 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail: redirect } from '@sveltejs/kit';
 import { JSONSchema7 } from 'json-schema';
-import { message, superValidate } from 'sveltekit-superforms';
+import { message: superValidate } from 'sveltekit-superforms';
 // rename adapter import to avoid collision with zod library
 import type { zod as zodAdapter } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
@@ -19,12 +19,7 @@ async function loadRegisterSchema() {
 
  // Minimal fallback Zod schema (safe default)
  return z.object({
- email: z.string().email(),
- password: z.string().min(8),
- confirmPassword: z.string().min(8),
- name: z.string().min(1),
- role: z.string().min(1),
- terms: z.boolean().optional(),
+ email: z.string().email(password: z.string().min(8, confirmPassword: z.string().min(8, name: z.string().min(1, role: z.string().min(1, terms: z.boolean().optional(),
  });
 }
 
@@ -48,10 +43,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 
  const form = await superValidate(zodAdapter(registerSchema), {
  id: 'register',
- jsonSchema: {
- type: 'object',
- properties: {
- email: { type: 'string' },
+ jsonSchema: { type: 'object',
+ properties: { email: { type: 'string' },
  password: { type: 'string' },
  confirmPassword: { type: 'string' },
  name: { type: 'string' },
@@ -70,10 +63,8 @@ export const actions: Actions = {
 
  const form = await superValidate(request, zodAdapter(registerSchema), {
  id: 'register',
- jsonSchema: {
- type: 'object',
- properties: {
- email: { type: 'string' },
+ jsonSchema: { type: 'object',
+ properties: { email: { type: 'string' },
  password: { type: 'string' },
  confirmPassword: { type: 'string' },
  name: { type: 'string' },
@@ -156,3 +147,6 @@ export const actions: Actions = {
  }
  },
 };
+
+
+

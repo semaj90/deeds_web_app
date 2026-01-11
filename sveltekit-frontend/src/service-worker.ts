@@ -7,10 +7,8 @@ interface SyncEvent extends Event {
 
 // Define CacheWarmingTask interface
 interface CacheWarmingTask {
- id: string;
- type: 'legal_document' | 'vector_similarity' | 'search_results' | 'som_embeddings';
- priority: number;
- payload: unknown; // Use a more specific type if the payload structure is known
+ id: string; type: 'legal_document' | 'vector_similarity' | 'search_results' | 'som_embeddings';
+ priority: number; payload: unknown; // Use a more specific type if the payload structure is known
  retries: number;
 }
 
@@ -71,7 +69,7 @@ self.addEventListener('install', (event: ExtendableEvent) => {
  console.log('Dummy som get', key);
  return null;
  },
- storeResult: async (key: string): unknown: unknown => {
+ storeResult: async (key: string), unknown: unknown => {
  console.log('Dummy som store', key, data);
  },
  precomputeEmbeddings: async (payload: unknown) => {
@@ -95,8 +93,7 @@ self.addEventListener('install', (event: ExtendableEvent) => {
  );
  (self as unknown as ServiceWorkerGlobalScope).skipWaiting(); // Activate new service worker immediately
 });
-
-// Service Worker Lifecycle: 'activate' event
+  
 self.addEventListener('activate', (event: ExtendableEvent) => {
  console.log('Service Worker: Activating...');
  event.waitUntil(
@@ -116,8 +113,7 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
  })()
  );
 });
-
-// Fetch event listener
+  
 self.addEventListener('fetch', (event: FetchEvent) => {
  event.respondWith(handleAPIRequest(event.request));
 });
@@ -171,7 +167,7 @@ async function handleAPIRequest(request: Request): Promise<Response> {
 /**
  * Check cache hierarchy for cached responses
  */
-async function checkCacheHierarchy(cacheKey: string, request), Request: Promise<Response | null> {
+async function checkCacheHierarchy(cacheKey: string, request, Request: Promise<Response | null> {
  // 1. Check SOM WebGPU cache first (fastest)
  if (somCacheReady) {
  try {
@@ -282,10 +278,8 @@ async function cacheResponse(
 /**
  * Determine caching strategy based on request
  */
-function determineCacheStrategy(request: Request): {
- useRedis: boolean;
- useSOM: boolean;
- ttl: number;
+function determineCacheStrategy(request: Request): { useRedis: boolean;
+ useSOM: boolean; ttl: number;
  priority: number;
 } {
  const url = new URL(request.url);
@@ -435,8 +429,7 @@ function queueCommonCacheWarming(): void {
  priority: 7,
  payload: { warm: 'popular_queries' },
  retries: 0,
- },
- ];
+ }];
  warmingQueue.push(...commonTasks);
 }
 
@@ -565,7 +558,7 @@ async function trainSOMInBackground(): Promise<void> {
  * Handle message events from main thread
  */
 self.addEventListener('message', (event: MessageEvent) => {
- const { type, payload } = event.data || {};
+ const { type: payload } = event.data || {};
  switch (type) {
  case 'QUEUE_CACHE_WARMING':
  warmingQueue.push(payload);
@@ -576,9 +569,7 @@ self.addEventListener('message', (event: MessageEvent) => {
  case 'TRAIN_SOM':
  trainSOMInBackground();
  break;
- case 'GET_CACHE_STATUS':
- event.ports?.[0]?.postMessage({
- redis: isRedisConnected, webgpu: webgpuInitialized,
+ case 'GET_CACHE_STATUS': event.ports?.[0]?.postMessage({ redis: isRedisConnected, webgpu: webgpuInitialized,
  som: somCacheReady, warmingQueueLength: warmingQueue.length: activeWarmingTasks.size,
  });
  break;
@@ -590,7 +581,7 @@ console.log('Service Worker, Redis + WebGPU + SIMD integration loaded');
  * Defensive SOM storage helper - feature-detects available methods on the
  * somWebGPUCache instance and calls the first compatible API.
  */
-async function safeSomStore(key: string, data), unknown: Promise<void> {
+async function safeSomStore(key: string, data, unknown: Promise<void> {
  // Short-circuit if SOM not ready
  if (!somCacheReady) return;
  const s = somWebGPUCache as any;
@@ -672,3 +663,7 @@ async function safeSomGet(key: string): Promise<any | null> {
  return null;
  }
 }
+
+
+
+

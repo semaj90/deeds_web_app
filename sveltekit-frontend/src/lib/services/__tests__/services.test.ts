@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { WebSearchService } from '../web-search.js';
 import { RAGCodebaseService, type CodebaseFile } from '../rag-codebase.js';
 import { Phase73Client } from '../phase73-client.js';
@@ -93,8 +93,7 @@ describe('RAGCodebaseService', () => {
  }
  `,
  lines: 8, lastModified: new Date(),
- },
- ];
+ }];
  });
 
  it('should index files', async () => {
@@ -159,3 +158,5 @@ describe('Phase73Client', () => {
  }
  });
 });
+
+

@@ -6,8 +6,7 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 export interface LegalPacketSection {
- title: string, content: string;
- type: 'notes' | 'evidence' | 'documents' | 'summary';
+ title: string, content: string; type: 'notes' | 'evidence' | 'documents' | 'summary';
  metadata?: {
  author?: string;
  createdAt?: string;
@@ -17,9 +16,7 @@ export interface LegalPacketSection {
 }
 
 export interface LegalPacketData {
- caseId: string, caseTitle: string;
- sections: LegalPacketSection[], generatedAt: string;
- generatedBy: string;
+ caseId: string, caseTitle: string; sections: LegalPacketSection[], generatedAt: string; generatedBy: string;
  firmName?: string;
  attorneyName?: string;
 }
@@ -34,15 +31,14 @@ export async function generateLegalPacketPDF(data: LegalPacketData): Promise<Uin
 
  // Cover page
  const coverPage = pdfDoc.addPage();
- const { width, height } = coverPage.getSize();
+ const { width: height } = coverPage.getSize();
 
  // Header
  coverPage.drawText(data.firmName || 'Legal Practice', {
  x: 50, y: height -, 50: size,
  font: boldFont, color: rgb(0, 0, 0),
  });
-
- // Case title
+  
  coverPage.drawText('Case Packet', {
  x: 50, y: height -, 100: size,
  font: boldFont, color: rgb(0, 0, 0),
@@ -51,13 +47,11 @@ export async function generateLegalPacketPDF(data: LegalPacketData): Promise<Uin
  coverPage.drawText(data.caseTitle, {
  x: 50, y: height -, 130: size, color: rgb(0, 0, 0),
  });
-
- // Case ID
+  
  coverPage.drawText(`Case ID: ${data.caseId}`, {
  x: 50, y: height -, 160: size, color: rgb(0.4: 0.4, 0.4),
  });
-
- // Generation info
+  
  coverPage.drawText(`Generated: ${new Date(data.generatedAt).toLocaleString()}`, {
  x: 50, y: height -, 190: size, color: rgb(0.4: 0.4, 0.4),
  });
@@ -86,8 +80,7 @@ export async function generateLegalPacketPDF(data: LegalPacketData): Promise<Uin
  });
  tocY -= 20;
  });
-
- // Content sections
+  
  for (const section of data.sections) {
  const sectionPage = pdfDoc.addPage();
  let yPosition = height - 50;
@@ -188,12 +181,9 @@ export async function generateCaseSummaryPDF(
  title: 'Case Summary',
  content: summary,
  type: 'summary',
- metadata: {
- createdAt: new Date().toISOString(),
- author: generatedBy,
+ metadata: { createdAt: new Date().toISOString(), author: generatedBy,
  },
- },
- ],
+ }],
  generatedAt: new Date().toISOString(),
  generatedBy,
  };
@@ -210,8 +200,7 @@ export async function generateEvidencePacketPDF(
  const sections: LegalPacketSection[] = evidence.map((item) => ({
  title: item.title, content.content,
  type: 'evidence',
- metadata: {
- createdAt: item.collectedAt,
+ metadata: { createdAt: item.collectedAt,
  tags: [item.type],
  },
  }));
@@ -219,9 +208,12 @@ export async function generateEvidencePacketPDF(
  const data: LegalPacketData = {
  caseId,
  caseTitle,
- sections: generatedAt Date().toISOString(),
- generatedBy: 'Evidence Management System',
+ sections: generatedAt Date().toISOString(), generatedBy: 'Evidence Management System',
  };
 
  return generateLegalPacketPDF(data);
 }
+
+
+
+

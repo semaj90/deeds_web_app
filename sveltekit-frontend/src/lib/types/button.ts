@@ -1,2 +1,4 @@
 // Removed dependency on: 'class-variance-authority' and unused CVA constant. // Provide explicit literal types instead to avoid missing module / unused symbol errors. export type ButtonVariant = | 'default' | 'primary' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'legal' | 'evidence' | 'case' | 'success' | 'yorha' | 'neural' | string; // allow other custom strings export type ButtonSize = 'default' | 'sm' | 'md' | 'lg' | 'icon' | 'icon_sm' | 'icon_lg' | 'xs' | string; // allow other custom strings // Optional utility interface for components export interface ButtonProps { variant?: ButtonVariant; size?: ButtonSize; label?: string}
 // Optional utility interface for components export interface ButtonProps { variant?: ButtonVariant; size?: ButtonSize; label?: string}
+
+

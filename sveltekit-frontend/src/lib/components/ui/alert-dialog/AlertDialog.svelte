@@ -1,4 +1,12 @@
 <script lang="ts" module>
+	let title = $state<any>(undefined);
+	let description = $state<any>(undefined);
+	let handleCancel = $state<any>(undefined);
+	let cancelLabel = $state<any>(undefined);
+	let onAction = $state<any>(undefined);
+	let variant = $state<any>(undefined);
+	let actionLabel = $state<any>(undefined);
+
 	// Re-export sub-components for compound component pattern
 	export { default as Action } from './AlertDialogAction.svelte';
 	export { default as Cancel } from './AlertDialogCancel.svelte';
@@ -61,7 +69,7 @@
 	}
 </script>
 
-<AlertDialogRoot bind:open {onOpenChange} class={className}>
+<AlertDialogRoot bind:open { onOpenChange } class={ className }>
 	<AlertDialogPortal>
 		<AlertDialogOverlay />
 		<AlertDialogContent>
@@ -85,3 +93,5 @@
 		</AlertDialogContent>
 	</AlertDialogPortal>
 </AlertDialogRoot>
+
+

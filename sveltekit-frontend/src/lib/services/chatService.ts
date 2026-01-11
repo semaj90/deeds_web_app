@@ -11,25 +11,20 @@
 const API_BASE = '/api/chat';
 
 interface ChatMessage {
- id: string;
- role: string;
- content: string;
- timestamp: string;
+ id: string; role: string;
+ content: string; timestamp: string;
  evidence_references?: string[];
  citations?: string[];
 }
 
 interface ChatResponse {
- message_id: string;
- status: string;
+ message_id: string; status: string;
  stream_url: string;
 }
 
 interface EvidenceItem {
- chunk_id: string;
- doc_id: string;
- relevance_score: number;
- reference_count: number;
+ chunk_id: string; doc_id: string;
+ relevance_score: number; reference_count: number;
  last_referenced: string;
 }
 
@@ -58,12 +53,10 @@ class ChatService {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- case_id: caseId,
+ body: JSON.stringify({ case_id: caseId,
  user_id: userId.trim(),
  role,
- }),
- signal: this.abortController.signal,
+ }, signal: this.abortController.signal,
  });
 
  if (!response.ok) {
@@ -125,14 +118,14 @@ class ChatService {
  */
  async getHistory(caseId: string, limit: number = 10): Promise<ChatMessage[]> {
  try {
- const response = await fetch(`${API_BASE}/history/${caseId}?limit=${limit}`);
+ const response = await fetch(`${API_BASE}/history/${ caseId }? limit=${ limit }`);
 
  if (!response.ok) {
  throw new Error('Failed to get history');
  }
 
  const data = await response.json();
- return data.messages || [];
+ return data.messages ?? [];
  } catch (error) {
  throw error;
  }
@@ -143,14 +136,14 @@ class ChatService {
  */
  async getEvidenceMemory(caseId: string, limit: number = 10): Promise<EvidenceItem[]> {
  try {
- const response = await fetch(`${API_BASE}/evidence/${caseId}?limit=${limit}`);
+ const response = await fetch(`${API_BASE}/evidence/${ caseId }? limit=${ limit }`);
 
  if (!response.ok) {
  throw new Error('Failed to get evidence memory');
  }
 
  const data = await response.json();
- return data.evidence || [];
+ return data.evidence ?? [];
  } catch (error) {
  throw error;
  }
@@ -161,7 +154,7 @@ class ChatService {
  */
  async deleteHistory(caseId: string): Promise<void> {
  try {
- const response = await fetch(`${API_BASE}/history/${caseId}`, {
+ const response = await fetch(`${API_BASE}/history/${ caseId }`, {
  method: 'DELETE',
  });
 
@@ -196,3 +189,7 @@ class ChatService {
 }
 
 export const chatService = new ChatService();
+
+
+
+

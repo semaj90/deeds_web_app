@@ -39,8 +39,7 @@ export const POST: RequestHandler = async ({ request }) => {
  crimeCategory: chunk.crime_category,
  sectionType: chunk.section_type,
  relevanceScore: chunk.score,
- excerpt: chunk.text.substring(0, 300),
- source: chunk.source,
+ excerpt: chunk.text.substring(0, 300, source: chunk.source,
  }));
 
  console.log('[Link Cases] Found', cases.length, 'related cases');
@@ -55,3 +54,5 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({ error: 'Failed to link cases', details: String(error) }, { status: 500 });
  }
 };
+
+

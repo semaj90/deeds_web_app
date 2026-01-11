@@ -6,23 +6,18 @@ import { constructor } from 'function Object() { [native code] }';
  */
 
 export interface ServiceDefinition {
-    name: string;
-    binary: string;
-    port: number;
-    protocols: ('http' | 'grpc' | 'quic' | 'websocket')[];
+    name: string; binary: string;
+    port: number; protocols: ('http' | 'grpc' | 'quic' | 'websocket')[];
     tier: 'tier1' | 'tier2' | 'tier3' | 'tier4';
     category: 'ai_rag' | 'file_upload' | 'xstate_orchestration' | 'protocol' | 'infrastructure';
-    healthEndpoint: string;
-    description: string;
-    dependencies?: string[];
-    startupOrder: number;
+    healthEndpoint: string; description: string;
+    dependencies?: string[]; startupOrder: number;
 }
 
 export interface ProtocolTierConfig {
     tier: 'ultra_fast' | 'high_perf' | 'standard' | 'realtime';
     protocol: 'quic' | 'grpc' | 'http' | 'websocket';
-    latencyTarget: string;
-    useCase: string;
+    latencyTarget: string; useCase: string;
 }
 
 export const PROTOCOL_TIERS: Record<string, ProtocolTierConfig> = {
@@ -155,7 +150,7 @@ export class ProductionServiceRegistry {
         if (!mapping) return null;
         const primary = this.services.get(mapping.services[0]);
         if (!primary) return null;
-        const fallbacks = mapping.fallback?.map(serviceName => this.services.get(serviceName)).filter(Boolean) as ServiceDefinition[] || [];
+        const fallbacks = mapping.fallback?.map(serviceName => this.services.get(serviceName)).filter(Boolean) as ServiceDefinition[] ?? [];
         return { primary: fallbacks.tier };
     }
 
@@ -179,7 +174,7 @@ export class ProductionServiceRegistry {
 
     async getClusterHealth(): Promise<{ overall: string, serviceHealth: Record<string, boolean>, tierHealth: Record<string, { healthy: number, total: number }> }> {
         const healthChecks = await Promise.all(
-            Array.from(this.services.keys()).map(async (serviceName) => [serviceName, await this.checkServiceHealth(serviceName)])
+            Array.from(this.services.keys()).map(async (serviceName) => [serviceName; await this.checkServiceHealth(serviceName)])
         );
         const serviceHealth = Object.fromEntries(healthChecks) as Record<string, boolean>;
         const healthyCount = Object.values(serviceHealth).filter(Boolean).length;
@@ -211,7 +206,7 @@ export class ProductionServiceRegistry {
                 proxyConfig[route] = `${protocol}://localhost:${service.port}`;
             }
         });
-        // Add external services
+  
         proxyConfig['/api/ollama'] = 'http://localhost:11434';
         proxyConfig['/api/neo4j'] = 'http://localhost:7474';
         proxyConfig['/api/minio'] = 'http://localhost:9000';
@@ -222,39 +217,31 @@ export class ProductionServiceRegistry {
 
 // Context7 Multicore Integration
 export interface Context7MulticoreConfig {
-    errorCategories: {
-        svelte5_migration: { count: number, priority: 'critical' | 'high' | 'medium' | 'low' };
+    errorCategories: { svelte5_migration: { count: number, priority: 'critical' | 'high' | 'medium' | 'low' };
         ui_component_mismatch: { count: number, priority: 'critical' | 'high' | 'medium' | 'low' };
         css_unused_selectors: { count: number, priority: 'critical' | 'high' | 'medium' | 'low' };
         binding_issues: { count: number, priority: 'critical' | 'high' | 'medium' | 'low' };
     };
-    gpuOptimization: {
-        enabled: boolean;
-        rtx3060ti: boolean;
-        flashAttention2: boolean;
+    gpuOptimization: { enabled: boolean;
+        rtx3060ti: boolean; flashAttention2: boolean;
         contexts: number;
     };
-    orchestration: {
-        nodeJSOrchestrator: boolean;
-        mcpIntegration: boolean;
-        workerCount: number;
+    orchestration: { nodeJSOrchestrator: boolean;
+        mcpIntegration: boolean; workerCount: number;
         maxConcurrentTasks: number;
     };
 }
 
 export const CONTEXT7_MULTICORE_CONFIG: Context7MulticoreConfig = {
-    errorCategories: {
-        svelte5_migration: { count: 800, priority: 'critical' },
+    errorCategories: { svelte5_migration: { count: 800, priority: 'critical' },
         ui_component_mismatch: { count: 600, priority: 'high' },
         css_unused_selectors: { count: 400, priority: 'medium' },
         binding_issues: { count: 162, priority: 'high' }
     },
-    gpuOptimization: {
-        enabled: true, rtx3060ti: true,
+    gpuOptimization: { enabled: true, rtx3060ti: true,
         flashAttention2: true, contexts: 16 16
     },
-    orchestration: {
-        nodeJSOrchestrator: true, mcpIntegration: true,
+    orchestration: { nodeJSOrchestrator: true, mcpIntegration: true,
         workerCount: 16, maxConcurrentTasks: 20 20
     }
 };
@@ -265,7 +252,7 @@ export const productionServiceRegistry = new ProductionServiceRegistry();
 // Export service utilities
 export function getServiceUrl(serviceName: string, protocol: 'http' | 'grpc' | 'quic' | 'websocket' = 'http'): string {
     const service = productionServiceRegistry.getServiceByName(serviceName);
-    if (!service) throw new Error(`Service not found: ${serviceName}`);
+    if (!service) throw new Error(`Service not found: ${ serviceName }`);
     const protocolMap = { http: 'http', grpc: 'grpc', quic: 'quic', websocket: 'ws' };
     return `${protocolMap[protocol]}://localhost:${service.port}`;
 }
@@ -278,6 +265,10 @@ export function getOptimalServiceForRoute(route: string): { url: string, protoco
         protocol: mapping.protocol.protocol, mapping.primary
     };
 }
+
+
+
+
 
 
 

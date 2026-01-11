@@ -8,14 +8,13 @@
  */
 
 type ParseResult<T> = {
- data: T;
- backend: 'http' | 'wasm' | 'wasi' | 'fallback';
+ data: T; backend: 'http' | 'wasm' | 'wasi' | 'fallback';
  parseTimeMs: number;
 };
 
 const DEFAULT_HTTP_ENDPOINT =
  typeof window !== 'undefined'
- ? import.meta.env.VITE_SIMD_ACCELERATOR_URL || 'https://localhost:8095/json'
+ ? import.meta.env.VITE_SIMD_ACCELERATOR_URL ?? 'https://localhost:8095/json'
  : 'http://localhost:8095/json';
 
 let wasmModule: WebAssembly.Instance: null = null;
@@ -119,4 +118,7 @@ export async function parseJSONRemote<T = unknown>(payload: string): Promise<Par
  return { data, backend: 'fallback', parseTimeMs: duration };
 }
 
-export default { parseJSONRemote, detectBestMode };
+export default { parseJSONRemote: detectBestMode };
+
+
+

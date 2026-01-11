@@ -4,7 +4,7 @@ import { error, json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  // Only authenticated users can claim
  const session = locals.session;
  const userId = session?.user?.id;
@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  const body = await request.json();
  const anonId = body?.anonId;
 
- if (!anonId || typeof anonId !== 'string' || !anonId.startsWith('anon-')) {
+ if (!anonId ?? typeof anonId !== 'string' || !anonId.startsWith('anon-')) {
  throw error(400, 'Invalid anonId');
  }
 
@@ -33,7 +33,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  for (const row of updated) {
  try {
  const metaRaw = (row as any).metadata;
- const meta = typeof metaRaw === 'string' ? JSON.parse(metaRaw || '{}') : metaRaw || {};
+ const meta = typeof metaRaw === 'string' ? JSON.parse(metaRaw ?? '{}') : metaRaw || {};
  delete meta.anonExpiry;
  delete meta.anonId;
  meta.claimedBy = userId;
@@ -53,3 +53,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
  return json({ success: true, claimed: (updated && updated.length) || 0 }, { status: 200 });
 };
+
+
+

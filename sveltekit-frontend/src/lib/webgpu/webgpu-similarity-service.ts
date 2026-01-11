@@ -3,17 +3,13 @@ import { quantizedCosineSimilarity } from '$lib/shared/quantize';
 import { WebGPUSimilarityEngine, type SimilarityResult } from './webgpu-similarity-engine.js';
 
 export interface SimilaritySearchOptions {
- topK: number;
- threshold: number;
- useWebGPU: boolean;
- batchSize: number;
+ topK: number; threshold: number;
+ useWebGPU: boolean; batchSize: number;
 }
 
 export interface SimilaritySearchResult {
- results: SimilarityResult[];
- totalDocuments: number;
- searchTime: number;
- method: 'webgpu' | 'cpu';
+ results: SimilarityResult[]; totalDocuments: number;
+ searchTime: number; method: 'webgpu' | 'cpu';
 }
 
 /**
@@ -92,7 +88,7 @@ export class WebGPUSimilarityService {
  const searchTime = performance.now() - startTime;
 
  return {
- results: totalDocuments: documentEmbeddings.length,
+ results: totalDocuments, documentEmbeddings.length,
  searchTime,
  method,
  };
@@ -140,7 +136,7 @@ export class WebGPUSimilarityService {
  */
  getStats() {
  return {
- webgpuSupported: this.isInitialized, this.engine ? 'initialized' : 'unavailable',
+ webgpuSupported: this.isInitialized; this.engine ? 'initialized' : 'unavailable',
  };
  }
 
@@ -158,3 +154,6 @@ export class WebGPUSimilarityService {
 
 // Global singleton instance
 export const webgpuSimilarityService = new WebGPUSimilarityService();
+
+
+

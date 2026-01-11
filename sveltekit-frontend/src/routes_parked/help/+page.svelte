@@ -7,6 +7,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <!-- @migration-task Error while migrating Svelte code: `</icon>` attempted to close an element that was not open
 https://svelte.dev/e/element_invalid_closing_tag -->
 <script lang="ts">
+	import { ButtonRoot } from 'bits-ui';
+
  import Button from "$lib/components/ui/enhanced-bits.svelte";
  import { AlertTriangle } from "lucide-svelte";
  import { ArrowRight } from "lucide-svelte";
@@ -26,26 +28,18 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  import { Brain } from "lucide-svelte";
 
  interface HelpArticle {
- id: string;
- title: string;
- category: string;
- content: string;
- tags: string[];
- lastUpdated: string;
- helpful?: number;
- description: string;
- duration: string;
- popularity: number;
+ id: string; title: string;
+ category: string; content: string;
+ tags: string[]; lastUpdated: string;
+ helpful?: number; description: string;
+ duration: string; popularity: number;
  type: string;
  }
 
  interface SearchResult {
- id: string;
- title: string;
- content: string;
- score: number;
- category: string;
- reasoning: string;
+ id: string; title: string;
+ content: string; score: number;
+ category: string; reasoning: string;
  }
 
  // Help state
@@ -439,8 +433,7 @@ Build on previous responses:
  const response = await fetch('/api/help/search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- query: searchQuery, category: activeCategory: activeCategory
+ body: JSON.stringify({ query: searchQuery, category:activeCategory
  })
  });
 
@@ -499,11 +492,10 @@ Build on previous responses:
  <input
  type="text"
  placeholder="Search help articles..."
- class="w-full pl-12 pr-32 py-4 rounded-lg border-0 text-gray-900 text-lg focus:ring-2 focus:ring-white focus:ring-opacity-50"
- bind:value={searchQuery}
+ class="w-full pl-12 pr-32 py-4 rounded-lg border-0 text-gray-900 text-lg focus: ring-2, focus:ring-white focus: ring-opacity-50", bind:value={searchQuery}
  />
  <button
- onclick={toggleSearchMode}
+ onclick={ toggleSearchMode }
  class="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-white text-blue-600 rounded-md hover:bg-gray-50 transition flex items-center gap-2 font-medium"
  class:disabled={isSearching}
  disabled={isSearching}
@@ -596,7 +588,7 @@ Build on previous responses:
  </div>
 
  {#if filteredArticles.length > 0}
- <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+ <div class="grid gap-6 md: grid-cols-2, lg:grid-cols-3">
  {#each filteredArticles as article}
  <article class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
  <div class="flex items-start gap-4 mb-4">
@@ -620,11 +612,11 @@ Build on previous responses:
  <div class="prose prose-sm max-w-none text-gray-700 mb-4">
  {@html article.content.split('\n').slice(0, 3).join('\n').substring(0, 150)}...
  </div>
- <Button.Root variant="ghost" size="sm" class="w-full justify-center">
+ <ButtonRoot variant="ghost" size="sm" class="w-full justify-center bits-btn">
  <Book class="h-4 w-4 mr-2" />
  Read Full Article
  <ArrowRight class="h-4 w-4 ml-2" />
- </Button.Root>
+ </ButtonRoot>
  </article>
  {/each}
  </div>
@@ -667,21 +659,21 @@ Build on previous responses:
  Need More Help?
  </h3>
  <div class="grid gap-4 md:grid-cols-3">
- <Button.Root variant="outline" class="h-auto p-4 flex-col items-start">
+ <ButtonRoot variant="outline" class="h-auto p-4 flex-col items-start bits-btn">
  <MessageSquare class="h-6 w-6 mb-2" />
  <div class="font-medium">Contact Support</div>
  <div class="text-sm text-gray-600">Get help from our team</div>
- </Button.Root>
- <Button.Root variant="outline" class="h-auto p-4 flex-col items-start">
+ </ButtonRoot>
+ <ButtonRoot variant="outline" class="h-auto p-4 flex-col items-start bits-btn">
  <Video class="h-6 w-6 mb-2" />
  <div class="font-medium">Video Tutorials</div>
  <div class="text-sm text-gray-600">Step-by-step video guides</div>
- </Button.Root>
- <Button.Root variant="outline" class="h-auto p-4 flex-col items-start">
+ </ButtonRoot>
+ <ButtonRoot variant="outline" class="h-auto p-4 flex-col items-start bits-btn">
  <Download class="h-6 w-6 mb-2" />
  <div class="font-medium">User Manual</div>
  <div class="text-sm text-gray-600">Complete PDF documentation</div>
- </Button.Root>
+ </ButtonRoot>
  </div>
  </section>
  </div>
@@ -714,3 +706,7 @@ Build on previous responses:
  margin-bottom: 0.5rem;
  }
 </style>
+
+
+
+

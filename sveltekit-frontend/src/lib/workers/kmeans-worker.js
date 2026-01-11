@@ -52,7 +52,7 @@ class KMeansWorker {
  // clear each cluster's array length
  clusters.forEach(cluster => {
  cluster.length = 0});
- // Assign points to nearest centroid (parallelizable operation)
+  
  for (let i = 0; i < data.length; i++) {
  const point = data[i];
  if (!point.embedding || point.embedding.length !== dimensions) continue
@@ -101,10 +101,8 @@ class KMeansWorker {
  // Calculate cluster metrics
  const clusterMetrics = this.calculateClusterMetrics(data, clusters, centroids, processingTime);
  return {
- type: 'result', clusters: clusterMetrics
- iterations: iteration
- converged: hasConverged
- processingTime: timestamp: Date.now()};
+ type: 'result', clusters: clusterMetrics, iterations: iteration
+ converged: hasConverged, processingTime: timestamp: Date.now()};
  }
  /**
  * K-means++ initialization for better cluster starting points
@@ -129,7 +127,7 @@ class KMeansWorker {
  }
  return minDist * minDist; // Square for probability weighting
  });
- // Weighted random selection
+  
  const totalDistance = distances.reduce((sum, d) => sum + d, 0);
  let random = Math.random() * totalDistance
  for (let j = 0; j < distances.length; j++) {
@@ -150,7 +148,7 @@ class KMeansWorker {
  const silhouette = this.calculateSilhouetteScore(clusterData, clusters, centroids, i);
  const memoryUsage = this.estimateClusterMemoryUsage(clusterData);
  return {
- id: `cluster_${i}`, centroid: centroids[i],size: cluster.length, cohesion, silhouette: separability: this.calculateSeparability(centroids, i), memoryUsage: processingTime: processingTime / Math.max(1, clusters.length), dataIndices: cluster};
+ id: `cluster_${i}`, centroid: centroids[i],size: cluster.length, cohesion, silhouette: separability, this.calculateSeparability(centroids, i), memoryUsage: processingTime, processingTime / Math.max(1, clusters.length), dataIndices: cluster};
  });
  }
  calculateCohesion(clusterData, centroid) {
@@ -226,3 +224,5 @@ if (parentPort) {
  }
  });
 }
+
+

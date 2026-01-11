@@ -40,7 +40,6 @@ export const GET: RequestHandler = async () => {
 			});
 		});
 
-		// Enrich with KB data from Qdrant
 		const kbCounts = await getKBCounts();
 
 		const enrichedRoutes = routes.map(route => {
@@ -50,15 +49,14 @@ export const GET: RequestHandler = async () => {
 			return {
 				...route,
 				errors: errorData.errors,
-				complexity: errorData.metadata?.complexity || 0,
+				complexity: errorData.metadata?.complexity ?? 0,
 				kb_vectors: kbCount
 			};
 		});
 
 		return json({
 			routes: enrichedRoutes,
-			summary: {
-				total: enrichedRoutes.length,
+			summary: { total: enrichedRoutes.length,
 				with_errors: enrichedRoutes.filter(r => r.errors > 0).length,
 				in_kb: enrichedRoutes.filter(r => r.kb_vectors > 0).length
 			}
@@ -189,8 +187,7 @@ async function getKBCounts(): Promise<Map<string, number>> {
 		const response = await fetch('http://localhost:6333/collections/phase76_knowledge_base/points/scroll', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				limit: 10000,
+			body: JSON.stringify({ limit: 10000,
 				with_payload: true,
 				with_vector: false
 			})
@@ -199,7 +196,7 @@ async function getKBCounts(): Promise<Map<string, number>> {
 		const data = await response.json();
 		if (data.result?.points) {
 			data.result.points.forEach((point: any) => {
-				const filePath = point.payload?.file_path || point.payload?.path;
+				const filePath = point.payload?.file_path ?? point.payload?.path;
 				if (filePath) {
 					counts.set(filePath, (counts.get(filePath) || 0) + 1);
 				}
@@ -211,3 +208,6 @@ async function getKBCounts(): Promise<Map<string, number>> {
 
 	return counts;
 }
+
+
+

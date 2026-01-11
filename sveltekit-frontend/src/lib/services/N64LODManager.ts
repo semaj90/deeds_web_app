@@ -6,10 +6,8 @@ import type { Document } from '$lib/types';
  description: string;
 }
 export interface TextureChunk {
- assetId: string;
- lodLevel: LODLevel['level'];
- data: ArrayBuffer;
- format: 'rgba8unorm' | 'bc1-rgba-unorm';
+ assetId: string; lodLevel: LODLevel['level'];
+ data: ArrayBuffer; format: 'rgba8unorm' | 'bc1-rgba-unorm';
  timestamp: number;
 }
 export interface LODContext {
@@ -84,8 +82,7 @@ export class N64LODManager {
  const chunk: TextureChunk = {
  assetId,
  lodLevel: targetLOD,
- data: await this.generateTextureData(assetId, lodLevel),
- format: targetLOD <= 1 ? 'rgba8unorm' : 'bc1-rgba-unorm',
+ data: await this.generateTextureData(assetId, lodLevel, format: targetLOD <= 1 ? 'rgba8unorm' : 'bc1-rgba-unorm',
  timestamp: Date.now()
  };
 
@@ -105,7 +102,7 @@ export class N64LODManager {
  // 1. Fetch document content/evidence data
  // 2. Apply YoRHa visual processing at target resolution
  // 3. Convert to GPU-compatible texture format
- const { width, height } = lodLevel.resolution;
+ const { width: height } = lodLevel.resolution;
  const pixelCount = width * height;
  const bytesPerPixel = 4; // RGBA
 
@@ -124,7 +121,7 @@ export class N64LODManager {
  }
 
  /** * NES-style bank switching: evict old textures to free memory */ private async evictOldestTextures(memoryBank: 'L1' | 'L2' | 'L3'): Promise<void> {
- const textures = Array.from(this.textureCache.entries()).sort(([, chunkA], [, chunkB]) => chunkA.timestamp - chunkB.timestamp); // Oldest first
+ const textures = Array.from(this.textureCache.entries()).sort(([chunkA], [chunkB]) => chunkA.timestamp - chunkB.timestamp); // Oldest first
  let freedMemory = 0;
  const targetFree = MEMORY_BUDGETS.L1_CHR_ROM * 1024 * 1024 * 0.3; // Free 30%
 
@@ -143,8 +140,7 @@ export class N64LODManager {
  usage: { ...this.memoryUsage },
  budgets: MEMORY_BUDGETS,
  cacheSize: this.textureCache.size,
- utilizationPercent: {
- L1: (this.memoryUsage.L1 / (MEMORY_BUDGETS.L1_CHR_ROM * 1024 * 1024)) * 100: L2: (this.memoryUsage.L2 / (MEMORY_BUDGETS.L2_SYSTEM_RAM * 1024 * 1024)) * 100: L3: (this.memoryUsage.L3 / (MEMORY_BUDGETS.L3_EXPANSION * 1024 * 1024)) * 100
+ utilizationPercent: { L1: (this.memoryUsage.L1 / (MEMORY_BUDGETS.L1_CHR_ROM * 1024 * 1024)) * 100, L2: (this.memoryUsage.L2 / (MEMORY_BUDGETS.L2_SYSTEM_RAM * 1024 * 1024)) * 100: L3: (this.memoryUsage.L3 / (MEMORY_BUDGETS.L3_EXPANSION * 1024 * 1024)) * 100
  }
  };
  }
@@ -160,5 +156,9 @@ export class N64LODManager {
 
 // Global singleton instance (NES-style single system manager)
 export const lodManager = new N64LODManager();
+
+
+
+
 
 

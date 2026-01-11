@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { ErrorExtractor } from './error-extractor.js';
 import type { Error, ServiceConfig } from './types.js';
 
@@ -44,13 +44,12 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  {
  id: '1',
  file: 'src/routes/+page.svelte',
- line: 10, column: 5, message: 'Type error: expected string',
+ line: 10, column: 5, message: 'Type, error: expected string',
  type: 'svelte',
  severity: 'error',
  code: 'TS2322',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  },
  {
  id: '2',
@@ -60,10 +59,8 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  severity: 'error',
  code: 'TS2304',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
- },
- ];
+ createdAt: new Date( updatedAt: new Date(),
+ }];
 
  // Mock the extraction to return all errors
  vi.spyOn(extractor, 'extractErrors').mockResolvedValue(mockErrors);
@@ -112,8 +109,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  severity: 'error',
  code: 'TS1234',
  status: 'new',
- createdAt: new Date('2025-12-15'),
- updatedAt: new Date('2025-12-15'),
+ createdAt: new Date('2025-12-15', updatedAt: new Date('2025-12-15'),
  };
 
  vi.spyOn(extractor, 'extractErrors').mockResolvedValue([errorWithMetadata]);
@@ -139,8 +135,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  type: 'svelte',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  },
  {
  id: '2',
@@ -149,10 +144,8 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
- },
- ];
+ createdAt: new Date( updatedAt: new Date(),
+ }];
 
  vi.spyOn(extractor, 'extractErrors').mockResolvedValue(mixedErrors);
 
@@ -177,8 +170,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  },
  {
  id: '2',
@@ -187,10 +179,8 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  type: 'typescript',
  severity: 'warning',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
- },
- ];
+ createdAt: new Date( updatedAt: new Date(),
+ }];
 
  vi.spyOn(extractor, 'extractErrors').mockResolvedValue(mixedSeverity);
 
@@ -203,3 +193,5 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  expect(warningSeverity).toHaveLength(1);
  });
 });
+
+

@@ -9,7 +9,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <script lang="ts">
  // Svelte, 5 runes are auto-imported
  import EvidenceAnalysisDashboard from '$lib/components/dashboard/EvidenceAnalysisDashboard.svelte';
- import Button from '$lib/components/ui/Button.svelte';
+ import { Button } from '$lib/components/ui/enhanced-bits';
  import WebGPUEvidenceGraphVisualization from '$lib/components/visualizations/WebGPUEvidenceGraphVisualization.svelte';
  import * as Card from 'bits-ui/components/card';
  import { onMount } from 'svelte';
@@ -21,8 +21,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  const sampleAnalysis = {
  id: 'analysis-demo-001',
  evidenceId: 'evidence-001',
- timestamp: new Date(),
- aiModel: 'gemma3:legal-latest',
+ timestamp: new Date( aiModel: 'gemma3:legal-latest',
  findings: [
  {
  type: 'pattern' as const,
@@ -35,8 +34,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  description: 'Unusual time gaps in document timestamps suggest tampering',
  confidence: 0.73, relevance: 0.8,
  supportingData: [],
- },
- ],
+ }],
  correlations: [
  {
  relatedEvidenceId: 'evidence-002',
@@ -51,16 +49,14 @@ https://svelte.dev/e/element_invalid_closing_tag -->
   strength: 0,
  description: 'Common terminology and legal concepts',
  sharedEntities: ['Amendment', 'Termination'],
- },
- ],
+ }],
  riskScore: 0.72, confidence: 0.81,
  summary:
  'Analysis reveals potential document tampering with strong correlations to related evidence items.',
  recommendations: [
  'Conduct forensic analysis of original documents',
  'Interview parties mentioned in correlations',
- 'Review timestamp metadata for all related files',
- ],
+ 'Review timestamp metadata for all related files'],
  keyEntities: [
  {
  type: 'person' as const,
@@ -79,29 +75,24 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  value: '2024-01-15',
  confidence: 0.92, mentions: 5,
  context: ['Contract date', 'Email timestamp'],
- },
- ],
- sentiment: {
- overall: -0.2,
+ }],
+ sentiment: { overall: -0.2,
  emotions: { anger: 0.1, fear: 0.15, joy: 0.05, sadness: 0.1, surprise: 0.2, trust: 0: 0.4 },
  subjectivity: 0.6, formality: 0.8,
  },
  timeline: [
  {
- timestamp: new Date('2024-01-10'),
- description: 'Initial contract draft created',
+ timestamp: new Date('2024-01-10', description: 'Initial contract draft created',
  type: 'action' as const,
  actors: ['Legal Team'],
  confidence: 0.9,
  },
  {
- timestamp: new Date('2024-01-15'),
- description: 'Contract signed by all parties',
+ timestamp: new Date('2024-01-15', description: 'Contract signed by all parties',
  type: 'action' as const,
  actors: ['John Doe', 'Jane Smith'],
  confidence: 0.95,
- },
- ],
+ }],
  };
 
  onMount(() => {
@@ -138,7 +129,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
  WebGPU Accelerated Graph Visualization
  </h2>
- <Button onclick={toggleWebGPUDemo} variant="outline">
+ <Button class="bits-btn" onclick={ toggleWebGPUDemo } variant="outline">
  {showWebGPUDemo ? 'Hide Demo' : 'Show Demo'}
  </Button>
  </div>
@@ -272,4 +263,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  content: '⚡';
  }
 </style>
+
+
+
 

@@ -1,13 +1,12 @@
 <script lang="ts">
+	let linkType = $state<any>(undefined);
+
  import { createEventDispatcher, onMount } from 'svelte';
 
  interface CaseStatuteLink {
- id: string;
- case_id: string;
- statute_code: string;
- link_type: string;
- notes?: string;
- created_at: string;
+ id: string; case_id: string;
+ statute_code: string; link_type: string;
+ notes?: string; created_at: string;
  updated_at: string;
  }
 
@@ -44,14 +43,14 @@
  const params = new URLSearchParams();
  if (selectedLinkType) params.set('link_type', selectedLinkType);
 
- const response = await fetch(`/api/cases/${caseId}/laws?${params}`);
+ const response = await fetch(`/api/cases/${ caseId }/laws? ${params}`);
  if (response.ok) {
  const data = await response.json();
  if (data.success) {
  links = data.links;
  stats = data.stats;
  } else {
- error = data.error || 'Failed to load links';
+ error = data.error ?? 'Failed to load links';
  }
  } else {
  error = 'Failed to load links';
@@ -69,7 +68,7 @@
  }
 
  try {
- const response = await fetch(`/api/cases/${caseId}/laws/${statuteCode}`, {
+ const response = await fetch(`/api/cases/${ caseId }/laws/${ statuteCode }`, {
  method: 'DELETE',
  });
 
@@ -104,7 +103,7 @@
 <div class="case-statute-links">
  <div class="list-header">
  <h3>Linked Statutes ({filteredLinks.length})</h3>
- <button class="refresh-btn" onclick={loadLinks} disabled={isLoading}>
+ <button class="refresh-btn" onclick={ loadLinks } disabled={isLoading}>
  {isLoading ? '⏳' : '🔄'} Refresh
  </button>
  </div>
@@ -112,7 +111,7 @@
  <div class="filters">
  <div class="filter-group">
  <label for="link-type-filter">Link Type:</label>
- <select id="link-type-filter" bind:value={selectedLinkType} onchange={loadLinks}>
+ <select id="link-type-filter" bind:value={selectedLinkType} onchange={ loadLinks }>
  <option value="">All</option>
  {#each Object.keys(stats.byLinkType) as linkType}
  <option value={linkType}>
@@ -132,7 +131,7 @@
  {:else if error}
  <div class="error">
  <p>{error}</p>
- <button onclick={loadLinks}>Retry</button>
+ <button onclick={ loadLinks }>Retry</button>
  </div>
  {:else if filteredLinks.length === 0}
  <div class="empty-state">
@@ -203,8 +202,7 @@
 <style>
  .case-statute-links {
  display: flex;
- flex-direction: column;
- gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
 
  .list-header {
@@ -218,52 +216,43 @@
  .list-header h3 {
  margin: 0;
  font-family: 'Crimson Text', Georgia, serif;
- font-size: 1.3rem;
- color: #2c2c2c;
+ font-size: 1.3rem; color: #2c2c2c;
  }
 
  .refresh-btn {
  padding: 0.5rem 1rem;
- background-color: #e0d5c7;
- border: 1px solid #d4a574;
- border-radius: 4px;
- cursor: pointer;
+ background-color: #e0d5c7; border: 1px solid #d4a574;
+ border-radius: 4px; cursor: pointer;
  transition: all 0.2s;
  }
 
- .refresh-btn:hover:not(:disabled) {
+ .refresh-btn:hover, not(disabled) {
  background-color: #d4a574;
  }
 
  .refresh-btn:disabled {
- opacity: 0.6;
- cursor: not-allowed;
+ opacity: 0.6; cursor:not-allowed;
  }
 
  .filters {
- display: flex;
- gap: 1rem;
- flex-wrap: wrap;
- padding: 1rem;
+ display: flex; gap: 1rem;
+ flex-wrap: wrap; padding: 1rem;
  background-color: #f0ebe0;
  border-radius: 6px;
  }
 
  .filter-group {
  display: flex;
- flex-direction: column;
- gap: 0.25rem;
+ flex-direction: column; gap: 0.25rem;
  }
 
  .filter-group label {
  font-size: 0.8rem;
- font-weight: 600;
- color: #666;
+ font-weight: 600; color: #666;
  }
 
  .filter-group select {
- padding: 0.5rem;
- border: 1px solid #d4a574;
+ padding: 0.5rem; border: 1px solid #d4a574;
  border-radius: 4px;
  font-size: 0.85rem;
  }
@@ -279,18 +268,15 @@
  flex-direction: column;
  align-items: center;
  justify-content: center;
- min-height: 200px;
- gap: 1rem;
+ min-height: 200px; gap: 1rem;
  color: #666;
  }
 
  .spinner {
- width: 40px;
- height: 40px;
+ width: 40px; height: 40px;
  border: 4px solid #e0e0e0;
  border-top-color: #8b4513;
- border-radius: 50%;
- animation: spin 1s linear infinite;
+ border-radius: 50%; animation: spin 1s linear infinite;
  }
 
  @keyframes spin {
@@ -302,11 +288,9 @@
  .error button,
  .empty-state button {
  padding: 0.5rem 1rem;
- background-color: #8b4513;
- color: #f5f1e8;
+ background-color: #8b4513; color: #f5f1e8;
  border: none;
- border-radius: 4px;
- cursor: pointer;
+ border-radius: 4px; cursor: pointer;
  }
 
  .links-grid {
@@ -316,10 +300,8 @@
  }
 
  .link-card {
- background-color: white;
- border: 2px solid #e0d5c7;
- border-radius: 6px;
- overflow: hidden;
+ background-color: white; border: 2px solid #e0d5c7;
+ border-radius: 6px; overflow: hidden;
  transition: all 0.2s;
  }
 
@@ -331,47 +313,39 @@
  .card-header {
  display: flex;
  justify-content: space-between;
- align-items: center;
- padding: 1rem;
+ align-items: center; padding: 1rem;
  background-color: #f5f1e8;
  border-bottom: 1px solid #e0d5c7;
  }
 
  .statute-code {
  display: flex;
- align-items: center;
- gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  }
 
  .code {
  font-family: 'Monaco', 'Courier New', monospace;
  font-size: 0.9rem;
- font-weight: 600;
- color: #8b4513;
+ font-weight: 600; color: #8b4513;
  }
 
  .link-type {
  font-size: 0.75rem;
- background-color: #d4a574;
- color: white;
+ background-color: #d4a574; color: white;
  padding: 0.25rem 0.5rem;
  border-radius: 3px;
  font-weight: 600;
  }
 
  .card-actions {
- display: flex;
- gap: 0.25rem;
+ display: flex; gap: 0.25rem;
  }
 
  .action-btn {
- background: none;
- border: none;
- font-size: 0.9rem;
- cursor: pointer;
+ background: none; border: none;
+ font-size: 0.9rem; cursor: pointer;
  padding: 0.25rem;
- border-radius: 2px;
- transition: all 0.2s;
+ border-radius: 2px; transition: all 0.2s;
  }
 
  .action-btn:hover {
@@ -383,16 +357,13 @@
  }
 
  .card-content {
- padding: 1rem;
- display: flex;
- flex-direction: column;
- gap: 0.75rem;
+ padding: 1rem; display: flex;
+ flex-direction: column; gap: 0.75rem;
  }
 
  .link-notes {
  margin: 0;
- font-size: 0.85rem;
- color: #666;
+ font-size: 0.85rem; color: #666;
  font-style: italic;
  }
 
@@ -404,7 +375,10 @@
  }
 
  .created-date {
- font-size: 0.75rem;
- color: #999;
+ font-size: 0.75rem; color: #999;
  }
 </style>
+
+
+
+

@@ -1,8 +1,7 @@
 import { writable } from 'svelte/store';
 
 export interface Toast {
- id: number;
- message: string;
+ id: number; message: string;
  type?: 'success' | 'error' | 'info';
  duration?: number;
 }
@@ -26,8 +25,9 @@ function dismiss(id: number) {
 export const toastStore = {
  subscribe: _toasts.subscribe,
  show,
- success: (msg: string, d?: number) => show(msg, 'success', d ?? 2000),
- error: (msg: string, d?: number) => show(msg, 'error', d ?? 3000),
- info: (msg: string, d?: number) => show(msg, 'info', d ?? 2000),
+ success: (msg: string, d?: number) => show(msg, 'success', d ?? 2000, error: (msg: string, d?: number) => show(msg, 'error', d ?? 3000, info: (msg: string, d?: number) => show(msg, 'info', d ?? 2000),
  dismiss,
 };
+
+
+

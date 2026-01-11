@@ -6,7 +6,7 @@ function fetchWithTimeout(input: RequestInfo | URL, init?: RequestInit, timeoutM
  // AbortSignal.timeout may not be available in all runtimes, use AbortController for compatibility
  const controller = new AbortController();
  const id = setTimeout(() => controller.abort(), timeoutMs);
- return fetch(input, { ...(init || {}), signal: controller.signal }).finally(() =>
+ return fetch(input, { ...(init || {}, signal: controller.signal }).finally(() =>
  clearTimeout(id)
  );
 }
@@ -29,3 +29,5 @@ export const GET: RequestHandler = async () => {
  return json({ status: 'unhealthy', available: false });
  }
 };
+
+

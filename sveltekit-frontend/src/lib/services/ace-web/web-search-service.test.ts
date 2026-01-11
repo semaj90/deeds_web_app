@@ -178,8 +178,7 @@ describe('WebSearchService', () => {
   describe('error handling', () => {
     it('should handle empty query gracefully', async () => {
       const results = await service.search('', { limit: 5 });
-
-      // Should still return some results (generic fallback)
+  
       expect(results).toBeDefined();
       expect(Array.isArray(results)).toBe(true);
     });
@@ -197,8 +196,7 @@ describe('WebSearchService', () => {
     it('should retrieve search history for a query', async () => {
       // First, perform a search
       await service.search('Svelte 5 runes', { limit: 5 });
-
-      // Then retrieve history
+  
       const history = await service.getSearchHistory('Svelte 5 runes', 10);
 
       expect(history).toBeDefined();
@@ -213,3 +211,5 @@ describe('WebSearchService', () => {
     });
   });
 });
+
+

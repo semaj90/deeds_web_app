@@ -8,8 +8,7 @@
 	let { data } = $props<{ data: PageData }>(); // Apply the PageData type to the data prop
 
 	const { form, errors, message, enhance } = superForm(data.form, {
-		validators: zodClient(uploadSchema),
-		taintedMessage: null
+		validators: zodClient(uploadSchema, taintedMessage: null
 	});
 </script>
 
@@ -35,9 +34,11 @@
 		color: red;
 	}
 	.message {
-		padding: 1em;
-		margin: 1em 0;
+		padding: 1em; margin: 1em 0;
 		border: 1px solid #ccc;
 		border-radius: 4px;
 	}
 </style>
+
+
+

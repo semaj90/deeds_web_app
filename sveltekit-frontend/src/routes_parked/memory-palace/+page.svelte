@@ -4,7 +4,7 @@
  import { onDestroy, onMount } from 'svelte';
 
  let container: HTMLDivElement = $state();
- let scene: MemoryPalaceScene: null = null;
+ let scene: MemoryPalaceScene, null = null;
  let query = $state('');
  let loading = $state(false);
  let chunks: any[] = $state([]);
@@ -80,8 +80,7 @@
  route: alignment?.route_decision,
  resultCount: chunks.length,
  },
- ...timeline.slice(0, 9),
- ];
+ ...timeline.slice(0, 9)];
  } finally {
  loading = false;
  }
@@ -192,3 +191,5 @@
  @apply bg-base-900;
  }
 </style>
+
+

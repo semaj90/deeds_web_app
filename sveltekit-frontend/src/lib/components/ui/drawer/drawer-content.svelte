@@ -48,11 +48,13 @@
 		transition:fly={flyParams()}
 		role="dialog"
 		aria-modal="true"
-		class="{baseClass} {sideClass()} {className}"
+		class="{baseClass} {sideClass()} { className }"
 	>
 		{#if children}
 			{@render children()}
 		{/if}
 	</div>
 {/if}
+
+
 

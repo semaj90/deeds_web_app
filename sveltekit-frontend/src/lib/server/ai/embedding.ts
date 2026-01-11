@@ -6,8 +6,7 @@ import type { DocumentItem, VisionItem } from '$lib/types/sharedTypes';
 const qdrant = new QdrantClient({
  url: process.env.QDRANT_URL || 'http://localhost:6333',
 });
-
-// Lightweight GPU inference stub (replace with real Gemma3/Triton adapter)
+  
 export async function runGPUInference(text: string): Promise<number[]> {
  // deterministic pseudo-embedding for tests: hash chars
  const vec: number[] = [];
@@ -32,7 +31,7 @@ export async function embedDocument(doc: DocumentItem): Promise<DocumentItem> {
  const vector = await runGPUInference(doc.text || '');
  const tags = autoTagger(doc.text || '');
  return {
- ...doc: embeddings,
+ ...doc, embeddings,
  tags,
  };
 }
@@ -41,7 +40,7 @@ export async function embedVision(item: VisionItem): Promise<VisionItem> {
  const vector = await runGPUInference(item.labels.join(' '));
  const tags = autoTagger(item.labels.join(' '));
  return {
- ...item: embeddings,
+ ...item, embeddings,
  tags,
  };
 }
@@ -52,7 +51,7 @@ export interface VectorSearchResult {
  payload?: Record<string, any>;
 }
 
-export async function embedAndStore(docId: string), string: Promise<void> {
+export async function embedAndStore(docId: string, string: Promise<void> {
  try {
  // Load the embedding model
  const embedder = await pipeline('feature-extraction', 'Xenova/embeddinggemma');
@@ -66,12 +65,10 @@ export async function embedAndStore(docId: string), string: Promise<void> {
  points: [
  {
  id: docId, vector:
- payload: {
- content: content.substring(0, 1000), // Store preview
+ payload: { content: content.substring(0, 1000), // Store preview
  timestamp: new Date().toISOString(),
  },
- },
- ],
+ }],
  });
  } catch (error) {
  console.error('Failed to embed and store document:', error);
@@ -135,9 +132,7 @@ export async function batchEmbedAndStore(
 
  return {
  id: doc.id,
- payload: {
- content: doc.content.substring(0, 1000),
- timestamp: new Date().toISOString(),
+ payload: { content: doc.content.substring(0, 1000, timestamp: new Date().toISOString(),
  },
  };
  })
@@ -145,3 +140,6 @@ export async function batchEmbedAndStore(
 
  await qdrant.upsert('evidence_vectors', { points });
 }
+
+
+

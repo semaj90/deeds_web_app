@@ -1,23 +1,18 @@
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 
 export interface SSEConnectionState {
- isConnected: boolean;
- isConnecting: boolean;
+ isConnected: boolean; isConnecting: boolean;
  error: string | null;
  lastMessageTime: Date | null;
- reconnectAttempts: number;
- maxReconnectAttempts: number;
+ reconnectAttempts: number; maxReconnectAttempts: number;
  reconnectDelay: number;
 }
 
 export interface ProcessingEvent {
  stage: 'imagemagick' | 'esrgan' | 'sam' | 'granite_docling' | 'tesseract_fallback';
- status: string;
- page: number;
- pages_total: number;
- percent: number;
- eta: number;
- details: string;
+ status: string; page: number;
+ pages_total: number; percent: number;
+ eta: number; details: string;
  timestamp: string;
  confidence?: number;
 }
@@ -46,7 +41,7 @@ function createSSEStatusStore() {
  try {
  const headers: Record<string, string> = {};
  if (token) {
- headers['Authorization'] = `Bearer ${token}`;
+ headers['Authorization'] = `Bearer ${ token }`;
  }
 
  eventSource = new EventSource(endpoint);
@@ -104,7 +99,7 @@ function createSSEStatusStore() {
 
  callback(data);
  } catch (error) {
- console.error(`[SSE] Error parsing ${eventType} event:`, error);
+ console.error(`[SSE] Error parsing ${ eventType } event:`, error);
  }
  });
  },
@@ -224,3 +219,6 @@ export const connectionStatus = derived(sseStatusStore, ($state) => {
  if ($state.error) return `Error: ${$state.error}`;
  return 'Disconnected';
 });
+
+
+

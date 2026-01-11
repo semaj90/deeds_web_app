@@ -78,15 +78,12 @@ export const GET: RequestHandler = async () => {
  *
  * @param data - Health change event data
  */
-export function broadcastHealthChange(data: {
-  routeId: string;
-  oldStatus: string;
-  newStatus: string;
+export function broadcastHealthChange(data: { routeId: string;
+  oldStatus: string; newStatus: string;
   timestamp: string;
   reason?: string;
 }) {
-  const message = `data: ${JSON.stringify({
-    type: 'health_change',
+  const message = `data: ${JSON.stringify({ type: 'health_change',
     ...data,
   })}\n\n`;
 
@@ -116,15 +113,12 @@ export function broadcastHealthChange(data: {
  *
  * @param data - Error count change event data
  */
-export function broadcastErrorCountChange(data: {
-  routeId: string;
+export function broadcastErrorCountChange(data: { routeId: string;
   errorCount: number;
   warningCount?: number;
-  infoCount?: number;
-  timestamp: string;
+  infoCount?: number; timestamp: string;
 }) {
-  const message = `data: ${JSON.stringify({
-    type: 'error_count_change',
+  const message = `data: ${JSON.stringify({ type: 'error_count_change',
     ...data,
   })}\n\n`;
 
@@ -146,4 +140,8 @@ export function broadcastErrorCountChange(data: {
 export function getConnectionCount(): number {
   return connections.size;
 }
+
+
+
+
 

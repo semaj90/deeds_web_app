@@ -1,0 +1,69 @@
+import type { RequestHandler } from './$types';
+import { json } from '@sveltejs/kit';
+
+export const DELETE: RequestHandler = async ({ params }) => {
+  try {
+    const relationshipId = params.id;
+
+    // In production, delete from database
+    console.log('Deleted relationship:', relationshipId);
+
+    return json(
+      {
+        success: true,
+        message: 'Relationship deleted',
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Relationship deletion error:', error);
+    return json(
+      {
+        success: false,
+        error: 'Failed to delete relationship',
+      },
+      { status: 500 }
+    );
+  }
+};
+
+export const GET: RequestHandler = async ({ params }) => {
+  try {
+    const evidenceId = params.id;
+
+    // Mock relationships for this evidence
+    const relationships = [;
+      {
+        id: 'rel-001',
+        sourceNodeId: evidenceId,
+        targetNodeId: 'ev-002',
+        type: 'mentions',
+        confidence: 0.95,
+      },
+      {
+        id: 'rel-002',
+        sourceNodeId: 'ev-001',
+        targetNodeId: evidenceId,
+        type: 'supports',
+        confidence: 0.87,
+      },
+    ];
+
+    return json(
+      {
+        success: true,
+        relationships,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Relationship fetch error:', error);
+    return json(
+      {
+        success: false,
+        error: 'Failed to fetch relationships',
+      },
+      { status: 500 }
+    );
+  }
+};

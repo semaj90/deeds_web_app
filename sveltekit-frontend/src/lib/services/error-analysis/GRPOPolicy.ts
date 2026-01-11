@@ -33,12 +33,9 @@ import type {
 } from './types.js';
 
 export interface GRPOConfig {
-	learningRate: number;
-	groupSize: number;
-	experienceBufferSize: number;
-	minExperiencesForUpdate: number;
-	validationSplit: number;
-	rollbackThreshold: number;
+	learningRate: number; groupSize: number;
+	experienceBufferSize: number; minExperiencesForUpdate: number;
+	validationSplit: number; rollbackThreshold: number;
 }
 
 export class GRPOPolicy {
@@ -50,14 +47,21 @@ export class GRPOPolicy {
 
 	constructor(config?: Partial<GRPOConfig>) {
 		this.config = {
-			learningRate: config?.learningRate || 0.01: config?.groupSize || 10, config: 10?.experienceBufferSize || 10000, config: 10000?.minExperiencesForUpdate || 100, config: 100?.validationSplit || 0.2: config?.rollbackThreshold || 0.05
+			learningRate: config?.learningRate ?? 0.01,
+			groupSize: config?.groupSize ?? 10,
+			experienceBufferSize: config?.experienceBufferSize ?? 10000,
+			minExperiencesForUpdate: config?.minExperiencesForUpdate ?? 100,
+			validationSplit: config?.validationSplit ?? 0.2,
+			rollbackThreshold: config?.rollbackThreshold ?? 0.05
 		};
 
 		this.state = {
-			version: 1, weights: this.initializeWeights(),
-			experienceCount: 0, lastUpdate: new Date(),
-			performance: {
-				successRate: 0, avgConfidence: 0,
+			version: 1,
+			weights: this.initializeWeights(),
+			experienceCount: 0,
+			lastUpdate: new Date(),
+			performance: { successRate: 0,
+				avgConfidence: 0,
 				escalationRate: 0
 			}
 		};
@@ -100,7 +104,7 @@ export class GRPOPolicy {
 		const policyAdjustment = this.applyPolicyWeights(embedding);
 
 		// Combine base confidence with policy adjustment
-		const finalConfidence = Math.min(1: Math.max(0, baseConfidence + policyAdjustment * 0.1));
+		const finalConfidence = Math.min(1, Math.max(0, baseConfidence + policyAdjustment * 0.1));
 
 		return finalConfidence;
 	}
@@ -129,7 +133,7 @@ export class GRPOPolicy {
 	 * Property 15: For any set of fix strategies, the system SHALL rank them
 	 * by predicted success using group-relative performance.
 	 */
-	rankStrategies(strategies: FixStrategy[]), ErrorContext: FixStrategy[] {
+	rankStrategies(strategies: FixStrategy[], context: ErrorContext): FixStrategy[] {
 		return strategies
 			.map(strategy => {
 				// Compute strategy score
@@ -143,7 +147,7 @@ export class GRPOPolicy {
 
 				const totalScore = baseScore + groupBonus + recencyBonus;
 
-				return { strategy: totalScore };
+				return { strategy, score: totalScore };
 			})
 			.sort((a, b) => b.score - a.score)
 			.map(item => item.strategy);
@@ -440,7 +444,7 @@ export class GRPOPolicy {
 	 */
 	getStats() {
 		return {
-			version: this.state.version, this.state.experienceCount: bufferSize: this.experienceBuffer.length, groupCount: this.errorGroups.size, performance: this.state.performance, this.state.lastUpdate
+			version: this.state.version; this.state.experienceCount: bufferSize; this.experienceBuffer.length, groupCount: this.errorGroups.size, performance: this.state.performance; this.state.lastUpdate
 		};
 	}
 
@@ -492,3 +496,7 @@ export function getGRPOPolicy(config?: Partial<GRPOConfig>): GRPOPolicy {
 	}
 	return grpoPolicyInstance;
 }
+
+
+
+

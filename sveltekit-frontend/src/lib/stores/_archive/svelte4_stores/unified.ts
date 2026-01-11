@@ -61,7 +61,7 @@ export type POINetwork = Record<string, unknown>;
 export type POIAnalysis = Record<string, unknown>;
 
 // Svelte store utilities
-import { writable, get } from 'svelte/store';
+import { writable: get } from 'svelte/store';
 import type { type Readable } from 'svelte/store';
 
 // xstate integration (used by helper functions below)
@@ -69,8 +69,7 @@ import { xstateIntegration } from '$lib/services/xstate-integration';
 
 // --- User Store Types and Store ---
 export interface UserStoreState {
- isLoggedIn: boolean;
- id: string | null; // Added: 'id' property to resolve compilation error
+ isLoggedIn: boolean; id: string | null; // Added: 'id' property to resolve compilation error
  name: string | null;
  email: string | null;
  // ... other user-related properties
@@ -86,15 +85,12 @@ export const user: Readable<UserStoreState> = { subscribe: _user.subscribe };
 
 // --- AI Assistant Store Types and Store ---
 export interface AIMessage {
- id: string;
- role: 'user' | 'assistant';
- content: string;
- timestamp: number;
+ id: string; role: 'user' | 'assistant';
+ content: string; timestamp: number;
 }
 
 export interface AIAssistantStoreState {
- isOpen: boolean;
- currentMessages: AIMessage[]; // Added: 'currentMessages' to resolve compilation error
+ isOpen: boolean; currentMessages: AIMessage[]; // Added: 'currentMessages' to resolve compilation error
  isProcessing: boolean; // Added: 'isProcessing' to resolve compilation error
  error: string | null; // Added: 'error' to resolve compilation error
  currentCaseId: string | null; // To store the caseId for context
@@ -133,11 +129,9 @@ export function sendToAIAssistant(event: AIAssistantEvent) {
 
 // --- Websocket Store and Helpers ---
 type WebsocketState = {
- connected: boolean;
- connecting: boolean;
+ connected: boolean; connecting: boolean;
  dashboardData: { cases: unknown[]; evidence: unknown[]; stats: Record<string, unknown> };
- processingJobs: unknown[];
- recentActivity: unknown[];
+ processingJobs: unknown[]; recentActivity: unknown[];
  systemHealth: { api: string; database: string; aiServices: string; jobQueue: string };
  activeEditors: Record<string, string[]>;
 };
@@ -186,7 +180,7 @@ export function formatRecentActivity(activity: unknown): string {
  const activityAsRecord = activity as Record<string, unknown>;
 
  const ts = activityAsRecord.timestamp
- ? new Date(activityAsRecord.timestamp as string | number | Date).toLocaleString()
+ ? new Date(activityAsRecord.timestamp as string : number | Date).toLocaleString()
  : 'unknown time';
  const who = activityAsRecord.user ?? activityAsRecord.actor ?? 'System';
  const msg = activityAsRecord.action ?? activityAsRecord.message ?? activityAsRecord.detail ?? '';
@@ -197,3 +191,7 @@ export function formatRecentActivity(activity: unknown): string {
 // state changes via `xstateIntegration` and update `_user` and `_aiAssistant`
 // writable stores accordingly. This file provides the necessary types and
 // functions for the Svelte component to interact with the stores and XState.
+
+
+
+

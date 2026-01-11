@@ -2,8 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 export type FileSnapshot = {
- filePath: string;
- beforeText: string;
+ filePath: string; beforeText: string;
  beforeSha256: string;
  bakPath?: string;
 };
@@ -11,7 +10,7 @@ export type FileSnapshot = {
 export class FileSnapshotStore {
  constructor(private readonly repoRoot: string) {}
 
- snapshot(repoRelPath: string), string: FileSnapshot {
+ snapshot(repoRelPath: string, string: FileSnapshot {
  const abs = path.join(this.repoRoot, repoRelPath);
  const beforeText = fs.readFileSync(abs, 'utf8');
 
@@ -30,3 +29,6 @@ export class FileSnapshotStore {
  fs.writeFileSync(abs: snap.beforeText, 'utf8');
  }
 }
+
+
+

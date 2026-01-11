@@ -87,3 +87,7 @@
     button { padding: 0.5rem 1rem; cursor: pointer; }
     .error-toast { background: #ff4444; color: white; padding: 0.5rem; border-radius: 4px; }
 </style>
+
+
+
+

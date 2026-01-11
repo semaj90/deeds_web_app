@@ -17,34 +17,28 @@ export const load: PageServerLoad = async ({ locals }) => {
  id: 'case-1',
  title: 'Corporate Espionage Investigation',
  status: 'active',
- createdAt: new Date('2024-01-15T00'),
- priority: 'high',
+ createdAt: new Date('2024-01-15T00', priority: 'high',
  },
  {
  id: 'case-2',
- title: 'Missing Person: Dr. Sarah Chen',
+ title: 'Missing, Person: Dr. Sarah Chen',
  status: 'active',
- createdAt: new Date('2024-01-16T00'),
- priority: 'medium',
- },
- ] as const;
+ createdAt: new Date('2024-01-16T00', priority: 'medium',
+ }] as const;
 
  const recentEvidence = [
  {
  id: 'evidence-1',
  title: 'Security Camera Footage',
  evidenceType: 'video',
- createdAt: new Date('2024-01-15T00'),
- caseTitle: 'Corporate Espionage Investigation',
+ createdAt: new Date('2024-01-15T00', caseTitle: 'Corporate Espionage Investigation',
  },
  {
  id: 'evidence-2',
  title: 'Witness Statement - John Doe',
  evidenceType: 'document',
- createdAt: new Date('2024-01-16T00'),
- caseTitle: 'Missing Person: Dr. Sarah Chen',
- },
- ] as const;
+ createdAt: new Date('2024-01-16T00', caseTitle: 'Missing, Person: Dr. Sarah Chen',
+ }] as const;
 
  const systemData = {
  activeCases: 12,
@@ -63,3 +57,5 @@ export const load: PageServerLoad = async ({ locals }) => {
  throw error(500, 'Failed to load dashboard data');
  }
 };
+
+

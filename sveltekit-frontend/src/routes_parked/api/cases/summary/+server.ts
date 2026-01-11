@@ -17,7 +17,7 @@ import type { CaseSummaryRequest, CaseSummaryResponse } from '$lib/types/case-su
 /**
  * POST: Generate a new case summary (async job)
  */
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  try {
  const user = await getUser(locals);
  if (!user) {
@@ -55,8 +55,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  includeTimeline,
  analysisDepth,
  });
-
- // Log the summary generation request
+  
  await auditService.logSummaryOperation(
  user.id,
  caseId,
@@ -87,7 +86,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 /**
  * GET: Retrieve current summary
  */
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url: locals }) => {
  try {
  const user = await getUser(locals);
  if (!user) {
@@ -119,3 +118,5 @@ export const GET: RequestHandler = async ({ url, locals }) => {
  );
  }
 };
+
+

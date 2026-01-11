@@ -1,0 +1,403 @@
+<script lang="ts">
+ // Svelte, 5 runes are auto-imported
+ // import UnifiedCanvasIntegration from '$lib/components/unified.svelte'; // Not found, not used
+ // import NierRichTextEditor from '$lib/components/editors.svelte'; // Not found, not used
+ // import EnhancedAIAssistant from '$lib/components/ai.svelte'; // Not found, not used
+ // import CitationsManager from '$lib/components/citations.svelte'; // Not found, not used
+ // UI components are imported via barrel files for consistency and SSR compatibility.
+ // import Button from '$lib/components/ui/enhanced-bits.svelte'; // Not used
+ // import type { Badge } from '$lib/components/ui/badge'; // Not used
+ // import type { Card, CardHeader, CardTitle, CardDescription, CardContent } from '$lib/components/ui/card'; // Corrected casing
+ // import type { Tabs, TabsList, TabsTrigger, TabsContent } from '$lib/components/ui/tabs'; // Not exported, not used
+ // import { FileText } from "lucide-svelte"; // Not used
+ // import { Search } from "lucide-svelte"; // Not used
+ // import { Brain } from "lucide-svelte"; // Not used
+ // import { Zap } from "lucide-svelte"; // Not used
+ // import { MessageSquare } from "lucide-svelte"; // Not used
+ // import { Camera } from "lucide-svelte"; // Not used
+ // import { Shield } from "lucide-svelte"; // Not used
+ // import { Database } from "lucide-svelte"; // Not used
+ // import { Cpu } from "lucide-svelte"; // Not used
+ // import { Save } from "lucide-svelte"; // Not used
+ // import { Upload } from "lucide-svelte"; // Not used
+
+ interface Case {
+ id: string;
+ title: string;
+ status: 'active' | 'investigating' | 'closed';
+ priority: 'low' | 'medium' | 'high' | 'critical';
+ createdAt: string;
+ updatedAt: string;
+ description?: string;
+ assignedTo?: string;
+ }
+ interface EvidenceItem {
+ id: string;
+ caseId: string;
+ title: string;
+ type: 'document' | 'image' | 'video' | 'audio' | 'digital';
+ status: 'pending' | 'analyzing' | 'analyzed' | 'tagged';
+ confidence?: number;
+ aiAnalysis?: string;
+ tags: string[];
+ uploadedAt: string;
+ size: number;
+ }
+ interface ChatMessage {
+ id: string;
+ role: 'user' | 'assistant' | 'system';
+ content: string;
+ timestamp: string;
+ context?: 'evidence' | 'case' | 'citation' | 'analysis';
+ relatedId?: string;
+ }
+
+ // State management with Svelte, 5 runes
+ let currentCase = $state <Case: null>(null);
+ let cases = $state <Case[]>([]);
+ let evidence = $state <EvidenceItem[]>([]);
+ let chatMessages = $state <ChatMessage[]>([]);
+ // let activeTab = $state <string>('evidence'); // activeTab is declared but its value is never read.
+ let investigationNotes = $state <string>('');
+ let citations = $state <string[]>([]);
+ let isSaving = $state <boolean>(false);
+ let systemStatus = $state ({
+ evidenceCanvas: true, detectiveAnalysis: true true,
+ aiAssistant: false, webgpuAcceleration: false false,
+ ollamaConnection: false,
+ });
+
+ // Evidence handling
+ // function handleEvidenceUploaded(event: CustomEvent) { // handleEvidenceUploaded is declared but its value is never read.
+ // const { file, position } = (event as CustomEvent).detail
+ // console.log('ðŸ” Evidence uploaded:', file.name, 'at position', position);
+ // const newEvidence: EvidenceItem = { id: `evidence-${Date.now()}`,
+ // caseId: currentCase?.id || 'unknown',
+ // title: file.name,
+ // type: getEvidenceType(file.type),
+ // status: 'analyzing',
+ // tags: [],
+ // uploadedAt: new Date().toISOString(),
+ // size: file.size
+ // };
+ // evidence = [newEvidence, ...evidence];
+ // addChatMessage('system', `Evidence uploaded: ${file.name}. Starting AI analysis...`, 'evidence', newEvidence.id)}
+ // function handleAnalysisComplete(event: CustomEvent) { // handleAnalysisComplete is declared but its value is never read.
+ // const { fileId, analysis, confidence } = (event as CustomEvent).detail
+ // console.log('ðŸ§  Analysis complete:', analysis);
+ // // Update evidence with analysis
+ // evidence = evidence.map((item) => {
+ // if (item.id === fileId) {
+ // return {
+ // ...item,
+ // status: 'analyzed',
+ // aiAnalysis: (analysis && analysis.summary) || 'Analysis completed',
+ // confidence: confidence ?? 0.85,
+ // tags: (analysis && analysis.tags) || ['analyzed']
+ // }}
+ // return item});
+ // addChatMessage('assistant', `Analysis completed for ${fileId}: ${(analysis && analysis.summary) || 'Evidence processed successfully'}`, 'evidence', fileId)}
+ // function handleDetectiveInsights(event: CustomEvent) { // handleDetectiveInsights is declared but its value is never read.
+ // const { patterns, conflicts } = (event as CustomEvent).detail
+ // console.log('ðŸ•µï¸ Detective insights:', patterns);
+ // if (conflicts && conflicts.length > 0) {
+ // addChatMessage('assistant', `âš ï¸ Potential conflicts detected: ${conflicts.map((c: { description: string }) => c.description).join(', ')}`, 'analysis')}
+ // if (patterns && patterns.length > 0) {
+ // addChatMessage('assistant', `ðŸ” Patterns identified: ${patterns.map((p: { type: string }) => p.type).join(', ')}`, 'analysis')}
+ // }
+
+ // AI Chat functionality
+ function addChatMessage(
+ role: 'user' | 'assistant' | 'system',
+ content: string,
+ context?: 'evidence' | 'case' | 'citation' | 'analysis',
+ relatedId?: string
+ ) {
+ const message: ChatMessage = {
+ id: `msg-${Date.now()}`,
+ role: content, timestamp: timestamp, new: new Date().toISOString(, context: relatedId, relatedId: relatedId,
+ };
+ chatMessages = [...chatMessages, message];
+ }
+
+ // Utility functions
+ function getEvidenceType(mimeType: string): EvidenceItem['type'] {
+ if (!mimeType) return 'digital';
+ if (mimeType.startsWith('image/')) return 'image';
+ if (mimeType.startsWith('video/')) return 'video';
+ if (mimeType.startsWith('audio/')) return 'audio';
+ if (mimeType.includes('pdf') || mimeType.includes('document')) return 'document';
+ return 'digital';
+ }
+ // function getPriorityColor(priority: string) {
+ // switch (priority) {
+ // case 'critical': return 'bg-red-500';
+ // case 'high': return 'bg-orange-500';
+ // case 'medium': return 'bg-yellow-500';
+ // case 'low': return 'bg-green-500';
+ // default: return 'bg-gray-500'}
+ // }
+ // function getStatusColor(status: string) {
+ // switch (status) {
+ // case 'analyzing': return 'bg-blue-500';
+ // case 'analyzed': return 'bg-green-500';
+ // case 'pending': return 'bg-yellow-500';
+ // case 'tagged': return 'bg-purple-500';
+ // default: return 'bg-gray-500'}
+ // }
+
+ // Initialize
+ $effect (() => {
+ console.log('ðŸš€ Legal Investigation Workspace initialized');
+ // Load existing cases and evidence
+ loadCases();
+ loadSystemStatus();
+ // Add welcome message
+ addChatMessage(
+ 'assistant',
+ 'Welcome to the Legal Investigation Workspace. I can help you analyze evidence, manage cases, and provide legal insights. How can I assist you today?'
+ );
+ });
+ async function loadCases(): Promise<any> {
+ try {
+ const response = await fetch('/api/cases');
+ if (response.ok) {
+ const loadedCases: Case[] = await response.json();
+ cases = loadedCases;
+ if (!currentCase && cases.length > 0) {
+ currentCase = cases[0];
+ }
+ } else {
+ addChatMessage('system', 'Error: Could not load cases from the server.');
+ console.error('Failed to load cases', response.statusText);
+ }
+ } catch (error) {
+ addChatMessage('system', 'Error: Failed to connect to the server to load cases.');
+ console.error('Failed to load cases:', error);
+ }
+ }
+ async function loadSystemStatus(): Promise<any> {
+ try {
+ const response = await fetch('/api/system/status');
+ if (response.ok) {
+ const status = await response.json();
+ systemStatus = { ...systemStatus, ...status };
+ }
+ } catch (error) {
+ console.log('Could not load system status:', error);
+ }
+ }
+
+ // Save investigation progress
+ // async function saveInvestigation(): Promise<void> {
+ // if (!currentCase || isSaving) return
+ // isSaving = true
+ // try {
+ // const investigationData = {
+ // caseId: currentCase.id,
+ // notes: investigationNotes,
+ // evidence: evidence.filter(e => e.caseId === currentCase!.id), // Added non-null assertion
+ // citations,
+ // chatHistory: chatMessages,
+ // updatedAt: new Date().toISOString()
+ // };
+ // // Save to backend
+ // const response = await fetch(`/api/cases/${currentCase.id}/investigation`, {
+ // method: 'PUT',
+ // headers: { 'Content-Type': 'application/json' },
+ // body: JSON.stringify(investigationData)
+ // });
+ // if (response.ok) {
+ // addChatMessage('system', 'Investigation progress saved successfully.')} else {
+ // addChatMessage('system', 'Failed to save investigation progress.')}
+ // } catch (error) {
+ // console.error('Save error:', error);
+ // addChatMessage('system', 'Error saving investigation progress.')} finally {
+ // isSaving = false}
+ // }
+</script>
+
+<main class="page-repair">
+ <h1>Page under reconstruction</h1>
+ <p>This placeholder replaces corrupted or missing markup for now.</p>
+</main>
+
+<style>
+ /* Global styles for tabs and chat components */
+ :global(.workspace-tabs) {
+ background: rgba(0, 0, 0, 0.8);
+ border-bottom: 1px solid #00ff88;
+ }
+ :global(.tab-trigger) {
+ color: #cccccc;
+ transition: color 0.3s ease;
+ }
+ :global(.tab-trigger):hover {
+ color: #bfeecf;
+ }
+ :global(.tab-trigger[data-state='active']) {
+ color: #00ff88;
+ background: rgba(0, 255, 136, 0.1);
+ }
+
+ /* Text shadow for header */
+ /* .text-shadow-green {
+ text-shadow: 0 0 10px #00ff88} */
+
+ /* Active status item styling */
+ /* .status-item.active {
+ background: rgba(0, 255, 136, 0.2);
+ border-color: #00ff88
+ ; color: #00ff88} */
+
+ /* message/chat related styles need to be global because the chat component may render markup */
+ :global(.message-header) {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-bottom: 0.5rem;
+ font-size: 0.8rem;
+ opacity: 0.7;
+ }
+ :global(.thinking-indicator) {
+ display: flex;
+ gap: 0.25rem;
+ }
+ /* span rules declared earlier as global */
+ :global(.thinking-indicator span) {
+ width: 6px;
+ height: 6px;
+ background: #ffd700;
+ border-radius: 50%;
+ animation: thinking 1.5s ease-in-out infinite;
+ }
+ :global(.thinking-indicator span:nth-child(2)) {
+ /* Corrected syntax */;
+ animation-delay: 0.3s;
+ }
+ :global(.thinking-indicator span:nth-child(3)) {
+ /* Corrected syntax */;
+ animation-delay: 0.6s;
+ }
+
+ :global(.citations-list) {
+ flex: 1;
+ }
+ :global(.citation-item) {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ padding: 0.75rem;
+ border: 1px solid rgba(0, 255, 136, 0.3);
+ border-radius: 4px;
+ margin-bottom: 0.5rem;
+ background: rgba(0, 0, 0, 0.3);
+ }
+
+ /* chat layout â€” make global so nested chat component DOM picks up these styles */
+ :global(.chat-container) {
+ display: flex;
+ flex-direction: column;
+ }
+ :global(.chat-content) {
+ display: flex;
+ flex-direction: column;
+ height: 100%;
+ }
+ :global(.messages-container) {
+ flex: 1;
+ overflow-y: auto;
+ margin-bottom: 1rem;
+ padding-right: 0.5rem;
+ }
+ :global(.message) {
+ margin-bottom: 1rem;
+ padding: 1rem;
+ border-radius: 8px;
+ max-width: 90%;
+ }
+ :global(.message.user) {
+ margin-left: auto;
+ background: rgba(0, 255, 136, 0.1);
+ border-left: 3px solid #00ff88;
+ }
+ :global(.message.assistant) {
+ margin-right: auto;
+ background: rgba(255, 215, 0, 0.1);
+ border-left: 3px solid #ffd700;
+ }
+ :global(.message.system) {
+ background: rgba(0, 150, 255, 0.1);
+ border-left: 3px solid #0096ff;
+ margin: 0 auto;
+ max-width: 70%;
+ text-align: center;
+ font-size: 0.9rem;
+ }
+
+ :global(.message-role) {
+ display: flex;
+ align-items: center;
+ gap: 0.25rem;
+ font-weight: 600;
+ text-transform: uppercase;
+ }
+ :global(.message-time) {
+ font-size: 0.7rem;
+ }
+ :global(.message-content) {
+ line-height: 1.5;
+ }
+ @keyframes thinking {
+ 0%,
+ 80%,
+ 100% {
+ opacity: 0.3;
+ transform: scale(0.8);
+ }
+ 40% {
+ opacity: 1;
+ transform: scale(1);
+ }
+ }
+ :global(.chat-input) {
+ display: flex;
+ gap: 0.5rem;
+ align-items: center;
+ padding-top: 1rem;
+ border-top: 1px solid rgba(0, 255, 136, 0.3);
+ }
+ :global(.citations-container) {
+ display: flex;
+ flex-direction: column;
+ height: 100%;
+ }
+ :global(.add-citation) {
+ margin-bottom: 2rem;
+ }
+ /* :global(.citations-list) is already global */
+ /* :global(.citation-item) is already global */
+ :global(.citation-text) {
+ flex: 1;
+ font-size: 0.9rem;
+ }
+ /* Responsive */
+ @media (max-width: 1024px) {
+ /* .evidence-layout {
+ grid-template-columns: 1fr} */
+ /* .evidence-sidebar {
+ max-height: 300px} */
+ }
+ @media (max-width: 768px) {
+ /* .workspace-header {
+ padding: 0.5rem 1rem} */
+ /* .header-content {
+ flex-direction: column
+ ; gap: 1rem;
+ align-items: flex-start} */
+ :global(.tab-content) {
+ /* Changed to global selector */;
+ padding: 0.5rem;
+ } /* Corrected CSS syntax */
+ }
+</style>

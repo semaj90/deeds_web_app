@@ -1,69 +1,75 @@
 <script lang="ts" module>
-	// Re-export sub-components for compound component pattern
-	export { default as Content } from './SelectContent.svelte';
-	export { default as Group } from './SelectGroup.svelte';
-	export { default as Item } from './SelectItem.svelte';
-	export { default as Label } from './SelectLabel.svelte';
-	export { default as Root } from './SelectRoot.svelte';
-	export { default as Separator } from './SelectSeparator.svelte';
-	export { default as Trigger } from './SelectTrigger.svelte';
-	export { default as Value } from './SelectValue.svelte';
+  export { default as Content } from "./SelectContent.svelte";
+  export { default as Group } from "./SelectGroup.svelte";
+  export { default as Item } from "./SelectItem.svelte";
+  export { default as Label } from "./SelectLabel.svelte";
+  export { default as Root } from "./SelectRoot.svelte";
+  export { default as Separator } from "./SelectSeparator.svelte";
+  export { default as Trigger } from "./SelectTrigger.svelte";
+  export { default as Value } from "./SelectValue.svelte";
 </script>
 
 <script lang="ts">
-	import type { Snippet } from 'svelte';
-	import SelectContent from './SelectContent.svelte';
-	import SelectItem from './SelectItem.svelte';
-	import SelectRoot from './SelectRoot.svelte';
-	import SelectTrigger from './SelectTrigger.svelte';
-	import SelectValue from './SelectValue.svelte';
-	import type { SelectOption, SelectRootProps } from './types';
+  import { Select as BitsSelect } from "bits-ui";
+  import type { Snippet } from "svelte";
+  import Content from "./SelectContent.svelte";
+  import Item from "./SelectItem.svelte";
+  import Root from "./SelectRoot.svelte";
+  import Trigger from "./SelectTrigger.svelte";
+  import Value from "./SelectValue.svelte";
 
-	/**
-	 * Convenient all-in-one Select component
-	 * For more control, use the individual sub-components (Select.Root, Select.Content, etc.)
-	 */
-	interface Props extends SelectRootProps {
-		children?: Snippet;
-		options?: SelectOption[];
-	}
+  interface SelectOption {
+    value: string; label: string;
+    disabled?: boolean;
+  }
 
-	let {
-		value = $bindable(''),
-		defaultValue,
-		onValueChange,
-		disabled = false,
-		required = false,
-		name,
-		children,
-		options = [],
-		class: className = '',
-		placeholder = 'Select...',
-	}: Props = $props();
+  interface Props {
+    value?: string;
+    onValueChange?: (value: string) => void;
+    disabled?: boolean;
+    name?: string;
+    required?: boolean;
+    class?: string;
+    placeholder?: string;
+    options?: SelectOption[];
+    children?: Snippet;
+  }
 
-	// Build labels map from options
-	const labels = $derived(
-		options.reduce((acc, opt) => {
-			acc[opt.value] = opt.label;
-			return acc;
-		}, {} as Record<string, string>)
-	);
+  let {
+    value = $bindable(""),
+    onValueChange,
+    disabled = false,
+    name,
+    required = false,
+    class: className = "",
+    placeholder = "Select...",
+    options = [],
+    children,
+  }: Props = $props();
+
+  const selectedLabel = $derived(
+    options.find((opt) => opt.value === value)?.label
+  );
 </script>
 
-<SelectRoot bind:value {defaultValue} {onValueChange} {disabled} {required} {name} class={className} {placeholder}>
-	<SelectTrigger>
-		<SelectValue {placeholder} {labels} />
-	</SelectTrigger>
-	<SelectContent>
-		{#if options.length > 0}
-			{#each options as option}
-				<SelectItem value={option.value} disabled={option.disabled}>
-					{option.label}
-				</SelectItem>
-			{/each}
-		{/if}
-		{#if children}
-			{@render children()}
-		{/if}
-	</SelectContent>
-</SelectRoot>
+<Root bind:value {disabled} {name} {required} {onValueChange}>
+  <Trigger class={className}>
+    <Value {placeholder} />
+  </Trigger>
+  <BitsSelect.Portal>
+    <Content>
+      {#if options.length > 0}
+        {#each options as option (option.value)}
+          <Item value={option.value} label={option.label} disabled={option.disabled} />
+        {/each}
+      {/if}
+      {#if children}
+        {@render children()}
+      {/if}
+    </Content>
+  </BitsSelect.Portal>
+</Root>
+
+
+
+

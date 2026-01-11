@@ -6,8 +6,11 @@ declare module '$lib/server/webgpu-redis-optimizer.js' {
  data: Float32Array,
  options: { compress: boolean; priority: string; parallel: boolean }
  ): Promise<unknown>;
- getOptimizationStats(): Promise<{
- gpuMetrics: { tensorCoreLoad: number; thermalStatus: string };
+ getOptimizationStats(): Promise<{ gpuMetrics: { tensorCoreLoad: number; thermalStatus: string };
  }>;
  }
 }
+
+
+
+

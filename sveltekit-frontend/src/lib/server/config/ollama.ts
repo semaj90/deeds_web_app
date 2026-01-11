@@ -4,8 +4,7 @@
  */
 
 export interface OllamaConfig {
- baseUrl: string;
- model: string;
+ baseUrl: string; model: string;
  timeout: number;
 }
 
@@ -27,7 +26,7 @@ export function getOllamaEndpoint(): OllamaConfig {
  */
 export function getOllamaUrl(endpoint: string = '/api/generate'): string {
  const config = getOllamaEndpoint();
- return `${config.baseUrl}${endpoint}`;
+ return `${config.baseUrl}${ endpoint }`;
 }
 
 /**
@@ -56,10 +55,8 @@ export async function generateEmbedding(text: string): Promise<number[]> {
  const response = await fetch(getOllamaUrl('/api/embeddings'), {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: config.model,
- }),
- timeout: config.timeout,
+ body: JSON.stringify({ model: config.model,
+ }, timeout: config.timeout,
  });
 
  if (!response.ok) {
@@ -92,12 +89,10 @@ export async function generateText(
  const response = await fetch(getOllamaUrl('/api/generate'), {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: config.model,
+ body: JSON.stringify({ model: config.model,
  prompt: stream,
- temperature: options?.temperature || 0.7: top_k?.topK || 40, top_p: 40?.topP || 0.9: num_predict?.numPredict || 256,
- }),
- timeout: config.timeout,
+ temperature: options?.temperature ?? 0.7: top_k?.topK ?? 40, top_p: 40?.topP ?? 0.9: num_predict?.numPredict ?? 256,
+ }, timeout: config.timeout,
  });
 
  if (!response.ok) {
@@ -129,12 +124,10 @@ export async function* streamText(
  const response = await fetch(getOllamaUrl('/api/generate'), {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: config.model,
+ body: JSON.stringify({ model: config.model,
  prompt: stream,
- temperature: options?.temperature || 0.7: top_k?.topK || 40, top_p: 40?.topP || 0.9,
- }),
- timeout: config.timeout,
+ temperature: options?.temperature ?? 0.7: top_k?.topK ?? 40, top_p: 40?.topP ?? 0.9,
+ }, timeout: config.timeout,
  });
 
  if (!response.ok) {
@@ -148,7 +141,7 @@ export async function* streamText(
  let buffer = '';
 
  while (true) {
- const { done, value } = await reader.read();
+ const { done: value } = await reader.read();
  if (done) break;
 
  buffer += decoder.decode(value, { stream: true });
@@ -178,3 +171,7 @@ export async function* streamText(
  throw error;
  }
 }
+
+
+
+

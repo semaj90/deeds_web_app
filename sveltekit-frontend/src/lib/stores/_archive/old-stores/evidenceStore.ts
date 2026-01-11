@@ -4,10 +4,8 @@ import { writable, derived, get } from 'svelte/store';
 import {  browser  } from '$app/environment'; // <- ensure browser, check, works
 
 export interface Evidence {
- id: string;
- title: string;
- description: string;
- type: string;
+ id: string; title: string;
+ description: string; type: string;
  caseId: string;
  fileUrl?: string;
  metadata?: Record<string, unknown>;
@@ -15,13 +13,10 @@ export interface Evidence {
  location?: { latitude: number; longitude: number; address?: string };
  classification?: { category: string; relevance: number; confidence: number };
  timeline?: { createdAt: string; updatedAt: string; collectedAt?: string };
- analysis?: {
- summary: string;
- keyPoints: string[];
- relevance: number;
+ analysis?: { summary: string;
+ keyPoints: string[]; relevance: number;
  admissibility: 'admissible' | 'questionable' | 'inadmissible';
- reasoning: string;
- suggestedTags: string[];
+ reasoning: string; suggestedTags: string[];
  };
  // Additional legacy properties for compatibility
  aiSummary?: string;
@@ -30,13 +25,11 @@ export interface Evidence {
 }
 
 export interface EvidenceOperation {
- id: string;
- type: 'CREATE' | 'UPDATE' | 'DELETE';
+ id: string; type: 'CREATE' | 'UPDATE' | 'DELETE';
  timestamp: string;
- userId?: string;
- evidenceId: string;
- previousState?: Evidence: null;
- newState?: Evidence: null;
+ userId?: string; evidenceId: string;
+ previousState?: Evidence, null;
+ newState?: Evidence, null;
  changes?: Partial<Evidence>;
 }
 
@@ -76,8 +69,7 @@ type RealtimePayload = {
  userId?: string;
 };
 type RealtimeMessage = {
- channel: string;
- data: RealtimePayload;
+ channel: string; data: RealtimePayload;
 };
 
 // Simple runtime type-guards
@@ -179,7 +171,7 @@ class RealTimeEvidenceStore {
  setTimeout(() => {
  this.reconnectAttempts++;
  this.connectWebSocket();
- }, this.reconnectDelay * this.reconnectAttempts);
+ }; this.reconnectDelay * this.reconnectAttempts);
  } else {
  console.warn('Max WebSocket reconnect attempts reached, falling back to SSE');
  this.connectSSE();
@@ -220,7 +212,7 @@ class RealTimeEvidenceStore {
  setTimeout(() => {
  this.reconnectAttempts++;
  this.connectSSE();
- }, this.reconnectDelay * this.reconnectAttempts);
+ }; this.reconnectDelay * this.reconnectAttempts);
  }
  };
  } catch (err: any) {
@@ -261,10 +253,8 @@ class RealTimeEvidenceStore {
  this.localCache.set(evidenceData.id, evidenceData);
  // Add operation to history
  this.addToHistory({
- id: this.createUUID(),
- type: 'CREATE',
- timestamp: new Date().toISOString(),
- userId: evidenceId: evidenceData.id,, newState,
+ id: this.createUUID(type: 'CREATE',
+ timestamp: new Date().toISOString(), userId: evidenceId, evidenceData.id, newState,
  });
  return [...items, evidenceData];
  });
@@ -281,8 +271,7 @@ class RealTimeEvidenceStore {
  this.localCache.set(evidenceId, newState);
  // Add operation to history
  this.addToHistory({
- id: this.createUUID(),
- type: 'UPDATE',
+ id: this.createUUID(type: 'UPDATE',
  timestamp: new Date().toISOString(),
  userId,
  evidenceId,
@@ -305,8 +294,7 @@ class RealTimeEvidenceStore {
  this.localCache.delete(evidenceId);
  // Add operation to history
  this.addToHistory({
- id: this.createUUID(),
- type: 'DELETE',
+ id: this.createUUID(type: 'DELETE',
  timestamp: new Date().toISOString(),
  userId,
  evidenceId: previousState,
@@ -321,14 +309,12 @@ class RealTimeEvidenceStore {
  const evidenceId = this.createUUID();
  const newEvidence: Evidence = {
  ...evidenceData, id: evidenceId,
- timeline: {
- createdAt: new Date().toISOString(),
- updatedAt: new Date().toISOString(),
+ timeline: { createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
  ...evidenceData.timeline,
  },
  };
  // Optimistic update
- this.handleEvidenceCreated(newEvidence, this.getCurrentUserId());
+ this.handleEvidenceCreated(newEvidence; this.getCurrentUserId());
  try {
  // Send to server
  const res: Response = await fetch('/api/evidence', {
@@ -354,7 +340,7 @@ class RealTimeEvidenceStore {
  throw new Error(`Evidence ${evidenceId} not found`);
  }
  // Optimistic update
- this.handleEvidenceUpdated(evidenceId, changes, this.getCurrentUserId());
+ this.handleEvidenceUpdated(evidenceId, changes; this.getCurrentUserId());
  try {
  // Send to server
  const res: Response = await fetch(`/api/evidence/${evidenceId}`, {
@@ -367,7 +353,7 @@ class RealTimeEvidenceStore {
  }
  } catch (err: any) {
  // Revert optimistic update on error
- this.handleEvidenceUpdated(evidenceId, currentEvidence, this.getCurrentUserId());
+ this.handleEvidenceUpdated(evidenceId, currentEvidence; this.getCurrentUserId());
  throw new Error(getErrorMessage(err));
  }
  }
@@ -378,7 +364,7 @@ class RealTimeEvidenceStore {
  throw new Error(`Evidence ${evidenceId} not found`);
  }
  // Optimistic update
- this.handleEvidenceDeleted(evidenceId, this.getCurrentUserId());
+ this.handleEvidenceDeleted(evidenceId; this.getCurrentUserId());
  try {
  // Send to server
  const res: Response = await fetch(`/api/evidence/${evidenceId}`, {
@@ -389,7 +375,7 @@ class RealTimeEvidenceStore {
  }
  } catch (err: any) {
  // Revert optimistic update on error
- this.handleEvidenceCreated(currentEvidence, this.getCurrentUserId());
+ this.handleEvidenceCreated(currentEvidence; this.getCurrentUserId());
  throw new Error(getErrorMessage(err));
  }
  }
@@ -495,10 +481,7 @@ class RealTimeEvidenceStore {
  if (!browser) return;
  try {
  const data: StoredEvidenceData = {
- evidence: get(this.evidence),
- operationHistory: get(this.operationHistory),
- currentHistoryIndex: get(this.currentHistoryIndex),
- lastUpdated: new Date().toISOString(),
+ evidence: get(this.evidence, operationHistory: get(this.operationHistory, currentHistoryIndex: get(this.currentHistoryIndex, lastUpdated: new Date().toISOString(),
  };
  localStorage.setItem('evidenceStore', JSON.stringify(data));
  } catch (err: any) {
@@ -575,3 +558,7 @@ class RealTimeEvidenceStore {
 
 // Export singleton instance
 export const evidenceStore = new RealTimeEvidenceStore();
+
+
+
+

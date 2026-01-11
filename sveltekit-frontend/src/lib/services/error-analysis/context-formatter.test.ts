@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import fc from 'fast-check';
 import { ContextFormatter } from './context-formatter.js';
 import type { ServiceConfig, Error, Pattern } from './types.js';
@@ -42,12 +42,11 @@ describe('ContextFormatter - Property-Based Tests (Task 8.1)', () => {
  const error: Error = {
  id: 'error-1',
  file: 'test.ts',
- line: 10, column: 5, message: 'Type error: expected string but got number',
+ line: 10, column: 5, message: 'Type, error: expected string but got number',
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const patterns: Pattern[] = [
@@ -55,11 +54,10 @@ describe('ContextFormatter - Property-Based Tests (Task 8.1)', () => {
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 20,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
- },
- ];
+ }];
 
  const context = await formatter.formatErrorContext(error, patterns);
 
@@ -79,8 +77,7 @@ describe('ContextFormatter - Property-Based Tests (Task 8.1)', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const codeSnippet = 'const x: string = 123;';
@@ -98,8 +95,7 @@ describe('ContextFormatter - Property-Based Tests (Task 8.1)', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const context = 'Error context here';
@@ -137,8 +133,7 @@ Change the type annotation from string to number to match the assigned value.`;
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const patterns: Pattern[] = [
@@ -146,7 +141,7 @@ Change the type annotation from string to number to match the assigned value.`;
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 20,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
  },
@@ -154,11 +149,10 @@ Change the type annotation from string to number to match the assigned value.`;
  id: 'pattern-2',
  filePath: 'other.ts',
  lineNumber: 30,
- code: 'const y: number = "hello";',
+ code: 'const, y: number = "hello";',
  errorType: 'type-mismatch',
  similarity: 0.92,
- },
- ];
+ }];
 
  const context = await formatter.formatErrorContext(error, patterns);
 
@@ -176,8 +170,7 @@ Change the type annotation from string to number to match the assigned value.`;
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const context = await formatter.formatErrorContext(error, []);
@@ -215,8 +208,7 @@ const x = 123;
 \`\`\`
 
 ## Explanation
-This is the fix.`,
- ];
+This is the fix.`];
 
  for (const response of responses) {
  const parsed = await formatter.parseResponse(response);
@@ -264,8 +256,7 @@ Some notes here.`;
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  await expect(formatter.formatErrorContext(error, null as any)).rejects.toThrow();
@@ -279,8 +270,7 @@ Some notes here.`;
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  await expect(formatter.formatPrompt(error, '')).rejects.toThrow('Invalid input');
@@ -311,8 +301,7 @@ Some notes here.`;
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const patterns: Pattern[] = [
@@ -320,11 +309,10 @@ Some notes here.`;
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 20,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
- },
- ];
+ }];
 
  const context1 = await formatter.formatErrorContext(error, patterns);
  const context2 = await formatter.formatErrorContext(error, patterns);
@@ -340,8 +328,7 @@ Some notes here.`;
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const context = 'Error context';
@@ -353,3 +340,5 @@ Some notes here.`;
  });
  });
 });
+
+

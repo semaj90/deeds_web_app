@@ -14,17 +14,18 @@ export const errorEventsTable = pgTable(
  routePath: text('route_path').notNull(),
  filePath: text('file_path'),
 
- // TS/JS error code, e.g. "TS1005" or runtime "ReferenceError", tsCode: text('ts_code'),
+ // TS/JS error code, e.g. "TS1005" or runtime "ReferenceError"
+ tsCode: text('ts_code'),
 
- // "info" | "warn" | "error" | "fatal", severity: text('severity').notNull().default('error'),
+ // "info" | "warn" | "error" | "fatal"
+ severity: text('severity').notNull().default('error'),
 
  // Raw message and optional stack trace
  message: text('message').notNull(),
  stackTrace: text('stack_trace'),
 
     // Cluster ID from CUDA embedding+clustering (Phase 78)
-    clusterId: text('cluster_id').references(() => errorClusterTable.clusterId),
-
+    clusterId: text('cluster_id'),
     createdAt: timestamp('created_at').defaultNow(),
   },
  (table) => {
@@ -35,6 +36,9 @@ export const errorEventsTable = pgTable(
  };
  }
 );
+);
 
 export type ErrorEvent = typeof errorEventsTable.$inferSelect;
 export type ErrorEventInsert = typeof errorEventsTable.$inferInsert;
+
+

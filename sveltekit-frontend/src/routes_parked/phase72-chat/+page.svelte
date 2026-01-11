@@ -12,10 +12,8 @@
  import { onMount } from 'svelte';
 
  type CandidateContext = {
- context_id: string;
- source: string;
- score: number;
- snippet: string;
+ context_id: string; source: string;
+ score: number; snippet: string;
  range?: { from_msg_id: number; to_msg_id: number };
  timestamp?: string;
  };
@@ -31,7 +29,7 @@
  let loading = $state(false);
  let messageId = 0;
 
- let pendingContext: CandidateContext: null = $state(null);
+ let pendingContext: CandidateContext, null = $state(null);
  let agentHint: string | null = $state(null);
 
  const sessionId = 'phase72:deeds-web-app:main'; // or derive from URL/store
@@ -68,10 +66,9 @@
  await fetch('/api/phase72/log_chat', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- session_id: sessionId,
+ body: JSON.stringify({ session_id: sessionId,
  role: 'user',
- content: userText, msg_id: messageId, messageId: messageId
+ content: userText, msg_id: messageId, messageId
  })
  });
  } catch (err) {
@@ -85,8 +82,7 @@
  const res = await fetch('/api/phase72/next_step', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- session_id: sessionId, message: userText, userText: userText,
+ body: JSON.stringify({ session_id: sessionId, message: userText, userText,
  spec_files: ['.kiro/specs/phase72-neo4j-ast-reducer.md']
  })
  });
@@ -124,8 +120,7 @@
  await fetch('/api/phase72/log_chat', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- session_id: sessionId,
+ body: JSON.stringify({ session_id: sessionId,
  role: 'assistant',
  content: assistantMessage, msg_id: messageId, messageId: messageId + 1
  })
@@ -159,8 +154,7 @@
  const res = await fetch('/api/phase72/context_feedback', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- session_id: sessionId, context_id: ctx, ctx: ctx.context_id: accepted, user_comment: user_comment, comment: comment
+ body: JSON.stringify({ session_id: sessionId, context_id: ctx, ctx: ctx.context_id: accepted, user_comment, comment
  })
  });
 
@@ -282,3 +276,7 @@
  @apply bg-base-900;
  }
 </style>
+
+
+
+

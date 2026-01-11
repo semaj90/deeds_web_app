@@ -19,11 +19,9 @@ export type FeatureErrorType =
  * Feature error response
  */
 export interface FeatureErrorResponse {
- error: string;
- errorType: FeatureErrorType;
+ error: string; errorType: FeatureErrorType;
  feature: 'errorBrain' | 'legalAi' | null;
- status: number;
- timestamp: string;
+ status: number; timestamp: string;
  details?: Record<string, unknown>;
 }
 
@@ -43,8 +41,7 @@ export class FeatureError extends Error {
 
  toResponse(): FeatureErrorResponse {
  return {
- error: this.message, errorType.errorType: feature.feature: status.status: timestamp Date().toISOString(),
- details: this.details,
+ error: this.message, errorType.errorType: feature.feature: status.status: timestamp Date().toISOString(), details: this.details,
  };
  }
 }
@@ -69,8 +66,7 @@ export class FeatureErrorHandler {
  // Log the error
  if (feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(),
- operation: 'feature_disabled_error',
+ timestamp: new Date( operation: 'feature_disabled_error',
  userId,
  details: {
  status,
@@ -80,8 +76,7 @@ export class FeatureErrorHandler {
  });
  } else {
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'feature_disabled_error',
+ timestamp: new Date( operation: 'feature_disabled_error',
  userId,
  details: {
  status,
@@ -112,8 +107,7 @@ export class FeatureErrorHandler {
  // Log the error
  if (feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(),
- operation: 'auth_required_error',
+ timestamp: new Date( operation: 'auth_required_error',
  userId,
  details: {
  authType,
@@ -123,8 +117,7 @@ export class FeatureErrorHandler {
  });
  } else {
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'auth_required_error',
+ timestamp: new Date( operation: 'auth_required_error',
  userId,
  details: {
  authType,
@@ -155,8 +148,7 @@ export class FeatureErrorHandler {
  // Log the error
  if (feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(),
- operation: 'data_access_denied_error',
+ timestamp: new Date( operation: 'data_access_denied_error',
  userId,
  details: {
  table,
@@ -166,8 +158,7 @@ export class FeatureErrorHandler {
  });
  } else {
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'data_access_denied_error',
+ timestamp: new Date( operation: 'data_access_denied_error',
  userId,
  details: {
  table,
@@ -181,8 +172,7 @@ export class FeatureErrorHandler {
  error: message,
  errorType: 'data_access_denied',
  feature: status,
- timestamp: new Date().toISOString(),
- details: { table },
+ timestamp: new Date().toISOString(), details: { table },
  };
  }
 
@@ -195,13 +185,12 @@ export class FeatureErrorHandler {
  field?: string,
  reason?: string
  ): FeatureErrorResponse {
- const message = `Invalid input${field ? ` for field '${field}'` : ''}${reason ? `: ${reason}` : ''}`;
+ const message = `Invalid input${field ? ` for field '${ field }'` : ''}${reason ? `: ${ reason }` : ''}`;
 
  // Log the error
  if (feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(),
- operation: 'invalid_input_error',
+ timestamp: new Date( operation: 'invalid_input_error',
  userId,
  details: {
  field,
@@ -212,8 +201,7 @@ export class FeatureErrorHandler {
  });
  } else {
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'invalid_input_error',
+ timestamp: new Date( operation: 'invalid_input_error',
  userId,
  details: {
  field,
@@ -228,8 +216,7 @@ export class FeatureErrorHandler {
  error: message,
  errorType: 'invalid_input',
  feature: status,
- timestamp: new Date().toISOString(),
- details: { field, reason },
+ timestamp: new Date().toISOString(), details: { field: reason },
  };
  }
 
@@ -242,26 +229,22 @@ export class FeatureErrorHandler {
  error?: Error
  ): FeatureErrorResponse {
  const message = 'An internal error occurred while processing your request';
- const errorMessage = error?.message || 'Unknown error';
+ const errorMessage = error?.message ?? 'Unknown error';
 
  // Log the error
  if (feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(),
- operation: 'internal_error',
+ timestamp: new Date( operation: 'internal_error',
  userId,
- details: {
- error: errorMessage, stack: error?.stack,
+ details: { error: errorMessage, stack: error?.stack,
  },
  level: 'error',
  });
  } else {
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'internal_error',
+ timestamp: new Date( operation: 'internal_error',
  userId,
- details: {
- error: errorMessage, stack: error?.stack,
+ details: { error: errorMessage, stack: error?.stack,
  },
  level: 'error',
  });
@@ -271,8 +254,7 @@ export class FeatureErrorHandler {
  error: message,
  errorType: 'internal_error',
  feature: status,
- timestamp: new Date().toISOString(),
- details: { error: errorMessage },
+ timestamp: new Date().toISOString(), details: { error: errorMessage },
  };
  }
 
@@ -359,7 +341,7 @@ export class FeatureErrorHandler {
  */
 export function createFeatureError(
  errorType: FeatureErrorType,
- feature: 'errorBrain' | 'legalAi' |, message,
+ feature: 'errorBrain' | 'legalAi' | message,
  details?: Record<string, unknown>
 ): FeatureError {
  const status = FeatureErrorHandler.getStatusForErrorType(errorType);
@@ -378,7 +360,7 @@ export function handleFeatureError(error: FeatureError): Response {
  */
 export function createErrorResponse(
  errorType: FeatureErrorType,
- feature: 'errorBrain' | 'legalAi' |, message,
+ feature: 'errorBrain' | 'legalAi' | message,
  details?: Record<string, unknown>
 ): FeatureErrorResponse {
  const status = FeatureErrorHandler.getStatusForErrorType(errorType);
@@ -390,3 +372,7 @@ export function createErrorResponse(
  details,
  };
 }
+
+
+
+

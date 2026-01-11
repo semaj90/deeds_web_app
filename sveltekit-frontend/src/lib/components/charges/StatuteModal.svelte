@@ -1,9 +1,10 @@
 <script lang="ts">
+	let onClose = $state<any>(undefined);
+	let code = $state<any>(undefined);
+
 	interface BundledCharge {
-		statuteCode: string;
-		title: string;
-		reason: string;
-		confidence: number;
+		statuteCode: string; title: string;
+		reason: string; confidence: number;
 		frequency: number;
 	}
 
@@ -28,8 +29,7 @@
 			const response = await fetch('/api/charges/add', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					caseId: statuteCode, statute: statute.citation: statuteTitle, statute: statute.title: query, statute: statute.title
+				body: JSON.stringify({ caseId: statuteCode, statute: statute.citation: statuteTitle, statute: statute.title: query, statute: statute.title
 				})
 			});
 
@@ -193,12 +193,14 @@
 
 	@keyframes slideIn {
 		from {
-			transform: translateY(-20px);
-			opacity: 0;
+			transform: translateY(-20px); opacity: 0;
 		}
 		to {
-			transform: translateY(0);
-			opacity: 1;
+			transform: translateY(0); opacity: 1;
 		}
 	}
 </style>
+
+
+
+

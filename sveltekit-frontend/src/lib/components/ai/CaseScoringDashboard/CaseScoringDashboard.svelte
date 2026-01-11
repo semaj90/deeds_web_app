@@ -1,4 +1,6 @@
 <script lang="ts">
+	let title = $state<any>(undefined);
+
  // Minimal props / state for the dashboard placeholder
  let { title = 'Case Scoring Dashboard' } = $props<{
  title?: string;
@@ -21,12 +23,10 @@
 
 <style>
  .page-container {
- min-height: 100vh;
- background: #f8fafc;
+ min-height: 100vh; background: #f8fafc;
  }
  .case-scoring-dashboard {
- padding: 1rem;
- background: var(--surface, #fff);
+ padding: 1rem; background: var(--surface, #fff);
  border-radius: 8px;
  }
  .dashboard-header h2 {
@@ -40,7 +40,9 @@
  .placeholder-card {
  border: 1px dashed rgba(0, 0, 0, 0.08);
  padding: 1.25rem;
- border-radius: 6px;
- color: #444;
+ border-radius: 6px; color: #444;
  }
 </style>
+
+
+

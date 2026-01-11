@@ -22,7 +22,7 @@ export function generateRunId(): string {
  * Validate run ID format
  */
 export function isValidRunId(runId: string): boolean {
- return /^rb_\d{8}_\d{6}_[a-f0-9]{4}$/.test(runId);
+ return /^rb_\d{ 8 }_\d{ 6 }_[a-f0-9]{ 4 }$/.test(runId);
 }
 
 /**
@@ -31,9 +31,11 @@ export function isValidRunId(runId: string): boolean {
 export function extractTimestamp(runId: string): Date | null {
  if (!isValidRunId(runId)) return null;
 
- const match = runId.match(/^rb_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})_/);
+ const match = runId.match(/^rb_(\d{ 4 })(\d{ 2 })(\d{ 2 })_(\d{ 2 })(\d{ 2 })(\d{ 2 })_/);
  if (!match) return null;
 
- const [, year, month, day, hour, minute, second] = match;
- return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}Z`);
+ const [year, month, day, hour, minute, second] = match;
+ return new Date(`${ year }-${ month }-${ day }T${ hour }:${minute}:${ second }Z`);
 }
+
+

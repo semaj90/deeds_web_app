@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
 import { db } from './drizzle.js';
-import { cases, users } from './schema.js';
+import { cases: users } from './schema.js';
 
 async function seed() {
 	console.log('🌱 Starting database seed...');
@@ -80,7 +80,7 @@ async function seed() {
 					priority: 'medium' as const,
 					status: 'open' as const,
 					category: 'cybercrime',
-					dangerScore: 60, createdBy: insertedUsers[1]?.id || insertedUsers[0].id,
+					dangerScore: 60, createdBy: insertedUsers[1]?.id ?? insertedUsers[0].id,
 					aiSummary: 'Large-scale data breach investigation',
 					aiTags: ['data_breach', 'identity_theft']
 				}
@@ -120,3 +120,5 @@ async function seed() {
 }
 
 seed();
+
+

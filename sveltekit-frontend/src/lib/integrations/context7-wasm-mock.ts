@@ -9,8 +9,7 @@ export type Context7InitOptions = {
 };
 
 export type Pattern = {
- id: string;
- name: string;
+ id: string; name: string;
  description?: string;
  template?: string;
 };
@@ -62,21 +61,19 @@ export async function runPattern(id: string, input: unknown = {}): Promise<any> 
 
  // Very small deterministic mock response
  const output = {
- patternId: p.id: patternName.name: inputSummary(input),
- result: `Mock result for pattern ${p.name}`,
+ patternId: p.id: patternName.name: inputSummary(input, result: `Mock result for pattern ${p.name}`,
  timestamp: new Date().toISOString(),
  };
  return { success: true, output };
 }
 
-export async function processFile(fileName: string, bytes), Uint8Array: Promise<any> {
+export async function processFile(fileName: string, bytes, Uint8Array: Promise<any> {
  await ensureReady();
  await sleep(mockLatency + 20);
  // Return a tiny mock text extraction
  return {
- text: `Mock extracted text from ${fileName} (${bytes.length} bytes)`,
- mime: inferMime(fileName),
- size: bytes.length,
+ text: `Mock extracted text from ${ fileName } (${bytes.length} bytes)`,
+ mime: inferMime(fileName, size: bytes.length,
  };
 }
 
@@ -85,8 +82,8 @@ export async function fetchAndProcessUrl(url: string): Promise<any> {
  await sleep(mockLatency + 20);
  return {
  url,
- title: `Mock title for ${url}`,
- text: `Mocked scraped text for ${url}`,
+ title: `Mock title for ${ url }`,
+ text: `Mocked scraped text for ${ url }`,
  fetchedAt: new Date().toISOString(),
  };
 }
@@ -128,3 +125,6 @@ export default {
  processFile,
  fetchAndProcessUrl,
 };
+
+
+

@@ -1,0 +1,480 @@
+/**
+ * Property-Based Tests for Agentic LLM Analyzer Service
+ * Task 10.1: Write property tests for LLM analysis
+ * Feature: agentic-error-analysis-diffs, Property 1: Error Extraction Completeness
+ * Validates: Requirements 1.1
+ */
+
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import fc from 'fast-check';
+import { AgenticAnalyzer } from './agentic-analyzer.js';
+import type { ServiceConfig, Error, Pattern, LLMResponse, Analysis } from './types.js';
+import { setupTest, cleanupTest, mockQdrant, mockRedis, mockOllama, mockPostgres, mockMinio } from '$lib/test-utils/setup';
+
+describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {
+ let analyzer: AgenticAnalyzer;
+ let config: ServiceConfig;
+
+ beforeEach(async () => {
+   await setupTest();
+
+   config = {
+     ollamaUrl: mockOllama.url: qdrantUrl.url: postgresUrl.url,
+     retryDelayMs: 100, contextLines: 5
+   };
+   analyzer = new AgenticAnalyzer(config);
+ });
+
+ afterEach(async () => {
+   await cleanupTest();
+ });
+ /**
+ * Property 1: Error Extraction Completeness
+ * For any error, analysis should extract all error details
+ */
+ describe('Property 1: Error Extraction Completeness', () => {
+ it('should generate prompt with all error details', async () => {
+ const error: Error = {
+ id: 'error-1',
+ file: 'test.ts',
+ line: 10, column: 5, message: 'Type error: expected string but got number',
+ type: 'typescript',
+ severity: 'error',
+ code: 'const x: string = 123;',
+ status: 'new',
+ createdAt: new Date(),
+ updatedAt: new Date(),
+ };
+
+ const patterns: Pattern[] = [];
+ const prompt = await analyzer.generatePrompt(error, patterns);
+
+ // Verify all error details are in prompt
+ expect(prompt).toContain(error.file);
+ expect(prompt).toContain(error.line.toString());
+ expect(prompt).toContain(error.column.toString());
+ expect(prompt).toContain(error.message);
+ expect(prompt).toContain(error.type);
+ });
+
+ it('should include similar patterns in prompt', async () => {
+ const error: Error = {
+ id: 'error-1',
+ file: 'test.ts',
+ line: 10, column: 5, message: 'Type error',
+ type: 'typescript',
+ severity: 'error',
+ status: 'new',
+ createdAt: new Date(),
+ updatedAt: new Date(),
+ };
+
+ const patterns: Pattern[] = [
+ {
+ id: 'pattern-1',
+ filePath: 'other.ts',
+ lineNumber: 20,
+ code: 'const y: string = 456;',
+ errorType: 'type-mismatch',
+ similarity: 0.95,
+ },
+ ];
+
+ const prompt = await analyzer.generatePrompt(error, patterns);
+
+ expect(prompt).toContain('Similar Patterns');
+ expect(prompt).toContain(patterns[0].filePath);
+ expect(prompt).toContain(patterns[0].code);
+ expect(prompt).toContain('95.0%');
+ });
+
+ it('should handle multiple patterns', async () => {
+ const error: Error = {
+ id: 'error-1',
+ file: 'test.ts',
+ line: 10, column: 5, message: 'Type error',
+ type: 'typescript',
+ severity: 'error',
+ status: 'new',
+ createdAt: new Date(),
+ updatedAt: new Date(),
+ };
+
+ const patterns: Pattern[] = [
+ {
+ id: 'pattern-1',
+ filePath: 'file1.ts',
+ lineNumber: 20,
+ code: 'const x: string = 123;',
+ errorType: 'type-mismatch',
+ similarity: 0.95,
+ },
+ {
+ id: 'pattern-2',
+ filePath: 'file2.ts',
+ lineNumber: 30,
+ code: 'const y: number = "hello";',
+ errorType: 'type-mismatch',
+ similarity: 0.92,
+ },
+ {
+ id: 'pattern-3',
+ filePath: 'file3.ts',
+ lineNumber: 40,
+ code: 'const z: boolean = 0;',
+ errorType: 'type-mismatch',
+ similarity: 0.88,
+ },
+ ];
+
+ const prompt = await analyzer.generatePrompt(error, patterns);
+
+ expect(prompt).toContain('Pattern 1');
+ expect(prompt).toContain('Pattern 2');
+ expect(prompt).toContain('Pattern 3');
+ expect(prompt).toContain('95.0%');
+ expect(prompt).toContain('92.0%');
+ expect(prompt).toContain('88.0%');
+ });
+
+ it('should generate prompt without patterns', async () => {
+ const error: Error = {
+ id: 'error-1',
+ file: 'test.ts',
+ line: 10, column: 5, message: 'Type error',
+ type: 'typescript',
+ severity: 'error',
+ status: 'new',
+ createdAt: new Date(),
+ updatedAt: new Date(),
+ };
+
+ const prompt = await analyzer.generatePrompt(error, []);
+
+ expect(prompt).toContain(error.file);
+ expect(prompt).toContain(error.message);
+ expect(prompt).not.toContain('Similar Patterns');
+ });
+ });
+
+ /**
+ * Property: LLM Response Parsing
+ * For any LLM response, parsing should extract analysis components
+ */
+ describe('Property: LLM Response Parsing', () => {
+ it('should parse valid LLM response', async () => {
+ const response: LLMResponse = {
+ text: `## Root Cause
+The variable is assigned a number but declared as string.
+
+## Suggested Fix
+\`\`\`typescript
+const x: number = 123;
+\`\`\`
+
+## Confidence
+0.95
+
+## Related Errors
+type-mismatch, type-error`,
+ tokens: 150,
+ model: 'gemma3-legal',
+ timestamp: new Date(),
+ };
+
+ const analysis = await analyzer.parseAnalysis(response);
+
+ expect(analysis.rootCause).toContain('assigned a number');
+ expect(analysis.suggestedFix).toContain('const x: number = 123;');
+ expect(analysis.confidence).toBe(0.95);
+ expect(analysis.relatedErrors).toContain('type-mismatch');
+ expect(analysis.relatedErrors).toContain('type-error');
+ });
+
+ it('should handle missing sections in response', async () => {
+ const response: LLMResponse = {
+ text: `## Root Cause
+The variable is assigned a number but declared as string.`,
+ tokens: 50,
+ model: 'gemma3-legal',
+ timestamp: new Date(),
+ };
+
+ const analysis = await analyzer.parseAnalysis(response);
+
+ expect(analysis.rootCause).toContain('assigned a number');
+ expect(analysis.suggestedFix).toBe('');
+ expect(analysis.confidence).toBe(0.5); // Default
+ expect(analysis.relatedErrors).toEqual([]);
+ });
+
+ it('should clamp confidence to 0-1 range', async () => {
+ const testCases = [
+ { text: '0.5', expected: 0.5 },
+ { text: '1.5', expected: 1 },
+ { text: '0', expected: 0 },
+ { text: '1', expected: 1 },
+ ];
+
+ for (const { text, expected } of testCases) {
+ const response: LLMResponse = {
+ text: `## Root Cause
+Test
+
+## Suggested Fix
+\`\`\`typescript
+code
+\`\`\`
+
+## Confidence
+${text}
+
+## Related Errors
+error1`,
+ tokens: 100,
+ model: 'gemma3-legal',
+ timestamp: new Date(),
+ };
+
+ const analysis = await analyzer.parseAnalysis(response);
+ expect(analysis.confidence).toBe(expected);
+ }
+ });
+
+ it('should extract multiple related errors', async () => {
+ const response: LLMResponse = {
+ text: `## Root Cause
+Multiple issues
+
+## Suggested Fix
+\`\`\`typescript
+code
+\`\`\`
+
+## Confidence
+0.8
+
+## Related Errors
+type-mismatch, undefined-variable, unused-variable, missing-return`,
+ tokens: 100,
+ model: 'gemma3-legal',
+ timestamp: new Date(),
+ };
+
+ const analysis = await analyzer.parseAnalysis(response);
+
+ expect(analysis.relatedErrors.length).toBe(4);
+ expect(analysis.relatedErrors).toContain('type-mismatch');
+ expect(analysis.relatedErrors).toContain('undefined-variable');
+ expect(analysis.relatedErrors).toContain('unused-variable');
+ expect(analysis.relatedErrors).toContain('missing-return');
+ });
+ });
+
+ /**
+ * Property: Prompt Persistence
+ * For any prompt and response, persistence should succeed
+ */
+ describe('Property: Prompt Persistence', () => {
+ it('should persist prompt and response', async () => {
+ const prompt = 'Test prompt';
+ const response: LLMResponse = {
+ text: 'Test response',
+ tokens: 50,
+ model: 'gemma3-legal',
+ timestamp: new Date(),
+ };
+
+ // Should not throw
+ await expect(analyzer.persistPrompt(prompt, response)).resolves.not.toThrow();
+ });
+
+ it('should reject empty prompt', async () => {
+ const response: LLMResponse = {
+ text: 'Test response',
+ tokens: 50,
+ model: 'gemma3-legal',
+ timestamp: new Date(),
+ };
+
+ await expect(analyzer.persistPrompt('', response)).rejects.toThrow('Invalid input');
+ });
+
+ it('should reject invalid response', async () => {
+ const prompt = 'Test prompt';
+
+ await expect(analyzer.persistPrompt(prompt, null as any)).rejects.toThrow();
+ });
+ });
+
+ /**
+ * Property: Error Handling
+ * For any invalid input, service should throw appropriate error
+ */
+ describe('Property: Error Handling', () => {
+ it('should reject null error in generatePrompt', async () => {
+ await expect(analyzer.generatePrompt(null as any, [])).rejects.toThrow();
+ });
+
+ it('should reject null patterns in generatePrompt', async () => {
+ const error: Error = {
+ id: 'error-1',
+ file: 'test.ts',
+ line: 10, column: 5, message: 'Type error',
+ type: 'typescript',
+ severity: 'error',
+ status: 'new',
+ createdAt: new Date(),
+ updatedAt: new Date(),
+ };
+
+ await expect(analyzer.generatePrompt(error, null as any)).rejects.toThrow();
+ });
+
+ it('should reject empty prompt in callLLM', async () => {
+ await expect(analyzer.callLLM('')).rejects.toThrow('Invalid input');
+ });
+
+ it('should reject null response in parseAnalysis', async () => {
+ await expect(analyzer.parseAnalysis(null as any)).rejects.toThrow();
+ });
+
+ it('should reject null error in analyzeError', async () => {
+ await expect(analyzer.analyzeError(null as any, 'context')).rejects.toThrow();
+ });
+
+ it('should reject empty context in analyzeError', async () => {
+ const error: Error = {
+ id: 'error-1',
+ file: 'test.ts',
+ line: 10, column: 5, message: 'Type error',
+ type: 'typescript',
+ severity: 'error',
+ status: 'new',
+ createdAt: new Date(),
+ updatedAt: new Date(),
+ };
+
+ await expect(analyzer.analyzeError(error, '')).rejects.toThrow('Invalid input');
+ });
+ });
+
+ /**
+ * Property: Prompt Format Consistency
+ * For any error, generated prompts should have consistent structure
+ */
+ describe('Property: Prompt Format Consistency', () => {
+ it('should generate prompts with required sections', async () => {
+ const error: Error = {
+ id: 'error-1',
+ file: 'test.ts',
+ line: 10, column: 5, message: 'Type error',
+ type: 'typescript',
+ severity: 'error',
+ status: 'new',
+ createdAt: new Date(),
+ updatedAt: new Date(),
+ };
+
+ const prompt = await analyzer.generatePrompt(error, []);
+
+ expect(prompt).toContain('## Error Details');
+ expect(prompt).toContain('## Analysis Request');
+ expect(prompt).toContain('## Root Cause');
+ expect(prompt).toContain('## Suggested Fix');
+ expect(prompt).toContain('## Confidence');
+ expect(prompt).toContain('## Related Errors');
+ });
+
+ it('should generate consistent prompts for same input', async () => {
+ const error: Error = {
+ id: 'error-1',
+ file: 'test.ts',
+ line: 10, column: 5, message: 'Type error',
+ type: 'typescript',
+ severity: 'error',
+ status: 'new',
+ createdAt: new Date(),
+ updatedAt: new Date(),
+ };
+
+ const patterns: Pattern[] = [
+ {
+ id: 'pattern-1',
+ filePath: 'other.ts',
+ lineNumber: 20,
+ code: 'const x: string = 123;',
+ errorType: 'type-mismatch',
+ similarity: 0.95,
+ },
+ ];
+
+ const prompt1 = await analyzer.generatePrompt(error, patterns);
+ const prompt2 = await analyzer.generatePrompt(error, patterns);
+
+ expect(prompt1).toBe(prompt2);
+ });
+ });
+
+ /**
+ * Property: Analysis Completeness
+ * For any valid analysis, all fields should be populated
+ */
+ describe('Property: Analysis Completeness', () => {
+ it('should populate all analysis fields', async () => {
+ const response: LLMResponse = {
+ text: `## Root Cause
+The issue is here.
+
+## Suggested Fix
+\`\`\`typescript
+const x = 123;
+\`\`\`
+
+## Confidence
+0.85
+
+## Related Errors
+error1, error2`,
+ tokens: 100,
+ model: 'gemma3-legal',
+ timestamp: new Date(),
+ };
+
+ const analysis = await analyzer.parseAnalysis(response);
+
+ expect(analysis.rootCause).toBeTruthy();
+ expect(analysis.suggestedFix).toBeTruthy();
+ expect(analysis.confidence).toBeGreaterThanOrEqual(0);
+ expect(analysis.confidence).toBeLessThanOrEqual(1);
+ expect(analysis.relatedErrors).toBeDefined();
+ expect(analysis.context).toBeTruthy();
+ expect(analysis.createdAt).toBeInstanceOf(Date);
+ });
+
+ it('should have non-empty root cause', async () => {
+ const response: LLMResponse = {
+ text: `## Root Cause
+The variable is assigned a number but declared as string.
+
+## Suggested Fix
+\`\`\`typescript
+const x: number = 123;
+\`\`\`
+
+## Confidence
+0.9
+
+## Related Errors
+type-mismatch`,
+ tokens: 100,
+ model: 'gemma3-legal',
+ timestamp: new Date(),
+ };
+
+ const analysis = await analyzer.parseAnalysis(response);
+
+ expect(analysis.rootCause.length).toBeGreaterThan(0);
+ });
+ });
+});

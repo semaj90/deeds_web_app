@@ -6,17 +6,15 @@ const machine = setup({
 }).createMachine({
     id: 'legalCase',
     initial: 'drafting',
-    states: {
-        drafting: { on: { SUBMIT: 'review' } },
+    states: { drafting: { on: { SUBMIT: 'review' } },
         review: { on: { REJECT: 'drafting', APPROVE: 'approved' } },
         approved: { type: 'final' }
     }
 });
 
-// 2. The Reactive Wrapper
 export class CaseManager {
     // The "snapshot" is the reactive part the UI listens to
-    state = $state() as any;
+    state = $state<any>();
     private actor;
 
     constructor() {
@@ -26,10 +24,13 @@ export class CaseManager {
     }
 
     get isLocked() {
-        return this.state.matches('review') || this.state.matches('approved');
+        return this.state?.matches('review') ?? this.state?.matches('approved');
     }
 
     submit() { this.actor.send({ type: 'SUBMIT' }); }
     reject() { this.actor.send({ type: 'REJECT' }); }
     approve() { this.actor.send({ type: 'APPROVE' }); }
 }
+
+
+

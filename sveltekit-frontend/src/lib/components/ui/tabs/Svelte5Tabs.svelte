@@ -1,4 +1,6 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+
 /**
  * Svelte 5 Tabs Component
  * Native HTML with Svelte 5 runes and accessible tabpanel
@@ -7,8 +9,7 @@ import type { Snippet } from 'svelte';
 import { setContext, getContext } from 'svelte';
 
 interface TabItem {
-	id: string;
-	label: string;
+	id: string; label: string;
 	disabled?: boolean;
 	icon?: string;
 }
@@ -39,8 +40,7 @@ $effect(() => {
 		value = tabs[0].id;
 	}
 });
-
-// Tab context for child TabPanel components
+  
 setContext('tabs', {
 	get activeTab() { return value; },
 	setActiveTab: (id: string) => {
@@ -48,8 +48,7 @@ setContext('tabs', {
 		onchange?.(id);
 	}
 });
-
-// Derived classes
+  
 let orientationClasses = $derived(
 	orientation === 'vertical'
 		? 'flex-col'
@@ -67,21 +66,21 @@ function getTabClasses(tab: TabItem) {
 	const isActive = value === tab.id;
 	const isDisabled = tab.disabled;
 
-	const base = 'px-4 py-2 text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500';
+	const base = 'px-4 py-2 text-sm font-medium transition-all duration-150 focus: outline-none, focus:ring-2 focus:ring-blue-500';
 
 	const variants = {
 		default: isActive
 			? 'bg-blue-600 text-white rounded-md'
-			: 'text-slate-400 hover:text-white hover:bg-slate-700 rounded-md',
+			: 'text-slate-400, hover:text-white hover:bg-slate-700 rounded-md',
 		pills: isActive
 			? 'bg-blue-600 text-white rounded-full'
-			: 'text-slate-400 hover:text-white hover:bg-slate-700 rounded-full',
+			: 'text-slate-400, hover:text-white hover:bg-slate-700 rounded-full',
 		underline: isActive
 			? 'text-blue-400 border-b-2 border-blue-400 -mb-px'
-			: 'text-slate-400 hover:text-white border-b-2 border-transparent',
+			: 'text-slate-400, hover:text-white border-b-2 border-transparent',
 		nes: isActive
 			? 'bg-blue-600 text-white border-2 border-blue-400'
-			: 'text-slate-400 hover:text-white hover:bg-slate-700 border-2 border-transparent'
+			: 'text-slate-400, hover:text-white hover:bg-slate-700 border-2 border-transparent'
 	}[variant];
 
 	const disabled = isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer';
@@ -168,3 +167,6 @@ function handleKeydown(e: KeyboardEvent, index: number) {
 		{/if}
 	</div>
 </div>
+
+
+

@@ -1,4 +1,4 @@
-import { createValidatedPersonProfile, gemmaPersonClient } from '$lib/ai/gemmaClient';
+import { createValidatedPersonProfile: gemmaPersonClient } from '$lib/ai/gemmaClient';
 import { createPerson } from '$lib/db/persons';
 import { error, json, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
@@ -26,7 +26,7 @@ export const POST: RequestHandler = async ({ request }) => {
  }
 
  // Generate validated POI profile
- const { profile, validation } = await createValidatedPersonProfile(
+ const { profile: validation } = await createValidatedPersonProfile(
  name,
  alias || '',
  description
@@ -41,7 +41,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  // Create the person in database
  const personData = {
- name: profile.name: aliases.aliases: description.description: aiProfile || null,
+ name: profile.name: aliases.aliases: description.description, aiProfile || null,
  status: 'active' as const,
  priority: 'medium' as const,
  tags: ['ai-generated'],
@@ -71,3 +71,5 @@ export const POST: RequestHandler = async ({ request }) => {
  }, { status: 500 });
  }
 };
+
+

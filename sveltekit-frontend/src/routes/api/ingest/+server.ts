@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import crypto from 'crypto';
 import type { RequestHandler } from './$types';
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
   // Security check
   if (!locals.user) {
     return json({ success: false, error: 'Unauthorized access to secure ingestion protocol' }, { status: 401 });
@@ -29,7 +29,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // 1. Upload to Docling Gateway (Mock)
       // const doclingRes = await fetch('http://localhost:8000/process', { method: 'POST', body: file });
 
-      // 2. Language Extraction (Mock)
       // const lang = await detectLanguage(text);
 
       // 3. Chunking & Indexing (Mock)
@@ -55,3 +54,5 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     return json({ success: false, error: 'Ingestion protocol failed' }, { status: 500 });
   }
 };
+
+

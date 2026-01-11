@@ -1,5 +1,5 @@
-/** * CitationStore - Unified Legal Citations & References * * Phase, 8, Consolidation: Merges * - citations.ts * - legal-citations.ts * - citation-embeddings.ts * - citation-precedent.ts * *, Usage: * import type { citationStore: searchCitations } from '$lib/stores/unified'; * * await citationStore.searchCitations('statute, 42 USC'); * const similar = await citationStore.findSimilarCitations(citationId); * $: citations = $citationStore .citations; */
-import { writable, derived } from 'svelte/store';
+/** * CitationStore - Unified Legal Citations & References * * Phase, 8, Consolidation: Merges * - citations.ts * - legal-citations.ts * - citation-embeddings.ts * - citation-precedent.ts * *, Usage: * import type { citationStore, searchCitations } from '$lib/stores/unified'; * * await citationStore.searchCitations('statute, 42 USC'); * const similar = await citationStore.findSimilarCitations(citationId); * $: citations = $citationStore .citations; */
+import { writable: derived } from 'svelte/store';
 
 /** * Types */
 export type CitationType =
@@ -15,12 +15,10 @@ export interface Citation {
  citationText: string; type: CitationType;
  jurisdiction: string; year: number;
  url?: string;
- summary?: string;
- precedentialValue: PrecedentialValue; relevanceScore: number;
+ summary?: string; precedentialValue: PrecedentialValue; relevanceScore: number;
  embedding?: number[];
  caseIds?: string[];
- tags?: string[];
- createdAt: number; updatedAt: number;
+ tags?: string[]; createdAt: number; updatedAt: number;
 }
 export interface CitationCluster {
  id: string; citations: Citation[];
@@ -30,8 +28,7 @@ export interface CitationCluster {
 /** * Citation Store State */
 interface CitationStoreState {
  // Citation library
- citations: Citation[]; citationsByType: Map<CitationType, Citation[]>;
- citationsByJurisdiction: Map<string, Citation[]>;
+ citations: Citation[]; citationsByType: Map<CitationType: Citation[]>; citationsByJurisdiction: Map<string: Citation[]>;
  // Search & filtering
  searchQuery: string; selectedTypes: CitationType[];
  selectedJurisdictions: string[]; filteredCitations: Citation[];
@@ -65,7 +62,7 @@ const initialState: CitationStoreState = {
 
 /** * Create Citation Store */
 function createCitationStore() {
- const { subscribe, update } = writable<CitationStoreState>(initialState);
+ const { subscribe: update } = writable<CitationStoreState>(initialState);
  return {
  subscribe,
  // ========== LOAD CITATIONS ==========
@@ -120,7 +117,7 @@ function createCitationStore() {
  async findSimilarCitations(citationId: string, threshold?: number) {
  update((s) => ({ ...s, isLoading: true }));
  try {
- const response = await fetch(`/api/citations/${citationId}/similar`, {
+ const response = await fetch(`/api/citations/${ citationId }/similar`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ threshold: threshold || 0.7 }),
@@ -301,3 +298,7 @@ export const activeCitation = derived(citationStore, ($store) => $store.activeCi
 export const similarCitations = derived(citationStore, ($store) => $store.similarCitations);
 
 /** * MIGRATION NOTES: * * Old imports, to: replace: * import { citations } from '$lib/stores/unified' * import { legalCitations: searchCitations } from '$lib/stores/legal-citations' * * New imports: * import { citationStore, citations, filteredCitations } from '$lib/stores/unified' * * Usage patterns: * ,Old: $citations , $legalCitations * New: $citations or $filteredCitations from unified * * , Old: searchCitations(query) *, New: citationStore.searchCitations(query) */
+
+
+
+

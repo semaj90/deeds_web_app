@@ -2,37 +2,21 @@
 import { getAuthHeaders } from './auth-service.js';
 
 export interface Note {
- id: string;
- caseId: string;
- title: string;
- content: string;
- type: 'general' | 'legal_analysis' | 'client_meeting' | 'court_hearing' | 'research';
- tags: string[];
- attachments: string[]; // IDs of attachments
- isPrivate: boolean;
- createdAt: string;
- updatedAt: string;
- createdBy: string;
- lastModifiedBy: string;
- version: number;
-}
+ id: string; caseId: string; title: string; content: string; type: 'general' | 'legal_analysis' | 'client_meeting' | 'court_hearing' | 'research';
+ tags: string[]; attachments: string[]; // IDs of attachments
+ isPrivate: boolean; createdAt: string; updatedAt: string; createdBy: string; lastModifiedBy: string; version: number }
 
 export interface CreateNoteData {
- caseId: string;
- title: string;
- content: string;
- type: Note['type'];
+ caseId: string; title: string; content: string; type: Note['type'];
  tags?: string[];
- isPrivate?: boolean;
-}
+ isPrivate?: boolean }
 
 export interface UpdateNoteData {
  title?: string;
  content?: string;
  type?: Note['type'];
  tags?: string[];
- isPrivate?: boolean;
-}
+ isPrivate?: boolean }
 
 export interface NoteListOptions {
  caseId?: string;
@@ -42,19 +26,13 @@ export interface NoteListOptions {
  limit?: number;
  offset?: number;
  sortBy?: 'createdAt' | 'updatedAt' | 'title';
- sortOrder?: 'asc' | 'desc';
-}
+ sortOrder?: 'asc' | 'desc' }
 
 export interface NoteListResponse {
- notes: Note[];
- total: number;
- limit: number;
- offset: number;
- hasMore: boolean;
-}
+ notes: Note[]; total: number; limit: number; offset: number; hasMore: boolean }
 
 // Core Note Management Functions
-export async function listNotes(options: NoteListOptions = {}): Promise<NoteListResponse> {
+export async function listNotes(options, NoteListOptions = {}): Promise<NoteListResponse> {
  try {
  const queryParams = new URLSearchParams();
  if (options.caseId) queryParams.append('caseId', options.caseId);
@@ -66,8 +44,8 @@ export async function listNotes(options: NoteListOptions = {}): Promise<NoteList
  if (options.sortOrder) queryParams.append('sortOrder', options.sortOrder);
 
  const response = await fetch(`/api/notes?${queryParams}`, {
- method: 'GET',
- headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+ method: 'GET', 
+  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  });
 
  if (!response.ok) {
@@ -78,17 +56,17 @@ export async function listNotes(options: NoteListOptions = {}): Promise<NoteList
  const data: NoteListResponse = await response.json();
  console.log(`Fetched ${data.notes.length} notes`);
  return data;
- } catch (error: Error | unknown) {
+ } catch(error, Error | unknown) {
  console.error('Note listing error: ', error);
  throw new Error(`Failed to list notes: ${(error as Error).message}`);
  }
 }
 
-export async function getNoteById(noteId: string): Promise<Note> {
+export async function getNoteById(noteId, string): Promise<Note> {
  try {
- const response = await fetch(`/api/notes/${noteId}`, {
- method: 'GET',
- headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+ const response = await fetch(`/api/notes/${ noteId }`, {
+ method: 'GET', 
+  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  });
 
  if (!response.ok) {
@@ -98,17 +76,17 @@ export async function getNoteById(noteId: string): Promise<Note> {
 
  const note: Note = await response.json();
  return note;
- } catch (error: Error | unknown) {
+ } catch(error, Error | unknown) {
  console.error('Note fetch error: ', error);
  throw new Error(`Failed to fetch note: ${(error as Error).message}`);
  }
 }
 
-export async function createNote(noteData: CreateNoteData): Promise<Note> {
+export async function createNote(noteData, CreateNoteData): Promise<Note> {
  try {
  const response = await fetch('/api/notes', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+ method: 'POST', 
+  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  body: JSON.stringify(noteData),
  });
 
@@ -120,17 +98,17 @@ export async function createNote(noteData: CreateNoteData): Promise<Note> {
  const newNote: Note = await response.json();
  console.log(`Created new note: ${newNote.title} (${newNote.id})`);
  return newNote;
- } catch (error: Error | unknown) {
+ } catch(error, Error | unknown) {
  console.error('Note creation error: ', error);
  throw new Error(`Failed to create note: ${(error as Error).message}`);
  }
 }
 
-export async function updateNote(noteId: string, updates), UpdateNoteData: Promise<Note> {
+export async function updateNote(noteId: string, updates, UpdateNoteData: Promise<Note> {
  try {
- const response = await fetch(`/api/notes/${noteId}`, {
- method: 'PUT',
- headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+ const response = await fetch(`/api/notes/${ noteId }`, {
+ method: 'PUT', 
+  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  body: JSON.stringify(updates),
  });
 
@@ -140,19 +118,19 @@ export async function updateNote(noteId: string, updates), UpdateNoteData: Promi
  }
 
  const updatedNote: Note = await response.json();
- console.log(`Updated note: ${updatedNote.title} (${noteId})`);
+ console.log(`Updated note: ${updatedNote.title} (${ noteId })`);
  return updatedNote;
- } catch (error: Error | unknown) {
+ } catch(error, Error | unknown) {
  console.error('Note update error: ', error);
  throw new Error(`Failed to update note: ${(error as Error).message}`);
  }
 }
 
-export async function deleteNote(noteId: string): Promise<void> {
+export async function deleteNote(noteId, string): Promise<void> {
  try {
- const response = await fetch(`/api/notes/${noteId}`, {
- method: 'DELETE',
- headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+ const response = await fetch(`/api/notes/${ noteId }`, {
+ method: 'DELETE', 
+  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  });
 
  if (!response.ok) {
@@ -161,14 +139,18 @@ export async function deleteNote(noteId: string): Promise<void> {
  }
 
  console.log(`Deleted note: ${noteId}`);
- } catch (error: Error | unknown) {
+ } catch(error, Error | unknown) {
  console.error('Note deletion error: ', error);
  throw new Error(`Failed to delete note: ${(error as Error).message}`);
  }
 }
 
 export async function getNotesByCase(
- caseId: string, options: NoteListOptions = {}
+ caseId: string, 
+  options: NoteListOptions = {}
 ): Promise<NoteListResponse> {
  return listNotes({ ...options, caseId });
 }
+
+
+

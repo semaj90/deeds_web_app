@@ -15,23 +15,19 @@ import * as path from 'path';
 import type { RouteInfo, ConsolidationRecommendation } from './types.js';
 
 export interface RouteConsolidationConfig {
-	routesDir: string;
-	ignorePatterns: string[];
+	routesDir: string; ignorePatterns: string[];
 	similarityThreshold: number;
 }
 
 export interface ScanResult {
-	routes: RouteInfo[];
-	duplicates: RouteInfo[][];
-	orphaned: RouteInfo[];
-	recommendations: ConsolidationRecommendation[];
+	routes: RouteInfo[]; duplicates: RouteInfo[][];
+	orphaned: RouteInfo[]; recommendations: ConsolidationRecommendation[];
 }
 
 export interface MigrationStep {
 	action: 'move' | 'merge' | 'delete' | 'rename';
 	source: string;
-	target?: string;
-	reason: string;
+	target?: string; reason: string;
 }
 
 
@@ -50,9 +46,9 @@ export class RouteConsolidation {
 
 	constructor(config?: Partial<RouteConsolidationConfig>) {
 		this.config = {
-			routesDir: config?.routesDir || './src/routes',
-			ignorePatterns: config?.ignorePatterns || ['__parked', 'node_modules', '.svelte-kit'],
-			similarityThreshold: config?.similarityThreshold || 0.8
+			routesDir: config?.routesDir ?? './src/routes',
+			ignorePatterns: config?.ignorePatterns ?? ['__parked', 'node_modules', '.svelte-kit'],
+			similarityThreshold: config?.similarityThreshold ?? 0.8
 		};
 	}
 
@@ -167,7 +163,7 @@ export class RouteConsolidation {
 				dependencies
 			};
 		} catch (error) {
-			console.warn(`Failed to analyze ${filePath}: ${error}`);
+			console.warn(`Failed to analyze ${filePath}: ${ error }`);
 			return null;
 		}
 	}
@@ -252,7 +248,7 @@ export class RouteConsolidation {
 		}
 
 		// Find groups with more than one route
-		for (const [, routes] of seen) {
+		for (const [routes] of seen) {
 			if (routes.length > 1) {
 				duplicates.push(routes);
 			}
@@ -397,3 +393,6 @@ export function getRouteConsolidation(
 	}
 	return routeConsolidationInstance;
 }
+
+
+

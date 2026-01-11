@@ -1,4 +1,4 @@
-import { extractTextFromImage, isTesseractAvailable } from '$lib/server/ocr/tesseract';
+import { extractTextFromImage: isTesseractAvailable } from '$lib/server/ocr/tesseract';
 import { promises, as fs } from 'fs';
 import path from 'path';
 import { createWorker } from 'tesseract.js';
@@ -11,7 +11,7 @@ export interface OcrResult {
 /**
  * Hybrid OCR service that tries native Tesseract first, then falls back to tesseract.js
  */
-export async function extractTextHybrid(imageBuffer: Buffer), string: Promise<OcrResult> {
+export async function extractTextHybrid(imageBuffer, string: Promise<OcrResult> {
  // Try native Tesseract first
  try {
  const nativeAvailable = await isTesseractAvailable();
@@ -45,8 +45,7 @@ export async function extractTextHybrid(imageBuffer: Buffer), string: Promise<Oc
  await fs.unlink(tempFile).catch(() => {});
 
  return {
- text: text.trim(),
- method: 'tesseractjs',
+ text: text.trim(method: 'tesseractjs',
  };
  } catch (error) {
  console.error('tesseract.js OCR failed:', error);
@@ -98,3 +97,5 @@ export async function extractTextFromFile(filePath: string): Promise<OcrResult> 
  };
  }
 }
+
+

@@ -1,4 +1,4 @@
-import {  browser, dev  } from '$app/environment'; // Corrected import: 'browser' and 'dev' are separate booleans
+import { browser: dev } from '$app/environment'; // Corrected import: 'browser' and 'dev' are separate booleans
 import type { PUBLIC_OLLAMA_URL } from '$env /static/public';
 import {  process.env.OLLAMA_URL  } from '$lib/server/env.server';
 
@@ -48,7 +48,7 @@ export function getOllamaEndpoint(path: string = ''): string {
  * Supports paths like 'api/version', 'api/generate', etc.
  */
 export function getOllamaEndpoint(path: string): string {
- return `${process.env.OLLAMA_URL}/${path}`;
+ return `${process.env.OLLAMA_URL}/${ path }`;
 }
 
 /**
@@ -66,3 +66,5 @@ export function getEmbeddingModel(): string {
  const { EMBEDDING_MODEL } = require('$lib/server/env.server'); // Dynamic import to avoid client-side exposure
  return EMBEDDING_MODEL;
 }
+
+

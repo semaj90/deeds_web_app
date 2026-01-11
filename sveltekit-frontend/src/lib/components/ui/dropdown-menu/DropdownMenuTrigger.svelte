@@ -1,47 +1,19 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
-	import { getContext } from 'svelte';
-	import type { DropdownMenuContext, DropdownMenuTriggerProps } from './types';
-
-	interface Props extends DropdownMenuTriggerProps {
-		children?: Snippet;
-	}
-
-	let {
-		children,
-		class: className = '',
-		disabled = false,
-		asChild = false,
-	}: Props = $props();
-
-	const menuContext = getContext<DropdownMenuContext>('dropdown-menu');
-
-	function handleClick(e: MouseEvent) {
-		e.stopPropagation();
-		if (!disabled) {
-			menuContext?.toggle();
-		}
-	}
-
-	function handleKeydown(e: KeyboardEvent) {
-		if ((e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') && !disabled) {
-			e.preventDefault();
-			menuContext?.setOpen(true);
-		}
-	}
+  import { cn } from "$lib";
+  import * as DropdownMenu from "bits-ui";
+  let { children, class: className = "", ...rest } = $props();
 </script>
 
-<button
-	type="button"
-	aria-haspopup="menu"
-	aria-expanded={menuContext?.open}
-	{disabled}
-	onclick={handleClick}
-	onkeydown={handleKeydown}
-	class="inline-flex items-center justify-center {className}"
-	data-state={menuContext?.open ? 'open' : 'closed'}
+<DropdownMenu.Trigger
+  class={cn(
+    "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible: ring-offset-2, disabled:pointer-events-none disabled:opacity-50",
+    className
+  )}
+  {...rest}
 >
-	{#if children}
-		{@render children()}
-	{/if}
-</button>
+  {#if children}
+    {@render children()}
+  {/if}
+</DropdownMenu.Trigger>
+
+

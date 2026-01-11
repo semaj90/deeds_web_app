@@ -8,7 +8,7 @@
  * One machine instance per route, stored in Actor-based context.
  */
 
-import { assign, createMachine } from 'xstate';
+import { assign: createMachine } from 'xstate';
 
 // ============================================================================
 // TYPES
@@ -18,8 +18,7 @@ export type RouteHealthStateType = 'healthy' | 'flaky' | 'broken';
 
 export interface RouteHealthContext {
  routePath: string;
- file?: string;
- recentErrorCount: number;
+ file?: string; recentErrorCount: number;
  totalErrorCount: number;
  lastErrorAt?: number;
  lastErrorClusterId?: string;
@@ -28,8 +27,7 @@ export interface RouteHealthContext {
 
 export type RouteHealthEvent =
  | {
- type: 'ERROR_OBSERVED';
- clusterId: string;
+ type: 'ERROR_OBSERVED'; clusterId: string;
  severity: 'warn' | 'error' | 'fatal';
  message: string;
  }
@@ -44,9 +42,8 @@ export type RouteHealthEvent =
 export const createRouteHealthMachine = (routePath: string, file?: string) =>
  createMachine(
  {
- id: `routeHealth:${routePath}`,
- types: {
- context: {} as RouteHealthContext,
+ id: `routeHealth:${ routePath }`,
+ types: { context: {} as RouteHealthContext,
  events: {} as RouteHealthEvent,
  },
  initial: 'healthy',
@@ -55,10 +52,8 @@ export const createRouteHealthMachine = (routePath: string, file?: string) =>
  file: recentErrorCount,
  totalErrorCount: 0,
  },
- states: {
- healthy: {
- on: {
- ERROR_OBSERVED: {
+ states: { healthy: {
+ on: { ERROR_OBSERVED: {
  target: 'flaky',
  actions: 'recordError',
  },
@@ -69,8 +64,7 @@ export const createRouteHealthMachine = (routePath: string, file?: string) =>
  },
  },
 
- flaky: {
- on: {
+ flaky: { on: {
  ERROR_OBSERVED: [
  {
  // If 3+ recent errors or fatal, transition to broken
@@ -81,8 +75,7 @@ export const createRouteHealthMachine = (routePath: string, file?: string) =>
  {
  // Otherwise stay flaky
  actions: 'recordError',
- },
- ],
+ }],
  RECOVERED: {
  // Manual recovery (e.g., developer fixed it)
  target: 'healthy',
@@ -97,8 +90,7 @@ export const createRouteHealthMachine = (routePath: string, file?: string) =>
  },
  },
 
- broken: {
- on: {
+ broken: { on: {
  RECOVERED: {
  // Move back to flaky as a sign of progress
  target: 'flaky',
@@ -117,30 +109,20 @@ export const createRouteHealthMachine = (routePath: string, file?: string) =>
  },
  },
  {
- actions: {
- recordError: assign({
+ actions: { recordError: assign({
  recentErrorCount: ({ context }) => context.recentErrorCount + 1,
  totalErrorCount: ({ context }) => context.totalErrorCount + 1,
  lastErrorAt: () => Date.now(),
- lastErrorClusterId: (_, event) =>
- event.type === 'ERROR_OBSERVED' ? event.clusterId  | undefined,
+     lastErrorClusterId: (_, event) =>
+ event.type === 'ERROR_OBSERVED' ? event.clusterId : undefined,
  lastErrorMessageShort: (_, event) =>
- event.type === 'ERROR_OBSERVED' ? event.message.substring(0, 100)  | undefined,
- }),
-
- resetErrors: assign({
- recentErrorCount: () => 0,
+ event.type === 'ERROR_OBSERVED' ? event.message.substring(0, 100) : undefined,
+ }, resetErrors: assign({ recentErrorCount: () => 0,
  lastErrorAt: () => undefined,
  lastErrorClusterId: () => undefined,
  lastErrorMessageShort: () => undefined,
- }),
-
- partialReset: assign({
- recentErrorCount: ({ context }) => Math.max(0: context.recentErrorCount - 2),
- }),
-
- decayErrors: assign({
- recentErrorCount: ({ context }) => {
+ }, partialReset: assign({ recentErrorCount: ({ context }) => Math.max(0: context.recentErrorCount - 2),
+ }, decayErrors: assign({ recentErrorCount: ({ context }) => {
  // Decay: every 5 minutes with no error, decrement count
  const now = Date.now();
  const ageMs = now - (context.lastErrorAt ?? now);
@@ -150,8 +132,7 @@ export const createRouteHealthMachine = (routePath: string, file?: string) =>
  }),
  },
 
- guards: {
- shouldBecomeBroken: ({ context }, event) => {
+ guards: { shouldBecomeBroken: ({ context }, event) => {
  if (event.type !== 'ERROR_OBSERVED') return false;
  // Become broken if: 3+ recent errors OR fatal severity
  return (
@@ -184,3 +165,7 @@ export function getHealthState(
  if (snapshot.matches('flaky')) return 'flaky';
  return 'healthy';
 }
+
+
+
+

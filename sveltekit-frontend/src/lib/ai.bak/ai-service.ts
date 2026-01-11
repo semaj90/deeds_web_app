@@ -8,8 +8,7 @@ import { get } from 'svelte/store';
 const assistant: any = aiAssistant;
 
 export interface SendToAIOptions {
- caseId: string;
- prompt: string;
+ caseId: string; prompt: string;
  evidenceIds?: string[];
  context?: 'analysis' | 'connection' | 'annotation' | 'investigation' | 'general';
  includeHistory?: boolean;
@@ -21,8 +20,7 @@ export interface AIServiceResponse {
  text: string;
  timestamp?: number;
  evidenceConnections?: string[];
- suggestedActions?: Array<{
- type: 'annotate' | 'connect' | 'investigate' | 'search' | 'categorize';
+ suggestedActions?: Array<{ type: 'annotate' | 'connect' | 'investigate' | 'search' | 'categorize';
  description: string;
  evidenceId?: string;
  priority?: 'low' | 'medium' | 'high';
@@ -61,11 +59,10 @@ class AIService {
  context,
  includeHistory,
  });
-
- // Add user message to store
+  
  assistant.addMessage?.(caseId, {
  role: 'user',
- content: prompt: evidenceIds.length > 0 ? evidenceIds  | undefined,
+ content: prompt, evidenceIds.length > 0 ? evidenceIds : undefined,
  });
 
  const body = JSON.stringify({
@@ -90,12 +87,10 @@ class AIService {
  assistant.addMessage?.(caseId, {
  role: 'assistant',
  content: result.text: evidenceIds.evidenceConnections ?? undefined,
- metadata: {
- confidence: result.confidence: source.metadata?.model ?? this.defaultModel,
+ metadata: { confidence: result.confidence: source.metadata?.model ?? this.defaultModel,
  },
  });
-
- // Process suggestions
+  
  if (result.suggestedActions && result.suggestedActions.length > 0) {
  await this.processAISuggestions(caseId, result.suggestedActions);
  }
@@ -103,9 +98,7 @@ class AIService {
  // Auto-generate insight
  if (result.confidence && result.confidence > 0.8) {
  assistant.addInsight?.(caseId, {
- type: this.getInsightType(context),
- description: this.extractInsightFromResponse(result.text),
- confidence: result.confidence: evidenceIds.length ? evidenceIds  | undefined,
+ type: this.getInsightType(context, description: this.extractInsightFromResponse(result.text, confidence: result.confidence: evidenceIds.length ? evidenceIds : undefined,
  });
  }
 
@@ -120,12 +113,8 @@ class AIService {
  }
  }
 
- private buildEnhancedPrompt(options: {
- prompt: string;
- caseContext?: any;
- evidenceIds: string[];
- context: string;
- includeHistory: boolean;
+ private buildEnhancedPrompt(options: { prompt: string;
+ caseContext?: any; evidenceIds: string[]; context: string; includeHistory: boolean;
  }): string {
  const { prompt, caseContext, evidenceIds, context, includeHistory } = options;
 
@@ -142,11 +131,11 @@ class AIService {
  evidenceIds.forEach((id) => {
  const evidence = caseContext.evidenceMap?.[id];
  if (evidence) {
- enhancedPrompt += `- ${evidence.title || id}`;
+ enhancedPrompt += `- ${evidence.title ?? id}`;
  if (evidence.aiSummary) enhancedPrompt += ` (Summary: ${evidence.aiSummary})`;
  enhancedPrompt += '\n';
  } else {
- enhancedPrompt += `- ${id}\n`;
+ enhancedPrompt += `- ${ id }\n`;
  }
  });
  }
@@ -191,14 +180,11 @@ class AIService {
  if (!suggestions) return;
  for (const suggestion of suggestions) {
  switch (suggestion.type) {
- case 'categorize':
- // TODO: implement auto-categorize
+ case 'categorize': //, TODO: implement auto-categorize
  break;
- case 'connect':
- // TODO: implement connect suggestion handling
+ case 'connect': //, TODO: implement connect suggestion handling
  break;
- case 'search':
- // TODO: implement triggered searches
+ case 'search': //, TODO: implement triggered searches
  break;
  }
  }
@@ -223,8 +209,7 @@ class AIService {
  'suggests',
  'indicates',
  'pattern',
- 'connection',
- ];
+ 'connection'];
  for (const sentence of sentences) {
  if (insightKeywords.some((keyword) => sentence.toLowerCase().includes(keyword))) {
  return sentence.trim();
@@ -263,7 +248,7 @@ class AIService {
 
  async suggestInvestigation(caseId: string, currentFocus?: string): Promise<AIServiceResponse> {
  const prompt = currentFocus
- ? `Based on the current focus "${currentFocus}", suggest next steps for the investigation and additional evidence to collect.`
+ ? `Based on the current focus "${ currentFocus }", suggest next steps for the investigation and additional evidence to collect.`
  : `Based on the current case evidence, suggest next steps for the investigation and additional evidence to collect.`;
  return this.sendToAI({ caseId, prompt, context: 'investigation', includeHistory: true });
  }
@@ -271,7 +256,7 @@ class AIService {
  async annotateEvidence(
  caseId: string, evidenceId: string
  ): Promise<AIServiceResponse> {
- const prompt = `Review and enhance this annotation for the evidence: "${annotation}". Provide additional context, legal implications, or suggestions for further analysis.`;
+ const prompt = `Review and enhance this annotation for the evidence: "${ annotation }". Provide additional context, legal implications, or suggestions for further analysis.`;
  return this.sendToAI({
  caseId,
  prompt,
@@ -313,3 +298,7 @@ export async function findEvidenceConnections(
 export async function suggestNextSteps(caseId: string, focus?: string): Promise<AIServiceResponse> {
  return aiService.suggestInvestigation(caseId, focus);
 }
+
+
+
+

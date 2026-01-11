@@ -33,7 +33,7 @@ const MAIN_ROUTES = [
 ];
 
 // Accessibility helper functions
-async function checkAccessibility(page: Page: routeName, string: string) {
+async function checkAccessibility(page: Page, routeName: string) {
   // Check for essential accessibility features
   const skipLink = page.locator('a[href="#main-content"]');
   await expect(skipLink).toBeVisible();

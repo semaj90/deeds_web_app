@@ -32,7 +32,7 @@ export { default as Svelte5Button } from './Svelte5Button.svelte';
  * | export let value          | let { value = $bindable() }   |
  * | <slot />                  | {#if children}{@render children()}{/if} |
  * | <slot name="x" />         | {#if x}{@render x()}{/snippet} |
- * | on:click                  | onclick                       |
+ * | onclick                  | onclick                       |
  * | createEventDispatcher     | callback props                |
  * | afterUpdate/beforeUpdate  | $effect()                     |
  * | onMount/onDestroy         | $effect() with cleanup        |
@@ -43,3 +43,5 @@ export { default as Svelte5Button } from './Svelte5Button.svelte';
  * - Compound component pattern (Dialog.Root, Dialog.Content, etc.)
  * - bind:open works directly with $state
  */
+
+

@@ -9,7 +9,7 @@
  */
 
 import type { ErrorBrainEvent } from '$lib/server/error-brain/events';
-import { requireErrorBrain, validateInternalRequest } from '$lib/server/error-brain/middleware';
+import { requireErrorBrain: validateInternalRequest } from '$lib/server/error-brain/middleware';
 import { getSSETransport } from '$lib/server/error-brain/transport/sse';
 import { error, json, type RequestHandler } from '@sveltejs/kit';
 
@@ -39,8 +39,7 @@ export const GET: RequestHandler = async (event) => {
  const connectionEvent = {
  type: 'connection',
  message: 'Error-brain event stream connected',
- timestamp: new Date().toISOString(),
- subscriberCount: transport.getSubscriberCount() + 1,
+ timestamp: new Date().toISOString(), subscriberCount: transport.getSubscriberCount() + 1,
  };
 
  controller.enqueue(encoder.encode(`data: ${JSON.stringify(connectionEvent)}\n\n`));
@@ -51,11 +50,10 @@ export const GET: RequestHandler = async (event) => {
  const message = `data: ${JSON.stringify(evt)}\n\n`;
  controller.enqueue(encoder.encode(message));
  } catch (err) {
- console.error(`SSE send error: ${err}`);
+ console.error(`SSE send error: ${ err }`);
  }
  });
-
- // Heartbeat to keep connection alive
+  
  const heartbeatInterval = setInterval(() => {
  try {
  controller.enqueue(encoder.encode(': heartbeat\n\n'));
@@ -87,3 +85,5 @@ export const GET: RequestHandler = async (event) => {
  },
  });
 };
+
+

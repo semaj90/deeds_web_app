@@ -1,0 +1,123 @@
+{
+  "metadata": {
+    "generatedAt": "2026-01-09T21:36:24.481Z",
+    "totalErrors": 1,
+    "totalFiles": 1,
+    "totalClusters": 1,
+    "topN": 100
+  },
+  "fileAnalyses": [
+    {
+      "file": "tsconfig.json",
+      "totalErrors": 1,
+      "astParsed": false,
+      "componentHierarchyDepth": 0,
+      "dependencies": {
+        "imports": [],
+        "exports": [],
+        "components": []
+      },
+      "errors": [
+        {
+          "file": "tsconfig.json",
+          "line": 1,
+          "column": 1,
+          "severity": "error",
+          "message": "Cannot read file 'c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/tsconfig.json'.",
+          "code": "ts",
+          "astContext": {
+            "nodeType": "unknown",
+            "depth": 0,
+            "isInComponent": false,
+            "isInScript": false,
+            "isInStyle": false,
+            "reactivityContext": "none"
+          },
+          "dependencyImpact": {
+            "importedBy": [],
+            "imports": [],
+            "blastRadius": 0,
+            "centralityScore": 0
+          },
+          "fixComplexity": {
+            "difficulty": "easy",
+            "estimatedMinutes": 5,
+            "requiresRefactor": false,
+            "affectsMultipleFiles": false
+          },
+          "priorityScore": 80,
+          "clusterSignature": "57c392c3"
+        }
+      ]
+    }
+  ],
+  "rankedErrors": [
+    {
+      "file": "tsconfig.json",
+      "line": 1,
+      "column": 1,
+      "severity": "error",
+      "message": "Cannot read file 'c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/tsconfig.json'.",
+      "code": "ts",
+      "astContext": {
+        "nodeType": "unknown",
+        "depth": 0,
+        "isInComponent": false,
+        "isInScript": false,
+        "isInStyle": false,
+        "reactivityContext": "none"
+      },
+      "dependencyImpact": {
+        "importedBy": [],
+        "imports": [],
+        "blastRadius": 0,
+        "centralityScore": 0
+      },
+      "fixComplexity": {
+        "difficulty": "easy",
+        "estimatedMinutes": 5,
+        "requiresRefactor": false,
+        "affectsMultipleFiles": false
+      },
+      "priorityScore": 80,
+      "clusterSignature": "57c392c3"
+    }
+  ],
+  "clusters": [
+    {
+      "signature": "57c392c3",
+      "count": 1,
+      "averagePriority": 80,
+      "sampleError": {
+        "file": "tsconfig.json",
+        "line": 1,
+        "column": 1,
+        "severity": "error",
+        "message": "Cannot read file 'c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/tsconfig.json'.",
+        "code": "ts",
+        "astContext": {
+          "nodeType": "unknown",
+          "depth": 0,
+          "isInComponent": false,
+          "isInScript": false,
+          "isInStyle": false,
+          "reactivityContext": "none"
+        },
+        "dependencyImpact": {
+          "importedBy": [],
+          "imports": [],
+          "blastRadius": 0,
+          "centralityScore": 0
+        },
+        "fixComplexity": {
+          "difficulty": "easy",
+          "estimatedMinutes": 5,
+          "requiresRefactor": false,
+          "affectsMultipleFiles": false
+        },
+        "priorityScore": 80,
+        "clusterSignature": "57c392c3"
+      }
+    }
+  ]
+}

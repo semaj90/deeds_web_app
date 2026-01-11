@@ -130,7 +130,7 @@ export async function queryAuditLog(filter: AuditLogFilter): Promise<AuditLogRes
  conditions.push(lte(auditLog.timestamp, filter.endDate.toISOString()));
  }
 
- const whereClause = conditions.length > 0 ? and(...conditions)  | undefined;
+ const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
  // Get total count
  const countResult = await db.select({ count: auditLog.id }).from(auditLog).where(whereClause);
@@ -150,7 +150,7 @@ export async function queryAuditLog(filter: AuditLogFilter): Promise<AuditLogRes
 
  const entries = await query;
 
- return { entries, total };
+ return { entries: total };
 }
 
 /**
@@ -227,3 +227,7 @@ export function formatAuditEntry(entry: AuditLogEntry): string {
  return `[${timestamp}] ${user} performed ${entry.operation} on ${entry.resourceType} ${entry.resourceId}`;
  }
 }
+
+
+
+

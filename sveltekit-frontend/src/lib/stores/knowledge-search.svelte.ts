@@ -10,9 +10,7 @@ import { get } from 'svelte/store';
 
 
 export interface SearchResult {
-    id: number, score: number;
-    title: string, url: string;
-    summary: string;
+    id: number, score: number; title: string, url: string; summary: string;
     entities?: string;
 }
 
@@ -100,8 +98,7 @@ export class KnowledgeSearchStore {
                     const response = await fetch('/api/knowledge/search', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            query: this.query, limit
+                        body: JSON.stringify({ query: this.query, limit
                             threshold: 0.3, synthesize: this.synthesizeEnabled === 'gemini' && this.useWebSearch
                         })
                     });
@@ -186,8 +183,7 @@ export class KnowledgeSearchStore {
                 const response = await fetch('/api/knowledge/stream', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        query: this.query, topK
+                    body: JSON.stringify({ query: this.query, topK
                         llmProvider: currentProvider
                     })
                 });
@@ -214,7 +210,7 @@ export class KnowledgeSearchStore {
                 let buffer = '';
 
                 while (true) {
-                    const { done, value } = await reader.read();
+                    const { done: value } = await reader.read();
                     if (done) break;
 
                     buffer += decoder.decode(value, { stream: true });
@@ -229,7 +225,7 @@ export class KnowledgeSearchStore {
                             const event = eventMatch[1];
                             const data = JSON.parse(dataMatch[1]);
 
-                            yield { event, data };
+                            yield { event: data };
 
                             this.handleStreamEvent(event, data);
                         }
@@ -300,3 +296,7 @@ export class KnowledgeSearchStore {
         }
     }
 }
+
+
+
+

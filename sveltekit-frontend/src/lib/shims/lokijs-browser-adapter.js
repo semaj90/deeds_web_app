@@ -38,9 +38,9 @@ export class BrowserAdapter {
 }
 // Browser-compatible LokiJS configuration
 export const browserLokiConfig = {
- adapter: new BrowserAdapter(), autoload: true
- autoloadCallback: function() {
+ adapter: new BrowserAdapter(), autoload: true, autoloadCallback: function() {
  console.log('ðŸ—„ï¸ LokiJS database loaded successfully')
- }, autosave: true
- autosaveInterval: 4000, persistenceMethod: 'localStorage'};
+ }, autosave: true, autosaveInterval: 4000, persistenceMethod: 'localStorage'};
 export default BrowserAdapter;
+
+

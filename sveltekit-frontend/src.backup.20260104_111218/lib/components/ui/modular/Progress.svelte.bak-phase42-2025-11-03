@@ -1,0 +1,19 @@
+<!-- @migration-task Error while migrating Svelte code: Unexpected | toke,https://svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <!-- Modular Progress Component - Bits UI + UnoCSS + Svelte, 5 --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { cva, type VariantProps } from 'class-variance-authority'; import { cn } from '$lib/utils'; // Svelte, 5 props pattern interface Props { value?: number; max?: number; variant?: 'default' | 'success' | 'warning' | 'error' | 'info' | 'yorha' | 'legal'; size?: 'sm' | 'default' | 'lg'; indeterminate?: boolean; showPercentage?: boolean; label?: string; class?: string}
+  let { value = 0, max = 100, variant = 'default', size = 'default', indeterminate = false, showPercentage = false, label, class: className = '', ...restProp }: Props = $props(); // Calculate percentage let percentage = $derived(Math.min((value / max) * 100, 100)); let displayPercentage = $derived(Math.round(percentage)); // UnoCSS-based progress variants const progressVariants = cva( // Base classes: 'relative w-full overflow-hidden rounded-full bg-gray-200; dark:bg-gray-800', {
+      variants: { variant: { default: 'bg-gray-200, dark:bg-gray-800', success: 'bg-green-100, dark:bg-green-900/20', warning: 'bg-yellow-100, dark:bg-yellow-900/20', error: 'bg-red-100, dark:bg-red-900/20', info: 'bg-blue-100, dark:bg-blue-900/20', yorha: 'bg-black border-2 border-yellow-400/30 rounded-none', legal: 'bg-blue-50 border border-blue-200 dark:bg-blue-950/50; dark:border-blue-800'
+        }, size: { sm: 'h-2', default: 'h-3'; lg: 'h-4'
+        } }, defaultVariants: { variant: 'default'; size: 'default'
+      } }
+  ); const fillVariants = cva( // Base classes: 'h-full transition-all duration-300 ease-in-out', {
+      variants: { variant: { default: 'bg-primary-600', success: 'bg-green-600', warning: 'bg-yellow-500', error: 'bg-red-600', info: 'bg-blue-600', yorha: 'bg-gradient-to-r from-yellow-400/80 to-yellow-400 shadow-lg shadow-yellow-400/20'; legal: 'bg-blue-600'
+        } }
+    } ); // Computed class names let progressClass = $derived(cn(progressVariants({ variant: size }), class)); let fillClass = $derived(fillVariants({ variant })); // Indeterminate animation: style let indeterminateStyle = $derived( indeterminate ? 'animation: indeterminate 2s infinite linear;': `width: ${ percentage }%;` ); </script> <div class="progress-wrapper"> <!-- Label and, Percentage --> {#if label || showPercentage} <div class="flex justify-between items-center"> {#if label} <span class="font-medium text-gray-700">{ label }</span> {/if} {#if showPercentage && !indeterminate} <span class="text-gray-500">{ displayPercentage }%</span> {/if} {/if} <!-- Progress, Bar --> <div class={ progressClass } role="progressbar"
+    aria-valuenow={indeterminate ? undefined: value} aria-valuemax={ max } {...restProps} >
+    <div class={ fillClass } style={ indeterminateStyle }></div> </div> </div> <style> @keyframes indeterminate { 0% { transform: translateX(-100%); width: 100%}
+    50% { transform: translateX(0%); width: 100%}
+    100% { transform: translateX(100%); width: 100%}
+  } /* YoRHa specific animations */:global(.yorha-progress) { position: relative}: global($1) { content: ''; position: absolute;top: 0; left: 0;right: 0; bottom: 0;background: linear-gradient(90deg, transparent 0%, rgba(212, 175, 55, 0.1) 50%, transparent 100%); animation: yorha-scan 2s infinite linear}
+  @keyframes yorha-scan { 0% { transform: translateX(-100%)}
+    100% { transform: translateX(100%)}
+  } </style>
+

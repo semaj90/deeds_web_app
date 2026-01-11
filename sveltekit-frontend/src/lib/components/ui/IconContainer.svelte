@@ -8,7 +8,7 @@
  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
  }
 
- let { icon: Icon, class: className: className = '', size = 'md' }: Props = $props();
+ let { icon: Icon, class: className, className = '', size = 'md' }: Props = $props();
 
  // Base size classes for different breakpoints
  const sizeClasses = {
@@ -47,7 +47,7 @@
 
 <div
  bind:this={containerRef}
- class="icon-container icon-container-{size} {sizeClasses[size]} {className}"
+ class="icon-container icon-container-{size} {sizeClasses[size]} { className }"
 >
  <Icon class="h-full w-full" />
 </div>
@@ -94,3 +94,4 @@
  .icon-container-2xl { @apply h-16 w-16; }
  }
 </style>
+

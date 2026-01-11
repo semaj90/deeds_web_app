@@ -1,12 +1,12 @@
 import { createEventDispatcher } from 'svelte';
 <script lang="ts">
+	let algorithm = $state<any>(undefined);
+
  // Migrated from createEventDispatcher to callback props;
 
  const dispatch = createEventDispatcher<{
- phaseChange: string;
- similarityAnalysis: void;
- layoutOptimization: void;
- exportData: void;
+ phaseChange: string; similarityAnalysis: void;
+ layoutOptimization: void; exportData: void;
  }>();
 
  let { webgpuSupported = false, gpuAccelerationEnabled = false, currentPhase = 'investigation' } = $props();
@@ -59,13 +59,13 @@ import { createEventDispatcher } from 'svelte';
  <h4>GPU Status</h4>
  <div class="status-item">
  <span class="status-label">WebGPU:</span>
- <span class="status-value" class:supported={webgpuSupported}>
+ <span class="status-value" class:supported={ webgpuSupported }>
  {webgpuSupported ? 'Supported' : 'Not Supported'}
  </span>
  </div>
  <div class="status-item">
  <span class="status-label">Acceleration:</span>
- <span class="status-value" class:enabled={gpuAccelerationEnabled}>
+ <span class="status-value" class:enabled={ gpuAccelerationEnabled }>
  {gpuAccelerationEnabled ? 'Enabled' : 'Disabled'}
  </span>
  </div>
@@ -74,7 +74,7 @@ import { createEventDispatcher } from 'svelte';
  <!-- Case Phase -->
  <div class="control-section">
  <h4>Case Phase</h4>
- <select bind:value={currentPhase} onchange={handlePhaseChange}>
+ <select bind:value={currentPhase} onchange={ handlePhaseChange }>
  {#each phases as phase}
  <option value={phase}>{phase.charAt(0).toUpperCase() + phase.slice(1)}</option>
  {/each}
@@ -192,8 +192,7 @@ import { createEventDispatcher } from 'svelte';
 
  .status-section {
  background: rgba(255, 255, 255, 0.05);
- border-radius: 8px;
- padding: 1rem;
+ border-radius: 8px; padding: 1rem;
  margin-bottom: 1rem;
  }
 
@@ -244,8 +243,7 @@ import { createEventDispatcher } from 'svelte';
 
  .control-group label {
  display: block;
- margin-bottom: 0.5rem;
- color: #cccccc;
+ margin-bottom: 0.5rem; color: #cccccc;
  font-size: 0.9rem;
  }
 
@@ -255,59 +253,43 @@ import { createEventDispatcher } from 'svelte';
 
  .control-group select,
  .control-group input[type="range"] {
- width: 100%;
- padding: 0.5rem;
- background: #333;
- border: 1px solid #555;
- border-radius: 4px;
- color: #ffffff;
+ width: 100%; padding: 0.5rem;
+ background: #333; border: 1px solid #555;
+ border-radius: 4px; color: #ffffff;
  font-size: 0.9rem;
  }
 
  .control-group input[type="range"] {
- -webkit-appearance: none;
- appearance: none;
- height: 6px;
- background: #333;
+ -webkit-appearance: none; appearance: none;
+ height: 6px; background: #333;
  outline: none;
  }
 
  .control-group input[type="range"]::-webkit-slider-thumb {
- -webkit-appearance: none;
- appearance: none;
- width: 16px;
- height: 16px;
- border-radius: 50%;
- background: #4fc3f7;
+ -webkit-appearance: none; appearance: none;
+ width: 16px; height: 16px;
+ border-radius: 50%; background: #4fc3f7;
  cursor: pointer;
  }
 
  .control-group input[type="range"]::-moz-range-thumb {
- width: 16px;
- height: 16px;
- border-radius: 50%;
- background: #4fc3f7;
- cursor: pointer;
- border: none;
+ width: 16px; height: 16px;
+ border-radius: 50%; background: #4fc3f7;
+ cursor: pointer; border: none;
  }
 
  .value {
  display: inline-block;
- margin-left: 0.5rem;
- color: #4fc3f7;
+ margin-left: 0.5rem; color: #4fc3f7;
  font-size: 0.8rem;
  font-weight: bold;
  }
 
  .action-button {
- width: 100%;
- padding: 0.75rem;
- background: #333;
- border: 1px solid #555;
- border-radius: 4px;
- color: #ffffff;
- cursor: pointer;
- transition: all 0.2s ease;
+ width: 100%; padding: 0.75rem;
+ background: #333; border: 1px solid #555;
+ border-radius: 4px; color: #ffffff;
+ cursor: pointer; transition: all 0.2s ease;
  font-size: 0.9rem;
  margin-bottom: 0.5rem;
  }
@@ -329,9 +311,11 @@ import { createEventDispatcher } from 'svelte';
 
  .analysis-info,
  .export-info {
- font-size: 0.8rem;
- color: #999;
+ font-size: 0.8rem; color: #999;
  line-height: 1.4;
  margin-top: 0.5rem;
  }
 </style>
+
+
+

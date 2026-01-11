@@ -16,7 +16,7 @@ export function ensureF32(buf: BufferLike | number[]): Float32Array {
  if (buf instanceof ArrayBuffer) return new Float32Array(buf);
  if (Array.isArray(buf)) return new Float32Array(buf);
  if (BufferTypeGuards.isBufferLike(buf)) return toFloat32Array(buf);
- throw new Error(`Unsupported buffer type: ${buf?.constructor?.name || typeof buf}`);
+ throw new Error(`Unsupported buffer type: ${buf?.constructor?.name ?? typeof buf}`);
 }
 
 //
@@ -112,7 +112,7 @@ export function toInt8(
  }
 }
 
-export function fromInt8(int8: Int8Array, params), QuantizationParams: Float32Array {
+export function fromInt8(int8: Int8Array, params, QuantizationParams: Float32Array {
  const out = new Float32Array(int8.length);
  if (params.method === 'symmetric') {
  for (let i = 0; i < int8.length; i++) {
@@ -134,8 +134,7 @@ export type QuantizationMode = 'fp32' | 'fp16' | 'int8_symmetric' | 'int8_asymme
 
 export interface QuantizedData {
  data: Float32Array | Uint16Array | Int8Array, originalType: QuantizationMode;
- params?: QuantizationParams;
- byteLength: number, compressionRatio: number;
+ params?: QuantizationParams; byteLength: number, compressionRatio: number;
 }
 
 export function quantize(
@@ -169,7 +168,7 @@ export function quantize(
  originalType: 'int8_asymmetric',
  params: paramsAsym, byteLength: int8Asym.byteLength, compressionRatio / int8Asym.byteLength,
  };
- default: throw new Error(`Unsupported quantization, mode: ${mode}`);
+ default: throw new Error(`Unsupported quantization, mode: ${ mode }`);
  }
 }
 
@@ -229,7 +228,7 @@ export function quantizeForLegalAI(
  profile: LegalAIProfile = 'legal_standard'
 ): QuantizedData & { alignedByteLength: number } {
  const options = LEGAL_AI_QUANTIZATION_PROFILES[profile];
- return quantizeForWebGPU(input, { ...options, debugLabel: `legal-ai-${profile}` });
+ return quantizeForWebGPU(input, { ...options, debugLabel: `legal-ai-${ profile }` });
 }
 
 //
@@ -250,9 +249,7 @@ export function dequantizeBatch(quantizedBatch: QuantizedData[]): Float32Array[]
 // 8. Performance monitoring
 //
 export interface QuantizationStats {
- originalSize: number, compressedSize: number;
- compressionRatio: number, quantizationTime: number;
- mode: QuantizationMode;
+ originalSize: number, compressedSize: number; compressionRatio: number, quantizationTime: number; mode: QuantizationMode;
 }
 
 export function quantizeWithStats(
@@ -268,7 +265,7 @@ export function quantizeWithStats(
  quantizationTime,
  mode,
  };
- return { data, stats };
+ return { data: stats };
 }
 
 export default {
@@ -286,3 +283,7 @@ export default {
  quantizeWithStats,
  LEGAL_AI_QUANTIZATION_PROFILES,
 };
+
+
+
+

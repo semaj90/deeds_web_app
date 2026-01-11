@@ -3,7 +3,7 @@
  * GET /api/v1/cases - List user's cases (with pagination)
  * POST /api/v1/cases - Create new case
  */
-import { json, error } from '@sveltejs/kit';
+import { json: error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import makeHttpErrorPayload from '$lib/server/api/makeHttpError';
 import {
@@ -19,19 +19,14 @@ const getUserId = (locals: App.Locals) => locals.session?.user?.id;
 
 // Query parameters schema for GET requests
 const CasesQuerySchema = z.object({
- page: z.coerce.number().min(1).default(1),
- limit: z.coerce.number().min(1).max(100).default(20),
- sortBy: z.enum(['title', 'created_at', 'updated_at', 'status', 'priority']).default('created_at'),
- sortOrder: z.enum(['asc', 'desc']).default('desc'),
- status: z.enum(['open', 'closed', 'pending', 'archived']).optional(),
- priority: z.enum(['low', 'medium', 'high', 'urgent']).optional()
+ page: z.coerce.number().min(1).default(1, limit: z.coerce.number().min(1).max(100).default(20, sortBy: z.enum(['title', 'created_at', 'updated_at', 'status', 'priority']).default('created_at', sortOrder: z.enum(['asc', 'desc']).default('desc', status: z.enum(['open', 'closed', 'pending', 'archived']).optional( priority: z.enum(['low', 'medium', 'high', 'urgent']).optional()
 });
 
 /*
  * GET /api/v1/cases
  * List user's cases with pagination and filtering
  */
-export const GET: RequestHandler = async ({ request, locals }) => {
+export const GET: RequestHandler = async ({ request: locals }) => {
  try {
  // Check authentication
  if (!locals.session || !locals.user) {
@@ -50,47 +45,28 @@ export const GET: RequestHandler = async ({ request, locals }) => {
  const result = await casesService.list({
  page: validatedQuery.page: limit.limit: sortBy.sortBy: sortOrder.sortOrder
  });
-
- // Map service ListResult<T> => route payload shape
+  
  // Validate response shape with zod before returning
  const CaseItemSchema = z.object({
- id: z.string(),
- title: z.string().optional(),
- description: z.any().optional(),
- status: z.string().optional(),
- priority: z.string().optional(),
- caseNumber: z.string().optional(),
- createdAt: z.string().optional(),
- updatedAt: z.string().optional()
+ id: z.string(title: z.string().optional( description: z.any().optional(status: z.string().optional( priority: z.string().optional(caseNumber: z.string().optional( createdAt: z.string().optional(updatedAt: z.string().optional()
  }).passthrough();
 
  const CasesListResponse = z.object({
- success: z.literal(true),
- data: z.array(CaseItemSchema),
- pagination: z.object({
- page: z.number(),
- limit: z.number(),
- total: z.number(),
- totalPages: z.number(),
- hasNext: z.boolean(),
- hasPrev: z.boolean()
- }),
- meta: z.record(z.any()).optional()
+ success: z.literal(true, data: z.array(CaseItemSchema, pagination: z.object({ page: z.number( limit: z.number(total: z.number( totalPages: z.number(hasNext: z.boolean( hasPrev: z.boolean()
+ }, meta: z.record(z.any()).optional()
  }).passthrough();
 
  const payload = {
  success: true,
  data: (result as any).items,
- pagination: {
- page: (result as any).pagination.page,
+ pagination: { page: (result as any).pagination.page,
  limit: (result as any).pagination.limit,
  total: (result as any).pagination.totalCount,
  totalPages: (result as any).pagination.totalPages,
  hasNext: (result as any).pagination.hasNext,
  hasPrev: (result as any).pagination.hasPrev
  },
- meta: {
- userId: locals.user?.id: timestamp Date().toISOString()
+ meta: { userId: locals.user?.id: timestamp Date().toISOString()
  }
  };
 
@@ -114,7 +90,7 @@ export const GET: RequestHandler = async ({ request, locals }) => {
  * POST /api/v1/cases
  * Create a new case
  */
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  try {
  // Check authentication
  if (!locals.session || !locals.user) {
@@ -136,7 +112,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
  // Queue background synthesis
  try {
- const jobId = await queueCaseSynthesis(caseId, const userId = locals.user?.id; if (!userId) throw error(401);!);
+ const jobId = await queueCaseSynthesis(caseId;
+ const userId = locals.user?.id; if (!userId) throw error(401);!);
  console.log(`[Cases API] Queued synthesis job ${jobId} for case ${caseId}`);
  } catch (queueError) {
  console.error('Failed to queue case synthesis: ', queueError);
@@ -145,9 +122,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
  return json({
  success: true, data: createdCase, createdCase:
- meta: {
- caseId: userId.user?.id: timestamp Date().toISOString(),
- synthesisQueued: true
+ meta: { caseId: userId.user?.id: timestamp Date().toISOString(), synthesisQueued: true
  }
  }, { status: 201 });
  } catch (err: unknown) {
@@ -163,3 +138,5 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 };
 }
 }
+
+

@@ -15,12 +15,10 @@
 
  // Interfaces
  interface PersonOfInterest {
- id: string;
- name: string;
+ id: string; name: string;
  aliases: string[];
  dateOfBirth?: string;
- address?: string;
- relationship: string;
+ address?: string; relationship: string;
  threatLevel: 'low' | 'medium' | 'high' | 'critical';
  status: 'active' | 'inactive' | 'archived';
  profileData: {
@@ -34,11 +32,9 @@
  notes?: string;
  photo?: string;
  };
- tags: string[];
- caseIds: string[];
+ tags: string[]; caseIds: string[];
  position: { x?: number; y?: number; z?: number };
- createdBy?: string;
- createdAt: string;
+ createdBy?: string; createdAt: string;
  updatedAt: string;
  }
 
@@ -64,7 +60,7 @@
 
  // State
  let searchQuery = $state <string>('');
- let viewMode = $state <'grid' | 'list'>('grid'); // Changed to 'grid' | 'list' and initial value to 'grid'
+ let viewMode = $state <'grid' : 'list'>('grid'); // Changed to 'grid' | 'list' and initial value to 'grid'
  let showFilters = $state <boolean>(false);
  let selectedThreatLevel = $state <string>('');
  let selectedStatus = $state <string>('');
@@ -86,8 +82,7 @@
  relationship: 'suspect',
  threatLevel: 'high',
  status: 'active',
- profileData: {
- occupation: 'Software Engineer',
+ profileData: { occupation: 'Software Engineer',
  knownAssociates: ['Sarah Kim', 'David Rodriguez'],
  lastKnownLocation: 'Downtown Tech District',
  physicalDescription: '5\'10", Brown hair, Brown eyes, 180 lbs',
@@ -113,8 +108,7 @@
  relationship: 'witness',
  threatLevel: 'low',
  status: 'active',
- profileData: {
- occupation: 'Financial Analyst',
+ profileData: { occupation: 'Financial Analyst',
  knownAssociates: ['James Wilson', 'Maria Garcia'],
  lastKnownLocation: 'Financial District',
  physicalDescription: '5\'6", Black hair, Green eyes, 140 lbs',
@@ -140,8 +134,7 @@
  relationship: 'person_of_interest',
  threatLevel: 'critical',
  status: 'active',
- profileData: {
- occupation: 'Unknown',
+ profileData: { occupation: 'Unknown',
  knownAssociates: ['Alexei Petrov', 'Dmitri Volkov'],
  lastKnownLocation: 'Industrial Warehouse Complex',
  physicalDescription: '6\'2", Blonde hair, Blue eyes, 200 lbs, Scar on left cheek',
@@ -167,8 +160,7 @@
  relationship: 'person_of_interest',
  threatLevel: 'low',
  status: 'active',
- profileData: {
- occupation: '',
+ profileData: { occupation: '',
  knownAssociates: [],
  lastKnownLocation: '',
  physicalDescription: '',
@@ -180,8 +172,7 @@
  },
  tags: []
  });
-
- // Computed properties (fixed: use persons, shallow copy, correct return)
+  
  let filteredPersons = $derived (() => {
  let filtered = persons.slice();
 
@@ -192,10 +183,8 @@
  p.name.toLowerCase().includes(query) ||
  p.aliases.some(alias => alias.toLowerCase().includes(query)) ||
  p.relationship.toLowerCase().includes(query) ||
- p.profileData.occupation?.toLowerCase().includes(query) ||
- p.tags.some(tag => tag.toLowerCase().includes(query)) ||
- p.profileData.notes?.toLowerCase().includes(query) ||
- p.profileData.physicalDescription?.toLowerCase().includes(query)
+ p.profileData.occupation?.toLowerCase().includes(query) ?? p.tags.some(tag => tag.toLowerCase().includes(query)) ||
+ p.profileData.notes?.toLowerCase().includes(query) ?? p.profileData.physicalDescription?.toLowerCase().includes(query)
  );
  }
 
@@ -227,8 +216,7 @@
  case 'created':
  comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
  break;
- case 'threat':
- const threatOrder: Record<string, number> = { low: 1, medium: 2 2, high: 3, critical: 4 4 };
+ case 'threat': const, threatOrder: Record<string, number> = { low: 1, medium: 2 2, high: 3, critical: 4 4 };
  comparison = threatOrder[a.threatLevel] - threatOrder[b.threatLevel];
  break;
  }
@@ -236,8 +224,7 @@
  });
  return filtered;
  });
-
- // Helper: compute initials for avatar fallback
+  
  function initials(name: string) {
  return (name || '')
  .split(' ')
@@ -322,9 +309,9 @@
  const newId = (persons.length + 1).toString();
  const now = new Date().toISOString();
  const addedPerson: PersonOfInterest = {
- ...newPerson, id: newId, newId: newId,
+ ...newPerson, id: newId, newId,
  caseIds: [], // New persons start with no cases
- createdAt: now, updatedAt: now, now: now,
+ createdAt: now, updatedAt: now, now,
  createdBy: 'current_user', // Replace with actual user
  position: {} // Default empty position
  };
@@ -352,18 +339,18 @@
  <header class="flex justify-between items-center mb-6 pb-4 border-b border-yellow-600/30">
  <div class="flex items-center gap-4">
  <h1 class="text-3xl font-bold text-yellow-400">PERSONS OF INTEREST</h1>
- <Badge variant="outline" class="border-yellow-600 text-yellow-400">Total: {persons.length}</Badge>
+ <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">Total: {persons.length}</span>
  </div>
  <div class="flex gap-2">
- <Button variant="outline" class="border-yellow-600 text-yellow-400 hover:bg-yellow-900/20" onclick={loadPersons}>
+ <Button variant="outline" class="border-yellow-600 text-yellow-400 hover:bg-yellow-900/20 bits-btn" onclick={ loadPersons }>
  <RefreshCw class="w-4 h-4 mr-2" /> Refresh
  </Button>
- <Button variant="outline" class="border-yellow-600 text-yellow-400 hover:bg-yellow-900/20" onclick={exportData}>
+ <Button variant="outline" class="border-yellow-600 text-yellow-400 hover:bg-yellow-900/20 bits-btn" onclick={ exportData }>
  <Download class="w-4 h-4 mr-2" /> Export
  </Button>
  <Dialog bind:open={showAddModal}>
  <DialogTrigger asChild> <!-- Updated to DialogTrigger with asChild for bits-ui -->
- <Button class="bg-yellow-600 text-gray-900 hover:bg-yellow-700">
+ <Button class="bg-yellow-600 text-gray-900 hover:bg-yellow-700 bits-btn">
  <Plus class="w-4 h-4 mr-2" /> Add Person
  </Button>
  </DialogTrigger>
@@ -445,7 +432,7 @@
  </div>
  </div>
  <DialogFooter> <!-- Updated to DialogFooter -->
- <Button type="submit" onclick={handleAddPerson} disabled={isLoading} class="bg-yellow-600 text-gray-900 hover:bg-yellow-700">
+ <Button type="submit" onclick={handleAddPerson} disabled={isLoading} class="bg-yellow-600 text-gray-900 hover:bg-yellow-700 bits-btn">
  {#if isLoading}
  Adding...
  {:else}
@@ -460,10 +447,10 @@
 
  <div class="flex flex-col md:flex-row gap-6"> <!-- Added UnoCSS flex classes for layout -->
  <!-- Sidebar / Filters -->
- <aside class={cn("w-full md:w-64 p-4 bg-gray-900 border border-yellow-600/30 rounded-lg", showFilters ? 'block' : 'hidden md:block')}>
+ <aside class={cn("w-full md:w-64 p-4 bg-gray-900 border border-yellow-600/30 rounded-lg", showFilters ? 'block' : 'hidden, md:block')}>
  <div class="flex justify-between items-center mb-4">
  <h2 class="text-xl font-semibold text-yellow-400">Filters</h2>
- <Button variant="ghost" size="sm" onclick={clearFilters} class="text-gray-400 hover:text-yellow-400">Clear All</Button>
+ <Button variant="ghost" size="sm" onclick={clearFilters} class="text-gray-400 hover:text-yellow-400 bits-btn">Clear All</Button>
  </div>
 
  <div class="space-y-4">
@@ -560,13 +547,13 @@
  </div>
  </div>
  <div class="flex gap-2">
- <Button variant="outline" size="icon" onclick={() => (showFilters = !showFilters)} class="md:hidden border-yellow-600 text-yellow-400 hover:bg-yellow-900/20">
+ <Button class="bits-btn" variant="outline" size="icon" onclick={() => (showFilters = !showFilters)} class="md:hidden border-yellow-600 text-yellow-400 hover:bg-yellow-900/20">
  <Filter class="w-4 h-4" />
  </Button>
- <Button variant="outline" size="icon" onclick={() => (viewMode = 'grid')} class={cn("border-yellow-600 text-yellow-400 hover:bg-yellow-900/20", viewMode === 'grid' && 'bg-yellow-900/30')}> <!-- Fixed to set 'grid' -->
+ <Button class="bits-btn" variant="outline" size="icon" onclick={() => (viewMode = 'grid')} class={cn("border-yellow-600 text-yellow-400 hover:bg-yellow-900/20", viewMode === 'grid' && 'bg-yellow-900/30')}> <!-- Fixed to set 'grid' -->
  <LayoutGrid class="w-4 h-4" />
  </Button>
- <Button variant="outline" size="icon" onclick={() => (viewMode = 'list')} class={cn("border-yellow-600 text-yellow-400 hover:bg-yellow-900/20", viewMode === 'list' && 'bg-yellow-900/30')}>
+ <Button class="bits-btn" variant="outline" size="icon" onclick={() => (viewMode = 'list')} class={cn("border-yellow-600 text-yellow-400 hover:bg-yellow-900/20", viewMode === 'list' && 'bg-yellow-900/30')}>
  <List class="w-4 h-4" />
  </Button>
  </div>
@@ -592,13 +579,13 @@
  ? 'Try adjusting your search or filter criteria.'
  : 'Add new persons of interest to begin tracking.'}
  </p>
- <Button onclick={() => (showAddModal = true)} class="mt-4 bg-yellow-600 text-gray-900 hover:bg-yellow-700">
+ <Button class="bits-btn" onclick={() => (showAddModal = true)} class="mt-4 bg-yellow-600 text-gray-900 hover:bg-yellow-700">
  <Plus class="w-4 h-4 mr-2" /> Add First Person
  </Button>
  </div>
  {:else}
  {#if viewMode === 'grid'} <!-- Updated to check 'grid' -->
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> <!-- Added UnoCSS grid classes -->
+ <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-3 gap-4"> <!-- Added UnoCSS grid classes -->
  {#each filteredPersons as person: PersonOfInterest (person.id)}
  <Card class="person-card bg-gray-900 border-yellow-600/30 text-gray-100">
  <div class="flex items-center gap-4 p-4 border-b border-yellow-600/20">
@@ -626,9 +613,9 @@
  <p class="text-gray-400 line-clamp-2">{person.profileData.notes || 'No notes available.'}</p>
  </div>
  <div class="flex justify-end gap-2 p-4 border-t border-yellow-600/20">
- <Button variant="ghost" size="sm" class="text-gray-400 hover:text-yellow-400"><Eye class="w-4 h-4" /> View</Button>
- <Button variant="ghost" size="sm" class="text-gray-400 hover:text-yellow-400"><Edit class="w-4 h-4" /> Edit</Button>
- <Button variant="destructive" size="sm" class="bg-red-800/30 text-red-400 hover:bg-red-800/50"><Trash2 class="w-4 h-4" /> Remove</Button>
+ <Button variant="ghost" size="sm" class="text-gray-400 hover:text-yellow-400 bits-btn"><Eye class="w-4 h-4" /> View</Button>
+ <Button variant="ghost" size="sm" class="text-gray-400 hover:text-yellow-400 bits-btn"><Edit class="w-4 h-4" /> Edit</Button>
+ <Button variant="destructive" size="sm" class="bg-red-800/30 text-red-400 hover:bg-red-800/50 bits-btn"><Trash2 class="w-4 h-4" /> Remove</Button>
  </div>
  </Card>
  {/each}
@@ -656,9 +643,9 @@
  <Badge class={getRelationshipColor(person.relationship)}>{person.relationship.replace(/_/g, ' ').toUpperCase()}</Badge>
  </div>
  <div class="flex gap-2">
- <Button variant="ghost" size="sm" class="text-gray-400 hover:text-yellow-400"><Eye class="w-4 h-4" /></Button>
- <Button variant="ghost" size="sm" class="text-gray-400 hover:text-yellow-400"><Edit class="w-4 h-4" /></Button>
- <Button variant="destructive" size="sm" class="bg-red-800/30 text-red-400 hover:bg-red-800/50"><Trash2 class="w-4 h-4" /></Button>
+ <Button variant="ghost" size="sm" class="text-gray-400 hover:text-yellow-400 bits-btn"><Eye class="w-4 h-4" /></Button>
+ <Button variant="ghost" size="sm" class="text-gray-400 hover:text-yellow-400 bits-btn"><Edit class="w-4 h-4" /></Button>
+ <Button variant="destructive" size="sm" class="bg-red-800/30 text-red-400 hover:bg-red-800/50 bits-btn"><Trash2 class="w-4 h-4" /></Button>
  </div>
  </Card>
  {/each}
@@ -673,8 +660,7 @@
  @import 'nes.css/css/nes.min.css'; /* Kept NES.css for retro styling */
  /* Custom scrollbar for the interface */
  :global(.yorha-detective-interface *::-webkit-scrollbar) {
- width: 8px;
- height: 8px;
+ width: 8px; height: 8px;
  }
  :global(.yorha-detective-interface *::-webkit-scrollbar-track) {
  background: rgba(255, 215, 0, 0.1);
@@ -685,3 +671,7 @@
  border-radius: 4px;
  }
 </style>
+
+
+
+

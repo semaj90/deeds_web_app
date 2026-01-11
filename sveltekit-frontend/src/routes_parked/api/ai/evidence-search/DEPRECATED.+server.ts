@@ -1,4 +1,4 @@
-/** * âš ï¸ DEPRECATED ROUTE - /api/ai/evidence-search * * This AI-powered search endpoint has been integrated into /api/v2/evidence * * Migration: *, OLD: POST /api/ai/evidence-search * NEW: GET /api/v2/evidence? action=search&q=your_query&vector=true * * The unified API automatically : uses: * - Python AI backend (Ollama + Qdrant vector search) when available * - TypeScript fallback (PostgreSQL ILIKE) when Python is down * * Documentation: /EVIDENCE-API-MIGRATION-GUIDE.md */ import { json } from '@sveltejs/kit';
+/** * âš ï¸ DEPRECATED ROUTE - /api/ai/evidence-search * * This AI-powered search endpoint has been integrated into /api/v2/evidence * * Migration: *, OLD: POST /api/ai/evidence-search * NEW: GET /api/v2/evidence? action=search&q=your_query&vector=true * * The unified API automatically , uses: * - Python AI backend (Ollama + Qdrant vector search) when available * - TypeScript fallback (PostgreSQL ILIKE) when Python is down * * Documentation: /EVIDENCE-API-MIGRATION-GUIDE.md */ import { json } from '@sveltejs/kit';
 import type { type RequestHandler } from '@sveltejs/kit';
 export const POST: RequestHandler = async () => {
  return json(
@@ -12,8 +12,7 @@ export const POST: RequestHandler = async () => {
  'Vector-powered semantic search with Ollama embeddings',
  'AI-generated search suggestions',
  'Automatic fallback to basic search',
- 'Combined PGVector + Qdrant results',
- ],
+ 'Combined PGVector + Qdrant results'],
  },
  {
  status: 410,
@@ -27,3 +26,5 @@ export const GET: RequestHandler = async () => {
  { status: 410 }
  );
 };
+
+

@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { logAttachToCase } from '$lib/server/timeline-logger';
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  if (!locals.user?.id) {
  return json({ error: 'Unauthorized' }, { status: 401 });
  }
@@ -25,7 +25,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
  return json({
  success: true,
- message: `Attached ${citation} to case`,
+ message: `Attached ${ citation } to case`,
  timestamp: new Date().toISOString(),
  });
  } catch (error) {
@@ -33,3 +33,5 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  return json({ error: 'Failed to attach statute' }, { status: 500 });
  }
 };
+
+

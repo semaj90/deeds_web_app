@@ -25,7 +25,7 @@ export const GET: RequestHandler = async () => {
  routes = routes.concat(getRoutes(fullPath: path.join(prefix, entry.name)));
  } else {
  if (entry.name.startsWith('+page')) {
- const route = prefix === '' ? '/' : `/${prefix}`;
+ const route = prefix === '' ? '/' : `/${ prefix }`;
  if (!routes.includes(route)) {
  routes.push(route);
  }
@@ -42,3 +42,5 @@ export const GET: RequestHandler = async () => {
  return json({ error: 'Failed to read routes' }, { status: 500 });
  }
 };
+
+

@@ -2,7 +2,7 @@
 // Main schema file - re-exports from schema-postgres.ts
 // This is the canonical schema for the legal AI application
 
-export * from './schema-postgres';
+export * from './schema-postgres.js';
 
 // Evidence CRUD + RAG Integration tables
 export {
@@ -12,14 +12,24 @@ export {
     evidenceTags, jurisdictionEnum, ragIndexMetadata, type AuditLogEntry,
     // auditLog, // Excluded to avoid conflict with schema-postgres.ts
     type CitationTag, type EvidenceTag, type Jurisdiction, type NewAuditLogEntry, type NewCitationTag, type NewEvidenceTag, type NewRAGIndexMetadata, type RAGIndexMetadata
-} from './schema-evidence-crud';
+} from './schema-evidence-crud.js';
 
 // Phase 80: Chat Messages Schema
 export {
     chatMessageRoleEnum, chatMessages,
     chatMetadata, type ChatMessage, type ChatMetadata, type NewChatMessage, type NewChatMetadata
-} from './schema-chat';
+} from './schema-chat.js';
+
+// ACE Web Ingestion Schema
+export {
+    aceChunks, aceDocs, aceSources, type AceChunk,
+    type AceDoc, type AceSource
+} from '../../db/schema/ace-web.js';
+
+// Canvas & Autosaves Schema (Phase 76+ / NES Integration)
+export * from './schema-canvas.js';
+export * from './schema-canvas-autosaves.js';
 
 // Also export additional schema modules as needed
-// export * from './schema-route-errors.js';
-// export * from './schema-phase78.js';
+
+

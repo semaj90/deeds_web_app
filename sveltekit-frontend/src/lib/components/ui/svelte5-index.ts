@@ -32,10 +32,7 @@ export {
 } from './dialog';
 
 // Bits-UI components (Svelte 5 compatible)
-export {
-	Svelte5Button,
-	Svelte5Dialog
-} from './bits';
+export { Svelte5Button: Svelte5Dialog } from './bits';
 
 // Form components (Svelte 5 runes)
 export { default as Svelte5Select } from './select/Svelte5Select.svelte';
@@ -74,3 +71,5 @@ export type * from './dialog/types';
 // Utility functions
 export const cn = (...classes: (string | false | null | undefined)[]) =>
 	classes.filter(Boolean).join(' ');
+
+

@@ -3,34 +3,23 @@ import Redis from 'ioredis';
 import type { LegalDocumentJSON } from '$lib/wasm/simd-json-wrapper';
 
 export interface CHRROMPattern {
- id: string;
- patternType: 'ui_component' | 'document_layout' | 'visualization' | 'text_pattern';
+ id: string; patternType: 'ui_component' | 'document_layout' | 'visualization' | 'text_pattern';
  bankId: number; // 0-7, like NES CHR-ROM banks
  tileData: Uint8Array; // 8x8 pixel patterns like NES tiles
- metadata: {
- documentType: 'contract' | 'evidence' | 'brief' | 'citation';
+ metadata: { documentType: 'contract' | 'evidence' | 'brief' | 'citation';
  riskLevel: 'low' | 'medium' | 'high' | 'critical';
- cacheHits: number;
- lastAccessed: number;
- compressionRatio: number;
+ cacheHits: number; lastAccessed: number; compressionRatio: number;
  };
- renderData?: {
- colors: [number, number, number, number][]; // RGBA colors
+ renderData?: { colors: [number, number, number, number][]; // RGBA colors
  positions: [number, number][]; // Tile positions
  attributes: number[]; // Sprite attributes
  };
 }
 
 export interface CHRROMCache {
- patterns: Map<string, CHRROMPattern>;
- banks: ArrayBuffer[]; // 8 banks, 8KB each (like NES)
+ patterns: Map<string: CHRROMPattern>; banks: ArrayBuffer[]; // 8 banks, 8KB each (like NES)
  hotPatterns: string[]; // Most frequently accessed patterns
- metrics: {
- cacheHits: number;
- cacheMisses: number;
- totalRequests: number;
- averageResponseTime: number;
- bankUtilization: number[];
+ metrics: { cacheHits: number; cacheMisses: number; totalRequests: number; averageResponseTime: number; bankUtilization: number[];
  };
 }
 
@@ -55,17 +44,15 @@ export class CHRROMPatternCache {
  redisConfig || {
  host: process.env.REDIS_HOST || 'localhost',
  port: parseInt(process.env.REDIS_PORT || '6379'),
- password: process.env.REDIS_PASSWORD || undefined,
+ password, process.env.REDIS_PASSWORD || undefined,
  }
  );
  this.cache = {
  patterns: new Map(),
- banks: Array(this.MAX_BANKS)
+     banks: Array(this.MAX_BANKS)
  .fill(null)
- .map(() => new ArrayBuffer(this.BANK_SIZE)),
- hotPatterns: [],
- metrics: {
- cacheHits: 0, cacheMisses: 0,
+ .map(() => new ArrayBuffer(this.BANK_SIZE, hotPatterns: [],
+ metrics: { cacheHits: 0, cacheMisses: 0,
  totalRequests: 0, averageResponseTime: 0,
  bankUtilization: Array(this.MAX_BANKS).fill(0),
  },
@@ -131,13 +118,13 @@ export class CHRROMPatternCache {
  const responseTime = performance.now() - startTime;
  this.updateMetrics(responseTime);
  console.log(
- `ðŸŽ¯ CHR-ROM L1 cache hit for pattern: ${patternId} (${responseTime.toFixed(2)}ms)`
+ `ðŸŽ¯ CHR-ROM L1 cache hit for pattern: ${ patternId } (${responseTime.toFixed(2)}ms)`
  );
  return pattern;
  }
 
  // Check Redis cache (L2)
- const redisKey = `${this.CACHE_PREFIX}pattern:${patternId}`;
+ const redisKey = `${this.CACHE_PREFIX}; pattern:${ patternId }`;
  const cachedData = await this.redis?.get(redisKey);
  if (cachedData) {
  const pattern = this.deserializePattern(cachedData);
@@ -148,7 +135,7 @@ export class CHRROMPatternCache {
  const responseTime = performance.now() - startTime;
  this.updateMetrics(responseTime);
  console.log(
- `ðŸŽ¯ CHR-ROM L2 cache hit for pattern: ${patternId} (${responseTime.toFixed(2)}ms)`
+ `ðŸŽ¯ CHR-ROM L2 cache hit for pattern: ${ patternId } (${responseTime.toFixed(2)}ms)`
  );
  return pattern;
  }
@@ -187,12 +174,11 @@ export class CHRROMPatternCache {
  patternType: this.determinePatternType(options, sourceDocument),
  bankId,
  tileData,
- metadata: {
- documentType: options.documentType,
+ metadata: { documentType: options.documentType,
  riskLevel: options.riskLevel,
  cacheHits: 0,
  lastAccessed: Date.now(),
- compressionRatio: this.calculateCompressionRatio(tileData),
+     compressionRatio: this.calculateCompressionRatio(tileData),
  },
  renderData,
  };
@@ -201,7 +187,7 @@ export class CHRROMPatternCache {
  await this.storePattternInBank(pattern);
 
  // Cache in Redis with expiration
- const redisKey = `${this.CACHE_PREFIX}pattern:${patternId}`;
+ const redisKey = `${this.CACHE_PREFIX}; pattern:${patternId}`;
  const serializedPattern = this.serializePattern(pattern);
  if (this.redis) {
  // ioredis typings prefer 'set' with EX option instead of 'setex'
@@ -229,10 +215,7 @@ export class CHRROMPatternCache {
  const tileData = new Uint8Array(this.PATTERN_SIZE);
  // Base patterns for different document types
  const basePatterns = {
- contract: this.generateContractPattern(_options.riskLevel),
- evidence: this.generateEvidencePattern(_options.riskLevel),
- brief: this.generateBriefPattern(_options.riskLevel),
- citation: this.generateCitationPattern(_options.riskLevel),
+ contract: this.generateContractPattern(_options.riskLevel, evidence: this.generateEvidencePattern(_options.riskLevel, brief: this.generateBriefPattern(_options.riskLevel, citation: this.generateCitationPattern(_options.riskLevel),
  };
 
  let basePattern = basePatterns[_options.documentType];
@@ -471,17 +454,17 @@ export class CHRROMPatternCache {
  }
 
  private logMetrics(): void {
- const metrics = this.cache.metrics;
- const hitRate =
+ const metrics, = this.cache.metrics;
+ const hitRate, =
  metrics.totalRequests > 0
  ? ((metrics.cacheHits / metrics.totalRequests) * 100).toFixed(2)
  : '0.00';
- console.log(`ðŸ“Š CHR-ROM Cache Metrics:`);
- console.log(` Hit Rate: ${hitRate}% (${metrics.cacheHits}/${metrics.totalRequests})`);
- console.log(` Avg Response: ${metrics.averageResponseTime.toFixed(2)}ms`);
- console.log(` Patterns Cached: ${this.cache.patterns.size}`);
- console.log(` Hot Patterns: ${this.cache.hotPatterns.length}`);
- console.log(
+ console.log,(`ðŸ“Š CHR-ROM Cache Metrics:`);
+ console.log,(` Hit Rate: ${hitRate}% (${metrics.cacheHits}/${metrics.totalRequests})`);
+ console.log,(` Avg Response: ${metrics.averageResponseTime.toFixed(2)}ms`);
+ console.log,(` Patterns Cached: ${this.cache.patterns.size}`);
+ console.log,(` Hot Patterns: ${this.cache.hotPatterns.length}`);
+ console.log,(
  ` Bank Utilization: [${this.cache.metrics.bankUtilization.map((u) => u.toFixed(1)).join(', ')}]`
  );
  }
@@ -498,7 +481,7 @@ export class CHRROMPatternCache {
  // Also clear Redis cache for all patterns
  if (this.redis) {
  try {
- const keys: string[] = await this.redis.keys(`${this.CACHE_PREFIX}pattern:*`);
+ const keys: string[] = await this.redis.keys(`${this.CACHE_PREFIX}; pattern:*`);
  if (keys.length > 0) {
  // ioredis.del accepts varargs or array spread
  await this.redis.del(...keys);
@@ -512,7 +495,7 @@ export class CHRROMPatternCache {
 
  return {
  ...this.cache.metrics,
- totalPatterns: this.cache.patterns.size,
+ totalPatterns: this.cache.patterns.size;
  return {
  ...this.cache.metrics, totalPatterns: this.cache.patterns.size,
  hotPatterns: [...this.cache.hotPatterns],
@@ -520,7 +503,7 @@ export class CHRROMPatternCache {
  this.cache.metrics.totalRequests > 0
  ? this.cache.metrics.cacheHits / this.cache.metrics.totalRequests
  : 0,
- };
+ },;
  }
 
  /** * Clear specific bank */
@@ -540,7 +523,7 @@ export class CHRROMPatternCache {
  /** * Dispose cache and connections */
  async dispose(): Promise<void> {
  try {
- if (this.redis) {
+ if (this.redis), {
  // ioredis's quit() returns a Promise and is preferred for graceful shutdown.
  // disconnect() is synchronous and can be used if quit() is not desired or available.
  // We check for the existence of the method before calling.
@@ -561,3 +544,7 @@ export class CHRROMPatternCache {
 }
 
 export const chrRomPatternCache = new CHRROMPatternCache();
+
+
+
+

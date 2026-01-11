@@ -21,3 +21,5 @@ declare module '$env/static/public' {
  // Duplicate removed:
  // Duplicate removed: export const __ENV__: Record<string, string | undefined>
 }
+
+

@@ -24,3 +24,5 @@ export async function handleFileUpload(request: Request): MinIOService {
  return json({ success: false, error: 'Failed to handle file upload' }, { status: 500 });
  }
 }
+
+

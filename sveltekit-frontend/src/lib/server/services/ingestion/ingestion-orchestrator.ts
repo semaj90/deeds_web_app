@@ -20,22 +20,16 @@ export interface IngestionConfig {
 
 export interface IngestionProgress {
  phase: 'loading' | 'processing' | 'embedding' | 'indexing' | 'complete';
- totalDocuments: number;
- processedDocuments: number;
- currentDocument: string;
- percentComplete: number;
+ totalDocuments: number; processedDocuments: number;
+ currentDocument: string; percentComplete: number;
  estimatedTimeRemaining: number;
 }
 
 export interface IngestionResult {
- success: boolean;
- totalDocuments: number;
- processedDocuments: number;
- indexedDocuments: number;
- totalChunks: number;
- totalEmbeddings: number;
- executionTimeMs: number;
- errors: Array<{ documentId: string; error: string }>;
+ success: boolean; totalDocuments: number;
+ processedDocuments: number; indexedDocuments: number;
+ totalChunks: number; totalEmbeddings: number;
+ executionTimeMs: number; errors: Array<{ documentId: string; error: string }>;
 }
 
 export class IngestionOrchestrator {
@@ -56,7 +50,7 @@ export class IngestionOrchestrator {
  this.config = {
  localBasePath: config.localBasePath || './lawpdfs',
  source: config.source || 'local',
- batchSize: config.batchSize || 100, skipEmbedding: 100.skipEmbedding || false: skipIndexing.skipIndexing || false: minioBucket.minioBucket: minioClient.minioClient,
+ batchSize, config.batchSize || 100, skipEmbedding, 100.skipEmbedding || false, skipIndexing.skipIndexing || false: minioBucket.minioBucket: minioClient.minioClient,
  };
  this.progress = {
  phase: 'loading',
@@ -177,7 +171,7 @@ export class IngestionOrchestrator {
  this.progress.phase = 'loading';
  this.progress.totalDocuments = limit;
 
- console.log(`Starting limited ingestion: ${limit} documents`);
+ console.log(`Starting limited ingestion: ${ limit } documents`);
 
  // Load and process batch
  const rawDocuments = await this.loader.getDocuments(limit, 0);
@@ -241,3 +235,7 @@ export class IngestionOrchestrator {
 export async function createOrchestrator(config?: IngestionConfig): Promise<IngestionOrchestrator> {
  return new IngestionOrchestrator(config);
 }
+
+
+
+

@@ -27,3 +27,6 @@ export async function POST({ request }: { request: Request }) {
  return json({ error: 'Failed to calculate magnetic forces' }, { status: 500 });
  }
 }
+
+
+

@@ -6,10 +6,8 @@
 	import SummaryCard from './SummaryCard.svelte';
 
 	interface Stats {
-		total_files: number;
-		total_summaries: number;
-		total_clusters: number;
-		files_with_errors: number;
+		total_files: number; total_summaries: number;
+		total_clusters: number; files_with_errors: number;
 		avg_complexity: number;
 	}
 
@@ -140,16 +138,14 @@
 <style>
 	.analytics-dashboard {
 		padding: 2rem;
-		max-width: 1400px;
-		margin: 0 auto;
+		max-width: 1400px; margin: 0 auto;
 		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 		min-height: 100vh;
 	}
 
 	.dashboard-header {
 		text-align: center;
-		margin-bottom: 2rem;
-		color: white;
+		margin-bottom: 2rem; color: white;
 	}
 
 	.dashboard-header h1 {
@@ -159,25 +155,21 @@
 	}
 
 	.subtitle {
-		font-size: 1rem;
-		opacity: 0.9;
+		font-size: 1rem; opacity: 0.9;
 	}
 
 	.loading-state, .error-state {
-		text-align: center;
-		padding: 4rem;
+		text-align: center; padding: 4rem;
 		background: white;
 		border-radius: 12px;
 		box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 	}
 
 	.spinner {
-		width: 50px;
-		height: 50px;
+		width: 50px; height: 50px;
 		border: 4px solid #f3f3f3;
 		border-top: 4px solid #667eea;
-		border-radius: 50%;
-		animation: spin 1s linear infinite;
+		border-radius: 50%; animation: spin 1s linear infinite;
 		margin: 0 auto 1rem;
 	}
 
@@ -192,19 +184,15 @@
 	}
 
 	.error-state .hint {
-		font-size: 0.875rem;
-		color: #6b7280;
+		font-size: 0.875rem; color: #6b7280;
 		margin-top: 1rem;
 	}
 
 	.error-state button {
-		margin-top: 1rem;
-		padding: 0.5rem 1.5rem;
-		background: #667eea;
-		color: white;
+		margin-top: 1rem; padding: 0.5rem 1.5rem;
+		background: #667eea; color: white;
 		border: none;
-		border-radius: 6px;
-		cursor: pointer;
+		border-radius: 6px; cursor: pointer;
 		font-weight: 500;
 	}
 
@@ -220,12 +208,10 @@
 	}
 
 	.stat-card {
-		background: white;
-		padding: 1.5rem;
+		background: white; padding: 1.5rem;
 		border-radius: 12px;
 		box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-		text-align: center;
-		transition: transform 0.2s;
+		text-align: center; transition: transform 0.2s;
 	}
 
 	.stat-card:hover {
@@ -240,21 +226,18 @@
 
 	.stat-value {
 		font-size: 2rem;
-		font-weight: bold;
-		color: #667eea;
+		font-weight: bold; color: #667eea;
 		margin-bottom: 0.25rem;
 	}
 
 	.stat-label {
-		font-size: 0.875rem;
-		color: #6b7280;
+		font-size: 0.875rem; color: #6b7280;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 	}
 
 	.tabs {
-		display: flex;
-		gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 		margin-bottom: 1.5rem;
 		flex-wrap: wrap;
 	}
@@ -262,12 +245,9 @@
 	.tabs button {
 		padding: 0.75rem 1.5rem;
 		background: rgba(255, 255, 255, 0.2);
-		color: white;
-		border: 2px solid transparent;
-		border-radius: 8px;
-		cursor: pointer;
-		font-weight: 500;
-		transition: all 0.2s;
+		color: white; border: 2px solid transparent;
+		border-radius: 8px; cursor: pointer;
+		font-weight: 500; transition: all 0.2s;
 		backdrop-filter: blur(10px);
 	}
 
@@ -276,8 +256,7 @@
 	}
 
 	.tabs button.active {
-		background: white;
-		color: #667eea;
+		background: white; color: #667eea;
 		border-color: white;
 		box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 	}
@@ -290,3 +269,6 @@
 		min-height: 500px;
 	}
 </style>
+
+
+

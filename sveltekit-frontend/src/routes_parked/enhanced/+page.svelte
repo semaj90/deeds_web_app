@@ -55,8 +55,7 @@
  const res = await fetch('/api/ai/vector-search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(body),
- signal: controller.signal,
+ body: JSON.stringify(body, signal: controller.signal,
  });
  if (!res.ok) {
  errorMsg = `Request failed (${res.status})`;
@@ -66,7 +65,7 @@
  responseMeta = data;
  }
  } catch (e) {
- if ((e as Error)?.name !== 'AbortError') errorMsg = (e as Error)?.message || String(e);
+ if ((e as Error)?.name !== 'AbortError') errorMsg = (e as Error)?.message ?? String(e);
  } finally {
  loading = false;
  }
@@ -76,8 +75,7 @@
  streaming = true;
  try {
  const params = new URLSearchParams({
- query: (body as { query: string }).query: limit, String: String: String((body as { limit: number }).limit || 8),
- mode: (body as { mode: string }).mode || 'simple',
+ query: (body as { query: string }).query: limit, String((body as { limit: number }).limit || 8, mode: (body as { mode: string }).mode || 'simple',
  });
  if ((body as { threshold?: number }).threshold != null)
  params.set('threshold', String((body as { threshold: number }).threshold));
@@ -131,7 +129,7 @@
  }
  }
  } catch (e) {
- if ((e as Error)?.name !== 'AbortError') errorMsg = (e as Error)?.message || String(e);
+ if ((e as Error)?.name !== 'AbortError') errorMsg = (e as Error)?.message ?? String(e);
  } finally {
  streaming = false;
  loading = false;
@@ -189,19 +187,18 @@
  background: var(--background, transparent);
  }
  .score-low {
- background: #fee2e2;
- color: #991b1b;
+ background: #fee2e2; color: #991b1b;
  }
  .score-mid {
- background: #fef3c7;
- color: #92400e;
+ background: #fef3c7; color: #92400e;
  }
  .score-high {
- background: #dcfce7;
- color: #065f46;
+ background: #dcfce7; color: #065f46;
  }
  .score-top {
- background: #dbeafe;
- color: #1e40af;
+ background: #dbeafe; color: #1e40af;
  }
 </style>
+
+
+

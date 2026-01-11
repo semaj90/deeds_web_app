@@ -34,8 +34,7 @@ async function generateEmbedding(text: string, model: string = 'embeddinggemma:l
 async function searchQdrant(
   collection: string,
   embedding: number[],
-  options: {
-    limit: number;
+  options: { limit: number;
     threshold: number;
     filters?: Record<string, unknown>;
   }
@@ -78,8 +77,8 @@ async function kbSearchHandler(request: KBSearchRequest): Promise<ToolResult<KBS
   const embedding = request.embedding || await generateEmbedding(request.query);
 
   const options = {
-    limit: request.options?.limit ?? 10,
-    threshold: request.options?.threshold ?? 0.5
+    limit, request.options?.limit ?? 10,
+    threshold, request.options?.threshold ?? 0.5
   };
 
   // Build filters
@@ -103,10 +102,8 @@ async function kbSearchHandler(request: KBSearchRequest): Promise<ToolResult<KBS
 
       for (const result of results) {
         allResults.push({
-          id: String(result.id),
-          score: result.score,
-          content: String(result.payload.content || result.payload.text || ''),
-          metadata: result.payload
+          id: String(result.id, score: result.score,
+          content: String(result.payload.content || result.payload.text || '', metadata: result.payload
         });
       }
     } catch (error) {
@@ -120,10 +117,9 @@ async function kbSearchHandler(request: KBSearchRequest): Promise<ToolResult<KBS
 
   return {
     success: true,
-    run_id: request.run_id,
+    run_id, request.run_id,
     tool: 'kb_search',
-    data: {
-      results: limitedResults,
+    data: { results: limitedResults,
       total_results: limitedResults.length
     },
     duration_ms: 0,
@@ -141,3 +137,7 @@ toolRegistry.register({
 });
 
 export { kbSearchHandler };
+
+
+
+

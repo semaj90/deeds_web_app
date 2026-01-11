@@ -17,7 +17,7 @@ import type { Document } from '$lib/types';
  * - View synthesis ranking scores
  */
 
- import Button from '$lib/components/ui/Button.svelte';
+ import { Button } from '$lib/components/ui/enhanced-bits';
  import { Upload } from "lucide-svelte";
 import { Search } from "lucide-svelte";
 import { Zap } from "lucide-svelte";
@@ -101,15 +101,14 @@ import { Database } from "lucide-svelte";;
  await new Promise((resolve) => setTimeout(resolve, 500));
 
  // Stage 2: Process through RAG pipeline
- processingStage = 'Embedding with, embeddinggemma:latest...',
+ processingStage = 'Embedding with, embeddinggemma:latest...';
  const response = await fetch('/api/rag/hybrid-pipeline/direct', {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  documents,
  query,
- config: {
- ranking: {
+ config: { ranking: {
  weights: { relevance: 0.5, keywords: 0.3, synthesis: 0.2 }
  }
  }
@@ -182,8 +181,7 @@ import { Database } from "lucide-svelte";;
 
 <style>
  .hybrid-rag-demo {
- background: #212529;
- color: #d4af37;
+ background: #212529; color: #d4af37;
  font-family: 'Press Start 2P', 'Courier New', monospace;
  }
 
@@ -212,3 +210,7 @@ import { Database } from "lucide-svelte";;
  }
  }
 </style>
+
+
+
+

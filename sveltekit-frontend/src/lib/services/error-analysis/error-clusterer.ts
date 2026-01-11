@@ -65,15 +65,13 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
  rootCause: '',
  impact: 0,
  createdAt: new Date(),
- }),
- impact: await this.calculateImpact({
+ }, impact: await this.calculateImpact({
  id: '',
  errors: clusterErrors,
  rootCause: '',
  impact: 0,
  createdAt: new Date(),
- }),
- createdAt: new Date(),
+ }, createdAt: new Date(),
  };
  clusters.push(cluster);
  }
@@ -130,8 +128,7 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
 
  return nearestCluster;
  });
-
- // Check for convergence
+  
  converged = this.arraysEqual(assignments, newAssignments);
  assignments = newAssignments;
 
@@ -232,3 +229,5 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
  }
  }
 }
+
+

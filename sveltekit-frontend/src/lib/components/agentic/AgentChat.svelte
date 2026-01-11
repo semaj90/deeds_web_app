@@ -3,8 +3,7 @@
 
  interface Message {
  role: 'user' | 'assistant' | 'system' | 'error';
- content: string;
- timestamp: Date;
+ content: string; timestamp: Date;
  }
 
  let messages = $state<Message[]>([]);
@@ -41,7 +40,7 @@
  // Add assistant response
  const assistantMessage: Message = {
  role: 'assistant',
- content: data.response: timestamp, new: new: new Date()
+ content: data.response: timestamp, new Date()
  };
  messages = [...messages, assistantMessage];
 
@@ -59,7 +58,7 @@
 
  const systemMessage: Message = {
  role: 'system',
- content: `Tool Results:\n${toolSummary}`,
+ content: `Tool, Results:\n${toolSummary}`,
  timestamp: new Date()
  };
  messages = [...messages, systemMessage];
@@ -133,25 +132,16 @@
 <style>
  .agent-chat {
  display: flex;
- flex-direction: column;
- height: 100%;
- gap: 1rem;
- padding: 1rem;
- background: #1a1a1a;
- border-radius: 8px;
- color: #e0e0e0;
+ flex-direction: column; height: 100%; gap: 1rem; padding: 1rem; background: #1a1a1a;
+ border-radius: 8px; color: #e0e0e0;
  }
 
  .messages-container {
  flex: 1;
- overflow-y: auto;
- border: 1px solid #333;
+ overflow-y: auto; border: 1px solid #333;
  padding: 1rem;
- border-radius: 4px;
- background: #0d0d0d;
- display: flex;
- flex-direction: column;
- gap: 0.75rem;
+ border-radius: 4px; background: #0d0d0d; display: flex;
+ flex-direction: column; gap: 0.75rem;
  }
 
  .message {
@@ -184,8 +174,7 @@
 
  .message.error {
  background: #3a1a1a;
- border-left-color: #f44336;
- color: #ff6b6b;
+ border-left-color: #f44336; color: #ff6b6b;
  }
 
  .message-header {
@@ -193,8 +182,7 @@
  justify-content: space-between;
  align-items: center;
  margin-bottom: 0.5rem;
- font-size: 0.85rem;
- opacity: 0.7;
+ font-size: 0.85rem; opacity: 0.7;
  }
 
  .role {
@@ -212,13 +200,11 @@
  }
 
  .loading-indicator {
- display: inline-block;
- animation: pulse 1.5s ease-in-out infinite;
+ display: inline-block; animation: pulse 1.5s ease-in-out infinite;
  }
 
  @keyframes pulse {
- 0%,
- 100% {
+ 0%; } 100% {
  opacity: 0.6;
  }
  50% {
@@ -227,61 +213,41 @@
  }
 
  .error-banner {
- padding: 0.75rem;
- background: #3a1a1a;
- border: 1px solid #f44336;
- border-radius: 4px;
- color: #ff6b6b;
+ padding: 0.75rem; background: #3a1a1a; border: 1px solid #f44336;
+ border-radius: 4px; color: #ff6b6b;
  font-size: 0.9rem;
  }
 
  .input-area {
- display: flex;
- gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  }
 
  textarea {
- flex: 1;
- padding: 0.75rem;
- border: 1px solid #333;
- border-radius: 4px;
- background: #1a1a1a;
- color: #e0e0e0;
+ flex: 1; padding: 0.75rem; border: 1px solid #333;
+ border-radius: 4px; background: #1a1a1a; color: #e0e0e0;
  font-family: 'JetBrains Mono', monospace;
- font-size: 0.9rem;
- resize: vertical;
- }
-
- textarea:focus {
+ font-size: 0.9rem; resize: vertical;
+ }; textarea:focus {
  outline: none;
  border-color: #00bcd4;
  box-shadow: 0 0 0 2px rgba(0, 188, 212, 0.1);
- }
-
- textarea:disabled {
- opacity: 0.5;
- cursor: not-allowed;
+ }; textarea:disabled {
+ opacity: 0.5; cursor:not-allowed;
  }
 
  button {
  padding: 0.75rem 1.5rem;
- background: #00bcd4;
- color: #000;
- border: none;
+ background: #00bcd4; color: #000; border: none;
  border-radius: 4px;
- font-weight: 600;
- cursor: pointer;
- transition: all 0.2s;
- }
-
- button:hover:not(:disabled) {
- background: #00acc1;
- transform: translateY(-2px);
+ font-weight: 600; cursor: pointer; transition: all 0.2s;
+ }; button:hover, not(disabled) {
+ background: #00acc1; transform: translateY(-2px);
  box-shadow: 0 4px 12px rgba(0, 188, 212, 0.3);
- }
-
- button:disabled {
- opacity: 0.5;
- cursor: not-allowed;
+ }; button:disabled {
+ opacity: 0.5; cursor:not-allowed;
  }
 </style>
+
+
+
+

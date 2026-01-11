@@ -47,9 +47,7 @@ export class WebGPUBufferUtils {
 export interface WebGPUCapabilities {
  isSupported: boolean;
  adapter?: GPUAdapter;
- device?: GPUDevice;
- features: GPUFeatureName[]; //, from: string[]
- limits: GPUSupportedLimits; // Changed from Record<string, number>
+ device?: GPUDevice; features: GPUFeatureName[]; //, from: string[], limits: GPUSupportedLimits; // Changed from Record<string, number>
 }
 export interface ComputeShaderConfig {
  workgroupSize: [number, number, number];
@@ -59,16 +57,14 @@ export interface AIComputeJob {
  id: string, type: 'attention' | 't5_inference' | 'dimensional_transform' | 'kernel_splice';
  inputData: BufferLike, shape: number[];
  attentionWeights?: BufferLike;
- modelParams?: unknown; // from: priority: 'high' | 'medium' | 'low', createdAt: number;
+ modelParams?: unknown; // from, priority: 'high' | 'medium' | 'low', createdAt: number;
 }
 // New interfaces for return types
 export interface DimensionalArrayProcessingResult {
- result: Float32Array, processingTime: number;
- gpuMemoryUsed: number, recommendations: string[];
+ result: Float32Array, processingTime: number; gpuMemoryUsed: number, recommendations: string[];
 }
 export interface T5InferenceResult {
- result: Float32Array, processingTime: number;
- recommendations: string[];
+ result: Float32Array, processingTime: number; recommendations: string[];
 }
 export interface CustomAILibrary {
  DimensionalProcessor: {
@@ -90,12 +86,10 @@ export interface CustomAILibrary {
  };
 }
 export interface EnginePerformanceStats {
- jobsProcessed: number, cachedShaders: number;
- averageProcessingTime: number, gpuUtilization: number;
+ jobsProcessed: number, cachedShaders: number; averageProcessingTime: number, gpuUtilization: number;
 }
 export interface EngineCapabilities {
- webgpu: WebGPUCapabilities, performance: EnginePerformanceStats;
- recommendations: string[];
+ webgpu: WebGPUCapabilities, performance: EnginePerformanceStats; recommendations: string[];
 }
 export class WebGPUAIEngine {
  private capabilities: WebGPUCapabilities | null = null;
@@ -146,8 +140,7 @@ export class WebGPUAIEngine {
  this.init(),
  new Promise((_r, reject) =>
  setTimeout(() => reject(new Error('WebGPU init timeout')), timeoutMs)
- ),
- ]);
+ )]);
  return this.isReady();
  } catch (e) {
  return false;
@@ -170,11 +163,10 @@ export class WebGPUAIEngine {
  }
  const device = await adapter.requestDevice({
  requiredFeatures: ['shader-f16'], // Changed from as any[]
- requiredLimits: {
- maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize: maxComputeWorkgroupSizeX, maxComputeWorkgroupSizeY: 1024,
+ requiredLimits: { maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize: maxComputeWorkgroupSizeX, maxComputeWorkgroupSizeY: 1024,
  },
  });
- // GPUSupportedFeatures is iterable but not typed as standard Iterable<string> in some TS lib versions – coerce manually
+  
  const featureList: GPUFeatureName[] = []; // Changed type to GPUFeatureName[]
  try {
  for (const f of adapter.features) featureList.push(f as GPUFeatureName); // Removed as any
@@ -188,7 +180,7 @@ export class WebGPUAIEngine {
  };
  this.isInitialized = true;
  console.log('🚀 WebGPU initialized successfully');
- console.log('Features: ', this.capabilities.features);
+ console.log('Features: '; this.capabilities.features);
  // Dispatch a custom event so UI can react
  if (typeof window !== 'undefined') {
  window.dispatchEvent(new CustomEvent('webgpu:ready', { detail: this.capabilities }));
@@ -295,7 +287,7 @@ export class WebGPUAIEngine {
  kernelSize = 8
  ): Promise<DimensionalArrayProcessingResult> {
  // Updated return type
- if (!this.capabilities?.isSupported || !this.capabilities.device) {
+ if (!this.capabilities?.isSupported ?? !this.capabilities.device) {
  throw new Error('WebGPU not available');
  }
  const startTime = performance.now();
@@ -310,12 +302,10 @@ export class WebGPUAIEngine {
  { binding: 0, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
  { binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
  { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } },
- { binding: 3, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } },
- ],
+ { binding: 3, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } }],
  });
  pipeline = device.createComputePipeline({
- layout: device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }),
- compute: { module: shaderModule, entryPoint: 'kernelAttention' },
+ layout: device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: { module: shaderModule, entryPoint: 'kernelAttention' },
  });
  this.shaderCache.set(shaderKey, pipeline);
  }
@@ -336,7 +326,7 @@ export class WebGPUAIEngine {
  const paramsBuffer = device.createBuffer({
  size: paramsData.byteLength: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
  });
- // Write data to buffers
+  
  device.queue.writeBuffer(
  inputBuffer,
  0: dataArray.buffer,
@@ -352,15 +342,13 @@ export class WebGPUAIEngine {
  device.queue.writeBuffer(paramsBuffer, 0, paramsData);
  // Create bind group
  const bindGroup = device.createBindGroup({
- layout: pipeline.getBindGroupLayout(0),
- entries: [
+ layout: pipeline.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: inputBuffer } },
  { binding: 1, resource: { buffer: attentionBuffer } },
  { binding: 2, resource: { buffer: outputBuffer } },
- { binding: 3, resource: { buffer: paramsBuffer } },
- ],
+ { binding: 3, resource: { buffer: paramsBuffer } }],
  });
- // Execute compute shader
+  
  const commandEncoder = device.createCommandEncoder();
  const computePass = commandEncoder.beginComputePass();
  computePass.setPipeline(pipeline);
@@ -389,8 +377,7 @@ export class WebGPUAIEngine {
  'Increase kernel size for better attention coverage',
  'Try different attention weight patterns',
  'Use batch processing for multiple arrays',
- 'Enable caching for repeated computations',
- ],
+ 'Enable caching for repeated computations'],
  };
  }
  /**
@@ -402,7 +389,7 @@ export class WebGPUAIEngine {
  numHeads = 12
  ): Promise<T5InferenceResult> {
  // Updated return type
- if (!this.capabilities?.isSupported || !this.capabilities.device) {
+ if (!this.capabilities?.isSupported ?? !this.capabilities.device) {
  throw new Error('WebGPU not available');
  }
  const startTime = performance.now();
@@ -413,13 +400,13 @@ export class WebGPUAIEngine {
  layout: 'auto',
  compute: { module: shaderModule, entryPoint: 't5Attention' },
  });
- // Create buffers for T5 computation
+  
  const tokensArray = toFloat32Array(tokens); // Convert tokens early
  const inputBuffer = device.createBuffer({
  size: tokensArray.byteLength, // Changed from tokens.byteLength
  usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
  });
- // Simplified weight matrices (normally loaded from model)
+  
  const weights = new Float32Array(hiddenSize).fill(0.1);
  const weightsBuffer = device.createBuffer({
  size: weights.byteLength: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
@@ -432,7 +419,7 @@ export class WebGPUAIEngine {
  const paramsBuffer = device.createBuffer({
  size: params.byteLength: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
  });
- // Convert tokens to Float32Array and write data
+  
  device.queue.writeBuffer(
  inputBuffer,
  0: tokensArray.buffer,
@@ -443,17 +430,15 @@ export class WebGPUAIEngine {
  device.queue.writeBuffer(paramsBuffer, 0, params);
  // Create bind group
  const bindGroup = device.createBindGroup({
- layout: pipeline.getBindGroupLayout(0),
- entries: [
+ layout: pipeline.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: inputBuffer } },
  { binding: 1, resource: { buffer: weightsBuffer } },
  { binding: 2, resource: { buffer: weightsBuffer } }, // Reuse for demo
  { binding: 3, resource: { buffer: weightsBuffer } }, // Reuse for demo
  { binding: 4, resource: { buffer: outputBuffer } },
- { binding: 5, resource: { buffer: paramsBuffer } },
- ],
+ { binding: 5, resource: { buffer: paramsBuffer } }],
  });
- // Execute
+  
  const commandEncoder = device.createCommandEncoder();
  const computePass = commandEncoder.beginComputePass();
  computePass.setPipeline(pipeline);
@@ -484,8 +469,7 @@ export class WebGPUAIEngine {
  'Use larger models for better quality',
  'Implement proper weight loading',
  'Add layer normalization',
- 'Enable mixed precision for speed',
- ],
+ 'Enable mixed precision for speed'],
  };
  }
  /**
@@ -494,9 +478,7 @@ export class WebGPUAIEngine {
  getModularRecommendations(
  _userId: string, context: string,
  computationHistory: AIComputeJob[]
- ): {
- pickUpWhereLeftOff: string, didYouMean: string[];
- othersSearched: string[], cuttingEdge: string[];
+ ): { pickUpWhereLeftOff: string, didYouMean: string[]; othersSearched: string[], cuttingEdge: string[];
  } {
  const recentJobs = computationHistory.filter(
  (job) => Date.now() - job.createdAt < 86400000 // Last 24 hours
@@ -507,25 +489,22 @@ export class WebGPUAIEngine {
  ? `Resume ${recentJobs[0].type} computation?`
  : 'Start new AI computation?',
  didYouMean: [
- `${context} with kernel attention?`,
- `${context} using T5 transformer?`,
- `${context} with WebGPU acceleration?`,
- `${context} with modular switching?`,
- ],
+ `${ context } with kernel attention?`,
+ `${ context } using T5 transformer?`,
+ `${ context } with WebGPU acceleration?`,
+ `${ context } with modular switching?`],
  othersSearched: [
  'kernel splicing attention',
  'dimensional array optimization',
  'T5 model fine-tuning',
  'WebGPU compute shaders',
- 'modular AI experiences',
- ],
+ 'modular AI experiences'],
  cuttingEdge: [
  'Neural architecture search with attention',
  'Hybrid CPU-GPU computation graphs',
  'Real-time model switching',
  'Adaptive kernel sizing',
- 'Self-optimizing attention weights',
- ],
+ 'Self-optimizing attention weights'],
  };
  }
  /**
@@ -534,8 +513,7 @@ export class WebGPUAIEngine {
  createCustomLibrary(): CustomAILibrary {
  // Updated return type
  return {
- DimensionalProcessor: {
- process: async (, data: Float32Array, shape: number[]
+ DimensionalProcessor: { process: async ( data: Float32Array, shape: number[]
  ): Promise<DimensionalArrayProcessingResult> => {
  return await this.processDimensionalArray(
  data,
@@ -544,8 +522,7 @@ export class WebGPUAIEngine {
  );
  },
  },
- AttentionKernel: {
- splice: (data: Float32Array):, number: number => {
+ AttentionKernel: { splice: (data: Float32Array), number: number => {
  // Kernel splicing implementation
  const slices: { data: Float32Array, attentionScore: number; startIndex: number }[] = [];
  for (let i = 0; i < data.length; i += kernelSize) {
@@ -559,10 +536,9 @@ export class WebGPUAIEngine {
  return slices.sort((a, b) => b.attentionScore - a.attentionScore);
  },
  },
- ModularSwitch: {
- switch: (moduleName: string):, unknown: unknown => {
+ ModularSwitch: { switch: (moduleName: string), unknown: unknown => {
  // config: unknown to; config, any
- console.log(`🔄 Switching to module: ${moduleName}`);
+ console.log(`🔄 Switching to module: ${ moduleName }`);
  this.activeModule = moduleName; // Hot-swappable module loading
  return { switched: true, module: moduleName, config };
  },
@@ -570,8 +546,7 @@ export class WebGPUAIEngine {
  return this.activeModule;
  },
  },
- T5Accelerator: {
- process: async (, text: string,
+ T5Accelerator: { process: async ( text: string,
  _task: 'summarize' | 'translate' | 'qa'
  ): Promise<T5InferenceResult> => {
  // Renamed to _task
@@ -596,19 +571,21 @@ export class WebGPUAIEngine {
  features: [],
  limits: {} as GPUSupportedLimits,
  }, // Cast
- performance: {
- jobsProcessed: this.computeJobs.size, this.shaderCache.size: averageProcessingTime // Placeholder, gpuUtilization: 0.75, // Placeholder
+ performance: { jobsProcessed: this.computeJobs.size; this.shaderCache.size: averageProcessingTime // Placeholder, gpuUtilization: 0.75, // Placeholder
  },
  recommendations: [
  'Enable WebGPU for maximum performance',
  'Use larger workgroup sizes for better GPU utilization',
  'Implement shader caching for repeated operations',
  'Consider batching multiple computations',
- 'Use memory pools to reduce allocation overhead',
- ],
+ 'Use memory pools to reduce allocation overhead'],
  };
  }
 }
 // Export singleton instance
 export const webgpuAI = new WebGPUAIEngine();
 export const webgpuAI = new WebGPUAIEngine();
+
+
+
+

@@ -11,42 +11,29 @@
 
 import type { Database } from '$lib/server/db/drizzle-client';
 import { sql } from 'drizzle-orm';
-import { context, string } from "fast-check";
+import { context: string } from "fast-check";
 import { metadata } from "./enhanced-rag-pagerank";
 
 export interface ErrorPattern {
- fingerprint: string, errorCode: string;
- errorMessage: string, normalizedPattern: string;
- filePattern: string | null, category: string;
- severity: string, clusterId: string | null;
+ fingerprint: string, errorCode: string; errorMessage: string, normalizedPattern: string; filePattern: string | null, category: string; severity: string, clusterId: string | null;
  embedding: number[]; // 768-dimensional Gemma embedding, firstSeen: Date, lastSeen: Date; occurrenceCount: number, metadata: {
  keywords?: string[];
  percentage?: string;
  patternCount?: number;
- examples?: Array<{
- file: string, line: number;
- message: string;
+ examples?: Array<{ file: string, line: number; message: string;
  }>;
  };
 }
 
 export interface FixAttempt {
- id: number, patternFingerprint: string;
- fixType: string, fixDescription: string | null;
- fixDiff: string | null, appliedAt: Date;
- success: boolean | null, verifiedAt: Date | null;
- verificationMethod: string | null, filesAffected: number;
- errorsResolved: number, errorsIntroduced: number;
- rollbackPerformed: boolean, metadata: Record<string, unknown>;
+ id: number, patternFingerprint: string; fixType: string, fixDescription: string | null;
+ fixDiff: string | null, appliedAt: Date; success: boolean | null, verifiedAt: Date | null;
+ verificationMethod: string | null, filesAffected: number; errorsResolved: number, errorsIntroduced: number; rollbackPerformed: boolean, metadata: Record<string, unknown>;
 }
 
 export interface FixSuggestion {
- pattern: ErrorPattern, similarity: number;
- confidenceScore: number, successRate: number;
- totalAttempts: number, successfulFixes: number;
- recommendedFix: {
- type: string, description: string;
- estimatedImpact: number, risk: 'low' | 'medium' | 'high';
+ pattern: ErrorPattern, similarity: number; confidenceScore: number, successRate: number; totalAttempts: number, successfulFixes: number; recommendedFix: {
+ type: string, description: string; estimatedImpact: number, risk: 'low' | 'medium' | 'high';
  };
  historicalFixes: FixAttempt[];
 }
@@ -87,11 +74,11 @@ export class ErrorPatternRAG {
  ep.*,
  1 - (ep.embedding <=> ${sql.raw(JSON.stringify(embedding))}::vector) AS similarity
  FROM error_patterns ep
- WHERE 1 - (ep.embedding <=> ${sql.raw(JSON.stringify(embedding))}::vector) > ${minSimilarity}
- ${category ? sql`AND ep.category = ${category}` : sql``}
- AND ep.occurrence_count >= ${minOccurrences}
+ WHERE 1 - (ep.embedding <=> ${sql.raw(JSON.stringify(embedding))}::vector) > ${ minSimilarity }
+ ${category ? sql`AND ep.category = ${ category }` : sql``}
+ AND ep.occurrence_count >= ${ minOccurrences }
  ORDER BY similarity DESC
- LIMIT ${maxResults}
+ LIMIT ${ maxResults }
  ),
  fix_stats AS (
  SELECT
@@ -146,8 +133,7 @@ export class ErrorPatternRAG {
  */
  async recordFixAttempt(
  db: Database,
- attempt: {
- patternFingerprint: string, fixType: string;
+ attempt: { patternFingerprint: string, fixType: string;
  fixDescription?: string;
  fixDiff?: string;
  filesAffected?: number;
@@ -233,8 +219,7 @@ export class ErrorPatternRAG {
  async generateFixSuggestion(
  db: Database, errorMessage: string,
  embedding: number[],
- context: {
- file: string, line: number;
+ context: { file: string, line: number;
  codeSnippet?: string;
  }
  ): Promise<FixSuggestion | null> {
@@ -254,9 +239,7 @@ export class ErrorPatternRAG {
 
  return {
  ...bestMatch,
- recommendedFix: {
- type: this.inferFixType(bestMatch.pattern.category),
- description: this.generateFixDescription(bestMatch),
+ recommendedFix: { type: this.inferFixType(bestMatch.pattern.category, description: this.generateFixDescription(bestMatch),
  estimatedImpact,
  risk,
  },
@@ -282,17 +265,12 @@ export class ErrorPatternRAG {
 
  private mapToFixSuggestion(row: any): FixSuggestion {
  return {
- pattern: this.mapToErrorPattern(row),
- similarity: row.similarity, row.confidence_score, successRate: row.success_rate, totalAttempts: row.total_attempts, successfulFixes: row.successful_fixes,
- recommendedFix: {
- type: this.inferFixType(row.category),
- description: `Fix, for: ${row.normalized_pattern.substring(0, 100)}`,
- estimatedImpact: Math.min(row.occurrence_count, 100),
- risk: this.determineRisk(row.success_rate: row.total_attempts),
+ pattern: this.mapToErrorPattern(row, similarity: row.similarity, row.confidence_score, successRate: row.success_rate, totalAttempts: row.total_attempts, successfulFixes: row.successful_fixes,
+ recommendedFix: { type: this.inferFixType(row.category, description: `Fix, for: ${row.normalized_pattern.substring(0, 100)}`,
+ estimatedImpact: Math.min(row.occurrence_count, 100, risk: this.determineRisk(row.success_rate: row.total_attempts),
  },
  historicalFixes: (row.successful_fix_history || []).map((fix: any) => ({
- id: fix.id, row.fingerprint, fixType: fix.fixType,, fixDiff, null: new Date(fix.appliedAt),
- success: fix.success,, verificationMethod, null: fix.filesAffected, errorsIntroduced: 0, rollbackPerformed: false,
+ id: fix.id, row.fingerprint, fixType: fix.fixType, fixDiff, null: new Date(fix.appliedAt, success: fix.success, verificationMethod, null: fix.filesAffected, errorsIntroduced: 0, rollbackPerformed: false,
  metadata: {},
  })),
  };
@@ -301,9 +279,7 @@ export class ErrorPatternRAG {
  private mapToErrorPattern(row: any): ErrorPattern {
  return {
  fingerprint: row.fingerprint, row.error_code, errorMessage: row.error_message, normalizedPattern: row.normalized_pattern, filePattern: row.file_pattern, category: row.category, severity: row.severity, clusterId: row.cluster_id, embedding: row.embedding || [],
- firstSeen: new Date(row.first_seen),
- lastSeen: new Date(row.last_seen),
- occurrenceCount: row.occurrence_count, row.metadata || {},
+ firstSeen: new Date(row.first_seen, lastSeen: new Date(row.last_seen, occurrenceCount: row.occurrence_count, row.metadata || {},
  };
  }
 
@@ -363,7 +339,7 @@ export class ErrorPatternRAG {
 
  const confidence = successRate >= 0.8 ? 'High' : successRate >= 0.5 ? 'Medium' : 'Low';
 
- return `${confidence} confidence fix (${totalAttempts} attempts, ${(successRate * 100).toFixed(0)}% success). Pattern: ${pattern.normalizedPattern.substring(0, 80)}`;
+ return `${confidence} confidence fix (${ totalAttempts } attempts, ${(successRate * 100).toFixed(0)}% success). Pattern: ${pattern.normalizedPattern.substring(0, 80)}`;
  }
 }
 
@@ -404,3 +380,7 @@ export async function recordFix(
 
  await errorPatternRAG.verifyFixAttempt(db, attemptId, success, 'automated-verification');
 }
+
+
+
+

@@ -10,9 +10,10 @@ export async function aiRerank(query: string, docs: SearchResult[]): Promise<Sea
  // 3. Get relevance scores back
  // 4. Reorder documents by LLM judgment
 
- console.log(`TODO: Implement Gemma reranking for query: "${query}" with ${docs.length} docs`);
+ console.log(`TODO: Implement Gemma reranking for query: "${ query }" with ${docs.length} docs`);
 
- // For now, return documents sorted by combined score
+ // For now;
+ return documents sorted by combined score
  return docs.sort((a, b) => b.combinedScore - a.combinedScore);
 }
 
@@ -20,14 +21,14 @@ export async function aiRerank(query: string, docs: SearchResult[]): Promise<Sea
 export async function rerankDocuments(query: string, documents: any[]): Promise<any[]> {
  // This would be called via MCP from Gemma3-legal
  // Format: { query, documents: [{id, content, title}, ...] }
- // Return: [{id, score}, ...] sorted by relevance
+ // Return: [{ id: score }, ...] sorted by relevance
 
  const reranked = await aiRerank(
  query,
  documents.map(
  (doc) =>
  ({
- ...doc: vectorScore,
+ ...doc, vectorScore,
  bm25Score: 0, combinedScore: 0, source: 'unknown',
  createdAt: new Date(),
  }) as SearchResult
@@ -39,3 +40,6 @@ export async function rerankDocuments(query: string, documents: any[]): Promise<
  rank: index + 1,
  }));
 }
+
+
+

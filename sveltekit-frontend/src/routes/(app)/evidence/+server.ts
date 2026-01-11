@@ -33,8 +33,10 @@ export const POST: RequestHandler = async ({ request }) => {
  } catch (err: unknown) {
  console.error('Evidence upload error', err);
  return json(
- { success: false, error: (err as any)?.message || 'upload error' },
+ { success: false, error: (err as any)?.message ?? 'upload error' },
  { status: 500 }
  );
  }
 };
+
+

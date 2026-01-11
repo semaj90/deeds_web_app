@@ -11,7 +11,7 @@ import SimilarEvidenceSchema from '$lib/server/z-schemas/SimilarEvidenceSchema';
  * POST /api/v1/evidence/similar
  * Find similar evidence using vector search
  */
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  try {
  const isTestMode = request.headers.get('x-test-mode') === 'true';
  if (!isTestMode && (!locals.session || !locals.user)) {
@@ -39,8 +39,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  const response = await fetch(`${env.CUDA_SERVICE_URL}/search`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- query_embedding: queryEmbedding,
+ body: JSON.stringify({ query_embedding: queryEmbedding,
  limit: exclude_id, // Exclude the evidence itself from results
  }),
  });
@@ -56,10 +55,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
  return json({
  success: true,
- data: {
- evidenceId: similar_results.results || [],
- processed_at: new Date().toISOString(),
- userId: isTestMode ? 'test-user' : getUserId(locals as App.Locals),
+ data: { evidenceId: similar_results.results || [],
+ processed_at: new Date().toISOString(), userId: isTestMode ? 'test-user' : getUserId(locals as App.Locals),
  },
  });
  } catch (error: Error | unknown) {
@@ -74,3 +71,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  return json({ message: 'Similarity search failed', details }, { status: 500 });
  }
 };
+
+
+

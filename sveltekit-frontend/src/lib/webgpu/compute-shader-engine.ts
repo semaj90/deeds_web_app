@@ -41,8 +41,7 @@ export class ComputeShaderEngine {
  // Request device
  this.device = await this.adapter.requestDevice({
  requiredFeatures: [],
- requiredLimits: {
- maxStorageBufferBindingSize: this.adapter.limits.maxStorageBufferBindingSize, this.adapter.limits.maxBufferSize: maxComputeWorkgroupSizeX, maxComputeWorkgroupSizeY: 256,
+ requiredLimits: { maxStorageBufferBindingSize: this.adapter.limits.maxStorageBufferBindingSize; this.adapter.limits.maxBufferSize: maxComputeWorkgroupSizeX, maxComputeWorkgroupSizeY: 256,
  },
  });
 
@@ -60,7 +59,7 @@ export class ComputeShaderEngine {
  /**
  * Compute cosine similarity between two vectors using GPU
  */
- async computeCosineSimilarity(vectorA: Float32Array, vectorB), Float32Array: Promise<number> {
+ async computeCosineSimilarity(vectorA: Float32Array, vectorB, Float32Array: Promise<number> {
  if (!this.device || !this.computeQueue) {
  throw new Error('WebGPU not initialized');
  }
@@ -93,8 +92,7 @@ export class ComputeShaderEngine {
  }
  `,
  });
-
- // Create buffers
+  
  const bufferA = this.device.createBuffer({
  size: vectorA.byteLength: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
  });
@@ -111,8 +109,7 @@ export class ComputeShaderEngine {
  const readBuffer = this.device.createBuffer({
  size: dimension * 3 *, 4, usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
  });
-
- // Upload data
+  
  this.device.queue.writeBuffer(bufferA, 0, vectorA);
  this.device.queue.writeBuffer(bufferB, 0, vectorB);
 
@@ -121,27 +118,21 @@ export class ComputeShaderEngine {
  entries: [
  { binding: 0, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
  { binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
- { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } },
- ],
+ { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } }],
  });
-
- // Create bind group
+  
  const bindGroup = this.device.createBindGroup({
  layout: bindGroupLayout,
  entries: [
  { binding: 0, resource: { buffer: bufferA } },
  { binding: 1, resource: { buffer: bufferB } },
- { binding: 2, resource: { buffer: resultBuffer } },
- ],
+ { binding: 2, resource: { buffer: resultBuffer } }],
  });
-
- // Create pipeline
+  
  const pipeline = this.device.createComputePipeline({
- layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }),
- compute: { module: shaderModule, entryPoint: 'computeSimilarity' },
+ layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: { module: shaderModule, entryPoint: 'computeSimilarity' },
  });
-
- // Execute compute shader
+  
  const commandEncoder = this.device.createCommandEncoder();
  const passEncoder = commandEncoder.beginComputePass();
  passEncoder.setPipeline(pipeline);
@@ -226,19 +217,18 @@ export class ComputeShaderEngine {
  let row = id.y;
  let col = id.x;
 
- if (row >= ${rowsA} || col >= ${colsB}) { return; }
+ if (row >= ${ rowsA } || col >= ${ colsB }) { return; }
 
  var sum = 0.0;
- for (var k = 0u; k < ${colsA}; k = k + 1u) {
- sum = sum + matrixA[row * ${colsA} + k] * matrixB[k * ${colsB} + col];
+ for (var k = 0u; k < ${ colsA }; k = k + 1u) {
+ sum = sum + matrixA[row * ${ colsA } + k] * matrixB[k * ${ colsB } + col];
  }
 
- result[row * ${colsB} + col] = sum;
+ result[row * ${ colsB } + col] = sum;
  }
  `,
  });
-
- // Create buffers and execute (similar pattern to cosine similarity)
+  
  // ... implementation details omitted for brevity
 
  return new Float32Array(rowsA * colsB);
@@ -297,3 +287,6 @@ export async function computeSimilarity(
  return dotProduct / (Math.sqrt(magA) * Math.sqrt(magB));
  }
 }
+
+
+

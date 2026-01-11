@@ -2,16 +2,13 @@
  import { createEventDispatcher } from 'svelte';
 
  interface Citation {
- id: string;
- statute_code: string;
+ id: string; statute_code: string;
  statute_title?: string;
  jurisdiction?: string;
  severity?: string;
- year?: number;
- source_type: 'manual' | 'auto_extracted';
+ year?: number; source_type: 'manual' | 'auto_extracted';
  highlighted_text?: string;
- notes?: string;
- created_at: string;
+ notes?: string; created_at: string;
  updated_at: string;
  }
 
@@ -190,7 +187,7 @@
  <button class="btn-primary" onclick={saveNotes} disabled={isSaving}>
  {isSaving ? 'Saving...' : 'Save'}
  </button>
- <button class="btn-secondary" onclick={cancelEdit} disabled={isSaving}>
+ <button class="btn-secondary" onclick={ cancelEdit } disabled={isSaving}>
  Cancel
  </button>
  </div>
@@ -233,39 +230,33 @@
 
 <style>
  .citation-detail {
- background-color: white;
- border: 2px solid #d4a574;
- border-radius: 8px;
- overflow: hidden;
+ background-color: white; border: 2px solid #d4a574;
+ border-radius: 8px; overflow: hidden;
  }
 
  .detail-header {
  display: flex;
  justify-content: space-between;
- align-items: flex-start;
- padding: 1.5rem;
+ align-items: flex-start; padding: 1.5rem;
  background-color: #f5f1e8;
  border-bottom: 2px solid #d4a574;
  }
 
  .header-left {
  display: flex;
- flex-direction: column;
- gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .citation-code {
  margin: 0;
  font-family: 'Monaco', 'Courier New', monospace;
  font-size: 1.5rem;
- font-weight: 600;
- color: #8b4513;
+ font-weight: 600; color: #8b4513;
  }
 
  .source-info {
  display: flex;
- align-items: center;
- gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  }
 
  .source-icon {
@@ -273,13 +264,11 @@
  }
 
  .source-label {
- font-size: 0.85rem;
- color: #666;
+ font-size: 0.85rem; color: #666;
  }
 
  .header-actions {
- display: flex;
- gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  flex-wrap: wrap;
  }
 
@@ -288,14 +277,12 @@
  border: none;
  border-radius: 4px;
  font-size: 0.85rem;
- font-weight: 500;
- cursor: pointer;
+ font-weight: 500; cursor: pointer;
  transition: all 0.2s;
  }
 
  .action-btn.attach {
- background-color: #8b4513;
- color: #f5f1e8;
+ background-color: #8b4513; color: #f5f1e8;
  }
 
  .action-btn.attach:hover {
@@ -303,8 +290,7 @@
  }
 
  .action-btn.edit {
- background-color: #e0d5c7;
- color: #2c2c2c;
+ background-color: #e0d5c7; color: #2c2c2c;
  }
 
  .action-btn.edit:hover {
@@ -312,8 +298,7 @@
  }
 
  .action-btn.delete {
- background-color: #ff6b6b;
- color: white;
+ background-color: #ff6b6b; color: white;
  }
 
  .action-btn.delete:hover {
@@ -321,32 +306,27 @@
  }
 
  .detail-content {
- padding: 1.5rem;
- display: flex;
- flex-direction: column;
- gap: 1.5rem;
+ padding: 1.5rem; display: flex;
+ flex-direction: column; gap: 1.5rem;
  }
 
  .section {
  display: flex;
- flex-direction: column;
- gap: 0.75rem;
+ flex-direction: column; gap: 0.75rem;
  }
 
  .section h3 {
  margin: 0;
  font-family: 'Crimson Text', Georgia, serif;
  font-size: 1.1rem;
- font-weight: 600;
- color: #2c2c2c;
+ font-weight: 600; color: #2c2c2c;
  padding-bottom: 0.5rem;
  border-bottom: 1px solid #e0d5c7;
  }
 
  .statute-title {
  margin: 0;
- font-size: 1rem;
- color: #333;
+ font-size: 1rem; color: #333;
  font-weight: 500;
  }
 
@@ -358,14 +338,12 @@
 
  .meta-item {
  display: flex;
- align-items: center;
- gap: 0.75rem;
+ align-items: center; gap: 0.75rem;
  }
 
  .meta-label {
  font-size: 0.85rem;
- font-weight: 600;
- color: #666;
+ font-weight: 600; color: #666;
  min-width: 80px;
  }
 
@@ -373,8 +351,7 @@
  padding: 0.25rem 0.75rem;
  border-radius: 4px;
  font-size: 0.75rem;
- font-weight: 600;
- color: white;
+ font-weight: 600; color: white;
  }
 
  .meta-badge.jurisdiction {
@@ -390,8 +367,7 @@
  }
 
  .meta-value {
- font-size: 0.85rem;
- color: #333;
+ font-size: 0.85rem; color: #333;
  }
 
  .highlighted-text {
@@ -403,23 +379,19 @@
 
  .highlighted-text p {
  margin: 0;
- font-style: italic;
- color: #333;
+ font-style: italic; color: #333;
  }
 
  .notes-editor {
  display: flex;
- flex-direction: column;
- gap: 0.75rem;
+ flex-direction: column; gap: 0.75rem;
  }
 
  .notes-editor textarea {
- padding: 0.75rem;
- border: 1px solid #d4a574;
+ padding: 0.75rem; border: 1px solid #d4a574;
  border-radius: 4px;
  font-family: 'Source Sans 3', sans-serif;
- font-size: 0.95rem;
- resize: vertical;
+ font-size: 0.95rem; resize: vertical;
  }
 
  .notes-editor textarea:focus {
@@ -429,13 +401,11 @@
  }
 
  .notes-editor textarea:disabled {
- background-color: #f0ebe0;
- color: #999;
+ background-color: #f0ebe0; color: #999;
  }
 
  .editor-actions {
- display: flex;
- gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  }
 
  .btn-primary,
@@ -443,49 +413,42 @@
  padding: 0.5rem 1rem;
  border: none;
  border-radius: 4px;
- font-weight: 500;
- cursor: pointer;
+ font-weight: 500; cursor: pointer;
  transition: all 0.2s;
  }
 
  .btn-primary {
- background-color: #8b4513;
- color: #f5f1e8;
+ background-color: #8b4513; color: #f5f1e8;
  }
 
- .btn-primary:hover:not(:disabled) {
+ .btn-primary:hover, not(disabled) {
  background-color: #a0522d;
  }
 
  .btn-primary:disabled {
- opacity: 0.6;
- cursor: not-allowed;
+ opacity: 0.6; cursor:not-allowed;
  }
 
  .btn-secondary {
- background-color: #e0d5c7;
- color: #2c2c2c;
+ background-color: #e0d5c7; color: #2c2c2c;
  }
 
- .btn-secondary:hover:not(:disabled) {
+ .btn-secondary:hover, not(disabled) {
  background-color: #d4a574;
  }
 
  .btn-secondary:disabled {
- opacity: 0.6;
- cursor: not-allowed;
+ opacity: 0.6; cursor:not-allowed;
  }
 
  .notes-display {
  display: flex;
- flex-direction: column;
- gap: 0.75rem;
+ flex-direction: column; gap: 0.75rem;
  }
 
  .notes-display p {
  margin: 0;
- font-size: 0.95rem;
- color: #333;
+ font-size: 0.95rem; color: #333;
  line-height: 1.5;
  }
 
@@ -495,13 +458,10 @@
  }
 
  .edit-notes-btn {
- align-self: flex-start;
- padding: 0.4rem 0.8rem;
- background-color: #e0d5c7;
- border: 1px solid #d4a574;
+ align-self: flex-start; padding: 0.4rem 0.8rem;
+ background-color: #e0d5c7; border: 1px solid #d4a574;
  border-radius: 4px;
- font-size: 0.8rem;
- cursor: pointer;
+ font-size: 0.8rem; cursor: pointer;
  transition: all 0.2s;
  }
 
@@ -511,19 +471,16 @@
 
  .timestamps {
  display: flex;
- flex-direction: column;
- gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .timestamp-item {
- display: flex;
- gap: 1rem;
+ display: flex; gap: 1rem;
  font-size: 0.85rem;
  }
 
  .timestamp-label {
- font-weight: 600;
- color: #666;
+ font-weight: 600; color: #666;
  min-width: 70px;
  }
 
@@ -531,3 +488,7 @@
  color: #333;
  }
 </style>
+
+
+
+

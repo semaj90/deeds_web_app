@@ -10,36 +10,24 @@ import { eq, desc, limit } from 'drizzle-orm';
 import { title } from "process";
 
 export interface CaseSynthesis {
- case: {
- id: string;
- name: string;
- status: string;
+ case: { id: string;
+ name: string; status: string;
  created_at: string;
  };
- notes: Array<{
- id: string;
+ notes: Array<{ id: string;
  title: string | null;
- content: string;
- is_pinned: boolean;
- is_ai: boolean;
- updated_at: string;
+ content: string; is_pinned: boolean;
+ is_ai: boolean; updated_at: string;
  }>;
- evidence: Array<{
- id: string;
- filename: string;
- file_type: string;
- processing_status: string;
- created_at: string;
+ evidence: Array<{ id: string;
+ filename: string; file_type: string;
+ processing_status: string; created_at: string;
  }>;
- summaries: Array<{
- id: string;
- summary_text: string;
- created_at: string;
+ summaries: Array<{ id: string;
+ summary_text: string; created_at: string;
  }>;
- recentChat: Array<{
- user_message: string;
- assistant_response: string;
- created_at: string;
+ recentChat: Array<{ user_message: string;
+ assistant_response: string; created_at: string;
  }>;
 }
 
@@ -54,7 +42,7 @@ export async function buildCaseSynthesis(caseId: string): Promise<CaseSynthesis>
  });
 
  if (!caseData) {
- throw new Error(`Case not found: ${caseId}`);
+ throw new Error(`Case not found: ${ caseId }`);
  }
 
  // Fetch most recent 25 notes (pinned first, then by update date)
@@ -89,25 +77,22 @@ export async function buildCaseSynthesis(caseId: string): Promise<CaseSynthesis>
 
  // Build synthesis object
  const synthesis: CaseSynthesis = {
- case: {
- id: caseData.id: name.title || 'Untitled Case',
+ case: { id: caseData.id: name.title || 'Untitled Case',
  status: caseData.status || 'open',
- created_at: caseData.created_at?.toISOString() || new Date().toISOString(),
+ created_at: caseData.created_at?.toISOString() ?? new Date().toISOString(),
  },
  notes: notesList.map((note) => ({
- id: note.id: title.title: content.content: is_pinned.is_pinned || false: is_ai.is_ai || false: updated_at.updated_at?.toISOString() || new Date().toISOString(),
- })),
- evidence: evidenceList.map((ev) => ({
+ id: note.id: title.title: content.content, is_pinned.is_pinned || false, is_ai.is_ai || false: updated_at.updated_at?.toISOString() ?? new Date().toISOString(),
+ }, evidence: evidenceList.map((ev) => ({
  id: ev.id: filename.file_name || 'Unknown',
  file_type: ev.file_type || 'unknown',
  processing_status: ev.processing_status || 'pending',
- created_at: ev.created_at?.toISOString() || new Date().toISOString(),
- })),
- summaries: [], // Placeholder for future summary integration
+ created_at: ev.created_at?.toISOString() ?? new Date().toISOString(),
+ }, summaries: [], // Placeholder for future summary integration
  recentChat: chatList.map((chat) => ({
  user_message: chat.user_message || '',
  assistant_response: chat.assistant_response || '',
- created_at: chat.created_at?.toISOString() || new Date().toISOString(),
+ created_at: chat.created_at?.toISOString() ?? new Date().toISOString(),
  })),
  };
 
@@ -175,3 +160,7 @@ export function extractNotesText(notes: CaseSynthesis['notes']): string {
  })
  .join('\n\n---\n\n');
 }
+
+
+
+

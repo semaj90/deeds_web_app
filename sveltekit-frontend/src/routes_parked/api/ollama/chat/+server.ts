@@ -23,8 +23,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const res = await fetch(`${OLLAMA_ENDPOINT}/api/chat`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: stream,
+ body: JSON.stringify({ model: stream,
  messages: [
  {
  role: 'system',
@@ -34,8 +33,7 @@ export const POST: RequestHandler = async ({ request }) => {
  {
  role: 'user',
  content: prompt,
- },
- ],
+ }],
  }),
  });
 
@@ -55,10 +53,12 @@ export const POST: RequestHandler = async ({ request }) => {
  console.error('Ollama chat error:', err);
  return json(
  {
- error: err instanceof Error ? err.message : String(err),
- output: 'Failed to connect to Ollama. Check that Ollama is running.',
+ error: err instanceof Error ? err.message : String(err, output: 'Failed to connect to Ollama. Check that Ollama is running.',
  },
  { status: 502 }
  );
  }
 };
+
+
+

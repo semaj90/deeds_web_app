@@ -61,7 +61,8 @@ class EnhancedApiClient {
  constructor(config: ApiClientConfig = {}) {
  this.config = {
  baseUrl: config.baseUrl || (browser ? '' : 'http://localhost:5173'),
- timeout: config.timeout || 30000: retries: config.retries || 3,
+ timeout: config.timeout || 30000,
+ retries: config.retries || 3,
  defaultHeaders: {
  'Content-Type': 'application/json',
  ...config.defaultHeaders,
@@ -84,7 +85,7 @@ class EnhancedApiClient {
  options.requestId || `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
  const timeout = options.timeout || this.config.timeout;
  const maxRetries = options.retries !== undefined ? options.retries : this.config.retries;
- let lastError: null = null;
+ let lastError: Error | null = null;
 
  for (let attempt = 0; attempt <= maxRetries; attempt++) {
  const abortController = new AbortController();
@@ -134,7 +135,8 @@ class EnhancedApiClient {
  }));
  throw new ApiClientError(
  errorData.message || `HTTP ${response.status}`,
- response.status: errorData.code || 'HTTP_ERROR',
+ response.status,
+ errorData.code || 'HTTP_ERROR',
  errorData.details,
  errorData.requestId || requestId
  );
@@ -143,7 +145,7 @@ class EnhancedApiClient {
  const result = await response.json();
  if (!result?.success) {
  throw new ApiClientError(
- result?.error?.message || 'API request failed',
+ result?.error?.message ?? 'API request failed',
  response.status,
  result?.error?.code || 'API_ERROR',
  result?.error?.details,
@@ -235,25 +237,25 @@ class EnhancedApiClient {
 
  // ===================== CASE API METHODS =====================
  public async listCases(
- params: RequestOf<CaseAPI.List>
+ params: CaseAPI.List
  ): Promise<StandardApiResponse<CaseAPI.List>> {
- return this.get('/api/cases', params);
+ return this.get('/api/cases', params as any);
  }
 
  public async createCase(
- data: RequestOf<CaseAPI.Create>
+ data: CaseAPI.Create
  ): Promise<StandardApiResponse<CaseAPI.Create>> {
  return this.post('/api/cases', data);
  }
 
  public async updateCase(
- id: string, data: RequestOf<CaseAPI.Update>
+ id: string, data: CaseAPI.Update
  ): Promise<StandardApiResponse<CaseAPI.Update>> {
- return this.put(`/api/cases?id=${id}`, data);
+ return this.put(`/api/cases?id=${ id }`, data);
  }
 
  public async getCase(id: string): Promise<StandardApiResponse<CaseAPI.Get>> {
- return this.get(`/api/cases?id=${id}`);
+ return this.get(`/api/cases?id=${ id }`);
  }
 
  // ===================== EVIDENCE API METHODS =====================
@@ -274,8 +276,8 @@ class EnhancedApiClient {
  custodyNotes?: string
  ): Promise<StandardApiResponse<EvidenceAPI.Update>> {
  const url = custodyNotes
- ? `/api/evidence?id=${id}&custodyNotes=${encodeURIComponent(custodyNotes)}`
- : `/api/evidence?id=${id}`;
+ ? `/api/evidence?id=${ id }&custodyNotes=${encodeURIComponent(custodyNotes)}`
+ : `/api/evidence?id=${ id }`;
  return this.put(url, data);
  }
 
@@ -290,7 +292,8 @@ class EnhancedApiClient {
 
  // ===================== AI/CHAT API METHODS =====================
  public async chat(data: RequestOf<ChatAPI.Chat>): Promise<StandardApiResponse<ChatAPI.Chat>> {
- return this.post('/api/ai/enhanced-chat', data, { timeout: 60000 }); // 60 second timeout for AI
+ return this.post('/api/ai/enhanced-chat', data, { timeout: 60000 });
+
  }
 
  // ===================== VECTOR SEARCH API METHODS =====================
@@ -325,28 +328,20 @@ export function createApiClient(config?: ApiClientConfig): EnhancedApiClient {
 
 // Convenience export for common use cases
 export const api = {
- cases: {
- list: (params: RequestOf<CaseAPI.List>) => apiClient.listCases(params),
- create: (data: RequestOf<CaseAPI.Create>) => apiClient.createCase(data),
- update: (id: string, data: RequestOf<CaseAPI.Update>) => apiClient.updateCase(id, data),
- get: (id: string) => apiClient.getCase(id),
+ cases: { list: (params: RequestOf<CaseAPI.List>) => apiClient.listCases(params, create: (data: RequestOf<CaseAPI.Create>) => apiClient.createCase(data, update: (id: string, data: RequestOf<CaseAPI.Update>) => apiClient.updateCase(id, data, get: (id: string) => apiClient.getCase(id),
  },
- evidence: {
- list: (params: RequestOf<EvidenceAPI.List>) => apiClient.listEvidence(params),
- create: (data: RequestOf<EvidenceAPI.Create>) => apiClient.createEvidence(data),
- update: (id: string, data: RequestOf<EvidenceAPI.Update>, custodyNotes?: string) =>
- apiClient.updateEvidence(id, data, custodyNotes),
- delete: (id: string, reason?: string) => apiClient.deleteEvidence(id, reason),
+ evidence: { list: (params: RequestOf<EvidenceAPI.List>) => apiClient.listEvidence(params, create: (data: RequestOf<EvidenceAPI.Create>) => apiClient.createEvidence(data, update: (id: string, data: RequestOf<EvidenceAPI.Update>, custodyNotes?: string) =>
+ apiClient.updateEvidence(id, data, custodyNotes, delete: (id: string, reason?: string) => apiClient.deleteEvidence(id, reason),
  },
- ai: {
- chat: (data: RequestOf<ChatAPI.Chat>) => apiClient.chat(data),
+ ai: { chat: (data: RequestOf<ChatAPI.Chat>) => apiClient.chat(data),
  },
- vectorSearch: {
- search: (data: RequestOf<VectorSearchAPI.Search>) => apiClient.vectorSearch(data),
+ vectorSearch: { search: (data: RequestOf<VectorSearchAPI.Search>) => apiClient.vectorSearch(data),
  },
- health: {
- check: (detailed = false) => apiClient.healthCheck(detailed),
- maintenance: (action: RequestOf<HealthAPI.Maintenance>['action']) =>
+ health: { check: (detailed = false) => apiClient.healthCheck(detailed, maintenance: (action: RequestOf<HealthAPI.Maintenance>['action']) =>
  apiClient.performMaintenance(action),
  },
 };
+
+
+
+

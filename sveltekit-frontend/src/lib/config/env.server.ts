@@ -185,3 +185,5 @@ export const LEGACY = {
 	MINIO_URL: CONFIG.MINIO_URL,
 	MINIO_REGION: CONFIG.MINIO_REGION ?? env.MINIO_REGION ?? undefined,
 };
+
+

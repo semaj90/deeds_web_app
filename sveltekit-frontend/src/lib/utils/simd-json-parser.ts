@@ -10,9 +10,7 @@
 export interface SIMDParseResult {
  success: boolean;
  data?: any;
- performance?: {
- method: string; timeMs: number;
- throughputMBps: number;
+ performance?: { method: string; timeMs: number; throughputMBps: number;
  };
  error?: string;
 }
@@ -40,8 +38,7 @@ class SIMDJSONParser {
  const response = await fetch(this.goServiceUrl, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ json: jsonString }),
- signal: controller.signal,
+ body: JSON.stringify({ json: jsonString }, signal: controller.signal,
  });
 
  clearTimeout(timeoutId);
@@ -53,8 +50,7 @@ class SIMDJSONParser {
 
  return {
  success: true, data: result, result:
- performance: {
- method: 'go-simd-service',
+ performance: { method: 'go-simd-service',
  timeMs: end - start,
  throughputMBps: ((jsonString.length / (end - start)) * 1000) / (1024 * 1024),
  },
@@ -75,8 +71,7 @@ class SIMDJSONParser {
  return {
  success: true,
  data,
- performance: {
- method: 'native-json-parse',
+ performance: { method: 'native-json-parse',
  timeMs: end - start,
  throughputMBps: ((jsonString.length / (end - start)) * 1000) / (1024 * 1024),
  },
@@ -107,8 +102,7 @@ class SIMDJSONParser {
  return {
  success: true,
  data,
- performance: {
- method: 'native-json-parse-sync',
+ performance: { method: 'native-json-parse-sync',
  timeMs: end - start,
  throughputMBps: ((jsonString.length / (end - start)) * 1000) / (1024 * 1024),
  },
@@ -141,15 +135,14 @@ class SIMDJSONParser {
  async benchmark(
  jsonString: string,
  iterations = 100
- ): Promise<{
- method: string; iterations: number;
- avgTimeMs: number; throughputMBps: number;
+ ): Promise<{ method: string; iterations: number; avgTimeMs: number; throughputMBps: number;
  }> {
  const results = [];
 
  for (let i = 0; i < iterations; i++) {
  const start = performance.now();
- await this.parse(jsonString, { useGoService: false }); // Use native for benchmark
+ await this.parse(jsonString, { useGoService: false });
+  
  const end = performance.now();
  results.push(end - start);
  }
@@ -173,8 +166,7 @@ class SIMDJSONParser {
  const response = await fetch(this.goServiceUrl, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ json: '{}' }),
- signal: AbortSignal.timeout(2000),
+ body: JSON.stringify({ json: '{}' }, signal: AbortSignal.timeout(2000),
  });
  return response.ok;
  } catch {
@@ -205,3 +197,7 @@ export async function parseCaseScoring(jsonString: string): Promise<SIMDParseRes
  useGoService: true, fallbackToNative: true, timeoutMs: 1000,
  });
 }
+
+
+
+

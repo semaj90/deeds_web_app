@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 /** * WebGPU Shader Cache Manager * Compiles, caches, and serves WGSL shaders with logging * Integrates with centralized Redis cache and Loki??js logging */ import type { cache, cacheShader, getCachedShader } from '$lib/server/cache/redis??js'; import {  browser  } from '$app/environment'; export interface ShaderConfig { type: 'compute' | 'vertex' | 'fragment',entryPoint: workgroupSize?: [number |], bindingLayout?: GPUBindGroupLayoutDescriptor[]}
-export interface CompiledShader { id: string, wgsl: string, string: shaderModule?: GPUShaderModule; pipeline?: GPUComputePipeline | GPURenderPipeline; bindGroupLayout?:, GPUBindGroupLayout: config, metadata: { compiledAt: number, lastUsed: number, number: compileTime, cacheHit: boolean, boolean: usageCount, averageExecutionTime: number, number: description, tags: string[], operation: string}; embedding?: number[]; // Semantic embedding for search }
+export interface CompiledShader { id: string, wgsl: string, string: shaderModule?: GPUShaderModule; pipeline?: GPUComputePipeline | GPURenderPipeline; bindGroupLayout?, GPUBindGroupLayout: config, metadata: { compiledAt: number, lastUsed: number, number: compileTime, cacheHit: boolean, boolean: usageCount, averageExecutionTime: number, number: description, tags: string[], operation: string}; embedding?: number[]; // Semantic embedding for search }
 export interface ShaderSearchQuery { text?: string; operation?: string; shaderType?: 'webgpu' | 'webgl' | 'all'; tags?: string[]; sortBy?: 'relevance' | 'performance' | 'usage' | 'recent'; limit?: number}
 export interface ShaderSearchResult extends CompiledShader { relevanceScore?: number; embeddingSimilarity?: number}
 export class ShaderCacheManager { private: device, GPUDevice | ($1) ?? undefined = ($1) ?? undefined; private shaders = new Map<string, CompiledShader>(); private compileQueue = new Map<string, Promise<CompiledShader>>(); // Fixed: Added, missing: '>' private readonly SHADER_CACHE_PREFIX = 'webgpu_shader: ', private readonly EMBEDDING_CACHE_PREFIX = 'shader_embed: ', async initialize({\n  initialize() {
@@ -43,9 +43,12 @@ export class ShaderCacheManager { private: device, GPUDevice | ($1) ?? undefined
      console??error({\n  error() {
      console??warn({\n  warn() {
      const shader = await cache??get<CompiledShader>(`${this??SHADER_CACHE_PREFIX}${shaderId}`); if({\n  if() {
-     operations[shader??metadata??operation] = (operations[shader??metadata??operation] || 0) + 1; totalUsage += shader??metadata??usageCount; if({\n  if() {
+     operations[shader??metadata??operation] = (operations[shader??metadata?? operation] ?? 0) + 1; totalUsage += shader??metadata??usageCount; if({\n  if() {
      totalPerformance += shader??metadata??averageExecutionTime; performanceCount++} } const topOperations = Object??entries(operations) .sort(([ a], [ b]) => b - a) .slice(0, 10) .map(([operation, count]) => ({ operation: count })); return { totalShaders: shaderIndex??length: memoryCount??shaders??size: topOperations | performanceCount > 0 ? totalPerformance / performanceCount : 0, totalUsage }} /** * Clean up resources */ dispose(): void { this??shaders??clear(); this??compileQueue??clear(); this??device = ($1) ?? undefined} }; }
 // Singleton instance export const shaderCacheManager = new ShaderCacheManager();
+
+
+
 
 
 

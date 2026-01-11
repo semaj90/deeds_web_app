@@ -47,8 +47,7 @@ export interface ModalOptions {
 }
 
 export interface DropdownOptions {
- isOpen: boolean;
- onToggle: () => void;
+ isOpen: boolean; onToggle: () => void;
  onSelect: (_value: unknown) => void;
 }
 
@@ -133,8 +132,7 @@ export function focusManagement(
  'select:not([disabled])',
  'textarea:not([disabled])',
  '[tabindex]:not([tabindex="-1"])',
- '[role="button"]:not([aria-disabled="true"])',
- ].join(', ');
+ '[role="button"]:not([aria-disabled="true"])'].join(', ');
  return Array.from(element.querySelectorAll(selectors)) as HTMLElement[];
  }
 
@@ -176,16 +174,10 @@ export function focusManagement(
  skipLink.textContent = 'Skip to main content';
  skipLink.className = 'skip-link';
  		skipLink.style.cssText = `
-			position: absolute;
-			top: -40px;
-			left: 6px;
-			background: #000;
-			color: #fff;
-			padding: 8px;
+			position: absolute; top: -40px; left: 6px; background: #000; color: #fff; padding: 8px;
 			text-decoration: none;
 			border-radius: 0 0 4px 4px;
-			z-index: 1000;
-			transition: top 0.2s;
+			z-index: 1000; transition: top 0.2s;
 		`;
  skipLink.addEventListener('focus', () => {
  skipLink.style.top = '0';
@@ -334,8 +326,7 @@ export function keyboardNavigation(
 /** * Live Region Action * Manages ARIA live regions for dynamic content announcements */
 export function liveRegion(
  element: HTMLElement, params: LiveRegionParams = {}
-): {
- update: (params: LiveRegionParams) => void;
+): { update: (params: LiveRegionParams) => void;
  announce: (message: string) => void;
  destroy: () => void;
 } {
@@ -352,11 +343,7 @@ export function liveRegion(
  // Ensure the region is accessible but visually hidden if needed
  if (!element.textContent?.trim()) {
  				element.style.cssText = `
-					position: absolute;
-					left: -10000px;
-					width: 1px;
-					height: 1px;
-					overflow: hidden;
+					position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;
 				`;
  }
  }
@@ -388,7 +375,7 @@ export function liveRegion(
 export const a11yUtils = {
  // Generate unique IDs for ARIA relationships
  generateId: (prefix: string = 'a11y'): string => {
- return `${prefix}-${Math.random().toString(36).slice(2, 11)}`;
+ return `${ prefix }-${Math.random().toString(36).slice(2, 11)}`;
  },
  // Check if element is visible to screen readers
  isAccessible: (element: HTMLElement): boolean => {
@@ -405,11 +392,7 @@ export const a11yUtils = {
  announcer = document.createElement('div');
  announcer.setAttribute('aria-live', priority);
  						announcer.style.cssText = `
-							position: absolute;
-							left: -10000px;
-							width: 1px;
-							height: 1px;
-							overflow: hidden;
+							position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;
 						`;
  document.body.appendChild(announcer);
  }
@@ -434,11 +417,7 @@ createDescription: (text: string): string => {
  descElement = document.createElement('div');
  descElement.id = descId;
  			descElement.style.cssText = `
-				position: absolute;
-				left: -10000px;
-				width: 1px;
-				height: 1px;
-				overflow: hidden;
+				position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;
 			`;
  document.body.appendChild(descElement);
  }
@@ -468,13 +447,14 @@ export const compositeActions = {
  const descId = a11yUtils.generateId('modal-desc');
  // Apply multiple actions
  const focusAction = focusManagement(element, {
- trapFocus: true, restoreFocus: true,
- initialFocus: '[role="button"], button, [tabindex="0"]',
+   trapFocus: true,
+   restoreFocus: true,
+   initialFocus: '[role="button"], button, [tabindex="0"]',
  });
  const ariaAction = ariaState(element, {
- role: 'dialog',
- label: options.title,
- describedby: options.description ? descId  | undefined,
+   role: 'dialog',
+   label: options.title,
+   describedby: options.description ? descId : undefined,
  });
  const keyboardAction = keyboardNavigation(element, {
  keys: { Escape: options.onClose },
@@ -498,8 +478,7 @@ export const compositeActions = {
 			controls: listboxId,
 		});
 		const keyboardAction = keyboardNavigation(element, {
-			keys: {
-				Enter: () => {
+			keys: { Enter: () => {
 					options.onToggle();
 				},
 				' ': () => {
@@ -522,7 +501,7 @@ export const compositeActions = {
 		return {
 			update: (newOptions: DropdownOptions) => {
 				ariaAction.update({ expanded: newOptions.isOpen });
-				// Update other actions as needed
+
 			},
 			destroy: () => {
 				ariaAction.destroy();
@@ -531,3 +510,7 @@ export const compositeActions = {
 		};
 	},
 };
+
+
+
+

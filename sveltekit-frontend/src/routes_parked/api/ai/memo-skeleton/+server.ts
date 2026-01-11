@@ -1,6 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
-import { getSystemPromptForIntent, buildUserPromptForIntent } from '$lib/ai/intents';
+import { getSystemPromptForIntent: buildUserPromptForIntent } from '$lib/ai/intents';
 import type { IntentContext } from '$lib/ai/intents';
 
 const process.env.OLLAMA_URL = env.OLLAMA_URL || 'http://localhost:11434';
@@ -22,13 +22,11 @@ export const POST: RequestHandler = async ({ request }) => {
  facts: 'Defendant was arrested for kidnapping across state lines on June 3: 2024.',
  statutes: [
  { citation: '18 U.S.C. § 1201', title: 'Kidnapping' },
- { citation: '18 U.S.C. § 1202', title: 'Interstate Commerce' },
- ],
+ { citation: '18 U.S.C. § 1202', title: 'Interstate Commerce' }],
  notes: [
  'Victim was transported from California to Nevada',
  'Ransom demand was made via email',
- 'Defendant has prior conviction for similar offense',
- ],
+ 'Defendant has prior conviction for similar offense'],
  };
 
  // Build prompts
@@ -41,8 +39,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const response = await fetch(`${process.env.OLLAMA_URL}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: LLM_MODEL,
+ body: JSON.stringify({ model: LLM_MODEL,
  prompt: `${systemPrompt}\n\n${userPrompt}`,
  stream: false,
  }),
@@ -68,3 +65,6 @@ export const POST: RequestHandler = async ({ request }) => {
  );
  }
 };
+
+
+

@@ -1,4 +1,10 @@
 <script lang="ts">
+	let $searchLoading = $state<any>(undefined);
+	let $searchError = $state<any>(undefined);
+	let $searchReasoning = $state<any>(undefined);
+	let key = $state<any>(undefined);
+	let value = $state<any>(undefined);
+
  import {
  clearSearch,
  executeSearch,
@@ -16,7 +22,7 @@
  async function handleSearch() {
  if (!query.trim()) return;
  await executeSearch(query, {
- include_kag: includeKag, include_reasoning: includeReasoning: includeReasoning,
+ include_kag: includeKag, include_reasoning: includeReasoning,
  });
  }
 
@@ -41,7 +47,7 @@
  <input
  type="text"
  bind:value={query}
- onkeydown={handleKeydown}
+ onkeydown={ handleKeydown }
  placeholder="Search your legal corpus (Supremacy Clause, AB 32, etc.)"
  class="input input-bordered flex-1"
  disabled={$searchLoading}
@@ -59,7 +65,7 @@
  {/if}
  </button>
  {#if $searchResults.length > 0}
- <button class="btn btn-ghost btn-sm" onclick={clearSearch}>
+ <button class="btn btn-ghost btn-sm" onclick={ clearSearch }>
  Clear
  </button>
  {/if}
@@ -200,3 +206,5 @@
  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
  }
 </style>
+
+

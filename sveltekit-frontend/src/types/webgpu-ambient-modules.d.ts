@@ -8,8 +8,7 @@ declare module '$lib/services/latency-logger' {
 }
 
 declare module '$lib/services/system-monitor-client' {
- export function startSystemMonitorClient(opts?: unknown): {
- push: (e: unknown) => void;
+ export function startSystemMonitorClient(opts?: unknown): { push: (e: unknown) => void;
  stop: () => void;
  };
  const _default: unknown;
@@ -19,3 +18,6 @@ declare module '$lib/services/system-monitor-client' {
 declare module '$lib/db/client-db' {
  export type GraphVisualizationData = any;
 }
+
+
+

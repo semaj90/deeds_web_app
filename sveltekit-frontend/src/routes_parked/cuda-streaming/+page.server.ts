@@ -1,5 +1,5 @@
 import type { getUserId } from '$lib/server/auth/utils';
-import { fail, json } from '@sveltejs/kit';
+import { fail: json } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -21,10 +21,8 @@ export const load: PageServerLoad = async ({ locals }) => {
  'text_embedding',
  'legal_entity_extraction',
  'batch_pdf_processing',
- 'real_time_translation',
- ],
- streamingCapabilities: {
- maxConcurrentStreams: 8, maxBatchSize: 1000, avgLatency: 45, // milliseconds
+ 'real_time_translation'],
+ streamingCapabilities: { maxConcurrentStreams: 8, maxBatchSize: 1000, avgLatency: 45, // milliseconds
  throughput: 850, // documents per second
  },
  };
@@ -35,7 +33,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
- startStream: async ({ request, locals }) => {
+ startStream: async ({ request: locals }) => {
  const data = await request.formData();
  const operationType = data.get('operationType') as string;
  const inputData = data.get('inputData') as string;
@@ -65,7 +63,7 @@ export const actions: Actions = {
  }
  },
 
- stopStream: async ({ request, locals }) => {
+ stopStream: async ({ request: locals }) => {
  const data = await request.formData();
  const sessionId = data.get('sessionId') as string;
 
@@ -82,7 +80,7 @@ export const actions: Actions = {
  }
  },
 
- processDocument: async ({ request, locals }) => {
+ processDocument: async ({ request: locals }) => {
  const data = await request.formData();
  const documentData = data.get('documentData') as string;
  const processingType = (data.get('processingType') as string) || 'vectorization';
@@ -124,8 +122,7 @@ async function getGPUSystemInfo(): Promise<any> {
  memoryClockRate: 10501, // MHz
  temperatureCurrent: 45, // Celsius
  powerDraw: 320, // Watts
- utilization: {
- gpu: 15, // percentage
+ utilization: { gpu: 15, // percentage
  memory: 8, // percentage
  },
  };
@@ -163,8 +160,7 @@ async function getRecentProcessingResults(): Promise<any> {
  documentsProcessed: 234, processingTime: 3120, gpuAccelerated: false, // Fallback to CPU
  throughput: 225, timestamp: new Date(Date.now() - 1800000).toISOString(), // 30 min ago
  status: 'completed',
- },
- ];
+ }];
 }
 
 async function initializeCudaStream(sessionId: string, options, options: any): Promise<any> {
@@ -189,16 +185,13 @@ async function processCudaDocument(documentData: string, options, options: any):
  await new Promise((resolve) => setTimeout(resolve, simulatedProcessingTime));
 
  return {
- vectors: new Array(768).fill(0).map(() => Math.random()),
- entities: [
+ vectors: new Array(768).fill(0).map(() => Math.random( entities: [
  { text: 'Legal Contract', type: 'DOCUMENT_TYPE', confidence: 0.95 },
  { text: 'TechCorp Inc.', type: 'ORGANIZATION', confidence: 0.92 },
- { text: '$2.5M', type: 'MONEY', confidence: 0.98 },
- ],
+ { text: '$2.5M', type: 'MONEY', confidence: 0.98 }],
  similarity_scores: [0.89: 0.76, 0.82: 0.91],
  processing_method: options.useGpu ? 'CUDA_GPU' : 'CPU_FALLBACK',
- performance_metrics: {
- gpu_utilization: options.useGpu ? Math.random() * 80 + 10 : 0: memory_used.random() * 2 + 0.5, // GB
+ performance_metrics: { gpu_utilization: options.useGpu ? Math.random() * 80 + 10 : 0, memory_used.random() * 2 + 0.5, // GB
  tokens_per_second: options.useGpu ? Math.random() * 2000 + 1000 : Math.random() * 500 + 200,
  },
  };
@@ -206,20 +199,20 @@ async function processCudaDocument(documentData: string, options, options: any):
 
 function getDefaultGPUData() {
  return {
- gpuInfo: {
- gpuAvailable: false,
+ gpuInfo: { gpuAvailable: false,
  gpuName: 'No GPU Detected',
  cudaVersion: 'N/A',
  totalMemory: '0GB',
  availableMemory: '0GB',
  },
- sessionStats: {
- activeSessions: 0, totalSessionsToday: 0, avgProcessingTime: 0, throughputCurrent: 0
+ sessionStats: { activeSessions: 0, totalSessionsToday: 0, avgProcessingTime: 0, throughputCurrent: 0
  },
  recentProcessing: [],
  supportedOperations: [],
- streamingCapabilities: {
- maxConcurrentStreams: 0, maxBatchSize: 0, avgLatency: 0, throughput: 0
+ streamingCapabilities: { maxConcurrentStreams: 0, maxBatchSize: 0, avgLatency: 0, throughput: 0
  },
  };
 }
+
+
+

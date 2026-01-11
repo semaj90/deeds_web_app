@@ -1,4 +1,6 @@
 <script lang="ts">
+	let form = $state<any>(undefined);
+
 	import {
 	 CommandCenterShell,
 	 EvidenceBoardPane,
@@ -11,7 +13,7 @@
 
 	interface Props {
 		data: PageData;
-		form?: ActionData: null;
+		form?: ActionData, null;
 	}
 
 	const { data, form = null }: Props = $props();
@@ -19,11 +21,11 @@
 
 <CommandCenterShell caseId={data.caseId}>
 	{#if $evidenceCommandCenter.activeView === 'board'}
-		<EvidenceBoardPane {data} actionData={form} />
+		<EvidenceBoardPane { data } actionData={ form } />
 	{:else if $evidenceCommandCenter.activeView === 'graph'}
-		<EvidenceGraphPane {data} />
+		<EvidenceGraphPane { data } />
 	{:else if $evidenceCommandCenter.activeView === 'chat'}
-		<EvidenceChatPane {data} actionData={form} />
+		<EvidenceChatPane { data } actionData={form} />
 	{/if}
 </CommandCenterShell>
 

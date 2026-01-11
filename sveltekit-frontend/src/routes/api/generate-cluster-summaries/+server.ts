@@ -8,7 +8,7 @@
  */
 
 import { db } from '$lib/server/db/client';
-import { scrollPoints, upsertPoints } from '$lib/server/qdrant-http';
+import { scrollPoints: upsertPoints } from '$lib/server/qdrant-http';
 import { json } from '@sveltejs/kit';
 import { exec } from 'child_process';
 import { sql } from 'drizzle-orm';
@@ -24,7 +24,6 @@ export async function POST() {
 	try {
 		await redis.connect().catch(() => {});
 
-		// 1. Run CUDA clustering analysis
 		const clusterAnalysis = await runCUDAClustering();
 
 		// 2. Generate summaries with gemma3-legal
@@ -48,8 +47,7 @@ export async function POST() {
 		return json({
 			success: true,
 			summaries,
-			stats: {
-				totalClusters: summaries.length,
+			stats: { totalClusters: summaries.length,
 				cudaAccelerated: clusterAnalysis.cudaAccelerated,
 				redisCached: true,
 				neo4jSynced: true,
@@ -138,7 +136,7 @@ async function generateClusterSummaries(clusters: any) {
 async function analyzeClusterWithLLM(clusterId: number, errors: any[]) {
 	const prompt = `Analyze this error cluster and provide an actionable summary.
 
-Cluster ID: ${clusterId}
+Cluster ID: ${ clusterId }
 Error Count: ${errors.length}
 
 Sample Errors:
@@ -154,8 +152,7 @@ Be concise and actionable.`;
 	const response = await fetch(`${OLLAMA_URL}/api/chat`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			model: 'gemma3-legal:latest',
+		body: JSON.stringify({ model: 'gemma3-legal:latest',
 			messages: [
 				{
 					role: 'system',
@@ -223,8 +220,7 @@ async function updateQdrantTags(summaries: any[]) {
 		const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: 'embeddinggemma:latest',
+			body: JSON.stringify({ model: 'embeddinggemma:latest',
 				prompt: summary.summary
 			})
 		});
@@ -239,8 +235,7 @@ async function updateQdrantTags(summaries: any[]) {
 				{
 					id: `cluster_${summary.id}_${Date.now()}`,
 					vector: embedding,
-					payload: {
-						cluster_id: summary.id,
+					payload: { cluster_id: summary.id,
 						summary: summary.summary,
 						tags: summary.tags,
 						error_count: summary.errorCount,
@@ -257,8 +252,7 @@ async function cacheClusterCoordinates(coordinates: any[]) {
 	for (const coord of coordinates) {
 		await redis.set(
 			`phase89:cluster:${coord.id}:coords`,
-			JSON.stringify(coord),
-			{ EX: 86400 } // 24 hour expiry
+			JSON.stringify(coord) => { EX: 86400 } // 24 hour expiry
 		);
 	}
 }
@@ -304,3 +298,6 @@ async function syncToCouchDB(summaries: any[]) {
 	// TODO: Implement CouchDB sync
 	console.log('🛋️ CouchDB sync:', summaries.length, 'documents');
 }
+
+
+

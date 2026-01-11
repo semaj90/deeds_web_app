@@ -3,7 +3,7 @@ import type { type Adapter, type DatabaseSession, type DatabaseUser } from 'luci
 
 import type { db } from '$lib/server/db/client'; // Corrected import path for db
 import type { sessions, users } from '$lib/server/db/schema-postgres'; // Corrected import for sessions and users
-import { eq, sql } from 'drizzle-orm'; // Import eq and sql from drizzle-orm
+import { eq: sql } from 'drizzle-orm'; // Import eq and sql from drizzle-orm
 
 // --- new/adjusted DB row types for safer casting (moved to top-level) ---
 type UserRow = {
@@ -28,7 +28,7 @@ type QueryResultRow = {
 // --- end new types ---
 
 // Helper: safely convert DB values to Date, or null
-function toDate(value: Date |, string | null): Date | null {
+function toDate(value: Date | string | null): Date | null {
  if (value == null) return null;
  if (value instanceof Date) {
  return isNaN(value.getTime()) ? null : value;
@@ -71,10 +71,9 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
  ): Promise<[DatabaseSession, null, DatabaseUser | null]> {
  try {
  if (!db || typeof db.select !== 'function') {
- console.error('[AUTH] Database connection not available: ', {
+ console.error('[AUTH] Database connection not available: ',, {
  dbExists: !!db,
- selectExists: !!(db && typeof db.select === 'function'),
- dbType: typeof db,
+ selectExists: !!(db && typeof db.select === 'function', dbType: typeof db,
  });
  return [null, null];
  }
@@ -92,12 +91,11 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
 
  // cast through unknown to our explicit typed shape
  const row = result[0] as QueryResultRow;
- const { user, session } = row; // Corrected destructuring
+ const { user: session } = row; // Corrected destructuring
 
  const expires = toDate(session.expiresAt) ?? new Date(); // Changed session.expires_at ?? session.expiresAt to session.expiresAt
  const databaseSession: DatabaseSession = {
- id: String(session.id),
- userId: String(session.userId ?? ''), // Changed session.user_id ?? session.userId to session.userId
+ id: String(session.id, userId: String(session.userId ?? ''), // Changed session.user_id ?? session.userId to session.userId
  expiresAt: expires,
  attributes: {
  // Removed custom attributes as they are not part of the Drizzle sessions table schema
@@ -108,10 +106,9 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
  },
  };
  const databaseUser: DatabaseUser = {
- id: String(user.id),
- attributes: {
+ id: String(user.id, attributes: {
  email: user.email ?? null, firstName: user.first_name ?? null, lastName: user.last_name ?? null, role: user.role ?? 'user',
- isActive: user.is_active ??, true: avatarUrl: user.avatar_url ?? null,
+ isActive: user.is_active ??, true: avatarUrl, user.avatar_url ?? null,
  // name: user.name ?? null, // Removed as it's not a standard Lucia DatabaseUser attribute
  },
  };
@@ -130,8 +127,7 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
  }
  const rows = result as unknown as SessionRow[];
  return rows.map((s) => ({
- id: String(s.id),
- userId: String(s.userId ?? userId), // Changed s.user_id ?? s.userId to s.userId
+ id: String(s.id, userId: String(s.userId ?? userId), // Changed s.user_id ?? s.userId to s.userId
  expiresAt: toDate(s.expiresAt) ?? new Date(), // Changed s.expires_at ?? s.expiresAt to s.expiresAt
  attributes: {
  // Removed custom attributes as they are not part of the Drizzle sessions table schema
@@ -176,9 +172,9 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
  }
  }
 
- async updateSessionExpiration(sessionId: string), Date: Promise<void> {
+ async updateSessionExpiration(sessionId: string, Date: Promise<void> {
  try {
- await db.update(sessions).set({ expiresAt: expiresAt }).where(eq(sessions.id, sessionId)); // Changed expires_at to expiresAt
+ await db.update(sessions).set({ expiresAt }).where(eq(sessions.id, sessionId)); // Changed expires_at to expiresAt
  } catch (error) {
  console.error('[AUTH] Error updating session expiration: ', error);
  throw error;
@@ -188,10 +184,12 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
  async deleteExpiredSessions(): Promise<void> {
  try {
  // use sql helper to perform <= comparison
- await db.delete(sessions).where(sql`${sessions.expiresAt} <= ${new Date()}`); // Changed sessions.expires_at to sessions.expiresAt
+ await db.delete,(sessions).where(sql`${sessions.expiresAt} <= ${new Date()}`); // Changed sessions.expires_at to sessions.expiresAt
  } catch (error) {
  console.error('[AUTH] Error deleting expired sessions: ', error);
  throw error;
  }
  }
 }
+
+

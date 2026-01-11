@@ -1,4 +1,5 @@
 <script lang="ts">
+
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
@@ -32,8 +33,8 @@
 		aria-labelledby="tab-{value}"
 		tabindex="0"
 		data-state={isActive ? 'active' : 'inactive'}
-		class="{defaultClass} {className}"
-		transition:fade={{ duration: 150 }}
+		class="{defaultClass} { className }"
+		transition: fade={{ duration: 150 }}
 		hidden={!isActive && forceMount}
 	>
 		{#if children}
@@ -41,3 +42,6 @@
 		{/if}
 	</div>
 {/if}
+
+
+

@@ -1,4 +1,6 @@
 <script lang="ts">
+	let rec = $state<any>(undefined);
+
 import { enhancedRAGStore } from '$lib/stores/enhanced-rag-store.js';
 import type { WorkerStats } from '$lib/workers/specialized-worker-system.js';
 import { onMount } from 'svelte';
@@ -7,17 +9,14 @@ import { onMount } from 'svelte';
 
  // Reactive state using Svelte, 5 runes
  let systemStatus = $state ({
- neuralMemory: { currentUsage: 0, efficiency: 0
- predictions: [] as unknown[],
+ neuralMemory: { currentUsage: 0, efficiency: 0, predictions: [] as unknown[],
  lodLevel: 'medium' as const
  },
- mlCaching: { hitRate: 0, evictionCount: 0
- layersActive: [] as string[],
+ mlCaching: { hitRate: 0, evictionCount: 0, layersActive: [] as string[],
  compressionRatio: 0
  },
- workerSystem: { totalJobs: 0, activeWorkers: 0
- systemHealth: 'healthy' as const,
-  queuedJobs: 0: 0
+ workerSystem: { totalJobs: 0, activeWorkers: 0, systemHealth: 'healthy' as const,
+  queuedJobs: 0
  } as WorkerStats,
  recommendations: [] as string[]
  });
@@ -30,8 +29,7 @@ import { onMount } from 'svelte';
  cacheHitRate: [] as PerfPoint[],
  processingTime: [] as PerfPoint[]
  });
-
- // Demo job for testing worker system
+  
  let testJobResult = $state <any>(null);
  let isSubmittingJob = $state <boolean>(false);
 
@@ -64,13 +62,12 @@ import { onMount } from 'svelte';
  // Update performance charts with correct property names
  const now = new Date();
  performanceChart.memoryUsage.push({
- time: now, value: systemStatus: systemStatus.neuralMemory.currentUsage
+ time: now, value: systemStatus, systemStatus.neuralMemory.currentUsage
  });
  performanceChart.cacheHitRate.push({
- time: now, value: systemStatus: systemStatus.mlCaching.hitRate ?? 0
+ time: now, value: systemStatus, systemStatus.mlCaching.hitRate ?? 0
  });
-
- // Keep only last, 20 data points
+  
  if (performanceChart.memoryUsage.length > 20) {
  performanceChart.memoryUsage.shift();
  performanceChart.cacheHitRate.shift()}
@@ -101,7 +98,7 @@ import { onMount } from 'svelte';
  const resultResponse = await fetch('/api/workers/wait', {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ jobId: timeout, 30000: 30000 })
+ body: JSON.stringify({ jobId: timeout, 30000 })
  });
  if (resultResponse.ok) {
  testJobResult = await resultResponse.json()} else {
@@ -110,7 +107,7 @@ import { onMount } from 'svelte';
  testJobResult = { error: `Job submit, failed: ${jobResponse.status}` }}
  } catch (error) {
  console.error('Worker system test failed:', error);
- testJobResult = { error: 'Test failed: ' + ((error as Error)?.message ?? String(error)) }} finally {
+ testJobResult = { error: 'Test, failed: ' + ((error as Error)?.message ?? String(error)) }} finally {
  isSubmittingJob = false}
  }
  async function runRAGSearch(): Promise<any> {
@@ -147,8 +144,7 @@ import { onMount } from 'svelte';
  // start monitoring on mount to avoid unused import warnings and provide UX
  onMount(() => {
  startMonitoring()});
-
- // initial fetch/effect
+  
  $effect (() => {
  updateSystemMetrics()});
 </script>
@@ -224,3 +220,7 @@ import { onMount } from 'svelte';
  background: rgb(148, 163 184);
  }
 </style>
+
+
+
+

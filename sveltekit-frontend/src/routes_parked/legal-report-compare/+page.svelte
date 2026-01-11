@@ -1,4 +1,17 @@
 <script lang="ts">
+	let fileSize = $state<any>(undefined);
+	let analysisError = $state<any>(undefined);
+	let charge = $state<any>(undefined);
+	let issue = $state<any>(undefined);
+	let fact = $state<any>(undefined);
+	let basis = $state<any>(undefined);
+	let precedent = $state<any>(undefined);
+	let evidence = $state<any>(undefined);
+	let arg = $state<any>(undefined);
+	let doc = $state<any>(undefined);
+	let test = $state<any>(undefined);
+	let opinion = $state<any>(undefined);
+
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; /** * Legal Report Comparison - PDF Upload & NLP Similarity Analysis *
  * Features: * - PDF report upload with OCR * - WHO/WHAT/WHY/HOW/EVIDENCE extraction * - Person of Interest (POI) tracking * - embeddinggemma vector search * - Qdrant tag-based filtering * - Case similarity recommendations * - gemma3-legal:latest agentic analysis */ import type { toast } from 'svelte-sonner'; import { FileText } from "lucide-svelte";
@@ -9,7 +22,8 @@ import { Scale } from "lucide-svelte";
 import { FileSearch } from "lucide-svelte";
 import { Sparkles } from "lucide-svelte";
 import { CheckCircle2 } from "lucide-svelte";
-import { AlertTriangle } from "lucide-svelte";; import Button from '$lib/components/ui/Button.svelte'; import Card, CardContent, CardHeader, CardTitle from "$lib/components/ui/Card.svelte"; // ============================================================================ // Svelte, 5 State Management // ============================================================================ let uploadFile = $state <File: null>(null); let isUploading = $state <boolean>(false); let uploadProgress = $state <number>(0); // Form data let formData = $state ({ title: '', documentType: 'report', as: 'verdict' | 'sentence' | 'contract' | 'evidence' | 'brief' | 'motion' | 'report', jurisdiction: '', // Added colon caseNumber: '', enableComparison: true, // Added colon }); // Analysis results type AnalysisResult = { fileUrl: string, fileName: string, string: string, fileSize: number, extractedTextLength: number, number: number, analysis: { who: { personsOfInterest: Array<{ name: string, role: string, string: string, mentions: number, relevance: number, number: number}>; parties: Array<{ name: string, type: string, string: string, role: string}>}; what: { summary: string, chargesOrClaims: string, string: string[], legalIssues: string[], keyFacts: string[]}; why: { motivation: string; // Added colon legalBasis: string[], precedents: string[]}; how: { methodology: string, evidenceChain: string, string: string[], legalArguments: string[]}; evidence: { physicalEvidence: Array<{ type: string, description: string, string: string; // Added colon relevance: number, admissible: boolean, boolean: boolean}>; documentaryEvidence: string[], testimonialEvidence: string[], expertOpinions: string[]}; verdict?: { outcome: string, reasoning: string, string: string, dissent?: string}; sentencing?: { penalties: string[], duration?: string; conditions?: string[]}}; comparison?: { similarCases: Array<{ caseId: string, title: string, string: string, similarity: number, matchedFactors: string, string: string[], relevantExcerpts: string[], outcome?: string}>; recommendations: Array<{ type: string, priority: string, string: string, description: string; // Added colon reasoning: string, confidence: number, number: number}>;, aiInsights: string};, processingTime: number} | null; let analysisResult = $state <AnalysisResult>(null); let analysisError = $state <string | null>(null); // Derived state let canSubmit = $derived ( uploadFile !== null && formData.title.length > 0 && !isUploading ); let fileSize = $derived ( uploadFile ? formatFileSize(uploadFile.size): null ); // Active tab let activeTab = $state <'who' | 'what' | 'why' | 'how' | 'evidence' | 'comparison'>('what'); // ============================================================================ // File Upload Handlers // ============================================================================ // Add small helpers so TypeScript accepts toast.* method usage. type ToastWithMethods = ((message: string, opts?: unknown) => any) & { info?: (message: string, opts?: unknown) => any; success?: (message: string, opts?: unknown) => any; error?: (message: string, opts?: unknown) => any}; const _toast = (toast as: unknown) as ToastWithMethods; function toastError(message: string) { if (typeof _toast.error === 'function') { _toast.error(message)} else { _toast(message, { type: 'error' }, as: unknown)}
+import { AlertTriangle } from "lucide-svelte";; import { Button } from '$lib/components/ui/enhanced-bits'; import Card, CardContent, CardHeader, CardTitle from "$lib/components/ui/Card.svelte"; // ============================================================================ // Svelte, 5 State Management // ============================================================================ let uploadFile = $state <File: null>(null); let isUploading = $state <boolean>(false); let uploadProgress = $state <number>(0); // Form data let formData = $state ({ title: '', documentType: 'report', as: 'verdict' | 'sentence' | 'contract' | 'evidence' | 'brief' | 'motion' | 'report', jurisdiction: '', // Added colon caseNumber: '', enableComparison: true, // Added colon });
+  
  }
  function toastSuccess(message: string) { if (typeof _toast.success === 'function') { _toast.success(message)} else { _toast(message, { type: 'success' }, as: unknown)}
  }
@@ -32,12 +46,13 @@ import { AlertTriangle } from "lucide-svelte";; import Button from '$lib/compone
  }
  async function submitReport(): Promise<any> { if (!uploadFile) return; isUploading = true; uploadProgress = 0; analysisError = null; analysisResult = null; try { const data = new FormData(); data.append('file', uploadFile); data.append('title', formData.title); data.append('documentType', formData.documentType); data.append('jurisdiction', formData.jurisdiction); data.append('caseNumber', formData.caseNumber); data.append('enableComparison', formData.enableComparison.toString()); uploadProgress = 25; toastInfo('ðŸ“„ Uploading PDF...'); const response = await fetch('/api/legal-report/analyze', { method: 'POST', body: data }); uploadProgress = 50; toastInfo('ðŸ” Extracting text with OCR...'); if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error || 'Analysis failed')}
 
- uploadProgress = 75; toastInfo('ðŸ§  Analyzing with gemma3-legal:latest...'), const result = await response.json(); uploadProgress = 100; if (result.success) { analysisResult = result.data; toastSuccess('âœ… Legal analysis complete!'); // Show summary toasts if (result.data.analysis.who.personsOfInterest.length > 0) { toastInfo(`ðŸ‘¥ Identified ${result.data.analysis.who.personsOfInterest.length} persons of interest`)}
+ uploadProgress = 75; toastInfo('ðŸ§  Analyzing with gemma3-legal:latest...');
+ const result = await response.json(); uploadProgress = 100; if (result.success) { analysisResult = result.data; toastSuccess('âœ… Legal analysis complete!'); // Show summary toasts if (result.data.analysis.who.personsOfInterest.length > 0) { toastInfo(`ðŸ‘¥ Identified ${result.data.analysis.who.personsOfInterest.length} persons of interest`)}
 
  if (result.data.comparison?.similarCases.length > 0) { toastInfo(`ðŸ“Š Found ${result.data.comparison.similarCases.length} similar cases`)}
 
  if (result.data.comparison?.recommendations.length > 0) { toastInfo(`ðŸ’¡ Generated ${result.data.comparison.recommendations.length} recommendations`)}
- } else { throw new Error(result.error || 'Analysis failed')}
+ } else { throw new Error(result.error ?? 'Analysis failed')}
  } catch (err: unknown) { console.error('Analysis error:', err); analysisError = err.message || 'Unknown error'; toastError(`âŒ Analysis failed: ${ analysisError }`)} finally { isUploading = false}
  }
  function resetForm() { uploadFile = null; analysisResult = null; analysisError = null; uploadProgress = 0; formData = { title: '', documentType: 'report', jurisdiction: '', // Added colon caseNumber: '', enableComparison: true, // Added colon }}
@@ -92,7 +107,7 @@ import { AlertTriangle } from "lucide-svelte";; import Button from '$lib/compone
  Enable Comparison
  </label>
  </div>
- <Button type="submit" disabled={!canSubmit} class="w-full">
+ <Button type="submit" disabled={!canSubmit} class="w-full bits-btn">
  {#if isUploading}
  <div class="flex items-center">
  <div class="loader-spin-icon mr-2"><Upload /></div>
@@ -110,7 +125,7 @@ import { AlertTriangle } from "lucide-svelte";; import Button from '$lib/compone
  <Card class="mt-4">
  <CardContent>
  <p class="text-red-500">Error: {analysisError}</p>
- <Button onclick={resetForm} variant="outline">Try Again</Button>
+ <Button class="bits-btn" onclick={ resetForm } variant="outline">Try Again</Button>
  </CardContent>
  </Card>
  {/if}
@@ -122,13 +137,13 @@ import { AlertTriangle } from "lucide-svelte";; import Button from '$lib/compone
  </CardHeader>
  <CardContent>
  <div class="flex space-x-2 mb-4">
- <Button onclick={() => activeTab = 'what'} variant={activeTab === 'what' ? 'default' : 'outline'}>What</Button>
- <Button onclick={() => activeTab = 'who'} variant={activeTab === 'who' ? 'default' : 'outline'}>Who</Button>
- <Button onclick={() => activeTab = 'why'} variant={activeTab === 'why' ? 'default' : 'outline'}>Why</Button>
- <Button onclick={() => activeTab = 'how'} variant={activeTab === 'how' ? 'default' : 'outline'}>How</Button>
- <Button onclick={() => activeTab = 'evidence'} variant={activeTab === 'evidence' ? 'default' : 'outline'}>Evidence</Button>
+ <Button class="bits-btn" onclick={() => activeTab = 'what'} variant={activeTab === 'what' ? 'default' : 'outline'}>What</Button>
+ <Button class="bits-btn" onclick={() => activeTab = 'who'} variant={activeTab === 'who' ? 'default' : 'outline'}>Who</Button>
+ <Button class="bits-btn" onclick={() => activeTab = 'why'} variant={activeTab === 'why' ? 'default' : 'outline'}>Why</Button>
+ <Button class="bits-btn" onclick={() => activeTab = 'how'} variant={activeTab === 'how' ? 'default' : 'outline'}>How</Button>
+ <Button class="bits-btn" onclick={() => activeTab = 'evidence'} variant={activeTab === 'evidence' ? 'default' : 'outline'}>Evidence</Button>
  {#if analysisResult.comparison}
- <Button onclick={() => activeTab = 'comparison'} variant={activeTab === 'comparison' ? 'default' : 'outline'}>Comparison</Button>
+ <Button class="bits-btn" onclick={() => activeTab = 'comparison'} variant={activeTab === 'comparison' ? 'default' : 'outline'}>Comparison</Button>
  {/if}
  </div>
 
@@ -276,7 +291,7 @@ import { AlertTriangle } from "lucide-svelte";; import Button from '$lib/compone
  </CardContent>
  </Card>
 
- <Button onclick={resetForm} variant="outline" class="mt-4">Reset</Button>
+ <Button onclick={resetForm} variant="outline" class="mt-4 bits-btn">Reset</Button>
  {/if}
 </main>
 
@@ -294,3 +309,5 @@ import { AlertTriangle } from "lucide-svelte";; import Button from '$lib/compone
  }
  }
 </style>
+
+

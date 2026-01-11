@@ -5,10 +5,8 @@ export type ReportTemplate = 'charging_memo' | 'intake_summary';
 const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';
 
-export async function generateReportWithGemma(opts: {
- caseTitle: string;
- caseId: string;
- template: ReportTemplate;
+export async function generateReportWithGemma(opts: { caseTitle: string;
+ caseId: string; template: ReportTemplate;
  narrative?: string | null;
  who?: string | null;
  what?: string | null;
@@ -44,8 +42,8 @@ You are a prosecutor-assistant legal AI.
 
 Write a ${templateLabel} in HTML suitable for rendering in a rich text editor (TipTap). Use headings (<h2>), paragraphs, and bullet lists. Do NOT include <html>, <head>, or <body> tags.
 
-Case ID: ${caseId}
-Case Title: ${caseTitle}
+Case ID: ${ caseId }
+Case Title: ${ caseTitle }
 
 WHO: ${who ?? ''}
 WHAT: ${what ?? ''}
@@ -77,8 +75,7 @@ Requirements:
  const res = await fetch(`${OLLAMA_URL}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: OLLAMA_MODEL,
+ body: JSON.stringify({ model: OLLAMA_MODEL,
  prompt,
  stream: false
  }),
@@ -91,3 +88,7 @@ Requirements:
  const data = (await res.json()) as { response: string };
  return data.response; // plain HTML-ish text
 }
+
+
+
+

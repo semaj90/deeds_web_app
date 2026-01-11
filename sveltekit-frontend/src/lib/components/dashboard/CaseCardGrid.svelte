@@ -2,11 +2,9 @@
  import { goto } from '$app/navigation';
 
  export interface Case {
- id: string;
- title: string;
+ id: string; title: string;
  status: 'active' | 'closed';
- createdAt: string;
- updatedAt: string;
+ createdAt: string; updatedAt: string;
  evidence: Array<{ id: string; status: string }>;
  }
 
@@ -47,11 +45,11 @@
  };
 
  const handleCaseClick = (caseId: string) => {
- goto(`/cases/${caseId}`);
+ goto(`/cases/${ caseId }`);
  };
 </script>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-3 gap-6">
  {#if isLoading}
  {#each Array(3) as _}
  <div class="bg-white border-2 border-gray-300 p-6 rounded animate-pulse">
@@ -72,8 +70,7 @@
  <button
  onclick={() => handleCaseClick(caseItem.id)}
  class="bg-white border-2 border-gray-300 hover:border-[#9E0000] transition p-6 cursor-pointer rounded text-left {getStatusColor(
- caseItem.status,
- )}"
+ caseItem.status)}"
  >
  <div class="flex items-start justify-between mb-3">
  <h3 class="text-lg font-bold text-gray-900 flex-1">{caseItem.title}</h3>
@@ -104,8 +101,7 @@
 
 <style>
  @keyframes pulse {
- 0%,
- 100% {
+ 0%; } 100% {
  opacity: 1;
  }
  50% {
@@ -117,3 +113,7 @@
  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
  }
 </style>
+
+
+
+

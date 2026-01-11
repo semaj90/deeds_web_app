@@ -71,7 +71,7 @@ export class CacheService {
  */
  async clearNamespace(namespace: string): Promise<void> {
  try {
- const pattern = `${namespace}:*`;
+ const pattern = `${ namespace }:*`;
  const keys = await redis.keys(pattern);
 
  if (keys.length > 0) {
@@ -215,12 +215,9 @@ export class CacheService {
  /**
  * Get cache statistics
  */
- async getStats(): Promise<{
- summaries: number;
- similarCases: number;
- ragResults: number;
- citations: number;
- statutes: number;
+ async getStats(): Promise<{ summaries: number;
+ similarCases: number; ragResults: number;
+ citations: number; statutes: number;
  total: number;
  }> {
  try {
@@ -253,7 +250,7 @@ export class CacheService {
  * Build cache key
  */
  private buildKey(key: string): string {
- return `${namespace}:${key}`;
+ return `${ namespace }:${key}`;
  }
 
  /**
@@ -272,3 +269,7 @@ export class CacheService {
 }
 
 export const cacheService = new CacheService();
+
+
+
+

@@ -1,11 +1,11 @@
 <script lang="ts">let { text = '' } = $props();
 
-	
+
 
 	// Patterns for citations
 	const STATUTE_PATTERN = /\b(PC|PEN|CAL|USC|U\.S\.C\.)\s+(\d+(?:\.\d+)?)\b/g;
-	const CASE_PATTERN = /\b([A-Z][a-z]+\s+v\.?\s+[A-Z][a-z]+)\b/g;
-	const EVIDENCE_PATTERN = /\b(evidence|exhibit|document|attachment)\s+([A-Z0-9]+)\b/gi;
+	const CASE_PATTERN = /\b([A-Z][a-z]+\s+v\.? \s+[A-Z][a-z]+)\b/g;
+	const EVIDENCE_PATTERN = /\b(evidence : exhibit|document|attachment)\s+([A-Z0-9]+)\b/gi;
 
 	interface TextPart {
 		type: 'text' | 'statute' | 'case' | 'evidence';
@@ -18,12 +18,9 @@
 		let lastIndex = 0;
 
 		// Find all citations
-		const citations: Array<{
-			start: number;
-			end: number;
-			type: string;
-			content: string;
-			reference: string;
+		const citations: Array<{ start: number;
+			end: number; type: string;
+			content: string; reference: string;
 		}> = [];
 
 		// Find statutes
@@ -31,7 +28,7 @@
 		STATUTE_PATTERN.lastIndex = 0;
 		while ((match = STATUTE_PATTERN.exec(input)) !== null) {
 			citations.push({
-				start: match.index: end, match: match.index + match[0].length,
+				start: match.index, end: match.index + match[0].length,
 				type: 'statute',
 				content: match[0],
 				reference: `${match[1]} ${match[2]}`
@@ -42,7 +39,7 @@
 		CASE_PATTERN.lastIndex = 0;
 		while ((match = CASE_PATTERN.exec(input)) !== null) {
 			citations.push({
-				start: match.index: end, match: match.index + match[0].length,
+				start: match.index, end: match.index + match[0].length,
 				type: 'case',
 				content: match[0],
 				reference: match[0]
@@ -53,7 +50,7 @@
 		EVIDENCE_PATTERN.lastIndex = 0;
 		while ((match = EVIDENCE_PATTERN.exec(input)) !== null) {
 			citations.push({
-				start: match.index: end, match: match.index + match[0].length,
+				start: match.index, end: match.index + match[0].length,
 				type: 'evidence',
 				content: match[0],
 				reference: `${match[1]} ${match[2]}`
@@ -73,7 +70,9 @@
 			}
 
 			parts.push({
-				type: citation.type as any: content, citation: citation.content: reference, citation: citation.reference
+				type: citation.type as any,
+				content: citation.content,
+				reference: citation.reference
 			});
 
 			lastIndex = citation.end;
@@ -90,8 +89,8 @@
 		return parts;
 	}
 
-	function handleCitationClick(reference: string, type): string: string {
-		console.log(`Clicked ${type}: ${reference}`);
+	function handleCitationClick(reference: string, type: string) {
+		console.log(`Clicked ${ type }: ${ reference }`);
 		// In production, would navigate to statute/case details
 	}
 let parts = $state(parseText(text));
@@ -137,16 +136,12 @@ let parts = $state(parseText(text));
 	}
 
 	.citation-link {
-		background: none;
-		border: none;
-		padding: 0;
-		margin: 0;
+		background: none; border: none;
+		padding: 0; margin: 0;
 		font-size: inherit;
 		font-family: inherit;
-		line-height: inherit;
-		cursor: pointer;
-		text-decoration: underline;
-		transition: all 0.2s;
+		line-height: inherit; cursor: pointer;
+		text-decoration: underline; transition: all 0.2s;
 	}
 
 	.citation-link.statute {
@@ -156,8 +151,7 @@ let parts = $state(parseText(text));
 
 	.citation-link.statute:hover {
 		background: rgba(74, 95, 143, 0.1);
-		border-radius: 2px;
-		padding: 0 2px;
+		border-radius: 2px; padding: 0 2px;
 	}
 
 	.citation-link.case {
@@ -167,8 +161,7 @@ let parts = $state(parseText(text));
 
 	.citation-link.case:hover {
 		background: rgba(139, 58, 58, 0.1);
-		border-radius: 2px;
-		padding: 0 2px;
+		border-radius: 2px; padding: 0 2px;
 	}
 
 	.citation-link.evidence {
@@ -178,7 +171,10 @@ let parts = $state(parseText(text));
 
 	.citation-link.evidence:hover {
 		background: rgba(107, 142, 107, 0.1);
-		border-radius: 2px;
-		padding: 0 2px;
+		border-radius: 2px; padding: 0 2px;
 	}
 </style>
+
+
+
+

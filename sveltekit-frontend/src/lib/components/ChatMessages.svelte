@@ -52,7 +52,7 @@
 				<div class="citations">
 					<span class="citations-label">Citations:</span>
 					{#each message.citations as citation}
-						<span class="citation-tag">{citation}</span>
+						<span class="citation-tag">{ citation }</span>
 					{/each}
 				</div>
 			{/if}
@@ -61,7 +61,7 @@
 				<div class="evidence-refs">
 					<span class="refs-label">Evidence:</span>
 					{#each message.evidence_references as ref}
-						<span class="ref-tag">{ref}</span>
+						<span class="ref-tag">{ ref }</span>
 					{/each}
 				</div>
 			{/if}
@@ -72,13 +72,11 @@
 <style>
 	.messages-list {
 		display: flex;
-		flex-direction: column;
-		gap: 1rem;
+		flex-direction: column; gap: 1rem;
 	}
 
 	.message {
-		padding: 1rem;
-		background: #fafaf8;
+		padding: 1rem; background: #fafaf8;
 		border: 1px solid #e0ddd8;
 		border-radius: 4px;
 		border-left: 4px solid #8b3a3a;
@@ -90,31 +88,26 @@
 	}
 
 	.message-header {
-		display: flex;
-		gap: 1rem;
+		display: flex; gap: 1rem;
 		align-items: center;
 		margin-bottom: 0.75rem;
 	}
 
 	.role-badge {
-		display: inline-block;
-		padding: 0.25rem 0.75rem;
-		border-radius: 12px;
-		color: white;
+		display: inline-block; padding: 0.25rem 0.75rem;
+		border-radius: 12px; color: white;
 		font-size: 0.8rem;
 		font-weight: 600;
 	}
 
 	.timestamp {
-		font-size: 0.8rem;
-		color: #999;
+		font-size: 0.8rem; color: #999;
 		margin-left: auto;
 	}
 
 	.message-content {
 		font-size: 0.95rem;
-		line-height: 1.6;
-		color: #2d2d2d;
+		line-height: 1.6; color: #2d2d2d;
 		margin-bottom: 0.75rem;
 	}
 
@@ -125,8 +118,7 @@
 	}
 
 	.citations {
-		display: flex;
-		gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 		flex-wrap: wrap;
 		margin-top: 0.75rem;
 		padding-top: 0.75rem;
@@ -135,42 +127,36 @@
 	}
 
 	.citations-label {
-		font-weight: 600;
-		color: #2d2d2d;
+		font-weight: 600; color: #2d2d2d;
 	}
 
 	.citation-tag {
-		display: inline-block;
-		padding: 0.25rem 0.5rem;
-		background: #e8f0e8;
-		border: 1px solid #d0ddd0;
-		border-radius: 3px;
-		color: #2d5f2d;
+		display: inline-block; padding: 0.25rem 0.5rem;
+		background: #e8f0e8; border: 1px solid #d0ddd0;
+		border-radius: 3px; color: #2d5f2d;
 		font-family: 'Courier New', monospace;
 		font-size: 0.8rem;
 	}
 
 	.evidence-refs {
-		display: flex;
-		gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 		flex-wrap: wrap;
 		margin-top: 0.5rem;
 		font-size: 0.85rem;
 	}
 
 	.refs-label {
-		font-weight: 600;
-		color: #2d2d2d;
+		font-weight: 600; color: #2d2d2d;
 	}
 
 	.ref-tag {
-		display: inline-block;
-		padding: 0.25rem 0.5rem;
-		background: #f0e8e0;
-		border: 1px solid #ddd0c0;
-		border-radius: 3px;
-		color: #5f3a2d;
+		display: inline-block; padding: 0.25rem 0.5rem;
+		background: #f0e8e0; border: 1px solid #ddd0c0;
+		border-radius: 3px; color: #5f3a2d;
 		font-family: 'Courier New', monospace;
 		font-size: 0.8rem;
 	}
 </style>
+
+
+

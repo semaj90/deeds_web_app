@@ -19,21 +19,15 @@ https://svelte.dev/e/js_parse_error -->
  import Textarea from '$lib/components/ui/textarea';
 
  type Statement = {
- victimName: string;
- victimContact: string;
- incidentDate: string;
- incidentLocation: string;
- incidentDescription: string;
- emotionalImpact: string;
- physicalImpact: string;
- financialImpact: string;
- linkedEvidence: string[];
- additionalNotes: string;
+ victimName: string; victimContact: string;
+ incidentDate: string; incidentLocation: string;
+ incidentDescription: string; emotionalImpact: string;
+ physicalImpact: string; financialImpact: string;
+ linkedEvidence: string[]; additionalNotes: string;
  };
 
  type Props = {
- open: boolean;
- caseId: string;
+ open: boolean; caseId: string;
  onSave: (data: { statement: Statement }) => void;
  onCancel: () => void;
  };
@@ -72,8 +66,7 @@ https://svelte.dev/e/js_parse_error -->
  { id: 'incident-details', title: 'Incident Details', description: 'What happened, when, and where' },
  { id: 'impact-assessment', title: 'Impact Assessment', description: 'Effects on the victim' },
  { id: 'evidence-links', title: 'Evidence Links', description: 'Connect to existing evidence' },
- { id: 'review', title: 'Review & Submit', description: 'Review and finalize the statement' },
- ];
+ { id: 'review', title: 'Review & Submit', description: 'Review and finalize the statement' }];
 
  function getCurrentStepIndex(): number {
  return steps.findIndex(step => step.id === currentStep);
@@ -169,8 +162,7 @@ https://svelte.dev/e/js_parse_error -->
  {#each steps as step, index}
  <div
  class="step-indicator"
- class:active={step.id === currentStep}
- class:completed={getCurrentStepIndex() > index}
+ class:active={step.id === currentStep}; class:completed={getCurrentStepIndex() > index}
  >
  <span class="step-number">{index + 1}</span>
  <span class="step-title">{step.title}</span>
@@ -228,15 +220,15 @@ https://svelte.dev/e/js_parse_error -->
  value={statement.incidentDescription}
  oninput={(e) => statement.incidentDescription = e.target.value}
  placeholder="Detailed description of what happened"
- rows={6}
+ rows={ 6 }
  />
  </div>nd:value={statement.incidentDescription}
  placeholder="Detailed description of what happened"
- rows={6}
+ rows={ 6 }
  />
  </div>
- <Button
- onclick={generateAISuggestions}
+ <Button class="bits-btn"
+ onclick={ generateAISuggestions }
  disabled={isGeneratingSuggestions}
  variant="outline"
  size="sm"
@@ -260,7 +252,7 @@ https://svelte.dev/e/js_parse_error -->
  value={statement.emotionalImpact}
  oninput={(e) => statement.emotionalImpact = e.target.value}
  placeholder="How has this affected you emotionally?"
- rows={4}
+ rows={ 4 }
  />
  <div class="form-group">
  <label for="physicalImpact">Physical Impact:</label>
@@ -328,7 +320,7 @@ https://svelte.dev/e/js_parse_error -->
 
  <!-- Navigation -->
  <div class="wizard-navigation">
- <Button
+ <Button class="bits-btn"
  variant="outline"
  onclick={prevStep}
  disabled={getCurrentStepIndex() === 0}
@@ -337,11 +329,11 @@ https://svelte.dev/e/js_parse_error -->
  </Button>
 
  {#if currentStep !== 'review'}
- <Button onclick={nextStep}>
+ <Button class="bits-btn" onclick={nextStep}>
  Next
  </Button>
  {:else}
- <Button onclick={saveStatement}>
+ <Button class="bits-btn" onclick={ saveStatement }>
  Save Statement
  </Button>
  {/if}
@@ -366,29 +358,24 @@ https://svelte.dev/e/js_parse_error -->
 
  .step-indicators {
  display: flex;
- justify-content: space-between;
- gap: 0.5rem;
+ justify-content: space-between; gap: 0.5rem;
  }
 
  .step-indicator {
  display: flex;
  flex-direction: column;
- align-items: center;
- flex: 1;
+ align-items: center; flex: 1;
  padding: 0.5rem;
- border-radius: 4px;
- background: #f3f4f6;
+ border-radius: 4px; background: #f3f4f6;
  transition: all 0.2s ease;
  }
 
  .step-indicator.active {
- background: #3b82f6;
- color: white;
+ background: #3b82f6; color: white;
  }
 
  .step-indicator.completed {
- background: #10b981;
- color: white;
+ background: #10b981; color: white;
  }
 
  .step-number {
@@ -423,15 +410,12 @@ https://svelte.dev/e/js_parse_error -->
  .form-group label {
  display: block;
  margin-bottom: 0.5rem;
- font-weight: 600;
- color: #374151;
+ font-weight: 600; color: #374151;
  }
 
  .ai-suggestions {
- margin-top: 1rem;
- padding: 1rem;
- background: #f0f9ff;
- border: 1px solid #0ea5e9;
+ margin-top: 1rem; padding: 1rem;
+ background: #f0f9ff; border: 1px solid #0ea5e9;
  border-radius: 8px;
  }
 
@@ -441,30 +425,24 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  .ai-suggestions p {
- margin: 0;
- color: #0c4a6e;
+ margin: 0; color: #0c4a6e;
  }
 
  .evidence-links-placeholder {
  padding: 2rem;
- text-align: center;
- background: #f9fafb;
+ text-align: center; background: #f9fafb;
  border: 2px dashed #d1d5db;
- border-radius: 8px;
- color: #6b7280;
+ border-radius: 8px; color: #6b7280;
  }
 
  .review-summary {
  display: flex;
- flex-direction: column;
- gap: 1.5rem;
+ flex-direction: column; gap: 1.5rem;
  }
 
  .review-section {
- padding: 1rem;
- background: #f9fafb;
- border-radius: 8px;
- border: 1px solid #e5e7eb;
+ padding: 1rem; background: #f9fafb;
+ border-radius: 8px; border: 1px solid #e5e7eb;
  }
 
  .review-section h4 {
@@ -485,3 +463,7 @@ https://svelte.dev/e/js_parse_error -->
  border-top: 1px solid #e5e7eb;
  }
 </style>
+
+
+
+

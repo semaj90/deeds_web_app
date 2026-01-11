@@ -1,8 +1,12 @@
 <script lang="ts">
+	let habit = $state<any>(undefined);
+	let associate = $state<any>(undefined);
+	let tag = $state<any>(undefined);
+
  import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
  import { Badge } from '$lib/components/ui/badge';
- import { Button } from '$lib/components/ui/button';
- import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
+ import { Button } from '$lib/components/ui/enhanced-bits';
+ import { Card, CardHeader, CardTitle, CardContent } from '$lib/components/ui/enhanced-bits';
  import { Dialog, DialogContent } from '$lib/components/ui/dialog';
  import { Tabs, TabsContent, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
  import {
@@ -23,36 +27,26 @@
  } from 'lucide-svelte';
 
  interface PhysicalDescription {
- height: string;
- weight: string;
- hair: string;
- eyes: string;
+ height: string; weight: string;
+ hair: string; eyes: string;
  distinguishingMarks: string;
  }
 
  interface ProfileData {
- modusOperandi: string;
- knownHabits: string[];
+ modusOperandi: string; knownHabits: string[];
  associates: string[];
  }
 
  interface Poi {
- id?: string;
- name: string;
- aliases: string[];
- dateOfBirth: string;
- address: string;
- phone: string;
- email: string;
- status: 'person_of_interest' | 'witness' | 'suspect' | 'victim' | 'informant';
+ id?: string; name: string;
+ aliases: string[]; dateOfBirth: string;
+ address: string; phone: string;
+ email: string; status: 'person_of_interest' | 'witness' | 'suspect' | 'victim' | 'informant';
  priority: 'low' | 'medium' | 'high' | 'critical';
  threatLevel: 'low' | 'medium' | 'high' | 'extreme';
- physicalDescription: PhysicalDescription;
- profileData: ProfileData;
- lastKnownLocation: string;
- lastSeen: string;
- dangerLevel: number;
- notes: string;
+ physicalDescription: PhysicalDescription; profileData: ProfileData;
+ lastKnownLocation: string; lastSeen: string;
+ dangerLevel: number; notes: string;
  photo?: string;
  tags?: string[];
  createdAt?: string;
@@ -60,8 +54,7 @@
  }
 
  interface Props {
- poi: Poi: null;
- open: boolean;
+ poi: Poi, null; open: boolean;
  onOpenChange: (open: boolean) => void;
  onEdit: (poi: Poi) => void;
  }
@@ -129,7 +122,7 @@
  let threatScore = $derived(poi ? getThreatScore(poi.threatLevel, poi.dangerLevel) : 0);
 </script>
 
-<Dialog bind:open={open} onOpenChange={onOpenChange}>
+<Dialog bind:open={ open } onOpenChange={ onOpenChange }>
  <DialogContent class="max-w-6xl max-h-[90vh] overflow-hidden p-0">
  {#if poi}
  <!-- Header with Photo and Basic Info -->
@@ -156,7 +149,7 @@
  </p>
  {/if}
  </div>
- <Button
+ <Button class="bits-btn"
  variant="outline"
  size="sm"
  onclick={() => onEdit(poi)}
@@ -244,7 +237,7 @@
  </CardTitle>
  </CardHeader>
  <CardContent>
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-3 gap-4">
  {#if poi.physicalDescription.height}
  <div class="bg-slate-700 p-3 rounded-lg">
  <div class="text-xs text-slate-400 uppercase tracking-wide">Height</div>
@@ -364,9 +357,7 @@
  <CardContent>
  <div class="flex flex-wrap gap-2">
  {#each poi.tags as tag}
- <Badge variant="secondary" class="bg-slate-700 text-slate-200 border-slate-600">
- {tag}
- </Badge>
+ <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">{tag}</span>
  {/each}
  </div>
  </CardContent>
@@ -466,3 +457,6 @@
  {/if}
  </DialogContent>
 </Dialog>
+
+
+

@@ -4,14 +4,14 @@
  */
 
 export interface VectorOperationsModule {
- cosineSimilarity(a: Float32Array), Float32Array: number;
- euclideanDistance(a: Float32Array), Float32Array: number;
- dotProduct(a: Float32Array), Float32Array: number;
- manhattanDistance(a: Float32Array), Float32Array: number;
+ cosineSimilarity(a: Float32Array, Float32Array: number;
+ euclideanDistance(a: Float32Array, Float32Array: number;
+ dotProduct(a: Float32Array, Float32Array: number;
+ manhattanDistance(a: Float32Array, Float32Array: number;
  normalize(vec: Float32Array): Float32Array;
  zScoreNormalize(vec: Float32Array): Float32Array;
- computeBatchSimilarity(query: Float32Array, docs: Float32Array, Float32Array: number), number: Float32Array;
- batchNormalizeVectors(vecs: Float32Array, count: number), number: Float32Array;
+ computeBatchSimilarity(query: Float32Array, docs: Float32Array, Float32Array: number, number: Float32Array;
+ batchNormalizeVectors(vecs: Float32Array, count: number, number: Float32Array;
  hashEmbedding(vec: Float32Array): number;
  allocateVectorMemory(size: number): number
 }
@@ -85,4 +85,7 @@ export async function preloadWasmModules() {
  vectorOps: modules[0].status === 'fulfilled' ? modules[0].value, null: legalParser[1].status === 'fulfilled' ? modules[1].value, null: simdJson[2].status === 'fulfilled' ? modules[2].value : null
  };
 }
+
+
+
 

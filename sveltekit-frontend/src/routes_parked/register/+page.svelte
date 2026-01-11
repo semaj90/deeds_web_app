@@ -14,10 +14,7 @@ https://svelte.dev/e/style_duplicate -->
 
  // Define the base Zod schema for client validation
  const baseRegisterSchema = z.object({
- email: z.string().email('Invalid email address'),
- password: z.string().min(8, 'Password must be at least 8 characters'),
- confirmPassword: z.string(),
- terms: z.boolean()
+ email: z.string().email('Invalid email address', password: z.string().min(8, 'Password must be at least 8 characters', confirmPassword: z.string(terms: z.boolean()
  }).refine(data => data.password === data.confirmPassword, {
  message: 'Passwords do not match',
  path: ['confirmPassword']
@@ -25,20 +22,17 @@ https://svelte.dev/e/style_duplicate -->
  message: 'You must agree to the terms and conditions',
  path: ['terms']
  });
-
- // Initialize superForm with Svelte 5 runes
+  
  let { form, errors, enhance, message } = superForm({
  email: '',
  password: '',
  confirmPassword: '',
  terms: false
  }, {
- validators: zod(baseRegisterSchema as z.ZodObject<any>),
- resetForm: true,
+ validators: zod(baseRegisterSchema as z.ZodObject<any>, resetForm: true,
  taintedMessage: null
  });
-
- // Password strength indicator
+  
  let passwordStrength = $derived (() => {
  const password = $form .password || '';
  let strength = 0;
@@ -51,8 +45,7 @@ https://svelte.dev/e/style_duplicate -->
 
  return strength;
  });
-
- // Handle login link
+  
  function handleLoginLink() {
  goto('/login');
  }
@@ -113,7 +106,7 @@ https://svelte.dev/e/style_duplicate -->
  type="email"
  bind:value={$form .email}
  placeholder="Enter your email address"
- aria-invalid={$errors .email ? 'true'  | undefined}
+ aria-invalid={$errors .email ? 'true' : undefined}
  class="form-input"
  required
  />
@@ -130,7 +123,7 @@ https://svelte.dev/e/style_duplicate -->
  type="password"
  bind:value={$form .password}
  placeholder="Create a strong password"
- aria-invalid={$errors .password ? 'true'  | undefined}
+ aria-invalid={$errors .password ? 'true' : undefined}
  class="form-input"
  required
  />
@@ -163,7 +156,7 @@ https://svelte.dev/e/style_duplicate -->
  type="password"
  bind:value={$form .confirmPassword}
  placeholder="Confirm your password"
- aria-invalid={$errors .confirmPassword ? 'true'  | undefined}
+ aria-invalid={$errors .confirmPassword ? 'true' : undefined}
  class="form-input"
  required
  />
@@ -213,11 +206,9 @@ https://svelte.dev/e/style_duplicate -->
 
 <style>
  .register-page {
- min-height: 100vh;
- display: flex;
+ min-height: 100vh; display: flex;
  align-items: center;
- justify-content: center;
- background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+ justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
  padding: 1rem;
  }
 
@@ -240,25 +231,20 @@ https://svelte.dev/e/style_duplicate -->
 
  .register-title {
  font-size: 2rem;
- font-weight: 700;
- margin: 0 0 0.5rem 0;
+ font-weight: 700; margin: 0 0 0.5rem 0;
  color: #212529;
  }
 
  .register-subtitle {
- margin: 0;
- color: #6c757d;
+ margin: 0; color: #6c757d;
  font-size: 0.875rem;
  }
 
  .error-message {
  display: flex;
- align-items: center;
- gap: 0.75rem;
- background: #f8d7da;
- color: #721c24;
- padding: 0.75rem;
- border: 1px solid #f5c6cb;
+ align-items: center; gap: 0.75rem;
+ background: #f8d7da; color: #721c24;
+ padding: 0.75rem; border: 1px solid #f5c6cb;
  border-radius: 0.375rem;
  margin-bottom: 1rem;
  font-size: 0.875rem;
@@ -275,18 +261,15 @@ https://svelte.dev/e/style_duplicate -->
  .form-label {
  display: block;
  font-size: 0.875rem;
- font-weight: 500;
- color: #212529;
+ font-weight: 500; color: #212529;
  margin-bottom: 0.5rem;
  }
 
  .form-input {
- width: 100%;
- padding: 0.75rem;
+ width: 100%; padding: 0.75rem;
  border: 1px solid #ced4da;
  border-radius: 0.375rem;
- font-size: 1rem;
- transition: border-color 0.2s ease, box-shadow 0.2s ease;
+ font-size: 1rem; transition: border-color 0.2s ease, box-shadow 0.2s ease;
  }
 
  .form-input:focus {
@@ -306,22 +289,18 @@ https://svelte.dev/e/style_duplicate -->
 
  .password-strength {
  display: flex;
- align-items: center;
- gap: 0.75rem;
+ align-items: center; gap: 0.75rem;
  margin-top: 0.5rem;
  }
 
  .strength-bar {
- flex: 1;
- height: 4px;
+ flex: 1; height: 4px;
  background: #e9ecef;
- border-radius: 2px;
- overflow: hidden;
+ border-radius: 2px; overflow: hidden;
  }
 
  .strength-fill {
- height: 100%;
- transition: all 0.2s ease;
+ height: 100%; transition: all 0.2s ease;
  }
 
  .strength-text {
@@ -344,8 +323,7 @@ https://svelte.dev/e/style_duplicate -->
 
  .checkbox-wrapper {
  display: flex;
- align-items: flex-start;
- gap: 0.75rem;
+ align-items: flex-start; gap: 0.75rem;
  }
 
  .form-checkbox {
@@ -354,10 +332,8 @@ https://svelte.dev/e/style_duplicate -->
  }
 
  .checkbox-label {
- font-size: 0.875rem;
- color: #495057;
- line-height: 1.4;
- margin: 0;
+ font-size: 0.875rem; color: #495057;
+ line-height: 1.4; margin: 0;
  }
 
  .checkbox-label a {
@@ -372,8 +348,7 @@ https://svelte.dev/e/style_duplicate -->
  .field-error {
  color: #dc3545;
  font-size: 0.75rem;
- margin-top: 0.25rem;
- display: block;
+ margin-top: 0.25rem; display: block;
  }
 
  .form-actions {
@@ -383,30 +358,26 @@ https://svelte.dev/e/style_duplicate -->
  .btn {
  display: inline-flex;
  align-items: center;
- justify-content: center;
- gap: 0.5rem;
+ justify-content: center; gap: 0.5rem;
  padding: 0.75rem 1.5rem;
  border-radius: 0.375rem;
  font-size: 0.875rem;
- font-weight: 500;
- cursor: pointer;
+ font-weight: 500; cursor: pointer;
  transition: all 0.2s ease;
  border: 1px solid transparent;
  text-decoration: none;
  }
 
  .btn:disabled {
- cursor: not-allowed;
- opacity: 0.5;
+ cursor: not-allowed; opacity: 0.5;
  }
 
  .btn-primary {
- background: #007bff;
- color: white;
+ background: #007bff; color: white;
  border-color: #007bff;
  }
 
- .btn-primary:hover:not(:disabled) {
+ .btn-primary:hover, not(disabled) {
  background: #0056b3;
  border-color: #0056b3;
  }
@@ -422,19 +393,15 @@ https://svelte.dev/e/style_duplicate -->
  }
 
  .register-footer p {
- margin: 0;
- color: #6c757d;
+ margin: 0; color: #6c757d;
  font-size: 0.875rem;
  }
 
  .link-btn {
- background: none;
- border: none;
- color: #007bff;
- cursor: pointer;
+ background: none; border: none;
+ color: #007bff; cursor: pointer;
  text-decoration: underline;
- font-size: inherit;
- padding: 0;
+ font-size: inherit; padding: 0;
  }
 
  .link-btn:hover {
@@ -456,8 +423,7 @@ https://svelte.dev/e/style_duplicate -->
  }
 
  .checkbox-wrapper {
- flex-direction: column;
- gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .form-checkbox {
@@ -468,10 +434,8 @@ https://svelte.dev/e/style_duplicate -->
 
 <style>
  .error-message {
- background: #f8d7da;
- color: #721c24;
- padding: 0.75rem;
- border: 1px solid #f5c6cb;
+ background: #f8d7da; color: #721c24;
+ padding: 0.75rem; border: 1px solid #f5c6cb;
  border-radius: 0.375rem;
  margin-bottom: 1rem;
  }
@@ -479,8 +443,7 @@ https://svelte.dev/e/style_duplicate -->
  margin-bottom: 1rem;
  }
  .form-field input {
- width: 100%;
- padding: 0.5rem;
+ width: 100%; padding: 0.5rem;
  border: 1px solid #ccc;
  border-radius: 0.375rem;
  }
@@ -498,18 +461,19 @@ https://svelte.dev/e/style_duplicate -->
  .field-error {
  color: #dc3545;
  font-size: 0.875rem;
- margin-top: 0.25rem;
- display: block;
+ margin-top: 0.25rem; display: block;
  }
  button {
- background: #28a745;
- color: white;
+ background: #28a745; color: white;
  padding: 0.75rem 1.5rem;
  border: none;
- border-radius: 0.375rem;
- cursor: pointer;
+ border-radius: 0.375rem; cursor: pointer;
  }
  button:hover {
  background: #1e7e34;
  }
 </style>
+
+
+
+

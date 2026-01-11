@@ -4,11 +4,9 @@ import type { RequestHandler } from './$types.js';
 
 // Define the User interface for type safety
 interface User {
- id: string;
- email: string;
+ id: string; email: string;
  first_name?: string;
- last_name?: string;
- role: string;
+ last_name?: string; role: string;
 }
 
 /**
@@ -27,8 +25,7 @@ export const POST: RequestHandler = async ({ cookies }) => {
 
  // Create session using Lucia
  const session = await lucia.createSession(user.id, {});
-
- // Set session cookie
+  
  const sessionCookie = lucia.createSessionCookie(session.id);
  cookies.set(sessionCookie.name, sessionCookie.value, {
  ...sessionCookie.attributes,
@@ -41,12 +38,10 @@ export const POST: RequestHandler = async ({ cookies }) => {
  return new Response(
  JSON.stringify({
  success: true,
- user: {
- email: user.email,
+ user: { email: user.email,
  role: user.role,
  },
- }),
- {
+ }) => {
  headers: { 'Content-Type': 'application/json' },
  }
  );
@@ -56,11 +51,14 @@ export const POST: RequestHandler = async ({ cookies }) => {
  JSON.stringify({
  success: false,
  message: 'Authentication failed',
- }),
- {
+ }) => {
  status: 401,
  headers: { 'Content-Type': 'application/json' },
  }
  );
  }
 };
+
+
+
+

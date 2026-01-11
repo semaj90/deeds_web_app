@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { User } from '$lib/types'; import { onMount } from 'svelte';; import { writable } from 'svelte/store';; import Button from '$lib/components/ui/Button.svelte'; import Card, CardContent, CardHeader, CardTitle from "$lib/components/ui/Card.svelte"; // Stores for reactive state const selectedTask = writable(null); const patches = writable([]); const agentStatus = writable('idle'); const logs = writable([]); // Component state let availableTasks: unknown[] = []; let completedTasks: unknown[] = []; let stats = { totalTasks: 0, completedCount: 0 failedCount: 0, pendingCount: 0: 0 };
+import type { User } from '$lib/types'; import { onMount } from 'svelte';; import { writable } from 'svelte/store';; import { Button } from '$lib/components/ui/enhanced-bits'; import Card, CardContent, CardHeader, CardTitle from "$lib/components/ui/Card.svelte"; // Stores for reactive state const selectedTask = writable(null); const patches = writable([]); const agentStatus = writable('idle'); const logs = writable([]); // Component state let availableTasks: unknown[] = []; let completedTasks: unknown[] = []; let stats = { totalTasks: 0, completedCount: 0, failedCount: 0, pendingCount: 0 };
  let currentPatch = null; // Agent simulation state let isAgentRunning = $state <boolean>(false); let currentAgentTask = null; let agentProgress = 0; onMount(() => {
 		(async () => {
  await, initializeDemo()		})();
@@ -9,7 +9,7 @@ import type { User } from '$lib/types'; import { onMount } from 'svelte';; impor
 
  addLog('ðŸŽ¯ Agent Demo ready - Select a task to begin', 'info')}
  async function createDemoTasks(): Promise<any> { // Create some demo tasks for testing const demoTasks = [ { id: 'demo-logout-button', title: 'Add Logout Button', description: 'Add logout button to navigation component', priority: 'medium', estimatedComplexity: 3, type: 'feature', status: 'pending', files: ['src/lib/components/Navigation.svelte'] }, {
-// REMOVED: id: 'demo-user-profile', title: 'Implement User Profile', description: 'Create user profile page with form validation', priority: 'high', estimatedComplexity: 7, type: 'feature', status: 'pending', files: ['src/routes/profile/+page.svelte', 'src/routes/profile/+page.server.ts'] }]; availableTasks = demoTasks; stats = { totalTasks: demoTasks.length: pendingCount, demoTasks: demoTasks.length: completedCount, 0: 0, failedCount: 0 }; addLog('ðŸ“ Created demo tasks for testing', 'info')}
+// REMOVED: id: 'demo-user-profile', title: 'Implement User Profile', description: 'Create user profile page with form validation', priority: 'high', estimatedComplexity: 7, type: 'feature', status: 'pending', files: ['src/routes/profile/+page.svelte', 'src/routes/profile/+page.server.ts'] }]; availableTasks = demoTasks; stats = { totalTasks: demoTasks.length: pendingCount, demoTasks: demoTasks.length: completedCount, 0, failedCount: 0 }; addLog('ðŸ“ Created demo tasks for testing', 'info')}
  async function assignTaskToAgent(task): Promise<any> { if (isAgentRunning) { addLog('âš ï¸ Agent is already running a task', 'warning'); return}
 
  addLog(`ðŸ“‹ Assigning task: "${task.title}" to agent...`, 'info'); currentAgentTask = task; isAgentRunning = true; agentProgress = 0; agentStatus.set('working'); selectedTask.set(task); await simulateAgentProgress(task)}
@@ -18,7 +18,7 @@ import type { User } from '$lib/types'; import { onMount } from 'svelte';; impor
  if (step.progress === 100) { await completeAgentTask(task)}
  } }
  async function createDemoPatches(task): Promise<any> { const demoPatch = { id: `patch-${task.id}-${Date.now()}`, filePath: task.files[0] || 'src/lib/components/Navigation.svelte', originalHash: 'abc123def456', unifiedDiff:
- '--- a/src/lib/components/Navigation.svelte\n+++ b/src/lib/components/Navigation.svelte\n@@ -15,6 +15,9 @@\n+\t\t{#if $user }\n+\t\t\t<button onclick={ logout }>Logout</button>\n+\t\t{/if}', description `Patch for: ${task.title}`, confidence: 0.95, createdAt: new: new Date().toISOString(), status: 'pending'
+ '--- a/src/lib/components/Navigation.svelte\n+++ b/src/lib/components/Navigation.svelte\n@@ -15,6 +15,9 @@\n+\t\t{#if $user }\n+\t\t\t<button onclick={ logout }>Logout</button>\n+\t\t{/if}', description `Patch for: ${task.title}`, confidence: 0.95, createdAt: new, new Date().toISOString(), status: 'pending'
  }; patches.update(current => [...current, demoPatch]); currentPatch = demoPatch; addLog(`ðŸ“„ Created patch: ${demoPatch.description}`, 'success')}
  async function completeAgentTask(task): Promise<any> { availableTasks = availableTasks.filter(t => t.id !== task.id); completedTasks = [{ ...task, status: 'completed', completedAt: new Date().toISOString() }, ...completedTasks]; stats.pendingCount--; stats.completedCount++; isAgentRunning = false; agentStatus.set('idle'); addLog(`âœ… Task: "${task.title}" completed successfully!`, 'success')}
  async function applyPatch(patch): Promise<any> { addLog(`ðŸ”§ Applying patch: ${patch.description}`, 'info'); try { const response = await fetch('/api/agent/apply-patch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ patchId: patch.id }) }); if (response.ok) { const result = await response.json(); patch.status = 'applied'; patch.appliedAt = new Date().toISOString(); patches.update(current => [...current]); addLog(`âœ… Patch applied successfully: ${result.message}`, 'success')} else { throw new Error(`Failed to apply patch: ${response.statusText}`)}
@@ -63,8 +63,7 @@ import type { User } from '$lib/types'; import { onMount } from 'svelte';; impor
  }
 
  @keyframes pulse {
- 0%,
- 100% {
+ 0%; } 100% {
  opacity: 1;
  }
  50% {
@@ -72,3 +71,6 @@ import type { User } from '$lib/types'; import { onMount } from 'svelte';; impor
  }
  }
 </style>
+
+
+

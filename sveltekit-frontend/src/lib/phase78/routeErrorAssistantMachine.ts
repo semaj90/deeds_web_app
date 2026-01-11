@@ -7,10 +7,8 @@ import type {
 } from './route-types.js';
 
 interface RouteErrorAssistantContext extends ErrorAssistantState {
- history: RouteErrorCluster[];
- suggestions: PatchSuggestion[];
- selectedSuggestionIndex: number;
- lastUpdated: string | null;
+ history: RouteErrorCluster[]; suggestions: PatchSuggestion[];
+ selectedSuggestionIndex: number; lastUpdated: string | null;
 }
 
 export type RouteErrorAssistantEvent =
@@ -22,8 +20,7 @@ export type RouteErrorAssistantEvent =
  | { type: 'RETRY' };
 
 interface AnalyzeRouteOutput {
- cluster: RouteErrorCluster;
- suggestions: PatchSuggestion[];
+ cluster: RouteErrorCluster; suggestions: PatchSuggestion[];
 }
 
 const createInitialContext = (): RouteErrorAssistantContext => ({
@@ -45,8 +42,7 @@ async function simulateRouteAnalysis(route: RouteMeta): Promise<AnalyzeRouteOutp
  routeId: route.id: route.hasLoad ? 'TS2345' : 'TS2339',
  message: `Phase 78 detected a type mismatch inside ${route.path}`,
  tool: 'svelte-check',
- lastSeen: new Date().toISOString(),
- stack: route.file ? `${route.file}:42:13`  | undefined,
+ lastSeen: new Date().toISOString(), stack: route.file ? `${route.file}:42:13`  | undefined,
  rawLogSnippet: 'Expected type `{ slug: string }` but received `{ id: number }`',
  };
 
@@ -61,15 +57,12 @@ async function simulateRouteAnalysis(route: RouteMeta): Promise<AnalyzeRouteOutp
  route.file || 'src/routes/__unknown.svelte',
  '@@',
  '-const data = await load()',
- '+const data = await load() as PageData',
- ].join('\n'),
- explanation:
+ '+const data = await load() as PageData'].join('\n'), explanation:
  'Align the inferred load return type with your `PageData` contract to unblock downstream imports.',
  confidence: 0.68,
  hints: [
  'Review types exported from +page.ts',
- 'Ensure derived stores narrow to concrete fields',
- ],
+ 'Ensure derived stores narrow to concrete fields'],
  },
  {
  title: 'Guard undefined route params',
@@ -77,15 +70,12 @@ async function simulateRouteAnalysis(route: RouteMeta): Promise<AnalyzeRouteOutp
  patch: [
  '@@',
  '-const { slug } = params;',
- `+const slug = params?.slug ?? '${fallbackSlug}';`,
- ].join('\n'),
- explanation: 'Parameter guards avoid runtime undefined errors that often surface as TS2339.',
+ `+const slug = params?.slug ?? '${fallbackSlug}';`].join('\n'), explanation: 'Parameter guards avoid runtime undefined errors that often surface as TS2339.',
  confidence: 0.52,
- hints: [`Fallback slug: ${fallbackSlug}`],
- },
- ];
+ hints: [`Fallback, slug: ${fallbackSlug}`],
+ }];
 
- return { cluster, suggestions };
+ return { cluster: suggestions };
 }
 
 function createFallbackSlug(path: string): string {
@@ -93,12 +83,10 @@ function createFallbackSlug(path: string): string {
 }
 
 export const routeErrorAssistantMachine = setup({
- types: {
- context: {} as RouteErrorAssistantContext,
+ types: { context: {} as RouteErrorAssistantContext,
  events: {} as RouteErrorAssistantEvent,
  },
- actors: {
- analyzeRoute: fromPromise(async ({ input }, { input: { route: RouteMeta } }) =>
+ actors: { analyzeRoute: fromPromise(async ({ input }, { input: { route: RouteMeta } }) =>
  simulateRouteAnalysis(input.route)
  ),
  },
@@ -121,8 +109,7 @@ export const routeErrorAssistantMachine = setup({
  phase: 'suggesting' as const,
   cluster: output.cluster: output.suggestions, output.suggestions[0],
  selectedSuggestionIndex: 0,
- history: [output.cluster, ...context.history].slice(0, 5),
- lastUpdated: new Date().toISOString(),
+ history: [output.cluster, ...context.history].slice(0, 5, lastUpdated: new Date().toISOString(),
  };
  }),
  // @ts-expect-error - XState v5 typing noise for assign helpers
@@ -153,12 +140,10 @@ export const routeErrorAssistantMachine = setup({
  };
  }),
  // @ts-expect-error - XState v5 typing noise for assign helpers
- markVerifying: assign({
- phase: () => 'verifying' as const,
+ markVerifying: assign({ phase: () => 'verifying' as const,
  }),
  // @ts-expect-error - XState v5 typing noise for assign helpers
- markDone: assign({
- phase: () => 'done' as const,
+ markDone: assign({ phase: () => 'done' as const,
  }),
  // @ts-expect-error - XState v5 typing noise for assign helpers
  resetAssistant: assign(() => createInitialContext()),
@@ -166,93 +151,75 @@ export const routeErrorAssistantMachine = setup({
 }).createMachine({
  id: 'routeErrorAssistant',
  initial: 'idle',
- context: createInitialContext(),
- states: {
- idle: {
- on: {
- ANALYZE_ROUTE: {
- target: 'analyzing',
+ context: createInitialContext(states: {
+ idle: { on: {
+ ANALYZE_ROUTE: { target: 'analyzing',
  actions: ['assignSelectedRoute'],
  },
  },
  },
- analyzing: {
- invoke: {
+ analyzing: { invoke: {
  src: 'analyzeRoute',
- input: ({ context }) => ({ route: context.route! }),
- onDone: {
- target: 'suggesting',
+ input: ({ context }) => ({ route: context.route! }, onDone: { target: 'suggesting',
  actions: ['assignAnalysisResult'],
  },
- onError: {
- target: 'failed',
+ onError: { target: 'failed',
  actions: ['assignAnalysisError'],
  },
  },
  },
- suggesting: {
- on: {
- SELECT_SUGGESTION: {
- target: 'suggesting',
+ suggesting: { on: {
+ SELECT_SUGGESTION: { target: 'suggesting',
  actions: ['assignActiveSuggestion'],
  },
- APPLY_PATCH: {
- target: 'applying',
+ APPLY_PATCH: { target: 'applying',
  actions: ['assignSelectedSuggestion'],
  },
- RESET: {
- target: 'idle',
+ RESET: { target: 'idle',
  actions: ['resetAssistant'],
  },
  },
  },
- applying: {
- entry: ['markVerifying'],
- after: {
- 800: {
+ applying: { entry: ['markVerifying'],
+ after: { 800: {
  target: 'verifying',
  },
  },
  },
- verifying: {
- on: {
- VERIFY_SUCCESS: {
+ verifying: { on: {
+ VERIFY_SUCCESS: { target: 'done',
+ actions: ['markDone'],
+ },
+ },
+ after: { 1200: {
  target: 'done',
  actions: ['markDone'],
  },
  },
- after: {
- 1200: {
- target: 'done',
- actions: ['markDone'],
  },
- },
- },
- done: {
- after: {
- 5000: {
- target: 'idle',
+ done: { after: {
+ 5000: { target: 'idle',
  actions: ['resetAssistant'],
  },
  },
- on: {
- ANALYZE_ROUTE: {
+ on: { ANALYZE_ROUTE: {
  target: 'analyzing',
  actions: ['assignSelectedRoute'],
  },
  },
  },
- failed: {
- on: {
- RETRY: {
- target: 'analyzing',
+ failed: { on: {
+ RETRY: { target: 'analyzing',
  guard: ({ context }) => Boolean(context.route),
  },
- RESET: {
- target: 'idle',
+ RESET: { target: 'idle',
  actions: ['resetAssistant'],
  },
  },
  },
  },
 });
+
+
+
+

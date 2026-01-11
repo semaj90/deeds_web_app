@@ -1,0 +1,92 @@
+import { extractFactsFromMarkdown } from './extractors/mdExtractor';
+import { extractDOMSemantics } from './extractors/domExtractor';
+import { extractUISpec } from './extractors/uiSpecExtractor';
+import { compareFacts } from './semantic/compareFacts';
+import { compareUI } from './semantic/compareUI';
+import { runReasoningPass } from './llm/reasoningPass';
+import { emitObjection } from './llm/objectionEmitter';
+import { searchEvidence } from '../rag/evidenceRag';
+import { fetchUISpecForRoute } from '../rag/uiComplianceRag';
+import { timelineCrosscheck } from './integration/timelineCrosscheck';
+import { analyzeTimeline } from './timeline';
+import type { ContradictionEngineInput, ContradictionEngineResult, UISpec } from './types';
+
+export async function analyzeContradictions(
+  input: ContradictionEngineInput
+): Promise<ContradictionEngineResult> {
+  const {
+    markdownEvidence = [],
+    testimony = [],
+    uiSnapshots = [],
+    routeSpecs = [],
+    timeline = [],
+  } = input;
+
+  const factClusters = [];
+
+  const factSources = [...markdownEvidence, ...testimony];
+
+  for (const md of factSources) {
+    factClusters.push(await extractFactsFromMarkdown(md));
+  }
+
+  const domSemantics = [];
+
+  for (const ui of uiSnapshots) {
+    domSemantics.push(await extractDOMSemantics(ui));
+  }
+
+  const specMap = new Map<string, UISpec>();
+  for (const spec of routeSpecs) {
+    const extracted = await extractUISpec(spec);
+    specMap.set(extracted.route, extracted);
+  }
+
+  for (const snapshot of uiSnapshots) {
+    const ragDocs = await fetchUISpecForRoute(snapshot.route);
+    if (!ragDocs.length) continue;
+
+    const existing = specMap.get(snapshot.route) ?? ({ route: snapshot.route } as UISpec);
+    specMap.set(snapshot.route, {
+      ...existing,
+      metadata: {
+        ...(existing.metadata ?? {}),
+        ragDocs: ragDocs.map((doc) => doc.text),
+      },
+    });
+  }
+
+  const factContradictions = [
+    ...compareFacts(factClusters),
+    ...(timeline.length ? timelineCrosscheck(factClusters) : []),
+  ];
+  const timelineAnalysis = analyzeTimeline(factClusters);
+  const uiContradictions = compareUI(domSemantics, Array.from(specMap.values()));
+
+  const ragSuggestions: Record<string, unknown> = {};
+  for (const cluster of factClusters) {
+    const claims = cluster.facts.map((fact) => fact.claim).join('\n');
+    if (!claims) continue;
+    ragSuggestions[cluster.id] = await searchEvidence(claims);
+  }
+
+  const reasoning = await runReasoningPass(
+    factContradictions,
+    uiContradictions,
+    ragSuggestions,
+    timelineAnalysis.timelineContradictions
+  );
+  const objection = emitObjection(reasoning);
+
+  return {
+    factContradictions,
+    uiContradictions,
+    timelineContradictions: timelineAnalysis.timelineContradictions,
+    timelineDescriptions: timelineAnalysis.timelineDescriptions,
+    reasoning,
+    objection,
+    ragSuggestions,
+  };
+}
+
+export * from './types';

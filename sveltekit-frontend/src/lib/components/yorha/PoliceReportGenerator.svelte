@@ -3,8 +3,7 @@ import { createEventDispatcher } from 'svelte';
  // Migrated from createEventDispatcher to callback props;
 
  interface Evidence {
- id: string;
- title: string;
+ id: string; title: string;
  description?: string;
  content?: string;
  fileName?: string;
@@ -12,15 +11,11 @@ import { createEventDispatcher } from 'svelte';
 
  interface PoliceReport {
  id: string;
- caseId?: string;
- generatedAt: string;
- type: string;
- content: string;
+ caseId?: string; generatedAt: string;
+ type: string; content: string;
  sections: Array<{ title: string; content: string }>;
- metadata: {
- narrativeProvided: boolean;
- evidenceCount: number;
- model: string;
+ metadata: { narrativeProvided: boolean;
+ evidenceCount: number; model: string;
  };
  }
 
@@ -51,9 +46,7 @@ import { createEventDispatcher } from 'svelte';
  headers: {
  'Content-Type': 'application/json'
  },
- body: JSON.stringify({
- narrative: narrative.trim(),
- evidence: selectedEvidence,
+ body: JSON.stringify({ narrative: narrative.trim( evidence: selectedEvidence,
  caseId
  })
  });
@@ -159,7 +152,7 @@ import { createEventDispatcher } from 'svelte';
  <textarea
  bind:value={narrative}
  placeholder="Describe what happened... (e.g., 'I was walking home when I noticed someone following me...')"
- class="w-full h-32 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+ class="w-full h-32 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus: outline-none, focus:ring-2 focus:ring-blue-500 resize-none"
  ></textarea>
  </div>
 
@@ -199,7 +192,7 @@ import { createEventDispatcher } from 'svelte';
  <button
  onclick={generateReport}
  disabled={isGenerating || (!narrative.trim() && selectedEvidence.length === 0)}
- class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:from-slate-600 disabled:to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+ class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover: from-blue-500, hover:to-blue-600 disabled: from-slate-600, disabled:to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
  >
  {#if isGenerating}
  <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -209,7 +202,7 @@ import { createEventDispatcher } from 'svelte';
  {/if}
  </button>
  <button
- onclick={clearAll}
+ onclick={ clearAll }
  class="px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors"
  >
  Clear
@@ -305,3 +298,7 @@ import { createEventDispatcher } from 'svelte';
  to { transform: rotate(360deg); }
  }
 </style>
+
+
+
+

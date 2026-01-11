@@ -722,6 +722,165 @@
       }
     },
     // ============================================
+    // Phase 66: Automated Error Fixing - Object Literals & Type Imports
+    // ============================================
+    {
+      "label": "🔧 Phase 66: Fix Object Literals (Limited)",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "scripts/fix-object-literals.mjs",
+        "--limit",
+        "${input:fileLimit}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      }
+    },
+    {
+      "label": "🔧 Phase 66: Fix Object Literals (All Files)",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "scripts/fix-object-literals.mjs"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🔧 Phase 66: Fix Type Imports",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "scripts/fix-type-imports.mjs"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      }
+    },
+    {
+      "label": "🔧 Phase 66: Fix CSS Selectors (Dry-Run)",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "scripts/fix-css-selectors.mjs",
+        "--dry-run",
+        "--limit",
+        "10"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      }
+    },
+    {
+      "label": "✅ Phase 66: Verify Error Count",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-Command",
+        "npx svelte-check --threshold error 2>&1 | Select-String -Pattern 'found \\d+ error'"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🤖 Phase 66: Run Python Agent",
+      "type": "shell",
+      "command": "${env:PHASE72_PYTHON}",
+      "args": [
+        "scripts/phase66_automated_error_fixer.py"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "dependsOn": [
+        "✅ Phase 66: Verify Error Count"
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🚀 Phase 66: Full Workflow",
+      "dependsOn": [
+        "🔧 Phase 66: Fix Object Literals (All Files)",
+        "🔧 Phase 66: Fix Type Imports",
+        "✅ Phase 66: Verify Error Count"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    // ============================================
     // Phase 94: Unified AST Graph - Error Analysis & Fixing
     // ============================================
     {
@@ -976,6 +1135,12 @@
       "type": "promptString",
       "description": "Enter cluster ID (0-11)",
       "default": "0"
+    },
+    {
+      "id": "fileLimit",
+      "type": "promptString",
+      "description": "Number of files to fix (default: all)",
+      "default": "50"
     },
     {
       "id": "errorType",

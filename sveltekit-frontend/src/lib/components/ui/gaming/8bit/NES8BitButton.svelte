@@ -3,6 +3,8 @@
  Retro gaming-style button with pixel art aesthetics
 -->
 <script lang="ts">
+	let disabled = $state<any>(undefined);
+
  import type { Snippet } from 'svelte';
 
  interface Props {
@@ -59,8 +61,8 @@
  relative font-bold uppercase tracking-wider
  {sizeStyles[size]}
  transition-transform duration-75
- disabled:opacity-50 disabled:cursor-not-allowed
- {className}
+ disabled: opacity-50, disabled:cursor-not-allowed
+ { className }
  "
  style="
  background-color: {colors.bg};
@@ -93,8 +95,11 @@
  -moz-osx-font-smoothing: unset;
  }
 
- button:active:not(:disabled) {
+ button: active, not(disabled) {
  transform: translate(2px, 2px);
  box-shadow: none;
  }
 </style>
+
+
+

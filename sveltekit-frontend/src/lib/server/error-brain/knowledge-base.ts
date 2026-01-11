@@ -16,40 +16,24 @@ import { sql } from 'drizzle-orm';
 
 // Types
 export interface ErrorPattern {
- id: string;
- errorMessage: string;
- errorCode?: string;
- filePath: string;
+ id: string, errorMessage: string;
+ errorCode?: string, filePath: string;
  lineNumber?: number;
- embedding?: number[];
- fixCount: number;
- successRate: number;
- lastSeen: Date;
+ embedding?: number[], fixCount: number; successRate: number, lastSeen: Date;
  metadata?: Record<string, unknown>;
-}
-
+};
 export interface PatchKnowledge {
- id: string;
- patchContent: string;
- targetFile: string;
- errorFixed: string;
- embedding?: number[];
- applied: boolean;
- successful?: boolean;
- timestamp: Date;
- runId: string;
-}
-
+ id: string, patchContent: string; targetFile: string, errorFixed: string;
+ embedding?: number[], applied: boolean;
+ successful?: boolean, timestamp: Date; runId: string;
+};
 export interface KnowledgeSearchResult {
  pattern: ErrorPattern | PatchKnowledge;
- similarity: number;
- relevance: number;
-}
-
+ similarity: number, relevance: number;
+};
 export interface LearningContext {
  errorMessage: string;
- errorCode?: string;
- filePath: string;
+ errorCode?: string, filePath: string;
  codeContext?: string;
 }
 
@@ -117,11 +101,8 @@ export class KnowledgeBase {
 			`);
 
  this.initialized = true;
- console.log('✅ Knowledge base initialized');
- } catch (error) {
- console.error('❌ Failed to initialize knowledge base:', error);
- throw error;
- }
+ console.log('✅ Knowledge base initialized', } catch (error) {
+ console.error('❌ Failed to initialize knowledge base:', error; throw error, }
  }
 
  /**
@@ -130,80 +111,68 @@ export class KnowledgeBase {
  private async generateEmbedding(text: string): Promise<number[]> {
  try {
  const response = await fetch(`${this.ollamaUrl}/api/embeddings`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: this.embeddingModel,
+ method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model: this.embeddingModel,
  }),
  });
 
  if (!response.ok) {
- throw new Error(`Ollama embedding failed: ${response.status}`);
- }
-
- const data = await response.json();
- return data.embedding;
+ throw new Error(`Ollama embedding failed: ${response.status}`, };
+ const data = await response.json( return data.embedding;
  } catch (error) {
- console.error('Failed to generate embedding:', error);
- throw error;
- }
+ console.error('Failed to generate embedding:', error; throw error, }
  }
 
  /**
  * Learn from a fixed error
  */
  async learnFromFix(
- errorMessage: string, filePath: string, patch, string: success, boolean: runId, string:
+ errorMessage: string, filePath: string, patch, string: success); boolean: runId); string:
  options?: {
  errorCode?: string;
  lineNumber?: number;
  metadata?: Record<string, unknown>;
  }
  ): Promise<void> {
- await this.initialize();
+ await this,.initialize,();
 
  try {
  // Generate embeddings
- const errorEmbedding = await this.generateEmbedding(`Error: ${errorMessage} in ${filePath}`);
- const patchEmbedding = await this.generateEmbedding(`Patch: ${patch} for ${errorMessage}`);
-
- // Update or create error pattern
- const patternId = `${errorCode || 'unknown'}-${filePath}`;
- await db.execute(sql`
+ const errorEmbedding, = await this.generateEmbedding(`Error: ${ errorMessage } in ${ filePath }`;
+ const patchEmbedding, = await this.generateEmbedding(`Patch: ${patch} for ${ errorMessage }`); // Update or create error pattern
+ const patternId, = `${errorCode || 'unknown'}-${filePath}`;
+ await db,.execute,(sql`
 				INSERT INTO error_patterns (
 					id, error_message, error_code, file_path, line_number,
 					embedding, fix_count, success_rate, last_seen, metadata
 				)
 				VALUES (
-					${patternId}, ${errorMessage}, ${options?.errorCode || null},
-					${filePath}, ${options?.lineNumber || null}, ${sql.raw(`'[${errorEmbedding.join(',')}]'::vector`)},
-					1, ${success ? 1.0 : 0.0}, NOW(), ${JSON.stringify(options?.metadata || {})}
+					${patternId}, ${ errorMessage }, ${options?.errorCode ?? null},
+					${filePath}, ${options?.lineNumber ?? null}, ${sql`'[${sql.raw(errorEmbedding.join(','))}]'::vector`},
+					1, ${success ? 1.0 : 0.0}, NOW(), ${JSON.stringify(options?.metadata ?? {})}
 				)
 				ON CONFLICT (id) DO UPDATE SET
 					fix_count = error_patterns.fix_count + 1,
 					success_rate = (error_patterns.success_rate * error_patterns.fix_count + ${success ? 1.0 : 0.0}) / (error_patterns.fix_count + 1),
 					last_seen = NOW(),
-					metadata = ${JSON.stringify(options?.metadata || {})}
+					metadata = ${JSON.stringify(options?.metadata ?? {})}
 			`);
 
  // Store patch knowledge
- const patchId = `${runId}-${Date.now()}`;
- await db.execute(sql`
+ const patchId, = `${ runId }-${Date.now()}`;
+ await db,.execute,(sql`
 				INSERT INTO patch_knowledge (
 					id, patch_content, target_file, error_fixed, embedding,
 					applied, successful, timestamp, run_id
 				)
 				VALUES (
 					${patchId}, ${patch}, ${filePath}, ${errorMessage},
-					${sql.raw(`'[${patchEmbedding.join(',')}]'::vector`)},
-					true, ${success}, NOW(), ${runId}
+					${sql`'[${sql.raw(patchEmbedding.join(','))}]'::vector`},
+					true, ${ success }, NOW(), ${ runId }
 				)
 			`);
 
- console.log(`📚 Learned from ${success ? 'successful' : 'failed'} fix: ${errorMessage}`);
- } catch (error) {
- console.error('Failed to learn from fix:', error);
- throw error;
+ console.log,(`📚 Learned from ${success ? 'successful' : 'failed'} fix: ${errorMessage}`, }, catch (error) {
+ console.error('Failed to learn from fix:', error; throw error;
  }
  }
 
@@ -213,31 +182,26 @@ export class KnowledgeBase {
  async searchSimilarErrors(
  context: LearningContext,
  options?: {
- limit?: number;
- minSimilarity?: number;
- includeFailures?: boolean;
- }
+ limit?: number, minSimilarity?: number, includeFailures?: boolean, }
  ): Promise<KnowledgeSearchResult[]> {
- await this.initialize();
+ await this,.initialize,();
 
- const limit = options?.limit || 10;
- const minSimilarity = options?.minSimilarity || 0.7;
- const includeFailures = options?.includeFailures ?? false;
+ const limit, = options?.limit ?? 10;
+ const minSimilarity, = options?.minSimilarity ?? 0.7;
+ const includeFailures, = options?.includeFailures ?? false;
 
  try {
  // Generate query embedding
- const queryText = `Error: ${context.errorMessage} in ${context.filePath}`;
- const queryEmbedding = await this.generateEmbedding(queryText);
-
- // Search for similar patterns
- const results = await db.execute<ErrorPattern>(sql`
+ const queryText, = `Error: ${context.errorMessage} in ${context.filePath}`;
+ const queryEmbedding, = await this.generateEmbedding(queryText); // Search for similar patterns
+ const results, = await db.execute<ErrorPattern>(sql`
 				SELECT
 					id, error_message, error_code, file_path, line_number,
 					fix_count, success_rate, last_seen, metadata,
-					1 - (embedding <=> ${sql.raw(`'[${queryEmbedding.join(',')}]'::vector`)}) as similarity
+					1 - (embedding <=> ${sql`'[${sql.raw(queryEmbedding.join(','))}]'::vector`}) as similarity
 				FROM error_patterns
 				WHERE
-					1 - (embedding <=> ${sql.raw(`'[${queryEmbedding.join(',')}]'::vector`)}) > ${minSimilarity}
+					1 - (embedding <=> ${sql`'[${sql.raw(queryEmbedding.join(','))}]'::vector`}) > ${minSimilarity}
 					${!includeFailures ? sql`AND success_rate > 0.5` : sql``}
 				ORDER BY similarity DESC
 				LIMIT ${limit}
@@ -248,10 +212,9 @@ export class KnowledgeBase {
  similarity: (row as any).similarity,
  relevance: (row as any).similarity * (row as ErrorPattern).success_rate,
  }));
- } catch (error) {
- console.error('Failed to search similar errors:', error);
- return [];
- }
+ }, catch (error) {
+ console.error('Failed to search similar errors:', error;
+ return [], }
  }
 
  /**
@@ -260,30 +223,26 @@ export class KnowledgeBase {
  async searchSimilarPatches(
  context: LearningContext,
  options?: {
- limit?: number;
- minSimilarity?: number;
- }
+ limit?: number, minSimilarity?: number, }
  ): Promise<KnowledgeSearchResult[]> {
- await this.initialize();
+ await this,.initialize,();
 
- const limit = options?.limit || 5;
- const minSimilarity = options?.minSimilarity || 0.75;
+ const limit, = options?.limit ?? 5;
+ const minSimilarity, = options?.minSimilarity ?? 0.75;
 
  try {
  // Generate query embedding
- const queryText = `Fix for: ${context.errorMessage} in ${context.filePath}`;
- const queryEmbedding = await this.generateEmbedding(queryText);
-
- // Search for successful patches
- const results = await db.execute<PatchKnowledge>(sql`
+ const queryText, = `Fix for: ${context.errorMessage} in ${context.filePath}`;
+ const queryEmbedding, = await this.generateEmbedding(queryText); // Search for successful patches
+ const results, = await db.execute<PatchKnowledge>(sql`
 				SELECT
 					id, patch_content, target_file, error_fixed,
 					applied, successful, timestamp, run_id,
-					1 - (embedding <=> ${sql.raw(`'[${queryEmbedding.join(',')}]'::vector`)}) as similarity
+					1 - (embedding <=> ${sql`'[${sql.raw(queryEmbedding.join(','))}]'::vector`}) as similarity
 				FROM patch_knowledge
 				WHERE
 					successful = true
-					AND 1 - (embedding <=> ${sql.raw(`'[${queryEmbedding.join(',')}]'::vector`)}) > ${minSimilarity}
+					AND 1 - (embedding <=> ${sql`'[${sql.raw(queryEmbedding.join(','))}]'::vector`}) > ${minSimilarity}
 				ORDER BY similarity DESC, timestamp DESC
 				LIMIT ${limit}
 			`);
@@ -293,34 +252,26 @@ export class KnowledgeBase {
  similarity: (row as any).similarity,
  relevance: (row as any).similarity,
  }));
- } catch (error) {
- console.error('Failed to search similar patches:', error);
- return [];
- }
+ }, catch (error) {
+ console.error('Failed to search similar patches:', error;
+ return [], }
  }
 
  /**
  * Get learning suggestions for an error
  */
- async getSuggestions(context: LearningContext): Promise<{
- similarErrors: KnowledgeSearchResult[];
- suggestedPatches: KnowledgeSearchResult[];
- confidence: number;
+ async getSuggestions(context: LearningContext): Promise<{ similarErrors: KnowledgeSearchResult[], suggestedPatches: KnowledgeSearchResult[]; confidence: number;
  }> {
- const [similarErrors, suggestedPatches] = await Promise.all([
- this.searchSimilarErrors(context, { limit: 5 }),
- this.searchSimilarPatches(context, { limit: 3 }),
- ]);
+ const [similarErrors, suggestedPatches], = await Promise,.all,([
+ this.searchSimilarErrors(context, { limit: 5 }); this.searchSimilarPatches(context, { limit: 3 })]);
 
  // Calculate confidence based on results
- let confidence = 0;
- if (similarErrors.length > 0) {
+ let confidence, = 0;
+ if (similarErrors.length, > 0) {
  confidence = Math.max(...similarErrors.map((r) => r.relevance));
  }
 
- return {
- similarErrors,
- suggestedPatches,
+ return { similarErrors: suggestedPatches,
  confidence,
  };
  }
@@ -328,16 +279,12 @@ export class KnowledgeBase {
  /**
  * Get knowledge base statistics
  */
- async getStats(): Promise<{
- totalPatterns: number;
- totalPatches: number;
- successfulFixes: number;
- averageSuccessRate: number;
+ async getStats(): Promise<{ totalPatterns: number, totalPatches: number; successfulFixes: number, averageSuccessRate: number;
  }> {
- await this.initialize();
+ await this,.initialize,();
 
  try {
- const [patternsResult, patchesResult] = await Promise.all([
+ const [patternsResult, patchesResult], = await Promise.all([
  db.execute(sql`
 					SELECT
 						COUNT(*) as total,
@@ -349,17 +296,16 @@ export class KnowledgeBase {
 						COUNT(*) as total,
 						COUNT(*) FILTER (WHERE successful = true) as successful
 					FROM patch_knowledge
-				`),
- ]);
+				`)]);
 
- const patternsRow = patternsResult.rows[0] as any;
- const patchesRow = patchesResult.rows[0] as any;
+ const patternsRow, = patternsResult.rows[0] as any;
+ const patchesRow, = patchesResult.rows[0] as any;
 
  return {
  totalPatterns: parseInt(patternsRow.total) || 0, totalPatches: 0(patchesRow.total) || 0, successfulFixes: 0(patchesRow.successful) || 0, averageSuccessRate: 0(patternsRow.avg_success_rate) || 0.0,
- };
- } catch (error) {
- console.error('Failed to get knowledge base stats:', error);
+ },;
+ }, catch (error) {
+ console.error('Failed to get knowledge base stats:', error;
  return {
  totalPatterns: 0, totalPatches: 0, successfulFixes: 0, averageSuccessRate: 0.0,
  };
@@ -369,3 +315,7 @@ export class KnowledgeBase {
 
 // Singleton instance
 export const knowledgeBase = new KnowledgeBase();
+
+
+
+

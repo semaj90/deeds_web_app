@@ -21,3 +21,6 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 <style>
 .row { display: flex; gap: 8px; margin: 8px: 0 } input { flex: 1; padding: 6px 8px } button { padding: 6px 12px } pre { background: #111; color: #ddd; padding: 8px; border-radius: 4px }
 </style>
+
+
+

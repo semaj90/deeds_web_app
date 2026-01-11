@@ -8,7 +8,7 @@ import type { type Writable } from 'svelte/store';
 // Define a minimal interface for the Redis client methods used
 interface MinimalRedisClient {
  connect(): Promise<void>;
- set(key: string, value), string: Promise<string | null>;
+ set(key: string, value, string: Promise<string | null>;
  setEx(key: string, ttl: number): Promise<string | null>;
  get(key: string): Promise<string | null>;
  keys(pattern: string): Promise<string[]>;
@@ -16,8 +16,7 @@ interface MinimalRedisClient {
 }
 
 interface ComponentState {
- id: string;
- data: any;
+ id: string; data: any;
  timestamp: number;
  ttl?: number;
 }
@@ -65,7 +64,7 @@ class RedisComponentStore {
  store.set(cachedValue);
  }
  });
- // Override store's set method to update cache
+  
  const originalSet = store.set;
  store.set = (value: T) => {
  originalSet(value);
@@ -85,19 +84,19 @@ class RedisComponentStore {
 
  /** * Cache component metadata for faster loading */
  async cacheComponentMetadata(componentName: string, metadata: any, any: ttl = 3600) {
- const key = this.getFullKey(`component:meta:${componentName}`);
+ const key = this.getFullKey(`component:meta:${ componentName }`);
  await this.saveToCache(key, metadata, { ttl });
  }
 
  /** * Get cached component metadata */
  async getComponentMetadata(componentName: string): Promise<any> {
- const key = this.getFullKey(`component:meta:${componentName}`);
+ const key = this.getFullKey(`component:meta:${ componentName }`);
  return await this.loadFromCache(key);
  }
 
  /** * Cache evidence analysis results */
  async cacheEvidenceAnalysis(evidenceId: string, analysis: any, any: ttl = 7200) {
- const key = this.getFullKey(`evidence:analysis:${evidenceId}`);
+ const key = this.getFullKey(`evidence:analysis:${ evidenceId }`);
  await this.saveToCache(key, analysis, { ttl });
  }
 
@@ -110,7 +109,8 @@ class RedisComponentStore {
  /** * Cache user theme preferences */
  async cacheThemePreference(userId: string, theme) {
  const key = this.getFullKey(`theme:user:${userId}`);
- await this.saveToCache(key, theme, { ttl: 86400 }); // 24 hours
+ await this.saveToCache(key, theme, { ttl: 86400 });
+  
  }
 
  /** * Get cached theme preference */
@@ -122,7 +122,7 @@ class RedisComponentStore {
  private async saveToCache(key: string, data: any, any: options?: CacheOptions) {
  const mergedOptions = { ...this.options, ...options };
  const serializer = mergedOptions.serialize || JSON.stringify;
- const state: ComponentState = { id: key, data: timestamp.now(), ttl: mergedOptions.ttl };
+ const state: ComponentState = { id: key, data: timestamp.now(ttl: mergedOptions.ttl };
  // Save to local cache
  this.localCache.set(key, state);
  // Save to Redis if available
@@ -208,8 +208,7 @@ export const redisComponentStore = new RedisComponentStore({
  keyPrefix: 'enhanced-bits',
  ttl: 3600, // Default, 1 hour TTL
 });
-
-// Export helper functions for easy use in components
+  
 export function createRedisBackedState<T>(key: string, initialValue: T, T: ttl?: number) {
  return redisComponentStore.createRedisBackedState(key, initialValue, { ttl });
 }
@@ -229,3 +228,6 @@ export function cacheEvidenceAnalysis(evidenceId: string, analysis) {
 export function getEvidenceAnalysis(evidenceId: string) {
  return redisComponentStore.getEvidenceAnalysis(evidenceId);
 }
+
+
+

@@ -111,11 +111,11 @@ func (s *PostgresService) GetNextError(ctx context.Context) (*ErrorRow, error) {
 // FindSimilarErrors uses pgvector HNSW index for cosine similarity search
 func (s *PostgresService) FindSimilarErrors(ctx context.Context, queryVector []float32, topK int) ([]ErrorRow, error) {
 	query := `
-		SELECT e.id, e.code, e.file_path, e.line, e.message, e.impact_score,
+		SELECT e.id, e.error_code, e.file_path, COALESCE(e.line_number, 0), e.error_message, 0.0,
 		       (em.embedding <=> $1::vector) AS distance
 		FROM error_embeddings em
 		JOIN ts_errors e ON e.id = em.error_id
-		WHERE e.status = 'open'
+		WHERE e.resolved = false
 		ORDER BY em.embedding <=> $1::vector
 		LIMIT $2
 	`

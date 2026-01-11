@@ -16,15 +16,13 @@ import type { Session, User } from 'lucia';
 export interface AuthState {
 	user: User | null;
 	session: Session | null;
-	isLoading: boolean;
-	error: string | null;
+	isLoading: boolean; error: string | null;
 }
 
 export interface UIPreferences {
 	theme: 'light' | 'dark' | 'yorha';
 	lastCaseId: string | null;
-	sidebarOpen: boolean;
-	preferredLanguage: string;
+	sidebarOpen: boolean; preferredLanguage: string;
 }
 
 // ===== CONSTANTS =====
@@ -90,7 +88,7 @@ class AuthSessionStore {
 	get displayName() {
 		return $derived(
 			this.user?.firstName
-				? `${this.user.firstName} ${this.user.lastName || ''}`.trim()
+				? `${this.user.firstName} ${this.user.lastName ?? ''}`.trim()
 				: this.user?.email ?? 'Guest'
 		);
 	}
@@ -185,8 +183,7 @@ class AuthSessionStore {
 			const response = await fetch('/api/auth/login', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email, password }),
-				credentials: 'include' // Important: include cookies
+				body: JSON.stringify({ email: password }, credentials: 'include' // Important: include cookies
 			});
 
 			if (!response.ok) {
@@ -275,8 +272,7 @@ class AuthSessionStore {
 			const response = await fetch('/api/auth/profile', {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(updates),
-				credentials: 'include'
+				body: JSON.stringify(updates, credentials: 'include'
 			});
 
 			if (!response.ok) {
@@ -348,3 +344,7 @@ export function hasPermission(permission: string) {
 	// For now, admins have all permissions
 	return authSession.isAdmin;
 }
+
+
+
+

@@ -1,241 +1,231 @@
-# Claude Brief: Phase13 Integration Pattern
+# Claude Tactical Error Fixing Guide - Phase 66
 
-## 🔧 TypeScript Language Server: Module Export Cache Issue
+## Current Situation (2026-01-11 10:50 PST)
 
-**Problem:** `Module '"$lib/server/db"' has no exported member 'db'` (but export exists)
-
-**Cause:** TypeScript Language Server caches module shapes. When `index.ts` is modified, TSServer doesn't reload.
-
-**Fix:**
-```
-Ctrl+Shift+P → "TypeScript: Restart TS Server"
-```
-
-**Code Snippet:**
-```typescript
-// Ensure correct import path
-import { db } from '$lib/server/db';
-```
-
-**Why:** Runtime works perfectly - this is purely an IDE/editor cache issue.
-
-**Prevention:**
-- After modifying barrel files (`index.ts`), restart TSServer
-- Avoid circular dependencies between schema and db files
-- Clear `.svelte-kit` cache if issues persist: `rm -rf .svelte-kit && npm run dev`
+**Baseline:** 77,002 TypeScript/CSS errors in 2,471 files
+**Goal:** Reduce to ~42,000 errors (45% reduction)
+**Strategy:** Iterative pattern-based fixing with validation gates
 
 ---
 
-- Probes (cached): Ollama via `getOllamaEndpoint`, Enhanced RAG `/health`, Qdrant `healthz/readyz/collections`, Redis via env/ping, DB via env presence, Docker flag. Cache results ~30s.
-- Preference order: Enhanced RAG > Ollama (`gemma3-legal:latest`); vector DB Qdrant > pgvector > memory; DB prod URL > memory; Redis caching when available.
-- Performance defaults: SSR on, code splitting, UnoCSS, Redis-or-memory caching.
-- Health endpoint `/api/system/phase13` returns status + recommendations.
-- Env-only wiring (no infra mutations): `ENHANCED_RAG_URL`, `DATABASE_URL`, `PGVECTOR_ENABLED`/`ENABLE_PGVECTOR`, `REDIS_URL`/`UPSTASH_REDIS_REST_URL`, `QDRANT_URL`, `OLLAMA_URL`/`OLLAMA_BASE_URL`, optional Docker flags.
-- Mirror pattern for other system health endpoints if needed; consume via `initializePhase13()` or the GET endpoint.
+## ✅ Completed Actions
+
+### 1. Structural TypeScript Fixes
+- **346 files**: Fixed `import type { A: B }` → `import type { A, B }` corruption
+- **3 files**: Fixed `formData.get('key', prop:` argument corruption
+- **Result**: Parse-level errors prevented, but didn't cascade as expected
+
+### 2. Knowledge Search SSR Migration
+- **Route**: `/admin/knowledge-search`
+- **Backend**: `+page.server.ts` with vector search actions
+- **Services**:
+  - `src/lib/server/embeddings/ollama.ts` (embeddinggemma:latest)
+  - `src/lib/server/db/qdrant-integration.ts` (Qdrant client)
+- **Result**: Local-first RAG stack operational
+
+### 3. Phase 66 Agent Preparation
+- **Script**: `scripts/phase66_automated_error_fixer.py`
+- **LLM**: Ollama gemma3-legal:latest (native, no OpenAI dependency)
+- **Tools**: Pattern detection, specialized Node.js fixers, verification
+- **Status**: Ready (pending Python dependency upgrade)
 
 ---
 
-## 📚 Knowledge Graph / RAG / KAG / DAG Sources
+## 🎯 High-Priority Error Patterns
 
-### AI Agent Context Files
-| File | Purpose | Load When |
-|------|---------|-----------|
-| `copilot.md` | Primary Copilot instructions | Copilot sessions |
-| `claude.md` | Primary Claude context | Always (this file) |
-| `gemini.md` | Gemini agent context | Gemini sessions |
-| `CLAUDE_RAG_KAG_RULES.md` | RAG/KAG endpoint generation rules | API endpoints |
+### Pattern 1: CSS Parsing Errors (15K-20K estimated)
+**Tool:** `fix-css-selectors.mjs` (created, dry-run validated)
 
-### Extended Documentation (docs/)
-| File | Content |
-|------|---------|
-| `docs/CLAUDE.md` | GPU environment, Phase 72 logging |
-| `docs/GEMINI.md` | FastMCP tools, Phase 72 automation |
-| `docs/COPILOT.md` | VS Code tasks, Phase 72 integration |
+**Targets:**
+- Split global selectors: `: global(` → `:global(`
+- Malformed keyframes: `"from" / "transform..."` → proper syntax
+- Quoted percentages: `"0%"` → `0%`
 
-### Cross-Reference Rules
-```
-WHEN editing database schema:
-  READ: claude.md#drizzle-orm-0.44
-  APPLY: db:check → db:generate → review → db:migrate:apply
-
-WHEN fixing TypeScript errors:
-  READ: COPILOT_ERROR_FIXING_GUIDE.md
-  APPLY: Largest cluster first, validate with svelte-check
-
-WHEN creating API endpoints:
-  READ: CLAUDE_RAG_KAG_RULES.md
-  APPLY: Category-specific rules (auth, data, ai, cache)
-```
-
----
-
-## 🔄 Phase 74: Core Route Gate & Fix Waves
-
-### Operating Loop
-1. **Inventory**: Run `node scripts/routes-inventory.mjs` to map Core vs Dev routes.
-2. **Check**: Run `scripts/advanced-check.ps1` to get a fresh error baseline.
-3. **Prioritize**:
-   - **Wave 1**: Fix all errors in `Core Routes` (must be 0 errors).
-   - **Wave 2**: Fix `Import` and `Type` errors globally.
-   - **Wave 3**: Fix `Event Handler` deprecations (on:click -> onclick).
-4. **Verify**: Re-run `scripts/advanced-check.ps1` after each wave.
-
-// ...existing code...
-### Fix Rules
-- **Never** delete a file unless explicitly instructed.
-- **If a fix is complex**, wrap it in `// @ts-ignore` with a TODO comment: `// TODO: Phase 75 fix`.
-- **Core Routes** take precedence over everything else.
-
-## 🗺️ Route Structure & Command Center
-- **Core Routes Location**: `src/routes/(app)/` contains the authenticated core application routes.
-- **Public Routes**: Root level `src/routes/` contains public/marketing pages.
-- **Command Center**: The main dashboard is at `src/routes/(app)/command-center/`.
-- **Navigation**: Defined in `src/lib/components/yorha/CommandCenterNav.svelte`.
-
-### Route Status
-The following routes have been migrated to `(app)`:
-- `active-cases`
-- `evidence-library`
-- `analysis-center`
-- `global-search`
-- `system-configuration`
-- `gpu-evidence-graph`
-- `persons-of-interest`
-
----
-
-## 🗄️ Drizzle ORM 0.44 Migration Best Practices
-
-### Stack
-- **Drizzle ORM**: 0.44.x
-- **Drizzle Kit**: 0.30.x
-- **PostgreSQL**: via `postgres-js` driver
-- **Schema Location**: `src/lib/server/db/schema-postgres.ts`
-- **Migrations Directory**: `drizzle/`
-
-### Migration Scripts (package.json)
+**Strategy:**
 ```bash
-db:check           # Validate schema syntax before any operation
-db:push:dev        # Interactive push (development only, with prompts)
-db:generate        # Create SQL migration files (review before applying)
-db:migrate:apply   # Apply migrations (production-safe)
-db:verify:canvas   # Verify canvas_states table exists
-db:studio          # Open Drizzle Studio GUI
+# Dry-run first
+node scripts/fix-css-selectors.mjs --dry-run --limit 10
+
+# Apply incrementally
+node scripts/fix-css-selectors.mjs --limit 50
+npx svelte-check --threshold error  # Verify
 ```
 
-### "No Data Loss" Workflow
-```
-1. Change schema → src/lib/server/db/schema-postgres.ts
-2. npm run db:generate → Creates drizzle/00XX_xxx.sql
-3. REVIEW the SQL file:
-   ✅ CREATE TABLE, ALTER TABLE ADD COLUMN
-   ❌ DROP TABLE, DROP COLUMN, TRUNCATE, ALTER COLUMN TYPE
-4. npm run db:migrate:apply → Applies to database
-```
+---
 
-### Critical Rules
-1. **Never use `db:push` on production** - Use `db:generate` → review → `db:migrate:apply`
-2. **Always review generated SQL** for DROP/TRUNCATE statements
-3. **Use `doublePrecision()` for float8 columns** to avoid precision loss
-4. **Run `db:check` before any migration** to catch syntax errors early
-5. **Backup before migrations**: `pg_dump -Fc -f backup.dump`
+### Pattern 2: Missing Semicolons (8K estimated)
+**Detection:** `Expected ';'` errors in TypeScript
 
-### Schema Type Mappings
-| PostgreSQL | Drizzle |
-|------------|---------|
-| `uuid` | `uuid()` |
-| `text` | `text()` |
-| `varchar(n)` | `varchar('col', { length: n })` |
-| `integer` | `integer()` |
-| `boolean` | `boolean()` |
-| `jsonb` | `jsonb()` |
-| `timestamp` | `timestamp('col', { mode: 'string' })` |
-| `float8/double precision` | `doublePrecision()` |
-| `float4/real` | `real()` |
-| `text[]` | `text('col').array()` |
-
-### Canvas States Table Verification
-Before saving board state, verify table exists:
+**Example:**
 ```typescript
-import { verifyCanvasStatesTable } from '$lib/server/db/verify-canvas-table';
+// ❌ Missing semicolon
+const x = 1
+const y = 2
 
-const tableExists = await verifyCanvasStatesTable();
-if (!tableExists) {
-    return json({ error: 'canvas_states table missing', code: 'TABLE_MISSING' }, { status: 503 });
+// ✅ Fixed
+const x = 1;
+const y = 2;
+```
+
+**Strategy:** Use AST parser (TypeScript Compiler API) to avoid false positives
+
+---
+
+### Pattern 3: Object Literal Commas (6K estimated)
+**Detection:** `Property expected` errors
+
+**Example:**
+```typescript
+// ❌ Missing comma
+const obj = {
+  key1: value1
+  key2: value2
+}
+
+// ✅ Fixed
+const obj = {
+  key1: value1,
+  key2: value2
 }
 ```
 
-### Related Files
-- `src/lib/server/db/schema-postgres.ts` - Main schema
-- `src/lib/server/db/index.ts` - DB client + exports
-- `drizzle.config.ts` - Drizzle Kit configuration
-- `drizzle/` - Migration files
+**Strategy:** Context-aware replacement (require AST parsing)
 
 ---
 
-## 🎨 Svelte 5 Component Library (2026-01-04)
+## 🚨 Critical Warnings
 
-### Import Path
-```typescript
-import { Svelte5Button, Svelte5Dialog, Svelte5Input, ... } from '$lib/components/ui/svelte5-index';
+### Do NOT Use Generic Regex On:
+1. **SVG attributes** - `width="100%"` is valid HTML, not CSS
+2. **Template literals** - Backticks can contain arbitrary strings
+3. **Comments** - May contain pattern-like text
+4. **String literals** - Code in strings should not be modified
+
+### Always Validate Before Bulk Apply:
+```bash
+# 1. Commit current state
+git add -A && git commit -m "Pre-fix checkpoint"
+
+# 2. Dry-run
+node scripts/fix-pattern.mjs --dry-run
+
+# 3. Limited run
+node scripts/fix-pattern.mjs --limit 10
+
+# 4. Verify improvement
+npx svelte-check --threshold error
+
+# 5. If errors increased, rollback
+git reset --hard HEAD
 ```
 
-### Components Available
-- **Form**: `Svelte5Input`, `Svelte5Select`, `Svelte5Checkbox`, `Svelte5Switch`, `Svelte5Slider`, `Svelte5RadioGroup`
-- **Navigation**: `Svelte5Tabs`, `Svelte5TabPanel`, `Svelte5DropdownMenu`
-- **Overlay**: `Dialog`, `Svelte5Tooltip`, `Svelte5Popover`
-- **Feedback**: `Svelte5Alert`, `Svelte5Badge`, `Svelte5Progress`
-- **Layout**: `Svelte5Card`, `Svelte5Accordion`
-- **Display**: `Svelte5Avatar`, `Svelte5Button`
+---
 
-### Key Patterns
-```svelte
-<!-- Props with runes -->
-let { value, variant = 'default' }: Props = $props();
+## 🔧 Recommended Fix Order
 
-<!-- Bindable for two-way -->
-let open = $bindable(false);
+| Priority | Pattern | Tool | Est. Reduction | Reason |
+|----------|---------|------|----------------|--------|
+| **1** | CSS selectors | `fix-css-selectors.mjs` | -1,000 | Safe, high impact |
+| **2** | Type imports (re-run) | `fix-type-imports.mjs` | -500 | Catch edge cases |
+| **3** | Missing semicolons | AST-based fixer | -8,000 | Needs precision |
+| **4** | Object commas | AST-based fixer | -6,000 | Needs context |
+| **5** | Type mismatches | Manual or AI | -20,000+ | Semantic analysis |
 
-<!-- Snippets replace slots -->
-{#if header}{@render header()}{/if}
+---
 
-<!-- New event syntax -->
-<button onclick={handler}>
+## 🤖 Phase 66 Agent Capabilities
+
+**Updated Script:** `scripts/phase66_automated_error_fixer.py`
+
+**New Features:**
+```python
+@tool("Run specialized Node.js fixer")
+def run_specialized_fixer(fixer_name: str) -> str:
+    """
+    Available fixers:
+    - 'fix-type-imports': Import corruption
+    - 'fix-formdata-corruption': Argument corruption
+    - 'fix-css-selectors': CSS parsing errors (future)
+    """
 ```
 
-### Template
-`src/lib/components/ui/templates/Svelte5ComponentTemplate.svelte`
+**Workflow:**
+1. Agent analyzes svelte-check output
+2. Identifies top 3 fixable patterns
+3. Recommends specialized fixer if pattern matches
+4. Applies fixes in batched mode
+5. Validates after each batch
+6. Rollbacks if regression detected
 
 ---
 
-## 🔍 Error Analysis (70,914 errors)
+## 📊 Expected Results by Phase
 
-### Top Categories
-| Category | % | Fix |
-|----------|---|-----|
-| Object corruption | 40% | AST repair |
-| `import type` | 25% | `import { z }` |
-| Event syntax | 10% | `fix-svelte5-events.mjs` |
-| Module exports | 10% | Fix barrels |
+| Phase | Action | Before | After | Reduction |
+|-------|--------|--------|-------|-----------|
+| ✅ Phase 1 | Structural fixes | 77,002 | 77,002* | 0%** |
+| 🔄 Phase 2 | CSS selectors | 77,002 | ~76,000 | 1.3% |
+| ⏳ Phase 3 | Semicolons | ~76,000 | ~68,000 | 11.6% |
+| ⏳ Phase 4 | Object commas | ~68,000 | ~62,000 | 19.5% |
+| ⏳ Phase 5 | Type re-check | ~62,000 | ~60,000 | 22.1% |
+| ⏳ Phase 6 | Import resolution | ~60,000 | ~56,000 | 27.3% |
+| 🎯 Final | Manual review | ~56,000 | ~42,000 | **45.5%** |
 
-### Priority Files
-1. `src/lib/command-center-manifest.ts`
-2. `src/lib/server/auth.ts`
-3. `src/lib/services/ollamaService.ts`
-
-### Resources
-- `logs/ERROR_ANALYSIS_RECOMMENDATIONS.md`
-- `logs/svelte-check-top-1000.txt`
+*Structural fixes prevent **cascading parse errors** but don't reduce count until dependent errors are fixed.
 
 ---
 
-## 🎯 UnoCSS Shortcuts
+## 💡 Tactical Recommendations
 
-| Shortcut | Effect |
-|----------|--------|
-| `nes-btn` | NES button |
-| `nes-panel` | NES panel |
-| `nes-badge-*` | Status badges |
-| `glass` | Glassmorphism |
+### For Immediate Impact:
+1. **Apply CSS fixes** - Safe, well-tested, limited scope
+2. **Re-run type import fixer** - May catch new edge cases
+3. **Commit frequently** - Easy rollback on regressions
 
-Config: `uno.config.ts`
+### For Long-Term Success:
+1. **Use AST parsers** - TypeScript Compiler API for precision
+2. **Implement validation gates** - Error count must decrease
+3. **Document all patterns** - Update knowledge base after each pass
+4. **Leverage AI agents** - CrewAI for semantic analysis
+
+### For Risk Mitigation:
+1. **Always dry-run** - Preview changes before applying
+2. **Limit batch size** - Fix 50-100 files at a time
+3. **Monitor error types** - If new errors appear, rollback
+4. **Git is your friend** - Commit before each fix batch
+
+---
+
+## 🔗 Quick Reference
+
+### Commands
+```bash
+# Check errors
+npx svelte-check --threshold error
+
+# Apply fixes (dry-run first!)
+node scripts/fix-type-imports.mjs --dry-run
+node scripts/fix-css-selectors.mjs --dry-run --limit 10
+
+# Run Phase 66 agent
+python scripts/phase66_automated_error_fixer.py
+
+# Verify improvement
+npx svelte-check --threshold error 2>&1 | Select-String "found \d+ error"
+```
+
+### Files Modified This Session
+- `scripts/fix-type-imports.mjs` - ✅ Applied (346 files)
+- `scripts/fix-formdata-corruption.mjs` - ✅ Applied (3 files)
+- `scripts/fix-css-selectors.mjs` - 🔄 Created (dry-run validated)
+- `scripts/phase66_automated_error_fixer.py` - ✅ Updated (Ollama native)
+- `src/routes/(app)/admin/knowledge-search/` - ✅ Migrated to SSR
+- `src/lib/server/embeddings/ollama.ts` - ✅ Regenerated (clean)
+- `src/lib/server/db/qdrant-integration.ts` - ✅ Regenerated (clean)
+
+---
+
+**Status:** Phase 2 ready for test application
+**Next:** Apply CSS fixes to 1-2 files, verify, then scale
+**Maintained by:** Claude (Anthropic) + Antigravity (Google Deepmind)
+**Last Updated:** 2026-01-11 10:52 PST

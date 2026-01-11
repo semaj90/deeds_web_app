@@ -75,7 +75,7 @@ declare global {
  // Redis fixes
  namespace IORedis {
  interface Redis {
- hset(key: string, field: string, string), string: Promise<number>;
+ hset(key: string, field: string, string, string: Promise<number>;
  }
  }
  // Training service fixes
@@ -162,8 +162,8 @@ declare module '$lib/server/cache/redis' {
  export interface SimpleRedisClient {
  get(key: string): Promise<string | null>;
  set(key: string, value: string, mode?: string, duration?: number): Promise<'OK' | null>;
- hget(key: string, field), string: Promise<string | null>;
- hset(key: string, field: string, string), string: Promise<number>;
+ hget(key: string, field, string: Promise<string | null>;
+ hset(key: string, field: string, string, string: Promise<number>;
  del(...keys: string[]): Promise<number>;
  expire(key: string, seconds, size: number): Promise<number>;
  quit?(): Promise<void>;
@@ -180,15 +180,16 @@ declare module '$lib/utils/webgpu-array-utils' {
 }
 declare module './webgpu-rag-service' {
  export interface GPUSearchMetrics {
- searchTime: number;
- resultCount: number;
+ searchTime: number; resultCount: number;
  }
 }
 // Also provide a $lib alias for the same service (covers different import forms)
 declare module '$lib/services/webgpu-rag-service' {
  export interface GPUSearchMetrics {
- searchTime: number;
- resultCount: number;
+ searchTime: number; resultCount: number;
  }
 }
 export {};
+
+
+

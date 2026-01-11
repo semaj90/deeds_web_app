@@ -4,13 +4,11 @@
 
  // Define interfaces locally since they are not exported from chat-context
  interface TopicNode {
- clusterSize: number;
- tags: string[];
+ clusterSize: number; tags: string[];
  }
 
  interface ShardNode {
- chunkCount: number;
- status: string;
+ chunkCount: number; status: string;
  }
 
  const chatContext = chatContextRaw as any;
@@ -51,7 +49,7 @@
  </h3>
  <button
  class="text-[10px] text-red-400 hover:text-red-300"
- onclick={clearAll}
+ onclick={ clearAll }
  >
  CLEAR ALL
  </button>
@@ -85,3 +83,6 @@
  </div>
  </div>
 {/if}
+
+
+

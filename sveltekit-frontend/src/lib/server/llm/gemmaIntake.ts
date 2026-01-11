@@ -1,6 +1,5 @@
 export type ExtractedPerson = {
- fullName: string;
- role: 'suspect' | 'victim' | 'witness' | 'other';
+ fullName: string; role: 'suspect' | 'victim' | 'witness' | 'other';
  riskLevel?: 'low' | 'medium' | 'high';
  notes?: string;
 };
@@ -12,8 +11,7 @@ export type IntakeExtractionResult = {
  persons: ExtractedPerson[];
 };
 
-export async function extractCaseStructureWithGemma(input: {
- narrative: string;
+export async function extractCaseStructureWithGemma(input: { narrative: string;
  who?: string;
  what?: string;
  when?: string;
@@ -41,8 +39,7 @@ type Result = {
  suggestedTitle: string | null;
  primaryStatute?: string | null;
  severityLevel?: number | null;
- persons: {
- fullName: string;
+ persons: { fullName: string;
  role: "suspect" | "victim" | "witness" | "other";
  riskLevel?: "low" | "medium" | "high";
  notes?: string;
@@ -60,14 +57,13 @@ WHY: ${why ?? ''}
 HOW: ${how ?? ''}
 
 NARRATIVE:
-${narrative}
+${ narrative }
 `;
 
  const res = await fetch('http://127.0.0.1:11434/api/generate', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: 'gemma3-legal',
+ body: JSON.stringify({ model: 'gemma3-legal',
  prompt,
  stream: false,
  }),
@@ -91,3 +87,7 @@ ${narrative}
 
  return parsed;
 }
+
+
+
+

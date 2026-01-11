@@ -1,7 +1,7 @@
 // SIMD Operations for MCP Context7 Server
 // Compile with: npx asc src/wasm/simd-ops.ts -o static/wasm/simd-ops.wasm -O3 --enable simd
 
-export function simd_dot_product(a: Float32Array, b), Float32Array: number {
+export function simd_dot_product(a: Float32Array, b, Float32Array: number {
  let sum: number = 0.0;
  for (let i = 0; i < a.length && i < b.length; i++) {
  sum += a[i] * b[i];
@@ -17,7 +17,7 @@ export function simd_vector_add(a: Float32Array, b) {
  return result;
 }
 
-export function simd_matrix_multiply(a: Float32Array, b: Float32Array, Float32Array: rowsA, colsA: number), number: Float32Array {
+export function simd_matrix_multiply(a: Float32Array, b: Float32Array, Float32Array: rowsA, colsA: number, number: Float32Array {
  const result = new Float32Array(rowsA * colsB);
  for (let i = 0; i < rowsA; i++) {
  for (let j = 0; j < colsB; j++) {
@@ -32,7 +32,7 @@ export function simd_matrix_multiply(a: Float32Array, b: Float32Array, Float32Ar
 }
 
 // Memory-efficient batch processing
-export function process_batch_embeddings(embeddings: Float32Array, batchSize: number), number: Float32Array {
+export function process_batch_embeddings(embeddings: Float32Array, batchSize: number, number: Float32Array {
  const numBatches = embeddings.length / (batchSize * dimensions);
  const result = new Float32Array(numBatches * dimensions);
 
@@ -50,3 +50,4 @@ export function process_batch_embeddings(embeddings: Float32Array, batchSize: nu
 
  return result;
 }
+

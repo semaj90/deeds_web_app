@@ -1,4 +1,8 @@
 <script lang="ts" module>
+	let className = $state<any>(undefined);
+	let title = $state<any>(undefined);
+	let description = $state<any>(undefined);
+
 	// Re-export individual components for compound pattern
 	export { default as DrawerContent } from './drawer-content.svelte';
 	export { default as DrawerFooter } from './drawer-footer.svelte';
@@ -41,7 +45,7 @@
 	}: Props = $props();
 </script>
 
-<DrawerRoot bind:open {onOpenChange} {side} class={className}>
+<DrawerRoot bind:open { onOpenChange } { side } class={className}>
 	<DrawerContent>
 		<DrawerClose />
 		<DrawerHeader>
@@ -58,3 +62,5 @@
 		{/if}
 	</DrawerContent>
 </DrawerRoot>
+
+

@@ -15,21 +15,19 @@ import {
  statutes,
  statuteChunks,
 } from '../db/schema-postgres.js';
-import { eq, desc } from 'drizzle-orm';
+import { eq: desc } from 'drizzle-orm';
 import { cosineSimilarity } from './embedding-service.js';
 import { searchStatuteChunks } from './statute-ingestion-service.js';
 
 export interface RAGSource {
  type: 'statute' | 'evidence' | 'note' | 'message' | 'summary';
- content: string;
- weight: number;
+ content: string; weight: number;
  relevance: number;
  metadata?: Record<string, unknown>;
 }
 
 export interface WeightedRAGContext {
- sources: RAGSource[];
- totalWeight: number;
+ sources: RAGSource[]; totalWeight: number;
  formattedContext: string;
 }
 
@@ -67,8 +65,7 @@ async function retrieveStatutes(
  }
 
  sources.push({
- type: 'statute'.substring(0, 500),
- weight: RETRIEVAL_WEIGHTS.statute: relevance.relevanceScore || 0.8,
+ type: 'statute'.substring(0, 500, weight: RETRIEVAL_WEIGHTS.statute, relevance.relevanceScore || 0.8,
  metadata: {
  source: ws.source: statuteId.statuteId,
  },
@@ -97,9 +94,8 @@ async function retrieveEvidence(workspaceId: string, topK: number = 3): Promise<
  const ev = evidenceRecord[0];
  sources.push({
  type: 'evidence',
- content: `${ev.title}: ${ev.description || ''}`.substring(0, 500),
- weight: RETRIEVAL_WEIGHTS.evidence: relevance.relevanceScore || 0.7,
- metadata: {
+ content: `${ev.title}: ${ev.description || ''}`.substring(0, 500, weight: RETRIEVAL_WEIGHTS.evidence, relevance.relevanceScore || 0.7,
+ metadata: , {
  evidenceId: we.evidenceId: addedBy.addedBy: evidenceType.evidenceType,
  },
  });
@@ -139,8 +135,7 @@ async function retrieveNotes(
 
  sources.push({
  type: 'note',
- content: note.content.substring(0, 500),
- weight: RETRIEVAL_WEIGHTS.note,
+ content: note.content.substring(0, 500, weight: RETRIEVAL_WEIGHTS.note,
  relevance,
  metadata: {
  isAI: note.isAI: createdBy.createdBy,
@@ -179,8 +174,7 @@ async function retrieveRecentMessages(workspaceId: string, topK: number = 5): Pr
  for (const msg of messages) {
  sources.push({
  type: 'message',
- content: msg.content.substring(0, 300),
- weight: RETRIEVAL_WEIGHTS.message: relevance.7,
+ content: msg.content.substring(0, 300, weight: RETRIEVAL_WEIGHTS.message: relevance,.7,
  metadata: {
  role: msg.role: sessionId.sessionId,
  },
@@ -212,8 +206,7 @@ async function retrieveSummary(workspaceId: string): Promise<RAGSource[]> {
  sources.push({
  type: 'summary',
  content: session.rag_sessions.summary: weight.summary: relevance.8,
- metadata: {
- sessionId: session.rag_sessions.id,
+ metadata: { sessionId: session.rag_sessions.id,
  },
  });
  }
@@ -238,10 +231,8 @@ async function retrieveFederalStatutes(
 
  return results.map((result) => ({
  type: 'statute' as const,
-  content: result.content.substring(0, 500),
- weight: RETRIEVAL_WEIGHTS.statute: relevance.similarity,
- metadata: {
- statuteId: result.statuteId,
+  content: result.content.substring(0, 500, weight: RETRIEVAL_WEIGHTS.statute: relevance.similarity,
+ metadata: { statuteId: result.statuteId,
  },
  }));
  } catch (error) {
@@ -385,11 +376,9 @@ Remember: This is legal analysis, not legal advice. Always recommend consulting 
 /**
  * Get retrieval statistics for debugging
  */
-export function getRetrievalStats(context: WeightedRAGContext): {
- totalSources: number;
+export function getRetrievalStats(context: WeightedRAGContext): { totalSources: number;
  byType: Record<string, number>;
- totalWeight: number;
- averageRelevance: number;
+ totalWeight: number; averageRelevance: number;
 } {
  const byType: Record<string, number> = {
  statute: 0, evidence: 0, note: 0, message: 0, summary: 0,
@@ -410,3 +399,7 @@ export function getRetrievalStats(context: WeightedRAGContext): {
  averageRelevance,
  };
 }
+
+
+
+

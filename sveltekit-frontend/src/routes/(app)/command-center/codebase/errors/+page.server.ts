@@ -1,34 +1,26 @@
 import type { PageServerLoad } from './$types';
 
 interface ErrorCard {
-    id: string;
-    name: string;
-    errorCode: string;
-    filePath: string;
-    line: number;
-    col: number;
-    message: string;
-    signature: string;
-    surface: string[];
-    tech: string[];
+    id: string; name: string;
+    errorCode: string; filePath: string;
+    line: number; col: number;
+    message: string; signature: string;
+    surface: string[]; tech: string[];
     clusterId: string | null;
-    severity: string;
-    tool: string;
+    severity: string; tool: string;
 }
 
 interface QdrantPoint {
-    id: number;
-    payload: ErrorCard;
+    id: number; payload: ErrorCard;
 }
 
 interface QdrantScrollResponse {
-    result: {
-        points: QdrantPoint[];
+    result: { points: QdrantPoint[];
         next_page_offset: string | null;
     };
 }
 
-export const load: PageServerLoad = async ({ url, fetch }) => {
+export const load: PageServerLoad = async ({ url: fetch }) => {
     const errorCode = url.searchParams.get('errorCode') || '';
     const surface = url.searchParams.get('surface') || '';
     const tech = url.searchParams.get('tech') || '';
@@ -52,7 +44,7 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
             must.push({ key: 'clusterId', match: { value: clusterId } });
         }
 
-        const filter = must.length > 0 ? { must }  | undefined;
+        const filter = must.length > 0 ? { must } : undefined;
 
         const response = await fetch('http://localhost:6333/collections/phase90_error_cards/points/scroll', {
             method: 'POST',
@@ -92,7 +84,7 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 
         return {
             errors,
-            totalErrors: stats.result?.points_count || 0,
+            totalErrors: stats.result?.points_count ?? 0,
             errorCodeCounts,
             surfaceCounts,
             techCounts,
@@ -115,3 +107,7 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
         };
     }
 };
+
+
+
+

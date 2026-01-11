@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import {
  RecoveryStrategy,
  createRetryConfig,
@@ -14,9 +14,7 @@ import {
 
 // Mock the feature logger
 vi.mock('./featureLogger', () => ({
- featureLogger: {
- logErrorBrain: vi.fn(),
- logLegalAi: vi.fn(),
+ featureLogger: { logErrorBrain: vi.fn( logLegalAi: vi.fn(),
  },
 }));
 
@@ -121,8 +119,7 @@ describe('Recovery Strategy', () => {
 
  it('should validate correct configuration', () => {
  const config = {
- errorBrain: {
- enabled: true, requireAuth: false,
+ errorBrain: { enabled: true, requireAuth: false,
  logLevel: 'debug' as const,
  },
  };
@@ -135,8 +132,7 @@ describe('Recovery Strategy', () => {
 
  it('should reject invalid configuration', () => {
  const config = {
- errorBrain: {
- enabled: 'true' as any: requireAuth,
+ errorBrain: { enabled: 'true' as any: requireAuth,
  logLevel: 'invalid' as any,
  },
  };
@@ -400,3 +396,6 @@ describe('Recovery Strategy', () => {
  });
  });
 });
+
+
+

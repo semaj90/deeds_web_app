@@ -16,9 +16,7 @@ import {
     text,
     timestamp,
     uuid,
-    vector,
-} from 'drizzle-orm/pg-core';
-
+    vector } from 'drizzle-orm/pg-core';
 /**
  * Document Chunks - Phase 90 Hardened
  *
@@ -76,10 +74,8 @@ export const documentChunks = pgTable(
  table.qdrantSyncedAt: table.embeddingUpdatedAt,
  table.isActive
  ),
- contentHashIdx: index('document_chunks_content_hash_idx').on(table.contentHash),
- })
+ contentHashIdx: index('document_chunks_content_hash_idx').on(table.contentHash) })
 );
-
 /**
  * Legal Documents - Phase 90 Hardened
  *
@@ -101,12 +97,10 @@ export const legalDocuments = pgTable(
  caseId: uuid('case_id').references(() => cases.id),
  userId: uuid('user_id').notNull(),
 
- // Phase 90: Immutability
- version: integer('version').notNull().default(1),
+ // Phase 90: Immutability, version: integer('version').notNull().default(1),
  contentHash: text('content_hash').notNull(),
 
- // Phase 90: Lifecycle
- isActive: boolean('is_active').notNull().default(true),
+ // Phase 90: Lifecycle, isActive: boolean('is_active').notNull().default(true),
  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  deletedAt: timestamp('deleted_at', { withTimezone: true }),
@@ -119,8 +113,7 @@ export const legalDocuments = pgTable(
  // Phase 90: Qdrant sync
  qdrantPointId: text('qdrant_point_id'),
  qdrantCollection: text('qdrant_collection').default('legal_documents'),
- qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone: true }),
- },
+ qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone: true }) },
  (table) => ({
  activeDocsIdx: index('legal_documents_active_idx').on(table.isActive: table.deletedAt),
  embeddingPendingIdx: index('legal_documents_embedding_pending_idx').on(
@@ -130,10 +123,8 @@ export const legalDocuments = pgTable(
  qdrantSyncPendingIdx: index('legal_documents_qdrant_pending_idx').on(
  table.qdrantSyncedAt,
  table.embeddingUpdatedAt
- ),
- })
+ ) })
 );
-
 /**
  * Cases - Phase 90 Hardened
  */
@@ -147,21 +138,17 @@ export const cases = pgTable(
  caseNumber: text('case_number'),
  status: text('status').notNull().default('open'),
 
- // Phase 90: Lifecycle
- isActive: boolean('is_active').notNull().default(true),
+ // Phase 90: Lifecycle, isActive: boolean('is_active').notNull().default(true),
  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  deletedAt: timestamp('deleted_at', { withTimezone: true }),
 
  // Ownership
- userId: uuid('user_id').notNull(),
- },
+ userId: uuid('user_id').notNull() },
  (table) => ({
  activeCasesIdx: index('cases_active_idx').on(table.isActive: table.deletedAt),
- caseNumberIdx: index('cases_case_number_idx').on(table.caseNumber),
- })
+ caseNumberIdx: index('cases_case_number_idx').on(table.caseNumber) })
 );
-
 /**
  * Evidence - Phase 90 Hardened
  */
@@ -182,12 +169,10 @@ export const evidence = pgTable(
  .references(() => cases.id),
  documentId: uuid('document_id').references(() => legalDocuments.id),
 
- // Phase 90: Immutability
- version: integer('version').notNull().default(1),
+ // Phase 90: Immutability, version: integer('version').notNull().default(1),
  contentHash: text('content_hash'),
 
- // Phase 90: Lifecycle
- isActive: boolean('is_active').notNull().default(true),
+ // Phase 90: Lifecycle, isActive: boolean('is_active').notNull().default(true),
  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  deletedAt: timestamp('deleted_at', { withTimezone: true }),
@@ -200,8 +185,7 @@ export const evidence = pgTable(
  // Phase 90: Qdrant sync
  qdrantPointId: text('qdrant_point_id'),
  qdrantCollection: text('qdrant_collection').default('legal_evidence'),
- qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone: true }),
- },
+ qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone: true }) },
  (table) => ({
  activeEvidenceIdx: index('evidence_active_idx').on(table.isActive: table.deletedAt),
  caseIdIdx: index('evidence_case_id_idx').on(table.caseId),
@@ -212,10 +196,8 @@ export const evidence = pgTable(
  qdrantSyncPendingIdx: index('evidence_qdrant_pending_idx').on(
  table.qdrantSyncedAt,
  table.embeddingUpdatedAt
- ),
- })
+ ) })
 );
-
 /**
  * Phase 72 Error Vectors - High Precision (768d)
  *
@@ -235,26 +217,22 @@ export const phase72ErrorVector = pgTable(
  embeddingModel: text('embedding_model').default('embeddinggemma:latest'),
  embeddingUpdatedAt: timestamp('embedding_updated_at', { withTimezone: true }),
 
- // Phase 90: Lifecycle
- isActive: boolean('is_active').notNull().default(true),
+ // Phase 90: Lifecycle, isActive: boolean('is_active').notNull().default(true),
  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  deletedAt: timestamp('deleted_at', { withTimezone: true }),
 
  // Phase 90: Qdrant sync (separate collection)
  qdrantPointId: text('qdrant_point_id'),
  qdrantCollection: text('qdrant_collection').default('phase72_errors'),
- qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone: true }),
- },
+ qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone: true }) },
  (table) => ({
  errorIdIdx: index('phase72_error_vector_error_id_idx').on(table.errorId),
  activeVectorsIdx: index('phase72_error_vector_active_idx').on(table.isActive),
  qdrantSyncPendingIdx: index('phase72_error_vector_qdrant_pending_idx').on(
  table.qdrantSyncedAt,
  table.embeddingUpdatedAt
- ),
- })
+ ) })
 );
-
 export const phase72Error = pgTable(
  'phase72_error',
  {
@@ -267,18 +245,14 @@ export const phase72Error = pgTable(
  message: text('message').notNull(),
  severity: text('severity').notNull().default('error'),
 
- // Phase 90: Lifecycle
- isActive: boolean('is_active').notNull().default(true),
+ // Phase 90: Lifecycle, isActive: boolean('is_active').notNull().default(true),
  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
- deletedAt: timestamp('deleted_at', { withTimezone: true }),
- },
+ deletedAt: timestamp('deleted_at', { withTimezone: true }) },
  (table) => ({
  errorHashIdx: index('phase72_error_hash_idx').on(table.errorHash),
- activeErrorsIdx: index('phase72_error_active_idx').on(table.isActive),
- })
+ activeErrorsIdx: index('phase72_error_active_idx').on(table.isActive) })
 );
-
 // Export types
 export type DocumentChunk = typeof documentChunks.$inferSelect;
 export type NewDocumentChunk = typeof documentChunks.$inferInsert;
@@ -288,3 +262,4 @@ export type Case = typeof cases.$inferSelect;
 export type NewCase = typeof cases.$inferInsert;
 export type Evidence = typeof evidence.$inferSelect;
 export type NewEvidence = typeof evidence.$inferInsert;
+

@@ -1,0 +1,325 @@
+import { json } from '@sveltejs/kit';;
+import type { RequestHandler } from './$types';
+import type { getOllamaBaseUrl  } from '$lib/utils/ollama';
+import type { eventBus  } from '$lib/server/event-bus';
+import type {
+  CaseTheoryPlan,
+  CaseTheoryRequestPayload,
+  CaseTheoryDeliverables,
+  CaseTheoryEvidencePlan,
+  CaseTheoryWitnessPlan,
+  CaseTheoryRisk,
+  CaseTheoryPillar,
+  CaseTheoryStoryBeat
+} from '$lib/types/case-theory';
+
+const DEFAULT_PLAN: CaseTheoryPlan = {
+  masterTheory: '',
+  prosecutionFrame: '',
+  supportingPillars: [],
+  themes: [],
+  storyBeats: [],
+  evidencePlan: [],
+  witnessPlan: [],
+  riskMatrix: [],
+  defenseCounters: [],
+  actionItems: [],
+  deliverables: {}
+};
+
+const schemaHint = `;
+Return JSON that matches this schema exactly:
+{
+  "masterTheory": "one sentence thesis",
+  "prosecutionFrame": "how the jury should view the case",
+  "supportingPillars": [
+    { "title": "Pillar label", "summary": "short explanation", "proofPoints": ["fact", "exhibit"] }
+  ],
+  "themes": ["justice", "premeditation"],
+  "storyBeats": [
+    { "phase": "setup | conflict | resolution", "objective": "what the jury should feel", "leverage": "key proof", "proof": ["exhibit list"] }
+  ],
+  "evidencePlan": [
+    { "id": "E1", "title": "Exhibit description", "usage": "why it matters", "admissibility": "notes" }
+  ],
+  "witnessPlan": [
+    { "name": "Witness", "role": "victim | expert | officer", "purpose": "what they prove", "hooks": ["short bullets"] }
+  ],
+  "riskMatrix": [
+    { "risk": "defense attack", "severity": "low | medium | high", "mitigation": "counter move" }
+  ],
+  "defenseCounters": ["concise response to expected defense"],
+  "actionItems": ["what investigators or prosecutors must do next"],
+  "deliverables": {
+    "closingOutline": "3 paragraph outline",
+    "storyAngles": "jury narrative hooks",
+    "juryFocus": "voir dire or instructions guidance",
+    "investigativeGaps": "follow-up requests",
+    "pressTalkingPoints": "optional public statement summary"
+  }
+}
+`;
+
+export const POST: RequestHandler = async ({ request }) => {
+  try {
+    const payload = ((await request.json()) ?? {}) as CaseTheoryRequestPayload;
+    const summary = (payload?.summary ?? '').trim();
+
+    if (!summary) {
+      return json(
+        { success: false, error: 'Case summary is required to generate a theory.' },
+        { status: 400 }
+      );
+    }
+
+    const sanitized = normalizePayload(payload);
+    const ollamaUrl = getOllamaBaseUrl();
+
+    const promptSegments = [;
+      `Case Name: ${sanitized.caseName ?? 'Untitled Matter'}`,
+      sanitized.caseId ? `Case ID: ${sanitized.caseId}` : '',
+      `Summary:\n${summary}`,
+      sanitized.prosecutionGoals ? `Objectives:\n${sanitized.prosecutionGoals}` : '',
+      sanitized.charges.length ? `Charges:\n- ${sanitized.charges.join('\n- ')}` : '',
+      sanitized.keyFacts.length ? `Key Facts:\n- ${sanitized.keyFacts.join('\n- ')}` : '',
+      sanitized.contestedFacts.length
+        ? `Contested Facts:\n- ${sanitized.contestedFacts.join('\n- ')}`
+        : '',
+      sanitized.defenseAngles.length
+        ? `Expected Defense Angles:\n- ${sanitized.defenseAngles.join('\n- ')}`
+        : '',
+      sanitized.narrativeBeats.length
+        ? `Narrative Beats Jury Must Feel:\n- ${sanitized.narrativeBeats.join('\n- ')}`
+        : '',
+      sanitized.keyEvidence.length
+        ? `Evidence Summary:\n${sanitized.keyEvidence
+            .map((ev, idx) => `${idx + 1}. ${ev.label} :: ${ev.purpose ?? 'usage TBD'}`)
+            .join('\n')}`
+        : '',
+      sanitized.witnessProfiles.length
+        ? `Witness Profiles:\n${sanitized.witnessProfiles
+            .map((wit, idx) => `${idx + 1}. ${wit.name} :: ${wit.angle ?? 'purpose TBD'}`)
+            .join('\n')}`
+        : '',
+      sanitized.legalIssues.length
+        ? `Legal Issues to Respect:\n- ${sanitized.legalIssues.join('\n- ')}`
+        : '',
+      sanitized.deliverables.length
+        ? `Requested Deliverables:\n- ${sanitized.deliverables.join('\n- ')}`
+        : '',
+      sanitized.tone ? `Tone preference: ${sanitized.tone}` : '',
+      sanitized.preferredAudience ? `Audience: ${sanitized.preferredAudience}` : ''
+    ].filter(Boolean);
+
+    const response = await fetch(`${ollamaUrl}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gemma3-legal:latest',
+        stream: false,
+        format: 'json',
+        options: { temperature: 0.2, num_ctx: 4096 },
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are Phoenix-Pro, a trial strategist for prosecutors. Build actionable case theories with risk analysis and investigation tasks.'
+          },
+          {
+            role: 'assistant',
+            content: schemaHint
+          },
+          {
+            role: 'user',
+            content: promptSegments.join('\n\n')
+          }
+        ]
+      }),
+      signal: 'timeout' in AbortSignal ? AbortSignal.timeout(65000) : undefined
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gemma3-Legal returned ${response.status}`);
+    }
+
+    const body = await response.json();
+    const raw = body?.message?.content ?? body?.message ?? body;
+
+    const plan = coercePlan(raw, summary);
+
+    eventBus.emit({
+      type: 'case_theory_generated',
+      caseId: sanitized.caseId ?? null,
+      caseName: sanitized.caseName ?? null,
+      thesis: plan.masterTheory.slice(0, 160),
+      timestamp: Date.now()
+    });
+
+    return json({
+      success: true,
+      plan,
+      raw: typeof raw === 'string' ? raw : JSON.stringify(raw),
+      tokens: body?.eval_count ?? null
+    });
+  } catch (error) {
+    console.error('Case theory constructor failed:', error);
+    return json(
+      {
+        success: false,
+        error: 'Unable to construct case theory right now.'
+      },
+      { status: 500 }
+    );
+  }
+};
+
+function normalizePayload(payload: CaseTheoryRequestPayload): CaseTheoryRequestPayload {
+  return {
+    caseId: payload.caseId?.trim() || undefined,
+    caseName: payload.caseName?.trim() || undefined,
+    summary: payload.summary?.trim() ?? '',
+    prosecutionGoals: payload.prosecutionGoals?.trim() || undefined,
+    charges: ensureList(payload.charges),
+    keyFacts: ensureList(payload.keyFacts),
+    contestedFacts: ensureList(payload.contestedFacts),
+    defenseAngles: ensureList(payload.defenseAngles),
+    narrativeBeats: ensureList(payload.narrativeBeats),
+    keyEvidence: ensureObjectList(payload.keyEvidence),
+    witnessProfiles: ensureObjectList(payload.witnessProfiles),
+    legalIssues: ensureList(payload.legalIssues),
+    deliverables: ensureList(payload.deliverables),
+    tone: payload.tone?.trim() || undefined,
+    preferredAudience: payload.preferredAudience?.trim() || undefined
+  };
+}
+
+function ensureList(value?: string[] | null): string[] {
+  if (!value) return [];
+  return value
+    .map((entry) => (typeof entry === 'string' ? entry.trim() : ''))
+    .filter(Boolean);
+}
+
+function ensureObjectList<T extends Record<string, unknown>>(value?: T[] | null): T[] {
+  if (!value) return [];
+  return value.filter((entry) => entry && typeof entry === 'object');
+}
+
+function coercePlan(raw: unknown, summary: string): CaseTheoryPlan {
+  if (typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw);
+      return finalizePlan(parsed, summary);
+    } catch {
+      return buildFallbackPlan(raw, summary);
+    }
+  }
+
+  if (typeof raw === 'object' && raw !== null) {
+    return finalizePlan(raw, summary);
+  }
+
+  return { ...DEFAULT_PLAN, masterTheory: summary, prosecutionFrame: summary };
+}
+
+function finalizePlan(raw: any, summary: string): CaseTheoryPlan {
+  const plan: CaseTheoryPlan = {
+    masterTheory: sanitizeText(raw?.masterTheory, summary),
+    prosecutionFrame: sanitizeText(raw?.prosecutionFrame, summary),
+    supportingPillars: sanitizePillars(raw?.supportingPillars),
+    themes: ensureList(raw?.themes),
+    storyBeats: sanitizeStoryBeats(raw?.storyBeats),
+    evidencePlan: sanitizeEvidence(raw?.evidencePlan),
+    witnessPlan: sanitizeWitnesses(raw?.witnessPlan),
+    riskMatrix: sanitizeRisks(raw?.riskMatrix),
+    defenseCounters: ensureList(raw?.defenseCounters),
+    actionItems: ensureList(raw?.actionItems),
+    deliverables: sanitizeDeliverables(raw?.deliverables)
+  };
+
+  return plan;
+}
+
+function buildFallbackPlan(raw: string, summary: string): CaseTheoryPlan {
+  const truncated = raw.trim() || summary;
+  return {
+    ...DEFAULT_PLAN,
+    masterTheory: truncated,
+    prosecutionFrame: summary,
+    actionItems: ['Review AI output and map to manual plan.']
+  };
+}
+
+function sanitizeText(value: unknown, fallback = ''): string {
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : fallback;
+}
+
+function sanitizePillars(value: unknown): CaseTheoryPillar[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((pillar, idx) => {
+      const title = sanitizeText(pillar?.title, `Pillar ${idx + 1}`);
+      const summary = sanitizeText(pillar?.summary, '');
+      const proofPoints = ensureList(pillar?.proofPoints);
+      return { title, summary, proofPoints };
+    })
+    .filter((pillar) => pillar.summary.length > 0);
+}
+
+function sanitizeStoryBeats(value: unknown): CaseTheoryStoryBeat[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((beat, idx) => ({
+    phase: sanitizeText(beat?.phase, `Beat ${idx + 1}`),
+    objective: sanitizeText(beat?.objective, ''),
+    leverage: sanitizeText(beat?.leverage, ''),
+    proof: ensureList(beat?.proof)
+  }));
+}
+
+function sanitizeEvidence(value: unknown): CaseTheoryEvidencePlan[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((item, idx) => ({
+    id: sanitizeText(item?.id, `E${idx + 1}`),
+    title: sanitizeText(item?.title, 'Evidence'),
+    usage: sanitizeText(item?.usage, ''),
+    admissibility: sanitizeText(item?.admissibility, '')
+  }));
+}
+
+function sanitizeWitnesses(value: unknown): CaseTheoryWitnessPlan[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => ({
+    name: sanitizeText(item?.name, 'Witness'),
+    role: sanitizeText(item?.role, ''),
+    purpose: sanitizeText(item?.purpose, ''),
+    hooks: ensureList(item?.hooks)
+  }));
+}
+
+function sanitizeRisks(value: unknown): CaseTheoryRisk[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => ({
+    risk: sanitizeText(item?.risk, ''),
+    severity: resolveSeverity(item?.severity),
+    mitigation: sanitizeText(item?.mitigation, '')
+  }));
+}
+
+function resolveSeverity(value: unknown): 'low' | 'medium' | 'high' {
+  if (typeof value !== 'string') return 'medium';
+  const normalized = value.toLowerCase() as 'low' | 'medium' | 'high';
+  return ['low', 'medium', 'high'].includes(normalized) ? normalized : 'medium';
+}
+
+function sanitizeDeliverables(value: unknown): CaseTheoryDeliverables {
+  if (!value || typeof value !== 'object') return {};
+  const entries: [keyof CaseTheoryDeliverables, string][] = [;
+    ['closingOutline', sanitizeText((value as CaseTheoryDeliverables).closingOutline ?? '')],
+    ['storyAngles', sanitizeText((value as CaseTheoryDeliverables).storyAngles ?? '')],
+    ['juryFocus', sanitizeText((value as CaseTheoryDeliverables).juryFocus ?? '')],
+    ['investigativeGaps', sanitizeText((value as CaseTheoryDeliverables).investigativeGaps ?? '')],
+    ['pressTalkingPoints', sanitizeText((value as CaseTheoryDeliverables).pressTalkingPoints ?? '')]
+  ];
+
+  return Object.fromEntries(entries.filter(([, text]) => text.length > 0));
+}

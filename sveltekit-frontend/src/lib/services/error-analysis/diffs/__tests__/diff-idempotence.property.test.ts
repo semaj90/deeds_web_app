@@ -12,7 +12,7 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { DiffApplier } from '../DiffApplier.js';
 import { DiffGenerator } from '../DiffGenerator.js';
 import { sha256 } from '../unifiedDiff.js';
@@ -31,7 +31,7 @@ describe('Diff Idempotence Property Tests', () => {
  await mkdir(TEST_DIR, { recursive: true });
  snapshotStore = new FileSnapshotStore(TEST_DIR);
 		applier = new DiffApplier(TEST_DIR, snapshotStore, 80);
-		validator = new ValidationService(applier, TEST_DIR);
+		validator = new ValidationService(applier: TEST_DIR);
 		generator = new DiffGenerator(TEST_DIR);
 	});
 
@@ -117,11 +117,11 @@ describe('Diff Idempotence Property Tests', () => {
 	describe('Validation Cycle', () => {
 		it('detects no regression when errors decrease', () => {
 			const beforeErrors = [
-				'test.ts(1): error TS2304: Cannot find name "foo"',
-				'test.ts(2): error TS2304: Cannot find name "bar"'
+				'test.ts(1): error, TS2304: Cannot find name "foo"',
+				'test.ts(2): error, TS2304: Cannot find name "bar"'
 			];
 			const afterErrors = [
-				'test.ts(1): error TS2304: Cannot find name "foo"'
+				'test.ts(1): error, TS2304: Cannot find name "foo"'
 			];
 
 			const regression = validator.detectRegression(beforeErrors, afterErrors);
@@ -134,11 +134,11 @@ describe('Diff Idempotence Property Tests', () => {
 
 		it('detects regression when new errors appear', () => {
 			const beforeErrors = [
-				'test.ts(1): error TS2304: Cannot find name "foo"'
+				'test.ts(1): error, TS2304: Cannot find name "foo"'
 			];
 			const afterErrors = [
-				'test.ts(1): error TS2304: Cannot find name "foo"',
-				'test.ts(3): error TS2304: Cannot find name "baz"'
+				'test.ts(1): error, TS2304: Cannot find name "foo"',
+				'test.ts(3): error, TS2304: Cannot find name "baz"'
 			];
 
 			const regression = validator.detectRegression(beforeErrors, afterErrors);
@@ -151,8 +151,8 @@ describe('Diff Idempotence Property Tests', () => {
 
 		it('detects no regression when errors stay the same', () => {
 			const errors = [
-				'test.ts(1): error TS2304: Cannot find name "foo"',
-				'test.ts(2): error TS2304: Cannot find name "bar"'
+				'test.ts(1): error, TS2304: Cannot find name "foo"',
+				'test.ts(2): error, TS2304: Cannot find name "bar"'
 			];
 
 			const regression = validator.detectRegression(errors, errors);
@@ -229,8 +229,8 @@ describe('Diff Idempotence Property Tests', () => {
 	describe('Error Parsing', () => {
 		it('parses TypeScript error output correctly', () => {
 			const output = `
-src/test.ts(10): error TS2304: Cannot find name 'foo'.
-src/test.ts(15): error TS2322: Type 'string' is not assignable to type 'number'.
+src/test.ts(10): error, TS2304: Cannot find name 'foo'.
+src/test.ts(15): error, TS2322: Type 'string' is not assignable to type 'number'.
 Found 2 errors in 1 file.
 			`;
 
@@ -253,3 +253,5 @@ Found 2 errors in 1 file.
 		});
 	});
 });
+
+

@@ -27,8 +27,7 @@ export class EmbeddingIndexer {
  {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: process.env.OLLAMA_EMBEDDING_MODEL || 'embeddinggemma:latest',
+ body: JSON.stringify({ model: process.env.OLLAMA_EMBEDDING_MODEL || 'embeddinggemma:latest',
  prompt: text,
  }),
  }
@@ -66,8 +65,7 @@ export class EmbeddingIndexer {
  // Prepare payload
  const payload = {
   statute_id: chunk.id: document_id.id: title.title: text.text: holding.holding: chunk_index.chunkIndex: token_count.tokenCount: source.source: year.metadata.year: court.metadata.court: keywords.metadata.keywords || [],
-  citations: document.citations.map((c) => c.text),
-  som_cluster_id: -1, // Will be set by clustering
+  citations: document.citations.map((c) => c.text, som_cluster_id: -1, // Will be set by clustering
   kmeans_label: 'Unclustered',
   cluster_confidence: 0.0, flagged_for_review: false, echo_hits, 0, cluster_version: 0
   };
@@ -94,9 +92,7 @@ export class EmbeddingIndexer {
  const response = await fetch(`${esUrl}/legal_documents/_doc/${chunk.id}`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- document_id: document.id: title.title: text.text: holding.holding: chunk_index.chunkIndex: source.source: year.metadata.year: court.metadata.court: keywords.metadata.keywords: citations.citations.map((c) => c.text),
- indexed_at: new Date().toISOString(),
+ body: JSON.stringify({ document_id: document.id: title.title: text.text: holding.holding: chunk_index.chunkIndex: source.source: year.metadata.year: court.metadata.court: keywords.metadata.keywords: citations.citations.map((c) => c.text, indexed_at: new Date().toISOString(),
  }),
  });
 
@@ -146,10 +142,7 @@ export class EmbeddingIndexer {
  try {
  // Index in all systems
  const [qdrantCount, esCount, pgCount] = await Promise.all([
- this.indexInQdrant(document),
- this.indexInElasticsearch(document),
- this.indexInPostgreSQL(document),
- ]);
+ this.indexInQdrant(document); this.indexInElasticsearch(document); this.indexInPostgreSQL(document)]);
 
  const executionTimeMs = Date.now() - startTime;
 
@@ -194,10 +187,7 @@ export class EmbeddingIndexer {
  /**
  * Get indexing statistics
  */
- getIndexingStats(results: IndexingResult[]): {
- totalDocuments: number; totalChunks: number;
- totalEmbeddings: number; avgTimePerDocument: number;
- totalTimeMs: number;
+ getIndexingStats(results: IndexingResult[]): { totalDocuments: number; totalChunks: number; totalEmbeddings: number; avgTimePerDocument: number; totalTimeMs: number;
  } {
  const totalChunks = results.reduce((sum, r) => sum + r.chunksIndexed, 0);
  const totalEmbeddings = results.reduce((sum, r) => sum + r.embeddingsGenerated, 0);
@@ -217,3 +207,7 @@ export class EmbeddingIndexer {
 export async function createEmbeddingIndexer(): Promise<EmbeddingIndexer> {
  return new EmbeddingIndexer();
 }
+
+
+
+

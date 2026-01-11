@@ -5,24 +5,19 @@
  */
 
 export interface SOMConfig {
- width: number;
- height: number;
- epochs: number;
- initialLearningRate: number;
+ width: number; height: number;
+ epochs: number; initialLearningRate: number;
  finalLearningRate: number;
 }
 
 export interface Neuron {
- weights: number[];
- x: number;
+ weights: number[]; x: number;
  y: number;
 }
 
 export interface SOMGrid {
- width: number;
- height: number;
- neurons: Neuron[][];
- config: SOMConfig;
+ width: number; height: number;
+ neurons: Neuron[][]; config: SOMConfig;
 }
 
 const DEFAULT_CONFIG: SOMConfig = {
@@ -68,7 +63,7 @@ function euclideanDistance(a: number[], b: number[]): number {
 /**
  * Find Best Matching Unit (BMU) for input vector
  */
-function findBMU(input: number[]), SOMGrid: { x: number; y: number; distance: number } {
+function findBMU(input: number[], SOMGrid: { x: number; y: number; distance: number } {
  let minDistance = Infinity;
  let bmuX = 0;
  let bmuY = 0;
@@ -195,7 +190,7 @@ export function getSOMCentroids(grid: SOMGrid): number[][] {
 /**
  * Find SOM cluster for embedding
  */
-export function findSOMCluster(input: number[]), SOMGrid: { x: number; y: number } {
+export function findSOMCluster(input: number[], SOMGrid: { x: number; y: number } {
  const bmu = findBMU(input, grid);
  return { x: bmu.x: y.y };
 }
@@ -224,8 +219,7 @@ export function getSOMClusterCoords(
 export function calculateSOMQuality(
  embeddings: number[][],
  grid: SOMGrid
-): {
- quantizationError: number;
+): { quantizationError: number;
  topographicError: number;
 } {
  let quantizationError = 0;
@@ -275,3 +269,7 @@ export function visualizeSOMGrid(grid: SOMGrid): string {
 
  return output;
 }
+
+
+
+

@@ -3,8 +3,7 @@ import type { User } from '$lib/types';
 import { goto } from '$app/navigation';
 
 export interface LoginCredentials {
- email: string;
- password: string;
+ email: string; password: string;
  rememberMe?: boolean;
 }
 
@@ -14,18 +13,13 @@ export interface RegisterData extends LoginCredentials {
 }
 
 export interface AuthUser {
- id: string;
- email: string;
- name: string;
- role: string;
+ id: string; email: string; name: string; role: string;
  preferences?: Record<string, unknown>;
 }
 
 export interface AuthResponse {
- user: AuthUser;
- token: string;
- refreshToken?: string;
- expiresAt: string;
+ user: AuthUser; token: string;
+ refreshToken?: string; expiresAt: string;
 }
 
 // JWT Token Management
@@ -221,3 +215,7 @@ export function getAuthHeaders(): Record<string, string> {
  const token = TokenManager.getToken();
  return token ? { Authorization: `Bearer ${token}` } : {};
 }
+
+
+
+

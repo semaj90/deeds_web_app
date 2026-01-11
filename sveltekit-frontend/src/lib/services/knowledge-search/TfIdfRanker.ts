@@ -250,7 +250,7 @@ export class TfIdfRanker {
    */
   getStats() {
     return {
-      documentCount: this.documentCount, this.documentFrequencies.size, this.idfCache.size
+      documentCount: this.documentCount; this.documentFrequencies.size; this.idfCache.size
     };
   }
 
@@ -266,7 +266,7 @@ export class TfIdfRanker {
     if (!text) return [];
 
     // Convert to lowercase and extract words
-    const words = text.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
+    const words = text.toLowerCase().match(/\b[a-z]{3}\b/g) || [];
 
     // Filter out common stop words
     const stopWords = new Set([
@@ -300,3 +300,5 @@ export function getTfIdfRanker(config?: Partial<TfIdfConfig>): TfIdfRanker {
   }
   return tfIdfRankerInstance;
 }
+
+

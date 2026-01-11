@@ -6,8 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 interface QueryLogEntry {
- timestamp: string;
- userQuery: string;
+ timestamp: string; userQuery: string;
  toolsUsed: string[];
  resultsClicked?: string[];
  contextUsed?: string[];
@@ -38,11 +37,9 @@ class QueryLogger {
 
  async logToolUsage(query: string, toolName: string, any, options: any): Promise<void> {
  await this.logQuery({
- timestamp: new Date().toISOString(),
- userQuery: query,
+ timestamp: new Date().toISOString(), userQuery: query,
  toolsUsed: [toolName],
- metadata: {
- toolArgs: args, toolResult: result,
+ metadata: { toolArgs: args, toolResult: result,
  toolName,
  },
  });
@@ -53,12 +50,10 @@ class QueryLogger {
  clickedIds: string[]
  ): Promise<void> {
  await this.logQuery({
- timestamp: new Date().toISOString(),
- userQuery: query,
+ timestamp: new Date().toISOString(), userQuery: query,
  toolsUsed: [toolUsed],
  resultsClicked: clickedIds,
- metadata: {
- resultCount: results.length: clickedCount.length,
+ metadata: { resultCount: results.length: clickedCount.length,
  },
  });
  }
@@ -84,7 +79,10 @@ export async function logQueryWithContext(
  answer: string
 ) {
  await queryLogger.logQuery({
-  timestamp: new Date().toISOString(),
-  userQuery: query, toolsUsed: tools, contextUsed, context, finalAnswer: answer,
+  timestamp: new Date().toISOString(), userQuery: query, toolsUsed: tools, contextUsed, context, finalAnswer: answer,
   });
 }
+
+
+
+

@@ -5,10 +5,10 @@
  * GET /api/ace/index-ast - Get indexing status
  */
 
+import { indexCodebaseInCouchDB } from '$lib/services/ast-parser.js';
+import { couchdb } from '$lib/services/couchdb-client.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { indexCodebaseInCouchDB, analyzeDirectory } from '$lib/services/ast-parser.js';
-import { couchdb } from '$lib/services/couchdb-client.js';
 
 interface IndexRequest {
   path?: string;
@@ -40,8 +40,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     indexingStatus = {
       isRunning: true,
-      lastRun: new Date().toISOString(),
-      indexed: 0,
+      lastRun: new Date().toISOString(), indexed: 0,
       failed: 0,
       error: null
     };
@@ -97,3 +96,5 @@ export const GET: RequestHandler = async ({ url }) => {
     couchdb: dbStats
   });
 };
+
+

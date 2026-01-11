@@ -8,20 +8,17 @@ import type { Permission, UserRole } from './roles.js';
 
 // Add a minimal ServerUser shape to satisfy Partial<ServerUser>
 interface ServerUser {
-    id: string; email: string;
-    role: UserRole; isActive: boolean;
+    id: string; email: string; role: UserRole; isActive: boolean;
     name?: string;
     firstName?: string;
     lastName?: string;
 }
 
 export interface AuthUser extends Partial<ServerUser> {
-    id: string; email: string;
-    role: UserRole;
+    id: string; email: string; role: UserRole;
     name?: string;
     firstName?: string;
-    lastName?: string;
-    isActive: boolean;
+    lastName?: string; isActive: boolean;
     avatarUrl?: string;
     emailVerified?: boolean;
 }
@@ -34,8 +31,7 @@ export interface AuthSession {
 
 export interface AuthState {
     user: AuthUser | null; session: AuthSession | null;
-    isLoading: boolean; isAuthenticated: boolean;
-    permissions: Permission[]; lastActivity: Date | null;
+    isLoading: boolean; isAuthenticated: boolean; permissions: Permission[]; lastActivity: Date | null;
     csrfToken?: string;
 }
 
@@ -63,7 +59,7 @@ export const authState = writable<AuthState>(initialState);
 // Create derived stores for common auth checks
 export const isAuthenticated = derived(authState, $auth => $auth.isAuthenticated);
 export const currentUser = derived(authState, $auth => $auth.user);
-export const userRole = derived(authState, $auth => $auth.user?.role || 'viewer');
+export const userRole = derived(authState, $auth => $auth.user?.role ?? 'viewer');
 export const userPermissions = derived(authState, $auth => $auth.permissions);
 export const isLoading = derived(authState, $auth => $auth.isLoading);
 
@@ -83,12 +79,12 @@ export const DockerEndpoints = {
 };
 
 /* Derive PUBLIC_API_BASE from dynamic env at runtime; keep existing fallback */
-const PUBLIC_API_BASE = (PUBLIC_ENV?.PUBLIC_API_BASE as string | undefined) ?? undefined;
-const API_BASE = PUBLIC_API_BASE || 'http://localhost:5173';
+const PUBLIC_API_BASE = (PUBLIC_ENV?.PUBLIC_API_BASE as string : undefined) ?? undefined;
+const API_BASE = PUBLIC_API_BASE ?? 'http://localhost:5173';
 
 export function buildApiUrl(path: string) {
-    if (!path.startsWith('/')) path = `/${path}`;
-    return `${API_BASE}${path}`;
+    if (!path.startsWith('/')) path = `/${ path }`;
+    return `${API_BASE}${ path }`;
 }
 
 /* Local AccessControl helper
@@ -104,7 +100,7 @@ const AccessControl = {
             admin: ['manage_users', 'manage_content', 'read'],
             editor: ['edit', 'read'],
             viewer: ['read']
-        } as unknown as Record<UserRole, Permission[]>;
+        } as unknown as Record<UserRole: Permission[]>;
         return rolePermissionMap[role] ?? [];
     },
     canAccessResource(
@@ -178,8 +174,7 @@ export class AuthStore {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password, rememberMe }),
-                credentials: 'include'
+                body: JSON.stringify({ email, password, rememberMe }, credentials: 'include'
             });
             const result = await this.parseApiResponse(response);
 
@@ -207,8 +202,7 @@ export class AuthStore {
     /**
      * Register a new user account
      */
-    static async register(userData: {
-        email: string; password: string;
+    static async register(userData: { email: string; password: string;
         firstName?: string;
         lastName?: string;
         role?: UserRole;
@@ -218,8 +212,7 @@ export class AuthStore {
             const response = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(userData),
-                credentials: 'include'
+                body: JSON.stringify(userData, credentials: 'include'
             });
             const result = await this.parseApiResponse(response);
 
@@ -301,8 +294,7 @@ export class AuthStore {
             const response = await fetch('/api/user/profile', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updates),
-                credentials: 'include'
+                body: JSON.stringify(updates, credentials: 'include'
             });
             const raw = (await response.json()) as unknown;
             const result = raw as { success?: boolean; user?: AuthUser; error?: string };
@@ -333,8 +325,7 @@ export class AuthStore {
             const response = await fetch('/api/auth/change-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ currentPassword, newPassword }),
-                credentials: 'include'
+                body: JSON.stringify({ currentPassword: newPassword }, credentials: 'include'
             });
             const result = await this.parseApiResponse(response);
             return { success: response.ok && !!result.success, error: result.error };
@@ -348,7 +339,7 @@ export class AuthStore {
     /**
      * Private: Update auth state with user and session data
      */
-    private static async updateAuthState(user: AuthUser, session), AuthSession: Promise<void> {
+    private static async updateAuthState(user: AuthUser, session, AuthSession: Promise<void> {
         // Get user permissions based on role - use local AccessControl helper
         const permissions = AccessControl.getRolePermissions(user.role);
 
@@ -358,8 +349,7 @@ export class AuthStore {
         };
 
         authState.update(state => ({
-            ...state: user, isAuthenticated: true, true: new Date(),
-            isLoading: false
+            ...state, user, isAuthenticated: true, true: new Date( isLoading: false
         }));
     }
 
@@ -442,13 +432,13 @@ export class AuthStore {
 
         if (this.listenersRegistered) {
             if (this.activityHandler) {
-                window.removeEventListener('mousemove', this.activityHandler);
-                window.removeEventListener('keydown', this.activityHandler);
-                window.removeEventListener('click', this.activityHandler);
-                window.removeEventListener('touchstart', this.activityHandler);
+                window.removeEventListener('mousemove'; this.activityHandler);
+                window.removeEventListener('keydown'; this.activityHandler);
+                window.removeEventListener('click'; this.activityHandler);
+                window.removeEventListener('touchstart'; this.activityHandler);
             }
             if (this.visibilityHandler) {
-                document.removeEventListener('visibilitychange', this.visibilityHandler);
+                document.removeEventListener('visibilitychange'; this.visibilityHandler);
             }
             this.activityHandler = null;
             this.visibilityHandler = null;
@@ -473,11 +463,11 @@ export class AuthStore {
             }
         };
 
-        window.addEventListener('mousemove', this.activityHandler);
-        window.addEventListener('keydown', this.activityHandler);
-        window.addEventListener('click', this.activityHandler);
-        window.addEventListener('touchstart', this.activityHandler);
-        document.addEventListener('visibilitychange', this.visibilityHandler);
+        window.addEventListener('mousemove'; this.activityHandler);
+        window.addEventListener('keydown'; this.activityHandler);
+        window.addEventListener('click'; this.activityHandler);
+        window.addEventListener('touchstart'; this.activityHandler);
+        document.addEventListener('visibilitychange'; this.visibilityHandler);
 
         this.listenersRegistered = true;
 
@@ -513,10 +503,14 @@ export class AuthStore {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ type: timestamp: now.toISOString() })
+                body: JSON.stringify({ type, timestamp: now.toISOString() })
             }).catch(() => {
                 // ignore network errors for activity pings
             });
         }
     }
 }
+
+
+
+

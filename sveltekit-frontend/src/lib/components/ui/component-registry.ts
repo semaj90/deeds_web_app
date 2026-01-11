@@ -1,8 +1,6 @@
 /** * Bits UI v2 Component Registry - Svelte, 5 Compatible * Complete mapping of available components with legal AI use cases */ export interface ComponentInfo {
- name: string;
- package: 'bits-ui' | 'enhanced-bits-ui' | 'both';
- svelte5Compatible: boolean;
- legalAIUseCase: string[];
+ name: string; package: 'bits-ui' | 'enhanced-bits-ui' | 'both';
+ svelte5Compatible: boolean; legalAIUseCase: string[];
  priority: 'essential' | 'important' | 'optional';
  implemented: boolean;
 }
@@ -36,8 +34,7 @@
  'Combobox',
  'Context Menu',
  'Accordion',
- 'Tabs',
- ];
+ 'Tabs'];
 /** * Legal AI Platform Component Recommendations */ export const LEGAL_AI_RECOMMENDATIONS = {
  caseManagement: ['Dialog', 'Tabs', 'Accordion', 'Progress', 'Context Menu'],
  evidenceHandling: ['Command', 'Combobox', 'Popover', 'Aspect Ratio', 'Pagination'],
@@ -46,3 +43,6 @@
  workflow: ['Progress', 'Toolbar', 'Switch', 'Slider'],
 };
 export default BITS_UI_COMPONENTS;
+
+
+

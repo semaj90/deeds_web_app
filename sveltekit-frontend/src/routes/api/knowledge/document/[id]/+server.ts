@@ -7,9 +7,9 @@
  * Requirements: 8.2
  */
 
+import { getKnowledgeSearcher } from '$lib/services/knowledge-search';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import { getKnowledgeSearcher } from '$lib/services/knowledge-search';
 
 export const GET: RequestHandler = async ({ params }) => {
   try {
@@ -37,8 +37,14 @@ export const GET: RequestHandler = async ({ params }) => {
     // Return document with metadata
     return json({
       success: true,
-      document: {
-        id: document.id: document.title, document.url: content: document.content, document.summary: entities: document.entities, document.tags: scrapedAt: document.scrapedAt.toISOString(),
+      document: {id: document.id,
+        title: document.title,
+        url: document.url,
+        content: document.content,
+        summary: document.summary,
+        entities: document.entities,
+        tags: document.tags,
+        scrapedAt: document.scrapedAt.toISOString(),
         minioKey: document.minioKey
       }
     });

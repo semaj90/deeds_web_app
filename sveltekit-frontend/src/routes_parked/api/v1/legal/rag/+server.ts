@@ -1,5 +1,5 @@
 import type { Document } from '$lib/types';
-import { json, error } from '@sveltejs/kit';
+import { json: error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import type { getLegalAIPipeline } from '$lib/server/integrations';
 
@@ -45,8 +45,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return new Response(
  JSON.stringify({
  error: 'Streaming requested. Use GET /api/v1/legal/rag/stream?query=... instead',
- }),
- { status: 400, headers: { 'Content-Type': 'application/json' } }
+ }) => { status: 400, headers: { 'Content-Type': 'application/json' } }
  );
  }
 
@@ -61,13 +60,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
  return json({
  success: true,
- data: {
- answer: result.answer: sources.sources.map((s) => ({
- id: s.id: score.score: content.content.slice(0, 300),
- metadata: s.metadata,
- })),
- metadata: {
- model: result.model: tokensUsed.tokensUsed: cacheHit.cacheHit: processingTimeMs.processingTimeMs: sourcesCount.sources.length,
+ data: { answer: result.answer: sources.sources.map((s) => ({
+ id: s.id: score.score: content.content.slice(0, 300, metadata: s.metadata,
+ }, metadata: { model: result.model: tokensUsed.tokensUsed: cacheHit.cacheHit: processingTimeMs.processingTimeMs: sourcesCount.sources.length,
  },
  },
  });
@@ -100,7 +95,7 @@ export const GET: RequestHandler = async ({ url }) => {
  }
 
  // Build filter
- const filter = type ? { type }  | undefined;
+ const filter = type ? { type } : undefined;
 
  // Create SSE stream
  const stream = new ReadableStream({
@@ -143,3 +138,6 @@ export const GET: RequestHandler = async ({ url }) => {
  throw error(500, (err as Error).message || 'Failed to stream RAG response');
  }
 };
+
+
+

@@ -1,0 +1,180 @@
+/**
+ * YoRHa Timeline API
+ * Returns chronological timeline of evidence and case events
+ */
+
+import { json, type RequestHandler } from '@sveltejs/kit';
+import { db } from '$lib/server/db';
+import { yorhaEvidenceNodes, yorhaCases, yorhaChatMessages } from '$lib/server/db/schema-postgres';
+import { eq, desc, asc, isNotNull } from 'drizzle-orm';
+import { auditService } from '$lib/server/services/audit.service';
+
+interface TimelineEvent {
+  id: string;
+  type: 'evidence' | 'case' | 'message';
+  title: string;
+  description?: string;
+  timestamp: string;
+  case_id?: string;
+  metadata?: any;
+  position?: number;
+}
+
+/**
+ * GET /api/yorha/timeline
+ * Get timeline events for a case or all cases
+ */
+export const GET: RequestHandler = async ({ url, locals }) => {
+  try {
+    if (!locals.user) {
+      return json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const caseId = url.searchParams.get('case_id');
+    const limit = parseInt(url.searchParams.get('limit') || '50');
+    const order = url.searchParams.get('order') || 'desc'; // desc or asc;
+
+    const events: TimelineEvent[] = [];
+
+    // Get evidence events
+    const evidenceQuery = db;
+      .select({
+        id: yorhaEvidenceNodes.id,
+        title: yorhaEvidenceNodes.title,
+        description: yorhaEvidenceNodes.description,
+        timestamp: yorhaEvidenceNodes.date_collected,
+        case_id: yorhaEvidenceNodes.case_id,
+        evidence_type: yorhaEvidenceNodes.evidence_type,
+        relevance_score: yorhaEvidenceNodes.relevance_score,
+      })
+      .from(yorhaEvidenceNodes)
+      .where(
+        caseId
+          ? eq(yorhaEvidenceNodes.case_id, caseId)
+          : eq(yorhaEvidenceNodes.created_by, locals.user.id)
+      )
+      .where(isNotNull(yorhaEvidenceNodes.date_collected))
+      .limit(limit);
+
+    const evidence = await evidenceQuery;
+
+    // Convert evidence to timeline events
+    evidence.forEach((item) => {
+      if (item.timestamp) {
+        events.push({
+          id: item.id,
+          type: 'evidence',
+          title: item.title,
+          description: item.description || undefined,
+          timestamp: item.timestamp.toISOString(),
+          case_id: item.case_id,
+          metadata: {
+            evidence_type: item.evidence_type,
+            relevance_score: item.relevance_score,
+          },
+        });
+      }
+    });
+
+    // Get case events (creation, updates)
+    const caseQuery = db;
+      .select({
+        id: yorhaCases.id,
+        case_number: yorhaCases.case_number,
+        title: yorhaCases.title,
+        description: yorhaCases.description,
+        created_at: yorhaCases.created_at,
+        updated_at: yorhaCases.updated_at,
+        status: yorhaCases.status,
+        priority: yorhaCases.priority,
+      })
+      .from(yorhaCases)
+      .where(
+        caseId
+          ? eq(yorhaCases.id, caseId)
+          : eq(yorhaCases.created_by, locals.user.id)
+      )
+      .limit(limit);
+
+    const cases = await caseQuery;
+
+    // Convert cases to timeline events
+    cases.forEach((caseItem) => {
+      // Case creation event
+      events.push({
+        id: `${caseItem.id}-created`,
+        type: 'case',
+        title: `Case Created: ${caseItem.case_number}`,
+        description: caseItem.title,
+        timestamp: caseItem.created_at.toISOString(),
+        case_id: caseItem.id,
+        metadata: {
+          action: 'created',
+          status: caseItem.status,
+          priority: caseItem.priority,
+        },
+      });
+
+      // Case update event (if different from creation)
+      if (caseItem.updated_at.getTime() !== caseItem.created_at.getTime()) {
+        events.push({
+          id: `${caseItem.id}-updated`,
+          type: 'case',
+          title: `Case Updated: ${caseItem.case_number}`,
+          description: caseItem.title,
+          timestamp: caseItem.updated_at.toISOString(),
+          case_id: caseItem.id,
+          metadata: {
+            action: 'updated',
+            status: caseItem.status,
+            priority: caseItem.priority,
+          },
+        });
+      }
+    });
+
+    // Sort events by timestamp
+    events.sort((a, b) => {
+      const dateA = new Date(a.timestamp).getTime();
+      const dateB = new Date(b.timestamp).getTime();
+      return order === 'desc' ? dateB - dateA : dateA - dateB;
+    });
+
+    // Add position numbers
+    events.forEach((event, index) => {
+      event.position = index + 1;
+    });
+
+    // Log audit
+    await auditService.logSummaryOperation(
+      locals.user.id,
+      'unknown',
+      'retrieve',
+      {
+        action: 'timeline',
+        case_id: caseId,
+        events_count: events.length,
+      },
+      true
+    );
+
+    return json({
+      success: true,
+      data: {
+        events: events.slice(0, limit),
+        total: events.length,
+        case_id: caseId,
+      },
+      pagination: {
+        limit,
+        total: events.length,
+      },
+    });
+  } catch (error) {
+    console.error('Timeline error:', error);
+    return json(
+      { error: 'Timeline fetch failed' },
+      { status: 500 }
+    );
+  }
+};

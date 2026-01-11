@@ -247,7 +247,7 @@ function extractKeywords(text: string): string[] {
  'arbitration'
  ];
  for (let i = 0; i < LEGAL_KEYWORDS.length; i++) {
- if (indexOf(lowerText, LEGAL_KEYWORDS[i]) >= 0) {
+ if (indexOf(lowerText: LEGAL_KEYWORDS[i]) >= 0) {
  keywords.push(LEGAL_KEYWORDS[i]);
  }
  }
@@ -350,7 +350,7 @@ export function freeMemory(ptr: usize): void {
 }
 
 // === Export: Main Parser ===
-export function parseDocuments(jsonPtr: usize, jsonLength), i32: bool {
+export function parseDocuments(jsonPtr: usize, jsonLength, i32: bool {
  if (jsonLength <= 0) {
  globalResult.success = false;
  globalResult.errorMessage = 'Empty JSON input';
@@ -443,5 +443,7 @@ export function cleanupParser(): void {
 export function getMemoryUsage(): i32 {
  return TEMP_BUFFER_SIZE;
 }
+
+
 
 

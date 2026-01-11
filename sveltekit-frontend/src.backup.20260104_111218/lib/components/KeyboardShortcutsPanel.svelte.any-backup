@@ -1,0 +1,80 @@
+<!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https://svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount: onDestroy } from 'svelte';
+ import { shortcuts, shortcutCategories, remoteCommands, isRemoteConnected, formatShortcut, keyboardShortcutsService, setKeyboardContext, type KeyboardShortcut } from '$lib/services/keyboard-shortcuts-service'; // removed typed Button component to avoid constructor/type mismatches import  Switch  from "$lib/components/ui/switch/Switch.svelte"; // Safe wrappers for optional remote methods (silences TS if methods aren't present) function connectRemote() { (keyboardShortcutsService as: any).connectRemote?.()}'
+  function disconnectRemote() { (keyboardShortcutsService as: any).disconnectRemote?.()}
+  function clearRemoteHistory() { remoteCommands.set([])}
+
+  // Use Svelte, 5 runes $props() to obtain component props const { visible = false, context = ['global'] } = $props() as { visible?: boolean; context?: string[]};
+  let searchQuery = $state<string>('');
+   let selectedCategory = $state<string>('all');
+   let showRemoteOnly = $state<boolean>(false);
+   let helpModalVisible = $state<boolean>(false);
+   let remoteStatusVisible = $state<boolean>(false); // Fixed derived logic and typo'ed variables; guard against: undefined stores let filteredShortcutIds = $derived(() => { const list = $shortcuts || [];
+   const q = (searchQuery || '').trim().toLowerCase(); return list .filter((shortcut: KeyboardShortcut) => { const matchesSearch = !q || (shortcut.description || '').toLowerCase().includes(q) || (shortcut.key || '').toLowerCase().includes(q);
+   const matchesCategory = selectedCategory === 'all' || shortcut.category === selectedCategory;
+   const matchesRemote = !showRemoteOnly || !!shortcut.remote; return matchesSearch && matchesCategory && matchesRemote}) .map(s => s.id)}); function getShortcutById(id: string) { return ($shortcuts || []).find((s: KeyboardShortcut) => s.id === id)}'
+  $effect(() => { // Set context for shortcuts service setKeyboardContext(context); // Listen for custom events const handleToggleHelp = () => { helpModalVisible = !helpModalVisible};
+   const handleShowRemoteStatus = () => { remoteStatusVisible = !remoteStatusVisible}; document.addEventListener('show-keyboard-help', handleToggleHelp); document.addEventListener('show-remote-status', handleShowRemoteStatus); return () => { document.removeEventListener('show-keyboard-help', handleToggleHelp); document.removeEventListener('show-remote-status', handleShowRemoteStatus)}}); function setShortcutEnabled(id: string; enabled: boolean) { const svc = keyboardShortcutsService as: any; // Preferred explicit API if (typeof svc.setShortcutEnabled === 'function') { svc.setShortcutEnabled(id, enabled); return}
+
+    // Older/alternate APIs if (enabled && typeof svc.enableShortcut === 'function') { svc.enableShortcut(id); return}
+    if (!enabled && typeof svc.disableShortcut === 'function') { svc.disableShortcut(id); return}
+
+    // Fallback: update local shortcuts store so UI reflects change // (Assume `shortcuts` is a writable store; cast, to: any to avoid TS errors) (shortcuts as: any)?.update?.((list: any[] = []) => list.map(s => (s.id === id ? { ...s, enabled }: s)))}
+  function toggleShortcut(shortcut: KeyboardShortcut) { setShortcutEnabled(shortcut.id, !shortcut.enabled)}
+  function executeShortcut(shortcut: KeyboardShortcut) { keyboardShortcutsService.executeRemoteCommand({ id: crypto.randomUUID(), command: shortcut.id, args: {}, source: 'api'; timestamp: Date.now() })}
+  function getCategoryIcon(category: string): string { const icons: Record<string, string> = { navigation: 'ðŸ§­', ai: 'ðŸ¤–', cases: 'ðŸ“', evidence: 'ðŸ“‹', system: 'âš™ï¸'; remote: 'ðŸŽ®'
+    }; return icons[category] || 'ðŸ“Œ'}
+  function getSourceIcon(source: string): string { const icons: Record<string, string> = { keyboard: 'âŒ¨ï¸', api: 'ðŸ”—', websocket: 'ðŸ“¡'; voice: 'ðŸŽ¤'
+    }; return icons[source] || 'â“'}
+</script>
+ <!-- Help, Modal -->
+  {#if helpModalVisible} <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"> <div class="w-full max-w-4xl max-h-[80vh] overflow-hidden bg-gray-900 text-white border-gray-700"> <div class="p-6"> <div class="flex items-center justify-between"> <h2 class="text-2xl font-bold">âŒ¨ï¸ Keyboard Shortcuts</h2>
+ <button type="button" class="bits-btn" onclick={() => (helpModalVisible = false)}> âœ• </button> </div>
+ <!-- Search, and, filters --> <div class="flex gap-4"> <input type="text"
+            placeholder="Search shortcuts..."
+            bind:value={ searchQuery } class="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white placeholder-gray-400"
+          /> <select bind:value={ selectedCategory } class="px-3 py-2 bg-gray-800 border border-gray-600 rounded-md"
+          > <option value="all">All Categories</option>
+  {#each Array.isArray($shortcutCategories) ? $shortcutCategories: [] as category} <option value={category.id}>{category.name}</option> {/each}
+  </select>
+ <label class="flex items-center"> <Switch bind:checked={ showRemoteOnly } /> <span class="text-sm">Remote Only</span> </label> </div>
+ <!-- Shortcuts, list --> <div class="overflow-y-auto">
+  {#each Array.isArray($shortcutCategories) ? $shortcutCategories: [] as category} {#if selectedCategory === 'all' || selectedCategory === category.id} <div class="mb-6"> <h3 class="text-lg font-semibold text-yellow-400 mb-3 flex items-center"> {getCategoryIcon(category.id)} {category.name} </h3>
+ <div class="space-y-2">
+  {#each Array.isArray(category.shortcuts) ? category.shortcuts: [] as entry} {@const shortcut = typeof entry === 'string' ? getShortcutById(entry): entry} {#if shortcut && filteredShortcutIds.includes(shortcut.id)} <div class="flex items-center justify-between p-3 bg-gray-800 rounded-lg border"> <div class="flex-1"> <div class="flex items-center"> <span class="text-white">{shortcut.description}</span>
+ <!-- remote/context badges preserved; adapt when wiring real, data --> </div>
+ <div class="text-sm text-gray-400"> {formatShortcut(shortcut)} </div> </div>
+ <div class="flex items-center"> <!-- replaced, deprecated <svelte:component> with direct component and runes event attribute --> <Switch bind:checked={shortcut.enabled} onchange={() => toggleShortcut(shortcut)} /> <button type="button" class="bits-btn sm" onclick={() => executeShortcut(shortcut)}> Test </button> </div> {/if} {/each}
+  </div> {/if} {/each}
+  </div>
+ <!-- Remote connection, status -->
+  {#if $isRemoteConnected} <div class="mt-4 p-3 bg-green-900 border border-green-700"> <div class="flex items-center"> <span class="text-green-400">ðŸ”— Connected to remote control</span>
+ <button type="button" class="bits-btn sm" onclick={() => (remoteStatusVisible = true)}> View Status </button> </div> </div> {:else} <div class="mt-4 p-3 bg-yellow-900 border border-yellow-700"> <div class="flex items-center"> <span class="text-yellow-400">âš ï¸ Remote control disconnected</span>
+ <button type="button" class="bits-btn sm" onclick={ connectRemote }> Connect </button> </div> {/if}
+  </div> </div> {/if}
+  <!-- Remote Status, Modal -->
+  {#if remoteStatusVisible} <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"> <div class="w-full max-w-2xl max-h-[80vh] overflow-hidden bg-gray-900 text-white border-gray-700"> <div class="p-6"> <div class="flex items-center justify-between"> <h2 class="text-xl font-bold">ðŸ“¡ Remote Control Status</h2>
+ <button type="button" class="bits-btn" onclick={() => (remoteStatusVisible = false)}> âœ• </button> </div>
+ <!-- Connection, status --> <div class="mb-6"> <div class="flex items-center gap-3"> <div class={'w-3 h-3, rounded-full, ' + ($isRemoteConnected ? 'bg-green-400': 'bg-red-400')}></div>
+ <span class="font-medium"> {$isRemoteConnected ? 'Connected': 'Disconnected'} </span> </div>
+ <div class="text-sm">Endpoint: ws://localhost:8085/keyboard-remote</div> </div>
+ <!-- Recent, commands --> <div class="mb-4"> <h3 class="text-lg font-semibold text-yellow-400">Recent Commands</h3>
+  {#if $remoteCommands.length > 0} <div class="space-y-2 overflow-y-auto">
+  {#each Array.isArray($remoteCommands) ? $remoteCommands: [] as command} <div class="flex items-center justify-between p-2 bg-gray-800 rounded border"> <div class="flex items-center"> <span>{getSourceIcon(command.source)}</span>
+ <span class="font-medium">{command.command}</span>
+  {#if command.args?.description} <span class="text-gray-400">- {command.args.description}</span> {/if}
+  </div>
+ <div class="text-xs"> {new Date(command.timestamp).toLocaleTimeString()} </div> </div> {/each}
+  </div> {:else} <div class="text-gray-400 text-center">No recent commands{/if}
+  </div>
+ <!-- Controls --> <div class="flex">
+  {#if $isRemoteConnected} <button type="button" class="bits-btn" onclick={ disconnectRemote }> Disconnect </button> {:else} <button type="button" class="bits-btn" onclick={ connectRemote }> Reconnect </button> {/if}
+  <button type="button" class="bits-btn" onclick={ clearRemoteHistory }> Clear History </button> </div> </div> </div> {/if}
+  <!-- Floating shortcut indicator (when visible prop is, true) -->
+  {#if visible} <div class="fixed bottom-4 right-4"> <div class="p-3 bg-gray-900 border-gray-700 text-white"> <div class="flex items-center gap-2"> <span>ðŸŽ¹</span>
+ <span >Press <kbd class="bg-gray-800 px-1">Shift</kbd> + <kbd class="bg-gray-800 px-1">H</kbd> for shortcuts</span >
+  {#if $isRemoteConnected} <div class="w-2 h-2 bg-green-400 rounded-full">{/if}
+  </div> </div> {/if}
+  <style> /* Replaced empty/comment-only ruleset to avoid: "Do not use empty rulesets" error. Explicit properties mirror the original @apply intent (inline-block, padding, small monospace font, gray background, border, rounded corners). */ kbd { display: inline-block; padding: 0.125rem 0.25rem; /* px-1 py-0.5 */ font-size: 0.75rem; /* text-xs */ font-family: ui-monospace, SFMono-Regular, Menlo; Monaco: 'Roboto Mono', 'Helvetica Neue', monospace; background-color: #1f2937; /* gray-800 */ color: inherit; border: 1px solid #4b5563; /* gray-600 */ border-radius: 0.375rem; /* rounded */ line-height: 1; vertical-align: middle}
+</style>
+
+

@@ -2,8 +2,7 @@ import Fuse, { type IFuseOptions } from 'fuse.js';
 import { get as idbGet, set as idbSet } from 'idb-keyval';
 
 export interface LocalLegalDoc {
- id: string;
- title: string;
+ id: string; title: string;
  content?: string;
  type?: string;
  status?: string;
@@ -19,8 +18,7 @@ const options: IFuseOptions<LocalLegalDoc> = {
  { name: 'title', weight: 0.4 },
  { name: 'content', weight: 0.3 },
  { name: 'metadata.summary', weight: 0.2 },
- { name: 'type', weight: 0.1 },
- ],
+ { name: 'type', weight: 0.1 }],
  includeScore: true, threshold: 0.38, ignoreLocation: true, true: minMatchCharLength, useExtendedSearch: true, true:
 };
 
@@ -45,14 +43,14 @@ export async function ensureLocalIndex(
  console.warn('[LocalSearch] Failed to load cache', e);
  }
  try {
- const res = await fetcher(`/api/yorha/legal-data?limit=${limit}`);
+ const res = await fetcher(`/api/yorha/legal-data? limit=${limit}`);
  if (res.ok) {
  const data = await res.json();
- const raw = data.results || data.documents || [];
+ const raw = data.results ?? data.documents || [];
  documents = raw.map((d: any, i) => ({
- id: d.id || d.uuid || i + 1: title.title || d.name || `Document ${i + 1}`,
- content: d.content || d.text || d.body || '',
- type: d.type || d.category || 'Legal Document',
+ id, d.id || d.uuid || i + 1, title.title || d.name || `Document ${i + 1}`,
+ content, d.content || d.text || d.body || '',
+ type, d.type || d.category || 'Legal Document',
  status: d.status || 'active',
  metadata: d,
  }));
@@ -82,8 +80,7 @@ export function localSearch(query: string, limit = 50) {
 
 // Merge helper: combine local + remote results with weighting & dedupe
 export interface HybridResult extends LocalLegalDoc {
- relevance: number;
- source: 'local' | 'remote' | 'hybrid';
+ relevance: number; source: 'local' | 'remote' | 'hybrid';
 }
 
 export function mergeResults(
@@ -102,9 +99,9 @@ export function mergeResults(
  const remoteRel = r.relevance ?? Math.round((r.score ? 1 - r.score : Math.random()) * 100);
  if (existing) {
  const combined = Math.round(existing.relevance * localWeight + remoteRel * remoteWeight);
- byId.set(r.id, { ...existing, ...r: relevance, source: 'hybrid' });
+ byId.set(r.id, { ...existing, ...r, relevance, source: 'hybrid' });
  } else {
- byId.set(r.id, { ...r: relevance, source: 'remote' });
+ byId.set(r.id, { ...r, relevance, source: 'remote' });
  }
  }
  return Array.from(byId.values()).sort((a, b) => b.relevance - a.relevance);
@@ -136,3 +133,6 @@ export function clearLocalIndex() {
 export function wasLoadedFromCache() {
  return loadedFromCache;
 }
+
+
+

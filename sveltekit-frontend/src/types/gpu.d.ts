@@ -12,28 +12,23 @@ declare global {
 
 // CUDA Service Types
 export interface CUDADevice {
-  id: number;
-  name: string;
-  computeCapability: string;
-  memoryTotal: number;
+  id: number; name: string;
+  computeCapability: string; memoryTotal: number;
   memoryFree: number;
   temperature?: number;
   utilization?: number;
 }
 
 export interface CUDAServiceStatus {
-  available: boolean;
-  devices: CUDADevice[];
+  available: boolean; devices: CUDADevice[];
   driverVersion?: string;
   runtimeVersion?: string;
 }
 
 // WebGPU SOM Cache Types
 export interface WebGPUSOMCache {
-  maxNodes: number;
-  dimensions: number;
-  learningRate: number;
-  neighborhoodRadius: number;
+  maxNodes: number; dimensions: number;
+  learningRate: number; neighborhoodRadius: number;
   decayRate: number;
   // Methods
   findSimilar(vector: Float32Array, k?: number): Array<unknown>;
@@ -63,10 +58,8 @@ export interface LocalLLMConnector {
 
 // Hidden Markov Model for AssemblyScript compatibility
 export class HiddenMarkovModel {
-  constructor(config: {
-    stateCount: number;
-    observationCount: number;
-    transitionSmoothness: number;
+  constructor(config: { stateCount: number;
+    observationCount: number; transitionSmoothness: number;
     emissionSmoothness: number;
   });
   train(observations: number[][]): void;
@@ -117,3 +110,7 @@ declare global {
 }
 
 export {};
+
+
+
+

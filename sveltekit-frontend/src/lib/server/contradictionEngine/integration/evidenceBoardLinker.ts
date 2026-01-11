@@ -1,11 +1,9 @@
 import type { FactContradiction } from '../types.js';
 
 export interface EvidenceBoard {
- addLink(link: {
- from: string | undefined;
+ addLink(link: { from: string | undefined;
  to: string | undefined;
- color: string;
- label: string;
+ color: string; label: string;
  }): void;
 }
 
@@ -20,3 +18,7 @@ export function linkContradictionsToBoard(
  });
  }
 }
+
+
+
+

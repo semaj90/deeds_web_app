@@ -6,21 +6,15 @@
 import type { EvidenceNode, SimilarityResult } from './case-similarity-service.js';
 
 export interface AISuggestion {
- id: string;
- type: 'evidence' | 'strategy' | 'risk' | 'precedent' | 'investigation';
- title: string;
- description: string;
- confidence: number;
- relatedNodes: string[];
- actionItems?: string[];
- priority: 'low' | 'medium' | 'high' | 'critical';
+ id: string; type: 'evidence' | 'strategy' | 'risk' | 'precedent' | 'investigation';
+ title: string; description: string;
+ confidence: number; relatedNodes: string[];
+ actionItems?: string[]; priority: 'low' | 'medium' | 'high' | 'critical';
 }
 
 export interface SuggestionContext {
- selectedNodes: EvidenceNode[];
- caseType: string;
- jurisdiction: string;
- currentPhase: string;
+ selectedNodes: EvidenceNode[]; caseType: string;
+ jurisdiction: string; currentPhase: string;
 }
 
 export class AISuggestionsService {
@@ -35,8 +29,7 @@ export class AISuggestionsService {
  const possibleEndpoints = [
  'http://localhost:11434',
  'http://127.0.0.1:11434',
- process.env.OLLAMA_ENDPOINT: process.env.PUBLIC_OLLAMA_URL,
- ].filter(Boolean);
+ process.env.OLLAMA_ENDPOINT: process.env.PUBLIC_OLLAMA_URL].filter(Boolean);
 
  return possibleEndpoints[0] || 'http://localhost:11434';
  }
@@ -75,8 +68,7 @@ export class AISuggestionsService {
  if (priorityDiff !== 0) return priorityDiff;
  return b.confidence - a.confidence;
  });
-
- // Cache results
+  
  this.suggestionCache.set(cacheKey, suggestions);
 
  return suggestions.slice(0, 10); // Return top 10 suggestions
@@ -101,13 +93,11 @@ export class AISuggestionsService {
  type: 'evidence',
  title: `Consider adding ${missingType} evidence`,
  description: `Your case appears to lack ${missingType} evidence, which could strengthen your position. Consider gathering ${this.getEvidenceExamples(missingType)}.`,
- confidence: 0.8, relatedNodes: context.selectedNodes.map((n) => n.id),
- priority: 'high',
+ confidence: 0.8, relatedNodes: context.selectedNodes.map((n) => n.id, priority: 'high',
  actionItems: [
  `Identify potential ${missingType} sources`,
  `Document collection procedures`,
- `Preserve chain of custody`,
- ],
+ `Preserve chain of custody`],
  };
  suggestions.push(suggestion);
  }
@@ -133,9 +123,7 @@ export class AISuggestionsService {
  const suggestions: AISuggestion[] = [];
 
  try {
- const prompt = `Analyze this legal case and suggest strategic approaches:
-
-Case Type: ${context.caseType}
+ const prompt = `Analyze this legal case and suggest strategic approaches: Case, Type: ${context.caseType}
 Jurisdiction: ${context.jurisdiction}
 Current Phase: ${context.currentPhase}
 Evidence Summary: ${context.selectedNodes.map((n) => `${n.type}: ${n.title}`).join(', ')}
@@ -147,11 +135,9 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- model: 'gemma3-legal:latest',
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
  prompt: stream,
- options: {
- temperature: 0.3, num_predict: 200
+ options: { temperature: 0.3, num_predict: 200
  },
  }),
  });
@@ -162,10 +148,9 @@ Provide 2-3 strategic recommendations with confidence levels.`;
 
  strategies.forEach((strategy, index) => {
  suggestions.push({
- id: `strategy_${index}_${Date.now()}`,
+ id: `strategy_${ index }_${Date.now()}`,
  type: 'strategy',
- title: strategy.title: description.description: confidence.confidence: relatedNodes.selectedNodes.map((n) => n.id),
- priority: strategy.priority: actionItems.actions,
+ title: strategy.title: description.description: confidence.confidence: relatedNodes.selectedNodes.map((n) => n.id, priority: strategy.priority: actionItems.actions,
  });
  });
  }
@@ -188,8 +173,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  id: `risk_${gap.type}_${Date.now()}`,
  type: 'risk',
  title: `High-risk evidence gap: ${gap.type}`,
- description: gap.description: confidence.confidence: relatedNodes.selectedNodes.map((n) => n.id),
- priority: 'critical',
+ description: gap.description: confidence.confidence: relatedNodes.selectedNodes.map((n) => n.id, priority: 'critical',
  actionItems: gap.mitigationSteps,
  });
  }
@@ -218,8 +202,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  actionItems: [
  'Research similar case outcomes',
  'Analyze applicable legal principles',
- 'Document precedent citations',
- ],
+ 'Document precedent citations'],
  };
  suggestions.push(precedentSuggestion);
  }
@@ -243,12 +226,9 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  return examples[type] || 'supporting documentation';
  }
 
- private analyzeEvidenceGaps(nodes: EvidenceNode[]): Array<{
- type: string;
- description: string;
- riskLevel: 'low' | 'medium' | 'high';
- confidence: number;
- mitigationSteps: string[];
+ private analyzeEvidenceGaps(nodes: EvidenceNode[]): Array<{ type: string;
+ description: string; riskLevel: 'low' | 'medium' | 'high';
+ confidence: number; mitigationSteps: string[];
  }> {
  const gaps = [];
 
@@ -272,8 +252,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  mitigationSteps: [
  'Document timeline gaps',
  'Explain missing periods',
- 'Gather bridging evidence',
- ],
+ 'Gather bridging evidence'],
  });
  }
  }
@@ -289,18 +268,15 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  mitigationSteps: [
  'Identify potential witnesses',
  'Prepare witness questionnaires',
- 'Schedule depositions',
- ],
+ 'Schedule depositions'],
  });
  }
 
  return gaps;
  }
 
- private parseStrategyResponse(response: string): Array<{
- title: string;
- description: string;
- confidence: number;
+ private parseStrategyResponse(response: string): Array<{ title: string;
+ description: string; confidence: number;
  priority: 'low' | 'medium' | 'high' | 'critical';
  actions: string[];
  }> {
@@ -311,8 +287,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  for (const line of lines) {
  if (line.includes('strategy') || line.includes('approach') || line.includes('recommend')) {
  strategies.push({
- title: line.substring(0, 50).trim(),
- description: line, confidence: 0.8,
+ title: line.substring(0, 50).trim( description: line, confidence: 0.8,
  priority: 'medium',
  actions: ['Evaluate feasibility', 'Assess risks', 'Plan implementation'],
  });
@@ -329,18 +304,15 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  type: 'evidence',
  title: 'Review evidence completeness',
  description: 'Consider reviewing all evidence to ensure completeness before proceeding.',
- confidence: 0.6, relatedNodes: context.selectedNodes.map((n) => n.id),
- priority: 'medium',
+ confidence: 0.6, relatedNodes: context.selectedNodes.map((n) => n.id, priority: 'medium',
  },
  {
  id: 'fallback_2',
  type: 'strategy',
  title: 'Consult with legal team',
  description: 'Consider consulting with your legal team about case strategy.',
- confidence: 0.7, relatedNodes: context.selectedNodes.map((n) => n.id),
- priority: 'high',
- },
- ];
+ confidence: 0.7, relatedNodes: context.selectedNodes.map((n) => n.id, priority: 'high',
+ }];
  }
 
  private generateCacheKey(context: SuggestionContext): string {
@@ -360,3 +332,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
 }
 
 export const aiSuggestionsService = new AISuggestionsService();
+
+
+
+

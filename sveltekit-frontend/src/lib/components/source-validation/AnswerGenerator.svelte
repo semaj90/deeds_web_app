@@ -1,4 +1,5 @@
 <script lang="ts">
+
 /**
  * AnswerGenerator Component (Svelte 5)
  * Display LLM-generated answer with inline citations
@@ -79,7 +80,7 @@ function renderAnswerWithClickableCitations(text: string): string {
 	return text.replace(/\[Source (\d+)\]/g, (match, num) => {
 		const index = parseInt(num) - 1;
 		if (index >= 0 && index < citations.length) {
-			return `<button class="citation-link" data-citation-index="${index}">${match}</button>`;
+			return `<button class="citation-link" data-citation-index="${index}">${ match }</button>`;
 		}
 		return match;
 	});
@@ -230,17 +231,14 @@ $effect(() => {
 
 <style>
 	.answer-generator {
-		max-width: 1000px;
-		margin: 0 auto;
+		max-width: 1000px; margin: 0 auto;
 	}
 
 	.spinner {
 		border: 3px solid #f3f4f6;
 		border-top: 3px solid #3b82f6;
-		border-radius: 50%;
-		width: 40px;
-		height: 40px;
-		animation: spin 1s linear infinite;
+		border-radius: 50%; width: 40px;
+		height: 40px; animation: spin 1s linear infinite;
 		margin: 0 auto;
 	}
 
@@ -255,24 +253,19 @@ $effect(() => {
 
 	:global(.citation-link) {
 		color: #2563eb;
-		text-decoration: underline;
-		cursor: pointer;
-		background: none;
-		border: none;
-		padding: 0;
-		font: inherit;
+		text-decoration: underline; cursor: pointer;
+		background: none; border: none;
+		padding: 0; font: inherit;
 	}
 
 	:global(.citation-link:hover) {
 		color: #1d4ed8;
-		background-color: #dbeafe;
-		padding: 2px 4px;
+		background-color: #dbeafe; padding: 2px 4px;
 		border-radius: 3px;
 	}
 
 	.line-clamp-2 {
-		overflow: hidden;
-		display: -webkit-box;
+		overflow: hidden; display: -webkit-box;
 		-webkit-line-clamp: 2;
 		line-clamp: 2;
 		-webkit-box-orient: vertical;
@@ -286,3 +279,6 @@ $effect(() => {
 		margin-bottom: 1em;
 	}
 </style>
+
+
+

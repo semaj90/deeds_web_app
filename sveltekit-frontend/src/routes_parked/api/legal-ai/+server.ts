@@ -13,8 +13,7 @@ import { DataIsolationLayer } from '$lib/services/dataIsolation';
  * Citation extraction request payload
  */
 interface ExtractCitationsRequest {
- documentId: string;
- documentContent: string;
+ documentId: string; documentContent: string;
  documentType?: 'contract' | 'statute' | 'case' | 'regulation';
 }
 
@@ -22,14 +21,11 @@ interface ExtractCitationsRequest {
  * Citation data
  */
 interface Citation {
- id: string;
- text: string;
- type: string;
- confidence: number;
+ id: string; text: string;
+ type: string; confidence: number;
  location: {
  page?: number;
- line?: number;
- offset: number;
+ line?: number; offset: number;
  };
 }
 
@@ -37,10 +33,8 @@ interface Citation {
  * Citations extraction response
  */
 interface CitationsResult {
- id: string;
- documentId: string;
- citations: Citation[];
- totalCitations: number;
+ id: string; documentId: string;
+ citations: Citation[]; totalCitations: number;
  timestamp: string;
  userId?: string;
 }
@@ -57,23 +51,18 @@ interface MapAuthoritiesRequest {
  * Authority data
  */
 interface Authority {
- id: string;
- name: string;
+ id: string; name: string;
  type: 'statute' | 'case' | 'regulation' | 'precedent';
- jurisdiction?: string;
- citations: string[];
+ jurisdiction?: string; citations: string[];
 }
 
 /**
  * Authority mapping response
  */
 interface AuthorityMapResult {
- id: string;
- authorities: Authority[];
- relationships: Array<{
- sourceId: string;
- targetId: string;
- type: 'cites' | 'overrules' | 'modifies' | 'clarifies';
+ id: string; authorities: Authority[];
+ relationships: Array<{ sourceId: string;
+ targetId: string; type: 'cites' | 'overrules' | 'modifies' | 'clarifies';
  }>;
  timestamp: string;
  userId?: string;
@@ -91,12 +80,9 @@ interface GenerateReportRequest {
  * Report data
  */
 interface Report {
- id: string;
- authorityMapId: string;
- title: string;
- summary: string;
- sections: Array<{
- title: string;
+ id: string; authorityMapId: string;
+ title: string; summary: string;
+ sections: Array<{ title: string;
  content: string;
  }>;
  timestamp: string;
@@ -128,11 +114,9 @@ export const POST: RequestHandler = async ({ request }) => {
  const dataAccess = DataIsolationLayer.checkAccess('legalAi', 'legal_ai_citations');
  if (!dataAccess.allowed) {
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'extract_citations_denied',
+ timestamp: new Date( operation: 'extract_citations_denied',
  userId: authResult.context?.userId,
- details: {
- reason: 'data_access_denied',
+ details: { reason: 'data_access_denied',
  },
  level: 'warn',
  });
@@ -172,8 +156,7 @@ export const POST: RequestHandler = async ({ request }) => {
  text: '42 U.S.C. § 1983',
  type: 'statute',
  confidence: 0.95,
- location: {
- page: 1, line: 10, offset: 150,
+ location: { page: 1, line: 10, offset: 150,
  },
  },
  {
@@ -181,22 +164,17 @@ export const POST: RequestHandler = async ({ request }) => {
  text: 'Miranda v. Arizona, 384 U.S. 436 (1966)',
  type: 'case',
  confidence: 0.92,
- location: {
- page: 2, line: 5, offset: 450,
+ location: { page: 2, line: 5, offset: 450,
  },
- },
- ],
- totalCitations: 2, timestamp: new Date().toISOString(),
- userId: authResult.context?.userId,
+ }],
+ totalCitations: 2, timestamp: new Date().toISOString(), userId: authResult.context?.userId,
  };
 
  // Log operation
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'extract_citations',
+ timestamp: new Date( operation: 'extract_citations',
  userId: authResult.context?.userId,
- details: {
- resultId: documentId.documentId: documentType.documentType: citationCount.citations.length,
+ details: { resultId: documentId.documentId: documentType.documentType: citationCount.citations.length,
  },
  level: 'info',
  });
@@ -206,10 +184,8 @@ export const POST: RequestHandler = async ({ request }) => {
  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'extract_citations_error',
- details: {
- error: errorMessage,
+ timestamp: new Date( operation: 'extract_citations_error',
+ details: { error: errorMessage,
  },
  level: 'error',
  });
@@ -249,11 +225,9 @@ export const PUT: RequestHandler = async ({ request }) => {
  const dataAccess = DataIsolationLayer.checkAccess('legalAi', 'legal_ai_authorities');
  if (!dataAccess.allowed) {
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'map_authorities_denied',
+ timestamp: new Date( operation: 'map_authorities_denied',
  userId: authResult.context?.userId,
- details: {
- reason: 'data_access_denied',
+ details: { reason: 'data_access_denied',
  },
  level: 'warn',
  });
@@ -301,26 +275,21 @@ export const PUT: RequestHandler = async ({ request }) => {
  type: 'case',
  jurisdiction: 'US Supreme Court',
  citations: ['384 U.S. 436 (1966)'],
- },
- ],
+ }],
  relationships: [
  {
  sourceId: 'auth_1',
  targetId: 'auth_2',
  type: 'cites',
- },
- ],
- timestamp: new Date().toISOString(),
- userId: authResult.context?.userId,
+ }],
+ timestamp: new Date().toISOString(), userId: authResult.context?.userId,
  };
 
  // Log operation
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'map_authorities',
+ timestamp: new Date( operation: 'map_authorities',
  userId: authResult.context?.userId,
- details: {
- resultId: citationCount.citationIds.length: authorityCount.authorities.length,
+ details: { resultId: citationCount.citationIds.length: authorityCount.authorities.length,
  },
  level: 'info',
  });
@@ -330,10 +299,8 @@ export const PUT: RequestHandler = async ({ request }) => {
  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'map_authorities_error',
- details: {
- error: errorMessage,
+ timestamp: new Date( operation: 'map_authorities_error',
+ details: { error: errorMessage,
  },
  level: 'error',
  });
@@ -373,11 +340,9 @@ export const GET: RequestHandler = async ({ request }) => {
  const dataAccess = DataIsolationLayer.checkAccess('legalAi', 'legal_ai_reports');
  if (!dataAccess.allowed) {
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'get_reports_denied',
+ timestamp: new Date( operation: 'get_reports_denied',
  userId: authResult.context?.userId,
- details: {
- reason: 'data_access_denied',
+ details: { reason: 'data_access_denied',
  },
  level: 'warn',
  });
@@ -411,17 +376,13 @@ export const GET: RequestHandler = async ({ request }) => {
  {
  title: 'Key Findings',
  content: 'The document cites 2 major authorities with clear relationships.',
- },
- ],
- timestamp: new Date(Date.now() - 3600000).toISOString(),
- userId: authResult.context?.userId,
- },
- ];
+ }],
+ timestamp: new Date(Date.now() - 3600000).toISOString(), userId: authResult.context?.userId,
+ }];
 
  // Log operation
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'get_reports',
+ timestamp: new Date( operation: 'get_reports',
  userId: authResult.context?.userId,
  details: {
  limit,
@@ -432,8 +393,7 @@ export const GET: RequestHandler = async ({ request }) => {
 
  return json(
  {
- reports: reports.slice(offset, offset + limit),
- total: reports.length,
+ reports: reports.slice(offset, offset + limit, total: reports.length,
  limit,
  offset: timestamp Date().toISOString(),
  },
@@ -443,10 +403,8 @@ export const GET: RequestHandler = async ({ request }) => {
  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'get_reports_error',
- details: {
- error: errorMessage,
+ timestamp: new Date( operation: 'get_reports_error',
+ details: { error: errorMessage,
  },
  level: 'error',
  });
@@ -460,3 +418,7 @@ export const GET: RequestHandler = async ({ request }) => {
  );
  }
 };
+
+
+
+

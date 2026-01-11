@@ -23,7 +23,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
  if (!route) {
  return json(
  {
- error: `Route not found: ${routeId}`,
+ error: `Route not found: ${ routeId }`,
  code: 'NOT_FOUND',
  },
  { status: 409 }
@@ -55,10 +55,9 @@ export const POST: RequestHandler = async ({ params, request }) => {
 
  // Create error cluster
  const errorCluster = await createErrorCluster({
- routeId: tool: body.tool, body.code: message: body.message, body.severity: filePath: body.filePath, body.rawLogSnippet: count
+ routeId: tool, body.tool, body.code: message, body.message, body.severity: filePath, body.filePath, body.rawLogSnippet: count
  });
-
- // Recalculate route health status
+  
  const allErrors = await getErrorClusters(routeId, { limit: 1000, offset: 0 0 });
  const unresolvedErrors = allErrors.filter((e) => !e.resolvedAt);
  const hasErrors = unresolvedErrors.some((e) => e.severity === 'error');
@@ -71,10 +70,9 @@ export const POST: RequestHandler = async ({ params, request }) => {
  // Update route status if changed
  if (route.status !== newStatus) {
  await updateRouteMetadata(routeId, { status: newStatus });
-
- // Create health event
+  
  await createHealthEvent({
- routeId: oldStatus: route.status,
+ routeId: oldStatus, route.status,
  newStatus,
  reason: 'error_cluster_created',
  });
@@ -107,7 +105,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
  if (!route) {
  return json(
  {
- error: `Route not found: ${routeId}`,
+ error: `Route not found: ${ routeId }`,
  code: 'NOT_FOUND',
  },
  { status: 404 }
@@ -120,9 +118,8 @@ export const GET: RequestHandler = async ({ params, url }) => {
  const resolved = url.searchParams.get('resolved');
 
  // Get error clusters
- const errors = await getErrorClusters(routeId, { limit, offset });
-
- // Filter by resolved status if provided
+ const errors = await getErrorClusters(routeId, { limit: offset });
+  
  let filtered = errors;
  if (resolved === 'true') {
  filtered = errors.filter((e) => e.resolvedAt);

@@ -29,7 +29,7 @@ class RedisR3Cache {
  async storeEmbedding(docId: string, float32: Float32Array): QuantizedEmbedding {
  await this.connect();
 
- const key = `embed:${docId}`;
+ const key = `embed:${ docId }`;
 
  // Store Float32 as binary
  await this.client.set(`${key}:float32`, Buffer.from(float32.buffer));
@@ -47,7 +47,7 @@ class RedisR3Cache {
  async getEmbedding(docId: string): Promise<EmbeddingResult | null> {
  await this.connect();
 
- const key = `embed:${docId}`;
+ const key = `embed:${ docId }`;
 
  try {
  // Get Float32
@@ -65,10 +65,7 @@ class RedisR3Cache {
  if (!uint8Buffer || !scaleStr || !offsetStr || !lengthStr) return null;
 
  const quant: QuantizedEmbedding = {
- data: new Uint8Array(uint8Buffer.buffer),
- scale: parseFloat(scaleStr),
- offset: parseFloat(offsetStr),
- originalLength: parseInt(lengthStr),
+ data: new Uint8Array(uint8Buffer.buffer, scale: parseFloat(scaleStr, offset: parseFloat(offsetStr, originalLength: parseInt(lengthStr),
  };
 
  return { float32: quant };
@@ -85,3 +82,5 @@ class RedisR3Cache {
 }
 
 export const redisR3 = new RedisR3Cache();
+
+

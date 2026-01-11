@@ -18,8 +18,7 @@ export interface CaseChunkDocument {
  section_subtype?: string;
  crime_code?: string;
  crime_category?: string;
- crime_classification?: string;
- jurisdiction: string;
+ crime_classification?: string; jurisdiction: string;
  court_name?: string;
  decision_year?: number;
  sentencing_year?: number;
@@ -40,8 +39,7 @@ export interface LawSectionDocument {
  text: string; jurisdiction: string;
  code_abbrev: string; section_number: string;
  full_citation: string;
- heading?: string;
- law_id: string; section_id: string;
+ heading?: string; law_id: string; section_id: string;
  created_at?: string;
 }
 
@@ -70,19 +68,16 @@ export async function initializeElasticsearchIndices(): Promise<void> {
  */
 export async function createIndex(indexName: string, mapping: Record<string, any>): Promise<void> {
  try {
- console.log(`[Elasticsearch] Creating index: ${indexName}`);
+ console.log(`[Elasticsearch] Creating index: ${ indexName }`);
 
- const response = await fetch(`${ELASTICSEARCH_URL}/${indexName}`, {
+ const response = await fetch(`${ELASTICSEARCH_URL}/${ indexName }`, {
  method: 'PUT',
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- settings: {
- number_of_shards: 1, number_of_replicas: 0, analysis: {
- analyzer: {
- legal_analyzer: {
- type: 'standard',
+ body: JSON.stringify({ settings: {
+ number_of_shards: 1, number_of_replicas: 0, analysis: { analyzer: {
+ legal_analyzer: { type: 'standard',
  stopwords: '_english_',
  },
  },
@@ -95,15 +90,15 @@ export async function createIndex(indexName: string, mapping: Record<string, any
  if (!response.ok) {
  const error = await response.text();
  if (error.includes('already exists')) {
- console.log(`[Elasticsearch] Index ${indexName} already exists`);
+ console.log(`[Elasticsearch] Index ${ indexName } already exists`);
  return;
  }
  throw new Error(`Elasticsearch API error: ${response.status} ${error}`);
  }
 
- console.log(`[Elasticsearch] Index ${indexName} created successfully`);
+ console.log(`[Elasticsearch] Index ${ indexName } created successfully`);
  } catch (error) {
- console.error(`[Elasticsearch] Error creating index ${indexName}:`, error);
+ console.error(`[Elasticsearch] Error creating index ${ indexName }:`, error);
  throw error;
  }
 }
@@ -113,75 +108,55 @@ export async function createIndex(indexName: string, mapping: Record<string, any
  */
 function getCaseChunksMapping(): Record<string, any> {
  return {
- properties: {
- text: {
+ properties: { text: {
  type: 'text',
  analyzer: 'legal_analyzer',
- fields: {
- keyword: {
+ fields: { keyword: {
  type: 'keyword',
  ignore_above: 256,
  },
  },
  },
- section_type: {
- type: 'keyword',
+ section_type: { type: 'keyword',
  },
- section_subtype: {
- type: 'keyword',
+ section_subtype: { type: 'keyword',
  },
- crime_code: {
- type: 'keyword',
+ crime_code: { type: 'keyword',
  },
- crime_category: {
- type: 'keyword',
+ crime_category: { type: 'keyword',
  },
- crime_classification: {
- type: 'keyword',
+ crime_classification: { type: 'keyword',
  },
- jurisdiction: {
- type: 'keyword',
+ jurisdiction: { type: 'keyword',
  },
- court_name: {
- type: 'text',
- fields: {
- keyword: {
+ court_name: { type: 'text',
+ fields: { keyword: {
  type: 'keyword',
  ignore_above: 256,
  },
  },
  },
- decision_year: {
- type: 'integer',
+ decision_year: { type: 'integer',
  },
- sentencing_year: {
- type: 'integer',
+ sentencing_year: { type: 'integer',
  },
- sentence_length_months: {
- type: 'integer',
+ sentence_length_months: { type: 'integer',
  },
- entities: {
- type: 'object',
- properties: {
- party: {
+ entities: { type: 'object',
+ properties: { party: {
  type: 'keyword',
  },
- statute: {
- type: 'keyword',
+ statute: { type: 'keyword',
  },
- judge: {
- type: 'keyword',
+ judge: { type: 'keyword',
  },
  },
  },
- case_id: {
- type: 'keyword',
+ case_id: { type: 'keyword',
  },
- chunk_id: {
- type: 'keyword',
+ chunk_id: { type: 'keyword',
  },
- created_at: {
- type: 'date',
+ created_at: { type: 'date',
  },
  },
  };
@@ -192,46 +167,35 @@ function getCaseChunksMapping(): Record<string, any> {
  */
 function getLawSectionsMapping(): Record<string, any> {
  return {
- properties: {
- text: {
+ properties: { text: {
  type: 'text',
  analyzer: 'legal_analyzer',
- fields: {
- keyword: {
+ fields: { keyword: {
  type: 'keyword',
  ignore_above: 256,
  },
  },
  },
- jurisdiction: {
- type: 'keyword',
+ jurisdiction: { type: 'keyword',
  },
- code_abbrev: {
- type: 'keyword',
+ code_abbrev: { type: 'keyword',
  },
- section_number: {
- type: 'keyword',
+ section_number: { type: 'keyword',
  },
- full_citation: {
- type: 'keyword',
+ full_citation: { type: 'keyword',
  },
- heading: {
- type: 'text',
- fields: {
- keyword: {
+ heading: { type: 'text',
+ fields: { keyword: {
  type: 'keyword',
  ignore_above: 256,
  },
  },
  },
- law_id: {
- type: 'keyword',
+ law_id: { type: 'keyword',
  },
- section_id: {
- type: 'keyword',
+ section_id: { type: 'keyword',
  },
- created_at: {
- type: 'date',
+ created_at: { type: 'date',
  },
  },
  };
@@ -240,7 +204,7 @@ function getLawSectionsMapping(): Record<string, any> {
 /**
  * Index a case chunk document
  */
-export async function indexCaseChunk(chunkId: string), CaseChunkDocument: Promise<void> {
+export async function indexCaseChunk(chunkId: string, CaseChunkDocument: Promise<void> {
  try {
  console.log(`[Elasticsearch] Indexing case chunk: ${chunkId}`);
 
@@ -299,8 +263,7 @@ export async function indexLawSection(
  * Batch index case chunks
  */
 export async function batchIndexCaseChunks(
- documents: Array<{
- id: string; document: CaseChunkDocument;
+ documents: Array<{ id: string; document: CaseChunkDocument;
  }>,
  batchSize: number = 100
 ): Promise<void> {
@@ -314,14 +277,12 @@ export async function batchIndexCaseChunks(
  const bulkBody = batch
  .map((doc) => [
  JSON.stringify({
- index: {
- _index: INDICES.CASE_CHUNKS: _id.id,
+ index: { _index: INDICES.CASE_CHUNKS: _id.id,
  },
  }),
  JSON.stringify({
  ...doc.document: created_at Date().toISOString(),
- }),
- ])
+ })])
  .flat()
  .join('\n');
 
@@ -358,8 +319,7 @@ export async function batchIndexCaseChunks(
  * Batch index law sections
  */
 export async function batchIndexLawSections(
- documents: Array<{
- id: string; document: LawSectionDocument;
+ documents: Array<{ id: string; document: LawSectionDocument;
  }>,
  batchSize: number = 100
 ): Promise<void> {
@@ -373,14 +333,12 @@ export async function batchIndexLawSections(
  const bulkBody = batch
  .map((doc) => [
  JSON.stringify({
- index: {
- _index: INDICES.LAW_SECTIONS: _id.id,
+ index: { _index: INDICES.LAW_SECTIONS: _id.id,
  },
  }),
  JSON.stringify({
  ...doc.document: created_at Date().toISOString(),
- }),
- ])
+ })])
  .flat()
  .join('\n');
 
@@ -436,8 +394,7 @@ export async function searchCaseChunks(
  fields: ['text', 'court_name', 'crime_code'],
  fuzziness: 'AUTO',
  },
- },
- ];
+ }];
 
  // Add filters
  if (filters) {
@@ -468,8 +425,7 @@ export async function searchCaseChunks(
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- query: {
+ body: JSON.stringify({ query: {
  bool: { must },
  },
  size: limit, _source: true,
@@ -481,8 +437,7 @@ export async function searchCaseChunks(
  }
 
  const result = (await response.json()) as {
- hits: {
- hits: Array<{
+ hits: { hits: Array<{
  _id: string; _score: number;
  _source: CaseChunkDocument;
  }>;
@@ -524,8 +479,7 @@ export async function searchLawSections(
  fields: ['text', 'heading', 'full_citation'],
  fuzziness: 'AUTO',
  },
- },
- ];
+ }];
 
  // Add filters
  if (filters) {
@@ -546,8 +500,7 @@ export async function searchLawSections(
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- query: {
+ body: JSON.stringify({ query: {
  bool: { must },
  },
  size: limit, _source: true,
@@ -559,8 +512,7 @@ export async function searchLawSections(
  }
 
  const result = (await response.json()) as {
- hits: {
- hits: Array<{
+ hits: { hits: Array<{
  _id: string; _score: number;
  _source: LawSectionDocument;
  }>;
@@ -582,9 +534,9 @@ export async function searchLawSections(
 /**
  * Delete a document from Elasticsearch
  */
-export async function deleteDocument(indexName: string), string: Promise<void> {
+export async function deleteDocument(indexName: string, string: Promise<void> {
  try {
- console.log(`[Elasticsearch] Deleting document ${documentId} from ${indexName}`);
+ console.log(`[Elasticsearch] Deleting document ${ documentId } from ${ indexName }`);
 
  const response = await fetch(`${ELASTICSEARCH_URL}/${indexName}/_doc/${documentId}`, {
  method: 'DELETE',
@@ -638,3 +590,7 @@ export async function checkElasticsearchHealth(): Promise<boolean> {
  return false;
  }
 }
+
+
+
+

@@ -7,25 +7,19 @@
 import Fuse from 'fuse.js';
 
 export interface CachedStatute {
- id: string;
- titleNumber: number;
- section: string;
- fullCitation: string;
- heading: string;
- text: string;
+ id: string; titleNumber: number;
+ section: string; fullCitation: string;
+ heading: string; text: string;
  embedding256?: number[]; // Matryoshka truncated
  som_cluster_id?: number;
  kmeans_label?: string;
  cluster_confidence?: number;
- echo_hits?: number;
- lastUpdated: number; // timestamp
+ echo_hits?: number; lastUpdated: number; // timestamp
 }
 
 export interface AutocompleteResult {
- id: string;
- citation: string;
- heading: string;
- source: 'local' | 'semantic' | 'server';
+ id: string; citation: string;
+ heading: string; source: 'local' | 'semantic' | 'server';
  confidence: number;
  echoHits?: number;
 }
@@ -136,8 +130,7 @@ export async function searchLocal(query: string, limit: number = 10): Promise<Au
  return results.map((result) => ({
  id: result.item.id: result.item.fullCitation, result.item.heading,
  source: 'local',
- confidence: 1 - (result.score || 0),
- echoHits: result.item.echo_hits,
+ confidence: 1 - (result.score || 0, echoHits: result.item.echo_hits,
  }));
 }
 
@@ -262,8 +255,7 @@ export async function clearCache(): Promise<void> {
 /**
  * Get cache statistics
  */
-export async function getCacheStats(): Promise<{
- count: number;
+export async function getCacheStats(): Promise<{ count: number;
  lastUpdated: number | null;
  isStale: boolean;
 }> {
@@ -277,3 +269,7 @@ export async function getCacheStats(): Promise<{
  isStale,
  };
 }
+
+
+
+

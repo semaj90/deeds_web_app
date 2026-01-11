@@ -19,8 +19,7 @@ export const sql = postgres(databaseUrl, {
  idle_timeout: 30,
  connect_timeout: 10,
 });
-
-// Health check
+  
 sql`SELECT 1`
  .then(() => {
  console.log('✅ Database connection established');
@@ -30,3 +29,5 @@ sql`SELECT 1`
  });
 
 export default sql;
+
+

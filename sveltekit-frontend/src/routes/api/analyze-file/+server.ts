@@ -33,7 +33,7 @@ export async function POST({ request }: RequestEvent) {
 		const errors = await db.execute(sql`
 			SELECT message, code, line_number, timestamp
 			FROM raw_error_embeddings
-			WHERE source = ${filePath}
+			WHERE source = ${ filePath }
 			ORDER BY timestamp DESC
 			LIMIT 20
 		`);
@@ -56,7 +56,7 @@ export async function POST({ request }: RequestEvent) {
 				metadata,
 				created_at
 			) VALUES (
-				${filePath},
+				${ filePath },
 				${analysis.summary},
 				${JSON.stringify(comments)},
 				${errors.rows.length},
@@ -95,7 +95,7 @@ async function extractComments(filePath: string): Promise<string[]> {
 	try {
 		// ripgrep: Find single-line and multi-line comments
 		const { stdout } = await execAsync(
-			`rg "(/\\*[\\s\\S]*?\\*/|//.*)" "${filePath}" --no-heading --no-line-number`,
+			`rg "(/\\*[\\s\\S]*? \\*/ : //.*)" "${filePath}" --no-heading --no-line-number`,
 			{ timeout: 5000 }
 		);
 
@@ -181,8 +181,7 @@ Be concise and actionable.`;
 	const response = await fetch(`${OLLAMA_URL}/api/chat`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			model: 'gemma3-legal:latest',
+		body: JSON.stringify({ model: 'gemma3-legal:latest',
 			messages: [
 				{
 					role: 'system',
@@ -234,8 +233,7 @@ async function generateEnhancedTag(filePath: string, analysis: any) {
 	const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			model: 'embeddinggemma:latest',
+		body: JSON.stringify({ model: 'embeddinggemma:latest',
 			prompt: analysis.summary
 		})
 	});
@@ -250,3 +248,6 @@ async function generateEnhancedTag(filePath: string, analysis: any) {
 		timestamp: new Date().toISOString()
 	};
 }
+
+
+

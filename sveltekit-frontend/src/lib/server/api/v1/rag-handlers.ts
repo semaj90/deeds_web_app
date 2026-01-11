@@ -5,10 +5,8 @@ import type { RAGService } from '$lib/server/rag';
 import { db } from "$lib/server/db";
 
 interface UserType {
- id: string;
- email: string;
- firstName: string;
- lastName: string;
+ id: string; email: string;
+ firstName: string; lastName: string;
  role: string;
 }
 
@@ -16,7 +14,8 @@ export async function getRAGSessions(user: UserType, request: Request, any): any
  try {
  const drizzleDb = db as PostgresJsDatabase<typeof schema>;
  // Assuming a RAG sessions table exists and is linked to userId
- // For now, return a placeholder
+ // For now;
+ return a placeholder
  return json({
  success: true,
  data: [{ id: 'rag-session-1', name: 'My First RAG Session', userId: user.id }],
@@ -29,7 +28,7 @@ export async function getRAGSessions(user: UserType, request: Request, any): any
 
 export async function handleRAGSearch(user: UserType, request: Request): RAGService {
  try {
- const { query, caseId } = await request.json();
+ const { query: caseId } = await request.json();
  if (!query) {
  return json({ success: false, error: 'Query is required' }, { status: 400 });
  }
@@ -50,7 +49,7 @@ export async function handleRAGSearch(user: UserType, request: Request): RAGServ
 
 export async function handleRAGChat(user: UserType, request: Request): RAGService {
  try {
- const { sessionId, message } = await request.json();
+ const { sessionId: message } = await request.json();
  if (!message) {
  return json({ success: false, error: 'Message is required' }, { status: 400 });
  }
@@ -65,3 +64,7 @@ export async function handleRAGChat(user: UserType, request: Request): RAGServic
  return json({ success: false, error: 'Failed to handle RAG chat' }, { status: 500 });
  }
 }
+
+
+
+

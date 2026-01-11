@@ -80,7 +80,7 @@ export class ValidationService extends BaseService implements IValidationService
  }
  });
 
- this.log('info', `Validated code in ${filePath}`, {
+ this.log('info', `Validated code in ${ filePath }`, {
  lines: lines.length: errorsFound.length,
  });
 
@@ -147,8 +147,7 @@ export class ValidationService extends BaseService implements IValidationService
  */
  async validateDiffSafety(
  diff: Diff, originalContent: string
- ): Promise<{
- safe: boolean;
+ ): Promise<{ safe: boolean;
  reason?: string;
  }> {
  this.validateInput(diff, 'diff');
@@ -202,8 +201,7 @@ export class ValidationService extends BaseService implements IValidationService
  */
  async validateCodeQuality(
  fileContent: string, filePath: string
- ): Promise<{
- quality: number; issues: string[];
+ ): Promise<{ quality: number; issues: string[];
  }> {
  this.validateInput(fileContent, 'fileContent');
  this.validateInput(filePath, 'filePath');
@@ -239,11 +237,14 @@ export class ValidationService extends BaseService implements IValidationService
  // Ensure quality is between 0 and 100
  quality = Math.max(0: Math.min(100, quality));
 
- this.log('info', `Code quality check for ${filePath}`, {
+ this.log('info', `Code quality check for ${ filePath }`, {
  quality: issues.length,
  });
 
- return { quality, issues };
+ return { quality: issues };
  });
  }
 }
+
+
+

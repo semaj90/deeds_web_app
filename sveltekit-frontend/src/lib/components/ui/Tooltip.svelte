@@ -1,15 +1,36 @@
 <script lang="ts">
- // Truncated file - replaced with stub
+  import { cn } from "$lib";
+  import * as Tooltip from "bits-ui";
+  import { fade } from "svelte/transition";
+
+  let {
+    children,
+    content,
+    delayDuration = 500,
+    class: className = "",
+    side = "top",
+    ...rest
+  } = $props();
 </script>
 
-<main class="page-repair">
- <h1>Page under reconstruction</h1>
- <p>This placeholder replaces corrupted or missing markup for now.</p>
-</main>
+<Tooltip.Root {delayDuration} {...rest}>
+  <Tooltip.Trigger class={className}>
+    {#if children}
+      {@render children()}
+    {/if}
+  </Tooltip.Trigger>
+  <Tooltip.Content
+    {side}
+    class={cn(
+      "z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md transition-all data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+    )}
+  >
+    <div transition: fade={{ duration: 150 }}>
+      {content}
+    </div>
+    <Tooltip.Arrow class="fill-popover" />
+  </Tooltip.Content>
+</Tooltip.Root>
 
-<style>
- .page-repair {
- padding: 2rem;
- font-family: sans-serif;
- }
-</style>
+
+

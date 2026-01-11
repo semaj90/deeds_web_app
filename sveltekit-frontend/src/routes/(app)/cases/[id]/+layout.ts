@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { LayoutLoad } from './$types.js';
 
-export const load: LayoutLoad = async ({ fetch, params }) => {
+export const load: LayoutLoad = async ({ fetch: params }) => {
  const res = await fetch(`/api/v1/cases/${params.id}`);
 
  if (!res.ok) {

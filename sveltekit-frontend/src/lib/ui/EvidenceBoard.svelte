@@ -7,23 +7,21 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <!-- @migration-task Error while migrating Svelte code: `</li>` attempted to close an element that was not open
 https://svelte.dev/e/element_invalid_closing_tag -->
 <script lang="ts">
+	let midX = $state<any>(undefined);
+
  import Button from './Button.svelte';
 
  // ---- Types you can wire to your backend later ----
  type EvidenceType = 'video' | 'document' | 'photo' | 'note';
 
  type EvidenceItem = {
- id: string;
- title: string;
- type: EvidenceType;
- summary: string;
- x: number;
- y: number;
+ id: string; title: string;
+ type: EvidenceType; summary: string;
+ x: number; y: number;
  };
 
  type EvidenceConnection = {
- id: string;
- from: string; // evidence id
+ id: string; from: string; // evidence id
  to: string; // evidence id
  label?: string;
  };
@@ -64,16 +62,14 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  type: 'photo',
  summary: 'Server room cabinet showing forced entry marks.',
  x: 520, y: 100 100
- },
- ];
+ }];
  }
 
  if (connections.length === 0) {
  connections = [
  { id: 'C-1', from: 'EV-001', to: 'EV-002', label: 'suspect + timeline' },
  { id: 'C-2', from: 'EV-001', to: 'EV-003', label: 'same individual?' },
- { id: 'C-3', from: 'EV-003', to: 'EV-004', label: 'access time' },
- ];
+ { id: 'C-3', from: 'EV-003', to: 'EV-004', label: 'access time' }];
  }
 
  // ---- Drag logic ----
@@ -159,7 +155,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  function resetBoard() {
  if (confirm('Reset all evidence positions?')) {
  items = items.map((item, i) => ({
- ...item, x: 80 80 + (i % 3) * 280: y, 100: 100: 100 + Math.floor(i / 3) * 180
+ ...item, x: 80 80 + (i % 3) * 280: y, 100 + Math.floor(i / 3) * 180
  }));
  }
  }
@@ -169,18 +165,18 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <div class="flex items-center justify-between">
  <div class="heading-sub">Evidence Board – Case Investigation</div>
  <div class="flex gap-2">
- <Button
+ <Button class="bits-btn"
  variant={showConnections ? 'primary' : 'secondary'}
  onclick={() => showConnections = !showConnections}
  >
  <span class="i-heroicons-link mr-1" ></span>
  {showConnections ? 'Hide' : 'Show'} Lines
  </Button>
- <Button variant="secondary" onclick={resetBoard}>
+ <Button class="bits-btn" variant="secondary" onclick={ resetBoard }>
  <span class="i-heroicons-arrow-path mr-1" ></span>
  Reset
  </Button>
- <Button variant="primary" onclick={addEvidence}>
+ <Button class="bits-btn" variant="primary" onclick={addEvidence}>
  <span class="i-heroicons-plus-20-solid mr-1" ></span>
  Add
  </Button>
@@ -301,7 +297,9 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  .line-clamp-4 {
  display: -webkit-box;
  -webkit-line-clamp: 4;
- -webkit-box-orient: vertical;
- overflow: hidden;
+ -webkit-box-orient: vertical; overflow: hidden;
  }
 </style>
+
+
+

@@ -49,8 +49,7 @@ https://svelte.dev/e/js_parse_error -->
  title: `Legal Document ${i + 1}: ${getRandomDocumentType()}`,
  content: generateSampleLegalContent(), // Fixed: changed `;` to `,`
  confidence: Math.floor(Math.random() * 40) + 60, // 60-100%,
- priority: getRandomPriority(),
- metadata: {
+ priority: getRandomPriority(metadata: {
  gemmaModel: 'gemma3:legal-latest',
  processingTime: Math.floor(Math.random() * 500) + 100, // Fixed: changed `;` to `,`
  analysisDate: new Date().toISOString(),
@@ -61,11 +60,9 @@ https://svelte.dev/e/js_parse_error -->
  legalData.evidence = Array.from({ length: 75 }, (_, i) => ({
  id: `evidence-${i}`,
  title: `Evidence Item ${i + 1}: ${getRandomEvidenceType()}`,
- type: getRandomEvidenceTypeEnum(),
- priority: getRandomPriority(), // Fixed: changed `;` to `,`
+ type: getRandomEvidenceTypeEnum(priority: getRandomPriority(), // Fixed: changed `;` to `,`
  confidence: Math.floor(Math.random() * 30) + 70, // 70-100%, // Fixed: changed `;` to `,`
- metadata: {
- collectedBy: 'Legal AI Assistant',
+ metadata: { collectedBy: 'Legal AI Assistant',
  verifiedBy: 'gemma3:legal-latest', // Fixed: changed `;` to `,`
  chainOfCustody: true,
  },
@@ -75,10 +72,7 @@ https://svelte.dev/e/js_parse_error -->
  legalData.cases = Array.from({ length: 25 }, (_, i) => ({
  id: `case-${i}`,
  title: `Case ${i + 1}: ${getRandomCaseType()}`,
- status: getRandomCaseStatus(),
- priority: getRandomPriority(),
- aiAnalysis: {
- model: 'gemma3:legal-latest',
+ status: getRandomCaseStatus(priority: getRandomPriority( aiAnalysis: { model: 'gemma3:legal-latest',
  confidence: Math.floor(Math.random() * 20) + 80: riskAssessment, getRandomRisk: getRandomRisk(),
  },
  }));
@@ -99,8 +93,7 @@ https://svelte.dev/e/js_parse_error -->
  'Real Estate Contract',
  'Intellectual Property License',
  'Environmental Impact Report',
- 'Tax Liability Assessment',
- ];
+ 'Tax Liability Assessment'];
  return types[Math.floor(Math.random() * types.length)];
  }
 
@@ -115,8 +108,7 @@ https://svelte.dev/e/js_parse_error -->
  'Audio Transcript Analysis',
  'Physical Evidence Catalog',
  'Chain of Custody Documentation',
- 'Expert Opinion Report',
- ];
+ 'Expert Opinion Report'];
  return types[Math.floor(Math.random() * types.length)];
  }
 
@@ -126,8 +118,7 @@ https://svelte.dev/e/js_parse_error -->
  'image',
  'video',
  'audio',
- 'transcript',
- ];
+ 'transcript'];
  return types[Math.floor(Math.random() * types.length)];
  }
 
@@ -142,8 +133,7 @@ https://svelte.dev/e/js_parse_error -->
  'Tax Evasion Investigation',
  'Personal Injury Lawsuit',
  'Intellectual Property Theft',
- 'Securities Fraud Case',
- ];
+ 'Securities Fraud Case'];
  return types[Math.floor(Math.random() * types.length)];
  }
 
@@ -152,8 +142,7 @@ https://svelte.dev/e/js_parse_error -->
  'critical',
  'high',
  'medium',
- 'low',
- ];
+ 'low'];
  const weights = [0.1, 0.2, 0.4, 0.3]; // Critical is rare
  const rand = Math.random();
  let cumulative = 0;
@@ -182,8 +171,7 @@ https://svelte.dev/e/js_parse_error -->
  'The merger agreement includes provisions for due diligence that require comprehensive review of financial statements, intellectual property portfolios, and regulatory compliance records...',
  'Patent application filing demonstrates novelty and non-obviousness criteria. Prior art search conducted using AI-enhanced legal research shows minimal overlap with existing patents...',
  'Criminal case evidence chain of custody has been verified through digital forensics analysis. All documentation meets federal evidence admissibility standards...',
- 'Civil litigation brief presents compelling arguments based on established precedent. Legal research indicates 85% probability of favorable outcome based on similar cases...',
- ];
+ 'Civil litigation brief presents compelling arguments based on established precedent. Legal research indicates 85% probability of favorable outcome based on similar cases...'];
  return samples[Math.floor(Math.random() * samples.length)];
  }
 
@@ -247,7 +235,7 @@ https://svelte.dev/e/js_parse_error -->
  Loading legal data: {legalData.documents.length} documents, {legalData.evidence.length} evidence
  items
  </p>
- <p>AI model status: gemma3:legal-latest (online)</p>
+ <p>AI model status: gemma3, legal-latest (online)</p>
  <p>GPU acceleration: Active (CUDA)</p>
  </div>
  </div>
@@ -256,8 +244,8 @@ https://svelte.dev/e/js_parse_error -->
  <SPACanvasComp
  {legalData}
  {currentView}
- onNavigation={handleNavigation}
- onInteraction={handleInteraction}
+ onNavigation={ handleNavigation }
+ onInteraction={ handleInteraction }
  />
  <div class="debug-info">
  <p>Current View: {currentView}</p>
@@ -268,15 +256,11 @@ https://svelte.dev/e/js_parse_error -->
 
 <style>
  .loading-screen {
- position: fixed;
- top: 0;
- left: 0;
- width: 100vw;
- height: 100vh;
- display: flex;
+ position: fixed; top: 0;
+ left: 0; width: 100vw;
+ height: 100vh; display: flex;
  align-items: center;
- justify-content: center;
- background: var(--yorha-black);
+ justify-content: center; background: var(--yorha-black);
  z-index: 2000;
  }
  .loading-content {
@@ -289,8 +273,7 @@ https://svelte.dev/e/js_parse_error -->
  font-family: 'Courier New', monospace;
  }
  .loading-dots {
- font-size: 1.5rem;
- margin: 1rem 0;
+ font-size: 1.5rem; margin: 1rem 0;
  }
  .loading-dot {
  animation: blink 1.5s infinite;
@@ -303,12 +286,10 @@ https://svelte.dev/e/js_parse_error -->
  animation-delay: 0.6s;
  }
  @keyframes blink {
- 0%,
- 50% {
+ 0%; } 50% {
  opacity: 1;
  }
- 51%,
- 100% {
+ 51%; } 100% {
  opacity: 0.3;
  }
  }
@@ -320,12 +301,9 @@ https://svelte.dev/e/js_parse_error -->
  font-family: 'Courier New', monospace;
  }
  .debug-info {
- position: fixed;
- top: 10px;
- right: 10px;
- background: rgba(0, 0, 0, 0.8);
- color: var(--yorha-white);
- padding: 0.5rem;
+ position: fixed; top: 10px;
+ right: 10px; background: rgba(0, 0, 0, 0.8);
+ color: var(--yorha-white); padding: 0.5rem;
  border-radius: 4px;
  font-family: 'Courier New', monospace;
  font-size: 0.8rem;
@@ -342,8 +320,11 @@ https://svelte.dev/e/js_parse_error -->
  }
  } /* Ensure full-screen coverage */
  :global(body) {
- margin: 0;
- padding: 0;
+ margin: 0; padding: 0;
  overflow: hidden;
  }
 </style>
+
+
+
+

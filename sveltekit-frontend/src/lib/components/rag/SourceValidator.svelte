@@ -7,29 +7,30 @@
  * Phase: Agentic RAG Source Validation (Task 1.3)
  */
 
-import {
-  type KBSearchResult,
-  type SourceValidatorProps
-} from '$lib/types/source-validation';
+import type {
+  ConfidenceLevel,
+  RetrievedChunk
+} from '$lib/types/rag-source-validation';
 
-// Type for confidence levels
-type ConfidenceLevel = 'high' | 'medium' | 'low' | 'marginal';
+interface SourceValidatorProps {
+  chunks: RetrievedChunk[]; caseId: string;
+  initialQuery?: string;
+  query?: string;
+  isLoading?: boolean;
+  onValidate?: (selectedIds: string[]) => void;
+  onCancel?: () => void;
+}
 
 // Svelte 5 props
 let {
 	caseId,
-	onValidationComplete,
 	initialQuery = '',
 	chunks = [],
+	query = '',
 	isLoading = false,
 	onValidate,
 	onCancel
-}: SourceValidatorProps & {
-	chunks?: Array<{ chunk_id: string; confidence: ConfidenceLevel; source_title: string; score: number; text?: string; snippet?: string; source_type?: string; page_num?: number; has_table?: boolean; has_image?: boolean; related_entities: string[]; source_url?: string }>;
-	isLoading?: boolean;
-	onValidate?: (selectedIds: string[]) => void;
-	onCancel?: () => void;
-} = $props();
+}: SourceValidatorProps = $props();
 
 // Svelte 5 reactive state - use $state.snapshot or make it reactive to prop changes
 let searchQuery = $state<string>('');
@@ -111,7 +112,7 @@ function truncate(text: string, maxLength: number = 200): string {
   <div class="validator-header">
     <h3 class="text-lg font-semibold">Validate Sources</h3>
     <p class="text-sm text-base-content/70">
-      Query: <span class="font-medium">"{query}"</span>
+      Query: <span class="font-medium">"{ query }"</span>
     </p>
     <p class="text-xs text-base-content/50 mt-1">
       Select the sources you want to use for generating an answer.
@@ -154,7 +155,7 @@ function truncate(text: string, maxLength: number = 200): string {
       {@const badge = getConfidenceBadge(chunk.confidence)}
 
       <div
-        class="chunk-card p-3 rounded-lg border transition-all cursor-pointer {isSelected ? 'border-primary bg-primary-5' : 'border-base-300 hover:border-primary-50'}"
+        class="chunk-card p-3 rounded-lg border transition-all cursor-pointer {isSelected ? 'border-primary bg-primary-5' : 'border-base-300, hover:border-primary-50'}"
         onclick={() => toggleChunk(chunk.chunk_id)}
         role="button"
         tabindex="0"
@@ -298,3 +299,7 @@ function truncate(text: string, maxLength: number = 200): string {
     border-color: oklch(var(--p) / 0.5);
   }
 </style>
+
+
+
+

@@ -5,7 +5,7 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { evidenceUploadSchema } from '$lib/schemas/evidence';
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ params: locals }) => {
  const session = locals.session as any;
  const isDevBypass = process.env.DEV_BYPASS_AUTH === 'true';
  const caseId = params.id as string;
@@ -99,7 +99,7 @@ export const actions: Actions = {
  }
  },
 
- delete: async ({ request, locals }) => {
+ delete: async ({ request: locals }) => {
  const session = locals.session as any;
  const isDevBypass = process.env.DEV_BYPASS_AUTH === 'true';
 
@@ -136,7 +136,7 @@ export const actions: Actions = {
  const formData = await request.formData();
  const question = formData.get('question') as string;
 
- if (!question || question.trim().length === 0) {
+ if (!question ?? question.trim().length === 0) {
  return fail(400, { message: 'Question is required' });
  }
 
@@ -145,8 +145,7 @@ export const actions: Actions = {
  const response = await fetch('http://localhost:5173/api/ai/yorha/context-chat', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- message: question,
+ body: JSON.stringify({message: question,
  caseId,
  userId,
  }),
@@ -177,11 +176,10 @@ export const actions: Actions = {
 
  return {
  success: true,
- chatResult: {
- answer: result.answer: result.keywords || [],
+ chatResult: {answer: result.answer: result.keywords || [],
  keyPhrases: result.keyPhrases || [],
  suggestions: result.suggestions || [],
- latencyMs: result.latencyMs || 0: citations: result.citations || [],
+ latencyMs, result.latencyMs || 0: citations, result.citations || [],
  },
  };
  } catch (err) {

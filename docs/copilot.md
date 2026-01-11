@@ -50,6 +50,79 @@ $effect(() => {
 </Tooltip.Root>
 ```
 
+## TypeScript Error Fixing - Quick Reference
+
+### TS1005 Error Position Rule
+
+**Critical:** Error position points to NEXT token, fix goes AFTER PREVIOUS token.
+
+```typescript
+// Error at 'arg2' → Fix at end of 'arg1'
+foo(arg1 arg2) // TS1005 at 'arg2'
+foo(arg1, arg2) // Fix: comma at prevArg.end
+```
+
+### Cascade Error Detection
+
+```javascript
+// Red flags:
+const errorDensity = errors / (lines / 100);
+if (errorDensity > 50) {
+  return 'MANUAL_REVIEW_REQUIRED';
+}
+```
+
+### Safe Fixing Pattern
+
+```javascript
+// 1. Check context
+if (!isSafeToFix(node, parent)) return null;
+
+// 2. Use correct position
+const pos = prevNode.end; // NOT node.getStart()
+
+// 3. Validate before/after
+if (errorsAfter > errorsBefore) rollback();
+```
+
+### Node Position API
+
+```typescript
+node.pos           // Includes whitespace (WRONG for insert)
+node.getStart()    // Start of token (WRONG for comma)
+node.end           // End of token (CORRECT for "append after")
+```
+
+### Phase 90/91 Commands
+
+```bash
+# Test with auto-rollback
+node scripts/phase91-test-run.mjs
+
+# Detect cascade errors
+node scripts/phase90-detect-cascade-errors.mjs
+
+# Safe fixing (small batch)
+node scripts/phase90-enhanced-ast-fixer.mjs --limit 10
+```
+
+### Common Root Causes
+
+```typescript
+// 1. Wrong delimiter
+const obj = { a: 1; b: 2 }; // Semicolon instead of comma
+
+// 2. Missing delimiter
+const arr = [1 2 3]; // Missing commas
+
+// 3. Wrong bracket
+const obj = { a: 1); // Paren instead of brace
+
+// 4. Unclosed string
+const str = "hello
+world"; // Missing closing quote
+```
+
 ## Canvas Patterns
 
 ### Setup
@@ -188,3 +261,21 @@ function layout(nodes, edges, width, height) {
 - Routes: `src/routes/`
 - APIs: `src/routes/api/`
 - Docs: `docs/`
+
+## Phase 90: Cascade Error Detection
+
+**Last Run:** January 8, 2026
+
+**Problem:** "Mashed" syntax (missing delimiters) caused massive cascade errors (87k+).
+**Diagnosis:** `scripts/phase90-detect-cascade-errors.mjs`
+**Fix:** Manual repair of syntax (semicolons, commas) in high-risk files.
+
+**Known Bad Pattern:**
+```typescript
+// BAD (Mashed)
+key: value: key2: value2
+
+// GOOD
+key: value,
+key2: value2
+```

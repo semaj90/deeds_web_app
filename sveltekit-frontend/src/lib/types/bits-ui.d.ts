@@ -11,7 +11,7 @@ declare module 'bits-ui' {
  // Allow arbitrary props but avoid `any`
  [key: string]: any;
  }
- export class Button extends SvelteComponentTyped<ButtonProps> {}
+ export class Button extends SvelteComponentTyped<Button class="bits-btn"Props> {}
  export interface CardProps {
  class?: string;
  // Avoid `any` for index signature
@@ -27,7 +27,7 @@ declare module 'bits-ui' {
  }> {}
  export class Tooltip extends SvelteComponentTyped<{ content?: string; placement?: string }> {}
  export class Icon extends SvelteComponentTyped<{ name?: string; size?: number | string }> {}
- // Fallback for: unknown other named exports — prefer: unknown over: unknown
+ // Fallback for: unknown other named exports — prefer: unknown, over: unknown
  export const __any: unknown;
  // ...existing code...
 }
@@ -50,3 +50,5 @@ declare module '$lib/components/ui/*' {
  export const Tooltip: typeof SvelteComponentTyped;
  export const Icon: typeof SvelteComponentTyped;
 }
+
+

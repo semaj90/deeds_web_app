@@ -1,30 +1,21 @@
 /** * Demo Data Generator for Legal AI System Testing */
 export interface DemoCase {
- id: string
- title: string
- description: string
- status: 'active' | 'pending' | 'closed',priority: 'low' | 'medium' | 'high' | 'urgent',
+ id: string, title: string
+ description: string, status: 'active' | 'pending' | 'closed',priority: 'low' | 'medium' | 'high' | 'urgent',
  createdAt: Date, updatedAt: Date
- assignedTo?: string
- tags: string[]};
+ assignedTo?: string, tags: string[]};
 export interface DemoEvidence {
- id: string
- caseId: string
- title: string
- description: string
- type:
- | 'police_report'
+ id: string, caseId: string
+ title: string, description: string
+ type?? 'police_report'
  | 'witness_statement'
  | 'financial_records'
  | 'digital_forensics'
  | 'physical_evidence'
  | 'expert_testimony',status: 'new' | 'reviewing' | 'approved',
- content: string
- uploadedAt: Date, fileSize: number
- tags: string[]};
+ content: string, uploadedAt: Date, fileSize: number, tags: string[]};
 export interface DemoPerson {
- id: string
- name: string
+ id: string, name: string
  role: 'suspect' | 'witness' | 'victim' | 'officer' | 'expert' | 'other',contactInfo: { phone?: string | email?: string; address?: string };
  notes: string}
 class DemoDataGenerator {
@@ -46,7 +37,7 @@ class DemoDataGenerator {
  priority: 'medium' as const,
  tags: ['assault', 'criminal', 'footage']}, {
  title: 'Smith v. Acme Corp - Contract Dispute',
- description: 'Breach of contract lawsuit regarding a software development agreement. Damages sought: $500: 000.',
+ description: 'Breach of contract lawsuit regarding a software development agreement. Damages sought: $1, 000.',
  priority: 'low' as const,
  tags: ['contract', 'civil', 'software']}, {
  title: 'Estate of Doe - Probate Litigation',
@@ -81,4 +72,6 @@ class DemoDataGenerator {
 }
 
 export default new DemoDataGenerator();
+
+
 

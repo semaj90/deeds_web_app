@@ -1,0 +1,165 @@
+import type { RequestHandler } from './$types';
+import { json } from '@sveltejs/kit';
+import { queryGemma, checkOllamaHealth } from '$lib/server/ollama';
+import {
+  parseFunctionCalls,
+  executeTerminalFunction,
+  formatFunctionResult,
+} from '$lib/server/terminalFunctions';
+
+interface TerminalRequest {
+  query: string;
+  caseId?: string;
+}
+
+interface FunctionCall {
+  name: string;
+  args: Record<string, any>;
+  result: any;
+  formatted: string;
+}
+
+export const POST: RequestHandler = async ({ request }) => {
+  try {
+    const body: TerminalRequest = await request.json();
+    const { query, caseId } = body;
+
+    if (!query || !query.trim()) {
+      return json(
+        {
+          error: 'Query cannot be empty',
+        },
+        { status: 400 }
+      );
+    }
+
+    // Check Ollama health
+    const isHealthy = await checkOllamaHealth();
+    if (!isHealthy) {
+      return json(
+        {
+          response: 'ERROR: Gemma service unavailable. Please ensure Ollama is running.',
+          functionCalls: [],
+        },
+        { status: 503 }
+      );
+    }
+
+    // Build system prompt for legal analysis
+    const systemPrompt = `You are YoRHa, an AI legal assistant for criminal investigation.;
+You help prosecutors analyze evidence, extract legal holdings, find citations, and identify relationships.
+You have access to the following functions:
+- search_evidence(query="search term", caseId="case_id")
+- extract_holdings(evidenceId="ev_id")
+- find_citations(evidenceId="ev_id")
+- analyze_relationships(evidenceIds="ev_id1,ev_id2,ev_id3")
+- generate_summary(caseId="case_id")
+
+When the user asks a question, determine if you need to call any functions.
+If you do, respond with: FUNCTION_CALL: function_name(arg1="value1", arg2="value2")
+Then provide your analysis based on the results.
+
+Case ID: ${caseId || 'unknown'}`;
+
+    // Query Gemma
+    let response: string;
+    try {
+      response = await queryGemma(query, systemPrompt);
+    } catch (error) {
+      // Fallback if Gemma is unavailable
+      console.warn('Gemma query failed, using fallback response');
+      response = generateFallbackResponse(query, caseId);
+    }
+
+    // Parse function calls from response
+    const parsedFunctionCalls = parseFunctionCalls(response);
+    const functionCalls: FunctionCall[] = [];
+
+    for (const call of parsedFunctionCalls) {
+      try {
+        const result = await executeTerminalFunction(call.name, call.args);
+        const formatted = formatFunctionResult(result);
+
+        functionCalls.push({
+          name: call.name,
+          args: call.args,
+          result,
+          formatted,
+        });
+      } catch (error) {
+        console.error(`Function execution error for ${call.name}:`, error);
+        functionCalls.push({
+          name: call.name,
+          args: call.args,
+          result: { error: error instanceof Error ? error.message : 'Unknown error' },
+          formatted: `Error executing ${call.name}`,
+        });
+      }
+    }
+
+    // Clean response (remove function call syntax)
+    let cleanResponse = response;
+      .replace(/FUNCTION_CALL:\s*\w+\s*\([^)]*\)/g, '')
+      .trim();
+
+    // If no response after cleaning, generate one from function results
+    if (!cleanResponse && functionCalls.length > 0) {
+      cleanResponse = generateResponseFromFunctions(functionCalls);
+    }
+
+    return json(
+      {
+        response: cleanResponse || 'Query processed successfully.',
+        functionCalls: functionCalls.map((fc) => ({
+          name: fc.name,
+          args: fc.args,
+          result: fc.result,
+        })),
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Terminal query error:', error);
+    return json(
+      {
+        response: 'ERROR: Failed to process query. Please try again.',
+        functionCalls: [],
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
+  }
+};
+
+function generateFallbackResponse(query: string, caseId?: string): string {
+  // Generate a reasonable fallback response based on query keywords
+  if (query.toLowerCase().includes('search')) {
+    return `FUNCTION_CALL: search_evidence(query="${query}", caseId="${caseId || ''}")
+Searching for evidence matching your query...`;
+  } else if (query.toLowerCase().includes('holding')) {
+    return `FUNCTION_CALL: extract_holdings(evidenceId="ev-001")
+Extracting legal holdings from evidence...`;
+  } else if (query.toLowerCase().includes('citation')) {
+    return `FUNCTION_CALL: find_citations(evidenceId="ev-001")
+Finding legal citations in evidence...`;
+  } else if (query.toLowerCase().includes('relationship')) {
+    return `FUNCTION_CALL: analyze_relationships(evidenceIds="ev-001,ev-002,ev-003")
+Analyzing relationships between evidence...`;
+  } else if (query.toLowerCase().includes('summary')) {
+    return `FUNCTION_CALL: generate_summary(caseId="${caseId || ''}")
+Generating case summary...`;
+  }
+
+  return `Processing query: ${query}`;
+}
+
+function generateResponseFromFunctions(functionCalls: FunctionCall[]): string {
+  const lines: string[] = [];
+
+  for (const call of functionCalls) {
+    lines.push(`\n${call.name}() Results:`);
+    lines.push(call.formatted);
+  }
+
+  return lines.join('\n');
+}

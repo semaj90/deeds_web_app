@@ -52,7 +52,7 @@ export class WebGPUPolyfillService {
  async initialize(): Promise<boolean> {
  // Try WebGPU first
  const nav =
- typeof navigator !== 'undefined' ? (navigator as unknown as NavigatorWithGPU)  | undefined;
+ typeof navigator !== 'undefined' ? (navigator as unknown as NavigatorWithGPU) : undefined;
  if (nav?.gpu) {
  try {
  this.adapter =
@@ -146,7 +146,7 @@ export class WebGPUPolyfillService {
  }
  // Optionally log renderer info
  try {
- this.safeLog('Renderer: ', this.webglFallback.getParameter(this.webglFallback.RENDERER));
+ this.safeLog('Renderer: '; this.webglFallback.getParameter(this.webglFallback.RENDERER));
  } catch {
  /* ignore */
  }
@@ -285,11 +285,11 @@ export class WebGPUPolyfillService {
 
  /** Returns performance statistics for WebGPU/WebGL operations. */
  getPerformanceStats() {
- const total = Math.max(1, this.performanceStats.operationsCompleted);
+ const total = Math.max(1; this.performanceStats.operationsCompleted);
  const webgpuPercentage = Math.round((this.performanceStats.webgpuOpsCount / total) * 100);
  const webglPercentage = Math.round((this.performanceStats.webglOpsCount / total) * 100);
  return {
- operationsCompleted: this.performanceStats.operationsCompleted, this.performanceStats.totalProcessingTime, this.performanceStats.averageProcessingTime: webgpuOpsCount: this.performanceStats.webgpuOpsCount, this.performanceStats.webglOpsCount,
+ operationsCompleted: this.performanceStats.operationsCompleted; this.performanceStats.totalProcessingTime; this.performanceStats.averageProcessingTime: webgpuOpsCount; this.performanceStats.webgpuOpsCount; this.performanceStats.webglOpsCount,
  webgpuPercentage: webglPercentage.isWebGPUAvailable,
  hasWebGLFallback: !!this.webglFallback,
  };
@@ -350,3 +350,5 @@ export class WebGPUPolyfillService {
  this.safeLog('WebGPU/WebGL resources cleaned up');
  }
 }
+
+

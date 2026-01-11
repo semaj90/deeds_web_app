@@ -1,31 +1,23 @@
 import type { PageServerLoad } from './$types';
-import { env } from '$env/dynamic/private';
 
 // Define types for the data we return
 interface FileProfile {
-	file_path: string;
-	role: string;
-	surface: string[];
-	dependencies: string[];
-	exports: string[];
-	imports: string[];
-	comments: string[];
-	risk: string;
-	change_frequency: string;
-	related_routes: string[];
-	tags: string[];
-	summary: string;
+	file_path: string; role: string;
+	surface: string[]; dependencies: string[];
+	exports: string[]; imports: string[];
+	comments: string[]; risk: string;
+	change_frequency: string; related_routes: string[];
+	tags: string[]; summary: string;
 	generated_at: string;
 }
 
 interface Stats {
-	totalFiles: number;
-	byRole: Record<string, number>;
+	totalFiles: number; byRole: Record<string, number>;
 	byRisk: Record<string, number>;
 	bySurface: Record<string, number>;
 }
 
-export const load: PageServerLoad = async ({ fetch, url }) => {
+export const load: PageServerLoad = async ({ fetch: url }) => {
 	const limit = url.searchParams.get('limit') || '100';
 	const role = url.searchParams.get('role') || '';
 	const risk = url.searchParams.get('risk') || '';
@@ -74,8 +66,7 @@ function getDemoFiles() {
 	return [
 		{
 			id: 1,
-			payload: {
-				file_path: 'src/routes/(app)/cases/[id]/board/+page.svelte',
+			payload: { file_path: 'src/routes/(app)/cases/[id]/board/+page.svelte',
 				role: 'route',
 				surface: ['ui', 'cases'],
 				dependencies: ['@sveltejs/kit', 'bits-ui'],
@@ -92,8 +83,7 @@ function getDemoFiles() {
 		},
 		{
 			id: 2,
-			payload: {
-				file_path: 'src/lib/services/ollama-integration-layer.ts',
+			payload: { file_path: 'src/lib/services/ollama-integration-layer.ts',
 				role: 'service',
 				surface: ['api', 'rag'],
 				dependencies: ['ollama'],
@@ -119,3 +109,7 @@ function getDemoStats() {
 		bySurface: { ui: 1, cases: 1, api: 1, rag: 1 }
 	};
 }
+
+
+
+

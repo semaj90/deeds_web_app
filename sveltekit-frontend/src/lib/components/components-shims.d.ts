@@ -10,3 +10,5 @@ declare module '$lib/components/*' {
  export default Component;
 }
 // Retain single pattern; remove redundant duplicate to reduce parser confusion
+
+

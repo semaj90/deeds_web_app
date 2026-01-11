@@ -11,22 +11,16 @@ import path from 'node:path';
 
 /** Raw TypeScript diagnostic from compiler */
 export interface TSDiagnostic {
- file: string;
- line: number;
- column: number;
- code: number;
- message: string;
- category: 'error' | 'warning';
+ file: string; line: number;
+ column: number; code: number;
+ message: string; category: 'error' | 'warning';
 }
 
 /** Parsed error with fix context */
 export interface ErrorRecord {
- file: string;
- line: number;
- column: number;
- code: number;
- message: string;
- category: 'error' | 'warning';
+ file: string; line: number;
+ column: number; code: number;
+ message: string; category: 'error' | 'warning';
  /** Original line content */
  originalLine: string;
  /** Line before (if exists) */
@@ -51,8 +45,7 @@ export function runTypeScriptCheck(tsconfigPath: string, filterCodes?: number[])
  encoding: 'utf-8',
  stdio: ['ignore', 'pipe', 'pipe'],
  });
-
- // tsc exits 0 on success, non-zero on errors
+  
  // If we reach here, no errors (but could be warnings)
  return [];
  } catch (error: unknown) {
@@ -71,7 +64,7 @@ export function runTypeScriptCheck(tsconfigPath: string, filterCodes?: number[])
 /**
  * Parse tsc stderr output into structured diagnostics.
  *
- * Format: src/file.ts(line): error TS1234: message
+ * Format: src/file.ts(line): error, TS1234: message
  */
 function parseTSCOutput(stderr: string): TSDiagnostic[] {
  const diagnostics: TSDiagnostic[] = [];
@@ -81,13 +74,10 @@ function parseTSCOutput(stderr: string): TSDiagnostic[] {
  const match = line.match(/^(.+?)\((\d+),(\d+)\): (error|warning) TS(\d+): (.+)$/);
  if (!match) continue;
 
- const [, file, lineStr, colStr, category, codeStr, message] = match;
+ const [file, lineStr, colStr, category, codeStr, message] = match;
 
  diagnostics.push({
- file: parseInt(lineStr, 10),
- column: parseInt(colStr, 10),
- code: parseInt(codeStr, 10),
- message: category as 'error' | 'warning',
+ file: parseInt(lineStr, 10, column: parseInt(colStr, 10, code: parseInt(codeStr, 10, message: category as 'error' | 'warning',
  });
  }
 
@@ -101,7 +91,7 @@ function parseTSCOutput(stderr: string): TSDiagnostic[] {
  * @param projectRoot - Workspace root for resolving file paths
  * @returns ErrorRecords with source lines attached
  */
-export function enrichWithContext(diagnostics: TSDiagnostic[]), string: ErrorRecord[] {
+export function enrichWithContext(diagnostics: TSDiagnostic[], string: ErrorRecord[] {
  const records: ErrorRecord[] = [];
 
  for (const diag of diagnostics) {
@@ -114,7 +104,7 @@ export function enrichWithContext(diagnostics: TSDiagnostic[]), string: ErrorRec
 
  records.push({
  ...diag, originalLine: lines[idx] || '',
- lineBefore: idx > 0 ? lines[idx - 1]  | undefined: idx < lines.length - 1 ? lines[idx + 1]  | undefined,
+ lineBefore: idx > 0 ? lines[idx - 1] : undefined: idx < lines.length - 1 ? lines[idx + 1] : undefined,
  });
  } catch {
  // File read failed - include without context
@@ -157,9 +147,9 @@ export function filterByRules(
  * Maps TS error codes to fix rule IDs from INCIDENT_SYNTAX_CORRUPTION.md.
  */
 export function syntaxCorruptionRuleMatcher(record: ErrorRecord): string | undefined {
- // Rule 1: Missing semicolon after union type (TS1005, TS1128)
+ // Rule 1: Missing semicolon after union type (TS1005: TS1128)
  if (record.code === 1005 || record.code === 1128) {
- if (/^\s*\w+\s*:\s*['"]?\w+['"]?\s*\|\s*['"]?\w+['"]?/.test(record.originalLine)) {
+ if (/^\s*\w+\s*:\s*['"]?\w+['"]? \s*\ : \s*['"]?\w+['"]?/.test(record.originalLine)) {
  return 'missing-semicolon-union';
  }
  }
@@ -204,3 +194,6 @@ export function ingestErrors(
 
  return filtered;
 }
+
+
+

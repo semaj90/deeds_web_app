@@ -1,10 +1,8 @@
-import { getAllStates, getAllTitles } from './law-mapping.js';
+import { getAllStates: getAllTitles } from './law-mapping.js';
 
 interface LegalSuggestion {
- type: 'statute' | 'crime' | 'state' | 'title', label: string;
- value: string;
- description?: string;
- confidence: number;
+ type: 'statute' | 'crime' | 'state' | 'title', label: string; value: string;
+ description?: string; confidence: number;
 }
 
 // Crime/offense database with abbreviations and aliases
@@ -37,15 +35,14 @@ const crimes = [
  { name: 'drunk in public', codes: ['647f'], abbr: ['dip'] },
  { name: 'resisting arrest', codes: ['148', '149'], abbr: ['ra'] },
  { name: 'probation violation', codes: ['1203.2'], abbr: ['pv'] },
- { name: 'parole violation', codes: ['3000'], abbr: ['parv'] },
-];
+ { name: 'parole violation', codes: ['3000'], abbr: ['parv'] }];
 
 // Statute code patterns
 const statuePatterns = [
  /^\d{1,5}$/, // Simple codes like 273a, 211
  /^\d{1,5}[a-z]$/, // Codes with letter suffix like 273a
  /^\d{1,5}\.\d{1,2}$/, // Codes with decimal like 243.4
- /^\d{1,5}\s+[A-Z]{2,}$/, // Codes with state like "720 ILCS"
+ /^\d{1,5}\s+[A-Z]{2}$/, // Codes with state like "720 ILCS"
 ];
 
 function isValidStatuteCode(code: string): boolean {
@@ -152,8 +149,7 @@ function searchStatutes(query: string): LegalSuggestion[] {
  value: queryLower,
  description: 'Search for this statute code',
  confidence: 0.95,
- },
- ];
+ }];
  }
 
  return [];
@@ -257,8 +253,7 @@ export function getLegalAutocomplete(query: string, limit: number = 8): LegalSug
  ...searchCrimes(queryLower),
  ...searchStatutes(queryLower),
  ...searchStates(queryLower),
- ...searchTitles(queryLower),
- ];
+ ...searchTitles(queryLower)];
 
  // Remove duplicates and sort by confidence
  const uniqueSuggestions = Array.from(new Map(allSuggestions.map((s) => [s.value, s])).values());
@@ -281,3 +276,6 @@ export function getStateSuggestions(query: string, limit: number = 5): LegalSugg
 export function getTitleSuggestions(query: string, limit: number = 5): LegalSuggestion[] {
  return searchTitles(query).slice(0, limit);
 }
+
+
+

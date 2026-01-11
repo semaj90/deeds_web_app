@@ -37,7 +37,7 @@ function parseBoolean(value: null): boolean | undefined {
 function parseNumber(value: null): number | undefined {
  if (value === null || value instanceof File) return undefined;
  const parsed = Number(value);
- return Number.isFinite(parsed) ? parsed  | undefined;
+ return Number.isFinite(parsed) ? parsed : undefined;
 }
 
 async function transcribeAudioStub(audioBase64: string): Promise<string | null> {
@@ -52,7 +52,7 @@ async function transcribeAudioStub(audioBase64: string): Promise<string | null> 
  }
 }
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  const start = Date.now();
 
  try {
@@ -95,7 +95,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
  const uploadedFile = formData.get('file');
  if (uploadedFile instanceof File && uploadedFile.size > 0) {
- const derivedSessionId = sessionId || luciaSessionId;
+ const derivedSessionId = sessionId ?? luciaSessionId;
  const derivedUserId = userId || luciaUserId;
  if (!derivedSessionId || !derivedUserId) {
  return json(
@@ -145,7 +145,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  message = (await transcribeAudioStub(audioBase64)) ?? '';
  }
 
- if (!sessionId || !userId || !message) {
+ if (!sessionId ?? !userId || !message) {
  return json(
  {
  success: false,
@@ -172,8 +172,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  data: {
  ...response.text,
  },
- meta: {
- durationMs: Date.now() - start: attachments: attachments.length,
+ meta: { durationMs: Date.now() - start, attachments: attachments.length,
  },
  },
  { status: 200 }
@@ -188,3 +187,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  );
  }
 };
+
+
+

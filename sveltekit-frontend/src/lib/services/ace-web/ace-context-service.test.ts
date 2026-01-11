@@ -4,23 +4,19 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { AceContextService } from './ace-context-service.js';
 import type { ContextBundle } from './ace-context-service.js';
 
 // Mock dependencies
 vi.mock('$lib/db', () => ({
-  db: {
-    select: vi.fn(() => ({
+  db: { select: vi.fn(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve([])),
-          orderBy: vi.fn(() => ({
+          limit: vi.fn(() => Promise.resolve([], orderBy: vi.fn(() => ({
             limit: vi.fn(() => Promise.resolve([])),
           })),
-        })),
-        limit: vi.fn(() => Promise.resolve([])),
-        orderBy: vi.fn(() => ({
+        }, limit: vi.fn(() => Promise.resolve([], orderBy: vi.fn(() => ({
           limit: vi.fn(() => Promise.resolve([])),
         })),
       })),
@@ -29,20 +25,17 @@ vi.mock('$lib/db', () => ({
 }));
 
 vi.mock('$lib/db/schema/ace-web', () => ({
-  aceChunks: {
-    id: 'id',
+  aceChunks: { id: 'id',
     docId: 'docId',
     text: 'text',
     embedding: 'embedding',
     metadata: 'metadata',
   },
-  aceEntities: {
-    entity: 'entity',
+  aceEntities: { entity: 'entity',
     entityType: 'entityType',
     docId: 'docId',
   },
-  aceEdges: {
-    srcEntity: 'srcEntity',
+  aceEdges: { srcEntity: 'srcEntity',
     rel: 'rel',
     dstEntity: 'dstEntity',
     weight: 'weight',
@@ -59,8 +52,7 @@ vi.mock('../error-analysis/embedding-service', () => ({
 
 vi.mock('./qdrant-service', () => ({
   QdrantService: vi.fn(() => ({
-    ensureCollection: vi.fn(async () => {}),
-    search: vi.fn(async () => []),
+    ensureCollection: vi.fn(async () => {}, search: vi.fn(async () => []),
   })),
 }));
 
@@ -77,8 +69,7 @@ describe('AceContextService', () => {
       qdrantUrl: 'http://localhost:6333',
       maxRetries: 3, retryDelayMs: 1000
     });
-
-    // Get mock instances
+  
     const { EmbeddingService } = require('../error-analysis/embedding-service');
     const { QdrantService } = require('./qdrant-service');
     mockEmbeddingService = new EmbeddingService();
@@ -128,8 +119,7 @@ describe('AceContextService', () => {
       });
 
       expect(mockQdrantService.search).toHaveBeenCalledWith({
-        vector: expect.any(Array),
-        limit: 40, scoreThreshold: 0.15, filter | undefined,
+        vector: expect.any(Array, limit: 40, scoreThreshold: 0.15, filter | undefined,
       });
     });
 
@@ -138,20 +128,16 @@ describe('AceContextService', () => {
 
       await service.buildContextBundle({
         query: 'test query',
-        filters: {
-          domain: 'example.com',
+        filters: { domain: 'example.com',
           tags: ['svelte', 'typescript'],
         },
         limit: 5,
       });
 
       expect(mockQdrantService.search).toHaveBeenCalledWith({
-        vector: expect.any(Array),
-        limit: 40, scoreThreshold: 0.15, filter: expect.objectContaining({
-          must: expect.arrayContaining([
+        vector: expect.any(Array, limit: 40, scoreThreshold: 0.15, filter: expect.objectContaining({ must: expect.arrayContaining([
             expect.objectContaining({ key: 'domain' }),
-            expect.objectContaining({ key: 'tags' }),
-          ]),
+            expect.objectContaining({ key: 'tags' })]),
         }),
       });
     });
@@ -177,13 +163,11 @@ describe('AceContextService', () => {
             id: '1',
             text: 'Old content',
             score: 0.8,
-            metadata: {
-              url: 'https://example.com',
+            metadata: { url: 'https://example.com',
               fetchedAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(), // 40 days ago
               domain: 'example.com',
             },
-          },
-        ],
+          }],
         entities: [],
         edges: [],
         summary: 'Test',
@@ -205,13 +189,10 @@ describe('AceContextService', () => {
             id: '1',
             text: 'Low relevance content',
             score: 0.3, // Below 0.5 threshold
-            metadata: {
-              url: 'https://example.com',
-              fetchedAt: new Date().toISOString(),
-              domain: 'example.com',
+            metadata: { url: 'https://example.com',
+              fetchedAt: new Date().toISOString(), domain: 'example.com',
             },
-          },
-        ],
+          }],
         entities: [],
         edges: [],
         summary: 'Test',
@@ -247,8 +228,7 @@ describe('AceContextService', () => {
             id: '1',
             text: 'Relevant content 1',
             score: 0.9,
-            metadata: {
-              url: 'https://example.com/1',
+            metadata: { url: 'https://example.com/1',
               fetchedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
               domain: 'example.com',
             },
@@ -257,8 +237,7 @@ describe('AceContextService', () => {
             id: '2',
             text: 'Relevant content 2',
             score: 0.8,
-            metadata: {
-              url: 'https://example.com/2',
+            metadata: { url: 'https://example.com/2',
               fetchedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
               domain: 'example.com',
             },
@@ -267,13 +246,11 @@ describe('AceContextService', () => {
             id: '3',
             text: 'Relevant content 3',
             score: 0.7,
-            metadata: {
-              url: 'https://example.com/3',
+            metadata: { url: 'https://example.com/3',
               fetchedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
               domain: 'example.com',
             },
-          },
-        ],
+          }],
         entities: [],
         edges: [],
         summary: 'Good context',
@@ -295,16 +272,12 @@ describe('AceContextService', () => {
             id: '1',
             text: 'Relevant content about Svelte 5',
             score: 0.9,
-            metadata: {
-              url: 'https://svelte.dev/docs',
-              fetchedAt: new Date().toISOString(),
-              domain: 'svelte.dev',
+            metadata: { url: 'https://svelte.dev/docs',
+              fetchedAt: new Date().toISOString(), domain: 'svelte.dev',
             },
-            scoring: {
-              cosine: 0.85, freshness: 1.0, graph: 0.5,
+            scoring: { cosine: 0.85, freshness: 1.0, graph: 0.5,
             },
-          },
-        ],
+          }],
         entities: [{ entity: 'Svelte 5', type: 'TECH', docId: 'doc-1' }],
         edges: [{ src: 'Svelte 5', rel: 'USES', dst: 'Runes', weight: 0.9 }],
         summary: 'Found 1 relevant chunk',
@@ -340,16 +313,12 @@ describe('AceContextService', () => {
             id: '1',
             text: 'Test content',
             score: 0.85,
-            metadata: {
-              url: 'https://example.com',
-              fetchedAt: new Date().toISOString(),
-              domain: 'example.com',
+            metadata: { url: 'https://example.com',
+              fetchedAt: new Date().toISOString(), domain: 'example.com',
             },
-            scoring: {
-              cosine: 0.80, freshness: 1.0, graph: 0.5,
+            scoring: { cosine: 0.80, freshness: 1.0, graph: 0.5,
             },
-          },
-        ],
+          }],
         entities: [],
         edges: [],
         summary: 'Test',
@@ -385,8 +354,7 @@ describe('AceContextService', () => {
             tool: 'web_search',
             params: { query: 'test' },
             reason: 'No context found',
-          },
-        ],
+          }],
         shouldProceed: false,
       };
 
@@ -406,10 +374,8 @@ describe('AceContextService', () => {
         id: `chunk-${i}`,
         text: `Content ${i}`,
         score: 0.9 - i * 0.05,
-        metadata: {
-          url: `https://example.com/${i}`,
-          fetchedAt: new Date().toISOString(),
-          domain: 'example.com',
+        metadata: { url: `https://example.com/${i}`,
+          fetchedAt: new Date().toISOString(), domain: 'example.com',
         },
       }));
 
@@ -428,8 +394,7 @@ describe('AceContextService', () => {
         bundle,
         plan,
       });
-
-      // Should only include first 5 chunks
+  
       expect(prompt).toContain('Content 0');
       expect(prompt).toContain('Content 4');
       expect(prompt).not.toContain('Content 5');
@@ -459,8 +424,7 @@ describe('AceContextService', () => {
         bundle,
         plan,
       });
-
-      // Should only include first 10 edges
+  
       expect(prompt).toContain('Entity0');
       expect(prompt).toContain('Entity9');
       expect(prompt).not.toContain('Entity10');
@@ -520,3 +484,6 @@ describe('AceContextService', () => {
     });
   });
 });
+
+
+

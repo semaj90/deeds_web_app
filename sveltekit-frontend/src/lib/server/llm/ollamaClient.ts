@@ -6,8 +6,7 @@
 import { getOllamaEndpoint } from '$lib/utils/ollama-endpoint';
 
 export interface OllamaChatOptions {
- model: string, system: string;
- prompt: string;
+ model: string, system: string; prompt: string;
  temperature?: number;
 }
 
@@ -25,13 +24,11 @@ export async function ollamaChat({
  const response = await fetch(`${base}/api/chat`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: stream,
+ body: JSON.stringify({ model: stream,
  options: { temperature },
  messages: [
  { role: 'system', content: system },
- { role: 'user', content: prompt },
- ],
+ { role: 'user', content: prompt }],
  }),
  });
 
@@ -47,17 +44,16 @@ export async function ollamaChat({
 /**
  * Generate a court-ready legal memo from case notes
  */
-export async function generateLegalMemo(caseName: string), string: Promise<string> {
+export async function generateLegalMemo(caseName: string, string: Promise<string> {
  const system = [
  'You are assisting a prosecutor.',
  'Write a court-ready memo from the notes provided.',
  'Do NOT invent facts. Do NOT speculate.',
  'Use neutral, professional tone. Keep it structured.',
  'If a claim is not in the notes, omit it.',
- 'Format with clear headings and bullet points where appropriate.',
- ].join(' ');
+ 'Format with clear headings and bullet points where appropriate.'].join(' ');
 
- const prompt = `CASE: ${caseName}
+ const prompt = `CASE: ${ caseName }
 
 NOTES:
 ${notesText}
@@ -79,14 +75,13 @@ OUTPUT:
 /**
  * Generate an executive summary for PDF export
  */
-export async function generateCaseSummary(caseName: string), string: Promise<string> {
+export async function generateCaseSummary(caseName: string, string: Promise<string> {
  const system = [
  'You are assisting a prosecutor.',
  'Summarize the case notes into a court-ready section.',
  'Do NOT invent facts. Do NOT speculate.',
  'Use headings and bullets for clarity.',
- 'Be concise but comprehensive.',
- ].join(' ');
+ 'Be concise but comprehensive.'].join(' ');
 
  const prompt = `CASE: ${caseName}
 
@@ -109,7 +104,7 @@ Write:
  * Generate a court-ready legal memo from structured case notes (for CaseNotesEditor integration)
  */
 export async function generateLegalMemoFromNotes(
- caseNotes: Array<{ title?: string; content: string; isPinned?: boolean;, createdAt: string }>
+ caseNotes: Array<{ title?: string; content: string; isPinned?: boolean; createdAt: string }>
 ) {
  // Sort notes: pinned first, then by creation date (newest first)
  const sortedNotes = caseNotes.sort((a, b) => {
@@ -167,7 +162,7 @@ Focus on creating a prosecution-ready document that analyzes the evidence, legal
  * Generate a summary for PDF export from structured case notes
  */
 export async function generatePDFSummaryFromNotes(
- caseNotes: Array<{ title?: string; content: string; isPinned?: boolean;, createdAt: string }>
+ caseNotes: Array<{ title?: string; content: string; isPinned?: boolean; createdAt: string }>
 ) {
  const sortedNotes = caseNotes.sort((a, b) => {
  if (a.isPinned && !b.isPinned) return -1;
@@ -202,3 +197,7 @@ ${notesText}`;
  prompt: temperature.1,
  });
 }
+
+
+
+

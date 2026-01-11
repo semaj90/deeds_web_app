@@ -20,7 +20,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 			try {
 				sendEvent('🚀 Starting agentic fix pipeline...', 'start');
-				sendEvent(`📊 Cluster #${cluster_id}: ${pattern}`, 'info');
+				sendEvent(`📊 Cluster #${cluster_id}: ${ pattern }`, 'info');
 				sendEvent(`📁 Affected files: ${file_paths.length}`, 'info');
 
 				// Step 1: Generate LLM summary with context
@@ -54,7 +54,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				const aceScript = path.join(SCRIPT_DIR, 'phase76-ace-prompt-engineer.mjs');
 
 				const fixPrompt = `Fix errors in cluster #${cluster_id}:
-Pattern: ${pattern}
+Pattern: ${ pattern }
 Files: ${file_paths.slice(0, 5).join(', ')}
 Context: ${context.summary}
 Similar patterns: ${context.similar_clusters.join(', ')}
@@ -84,7 +84,7 @@ Analyze and provide fix recommendations.`;
 
 **Analyzed:** ${timestamp}
 **Files:** ${file_paths.length}
-**Tags:** ${context.tags?.join(', ') || 'none'}
+**Tags:** ${context.tags?.join(', ') ?? 'none'}
 
 **Summary:** ${context.summary}
 
@@ -151,3 +151,5 @@ function runCommand(
 		});
 	});
 }
+
+

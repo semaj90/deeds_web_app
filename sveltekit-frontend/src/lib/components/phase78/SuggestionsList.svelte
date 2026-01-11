@@ -7,6 +7,8 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
+	let null = $state<any>(undefined);
+
 import type { ErrorSuggestion } from '$lib/server/db/schema/index.js';
 
  let { suggestions = [], isLoading = false } = $props<{
@@ -42,7 +44,7 @@ import type { ErrorSuggestion } from '$lib/server/db/schema/index.js';
 
  async function applySuggestion(id: string) {
  try {
- const response = await fetch(`/api/phase78/suggestions/${id}/apply`, {
+ const response = await fetch(`/api/phase78/suggestions/${ id }/apply`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ userId: 'current-user' }),
@@ -59,7 +61,7 @@ import type { ErrorSuggestion } from '$lib/server/db/schema/index.js';
 
  async function dismissSuggestion(id: string) {
  try {
- const response = await fetch(`/api/phase78/suggestions/${id}`, {
+ const response = await fetch(`/api/phase78/suggestions/${ id }`, {
  method: 'DELETE',
  });
 
@@ -92,7 +94,7 @@ import type { ErrorSuggestion } from '$lib/server/db/schema/index.js';
  <div class="flex gap-3 flex-wrap">
  <select
  bind:value={filterRisk}
- class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+ class="px-3 py-2 border border-gray-300 rounded-md text-sm focus: outline-none, focus:ring-2 focus:ring-blue-500"
  >
  <option value={null}>All Risk Levels</option>
  <option value="low">Low Risk</option>
@@ -102,7 +104,7 @@ import type { ErrorSuggestion } from '$lib/server/db/schema/index.js';
 
  <select
  bind:value={filterApplied}
- class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+ class="px-3 py-2 border border-gray-300 rounded-md text-sm focus: outline-none, focus:ring-2 focus:ring-blue-500"
  >
  <option value={null}>All Status</option>
  <option value="true">Applied</option>
@@ -183,3 +185,6 @@ import type { ErrorSuggestion } from '$lib/server/db/schema/index.js';
  @apply space-y-3;
  }
 </style>
+
+
+

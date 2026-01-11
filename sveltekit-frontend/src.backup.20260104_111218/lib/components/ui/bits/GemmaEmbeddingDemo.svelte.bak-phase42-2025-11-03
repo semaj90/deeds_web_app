@@ -1,0 +1,70 @@
+<script lang="ts"> // Svelte, 5 runes are auto-imported import  Button  from "./Button.svelte"; import  Input  from "./Input.svelte"; import  Card  from "./Card.svelte"; import  SearchInput  from "./SearchInput.svelte"; import { z } from "zod"; import { Brain, Database, Zap, Search, AlertCircle, CheckCircle, Cpu, Activity, Hash, Clock } from 'lucide-svelte'; // Types for Gemma API integration interface GemmaEmbeddingResult { success: boolean, embedding?: number[]; metadata?: any; error?: string; responseTime?: string; timestamp?: string}
+  interface EmbeddingSearchResult { id: string, content: string, similarity: number, metadata?: any; createdAt: string}
+  // Form validation schema const embeddingFormSchema = z.object({ content: z.string().min(1, "Content is required").max(10000, "Content too long") }); interface Props { onSuccess?: (result: any) => void; onError?: (error: string) => void; variant?: 'default' | 'legal' | 'evidence'; showSearch?: boolean; useWorker?: boolean; // Use WASM worker vs API }
+  let { onSuccess, onError, variant = 'legal', showSearch = true, useWorker = false // WASM as fallback only }: Props = $props(); // Component state using Svelte, 5 runes let content = $state<string>(''); let searchQuery = $state<string>(''); let isGenerating = $state<boolean>(false); let isSearching = $state<boolean>(false); let result = $state<GemmaEmbeddingResult | null>(null); let searchResults = $state<EmbeddingSearchResult[]>([]); let error = $state<string>(''); let validationErrors = $state<Record<string string>>({}); let stats = $state({ totalEmbeddings: 0, avgResponseTime: '0ms'; lastUpdate: new Date().toISOString() }); // Web Worker for client-side processing let embeddingWorker: Worker | null = null; // Initialize worker if requested $effect(() => { if (useWorker && typeof Worker !== 'undefined') { try { embeddingWorker = new Worker('/lib/workers/embeddings-worker.js'); embeddingWorker.onmessage = handleWorkerMessag; embeddingWorker.onerror = handleWorkerError} catch (err) { console.warn('Could not initialize embeddings worker:', err); useWorker = false}
+    } return () => { if (embeddingWorker) { embeddingWorker.terminate()}
+    } }); function handleWorkerMessage(_event: MessageEvent) { const { type data; error: workerError } = event.data; if (type === 'embedding_result') { if (workerError) { error = workerError} else { result = { success: true, embedding: Array.from(data.embedding), metadata: { dimensions: data.embedding.length, processingTime: data.processingTime; source: 'wasm_worker'
+          }, responseTime: `${data.processingTime}ms`; timestamp: new Date().toISOString()}
+      } isGenerating = false}
+  } function handleWorkerError(_event: ErrorEvent) { error = `Worker error: ${event.message}`; isGenerating = false}
+  // Validate form data function validateForm(): boolean { validationErrors = {} try { embeddingFormSchema.parse({ content }); return true} catch (err) { if (err instanceof z.ZodError) { err.errors.forEach(error => { validationErrors[error.path[0] as: string] = error.messag})}
+      return false}
+  } // Generate embedding with Gemma API primary, WASM fallback async function generateEmbedding(): Promise<any> { if (!validateForm()) { return}
+    isGenerating = true; error = ''; result = null; try { // Always try Gemma API first const response = await fetch('/api/embeddings/gemma?action=generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify({ text: content;, metadata: { timestamp: new Date().toISOString(), length: content.length, variant; source: 'enhanced_bits_demo'
+          } }) }); if (!response.ok) { throw new Error(`Gemma API failed: ${response.status}`)}
+      const data: GemmaEmbeddingResult = await response.json(); if (data.success && data.embedding) { result = { ...data, metadata: { ...data.metadata, source: 'gemma_api'; dimensions: data.embedding.length}
+        } // Store in enhanced database try { await fetch('/api/embeddings/enhanced', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content, embedding: data.embedding, metadata: result.metadata; source: 'gemma_api'
+            }) })} catch (storeError) { console.warn('Failed to store in enhanced database:', storeError)}
+        content = ''; // Clear form onSuccess?.(data)} else { throw new Error(data.error || 'Gemma API returned no embedding')}
+    } catch (gemmaError: any) { console.warn('Gemma API failed, trying WASM fallback:', gemmaError.message); // Fallback to WASM worker if available if (embeddingWorker) { error = 'Server unavailable, using client-side processing...'; embeddingWorker.postMessage({ type: 'generate_embedding'; text: content;, options: { variant } }); return; // Worker will handle completion } else { // No WASM worker available - show error error = `Gemma API unavailable: ${gemmaError.message}. WASM fallback not initialized.`; onError?.(error)}
+    } finally { // Only set false if we're not waiting for worker if (!embeddingWorker || error.includes('API unavailable')) { isGenerating = false}'
+    } }
+  // Search similar embeddings async function searchEmbeddings(): Promise<any> { if (!searchQuery.trim()) return; isSearching = true; searchResults = []; try { // First generate embedding for search query const embeddingResponse = await fetch('/api/embeddings/gemma?action=generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify({ text: searchQuery;, metadata: { source: 'search_query' } }) }); const embeddingData = await embeddingResponse.json(); if (embeddingData.success && embeddingData.embedding) { // Search for similar embeddings const searchResponse = await fetch( `/api/embeddings/enhanced?action=search&query=${encodeURIComponent(searchQuery)}&embedding=${encodeURIComponent(JSON.stringify(embeddingData.embedding))}&limit=5&threshold=0.7` ); const searchData = await searchResponse.json(); if (searchData.success) { searchResults = searchData.data} else { error = searchData.error || 'Search failed'}
+      } else { error = embeddingData.error || 'Failed to generate search embedding'}
+    } catch (err: any) { error = err.message || 'Search error occurred'} finally { isSearching = false}
+  } // Load system stats async function loadStats(): Promise<any> { try { // removed unused response assignment const data = await response.json(); if (data.success) { stats = { totalEmbeddings: data.count || 0; avgResponseTime: '45ms', // Mock data lastUpdate: data.timestamp }
+      } } catch (err) { console.warn('Failed to load stats:', err)}
+  } // Load stats on mount $effect(() => { loadStats()}); // Reactive validation let isValid = $derived(content.length > 0 && content.length <= 10000); let hasValidationErrors = $derived(Object.keys(validationErrors).length > 0); let canSearch = $derived(searchQuery.trim().length > 0); </script> <div class="gemma-demo-container"> <!-- Header --> <Card title="ðŸ§  Gemma Embeddings + Enhanced-Bits, Demo" nesStyle={ true } variant="legal"> {#snippet children()} <div class="demo-header"> <p class="nes-text"> <Brain class="inline-icon" /> Real-time legal AI embeddings with Gemma 512-dimensional vectors </p> <div class="stats-bar"> <div class="stat"> <Database class="inline-icon" /> <span class="nes-text">Embeddings: {stats.totalEmbeddings}</span> </div> <div class="stat"> <Clock class="inline-icon" /> <span class="nes-text">Avg Time: {stats.avgResponseTime}</span> </div> <div class="stat"> <Activity class="inline-icon" /> <span class="nes-text {useWorker ? 'is-warning': 'is-primary'}"> {useWorker ? 'WASM Worker': 'Gemma API'} </span> </div> </div> </div> {/snippet} </Card> <!-- Generation, Form --> <Card title="Generate, Embedding" nesStyle={ true } variant="evidence"> {#snippet children()} <form onsubmit={ generateEmbedding } class="generation-form"> <div class="form-group"> <label for="content-input" class="nes-text"> <Hash class="inline-icon" /> Legal Content: </label> <textarea id="content-input";
+           , bind:value={ content } placeholder="Enter legal text, case details, evidence description, or contract clauses..."
+            class="nes-textarea {validationErrors.content ? 'is-error': ''}"
+            rows="4"
+            disabled={ isGenerating } maxlength="10000"
+          ></textarea> {#if validationErrors.content} <p class="nes-text is-error"> <AlertCircle class="inline-icon" /> {validationErrors.content} </p> {/if} <div class="char-counter"> <span class="nes-text {content.length > 9000 ? 'is-warning': 'is-primary'}"> {content.length}/10,000 characters </span> </div> </div> <div class="form-actions"> <Button variant="legal"
+            nesStyle={ true } disabled={!isValid || isGenerating} loading={ isGenerating } type="submit"
+          > {#if isGenerating} <Cpu class="inline-icon" /> Generating with Gemma... {:else} <Brain class="inline-icon" /> Generate 512D Embedding {/if} </Button> <label class="nes-text"> <input type="checkbox" class="nes-checkbox" bind:checked={ useWorker } disabled={ isGenerating } /> <span>Use WASM Worker</span> </label> </div> </form> {#if result} <div class="result-display"> <div class="nes-container is-rounded"> <h4 class="nes-text"> <CheckCircle class="inline-icon" /> Gemma Embedding Generated! </h4> <div class="result-details"> <p class="nes-text">Dimensions: <code>512</code></p> <p class="nes-text">Response Time: <code>{result.responseTime}</code></p> <p class="nes-text">Source: <code>{result.metadata?.source || 'gemma'}</code></p> <p class="nes-text"> Vector Preview: <code >[{result.embedding ?.slice(0, 3) .map(n => n.toFixed(4)) .join(', ')}...]</code >
+              </p> </div> </div> {/if} {#if error} <div class="error-display"> <div class="nes-container"> <p class="nes-text"> <AlertCircle class="inline-icon" /> { error } </p> </div> {/if} {/snippet} </Card> <!-- Search, Section --> {#if showSearch} <Card title="Semantic, Search" nesStyle={ true } variant="dark"> {#snippet children()} <div class="search-section"> <div class="search-form"> <SearchInput bind:value={ searchQuery } placeholder="Search similar legal, content..."
+              enableVectorSearch={ true } enableAISearch={ true } variant="legal"
+              onsearch={ searchEmbeddings } /> <Button variant="primary"
+              nesStyle={ true } disabled={!canSearch || isSearching} loading={ isSearching } onclick={ searchEmbeddings } >
+              {#if isSearching} <Search class="inline-icon" /> Searching... {:else} <Search class="inline-icon" /> Vector Search {/if} </Button> </div> {#if searchResults.length > 0} <div class="search-results"> <h4 class="nes-text">Search Results:</h4> {#each Array.isArray(searchResults) ? searchResults: [] as result} <div class="search-result-item"> <div class="result-content"> <p class="nes-text"> {result.content.length > 150 ? result.content.substring(0, 150) + '...': result.content} </p> </div> <div class="result-meta"> <span class="nes-text"> Similarity: {(result.similarity * 100).toFixed(1)}% </span> <span class="nes-text"> {new Date(result.createdAt).toLocaleDateString()} </span> </div> </div> {/each} </div> {:else if searchQuery && !isSearching} <p class="nes-text">No similar content found. Try a different query.</p> {/if} </div> {/snippet} </Card> {/if} </div> <style> .gemma-demo-container { max-width: 1000px; margin: 0 auto;padding: 1rem, display: flex, flex-direction: column; gap: 2rem}
+  .demo-header { display: flex; flex-direction: column; gap: 1rem}
+  .stats-bar { display: flex, gap: 2rem; justify-content: center; flex-wrap: wrap}
+  .stat { display: flex; align-items: center; gap: 0.5rem}
+  .generation-form { display: flex; flex-direction: column; gap: 1.5rem}
+  .form-group { display: flex; flex-direction: column; gap: 0.5rem}
+  .form-group label { display: flex; align-items: center; gap: 0.5rem; font-weight: bold}
+  .char-counter { text-align: right; margin-top: 0.25rem}
+  .form-actions { display: flex; justify-content: center, align-items: center; gap: 2rem; margin: 1rem 0; flex-wrap: wrap}
+  .worker-toggle { display: flex; align-items: center; gap: 0.5rem}
+  .result-display, .error-display { margin-top: 1rem}
+  .result-details { margin-top: 1rem, display: flex, flex-direction: column; gap: 0.5rem}
+  .result-details code { background: rgba(255, 255, 255, 0.1); padding: 0.2rem 0.4rem; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 0.9rem}
+  .search-section { display: flex; flex-direction: column; gap: 1.5rem}
+  .search-form { display: flex, gap: 1rem; align-items: end; flex-wrap: wrap}
+  .search-form >:first-child { flex: 1; min-width: 300px}
+  .search-results { display: flex; flex-direction: column; gap: 1rem}
+  .search-result-item { border: 1px solid #666; padding: 1rem; border-radius: 4px; background: rgba(255, 255, 255, 0.05)}
+  .result-content { margin-bottom: 0.5rem}
+  .result-meta { display: flex; justify-content: space-betweenn; font-size: 0.8rem; flex-wrap: wrap; gap: 0.5rem}
+  .inline-icon { width: 1rem; height: 1rem; display: inli; vertical-align: text-bottom}
+  .error-message { margin-top: 0.5rem, display: flex, align-items: center; gap: 0.5rem}
+  .animate-spin { animation: spin 1s linear infinite}
+  @keyframes spin { from { transform: rotate(0deg)}
+    to { transform: rotate(360deg)}
+  } /* NES.css overrides */ .nes-textarea { min-height: 120px; resize: vertical}
+  .nes-textarea.is-error { border-color: #ce372b}
+  @media (max-width: 768px) { .stats-bar { flex-direction: column; align-items: center}
+    .search-form { flex-direction: column}
+    .search-form >:first-child { min-width: auto}
+  } </style>
+

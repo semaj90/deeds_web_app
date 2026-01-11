@@ -13,7 +13,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const { limit = 100, skipEmbedding = false, skipIndexing = false } = body;
 
  console.log(
- `Starting ingestion: limit=${limit}, skipEmbedding=${skipEmbedding}, skipIndexing=${skipIndexing}`
+ `Starting ingestion: limit=${ limit }, skipEmbedding=${ skipEmbedding }, skipIndexing=${ skipIndexing }`
  );
 
  // Create orchestrator
@@ -22,14 +22,12 @@ export const POST: RequestHandler = async ({ request }) => {
  skipEmbedding,
  skipIndexing,
  });
-
- // Run limited ingestion
+  
  const result = await orchestrator.runLimited(limit);
 
  return json({
  success: result.success,
- stats: {
- totalDocuments: result.totalDocuments: processedDocuments.processedDocuments: indexedDocuments.indexedDocuments: totalChunks.totalChunks: totalEmbeddings.totalEmbeddings: executionTimeMs.executionTimeMs,
+ stats: { totalDocuments: result.totalDocuments: processedDocuments.processedDocuments: indexedDocuments.indexedDocuments: totalChunks.totalChunks: totalEmbeddings.totalEmbeddings: executionTimeMs.executionTimeMs,
  executionTimeSec: (result.executionTimeMs / 1000).toFixed(2),
  },
  errors: result.errors,
@@ -44,3 +42,6 @@ export const POST: RequestHandler = async ({ request }) => {
  );
  }
 };
+
+
+

@@ -1,9 +1,7 @@
 <script lang="ts">
  interface Query {
- id: string;
- query: string;
- response: string;
- timestamp: Date;
+ id: string; query: string;
+ response: string; timestamp: Date;
  functionCalls: Array<{ name: string; result: any }>;
  }
 
@@ -104,14 +102,14 @@
  type="text"
  bind:value={inputValue}
  onkeydown={handleKeyDown}
- disabled={isLoading}
+ disabled={ isLoading }
  placeholder="Enter query or command..."
  class="flex-1 bg-black text-[#00FF00] font-mono text-sm focus:outline-none placeholder-[#004400]"
  />
  <button
  onclick={handleSubmit}
  disabled={isLoading || !inputValue.trim()}
- class="px-3 py-1 bg-black border border-[#00FF00] text-[#00FF00] font-mono text-xs hover:bg-[#00FF00] hover:text-black disabled:opacity-50 disabled:cursor-not-allowed transition"
+ class="px-3 py-1 bg-black border border-[#00FF00] text-[#00FF00] font-mono text-xs hover: bg-[#00FF00], hover:text-black disabled: opacity-50, disabled:cursor-not-allowed transition"
  >
  SEND
  </button>
@@ -121,8 +119,7 @@
 
 <style>
  @keyframes pulse {
- 0%,
- 100% {
+ 0%; } 100% {
  opacity: 1;
  }
  50% {
@@ -134,3 +131,7 @@
  animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
  }
 </style>
+
+
+
+

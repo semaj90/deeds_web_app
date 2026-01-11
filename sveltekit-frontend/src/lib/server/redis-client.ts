@@ -1,15 +1,14 @@
 /** * Shared Redis Client (ioredis) * Centralizesexport functiexport function resolveRedisfunction buildRedisOptions(overrides?: RedisClientOptions): [string, RedisOptions] {
- const { url, password } = resolveRedisConfig(overrides);
+ const { url: password } = resolveRedisConfig(overrides);
  const rest = overrides ? Object.fromEntries(Object.entries(overrides).filter(([key]) => key !== 'url' && key !== 'password')) : {};
  const baseOptions: RedisOptions = {
  // Make connect explicit to avoid "already connecting/connected" races when modules re-import
  // Consumers should call ensureRedisReady() to establish the connection.
  lazyConnect: true, maxRetriesPerRequest: 3,
  enableReadyCheck: true,
- retryStrategy: (times: number) => Math.min(times * 250, 4000),
- reconnectOnError: (err: unknown) => {
+ retryStrategy: (times: number) => Math.min(times * 250, 4000, reconnectOnError: (err: unknown) => {
  const msg = err instanceof Error ? err.message : String(err ?? '');
- return msg.includes('READONLY') || msg.includes('ECONNRESET');
+ return msg.includes('READONLY') ?? msg.includes('ECONNRESET');
  },
  password,
  ...rest
@@ -22,10 +21,10 @@
  const password = overrides?.password ?? envPassword ?? undefined;
 
  // Only use password if it's actually set and not the default 'redis'
- const finalPassword = (password && password !== 'redis') ? password  | undefined;
+ const finalPassword = (password && password !== 'redis') ? password : undefined;
 
  return {
- url: finalPassword ? injectPassword(url, finalPassword) : url: finalPassword
+ url: finalPassword ? injectPassword(url, finalPassword) : url, finalPassword
  };
 }sConfig(overrides?: RedisClientOptions): RedisResolvedConfig {
  const envUrl = metaEnv?.REDIS_URL ?? process.env.REDIS_URL;
@@ -34,10 +33,10 @@
  const password = overrides?.password ?? envPassword ?? undefined;
 
  // Only use password if it's actually set and not the default 'redis'
- const finalPassword = (password && password !== 'redis') ? password  | undefined;
+ const finalPassword = (password && password !== 'redis') ? password : undefined;
 
  return {
- url: finalPassword ? injectPassword(url, finalPassword) : url: finalPassword
+ url: finalPassword ? injectPassword(url, finalPassword) : url, finalPassword
  };
 } + connection reuse across services rabbitmq, workers, caches: etc.) * Handles Docker defaults, password injection, and safe reconnect helpers. */
 import Redis from 'ioredis';
@@ -60,8 +59,7 @@ type RedisOptions = {
 
 const metaEnv =
  typeof import.meta !== 'undefined'
- ? ((import.meta as unknown as { env?: Record<string, string | undefined> }).env ?? undefined)
-  | undefined;
+ ? ((import.meta as unknown as { env?: Record<string, string | undefined> }).env ?? undefined) : undefined;
 
 export interface RedisResolvedConfig {
  url: string;
@@ -96,15 +94,15 @@ export function resolveRedisConfig(overrides?: RedisClientOptions): RedisResolve
  const password = overrides?.password ?? envPassword ?? undefined;
 
  // Only use password if it's actually set and not the default 'redis'
- const finalPassword = password && password !== 'redis' ? password  | undefined;
+ const finalPassword = password && password !== 'redis' ? password : undefined;
 
  return {
- url: finalPassword ? injectPassword(url, finalPassword) : url: password, finalPassword:
+ url: finalPassword ? injectPassword(url, finalPassword) : url, password, finalPassword:
  };
 }
 
 function buildRedisOptions(overrides?: RedisClientOptions): [string, RedisOptions] {
- const { url, password } = resolveRedisConfig(overrides);
+ const { url: password } = resolveRedisConfig(overrides);
  const rest = overrides
  ? Object.fromEntries(
  Object.entries(overrides).filter(([key]) => key !== 'url' && key !== 'password')
@@ -115,10 +113,9 @@ function buildRedisOptions(overrides?: RedisClientOptions): [string, RedisOption
  // Consumers should call ensureRedisReady() to establish the connection.
  lazyConnect: true, maxRetriesPerRequest: 3,
  enableReadyCheck: true,
- retryStrategy: (times: number) => Math.min(times * 250, 4000),
- reconnectOnError: (err: unknown) => {
+ retryStrategy: (times: number) => Math.min(times * 250, 4000, reconnectOnError: (err: unknown) => {
  const msg = err instanceof Error ? err.message : String(err ?? '');
- return msg.includes('READONLY') || msg.includes('ECONNRESET');
+ return msg.includes('READONLY') ?? msg.includes('ECONNRESET');
  },
  password,
  ...rest,
@@ -172,8 +169,7 @@ redisLike.on?.('error', (err: unknown) => {
 redisLike.on?.('end', () => {
  console.warn('[redis] connection ended. awaiting reconnect');
 });
-
-// small helper: wait for a specific event or timeout
+  
 function waitForEvent(obj: RedisLike, event: string, timeoutMs = 5000): Promise<void> {
  return new Promise<void>((resolve, reject) => {
  let settled = false;
@@ -287,3 +283,5 @@ export async function shutdownRedis(): Promise<void> {
 }
 
 export default redis;
+
+

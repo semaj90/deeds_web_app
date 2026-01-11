@@ -13,8 +13,7 @@ interface FixRequest {
 
 interface AgentProgress {
 	status: 'analyzing' | 'fixing' | 'testing' | 'complete' | 'failed';
-	file_path: string;
-	progress: number;
+	file_path: string; progress: number;
 	message: string;
 	fixes?: string[];
 }
@@ -25,8 +24,7 @@ async function queryKnowledgeBase(filePath: string, errorContext: string): Promi
 		const embedResponse = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: 'embeddinggemma:latest',
+			body: JSON.stringify({ model: 'embeddinggemma:latest',
 				prompt: errorContext
 			})
 		});
@@ -47,8 +45,7 @@ async function queryKnowledgeBase(filePath: string, errorContext: string): Promi
 				vector,
 				limit: 5,
 				with_payload: true,
-				filter: {
-					should: [
+				filter: { should: [
 						{
 							key: 'file_path',
 							match: { value: filePath }
@@ -71,7 +68,7 @@ async function queryKnowledgeBase(filePath: string, errorContext: string): Promi
 
 		// Concatenate relevant knowledge
 		const knowledge = results
-			.map((r: any) => r.payload?.content || r.payload?.text || '')
+			.map((r: any) => r.payload?.content ?? r.payload?.text || '')
 			.filter(Boolean)
 			.join('\n\n');
 
@@ -97,9 +94,8 @@ async function generateFix(
 		progress: 0,
 		message: 'Analyzing errors and retrieving context...'
 	});
-
-	// Build prompt with KB context
-	const prompt = `You are an expert TypeScript/Svelte developer fixing errors in: ${filePath}
+  
+	const prompt = `You are an expert TypeScript/Svelte developer fixing errors in: ${ filePath }
 
 ERRORS TO FIX:
 ${errors.map((e, i) => `${i + 1}. ${e}`).join('\n')}
@@ -136,12 +132,10 @@ Return fixes in JSON format:
 		const response = await fetch(`${OLLAMA_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
+			body: JSON.stringify({ model: 'gemma3-legal:latest',
 				prompt,
 				stream: false,
-				options: {
-					temperature: 0.3,
+				options: { temperature: 0.3,
 					top_p: 0.9,
 					num_predict: 2048
 				}
@@ -161,8 +155,7 @@ Return fixes in JSON format:
 			progress: 70,
 			message: 'Parsing and validating fixes...'
 		});
-
-		// Try to extract JSON
+  
 		const jsonMatch = text.match(/\{[\s\S]*"fixes"[\s\S]*\}/);
 		if (jsonMatch) {
 			const parsed = JSON.parse(jsonMatch[0]);
@@ -241,3 +234,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		);
 	}
 };
+
+
+
+

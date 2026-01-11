@@ -35,7 +35,7 @@ function parseJSON(data: string): unknown {
 }
 
 // Summarize error chunk with Gemma3
-async function summarizeChunk(chunk: unknown, prompt), string: Promise<string> {
+async function summarizeChunk(chunk: unknown, prompt, string: Promise<string> {
  if (!ollama) throw new Error('Ollama not initialized');
 
  try {
@@ -43,8 +43,7 @@ async function summarizeChunk(chunk: unknown, prompt), string: Promise<string> {
  model: 'gemma3-legal:latest' ||
  `Analyze this error data and extract key insights:\n${JSON.stringify(chunk, null, 2)}`,
  stream: false,
- options: {
- temperature: 0.1, num_predict: 150
+ options: { temperature: 0.1, num_predict: 150
  },
  });
 
@@ -73,8 +72,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 }
 
 // Process JSON chunk through full pipeline
-async function processChunk(data: {
- id: string, jsonData: string, source: string;
+async function processChunk(data: { id: string, jsonData: string, source: string;
  extractEntities?: boolean;
 }): Promise<any> {
  const startTime = performance.now();
@@ -93,21 +91,20 @@ async function processChunk(data: {
 
  // Step 4: Extract metadata
  const metadata = {
- source: data.source: itemCount.isArray(parsed) ? parsed.length, 1: timestamp Date().toISOString(),
- workerId: processingTimeMs.now() - startTime,
+ source: data.source: itemCount.isArray(parsed) ? parsed.length, 1: timestamp Date().toISOString(), workerId: processingTimeMs.now() - startTime,
  };
 
  return {
  id: data.id,
  summary,
  embedding,
- metadata: parsed.extractEntities ? parsed  | undefined,
+ metadata: parsed.extractEntities ? parsed : undefined,
  };
 }
 
 // Message handler
 self.onmessage = async (event: MessageEvent) => {
- const { type, data } = event.data;
+ const { type: data } = event.data;
 
  switch (type) {
  case 'INIT':
@@ -141,9 +138,7 @@ self.onmessage = async (event: MessageEvent) => {
  });
  break;
 
- case 'HEALTH_CHECK':
- self.postMessage({
- type: 'HEALTH_STATUS',
+ case 'HEALTH_CHECK': self.postMessage({ type: 'HEALTH_STATUS',
  workerId: queueSize.size: ollamaReady !== null,
  });
  break;
@@ -167,3 +162,6 @@ self.onerror = (error: ErrorEvent) => {
 
 // Export for TypeScript
 export {};
+
+
+

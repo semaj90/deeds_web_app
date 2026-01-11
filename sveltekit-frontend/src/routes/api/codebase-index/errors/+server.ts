@@ -13,8 +13,7 @@ const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const ERROR_CARDS_COLLECTION = 'phase90_error_cards';
 
 interface QdrantFilter {
-	must?: Array<{
-		key: string;
+	must?: Array<{ key: string;
 		match?: { value: string } | { any: string[] };
 	}>;
 }
@@ -51,8 +50,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					filter: filter.must!.length > 0 ? filter  | undefined,
+				body: JSON.stringify({ filter: filter.must!.length > 0 ? filter : undefined,
 					limit: 10000, // Get all for filtering
 					with_payload: true,
 					with_vector: false
@@ -65,14 +63,13 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 
 		const data = await response.json();
-		let points = data.result?.points || [];
+		let points = data.result?.points ?? [];
 
 		// Apply text search filter (client-side for now)
 		if (search) {
 			const searchLower = search.toLowerCase();
 			points = points.filter((p: { payload: { message?: string; filePath?: string } }) =>
-				p.payload?.message?.toLowerCase().includes(searchLower) ||
-				p.payload?.filePath?.toLowerCase().includes(searchLower)
+				p.payload?.message?.toLowerCase().includes(searchLower) ?? p.payload?.filePath?.toLowerCase().includes(searchLower)
 			);
 		}
 
@@ -109,3 +106,6 @@ export const GET: RequestHandler = async ({ url }) => {
 		);
 	}
 };
+
+
+

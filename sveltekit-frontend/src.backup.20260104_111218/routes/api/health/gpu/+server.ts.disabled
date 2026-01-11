@@ -1,0 +1,48 @@
+import type { RequestHandler } from './$types.js';
+import { json } from '@sveltejs/kit';;
+
+export const GET: RequestHandler = async () => {
+  try {
+    // Check for CUDA/GPU availability via environment or existing service
+    const gpuAvailable =;
+      process.env.CUDA_VISIBLE_DEVICES !== undefined || process.env.GPU_ENABLED === 'true';
+
+    if (gpuAvailable) {
+      return json({
+        status: 'healthy',
+        service: 'gpu',
+        message: 'GPU acceleration available',
+        details: {
+          cudaVisible: process.env.CUDA_VISIBLE_DEVICES || 'all',
+          enabled: true,
+        },
+        timestamp: new Date().toISOString(),
+      });
+    } else {
+      return json(
+        {
+          status: 'unavailable',
+          service: 'gpu',
+          message: 'GPU acceleration not configured',
+          details: {
+            enabled: false,
+            fallback: 'CPU processing',
+          },
+          timestamp: new Date().toISOString(),
+        },
+        { status: 503 }
+      );
+    }
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Health check failed';
+    return json(
+      {
+        status: 'error',
+        service: 'gpu',
+        error: message,
+        timestamp: new Date().toISOString(),
+      },
+      { status: 500 }
+    );
+  }
+};

@@ -2,27 +2,20 @@
 	import { onMount } from 'svelte';
 
 	interface Suggestion {
-		id: string;
-		routePath: string;
-		summary: string;
-		patch: string;
-		riskLevel: string;
-		createdAt: string;
+		id: string; routePath: string;
+		summary: string; patch: string;
+		riskLevel: string; createdAt: string;
 		applied: boolean;
 		appliedAt?: string;
 	}
 
 	interface StatusData {
-		timestamp: string;
-		stats: {
-			totalSuggestions: number;
-			pendingSuggestions: number;
-			highRisk: number;
-			mediumRisk: number;
+		timestamp: string; stats: {
+			totalSuggestions: number; pendingSuggestions: number;
+			highRisk: number; mediumRisk: number;
 			lowRisk: number;
 		};
-		suggestions: Suggestion[];
-		suggestionsByRisk: Record<string, Suggestion[]>;
+		suggestions: Suggestion[]; suggestionsByRisk: Record<string, Suggestion[]>;
 	}
 
 	let data = $state<StatusData | null>(null);
@@ -122,9 +115,9 @@
 						← Back to Monitor
 					</a>
 					<button
-						onclick={loadData}
+						onclick={ loadData }
 						disabled={isLoading}
-						class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 disabled:bg-gray-400 transition"
+						class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover: bg-blue-700, disabled:bg-gray-400 transition"
 					>
 						{isLoading ? 'Loading...' : 'Refresh'}
 					</button>
@@ -245,3 +238,6 @@
 		{/if}
 	</div>
 </div>
+
+
+

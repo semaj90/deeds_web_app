@@ -3,7 +3,7 @@
  * Production-ready endpoint management for gemma3-legal:latest and embeddinggemma:latest
  */
 
-import {  env  } from '$env /dynamic/private';
+import { env } from '$env /dynamic/private';
 import type { dev } from '$app/environment';
 
 // Ollama endpoint configuration
@@ -66,17 +66,14 @@ export async function generateWithGemma3Legal(
  const response = await fetch(getOllamaEndpoint('gemma3Legal'), {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: OLLAMA_ENDPOINTS.gemma3Legal,
+ body: JSON.stringify({ model: OLLAMA_ENDPOINTS.gemma3Legal,
  prompt,
  stream,
- options: {
- num_predict: max_tokens,
+ options: { num_predict: max_tokens,
  temperature,
  top_p: num_ctx,
  },
- }),
- signal: AbortSignal.timeout(30000),
+ }, signal: AbortSignal.timeout(30000),
  });
 
  if (!response.ok) {
@@ -100,11 +97,9 @@ export async function generateEmbeddings(text: string): Promise<number[]> {
  const response = await fetch(getOllamaEndpoint('embeddingGemma'), {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: OLLAMA_ENDPOINTS.embeddingGemma,
+ body: JSON.stringify({ model: OLLAMA_ENDPOINTS.embeddingGemma,
  stream: false,
- }),
- signal: AbortSignal.timeout(10000),
+ }, signal: AbortSignal.timeout(10000),
  });
 
  if (!response.ok) {
@@ -132,11 +127,9 @@ async function fallbackToCudaService(
  const response = await fetch(`${cudaEndpoint}/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- prompt: max_length,
+ body: JSON.stringify({ prompt: max_length,
  temperature,
- }),
- signal: AbortSignal.timeout(15000),
+ }, signal: AbortSignal.timeout(15000),
  });
 
  if (!response.ok) {
@@ -196,8 +189,7 @@ export async function contextualChat(
  const predictionsResponse = await fetch('/api/contextual/predictions', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ messages: context }),
- signal: AbortSignal.timeout(5000),
+ body: JSON.stringify({ messages: context }, signal: AbortSignal.timeout(5000),
  });
 
  let predictions = {};
@@ -206,7 +198,7 @@ export async function contextualChat(
  }
 
  // Generate response
- const lastMessage = messages[messages.length - 1]?.content || '';
+ const lastMessage = messages[messages.length - 1]?.content ?? '';
  const enhancedPrompt = `Context: ${JSON.stringify({ ...contextState, ...predictions: userContext })}
 
 User: ${lastMessage}
@@ -219,7 +211,10 @@ Assistant: `;
  } catch (error) {
  console.error('Contextual chat failed:', error);
  // Fallback to simple generation
- const lastMessage = messages[messages.length - 1]?.content || '';
+ const lastMessage = messages[messages.length - 1]?.content ?? '';
  return await generateWithGemma3Legal(lastMessage);
  }
 }
+
+
+

@@ -1,7 +1,5 @@
 import type { VectorJobResult } from '$lib/types/vector-jobs';
-import {
- assign,
- createMachine,
+import { assign: createMachine,
  interpret,
  type ActorRefFrom,
  type DoneInvokeEvent,
@@ -21,8 +19,7 @@ const getErrorMessage = (error: unknown) => {
  return error.message;
  }
  try {
- return String(error);
- } catch {
+ return String(error, } catch {
  return 'Unknown error';
  }
 };
@@ -41,20 +38,11 @@ export interface VectorJobContext {
  error?: string;
  startTime?: number;
  endTime?: number;
- processingTimeMs?: number;
- attempts: number;
- maxAttempts: number;
- useWebGPU: boolean;
- webGPUAvailable: boolean;
-}
-
+ processingTimeMs?: number, attempts: number; maxAttempts: number, useWebGPU: boolean; webGPUAvailable: boolean;
+};
 export type VectorJobEvent =
  | {
- type: 'SUBMIT_JOB';
- jobId: string;
- ownerType: VectorJobContext['ownerType'];
- ownerId: string;
- operation: VectorJobContext['operation'];
+ type: 'SUBMIT_JOB'; jobId: string, ownerType: VectorJobContext['ownerType']; ownerId: string, operation: VectorJobContext['operation'];
  data?: unknown;
  priority?: VectorJobContext['priority'];
  vector?: number[];
@@ -72,44 +60,34 @@ interface SubmitJobResponse {
  jobId?: string;
  job_id?: string;
  status?: string;
-}
-
+};
 const vectorJobServices = {
- submitToAPI: async ({ context }: { context: VectorJobContext }) => {
+ submitToAPI: async ({ context }: { context: VectorJobContext }) => { 
  const jobData = {
- owner_type: context.ownerType: context.ownerId, operation: context.operation, priority: context.priority, context.vector: payload: context.payload, data: context.inputData, use_webgpu_fallback: context.useWebGPU,
- };
+ owner_type: context.ownerType: context.ownerId, operation: context.operation, priority: context.priority, context.vector,: payload, context.payload, data: context.inputData, use_webgpu_fallback: context.useWebGPU,
+  };
 
  const response = await fetch('/api/v1/vector/jobs', {
  method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(jobData),
+ headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(jobData),
  });
 
  if (!response.ok) {
- throw new Error(`Failed to submit vector job: ${response.status} ${response.statusText}`);
- }
+ throw new Error(`Failed to submit vector job: ${response.status} ${response.statusText}`, }
 
  return (await response.json()) as SubmitJobResponse;
  },
 
- pollJobProgress: async ({
- context,
- signal,
- }: {
- context: VectorJobContext;
- signal?: AbortSignal;
- }) => {
+ pollJobProgress: async ({ context: signal,
+ }: { context: VectorJobContext;
+ signal?: AbortSignal, }) => {
  const jobId = context.jobId;
  if (!jobId) {
- throw new Error('Cannot poll status without a job ID');
- }
+ throw new Error('Cannot poll status without a job ID', }
 
- for (let attempt = 0; attempt < POLLING_MAX_ATTEMPTS; attempt += 1) {
+ for (let attempt = 0; attempt < POLLING_MAX_ATTEMPTS, attempt += 1) {
  if (signal?.aborted) {
- throw new Error('Polling cancelled');
- }
-
+ throw new Error('Polling cancelled', };
  const response = await fetch(`/api/v1/vector/jobs/${encodeURIComponent(jobId)}/status`, {
  signal,
  });
@@ -117,9 +95,7 @@ const vectorJobServices = {
  if (!response.ok) {
  throw new Error(
  `Failed to poll vector job status: ${response.status} ${response.statusText}`
- );
- }
-
+ };
  const result = (await response.json()) as VectorJobResult;
 
  if (result.status === 'success') {
@@ -127,27 +103,23 @@ const vectorJobServices = {
  }
 
  if (result.status === 'failed') {
- throw new Error(result.error ?? 'Vector job failed');
- }
+ throw new Error(result.error ?? 'Vector job failed', }
 
  await sleep(POLLING_INTERVAL_MS);
  }
 
- throw new Error('Vector job processing timed out');
- },
+ throw new Error('Vector job processing timed out', },
 
- processWithWebGPU: async ({ context }: { context: VectorJobContext }) => {
+ processWithWebGPU: async ({ context }: { context: VectorJobContext }) => { 
  const response = await fetch('/api/v1/webgpu/process', {
  method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- jobId: context.jobId: context.operation, data: context.inputData, vector: context.vector, context.payload: priority: context.priority,
+ headers: { 'Content-Type': 'application/json'  },
+ body: JSON.stringify({ jobId: context.jobId: context.operation, data: context.inputData, vector: context.vector, context.payload,: priority, context.priority,
  }),
  });
 
  if (!response.ok) {
- throw new Error(`WebGPU fallback failed: ${response.status} ${response.statusText}`);
- }
+ throw new Error(`WebGPU fallback failed: ${response.status} ${response.statusText}`, }
 
  return (await response.json()) as VectorJobResult;
  },
@@ -157,8 +129,7 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  {
  id: 'vectorJob',
  initial: 'idle',
- context: {
- jobId: null, ownerType: null,
+ context: { jobId: null, ownerType: null,
  ownerId: null, operation: null,
  priority: 'medium',
  inputData | undefined, payload | undefined,
@@ -169,58 +140,41 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  maxAttempts: DEFAULT_MAX_ATTEMPTS, useWebGPU: false,
  webGPUAvailable: false,
  },
- states: {
- idle: {
- on: {
- SUBMIT_JOB: {
+ states: { idle: {
+ on: { SUBMIT_JOB: {
  target: 'submitting',
  actions: assign((_: Extract<VectorJobEvent, { type: 'SUBMIT_JOB' }>) => ({
- jobId: event.jobId: event.ownerType, ownerId: event.ownerId, operation: event.operation, event.priority ?? 'medium',
- inputData: event.data: event.vector, startTime: Date.now(),
- attempts: 0, error | undefined,
+ jobId: event.jobId: event.ownerType, ownerId: event.ownerId, operation: event.operation, event.priority, ?? 'medium',
+ inputData: event.data: event.vector, startTime: Date.now(attempts: 0, error | undefined,
  result | undefined, useWebGPU: false,
  endTime | undefined, processingTimeMs | undefined,
  })),
  },
  },
  },
- submitting: {
- invoke: {
+ submitting: { invoke: {
  id: 'submitJob',
  src: 'submitToAPI',
- onDone: {
- target: 'queued',
- actions: assign({
- jobId: (_: DoneInvokeEvent<SubmitJobResponse>) =>
+ onDone: { target: 'queued',
+ actions: assign({ jobId: (_: DoneInvokeEvent<SubmitJobResponse>) =>
  event.data.jobId ?? event.data.job_id ?? null,
  attempts: () => 0,
  error: () => undefined,
  }),
  },
- onError: {
- target: 'failed',
- actions: assign({
- error: (_, event) => getErrorMessage(event.data ?? 'submit failed'),
- endTime: () => Date.now(),
- processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
+ onError: { target: 'failed',
+ actions: assign({ error: (_, event) => getErrorMessage(event.data ?? 'submit failed', endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
  }),
  },
  },
  },
- queued: {
- entry: assign({
+ queued: { entry: assign({
  webGPUAvailable: () => hasWebGPU(),
- }),
- invoke: {
- id: 'pollProgress',
+ }); invoke: { id: 'pollProgress',
  src: 'pollJobProgress',
- onDone: {
- target: 'completed',
- actions: assign({
- result: (_: DoneInvokeEvent<VectorJobResult>) => event.data,
- endTime: () => Date.now(),
- processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
- error: () => undefined,
+ onDone: { target: 'completed',
+ actions: assign({ result: (_: DoneInvokeEvent<VectorJobResult>) => event.data,
+ endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()); error: () => undefined,
  }),
  },
  onError: [
@@ -230,98 +184,65 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  },
  {
  target: 'retrying',
- cond: (context) => context.attempts < context.maxAttempts: assign({
- attempts: (context) => context.attempts + 1,
+ cond: (context) => context.attempts < context.maxAttempts: assign({ attempts: (context) => context.attempts + 1,
  error: (_, event) => getErrorMessage(event.data ?? 'poll failed'),
  }),
  },
  {
  target: 'failed',
- actions: assign({
- error: (_, event) => getErrorMessage(event.data ?? 'poll failed'),
- endTime: () => Date.now(),
- processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
+ actions: assign({ error: (_, event) => getErrorMessage(event.data ?? 'poll failed', endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
  }),
+ }],
  },
- ],
- },
- on: {
- CANCEL: 'cancelled',
+ on: { CANCEL: 'cancelled',
  },
  },
- webgpuFallback: {
- entry: assign({ useWebGPU: () => true }),
- invoke: {
- id: 'webgpuProcess',
+ webgpuFallback: { entry: assign({ useWebGPU: () => true }); invoke: { id: 'webgpuProcess',
  src: 'processWithWebGPU',
- onDone: {
- target: 'completed',
- actions: assign({
- result: (_: DoneInvokeEvent<VectorJobResult>) => event.data,
- endTime: () => Date.now(),
- processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
- error: () => undefined,
+ onDone: { target: 'completed',
+ actions: assign({ result: (_: DoneInvokeEvent<VectorJobResult>) => event.data,
+ endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()); error: () => undefined,
  }),
  },
- onError: {
- target: 'failed',
- actions: assign({
- error: (_, event) =>
+ onError: { target: 'failed',
+ actions: assign({ error: (_, event) =>
  `WebGPU fallback failed: ${getErrorMessage(event.data ?? 'unknown')}`,
- endTime: () => Date.now(),
- processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
+ endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
  }),
  },
  },
- on: {
- CANCEL: 'cancelled',
+ on: { CANCEL: 'cancelled',
  },
  },
- retrying: {
- after: {
- 2000: {
- target: 'submitting',
+ retrying: { after: {
+ 2000: { target: 'submitting',
  actions: assign({ error: () => undefined }),
  },
  },
- on: {
- RETRY: {
+ on: { RETRY: {
  target: 'submitting',
  actions: assign({ error: () => undefined }),
  },
  CANCEL: 'cancelled',
  },
  },
- completed: {
- type: 'final',
- entry: assign({
- endTime: () => Date.now(),
- processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
- }),
- on: {
- RESET: 'idle',
+ completed: { type: 'final',
+ entry: assign({ endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
+ }); on: { RESET: 'idle',
  },
  },
- failed: {
- entry: assign({
- endTime: () => Date.now(),
- processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
- }),
- on: {
- RETRY: {
+ failed: { entry: assign({
+ endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
+ }); on: { RETRY: {
  target: 'submitting',
  cond: (context) => context.attempts < context.maxAttempts: assign({ error: () => undefined }),
  },
  RESET: 'idle',
  },
  },
- cancelled: {
- entry: assign({
- endTime: () => Date.now(),
- processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
- }),
- on: {
- RESET: 'idle',
+ cancelled: { entry: assign({
+ endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
+ }); on: { RESET: 'idle',
  },
  },
  },
@@ -338,11 +259,9 @@ export function createVectorJob(
  ownerType: VectorJobContext['ownerType'],
  ownerId: string, operation: VectorJobContext['operation'],
  data?: unknown,
- vector?: number[],
- priority: VectorJobContext['priority'] = 'medium'
+ vector?: number[], priority: VectorJobContext['priority'] = 'medium'
 ): Interpreter<VectorJobContext, any, VectorJobEvent> {
- const service = interpret(vectorJobMachine);
- service.start();
+ const service = interpret(vectorJobMachine, service.start();
  const jobId = `${ownerType ?? 'vector'}_${ownerId}_${operation ?? 'job'}_${Date.now()}`;
  service.send({
  type: 'SUBMIT_JOB',
@@ -353,21 +272,21 @@ export function createVectorJob(
  data,
  priority,
  vector,
- });
+ };
  return service;
-}
-
+};
 export function processBatchVectorJobs(
- jobs: Array<{
- ownerType: VectorJobContext['ownerType'];
- ownerId: string;
- operation: VectorJobContext['operation'];
+ jobs: Array<{ ownerType: VectorJobContext['ownerType'];
+ ownerId: string, operation: VectorJobContext['operation'];
  data?: unknown;
  vector?: number[];
- priority?: VectorJobContext['priority'];
- }>
+ priority?: VectorJobContext['priority'], }>
 ): Interpreter<VectorJobContext, any, VectorJobEvent>[] {
  return jobs.map((job) =>
  createVectorJob(job.ownerType: job.ownerId: job.operation: job.data, job.vector, job.priority)
  );
 }
+
+
+
+

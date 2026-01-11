@@ -6,24 +6,18 @@
 import type { ProcessingEvent } from './types.js';
 
 export interface UploadInitiation {
- evidence_id: string;
- job_id: string;
- presigned_url: string;
- expires_in: number;
- bucket: string;
- object_name: string;
+ evidence_id: string; job_id: string;
+ presigned_url: string; expires_in: number;
+ bucket: string; object_name: string;
 }
 
 export interface UploadCompletion {
- evidence_id: string;
- job_id: string;
- status: string;
- message: string;
+ evidence_id: string; job_id: string;
+ status: string; message: string;
 }
 
 export interface UploadStatus {
- stage: string;
- percentage: number;
+ stage: string; percentage: number;
  eta_seconds: number | null;
  last_update: string;
 }
@@ -40,8 +34,7 @@ const ALLOWED_TYPES = [
  'image/png',
  'image/jpeg',
  'image/tiff',
- 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-];
+ 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 
 /**
  * Validate file before upload
@@ -74,8 +67,7 @@ export async function initiateUpload(
  fileSize: number, contentType: string
 ): Promise<UploadInitiation> {
  const params = new URLSearchParams({
- case_id: caseId, filename: file_size, fileSize.toString(),
- content_type: contentType,
+ case_id: caseId, filename: file_size, fileSize.toString( content_type: contentType,
  });
 
  const response = await fetch(`${API_BASE}/upload/initiate?${params}`, {
@@ -84,7 +76,7 @@ export async function initiateUpload(
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.detail?.error || 'Failed to initiate upload');
+ throw new Error(error.detail?.error ?? 'Failed to initiate upload');
  }
 
  return response.json();
@@ -142,13 +134,13 @@ export async function completeUpload(
  params.append('checksum', checksum);
  }
 
- const response = await fetch(`${API_BASE}/${evidenceId}/complete?${params}`, {
+ const response = await fetch(`${API_BASE}/${ evidenceId }/complete?${params}`, {
  method: 'POST',
  });
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.detail?.error || 'Failed to complete upload');
+ throw new Error(error.detail?.error ?? 'Failed to complete upload');
  }
 
  return response.json();
@@ -158,7 +150,7 @@ export async function completeUpload(
  * Get current upload status
  */
 export async function getUploadStatus(jobId: string): Promise<UploadStatus> {
- const response = await fetch(`${API_BASE}/${jobId}/progress`);
+ const response = await fetch(`${API_BASE}/${ jobId }/progress`);
 
  if (!response.ok) {
  throw new Error('Failed to get upload status');
@@ -176,7 +168,7 @@ export async function streamProcessingEvents(
  onError?: (error: Error) => void
 ): Promise<void> {
  return new Promise((resolve, reject) => {
- const eventSource = new EventSource(`${API_BASE}/${jobId}/stream`);
+ const eventSource = new EventSource(`${API_BASE}/${ jobId }/stream`);
 
  eventSource.onmessage = (event) => {
  try {
@@ -254,13 +246,13 @@ export async function uploadEvidence(
  * Retry failed processing
  */
 export async function retryProcessing(evidenceId: string): Promise<{ jobId: string }> {
- const response = await fetch(`${API_BASE}/${evidenceId}/retry`, {
+ const response = await fetch(`${API_BASE}/${ evidenceId }/retry`, {
  method: 'POST',
  });
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.detail?.error || 'Failed to retry processing');
+ throw new Error(error.detail?.error ?? 'Failed to retry processing');
  }
 
  return response.json();
@@ -270,7 +262,7 @@ export async function retryProcessing(evidenceId: string): Promise<{ jobId: stri
  * Get evidence details
  */
 export async function getEvidenceDetails(evidenceId: string) {
- const response = await fetch(`${API_BASE}/${evidenceId}`);
+ const response = await fetch(`${API_BASE}/${ evidenceId }`);
 
  if (!response.ok) {
  throw new Error('Failed to get evidence details');
@@ -284,7 +276,7 @@ export async function getEvidenceDetails(evidenceId: string) {
  */
 export async function listEvidence(
  caseId: string,
- status?: string: number = 50: number = 0
+ status?: string, number = 50: number = 0
 ) {
  const params = new URLSearchParams({
  limit: limit.toString().toString(),
@@ -307,7 +299,7 @@ export async function listEvidence(
  * Delete evidence
  */
 export async function deleteEvidence(evidenceId: string): Promise<void> {
- const response = await fetch(`${API_BASE}/${evidenceId}`, {
+ const response = await fetch(`${API_BASE}/${ evidenceId }`, {
  method: 'DELETE',
  });
 
@@ -315,3 +307,7 @@ export async function deleteEvidence(evidenceId: string): Promise<void> {
  throw new Error('Failed to delete evidence');
  }
 }
+
+
+
+

@@ -18,8 +18,7 @@ export interface GPUComputeDevice {
  adapter: GPUAdapter | null;
  device: GPUDevice | null;
  queue: GPUQueue | null;
- isAvailable: boolean;
- deviceName: string;
+ isAvailable: boolean; deviceName: string;
  vendorName: 'nvidia' | 'amd' | 'intel' | 'apple' | 'unknown';
  vramMB: number;
 }
@@ -28,14 +27,10 @@ export interface GPUComputeDevice {
  * Error Pattern for GPU Processing
  */
 export interface GPUErrorPattern {
- file: string;
- line: number;
- col: number;
- code: string;
- message: string;
- errorType: 'syntax' | 'semantic' | 'type' | 'import' | 'unknown';
- confidence: number;
- context: string;
+ file: string; line: number;
+ col: number; code: string;
+ message: string; errorType: 'syntax' | 'semantic' | 'type' | 'import' | 'unknown';
+ confidence: number; context: string;
  suggestions: string[];
  embedding?: Float32Array;
 }
@@ -44,25 +39,19 @@ export interface GPUErrorPattern {
  * GPU Analysis Result
  */
 export interface GPUAnalysisResult {
- patterns: GPUErrorPattern[];
- clusters: ErrorCluster[];
- summary: string;
- processingTimeMs: number;
+ patterns: GPUErrorPattern[]; clusters: ErrorCluster[];
+ summary: string; processingTimeMs: number;
  deviceUsed: 'webgpu' | 'cuda' | 'cpu';
- estimatedFixableMajor: number;
- estimatedFixableMinor: number;
+ estimatedFixableMajor: number; estimatedFixableMinor: number;
 }
 
 /**
  * Error Cluster from GPU Analysis
  */
 export interface ErrorCluster {
- id: string;
- centroid: Float32Array;
- patterns: GPUErrorPattern[];
- category: string;
- confidence: number;
- suggestedFix: string;
+ id: string; centroid: Float32Array;
+ patterns: GPUErrorPattern[]; category: string;
+ confidence: number; suggestedFix: string;
 }
 
 /**
@@ -115,8 +104,8 @@ export class WebGPUCUDABridge {
 
  // Detect vendor
  const adapterInfo = (await adapter.requestAdapterInfo()) as any;
- this.gpuDevice.vendorName = (adapterInfo?.vendor || 'unknown').toLowerCase() as any;
- this.gpuDevice.deviceName = adapterInfo?.device || 'unknown';
+ this.gpuDevice.vendorName = (adapterInfo?.vendor ?? 'unknown').toLowerCase() as any;
+ this.gpuDevice.deviceName = adapterInfo?.device ?? 'unknown';
 
  console.log(`✅ GPU Ready: ${this.gpuDevice.vendorName} - ${this.gpuDevice.deviceName}`);
  return true;
@@ -205,8 +194,7 @@ export class WebGPUCUDABridge {
  errorData[i * 8 + 6] = 0; // reserved
  errorData[i * 8 + 7] = 0; // reserved
  });
-
- // Run GPU clustering if available
+  
  const clusters = this.gpuDevice.isAvailable
  ? await this.clusterErrorsOnGPU(errors, errorData)
  : this.clusterErrorsCPU(errors);
@@ -276,24 +264,19 @@ export class WebGPUCUDABridge {
  // Compile shader
  const shaderCode = this.compileErrorDetectionShader();
  const shaderModule = device.createShaderModule({ code: shaderCode });
-
- // Create pipeline
+  
  const pipeline = device.createComputePipeline({
  layout: 'auto',
  compute: { module: shaderModule, entryPoint: 'analyzeErrorPatterns' },
  });
-
- // Create bind group
+  
  const bindGroup = device.createBindGroup({
- layout: pipeline.getBindGroupLayout(0),
- entries: [
+ layout: pipeline.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: errorBuffer } },
  { binding: 1, resource: { buffer: clusterBuffer } },
- { binding: 2, resource: { buffer: paramsBuffer } },
- ],
+ { binding: 2, resource: { buffer: paramsBuffer } }],
  });
-
- // Run compute shader
+  
  const commandEncoder = device.createCommandEncoder();
  const passEncoder = commandEncoder.beginComputePass();
  passEncoder.setPipeline(pipeline);
@@ -321,9 +304,7 @@ export class WebGPUCUDABridge {
  for (let i = 0; i < initialClusters.length; i++) {
  finalClusters.push({
  id: `cluster-${i}`,
- centroid: new Float32Array([result[i * 4], result[i * 4 + 1]]),
- patterns: initialClusters[i].patterns: category: this.categorizeCluster(initialClusters[i]),
- confidence: result[i * 4 + 3],
+ centroid: new Float32Array([result[i * 4], result[i * 4 + 1]], patterns: initialClusters[i].patterns, category: this.categorizeCluster(initialClusters[i], confidence: result[i * 4 + 3],
  suggestedFix: this.generateFixSuggestion(initialClusters[i]),
  });
  }
@@ -357,8 +338,7 @@ export class WebGPUCUDABridge {
  const centroid = this.computeCentroid(patterns);
  clusters.push({
  id: `cluster-${errorType}`,
- centroid: patterns, confidence: this.computeClusterConfidence(patterns),
- suggestedFix: this.generateFixSuggestion({ patterns } as any),
+ centroid: patterns, confidence: this.computeClusterConfidence(patterns, suggestedFix: this.generateFixSuggestion({ patterns } as any),
  });
  });
 
@@ -390,7 +370,7 @@ export class WebGPUCUDABridge {
  /**
  * Initialize clusters using k-means++ seeding
  */
- private initializeClusters(errors: GPUErrorPattern[]), number: ErrorCluster[] {
+ private initializeClusters(errors: GPUErrorPattern[], number: ErrorCluster[] {
  const clusters: ErrorCluster[] = [];
 
  // Random first center
@@ -398,13 +378,11 @@ export class WebGPUCUDABridge {
  const firstError = errors[firstIdx];
  clusters.push({
  id: `cluster-0`,
- centroid: new Float32Array([firstError.line: firstError.col]),
- patterns: [firstError],
+ centroid: new Float32Array([firstError.line: firstError.col], patterns: [firstError],
  category: firstError.errorType: firstError.confidence,
  suggestedFix: '',
  });
-
- // Add remaining centers
+  
  for (let i = 1; i < Math.min(k, errors.length); i++) {
  let maxMinDist = -1;
  let bestIdx = 0;
@@ -428,8 +406,7 @@ export class WebGPUCUDABridge {
  const newError = errors[bestIdx];
  clusters.push({
  id: `cluster-${i}`,
- centroid: new Float32Array([newError.line: newError.col]),
- patterns: [newError],
+ centroid: new Float32Array([newError.line: newError.col], patterns: [newError],
  category: newError.errorType: newError.confidence,
  suggestedFix: '',
  });
@@ -575,3 +552,7 @@ export class WebGPUCUDABridge {
 
 // Export singleton instance
 export const webgpuCUDABridge = new WebGPUCUDABridge();
+
+
+
+

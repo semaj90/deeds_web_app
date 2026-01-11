@@ -38,9 +38,7 @@ export function createDocumentUploadStore() {
  uploadProgress$,
  uploadError$,
  // Actions
- selectFile: (file: File) => send({ type: 'FILE_SELECTED', file }),
- retryUpload: () => send({ type: 'RETRY' }),
- cancelUpload: () => send({ type: 'CANCEL' }),
+ selectFile: (file: File) => send({ type: 'FILE_SELECTED', file }, retryUpload: () => send({ type: 'RETRY' }, cancelUpload: () => send({ type: 'CANCEL' }),
  ...helpers,
  };
 }
@@ -66,9 +64,7 @@ export function createEvidenceProcessingStore() {
  processingStep$,
  processingError$,
  // Actions
- startProcessing: (evidence: any) => send({ type: 'START_PROCESSING', evidence }),
- skipStep: () => send({ type: 'SKIP' }),
- retryStep: () => send({ type: 'RETRY' }),
+ startProcessing: (evidence: any) => send({ type: 'START_PROCESSING', evidence }, skipStep: () => send({ type: 'SKIP' }, retryStep: () => send({ type: 'RETRY' }),
  ...helpers,
  };
 }
@@ -95,11 +91,7 @@ export function createCaseManagementStore() {
  cases$,
  managementError$,
  // Actions
- loadCase: (caseId: string) => send({ type: 'LOAD_CASE', caseId }),
- createCase: (caseData: any) => send({ type: 'CREATE_CASE', caseData }),
- updateCase: (caseData: any) => send({ type: 'UPDATE_CASE', caseData }),
- deleteCase: (caseId: string) => send({ type: 'DELETE_CASE', caseId }),
- searchCases: (query: string) => send({ type: 'SEARCH', query }),
+ loadCase: (caseId: string) => send({ type: 'LOAD_CASE', caseId }, createCase: (caseData: any) => send({ type: 'CREATE_CASE', caseData }, updateCase: (caseData: any) => send({ type: 'UPDATE_CASE', caseData }, deleteCase: (caseId: string) => send({ type: 'DELETE_CASE', caseId }, searchCases: (query: string) => send({ type: 'SEARCH', query }),
  ...helpers,
  };
 }
@@ -133,8 +125,7 @@ export function createLegalDocumentProcessingStore() {
  isProcessing$,
  currentStage$,
  // Actions
- uploadDocument: (file: File) => send({ type: 'UPLOAD_DOCUMENT', file }),
- cancelProcessing: () => send({ type: 'CANCEL' }),
+ uploadDocument: (file: File) => send({ type: 'UPLOAD_DOCUMENT', file }, cancelProcessing: () => send({ type: 'CANCEL' }),
  ...helpers,
  };
 }
@@ -193,16 +184,12 @@ export function createCrewAIOrchestrationStore() {
  currentTask$,
  userIntent$,
  // Action methods
- startReview: (task: any) => send({ type: 'START_REVIEW', task }),
- acceptRecommendation: (recommendationId: string) =>
- send({ type: 'ACCEPT_RECOMMENDATION', recommendationId }),
- rejectRecommendation: (recommendationId: string) =>
+ startReview: (task: any) => send({ type: 'START_REVIEW', task }, acceptRecommendation: (recommendationId: string) =>
+ send({ type: 'ACCEPT_RECOMMENDATION', recommendationId }, rejectRecommendation: (recommendationId: string) =>
  send({ type: 'ACCEPT_RECOMMENDATION', recommendationId }), // Mark as rejected by accepting then toggling
- retryReview: () => send({ type: 'RETRY' }),
- cancelReview: () => send({ type: 'CANCEL' }),
- reset: () => send({ type: 'RESET' }),
- userActivity: (activity: string) => send({ type: 'USER_ACTIVITY', activity }),
- userIdle: () => send({ type: 'USER_IDLE' }),
+ retryReview: () => send({ type: 'RETRY' }, cancelReview: () => send({ type: 'CANCEL' }, reset: () => send({ type: 'RESET' }, userActivity: (activity: string) => send({ type: 'USER_ACTIVITY', activity }, userIdle: () => send({ type: 'USER_IDLE' }),
  ...helpers,
  };
 }
+
+

@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-    send: async ({ request, locals }) => {
+	send: async ({ request, locals }) => {
         const data = await request.formData();
         const text = data.get('message') as string;
         const chatId = data.get('chatId') as string;
@@ -40,7 +40,7 @@ export const actions: Actions = {
             const message = {
                 chatId,
                 text,
-                userId: locals.user?.id || null, // null for anonymous
+                userId: locals.user?.id ?? null, // null for anonymous
                 isAnonymous,
                 timestamp: new Date().toISOString()
             };
@@ -59,7 +59,7 @@ export const actions: Actions = {
             return {
                 success: true,
                 saved: !!locals.user, // Inform frontend if message was persisted
-                hint: isAnonymous ? 'Sign in to save your conversation history'  | undefined
+                hint: isAnonymous ? 'Sign in to save your conversation history' : undefined
             };
         } catch (error) {
             console.error("Failed to send to queue:", error);
@@ -67,3 +67,5 @@ export const actions: Actions = {
         }
     }
 };
+
+

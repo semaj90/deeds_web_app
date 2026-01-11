@@ -1,0 +1,178 @@
+import { db } from '$lib/server/db';
+import { evidenceRelationships } from '$lib/server/db/schema-postgres';
+import type { RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
+
+export const POST: RequestHandler = async ({ request }) => {
+  try {
+    const body = await request.json().catch(() => null);
+
+    // Validate required fields
+    if (
+      !body ||
+      typeof body.caseId !== 'string' ||
+      typeof body.fromEvidenceId !== 'string' ||
+      typeof body.toEvidenceId !== 'string' ||
+      typeof body.relationshipType !== 'string'
+    ) {
+      return json(
+        { error: 'Missing or invalid required fields: caseId, fromEvidenceId, toEvidenceId, relationshipType' },
+        { status: 400 }
+      );
+    }
+
+    const {
+      caseId,
+      fromEvidenceId,
+      toEvidenceId,
+      relationshipType,
+      label,
+      strength = 'medium'
+    } = body as {
+      caseId: string;
+      fromEvidenceId: string;
+      toEvidenceId: string;
+      relationshipType: string;
+      label?: string;
+      strength?: string;
+    };
+
+    // Validate relationship type
+    const validTypes = ['supports', 'contradicts', 'same_person', 'timeline', 'chain_of_custody', 'corroborates', 'alibi', 'motive', 'opportunity', 'means', 'witness_statement', 'physical_evidence', 'digital_evidence', 'circumstantial', 'direct_evidence', 'hearsay', 'privileged', 'inadmissible'];
+    if (!validTypes.includes(relationshipType)) {
+      return json(
+        { error: `Invalid relationshipType. Must be one of: ${validTypes.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
+    // Prevent self-linking
+    if (fromEvidenceId === toEvidenceId) {
+      return json(
+        { error: 'Cannot link an evidence item to itself' },
+        { status: 400 }
+      );
+    }
+
+    // Check for existing relationships (bidirectional check)
+    const existing = await db;
+      .select()
+      .from(evidenceRelationships)
+      .where(eq(evidenceRelationships.caseId, caseId));
+
+    const alreadyExists = existing.some(;
+      (r) =>
+        (r.fromEvidenceId === fromEvidenceId && r.toEvidenceId === toEvidenceId) ||
+        (r.fromEvidenceId === toEvidenceId && r.toEvidenceId === fromEvidenceId)
+    );
+
+    if (alreadyExists) {
+      return json(
+        { error: 'A relationship between these evidence items already exists' },
+        { status: 409 }
+      );
+    }
+
+    // Create the relationship
+    const [created] = await db;
+      .insert(evidenceRelationships)
+      .values({
+        caseId,
+        fromEvidenceId,
+        toEvidenceId,
+        relationshipType: relationshipType as any,
+        label: label ?? relationshipType.replace('_', ' '),
+        strength: (strength as any) ?? 'medium'
+      })
+      .returning();
+
+    return json(created, { status: 201 });
+  } catch (error) {
+    console.error('Error creating relationship:', error);
+    return json(
+      {
+        error: 'Failed to create relationship',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    );
+  }
+};
+
+/**
+ * GET /api/evidence/relationships
+ * Query relationships for a case or evidence item
+ */
+export const GET: RequestHandler = async ({ url }) => {
+  try {
+    const caseId = url.searchParams.get('caseId');
+    const evidenceId = url.searchParams.get('evidenceId');
+
+    if (!caseId) {
+      return json(
+        { error: 'caseId query parameter is required' },
+        { status: 400 }
+      );
+    }
+
+    let relationships = await db;
+      .select()
+      .from(evidenceRelationships)
+      .where(eq(evidenceRelationships.caseId, caseId));
+
+    if (evidenceId) {
+      // Filter to relationships involving this evidence item
+      relationships = relationships.filter(
+        (r) => r.fromEvidenceId === evidenceId || r.toEvidenceId === evidenceId
+      );
+    }
+
+    return json({ caseId, evidenceId: evidenceId ?? null, relationships, count: relationships.length });
+  } catch (error) {
+    console.error('Error fetching relationships:', error);
+    return json(
+      {
+        error: 'Failed to fetch relationships',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    );
+  }
+};
+
+/**
+ * DELETE /api/evidence/relationships
+ * Remove a relationship between evidence items
+ */
+export const DELETE: RequestHandler = async ({ request }) => {
+  try {
+    const body = await request.json().catch(() => null);
+
+    if (!body || typeof body.id !== 'string') {
+      return json({ error: 'Missing or invalid relationship id' }, { status: 400 });
+    }
+
+    const { id } = body;
+
+    const deleted = await db;
+      .delete(evidenceRelationships)
+      .where(eq(evidenceRelationships.id, id))
+      .returning();
+
+    if (deleted.length === 0) {
+      return json({ error: 'Relationship not found' }, { status: 404 });
+    }
+
+    return json({ success: true, deleted: deleted[0] });
+  } catch (error) {
+    console.error('Error deleting relationship:', error);
+    return json(
+      {
+        error: 'Failed to delete relationship',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    );
+  }
+};

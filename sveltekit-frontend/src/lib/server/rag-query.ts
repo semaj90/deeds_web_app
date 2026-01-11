@@ -13,11 +13,11 @@
  */
 
 import { QdrantClient } from '@qdrant/js-client-rest';
-import { generateEmbedding } from './embedding-service.js';
+import { generateEmbedding } from './embedding-service';
 
 // Initialize Qdrant client
 const qdrantClient = new QdrantClient({
- url: process.env.QDRANT_URL || 'http://localhost:6333',
+    url: process.env.QDRANT_URL || 'http://localhost:6333',
 });
 
 const COLLECTION_NAME = 'phase72_evidence_embeddings';
@@ -28,12 +28,11 @@ const SCORE_THRESHOLD = 0.5;
  * RAG Query Response Shape
  */
 export interface RagQueryResponse {
- contextText: string;
- citations: Array<{
- id: string;
- source: string;
- score: number;
- }>;
+    contextText: string; citations: Array<{
+        id: string; source: string;
+        score: number;
+        matchedTags?: string[];
+    }>;
 }
 
 /**
@@ -45,188 +44,207 @@ export interface RagQueryResponse {
  * @param opts.jurisdiction - Optional jurisdiction to filter results (CA, NY, TX, Fed-US, Other)
  * @returns Context text and citations
  */
-export async function getContextFromRag(opts: {
- query: string;
- caseId?: string | null;
- tags?: string[] | null;
- jurisdiction?: string | null;
+export async function getContextFromRag(opts: { query: string;
+    caseId?: string | null;
+    tags?: string[] | null;
+    jurisdiction?: string | null;
 }): Promise<RagQueryResponse> {
- const { query, caseId, tags, jurisdiction } = opts;
+    const { query, caseId, tags, jurisdiction } = opts;
 
- try {
- // 1. Generate embedding for the query
- console.log(`[RAG] Generating embedding for query: "${query.substring(0, 50)}..."`);
- const queryEmbedding = await generateEmbedding(query);
- console.log(`[RAG] Embedding generated (${queryEmbedding.length} dimensions)`);
+    try {
+        // 1. Generate embedding for the query
+        console.log(`[RAG] Generating embedding for query: "${query.substring(0, 50)}..."`);
+        const queryEmbedding = await generateEmbedding(query);
+        console.log(`[RAG] Embedding generated (${queryEmbedding.length} dimensions)`);
 
- // 2. Build Qdrant filter for caseId, tags, and jurisdiction
- const filterConditions: any[] = [];
+        // 2. Build Qdrant filter for caseId, tags, and jurisdiction
+        const filterConditions: any[] = [];
 
- if (caseId) {
- filterConditions.push({
- key: 'case_id',
- match: { value: caseId },
- });
- console.log(`[RAG] Filtering by case_id: ${caseId}`);
- }
+        if (caseId) {
+            filterConditions.push({
+                key: 'case_id',
+                match: { value: caseId },
+            });
+            console.log(`[RAG] Filtering by case_id: ${caseId}`);
+        }
 
- if (jurisdiction) {
- filterConditions.push({
- key: 'jurisdiction',
- match: { value: jurisdiction },
- });
- console.log(`[RAG] Filtering by jurisdiction: ${jurisdiction}`);
- }
+        if (jurisdiction) {
+            filterConditions.push({
+                key: 'jurisdiction',
+                match: { value: jurisdiction },
+            });
+            console.log(`[RAG] Filtering by jurisdiction: ${jurisdiction}`);
+        }
 
- if (tags && tags.length > 0) {
- // Filter: results must have at least one of the specified tags
- filterConditions.push({
- key: 'tags',
- match: { any: tags },
- });
- console.log(`[RAG] Filtering by tags: ${tags.join(', ')}`);
- }
+        if (tags && tags.length > 0) {
+            // Filter: results must have at least one of the specified tags
+            filterConditions.push({
+                key: 'tags',
+                match: { any: tags },
+            });
+            console.log(`[RAG] Filtering by tags: ${tags.join(', ')}`);
+        }
 
- const filter =
- filterConditions.length > 0
- ? {
- must: filterConditions,
- }
-  | undefined;
+        const filter =
+            filterConditions.length > 0
+                ? {
+                      must: filterConditions,
+                  }
+                : undefined;
 
- // 3. Search Qdrant
- console.log(`[RAG] Searching Qdrant collection: ${COLLECTION_NAME}`);
- const searchResults = await qdrantClient.search(COLLECTION_NAME, {
- vector: queryEmbedding, limit: SEARCH_LIMIT,
- score_threshold: SCORE_THRESHOLD,
- filter,
- } as any);
+        // 3. Search Qdrant
+        console.log(`[RAG] Searching Qdrant collection: ${COLLECTION_NAME}`);
+        const searchResults = await qdrantClient.search(COLLECTION_NAME, {
+            vector: queryEmbedding,
+            limit: SEARCH_LIMIT,
+            score_threshold: SCORE_THRESHOLD,
+            filter,
+        });
 
- const results = (searchResults as any) || [];
- console.log(`[RAG] Found ${results.length} results`);
+        const results = searchResults || [];
+        console.log(`[RAG] Found ${results.length} results`);
 
- // 4. Extract context and citations with tag-based weighting
- const citations: Array<{ id: string; source: string; score: number; matchedTags?: string[] }> =
- [];
- const contextChunks: string[] = [];
+        // 4. Extract context and citations with tag-based weighting
+        const citations: Array<{ id: string; source: string; score: number; matchedTags?: string[] }> =
+            [];
+        const contextChunks: string[] = [];
 
- for (const result of results) {
- const payload = result.payload as Record<string, any>;
- const text = payload.text || payload.content || '';
- const evidenceId = payload.evidence_id || result.id;
- const fileName = payload.file_name || `Evidence ${evidenceId}`;
- let score = result.score || 0;
+        for (const result of results) {
+            const payload = result.payload as Record<string, any>;
+            const text = payload.text || payload.content || '';
+            const evidenceId = payload.evidence_id || result.id;
+            const fileName = payload.file_name || `Evidence ${evidenceId}`;
+            let score = result.score || 0;
 
- // Check if this result matches any of the requested tags
- const resultTags = payload.tags || [];
- const matchedTags =
- tags && tags.length > 0 ? resultTags.filter((tag: string) => tags.includes(tag)) : [];
+            // Check if this result matches any of the requested tags
+            const resultTags = payload.tags || [];
+            const matchedTags =
+                tags && tags.length > 0 ? resultTags.filter((tag: string) => tags.includes(tag)) : [];
 
- // Apply 1.5x weight boost if tags match (Requirement 3.3)
- if (matchedTags.length > 0) {
- score = score * 1.5;
- console.log(
- `[RAG] Tag boost applied: ${fileName} (${matchedTags.join(', ')}) - score: ${result.score.toFixed(3)} → ${score.toFixed(3)}`
- );
- }
+            // Apply 1.5x weight boost if tags match (Requirement 3.3)
+            if (matchedTags.length > 0) {
+                score = score * 1.5;
+                console.log(
+                    `[RAG] Tag boost applied: ${fileName} (${matchedTags.join(', ')}) - score: ${result.score.toFixed(3)} → ${score.toFixed(3)}`
+                );
+            }
 
- if (text) {
- // Add to context
- contextChunks.push(text);
+            if (text) {
+                // Add to context
+                contextChunks.push(text);
 
- // Add to citations with matched tags
- citations.push({
- id: String(evidenceId),
- source: fileName,
- score,
- ...(matchedTags.length > 0 && { matchedTags }),
- });
+                // Add to citations with matched tags
+                const citation: any = {
+                    id: String(evidenceId),
+                    source: fileName,
+                    score,
+                };
 
- console.log(`[RAG] Added citation: ${fileName} (score: ${score.toFixed(3)})`);
- }
- }
+                if (matchedTags.length > 0) {
+                    citation.matchedTags = matchedTags;
+                }
 
- // Sort citations by score (descending) after applying tag boost
- citations.sort((a, b) => b.score - a.score);
+                citations.push(citation);
 
- // 5. Combine context chunks
- const contextText =
- contextChunks.length > 0
- ? contextChunks.join('\n\n---\n\n')
- : 'No relevant evidence found in the knowledge base.';
+                console.log(`[RAG] Added citation: ${fileName} (score: ${score.toFixed(3)})`);
+            }
+        }
 
- console.log(
- `[RAG] Context assembled (${contextText.length} chars, ${citations.length} citations)`
- );
+        // Sort citations by score (descending) after applying tag boost
+        citations.sort((a, b) => b.score - a.score);
 
- return {
- contextText,
- citations,
- };
- } catch (err) {
- console.error('[RAG] Query failed:', err);
+        // 5. Combine context chunks
+        const contextText =
+            contextChunks.length > 0
+                ? contextChunks.join('\n\n---\n\n')
+                : 'No relevant evidence found in the knowledge base.';
 
- // Return graceful fallback
- return {
- contextText: 'Unable to retrieve evidence context. Please try again or contact support.',
- citations: [],
- };
- }
+        console.log(
+            `[RAG] Context assembled (${contextText.length} chars, ${citations.length} citations)`
+        );
+
+        return {
+            contextText,
+            citations,
+        };
+    } catch (err) {
+        console.error('[RAG] Query failed:', err);
+
+        // Return graceful fallback
+        return {
+            contextText: 'Unable to retrieve evidence context. Please try again or contact support.',
+            citations: [],
+        };
+    }
 }
 
 /**
  * Health check: Verify Qdrant collection exists and is accessible
  */
-export async function checkRagHealth(): Promise<{
- healthy: boolean;
- message: string;
- collectionInfo?: {
- name: string;
- pointsCount: number;
- vectorSize: number;
- };
+export async function checkRagHealth(): Promise<{ healthy: boolean;
+    message: string;
+    collectionInfo?: { name: string;
+        pointsCount: number; vectorSize: number;
+    };
 }> {
- try {
- const collections = (await (qdrantClient as any).getCollections?.()) as any;
- const collectionsList = collections?.collections || [];
- const collection = collectionsList.find((c: any) => c.name === COLLECTION_NAME);
+    try {
+        const collections = await qdrantClient.getCollections();
+        const collectionsList = collections.collections || [];
+        const collection = collectionsList.find((c: any) => c.name === COLLECTION_NAME);
 
- if (!collection) {
- return {
- healthy: false,
- message: `Collection "${COLLECTION_NAME}" not found. Available: ${collectionsList.map((c: any) => c.name).join(', ') || 'none'}`,
- };
- }
+        if (!collection) {
+            return {
+                healthy: false,
+                message: `Collection "${COLLECTION_NAME}" not found. Available: ${collectionsList.map((c: any) => c.name).join(', ') || 'none'}`,
+            };
+        }
 
- const collectionInfo = (await (qdrantClient as any).getCollection.COLLECTION_NAME) as any;
+        const collectionInfo = await qdrantClient.getCollection(COLLECTION_NAME);
 
- return {
- healthy: true,
- message: `Collection "${COLLECTION_NAME}" is healthy`,
- collectionInfo: {
- name: COLLECTION_NAME, pointsCount: collectionInfo.points_count || 0, typeof: 0 collectionInfo.config?.params?.vectors === 'object'
- ? (collectionInfo.config.params.vectors as any)?.size || 0
- : collectionInfo.config?.params?.vectors?.size || 0,
- },
- };
- } catch (err) {
- return {
- healthy: false,
- message: `Qdrant connection failed: ${err instanceof Error ? err.message : String(err)}`,
- };
- }
+        let vectorSize = 0;
+        if (collectionInfo.config?.params?.vectors) {
+            const vectors = collectionInfo.config.params.vectors as any;
+            if (typeof vectors === 'object' && vectors.size) {
+                 vectorSize = vectors.size;
+            } else if (typeof vectors === 'number') {
+                 // Should not happen in standard config but handling generic
+                 // if vectors is mapped weirdly
+            }
+        }
+
+        return {
+            healthy: true,
+            message: `Collection "${COLLECTION_NAME}" is healthy`,
+            collectionInfo: { name: COLLECTION_NAME,
+                pointsCount: collectionInfo.points_count || 0,
+                vectorSize,
+            },
+        };
+    } catch (err) {
+        return {
+            healthy: false,
+            message: `Qdrant connection failed: ${err instanceof Error ? err.message : String(err)}`,
+        };
+    }
 }
 
 /**
  * Debug: List recent points in collection (for testing)
  */
 export async function debugListRecentPoints(limit: number = 5): Promise<any[]> {
- try {
- // Simplified debug - just return empty array for now
- console.log(`[RAG] Debug: Would list ${limit} points from ${COLLECTION_NAME}`);
- return [];
- } catch (err) {
- console.error('[RAG] Debug list failed:', err);
- return [];
- }
+    try {
+        const result = await qdrantClient.scroll(COLLECTION_NAME, {
+            limit,
+            with_payload: true,
+            with_vector: false,
+        });
+        return result.points || [];
+    } catch (err) {
+        console.error('[RAG] Debug list failed:', err);
+        return [];
+    }
 }
+
+
+
+

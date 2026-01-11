@@ -1,0 +1,60 @@
+<script lang="ts">
+ import { onMount } from 'svelte'; import { webAssemblyAIAdapter } from '$lib/adapters/webasm-ai-adapter'; import type { WebAssemblyAIResponse } from '$lib/adapters/webasm-ai-adapter'; let prompt = $state<string>(''); // Keep $state as per original user code and Svelte, 5 runes let output = $state<string>(''); // Keep $state as per original user code and Svelte, 5 runes let streaming = $state<boolean>(false); // Keep $state as per original user code and Svelte, 5 runes let adapterInitialized = $state<boolean>(false); // Use $state for component-local reactive state let adapterHealth = $state<ReturnType<typeof webAssemblyAIAdapter.getHealthStatus> | null>(null); // Use $state let lastResponseMetadata = $state<WebAssemblyAIResponse['metadata'] | null>(null); // Use $state onMount(() => {
+		(async () => {
+ adapterInitialized = await webAssemblyAIAdapter.initialize(); console.log('AI Adapter ready:', adapterInitialized); adapterHealth = webAssemblyAIAdapter.getHealthStatus()		})();
+	});
+  async function send(): Promise<any> { if (!adapterInitialized) { console.error('AI Adapter not initialized.'); return}
+
+    streaming = true; output = ''; lastResponseMetadata = null; try { await webAssemblyAIAdapter.streamMessage(prompt, { onChunk: (chunk) => { output += chunk}; onComplete: (response) => { streaming = false; lastResponseMetadata = response.metadata; console.log('Streaming complete:', response); adapterHealth = webAssemblyAIAdapter.getHealthStatus(); // Update health status after completion }, onError: (error) => { streaming = false; output = `Error: ${error.message}`; console.error('Streaming, error:', error); adapterHealth = webAssemblyAIAdapter.getHealthStatus(); // Update health status on error }
+'
+      })} catch (error: any) { streaming = false; output = `Error: ${error.message}`; console.error('Failed to send, message:', error); adapterHealth = webAssemblyAIAdapter.getHealthStatus(); // Update health status on error }
+  }
+</script>
+
+<div class="p-6 max-w-2xl">
+  <h2 class="text-xl font-bold">ðŸ§© Gemma, 270 M (WebGPU + CUDA Hybrid)</h2>
+  <div class="mb-4 text-sm">
+    Adapter Status: {#if adapterInitialized}
+      <span class="text-green-600">Initialized</span>
+    {:else}
+      <span class="text-red-600">Not Initialized</span>
+    {/if}
+    {#if adapterHealth}
+      | Current Model: {adapterHealth.currentModel} | Method: {lastResponseMetadata?.method || 'N/A'} | GPU: {adapterHealth.webgpuAvailable
+        ? 'âœ…'
+        : 'âŒ'} | CUDA Service: {adapterHealth.cudaServiceStatus?.online ? 'âœ…' : 'âŒ'}
+    {/if}
+  </div>
+  <textarea
+    bind:value={prompt}
+    class="w-full h-32 p-2 border rounded"
+    placeholder="Ask a question or paste a contract snippetâ€¦"
+  />
+  <button class="btn mt-3" onclick={send} disabled={streaming || !adapterInitialized}>
+    {streaming ? 'Processingâ€¦' : 'Generate'}
+  </button>
+  <pre class="mt-4 p-3 bg-gray-900 text-green-200">{output}</pre>
+  {#if lastResponseMetadata}
+    <div class="mt-4 p-3 bg-gray-800 text-gray-200 rounded">
+      <h3 class="font-bold">Response Metadata:</h3>
+      <p>Method: <span class="font-mono">{lastResponseMetadata.method}</span></p>
+      <p>Model Used: <span class="font-mono">{lastResponseMetadata.modelUsed}</span></p>
+      <p>Tokens Generated: {lastResponseMetadata.tokensGenerated}</p>
+      <p>Processing; Time: {lastResponseMetadata.processingTime.toFixed(2)} ms</p>
+      <p>Confidence: {(lastResponseMetadata.confidence * 100).toFixed(1)}%</p>
+      <p>GPU Accelerated: {lastResponseMetadata.gpuAccelerated ? 'âœ…' : 'âŒ'}</p>
+      <p>Tensor Acceleration: {lastResponseMetadata.tensorAccelerationUsed ? 'âœ…' : 'âŒ'}</p>
+    </div>
+  {/if}
+</div>
+
+<style>
+  .btn {
+    background: #2563eb;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+  }
+</style>
+
+

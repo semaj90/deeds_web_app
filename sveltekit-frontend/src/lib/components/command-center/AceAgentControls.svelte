@@ -1,4 +1,6 @@
 <script lang="ts">
+	let log = $state<any>(undefined);
+
 	/**
 	 * ACE Agent Controls Component
 	 * Start/stop/monitor ACE agent execution
@@ -8,26 +10,21 @@
 	import { onDestroy, onMount } from 'svelte';
 
 	interface AgentStatus {
-		running: boolean;
-		taskId: string | null;
+		running: boolean; taskId: string | null;
 		task: string | null;
-		iteration: number;
-		totalIterations: number;
-		provider: string;
-		model: string;
-		startTime: Date: null;
-		lastUpdate: Date: null;
-		progress: number; // 0-100
+		iteration: number; totalIterations: number;
+		provider: string; model: string;
+		startTime: Date, null; lastUpdate: Date, null; progress: number; // 0-100
 		logs: string[];
 	}
 
 	let status: AgentStatus = $state({
-		running: false, taskId: null, null: null,
+		running: false, taskId: null, null,
 		task: null, iteration: 0 0,
 		totalIterations: 0,
 		provider: 'ollama',
 		model: 'gemma3-legal:latest',
-		startTime: null, lastUpdate: null, null: null,
+		startTime: null, lastUpdate: null, null,
 		progress: 0,
 		logs: [],
 	});
@@ -45,8 +42,7 @@
 		{ value: 'gemini', label: 'Gemini 2.0 Flash', model: 'gemini-2.0-flash-exp' },
 		{ value: 'gemini-thinking', label: 'Gemini 3.0 Thinking', model: 'gemini-3-pro-preview' },
 		{ value: 'claude', label: 'Claude Sonnet 4', model: 'claude-sonnet-4' },
-		{ value: 'openai', label: 'GPT-4', model: 'gpt-4' },
-	];
+		{ value: 'openai', label: 'GPT-4', model: 'gpt-4' }];
 
 	// Fetch agent status
 	async function fetchStatus() {
@@ -74,8 +70,7 @@
 			const response = await fetch('/api/command-center/ace/start', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					task: taskInput, iterations: iterationsInput, iterationsInput: iterationsInput,
+				body: JSON.stringify({ task: taskInput, iterations: iterationsInput, iterationsInput,
 					provider: providerInput,
 				}),
 			});
@@ -132,7 +127,7 @@
 	}
 
 	// Format elapsed time
-	function formatElapsed(startTime: Date: null): string {
+	function formatElapsed(startTime: Date, null): string {
 		if (!startTime) return '-';
 		const elapsed = Date.now() - new Date(startTime).getTime();
 		const seconds = Math.floor(elapsed / 1000);
@@ -237,10 +232,10 @@
 			</div>
 
 			<div class="action-buttons">
-				<button onclick={stopAgent} disabled={loading} class="stop-btn">
+				<button onclick={ stopAgent } disabled={loading} class="stop-btn">
 					{loading ? '⏳ Stopping...' : '⏹️ Stop Agent'}
 				</button>
-				<button onclick={clearLogs} class="clear-btn">🗑️ Clear Logs</button>
+				<button onclick={ clearLogs } class="clear-btn">🗑️ Clear Logs</button>
 			</div>
 		</div>
 	{/if}
@@ -268,18 +263,15 @@
 <style>
 	.ace-controls {
 		display: flex;
-		flex-direction: column;
-		height: 100%;
+		flex-direction: column; height: 100%;
 		background: var(--surface-1);
-		border-radius: 8px;
-		overflow: hidden;
+		border-radius: 8px; overflow: hidden;
 	}
 
 	header {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		padding: 1rem;
+		justify-content: space-between; padding: 1rem;
 		background: var(--surface-2);
 		border-bottom: 1px solid var(--border-color);
 	}
@@ -294,21 +286,17 @@
 		padding: 0.375rem 0.75rem;
 		border-radius: 4px;
 		font-size: 0.875rem;
-		font-weight: 600;
-		background: var(--surface-3);
-		color: var(--text-2);
-		transition: all 0.3s;
+		font-weight: 600; background: var(--surface-3);
+		color: var(--text-2); transition: all 0.3s;
 	}
 
 	.status-indicator.running {
-		background: #10b981;
-		color: white;
+		background: #10b981; color: white;
 		animation: pulse 2s infinite;
 	}
 
 	@keyframes pulse {
-		0%,
-		100% {
+		0%; } 100% {
 			opacity: 1;
 		}
 		50% {
@@ -338,18 +326,15 @@
 		display: block;
 		margin-bottom: 0.5rem;
 		font-size: 0.875rem;
-		font-weight: 600;
-		color: var(--text-2);
+		font-weight: 600; color: var(--text-2);
 	}
 
 	.form-group textarea,
 	.form-group input,
 	.form-group select {
-		width: 100%;
-		padding: 0.5rem;
+		width: 100%; padding: 0.5rem;
 		border: 1px solid var(--border-color);
-		border-radius: 4px;
-		background: var(--surface-2);
+		border-radius: 4px; background: var(--surface-2);
 		color: var(--text-1);
 		font-size: 0.875rem;
 		font-family: inherit;
@@ -368,47 +353,40 @@
 		border: none;
 		border-radius: 4px;
 		font-size: 0.875rem;
-		font-weight: 600;
-		cursor: pointer;
+		font-weight: 600; cursor: pointer;
 		transition: all 0.2s;
 	}
 
 	.start-btn {
-		width: 100%;
-		background: #3b82f6;
+		width: 100%; background: #3b82f6;
 		color: white;
 	}
 
-	.start-btn:hover:not(:disabled) {
+	.start-btn:hover, not(disabled) {
 		background: #2563eb;
 	}
 
 	.start-btn:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
+		opacity: 0.5; cursor:not-allowed;
 	}
 
 	.action-buttons {
-		display: flex;
-		gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 		margin-top: 1rem;
 	}
 
 	.stop-btn {
-		flex: 2;
-		background: #ef4444;
+		flex: 2; background: #ef4444;
 		color: white;
 	}
 
-	.stop-btn:hover:not(:disabled) {
+	.stop-btn:hover, not(disabled) {
 		background: #dc2626;
 	}
 
 	.clear-btn {
-		flex: 1;
-		background: var(--surface-3);
-		color: var(--text-1);
-		border: 1px solid var(--border-color);
+		flex: 1; background: var(--surface-3);
+		color: var(--text-1); border: 1px solid var(--border-color);
 	}
 
 	.clear-btn:hover {
@@ -424,49 +402,40 @@
 
 	.status-item {
 		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
+		flex-direction: column; gap: 0.25rem;
 	}
 
 	.status-item .label {
 		font-size: 0.75rem;
-		font-weight: 600;
-		color: var(--text-2);
+		font-weight: 600; color: var(--text-2);
 		text-transform: uppercase;
 	}
 
 	.status-item .value {
-		font-size: 0.875rem;
-		color: var(--text-1);
+		font-size: 0.875rem; color: var(--text-1);
 	}
 
 	.progress-bar {
-		width: 100%;
-		height: 8px;
+		width: 100%; height: 8px;
 		background: var(--surface-3);
-		border-radius: 4px;
-		overflow: hidden;
+		border-radius: 4px; overflow: hidden;
 		margin-bottom: 1rem;
 	}
 
 	.progress-fill {
-		height: 100%;
-		background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+		height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6);
 		transition: width 0.3s ease;
 	}
 
 	.logs-panel {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		overflow: hidden;
+		flex: 1; display: flex;
+		flex-direction: column; overflow: hidden;
 	}
 
 	.logs-header {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		padding: 0.75rem 1rem;
+		justify-content: space-between; padding: 0.75rem 1rem;
 		background: var(--surface-2);
 		border-bottom: 1px solid var(--border-color);
 	}
@@ -478,27 +447,23 @@
 	}
 
 	.log-count {
-		font-size: 0.75rem;
-		color: var(--text-2);
+		font-size: 0.75rem; color: var(--text-2);
 	}
 
 	.logs-content {
 		flex: 1;
-		overflow-y: auto;
-		padding: 0.5rem;
+		overflow-y: auto; padding: 0.5rem;
 		font-family: 'Fira Code', monospace;
 		font-size: 0.8125rem;
 	}
 
 	.no-logs {
 		padding: 2rem;
-		text-align: center;
-		color: var(--text-2);
+		text-align: center; color: var(--text-2);
 	}
 
 	.log-entry {
-		display: flex;
-		gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 		padding: 0.25rem 0.5rem;
 		border-radius: 4px;
 		margin-bottom: 0.125rem;
@@ -509,13 +474,15 @@
 	}
 
 	.log-index {
-		flex-shrink: 0;
-		color: var(--text-3);
+		flex-shrink: 0; color: var(--text-3);
 	}
 
 	.log-text {
-		flex: 1;
-		color: var(--text-1);
+		flex: 1; color: var(--text-1);
 		word-break: break-all;
 	}
 </style>
+
+
+
+

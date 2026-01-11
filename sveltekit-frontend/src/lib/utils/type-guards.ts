@@ -8,15 +8,13 @@ import type { AITask, APIResponse, WorkerStatus, WorkerMessage, WorkerMessageTyp
 export type ServiceStatus = 'operational' | 'degraded' | 'offline' | 'unknown';
 
 export interface Evidence {
-    id: string;
-    type: string;
+    id: string; type: string;
     content: string;
     metadata?: { [key: string]: any };
 }
 
 export interface LegalCase {
-    id: string;
-    title: string;
+    id: string; title: string;
     status: string;
     description?: string;
 }
@@ -130,6 +128,10 @@ export function isRecord(_value): value is { [key, string], any }{ return isObje
 // --- Type Assertion Helpers --- export function assertIsAITask(_value): asserts value is AITask { if (!isAITask(value)) { throw new Error('Value is not a valid AITask')} }
 export function assertIsWorkerStatus(_value): asserts value is WorkerStatus { if (!isWorkerStatus(value)) { throw new Error('Value is not a valid WorkerStatus')} }
 export function assertIsAPIResponse(_value): asserts value is APIResponse<any> { if (!isAPIResponse(value)) { throw new Error('Value is not a valid APIResponse')}
+
+
+
+
 
 
 

@@ -1,4 +1,8 @@
 <script lang="ts">
+	let suggestion = $state<any>(undefined);
+
+	import { ButtonRoot } from 'bits-ui';
+
 import { browser } from '$app/environment';
 import { xstateIntegration } from '$lib/services/xstate-integration';
 import * as Button from 'bits-ui/components/button';
@@ -21,8 +25,7 @@ import { onMount } from 'svelte';
 
  // Workflow state
  interface WorkflowStatus {
- stage: string
- progress: number
+ stage: string, progress: number
  status: 'pending' | 'processing' | 'complete' | 'error';
  message?: string
  }
@@ -30,19 +33,15 @@ import { onMount } from 'svelte';
  progress: 0,
  status: 'pending'
  });
-
- // Backend health state
+  
  let backendStatus = $state <{
- typescript: boolean
- pythonAI: boolean
- advancedAI: boolean
- capabilities: string[]
- }>({ typescript: true, pythonAI: false, false: false,
+ typescript: boolean, pythonAI: boolean
+ advancedAI: boolean, capabilities: string[]
+ }>({ typescript: true, pythonAI: false, false,
  advancedAI: false,
  capabilities: []
  });
-
- // AI streaming state
+  
  let streamingTokens = $state <string>('');
  let isStreaming = $state <boolean>(false);
  let aiSource = $state <'ollama' | 'tensorrt' | 'typescript-fallback' | 'advanced-ai' | null>(null);
@@ -63,8 +62,7 @@ import { onMount } from 'svelte';
 
  // File metadata
  let fileMetadata = $state <{
- filename: string
- size: number
+ filename: string, size: number
  uploadTime: string
  analysis?: string
  } | null>(null);
@@ -76,7 +74,7 @@ import { onMount } from 'svelte';
  // Compute WebSocket URL using public env or infer from location, fallback to Docker Desktop python-ai (localhost:8000)
  function computeWsUrl(): string {
  // Prefer explicit public env var (set in Docker / Caddy)
- const envUrl = (import.meta as any).env?.PUBLIC_WS_URL || (import.meta as any).env?.VITE_WS_URL;
+ const envUrl = (import.meta as any).env?.PUBLIC_WS_URL ?? (import.meta as any).env?.VITE_WS_URL;
  if (envUrl) return envUrl;
  if (browser) {
  // If page served over TLS use wss, else ws
@@ -87,7 +85,7 @@ import { onMount } from 'svelte';
 
  // Fallback to Docker Desktop python AI service host
  const fallbackProtocol = 'ws';
- const fallbackHost = (import.meta as any).env?.PUBLIC_WS_HOST || 'localhost:8000';
+ const fallbackHost = (import.meta as any).env?.PUBLIC_WS_HOST ?? 'localhost:8000';
  return `${fallbackProtocol}://${fallbackHost}/ws`;
  }
 
@@ -158,7 +156,7 @@ import { onMount } from 'svelte';
 
  // Cache the final analysis
  if (fileMetadata && streamingTokens) {
- fileMetadata = { ...fileMetadata, analysis: streamingTokens, streamingTokens: streamingTokens };
+ fileMetadata = { ...fileMetadata, analysis: streamingTokens, streamingTokens };
  }
  break;
  case 'WORKFLOW_UPDATE':
@@ -168,8 +166,7 @@ import { onMount } from 'svelte';
  message: data.message as string
  };
  break;
- case 'ERROR':
- console.error('AI Error:', data.message);
+ case 'ERROR': console.error('AI, Error:', data.message);
  workflowStatus = {
  ...workflowStatus,
  status: 'error',
@@ -186,11 +183,11 @@ import { onMount } from 'svelte';
  if (!ws || !wsConnected || ws.readyState !== WebSocket.OPEN) {
  console.warn('WebSocket not open; falling back to REST query where available');
  // Optionally call REST endpoint for analysis if WS not available (server must support)
- const apiBase = (import.meta as any).env?.PUBLIC_API_BASE || '/api/v2/evidence';
+ const apiBase = (import.meta as any).env?.PUBLIC_API_BASE ?? '/api/v2/evidence';
  fetch(`${apiBase}?action=analyze`, {
  method: 'POST',
  headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
- body: JSON.stringify({ query: file_id, fileId: fileId: fileId || currentFileId })
+ body: JSON.stringify({ query: file_id, fileId, fileId || currentFileId })
  }).catch(err => console.warn('REST analysis fallback failed', err));
  streamingTokens = '';
  isStreaming = true;
@@ -199,7 +196,7 @@ import { onMount } from 'svelte';
 
  ws.send(JSON.stringify({
  type: 'QUERY',
- query: file_id, fileId: fileId: fileId || currentFileId
+ query: file_id, fileId, fileId || currentFileId
  }));
 
  // Reset streaming state
@@ -246,12 +243,12 @@ import { onMount } from 'svelte';
  const _global = (xstateIntegration as any)?.globalState;
  // authState may be stored under .auth or be the top-level state: object, handle both
  const authState = _global?.auth ?? _global ?? null;
- const userId = authState?.context?.user?.id || 'anonymous';
+ const userId = authState?.context?.user?.id ?? 'anonymous';
  formData.append('user_id', userId);
  formData.append('caseId', 'case_001');
 
  // Ensure apiBase is available for upload and later analysis triggers
- const apiBase = (import.meta as any).env?.PUBLIC_API_BASE || '/api/v2/evidence';
+ const apiBase = (import.meta as any).env?.PUBLIC_API_BASE ?? '/api/v2/evidence';
 
  try {
  uploadProgress = 0;
@@ -272,10 +269,10 @@ import { onMount } from 'svelte';
  // mark upload complete
  uploadProgress = 100;
  if (result.success) {
- currentFileId = result.aiProcessing?.file_id || result.evidence?.id;
+ currentFileId = result.aiProcessing?.file_id ?? result.evidence?.id;
  // Set file metadata
  fileMetadata = {
- filename: selectedFile.name: size, selectedFile: selectedFile.size: uploadTime, new: new: new Date().toISOString(),
+ filename: selectedFile.name: size, selectedFile: selectedFile.size: uploadTime, new Date().toISOString(),
  analysis | undefined
  };
 
@@ -343,8 +340,7 @@ import { onMount } from 'svelte';
  const response = await fetch('http://localhost:8001/api/v3/advanced-ai/analyze', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- file_id: fileId,
+ body: JSON.stringify({ file_id: fileId,
  prompt: `Perform comprehensive legal analysis of this evidence document using advanced AI orchestration: ${selectedFile?.name}`,
  user_id: 'current_user'
  })
@@ -388,15 +384,15 @@ import { onMount } from 'svelte';
  isSearching = true;
  try {
  // Use unified API v2 endpoint with vector search (env-aware)
- const apiBase = (import.meta as any).env?.PUBLIC_API_BASE || '/api/v2/evidence';
+ const apiBase = (import.meta as any).env?.PUBLIC_API_BASE ?? '/api/v2/evidence';
  const response = await fetch(
- `${apiBase}?action=search&q=${encodeURIComponent(searchQuery)}&vector=true&limit=10`
+ `${apiBase}? action=search&q=${encodeURIComponent(searchQuery)}&vector=true&limit=10`
  );
 
  const data = await response.json();
 
  if (data.success) {
- searchResults = data.data || [];
+ searchResults = data.data ?? [];
  aiSuggestions = data.suggestions || [];
 
  // Update backend status indicator
@@ -437,21 +433,17 @@ import { onMount } from 'svelte';
  }
  };
  });
-
- // onMount: health check, connect WS if available, heartbeat and cleanup
+  
  onMount(() => {
  let mounted = true;
  (async () => {
  try {
- const apiBase = (import.meta as any).env?.PUBLIC_API_BASE || '/api/v2/evidence';
+ const apiBase = (import.meta as any).env?.PUBLIC_API_BASE ?? '/api/v2/evidence';
  const healthResponse = await fetch(`${apiBase}?action=health`);
  const health = await healthResponse.json();
  if (!mounted) return;
  backendStatus = {
- typescript: !!(health.backends?.typescript?.status === 'healthy'),
- pythonAI: !!(health.backends?.pythonAI?.status === 'healthy'),
- advancedAI: !!(health.backends?.advancedAI?.status === 'healthy'),
- capabilities: health.backends?.pythonAI?.capabilities || []
+ typescript: !!(health.backends?.typescript?.status === 'healthy', pythonAI: !!(health.backends?.pythonAI?.status === 'healthy', advancedAI: !!(health.backends?.advancedAI?.status === 'healthy', capabilities: health.backends?.pythonAI?.capabilities ?? []
  };
 
  // Check advanced AI status separately
@@ -462,7 +454,7 @@ import { onMount } from 'svelte';
  } catch (error) {
  if (!mounted) return;
  console.error('Health check failed:', error);
- backendStatus = { ...backendStatus, pythonAI: false, false: false };
+ backendStatus = { ...backendStatus, pythonAI: false, false };
  }
  })();
 
@@ -479,8 +471,7 @@ import { onMount } from 'svelte';
  if (searchTimeout) clearTimeout(searchTimeout);
  };
  });
-
- // ======================
+  
  // HELPER FUNCTIONS
  // ======================
 
@@ -589,23 +580,23 @@ import { onMount } from 'svelte';
  <h2 class="text-xl font-semibold mb-4">Upload Evidence Document</h2>
  <div
  class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}"
- ondragover={handleDragOver}
- ondragleave={handleDragLeave}
- ondrop={handleDrop}
+ ondragover={ handleDragOver }
+ ondragleave={ handleDragLeave }
+ ondrop={ handleDrop }
  >
  {#if selectedFile}
  <div class="space-y-2">
  <p class="text-lg font-medium">{selectedFile.name}</p>
  <p class="text-gray-600">Size: {formatFileSize(selectedFile.size)}</p>
  <div class="flex justify-center space-x-2">
- <Button.Root onclick={uploadFile} disabled={workflowStatus.status === 'processing'}>
+ <Button class="bits-btn"Root onclick={ uploadFile } disabled={workflowStatus.status === 'processing'}>
  {#if workflowStatus.status === 'processing'}
  Uploading...
  {:else}
  Upload File
  {/if}
- </Button.Root>
- <Button.Root variant="outline" onclick={() => selectedFile = null}>Clear</Button.Root>
+ </ButtonRoot>
+ <Button class="bits-btn"Root variant="outline" onclick={() => selectedFile = null}>Clear</ButtonRoot>
  </div>
  </div>
  {:else}
@@ -619,9 +610,9 @@ import { onMount } from 'svelte';
  onchange={handleFileSelect}
  accept=".pdf,.doc,.docx,.txt,.jpg,.png"
  />
- <Button.Root onclick={() => document.getElementById('file-input')?.click()}>
+ <Button class="bits-btn"Root onclick={() => document.getElementById('file-input')?.click()}>
  Select File
- </Button.Root>
+ </ButtonRoot>
  </div>
  {/if}
  </div>
@@ -697,7 +688,7 @@ import { onMount } from 'svelte';
  type="text"
  bind:value={searchQuery}
  placeholder="Search for evidence, keywords, or ask questions..."
- class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ class="w-full p-3 border border-gray-300 rounded-lg focus: ring-2, focus:ring-blue-500 focus:border-transparent"
  />
  {#if isSearching}
  <div class="absolute right-3 top-3">
@@ -754,8 +745,7 @@ import { onMount } from 'svelte';
 
  /* Smooth animations */
  @keyframes pulse {
- 0%,
- 100% {
+ 0%; } 100% {
  opacity: 1;
  }
  50% {
@@ -763,3 +753,6 @@ import { onMount } from 'svelte';
  }
  }
 </style>
+
+
+

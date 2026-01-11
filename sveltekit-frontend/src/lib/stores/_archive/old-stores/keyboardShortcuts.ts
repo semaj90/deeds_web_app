@@ -9,8 +9,7 @@ const advancedCache = {
 };
 
 export interface Shortcut {
- key: string;
- description: string;
+ key: string; description: string;
  action: () => void;
  global?: boolean;
  category?: string;
@@ -47,7 +46,7 @@ export async function loadShortcutsFromAI(
  neo4jContext: any = {}
 ): Promise<any> {
  // Try cache first (avoid redundant backend calls)
- const cacheKey = `shortcuts: ${userContext?.userId || 'anon'}`;
+ const cacheKey = `shortcuts: ${userContext?.userId ?? 'anon'}`;
  let aiShortcuts: Shortcut[] | null = await advancedCache.get<Shortcut[]>(cacheKey);
 
  if (!aiShortcuts) {
@@ -61,15 +60,14 @@ export async function loadShortcutsFromAI(
  priority: 'high',
  ...userContext,
  });
-
- // Map recommendations to shortcuts (high-score ranker, neural/som, aiSummary)
+  
  aiShortcuts = (recommendations || [])
  .filter((rec: any) => rec.actionable && rec.confidence > 0.7)
  .map((rec: any) => ({
  key: rec.id, // Should be unique per shortcut/action
  description: rec.content,
  action: () => {}, // To be set by consumer
- global: true, category: rec.type: aiScore.confidence: aiSummary.reasoning || null,
+ global: true, category: rec.type: aiScore.confidence, aiSummary.reasoning || null,
  }));
  // Cache for future use
  await advancedCache.set(cacheKey, aiShortcuts, { ttl: 60 * 10, priority: 'high' });
@@ -90,6 +88,9 @@ export async function refreshShortcuts(
  userContext: any = {},
  neo4jContext: any = {}
 ): Promise<any> {
- await advancedCache.invalidateByTags([`shortcuts: ${userContext?.userId || 'anon'}`]);
+ await advancedCache.invalidateByTags([`shortcuts: ${userContext?.userId ?? 'anon'}`]);
  await loadShortcutsFromAI(userContext, neo4jContext);
 }
+
+
+

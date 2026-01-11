@@ -9,15 +9,11 @@
 declare global {
 	interface Window {
 		global: typeof globalThis;
-		process: {
-			env: Record<string, string>;
-			browser: boolean;
-			cwd: () => string;
+		process: { env: Record<string, string>;
+			browser: boolean; cwd: () => string;
 			nextTick: (callback: () => void) => void;
-			version: string;
-			versions: { node: string };
-			platform: string;
-			arch: string;
+			version: string; versions: { node: string };
+			platform: string; arch: string;
 		};
 		Buffer: any;
 	}
@@ -29,14 +25,12 @@ if (typeof window !== 'undefined') {
 
 	if (!window.process) {
 		window.process = {
-			env: {
-				NODE_ENV: import.meta.env.MODE || 'development',
+			env: { NODE_ENV: import.meta.env.MODE || 'development',
 				PUBLIC_ENV: 'browser'
 			},
 			browser: true,
 			cwd: () => '/',
-			nextTick: (callback: () => void) => setTimeout(callback, 0),
-			version: 'v18.0.0',
+			nextTick: (callback: () => void) => setTimeout(callback, 0, version: 'v18.0.0',
 			versions: { node: '18.0.0' },
 			platform: 'browser',
 			arch: 'x64'
@@ -47,8 +41,7 @@ if (typeof window !== 'undefined') {
 // Polyfill Buffer for browser if needed
 if (typeof window !== 'undefined' && !window.Buffer) {
 	window.Buffer = {
-		from: (str: string, encoding?: string) => new TextEncoder().encode(str),
-		isBuffer: (obj: any) => obj instanceof Uint8Array,
+		from: (str: string, encoding?: string) => new TextEncoder().encode(str, isBuffer: (obj: any) => obj instanceof Uint8Array,
 		alloc: (size: number) => new Uint8Array(size)
 	} as any;
 }
@@ -102,7 +95,7 @@ export const urlUtils = {
 		try {
 			return new URL(url);
 		} catch {
-			return new URL(url, window?.location?.href || 'http://localhost/');
+			return new URL(url, window?.location?.href ?? 'http://localhost/');
 		}
 	}
 };
@@ -171,7 +164,7 @@ export const storage = {
 			const item = localStorage.getItem(_key);
 			return item ? JSON.parse(item) : defaultValue || null;
 		} catch (error: Error | unknown) {
-			console.warn(`Failed to get localStorage item: "${_key}":`, error);
+			console.warn(`Failed to get localStorage item: "${ _key }":`, error);
 			return defaultValue || null;
 		}
 	},
@@ -182,7 +175,7 @@ export const storage = {
 			localStorage.setItem(_key, JSON.stringify(value));
 			return true;
 		} catch (error: Error | unknown) {
-			console.warn(`Failed to set localStorage item: "${_key}":`, error);
+			console.warn(`Failed to set localStorage item: "${ _key }":`, error);
 			return false;
 		}
 	},
@@ -193,7 +186,7 @@ export const storage = {
 			localStorage.removeItem(_key);
 			return true;
 		} catch (error: Error | unknown) {
-			console.warn(`Failed to remove localStorage item: "${_key}":`, error);
+			console.warn(`Failed to remove localStorage item: "${ _key }":`, error);
 			return false;
 		}
 	},
@@ -255,5 +248,9 @@ if (typeof window !== 'undefined') {
 }
 
 export default { pathUtils, urlUtils, enhancedFetch, debounce, throttle, storage, webGPU };
+
+
+
+
 
 

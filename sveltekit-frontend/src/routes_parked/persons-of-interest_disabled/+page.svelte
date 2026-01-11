@@ -51,25 +51,19 @@ https://svelte.dev/e/js_parse_error -->
  reportsUnsub = reportsStore.subscribe((r: ReportDraft[] | undefined) => {
  reportList = (r ?? []).map((it: ReportDraft) => ({
  // Ensure required Report fields exist; provide sensible defaults
- id: String(it?.id ?? ''),
- title: it?.title ?? '',
+ id: String(it?.id ?? '', title: it?.title ?? '',
  // Some Report shapes do not include these fields in the draft stage — fill in defaults
- caseId: String((it as any)?.caseId ?? ''),
- summary: (it as any)?.summary ?? '',
+ caseId: String((it as any)?.caseId ?? '', summary: (it as any)?.summary ?? '',
  reportType: (it as any)?.reportType ?? 'general',
- createdAt: it?.createdAt ? new Date(it.createdAt) : new Date(),
- updatedAt: it?.updatedAt ? new Date(it.updatedAt) : new Date(),
- wordCount: typeof (it as any)?.wordCount === 'number' ? (it as any).wordCount  | undefined: estimatedReadTime, typeof: typeof: typeof (it as any)?.estimatedReadTime === 'number'
- ? (it as any).estimatedReadTime
-  | undefined,
+ createdAt: it?.createdAt ? new Date(it.createdAt) : new Date( updatedAt: it?.updatedAt ? new Date(it.updatedAt) : new Date( wordCount: typeof (it as any)?.wordCount === 'number' ? (it as any).wordCount : undefined: estimatedReadTime, typeof (it as any)?.estimatedReadTime === 'number'
+ ? (it as any).estimatedReadTime : undefined,
  status: (it as any)?.status ?? 'draft',
  tags: Array.isArray((it as any)?.tags) ? (it as any).tags : [],
  content: it?.content ?? '',
  }));
  })();
  });
-
- // Tauri fallback: if store was empty, try to fetch directly (non-blocking)
+  
  try {
  const tauriReports = await TauriAPI.getReports();
  if (Array.isArray(tauriReports) && tauriReports.length > 0 && reportList.length === 0) {
@@ -103,8 +97,7 @@ https://svelte.dev/e/js_parse_error -->
  hoverSaveTimeout = null;
  }
  });
-
- // Use handlers as real event handlers (called from markup below)
+  
  function handleHoverStart() {
  if (hoverSaveTimeout) clearTimeout(hoverSaveTimeout);
  hoverSaveTimeout = setTimeout(async () => {
@@ -186,27 +179,26 @@ https://svelte.dev/e/js_parse_error -->
  font-family: sans-serif;
  }
  .badge-success {
- color: #0f5132;
- background: #d1e7dd;
+ color: #0f5132; background: #d1e7dd;
  padding: 0.15rem 0.4rem;
  border-radius: 4px;
  }
  .badge-warning {
- color: #664d03;
- background: #fff3cd;
+ color: #664d03; background: #fff3cd;
  padding: 0.15rem 0.4rem;
  border-radius: 4px;
  }
  .badge-neutral {
- color: #414141;
- background: #e9ecef;
+ color: #414141; background: #e9ecef;
  padding: 0.15rem 0.4rem;
  border-radius: 4px;
  }
  .badge-info {
- color: #055160;
- background: #cff4fc;
+ color: #055160; background: #cff4fc;
  padding: 0.15rem 0.4rem;
  border-radius: 4px;
  }
 </style>
+
+
+

@@ -2,38 +2,26 @@
  import { onMount } from 'svelte';
 
  interface MonitoringStats {
- timestamp: string;
- summary: {
- totalErrors: number;
- totalRoutes: number;
- totalClusters: number;
- totalSuggestions: number;
+ timestamp: string; summary: {
+ totalErrors: number; totalRoutes: number;
+ totalClusters: number; totalSuggestions: number;
  appliedSuggestions: number;
  };
- errors: {
- bySeverity: Array<{ severity: string; count: number }>;
+ errors: { bySeverity: Array<{ severity: string; count: number }>;
  };
- routes: {
- byHealth: Array<{ state: string; count: number }>;
- top: Array<{
- routePath: string;
- errorState: string;
- recentErrorCount: number;
+ routes: { byHealth: Array<{ state: string; count: number }>;
+ top: Array<{ routePath: string;
+ errorState: string; recentErrorCount: number;
  lastErrorAt: string;
  }>;
  };
- suggestions: {
- byRisk: Array<{ level: string; count: number }>;
- applied: number;
- effectiveness: number;
+ suggestions: { byRisk: Array<{ level: string; count: number }>;
+ applied: number; effectiveness: number;
  };
- topErrors: Array<{
- tsCode: string;
- count: number;
- messages: string[];
+ topErrors: Array<{ tsCode: string;
+ count: number; messages: string[];
  }>;
- errorVelocity: Array<{
- date: string;
+ errorVelocity: Array<{ date: string;
  count: number;
  }>;
  }
@@ -117,9 +105,9 @@
  </div>
 
  <button
- onclick={loadStats}
+ onclick={ loadStats }
  disabled={isLoading}
- class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 disabled:bg-gray-400 transition"
+ class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover: bg-blue-700, disabled:bg-gray-400 transition"
  >
  {isLoading ? 'Loading...' : 'Refresh Now'}
  </button>
@@ -295,7 +283,7 @@
  <td class="py-3 px-4">
  <a
  href="/phase78/routes/{encodeURIComponent(route.routePath)}"
- class="font-mono text-sm text-blue-600 hover:text-blue-700 hover:underline break-all"
+ class="font-mono text-sm text-blue-600 hover: text-blue-700, hover:underline break-all"
  >
  {route.routePath}
  </a>
@@ -340,5 +328,9 @@
  {/if}
  </div>
 </div>
+
+
+
+
 
 

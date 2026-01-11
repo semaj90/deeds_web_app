@@ -19,8 +19,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  // Run the web crawler with the URLs
  const child = spawn('npx', ['tsx', crawlerPath, ...urls], {
- cwd: join(__dirname, '../../../../../'),
- stdio: ['pipe', 'pipe', 'pipe'],
+ cwd: join(__dirname, '../../../../../', stdio: ['pipe', 'pipe', 'pipe'],
  });
 
  let stdout = '';
@@ -49,7 +48,7 @@ export const POST: RequestHandler = async ({ request }) => {
  resolve(
  json(
  {
- error: `Indexing failed with code ${code}`,
+ error: `Indexing failed with code ${ code }`,
  stderr,
  stdout,
  },
@@ -69,3 +68,5 @@ export const POST: RequestHandler = async ({ request }) => {
  );
  }
 };
+
+

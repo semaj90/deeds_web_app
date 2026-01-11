@@ -1,4 +1,6 @@
 <script lang="ts">
+	let onclick = $state<any>(undefined);
+
 /**
  * Svelte 5 Card Component
  * Flexible container with Svelte 5 runes
@@ -47,15 +49,15 @@ let paddingClasses = $derived({
 
 let interactiveClasses = $derived(
 	isClickable
-		? 'cursor-pointer transition-all duration-200 hover:border-blue-500 hover:shadow-lg active:scale-[0.98]'
+		? 'cursor-pointer transition-all duration-200 hover: border-blue-500, hover:shadow-lg active:scale-[0.98]'
 		: ''
 );
 </script>
 
 {#if href}
 	<a
-		{href}
-		class="block rounded-lg overflow-hidden {variantClasses} {interactiveClasses} {className}"
+		{ href }
+		class="block rounded-lg overflow-hidden {variantClasses} {interactiveClasses} { className }"
 		onclick={onclick}
 	>
 		{#if header}
@@ -78,9 +80,9 @@ let interactiveClasses = $derived(
 	</a>
 {:else}
 	<div
-		class="rounded-lg overflow-hidden {variantClasses} {interactiveClasses} {className}"
-		role={isClickable ? 'button'  | undefined}
-		tabindex={isClickable ? 0  | undefined}
+		class="rounded-lg overflow-hidden {variantClasses} {interactiveClasses} { className }"
+		role={isClickable ? 'button' : undefined}
+		tabindex={isClickable ? 0 : undefined}
 		onclick={onclick}
 		onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && onclick?.()}
 	>
@@ -103,3 +105,5 @@ let interactiveClasses = $derived(
 		{/if}
 	</div>
 {/if}
+
+

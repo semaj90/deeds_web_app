@@ -1,0 +1,137 @@
+/**
+ * Summary Approval API
+ * Prosecutor approves/edits AI-suggested summary
+ * Stores approved summary and propagates to RAG + citation graph
+ */
+
+import { json, type RequestHandler } from '@sveltejs/kit';
+import { getUser } from '$lib/server/auth/lucia';
+import { db } from '$lib/server/db';
+import {
+  wardenEvidenceSummaries,
+  wardenEvidence,
+  wardenAuditLog,
+  wardenCitationGraph,
+} from '$lib/server/db/warden-schema';
+import { eq } from 'drizzle-orm';
+
+interface ApprovalRequest {
+  holding: string;
+  reasoning: string;
+  citations: Array<{ text: string; caseId?: string }>;
+  keywords: string[];
+}
+
+export const POST: RequestHandler = async ({ request, locals, params }) => {
+  try {
+    // 1. Authenticate
+    const user = await getUser(locals);
+    if (!user) {
+      return json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const summaryId = params.id;
+    if (!summaryId) {
+      return json({ error: 'Summary ID required' }, { status: 400 });
+    }
+
+    // 2. Parse request
+    const body = (await request.json()) as ApprovalRequest;
+
+    // 3. Fetch summary
+    const summary = await db.query.wardenEvidenceSummaries.findFirst({
+      where: eq(wardenEvidenceSummaries.id, summaryId),
+      with: {
+        evidence: true,
+      },
+    });
+
+    if (!summary) {
+      return json({ error: 'Summary not found' }, { status: 404 });
+    }
+
+    // 4. Verify ownership (prosecutor can only approve own evidence)
+    const evidence = await db.query.wardenEvidence.findFirst({
+      where: eq(wardenEvidence.id, summary.evidenceId),
+    });
+
+    if (!evidence || evidence.prosecutorId !== user.id) {
+      return json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
+    // 5. Update summary with prosecutor edits
+    const [approved] = await db;
+      .update(wardenEvidenceSummaries)
+      .set({
+        holding: body.holding,
+        reasoning: body.reasoning,
+        citations: body.citations,
+        keywords: body.keywords,
+        approved: true,
+        approvedBy: user.id,
+        approvedAt: new Date(),
+      })
+      .where(eq(wardenEvidenceSummaries.id, summaryId))
+      .returning();
+
+    // 6. Extract case IDs from citations and create citation graph entries
+    const caseId = evidence.caseId;
+    for (const citation of body.citations) {
+      if (citation.caseId) {
+        await db
+          .insert(wardenCitationGraph)
+          .values({
+            caseId,
+            citedCaseId: citation.caseId,
+            weight: 1.0,
+            source: 'ai',
+            approved: true,
+            approvedBy: user.id,
+            approvedAt: new Date(),
+          })
+          .onConflictDoUpdate({
+            target: [wardenCitationGraph.caseId, wardenCitationGraph.citedCaseId],
+            set: {
+              approved: true,
+              approvedBy: user.id,
+              approvedAt: new Date(),
+            },
+          });
+      }
+    }
+
+    // 7. Log to audit trail
+    await db.insert(wardenAuditLog).values({
+      prosecutorId: user.id,
+      caseId: evidence.caseId,
+      evidenceId: evidence.id,
+      action: 'APPROVE_SUMMARY',
+      sha256: evidence.sha256,
+      details: {
+        summaryId,
+        holding: body.holding,
+        citationCount: body.citations.length,
+      },
+    });
+
+    // 8. TODO: Trigger reindexing in PGVector + Elasticsearch
+    // TODO: Sync citations to Neo4j
+
+    return json({
+      success: true,
+      summaryId,
+      approved: true,
+      approvedAt: approved.approvedAt,
+      holding: approved.holding,
+      reasoning: approved.reasoning,
+      citations: approved.citations,
+      keywords: approved.keywords,
+    });
+  } catch (error) {
+    console.error('Summary approval error:', error);
+    return json(
+      { error: error instanceof Error ? error.message : 'Approval failed' },
+      { status: 500 }
+    );
+  }
+};

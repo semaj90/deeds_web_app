@@ -75,19 +75,13 @@ export const actions: Actions = {
 					Analysis:
 					✅ Parser Unblocking Complete: The +222 delta from Batch 8 comma fixes (39,075 → 39,297) is parser revealing deeper syntax errors—this is expected and healthy.
 
-					Pattern Exhaustion Signals:
-
-					Comma fixer: Exhausted at Batch 10 (0/50)
+					Pattern Exhaustion Signals: Comma, fixer: Exhausted at Batch 10 (0/50)
 					Colon fixer: Tested Batch 7 (0/50 modified due to guardrails catching unsafe patterns)
 					Delimiter fixer: Minimal (0/10 top files modified)
 					TS1005 Plateau: Still 65.0% of total errors (was 65.3% pre-delimiter). Raw-text fixers have plateau'd.
 
 					Next Deterministic Action:
-					Your choice from:
-
-					Batch 9 Comma Fixer (final coin flip—may hit 0 like Batch 10):
-
-					Risk: Exhausted pattern, likely 0 modifications
+					Your choice from: Batch 9 Comma Fixer (final coin flip—may hit 0 like Batch 10), Risk: Exhausted pattern, likely 0 modifications
 					Reward: Tiny if not exhausted (cost: 5 min)
 					Directory Sweep (e.g., src/lib/services/**):
 
@@ -119,9 +113,7 @@ export const actions: Actions = {
             const model = genAI.getGenerativeModel({ model: env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
 
             const prompt = `
-                Analyze this error cluster (ID: ${clusterId}):
-
-                Sample Messages:
+                Analyze this error cluster (ID: ${clusterId}): Sample, Messages:
                 ${cluster.sample_messages.join('\n')}
 
                 Sample Sources:
@@ -167,3 +159,5 @@ export const actions: Actions = {
         }
     }
 };
+
+

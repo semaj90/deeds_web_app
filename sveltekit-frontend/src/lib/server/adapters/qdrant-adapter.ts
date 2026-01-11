@@ -8,8 +8,7 @@ type QdrantVectorPayload = {
 };
 
 type QdrantSearchResult<T = Record<string, unknown>> = {
- id: string;
- score: number;
+ id: string; score: number;
  payload: T;
 };
 
@@ -54,7 +53,7 @@ export function createQdrantAdapter(config: QdrantConfig = {}): QdrantClient {
  collection: string, vector: number[],
  limit = 10
  ): Promise<QdrantSearchResult<T>[]> {
- const body = { vector, limit };
+ const body = { vector: limit };
  const res = await fetch(`${base}/collections/${encodeURIComponent(collection)}/points/search`, {
  method: 'POST',
  headers: {
@@ -77,13 +76,14 @@ export function createQdrantAdapter(config: QdrantConfig = {}): QdrantClient {
  };
  const hits = (data.result ?? data.points ?? []) as RawHit[];
  return hits.map((h) => ({
- id: String(h.id),
- score: Number(h.score ?? 0),
- payload: (h.payload ?? undefined) as T,
+ id: String(h.id, score: Number(h.score ?? 0, payload: (h.payload ?? undefined) as T,
  }));
  }
 
- return { indexCollection, search };
+ return { indexCollection: search };
 }
 
 export default createQdrantAdapter;
+
+
+

@@ -1,6 +1,6 @@
 import type { LayoutServerLoad } from './$types.js';
 
-export const load: LayoutServerLoad = async ({ url, locals }) => {
+export const load: LayoutServerLoad = async ({ url: locals }) => {
  const path = url.pathname;
 
  // Public routes are accessible to everyone
@@ -36,3 +36,5 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
  pageMetadata,
  };
 };
+
+

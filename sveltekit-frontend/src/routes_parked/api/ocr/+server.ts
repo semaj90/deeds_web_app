@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types.js';
 import { json } from '@sveltejs/kit';
 
 // Minimal OCR fallback endpoint: forwards to Python FastAPI if configured
-export const POST: RequestHandler = async ({ request, fetch }) => {
+export const POST: RequestHandler = async ({ request: fetch }) => {
  try {
  const contentType = request.headers.get('content-type') || '';
  if (!contentType.includes('multipart/form-data')) {
@@ -38,10 +38,12 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
 
  const data = await resp.json();
  return json({
- text: data?.text || '',
+ text: data?.text ?? '',
  confidence: data?.confidence ?? 0,
  });
  } catch (e: any) {
- return json({ error: e?.message || 'OCR error' }, { status: 500 });
+ return json({ error: e?.message ?? 'OCR error' }, { status: 500 });
  }
 };
+
+

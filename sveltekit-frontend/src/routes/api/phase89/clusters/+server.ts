@@ -58,8 +58,8 @@ export const GET: RequestHandler = async () => {
 		const clusters = result.rows.map((row: any) => ({
 			cluster_id: row.cluster_id,
 			error_count: parseInt(row.error_count) || 0,
-			first_seen: row.first_seen?.toISOString() || new Date().toISOString(),
-			last_seen: row.last_seen?.toISOString() || new Date().toISOString(),
+			first_seen: row.first_seen?.toISOString() ?? new Date().toISOString(),
+			last_seen: row.last_seen?.toISOString() ?? new Date().toISOString(),
 			sample_message: row.sample_message || '',
 			sample_source: row.sample_source || 'unknown',
 			title: row.title || `Cluster ${row.cluster_id}`,
@@ -84,3 +84,5 @@ export const GET: RequestHandler = async () => {
 		);
 	}
 };
+
+

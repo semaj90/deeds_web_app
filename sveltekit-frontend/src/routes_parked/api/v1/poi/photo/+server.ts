@@ -1,4 +1,4 @@
-import { json, error } from '@sveltejs/kit';
+import { json: error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import type { minio, ensureBucket } from '$lib/server/minio/client';
 import type { db } from '$lib/server/db/drizzle';
@@ -44,3 +44,5 @@ export const POST: RequestHandler = async ({ request }) => {
  throw error(500, 'Failed to upload POI photo');
  }
 };
+
+

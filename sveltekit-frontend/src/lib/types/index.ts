@@ -6,19 +6,16 @@ export interface CanvasState {
 }
 
 export type MultiDimArray = {
-  shape: number[];
-  data: Float32Array | number[];
+  shape: number[]; data: Float32Array | number[];
   layout?: string;
   cacheKey?: string;
   timestamp?: number;
 };
 
 export interface Report {
-  id: string;
-  title: string;
+  id: string; title: string;
   summary?: string;
-  reportType?: string;
-  createdAt: string | Date;
+  reportType?: string; createdAt: string | Date;
   wordCount?: number;
   estimatedReadTime?: number;
   status?: 'draft' | 'published' | 'archived' | string;
@@ -31,8 +28,7 @@ export interface Report {
 }
 
 export interface Message {
-  id: string;
-  content: string;
+  id: string; content: string;
   role: 'user' | 'assistant' | 'system';
   timestamp: Date | string;
   metadata?: Record<string, unknown>;
@@ -40,6 +36,26 @@ export interface Message {
 
 // Generic Utility Types
 export * from './generics.js';
+
+// External Services Types
+export type {
+    MinIOClient,
+    MinIOConfig,
+    Neo4jClient,
+    Neo4jConfig,
+    OllamaClient,
+    OllamaConfig,
+    PgVectorClient,
+    PostgresConfig,
+    QdrantClient,
+    QdrantConfig,
+    QdrantSearchResult,
+    QdrantVectorPayload,
+    RedisCacheService,
+    RedisConfig,
+    ServiceEnvironment,
+    ServiceUrls
+} from './external-services.js';
 
 export interface Case {
   // core
@@ -64,3 +80,6 @@ export interface Case {
   tags?: string[];
   metadata?: Record<string, unknown>;
 }
+
+
+

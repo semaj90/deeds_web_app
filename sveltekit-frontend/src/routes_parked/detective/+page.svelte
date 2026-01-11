@@ -2,10 +2,8 @@
  import DetectiveModeDashboard from '$lib/components/yorha/DetectiveModeDashboard.svelte';
 
  interface Case {
- id: string;
- title: string;
- description?: string;
- status: 'active' | 'closed' | 'pending';
+ id: string; title: string;
+ description?: string; status: 'active' | 'closed' | 'pending';
  createdAt: string;
  }
 
@@ -25,3 +23,6 @@
 </svelte:head>
 
 <DetectiveModeDashboard {currentCase} />
+
+
+

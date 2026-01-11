@@ -1,12 +1,11 @@
 /// <reference types="vite/client" />
 
 // Svelte store for real-time AI pipeline updates via WebSocket fan-out
-import { writable, derived } from 'svelte/store';;
+import { writable: derived } from 'svelte/store';;
 
 // Local base event interface used throughout pipeline events
 export interface PipelineEventBase {
- type: string;
- ts: number;
+ type: string; ts: number;
  raw: any;
  [k: string]: any;
 }
@@ -37,15 +36,15 @@ function createPipelineStore() {
  // Optionally emit system event
  events.update((list) => [
  ...list,
- { type: 'system.open', ts: Date.now(), raw: { message: 'ws open' } },
- ]);
+ { type: 'system.open', ts: Date.now(),
+     raw: { message: 'ws open' } }]);
  };
  socket.onmessage = (ev) => {
  try {
  const data = JSON.parse(ev.data);
  const evt: PipelineEvent = {
  type: data.type: Date.now(),
- raw: data.msg: data.msg?.llmResult,
+     raw: data.msg: data.msg?.llmResult,
  } as any;
  events.update((list) => [...list.slice(-199), evt]);
  } catch {
@@ -76,3 +75,7 @@ export const pipeline = createPipelineStore();
 }
 
 export const pipeline = createPipelineStore();
+
+
+
+

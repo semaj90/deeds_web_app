@@ -1,6 +1,6 @@
 import { env } from '$lib/env';
 import { db } from '../db/drizzle.js';
-import { caseChunks, lawSections } from '../db/schema/legal-index.js';
+import { caseChunks: lawSections } from '../db/schema/legal-index.js';
 import { eq } from 'drizzle-orm';
 
 const OLLAMA_API_URL = env.OLLAMA_API_URL || 'http://localhost:11434';
@@ -31,8 +31,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- model: EMBEDDING_MODEL, input: text,
+ body: JSON.stringify({ model: EMBEDDING_MODEL, input: text,
  }),
  });
 
@@ -99,7 +98,7 @@ export async function generateEmbeddingsBatch(
  error
  );
  errors.push({ index: i + batchIndex: error(error) });
- // Use zero vector as fallback
+  
  embeddings[i + batchIndex] = new Array(EMBEDDING_DIMENSION).fill(0);
  })
  );
@@ -120,14 +119,14 @@ export async function generateEmbeddingsBatch(
  */
 export async function storeCaseChunkEmbedding(chunkId: string, embedding: number[]): Promise<void> {
  try {
- console.log(`[Embedding] Storing embedding for case chunk: ${chunkId}`);
+ console.log(`[Embedding] Storing embedding for case chunk: ${ chunkId }`);
 
  await db
  .update(caseChunks)
  .set({ embedding: embedding as any })
  .where(eq(caseChunks.id, chunkId));
 
- console.log(`[Embedding] Stored embedding for case chunk: ${chunkId}`);
+ console.log(`[Embedding] Stored embedding for case chunk: ${ chunkId }`);
  } catch (error) {
  console.error('[Embedding] Error storing case chunk embedding:', error);
  throw error;
@@ -141,7 +140,7 @@ export async function storeLawSectionEmbedding(
  sectionId: string, embedding: number[]
 ): Promise<void> {
  try {
- console.log(`[Embedding] Storing embedding for law section: ${sectionId}`);
+ console.log(`[Embedding] Storing embedding for law section: ${ sectionId }`);
 
  await db
  .update(lawSections)
@@ -297,3 +296,6 @@ export async function verifyEmbeddingModel(): Promise<boolean> {
  return false;
  }
 }
+
+
+

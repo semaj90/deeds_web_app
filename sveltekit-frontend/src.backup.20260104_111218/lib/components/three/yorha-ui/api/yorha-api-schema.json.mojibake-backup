@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "YoRHa 3D UI Component API Schema",
+  "description": "Schema describing modular YoRHa 3D UI component configuration and data bindings",
+  "type": "object",
+  "properties": {
+    "version": { "type": "string" },
+    "components": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string", "enum": ["button","panel","input","modal","graph","metric","custom"] },
+          "position": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "rotation": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "scale": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "dataSource": { "type": "string", "description": "Named real-time data source (SSE / WS / Poll)" },
+          "bindings": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          },
+          "style": { "type": "object", "additionalProperties": true },
+          "meta": { "type": "object", "additionalProperties": true }
+        }
+      }
+    },
+    "dataSources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name","type"],
+        "properties": {
+          "name": { "type": "string" },
+            "type": { "type": "string", "enum": ["sse","ws","rest","mock"] },
+            "endpoint": { "type": "string" },
+            "intervalMs": { "type": "number" },
+            "headers": { "type": "object", "additionalProperties": {"type":"string"} },
+            "transform": { "type": "string", "description": "Optional client-side transform expression" }
+        }
+      }
+    }
+  },
+  "required": ["version","components"],
+  "additionalProperties": false
+}

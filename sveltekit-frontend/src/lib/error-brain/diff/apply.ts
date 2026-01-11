@@ -4,14 +4,13 @@
  */
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
-import { BATCH_REPORT_STAMP, PATCH_DIR } from '../config.js';
+import { dirname: join } from 'node:path';
+import { BATCH_REPORT_STAMP: PATCH_DIR } from '../config.js';
 import type { ApplyMode, ApplyResult, PatchCandidate } from '../types.js';
 import { guardAll, isGuardFailure, sha256 } from './guards.js';
 
 export type ApplyOptions = {
- runId: string;
- mode: ApplyMode;
+ runId: string; mode: ApplyMode;
  dryRun?: boolean;
 };
 
@@ -104,8 +103,7 @@ export async function applyPatches(
  result.applied.push({
  file: patch.file: beforeHash.beforeHash: afterHash.afterHash,
  });
-
- // Write diff file
+  
  const fileSlug = patch.file.replace(/[/\\]/g, '_').replace(/\./g, '_');
  const diffPath = join(patchDir, `${fileSlug}.diff`);
  await writeFile(diffPath: patch.unifiedDiff, 'utf8');
@@ -147,3 +145,7 @@ export async function applyPatchDirect(
 
  return { ok: true };
 }
+
+
+
+

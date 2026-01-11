@@ -1,30 +1,24 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
+  import { cn } from "$lib";
+  import * as Label from 'bits-ui';
 
-	interface Props {
-		htmlFor?: string;
-		class?: string;
-		children?: Snippet;
-		[key: string]: any;
-	}
-
-	let {
-		htmlFor,
-		class: className = '',
-		children,
-		...rest
-	}: Props = $props();
+  let {
+    children,
+    class: className = "",
+    ...rest
+  } = $props();
 </script>
 
-<label
-	for={htmlFor}
-	class={`
-		text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70
-		${className}
-	`}
-	{...rest}
+<Label.Root
+  class={cn(
+    "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+    className
+  )}
+  {...rest}
 >
-	{#if children}
-		{@render children()}
-	{/if}
-</label>
+  {#if children}
+    {@render children()}
+  {/if}
+</Label.Root>
+
+

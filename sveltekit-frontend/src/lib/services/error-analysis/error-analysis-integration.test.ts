@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { KnowledgeBase } from './knowledge-base.js';
 import { ContextFormatter } from './context-formatter.js';
 import { ProgressTracker } from './progress-tracker.js';
@@ -123,8 +123,7 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const diff: Diff = {
@@ -152,8 +151,7 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const retrievedFixes = await knowledgeBaseLearning.retrieveFixesForError(similarError, 5);
@@ -169,8 +167,7 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const diff: Diff = {
@@ -233,8 +230,7 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  relatedErrors: [],
  context: 'Test context',
  createdAt: new Date(),
- },
- ],
+ }],
  fixesApplied: [
  {
  id: 'diff-1',
@@ -245,12 +241,9 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  context: 'const x = 5;',
  explanation: 'Use const for immutable variables',
  lineStart: 1, lineEnd: 1, status: 'applied' as const,
-  createdAt: new Date(),
- appliedAt: new Date(),
- },
- ],
- metrics: {
- totalErrors: 1, errorsFixed: 1, successRate: 1.0, averageConfidence: 0.95,
+  createdAt: new Date( appliedAt: new Date(),
+ }],
+ metrics: { totalErrors: 1, errorsFixed: 1, successRate: 1.0, averageConfidence: 0.95,
  },
  timestamp: new Date(),
  };
@@ -275,8 +268,7 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  sessionId,
  errorAnalysis: [],
  fixesApplied: [],
- metrics: {
- totalErrors: 10, errorsFixed: 5, successRate: 0.5, averageConfidence: 0.8,
+ metrics: { totalErrors: 10, errorsFixed: 5, successRate: 0.5, averageConfidence: 0.8,
  },
  timestamp: new Date(),
  };
@@ -326,8 +318,7 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const diff: Diff = {
@@ -363,8 +354,7 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  confidence: 0.95,
  relatedErrors: [],
  context: createdAt Date(),
- },
- ],
+ }],
  fixesApplied: [diff],
  metrics: timestamp Date(),
  };
@@ -379,3 +369,6 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  });
  });
 });
+
+
+

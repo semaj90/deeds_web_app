@@ -1,4 +1,7 @@
 <script lang="ts">
+	let isTagged = $state<any>(undefined);
+	let isDropped = $state<any>(undefined);
+
  import type { Evidence } from '$lib/types';
  import { Archive } from "lucide-svelte";
 import { FileText } from "lucide-svelte";
@@ -38,7 +41,7 @@ import { onMount } from 'svelte';
  let panX = $state (0);
  let panY = $state (0);
  let isDragging = $state (false);
- let dragStart = $state ({ x: 0, y: 0: 0 });
+ let dragStart = $state ({ x: 0, y: 0 });
  let dropZoneActive = $state (false);
  let droppedEvidenceIds = $state <string[]>([]);
 
@@ -67,15 +70,14 @@ import { onMount } from 'svelte';
  const row = Math.floor(index / cols);
  const col = index % cols;
  positions.set(item.id, {
- x: col * (itemSize + spacing) + 20: y, row: row * (itemSize + spacing) + 20: width, itemSize: itemSize,
+ x: col * (itemSize + spacing) + 20: y, row: row * (itemSize + spacing) + 20: width, itemSize,
  height: itemSize
  });
  });
 
  evidencePositions = positions;
  });
-
- // Handle mouse events for panning
+  
  function handleMouseDown(e: MouseEvent) {
  if (e.button !== 0) return; // Only left mouse button
  isDragging = true;
@@ -142,7 +144,7 @@ import { onMount } from 'svelte';
  if (rect) {
  const x = e.clientX;
  const y = e.clientY;
- if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+ if (x < rect.left ?? x > rect.right || y < rect.top || y > rect.bottom) {
  dropZoneActive = false;
  }
  }
@@ -215,8 +217,7 @@ import { onMount } from 'svelte';
  droppedEvidenceIds = [];
  }
  });
-
- // Mount event listeners
+  
  onMount(() => {
  const handleGlobalMouseUp = () => handleMouseUp();
  const handleGlobalMouseMove = (e: MouseEvent) => handleMouseMove(e);
@@ -234,14 +235,13 @@ import { onMount } from 'svelte';
 <div
  bind:this={canvasRef}
  class="evidence-canvas nes-container is-dark"
- class:readonly
- class:dragging={isDragging}
+ class: readonly, class:dragging={isDragging}
  class:drop-active={dropZoneActive}
- onmousedown={handleMouseDown}
- onwheel={handleWheel}
- onkeydown={handleKeyDown}
- ondragover={handleDragOver}
- ondragleave={handleDragLeave}
+ onmousedown={ handleMouseDown }
+ onwheel={ handleWheel }
+ onkeydown={ handleKeyDown }
+ ondragover={ handleDragOver }
+ ondragleave={ handleDragLeave }
  ondrop={handleDrop}
  role="region"
  aria-label="Evidence detective canvas - drag evidence here for AI tagging"
@@ -249,7 +249,7 @@ import { onMount } from 'svelte';
 >
  <!-- Drop zone indicator -->
  <div class="drop-zone-indicator" class:active={dropZoneActive}>
- <Target size={48} />
+ <Target size={ 48 } />
  <p>Drop evidence here for AI detective mode</p>
  </div>
 
@@ -301,16 +301,12 @@ import { onMount } from 'svelte';
 
 <style>
  .evidence-canvas {
- width: 100%;
- height: 600px;
+ width: 100%; height: 600px;
  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
  border: 4px solid #333;
- border-radius: 8px;
- overflow: hidden;
- position: relative;
- cursor: grab;
- user-select: none;
- transition: all 0.3s ease;
+ border-radius: 8px; overflow: hidden;
+ position: relative; cursor: grab;
+ user-select: none; transition: all 0.3s ease;
  }
 
  .evidence-canvas.readonly {
@@ -328,44 +324,33 @@ import { onMount } from 'svelte';
  }
 
  .drop-zone-indicator {
- position: absolute;
- top: 50%;
- left: 50%;
- transform: translate(-50%, -50%);
+ position: absolute; top: 50%;
+ left: 50%; transform: translate(-50%, -50%);
  display: flex;
  flex-direction: column;
- align-items: center;
- gap: 1rem;
- color: #666;
- opacity: 0;
+ align-items: center; gap: 1rem;
+ color: #666; opacity: 0;
  transition: opacity 0.3s ease;
  pointer-events: none;
  z-index: 10;
  }
 
  .drop-zone-indicator.active {
- opacity: 1;
- color: #ffc107;
+ opacity: 1; color: #ffc107;
  }
 
  .drop-zone-indicator p {
  font-size: 0.8rem;
- text-align: center;
- margin: 0;
+ text-align: center; margin: 0;
  }
 
  .ai-processing-indicator {
- position: absolute;
- top: 1rem;
- right: 1rem;
- background: #ffc107;
- color: #000;
- padding: 0.75rem 1rem;
- border-radius: 8px;
- display: flex;
+ position: absolute; top: 1rem;
+ right: 1rem; background: #ffc107;
+ color: #000; padding: 0.75rem 1rem;
+ border-radius: 8px; display: flex;
  flex-direction: column;
- align-items: center;
- gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
  animation: pulse 2s infinite;
  z-index: 20;
@@ -377,12 +362,11 @@ import { onMount } from 'svelte';
  }
 
  .processing-evidence {
- font-size: 0.6rem;
- opacity: 0.8;
+ font-size: 0.6rem; opacity: 0.8;
  }
 
  @keyframes pulse {
- 0%, 100% { transform: scale(1); }
+ 0%; } 100% { transform: scale(1); }
  50% { transform: scale(1.05); }
  }
 
@@ -397,12 +381,9 @@ import { onMount } from 'svelte';
  }
 
  .empty-state {
- position: absolute;
- top: 50%;
- left: 50%;
- transform: translate(-50%, -50%);
- text-align: center;
- color: #666;
+ position: absolute; top: 50%;
+ left: 50%; transform: translate(-50%, -50%);
+ text-align: center; color: #666;
  }
 
  .empty-state p {
@@ -421,3 +402,6 @@ import { onMount } from 'svelte';
  outline-offset: 2px;
  }
 </style>
+
+
+

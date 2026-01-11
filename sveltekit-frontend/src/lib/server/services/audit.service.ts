@@ -7,14 +7,11 @@ import db from '$lib/server/db';
 import { auditLog } from '$lib/server/db/schema';
 
 export interface AuditLogEntry {
- userId: string, action: string;
- resourceType: string, resourceId: string;
- details: Record<string, any>;
+ userId: string, action: string; resourceType: string, resourceId: string; details: Record<string, any>;
  success: boolean;
  error?: string;
  ipAddress?: string;
- userAgent?: string;
- timestamp: Date;
+ userAgent?: string; timestamp: Date;
 }
 
 class AuditService {
@@ -31,10 +28,9 @@ class AuditService {
  try {
  await db.insert(auditLog).values({
  userId,
- action: `summary_${action}`,
+ action: `summary_${ action }`,
  resourceType: 'case_summary',
- resourceId: caseId, details: JSON.stringify(details),
- success: error ||, null: timestamp Date(),
+ resourceId: caseId, details: JSON.stringify(details, success: error || null: timestamp Date(),
  });
  } catch (err) {
  console.error('Error logging summary operation:', err);
@@ -51,12 +47,10 @@ class AuditService {
  try {
  await db.insert(auditLog).values({
  userId,
- action: `auth_check_${action}`,
+ action: `auth_check_${ action }`,
  resourceType,
- resourceId: details.stringify({
- authorized: reason || (authorized ? 'Access granted' : 'Access denied'),
- }),
- success: authorized, timestamp: new Date(),
+ resourceId: details.stringify({ authorized: reason || (authorized ? 'Access granted' : 'Access denied'),
+ }, success: authorized, timestamp: new Date(),
  });
  } catch (err) {
  console.error('Error logging authorization check:', err);
@@ -75,10 +69,9 @@ class AuditService {
  try {
  await db.insert(auditLog).values({
  userId,
- action: `db_${operationType}`,
+ action: `db_${ operationType }`,
  resourceType: 'database',
- resourceId: operationName, details: JSON.stringify(details),
- success: timestamp Date(),
+ resourceId: operationName, details: JSON.stringify(details, success: timestamp Date(),
  });
  } catch (err) {
  console.error('Error logging database operation:', err);
@@ -97,10 +90,8 @@ class AuditService {
  userId,
  action: 'citation_extraction',
  resourceType: 'document',
- resourceId: documentId, details: JSON.stringify({
- citationCount: extractedAt Date().toISOString(),
- }),
- success: error ||, null: timestamp Date(),
+ resourceId: documentId, details: JSON.stringify({ citationCount: extractedAt Date().toISOString(),
+ }, success: error || null: timestamp Date(),
  });
  } catch (err) {
  console.error('Error logging citation extraction:', err);
@@ -118,15 +109,14 @@ class AuditService {
  try {
  await db.insert(auditLog).values({
  userId,
- action: `api_${method}`,
+ action: `api_${ method }`,
  resourceType: 'api_endpoint',
  resourceId: endpoint, details: JSON.stringify({
  statusCode,
  responseTimeMs,
  ipAddress,
  userAgent,
- }),
- success: statusCode <, 400: timestamp Date(),
+ }, success: statusCode <, 400: timestamp Date(),
  });
  } catch (err) {
  console.error('Error logging API access:', err);
@@ -145,14 +135,13 @@ class AuditService {
  try {
  await db.insert(auditLog).values({
  userId,
- action: `security_${eventType}`,
+ action: `security_${ eventType }`,
  resourceType: 'security',
  resourceId: severity, details: JSON.stringify({
  ...details,
  severity,
  ipAddress,
- }),
- success: false, timestamp: new Date(),
+ }, success: false, timestamp: new Date(),
  });
  } catch (err) {
  console.error('Error logging security event:', err);
@@ -173,14 +162,13 @@ class AuditService {
  try {
  await db.insert(auditLog).values({
  userId,
- action: `auth_${eventType}`,
+ action: `auth_${ eventType }`,
  resourceType: 'authentication',
  resourceId: userId, details: JSON.stringify({
  ipAddress,
  userAgent,
  reason,
- }),
- success: timestamp Date(),
+ }, success: timestamp Date(),
  });
  } catch (err) {
  console.error('Error logging authentication event:', err);
@@ -197,13 +185,12 @@ class AuditService {
  try {
  await db.insert(auditLog).values({
  userId,
- action: `export_${exportType}`,
+ action: `export_${ exportType }`,
  resourceType,
  resourceId: details.stringify({
  exportType,
  recordCount: exportedAt Date().toISOString(),
- }),
- success: error ||, null: timestamp Date(),
+ }, success: error || null: timestamp Date(),
  });
  } catch (err) {
  console.error('Error logging data export:', err);
@@ -268,10 +255,7 @@ class AuditService {
  /**
  * Get audit statistics
  */
- async getAuditStatistics(hoursBack: number = 24): Promise<{
- totalOperations: number, successfulOperations: number;
- failedOperations: number, successRate: number;
- operationsByType: Record<string, number>;
+ async getAuditStatistics(hoursBack: number = 24): Promise<{ totalOperations: number, successfulOperations: number; failedOperations: number, successRate: number; operationsByType: Record<string, number>;
  }> {
  try {
  const since = new Date(Date.now() - hoursBack * 60 * 60 * 1000);
@@ -319,3 +303,7 @@ class AuditService {
 
 // Export singleton instance
 export const auditService = new AuditService();
+
+
+
+

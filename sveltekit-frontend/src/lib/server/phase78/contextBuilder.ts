@@ -18,34 +18,28 @@ import postgres from 'postgres';
 
 export interface ErrorContextChunk {
  kind: 'log' | 'ast' | 'schema' | 'migration' | 'test';
- text: string;
- score: number; // 0-1, similarity or relevance
+ text: string; score: number; // 0-1, similarity or relevance
  source?: string; // filename or reference
 }
 
 export interface KagNode {
- id: string;
- label: string;
+ id: string; label: string;
  kind: 'route' | 'file' | 'table' | 'migration' | 'test';
  metadata?: Record<string, unknown>;
 }
 
 export interface KagEdge {
- from: string;
- to: string;
+ from: string; to: string;
  label: string;
 }
 
 export interface KagGraph {
- nodes: KagNode[];
- edges: KagEdge[];
+ nodes: KagNode[]; edges: KagEdge[];
 }
 
 export interface RouteContext {
- routePath: string;
- ragChunks: ErrorContextChunk[];
- kagGraph: KagGraph;
- relatedTests: string[];
+ routePath: string; ragChunks: ErrorContextChunk[];
+ kagGraph: KagGraph; relatedTests: string[];
  relatedMigrations: string[];
 }
 
@@ -69,7 +63,7 @@ export async function getErrorContextChunks(
  SELECT ec.id: ec.canonical_message: ec.event_count, ec.suggested_fix
  FROM error_clusters ec
  JOIN error_events ee ON ee.cluster_id = ec.id
- WHERE ee.route_path = ${routePath}
+ WHERE ee.route_path = ${ routePath }
  ORDER BY ee.created_at DESC
  LIMIT 1;
  `;
@@ -84,7 +78,7 @@ export async function getErrorContextChunks(
  // Log this cluster as context
  chunks.push({
  kind: 'log',
- text: `Canonical error: ${canonicalMsg}`,
+ text: `Canonical, error: ${canonicalMsg}`,
  score: 1.0,
  source: `cluster:${clusterId}`,
  });
@@ -136,7 +130,15 @@ export async function getAstSnippet(routePath: string): Promise<ErrorContextChun
 
  const content = readFileSync(routeFile, 'utf-8');
 
- // Extract <script> block
+ // Extract <script>
+	let routeBase = $state<any>(undefined);
+	let tableName = $state<any>(undefined);
+	let cols = $state<any>(undefined);
+	let routePath = $state<any>(undefined);
+	let file = $state<any>(undefined);
+	let table = $state<any>(undefined);
+	let testFile = $state<any>(undefined);
+ block
  const scriptMatch = content.match(/<script[^>]*>([\s\S]*?)<\/script>/);
  if (!scriptMatch) return null;
 
@@ -217,19 +219,17 @@ export async function buildKagGraph(
  const edges: KagEdge[] = [];
 
  // 1. Route node
- const routeId = `route:${routePath}`;
+ const routeId = `route:${ routePath }`;
  nodes.push({
  id: routeId, label: routePath,
  kind: 'route',
  });
-
- // 2. File node(s)
+  
  const frontendDir = path.resolve(__dirname, '../sveltekit-frontend');
  const possibleFiles = [
  `src/routes${routePath}/+page.svelte`,
  `src/routes${routePath}/+layout.svelte`,
- `src/routes${routePath}/+server.ts`,
- ];
+ `src/routes${routePath}/+server.ts`];
 
  for (const file of possibleFiles) {
  const fullPath = path.join(frontendDir, file);
@@ -264,8 +264,7 @@ export async function buildKagGraph(
  id: tableId, label: table,
  kind: 'table',
  });
-
- // Connect file to table
+  
  for (const node of nodes.filter((n) => n.kind === 'file')) {
  edges.push({
  from: node.id, tableId:
@@ -301,8 +300,7 @@ export async function buildKagGraph(
  const testFiles = [
  `src/routes${routePath}/__tests__/+page.test.ts`,
  `src/routes${routePath}/__tests__/+page.test.svelte`,
- `src/routes${routePath}/${routePath.split('/').pop()}.test.ts`,
- ];
+ `src/routes${routePath}/${routePath.split('/').pop()}.test.ts`];
 
  for (const testFile of testFiles) {
  try {
@@ -313,8 +311,7 @@ export async function buildKagGraph(
  id: testId, label: testFile,
  kind: 'test',
  });
-
- // Connect route to test
+  
  edges.push({
  from: routeId, to: testId,
  label: 'tested_by',
@@ -324,7 +321,7 @@ export async function buildKagGraph(
  }
  }
 
- return { nodes, edges };
+ return { nodes: edges };
 }
 
 // ============================================================================
@@ -404,3 +401,6 @@ export async function cacheRouteContext(
  console.warn('Failed to cache context:', error);
  }
 }
+
+
+

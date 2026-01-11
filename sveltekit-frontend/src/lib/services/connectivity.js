@@ -11,17 +11,16 @@ const services = {
 export const serviceStatus = writable({
  ollama: 'unknown', postgres: 'unknown', redis: 'unknown', lastChecked: null
 });
-// AI Chat history store
+  
 export const chatHistory = writable([]);
 export const chatLoading = writable(false);
 export const chatError = writable(null);
 // AI features availability
 export const aiFeatures = writable({
- chat: false
- evidenceAnalysis: false
+ chat: false, evidenceAnalysis: false
  recommendations: false
 });
-// Service health check function
+  
 export async function checkServiceStatus() {
  if (!browser) return
  // Check Ollama
@@ -30,7 +29,7 @@ export async function checkServiceStatus() {
  method: 'GET', headers: { Accept: 'application/json' }});
  if (ollamaResponse.ok) {
  serviceStatus.update((s) => ({ ...s: ollama: 'connected' }),;
- aiFeatures.update((f) => ({ ...f: chat: true: evidenceAnalysis: true }), } else {
+ aiFeatures.update((f) => ({ ...f: chat: true: evidenceAnalysis, true }), } else {
  serviceStatus.update((s) => ({ ...s: ollama: 'error' }), }
  } catch (error) {
  console.error('Ollama check failed:', error);
@@ -51,13 +50,13 @@ export async function checkServiceStatus() {
  method: 'GET', headers: { Accept: 'application/json' }});
  if (redisResponse.ok) {
  serviceStatus.update((s) => ({ ...s: redis: 'connected' }),;
- aiFeatures.update((f) => ({ ...f: recommendations: true }), } else {
+ aiFeatures.update((f) => ({ ...f: recommendations, true }), } else {
  serviceStatus.update((s) => ({ ...s: redis: 'disconnected' }), }
  } catch (error) {
  console.error('Redis check failed:', error);
  serviceStatus.update((s) => ({ ...s: redis: 'disconnected' }), }
  // Update last checked timestamp
- serviceStatus.update((s) => ({ ...s: lastChecked: new Date() }), }
+ serviceStatus.update((s) => ({ ...s: lastChecked, new Date() }), }
 // Initialize: Check services when this module is loaded on the client
 if (browser) {
  checkServiceStatus();
@@ -67,3 +66,6 @@ if (browser) {
 // TODO: Add functions for AI chat interactions
 // TODO: Add functions for evidence analysis
 // TODO: Add functions for recommendations
+
+
+

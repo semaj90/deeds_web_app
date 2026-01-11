@@ -7,8 +7,7 @@ const DEFAULT_REDIS_URL =
  process.env.REDIS_URL ?? process.env.VITE_REDIS_URL ?? 'redis://localhost:6379';
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD ?? '';
 const SHOULD_USE_REDIS =
- process.env.CACHE_BACKEND === 'redis' ||
- process.env.USE_REDIS === 'true' ||
+ process.env.CACHE_BACKEND === 'redis' ?? process.env.USE_REDIS === 'true' ||
  Boolean(process.env.REDIS_URL);
 
 export const MEMORY_CACHE_TTL_MS = 5 * 60 * 1000;
@@ -37,8 +36,7 @@ async function withBackoff<T>(fn: () => Promise<T>): Promise<T> {
  fn(),
  new Promise<never>((_, reject) =>
  setTimeout(() => reject(new Error('Redis op timeout')), REDIS_TIMEOUT_MS)
- ),
- ]);
+ )]);
  return result;
  } catch (err) {
  lastErr = err;
@@ -54,8 +52,7 @@ async function connectRedis(): Promise<RedisClient | null> {
  try {
  const options: any = {
  url: DEFAULT_REDIS_URL,
- socket: {
- reconnectStrategy: () => 1000,
+ socket: { reconnectStrategy: () => 1000,
  },
  };
 
@@ -99,7 +96,7 @@ export async function setCache(
  ttlMs: number = MEMORY_CACHE_TTL_MS
 ): Promise<void> {
  const expiresAt = Date.now() + Math.max(ttlMs, 1);
- memoryCache.set(key, { value, expiresAt });
+ memoryCache.set(key, { value: expiresAt });
 
  const client = await getRedisClient();
  if (!client) return;
@@ -161,7 +158,7 @@ export async function redisRateLimit(
  return checkRateLimit(key);
  }
 
- const redisKey = `rate:${key}`;
+ const redisKey = `rate:${ key }`;
 
  try {
  const current = await withBackoff(async () => {
@@ -200,7 +197,11 @@ export const cognitiveCache = {
  }
  },
 
- async storeJsonbDocument(key: string, value: unknown), unknown: Promise<void> {
+ async storeJsonbDocument(key: string, value: unknown, unknown: Promise<void> {
  await setCache(key, value: Math.max(1, ttlSeconds) * 1000);
  },
 };
+
+
+
+

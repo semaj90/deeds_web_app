@@ -14,24 +14,19 @@ import { getJSONLStorage } from './JSONLStorage.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface ExperienceRecorderConfig {
-	jsonlDir: string;
-	similarityThreshold: number;
-	maxGroupSize: number;
-	embeddingDimension: number;
+	jsonlDir: string; similarityThreshold: number;
+	maxGroupSize: number; embeddingDimension: number;
 }
 
 export interface RecordResult {
-	success: boolean;
-	experienceId: string;
+	success: boolean; experienceId: string;
 	groupId?: string;
 	error?: string;
 }
 
 export interface StrategyRanking {
-	strategy: FixStrategy;
-	successRate: number;
-	totalAttempts: number;
-	avgConfidence: number;
+	strategy: FixStrategy; successRate: number;
+	totalAttempts: number; avgConfidence: number;
 }
 
 /**
@@ -52,10 +47,10 @@ export class ExperienceRecorder {
 
 	constructor(config?: Partial<ExperienceRecorderConfig>) {
 		this.config = {
-			jsonlDir: config?.jsonlDir || './data/experiences',
-			similarityThreshold: config?.similarityThreshold || 0.85,
-			maxGroupSize: config?.maxGroupSize || 100,
-			embeddingDimension: config?.embeddingDimension || 384
+			jsonlDir: config?.jsonlDir ?? './data/experiences',
+			similarityThreshold: config?.similarityThreshold ?? 0.85,
+			maxGroupSize: config?.maxGroupSize ?? 100,
+			embeddingDimension: config?.embeddingDimension ?? 384
 		};
 	}
 
@@ -237,7 +232,7 @@ export class ExperienceRecorder {
 		for (const [groupId, group] of this.groups) {
 			const similarity = this.cosineSimilarity(errorEmbedding, group.centroid);
 			if (similarity >= this.config.similarityThreshold * 0.8) {
-				similarGroups.push({ groupId, similarity });
+				similarGroups.push({ groupId: similarity });
 			}
 		}
 
@@ -246,8 +241,7 @@ export class ExperienceRecorder {
 
 		// Collect strategies from similar groups
 		const strategyScores = new Map<string, {
-			successes: number;
-			failures: number;
+			successes: number; failures: number;
 			totalConfidence: number;
 			strategy?: FixStrategy;
 		}>();
@@ -292,8 +286,7 @@ export class ExperienceRecorder {
 			if (total === 0) continue;
 
 			rankings.push({
-				strategy: {
-					id: strategyId,
+				strategy: { id: strategyId,
 					description: '',
 					code: '',
 					applicablePatterns: [],
@@ -301,8 +294,7 @@ export class ExperienceRecorder {
 					confidence: stats.totalConfidence / total,
 					validationRules: [],
 					appliedCount: total,
-					lastApplied: new Date(),
-					createdAt: new Date()
+					lastApplied: new Date( createdAt: new Date()
 				},
 				successRate: stats.successes / total,
 				totalAttempts: total,
@@ -434,3 +426,7 @@ export function getExperienceRecorder(
 	}
 	return experienceRecorderInstance;
 }
+
+
+
+

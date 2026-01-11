@@ -3,8 +3,7 @@
 
 // Experimental types for WebGPU that might not be in default TS libs
 interface GPUAdapterInfo {
- vendor: string;
- architecture: string;
+ vendor: string; architecture: string;
  device?: string;
  description?: string;
 }
@@ -18,30 +17,23 @@ interface NavigatorWithGPU extends Navigator {
 }
 
 export interface WebGPUDiagnostics {
- isSupported: boolean;
- browserSupport: {
- hasNavigatorGPU: boolean;
- browserName: string;
- browserVersion: string;
- isChrome: boolean;
- isFirefox: boolean;
- isEdge: boolean;
+ isSupported: boolean; browserSupport: {
+ hasNavigatorGPU: boolean; browserName: string;
+ browserVersion: string; isChrome: boolean;
+ isFirefox: boolean; isEdge: boolean;
  isSafari: boolean;
  };
- adapterInfo?: {
- vendor: string;
+ adapterInfo?: { vendor: string;
  architecture: string;
  device?: string;
  description?: string;
  };
- deviceInfo?: {
- features: string[];
+ deviceInfo?: { features: string[];
  limits: Record<string, number>;
  maxBufferSize?: number;
  maxComputeWorkgroupSize?: number;
  };
- errors: string[];
- recommendations: string[];
+ errors: string[]; recommendations: string[];
 }
 
 export class WebGPUDiagnosticsService {
@@ -50,8 +42,7 @@ export class WebGPUDiagnosticsService {
 
  async runDiagnostics(): Promise<WebGPUDiagnostics> {
  const diagnostics: WebGPUDiagnostics = {
- isSupported: false, browserSupport: this.getBrowserSupport(),
- errors: [],
+ isSupported: false, browserSupport: this.getBrowserSupport(errors: [],
  recommendations: [],
  };
 
@@ -179,8 +170,7 @@ export class WebGPUDiagnosticsService {
  ) as Record<string, number>;
 
  diagnostics.deviceInfo = {
- features: limits(this.device.limits.maxBufferSize ?? 0),
- maxComputeWorkgroupSize: Number(this.device.limits.maxComputeWorkgroupSizeX ?? 0),
+ features: limits(this.device.limits.maxBufferSize ?? 0, maxComputeWorkgroupSize: Number(this.device.limits.maxComputeWorkgroupSizeX ?? 0),
  };
  console.log('[WEBGPU] Device created successfully');
  console.log('[WEBGPU] Device features: ', diagnostics.deviceInfo.features);
@@ -311,3 +301,7 @@ export function checkBrowserCompatibility(): { compatible: boolean; message: str
 
  return { compatible: false, message: 'Browser may have limited WebGPU support' };
 }
+
+
+
+

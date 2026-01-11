@@ -283,6 +283,15 @@ export class WebASMAIAdapter {
         return dotProduct / (normA * normB);
     }
 
+    private calculateEuclideanDistance(a: Float32Array, b: Float32Array): number {
+        let sum = 0;
+        for (let i = 0; i < a.length; i++) {
+            const diff = a[i] - b[i];
+            sum += diff * diff;
+        }
+        return Math.sqrt(sum);
+    }
+
     // Calculate silhouette score for clustering quality
     private calculateSilhouetteScore(
         vectors: Float32Array[],
@@ -301,7 +310,7 @@ export class WebASMAIAdapter {
             let intraDistance = 0;
             for (const member of clusterMembers) {
                 if (member !== vectors[i]) {
-                    intraDistance += this.wasmAccelerator.euclideanDistance?.(vectors[i], member) || 0;
+                    intraDistance += this.calculateEuclideanDistance(vectors[i], member);
                 }
             }
             intraDistance /= (clusterMembers.length - 1);
@@ -314,7 +323,7 @@ export class WebASMAIAdapter {
                 const otherMembers = vectors.filter((_, j) => assignments[j] === otherCluster);
                 let interDistance = 0;
                 for (const otherMember of otherMembers) {
-                    interDistance += this.wasmAccelerator.euclideanDistance?.(vectors[i], otherMember) || 0;
+                    interDistance += this.calculateEuclideanDistance(vectors[i], otherMember);
                 }
                 interDistance /= otherMembers.length;
                 minInterDistance = Math.min(minInterDistance, interDistance);
@@ -330,6 +339,15 @@ export class WebASMAIAdapter {
 
     // Cache embedding with WASM compression
     private async cacheEmbeddingWithCompression(embedding: TensorEmbedding) {
+        if (this.modelConfig.compressionLevel === 'none') {
+            await this.tensorCache.storeTensorSlices(
+                embedding.id,
+                embedding.vector,
+                [embedding.vector.length]
+            );
+            return;
+        }
+
         const compressedData = await this.wasmAccelerator.compressTensor(
             embedding.vector,
             this.modelConfig.compressionLevel
@@ -337,7 +355,7 @@ export class WebASMAIAdapter {
 
         await this.tensorCache.storeTensorSlices(
             embedding.id,
-            embedding.vector,
+            new Uint8Array(compressedData) as any,
             [embedding.vector.length]
         );
     }
@@ -412,7 +430,7 @@ export class WebASMAIAdapter {
             ids.map(async (id) => {
                 const embedding = this.embeddingCache.get(id) ||
                     await this.deserializeEmbedding(
-                        await this.tensorCache.getTensor(id)!,
+                        (await this.tensorCache.getTensor(id))!,
                         id
                     );
 

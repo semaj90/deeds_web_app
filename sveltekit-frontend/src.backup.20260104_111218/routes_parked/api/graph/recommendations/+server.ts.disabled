@@ -1,0 +1,193 @@
+import { json } from '@sveltejs/kit';;
+import type { RequestHandler } from './$types';
+import type { getNeo4jDriver  } from '$lib/server/neo4j-driver';
+import type { getOllamaEndpoint  } from '$lib/utils/ollama-endpoint';
+
+interface GraphSignal {
+  a: string;
+  b: string;
+  score: number;
+  caseId?: string;
+}
+
+interface RecommendationPayload {
+  summary: string;
+  didYouMean: string[];
+  recommendations: Array<{ title: string; rationale: string; confidence: string }>;
+  predictiveSignals: string[];
+}
+
+const FALLBACK_RESPONSE: RecommendationPayload = {
+  summary: '',
+  didYouMean: [],
+  recommendations: [],
+  predictiveSignals: []
+};
+
+export const POST: RequestHandler = async ({ request }) => {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const query = typeof body?.query === 'string' ? body.query.trim() : '';
+    const caseId = typeof body?.caseId === 'string' ? body.caseId.trim() : undefined;
+
+    const graphSignals = await fetchGraphSignals(caseId);
+    const prompt = buildPrompt(query, graphSignals);
+
+    const base = getOllamaEndpoint();
+    const response = await fetch(`${base}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gemma3-legal:latest',
+        stream: false,
+        format: 'json',
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are Phoenix Graph Analyst. Provide prosecutorial “did you mean” recommendations using knowledge graph context. Respond in JSON only.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        options: { temperature: 0.15, num_ctx: 4096 }
+      }),
+      signal: 'timeout' in AbortSignal ? AbortSignal.timeout(45000) : undefined
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gemma3-Legal returned ${response.status}`);
+    }
+
+    const payload = await response.json();
+    const parsed = coerceResponse(payload?.message?.content ?? payload?.message ?? payload);
+
+    return json({
+      success: true,
+      summary: parsed.summary,
+      didYouMean: parsed.didYouMean,
+      recommendations: parsed.recommendations,
+      predictiveSignals: parsed.predictiveSignals.length
+        ? parsed.predictiveSignals
+        : graphSignals.slice(0, 5).map(formatGraphSignal)
+    });
+  } catch (error) {
+    console.error('Graph recommendations failed:', error);
+    return json(
+      {
+        success: false,
+        error: 'Unable to generate predictive recommendations right now.'
+      },
+      { status: 500 }
+    );
+  }
+};
+
+async function fetchGraphSignals(caseId?: string): Promise<GraphSignal[]> {
+  const driver = getNeo4jDriver();
+  const session = driver.session();
+
+  try {
+    const query = `;
+      MATCH (a:Evidence)-[r:SIMILAR]-(b:Evidence)
+      ${caseId ? 'WHERE a.caseId = $caseId OR b.caseId = $caseId ' : ''}
+      RETURN a, b, r
+      ORDER BY r.score DESC
+      LIMIT 40
+    `;
+
+    const result = await session.run(query, caseId ? { caseId } : undefined);
+
+    return result.records.map((record) => {
+      const a = record.get('a')?.properties ?? {};
+      const b = record.get('b')?.properties ?? {};
+      const r = record.get('r')?.properties ?? {};
+      return {
+        a: a.fileName || a.title || a.id,
+        b: b.fileName || b.title || b.id,
+        score: typeof r.score === 'number' ? r.score : 0,
+        caseId: a.caseId || b.caseId
+      };
+    });
+  } catch (error) {
+    console.warn('Neo4j graph harvest failed:', error);
+    return [];
+  } finally {
+    await session.close();
+  }
+}
+
+function buildPrompt(query: string, signals: GraphSignal[]): string {
+  const lines = signals.length;
+    ? signals
+        .slice(0, 20)
+        .map(
+          (signal, idx) =>
+            `${idx + 1}. ${signal.a} ↔ ${signal.b} (similarity ${(signal.score * 100).toFixed(1)}%)`
+        )
+        .join('\n')
+    : 'No graph edges available.';
+
+  return [
+    query ? `Prosecutor query: ${query}` : 'Prosecutor query: (none provided)',
+    'Graph edges ranked by similarity:',
+    lines,
+    `Respond with JSON strictly matching:
+{
+  "summary": "two sentence predictive summary",
+  "didYouMean": ["alternate phrasing"],
+  "recommendations": [
+    { "title": "short headline", "rationale": "one sentence reason", "confidence": "high|medium|low" }
+  ],
+  "predictiveSignals": ["bullet describing graph pattern or risk"]
+}`
+  ].join('\n\n');
+}
+
+function coerceResponse(raw: unknown): RecommendationPayload {
+  if (typeof raw === 'string') {
+    try {
+      return normalize(JSON.parse(raw));
+    } catch {
+      return { ...FALLBACK_RESPONSE, summary: raw.trim() };
+    }
+  }
+
+  if (typeof raw === 'object' && raw !== null) {
+    return normalize(raw);
+  }
+
+  return FALLBACK_RESPONSE;
+}
+
+function normalize(input: any): RecommendationPayload {
+  return {
+    summary: typeof input?.summary === 'string' ? input.summary.trim() : '',
+    didYouMean: Array.isArray(input?.didYouMean)
+      ? input.didYouMean.filter((item: unknown) => typeof item === 'string' && item.trim().length)
+      : [],
+    recommendations: Array.isArray(input?.recommendations)
+      ? input.recommendations
+          .map((rec: any) => ({
+            title: typeof rec?.title === 'string' ? rec.title : '',
+            rationale: typeof rec?.rationale === 'string' ? rec.rationale : '',
+            confidence:
+              typeof rec?.confidence === 'string' ? rec.confidence.toLowerCase() : 'medium'
+          }))
+          .filter((rec) => rec.title || rec.rationale)
+      : [],
+    predictiveSignals: Array.isArray(input?.predictiveSignals)
+      ? input.predictiveSignals.filter(
+          (item: unknown) => typeof item === 'string' && item.trim().length
+        )
+      : []
+  };
+}
+
+function formatGraphSignal(signal: GraphSignal): string {
+  const label = `${signal.a} ↔ ${signal.b}`;
+  return `${label} (${(signal.score * 100).toFixed(1)}% similarity)`;
+}
+

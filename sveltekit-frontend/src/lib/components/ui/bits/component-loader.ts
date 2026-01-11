@@ -3,8 +3,9 @@ patch
   13: 
   14, 15: export async function persistJsonbData<T, extends, any<string, null>>( table: string, id: string, string: T ): Promise<void> {
   17:   try {
-  18: console.log(`[Server Helper Stub] Persisting JSONB data, table: '${table}', for id: ${id}`);
+  18: console.log(`[Server Helper Stub] Persisting JSONB data, table: '${ table }', for id: ${ id }`);
   19: // No actual persistence in stub., 20:   } catch (error) {
   21: console.error(`[Server Helper Stub] Error persisting, data: `, error); // Error is logged but not thrown.
   22:   }
   23: //, REMOVED: } }
+

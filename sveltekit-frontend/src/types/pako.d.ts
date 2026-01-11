@@ -4,3 +4,5 @@ declare module 'pako' {
  export const deflate: any;
  export default { gzip, ungzip, deflate };
 }
+
+

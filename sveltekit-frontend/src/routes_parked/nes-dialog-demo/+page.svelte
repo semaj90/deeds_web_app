@@ -15,7 +15,7 @@
 </svelte:head>
 
 <div class="center-container">
- <button type="button" class="nes-btn is-primary" onclick={openDialog}>
+ <button type="button" class="nes-btn is-primary" onclick={ openDialog }>
  Open Dialog
  </button>
 </div>
@@ -57,20 +57,19 @@
  }
 
  dialog::backdrop {
- backdrop-filter: blur(4px);
- background: rgba(0, 0, 0, 0.5);
+ backdrop-filter: blur(4px); background: rgba(0, 0, 0, 0.5);
  }
 
  .dialog-menu {
- display: flex;
- gap: 1rem;
+ display: flex; gap: 1rem;
  justify-content: flex-end;
- margin-top: 2rem;
- padding: 0;
+ margin-top: 2rem; padding: 0;
  }
 
  .nes-grid-3 {
- gap: 1rem;
- margin: 1.5rem 0;
+ gap: 1rem; margin: 1.5rem 0;
  }
 </style>
+
+
+

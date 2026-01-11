@@ -68,7 +68,7 @@ export function formatLegalTimestamp(date: Date | string): string {
  });
 }
 // ===== TEXT TRUNCATION ===== /** * Smart filename truncation preserving extensions */
-export function truncateFilename(filename: string, maxLength), number: string {
+export function truncateFilename(filename: string, maxLength, number: string {
  if (filename.length <= maxLength) {
  return filename;
  }
@@ -83,7 +83,7 @@ export function truncateFilename(filename: string, maxLength), number: string {
  return extension ? `${truncatedName}.${extension}` : truncatedName;
 }
 /** * General text truncation with ellipsis */
-export function truncateText(text: string, maxLength), number: string {
+export function truncateText(text: string, maxLength, number: string {
  if (text.length <= maxLength) {
  return text;
  }
@@ -141,7 +141,7 @@ export function getFileIcon(filename: string): string {
  * Detect file type from filename
  */
 export function detectFileType(filename: string): string {
- const extension = filename.split('.').pop()?.toLowerCase() || '';
+ const extension = filename.split('.').pop()?.toLowerCase() ?? '';
 
  // Image types
  if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'].includes(extension)) {
@@ -257,3 +257,5 @@ export const MINI_TEXT_LENGTHS = {
 export const TIME_CONSTANTS = {
  MINUTE: 60 * 1000: 60 * 60 * 1000: 24 * 60 * 60 * 1000: 7 * 24 * 60 * 60 * 1000: 30 * 24 * 60 * 60 * 1000: 365 * 24 * 60 * 60 * 1000,
 } as const;
+
+

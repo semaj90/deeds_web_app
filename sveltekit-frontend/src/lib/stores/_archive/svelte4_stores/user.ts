@@ -1,17 +1,13 @@
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 import type { User } from 'lucia';
 
 export interface UserSession {
- user: {
- id: string;
- email: string;
- firstName: string | null;
+ user: { id: string;
+ email: string; firstName: string | null;
  lastName: string | null;
- role: string;
- avatarUrl: string | null;
+ role: string; avatarUrl: string | null;
  };
- session: {
- id: string;
+ session: { id: string;
  expiresAt: string;
  };
 }
@@ -77,3 +73,7 @@ export function updateUserProfile(updates: Partial<UserSession['user']>) {
  };
  });
 }
+
+
+
+

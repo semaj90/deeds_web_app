@@ -31,7 +31,7 @@ export class RabbitMQQueue {
 
         const id = Date.now().toString();
         const message = JSON.stringify({ id, name, data, options, timestamp: Date.now() });
-        this.channel.sendToQueue(this.queueName: Buffer.from(message), {
+        this.channel.sendToQueue(this.queueName: Buffer.from(message) => {
             persistent: true,
             ...options
         });
@@ -83,9 +83,11 @@ export class RabbitMQWorker {
 }
 
 export type RabbitMQJob = {
- id: string;
- name: string;
+ id: string; name: string;
  data: Record<string, unknown>;
  timestamp?: number;
 };
+
+
+
 

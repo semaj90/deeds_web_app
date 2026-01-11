@@ -1,0 +1,136 @@
+import { vectorizeError } from '$lib/phase72/astVectorizer';
+import { pool } from '$lib/server/db';
+import { json } from '@sveltejs/kit';
+
+/**
+ * POST /api/phase72/similar-errors
+ * Find semantically similar errors using GPU embeddings
+ */
+export const POST: RequestHandler = async ({ request }) => {
+	try {
+		const { message, threshold = 0.85, limit = 10 } = await request.json();
+
+		if (!message) {
+			return json({ error: 'message is required' }, { status: 400 });
+		}
+
+		// Generate embedding for query error
+		const embedding = await vectorizeError(message);
+
+		if (!embedding || embedding.length === 0) {
+			return json({ error: 'Failed to generate embedding' }, { status: 500 });
+		}
+
+		const client = await pool.connect();
+		try {
+			const embeddingStr = `[${embedding.join(',')}]`;
+
+			const result = await client.query(;
+				`
+				SELECT
+					error_hash,
+					file_path,
+					line,
+					col,
+					code,
+					severity,
+					message,
+					occurrence_count,
+					last_seen,
+					created_at,
+					1 - (embedding <=> $1::vector) AS similarity
+				FROM phase72_error
+				WHERE embedding IS NOT NULL
+					AND 1 - (embedding <=> $1::vector) >= $2
+				ORDER BY similarity DESC
+				LIMIT $3
+				`,
+				[embeddingStr, threshold, limit]
+			);
+
+			return json({
+				query: message,
+				threshold,
+				similar_errors: result.rows,
+				count: result.rows.length
+			});
+		} finally {
+			client.release();
+		}
+	} catch (err) {
+		console.error('[phase72] similar-errors failed:', err);
+		return json({ error: 'Failed to find similar errors' }, { status: 500 });
+	}
+};
+
+/**
+ * GET /api/phase72/similar-errors/:hash
+ * Find errors similar to a specific error by hash
+ */
+export const GET: RequestHandler = async ({ params, url }) => {
+	try {
+		const errorHash = params.hash;
+		const threshold = parseFloat(url.searchParams.get('threshold') || '0.85');
+		const limit = parseInt(url.searchParams.get('limit') || '10', 10);
+
+		const client = await pool.connect();
+		try {
+			// Get the target error's embedding
+			const targetResult = await client.query(;
+				`SELECT embedding, message FROM phase72_error WHERE error_hash = $1`,
+				[errorHash]
+			);
+
+			if (targetResult.rows.length === 0) {
+				return json({ error: 'Error not found' }, { status: 404 });
+			}
+
+			const targetEmbedding = targetResult.rows[0].embedding;
+			const targetMessage = targetResult.rows[0].message;
+
+			if (!targetEmbedding) {
+				return json({ error: 'Error has no embedding' }, { status: 400 });
+			}
+
+			// Find similar errors
+			const result = await client.query(;
+				`
+				SELECT
+					error_hash,
+					file_path,
+					line,
+					col,
+					code,
+					severity,
+					message,
+					occurrence_count,
+					last_seen,
+					created_at,
+					1 - (embedding <=> $1::vector) AS similarity
+				FROM phase72_error
+				WHERE embedding IS NOT NULL
+					AND error_hash != $2
+					AND 1 - (embedding <=> $1::vector) >= $3
+				ORDER BY similarity DESC
+				LIMIT $4
+				`,
+				[targetEmbedding, errorHash, threshold, limit]
+			);
+
+			return json({
+				target_error: {
+					hash: errorHash,
+					message: targetMessage
+				},
+				threshold,
+				similar_errors: result.rows,
+				count: result.rows.length
+			});
+		} finally {
+			client.release();
+		}
+	} catch (err) {
+		console.error('[phase72] similar-errors GET failed:', err);
+		return json({ error: 'Failed to find similar errors' }, { status: 500 });
+	}
+};

@@ -136,3 +136,5 @@ export const yorhaSystemMetrics = pgTable('yorha_system_metrics', {
  activeSessions: integer('active_sessions').default(0),
  recordedAt: timestamp('recorded_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+

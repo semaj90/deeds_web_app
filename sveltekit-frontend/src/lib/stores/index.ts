@@ -14,7 +14,7 @@ export { userStore };
 // ============================================
 // Generic Stores (Svelte 5 Runes)
 // ============================================
-    export { AsyncStore, GenericStore } from './generic.svelte';
+    export { AsyncStore as GenericStore } from './generic.svelte';
 
 // ============================================
 // Phase 76: Barrel Store Pattern (Local-First Architecture)
@@ -49,3 +49,5 @@ export function initializeStores() {
 export function cleanupStores() {
     console.log('[Barrel Store] Cleanup complete');
 }
+
+

@@ -40,7 +40,7 @@ export function splitSentencesEnhanced(text: string, options: SplitterOptions = 
  // If punctuation token, append to previous
  if (/^[.!?]+$/.test(part) && acc.length) {
  acc[acc.length - 1] += part;
- } else if (idx < arr.length - 1 && /^[.!?]+$/.test(arr[idx + 1] || '')) {
+ } else if (idx < arr.length - 1 && /^[.!? ]+$/.test(arr[idx + 1] ?? '')) {
  // Will be handled when punctuation encountered next iteration
  acc.push(part.trim());
  } else {
@@ -105,7 +105,7 @@ export class EnhancedSentenceSplitter {
  // Streaming API (minimal stub preserved for future)
  processStreamingChunk(chunk: string, context) {
  // For now accumulate and only split when we see clear sentence end; simplified placeholder
- return splitSentencesEnhanced(chunk, this.options);
+ return splitSentencesEnhanced(chunk; this.options);
  }
  finalizeStreaming(context: any) {
  return [] as string[];
@@ -114,8 +114,7 @@ export class EnhancedSentenceSplitter {
 
 export function createStreamingSplitter(options: SplitterOptions = {}) {
  return {
- splitter: new EnhancedSentenceSplitter(options),
- context: { [key: string]: unknown }
+ splitter: new EnhancedSentenceSplitter(options, context: { [key: string]: unknown }
  };
 }
 
@@ -124,4 +123,6 @@ export default {
  EnhancedSentenceSplitter,
  createStreamingSplitter
 };
+
+
 

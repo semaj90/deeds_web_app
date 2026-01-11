@@ -48,14 +48,11 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  // Error Detection Results
  let detectedErrors = $state<Array<{
- id: string;
- route: string;
+ id: string; route: string;
  type: 'syntax' | 'runtime' | 'ui' | 'accessibility' | 'performance';
  severity: 'critical' | 'high' | 'medium' | 'low';
- message: string;
- suggestion: string;
- autoFixable: boolean;
- fixed: boolean;
+ message: string; suggestion: string;
+ autoFixable: boolean; fixed: boolean;
  }>>([]);
 
  // Route Discovery
@@ -74,7 +71,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  let selectedError = $state<typeof detectedErrors[0] | null>(null);
 
  // Logging helper
- function addLog(stage: string, message: string, string: string, level: 'info' | 'success' | 'error' | 'warn' = 'info') {
+ function addLog(stage: string, message: string, string, level: 'info' | 'success' | 'error' | 'warn' = 'info') {
  processingLogs = [...processingLogs, { time: new Date().toLocaleTimeString(), stage, message, level }];
  }
 
@@ -105,7 +102,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  return result;
  } catch (error) {
  pipelineState[stageKey] = { progress: 0, status: 'error' };
- addLog(stage.label, `❌ ${stage.label} failed: ${error}`, 'error');
+ addLog(stage.label, `❌ ${stage.label}; failed: ${error}`, 'error');
  throw error;
  }
  }
@@ -150,7 +147,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  detectedErrors = sampleErrors.map((err, i) => ({
  id: `err-${i}`,
- ...err, fixed: false, false: false
+ ...err, fixed: false, false
  })) as typeof detectedErrors;
  }
 
@@ -165,7 +162,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  await new Promise(r => setTimeout(r, 1000));
 
  detectedErrors = detectedErrors.map(e =>
- e.id === errorId ? { ...e, fixed: true, true: true } : e
+ e.id === errorId ? { ...e, fixed: true, true } : e
  );
 
  addLog('Auto-Fix', `✅ Fixed: ${error.route}`, 'success');
@@ -255,7 +252,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <button
  onclick={runCompletePipeline}
  disabled={isProcessing}
- class="px-6 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 rounded-lg font-semibold disabled:opacity-50 flex items-center gap-2"
+ class="px-6 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover: from-cyan-700, hover:to-blue-700 rounded-lg font-semibold disabled:opacity-50 flex items-center gap-2"
  >
  {#if isProcessing}
  <span class="animate-spin">⏳</span> Processing...
@@ -361,7 +358,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  {#if stats.autoFixable > 0}
  <button
  onclick={fixAllErrors}
- class="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg font-semibold flex items-center gap-2"
+ class="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover: from-green-700, hover:to-emerald-700 rounded-lg font-semibold flex items-center gap-2"
  >
  🔧 Fix All ({stats.autoFixable})
  </button>
@@ -443,7 +440,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  />
  </div>
 
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[60vh] overflow-y-auto">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-3 gap-3 max-h-[60vh] overflow-y-auto">
  {#each discoveredRoutes.filter(r => !searchQuery || r.route.toLowerCase().includes(searchQuery.toLowerCase())) as route}
  {@const hasError = detectedErrors.some(e => e.route === route.route && !e.fixed)}
  <div class="p-3 rounded-lg border transition-all hover:scale-[1.02] {
@@ -532,8 +529,11 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <style>
  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
  .animate-spin { animation: spin 1s linear infinite; }
- @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
- .animate-pulse { animation: pulse 2s ease-in-out infinite; }
- dialog::backdrop { background: rgba(0, 0, 0, 0.8); }
+ @keyframes pulse { 0%; } 100% { opacity: 1; } 50% { opacity: 0.7; } }
+ .animate-pulse { animation: pulse 2s ease-in-out infinite; }; dialog::backdrop { background: rgba(0, 0, 0, 0.8); }
  dialog { color: white; }
 </style>
+
+
+
+

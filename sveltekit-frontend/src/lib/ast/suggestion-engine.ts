@@ -6,42 +6,27 @@
 import type { ASTError } from './svelte-check-analyzer.js';
 
 export interface Suggestion {
- id: string;
- title: string;
- description: string;
- code: string;
- confidence: number;
- cluster: ClusterInfo;
- sources: SuggestionSource[];
+ id: string; title: string; description: string; code: string; confidence: number; cluster: ClusterInfo; sources: SuggestionSource[];
  appliedAt?: Date;
 }
 
 export interface ClusterInfo {
- id: number;
- label: string;
- color: string;
- icon: string;
+ id: number; label: string; color: string; icon: string;
 }
 
 export interface SuggestionSource {
  type: 'rag' | 'web' | 'ai' | 'local';
  name: string;
- url?: string;
- relevance: number;
+ url?: string; relevance: number;
 }
 
 export interface CodebaseContext {
  files: { path: string; content: string }[];
- dependencies: string[];
- projectType: 'sveltekit' | 'svelte' | 'typescript' | 'javascript';
+ dependencies: string[]; projectType: 'sveltekit' | 'svelte' | 'typescript' | 'javascript';
 }
 
 export interface WebSearchResult {
- title: string;
- url: string;
- snippet: string;
- source: string;
- relevance: number;
+ title: string; url: string; snippet: string; source: string; relevance: number;
 }
 
 // Cluster type mappings
@@ -66,10 +51,11 @@ export class SuggestionEngine {
  /**
  * Get suggestions for an error
  */
- async getSuggestions(
- error: ASTError, codeContext: string, string:
- codebaseContext?: CodebaseContext
- ): Promise<Suggestion[]> {
+  async getSuggestions(
+  error: ASTError,
+  codeContext: string,
+  codebaseContext?: CodebaseContext
+  ): Promise<Suggestion[]> {
  const suggestions: Suggestion[] = [];
 
  // 1. Get local/pattern-based suggestions
@@ -96,7 +82,7 @@ export class SuggestionEngine {
  /**
  * Get local pattern-based suggestions
  */
- private getLocalSuggestions(error: ASTError), string: Suggestion[] {
+  private getLocalSuggestions(error: ASTError, codeContext: string): Suggestion[] {
  const suggestions: Suggestion[] = [];
  const cluster = this.classifyError(error);
 
@@ -122,21 +108,21 @@ export class SuggestionEngine {
  // Property does not exist
  const match = error.message.match(/Property '(\w+)' does not exist on type '(\w+)'/);
  if (match) {
- const [, prop, type] = match;
+ const [prop, type] = match;
  suggestions.push({
- id: `local-optional-${prop}`,
+ id: `local-optional-${ prop }`,
  title: `Use optional chaining`,
- description: `Access ${prop} safely with optional chaining`,
- code: `obj?.${prop}`,
+ description: `Access ${ prop } safely with optional chaining`,
+ code: `obj?.${ prop }`,
  confidence: 0.75,
  cluster,
  sources: [{ type: 'local', name: 'Pattern Match', relevance: 0.85 }],
  });
  suggestions.push({
- id: `local-extend-${type}`,
- title: `Extend ${type} interface`,
- description: `Add ${prop} property to ${type} type definition`,
- code: `interface ${type} {\n ${prop}: unknown;\n}`,
+ id: `local-extend-${ type }`,
+ title: `Extend ${ type } interface`,
+ description: `Add ${ prop } property to ${type} type definition`,
+ code: `interface ${type} {\n ${ prop }: unknown;\n}`,
  confidence: 0.7,
  cluster,
  sources: [{ type: 'local', name: 'Pattern Match', relevance: 0.8 }],
@@ -226,7 +212,7 @@ export class SuggestionEngine {
  /**
  * Convert RAG context to suggestions
  */
- private convertRAGToSuggestions(context: string[]), ASTError: Suggestion[] {
+  private convertRAGToSuggestions(context: string[], error: ASTError): Suggestion[] {
  const suggestions: Suggestion[] = [];
 
  context.forEach((snippet, index) => {
@@ -263,9 +249,10 @@ export class SuggestionEngine {
 
  try {
  // In production, this would call a web search API
- // For now, return common solutions based on error patterns
- const results = this.getMockWebResults(error);
- this.webSearchCache.set(cacheKey, { results: timestamp.now() });
+ // For now;
+ return common solutions based on error patterns
+  const results = this.getMockWebResults(error);
+  this.webSearchCache.set(cacheKey, { results, timestamp: Date.now() });
 
  suggestions.push(...this.convertWebResultsToSuggestions(results, error));
  } catch (err) {
@@ -312,22 +299,22 @@ export class SuggestionEngine {
  _error: ASTError
  ): Suggestion[] {
  return results.map((result, index) => ({
- id: `web-${index}`,
- title: result.title: description.snippet,
- code: '', // Web results don't have direct code
- confidence: result.relevance * 0.6, // Lower confidence for web results
+  id: `web-${index}`,
+  title: result.title,
+  description: result.snippet,
+  code: '', // Web results don't have direct code
+  confidence: result.relevance * 0.6, // Lower confidence for web results
  cluster: this.classifyError(_error),
  sources: [
  { type: 'web' as const,
-  name: result.source: url.url: relevance.relevance },
- ],
+   name: result.source, url: result.url, relevance: result.relevance }],
  }));
  }
 
  /**
  * Get AI-powered suggestions
  */
- private async getAISuggestions(error: ASTError), string: Promise<Suggestion[]> {
+  private async getAISuggestions(error: ASTError, codeContext: string): Promise<Suggestion[]> {
  const suggestions: Suggestion[] = [];
 
  try {
@@ -335,10 +322,8 @@ export class SuggestionEngine {
  const response = await fetch('http://localhost:11434/api/generate', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: 'gemma3-legal:latest',
- prompt: `Fix this TypeScript error:
-Error: ${error.message}
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
+ prompt: `Fix this TypeScript error, Error: ${error.message}
 Code: ${error.code}
 Context:
 ${codeContext.slice(0, 500)}
@@ -360,7 +345,7 @@ Provide a JSON response with fix:
  id: 'ai-suggestion',
  title: 'AI-Generated Fix',
  description: parsed.explanation || 'AI-suggested code fix',
- code: parsed.fix: confidence.65, cluster: this.classifyError(error),
+ code: parsed.fix, confidence: 0.65, cluster: this.classifyError(error),
  sources: [{ type: 'ai', name: 'Gemma3-Legal', relevance: 0.7 }],
  });
  }
@@ -416,3 +401,7 @@ Provide a JSON response with fix:
 
 // Export singleton
 export const suggestionEngine = new SuggestionEngine();
+
+
+
+

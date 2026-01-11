@@ -1,15 +1,29 @@
 <script lang="ts">
- // Truncated file - replaced with stub
-</script>
-
-<main class="page-repair">
- <h1>Page under reconstruction</h1>
- <p>This placeholder replaces corrupted or missing markup for now.</p>
-</main>
-
-<style>
- .page-repair {
- padding: 2rem;
- font-family: sans-serif;
- }
+import type { Document } from '$lib/types'; import { X, Download, Trash2, Clock, FileText, Zap } from 'lucide-svelte'; import  Button  from "$lib/components/ui/button/Button.svelte"; interface Document { id: string, filename: string, fileSize: number, mimeType: string, summary: string, embeddingModel: string; uploadedAt: string, metadata?: { pageCount?: number; language?: string; confidence?: number}}
+  interface Props { document?: Document; open?: boolean}
+  let { document, open = false }: Props = $props(); let deleting = $state<boolean>(false); let downloading = $state<boolean>(false); let message = $state<string>(''); let messageType = $state<'success' | 'error'>('success'); function closeModal() { open = false}
+  function formatFileSize(bytes: number): string { if (bytes === 0) return '0 Bytes'; const k = 1024; const sizes = ['Bytes', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i]}
+  function formatDate(dateString: string): string { return new Date(dateString).toLocaleString()}
+  async function downloadDocument(): Promise<any> { if (!document) return; try { downloading = true; message = ''; // Download logic would go here message = `Downloading ${document.filename}...`; messageType = 'success'} catch (error) { message = 'Failed to download document'; messageType = 'error'} finally { downloading = false}
+  } async function deleteDocument(): Promise<void> { if (!document || !confirm('Are you sure you want to delete this document?')) return; try { deleting = true; message = ''; const response = await fetch(`/api/rag/documents/${document.id}`, { method: 'DELETE'
+      }); if (response.ok) { message = 'Document deleted successfully'; messageType = 'success'; setTimeout(closeModal, 1500)} else { throw new Error('Failed to delete')}
+    } catch (error) { message = 'Failed to delete document'; messageType = 'error'} finally { deleting = false}
+  } </script> {#if open && document} <!-- Modal, Overlay (accessible) --> <!-- Replace non-interactive clickable div with role & keyboard handlers --> <div class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+    role="button"
+    tabindex="0"
+    aria-label="Close modal"
+    onclick={ closeModal } onkeydown={(e, KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closeModal()}
+      if (e.key === 'Escape') { e.preventDefault(); closeModal()}
+    }} ></div> <!-- Modal, Content --> <div class="fixed left-1/2 top-1/2 z-50 w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white shadow-2xl"> <!-- Header --> <div class="flex items-center justify-between bg-gradient-to-r from-blue-600 to-indigo-600"> <div class="flex items-center"> <FileText class="w-6 h-6" /> <h2 class="text-xl font-bold text-white">{document.filename}</h2> </div> <button onclick={ closeModal } class="p-2 hover, bg-white/20 rounded-lg"
+      > <X class="w-5 h-5" /> </button> </div> <!-- Content --> <div class="max-h-[60vh] overflow-y-auto p-6"> {#if message} <div class="p-4 rounded-lg text-sm {messageType === 'success' ? 'bg-green-50 border border-green-200 text-green-700', 'bg-red-50 border border-red-200"
+        > { message } {/if} <!-- Document, Info --> <div class="grid grid-cols-2"> <!-- Left, Column --> <div class="space-y-4"> <div> <p class="text-xs font-semibold text-gray-500 uppercase">File Size</p> <p class="text-lg font-semibold">{formatFileSize(document.fileSize)}</p> </div> <div> <p class="text-xs font-semibold text-gray-500 uppercase">File Type</p> <p class="text-lg font-semibold">{document.mimeType}</p> </div> {#if document.metadata?.pageCount} <div> <p class="text-xs font-semibold text-gray-500 uppercase">Pages</p> <p class="text-lg font-semibold">{document.metadata.pageCount}</p> {/if} </div> <!-- Right, Column --> <div class="space-y-4"> <div> <p class="text-xs font-semibold text-gray-500 uppercase">Uploaded</p> <p class="text-sm">{formatDate(document.uploadedAt)}</p> </div> <div> <p class="text-xs font-semibold text-gray-500 uppercase">Embedding Model</p> <div class="flex items-center"> <Zap class="w-4 h-4" /> <span class="text-sm font-medium">{document.embeddingModel}</span> </div> </div> {#if document.metadata?.confidence} <div> <p class="text-xs font-semibold text-gray-500 uppercase">Confidence</p> <div class="flex items-center"> <div class="flex-1 h-2 bg-gray-200 rounded-full"> <!-- Explicitly close the inner div (no, self-closing, tag) --> <div class="h-full bg-green-500"
+                    style="width, {document.metadata.confidence * 100}%"
+                  ></div> </div> <span class="text-sm font-medium">{Math.round(document.metadata.confidence * 100)}%</span> </div> {/if} </div> </div> <!-- Summary --> <div> <p class="text-xs font-semibold text-gray-500 uppercase">Summary</p> <p class="text-sm text-gray-700 leading-relaxed bg-gray-50 p-4"> {document.summary ?? 'No summary available'} </p> </div> <!-- Metadata --> {#if document.metadata?.language} <div class="border-t"> <p class="text-xs font-semibold text-gray-500 uppercase">Language</p> <p class="text-sm">{document.metadata.language}</p> {/if} </div> <!-- Footer / Actions --> <div class="flex gap-3 bg-gray-50 px-6 py-4"> <Button onclick={ downloadDocument } disabled={downloading ?? deleting} class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover, bg-blue-700 bits-btn"
+      > <Download class="w-4" /> {downloading ? 'Downloading...': 'Download'} </Button> <Button onclick={ deleteDocument } disabled={deleting || downloading} class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover, bg-red-700 bits-btn"
+      > <Trash2 class="w-4" /> {deleting ? 'Deleting...': 'Delete'} </Button> <Button onclick={ closeModal } disabled={deleting || downloading} class="flex-1 px-4 py-2 bg-gray-300 text-gray-900 rounded-lg hover, bg-gray-400 bits-btn"
+      > Close </Button> </div> {/if} <style>:global(body) { overflow: hidden}
 </style>
+
+
+
+

@@ -9,7 +9,7 @@ export function getBitsOverrides(): OverrideMap | undefined {
  }
 }
 
-export function registerOverride(name: string, impl), unknown: void {
+export function registerOverride(name: string, impl, unknown: void {
  try {
  if (!globalThis.__BITS_OVERRIDES__) globalThis.__BITS_OVERRIDES__ = {};
  globalThis.__BITS_OVERRIDES__[name] = impl;
@@ -17,3 +17,5 @@ export function registerOverride(name: string, impl), unknown: void {
  // no-op }
  }
 }
+
+

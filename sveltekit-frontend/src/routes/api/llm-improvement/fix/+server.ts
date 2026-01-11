@@ -6,18 +6,17 @@
  * Applies a fix strategy with confidence-based routing
  */
 
-import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types.js';
 import { getDecisionEngine } from '$lib/services/error-analysis/DecisionEngine';
 import { getFixSynthesizer } from '$lib/services/error-analysis/FixSynthesizer';
-import type { ErrorReport, FixStrategy, ErrorContext } from '$lib/services/error-analysis/types';
+import type { ErrorContext, ErrorReport, FixStrategy } from '$lib/services/error-analysis/types';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types.js';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const body = await request.json();
 		const { error, strategy, context, autoApply } = body as {
-			error: ErrorReport;
-			strategy: FixStrategy;
+			error: ErrorReport; strategy: FixStrategy;
 			context: ErrorContext;
 			autoApply?: boolean;
 		};
@@ -29,14 +28,12 @@ export const POST: RequestHandler = async ({ request }) => {
 		const decisionEngine = getDecisionEngine({
 			autoApplyEnabled: autoApply ?? false
 		});
-
-		// Process the error with decision engine
+  
 		const result = await decisionEngine.processError(error, strategy, context);
 
 		return json({
 			success: result.success,
-			result: {
-				action: result.action, confidence: result.confidence, fixApplied: result.fixApplied, experienceId: result.experienceId, error: result.error
+			result: { action: result.action, confidence: result.confidence, fixApplied: result.fixApplied, experienceId: result.experienceId, error: result.error
 			},
 			stats: decisionEngine.getStats()
 		});
@@ -60,9 +57,8 @@ export const GET: RequestHandler = async () => {
 
 		return json({
 			success: true,
-			stats: {
-				decision: decisionEngine.getStats(),
-				thresholds: decisionEngine.getThresholds().getStats()
+			stats: { decision: decisionEngine.getStats(),
+				thresholds: decisionEngine.getThresholds()
 			}
 		});
 	} catch (err) {
@@ -72,3 +68,7 @@ export const GET: RequestHandler = async () => {
 		);
 	}
 };
+
+
+
+

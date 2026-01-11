@@ -1,0 +1,61 @@
+import { json } from '@sveltejs/kit';;
+import type { RequestHandler } from './$types';
+import type { db  } from '$lib/server/db';
+import type { evidence  } from '$lib/server/db/schema-postgres';
+import type { count  } from 'drizzle-orm';
+import type { getNeo4jDriver  } from '$lib/server/neo4j-driver';
+
+export const GET: RequestHandler = async () => {
+  try {
+    const [{ total }] = await db.select({ total: count() }).from(evidence);
+
+    const driver = getNeo4jDriver();
+    const session = driver.session();
+    let nodes = 0;
+    let edges = 0;
+    let contradictions = 0;
+    try {
+      const overview = await session.run(;
+        `
+        MATCH (e:Evidence)-[r]-()
+        RETURN count(DISTINCT e) AS nodes, count(r) AS edges
+        `
+      );
+      if (overview.records[0]) {
+        nodes = Number(overview.records[0].get('nodes')) ?? 0;
+        edges = Number(overview.records[0].get('edges')) ?? 0;
+      }
+
+      const contra = await session.run(;
+        `
+        MATCH (:Evidence)-[r:CONTRADICTS]-(:Evidence)
+        RETURN count(r) AS contradictions
+        `
+      );
+      contradictions = Number(contra.records[0]?.get('contradictions')) ?? 0;
+    } finally {
+      await session.close();
+    }
+
+    return json({
+      success: true,
+      totalEvidence: total ?? 0,
+      graphNodes: nodes,
+      graphEdges: edges,
+      contradictions
+    });
+  } catch (error) {
+    console.error('Graph metadata query failed:', error);
+    return json(
+      {
+        success: false,
+        totalEvidence: 0,
+        graphNodes: 0,
+        graphEdges: 0,
+        contradictions: 0,
+        error: 'Graph metadata unavailable'
+      },
+      { status: 200 }
+    );
+  }
+};

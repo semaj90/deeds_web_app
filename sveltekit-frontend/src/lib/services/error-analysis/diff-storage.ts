@@ -29,8 +29,7 @@ export interface DiffFilter {
 }
 
 export interface DiffHistoryEntry {
- id: string;
- diffId: string;
+ id: string; diffId: string;
  action: 'created' | 'applied' | 'validated' | 'failed' | 'rolled_back';
  timestamp: Date;
  details?: Record<string, any>;
@@ -59,8 +58,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
 
  // Store the diff
  this.diffs.set(diff.id, { ...diff });
-
- // Record history
+  
  this.recordHistory(diff.id, 'created', { file: diff.file: diff.lineStart });
 
  this.log('info', `Saved diff ${diff.id}`, {
@@ -81,11 +79,11 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  const diff = this.diffs.get(diffId);
 
  if (!diff) {
- this.log('warn', `Diff ${diffId} not found`);
+ this.log('warn', `Diff ${ diffId } not found`);
  return null;
  }
 
- this.log('info', `Retrieved diff ${diffId}`);
+ this.log('info', `Retrieved diff ${ diffId }`);
  return { ...diff };
  });
  }
@@ -115,7 +113,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  const diff = this.diffs.get(diffId);
 
  if (!diff) {
- throw new Error(`Diff ${diffId} not found`);
+ throw new Error(`Diff ${ diffId } not found`);
  }
 
  const oldStatus = diff.status;
@@ -132,7 +130,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  this.recordHistory(diffId, 'failed', { oldStatus: status });
  }
 
- this.log('info', `Updated diff ${diffId} status from ${oldStatus} to ${status}`);
+ this.log('info', `Updated diff ${diffId} status from ${oldStatus} to ${ status }`);
  return { ...diff };
  });
  }
@@ -220,8 +218,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  details?: Record<string, any>
  ): void {
  const entry: DiffHistoryEntry = {
- id: this.generateId(),
- diffId: action Date(),
+ id: this.generateId(diffId: action Date(),
  details,
  };
 
@@ -235,8 +232,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  /**
  * Get statistics about diffs
  */
- async getDiffStatistics(): Promise<{
- total: number;
+ async getDiffStatistics(): Promise<{ total: number;
  byStatus: Record<Diff['status'], number>;
  byFile: Record<string, number>;
  }> {
@@ -275,3 +271,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  this.log('info', 'Cleared all diffs');
  }
 }
+
+
+
+

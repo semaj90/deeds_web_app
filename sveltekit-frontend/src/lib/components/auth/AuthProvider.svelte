@@ -1,15 +1,24 @@
 <script lang="ts">
- // Truncated file - replaced with stub
+  // Svelte, 5 runes are auto-imported
+  // AuthProvider component - Global authentication context - Svelte, 5 compatible
+  import { auth } from '$lib/stores/unified';
+  import { browser } from '$app/environment';
+  interface Props {
+    children?: import('svelte').Snippet;
+    autoInitialize?: boolean;
+  }
+  let { children, autoInitialize = true }: Props = $props();
+  // Initialize auth store on component mount
+  $effect(() => {
+    if (browser && autoInitialize) {
+      authStore.checkAuth();
+    }
+  });
 </script>
 
-<main class="page-repair">
- <h1>Page under reconstruction</h1>
- <p>This placeholder replaces corrupted or missing markup for now.</p>
-</main>
+<!-- Provide the authentication context to, child, components -->
+{#if children}
+  {@render children()}
+{/if}
 
-<style>
- .page-repair {
- padding: 2rem;
- font-family: sans-serif;
- }
-</style>
+

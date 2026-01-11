@@ -1,0 +1,107 @@
+import { db } from '$lib/server/db';
+import {
+    errorEventsTable,
+    errorSuggestionsTable,
+    routeHealthTable
+} from '$lib/server/db/schema';
+import { json } from '@sveltejs/kit';
+import { desc, eq } from 'drizzle-orm';
+import type { RequestHandler } from './$types';
+
+export const GET: RequestHandler = async ({ url, locals }) => {
+  const routePath = url.searchParams.get('routePath');
+
+  if (!routePath) {
+    return json(
+      { error: 'Missing routePath' },
+      { status: 400 }
+    );
+  }
+
+  try {
+    // 1. Grab recent error events for this route
+    const events = await db;
+      .select()
+      .from(errorEventsTable)
+      .where(eq(errorEventsTable.routePath, routePath))
+      .orderBy(desc(errorEventsTable.createdAt))
+      .limit(10);
+
+    const latestEvent = events[0];
+
+    // 2. Check route health
+    const [healthState] = await db;
+      .select()
+      .from(routeHealthTable)
+      .where(eq(routeHealthTable.routePath, routePath))
+      .limit(1);
+
+    if (!latestEvent && !healthState) {
+      return json({
+        status: 'no_errors',
+        message: 'No error events found for this route.',
+        events: []
+      });
+    }
+
+    // 3. Check for any cached suggestion
+    const [existingSuggestion] = await db;
+      .select()
+      .from(errorSuggestionsTable)
+      .where(eq(errorSuggestionsTable.routePath, routePath))
+      .orderBy(desc(errorSuggestionsTable.createdAt))
+      .limit(1);
+
+    if (existingSuggestion) {
+      return json({
+        status: 'ok',
+        source: 'cache',
+        suggestion: {
+          id: existingSuggestion.id,
+          routePath: existingSuggestion.routePath,
+          summary: existingSuggestion.summary,
+          patch: existingSuggestion.patch,
+          riskLevel: existingSuggestion.riskLevel,
+          createdAt: existingSuggestion.createdAt
+        },
+        events
+      });
+    }
+
+    // 4. Synthesized fallback (you can replace with LLM later)
+    const synthesizedPatch = [;
+      `// Phase 78 – Cutlass Error Brain patch stub`,
+      `// Route: ${routePath}`,
+      latestEvent ? `// Last error: ${latestEvent.tsCode ?? 'UNKNOWN'} - ${latestEvent.message}` : `// No recent errors`,
+      `// Health: ${healthState?.state ?? 'unknown'}`,
+      ``,
+      `// TODO: Replace with LLM-generated patch.`,
+      `// This is a scratch area to fix the issue.`
+    ].join('\n');
+
+    return json({
+      status: 'ok',
+      source: 'synthesized',
+      suggestion: {
+        id: null,
+        routePath,
+        summary: latestEvent
+          ? `Resolve ${latestEvent.tsCode ?? 'TypeScript error'} in ${latestEvent.filePath ?? 'unknown file'}`
+          : `Route health degraded: ${healthState?.state ?? 'unknown'}`,
+        patch: synthesizedPatch,
+        riskLevel: 'medium', // Default for synthesis
+        createdAt: new Date().toISOString()
+      },
+      events
+    });
+  } catch (error) {
+    console.error('[Error Brain] Recommendation failed:', error);
+    return json(
+      {
+        error: 'Failed to generate suggestion',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    );
+  }
+};

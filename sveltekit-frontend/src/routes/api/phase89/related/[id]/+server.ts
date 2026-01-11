@@ -52,11 +52,11 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 		const related = results
 			.filter((r: any) => r.id !== componentId)
 			.map((r: any) => ({
-				path: r.payload?.file_path || '',
+				path: r.payload?.file_path ?? '',
 				similarity: r.score,
 				shared_imports: findSharedImports(pointData.result?.payload, r.payload),
-				unit_kind: r.payload?.unit_kind || 'unknown',
-				component_name: r.payload?.component_name || r.payload?.module_name || 'Unknown'
+				unit_kind: r.payload?.unit_kind ?? 'unknown',
+				component_name: r.payload?.component_name ?? r.payload?.module_name || 'Unknown'
 			}));
 
 		return json({ related });

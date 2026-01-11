@@ -3,18 +3,14 @@
 import type { query } from "$app/server";
 
 interface BundledCharge {
- statuteCode: string;
- title: string;
- reason: string;
- confidence: number;
+ statuteCode: string; title: string;
+ reason: string; confidence: number;
  frequency: number; // How often filed together (0-1)
 }
 
 interface ChargeBundle {
- victimClass: string;
- penaltyLevel: string;
- suggestedBundles: BundledCharge[];
- confidence: number;
+ victimClass: string; penaltyLevel: string;
+ suggestedBundles: BundledCharge[]; confidence: number;
 }
 
 // Penalty classification patterns (HMM-inspired states)
@@ -29,8 +25,7 @@ const penaltyPatterns = {
  'trafficking',
  'assault with weapon',
  'child abuse',
- 'sexual assault',
- ],
+ 'sexual assault'],
  wobbler: [
  'dui injury',
  'child endangerment',
@@ -40,8 +35,7 @@ const penaltyPatterns = {
  'fraud',
  'embezzlement',
  'stalking',
- 'harassment',
- ],
+ 'harassment'],
  misdemeanor: [
  'resisting arrest',
  'disorderly conduct',
@@ -50,8 +44,7 @@ const penaltyPatterns = {
  'drunk in public',
  'simple assault',
  'petty theft',
- 'harassment',
- ],
+ 'harassment'],
  infraction: ['traffic violation', 'parking', 'noise complaint', 'minor offense'],
 };
 
@@ -66,8 +59,7 @@ const victimPatterns = {
  'endangerment',
  'abuse',
  'neglect',
- 'molestation',
- ],
+ 'molestation'],
  elder: ['elder', 'elderly', 'senior', 'aged', 'dependent adult', 'nursing home'],
  spouse: ['spouse', 'partner', 'domestic', 'intimate', 'family violence', 'dv'],
  disabled: ['disabled', 'disability', 'vulnerable', 'incapacitated', 'dependent'],
@@ -100,8 +92,7 @@ const bundlePatterns: Record<string, BundledCharge[]> = {
  title: 'Resisting Arrest',
  reason: 'Common companion - arrest resistance',
  confidence: 0.5, frequency: 0.3,
- },
- ],
+ }],
  '211': [
  // Robbery
  {
@@ -127,8 +118,7 @@ const bundlePatterns: Record<string, BundledCharge[]> = {
  title: 'Personal Use of Firearm',
  reason: 'Enhancement - weapon allegation',
  confidence: 0.8, frequency: 0.6,
- },
- ],
+ }],
  '23153': [
  // DUI Causing Injury
  {
@@ -154,8 +144,7 @@ const bundlePatterns: Record<string, BundledCharge[]> = {
  title: 'Great Bodily Injury Enhancement',
  reason: 'Enhancement - serious injury',
  confidence: 0.75, frequency: 0.5,
- },
- ],
+ }],
 };
 
 export function inferPenaltyLevel(query: string): string {
@@ -182,7 +171,7 @@ export function inferVictimClass(query: string): string {
  return 'general'; // Default
 }
 
-export function suggestBundles(statuteCode: string), string: BundledCharge[] {
+export function suggestBundles(statuteCode: string, string: BundledCharge[] {
  const bundles = bundlePatterns[statuteCode] || [];
 
  // Filter bundles based on query context
@@ -205,7 +194,7 @@ export function suggestBundles(statuteCode: string), string: BundledCharge[] {
  });
 }
 
-export function classifyCharge(query: string), string: ChargeBundle {
+export function classifyCharge(query: string, string: ChargeBundle {
  const penaltyLevel = inferPenaltyLevel(query);
  const victimClass = inferVictimClass(query);
  const suggestedBundles = suggestBundles(statuteCode, query);
@@ -244,3 +233,6 @@ export function getVictimIcon(victimClass: string): string {
  };
  return icons[victimClass] || '👤';
 }
+
+
+

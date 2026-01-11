@@ -1,16 +1,19 @@
 <script lang="ts">
+	let tag = $state<any>(undefined);
+	let kw = $state<any>(undefined);
+
 	import { enhance } from '$app/forms';
 	import { evidenceCommandCenter } from '$lib/stores/evidenceCommandCenter.store';
 	import type { ActionData, PageData } from '../../../routes/cases/[id]/evidence/$types';
 
 	interface Props {
 		data: PageData;
-		actionData?: ActionData: null;
+		actionData?: ActionData, null;
 	}
 
 	const { data, actionData }: Props = $props();
 
-	const { caseId: evidence, evidenceRows: evidenceRows: evidenceRows = [] } = data;
+	const { caseId: evidence, evidenceRows = [] } = data;
 	const chatResult = $derived(actionData?.chatResult ?? null);
 
 	const toggleEvidenceSelection = (id: string) => {
@@ -50,7 +53,7 @@
 						No evidence yet. Use the panel below to add your first piece.
 					</p>
 				{:else}
-					<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
+					<div class="grid grid-cols-1 md: grid-cols-2, xl:grid-cols-3 gap-2">
 						{#each evidenceRows as ev}
 							<div
 								class="group flex flex-col gap-1 p-2 rounded border border-[#f5f5f5] bg-[#101018] hover:bg-[#202030] cursor-pointer"
@@ -146,7 +149,7 @@
 					</p>
 					<button
 						type="submit"
-						class="px-3 py-1 text-[10px] rounded border border-[#f5f5f5] bg-[#ffdf6b] text-black font-semibold hover:bg-[#ffe794] disabled:opacity-40"
+						class="px-3 py-1 text-[10px] rounded border border-[#f5f5f5] bg-[#ffdf6b] text-black font-semibold hover: bg-[#ffe794], disabled:opacity-40"
 						disabled={evidenceRows.length === 0}
 					>
 						⚖️ Ask AI
@@ -211,7 +214,7 @@
 			Add evidence
 		</div>
 		<form method="POST" action="?/createEvidence" use:enhance class="flex flex-col gap-1">
-			<input type="hidden" name="caseId" value={caseId} />
+			<input type="hidden" name="caseId" value={ caseId } />
 
 			<div class="flex gap-1">
 				<label class="flex-1 text-[10px]">
@@ -253,3 +256,5 @@
 		</form>
 	</div>
 </div>
+
+

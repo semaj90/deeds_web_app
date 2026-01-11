@@ -1,0 +1,237 @@
+<!--
+  AiAssistant.svelte BACKUP
+  This is a backup of the original AiAssistant.svelte before the latest changes.
+  Date: 2025-07-20
+-->
+<script lang="ts">
+  // @ts-nocheck
+  /**
+   * AiAssistant.svelte
+   *
+   * Production-ready AI component using Svelte 5 Runes and XState.
+   * This component orchestrates AI-powered evidence summarization and embedding generation.
+   *
+   * ARCHITECTURE INTEGRATION:
+   * - SvelteKit: Uses Svelte 5 Runes ($props, $state, $derived, $effect) for reactivity.
+   * - XState: Manages complex asynchronous UI state for AI operations.
+   * - Loki.js: Implements a simple client-side cache for summaries to reduce API calls.
+   * - API Layer: Communicates with a SvelteKit API endpoint (`/api/ai/process-evidence`).
+   *
+   * BACKEND STACK (Orchestrated via the API endpoint):
+   * - Docker: The entire backend stack (Postgres, Ollama, Redis, Neo4j) is expected to run in Docker containers.
+   * - Ollama: Provides local LLMs for summarization (e.g., 'gemma3') and embeddings ('nomic-embed-text').
+   * - PostgreSQL + pg_vector: Stores evidence embeddings for efficient semantic search.
+   * - Neo4j: Stores graph relationships between evidence, cases, and extracted entities.
+   * - Redis: Caches expensive AI results and can be used as a message queue for background jobs.
+   * - LangChain.js: Used on the server to build chains that orchestrate LLM calls, embedding, and vector store interactions.
+   */
+  import { Card, Button } from 'bits-ui';
+  import { onMount, getContext } from 'svelte';
+  import { useMachine } from '@xstate/svelte';
+  import { createMachine, assign } from 'xstate';
+  import Loki from 'lokijs';
+
+  // Get user from context (set in +layout.svelte)
+  const getUser = getContext('user');
+  const user = typeof getUser === 'function' ? getUser() : undefined;
+
+  export let contextItems: any[] = [];
+  export let caseId: string = '';
+
+  // --- Client-Side Caching with Loki.js ---
+  // Initializes a simple in-memory DB to cache summaries on the client.
+  // Ensure Loki.js DB and collection are initialized only once (singleton pattern).
+  let db: Loki;
+  let summaryCache: Collection<any>;
+
+  function getSummaryCache() {
+    if (!db) {
+      db = new Loki('ai-cache.db');
+      summaryCache = db.addCollection('summaries', { indices: ['caseId'] });
+    } else if (!summaryCache) {
+      summaryCache = db.getCollection('summaries') || db.addCollection('summaries', { indices: ['caseId'] });
+    }
+    return summaryCache;
+  }
+  const summaryCache = getSummaryCache();
+
+  // --- XState Machine for AI Processing ---
+  const aiProcessingMachine = createMachine(
+    {
+      id: 'aiProcessing',
+      initial: 'idle',
+      context: {
+        caseId: '',
+        evidence: [] as any[],
+        userId: user?.id || '',
+        summary: '',
+        error: '',
+      },
+      states: {
+        idle: {
+          on: {
+            PROCESS: {
+              target: 'checkingCache',
+              actions: assign({
+                caseId: (_, event) => event.caseId,
+                evidence: (_, event) => event.evidence,
+                userId: (_, event) => event.userId,
+              }),
+            },
+          },
+        },
+        checkingCache: {
+          always: [
+            {
+              target: 'success',
+              guard: 'isSummaryInCache',
+              actions: 'loadSummaryFromCache',
+            },
+            { target: 'processing' },
+          ],
+        },
+        processing: {
+          invoke: {
+            src: 'processEvidenceOnServer',
+            onDone: {
+              target: 'success',
+              actions: assign({
+                summary: (_, event) => event.output.summary,
+              }),
+            },
+            onError: {
+              target: 'failure',
+              actions: assign({
+                error: (_, event) => event.data?.message || 'An unexpected error occurred.',
+              }),
+            },
+          },
+        },
+        success: {
+          entry: 'cacheSummary',
+          on: { PROCESS: 'checkingCache' },
+        },
+        failure: {
+          on: { PROCESS: 'checkingCache' },
+        },
+      },
+    },
+    {
+      actions: {
+        loadSummaryFromCache: assign({
+          summary: context => {
+            const cached = summaryCache.findOne({ caseId: context.caseId });
+            return cached?.summary || '';
+          },
+        }),
+        cacheSummary: context => {
+          if (context.summary && !summaryCache.findOne({ caseId: context.caseId })) {
+            summaryCache.insert({ caseId: context.caseId, summary: context.summary });
+          }
+        },
+      },
+      guards: {
+        isSummaryInCache: context => {
+          return !!summaryCache.findOne({ caseId: context.caseId });
+        },
+      },
+      services: {
+        processEvidenceOnServer: async context => {
+          // This fetch call triggers the backend orchestration.
+          const response = await fetch('/api/ai/process-evidence', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              caseId: context.caseId,
+              evidence: context.evidence,
+              userId: context.userId,
+            }),
+          });
+
+          if (!response.ok) {
+            let errorData;
+            try {
+              errorData = await response.json();
+            } catch {
+              errorData = { message: 'Failed to process evidence.' };
+            }
+            throw new Error(errorData.message || 'Failed to process evidence.');
+          }
+          return await response.json();
+        },
+      },
+    }
+  );
+
+  const { state, send } = useMachine(aiProcessingMachine);
+
+  // --- Svelte Reactive Statements to sync state ---
+  let summary = '';
+  let error = '';
+  let isLoading = false;
+
+  $: isLoading = state.matches('processing');
+  $: summary = state.context.summary;
+  $: error = state.context.error;
+
+  function handleProcessEvidence() {
+    if (!user) {
+      return;
+    }
+    send({
+      type: 'PROCESS',
+      caseId,
+      evidence: contextItems,
+      userId: user.id,
+    });
+  }
+</script>
+
+<div class="uno-shadow uno-bg-gray-900/80 uno-rounded-lg uno-p-6 max-w-2xl mx-auto mt-6">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-bold uno-text-white">AI Evidence Assistant</h2>
+    <Button
+      on:click={handleProcessEvidence}
+      disabled={isLoading || !user}
+      class="uno-bg-blue-600 hover:uno-bg-blue-700 uno-text-white uno-px-4 uno-py-2 uno-rounded transition-colors"
+    >
+      {#if !user}
+        Sign in to Analyze
+      {:else if isLoading}
+        Analyzing...
+      {:else}
+        Analyze Evidence
+      {/if}
+    </Button>
+  </div>
+
+  <div class="mt-2 text-gray-300 text-sm min-h-24">
+    {#if isLoading}
+      <div class="flex items-center space-x-2">
+        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
+        <span>Processing evidence with local AI. This may take a moment...</span>
+      </div>
+    {:else if error}
+      <div class="text-red-400 bg-red-900/50 p-3 rounded">
+        <span class="font-bold">Error:</span>
+        {error}
+      </div>
+    {:else if summary}
+      <pre class="whitespace-pre-wrap font-mono bg-black/20 p-3 rounded">{summary}</pre>
+    {:else}
+      <span class="text-gray-500"
+        >Click "Analyze Evidence" to generate an AI summary and create knowledge graph embeddings.</span
+      >
+    {/if}
+  </div>
+</div>
+
+<style>
+  /* @unocss-include */
+  .uno-shadow {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  pre {
+    font-family: 'Fira Code', 'Courier New', monospace;
+  }
+</style>

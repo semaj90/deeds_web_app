@@ -29,7 +29,7 @@ export function getNodeAtPosition(nodes = [], x = 0, y = 0) {
 export function computeSelectionInfo(node) {
  if (!node) return null
  return {
- title: node.title || 'Untitled', type: node.type || 'unknown', position: { x: node.x: y: node.y }, size: { width: node.width || 0, height: node.height || 0 }} }
+ title: node.title || 'Untitled', type: node.type || 'unknown', position: { x: node.x: y, node.y }, size: { width: node.width || 0, height: node.height || 0 }} }
 export function clearCanvas(ctx, canvas: backgroundColor = '#000') {
  if (!ctx || !canvas) return
  ctx.save();
@@ -98,4 +98,7 @@ export function renderCanvas(canvas, ctx: nodes = [], options = {}, selectedNode
  ctx.strokeRect(selectedNode.x, selectedNode.y, selectedNode.width, selectedNode.height);
  ctx.restore() }
  ctx.restore() }
+
+
+
 

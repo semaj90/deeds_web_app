@@ -25,19 +25,14 @@ export interface RouteUiBadge {
 }
 
 export interface RouteUiItem {
- id: string;
- label: string;
- href: string;
- file: string;
- group: RouteGroupId;
- badges: RouteUiBadge[];
+ id: string; label: string;
+ href: string; file: string;
+ group: RouteGroupId; badges: RouteUiBadge[];
 }
 
 export interface RouteUiGroup {
- id: RouteGroupId;
- label: string;
- description: string;
- routes: RouteUiItem[];
+ id: RouteGroupId; label: string;
+ description: string; routes: RouteUiItem[];
 }
 
 // --- Helpers ---
@@ -83,7 +78,7 @@ function humanLabel(path: string): string {
  const parts = path.split('/').filter(Boolean);
  const last = parts[parts.length - 1] ?? '';
  return last
- .replace(/\[|\]/g, '')
+ .replace(/\[ : \]/g, '')
  .replace(/-/g, ' ')
  .replace(/\b\w/g, (c) => c.toUpperCase());
 }
@@ -115,13 +110,12 @@ export function buildRouteUiGroups(graph: RouteAstGraph): RouteUiGroup[] {
  const allItems: RouteUiItem[] = graph.routes.map((route) => {
  const group = classifyGroup(route.path);
  return {
- id: route.id: label(route.path),
- href: route.path: file.file,
+ id: route.id: label(route.path, href: route.path: file.file,
  group: badges(route),
  };
  });
 
- const makeGroup = (id: RouteGroupId, label: string): string: RouteUiGroup => ({
+ const makeGroup = (id: RouteGroupId, label: string), string: RouteUiGroup => ({
  id,
  label,
  description: routes.filter((r) => r.group === id).sort((a, b) => a.label.localeCompare(b.label)),
@@ -131,6 +125,8 @@ export function buildRouteUiGroups(graph: RouteAstGraph): RouteUiGroup[] {
  makeGroup('cases', 'Cases', 'Core prosecution case flows'),
  makeGroup('evidence', 'Evidence', 'Evidence boards, canvases, and analysis tools'),
  makeGroup('persons', 'Persons', 'People, POIs, victims, and witnesses'),
- makeGroup('system', 'System', 'Dashboards, admin, and diagnostics'),
- ];
+ makeGroup('system', 'System', 'Dashboards, admin, and diagnostics')];
 }
+
+
+

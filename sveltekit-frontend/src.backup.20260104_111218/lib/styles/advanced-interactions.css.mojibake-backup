@@ -1,0 +1,47 @@
+/* Placeholder for advanced interactions CSS */
+
+:root {
+  --yorha-bg-primary: #0f172a;
+  --yorha-bg-secondary: #0b1220;
+  --yorha-text-primary: #e6eef8;
+  --yorha-text-muted: #9fb0c8;
+  --yorha-primary: #60a5fa;
+  --yorha-accent: #7c3aed;
+  --yorha-border: rgba(255, 255, 255, 0.06);
+  --yorha-success: #10b981;
+  --yorha-warning: #f59e0b;
+  --yorha-error: #ef4444;
+}
+
+/* small utility rules used by the demo */
+.advanced-cache-demo {
+  padding: 1.5rem;
+}
+.cache-stat-nier-bits-card {
+  background: var(--yorha-bg-primary);
+  color: var(--yorha-text-primary);
+}
+.sample-query-btn {
+  cursor: pointer;
+}
+.typewriter-section {
+  white-space: pre-wrap;
+}
+
+/* conservative resets for demo areas */
+.ai-loading-container .neural-node {
+  width: 8px;
+  height: 8px;
+  background: var(--yorha-primary);
+  border-radius: 999px;
+}
+.confidence-indicator {
+  background: rgba(255, 255, 255, 0.03);
+  height: 6px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.confidence-bar {
+  background: linear-gradient(90deg, var(--yorha-accent), var(--yorha-primary));
+  height: 100%;
+}

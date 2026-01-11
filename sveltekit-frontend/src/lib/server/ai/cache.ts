@@ -15,8 +15,7 @@ async function getRedisClient(): Promise<RedisClientType> {
  redisClient = createClient({
  url: REDIS_URL,
  });
-
- // Provide an explicit type for the error parameter
+  
  redisClient.on('error', (err: any) => console.error('Redis Client Error', err));
  await redisClient.connect();
  console.log('Connected to Redis for cognitive cache.');
@@ -91,3 +90,5 @@ process.on('beforeExit', async () => {
 });
 
 export default cognitiveCache;
+
+

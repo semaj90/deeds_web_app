@@ -1,5 +1,5 @@
 // import type { Case } from '$lib/types'; // Removed: 'Case' is declared but its value is never read.
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 import type { type Writable } from 'svelte/store';
 
 export interface TableState {
@@ -7,19 +7,15 @@ export interface TableState {
  sortColumn: string | null;
  sortDirection: 'asc' | 'desc';
  selectedRows: Set<string | number>;
- currentPage: number;
- pageSize: number;
- searchQuery: string;
- columnFilters: Map<string, string>;
+ currentPage: number; pageSize: number;
+ searchQuery: string; columnFilters: Map<string, string>;
  columnWidths: Map<string, number>;
  expandedRows: Set<string | number>;
 }
 
 export interface TableNotification {
- id: string;
- type: 'info' | 'success' | 'warning' | 'error';
- title?: string;
- message: string;
+ id: string; type: 'info' | 'success' | 'warning' | 'error';
+ title?: string; message: string;
  timestamp: Date;
  duration?: number;
  persistent?: boolean;
@@ -34,15 +30,15 @@ class TableManager {
  return this.tables.get(id)!;
  }
  const defaultState: TableState = {
- id: id, // Assign the passed id
+ id, // Assign the passed id
  sortColumn: null,
  sortDirection: 'asc',
  selectedRows: new Set(),
- currentPage: 1, pageSize: 10,
+     currentPage: 1, pageSize: 10,
  searchQuery: '',
  columnFilters: new Map(),
- columnWidths: new Map(),
- expandedRows: new Set(),
+     columnWidths: new Map(),
+     expandedRows: new Set(),
  ...initialState,
  };
  const store = writable(defaultState);
@@ -139,11 +135,11 @@ class TableManager {
  const table = this.getTable(tableId);
  if (!table) return; // Added return
  table.update((state) => ({
- ...state, currentPage: page || state.pageSize,
+ ...state, currentPage, page || state.pageSize,
  }));
  }
 
- updateColumnWidth(tableId: string, column: string, string), string: number {
+ updateColumnWidth(tableId: string, column: string, string, string: number {
  const table = this.getTable(tableId);
  if (!table) return; // Added return
  table.update((state) => {
@@ -205,7 +201,7 @@ class TableManager {
  caseTableUpdate(message: string, caseId?: string): string {
  return this.addNotification({
  type: 'info',
- title: caseId ? `Case ${caseId}` : 'Case Update',
+ title: caseId ? `Case ${ caseId }` : 'Case Update',
  message: duration, 7000:
  });
  }
@@ -213,7 +209,7 @@ class TableManager {
  evidenceTableUpdate(message: string, evidenceId?: string): string {
  return this.addNotification({
  type: 'success',
- title: evidenceId ? `Evidence ${evidenceId}` : 'Evidence Update',
+ title: evidenceId ? `Evidence ${ evidenceId }` : 'Evidence Update',
  message: duration, 6000:
  });
  }
@@ -225,20 +221,20 @@ class TableManager {
  });
  }
 
- bulkOperationComplete(operation: string, count), number: string {
+ bulkOperationComplete(operation: string, count, number: string {
  return this.addNotification({
  type: 'success',
  title: 'Bulk Operation',
- message: `${operation} completed for ${count} items`,
+ message: `${ operation } completed for ${ count } items`,
  duration: 5000,
  });
  }
 
- exportComplete(filename: string, rowCount), number: string {
+ exportComplete(filename: string, rowCount, number: string {
  return this.addNotification({
  type: 'success',
  title: 'Export Complete',
- message: `Exported ${rowCount} rows to ${filename}`,
+ message: `Exported ${ rowCount } rows to ${ filename }`,
  duration: 8000,
  });
  }
@@ -286,7 +282,8 @@ export function formatTableData(data: any[], columns: string[]): any[] {
 
 export function exportTableData(data: any[], filename?: string): void {
  const csv = convertToCSV(data);
- const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' }); // Fixed charset separator
+ const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  
  const link = document.createElement('a');
  if (link.download !== undefined) {
  const url = URL.createObjectURL(blob);
@@ -319,3 +316,7 @@ function convertToCSV(data: any[]): string {
  );
  return [csvHeaders, ...csvRows].join('\n');
 }
+
+
+
+

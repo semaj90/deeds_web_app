@@ -6,11 +6,11 @@
  * Triggers policy update from accumulated experiences
  */
 
+import { getExperienceRecorder } from '$lib/services/error-analysis/ExperienceRecorder';
+import { getGRPOPolicy } from '$lib/services/error-analysis/GRPOPolicy';
+import { getLearningPipeline } from '$lib/services/error-analysis/LearningPipeline';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import { getLearningPipeline } from '$lib/services/error-analysis/LearningPipeline';
-import { getGRPOPolicy } from '$lib/services/error-analysis/GRPOPolicy';
-import { getExperienceRecorder } from '$lib/services/error-analysis/ExperienceRecorder';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
@@ -26,8 +26,10 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return json({
 			success: result.success,
-			result: {
-				version: result.version, message: result.message, validationScore: result.validationScore, rollback: result.rollback
+			result: { version: result.version,
+				message: result.message,
+				validationScore: result.validationScore,
+				rollback: result.rollback
 			},
 			status: pipeline.getStatus()
 		});
@@ -52,10 +54,9 @@ export const GET: RequestHandler = async () => {
 
 		return json({
 			success: true,
-			pipeline: {
-				status: pipeline.getStatus(),
+			pipeline: { status: pipeline.getStatus(),
 				stats: pipeline.getStats()
-			}.getStats(),
+			},
 			experiences: recorder.getStats()
 		});
 	} catch (err) {
@@ -73,7 +74,7 @@ export const GET: RequestHandler = async () => {
 export const PUT: RequestHandler = async ({ request }) => {
 	try {
 		const body = await request.json();
-		const { action, config } = body as {
+		const { action: config } = body as {
 			action: 'start' | 'stop' | 'configure';
 			config?: Record<string, any>;
 		};
@@ -100,8 +101,11 @@ export const PUT: RequestHandler = async ({ request }) => {
 		}
 	} catch (err) {
 		return json(
-			{ error: err instanceof Error ? err.message : 'Action failed' },
+			{ error: err instanceof Error ? err.message : 'Failed to update pipeline' },
 			{ status: 500 }
 		);
 	}
 };
+
+
+

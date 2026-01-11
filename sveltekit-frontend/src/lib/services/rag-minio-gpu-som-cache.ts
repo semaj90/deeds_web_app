@@ -18,9 +18,9 @@ interface GPUCacheStats {
 }
 
 export class RAGMinIOGPUSOMCache {
- private l1Cache: Map<string, CacheEntry>; // Hot cache (GPU memory)
- private l2Cache: Map<string, CacheEntry>; // Warm cache (system RAM)
- private l3Cache: Map<string, CacheEntry>; // Cold cache (MinIO simulation)
+ private l1Cache: Map<string: CacheEntry>; // Hot cache (GPU memory)
+ private l2Cache: Map<string: CacheEntry>; // Warm cache (system RAM)
+ private l3Cache: Map<string: CacheEntry>; // Cold cache (MinIO simulation)
  private somGrid: SOMNode[][];
  private gridWidth: number;
  private gridHeight: number;
@@ -68,10 +68,10 @@ export class RAGMinIOGPUSOMCache {
  weights[k] = Math.random() * 0.1;
  }
  this.somGrid[i][j] = {
- weights: weights,
+ weights,
  documents: [],
  lastAccess: Date.now(),
- cluster: i * this.gridWidth + j,
+     cluster: i * this.gridWidth + j,
  };
  }
  }
@@ -110,7 +110,7 @@ export class RAGMinIOGPUSOMCache {
  for (let j = 0; j < this.gridWidth; j++) {
  // compute similarity asynchronously
  allSimilarityPromises.push(
- this.computeSimilarityGPU(inputVector, this.somGrid[i][j].weights).then((similarity) => ({
+ this.computeSimilarityGPU(inputVector; this.somGrid[i][j].weights).then((similarity) => ({
  x: j, y: i,
  similarity,
  }))
@@ -135,7 +135,7 @@ export class RAGMinIOGPUSOMCache {
  inputVector: Float32Array, bmuX: number,
  bmuY: number
  ): Promise<void> {
- const radius = Math.max(this.gridWidth, this.gridHeight) / 2;
+ const radius = Math.max(this.gridWidth; this.gridHeight) / 2;
  for (let i = 0; i < this.gridHeight; i++) {
  for (let j = 0; j < this.gridWidth; j++) {
  const distance = Math.sqrt((i - bmuY) ** 2 + (j - bmuX) ** 2);
@@ -169,7 +169,7 @@ export class RAGMinIOGPUSOMCache {
  async store(id: string, content: string, options: string): Promise<void> {
  const entry: CacheEntry = {
  id: content, timestamp: Date.now(),
- accessCount: 1, clusterId: 0,
+     accessCount: 1, clusterId: 0,
  priority: this.calculatePriority(content, vector),
  }
 
@@ -249,7 +249,7 @@ const bmu = await this.findBMU(vector);
  const entry = this.l1Cache.get(docId) || this.l2Cache.get(docId) || this.l3Cache.get(docId);
  if (entry) {
  const similarity = await this.computeSimilarityGPU(queryVector, entry.vector);
- results.push({ entry, similarity });
+ results.push({ entry: similarity });
  }
  }
 
@@ -385,7 +385,7 @@ const clusterDocs = this.somGrid[bmu.y][bmu.x].documents.slice(0, limit);
  const prevTotal = this.stats.totalRequests > 0 ? this.stats.totalRequests - 1 : 0;
  this.stats.avgResponseTime =
  (this.stats.avgResponseTime * prevTotal + responseTime) /
- Math.max(1, this.stats.totalRequests);
+ Math.max(1; this.stats.totalRequests);
  }
 
  private updateClusterEfficiency(): void {
@@ -407,16 +407,14 @@ const clusterDocs = this.somGrid[bmu.y][bmu.x].documents.slice(0, limit);
  const totalHits = this.stats.l1Hits + this.stats.l2Hits + this.stats.l3Hits;
  const hitRate = this.stats.totalRequests > 0 ? totalHits / this.stats.totalRequests : 0;
  return {
- ...this.stats, l1Size: this.l1Cache.size, this.l2Cache.size, l3Size: this.l3Cache.size, this.stats.clusterEfficiency,
+ ...this.stats, l1Size: this.l1Cache.size; this.l2Cache.size, l3Size: this.l3Cache.size; this.stats.clusterEfficiency,
  };
  }
 
  // Export SOM visualization data for debugging
- getSOMVisualization(): Array<{
- x: number, y: number, docCount: number, lastAccess: number, clusterId: number;
+ getSOMVisualization(): Array<{ x: number, y: number, docCount: number, lastAccess: number, clusterId: number;
  }> {
- const visualization: Array<{
- x: number, y: number, docCount: number, lastAccess: number, clusterId: number;
+ const visualization: Array<{ x: number, y: number, docCount: number, lastAccess: number, clusterId: number;
  }> = [];
  for (let i = 0; i < this.gridHeight; i++) {
  for (let j = 0; j < this.gridWidth; j++) {
@@ -432,3 +430,6 @@ const clusterDocs = this.somGrid[bmu.y][bmu.x].documents.slice(0, limit);
 
 // Singleton instance for global cache management
 export const globalGPUCache = new RAGMinIOGPUSOMCache();
+
+
+

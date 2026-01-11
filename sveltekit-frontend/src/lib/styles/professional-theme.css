@@ -202,8 +202,7 @@
 }
 
 @keyframes legal-ai-glow {
- 0%,
- 100% {
+ 0%; } 100% {
  box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
  }
  50% {

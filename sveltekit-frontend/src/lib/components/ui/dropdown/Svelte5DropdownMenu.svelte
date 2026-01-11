@@ -1,4 +1,6 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+
 /**
  * Svelte 5 Dropdown Menu Component
  * Accessible dropdown with Svelte 5 runes
@@ -7,7 +9,7 @@ import type { Snippet } from 'svelte';
 
 interface MenuItem {
 	id: string;
-	label: string;
+	label?: string;
 	icon?: string;
 	shortcut?: string;
 	disabled?: boolean;
@@ -164,7 +166,7 @@ $effect(() => {
 						class="w-full px-3 py-2 text-left text-sm flex items-center gap-2
 							   transition-colors duration-100
 							   {item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-							   {item.danger ? 'text-red-400 hover:bg-red-900/30' : 'text-white hover:bg-slate-700'}
+							   {item.danger ? 'text-red-400 hover:bg-red-900/30' : 'text-white, hover:bg-slate-700'}
 							   {focusedIndex === i ? 'bg-slate-700' : ''}"
 						role="menuitem"
 						tabindex={focusedIndex === i ? 0 : -1}
@@ -201,3 +203,5 @@ $effect(() => {
 		to { transform: scale(1); }
 	}
 </style>
+
+

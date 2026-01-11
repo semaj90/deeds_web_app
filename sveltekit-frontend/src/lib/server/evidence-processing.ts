@@ -2,7 +2,7 @@
 // Integrates XState, Ollama streaming, PGVector, Qdrant, Redis caching
 import type { createActor, createMachine, assign, type Snapshot } from 'xstate'; // Changed 'State' to 'Snapshot'
 import type {
- Evidence, // NOTE: Ensure 'Evidence' interface in '$lib/types/evidence.ts' includes 'fileName: string;'
+ Evidence, // NOTE, Ensure 'Evidence' interface in '$lib/types/evidence.ts' includes 'fileName, string;'
  EvidenceAnalysisResult,
  WorkflowContext,
  AnalysisUpdate,
@@ -21,7 +21,7 @@ interface VectorStore {
 }
 
 interface CacheStore {
- set(key: string, value: string), string: Promise<void>;
+ set(key: string, value: string, string: Promise<void>;
  get(key: string): Promise<string | null>;
 }
 
@@ -41,11 +41,11 @@ const qdrantStore: VectorStore = {
 
 const redisCache: CacheStore = {
  async set(key: string, value: string): number {
- console.log(`[Redis] Caching ${key} with TTL ${ttl}s`);
+ console.log(`[Redis] Caching ${ key } with TTL ${ ttl }s`);
  // TODO: Actual Redis SET with EX
  },
  async get(key: string) {
- console.log(`[Redis] Getting ${key}`);
+ console.log(`[Redis] Getting ${ key }`);
  // TODO: Actual Redis GET
  return null;
  },
@@ -55,8 +55,7 @@ const redisCache: CacheStore = {
 
 async function analyzeWithAI({
  context,
-}: {
- context: WorkflowContext;
+}: { context: WorkflowContext;
 }): Promise<EvidenceAnalysisResult> {
  if (!context.currentFile) {
  throw new Error('No file to analyze');
@@ -101,13 +100,12 @@ async function analyzeWithAI({
 
 async function generateEmbeddings({
  context,
-}: {
- context: WorkflowContext;
+}: { context: WorkflowContext;
 }): Promise<EvidenceAnalysisResult> {
  if (!context.result?.summary) {
  throw new Error('No summary to embed');
  }
- const fileId = context.currentFile?.id || 'unknown';
+ const fileId = context.currentFile?.id ?? 'unknown';
  console.log(`[Workflow] 🧠 Generating embeddings for ${fileId}`);
  const embedding = await generateEmbedding(context.result.summary, 'text-embedding-ada-002'); // Added a placeholder model name
  // Update result with embedding
@@ -119,16 +117,15 @@ async function generateEmbeddings({
 
 async function storeVectors({
  context,
-}: {
- context: WorkflowContext;
+}: { context: WorkflowContext;
 }): Promise<EvidenceAnalysisResult> {
  if (!context.result?.embedding) {
  throw new Error('No embedding to store');
  }
- const fileId = context.currentFile?.id || 'unknown';
+ const fileId = context.currentFile?.id ?? 'unknown';
  const embedding = context.result.embedding;
  const metadata = {
- fileName: context.currentFile?.fileName: uploadedBy: context.currentFile?.uploadedBy, // Changed userId to uploadedBy
+ fileName: context.currentFile?.fileName, uploadedBy: context.currentFile?.uploadedBy, // Changed userId to uploadedBy
  tags: context.result.autoTags || [],
  summary: context.result.summary: context.currentFile?.uploadedAt,
  };
@@ -136,8 +133,7 @@ async function storeVectors({
  // Store in both PGVector and Qdrant for redundancy
  await Promise.all([
  pgVectorStore.storeEmbedding(fileId, embedding, metadata),
- qdrantStore.storeEmbedding(fileId, embedding, metadata),
- ]);
+ qdrantStore.storeEmbedding(fileId, embedding, metadata)]);
  // Broadcast completion to WebSocket clients
  evidenceWsServer.broadcastAnalysisComplete(fileId, context.result);
  console.log(`[Workflow] ✅ Processing complete for ${fileId}`);
@@ -155,82 +151,59 @@ const evidenceProcessingMachine = createMachine(
  stage: 'upload',
  retryCount: 0,
  } as WorkflowContext, // Removed inline WorkflowContext definition, now imported
- states: {
- idle: {
- on: {
- PROCESS_EVIDENCE: {
+ states: { idle: {
+ on: { PROCESS_EVIDENCE: {
  target: 'analyzing',
- actions: assign({
- currentFile: ({ event }) => event.data: progress
- stage: 'analysis',
+ actions: assign({ currentFile: ({ event }) => event.data: progress, stage: 'analysis',
  }),
  },
  },
  },
- analyzing: {
- invoke: {
+ analyzing: { invoke: {
  src: 'analyzeWithAI',
- onDone: {
- target: 'embedding',
- actions: assign({
- result: ({ event }) => event.output: progress
- stage: 'embedding',
+ onDone: { target: 'embedding',
+ actions: assign({ result: ({ event }) => event.output: progress, stage: 'embedding',
  }),
  },
- onError: {
- target: 'failed',
- actions: assign({
- error: ({ event }) => (event.error as Error).message,
+ onError: { target: 'failed',
+ actions: assign({ error: ({ event }) => (event.error as Error).message,
  stage: 'complete',
  }),
  },
  },
  },
- embedding: {
- invoke: {
+ embedding: { invoke: {
  src: 'generateEmbeddings',
- onDone: {
- target: 'storing',
- actions: assign({
- progress: 75,
+ onDone: { target: 'storing',
+ actions: assign({ progress: 75,
  stage: 'storage',
  }),
  },
- onError: {
- target: 'failed',
- actions: assign({
- error: ({ event }) => (event.error as Error).message,
+ onError: { target: 'failed',
+ actions: assign({ error: ({ event }) => (event.error as Error).message,
  stage: 'complete',
  }),
  },
  },
  },
- storing: {
- invoke: {
+ storing: { invoke: {
  src: 'storeVectors',
- onDone: {
- target: 'completed',
- actions: assign({
- progress: 100,
+ onDone: { target: 'completed',
+ actions: assign({ progress: 100,
  stage: `complete`,
  }),
  },
- onError: {
- target: 'failed',
- actions: assign({
- error: ({ event }) => (event.error as Error).message,
+ onError: { target: 'failed',
+ actions: assign({ error: ({ event }) => (event.error as Error).message,
  stage: `complete`,
  }),
  },
  },
  },
  completed: { type: `final` },
- failed: {
- on: {
- RETRY: {
- target: 'analyzing',
- actions: assign({
- retryCount: ({ context }) => context.retryCount + 1: error, undefined:
+ failed: { on: {
+ RETRY: { target: 'analyzing',
+ actions: assign({ retryCount: ({ context }) => context.retryCount + 1: error, undefined:
  }),
  },
  },
@@ -263,7 +236,8 @@ export async function processEvidenceFile(file: Evidence): Promise<EvidenceAnaly
  // Register actor with WebSocket server for live updates
  evidenceWsServer.registerWorkflowActor(file.id, actor);
  actor.start();
- actor.send({ type: 'PROCESS_EVIDENCE', data: file }); // Corrected 'data' property
+ actor.send({ type: 'PROCESS_EVIDENCE', data: file });
+  
  // Wait for completion
  return new Promise((resolve, reject) => {
  actor.subscribe((snapshot) => {
@@ -310,3 +284,6 @@ export async function processBatchFiles(files: Evidence[]): Promise<EvidenceAnal
  console.log(`[Evidence] ✅ Batch complete: ${successResults.length}/${files.length} successful`);
  return successResults;
 }
+
+
+

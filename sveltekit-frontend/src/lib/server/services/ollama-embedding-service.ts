@@ -72,3 +72,6 @@ async function fetchEmbeddingAPI(text: string): Promise<number[]> {
  const data = await res.json();
  return data?.embedding ?? [];
 }
+
+
+

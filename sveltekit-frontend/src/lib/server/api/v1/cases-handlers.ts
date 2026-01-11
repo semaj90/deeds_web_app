@@ -4,10 +4,8 @@ import { eq } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 interface UserType {
- id: string;
- email: string;
- firstName: string;
- lastName: string;
+ id: string; email: string;
+ firstName: string; lastName: string;
  role: string;
 }
 
@@ -42,7 +40,7 @@ export async function getCase(user: UserType, caseId: string, any): any {
 
 export async function handleCreateCase(user: UserType, request: Request, any): any {
  try {
- const { name, description } = await request.json();
+ const { name: description } = await request.json();
  if (!name) {
  return json({ success: false, error: 'Case name is required' }, { status: 400 });
  }
@@ -60,3 +58,6 @@ export async function handleCreateCase(user: UserType, request: Request, any): a
  return json({ success: false, error: 'Failed to create case' }, { status: 500 });
  }
 }
+
+
+

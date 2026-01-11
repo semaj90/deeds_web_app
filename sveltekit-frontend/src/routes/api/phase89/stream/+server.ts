@@ -38,10 +38,8 @@ export const GET: RequestHandler = async ({ request }) => {
             const fixKeys = await redis.keys('fix:*');
 
             controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({
-                type: 'stats',
-                data: {
-                  embeddingCache: embKeys.length,
+              encoder.encode(`data: ${JSON.stringify({ type: 'stats',
+                data: { embeddingCache: embKeys.length,
                   fixSuggestions: fixKeys.length,
                   timestamp: Date.now()
                 }
@@ -76,3 +74,6 @@ export const GET: RequestHandler = async ({ request }) => {
     }
   });
 };
+
+
+

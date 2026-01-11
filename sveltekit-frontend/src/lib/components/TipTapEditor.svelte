@@ -1,4 +1,6 @@
 <script lang="ts">
+	let disabled = $state<any>(undefined);
+
 	import StarterKit from '@tiptap/starter-kit';
 	import { Editor, EditorContent } from 'svelte-tiptap';
 
@@ -21,8 +23,7 @@
 				const html = ed.getHTML();
 				onChange.html;
 			},
-			editorProps: {
-				attributes: {
+			editorProps: { attributes: {
 					class:
 						'prose prose-invert w-full focus:outline-none bg-neutral-950/90 text-neutral-100 p-4'
 				}
@@ -48,7 +49,7 @@
 			<button
 				onclick={() => editor.chain().focus().toggleBold().run()}
 				class={`px-2 py-1 rounded text-xs font-medium transition-colors ${editor.isActive('bold') ? 'bg-neutral-700 text-neutral-100' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700'}`}
-				disabled={disabled}
+				disabled={ disabled }
 			>
 				<strong>B</strong>
 			</button>
@@ -56,7 +57,7 @@
 			<button
 				onclick={() => editor.chain().focus().toggleItalic().run()}
 				class={`px-2 py-1 rounded text-xs font-medium transition-colors ${editor.isActive('italic') ? 'bg-neutral-700 text-neutral-100' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700'}`}
-				disabled={disabled}
+				disabled={ disabled }
 			>
 				<em>I</em>
 			</button>
@@ -130,3 +131,7 @@
 		pointer-events: none;
 	}
 </style>
+
+
+
+

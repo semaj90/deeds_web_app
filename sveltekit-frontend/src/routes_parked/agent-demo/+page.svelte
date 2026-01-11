@@ -1,36 +1,28 @@
 <script lang="ts">
- import Card from '$lib/components/ui/Card.svelte';
+ import { Card } from '$lib/components/ui/enhanced-bits';
  import { CheckCircle, FileCode, Terminal } from 'lucide-svelte';
  import { onMount } from 'svelte';
  import { fade, slide } from 'svelte/transition';
 
  // Types
  interface Task {
- id: string;
- title: string;
- description: string;
- priority: 'low' | 'medium' | 'high' | 'critical';
- estimatedComplexity: number;
- type: 'feature' | 'bug' | 'refactor';
+ id: string; title: string;
+ description: string; priority: 'low' | 'medium' | 'high' | 'critical';
+ estimatedComplexity: number; type: 'feature' | 'bug' | 'refactor';
  status: 'pending' | 'in-progress' | 'completed' | 'failed';
  files: string[];
  completedAt?: string;
  }
 
  interface Log {
- id: number;
- timestamp: string;
- message: string;
- type: 'info' | 'success' | 'warning' | 'error';
+ id: number; timestamp: string;
+ message: string; type: 'info' | 'success' | 'warning' | 'error';
  }
 
  interface Patch {
- id: string;
- filePath: string;
- description: string;
- status: 'pending' | 'applied' | 'failed';
- confidence: number;
- createdAt: string;
+ id: string; filePath: string;
+ description: string; status: 'pending' | 'applied' | 'failed';
+ confidence: number; createdAt: string;
  }
 
  // State
@@ -81,8 +73,7 @@
 
  function addLog(message: string, type: 'info' | 'success' | 'warning' | 'error' = 'info') {
  logs = [{
- id: Date.now() + Math.random(),
- timestamp: new Date().toLocaleTimeString(),
+ id: Date.now() + Math.random( timestamp: new Date().toLocaleTimeString(),
  message,
  type
  }, ...logs.slice(0, 49)];
@@ -189,7 +180,7 @@
  <span>{task.files.length} files</span>
  </div>
  <button
- class="px-3 py-1.5 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 rounded text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+ class="px-3 py-1.5 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 rounded text-xs font-medium transition-colors disabled: opacity-50, disabled:cursor-not-allowed"
  disabled={isAgentRunning}
  onclick={() => assignTaskToAgent(task)}
  >
@@ -262,7 +253,7 @@
  </div>
  <div class="flex-1 overflow-auto p-4 space-y-2">
  {#each logs as log (log.id)}
- <div transition:fade={{ duration: 100 }} class="flex items-start space-x-3">
+ <div transition: fade={{ duration: 100 }} class="flex items-start space-x-3">
  <span class="text-slate-600 shrink-0">[{log.timestamp}]</span>
  <span class:text-cyan-400={log.type === 'info'}
  class:text-green-400={log.type === 'success'}
@@ -277,4 +268,8 @@
  </div>
  </div>
 </div>
+
+
+
+
 

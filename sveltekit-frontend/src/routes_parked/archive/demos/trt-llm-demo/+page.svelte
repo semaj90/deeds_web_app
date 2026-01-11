@@ -32,8 +32,7 @@
 
 		try {
 			const result = await trtLLMClient.generate({
-				prompt: prompt.trim(),
-				max_tokens: 256,
+				prompt: prompt.trim(max_tokens: 256,
 				temperature: 0.8,
 				top_p: 0.9
 			});
@@ -57,8 +56,7 @@
 		try {
 			let fullText = '';
 			for await (const chunk of trtLLMClient.generateStream({
-				prompt: prompt.trim(),
-				max_tokens: 256,
+				prompt: prompt.trim(max_tokens: 256,
 				temperature: 0.8,
 				top_p: 0.9
 			})) {
@@ -208,13 +206,11 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 
 <style>
 	.trt-llm-demo {
-		max-width: 1200px;
-		margin: 0 auto;
+		max-width: 1200px; margin: 0 auto;
 		padding: 2rem;
 		font-family: 'JetBrains Mono', monospace;
 		background: linear-gradient(135deg, #0d1117, #161b22);
-		min-height: 100vh;
-		color: #f0f6fc;
+		min-height: 100vh; color: #f0f6fc;
 	}
 
 	.demo-header {
@@ -224,16 +220,14 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 
 	.demo-header h1 {
 		color: #10b981;
-		font-size: 2.5rem;
-		margin: 0 0 1rem 0;
+		font-size: 2.5rem; margin: 0 0 1rem 0;
 		text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
 	}
 
 	.health-indicator {
 		display: flex;
 		align-items: center;
-		justify-content: center;
-		gap: 1rem;
+		justify-content: center; gap: 1rem;
 		font-size: 1.1rem;
 	}
 
@@ -263,29 +257,24 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 	.output-section {
 		background: rgba(13, 17, 23, 0.9);
 		border: 2px solid #10b981;
-		border-radius: 12px;
-		padding: 2rem;
+		border-radius: 12px; padding: 2rem;
 		box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
 	}
 
 	.input-section h2,
 	.output-section h2 {
-		color: #10b981;
-		margin: 0 0 1.5rem 0;
+		color: #10b981; margin: 0 0 1.5rem 0;
 		font-size: 1.5rem;
 		text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
 	}
 
 	.prompt-input {
-		width: 100%;
-		padding: 1rem;
+		width: 100%; padding: 1rem;
 		background: rgba(30, 41, 59, 0.8);
 		border: 1px solid #6b7280;
-		border-radius: 8px;
-		color: #f0f6fc;
+		border-radius: 8px; color: #f0f6fc;
 		font-family: inherit;
-		font-size: 1rem;
-		resize: vertical;
+		font-size: 1rem; resize: vertical;
 		min-height: 120px;
 	}
 
@@ -296,8 +285,7 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 	}
 
 	.action-buttons {
-		display: flex;
-		gap: 1rem;
+		display: flex; gap: 1rem;
 		margin-top: 1.5rem;
 		flex-wrap: wrap;
 	}
@@ -308,8 +296,7 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 		padding: 0.75rem 1.5rem;
 		border: none;
 		border-radius: 8px;
-		font-weight: bold;
-		cursor: pointer;
+		font-weight: bold; cursor: pointer;
 		transition: all 0.3s ease;
 		font-size: 0.9rem;
 	}
@@ -329,9 +316,9 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 		color: white;
 	}
 
-	.generate-btn:hover:not(:disabled),
-	.stream-btn:hover:not(:disabled),
-	.legal-btn:hover:not(:disabled) {
+	.generate-btn:hover, not(disabled),
+	.stream-btn:hover, not(disabled),
+	.legal-btn:hover, not(disabled) {
 		filter: brightness(0.95);
 		box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
 	}
@@ -339,16 +326,14 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 	.generate-btn:disabled,
 	.stream-btn:disabled,
 	.legal-btn:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
+		opacity: 0.6; cursor:not-allowed;
 	}
 
 	.streaming-output,
 	.final-output {
 		background: rgba(30, 41, 59, 0.8);
 		border: 1px solid #6b7280;
-		border-radius: 8px;
-		padding: 1.5rem;
+		border-radius: 8px; padding: 1.5rem;
 	}
 
 	.stream-header,
@@ -384,24 +369,22 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 	}
 
 	@keyframes blink {
-		0%, 50% { opacity: 1; }
-		51%, 100% { opacity: 0; }
+		0%; } 50% { opacity: 1; }
+		51%; } 100% { opacity: 0; }
 	}
 
 	.placeholder-output {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		height: 200px;
+		justify-content: center; height: 200px;
 		color: #9ca3af;
 		text-align: center;
 	}
 
 	.placeholder-icon {
 		font-size: 3rem;
-		margin-bottom: 1rem;
-		opacity: 0.5;
+		margin-bottom: 1rem; opacity: 0.5;
 	}
 
 	.placeholder-output p {
@@ -411,8 +394,7 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 
 	@media (max-width: 768px) {
 		.demo-content {
-			grid-template-columns: 1fr;
-			gap: 1rem;
+			grid-template-columns: 1fr; gap: 1rem;
 		}
 
 		.action-buttons {
@@ -426,3 +408,7 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 		}
 	}
 </style>
+
+
+
+

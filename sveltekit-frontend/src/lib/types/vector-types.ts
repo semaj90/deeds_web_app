@@ -13,15 +13,11 @@ export interface VectorSimilarityRequest {
 export interface VectorSimilarityResponse {
  success: boolean;
  result?: number | number[];
- metadata: {
- operation: string;
- vectorDimensions: number;
- vectorCount: number;
+ metadata: { operation: string;
+ vectorDimensions: number; vectorCount: number;
  usedCUDA: boolean;
- gpuTime?: number;
- parallelWorkers: number;
- memoryUsed: number;
- timestamp: string;
+ gpuTime?: number; parallelWorkers: number;
+ memoryUsed: number; timestamp: string;
  };
 }
 export interface EmbeddingRequest {
@@ -35,16 +31,12 @@ export interface EmbeddingRequest {
  minioUrl?: string; // For large document processing
 }
 export interface EmbeddingResponse {
- success: boolean;
- embeddings: number[][];
+ success: boolean; embeddings: number[][];
  chunks?: string[];
- metadata?: unknown;
- performance: {
+ metadata?: unknown; performance: {
  totalTime: number;
- cudaTime?: number;
- chunksProcessed: number;
- tokensProcessed: number;
- parallelWorkers: number;
+ cudaTime?: number; chunksProcessed: number;
+ tokensProcessed: number; parallelWorkers: number;
  };
 }
 export interface MatrixOperation {
@@ -73,14 +65,10 @@ export interface MatrixBatchOperation {
 export interface MatrixResponse {
  success: boolean;
  result?: number[][] | number[][][] | number[];
- metadata: {
- operation: string;
- inputShape: number[];
- outputShape: number[];
- processingTime: number;
- usedCUDA: boolean;
- parallelWorkers: number;
- memoryUsed: number;
+ metadata: { operation: string;
+ inputShape: number[]; outputShape: number[];
+ processingTime: number; usedCUDA: boolean;
+ parallelWorkers: number; memoryUsed: number;
  flops?: number; // Floating point operations count
  };
 }
@@ -102,26 +90,21 @@ export interface VectorSearchRequest {
  rerank?: boolean;
 }
 export interface SearchResult {
- id: string;
- content: string;
+ id: string; content: string;
  similarity: number;
  metadata?: unknown;
  embedding?: number[];
 }
 export interface VectorSearchResponse {
- success: boolean;
- results: SearchResult[];
- totalCount: number;
- performance: {
+ success: boolean; results: SearchResult[];
+ totalCount: number; performance: {
  searchTime: number;
  embeddingTime?: number;
  cudaTime?: number;
  rerankTime?: number;
  };
- query: {
- original: string;
- embedding?: number[];
- filters: unknown;
+ query: { original: string;
+ embedding?: number[]; filters: unknown;
  };
 }
 export interface ChunkingRequest {
@@ -132,95 +115,69 @@ export interface ChunkingRequest {
  extractMetadata?: boolean;
 }
 export interface ChunkingResponse {
- success: boolean;
- chunks: string[];
- metadata?: {
- originalLength: number;
- chunkCount: number;
- averageChunkSize: number;
- chunkingMethod: string;
- chunkSize: number;
+ success: boolean; chunks: string[];
+ metadata?: { originalLength: number;
+ chunkCount: number; averageChunkSize: number;
+ chunkingMethod: string; chunkSize: number;
  chunkOverlap: number;
  };
 }
 export interface RAGChunkingOptions {
- chunkSize: number;
- chunkOverlap: number;
- preserveParagraphs: boolean;
- extractMetadata: boolean;
+ chunkSize: number; chunkOverlap: number;
+ preserveParagraphs: boolean; extractMetadata: boolean;
  useSemanticChunking?: boolean;
  minChunkSize?: number;
  maxChunkSize?: number;
 }
 export interface LegalDocumentMetadata {
- case: {
- id: string;
- jurisdiction: string;
- parties: Array<{ role: string; name: string; type: string }>;
- datesFiled: string[];
- courtLevel: 'district' | 'appellate' | 'supreme';
+ case: { id: string;
+ jurisdiction: string; parties: Array<{ role: string; name: string; type: string }>;
+ datesFiled: string[]; courtLevel: 'district' | 'appellate' | 'supreme';
  };
- classification: {
- documentType: 'contract' | 'evidence' | 'brief' | 'citation';
- practiceArea: string[];
- confidenceLevel: number;
+ classification: { documentType: 'contract' | 'evidence' | 'brief' | 'citation';
+ practiceArea: string[]; confidenceLevel: number;
  riskLevel: 'low' | 'medium' | 'high' | 'critical';
  };
- processing: {
- extractedEntities: string[];
- keyTerms: string[];
- sentiment: number;
+ processing: { extractedEntities: string[];
+ keyTerms: string[]; sentiment: number;
  complexity: number;
  };
 }
 export interface CUDAConfig {
- url: string;
- endpoints: {
- health: string;
- search: string;
- submit: string;
- workers: string;
+ url: string; endpoints: {
+ health: string; search: string;
+ submit: string; workers: string;
  metrics: string;
  };
- gpu: {
- model: string;
- cudaCores: number;
- tensorCores: number;
- memoryGB: number;
- computeCapability: string;
+ gpu: { model: string;
+ cudaCores: number; tensorCores: number;
+ memoryGB: number; computeCapability: string;
  };
 }
 export interface PerformanceMetrics {
  totalTime: number;
  cudaTime?: number;
  wasmTime?: number;
- networkTime?: number;
- memoryUsed: number;
+ networkTime?: number; memoryUsed: number;
  parallelWorkers: number;
  flops?: number; // Floating point operations count
  throughput?: number; // operations per second
 }
 export interface VectorOperationResult<T> {
- success: boolean;
- result: T;
- usedServer: boolean;
- performance: PerformanceMetrics;
+ success: boolean; result: T;
+ usedServer: boolean; performance: PerformanceMetrics;
  metadata?: unknown;
 }
 export interface WasmVectorModule {
- memory: WebAssembly.Memory;
- cosineSimJS: (aPtr: number, bPtr: number): number => number;
+ memory: WebAssembly.Memory; cosineSimJS: (aPtr: number, bPtr: number): number => number;
  dotProductJS: (aPtr: number, bPtr: number): number => number;
  cosineSimilaritySIMD: (aPtr: number, bPtr: number): number => number;
- hybridCosineSimilarity: (
- aPtr: number, bPtr: number, number: length, useServer: boolean
+ hybridCosineSimilarity: (aPtr: number, bPtr: number, number: length, useServer: boolean
  ) => number;
  shouldUseServer: (operationType: number, dataSize: number): number => boolean;
- batchVectorChunking: (
- vectorsPtr: number, numVectors: number, number: vectorLength, chunkSize: number
+ batchVectorChunking: (vectorsPtr: number, numVectors: number, number: vectorLength, chunkSize: number
  ) => number;
- optimizedEmbeddingTransfer: (
- embeddingPtr: number, length: number
+ optimizedEmbeddingTransfer: (embeddingPtr: number, length: number
  ) => number;
  allocateVectorMemory: (length: number) => number;
  freeVectorMemory: (ptr: number) => void;
@@ -238,3 +195,7 @@ export type MatrixOperationType =
  | 'qr'
  | 'cholesky';
 export type ProcessingMode = 'wasm' | 'server' | 'hybrid' | 'auto';
+
+
+
+

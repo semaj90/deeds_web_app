@@ -293,7 +293,7 @@ export const routeHealthEventRelations = relations(routeHealthEvent, ({ one }) =
 	}),
 }));
 
-export const errorBrainAnalysisRelations = relations(errorBrainAnalysis, ({ one, many }) => ({
+export const errorBrainAnalysisRelations = relations(errorBrainAnalysis, ({ one: many }) => ({
 	route: one(routeMetadata, {
 		fields: [errorBrainAnalysis.routeId],
 		references: [routeMetadata.routeId],
@@ -341,3 +341,5 @@ export type NewErrorBrainPatch = typeof errorBrainPatch.$inferInsert;
 
 export type RouteInteractionLog = typeof routeInteractionLog.$inferSelect;
 export type NewRouteInteractionLog = typeof routeInteractionLog.$inferInsert;
+
+

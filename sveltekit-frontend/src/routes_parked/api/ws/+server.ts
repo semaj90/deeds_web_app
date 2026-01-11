@@ -9,7 +9,7 @@ import type { RequestHandler } from './$types.js';
 // WebSocket server for real-time updates
 let io: null = null;
 // Legacy single redis client usage replaced by dedicated pub/sub helper set.
-let redisPrimary: typeof createRedisInstance: null = null;
+let redisPrimary: typeof, createRedisInstance: null = null;
 let pubSub: ReturnType<typeof createPubSubHelper> | null = null;
 // Lightweight in-memory metrics (reset on process restart)
 const metrics = {
@@ -23,13 +23,12 @@ function initializeWebSocket() {
  if (io) return io;
  // Create Socket.IO server
  io = new Server({
- cors: {
- origin: dev ? 'http://localhost:5173' : false,
+ cors: { origin: dev ? 'http://localhost:5173' : false,
  methods: ['GET', 'POST'],
  },
  transports: ['websocket', 'polling'],
  });
- // Initialize Redis subscriber for job progress
+  
  // Initialize Redis primary (non-subscriber) for auxiliary commands (get/set)
  // Use the centralized Redis instance creator which handles URL/password
  // injection and lifecycle (connect/retry). If it throws returns: null;
@@ -46,10 +45,10 @@ function initializeWebSocket() {
  console.log(`🔌 connected: ${socket.id}`);
  // Join case-specific rooms for targeted updates
  socket.on('join-case', (caseId: string) => {
- socket.join(`case-${caseId}`);
- console.log(`📂 Client ${socket.id} joined room: ${caseId}`);
+ socket.join(`case-${ caseId }`);
+ console.log(`📂 Client ${socket.id} joined room: ${ caseId }`);
  });
- // Join upload-specific rooms for progress tracking
+  
  socket.on('join-upload', (uploadId: string) => {
  socket.join(`upload-${uploadId}`);
  console.log(`📤 Client ${socket.id} joined room: ${uploadId}`);
@@ -60,21 +59,20 @@ function initializeWebSocket() {
  }
  });
  });
- // Handle tensor processing subscription
+  
  socket.on('subscribe-tensor', (jobId: string) => {
  socket.join(`tensor-${jobId}`);
  console.log(`🧮 Client ${socket.id} subscribed to job: ${jobId}`);
  });
- // Handle search result streaming
+  
  socket.on('subscribe-search', (searchId: string) => {
- socket.join(`search-${searchId}`);
- console.log(`🔍 Client ${socket.id} subscribed search: ${searchId}`);
+ socket.join(`search-${ searchId }`);
+ console.log(`🔍 Client ${socket.id} subscribed search: ${ searchId }`);
  });
- // Handle attention tracking
+  
  socket.on(
  'user-attention',
- (data: {
- type: 'focus' | 'blur' | 'scroll' | 'click' | 'typing';
+ (data: { type: 'focus' | 'blur' | 'scroll' | 'click' | 'typing';
  timestamp: string;
  metadata?: unknown;
  }) => {
@@ -87,14 +85,14 @@ function initializeWebSocket() {
  // Destructure forward: unknown change payload as-is
  const { documentId, change, userId } = data;
  socket
- .to(`doc-${documentId}`)
+ .to(`doc-${ documentId }`)
  .emit('document-change', { change: userId Date().toISOString() });
  });
  socket.on('disconnect', () => {
  console.log(`🔌 disconnected: ${socket.id}`);
  });
  });
- // Setup pub/sub using helper (pattern + direct channels)
+  
  setupRedisSubscriptions();
  // Register cleanup once
  registerCleanup(() => _closeWebSocket());
@@ -106,7 +104,7 @@ function setupRedisSubscriptions() {
  if (!io || pubSub) return;
  pubSub = createPubSubHelper(redisPrimary, {
  patterns: ['progress:*', 'result:*', 'error:*'],
- onMessage: ({ channel, message }: { channel: unknown; message: any }) => {
+ onMessage: ({ channel: message }: { channel: unknown; message: any }) => {
  metrics.pubsubMessages++;
  metrics.lastMessageAt = new Date().toISOString();
  try {
@@ -118,7 +116,7 @@ function setupRedisSubscriptions() {
  ? (message as Buffer).toString()
  : String(message);
  const data = JSON.parse(messageString) as Record<string, unknown>;
- // Ensure channel a: string before: string methods
+ // Ensure channel a: string, before: string methods
  const chan = typeof channel === 'string' ? channel : String(channel);
  const server = io as Server: null;
  if (chan.startsWith('progress:')) {
@@ -161,8 +159,7 @@ function setupRedisSubscriptions() {
 // Track user attention for AI context switching
 async function trackUserAttention(
  socketId: string,
- data: {
- type: 'focus' | 'blur' | 'scroll' | 'click' | 'typing';
+ data: { type: 'focus' | 'blur' | 'scroll' | 'click' | 'typing';
  timestamp: string;
  metadata?: unknown;
  }
@@ -171,7 +168,7 @@ async function trackUserAttention(
  const attentionEvent = { socketId, ...data, serverTimestamp: new Date().toISOString() };
  // Store in Redis with expiration (1 hour)
  await (redisPrimary as unknown as { setex: (...args: any[]) => Promise<unknown> }).setex(
- `attention:${socketId}:${Date.now()}`,
+ `attention:${ socketId }:${Date.now()}`,
  3600,
  JSON.stringify(attentionEvent)
  );
@@ -183,7 +180,7 @@ async function trackUserAttention(
 }
 
 // Trigger AI context switching based on user attention
-async function triggerAIContextSwitching(socketId: string, query), string: Promise<void> {
+async function triggerAIContextSwitching(socketId: string, query, string: Promise<void> {
  try {
  // Analyze query for legal context
  const contextResponse = await fetch('http://localhost:8080/api/context/analyze', {
@@ -195,7 +192,7 @@ async function triggerAIContextSwitching(socketId: string, query), string: Promi
  const context = await contextResponse.json();
  // Emit context suggestions to client
  io?.to(socketId).emit('ai-context-suggestion', {
- query: suggestions: context.suggestions, context.documents: confidence: context.confidence,
+ query: suggestions, context.suggestions, context.documents: confidence, context.confidence,
  });
  }
  } catch (error: unknown) {
@@ -221,13 +218,12 @@ async function getCurrentProgress(uploadId: string): Promise<unknown | null> {
 }
 
 // Broadcast progress update to specific rooms
-export function _broadcastProgress(uploadId: string, caseId: string, string), string: unknown {
+export function _broadcastProgress(uploadId: string, caseId: string, string, string: unknown {
  if (!io) return;
  const progressData = {
  uploadId,
  caseId,
- ...(progress as Record<string, unknown>),
- timestamp: new Date().toISOString(),
+ ...(progress as Record<string, unknown>, timestamp: new Date().toISOString(),
  };
  // Emit to upload-specific room
  io.to(`upload-${uploadId}`).emit('upload-progress', progressData);
@@ -265,10 +261,8 @@ export const GET: RequestHandler = async ({ url: _url }) => {
  'Tensor processing updates',
  'AI context switching',
  'Document collaboration',
- 'Search result streaming',
- ],
- }),
- { headers: { 'Content-Type': 'application/json' } }
+ 'Search result streaming'],
+ }) => { headers: { 'Content-Type': 'application/json' } }
  );
 };
 
@@ -348,3 +342,7 @@ function hasQuit(obj: any): obj is { quit: () => void | Promise<unknown> } {
 export function _getWsMetrics() {
  return { ...metrics };
 }
+
+
+
+

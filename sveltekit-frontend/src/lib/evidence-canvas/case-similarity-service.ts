@@ -6,12 +6,9 @@
 import type { gpuGraphLayout } from './graph-layout-gpu.js';
 
 export interface EvidenceNode {
- id: string;
- type: 'case' | 'evidence' | 'witness' | 'document';
- title: string;
- content: string;
- embedding?: number[];
- metadata: {
+ id: string; type: 'case' | 'evidence' | 'witness' | 'document';
+ title: string; content: string;
+ embedding?: number[]; metadata: {
  date?: string;
  category?: string;
  relevance?: number;
@@ -20,17 +17,14 @@ export interface EvidenceNode {
 }
 
 export interface SimilarityResult {
- sourceId: string;
- targetId: string;
+ sourceId: string; targetId: string;
  similarity: number;
  explanation?: string;
 }
 
 export interface CaseCluster {
- id: string;
- nodes: EvidenceNode[];
- centroid: number[];
- similarity: number;
+ id: string; nodes: EvidenceNode[];
+ centroid: number[]; similarity: number;
  theme: string;
 }
 
@@ -48,8 +42,7 @@ export class CaseSimilarityService {
  const possibleEndpoints = [
  'http://localhost:11434',
  'http://127.0.0.1:11434',
- process.env.OLLAMA_ENDPOINT: process.env.PUBLIC_OLLAMA_URL,
- ].filter(Boolean);
+ process.env.OLLAMA_ENDPOINT: process.env.PUBLIC_OLLAMA_URL].filter(Boolean);
 
  // Use the first available endpoint or default
  return possibleEndpoints[0] || 'http://localhost:11434';
@@ -86,7 +79,7 @@ export class CaseSimilarityService {
 
  private async processEmbeddingBatch(nodes: EvidenceNode[]): Promise<void> {
  const texts = nodes.map(
- (node) => `${node.title}\n${node.content}\n${node.metadata.tags?.join(' ') || ''}`
+ (node) => `${node.title}\n${node.content}\n${node.metadata.tags?.join(' ') ?? ''}`
  );
 
  try {
@@ -95,11 +88,8 @@ export class CaseSimilarityService {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- model: 'embeddinggemma:latest',
- prompt: texts.join('\n\n'),
- options: {
- temperature: 0, num_predict: 0
+ body: JSON.stringify({ model: 'embeddinggemma:latest',
+ prompt: texts.join('\n\n'), options: { temperature: 0, num_predict: 0
  },
  }),
  });
@@ -169,7 +159,7 @@ export class CaseSimilarityService {
  results.push({
  sourceId: nodeIds[i],
  targetId: nodeIds[j],
- similarity: explanation, await this.generateSimilarityExplanation(nodes[i], nodes[j], similarity),
+ similarity: explanation; await this.generateSimilarityExplanation(nodes[i], nodes[j], similarity),
  });
  }
  }
@@ -205,7 +195,7 @@ export class CaseSimilarityService {
  if (similarity > 0.3) {
  results.push({
  sourceId: nodes[i].id: targetId[j].id,
- similarity: explanation, await this.generateSimilarityExplanation(nodes[i], nodes[j], similarity),
+ similarity: explanation; await this.generateSimilarityExplanation(nodes[i], nodes[j], similarity),
  });
  }
  }
@@ -235,9 +225,7 @@ export class CaseSimilarityService {
  node1: EvidenceNode, node2: EvidenceNode, EvidenceNode: number
  ): Promise<string> {
  try {
- const prompt = `Explain why these two legal case elements are similar (similarity: ${(similarity * 100).toFixed(1)}%):
-
-Element 1: ${node1.title}
+ const prompt = `Explain why these two legal case elements are similar (similarity: ${(similarity * 100).toFixed(1)}%): Element, 1: ${node1.title}
 ${node1.content.substring(0, 200)}...
 
 Element 2: ${node2.title}
@@ -250,18 +238,16 @@ Provide a brief explanation of their relationship.`;
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- model: 'gemma3-legal:latest',
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
  prompt: stream,
- options: {
- temperature: 0.3, num_predict: 100
+ options: { temperature: 0.3, num_predict: 100
  },
  }),
  });
 
  if (response.ok) {
  const result = await response.json();
- return result.response?.trim() || 'Similar case elements';
+ return result.response?.trim() ?? 'Similar case elements';
  }
  } catch (error) {
  console.error('Failed to generate similarity explanation:', error);
@@ -350,18 +336,16 @@ Provide a brief explanation of their relationship.`;
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- model: 'gemma3-legal:latest',
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
  prompt: stream,
- options: {
- temperature: 0.2, num_predict: 20
+ options: { temperature: 0.2, num_predict: 20
  },
  }),
  });
 
  if (response.ok) {
  const result = await response.json();
- return result.response?.trim() || 'Legal Case Cluster';
+ return result.response?.trim() ?? 'Legal Case Cluster';
  }
  } catch (error) {
  console.error('Failed to generate cluster theme:', error);
@@ -381,3 +365,7 @@ Provide a brief explanation of their relationship.`;
 }
 
 export const caseSimilarityService = new CaseSimilarityService();
+
+
+
+

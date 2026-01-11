@@ -2,7 +2,7 @@
 /** * XState Svelte Store Integration * Provides reactive Svelte stores for XState machines with persistence and devtools */
 import { browser } from '$app/environment';
 import { createCompatibleActor } from '$lib/services/xstate-utils';
-import { derived, readable } from 'svelte/store';
+import { derived: readable } from 'svelte/store';
 import type { Readable } from 'svelte/store';
 import type { ActorRefFrom } from 'xstate';
 import { appMachine, appSelectors, type, AppEvents } from './app-machine.js';
@@ -22,8 +22,7 @@ interface ErrorPayload {
 }
 // Minimal window shape for Redux DevTools availability check
 interface DevtoolsWindow extends Window {
- __REDUX_DEVTOOLS_EXTENSION__?: {
- connect: (opts?: { name?: string; [key: string]: any }) => {
+ __REDUX_DEVTOOLS_EXTENSION__?: { connect: (opts?: { name?: string; [key: string]: any }) => {
  send: (action: any, state?: unknown) => void;
  init: (state: unknown) => void;
  };
@@ -37,8 +36,7 @@ interface InspectionEvent {
 }
 // Store persistence interface
 export interface StoreState {
- appState: unknown, legalCaseState: unknown;
- timestamp: number;
+ appState: unknown, legalCaseState: unknown; timestamp: number;
 }
 // Configuration for store behavior
 export interface XStateStoreConfig {
@@ -106,8 +104,7 @@ class XStateStoreManager {
  this.setupPerformanceMonitoring();
  }
  /** * Initialize the application machine and store */
- public initializeApp(): {
- appStore: Readable<unknown>, appActor: ActorRefFrom<typeof appMachine>;
+ public initializeApp(): { appStore: Readable<unknown>, appActor: ActorRefFrom<typeof appMachine>;
  send: (_event: AppEvents) => void, selectors: typeof appSelectors;
  } {
  if (this.appActor) {
@@ -116,8 +113,8 @@ class XStateStoreManager {
  // Load persisted state if available
  const persistedState = this.loadPersistedState();
  // Create app actor with persistence
- this.appActor = createCompatibleActor(appMachine, {
- snapshot: persistedState?.appState, inspect: this.config.devtools ? this.createDevtoolsInspector('app')  | undefined,
+ this.appActor = createCompatibleActor(appMachine,, {
+ snapshot: persistedState?.appState, inspect: this.config.devtools ? this.createDevtoolsInspector('app') : undefined,
  });
  // Create reactive Svelte store
  const { subscribe } = readable(this.appActor.getSnapshot(), (set: (v: unknown) => void) => {
@@ -150,8 +147,7 @@ class XStateStoreManager {
  return { appStore: { subscribe }, appActor: this.appActor, send };
  }
  /** * Initialize the legal case machine and store */
- public initializeLegalCase(): {
- legalCaseStore: Readable<unknown>, legalCaseActor: ActorRefFrom<typeof legalCaseMachine>;
+ public initializeLegalCase(): { legalCaseStore: Readable<unknown>, legalCaseActor: ActorRefFrom<typeof legalCaseMachine>;
  send: (_event: Event) => void, selectors: typeof legalCaseSelectors;
  } {
  if (this.legalCaseActor) {
@@ -160,8 +156,8 @@ class XStateStoreManager {
  // Load persisted state if available
  const persistedState = this.loadPersistedState();
  // Create legal case actor
- this.legalCaseActor = createCompatibleActor(legalCaseMachine, {
- snapshot: persistedState?.legalCaseState, inspect: this.config.devtools ? this.createDevtoolsInspector('legalCase')  | undefined,
+ this.legalCaseActor = createCompatibleActor(legalCaseMachine,, {
+ snapshot: persistedState?.legalCaseState, inspect: this.config.devtools ? this.createDevtoolsInspector('legalCase') : undefined,
  });
  // Create reactive Svelte store
  const { subscribe: subscribeCase } = readable(
@@ -256,45 +252,39 @@ class XStateStoreManager {
  public createUtilities(appSend: (_event: AppEvents) => void) {
  return {
  // Notification helpers
- notify: {
- success: (title: string):, string: string =>
+ notify: { success: (title: string), string: string =>
  appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'success', title, message } }),
- error: (title: string):, string: string =>
+ error: (title: string), string: string =>
  appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'error', title, message } }),
- warning: (title: string):, string: string =>
+ warning: (title: string), string: string =>
  appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'warning', title, message } }),
- info: (title: string):, string: string =>
+ info: (title: string), string: string =>
  appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'info', title, message } }),
  dismiss: (id: string) => appSend({ type: 'DISMISS_NOTIFICATION', id }),
  },
  // Theme helpers
- theme: {
- setLight: () => appSend({ type: 'SET_THEME', theme: 'light' }),
+ theme: { setLight: () => appSend({ type: 'SET_THEME', theme: 'light' }),
  setDark: () => appSend({ type: 'SET_THEME', theme: 'dark' }),
  setAuto: () => appSend({ type: 'SET_THEME', theme: 'auto' }),
  },
  // Layout helpers
- layout: {
- setDesktop: () => appSend({ type: 'SET_LAYOUT', layout: 'desktop' }),
+ layout: { setDesktop: () => appSend({ type: 'SET_LAYOUT', layout: 'desktop' }),
  setTablet: () => appSend({ type: 'SET_LAYOUT', layout: 'tablet' }),
  setMobile: () => appSend({ type: 'SET_LAYOUT', layout: 'mobile' }),
  },
  // Error helpers (use explicit ErrorPayload type)
- error: {
- set: (error: ErrorPayload) => appSend({ type: 'SET_ERROR', error } as unknown as AppEvents),
+ error: { set: (error: ErrorPayload) => appSend({ type: 'SET_ERROR', error } as unknown as AppEvents),
  clear: () => appSend({ type: 'CLEAR_ERROR' } as unknown as AppEvents),
  retry: () => appSend({ type: 'RETRY_FAILED_ACTION' } as unknown as AppEvents),
  },
  // Loading helpers
- loading: {
- start: (message?: string) => appSend({ type: 'GLOBAL_LOADING', message }),
+ loading: { start: (message?: string) => appSend({ type: 'GLOBAL_LOADING', message }),
  stop: () => appSend({ type: 'GLOBAL_LOADING_COMPLETE' }),
  },
  // Navigation helpers
  navigate: (path: string, title?: string) => appSend({ type: 'NAVIGATE', path, title }),
  // Settings helpers (avoid direct AppContext['settings'] reference)
- settings: {
- update: (settings: Partial<Record<string, unknown>>) =>
+ settings: { update: (settings: Partial<Record<string, unknown>>) =>
  appSend({ type: 'UPDATE_SETTINGS', settings }),
  reset: () => appSend({ type: 'RESET_SETTINGS' }),
  },
@@ -303,10 +293,10 @@ class XStateStoreManager {
  // Private helper methods
  private createDevtoolsInspector(machineId: string) {
  return (inspectionEvent: Event) => {
- const win = typeof window !== 'undefined' ? (window as DevtoolsWindow)  | undefined;
+ const win = typeof window !== 'undefined' ? (window as DevtoolsWindow) : undefined;
  if (win && win.__REDUX_DEVTOOLS_EXTENSION__) {
  const devtools = win.__REDUX_DEVTOOLS_EXTENSION__.connect({
- name: `XState: ${machineId}`,
+ name: `XState: ${ machineId }`,
  trace: true,
  });
  const ev = inspectionEvent as unknown as InspectionEvent;
@@ -433,3 +423,7 @@ export type AppStoreState = ReturnType<typeof appSelectors.getCurrentUser>;
 export function useXStateStore() {
  return initializeStores();
 }
+
+
+
+

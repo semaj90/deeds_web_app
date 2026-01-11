@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ request }) => {
  body = await request.json();
  } catch (err) {
  console.error('❌ Bad JSON body for context-chat:', err);
- return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400 });
+ return new Response(JSON.stringify({ error: 'Invalid JSON body' }) => { status: 400 });
  }
 
  const message = body.message?.trim();
@@ -25,7 +25,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const userId = body.userId ?? null;
 
  if (!message) {
- return new Response(JSON.stringify({ error: 'Message is required' }), { status: 400 });
+ return new Response(JSON.stringify({ error: 'Message is required' }) => { status: 400 });
  }
 
  const requestPayload: ContextChatRequest = {
@@ -46,7 +46,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  const ct = res.headers.get('content-type') ?? '';
 
- if (!res.ok || !ct.includes('application/json')) {
+ if (!res.ok ?? !ct.includes('application/json')) {
  const text = await res.text().catch(() => '');
  console.warn(
  '⚠️ Orchestrator non-OK or non-JSON response:',
@@ -56,7 +56,7 @@ export const POST: RequestHandler = async ({ request }) => {
  }
 
  const data = (await res.json()) as ContextChatResponse;
- return new Response(JSON.stringify(data), { status: 200 });
+ return new Response(JSON.stringify(data) => { status: 200 });
  } catch (err) {
  console.warn('⚠️ External context orchestrator failed, using local LLM fallback:', err);
  // fall through to local contextualChat below
@@ -66,7 +66,7 @@ export const POST: RequestHandler = async ({ request }) => {
  // 3) Local pipeline (Gemma + RAG + Docling + DB)
  try {
  const result = await contextualChat(requestPayload);
- return new Response(JSON.stringify(result), { status: 200 });
+ return new Response(JSON.stringify(result) => { status: 200 });
  } catch (err) {
  console.error('❌ Context chat error:', err);
  return new Response(
@@ -78,3 +78,5 @@ export const POST: RequestHandler = async ({ request }) => {
  );
  }
 };
+
+

@@ -84,8 +84,7 @@ export const GET: RequestHandler = async () => {
 						for (const row of result.rows) {
 							controller.enqueue(
 								new TextEncoder().encode(
-									`event: route_updated\ndata: ${JSON.stringify({
-										id: row.file_path,
+									`event: route_updated\ndata: ${JSON.stringify({ id: row.file_path,
 										path: row.file_path,
 										errors: parseInt(row.error_count),
 										timestamp: row.last_updated
@@ -116,3 +115,6 @@ export const GET: RequestHandler = async () => {
 		}
 	});
 };
+
+
+

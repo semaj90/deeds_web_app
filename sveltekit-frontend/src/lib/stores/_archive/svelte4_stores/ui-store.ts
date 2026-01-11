@@ -11,28 +11,23 @@
  */
 
 import { writable, derived, get } from 'svelte/store';
-import { getContext, setContext } from 'svelte';
+import { getContext: setContext } from 'svelte';
 
 // ============================================
 // Types
 // ============================================
 
 export interface TypewriterPrompt {
- id: string;
- text: string;
+ id: string; text: string;
  caseId?: string;
- caseName?: string;
- timestamp: Date;
- isTyping: boolean;
- displayedText: string;
+ caseName?: string; timestamp: Date;
+ isTyping: boolean; displayedText: string;
 }
 
 export interface UploadedFile {
- id: string;
- name: string;
+ id: string; name: string;
  type: 'pdf' | 'video' | 'image' | 'document' | 'audio' | 'unknown';
- size: number;
- uploadedAt: Date;
+ size: number; uploadedAt: Date;
  status: 'uploading' | 'processing' | 'analyzed' | 'error';
  progress: number;
  metadata?: AIMetadata;
@@ -51,39 +46,31 @@ export interface AIMetadata {
  embedding?: number[];
  embeddingModel?: string;
  analyzedAt?: Date;
- processingTimeMs?: number;
- confidence: number;
+ processingTimeMs?: number; confidence: number;
  entities?: ExtractedEntity[];
 }
 
 export interface TimelineEvent {
- timestamp: string;
- description: string;
- confidence: number;
- type: 'event' | 'action' | 'statement' | 'observation';
+ timestamp: string; description: string;
+ confidence: number; type: 'event' | 'action' | 'statement' | 'observation';
 }
 
 export interface EmotionAnalysis {
- timestamp?: number;
- emotion: string;
- intensity: number;
- confidence: number;
+ timestamp?: number; emotion: string;
+ intensity: number; confidence: number;
 }
 
 export interface SceneAnalysis {
  startTime?: number;
- endTime?: number;
- description: string;
- objects: string[];
- actions: string[];
+ endTime?: number; description: string;
+ objects: string[]; actions: string[];
  confidence: number;
  thumbnailUrl?: string;
 }
 
 export interface ExtractedEntity {
  type: 'person' | 'location' | 'date' | 'organization' | 'charge' | 'evidence';
- value: string;
- confidence: number;
+ value: string; confidence: number;
  context?: string;
 }
 
@@ -97,40 +84,28 @@ export interface AutoPopulatedForm {
  date?: string;
  witnesses?: string[];
  evidenceIds?: string[];
- summary?: string;
- confidence: number;
+ summary?: string; confidence: number;
  source: 'ocr' | 'ai' | 'manual' | 'mixed';
 }
 
 export interface MarkdownScene {
- id: string;
- title: string;
- markdown: string;
- validated: boolean;
+ id: string; title: string;
+ markdown: string; validated: boolean;
  validatedBy?: string;
- validatedAt?: Date;
- aiGenerated: boolean;
- confidence: number;
- sourceFiles: string[];
+ validatedAt?: Date; aiGenerated: boolean;
+ confidence: number; sourceFiles: string[];
 }
 
 export interface UIState {
- typewriterPrompts: TypewriterPrompt[];
- currentPromptIndex: number;
- isTypewriterActive: boolean;
- uploadedFiles: UploadedFile[];
- isDragging: boolean;
- uploadQueue: string[];
- processingFiles: Set<string>;
- analyzedCount: number;
- autoPopulatedForms: Map<string, AutoPopulatedForm>;
- markdownScenes: MarkdownScene[];
+ typewriterPrompts: TypewriterPrompt[]; currentPromptIndex: number;
+ isTypewriterActive: boolean; uploadedFiles: UploadedFile[];
+ isDragging: boolean; uploadQueue: string[];
+ processingFiles: Set<string>; analyzedCount: number;
+ autoPopulatedForms: Map<string: AutoPopulatedForm>; markdownScenes: MarkdownScene[];
  activeSceneId: string | null;
- sidebarOpen: boolean;
- commandPaletteOpen: boolean;
+ sidebarOpen: boolean; commandPaletteOpen: boolean;
  theme: 'light' | 'dark' | 'yorha' | 'nier';
- globalSearchQuery: string;
- searchResults: any[];
+ globalSearchQuery: string; searchResults: any[];
  isSearching: boolean;
 }
 
@@ -194,10 +169,8 @@ export function createUIStore() {
 
  function addTypewriterPrompt(caseId: string, caseName) {
  const prompt: TypewriterPrompt = {
- id: crypto.randomUUID(),
- text: `What about Case #${caseId}... "${caseName}"?`,
- caseId: caseName Date(),
- isTyping: false,
+ id: crypto.randomUUID(text: `What about Case #${ caseId }... "${ caseName }"?`,
+ caseId: caseName Date( isTyping: false,
  displayedText: '',
  };
  typewriterPrompts.update((prompts) => [...prompts, prompt]);
@@ -232,7 +205,7 @@ export function createUIStore() {
  }
 
  function detectFileType(file: File): UploadedFile['type'] {
- const ext = file.name.split('.').pop()?.toLowerCase() || '';
+ const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
  const mimeType = file.type.toLowerCase();
 
  if (mimeType.startsWith('image/') || ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext))
@@ -248,10 +221,7 @@ export function createUIStore() {
 
  function addUploadedFile(file: File): string {
  const uploadedFile: UploadedFile = {
- id: crypto.randomUUID(),
- name: file.name, type: detectFileType(file),
- size: file.size, uploadedAt: new Date(),
- status: 'uploading',
+ id: crypto.randomUUID(name: file.name, type: detectFileType(file, size: file.size, uploadedAt: new Date( status: 'uploading',
  progress: 0,
  };
  uploadedFiles.update((files) => [...files, uploadedFile]);
@@ -266,7 +236,7 @@ export function createUIStore() {
  uploadedFiles.update((files) => files.map((f) => (f.id === fileId ? { ...f, status } : f)));
  }
 
- function updateFileMetadata(fileId: string, metadata), AIMetadata: void {
+ function updateFileMetadata(fileId: string, metadata, AIMetadata: void {
  uploadedFiles.update((files) =>
  files.map((f) => (f.id === fileId ? { ...f, metadata, status: 'analyzed' } : f))
  );
@@ -281,7 +251,7 @@ export function createUIStore() {
  uploadedFiles.update((files) => files.filter((f) => f.id !== fileId));
  }
 
- function setAutoPopulatedForm(formId: string, form), AutoPopulatedForm: void {
+ function setAutoPopulatedForm(formId: string, form, AutoPopulatedForm: void {
  autoPopulatedForms.update((forms) => {
  forms.set(formId, form);
  return new Map(forms);
@@ -305,7 +275,7 @@ export function createUIStore() {
  return newScene.id;
  }
 
- function validateScene(sceneId: string, validatedBy), string: void {
+ function validateScene(sceneId: string, validatedBy, string: void {
  markdownScenes.update((scenes) =>
  scenes.map((s) =>
  s.id === sceneId ? { ...s, validated: true, validatedBy: new Date() } : s
@@ -317,7 +287,7 @@ export function createUIStore() {
  activeSceneId.set(sceneId);
  }
 
- function updateSceneMarkdown(sceneId: string, markdown), string: void {
+ function updateSceneMarkdown(sceneId: string, markdown, string: void {
  markdownScenes.update((scenes) =>
  scenes.map((s) => (s.id === sceneId ? { ...s, markdown } : s))
  );
@@ -422,3 +392,6 @@ export function getGlobalUIStore(): UIStore {
  }
  return globalUIStore;
 }
+
+
+

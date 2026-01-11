@@ -7,3 +7,5 @@ declare module 'embeddinggemma' {
  const defaultExport: typeof EmbeddingGemma;
  export default defaultExport;
 }
+
+

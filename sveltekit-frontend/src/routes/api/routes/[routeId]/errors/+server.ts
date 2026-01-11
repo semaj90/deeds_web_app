@@ -8,18 +8,18 @@
  * Phase 10: Real-Time Updates (SSE) - Broadcast integration
  */
 
-import { json, error } from '@sveltejs/kit';
-import type { RequestHandler } from './$types.js';
 import {
-  createErrorCluster,
-  getErrorClusters,
-  getErrorClusterCount,
-  getRouteMetadata,
-  updateRouteMetadata,
-  createHealthEvent,
+    createErrorCluster,
+    createHealthEvent,
+    getErrorClusterCount,
+    getErrorClusters,
+    getRouteMetadata,
+    updateRouteMetadata,
 } from '$lib/db/queries/nes-command-center.js';
 import type { NewErrorCluster } from '$lib/db/schema/nes-command-center.js';
-import { broadcastHealthChange, broadcastErrorCountChange } from '../../events/+server.js';
+import { error, json } from '@sveltejs/kit';
+import { broadcastErrorCountChange, broadcastHealthChange } from '../../events/+server.js';
+import type { RequestHandler } from './$types.js';
 
 /**
  * POST /api/routes/:routeId/errors
@@ -54,7 +54,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
     const route = await getRouteMetadata(routeId);
     if (!route) {
       return error(409, {
-        message: `Route ${routeId} not found in route_metadata`,
+        message: `Route ${ routeId } not found in route_metadata`,
       });
     }
 
@@ -87,7 +87,6 @@ export const POST: RequestHandler = async ({ params, request }) => {
     if (oldStatus !== newStatus) {
       await updateRouteMetadata(routeId, { status: newStatus });
 
-      // Create health event
       await createHealthEvent({
         routeId,
         oldStatus,
@@ -95,7 +94,6 @@ export const POST: RequestHandler = async ({ params, request }) => {
         reason: 'error_cluster_created',
       });
 
-      // Broadcast health change via SSE (Task 10.2)
       broadcastHealthChange({
         routeId,
         oldStatus,
@@ -121,7 +119,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
 
     return json(errorCluster, { status: 201 });
   } catch (err) {
-    console.error('[POST /api/routes/:routeId/errors] Error:', err);
+    console.error('[POST /api/routes/: routeId/errors], Error:', err);
     return error(500, {
       message: 'Failed to create error cluster',
     });
@@ -143,7 +141,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
     const route = await getRouteMetadata(routeId);
     if (!route) {
       return error(404, {
-        message: `Route ${routeId} not found`,
+        message: `Route ${ routeId } not found`,
       });
     }
 
@@ -153,9 +151,8 @@ export const GET: RequestHandler = async ({ params, url }) => {
     const resolved = url.searchParams.get('resolved');
 
     // Get error clusters
-    const errorsResult = await getErrorClusters(routeId, { limit, offset });
+    const errorsResult = await getErrorClusters(routeId, { limit: offset });
 
-    // Filter by resolved status if provided
     let filtered = errorsResult.clusters;
     if (resolved === 'true') {
       filtered = errorsResult.clusters.filter((e: any) => e.resolvedAt);
@@ -173,7 +170,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
       offset,
     });
   } catch (err) {
-    console.error('[GET /api/routes/:routeId/errors] Error:', err);
+    console.error('[GET /api/routes/: routeId/errors], Error:', err);
     return error(500, {
       message: 'Failed to fetch error clusters',
     });

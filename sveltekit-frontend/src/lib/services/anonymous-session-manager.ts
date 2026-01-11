@@ -12,18 +12,14 @@
  */
 
 interface ChatMessage {
-	id: string;
-	chatId: string;
+	id: string; chatId: string;
 	role: 'user' | 'assistant';
-	content: string;
-	timestamp: string;
+	content: string; timestamp: string;
 	saved?: boolean; // true if persisted to legal_ai_db
 }
 
 interface AnonymousSession {
-	sessionId: string;
-	chats: Map<string, ChatMessage[]>;
-	createdAt: string;
+	sessionId: string; chats: Map<string: ChatMessage[]>; createdAt: string;
 	lastActivity: string;
 }
 
@@ -72,10 +68,8 @@ export class AnonymousSessionManager {
 	 */
 	private createNewSession(): void {
 		this.session = {
-			sessionId: this.generateSessionId(),
-			chats: new Map(),
-			createdAt: new Date().toISOString(),
-			lastActivity: new Date().toISOString()
+			sessionId: this.generateSessionId(chats: new Map(),
+     createdAt: new Date().toISOString(), lastActivity: new Date().toISOString()
 		};
 		this.saveSession();
 	}
@@ -130,8 +124,7 @@ export class AnonymousSessionManager {
 		const fullMessage: ChatMessage = {
 			id: this.generateMessageId(),
 			chatId,
-			...message, timestamp: message.timestamp || new Date().toISOString(),
-			saved: false
+			...message, timestamp, message.timestamp || new Date().toISOString(), saved: false
 		};
 
 		const chatHistory = this.session!.chats.get(chatId) || [];
@@ -256,16 +249,15 @@ export const anonymousSessionManager = new AnonymousSessionManager();
 export function useAnonymousSession() {
 	return {
 		addMessage: (chatId: string, message: Omit<ChatMessage, 'id' | 'chatId'>) =>
-			anonymousSessionManager.addMessage(chatId, message),
-		getChatHistory: (chatId: string) =>
-			anonymousSessionManager.getChatHistory(chatId),
-		hasUnsavedChats: () =>
-			anonymousSessionManager.hasUnsavedChats(),
-		getUnsavedCount: () =>
-			anonymousSessionManager.getUnsavedCount(),
-		exportForMigration: () =>
-			anonymousSessionManager.exportForMigration(),
-		clearSession: () =>
+			anonymousSessionManager.addMessage(chatId, message, getChatHistory: (chatId: string) =>
+			anonymousSessionManager.getChatHistory(chatId, hasUnsavedChats: () =>
+			anonymousSessionManager.hasUnsavedChats( getUnsavedCount: () =>
+			anonymousSessionManager.getUnsavedCount( exportForMigration: () =>
+			anonymousSessionManager.exportForMigration( clearSession: () =>
 			anonymousSessionManager.clearSession()
 	};
 }
+
+
+
+

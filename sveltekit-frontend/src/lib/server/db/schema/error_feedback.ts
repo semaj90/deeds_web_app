@@ -16,7 +16,8 @@ export const errorFeedbackTable = pgTable(
  patchId: uuid('patch_id'),
 
  // The feedback itself
- feedbackType: text('feedback_type').notNull(), // "helpful" | "misleading" | "incomplete" | "incorrect" | "fixed-it", feedbackText: text('feedback_text'), // User's notes
+ feedbackType: text('feedback_type').notNull(), // "helpful" | "misleading" | "incomplete" | "incorrect" | "fixed-it"
+ feedbackText: text('feedback_text'), // User's notes
  rating: text('rating'), // Optional: 1-5 star rating
 
  // Who gave the feedback
@@ -40,3 +41,5 @@ export const errorFeedbackTable = pgTable(
 
 export type ErrorFeedback = typeof errorFeedbackTable.$inferSelect;
 export type ErrorFeedbackInsert = typeof errorFeedbackTable.$inferInsert;
+
+

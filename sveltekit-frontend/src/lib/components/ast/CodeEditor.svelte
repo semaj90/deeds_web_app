@@ -36,8 +36,7 @@
  const lines = code.split('\n').length;
  lineNumbers = Array.from({ length: lines }, (_, i) => i + 1);
  });
-
- // Update highlighted error lines
+  
  $effect(() => {
  highlightedLines = new Set(errors.map(e => e.line));
  });
@@ -111,12 +110,11 @@
  <!-- Code Area -->
  <div class="code-area flex-1 relative">
  <textarea
- bind:this={editorRef}
- bind:value={code}
- oninput={handleInput}
- onkeydown={handleKeyDown}
- {readonly}
- {placeholder}
+ bind:this={editorRef}; bind:value={ code }
+ oninput={ handleInput }
+ onkeydown={ handleKeyDown }
+ { readonly }
+ { placeholder }
  spellcheck="false"
  autocomplete="off"
  autocorrect="off"
@@ -167,3 +165,5 @@
  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
  }
 </style>
+
+

@@ -1,4 +1,7 @@
 <script lang="ts">
+	let $uploadProgress$ = $state<any>(undefined);
+	let $errorMessage$ = $state<any>(undefined);
+
  /**
  * Document Upload Component - XState v5 Integration Example
  * Demonstrates proper usage of documentUploadMachine with Svelte
@@ -14,8 +17,7 @@
  const { state$, send, cleanup } = useMachine(documentUploadMachine as AnyStateMachine, {
  autoStart: true
  });
-
- // Derived stores for easier access
+  
  const hasError$ = machineState($state$, (s) =>
  s.matches('validationError') || s.matches('uploadError') || s.matches('processingError')
  );
@@ -52,9 +54,9 @@
  if (fileSizeMB > maxFileSize) {
  send({
  type: 'SET_ERROR',
- error: `File size exceeds ${maxFileSize}MB limit`
+ error: `File size exceeds ${ maxFileSize }MB limit`
  });
- onError?.(`File size exceeds ${maxFileSize}MB limit`);
+ onError?.(`File size exceeds ${ maxFileSize }MB limit`);
  return;
  }
 
@@ -81,8 +83,7 @@
  cleanup();
  };
  });
-
- // Watch for completion
+  
  $effect(() => {
  if ($state$ && $state$.matches('completed')) {
  onUploadComplete?.($context$);
@@ -97,7 +98,7 @@
  class:drag-over={dragOver}
  role="button"
  tabindex="0"
- ondrop={handleDrop}
+ ondrop={ handleDrop }
  ondragover={(e) => {
  e.preventDefault();
  dragOver = true;
@@ -117,7 +118,7 @@
 
  <button
  onclick={() => fileInput.click()}
- disabled={$isUploading$ || $isValidating$ || $isProcessing$}
+ disabled={$isUploading$ ?? $isValidating$ || $isProcessing$}
  class="upload-button"
  >
  {#if $isValidating$}
@@ -132,7 +133,7 @@
  </button>
 
  <p class="upload-hint">
- Supported: PDF, DOC, DOCX, TXT (max {maxFileSize}MB)
+ Supported: PDF, DOC, DOCX, TXT (max { maxFileSize }MB)
  </p>
  </div>
 
@@ -155,7 +156,7 @@
  {#if $hasError$}
  <div class="error-message">
  <p><strong>Error:</strong> {$errorMessage$}</p>
- <button onclick={handleRetry} class="retry-button">Retry</button>
+ <button onclick={ handleRetry } class="retry-button">Retry</button>
  <button onclick={handleCancel} class="cancel-button">Cancel</button>
  </div>
  {/if}
@@ -179,17 +180,14 @@
 
 <style>
  .document-upload-container {
- max-width: 600px;
- margin: 2rem auto;
+ max-width: 600px; margin: 2rem auto;
  padding: 2rem;
  }
 
  .upload-area {
  border: 2px dashed #ccc;
- border-radius: 8px;
- padding: 3rem 2rem;
- text-align: center;
- transition: all 0.2s ease;
+ border-radius: 8px; padding: 3rem 2rem;
+ text-align: center; transition: all 0.2s ease;
  background-color: #f9f9f9;
  }
 
@@ -199,104 +197,84 @@
  }
 
  .upload-button {
- background-color: #0066cc;
- color: white;
+ background-color: #0066cc; color: white;
  border: none;
- border-radius: 6px;
- padding: 0.75rem 1.5rem;
- font-size: 1rem;
- cursor: pointer;
+ border-radius: 6px; padding: 0.75rem 1.5rem;
+ font-size: 1rem; cursor: pointer;
  transition: background-color 0.2s;
  }
 
- .upload-button:hover:not(:disabled) {
+ .upload-button:hover, not(disabled) {
  background-color: #0052a3;
  }
 
  .upload-button:disabled {
- background-color: #ccc;
- cursor: not-allowed;
+ background-color: #ccc; cursor:not-allowed;
  }
 
  .upload-hint {
- margin-top: 1rem;
- color: #666;
+ margin-top: 1rem; color: #666;
  font-size: 0.9rem;
  }
 
  .file-info {
- margin-top: 1rem;
- padding: 1rem;
+ margin-top: 1rem; padding: 1rem;
  background-color: #f0f0f0;
  border-radius: 6px;
  }
 
  .progress-container {
- margin-top: 1rem;
- width: 100%;
+ margin-top: 1rem; width: 100%;
  height: 8px;
  background-color: #e0e0e0;
- border-radius: 4px;
- overflow: hidden;
+ border-radius: 4px; overflow: hidden;
  }
 
  .progress-bar {
  height: 100%;
- background-color: #0066cc;
- transition: width 0.3s ease;
+ background-color: #0066cc; transition: width 0.3s ease;
  }
 
  .error-message {
- margin-top: 1rem;
- padding: 1rem;
+ margin-top: 1rem; padding: 1rem;
  background-color: #ffe0e0;
  border-left: 4px solid #cc0000;
- border-radius: 4px;
- color: #cc0000;
+ border-radius: 4px; color: #cc0000;
  }
 
  .retry-button,
  .cancel-button {
  margin-top: 0.5rem;
- margin-right: 0.5rem;
- padding: 0.5rem 1rem;
+ margin-right: 0.5rem; padding: 0.5rem 1rem;
  border: none;
- border-radius: 4px;
- cursor: pointer;
+ border-radius: 4px; cursor: pointer;
  font-size: 0.9rem;
  }
 
  .retry-button {
- background-color: #0066cc;
- color: white;
+ background-color: #0066cc; color: white;
  }
 
  .cancel-button {
- background-color: #cc0000;
- color: white;
+ background-color: #cc0000; color: white;
  }
 
  .success-message {
- margin-top: 1rem;
- padding: 1rem;
+ margin-top: 1rem; padding: 1rem;
  background-color: #e0ffe0;
  border-left: 4px solid #00cc00;
- border-radius: 4px;
- color: #006600;
+ border-radius: 4px; color: #006600;
  }
 
  .status-info {
- margin-top: 1rem;
- padding: 0.75rem;
+ margin-top: 1rem; padding: 0.75rem;
  background-color: #f5f5f5;
  border-radius: 4px;
- font-size: 0.85rem;
- color: #666;
+ font-size: 0.85rem; color: #666;
  }
 
  .current-state {
- font-weight: 600;
- color: #333;
+ font-weight: 600; color: #333;
  }
 
  .file-hash {
@@ -304,3 +282,7 @@
  font-family: monospace;
  }
 </style>
+
+
+
+

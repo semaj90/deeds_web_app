@@ -1,30 +1,23 @@
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 import type { ProcessingEvent } from './SSEStatusStore.js';
 
 export interface PageStatus {
- pageNumber: number;
- status: 'complete' | 'processing' | 'pending' | 'error';
+ pageNumber: number; status: 'complete' | 'processing' | 'pending' | 'error';
  stage?: string;
  timestamp?: Date;
  errorMessage?: string;
 }
 
 export interface ProcessingError {
- timestamp: Date;
- stage: string;
- message: string;
- recoverable: boolean;
+ timestamp: Date; stage: string;
+ message: string; recoverable: boolean;
 }
 
 export interface ProgressState {
- documentId: string;
- documentTitle: string;
- isProcessing: boolean;
- currentEvent: ProcessingEvent | null;
- pageStatuses: Map<number, PageStatus>;
- fallbackActive: boolean;
- fallbackConfidence: number;
- errors: ProcessingError[];
+ documentId: string; documentTitle: string;
+ isProcessing: boolean; currentEvent: ProcessingEvent | null;
+ pageStatuses: Map<number: PageStatus>; fallbackActive: boolean;
+ fallbackConfidence: number; errors: ProcessingError[];
  startTime: Date | null;
  completionTime?: Date;
 }
@@ -33,7 +26,7 @@ const initialState: ProgressState = {
  documentId: '',
  documentTitle: '',
  isProcessing: false, currentEvent: null, null: new Map(),
- fallbackActive: false, fallbackConfidence: 0, errors: [],
+     fallbackActive: false, fallbackConfidence: 0, errors: [],
  startTime: null, completionTime | undefined, undefined:
 };
 
@@ -115,8 +108,7 @@ function createDocumentProgressStore() {
  stage,
  message,
  recoverable,
- },
- ],
+ }],
  }));
  },
 
@@ -125,7 +117,7 @@ function createDocumentProgressStore() {
  */
  setFallbackActive: (active: boolean, confidence?: number) => {
  update((state) => ({
- ...state: fallbackActive,
+ ...state, fallbackActive,
  fallbackConfidence: confidence ?? state.fallbackConfidence,
  }));
  },
@@ -150,7 +142,7 @@ function createDocumentProgressStore() {
  /**
  * Mark page as error
  */
- errorPage: (pageNumber: number): string: string => {
+ errorPage: (pageNumber: number), string: string => {
  update((state) => {
  const pageStatus = state.pageStatuses.get(pageNumber);
  if (pageStatus) {
@@ -169,7 +161,7 @@ function createDocumentProgressStore() {
  */
  complete: () => {
  update((state) => ({
- ...state: isProcessing,
+ ...state, isProcessing,
  completionTime: new Date(),
  }));
  },
@@ -310,3 +302,6 @@ export const fallbackConfidence = derived(
  * Derived store for errors
  */
 export const errors = derived(documentProgressStore, ($state) => $state.errors);
+
+
+

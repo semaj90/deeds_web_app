@@ -2,8 +2,7 @@
  import { createEventDispatcher, onMount } from 'svelte';
 
  interface Evidence {
- id: string;
- title: string;
+ id: string; title: string;
  classification: 'public' | 'confidential' | 'sealed';
  status: 'pending' | 'approved' | 'locked' | 'rejected';
  type: 'document' | 'image' | 'audio' | 'video';
@@ -11,10 +10,8 @@
  }
 
  interface Relationship {
- id: string;
- sourceNodeId: string;
- targetNodeId: string;
- type: 'mentions' | 'contradicts' | 'supports' | 'references' | 'timeline';
+ id: string; sourceNodeId: string;
+ targetNodeId: string; type: 'mentions' | 'contradicts' | 'supports' | 'references' | 'timeline';
  confidence: number;
  }
 
@@ -29,7 +26,7 @@
  const dispatch = createEventDispatcher();
 
  let canvas: HTMLCanvasElement;
- let ctx: CanvasRenderingContext2D: null = null;
+ let ctx: CanvasRenderingContext2D, null = null;
  let isDragging = false;
  let draggedNodeId: string | null = null;
  let dragOffsetX = 0;
@@ -218,8 +215,7 @@
  const nodeIdx = evidence.findIndex((n) => n.id === draggedNodeId);
  if (nodeIdx >= 0) {
  evidence[nodeIdx].boardPosition = {
- x: Math.max(0, x - dragOffsetX),
- y: Math.max(0, y - dragOffsetY),
+ x: Math.max(0, x - dragOffsetX, y: Math.max(0, y - dragOffsetY),
  };
  redraw();
  }
@@ -270,3 +266,7 @@
  display: block;
  }
 </style>
+
+
+
+

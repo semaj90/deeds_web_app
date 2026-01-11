@@ -8,3 +8,5 @@ export function getOllamaEndpoint(): string {
  const raw = envUrl || dockerDefault || localFallback;
  return raw.replace(/\/$/, '');
 }
+
+

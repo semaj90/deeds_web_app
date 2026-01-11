@@ -9,8 +9,7 @@ import { writable } from 'svelte/store';
 
 // XState-compatible state type
 interface UploadState {
-	files: File[];
-	progress: number;
+	files: File[]; progress: number;
 	status: 'idle' | 'uploading' | 'complete' | 'completed' | 'error';
 	error: string | null;
 	caseId?: string;
@@ -98,3 +97,6 @@ export const enhancedUploadStore = createEnhancedUploadStore();
 
 // Additional exports that may be expected
 export const uploadStore = enhancedUploadStore;
+
+
+

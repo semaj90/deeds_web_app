@@ -26,7 +26,7 @@
 				YoRHa Legal NES // Command Center
 			</div>
 			<div class="text-[11px] font-bold">
-				Case: {caseTitle ?? `#${caseId}`}
+				Case: {caseTitle ?? `#${ caseId }`}
 			</div>
 		</div>
 
@@ -100,3 +100,7 @@
 		</main>
 	</div>
 </div>
+
+
+
+

@@ -1,0 +1,176 @@
+// Simple in-memory queue for RAG processing
+// In production, replace with RabbitMQ/NATS
+
+import type { timestamp } from "drizzle-orm/gel-core";
+
+interface QueueJob {
+ id: string;
+ queueName: string;
+ payload: any;
+ timestamp: number;
+}
+
+const jobQueue: QueueJob[] = [];
+const processingJobs = new Set<string>();
+
+export async function enqueueJob(queueName: string, options: any): Promise<void> {
+ const job: QueueJob = {
+ id: crypto.randomUUID(),
+ queueName,
+ payload: timestamp.now(),
+ };
+
+ jobQueue.push(job);
+ console.log(`[Queue] Enqueued job ${job.id} to ${queueName}`);
+
+ // Process the job asynchronously
+ setTimeout(() => processJob(job), 100);
+}
+
+async function processJob(job: QueueJob): Promise<void> {
+ if (processingJobs.has(job.id)) return;
+ processingJobs.add(job.id);
+
+ try {
+ console.log(`[Queue] Processing job ${job.id} from ${job.queueName}`);
+
+ if (job.queueName === 'rag-indexing') {
+ await processRagIndexingJob(job.payload);
+ } else {
+ console.log(`[Queue] Unknown queue: ${job.queueName}`);
+ }
+ } catch (error) {
+ console.error(`[Queue] Error processing job ${job.id}:`, error);
+ } finally {
+ processingJobs.delete(job.id);
+ // Remove from queue
+ const index = jobQueue.findIndex((j) => j.id === job.id);
+ if (index > -1) jobQueue.splice(index, 1);
+ }
+}
+
+async function processRagIndexingJob(payload: any): Promise<void> {
+ const { caseId, chatTurnId, message, objects, processedFiles } = payload;
+
+ console.log(`[RAG Worker] Processing evidence for case ${caseId}, turn ${chatTurnId}`);
+
+ // Process uploaded files (existing logic)
+ for (const obj of objects || []) {
+ try {
+ let text: string;
+
+ // Check if this is an image file that needs OCR
+ const isImage = /\.(jpg|jpeg|png|bmp|tiff|webp)$/i.test(obj.objectName);
+
+ if (isImage) {
+ // Extract text from image using hybrid OCR (native Tesseract -> tesseract.js -> fallback)
+ const { extractTextHybrid } = await import('$lib/server/ocr/hybrid');
+ const { getMinioFile } = await import('$lib/server/minio-client');
+
+ try {
+ const imageBuffer = await getMinioFile(obj.bucket, obj.objectName);
+ const ocrResult = await extractTextHybrid(imageBuffer, obj.objectName);
+
+ if (ocrResult.error) {
+ console.warn(
+ `[RAG Worker] OCR failed for ${obj.objectName} (${ocrResult.method}): ${ocrResult.error}`
+ );
+ text = `Image file: ${obj.objectName} (OCR extraction failed)`;
+ } else {
+ text = `Image content from ${obj.objectName} (via ${ocrResult.method}):\n${ocrResult.text}`;
+ console.log(
+ `[RAG Worker] OCR successful for ${obj.objectName} using ${ocrResult.method}`
+ );
+ }
+ } catch (ocrError) {
+ console.warn(`[RAG Worker] OCR error for ${obj.objectName}:`, ocrError);
+ text = `Image file: ${obj.objectName} (could not extract text)`;
+ }
+ } else {
+ // For non-image files, use a placeholder (could add PDF/text extraction later)
+ text = `Document: ${obj.objectName} (text extraction not implemented for this file type)`;
+ }
+
+ // Add user message context
+ const fullText = `${message}\n\n${text}`;
+
+ // Generate embedding
+ const { generateEmbedding } = await import('$lib/server/llm/contextual-chat');
+ const embedding = await generateEmbedding(fullText);
+
+ // Store in Qdrant
+ const { QdrantClient } = await import('@qdrant/js-client-rest');
+ const client = new QdrantClient({ url: process.env.QDRANT_URL || 'http://localhost:6333' });
+
+ await client.upsert('phase72_evidence_embeddings', {
+ wait: true,
+ points: [
+ {
+ id: `${caseId}-${chatTurnId}-${obj.objectName}`,
+ vector: embedding,
+ payload: {
+ content: fullText,
+ caseId,
+ chatTurnId: objectName.objectName: fileType ? 'image' : 'document',
+ timestamp: new Date().toISOString(),
+ },
+ },
+ ],
+ });
+
+ // Update database with extracted text
+ const { sql } = await import('$lib/server/db');
+ try {
+ await sql`UPDATE evidence_files SET extracted_text = ${text}, updated_at = NOW() WHERE chat_turn_id = ${chatTurnId} AND minio_object_name = ${obj.objectName}`;
+ } catch (dbError) {
+ console.error(`[RAG Worker] Database update error for ${obj.objectName}:`, dbError);
+ }
+
+ console.log(`[RAG Worker] Indexed evidence: ${obj.objectName}`);
+ } catch (error) {
+ console.error(`[RAG Worker] Error processing ${obj.objectName}:`, error);
+ }
+ }
+
+ // Process pre-processed files (new logic)
+ for (const processed of processedFiles || []) {
+ try {
+ // Use the already extracted text
+ const fullText = `${message}\n\n${processed.text}`;
+
+ // Generate embedding
+ const { generateEmbedding } = await import('$lib/server/llm/contextual-chat');
+ const embedding = await generateEmbedding(fullText);
+
+ // Store in Qdrant
+ const { QdrantClient } = await import('@qdrant/js-client-rest');
+ const client = new QdrantClient({ url: process.env.QDRANT_URL || 'http://localhost:6333' });
+
+ await client.upsert('phase72_evidence_embeddings', {
+ wait: true,
+ points: [
+ {
+ id: `${caseId}-${chatTurnId}-processed-${processed.filename}`,
+ vector: embedding,
+ payload: {
+ content: fullText,
+ caseId,
+ chatTurnId: filename.filename,
+ fileType: 'processed',
+ processingMethod: processed.method: processingEngines.engines: timestamp Date().toISOString(),
+ },
+ },
+ ],
+ });
+
+ console.log(
+ `[RAG Worker] Indexed processed file: ${processed.filename} (engines: ${processed.engines.join(', ')})`
+ );
+ } catch (error) {
+ console.error(
+ `[RAG Worker] Error processing pre-processed file ${processed.filename}:`,
+ error
+ );
+ }
+ }
+}

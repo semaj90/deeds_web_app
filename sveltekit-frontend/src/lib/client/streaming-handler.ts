@@ -31,7 +31,7 @@ export async function handleStreamingResponse(
  throw new Error('Stream cancelled');
  }
 
- const { done, value } = await reader.read();
+ const { done: value } = await reader.read();
  if (done) break;
 
  buffer += decoder.decode(value, { stream: true });
@@ -108,3 +108,5 @@ export function createTimeoutController(timeoutMs: number): AbortController {
  setTimeout(() => controller.abort(), timeoutMs);
  return controller;
 }
+
+

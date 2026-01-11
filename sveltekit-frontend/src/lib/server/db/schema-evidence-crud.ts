@@ -36,8 +36,7 @@ export const auditResourceTypeEnum = pgEnum('audit_resource_type', [
  'Evidence',
  'Tag',
  'EvidenceTag',
- 'RAGIndex',
-]);
+ 'RAGIndex']);
 
 // === CITATION TAGS TABLE ===
 // Task 2: User-defined labels for evidence files
@@ -46,19 +45,12 @@ export const auditResourceTypeEnum = pgEnum('audit_resource_type', [
 export const citationTags = pgTable(
  'citation_tags',
  {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- name: varchar('name', { length: 255 }).notNull(),
- jurisdiction: jurisdictionEnum('jurisdiction').notNull(),
- description: text('description'),
- createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
- .defaultNow()
- .notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
- .defaultNow()
- .notNull(),
+ 			id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+			name: varchar('name', { length: 255 }).notNull(),
+			jurisdiction: jurisdictionEnum('jurisdiction').notNull(),
+			description: text('description'),
+			createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+			updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
  },
  (table) => ({
  // Unique constraint on (name, jurisdiction)
@@ -80,13 +72,9 @@ export const citationTags = pgTable(
 export const evidenceTags = pgTable(
  'evidence_tags',
  {
- evidenceId: uuid('evidence_id')
- .notNull()
- .references(() => evidence.id, { onDelete: 'cascade' }),
- tagId: uuid('tag_id')
- .notNull()
- .references(() => citationTags.id, { onDelete: 'cascade' }),
- createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+ 		evidenceId: uuid('evidence_id').notNull().references(() => evidence.id, { onDelete: 'cascade' }),
+		tagId: uuid('tag_id').notNull().references(() => citationTags.id, { onDelete: 'cascade' }),
+		createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
  .defaultNow()
  .notNull(),
  },
@@ -107,12 +95,9 @@ export const evidenceTags = pgTable(
 export const ragIndexMetadata = pgTable(
  'rag_index_metadata',
  {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- chunkId: uuid('chunk_id').notNull(),
- evidenceId: uuid('evidence_id')
+ 		id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+		chunkId: uuid('chunk_id').notNull(),
+		evidenceId: uuid('evidence_id')
  .notNull()
  .references(() => evidence.id, { onDelete: 'cascade' }),
  // Array of tag names for weighting
@@ -121,8 +106,8 @@ export const ragIndexMetadata = pgTable(
  .default(sql`'{}'::text[]`)
  .notNull(),
  // Weight multiplier (default 1.0, 1.5 if tags match)
- tagWeight: real('tag_weight').default(1.0).notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
+ 		tagWeight: real('tag_weight').default(1.0).notNull(),
+		updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
  .defaultNow()
  .notNull(),
  },
@@ -143,16 +128,13 @@ export const ragIndexMetadata = pgTable(
 export const auditLog = pgTable(
  'audit_log',
  {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- userId: uuid('user_id'),
- resourceType: auditResourceTypeEnum('resource_type').notNull(),
- resourceId: uuid('resource_id').notNull(),
- operation: auditOperationEnum('operation').notNull(),
- oldValues: jsonb('old_values'),
- newValues: jsonb('new_values'),
+ 			id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+			userId: uuid('user_id'),
+			resourceType: auditResourceTypeEnum('resource_type').notNull(),
+			resourceId: uuid('resource_id').notNull(),
+			operation: auditOperationEnum('operation').notNull(),
+			oldValues: jsonb('old_values'),
+			newValues: jsonb('new_values'),
  // Timestamp is immutable - no updates allowed
  timestamp: timestamp('timestamp', { withTimezone: true, mode: 'string' })
  .defaultNow()
@@ -185,3 +167,6 @@ export type NewAuditLogEntry = typeof auditLog.$inferInsert;
 // === JURISDICTION TYPE ===
 export type Jurisdiction = 'CA' | 'NY' | 'TX' | 'Fed-US' | 'Other';
 export const JURISDICTIONS: Jurisdiction[] = ['CA', 'NY', 'TX', 'Fed-US', 'Other'];
+
+
+

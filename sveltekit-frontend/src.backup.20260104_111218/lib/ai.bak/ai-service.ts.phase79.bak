@@ -1,0 +1,329 @@
+import type { aiAssistant } from '$lib/stores/unified';
+import { get } from 'svelte/store';
+
+// The aiAssistant store is a Svelte readable store but the runtime object
+// also exposes helper methods (setLoading, addMessage, etc.) via the
+// concrete implementation. Type definitions for the store may not include
+// those methods, so assert to any for usage here to avoid TypeScript errors.
+const assistant: any = aiAssistant;
+
+export interface SendToAIOptions {
+ caseId: string;
+ prompt: string;
+ evidenceIds?: string[];
+ context?: 'analysis' | 'connection' | 'annotation' | 'investigation' | 'general';
+ includeHistory?: boolean;
+ maxTokens?: number;
+ temperature?: number;
+}
+
+export interface AIServiceResponse {
+ text: string;
+ timestamp?: number;
+ evidenceConnections?: string[];
+ suggestedActions?: Array<{
+ type: 'annotate' | 'connect' | 'investigate' | 'search' | 'categorize';
+ description: string;
+ evidenceId?: string;
+ priority?: 'low' | 'medium' | 'high';
+ }>;
+ confidence?: number;
+ reasoning?: string;
+ metadata?: { model?: string; tokensUsed?: number; processingTime?: number };
+}
+
+class AIService {
+ private baseUrl = '/api/ai';
+ private defaultModel = 'gemma3-legal:latest';
+
+ async sendToAI(options: SendToAIOptions): Promise<AIServiceResponse> {
+ const {
+ caseId,
+ prompt,
+ evidenceIds = [],
+ context = 'general',
+ includeHistory = true,
+ maxTokens,
+ temperature,
+ } = options;
+
+ assistant.setLoading?.(true);
+ assistant.setError?.(undefined);
+
+ try {
+ const currentState: any = get(aiAssistant);
+ const caseContext: any = currentState?.cases?.[caseId];
+
+ const enhancedPrompt = this.buildEnhancedPrompt({
+ prompt,
+ caseContext,
+ evidenceIds,
+ context,
+ includeHistory,
+ });
+
+ // Add user message to store
+ assistant.addMessage?.(caseId, {
+ role: 'user',
+ content: prompt,
+ evidenceIds: evidenceIds.length > 0 ? evidenceIds : undefined,
+ });
+
+ const body = JSON.stringify({
+ caseId,
+ prompt: enhancedPrompt,
+ model: this.defaultModel,
+ evidenceIds,
+ maxTokens: maxTokens ?? 2048,
+ temperature: temperature ?? 0.7,
+ stream: false,
+ });
+
+ const response = await fetch(this.baseUrl, {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body,
+ });
+
+ if (!response.ok) {
+ throw new Error(`AI service error: ${response.status} ${response.statusText}`);
+ }
+
+ const result: AIServiceResponse = await response.json();
+
+ // Add AI response to store
+ assistant.addMessage?.(caseId, {
+ role: 'assistant',
+ content: result.text,
+ evidenceIds: result.evidenceConnections ?? undefined,
+ metadata: {
+ confidence: result.confidence,
+ source: result.metadata?.model ?? this.defaultModel,
+ },
+ });
+
+ // Process suggestions
+ if (result.suggestedActions && result.suggestedActions.length > 0) {
+ await this.processAISuggestions(caseId, result.suggestedActions);
+ }
+
+ // Auto-generate insight
+ if (result.confidence && result.confidence > 0.8) {
+ assistant.addInsight?.(caseId, {
+ type: this.getInsightType(context),
+ description: this.extractInsightFromResponse(result.text),
+ confidence: result.confidence,
+ evidenceIds: evidenceIds.length ? evidenceIds : undefined,
+ });
+ }
+
+ return result;
+ } catch (error) {
+ const errorMessage = error instanceof Error ? error.message : 'Unknown AI service error';
+ assistant.addMessage?.(options.caseId, { role: 'system', content: `Error: ${errorMessage}` });
+ assistant.setError?.(errorMessage);
+ throw error;
+ } finally {
+ assistant.setLoading?.(false);
+ }
+ }
+
+ private buildEnhancedPrompt(options: {
+ prompt: string;
+ caseContext?: any;
+ evidenceIds: string[];
+ context: string;
+ includeHistory: boolean;
+ }): string {
+ const { prompt, caseContext, evidenceIds, context, includeHistory } = options;
+
+ let enhancedPrompt = '';
+ enhancedPrompt += this.getSystemPrompt(context);
+
+ if (caseContext) {
+ enhancedPrompt += '\n\nCase Context:\n';
+ enhancedPrompt += `- Case ID: ${caseContext.caseId || 'unknown'}\n`;
+ if (caseContext.title) enhancedPrompt += `- Case Title: ${caseContext.title}\n`;
+
+ if (evidenceIds && evidenceIds.length > 0) {
+ enhancedPrompt += '\nRelevant Evidence:\n';
+ evidenceIds.forEach((id) => {
+ const evidence = caseContext.evidenceMap?.[id];
+ if (evidence) {
+ enhancedPrompt += `- ${evidence.title || id}`;
+ if (evidence.aiSummary) enhancedPrompt += ` (Summary: ${evidence.aiSummary})`;
+ enhancedPrompt += '\n';
+ } else {
+ enhancedPrompt += `- ${id}\n`;
+ }
+ });
+ }
+
+ if (
+ includeHistory &&
+ Array.isArray(caseContext.messages) &&
+ caseContext.messages.length > 0
+ ) {
+ const recentMessages = caseContext.messages.slice(-5);
+ enhancedPrompt += '\nRecent Conversation:\n';
+ recentMessages.forEach((msg: any) => {
+ enhancedPrompt += `${msg.role}: ${msg.content}\n`;
+ });
+ }
+ }
+
+ enhancedPrompt += `\n\nUser Query: ${prompt}`;
+ return enhancedPrompt;
+ }
+
+ private getSystemPrompt(context: string): string {
+ const basePrompt = `You are a legal AI assistant specialized in case analysis and evidence evaluation. You help legal professionals analyze evidence, identify connections, and provide insights for investigations.`;
+ switch (context) {
+ case 'analysis':
+ return `${basePrompt} Focus on analyzing the provided evidence and identifying key insights, patterns, or anomalies.`;
+ case 'connection':
+ return `${basePrompt} Focus on identifying relationships and connections between different pieces of evidence.`;
+ case 'annotation':
+ return `${basePrompt} Focus on providing detailed annotations and explanations for the evidence.`;
+ case 'investigation':
+ return `${basePrompt} Focus on suggesting investigative directions and additional evidence to collect.`;
+ default:
+ return basePrompt;
+ }
+ }
+
+ private async processAISuggestions(
+ caseId: string,
+ suggestions?: AIServiceResponse['suggestedActions']
+ ) {
+ if (!suggestions) return;
+ for (const suggestion of suggestions) {
+ switch (suggestion.type) {
+ case 'categorize':
+ // TODO: implement auto-categorize
+ break;
+ case 'connect':
+ // TODO: implement connect suggestion handling
+ break;
+ case 'search':
+ // TODO: implement triggered searches
+ break;
+ }
+ }
+ }
+
+ private getInsightType(context: string): 'pattern' | 'connection' | 'anomaly' | 'recommendation' {
+ switch (context) {
+ case 'connection':
+ return 'connection';
+ case 'analysis':
+ return 'pattern';
+ default:
+ return 'recommendation';
+ }
+ }
+
+ private extractInsightFromResponse(text: string): string {
+ const sentences = text.split('. ');
+ const insightKeywords = [
+ 'important',
+ 'significant',
+ 'suggests',
+ 'indicates',
+ 'pattern',
+ 'connection',
+ ];
+ for (const sentence of sentences) {
+ if (insightKeywords.some((keyword) => sentence.toLowerCase().includes(keyword))) {
+ return sentence.trim();
+ }
+ }
+ return sentences[0] ? sentences[0].trim() : text.substring(0, 200);
+ }
+
+ // Specialized methods for common use cases
+ async analyzeEvidence(
+ caseId: string,
+ evidenceId: string,
+ specificQuestion?: string
+ ): Promise<AIServiceResponse> {
+ const prompt =
+ specificQuestion ||
+ `Analyze this evidence and provide key insights, potential legal implications, and relevance to the case.`;
+ return this.sendToAI({
+ caseId,
+ prompt,
+ evidenceIds: [evidenceId],
+ context: 'analysis',
+ includeHistory: false,
+ });
+ }
+
+ async findConnections(caseId: string, evidenceIds: string[]): Promise<AIServiceResponse> {
+ const prompt = `Analyze the relationships and connections between these pieces of evidence. Identify patterns, contradictions, or supporting elements.`;
+ return this.sendToAI({
+ caseId,
+ prompt,
+ evidenceIds,
+ context: 'connection',
+ includeHistory: true,
+ });
+ }
+
+ async suggestInvestigation(caseId: string, currentFocus?: string): Promise<AIServiceResponse> {
+ const prompt = currentFocus
+ ? `Based on the current focus "${currentFocus}", suggest next steps for the investigation and additional evidence to collect.`
+ : `Based on the current case evidence, suggest next steps for the investigation and additional evidence to collect.`;
+ return this.sendToAI({ caseId, prompt, context: 'investigation', includeHistory: true });
+ }
+
+ async annotateEvidence(
+ caseId: string,
+ evidenceId: string,
+ annotation: string
+ ): Promise<AIServiceResponse> {
+ const prompt = `Review and enhance this annotation for the evidence: "${annotation}". Provide additional context, legal implications, or suggestions for further analysis.`;
+ return this.sendToAI({
+ caseId,
+ prompt,
+ evidenceIds: [evidenceId],
+ context: 'annotation',
+ includeHistory: false,
+ });
+ }
+
+ // Streaming support for real-time responses (not implemented)
+ async sendToAIStream(_options: SendToAIOptions): Promise<ReadableStream<any>> {
+ throw new Error('Streaming not yet implemented');
+ }
+}
+
+export const aiService = new AIService();
+
+// Convenience functions for common operations
+export async function sendToAI(
+ caseId: string,
+ prompt: string,
+ evidenceIds?: string[]
+): Promise<AIServiceResponse> {
+ return aiService.sendToAI({ caseId, prompt, evidenceIds, context: 'general' });
+}
+
+export async function analyzeEvidence(
+ caseId: string,
+ evidenceId: string,
+ question?: string
+): Promise<AIServiceResponse> {
+ return aiService.analyzeEvidence(caseId, evidenceId, question);
+}
+
+export async function findEvidenceConnections(
+ caseId: string,
+ evidenceIds: string[]
+): Promise<AIServiceResponse> {
+ return aiService.findConnections(caseId, evidenceIds);
+}
+
+export async function suggestNextSteps(caseId: string, focus?: string): Promise<AIServiceResponse> {
+ return aiService.suggestInvestigation(caseId, focus);
+}

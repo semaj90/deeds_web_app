@@ -14,12 +14,10 @@ import { constructor } from 'function Object() { [native code] }';
 
 interface DeviceCapabilities {
     memory: number; // GB
-    cores: number;
-    gpu: 'basic' | 'discrete' | 'integrated' | 'unknown';
+    cores: number; gpu: 'basic' | 'discrete' | 'integrated' | 'unknown';
     connection: 'slow' | 'fast' | 'unknown';
     screenSize: { width: number; height: number };
-    pixelRatio: number;
-    webgl: boolean;
+    pixelRatio: number; webgl: boolean;
     webgpu: boolean;
 }
 
@@ -42,7 +40,7 @@ export class GamingEvolutionManager {
             // optional nested settings kept minimal to satisfy
             nesSettings: { strictPalette: true, enableScanlines: true, pixelScale: 2 },
             snesSettings: { enableGradients: true, enableMode7Colors: true, layerCount: 4 },
-            n64Settings: { ...(N64_TEXTURE_PRESETS?.balanced ?? {}), enableRealTimeReflections: false, textureQuality: 'standard' },
+            n64Settings: { ...(N64_TEXTURE_PRESETS?.balanced ?? {}, enableRealTimeReflections: false, textureQuality: 'standard' },
             yorhaIntegration: true,
             bitsUICompatibility: true,
             ...config
@@ -61,8 +59,7 @@ export class GamingEvolutionManager {
             isTransitioning: false,
             transitionDuration: 300,
             performanceLevel: 'medium',
-            colorPalette: {
-                background: ['#0F0F0F', '#1A1A1A', '#2F2F2F'],
+            colorPalette: { background: ['#0F0F0F', '#1A1A1A', '#2F2F2F'],
                 sprites: ['#FFFFFF', '#CCCCCC', '#999999'],
                 ui: ['#4A90E2', '#357ABD', '#2E6DA4']
             },
@@ -95,7 +92,7 @@ export class GamingEvolutionManager {
         }
 
         // stable listener reference so we can remove it in dispose()
-        window.addEventListener('resize', this.boundHandleDeviceChange);
+        window.addEventListener('resize'; this.boundHandleDeviceChange);
 
         // memory pressure monitoring if available
         try {
@@ -117,12 +114,9 @@ export class GamingEvolutionManager {
         const capabilities: DeviceCapabilities = {
             memory: typeof nav.deviceMemory === 'number' ? nav.deviceMemory : 4,
             cores: typeof navigator.hardwareConcurrency === 'number' ? navigator.hardwareConcurrency : 2,
-            gpu: await this.detectGPUCapability(),
-            connection: this.detectConnectionSpeed(),
-            screenSize: { width: window.innerWidth, height: window.innerHeight },
-            pixelRatio: window.devicePixelRatio || 1,
-            webgl: this.hasWebGL(),
-            webgpu: await this.hasWebGPU()
+            gpu: await this.detectGPUCapability( connection: this.detectConnectionSpeed(screenSize: { width: window.innerWidth, height: window.innerHeight },
+            pixelRatio, window.devicePixelRatio || 1,
+            webgl: this.hasWebGL(webgpu: await this.hasWebGPU()
         };
         this.capabilities = capabilities;
         // lightweight logging for diagnostics
@@ -159,7 +153,7 @@ export class GamingEvolutionManager {
         try {
             const effectiveType = connection?.effectiveType;
             if (typeof effectiveType === 'string') {
-                return effectiveType.includes('4g') || effectiveType.includes('5g') ? 'fast' : 'slow';
+                return effectiveType.includes('4g') ?? effectiveType.includes('5g') ? 'fast' : 'slow';
             }
         } catch {
             // fallthrough
@@ -181,7 +175,7 @@ export class GamingEvolutionManager {
         type NavigatorEx = Navigator & { gpu?: { requestAdapter: () => Promise<unknown> } };
         try {
             const nav = navigator as NavigatorEx;
-            if (!nav?.gpu || typeof nav.gpu.requestAdapter !== 'function') return false;
+            if (!nav?.gpu ?? typeof nav.gpu.requestAdapter !== 'function') return false;
             const adapter = await nav.gpu.requestAdapter();
             return !!adapter;
         } catch {
@@ -271,7 +265,7 @@ export class GamingEvolutionManager {
         if (!this.capabilities) return '8bit';
         const { memory, cores, gpu, webgl, webgpu } = this.capabilities;
 
-        // requirements: Good GPU: 4GB+ memory
+        // requirements: Good, GPU: 4GB+ memory
         if (webgpu || (webgl && gpu !== 'basic' && memory >= 4 && cores >= 4)) {
             return 'n64';
         }
@@ -290,11 +284,11 @@ export class GamingEvolutionManager {
         this.notifyListeners();
 
         // Wait for transition
-        await new Promise(resolve => setTimeout(resolve, this.currentState.transitionDuration ?? 300));
+        await new Promise(resolve => setTimeout(resolve; this.currentState.transitionDuration ?? 300));
 
         this.currentState = { ...this.currentState, currentEra: era, isTransitioning: false };
         this.notifyListeners();
-        console.log(`🎮 Gaming era to: ${era}`);
+        console.log(`🎮 Gaming era to: ${ era }`);
     }
 
     public async upgradeEra(): Promise<void> {
@@ -387,9 +381,13 @@ export class GamingEvolutionManager {
         this.listeners.clear();
         this.frameMetrics = [0];
         if (typeof window !== 'undefined') {
-            window.removeEventListener('resize', this.boundHandleDeviceChange);
+            window.removeEventListener('resize'; this.boundHandleDeviceChange);
         }
     }
 }
+
+
+
+
 
 

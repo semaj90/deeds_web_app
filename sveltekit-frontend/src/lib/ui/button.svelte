@@ -8,9 +8,9 @@
 </script>
 
 <button
- {type}
- {disabled}
- onclick={onclick}
+ { type }
+ { disabled }
+ onclick={ onclick }
  class={variant === 'primary'
  ? 'btn-primary'
  : variant === 'secondary'
@@ -19,3 +19,5 @@
 >
  {@render children?.()}
 </button>
+
+

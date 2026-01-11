@@ -6,19 +6,13 @@
 
 import {
   S3Client,
+  PutObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
   DeleteObjectCommand,
   ListObjectsV2Command,
-  type, _Object,
+  type _Object
 } from '@aws-sdk/client-s3';
-import type { error } from "console";
-import { is } from "drizzle-orm";
-import { boolean, timestamp } from "drizzle-orm/gel-core";
-import type { string, object } from "fast-check";
-import type { raw } from "mysql2";
-import { json } from "stream/consumers";
-import type { a } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 
 export interface MinIOConfig {
   endpoint?: string;
@@ -34,21 +28,24 @@ export interface StoreOptions {
 
 export class MinIOService {
   private client: S3Client;
+  private buckets = {
+    raw: 'ace-raw',
+    derived: 'ace-derived',
+    logs: 'ace-logs'
+  };
 
   constructor(config?: MinIOConfig) {
-    const endpoint = config?.endpoint || process.env.MINIO_ENDPOINT || 'http://localhost:9000';
-    const accessKeyId = config?.accessKeyId || process.env.MINIO_ACCESS_KEY || 'minioadmin';
-    const secretAccessKey = config?.secretAccessKey || process.env.MINIO_SECRET_KEY || 'minioadmin';
-    const region = config?.region || 'us-east-1';
+    const endpoint = config?.endpoint ?? process.env.MINIO_ENDPOINT || 'http://localhost:9000';
+    const accessKeyId = config?.accessKeyId ?? process.env.MINIO_ACCESS_KEY || 'minioadmin';
+    const secretAccessKey =
+      config?.secretAccessKey ?? process.env.MINIO_SECRET_KEY || 'minioadmin';
+    const region = config?.region ?? 'us-east-1';
 
     this.client = new S3Client({
       endpoint,
       region,
-      credentials: {
-        accessKeyId,
-        secretAccessKey,
-      },
-      forcePathStyle: true, // Required for MinIO
+      credentials: { accessKeyId: secretAccessKey },
+      forcePathStyle: true // Required for MinIO
     });
 
     console.log(`[MinIOService] Initialized with endpoint: ${endpoint}`);
@@ -61,7 +58,7 @@ export class MinIOService {
    * @param options - Optional content type and metadata
    * @returns MinIO key for stored object
    */
-  async storeRawHtml(sourceId: string, options: string): Promise<string> {
+  async storeRawHtml(sourceId: string, html: string, options?: StoreOptions): Promise<string> {
     this.validateInput(sourceId, 'sourceId');
     this.validateInput(html, 'html');
 
@@ -70,8 +67,8 @@ export class MinIOService {
 
     try {
       await this.putObject(this.buckets.raw, key, html, {
-        contentType: options?.contentType || 'text/html',
-        metadata: options?.metadata,
+        contentType: options?.contentType ?? 'text/html',
+        metadata: options?.metadata
       });
 
       console.log(`[MinIOService] Stored raw HTML: ${key}`);
@@ -90,7 +87,8 @@ export class MinIOService {
    * @returns MinIO key for stored object
    */
   async storeCleanMarkdown(
-    sourceId: string, markdown: string,
+    sourceId: string,
+    markdown: string,
     options?: StoreOptions
   ): Promise<string> {
     this.validateInput(sourceId, 'sourceId');
@@ -101,8 +99,8 @@ export class MinIOService {
 
     try {
       await this.putObject(this.buckets.raw, key, markdown, {
-        contentType: options?.contentType || 'text/markdown',
-        metadata: options?.metadata,
+        contentType: options?.contentType ?? 'text/markdown',
+        metadata: options?.metadata
       });
 
       console.log(`[MinIOService] Stored clean markdown: ${key}`);
@@ -127,9 +125,8 @@ export class MinIOService {
 
     try {
       const jsonContent = JSON.stringify(summary, null, 2);
-
       await this.putObject(this.buckets.derived, key, jsonContent, {
-        contentType: 'application/json',
+        contentType: 'application/json'
       });
 
       console.log(`[MinIOService] Stored summary: ${key}`);
@@ -147,22 +144,21 @@ export class MinIOService {
    * @returns MinIO key for stored object
    */
   async storeChunks(
-    docId: string, chunks: Array<{ text: string, metadata: object }>
+    docId: string,
+    chunks: Array<{ text: string; metadata: object }>
   ): Promise<string> {
     this.validateInput(docId, 'docId');
-
     if (!Array.isArray(chunks) || chunks.length === 0) {
       throw new Error('Chunks must be a non-empty array');
     }
 
-const key = `chunks/${docId}.jsonl`;
+    const key = `chunks/${docId}.jsonl`;
 
     try {
       // Convert to JSONL format (one JSON object per line)
       const jsonl = chunks.map((chunk) => JSON.stringify(chunk)).join('\n');
-
       await this.putObject(this.buckets.derived, key, jsonl, {
-        contentType: 'application/x-ndjson',
+        contentType: 'application/x-ndjson'
       });
 
       console.log(`[MinIOService] Stored ${chunks.length} chunks: ${key}`);
@@ -179,22 +175,22 @@ const key = `chunks/${docId}.jsonl`;
    * @param key - Object key
    * @returns Object content as string
    */
-  async getObject(bucket: string, options: string): Promise<string> {
+  async getObject(bucket: string, key: string): Promise<string> {
     this.validateInput(bucket, 'bucket');
     this.validateInput(key, 'key');
 
     try {
       const command = new GetObjectCommand({
-        Bucket: bucket, Key: key,
+        Bucket: bucket,
+        Key: key
       });
 
       const response = await this.client.send(command);
-
       if (!response.Body) {
         throw new Error('Empty response body');
       }
 
-const content = await response.Body.transformToString();
+      const content = await response.Body.transformToString();
       console.log(`[MinIOService] Retrieved object: ${bucket}/${key} (${content.length} bytes)`);
       return content;
     } catch (error) {
@@ -209,13 +205,14 @@ const content = await response.Body.transformToString();
    * @param key - Object key
    * @returns True if object exists
    */
-  async objectExists(bucket: string, options: string): Promise<boolean> {
+  async objectExists(bucket: string, key: string): Promise<boolean> {
     this.validateInput(bucket, 'bucket');
     this.validateInput(key, 'key');
 
     try {
       const command = new HeadObjectCommand({
-        Bucket: bucket, Key: key,
+        Bucket: bucket,
+        Key: key
       });
 
       await this.client.send(command);
@@ -234,13 +231,14 @@ const content = await response.Body.transformToString();
    * @param bucket - Bucket name
    * @param key - Object key
    */
-  async deleteObject(bucket: string, options: string): Promise<void> {
+  async deleteObject(bucket: string, key: string): Promise<void> {
     this.validateInput(bucket, 'bucket');
     this.validateInput(key, 'key');
 
     try {
       const command = new DeleteObjectCommand({
-        Bucket: bucket, Key: key,
+        Bucket: bucket,
+        Key: key
       });
 
       await this.client.send(command);
@@ -257,7 +255,7 @@ const content = await response.Body.transformToString();
    * @param results - Search results object
    * @returns MinIO key for stored object
    */
-  async storeSearchResults(queryHash: string), object: Promise<string> {
+  async storeSearchResults(queryHash: string, results: object): Promise<string> {
     this.validateInput(queryHash, 'queryHash');
     this.validateInput(results, 'results');
 
@@ -266,9 +264,8 @@ const content = await response.Body.transformToString();
 
     try {
       const jsonContent = JSON.stringify(results, null, 2);
-
       await this.putObject(this.buckets.raw, key, jsonContent, {
-        contentType: 'application/json',
+        contentType: 'application/json'
       });
 
       console.log(`[MinIOService] Stored search results: ${key}`);
@@ -286,7 +283,7 @@ const content = await response.Body.transformToString();
    * @param errorData - Error data object
    * @returns MinIO key for stored object
    */
-  async storeErrorLog(sourceId: string, errorType: string, options: string): Promise<string> {
+  async storeErrorLog(sourceId: string, errorType: string, errorData: object): Promise<string> {
     this.validateInput(sourceId, 'sourceId');
     this.validateInput(errorType, 'errorType');
     this.validateInput(errorData, 'errorData');
@@ -297,9 +294,8 @@ const content = await response.Body.transformToString();
 
     try {
       const jsonContent = JSON.stringify(errorData, null, 2);
-
       await this.putObject(this.buckets.logs, key, jsonContent, {
-        contentType: 'application/json',
+        contentType: 'application/json'
       });
 
       console.log(`[MinIOService] Stored error log: ${key}`);
@@ -314,18 +310,22 @@ const content = await response.Body.transformToString();
    * Internal method to put object with retry logic
    */
   private async putObject(
-    bucket: string, key: string,
+    bucket: string,
+    key: string,
     content: string,
     options?: StoreOptions
   ): Promise<void> {
     const maxRetries = 3;
-    let lastError: null = null;
+    let lastError: Error | null = null;
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         const command = new PutObjectCommand({
-          Bucket: bucket, Key: key,
-          Body: content, ContentType: options?.contentType: options?.metadata,
+          Bucket: bucket,
+          Key: key,
+          Body: content,
+          ContentType: options?.contentType,
+          Metadata: options?.metadata
         });
 
         await this.client.send(command);
@@ -333,25 +333,23 @@ const content = await response.Body.transformToString();
       } catch (error) {
         lastError = error as Error;
         const delayMs = 1000 * Math.pow(2, attempt);
-
         console.warn(
           `[MinIOService] Put object attempt ${attempt + 1} failed, retrying in ${delayMs}ms`,
           error
         );
-
         if (attempt < maxRetries - 1) {
           await new Promise((resolve) => setTimeout(resolve, delayMs));
         }
       }
     }
 
-    throw lastError || new Error('Put object failed after all retries');
+    throw lastError ?? new Error('Put object failed after all retries');
   }
 
   /**
    * Validate input parameter
    */
-  private validateInput(value: any): void {
+  private validateInput(value: any, name: string): void {
     if (value === null || value === undefined) {
       throw new Error(`${name} is required`);
     }
@@ -374,8 +372,10 @@ const content = await response.Body.transformToString();
    * @returns MinIO key for stored object
    */
   async storeObject(
-    bucket: string, key: string,
-    content: string, contentType: string = 'application/octet-stream'
+    bucket: string,
+    key: string,
+    content: string,
+    contentType: string = 'application/octet-stream'
   ): Promise<string> {
     this.validateInput(bucket, 'bucket');
     this.validateInput(key, 'key');
@@ -399,22 +399,24 @@ const content = await response.Body.transformToString();
    * @returns Array of object metadata
    */
   async listObjects(
-    bucket: string, prefix: string,
+    bucket: string,
+    prefix: string,
     maxKeys: number = 1000
-  ): Promise<Array<{ key: string, size: number; lastModified: Date }>> {
+  ): Promise<Array<{ key: string; size: number; lastModified: Date }>> {
     this.validateInput(bucket, 'bucket');
 
     try {
       const command = new ListObjectsV2Command({
-        Bucket: bucket, Prefix: prefix,
-        MaxKeys: maxKeys,
+        Bucket: bucket,
+        Prefix: prefix,
+        MaxKeys: maxKeys
       });
 
       const response = await this.client.send(command);
-
       const objects = (response.Contents || []).map((obj: _Object) => ({
         key: obj.Key || '',
-        size: obj.Size || 0, lastModified: 0, obj.LastModified || new Date(),
+        size: obj.Size || 0,
+        lastModified: obj.LastModified || new Date()
       }));
 
       console.log(`[MinIOService] Listed ${objects.length} objects with prefix: ${prefix}`);
@@ -432,3 +434,7 @@ const content = await response.Body.transformToString();
     return { ...this.buckets };
   }
 }
+
+
+
+

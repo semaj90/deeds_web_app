@@ -21,8 +21,7 @@ case_type?: 'civil' | 'criminal' | 'corporate' | 'intellectual_property' | 'fami
 }
 
 export interface ComplianceViolation {
-regulation: string; // e.g., 'FRCP 26', 'GDPR Article 32', 'HIPAA 164.306', violation_type:
-// REMOVED: ; | 'data_breach' | 'access_violation' | 'retention_violation' | 'disclosure_violation' | 'procedural_violation'; severity: 'low' | 'medium' | 'high' | 'critical',required_actions: string[], notification_required: notification_timeline?: string; // e.g., '72 hours', '30 days' potential_penalties?: string[]
+regulation: string; // e.g., 'FRCP 26', 'GDPR Article 32', 'HIPAA 164.306', violation_type: //, REMOVED: ; | 'data_breach' | 'access_violation' | 'retention_violation' | 'disclosure_violation' | 'procedural_violation'; severity: 'low' | 'medium' | 'high' | 'critical',required_actions: string[], notification_required: notification_timeline?: string; // e.g., '72 hours', '30 days' potential_penalties?: string[]
 }
 
 export interface ErrorStats {
@@ -59,3 +58,7 @@ class Store {
 }
 
 export const store = new Store();
+
+
+
+

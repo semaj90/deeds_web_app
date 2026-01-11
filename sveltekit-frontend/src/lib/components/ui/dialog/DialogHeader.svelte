@@ -14,8 +14,10 @@
 	const defaultClass = 'flex flex-col space-y-1.5 text-center sm:text-left';
 </script>
 
-<div class="{defaultClass} {className}" data-dialog-header="">
+<div class="{defaultClass} { className }" data-dialog-header="">
 	{#if children}
 		{@render children()}
 	{/if}
 </div>
+
+

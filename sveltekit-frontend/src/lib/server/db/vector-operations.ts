@@ -6,27 +6,21 @@ import { sql } from 'drizzle-orm'; // Removed unused type Table
 
 // GRPMO imports
 interface GRPMOConfig {
- hotCacheThreshold: number;
- warmCacheThreshold: number;
- coldCacheThreshold: number;
- reinforcementLearningRate: number;
- predictiveWindowMs: number;
- glyphCompressionRatio: number;
+ hotCacheThreshold: number; warmCacheThreshold: number;
+ coldCacheThreshold: number; reinforcementLearningRate: number;
+ predictiveWindowMs: number; glyphCompressionRatio: number;
 }
 
 interface ExtendedThinkingStage {
- name: string;
- duration: number;
+ name: string; duration: number;
  cacheLayer: 'hot' | 'warm' | 'cold';
  confidence: number;
  glyphData?: string;
 }
 
 interface PPOState {
- stateVector: number[];
- actionHistory: string[];
- rewardSignal: number;
- policyGradient: number[];
+ stateVector: number[]; actionHistory: string[];
+ rewardSignal: number; policyGradient: number[];
  valueFunction: number;
 }
 
@@ -46,8 +40,7 @@ type PPOContext = {
 
 interface SimilarityResult {
  id: string;
- title?: string;
- content: string;
+ title?: string; content: string;
  similarity: number;
  metadata?: Metadata;
  cacheLayer?: 'hot' | 'warm' | 'cold';
@@ -88,14 +81,14 @@ export async function searchSimilarDocuments(
  const results = (
  await db.execute(sql`
  SELECT id, title, content, 1 - (embedding <=> ${vectorString}::vector) as similarity
- FROM ${legalDocuments}
- WHERE 1 - (embedding <=> ${vectorString}::vector) > ${similarityThreshold}
+ FROM ${ legalDocuments }
+ WHERE 1 - (embedding <=> ${vectorString}::vector) > ${ similarityThreshold }
  ORDER BY embedding <=> ${vectorString}::vector
- LIMIT ${limit}`)
+ LIMIT ${ limit }`)
  ).rows as DBRow[];
  return results.map((row) => {
  const id = row.id !== undefined ? String(row.id) : '';
- const title = typeof row.title === 'string' ? row.title  | undefined;
+ const title = typeof row.title === 'string' ? row.title : undefined;
  const content = typeof row.content === 'string' ? row.content : '';
  const similarity = Number(row.similarity ?? 0);
  return { id, title, content, similarity, metadata: {} } as SimilarityResult;
@@ -122,7 +115,7 @@ async function fallbackTextSearch(
  .limit(limit)) as DBRow[];
  return results.map((doc, index) => {
  const id = doc.id !== undefined ? String(doc.id) : '';
- const title = typeof doc.title === 'string' ? doc.title  | undefined;
+ const title = typeof doc.title === 'string' ? doc.title : undefined;
  const content = typeof doc.content === 'string' ? doc.content : '';
  return { id, title: content - index * 0.1, metadata: {} } as SimilarityResult;
  });
@@ -130,7 +123,7 @@ async function fallbackTextSearch(
 
 // Store AI query with embedding for future similarity search
 export async function storeAiQueryWithEmbedding(
- userId: string, caseId: string,, query, string: response, string: number[],
+ userId: string, caseId: string, query, string: response, string: number[],
  metadata: Metadata = {}
 ): Promise<void> {
  try {
@@ -172,7 +165,7 @@ export async function getCachedEmbedding(textHash: string): Promise<number[] | n
  const result = (await db
  .select({ embedding: embeddingCache.embedding })
  .from(embeddingCache)
- .where(sql`${embeddingCache.textHash} = ${textHash}`)
+ .where(sql`${embeddingCache.textHash} = ${ textHash }`)
  .limit(1)) as DBRow[];
  if (result.length > 0) {
  const vectorString = result[0].embedding;
@@ -212,7 +205,7 @@ export async function hybridSearch(
  ).rows as DBRow[];
  const textSearchResults: SimilarityResult[] = textResults.map((row) => {
  const id = row.id !== undefined ? String(row.id) : '';
- const title = typeof row.title === 'string' ? row.title  | undefined;
+ const title = typeof row.title === 'string' ? row.title : undefined;
  const content = typeof row.content === 'string' ? row.content : '';
  const rank = Number(row.rank ?? 0);
  return {
@@ -221,7 +214,7 @@ export async function hybridSearch(
  metadata: { searchType: 'text' },
  } as SimilarityResult;
  });
- // Combine and deduplicate results
+  
  const combinedResults = [...vectorResults, ...textSearchResults];
  const uniqueResults = Array.from(
  new Map(combinedResults.map((item) => [item.id, item])).values()
@@ -246,10 +239,8 @@ export async function checkPgVectorAvailable(): Promise<boolean> {
 }
 
 // Vector operations test function
-export async function testVectorOperations(): Promise<{
- pgvectorAvailable: boolean;
- similaritySearchWorking: boolean;
- embeddingCacheWorking: boolean;
+export async function testVectorOperations(): Promise<{ pgvectorAvailable: boolean;
+ similaritySearchWorking: boolean; embeddingCacheWorking: boolean;
 }> {
  const pgvectorAvailable = await checkPgVectorAvailable();
  let similaritySearchWorking = false;
@@ -276,8 +267,7 @@ export async function testVectorOperations(): Promise<{
 
 // New interface for the return type of processExtendedThinking
 interface ProcessExtendedThinkingResult {
- result: SimilarityResult[];
- thinkingStages: ExtendedThinkingStage[];
+ result: SimilarityResult[]; thinkingStages: ExtendedThinkingStage[];
  cachePerformance: { hot: number; warm: number; cold: number };
 }
 
@@ -327,7 +317,7 @@ export class GRPMOOrchestrator {
  cacheLayer: 'warm',
  confidence: 0.8, glyphData: this.compressToGlyph(warmResult.data),
  });
- // Predictive enhancement
+  
  const enhanced = await this.enhanceWithPredictiveAnalysis(warmResult.data, queryEmbedding);
  await this.cacheResult(hotCacheKey, enhanced, 'hot');
  return { result: enhanced, thinkingStages: stages, cachePerformance };
@@ -346,7 +336,7 @@ export class GRPMOOrchestrator {
  query,
  userId: caseId,
  });
- // Stage 5: Glyph compression and caching
+  
  const glyphData = this.compressToGlyph(optimizedResults);
  stages.push({
  name: 'Glyph Compression',
@@ -355,7 +345,7 @@ export class GRPMOOrchestrator {
  confidence: 0.9,
  glyphData,
  });
- // Cache at multiple layers
+  
  await this.cacheResult(warmCacheKey, optimizedResults, 'warm');
  await this.cacheResult(hotCacheKey, optimizedResults, 'hot');
  return { result: optimizedResults, thinkingStages: stages, cachePerformance };
@@ -363,7 +353,7 @@ export class GRPMOOrchestrator {
 
  private generateCacheKey(query: string, embedding: number[]): string {
  const embeddingHash = this.hashEmbedding(embedding);
- return `${layer}:${this.hashString(query)}:${embeddingHash}`;
+ return `${ layer }:${this.hashString(query)}:${embeddingHash}`;
  }
 
  private async retrieveFromCache(
@@ -388,9 +378,7 @@ export class GRPMOOrchestrator {
  private compressToGlyph(data: SimilarityResult[]): string {
  // Simplified compression/glyph generation
  const compressed = data.map((item) => ({
- id: String(item.id).slice(0, 8),
- sim: Math.round(item.similarity * 127),
- key: item.metadata?.keywords && item.metadata.keywords[0] ? item.metadata.keywords[0] : '',
+ id: String(item.id).slice(0, 8, sim: Math.round(item.similarity * 127, key: item.metadata?.keywords && item.metadata.keywords[0] ? item.metadata.keywords[0] : '',
  }));
  return JSON.stringify(compressed);
  }
@@ -440,3 +428,7 @@ class PPOAgent {
  return results;
  }
 }
+
+
+
+

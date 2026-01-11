@@ -35,8 +35,7 @@ describe('Integration Tests', () => {
  // Step 1: Retrieve statutes and case law
  const [statutes, caseLaw] = await Promise.all([
  ragService.retrieveStatutes(charges),
- ragService.retrieveCaseLaw(charges),
- ]);
+ ragService.retrieveCaseLaw(charges)]);
 
  expect(statutes).toBeDefined();
  expect(caseLaw).toBeDefined();
@@ -93,8 +92,7 @@ describe('Integration Tests', () => {
  // Attempt full pipeline
  const [statutes, caseLaw] = await Promise.all([
  ragService.retrieveStatutes(charges),
- ragService.retrieveCaseLaw(charges),
- ]);
+ ragService.retrieveCaseLaw(charges)]);
 
  const context = {
  caseId: testCaseId,
@@ -326,8 +324,7 @@ describe('Integration Tests', () => {
  const results = await Promise.all([
  caseSummaryService.getSummary(testCaseId),
  caseSummaryService.getSummary(testCaseId),
- caseSummaryService.getSummary(testCaseId),
- ]);
+ caseSummaryService.getSummary(testCaseId)]);
 
  results.forEach((result) => {
  expect(result).toBeDefined();
@@ -344,8 +341,7 @@ describe('Integration Tests', () => {
 
  const [statutes, caseLaw] = await Promise.all([
  ragService.retrieveStatutes(charges),
- ragService.retrieveCaseLaw(charges),
- ]);
+ ragService.retrieveCaseLaw(charges)]);
 
  const context = {
  caseId: testCaseId,
@@ -391,3 +387,5 @@ describe('Integration Tests', () => {
  });
  });
 });
+
+

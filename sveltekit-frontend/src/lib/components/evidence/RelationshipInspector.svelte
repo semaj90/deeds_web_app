@@ -1,16 +1,12 @@
 <script lang="ts">
  // Define types locally to avoid importing server schema in browser
  type EvidenceRelationship = {
- id: string;
- caseId: string;
- fromEvidenceId: string;
- toEvidenceId: string;
- relationshipType: string;
- strength: 'weak' | 'medium' | 'strong';
+ id: string; caseId: string;
+ fromEvidenceId: string; toEvidenceId: string;
+ relationshipType: string; strength: 'weak' | 'medium' | 'strong';
  label?: string;
  notes?: string;
- createdBy?: number;
- createdAt: string;
+ createdBy?: number; createdAt: string;
  updatedAt: string;
  };
 
@@ -27,10 +23,10 @@
 
  loading = true;
  try {
- const response = await fetch(`/api/evidence/relationships?caseId=${caseId}&evidenceId=${selectedEvidenceId}`);
+ const response = await fetch(`/api/evidence/relationships? caseId=${caseId}&evidenceId=${selectedEvidenceId}`);
  if (response.ok) {
  const data = await response.json();
- relationships = data.relationships || [];
+ relationships = data.relationships ?? [];
  } else {
  console.error('Failed to fetch relationships');
  relationships = [];
@@ -147,8 +143,7 @@
 
 <style>
  .relationship-inspector {
- width: 320px;
- height: 100%;
+ width: 320px; height: 100%;
  background: white;
  border-left: 1px solid #e5e7eb;
  display: flex;
@@ -164,52 +159,43 @@
  .inspector-header h3 {
  margin: 0 0 0.5rem 0;
  font-size: 1.1rem;
- font-weight: 600;
- color: #111827;
+ font-weight: 600; color: #111827;
  }
 
  .selected-evidence {
- font-size: 0.85rem;
- color: #059669;
+ font-size: 0.85rem; color: #059669;
  font-family: monospace;
  }
 
  .no-selection {
- font-size: 0.85rem;
- color: #6b7280;
+ font-size: 0.85rem; color: #6b7280;
  font-style: italic;
  }
 
  .inspector-content {
  flex: 1;
- overflow-y: auto;
- padding: 1rem;
+ overflow-y: auto; padding: 1rem;
  }
 
  .loading, .no-relationships, .no-selection-message {
- text-align: center;
- color: #6b7280;
- font-style: italic;
- padding: 2rem;
+ text-align: center; color: #6b7280;
+ font-style: italic; padding: 2rem;
  }
 
  .relationships-list {
  display: flex;
- flex-direction: column;
- gap: 0.75rem;
+ flex-direction: column; gap: 0.75rem;
  }
 
  .relationship-item {
  border: 2px solid var(--relationship-color);
- border-radius: 8px;
- padding: 0.75rem;
+ border-radius: 8px; padding: 0.75rem;
  background: rgba(var(--relationship-color), 0.05);
  }
 
  .relationship-header {
  display: flex;
- align-items: center;
- gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  margin-bottom: 0.5rem;
  }
 
@@ -220,25 +206,21 @@
  .relationship-type {
  flex: 1;
  font-weight: 600;
- text-transform: capitalize;
- color: var(--relationship-color);
+ text-transform: capitalize; color: var(--relationship-color);
  }
 
  .relationship-direction {
- font-size: 0.8rem;
- color: #6b7280;
+ font-size: 0.8rem; color: #6b7280;
  font-family: monospace;
  }
 
  .relationship-label {
- font-size: 0.9rem;
- color: #374151;
+ font-size: 0.9rem; color: #374151;
  margin-bottom: 0.25rem;
  }
 
  .relationship-notes {
- font-size: 0.85rem;
- color: #6b7280;
+ font-size: 0.85rem; color: #6b7280;
  font-style: italic;
  margin-bottom: 0.5rem;
  }
@@ -246,11 +228,14 @@
  .relationship-meta {
  display: flex;
  justify-content: space-between;
- font-size: 0.75rem;
- color: #9ca3af;
+ font-size: 0.75rem; color: #9ca3af;
  }
 
  .strength {
  text-transform: capitalize;
  }
 </style>
+
+
+
+

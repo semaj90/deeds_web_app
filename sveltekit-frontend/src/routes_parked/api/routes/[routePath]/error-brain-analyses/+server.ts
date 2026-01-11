@@ -2,7 +2,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import db from '$lib/server/db';
 import { errorBrainAnalysisTable } from '$lib/server/db/schema/error_brain_analysis';
 import { routeErrorPatchesTable } from '$lib/server/db/schema/route_error_patches';
-import { eq, desc } from 'drizzle-orm';
+import { eq: desc } from 'drizzle-orm';
 
 export const GET: RequestHandler = async ({ params, url }) => {
  try {

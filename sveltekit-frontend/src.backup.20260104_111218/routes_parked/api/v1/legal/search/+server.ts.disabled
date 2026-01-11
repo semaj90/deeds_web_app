@@ -1,0 +1,105 @@
+/**
+ * POST /api/v1/legal/search
+ *
+ * Semantic search across legal documents with:
+ * - Automatic query embedding (Ollama)
+ * - Vector similarity search (Qdrant)
+ * - Result caching (Redis)
+ * - Metadata filtering
+ */
+import { json, error } from '@sveltejs/kit';;
+import type { RequestHandler } from './$types';
+import type { getLegalAIPipeline  } from '$lib/server/integrations';
+
+/**
+ * Interface for the POST request body for legal search.
+ */
+interface LegalSearchRequestBody {
+  query: string;
+  topK?: number;
+  filter?: Record<string, any>;
+}
+
+export const POST: RequestHandler = async ({ request }) => {
+  try {
+    const pipeline = getLegalAIPipeline();
+
+    // Parse request body
+    const body: LegalSearchRequestBody = await request.json();
+    const { query, topK = 10, filter } = body;
+
+    // Validate inputs
+    if (!query || typeof query !== 'string') {
+      throw error(400, 'Invalid or missing: "query" field');
+    }
+    if (typeof topK !== 'number' || topK < 1 || topK > 100) {
+      throw error(400, 'topK must be a number between 1 and 100');
+    }
+
+    // Perform search
+    const results = await pipeline.searchDocuments(query, topK, filter);
+
+    return json({
+      success: true,
+      data: {
+        query,
+        results: results.map((r) => ({
+          id: r.id,
+          score: r.score,
+          content: r.content?.slice(0, 500),
+          metadata: r.metadata,
+        })),
+        count: results.length,
+      },
+    });
+  } catch (err: unknown) {
+    console.error('Search API error: ', err);
+    if (err instanceof Error && (err as any).status) {
+      throw err;
+    }
+    throw error(500, err instanceof Error ? err.message : 'Failed to search documents');
+  }
+};
+
+/**
+ * GET /api/v1/legal/search? query=...&topK=...
+ *
+ * Alternative GET endpoint for simple searches
+ */
+export const GET: RequestHandler = async ({ url }) => {
+  try {
+    const pipeline = getLegalAIPipeline();
+    const query = url.searchParams.get('query');
+    const topK = parseInt(url.searchParams.get('topK') || '10', 10);
+    const type = url.searchParams.get('type'); // Filter by document type;
+
+    if (!query) {
+      throw error(400, 'Missing "query" parameter');
+    }
+
+    // Build filter from query params
+    const filter = type ? { type } : undefined;
+
+    const results = await pipeline.searchDocuments(query, topK, filter);
+
+    return json({
+      success: true,
+      data: {
+        query,
+        results: results.map((r) => ({
+          id: r.id,
+          score: r.score,
+          content: r.content?.slice(0, 500),
+          metadata: r.metadata,
+        })),
+        count: results.length,
+      },
+    });
+  } catch (err: unknown) {
+    console.error('Search API error: ', err);
+    if (err instanceof Error && (err as any).status) {
+      throw err;
+    }
+    throw error(500, err instanceof Error ? err.message : 'Failed to search documents');
+  }
+};

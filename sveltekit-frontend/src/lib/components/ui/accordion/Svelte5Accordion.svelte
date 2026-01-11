@@ -7,8 +7,7 @@ import type { Snippet } from 'svelte';
 import { setContext, getContext } from 'svelte';
 
 interface AccordionItem {
-	id: string;
-	title: string;
+	id: string; title: string;
 	disabled?: boolean;
 	icon?: string;
 }
@@ -72,9 +71,9 @@ let variantClasses = $derived({
 }[variant]);
 </script>
 
-<div class="w-full {variantClasses} {className}" data-accordion>
+<div class="w-full {variantClasses} { className }" data-accordion>
 	{#each items as item}
-		<AccordionItemComponent {item} {variant} />
+		<AccordionItemComponent { item } {variant} />
 	{/each}
 	{#if children}
 		{@render children()}
@@ -91,8 +90,8 @@ let variantClasses = $derived({
 			class="flex w-full items-center justify-between px-4 py-3 text-left
 				   text-white font-medium
 				   hover:bg-slate-700/50 transition-colors duration-150
-				   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset
-				   disabled:opacity-50 disabled:cursor-not-allowed
+				   focus: outline-none, focus:ring-2 focus: ring-blue-500, focus:ring-inset
+				   disabled: opacity-50, disabled:cursor-not-allowed
 				   {variant === 'nes' ? 'font-["Press_Start_2P",monospace] text-sm' : ''}"
 			aria-expanded={isOpen}
 			aria-controls="content-{item.id}"
@@ -131,12 +130,10 @@ let variantClasses = $derived({
 <style>
 	@keyframes accordion-down {
 		from {
-			height: 0;
-			opacity: 0;
+			height: 0; opacity: 0;
 		}
 		to {
-			height: var(--accordion-content-height);
-			opacity: 1;
+			height: var(--accordion-content-height); opacity: 1;
 		}
 	}
 
@@ -144,3 +141,7 @@ let variantClasses = $derived({
 		animation: accordion-down 0.2s ease-out;
 	}
 </style>
+
+
+
+

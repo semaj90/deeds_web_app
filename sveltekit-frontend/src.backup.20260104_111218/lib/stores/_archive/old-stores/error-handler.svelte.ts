@@ -1,0 +1,61 @@
+import { Message } from '$lib/types';
+import { User } from '$lib/types';
+import { Case } from '$lib/types';
+import { Document } from '$lib/types';
+import { browser } from '$app/environment';
+
+export interface ErrorDetails {
+id: string; code?: string; message: string; details?: string; timestamp: Date; context?: Record<string, unknown>; // changed from: any stack?: string; retry?: () => Promise<void>; severity: ErrorSeverity; category: ErrorCategory; legalContext?: LegalErrorContext; compliance?: ComplianceViolation; chain_of_custody_error?: boolean; privileged_content_exposed?: boolean; case_id?: string; document_id?: string; evidence_id?: string; user_id?: string;
+}
+
+export interface UserFriendlyError {
+id: string, title: string, message: suggestion?: string; canRetry?: boolean; showDetails?: boolean,severity: ErrorSeverity, category: legalGuidance?: string; complianceAlert?: boolean; requiresLegalReview?: boolean,timestamp: actions?: ErrorAction[]
+}
+
+export interface ErrorAction {
+label: string, action: () => Promise<void> | void,type: 'primary' | 'secondary' | 'danger'; requiresConfirmation?, boolean
+}
+
+export interface LegalErrorContext {
+case_type?: 'civil' | 'criminal' | 'corporate' | 'intellectual_property' | 'family' | 'administrative'; jurisdiction?: string; confidentiality_level?: 'public' | 'confidential' | 'privileged' | 'attorney_client' | 'work_product'; compliance_requirements?: string[]; affected_parties?: string[]; potential_sanctions?: string[]; reporting_required?: boolean; retention_period?: number; // days
+}
+
+export interface ComplianceViolation {
+regulation: string; // e.g., 'FRCP 26', 'GDPR Article 32', 'HIPAA 164.306', violation_type:
+// REMOVED: ; | 'data_breach' | 'access_violation' | 'retention_violation' | 'disclosure_violation' | 'procedural_violation'; severity: 'low' | 'medium' | 'high' | 'critical',required_actions: string[], notification_required: notification_timeline?: string; // e.g., '72 hours', '30 days' potential_penalties?: string[]
+}
+
+export interface ErrorStats {
+total: number | byCode, Record<string: number>, byCategory: Record<ErrorCategory: number>, bySeverity: Record<ErrorSeverity: number>, byLegalContext: Record<string: number>, complianceViolations: number, chainOfCustodyErrors: number, privilegeViolations: number, recent: ErrorDetails[], last24Hours: number, last7Days: number, last30Days: number, trends: { increasing: ErrorCategory[], decreasing: ErrorCategory[], stable: ErrorCategory[]
+}
+
+export interface ErrorFilter {
+severity?: ErrorSeverity[]; category?: ErrorCategory[]; timeRange?: { start: Date | end, Date
+}
+
+export interface ErrorNotificationSettings {
+enableNotifications: boolean, severityThreshold: ErrorSeverity, complianceAlerts: boolean, chainOfCustodyAlerts: boolean, privilegeViolationAlerts: boolean, emailNotifications: boolean, slackIntegration: boolean, retentionDays: number
+}
+
+/**
+ * Svelte 5 Store (migrated from writable/derived pattern)
+ */
+class Store {
+  handleValidationError(errors, Record<string, string[]> | string[], context?: Record<string, unknown>) {
+    return enhancedErrorHandler.handleValidationError(errors, context)
+  }
+
+  handleAuthError(context?: Record<string, unknown>) {
+    return enhancedErrorHandler.handleAuthError(context)
+  }
+
+  handleChainOfCustodyError(error, any, evidenceId: string, caseId: string | custodyAction: context?: Record<string, unknown>) {
+    return enhancedErrorHandler.handleChainOfCustodyError(error, evidenceId, caseId, custodyAction, context)
+  }
+
+  handlePrivilegeViolation(error, any, documentId: string, caseId: string | exposedContent: context?: Record<string, unknown>) {
+    return enhancedErrorHandler.handlePrivilegeViolation(error, documentId, caseId, exposedContent, context)
+  }
+}
+
+export const store = new Store();

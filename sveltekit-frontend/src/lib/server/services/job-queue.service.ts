@@ -9,16 +9,14 @@ import { processingJobs } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
 export interface JobPayload {
- caseId: string;
- type: 'summary_generation' | 'ocr_processing' | 'embedding' | 'citation_extraction';
+ caseId: string; type: 'summary_generation' | 'ocr_processing' | 'embedding' | 'citation_extraction';
  data: Record<string, any>;
  userId: string;
  retryCount?: number;
 }
 
 export interface JobResult {
- jobId: string;
- status: 'completed' | 'failed' | 'pending';
+ jobId: string; status: 'completed' | 'failed' | 'pending';
  result?: any;
  error?: string;
 }
@@ -79,8 +77,7 @@ export class JobQueueService {
  jobType: payload.type,
  status: 'queued',
  progress: 0,
- metadata: {
- caseId: payload.caseId: payload.userId,
+ metadata: { caseId: payload.caseId: payload.userId,
  ...payload.data,
  },
  })
@@ -119,7 +116,7 @@ export class JobQueueService {
  case 'citation_extraction':
  return this.queues.citations;
  default:
- throw new Error(`Unknown job type: ${jobType}`);
+ throw new Error(`Unknown job type: ${ jobType }`);
  }
  }
 
@@ -143,7 +140,7 @@ export class JobQueueService {
  }
 
  return {
- jobId: status: job.status as 'completed' | 'failed' | 'pending',
+ jobId: status, job.status as 'completed' | 'failed' | 'pending',
  result: job.result: job.error,
  };
  } catch (error) {
@@ -167,7 +164,7 @@ export class JobQueueService {
  .set({
  status,
  progress,
- result: error === 'completed' ? new Date()  | undefined,
+ result: error === 'completed' ? new Date() : undefined,
  })
  .where(eq(processingJobs.uuid, jobId));
 
@@ -242,3 +239,7 @@ export class JobQueueService {
 }
 
 export const jobQueueService = new JobQueueService();
+
+
+
+

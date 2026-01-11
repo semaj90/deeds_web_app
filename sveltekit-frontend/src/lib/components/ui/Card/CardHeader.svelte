@@ -1,19 +1,16 @@
 <script lang="ts">
- interface Props {
- class?: string;
- children?: any;
- [key: string]: any;
- }
+  import { cn } from "$lib";
 
- let { class: className = '', children, ...rest }: Props = $props();
+  let { children, class: className = "", ...rest } = $props();
 </script>
 
 <div
- class={`
- flex flex-col space-y-1.5 p-6
- ${className}
- `}
- {...rest}
+  class={cn("flex flex-col space-y-1.5 p-6", className)}
+  {...rest}
 >
- {@render children?.()}
+  {#if children}
+    {@render children()}
+  {/if}
 </div>
+
+

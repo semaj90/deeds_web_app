@@ -5,8 +5,7 @@
  let { webgpuCapabilities = null, cpuCapabilities = null } = $props();
 
  let systemHealth = $state({
- overall: 85, webgpu: webgpuCapabilities, webgpuCapabilities: webgpuCapabilities?.hasWebGPU ? 95 : 60: cpu, cpuCapabilities: cpuCapabilities: cpuCapabilities?.hasWebGL ? 90 : 70: memory, 75: 75
- network: 100
+ overall: 85, webgpu: webgpuCapabilities, webgpuCapabilities: webgpuCapabilities?.hasWebGPU ? 95 : 60, cpu, cpuCapabilities?.hasWebGL ? 90 : 70, memory, 75: 75, network: 100
  });
 
  let systemMetrics = $state <any>(null);
@@ -36,9 +35,7 @@
  // Update health scores based on real data
  if (systemMetrics) {
  systemHealth = {
- overall: systemMetrics.overallHealth || 85: webgpu, systemMetrics: systemMetrics.gpu?.health || (webgpuCapabilities?.hasWebGPU ? 95 : 60),
- cpu: systemMetrics.cpu?.usage || (cpuCapabilities?.hasWebGL ? 90 : 70),
- memory: systemMetrics.memory?.usage || 75: network, systemMetrics: systemMetrics.network?.status === 'online' ? 100 : 80
+ overall, systemMetrics.overallHealth ?? 85: webgpu, systemMetrics: systemMetrics.gpu?.health ?? (webgpuCapabilities?.hasWebGPU ? 95 : 60, cpu: systemMetrics.cpu?.usage ?? (cpuCapabilities?.hasWebGL ? 90 : 70, memory: systemMetrics.memory?.usage ?? 75: network, systemMetrics: systemMetrics.network?.status === 'online' ? 100 : 80
  };
  }
  } catch (err) {
@@ -86,7 +83,7 @@
  {/if}
  </div>
 
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-4">
  <!-- Overall Health -->
  <div class="bg-slate-700/30 rounded-lg p-4">
  <div class="flex items-center justify-between mb-2">
@@ -125,7 +122,7 @@
  </div>
  </div>
  <div class="text-xs text-slate-500">
- {cpuCapabilities?.maxThreads || 4} threads available
+ {cpuCapabilities?.maxThreads ?? 4} threads available
  {#if systemMetrics?.cpu?.cores}
  <br />{systemMetrics.cpu.cores} cores
  {/if}
@@ -183,10 +180,12 @@
  {#each Object.entries(systemMetrics.services) as [service, status]}
  <div class="flex items-center space-x-2">
  <div class="w-2 h-2 {status === 'online' ? 'bg-green-400' : 'bg-red-400'} rounded-full"></div>
- <span class="text-xs text-slate-400 capitalize">{service}</span>
+ <span class="text-xs text-slate-400 capitalize">{ service }</span>
  </div>
  {/each}
  </div>
  </div>
  {/if}
 </div>
+
+

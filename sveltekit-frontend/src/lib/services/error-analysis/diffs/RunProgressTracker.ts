@@ -20,26 +20,21 @@ export type RunPhase =
  | 'failed';
 
 export interface RunProgress {
- runId: string;
- phase: RunPhase;
+ runId: string; phase: RunPhase;
 
  // Diff generation
- totalPatches: number;
- generatedPatches: number;
+ totalPatches: number; generatedPatches: number;
 
  // Diff application
- appliedPatches: number;
- failedPatches: number;
+ appliedPatches: number; failedPatches: number;
  rolledBackPatches: number;
 
  // Validation
  validationStatus: 'pending' | 'passed' | 'failed' | 'regression';
- errorCountBefore: number;
- errorCountAfter: number;
+ errorCountBefore: number; errorCountAfter: number;
 
  // Timing
- startedAt: Date;
- updatedAt: Date;
+ startedAt: Date; updatedAt: Date;
  completedAt?: Date;
 
  // Error tracking
@@ -49,8 +44,7 @@ export interface RunProgress {
 
 export interface ProgressEvent {
  type: 'progress' | 'patch-applied' | 'validation-complete' | 'error' | 'done';
- runId: string;
- timestamp: Date;
+ runId: string; timestamp: Date;
  data: Partial<RunProgress>;
 }
 
@@ -150,7 +144,7 @@ export class RunProgressTracker {
  */
  patchFailed(filePath: string): void {
  this.progress.failedPatches++;
- this.progress.lastError = `Failed to apply patch to ${filePath}: ${reason}`;
+ this.progress.lastError = `Failed to apply patch to ${ filePath }: ${reason}`;
  this.progress.errorStack?.push(this.progress.lastError);
  this.progress.updatedAt = new Date();
  this.emit('error', {
@@ -244,3 +238,6 @@ export class RunProgressTracker {
  return { ...this.progress };
  }
 }
+
+
+

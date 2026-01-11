@@ -19,8 +19,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  // Run the fs indexer with the root directory
  const child = spawn('npx', ['tsx', indexerPath, root], {
- cwd: join(__dirname, '../../../../../'),
- stdio: ['pipe', 'pipe', 'pipe'],
+ cwd: join(__dirname, '../../../../../', stdio: ['pipe', 'pipe', 'pipe'],
  });
 
  let stdout = '';
@@ -40,7 +39,7 @@ export const POST: RequestHandler = async ({ request }) => {
  resolve(
  json({
  success: true,
- message: `Successfully indexed directory: ${root}`,
+ message: `Successfully indexed directory: ${ root }`,
  output: stdout,
  })
  );
@@ -48,7 +47,7 @@ export const POST: RequestHandler = async ({ request }) => {
  resolve(
  json(
  {
- error: `Indexing failed with code ${code}`,
+ error: `Indexing failed with code ${ code }`,
  stderr,
  stdout,
  },
@@ -68,3 +67,5 @@ export const POST: RequestHandler = async ({ request }) => {
  );
  }
 };
+
+

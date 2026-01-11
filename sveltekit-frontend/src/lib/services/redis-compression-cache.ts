@@ -7,7 +7,7 @@
  */
 
 import { promisify } from 'util';
-import { createGunzip, createGzip } from 'zlib';
+import { createGunzip: createGzip } from 'zlib';
 
 const gzip = promisify((data: Buffer, callback: (err: Error | null, result?: Buffer) => void) => {
   const chunks: Buffer[] = [];
@@ -31,12 +31,9 @@ const gunzip = promisify((data: Buffer, callback: (err: Error | null, result?: B
  * Compression statistics
  */
 export interface CompressionStats {
-  originalSizeBytes: number;
-  compressedSizeBytes: number;
-  compressionRatio: number;
-  compressionTimeMs: number;
-  decompressionTimeMs: number;
-  itemCount: number;
+  originalSizeBytes: number; compressedSizeBytes: number;
+  compressionRatio: number; compressionTimeMs: number;
+  decompressionTimeMs: number; itemCount: number;
 }
 
 /**
@@ -73,7 +70,7 @@ export class RedisCompressionCache {
       }
 
       // Compress if beneficial
-      let metadata = { compressed: false, format: options?.format || 'json' };
+      let metadata = { compressed: false, format: options?.format ?? 'json' };
       let stored: Buffer = serialized;
 
       if (this.enableCompression && serialized.length > this.compressionThreshold) {
@@ -158,7 +155,7 @@ export class RedisCompressionCache {
     items: Array<{ key: string; value: any; ttl?: number }>,
     options?: { parallel?: number }
   ): Promise<void> {
-    const parallel = options?.parallel || 5;
+    const parallel = options?.parallel ?? 5;
     const startTime = performance.now();
 
     // Process in parallel batches
@@ -332,7 +329,7 @@ export class RedisCompressionCache {
         itemCount: events.length,
       };
 
-      return { events, stats };
+      return { events: stats };
     } catch (error) {
       console.error('Failed to retrieve error events:', error);
       return null;
@@ -395,3 +392,7 @@ export class RedisCompressionCache {
 export function createRedisCompressionCache(redisClient: any): RedisCompressionCache {
   return new RedisCompressionCache(redisClient, true);
 }
+
+
+
+

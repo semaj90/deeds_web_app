@@ -13,7 +13,7 @@
  ? 'pill-yellow'
  : 'pill-green'}
  >
- {risk}
+ { risk }
  </span>
  <span
  class={status === 'closed'
@@ -22,6 +22,8 @@
  ? 'pill-yellow'
  : 'pill-green'}
  >
- {status}
+ { status }
  </span>
 </div>
+
+

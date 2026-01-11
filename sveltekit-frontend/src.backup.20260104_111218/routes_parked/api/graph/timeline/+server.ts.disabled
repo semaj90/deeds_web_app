@@ -1,0 +1,50 @@
+import { json } from '@sveltejs/kit';;
+import type { RequestHandler } from './$types';
+import type { db  } from '$lib/server/db';
+import type { evidence  } from '$lib/server/db/schema-postgres';
+import type { asc  } from 'drizzle-orm';
+
+export const GET: RequestHandler = async () => {
+  try {
+    const rows = await db;
+      .select({
+        id: evidence.id,
+        caseId: evidence.caseId,
+        fileName: evidence.fileName,
+        type: evidence.evidenceType,
+        createdAt: evidence.dateCreated
+      })
+      .from(evidence)
+      .orderBy(asc(evidence.dateCreated))
+      .limit(500);
+
+    const nodes = rows.map((row) => ({
+      id: row.id,
+      label: row.fileName ?? row.id,
+      caseId: row.caseId,
+      timestamp: row.createdAt,
+      type: row.type ?? 'evidence'
+    }));
+
+    const links = [];
+    for (let i = 0; i < nodes.length - 1; i++) {
+      links.push({
+        source: nodes[i].id,
+        target: nodes[i + 1].id,
+        relation: 'NEXT_EVENT'
+      });
+    }
+
+    return json({ nodes, links });
+  } catch (error) {
+    console.error('Timeline graph query failed:', error);
+    return json(
+      {
+        nodes: [],
+        links: [],
+        error: 'Timeline data unavailable'
+      },
+      { status: 200 }
+    );
+  }
+};

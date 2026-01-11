@@ -38,7 +38,7 @@ let kagUpdateStatus = $state<string | null>(null);
 async function handleValidationComplete(valId: string, chunks: KBSearchResult[]) {
 	validationId = valId;
 	approvedChunks = chunks;
-	query = chunks[0]?.metadata.query || 'Unknown query';
+	query = chunks[0]?.metadata.query ?? 'Unknown query';
 	currentStep = 'answer';
 
 	console.log('✅ Validation complete:', { validationId, approvedCount: chunks.length });
@@ -111,8 +111,7 @@ function extractEntities(text: string): string[] {
 			matches.forEach((match) => entities.add(match));
 		}
 	});
-
-	// Capitalized words
+  
 	const capitalizedWords = text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g);
 	if (capitalizedWords) {
 		capitalizedWords.forEach((word) => {
@@ -167,7 +166,7 @@ function extractRelationships(
 					</p>
 				</div>
 				<button
-					onclick={resetWorkflow}
+					onclick={ resetWorkflow }
 					class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
 				>
 					🔄 Reset Workflow
@@ -256,7 +255,7 @@ function extractRelationships(
 						<div>
 							<h4 class="font-semibold mb-2">Answer Generation:</h4>
 							<ul class="text-sm space-y-1">
-								<li>✅ Answer Length: {generatedAnswer?.length || 0} chars</li>
+								<li>✅ Answer Length: {generatedAnswer?.length ?? 0} chars</li>
 								<li>✅ Citations: {citations.length} total</li>
 								<li>✅ Used Citations: {citations.filter(c => c.used_in_answer).length}</li>
 							</ul>
@@ -281,7 +280,7 @@ function extractRelationships(
 									← Back to Search
 								</button>
 								<button
-									onclick={resetWorkflow}
+									onclick={ resetWorkflow }
 									class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
 								>
 									🔄 Start New Workflow
@@ -297,8 +296,7 @@ function extractRelationships(
 
 <style>
 	.test-page {
-		min-height: 100vh;
-		background: #f9fafb;
+		min-height: 100vh; background: #f9fafb;
 	}
 
 	.header {
@@ -314,10 +312,8 @@ function extractRelationships(
 	.step {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		gap: 0.5rem;
-		opacity: 0.4;
-		transition: opacity 0.3s;
+		align-items: center; gap: 0.5rem;
+		opacity: 0.4; transition: opacity 0.3s;
 	}
 
 	.step.active,
@@ -326,34 +322,27 @@ function extractRelationships(
 	}
 
 	.step-number {
-		width: 48px;
-		height: 48px;
-		border-radius: 50%;
-		background: #e5e7eb;
-		color: #6b7280;
-		display: flex;
+		width: 48px; height: 48px;
+		border-radius: 50%; background: #e5e7eb;
+		color: #6b7280; display: flex;
 		align-items: center;
 		justify-content: center;
 		font-weight: bold;
-		font-size: 1.25rem;
-		transition: all 0.3s;
+		font-size: 1.25rem; transition: all 0.3s;
 	}
 
 	.step.active .step-number {
-		background: #3b82f6;
-		color: white;
+		background: #3b82f6; color: white;
 		box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
 	}
 
 	.step.completed .step-number {
-		background: #10b981;
-		color: white;
+		background: #10b981; color: white;
 	}
 
 	.step-label {
 		font-size: 0.875rem;
-		font-weight: 600;
-		color: #6b7280;
+		font-weight: 600; color: #6b7280;
 	}
 
 	.step.active .step-label {
@@ -361,15 +350,13 @@ function extractRelationships(
 	}
 
 	.step-arrow {
-		font-size: 1.5rem;
-		color: #d1d5db;
+		font-size: 1.5rem; color: #d1d5db;
 		margin: 0 1rem;
 	}
 
 	.step-content {
 		background: white;
-		border-radius: 12px;
-		padding: 2rem;
+		border-radius: 12px; padding: 2rem;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	}
 
@@ -377,3 +364,7 @@ function extractRelationships(
 		font-family: 'Courier New', monospace;
 	}
 </style>
+
+
+
+

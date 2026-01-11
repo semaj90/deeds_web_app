@@ -9,8 +9,7 @@
  description: 'Legal contract between parties A and B for service provision',
  tags: ['contract', 'agreement', 'services'],
  confidence: 0.85,
- metadata: {
- fileSize: '2.3 MB',
+ metadata: { fileSize: '2.3 MB',
  uploadDate: '2024-01-15',
  documentType: 'PDF'
  }
@@ -21,8 +20,7 @@
  description: 'Statement from witness regarding the incident',
  tags: ['witness', 'statement', 'testimony'],
  confidence: 0.72,
- metadata: {
- pages: 5,
+ metadata: { pages: 5,
  recordedBy: 'John Smith',
  dateOfStatement: '2024-01-10'
  }
@@ -32,8 +30,7 @@
  title: 'Email Correspondence',
  description: 'Chain of emails between involved parties',
  tags: ['email', 'communication', 'evidence'],
- metadata: {
- emailCount: 12,
+ metadata: { emailCount: 12,
  dateRange: '2024-01-01 to 2024-01-20',
  participants: ['alice@company.com', 'bob@company.com']
  }
@@ -94,3 +91,6 @@
  </div>
  </div>
 </div>
+
+
+

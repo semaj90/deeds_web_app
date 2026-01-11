@@ -67,11 +67,7 @@ export class ClientEmbeddingGemma {
  normalize?: boolean;
  maxLength?: number;
  } = {}
- ): Promise<{
- embeddings: number[][];
- model: string;
- dimension: number;
- count: number;
+ ): Promise<{ embeddings: number[][]; model: string; dimension: number; count: number;
  }> {
  if (!this.isInitialized || !this.session || !this.tokenizer) {
  await this.initialize();
@@ -97,11 +93,9 @@ export class ClientEmbeddingGemma {
 
  // Create tensors
  const inputIdsTensor = new ort.Tensor('int64', encoded.input_ids, [
- 1, encoded.input_ids.length,
- ]);
+ 1, encoded.input_ids.length]);
  const attentionMaskTensor = new ort.Tensor('int64', encoded.attention_mask, [
- 1, encoded.attention_mask.length,
- ]);
+ 1, encoded.attention_mask.length]);
 
  // Run inference
  const feeds = {
@@ -134,7 +128,7 @@ export class ClientEmbeddingGemma {
  return {
  embeddings,
  model: 'embeddinggemma_300m_onnx',
- dimension: embeddings[0]?.length || 0,
+ dimension: embeddings[0]?.length ?? 0,
  count: embeddings.length,
  };
  } catch (error) {
@@ -203,7 +197,7 @@ export class ClientEmbeddingGemma {
  maxLength: 512,
  quantization: 'FP16',
  size: '~291MB',
- providers: [], // this.session?.getProviders?.() || [],
+ providers: [], // this.session?.getProviders?.() ?? [],
  };
  }
 }/**
@@ -253,8 +247,7 @@ class SimpleTokenizer {
  }
 
  return {
- input_ids: new BigInt64Array(tokens.map((t) => BigInt(t))),
- attention_mask: attentionMask,
+ input_ids: new BigInt64Array(tokens.map((t) => BigInt(t), attention_mask: attentionMask,
  };
  }
 }
@@ -303,3 +296,7 @@ export function findSimilar(
 
  return similarities.sort((a, b) => b.similarity - a.similarity).slice(0, topK);
 }
+
+
+
+

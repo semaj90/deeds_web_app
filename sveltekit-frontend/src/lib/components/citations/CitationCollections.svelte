@@ -51,8 +51,7 @@
  const response = await fetch('/api/citations/collections', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- name: newCollectionName, color: newCollectionColor, newCollectionColor: newCollectionColor,
+ body: JSON.stringify({ name: newCollectionName, color: newCollectionColor, newCollectionColor,
  isPublic: false
  })
  });
@@ -76,7 +75,7 @@
  if (!confirm('Are you sure you want to delete this collection?')) return;
 
  try {
- const response = await fetch(`/api/citations/collections/${collectionId}`, {
+ const response = await fetch(`/api/citations/collections/${ collectionId }`, {
  method: 'DELETE'
  });
 
@@ -137,7 +136,7 @@
  </div>
 
  <div class="form-actions">
- <button onclick={handleCreateCollection} class="btn-primary">
+ <button onclick={ handleCreateCollection } class="btn-primary">
  Create Collection
  </button>
  <button onclick={() => (showCreateForm = false)} class="btn-secondary">
@@ -194,10 +193,8 @@
 
 <style>
  .citation-collections {
- background: var(--color-parchment);
- border: 1px solid var(--color-tan);
- border-radius: 8px;
- padding: 16px;
+ background: var(--color-parchment); border: 1px solid var(--color-tan);
+ border-radius: 8px; padding: 16px;
  }
 
  .collections-header {
@@ -208,52 +205,41 @@
  }
 
  .collections-header h3 {
- margin: 0;
- color: var(--color-burgundy);
+ margin: 0; color: var(--color-burgundy);
  font-size: 16px;
  }
 
  .btn-create {
  padding: 6px 12px;
- background: var(--color-burgundy);
- color: white;
+ background: var(--color-burgundy); color: white;
  border: none;
- border-radius: 4px;
- cursor: pointer;
+ border-radius: 4px; cursor: pointer;
  font-size: 13px;
- font-weight: 600;
- transition: all 150ms ease;
+ font-weight: 600; transition: all 150ms ease;
  }
 
- .btn-create:hover:not(:disabled) {
+ .btn-create:hover, not(disabled) {
  background: var(--color-dark-burgundy);
  }
 
  .btn-create:disabled {
- background: var(--color-light-gray);
- cursor: not-allowed;
+ background: var(--color-light-gray); cursor:not-allowed;
  }
 
  .create-form {
- background: white;
- border: 1px solid var(--color-tan);
- border-radius: 4px;
- padding: 12px;
- margin-bottom: 12px;
- display: flex;
- flex-direction: column;
- gap: 12px;
+ background: white; border: 1px solid var(--color-tan);
+ border-radius: 4px; padding: 12px;
+ margin-bottom: 12px; display: flex;
+ flex-direction: column; gap: 12px;
  }
 
  .form-group {
  display: flex;
- flex-direction: column;
- gap: 6px;
+ flex-direction: column; gap: 6px;
  }
 
  .form-group label {
- font-weight: 600;
- color: var(--color-burgundy);
+ font-weight: 600; color: var(--color-burgundy);
  font-size: 13px;
  }
 
@@ -271,17 +257,14 @@
  }
 
  .color-picker {
- display: flex;
- gap: 8px;
+ display: flex; gap: 8px;
  flex-wrap: wrap;
  }
 
  .color-option {
- width: 32px;
- height: 32px;
+ width: 32px; height: 32px;
  border: 2px solid transparent;
- border-radius: 4px;
- cursor: pointer;
+ border-radius: 4px; cursor: pointer;
  transition: all 150ms ease;
  }
 
@@ -295,25 +278,21 @@
  }
 
  .form-actions {
- display: flex;
- gap: 8px;
+ display: flex; gap: 8px;
  }
 
  .btn-primary,
  .btn-secondary {
- flex: 1;
- padding: 8px 12px;
+ flex: 1; padding: 8px 12px;
  border: none;
  border-radius: 4px;
  font-size: 13px;
- font-weight: 600;
- cursor: pointer;
+ font-weight: 600; cursor: pointer;
  transition: all 150ms ease;
  }
 
  .btn-primary {
- background: var(--color-burgundy);
- color: white;
+ background: var(--color-burgundy); color: white;
  }
 
  .btn-primary:hover {
@@ -321,8 +300,7 @@
  }
 
  .btn-secondary {
- background: var(--color-light-gray);
- color: var(--color-dark);
+ background: var(--color-light-gray); color: var(--color-dark);
  }
 
  .btn-secondary:hover {
@@ -330,10 +308,8 @@
  }
 
  .error-message {
- background: #fee;
- border: 1px solid #fcc;
- border-radius: 4px;
- padding: 8px 12px;
+ background: #fee; border: 1px solid #fcc;
+ border-radius: 4px; padding: 8px 12px;
  color: #c33;
  font-size: 13px;
  margin-bottom: 12px;
@@ -341,35 +317,28 @@
 
  .loading,
  .empty-state {
- text-align: center;
- padding: 20px;
+ text-align: center; padding: 20px;
  color: var(--color-medium-gray);
  font-size: 13px;
  }
 
  .collections-list {
  display: flex;
- flex-direction: column;
- gap: 8px;
+ flex-direction: column; gap: 8px;
  }
 
  .collection-item {
- display: flex;
- gap: 8px;
+ display: flex; gap: 8px;
  align-items: center;
  }
 
  .collection-button {
- flex: 1;
- display: flex;
+ flex: 1; display: flex;
  gap: 12px;
- align-items: center;
- background: white;
+ align-items: center; background: white;
  border: 1px solid var(--color-tan);
- border-radius: 4px;
- padding: 10px 12px;
- cursor: pointer;
- transition: all 150ms ease;
+ border-radius: 4px; padding: 10px 12px;
+ cursor: pointer; transition: all 150ms ease;
  text-align: left;
  }
 
@@ -379,8 +348,7 @@
  }
 
  .collection-color {
- width: 24px;
- height: 24px;
+ width: 24px; height: 24px;
  border-radius: 4px;
  flex-shrink: 0;
  }
@@ -392,11 +360,9 @@
 
  .collection-name {
  margin: 0;
- font-weight: 600;
- color: var(--color-dark);
+ font-weight: 600; color: var(--color-dark);
  font-size: 13px;
- white-space: nowrap;
- overflow: hidden;
+ white-space: nowrap; overflow: hidden;
  text-overflow: ellipsis;
  }
 
@@ -407,16 +373,17 @@
  }
 
  .btn-delete {
- background: none;
- border: none;
+ background: none; border: none;
  cursor: pointer;
- font-size: 14px;
- padding: 4px;
- opacity: 0.6;
- transition: opacity 150ms ease;
+ font-size: 14px; padding: 4px;
+ opacity: 0.6; transition: opacity 150ms ease;
  }
 
  .btn-delete:hover {
  opacity: 1;
  }
 </style>
+
+
+
+

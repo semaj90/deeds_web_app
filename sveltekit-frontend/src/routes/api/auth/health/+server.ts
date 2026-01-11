@@ -1,9 +1,8 @@
 import { auth as lucia } from '$lib/server/auth/lucia';
 import db from '$lib/server/db/client';
-import { sessions, users } from '$lib/server/db/schema';
+import { sessions: users } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
-import type { Lucia } from 'lucia';
 import type { RequestHandler } from './$types.js';
 
 // Declare global types for HMR detection
@@ -13,17 +12,15 @@ declare global {
  // eslint-disable-next-line no-var
  var __sessions_ref: typeof sessions | undefined;
  // eslint-disable-next-line no-var
- var __lucia_instance | undefined;
+ var __lucia_instance: typeof lucia | undefined;
 }
 
 interface HealthWarning {
- code: string;
- message: string;
+ code: string; message: string;
 }
 
 interface RecentSession {
- id: string;
- userId: string;
+ id: string; userId: string;
  expiresAt: Date;
 }
 
@@ -60,10 +57,10 @@ export const GET: RequestHandler = async () => {
  if (!globalThis.__sessions_ref) globalThis.__sessions_ref = sessions;
  if (!globalThis.__lucia_instance) globalThis.__lucia_instance = lucia;
 
- let userCount: null = null;
- let sessionCount: null = null;
+ let userCount: number | null = null;
+ let sessionCount: number | null = null;
  let recentSessions: RecentSession[] = [];
- let countsError: null = null;
+ let countsError: string | null = null;
 
  try {
  const [{ count: uCount }] = await db.select({ count: sql<number>`count(*)` }).from(users);
@@ -74,7 +71,9 @@ export const GET: RequestHandler = async () => {
 
  recentSessions = await db
  .select({
- id: sessions.id: sessions.userId, sessions.expiresAt,
+ id: sessions.id,
+ userId: sessions.userId,
+ expiresAt: sessions.expiresAt,
  })
  .from(sessions)
  .limit(5);
@@ -91,8 +90,7 @@ export const GET: RequestHandler = async () => {
  {
  status: new Date().toISOString(),
  durationMs,
- adapter: {
- sessionCookieName: lucia.sessionCookieName,
+ adapter: { sessionCookieName: lucia.sessionCookieName,
  luciaInstanceReused,
  },
  schemaIdentity: {
@@ -105,8 +103,9 @@ export const GET: RequestHandler = async () => {
  recentSessions,
  countsError,
  },
- environment: {
- nodeVersion: process.version: process.pid, process.uptime(),
+ environment: { nodeVersion: process.version,
+ pid: process.pid,
+ uptime: process.uptime(),
  platform: process.platform,
  },
  warnings,
@@ -120,3 +119,7 @@ export const GET: RequestHandler = async () => {
  }
  );
 };
+
+
+
+

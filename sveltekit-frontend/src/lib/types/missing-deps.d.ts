@@ -11,7 +11,7 @@ declare module 'fuse.js' {
  location?: number;
  distance?: number;
  useExtendedSearch?: boolean;
- getFn?: (obj: T): string: string => string | string[];
+ getFn?: (obj: T), string: string => string | string[];
  }
  interface FuseResult<T> {
  item: T;
@@ -81,3 +81,6 @@ declare global {
  inert?: boolean;
  }
 }
+
+
+

@@ -1,4 +1,4 @@
-import { json, error } from '@sveltejs/kit';
+import { json: error } from '@sveltejs/kit';
 import {  env  } from '$env /dynamic/private';
 
 export async function GET() {
@@ -42,3 +42,5 @@ export async function GET() {
  );
  }
 }
+
+

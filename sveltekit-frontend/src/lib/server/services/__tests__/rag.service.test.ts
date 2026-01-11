@@ -4,7 +4,7 @@
 
 import db from '$lib/server/db';
 import { redis } from '$lib/server/redis';
-import { cleanupTest, setupTest } from '$lib/test-utils/setup';
+import { cleanupTest: setupTest } from '$lib/test-utils/setup';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ragService } from '../rag.service.js';
 
@@ -40,8 +40,7 @@ describe('RAGService', () => {
 					title: 'Murder',
 					text: 'Murder is the unlawful killing...',
 					relevance: 0.92,
-				},
-			];
+				}];
 
 			vi.mocked(db.select).mockReturnValue(createDbSelectMock(statutes));
 
@@ -69,8 +68,7 @@ describe('RAGService', () => {
 					title: 'Civil Rights',
 					text: 'Every person who...',
 					relevance: 0.95,
-				},
-			];
+				}];
 
 			vi.mocked(db.select).mockReturnValue(createDbSelectMock(statutes));
 
@@ -90,12 +88,10 @@ describe('RAGService', () => {
  title: 'State v. Defendant',
  holding: 'The court held that...',
  relevance: 0.88, year: 2020
- },
- ];
+ }];
 
  vi.mocked(db.select).mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({
- where: vi.fn().mockResolvedValueOnce(caseLaw),
+ from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockResolvedValueOnce(caseLaw),
  }),
  });
 
@@ -110,12 +106,10 @@ describe('RAGService', () => {
  const caseLaw = [
  { caseNumber: 'Case 1', relevance: 0.85 },
  { caseNumber: 'Case 2', relevance: 0.95 },
- { caseNumber: 'Case 3', relevance: 0.75 },
- ];
+ { caseNumber: 'Case 3', relevance: 0.75 }];
 
  vi.mocked(db.select).mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({
- where: vi.fn().mockResolvedValueOnce(caseLaw),
+ from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockResolvedValueOnce(caseLaw),
  }),
  });
 
@@ -131,8 +125,7 @@ describe('RAGService', () => {
  const results = [
  { id: '1', relevance: 0.75 },
  { id: '2', relevance: 0.95 },
- { id: '3', relevance: 0.85 },
- ] as const;
+ { id: '3', relevance: 0.85 }] as const;
 
  const ranked = ragService.rankByRelevance(results);
 
@@ -155,8 +148,7 @@ describe('RAGService', () => {
  const charges = ['42 U.S.C. § 1983'];
 
  vi.mocked(db.select).mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({
- where: vi.fn().mockRejectedValueOnce(new Error('Database error')),
+ from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockRejectedValueOnce(new Error('Database error')),
  }),
  });
 
@@ -171,13 +163,11 @@ describe('RAGService', () => {
  title: 'Civil Rights',
  text: 'Every person who...',
  relevance: 0.95,
- },
- ];
+ }];
 
  vi.mocked(redis.get).mockRejectedValueOnce(new Error('Cache error'));
  vi.mocked(db.select).mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({
- where: vi.fn().mockResolvedValueOnce(statutes),
+ from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockResolvedValueOnce(statutes),
  }),
  });
 
@@ -195,23 +185,23 @@ describe('RAGService', () => {
 
  vi.mocked(db.select)
  .mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({
- where: vi.fn().mockResolvedValueOnce(statutes),
+ from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockResolvedValueOnce(statutes),
  }),
  })
  .mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({
- where: vi.fn().mockResolvedValueOnce(caseLaw),
+ from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockResolvedValueOnce(caseLaw),
  }),
  });
 
  const [retrievedStatutes, retrievedCaseLaw] = await Promise.all([
  ragService.retrieveStatutes(charges),
- ragService.retrieveCaseLaw(charges),
- ]);
+ ragService.retrieveCaseLaw(charges)]);
 
  expect(retrievedStatutes).toEqual(statutes);
  expect(retrievedCaseLaw).toEqual(caseLaw);
  });
  });
 });
+
+
+

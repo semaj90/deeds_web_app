@@ -1,4 +1,4 @@
-import type { test, expect  } from '@playwright/test';
+import type { expect, test } from '@playwright/test';
 
 /**
  * Simple UX Tests for Enhanced-Bits Components
@@ -125,7 +125,7 @@ test.describe('Enhanced-Bits UX Tests (Dev Server)', () => {
 
   test('Responsive Design - Mobile Layout', async ({ page }) => {
     // Set mobile viewport
-    await page.setViewportSize({ width: 375: height, 667: 667 });
+    await page.setViewportSize({ width: 375, height: 667 });
 
     await page.goto(`${baseURL}/demo/case-scoring`);
 

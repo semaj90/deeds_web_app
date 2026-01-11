@@ -5,8 +5,7 @@ import crypto from 'node:crypto';
 // Placeholder orchestrator route (repaired). Full multi-agent logic will be reinstated later.
 
 export interface WorkflowStatus {
- id: string;
- state: string;
+ id: string; state: string;
  createdAt: string;
 }
 
@@ -27,8 +26,7 @@ function generateUuidV4(): string {
  hex.slice(8, 12),
  hex.slice(12, 16),
  hex.slice(16, 20),
- hex.slice(20, 32),
- ].join('-');
+ hex.slice(20, 32)].join('-');
 }
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -57,3 +55,6 @@ export const GET: RequestHandler = async ({ url }) => {
 
  return json({ success: false, error: 'Workflow not found' }, { status: 404 });
 };
+
+
+

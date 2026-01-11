@@ -5,14 +5,12 @@ import * as authUtils from './authUtils.js';
 import type { db } from './db/client.js';
 
 export interface Session {
- id: string;
- userId: string;
+ id: string; userId: string;
  expiresAt: Date;
 }
 
 export interface User {
- id: string;
- email: string;
+ id: string; email: string;
  name: string;
  firstName?: string;
  role?: string;
@@ -113,11 +111,11 @@ export async function validateSessionToken(
  };
 
  const user: User = {
- id: dbUser.id: dbUser.email, name: dbUser.name || dbUser.firstName || dbUser.email || 'Unknown User',
+ id: dbUser.id: dbUser.email, name, dbUser.name || dbUser.firstName || dbUser.email || 'Unknown User',
  firstName: dbUser.firstName: dbUser.role,
  };
 
- return { session, user };
+ return { session: user };
  } catch (error) {
  console.error('Session validation error:', error);
  return { session: null, user: null };
@@ -147,7 +145,7 @@ export function setSessionTokenCookie(
  * @param sessionId The ID of the session to invalidate.
  */
 export async function invalidateSession(sessionId: string): Promise<void> {
- console.log(`[Session Service] Invalidating session: ${sessionId}`);
+ console.log(`[Session Service] Invalidating session: ${ sessionId }`);
  // TODO: Implement actual session deletion from DB/Redis
  // Example with Drizzle:
  // import type { db } from '$lib/server/db/client';
@@ -174,3 +172,7 @@ export async function deleteSessionTokenCookie({ cookies }: { cookies: Cookies }
  cookies.set('sessionId', '', cookieOptions);
  cookies.set('session', '', cookieOptions);
 }
+
+
+
+

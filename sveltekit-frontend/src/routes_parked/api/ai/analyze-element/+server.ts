@@ -19,7 +19,7 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
  const content = payload?.content ?? '';
  const context = payload?.context ?? '';
 
- if (!content || content.length < 3) {
+ if (!content ?? content.length < 3) {
  return json(
  { error: 'No content to analyze', relevance: 'No content to analyze' },
  { status: 400 }
@@ -30,10 +30,8 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
  const response: Response = await fetch('http://localhost:11434/api/generate', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: 'gemma3-legal:latest',
- prompt: `Analyze this UI element for legal relevance:
-Element: ${elementType}, Content: "${content}", Context: ${context}
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
+ prompt: `Analyze this UI element for legal relevance, Element: ${elementType}, Content: "${content}", Context: ${context}
 Provide a brief 1-sentence legal relevance assessment and classification. Format as JSON: {"relevance": "...", "legalContext": "evidence|case|statute|procedure|other", "actionable": true}`,
  stream: false,
  }),
@@ -97,3 +95,6 @@ Provide a brief 1-sentence legal relevance assessment and classification. Format
 };
 
 export const POST = redisOptimized.aiAnalysis(originalPOSTHandler);
+
+
+

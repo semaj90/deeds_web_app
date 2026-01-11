@@ -18,8 +18,7 @@
  { name: 'Upload Tools', href: '/tools/upload', icon: 'â¬†ï¸' },
  { name: 'Cache Manager', href: '/tools/cache', icon: 'ðŸ’¾' },
  { name: 'Brain Interface', href: '/tools/brain', icon: 'ðŸ§ ' },
- { name: 'Detective Tools', href: '/tools/detective', icon: 'ðŸ•µï¸' },
- ];
+ { name: 'Detective Tools', href: '/tools/detective', icon: 'ðŸ•µï¸' }];
 </script>
 
 <div class="tools-layout">
@@ -78,10 +77,8 @@
 
 <style>
  .tools-layout {
- min-height: 100vh;
- display: flex;
- flex-direction: column;
- background: var(--nier-bg-primary, #0a0a0a);
+ min-height: 100vh; display: flex;
+ flex-direction: column; background: var(--nier-bg-primary, #0a0a0a);
  color: var(--nier-text-primary, #f0f0f0);
  }
 
@@ -94,8 +91,7 @@
 
  .tools-brand {
  display: flex;
- align-items: center;
- gap: 1rem;
+ align-items: center; gap: 1rem;
  margin-bottom: 1rem;
  }
 
@@ -105,8 +101,7 @@
 
  .tools-title {
  font-size: 1.5rem;
- font-weight: bold;
- color: var(--nier-accent-cool, #87ceeb);
+ font-weight: bold; color: var(--nier-accent-cool, #87ceeb);
  margin: 0;
  }
 
@@ -122,19 +117,16 @@
  /* Navigation */
  .tools-nav {
  display: flex;
- flex-wrap: wrap;
- gap: 0.5rem;
+ flex-wrap: wrap; gap: 0.5rem;
  }
 
  .tools-nav-item {
  display: flex;
- align-items: center;
- gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  padding: 0.5rem 1rem;
  border: 1px solid var(--nier-border-primary, #333);
  border-radius: 0.5rem;
- text-decoration: none;
- color: var(--nier-text-secondary, #ccc);
+ text-decoration: none; color: var(--nier-text-secondary, #ccc);
  background: var(--nier-bg-primary, #0a0a0a);
  transition: all 0.2s ease;
  }
@@ -163,20 +155,17 @@
  /* Content */
  .tools-content {
  flex: 1;
- overflow-y: auto;
- background: var(--nier-bg-primary, #0a0a0a);
+ overflow-y: auto; background: var(--nier-bg-primary, #0a0a0a);
  }
 
  .tools-container {
- max-width: 1400px;
- margin: 0 auto;
+ max-width: 1400px; margin: 0 auto;
  padding: 2rem;
  min-height: 100%;
  }
 
  .tools-placeholder {
- text-align: center;
- padding: 4rem 2rem;
+ text-align: center; padding: 4rem 2rem;
  background: var(--nier-bg-secondary, #1a1a1a);
  border: 2px dashed var(--nier-border-muted, #444);
  border-radius: 1rem;
@@ -195,20 +184,16 @@
  }
 
  .tools-footer-content {
- max-width: 1400px;
- margin: 0 auto;
+ max-width: 1400px; margin: 0 auto;
  display: flex;
  justify-content: space-betweennn;
- align-items: center;
- gap: 2rem;
+ align-items: center; gap: 2rem;
  }
 
  .tools-info {
  display: flex;
- align-items: center;
- gap: 1rem;
- font-size: 0.9rem;
- color: var(--nier-text-muted, #999);
+ align-items: center; gap: 1rem;
+ font-size: 0.9rem; color: var(--nier-text-muted, #999);
  }
 
  .tools-current strong {
@@ -217,16 +202,14 @@
  }
 
  .tools-controls {
- display: flex;
- gap: 1rem;
+ display: flex; gap: 1rem;
  }
 
  .tools-main-btn {
  padding: 0.5rem 1rem;
  border: 1px solid var(--nier-border-primary, #333);
  border-radius: 0.5rem;
- text-decoration: none;
- color: var(--nier-text-primary, #f0f0f0);
+ text-decoration: none; color: var(--nier-text-primary, #f0f0f0);
  background: var(--nier-bg-primary, #0a0a0a);
  transition: all 0.2s ease;
  font-size: 0.9rem;
@@ -245,8 +228,7 @@
 
  .tools-footer-content {
  flex-direction: column;
- text-align: center;
- gap: 1rem;
+ text-align: center; gap: 1rem;
  }
 
  .tools-nav {
@@ -272,3 +254,6 @@
  background: var(--nier-accent-warm, #d4af37);
  }
 </style>
+
+
+

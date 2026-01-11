@@ -1,15 +1,19 @@
 <script lang="ts">
- // Truncated file - replaced with stub
+  // Replaced melt with bits-ui components
+  import { setContext } from 'svelte';
+  interface Props {
+    children?: import('svelte').Snippet;
+  }
+  let { children }: Props = $props();
+  // Create the context menu and set it in context for child components
+  const contextMenu = createContextMenu();
+  setContext('contextMenu', contextMenu);
+  const { elements } = contextMenu;
+  const { trigger } = element;
 </script>
 
-<main class="page-repair">
- <h1>Page under reconstruction</h1>
- <p>This placeholder replaces corrupted or missing markup for now.</p>
-</main>
+<div>
+  {@render children?.()}
+</div>
 
-<style>
- .page-repair {
- padding: 2rem;
- font-family: sans-serif;
- }
-</style>
+

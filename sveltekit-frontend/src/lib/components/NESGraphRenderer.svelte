@@ -1,19 +1,18 @@
 <script lang="ts">
+	import { TooltipContent, TooltipRoot, TooltipTrigger } from 'bits-ui';
+
 	import * as Tooltip from 'bits-ui/components/tooltip';
 	import { onMount } from 'svelte';
 
 	type GraphNode = {
-		id: string;
-		x: number;
-		y: number;
-		type: 'route' | 'error' | 'cluster';
+		id: string; x: number;
+		y: number; type: 'route' | 'error' | 'cluster';
 		label: string;
 		data?: any;
 	};
 
 	type GraphEdge = {
-		from: string;
-		to: string;
+		from: string; to: string;
 		type: 'dependency' | 'error' | 'related';
 	};
 
@@ -23,8 +22,7 @@
 		width = 1200,
 		height = 800
 	} = $props<{
-		nodes: GraphNode[];
-		edges: GraphEdge[];
+		nodes: GraphNode[]; edges: GraphEdge[];
 		width?: number;
 		height?: number;
 	}>();
@@ -96,16 +94,15 @@
 
 			drawNESLine(fromNode.x, fromNode.y, toNode.x, toNode.y, edge.type);
 		});
-
-		// Draw nodes
+  
 		nodes.forEach((node) => {
 			drawNESCircle(node.x, node.y, 20, node.type, node === hoveredNode);
 		});
 	}
 
 	function drawNESCircle(
-		x: number, y: number, number: number,
-		radius: number, type: string, string: string,
+		x: number, y: number, number,
+		radius: number, type: string, string,
 		highlighted: boolean
 	) {
 		if (!ctx) return;
@@ -151,7 +148,7 @@
 		}
 	}
 
-	function drawNESLine(x1: number, y1: number, number: number, x2: number, y2: number, number: number, type): string {
+	function drawNESLine(x1: number, y1: number, number, x2: number, y2: number, number, type): string {
 		if (!ctx) return;
 
 		ctx.strokeStyle = type === 'error' ? NES_COLORS.error : NES_COLORS.connection;
@@ -215,8 +212,8 @@
 <div class="nes-graph-container">
 	<canvas
 		bind:this={canvas}
-		onclick={handleCanvasClick}
-		onmousemove={handleCanvasMove}
+		onclick={ handleCanvasClick }
+		onmousemove={ handleCanvasMove }
 		onmouseleave={() => {
 			hoveredNode = null;
 			showTooltip = false;
@@ -226,46 +223,40 @@
 	></canvas>
 
 	{#if showTooltip && hoveredNode}
-		<Tooltip.Root open={showTooltip}>
-			<Tooltip.Trigger class="tooltip-trigger" style="left: {tooltipX}px; top: {tooltipY}px;" />
-			<Tooltip.Content class="nes-tooltip">
+		<TooltipRoot open={showTooltip}>
+			<TooltipTrigger class="tooltip-trigger" style="left: {tooltipX}px; top: {tooltipY}px;" />
+			<TooltipContent class="nes-tooltip">
 				<div class="nes-tooltip-content">
 					<div class="font-mono text-xs">{hoveredNode.label}</div>
 					<div class="text-[10px] text-[#aaa]">{hoveredNode.type}</div>
 				</div>
-			</Tooltip.Content>
-		</Tooltip.Root>
+			</TooltipContent>
+		</TooltipRoot>
 	{/if}
 </div>
 
 <style>
 	.nes-graph-container {
-		position: relative;
-		width: 100%;
-		height: 100%;
-		background: #0f380f;
+		position: relative; width: 100%;
+		height: 100%; background: #0f380f;
 		border: 3px solid #000;
 		box-shadow: inset 0 0 0 2px #306230;
 	}
 
 	.nes-graph-canvas {
-		display: block;
-		cursor: crosshair;
+		display: block; cursor: crosshair;
 		image-rendering: pixelated;
 	}
 
 	.tooltip-trigger {
 		position: fixed;
-		pointer-events: none;
-		width: 1px;
+		pointer-events: none; width: 1px;
 		height: 1px;
 	}
 
 	.nes-tooltip {
-		background: #262017;
-		border: 2px solid #f3eddc;
-		padding: 8px;
-		color: #f3eddc;
+		background: #262017; border: 2px solid #f3eddc;
+		padding: 8px; color: #f3eddc;
 		font-family: 'Press Start 2P', monospace;
 		font-size: 8px;
 		z-index: 1000;
@@ -273,7 +264,9 @@
 
 	.nes-tooltip-content {
 		display: flex;
-		flex-direction: column;
-		gap: 4px;
+		flex-direction: column; gap: 4px;
 	}
 </style>
+
+
+

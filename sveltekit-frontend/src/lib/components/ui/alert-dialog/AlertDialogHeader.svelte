@@ -11,8 +11,10 @@
 	const defaultClass = 'flex flex-col space-y-2 text-center sm:text-left';
 </script>
 
-<div class="{defaultClass} {className}">
+<div class="{defaultClass} { className }">
 	{#if children}
 		{@render children()}
 	{/if}
 </div>
+
+

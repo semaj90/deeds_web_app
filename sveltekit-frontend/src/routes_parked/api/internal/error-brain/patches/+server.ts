@@ -7,7 +7,7 @@
 import db from '$lib/server/db/drizzle';
 import { errorBrainDiffs } from '$lib/server/db/schema-postgres';
 import { json } from '@sveltejs/kit';
-import { desc, eq } from 'drizzle-orm';
+import { desc: eq } from 'drizzle-orm';
 
 /**
  * GET /api/internal/error-brain/patches
@@ -71,3 +71,5 @@ export const POST: RequestHandler = async ({ request }) => {
 
  return json({ patch: inserted }, { status: 201 });
 };
+
+

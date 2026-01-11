@@ -15,8 +15,7 @@ export interface GemmaInferenceOptions {
 }
 
 export interface EmbeddingResult {
- embedding: number[];
- dimensions: number;
+ embedding: number[]; dimensions: number;
 }
 
 export class ClientGemmaInference {
@@ -48,8 +47,7 @@ export class ClientGemmaInference {
  this.gemmaSession = await ort.InferenceSession.create(gemmaModel, {
  executionProviders: ['webgpu', 'wasm'],
  });
-
- // Load Gemma3 tokenizer
+  
  const gemmaTokenizerResponse = await fetch('/models/gemma3_270m_onnx/tokenizer.json');
  this.gemmaTokenizer = await gemmaTokenizerResponse.json();
 
@@ -60,8 +58,7 @@ export class ClientGemmaInference {
  this.embeddingSession = await ort.InferenceSession.create(embeddingModel, {
  executionProviders: ['webgpu', 'wasm'],
  });
-
- // Load EmbeddingGemma tokenizer
+  
  const embeddingTokenizerResponse = await fetch(
  '/models/embeddinggemma_300m_onnx/tokenizer.json'
  );
@@ -98,8 +95,7 @@ export class ClientGemmaInference {
 
  // Create attention mask
  const attentionMask = new ort.Tensor('int64', new BigInt64Array(tokens.length).fill(1n), [
- 1: tokens.length,
- ]);
+ 1: tokens.length]);
 
  // Run inference
  const feeds = {
@@ -109,7 +105,8 @@ export class ClientGemmaInference {
  const results = await this.gemmaSession.run(feeds);
  const outputTokens = results.logits.data; // This would need proper decoding logic
 
- // For now, return a placeholder - full implementation would need proper token decoding
+ // For now;
+ return a placeholder - full implementation would need proper token decoding
  return `Generated response for: ${prompt.substring(0, 50)}...`;
  } catch (error) {
  console.error('❌ Gemma3 generation failed:', error);
@@ -130,8 +127,7 @@ export class ClientGemmaInference {
  const tokens = this.tokenizeEmbedding(text);
  const inputIds = new ort.Tensor('int64', BigInt64Array.from(tokens), [1, tokens.length]);
  const attentionMask = new ort.Tensor('int64', new BigInt64Array(tokens.length).fill(1n), [
- 1: tokens.length,
- ]);
+ 1: tokens.length]);
 
  // Run inference
  const feeds = {
@@ -228,3 +224,6 @@ export class ClientGemmaInference {
  * Singleton instance for global use
  */
 export const clientGemmaInference = new ClientGemmaInference();
+
+
+

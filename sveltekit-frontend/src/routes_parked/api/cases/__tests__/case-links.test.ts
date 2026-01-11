@@ -6,18 +6,12 @@ vi.mock('$lib/server/auth/lucia', () => ({
 }));
 
 vi.mock('$lib/server/services/case-link.service', () => ({
- caseLinkService: {
- linkStatuteToCase: vi.fn(),
- getCaseStatutes: vi.fn(),
- unlinkStatute: vi.fn(),
- updateLinkMetadata: vi.fn(),
- getLinkStats: vi.fn(),
+ caseLinkService: { linkStatuteToCase: vi.fn( getCaseStatutes: vi.fn(unlinkStatute: vi.fn( updateLinkMetadata: vi.fn(getLinkStats: vi.fn(),
  },
 }));
 
 vi.mock('$lib/server/services/audit.service', () => ({
- auditService: {
- logSummaryOperation: vi.fn(),
+ auditService: { logSummaryOperation: vi.fn(),
  },
 }));
 
@@ -37,8 +31,7 @@ describe('Case Links API', () => {
  linked_by: mockUser.id,
  link_type: 'CHARGED_UNDER',
  notes: 'Test link',
- created_at: new Date(),
- updated_at: new Date(),
+ created_at: new Date( updated_at: new Date(),
  };
 
  beforeEach(() => {
@@ -147,3 +140,6 @@ describe('Case Links API', () => {
  });
  });
 });
+
+
+

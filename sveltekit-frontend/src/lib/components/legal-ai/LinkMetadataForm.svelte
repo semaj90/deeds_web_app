@@ -2,12 +2,9 @@
 	import { createEventDispatcher } from 'svelte';
 
 	interface Link {
-		id: string;
-		case_id: string;
-		statute_code: string;
-		link_type: string;
-		notes?: string;
-		created_at: string;
+		id: string; case_id: string;
+		statute_code: string; link_type: string;
+		notes?: string; created_at: string;
 		updated_at: string;
 	}
 
@@ -50,8 +47,7 @@
 				{
 					method: 'PUT',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						link_type: editedLinkType, notes: editedNotes, editedNotes: editedNotes || undefined,
+					body: JSON.stringify({ link_type: editedLinkType, notes: editedNotes, editedNotes, editedNotes || undefined,
 					}),
 				}
 			);
@@ -89,7 +85,7 @@
 				<label for="link-type">Link Type</label>
 				<select id="link-type" bind:value={editedLinkType} disabled={isSaving}>
 					{#each linkTypes as type}
-						<option value={type}>{type}</option>
+						<option value={ type }>{ type }</option>
 					{/each}
 				</select>
 			</div>
@@ -109,7 +105,7 @@
 				<button class="btn-save" onclick={saveChanges} disabled={isSaving}>
 					{isSaving ? 'Saving...' : 'Save'}
 				</button>
-				<button class="btn-cancel" onclick={cancelEdit} disabled={isSaving}>
+				<button class="btn-cancel" onclick={ cancelEdit } disabled={isSaving}>
 					Cancel
 				</button>
 			</div>
@@ -146,16 +142,13 @@
 <style>
 	.link-metadata-form {
 		display: flex;
-		flex-direction: column;
-		gap: 1rem;
+		flex-direction: column; gap: 1rem;
 	}
 
 	.error-message {
 		padding: 1rem;
-		background-color: #ffe6e6;
-		border: 1px solid #ff6b6b;
-		border-radius: 4px;
-		color: #c92a2a;
+		background-color: #ffe6e6; border: 1px solid #ff6b6b;
+		border-radius: 4px; color: #c92a2a;
 	}
 
 	.error-message p {
@@ -165,30 +158,25 @@
 
 	.form-content {
 		display: flex;
-		flex-direction: column;
-		gap: 1rem;
+		flex-direction: column; gap: 1rem;
 	}
 
 	.form-group {
 		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
+		flex-direction: column; gap: 0.5rem;
 	}
 
 	.form-group label {
-		font-weight: 600;
-		color: #2c2c2c;
+		font-weight: 600; color: #2c2c2c;
 		font-size: 0.9rem;
 	}
 
 	.form-group select,
 	.form-group textarea {
-		padding: 0.75rem;
-		border: 1px solid #d4a574;
+		padding: 0.75rem; border: 1px solid #d4a574;
 		border-radius: 4px;
 		font-family: 'Source Sans 3', sans-serif;
-		font-size: 0.95rem;
-		transition: all 0.2s;
+		font-size: 0.95rem; transition: all 0.2s;
 	}
 
 	.form-group select:focus,
@@ -200,8 +188,7 @@
 
 	.form-group select:disabled,
 	.form-group textarea:disabled {
-		background-color: #f0ebe0;
-		color: #999;
+		background-color: #f0ebe0; color: #999;
 	}
 
 	.form-group textarea {
@@ -209,8 +196,7 @@
 	}
 
 	.form-actions {
-		display: flex;
-		gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 	}
 
 	.btn-save,
@@ -218,68 +204,57 @@
 		padding: 0.5rem 1rem;
 		border: none;
 		border-radius: 4px;
-		font-weight: 500;
-		cursor: pointer;
+		font-weight: 500; cursor: pointer;
 		transition: all 0.2s;
 	}
 
 	.btn-save {
-		background-color: #8b4513;
-		color: #f5f1e8;
+		background-color: #8b4513; color: #f5f1e8;
 	}
 
-	.btn-save:hover:not(:disabled) {
+	.btn-save:hover, not(disabled) {
 		background-color: #a0522d;
 	}
 
 	.btn-cancel {
-		background-color: #e0d5c7;
-		color: #2c2c2c;
+		background-color: #e0d5c7; color: #2c2c2c;
 	}
 
-	.btn-cancel:hover:not(:disabled) {
+	.btn-cancel:hover, not(disabled) {
 		background-color: #d4a574;
 	}
 
 	.btn-save:disabled,
 	.btn-cancel:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
+		opacity: 0.6; cursor:not-allowed;
 	}
 
 	.display-content {
 		display: flex;
-		flex-direction: column;
-		gap: 1rem;
+		flex-direction: column; gap: 1rem;
 	}
 
 	.metadata-item {
-		display: flex;
-		gap: 1rem;
+		display: flex; gap: 1rem;
 		padding: 0.75rem;
 		background-color: #f5f1e8;
 		border-radius: 4px;
 	}
 
 	.label {
-		font-weight: 600;
-		color: #666;
+		font-weight: 600; color: #666;
 		min-width: 100px;
 	}
 
 	.value {
-		color: #333;
-		flex: 1;
+		color: #333; flex: 1;
 	}
 
 	.btn-edit {
-		align-self: flex-start;
-		padding: 0.5rem 1rem;
-		background-color: #e0d5c7;
-		border: 1px solid #d4a574;
+		align-self: flex-start; padding: 0.5rem 1rem;
+		background-color: #e0d5c7; border: 1px solid #d4a574;
 		border-radius: 4px;
-		font-size: 0.9rem;
-		cursor: pointer;
+		font-size: 0.9rem; cursor: pointer;
 		transition: all 0.2s;
 	}
 
@@ -287,3 +262,7 @@
 		background-color: #d4a574;
 	}
 </style>
+
+
+
+

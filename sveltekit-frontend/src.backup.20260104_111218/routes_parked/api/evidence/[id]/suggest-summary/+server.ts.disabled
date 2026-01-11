@@ -1,0 +1,107 @@
+/**
+ * AI Summary Suggestion API
+ * Generates holding, reasoning, and citations using Gemma
+ * Prosecutor reviews before approval
+ */
+
+import { json, type RequestHandler } from '@sveltejs/kit';
+import { getUser } from '$lib/server/auth/lucia';
+import { db } from '$lib/server/db';
+import { wardenEvidence, wardenChunks, wardenEvidenceSummaries, wardenAuditLog } from '$lib/server/db/warden-schema';
+import { eq } from 'drizzle-orm';
+import { extractHolding, extractCitations } from '$lib/server/services/summarization/gemma-legal-summarizer';
+
+export const POST: RequestHandler = async ({ request, locals, params }) => {
+  try {
+    // 1. Authenticate
+    const user = await getUser(locals);
+    if (!user) {
+      return json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const evidenceId = params.id;
+    if (!evidenceId) {
+      return json({ error: 'Evidence ID required' }, { status: 400 });
+    }
+
+    // 2. Fetch evidence
+    const evidence = await db.query.wardenEvidence.findFirst({
+      where: eq(wardenEvidence.id, evidenceId),
+    });
+
+    if (!evidence) {
+      return json({ error: 'Evidence not found' }, { status: 404 });
+    }
+
+    // 3. Verify ownership
+    if (evidence.prosecutorId !== user.id) {
+      return json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
+    // 4. Fetch chunks for this evidence
+    const chunks = await db.query.wardenChunks.findMany({
+      where: eq(wardenChunks.evidenceId, evidenceId),
+      orderBy: (chunks, { asc }) => [asc(chunks.seq)],
+    });
+
+    if (chunks.length === 0) {
+      return json({ error: 'No chunks found for evidence' }, { status: 400 });
+    }
+
+    // 5. Combine chunks into context
+    const fullText = chunks.map((c) => c.text).join('\n\n');
+
+    // 6. Generate AI summary
+    const summary = await extractHolding({
+      chunk: fullText,
+      maxTokens: 512,
+    });
+
+    // 7. Extract citations
+    const citations = await extractCitations(fullText);
+
+    // 8. Store suggested summary (not yet approved)
+    const [storedSummary] = await db;
+      .insert(wardenEvidenceSummaries)
+      .values({
+        evidenceId,
+        holding: summary.holding,
+        reasoning: summary.reasoning,
+        citations: citations.map((c) => ({ text: c, approved: false })),
+        keywords: summary.citations,
+        suggestedAt: new Date(),
+        approved: false,
+      })
+      .returning();
+
+    // 9. Log to audit trail
+    await db.insert(wardenAuditLog).values({
+      prosecutorId: user.id,
+      caseId: evidence.caseId,
+      evidenceId,
+      action: 'SUGGEST_SUMMARY',
+      sha256: evidence.sha256,
+      details: {
+        summaryId: storedSummary.id,
+        confidence: summary.confidence,
+      },
+    });
+
+    return json({
+      success: true,
+      summaryId: storedSummary.id,
+      holding: summary.holding,
+      reasoning: summary.reasoning,
+      citations,
+      keywords: summary.citations,
+      confidence: summary.confidence,
+      approved: false,
+    });
+  } catch (error) {
+    console.error('Summary suggestion error:', error);
+    return json(
+      { error: error instanceof Error ? error.message : 'Summary generation failed' },
+      { status: 500 }
+    );
+  }
+};

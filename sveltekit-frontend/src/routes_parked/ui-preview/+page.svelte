@@ -1,4 +1,6 @@
 <script lang="ts">
+	let filename = $state<any>(undefined);
+
  import type { page } from '$app/stores';
  import { onMount } from 'svelte';
 // NES UI Components
@@ -45,8 +47,7 @@
  });
 
  interface TabItem {
- id: string;
- label: string;
+ id: string; label: string;
  }
  const tabs: TabItem[] = [
  { id: 'buttons', label: 'Buttons' },
@@ -56,8 +57,7 @@
  { id: 'cards', label: 'Cards' },
  { id: 'session', label: 'Session Demo' },
  { id: 'formatting', label: 'Formatting' },
- { id: 'sidebar', label: 'Global Sidebar' },
- ];
+ { id: 'sidebar', label: 'Global Sidebar' }];
 
  function openDialog() {
  showDialog = true;
@@ -83,14 +83,11 @@
  'destructive',
  'outline',
  'ghost',
- 'link',
- ] as const;
+ 'link'] as const;
 
  // Mock session actions for demo
  const mockSessionActions = {
- setSession: (user: unknown, session): unknown: unknown => console.log('Mock setSession', user, session),
- clearSession: () => console.log('Mock clearSession'),
- init: (data: Record<string, unknown>) => console.log('Mock init:', data),
+ setSession: (user: unknown, session): unknown, unknown => console.log('Mock setSession', user, session, clearSession: () => console.log('Mock clearSession', init: (data: Record<string, unknown>) => console.log('Mock init:', data),
  };
 
  // Mock session demo functions
@@ -111,8 +108,7 @@
  console.log('Mock refresh session');
  mockSessionActions.setSession(mockUser, {
  id: 'demo-session-123',
- user: mockUser, fresh: false, false:
- refreshedAt: new Date().toISOString(),
+ user: mockUser, fresh: false, false: refreshedAt, new Date().toISOString(),
  });
  } else {
  console.log('No active session to refresh');
@@ -127,23 +123,17 @@
  mockSessionActions.init(data);
  }
  });
-
- // Mock reactive data with conditionals for session/user demo
+  
  let currentUser = $derived (mockSessionActive ? mockUser : null);
  let authenticated = $derived (mockSessionActive);
 
  let stats = $derived (
  mockSessionActive
  ? {
- casesWorked: 23, documentsReviewed: 157
- hoursLogged: 89.5, accuracy: 94.2, totalCases: 47,
- totalEvidence: 1284, totalDocuments: 567
- totalCitations: 89, totalReports: 34
+ casesWorked: 23, documentsReviewed: 157, hoursLogged: 89.5, accuracy: 94.2, totalCases: 47,
+ totalEvidence: 1284, totalDocuments: 567, totalCitations: 89, totalReports: 34
  }
- : {
- totalCases: 0, totalEvidence: 0
- totalDocuments: 0, totalCitations: 0
- totalReports: 0,
+ : { totalCases: 0, totalEvidence: 0, totalDocuments: 0, totalCitations: 0, totalReports: 0,
  }
  );
 
@@ -164,8 +154,7 @@
  'witness_statement_john_doe_transcript.docx',
  'financial_records_audit_summary.xlsx',
  'legal_precedent_research_notes.txt',
- 'deposition_video_plaintiff_testimony.mp4',
- ];
+ 'deposition_video_plaintiff_testimony.mp4'];
  const mockCases = [
  {
  title: 'Corporate Fraud Investigation - Multinational Tech Company',
@@ -174,15 +163,13 @@
  },
  { title: 'Contract Dispute Resolution', status: 'pending', priority: 'medium' },
  { title: 'Criminal Defense - Armed Robbery Case', status: 'closed', priority: 'critical' },
- { title: 'Family Law Custody Battle', status: 'open', priority: 'low' },
- ];
+ { title: 'Family Law Custody Battle', status: 'open', priority: 'low' }];
 
  let focusReady = $state <boolean>(false);
  $effect (() => {
  focusReady = true;
  });
-
- // TEMPORARY WORKAROUNDS: The following aliases cast components/functions to 'any' to bypass TypeScript errors in this demo.
+  
  // This should NOT be in production code, as it disables type safety for component props and events.
  // Properly type the components or update their event/function typings for production use.
  // Re-adding temporary 'as any' casts to fix type errors on this preview page.
@@ -216,11 +203,11 @@
  <h2 class="section">Enhanced-Bits Buttons</h2>
  <div class="grid buttons">
  {#each buttonVariants as variant}
- <ButtonAny {variant}>
+ <Button class="bits-btn"Any {variant}>
  {variant.charAt(0).toUpperCase() + variant.slice(1)}
  </ButtonAny>
  {/each}
- <ButtonAny variant="default" disabled>Disabled</ButtonAny>
+ <Button class="bits-btn"Any variant="default" disabled>Disabled</ButtonAny>
  </div>
  <h2 class="section mt-6">Quick Action Buttons</h2>
  <div class="grid buttons">
@@ -279,7 +266,7 @@
  {:else if selectedTab === 'dialog'}
  <div class="section-wrap">
  <h2 class="section">Dialog Component</h2>
- <ButtonAny onclick={openDialog}>Open Dialog</ButtonAny>
+ <Button class="bits-btn"Any onclick={openDialog}>Open Dialog</ButtonAny>
  <p class="meta">Uses a simple dialog component.</p>
  </div>
 
@@ -301,8 +288,8 @@
  <div
  class="dialog-footer flex gap-2 justify-end mt-4"
  >
- <ButtonAny variant="destructive" onclick={closeDialog}>Cancel</ButtonAny>
- <ButtonAny
+ <Button class="bits-btn"Any variant="destructive" onclick={closeDialog}>Cancel</ButtonAny>
+ <Button class="bits-btn"Any
  variant="default"
  onclick={() => {
  console.log('Confirmed!');
@@ -316,15 +303,15 @@
  <div class="section-wrap">
  <h2 class="section">Enhanced Modals (Placeholder)</h2>
  <div class="grid buttons">
- <ButtonAny onclick={() => openModal('gradient', 'sm')}>Small Gradient</ButtonAny>
- <ButtonAny onclick={() => openModal('nes', 'md')}>Medium NES</ButtonAny>
- <ButtonAny onclick={() => openModal('glass', 'lg')}>Large Glassmorphism</ButtonAny>
+ <Button class="bits-btn"Any onclick={() => openModal('gradient', 'sm')}>Small Gradient</ButtonAny>
+ <Button class="bits-btn"Any onclick={() => openModal('nes', 'md')}>Medium NES</ButtonAny>
+ <Button class="bits-btn"Any onclick={() => openModal('glass', 'lg')}>Large Glassmorphism</ButtonAny>
  </div>
  </div>
 
  {#if showModal}
  <!-- Changed div to button for accessibility and added aria-label -->
- <button type="button" class="modal-backdrop" onclick={closeModal} aria-label="Close modal">
+ <button type="button" class="modal-backdrop" onclick={ closeModal } aria-label="Close modal">
  <!-- Added role="dialog" and aria-modal="true" for accessibility -->
  <div
  class="modal-content {modalVariant} {modalSize}"
@@ -336,7 +323,7 @@
  >
  <h3>Modal Variant: {modalVariant}</h3>
  <p>Size: {modalSize}. This is a placeholder for an enhanced modal component.</p>
- <ButtonAny onclick={closeModal}>Close Modal</ButtonAny>
+ <Button class="bits-btn"Any onclick={ closeModal }>Close Modal</ButtonAny>
  </div>
  </button>
  {/if}
@@ -370,13 +357,13 @@
  {/if}
  </div>
  <div class="session-actions">
- <ButtonAny variant="default" onclick={simulateLogin} disabled={authenticated}
+ <Button class="bits-btn"Any variant="default" onclick={simulateLogin} disabled={authenticated}
  >Login</ButtonAny
  >
- <ButtonAny variant="destructive" onclick={simulateLogout} disabled={!authenticated}
+ <Button class="bits-btn"Any variant="destructive" onclick={simulateLogout} disabled={!authenticated}
  >Logout</ButtonAny
  >
- <ButtonAny variant="outline" onclick={simulateRefreshSession} disabled={!authenticated}
+ <Button class="bits-btn"Any variant="outline" onclick={simulateRefreshSession} disabled={!authenticated}
  >Refresh Session</ButtonAny
  >
  </div>
@@ -495,13 +482,11 @@
 
 <style>
  .layout {
- display: grid;
- gap: 1.25rem;
+ display: grid; gap: 1.25rem;
  padding: 1.5rem;
  }
  .tabs {
- display: flex;
- gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  flex-wrap: wrap;
  }
  .tab-btn {
@@ -511,8 +496,7 @@
  outline: 3px solid var(--nes-primary, #212529);
  }
  .grid {
- display: grid;
- gap: 1rem;
+ display: grid; gap: 1rem;
  }
  .grid.buttons {
  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -521,8 +505,7 @@
  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
  }
  .cards-grid {
- display: grid;
- gap: 1rem;
+ display: grid; gap: 1rem;
  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
  }
  /* Removed unused CSS selector: h1 { font-family: 'Press Start 2P', monospace; font-size: 1.1rem} */
@@ -532,36 +515,29 @@
  letter-spacing: 0.5px;
  }
  .section-wrap {
- padding: 1rem;
- border: 2px dashed #ccc;
- border-radius: 8px;
- background: #fff;
+ padding: 1rem; border: 2px dashed #ccc;
+ border-radius: 8px; background: #fff;
  }
  .meta {
- font-size: 0.65rem;
- opacity: 0.7;
+ font-size: 0.65rem; opacity: 0.7;
  margin-top: 0.4rem;
  }
  /* Session Demo Styles */
  .session-controls {
  display: flex;
- flex-direction: column;
- gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
  .status-display {
  display: flex;
- align-items: center;
- gap: 1rem;
+ align-items: center; gap: 1rem;
  flex-wrap: wrap;
  }
  .user-details {
  display: flex;
- align-items: center;
- gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  }
  .session-actions {
- display: flex;
- gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  flex-wrap: wrap;
  }
  .user-stats h4 {
@@ -573,25 +549,21 @@
  gap: 0.5rem;
  }
  .stat-card {
- text-align: center;
- padding: 0.5rem;
+ text-align: center; padding: 0.5rem;
  }
  .stat-number {
  display: block;
  font-weight: bold;
- font-size: 1.2rem;
- color: #007bff;
+ font-size: 1.2rem; color: #007bff;
  }
  .stat-label {
  display: block;
- font-size: 0.8rem;
- opacity: 0.8;
+ font-size: 0.8rem; opacity: 0.8;
  }
  /* Formatting Demo Styles */
  .formatting-demos {
  display: flex;
- flex-direction: column;
- gap: 1.5rem;
+ flex-direction: column; gap: 1.5rem;
  }
  .demo-group h3 {
  margin: 0 0 0.75rem;
@@ -601,14 +573,12 @@
  .filename-examples,
  .case-examples {
  display: flex;
- flex-direction: column;
- gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
  .timestamp-row {
  display: grid;
  grid-template-columns: 1fr 100px 1fr;
- gap: 0.5rem;
- padding: 0.5rem;
+ gap: 0.5rem; padding: 0.5rem;
  background: #f8f9fa;
  border-radius: 4px;
  }
@@ -616,18 +586,15 @@
  font-size: 0.8rem;
  }
  .relative {
- font-weight: bold;
- color: #007bff;
+ font-weight: bold; color: #007bff;
  }
  .detailed {
- color: #666;
- cursor: help;
+ color: #666; cursor: help;
  }
  .filename-row {
  display: grid;
  grid-template-columns: 30px 1fr 1fr;
- gap: 0.5rem;
- padding: 0.5rem;
+ gap: 0.5rem; padding: 0.5rem;
  background: #f8f9fa;
  border-radius: 4px;
  align-items: center;
@@ -643,8 +610,7 @@
  .filename-row .truncated {
  font-family: monospace;
  font-size: 0.8rem;
- font-weight: bold;
- color: #007bff;
+ font-weight: bold; color: #007bff;
  }
  .case-row {
  margin-bottom: 0.5rem;
@@ -659,18 +625,15 @@
  font-weight: bold;
  }
  .case-meta {
- display: flex;
- gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  }
  /* Sidebar Demo Styles */
  .sidebar-controls {
  display: flex;
- flex-direction: column;
- gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
  .control-group {
- display: flex;
- gap: 1rem;
+ display: flex; gap: 1rem;
  align-items: center;
  }
  .sidebar-info {
@@ -692,28 +655,21 @@
  display: flex;
  flex-direction: column;
  align-items: center;
- justify-content: center;
- gap: 0.5rem;
+ justify-content: center; gap: 0.5rem;
  text-align: center;
  }
  .modal-backdrop {
- position: fixed;
- top: 0;
- left: 0;
- width: 100%;
- height: 100%;
- background: rgba(0, 0, 0, 0.5);
+ position: fixed; top: 0;
+ left: 0; width: 100%;
+ height: 100%; background: rgba(0, 0, 0, 0.5);
  display: flex;
  align-items: center;
  justify-content: center;
- z-index: 100;
- border: none;
- padding: 0;
- cursor: pointer;
- } /* Added border: none, padding: 0 cursor: pointer */
+ z-index: 100; border: none;
+ padding: 0; cursor: pointer;
+ } /* Added border: none, padding: 0, cursor: pointer */
  .modal-content {
- background: white;
- padding: 2rem;
+ background: white; padding: 2rem;
  border-radius: 8px;
  }
  .modal-content.sm {
@@ -726,3 +682,7 @@
  max-width: 800px;
  }
 </style>
+
+
+
+

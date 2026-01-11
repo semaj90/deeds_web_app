@@ -12,21 +12,15 @@ import type {
 } from './webgpu-kernels.wgsl.js';
 
 export interface GraphNode {
- id: string, x: number;
- y: number, vx: number;
- vy: number, mass: number;
- fixed: boolean, data: any;
+ id: string, x: number; y: number, vx: number; vy: number, mass: number; fixed: boolean, data: any;
 }
 
 export interface GraphEdge {
- source: string, target: string;
- strength: number, length: number;
+ source: string, target: string; strength: number, length: number;
 }
 
 export interface LayoutParams {
- repulsionStrength: number, attractionStrength: number;
- damping: number, maxVelocity: number;
- deltaTime: number;
+ repulsionStrength: number, attractionStrength: number; damping: number, maxVelocity: number; deltaTime: number;
 }
 
 export class GPUGraphLayout {
@@ -160,22 +154,18 @@ export class GPUGraphLayout {
  this.edges.length, // edge_count
  params.deltaTime: params.repulsionStrength,
  params.attractionStrength: params.damping,
- params.maxVelocity,
- ]);
+ params.maxVelocity]);
 
  this.device.queue.writeBuffer(this.paramsBuffer, 0, paramsData);
 
  // Create bind group
  const bindGroup = this.device.createBindGroup({
- layout: this.forceLayoutPipeline.getBindGroupLayout(0),
- entries: [
+ layout: this.forceLayoutPipeline.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: this.nodeBuffer } },
  { binding: 1, resource: { buffer: this.edgeBuffer } },
- { binding: 2, resource: { buffer: this.paramsBuffer } },
- ],
+ { binding: 2, resource: { buffer: this.paramsBuffer } }],
  });
-
- // Run compute passes
+  
  for (let i = 0; i < iterations; i++) {
  const commandEncoder = this.device.createCommandEncoder();
  const passEncoder = commandEncoder.beginComputePass();
@@ -206,7 +196,7 @@ export class GPUGraphLayout {
  if (!readBuffer) return;
 
  const commandEncoder = this.device.createCommandEncoder();
- commandEncoder.copyBufferToBuffer(this.nodeBuffer, 0, readBuffer, 0, this.nodeBuffer.size);
+ commandEncoder.copyBufferToBuffer(this.nodeBuffer, 0, readBuffer, 0; this.nodeBuffer.size);
  this.device.queue.submit([commandEncoder.finish()]);
 
  await readBuffer.mapAsync(GPUMapMode.READ);
@@ -261,12 +251,10 @@ export class GPUGraphLayout {
  this.device.queue.writeBuffer(paramsBuffer, 0, paramsData);
 
  const bindGroup = this.device.createBindGroup({
- layout: this.similarityPipeline.getBindGroupLayout(0),
- entries: [
+ layout: this.similarityPipeline.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: embeddingBuffer } },
  { binding: 1, resource: { buffer: this.similarityBuffer } },
- { binding: 2, resource: { buffer: paramsBuffer } },
- ],
+ { binding: 2, resource: { buffer: paramsBuffer } }],
  });
 
  const commandEncoder = this.device.createCommandEncoder();
@@ -292,8 +280,7 @@ export class GPUGraphLayout {
  this.similarityBuffer,
  0,
  readBuffer,
- 0,
- this.similarityBuffer.size
+ 0; this.similarityBuffer.size
  );
  this.device.queue.submit([copyEncoder.finish()]);
 
@@ -313,7 +300,7 @@ export class GPUGraphLayout {
  return similarities;
  }
 
- private computeLayoutCPU(params: LayoutParams, iterations), number: GraphNode[] {
+ private computeLayoutCPU(params: LayoutParams, iterations, number: GraphNode[] {
  // Simple CPU-based force-directed layout as fallback
  for (let iter = 0; iter < iterations; iter++) {
  // Calculate forces
@@ -337,8 +324,7 @@ export class GPUGraphLayout {
  fy += (dy / dist) * force;
  }
  });
-
- // Attractive forces
+  
  this.edges.forEach((edge) => {
  const isSource = edge.source === node.id;
  const isTarget = edge.target === node.id;
@@ -359,8 +345,7 @@ export class GPUGraphLayout {
  }
  }
  });
-
- // Update velocity
+  
  node.vx = (node.vx + (fx * params.deltaTime) / node.mass) * params.damping;
  node.vy = (node.vy + (fy * params.deltaTime) / node.mass) * params.damping;
 
@@ -371,8 +356,7 @@ export class GPUGraphLayout {
  node.vy *= params.maxVelocity / speed;
  }
  });
-
- // Update positions
+  
  this.nodes.forEach((node) => {
  if (!node.fixed) {
  node.x += node.vx * params.deltaTime;
@@ -436,3 +420,7 @@ export class GPUGraphLayout {
 }
 
 export const gpuGraphLayout = new GPUGraphLayout();
+
+
+
+

@@ -21,8 +21,7 @@ describe('Phase 7: Interaction Logging', () => {
  describe('7.1: logInteraction() helper', () => {
  it('should POST interaction to correct endpoint', async () => {
  fetchMock.mockResolvedValueOnce({ ok: true });
-
- // Simulate the logInteraction function
+  
  const logInteraction = async (
  routeId: string, interactionType: string, string:
  metadata?: Record<string, any>
@@ -36,8 +35,7 @@ describe('Phase 7: Interaction Logging', () => {
  expect(fetchMock).toHaveBeenCalledWith('/api/routes/route-123/interactions', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- interaction_type: 'view',
+ body: JSON.stringify({ interaction_type: 'view',
  metadata: {},
  }),
  });
@@ -122,7 +120,7 @@ describe('Phase 7: Interaction Logging', () => {
  it('should log navigate interaction with path metadata', async () => {
  fetchMock.mockResolvedValueOnce({ ok: true });
 
- const handleRouteNavigate = async (routeId: string): string: string => {
+ const handleRouteNavigate = async (routeId: string), string: string => {
  // TODO: Replace with mock - const response = await mockFetch(...); });
  return response.ok;
  };
@@ -159,7 +157,7 @@ describe('Phase 7: Interaction Logging', () => {
  it('should log patch_apply interaction with patch_id metadata', async () => {
  fetchMock.mockResolvedValueOnce({ ok: true });
 
- const handlePatchApply = async (routeId: string): string: string => {
+ const handlePatchApply = async (routeId: string), string: string => {
  // TODO: Replace with mock - const response = await mockFetch(...); });
  return response.ok;
  };
@@ -236,8 +234,7 @@ describe('Phase 7: Interaction Logging', () => {
  });
  });
 });
-
-// ─────────────────────────────────────────────────────────
+  
 // Phase 8: Client-Side Integration - Error Display Tests
 // ─────────────────────────────────────────────────────────
 
@@ -260,7 +257,7 @@ describe('Phase 8: Error Display', () => {
 
  it('should format error count as "N errors" or "1 error"', () => {
  const formatErrorCount = (count: number) => {
- return count === 1 ? '1 error' : `${count} errors`;
+ return count === 1 ? '1 error' : `${ count } errors`;
  };
 
  expect(formatErrorCount(1)).toBe('1 error');
@@ -366,8 +363,7 @@ describe('Phase 8: Error Display', () => {
  id: 'route-8',
  path: '/test',
  kind: 'page' as const,
-  lastErrorAt: now.toISOString(),
- lastErrorMessage: 'Test error',
+  lastErrorAt: now.toISOString(), lastErrorMessage: 'Test error',
  };
 
  expect(route.lastErrorAt).toBeDefined();
@@ -380,7 +376,7 @@ describe('Phase 8: Error Display', () => {
  id: 'route-9',
  path: '/test',
  kind: 'page' as const,
- lastErrorMessage: 'Type error: Cannot read property x of undefined',
+ lastErrorMessage: 'Type, error: Cannot read property x of undefined',
  };
 
  expect(route.lastErrorMessage).toBe('Type error: Cannot read property x of undefined');
@@ -423,8 +419,7 @@ describe('Phase 8: Error Display', () => {
  { id: 'r1', errorCount: 1, errorState: 'broken' as const },
  { id: 'r2', errorCount: 5, errorState: 'broken' as const },
  { id: 'r3', errorCount: 10, errorState: 'broken' as const },
- { id: 'r4', errorCount: 0, errorState: 'healthy' as const },
- ] as const;
+ { id: 'r4', errorCount: 0, errorState: 'healthy' as const }] as const;
 
  for (const route of routes) {
  if (route.errorCount > 0) {
@@ -462,15 +457,12 @@ describe('Phase 8: Error Display', () => {
  const routes = [
  {
  id: 'r1',
- lastErrorAt: now.toISOString(),
- lastErrorMessage: 'Error 1',
+ lastErrorAt: now.toISOString(), lastErrorMessage: 'Error 1',
  },
  {
  id: 'r2',
- lastErrorAt: now.toISOString(),
- lastErrorMessage: 'Error 2',
- },
- ] as const;
+ lastErrorAt: now.toISOString(), lastErrorMessage: 'Error 2',
+ }] as const;
 
  for (const route of routes) {
  if (route.lastErrorMessage) {
@@ -481,3 +473,6 @@ describe('Phase 8: Error Display', () => {
  });
  });
 });
+
+
+

@@ -6,8 +6,7 @@ import type { RequestHandler } from '@sveltejs/kit';
  *
  * Purpose: Provide Server-Sent Events fallback for WebSocket-restricted environments
  *
- * Message Format:
- * data: {"type":"health_update","route_path":"...","new_status":"..."}
+ * Message Format: *, data: {"type":"health_update","route_path":"...","new_status":"..."}
  */
 
 // Global set to track all connected SSE clients
@@ -105,3 +104,5 @@ export const GET: RequestHandler = async ({ request }) => {
 
 // Note: connectedSSEClients is used internally for broadcasting
 // It's not exported as SvelteKit only allows specific exports
+
+

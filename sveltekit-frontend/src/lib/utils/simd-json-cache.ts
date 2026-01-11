@@ -16,31 +16,22 @@ interface SIMDJSONModule {
 
 // Cache Configuration
 interface CacheConfig {
-	redisUrl: string;
-	defaultTTL: number;
-	compressionEnabled: boolean;
-	compressionThreshold: number;
-	maxKeyLength: number;
-	enableMetrics: boolean;
+	redisUrl: string; defaultTTL: number;
+	compressionEnabled: boolean; compressionThreshold: number;
+	maxKeyLength: number; enableMetrics: boolean;
 }
 
 // Performance Metrics
 interface ParseMetrics {
-	totalParses: number;
-	simdParses: number;
-	nativeParses: number;
-	cacheHits: number;
-	cacheMisses: number;
-	averageParseTime: number;
-	averageSIMDTime: number;
-	averageNativeTime: number;
-	totalDataProcessed: number;
-	compressionRatio: number;
+	totalParses: number; simdParses: number;
+	nativeParses: number; cacheHits: number;
+	cacheMisses: number; averageParseTime: number;
+	averageSIMDTime: number; averageNativeTime: number;
+	totalDataProcessed: number; compressionRatio: number;
 }
 
 interface CacheEntry<T = unknown> {
-	data: T;
-	timestamp: number;
+	data: T; timestamp: number;
 	ttl: number;
 }
 
@@ -53,11 +44,11 @@ class SIMDJSONCache {
 
 	constructor(config: Partial<CacheConfig> = {}) {
 		this.config = {
-			redisUrl: config.redisUrl || process.env.REDIS_URL || 'redis://localhost:6379/0',
-			defaultTTL: config.defaultTTL || 3600,
+			redisUrl, config.redisUrl || process.env.REDIS_URL || 'redis://localhost:6379/0',
+			defaultTTL, config.defaultTTL || 3600,
 			compressionEnabled: config.compressionEnabled ?? false,
-			compressionThreshold: config.compressionThreshold || 1024,
-			maxKeyLength: config.maxKeyLength || 250,
+			compressionThreshold, config.compressionThreshold ?? 1024,
+			maxKeyLength, config.maxKeyLength || 250,
 			enableMetrics: config.enableMetrics ?? false
 		};
 
@@ -115,9 +106,9 @@ class SIMDJSONCache {
 
 	private generateCacheKey(data: string, operation: string): string {
 		const hash = this.fastHash(data + operation);
-		const key = `simd_json:${operation}:${hash}`;
+		const key = `simd_json:${ operation }:${hash}`;
 		return key.length > this.config.maxKeyLength
-			? key.substring(0, this.config.maxKeyLength)
+			? key.substring(0; this.config.maxKeyLength)
 			: key;
 	}
 
@@ -216,10 +207,10 @@ class SIMDJSONCache {
 					}
 					return result;
 				} catch (fallbackError) {
-					throw new Error(`JSON parsing failed: ${fallbackError}`);
+					throw new Error(`JSON parsing failed: ${ fallbackError }`);
 				}
 			}
-			throw new Error(`JSON parsing failed: ${error}`);
+			throw new Error(`JSON parsing failed: ${ error }`);
 		}
 	}
 
@@ -264,7 +255,7 @@ class SIMDJSONCache {
 				}
 				return result;
 			}
-			throw new Error(`JSON stringification failed: ${error}`);
+			throw new Error(`JSON stringification failed: ${ error }`);
 		}
 	}
 
@@ -318,7 +309,7 @@ class SIMDJSONCache {
 
 			return result;
 		} catch (error) {
-			throw new Error(`JSON minification failed: ${error}`);
+			throw new Error(`JSON minification failed: ${ error }`);
 		}
 	}
 
@@ -395,4 +386,8 @@ export function minifyJSON(jsonString: string, useCache = true): string {
 // Export types and class
 export { SIMDJSONCache };
 export type { CacheConfig, ParseMetrics, SIMDJSONModule };
+
+
+
+
 

@@ -37,29 +37,23 @@ try {
  // Fallback for SSR or when actor is not available
  legalAIStateStore = writable({
  value: 'initializing',
- context: {
- user: { id: null, email: null,, role, null: permissions: [], isAuthenticated: false },
- cases: {
- items: [],
+ context: { user: { id: null, email: null, role, null: permissions: [], isAuthenticated: false },
+ cases: { items: [],
  currentCase: null,
  filters: { search: '', status: 'all', priority: 'all', category: 'all' },
  pagination: { page: 1, limit: 10, total: 0 },
  loading: false, error: null,
  },
- ai: {
- isProcessing: false,
+ ai: { isProcessing: false,
  currentQuery: '',
  lastResponse: null, error: null,
- models: {
- primary: 'gemma3-legal',
+ models: { primary: 'gemma3-legal',
  embedding: 'nomic-embed-text',
  available: ['gemma3-legal', 'gpt4-legal', 'llama2-legal'],
  },
  },
- system: {
- connected: false,
- services: {
- database: false, redis: false, ollama: false, gpu: false, pgvector: false, qdrant: false, neo4j: false,
+ system: { connected: false,
+ services: { database: false, redis: false, ollama: false, gpu: false, pgvector: false, qdrant: false, neo4j: false,
  },
  metrics: { errorCount: 0, performanceScore: 0, uptime: 0 },
  },
@@ -73,31 +67,25 @@ try {
  // Fallback store for error cases
  legalAIStateStore = writable({
  value: 'error',
- context: {
- user: { id: null, email: null,, role, null: permissions: [], isAuthenticated: false },
- cases: {
- items: [],
+ context: { user: { id: null, email: null, role, null: permissions: [], isAuthenticated: false },
+ cases: { items: [],
  currentCase: null,
  filters: { search: '', status: 'all', priority: 'all', category: 'all' },
  pagination: { page: 1, limit: 10, total: 0 },
  loading: false,
  error: 'XState initialization failed',
  },
- ai: {
- isProcessing: false,
+ ai: { isProcessing: false,
  currentQuery: '',
  lastResponse: null,
  error: 'XState initialization failed',
- models: {
- primary: 'gemma3-legal',
+ models: { primary: 'gemma3-legal',
  embedding: 'nomic-embed-text',
  available: ['gemma3-legal', 'gpt4-legal', 'llama2-legal'],
  },
  },
- system: {
- connected: false,
- services: {
- database: false, redis: false, ollama: false, gpu: false, pgvector: false, qdrant: false, neo4j: false,
+ system: { connected: false,
+ services: { database: false, redis: false, ollama: false, gpu: false, pgvector: false, qdrant: false, neo4j: false,
  },
  metrics: { errorCount: 1, performanceScore: 0, uptime: 0 },
  },
@@ -123,27 +111,22 @@ export const xstateIntegration = {
  console.warn('[XState] Failed to get global state:', error);
  return {
  value: 'error',
- context: {
- user: { id: null, email: null,, role, null: permissions: [], isAuthenticated: false },
- cases: {
- items: [],
+ context: { user: { id: null, email: null, role, null: permissions: [], isAuthenticated: false },
+ cases: { items: [],
  currentCase: null,
  filters: { search: '', status: 'all', priority: 'all', category: 'all' },
  pagination: { page: 1, limit: 10, total: 0 },
  loading: false,
  error: 'XState unavailable',
  },
- ai: {
- isProcessing: false,
+ ai: { isProcessing: false,
  currentQuery: '',
  lastResponse: null,
  error: 'XState unavailable',
  models: { primary: 'gemma3-legal', embedding: 'nomic-embed-text', available: [] },
  },
- system: {
- connected: false,
- services: {
- database: false, redis: false, ollama: false, gpu: false, pgvector: false, qdrant: false, neo4j: false,
+ system: { connected: false,
+ services: { database: false, redis: false, ollama: false, gpu: false, pgvector: false, qdrant: false, neo4j: false,
  },
  metrics: { errorCount: 1, performanceScore: 0, uptime: 0 },
  },
@@ -167,7 +150,7 @@ export const xstateIntegration = {
  legalAIActor.send(event);
  } else {
  console.warn(
- `[XState] Cannot send event: actor not available or unknown machine, ID: ${machineId}`
+ `[XState] Cannot send event: actor not available or unknown machine, ID: ${ machineId }`
  );
  }
  } catch (error) {
@@ -210,3 +193,6 @@ export const xstateIntegration = {
 };
 
 // export default xstateIntegration; // Remove this redundant line
+
+
+

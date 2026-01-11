@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
 import pg from 'pg';
+import type { RequestHandler } from './$types';
 
 const { Pool } = pg;
 
@@ -107,7 +107,7 @@ Provide your analysis in this JSON structure:
 		}
 
 		const ollamaData = await ollamaRes.json();
-		const content = ollamaData.message?.content || '';
+		const content = ollamaData.message?.content ?? '';
 
 		// Try to parse JSON from response
 		let analysis: any = null;
@@ -120,7 +120,7 @@ Provide your analysis in this JSON structure:
 		} catch (e) {
 			// Fallback: return raw content
 			analysis = {
-				pattern_name: `cluster_${cluster_id}_analysis`,
+				pattern_name: `cluster_${ cluster_id }_analysis`,
 				root_cause: content.slice(0, 500),
 				fix_strategy: ['Review the analysis above'],
 				estimated_effort: 'moderate',
@@ -160,3 +160,6 @@ Provide your analysis in this JSON structure:
 		}, { status: 500 });
 	}
 };
+
+
+

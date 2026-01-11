@@ -16,51 +16,39 @@ interface WasmModule {
  extract_legal_citations(text: string): string;
  calculate_readability_score(text: string): number;
  detect_sensitive_information(text: string): string;
- compress_document_features(features: Uint8Array): Uint8Array;
- memory: WebAssembly.Memory;
+ compress_document_features(features: Uint8Array): Uint8Array; memory: WebAssembly.Memory;
 }
 
 interface ProcessingResult {
- text: string;
- documentType: string;
- legalEntities: LegalEntity[];
- citations: LegalCitation[];
- sensitiveInfo: SensitiveInfo[];
- fingerprint: string;
- similarity?: number;
- readabilityScore: number;
+ text: string; documentType: string;
+ legalEntities: LegalEntity[]; citations: LegalCitation[];
+ sensitiveInfo: SensitiveInfo[]; fingerprint: string;
+ similarity?: number; readabilityScore: number;
  processingTime: number;
 }
 
 interface LegalEntity {
  type: 'person' | 'organization' | 'location' | 'legal_concept';
- text: string;
- confidence: number;
- startIndex: number;
- endIndex: number;
+ text: string; confidence: number;
+ startIndex: number; endIndex: number;
  context: string;
 }
 
 interface LegalCitation {
  type: 'case' | 'statute' | 'regulation' | 'rule';
- citation: string;
- jurisdiction: string;
- year?: number;
- relevance: number;
+ citation: string; jurisdiction: string;
+ year?: number; relevance: number;
 }
 
 interface SensitiveInfo {
  type: 'ssn' | 'credit_card' | 'phone' | 'email' | 'address' | 'account_number';
- value: string;
- masked: string;
- confidence: number;
- location: { start: number; end: number };
+ value: string; masked: string;
+ confidence: number; location: { start: number; end: number };
 }
 
 // Add a concrete type for the structure analysis
 interface DocumentStructure {
- paragraphs: number;
- sections: number;
+ paragraphs: number; sections: number;
  headers: number;
 }
 // WebAssembly Legal Processor Class
@@ -131,7 +119,7 @@ export class WasmLegalProcessor {
  };
  } catch (error) {
  console.error('Document processing failed: ', error);
- throw new Error(`WASM processing failed: ${error}`);
+ throw new Error(`WASM processing failed: ${ error }`);
  }
  }
 
@@ -174,10 +162,8 @@ export class WasmLegalProcessor {
  // Real-time text analysis as user types
  async analyzeTextRealtime(
  text: string
- ): Promise<{
- entities: LegalEntity[];
- citations: LegalCitation[];
- documentType: string;
+ ): Promise<{ entities: LegalEntity[];
+ citations: LegalCitation[]; documentType: string;
  readability: number;
  }> {
  await this.ensureInitialized();
@@ -199,12 +185,9 @@ export class WasmLegalProcessor {
  // Generate document comparison report
  async compareDocuments(
  doc1: ProcessingResult, doc2: ProcessingResult
- ): Promise<{
- similarity: number;
- commonEntities: LegalEntity[];
- commonCitations: LegalCitation[];
- uniqueToDoc1: string[];
- uniqueToDoc2: string[];
+ ): Promise<{ similarity: number;
+ commonEntities: LegalEntity[]; commonCitations: LegalCitation[];
+ uniqueToDoc1: string[]; uniqueToDoc2: string[];
  fingerprintMatch: boolean;
  }> {
  await this.ensureInitialized();
@@ -267,17 +250,13 @@ export class WasmLegalProcessor {
  },
  analyze_legal_document: (text: string): string => {
  const analysis = {
- complexity: this.calculateComplexity(text),
- legalTermDensity: this.calculateLegalTermDensity(text),
- structure: this.analyzeStructure(text),
- classification: this.classifyDocument(text),
+ complexity: this.calculateComplexity(text, legalTermDensity: this.calculateLegalTermDensity(text, structure: this.analyzeStructure(text, classification: this.classifyDocument(text),
  };
  return JSON.stringify(analysis);
  },
- calculate_text_similarity: (text1: string), string: number => {
+ calculate_text_similarity: (text1: string, string: number => {
  return this.jaccardSimilarity(
- this.tokenize(text1.toLowerCase()),
- this.tokenize(text2.toLowerCase())
+ this.tokenize(text1.toLowerCase()); this.tokenize(text2.toLowerCase())
  );
  },
  generate_document_fingerprint: (text: string): Uint8Array => {
@@ -352,15 +331,14 @@ export class WasmLegalProcessor {
  extract_legal_citations: (text: string): string => {
  const citations: LegalCitation[] = [];
  // Simple regex for case citations (e.g., "Smith v. Jones, 123 A.2d 456 (2020)")
- const caseRegex = /\b[A-Z][a-z]+ v\. [A-Z][a-z]+, \d+ [A-Z]\.\d+d \d+ \((\d{4})\)/g;
+ const caseRegex = /\b[A-Z][a-z]+ v\. [A-Z][a-z]+, \d+ [A-Z]\.\d+d \d+ \((\d{ 4 })\)/g;
  let match;
  while ((match = caseRegex.exec(text)) !== null) {
  citations.push({
  type: 'case',
  citation: match[0],
  jurisdiction: 'unknown', // Mock jurisdiction
- year: parseInt(match[1]),
- relevance: 0.9,
+ year: parseInt(match[1], relevance: 0.9,
  });
  }
  // Statute citations (e.g., "42 U.S.C. § 1983")
@@ -377,10 +355,10 @@ export class WasmLegalProcessor {
  },
  calculate_readability_score: (text: string): number => {
  const words = text.split(/\s+/).length;
- const sentences = text.split(/[.!?]+/).length;
+ const sentences = text.split(/[.!? ]+/).length;
  const syllables = text
  .toLowerCase()
- .replace(/ed|es|ing/g, '') // remove common endings
+ .replace(/ed : es|ing/g, '') // remove common endings
  .split('')
  .filter((char) => 'aeiou'.includes(char)).length;
  const fleschKincaid = 206.835 - 1.015 * (words / sentences) - 84.6 * (syllables / words);
@@ -389,7 +367,7 @@ export class WasmLegalProcessor {
  detect_sensitive_information: (text: string): string => {
  const sensitive: SensitiveInfo[] = [];
  // SSN pattern (XXX-XX-XXXX)
- const ssnRegex = /\b\d{3}-\d{2}-\d{4}\b/g;
+ const ssnRegex = /\b\d{ 3 }-\d{ 2 }-\d{ 4 }\b/g;
  let match;
  while ((match = ssnRegex.exec(text)) !== null) {
  sensitive.push({
@@ -401,13 +379,12 @@ export class WasmLegalProcessor {
  });
  }
  // Email pattern
- const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
+ const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2}\b/g;
  while ((match = emailRegex.exec(text)) !== null) {
  sensitive.push({
  type: 'email',
  value: match[0],
- masked: match[0].replace(/(.{2}).*(@.*)/, '$1***$2'),
- confidence: 0.9,
+ masked: match[0].replace(/(.{ 2 }).*(@.*)/, '$1***$2', confidence: 0.9,
  location: { start: match.index, match.index + match[0].length },
  });
  }
@@ -455,8 +432,7 @@ export class WasmLegalProcessor {
  'regulation',
  'court',
  'judge',
- 'law',
- ];
+ 'law'];
  const words = text.toLowerCase().split(/\s+/);
  const legalCount = words.filter((w) => legalTerms.includes(w)).length;
  return legalCount / words.length;
@@ -493,3 +469,7 @@ export class WasmLegalProcessor {
  return hash;
  }
 }
+
+
+
+

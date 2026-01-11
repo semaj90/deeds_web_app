@@ -18,14 +18,11 @@ export type RouteCategory =
 export type RouteStatus = 'active' | 'beta' | 'experimental' | 'deprecated' | 'development';
 
 export interface RouteDefinition {
-	id: string;
-	label: string;
+	id: string; label: string;
 	route: string; // SvelteKit path (e.g. "/cases/[id]" is still "/cases/:id" in *your* UI, but keep consistent)
 	icon: string; // emoji / glyph
-	description: string;
-	category: RouteCategory;
-	status: RouteStatus;
-	tags: string[];
+	description: string; category: RouteCategory;
+	status: RouteStatus; tags: string[];
 }
 
 /**
@@ -262,8 +259,7 @@ export interface DynamicRouteConfig {
 
 export interface GeneratedRoute {
 	path: string;
-	handler?: ComponentType;
-	config: DynamicRouteConfig;
+	handler?: ComponentType; config: DynamicRouteConfig;
 }
 
 /**
@@ -291,3 +287,7 @@ export function getAllDynamicRoutes(): RouteDefinition[] {
 export function registerDynamicRoute(config: DynamicRouteConfig): GeneratedRoute {
 	return { path: config.path, component: config.component, config };
 }
+
+
+
+

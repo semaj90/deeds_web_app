@@ -1,14 +1,11 @@
 export interface UploadResult {
-  success: boolean;
-  fileId: string;
-  fileName: string;
-  url: string;
+  success: boolean; fileId: string;
+  fileName: string; url: string;
   metadata?: Record<string, unknown>;
 }
 
 export interface WorkerResponse {
-  taskId: string;
-  success: boolean;
+  taskId: string; success: boolean;
   data?: unknown;
   error?: string;
 }
@@ -27,3 +24,6 @@ export class EmbeddingService {
 }
 
 export const embeddingService = new EmbeddingService();
+
+
+

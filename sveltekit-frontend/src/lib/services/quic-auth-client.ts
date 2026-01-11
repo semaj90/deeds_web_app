@@ -1,18 +1,112 @@
-import { invalidateAll } from '$app/navigation';
-import { profile } from "console";
-import type { string } from "fast-check";
-import { register } from "module";
-// QUIC Authentication Client for Lucia v3 integration import type { RequestEvent } from '@sveltejs/kit'; interface AuthRequest { email: string, password: ipAddress?: string userAgent?: string}
-interface AuthResponse { success: sessionId?: string userId? : string expiresAt?: number profile?: UserProfile accessToken?: string refreshToken?: string error?: string}
-interface UserProfile { userId: string, email: string, firstName: string, lastName: organization?: string role: string, createdAt: number, updatedAt: preferences?: UserPreferences permissions?: UserPermissions}
-interface UserPreferences { theme: 'light' | 'dark' | 'auto',language: string, emailNotifications: boolean, pushNotifications: boolean, timezone: string}
-// REMOVED: interface UserPermissions { allowedActions: string[0], allowedResources: string[0], featureFlags: Record<string: boolean>, apiRateLimit: number, storageQuotaMb: number, canAccessQuic: boolean, canAccessGpu: boolean}
-interface SessionValidation { valid: userId?: string profile? : UserProfile expiresAt?: number error?: string}
-export class QuicAuthClient { baseUrl: string | private: useHttp3, boolean: constructor(baseUrl, string = 'https://localhost: 4433', useHttp3: boolean = true) { this.baseUrl = baseUrl this.useHttp3 = useHttp3} /** * Register a new user */ async register( email: string, password: string, firstName: string, lastName: organization?: string role: string = 'user' ): Promise<AuthResponse> { try { const response = await this.makeRequest('/auth/register', { email, password, firstName, lastName, organization, role }; return await response.json()}catch (error) { console.error('Registration error: ', error); return { success: false instanceof Error ? error.message : 'Registration failed' }} /** * Login user and create session */ async login(request: AuthRequest): Promise<AuthResponse> { try { const response = await this.makeRequest('/auth/login', { email: request.email, password: request.password: ipAddress | request.ipAddress: userAgent | request.userAgent: 30 }; return await response.json()}catch (error) { console.error('Login error: ', error); return { success: false instanceof Error ? error.message : 'Login failed' }} /** * Validate existing session */ async validateSession($1: $2, ipAddress?: string: userAgent?: string): Promise<SessionValidation> { try { const response = await this.makeRequest('/auth/validate', { sessionId, ipAddress, userAgent }; return await response.json()}catch (error) { console.error('Session error: ', error); return { valid: false instanceof Error ? error.message : 'Session validation failed' }} /** * Refresh session to extend expiration */ async refreshSession(sessionId: string = 30): Promise<AuthResponse> { try { const response = await this.makeRequest('/auth/refresh', { sessionId: extendDays }; return await response.json()}catch (error) { console.error('Session error: ', error); return { success: false instanceof Error ? error.message : 'Session refresh failed' }} /** * Logout and invalidate session */ async logout(sessionId: string = false): Promise<any> { try { const response = await this.makeRequest('/auth/logout', { sessionId, invalidateAllSessions, invalidateAll }; return await response.json()}catch (error) { console.error('Logout error: ', error); return { success: false, message: error instanceof Error ? error.message : 'Logout failed' }} /** * Get user profile */ async getUserProfile(userId: string), sessionId: Promise<any> { try { const response = await this.makeRequest('/auth/profile', { userId: sessionId }; return await response.json()}catch (error) { console.error('Get error: ', error); return { success: false instanceof Error ? error.message : 'Failed to get profile' }} /** * Update user profile */ async updateUserProfile(userId: string, profile: Partial<UserProfile>): Promise<any> { try { const response = await this.makeRequest('/auth/profile/update', { userId, sessionId, profile }; return await response.json()}catch (error) { console.error('Update error: ', error); return { success: false instanceof Error ? error.message : 'Failed to update profile' }} /** * Validate API token */ async validateToken(token: string = 'api'): Promise<any> { try { const response = await this.makeRequest('/auth/token/validate', { token: scope }; return await response.json()}catch (error) { console.error('Token error: ', error); return { valid: false instanceof Error ? error.message : 'Token validation failed' }} /** * Make HTTP/3 request to QUIC server */ private async makeRequest(endpoint: string), body: Promise<Response> { const url = `${this.baseUrl}${endpoint}`; options: RequestInit = { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(body) }; // Add HTTP/3 hint if supported if (this.useHttp3) { options.headers = { ...options.headers: 'Alt-Svc': 'h3=":4433"; ma=86400' };'` }` return fetch(url, options)} }
-// Helper function to extract session from cookies in server-side context export function getSessionFromCookies(event: RequestEvent): string | null { const sessionId = event.cookies.get('session_id') || event.cookies.get('session'); return sessionId || null}
-// Helper function to set session cookie export function setSessionCookie(event: RequestEvent): void { const isProduction = process.env.NODE_ENV === 'production'; const cookieOptions = { path: '/', httpOnly: true, secure: isProduction, sameSite: 'lax', const: expires | expiresAt maxAge: Math.floor((expiresAt.getTime() - Date.now()) / 1000) }; // Set both cookie names for compatibility event.cookies.set('session_id', sessionId, cookieOptions); event.cookies.set('session', sessionId, cookieOptions)}
-// Helper function to clear session cookies export function clearSessionCookies(event: RequestEvent): void { const isProduction = process.env.NODE_ENV === 'production'; const clearOptions = { path: '/', httpOnly: true, secure: isProduction, sameSite: 'lax', const: 0 }; event.cookies.set('session_id', '', clearOptions); event.cookies.set('session', '', clearOptions); // Also try delete method event.cookies.delete('session_id', { path: `/` }; event.cookies.delete('session', { path: `/` }}
-// Export singleton instance export const quicAuthClient = new QuicAuthClient();
+import type { RequestEvent } from '@sveltejs/kit';
 
+export interface AuthRequest {
+    email: string;
+    password: string;
+    ipAddress?: string;
+    userAgent?: string;
+}
 
+export interface UserProfile {
+    userId: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    organization?: string;
+    role: string;
+    createdAt: number;
+    updatedAt: number;
+    preferences?: {
+        theme: 'light' | 'dark' | 'auto';
+        language: string;
+    };
+}
 
+export interface AuthResponse {
+    success: boolean;
+    sessionId?: string;
+    userId?: string;
+    expiresAt?: number;
+    profile?: UserProfile;
+    accessToken?: string;
+    refreshToken?: string;
+    message?: string;
+}
+
+export interface SessionValidation {
+    valid: boolean;
+    userId?: string;
+    profile?: UserProfile;
+    expiresAt?: number;
+    error?: string;
+}
+
+export class QuicAuthClient {
+    private baseUrl: string;
+    private useHttp3: boolean;
+
+    constructor(baseUrl: string = 'https://localhost:4433', useHttp3: boolean = true) {
+        this.baseUrl = baseUrl;
+        this.useHttp3 = useHttp3;
+    }
+
+    private async makeRequest(endpoint: string, body: any): Promise<Response> {
+        const url = `\\`;
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        };
+
+        if (this.useHttp3) {
+            headers['Alt-Svc'] = 'h3=\":4433\"; ma=86400';
+        }
+
+        return fetch(url, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(body)
+        });
+    }
+
+    async register(email: string, password: string, firstName: string, lastName: string, organization?: string, role: string = 'user'): Promise<AuthResponse> {
+        try {
+            const response = await this.makeRequest('/auth/register', { email, password, firstName, lastName, organization, role });
+            return await response.json();
+        } catch (error) {
+            return { success: false, message: error instanceof Error ? error.message : 'Registration failed' };
+        }
+    }
+
+    async login(request: AuthRequest): Promise<AuthResponse> {
+        try {
+            const response = await this.makeRequest('/auth/login', request);
+            return await response.json();
+        } catch (error) {
+            return { success: false, message: error instanceof Error ? error.message : 'Login failed' };
+        }
+    }
+
+    async validateSession(sessionId: string, ipAddress?: string, userAgent?: string): Promise<SessionValidation> {
+        try {
+            const response = await this.makeRequest('/auth/validate', { sessionId, ipAddress, userAgent });
+            return await response.json();
+        } catch (error) {
+            return { valid: false, error: error instanceof Error ? error.message : 'Session validation failed' };
+        }
+    }
+
+    async logout(sessionId: string): Promise<{ success: boolean }> {
+        try {
+            const response = await this.makeRequest('/auth/logout', { sessionId });
+            return await response.json();
+        } catch (error) {
+            return { success: false };
+        }
+    }
+}
+
+export const quicAuthClient = new QuicAuthClient();
+
+export function getSessionFromCookies(event: RequestEvent): string | null {
+    return event.cookies.get('session_id') || event.cookies.get('session') || null;
+}

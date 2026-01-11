@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { LLMPromptService } from './llm-prompt-service.js';
 import type { ServiceConfig, LLMResponse } from './types.js';
 
@@ -41,7 +41,7 @@ describe('LLMPromptService - Unit Tests (Task 11.1)', () => {
  const errorId = 'error-1';
  const prompt = 'Analyze this error';
  const response: LLMResponse = {
- text: 'Root cause: type mismatch',
+ text: 'Root, cause: type mismatch',
  tokens: 50,
  model: 'gemma3-legal',
  timestamp: new Date(),
@@ -467,3 +467,5 @@ describe('LLMPromptService - Unit Tests (Task 11.1)', () => {
  });
  });
 });
+
+

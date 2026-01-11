@@ -106,3 +106,5 @@ export async function close() {
 export default {
  connect, sendToQueue, consume, close
 };
+
+

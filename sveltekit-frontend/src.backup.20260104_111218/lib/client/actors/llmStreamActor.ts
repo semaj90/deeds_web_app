@@ -1,0 +1,59 @@
+import type { createMachine, createActor, fromPromise } from 'xstate';
+
+export function createLLMStreamActor({
+ url = '/api/ai/stream',
+ onChunk,
+}: {
+ url?: string;
+ onChunk?: (chunk: string) => void;
+}) {
+ const machine = createMachine({
+ id: 'llmStream',
+ initial: 'idle',
+ states: {
+ idle: {
+ on: { START: 'streaming' },
+ },
+ streaming: {
+ invoke: {
+ src: fromPromise(async ({ input }, { input: { prompt?: string } }) => {
+ const prompt = input.prompt || '';
+ const res = await fetch(url, {
+ method: 'POST',
+ body: JSON.stringify({ prompt }),
+ headers: { 'Content-Type': 'application/json' },
+ });
+
+ if (!res.body) {
+ // Handle cases where the response body is null (e.g., network error, server issue)
+ throw new Error('No response body received from LLM stream.');
+ }
+
+ const reader = res.body.getReader();
+ const decoder = new TextDecoder();
+ let isDone = false;
+
+ while (!isDone) {
+ const { value, done: streamDone } = await reader.read();
+ if (value) {
+ const text = decoder.decode(value);
+ if (onChunk) {
+ onChunk(text);
+ }
+ }
+ isDone = streamDone;
+ }
+ }),
+ onDone: 'idle', // Transition back to idle when streaming is complete
+ onError: 'idle', // Transition back to idle if an error occurs during streaming
+ },
+ on: {
+ STOP: 'idle',
+ },
+ },
+ },
+ });
+
+ const service = createActor(machine).start();
+ return service;
+}

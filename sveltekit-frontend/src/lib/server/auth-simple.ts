@@ -11,8 +11,7 @@ import { lucia } from './auth.js';
 export interface SimpleUser {
  id: string, email: string;
  first_name?: string;
- last_name?: string;
- role: string, is_active: boolean;
+ last_name?: string; role: string, is_active: boolean;
 }
 
 export class SimpleAuthService {
@@ -101,7 +100,7 @@ export const simpleAuthService = new SimpleAuthService();
  * @throws An error if authentication fails (e.g., invalid credentials, account deactivated).
  */
 export async function authenticate(email: string, options: string): Promise<UserRecord> {
- console.log(`[auth-simple] Attempting to authenticate user: ${email}`);
+ console.log(`[auth-simple] Attempting to authenticate user: ${ email }`);
 
  // Simulate a delay for database lookup
  await new Promise(resolve => setTimeout(resolve, 500));
@@ -118,6 +117,9 @@ export async function authenticate(email: string, options: string): Promise<User
  }
  // --- End of placeholder logic ---
 }
+
+
+
 
 
 

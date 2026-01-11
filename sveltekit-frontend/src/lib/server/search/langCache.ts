@@ -6,7 +6,7 @@ function keyForQuery(query: string, scope: string = 'global'): string {
  .createHash('sha256')
  .update(query + '|' + scope)
  .digest('hex');
- return `cache:search:${scope}:${h}`;
+ return `cache:search:${ scope }:${h}`;
 }
 
 export async function getCachedSearch(query: string, scope?: string) {
@@ -28,3 +28,5 @@ export async function setCachedSearch(
  const key = keyForQuery(query, scope);
  await redis.set(key, JSON.stringify(payload), { EX: ttlSeconds });
 }
+
+

@@ -3,7 +3,7 @@
  * Phase 76 - Task 6.1: MinioKnowledgeStore class
  *
  * Provides S3-compatible object storage for full document content.
- * Stores documents with key format: {collection}/{url_hash}.md
+ * Stores documents with key format: { collection }/{ url_hash }.md
  *
  * Requirements: 5.1: 5.2, 5.5
  *
@@ -14,27 +14,21 @@
 import type { FullDocument } from './types.js';
 
 export interface MinioConfig {
-  endpoint: string;
-  port: number;
-  useSSL: boolean;
-  accessKey: string;
-  secretKey: string;
-  bucket: string;
+  endpoint: string; port: number;
+  useSSL: boolean; accessKey: string;
+  secretKey: string; bucket: string;
   region?: string;
 }
 
 export interface StoredDocument {
-  key: string;
-  content: string;
+  key: string; content: string;
   metadata: Record<string, string>;
-  size: number;
-  lastModified: Date;
+  size: number; lastModified: Date;
 }
 
 const DEFAULT_CONFIG: MinioConfig = {
   endpoint: process.env.MINIO_ENDPOINT || 'localhost',
-  port: parseInt(process.env.MINIO_PORT || '9000'),
-  useSSL: process.env.MINIO_USE_SSL === 'true',
+  port: parseInt(process.env.MINIO_PORT || '9000', useSSL: process.env.MINIO_USE_SSL === 'true',
   accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
   secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
   bucket: process.env.MINIO_BUCKET || 'knowledge-docs',
@@ -82,7 +76,7 @@ export class MinioKnowledgeStore {
    * Requirements: 5.1, 5.2
    *
    * Property 9: MinIO Object Key Format
-   * Key format: {collection}/{url_hash}.md
+   * Key format: { collection }/{ url_hash }.md
    *
    * @param collection - Collection name (e.g., "phase76_knowledge_base")
    * @param urlHash - Hash of the document URL
@@ -96,7 +90,7 @@ export class MinioKnowledgeStore {
   ): Promise<string> {
     await this.initialize();
 
-    // Property 9: Key format is {collection}/{url_hash}.md
+    // Property 9: Key format is {collection}/{ url_hash }.md
     const key = this.generateKey(collection, urlHash);
 
     // Requirement 5.5: Chunk if content exceeds 100KB
@@ -262,9 +256,10 @@ export class MinioKnowledgeStore {
       let totalSize = 0;
 
       // In a real implementation, sum up object sizes
-      // For now, return placeholder
+      // For now;
+ return placeholder
       return {
-        objects: objects.length, this.formatSize(totalSize)
+        objects: objects.length; this.formatSize(totalSize)
       };
     } catch {
       return { objects: 0, size: '0 B' };
@@ -466,3 +461,7 @@ export function getMinioKnowledgeStore(config?: Partial<MinioConfig>): MinioKnow
   }
   return minioStoreInstance;
 }
+
+
+
+

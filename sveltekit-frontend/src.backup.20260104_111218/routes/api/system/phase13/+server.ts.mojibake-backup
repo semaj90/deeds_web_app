@@ -1,0 +1,78 @@
+import { error, json } from '@sveltejs/kit';
+import { getRedisClient } from '$lib/server/cache/redis';
+import { getDb } from '$lib/server/db';
+
+/**
+ * GET /api/system/phase13
+ * Health check - verifies core services are reachable
+ * No side effects
+ */
+export async function GET() {
+  const health = {
+    timestamp: new Date().toISOString(),
+    services: {},
+  };
+
+  try {
+    // Check Redis
+    const redis = getRedisClient();
+    try {
+      const pingResult = await redis.ping();
+      health.services.redis = {
+        ok: pingResult === 'PONG',
+        message: pingResult,
+      };
+    } catch (e) {
+      health.services.redis = { ok: false, message: e.message };
+    }
+
+    // Check PostgreSQL + pgvector
+    const db = getDb();
+    try {
+      const result = await db.query('SELECT version(), current_database()');
+      health.services.postgres = {
+        ok: result.rows.length > 0,
+        version: result.rows[0]?.version?.substring(0, 40) || 'unknown',
+        database: result.rows[0]?.current_database || 'unknown',
+      };
+    } catch (e) {
+      health.services.postgres = { ok: false, message: e.message };
+    }
+
+    // Check Qdrant (if configured)
+    if (process.env.QDRANT_URL) {
+      try {
+        const resp = await fetch(`${process.env.QDRANT_URL}/health`);
+        health.services.qdrant = { ok: resp.ok, status: resp.status };
+      } catch (e) {
+        health.services.qdrant = { ok: false, message: e.message };
+      }
+    }
+
+    // Check Ollama (if configured)
+    if (process.env.OLLAMA_URL) {
+      try {
+        const resp = await fetch(`${process.env.OLLAMA_URL}/api/tags`);
+        const data = await resp.json();
+        health.services.ollama = {
+          ok: resp.ok,
+          modelCount: data.models?.length || 0,
+        };
+      } catch (e) {
+        health.services.ollama = { ok: false, message: e.message };
+      }
+    }
+
+    // Check MinIO (if configured)
+    if (process.env.MINIO_ENDPOINT) {
+      health.services.minio = {
+        ok: true,
+        endpoint: process.env.MINIO_ENDPOINT,
+      };
+    }
+
+    return json(health);
+  } catch (e) {
+    return json({ error: e.message }, { status: 500 });
+  }
+}

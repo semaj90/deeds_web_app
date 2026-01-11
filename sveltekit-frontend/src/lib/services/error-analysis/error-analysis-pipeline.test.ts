@@ -8,7 +8,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { ErrorAnalysisPipeline } from './error-analysis-pipeline.js';
 import type { ServiceConfig, Error } from './types.js';
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';
 
 describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
   let pipeline: ErrorAnalysisPipeline;
@@ -44,10 +44,8 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
+          createdAt: new Date( updatedAt: new Date(),
+        }];
 
       const context = await pipeline.analyzeErrors(sessionId, errors);
 
@@ -67,10 +65,8 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
+          createdAt: new Date( updatedAt: new Date(),
+        }];
 
       await pipeline.analyzeErrors(sessionId, errors);
 
@@ -97,8 +93,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: new Date( updatedAt: new Date(),
         },
         {
           id: 'error-2',
@@ -107,8 +102,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: new Date( updatedAt: new Date(),
         },
         {
           id: 'error-3',
@@ -117,10 +111,8 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'svelte',
           severity: 'warning',
           status: 'new',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
+          createdAt: new Date( updatedAt: new Date(),
+        }];
 
       const context = await pipeline.analyzeErrors(sessionId, errors);
 
@@ -139,10 +131,8 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
+          createdAt: new Date( updatedAt: new Date(),
+        }];
 
       const context = await pipeline.analyzeErrors(sessionId, errors);
 
@@ -165,8 +155,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
         type: 'typescript',
         severity: 'error',
         status: 'new',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date( updatedAt: new Date(),
       };
 
       await expect(pipeline.analyzeError('', error)).rejects.toThrow('Invalid input');
@@ -185,10 +174,8 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
+          createdAt: new Date( updatedAt: new Date(),
+        }];
 
       await expect(pipeline.analyzeErrors('', errors)).rejects.toThrow('Invalid input');
     });
@@ -223,10 +210,8 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
+          createdAt: new Date( updatedAt: new Date(),
+        }];
 
       const analyzedContext = await pipeline.analyzeErrors(sessionId, errors);
       const retrievedContext = await pipeline.getSessionContext(sessionId);
@@ -247,10 +232,8 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
+          createdAt: new Date( updatedAt: new Date(),
+        }];
 
       await pipeline.analyzeErrors(sessionId, errors);
 
@@ -278,10 +261,8 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
+          createdAt: new Date( updatedAt: new Date(),
+        }];
 
       const context = await pipeline.analyzeErrors(sessionId, errors);
 
@@ -293,3 +274,5 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
     });
   });
 });
+
+

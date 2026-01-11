@@ -1,0 +1,424 @@
+// Gemma Embeddings gRPC Service Protobuf Schema
+// Ultra-optimized for high-throughput legal document processing
+
+syntax = "proto3";
+
+package gemma_embeddings;
+
+option go_package = "github.com/legal-ai/gemma-embeddings/proto";
+option java_package = "com.legalai.gemmaembeddings";
+option java_outer_classname = "GemmaEmbeddingsProto";
+
+// =============================================================================
+// GEMMA EMBEDDING SERVICE
+// =============================================================================
+
+service GemmaEmbeddingService {
+  // Single embedding generation
+  rpc GenerateEmbedding(EmbeddingRequest) returns (EmbeddingResponse);
+
+  // Batch embedding generation (non-streaming)
+  rpc GenerateBatchEmbeddings(BatchEmbeddingRequest) returns (BatchEmbeddingResponse);
+
+  // Streaming batch embeddings (bidirectional streaming)
+  rpc StreamBatchEmbeddings(stream EmbeddingRequest) returns (stream EmbeddingResponse);
+
+  // Real-time embedding with contextual awareness
+  rpc GenerateContextualEmbedding(ContextualEmbeddingRequest) returns (EmbeddingResponse);
+
+  // Health check
+  rpc Check(HealthCheckRequest) returns (HealthCheckResponse);
+
+  // Performance metrics
+  rpc GetMetrics(MetricsRequest) returns (MetricsResponse);
+}
+
+// =============================================================================
+// REQUEST MESSAGES
+// =============================================================================
+
+message EmbeddingRequest {
+  string document_id = 1;
+  string text_content = 2;
+  map<string, string> metadata = 3;
+  string batch_id = 4;
+  int32 priority = 5; // 0-10, higher = more urgent
+  EmbeddingOptions options = 6;
+  int64 timestamp = 7;
+}
+
+message EmbeddingOptions {
+  string model_version = 1; // e.g., "gemma-7b-it", "gemma-2b"
+  int32 context_length = 2; // Maximum context tokens
+  bool normalize = 3; // L2 normalize embeddings
+  bool quantize = 4; // Quantize to int8 for storage efficiency
+  bool cache_result = 5; // Cache in Redis/memory
+  float temperature = 6; // For contextual embeddings
+  repeated string focus_keywords = 7; // Legal keywords to emphasize
+}
+
+message BatchEmbeddingRequest {
+  string batch_id = 1;
+  repeated EmbeddingRequest requests = 2;
+  BatchOptions batch_options = 3;
+  int64 timestamp = 4;
+}
+
+message BatchOptions {
+  int32 max_concurrent = 1; // Max parallel processing
+  int32 timeout_ms = 2; // Batch timeout
+  bool enable_streaming = 3; // Use streaming for real-time results
+  bool postgresql_optimization = 4; // Direct PostgreSQL insertion
+  bool enable_compression = 5; // Compress embeddings
+  CompressionType compression_type = 6;
+}
+
+message ContextualEmbeddingRequest {
+  EmbeddingRequest base_request = 1;
+  repeated string context_documents = 2; // Related document IDs
+  LegalContext legal_context = 3;
+  float context_weight = 4; // 0.0-1.0, influence of context
+}
+
+message LegalContext {
+  string case_type = 1; // "contract", "litigation", "patent", etc.
+  string jurisdiction = 2; // "federal", "state", "international"
+  repeated string legal_areas = 3; // "corporate", "IP", "criminal", etc.
+  string case_id = 4; // Related case identifier
+  map<string, string> custom_context = 5;
+}
+
+message HealthCheckRequest {
+  string service = 1;
+}
+
+message MetricsRequest {
+  bool include_detailed_stats = 1;
+  int64 time_range_start = 2;
+  int64 time_range_end = 3;
+}
+
+// =============================================================================
+// RESPONSE MESSAGES
+// =============================================================================
+
+message EmbeddingResponse {
+  string document_id = 1;
+  repeated float embedding = 2; // 768-dimensional vector
+  int32 dimensions = 3;
+  string model_version = 4;
+  float processing_time = 5; // Milliseconds
+  float confidence_score = 6; // 0.0-1.0
+  map<string, string> metadata = 7;
+  EmbeddingStatus status = 8;
+  float vector_norm = 9; // L2 norm for optimization
+  bytes compressed_embedding = 10; // Optional compressed version
+  int64 timestamp = 11;
+}
+
+message EmbeddingStatus {
+  int32 code = 1; // 0 = success, >0 = error codes
+  string message = 2;
+  int32 retry_after = 3; // Seconds before retry
+  string error_category = 4; // "rate_limit", "model_error", "network", etc.
+}
+
+message BatchEmbeddingResponse {
+  string batch_id = 1;
+  repeated EmbeddingResponse responses = 2;
+  BatchStatistics batch_statistics = 3;
+  PostgreSQLBatchResult postgresql_results = 4;
+  int64 timestamp = 5;
+}
+
+message BatchStatistics {
+  int32 total_requests = 1;
+  int32 successful_embeddings = 2;
+  int32 failed_embeddings = 3;
+  float avg_processing_time = 4; // Milliseconds
+  float total_batch_time = 5; // Milliseconds
+  float throughput_per_second = 6;
+  float cache_hit_rate = 7;
+  MemoryUsage memory_usage = 8;
+}
+
+message PostgreSQLBatchResult {
+  int32 inserted_rows = 1;
+  int32 updated_rows = 2;
+  float jsonb_compression_ratio = 3;
+  float index_update_time = 4; // Milliseconds
+  repeated IndexPerformance index_performance = 5;
+}
+
+message IndexPerformance {
+  string index_name = 1; // "ivf_flat", "hnsw"
+  float creation_time = 2;
+  float query_performance = 3; // Average query time
+  int64 memory_usage = 4; // Bytes
+}
+
+message HealthCheckResponse {
+  HealthStatus status = 1;
+  string message = 2;
+  repeated ServiceHealth service_health = 3;
+  int64 timestamp = 4;
+}
+
+message ServiceHealth {
+  string service_name = 1;
+  HealthStatus status = 2;
+  float response_time = 3;
+  string version = 4;
+}
+
+message MetricsResponse {
+  ProcessingMetrics processing_metrics = 1;
+  PerformanceMetrics performance_metrics = 2;
+  ResourceMetrics resource_metrics = 3;
+  repeated ModelMetrics model_metrics = 4;
+  int64 timestamp = 5;
+}
+
+message ProcessingMetrics {
+  int64 total_embeddings_generated = 1;
+  int64 successful_embeddings = 2;
+  int64 failed_embeddings = 3;
+  float avg_processing_time = 4;
+  float peak_processing_time = 5;
+  int64 total_tokens_processed = 6;
+  float tokens_per_second = 7;
+}
+
+message PerformanceMetrics {
+  float avg_latency = 1;
+  float p95_latency = 2;
+  float p99_latency = 3;
+  float throughput_per_second = 4;
+  int32 concurrent_requests = 5;
+  float cache_hit_rate = 6;
+  float error_rate = 7;
+}
+
+message ResourceMetrics {
+  MemoryUsage memory_usage = 1;
+  CPUUsage cpu_usage = 2;
+  GPUUsage gpu_usage = 3;
+  NetworkUsage network_usage = 4;
+  StorageUsage storage_usage = 5;
+}
+
+message MemoryUsage {
+  int64 heap_used = 1; // Bytes
+  int64 heap_total = 2; // Bytes
+  int64 resident_set_size = 3; // Bytes
+  int64 external_memory = 4; // Bytes
+}
+
+message CPUUsage {
+  float cpu_percent = 1; // 0.0-100.0
+  int32 active_cores = 2;
+  float system_load = 3;
+  int64 user_time = 4; // Microseconds
+  int64 system_time = 5; // Microseconds
+}
+
+message GPUUsage {
+  float gpu_utilization = 1; // 0.0-100.0
+  int64 gpu_memory_used = 2; // Bytes
+  int64 gpu_memory_total = 3; // Bytes
+  float gpu_temperature = 4; // Celsius
+  string gpu_model = 5;
+}
+
+message NetworkUsage {
+  int64 bytes_sent = 1;
+  int64 bytes_received = 2;
+  int32 active_connections = 3;
+  float network_latency = 4; // Milliseconds
+}
+
+message StorageUsage {
+  int64 disk_used = 1; // Bytes
+  int64 disk_total = 2; // Bytes
+  float disk_io_rate = 3; // MB/s
+  int64 cache_size = 4; // Bytes
+}
+
+message ModelMetrics {
+  string model_name = 1;
+  string model_version = 2;
+  int64 embeddings_generated = 3;
+  float avg_processing_time = 4;
+  float model_accuracy = 5;
+  int64 model_memory_usage = 6; // Bytes
+  ModelStatus status = 7;
+}
+
+// =============================================================================
+// ENUMS
+// =============================================================================
+
+enum HealthStatus {
+  UNKNOWN = 0;
+  SERVING = 1;
+  NOT_SERVING = 2;
+  SERVICE_UNKNOWN = 3;
+}
+
+enum CompressionType {
+  NONE = 0;
+  GZIP = 1;
+  LZ4 = 2;
+  SNAPPY = 3;
+  BROTLI = 4;
+}
+
+enum ModelStatus {
+  MODEL_UNKNOWN = 0;
+  MODEL_LOADING = 1;
+  MODEL_READY = 2;
+  MODEL_ERROR = 3;
+  MODEL_UPDATING = 4;
+}
+
+enum PriorityLevel {
+  LOW = 0;
+  NORMAL = 1;
+  HIGH = 2;
+  URGENT = 3;
+  CRITICAL = 4;
+}
+
+// =============================================================================
+// STREAMING MESSAGES
+// =============================================================================
+
+message StreamingEmbeddingResponse {
+  oneof response_type {
+    EmbeddingResponse embedding = 1;
+    BatchProgress progress = 2;
+    StreamingError error = 3;
+    StreamingComplete complete = 4;
+  }
+  int64 timestamp = 5;
+}
+
+message BatchProgress {
+  string batch_id = 1;
+  int32 processed_count = 2;
+  int32 total_count = 3;
+  float progress_percent = 4;
+  float current_throughput = 5;
+  float estimated_time_remaining = 6; // Seconds
+}
+
+message StreamingError {
+  string batch_id = 1;
+  string document_id = 2;
+  EmbeddingStatus error_status = 3;
+  bool is_recoverable = 4;
+}
+
+message StreamingComplete {
+  string batch_id = 1;
+  BatchStatistics final_statistics = 2;
+  repeated string failed_document_ids = 3;
+}
+
+// =============================================================================
+// CONFIGURATION MESSAGES
+// =============================================================================
+
+message ServerConfig {
+  int32 max_concurrent_requests = 1;
+  int32 batch_size_limit = 2;
+  int32 timeout_seconds = 3;
+  bool enable_caching = 4;
+  bool enable_compression = 5;
+  repeated string allowed_models = 6;
+  ResourceLimits resource_limits = 7;
+}
+
+message ResourceLimits {
+  int64 max_memory_mb = 1;
+  float max_cpu_percent = 2;
+  int64 max_gpu_memory_mb = 3;
+  int32 max_disk_io_mb_per_sec = 4;
+}
+
+// =============================================================================
+// LEGAL-SPECIFIC EXTENSIONS
+// =============================================================================
+
+message LegalDocumentMetadata {
+  string document_type = 1; // "contract", "brief", "statute", etc.
+  string court = 2;
+  string jurisdiction = 3;
+  repeated string parties = 4;
+  string date_filed = 5;
+  string case_number = 6;
+  repeated string legal_topics = 7;
+  string practice_area = 8;
+  map<string, string> custom_fields = 9;
+}
+
+message CitationExtraction {
+  repeated LegalCitation citations = 1;
+  float extraction_confidence = 2;
+}
+
+message LegalCitation {
+  string citation_text = 1;
+  string case_name = 2;
+  string reporter = 3;
+  string year = 4;
+  string court = 5;
+  CitationType type = 6;
+}
+
+enum CitationType {
+  CASE_LAW = 0;
+  STATUTE = 1;
+  REGULATION = 2;
+  CONSTITUTIONAL = 3;
+  SECONDARY_SOURCE = 4;
+  INTERNATIONAL = 5;
+}
+
+// =============================================================================
+// VECTOR OPTIMIZATION MESSAGES
+// =============================================================================
+
+message VectorOptimizationConfig {
+  bool enable_quantization = 1;
+  QuantizationType quantization_type = 2;
+  bool enable_dimensionality_reduction = 3;
+  int32 target_dimensions = 4;
+  bool enable_clustering = 5;
+  int32 cluster_count = 6;
+}
+
+enum QuantizationType {
+  NO_QUANTIZATION = 0;
+  INT8_QUANTIZATION = 1;
+  INT4_QUANTIZATION = 2;
+  BINARY_QUANTIZATION = 3;
+  PRODUCT_QUANTIZATION = 4;
+}
+
+message VectorIndex {
+  string index_id = 1;
+  string index_type = 2; // "ivf_flat", "hnsw", "annoy"
+  map<string, string> index_parameters = 3;
+  int32 vector_count = 4;
+  float build_time = 5;
+  float memory_usage_mb = 6;
+  IndexPerformanceStats performance_stats = 7;
+}
+
+message IndexPerformanceStats {
+  float avg_query_time = 1; // Milliseconds
+  float recall_at_k = 2; // Recall@10
+  int32 queries_per_second = 3;
+  float index_size_mb = 4;
+}

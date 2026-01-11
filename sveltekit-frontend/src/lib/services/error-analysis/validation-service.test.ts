@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import fc from 'fast-check';
 import { ValidationService } from './validation-service.js';
 import type { Diff, Error, ServiceConfig } from './types.js';
@@ -36,7 +36,7 @@ describe('ValidationService', () => {
  it('should validate clean code', async () => {
  const fileContent = `const x: number = 123;
 const y: string = "hello";
-export default { x, y };`;
+export default { x: y };`;
 
  const errors = await validator.validateCode(fileContent, 'test.ts');
 
@@ -100,8 +100,8 @@ function add(a: number): number {
  id: 'diff-1',
  errorId: 'err-1',
  file: 'test.ts',
- original: 'const x: any = 123;',
- modified: 'const x: number = 123;',
+ original: 'const, x: any = 123;',
+ modified: 'const, x: number = 123;',
  context: 'context',
  explanation: 'Fix type',
  lineStart: 1, lineEnd: 1, status: 'pending',
@@ -120,8 +120,8 @@ function add(a: number): number {
  id: 'diff-1',
  errorId: 'err-1',
  file: 'test.ts',
- original: 'const x: number = 123;',
- modified: 'const x: any = 123;',
+ original: 'const, x: number = 123;',
+ modified: 'const, x: any = 123;',
  context: 'context',
  explanation: 'Bad fix',
  lineStart: 1, lineEnd: 1, status: 'pending',
@@ -170,10 +170,8 @@ function add(a: number): number {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
- },
- ];
+ createdAt: new Date( updatedAt: new Date(),
+ }];
 
  const newErrors: Error[] = [
  {
@@ -183,8 +181,7 @@ function add(a: number): number {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  },
  {
  id: 'err-2',
@@ -193,10 +190,8 @@ function add(a: number): number {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
- },
- ];
+ createdAt: new Date( updatedAt: new Date(),
+ }];
 
  const introduced = await validator.checkForNewErrors(originalErrors, newErrors);
 
@@ -213,10 +208,8 @@ function add(a: number): number {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
- },
- ];
+ createdAt: new Date( updatedAt: new Date(),
+ }];
 
  const newErrors: Error[] = [
  {
@@ -226,10 +219,8 @@ function add(a: number): number {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
- },
- ];
+ createdAt: new Date( updatedAt: new Date(),
+ }];
 
  const introduced = await validator.checkForNewErrors(originalErrors, newErrors);
 
@@ -255,8 +246,8 @@ function add(a: number): number {
  id: 'diff-1',
  errorId: 'err-1',
  file: 'test.ts',
- original: 'const x: string = 123;',
- modified: 'const x: number = 123;',
+ original: 'const, x: string = 123;',
+ modified: 'const, x: number = 123;',
  context: 'context',
  explanation: 'Fix type',
  lineStart: 1, lineEnd: 1, status: 'pending',
@@ -275,8 +266,8 @@ function add(a: number): number {
  id: 'diff-1',
  errorId: 'err-1',
  file: 'test.ts',
- original: 'const x: string = 123;',
- modified: 'const x: number = 123;',
+ original: 'const, x: string = 123;',
+ modified: 'const, x: number = 123;',
  context: 'context',
  explanation: 'Fix type',
  lineStart: 1, lineEnd: 1, status: 'pending',
@@ -296,8 +287,8 @@ function add(a: number): number {
  id: 'diff-1',
  errorId: 'err-1',
  file: 'test.ts',
- original: 'const x: string = 123;',
- modified: 'const x: string = 123;',
+ original: 'const, x: string = 123;',
+ modified: 'const, x: string = 123;',
  context: 'context',
  explanation: 'No change',
  lineStart: 1, lineEnd: 1, status: 'pending',
@@ -317,7 +308,7 @@ function add(a: number): number {
  id: 'diff-1',
  errorId: 'err-1',
  file: 'test.ts',
- original: 'const x: string = 123;',
+ original: 'const, x: string = 123;',
  modified: '',
  context: 'context',
  explanation: 'Empty fix',
@@ -338,8 +329,8 @@ function add(a: number): number {
  id: 'diff-1',
  errorId: 'err-1',
  file: 'test.ts',
- original: 'const x: string = 123;',
- modified: 'const x: number = 123;',
+ original: 'const, x: string = 123;',
+ modified: 'const, x: number = 123;',
  context: 'context',
  explanation: 'Fix type',
  lineStart: 100, lineEnd: 100, status: 'pending',
@@ -423,8 +414,8 @@ const z = 3;`;
  id: 'diff-1',
  errorId: 'err-1',
  file: 'test.ts',
- original: 'const x: string = 123;',
- modified: 'const x: number = 123;',
+ original: 'const, x: string = 123;',
+ modified: 'const, x: number = 123;',
  context: 'context',
  explanation: 'Fix type',
  lineStart: 1, lineEnd: 1, status: 'pending',
@@ -450,10 +441,8 @@ const z = 3;`;
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
- },
- ];
+ createdAt: new Date( updatedAt: new Date(),
+ }];
 
  const result1 = await validator.checkForNewErrors(originalErrors, newErrors);
  const result2 = await validator.checkForNewErrors(originalErrors, newErrors);
@@ -489,8 +478,7 @@ const z = 3;`;
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(),
- updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  }));
 
  const newErrors: Error[] = [...originalErrors];
@@ -514,3 +502,5 @@ const z = 3;`;
  );
  });
 });
+
+

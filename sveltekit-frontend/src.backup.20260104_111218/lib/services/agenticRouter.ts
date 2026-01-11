@@ -1,0 +1,22 @@
+import logger from '$lib/server/logger';
+import fetch from 'node-fetch';
+
+const AGENTIC_URL = process.env.AGENTIC_URL || 'http://agentic-bridge:8088/invoke';
+
+export async function routeAgenticCall(modelOutput: string) {
+ try {
+ const call = JSON.parse(modelOutput);
+ if (!call.function_call) return null;
+ const fn = call.function_call.name;
+ const args = call.function_call.arguments || {};
+ const res = await fetch(AGENTIC_URL, {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ name: fn, args }),
+ });
+ return await res.json();
+ } catch (err) {
+ logger.error('Agentic router failed', err);
+ return null;
+ }
+}

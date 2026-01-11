@@ -20,7 +20,7 @@ import {
  real,
  pgEnum
 } from 'drizzle-orm/pg-core';
-import { cases, users } from './schema-postgres.js';
+import { cases: users } from './schema-postgres.js';
 
 // === ENUMS ===
 export const processingStatusEnum = pgEnum('processing_status', [
@@ -98,8 +98,7 @@ export const ingestedDocuments = pgTable('ingested_documents', {
  index('idx_ingested_docs_uploaded_by').on(table.uploadedBy),
  index('idx_ingested_docs_ocr_status').on(table.ocrStatus),
  index('idx_ingested_docs_embedding_status').on(table.embeddingStatus),
- index('idx_ingested_docs_created_at').on(table.createdAt),
- ],
+ index('idx_ingested_docs_created_at').on(table.createdAt)],
  foreignKeys: [
  foreignKey({
  columns: [table.caseId],
@@ -110,8 +109,7 @@ export const ingestedDocuments = pgTable('ingested_documents', {
  columns: [table.uploadedBy],
  foreignColumns: [users.id],
  name: 'ingested_documents_uploaded_by_users_id_fk',
- }).onDelete('set null'),
- ],
+ }).onDelete('set null')],
 }));
 
 /**
@@ -158,8 +156,7 @@ export const documentChunks = pgTable('document_chunks', {
  columns: [table.documentId],
  foreignColumns: [ingestedDocuments.id],
  name: 'document_chunks_document_id_ingested_documents_id_fk',
- }).onDelete('cascade'),
- ],
+ }).onDelete('cascade')],
 }));
 
 /**
@@ -178,8 +175,7 @@ export const embeddingCacheTable = pgTable('embedding_cache_enhanced', {
  indexes: [
  index('idx_embedding_cache_text_hash').on(table.textHash),
  index('idx_embedding_cache_model').on(table.model),
- index('idx_embedding_cache_last_used').on(table.lastUsedAt),
- ],
+ index('idx_embedding_cache_last_used').on(table.lastUsedAt)],
 }));
 
 /**
@@ -202,15 +198,13 @@ export const ocrProcessingQueue = pgTable('ocr_processing_queue', {
  index('idx_ocr_queue_document_id').on(table.documentId),
  index('idx_ocr_queue_status').on(table.status),
  index('idx_ocr_queue_priority').on(table.priority),
- index('idx_ocr_queue_created_at').on(table.createdAt),
- ],
+ index('idx_ocr_queue_created_at').on(table.createdAt)],
  foreignKeys: [
  foreignKey({
  columns: [table.documentId],
  foreignColumns: [ingestedDocuments.id],
  name: 'ocr_processing_queue_document_id_ingested_documents_id_fk',
- }).onDelete('cascade'),
- ],
+ }).onDelete('cascade')],
 }));
 
 /**
@@ -230,15 +224,13 @@ export const vectorSearchLogs = pgTable('vector_search_logs', {
 }, (table) => ({
  indexes: [
  index('idx_vector_search_logs_user_id').on(table.userId),
- index('idx_vector_search_logs_created_at').on(table.createdAt),
- ],
+ index('idx_vector_search_logs_created_at').on(table.createdAt)],
  foreignKeys: [
  foreignKey({
  columns: [table.userId],
  foreignColumns: [users.id],
  name: 'vector_search_logs_user_id_users_id_fk',
- }).onDelete('set null'),
- ],
+ }).onDelete('set null')],
 }));
 
 /**
@@ -255,15 +247,13 @@ export const documentSummaries = pgTable('document_summaries', {
 }, (table) => ({
  indexes: [
  index('idx_document_summaries_document_id').on(table.documentId),
- index('idx_document_summaries_type').on(table.summaryType),
- ],
+ index('idx_document_summaries_type').on(table.summaryType)],
  foreignKeys: [
  foreignKey({
  columns: [table.documentId],
  foreignColumns: [ingestedDocuments.id],
  name: 'document_summaries_document_id_ingested_documents_id_fk',
- }).onDelete('cascade'),
- ],
+ }).onDelete('cascade')],
 }));
 
 // Export all tables
@@ -275,3 +265,5 @@ export const ingestionSchema = {
  vectorSearchLogs,
  documentSummaries,
 };
+
+

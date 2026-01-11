@@ -4,7 +4,7 @@ import type { OllamaService } from '$lib/server/ollama';
 const ollama = new OllamaService();
 
 export const POST = async ({ request }) => {
- const { message, caseId } = await request.json();
+ const { message: caseId } = await request.json();
  if (!message) return json({ error: 'Missing message' }, { status: 400 });
 
  try {
@@ -15,3 +15,5 @@ export const POST = async ({ request }) => {
  return json({ error: 'Chat failed', details: error.message }, { status: 500 });
  }
 };
+
+

@@ -1,14 +1,11 @@
 export type ChatMessage = {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
+  id: string; role: 'user' | 'assistant';
+  content: string; timestamp: Date;
   metadata?: unknown;
 };
 
 export interface ChatSession {
-  id: string;
-  model: string;
+  id: string; model: string;
   createdAt: string | Date;
   updatedAt?: string | Date;
   messageCount?: number;
@@ -22,10 +19,8 @@ export interface ChatSession {
 }
 
 export interface OllamaResponse {
-  model: string;
-  createdAt: string | Date;
-  response: string;
-  done: boolean;
+  model: string; createdAt: string | Date;
+  response: string; done: boolean;
   context?: number[];
   totalDuration?: number;
   loadDuration?: number;
@@ -47,8 +42,7 @@ export interface ChatResponse {
   response: string;
   confidence?: number;
   sources?: string[];
-  processingTime?: number;
-  model: string;
+  processingTime?: number; model: string;
   metadata?: unknown;
 }
 
@@ -56,8 +50,7 @@ export interface ChatResponse {
 export type ConnectionStatus = 'connected' | 'disconnected' | 'connecting' | 'error';
 
 export interface AttentionData {
-  layer: number;
-  head: number;
+  layer: number; head: number;
   scores: number[];
 }
 
@@ -75,8 +68,7 @@ export interface RAGContext {
 }
 
 export interface Recommendation {
-  id: string;
-  type: string;
+  id: string; type: string;
   title: string;
   description?: string;
   confidence?: number;
@@ -84,10 +76,13 @@ export interface Recommendation {
 }
 
 export interface UserActivity {
-  lastSeen: Date;
-  messageCount: number;
+  lastSeen: Date; messageCount: number;
   sessionDuration: number;
 }
+
+
+
+
 
 
 

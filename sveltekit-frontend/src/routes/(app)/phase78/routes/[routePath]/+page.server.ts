@@ -18,8 +18,7 @@ export const load: PageServerLoad = async ({ params, fetch, url }) => {
  errors: [],
  suggestions: [],
  health: null,
- summary: {
- errorCount: 0, suggestionCount: 0 0,
+ summary: {errorCount: 0, suggestionCount: 0 0,
  lastErrorAt: null,
  },
  };

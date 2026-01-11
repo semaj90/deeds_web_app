@@ -24,9 +24,7 @@ export interface ApiResponse<T = unknown> {
 }
 
 export interface PaginatedResponse<T = unknown> {
- data: T[], page: number;
- limit: number, total: number;
- totalPages: number;
+ data: T[], page: number; limit: number, total: number; totalPages: number;
  hasNext?: boolean;
  hasPrev?: boolean;
 }
@@ -92,7 +90,7 @@ export class LegalAIApiClient {
  retry = { attempts: 3, backoffMs: 1000 },
  } = options;
  const origin = browser ? window.location.origin : 'http://localhost:5173';
- const url = new URL(`${this.baseUrl}${endpoint}`, origin);
+ const url = new URL(`${this.baseUrl}${ endpoint }`, origin);
 
  if (query) {
  Object.entries(query).forEach(([key, value]) => {
@@ -184,22 +182,21 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  } = {}
  ): Promise<PaginatedResponse<unknown>> {
  const { signal, ...query } = _options;
- return this.request<PaginatedResponse<unknown>>('/cases', { query, signal });
+ return this.request<PaginatedResponse<unknown>>('/cases', { query: signal });
  }
 
  /**
  * Get specific case by ID
  */
  async getCase(id: string, signal?: AbortSignal): Promise<ApiResponse<unknown>> {
- return this.request<ApiResponse<unknown>>(`/cases/${id}`, { signal });
+ return this.request<ApiResponse<unknown>>(`/cases/${ id }`, { signal });
  }
 
  /**
  * Create new case
  */
  async createCase(
- caseData: {
- title: string;
+ caseData: { title: string;
  description?: string;
  caseNumber?: string;
  status?: 'open' | 'closed' | 'pending' | 'archived';
@@ -216,11 +213,8 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Update case
  */
  async updateCase(
- id: string, caseData: Partial<{
- title: string, description: string;
- caseNumber: string, status: 'open' | 'closed' | 'pending' | 'archived';
- priority: 'low' | 'medium' | 'high' | 'urgent', category: string;
- metadata: Record<string, unknown>;
+ id: string, caseData: Partial<{ title: string, description: string; caseNumber: string, status: 'open' | 'closed' | 'pending' | 'archived';
+ priority: 'low' | 'medium' | 'high' | 'urgent', category: string; metadata: Record<string, unknown>;
  }>,
  signal?: AbortSignal
  ): Promise<ApiResponse<unknown>> {
@@ -253,7 +247,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  } = {}
  ): Promise<PaginatedResponse<unknown>> {
  const { signal, ...query } = _options;
- return this.request<PaginatedResponse<unknown>>('/evidence', { query, signal });
+ return this.request<PaginatedResponse<unknown>>('/evidence', { query: signal });
  }
 
  /**
@@ -267,9 +261,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Create new evidence
  */
  async createEvidence(
- evidenceData: {
- caseId: string, title: string;
- evidenceType: string;
+ evidenceData: { caseId: string, title: string; evidenceType: string;
  description?: string;
  fileUrl?: string;
  fileName?: string;
@@ -296,14 +288,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Update evidence
  */
  async updateEvidence(
- id: string, evidenceData: Partial<{
- title: string, evidenceType: string;
- description: string, fileUrl: string;
- fileName: string, fileSize: number;
- mimeType: string, hash: string;
- tags: string[], chainOfCustody: unknown[];
- aiSummary: string, summary: string;
- isAdmissible: boolean, confidentialityLevel: string;
+ id: string, evidenceData: Partial<{ title: string, evidenceType: string; description: string, fileUrl: string; fileName: string, fileSize: number; mimeType: string, hash: string; tags: string[], chainOfCustody: unknown[]; aiSummary: string, summary: string; isAdmissible: boolean, confidentialityLevel: string;
  }>,
  signal?: AbortSignal
  ): Promise<ApiResponse<unknown>> {
@@ -336,7 +321,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  } = {}
  ): Promise<PaginatedResponse<unknown>> {
  const { signal, ...query } = _options;
- return this.request<PaginatedResponse<unknown>>('/reports', { query, signal });
+ return this.request<PaginatedResponse<unknown>>('/reports', { query: signal });
  }
 
  /**
@@ -350,10 +335,8 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Create new report
  */
  async createReport(
- reportData: {
- title: string;
- description?: string;
- reportType: string;
+ reportData: { title: string;
+ description?: string; reportType: string;
  caseId?: string;
  content?: string;
  status?: string;
@@ -372,11 +355,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Update report
  */
  async updateReport(
- id: string, reportData: Partial<{
- title: string, description: string;
- reportType: string, caseId: string;
- content: string, status: string;
- metadata: Record<string, unknown>;
+ id: string, reportData: Partial<{ title: string, description: string; reportType: string, caseId: string; content: string, status: string; metadata: Record<string, unknown>;
  }>,
  signal?: AbortSignal
  ): Promise<ApiResponse<unknown>> {
@@ -408,7 +387,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  } = {}
  ): Promise<PaginatedResponse<unknown>> {
  const { signal, ...query } = _options;
- return this.request<PaginatedResponse<unknown>>('/persons-of-interest', { query, signal });
+ return this.request<PaginatedResponse<unknown>>('/persons-of-interest', { query: signal });
  }
 
  /**
@@ -422,10 +401,8 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Create new person of interest
  */
  async createPersonOfInterest(
- personData: {
- name: string;
- description?: string;
- riskLevel: string;
+ personData: { name: string;
+ description?: string; riskLevel: string;
  caseId?: string;
  contactInfo?: Record<string, unknown>;
  aliases?: string[];
@@ -444,10 +421,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Update person of interest
  */
  async updatePersonOfInterest(
- id: string, personData: Partial<{
- name: string, description: string;
- riskLevel: string, caseId: string;
- contactInfo: Record<string, unknown>;
+ id: string, personData: Partial<{ name: string, description: string; riskLevel: string, caseId: string; contactInfo: Record<string, unknown>;
  aliases: string[], metadata: Record<string, unknown>;
  }>,
  signal?: AbortSignal
@@ -477,10 +451,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  file: File,
  onProgress?: () => void,
  signal?: AbortSignal
- ): Promise<{
- fileUrl: string, fileName: string;
- fileSize: number, mimeType: string;
- hash: string;
+ ): Promise<{ fileUrl: string, fileName: string; fileSize: number, mimeType: string; hash: string;
  }> {
  const formData = new FormData();
  formData.append('file', file);
@@ -610,3 +581,7 @@ export type CreateCaseData = z.infer<typeof CreateCaseSchema>;
 export type CreateEvidenceData = z.infer<typeof CreateEvidenceSchema>;
 export type CreateReportData = z.infer<typeof CreateReportSchema>;
 export type CreatePersonOfInterestData = z.infer<typeof CreatePersonOfInterestSchema>;
+
+
+
+

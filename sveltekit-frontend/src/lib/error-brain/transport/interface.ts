@@ -8,3 +8,5 @@ import type { ErrorBrainEvent } from '../types.js';
 export interface ErrorBrainTransport {
  publish(evt: ErrorBrainEvent): Promise<void>;
 }
+
+

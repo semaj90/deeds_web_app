@@ -125,3 +125,5 @@ export type NewErrorSession = typeof errorSessions.$inferInsert;
 
 export type GeneratedFix = typeof generatedFixes.$inferSelect;
 export type NewGeneratedFix = typeof generatedFixes.$inferInsert;
+
+

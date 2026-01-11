@@ -77,11 +77,10 @@ export const GET: RequestHandler = async () => {
 
 		return json({
 			components,
-			summary: {
-				total_components: components.length,
-				total_errors: components.reduce((sum, c) => sum + c.errors, 0),
-				high_priority: components.filter(c => c.recommended_action === 'urgent_refactor').length,
-				avg_complexity: components.reduce((sum, c) => sum + c.complexity, 0) / components.length
+			summary: { total_components: components.length,
+				total_errors: components.reduce((sum: number, c: any) => sum + c.errors, 0),
+				high_priority: components.filter((c: any) => c.recommended_action === 'urgent_refactor').length,
+				avg_complexity: components.reduce((sum: number, c: any) => sum + c.complexity, 0) / components.length
 			}
 		});
 
@@ -104,52 +103,24 @@ function extractComponent(filePath: string): string {
 		return parts.slice(idx, idx + 2).join('/');
 	}
 
-	return parts.slice(-2).join('/');
+	return filePath;
 }
 
-function generateTags(component: any): Set<string> {
+function generateTags(comp: any): Set<string> {
 	const tags = new Set<string>();
-
-	if (component.name.includes('routes')) {
-		tags.add('route');
-		tags.add('page');
-	}
-	if (component.name.includes('lib')) {
-		tags.add('library');
-		tags.add('utility');
-	}
-	if (component.name.includes('server')) {
-		tags.add('server-side');
-		tags.add('ssr');
-	}
-	if (component.name.includes('components')) {
-		tags.add('component');
-		tags.add('ui');
-	}
-	if (component.errors > 10) {
-		tags.add('high-error');
-	}
-	if (component.complexity > 0.7) {
-		tags.add('complex');
-	}
-
-	// Add error code tags
-	component.error_codes.forEach((code: string) => {
-		tags.add(`error-${code}`);
-	});
-
+	if (comp.errors > 10) tags.add('buggy');
+	if (comp.complexity > 20) tags.add('complex');
+	if (comp.path.includes('routes')) tags.add('route');
+	if (comp.path.includes('lib')) tags.add('library');
 	return tags;
 }
 
-function recommendAction(component: any): string {
-	if (component.errors > 20) {
-		return 'urgent_refactor';
-	} else if (component.complexity > 0.8) {
-		return 'simplify_logic';
-	} else if (component.errors > 10) {
-		return 'review_errors';
-	} else if (component.errors > 5) {
-		return 'low_priority_fix';
-	}
+function recommendAction(comp: any): string {
+	if (comp.errors > 20) return 'urgent_refactor';
+	if (comp.errors > 5) return 'investigate';
+	if (comp.complexity > 30) return 'simplify';
 	return 'monitor';
 }
+
+
+

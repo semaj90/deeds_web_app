@@ -16,40 +16,35 @@
  id: 1,
  type: 'evidence_processed',
  message: 'AI analyzed 47 new contract documents',
- timestamp: new Date(Date.now() - 1000 * 60 * 15),
- icon: '🤖',
+ timestamp: new Date(Date.now() - 1000 * 60 * 15, icon: '🤖',
  color: 'text-cyan-400'
  },
  {
  id: 2,
  type: 'case_updated',
  message: 'Case CASE-2024-001 status changed to "Under Review"',
- timestamp: new Date(Date.now() - 1000 * 60 * 32),
- icon: '📋',
+ timestamp: new Date(Date.now() - 1000 * 60 * 32, icon: '📋',
  color: 'text-yellow-400'
  },
  {
  id: 3,
  type: 'user_action',
  message: 'Evidence correlation completed for POI-789',
- timestamp: new Date(Date.now() - 1000 * 60 * 45),
- icon: '🔗',
+ timestamp: new Date(Date.now() - 1000 * 60 * 45, icon: '🔗',
  color: 'text-green-400'
  },
  {
  id: 4,
  type: 'system_alert',
  message: 'GPU memory optimization completed',
- timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
- icon: '⚡',
+ timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2, icon: '⚡',
  color: 'text-purple-400'
  },
  {
  id: 5,
  type: 'evidence_uploaded',
  message: 'New evidence batch uploaded: financial_records_q3.pdf',
- timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3),
- icon: '📄',
+ timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3, icon: '📄',
  color: 'text-blue-400'
  }
  ];
@@ -149,3 +144,5 @@
  </div>
  </div>
 </div>
+
+

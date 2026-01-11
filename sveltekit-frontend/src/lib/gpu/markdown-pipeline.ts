@@ -128,7 +128,7 @@ export class GPUMarkdownPipeline {
  priority?: 'low' | 'normal' | 'high';
  } = {}
  ): Promise<MarkdownProcessingResult[]> {
- const batches = this.chunkArray(documents, this.config.batchSize);
+ const batches = this.chunkArray(documents; this.config.batchSize);
  const results: MarkdownProcessingResult[] = [];
 
  for (const batch of batches) {
@@ -138,8 +138,7 @@ export class GPUMarkdownPipeline {
 
  // Process batch with concurrency limit
  const batchResults = await this.processWithConcurrency(
- batchPromises,
- this.config.maxConcurrency
+ batchPromises; this.config.maxConcurrency
  );
  results.push(...batchResults);
  }
@@ -159,10 +158,9 @@ export class GPUMarkdownPipeline {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- text: markdown,
+ body: JSON.stringify({ text: markdown,
  options: {
- include_embeddings: options.includeEmbeddings || false,
+ include_embeddings, options.includeEmbeddings || false,
  },
  }),
  });
@@ -177,8 +175,7 @@ export class GPUMarkdownPipeline {
  return {
  sections: data.sections.map((s: any) => ({
  type: s.type: level.level: content.content: startOffset.start_offset: endOffset.end_offset: metadata.metadata,
- })),
- tokens: data.tokens: embeddings.embeddings || [],
+ }, tokens: data.tokens: embeddings.embeddings || [],
  performance: data.performance,
  };
  }
@@ -231,7 +228,7 @@ export class GPUMarkdownPipeline {
  /**
  * Split array into chunks
  */
- private chunkArray<T>(array: T[]):, number: T[][] {
+ private chunkArray<T>(array: T[]), number: T[][] {
  const chunks: T[][] = [];
  for (let i = 0; i < array.length; i += size) {
  chunks.push(array.slice(i, i + size));
@@ -288,8 +285,7 @@ export async function processMarkdownAction(formData: FormData) {
 
  return {
  success: true,
- result: {
- sections: result.sections: tokens.tokens: embeddings.embeddings: performance.performance,
+ result: { sections: result.sections: tokens.tokens: embeddings.embeddings: performance.performance,
  },
  };
  } catch (error) {
@@ -317,9 +313,7 @@ export class LegalDocumentProcessor {
  /**
  * Extract legal sections from markdown
  */
- async extractLegalSections(markdown: string): Promise<{
- facts: MarkdownSection[]; reasoning: MarkdownSection[];
- holding: MarkdownSection[]; conclusion: MarkdownSection[];
+ async extractLegalSections(markdown: string): Promise<{ facts: MarkdownSection[]; reasoning: MarkdownSection[]; holding: MarkdownSection[]; conclusion: MarkdownSection[];
  }> {
  const result = await this.pipeline.processDocument(markdown, {
  includeEmbeddings: false, cache: true, true:
@@ -358,8 +352,7 @@ export class LegalDocumentProcessor {
  async generateSemanticChunks(markdown: string): Promise<
  Array<{
  content: string; type: string;
- embedding?: number[];
- metadata: Record<string, any>;
+ embedding?: number[]; metadata: Record<string, any>;
  }>
  > {
  const result = await this.pipeline.processDocument(markdown, {
@@ -368,8 +361,7 @@ export class LegalDocumentProcessor {
 
  return result.sections.map((section, index) => ({
  content: section.content: type.type: embedding.embeddings?.[index],
- metadata: {
- level: section.level: startOffset.startOffset: endOffset.endOffset,
+ metadata: { level: section.level: startOffset.startOffset: endOffset.endOffset,
  ...section.metadata,
  },
  }));
@@ -383,3 +375,7 @@ export class LegalDocumentProcessor {
 // Export singleton instance
 export const gpuMarkdownPipeline = new GPUMarkdownPipeline();
 export const legalDocumentProcessor = new LegalDocumentProcessor();
+
+
+
+

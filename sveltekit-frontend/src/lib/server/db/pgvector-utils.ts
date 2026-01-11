@@ -71,12 +71,11 @@ function asNumber(v: any, fallback = 0): number {
 }
 
 function asObject(v: any): Record<string, unknown> | undefined {
-    return v && typeof v === 'object' ? (v as Record<string, unknown>)  | undefined;
+    return v && typeof v === 'object' ? (v as Record<string, unknown>) : undefined;
 }
 
 export interface VectorSearchResult {
-    id: string;
-    content: string;
+    id: string; content: string;
     similarity: number;
     metadata?: Record<string, unknown>;
     documentType?: string;
@@ -91,8 +90,7 @@ export interface VectorSearchOptions {
 // Add a typed return shape for the health check
 export interface PgVectorHealthResult {
     available: boolean;
-    version?: string;
-    functions: string[];
+    version?: string; functions: string[];
     error?: string;
 }
 
@@ -228,16 +226,13 @@ export async function searchSimilarMessages(
         const sql = `
             SELECT * FROM search_similar_messages(
                 ${vectorString}::vector,
-                ${threshold}::float,
-                ${limit}::int
+                ${ threshold }::float,
+                ${ limit }::int
             );
         `;
         const results = (await db.execute(sql)) as Array<Row>;
         return (results || []).map((row: Row) => ({
-            id: asString(row.id),
-            content: asString(row.content),
-            similarity: asNumber(row.similarity),
-            metadata: includeMetadata ? asObject(row.metadata)  | undefined,
+            id: asString(row.id, content: asString(row.content, similarity: asNumber(row.similarity, metadata: includeMetadata ? asObject(row.metadata) : undefined,
             documentType: 'chat_message'
         }));
     } catch (error: unknown) {
@@ -252,7 +247,7 @@ export async function searchSimilarMessages(
  */
 export async function searchSimilarEvidence(
     queryEmbedding: number[],
-    caseId?: string: options = {}
+    caseId?: string, options = {}
 ): Promise<VectorSearchResult[]> {
     const { limit = 10, threshold = 0.7, includeMetadata = true } = options;
     try {
@@ -262,21 +257,16 @@ export async function searchSimilarEvidence(
             SELECT * FROM search_similar_evidence(
                 ${vectorString}::vector,
                 ${caseIdParam},
-                ${threshold}::float,
-                ${limit}::int
+                ${ threshold }::float,
+                ${ limit }::int
             );
         `;
         const results = (await db.execute(sql)) as Array<Row>;
         return (results || []).map((row: Row) => ({
-            id: asString(row.id),
-            content: asString(row.description ?? row.title),
-            similarity: asNumber(row.similarity),
-            metadata: includeMetadata ? {
-                title: asString(row.title),
-                evidenceType: asString(row.evidence_type),
-                caseId: asString(row.case_id),
+            id: asString(row.id, content: asString(row.description ?? row.title, similarity: asNumber(row.similarity, metadata: includeMetadata ? {
+                title: asString(row.title, evidenceType: asString(row.evidence_type, caseId: asString(row.case_id),
                 ...(asObject(row.metadata) ?? asObject(row.ai_analysis) ?? {})
-            }  | undefined,
+            } : undefined,
             documentType: 'evidence'
         }));
     } catch (error: unknown) {
@@ -289,12 +279,9 @@ export async function searchSimilarEvidence(
 /**
  * Insert chat message with vector embedding
  */
-export async function insertChatMessageWithEmbedding(messageData: {
-    id: string;
-    sessionId: string;
-    role: string;
-    content: string;
-    embedding: number[];
+export async function insertChatMessageWithEmbedding(messageData: { id: string;
+    sessionId: string; role: string;
+    content: string; embedding: number[];
     metadata?: Record<string, unknown>;
 }): Promise<boolean> {
     try {
@@ -459,3 +446,7 @@ if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
         console.warn('pgvector initialization failed: ', error);
     });
 }
+
+
+
+

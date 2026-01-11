@@ -1,1 +1,3 @@
 // Initialize on module load in browser // The constructor already handles autoload if browser is true. // This explicit call is redundant if autoload is true in config. // If autoload is false, you might want to call it manually later. // if (browser) { // lokiStorage.initialize().catch(console.error); // }
+
+

@@ -18,7 +18,7 @@ const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
 const PHASE72_PYTHON = process.env.PHASE72_PYTHON || 'python';
 
 async function fetchVectors(collection: string, limit: number): Promise<Array<{ id: string; vector: number[] }>> {
-  const response = await fetch(`${QDRANT_URL}/collections/${collection}/points/scroll`, {
+  const response = await fetch(`${QDRANT_URL}/collections/${ collection }/points/scroll`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -62,15 +62,14 @@ async function generateClusterSummary(clusterPoints: string[], model: string): P
 
 async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult<ClusterTagResult>> {
   // Fetch vectors from Qdrant
-  const points = await fetchVectors(request.collection, request.options?.batch_size || 10000);
+  const points = await fetchVectors(request.collection, request.options?.batch_size ?? 10000);
 
   if (points.length === 0) {
     return {
       success: true,
-      run_id: request.run_id,
+      run_id, request.run_id,
       tool: 'cluster_tag',
-      data: {
-        clusters: [],
+      data: { clusters: [],
         total_clusters: 0,
         noise_points: 0
       },
@@ -80,12 +79,9 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
   }
 
   // Simple clustering simulation (in production, call CUDA script)
-  const clusters: Array<{
-    id: number;
-    size: number;
-    centroid_id: string;
-    summary?: string;
-    tags: string[];
+  const clusters: Array<{ id: number;
+    size: number; centroid_id: string;
+    summary?: string; tags: string[];
   }> = [];
 
   const clusterSize = Math.max(5, Math.floor(points.length / 10));
@@ -99,7 +95,7 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
     if (request.tag_config?.generate_summaries) {
       summary = await generateClusterSummary(
         clusterPoints.map(p => String(p.id)),
-        request.tag_config.model || 'gemma3-legal:latest'
+        request.tag_config.model ?? 'gemma3-legal:latest'
       );
     }
 
@@ -114,7 +110,7 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
 
   return {
     success: true,
-    run_id: request.run_id,
+    run_id, request.run_id,
     tool: 'cluster_tag',
     data: {
       clusters,
@@ -136,3 +132,7 @@ toolRegistry.register({
 });
 
 export { clusterTagHandler };
+
+
+
+

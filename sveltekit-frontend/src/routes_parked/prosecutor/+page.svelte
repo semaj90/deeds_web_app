@@ -5,7 +5,7 @@
  let { data }: { data: PageData } = $props();
 
  // Extract caseId from URL params if available
- let caseId = $derived(data?.caseId || null);
+ let caseId = $derived(data?.caseId ?? null);
 </script>
 
 <svelte:head>
@@ -14,3 +14,6 @@
 </svelte:head>
 
 <PhoenixProsecutorDashboard {caseId} />
+
+
+

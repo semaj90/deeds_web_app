@@ -3,11 +3,31 @@ import './polyfills.js';
 // ===== CENTRALIZED TYPES (SINGLE SOURCE OF TRUTH) =====
 export * from './types/index.js';
 
+// ===== EXTERNAL SERVICE TYPES =====
+export type {
+    MinIOClient,
+    MinIOConfig,
+    Neo4jClient,
+    Neo4jConfig,
+    OllamaClient,
+    OllamaConfig,
+    PgVectorClient,
+    PostgresConfig,
+    QdrantClient,
+    QdrantConfig,
+    QdrantSearchResult,
+    QdrantVectorPayload,
+    RedisCacheService,
+    RedisConfig,
+    ServiceEnvironment,
+    ServiceUrls
+} from './types/external-services.js';
+
 // ===== TYPE GUARDS & UTILITIES =====
 export * from './utils/type-guards.js';
 
 // ===== ENHANCED API CLIENT =====
-export { apiClient, EnhancedApiClient } from './services/enhanced-api-client.js';
+export { EnhancedApiClient: apiClient } from './services/enhanced-api-client.js';
 
 // ===== ALL COMPONENTS (COMPREHENSIVE BARREL EXPORT) =====
 // Temporarily commented to avoid LegalDocument export conflict
@@ -18,46 +38,53 @@ export { enhancedFileUpload } from './services/enhanced-file-upload.js';
 export { default } from './services/localStorage-file-fallback.js';
 
 // ===== UTILITIES & TYPES =====
+export { cn, confidenceClass, legalCn, priorityClass } from './utils/cn';
 export {
-  cn, copyToClipboard, debounce, downloadFile, formatDate, formatFileSize, formatProcessingTime, generateId, getCaseStatusStyling, getConfidenceLevel, getEvidenceTypeStyling, getInitials, isBrowser, isValidEmail, storage,
-  theme, throttle
-} from './utils.js';
+    copyToClipboard, debounce, downloadFile, formatDate, formatFileSize, formatProcessingTime, generateId, getCaseStatusStyling, getConfidenceLevel, getEvidenceTypeStyling, getInitials, isBrowser, isValidEmail, storage,
+    theme, throttle
+} from './utils/index';
 
 // Export type helpers for Svelte 5 compatibility
 export type {
-  WithElementRef, WithoutChild,
-  WithoutChildren,
-  WithoutChildrenOrChild
+    WithElementRef, WithoutChild,
+    WithoutChildren,
+    WithoutChildrenOrChild
 } from './utils.js';
 
 // ===== OLLAMA INTEGRATION SERVICES =====
-export {
-  comprehensiveOllamaSummarizer,
-  type ComprehensiveSummaryRequest,
-  type ComprehensiveSummaryResponse,
-  type SummarizerConfig,
-  type SummarizerStats
-} from './services/comprehensive-ollama-summarizer.js';
+// Temporarily disabled due to syntax errors in comprehensive-ollama-summarizer.ts
+// export {
+//     comprehensiveOllamaSummarizer,
+//     type ComprehensiveSummaryRequest,
+//     type ComprehensiveSummaryResponse,
+//     type SummarizerConfig,
+//     type SummarizerStats
+// } from './services/comprehensive-ollama-summarizer.js';
 
 export {
-  ollamaIntegrationLayer,
-  type IntegratedChatRequest,
-  type IntegratedChatResponse,
-  type OllamaServiceStatus
+    ollamaIntegrationLayer,
+    type IntegratedChatRequest,
+    type IntegratedChatResponse,
+    type OllamaServiceStatus
 } from './services/ollama-integration-layer.js';
 
-export {
-  LangChainOllamaService,
-  langChainOllamaService,
-  type LangChainConfig,
-  type ProcessingResult,
-  type QueryResult
-} from './ai/langchain-ollama-service.js';
+// Temporarily disabled - file is in ai.bak folder, not ai folder
+// export {
+//     LangChainOllamaService,
+//     langChainOllamaService,
+//     type LangChainConfig,
+//     type ProcessingResult,
+//     type QueryResult
+// } from './ai/langchain-ollama-service.js';
 
 // ===== SERVER SERVICES (Server-side only) =====
 // Note: These should only be imported on the server side
 export type { AuthService } from './server/auth.js';
 export type { EmbeddingService, type EmbeddingOptions } from './server/embedding-service.js';
+
+// ===== SERVER DATABASE EXPORTS =====
+export { aceChunks, aceDocs, aceSources } from './db/schema/ace-web.js';
+export { adminDb: db } from './server/db/client.js';
 
 // ===== VERSION INFO =====
 export const VERSION = '2.0.0';
@@ -107,8 +134,8 @@ if (typeof globalThis !== 'undefined') {
 // Global User Store with Svelte 5 Runes
 export { default as globalUserStore } from './stores/global-user-store.svelte';
 
-// Search Services with Fuse.js Integration
-export { searchComponents, searchDemos, searchDocumentation, searchServices } from './services/search-service.js';
+// Search Services with Fuse.js Integration - TEMPORARILY DISABLED (corrupted file)
+// export { searchComponents, searchDemos, searchDocumentation, searchServices } from './services/search-service.js';
 
 // Hybrid Vector Operations
 export { getVectorSystemHealth, syncVectorData } from './services/hybrid-vector-operations.js';
@@ -118,3 +145,4 @@ export type { SearchCategory, SearchFilter, SearchOptions, SearchResult, SearchS
 
 // Default export for convenience
 export default { VERSION, BUILD_DATE, FRAMEWORK_INFO, FEATURES, DEV_TOOLS, barrelStore };
+

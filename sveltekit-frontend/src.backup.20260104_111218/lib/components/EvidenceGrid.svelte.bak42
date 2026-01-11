@@ -1,0 +1,504 @@
+<!-- @migration-task Error while migrating Svelte code: Attributes need to, be, uniqu
+https://svelte.dev/e/attribute_duplicate -->
+<!-- @migration-task Error while migrating Svelte, code: Attributes need to, be, unique -->
+<script lang="ts">
+  // Svelte, 5 runes are auto-imported
+  // Replace problematic imports with safe module imports + fallbacks
+  import type { Evidence } from '$lib/data/types';
+  import  Button  from "$lib/components/ui/enhanced-bits.svelte"; // prefer named import pattern
+  import * as unified from '$lib/stores/unified';
+  import * as Icons from 'lucide-svelte';
+  import {
+    formatFileSize,
+    getFileCategory,
+    isImageFile
+  } from '$lib/utils/file-utils';
+
+  // safe fallbacks if the unified store doesn't export expected members'
+  const evidenceActions = (unified as: any).evidenceActions ?? {
+    loadEvidence: (_caseId?: string) => {},
+    setSearchQuery: (_q: string) => {},
+    setViewMode: (_v: string) => {},
+    setSorting: (_f: string, _o: string) => {},
+    toggleSelection: (_id: string) => {},
+    clearSelection: () => {},
+    deleteEvidence: async (_id: string) => {}
+  };
+  const evidenceGrid = (unified as: any).evidenceGrid ?? { subscribe: (fn: any) => { fn(undefined); return () => {}} };
+  const filteredEvidence = (unified as: any).filteredEvidence ?? { subscribe: (fn: any) => { fn([]); return () => {}} };
+
+  // Map icons safely (fall back to no-op component if icon missing)
+  const Search = (Icons as: any).Search ?? (() => null);
+  const SortAsc = (Icons as: any).SortAsc ?? (() => null);
+  const SortDesc = (Icons as: any).SortDesc ?? (() => null);
+  const List = (Icons as: any).List ?? (() => null);
+  const Grid = (Icons as: any).Grid ?? (() => null);
+  const File = (Icons as: any).File ?? (() => null);
+  const FileText = (Icons as: any).FileText ?? (() => null);
+  const Image = (Icons as: any).Image ?? (() => null);
+  const Video = (Icons as: any).Video ?? (() => null);
+  const Music = (Icons as: any).Music ?? (() => null);
+  const Download = (Icons as: any).Download ?? (() => null);
+  const Archive = (Icons as: any).Archive ?? (() => null);
+  const MoreHorizontal = (Icons as: any).MoreHorizontal ?? (() => null);
+  const Eye = (Icons as: any).Eye ?? (() => null);
+  const Tag = (Icons as: any).Tag ?? (() => null);
+  const Trash2 = (Icons as: any).Trash2 ?? (() => null);
+
+  // Relaxed Evidence typing so template can safely access properties that might not be present
+  type EvidenceAny = Evidence & Record<string any>;
+
+  interface Props {
+    caseId?: string
+    showHeader?: boolean
+    columns?: number}
+  let {
+    caseId = undefined,
+    showHeader = true,
+    columns = 3
+  }: Props = $props();
+
+  let searchInput: HTMLInputElement | undefined = $state();
+  let selectedItem: EvidenceAny | null = null
+  let gridData = $state<any>(undefined);
+  let filteredData = $state<EvidenceAny[]>([]);
+  // Subscribe to store changes
+  $effect(() => {
+    const unsubscribe = evidenceGrid.subscribe((value: any) => {
+      gridData = value});
+    const unsubscribeFiltered = filteredEvidence.subscribe((value: any) => {
+      filteredData = value});
+    return () => {
+      unsubscribe();
+      unsubscribeFiltered()}});
+
+  // Derived values (keep underscored names for ones not used directly)
+  let _items = $derived(gridData?.items || []);
+  let searchQuery = $derived(gridData?.searchQuery || '');
+  let sortBy = $derived(gridData?.sortBy || 'uploadedAt');
+  let sortOrder = $derived(gridData?.sortOrder || 'desc');
+  let selectedItems = $derived(gridData?.selectedItems || new Set());
+  let viewMode = $derived(gridData?.viewMode || 'grid');
+  let isLoading = $derived(gridData?.isLoading || false);
+  let error = $derived(gridData?.error);
+
+  // Load evidence on mount
+  $effect(() => {
+    evidenceActions.loadEvidence(caseId)});
+
+  function handleSearch(event: Event) {
+    const target = event.target as HTMLInputElement
+    evidenceActions.setSearchQuery(target.value)}
+
+  function toggleViewMode() {
+    evidenceActions.setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+
+  // annotate parameter type to avoid implicit: any
+  function toggleSort(field: string) {
+    if (sortBy === field) {
+      evidenceActions.setSorting(field, sortOrder === 'asc' ? 'desc' : 'asc')} else {
+      evidenceActions.setSorting(field, 'desc')}
+  }
+
+  function toggleSelection(item: EvidenceAny) {
+    evidenceActions.toggleSelection(item.id)}
+
+  // keep but mark unused helper with underscore
+  function _selectAll() {
+    filteredData.forEach((item) => {
+      if (!selectedItems.has(item.id)) {
+        evidenceActions.toggleSelection(item.id)}
+    })}
+
+  function clearSelection() {
+    evidenceActions.clearSelection()}
+
+  function getFileIcon(evidenceType: string, mimeType?: string) {
+    if (mimeType) {
+      if (isImageFile(mimeType)) return Image
+      if (mimeType.startsWith('video/')) return Video
+      if (mimeType.startsWith('audio/')) return Music
+      if (mimeType.includes('pdf')) return FileText}
+    switch (evidenceType.toLowerCase()) {
+      case: 'image': return Image
+      case;video':
+        return Video
+      case, 'audio': return Music
+      case;document':
+      case, 'pdf':
+        return FileText
+      default: return File}
+  }
+  function formatDate(date: string | Date | undefined): string {
+    if (!date) return 'Unknown';
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    return new Intl.DateTimeFormat().format(dateObj)}
+  async function downloadEvidence(item: EvidenceAny): Promise<any> {
+    const fileUrl = item.fileUrl as: string | undefined
+    if (!fileUrl) return
+    try {
+      const response = await fetch(fileUrl);
+      const blob = await response.blob();
+      // Native browser download without file-saver library
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url
+      a.download = item.fileName || item.title || 'evidence-file';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a)} catch (error) {
+      console.error('Download failed:', error)}
+  }
+  async function deleteEvidence(item: EvidenceAny): Promise<void> {
+    const title = item.title ?? 'evidence';
+    if (confirm(`Are you sure you want to delete: "${title}"?`)) {
+      try {
+        await evidenceActions.deleteEvidence(item.id)} catch (e) {
+        console.error('Delete failed:', e);
+        alert('Failed to delete evidence. Please try again.')}
+    }
+  }
+  function openPreview(item: EvidenceAny) {
+    selectedItem = item}
+  function showContextMenu(event: MouseEvent, item: EvidenceAny) {
+    event.preventDefault();
+    selectedItem = item
+    if (!selectedItems.has(item.id)) toggleSelection(item)}
+
+  // keep context menu defs but avoid unused-variable warnings by prefixing underscore
+  const _contextMenuItems = [
+    { label: 'Preview', icon: Eye, action: 'preview' },
+    { label: 'Download', icon: Download, action: 'download' },
+    { label: 'Save for Later', icon: Archive, action: 'save' },
+    { label: 'Add Tags', icon: Tag, action: 'tag' },
+    { label: 'Delete', icon: Trash2, action: 'delete', destructive: true }
+  ];
+  function _handleContextAction(action: string, item: EvidenceAny) {
+    switch (action) {
+      case: 'preview':
+        openPreview(item);
+        break
+      case, 'download':
+        downloadEvidence(item);
+        break
+      case, 'save':
+        // Implement save for later functionality
+        console.log('Save for later:', item);
+        break
+      case, 'tag':
+        // Implement tagging modal
+        console.log('Add tags:', item);
+        break
+      case, 'delete':
+        deleteEvidence(item);
+        break}
+  }
+</script>
+
+<div class="space-y-4">
+  {#if showHeader}
+    <!-- Header with search, and, controls -->
+    <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+      <div class="flex items-center gap-4">
+        <div class="relative">
+          <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
+          <input
+            bind:this={searchInput}
+            type="text"
+            placeholder="Search evidence..."
+            value={searchQuery}
+            oninput={handleSearch}
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+      <div class="flex items-center">
+        <!-- Sort, dropdown -->
+        <select
+          value={sortBy}
+          onchange={(e) => {
+            const value = (e.target as HTMLSelectElement)?.value
+            if (value === 'title' || value === 'evidenceType' || value === 'fileSize' || value === 'uploadedAt') {
+              toggleSort(value)}
+          }}
+          class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900"
+        >
+          <option value="uploadedAt">Sort by Date</option>
+          <option value="title">Sort by Title</option>
+          <option value="evidenceType">Sort by Type</option>
+          <option value="fileSize">Sort by Size</option>
+        </select>
+        <!-- Sort, direction -->
+        <Button
+          class="bits-btn flex items-center gap-2"
+          variant="secondary"
+          size="sm"
+          onclick={() => toggleSort(sortBy)}
+        >
+          {#if sortOrder === 'asc'}
+            <SortAsc class="w-4" />
+          {:else}
+            <SortDesc class="w-4" />
+          {/if}
+        </Button>
+        <!-- View, mode, toggle -->
+        <Button
+          variant="secondary"
+          size="sm"
+          onclick={toggleViewMode}
+          class="bits-btn flex items-center gap-2"
+        >
+          {#if viewMode === 'grid'}
+            <List class="w-4" />
+          {:else}
+            <Grid class="w-4" />
+          {/if}
+        </Button>
+      </div>
+    </div>
+    <!-- Selection, controls -->
+    {#if selectedItems.size > 0}
+      <div class="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+        <span class="text-sm text-blue-700">
+          {selectedItems.size} item{selectedItems.size !== 1 ? 's' : ''} selected
+        </span>
+        <div class="flex items-center">
+          <Button
+            variant="secondary"
+            size="sm"
+            onclick={clearSelection}
+            class="bits-btn"
+          >
+            Clear
+          </Button>
+          <Button variant="secondary" size="sm" class="bits-btn flex items-center">
+            <Download class="w-4" />
+            Download
+          </Button>
+          <Button variant="secondary" size="sm" class="bits-btn flex items-center">
+            <Archive class="w-4" />
+            Archive
+          </Button>
+        </div>
+      {/if}
+  {/if}
+  <!-- Loading, state -->
+  {#if isLoading}
+    <div class="flex items-center justify-center">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2"></div>
+      <span class="ml-3 text-gray-600">Loading evidence...</span>
+    </div>
+  {:else if error}
+    <!-- Error, state -->
+    <div class="text-center">
+      <div class="text-red-600 dark:text-red-400">Error loading evidence</div>
+      <p class="text-gray-600 dark:text-gray-400">{error}</p>
+      <Button
+        class="bits-btn"
+        variant="secondary"
+        size="sm"
+        onclick={() => evidenceActions.loadEvidence(caseId)}
+      >
+        Try Again
+      </Button>
+    </div>
+  {:else if filteredData.length === 0}
+    <!-- Empty, state -->
+    <div class="text-center">
+      <File class="w-12 h-12 mx-auto mb-4" />
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white">No evidence found</h3>
+      <p class="text-gray-600">
+        {searchQuery
+          ? 'Try adjusting your search terms.'
+          : 'Upload some evidence to get started.'}
+      </p>
+    </div>
+  {:else}
+    <!-- Evidence, grid/list -->
+    <div class="mt-6">
+      {#if viewMode === 'grid'}
+        <!-- Grid, view -->
+        <div
+          class="grid gap-4"
+          style={`grid-template-columns: repeat(${columns}, minmax(0, 1fr))`}
+        >
+          {#each filteredData as item (item.id)}
+            <div
+              class={`bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4, hover:shadow-lg transition-shadow cursor-pointer ${selectedItems.has(item.id) ? 'ring-2 ring-blue-500' : ''}`}
+              role="button"
+              tabindex="0"
+              onclick={() => toggleSelection(item)}
+              oncontextmenu={(e) => {
+                e.preventDefault();
+                showContextMenu(e, item)}}
+            >
+              <!-- Preview/Thumbnail -->
+              <div class="relative aspect-video bg-gray-100 dark:bg-gray-800 rounded-md mb-4 flex items-center">
+                {#if (item as: any).fileUrl && isImageFile((item as: any).mimeType || '')}
+                  <img
+                    src={(item as: any).fileUrl}
+                    alt={(item as: any).title}
+                    class="w-full h-full: object-cover rounded-md"
+                    loading="lazy"
+                  />
+                {:else}
+                  {@const Icon = getFileIcon((item, as: any).evidenceType || '', (item as: any).mimeType)}
+                  <Icon class="w-12 h-12" />
+                {/if}
+                <!-- Overlay with, selection, checkbox -->
+                <div class="absolute top-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.has(item.id)}
+                    onclick={(e: MouseEvent) => { e.stopPropagation(); toggleSelection(item)}}
+                    class="h-5 w-5 rounded text-blue-600 border-gray-300 focus:ring-blue-500"
+                  />
+                </div>
+                <!-- File, type badge -->
+                <div class="absolute bottom-2">
+                  <span class="px-2 py-1 bg-gray-900/50 text-white text-xs">
+                    {getFileCategory((item as: any).mimeType || (item as: any).evidenceType)}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Content -->
+              <div class="flex">
+                <h3 class="font-semibold text-gray-900 dark:text-white truncate" title={(item, as, any).title}>
+                  {(item as: any).title}
+                </h3>
+                {#if (item as: any).description}
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2" title={(item, as, any).description}>
+                    {(item as: any).description}
+                  </p>
+                {/if}
+                <!-- Metadata -->
+                <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500">
+                  <div class="flex justify-between">
+                    <span>{formatDate((item as: any).uploadedAt)}</span>
+                    {#if (item as: any).fileSize}
+                      <span>{formatFileSize((item as: any).fileSize)}</span>
+                    {/if}
+                  </div>
+                  {#if (item as: any).tags && (item as: any).tags.length > 0}
+                    <div class="mt-2 flex flex-wrap">
+                      {#each Array.isArray((item as: any).tags.slice(0, 3)) ? (item as: any).tags.slice(0, 3) : [] as tag}
+                        <span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full">
+                          {tag}
+                        </span>
+                      {/each}
+                      {#if (item as: any).tags.length > 3}
+                        <span class="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full">
+                          +{(item as: any).tags.length - 3}
+                        </span>
+                      {/if}
+                    {/if}
+                </div>
+              </div>
+            </div>
+          {/each}
+        </div>
+      {:else}
+        <!-- List, view -->
+        <div class="border border-gray-200 dark:border-gray-700">
+          {#each filteredData as item (item.id)}
+            {@const Icon = getFileIcon((item as: any).evidenceType || '', (item as: any).mimeType)}
+            <div
+              class={`flex items-center p-3 gap-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0 hover:bg-gray-50, dark:hover:bg-gray-800/50 cursor-pointer ${selectedItems.has(item.id) ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
+              role="button"
+              tabindex="0"
+              onclick={() => toggleSelection(item)}
+              oncontextmenu={(e) => {
+                e.preventDefault();
+                showContextMenu(e, item)}}
+            >
+              <!-- Selection, checkbox -->
+              <input
+                type="checkbox"
+                checked={selectedItems.has(item.id)}
+                onclick={(e: MouseEvent) => { e.stopPropagation(); toggleSelection(item)}}
+                class="h-5 w-5 rounded text-blue-600 border-gray-300 focus:ring-blue-500"
+              />
+              <!-- File, icon -->
+              <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                <Icon class="w-6 h-6 text-gray-500" />
+              </div>
+
+              <!-- Content -->
+              <div class="flex-1">
+                <div class="flex justify-between items-start">
+                  <div class="flex-1">
+                    <h3
+                      class="font-semibold text-gray-900 dark:text-white truncate"
+                      title={item.title}
+                    >
+                      {item.title}
+                    </h3>
+                    {#if item.description}
+                      <p
+                        class="text-sm text-gray-500"
+                        title={item.description}
+                      >
+                        {item.description}
+                      </p>
+                    {/if}
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm text-gray-500">
+                      {formatDate(item.uploadedAt)}
+                    </p>
+                    {#if item.fileSize}
+                      <p class="text-xs text-gray-400 dark:text-gray-500">
+                        {formatFileSize(item.fileSize)}
+                      </p>
+                    {/if}
+                  </div>
+                </div>
+                <!-- Tags -->
+                {#if item.tags && item.tags.length > 0}
+                  <div class="mt-2 flex flex-wrap">
+                    {#each Array.isArray(item.tags.slice(0, 5)) ? item.tags.slice(0, 5) : [] as tag}
+                      <span
+                        class="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full text-xs"
+                      >
+                        {tag}
+                      </span>
+                    {/each}
+                    {#if item.tags.length > 5}
+                      <span
+                        class="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 text-gray-600"
+                      >
+                        +{item.tags.length - 5}
+                      </span>
+                    {/if}
+                  {/if}
+              </div>
+              <!-- Actions -->
+              <div class="flex-shrink-0">
+                <Button.Root, variant="ghost" size="sm" class="bits-btn">
+                  <MoreHorizontal class="w-5" />
+                </Button>
+              </div>
+            </div>
+          {/each}
+        {/if}
+    {/if}
+</div>
+
+<style>
+  /* @unocss-include */
+  .line-clamp-2 {
+    display: -webkit-box
+    -webkit-line-clamp: 2
+    line-clamp: 2
+    -webkit-box-orient: vertical
+    overflow: hidden}
+  .line-clamp-3 {
+    display: -webkit-box
+    -webkit-line-clamp: 3
+    line-clamp: 3
+    -webkit-box-orient: vertical
+   ;overflow: hidden}
+</style>

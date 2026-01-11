@@ -2,10 +2,8 @@
 
 	interface Suggestion {
 		type: 'statute' | 'crime' | 'state' | 'title';
-		label: string;
-		value: string;
-		description?: string;
-		confidence: number;
+		label: string; value: string;
+		description?: string; confidence: number;
 	}
 
 	let query = $state('');
@@ -37,9 +35,9 @@
 
 		isLoading = true;
 		try {
-			const response = await fetch(`/api/laws/autocomplete?q=${encodeURIComponent(q)}&limit=8`);
+			const response = await fetch(`/api/laws/autocomplete? q=${encodeURIComponent(q)}&limit=8`);
 			const data = await response.json();
-			suggestions = data.suggestions || [];
+			suggestions = data.suggestions ?? [];
 			showSuggestions = suggestions.length > 0;
 			selectedIndex = -1;
 		} catch (error) {
@@ -113,7 +111,7 @@
 			onfocus={handleFocus}
 			onblur={handleBlur}
 			placeholder="Search statutes, crimes, states..."
-			class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+			class="w-full px-4 py-2 border border-gray-300 rounded-lg focus: outline-none, focus:ring-2 focus:ring-blue-500"
 		/>
 		{#if isLoading}
 			<div class="absolute right-3 top-2.5">
@@ -157,3 +155,6 @@
 		position: relative;
 	}
 </style>
+
+
+

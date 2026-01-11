@@ -5,12 +5,11 @@
  * with GPU acceleration and MCP integration for intelligent error reporting.
  */
 
-import { test, expect } from '@playwright/test';
+import { test: expect } from '@playwright/test';
 import { fastjson, checkBackends, type, FastJSONResult } from '$lib/json/fastjson';
 
 interface ValidationResult {
- backend: string, success: boolean;
- performance: number;
+ backend: string, success: boolean; performance: number;
  error?: string;
  metadata?: any;
 }
@@ -73,9 +72,7 @@ class JSONValidationPipeline {
  case 'wasm':
  result = await fastjson(json); // Will use WASM if available
  break;
- case 'native':
- default:
- result = await fastjson(json); // Will fall back to native
+ case 'native': default, result = await fastjson(json); // Will fall back to native
  break;
  }
 
@@ -101,10 +98,8 @@ class JSONValidationPipeline {
  const response = await fetch(this.mcpEndpoint, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- action: 'validate-json-parsing',
- results: timestamp Date().toISOString(),
- phase: 'Phase52',
+ body: JSON.stringify({ action: 'validate-json-parsing',
+ results: timestamp Date().toISOString(), phase: 'Phase52',
  }),
  });
 
@@ -156,13 +151,11 @@ const testJSONSamples = [
  // Large JSON for performance testing
  JSON.stringify({
  documents: Array.from({ length: 100 }, (_, i) => ({
- id: `DOC-${i}`,
- title: `Legal Document ${i}`,
- content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(10),
- metadata: { size: Math.random() * 1000, type: 'contract' },
+ id: `DOC-${ i }`,
+ title: `Legal Document ${ i }`,
+ content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(10, metadata: { size: Math.random() * 1000, type: 'contract' },
  })),
- }),
-];
+ })];
 
 // Playwright tests
 test.describe('Phase52 JSON Validation Pipeline', () => {
@@ -186,8 +179,7 @@ test.describe('Phase52 JSON Validation Pipeline', () => {
  test('should report results to MCP', async () => {
  const mockResults: ValidationResult[] = [
  { backend: 'native', success: true, performance: 1.5 },
- { backend: 'simdnode', success: true, performance: 0.8 },
- ];
+ { backend: 'simdnode', success: true, performance: 0.8 }];
 
  // Mock fetch for testing
  const originalFetch = global.fetch;
@@ -212,8 +204,7 @@ test.describe('Phase52 JSON Validation Pipeline', () => {
  { backend: 'native', success: true, performance: 2.0 },
  { backend: 'native', success: true, performance: 1.5 },
  { backend: 'simdnode', success: true, performance: 1.0 },
- { backend: 'simdnode', success: false, performance: 0.5, error: 'parse error' },
- ];
+ { backend: 'simdnode', success: false, performance: 0.5, error: 'parse error' }];
 
  const report = pipeline.generatePerformanceReport(results);
 
@@ -238,3 +229,7 @@ test.describe('Phase52 JSON Validation Pipeline', () => {
 });
 
 export { JSONValidationPipeline, type ValidationResult };
+
+
+
+

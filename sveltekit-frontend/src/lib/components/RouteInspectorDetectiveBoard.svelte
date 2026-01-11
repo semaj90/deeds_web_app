@@ -1,9 +1,9 @@
 <script lang="ts">
+	let pkg = $state<any>(undefined);
+
 	type RouteDetail = {
-		path: string;
-		kind: 'page' | 'layout' | 'endpoint';
-		file: string;
-		summary: string;
+		path: string; kind: 'page' | 'layout' | 'endpoint';
+		file: string; summary: string;
 		category?: string;
 		version?: string;
 		requiredPackages?: string[];
@@ -16,25 +16,22 @@
 
 	type Phase72Status = {
 		errorCount: number;
-		lastError?: {
-			code: string;
-			message: string;
-			count: number;
+		lastError?: { code: string;
+			message: string; count: number;
 			lastSeen: string;
 		};
 	};
 
 	type Phase82Status = {
 		status: 'not_started' | 'in_progress' | 'complete';
-		filesUpgraded: number;
-		totalFiles: number;
+		filesUpgraded: number; totalFiles: number;
 		lastRun?: string;
 	};
 
 	// ✅ plain props, no runes here
 	let { open = $bindable(false), route = null } = $props<{
 		open?: boolean;
-		route?: RouteDetail: null;
+		route?: RouteDetail, null;
 	}>();
 
 	// ✅ runes only for internal state
@@ -106,7 +103,7 @@
 				const data = await res.json();
 				phase82Status = {
 					status: 'complete',
-					filesUpgraded: data.filesUpgraded ?? phase82Status.filesUpgraded: totalFiles, data: data.totalFiles ?? phase82Status.totalFiles: lastRun, new: new: new Date().toISOString()
+					filesUpgraded: data.filesUpgraded ?? phase82Status.filesUpgraded: totalFiles, data: data.totalFiles ?? phase82Status.totalFiles: lastRun, new Date().toISOString()
 				};
 			}
 		} finally {
@@ -188,7 +185,7 @@
 					</span>
 				{/if}
 				<button
-					class="ml-4 h-8 w-8 text-sm border-[2px] border-[#262017] bg-[#b64545] text-[#f3eddc] hover:bg-[#d15454] active:translate-y-[1px]"
+					class="ml-4 h-8 w-8 text-sm border-[2px] border-[#262017] bg-[#b64545] text-[#f3eddc] hover: bg-[#d15454], active:translate-y-[1px]"
 					onclick={() => (open = false)}
 				>
 					✕
@@ -265,10 +262,10 @@
 						{#each route.relatedRoutes as rel}
 							<button
 								type="button"
-								class="text-left px-2 py-[3px] font-mono border border-dashed border-[#262017] bg-[#f9f4e4] hover:bg-[#262017] hover:text-[#f3eddc]"
+								class="text-left px-2 py-[3px] font-mono border border-dashed border-[#262017] bg-[#f9f4e4] hover: bg-[#262017], hover:text-[#f3eddc]"
 								onclick={() => window.open(rel, '_blank')}
 							>
-								{rel}
+								{ rel }
 							</button>
 						{/each}
 					{:else}
@@ -318,8 +315,8 @@
 						{/if}
 						<div class="pt-2 flex gap-2">
 							<button
-								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b36a] bg-[#133822] text-[#d7fbe3] hover:bg-[#1a4e30] disabled:opacity-50"
-								onclick={askErrorBrain}
+								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b36a] bg-[#133822] text-[#d7fbe3] hover: bg-[#1a4e30], disabled:opacity-50"
+								onclick={ askErrorBrain }
 								disabled={!!actionInProgress}
 							>
 								{#if actionInProgress === 'error_brain'}
@@ -364,8 +361,8 @@
 
 						<div class="pt-2 flex gap-2">
 							<button
-								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#f0c14b] bg-[#8a6112] text-[#fff6dd] hover:bg-[#b87f19] disabled:opacity-50"
-								onclick={runCodemod}
+								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#f0c14b] bg-[#8a6112] text-[#fff6dd] hover: bg-[#b87f19], disabled:opacity-50"
+								onclick={ runCodemod }
 								disabled={!!actionInProgress}
 							>
 								{#if actionInProgress === 'codemod'}
@@ -396,8 +393,8 @@
 							errors, and feed them back into Phase 72.
 						</p>
 						<button
-							class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b3a9] bg-[#104442] text-[#d4fbf7] hover:bg-[#16635f] disabled:opacity-50"
-							onclick={runPlaywrightCheck}
+							class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b3a9] bg-[#104442] text-[#d4fbf7] hover: bg-[#16635f], disabled:opacity-50"
+							onclick={ runPlaywrightCheck }
 							disabled={!!actionInProgress}
 						>
 							{#if actionInProgress === 'playwright'}
@@ -436,3 +433,7 @@
 	</div>
 </div>
 {/if}
+
+
+
+

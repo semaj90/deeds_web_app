@@ -45,3 +45,5 @@ export function getOllamaApiEndpoint(
  return `${base}/api/generate`; // Default to generate if type is unknown
  }
 }
+
+

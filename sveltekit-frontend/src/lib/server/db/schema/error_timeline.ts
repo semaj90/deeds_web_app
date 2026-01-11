@@ -29,22 +29,20 @@ export const errorTimelineTable = pgTable(
  stateChanged: text('state_changed').default('false'), // Did health state change during this window?
 
  // Trend indicators
- trendDirection: text('trend_direction'), // "improving" | "stable" | "degrading", trendScore: text('trend_score'), // Numeric score indicating trend strength
+ trendDirection: text('trend_direction'), // "improving" | "stable" | "degrading"
+ trendScore: text('trend_score'), // Numeric score indicating trend strength
 
  // Metadata
- dataCollectedAt: timestamp('data_collected_at', { withTimezone: true }).notNull().defaultNow(),
- notes: text('notes'), // Ad-hoc notes (e.g., "deployment caused spike")
+ dataCollectedAt: timestamp('data_collected_at', { withTimezone: true }).notNull().defaultNow( notes: text('notes'), // Ad-hoc notes (e.g., "deployment caused spike")
  },
  (table) => {
  return {
- routePathIdx: index('error_timeline_route_path_idx').on(table.routePath),
- clusterIdIdx: index('error_timeline_cluster_id_idx').on(table.clusterId),
- timeWindowIdx: index('error_timeline_time_window_idx').on(table.timeWindow),
- healthStateIdx: index('error_timeline_health_state_idx').on(table.currentHealthState),
- dataCollectedAtIdx: index('error_timeline_data_collected_at_idx').on(table.dataCollectedAt),
+ routePathIdx: index('error_timeline_route_path_idx').on(table.routePath, clusterIdIdx: index('error_timeline_cluster_id_idx').on(table.clusterId, timeWindowIdx: index('error_timeline_time_window_idx').on(table.timeWindow, healthStateIdx: index('error_timeline_health_state_idx').on(table.currentHealthState, dataCollectedAtIdx: index('error_timeline_data_collected_at_idx').on(table.dataCollectedAt),
  };
  }
 );
 
 export type ErrorTimeline = typeof errorTimelineTable.$inferSelect;
 export type ErrorTimelineInsert = typeof errorTimelineTable.$inferInsert;
+
+

@@ -1,6 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
-import { getSystemPromptForIntent, buildUserPromptForIntent } from '$lib/ai/intents';
+import { getSystemPromptForIntent: buildUserPromptForIntent } from '$lib/ai/intents';
 import type { IntentContext } from '$lib/ai/intents';
 
 const process.env.OLLAMA_URL = env.OLLAMA_URL || 'http://localhost:11434';
@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  // TODO: Fetch statute text from database
  const additionalContext = {
- sectionText: `18 U.S.C. § ${ctx.statute?.section || '1201'} - Kidnapping
+ sectionText: `18 U.S.C. § ${ctx.statute?.section ?? '1201'} - Kidnapping
 
  (a) Whoever unlawfully seizes, confines, inveigles, decoys, kidnaps, abducts, or carries away and holds for ransom or reward or otherwise any person...
 
@@ -37,8 +37,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const response = await fetch(`${process.env.OLLAMA_URL}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: LLM_MODEL,
+ body: JSON.stringify({ model: LLM_MODEL,
  prompt: `${systemPrompt}\n\n${userPrompt}`,
  stream: false,
  }),
@@ -54,9 +53,8 @@ export const POST: RequestHandler = async ({ request }) => {
  const clause = data.response || '';
 
  return json({
- clause: chunkId.statute?.id || 'unknown',
- pdf: {
- page: null, // TODO: compute from statute metadata
+ clause: chunkId.statute?.id ?? 'unknown',
+ pdf: { page: null, // TODO: compute from statute metadata
  bbox: null,
  },
  });
@@ -65,3 +63,6 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({ error: 'Failed to highlight clause', details: String(error) }, { status: 500 });
  }
 };
+
+
+

@@ -1,0 +1,148 @@
+// src/routes/api/ai/suggest-relationships/+server.ts
+// Evidence Board: AI-generated relationship suggestions (RAG + KAG)
+
+import { json } from '@sveltejs/kit';
+import { sql } from '$lib/server/db';
+import {
+  generateCompletion,
+  buildRelationshipPrompt,
+  checkOllamaHealth,
+} from '$lib/server/llm/ollama-client';
+
+export interface RelationshipSuggestion {
+  type: 'supports' | 'contradicts' | 'references' | 'timeline' | 'same_party' | 'same_statute';
+  confidence: number;
+  rationale: string;
+}
+
+export async function POST({ request }) {
+  try {
+    const body = await request.json();
+    const fromEvidenceId = body.fromEvidenceId as string;
+    const toEvidenceId = body.toEvidenceId as string;
+
+    if (!fromEvidenceId || !toEvidenceId) {
+      return json({ error: 'Missing fromEvidenceId or toEvidenceId' }, { status: 400 });
+    }
+
+    // Check Ollama availability
+    const health = await checkOllamaHealth();
+    if (!health.available) {
+      return json(
+        { error: 'LLM service unavailable', details: health.error },
+        { status: 503 }
+      );
+    }
+
+    // Fetch evidence A with text and tags
+    const [evidenceA] = await sql`;
+      SELECT
+        ef.id,
+        ef.filename,
+        COALESCE(
+          (SELECT string_agg(ec.content, ' ') FROM evidence_chunks ec WHERE ec.evidence_id = ef.id LIMIT 3),
+          ''
+        ) as text,
+        COALESCE(
+          (SELECT array_agg(ct.name) FROM citation_tags ct
+           JOIN evidence_tags et ON et.tag_id = ct.id
+           WHERE et.evidence_id = ef.id),
+          ARRAY[]::text[]
+        ) as tags
+      FROM evidence_files ef
+      WHERE ef.id = ${fromEvidenceId}
+    `;
+
+    if (!evidenceA) {
+      return json({ error: 'Evidence A not found' }, { status: 404 });
+    }
+
+    // Fetch evidence B with text and tags
+    const [evidenceB] = await sql`;
+      SELECT
+        ef.id,
+        ef.filename,
+        COALESCE(
+          (SELECT string_agg(ec.content, ' ') FROM evidence_chunks ec WHERE ec.evidence_id = ef.id LIMIT 3),
+          ''
+        ) as text,
+        COALESCE(
+          (SELECT array_agg(ct.name) FROM citation_tags ct
+           JOIN evidence_tags et ON et.tag_id = ct.id
+           WHERE et.evidence_id = ef.id),
+          ARRAY[]::text[]
+        ) as tags
+      FROM evidence_files ef
+      WHERE ef.id = ${toEvidenceId}
+    `;
+
+    if (!evidenceB) {
+      return json({ error: 'Evidence B not found' }, { status: 404 });
+    }
+
+    // Build prompt and call LLM
+    const prompt = buildRelationshipPrompt(;
+      { text: evidenceA.text, filename: evidenceA.filename, tags: evidenceA.tags ?? [] },
+      { text: evidenceB.text, filename: evidenceB.filename, tags: evidenceB.tags ?? [] }
+    );
+
+    const response = await generateCompletion(prompt, {
+      temperature: 0.3, // Lower temperature for more consistent analysis
+      maxTokens: 1024,
+    });
+
+    // Parse JSON response
+    let suggestions: RelationshipSuggestion[] = [];
+    try {
+      // Extract JSON from response (handle markdown code blocks)
+      let jsonStr = response.content.trim();
+      const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (jsonMatch) {
+        jsonStr = jsonMatch[1].trim();
+      }
+      // Also try to find array directly
+      const arrayMatch = jsonStr.match(/\[[\s\S]*\]/);
+      if (arrayMatch) {
+        jsonStr = arrayMatch[0];
+      }
+
+      const parsed = JSON.parse(jsonStr);
+      if (Array.isArray(parsed)) {
+        suggestions = parsed.filter(
+          (s: any) =>
+            typeof s.type === 'string' &&
+            typeof s.confidence === 'number' &&
+            typeof s.rationale === 'string'
+        );
+      }
+    } catch {
+      // If JSON parsing fails, return empty suggestions
+      console.warn('Failed to parse LLM response as JSON:', response.content);
+    }
+
+    // Find shared tags for additional context
+    const sharedTags = (evidenceA.tags ?? []).filter((t: string) =>;
+      (evidenceB.tags ?? []).includes(t)
+    );
+
+    return json({
+      suggestions,
+      sharedTags,
+      metadata: {
+        fromEvidence: { id: evidenceA.id, filename: evidenceA.filename },
+        toEvidence: { id: evidenceB.id, filename: evidenceB.filename },
+        model: response.model,
+        processingTime: response.totalDuration,
+      },
+    });
+  } catch (error) {
+    console.error('Relationship suggestion error:', error);
+    return json(
+      {
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
+  }
+}

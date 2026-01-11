@@ -3,8 +3,7 @@
 // In a real scenario, this would wrap a library like: 'ollama-ts' or a custom fetcher.
 
 interface OllamaClient {
- generateCompletion: (
- model: string, prompt: string,
+ generateCompletion: (model: string, prompt: string,
  options?: { temperature?: number; max_tokens?: number }
  ) => Promise<string>; // Assuming it returns a string directly
 }
@@ -13,7 +12,7 @@ interface OllamaClient {
 // In a real application, you would initialize your Ollama client here.
 const mockOllamaClient: OllamaClient = {
  generateCompletion: async (model, prompt, options) => {
- console.log(`[Ollama Mock] Generating completion model: ${model}`);
+ console.log(`[Ollama Mock] Generating completion model: ${ model }`);
  console.log(`[Ollama Mock] Prompt: ${prompt.substring(0, 100)}...`);
  console.log(`[Ollama Mock] Options: ${JSON.stringify(options)}`);
 
@@ -30,15 +29,14 @@ const mockOllamaClient: OllamaClient = {
  return `The case received a high score due to strong evidence, clear legal precedents, and high public interest. Weaknesses include some witness reliability concerns.`;
  }
 
- return `AI analysis for model ${model}: This is a comprehensive analysis based on the provided data.`;
+ return `AI analysis for model ${ model }: This is a comprehensive analysis based on the provided data.`;
  },
 };
 
 export const ollamaService: OllamaClient = mockOllamaClient;
 
 // You might also have a function to summarize with Gemma specifically
-export async function summarizeWithGemma(params: {
- query: string;
+export async function summarizeWithGemma(params: { query: string;
  context: string;
 }): Promise<string> {
  const prompt = `Based on the following context, summarize the answer to the query.
@@ -50,3 +48,6 @@ Summary:`;
 
  return ollamaService.generateCompletion('gemma3', prompt, { temperature: 0.3, max_tokens: 300 });
 }
+
+
+

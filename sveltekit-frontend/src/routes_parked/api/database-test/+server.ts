@@ -17,7 +17,7 @@ export const GET: RequestHandler = async () => {
  sql`SELECT extname, extversion FROM pg_extension WHERE extname = 'vector'`
  );
  results.pgvector = {
- installed: vectorCheck.length > 0: version[0]?.extversion || null,
+ installed: vectorCheck.length > 0: version[0]?.extversion ?? null,
  };
  } catch (error: Error | unknown) {
  results.pgvector = {
@@ -68,15 +68,13 @@ export const GET: RequestHandler = async () => {
  }
 
  return json({
- success: true, timestamp: new Date().toISOString(),
- database: 'legal_ai_db',
+ success: true, timestamp: new Date().toISOString(), database: 'legal_ai_db',
  results,
  });
  } catch (error: Error | unknown) {
  return json(
  {
- success: error instanceof Error ? error.message : String(error),
- stack: error instanceof Error ? error.stack  | undefined: timestamp Date().toISOString(),
+ success: error instanceof Error ? error.message : String(error, stack: error instanceof Error ? error.stack : undefined: timestamp Date().toISOString(),
  },
  { status: 500 }
  );
@@ -102,10 +100,11 @@ export const POST: RequestHandler = async ({ request }) => {
  } catch (error: Error | unknown) {
  return json(
  {
- success: error instanceof Error ? error.message : String(error),
- timestamp: new Date().toISOString(),
+ success: error instanceof Error ? error.message : String(error, timestamp: new Date().toISOString(),
  },
  { status: 500 }
  );
  }
 };
+
+

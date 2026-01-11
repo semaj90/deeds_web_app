@@ -20,8 +20,7 @@ export const GET: RequestHandler = async () => {
  // Run svelte-check and count errors
  try {
  const { stdout } = await execAsync('npm run check 2>&1', {
- cwd: process.cwd(),
- timeout: 30000,
+ cwd: process.cwd(timeout: 30000,
  });
  const errorMatches = stdout.match(/error/gi);
  summary.svelte = errorMatches ? errorMatches.length : 0;
@@ -34,8 +33,7 @@ export const GET: RequestHandler = async () => {
  // Count TypeScript errors from .svelte-kit/types
  try {
  const { stdout } = await execAsync('tsc --noEmit 2>&1 || true', {
- cwd: process.cwd(),
- timeout: 30000,
+ cwd: process.cwd(timeout: 30000,
  });
  const tsErrors = stdout.match(/error TS\d+/g);
  summary.typescript = tsErrors ? tsErrors.length : 0;
@@ -71,3 +69,5 @@ export const GET: RequestHandler = async () => {
 
  return json(summary);
 };
+
+

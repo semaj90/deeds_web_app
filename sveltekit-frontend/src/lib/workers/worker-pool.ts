@@ -70,10 +70,8 @@ export class AnalyzerWorkerPool {
 
  worker.postMessage({
  type: 'INIT',
- data: {
- workerId: i,
- config: {
- url: this.config.ollamaUrl || 'http://localhost:11434',
+ data: { workerId: i,
+ config: { url: this.config.ollamaUrl || 'http://localhost:11434',
  model: this.config.model || 'gemma3-legal:latest',
  },
  },
@@ -151,7 +149,7 @@ export class AnalyzerWorkerPool {
  this.workers[workerId].addEventListener('message', handler);
  this.workers[workerId].postMessage({
  type: 'PROCESS_BATCH',
- data: { batchId, chunks },
+ data: { batchId: chunks },
  });
 
  setTimeout(() => reject(new Error('Batch timeout')), 60000);
@@ -173,7 +171,7 @@ export class AnalyzerWorkerPool {
  /**
  * Handle worker message
  */
- private handleWorkerMessage(workerId: number, event), MessageEvent: void {
+ private handleWorkerMessage(workerId: number, event, MessageEvent: void {
  const { type, result, results, error } = event.data;
 
  switch (type) {
@@ -203,7 +201,7 @@ export class AnalyzerWorkerPool {
  /**
  * Handle worker error
  */
- private handleWorkerError(workerId: number, error), ErrorEvent: void {
+ private handleWorkerError(workerId: number, error, ErrorEvent: void {
  console.error(`Worker ${workerId} error:`, error);
  this.workerStatus.set(workerId, false);
 
@@ -229,8 +227,7 @@ export class AnalyzerWorkerPool {
  type: 'INIT',
  data: {
  workerId,
- config: {
- url: this.config.ollamaUrl || 'http://localhost:11434',
+ config: { url: this.config.ollamaUrl || 'http://localhost:11434',
  model: this.config.model || 'gemma3-legal:latest',
  },
  },
@@ -296,3 +293,7 @@ export async function getWorkerPool(config?: WorkerPoolConfig): Promise<Analyzer
  }
  return globalWorkerPool;
 }
+
+
+
+

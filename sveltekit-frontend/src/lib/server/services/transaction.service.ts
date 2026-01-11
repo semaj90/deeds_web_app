@@ -49,7 +49,7 @@ export async function withTransaction<T>(
  userId,
  operationName,
  'commit',
- { duration, isolationLevel },
+ { duration: isolationLevel },
  true
  );
  }
@@ -72,7 +72,7 @@ export async function withTransaction<T>(
  );
  }
 
- console.error(`Transaction ${operationName} failed:`, error);
+ console.error(`Transaction ${ operationName } failed:`, error);
  throw error;
  }
 }
@@ -233,3 +233,5 @@ export class ConnectionPoolMonitor {
 // Export singleton instance
 export const transactionManager = new TransactionManager();
 export const connectionPoolMonitor = new ConnectionPoolMonitor();
+
+

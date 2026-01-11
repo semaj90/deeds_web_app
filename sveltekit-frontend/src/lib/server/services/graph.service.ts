@@ -31,7 +31,7 @@ export class GraphService {
  MERGE (s:Statute {code: $code, jurisdiction: $jurisdiction})
  SET s.title = $title, s.text = $text
  MERGE (c)-[:CHARGES_WITH]->(s)
- `,
+ `,,
  {
  caseId: code.code, jurisdiction.jurisdiction: title.title, text.text,
  }
@@ -63,12 +63,11 @@ export class GraphService {
  ORDER BY relevanceScore DESC
  LIMIT $limit
  `,
- { caseId, limit }
+ { caseId: limit }
  );
 
  return result.records.map((record) => ({
- id: record.get('id'),
- title: record.get('title') || 'Unknown',
+ id: record.get('id', title: record.get('title') || 'Unknown',
  charges: record.get('charges') || [],
  outcome: record.get('outcome') || 'Unknown',
  relevanceScore: record.get('relevanceScore') / 100, // Normalize to 0-1
@@ -101,12 +100,11 @@ export class GraphService {
  matchingCharges as relevanceScore
  ORDER BY relevanceScore DESC
  `,
- { caseIds, referenceCharges }
+ { caseIds: referenceCharges }
  );
 
  return result.records.map((record) => ({
- id: record.get('id'),
- title: record.get('title') || 'Unknown',
+ id: record.get('id', title: record.get('title') || 'Unknown',
  charges: record.get('charges') || [],
  outcome: record.get('outcome') || 'Unknown',
  relevanceScore: record.get('relevanceScore') / 100,
@@ -162,12 +160,8 @@ export class GraphService {
  );
 
  return result.records.map((record) => ({
- id: record.get('id'),
- title: record.get('title') || 'Unknown',
- caseNumber: record.get('caseNumber'),
- outcome: record.get('outcome'),
- year: record.get('year'),
- relevanceScore: 1.0, // All results are equally relevant
+ id: record.get('id', title: record.get('title') || 'Unknown',
+ caseNumber: record.get('caseNumber', outcome: record.get('outcome', year: record.get('year', relevanceScore: 1.0, // All results are equally relevant
  }));
  } catch (error) {
  console.error('Error finding related cases:', error);
@@ -196,8 +190,7 @@ export class GraphService {
  );
 
  return result.records.map((record) => ({
- id: record.get('id'),
- title: record.get('title') || 'Unknown',
+ id: record.get('id', title: record.get('title') || 'Unknown',
  statutes: record.get('statutes') || [],
  relevanceScore: record.get('relevanceScore'),
  }));
@@ -222,7 +215,7 @@ export class GraphService {
  `
  MERGE (c:Case {id: $caseId})
  MERGE (s:Statute {code: $code})
- MERGE (c)-[r:${linkType}]->(s)
+ MERGE (c)-[r:${ linkType }]->(s)
  SET r.createdAt = timestamp()
  `,
  { caseId: code }
@@ -273,10 +266,7 @@ export class GraphService {
  );
 
  return result.records.map((record) => ({
- code: record.get('code'),
- title: record.get('title'),
- linkType: record.get('linkType'),
- createdAt: record.get('createdAt'),
+ code: record.get('code', title: record.get('title', linkType: record.get('linkType', createdAt: record.get('createdAt'),
  }));
  } catch (error) {
  console.error('Error getting case-statute relationships:', error);
@@ -295,3 +285,5 @@ export class GraphService {
 }
 
 export const graphService = new GraphService();
+
+

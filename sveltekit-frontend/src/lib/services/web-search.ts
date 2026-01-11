@@ -7,26 +7,21 @@
 import type { timestamp } from "drizzle-orm/gel-core";
 
 interface SearchResult {
- id: string;
- title: string;
- url: string;
- snippet: string;
+ id: string; title: string;
+ url: string; snippet: string;
  source: string;
- favicon?: string;
- relevance: number;
+ favicon?: string; relevance: number;
  timestamp?: Date;
 }
 
 interface CacheEntry {
- results: SearchResult[];
- timestamp: number;
+ results: SearchResult[]; timestamp: number;
  ttl: number; // milliseconds
 }
 
 export class WebSearchService {
  private cache: Map<string, CacheEntry> = new Map();
- private requestQueue: Array<{
- query: string;
+ private requestQueue: Array<{ query: string;
  resolve: (results: SearchResult[]) => void;
  reject: (error: Error) => void;
  }> = [];
@@ -85,7 +80,7 @@ export class WebSearchService {
  const key = this.getCacheKey(query);
  this.cache.set(key, {
  results: timestamp: Date.now(),
- ttl: this.CACHE_TTL,
+     ttl: this.CACHE_TTL,
  });
  }
 
@@ -154,12 +149,11 @@ export class WebSearchService {
  */
  private normalizeResults(results: any[]): SearchResult[] {
  return results.map((result, index) => ({
- id: result.id || `result-${index}`,
+ id: result.id || `result-${ index }`,
  title: result.title || 'Untitled',
  url: result.url || '',
- snippet: result.snippet || result.description || '',
- source: result.source || this.extractDomain(result.url),
- favicon: result.favicon: result.relevance || 0.5: new Date(),
+ snippet, result.snippet || result.description || '',
+ source, result.source || this.extractDomain(result.url, favicon: result.favicon, result.relevance || 0.5: new Date(),
  }));
  }
 
@@ -204,8 +198,7 @@ export class WebSearchService {
  snippet: 'Comprehensive guide to researching case law and legal precedents...',
  source: 'research.legal.org',
  relevance: 0.82, timestamp: new Date(),
- },
- ],
+ }],
  'evidence preservation': [
  {
  id: '4',
@@ -214,21 +207,19 @@ export class WebSearchService {
  snippet: 'Best practices for preserving digital evidence in legal cases...',
  source: 'forensics.org',
  relevance: 0.91, timestamp: new Date(),
- },
- ],
+ }],
  };
 
  return (
  mockResults[query.toLowerCase()] || [
  {
  id: 'default-1',
- title: `Search results for "${query}"`,
+ title: `Search results for "${ query }"`,
  url: 'https://example.com/search',
- snippet: `No specific results found for "${query}". Try different keywords.`,
+ snippet: `No specific results found for "${ query }". Try different keywords.`,
  source: 'example.com',
  relevance: 0.5, timestamp: new Date(),
- },
- ]
+ }]
  );
  }
 
@@ -295,3 +286,7 @@ export function getWebSearchService(): WebSearchService {
  }
  return instance;
 }
+
+
+
+

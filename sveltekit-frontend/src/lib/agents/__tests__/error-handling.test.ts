@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import {
  classifyError,
  determineRecoveryStrategy,
@@ -40,8 +40,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  new Error('Network error'),
  new Error('fetch failed'),
  new Error('Connection refused'),
- new Error('ECONNREFUSED'),
- ];
+ new Error('ECONNREFUSED')];
 
  for (const error of networkErrors) {
  const category = classifyError(error);
@@ -53,8 +52,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  const timeoutErrors = [
  new Error('Timeout'),
  new Error('Request timed out'),
- new Error('Operation timeout'),
- ];
+ new Error('Operation timeout')];
 
  for (const timeoutError of timeoutErrors) {
  const category = classifyError(timeoutError);
@@ -66,8 +64,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  const validationErrors = [
  new Error('Validation failed'),
  new Error('Invalid input'),
- new Error('Required field missing'),
- ];
+ new Error('Required field missing')];
 
  for (const error of validationErrors) {
  const category = classifyError(error);
@@ -79,8 +76,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  const serviceErrors = [
  new Error('Service unavailable'),
  new Error('500 Internal Server Error'),
- new Error('503 Service Unavailable'),
- ];
+ new Error('503 Service Unavailable')];
 
  for (const error of serviceErrors) {
  const category = classifyError(error);
@@ -99,8 +95,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  it('should abort on validation errors', () => {
  const context: ErrorRecoveryContext = {
  toolName: 'test_tool',
- error: new Error('Validation failed'),
- category: ErrorCategory.VALIDATION,
+ error: new Error('Validation failed', category: ErrorCategory.VALIDATION,
  maxAttempts: 3,
  };
 
@@ -111,8 +106,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  it('should retry on network errors within max attempts', () => {
  const context: ErrorRecoveryContext = {
  toolName: 'test_tool',
- error: new Error('Network error'),
- category: ErrorCategory.NETWORK,
+ error: new Error('Network error', category: ErrorCategory.NETWORK,
  maxAttempts: 3,
  };
 
@@ -123,8 +117,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  it('should degrade on network errors after max attempts', () => {
  const context: ErrorRecoveryContext = {
  toolName: 'test_tool',
- error: new Error('Network error'),
- category: ErrorCategory.NETWORK,
+ error: new Error('Network error', category: ErrorCategory.NETWORK,
  maxAttempts: 3,
  };
 
@@ -135,8 +128,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  it('should retry on timeout errors within max attempts', () => {
  const context: ErrorRecoveryContext = {
  toolName: 'test_tool',
- error: new Error('Timeout'),
- category: ErrorCategory.TIMEOUT,
+ error: new Error('Timeout', category: ErrorCategory.TIMEOUT,
  maxAttempts: 3,
  };
 
@@ -147,8 +139,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  it('should degrade on service errors after max attempts', () => {
  const context: ErrorRecoveryContext = {
  toolName: 'test_tool',
- error: new Error('Service unavailable'),
- category: ErrorCategory.SERVICE,
+ error: new Error('Service unavailable', category: ErrorCategory.SERVICE,
  maxAttempts: 3,
  };
 
@@ -163,8 +154,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  calculateBackoffDelay(1, 100),
  calculateBackoffDelay(2, 100),
  calculateBackoffDelay(3, 100),
- calculateBackoffDelay(4, 100),
- ];
+ calculateBackoffDelay(4, 100)];
 
  // Each delay should be roughly double the previous (with jitter)
  expect(delays[0]).toBeLessThan(200);
@@ -191,8 +181,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  it('should return retry strategy for retryable errors', async () => {
  const context: ErrorRecoveryContext = {
  toolName: 'test_tool',
- error: new Error('Network error'),
- category: ErrorCategory.NETWORK,
+ error: new Error('Network error', category: ErrorCategory.NETWORK,
  maxAttempts: 3,
  };
 
@@ -204,8 +193,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  it('should return degrade strategy for non-retryable errors', async () => {
  const context: ErrorRecoveryContext = {
  toolName: 'test_tool',
- error: new Error('Network error'),
- category: ErrorCategory.NETWORK,
+ error: new Error('Network error', category: ErrorCategory.NETWORK,
  maxAttempts: 3,
  };
 
@@ -219,8 +207,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
 
  const context: ErrorRecoveryContext = {
  toolName: 'test_tool',
- error: new Error('Error'),
- category: ErrorCategory.UNKNOWN,
+ error: new Error('Error', category: ErrorCategory.UNKNOWN,
  maxAttempts: 3,
  };
 
@@ -232,8 +219,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  it('should abort on validation errors', async () => {
  const context: ErrorRecoveryContext = {
  toolName: 'test_tool',
- error: new Error('Validation failed'),
- category: ErrorCategory.VALIDATION,
+ error: new Error('Validation failed', category: ErrorCategory.VALIDATION,
  maxAttempts: 3,
  };
 
@@ -445,3 +431,5 @@ describe('Error Handling - Property 3: Error Handling', () => {
  });
  });
 });
+
+

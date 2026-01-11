@@ -1,0 +1,155 @@
+import { db } from '$lib/server/db';
+import { routeHealthTable } from '$lib/server/db/schema';
+import { computeRouteCluster, inferRouteOwner } from '$lib/shared/phase80-route-metadata';
+import type { RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+
+/**
+ * POST /api/phase78/route-health
+ * Safe write endpoint to log or update route health status
+ * Additive-only: Creates new records or updates existing ones
+ * NO data destruction (no truncates, no deletes of existing rows)
+ */
+export const POST: RequestHandler = async ({ request }) => {
+  try {
+    const body = await request.json().catch(() => ({}));
+
+    const {
+      routePath,
+      filePath,
+      errorState = 'healthy',
+      recentErrorCount = 0,
+      lastErrorClusterId = null,
+      lastErrorMessageShort = null
+    } = body;
+
+    if (!routePath) {
+      return json(
+        { error: 'routePath is required' },
+        { status: 400 }
+      );
+    }
+
+    if (!filePath) {
+      return json(
+        { error: 'filePath is required' },
+        { status: 400 }
+      );
+    }
+
+    if (!['healthy', 'flaky', 'broken'].includes(errorState)) {
+      return json(
+        { error: 'errorState must be one of: healthy, flaky, broken' },
+        { status: 400 }
+      );
+    }
+
+    // Compute metadata from route path
+    const routeCluster = computeRouteCluster(routePath);
+    const routeOwner = inferRouteOwner(routeCluster);
+
+    // Try to insert or update the route health record
+    // Using upsert pattern: try to insert, catch duplicate and update instead
+    let result;
+
+    try {
+      // First, try to insert
+      const inserted = await db;
+        .insert(routeHealthTable)
+        .values({
+          routePath,
+          filePath,
+          errorState,
+          recentErrorCount,
+          lastErrorClusterId,
+          lastErrorMessageShort,
+          lastErrorAt: lastErrorMessageShort ? new Date() : null,
+          routeCluster,
+          routeOwner
+        })
+        .returning();
+
+      result = inserted?.[0];
+    } catch (insertErr: any) {
+      // If insert fails due to unique constraint, update instead
+      if (insertErr.message?.includes('unique') || insertErr.code === '23505') {
+        const updated = await db;
+          .update(routeHealthTable)
+          .set({
+            errorState,
+            recentErrorCount,
+            lastErrorClusterId,
+            lastErrorMessageShort,
+            lastErrorAt: lastErrorMessageShort ? new Date() : null,
+            routeCluster,
+            routeOwner,
+            updatedAt: new Date()
+          })
+          .where(db.sql`${routeHealthTable.routePath} = ${routePath}`)
+          .returning();
+
+        result = updated?.[0];
+      } else {
+        throw insertErr;
+      }
+    }
+
+    return json(
+      {
+        success: true,
+        data: result,
+        message: 'Route health recorded successfully',
+        timestamp: new Date().toISOString()
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error('Error recording route health:', error);
+    return json(
+      {
+        error: 'Failed to record route health',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    );
+  }
+};
+
+/**
+ * GET /api/phase78/route-health
+ * Read current health status for one or more routes
+ */
+export const GET: RequestHandler = async ({ url }) => {
+  try {
+    const routePath = url.searchParams.get('routePath');
+    const limit = Math.min(Number(url.searchParams.get('limit') ?? 50), 500);
+
+    if (!routePath) {
+      return json(
+        { error: 'routePath query parameter is required' },
+        { status: 400 }
+      );
+    }
+
+    const health = await db;
+      .select()
+      .from(routeHealthTable)
+      .where(db.sql`${routeHealthTable.routePath} = ${routePath}`)
+      .limit(limit);
+
+    return json(
+      {
+        routePath,
+        health: health || [],
+        timestamp: new Date().toISOString()
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Error fetching route health:', error);
+    return json(
+      { error: 'Failed to fetch route health' },
+      { status: 500 }
+    );
+  }
+};

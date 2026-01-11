@@ -13,16 +13,13 @@ export const GET: RequestHandler = async ({ url }) => {
  switch (action) {
  case 'status':
  return json({
- ready: await startupFlagService.isReady(),
- summary: startupFlagService.getServiceSummary(),
- timestamp: Date.now(),
+ ready: await startupFlagService.isReady( summary: startupFlagService.getServiceSummary(timestamp: Date.now(),
  });
  case 'health': {
  const summary: StartupServiceSummary = startupFlagService.getServiceSummary();
  const healthGrade = calculateOverallHealth(summary);
  return json({
- health: healthGrade, ready: await startupFlagService.isReady(),
- criticalServices: Object.entries(summary.services)
+ health: healthGrade, ready: await startupFlagService.isReady( criticalServices: Object.entries(summary.services)
  .filter(([name, service]) => !service.isOptional)
  .reduce<Record<string, { status: string; health: string; startupTime?: number }>>(
  (acc, [name, service]) => {
@@ -32,7 +29,6 @@ export const GET: RequestHandler = async ({ url }) => {
  return acc;
  },
  {}
- ),
  timestamp: Date.now(),
  });
  }
@@ -42,8 +38,7 @@ export const GET: RequestHandler = async ({ url }) => {
  if (existsSync(diffPath)) {
  const diffContent = await readFile(diffPath, 'utf-8');
  return json({
- diff: JSON.parse(diffContent),
- timestamp: Date.now(),
+ diff: JSON.parse(diffContent, timestamp: Date.now(),
  });
  } else {
  return json({
@@ -67,8 +62,7 @@ export const GET: RequestHandler = async ({ url }) => {
  if (existsSync(flagPath)) {
  const flagContent = await readFile(flagPath, 'utf-8');
  return json({
- flag: JSON.parse(flagContent),
- exists: true, timestamp: Date.now(),
+ flag: JSON.parse(flagContent, exists: true, timestamp: Date.now(),
  });
  } else {
  return json({
@@ -177,3 +171,6 @@ function calculateOverallHealth(summary: StartupServiceSummary): string {
  return 'poor';
  }
 }
+
+
+

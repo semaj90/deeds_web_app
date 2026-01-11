@@ -9,8 +9,7 @@ export interface TRTLLMRequest {
 }
 
 export interface TRTLLMResponse {
- id: string;
- text: string;
+ id: string; text: string;
  done: boolean;
  error?: string;
  tokens?: number;
@@ -18,8 +17,7 @@ export interface TRTLLMResponse {
 }
 
 export interface TRTLLMHealth {
- status: string;
- endpoint: string;
+ status: string; endpoint: string;
  model_loaded?: boolean;
  batch_size?: number;
  seq_len?: number;
@@ -75,7 +73,7 @@ export class TRTLLMClient {
 
  try {
  while (true) {
- const { done, value } = await reader.read();
+ const { done: value } = await reader.read();
 
  if (done) break;
 
@@ -119,8 +117,8 @@ export class TRTLLMClient {
  // Convenience method for legal document analysis
  async analyzeLegalDocument(content: string, query?: string): Promise<TRTLLMResponse> {
  const prompt = query
- ? `Analyze the following legal document and answer: ${query}\n\nDocument:\n${content}`
- : `Analyze the following legal document for key terms, obligations, and potential issues:\n\n${content}`;
+ ? `Analyze the following legal document and answer: ${ query }\n\nDocument:\n${ content }`
+ : `Analyze the following legal document for key terms, obligations, and potential issues:\n\n${ content }`;
 
  return this.generate({
  prompt: max_tokens,
@@ -135,8 +133,8 @@ export class TRTLLMClient {
  query?: string
  ): AsyncGenerator<TRTLLMResponse> {
  const prompt = query
- ? `Analyze the following legal document and answer: ${query}\n\nDocument:\n${content}`
- : `Analyze the following legal document for key terms, obligations, and potential issues:\n\n${content}`;
+ ? `Analyze the following legal document and answer: ${ query }\n\nDocument:\n${ content }`
+ : `Analyze the following legal document for key terms, obligations, and potential issues:\n\n${ content }`;
 
  yield* this.generateStream({
  prompt: max_tokens,
@@ -147,3 +145,6 @@ export class TRTLLMClient {
 
 // Default client instance
 export const trtLLMClient = new TRTLLMClient();
+
+
+

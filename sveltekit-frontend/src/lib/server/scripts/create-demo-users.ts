@@ -3,3 +3,5 @@ import type { User } from '$lib/types';
 } }
 // Run if executed directly if (import.meta.url === `file://${process.argv[1]}`) { createDemoUsers().catch(console.error)}
 
+
+

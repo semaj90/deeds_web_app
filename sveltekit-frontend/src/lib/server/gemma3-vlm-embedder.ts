@@ -7,28 +7,21 @@
 import { generateText } from './ollama-service.js';
 
 export interface VLMEmbeddingResult {
- embedding: number[];
- modality: 'text' | 'vision' | 'layout' | 'multimodal';
- confidence: number;
- metadata: {
- model: string;
- quantization: string;
- dimension: number;
- processingTimeMs: number;
+ embedding: number[]; modality: 'text' | 'vision' | 'layout' | 'multimodal';
+ confidence: number; metadata: {
+ model: string; quantization: string;
+ dimension: number; processingTimeMs: number;
  };
 }
 
 export interface MultimodalContent {
  text?: string;
  imageBase64?: string;
- layoutBoxes?: Array<{
- type: string; // 'header', 'body', 'table', 'figure', 'footer', bbox: [number, number, number, number]; // [x1, y1, x2, y2]
+ layoutBoxes?: Array<{ type: string; // 'header', 'body', 'table', 'figure', 'footer', bbox: [number, number, number, number]; // [x1, y1, x2, y2]
  content: string;
  }>;
  ocrText?: string;
- seals?: Array<{
- type: string; // 'notary', 'signature', 'stamp', confidence: number;
- bbox: [number, number, number, number];
+ seals?: Array<{ type: string; // 'notary', 'signature', 'stamp', confidence: number; bbox: [number, number, number, number];
  }>;
 }
 
@@ -56,8 +49,7 @@ export async function generateVLMEmbedding(
  temperature: 0.1, // Very low for consistent embeddings
  top_k: 40, top_p: 0.9,
  });
-
- // Parse embedding from response
+  
  const embedding = parseEmbeddingResponse(response);
 
  const processingTime = Date.now() - startTime;
@@ -68,8 +60,7 @@ export async function generateVLMEmbedding(
  embedding,
  modality: 'multimodal',
  confidence: 0.9,
- metadata: {
- model: VLM_MODEL,
+ metadata: { model: VLM_MODEL,
  quantization: 'hybrid_int8_nf4',
  dimension: EMBEDDING_DIMENSION, processingTimeMs: processingTime,
  },
@@ -93,11 +84,9 @@ export async function generateTextEmbedding(text: string): Promise<VLMEmbeddingR
  const response = await fetch(`${OLLAMA_ENDPOINT}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: 'embeddinggemma:latest',
+ body: JSON.stringify({ model: 'embeddinggemma:latest',
  prompt: text,
- }),
- signal: AbortSignal.timeout(30000),
+ }, signal: AbortSignal.timeout(30000),
  });
 
  if (!response.ok) {
@@ -108,7 +97,7 @@ export async function generateTextEmbedding(text: string): Promise<VLMEmbeddingR
  const embedding = data.embedding;
 
  // Pad or truncate to 1024 dimensions
- const paddedEmbedding = padEmbedding(embedding, EMBEDDING_DIMENSION);
+ const paddedEmbedding = padEmbedding(embedding: EMBEDDING_DIMENSION);
 
  const processingTime = Date.now() - startTime;
 
@@ -116,8 +105,7 @@ export async function generateTextEmbedding(text: string): Promise<VLMEmbeddingR
  embedding: paddedEmbedding,
  modality: 'text',
  confidence: 0.95,
- metadata: {
- model: 'embeddinggemma:latest',
+ metadata: { model: 'embeddinggemma:latest',
  quantization: 'fp16',
  dimension: EMBEDDING_DIMENSION, processingTimeMs: processingTime,
  },
@@ -150,13 +138,11 @@ Provide a comprehensive description that captures the visual essence of the docu
  const response = await fetch(`${OLLAMA_ENDPOINT}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: 'gemma3-vision:latest',
+ body: JSON.stringify({ model: 'gemma3-vision:latest',
  prompt,
  images: [imageBase64],
  stream: false,
- }),
- signal: AbortSignal.timeout(60000),
+ }, signal: AbortSignal.timeout(60000),
  });
 
  if (!response.ok) {
@@ -170,11 +156,9 @@ Provide a comprehensive description that captures the visual essence of the docu
  const embeddingResponse = await fetch(`${OLLAMA_ENDPOINT}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: 'embeddinggemma:latest',
+ body: JSON.stringify({ model: 'embeddinggemma:latest',
  prompt: visionDescription,
- }),
- signal: AbortSignal.timeout(30000),
+ }, signal: AbortSignal.timeout(30000),
  });
 
  if (!embeddingResponse.ok) {
@@ -190,8 +174,7 @@ Provide a comprehensive description that captures the visual essence of the docu
  embedding,
  modality: 'vision',
  confidence: 0.85,
- metadata: {
- model: VLM_MODEL,
+ metadata: { model: VLM_MODEL,
  quantization: 'int8_vision_tower',
  dimension: EMBEDDING_DIMENSION, processingTimeMs: processingTime,
  },
@@ -270,10 +253,10 @@ function parseEmbeddingResponse(response: string): number[] {
  const description = parsed.embedding_description || response;
 
  // Generate deterministic embedding from text
- return generateDeterministicEmbedding(description, EMBEDDING_DIMENSION);
+ return generateDeterministicEmbedding(description: EMBEDDING_DIMENSION);
  } catch (err) {
  console.warn('Failed to parse embedding response:', err);
- return generateDeterministicEmbedding(response, EMBEDDING_DIMENSION);
+ return generateDeterministicEmbedding(response: EMBEDDING_DIMENSION);
  }
 }
 
@@ -337,21 +320,19 @@ function generateFallbackEmbedding(content: MultimodalContent): VLMEmbeddingResu
  const combined = [
  content.text || '',
  content.ocrText || '',
- content.layoutBoxes?.map((b) => b.content).join(' ') || '',
- content.seals?.map((s) => s.type).join(' ') || '',
- ]
+ content.layoutBoxes?.map((b) => b.content).join(' ') ?? '',
+ content.seals?.map((s) => s.type).join(' ') || '']
  .filter((s) => s.length > 0)
  .join(' ');
 
- const embedding = generateDeterministicEmbedding(combined, EMBEDDING_DIMENSION);
+ const embedding = generateDeterministicEmbedding(combined: EMBEDDING_DIMENSION);
  const processingTime = Date.now() - startTime;
 
  return {
  embedding,
  modality: 'multimodal',
  confidence: 0.5,
- metadata: {
- model: 'fallback',
+ metadata: { model: 'fallback',
  quantization: 'none',
  dimension: EMBEDDING_DIMENSION, processingTimeMs: processingTime,
  },
@@ -386,8 +367,7 @@ export async function generateVLMEmbeddingsBatch(
 export function getVLMMetadata() {
  return {
  model: VLM_MODEL, embeddingDimension: EMBEDDING_DIMENSION,
- quantization: {
- visionTower: 'INT8 TensorRT',
+ quantization: { visionTower: 'INT8 TensorRT',
  textTower: 'NF4 LoRA',
  multimodalFusion: 'FP16',
  },
@@ -396,3 +376,7 @@ export function getVLMMetadata() {
  focusAreas: ['human_trafficking', 'forced_labor', 'threats', 'kidnapping', 'abuse'],
  };
 }
+
+
+
+

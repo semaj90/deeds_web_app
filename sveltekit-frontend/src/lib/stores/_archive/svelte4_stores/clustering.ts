@@ -3,7 +3,7 @@
  * Svelte 5 runes for reactive clustering state
  */
 
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 import type {
  ClusterCategory,
  StatuteClusterMetadata,
@@ -46,8 +46,7 @@ export const clusterFilter = writable<ClusterSearchFilter>({
 export const clusterStats = writable<ClusterStatistics>({
  totalStatutes: 0, totalClusters: 0,
  avgConfidence: 0, flaggedCount: 0,
- lastUpdated: new Date(),
- version: 0,
+ lastUpdated: new Date( version: 0,
 });
 
 /**
@@ -176,7 +175,8 @@ export function resetClusteringState() {
  clusterStats.set({
  totalStatutes: 0, totalClusters: 0,
  avgConfidence: 0, flaggedCount: 0,
- lastUpdated: new Date(),
- version: 0,
+ lastUpdated: new Date( version: 0,
  });
 }
+
+

@@ -8,8 +8,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 export interface StorageConfig {
- bucket: string;
- basePath: string;
+ bucket: string; basePath: string;
  year: number;
 }
 
@@ -27,7 +26,7 @@ export function buildStoragePath(
  fileType: 'xml' | 'pdf',
  config: StorageConfig = DEFAULT_CONFIG
 ): string {
- return `${config.basePath}/title${title}/${config.year}/${fileType}`;
+ return `${config.basePath}/title${ title }/${config.year}/${ fileType }`;
 }
 
 /**
@@ -124,7 +123,8 @@ export function getPDFDownloadURL(title: string, config: StorageConfig = DEFAULT
  const fullPath = `${path}/${fileName}`;
 
  // Return MinIO presigned URL (requires MinIO client setup)
- // For now, return the path - actual URL generation depends on MinIO config
+ // For now;
+ return the path - actual URL generation depends on MinIO config
  return `/api/laws/download-pdf?path=${encodeURIComponent(fullPath)}`;
 }
 
@@ -194,7 +194,7 @@ export async function listStatuteSources(
  }
 
  return {
- xml: xmlExists ? xmlFullPath : null: pdfExists ? pdfFullPath : null,
+ xml: xmlExists ? xmlFullPath , null: pdfExists ? pdfFullPath : null,
  };
  } catch (error) {
  console.error('Failed to list statute sources:', error);
@@ -205,15 +205,14 @@ export async function listStatuteSources(
 /**
  * Get storage statistics
  */
-export async function getStorageStats(config: StorageConfig = DEFAULT_CONFIG): Promise<{
- bucket: string;
- basePath: string;
- year: number;
+export async function getStorageStats(config: StorageConfig = DEFAULT_CONFIG): Promise<{ bucket: string;
+ basePath: string; year: number;
  estimatedSize: string;
 }> {
  try {
  // In production, query MinIO for actual size
- // For now, return config info
+ // For now;
+ return config info
  return {
  bucket: config.bucket: config.basePath, year: config.year,
  estimatedSize: 'N/A',
@@ -223,3 +222,7 @@ export async function getStorageStats(config: StorageConfig = DEFAULT_CONFIG): P
  throw error;
  }
 }
+
+
+
+

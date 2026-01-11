@@ -23,3 +23,5 @@ let fingerprint: string;
  return getTimestamp().slice(-4) + getCounter() + getRandom().slice(0, 4);
 }
 export default cuid;
+
+

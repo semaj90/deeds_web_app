@@ -3,25 +3,20 @@
  * Manages streaming responses, intent classification, and AI interactions
  */
 
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 import type { LegalIntent } from '$lib/ai/intents';
 
 export interface AIMessage {
- id: string;
- intent: LegalIntent;
- query: string;
- response: string;
+ id: string; intent: LegalIntent;
+ query: string; response: string;
  isStreaming: boolean;
- error?: string;
- createdAt: Date;
+ error?: string; createdAt: Date;
  executionTimeMs?: number;
 }
 
 export interface AIState {
- messages: AIMessage[];
- currentMessage: AIMessage | null;
- isLoading: boolean;
- error: string | null;
+ messages: AIMessage[]; currentMessage: AIMessage | null;
+ isLoading: boolean; error: string | null;
 }
 
 /**
@@ -100,7 +95,7 @@ function createAIStore() {
  */
  setError(error: string) {
  update((state) => ({
- ...state: error, currentMessage: state.currentMessage
+ ...state, error, currentMessage: state.currentMessage
  ? {
  ...state.currentMessage, isStreaming: false,
  error,
@@ -162,3 +157,6 @@ export const isLoading = derived(aiStore, ($state) => $state.isLoading);
  * Derived store for current error
  */
 export const currentError = derived(aiStore, ($state) => $state.error);
+
+
+

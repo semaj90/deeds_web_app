@@ -98,3 +98,4 @@ const parser = new SIMDJSONParser();
 
 module.exports = parser;
 module.exports.SIMDJSONParser = SIMDJSONParser;
+

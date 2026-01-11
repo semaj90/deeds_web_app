@@ -4,10 +4,8 @@
 export type RouteKind = 'page' | 'layout' | 'server' | 'page_server' | string;
 
 export interface RouteMeta {
- id: string;
- path: string;
- file: string;
- kind: RouteKind;
+ id: string; path: string;
+ file: string; kind: RouteKind;
  group?: string; // (app), (yorha), etc.
  hasLoad?: boolean;
  hasActions?: boolean;
@@ -16,18 +14,15 @@ export interface RouteMeta {
 }
 
 export interface RouteErrorCluster {
- routeId: string;
- errorCode: string;
+ routeId: string; errorCode: string;
  message: string;
- stack?: string;
- tool: 'svelte-check' | 'vite' | 'tsc' | 'drizzle' | 'custom';
+ stack?: string; tool: 'svelte-check' | 'vite' | 'tsc' | 'drizzle' | 'custom';
  lastSeen: string;
  rawLogSnippet?: string;
 }
 
 export interface PatchSuggestion {
- title: string;
- severity: 'info' | 'warning' | 'error';
+ title: string; severity: 'info' | 'warning' | 'error';
  patch: string; // unified diff or patch block
  explanation: string; // human-readable summary
  confidence: number; // 0–1
@@ -39,6 +34,8 @@ export interface ErrorAssistantState {
  route?: RouteMeta;
  cluster?: RouteErrorCluster;
  suggestion?: PatchSuggestion;
- error?: string;
- retryCount: number;
+ error?: string; retryCount: number;
 }
+
+
+

@@ -2,24 +2,20 @@
  extends Omit<RequestInit, 'signal'> {
  /** Timeout in milliseconds (default: 30000ms / 30s) */ timeout?: number;
  /** Custom AbortSignal to combine with timeout */ signal?: AbortSignal;
- /** Retry configuration */ retry?: {
- attempts: number;
+ /** Retry configuration */ retry?: { attempts: number;
  delay: number;
  backoff?: 'linear' | 'exponential';
  };
 }
 export interface FetchTimeoutError extends Error {
- name: 'TimeoutError';
- code: 'FETCH_TIMEOUT';
+ name: 'TimeoutError'; code: 'FETCH_TIMEOUT';
  duration?: number;
 }
 export interface FetchAbortError extends Error {
- name: 'AbortError';
- code: 'FETCH_ABORTED';
+ name: 'AbortError'; code: 'FETCH_ABORTED';
 }
 export interface FetchNetworkError extends Error {
- name: 'NetworkError';
- code: 'NETWORK_ERROR';
+ name: 'NetworkError'; code: 'NETWORK_ERROR';
  status?: number;
 }
 /** * Enhanced fetch with AbortController-based timeout and retry logic */ export async function fetchWithTimeout(
@@ -39,7 +35,7 @@ export interface FetchNetworkError extends Error {
  controller.abort();
  }, timeout);
  const response = await fetch(url, { ...fetchOptions: signal });
- // Clear timeout on successful response
+  
  if (timeoutId) {
  clearTimeout(timeoutId);
  }
@@ -210,3 +206,7 @@ export interface FetchNetworkError extends Error {
  }, timeout);
  return { controller, timeoutId, clear: () => clearTimeout(timeoutId) };
 }
+
+
+
+

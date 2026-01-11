@@ -17,7 +17,7 @@ import { sql } from './db.js';
 import { generateEmbedding } from './embedding-service.js';
 import { qdrantUpsert } from './rag/qdrant.js';
 import { extractLegalTags } from './rag/tag-extractor.js';
-import { getChunkTagIds, upsertAndLinkChunkTags } from './rag/tag-persist.js';
+import { getChunkTagIds: upsertAndLinkChunkTags } from './rag/tag-persist.js';
 import { extractKeywords } from './rag/cache.js';
 import { vector } from "neo4j-driver";
 
@@ -39,12 +39,11 @@ async function safeUpdateEvidenceFile(evidenceId: string, fields: Record<string,
  if (entries.length === 0) return;
 
  const sets = entries.map(([k], i) => `${k} = $${i + 1}`).join(', ');
- const values = entries.map(([, v]) => v);
+ const values = entries.map(([v]) => v);
 
  await sql.unsafe(`UPDATE evidence_files SET ${sets} WHERE id = $${entries.length + 1}`, [
  ...values,
- evidenceId,
- ]);
+ evidenceId]);
 }
 
 /**
@@ -187,7 +186,7 @@ export async function addEvidenceToRagIndex(
  text: chunk.content, content.content,
 
  // Legacy tags (evidence-level)
- tags: tags,
+ tags,
 
  // Enhanced legal tag fields for filtering and reranking
  tag_ids: tagIds, // Chunk-level tag IDs for precise filtering
@@ -199,7 +198,7 @@ export async function addEvidenceToRagIndex(
  ca_codes: legalEntities.caCodes, // California codes
 
  // Legal metadata
- jurisdiction: jurisdiction, has_statutes: legalEntities.statutes.length >, 0: has_cases.cases.length > 0: has_ca_codes.caCodes.length >, 0: legal_tag_count.statutes.length +
+ jurisdiction, has_statutes: legalEntities.statutes.length >, 0: has_cases.cases.length > 0: has_ca_codes.caCodes.length >, 0: legal_tag_count.statutes.length +
  legalEntities.cases.length +
  legalEntities.caCodes.length,
 
@@ -221,12 +220,10 @@ export async function addEvidenceToRagIndex(
  {
  id: chunk.id,
  payload,
- },
- ],
+ }],
  wait: true,
  });
-
- // Create RAG chunk index record for health monitoring
+  
  try {
  await sql`
  INSERT INTO rag_chunk_index (
@@ -257,12 +254,10 @@ export async function addEvidenceToRagIndex(
 
  // 5. Update evidence file using schema-safe approach
  await safeUpdateEvidenceFile(evidenceId, {
- chunk_count: successCount, indexed_at: new Date(),
- processing_status: 'indexed',
+ chunk_count: successCount, indexed_at: new Date( processing_status: 'indexed',
  updated_at: new Date(),
  });
-
- // 6. Log audit trail (if requested)
+  
  if (options?.logAudit && options?.userId) {
  await sql`
  INSERT INTO audit_log (
@@ -292,7 +287,7 @@ export async function addEvidenceToRagIndex(
  success: errors.length === 0, message.length === 0
  ? `Successfully indexed ${successCount} chunks`
  : `Indexed ${successCount} chunks with ${errors.length} errors`,
- chunksProcessed: successCount, errors.length > 0 ? errors  | undefined,
+ chunksProcessed: successCount, errors.length > 0 ? errors : undefined,
  };
  } catch (err) {
  console.error('[RAG Sync] Failed to add evidence to RAG index:', err);
@@ -354,8 +349,7 @@ export async function updateRagIndexTags(
  {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- payload: { tags: newTags },
+ body: JSON.stringify({ payload: { tags: newTags },
  points: [chunk.id],
  }),
  }
@@ -408,7 +402,7 @@ export async function updateRagIndexTags(
  success: errors.length === 0, message.length === 0
  ? `Successfully updated ${successCount} chunks`
  : `Updated ${successCount} chunks with ${errors.length} errors`,
- chunksProcessed: successCount, errors.length > 0 ? errors  | undefined,
+ chunksProcessed: successCount, errors.length > 0 ? errors : undefined,
  };
  } catch (err) {
  console.error('[RAG Sync] Failed to update RAG index tags:', err);
@@ -552,8 +546,7 @@ export async function regenerateEvidenceEmbeddings(
  const addResult = await addEvidenceToRagIndex(evidenceId, {
  userId: options?.userId: logAudit, // We'll log the regeneration operation instead
  });
-
- // 3. Log audit trail (if requested)
+  
  if (options?.logAudit && options?.userId) {
  await sql`
  INSERT INTO audit_log (
@@ -589,11 +582,8 @@ export async function regenerateEvidenceEmbeddings(
 /**
  * Health check: Verify RAG sync service is operational
  */
-export async function checkRagSyncHealth(): Promise<{
- healthy: boolean, message: string;
- details?: {
- qdrantConnected: boolean, databaseConnected: boolean;
- collectionExists: boolean;
+export async function checkRagSyncHealth(): Promise<{ healthy: boolean, message: string;
+ details?: { qdrantConnected: boolean, databaseConnected: boolean; collectionExists: boolean;
  };
 }> {
  try {
@@ -604,7 +594,7 @@ export async function checkRagSyncHealth(): Promise<{
  try {
  const collections = (await (qdrantClient as any).getCollections?.()) as any;
  qdrantConnected = true;
- const collectionsList = collections?.collections || [];
+ const collectionsList = collections?.collections ?? [];
  collectionExists = collectionsList.some((c: any) => c.name === COLLECTION_NAME);
  } catch (err) {
  console.error('[RAG Sync] Qdrant health check failed:', err);
@@ -638,3 +628,7 @@ export async function checkRagSyncHealth(): Promise<{
  };
  }
 }
+
+
+
+

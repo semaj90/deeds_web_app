@@ -7,6 +7,10 @@ https://svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
 https://svelte.dev/e/tag_invalid_name -->
 <script lang="ts">
+	let isTagged = $state<any>(undefined);
+	let isDropped = $state<any>(undefined);
+	let tag = $state<any>(undefined);
+
  import type { Evidence } from '$lib/types';
  import { Archive } from "lucide-svelte";
 import { Download } from "lucide-svelte";
@@ -51,7 +55,7 @@ import { Zap } from "lucide-svelte";;
  if (mimeType?.startsWith('image/')) return Image;
  if (mimeType?.startsWith('video/')) return Video;
  if (mimeType?.startsWith('audio/')) return Music;
- if (mimeType?.includes('zip') || mimeType?.includes('rar') || mimeType?.includes('7z')) return Archive;
+ if (mimeType?.includes('zip') ?? mimeType?.includes('rar') || mimeType?.includes('7z')) return Archive;
  return FileText;
  }
 
@@ -94,12 +98,11 @@ import { Zap } from "lucide-svelte";;
 
 <div
  class="evidence-card nes-container is-dark with-title"
- class:selected
- class:readonly
+ class: selected, class:readonly
  class:is-tagged={isTagged}
  class:is-dropped={isDropped}
  draggable={!readonly}
- onclick={handleCardClick}
+ onclick={ handleCardClick }
  ondragstart={handleDragStart}
  role="button"
  tabindex="0"
@@ -205,13 +208,10 @@ import { Zap } from "lucide-svelte";;
 
 <style>
  .evidence-card {
- width: 160px;
- background: #1a1a1a;
+ width: 160px; background: #1a1a1a;
  border: 3px solid #333;
- border-radius: 8px;
- padding: 12px;
- cursor: grab;
- transition: all 0.3s ease;
+ border-radius: 8px; padding: 12px;
+ cursor: grab; transition: all 0.3s ease;
  position: relative;
  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
  font-size: 0.7rem;
@@ -224,8 +224,7 @@ import { Zap } from "lucide-svelte";;
  }
 
  .evidence-card:active {
- cursor: grabbing;
- transform: translateY(-1px);
+ cursor: grabbing; transform: translateY(-1px);
  }
 
  .evidence-card.selected {
@@ -248,13 +247,12 @@ import { Zap } from "lucide-svelte";;
  }
 
  .evidence-card.is-dropped {
- border-color: #ffc107;
- background: linear-gradient(135deg, #2a2a2a, #3a3a3a);
+ border-color: #ffc107; background: linear-gradient(135deg, #2a2a2a, #3a3a3a);
  animation: pulse 1s infinite;
  }
 
  @keyframes pulse {
- 0%, 100% { transform: scale(1); }
+ 0%; } 100% { transform: scale(1); }
  50% { transform: scale(1.02); }
  }
 
@@ -266,33 +264,28 @@ import { Zap } from "lucide-svelte";;
  }
 
  .file-icon {
- color: #92cc41;
- background: #2a2a2a;
+ color: #92cc41; background: #2a2a2a;
  padding: 6px;
  border-radius: 6px;
  }
 
  .ai-indicator {
  display: flex;
- align-items: center;
- gap: 4px;
+ align-items: center; gap: 4px;
  color: #92cc41;
  font-size: 0.6rem;
  font-weight: bold;
- text-transform: uppercase;
- animation: glow 2s infinite;
+ text-transform: uppercase; animation: glow 2s infinite;
  }
 
  @keyframes glow {
- 0%, 100% { text-shadow: 0 0 5px rgba(146, 204, 65, 0.5); }
+ 0%; } 100% { text-shadow: 0 0 5px rgba(146, 204, 65, 0.5); }
  50% { text-shadow: 0 0 10px rgba(146, 204, 65, 0.8); }
  }
 
  .card-actions {
- display: flex;
- gap: 4px;
- opacity: 0;
- transition: opacity 0.2s ease;
+ display: flex; gap: 4px;
+ opacity: 0; transition: opacity 0.2s ease;
  }
 
  .evidence-card:hover .card-actions {
@@ -301,12 +294,10 @@ import { Zap } from "lucide-svelte";;
 
  .action-btn {
  padding: 4px 6px;
- border-radius: 4px;
- cursor: pointer;
+ border-radius: 4px; cursor: pointer;
  display: flex;
  align-items: center;
- justify-content: center;
- transition: all 0.2s ease;
+ justify-content: center; transition: all 0.2s ease;
  font-size: 0.6rem;
  }
 
@@ -331,50 +322,41 @@ import { Zap } from "lucide-svelte";;
 
  .evidence-title {
  font-size: 0.8rem;
- font-weight: bold;
- margin: 0 0 6px 0;
- line-height: 1.3;
- overflow: hidden;
+ font-weight: bold; margin: 0 0 6px 0;
+ line-height: 1.3; overflow: hidden;
  text-overflow: ellipsis;
  white-space: nowrap;
  }
 
  .evidence-description {
- font-size: 0.6rem;
- margin: 0 0 8px 0;
- line-height: 1.4;
- display: -webkit-box;
+ font-size: 0.6rem; margin: 0 0 8px 0;
+ line-height: 1.4; display: -webkit-box;
  -webkit-line-clamp: 2;
- -webkit-box-orient: vertical;
- overflow: hidden;
+ -webkit-box-orient: vertical; overflow: hidden;
  }
 
  .evidence-meta {
  display: flex;
- flex-direction: column;
- gap: 4px;
+ flex-direction: column; gap: 4px;
  margin-bottom: 8px;
  }
 
  .meta-item {
  display: flex;
  align-items: center;
- justify-content: center;
- gap: 4px;
+ justify-content: center; gap: 4px;
  font-size: 0.5rem;
  }
 
  .evidence-tags {
  display: flex;
  flex-wrap: wrap;
- justify-content: center;
- gap: 4px;
+ justify-content: center; gap: 4px;
  margin-bottom: 8px;
  }
 
  .ai-summary {
- background: #2a2a2a;
- padding: 6px;
+ background: #2a2a2a; padding: 6px;
  margin: 8px 0;
  border: 1px solid #444;
  }
@@ -382,8 +364,7 @@ import { Zap } from "lucide-svelte";;
  .summary-header {
  display: flex;
  align-items: center;
- justify-content: center;
- gap: 4px;
+ justify-content: center; gap: 4px;
  font-size: 0.6rem;
  font-weight: bold;
  margin-bottom: 4px;
@@ -393,16 +374,14 @@ import { Zap } from "lucide-svelte";;
 
  .summary-text {
  font-size: 0.6rem;
- line-height: 1.4;
- margin: 0;
+ line-height: 1.4; margin: 0;
  cursor: help;
  }
 
  .drag-hint {
  font-size: 0.5rem;
  text-align: center;
- margin-top: 6px;
- opacity: 0.7;
+ margin-top: 6px; opacity: 0.7;
  }
 
  /* Focus styles for accessibility */
@@ -419,9 +398,11 @@ import { Zap } from "lucide-svelte";;
  /* Responsive design */
  @media (max-width: 768px) {
  .evidence-card {
- width: 140px;
- padding: 10px;
+ width: 140px; padding: 10px;
  font-size: 0.65rem;
  }
  }
 </style>
+
+
+

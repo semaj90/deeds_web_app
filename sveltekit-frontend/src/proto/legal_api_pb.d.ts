@@ -88,7 +88,7 @@ export namespace legal {
  * @param reader Reader or buffer to decode from
  * @param [length] Message length if known beforehand
  * @returns User
- * @throws {Error} If the payload is not a reader or valid buffer
+ * @throws { Error } If the payload is not a reader or valid buffer
  * @throws {$protobuf.util.ProtocolError} If required fields are missing
  */
  public static decode(reader: $protobuf.Reader | Uint8Array, length?: number): legal.api.User;
@@ -97,7 +97,7 @@ export namespace legal {
  * Decodes a User message from the specified reader or buffer, length delimited.
  * @param reader Reader or buffer to decode from
  * @returns User
- * @throws {Error} If the payload is not a reader or valid buffer
+ * @throws { Error } If the payload is not a reader or valid buffer
  * @throws {$protobuf.util.ProtocolError} If required fields are missing
  */
  public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): legal.api.User;
@@ -210,7 +210,7 @@ export namespace legal {
  * @param reader Reader or buffer to decode from
  * @param [length] Message length if known beforehand
  * @returns UserPreferences
- * @throws {Error} If the payload is not a reader or valid buffer
+ * @throws { Error } If the payload is not a reader or valid buffer
  * @throws {$protobuf.util.ProtocolError} If required fields are missing
  */
  public static decode(
@@ -222,7 +222,7 @@ export namespace legal {
  * Decodes a UserPreferences message from the specified reader or buffer, length delimited.
  * @param reader Reader or buffer to decode from
  * @returns UserPreferences
- * @throws {Error} If the payload is not a reader or valid buffer
+ * @throws { Error } If the payload is not a reader or valid buffer
  * @throws {$protobuf.util.ProtocolError} If required fields are missing
  */
  public static decodeDelimited(
@@ -337,7 +337,7 @@ export namespace legal {
  * @param reader Reader or buffer to decode from
  * @param [length] Message length if known beforehand
  * @returns AuthRequest
- * @throws {Error} If the payload is not a reader or valid buffer
+ * @throws { Error } If the payload is not a reader or valid buffer
  * @throws {$protobuf.util.ProtocolError} If required fields are missing
  */
  public static decode(
@@ -349,7 +349,7 @@ export namespace legal {
  * Decodes an AuthRequest message from the specified reader or buffer, length delimited.
  * @param reader Reader or buffer to decode from
  * @returns AuthRequest
- * @throws {Error} If the payload is not a reader or valid buffer
+ * @throws { Error } If the payload is not a reader or valid buffer
  * @throws {$protobuf.util.ProtocolError} If required fields are missing
  */
  public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): legal.api.AuthRequest;
@@ -5497,3 +5497,5 @@ export namespace google {
  }
  }
 }
+
+

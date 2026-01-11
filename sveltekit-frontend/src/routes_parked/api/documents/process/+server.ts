@@ -17,7 +17,7 @@ export const POST: RequestHandler = async ({ request }) => {
  try {
  const formData = await request.formData();
  const file = formData.get('file') as File;
- const methods = (formData.get('methods') as string)?.split(',') || ['docling'];
+ const methods = (formData.get('methods') as string)?.split(',') ?? ['docling'];
  const extractCitations = formData.get('extractCitations') === 'true';
 
  if (!file) {
@@ -122,16 +122,12 @@ export const POST: RequestHandler = async ({ request }) => {
 /**
  * Extract citations from text
  */
-function extractCitationsFromText(text: string): Array<{
- type: string;
- code: string;
- text: string;
+function extractCitationsFromText(text: string): Array<{ type: string;
+ code: string; text: string;
  context: string;
 }> {
- const citations: Array<{
- type: string;
- code: string;
- text: string;
+ const citations: Array<{ type: string;
+ code: string; text: string;
  context: string;
  }> = [];
 
@@ -168,3 +164,7 @@ function extractCitationsFromText(text: string): Array<{
 
  return citations;
 }
+
+
+
+

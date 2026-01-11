@@ -23,8 +23,7 @@
 		'evidence-canvas': () => import('$lib/components/evidence/EnhancedEvidenceBoard.svelte'),
 		'legal-research': () => import('$lib/components/ai/LegalAIPipelineDemo.svelte'),
 		'vector-search': () => import('$lib/components/ai/VectorIntelligenceDemo.svelte'),
-		'gaming-ui': () => import('$lib/components/cache/CacheDemo.svelte'),
-		performance: () => import('$lib/components/ai/CachePerformanceDashboard.svelte'),
+		'gaming-ui': () => import('$lib/components/cache/CacheDemo.svelte', performance: () => import('$lib/components/ai/CachePerformanceDashboard.svelte'),
 		'neural-topology': () => import('$lib/components/ai/NeuralTopology3DDemo.svelte'),
 		'simd-ai': () => import('$lib/components/ai/SIMDAIAssistantDemo.svelte'),
 		'realtime-comm': () => import('$lib/components/ai/RealtimeCommunicationDemo.svelte'),
@@ -32,7 +31,7 @@
 	};
 
 	let demoSlug = $derived($page.params.slug ?? 'showcase');
-	let currentComponent = $state<SvelteComponentConstructor | null>(null);
+	let currentComponent = $state<SvelteComponentConstructor : null>(null);
 	let loading = $state<boolean>(true);
 	let error = $state<string | null>(null);
 
@@ -67,71 +66,58 @@
 	});
 
 	const demoMetadata = {
-		webgpu: {
-			title: 'WebGPU Cache Optimizer',
+		webgpu: {title: 'WebGPU Cache Optimizer',
 			description: 'Hardware-accelerated cache optimization with WebGPU.',
 			tags: ['WebGPU', 'Cache', 'Performance']
 		},
-		'cuda-streaming': {
-			title: 'CUDA OCR & Tensor Processing',
+		'cuda-streaming': {title: 'CUDA OCR & Tensor Processing',
 			description: 'Real-time GPU-accelerated document OCR and tensor operations.',
 			tags: ['CUDA', 'OCR', 'GPU']
 		},
-		'ai-assistant': {
-			title: 'Enhanced RAG AI Assistant',
+		'ai-assistant': {title: 'Enhanced RAG AI Assistant',
 			description: 'Retrieval-Augmented Generation for legal research.',
 			tags: ['RAG', 'AI', 'Legal']
 		},
-		'evidence-canvas': {
-			title: 'Evidence Board Canvas',
+		'evidence-canvas': {title: 'Evidence Board Canvas',
 			description: 'Interactive evidence organization and visualization.',
 			tags: ['Evidence', 'Canvas', 'Visualization']
 		},
-		'legal-research': {
-			title: 'Legal AI Pipeline',
+		'legal-research': {title: 'Legal AI Pipeline',
 			description: 'End-to-end legal document processing pipeline.',
 			tags: ['Pipeline', 'Legal', 'AI']
 		},
-		'vector-search': {
-			title: 'Vector Intelligence Search',
+		'vector-search': {title: 'Vector Intelligence Search',
 			description: 'Semantic search using vector embeddings and SIMD.',
 			tags: ['Vector', 'Search', 'SIMD']
 		},
-		'gaming-ui': {
-			title: 'Gaming Cache Demo',
+		'gaming-ui': {title: 'Gaming Cache Demo',
 			description: 'YoRHa-inspired caching system with Redis integration.',
 			tags: ['Cache', 'Gaming', 'Redis']
 		},
-		performance: {
-			title: 'Cache Performance Dashboard',
+		performance: {title: 'Cache Performance Dashboard',
 			description: 'Real-time cache performance monitoring and optimization.',
 			tags: ['Performance', 'Cache', 'Monitoring']
 		},
-		'neural-topology': {
-			title: 'Neural Topology 3D Visualization',
+		'neural-topology': {title: 'Neural Topology 3D Visualization',
 			description: '3D visualization of neural network topology.',
 			tags: ['3D', 'Neural', 'Visualization']
 		},
-		'simd-ai': {
-			title: 'SIMD AI Assistant',
+		'simd-ai': {title: 'SIMD AI Assistant',
 			description: 'CPU-optimized AI assistant using SIMD instructions.',
 			tags: ['SIMD', 'AI', 'Performance']
 		},
-		'realtime-comm': {
-			title: 'Real-time Communication',
+		'realtime-comm': {title: 'Real-time Communication',
 			description: 'WebSocket-based real-time AI communication.',
 			tags: ['WebSocket', 'Real-time', 'Communication']
 		},
-		'autonomous-eng': {
-			title: 'Autonomous Engineering Copilot',
+		'autonomous-eng': {title: 'Autonomous Engineering Copilot',
 			description: 'AI-powered autonomous code generation and engineering.',
 			tags: ['Copilot', 'Autonomous', 'Engineering']
 		}
 	} satisfies Record<
 		string,
 		{
-			title: string;
-			description: string;
+			title: string; description: string;
 			tags: string[];
 		}
 	>;
@@ -166,7 +152,7 @@
 			{#if metadata.tags.length > 0}
 				<div class="demo-tags">
 					{#each Array.isArray(metadata.tags) ? metadata.tags : [] as tag}
-						<span class="demo-tag">{tag}</span>
+						<span class="demo-tag">{ tag }</span>
 					{/each}
 				</div>
 			{/if}
@@ -191,7 +177,7 @@
 			</div>
 		{:else if currentComponent}
 			<div class="demo-wrapper">
-				<currentComponent {data} ></currentComponent>
+				<currentComponent { data } ></currentComponent>
 			</div>
 		{:else}
 			<div class="demo-placeholder">
@@ -209,17 +195,14 @@
 	}
 
 	.demo-page-header {
-		padding: 2rem;
-		background: var(--nier-bg-secondary);
+		padding: 2rem; background: var(--nier-bg-secondary);
 		border-bottom: 1px solid var(--nier-border-muted);
 	}
 
 	.demo-breadcrumb {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.9rem;
-		color: var(--nier-text-muted);
+		align-items: center; gap: 0.5rem;
+		font-size: 0.9rem; color: var(--nier-text-muted);
 		margin-bottom: 1rem;
 	}
 
@@ -242,37 +225,30 @@
 	}
 
 	.demo-title {
-		font-size: 2rem;
-		margin: 0 0 0.5rem;
+		font-size: 2rem; margin: 0 0 0.5rem;
 		color: var(--nier-text-primary);
 	}
 
 	.demo-description {
-		font-size: 1.1rem;
-		color: var(--nier-text-secondary);
-		max-width: 800px;
-		margin: 0 0 1.5rem;
+		font-size: 1.1rem; color: var(--nier-text-secondary);
+		max-width: 800px; margin: 0 0 1.5rem;
 	}
 
 	.demo-tags {
-		display: flex;
-		gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 		flex-wrap: wrap;
 	}
 
 	.demo-tag {
 		padding: 0.25rem 0.75rem;
-		background: var(--nier-bg-tertiary);
-		border: 1px solid var(--nier-border-muted);
+		background: var(--nier-bg-tertiary); border: 1px solid var(--nier-border-muted);
 		border-radius: 4px;
-		font-size: 0.8rem;
-		color: var(--nier-text-secondary);
+		font-size: 0.8rem; color: var(--nier-text-secondary);
 	}
 
 	.demo-content {
 		padding: 2rem;
-		max-width: 1400px;
-		margin: 0 auto;
+		max-width: 1400px; margin: 0 auto;
 	}
 
 	.demo-loading,
@@ -281,21 +257,17 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		padding: 4rem 2rem;
-		text-align: center;
-		background: var(--nier-bg-secondary);
+		justify-content: center; padding: 4rem 2rem;
+		text-align: center; background: var(--nier-bg-secondary);
 		border: 1px solid var(--nier-border-muted);
 		border-radius: 8px;
 	}
 
 	.loading-spinner {
-		width: 40px;
-		height: 40px;
+		width: 40px; height: 40px;
 		border: 3px solid var(--nier-border-muted);
 		border-top-color: var(--nier-accent-warm);
-		border-radius: 50%;
-		animation: spin 1s linear infinite;
+		border-radius: 50%; animation: spin 1s linear infinite;
 		margin-bottom: 1rem;
 	}
 
@@ -311,18 +283,15 @@
 	}
 
 	.error-actions {
-		display: flex;
-		gap: 1rem;
+		display: flex; gap: 1rem;
 		margin-top: 1.5rem;
 	}
 
 	button {
 		padding: 0.5rem 1.5rem;
-		background: var(--nier-accent-warm);
-		color: white;
+		background: var(--nier-accent-warm); color: white;
 		border: none;
-		border-radius: 4px;
-		cursor: pointer;
+		border-radius: 4px; cursor: pointer;
 		font-weight: 500;
 	}
 
@@ -333,8 +302,7 @@
 	a {
 		padding: 0.5rem 1.5rem;
 		color: var(--nier-text-primary);
-		text-decoration: none;
-		border: 1px solid var(--nier-border-muted);
+		text-decoration: none; border: 1px solid var(--nier-border-muted);
 		border-radius: 4px;
 	}
 

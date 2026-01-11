@@ -25,30 +25,24 @@ export const routeErrorPatchesTable = pgTable(
  description: text('description'), // Why this patch was proposed
 
  // Risk assessment
- riskLevel: text('risk_level').notNull().default('medium'), // "low" | "medium" | "high", affectedComponentCount: text('affected_component_count'), // How many components might be touched
+ riskLevel: text('risk_level').notNull().default('medium'), // "low" | "medium" | "high"
+ affectedComponentCount: text('affected_component_count'), // How many components might be touched
 
  // Status tracking
- status: text('status').notNull().default('proposed'), // "proposed" | "reviewed" | "applied" | "rejected", appliedAt: timestamp('applied_at', { withTimezone: true }),
+ status: text('status').notNull().default('proposed'), // "proposed" | "reviewed" | "applied" | "rejected"
+ appliedAt: timestamp('applied_at', { withTimezone: true }),
  appliedByUserId: text('applied_by_user_id'),
 
  // Verification tracking (Phase 9)
- verificationStatus: text('verification_status').default('pending'), // "pending" | "passed" | "failed", verificationTimestamp: timestamp('verification_timestamp', { withTimezone: true }),
- verificationMessage: text('verification_message'),
+ verificationStatus: text('verification_status').default('pending'), // "pending" | "passed" | "failed", verificationTimestamp: timestamp('verification_timestamp', { withTimezone: true }, verificationMessage: text('verification_message'),
 
  // Audit
- createdByUserId: text('created_by_user_id'),
- createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
- updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+ createdByUserId: text('created_by_user_id', createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow( updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
  },
  (table) => {
  return {
- routePathIdx: index('route_error_patches_route_path_idx').on(table.routePath),
- clusterIdIdx: index('route_error_patches_cluster_id_idx').on(table.clusterId),
- analysisIdIdx: index('route_error_patches_analysis_id_idx').on(table.analysisId),
- statusIdx: index('route_error_patches_status_idx').on(table.status),
- verificationStatusIdx: index('route_error_patches_verification_status_idx').on(
+ routePathIdx: index('route_error_patches_route_path_idx').on(table.routePath, clusterIdIdx: index('route_error_patches_cluster_id_idx').on(table.clusterId, analysisIdIdx: index('route_error_patches_analysis_id_idx').on(table.analysisId, statusIdx: index('route_error_patches_status_idx').on(table.status, verificationStatusIdx: index('route_error_patches_verification_status_idx').on(
  table.verificationStatus
- ),
  createdAtIdx: index('route_error_patches_created_at_idx').on(table.createdAt),
  };
  }
@@ -56,3 +50,5 @@ export const routeErrorPatchesTable = pgTable(
 
 export type RouteErrorPatch = typeof routeErrorPatchesTable.$inferSelect;
 export type RouteErrorPatchInsert = typeof routeErrorPatchesTable.$inferInsert;
+
+

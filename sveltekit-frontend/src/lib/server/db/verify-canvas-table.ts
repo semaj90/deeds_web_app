@@ -39,3 +39,5 @@ export function clearCanvasTableCache(): void {
     canvasStatesExists = null;
     lastChecked = 0;
 }
+
+

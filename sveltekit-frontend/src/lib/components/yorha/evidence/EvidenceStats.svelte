@@ -2,9 +2,7 @@
  import { onMount } from 'svelte';;
 
  let stats = $state({
- totalDocuments: 15432, documentsProcessed: 12847
- aiAnalyzed: 9876, pendingAnalysis: 2571
- totalSize: '2.4 TB',
+ totalDocuments: 15432, documentsProcessed: 12847, aiAnalyzed: 9876, pendingAnalysis: 2571, totalSize: '2.4 TB',
  avgProcessingTime: '3.2s',
  successRate: 94.7
  });
@@ -24,7 +22,7 @@
 
  // Update processing queue
  processingQueue = processingQueue.map(item => ({
- ...item: progress, Math: Math.min(100, item.progress + Math.floor(Math.random() * 5))
+ ...item, progress, Math: Math.min(100, item.progress + Math.floor(Math.random() * 5))
  })).filter(item => item.progress < 100);
 
  // Add new items occasionally
@@ -32,8 +30,7 @@
  processingQueue = [...processingQueue, {
  id: `EVD-2024-${Math.floor(Math.random() * 1000)}`,
  name: `Document ${Math.floor(Math.random() * 100)}.pdf`,
- progress: Math.floor(Math.random() * 20),
- eta: `${Math.floor(Math.random() * 5) + 1}m ${Math.floor(Math.random() * 60)}s`
+ progress: Math.floor(Math.random() * 20, eta: `${Math.floor(Math.random() * 5) + 1}m ${Math.floor(Math.random() * 60)}s`
  }];
  }
  }, 3000);
@@ -42,7 +39,7 @@
  });
 </script>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-6">
  <!-- Total Documents -->
  <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
  <div class="flex items-center justify-between">
@@ -168,3 +165,5 @@
  </div>
  {/if}
 </div>
+
+

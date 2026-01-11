@@ -4,12 +4,11 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { llmService } from '../llm.service.js';
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';
 
 // Mock the Ollama API
 vi.mock('$lib/server/ollama', () => ({
- ollamaClient: {
- generate: vi.fn(),
+ ollamaClient: { generate: vi.fn(),
  },
 }));
 
@@ -28,7 +27,7 @@ describe('LLMService', () => {
  describe('generateSummary', () => {
  it('should generate a summary from context', async () => {
  (ollamaClient.generate as any).mockResolvedValue({
- response: 'Mocked summary: The defendant was charged with murder and assault.'
+ response: 'Mocked, summary: The defendant was charged with murder and assault.'
  });
 
  const context = {
@@ -39,15 +38,13 @@ describe('LLMService', () => {
  code: '42 U.S.C. § 1983',
  title: 'Civil Rights',
  text: 'Every person who...',
- },
- ],
+ }],
  caseLaw: [
  {
  caseNumber: '123 F.3d 456',
  title: 'State v. Defendant',
  holding: 'The court held that...',
- },
- ],
+ }],
  };
 
  const result = await llmService.generateSummary(context);
@@ -222,3 +219,6 @@ describe('LLMService', () => {
  });
  });
 });
+
+
+

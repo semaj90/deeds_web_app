@@ -49,17 +49,18 @@ declare interface SimpleRedis {
 	keys(...args: any[]): Promise<string[]>;
 	info(...args: any[]): Promise<unknown>;
 	status?: unknown;
+	isOpen?: boolean;
 	dbsize(...args: any[]): Promise<number>;
 	get(...args: any[]): Promise<unknown>;
 	set(...args: any[]): Promise<unknown>;
 	/** Set key with expiry (seconds) */
-	setex(key: string, seconds: number, value), string: Promise<unknown>;
+	setex(key: string, seconds: number, value: string): Promise<unknown>;
 	/** Push value(s) to list (left) */
 	lpush(key: string, ...values: unknown[]): Promise<number | unknown>;
 	/** Range query for list */
-	lrange(key: string, start: number, stop, size: number): Promise<unknown[]>;
+	lrange(key: string, start: number, stop: number): Promise<unknown[]>;
 	del(...args: unknown[]): Promise<unknown>;
-	publish(channel: string, message), string: Promise<number | unknown>;
+	publish(channel: string, message: string): Promise<number | unknown>;
 	subscribe(...args: unknown[]): Promise<unknown>;
 	psubscribe(...args: unknown[]): Promise<unknown>;
 	on(event: string, cb: (...args: unknown[]) => void): void;
@@ -234,3 +235,5 @@ declare type RowListOfRecords = RowList<Record<string, unknown>[]>;
 declare type TableParam = string | { name?: string } | unknown;
 declare type ResultLike<T = Record<string, unknown>> = DBQueryResult<T> | RowList<T[]> | unknown;
 declare type ItemLike = Record<string, unknown> | unknown;
+
+

@@ -67,18 +67,15 @@ https://svelte.dev/e/js_parse_error -->
 <style>
  .auth-layout {
  display: flex;
- flex-direction: column;
- height: 100vh;
+ flex-direction: column; height: 100vh;
  background: var(--console-bg, #0f0f23);
  color: var(--console-fg, white);
  }
 
  .main-content {
  flex: 1;
- margin-left: 0;
- transition: margin-left 0.3s ease;
- overflow-y: auto;
- background: var(--console-gradient-main, linear-gradient(135deg, #0f0f23, #1a1a2e));
+ margin-left: 0; transition: margin-left 0.3s ease;
+ overflow-y: auto; background: var(--console-gradient-main, linear-gradient(135deg, #0f0f23, #1a1a2e));
  }
 
  .main-content.sidebar-open {
@@ -87,8 +84,7 @@ https://svelte.dev/e/js_parse_error -->
 
  .content-container {
  padding: 1.5rem;
- max-width: 1400px;
- margin: 0 auto;
+ max-width: 1400px; margin: 0 auto;
  min-height: 100%;
  }
  /* Responsive design */
@@ -127,3 +123,6 @@ https://svelte.dev/e/js_parse_error -->
  background: var(--console-primary-light, #00cc00);
  }
 </style>
+
+
+

@@ -4,8 +4,7 @@ import { VertexCacheManager } from './vertex-cache-manager.js';
 const vertexCacheManager = new VertexCacheManager();
 
 export interface StreamedVertexPayload {
- id: string;
- tensor: Float32Array;
+ id: string; tensor: Float32Array;
  metadata: Record<string, unknown>;
 }
 
@@ -14,7 +13,7 @@ export class WebGPUVertexStreamer {
 
  async streamTensor(id: string): Promise<void> {
  const ctx = globalGPUManager.getHybridGPU();
- if (ctx?.type !== 'webgpu' || !ctx.device) {
+ if (ctx?.type !== 'webgpu' ?? !ctx.device) {
  console.warn('WebGPUVertexStreamer: Fallback to vertex cache manager');
  await vertexCacheManager.createChunk(id, tensor);
  return;
@@ -25,8 +24,7 @@ export class WebGPUVertexStreamer {
  usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
  mappedAtCreation: true,
  });
-
- // Safely write into the mapped range
+  
  const mapped = buffer.getMappedRange();
  try {
  if (mapped instanceof ArrayBuffer) {
@@ -46,7 +44,7 @@ export class WebGPUVertexStreamer {
  }
 
  this.activeStreams.set(id, buffer);
- console.log(`📡 Streamed vertex tensor: ${id} (${tensor.length} floats)`);
+ console.log(`📡 Streamed vertex tensor: ${ id } (${tensor.length} floats)`);
  }
 
  closeStream(id: string): void {
@@ -76,3 +74,6 @@ export class WebGPUVertexStreamer {
 }
 
 export const webgpuVertexStreamer = new WebGPUVertexStreamer();
+
+
+

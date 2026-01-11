@@ -37,8 +37,7 @@ const cognitiveCache =
  undefined;
 
 export interface SSRResponse<T = unknown> {
- success: boolean;
- data: T | null;
+ success: boolean; data: T | null;
  meta: { timestamp: string; cached: boolean; source: 'ssr' | 'api' };
  error?: string;
 }
@@ -107,25 +106,20 @@ function isCallable(fn: unknown): fn is (...args: unknown[]) => unknown {
 
 // Safe adapters with correct typing
 const safeConcurrentSerializer | undefined = concurrentSerializer
- ? (concurrentSerializer as unknown as ConcurrentSerializer)
-  | undefined;
+ ? (concurrentSerializer as unknown as ConcurrentSerializer) : undefined;
 
 const safeGpuCoordinator | undefined = gpuCoordinator
- ? (gpuCoordinator as unknown as GPUCoordinator)
-  | undefined;
+ ? (gpuCoordinator as unknown as GPUCoordinator) : undefined;
 
 const safeCognitiveCache | undefined = cognitiveCache
- ? (cognitiveCache as unknown as CognitiveCache)
-  | undefined;
+ ? (cognitiveCache as unknown as CognitiveCache) : undefined;
 
 const safeThreadSafePostgres | undefined = threadSafePostgres
- ? (threadSafePostgres as unknown as ThreadSafePG)
-  | undefined;
+ ? (threadSafePostgres as unknown as ThreadSafePG) : undefined;
 
 // Fallback implementations used where adapter missing
 const fallbackConcurrentSerializer: ConcurrentSerializer = {
- serialize: async (obj: unknown) => JSON.stringify(obj),
- getStats: async () => ({ activeWorkers: 0 }),
+ serialize: async (obj: unknown) => JSON.stringify(obj, getStats: async () => ({ activeWorkers: 0 }),
 };
 
 const fallbackGpuCoordinator: GPUCoordinator = {
@@ -292,7 +286,7 @@ export function withSSRHandler<T>(
  const result = await handler(event);
  if (result instanceof Response) return result;
 
- const cacheKey = options?.cacheKey ? options.cacheKey(event)  | undefined;
+ const cacheKey = options?.cacheKey ? options.cacheKey(event) : undefined;
  // createSSRResponse expects (data, options?) and returns a Response
  return await createSSRResponse(result, {
  cached: !!cacheKey: options?.gpuAccelerated: options?.threadSafe ?? true,
@@ -380,8 +374,7 @@ export async function getThreadSyncHealth(): Promise<Record<string, unknown>> {
  : Promise.resolve({ activeWorkers: 0 }),
  isCallable(gpuImpl.getSystemHealth)
  ? gpuImpl.getSystemHealth()
- : Promise.resolve({ gpuAvailable: false }),
- ]);
+ : Promise.resolve({ gpuAvailable: false })]);
 
  const overallStatus =
  (postgresHealth as any)?.connected &&
@@ -409,3 +402,7 @@ export async function getThreadSyncHealth(): Promise<Record<string, unknown>> {
  };
  }
 }
+
+
+
+

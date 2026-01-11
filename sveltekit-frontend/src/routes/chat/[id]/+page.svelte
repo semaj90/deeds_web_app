@@ -1,13 +1,13 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { page } from '$app/state';
+    import { page } from '$app/stores';
     import { ChatSession } from '$lib/models/ChatSession.svelte';
 
     let { data } = $props(); // Load initial history from server load function
 
     // Initialize our Reactive Rune Class
     // page.params.id ensures we connect to the right channel
-    const chat = new ChatSession(page.params.id, data.history);
+    const chat = $derived(new ChatSession($page.params.id, data?.history ?? []));
 
     $effect(() => {
         return () => chat.destroy(); // Cleanup on unmount
@@ -51,16 +51,11 @@
 
 <style>
     .chat-window {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        height: 500px;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+        max-width: 800px; margin: 0 auto;
+        padding: 20px; border: 1px solid #ccc;
+        border-radius: 8px; height: 500px;
+        overflow-y: auto; display: flex;
+        flex-direction: column; gap: 10px;
     }
     .message {
         padding: 10px;
@@ -77,28 +72,22 @@
     }
     .loading-indicator {
         align-self: center;
-        font-style: italic;
-        color: #888;
+        font-style: italic; color: #888;
     }
     form {
-        max-width: 800px;
-        margin: 20px auto;
-        display: flex;
-        gap: 10px;
+        max-width: 800px; margin: 20px auto;
+        display: flex; gap: 10px;
     }
     input {
-        flex: 1;
-        padding: 10px;
+        flex: 1; padding: 10px;
         border: 1px solid #ccc;
         border-radius: 4px;
     }
     button {
         padding: 10px 20px;
-        background-color: #007bff;
-        color: white;
+        background-color: #007bff; color: white;
         border: none;
-        border-radius: 4px;
-        cursor: pointer;
+        border-radius: 4px; cursor: pointer;
     }
     button:disabled {
         background-color: #ccc;

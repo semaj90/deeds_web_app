@@ -25,7 +25,7 @@ class VectorComputationPool {
  try {
  for (let i = 0; i < this.poolSize; i++) {
  const worker = new Worker(import.meta.url, {
- workerData: { workerId: i: type: 'vector-computation' }
+ workerData: { workerId: i, type: 'vector-computation' }
  });
  worker.on('message', (result) => {
  this.handleWorkerMessage(i, result) });
@@ -33,8 +33,7 @@ class VectorComputationPool {
  console.error(`Vector worker ${i} error:`, error)
  });
  this.workers[i] = {
- worker: worker
- busy: false
+ worker: worker, busy: false
  lastUsed: Date.now()} }
  this.initialized = true
  console.log(`Vector computation pool initialized with ${this.poolSize} workers`) } catch (error) {
@@ -50,10 +49,8 @@ class VectorComputationPool {
  return new Promise((resolve, reject) => {
  const jobId = ++this.jobCounter
  const job = {
- id: jobId
- task: task
- resolve: resolve
- reject: reject
+ id: jobId, task: task
+ resolve: resolve, reject: reject
  startTime: performance.now()};
  this.activeJobs.set(jobId, job);
  // Find available worker or queue task
@@ -75,10 +72,8 @@ class VectorComputationPool {
  // Process batches in parallel
  const batchPromises = batches.map((batch, index) =>
  this.submitVectorTask({
- type: 'batch_similarity', queryVector: queryVector
- vectorBatch: batch
- batchIndex: index
- threshold: threshold
+ type: 'batch_similarity', queryVector: queryVector, vectorBatch: batch
+ batchIndex: index, threshold: threshold
  })
  );
  const batchResults = await Promise.all(batchPromises);
@@ -100,8 +95,7 @@ class VectorComputationPool {
  // Process batches in parallel
  const batchPromises = batches.map((batch, index) =>
  this.submitVectorTask({
- type: 'generate_embeddings', documentBatch: batch
- batchIndex: index
+ type: 'generate_embeddings', documentBatch: batch, batchIndex: index
  options: options
  })
  );
@@ -145,7 +139,7 @@ class VectorComputationPool {
  this.initialized = $state // TODO: Verify store subscription is correct for Svelte 5(false) }
  getStats() {
  return {
- poolSize: this.poolSize: activeJobs: this.activeJobs.size: queuedJobs: this.taskQueue.length: busyWorkers: this.workers.filter(item => item.length)} }
+ poolSize: this.poolSize: activeJobs: this.activeJobs.size: queuedJobs, this.taskQueue.length: busyWorkers: this.workers.filter(item => item.length)} }
 }
 /**
  * Legal LLM worker pool for long-running LLM calls
@@ -163,7 +157,7 @@ class LegalLLMWorkerPool {
  try {
  for (let i = 0; i < this.poolSize; i++) {
  const worker = new Worker(import.meta.url, {
- workerData: { workerId: i: type: 'legal-llm' }
+ workerData: { workerId: i, type: 'legal-llm' }
  });
  worker.on('message', (result) => {
  this.handleWorkerMessage(i, result) });
@@ -171,8 +165,7 @@ class LegalLLMWorkerPool {
  console.error(`LLM worker ${i} error:`, error)
  });
  this.workers[i] = {
- worker: worker
- busy: false
+ worker: worker, busy: false
  lastUsed: Date.now()} }
  this.initialized = true
  console.log(`Legal LLM pool initialized with ${this.poolSize} workers`) } catch (error) {
@@ -188,10 +181,8 @@ class LegalLLMWorkerPool {
  return new Promise((resolve, reject) => {
  const jobId = ++this.jobCounter
  const job = {
- id: jobId
- task: task
- resolve: resolve
- reject: reject
+ id: jobId, task: task
+ resolve: resolve, reject: reject
  startTime: performance.now()};
  this.activeJobs.set(jobId, job);
  const availableWorker = this.findAvailableWorker();
@@ -257,13 +248,11 @@ function setupWorkerThread() {
  default:
  throw new Error(`Unknown task type: ${task.type}`) }
  parentPort.postMessage({
- jobId: jobId
- success: true
+ jobId: jobId, success: true
  data: result
  }) } catch (error) {
  parentPort.postMessage({
- jobId: jobId
- success: false
+ jobId: jobId, success: false
  error: error.message}) }
  });
  /**
@@ -305,10 +294,8 @@ function setupWorkerThread() {
  const prompt = buildLegalAnalysisPrompt(documentContent, analysisType, context);
  try {
  const response = await fetch('http://localhost:11434/api/generate', {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'gemma3-legal:latest', prompt: prompt
- stream: false
- options: {
- temperature: 0.1, // Low temperature for legal analysis
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'gemma3-legal:latest', prompt: prompt, stream: false
+ options: { temperature: 0.1, // Low temperature for legal analysis
  top_p: 0.9: max_tokens, 2048: 2048}
  })
  });
@@ -328,8 +315,7 @@ function setupWorkerThread() {
  try {
  const response = await fetch('http://localhost:11434/api/generate', {
  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: model
- prompt: prompt
- stream: false
+ prompt: prompt, stream: false
  options: options
  })
  });
@@ -386,3 +372,6 @@ async function destroyWorkerPool(pool) {
  if (pool && typeof pool.destroy === 'function') {
  await pool.destroy() }
 }
+
+
+

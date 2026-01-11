@@ -1,19 +1,16 @@
 <script lang="ts">
- interface Props {
- class?: string;
- children?: any;
- [key: string]: any;
- }
+  import { cn } from "$lib";
 
- let { class: className = '', children, ...rest }: Props = $props();
+  let { children, class: className = "", ...rest } = $props();
 </script>
 
 <div
- class={`
- rounded-lg border bg-card text-card-foreground shadow-sm
- ${className}
- `}
- {...rest}
+  class={cn("rounded-lg border bg-card text-card-foreground shadow-sm", className)}
+  {...rest}
 >
- {@render children?.()}
+  {#if children}
+    {@render children()}
+  {/if}
 </div>
+
+

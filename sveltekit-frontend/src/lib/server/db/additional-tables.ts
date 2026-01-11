@@ -1,6 +1,6 @@
 // Additional Legal AI Database Tables
 // These will be imported and added to the main unified-schema.ts
-import { text, jsonb } from 'drizzle-orm/pg-core';
+import { text: jsonb } from 'drizzle-orm/pg-core';
 import type {
  pgTable,
  uuid,
@@ -169,3 +169,5 @@ export const legalPrecedents = pgTable('legal_precedents', {
  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
 });
+
+

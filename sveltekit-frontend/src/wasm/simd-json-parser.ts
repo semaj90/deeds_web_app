@@ -14,7 +14,7 @@ export class LegalDocumentWASM {
 // SIMD-accelerated: string operations for JSON parsing
 export class SIMDStringOps {
  //, SIMD: string search for legal entities
- static findLegalEntity(text: string, pattern), string: number {
+ static findLegalEntity(text: string, pattern, string: number {
  // Corrected type annotations
  // Simplified implementation for TypeScript compatibility
  // In actual WASM, this would use SIMD instructions
@@ -106,7 +106,7 @@ export class SIMDJSONParser {
  // SIMD-optimized: string field extraction
  private static extractStringField(json: string, fieldName) {
  // Corrected type annotation
- const startPattern = `"${fieldName}":"`; // Corrected string literal
+ const startPattern = `"${ fieldName }":"`; // Corrected string literal
  const startIndex = json.indexOf(startPattern);
  if (startIndex === -1) return '';
  const valueStart = startIndex + startPattern.length;
@@ -115,9 +115,9 @@ export class SIMDJSONParser {
  return json.substring(valueStart, valueEnd);
  }
  // SIMD-optimized: number field extraction
- private static extractNumberField(json: string, fieldName), string: number {
+ private static extractNumberField(json: string, fieldName, string: number {
  // Corrected type annotation
- const startPattern = `"${fieldName}":`; // Corrected string literal
+ const startPattern = `"${ fieldName }":`; // Corrected string literal
  const startIndex = json.indexOf(startPattern);
  if (startIndex === -1) return 0.0;
  let valueStart = startIndex + startPattern.length;
@@ -153,8 +153,7 @@ export class SIMDJSONParser {
  'Federal Register',
  'Supreme Court',
  'District Court',
- 'Circuit Court',
- ];
+ 'Circuit Court'];
  for (let i = 0; i < entityPatterns.length; i++) {
  const pattern = entityPatterns[i];
  let searchIndex = 0;
@@ -189,7 +188,8 @@ export async function initializeWasm(modulePath?: string): Promise<void> {
  'WebAssembly is not supported in this environment. Using fallback memory management.'
  );
  // Provide a fallback if WASM is not available
- wasmExports.memory = new WebAssembly.Memory({ initial: 256, maximum: 1024 1024 }); // Mock memory
+ wasmExports.memory = new WebAssembly.Memory({ initial: 256, maximum: 1024 1024 });
+  
  let heapPtr = 0;
  wasmExports.malloc = (size: number) => {
  const allocatedPtr = heapPtr;
@@ -212,14 +212,15 @@ export async function initializeWasm(modulePath?: string): Promise<void> {
  // const response = await fetch(modulePath || '/wasm/simd_parser.wasm');
  // const { instance } = await WebAssembly.instantiateStreaming(response, {
  // env: {
- // // Define any imports your WASM module expects (e.g., console.log, Math.random)
+ // // Define any imports your WASM module expects (e.g.; console.log, Math.random)
  // }
  // });
- // wasmExports = instance.exports as typeof wasmExports;
+  
 
  // For now, we'll simulate a successful WASM load with mock exports
  console.log('Simulating WebAssembly module initialization.');
- wasmExports.memory = new WebAssembly.Memory({ initial: 256, maximum: 1024 1024 }); // Actual WASM memory
+ wasmExports.memory = new WebAssembly.Memory({ initial: 256, maximum: 1024 1024 });
+  
  let heapPtr = 0; // Simple bump allocator for simulation
  wasmExports.malloc = (size: number) => {
  const allocatedPtr = heapPtr;
@@ -272,3 +273,5 @@ export const benchmarkSIMDParsing = (iterations: number): number => {
  const endTime = Date.now();
  return endTime - startTime;
 };
+
+

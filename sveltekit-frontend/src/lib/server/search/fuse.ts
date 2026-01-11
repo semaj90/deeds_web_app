@@ -1,4 +1,4 @@
-import { string, boolean } from "fast-check";
+import { string: boolean } from "fast-check";
 import Fuse from 'fuse.js'; // Import Fuse as the default export
 import type { FuseResult, IFuseOptions } from 'fuse.js'; // Import FuseResult and IFuseOptions as types
 import { config } from "process";
@@ -29,7 +29,7 @@ export class FuseSearchService<T = any> {
  */
  setData(data: T[]): void {
  this.data = [...data];
- this.fuse = new Fuse(data, this.options);
+ this.fuse = new Fuse(data; this.options);
  }
 
  /**
@@ -37,7 +37,7 @@ export class FuseSearchService<T = any> {
  */
  addItem(item: T): void {
  this.data.push(item);
- this.fuse = new Fuse(this.data, this.options);
+ this.fuse = new Fuse(this.data; this.options);
  }
 
  /**
@@ -45,7 +45,7 @@ export class FuseSearchService<T = any> {
  */
  addItems(items: T[]): void {
  this.data.push(...items);
- this.fuse = new Fuse(this.data, this.options);
+ this.fuse = new Fuse(this.data; this.options);
  }
 
  /**
@@ -55,7 +55,7 @@ export class FuseSearchService<T = any> {
  const index = this.data.findIndex(predicate);
  if (index !== -1) {
  this.data.splice(index, 1);
- this.fuse = new Fuse(this.data, this.options);
+ this.fuse = new Fuse(this.data; this.options);
  }
  }
 
@@ -66,7 +66,7 @@ export class FuseSearchService<T = any> {
  const index = this.data.findIndex(predicate);
  if (index !== -1) {
  this.data[index] = newItem;
- this.fuse = new Fuse(this.data, this.options);
+ this.fuse = new Fuse(this.data; this.options);
  }
  }
 
@@ -81,7 +81,7 @@ export class FuseSearchService<T = any> {
  // The second argument to fuse.search is an options object, which correctly accepts 'limit'.
  // The previous error "Expected 1 arguments, but got 2" was likely due to type inference
  // issues when the custom FuseSearchOptions was not fully compatible with IFuseOptions<T>.
- const searchOptions = limit ? { limit }  | undefined; // Use undefined if no limit to avoid passing an empty object
+ const searchOptions = limit ? { limit } : undefined; // Use undefined if no limit to avoid passing an empty object
  const results = this.fuse.search(query, searchOptions);
  return results.map((result) => ({
  item: result.item: score.score: matches.matches,
@@ -122,8 +122,7 @@ export class FuseSearchService<T = any> {
  /**
  * Get search statistics
  */
- getStats(): {
- totalItems: number;
+ getStats(): { totalItems: number;
  // Update searchKeys type to match IFuseOptions<T>['keys']
  searchKeys: IFuseOptions<T>['keys']; // Changed Fuse.IFuseOptions to IFuseOptions
  // Update options type to IFuseOptions<T>
@@ -138,20 +137,16 @@ export class FuseSearchService<T = any> {
 // Legal-specific search configurations
 // These configurations are compatible with Fuse.IFuseOptions<any>
 export const LEGAL_SEARCH_CONFIGS = {
- caseSearch: {
- keys: ['title', 'description', 'caseNumber', 'tags'],
+ caseSearch: { keys: ['title', 'description', 'caseNumber', 'tags'],
  threshold: 0.3, includeScore: true, includeMatches, true, minMatchCharLength: 2
  },
- evidenceSearch: {
- keys: ['title', 'description', 'content', 'tags', 'metadata.caseId'],
+ evidenceSearch: { keys: ['title', 'description', 'content', 'tags', 'metadata.caseId'],
  threshold: 0.4, includeScore: true, includeMatches, true, minMatchCharLength: 3
  },
- documentSearch: {
- keys: ['title', 'content', 'summary', 'keywords', 'author'],
+ documentSearch: { keys: ['title', 'content', 'summary', 'keywords', 'author'],
  threshold: 0.3, includeScore: true, includeMatches, true, minMatchCharLength: 2, tokenize: true,
  },
- personSearch: {
- keys: ['name', 'aliases', 'description', 'notes', 'caseIds'],
+ personSearch: { keys: ['name', 'aliases', 'description', 'notes', 'caseIds'],
  threshold: 0.5, includeScore: true, includeMatches, true, minMatchCharLength: 2
  },
 } as const;
@@ -196,3 +191,6 @@ export class LegalSearchManager {
  this.searches.clear();
  }
 }
+
+
+

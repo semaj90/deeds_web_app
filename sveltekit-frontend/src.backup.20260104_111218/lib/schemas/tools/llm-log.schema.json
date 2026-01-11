@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ace.llm_log",
+  "title": "LLMLogEntry",
+  "description": "Structured LLM interaction log for instruction tuning",
+  "type": "object",
+  "required": ["log_id", "timestamp", "model", "task_type", "input", "output", "evaluation"],
+  "properties": {
+    "log_id": {
+      "type": "string",
+      "pattern": "^llm_\\d+_[a-f0-9]+$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "model": {
+      "type": "string",
+      "examples": ["gemma3-legal:latest", "embeddinggemma:latest"]
+    },
+    "task_type": {
+      "type": "string",
+      "enum": ["error_fix", "code_gen", "summary", "extraction", "chat", "analysis"]
+    },
+    "input": {
+      "type": "object",
+      "required": ["prompt"],
+      "properties": {
+        "prompt": { "type": "string" },
+        "context_chunks": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "system_prompt": { "type": "string" },
+        "metadata": { "type": "object" }
+      }
+    },
+    "output": {
+      "type": "object",
+      "required": ["response", "tokens_in", "tokens_out", "latency_ms"],
+      "properties": {
+        "response": { "type": "string" },
+        "tokens_in": { "type": "integer", "minimum": 0 },
+        "tokens_out": { "type": "integer", "minimum": 0 },
+        "latency_ms": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "required": ["success"],
+      "properties": {
+        "success": { "type": "boolean" },
+        "errors_fixed": { "type": "integer", "minimum": 0 },
+        "human_feedback": {
+          "type": ["string", "null"],
+          "enum": ["positive", "negative", null]
+        },
+        "ace_score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

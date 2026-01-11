@@ -26,10 +26,10 @@ function makeCacheKey(text: string): string {
  hash = (hash * 33) ^ text.charCodeAt(i);
  }
  // Use absolute value to avoid negative keys
- return `${model}:${text.length}:${Math.abs(hash).toString(16)}`;
+ return `${ model }:${text.length}:${Math.abs(hash).toString(16)}`;
 }
 
-async function getCachedEmbedding(text: string), string: Promise<number[] | null> {
+async function getCachedEmbedding(text: string, string: Promise<number[] | null> {
  const key = makeCacheKey(text, model);
  const entry = _embeddingCache.get(key);
  if (!entry) return null;
@@ -47,7 +47,7 @@ async function cacheEmbedding(text: string, model: string, number[]): Promise<vo
  // Store a clone to avoid external mutation
  const stored = embedding.slice();
  _embeddingCache.set(key, { value: stored, expiresAt: Date.now() + DEFAULT_CACHE_TTL_MS });
- // Optional: prevent unbounded growth by trimming periodically (simple heuristic)
+  
  if (_embeddingCache.size > 5000) {
  // delete the oldest ~10% entries
  const keys = Array.from(_embeddingCache.keys()).slice(
@@ -109,7 +109,7 @@ async function generateLocalEmbedding(
  'Content-Type': 'application/json',
  },
  body: JSON.stringify({
- model: model,
+ model,
  // Ollama uses: "prompt" for embeddings with recent versions
  prompt: text,
  }),
@@ -241,9 +241,9 @@ export async function updateCaseEmbeddings(caseId: string): Promise<void> {
  // })
  // .where(eq(cases.id, caseId));
 
- console.log(`Updated embeddings for case ${caseId}`);
+ console.log(`Updated embeddings for case ${ caseId }`);
  } catch (error: unknown) {
- console.error(`Failed to update embeddings for case ${caseId}: `, error);
+ console.error(`Failed to update embeddings for case ${ caseId }: `, error);
  throw error;
  }
 }
@@ -283,9 +283,12 @@ export async function updateEvidenceEmbeddings(evidenceId: string): Promise<void
  // })
  // .where(eq(evidence.id, evidenceId));
 
- console.log(`Updated embeddings for evidence ${evidenceId}`);
+ console.log(`Updated embeddings for evidence ${ evidenceId }`);
  } catch (error: unknown) {
  console.error(`Failed to update embeddings for evidence ${evidenceId}:`, error);
  throw error;
  }
 }
+
+
+

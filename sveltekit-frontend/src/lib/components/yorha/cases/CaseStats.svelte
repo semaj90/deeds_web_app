@@ -44,7 +44,7 @@
  }
 </script>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-6">
  <!-- Total Cases -->
  <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
  <div class="flex items-center justify-between">
@@ -172,3 +172,5 @@
  </div>
  </div>
 </div>
+
+

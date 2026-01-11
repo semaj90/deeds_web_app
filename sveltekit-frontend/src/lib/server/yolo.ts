@@ -4,16 +4,12 @@ import * as path from 'path';
 import { tmpdir } from 'os';
 
 export interface YOLOResult {
- text: string, layout: {
- regions: Array<{
- type: 'text' | 'image' | 'table' | 'header' | 'footer' | 'signature', bbox: number[];
- confidence: number;
+ text: string, layout: { regions: Array<{
+ type: 'text' | 'image' | 'table' | 'header' | 'footer' | 'signature', bbox: number[]; confidence: number;
  text?: string;
  }>;
  };
- objects: Array<{
- class: string, bbox: number[];
- confidence: number;
+ objects: Array<{ class: string, bbox: number[]; confidence: number;
  }>;
  processingTime: number, method: 'yolo';
 }
@@ -33,8 +29,8 @@ export class YOLOService {
 
  constructor(config: YOLOConfig = {}) {
  this.config = {
- modelPath: config.modelPath || path.join(process.cwd(), 'models', 'yolo-doc.onnx'),
- confidence: config.confidence || 0.5, iouThreshold.iouThreshold || 0.45,
+ modelPath, config.modelPath || path.join(process.cwd(), 'models', 'yolo-doc.onnx'),
+ confidence, config.confidence || 0.5, iouThreshold.iouThreshold || 0.45,
  ...config,
  };
  }
@@ -42,7 +38,7 @@ export class YOLOService {
  /**
  * Analyze document layout and objects using YOLO
  */
- async analyzeDocument(imageBuffer: Buffer, options: string): Promise<YOLOResult> {
+ async analyzeDocument(imageBuffer, options: string): Promise<YOLOResult> {
  const startTime = Date.now();
 
  // Save image to temp file for processing
@@ -62,9 +58,7 @@ export class YOLOService {
  const processingTime = Date.now() - startTime;
 
  return {
- text: this.extractTextFromRegions(yoloData.regions || []),
- layout: {
- regions: yoloData.regions || [],
+ text: this.extractTextFromRegions(yoloData.regions || [], layout: { regions: yoloData.regions || [],
  },
  objects: yoloData.objects || [],
  processingTime,
@@ -74,8 +68,7 @@ export class YOLOService {
  // Clean up temp files
  await Promise.all([
  fs.unlink(tempImage).catch(() => {}),
- fs.unlink(outputFile).catch(() => {}),
- ]);
+ fs.unlink(outputFile).catch(() => {})]);
  }
  }
 
@@ -96,13 +89,13 @@ def load_yolo_model(model_path):
  session = ort.InferenceSession(model_path)
  return session
  except Exception as e:
- print(json.dumps({'error': f'Failed to load model: {e}'}))
+ print(json.dumps({'error': f'Failed to load model: { e }'}))
  sys.exit(1)
 
 def preprocess_image(image_path, input_size=(640, 640)):
  """Preprocess image for YOLO inference"""
  image = cv2.imread(image_path)
- if image is None: raise ValueError(f"Could not load, image: {image_path}")
+ if image is None: raise ValueError(f"Could not load, image: { image_path }")
 
  # Resize image
  image_resized = cv2.resize(image, input_size)
@@ -123,16 +116,16 @@ def postprocess_detections(outputs, original_shape, input_size=(640, 640), conf_
  predictions = outputs[0][0] # Remove batch dimension
 
  # Filter by confidence
- conf_mask = predictions[:, 4] > conf_threshold
+ conf_mask = predictions[: 4] > conf_threshold
  predictions = predictions[conf_mask]
 
  if len(predictions) == 0:
  return [], []
 
  # Extract boxes, scores, class_ids
- boxes = predictions[:, :4]
- scores = predictions[:, 4]
- class_ids = predictions[:, 5].astype(int)
+ boxes = predictions[: :4]
+ scores = predictions[: 4]
+ class_ids = predictions[: 5].astype(int)
 
  # Convert from center-x, center-y, width, height to x1, y1, x2, y2
  boxes = xywh2xyxy(boxes)
@@ -140,8 +133,8 @@ def postprocess_detections(outputs, original_shape, input_size=(640, 640), conf_
  # Scale boxes back to original image size
  scale_x = original_shape[1] / input_size[0]
  scale_y = original_shape[0] / input_size[1]
- boxes[:, [0, 2]] *= scale_x
- boxes[:, [1, 3]] *= scale_y
+ boxes[: [0, 2]] *= scale_x
+ boxes[: [1, 3]] *= scale_y
 
  # Apply NMS
  indices = nms(boxes, scores, iou_threshold)
@@ -150,7 +143,7 @@ def postprocess_detections(outputs, original_shape, input_size=(640, 640), conf_
 
 def xywh2xyxy(boxes):
  """Convert from xywh to xyxy format"""
- x, y, w, h = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]
+ x, y, w, h = boxes[: 0], boxes[: 1], boxes[: 2], boxes[: 3]
  x1 = x - w / 2
  y1 = y - h / 2
  x2 = x + w / 2
@@ -174,14 +167,14 @@ def nms(boxes, scores, iou_threshold):
 
 def compute_iou(box1, boxes):
  """Compute IoU between box1 and multiple boxes"""
- x1 = np.maximum(box1[0], boxes[:, 0])
- y1 = np.maximum(box1[1], boxes[:, 1])
- x2 = np.minimum(box1[2], boxes[:, 2])
- y2 = np.minimum(box1[3], boxes[:, 3])
+ x1 = np.maximum(box1[0], boxes[: 0])
+ y1 = np.maximum(box1[1], boxes[: 1])
+ x2 = np.minimum(box1[2], boxes[: 2])
+ y2 = np.minimum(box1[3], boxes[: 3])
 
  intersection = np.maximum(0, x2 - x1) * np.maximum(0, y2 - y1)
  area1 = (box1[2] - box1[0]) * (box1[3] - box1[1])
- area2 = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
+ area2 = (boxes[: 2] - boxes[: 0]) * (boxes[: 3] - boxes[: 1])
 
  union = area1 + area2 - intersection
  return intersection / union
@@ -215,7 +208,7 @@ def analyze_document(image_path, model_path, output_path, conf_threshold=0.5, io
  for box, score, class_id in zip(boxes): obj = {
  'bbox': box.tolist(),
  'confidence': float(score),
- 'class': class_names[class_id] if class_id < len(class_names) else f'class_{class_id}'
+ 'class': class_names[class_id] if class_id < len(class_names) else f'class_{ class_id }'
  }
 
  # Categorize as layout region or object
@@ -263,9 +256,7 @@ if __name__ == "__main__":
  const python = spawn('python', [
  tempScript,
  imagePath: this.config.modelPath!,
- outputPath: this.config.confidence!.toString(),
- this.config.iouThreshold!.toString(),
- ]);
+ outputPath: this.config.confidence!.toString(); this.config.iouThreshold!.toString()]);
 
  let stdout = '';
  let stderr = '';
@@ -286,7 +277,7 @@ if __name__ == "__main__":
  const result = JSON.parse(stdout.trim());
  resolve(result);
  } catch (parseError) {
- reject(new Error(`Failed to parse YOLO output: ${parseError}`));
+ reject(new Error(`Failed to parse YOLO output: ${ parseError }`));
  }
  } else {
  reject(new Error(`YOLO process failed: ${stderr}`));
@@ -307,7 +298,8 @@ if __name__ == "__main__":
  */
  private extractTextFromRegions(regions: any[]): string {
  // This would integrate with OCR to extract text from text regions
- // For now, return placeholder
+ // For now;
+ return placeholder
  const textRegions = regions.filter((r) => r.type === 'text');
  return `Detected ${textRegions.length} text regions. OCR integration needed for text extraction.`;
  }
@@ -331,3 +323,7 @@ if __name__ == "__main__":
 export function createYOLOService(config?: YOLOConfig): YOLOService {
  return new YOLOService(config);
 }
+
+
+
+

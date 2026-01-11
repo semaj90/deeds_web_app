@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import {
  AuthSeparation,
  isRequestAuthenticated,
@@ -152,8 +152,7 @@ describe('AuthSeparation', () => {
  describe('Token Extraction', () => {
  it('should extract Bearer token from Authorization header', () => {
  const request = new Request('http://localhost/api/legal-ai/citations', {
- headers: {
- Authorization: 'Bearer token123',
+ headers: { Authorization: 'Bearer token123',
  },
  });
 
@@ -169,8 +168,7 @@ describe('AuthSeparation', () => {
 
  it('should return undefined for invalid Authorization format', () => {
  const request = new Request('http://localhost/api/legal-ai/citations', {
- headers: {
- Authorization: 'InvalidFormat token123',
+ headers: { Authorization: 'InvalidFormat token123',
  },
  });
 
@@ -180,8 +178,7 @@ describe('AuthSeparation', () => {
 
  it('should return undefined for malformed Bearer token', () => {
  const request = new Request('http://localhost/api/legal-ai/citations', {
- headers: {
- Authorization: 'Bearer',
+ headers: { Authorization: 'Bearer',
  },
  });
 
@@ -258,8 +255,7 @@ describe('AuthSeparation', () => {
  describe('Helper Functions', () => {
  it('should check if request is authenticated', () => {
  const request = new Request('http://localhost/api/legal-ai/citations', {
- headers: {
- Authorization: 'Bearer token123',
+ headers: { Authorization: 'Bearer token123',
  'X-User-ID': 'user123',
  },
  });
@@ -285,8 +281,7 @@ describe('AuthSeparation', () => {
 
  it('should return null for authenticated request', () => {
  const request = new Request('http://localhost/api/legal-ai/citations', {
- headers: {
- Authorization: 'Bearer token123',
+ headers: { Authorization: 'Bearer token123',
  'X-User-ID': 'user123',
  },
  });
@@ -329,8 +324,7 @@ describe('AuthSeparation', () => {
  const requests = [
  new Request('http://localhost/api/error-brain/analyze'),
  new Request('http://localhost/api/error-brain/patch'),
- new Request('http://localhost/api/error-brain/history'),
- ];
+ new Request('http://localhost/api/error-brain/history')];
 
  requests.forEach((request) => {
  const result = AuthSeparation.checkAuth(request);
@@ -340,15 +334,13 @@ describe('AuthSeparation', () => {
 
  it('should handle multiple legal-ai requests with auth', () => {
  const request1 = new Request('http://localhost/api/legal-ai/citations', {
- headers: {
- Authorization: 'Bearer token123',
+ headers: { Authorization: 'Bearer token123',
  'X-User-ID': 'user123',
  },
  });
 
  const request2 = new Request('http://localhost/api/legal-ai/authorities', {
- headers: {
- Authorization: 'Bearer token456',
+ headers: { Authorization: 'Bearer token456',
  'X-User-ID': 'user456',
  },
  });
@@ -361,3 +353,6 @@ describe('AuthSeparation', () => {
  });
  });
 });
+
+
+

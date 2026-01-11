@@ -3,7 +3,6 @@ import { sql } from 'drizzle-orm';
 import {
     bigint,
     boolean,
-    doublePrecision,
     foreignKey,
     index,
     integer,
@@ -29,22 +28,19 @@ export const userRoleEnum = pgEnum('user_role', [
  'detective',
  'admin',
  'analyst',
- 'paralegal',
-]);
+ 'paralegal']);
 export const caseStatusEnum = pgEnum('case_status', [
  'open',
  'in_progress',
  'pending_review',
  'closed',
- 'archived',
-]);
+ 'archived']);
 export const casePriorityEnum = pgEnum('case_priority', [
  'low',
  'medium',
  'high',
  'critical',
- 'urgent',
-]);
+ 'urgent']);
 export const evidenceTypeEnum = pgEnum('evidence_type', [
  'document',
  'photo',
@@ -53,20 +49,30 @@ export const evidenceTypeEnum = pgEnum('evidence_type', [
  'physical',
  'digital',
  'witness_statement',
- 'forensic',
-]);
+ 'forensic']);
 export const evidenceRelationshipTypeEnum = pgEnum('evidence_relationship_type', [
  'supports',
  'contradicts',
  'same_person',
  'timeline',
  'chain_of_custody',
-]);
+ 'corroborates',
+ 'alibi',
+ 'motive',
+ 'opportunity',
+ 'means',
+ 'witness_statement',
+ 'physical_evidence',
+ 'digital_evidence',
+ 'circumstantial',
+ 'direct_evidence',
+ 'hearsay',
+ 'privileged',
+ 'inadmissible']);
 export const evidenceRelationshipStrengthEnum = pgEnum('evidence_relationship_strength', [
  'low',
  'medium',
- 'high',
-]);
+ 'high']);
 export const threatLevelEnum = pgEnum('threat_level', ['low', 'medium', 'high', 'critical']);
 export const documentTypeEnum = pgEnum('document_type', [
  'case_law',
@@ -76,35 +82,30 @@ export const documentTypeEnum = pgEnum('document_type', [
  'contract',
  'evidence',
  'report',
- 'precedent',
-]);
+ 'precedent']);
 export const confidentialityEnum = pgEnum('confidentiality_level', [
  'public',
  'standard',
  'confidential',
  'restricted',
- 'classified',
-]);
+ 'classified']);
 export const activityStatusEnum = pgEnum('activity_status', [
  'pending',
  'in_progress',
  'completed',
  'cancelled',
- 'postponed',
-]);
+ 'postponed']);
 export const reportStatusEnum = pgEnum('report_status', [
  'draft',
  'review',
  'approved',
  'published',
- 'archived',
-]);
+ 'archived']);
 export const verificationStatusEnum = pgEnum('verification_status', [
  'pending',
  'verified',
  'rejected',
- 'needs_review',
-]);
+ 'needs_review']);
 export const documentStatusEnum = pgEnum('document_status', [
  'queued',
  'processing',
@@ -115,20 +116,17 @@ export const documentStatusEnum = pgEnum('document_status', [
  'pending_embedding',
  'embedding_completed',
  'pending_summary',
- 'summary_completed',
-]);
+ 'summary_completed']);
 export const summaryTypeEnum = pgEnum('summary_type', [
  'legal_analysis',
  'executive_summary',
- 'key_facts',
-]);
+ 'key_facts']);
 export const caseRiskLevelEnum = pgEnum('case_risk_level', [
  'low',
  'medium',
  'high',
  'critical',
- 'urgent',
-]);
+ 'urgent']);
 export const patchStatusEnum = pgEnum('patch_status', ['suggested', 'applied', 'rejected']);
 
 // === TABLES FOR LEGAL AI APPLICATION ===
@@ -136,8 +134,7 @@ export const patchStatusEnum = pgEnum('patch_status', ['suggested', 'applied', '
 export const users = pgTable('users', {
  id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
  email: varchar('email', { length: 255 }).unique().notNull(),
- passwordHash: varchar('password_hash', { length: 255 }).notNull(),
- name: varchar('name', { length: 255 }),
+ passwordHash: varchar('hashed_password', { length: 255 }).notNull(),
  firstName: varchar('first_name', { length: 255 }),
  lastName: varchar('last_name', { length: 255 }),
  role: userRoleEnum('role').notNull().default('prosecutor'),
@@ -160,8 +157,7 @@ export const sessions = pgTable(
  columns: [table.userId],
  foreignColumns: [users.id],
  name: 'sessions_user_id_users_id_fk',
- }).onDelete('cascade'),
- ],
+ }).onDelete('cascade')],
  })
 );
 
@@ -180,8 +176,7 @@ export const emailVerificationCodes = pgTable(
  columns: [table.userId],
  foreignColumns: [users.id],
  name: `email_verification_codes_user_id_users_id_fk`,
- }).onDelete('cascade'),
- ],
+ }).onDelete('cascade')],
  uniqueConstraints: [unique('email_verification_codes_user_id_unique').on(table.userId)],
  })
 );
@@ -199,8 +194,7 @@ export const passwordResetTokens = pgTable(
  columns: [table.userId],
  foreignColumns: [users.id],
  name: `password_reset_tokens_user_id_users_id_fk`,
- }).onDelete('cascade'),
- ],
+ }).onDelete('cascade')],
  })
 );
 
@@ -240,16 +234,14 @@ export const cases = pgTable(
  indexes: [
  index('idx_cases_created_at').on(table.createdAt),
  index('idx_cases_status_priority').on(table.status, table.priority),
- index('idx_cases_status_priority_created').on(table.status, table.priority, table.createdAt),
- ],
+ index('idx_cases_status_priority_created').on(table.status, table.priority, table.createdAt)],
  foreignKeys: [
  // Added foreign key for assignedAttorney
  foreignKey({
  columns: [table.assignedAttorney],
  foreignColumns: [users.id],
  name: 'cases_assigned_attorney_users_id_fk',
- }).onDelete('set null'),
- ],
+ }).onDelete('set null')],
  })
 );
 
@@ -295,16 +287,14 @@ export const criminals = pgTable(
  index('criminals_threat_level_idx').on(table.threatLevel),
  index('criminals_status_idx').on(table.status),
  index('criminals_created_by_idx').on(table.createdBy),
- index('criminals_ssn_idx').on(table.ssn),
- ],
+ index('criminals_ssn_idx').on(table.ssn)],
  foreignKeys: [
  // Added foreign key for createdBy
  foreignKey({
  columns: [table.createdBy],
  foreignColumns: [users.id],
  name: 'criminals_created_by_users_id_fk',
- }).onDelete('set null'),
- ],
+ }).onDelete('set null')],
  })
 );
 
@@ -321,23 +311,6 @@ export const evidence = pgTable(
  title: varchar('title', { length: 255 }).notNull(),
  description: text('description'),
  evidenceType: evidenceTypeEnum('evidence_type').notNull(),
- type: varchar('type', { length: 50 }),
- evidenceNumber: integer('evidence_number'),
- summary: text('summary'),
- posX: doublePrecision('pos_x'),
- posY: doublePrecision('pos_y'),
- collectedAt: timestamp('collected_at', { mode: 'string' }),
- collectedBy: uuid('collected_by'),
- verifiedAt: timestamp('verified_at', { mode: 'string' }),
- verified: boolean('verified'),
- createdAt: timestamp('created_at', { mode: 'string' }),
- fileSize: integer('file_size'),
- mimeType: varchar('mime_type', { length: 100 }),
- hash: varchar('hash', { length: 255 }),
- tags: jsonb('tags'),
- aiAnalysis: jsonb('ai_analysis'),
- aiTags: jsonb('ai_tags'),
- aiSummary: text('ai_summary'),
  fileType: varchar('file_type', { length: 50 }),
  subType: varchar('sub_type', { length: 50 }),
  fileUrl: text('file_url'),
@@ -353,8 +326,7 @@ export const evidence = pgTable(
  index('evidence_criminal_id_idx').on(table.criminalId),
  index('evidence_type_idx').on(table.evidenceType),
  index('evidence_uploaded_by_idx').on(table.uploadedBy),
- index('evidence_uploaded_at_idx').on(table.uploadedAt),
- ],
+ index('evidence_uploaded_at_idx').on(table.uploadedAt)],
  foreignKeys: [
  foreignKey({
  columns: [table.caseId],
@@ -370,8 +342,7 @@ export const evidence = pgTable(
  columns: [table.uploadedBy],
  foreignColumns: [users.id],
  name: 'evidence_uploaded_by_users_id_fk',
- }).onDelete('set null'),
- ],
+ }).onDelete('set null')],
  })
 );
 
@@ -395,8 +366,7 @@ export const evidenceRelationships = pgTable(
  indexes: [
  index('evidence_relationships_case_id_idx').on(table.caseId),
  index('evidence_relationships_from_idx').on(table.fromEvidenceId),
- index('evidence_relationships_to_idx').on(table.toEvidenceId),
- ],
+ index('evidence_relationships_to_idx').on(table.toEvidenceId)],
  foreignKeys: [
  foreignKey({
  columns: [table.caseId],
@@ -412,8 +382,7 @@ export const evidenceRelationships = pgTable(
  columns: [table.toEvidenceId],
  foreignColumns: [evidence.id],
  name: 'evidence_relationships_to_fk',
- }).onDelete('cascade'),
- ],
+ }).onDelete('cascade')],
  })
 );
 
@@ -480,8 +449,7 @@ export const legalDocuments = pgTable(
  index('idx_legal_documents_qdrant_id').on(table.qdrantId),
  // HNSW index for contentEmbedding for fast similarity search
  // Note: HNSW indexes must be created via raw SQL migration, not in schema
- index('idx_legal_documents_content_embedding_hnsw').on(table.contentEmbedding),
- ],
+ index('idx_legal_documents_content_embedding_hnsw').on(table.contentEmbedding)],
  foreignKeys: [
  foreignKey({
  columns: [table.caseId],
@@ -504,8 +472,7 @@ export const legalDocuments = pgTable(
  columns: [table.createdBy],
  foreignColumns: [users.id],
  name: 'legal_documents_created_by_users_id_fk',
- }).onDelete('set null'),
- ],
+ }).onDelete('set null')],
  })
 );
 
@@ -531,8 +498,7 @@ export const storageFiles = pgTable(
  columns: [table.userId],
  foreignColumns: [users.id],
  name: 'storage_files_user_id_users_id_fk',
- }).onDelete('set null'),
- ],
+ }).onDelete('set null')],
  })
 );
 
@@ -583,8 +549,7 @@ export const caseScores = pgTable(
  columns: [table.calculatedBy],
  foreignColumns: [users.id],
  name: `case_scores_calculated_by_users_id_fk`,
- }).onDelete('set null'),
- ]
+ }).onDelete('set null')]
 );
 
 // === EMBEDDING CACHE ===
@@ -633,8 +598,7 @@ export const userAiQueriesTable = pgTable(
  columns: [table.caseId],
  foreignColumns: [cases.id],
  name: 'user_ai_queries_case_id_cases_id_fk',
- }).onDelete('set null'),
- ],
+ }).onDelete('set null')],
  })
 );
 
@@ -663,8 +627,7 @@ export const autoTagsTable = pgTable(
  columns: [table.confirmedBy],
  foreignColumns: [users.id],
  name: 'auto_tags_confirmed_by_users_id_fk',
- }).onDelete('set null'),
- ],
+ }).onDelete('set null')],
  indexes: [index('idx_autotags_entity').on(table.entityId, table.entityType)],
  })
 );
@@ -729,15 +692,15 @@ export const attachmentVerifications = pgTable('attachment_verifications', {
 });
 
 export const canvasStates = pgTable('canvas_states', {
-	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
-	caseId: uuid('case_id').references(() => cases.id, { onDelete: 'cascade' }).notNull(),
-	name: varchar('name', { length: 255 }).default('Untitled Board').notNull(),
-	canvasData: jsonb('canvas_data').notNull(),
-	version: integer('version').default(1),
-	isDefault: boolean('is_default').default(false),
-	createdBy: uuid('created_by'), // FK to users.id (references users.id if available)
-	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
-	updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
+ id: uuid('id')
+ .default(sql`gen_random_uuid()`)
+ .primaryKey()
+ .notNull(),
+ caseId: uuid('case_id'), // FK to cases.id
+ userId: integer('user_id'), // FK to users.id
+ stateData: jsonb('state_data').notNull(),
+ createdAt: timestamp('created_at').defaultNow(),
+ updatedAt: timestamp('updated_at').defaultNow(),
 });
 
 export const canvasAnnotations = pgTable('canvas_annotations', {
@@ -819,14 +782,6 @@ export const savedReports = pgTable('saved_reports', {
  caseId: uuid('case_id'), // FK to cases.id
  savedAt: timestamp('saved_at').defaultNow().notNull(),
  notes: text('notes'),
- exportFormat: varchar('export_format', { length: 50 }),
- version: integer('version'),
- wordCount: integer('word_count'),
- tags: jsonb('tags'),
- metadata: jsonb('metadata'),
- sharedWith: jsonb('shared_with'),
- lastExported: timestamp('last_exported', { mode: 'string' }),
- createdBy: uuid('created_by'),
  createdAt: timestamp('created_at').defaultNow(),
  updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -865,17 +820,16 @@ export const personsOfInterest = pgTable('persons', {
  cases: jsonb('cases').$type<string[]>().default([]),
  // Multiple photos with forensic metadata
  photos: jsonb('photos')
- .$type<{
- id, string;
- url: string;
- filename: string;
- uploadedAt: string;
+ .$type<
+ {
+ id: string; url: string;
+ filename: string; uploadedAt: string;
  metadata: {
  exif?: Record<string, any>;
- gps?: { lat: number; lng: number};
+ gps?: { lat: number; lng: number };
  timestamp?: string;
  deviceModel?: string;
- resolution?: { width: number; height: number};
+ resolution?: { width: number; height: number };
  };
  ai: {
  faceEmbedding?: number[]; // Face recognition vector
@@ -889,10 +843,8 @@ export const personsOfInterest = pgTable('persons', {
  photoUrl: text('photo_url'),
  ai: jsonb('ai')
  .$type<{
- riskScore, number;
- patterns: string[];
- recommendations: string[];
- lastUpdated: string;
+ riskScore: number; patterns: string[];
+ recommendations: string[]; lastUpdated: string;
  }>()
  .default(null),
  createdAt: timestamp('created_at').defaultNow(),
@@ -928,12 +880,10 @@ export const poiPhotos = pgTable(
  columns: [table.poiId],
  foreignColumns: [personsOfInterest.id],
  name: 'poi_photos_poi_id_persons_id_fk',
- }).onDelete('cascade'),
- ],
+ }).onDelete('cascade')],
  indexes: [
  index('idx_poi_photos_poi_id').on(table.poiId),
- index('idx_poi_photos_uploaded_at').on(table.uploadedAt),
- ],
+ index('idx_poi_photos_uploaded_at').on(table.uploadedAt)],
  })
 );
 
@@ -970,9 +920,7 @@ export const userEmbeddings = pgTable('user_embeddings', {
  .default(sql`gen_random_uuid()`)
  .primaryKey()
  .notNull(),
- userId: uuid('user_id').notNull(),
- content: text('content'),
- metadata: jsonb('metadata'),
+ userId: integer('user_id').notNull(),
  embedding: text('embedding').notNull(), // Store vector as text
  model: varchar('model', { length: 100 }).notNull(),
  createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -1029,7 +977,8 @@ export const ragMessages = pgTable('rag_messages', {
  .primaryKey()
  .notNull(),
  sessionId: uuid('session_id').notNull(),
- role: varchar('role', { length: 50 }).notNull(), // e.g., 'user', 'assistant', content: text('content').notNull(),
+ role: varchar('role', { length: 50 }).notNull(), // e.g., 'user', 'assistant'
+ content: text('content').notNull(),
  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -1204,7 +1153,7 @@ export const passwordResetTokensRelations = relations(passwordResetTokens, ({ on
  user: one(users, { fields: [passwordResetTokens.userId], references: [users.id] }),
 }));
 
-export const casesRelations = relations(cases, ({ many, one }) => ({
+export const casesRelations = relations(cases, ({ one, many }) => ({
  assignedAttorney: one(users, { fields: [cases.assignedAttorney], references: [users.id] }),
  evidence: many(evidence),
  activities: many(caseActivities),
@@ -1223,7 +1172,7 @@ export const casesRelations = relations(cases, ({ many, one }) => ({
  canvasStates: many(canvasStates),
 }));
 
-export const criminalsRelations = relations(criminals, ({ many, one }) => ({
+export const criminalsRelations = relations(criminals, ({ one, many }) => ({
  createdBy: one(users, { fields: [criminals.createdBy], references: [users.id] }),
  evidence: many(evidence),
 }));
@@ -1238,7 +1187,7 @@ export const evidenceRelations = relations(evidence, ({ one, many }) => ({
  hashVerifications: many(hashVerifications),
 }));
 
-export const documentsRelations = relations(documents, ({ many, one }) => ({
+export const documentsRelations = relations(documents, ({ one, many }) => ({
  case: one(cases, { fields: [documents.caseId], references: [cases.id] }),
  user: one(users, { fields: [documents.userId], references: [users.id] }),
  documentProcessing: many(documentProcessing),
@@ -1290,7 +1239,7 @@ export const attachmentVerificationsRelations = relations(attachmentVerification
 
 export const canvasStatesRelations = relations(canvasStates, ({ one, many }) => ({
  case: one(cases, { fields: [canvasStates.caseId], references: [cases.id] }),
- user: one(users, { fields: [canvasStates.createdBy], references: [users.id] }),
+ user: one(users, { fields: [canvasStates.userId], references: [users.id] }),
  annotations: many(canvasAnnotations),
  autosaves: many(canvasAutosaves),
 }));
@@ -1383,7 +1332,8 @@ export const evidenceBoardConnections = pgTable(
  toEvidenceId: uuid('to_evidence_id')
  .notNull()
  .references(() => evidence.id, { onDelete: 'cascade' }),
- connectionType: varchar('connection_type', { length: 50 }).default('related').notNull(), // 'related', 'contradicts', 'supports', 'references', label: varchar('label', { length: 255 }),
+ connectionType: varchar('connection_type', { length: 50 }).default('related').notNull(), // 'related', 'contradicts', 'supports', 'references'
+ label: varchar('label', { length: 255 }),
  notes: text('notes'),
  strength: real('strength').default(1.0), // 0.0 to 1.0 confidence
  isVisible: boolean('is_visible').default(true),
@@ -1527,10 +1477,10 @@ export const workspaceEvidence = pgTable(
  .notNull()
  .references(() => evidence.id, { onDelete: 'cascade' }),
  relevanceScore: real('relevance_score').default(0),
-  addedBy: varchar('added_by', { length: 50 }).default('user'), // 'system', 'user'
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .default(sql`now()`)
-    .notNull(),
+ addedBy: varchar('added_by', { length: 50 }).default('user'), // 'system', 'user'
+ createdAt: timestamp('created_at', { withTimezone: true })
+ .default(sql`now()`)
+ .notNull(),
  },
  (table) => ({
  workspaceIdIdx: index('workspace_evidence_workspace_id_idx').on(table.workspaceId),
@@ -1553,7 +1503,7 @@ export const workspaceStatutes = pgTable(
  statuteText: text('statute_text'), // Fallback if statute not in DB
  relevanceScore: real('relevance_score').default(0),
  source: varchar('source', { length: 50 }).default('user'), // 'ai', 'user', 'citation'
-  createdAt: timestamp('created_at', { withTimezone: true })
+ createdAt: timestamp('created_at', { withTimezone: true })
  .default(sql`now()`)
  .notNull(),
  },
@@ -1603,9 +1553,10 @@ export const workspaceCitations = pgTable(
  .notNull()
  .references(() => workspaces.id, { onDelete: 'cascade' }),
  messageId: uuid('message_id').references(() => ragMessages.id, { onDelete: 'cascade' }),
- citationText: text('citation_text').notNull(), // e.g., "Penal Code 187(a)", citationURL: text('citation_url'),
+ citationText: text('citation_text').notNull(), // e.g., "Penal Code 187(a)"
+ citationURL: text('citation_url'),
  citationType: varchar('citation_type', { length: 50 }).default('statute'), // 'statute', 'case', 'regulation', 'precedent'
-  createdAt: timestamp('created_at', { withTimezone: true })
+ createdAt: timestamp('created_at', { withTimezone: true })
  .default(sql`now()`)
  .notNull(),
  },
@@ -2041,15 +1992,13 @@ export const errorKindEnum = pgEnum('error_kind', [
  'build',
  'runtime',
  'api',
- 'other',
-]);
+ 'other']);
 
 export const suggestionStateEnum = pgEnum('suggestion_state', [
  'pending',
  'applied',
  'dismissed',
- 'snoozed',
-]);
+ 'snoozed']);
 
 /**
  * route_health: Current health state of each route (HMM-style state tracking)
@@ -2228,10 +2177,10 @@ export const errorSuggestionStates = pgTable(
  table.routePath
  ),
  uniqueSuggestionRouteUser: unique('uq_error_suggestion_states_suggestion_route_user').on(
-  table.suggestionId,
-  table.routePath,
-  table.userId
-  ),
+ table.suggestionId,
+ table.routePath,
+ table.userId
+ ),
  })
 );
 
@@ -2342,29 +2291,6 @@ export const auditLog = pgTable('audit_log', {
 	createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
 
-export const ragIndexMetadata = pgTable('rag_index_metadata', {
-	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
-	chunkId: uuid('chunk_id'),
-	evidenceId: uuid('evidence_id'),
-	qdrantPointId: text('qdrant_point_id'),
-	tags: text('tags').array(),
-	jurisdiction: text('jurisdiction'),
-	indexedAt: timestamp('indexed_at', { withTimezone: true, mode: 'string' }),
-	tagWeight: real('tag_weight'),
-	embeddingModel: text('embedding_model'),
-	createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow(),
-	updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow(),
-});
 
-export const citationTags = pgTable('citation_tags', {
-	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
-	name: text('name').notNull(),
-	jurisdiction: text('jurisdiction'),
-	description: text('description'),
-	createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow(),
-	namespace: text('namespace'),
-	synonyms: text('synonyms').array(),
-	updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow(),
-});
 
 

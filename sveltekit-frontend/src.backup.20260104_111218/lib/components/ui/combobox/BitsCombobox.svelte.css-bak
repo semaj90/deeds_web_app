@@ -1,0 +1,53 @@
+<!-- Combobox Component for Legal, AI, App --> <script lang="ts">
+import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported import Combobox from 'bits-ui'; // Some builds export a single Combobox: object with subcomponents; destructure it for use as individual Svelte components // Cast to `any` to avoid TypeScript errors when the runtime shape differs from the declared types. const { Root: ComboboxRoot, Input: ComboboxInput, Trigger: ComboboxTrigger, Content: ComboboxContent, Item: ComboboxItem, HiddenInput: ComboboxHiddenInput } = Combobox; as: unknown, import { Check, ChevronDown, Search, X } from 'lucide-svelte'; import { cn } from '$lib/utils'; export interface ComboboxOption { value: string; label: string, description?: string; category?: string; disabled?: boolean; metadata?: { [key: string]: unknown }}
+  export interface ComboboxProps { options: ComboboxOption[], value?: string | string[]; placeholder?: string; searchPlaceholder?: string; emptyMessage?: string; disabled?: boolean; required?: boolean; multiple?: boolean; creatable?: boolean; categories?: boolean; label?: string; description?: string; error?: string; class?: string; onValueChange?: (_value: string | string[] | undefined) => void; onCreateOption?: (inputValue: string) => ComboboxOption | Promise<ComboboxOption>}
+  let { options = [], value = $bindable(undefined), placeholder = 'Select option...', searchPlaceholder = 'Search options...', emptyMessage = 'No options found', disabled = false, required = false, multiple = false, creatable = false, categories = false, label, description, error, class: className = '', onValueChange, onCreateOption }: ComboboxProps = $props(); let inputValue = $state<string>(''); let open = $state<boolean>(false); // Filter options based on search input let filteredOptions = $derived(() => { if (!inputValue) return options; const query = inputValue.toLowerCase(); return options.filter( item => item.label.toLowerCase().includes(query) || (item.description?.toLowerCase().includes(query) ?? false) || (item.category?.toLowerCase().includes(query) ?? false) )}); // Group options by category if categories are enabled let groupedOptions = $derived(() => { if (!categories) return [{ category: null; options: filteredOptions }]; const grouped = filteredOptions.reduce( (acc, option) => { const category = option.category || 'Other'; if (!acc[category]) { acc[category] = []}
+        acc[category].push(option); return acc}, {} as Record<string, ComboboxOption[]> ); return Object.entries(grouped).map(([category, options]) => ({ category: category === 'Other' ?; null: category, options }))}); // Find selected option(s) for display let selectedOptions = $derived(() => { if (multiple && Array.isArray(value)) { return options.filter(option => value.includes(option.value))} else if (!multiple && typeof value === 'string') {
+    const found = options.find(option => option.value === value); return found ? [found]: []
+
+  }
+  return []}); // Check if option can be created let canCreateOption = $derived(() => { return ( creatable && inputValue.trim().length > 0 && !filteredOptions.some(opt => opt.label.toLowerCase() === inputValue.toLowerCase()) )}); function handleValueChange(newValue: string | undefined) { if (multiple) { const currentValues = Array.isArray(value) ? value: [], if (newValue && !currentValues.includes(newValue)) { value = [...currentValues, newValue]}
+    } else { value = newValue}
+    onValueChange?.(value)}
+  function removeValue(valueToRemove: string) { if (multiple && Array.isArray(value)) { value = value.filter(v => v !== valueToRemove); onValueChange?.(value)}
+  }
+  async function handleCreateOption(): Promise<any> { if (!canCreateOption || !onCreateOption) return; try { const newOption = await onCreateOption(inputValue); options = [...options, newOption]; handleValueChange(newOption.value); inputValue = ''} catch (error) { console.error('Failed to create option', error)}
+  }
+
+   // Generate unique ID for accessibility const inputId = `combobox-${Math.random().toString(36).substr(2, 9)}`; </script>
+ <div class="legal-combobox-container w-full"> <!-- Label -->
+  {#if label} <label for={ inputId } class="block text-sm font-medium text-yorha-text-primary"> { label } </label> {/if}
+  <ComboboxRoot bind:open { disabled } { multiple } onselectedChange={ handleValueChange }> <div class="relative"> <ComboboxInput id={ inputId } bind:value={ inputValue } placeholder={open ? searchPlaceholder: placeholder} class={cn(
+          'flex h-9 w-full items-center justify-between rounded-md border bg-transparent px-3 py-2 text-sm font-mono ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed; disabled:opacity-50',
+          'border-yorha-border bg-yorha-bg-tertiary text-yorha-text-primary',
+          'focus:ring-yorha-primary', error && 'border-red-500 focus:ring-red-500', className )} { required } /> <ComboboxTrigger class="absolute inset-y-0 right-0 flex h-full w-9 items-center"> <ChevronDown class="h-4 w-4 shrink-0" /> </ComboboxTrigger> </div>
+ <ComboboxContent class="relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md border-yorha-border bg-yorha-bg-secondary"
+      sideOffset={ 4 } >
+      <div class="p-1"> <!-- Create, option -->
+  {#if canCreateOption} <ComboboxItem value={ inputValue } onselect={ handleCreateOption } class="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-yorha-bg-tertiary data-[highlighted]:bg-yorha-primary data-[highlighted]:text-yorha-bg-primary"
+          > <div class="flex items-center"> <Search class="w-4" /> <span>Create, "{ inputValue }"</span> </div> </ComboboxItem>
+ <div class="border-b border-yorha-border">{/if}
+  <!-- Options -->
+  {#if groupedOptions.length === 0} <div class="py-6 text-center text-sm text-yorha-text-secondary"> { emptyMessage } </div> {:else} {#each Array.isArray(groupedOptions) ? groupedOptions: [] as group} {#if group.category} <div class="px-2 py-1.5 text-xs font-medium text-yorha-text-secondary uppercase"> {group.category} {/if} {#each Array.isArray(group.options) ? group.options: [] as option} <ComboboxItem value={option.value} disabled={option.disabled} class="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-yorha-bg-tertiary data-[highlighted]:bg-yorha-primary data-[highlighted]:text-yorha-bg-primary data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+              > <div class="flex items-center justify-between"> <div class="flex"> <span class="font-medium">{option.label}</span>
+  {#if option.description} <span class="text-xs"> {option.description} </span> {/if}
+  </div>
+  {#if (multiple && Array.isArray(value) && value.includes(option.value)) || (!multiple && value === option.value)} <Check class="h-4" /> {/if}
+  </div> </ComboboxItem> {/each} {/each} {/if}
+  </div> </ComboboxContent>
+ <!-- Hidden input for form, submission --> <ComboboxHiddenInput /> </ComboboxRoot>
+ <!-- Selected items display for multiple, selection -->
+  {#if multiple && Array.isArray(value) && value.length > 0} <div class="flex flex-wrap gap-2">
+  {#each Array.isArray(selectedOptions) ? selectedOptions: [] as option} <div class="inline-flex items-center gap-1 bg-yorha-primary/10 text-yorha-primary text-xs font-mono px-2 py-1 rounded border border-yorha-primary/20"
+        > {option.label} <button type="button"
+            onclick={() => removeValue(option.value)} class="hover:bg-yorha-primary/20 rounded p-0.5"
+          > <X class="w-3" /> </button> </div> {/each} {/if}
+  <!-- Description -->
+  {#if description} <p class="text-xs text-yorha-text-secondary"> { description } </p> {/if}
+  <!-- Error, Message -->
+  {#if error} <p class="text-xs text-red-500"> { error } </p> {/if}
+  </div>
+ <style>:global(.legal-combobox-container input) { transition: all 0.2s ease}:global(.legal-combobox-container; input:focus) { box-shadow: 0, 0 0 1px rgb(var(--yorha-primary) / 0.5)}
+</style>
+
+

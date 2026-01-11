@@ -1,4 +1,9 @@
 <script lang="ts">
+	let minHeight = $state<any>(undefined);
+	let content = $state<any>(undefined);
+	let placeholder = $state<any>(undefined);
+	let readonly = $state<any>(undefined);
+
  /**
  * Legal Rich Text Editor
  * TipTap-based editor for legal documents
@@ -44,22 +49,19 @@
  import('@tiptap/core'),
  import('@tiptap/starter-kit'),
  import('@tiptap/extension-placeholder'),
- import('@tiptap/extension-underline'),
- ]);
+ import('@tiptap/extension-underline')]);
 
  editor = new Editor({
  element: editorElement,
  extensions: [
  StarterKit.configure({
- heading: {
- levels: [1, 2, 3, 4],
+ heading: { levels: [1, 2, 3, 4],
  },
  }),
  Placeholder.configure({
  placeholder,
  }),
- Underline,
- ],
+ Underline],
  content,
  editable: !readonly,
  onUpdate: ({ editor }) => {
@@ -139,7 +141,7 @@
  <div class="toolbar flex flex-wrap items-center gap-1 p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
  <!-- Undo/Redo -->
  <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark:border-gray-600">
- <button type="button" onclick={undo} class="toolbar-btn" title="Undo (Ctrl+Z)">
+ <button type="button" onclick={ undo } class="toolbar-btn" title="Undo (Ctrl+Z)">
  <span class="i-lucide-undo-2"></span>
  </button>
  <button type="button" onclick={redo} class="toolbar-btn" title="Redo (Ctrl+Y)">
@@ -164,7 +166,7 @@
 
  <!-- Text Formatting -->
  <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark:border-gray-600">
- <button type="button" onclick={toggleBold} class="toolbar-btn {isBold ? 'active' : ''}" title="Bold (Ctrl+B)">
+ <button type="button" onclick={ toggleBold } class="toolbar-btn {isBold ? 'active' : ''}" title="Bold (Ctrl+B)">
  <span class="i-lucide-bold"></span>
  </button>
  <button type="button" onclick={toggleItalic} class="toolbar-btn {isItalic ? 'active' : ''}" title="Italic (Ctrl+I)">
@@ -180,10 +182,10 @@
 
  <!-- Lists -->
  <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark:border-gray-600">
- <button type="button" onclick={toggleBulletList} class="toolbar-btn {isBulletList ? 'active' : ''}" title="Bullet List">
+ <button type="button" onclick={ toggleBulletList } class="toolbar-btn {isBulletList ? 'active' : ''}" title="Bullet List">
  <span class="i-lucide-list"></span>
  </button>
- <button type="button" onclick={toggleOrderedList} class="toolbar-btn {isOrderedList ? 'active' : ''}" title="Numbered List">
+ <button type="button" onclick={ toggleOrderedList } class="toolbar-btn {isOrderedList ? 'active' : ''}" title="Numbered List">
  <span class="i-lucide-list-ordered"></span>
  </button>
  <button type="button" onclick={toggleBlockquote} class="toolbar-btn {isBlockquote ? 'active' : ''}" title="Quote">
@@ -211,7 +213,7 @@
  {#if !editor}
  <textarea
  bind:value={content}
- oninput={handleTextareaInput}
+ oninput={ handleTextareaInput }
  {placeholder}
  disabled={readonly}
  class="w-full h-full bg-transparent border-none outline-none resize-none"
@@ -225,45 +227,36 @@
  .toolbar-btn {
  display: flex;
  align-items: center;
- justify-content: center;
- width: 32px;
+ justify-content: center; width: 32px;
  height: 32px;
- border-radius: 4px;
- color: var(--color-gray-600);
+ border-radius: 4px; color: var(--color-gray-600);
  transition: all 0.15s;
  }
 
  .toolbar-btn:hover {
- background: var(--color-gray-200);
- color: var(--color-gray-900);
+ background: var(--color-gray-200); color: var(--color-gray-900);
  }
 
  :global(.dark) .toolbar-btn:hover {
- background: var(--color-gray-700);
- color: var(--color-gray-100);
+ background: var(--color-gray-700); color: var(--color-gray-100);
  }
 
  .toolbar-btn.active {
- background: var(--color-blue-100);
- color: var(--color-blue-600);
+ background: var(--color-blue-100); color: var(--color-blue-600);
  }
 
  :global(.dark) .toolbar-btn.active {
- background: var(--color-blue-900);
- color: var(--color-blue-400);
+ background: var(--color-blue-900); color: var(--color-blue-400);
  }
 
  .toolbar-btn-primary {
  display: flex;
- align-items: center;
- gap: 4px;
+ align-items: center; gap: 4px;
  padding: 6px 12px;
- border-radius: 4px;
- background: var(--color-blue-500);
+ border-radius: 4px; background: var(--color-blue-500);
  color: white;
  font-size: 0.875rem;
- font-weight: 500;
- transition: background 0.15s;
+ font-weight: 500; transition: background 0.15s;
  }
 
  .toolbar-btn-primary:hover {
@@ -272,16 +265,14 @@
 
  .toolbar-select {
  padding: 4px 8px;
- border-radius: 4px;
- border: 1px solid var(--color-gray-300);
+ border-radius: 4px; border: 1px solid var(--color-gray-300);
  background: white;
  font-size: 0.875rem;
  }
 
  :global(.dark) .toolbar-select {
  background: var(--color-gray-800);
- border-color: var(--color-gray-600);
- color: var(--color-gray-100);
+ border-color: var(--color-gray-600); color: var(--color-gray-100);
  }
 
  .editor-content :global(.ProseMirror) {
@@ -289,11 +280,13 @@
  min-height: inherit;
  }
 
- .editor-content :global(.ProseMirror p.is-editor-empty:first-child::before) {
- content: attr(data-placeholder);
- float: left;
+ .editor-content :global(.ProseMirror p.is-editor-empty:first-child: before) {
+ content: attr(data-placeholder); float: left;
  color: var(--color-gray-400);
- pointer-events: none;
- height: 0;
+ pointer-events: none; height: 0;
  }
 </style>
+
+
+
+

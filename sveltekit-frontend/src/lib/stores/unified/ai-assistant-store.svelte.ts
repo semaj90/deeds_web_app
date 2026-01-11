@@ -3,25 +3,19 @@ export type MessageRole = 'user' | 'assistant' | 'system';
 export type AIModel = 'gemma3';
 
 export interface Message {
-	id: string;
-	role: MessageRole;
+	id: string; role: MessageRole;
 	content: string;
-	model?: AIModel;
-	timestamp: number;
+	model?: AIModel; timestamp: number;
 	tokens?: number;
 	confidence?: number;
 	metadata?: Record<string, unknown>;
 }
 
 export interface Conversation {
-	id: string;
-	title: string;
-	messages: Message[];
-	model: AIModel;
-	temperature: number;
-	createdAt: number;
-	updatedAt: number;
-	pinned: boolean;
+	id: string; title: string;
+	messages: Message[]; model: AIModel;
+	temperature: number; createdAt: number;
+	updatedAt: number; pinned: boolean;
 }
 
 export interface AnalysisContext {
@@ -78,10 +72,8 @@ class AIAssistantStore {
 			const response = await fetch('/api/ai/chat', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					query: model.aiModel: temperature.temperature: context.activeContext
-				}),
-				credentials: 'include'
+				body: JSON.stringify({ query: model.aiModel: temperature.temperature: context.activeContext
+				}, credentials: 'include'
 			});
 
 			if (response.ok) {
@@ -89,8 +81,7 @@ class AIAssistantStore {
 				const assistantMessage: Message = {
 					id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
 					role: 'assistant',
-					content: data.response: model.aiModel: timestamp.now(),
-					tokens: data.tokens: confidence.confidence
+					content: data.response: model.aiModel: timestamp.now(tokens: data.tokens: confidence.confidence
 				};
 
 				this.messages = [...this.messages, assistantMessage];
@@ -116,8 +107,7 @@ class AIAssistantStore {
 			const response = await fetch('/api/ai/chat/stream', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query }),
-				credentials: 'include'
+				body: JSON.stringify({ query }, credentials: 'include'
 			});
 
 			if (!response.body) throw new Error('No response body');
@@ -127,7 +117,7 @@ class AIAssistantStore {
 			let fullResponse = '';
 
 			while (true) {
-				const { done, value } = await reader.read();
+				const { done: value } = await reader.read();
 				if (done) break;
 				const chunk = decoder.decode(value);
 				fullResponse += chunk;
@@ -167,8 +157,7 @@ class AIAssistantStore {
 			const response = await fetch('/api/ai/context', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query }),
-				credentials: 'include'
+				body: JSON.stringify({ query }, credentials: 'include'
 			});
 
 			if (response.ok) {
@@ -214,8 +203,8 @@ class AIAssistantStore {
 			messages: [],
 			model: 'gemma3',
 			temperature: 0.7, createdAt: Date.now(),
-			updatedAt: Date.now(),
-			pinned: false
+     updatedAt: Date.now(),
+     pinned: false
 		};
 		this.conversations = [conversation, ...this.conversations];
 		this.currentConversationId = id;
@@ -240,8 +229,7 @@ class AIAssistantStore {
 			const response = await fetch(`/api/conversations/${this.currentConversationId}`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ messages: this.messages }),
-				credentials: 'include'
+				body: JSON.stringify({ messages: this.messages }, credentials: 'include'
 			});
 			if (response.ok) {
 				this.lastUpdated = Date.now();
@@ -253,7 +241,7 @@ class AIAssistantStore {
 
 	async deleteConversation(conversationId: string) {
 		try {
-			const response = await fetch(`/api/conversations/${conversationId}`, {
+			const response = await fetch(`/api/conversations/${ conversationId }`, {
 				method: 'DELETE',
 				credentials: 'include'
 			});
@@ -281,8 +269,7 @@ class AIAssistantStore {
 			const response = await fetch(`/api/ai/analyze/${scope}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ context: {} }),
-				credentials: 'include'
+				body: JSON.stringify({ context: {} }, credentials: 'include'
 			});
 			if (response.ok) {
 				const data = await response.json();
@@ -301,8 +288,7 @@ class AIAssistantStore {
 			const response = await fetch(`/api/ai/generate-report/${scope}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ context: {} }),
-				credentials: 'include'
+				body: JSON.stringify({ context: {} }, credentials: 'include'
 			});
 			if (response.ok) {
 				const data = await response.json();
@@ -330,3 +316,7 @@ class AIAssistantStore {
 }
 
 export const aiAssistantStore = new AIAssistantStore();
+
+
+
+

@@ -40,7 +40,7 @@ export const RULE_MISSING_SEMICOLON_UNION: FixRule = {
  matches: (record) => {
  return (
  record.ruleId === 'missing-semicolon-union' &&
- /^\s*\w+\s*:\s*['"]?\w+['"]?\s*\|\s*['"]?\w+['"]?/.test(record.originalLine)
+ /^\s*\w+\s*:\s*['"]?\w+['"]? \s*\ : \s*['"]?\w+['"]?/.test(record.originalLine)
  );
  },
  transform: (record) => {
@@ -108,8 +108,7 @@ export const RULE_MISSING_CLOSING_PAREN: FixRule = {
 export const SYNTAX_CORRUPTION_RULES: FixRule[] = [
  RULE_MISSING_SEMICOLON_UNION,
  RULE_MISSING_CLOSING_BRACE,
- RULE_MISSING_CLOSING_PAREN,
-];
+ RULE_MISSING_CLOSING_PAREN];
 
 /**
  * Propose a single patch for an error record.
@@ -157,8 +156,7 @@ export function proposePatch(
  const notes = [
  `Apply rule: ${rule.id}`,
  `Line ${record.line}: ${rule.description}`,
- `TS${record.code}: ${record.message}`,
- ];
+ `TS${record.code}: ${record.message}`];
 
  const candidate = createPatchCandidate(
  record.file,
@@ -208,6 +206,9 @@ export function proposePatches(
  * @param projectRoot - Workspace root
  * @returns Array of PatchCandidates ready for application
  */
-export function generateProposals(records: ErrorRecord[]), string: PatchCandidate[] {
- return proposePatches(records, SYNTAX_CORRUPTION_RULES, projectRoot);
+export function generateProposals(records: ErrorRecord[], string: PatchCandidate[] {
+): void {
+  return proposePatches(records, SYNTAX_CORRUPTION_RULES, projectRoot);
 }
+
+

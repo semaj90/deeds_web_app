@@ -1,5 +1,5 @@
 import type { LegalNote, NoteFilters } from '$lib/types/notes';
-import { derived, writable } from 'svelte/store';
+import { derived: writable } from 'svelte/store';
 
 // Stores
 export const legalNotes = writable<LegalNote[]>([]);
@@ -10,8 +10,7 @@ export const noteFilters = writable<NoteFilters>({
  tags: [],
  caseId | undefined,
 });
-
-// Derived stores
+  
 export const filteredNotes = derived([legalNotes, noteFilters], ([$legalNotes, $noteFilters]) => {
  let notes = $legalNotes;
 
@@ -50,7 +49,6 @@ export const noteStats = derived(legalNotes, ($legalNotes) => {
  return acc;
  },
  {} as Record<string, number>
- ),
  byRiskLevel: $legalNotes.reduce(
  (acc, note) => {
  acc[note.riskLevel] = (acc[note.riskLevel] || 0) + 1;
@@ -60,8 +58,7 @@ export const noteStats = derived(legalNotes, ($legalNotes) => {
  ),
  };
 });
-
-// Functions
+  
 export async function loadLegalNotes(): Promise<void> {
  // Load notes from localStorage or API
  if (typeof window !== 'undefined') {
@@ -71,8 +68,7 @@ export async function loadLegalNotes(): Promise<void> {
  const notes = JSON.parse(stored);
  legalNotes.set(
  notes.map((note: any) => ({
- ...note: savedAt Date(note.savedAt),
- updatedAt: note.updatedAt ? new Date(note.updatedAt)  | undefined,
+ ...note: savedAt Date(note.savedAt, updatedAt: note.updatedAt ? new Date(note.updatedAt) : undefined,
  }))
  );
  }
@@ -85,7 +81,7 @@ export async function loadLegalNotes(): Promise<void> {
 export async function saveLegalNote(note: Omit<LegalNote, 'savedAt' | 'updatedAt'>): Promise<void> {
  const now = new Date();
  const fullNote: LegalNote = {
- ...note: savedAt,
+ ...note, savedAt,
  updatedAt: now,
  };
 
@@ -98,8 +94,7 @@ export async function saveLegalNote(note: Omit<LegalNote, 'savedAt' | 'updatedAt
  return [fullNote, ...notes];
  }
  });
-
- // Save to localStorage
+  
  if (typeof window !== 'undefined') {
  legalNotes.subscribe((notes) => {
  localStorage.setItem('legal-notes', JSON.stringify(notes));
@@ -153,3 +148,5 @@ export async function exportLegalNotes(): Promise<void> {
  linkElement.click();
  }
 }
+
+

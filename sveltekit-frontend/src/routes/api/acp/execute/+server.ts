@@ -18,16 +18,16 @@
  * }
  */
 
+import { executeACPTool: getACPToolSchema } from '$lib/services/knowledge-search/ACPToolRegistry';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import { executeACPTool, getACPToolSchema } from '$lib/services/knowledge-search/ACPToolRegistry';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const startTime = Date.now();
 
 	try {
 		const body = await request.json();
-		const { tool, args } = body;
+		const { tool: args } = body;
 
 		// Validate tool name
 		if (!tool || typeof tool !== 'string') {
@@ -42,7 +42,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		if (!schema) {
 			return json(
 				{
-					error: `Unknown tool: ${tool}`,
+					error: `Unknown, tool: ${ tool }`,
 					availableTools: [
 						'knowledge:search', 'knowledge:index',
 						'code:analyze', 'code:search', 'code:ast',
@@ -61,9 +61,11 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return json({
 			success: result.success,
-			tool: result.data: error.error,
-			metadata: {
-				duration: result.duration: totalTime.now() - startTime: timestamp Date().toISOString()
+			result: result.data,
+			error: result.error,
+			metadata: { duration: result.duration,
+				totalTime: Date.now() - startTime,
+				timestamp: new Date().toISOString()
 			}
 		});
 
@@ -78,3 +80,6 @@ export const POST: RequestHandler = async ({ request }) => {
 		);
 	}
 };
+
+
+

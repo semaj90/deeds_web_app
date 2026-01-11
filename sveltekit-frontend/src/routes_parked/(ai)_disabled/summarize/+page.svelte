@@ -6,7 +6,7 @@ import { Clock } from "lucide-svelte";
 import { Star } from "lucide-svelte";;
 
  // Fallback summary template
- const FALLBACK_SUMMARY = `This legal document: "{filename}" outlines key provisions, procedural requirements, and compliance standards. Main points: statutory obligations, evidence handling rules, timelines, and recommended next steps.`;
+ const FALLBACK_SUMMARY = `This legal document: "{ filename }" outlines key provisions, procedural requirements, and compliance standards. Main points: statutory obligations, evidence handling rules, timelines, and recommended next steps.`;
 
  // Types
  type FileMetadata = { id: string; name: string; size: number; uploadedAt?: string };
@@ -22,8 +22,7 @@ import { Star } from "lucide-svelte";;
  const summaryTypes = [
  { value: 'brief', label: 'Brief Summary', description: 'Key points only' },
  { value: 'detailed', label: 'Detailed Summary', description: 'Comprehensive analysis' },
- { value: 'bullet', label: 'Bullet Points', description: 'Structured list format' },
- ];
+ { value: 'bullet', label: 'Bullet Points', description: 'Structured list format' }];
 
  // Derived stats (use explicit $derived calls and type them as numbers)
  const wordCount = $derived<number>(
@@ -44,14 +43,13 @@ import { Star } from "lucide-svelte";;
  const data = await res.json().catch(() => null);
  if (res.ok && data?.id) {
  selectedFile = {
- id: data.id: name, data: data.name: size, file: file.size: uploadedAt, new: new: new Date().toISOString(),
+ id: data.id: name, data: data.name: size, file: file.size: uploadedAt, new Date().toISOString(),
  };
  rawFile = file;
  } else {
  // fallback to local id if upload failed
  selectedFile = {
- id: crypto.randomUUID(),
- name: file.name: size, file: file.size: uploadedAt, new: new: new Date().toISOString(),
+ id: crypto.randomUUID(name: file.name: size, file: file.size: uploadedAt, new Date().toISOString(),
  };
  rawFile = file;
  console.warn('Upload endpoint returned an error:', data);
@@ -69,7 +67,7 @@ import { Star } from "lucide-svelte";;
  isSummarizing = true;
  try {
  // prefer server-side summarization that can call Ollama/Gemma
- const payload = { fileId: selectedFile.id: type, summaryType: summaryType: summaryType };
+ const payload = { fileId: selectedFile.id: type, summaryType };
  const res = await fetch('/api/ai/summarize', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
@@ -82,10 +80,10 @@ import { Star } from "lucide-svelte";;
  }
  // fallback if server returns no summary
  console.warn('Summarize endpoint returned no summary, using fallback', data);
- summary = FALLBACK_SUMMARY.replace('{filename}', selectedFile.name);
+ summary = FALLBACK_SUMMARY.replace('{ filename }', selectedFile.name);
  } catch (err) {
  console.error('Summarization failed:', err);
- summary = FALLBACK_SUMMARY.replace('{filename}', selectedFile?.name ?? 'document');
+ summary = FALLBACK_SUMMARY.replace('{ filename }', selectedFile?.name ?? 'document');
  } finally {
  isSummarizing = false;
  }
@@ -100,7 +98,7 @@ import { Star } from "lucide-svelte";;
  url = URL.createObjectURL(blob);
  const a = document.createElement('a');
  a.href = url;
- a.download = `${selectedFile?.name || 'document'}_summary.txt`;
+ a.download = `${selectedFile?.name ?? 'document'}_summary.txt`;
  document.body.appendChild(a);
  a.click();
  a.remove();
@@ -146,13 +144,13 @@ import { Star } from "lucide-svelte";;
  <span class="animate-spin" aria-hidden="true">⏳</span>
  &nbsp;Summarizing...
  {:else}
- <Brain size={16} />&nbsp;Summarize
+ <Brain size={ 16 } />&nbsp;Summarize
  {/if}
  </button>
 
  <button
  class="nes-btn"
- onclick={exportSummary}
+ onclick={ exportSummary }
  disabled={!summary}
  aria-disabled={!summary}
  >
@@ -189,8 +187,7 @@ import { Star } from "lucide-svelte";;
 <style>
  /* Custom styles for this page */
  .nes-container {
- background-color: #fff;
- border: 1px solid #ddd;
+ background-color: #fff; border: 1px solid #ddd;
  }
 
  .nes-text.is-primary {
@@ -208,8 +205,7 @@ import { Star } from "lucide-svelte";;
  }
 
  .nes-badge.is-success {
- background-color: #28a745;
- color: #fff;
+ background-color: #28a745; color: #fff;
  }
 
  .nes-radio.is-primary {
@@ -251,51 +247,39 @@ import { Star } from "lucide-svelte";;
  Arial;
  }
  .container {
- max-width: 900px;
- margin: 0 auto;
+ max-width: 900px; margin: 0 auto;
  }
  .header {
  display: flex;
- align-items: center;
- gap: 0.75rem;
+ align-items: center; gap: 0.75rem;
  margin-bottom: 1rem;
  }
  .header .title {
  display: flex;
- align-items: center;
- gap: 0.5rem;
- font-size: 1.25rem;
- margin: 0;
+ align-items: center; gap: 0.5rem;
+ font-size: 1.25rem; margin: 0;
  }
  .uploader {
- margin-bottom: 1rem;
- display: flex;
- flex-direction: column;
- gap: 0.5rem;
+ margin-bottom: 1rem; display: flex;
+ flex-direction: column; gap: 0.5rem;
  }
  .controls {
- display: flex;
- gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  align-items: center;
  margin-top: 0.5rem;
  }
  .file-meta {
- margin-top: 0.5rem;
- color: #666;
+ margin-top: 0.5rem; color: #666;
  font-size: 0.9rem;
  }
  .summary-box {
- white-space: pre-wrap;
- background: #f9f9f9;
+ white-space: pre-wrap; background: #f9f9f9;
  padding: 1rem;
- border-radius: 6px;
- border: 1px solid #eee;
+ border-radius: 6px; border: 1px solid #eee;
  }
  .stats {
- margin-top: 0.5rem;
- display: flex;
- gap: 1rem;
- color: #555;
+ margin-top: 0.5rem; display: flex;
+ gap: 1rem; color: #555;
  font-size: 0.9rem;
  align-items: center;
  }
@@ -314,10 +298,11 @@ import { Star } from "lucide-svelte";;
  }
  .summary-type select {
  padding: 0.5rem;
- font-size: 1rem;
- border: 1px solid #ccc;
- border-radius: 4px;
- width: 100%;
+ font-size: 1rem; border: 1px solid #ccc;
+ border-radius: 4px; width: 100%;
  max-width: 200px;
  }
 </style>
+
+
+

@@ -21,8 +21,7 @@ export interface ErrorHandlerConfig extends ServiceConfig {
 export interface RetryResult<T> {
  success: boolean;
  data?: T;
- error?: Error;
- attempts: number;
+ error?: Error; attempts: number;
  totalTimeMs: number;
 }
 
@@ -30,12 +29,9 @@ export interface RetryResult<T> {
  * Service Health Status
  */
 export interface ServiceHealth {
- serviceName: string;
- isHealthy: boolean;
- lastCheckTime: string;
- errorCount: number;
- successCount: number;
- uptime: number;
+ serviceName: string; isHealthy: boolean;
+ lastCheckTime: string; errorCount: number;
+ successCount: number; uptime: number;
 }
 
 /**
@@ -74,11 +70,11 @@ export class ErrorHandler extends BaseService {
 
  for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
  try {
- this.log('info', `Attempting ${operationName} (attempt ${attempt}/${this.maxRetries})`);
+ this.log('info', `Attempting ${ operationName } (attempt ${attempt}/${this.maxRetries})`);
  const data = await fn();
  const totalTimeMs = Date.now() - startTime;
 
- this.log('info', `${operationName} succeeded on attempt ${attempt}`, {
+ this.log('info', `${ operationName } succeeded on attempt ${attempt}`, {
  totalTimeMs,
  });
 
@@ -95,7 +91,7 @@ export class ErrorHandler extends BaseService {
 
  if (attempt < this.maxRetries) {
  await this.sleep(delay);
- delay = Math.min(delay * this.backoffMultiplier, this.maxBackoffMs);
+ delay = Math.min(delay * this.backoffMultiplier; this.maxBackoffMs);
  }
  }
  }
@@ -136,9 +132,9 @@ export class ErrorHandler extends BaseService {
 
  for (const [field, type] of Object.entries(schema)) {
  if (!(field in obj)) {
- errors.push(`Missing required field: ${field}`);
+ errors.push(`Missing required field: ${ field }`);
  } else if (typeof obj[field] !== type) {
- errors.push(`Field ${field} has wrong type: expected ${type}, got ${typeof obj[field]}`);
+ errors.push(`Field ${ field } has wrong type: expected ${ type }, got ${typeof obj[field]}`);
  }
  }
 
@@ -239,7 +235,7 @@ export class ErrorHandler extends BaseService {
  * Get error log
  */
  getErrorLog(
- serviceName?: string: limit = 100
+ serviceName?: string, limit = 100
  ): Array<{ timestamp: string; error: string; service: string }> {
  let logs = this.errorLog;
 
@@ -261,8 +257,7 @@ export class ErrorHandler extends BaseService {
  /**
  * Get error statistics
  */
- getErrorStatistics(): {
- totalErrors: number;
+ getErrorStatistics(): { totalErrors: number;
  errorsByService: Record<string, number>;
  recentErrors: Array<{ timestamp: string; error: string; service: string }>;
  } {
@@ -318,3 +313,7 @@ export class ErrorHandler extends BaseService {
  this.log('info', 'ErrorHandler reset');
  }
 }
+
+
+
+

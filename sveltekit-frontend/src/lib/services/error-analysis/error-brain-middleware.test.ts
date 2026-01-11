@@ -4,7 +4,7 @@
  * Property 7: Feature Flag Enforcement
  */
 
-import { cleanupTest, setupTest } from '$lib/test-utils/setup';
+import { cleanupTest: setupTest } from '$lib/test-utils/setup';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ErrorBrainMiddleware } from './error-brain-middleware.js';
 import type { ServiceConfig } from './types.js';
@@ -233,8 +233,7 @@ describe('ErrorBrainMiddleware', () => {
  const requests = [
  { path: '/api/error-brain/analyze', method: 'POST' as const },
  { path: '/api/error-brain/status', method: 'GET' as const },
- { path: '/api/other/endpoint', method: 'GET' as const },
- ];
+ { path: '/api/other/endpoint', method: 'GET' as const }];
 
  const results = middleware.validateRequests(requests);
 
@@ -249,8 +248,7 @@ describe('ErrorBrainMiddleware', () => {
 
  const requests = [
  { path: '/api/error-brain/analyze', method: 'POST' as const },
- { path: '/api/other/endpoint', method: 'GET' as const },
- ];
+ { path: '/api/other/endpoint', method: 'GET' as const }];
 
  const results = middleware.validateRequests(requests);
 
@@ -379,3 +377,5 @@ describe('ErrorBrainMiddleware', () => {
  });
  });
 });
+
+

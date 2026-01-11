@@ -34,13 +34,10 @@ export interface EnhancedChatResponse {
  response: string;
  synthesizedInput?: unknown;
  legalAnalysis?: unknown;
- ragResults?: unknown;
- confidence: number;
- processingTime: number;
- metadata: {
+ ragResults?: unknown; confidence: number;
+ processingTime: number; metadata: {
  model: string;
- tokensUsed?: number;
- enabledFeatures: string[];
+ tokensUsed?: number; enabledFeatures: string[];
  fallbacksUsed?: string[];
  cacheHits?: string[];
  };
@@ -62,10 +59,8 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
 
  const response: EnhancedChatResponse = {
  response: aiResponse, confidence: 0.8, processingTime: Date.now() - startTime,
- metadata: {
- model: settings?.model || 'gemma3-legal:latest',
- tokensUsed: Math.ceil(aiResponse.length / 4),
- enabledFeatures: ['basic-generation'],
+ metadata: { model: settings?.model ?? 'gemma3-legal:latest',
+ tokensUsed: Math.ceil(aiResponse.length / 4, enabledFeatures: ['basic-generation'],
  },
  recommendations: ['Verify legal advice with qualified counsel'],
  };
@@ -75,25 +70,22 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
  return json(
  {
  error: 'Internal server error',
- message: error instanceof Error ? error.message : String(error),
- processingTime: Date.now() - startTime,
+ message: error instanceof Error ? error.message : String(error, processingTime: Date.now() - startTime,
  },
  { status: 500 }
  );
  }
 };
 
-async function generateAIResponse(query: string, _context), unknown: Promise<string> {
+async function generateAIResponse(query: string, _context, unknown: Promise<string> {
  try {
  const response = await fetch('http://localhost:11434/api/generate', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: 'gemma3-legal:latest',
- prompt: `Legal AI Assistant: ${query}`,
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
+ prompt: `Legal AI Assistant: ${ query }`,
  stream: false,
- options: {
- temperature: 0.3, top_p: 0.9, num_ctx: 4096
+ options: { temperature: 0.3, top_p: 0.9, num_ctx: 4096
  },
  }),
  });
@@ -107,7 +99,7 @@ async function generateAIResponse(query: string, _context), unknown: Promise<str
  'Ollama connection failed, using fallback response: ',
  error instanceof Error ? error.message : String(error)
  );
- return `I understand you're asking about: "${query}". I'm currently experiencing connectivity issues with the AI service. Please try again later or contact support for assistance.`;
+ return `I understand you're asking about: "${ query }". I'm currently experiencing connectivity issues with the AI service. Please try again later or contact support for assistance.`;
  }
 }
 
@@ -117,8 +109,7 @@ const originalGETHandler: RequestHandler = async () => {
  const status = {
  service: 'enhanced-ai-chat',
  status: 'healthy',
- timestamp: new Date().toISOString(),
- features: ['basic-generation', 'ollama-integration'],
+ timestamp: new Date().toISOString(), features: ['basic-generation', 'ollama-integration'],
  };
  return json(status);
  } catch (error: Error | unknown) {
@@ -128,3 +119,7 @@ const originalGETHandler: RequestHandler = async () => {
 
 export const POST = (redisOptimized as RedisOptimizedMiddleware).aiChat(originalPOSTHandler);
 export const GET = (redisOptimized as RedisOptimizedMiddleware).aiChat(originalGETHandler);
+
+
+
+

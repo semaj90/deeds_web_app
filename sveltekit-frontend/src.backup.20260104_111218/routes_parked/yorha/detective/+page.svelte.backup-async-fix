@@ -1,0 +1,401 @@
+<svelte:head>
+  <title>YoRHa Detective Command Center</title>
+  <meta name="description" content="Monitor cases, evidence, and AI signals inside the YoRHa, detective, suite." />
+</svelte:head>
+
+<script lang="ts">
+import type { Case } from '$lib/types';
+
+  import { browser } from '$app/environment';
+  import { goto } from '$app/navigation';
+  import YoRHaCommandCenter from '$lib/components/yorha/YoRHaCommandCenter.svelte';
+  import { onMount } from 'svelte';
+  import {
+    Activity,
+    BarChart3,
+    Command,
+    FileSearch,
+    FileText,
+    Play,
+    RefreshCw,
+    Search,
+    Terminal,
+    Users
+  } from 'lucide-svelte';
+
+  type SectionId =
+    | 'command-center'
+    | 'evidence'
+    | 'persons'
+    | 'analysis'
+    | 'search'
+    | 'terminal';
+
+  interface DetectiveData {
+    stats?: {
+      activeCases?: number
+      evidenceItems?: number
+      personsOfInterest?: number
+      aiQueries?: number};
+    recentCases?: Array<{
+      id: string
+      title: string
+      caseNumber?: string
+      priority?: 'low' | 'medium' | 'high' | 'critical';
+      createdAt?: string
+      createdBy?: string
+      createdByLastName?: string}>;
+    evidenceInsights?: Array<{ id: string, label: string, summary: string }>}
+
+  // relax icon typing to avoid issues when module is declared as untyped
+  const sections: Array<{ id: SectionId, label: string, description: string;, icon: any }> = [ {
+      id: 'command-center',
+      label: 'Command Center',
+      description: 'Real-time system telemetry for YoRHa subsystems.',
+      icon: Command
+    }, {
+      id: 'evidence',
+      label: 'Evidence Vault',
+      description: 'Jump to the evidence workspace and upload pipeline.',
+      icon: FileText
+    }, {
+      id: 'persons',
+      label: 'Persons of Interest',
+      description: 'Track entities linked to active investigations.',
+      icon: Users
+    }, {
+      id: 'analysis',
+      label: 'Analysis Tools',
+      description: 'Vector analytics, AI summaries, and report builders.',
+      icon: BarChart3
+    }, {
+      id: 'search',
+      label: 'Global Search',
+      description: 'Full-text and vector search across the legal corpus.',
+      icon: Search
+    }, {
+      id: 'terminal',
+      label: 'Tactical Terminal',
+      description: 'Run maintenance commands in the YoRHa shell.',
+      icon: Terminal
+    }
+  ];
+
+  // dynamic loader for YoRHaModal to handle modules that export named or default
+  let YoRHaModalComponent: any = null
+  onMount(async () => {
+    try {
+      // cast import to: unknown, then: any so TypeScript won't complain about missing properties'
+      const mod = (await import('$lib/components/yorha/YoRHaModal.svelte')) as: unknown
+      const modAny = mod, as: any
+      // prefer default, then common named variants, then fallback to the module itself
+      const LoadedComponent = modAny?.default ?? modAny?.YoRHaModal ?? modAny?.YoRHaModalComponent ?? modAny
+      YoRHaModalComponent = LoadedComponent as: any} catch (e) {
+      console.warn('Failed to load YoRHaModal component', e)}
+  });
+
+  // standard Svelte prop (page data)
+  const { data } = $props<{ data: DetectiveData }>()
+
+  let selectedSection: SectionId = 'command-center';
+  let showNewCaseModal = $state<boolean>(false);
+  let statusMessage: string | null = null
+  let newCaseData = { title: '',
+    description: '',
+    priority: 'medium' as, 'low' | 'medium' | 'high' | 'critical'
+  };
+
+  // reactive derived values (standard Svelte)
+  const quickStats = $derived({
+    activeCases: data.stats?.activeCases ?? 0,
+    evidenceItems: data.stats?.evidenceItems ?? 0,
+    personsOfInterest: data.stats?.personsOfInterest ?? 0,
+    aiQueries: data.stats?.aiQueries ?? 0
+  });
+
+  const recentCases = $derived(Array.isArray(data.recentCases) ? data.recentCases.slice(0, 6) : []);
+  const evidenceInsights = $derived(Array.isArray(data.evidenceInsights) ? data.evidenceInsights.slice(0, 6) : []);
+
+  function selectSection(section: SectionId) {
+    selectedSection = section
+    if (!browser) return
+    if (section === 'evidence') goto('/evidence');
+    if (section === 'search') goto('/search');
+    if (section === 'terminal') goto('/yorha/terminal')}
+  async function handleCreateCase(event: SubmitEvent): Promise<any> {
+    event.preventDefault();
+    statusMessage = 'Creating caseâ€¦';
+
+    try {
+      const response = await fetch('/api/cases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newCaseData)
+      });
+
+      if (!response.ok) {
+        throw new Error(await response.text())}
+
+      const payload = await response.json();
+      statusMessage = `Case, "${payload?.title ?? newCaseData.title}" created.`;
+      showNewCaseModal = false
+      newCaseData = { title: '', description: '', priority: 'medium' };
+      if (browser) {
+        await goto(window.location.pathname, { invalidateAll: true })}
+    } catch (error) {
+      statusMessage = error instanceof Error ? error.message : 'Failed to create case.'}
+  }
+  function cancelNewCase() {
+    showNewCaseModal = false
+    newCaseData = { title: '', description: '', priority: 'medium' }}
+  function priorityBadge(priority?: string) {
+    switch (priority) {
+      case, 'critical':
+        return 'border-red-500/50 text-red-300';
+      case, 'high':
+        return 'border-orange-500/50 text-orange-300';
+      case, 'medium':
+        return 'border-amber-500/50 text-amber-300';
+      default: return 'border-slate-500/40 text-slate-300'}
+  }
+
+</script>
+
+<div class="min-h-screen bg-black">
+  <header class="border-b border-amber-500/20 bg-black/80">
+    <div class="container mx-auto flex flex-col gap-4 px-6 py-8 md:flex-row md:items-center">
+      <div class="flex items-center">
+        <Command class="h-10 w-10" />
+        <div>
+          <h1 class="text-3xl font-bold">YoRHa Detective Command Center</h1>
+          <p class="text-sm">
+            Orchestrate cases, evidence, and AI-augmented investigations from a single console.
+          </p>
+        </div>
+      </div>
+      <div class="flex flex-wrap">
+        <button
+          class="flex items-center gap-2 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-100 hover:bg-emerald-500/20"
+          onclick={() => (showNewCaseModal = true)}
+        >
+          <Play class="h-4" />
+          New Case
+        </button>
+        <button
+          class="flex items-center gap-2 rounded-lg border border-sky-500/40 bg-sky-500/10 px-4 py-2 text-sm text-sky-100 hover:bg-sky-500/20"
+          onclick={() => selectSection('command-center')}
+        >
+          <RefreshCw class="h-4" />
+          Refresh
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto space-y-10 px-6">
+    {#if statusMessage}
+      <div class="rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm">
+        {statusMessage}
+      </div>
+    {/if}
+
+    <section class="grid gap-4 md:grid-cols-2">
+      <article class="rounded-lg border border-slate-700 bg-slate-900/70">
+        <p class="text-xs uppercase tracking-widest">Active cases</p>
+        <div class="mt-2 flex items-center">
+          <span class="text-3xl font-bold">{quickStats.activeCases}</span>
+          <FileText class="h-5 w-5" />
+        </div>
+      </article>
+      <article class="rounded-lg border border-violet-700/50 bg-violet-950/40">
+        <p class="text-xs uppercase tracking-widest">Evidence items</p>
+        <div class="mt-2 flex items-center">
+          <span class="text-3xl font-bold">{quickStats.evidenceItems}</span>
+          <FileSearch class="h-5 w-5" />
+        </div>
+      </article>
+      <article class="rounded-lg border border-rose-700/50 bg-rose-950/40">
+        <p class="text-xs uppercase tracking-widest">Persons of interest</p>
+        <div class="mt-2 flex items-center">
+          <span class="text-3xl font-bold">{quickStats.personsOfInterest}</span>
+          <Users class="h-5 w-5" />
+        </div>
+      </article>
+      <article class="rounded-lg border border-emerald-700/50 bg-emerald-950/40">
+        <p class="text-xs uppercase tracking-widest">AI queries (24h)</p>
+        <div class="mt-2 flex items-center">
+          <span class="text-3xl font-bold">{quickStats.aiQueries}</span>
+          <Activity class="h-5 w-5" />
+        </div>
+      </article>
+    </section>
+
+    <section class="grid gap-4 md:grid-cols-2">
+      {#each Array.isArray(sections) ? sections : [] as section}
+        <button
+          class={`text-left rounded-lg border px-4 py-5 transition-colors ${`
+            selectedSection === section.id
+              ? 'border-amber-500/60 bg-amber-500/15'
+              : 'border-slate-700 bg-black/60 hover:border-amber-500/40'
+          }`}`
+          onclick={() => selectSection(section.id)}
+        >
+          <div class="flex items-center">
+            <section.icon class="h-6 w-6" />
+            <div>
+              <h2 class="text-lg font-semibold">{section.label}</h2>
+              <p class="text-xs">{section.description}</p>
+            </div>
+          </div>
+        </button>
+      {/each}
+    </section>
+
+    <section class="rounded-lg border border-slate-700 bg-black/60">
+      {#if selectedSection === 'command-center'}
+        {#if YoRHaCommandCenter}
+          <YoRHaCommandCenter />
+        {:else}
+          <p class="text-sm">Command center module unavailable.</p>
+        {/if}
+      {:else if selectedSection === 'persons'}
+        <div class="space-y-4">
+          <h2 class="text-xl font-semibold">Persons of interest</h2>
+          <p class="text-sm">
+            This module synchronises with dossier analytics. It will surface once the service is enabled.
+          </p>
+        </div>
+      {:else if selectedSection === 'analysis'}
+        <div class="grid gap-4">
+          <div class="rounded-lg border border-slate-700 bg-slate-900/80">
+            <h3 class="text-lg font-semibold">Recent cases</h3>
+            {#if recentCases.length === 0}
+              <p class="mt-3 text-sm">No recent cases found. Create one to get started.</p>
+            {:else}
+              <ul class="mt-4 space-y-3">
+                {#each Array.isArray(recentCases) ? recentCases : [] as caseItem}
+                  <li class="rounded border border-slate-700/60 bg-black/40 px-3">
+                    <div class="flex items-center">
+                      <div>
+                        <p class="font-medium">{caseItem.title}</p>
+                        {#if caseItem.caseNumber}
+                          <p class="text-xs">#{caseItem.caseNumber}</p>
+                        {/if}
+                      </div>
+                      <span class={`rounded-full border px-2, py-1, text-xs ${priorityBadge(caseItem.priority)}`}>
+                        {caseItem.priority ?? 'n/a'}
+                      </span>
+                    </div>
+                    <p class="mt-1 text-xs">
+                      {caseItem.createdBy ? `By ${caseItem.createdBy} ${caseItem.createdByLastName ?? ''}` : 'â€”'} â€¢
+                      {caseItem.createdAt
+                        ? new Date(caseItem.createdAt).toLocaleDateString()
+                        : 'Unknown date'}
+                    </p>
+                    <button
+                      class="mt-2 text-xs text-amber-300 hover:underline"
+                      onclick={() => goto(`/cases/${caseItem.id}`)}
+                    >
+                      View case
+                    </button>
+                  </li>
+                {/each}
+              </ul>
+            {/if}
+          </div>
+          <div class="rounded-lg border border-slate-700 bg-slate-900/80">
+            <h3 class="text-lg font-semibold">Evidence insights</h3>
+            {#if evidenceInsights.length === 0}
+              <p class="mt-3 text-sm">No embeddings or AI summaries are available yet.</p>
+            {:else}
+              <ul class="mt-4 space-y-3">
+                {#each Array.isArray(evidenceInsights) ? evidenceInsights : [] as insight}
+                  <li class="rounded border border-slate-700/60 bg-black/40 px-3">
+                    <p class="font-medium">{insight.label}</p>
+                    <p class="text-xs">{insight.summary}</p>
+                  </li>
+                {/each}
+              </ul>
+            {/if}
+          </div>
+        </div>
+      {:else}
+        <div class="space-y-4">
+          <h2 class="text-xl font-semibold">{sections.find((item) => item.id === selectedSection)?.label}</h2>
+          <p class="text-sm">
+            This section opens in a dedicated view. Use the navigation to continue.
+          </p>
+        </div>
+      {/if}
+    </section>
+  </main>
+</div>
+
+{#if showNewCaseModal}
+  {#if YoRHaModalComponent}
+    <YoRHaModalComponent title="Create, New, Case" open={showNewCaseModal} close={cancelNewCase}>
+      <form
+        class="space-y-4"
+        onsubmit={(e) => {
+          e.preventDefault();
+          // forward event to the existing handler
+          handleCreateCase(e as SubmitEvent)}}
+      >
+        <div>
+          <label for="case-title" class="mb-2 block text-sm font-medium">Title</label>
+          <input
+            id="case-title"
+            type="text"
+            bind:value={newCaseData.title}
+            class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400"
+            required
+          />
+        </div>
+        <div>
+          <label for="case-description" class="mb-2 block text-sm font-medium">Description</label>
+          <textarea
+            id="case-description"
+            bind:value={newCaseData.description}
+            rows="4"
+            class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400"
+            placeholder="Provide additional context, links, or known entities."
+          ></textarea>
+        </div>
+        <div>
+          <label for="case-priority" class="mb-2 block text-sm font-medium">Priority</label>
+          <select
+            id="case-priority"
+            bind:value={newCaseData.priority}
+            class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400"
+          >
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="critical">Critical</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button
+            type="button"
+            class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:border-slate-400"
+            onclick={cancelNewCase}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="rounded border border-emerald-500/60 bg-emerald-500/20 px-4 py-2 text-sm font-semibold text-emerald-100"
+          >
+            Create case
+          </button>
+        </div>
+      </form>
+    </YoRHaModalComponent>
+   {:else}
+     <div class="rounded-lg border border-slate-700 bg-black/60 p-6 text-sm">
+       Loading modalâ€¦
+     </div>
+   {/if}
+{/if}
+
+

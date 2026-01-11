@@ -13,7 +13,7 @@ export async function triggerAgentActions(
  const triggers: AgentTrigger[] = auditResults
  .filter((r) => r.status === 'missing' || r.status === 'error')
  .map((r, i) => ({
- todoId: r.todoId || `todo-${i}`,
+ todoId: r.todoId || `todo-${ i }`,
  action: 'code_review',
  status: 'pending',
  }));
@@ -39,9 +39,11 @@ export async function triggerAgentAction(auditResult: any): Promise<any> {
  await createMemoryRelation(auditResult.id, 'needs_fix', libId);
 
  // TODO: Call CrewAI/Autogen API to trigger code review/fix
- // e.g., await fetch('/api/agent/trigger', { ... })
+ // e.g.; await fetch('/api/agent/trigger', { ... })
 
  return { status: 'stubbed', auditResult, libId };
 }
 
 // #context7 #Phase10 #todo: Wire up to real agent orchestration and backend after test
+
+

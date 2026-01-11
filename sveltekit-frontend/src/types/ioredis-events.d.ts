@@ -8,3 +8,5 @@ declare module 'ioredis' {
  */
  interface Redis extends EventEmitter {}
 }
+
+

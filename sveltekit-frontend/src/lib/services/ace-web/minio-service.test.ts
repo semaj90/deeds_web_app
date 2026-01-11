@@ -14,11 +14,7 @@ vi.mock('@aws-sdk/client-s3', () => {
   return {
     S3Client: vi.fn(() => ({
       send: mockSend,
-    })),
-    PutObjectCommand: vi.fn((input) => ({ input })),
-    GetObjectCommand: vi.fn((input) => ({ input })),
-    HeadObjectCommand: vi.fn((input) => ({ input })),
-    DeleteObjectCommand: vi.fn((input) => ({ input })),
+    }, PutObjectCommand: vi.fn((input) => ({ input }, GetObjectCommand: vi.fn((input) => ({ input }, HeadObjectCommand: vi.fn((input) => ({ input }, DeleteObjectCommand: vi.fn((input) => ({ input })),
   };
 });
 
@@ -149,8 +145,7 @@ describe('MinIOService', () => {
       const docId = 'doc-456';
       const chunks = [
         { text: 'Chunk 1 content', metadata: { index: 0 } },
-        { text: 'Chunk 2 content', metadata: { index: 1 } },
-      ];
+        { text: 'Chunk 2 content', metadata: { index: 1 } }];
 
       const key = await service.storeChunks(docId, chunks);
 
@@ -181,8 +176,7 @@ describe('MinIOService', () => {
     it('should retrieve object successfully', async () => {
       const mockContent = 'Test content';
       mockSend.mockResolvedValueOnce({
-        Body: {
-          transformToString: async () => mockContent,
+        Body: { transformToString: async () => mockContent,
         },
       });
 
@@ -347,3 +341,6 @@ describe('MinIOService', () => {
     });
   });
 });
+
+
+

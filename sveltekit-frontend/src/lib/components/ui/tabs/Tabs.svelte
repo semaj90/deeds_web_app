@@ -1,4 +1,6 @@
 <script lang="ts" module>
+	let className = $state<any>(undefined);
+
 	// Re-export sub-components for compound component pattern
 	export { default as Content } from './TabsContent.svelte';
 	export { default as List } from './TabsList.svelte';
@@ -18,8 +20,7 @@
 	 * For more control, use the individual sub-components (Tabs.Root, Tabs.List, etc.)
 	 */
 	interface TabItem {
-		value: string;
-		label: string;
+		value: string; label: string;
 		disabled?: boolean;
 	}
 
@@ -39,7 +40,7 @@
 	}: Props = $props();
 </script>
 
-<TabsRoot bind:value {defaultValue} {onValueChange} class={className} {orientation}>
+<TabsRoot bind:value { defaultValue } { onValueChange } class={className} { orientation }>
 	{#if tabs.length > 0}
 		<TabsList>
 			{#each tabs as tab}
@@ -54,3 +55,6 @@
 		{@render children()}
 	{/if}
 </TabsRoot>
+
+
+

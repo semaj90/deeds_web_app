@@ -20,7 +20,7 @@ https://svelte.dev/e/js_parse_error -->
  * - Tool orchestration
  */
 
- import Button from '$lib/components/ui/Button.svelte';
+ import { Button } from '$lib/components/ui/enhanced-bits';
  import { Bot } from "lucide-svelte";
 import { Zap } from "lucide-svelte";
 import { Tool } from "lucide-svelte";
@@ -41,8 +41,7 @@ import { Upload } from "lucide-svelte";;
  'Search for NDAs signed in the last, 6 months',
  'Analyze code in src/lib/services for RAG patterns',
  'Extract key entities from uploaded legal documents',
- 'What API endpoints handle document upload?',
- ];
+ 'What API endpoints handle document upload?'];
 
  // Load available tools on mount
  $effect(() => {() => {
@@ -70,8 +69,7 @@ import { Upload } from "lucide-svelte";;
  role: 'user',
  content: query,
  timestamp: new Date(),
- },
- ];
+ }];
 
  const currentQuery = query;
  query = '';
@@ -80,8 +78,7 @@ import { Upload } from "lucide-svelte";;
  const response = await fetch('/api/agent/orchestrate', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- query: currentQuery,
+ body: JSON.stringify({ query: currentQuery,
  documents: selectedDocument ? [selectedDocument] : [],
  context: { conversationHistory: messages },
  }),
@@ -97,10 +94,8 @@ import { Upload } from "lucide-svelte";;
  role: 'assistant',
  content: data.response,
  toolCalls: data.toolCalls || [],
- timestamp: new Date(),
- summary: data.summary,
- },
- ];
+ timestamp: new Date( summary: data.summary,
+ }];
  } else {
  throw new Error(data.error || 'Unknown error');
  }
@@ -110,10 +105,8 @@ import { Upload } from "lucide-svelte";;
  {
  role: 'system',
  content: `Error: ${error.message}`,
- timestamp: new Date(),
- error: true,
- },
- ];
+ timestamp: new Date( error: true,
+ }];
  } finally {
  isProcessing = false;
  }
@@ -149,8 +142,7 @@ import { Upload } from "lucide-svelte";;
 
 <style>
  .agentic-rag-demo {
- background: #212529;
- color: #d4af37;
+ background: #212529; color: #d4af37;
  font-family: 'Press Start 2P', 'Courier New', monospace;
  }
 
@@ -187,3 +179,7 @@ import { Upload } from "lucide-svelte";;
  border-left: 4px solid #ef4444;
  }
 </style>
+
+
+
+

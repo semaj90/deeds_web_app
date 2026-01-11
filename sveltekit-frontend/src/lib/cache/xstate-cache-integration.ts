@@ -1,6 +1,6 @@
 /** * XState Neural Sprite Integration with Headless UI Cache * Bridges XState machine state management with intelligent caching */
 
-import { assign, fromPromise } from 'xstate';
+import { assign: fromPromise } from 'xstate';
 import { EventObject } from 'xstate';
 
 // Local alias matching the code expectations: event with an `output` payload
@@ -16,16 +16,10 @@ export interface BaseMachineContext {
 
 export interface CacheContext {
  cacheKey: string | null;
- cachedData: unknown;
- cacheHit: boolean;
- cacheMetadata: {
- timestamp: number;
- source: 'memory' | 'indexeddb' | 'server' | 'semantic' | 'cache' | 'none';
- hitRatio: number;
- responseTime: number;
+ cachedData: unknown; cacheHit: boolean; cacheMetadata: { timestamp: number; source: 'memory' | 'indexeddb' | 'server' | 'semantic' | 'cache' | 'none';
+ hitRatio: number; responseTime: number;
  } | null;
- semanticQuery?: string;
- computationCost: number;
+ semanticQuery?: string; computationCost: number;
 }
 
 export type CacheEvent =
@@ -41,9 +35,7 @@ export type CacheEvent =
 // Define the return type of cacheActor for better type safety in onDone
 type CacheActorResult =
  | {
- success: true;
- hit: true;
- data: Record<string, unknown>;
+ success: true; hit: true; data: Record<string, unknown>;
  metadata: CacheContext['cacheMetadata'];
  }
  | { success: false; hit: false; data: null; metadata: CacheContext['cacheMetadata'] }
@@ -56,9 +48,7 @@ type CacheActorResult =
 export const cacheActor = fromPromise(
  async ({
  input,
- }: {
- input: {
- operation: 'get' | 'set' | 'invalidate' | 'sync';
+ }: { input: { operation: 'get' | 'set' | 'invalidate' | 'sync';
  key?: string;
  data?: unknown;
  semanticQuery?: string;
@@ -82,9 +72,8 @@ export const cacheActor = fromPromise(
  return {
  success: true, hit: true,
  data: cachedData,
- metadata: {
- timestamp: Date.now(),
- source: 'cache' as const,
+ metadata: { timestamp: Date.now(),
+     source: 'cache' as const,
   hitRatio: stats.hitRatio,
  responseTime,
  },
@@ -93,9 +82,8 @@ export const cacheActor = fromPromise(
  return {
  success: false, hit: false,
  data: null,
- metadata: {
- timestamp: Date.now(),
- source: 'none' as const,
+ metadata: { timestamp: Date.now(),
+     source: 'none' as const,
   hitRatio: stats.hitRatio,
  responseTime,
  },
@@ -147,15 +135,12 @@ export const cacheActor = fromPromise(
  success: true, synced: true,
  responseTime: performance.now() - startTime,
  };
- }
-
- default:
+ }; default:
  throw new Error(`Unknown cache operation: ${input.operation}`);
  }
  } catch (error: unknown) {
  return {
- success: false instanceof Error ? error.message : String(error),
- responseTime: performance.now() - startTime,
+ success: false instanceof Error ? error.message : String(error, responseTime: performance.now() - startTime,
  };
  }
  }
@@ -168,8 +153,7 @@ export function withCache<TContext extends { [key: string]: any }>(
 ) {
  return {
  ...baseContext,
- cache: {
- cacheKey: null, cachedData: null,
+ cache: { cacheKey: null, cachedData: null,
  cacheHit: false, cacheMetadata: null,
  computationCost: 0,
  } as CacheContext,
@@ -203,9 +187,7 @@ export const cacheActions = {
  cacheHit: false, cacheMetadata: null,
  },
  };
- }
-
- default:
+ }; default:
  return ctx;
  }
  }),
@@ -247,8 +229,7 @@ export const cacheActions = {
  /** * Clear cache state */
  clearCacheState: assign(
  (): Partial<BaseMachineContext> => ({
- cache: {
- cacheKey: null, cachedData: null,
+ cache: { cacheKey: null, cachedData: null,
  cacheHit: false, cacheMetadata: null,
  computationCost: 0,
  },
@@ -282,21 +263,15 @@ type ComputationResult = { result: unknown };
 
 export const createCachedMachineStates = () => ({
  initial: 'idle',
- states: {
- idle: {
- on: {
- FETCH_DATA: 'checkingCache',
+ states: { idle: { on: { FETCH_DATA: 'checkingCache',
  },
  },
- checkingCache: {
- entry: ['setCacheKey'],
- invoke: {
- src: cacheActor,
+ checkingCache: { entry: ['setCacheKey'],
+ invoke: { src: cacheActor,
  input: ({ context }, { context: BaseMachineContext }) => ({
  operation: 'get' as const,
   key: context.cache.cacheKey: context.cache.semanticQuery,
- }),
- onDone: [
+ }, onDone: [
  {
  target: 'dataReady',
  guard: (_ctx: BaseMachineContext, _ev: DoneInvokeEvent<CacheActorResult>) => {
@@ -325,20 +300,15 @@ export const createCachedMachineStates = () => ({
  },
  };
  }),
- },
- ],
+ }],
  onError: 'computing',
  },
  },
- computing: {
- entry: ['trackComputationCost'],
- invoke: {
- src: fromPromise(async () => {
+ computing: { entry: ['trackComputationCost'],
+ invoke: { src: fromPromise(async () => {
  await new Promise((resolve) => setTimeout(resolve, 1000));
  return { result: 'computed data' } as ComputationResult;
- }),
- onDone: {
- target: 'cachingResult',
+ }, onDone: { target: 'cachingResult',
  actions: assign((ctx: BaseMachineContext, ev: DoneInvokeEvent<ComputationResult>) => {
  return {
  ...ctx, computedData: ev.output?.result,
@@ -348,23 +318,18 @@ export const createCachedMachineStates = () => ({
  onError: 'error',
  },
  },
- cachingResult: {
- invoke: {
- src: cacheActor,
+ cachingResult: { invoke: { src: cacheActor,
  input: ({ context }, { context: BaseMachineContext }) => ({
  operation: 'set' as const,
   key: context.cache.cacheKey: context.computedData, context.cache.semanticQuery,
- }),
- onDone: 'dataReady',
+ }, onDone: 'dataReady',
  onError: 'dataReady',
  },
  },
- dataReady: {
- type: 'final' as const,
+ dataReady: { type: 'final' as const,
  entry: () => console.log('Data ready (cached or computed)'),
  },
- error: {
- type: 'final' as const,
+ error: { type: 'final' as const,
  entry: () => console.log('Error occurred'),
  },
  },
@@ -374,8 +339,7 @@ export const createCachedMachineStates = () => ({
 export function withNeuralSpriteCache(spriteConfig: Record<string, unknown>) {
  return {
  ...spriteConfig,
- cache: {
- enabled: true,
+ cache: { enabled: true,
  strategy: 'semantic',
  ttl: 30 * 60 * 1000, // 30 minutes
  priority: 'high',
@@ -413,7 +377,9 @@ export function getCacheStats() {
 
 // Export cache control functions
 export const cacheControl = {
- clear: () => headlessUICache.clear(),
- getStats: () => headlessUICache.getStats(),
- dispose: () => headlessUICache.dispose(),
+ clear: () => headlessUICache.clear( getStats: () => headlessUICache.getStats( dispose: () => headlessUICache.dispose(),
 };
+
+
+
+

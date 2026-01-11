@@ -21,18 +21,15 @@ import type { string, boolean } from "fast-check";
 import type { ErrorReport, ErrorRelationship, FixStrategy, SimilarError } from './types.js';
 
 export interface KAGConfig {
-	neo4jUrl: string, neo4jUser: string;
-	neo4jPassword: string, maxDepth: number;
+	neo4jUrl: string, neo4jUser: string; neo4jPassword: string, maxDepth: number;
 }
 
 export interface GraphNode {
-	id: string, labels: string[];
-	properties: Record<string, unknown>;
+	id: string, labels: string[]; properties: Record<string, unknown>;
 }
 
 export interface GraphPath {
-	nodes: GraphNode[], relationships: ErrorRelationship[];
-	length: number;
+	nodes: GraphNode[], relationships: ErrorRelationship[]; length: number;
 }
 
 export class KAGTraverser {
@@ -46,10 +43,10 @@ export class KAGTraverser {
 
 	constructor(config?: Partial<KAGConfig>) {
 		this.config = {
-			neo4jUrl: config?.neo4jUrl || process.env.NEO4J_URL || 'bolt://localhost:7687',
-			neo4jUser: config?.neo4jUser || process.env.NEO4J_USER || 'neo4j',
-			neo4jPassword: config?.neo4jPassword || process.env.NEO4J_PASSWORD || 'password',
-			maxDepth: config?.maxDepth || 5
+			neo4jUrl: config?.neo4jUrl ?? process.env.NEO4J_URL || 'bolt://localhost:7687',
+			neo4jUser: config?.neo4jUser ?? process.env.NEO4J_USER || 'neo4j',
+			neo4jPassword: config?.neo4jPassword ?? process.env.NEO4J_PASSWORD || 'password',
+			maxDepth: config?.maxDepth ?? 5
 		};
 		this.initPromise = this.initialize();
 	}
@@ -67,10 +64,8 @@ export class KAGTraverser {
 					'Content-Type': 'application/json',
 					'Authorization': 'Basic ' + Buffer.from(`${this.config.neo4jUser}, ${this.config.neo4jPassword}`).toString('base64')
 				},
-				body: JSON.stringify({
-					statements: [{ statement: 'RETURN 1 as test' }]
-				}),
-				signal: AbortSignal.timeout(5000)
+				body: JSON.stringify({ statements: [{ statement: 'RETURN 1 as test' }]
+				}, signal: AbortSignal.timeout(5000)
 			});
 
 			this.available = response.ok;
@@ -103,10 +98,8 @@ export class KAGTraverser {
 					'Content-Type': 'application/json',
 					'Authorization': 'Basic ' + Buffer.from(`${this.config.neo4jUser}, ${this.config.neo4jPassword}`).toString('base64')
 				},
-				body: JSON.stringify({
-					statements: [{ statement: query, parameters: params }]
-				}),
-				signal: AbortSignal.timeout(30000)
+				body: JSON.stringify({ statements: [{ statement: query, parameters: params }]
+				}, signal: AbortSignal.timeout(30000)
 			});
 
 			if (!response.ok) {
@@ -120,7 +113,7 @@ export class KAGTraverser {
 			}
 
 			// Extract results
-			const results = data.results?.[0]?.data || [];
+			const results = data.results?.[0]?.data ?? [];
 			return results.map((r: any) => r.row);
 		} catch (error) {
 			console.warn(`⚠️  Cypher query failed: ${error instanceof Error ? error.message : String(error)}`);
@@ -149,8 +142,7 @@ export class KAGTraverser {
 		return results.map(row => ({
 			from: row[0],
 			to: row[2],
-			type: this.normalizeRelationType(row[1]),
-			weight: row[3] || 1.0
+			type: this.normalizeRelationType(row[1], weight: row[3] || 1.0
 		}));
 	}
 
@@ -222,11 +214,10 @@ export class KAGTraverser {
 		`;
 
 		const relatedFixes = await this.executeCypher(query, { errorId });
-
-		// Augment strategies with graph insights
+  
 		return strategies.map(strategy => {
 			const graphInsight = relatedFixes.find(f =>
-				strategy.description.toLowerCase().includes(f[1]?.toLowerCase() || '')
+				strategy.description.toLowerCase().includes(f[1]?.toLowerCase() ?? '')
 			);
 
 			if (graphInsight) {
@@ -288,7 +279,7 @@ export class KAGTraverser {
 	/**
 	 * Link error to fix strategy
 	 */
-	async linkErrorToFix(errorId: string, strategyId: string), string: Promise<boolean> {
+	async linkErrorToFix(errorId: string, strategyId: string, string: Promise<boolean> {
 		const relType = success ? 'FIXED_BY' : 'ATTEMPTED_FIX';
 		const query = `
 			MATCH (e:Error {id: $errorId})
@@ -354,3 +345,7 @@ export function getKAGTraverser(config?: Partial<KAGConfig>): KAGTraverser {
 	}
 	return kagTraverserInstance;
 }
+
+
+
+

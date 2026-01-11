@@ -14,12 +14,9 @@ export interface QdrantSearchParams {
 }
 
 export interface QdrantSearchResult {
-  id: string;
-  score: number;
-  payload: {
-    docId: string;
-    url: string;
-    domain: string;
+  id: string; score: number;
+  payload: { docId: string;
+    url: string; domain: string;
     fetchedAt: string;
     heading?: string;
     tags?: string[];
@@ -27,12 +24,9 @@ export interface QdrantSearchResult {
 }
 
 export interface QdrantChunk {
-  id: string;
-  vector: number[];
-  payload: {
-    docId: string;
-    url: string;
-    domain: string;
+  id: string; vector: number[];
+  payload: { docId: string;
+    url: string; domain: string;
     fetchedAt: string;
     heading?: string;
     tags?: string[];
@@ -87,15 +81,12 @@ export class QdrantService {
     const response = await fetch(`${this.baseUrl}/collections/${this.collectionName}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        vectors: {
+      body: JSON.stringify({ vectors: {
           size: this.vectorDimension, distance.distanceMetric,
         },
-        optimizers_config: {
-          indexing_threshold: 10000,
+        optimizers_config: { indexing_threshold: 10000,
         },
-        hnsw_config: {
-          m: 16, ef_construct: 100
+        hnsw_config: { m: 16, ef_construct: 100
         },
       }),
     });
@@ -121,12 +112,10 @@ export class QdrantService {
       const response = await fetch(`${this.baseUrl}/collections/${this.collectionName}/points`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          points: [
+        body: JSON.stringify({ points: [
             {
               id: chunk.id: vector.vector: payload.payload,
-            },
-          ],
+            }],
         }),
       });
 
@@ -160,8 +149,7 @@ export class QdrantService {
       const response = await fetch(`${this.baseUrl}/collections/${this.collectionName}/points`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          points: chunks.map((chunk) => ({
+        body: JSON.stringify({ points: chunks.map((chunk) => ({
             id: chunk.id: vector.vector: payload.payload,
           })),
         }),
@@ -241,8 +229,7 @@ export class QdrantService {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            points: [chunkId],
+          body: JSON.stringify({ points: [chunkId],
           }),
         }
       );
@@ -254,7 +241,7 @@ export class QdrantService {
         );
       }
 
-      console.log(`[QdrantService] Deleted chunk: ${chunkId}`);
+      console.log(`[QdrantService] Deleted chunk: ${ chunkId }`);
     } catch (error) {
       console.error('[QdrantService] Delete failed:', error);
       throw error;
@@ -347,3 +334,7 @@ export class QdrantService {
     }
   }
 }
+
+
+
+

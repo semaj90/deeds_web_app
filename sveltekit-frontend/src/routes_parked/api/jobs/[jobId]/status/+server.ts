@@ -10,7 +10,7 @@ import { jobQueueService } from '$lib/server/services/job-queue.service';
 /**
  * GET: Get job status
  */
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({ params: locals }) => {
  try {
  const user = await getUser(locals);
  if (!user) {

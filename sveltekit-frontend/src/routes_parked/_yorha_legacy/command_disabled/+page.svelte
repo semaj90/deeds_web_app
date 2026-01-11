@@ -28,8 +28,7 @@
  updated: '1 day ago',
  risk: 'medium' as const,
  status: 'pending' as const,
- },
- ] as const;
+ }] as const;
 
  const systemStatus = [
  {
@@ -46,8 +45,7 @@
  type: 'info',
  message: 'New facial recognition matches found',
  time: '2 hours ago',
- },
- ];
+ }];
 </script>
 
 <div class="grid grid-cols-[2fr_1fr] gap-4">
@@ -73,7 +71,7 @@
  <Panel>
  <div class="flex items-center justify-between mb-3">
  <div class="heading-sub">Active Cases</div>
- <Button variant="secondary">View All</Button>
+ <Button class="bits-btn" variant="secondary">View All</Button>
  </div>
 
  <div class="flex flex-col gap-3">
@@ -93,7 +91,7 @@
  </div>
  <div class="flex flex-col items-end gap-2">
  <StatusPill risk={c.risk} status={c.status} />
- <Button variant="primary">Open Case</Button>
+ <Button class="bits-btn" variant="primary">Open Case</Button>
  </div>
  </div>
  </Card>
@@ -128,9 +126,9 @@
  <Panel>
  <div class="heading-sub mb-3">Quick Actions</div>
  <div class="flex flex-col gap-2">
- <Button variant="secondary">Open Evidence Board</Button>
- <Button variant="secondary">Timeline Analysis</Button>
- <Button variant="secondary">
+ <Button class="bits-btn" variant="secondary">Open Evidence Board</Button>
+ <Button class="bits-btn" variant="secondary">Timeline Analysis</Button>
+ <Button class="bits-btn" variant="secondary">
  <span class="i-heroicons-chat-bubble-left-right mr-2" ></span>
  AI Sentencing Assistant
  </Button>
@@ -138,3 +136,5 @@
  </Panel>
  </div>
 </div>
+
+

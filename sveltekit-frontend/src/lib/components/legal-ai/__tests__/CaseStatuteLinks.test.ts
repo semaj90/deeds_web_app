@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { render, screen, fireEvent, waitFor } from '@testing-library/svelte';
 import CaseStatuteLinks from '../CaseStatuteLinks.svelte';
 
@@ -23,8 +23,7 @@ describe('CaseStatuteLinks Component', () => {
  statute_code: '18 U.S.C. § 1001',
  link_type: 'CHARGED_UNDER',
  notes: 'Primary charge',
- created_at: new Date().toISOString(),
- updated_at: new Date().toISOString(),
+ created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
  },
  {
  id: 'link-2',
@@ -32,10 +31,8 @@ describe('CaseStatuteLinks Component', () => {
  statute_code: 'Cal. Penal Code § 187',
  link_type: 'CITED_IN',
  notes: 'Supporting statute',
- created_at: new Date().toISOString(),
- updated_at: new Date().toISOString(),
- },
- ] as const;
+ created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+ }] as const;
 
  const mockStats = {
  total: 2,
@@ -187,3 +184,6 @@ describe('CaseStatuteLinks Component', () => {
  });
  });
 });
+
+
+

@@ -1,12 +1,11 @@
-import type { allRoutes } from '$lib/data/routes-config';
+import { allRoutes } from '$lib/data/routes-config';
 import { error } from '@sveltejs/kit';
 
 /**
  * Local (minimal) types to avoid hard coupling to external shape.
  */
 export interface RouteDefinition {
- id: string;
- route: string;
+ id: string; route: string;
  category?: string;
  status?: string;
  tags?: string[];
@@ -17,8 +16,7 @@ export interface RouteDefinition {
 
 /** Pattern config used to generate routes */
 export interface DynamicRouteConfig {
- pattern: string;
- template: string;
+ pattern: string; template: string;
  component?: string;
  layout?: string;
  params?: Record<string, { optional?: boolean; type?: string }>;
@@ -29,18 +27,14 @@ export interface DynamicRouteConfig {
 
 /** Generated route shape */
 export interface GeneratedRoute {
- id: string;
- path: string;
+ id: string; path: string;
  component: string;
- layout?: string;
- params: Record<string, { optional?: boolean; type?: string }>;
+ layout?: string; params: Record<string, { optional?: boolean; type?: string }>;
  metadata: {
  category?: string;
  status?: string;
- tags?: string[];
- preload: boolean;
- ssr: boolean;
- hydrate: boolean;
+ tags?: string[]; preload: boolean;
+ ssr: boolean; hydrate: boolean;
  label?: string;
  };
 }
@@ -108,7 +102,7 @@ export class DynamicRouteGenerator {
 
  private createRouteFromConfig(routeConfig: RouteDefinition): GeneratedRoute {
  const patternKey = this.findMatchingPattern(routeConfig);
- const cfg = patternKey ? this.patterns.get(patternKey)  | undefined;
+ const cfg = patternKey ? this.patterns.get(patternKey) : undefined;
  const path = routeConfig.route || '/';
  const component = cfg?.component ?? routeConfig.component ?? this.inferComponentPath(path);
  const layout = cfg?.layout ?? routeConfig.layout;
@@ -120,8 +114,7 @@ export class DynamicRouteGenerator {
  component,
  layout,
  params,
- metadata: {
- category: routeConfig.category,
+ metadata: { category: routeConfig.category,
  status: routeConfig.status,
  tags: routeConfig.tags ?? [],
  preload: cfg?.preload ?? true,
@@ -192,8 +185,7 @@ export class DynamicRouteGenerator {
  component: config.component!,
  layout: config.layout,
  params: config.params ?? this.extractParams(path),
- metadata: {
- category: 'dynamic',
+ metadata: { category: 'dynamic',
  status: 'active',
  tags: ['dynamic'],
  preload: Boolean(config.preload),
@@ -237,20 +229,16 @@ export class DynamicRouteGenerator {
  public getRouteManifest(): Record<
  string,
  {
- id: string;
- component: string;
- layout?: string;
- params: Record<string, { optional?: boolean; type?: string }>;
+ id: string; component: string;
+ layout?: string; params: Record<string, { optional?: boolean; type?: string }>;
  metadata: GeneratedRoute['metadata'];
  }
  > {
  const manifest: Record<
  string,
  {
- id: string;
- component: string;
- layout?: string;
- params: Record<string, { optional?: boolean; type?: string }>;
+ id: string; component: string;
+ layout?: string; params: Record<string, { optional?: boolean; type?: string }>;
  metadata: GeneratedRoute['metadata'];
  }
  > = {};
@@ -286,7 +274,7 @@ export class DynamicRouteGenerator {
  for (const [paramName, paramCfg] of Object.entries(r.params)) {
  const optional = paramCfg.optional ? '?' : '';
  const t = paramCfg.type ?? 'string';
- types += ` ${paramName}${optional}: ${t};\n`;
+ types += ` ${ paramName }${optional}: ${t};\n`;
  }
  types += ' };\n';
  }
@@ -342,7 +330,7 @@ export function createDynamicRouteHandler(route: GeneratedRoute) {
  return async (event: { params?: Record<string, string | undefined> }) => {
  const params: Record<string, string | undefined> = event?.params ?? {};
  // Validate required params
- for (const [name, cfg] of Object.entries(route.params || {})) {
+ for (const [name, cfg] of Object.entries(route.params ?? {})) {
  if (!cfg.optional) {
  const val = params[name];
  if (val == null || val === '') {
@@ -353,3 +341,8 @@ export function createDynamicRouteHandler(route: GeneratedRoute) {
  return { route: params.metadata };
  };
 }
+
+
+
+
+

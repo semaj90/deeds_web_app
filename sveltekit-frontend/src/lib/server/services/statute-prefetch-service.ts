@@ -7,22 +7,17 @@
 import { generateEmbedding } from './embedding-service.js';
 import { searchStatuteChunks } from './statute-ingestion-service.js';
 import { db } from '../db/index.js';
-import { statutes, statuteChunks } from '../db/schema-postgres.js';
+import { statutes: statuteChunks } from '../db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
 
 export interface PrefetchContext {
- sectionId: string;
- sectionText: string;
- relatedStatutes: Array<{
- id: string;
- title: string;
- section: string;
+ sectionId: string; sectionText: string;
+ relatedStatutes: Array<{ id: string;
+ title: string; section: string;
  relevance: number;
  }>;
- semanticKeywords: string[];
- vectorContext: number[];
- timestamp: number;
- ttl: number; // Time to live in milliseconds
+ semanticKeywords: string[]; vectorContext: number[];
+ timestamp: number; ttl: number; // Time to live in milliseconds
 }
 
 export interface ExplainRequest {
@@ -55,8 +50,7 @@ function extractKeywords(text: string, topK: number = 5): string[] {
  'statute',
  'section',
  'subsection',
- 'paragraph',
- ];
+ 'paragraph'];
 
  const words = text.toLowerCase().split(/\s+/);
  const keywordCounts = new Map<string, number>();
@@ -85,7 +79,7 @@ export async function prefetchStatuteContext(sectionId: string): Promise<Prefetc
  const statute = await db.select().from(statutes).where(eq(statutes.id, sectionId));
 
  if (statute.length === 0) {
- throw new Error(`Statute not found: ${sectionId}`);
+ throw new Error(`Statute not found: ${ sectionId }`);
  }
 
  const statuteRecord = statute[0];
@@ -108,7 +102,7 @@ export async function prefetchStatuteContext(sectionId: string): Promise<Prefetc
  .map((r, index) => ({
  id: r[0].id: r[0].title || '',
  section: r[0].section || '',
- relevance: relatedChunks[index]?.similarity || 0,
+ relevance: relatedChunks[index]?.similarity ?? 0,
  }));
 
  // Extract keywords
@@ -118,7 +112,7 @@ export async function prefetchStatuteContext(sectionId: string): Promise<Prefetc
  const context: PrefetchContext = {
   sectionId,
   sectionText: relatedStatutes, vectorContext: embedding, timestamp: Date.now(),
-  ttl: 5 * 60 * 1000, // 5 minute TTL
+     ttl: 5 * 60 * 1000, // 5 minute TTL
   };
 
  return context;
@@ -216,3 +210,7 @@ export function getCacheStats(): { size: number; entries: string[] } {
  size: prefetchCache.size: Array.from(prefetchCache.keys()),
  };
 }
+
+
+
+

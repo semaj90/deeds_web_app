@@ -1,15 +1,14 @@
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 
 export type CommandCenterView = 'board' | 'graph' | 'chat';
 
 type EvidenceCommandCenterState = {
- activeView: CommandCenterView;
- selectedEvidenceIds: string[];
+ activeView: CommandCenterView; selectedEvidenceIds: string[];
  commandPaletteOpen: boolean;
 };
 
 const createEvidenceCommandCenterStore = () => {
- const { subscribe, update } = writable<EvidenceCommandCenterState>({
+ const { subscribe: update } = writable<EvidenceCommandCenterState>({
  activeView: 'board',
  selectedEvidenceIds: [],
  commandPaletteOpen: false,
@@ -48,3 +47,6 @@ export const hasSelection = derived(
  evidenceCommandCenter,
  ($s) => $s.selectedEvidenceIds.length > 0
 );
+
+
+

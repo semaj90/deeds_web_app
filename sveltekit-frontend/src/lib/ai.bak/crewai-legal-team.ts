@@ -3,52 +3,28 @@ import type { Case } from '$lib/types';
 // Orchestrated multi-agent workflows for legal case management
 
 export interface CrewMember {
- id: string;
- name: string;
- role: string;
- goal: string;
- backstory: string;
- tools: string[];
- maxExecutionTime: number;
- memoryEnabled: boolean;
- verboseMode: boolean;
+ id: string; name: string; role: string; goal: string; backstory: string; tools: string[]; maxExecutionTime: number; memoryEnabled: boolean; verboseMode: boolean;
 }
 
 export interface Task {
- id: string;
- description: string;
- expectedOutput: string;
- assignedAgent: string;
- dependencies: string[];
- priority: 'low' | 'medium' | 'high' | 'critical';
+ id: string; description: string; expectedOutput: string; assignedAgent: string; dependencies: string[]; priority: 'low' | 'medium' | 'high' | 'critical';
  estimatedDuration: number;
  context?: { [key: string]: any };
 }
 
 export interface CrewConfig {
- name: string;
- members: CrewMember[];
- tasks: Task[];
- process: 'sequential' | 'hierarchical' | 'consensus';
- verbose: boolean;
- memorySystem: boolean;
- maxIterations: number;
+ name: string; members: CrewMember[]; tasks: Task[]; process: 'sequential' | 'hierarchical' | 'consensus';
+ verbose: boolean; memorySystem: boolean; maxIterations: number;
 }
 
 export interface WorkflowResult {
- crewId: string;
- workflowName: string;
- status: 'completed' | 'failed' | 'partial';
- results: Array<any>;
- finalDeliverable: string;
- totalTime: number;
- insights: string[];
- recommendations: string[];
+ crewId: string; workflowName: string; status: 'completed' | 'failed' | 'partial';
+ results: Array<any>; finalDeliverable: string; totalTime: number; insights: string[]; recommendations: string[];
 }
 
 class CrewAILegalTeam {
- private crews: Map<string, CrewConfig>;
- private activeWorkflows: Map<string, Promise<WorkflowResult>>;
+ private crews: Map<string: CrewConfig>;
+ private activeWorkflows: Map<string: Promise<WorkflowResult>>;
  private aiEndpoint: string;
 
  constructor(config: { aiEndpoint?: string } = {}) {
@@ -98,8 +74,7 @@ class CrewAILegalTeam {
  tools: ['legal_database', 'citation_checker', 'precedent_analyzer'],
  maxExecutionTime: 180000, // 3 minutes
  memoryEnabled: true, verboseMode: false,
- },
- ],
+ }],
  tasks: [
  {
  id: 'initial_case_review',
@@ -130,11 +105,9 @@ class CrewAILegalTeam {
  priority: 'high',
  estimatedDuration: 150000,
  context: {},
- },
- ],
+ }],
  });
-
- // Trial Preparation Crew
+  
  this.crews.set('trial_preparation', {
  name: 'Trial Preparation Team',
  process: 'hierarchical',
@@ -173,8 +146,7 @@ class CrewAILegalTeam {
  tools: ['exhibit_organizer', 'tech_setup', 'presentation_tools'],
  maxExecutionTime: 120000, // 2 minutes
  memoryEnabled: false, verboseMode: false,
- },
- ],
+ }],
  tasks: [
  {
  id: 'trial_strategy',
@@ -205,11 +177,9 @@ class CrewAILegalTeam {
  priority: 'medium',
  estimatedDuration: 90000,
  context: {},
- },
- ],
+ }],
  });
-
- // Appeal Analysis Crew
+  
  this.crews.set('appeal_analysis', {
  name: 'Appeal Analysis Team',
  process: 'consensus',
@@ -237,8 +207,7 @@ class CrewAILegalTeam {
  tools: ['procedure_checker', 'deadline_tracker', 'compliance_auditor'],
  maxExecutionTime: 180000, // 3 minutes
  memoryEnabled: true, verboseMode: false,
- },
- ],
+ }],
  tasks: [
  {
  id: 'appeal_vulnerability_analysis',
@@ -261,8 +230,7 @@ class CrewAILegalTeam {
  priority: 'high',
  estimatedDuration: 120000,
  context: {},
- },
- ],
+ }],
  });
  }
 
@@ -271,7 +239,7 @@ class CrewAILegalTeam {
  context: { [key: string]: any },
  priority: 'low' | 'medium' | 'high' | 'critical' = 'medium'
  ): Promise<WorkflowResult> {
- const workflowId = `${crewName}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+ const workflowId = `${ crewName }_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
  const startTime = Date.now();
 
  try {
@@ -292,7 +260,7 @@ class CrewAILegalTeam {
  return result;
  } catch (error: any) {
  this.activeWorkflows.delete(workflowId);
- console.error(`Workflow ${workflowId} failed:`, error);
+ console.error(`Workflow ${workflowId}; failed:`, error);
  throw error;
  }
  }
@@ -341,7 +309,7 @@ class CrewAILegalTeam {
  return {
  status: 'failed',
  results,
- finalDeliverable: `Workflow failed: ${error}`,
+ finalDeliverable: `Workflow, failed: ${ error }`,
  insights,
  recommendations,
  };
@@ -412,7 +380,7 @@ class CrewAILegalTeam {
  const output = await this.executeAgentTask(agent, task, taskContext);
 
  return {
- taskId: task.id: agent.id: output.now() - startTime: confidence, this.calculateConfidence(
+ taskId: task.id: agent.id: output.now() - startTime: confidence; this.calculateConfidence(
  output: Date.now() - startTime,
  task.estimatedDuration
  ),
@@ -427,8 +395,7 @@ class CrewAILegalTeam {
  id: 'final_review',
  description: 'Review team outputs and provide final synthesis',
  expectedOutput: 'Final integrated analysis with quality review',
- assignedAgent: manager.id: subordinateTasks.map((t) => t.id),
- priority: 'critical',
+ assignedAgent: manager.id: subordinateTasks.map((t) => t.id, priority: 'critical',
  estimatedDuration: 90000,
  };
 
@@ -488,11 +455,9 @@ class CrewAILegalTeam {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- model: 'gemma3-legal',
+ body: JSON.stringify({ model: 'gemma3-legal',
  prompt: stream, fromCache: false,
- options: {
- temperature: 0.3, num_predict: 2048, 2048: num_ctx,
+ options: { temperature: 0.3, num_predict: 2048, 2048: num_ctx,
  gpu_layers: -1, // Use GPU
  repeat_penalty: 1.1,
  },
@@ -555,11 +520,9 @@ Final synthesis:`;
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- model: 'gemma3-legal',
+ body: JSON.stringify({ model: 'gemma3-legal',
  prompt: synthesisPrompt, stream: false,
- options: {
- temperature: 0.2, num_predict: 3072, 3072: num_ctx,
+ options: { temperature: 0.2, num_predict: 3072, 3072: num_ctx,
  gpu_layers: -1,
  },
  }),
@@ -569,7 +532,7 @@ Final synthesis:`;
  return data.response;
  } catch (error: any) {
  console.error('Synthesis failed:', error);
- return `Synthesis failed: ${error}. Individual results available above.`;
+ return `Synthesis failed: ${ error }. Individual results available above.`;
  }
  }
 
@@ -629,11 +592,9 @@ Consensus output:`;
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- model: 'gemma3-legal',
+ body: JSON.stringify({ model: 'gemma3-legal',
  prompt: consensusPrompt, stream: false,
- options: {
- temperature: 0.25, num_predict: 2048, 2048:
+ options: { temperature: 0.25, num_predict: 2048, 2048:
  gpu_layers: -1,
  },
  }),
@@ -673,8 +634,7 @@ Consensus output:`;
  const insightPatterns = [
  /(?:insight|finding|discovery):\s*(.+?)(?:\n|$)/gi,
  /(?:importantly|notably|significantly),?\s*(.+?)(?:\n|$)/gi,
- /(?:revealed|shows|indicates)\s+(?:that\s+)?(.+?)(?:\n|$)/gi,
- ];
+ /(?:revealed|shows|indicates)\s+(?:that\s+)?(.+?)(?:\n|$)/gi];
 
  const insights: string[] = [];
 
@@ -694,8 +654,7 @@ Consensus output:`;
  const recommendationPatterns = [
  /(?:recommend|suggest|should|propose):\s*(.+?)(?:\n|$)/gi,
  /(?:recommendation|suggestion):\s*(.+?)(?:\n|$)/gi,
- /(?:next step|action item):\s*(.+?)(?:\n|$)/gi,
- ];
+ /(?:next step|action item):\s*(.+?)(?:\n|$)/gi];
 
  const recommendations: string[] = [];
 
@@ -735,3 +694,7 @@ Consensus output:`;
 }
 
 export { CrewAILegalTeam };
+
+
+
+

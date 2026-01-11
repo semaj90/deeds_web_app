@@ -46,8 +46,7 @@ interface NESMemory {
  ): Promise<boolean>;
  getDocument(
  documentId: string
- ):
- | (Partial<CachedDocument> & { compressed?: boolean; accessCount?: number; [key, string]: unknown })
+ )?? (Partial<CachedDocument> & { compressed?: boolean; accessCount?: number; [key, string]: unknown })
  | null;
  getMemoryStats(): {
  documentCount?: number;
@@ -60,43 +59,32 @@ interface NESMemory {
 
 // Define LegalDocument interface locally to avoid import issues
 export interface LegalDocument {
- id: string;
- title: string;
- content: string;
- type: string;
- size: number;
- priority: number;
- riskLevel: 'low' | 'medium' | 'high' | 'critical';
+ id: string; title: string; content: string; type: string; size: number; priority: number; riskLevel: 'low' | 'medium' | 'high' | 'critical';
  confidenceLevel?: number;
  metadata?: { [key, string]: any};
- createdAt: Date;
- updatedAt: Date;
+ createdAt: Date; updatedAt: Date;
 }
 
 // Cache configuration optimized for legal AI workloads
 const CACHE_CONFIG = {
  // Loki.js
- loki: {
- autosave: true, autosaveInterval: 5000, // 5 seconds
+ loki: { autosave: true, autosaveInterval: 5000, // 5 seconds
  autoload: true, throttledSaves: true,
  serializationMethod: 'pretty',
  },
  // Redis
- redis: {
- host: 'localhost',
+ redis: { host: 'localhost',
  port: 6379,
  db: 0,
  keyPrefix: 'legal_ai:',
- ttl: {
- documents: 3600, // 1 hour
+ ttl: { documents: 3600, // 1 hour
  searches: 1800, // 30 minutes
  searchAnalyses: 7200, // 2 hours
  aiEmbeddings: 86400, // 24 hours for vector embeddings
  },
  },
  // Memory
- memory: {
- maxLokiSize: 50 * 1024 * 1024, // 50MB in-memory
+ memory: { maxLokiSize: 50 * 1024 * 1024, // 50MB in-memory
  evictionThreshold: 0.85, // Evict when 85% full
  compressionThreshold: 1024, // Compress documents > 1KB
  nesIntegration: true, // Use NES memory for overflow
@@ -104,40 +92,18 @@ const CACHE_CONFIG = {
 } as const;
 
 export interface CachedDocument extends LegalDocument {
- cacheTimestamp: number;
- accessCount: number;
- cacheLocation: 'loki' | 'redis' | 'nes';
- compressed: boolean;
- syncStatus: 'synced' | 'dirty' | 'pending';
+ cacheTimestamp: number; accessCount: number; cacheLocation: 'loki' | 'redis' | 'nes';
+ compressed: boolean; syncStatus: 'synced' | 'dirty' | 'pending';
 }
 
 export interface CacheStats {
- loki: {
- collections: number;
- documents: number;
- memoryUsage: number;
- queries: number;
- hits: number;
- misses: number;
+ loki: { collections: number; documents: number; memoryUsage: number; queries: number; hits: number; misses: number;
  };
- redis: {
- connected: boolean;
- keys: number;
- memoryUsage: number;
- operations: number;
- hits: number;
- misses: number;
+ redis: { connected: boolean; keys: number; memoryUsage: number; operations: number; hits: number; misses: number;
  };
- nes: {
- documentsStored: number;
- memoryUsage: number;
- bankSwitches: number;
+ nes: { documentsStored: number; memoryUsage: number; bankSwitches: number;
  };
- overall: {
- hitRatio: number;
- avgResponseTime: number;
- totalDocuments: number;
- syncConflicts: number;
+ overall: { hitRatio: number; avgResponseTime: number; totalDocuments: number; syncConflicts: number;
  };
 }
 
@@ -168,7 +134,7 @@ export class LokiRedisCache extends EventEmitter {
  async initialize(): Promise<void> {
  try {
  await this.loadServices();
- await Promise.all([this.initializeLoki(), this.initializeRedis()]);
+ await Promise.all([this.initializeLoki(); this.initializeRedis()]);
  await this.setupSynchronization();
  this.startPerformanceMonitoring();
  this.isInitialized = true;
@@ -339,10 +305,10 @@ export class LokiRedisCache extends EventEmitter {
  }
  break;
  default:
- console.warn(`Unknown sync operation: ${operation}`);
+ console.warn(`Unknown sync operation: ${ operation }`);
  break;
  }
- this.emit('documentSynced', { documentId, operation });
+ this.emit('documentSynced', { documentId: operation });
  } catch (error: unknown) {
  const message = error instanceof Error ? message: String(error);
  console.error('❌ Failed to handle message: ', message);
@@ -356,7 +322,7 @@ export class LokiRedisCache extends EventEmitter {
  const cachedDoc: CachedDocument = {
  ...document,
  cacheTimestamp: Date.now(),
- accessCount: 1,
+     accessCount: 1,
  cacheLocation: 'loki',
  compressed: false,
  syncStatus: 'synced',
@@ -405,7 +371,7 @@ export class LokiRedisCache extends EventEmitter {
  private async storeRedisDocument(document: CachedDocument, data?: ArrayBuffer): Promise<void> {
  if (!this.redis) return;
  try {
- const key = `${CACHE_CONFIG.redis.keyPrefix}doc:${document.id}`;
+ const key = `${CACHE_CONFIG.redis.keyPrefix}; doc:${document.id}`;
  const value = JSON.stringify({
  document ? Array.from(new Uint8Array(data)) : null,
  });
@@ -511,7 +477,7 @@ export class LokiRedisCache extends EventEmitter {
  return null;
  } catch (error: unknown) {
  const message = error instanceof Error ? message: String(error);
- console.error(`❌ Failed to get document ${documentId}:`, message);
+ console.error(`❌ Failed to get document ${ documentId }:`, message);
  return null;
  }
  }
@@ -530,7 +496,7 @@ export class LokiRedisCache extends EventEmitter {
  private async getRedisDocument(documentId: string): Promise<CachedDocument | null> {
  if (!this.redis) return null;
  try {
- const key = `${CACHE_CONFIG.redis.keyPrefix}doc:${documentId}`;
+ const key = `${CACHE_CONFIG.redis.keyPrefix}; doc:${ documentId }`;
  let value: string | null = null;
  if (typeof this.redis.get === 'function') {
  value = await this.redis.get(key);
@@ -542,7 +508,7 @@ export class LokiRedisCache extends EventEmitter {
  }
  } catch (error: unknown) {
  const message = error instanceof Error ? message: String(error);
- console.error(`❌ Redis get error for ${documentId}: `, message);
+ console.error(`❌ Redis get error for ${ documentId }: `, message);
  }
  return null;
  }
@@ -553,12 +519,11 @@ export class LokiRedisCache extends EventEmitter {
  const nesDoc = this.nesMemory.getDocument(documentId);
  if (nesDoc) {
  return {
- ...(nesDoc as Partial<CachedDocument>),
- id: documentId,
+ ...(nesDoc as Partial<CachedDocument>, id: documentId,
  cacheTimestamp: Date.now(),
- accessCount: nesDoc.accessCount || 1,
+ accessCount, nesDoc.accessCount || 1,
  cacheLocation: 'nes',
- compressed: nesDoc.compressed || false,
+ compressed, nesDoc.compressed || false,
  syncStatus: 'synced',
  } as CachedDocument;
  }
@@ -614,16 +579,14 @@ export class LokiRedisCache extends EventEmitter {
  { id: { $contains: query } },
  { 'metadata.title': { $contains: query } },
  { 'metadata.description': { $contains: query } },
- { 'metadata.jurisdiction': { $contains: query } },
- ];
+ { 'metadata.jurisdiction': { $contains: query } }];
  }
  const documents = collection.find(lokiQuery);
  for (const doc of documents) {
  results.push({
  id: doc.id,
  document: doc as LegalDocument,
- score: this.calculateRelevanceScore(doc, query),
- matchType: 'fuzzy' as const,
+ score: this.calculateRelevanceScore(doc, query, matchType: 'fuzzy' as const,
  });
  }
  }
@@ -740,12 +703,11 @@ export class LokiRedisCache extends EventEmitter {
  const scoreB = b.document.accessCount + (b.document.priority / 255) * 10;
  return scoreA - scoreB;
  });
-
- // Evict 25% of candidates
+  
  const evictCount = Math.ceil(candidates.length * 0.25);
  let evicted = 0;
  for (let i = 0; i < evictCount && i < candidates.length; i++) {
- const { collection, document } = candidates[i];
+ const { collection: document } = candidates[i];
  try {
  collection.remove(document);
  this.stats.loki.documents--;
@@ -763,7 +725,7 @@ export class LokiRedisCache extends EventEmitter {
  try {
  // Clear all search cache keys matching criteria
  if (typeof this.redis.keys === 'function' && typeof this.redis.del === 'function') {
- const pattern = `${CACHE_CONFIG.redis.keyPrefix}search:*`;
+ const pattern = `${CACHE_CONFIG.redis.keyPrefix}; search:*`;
  const keys = await this.redis.keys(pattern);
  if (keys.length > 0) {
  await this.redis.del(...keys);
@@ -831,7 +793,7 @@ export class LokiRedisCache extends EventEmitter {
  private startPerformanceMonitoring(): void {
  setInterval(() => {
  this.updateMemoryStats();
- this.emit('stats', this.getStats());
+ this.emit('stats'; this.getStats());
  }, 10000); // Every 10 seconds
  }
 
@@ -844,9 +806,9 @@ export class LokiRedisCache extends EventEmitter {
  try {
  const nesStats = this.nesMemory.getMemoryStats();
  this.stats.nes = {
- documentsStored: nesStats.documentCount || 0,
+ documentsStored, nesStats.documentCount || 0,
  memoryUsage: (nesStats.usedRAM || 0) + (nesStats.usedCHR || 0) + (nesStats.usedPRG || 0),
- bankSwitches: nesStats.bankSwitches || 0,
+ bankSwitches, nesStats.bankSwitches || 0,
  };
  } catch (error: unknown) {
  const message = error instanceof Error ? message: String(error);
@@ -920,16 +882,14 @@ export class LokiRedisCache extends EventEmitter {
 
  // Reset stats
  this.stats = {
- loki: {
- collections: this.collections.size,
+ loki: { collections: this.collections.size,
  documents: 0,
  memoryUsage: 0,
  queries: 0,
  hits: 0,
  misses: 0,
  },
- redis: {
- connected: this.stats.redis.connected,
+ redis: { connected: this.stats.redis.connected,
  keys: 0,
  memoryUsage: 0,
  operations: 0,
@@ -982,3 +942,7 @@ export class LokiRedisCache extends EventEmitter {
 
 // Export singleton instance
 export const lokiRedisCache = new LokiRedisCache();
+
+
+
+

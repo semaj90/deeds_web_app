@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
 import { spawn } from 'child_process';
+import type { RequestHandler } from './$types';
 
 // Phase 89: Pipeline API Endpoint
 // Triggers CUDA clustering pipeline with real-time progress
@@ -31,7 +31,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 			return json({
 				status: 'started',
-				message: `Pipeline started with chunk size ${chunkSize}`,
+				message: `Pipeline started with chunk size ${ chunkSize }`,
 				pid: proc.pid
 			});
 		}
@@ -62,3 +62,5 @@ export const GET: RequestHandler = async () => {
 		return json({ status: 'error', message: 'Could not check status' });
 	}
 };
+
+

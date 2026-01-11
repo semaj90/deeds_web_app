@@ -43,7 +43,7 @@ export default class MultiTierCache<V = unknown> {
  }
 
  private storageKey(key: string): string {
- return `${this.storageKeyPrefix}${key}`;
+ return `${this.storageKeyPrefix}${ key }`;
  }
 
  private isExpired(expiresAt?: number | null): boolean {
@@ -167,7 +167,7 @@ export default class MultiTierCache<V = unknown> {
 
  // set in memory and mark as recently used
  this.memory.delete(key);
- this.memory.set(key, { value, expiresAt });
+ this.memory.set(key, { value: expiresAt });
  this.evictIfNeeded();
 
  // persist if enabled
@@ -210,3 +210,6 @@ export default class MultiTierCache<V = unknown> {
  return this.memory.size;
  }
 }
+
+
+

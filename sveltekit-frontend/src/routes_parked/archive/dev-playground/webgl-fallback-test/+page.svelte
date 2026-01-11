@@ -22,8 +22,7 @@
 // REMOVED: { id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
  { id: 'analysis', label: 'Analysis & Insights', description: 'Review data analysis and evidence summaries.' },
  { id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
- { id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' },
- ]);
+ { id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' }]);
 
  let evidenceInsights = $state([]);
  let recentCases = $state([]);
@@ -46,19 +45,18 @@
  await appActions.loadCases();
 
  // Get cases from store and filter for recent ones
- const allCases = appState?.cases || [];
+ const allCases = appState?.cases ?? [];
  recentCases = allCases
  .sort((a: any, b): any => new Date(b.createdAt || b.updatedAt || 0).getTime() - new Date(a.createdAt || a.updatedAt || 0).getTime())
  .slice(0, 10)
  .map((caseItem: any) => ({
- id: caseItem.id || caseItem.caseId,
- title: caseItem.title || caseItem.name || 'Untitled Case',
- caseNumber: caseItem.caseNumber || caseItem.id,
+ id, caseItem.id || caseItem.caseId,
+ title, caseItem.title || caseItem.name || 'Untitled Case',
+ caseNumber, caseItem.caseNumber || caseItem.id,
  priority: caseItem.priority || 'medium',
  createdBy: caseItem.createdBy || 'System',
  createdByLastName: caseItem.createdByLastName || '',
- createdAt: caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(),
- status: caseItem.status || 'active'
+ createdAt, caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(), status: caseItem.status || 'active'
  }));
 
  } catch (err) {
@@ -74,8 +72,7 @@
  priority: 'high',
  createdBy: '2B',
  createdByLastName: '',
- createdAt: new Date().toISOString(),
- status: 'active'
+ createdAt: new Date().toISOString(), status: 'active'
  },
  {
  id: 'case-002',
@@ -84,8 +81,7 @@
  priority: 'medium',
  createdBy: '9S',
  createdByLastName: '',
- createdAt: new Date(Date.now() - 86400000).toISOString(),
- status: 'active'
+ createdAt: new Date(Date.now() - 86400000).toISOString(), status: 'active'
  }
  ];
  } finally {
@@ -98,7 +94,7 @@
  // Load evidence from API
  await appActions.loadEvidence();
 
- const evidence = appState?.evidence || [];
+ const evidence = appState?.evidence ?? [];
 
  // Generate insights from evidence data
  evidenceInsights = evidence
@@ -106,8 +102,8 @@
  .slice(0, 5)
  .map((item: any, index): number => ({
  id: `insight-${item.id || index}`,
- label: item.filename || item.title || `Evidence Analysis ${index + 1}`,
- summary: item.analysis || item.summary || 'AI analysis completed'
+ label, item.filename || item.title || `Evidence Analysis ${index + 1}`,
+ summary, item.analysis || item.summary || 'AI analysis completed'
  }));
 
  // Add some generated insights if we don't have enough
@@ -133,8 +129,7 @@
  // Fallback insights
  evidenceInsights = [
  { id: 'insight-001', label: 'Anomaly detected in network logs', summary: 'Unusual data transfer patterns identified.' },
- { id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' },
- ];
+ { id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' }];
  }
  }
 
@@ -181,7 +176,7 @@
 
  // Function to handle navigation to a case, addressing the goto() warning
  async function navigateToCase(caseId: string) {
- await goto(`/cases/${caseId}`);
+ await goto(`/cases/${ caseId }`);
  }
 
  let intervalId: ReturnType<typeof setInterval>;
@@ -345,7 +340,7 @@
  data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0
  data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2
  data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2
- data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg md:w-full"
+ data-[state=open]: slide-in-from-top-[48%], sm:rounded-lg md:w-full"
  >
  <div class="space-y-4">
  <h2 class="text-xl font-semibold text-slate-100">Create New Case</h2>
@@ -397,7 +392,7 @@
  <button
  type="button"
  class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:border-slate-400"
- onclick={cancelNewCase}
+ onclick={ cancelNewCase }
  >
  Cancel
  </button>
@@ -410,7 +405,7 @@
  </div>
  </form>
  <Close
- class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+ class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover: opacity-100, focus:outline-none focus: ring-2, focus:ring-ring focus: ring-offset-2, disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
  >
  <svg
  xmlns="http://www.w3.org/2000/svg"
@@ -432,5 +427,8 @@
  </Content>
  </Root>
 {/if}
+
+
+
 
 

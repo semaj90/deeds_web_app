@@ -43,7 +43,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
  * DELETE /api/citations/collections/[collectionId]/items/[citationId]
  * Remove a citation from a collection
  */
-export const DELETE: RequestHandler = async ({ params, locals }) => {
+export const DELETE: RequestHandler = async ({ params: locals }) => {
  try {
  // Check authentication
  if (!locals.user) {

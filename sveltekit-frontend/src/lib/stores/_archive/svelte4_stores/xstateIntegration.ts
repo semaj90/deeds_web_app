@@ -8,8 +8,7 @@ import type { Actor, AnyStateMachine } from 'xstate';
 import { createActor } from 'xstate';
 
 type AnySnapshot = {
- value: any;
- context: any;
+ value: any; context: any;
  matches: (value: any) => boolean;
  can: (event: any) => boolean;
 };
@@ -37,8 +36,7 @@ export function useMachine<T extends AnyStateMachine>(
  const subscription = actor.subscribe((snapshot) => {
  state$.set(snapshot);
  });
-
- // Auto-start if requested
+  
  if (autoStart) {
  actor.start();
  }
@@ -92,7 +90,7 @@ export function machineContext<T>(
 
 /**
  * Action helper for cleanup on component destroy
- * Usage: <div use:machineCleanup={cleanup}>
+ * Usage: <div, use:machineCleanup={cleanup}>
  */
 export function machineCleanup(node: HTMLElement, cleanup: () => void) {
  return {
@@ -117,3 +115,6 @@ export function createMachineStore<T extends AnyStateMachine>(machine: T) {
  subscribe: state$.subscribe,
  };
 }
+
+
+

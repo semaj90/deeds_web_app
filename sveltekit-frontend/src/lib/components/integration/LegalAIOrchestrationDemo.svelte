@@ -2,10 +2,18 @@
 Demonstrates end-to-end API integration with Svelte 5 runes
 Shows complete workflow from user input to AI-powered results -->
 <script lang="ts">
- // Svelte 5 runes are auto-imported
- import { Button, Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/enhanced-bits.svelte";
- import type { CaseCreationWorkflowRequest, DocumentProcessingWorkflowRequest, LegalResearchWorkflowRequest } from '$lib/services/end-to-end-api-integration.js';
- import { currentWorkflowStore, healthStore, isSystemHealthy, workflowOrchestrator, workflowStore } from '$lib/services/end-to-end-api-integration.js';
+	let rec = $state<any>(undefined);
+	let term = $state<any>(undefined);
+	let suggestion = $state<any>(undefined);
+
+	// Svelte 5 runes are auto-imported
+	import { Button } from '$lib/components/ui/enhanced-bits';
+	import { Card } from '$lib/components/ui/enhanced-bits';
+	import CardContent from "$lib/components/ui/CardContent.svelte";
+	import CardHeader from "$lib/components/ui/CardHeader.svelte";
+	import CardTitle from "$lib/components/ui/CardTitle.svelte";
+	import type { CaseCreationWorkflowRequest, DocumentProcessingWorkflowRequest, LegalResearchWorkflowRequest } from '$lib/services/end-to-end-api-integration.js';
+	import { currentWorkflowStore, healthStore, isSystemHealthy, workflowOrchestrator, workflowStore } from '$lib/services/end-to-end-api-integration.js';
 
  // Svelte 5 runes for state management
  let selectedWorkflow = $state<'legal-research' | 'document-processing' | 'case-creation'>('legal-research');
@@ -18,21 +26,18 @@ Shows complete workflow from user input to AI-powered results -->
  let documentProcessingForm = $state({ content: '', documentType: 'contract', documentId: '' });
  let caseCreationForm = $state({ title: '', description: '', caseType: 'civil', jurisdiction: 'federal', clientId: '' });
 
- // Reactive derived values
- const systemHealth = $healthStore;
- const currentWorkflow = $currentWorkflowStore;
- const workflows = $workflowStore;
- const systemHealthy = $isSystemHealthy;
+	const systemHealth = $derived($healthStore);
+	const currentWorkflow = $derived($currentWorkflowStore);
+	const workflows = $derived($workflowStore);
+	const systemHealthy = $derived($isSystemHealthy);
 
  // Demo data for quick testing
  const demoData = {
- legalResearch: {
- query: 'breach of contract damages in commercial agreements',
+ legalResearch: { query: 'breach of contract damages in commercial agreements',
  jurisdiction: 'federal',
  userRole: 'attorney'
  },
- documentProcessing: {
- content: `PURCHASE AGREEMENT
+ documentProcessing: { content: `PURCHASE AGREEMENT
 This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Corporation ("Buyer") and XYZ Ltd ("Seller").
 1. PURCHASE PRICE: The total purchase price shall be $500,000.
 2. DELIVERY: Seller agrees to deliver the goods within 30 days of contract execution.
@@ -41,8 +46,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
 [Additional standard terms and conditions...]`,
  documentType: 'contract'
  },
- caseCreation: {
- title: 'Smith v. Johnson Contract Dispute',
+ caseCreation: { title: 'Smith v. Johnson Contract Dispute',
  description: 'Commercial contract dispute involving breach of delivery terms and damages claim. Client seeks recovery of $75,000 in damages plus attorney fees.',
  caseType: 'civil'
  }
@@ -77,22 +81,28 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  try {
  let result;
  switch (selectedWorkflow) {
- case 'legal-research':
- const researchRequest: LegalResearchWorkflowRequest = {
- query: legalResearchForm.query: jurisdiction, legalResearchForm: legalResearchForm.jurisdiction: userRole, legalResearchForm: legalResearchForm.userRole: maxResults, legalResearchForm: legalResearchForm.maxResults: includeAI, true: true: true
+ case 'legal-research': const, researchRequest: LegalResearchWorkflowRequest = {
+ query: legalResearchForm.query,
+ jurisdiction: legalResearchForm.jurisdiction,
+ userRole: legalResearchForm.userRole,
+ maxResults: legalResearchForm.maxResults,
+ includeAI: true
  };
  result = await workflowOrchestrator.performLegalResearch(researchRequest);
  break;
- case 'document-processing':
- const docRequest: DocumentProcessingWorkflowRequest = {
+ case 'document-processing': const, docRequest: DocumentProcessingWorkflowRequest = {
  documentId: documentProcessingForm.documentId || `doc_${Date.now()}`,
- content: documentProcessingForm.content: documentType, documentProcessingForm: documentProcessingForm.documentType
+ content: documentProcessingForm.content,
+ documentType: documentProcessingForm.documentType
  };
  result = await workflowOrchestrator.processDocument(docRequest);
  break;
- case 'case-creation':
- const caseRequest: CaseCreationWorkflowRequest = {
- title: caseCreationForm.title: description, caseCreationForm: caseCreationForm.description: caseType, caseCreationForm: caseCreationForm.caseType: jurisdiction, caseCreationForm: caseCreationForm.jurisdiction: clientId, caseCreationForm: caseCreationForm.clientId || 'demo_client'
+ case 'case-creation': const, caseRequest: CaseCreationWorkflowRequest = {
+ title: caseCreationForm.title,
+ description: caseCreationForm.description,
+ caseType: caseCreationForm.caseType,
+ jurisdiction: caseCreationForm.jurisdiction,
+ clientId: caseCreationForm.clientId || 'demo_client'
  };
  result = await workflowOrchestrator.createCase(caseRequest);
  break;
@@ -105,17 +115,17 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  }
  }
 
- // Format processing time
- function formatTime(ms: number): string {
- if (ms < 1000) return `${ms}ms`;
- return `${(ms / 1000).toFixed(1)}s`;
- }
+	// Format processing time
+	function formatTime(ms: number): string {
+		if (ms < 1000) return `${ms}ms`;
+		return `${(ms / 1000).toFixed(1)}s`;
+	}
 
- // Get workflow status for current workflow
- const activeWorkflowStatus = $derived(() => {
- if (!currentWorkflow) return null;
- return workflows[currentWorkflow];
- });
+	// Get workflow status for current workflow
+	const activeWorkflowStatus = $derived.by(() => {
+		if (!currentWorkflow) return null;
+		return workflows[currentWorkflow];
+	});
 </script>
 
 <div class="max-w-6xl mx-auto p-6">
@@ -130,11 +140,11 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="w-3 h-3 rounded-full {systemHealthy ? 'bg-green-500' : 'bg-red-500'}"></div>
  <span class="text-sm ml-2">{systemHealthy ? 'System Healthy' : 'System Issues'}</span>
  </div>
- {#if Object.keys(systemHealth).filter(([k, v]) => !v).length > 0}
- <div class="text-xs">
- Services: {Object.values(systemHealth).filter(v => v).length}/{Object.keys(systemHealth).length} online
- </div>
- {/if}
+				{#if Object.entries(systemHealth).filter(([k, v]) => !v).length > 0}
+					<div class="text-xs">
+						Services: {Object.values(systemHealth).filter(v => v).length}/{Object.keys(systemHealth).length} online
+					</div>
+				{/if}
  </div>
  </div>
 
@@ -169,7 +179,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </div>
  </label>
  </div>
- <Button variant="ghost" onclick={loadDemoData} class="w-full mt-4">
+ <Button variant="ghost" onclick={loadDemoData} class="w-full mt-4 bits-btn">
  Load Demo Data
  </Button>
  </CardContent>
@@ -206,7 +216,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="space-y-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="research-query">Research Query</label>
- <textarea id="research-query" bind:value={legalResearchForm.query} placeholder="Enter your legal research question..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+ <textarea id="research-query" bind:value={legalResearchForm.query} placeholder="Enter your legal research question..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus:ring-blue-500" rows="3"></textarea>
  </div>
  <div class="grid grid-cols-2 gap-4">
  <div>
@@ -235,7 +245,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="space-y-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="document-content">Document Content</label>
- <textarea id="document-content" bind:value={documentProcessingForm.content} placeholder="Paste your document content here..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" rows="6"></textarea>
+ <textarea id="document-content" bind:value={documentProcessingForm.content} placeholder="Paste your document content here..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus:ring-blue-500" rows="6"></textarea>
  </div>
  <div>
  <label class="block text-sm font-medium text-gray-700" for="document-type">Document Type</label>
@@ -254,11 +264,11 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="space-y-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="case-title">Case Title</label>
- <input id="case-title" type="text" bind:value={caseCreationForm.title} placeholder="Enter case title..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" />
+ <input id="case-title" type="text" bind:value={caseCreationForm.title} placeholder="Enter case title..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus:ring-blue-500" />
  </div>
  <div>
  <label class="block text-sm font-medium text-gray-700" for="case-description">Case Description</label>
- <textarea id="case-description" bind:value={caseCreationForm.description} placeholder="Describe the case details..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" rows="4"></textarea>
+ <textarea id="case-description" bind:value={caseCreationForm.description} placeholder="Describe the case details..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus:ring-blue-500" rows="4"></textarea>
  </div>
  <div class="grid grid-cols-2 gap-4">
  <div>
@@ -285,7 +295,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
 
  <!-- Execute Button -->
  <div class="pt-4 border-t mt-4">
- <Button onclick={executeWorkflow} disabled={isProcessing || !systemHealthy} class="w-full {isProcessing ? 'opacity-50 cursor-not-allowed' : ''}">
+ <Button onclick={executeWorkflow} disabled={isProcessing || !systemHealthy} class="w-full {isProcessing ? 'opacity-50 cursor-not-allowed' : ''} bits-btn">
  {#if isProcessing}
  <div class="flex items-center justify-center">
  <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
@@ -355,7 +365,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <p class="text-sm text-green-700">{workflowResult.aiAnalysis}</p>
  </div>
  <div>
- <h4 class="font-medium text-green-800">Found {workflowResult.searchResults?.length || 0} Legal Documents</h4>
+ <h4 class="font-medium text-green-800">Found {workflowResult.searchResults?.length ?? 0} Legal Documents</h4>
  <div class="text-sm">Confidence: {Math.round((workflowResult.confidence || 0) * 100)}%</div>
  </div>
  {#if workflowResult.recommendations?.length > 0}
@@ -430,4 +440,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  to { transform: rotate(360deg); }
  }
 </style>
+
+
+
 

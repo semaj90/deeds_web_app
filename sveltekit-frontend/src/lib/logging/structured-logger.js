@@ -7,7 +7,7 @@ class StructuredLogger {
  if (entry.success) {
  console.debug('[api:res]', entry.requestId, entry.statusCode, entry.processingTime + 'ms');
  } else {
- console.warn('[api:res:err]', entry.requestId, entry.statusCode, entry.error);
+ console.warn('[api: res, err]', entry.requestId, entry.statusCode, entry.error);
  }
  }
  async logError(entry) {
@@ -66,3 +66,5 @@ export const logger = {
  }
  }, // ...existing methods...
 };
+
+

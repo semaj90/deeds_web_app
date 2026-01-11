@@ -2,3 +2,5 @@
 export * from '$lib/services/documentApi';
 import type { DocumentApiService } from '$lib/services/documentApi';
 export default new DocumentApiService();
+
+

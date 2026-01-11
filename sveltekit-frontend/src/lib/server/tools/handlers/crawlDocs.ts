@@ -13,19 +13,14 @@ import {
 } from '../registry.js';
 
 interface CrawlDocsResult {
-  pages_crawled: number;
-  pages_failed: number;
-  total_content_bytes: number;
-  urls_processed: string[];
+  pages_crawled: number; pages_failed: number;
+  total_content_bytes: number; urls_processed: string[];
 }
 
 interface CrawledPage {
-  url: string;
-  title: string;
-  content: string;
-  code_blocks: string[];
-  tables: string[];
-  links: string[];
+  url: string; title: string;
+  content: string; code_blocks: string[];
+  tables: string[]; links: string[];
   crawled_at: string;
 }
 
@@ -97,10 +92,8 @@ function extractTextContent(html: string): string {
 
 async function crawlUrl(
   url: string,
-  options: {
-    timeout: number;
-    userAgent?: string;
-    extractCode: boolean;
+  options: { timeout: number;
+    userAgent?: string; extractCode: boolean;
     extractTables: boolean;
     selectors?: { content?: string; exclude?: string[] };
   }
@@ -126,12 +119,9 @@ async function crawlUrl(
 
     return {
       url,
-      title: extractTitle(html),
-      content: extractTextContent(html),
-      code_blocks: options.extractCode ? extractCodeBlocks(html) : [],
+      title: extractTitle(html, content: extractTextContent(html, code_blocks: options.extractCode ? extractCodeBlocks(html) : [],
       tables: options.extractTables ? extractTables(html) : [],
-      links: extractLinks(html, url),
-      crawled_at: new Date().toISOString()
+      links: extractLinks(html, url, crawled_at: new Date().toISOString()
     };
   } catch {
     return null;
@@ -182,10 +172,9 @@ async function crawlDocsHandler(request: CrawlDocsRequest): Promise<ToolResult<C
 
   return {
     success: true,
-    run_id: request.run_id,
+    run_id, request.run_id,
     tool: 'crawl_docs',
-    data: {
-      pages_crawled: crawledPages.length,
+    data: { pages_crawled: crawledPages.length,
       pages_failed: failedUrls.length,
       total_content_bytes: totalBytes,
       urls_processed: crawledPages.map(p => p.url)
@@ -205,3 +194,7 @@ toolRegistry.register({
 });
 
 export { crawlDocsHandler };
+
+
+
+

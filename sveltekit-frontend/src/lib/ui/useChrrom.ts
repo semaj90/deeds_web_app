@@ -11,3 +11,5 @@ export async function getCHRPatternOrFetch(
  const data = await res.json();
  return { pattern: data as CHRPattern, fromCache: false };
 }
+
+

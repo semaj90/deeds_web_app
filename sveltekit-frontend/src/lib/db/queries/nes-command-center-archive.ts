@@ -85,7 +85,7 @@ export async function getArchivedErrorClusters(
     WHERE ${whereClause}
   `);
 
-  const total = Number(countResult.rows[0]?.total || 0);
+  const total = Number(countResult.rows[0]?.total ?? 0);
 
   return {
     data: result.rows,
@@ -166,7 +166,7 @@ export async function getArchivedInteractions(
     WHERE ${whereClause}
   `);
 
-  const total = Number(countResult.rows[0]?.total || 0);
+  const total = Number(countResult.rows[0]?.total ?? 0);
 
   return {
     data: result.rows,
@@ -237,7 +237,7 @@ export async function getCombinedErrorClusters(
         AND archived_at IS NULL
     `);
 
-    const total = Number(countResult.rows[0]?.total || 0);
+    const total = Number(countResult.rows[0]?.total ?? 0);
 
     return {
       data: result.rows,
@@ -315,7 +315,7 @@ export async function getCombinedErrorClusters(
       as total
   `);
 
-  const total = Number(countResult.rows[0]?.total || 0);
+  const total = Number(countResult.rows[0]?.total ?? 0);
 
   return {
     data: result.rows,
@@ -378,7 +378,7 @@ export async function getCombinedInteractions(
       WHERE route_id = ${routeId}
     `);
 
-    const total = Number(countResult.rows[0]?.total || 0);
+    const total = Number(countResult.rows[0]?.total ?? 0);
 
     return {
       data: result.rows,
@@ -443,7 +443,7 @@ export async function getCombinedInteractions(
       as total
   `);
 
-  const total = Number(countResult.rows[0]?.total || 0);
+  const total = Number(countResult.rows[0]?.total ?? 0);
 
   return {
     data: result.rows,
@@ -482,3 +482,5 @@ export default {
 	getCombinedInteractions,
 	getArchiveStatistics,
 };
+
+

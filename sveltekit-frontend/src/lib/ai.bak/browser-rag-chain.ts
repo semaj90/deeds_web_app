@@ -20,18 +20,13 @@ import type { Document } from '@langchain/core/documents';
 import type { PromptTemplate } from '@langchain/core/prompts';
 
 export interface RAGDocument {
- id: string;
- content: string;
+ id: string; content: string;
  metadata?: Record<string, any>;
  embedding?: number[];
 }
 
 export interface RAGQueryResult {
- answer: string;
- sources: RAGDocument[];
- confidence: number;
- tokensGenerated: number;
- duration: number;
+ answer: string; sources: RAGDocument[]; confidence: number; tokensGenerated: number; duration: number;
 }
 
 export interface RAGOptions {
@@ -114,7 +109,7 @@ export class BrowserRAGChain {
  const { topK = 3, temperature = 0.7, maxTokens = 512, minSimilarity = 0.3 } = options;
  const startTime = performance.now();
 
- console.log(`🔍 [Browser RAG] Querying: "${question}"`);
+ console.log(`🔍 [Browser RAG] Querying: "${ question }"`);
 
  // Step 1: Generate query embedding
  console.log('📊 [Browser RAG] Generating query embedding...');
@@ -150,8 +145,7 @@ export class BrowserRAGChain {
 
  return {
  answer: sources,
- confidence: this.calculateConfidence(relevantDocs),
- tokensGenerated: maxTokens, duration: endTime - startTime,
+ confidence: this.calculateConfidence(relevantDocs, tokensGenerated: maxTokens, duration: endTime - startTime,
  };
  }
 
@@ -182,9 +176,9 @@ export class BrowserRAGChain {
 
  // Build prompt and stream response
  const prompt = this.buildRAGPrompt(question, relevantDocs);
- for await (const chunk of this.llm.generateStream(prompt, { maxTokens, temperature })) {
+ for await (const chunk of this.llm.generateStream(prompt, { maxTokens: temperature })) {
  yield {
- text: chunk.text: done.done: sources.done ? relevantDocs  | undefined,
+ text: chunk.text: done.done: sources.done ? relevantDocs : undefined,
  };
  }
  }
@@ -219,7 +213,7 @@ export class BrowserRAGChain {
  return `Context Information:
 ${context}
 
-Question: ${question}
+Question: ${ question }
 
 Instructions: Answer the question based ONLY on the context provided above. If the context does not contain enough information, say: "I don't have enough information to answer this question." Be concise and accurate.
 
@@ -351,3 +345,7 @@ export const browserRAG = new BrowserRAGChain();
  * }
  * </script>
  */
+
+
+
+

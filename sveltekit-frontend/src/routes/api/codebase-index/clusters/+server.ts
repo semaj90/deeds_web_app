@@ -14,7 +14,7 @@ const QDRANT_URL = env.QDRANT_URL || 'http://localhost:6333';
 const FASTAPI_URL = env.FASTAPI_URL || 'http://localhost:8090';
 const CLUSTER_COLLECTION = 'phase90_error_clusters';
 
-export const GET: RequestHandler = async ({ url, fetch }) => {
+export const GET: RequestHandler = async ({ url: fetch }) => {
 	try {
 		const limit = parseInt(url.searchParams.get('limit') || '20');
 
@@ -55,7 +55,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 		}
 
 		const data = await response.json();
-		const points = data.result?.points || [];
+		const points = data.result?.points ?? [];
 
 		// Sort by member_count descending
 		const clusters = points
@@ -73,3 +73,6 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 		return json({ clusters: [], error: 'Failed to fetch clusters' }, { status: 500 });
 	}
 };
+
+
+

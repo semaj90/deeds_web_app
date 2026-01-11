@@ -17,16 +17,13 @@ const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
 
 interface ExtractedEntity {
-  type: string;
-  name: string;
+  type: string; name: string;
   confidence: number;
 }
 
 interface ExtractedRelation {
-  type: string;
-  source: string;
-  target: string;
-  confidence: number;
+  type: string; source: string;
+  target: string; confidence: number;
 }
 
 async function extractFromDocument(
@@ -49,8 +46,7 @@ async function extractFromDocument(
         entity_types: entityTypes,
         relation_types: relationTypes,
         model
-      }),
-      signal: controller.signal
+      }, signal: controller.signal
     });
 
     clearTimeout(timeoutId);
@@ -111,7 +107,7 @@ async function fetchDocumentContent(url: string, textRef: string): Promise<strin
   }
 
   // If textRef is a hash/id, fetch from storage (stub)
-  return `Document content for ${url} (ref: ${textRef})`;
+  return `Document content for ${ url } (ref: ${ textRef })`;
 }
 
 async function langextractBatchHandler(request: LangExtractBatchRequest): Promise<ToolResult<LangExtractResult>> {
@@ -119,10 +115,8 @@ async function langextractBatchHandler(request: LangExtractBatchRequest): Promis
   const model = options.model || 'gemma3-legal:latest';
   const timeout = options.timeout_ms || 30000;
 
-  const extractions: Array<{
-    doc_url: string;
-    entities: ExtractedEntity[];
-    relations: ExtractedRelation[];
+  const extractions: Array<{ doc_url: string;
+    entities: ExtractedEntity[]; relations: ExtractedRelation[];
   }> = [];
 
   let totalEntities = 0;
@@ -159,7 +153,7 @@ async function langextractBatchHandler(request: LangExtractBatchRequest): Promis
 
   return {
     success: true,
-    run_id: request.run_id,
+    run_id, request.run_id,
     tool: 'langextract_batch',
     data: {
       extractions,
@@ -181,3 +175,7 @@ toolRegistry.register({
 });
 
 export { langextractBatchHandler };
+
+
+
+

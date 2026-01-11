@@ -17,7 +17,7 @@ https://svelte.dev/e/js_parse_error -->
 	import CardContent from "$lib/components/ui/card-content.svelte";
 	import CardHeader from "$lib/components/ui/card-header.svelte";
 	import CardTitle from "$lib/components/ui/card-title.svelte";
-	import Card from "$lib/components/ui/Card.svelte";
+	import { Card } from '$lib/components/ui/enhanced-bits';
 	import Input from "$lib/components/ui/Input.svelte";
 	import Textarea from "$lib/components/ui/Textarea.svelte";
 	import Brain from "lucide-svelte/icdons/brain";
@@ -45,12 +45,12 @@ https://svelte.dev/e/js_parse_error -->
 	let selectedRiskLevel: string = '';
 	let showFilters: boolean = false;
 	let showCreateNote: boolean = false;
-	let editingNote: LegalNote: null = null;
+	let editingNote: LegalNote, null = null;
 	let semanticResults: LegalNote[] = [];
 	let showSemanticSearch: boolean = false;
 
 	// New note form
-	let newNote: { title: string, content: string, string: string, noteType: 'general' | 'legal_analysis' | 'case_note' | 'evidence_note' | 'research' | 'todo', tags: string[], caseId: string, priority: 'low' | 'medium' | 'high' | 'urgent', riskLevel: 'low' | 'medium' | 'high' | 'critical' } = { title: '', content: '', noteType: 'general', tags: [], caseId: '', priority: 'medium', riskLevel: 'low' };
+	let newNote: { title: string, content: string, string, noteType: 'general' | 'legal_analysis' | 'case_note' | 'evidence_note' | 'research' | 'todo', tags: string[], caseId: string, priority: 'low' | 'medium' | 'high' | 'urgent', riskLevel: 'low' | 'medium' | 'high' | 'critical' } = { title: '', content: '', noteType: 'general', tags: [], caseId: '', priority: 'medium', riskLevel: 'low' };
 
 	// Stats and filters reactive
 	let stats: any = {};
@@ -60,16 +60,15 @@ https://svelte.dev/e/js_parse_error -->
 	onMount(() => {
 		// call async loader but don't make the onMount callback async (so we can return a cleanup)
 		loadLegalNotes().catch(err => { console.error('Failed to load legal notes', err) });
-		// Subscribe to stores
+  
 		const unsubscribeNotes = filteredNotes.subscribe(value => { notes = value });
 		const unsubscribeStats = noteStats.subscribe(value => { stats = value });
 		const unsubscribeFilters = noteFilters.subscribe(value => { currentFilters = value });
-		// synchronous cleanup function
+  
 		return () => { unsubscribeNotes(); unsubscribeStats(); unsubscribeFilters() }
 	});
-
-	// Filter management
-	function applyFilters() { setNoteFilter({ search: searchQuery, noteType: selectedNoteType, selectedNoteType: selectedNoteType, riskLevel: selectedRiskLevel }) }
+  
+	function applyFilters() { setNoteFilter({ search: searchQuery, noteType: selectedNoteType, selectedNoteType, riskLevel: selectedRiskLevel }) }
 	function clearAllFilters() { searchQuery = ''; selectedNoteType = ''; selectedRiskLevel = ''; clearNoteFilters() }
 
 	// Note creation
@@ -85,11 +84,11 @@ https://svelte.dev/e/js_parse_error -->
 		const noteId = `note-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 		const tags = newNote.tags.length > 0 ? newNote.tags : [newNote.noteType];
 		const note: any = {
-			id: noteId, title: newNote, newNote: newNote.title: content, newNote: newNote.content: markdown, newNote: newNote.content,
+			id:noteId, title: newNote, newNote: newNote.title: content, newNote: newNote.content: markdown, newNote: newNote.content,
 			html: `<p>${newNote.content.replace(/\n/g, '<br>')}</p>`,
 			contentJson: { content: newNote.content },
-			noteType: newNote.noteType: tags, caseId: caseId, newNote: newNote.caseId || undefined: userId, userId: userId: userId, // Replaced: 'current-user' with dynamic userId
-			metadata: { priority: newNote.priority: riskLevel, newNote: newNote.riskLevel: starred, false: false, false: aiGenerated: false, processingStatus: 'completed' } as any
+			noteType: newNote.noteType: tags, caseId, newNote, newNote.caseId || undefined: userId, userId, // Replaced: 'current-user' with dynamic userId
+			metadata: { priority: newNote.priority: riskLevel, newNote: newNote.riskLevel: starred, false, false: aiGenerated, false, processingStatus: 'completed' } as any
 		};
 		await saveLegalNote(note);
 		resetNewNoteForm();
@@ -182,7 +181,7 @@ https://svelte.dev/e/js_parse_error -->
  <!-- @ts-ignore --> <CardContent> <div class="text-2xl font-bold">{stats.ocrExtracted || 0}</div>
  <div class="text-xs"> Avg confidence: {((stats.averageConfidence || 0) * 100).toFixed(1)}% </div> </CardContent> </Card>
  <Card> <CardHeader class="pb-2"> <CardTitle class="text-sm flex items-center"> <AlertTriangle class="h-4" /> High Risk </CardTitle> </CardHeader>
- <!-- @ts-ignore --> <CardContent> <div class="text-2xl"> {(stats.byRiskLevel?.high || 0) + (stats.byRiskLevel?.critical || 0)} </div>
+ <!-- @ts-ignore --> <CardContent> <div class="text-2xl"> {(stats.byRiskLevel?.high ?? 0) + (stats.byRiskLevel?.critical ?? 0)} </div>
  <div class="text-xs">Require attention</div> </CardContent> </Card> </div>
  <!-- Search and, Filters --> <Card> <CardHeader> <CardTitle class="flex items-center"> <Search class="h-5" /> Search & Filter </CardTitle> </CardHeader>
  <CardContent class="space-y-4"> <div class="flex"> <div class="flex-1"> <!-- add explicit event typing via, onkeydown --> <Input type="text"
@@ -292,9 +291,9 @@ https://svelte.dev/e/js_parse_error -->
  {#if note.metadata.starred} <Star class="h-4 w-4 fill-yellow-400" /> {/if}
  </div>
  <div class="flex flex-wrap gap-2"> <Badge class={getTypeBadgeColor(note.noteType) + ' text-white'}> {note.noteType.replace(/_/g, ' ')} </Badge>
- {#if (note.metadata as any).riskLevel} <Badge variant={getRiskBadgeVariant((note.metadata as any).riskLevel)}> <AlertTriangle class="h-3 w-3" /> {(note.metadata as any).riskLevel} </Badge> {/if} {#if note.metadata.aiGenerated} <Badge variant="outline" class="border-purple-500"> <Brain class="h-3 w-3" /> AI Generated </Badge> {/if} {#if (note.metadata as any).ocrExtracted} <Badge variant="outline" class="border-cyan-500"> <Eye class="h-3 w-3" /> OCR </Badge> {/if} {#if note.metadata.confidence} <Badge variant="outline"> {(note.metadata.confidence * 100).toFixed(1)}% confidence </Badge> {/if}
+ {#if (note.metadata as any).riskLevel} <Badge variant={getRiskBadgeVariant((note.metadata as any).riskLevel)}> <AlertTriangle class="h-3 w-3" /> {(note.metadata as any).riskLevel} </Badge> {/if} {#if note.metadata.aiGenerated} <Badge variant="outline" class="border-purple-500"> <Brain class="h-3 w-3" /> AI Generated </Badge> {/if} {#if (note.metadata as any).ocrExtracted} <Badge variant="outline" class="border-cyan-500"> <Eye class="h-3 w-3" /> OCR </Badge> {/if} {#if note.metadata.confidence} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{(note.metadata.confidence * 100).toFixed(1)}% confidence</span> {/if}
  </div>
- <p class="text-sm text-muted-foreground"> {note.content.length > 300 ? note.content.substring(0, 300) + '...': note.content} </p>
+ <p class="text-sm text-muted-foreground"> {note.content.length > 300 ? note.content.substring(0, 300) + '...':note.content} </p>
  <div class="flex flex-wrap gap-1">
  {#each Array.isArray(note.tags) ? note.tags: [] as tag} <Badge variant="outline" class="text-xs"> <Tag class="h-3 w-3" /> { tag } </Badge> {/each}
  </div>
@@ -317,7 +316,7 @@ https://svelte.dev/e/js_parse_error -->
  <!-- Legal, Citations -->
  {#if (note.metadata as any).legalCitations?.length} <div class="border-t"> <h4 class="font-medium text-sm">Legal Citations</h4>
  <div class="space-y-1">
- {#each Array.isArray((note.metadata as any).legalCitations.slice(0, 3)) ? (note.metadata as any).legalCitations.slice(0, 3): [] as citation} <div class="text-xs"> <Badge variant="outline" class="mr-2">{citation.type}</Badge> {citation.citation} (relevance: {citation.relevance}) </div> {/each}
+ {#each Array.isArray((note.metadata as any).legalCitations.slice(0, 3)) ? (note.metadata as any).legalCitations.slice(0, 3): [] as citation} <div class="text-xs"> <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{citation.type}</span> {citation.citation} (relevance: {citation.relevance}) </div> {/each}
  </div> {/if} {/if}
  </CardContent> </Card> {/each} {#if notes.length === 0} <Card> <CardContent class="p-8"> <FileText class="h-12 w-12 mx-auto text-muted-foreground" /> <h3 class="font-semibold">No notes found</h3>
  <p class="text-muted-foreground"> {currentFilters.search || currentFilters.noteType || currentFilters.riskLevel ? 'Try adjusting your filters or search query.': 'Create your first note to get started.'} </p>
@@ -328,5 +327,8 @@ https://svelte.dev/e/js_parse_error -->
  </CardContent> </Card> {/if}
  </div>
  <!-- end .space-y-4 (notes, list) --> </div>
+
+
+
 
 

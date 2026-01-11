@@ -10,15 +10,13 @@ export type RankExplain = {
 };
 
 export type RankedHit = QdrantHit & {
- finalScore: number;
- explain: RankExplain;
+ finalScore: number; explain: RankExplain;
 };
 
 /**
  * Rerank search results using legal-aware scoring
  */
-export function rerankLegalAware(opts: {
- hits: QdrantHit[];
+export function rerankLegalAware(opts: { hits: QdrantHit[];
  queryTagIds?: string[];
  jurisdiction?: string | null;
  weights?: { cosine: number; sharedTags: number; sameJurisdiction: number };
@@ -48,8 +46,7 @@ export function rerankLegalAware(opts: {
 
  return { ...h, finalScore, explain };
  });
-
- // Sort by final score (highest first)
+  
  out.sort((a, b) => (b.finalScore ?? b.score) - (a.finalScore ?? a.score));
 
  return out;
@@ -80,3 +77,7 @@ export function createQdrantFilter(opts: {
 
  return conditions.length > 0 ? { must: conditions }  | undefined;
 }
+
+
+
+

@@ -24,8 +24,10 @@
 
 <style>
 	.app-layout {
-		min-height: 100vh;
-		display: flex;
+		min-height: 100vh; display: flex;
 		flex-direction: column;
 	}
 </style>
+
+
+

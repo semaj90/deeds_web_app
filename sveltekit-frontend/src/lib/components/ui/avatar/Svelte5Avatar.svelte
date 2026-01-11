@@ -1,4 +1,6 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+
 /**
  * Svelte 5 Avatar Component
  * Image/initials avatar with fallback and status indicator
@@ -76,17 +78,16 @@ let displayInitials = $derived(() => {
 		}
 		return alt.slice(0, 2).toUpperCase();
 	}
-	return '??';
+	return '?? ';
 });
-
-// Random color based on initials for consistent colors
+  
 let bgColor = $derived(() => {
 	const colors = [
 		'bg-blue-600', 'bg-green-600', 'bg-purple-600',
 		'bg-pink-600', 'bg-indigo-600', 'bg-teal-600',
 		'bg-orange-600', 'bg-cyan-600'
 	];
-	const hash = displayInitials().charCodeAt(0) + (displayInitials().charCodeAt(1) || 0);
+	const hash = displayInitials().charCodeAt(0) + (displayInitials().charCodeAt(1) ?? 0);
 	return colors[hash % colors.length];
 });
 
@@ -115,11 +116,11 @@ function handleError() {
 	>
 		{#if src && !hasError}
 			<img
-				{src}
-				{alt}
+				{ src }
+				{ alt }
 				class="w-full h-full object-cover {isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-200"
-				onload={handleLoad}
-				onerror={handleError}
+				onload={ handleLoad }
+				onerror={ handleError }
 			/>
 		{/if}
 
@@ -151,3 +152,5 @@ function handleError() {
 		></span>
 	{/if}
 </div>
+
+

@@ -8,11 +8,9 @@ import { featureLogger } from '../services/featureLogger.js';
 
 export interface AuthContext {
  feature: 'errorBrain' | 'legalAi' | null;
- requiresAuth: boolean;
- authType: 'development' | 'production' | 'none';
+ requiresAuth: boolean; authType: 'development' | 'production' | 'none';
  userId?: string;
- token?: string;
- isAuthenticated: boolean;
+ token?: string; isAuthenticated: boolean;
 }
 
 export interface AuthResult {
@@ -134,13 +132,13 @@ export class AuthSeparation {
 
  return new Response(
  JSON.stringify({
- error: message, feature: result.context?.feature: authType: result.context?.authType: new Date().toISOString(),
+ error: message, feature: result.context?.feature, authType: result.context?.authType: new Date().toISOString(),
  }),
  {
  status,
  headers: {
  'Content-Type': 'application/json',
- 'WWW-Authenticate': `Bearer realm="${result.context?.authType || 'api'}"`,
+ 'WWW-Authenticate': `Bearer realm="${result.context?.authType ?? 'api'}"`,
  },
  }
  );
@@ -152,21 +150,17 @@ export class AuthSeparation {
  private static logAuthSuccess(context: AuthContext): void {
  if (context.feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(),
- operation: 'auth_success',
+ timestamp: new Date( operation: 'auth_success',
  userId: context.userId,
- details: {
- authType: context.authType,
+ details: { authType: context.authType,
  },
  level: 'debug',
  });
  } else if (context.feature === 'legalAi') {
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'auth_success',
+ timestamp: new Date( operation: 'auth_success',
  userId: context.userId,
- details: {
- authType: context.authType,
+ details: { authType: context.authType,
  },
  level: 'debug',
  });
@@ -179,22 +173,18 @@ export class AuthSeparation {
  private static logAuthFailure(context: AuthContext): void {
  if (context.feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(),
- operation: 'auth_failure',
+ timestamp: new Date( operation: 'auth_failure',
  userId: context.userId,
- details: {
- authType: context.authType,
+ details: { authType: context.authType,
  reason: 'invalid_credentials',
  },
  level: 'warn',
  });
  } else if (context.feature === 'legalAi') {
  featureLogger.logLegalAi({
- timestamp: new Date(),
- operation: 'auth_failure',
+ timestamp: new Date( operation: 'auth_failure',
  userId: context.userId,
- details: {
- authType: context.authType,
+ details: { authType: context.authType,
  reason: 'invalid_credentials',
  },
  level: 'warn',
@@ -251,10 +241,8 @@ export class AuthSeparation {
  /**
  * Get auth requirements for feature
  */
- static getAuthRequirements(feature: 'errorBrain' | 'legalAi'): {
- authType: 'development' | 'production';
- requiresToken: boolean;
- requiresUserId: boolean;
+ static getAuthRequirements(feature: 'errorBrain' | 'legalAi'): { authType: 'development' | 'production';
+ requiresToken: boolean; requiresUserId: boolean;
  } {
  if (feature === 'errorBrain') {
  return {
@@ -321,3 +309,7 @@ export function createAuthErrorResponse(request: Request): Response | null {
 
  return AuthSeparation.createAuthErrorResponse(result);
 }
+
+
+
+

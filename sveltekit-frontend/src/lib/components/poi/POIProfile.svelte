@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { DialogContent, DialogOverlay, DialogPortal, DialogRoot } from 'bits-ui';
+
  import * as Dialog from 'bits-ui/components/dialog';
 
  let { person } = $props();
@@ -61,13 +63,16 @@
  AI ANALYSIS
  </button>
 
- <Dialog.Root bind:open={aiOpen}>
- <Dialog.Portal>
- <Dialog.Overlay />
- <Dialog.Content class="nes-container bg-gray-900 text-white w-[500px] rounded-xl">
+ <DialogRoot bind:open={aiOpen}>
+ <DialogPortal>
+ <DialogOverlay />
+ <DialogContent class="nes-container bg-gray-900 text-white w-[500px] rounded-xl">
  <h2 class="text-xl mb-4">AI Legal Risk Summary</h2>
  <p>{aiSummary}</p>
- </Dialog.Content>
- </Dialog.Portal>
- </Dialog.Root>
+ </DialogContent>
+ </DialogPortal>
+ </DialogRoot>
 </div>
+
+
+

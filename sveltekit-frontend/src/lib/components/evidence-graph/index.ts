@@ -9,3 +9,5 @@ export { default as LegalHUD } from './LegalHUD.svelte';
 export { default as ContradictionReveal } from './ContradictionReveal.svelte';
 export { default as GraphView } from './GraphView.svelte';
 export { default as GraphFilterPanel } from './GraphFilterPanel.svelte';
+
+

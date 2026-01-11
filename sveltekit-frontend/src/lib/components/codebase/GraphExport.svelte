@@ -13,17 +13,14 @@
 	import Image from 'lucide-svelte/icons/image';
 
 	interface GraphNode {
-		id: string;
-		label: string;
-		type: string;
-		errorCount: number;
+		id: string; label: string;
+		type: string; errorCount: number;
 		filePath: string;
 		cluster?: string;
 	}
 
 	interface GraphEdge {
-		source: string;
-		target: string;
+		source: string; target: string;
 		type: string;
 	}
 
@@ -58,15 +55,13 @@
 			const data = {
 				nodes,
 				edges,
-				metadata: {
-					exportedAt: new Date().toISOString(),
-					nodeCount: nodes.length,
+				metadata: { exportedAt: new Date().toISOString(), nodeCount: nodes.length,
 					edgeCount: edges.length
 				}
 			};
 
 			const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-			downloadBlob(blob, `${filename}.json`);
+			downloadBlob(blob, `${ filename }.json`);
 			showSuccess('JSON');
 		} finally {
 			isExporting = false;
@@ -92,7 +87,7 @@
 			const combinedCSV = `# Nodes\n${nodesCSV}\n\n# Edges\n${edgesCSV}`;
 
 			const blob = new Blob([combinedCSV], { type: 'text/csv' });
-			downloadBlob(blob, `${filename}.csv`);
+			downloadBlob(blob, `${ filename }.csv`);
 			showSuccess('CSV');
 		} finally {
 			isExporting = false;
@@ -109,7 +104,7 @@
 		try {
 			const svgData = new XMLSerializer().serializeToString(svgElement);
 			const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-			downloadBlob(svgBlob, `${filename}.svg`);
+			downloadBlob(svgBlob, `${ filename }.svg`);
 			showSuccess('SVG');
 		} finally {
 			isExporting = false;
@@ -240,53 +235,44 @@
 <style>
 	.graph-export {
 		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
+		flex-direction: column; gap: 0.5rem;
 	}
 
 	.export-header {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 		font-size: 0.75rem;
-		font-weight: 500;
-		color: rgba(255, 255, 255, 0.5);
+		font-weight: 500; color: rgba(255, 255, 255, 0.5);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 	}
 
 	.export-options {
-		display: flex;
-		gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 	}
 
 	.export-btn {
 		display: flex;
-		align-items: center;
-		gap: 0.375rem;
+		align-items: center; gap: 0.375rem;
 		padding: 0.5rem 0.75rem;
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 6px;
-		color: rgba(255, 255, 255, 0.8);
-		font-size: 0.8rem;
-		cursor: pointer;
+		border-radius: 6px; color: rgba(255, 255, 255, 0.8);
+		font-size: 0.8rem; cursor: pointer;
 		transition: all 0.2s ease;
 	}
 
-	.export-btn:hover:not(:disabled) {
+	.export-btn:hover, not(disabled) {
 		background: rgba(255, 255, 255, 0.1);
 		border-color: rgba(255, 255, 255, 0.2);
 	}
 
 	.export-btn:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
+		opacity: 0.5; cursor:not-allowed;
 	}
 
 	.success-icon {
-		color: #4ade80;
-		animation: pop 0.3s ease;
+		color: #4ade80; animation: pop 0.3s ease;
 	}
 
 	@keyframes pop {
@@ -295,3 +281,7 @@
 		100% { transform: scale(1); }
 	}
 </style>
+
+
+
+

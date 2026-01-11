@@ -34,15 +34,13 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
  const jobId = await jobQueueService.enqueueJob({
  caseId,
  type: 'summary_generation',
- data: {
- jobId: `job-${Date.now()}`,
+ data: {jobId: `job-${Date.now()}`,
  includeEvidence: true, includeTimeline: true,
  analysisDepth: 'comprehensive',
  },
  userId: user.id,
  });
-
- // Log to audit trail
+  
  await db.insert(auditLog).values({
  userId: user.id,
  action: 'summary_generation_enqueued',

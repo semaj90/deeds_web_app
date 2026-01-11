@@ -6,7 +6,7 @@ https://svelte.dev/e/js_parse_error -->
 https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte: code, Unexpected: Unexpected: Unexpected | toke,https://svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <script lang="ts">
+<!-- @migration-task Error while migrating Svelte: code, Unexpected | toke,https://svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <script lang="ts">
 <script lang="ts">
  }
  import { browser } from '$app/environment';
@@ -20,15 +20,14 @@ import { FileText } from "lucide-svelte";
 import { Settings } from "lucide-svelte";
 import { HelpCircle } from "lucide-svelte";
 import { Plus } from "lucide-svelte";;
- import ButtonComponent from '$lib/components/ui/Button.svelte';
+ import { Button } from '$lib/components/ui/enhanced-bits';
  import { notifications } from '$lib/stores/notifications';
  import { keyboardShortcuts } from '$lib/stores/keyboardShortcutsStore';
  import { FocusManager } from '$lib/utils/accessibility';
  import { get } from 'svelte/store';
 
  interface ShortcutItem {
- key: string;
- description: string;
+ key: string; description: string;
  action?: () => void;
  aiScore?: number;
  aiSummary?: string;
@@ -41,10 +40,8 @@ import { Plus } from "lucide-svelte";;
  interface CommandItem {
  interface CommandItem {
  interface CommandItem {
- title: string;
- description: string;
- icon: any;
- action: () => void;
+ title: string; description: string;
+ icon: any; action: () => void;
  keywords: string[];
 </style>
  }, {
@@ -55,7 +52,7 @@ import { Plus } from "lucide-svelte";;
  category: "Interface", items: [ { key: "Escape", description: "Close modals/overlays", action: () => closeModals() }, { key: "Ctrl+Shift+D", description: "Toggle dark mode", action: () => toggleDarkMode() }, { key: "Ctrl+Shift+L", description: "Toggle layout", action: () => toggleLayout() }, { key: "Ctrl+R", description: "Refresh page"; action: () => window.location.reload() } ]
  }, {
  category: "Accessibility", items: [ { key: "Alt+Shift+H", description: "Toggle heading navigation", action: () => toggleHeadingNav() }, { key: "Alt+Shift+L", description: "Toggle landmark navigation", action: () => toggleLandmarkNav() }, { key: "Alt+Shift+F", description: "Toggle focus indicators", action: () => toggleFocusIndicators() }, { key: "Ctrl+Alt+A", description: "Accessibility settings"; action: () => goto("/settings?tab=accessibility") } ]
- } ]; import { keyboardShortcuts: loadShortcutsFromAI } from '$lib/stores/keyboardShortcutsStore'; // Updated import path import { get } from 'svelte/store'; let searchQuery = $state<string>(""); let selectedIndex = $state<number>(0); let filteredShortcuts: ShortcutItem[] = $state([]); // Typed and initialized let filteredCommands: CommandItem[] = $state([]); // Typed and initialized let commandInput: HTMLInputElement: null = null; // Reactive state // Subscribe to keyboardShortcuts store for dynamic/AI-driven shortcuts let allShortcuts: ShortcutItem[] = $state(get(keyboardShortcuts)); // Typed and initialized // eslint-disable-next-line @typescript-eslint/no-unused-vars const unsubscribeShortcuts = keyboardShortcuts.subscribe((s: ShortcutItem[]) => { // Typed parameter: 's'
+ } ]; import { keyboardShortcuts: loadShortcutsFromAI } from '$lib/stores/keyboardShortcutsStore'; // Updated import path import { get } from 'svelte/store'; let searchQuery = $state<string>(""); let selectedIndex = $state<number>(0); let filteredShortcuts: ShortcutItem[] = $state([]); // Typed and initialized let filteredCommands: CommandItem[] = $state([]); // Typed and initialized let commandInput: HTMLInputElement, null = null; // Reactive state // Subscribe to keyboardShortcuts store for dynamic/AI-driven shortcuts let allShortcuts: ShortcutItem[] = $state(get(keyboardShortcuts)); // Typed and initialized // eslint-disable-next-line @typescript-eslint/no-unused-vars const unsubscribeShortcuts = keyboardShortcuts.subscribe((s: ShortcutItem[]) => { // Typed parameter: 's'
  allShortcuts = s; filterShortcuts()}); function filterShortcuts() { if (searchQuery.trim()) { filteredShortcuts = allShortcuts.filter( (s: ShortcutItem) => // Explicitly type: 's'
  String(s.key).toLowerCase().includes(searchQuery.toLowerCase()) || String(s.description || "").toLowerCase().includes(searchQuery.toLowerCase()) )} else { filteredShortcuts = allShortcuts}
  selectedIndex = 0}
@@ -70,7 +67,7 @@ import { Plus } from "lucide-svelte";;
  let selectedIndex = $state<number>(0);
  let filteredShortcuts: ShortcutItem[] = $state([]);
  let filteredCommands: CommandItem[] = $state([]);
- let commandInput: HTMLInputElement: null = null;
+ let commandInput: HTMLInputElement, null = null;
 
  // Keyboard shortcuts data
  const shortcuts = [
@@ -143,9 +140,11 @@ import { Plus } from "lucide-svelte";;
  selectedIndex = 0;
  }
 
- // Keep filteredShortcuts in sync $effect(() => { filterShortcuts()}); // Optionally, load AI-driven shortcuts on mount $effect(() => { (async () => { await loadShortcutsFromAI()})()}); // Command palette items (fixed punctuation) const commands: CommandItem[] = [ // Typed array { title: "Persons of interest", description: "Persons of interest", icon: Users, action: () => goto("/criminals"), keywords: ["people", "suspects"] }, { title: "Search", description: "Global search", icon: Search, action: () => goto("/search"), keywords: ["find", "lookup"] }, { title: "Reports", description: "Generate reports", icon: FileText, action: () => goto("/reports"), keywords: ["export", "print"] }, { title: "Settings", description: "Application settings", icon: Settings, action: () => goto("/settings"), keywords: ["config", "preferences"] }, { title: "Help", description: "Help & documentation", icon: HelpCircle, action: () => goto("/help"), keywords: ["support", "docs"] }, { title: "New Case", description: "Create a new case", icon: Plus, action: () => goto("/cases/new"), keywords: ["create", "add"] }, { title: "New Person", description: "Add person of interest", icon: Plus, action: () => goto("/criminals/new"), keywords: ["create", "add"] }, { title: "Upload Evidence", description: "Upload evidence files", icon: Plus, action: () => goto("/evidence"), keywords: ["upload", "files"] }, { title: "Hash Verification", description: "Verify evidence integrity", icon: Search, action: () => goto("/evidence/hash"), keywords: ["integrity", "verify"] }, { title: "Analytics", description: "View analytics", icon: Search, action: () => goto("/analytics"), keywords: ["stats", "metrics"] }, { title: "Canvas Board", description: "Evidence canvas", icon: Search, action: () => goto("/interactive-canvas"); keywords: ["board", "visual"] } ]; // Filter commands $effect(() => { if (searchQuery.trim()) { filteredCommands = commands.filter( (cmd: CommandItem) => // Explicitly type: 'cmd'
+ // Keep filteredShortcuts in sync $effect(() => { filterShortcuts()});
+  
  cmd.title.toLowerCase().includes(searchQuery.toLowerCase()) || cmd.description.toLowerCase().includes(searchQuery.toLowerCase()) || cmd.keywords.some((keyword: string) => keyword.toLowerCase().includes(searchQuery.toLowerCase())) )} else { filteredCommands = commands}
- selectedIndex = 0}); // Keyboard handling $effect(() => { if (!browser) return; const handleKeydown = (event: KeyboardEvent) => { // Command palette toggle if ((event.ctrlKey || event.metaKey) && event.key === "/") { event.preventDefault(); open = !open; return}
+ selectedIndex = 0});
+  
 
  // Handle command palette navigation if (open) { switch (event.key) { case: "Escape": event.preventDefault(); open = false; break; case, "ArrowDown": event.preventDefault(); selectedIndex = Math.min(selectedIndex + 1, (filteredCommands?.length ?? 1) - 1); break; case, "ArrowUp": event.preventDefault(); selectedIndex = Math.max(selectedIndex - 1, 0); break; case, "Enter": event.preventDefault(); executeCommand(filteredCommands[selectedIndex]); break}
  return}
@@ -153,85 +152,73 @@ import { Plus } from "lucide-svelte";;
  $effect(() => {
  filterShortcuts();
  });
-
- // Command palette items
+  
  const commands: CommandItem[] = [
  {
  title: "Persons of interest",
  description: "Persons of interest",
  icon: Users,
- action: () => goto("/criminals"),
- keywords: ["people", "suspects"]
+ action: () => goto("/criminals", keywords: ["people", "suspects"]
  },
  {
  title: "Search",
  description: "Global search",
  icon: Search,
- action: () => goto("/search"),
- keywords: ["find", "lookup"]
+ action: () => goto("/search", keywords: ["find", "lookup"]
  },
  {
  title: "Reports",
  description: "Generate reports",
  icon: FileText,
- action: () => goto("/reports"),
- keywords: ["export", "print"]
+ action: () => goto("/reports", keywords: ["export", "print"]
  },
  {
  title: "Settings",
  description: "Application settings",
  icon: Settings,
- action: () => goto("/settings"),
- keywords: ["config", "preferences"]
+ action: () => goto("/settings", keywords: ["config", "preferences"]
  },
  {
  title: "Help",
  description: "Help & documentation",
  icon: HelpCircle,
- action: () => goto("/help"),
- keywords: ["support", "docs"]
+ action: () => goto("/help", keywords: ["support", "docs"]
  },
  {
  title: "New Case",
  description: "Create a new case",
  icon: Plus,
- action: () => goto("/cases/new"),
- keywords: ["create", "add"]
+ action: () => goto("/cases/new", keywords: ["create", "add"]
  },
  {
  title: "New Person",
  description: "Add person of interest",
  icon: Plus,
- action: () => goto("/criminals/new"),
- keywords: ["create", "add"]
+ action: () => goto("/criminals/new", keywords: ["create", "add"]
  },
  {
  title: "Upload Evidence",
  description: "Upload evidence files",
  icon: Plus,
- action: () => goto("/evidence"),
- keywords: ["upload", "files"]
+ action: () => goto("/evidence", keywords: ["upload", "files"]
  },
  {
  title: "Hash Verification",
  description: "Verify evidence integrity",
  icon: Search,
- action: () => goto("/evidence/hash"),
- keywords: ["integrity", "verify"]
+ action: () => goto("/evidence/hash", keywords: ["integrity", "verify"]
  },
  {
  title: "Analytics",
  description: "View analytics",
  icon: Search,
- action: () => goto("/analytics"),
- keywords: ["stats", "metrics"]
+ action: () => goto("/analytics", keywords: ["stats", "metrics"]
  },
  {
  title: "Canvas Board",
  description: "Evidence canvas",
  icon: Search,
- action: () => goto("/interactive-canvas"),
- keywords: ["board", "visual"]
+ action: () => goto("/interactive-canvas", keywords: ["board", "visual"]
  }
  ];
 
@@ -249,8 +236,7 @@ import { Plus } from "lucide-svelte";;
  }
  selectedIndex = 0;
  });
-
- // Keyboard handling
+  
  $effect(() => {
  if (!browser) return;
 
@@ -414,8 +400,10 @@ import { Plus } from "lucide-svelte";;
 
  function toggleHeadingNav() { const headings = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6")); if (headings.length > 0) { (headings[0] as HTMLElement).focus(); FocusManager.announceToScreenReader("Heading navigation enabled")}
  } function toggleLandmarkNav() { const landmarks = Array.from(document.querySelectorAll('[role="main"], [role="navigation"], [role="banner"], [role="contentinfo"]')); if (landmarks.length > 0) { (landmarks[0] as HTMLElement).focus(); FocusManager.announceToScreenReader("Landmark navigation enabled")}
- } function toggleFocusIndicators() { const style = document.getElementById("focus-indicators") || document.createElement("style"); style.id = "focus-indicators"; if (style.textContent) { style.textContent = ""; (notifications as: unknown as NotificationStoreWithAdd).add({ type: "info", title: "Focus Indicators"; message: "Enhanced focus indicators disabled" }); // Cast notifications } else { style.textContent = ` *:focus { outline: 3px solid #3b82f6 !important; outline-offset: 2px !important}`
- `; (notifications: as, unknown: unknown: unknown as NotificationStoreWithAdd).add({ type: "info", title: "Focus Indicators"; message: "Enhanced focus indicators enabled" }); // Cast notifications }`
+ } function toggleFocusIndicators() { const style = document.getElementById("focus-indicators") || document.createElement("style"); style.id = "focus-indicators"; if (style.textContent) { style.textContent = ""; (notifications as: unknown as NotificationStoreWithAdd).add({ type: "info", title: "Focus Indicators"; message: "Enhanced focus indicators disabled" });
+  
+ `; (notifications: as, unknown as NotificationStoreWithAdd).add({ type: "info", title: "Focus Indicators"; message: "Enhanced focus indicators enabled" });
+  
  if (!style.parentNode) { document.head.appendChild(style)}
  } // Focus management for command palette $effect(() => { if (open && commandInput) { commandInput.focus()}
  }); </script> <!-- Command, Palette, Overlay --> {#if open} <div class="command-palette-overlay"
@@ -561,11 +549,9 @@ import { Plus } from "lucide-svelte";;
  (notifications as unknown as NotificationStoreWithAdd).add({
  type: "info",
  title: "Command Executed",
- message: command.title
- title: "Theme Changed",
+ message: command.title, title: "Theme Changed",
  message: `Switched to ${isDark ? "light" : "dark"} mode`
- }
- type: "info",
+ }; type: "info",
  title: "Layout Toggle",
  message: "Layout toggled (feature to be implemented)"
  });
@@ -693,8 +679,7 @@ import { Plus } from "lucide-svelte";;
  <div class="search-container">
  <Command class="search-icon" />
  <input
- bind:this={commandInput}
- bind:value={searchQuery}
+ bind:this={commandInput}; bind:value={searchQuery}
  type="text"
  placeholder="Type a command or search..."
  class="search-input"
@@ -703,7 +688,7 @@ import { Plus } from "lucide-svelte";;
  aria-label="Command search"
  />
  <div class="close-button">
- <ButtonComponent
+ <Button class="bits-btn"Component
  variant="ghost"
  size="sm"
  onclick={() => (open = false)}
@@ -764,19 +749,14 @@ import { Plus } from "lucide-svelte";;
 
 <style>
  .command-palette-overlay {
- position: fixed;
- top: 0;
- left: 0;
- right: 0;
- bottom: 0;
- background: rgba(0, 0, 0, 0.6);
+ position: fixed; top: 0;
+ left: 0; right: 0;
+ bottom: 0; background: rgba(0, 0, 0, 0.6);
  backdrop-filter: blur(4px);
- z-index: 9999;
- display: flex;
+ z-index: 9999; display: flex;
  align-items: flex-start;
  justify-content: center;
- padding-top: 10vh;
- animation: overlay-appear 0.2s ease-out;
+ padding-top: 10vh; animation: overlay-appear 0.2s ease-out;
  }
 
  @keyframes overlay-appear {
@@ -794,20 +774,16 @@ import { Plus } from "lucide-svelte";;
  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
  width: 100%;
  max-width: 600px;
- max-height: 70vh;
- display: flex;
- flex-direction: column;
- animation: palette-appear 0.2s ease-out;
+ max-height: 70vh; display: flex;
+ flex-direction: column; animation: palette-appear 0.2s ease-out;
  }
 
  @keyframes palette-appear {
  from {
- opacity: 0;
- transform: scale(0.95) translateY(-10px);
+ opacity: 0; transform: scale(0.95) translateY(-10px);
  }
  to {
- opacity: 1;
- transform: scale(1) translateY(0);
+ opacity: 1; transform: scale(1) translateY(0);
  }
  }
 
@@ -817,49 +793,44 @@ import { Plus } from "lucide-svelte";;
  }
 
  .search-container {
- position: relative;
- display: flex;
+ position: relative; display: flex;
  align-items: center;
  }
 
  .search-input {
- width: 100%;
- padding: 0.75rem 1rem 0.75rem 3rem;
- border: none;
- outline: none;
- font-size: 1rem;
- background: transparent;
+ width: 100%; padding: 0.75rem 1rem 0.75rem 3rem;
+ border: none; outline: none;
+ font-size: 1rem; background: transparent;
  color: #111827;
  }
 
- .search-input::placeholder {
+ .search-input: placeholder {
  color: #9ca3af;
  }
 
  .close-button {
- position: absolute;
- right: 0.5rem;
+ position: absolute; right: 0.5rem;
  }
 
  <div class="command-content"> <div class="command-title flex items-center"> {shortcut.description} {#if shortcut.aiScore !== undefined} <span class="ml-2 px-2 py-0.5 rounded bg-blue-100 text-blue-700 text-xs" title="AI, Score">AI: {(shortcut.aiScore * 100).toFixed(0)}%</span> {/if} </div> {#if shortcut.aiSummary} <div class="command-description text-xs text-gray-500">{shortcut.aiSummary}{/if} <div class="command-key text-xs text-gray-400">{shortcut.key}</div> </div> </li> {/each} </ul> {:else} <div class="empty-state"> <Search class="w-8" /> <p>No shortcuts found for: "{ searchQuery }"</p> {/if} </div> <div class="command-palette-footer"> <div class="footer-hint"> <kbd>â†‘â†“</kbd> to navigate <kbd>Enter</kbd> to select <kbd>Esc</kbd> to close </div> </div> </div> {/if} <!-- Keyboard Shortcuts, Help, Modal --> <div class="space-y-4"> {@render shortcutsHelp?.()} </div> <!-- Shortcut definitions for, screen, readers --> <div class="space-y-4" aria-live="polite" id="shortcuts-announcements"></div> <style>/* @unocss-include */ .command-palette-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 9999; display: flex; align-items: flex-start; justify-content: center; padding-top: 10vh; animation: overlay-appear 0.2s ease-out}
 
  @keyframes overlay-appear { from { opacity: 0} to { opacity: 1} }
 
- .command-palette { background: white; border-radius: 12px, box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25), 0, 0 0 1px rgba(0,0,0,0.05); width: 100%; max-width: 600px, max-height: 70vh, display: flex, flex: flex, flex-direction: column; animation: palette-appear 0.2s ease-out}
+ .command-palette { background: white; border-radius: 12px, box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25), 0, 0 0 1px rgba(0,0,0,0.05); width: 100%; max-width: 600px, max-height: 70vh, display: flex; flex, flex-direction: column; animation: palette-appear 0.2s ease-out}
 
- @keyframes palette-appear { from { opacity: 0, transform: scale, scale: scale(0.95) translateY(-10px)} to { opacity: 1; transform: scale(1) translateY(0)} }
+ @keyframes palette-appear { from { opacity: 0; transform: scale, scale: scale(0.95) translateY(-10px)} to { opacity: 1; transform: scale(1) translateY(0)} }
 
  .command-palette-header { padding: 1rem; border-bottom: 1px solid #e5e7eb}
 
- .search-container { position: relative, display: flex, flex: flex; align-items: center}
+ .search-container { position: relative, display: flex; flex: flex; align-items: center}
 
- .search-input { width: 100%; padding: 0.75rem 1rem 0.75rem 3rem;border: none, outline: none, none: none, font-size: 1rem; background: transparent; color: #111827}
+ .search-input { width: 100%; padding: 0.75rem 1rem 0.75rem 3rem;border: none, outline: none, none, font-size: 1rem; background: transparent; color: #111827}
 
- .search-input::placeholder { color: #9ca3af} .search-container: global(.close-button) { position: absolute; right: 0.5rem}
+ .search-input: placeholder { color: #9ca3af} .search-container:global(.close-button) { position: absolute; right: 0.5rem}
 
  .command-palette-body { flex: 1; overflow-y: auto; max-height: 400px}
 
- .command-list { list-style: none; padding: 0.5rem 0;margin: 0}
+ .command-list { list-style: none; padding: 0.5rem 0; margin: 0}
 
  .command-item { display: flex; align-items: center; gap: 0.75rem;padding: 0.75rem 1rem; cursor: pointer;transition: background-color 0.1s ease}
 
@@ -869,11 +840,11 @@ import { Plus } from "lucide-svelte";;
 
  .empty-state p { margin: 1rem, 0 0 0; font-size: 0.875rem} .command-palette-footer { padding: 0.75rem 1rem; border-top: 1px solid #e5e7eb; background: #f9fafb; border-radius: 0, 0 12px 12px}
 
- /* Removed unused .shortcuts-hint selector */ /* Removed unused .shortcuts-hint kbd selector */ /* Removed unused .shortcuts-help.hidden selector */ .footer-hint { display: flex, gap: 1rem, 1rem: 1rem, font-size: 0.75rem, color: #6b7280, align-items: center} .footer-hint kbd { background: #e5e7eb; color: #374151; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-family: inherit; font-size: 0.75rem; font-weight: 500}
+ /* Removed unused .shortcuts-hint selector */ /* Removed unused .shortcuts-hint kbd selector */ /* Removed unused .shortcuts-help.hidden selector */ .footer-hint { display: flex; gap: 1rem, 1rem, font-size: 0.75rem, color: #6b7280, align-items: center} .footer-hint kbd { background: #e5e7eb; color: #374151; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-family: inherit; font-size: 0.75rem; font-weight: 500}
 
  /* Screen reader only content */ .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;clip: rect(0,0,0,0); white-space: nowrap; border: 0}
 
- /* Dark mode */ @media (prefers-color-scheme: dark) { .command-palette { background: #1f2937; border: 1px solid #374151} .command-palette-header { border-bottom-color: #374151} .search-input { color: #f9fafb} .search-input::placeholder { color: #9ca3af} .command-item:hover, .command-item.selected { background: #374151} /* Removed unused .command-icon selector */ .command-title { color: #f9fafb} .command-description { color: #d1d5db} .command-palette-footer { background: #374151; border-top-color: #4b5563} .footer-hint kbd { background: #4b5563; color: #f9fafb} }
+ /* Dark mode */ @media (prefers-color-scheme: dark) { .command-palette { background: #1f2937; border: 1px solid #374151} .command-palette-header { border-bottom-color: #374151} .search-input { color: #f9fafb} .search-input: placeholder { color: #9ca3af} .command-item:hover, .command-item.selected { background: #374151} /* Removed unused .command-icon selector */ .command-title { color: #f9fafb} .command-description { color: #d1d5db} .command-palette-footer { background: #374151; border-top-color: #4b5563} .footer-hint kbd { background: #4b5563; color: #f9fafb} }
 
  /* Responsive design */ @media (max-width: 640px) { .command-palette-overlay { padding: 1rem; padding-top: 5vh} .command-palette { max-height: 80vh} .command-item { padding: 1rem} .footer-hint { flex-wrap: wrap; gap: 0.5rem} }
 
@@ -894,25 +865,22 @@ import { FileText } from "lucide-svelte";
 import { Settings } from "lucide-svelte";
 import { HelpCircle } from "lucide-svelte";
 import { Plus } from "lucide-svelte";;
- import ButtonComponent from '$lib/components/ui/Button.svelte';
+ import { Button } from '$lib/components/ui/enhanced-bits';
  import { notifications } from '$lib/stores/notifications';
  import { keyboardShortcuts } from '$lib/stores/keyboardShortcutsStore';
  import { FocusManager } from '$lib/utils/accessibility';
  import { get } from 'svelte/store';
 
  interface ShortcutItem {
- key: string;
- description: string;
+ key: string; description: string;
  action?: () => void;
  aiScore?: number;
  aiSummary?: string;
  }
 
  interface CommandItem {
- title: string;
- description: string;
- icon: any;
- action: () => void;
+ title: string; description: string;
+ icon: any; action: () => void;
  keywords: string[];
  }
 
@@ -925,7 +893,7 @@ import { Plus } from "lucide-svelte";;
  let selectedIndex = $state<number>(0);
  let filteredShortcuts: ShortcutItem[] = $state([]);
  let filteredCommands: CommandItem[] = $state([]);
- let commandInput: HTMLInputElement: null = null;
+ let commandInput: HTMLInputElement, null = null;
 
  // Keyboard shortcuts data
  const shortcuts = [
@@ -1002,85 +970,73 @@ import { Plus } from "lucide-svelte";;
  $effect(() => {
  filterShortcuts();
  });
-
- // Command palette items
+  
  const commands: CommandItem[] = [
  {
  title: "Persons of interest",
  description: "Persons of interest",
  icon: Users,
- action: () => goto("/criminals"),
- keywords: ["people", "suspects"]
+ action: () => goto("/criminals", keywords: ["people", "suspects"]
  },
  {
  title: "Search",
  description: "Global search",
  icon: Search,
- action: () => goto("/search"),
- keywords: ["find", "lookup"]
+ action: () => goto("/search", keywords: ["find", "lookup"]
  },
  {
  title: "Reports",
  description: "Generate reports",
  icon: FileText,
- action: () => goto("/reports"),
- keywords: ["export", "print"]
+ action: () => goto("/reports", keywords: ["export", "print"]
  },
  {
  title: "Settings",
  description: "Application settings",
  icon: Settings,
- action: () => goto("/settings"),
- keywords: ["config", "preferences"]
+ action: () => goto("/settings", keywords: ["config", "preferences"]
  },
  {
  title: "Help",
  description: "Help & documentation",
  icon: HelpCircle,
- action: () => goto("/help"),
- keywords: ["support", "docs"]
+ action: () => goto("/help", keywords: ["support", "docs"]
  },
  {
  title: "New Case",
  description: "Create a new case",
  icon: Plus,
- action: () => goto("/cases/new"),
- keywords: ["create", "add"]
+ action: () => goto("/cases/new", keywords: ["create", "add"]
  },
  {
  title: "New Person",
  description: "Add person of interest",
  icon: Plus,
- action: () => goto("/criminals/new"),
- keywords: ["create", "add"]
+ action: () => goto("/criminals/new", keywords: ["create", "add"]
  },
  {
  title: "Upload Evidence",
  description: "Upload evidence files",
  icon: Plus,
- action: () => goto("/evidence"),
- keywords: ["upload", "files"]
+ action: () => goto("/evidence", keywords: ["upload", "files"]
  },
  {
  title: "Hash Verification",
  description: "Verify evidence integrity",
  icon: Search,
- action: () => goto("/evidence/hash"),
- keywords: ["integrity", "verify"]
+ action: () => goto("/evidence/hash", keywords: ["integrity", "verify"]
  },
  {
  title: "Analytics",
  description: "View analytics",
  icon: Search,
- action: () => goto("/analytics"),
- keywords: ["stats", "metrics"]
+ action: () => goto("/analytics", keywords: ["stats", "metrics"]
  },
  {
  title: "Canvas Board",
  description: "Evidence canvas",
  icon: Search,
- action: () => goto("/interactive-canvas"),
- keywords: ["board", "visual"]
+ action: () => goto("/interactive-canvas", keywords: ["board", "visual"]
  }
  ];
 
@@ -1098,8 +1054,7 @@ import { Plus } from "lucide-svelte";;
  }
  selectedIndex = 0;
  });
-
- // Keyboard handling
+  
  $effect(() => {
  if (!browser) return;
 
@@ -1323,8 +1278,7 @@ import { Plus } from "lucide-svelte";;
  <div class="search-container">
  <Command class="search-icon" />
  <input
- bind:this={commandInput}
- bind:value={searchQuery}
+ bind:this={commandInput}; bind:value={searchQuery}
  type="text"
  placeholder="Type a command or search..."
  class="search-input"
@@ -1333,7 +1287,7 @@ import { Plus } from "lucide-svelte";;
  aria-label="Command search"
  />
  <div class="close-button">
- <ButtonComponent
+ <Button class="bits-btn"Component
  variant="ghost"
  size="sm"
  onclick={() => (open = false)}
@@ -1394,19 +1348,14 @@ import { Plus } from "lucide-svelte";;
 
 <style>
  .command-palette-overlay {
- position: fixed;
- top: 0;
- left: 0;
- right: 0;
- bottom: 0;
- background: rgba(0, 0, 0, 0.6);
+ position: fixed; top: 0;
+ left: 0; right: 0;
+ bottom: 0; background: rgba(0, 0, 0, 0.6);
  backdrop-filter: blur(4px);
- z-index: 9999;
- display: flex;
+ z-index: 9999; display: flex;
  align-items: flex-start;
  justify-content: center;
- padding-top: 10vh;
- animation: overlay-appear 0.2s ease-out;
+ padding-top: 10vh; animation: overlay-appear 0.2s ease-out;
  }
 
  @keyframes overlay-appear {
@@ -1424,20 +1373,16 @@ import { Plus } from "lucide-svelte";;
  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
  width: 100%;
  max-width: 600px;
- max-height: 70vh;
- display: flex;
- flex-direction: column;
- animation: palette-appear 0.2s ease-out;
+ max-height: 70vh; display: flex;
+ flex-direction: column; animation: palette-appear 0.2s ease-out;
  }
 
  @keyframes palette-appear {
  from {
- opacity: 0;
- transform: scale(0.95) translateY(-10px);
+ opacity: 0; transform: scale(0.95) translateY(-10px);
  }
  to {
- opacity: 1;
- transform: scale(1) translateY(0);
+ opacity: 1; transform: scale(1) translateY(0);
  }
  }
 
@@ -1447,28 +1392,23 @@ import { Plus } from "lucide-svelte";;
  }
 
  .search-container {
- position: relative;
- display: flex;
+ position: relative; display: flex;
  align-items: center;
  }
 
  .search-input {
- width: 100%;
- padding: 0.75rem 1rem 0.75rem 3rem;
- border: none;
- outline: none;
- font-size: 1rem;
- background: transparent;
+ width: 100%; padding: 0.75rem 1rem 0.75rem 3rem;
+ border: none; outline: none;
+ font-size: 1rem; background: transparent;
  color: #111827;
  }
 
- .search-input::placeholder {
+ .search-input: placeholder {
  color: #9ca3af;
  }
 
  .close-button {
- position: absolute;
- right: 0.5rem;
+ position: absolute; right: 0.5rem;
  }
 
  .command-palette-body {
@@ -1478,8 +1418,11 @@ import { Plus } from "lucide-svelte";;
  }
 
  .command-list {
- list-style: none;
- padding: 0.5rem 0;
+ list-style: none; padding: 0.5rem 0;
  margin: 0;
  }
+
+
+
+
 

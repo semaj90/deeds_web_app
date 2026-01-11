@@ -1,0 +1,33 @@
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+	import { setContext } from 'svelte';
+	import type { AlertDialogContext, AlertDialogRootProps } from './types';
+
+	interface Props extends AlertDialogRootProps {
+		children?: Snippet;
+	}
+
+	let {
+		open = $bindable(false),
+		onOpenChange,
+		children,
+		class: className = '',
+	}: Props = $props();
+
+	// Create context with getter pattern for reactivity
+	setContext<AlertDialogContext>('alert-dialog', {
+		get open() { return open; },
+		setOpen: (value: boolean) => {
+			open = value;
+			onOpenChange?.(value);
+		},
+		close: () => {
+			open = false;
+			onOpenChange?.(false);
+		}
+	});
+</script>
+
+{#if children}
+	{@render children()}
+{/if}

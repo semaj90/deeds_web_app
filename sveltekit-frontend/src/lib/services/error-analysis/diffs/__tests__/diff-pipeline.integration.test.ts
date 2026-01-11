@@ -21,7 +21,7 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { DiffGenerator } from '../DiffGenerator.js';
 import { DiffRunner, type DiffProposal } from '../DiffRunner.js';
 import { RedisCache } from '../RedisCache.js';
@@ -35,8 +35,7 @@ describe('Diff Pipeline Integration', () => {
 
  beforeEach(async () => {
  await mkdir(TEST_DIR, { recursive: true });
-
- // Create test files
+  
  testFiles = [];
  for (let i = 0; i < 10; i++) {
  const file = join(TEST_DIR, `test${i}.ts`);
@@ -48,8 +47,7 @@ describe('Diff Pipeline Integration', () => {
  try {
  redis = new Redis({
  host: process.env.REDIS_HOST || '127.0.0.1',
- port: parseInt(process.env.REDIS_PORT || '4005'),
- db: 15, // Use separate DB for tests
+ port: parseInt(process.env.REDIS_PORT || '4005', db: 15, // Use separate DB for tests
  lazyConnect: true, maxRetriesPerRequest: 1, retryStrategy: () => null,
  });
  await redis.connect();
@@ -114,14 +112,12 @@ describe('Diff Pipeline Integration', () => {
  runId: 'test-run-1',
  projectRoot: TEST_DIR, dryRun: false,
  });
-
- // Track progress events
+  
  const events: any[] = [];
  runner.getTracker().subscribe((event) => {
  events.push(event);
  });
-
- // Run pipeline
+  
  const tracker = await runner.runSafe(proposals);
 
  // Verify completion
@@ -164,8 +160,7 @@ describe('Diff Pipeline Integration', () => {
  reason: 'test modification',
  confidence: 0.9,
  ruleId: 'test-rule',
- },
- ];
+ }];
 
  const runner = new DiffRunner({
  runId: 'test-run-3',
@@ -241,8 +236,7 @@ describe('Diff Pipeline Integration', () => {
  reason: 'another valid change',
  confidence: 0.9,
  ruleId: 'test-rule',
- },
- ];
+ }];
 
  const runner = new DiffRunner({
  runId: 'test-recovery',
@@ -380,8 +374,7 @@ describe('Diff Pipeline Integration', () => {
  reason: 'test',
  confidence: 0.9,
  ruleId: 'test-rule',
- },
- ];
+ }];
 
  const runner = new DiffRunner({
  runId: 'test-phases',
@@ -435,8 +428,7 @@ describe('Diff Pipeline Integration', () => {
  reason: 'test',
  confidence: 0.9,
  ruleId: 'test-rule',
- },
- ];
+ }];
 
  const runner = new DiffRunner({
  runId: 'test-duration',
@@ -452,3 +444,5 @@ describe('Diff Pipeline Integration', () => {
  });
  });
 });
+
+

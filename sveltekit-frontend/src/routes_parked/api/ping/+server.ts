@@ -8,3 +8,5 @@ export const GET: RequestHandler = async () => {
  timestamp: new Date().toISOString(),
  });
 };
+
+

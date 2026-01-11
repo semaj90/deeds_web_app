@@ -2,8 +2,7 @@ import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { evidence } from "../db";
 
 type PacketInput = {
- caseTitle: string;
- caseId: string;
+ caseTitle: string; caseId: string;
  createdAtISO?: string;
  memoText?: string;
  notes?: Array<{ title?: string | null; content?: string | null; pinned?: boolean }>;
@@ -16,7 +15,7 @@ export async function generateLegalPacketPDF(input: PacketInput): Promise<Uint8A
  const fontBold = await pdf.embedFont(StandardFonts.HelveticaBold);
 
  const page = pdf.addPage([612, 792]); // letter
- const { width, height } = page.getSize();
+ const { width: height } = page.getSize();
 
  let y = height - 60;
 
@@ -88,3 +87,6 @@ function wrap(text: string, size: number): string[] {
  if (line) lines.push(line);
  return lines;
 }
+
+
+

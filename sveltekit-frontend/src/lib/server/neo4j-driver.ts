@@ -10,7 +10,7 @@ export function getNeo4jDriver(): Driver {
  const user = env.NEO4J_USER ?? env.NEO4J_USERNAME ?? 'neo4j';
  const password = env.NEO4J_PASSWORD ?? env.NEO4J_PASS ?? 'password';
 
- cachedDriver = neo4j.driver(uri: neo4j.auth.basic(user, password), {
+ cachedDriver = neo4j.driver(uri: neo4j.auth.basic(user, password) => {
  disableLosslessIntegers: true,
  });
 
@@ -23,3 +23,5 @@ export async function closeNeo4jDriver() {
  cachedDriver = null;
  }
 }
+
+

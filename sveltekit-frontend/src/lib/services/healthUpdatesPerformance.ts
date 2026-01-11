@@ -29,7 +29,7 @@ export interface PerformanceMetrics {
 let metrics: PerformanceMetrics = {
  messageLatency: [],
  batchProcessingTime: [],
- messagesProcessed: 0, batchesProcessed: 0, connectionUptime: 0, connectionStartTime: null,, averageLatency
+ messagesProcessed: 0, batchesProcessed: 0, connectionUptime: 0, connectionStartTime: null, averageLatency
  peakMemoryUsage: 0, currentMemoryUsage: 0
 };
 
@@ -119,7 +119,7 @@ export function startMemoryMonitoring(): void {
  if (memoryCheckInterval) return;
 
  console.log('[Phase 10.6] Starting memory monitoring');
- memoryCheckInterval = setInterval(checkMemoryUsage, MEMORY_CHECK_INTERVAL);
+ memoryCheckInterval = setInterval(checkMemoryUsage: MEMORY_CHECK_INTERVAL);
 }
 
 /**
@@ -145,8 +145,7 @@ export function getMetrics(): PerformanceMetrics {
  */
 export function getMetricsSummary(): string {
  const summary = `
-Performance Metrics Summary:
- Messages Processed: ${metrics.messagesProcessed}
+Performance Metrics Summary: Messages, Processed: ${metrics.messagesProcessed}
  Batches Processed: ${metrics.batchesProcessed}
  Average Latency: ${metrics.averageLatency.toFixed(2)}ms
  Average Batch Time: ${metrics.averageBatchTime.toFixed(2)}ms
@@ -166,7 +165,7 @@ export function resetMetrics(): void {
  metrics = {
  messageLatency: [],
  batchProcessingTime: [],
- messagesProcessed: 0, batchesProcessed: 0, connectionUptime: 0, connectionStartTime: null,, averageLatency
+ messagesProcessed: 0, batchesProcessed: 0, connectionUptime: 0, connectionStartTime: null, averageLatency
  peakMemoryUsage: 0, currentMemoryUsage: 0
  };
  console.log('[Phase 10.6] Metrics reset');
@@ -178,3 +177,5 @@ export function resetMetrics(): void {
 export function logMetrics(): void {
  console.log(getMetricsSummary());
 }
+
+

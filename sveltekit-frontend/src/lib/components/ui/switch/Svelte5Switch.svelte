@@ -44,10 +44,10 @@ let labelSizeClasses = $derived({
 
 // Variant classes
 let trackVariants = $derived({
-	default: checked
+	default:checked
 		? 'bg-blue-600'
 		: 'bg-slate-600',
-	nes: checked
+	nes:checked
 		? 'bg-green-500 border-4 border-white'
 		: 'bg-red-500 border-4 border-white'
 }[variant]);
@@ -76,32 +76,31 @@ function handleKeydown(e: KeyboardEvent) {
 
 <label
 	class="inline-flex items-center gap-3 cursor-pointer select-none {className}"
-	class:opacity-50={disabled}
-	class:cursor-not-allowed={disabled}
+	class:opacity-50={ disabled }
+	class:cursor-not-allowed={ disabled }
 >
 	<!-- Hidden native checkbox -->
 	<input
 		type="checkbox"
 		{id}
-		{name}
-		{disabled}
+		{ name }
+		{ disabled }
 		bind:checked
 		class="sr-only peer"
-		onchange={handleChange}
+		onchange={ handleChange }
 	/>
 
 	<!-- Custom switch track -->
 	<button
 		type="button"
 		role="switch"
-		aria-checked={checked}
+		aria-checked={ checked }
 		aria-labelledby="{id}-label"
 		{disabled}
 		class="relative inline-flex shrink-0 {dimensions.track}
 			   rounded-full cursor-pointer
 			   transition-colors duration-200 ease-in-out
-			   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900
-			   disabled:cursor-not-allowed
+			   focus: outline-none, focus:ring-2 focus: ring-blue-500, focus:ring-offset-2 focus: ring-offset-slate-900, disabled:cursor-not-allowed
 			   {trackVariants}"
 		onclick={() => !disabled && (checked = !checked, onchange?.(checked))}
 		onkeydown={handleKeydown}
@@ -126,14 +125,15 @@ function handleKeydown(e: KeyboardEvent) {
 
 <style>
 	.sr-only {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		padding: 0;
-		margin: -1px;
-		overflow: hidden;
+		position: absolute; width: 1px;
+		height: 1px; padding: 0;
+		margin: -1px; overflow: hidden;
 		clip: rect(0, 0, 0, 0);
 		white-space: nowrap;
 		border-width: 0;
 	}
 </style>
+
+
+
+

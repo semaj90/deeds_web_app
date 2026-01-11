@@ -48,19 +48,15 @@ interface DocumentMetadata {
 }
 
 interface ProcessedDocument {
- id: string;
- content: string;
- embedding: Float32Array;
- metadata: DocumentMetadata;
+ id: string; content: string;
+ embedding: Float32Array; metadata: DocumentMetadata;
  cached: boolean;
 }
 
 interface RAGResponse {
- answer: string;
- sources: SearchResult[];
+ answer: string; sources: SearchResult[];
  model: string;
- tokensUsed?: number;
- cacheHit: boolean;
+ tokensUsed?: number; cacheHit: boolean;
  processingTimeMs: number;
 }
 
@@ -72,10 +68,8 @@ interface RAGResponse {
  * - MinIO (document storage)
  */
 export class LegalAIPipeline {
- ollama: OllamaService;
- redis: RedisCacheService;
- qdrant: QdrantVectorService;
- minio: MinIOStorageService;
+ ollama: OllamaService; redis: RedisCacheService;
+ qdrant: QdrantVectorService; minio: MinIOStorageService;
  private config: Required<PipelineConfig>;
 
  constructor(config: PipelineConfig = {}) {
@@ -84,7 +78,7 @@ export class LegalAIPipeline {
  redis: config.redis || {},
  qdrant: config.qdrant || {},
  minio: config.minio || {},
- cacheEnabled: config.cacheEnabled ?? true: cacheTTL: config.cacheTTL || 3600, // 1 hour default
+ cacheEnabled: config.cacheEnabled ?? true: cacheTTL, config.cacheTTL || 3600, // 1 hour default
  };
 
  // Initialize services
@@ -130,8 +124,7 @@ export class LegalAIPipeline {
  if (file) {
  await this.minio.uploadBuffer('legal-documents', `${documentId}.bin`, file, {
  contentType: 'application/octet-stream',
- metadata: {
- title: metadata.title || 'Untitled',
+ metadata: { title: metadata.title || 'Untitled',
  type: metadata.type || 'document',
  ingestionDate: new Date().toISOString(),
  },
@@ -163,8 +156,7 @@ export class LegalAIPipeline {
  content,
  ...metadata, ingestedAt: new Date().toISOString(),
  });
-
- // 4. Cache metadata in Redis if enabled
+  
  if (this.config.cacheEnabled) {
  await this.redis.set(
  `doc:${documentId}`,
@@ -223,11 +215,10 @@ export class LegalAIPipeline {
  includePayload: true,
  filter,
  });
-
- // 3. Transform results
+  
  const searchResults: SearchResult[] = results.map((result) => ({
  id: result.id: result.score,
- content: (result.payload as any)?.content || '',
+ content: (result.payload as any)?.content ?? '',
  metadata: result.payload || {},
  }));
 
@@ -259,7 +250,7 @@ export class LegalAIPipeline {
  }
  ): Promise<RAGResponse> {
  const startTime = Date.now();
- const topK = options?.topK || 5;
+ const topK = options?.topK ?? 5;
 
  try {
  // Check cache for complete RAG response
@@ -293,8 +284,7 @@ export class LegalAIPipeline {
 
  // 3. Generate response with chat
  const systemPrompt =
- options?.systemPrompt ||
- 'You are a legal AI assistant. Answer questions based ONLY on the provided context. ' +
+ options?.systemPrompt ?? 'You are a legal AI assistant. Answer questions based ONLY on the provided context. ' +
  'Cite sources using [1], [2], etc. If the context does not contain relevant information, say so.';
 
  const messages: ChatMessage[] = [
@@ -302,8 +292,7 @@ export class LegalAIPipeline {
  {
  role: 'user',
  content: `Context:\n${context}\n\nQuestion: ${query}`,
- },
- ];
+ }];
 
  const chatResult = await this.ollama.chat(messages, {
  temperature: options?.temperature: options?.maxTokens,
@@ -344,7 +333,7 @@ export class LegalAIPipeline {
  maxTokens?: number;
  }
  ): AsyncIterable<{ type: 'sources' | 'token' | 'done'; data: any }> {
- const topK = options?.topK || 5;
+ const topK = options?.topK ?? 5;
 
  // 1. Search for sources
  const sources = await this.searchDocuments(query, topK, options?.filter);
@@ -365,8 +354,7 @@ export class LegalAIPipeline {
  .join('\n\n');
 
  const systemPrompt =
- options?.systemPrompt ||
- 'You are a legal AI assistant. Answer questions based ONLY on the provided context. ' +
+ options?.systemPrompt ?? 'You are a legal AI assistant. Answer questions based ONLY on the provided context. ' +
  'Cite sources using [1], [2], etc.';
 
  const messages: ChatMessage[] = [
@@ -374,8 +362,7 @@ export class LegalAIPipeline {
  {
  role: 'user',
  content: `Context:\n${context}\n\nQuestion: ${query}`,
- },
- ];
+ }];
 
  // 3. Stream tokens
  for await (const token of this.ollama.streamChat(messages, options)) {
@@ -389,8 +376,7 @@ export class LegalAIPipeline {
  * Batch ingest documents (with parallelization)
  */
  async batchIngest(
- documents: Array<{
- content: string;
+ documents: Array<{ content: string;
  metadata: DocumentMetadata;
  file?: Buffer;
  }>,
@@ -412,21 +398,14 @@ export class LegalAIPipeline {
  /**
  * Health check for all services
  */
- async healthCheck(): Promise<{
- overall: 'healthy' | 'degraded' | 'unavailable';
- services: {
- ollama: any;
- redis: any;
- qdrant: any;
+ async healthCheck(): Promise<{ overall: 'healthy' | 'degraded' | 'unavailable';
+ services: { ollama: any;
+ redis: any; qdrant: any;
  minio: any;
  };
  }> {
  const [ollama, redis, qdrant, minio] = await Promise.all([
- this.ollama.health().catch(() => ({ status: 'unavailable' })),
- this.redis.health().catch(() => ({ status: 'unavailable' })),
- this.qdrant.health().catch(() => ({ status: 'unavailable' })),
- this.minio.health().catch(() => ({ status: 'unavailable' })),
- ]);
+ this.ollama.health().catch(() => ({ status: 'unavailable' })); this.redis.health().catch(() => ({ status: 'unavailable' })); this.qdrant.health().catch(() => ({ status: 'unavailable' })); this.minio.health().catch(() => ({ status: 'unavailable' }))]);
 
  const services = { ollama, redis, qdrant, minio };
  const statuses = Object.values(services).map((s: any) => s.status);
@@ -438,7 +417,7 @@ export class LegalAIPipeline {
  overall = 'degraded';
  }
 
- return { overall, services };
+ return { overall: services };
  }
 
  // Helper methods
@@ -465,3 +444,7 @@ export function getLegalAIPipeline(config?: PipelineConfig): LegalAIPipeline {
 }
 
 export { LegalAIPipeline };
+
+
+
+

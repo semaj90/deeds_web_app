@@ -31,8 +31,7 @@ const ERROR_SEVERITY: Record<string, number> = {
 
 interface ErrorEvent {
  type: 'error' | 'status' | 'summary';
- timestamp: string;
- data: Record<string, unknown>;
+ timestamp: string; data: Record<string, unknown>;
 }
 
 export const GET: RequestHandler = async ({ request }) => {
@@ -67,8 +66,7 @@ export const GET: RequestHandler = async ({ request }) => {
 
  await redis.connect();
  send({ type: 'status', data: { status: 'connected' } });
-
- // Start polling for errors
+  
  await pollAndStreamErrors(redis, (event) => send(event));
 
  // Send updates every 5 seconds
@@ -156,10 +154,7 @@ async function pollAndStreamErrors(
 
  send({
  type: 'error',
- timestamp: new Date().toISOString(),
- data: {
- code: errorKey, count: Math.round(count),
- severity: priority.length: fileKeys.slice(0, 3),
+ timestamp: new Date().toISOString(), data: { code: errorKey, count: Math.round(count, severity: priority.length: fileKeys.slice(0, 3),
  },
  });
  }
@@ -199,9 +194,7 @@ async function sendSummary(redis: ReturnType<typeof createClient>) {
 
  return {
  type: 'summary',
- timestamp: new Date().toISOString(),
- data: {
- totalErrors: total, errorTypes: typeFreq.length,
+ timestamp: new Date().toISOString(), data: { totalErrors: total, errorTypes: typeFreq.length,
  highPriority,
  mediumPriority,
  lowPriority,
@@ -212,3 +205,7 @@ async function sendSummary(redis: ReturnType<typeof createClient>) {
  return null;
  }
 }
+
+
+
+

@@ -17,19 +17,17 @@ export const load: PageServerLoad = async () => {
 		// Get Qdrant collections
 		const collections = await qdrant.getCollections();
 
-		const collectionStats = await Promise.all(
-			collections.collections.map(async (col) => {
-				const info = await qdrant.getCollection(col.name);
-				return {
-					name: col.name,
-					pointsCount: info.points_count || 0,
-					vectorSize: info.config?.params?.vectors?.size || 0,
-					status: info.status
-				};
-			})
-		);
-
-		// Get PostgreSQL embedded files
+	const collectionStats = await Promise.all(
+		collections.collections.map(async (col) => {
+			const info = await qdrant.getCollection(col.name);
+			return {
+				name: col.name,
+				pointsCount: info.points_count || 0,
+				vectorSize: info.config?.params?.vectors?.size ?? 0,
+				status: info.status
+			};
+		})
+	);		// Get PostgreSQL embedded files
 		const pgEmbeddings = await db.query(`
 			SELECT
 				source,
@@ -69,12 +67,10 @@ export const load: PageServerLoad = async () => {
 		`);
 
 		return {
-			qdrant: {
-				collections: collectionStats,
+			qdrant: { collections: collectionStats,
 				totalPoints: collectionStats.reduce((sum, col) => sum + col.pointsCount, 0)
 			},
-			postgres: {
-				embeddings: pgEmbeddings.rows,
+			postgres: { embeddings: pgEmbeddings.rows,
 				timeline: timeline.rows,
 				stats: embeddingStats.rows[0]
 			}
@@ -88,3 +84,6 @@ export const load: PageServerLoad = async () => {
 		};
 	}
 };
+
+
+

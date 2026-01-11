@@ -8,9 +8,10 @@ https://svelte.dev/e/js_parse_error -->
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte';; import type { wasmGraphEngine } from '$lib/wasm/graphEngine'; import type { unifiedServiceRegistry } from '$lib/services/unifiedServiceRegistry'; import ModernButton from '$lib/components/ui/Button.svelte'; let engineStats = $state <any>(null); let hotQueries = $state <any[]>([]); let queryInput = $state <string>('MATCH (n) RETURN n LIMIT 10'); let queryResult = $state <any>(null); let queryHistory = $state <any[]>([]); let isExecuting = $state <boolean>(false); let cacheStats = $state <any>(null); $effect (() => { (async () => { await, loadEngineData(); // Refresh data periodically const interval = setInterval(loadEngineData, 3000); return () => clearInterval(interval)})()});
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte';; import type { wasmGraphEngine } from '$lib/wasm/graphEngine'; import type { unifiedServiceRegistry } from '$lib/services/unifiedServiceRegistry'; import { Button } from '$lib/components/ui/enhanced-bits'; let engineStats = $state <any>(null); let hotQueries = $state <any[]>([]); let queryInput = $state <string>('MATCH (n) RETURN n LIMIT 10'); let queryResult = $state <any>(null); let queryHistory = $state <any[]>([]); let isExecuting = $state <boolean>(false); let cacheStats = $state <any>(null); $effect (() => { (async () => { await, loadEngineData(); // Refresh data periodically const interval = setInterval(loadEngineData, 3000); return () => clearInterval(interval)})()});
  async function loadEngineData(): Promise<any> { engineStats = wasmGraphEngine.getStats(); hotQueries = await unifiedServiceRegistry.getHotQueries(10); cacheStats = unifiedServiceRegistry.getCacheStats()}
- async function executeQuery(): Promise<any> { if (!queryInput.trim() || isExecuting) return; isExecuting = true; const startTime = Date.now(); try { const result = await wasmGraphEngine.executeQuery(queryInput); const executionTime = Date.now() - startTime; queryResult = result; // Add to history queryHistory.unshift({ query: queryInput, result, timestamp: new Date(), executionTime }); // Keep only last, 5 queries in history if (queryHistory.length > 5) { queryHistory = queryHistory.slice(0, 5)}
+ async function executeQuery(): Promise<any> { if (!queryInput.trim() || isExecuting) return; isExecuting = true; const startTime = Date.now(); try { const result = await wasmGraphEngine.executeQuery(queryInput); const executionTime = Date.now() - startTime; queryResult = result; // Add to history queryHistory.unshift({ query: queryInput, result, timestamp: new Date(), executionTime });
+  
  await loadEngineData()} catch (error) { queryResult = { error: error.message, metadata: { source: 'error', queryTime: Date.now() - startTime, resultCount: 0 }
  } } finally { isExecuting = false}
  }
@@ -38,3 +39,6 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  .overflow-y-auto::-webkit-scrollbar-thumb { background: var(--nier-accent-warm); border-radius: 3px}
  .overflow-y-auto::-webkit-scrollbar-thumb:hover { background: var(--nier-accent-cool)}
 </style>
+
+
+

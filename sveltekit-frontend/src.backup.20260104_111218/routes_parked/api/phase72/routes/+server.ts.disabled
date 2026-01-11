@@ -1,0 +1,212 @@
+import type { Phase72RouteNode, RouteAstGraph } from '$lib/phase72/routeAdapter';
+import { json, type RequestHandler } from '@sveltejs/kit';
+
+// Static route AST graph - canonical routes from the app
+const ROUTE_AST_GRAPH: Phase72RouteNode[] = [;
+	// Cases Routes
+	{
+		id: 'cases-list',
+		path: '/cases',
+		kind: 'page',
+		file: 'src/routes/(app)/cases/+page.svelte',
+		label: 'Cases List',
+		ai: true,
+		hasStateMachine: true,
+		errorCount: 0
+	},
+	{
+		id: 'cases-new',
+		path: '/cases/new',
+		kind: 'page',
+		file: 'src/routes/(app)/cases/new/+page.svelte',
+		label: 'New Case',
+		ai: true,
+		hasStateMachine: true,
+		errorCount: 0
+	},
+	{
+		id: 'cases-id-overview',
+		path: '/cases/[id]',
+		kind: 'layout',
+		file: 'src/routes/(app)/cases/[id]/+layout.svelte',
+		label: 'Case Detail Layout',
+		ai: false,
+		hasStateMachine: true,
+		errorCount: 0
+	},
+	{
+		id: 'cases-id-page',
+		path: '/cases/[id]/overview',
+		kind: 'page',
+		file: 'src/routes/(app)/cases/[id]/+page.svelte',
+		label: 'Case Overview',
+		ai: true,
+		hasStateMachine: true,
+		errorCount: 0
+	},
+	{
+		id: 'cases-id-timeline',
+		path: '/cases/[id]/timeline',
+		kind: 'page',
+		file: 'src/routes/(app)/cases/[id]/timeline/+page.svelte',
+		label: 'Case Timeline',
+		ai: true,
+		hasStateMachine: false,
+		errorCount: 0
+	},
+	{
+		id: 'cases-id-evidence-board',
+		path: '/cases/[id]/evidence-board',
+		kind: 'page',
+		file: 'src/routes/(app)/cases/[id]/evidence-board/+page.svelte',
+		label: 'Evidence Board',
+		ai: true,
+		hasStateMachine: true,
+		errorCount: 0
+	},
+	// Evidence Routes
+	{
+		id: 'evidence-library',
+		path: '/evidence',
+		kind: 'page',
+		file: 'src/routes/(app)/evidence/+page.svelte',
+		label: 'Evidence Library',
+		ai: true,
+		hasStateMachine: false,
+		errorCount: 0
+	},
+	{
+		id: 'evidence-board',
+		path: '/evidence/board',
+		kind: 'page',
+		file: 'src/routes/(app)/evidence/board/+page.svelte',
+		label: 'Evidence Board',
+		ai: true,
+		hasStateMachine: true,
+		errorCount: 0
+	},
+	{
+		id: 'evidence-canvas',
+		path: '/evidence/canvas',
+		kind: 'page',
+		file: 'src/routes/(app)/evidence/canvas/+page.svelte',
+		label: 'Evidence Canvas',
+		ai: true,
+		hasStateMachine: true,
+		errorCount: 0
+	},
+	{
+		id: 'evidence-id-detail',
+		path: '/evidence/[id]',
+		kind: 'page',
+		file: 'src/routes/(app)/evidence/[id]/+page.svelte',
+		label: 'Evidence Detail',
+		ai: true,
+		hasStateMachine: false,
+		errorCount: 0
+	},
+	// Persons Routes
+	{
+		id: 'persons-list',
+		path: '/persons',
+		kind: 'page',
+		file: 'src/routes/(app)/persons/+page.svelte',
+		label: 'Persons Directory',
+		ai: true,
+		hasStateMachine: false,
+		errorCount: 0
+	},
+	{
+		id: 'persons-id-profile',
+		path: '/persons/[id]',
+		kind: 'page',
+		file: 'src/routes/(app)/persons/[id]/+page.svelte',
+		label: 'Person Profile',
+		ai: true,
+		hasStateMachine: true,
+		errorCount: 0
+	},
+	{
+		id: 'persons-id-network',
+		path: '/persons/[id]/network',
+		kind: 'page',
+		file: 'src/routes/(app)/persons/[id]/network/+page.svelte',
+		label: 'Network Analysis',
+		ai: true,
+		hasStateMachine: false,
+		errorCount: 0
+	},
+	// System Routes
+	{
+		id: 'dashboard',
+		path: '/dashboard',
+		kind: 'page',
+		file: 'src/routes/(app)/dashboard/+page.svelte',
+		label: 'Dashboard',
+		ai: false,
+		hasStateMachine: false,
+		errorCount: 0
+	},
+	{
+		id: 'all-routes',
+		path: '/all-routes',
+		kind: 'page',
+		file: 'src/routes/(app)/all-routes/+page.svelte',
+		label: 'Route Command Center',
+		ai: false,
+		hasStateMachine: false,
+		errorCount: 0
+	},
+	{
+		id: 'admin',
+		path: '/admin',
+		kind: 'page',
+		file: 'src/routes/(app)/admin/+page.svelte',
+		label: 'Admin Console',
+		ai: false,
+		hasStateMachine: false,
+		errorCount: 0
+	},
+	{
+		id: 'diagnostics',
+		path: '/diagnostics',
+		kind: 'page',
+		file: 'src/routes/(app)/diagnostics/+page.svelte',
+		label: 'System Diagnostics',
+		ai: false,
+		hasStateMachine: false,
+		errorCount: 0
+	}
+];
+
+export const GET: RequestHandler = async () => {
+	const graph: RouteAstGraph = {
+		routes: ROUTE_AST_GRAPH
+	};
+
+	return json(graph);
+};
+
+export const POST: RequestHandler = async ({ request }) => {
+	const body = (await request.json()) as { search?: string; filter?: string };
+
+	let routes = ROUTE_AST_GRAPH;
+
+	// Filter by search term
+	if (body.search) {
+		const q = body.search.toLowerCase();
+		routes = routes.filter(
+			(r) =>
+				r.path.toLowerCase().includes(q) ||
+				r.label.toLowerCase().includes(q) ||
+				r.file.toLowerCase().includes(q)
+		);
+	}
+
+	// Filter by kind
+	if (body.filter && body.filter !== 'all') {
+		routes = routes.filter((r) => r.kind === body.filter);
+	}
+
+	return json({ routes });
+};

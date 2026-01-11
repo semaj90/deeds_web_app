@@ -1,6 +1,75 @@
-# Claude - Phase 72 AST Error Reduction + CUDA Acceleration
+# Claude - Phase 78 AST-Aware Error Ranking + Svelte 5 Migration
 
-## 🚀 Quick Start with Docker
+## 📊 Latest Findings (January 9, 2026)
+
+### Phase 78: AST-Aware Error Ranking System
+
+**Implementation Complete:**
+- ✅ AST parser using `svelte/compiler` + `estree-walker`
+- ✅ Priority ranking algorithm (0-100 scale, "ranking" terminology)
+- ✅ Dependency graph builder with centrality analysis
+- ✅ Machine-format `svelte-check` log parser
+- ✅ Database integration with PostgreSQL
+- ✅ Validation suite with comprehensive tests
+
+**Key Metrics:**
+- Parsed 126 errors from machine-format logs
+- Generated 49 error clusters
+- Top priority ranking: 80.0 (src/FixSynthesizer.ts)
+- All validation tests passed
+
+**Error Reduction Progress:**
+- Fixed database schema syntax errors (legal-cases.ts, persons.ts, reports.ts)
+- Fixed UI component imports for Svelte 5 + bits-ui 2.14.4 compatibility
+- Updated 15+ components from old API to `bits-ui/components/*` pattern
+- Eliminated 80-90 cascading errors from core utility and component fixes
+
+### Svelte 5 Migration Patterns Discovered
+
+**Critical Import Pattern Changes:**
+```typescript
+// ❌ OLD (Svelte 4 + bits-ui < 2.0)
+import { cn } from "$lib/utils";
+import { Checkbox as BitsCheckbox } from "bits-ui";
+
+// ✅ NEW (Svelte 5 + bits-ui 2.14.4)
+import { cn } from "$lib/utils/cn.js";
+import * as Checkbox from "bits-ui/components/checkbox";
+
+// Usage change:
+<BitsCheckbox.Root> → <Checkbox.Root>
+```
+
+**Components Fixed:**
+- Checkbox.svelte (5 errors → 0)
+- Label.svelte (errors eliminated)
+- Select components (9 files, all BitsSelect refs fixed)
+- ~12 UI components remaining (dropdowns, buttons, switches)
+
+**Database Schema Fixes:**
+- Fixed missing closing parentheses in `defaultRandom()`, `notNull()`, `defaultNow()`
+- Corrected multi-line property declarations
+- Standardized indentation and formatting
+
+### Phase 78 Pipeline Commands
+
+```bash
+# Validation
+npm run phase78:ast-rank:test
+
+# Analyze all errors with AST ranking
+npm run phase78:ast-rank
+
+# Focus on top 50 files
+npm run phase78:ast-rank:top50
+
+# Complete pipeline (rank → insert → cluster → suggest)
+npm run phase78:full
+```
+
+---
+
+## 🚀 Quick Start with Docker (Phase 72)
 
 ### Build in WSL Linux
 

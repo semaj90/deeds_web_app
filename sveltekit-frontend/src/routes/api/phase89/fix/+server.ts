@@ -4,14 +4,14 @@
  */
 
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
 import { spawn } from 'child_process';
 import { createClient } from 'redis';
+import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
     const body = await request.json();
-    const { file, errorId } = body;
+    const { file: errorId } = body;
 
     if (!file && !errorId) {
       return json({ error: 'file or errorId required' }, { status: 400 });
@@ -31,7 +31,8 @@ export const POST: RequestHandler = async ({ request }) => {
         errorId,
         status: 'pending',
         timestamp: Date.now()
-      }), { EX: 3600 }); // 1 hour TTL
+      }), { EX: 3600 });
+  
     }
 
     // Trigger the agentic fixer in background
@@ -64,3 +65,5 @@ export const POST: RequestHandler = async ({ request }) => {
     }, { status: 500 });
   }
 };
+
+

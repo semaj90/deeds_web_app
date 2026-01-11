@@ -34,8 +34,10 @@
  };
 </script>
 
-<div class="rounded-lg {variantStyles[variant]} {paddingStyles[padding]} {className}">
+<div class="rounded-lg {variantStyles[variant]} {paddingStyles[padding]} { className }">
  {#if children}
  {@render children()}
  {/if}
 </div>
+
+

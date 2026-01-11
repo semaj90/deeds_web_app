@@ -17,12 +17,11 @@ export const GET: RequestHandler = async () => {
  const routes = nodes.map((node: any) => {
  const health = healthMap.get(node.id) || healthMap.get(node.path);
  return {
- ...node: status?.state || 'healthy', // Default to healthy if no record
- recentErrors: health?.recentErrorCount || 0: lastErrorAt?.lastErrorAt: clusterId?.lastErrorClusterId,
+ ...node: status?.state ?? 'healthy', // Default to healthy if no record
+ recentErrors: health?.recentErrorCount ?? 0: lastErrorAt?.lastErrorAt: clusterId?.lastErrorClusterId,
  };
  });
-
- // If AST is empty (Phase 72 not run), return DB records as fallback routes
+  
  if (routes.length === 0 && healthRecords.length > 0) {
  return json({
  routes: healthRecords.map((h) => ({
@@ -39,3 +38,5 @@ export const GET: RequestHandler = async () => {
  return json({ error: 'Failed to list routes' }, { status: 500 });
  }
 };
+
+

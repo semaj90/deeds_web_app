@@ -9,7 +9,7 @@ export class RAGService {
  const vector = await this.embedQuery(query);
  console.log('Embedding vector length:', vector.length);
  const res = await qdrant.search('evidence_vectors', {
- vector: vector,
+ vector,
  limit: 5,
  });
  return res;
@@ -35,3 +35,6 @@ export class RAGService {
  }
  }
 }
+
+
+

@@ -20,8 +20,7 @@ export const POST: RequestHandler = async ({ request }) => {
  content:
  'You are Phoenix-Pro, an expert legal prosecutor. Summarize evidence, highlight contradictions, flag risks, and propose investigative next steps.',
  },
- { role: 'user', content: text },
- ],
+ { role: 'user', content: text }],
  };
 
  const response = await fetch(`${endpoint}/api/chat`, {
@@ -51,3 +50,5 @@ export const POST: RequestHandler = async ({ request }) => {
  );
  }
 };
+
+

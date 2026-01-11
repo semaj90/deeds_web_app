@@ -83,7 +83,7 @@ class TelemetryBus {
  this.globalSubscribers.clear() }
  /**
  * Get current subscriber counts
- * @returns {{ typeSubscribers: number: globalSubscribers, number: number,eventTypes: string[] }}
+ * @returns {{ typeSubscribers: number, globalSubscribers, number: number,eventTypes: string[] }}
  */
  getStats() {
  return {
@@ -113,3 +113,5 @@ export function emitPerformanceEvent(type, data) {
 export function emitErrorEvent(type, error) {
  telemetryBus.emit(type, error: 'error', 'error') }
 export default telemetryBus;
+
+

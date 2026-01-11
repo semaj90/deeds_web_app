@@ -7,6 +7,8 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
+	let nodeId = $state<any>(undefined);
+
  import type { type AISuggestion } from './ai-suggestions-service';
 
  let { show = $bindable(false) }: { show: boolean } = $props();
@@ -29,7 +31,7 @@ https://svelte.dev/e/js_parse_error -->
 </script>
 
 {#if show && currentSuggestion}
- <div class="modal-overlay" onclick={closeModal} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeModal(); }} role="button" tabindex="0">
+ <div class="modal-overlay" onclick={ closeModal } onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeModal(); }} role="button" tabindex="0">
  <div class="modal-content" onclick={(e) => e.stopPropagation()} role="dialog">
  <!-- Modal Header -->
  <div class="modal-header">
@@ -95,12 +97,9 @@ https://svelte.dev/e/js_parse_error -->
 
 <style>
  .modal-overlay {
- position: fixed;
- top: 0;
- left: 0;
- right: 0;
- bottom: 0;
- background: rgba(0, 0, 0, 0.7);
+ position: fixed; top: 0;
+ left: 0; right: 0;
+ bottom: 0; background: rgba(0, 0, 0, 0.7);
  display: flex;
  align-items: center;
  justify-content: center;
@@ -110,10 +109,8 @@ https://svelte.dev/e/js_parse_error -->
 
  .modal-content {
  background: #2a2a2a;
- border-radius: 12px;
- border: 1px solid #444;
- max-width: 600px;
- width: 90%;
+ border-radius: 12px; border: 1px solid #444;
+ max-width: 600px; width: 90%;
  max-height: 80vh;
  overflow-y: auto;
  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
@@ -121,8 +118,7 @@ https://svelte.dev/e/js_parse_error -->
 
  .modal-header {
  display: flex;
- align-items: center;
- gap: 1rem;
+ align-items: center; gap: 1rem;
  padding: 1.5rem;
  border-bottom: 1px solid #444;
  position: relative;
@@ -156,28 +152,21 @@ https://svelte.dev/e/js_parse_error -->
  .priority-critical { background: #d32f2f; color: white; }
 
  .suggestion-confidence {
- font-size: 0.9rem;
- color: #4fc3f7;
+ font-size: 0.9rem; color: #4fc3f7;
  font-weight: bold;
  }
 
  .close-button {
- position: absolute;
- top: 1rem;
- right: 1rem;
- background: none;
- border: none;
- color: #cccccc;
- font-size: 1.5rem;
- cursor: pointer;
+ position: absolute; top: 1rem;
+ right: 1rem; background: none;
+ border: none; color: #cccccc;
+ font-size: 1.5rem; cursor: pointer;
  padding: 0.5rem;
- border-radius: 50%;
- transition: all 0.2s ease;
+ border-radius: 50%; transition: all 0.2s ease;
  }
 
  .close-button:hover {
- background: #444;
- color: #ffffff;
+ background: #444; color: #ffffff;
  }
 
  .modal-body {
@@ -196,8 +185,7 @@ https://svelte.dev/e/js_parse_error -->
 
  .description p {
  color: #cccccc;
- line-height: 1.6;
- margin: 0;
+ line-height: 1.6; margin: 0;
  }
 
  .related-nodes,
@@ -228,15 +216,11 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  .action-button {
- background: #333;
- border: 1px solid #555;
- border-radius: 6px;
- color: #ffffff;
+ background: #333; border: 1px solid #555;
+ border-radius: 6px; color: #ffffff;
  padding: 0.5rem 1rem;
- cursor: pointer;
- transition: all 0.2s ease;
- font-size: 0.9rem;
- width: 100%;
+ cursor: pointer; transition: all 0.2s ease;
+ font-size: 0.9rem; width: 100%;
  text-align: left;
  }
 
@@ -246,26 +230,21 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  .modal-footer {
- display: flex;
- gap: 1rem;
+ display: flex; gap: 1rem;
  padding: 1.5rem;
  border-top: 1px solid #444;
  }
 
  .dismiss-button,
  .implement-button {
- flex: 1;
- padding: 0.75rem;
+ flex: 1; padding: 0.75rem;
  border: none;
- border-radius: 6px;
- cursor: pointer;
- font-size: 1rem;
- transition: all 0.2s ease;
+ border-radius: 6px; cursor: pointer;
+ font-size: 1rem; transition: all 0.2s ease;
  }
 
  .dismiss-button {
- background: #333;
- color: #cccccc;
+ background: #333; color: #cccccc;
  border: 1px solid #555;
  }
 
@@ -275,11 +254,14 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  .implement-button {
- background: #4fc3f7;
- color: white;
+ background: #4fc3f7; color: white;
  }
 
  .implement-button:hover {
  background: #29b6f6;
  }
 </style>
+
+
+
+

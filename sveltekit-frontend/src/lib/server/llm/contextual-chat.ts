@@ -15,18 +15,14 @@ export type ContextChatRequest = {
 };
 
 export type Suggestion = {
- query: string;
- reason: string;
+ query: string; reason: string;
  score: number;
 };
 
 export type ContextChatResponse = {
- turnId: string;
- answer: string;
- keywords: string[];
- keyPhrases: string[];
- suggestions: Suggestion[];
- latencyMs: number;
+ turnId: string; answer: string;
+ keywords: string[]; keyPhrases: string[];
+ suggestions: Suggestion[]; latencyMs: number;
  citations?: Array<{ id: string; source: string; score: number }>;
 };
 
@@ -56,8 +52,7 @@ export async function contextualChat(params: ContextChatRequest): Promise<Contex
  'Use the provided context when relevant, but do not hallucinate facts.',
  rag.contextText
  ? `\nRelevant context:\n${rag.contextText}`
- : '\nNo additional context was retrieved for this query.',
- ].join('\n');
+ : '\nNo additional context was retrieved for this query.'].join('\n');
 
  // 2) Call local LLM (Gemma via Ollama)
  const answer = await callOllamaChat(systemPrompt, message);
@@ -70,7 +65,7 @@ export async function contextualChat(params: ContextChatRequest): Promise<Contex
  const keywords = extractionResult.keywords;
  const keyPhrases = extractionResult.keyPhrases;
  const suggestions: Suggestion[] = extractionResult.keyPhrases.slice(0, 3).map((phrase, i) => ({
- query: `Explore: ${phrase}`,
+ query: `Explore: ${ phrase }`,
  reason: `Key phrase from analysis`,
  score: 0.8 - i * 0.1,
  }));
@@ -125,3 +120,7 @@ export async function contextualChat(params: ContextChatRequest): Promise<Contex
  latencyMs: citations.citations,
  };
 }
+
+
+
+

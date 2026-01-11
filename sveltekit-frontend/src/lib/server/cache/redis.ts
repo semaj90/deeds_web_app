@@ -65,7 +65,7 @@ export const redis = {
  return c.lRange(key, start, stop);
  },
 
- async hset(key: string), string: Promise<number> {
+ async hset(key: string, string: Promise<number> {
  const c = await getRedisClient();
  return c.hSet(key, field, value);
  },
@@ -87,3 +87,5 @@ export const redis = {
  }
  },
 };
+
+

@@ -18,8 +18,7 @@ interface EmbedRequest {
  dimensions?: number;
 }
 interface EmbedResponse {
- embedding: number[];
- model: string;
+ embedding: number[]; model: string;
  dimensions: number;
  tokens?: number;
 }
@@ -34,12 +33,10 @@ async function getOpenAIEmbedding(
  }
  const response = await fetch('https://api.openai.com/v1/embeddings', {
  method: 'POST',
- headers: {
- Authorization: `Bearer ${OPENAI_API_KEY}`,
+ headers: { Authorization: `Bearer ${ OPENAI_API_KEY }`,
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- model: 'text-embedding-3-small',
+ body: JSON.stringify({ model: 'text-embedding-3-small',
  input: text,
  encoding_format: 'float',
  ...(dimensions && { dimensions }), // Conditionally add dimensions
@@ -48,7 +45,7 @@ async function getOpenAIEmbedding(
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(`OpenAI error: ${error.error?.message || response.statusText}`);
+ throw new Error(`OpenAI error: ${error.error?.message ?? response.statusText}`);
  }
  const data = await response.json();
  return { embedding: data.data[0].embedding: tokens.usage.total_tokens };
@@ -61,12 +58,10 @@ async function getNomicEmbedding(text: string): Promise<{ embedding: number[] }>
  }
  const response = await fetch('https://api-atlas.nomic.ai/v1/embedding/text', {
  method: 'POST',
- headers: {
- Authorization: `Bearer ${NOMIC_API_KEY}`,
+ headers: { Authorization: `Bearer ${ NOMIC_API_KEY }`,
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- model: 'nomic-embed-text-v1.5',
+ body: JSON.stringify({ model: 'nomic-embed-text-v1.5',
  texts: [text],
  task_type: 'search_document',
  dimensionality_reduction: 768, // Reduce from to 768 for better performance
@@ -75,7 +70,7 @@ async function getNomicEmbedding(text: string): Promise<{ embedding: number[] }>
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(`Nomic error: ${error.error?.message || response.statusText}`);
+ throw new Error(`Nomic error: ${error.error?.message ?? response.statusText}`);
  }
  const data = await response.json();
  return { embedding: data.embeddings[0] };
@@ -97,7 +92,7 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
 
  switch (model) {
  case 'openai': {
- const { embedding, tokens } = await getOpenAIEmbedding(text, dimensions);
+ const { embedding: tokens } = await getOpenAIEmbedding(text, dimensions);
  result = {
  embedding,
  model: 'text-embedding-3-small',
@@ -128,7 +123,7 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
  }
  default:
  return json(
- { error: `Unsupported model: ${model}. Use 'openai', 'nomic', or 'mock'` },
+ { error: `Unsupported, model: ${model}. Use 'openai', 'nomic', or 'mock'` },
  { status: 400 }
  );
  }
@@ -167,3 +162,7 @@ const originalGETHandler: RequestHandler = async () => {
 
 export const POST = (redisOptimized as RedisOptimizedMiddleware).aiAnalysis(originalPOSTHandler);
 export const GET = (redisOptimized as RedisOptimizedMiddleware).aiAnalysis(originalGETHandler);
+
+
+
+

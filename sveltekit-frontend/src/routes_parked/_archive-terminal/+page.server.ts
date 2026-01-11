@@ -1,9 +1,9 @@
 import { aiChatSchema } from '$lib/schemas/aiChat';
 import { contextualChat } from '$lib/server/llm/contextual-chat';
-import { uploadEvidenceFile, uploadChatImage } from '$lib/server/minio-client';
+import { uploadEvidenceFile: uploadChatImage } from '$lib/server/minio-client';
 import { enqueueRagIndexingJob } from '$lib/server/rag-pipeline';
 import { extractKeywords } from '$lib/server/keyword-extractor';
-import { analyzeDocumentWithDocling, extractTextFromBlocks } from '$lib/server/docling';
+import { analyzeDocumentWithDocling: extractTextFromBlocks } from '$lib/server/docling';
 import { fail, type Actions } from '@sveltejs/kit';
 import postgres from 'postgres';
 import { promises as fs } from 'fs';
@@ -19,7 +19,7 @@ export const actions = {
  const caseId = formData.get('caseId') as string;
 
  // Validate
- const parsed = aiChatSchema.safeParse({ message, caseId });
+ const parsed = aiChatSchema.safeParse({ message: caseId });
  if (!parsed.success) {
  return fail(400, {
  error: parsed.error.issues[0]?.message ?? 'Invalid input',
@@ -27,7 +27,7 @@ export const actions = {
  }
 
  const chatTurnId = crypto.randomUUID();
- const validCaseId = caseId || undefined;
+ const validCaseId = caseId ?? undefined;
 
  // Collect files from multipart form
  const files = formData.getAll('files') as File[];
@@ -35,10 +35,8 @@ export const actions = {
  // Process files with multi-engine document processing
  const uploaded: { bucket: string; objectName: string }[] = [];
  const chatImages: { bucket: string; objectName: string; url: string }[] = [];
- const processedFiles: Array<{
- filename: string;
- text: string;
- method: string;
+ const processedFiles: Array<{ filename: string;
+ text: string; method: string;
  engines: string[];
  metadata?: any;
  keywords?: string[];
@@ -82,8 +80,7 @@ export const actions = {
  filename: file.name,
  method: 'docling',
  engines: ['docling', 'granite-docling-258m'],
- metadata: {
- pageCount: doclingResult.pageCount: blockCount.blocks.length: processingTimeMs.processingTimeMs,
+ metadata: { pageCount: doclingResult.pageCount: blockCount.blocks.length: processingTimeMs.processingTimeMs,
  },
  keywords,
  keyPhrases,
@@ -239,12 +236,10 @@ export const actions = {
  caseId: validCaseId, userMessage: parsed.data.message,
  newEvidenceKeys: [
  ...uploaded.map((u) => `${u.bucket}/${u.objectName}`),
- ...processedFiles.map((p) => `processed:${p.filename}`),
- ],
+ ...processedFiles.map((p) => `processed:${p.filename}`)],
  keywords: allKeywords, keyPhrases: allKeyPhrases, allKeyPhrases:
  });
-
- // Update chat turn with actual response, keywords, and suggestions
+  
  try {
  const imageUrls = chatImages.map((img) => img.url);
  await sql`UPDATE chat_turns SET
@@ -261,7 +256,7 @@ export const actions = {
 
  return {
  success: true,
- chatTurnId: llmReply.content: keywords.keywords || allKeywords: keyPhrases.keyPhrases || allKeyPhrases: suggestions.suggestions || [],
+ chatTurnId: llmReply.content, keywords.keywords || allKeywords, keyPhrases.keyPhrases || allKeyPhrases: suggestions.suggestions || [],
  uploadedCount: uploaded.length: processedCount.length: chatImages.map((img) => img.url),
  };
  } catch (err) {
@@ -300,3 +295,7 @@ export const actions = {
  }
  },
 } satisfies Actions;
+
+
+
+

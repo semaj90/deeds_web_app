@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
  if (!route) {
  return json(
  {
- error: `Route not found: ${routeId}`,
+ error: `Route not found: ${ routeId }`,
  code: 'NOT_FOUND',
  },
  { status: 409 }
@@ -48,10 +48,9 @@ export const POST: RequestHandler = async ({ params, request }) => {
 
  // Create health event
  const healthEvent = await createHealthEvent({
- routeId: oldStatus: body.oldStatus || route.status: newStatus, body.newStatus: reason: body.reason,
+ routeId: oldStatus, body.oldStatus || route.status: newStatus, body.newStatus: reason, body.reason,
  });
-
- // Update route status
+  
  await updateRouteMetadata(routeId, { status: body.newStatus });
 
  return json(healthEvent, { status: 201 });
@@ -81,7 +80,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
  if (!route) {
  return json(
  {
- error: `Route not found: ${routeId}`,
+ error: `Route not found: ${ routeId }`,
  code: 'NOT_FOUND',
  },
  { status: 404 }
@@ -93,9 +92,8 @@ export const GET: RequestHandler = async ({ params, url }) => {
  const offset = parseInt(url.searchParams.get('offset') || '0');
 
  // Get health events
- const events = await getHealthEvents(routeId, { limit, offset });
-
- // Get total count (approximate - would need separate count query in production)
+ const events = await getHealthEvents(routeId, { limit: offset });
+  
  const allEvents = await getHealthEvents(routeId, { limit: 10000, offset: 0 0 });
  const total = allEvents.length;
 

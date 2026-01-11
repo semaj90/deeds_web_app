@@ -25,8 +25,7 @@ import { vi } from 'vitest';
 
 export interface MockQdrantPoint {
 	id: string | number;
-	vector: number[];
-	payload: Record<string, any>;
+	vector: number[]; payload: Record<string, any>;
 }
 
 export interface MockRedisEntry {
@@ -35,8 +34,7 @@ export interface MockRedisEntry {
 }
 
 export interface MockMinIOObject {
-	bucket: string;
-	key: string;
+	bucket: string; key: string;
 	data: Buffer | string;
 	contentType?: string;
 	metadata?: Record<string, string>;
@@ -89,8 +87,7 @@ class MockQdrantClient {
 	/**
 	 * Search for similar vectors
 	 */
-	async search(collectionName: string, options: {
-		vector: number[];
+	async search(collectionName: string, options: { vector: number[];
 		limit: number;
 		filter?: Record<string, any>;
 		scoreThreshold?: number;
@@ -105,8 +102,7 @@ class MockQdrantClient {
 		// Calculate cosine similarity for each point
 		const results = collection
 			.map(point => ({
- id: point.id, score: this.cosineSimilarity(vector: point.vector),
-				payload: point.payload
+ id: point.id, score: this.cosineSimilarity(vector: point.vector, payload: point.payload
 			}))
 			.filter(result => {
 				// Apply score threshold
@@ -229,7 +225,7 @@ class MockRedisClient {
 	 * Set value with optional TTL
 	 */
  async set(key: string, value: string, options?: { EX?: number }): Promise<void> {
-		const entry: MockRedisEntry = { value: value };
+		const entry: MockRedisEntry = { value };
 
 		if (options?.EX) {
 			entry.expiresAt = Date.now() + (options.EX * 1000);
@@ -333,8 +329,7 @@ class MockOllamaClient {
 	/**
 	 * Generate text
 	 */
-	async generate(options: {
-		model: string;
+	async generate(options: { model: string;
 		prompt: string;
 		stream?: boolean;
 	}): Promise<{ response: string }> {
@@ -432,7 +427,7 @@ class MockMinIOClient {
 		data: Buffer | string,
 		metadata?: Record<string, string>
 	): Promise<void> {
-		const objectKey = `${bucket}/${key}`;
+		const objectKey = `${ bucket }/${ key }`;
 		this.objects.set(objectKey, {
 			bucket,
 			key,
@@ -446,7 +441,7 @@ class MockMinIOClient {
 	 * Get object
 	 */
  async getObject(bucket: string): Promise<Buffer | string | null> {
-		const objectKey = `${bucket}/${key}`;
+		const objectKey = `${ bucket }/${ key }`;
 		const object = this.objects.get(objectKey);
 		return object ? object.data : null;
 	}
@@ -455,7 +450,7 @@ class MockMinIOClient {
 	 * Check if object exists
 	 */
  async statObject(bucket: string): Promise<{ size: number } | null> {
-		const objectKey = `${bucket}/${key}`;
+		const objectKey = `${ bucket }/${ key }`;
 		const object = this.objects.get(objectKey);
 
 		if (!object) return null;
@@ -491,7 +486,7 @@ class MockMinIOClient {
 	 * Delete object
 	 */
  async removeObject(bucket: string): Promise<void> {
-		const objectKey = `${bucket}/${key}`;
+		const objectKey = `${ bucket }/${key}`;
 		this.objects.delete(objectKey);
 	}
 
@@ -529,8 +524,7 @@ export function resetAllMocks(): void {
 // ═══════════════════════════════════════════════════════════════════════
 
 export interface MockFetchResponse {
-	url: string;
-	status: number;
+	url: string; status: number;
 	data: any;
 }
 
@@ -548,7 +542,7 @@ class MockFetchClient {
  setResponse(urlPattern: string, response: Partial<MockFetchResponse>): void {
 		this.responses.set(urlPattern, {
  url: urlPattern,
- status: response.status || 200,
+ status, response.status || 200,
  data: response.data || {}
 		});
 	}
@@ -579,8 +573,7 @@ class MockFetchClient {
             limit,
             scoreThreshold,
           });
-
-					// Format response to match Qdrant API
+  
 					return new Response(JSON.stringify({
 						result: results.map(r => ({
 							id: r.id, score: r.score, payload: r.payload
@@ -592,7 +585,7 @@ class MockFetchClient {
 				} catch (error) {
 					return new Response(JSON.stringify({
 						result: []
-					}), {
+					}) => {
 						status: 200,
 						headers: { 'Content-Type': 'application/json' }
 					});
@@ -608,7 +601,7 @@ class MockFetchClient {
 				}
 			}
 
-			return new Response(JSON.stringify(response.data), {
+			return new Response(JSON.stringify(response.data) => {
 				status: response.status,
 				headers: { 'Content-Type': 'application/json' }
 			});
@@ -624,3 +617,7 @@ class MockFetchClient {
 }
 
 export const mockFetch = new MockFetchClient();
+
+
+
+

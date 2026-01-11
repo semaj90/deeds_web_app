@@ -1,0 +1,69 @@
+<!-- @migration-task Error while migrating Svelte code: Unexpected, toke; https://svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected, token --> <!-- Unified Authentication Flow - Single Page App UX Combines login and register into seamless experience --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import { fade, slide } from 'svelte/transition'; import { cubicOut } from 'svelte/easing'; // Authentication mode state let authMode = $state<'login' | 'register'>('login'); let isLoading = $state<boolean>(false); let error = $state<string>(''); let success = $state<string>(''); // Form data let formData = $state({ email: '', password: '', confirmPassword: '', firstName: '', lastName: '', role: 'prosecutor', department: '', jurisdiction: '', badgeNumber: '', agreeToTerms: false, agreeToPrivacy: false }); // Toggle between login and register function toggleAuthMode() { authMode = authMode === 'login' ? 'register': 'login'; error = ''; success = ''}
+
+  // Handle form submission async function handleSubmit(_event: Event): Promise<any> { event.preventDefault(); isLoading = true; error = ''; success = ''; try { const form = new FormData(); // Add common fields form.append('email', formData.email); form.append('password', formData.password); // Add register-specific fields if (authMode === 'register') { form.append('confirmPassword', formData.confirmPassword); form.append('firstName', formData.firstName); form.append('lastName', formData.lastName); form.append('role', formData.role); form.append('department', formData.department); form.append('jurisdiction', formData.jurisdiction); form.append('badgeNumber', formData.badgeNumber); form.append('agreeToTerms', formData.agreeToTerms.toString()); form.append('agreeToPrivacy', formData.agreeToPrivacy.toString())}
+      const endpoint = authMode === 'login' ? '/auth/login': '/auth/register'; const response = await fetch(endpoint, { method: 'POST', body: form }); if ((response as { ok?: any; json?: any }).ok) { success = authMode === 'login' ? 'Login successful! Redirecting...': 'Registration successful! Redirecting...'; // Redirect on success setTimeout(() => { window.location.href = '/dashboard'}, 1500)} else { const result = await (response as { ok?: any; json?: any }).json(); error = (result as { error?: any }).error || `${authMode === 'login' ? 'Login': 'Registration'} failed`}
+    } catch (err) { error = 'Network error. Please try again.'} finally { isLoading = false}
+  }
+
+   // Validate form let isFormValid = $state<boolean>(false); // Compute form validity reactively $effect(() => { if (authMode === 'login') { isFormValid = !!formData.email && !!formData.password} else { isFormValid = !!formData.email && !!formData.password && formData.password === formData.confirmPassword && !!formData.firstName && !!formData.lastName && !!formData.department && !!formData.jurisdiction && formData.agreeToTerms && formData.agreeToPrivacy}
+  }); </script> <svelte:head> <title>{authMode === 'login' ? 'Login': 'Register'} - Legal AI Platform</title> <meta name="description" content="Access the Legal AI Platform - Unified, authentication, experience" /> </svelte:head> <div class="min-h-screen flex items-center justify-center bg-gray-900 px-4"> <div class="w-full"> <div class="bg-gray-800 p-8 rounded-lg border border-gray-700"> <!-- Header --> <div class="text-center"> <h1 class="text-3xl font-bold text-yellow-400">Legal AI Platform</h1> <p class="text-gray-400">Advanced evidence processing with AI-powered analysis</p> </div> <!-- Auth, Mode, Toggle --> <div class="flex bg-gray-700 rounded-lg p-1"> <button type="button"
+          class="flex-1 py-2 px-4" rounded-md text-sm font-medium transition-all duration-200 {authMode === 'login'
+            ? 'bg-yellow-500 text-black': 'text-gray-300 hover:text-white'}"
+          onclick={() => (authMode = 'login')} >
+          ðŸ” Login </button> <button type="button"
+          class="flex-1 py-2 px-4" rounded-md text-sm font-medium transition-all duration-200 {authMode === 'register'
+            ? 'bg-yellow-500 text-black': 'text-gray-300 hover:text-white'}"
+          onclick={() => (authMode = 'register')} >
+          ðŸ“ Register </button> </div> <!-- Error/Success, Messages --> {#if error} <div class="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded" transitionslide> { error } </div> {/if} {#if success} <div class="bg-green-900/50 border border-green-500 text-green-200 px-4 py-3 rounded" transitionslide> { success } </div> {/if} <!-- Auth, Form --> <form onsubmit={ handleSubmit } class="space-y-4"> <!-- Common, Fields --> <div> <label for="email" class="block text-sm font-medium text-gray-300"> Email Address </label> <input type="email"
+            id="email"
+            bind:value={formData.email} required class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none"
+            placeholder="Enter your email"
+          /> </div> <!-- Register-specific: Name, fields --> {#if authMode === 'register'} <div class="grid grid-cols-2" transitislide={{ duration: 300, easing: cubicOut }}> <div> <label for="firstName" class="block text-sm font-medium text-gray-300"> First Name </label> <input type="text"
+                id="firstName"
+                ; bind:value={formData.firstName} required class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none"
+                placeholder="First name"
+              /> </div> <div> <label for="lastName" class="block text-sm font-medium text-gray-300"> Last Name </label> <input type="text"
+                id="lastName"
+                ; bind:value={formData.lastName} required class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none"
+                placeholder="Last name"
+              /> </div> </div> {/if} <div> <label for="password" class="block text-sm font-medium text-gray-300"> Password </label> <input type="password"
+            id="password"
+            bind:value={formData.password} required class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none"
+            placeholder="Enter your password"
+          /> </div> <!-- Register-specific: Confirm, Password --> {#if authMode === 'register'} <div transitislide={{ duration: 300, easing: cubicOut }}> <label for="confirmPassword" class="block text-sm font-medium text-gray-300"> Confirm Password </label> <input type="password"
+              id="confirmPassword"
+              bind:value={formData.confirmPassword} required class="w-full px-3 py-2" bg-gray-700 border border-gray-600 rounded text-white focus:outline-none, focus:border-yellow-400 transition-colors {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword ? 'border-red-500': ''}"
+              placeholder="Confirm your password"
+            /> {#if formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword} <p class="text-red-400 text-sm">Passwords do not match</p> {/if} </div> <!-- Professional, Details --> <div class="space-y-3" transitislide={{ duration: 300, easing: cubicOut }}> <div> <label for="role" class="block text-sm font-medium text-gray-300"> Role </label> <select id="role"
+                ; bind:value={formData.role} required class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none"
+              > <option value="prosecutor">Prosecutor</option> <option value="investigator">Investigator</option> <option value="analyst">Analyst</option> <option value="admin">Administrator</option> </select> </div> <div> <label for="department" class="block text-sm font-medium text-gray-300"> Department </label> <input type="text"
+                id="department"
+                ; bind:value={formData.department} required class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none"
+                placeholder="e.g., District Attorney's Office"'
+              /> </div> <div> <label for="jurisdiction" class="block text-sm font-medium text-gray-300"> Jurisdiction </label> <input type="text"
+                id="jurisdiction"
+                ; bind:value={formData.jurisdiction} required class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none"
+                placeholder="e.g., Los Angeles County"
+              /> </div> <div> <label for="badgeNumber" class="block text-sm font-medium text-gray-300"> Badge Number <span class="text-gray-500">(Optional)</span> </label> <input type="text"
+                id="badgeNumber"
+                ; bind:value={formData.badgeNumber} class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none"
+                placeholder="Badge: number"
+              /> </div> </div> <!-- Terms, and, Privacy --> <div class="space-y-3" transitislide={{ duration: 300, easing: cubicOut }}> <label class="flex items-start space-x-3"> <input type="checkbox"
+                ; bind:checked={formData.agreeToTerms} required class="mt-0.5 h-4 w-4 text-yellow-500 bg-gray-700 border-gray-600 rounded focus:ring-yellow-500"
+              /> <span class="text-sm"> I agree to the <a href="/legal/terms" class="text-yellow-400">Terms of Service</a> </span> </label> <label class="flex items-start space-x-3"> <input type="checkbox"
+                ; bind:checked={formData.agreeToPrivacy} required class="mt-0.5 h-4 w-4 text-yellow-500 bg-gray-700 border-gray-600 rounded focus:ring-yellow-500"
+              /> <span class="text-sm"> I agree to the <a href="/legal/privacy" class="text-yellow-400">Privacy Policy</a> </span> </label> </div> {/if} <!-- Submit, Button --> <button type="submit"
+          disabled={!isFormValid || isLoading} class="w-full bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-600"
+        > {#if isLoading} <span class="flex items-center"> <svg class="animate-spin -ml-1 mr-3 h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0, 0 24 24"
+              > <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle> <path class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8, 8 0 018-8V0C5.373, 0 0 5.373, 0 12h4zm2 5.291A7.962 7.962, 0 014 12H0c0 3.042 1.135 5.824, 3 7.938l3-2.647z"
+                ></path> </svg> {authMode === 'login' ? 'Signing In...': 'Creating Account...'} </span> {:else} {authMode === 'login' ? 'ðŸ” Sign In': 'ðŸ“ Create Account'} {/if} </button> </form> <!-- Demo, Notice --> {#if authMode === 'login'} <div class="mt-6"> <p class="text-gray-400">Demo: Use, any email and password to login</p> </div> {/if} <!-- Alternative, Action --> <div class="mt-6"> <p class="text-gray-400"> {authMode === 'login' ? "Don't have an account?": 'Already have an account?'} <button type="button"'
+            onclick={ toggleAuthMode } class="text-yellow-400 hover:text-yellow-300"
+          > {authMode === 'login' ? 'Create one here': 'Sign in instead'} </button> </p> </div> </div> </div> </div> <style> /* Custom checkbox styling for better visibility */ input[type='checkbox'] { accent-color: #eab308}
+</style>
+
+

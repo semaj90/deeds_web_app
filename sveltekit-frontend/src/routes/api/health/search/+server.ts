@@ -1,5 +1,5 @@
-import { json, type RequestHandler } from '@sveltejs/kit';
 import { env } from '$lib/env';
+import { json, type RequestHandler } from '@sveltejs/kit';
 
 const GO_MICROSERVICE_URL = env.GO_MICROSERVICE_URL || 'http://localhost:8080';
 
@@ -25,8 +25,7 @@ export const GET: RequestHandler = async () => {
  {
  healthy: false,
  status: 'Go microservice unavailable',
- services: {
- go_microservice: false,
+ services: { go_microservice: false,
  },
  },
  { status: 503 }
@@ -37,19 +36,26 @@ export const GET: RequestHandler = async () => {
 
  console.log('[Health] Search service health check passed:', result);
 
- return json({
- healthy: result.healthy: status.status: services.services: timestamp Date().toISOString(),
- });
- } catch (error) {
- console.error('[Health] Error checking search service health:', error);
+    return json({
+      healthy: result.healthy,
+      status: result.status,
+      services: result.services,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('[Health] Error checking search service health:', error);
 
- return json(
- {
- healthy: false,
- status: 'Health check failed' instanceof Error ? error.message : 'Unknown error',
- timestamp: new Date().toISOString(),
+    return json(
+      {
+        healthy: false,
+        status: 'Health check failed',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString(),
  },
  { status: 503 }
  );
  }
 };
+
+
+

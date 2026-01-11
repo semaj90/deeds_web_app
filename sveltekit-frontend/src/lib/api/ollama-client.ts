@@ -7,8 +7,7 @@
 
 // Environment-based endpoint resolution
 const OLLAMA_HOST =
- import.meta.env?.VITE_OLLAMA_URL ||
- import.meta.env?.OLLAMA_URL ||
+ import.meta.env?.VITE_OLLAMA_URL ?? import.meta.env?.OLLAMA_URL ||
  (typeof process !== 'undefined' ? process.env.OLLAMA_URL : null) ||
  'http://localhost:11434';
 
@@ -58,7 +57,7 @@ export function buildOllamaUrl(
  context: 'server' | 'client' | 'docker' = 'client'
 ): string {
  const base = getOllamaEndpoint(context);
- return `${base}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+ return `${base}${endpoint.startsWith('/') ? endpoint : `/${ endpoint }`}`;
 }
 
 /**
@@ -183,3 +182,7 @@ export async function ollamaEmbed(
  const data = await response.json();
  return Array.isArray(text) ? data.embeddings : data.embedding;
 }
+
+
+
+

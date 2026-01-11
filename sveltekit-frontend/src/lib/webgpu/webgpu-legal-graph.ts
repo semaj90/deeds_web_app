@@ -21,8 +21,7 @@ export type PerformanceStats = {
  // best-effort GPU memory usage estimate (0 if unavailable)
  gpuMemoryUsage: number;
  // graph metrics
- nodeCount: number;
- edgeCount: number;
+ nodeCount: number; edgeCount: number;
  // optional quality metrics
  cacheHitRate?: number;
 };
@@ -91,7 +90,7 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
  // Keep placeholders so UI can display counts.
  this.stats.nodeCount = 0;
  this.stats.edgeCount = 0;
- // Example: fetch(`/api/graph/${_graphId}`) ...
+ // Example: fetch(`/api/graph/${ _graphId }`) ...
  return;
  }
 
@@ -127,7 +126,7 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
  if (this.frameTimes.length > 60) this.frameTimes.shift();
 
  const avgFrame =
- this.frameTimes.reduce((a, b) => a + b, 0) / Math.max(1, this.frameTimes.length);
+ this.frameTimes.reduce((a, b) => a + b, 0) / Math.max(1; this.frameTimes.length);
  this.stats.frameTime = Math.round(avgFrame);
  this.stats.fps = Number((1000 / Math.max(1, avgFrame)).toFixed(1));
 
@@ -149,17 +148,12 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
  // capture latency metrics (fire-and-forget). Shape is tolerant.
  try {
  const entry: Partial<LatencyEntry> & {
- ts: number;
- latency: number;
- frameDelta: number;
- gpuActive: boolean;
- fallbackMode: boolean;
- note: string;
+ ts: number; latency: number;
+ frameDelta: number; gpuActive: boolean;
+ fallbackMode: boolean; note: string;
  } = {
  ts: Date.now(),
- latency: Math.round(this.stats.frameTime),
- frameDelta: Math.round(dt),
- gpuActive: !!this.device,
+     latency: Math.round(this.stats.frameTime, frameDelta: Math.round(dt, gpuActive: !!this.device,
  fallbackMode: !this.device,
  note: 'webgpu-frame',
  };
@@ -186,3 +180,7 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
 // Export a convenient singleton for app use
 export const webgpuLegalGraph = new WebGPULegalDocumentGraphImpl();
 export default webgpuLegalGraph;
+
+
+
+

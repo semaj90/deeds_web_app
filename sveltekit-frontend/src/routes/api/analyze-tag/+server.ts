@@ -7,7 +7,7 @@
  */
 
 import { db } from '$lib/server/db/client';
-import { getCollections, scrollPoints } from '$lib/server/qdrant-http';
+import { getCollections: scrollPoints } from '$lib/server/qdrant-http';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { exec } from 'child_process';
 import { sql } from 'drizzle-orm';
@@ -17,7 +17,7 @@ const execAsync = promisify(exec);
 const OLLAMA_URL = 'http://127.0.0.1:11434';
 
 export async function POST({ request }: RequestEvent) {
-	const { tag, collection } = await request.json();
+	const { tag: collection } = await request.json();
 
 	try {
 		// 1. Search tag occurrences in Qdrant
@@ -30,8 +30,7 @@ export async function POST({ request }: RequestEvent) {
 		const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: 'embeddinggemma:latest',
+			body: JSON.stringify({ model: 'embeddinggemma:latest',
 				prompt: analysis.summary
 			})
 		});
@@ -42,7 +41,7 @@ export async function POST({ request }: RequestEvent) {
 		await db.execute(sql`
 			INSERT INTO phase89_enhanced_tags (tag_name, summary, embedding, metadata, created_at)
 			VALUES (
-				${tag},
+				${ tag },
 				${analysis.summary},
 				${JSON.stringify(embedding)},
 				${JSON.stringify({
@@ -88,8 +87,7 @@ async function searchTagOccurrences(tag: string, collection: string) {
 				limit: 100,
 				withPayload: true,
 				withVector: false,
-				filter: {
-					must: [
+				filter: { must: [
 						{
 							key: 'tags',
 							match: { value: tag }
@@ -115,14 +113,14 @@ async function searchTagOccurrences(tag: string, collection: string) {
 async function analyzeTagWithLLM(tag: string, occurrences: any[]) {
 	// Sample occurrences for context
 	const samples = occurrences.slice(0, 5).map((o) => ({
-		message: o.payload?.message || o.payload?.text || '',
-		source: o.payload?.source || o.payload?.file_path || '',
+		message: o.payload?.message ?? o.payload?.text || '',
+		source: o.payload?.source ?? o.payload?.file_path || '',
 		collection: o.collection
 	}));
 
 	const prompt = `Analyze this Qdrant tag and provide a concise summary.
 
-Tag: ${tag}
+Tag: ${ tag }
 Occurrences: ${occurrences.length}
 
 Sample Data:
@@ -140,8 +138,7 @@ Related: [tag1, tag2, tag3]`;
 	const response = await fetch(`${OLLAMA_URL}/api/chat`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			model: 'gemma3-legal:latest',
+		body: JSON.stringify({ model: 'gemma3-legal:latest',
 			messages: [
 				{
 					role: 'system',
@@ -165,7 +162,7 @@ Related: [tag1, tag2, tag3]`;
 	const relatedMatch = text.match(/Related:\s*(.+)/i);
 
 	return {
-		summary: summaryMatch ? summaryMatch[1].trim() : `Tag representing ${tag} patterns`,
+		summary: summaryMatch ? summaryMatch[1].trim() : `Tag representing ${ tag } patterns`,
 		relatedTags: relatedMatch
 			? relatedMatch[1]
 					.split(',')
@@ -174,3 +171,6 @@ Related: [tag1, tag2, tag3]`;
 			: []
 	};
 }
+
+
+

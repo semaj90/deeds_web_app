@@ -17,18 +17,14 @@
 import type { FixStrategy, SimilarError } from './types.js';
 
 export interface RAGConfig {
-	qdrantUrl: string;
-	qdrantCollection: string;
-	pgvectorUrl?: string;
-	redisUrl: string;
-	topK: number;
-	similarityThreshold: number;
+	qdrantUrl: string; qdrantCollection: string;
+	pgvectorUrl?: string; redisUrl: string;
+	topK: number; similarityThreshold: number;
 }
 
 export interface VectorSearchResult {
 	id: string | number;
-	score: number;
-	payload: Record<string, unknown>;
+	score: number; payload: Record<string, unknown>;
 }
 
 export class RAGRetriever {
@@ -47,12 +43,12 @@ export class RAGRetriever {
 
 	constructor(config?: Partial<RAGConfig>) {
 		this.config = {
-			qdrantUrl: config?.qdrantUrl || process.env.QDRANT_URL || 'http://localhost:6333',
-			qdrantCollection: config?.qdrantCollection || process.env.QDRANT_COLLECTION || 'phase72_error_patterns',
-			pgvectorUrl: config?.pgvectorUrl || process.env.DATABASE_URL,
-			redisUrl: config?.redisUrl || process.env.REDIS_URL || 'redis://localhost:6379',
-			topK: config?.topK || 5,
-			similarityThreshold: config?.similarityThreshold || 0.7
+			qdrantUrl: config?.qdrantUrl ?? process.env.QDRANT_URL || 'http://localhost:6333',
+			qdrantCollection: config?.qdrantCollection ?? process.env.QDRANT_COLLECTION || 'phase72_error_patterns',
+			pgvectorUrl: config?.pgvectorUrl ?? process.env.DATABASE_URL,
+			redisUrl: config?.redisUrl ?? process.env.REDIS_URL || 'redis://localhost:6379',
+			topK: config?.topK ?? 5,
+			similarityThreshold: config?.similarityThreshold ?? 0.7
 		};
 		this.initPromise = this.initialize();
 	}
@@ -144,13 +140,11 @@ export class RAGRetriever {
 		const response = await fetch(`${this.config.qdrantUrl}/collections/${this.config.qdrantCollection}/points/search`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				vector: embedding,
+			body: JSON.stringify({ vector: embedding,
 				limit: topK,
 				with_payload: true,
 				score_threshold: this.config.similarityThreshold
-			}),
-			signal: AbortSignal.timeout(10000)
+			}, signal: AbortSignal.timeout(10000)
 		});
 
 		if (!response.ok) {
@@ -172,7 +166,8 @@ export class RAGRetriever {
 	 */
 	private async queryPgVector(embedding: number[]): Promise<VectorSearchResult[]> {
 		// This would use a PostgreSQL client with pgvector
-		// For now, return empty as pgvector requires database connection
+		// For now;
+ return empty as pgvector requires database connection
 		console.log('📊 pgvector fallback query (not implemented - requires DB connection)');
 		return [];
 	}
@@ -182,14 +177,12 @@ export class RAGRetriever {
 	 */
 	private transformToSimilarErrors(results: VectorSearchResult[]): SimilarError[] {
 		return results.map(r => ({
-			id: String(r.id),
-			embedding: [], // Not returned from search
+			id: String(r.id, embedding: [], // Not returned from search
 			similarity: r.score,
 			fixStrategies: [], // Will be populated from cache
 			successRate: (r.payload.success_rate as number) || 0,
 			timestamp: Date.now(),
-			errorReport: {
-				file: (r.payload.file as string) || '',
+     errorReport: { file: (r.payload.file as string) || '',
 				line: (r.payload.line as number) || 0,
 				column: (r.payload.column as number) || 0,
 				code: (r.payload.error_code as string) || '',
@@ -213,7 +206,7 @@ export class RAGRetriever {
 		}
 
 		try {
-			const cacheKey = `fix-strategies:${errorId}`;
+			const cacheKey = `fix-strategies:${ errorId }`;
 			const cached = await this.redisClient.get(cacheKey);
 
 			if (cached) {
@@ -236,7 +229,7 @@ export class RAGRetriever {
 		if (!this.redisClient) return;
 
 		try {
-			const cacheKey = `fix-strategies:${errorId}`;
+			const cacheKey = `fix-strategies:${ errorId }`;
 			await this.redisClient.set(cacheKey, JSON.stringify(strategies), { EX: ttl });
 		} catch (error) {
 			console.warn(`⚠️  Failed to cache fix strategies: ${error instanceof Error ? error.message : String(error)}`);
@@ -333,3 +326,7 @@ export function getRAGRetriever(config?: Partial<RAGConfig>): RAGRetriever {
 	}
 	return ragRetrieverInstance;
 }
+
+
+
+

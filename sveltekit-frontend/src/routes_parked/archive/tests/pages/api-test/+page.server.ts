@@ -103,8 +103,7 @@ export const load: PageServerLoad = async ({ url: _url, fetch: _fetch }) => {
  description: 'Test Ollama AI model inference',
  headers: { 'Content-Type': 'application/json' },
  body: { prompt: 'Analyze this legal contract', model: 'gemma3-legal' },
- },
- ];
+ }];
 
  // Define test suites
  const testSuites = [
@@ -137,8 +136,7 @@ export const load: PageServerLoad = async ({ url: _url, fetch: _fetch }) => {
  name: 'Smoke Test',
  description: 'Quick health check of critical endpoints',
  endpoints: ['system-status', 'multicore-status', 'database-health'],
- },
- ];
+ }];
 
  // Generate test documentation
  const testDocumentation = {
@@ -149,20 +147,17 @@ export const load: PageServerLoad = async ({ url: _url, fetch: _fetch }) => {
  'YoRHa 3D interface API validation',
  'Performance monitoring and latency tracking',
  'Test suite automation with batch execution',
- 'Historical test result tracking',
- ],
+ 'Historical test result tracking'],
  protocols: [
  { name: 'YoRHa API', description: 'Custom APIs for YoRHa 3D interface components' },
  { name: 'Context7', description: 'Multicore processing and AI analysis services' },
- { name: 'Standard REST', description: 'Traditional HTTP REST API endpoints' },
- ],
+ { name: 'Standard REST', description: 'Traditional HTTP REST API endpoints' }],
  metrics: [
  'Total test executions',
  'Pass/fail rates',
  'Average response latency',
  'Success rate percentage',
- 'Error categorization',
- ],
+ 'Error categorization'],
  };
 
  return {
@@ -179,8 +174,10 @@ export const load: PageServerLoad = async ({ url: _url, fetch: _fetch }) => {
  testSuites: [],
  documentation: { overview: '', features: [], protocols: [], metrics: [] },
  initialLoad: false,
- timestamp: new Date().toISOString(),
- error: 'Failed to load API test configuration',
+ timestamp: new Date().toISOString(), error: 'Failed to load API test configuration',
  };
  }
 };
+
+
+

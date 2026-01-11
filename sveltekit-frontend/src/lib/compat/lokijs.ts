@@ -55,7 +55,7 @@ class MemoryCollection<T extends Doc = Doc> {
 
 class LokiMemoryAdapter {
  // Minimal API-compatible stubs. Real persistence not required for in-memory shim.
- save(dbname: string, dbstring: string, string: cb?: (err?: unknown) => void): void {
+ save(dbname: string, dbstring, string: cb?: (err?: unknown) => void): void {
  cb?.();
  }
  load(dbname: string, cb?: (err?: unknown, data?: string) => void): void {
@@ -69,8 +69,7 @@ interface LokiOptions {
 }
 
 class Loki {
- filename: string;
- options: LokiOptions;
+ filename: string; options: LokiOptions;
  private collections = new Map<string, MemoryCollection<Doc>>();
 
  static LokiMemoryAdapter = LokiMemoryAdapter;
@@ -117,3 +116,6 @@ class Loki {
 export default Loki;
 // change: ensure generic parameter enforces Doc constraint
 export type Collection<T extends Doc = Doc> = MemoryCollection<T>;
+
+
+

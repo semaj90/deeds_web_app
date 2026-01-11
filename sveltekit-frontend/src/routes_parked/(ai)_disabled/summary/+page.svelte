@@ -24,8 +24,7 @@ https://svelte.dev/e/js_parse_error -->
  const res = await fetch('/api/ai/generate-summary', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- caseId: 'demo-case',
+ body: JSON.stringify({ caseId: 'demo-case',
  summaryType,
  includeEvidence: true,
  prompt: `Generate ${summaryType} summary with legal analysis`,
@@ -41,10 +40,10 @@ https://svelte.dev/e/js_parse_error -->
  ).summary;
  confidence =
  (result as { success?: unknown; summary?: unknown; metadata?: unknown; error?: unknown })
- .metadata?.confidence || 0.85;
+ .metadata?.confidence ?? 0.85;
  ragScore =
  (result as { success?: unknown; summary?: unknown; metadata?: unknown; error?: unknown })
- .metadata?.ragScore || 0.82;
+ .metadata?.ragScore ?? 0.82;
  } else {
  summary = `API Error: ${(result as { success?: unknown; summary?: unknown; metadata?: unknown; error?: unknown }).error}`;
  }
@@ -62,8 +61,7 @@ https://svelte.dev/e/js_parse_error -->
  evidence: [
  { id: '1', type: 'digital', title: 'Email Communications' },
  { id: '2', type: 'document', title: 'Financial Records' },
- { id: '3', type: 'photo', title: 'Crime Scene Photos' },
- ],
+ { id: '3', type: 'photo', title: 'Crime Scene Photos' }],
  status: 'active',
  };
  };
@@ -84,3 +82,6 @@ https://svelte.dev/e/js_parse_error -->
  font-family: sans-serif;
  }
 </style>
+
+
+

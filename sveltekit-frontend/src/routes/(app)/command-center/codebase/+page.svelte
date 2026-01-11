@@ -8,7 +8,7 @@
 	 * Purpose: Main codebase intelligence view with error overview and clusters
 	 */
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui';
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from '$lib/components/ui/enhanced-bits';
 	import {
 	  Activity,
 	  AlertTriangle,
@@ -41,15 +41,11 @@
 		surfaceBreakdown: {} as Record<string, number>,
 		techBreakdown: {} as Record<string, number>
 	});
-
-	// Recent clusters
+  
 	let recentClusters = $state<Array<{
-		id: string;
-		name: string;
-		dominant_code: string;
-		member_count: number;
-		fix_suggestion: string;
-		surface: string[];
+		id: string; name: string;
+		dominant_code: string; member_count: number;
+		fix_suggestion: string; surface: string[];
 		tech: string[];
 	}>>([]);
 
@@ -65,10 +61,10 @@
 			if (response.ok) {
 				const data = await response.json();
 				metrics = {
-					totalFiles: data.totalFiles || 0,
-					indexedFiles: data.indexedFiles || 0,
-					totalErrors: data.totalErrors || 0,
-					errorClusters: data.errorClusters || 0,
+					totalFiles, data.totalFiles || 0,
+					indexedFiles, data.indexedFiles || 0,
+					totalErrors, data.totalErrors || 0,
+					errorClusters, data.errorClusters || 0,
 					topErrorCodes: data.topErrorCodes || [],
 					surfaceBreakdown: data.surfaceBreakdown || {},
 					techBreakdown: data.techBreakdown || {}
@@ -77,10 +73,10 @@
 			}
 
 			// Load recent clusters
-			const clustersResponse = await fetch('/api/codebase-index/clusters?limit=5');
+			const clustersResponse = await fetch('/api/codebase-index/clusters? limit=5');
 			if (clustersResponse.ok) {
 				const clustersData = await clustersResponse.json();
-				recentClusters = clustersData.clusters || [];
+				recentClusters = clustersData.clusters ?? [];
 			}
 		} catch (error) {
 			console.error('Failed to load dashboard data:', error);
@@ -151,7 +147,7 @@
 					class="search-input"
 				/>
 			</div>
-			<Button variant="outline" onclick={triggerReindex} disabled={isLoading}>
+			<Button class="bits-btn" variant="outline" onclick={triggerReindex} disabled={isLoading}>
 				<RefreshCw class={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
 				Reindex
 			</Button>
@@ -240,7 +236,7 @@
 								<div class="error-bar-container">
 									<div
 										class="error-bar"
-										style="width: {Math.min(100, (count / (metrics.topErrorCodes[0]?.count || 1)) * 100)}%"
+										style="width: {Math.min(100, (count / (metrics.topErrorCodes[0]?.count ?? 1)) * 100)}%"
 									></div>
 								</div>
 								<span class="error-count">{count}</span>
@@ -349,25 +345,21 @@
 <style>
 	.codebase-dashboard {
 		padding: 2rem;
-		max-width: 1400px;
-		margin: 0 auto;
+		max-width: 1400px; margin: 0 auto;
 	}
 
 	.dashboard-header {
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-start;
-		margin-bottom: 2rem;
-		gap: 2rem;
+		margin-bottom: 2rem; gap: 2rem;
 	}
 
 	.page-title {
 		display: flex;
-		align-items: center;
-		gap: 0.75rem;
+		align-items: center; gap: 0.75rem;
 		font-size: 1.5rem;
-		font-weight: 600;
-		color: white;
+		font-weight: 600; color: white;
 	}
 
 	.page-subtitle {
@@ -377,24 +369,20 @@
 	}
 
 	.header-actions {
-		display: flex;
-		gap: 1rem;
+		display: flex; gap: 1rem;
 		align-items: center;
 	}
 
 	.graph-link {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 		padding: 0.5rem 1rem;
 		background: rgba(0, 212, 255, 0.1);
 		border: 1px solid rgba(0, 212, 255, 0.3);
-		border-radius: 8px;
-		color: #00d4ff;
+		border-radius: 8px; color: #00d4ff;
 		text-decoration: none;
 		font-size: 0.875rem;
-		font-weight: 500;
-		transition: all 0.2s ease;
+		font-weight: 500; transition: all 0.2s ease;
 	}
 
 	.graph-link:hover {
@@ -403,24 +391,20 @@
 	}
 
 	.search-box {
-		position: relative;
-		display: flex;
+		position: relative; display: flex;
 		align-items: center;
 	}
 
 	.search-icon {
-		position: absolute;
-		left: 0.75rem;
+		position: absolute; left: 0.75rem;
 		color: rgba(255, 255, 255, 0.5);
 	}
 
 	.search-input {
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 8px;
-		padding: 0.5rem 1rem 0.5rem 2.5rem;
-		color: white;
-		width: 300px;
+		border-radius: 8px; padding: 0.5rem 1rem 0.5rem 2.5rem;
+		color: white; width: 300px;
 		font-size: 0.875rem;
 	}
 
@@ -437,10 +421,8 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		padding: 4rem;
-		gap: 1rem;
-		color: rgba(255, 255, 255, 0.6);
+		justify-content: center; padding: 4rem;
+		gap: 1rem; color: rgba(255, 255, 255, 0.6);
 	}
 
 	.metrics-grid {
@@ -458,22 +440,18 @@
 
 	.metric-value {
 		font-size: 2rem;
-		font-weight: 700;
-		color: white;
+		font-weight: 700; color: white;
 	}
 
 	.metric-sub {
-		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.5);
+		font-size: 0.75rem; color: rgba(255, 255, 255, 0.5);
 		margin-top: 0.25rem;
 	}
 
 	.metric-link {
-		font-size: 0.75rem;
-		color: #00d4ff;
+		font-size: 0.75rem; color: #00d4ff;
 		text-decoration: none;
-		margin-top: 0.25rem;
-		display: inline-block;
+		margin-top: 0.25rem; display: inline-block;
 	}
 
 	.metric-link:hover {
@@ -496,8 +474,7 @@
 	}
 
 	.view-all-link {
-		font-size: 0.75rem;
-		color: #00d4ff;
+		font-size: 0.75rem; color: #00d4ff;
 		text-decoration: none;
 	}
 
@@ -507,14 +484,12 @@
 
 	.error-codes-list {
 		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
+		flex-direction: column; gap: 0.75rem;
 	}
 
 	.error-code-item {
 		display: flex;
-		align-items: center;
-		gap: 1rem;
+		align-items: center; gap: 1rem;
 	}
 
 	.error-code {
@@ -525,41 +500,33 @@
 	}
 
 	.error-bar-container {
-		flex: 1;
-		height: 8px;
+		flex: 1; height: 8px;
 		background: rgba(255, 255, 255, 0.1);
-		border-radius: 4px;
-		overflow: hidden;
+		border-radius: 4px; overflow: hidden;
 	}
 
 	.error-bar {
-		height: 100%;
-		background: linear-gradient(90deg, #ef4444, #f97316);
-		border-radius: 4px;
-		transition: width 0.3s ease;
+		height: 100%; background: linear-gradient(90deg, #ef4444, #f97316);
+		border-radius: 4px; transition: width 0.3s ease;
 	}
 
 	.error-count {
-		font-size: 0.875rem;
-		color: rgba(255, 255, 255, 0.7);
+		font-size: 0.875rem; color: rgba(255, 255, 255, 0.7);
 		min-width: 40px;
 		text-align: right;
 	}
 
 	.clusters-list {
 		display: flex;
-		flex-direction: column;
-		gap: 1rem;
+		flex-direction: column; gap: 1rem;
 	}
 
 	.cluster-item {
-		display: block;
-		padding: 1rem;
+		display: block; padding: 1rem;
 		background: rgba(255, 255, 255, 0.03);
 		border: 1px solid rgba(255, 255, 255, 0.08);
 		border-radius: 8px;
-		text-decoration: none;
-		transition: all 0.2s ease;
+		text-decoration: none; transition: all 0.2s ease;
 	}
 
 	.cluster-item:hover {
@@ -575,75 +542,63 @@
 	}
 
 	.cluster-name {
-		font-weight: 500;
-		color: white;
+		font-weight: 500; color: white;
 	}
 
 	.cluster-count {
-		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.5);
+		font-size: 0.75rem; color: rgba(255, 255, 255, 0.5);
 	}
 
 	.cluster-code {
 		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.75rem;
-		color: #f97316;
+		font-size: 0.75rem; color: #f97316;
 		margin-bottom: 0.5rem;
 	}
 
 	.cluster-suggestion {
-		font-size: 0.875rem;
-		color: rgba(255, 255, 255, 0.7);
+		font-size: 0.875rem; color: rgba(255, 255, 255, 0.7);
 		margin-bottom: 0.75rem;
 		line-height: 1.4;
 	}
 
 	.cluster-tags {
-		display: flex;
-		gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 		flex-wrap: wrap;
 	}
 
 	.tag {
-		font-size: 0.7rem;
-		padding: 0.2rem 0.5rem;
+		font-size: 0.7rem; padding: 0.2rem 0.5rem;
 		border-radius: 4px;
 	}
 
 	.breakdown-list {
 		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
+		flex-direction: column; gap: 0.5rem;
 	}
 
 	.breakdown-item {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
-		padding: 0.5rem;
+		align-items: center; padding: 0.5rem;
 		background: rgba(255, 255, 255, 0.03);
 		border-radius: 6px;
 	}
 
 	.breakdown-label {
-		font-size: 0.875rem;
-		color: rgba(255, 255, 255, 0.8);
+		font-size: 0.875rem; color: rgba(255, 255, 255, 0.8);
 	}
 
 	.breakdown-count {
 		font-size: 0.875rem;
-		font-weight: 500;
-		color: white;
+		font-weight: 500; color: white;
 	}
 
 	.empty-state {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		padding: 2rem;
-		gap: 0.5rem;
-		color: rgba(255, 255, 255, 0.5);
+		justify-content: center; padding: 2rem;
+		gap: 0.5rem; color: rgba(255, 255, 255, 0.5);
 		text-align: center;
 	}
 
@@ -675,3 +630,6 @@
 		}
 	}
 </style>
+
+
+

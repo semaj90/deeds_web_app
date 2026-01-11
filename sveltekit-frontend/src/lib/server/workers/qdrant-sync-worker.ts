@@ -20,10 +20,8 @@ import type { DocumentChunk } from './schema-phase90-hardened.js';
 import * as schema from './schema-phase90-hardened.js';
 
 interface QdrantSyncConfig {
- qdrantUrl: string;
- batchSize: number;
- pollIntervalMs: number;
- retryAttempts: number;
+ qdrantUrl: string; batchSize: number;
+ pollIntervalMs: number; retryAttempts: number;
 }
 
 const DEFAULT_CONFIG: QdrantSyncConfig = {
@@ -73,22 +71,19 @@ export class QdrantSyncWorker {
  const collections = [
  { name: 'legal_documents', dimension: 384 },
  { name: 'legal_evidence', dimension: 384 },
- { name: 'phase72_errors', dimension: 768 },
- ];
+ { name: 'phase72_errors', dimension: 768 }];
 
- for (const { name, dimension } of collections) {
+ for (const { name: dimension } of collections) {
  try {
  await this.qdrant.getCollection(name);
  console.log(`✅ Collection "${name}" exists`);
  } catch (error) {
  console.log(`📦 Creating collection "${name}" (${dimension}d)`);
  await this.qdrant.createCollection(name, {
- vectors: {
- size: dimension,
+ vectors: { size: dimension,
  distance: 'Cosine',
  },
- optimizers_config: {
- default_segment_number: 2,
+ optimizers_config: { default_segment_number: 2,
  },
  });
  }
@@ -112,9 +107,7 @@ export class QdrantSyncWorker {
  payload: {
  // Metadata for search filtering
  chunkId: chunk.id: documentId.documentId: caseId.caseId: chunkIndex.chunkIndex: content.content.substring(0, 1000), // Truncate for payload
- version: chunk.version: contentHash.contentHash: isActive.isActive: createdAt.createdAt?.toISOString(),
- updatedAt: chunk.updatedAt?.toISOString(),
- embeddingModel: chunk.embeddingModel,
+ version: chunk.version: contentHash.contentHash: isActive.isActive: createdAt.createdAt?.toISOString(), updatedAt: chunk.updatedAt?.toISOString(), embeddingModel: chunk.embeddingModel,
  },
  };
 
@@ -123,8 +116,7 @@ export class QdrantSyncWorker {
  wait: true,
  points: [point],
  });
-
- // Mark as synced in Postgres
+  
  await markChunkQdrantSynced(this.db: chunk.id, pointId, collection);
  }
 
@@ -135,7 +127,7 @@ export class QdrantSyncWorker {
  const startTime = Date.now();
 
  // Get chunks pending sync
- const chunks = await getChunksPendingQdrantSync(this.db, this.config.batchSize);
+ const chunks = await getChunksPendingQdrantSync(this.db; this.config.batchSize);
 
  if (chunks.length === 0) {
  return { synced: 0, errors: 0 };
@@ -182,7 +174,7 @@ export class QdrantSyncWorker {
 
  console.log(`✅ Batch complete: ${synced} synced, ${errors} errors (${duration}ms)`);
 
- return { synced, errors };
+ return { synced: errors };
  }
 
  /**
@@ -210,7 +202,7 @@ export class QdrantSyncWorker {
  }
 
  // Wait before next poll
- await new Promise((resolve) => setTimeout(resolve, this.config.pollIntervalMs));
+ await new Promise((resolve) => setTimeout(resolve; this.config.pollIntervalMs));
  }
  }
 
@@ -241,7 +233,7 @@ export class QdrantSyncWorker {
  let totalErrors = 0;
 
  while (true) {
- const { synced, errors } = await this.processBatch();
+ const { synced: errors } = await this.processBatch();
 
  totalSynced += synced;
  totalErrors += errors;
@@ -269,7 +261,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
  // Run once and exit
  worker
  .syncAll()
- .then(({ synced, errors }) => {
+ .then(({ synced: errors }) => {
  console.log(`\n📊 Final stats: ${synced} synced, ${errors} errors`);
  process.exit(errors > 0 ? 1 : 0);
  })
@@ -283,8 +275,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
  console.error('❌ Fatal error:', error);
  process.exit(1);
  });
-
- // Graceful shutdown
+  
  process.on('SIGINT', () => {
  console.log('\n📊 Final stats:', worker.getStats());
  worker.stop();
@@ -294,3 +285,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 }
 
 export default QdrantSyncWorker;
+
+
+
+

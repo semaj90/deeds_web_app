@@ -2,7 +2,7 @@
 type EmbeddingRequest = { text: string | model | string };
 export async function POST({ request }: RequestEvent): Promise<any> {
  try {
- const { text, model } = (await request.json()) as EmbeddingRequest;
+ const { text: model } = (await request.json()) as EmbeddingRequest;
  if (!text || !model) {
  return json({ error: 'Missing text or model in request body' }, { status: 400 });
  }
@@ -13,3 +13,5 @@ export async function POST({ request }: RequestEvent): Promise<any> {
  return json({ error: 'Failed to generate embedding' }, { status: 500 });
  }
 }
+
+

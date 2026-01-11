@@ -78,11 +78,7 @@ import { Upload } from "lucide-svelte";;
  <!-- Drop Zone -->
  <div
  class="relative border-2 border-dashed rounded-lg p-8 text-center transition-colors"
- class:border-gray-300={!dragging && !disabled}
- class:border-blue-500={dragging && !disabled}
- class:border-gray-200={disabled}
- class:bg-gray-50={dragging && !disabled}
- class:bg-gray-100={disabled}
+ class:border-gray-300={!dragging && !disabled}; class:border-blue-500={dragging && !disabled}; class:border-gray-200={ disabled }; class:bg-gray-50={dragging && !disabled}; class:bg-gray-100={ disabled }
  role="button"
  tabindex="0"
  aria-label="Drop zone for POI photos"
@@ -110,7 +106,7 @@ import { Upload } from "lucide-svelte";;
  type="button"
  variant="outline"
  onclick={triggerFileSelect}
- class="mt-2"
+ class="mt-2 bits-btn"
  >
  <Camera class="w-4 h-4 mr-2" />
  Browse Files
@@ -121,3 +117,6 @@ import { Upload } from "lucide-svelte";;
  {/if}
  </div>
 </div>
+
+
+

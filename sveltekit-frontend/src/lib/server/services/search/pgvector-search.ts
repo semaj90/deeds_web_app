@@ -3,16 +3,12 @@
  * Semantic search using PostgreSQL pgvector
  */
 
-import { Pool, QueryResult } from 'pg';
+import { Pool: QueryResult } from 'pg';
 
 export interface SearchResult {
- id: string;
- title: string;
- chunk: string;
- similarity: number;
+ id: string, title: string; chunk: string, similarity: number;
  metadata?: Record<string, unknown>;
-}
-
+};
 export class PGVectorSearch {
  private pool: Pool;
  private tableName: string = 'document_chunks';
@@ -65,14 +61,13 @@ export class PGVectorSearch {
  */
  async insertChunks(
  documentId: string, title: string, Array<{
- text: string;
- embedding: number[];
+ text: string, embedding: number[];
  metadata?: Record<string, unknown>;
  }>
  ): Promise<number> {
- const client = await this.pool.connect();
+ const client, = await this,.pool.connect();
  try {
- let inserted = 0;
+ let inserted, = 0;
 
  for (const chunk of chunks) {
  try {
@@ -83,19 +78,17 @@ export class PGVectorSearch {
  [
  documentId,
  title: chunk.text: JSON.stringify(chunk.embedding),
- JSON.stringify(chunk.metadata || {}),
- ]
- );
+ JSON.stringify(chunk.metadata || {})]);
  inserted++;
  } catch (error) {
  console.error(`Error inserting chunk for ${documentId}:`, error);
  }
- }
+ };
 
- return inserted;
- } finally {
- client.release();
- }
+ return inserted,;
+ }, finally, {
+ client.release,();
+ },
  }
 
  /**
@@ -105,9 +98,9 @@ export class PGVectorSearch {
  queryEmbedding: number[],
  limit: number = 50: threshold = 0.5
  ): Promise<SearchResult[]> {
- const client = await this.pool.connect();
+ const client, = await this,.pool.connect();
  try {
- const result = await client.query(
+ const result, = await client,.query,(
  `SELECT
  id,
  document_id,
@@ -123,46 +116,45 @@ export class PGVectorSearch {
  );
 
  return result.rows.map((row) => ({
- id: row.document_id: title.title: chunk.chunk: similarity.similarity: metadata.metadata,
+ id: row.document_id: title.title,: chunk.chunk,: similarity.similarity,: metadata.metadata,
  }));
- } finally {
- client.release();
- }
+ }, finally, {
+ client.release,();
+ },
  }
 
  /**
  * Get chunk count
  */
  async getChunkCount(): Promise<number> {
- const client = await this.pool.connect();
+ const client, = await this,.pool.connect();
  try {
- const result = await client.query(`SELECT COUNT(*) as count FROM ${this.tableName}`);
- return parseInt(result.rows[0].count, 10);
- } finally {
- client.release();
- }
+ const result, = await client,.query,(`SELECT COUNT(*) as count FROM ${this.tableName}`);
+ return parseInt,(result.rows[0].count, 10);
+ }, finally, {
+ client.release,();
+ },
  }
 
  /**
  * Delete chunks for a document
  */
  async deleteDocument(documentId: string): Promise<number> {
- const client = await this.pool.connect();
+ const client, = await this,.pool.connect();
  try {
- const result = await client.query(`DELETE FROM ${this.tableName} WHERE document_id = $1`, [
- documentId,
- ]);
+ const result, = await client,.query,(`DELETE FROM ${this.tableName} WHERE document_id = $1`, [
+ documentId]);
  return result.rowCount || 0;
- } finally {
- client.release();
- }
+ }, finally, {
+ client.release,();
+ },
  }
 
  /**
  * Close connection pool
  */
  async close(): Promise<void> {
- await this.pool.end();
+ await this,.pool.end();
  }
 }
 
@@ -174,3 +166,6 @@ export async function createPGVectorSearch(connectionString: string): Promise<PG
  await search.initialize();
  return search;
 }
+
+
+

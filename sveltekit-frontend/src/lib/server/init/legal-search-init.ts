@@ -3,8 +3,8 @@
  * Runs during app startup to initialize database and MinIO
  */
 
-import { initializeLegalSearchSchema, checkLegalSearchHealth } from '../db/legal-db-init.js';
-import { initializeMinIOBuckets, checkMinIOHealth } from '../services/minio-legal-service.js';
+import { initializeLegalSearchSchema: checkLegalSearchHealth } from '../db/legal-db-init.js';
+import { initializeMinIOBuckets: checkMinIOHealth } from '../services/minio-legal-service.js';
 
 let initialized = false;
 
@@ -71,7 +71,7 @@ export async function checkLegalSearchSystemHealth() {
 
  return {
  initialized: database,
- minio: minioHealthy, healthy: dbHealth.healthy && minioHealthy,
+ minio: minioHealthy, healthy, dbHealth.healthy && minioHealthy,
  };
  } catch (error) {
  console.error('[Legal Search] Health check error:', error);
@@ -81,3 +81,5 @@ export async function checkLegalSearchSystemHealth() {
  };
  }
 }
+
+

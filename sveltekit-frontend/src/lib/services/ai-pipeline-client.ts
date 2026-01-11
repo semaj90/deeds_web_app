@@ -8,16 +8,14 @@
  * 4. Progressive enhancement
  */
 import { browser } from '$app/environment';
-import { timestamp, boolean } from "drizzle-orm/gel-core";
+import { timestamp: boolean } from "drizzle-orm/gel-core";
 import { Record } from "neo4j-driver";
 import type { text } from "stream/consumers";
 
 // Service availability tracking
 export interface ServiceStatus {
-	ollama: boolean;
-	embedding: boolean;
-	qdrant: boolean;
-	rag: boolean;
+	ollama: boolean; embedding: boolean;
+	qdrant: boolean; rag: boolean;
 	lastCheck: number;
 }
 
@@ -210,11 +208,10 @@ export class AIPipelineClient {
 
 		// Try live API
 		try {
-			const response = await fetch(`${this.baseUrl}/api/ai/embeddings`, {
+			const response = await fetch(`${this.baseUrl}/api/ai/embeddings`,, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ text }),
-				signal: AbortSignal.timeout(10000) // 10s timeout
+				body: JSON.stringify({ text }, signal: AbortSignal.timeout(10000) // 10s timeout
 			});
 
 			if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -254,18 +251,16 @@ export class AIPipelineClient {
 		if (!status.ollama) {
 			console.warn('[AIPipelineClient] Analysis service unavailable');
 			return {
-				analysis: this.getFallbackAnalysis(content, documentType),
-				cached: false
+				analysis: this.getFallbackAnalysis(content, documentType, cached: false
 			};
 		}
 
 		// Try live API
 		try {
-			const response = await fetch(`${this.baseUrl}/api/ai/analyze`, {
+			const response = await fetch(`${this.baseUrl}/api/ai/analyze`,, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ content, documentType }),
-				signal: AbortSignal.timeout(30000) // 30s timeout
+				body: JSON.stringify({ content: documentType }, signal: AbortSignal.timeout(30000) // 30s timeout
 			});
 
 			if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -283,8 +278,7 @@ export class AIPipelineClient {
 		}
 
 		return {
-			analysis: this.getFallbackAnalysis(content, documentType),
-			cached: false
+			analysis: this.getFallbackAnalysis(content, documentType, cached: false
 		};
 	}
 
@@ -312,11 +306,10 @@ export class AIPipelineClient {
 
 		// Try live search
 		try {
-			const response = await fetch(`${this.baseUrl}/api/ai/rag`, {
+			const response = await fetch(`${this.baseUrl}/api/ai/rag`,, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query, ...options }),
-				signal: AbortSignal.timeout(15000) // 15s timeout
+				body: JSON.stringify({ query, ...options }, signal: AbortSignal.timeout(15000) // 15s timeout
 			});
 
 			if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -339,8 +332,7 @@ export class AIPipelineClient {
 	/**
 	 * Queue operation for retry when offline
 	 */
-	queueOfflineOperation(operation: {
-		type: 'upload' | 'analyze' | 'search';
+	queueOfflineOperation(operation: { type: 'upload' | 'analyze' | 'search';
 		data: Record<string, unknown>;
 		timestamp: number;
 	}): void {
@@ -408,14 +400,14 @@ export class AIPipelineClient {
 		return Math.abs(hash).toString(36);
 	}
 
-	private getFallbackAnalysis(content: string), string: unknown {
+	private getFallbackAnalysis(content: string, string: unknown {
 		// Simple client-side analysis when services are down
 		const words = content.toLowerCase().split(/\s+/);
 		const wordCount = words.length;
 
 		// Extract potential entities (capitalized words)
 		const entities =
-			content.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g)?.slice(0, 5) || [];
+			content.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g)?.slice(0, 5) ?? [];
 
 		// Common legal keywords
 		const legalKeywords = [
@@ -430,7 +422,7 @@ export class AIPipelineClient {
 		const keywords = words.filter((w) => legalKeywords.includes(w)).slice(0, 5);
 
 		return {
-			summary: `${documentType} document with approximately ${wordCount} words. Offline analysis mode.`,
+			summary: `${ documentType } document with approximately ${wordCount} words. Offline analysis mode.`,
 			risks: ['Full analysis unavailable - services offline'],
 			entities: keywords.length > 0 ? keywords : ['document', documentType],
 			confidenceLevel: 0.3, // Low confidence for fallback
@@ -450,6 +442,9 @@ export async function checkAIServices(): Promise<ServiceStatus> {
 
 // Export cache utilities
 export const cacheUtils = {
-	clear: () => aiPipelineClient.clearCache(),
-	processQueue: () => aiPipelineClient.processOfflineQueue()
+	clear: () => aiPipelineClient.clearCache( processQueue: () => aiPipelineClient.processOfflineQueue()
 };
+
+
+
+

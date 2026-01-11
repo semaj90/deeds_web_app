@@ -1,0 +1,157 @@
+<script lang="ts">
+ import { poiService } from '$lib/services/poi';
+ import { AlertTriangle, TrendingUp, Users } from 'lucide-svelte';
+ import { onMount } from 'svelte';
+
+ // Props
+ let { caseId = null } = $props();
+
+ // State
+ let stats = $state({
+ totalPOIs: 0, activePOIs: 0 0,
+ criticalPOIs: 0, recentActivity: 0 0
+ });
+ let loading = $state(true);
+ let error = $state<string | null>(null);
+
+ onMount(() => {
+ (async () => {
+ await loadStats();
+ })();
+ });
+
+ async function loadStats() {
+ loading = true;
+ error = null;
+ try {
+ if (caseId) {
+ const response = await poiService.listPOIs(caseId, 1000, 0);
+ stats.totalPOIs = response.total;
+ stats.activePOIs = response.pois.filter(
+ (p) => p.status !== 'victim' && p.status !== 'informant'
+ ).length;
+ stats.criticalPOIs = response.pois.filter((p) => p.priority === 'critical').length;
+ stats.recentActivity = response.pois.filter(
+ (p) => new Date(p.updatedAt).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000
+ ).length;
+ }
+ } catch (err) {
+ error = err instanceof Error ? err.message : 'Failed to load stats';
+ } finally {
+ loading = false;
+ }
+ }
+</script>
+
+<div class="poi-stats">
+ <div class="stat-card">
+ <div class="stat-icon">
+ <Users size={24} />
+ </div>
+ <div class="stat-content">
+ <p class="stat-label">Total POIs</p>
+ <p class="stat-value">{stats.totalPOIs}</p>
+ </div>
+ </div>
+
+ <div class="stat-card">
+ <div class="stat-icon active">
+ <TrendingUp size={24} />
+ </div>
+ <div class="stat-content">
+ <p class="stat-label">Active</p>
+ <p class="stat-value">{stats.activePOIs}</p>
+ </div>
+ </div>
+
+ <div class="stat-card">
+ <div class="stat-icon critical">
+ <AlertTriangle size={24} />
+ </div>
+ <div class="stat-content">
+ <p class="stat-label">Critical</p>
+ <p class="stat-value">{stats.criticalPOIs}</p>
+ </div>
+ </div>
+
+ <div class="stat-card">
+ <div class="stat-icon recent">
+ <Users size={24} />
+ </div>
+ <div class="stat-content">
+ <p class="stat-label">Recent Activity</p>
+ <p class="stat-value">{stats.recentActivity}</p>
+ </div>
+ </div>
+</div>
+
+<style>
+ .poi-stats {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+ gap: 1rem;
+ }
+
+ .stat-card {
+ display: flex;
+ align-items: center;
+ gap: 1rem;
+ padding: 1rem;
+ background: #1a1a2e;
+ border: 1px solid #333;
+ border-radius: 0.5rem;
+ transition: all 0.2s;
+ }
+
+ .stat-card:hover {
+ border-color: #dc2626;
+ box-shadow: 0 0 15px rgba(220, 38, 38, 0.1);
+ }
+
+ .stat-icon {
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ width: 40px;
+ height: 40px;
+ background: rgba(220, 38, 38, 0.1);
+ border-radius: 0.375rem;
+ color: #dc2626;
+ }
+
+ .stat-icon.active {
+ background: rgba(16, 185, 129, 0.1);
+ color: #10b981;
+ }
+
+ .stat-icon.critical {
+ background: rgba(239, 68, 68, 0.1);
+ color: #ef4444;
+ }
+
+ .stat-icon.recent {
+ background: rgba(59, 130, 246, 0.1);
+ color: #3b82f6;
+ }
+
+ .stat-content {
+ display: flex;
+ flex-direction: column;
+ gap: 0.25rem;
+ }
+
+ .stat-label {
+ color: #9ca3af;
+ font-size: 0.75rem;
+ font-weight: 600;
+ margin: 0;
+ text-transform: uppercase;
+ }
+
+ .stat-value {
+ color: #ffffff;
+ font-size: 1.5rem;
+ font-weight: 700;
+ margin: 0;
+ }
+</style>

@@ -2,53 +2,39 @@
 import * as concurrentSearch from './concurrent-indexeddb-search.js';
 
 export interface FlashAttentionConfig {
- gpu_device: number;
- memory_limit: number;
- attention_heads: number;
- sequence_length: number;
- batch_size: number;
- precision: 'fp16' | 'fp32';
+ gpu_device: number; memory_limit: number;
+ attention_heads: number; sequence_length: number;
+ batch_size: number; precision: 'fp16' | 'fp32';
  optimization_level: 'O1' | 'O2' | 'O3';
 }
 
 export interface GPUErrorBatch {
- id: string;
- errors: TypeScriptError[];
+ id: string; errors: TypeScriptError[];
  priority: 'low' | 'medium' | 'high' | 'critical';
  processing_strategy: 'parallel' | 'sequential' | 'hybrid';
- model: 'gemma3-legal:latest';
- expected_tokens: number;
+ model: 'gemma3-legal:latest'; expected_tokens: number;
 }
 
 export interface TypeScriptError {
- code: string;
- message: string;
- file: string;
- line: number;
- column: number;
- severity: 'error' | 'warning' | 'info';
+ code: string; message: string;
+ file: string; line: number;
+ column: number; severity: 'error' | 'warning' | 'info';
  category: 'syntax' | 'type' | 'import' | 'binding' | 'svelte5' | 'unknown';
 }
 
 export interface GPUProcessingResult {
- batchId: string;
- fixes: ErrorFix[];
- performance: {
- processing_time_ms: number;
- gpu_utilization: number;
- memory_usage_mb: number;
+ batchId: string; fixes: ErrorFix[];
+ performance: { processing_time_ms: number;
+ gpu_utilization: number; memory_usage_mb: number;
  tokens_per_second: number;
  };
  status: 'completed' | 'partial' | 'failed';
 }
 
 export interface ErrorFix {
- errorId: string;
- originalCode: string;
- fixedCode: string;
- confidence: number;
- explanation: string;
- category: string;
+ errorId: string; originalCode: string;
+ fixedCode: string; confidence: number;
+ explanation: string; category: string;
 }
 
 export class FlashAttentionGPUErrorProcessor {
@@ -125,10 +111,7 @@ export class FlashAttentionGPUErrorProcessor {
  const result: GPUProcessingResult = {
  batchId,
  fixes,
- performance: {
- processing_time_ms: processingTime, gpu_utilization: await, await this.getGPUUtilization(),
- memory_usage_mb: await this.getMemoryUsage(),
- tokens_per_second: this.calculateTokensPerSecond(fixes.length, processingTime),
+ performance: { processing_time_ms: processingTime, gpu_utilization: await; await this.getGPUUtilization( memory_usage_mb: await this.getMemoryUsage( tokens_per_second: this.calculateTokensPerSecond(fixes.length, processingTime),
  },
  status: 'completed',
  };
@@ -143,9 +126,7 @@ export class FlashAttentionGPUErrorProcessor {
  return {
  batchId,
  fixes: [],
- performance: {
- processing_time_ms: performance.now() - startTime: gpu_utilization
- memory_usage_mb: 0, tokens_per_second: 0,
+ performance: { processing_time_ms: performance.now() - startTime: gpu_utilization, memory_usage_mb: 0, tokens_per_second: 0,
  },
  status: 'failed',
  };
@@ -231,8 +212,7 @@ export class FlashAttentionGPUErrorProcessor {
  const response = await fetch('http://localhost:11434/api/generate', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: 'gemma3-legal:latest',
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
  prompt: stream, fromCache: false,
  options: { temperature: 0.1, top_p: 0.9, max_tokens: 500 },
  }),
@@ -280,14 +260,13 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
 
  private parseFixResponse(error: TypeScriptError, options: string): ErrorFix {
  let fixedCode = response
- .replace(/```[a-zA-Z0-9-]*\n?/g, '')
+ .replace(/```[a-zA-Z0-9-]*\n? /g, '')
  .replace(/```/g, '')
  .trim();
  const lines = fixedCode.split('\n').map((l) => l.trim());
  const firstCodeLineIndex = lines.findIndex(
  (l) =>
- l.startsWith('import ') ||
- l.startsWith('export ') ||
+ l.startsWith('import ') ?? l.startsWith('export ') ||
  l.includes('=>') ||
  l.includes(';') ||
  l.includes('{')
@@ -301,8 +280,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  return {
  errorId: `${error.file}:${error.line}:${error.column}`,
  originalCode: `// Line ${error.line}: ${error.message}`,
- fixedCode: confidence: this.calculateConfidence(error.category, responseLength),
- explanation: `Fixed ${error.category} error: ${error.code}`,
+ fixedCode: confidence; this.calculateConfidence(error.category, responseLength, explanation: `Fixed ${error.category} error: ${error.code}`,
  category: error.category,
  };
  }
@@ -390,7 +368,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  .split('\n')
  .filter((line) => /TS\d+/.test(line) && (line.includes('error') || line.includes('warning')));
  return errorLines.map((line, index) => {
- // Match like: path/to/file.ts(12), TS2322:...
+ // Match like: path/to/file.ts(12, TS2322:...
  const fileMatch = line.match(/^(.+?)\((\d+),(\d+)\)/);
  let file = 'unknown';
  let lineNum = 0;
@@ -402,7 +380,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  }
 
  const tsCodeMatch = line.match(/TS(\d+)/);
- const code = tsCodeMatch ? `TS${tsCodeMatch[1]}` : `TS-${index}`;
+ const code = tsCodeMatch ? `TS${tsCodeMatch[1]}` : `TS-${ index }`;
  const severity: TypeScriptError['severity'] = line.includes('error') ? 'error' : 'warning';
  const messageParts = line.split(':').slice(1); // remove file(...) prefix
  const message = messageParts.join(':').trim();
@@ -426,8 +404,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const batchErrors = categoryErrors.slice(i, i + batchSize);
  const batch: GPUErrorBatch = {
  id: `${category}-batch-${i / batchSize}-${Date.now()}`,
- errors: batchErrors, priority: processing_strategy, this.selectProcessingStrategy(batchErrors.length),
- model: 'gemma3-legal:latest',
+ errors: batchErrors, priority: processing_strategy; this.selectProcessingStrategy(batchErrors.length, model: 'gemma3-legal:latest',
  expected_tokens: batchErrors.length * 150,
  };
  batches.push(batch);
@@ -476,9 +453,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
 
  async getFlashAttentionStatus(): Promise<any> {
  const [gpuStatus, memoryStatus] = await Promise.all([
- this.checkGPUStatus(),
- this.getMemoryUsage(),
- ]);
+ this.checkGPUStatus(); this.getMemoryUsage()]);
  return {
  gpu_available: gpuStatus, model_loaded: this.isInitialized, memoryStatus: this.processingQueue.length, last_processing_time
  };
@@ -515,8 +490,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  line: 2, column: 1,
  severity: 'error',
  category: 'import',
- },
- ];
+ }];
 
  const startTime = performance.now();
  const result = await this.processErrors(testErrors);
@@ -544,3 +518,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
 }
 
 export const flashAttentionProcessor = new FlashAttentionGPUErrorProcessor();
+
+
+
+

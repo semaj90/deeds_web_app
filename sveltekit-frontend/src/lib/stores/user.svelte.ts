@@ -1,10 +1,8 @@
 
 export interface UserSession {
-  user: {
-    id: string, email: string, firstName: string | null, lastName: string | null, role: string, avatarUrl: string | null;
+  user: { id: string, email: string, firstName: string | null, lastName: string | null, role: string, avatarUrl: string | null;
   };
-  session: {
-    id: string, expiresAt: string;
+  session: { id: string, expiresAt: string;
   };
 }
 
@@ -78,3 +76,6 @@ class UserStore {
 }
 
 export const userStore = new UserStore();
+
+
+

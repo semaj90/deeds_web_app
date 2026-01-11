@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import {
  FeatureError,
  FeatureErrorHandler,
@@ -14,9 +14,7 @@ import {
 
 // Mock the feature logger
 vi.mock('../services/featureLogger', () => ({
- featureLogger: {
- logErrorBrain: vi.fn(),
- logLegalAi: vi.fn(),
+ featureLogger: { logErrorBrain: vi.fn( logLegalAi: vi.fn(),
  },
 }));
 
@@ -389,3 +387,6 @@ describe('Feature Error Handlers', () => {
  });
  });
 });
+
+
+

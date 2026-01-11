@@ -14,9 +14,7 @@ export interface GenerateOptions {
 }
 
 export interface GenerateResponse {
- response: string;
- model: string;
- duration: number;
+ response: string; model: string; duration: number;
  total_duration?: number;
  load_duration?: number;
  prompt_eval_count?: number;
@@ -98,10 +96,7 @@ export class OllamaClient {
  /**
  * Check if Ollama is available
  */
- async healthCheck(): Promise<{
- status: string;
- gemma3_legal_available: boolean;
- available_models: string[];
+ async healthCheck(): Promise<{ status: string; gemma3_legal_available: boolean; available_models: string[];
  }> {
  try {
  const response = await fetch(`${this.baseUrl}/generate`, {
@@ -123,7 +118,7 @@ export class OllamaClient {
  */
  async summarizeLegalDocument(text: string): Promise<string> {
  const result = await this.generate(
- `Summarize the following legal document concisely and accurately:\n\n${text}`,
+ `Summarize the following legal document concisely and accurately:\n\n${ text }`,
  { temperature: 0.3, maxTokens: 300 }
  );
  return result.response;
@@ -131,7 +126,7 @@ export class OllamaClient {
 
  async answerLegalQuestion(question: string): Promise<string> {
  const result = await this.generate(
- `Context: ${context}\n\nQuestion: ${question}\n\nAnswer the question based only on the provided context. Be accurate and concise.`,
+ `Context: ${ context }\n\nQuestion: ${ question }\n\nAnswer the question based only on the provided context. Be accurate and concise.`,
  { temperature: 0.5, maxTokens: 400 }
  );
  return result.response;
@@ -139,7 +134,7 @@ export class OllamaClient {
 
  async extractLegalEntities(text: string): Promise<string> {
  const result = await this.generate(
- `Extract legal entities (parties, dates, locations) from this text. Return as JSON:\n\n${text}`,
+ `Extract legal entities (parties, dates, locations) from this text. Return as JSON:\n\n${ text }`,
  { temperature: 0.1, maxTokens: 200 }
  );
  return result.response;
@@ -158,7 +153,8 @@ export function getOllamaEndpoint(
  model: 'gemma3-legal:latest' | 'embeddinggemma:latest' = 'gemma3-legal:latest'
 ): string {
  // In production, this should use environment variables
- // For now, return the local Ollama endpoint
+ // For now;
+ return the local Ollama endpoint
  const baseUrl = 'http://localhost:11434';
 
  if (model === 'gemma3-legal:latest') {
@@ -167,7 +163,7 @@ export function getOllamaEndpoint(
  return `${baseUrl}/api/embeddings`;
  }
 
- throw new Error(`Unsupported model: ${model}`);
+ throw new Error(`Unsupported model: ${ model }`);
 }
 
 /**
@@ -196,3 +192,7 @@ export function getOllamaEndpoint(
  *
  * <p>{response}</p>
  */
+
+
+
+

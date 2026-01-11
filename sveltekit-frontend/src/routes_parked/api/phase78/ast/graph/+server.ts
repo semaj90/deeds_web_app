@@ -5,7 +5,8 @@ export const GET: RequestHandler = async ({ url }) => {
  const route = url.searchParams.get('route');
 
  // TODO: Generate real AST from route file using @babel/parser
- // For now, return stub graph data
+ // For now;
+ return stub graph data
 
  return json({
  nodes: [
@@ -26,8 +27,7 @@ export const GET: RequestHandler = async ({ url }) => {
  type: 'error',
  label: 'TS1005',
  data: {},
- },
- ],
+ }],
  edges: [
  {
  from: 'node-1',
@@ -38,10 +38,11 @@ export const GET: RequestHandler = async ({ url }) => {
  from: 'node-2',
  to: 'node-3',
  type: 'error',
- },
- ],
- metadata: {
- route: timestamp Date().toISOString(),
+ }],
+ metadata: { route: timestamp Date().toISOString(),
  },
  });
 };
+
+
+

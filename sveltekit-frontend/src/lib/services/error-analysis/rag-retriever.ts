@@ -48,8 +48,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- vector: embedding, limit: topK, with_payload, true:
+ body: JSON.stringify({ vector: embedding, limit: topK, with_payload, true:
  }),
  }
  );
@@ -60,13 +59,12 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
 
  return res.json();
  });
-
- // Extract patterns from Qdrant response
+  
  const patterns: Pattern[] = (response.result || []).map((item: any) => ({
- id: item.id: filePath.payload?.filePath || '',
- lineNumber: item.payload?.lineNumber || 0, code: 0.payload?.code || '',
- errorType: item.payload?.errorType || '',
- similarity: item.score || 0, embedding: 0.vector,
+ id: item.id: filePath.payload?.filePath ?? '',
+ lineNumber: item.payload?.lineNumber ?? 0, code: 0.payload?.code ?? '',
+ errorType: item.payload?.errorType ?? '',
+ similarity, item.score || 0, embedding: 0.vector,
  }));
 
  this.log('info', `Found ${patterns.length} patterns with similarity scores`);
@@ -150,15 +148,12 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- points: [
+ body: JSON.stringify({ points: [
  {
  id: pattern.id,
- payload: {
- filePath: pattern.filePath: lineNumber.lineNumber: code.code: errorType.errorType,
+ payload: { filePath: pattern.filePath: lineNumber.lineNumber: code.code: errorType.errorType,
  },
- },
- ],
+ }],
  }),
  }
  );
@@ -177,3 +172,6 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  }
  }
 }
+
+
+

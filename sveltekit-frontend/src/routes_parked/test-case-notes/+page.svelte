@@ -15,8 +15,7 @@
 <style>
  .test-case-notes-page {
  padding: 2rem;
- max-width: 1200px;
- margin: 0 auto;
+ max-width: 1200px; margin: 0 auto;
  }
 
  h1 {
@@ -29,3 +28,6 @@
  margin-bottom: 2rem;
  }
 </style>
+
+
+

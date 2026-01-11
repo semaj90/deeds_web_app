@@ -18,9 +18,7 @@ import type { ContextBundle, ToolPlan } from './ace-context-service.js';
 
 export interface AceRequest {
   userRequest: string;
-  errorContext?: {
-    message: string; filePath: string;
-    lineNumber: number;
+  errorContext?: { message: string; filePath: string; lineNumber: number;
     code?: string;
   };
   systemRules?: string;
@@ -30,14 +28,10 @@ export interface AceRequest {
 
 export interface AceResponse {
   response: string; context: ContextBundle;
-  toolCalls: Array<{
-    tool: string; params: Record<string, unknown>;
+  toolCalls: Array<{ tool: string; params: Record<string, unknown>;
     reason: string;
   }>;
-  metadata: {
-    sessionId: string; timestamp: string;
-    contextQuality: 'sufficient' | 'stale' | 'insufficient'; webSearchTriggered: boolean;
-    llmProvider: string;
+  metadata: { sessionId: string; timestamp: string; contextQuality: 'sufficient' | 'stale' | 'insufficient'; webSearchTriggered: boolean; llmProvider: string;
   };
 }
 
@@ -56,7 +50,7 @@ export class AceAdapter {
   constructor(config?: { llmConfig?: LLMConfig }) {
     this.contextService = new AceContextService();
     this.webSearchService = new WebSearchService();
-    this.llmConfig = config?.llmConfig || {
+    this.llmConfig = config?.llmConfig ?? {
       provider: 'gemma3',
       temperature: 0.1, maxTokens: 2000
     };
@@ -190,7 +184,7 @@ export class AceAdapter {
   /**
    * Trigger web search and enqueue URLs for ingestion
    */
-  private async triggerWebSearch(query: string), string: Promise<void> {
+  private async triggerWebSearch(query: string, string: Promise<void> {
     try {
       // Perform web search
       const searchResults = await this.webSearchService.search(query, { limit: 5 });
@@ -206,9 +200,7 @@ export class AceAdapter {
       const response = await fetch('/api/ace/web/ingest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          urls: searchResults.map((r) => r.url),
-          tags: ['ace', 'auto-ingested', sessionId],
+        body: JSON.stringify({ urls: searchResults.map((r) => r.url, tags: ['ace', 'auto-ingested', sessionId],
           priority: 'high',
         }),
       });
@@ -230,7 +222,7 @@ export class AceAdapter {
    * In production, this should poll the job status API
    */
   private async waitForIngestion(ms: number): Promise<void> {
-    console.log(`[ACE] Waiting ${ms}ms for ingestion to complete...`);
+    console.log(`[ACE] Waiting ${ ms }ms for ingestion to complete...`);
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
@@ -240,7 +232,7 @@ export class AceAdapter {
   private async callLLM(prompt: string): Promise<string> {
     const { provider, model, temperature, maxTokens } = this.llmConfig;
 
-    console.log(`[ACE] Calling LLM: ${provider} (model: ${model || 'default'})`);
+    console.log(`[ACE] Calling LLM: ${ provider } (model: ${model || 'default'})`);
 
     try {
       if (provider === 'gemma3') {
@@ -269,11 +261,9 @@ export class AceAdapter {
     const response = await fetch(`${ollamaUrl}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gemma3-legal',
+      body: JSON.stringify({ model: 'gemma3-legal',
         prompt: stream,
-        options: {
-          temperature: num_predict,
+        options: { temperature: num_predict,
         },
       }),
     });
@@ -308,3 +298,7 @@ export class AceAdapter {
     return `[Gemini response placeholder]\n\n${prompt.substring(0, 200)}...`;
   }
 }
+
+
+
+

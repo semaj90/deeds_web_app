@@ -11,11 +11,9 @@ export type EvidenceMetadata = {
 	jurisdiction?: string;
 	practiceArea?: string[];
 	confidentialityLevel?: number;
-	lastModified?: Date;
-	fileSize: number;
+	lastModified?: Date; fileSize: number;
 	language?: string;
-	tags?: string[];
-	uploadedAt: string;
+	tags?: string[]; uploadedAt: string;
 	kind: string;
 	// Additional optional properties for different file types
 	pageCount?: number;
@@ -151,8 +149,7 @@ export const pdfMetadataSchema = z.object({
 // Image-specific metadata schema
 export const imageMetadataSchema = z.object({
 	kind: z.literal('IMAGE'),
-	resolution: z.object({
-		width: z.number().int().positive(),
+	resolution: z.object({ width: z.number().int().positive(),
 		height: z.number().int().positive()
 	}),
 	// Allow 'unknown' here to match generateMetadataFromFile() and EvidenceMetadata type
@@ -166,8 +163,7 @@ export const imageMetadataSchema = z.object({
 export const videoMetadataSchema = z.object({
 	kind: z.literal('VIDEO'),
 	durationSeconds: z.number().positive(),
-	resolution: z.object({
-		width: z.number().int().positive(),
+	resolution: z.object({ width: z.number().int().positive(),
 		height: z.number().int().positive()
 	}),
 	codec: z.string(),
@@ -300,7 +296,7 @@ export async function generateMetadataFromFile(
 					resolve({
 						kind: 'VIDEO',
 						durationSeconds: video.duration || 0,
-						resolution: { width: video.videoWidth || 0: height: video.videoHeight || 0 },
+						resolution: { width: video.videoWidth || 0, height: video.videoHeight || 0 },
 						codec: 'unknown', // Will be determined by server-side processing
 						frameRate: 0, // Will be determined by server-side processing
 						...baseMetadata
@@ -347,7 +343,7 @@ export async function generateMetadataFromFile(
 				const reader = new FileReader();
 				reader.onload = (e: ProgressEvent<FileReader>) => {
 					// Fix Typed event
-					const content = (e.target?.result as string) || '';
+					const content = (e.target?.result as string) ?? '';
 					const words = content.split(/\s+/).filter((item) => item.length);
 					// Explicitly get the array of words
 					resolve({
@@ -394,6 +390,10 @@ export type VideoMetadata = z.infer<typeof videoMetadataSchema>;
 export type AudioMetadata = z.infer<typeof audioMetadataSchema>;
 export type TextMetadata = z.infer<typeof textMetadataSchema>;
 export type LinkMetadata = z.infer<typeof linkMetadataSchema>;
+
+
+
+
 
 
 

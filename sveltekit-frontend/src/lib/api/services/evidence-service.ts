@@ -2,64 +2,31 @@
 import { getAuthHeaders } from './auth-service.js';
 
 export interface Evidence {
- id: string;
- caseId: string;
- title: string;
- description?: string;
- type: 'document' | 'testimony' | 'physical' | 'digital' | 'expert_report' | 'correspondence';
+ id: string; caseId: string; title: string;
+ description?: string; type: 'document' | 'testimony' | 'physical' | 'digital' | 'expert_report' | 'correspondence';
  category: 'favorable' | 'unfavorable' | 'neutral' | 'unknown';
- source: string;
- acquiredDate: string;
- relevanceScore: number; // 0-1, authenticityVerified: boolean;
- chainOfCustody: ChainOfCustodyEntry[];
- tags: string[];
- attachments: EvidenceAttachment[];
- analysis?: EvidenceAnalysis;
- metadata: { [key: string]: any };
- createdAt: string;
- updatedAt: string;
- createdBy: string;
- lastModifiedBy: string;
+ source: string; acquiredDate: string; relevanceScore: number; // 0-1, authenticityVerified: boolean; chainOfCustody: ChainOfCustodyEntry[]; tags: string[]; attachments: EvidenceAttachment[];
+ analysis?: EvidenceAnalysis; metadata: { [key: string]: any };
+ createdAt: string; updatedAt: string; createdBy: string; lastModifiedBy: string;
 }
 
 export interface ChainOfCustodyEntry {
- id: string;
- evidenceId: string;
- timestamp: string;
- action: 'acquired' | 'transferred' | 'examined' | 'sealed' | 'unsealed' | 'copied' | 'stored';
- performedBy: string;
- location: string;
+ id: string; evidenceId: string; timestamp: string; action: 'acquired' | 'transferred' | 'examined' | 'sealed' | 'unsealed' | 'copied' | 'stored';
+ performedBy: string; location: string;
  notes?: string;
  witness?: string;
  digitalSignature?: string;
 }
 
 export interface EvidenceAttachment {
- id: string;
- evidenceId: string;
- filename: string;
- originalFilename: string;
- mimeType: string;
- size: number;
- hash: string; // SHA-256 hash for integrity verification
- uploadedAt: string;
- uploadedBy: string;
- processingStatus: 'pending' | 'processing' | 'completed' | 'failed';
- ocrText?: string;
- aiAnalysisCompleted: boolean;
+ id: string; evidenceId: string; filename: string; originalFilename: string; mimeType: string; size: number; hash: string; // SHA-256 hash for integrity verification
+ uploadedAt: string; uploadedBy: string; processingStatus: 'pending' | 'processing' | 'completed' | 'failed';
+ ocrText?: string; aiAnalysisCompleted: boolean;
 }
 
 export interface EvidenceAnalysis {
- id: string;
- evidenceId: string;
- summary: string;
- keyFindings: string[];
- legalSignificance: string;
- potentialImpact: 'low' | 'medium' | 'high' | 'critical';
- relatedCases: string[];
- suggestedActions: string[];
- confidenceScore: number; // 0-1, analysisDate: string;
- analyzedBy: 'ai' | 'human' | 'hybrid';
+ id: string; evidenceId: string; summary: string; keyFindings: string[]; legalSignificance: string; potentialImpact: 'low' | 'medium' | 'high' | 'critical';
+ relatedCases: string[]; suggestedActions: string[]; confidenceScore: number; // 0-1, analysisDate: string; analyzedBy: 'ai' | 'human' | 'hybrid';
  reviewStatus: 'pending' | 'reviewed' | 'approved' | 'rejected';
 }
 
@@ -78,12 +45,8 @@ export interface EvidenceListOptions {
 }
 
 export interface CreateEvidenceData {
- caseId: string;
- title: string;
- description?: string;
- type: Evidence['type'];
- source: string;
- acquiredDate: string;
+ caseId: string; title: string;
+ description?: string; type: Evidence['type']; source: string; acquiredDate: string;
  tags?: string[];
  metadata?: { [key: string]: any };
 }
@@ -100,11 +63,7 @@ export interface UpdateEvidenceData {
 }
 
 export interface EvidenceListResponse {
- evidence: Evidence[];
- total: number;
- limit: number;
- offset: number;
- hasMore: boolean;
+ evidence: Evidence[]; total: number; limit: number; offset: number; hasMore: boolean;
 }
 
 // Core Evidence Management Functions
@@ -154,7 +113,7 @@ export async function listEvidence(
 
 export async function getEvidenceById(evidenceId: string): Promise<Evidence> {
  try {
- const response = await fetch(`/api/evidence/${evidenceId}`, {
+ const response = await fetch(`/api/evidence/${ evidenceId }`, {
  method: 'GET',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  });
@@ -166,7 +125,7 @@ export async function getEvidenceById(evidenceId: string): Promise<Evidence> {
 
  const evidence: Evidence = await response.json();
  // TODO: Add audit logging for evidence access
- console.log(`Fetched evidence: ${evidence.title} (${evidenceId})`);
+ console.log(`Fetched evidence: ${evidence.title} (${ evidenceId })`);
  return evidence;
  } catch (error: Error | unknown) {
  console.error('Evidence fetch error: ', error);
@@ -201,7 +160,7 @@ export async function updateEvidence(
  evidenceId: string, updates: UpdateEvidenceData
 ): Promise<Evidence> {
  try {
- const response = await fetch(`/api/evidence/${evidenceId}`, {
+ const response = await fetch(`/api/evidence/${ evidenceId }`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  body: JSON.stringify(updates),
@@ -214,7 +173,7 @@ export async function updateEvidence(
 
  const updatedEvidence: Evidence = await response.json();
  // TODO: Add audit logging for evidence updates
- console.log(`Updated evidence: ${updatedEvidence.title} (${evidenceId})`);
+ console.log(`Updated evidence: ${updatedEvidence.title} (${ evidenceId })`);
  return updatedEvidence;
  } catch (error: Error | unknown) {
  console.error('Evidence update error: ', error);
@@ -423,3 +382,6 @@ export async function uploadEvidenceAttachment(
  throw new Error(`Failed to upload evidence attachment: ${(error as Error).message}`);
  }
 }
+
+
+

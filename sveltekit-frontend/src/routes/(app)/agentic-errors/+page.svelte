@@ -1,27 +1,23 @@
 <script lang="ts">
+	import { DialogClose, DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, TabsContent, TabsList, TabsRoot, TabsTrigger } from 'bits-ui';
+
 	import * as Dialog from 'bits-ui';
-	import * as Tabs from 'bits-ui';
 	import { onMount } from 'svelte';
 
 	interface Cluster {
-		id: number;
-		error_count: number;
-		tags: string[];
-		summary: string;
+		id: number; error_count: number;
+		tags: string[]; summary: string;
 		error_ids: number[];
 		centroid?: number[];
 	}
 
 	interface GraphNode {
-		id: string;
-		file_path: string;
-		error_count: number;
-		dependencies: string[];
+		id: string; file_path: string;
+		error_count: number; dependencies: string[];
 	}
 
 	interface VectorSearchResult {
-		id: string;
-		score: number;
+		id: string; score: number;
 		payload: any;
 	}
 
@@ -38,7 +34,6 @@
 		qdrant_points: 0
 	});
 
-	// Fetch Phase 89 status
 	async function fetchStatus() {
 		loading = true;
 		try {
@@ -46,10 +41,10 @@
 			const data = await res.json();
 
 			stats = {
-				total_errors: data.postgres?.legal_ai?.error_instances || 0,
+				total_errors: data.postgres?.legal_ai?.error_instances ?? 0,
 				total_clusters: 0,
-				total_nodes: data.qdrant?.phase89_code_units || 0,
-				qdrant_points: data.qdrant?.total_points || 0
+				total_nodes: data.qdrant?.phase89_code_units ?? 0,
+				qdrant_points: data.qdrant?.total_points ?? 0
 			};
 		} catch (err) {
 			console.error('Failed to fetch status:', err);
@@ -96,8 +91,7 @@
 			const res = await fetch('/api/phase89/search', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					query: searchQuery,
+				body: JSON.stringify({ query: searchQuery,
 					top_k: 10,
 					similarity: 'cosine'
 				})
@@ -173,39 +167,39 @@
 		</div>
 
 		<!-- Main Tabs -->
-		<Tabs.Root value="search" class="w-full">
-			<Tabs.List class="flex gap-2 mb-6 border-b border-gray-700 pb-2">
-				<Tabs.Trigger
+		<TabsRoot value="search" class="w-full">
+			<TabsList class="flex gap-2 mb-6 border-b border-gray-700 pb-2">
+				<TabsTrigger
 					value="search"
 					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:text-gray-400 transition-colors"
 				>
 					🔍 Vector Search
-				</Tabs.Trigger>
+				</TabsTrigger>
 
-				<Tabs.Trigger
+				<TabsTrigger
 					value="clusters"
 					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:text-gray-400 transition-colors"
 				>
 					📊 Clusters
-				</Tabs.Trigger>
+				</TabsTrigger>
 
-				<Tabs.Trigger
+				<TabsTrigger
 					value="graph"
 					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:text-gray-400 transition-colors"
 				>
 					🕸️ Graph Analysis
-				</Tabs.Trigger>
+				</TabsTrigger>
 
-				<Tabs.Trigger
+				<TabsTrigger
 					value="pipeline"
 					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:text-gray-400 transition-colors"
 				>
 					⚡ Pipeline
-				</Tabs.Trigger>
-			</Tabs.List>
+				</TabsTrigger>
+			</TabsList>
 
 			<!-- Vector Search Tab -->
-			<Tabs.Content value="search" class="bg-gray-800/30 backdrop-blur rounded-lg p-6 border border-gray-700">
+			<TabsContent value="search" class="bg-gray-800/30 backdrop-blur rounded-lg p-6 border border-gray-700">
 				<h2 class="text-2xl font-bold mb-4">Semantic Vector Search</h2>
 				<p class="text-gray-400 mb-6">
 					Search errors using embeddinggemma:latest (768-dim) with cosine similarity ranking
@@ -216,7 +210,7 @@
 						type="text"
 						bind:value={searchQuery}
 						placeholder="Search for errors (e.g., 'svelte5 runes type error')"
-						class="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+						class="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg focus: outline-none, focus:ring-2 focus:ring-purple-500"
 						onkeydown={(e) => e.key === 'Enter' && vectorSearch()}
 					/>
 					<button
@@ -245,7 +239,7 @@
 									</div>
 								</div>
 								<div class="text-white font-mono text-sm">
-									{result.payload?.file_path || result.payload?.message || 'No details'}
+									{result.payload?.file_path ?? result.payload?.message || 'No details'}
 								</div>
 							</div>
 						{/each}
@@ -255,10 +249,10 @@
 						No results found. Try a different query.
 					</div>
 				{/if}
-			</Tabs.Content>
+			</TabsContent>
 
 			<!-- Clusters Tab -->
-			<Tabs.Content value="clusters" class="bg-gray-800/30 backdrop-blur rounded-lg p-6 border border-gray-700">
+			<TabsContent value="clusters" class="bg-gray-800/30 backdrop-blur rounded-lg p-6 border border-gray-700">
 				<div class="flex justify-between items-center mb-6">
 					<h2 class="text-2xl font-bold">Error Clusters</h2>
 					<button
@@ -273,7 +267,7 @@
 				{#if clusters.length > 0}
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 						{#each clusters as cluster}
-							<Dialog.Root>
+							<DialogRoot>
 								<Dialog.Trigger class="text-left">
 									<div class="bg-gray-700/50 rounded-lg p-4 border border-gray-600 hover:border-purple-500 transition-colors cursor-pointer">
 										<div class="flex justify-between items-start mb-2">
@@ -295,10 +289,10 @@
 									</div>
 								</Dialog.Trigger>
 
-								<Dialog.Portal>
-									<Dialog.Overlay class="fixed inset-0 bg-black/50 backdrop-blur-sm" />
-									<Dialog.Content class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto border border-purple-500">
-										<Dialog.Title class="text-2xl font-bold mb-4">Cluster {cluster.id}</Dialog.Title>
+								<DialogPortal>
+									<DialogOverlay class="fixed inset-0 bg-black/50 backdrop-blur-sm" />
+									<DialogContent class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto border border-purple-500">
+										<DialogTitle class="text-2xl font-bold mb-4">Cluster {cluster.id}</DialogTitle>
 
 										<div class="mb-4">
 											<div class="text-sm text-gray-400 mb-2">Tags:</div>
@@ -324,12 +318,12 @@
 											</div>
 										</div>
 
-										<Dialog.Close class="absolute top-4 right-4 text-gray-400 hover:text-white">
+										<DialogClose class="absolute top-4 right-4 text-gray-400 hover:text-white">
 											✕
-										</Dialog.Close>
-									</Dialog.Content>
-								</Dialog.Portal>
-							</Dialog.Root>
+										</DialogClose>
+									</DialogContent>
+								</DialogPortal>
+							</DialogRoot>
 						{/each}
 					</div>
 				{:else}
@@ -337,10 +331,10 @@
 						No clusters found. Run the clustering pipeline first.
 					</div>
 				{/if}
-			</Tabs.Content>
+			</TabsContent>
 
 			<!-- Graph Analysis Tab -->
-			<Tabs.Content value="graph" class="bg-gray-800/30 backdrop-blur rounded-lg p-6 border border-gray-700">
+			<TabsContent value="graph" class="bg-gray-800/30 backdrop-blur rounded-lg p-6 border border-gray-700">
 				<h2 class="text-2xl font-bold mb-4">Codebase Dependency Graph</h2>
 				<p class="text-gray-400 mb-6">
 					Visualize error propagation through import dependencies
@@ -367,17 +361,17 @@
 						No graph data available. Index codebase first.
 					</div>
 				{/if}
-			</Tabs.Content>
+			</TabsContent>
 
 			<!-- Pipeline Tab -->
-			<Tabs.Content value="pipeline" class="bg-gray-800/30 backdrop-blur rounded-lg p-6 border border-gray-700">
+			<TabsContent value="pipeline" class="bg-gray-800/30 backdrop-blur rounded-lg p-6 border border-gray-700">
 				<h2 class="text-2xl font-bold mb-4">Clustering Pipeline</h2>
 
 				<div class="space-y-4">
 					<button
 						onclick={runClustering}
 						disabled={loading}
-						class="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg font-semibold disabled:opacity-50 transition-colors"
+						class="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover: from-purple-700, hover:to-pink-700 rounded-lg font-semibold disabled:opacity-50 transition-colors"
 					>
 						{loading ? '🔄 Running Pipeline...' : '🚀 Run GPU Clustering'}
 					</button>
@@ -395,8 +389,8 @@
 						</ol>
 					</div>
 				</div>
-			</Tabs.Content>
-		</Tabs.Root>
+			</TabsContent>
+		</TabsRoot>
 	</div>
 </div>
 
@@ -408,7 +402,10 @@
 	.line-clamp-2 {
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
+		-webkit-box-orient: vertical; overflow: hidden;
 	}
 </style>
+
+
+
+

@@ -32,7 +32,7 @@ export function createTransport(type: TransportType): ErrorBrainTransport {
  }
 
  default:
- console.warn(`Unknown transport type: ${type}, using 'none'`);
+ console.warn(`Unknown transport type: ${ type }, using 'none'`);
  return new NoneTransport();
  }
 }
@@ -61,3 +61,5 @@ export function resetTransport(): void {
  }
  currentTransport = null;
 }
+
+

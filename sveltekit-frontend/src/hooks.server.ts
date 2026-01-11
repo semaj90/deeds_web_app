@@ -13,6 +13,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   // Add request ID for tracing
   const requestId = crypto.randomUUID();
   event.locals.requestId = requestId;
+  console.log('[HOOK] Request:', event.url.pathname);
 
   // Add timing information
   const startTime = Date.now();
@@ -69,3 +70,5 @@ export const handleError: HandleServerError = ({ error, event }) => {
     code: errorId,
   };
 };
+
+

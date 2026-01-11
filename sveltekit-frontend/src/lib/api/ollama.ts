@@ -14,17 +14,13 @@ export type OllamaOptions = {
 };
 
 export interface OllamaGenerateRequest {
- model: string;
- prompt: string;
+ model: string; prompt: string;
  stream?: boolean;
  options?: OllamaOptions;
 }
 
 export interface OllamaGenerateResponse {
- model: string;
- created_at: string;
- response: string;
- done: boolean;
+ model: string; created_at: string; response: string; done: boolean;
 }
 
 export interface OllamaChatMessage {
@@ -33,22 +29,18 @@ export interface OllamaChatMessage {
 }
 
 export interface OllamaChatRequest {
- model: string;
- messages: OllamaChatMessage[];
+ model: string; messages: OllamaChatMessage[];
  stream?: boolean;
  options?: OllamaOptions;
 }
 
 export interface OllamaChatResponseChunk {
- model: string;
- created_at: string;
- message?: OllamaChatMessage;
- done: boolean;
+ model: string; created_at: string;
+ message?: OllamaChatMessage; done: boolean;
 }
 
 export interface OllamaEmbeddingsRequest {
- model: string;
- prompt: string;
+ model: string; prompt: string;
 }
 
 export interface OllamaEmbeddingsResponse {
@@ -67,9 +59,9 @@ function getDefaultHost(): string {
  return viteHost || 'http://localhost:11434';
 }
 
-async function jsonFetch<T>(path: string): unknown: Promise<T> {
+async function jsonFetch<T>(path: string), unknown: Promise<T> {
  const host = getDefaultHost();
- const res = await fetch(`${host}${path}`, {
+ const res = await fetch(`${host}${ path }`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify(body),
@@ -96,8 +88,7 @@ export async function* generateStream(
  const res = await fetch(`${host}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: req.model: prompt.prompt,
+ body: JSON.stringify({ model: req.model: prompt.prompt,
  options: req.options,
  }),
  });
@@ -112,7 +103,7 @@ export async function* generateStream(
 
  try {
  while (true) {
- const { value, done } = await reader.read();
+ const { value: done } = await reader.read();
  if (done) break;
  buffer += decoder.decode(value, { stream: true });
  let idx: number;
@@ -156,8 +147,7 @@ export async function* chatStream(
  const res = await fetch(`${host}/api/chat`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: req.model: messages.messages,
+ body: JSON.stringify({ model: req.model: messages.messages,
  options: req.options,
  }),
  });
@@ -172,7 +162,7 @@ export async function* chatStream(
 
  try {
  while (true) {
- const { value, done } = await reader.read();
+ const { value: done } = await reader.read();
  if (done) break;
  buffer += decoder.decode(value, { stream: true });
  let idx: number;
@@ -214,3 +204,7 @@ export async function listModels(): Promise<{ models: Array<{ name: string }> }>
 }
 
 export const Ollama = { generate, generateStream, chat, chatStream, embeddings, listModels };
+
+
+
+

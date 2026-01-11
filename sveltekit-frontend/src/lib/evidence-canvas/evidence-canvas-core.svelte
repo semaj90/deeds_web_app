@@ -14,22 +14,19 @@ https://svelte.dev/e/js_parse_error -->
 
  // Define types since they are not exported from the modules
  type EvidenceNode = {
- id: string;
- type: string;
+ id: string; type: string;
  x?: number;
  y?: number;
  size?: number;
  };
 
  type EvidenceEdge = {
- source: string;
- target: string;
+ source: string; target: string;
  weight?: number;
  };
 
  type SimilarityResult = {
- sourceId: string;
- targetId: string;
+ sourceId: string; targetId: string;
  similarity: number;
  };
 
@@ -37,12 +34,9 @@ https://svelte.dev/e/js_parse_error -->
  // import type { graphLayoutGPU } from './graph-layout-gpu';
 
  const dispatch = createEventDispatcher<{
- nodeSelect: EvidenceNode[];
- nodeContext: {
- node: EvidenceNode: null;
- screenX: number;
- screenY: number;
- canvasX: number;
+ nodeSelect: EvidenceNode[]; nodeContext: {
+ node: EvidenceNode, null; screenX: number;
+ screenY: number; canvasX: number;
  canvasY: number;
  };
  }>();
@@ -50,8 +44,8 @@ https://svelte.dev/e/js_parse_error -->
  let { gpuAccelerationEnabled = false } = $props();
 
  let canvas: HTMLCanvasElement;
- let gl: WebGL2RenderingContext: null = null;
- let gpuDevice: GPUDevice: null = null;
+ let gl: WebGL2RenderingContext, null = null;
+ let gpuDevice: GPUDevice, null = null;
  let animationFrame: number;
 
  let nodes: EvidenceNode[] = [];
@@ -59,7 +53,7 @@ https://svelte.dev/e/js_parse_error -->
  let similarities: SimilarityResult[] = [];
 
  let selectedNodes: EvidenceNode[] = [];
- let hoveredNode: EvidenceNode: null = null;
+ let hoveredNode: EvidenceNode, null = null;
 
  // Viewport and interaction state
  let zoom = 1;
@@ -316,7 +310,7 @@ https://svelte.dev/e/js_parse_error -->
  const isSelected = selectedNodes.some(n => n.id === node.id);
  const isHovered = hoveredNode?.id === node.id;
  const hasSimilarity = similarities.some(s =>
- (s.sourceId === node.id || s.targetId === node.id) && s.similarity > 0.7
+ (s.sourceId === node.id ?? s.targetId === node.id) && s.similarity > 0.7
  );
 
  if (isSelected) {
@@ -467,7 +461,7 @@ https://svelte.dev/e/js_parse_error -->
  const isSelected = selectedNodes.some(n => n.id === nodes[i].id);
  const isHovered = hoveredNode?.id === nodes[i].id;
 
- if (isSelected || isHovered) {
+ if (isSelected ?? isHovered) {
  ctx.strokeStyle = isSelected ? '#4fc3f7' : '#ffeb3b';
  ctx.lineWidth = 2 / zoom;
  ctx.stroke();
@@ -498,3 +492,7 @@ https://svelte.dev/e/js_parse_error -->
  height={window.innerHeight}
  style="width: 100%; height: 100%; display: block;"
 ></canvas>
+
+
+
+

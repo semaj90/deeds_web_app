@@ -2,10 +2,8 @@
  import { onMount } from 'svelte';
 
  interface Props {
- evidenceItem?: {
- title: string;
- excerpt: string;
- type: string;
+ evidenceItem?: { title: string;
+ excerpt: string; type: string;
  relevance: number;
  };
  }
@@ -24,7 +22,7 @@
  // Set default input based on evidence item with legal analysis prompt
  $effect(() => {
  if (evidenceItem) {
- inputText = `LEGAL ANALYSIS REQUEST:\n\nEvidence Title: ${evidenceItem.title}\nEvidence Content: ${evidenceItem.excerpt}\nEvidence Type: ${evidenceItem.type}\nRelevance Score: ${evidenceItem.relevance}%\n\nPlease provide a comprehensive legal analysis including:\n1. Key legal issues identified\n2. Potential risks or implications\n3. Recommended actions\n4. Supporting legal precedents or principles\n\nAnalysis:`;
+ inputText = `LEGAL ANALYSIS REQUEST: \n\nEvidence, Title: ${evidenceItem.title}\nEvidence Content: ${evidenceItem.excerpt}\nEvidence Type: ${evidenceItem.type}\nRelevance Score: ${evidenceItem.relevance}%\n\nPlease provide a comprehensive legal analysis including:\n1. Key legal issues identified\n2. Potential risks or implications\n3. Recommended actions\n4. Supporting legal precedents or principles\n\nAnalysis:`;
  }
  });
 
@@ -38,8 +36,7 @@
  tokenizer = await AutoTokenizer.from_pretrained('/models/', {
  local_files_only: true
  });
-
- // Load ONNX model
+  
  const modelPath = '/models/gemma3_270m_w8a16.onnx';
  const response = await fetch(modelPath);
  const modelBuffer = await response.arrayBuffer();
@@ -60,11 +57,8 @@
  // Always include CPU as fallback
  executionProviders.push('cpu');
 
- model = await InferenceSession.create(modelBuffer, {
- executionProviders: executionProviders
- });
-
- // Determine which provider was actually selected
+ model = await InferenceSession.create(modelBuffer, { executionProviders });
+  
  const selectedProvider = model.getExecutionProviders()[0];
  currentProvider = selectedProvider === 'WebGPUExecutionProvider' ? 'WebGPU' :
  selectedProvider === 'WebNNExecutionProvider' ? 'WebNN' : 'CPU';
@@ -85,18 +79,16 @@
  try {
  const inputs = tokenizer(inputText, {
  return_tensors: 'np',
- padding: true, truncation: true
- max_length: 512
+ padding: true, truncation: true, max_length: 512
  });
-
- // Convert to ONNX tensors
+  
  const { Tensor } = await import('onnxruntime-web');
  const inputIdsTensor = new Tensor('int32', new Int32Array(inputs.input_ids.data), [1, inputs.input_ids.data.length]);
  const attentionMaskTensor = new Tensor('int32', new Int32Array(inputs.attention_mask.data), [1, inputs.attention_mask.data.length]);
 
  // Run inference
  const feeds = {
- input_ids: inputIdsTensor, attention_mask: attentionMaskTensor: attentionMaskTensor
+ input_ids: inputIdsTensor, attention_mask: attentionMaskTensor
  };
 
  const results = await model.run(feeds);
@@ -184,16 +176,14 @@
 
 <style>
  .client-inference {
- margin-top: 1rem;
- background: rgba(33, 37, 41, 0.9);
+ margin-top: 1rem; background: rgba(33, 37, 41, 0.9);
  border: 1px solid #00ff88;
  }
 
  .inference-title {
  color: #00ff88;
  font-family: 'Press Start 2P', cursive;
- font-size: 0.75rem;
- margin: 0 0 1rem 0;
+ font-size: 0.75rem; margin: 0 0 1rem 0;
  text-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
  }
 
@@ -223,8 +213,7 @@
  }
 
  .input-section label {
- display: block;
- color: #00ff88;
+ display: block; color: #00ff88;
  font-family: 'Courier New', monospace;
  font-size: 0.75rem;
  margin-bottom: 0.5rem;
@@ -236,8 +225,7 @@
  border: 1px solid #495057;
  color: #ffffff;
  font-family: 'Courier New', monospace;
- width: 100%;
- resize: vertical;
+ width: 100%; resize: vertical;
  }
 
  .nes-textarea:focus {
@@ -247,40 +235,38 @@
 
  .nes-btn {
  font-family: 'Courier New', monospace;
- font-size: 0.75rem;
- padding: 0.5rem 1rem;
+ font-size: 0.75rem; padding: 0.5rem 1rem;
  width: 100%;
  }
 
  .nes-btn.is-primary {
- background: #00ff88;
- color: #000;
+ background: #00ff88; color: #000;
  }
 
  .nes-btn.is-disabled {
- background: #6c757d;
- color: #adb5bd;
- cursor: not-allowed;
+ background: #6c757d; color: #adb5bd;
+ cursor:not-allowed;
  }
 
  .output-section {
- margin-top: 1rem;
- background: rgba(0, 0, 0, 0.5);
+ margin-top: 1rem; background: rgba(0, 0, 0, 0.5);
  border: 1px solid #495057;
  }
 
  .output-title {
  color: #00ff88;
  font-family: 'Courier New', monospace;
- font-size: 0.75rem;
- margin: 0 0 0.5rem 0;
+ font-size: 0.75rem; margin: 0 0 0.5rem 0;
  }
 
  .output-text {
  color: #ffffff;
  font-family: 'Courier New', monospace;
  font-size: 0.75rem;
- line-height: 1.4;
- margin: 0;
+ line-height: 1.4; margin: 0;
  }
 </style>
+
+
+
+

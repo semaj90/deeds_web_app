@@ -7,10 +7,8 @@ type MemoryBank = 'INTERNAL_RAM' | 'CHR_ROM' | 'PRG_ROM' | 'SAVE_RAM';
 
 export function withRedisOrchestrator(
  originalHandler: RequestHandler,
- config: {
- endpointName: string;
- cacheStrategy: CacheStrategy;
- memoryBank: MemoryBank;
+ config: { endpointName: string;
+ cacheStrategy: CacheStrategy; memoryBank: MemoryBank;
  requiresFresh?: boolean;
  }
 ): RequestHandler {
@@ -30,27 +28,23 @@ export const redisMiddleware = {
  endpointName: 'ai-chat',
  cacheStrategy: 'aggressive',
  memoryBank: 'CHR_ROM',
- }),
- aiAnalysis: (handler: RequestHandler) =>
+ }, aiAnalysis: (handler: RequestHandler) =>
  withRedisOrchestrator(handler, {
  endpointName: 'ai-analysis',
  cacheStrategy: 'conservative',
  memoryBank: 'PRG_ROM',
- }),
- evidence: (handler: RequestHandler) =>
+ }, evidence: (handler: RequestHandler) =>
  withRedisOrchestrator(handler, {
  endpointName: 'evidence',
  cacheStrategy: 'minimal',
  memoryBank: 'SAVE_RAM',
- }),
- caseScoring: (handler: RequestHandler) =>
+ }, caseScoring: (handler: RequestHandler) =>
  withRedisOrchestrator(handler, {
  endpointName: 'case-scoring',
  cacheStrategy: 'bypass',
  memoryBank: 'INTERNAL_RAM',
  requiresFresh: true,
- }),
- search: (handler: RequestHandler) =>
+ }, search: (handler: RequestHandler) =>
  withRedisOrchestrator(handler, {
  endpointName: 'search',
  cacheStrategy: 'aggressive',
@@ -64,8 +58,7 @@ export const redisMiddleware = {
  */
 export interface RedisOptimizedMiddleware {
  documentProcessing: (handler: RequestHandler) => RequestHandler;
- // Add other middleware methods here as they are implemented, e.g.:
- // minimal: (handler: RequestHandler) => RequestHandler;
+ // Add other middleware methods here as they are implemented, e.g.: //, minimal: (handler: RequestHandler) => RequestHandler;
  // cacheManagement: (handler: RequestHandler) => RequestHandler;
 }
 
@@ -86,3 +79,7 @@ const redisOptimized: RedisOptimizedMiddleware = {
 };
 
 export { redisOptimized };
+
+
+
+

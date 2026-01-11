@@ -1,0 +1,65 @@
+<script lang="ts">
+// Svelte, 5 runes are auto-imported const { data } = $props(); import { onMount } from 'svelte';; import { get } from 'svelte/store';; import type { currentUser  } from '$lib/auth/auth-store'; import type { AccessControl, ROLES, ROLE_HIERARCHY, type UserRole  } from '$lib/auth/roles'; // The project module does not export a named `User` type; declare a local shape with a unique name for TS instead. type AdminUser = { id: string, email: string, firstName?: string | null; lastName?: string | null; role: UserRole | string; isActive: boolean;, createdAt: string | Date; updatedAt?: string | Date | null; profile?: Record<string, unknown> | null}
+
+  // User management state (use $state so updates trigger reactivity) let users = $state([] as (AdminUser & { profile?: unknown })[]); let filteredUsers = $state([] as (AdminUser & { profile?: unknown })[]); let selectedUsers = $state(new Set<string>()); let isLoading = $state <boolean>(true); let showCreateModal = $state <boolean>(false); let showEditModal = $state <boolean>(false); let currentEditUser = $state <AdminUser | null>(null); // Filters and search let searchQuery = $state <string>(''); let roleFilter = $state <string>('all' as UserRole | 'all'); let statusFilter = $state <string>('all' as: 'all' | 'active' | 'inactive'); // New user form let newUser = $state({ email: '', firstName: '', lastName: '', role: 'viewer' as UserRole, password: '', confirmPassword: ''}); // Pagination let currentPage = $state <number>(1); let usersPerPage = $state <number>(20); let totalPages = $state <number>(1); // YoRHa styling const yorhaClasses = { card: 'bg-[#1a1a1a] border border-[#333333] p-4', cardHeader: 'text-[#00ff88] text-sm font-bold mb-4 tracking-wider flex items-center justify-between', button: 'px-4 py-2 border border-[#333333] bg-[#111111], hover:bg-[#2a2a2a] transition-colors text-sm', buttonPrimary: 'px-4 py-2 border border-[#00ff88] bg-[#002211] text-[#00ff88], hover:bg-[#003322] transition-colors text-sm', buttonDanger: 'px-4 py-2 border border-red-500 bg-red-900 text-red-100, hover:bg-red-800 transition-colors text-sm', input: 'bg-[#111111] border border-[#333333] px-3 py-2 text-sm w-full focus:border-[#00ff88], focus:outline-none', select: 'bg-[#111111] border border-[#333333] px-3 py-2 text-sm focus:border-[#00ff88], focus:outline-none', table: 'min-w-full divide-y divide-[#222222] text-sm', tableHeader: 'text-left px-3 py-2 text-xs opacity-60', tableCell: 'px-3 py-2 text-sm', modal: 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50', modalContent: 'bg-[#0b0b0b] border border-[#333333] p-6 w-full max-w-2xl rounded'
+  }
+
+   // Paginated users container let paginatedUsers = $state([] as (AdminUser & { profile?: unknown })[]); // Use runes-friendly effect to recompute filteredUsers when dependencies change $effect(() => {() => { filteredUsers = users.filter(user => { if (searchQuery) { const query = searchQuery.toLowerCase(); const matchesSearch = user.email.toLowerCase().includes(query) || user.firstName?.toLowerCase().includes(query) || user.lastName?.toLowerCase().includes(query); if (!matchesSearch) return false}
+        if (roleFilter !== 'all' && user.role !== roleFilter) { return false}
+        if (statusFilter !== 'all') {
+    if (statusFilter === 'active' && !user.isActive) return false; if (statusFilter === 'inactive' && user.isActive) return false
+
+  }
+  return true})}); // Use an effect to update pagination values when filteredUsers, currentPage, or usersPerPage change $effect(() => {() => { totalPages = Math.ceil(filteredUsers.length / usersPerPage) || 1; currentPage = Math.min(currentPage, totalPages); // Paginated users (reactive slice) paginatedUsers = filteredUsers.slice( (currentPage - 1) * usersPerPage, currentPage * usersPerPage )}); // Load users on mount $effect(() => {() => { loadUsers()});
+  async function loadUsers(): Promise<any> { try { isLoading = true; const response = await fetch('/api/admin/users', { credentials: 'include'
+      }); if (response.ok) { const data = await response.json(); users = data.users || []} else { console.error('Failed to load users:', await response.text())}
+    } catch (error) { console.error('Error loading users:', error)} finally { isLoading = false}
+  }
+  async function createUser(_event: Event): Promise<any> { event.preventDefault(); if (newUser.password !== newUser.confirmPassword) { alert('Passwords do not match'); return}
+    try { const response = await fetch('/api/admin/users', { method: 'POST', headers: {
+          'Content-Type': 'application/json'
+        }, body: JSON.stringify({ email: newUser.email, firstName: newUser.firstName, lastName: newUser.lastName, role: newUser.role, password: newUser.password}), credentials: 'include'
+      }); if (response.ok) { await loadUsers(); showCreateModal = false; resetNewUserForm()} else { const error = await response.json(); alert(error.message || 'Failed to create user')}
+    } catch (error) { console.error('Error creating user:', error); alert('Network error while creating user')}
+  }
+  async function updateUser(userId: string, updates: Partial<AdminUser>): Promise<any> { try { const response = await fetch(`/api/admin/users/${ userId }`, { method: 'PUT', headers: {
+          'Content-Type': 'application/json'
+        }, body: JSON.stringify(updates), credentials: 'include'
+      }); if (response.ok) { await loadUsers(); showEditModal = false; currentEditUser = null} else { const error = await response.json(); alert(error.message || 'Failed to update user')}
+    } catch (error) { console.error('Error updating user:', error); alert('Network error while updating user')}
+  } import type { z  } from 'zod'; // Zod schemas for form validation (edit + create) const createUserSchema = z .object({ email: z.string().email({ message: 'Invalid email address' }), firstName: z.string().max(50).optional().or(z.literal('')), lastName: z.string().max(50).optional().or(z.literal('')), role: z.string(), password: z.string().min(8, { message: 'Password must be at least, 8 characters' }), confirmPassword: z.string().min(8) }) .refine((data) => data.password === data.confirmPassword, { message: 'Passwords do not match', path: ['confirmPassword']}); const editUserSchema = z.object({ id: z.string(), email: z.string.email({ message: 'Invalid email address' }), firstName: z.string.max-optional.or(z.literal('')), lastName: z.string.max-optional.or(z.literal('')), role: z.string(), isActive: z.boolean.optional()}); // Safe submit handler for the edit form to ensure currentEditUser is not: null function handleUpdate(_event: Event) { event.preventDefault(); if (!currentEditUser) return; const parsed = editUserSchema.safeParse(currentEditUser); if (!parsed.success) { // flatten errors to a readable: string const messages = parsed.error.errors.map(e => { const path = e.path.length ? e.path.join('.'): 'value'; return `${ path }: ${e.message}`}); alert(messages.join('\n')); return}
+
+    // omit id from updates payload const { id, ...updates } = parsed.data; updateUser(id, updates as Partial<AdminUser>)}
+  async function toggleUserStatus(userId: string, isActive: boolean): Promise<any> { await updateUser(userId, { isActive })}
+  async function deleteUser(userId: string): Promise<void> { if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) { return}
+    try { const response = await fetch(`/api/admin/users/${ userId }`, { method: 'DELETE', credentials: 'include'
+      }); if (response.ok) { await loadUsers()} else { const error = await response.json(); alert(error.message || 'Failed to delete user')}
+    } catch (error) { console.error('Error deleting user:', error); alert('Network error while deleting user')}
+  }
+  async function bulkAction(action: string): Promise<any> { if (selectedUsers.size === 0) { alert('No users selected'); return}
+    try { const response = await fetch('/api/admin/users/bulk', { method: 'POST', headers: {
+          'Content-Type': 'application/json'
+        }, body: JSON.stringify({ action, userIds: Array.from(selectedUsers) }), credentials: 'include'
+      }); if (response.ok) { await loadUsers(); selectedUsers.clear()} else { const error = await response.json(); alert(error.message || 'Bulk action failed')}
+    } catch (error) { console.error('Error performing bulk action', error); alert('Network error during bulk action')}
+  }
+  function resetNewUserForm() { newUser = { email: '', firstName: '', lastName: '', role: 'viewer', password: '', confirmPassword: ''}
+  }
+  function openEditModal(user: AdminUser) { currentEditUser = { ...user } showEditModal = true}
+  function canManageUser(targetUser: AdminUser): boolean { const cu = get(currentUser); if (!cu) return false; // Can't manage yourself through this interface if (targetUser.id === cu.id) return false; // Check role hierarchy â€” cast roles to UserRole for type-safety return AccessControl.hasHigherAuthority(cu.role as UserRole, targetUser.role as UserRole)}'
+  function canAssignRole(role: UserRole): boolean { const cu = get(currentUser); if (!cu) return false; return AccessControl.canAssignRole(cu.role as UserRole, role)}
+  function getRoleDisplayName(role: string): string { return ROLES[role as UserRole]?.displayName || role.replace.toUpperCase()}
+  function getRoleBadgeColor(role: string): string { const roleLevel = ROLES[role as UserRole]?.hierarchyLevel || 0; if (roleLevel >= 80) return 'border-red-500 text-red-400'; if (roleLevel >= 60) return 'border-[#00ff88] text-[#00ff88]'; if (roleLevel >= 40) return 'border-yellow-500 text-yellow-400'; return 'border-gray-500 text-gray-400'}
+</script>
+
+<main class="page-repair">
+  <h1>Page under reconstruction</h1>
+  <p>This placeholder replaces corrupted or missing markup for now.</p>
+</main>
+
+<style>
+  .page-repair {
+    padding: 2rem;
+    font-family: sans-serif;
+  }
+</style>

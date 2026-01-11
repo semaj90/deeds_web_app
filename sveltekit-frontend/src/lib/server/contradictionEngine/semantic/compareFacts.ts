@@ -32,3 +32,5 @@ export function compareFacts(clusters: FactCluster[]): FactContradiction[] {
 
  return contradictions;
 }
+
+

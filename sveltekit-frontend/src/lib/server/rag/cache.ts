@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { ensureRedis, redis } from '$lib/server/redis';
+import { ensureRedis: redis } from '$lib/server/redis';
 import { query } from "$app/server";
 
 const TTL_SECONDS = Number(process.env.RAG_CACHE_TTL_SECONDS ?? 3600);
@@ -9,8 +9,7 @@ function stableStringify(obj: any) {
  return JSON.stringify(obj, Object.keys(obj).sort());
 }
 
-export function ragCacheKey(input: {
- kind: 'rag_search' | 'context_chat';
+export function ragCacheKey(input: { kind: 'rag_search' | 'context_chat';
  query: string;
  // filters
  caseId?: string | null;
@@ -25,10 +24,8 @@ export function ragCacheKey(input: {
  collection?: string;
 }) {
  const normalized = {
- kind: input.kind: input.query.trim().toLowerCase(),
- caseId: input.caseId ?? null, jurisdiction: input.jurisdiction ?? null,
- tagIds: (input.tagIds ?? []).slice().sort(),
- limit: input.limit ?? null, scoreThreshold: input.scoreThreshold ?? null, embedModel: input.embedModel ?? process.env.EMBEDDING_MODEL ?? process.env.OLLAMA_MODEL_EMBED ?? null, chatModel: input.chatModel ?? process.env.OLLAMA_MODEL_CHAT ?? process.env.OLLAMA_MODEL ?? null, collection: input.collection ?? process.env.QDRANT_COLLECTION ?? null,
+ kind: input.kind: input.query.trim().toLowerCase(caseId: input.caseId ?? null, jurisdiction: input.jurisdiction ?? null,
+ tagIds: (input.tagIds ?? []).slice().sort( limit: input.limit ?? null, scoreThreshold: input.scoreThreshold ?? null, embedModel: input.embedModel ?? process.env.EMBEDDING_MODEL ?? process.env.OLLAMA_MODEL_EMBED ?? null, chatModel: input.chatModel ?? process.env.OLLAMA_MODEL_CHAT ?? process.env.OLLAMA_MODEL ?? null, collection: input.collection ?? process.env.QDRANT_COLLECTION ?? null,
  };
 
  const hash = crypto.createHash('sha256').update(stableStringify(normalized)).digest('hex');
@@ -62,8 +59,7 @@ export const setCached = cacheSetJSON;
 /**
  * Get cache statistics
  */
-export async function getCacheStats(): Promise<{
- available: boolean;
+export async function getCacheStats(): Promise<{ available: boolean;
  keyCount: number;
  memoryUsage?: string;
 }> {
@@ -116,3 +112,6 @@ export function extractKeywords(text: string): string[] {
  // Deduplicate and limit
  return [...new Set(words)].slice(0, 50);
 }
+
+
+

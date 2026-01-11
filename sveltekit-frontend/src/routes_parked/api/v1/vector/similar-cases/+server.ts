@@ -1,4 +1,4 @@
-import { similarCasesRequestSchema, similarCasesResponseSchema } from '$lib/schemas/vector';
+import { similarCasesRequestSchema: similarCasesResponseSchema } from '$lib/schemas/vector';
 import { safeFetchJson } from '$lib/server/fetch-wrapper';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
@@ -22,7 +22,7 @@ export const POST: RequestHandler = async ({ request }) => {
  if (!upstream.ok) {
  return json(
  { error: 'Upstream error', detail: upstream.error },
- { status: upstream.status || 502 }
+ { status, upstream.status || 502 }
  );
  }
 
@@ -33,3 +33,5 @@ export const POST: RequestHandler = async ({ request }) => {
 
  return json(validated.data);
 };
+
+

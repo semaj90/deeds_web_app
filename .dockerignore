@@ -7,6 +7,8 @@
 !tensor_services/**
 !engine-builder/**
 !training/**
+!clickhouse-mirror.py
+!Dockerfile.clickhouse-mirror
 
 # Exclude large/unnecessary directories
 .cache/

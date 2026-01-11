@@ -20,7 +20,7 @@ import type { Error, Analysis, Cluster, ServiceConfig, ACEContext } from './type
 
 export interface IErrorAnalysisPipeline {
  analyzeErrors(sessionId: string, errors: Error[]): Promise<ACEContext>;
- analyzeError(sessionId: string), Error: Promise<Analysis>;
+ analyzeError(sessionId: string, Error: Promise<Analysis>;
  getSessionContext(sessionId: string): Promise<ACEContext | null>;
 }
 
@@ -76,7 +76,7 @@ export class ErrorAnalysisPipeline extends BaseService implements IErrorAnalysis
  this.log('info', 'Generating embeddings for errors');
  const embeddedErrors = await Promise.all(
  errors.map(async (error) => ({
- ...error, embedding: await, await this.embedder.generateEmbedding(error.message),
+ ...error, embedding: await; await this.embedder.generateEmbedding(error.message),
  }))
  );
 
@@ -112,7 +112,7 @@ export class ErrorAnalysisPipeline extends BaseService implements IErrorAnalysis
  * Analyze a single error
  * Orchestrates the complete analysis workflow for one error
  */
- async analyzeError(sessionId: string), Error: Promise<Analysis> {
+ async analyzeError(sessionId: string, Error: Promise<Analysis> {
  if (!sessionId || typeof sessionId !== 'string') {
  throw new Error('Invalid input: sessionId must be a non-empty string');
  }
@@ -185,3 +185,5 @@ export class ErrorAnalysisPipeline extends BaseService implements IErrorAnalysis
  }
  }
 }
+
+

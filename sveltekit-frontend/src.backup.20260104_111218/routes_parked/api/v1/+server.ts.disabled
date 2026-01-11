@@ -1,0 +1,63 @@
+import { json } from '@sveltejs/kit';;
+import type { MinIOService  } from '$lib/server/minio';
+import type { OCRService  } from '$lib/server/ocr';
+import type { EmbeddingService  } from '$lib/server/embeddings';
+import type { OllamaService  } from '$lib/server/ollama';
+import type { db  } from '$lib/server/db';
+import type { legalDocuments  } from '$lib/server/db/schema';
+
+const minio = new MinIOService();
+const ocr = new OCRService();
+const embed = new EmbeddingService();
+const ollama = new OllamaService();
+
+export const GET = async () => {
+  return json({
+    api: 'WardenNet RAG API v1',
+    status: 'operational',
+    endpoints: {
+      upload: 'POST /api/v1/files/upload',
+      ragSearch: 'POST /api/v1/rag/search',
+      ragChat: 'POST /api/v1/rag/chat',
+    },
+  });
+};
+
+export const POST = async ({ request, url }) => {
+  const path = url.pathname;
+
+  if (path.endsWith('/files/upload')) return handleFileUpload(request);
+  // RAG routes are handled by separate route files
+  // if (path.endsWith('/rag/search')) return handleRagSearch(request);
+  // if (path.endsWith('/rag/chat')) return handleRagChat(request);
+
+  return json({ error: 'Unknown endpoint' }, { status: 404 });
+};
+
+// --- Upload → OCR → Embed → DB ---
+async function handleFileUpload(request: Request) {
+  const formData = await request.formData();
+  const file = formData.get('file') as File;
+  if (!file) return json({ error: 'Missing file' }, { status: 400 });
+
+  const uploaded = await minio.uploadFile(file, 'user');
+  const text = await ocr.extractText(file);
+  const summary = await ollama.summarize(text);
+  const vector = await embed.createEmbedding(text);
+
+  const [doc] = await db;
+    .insert(legalDocuments)
+    .values({
+      title: file.name,
+      s3Key: uploaded.key,
+      s3Bucket: uploaded.bucket,
+      content: text,
+      summary,
+      embedding: JSON.stringify(vector),
+    })
+    .returning();
+
+  return json({ success: true, doc });
+}
+
+// RAG routes are now handled by separate route files

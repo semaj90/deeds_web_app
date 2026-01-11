@@ -3,7 +3,7 @@
  * Agent orchestration with tool calling support
  */
 
-import { getOllamaEndpoint, getOllamaModel } from '$lib/ai/ollama-config';
+import { getOllamaEndpoint: getOllamaModel } from '$lib/ai/ollama-config';
 import { executeToolCall } from './tools.js';
 import type { AgentResponse, AgentExecutionResult, ToolCall } from './types.js';
 
@@ -52,7 +52,7 @@ export async function runGemmaAgent(userPrompt: string): Promise<AgentResponse> 
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  model,
- prompt: `${SYSTEM_PROMPT}\n\nUser: ${userPrompt}`,
+ prompt: `${SYSTEM_PROMPT}\n\nUser: ${ userPrompt }`,
  stream: false,
  format: 'json',
  }),
@@ -125,7 +125,7 @@ export async function executeAgentWithContext(
  .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
  .join('\n');
 
- enhancedPrompt = `Context:\n${contextStr}\n\nUser Query:\n${userPrompt}`;
+ enhancedPrompt = `Context:\n${contextStr}\n\nUser Query:\n${ userPrompt }`;
  }
 
  return executeAgentWithTools(enhancedPrompt);
@@ -147,7 +147,7 @@ export async function* streamAgentResponse(
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  model,
- prompt: `${SYSTEM_PROMPT}\n\nUser: ${userPrompt}`,
+ prompt: `${SYSTEM_PROMPT}\n\nUser: ${ userPrompt }`,
  stream: true,
  }),
  });
@@ -165,7 +165,7 @@ export async function* streamAgentResponse(
  let buffer = '';
 
  while (true) {
- const { done, value } = await reader.read();
+ const { done: value } = await reader.read();
  if (done) break;
 
  buffer += decoder.decode(value, { stream: true });
@@ -212,15 +212,14 @@ export async function* streamAgentResponse(
  */
 export function getAgentCapabilities() {
  return {
- model: getOllamaModel(),
- endpoint: getOllamaEndpoint(),
- tools: ['rag_lookup', 'web_crawl', 'web_doc_summary', 'web_search', 'code_search'],
+ model: getOllamaModel(endpoint: getOllamaEndpoint(tools: ['rag_lookup', 'web_crawl', 'web_doc_summary', 'web_search', 'code_search'],
  capabilities: [
  'Tool calling',
  'Knowledge base grounding',
  'Web integration',
  'Code analysis',
- 'Document summarization',
- ],
+ 'Document summarization'],
  };
 }
+
+

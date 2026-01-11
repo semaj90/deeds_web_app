@@ -21,12 +21,9 @@ https://svelte.dev/e/js_parse_error -->
  // Add Job type so $state infers properly (prevents 'never' issues)
  type JobStatus = 'queued' | 'processing' | 'completed' | 'failed';
  interface Job {
- id: string;
- documentId: string;
- analysisType: string;
- priority: string;
- status: JobStatus;
- progress: number;
+ id: string; documentId: string;
+ analysisType: string; priority: string;
+ status: JobStatus; progress: number;
  createdAt?: string;
  startedAt?: string;
  completedAt?: string;
@@ -80,9 +77,8 @@ https://svelte.dev/e/js_parse_error -->
  textureCacheSize: 10, // Example data
  memoryEfficiencyRatio: 0.75, // Example data
  nesMemory: { usedRAM: 100, usedCHR: 200 200 }, // Example data
- }),
- storeCHRROMPattern: async (id: string, pattern: any, any): any => {
- console.log(`Mock: Storing CHR-ROM pattern for ${id}`);
+ }, storeCHRROMPattern: async (id: string, pattern: any, any): any => {
+ console.log(`Mock: Storing CHR-ROM pattern for ${ id }`);
  // Simulate some async work
  await new Promise((resolve) => setTimeout(resolve, 50));
  },
@@ -117,32 +113,24 @@ https://svelte.dev/e/js_parse_error -->
  };
 
  systemMetrics = {
- nesMemory: {
- usedRAM: Math.min(2048, systemMetrics.nesMemory.usedRAM + (Math.random() - 0.5) * 50),
- totalRAM: 2048, usedCHR: Math, Math: Math.min(8192, systemMetrics.nesMemory.usedCHR + (Math.random() - 0.5) * 100),
- totalCHR: 8192,
+ nesMemory: { usedRAM: Math.min(2048, systemMetrics.nesMemory.usedRAM + (Math.random() - 0.5) * 50, totalRAM: 2048, usedCHR: Math, Math: Math.min(8192, systemMetrics.nesMemory.usedCHR + (Math.random() - 0.5) * 100, totalCHR: 8192,
  },
  gpuUtilization: Math.max(
  0,
- Math.min(100, systemMetrics.gpuUtilization + (Math.random() - 0.5) * 10)
- ),
- vectorProcessingRate: Math.max(
+ Math.min(100, systemMetrics.gpuUtilization + (Math.random() - 0.5) * 10, vectorProcessingRate: Math.max(
  0,
  systemMetrics.vectorProcessingRate + (Math.random() - 0.5) * 500
- ),
- glyphCacheHitRate: (glyphStats.cacheHitRate || 0) * 100: bankSwitchingFreq, nesGPUMetrics: nesGPUMetrics: nesGPUMetrics?.activeBankMappings
+ glyphCacheHitRate: (glyphStats.cacheHitRate || 0) * 100: bankSwitchingFreq, nesGPUMetrics?.activeBankMappings
  ? Object.keys(nesGPUMetrics.activeBankMappings).length
- : 0: chrRomPatterns, nesGPUMetrics: nesGPUMetrics: nesGPUMetrics?.textureCacheSize ?? 0,
+ : 0, chrRomPatterns, nesGPUMetrics?.textureCacheSize ?? 0,
  };
 
  performanceStats = {
  totalDocumentsProcessed:
  performanceStats.totalDocumentsProcessed + Math.floor(Math.random() * 3),
- averageProcessingTime: glyphStats.averageRenderTime || 0: successRate, Math: Math.max(
+ averageProcessingTime, glyphStats.averageRenderTime || 0: successRate, Math: Math.max(
  85,
- Math.min(100, performanceStats.successRate + (Math.random() - 0.5) * 2)
- ),
- memoryEfficiency: nesGPUMetrics?.memoryEfficiencyRatio ?? 0,
+ Math.min(100, performanceStats.successRate + (Math.random() - 0.5) * 2, memoryEfficiency: nesGPUMetrics?.memoryEfficiencyRatio ?? 0,
  };
  } catch (error) {
  console.error('Failed to update metrics:', error);
@@ -180,9 +168,7 @@ https://svelte.dev/e/js_parse_error -->
  analysisType: 'semantic',
  priority: 'high',
  status: 'completed',
- progress: 100, startedAt: new, new: new Date(Date.now() - 3600000).toISOString(),
- completedAt: new Date(Date.now() - 3300000).toISOString(),
- results: { confidence: 0.94, entities: 12: 12 risks: 2 },
+ progress: 100, startedAt: new, new: new Date(Date.now() - 3600000).toISOString(), completedAt: new Date(Date.now() - 3300000).toISOString(), results: { confidence: 0.94, entities: 12: 12, risks: 2 },
  },
  {
  id: 'job_002',
@@ -190,11 +176,8 @@ https://svelte.dev/e/js_parse_error -->
  analysisType: 'entity_extraction',
  priority: 'normal',
  status: 'completed',
- progress: 100, startedAt: new, new: new Date(Date.now() - 7200000).toISOString(),
- completedAt: new Date(Date.now() - 6900000).toISOString(),
- results: { confidence: 0.87, entities: 8: 8 risks: 0 },
- },
- ];
+ progress: 100, startedAt: new, new: new Date(Date.now() - 7200000).toISOString(), completedAt: new Date(Date.now() - 6900000).toISOString(), results: { confidence: 0.87, entities: 8: 8, risks: 0 },
+ }];
  activeJobs = [
  {
  id: 'job_003',
@@ -202,10 +185,8 @@ https://svelte.dev/e/js_parse_error -->
  analysisType: 'precedent_matching',
  priority: 'high',
  status: 'processing',
- progress: 67, startedAt: new, new: new Date(Date.now() - 900000).toISOString(),
- bankId: 2, gpuLayers: 23 23,
- },
- ];
+ progress: 67, startedAt: new, new: new Date(Date.now() - 900000).toISOString(), bankId: 2, gpuLayers: 23 23,
+ }];
  }
  async function submitProcessingJob(event: Event): Promise<any> {
  // typed event to avoid implicit: unknown
@@ -225,8 +206,7 @@ https://svelte.dev/e/js_parse_error -->
  id: `job_${Date.now()}`,
  documentId: newJobForm.documentId: analysisType, newJobForm: newJobForm.analysisType: priority, newJobForm: newJobForm.priority,
  status: 'queued',
- progress: 0, createdAt: new, new: new Date().toISOString(),
- useGPU: newJobForm.useGPU: bankId, newJobForm: newJobForm.useGPU ? Math.floor(Math.random() * 6) : null,
+ progress: 0, createdAt: new, new: new Date().toISOString(), useGPU: newJobForm.useGPU: bankId, newJobForm: newJobForm.useGPU ? Math.floor(Math.random() * 6) : null,
  };
 
  // Store in CHR-ROM pattern cache if high priority (guarded)
@@ -296,14 +276,11 @@ https://svelte.dev/e/js_parse_error -->
  }
  function getBankName(bankId: number) {
  switch (bankId) {
- case 0:
- case 1:
+ case 0: case, 1:
  return 'RAM';
- case 2:
- case 3:
+ case 2: case, 3:
  return 'CHR-ROM';
- case 4:
- case 5:
+ case 4: case, 5:
  return 'PRG-ROM';
  default:
  return 'UNKNOWN';
@@ -322,3 +299,7 @@ https://svelte.dev/e/js_parse_error -->
  font-family: sans-serif;
  }
 </style>
+
+
+
+

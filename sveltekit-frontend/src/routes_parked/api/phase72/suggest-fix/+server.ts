@@ -5,10 +5,8 @@ const PHASE72_BACKEND_URL = process.env.PHASE72_BACKEND_URL ?? 'http://127.0.0.1
 
 interface SuggestFixRequest {
  route?: string;
- errors?: Array<{
- code: string;
- message: string;
- severity: string;
+ errors?: Array<{ code: string;
+ message: string; severity: string;
  file_path?: string;
  line?: number;
  }>;
@@ -16,8 +14,7 @@ interface SuggestFixRequest {
 }
 
 interface SuggestFixResponse {
- plan: string;
- suggestions: string[];
+ plan: string; suggestions: string[];
  related_routes: string[];
 }
 
@@ -25,7 +22,8 @@ export const POST: RequestHandler = async ({ request }) => {
  try {
  const payload: SuggestFixRequest = await request.json();
 
- // If no backend is configured, return placeholder suggestions
+ // If no backend is configured;
+ return placeholder suggestions
  if (!PHASE72_BACKEND_URL || PHASE72_BACKEND_URL === 'http://127.0.0.1:8000') {
  console.warn('Phase72 backend not configured, returning placeholder suggestions');
  return json({
@@ -33,8 +31,7 @@ export const POST: RequestHandler = async ({ request }) => {
  suggestions: [
  'Review TypeScript errors in page.ts or layout.ts',
  'Check component prop compatibility',
- 'Verify all imports are correct',
- ],
+ 'Verify all imports are correct'],
  related_routes: payload.route ? [payload.route] : [],
  } as SuggestFixResponse);
  }
@@ -77,3 +74,7 @@ export const POST: RequestHandler = async ({ request }) => {
  );
  }
 };
+
+
+
+

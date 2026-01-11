@@ -2,41 +2,18 @@
 // Uses Gemma 3 Legal model for structured JSON output
 
 export interface PersonOfInterestData {
- name: string;
- aliases: string[];
- description: string;
- who: {
- identity: string;
- background: string;
- occupation: string;
- affiliations: string[];
+ name: string; aliases: string[]; description: string; who: { identity: string; background: string; occupation: string; affiliations: string[];
  };
- what: {
- activities: string[];
- knownActions: string[];
- patterns: string[];
+ what: { activities: string[]; knownActions: string[]; patterns: string[];
  };
- why: {
- motivations: string[];
- objectives: string[];
- drivingFactors: string[];
+ why: { motivations: string[]; objectives: string[]; drivingFactors: string[];
  };
- how: {
- methods: string[];
- resources: string[];
- capabilities: string[];
+ how: { methods: string[]; resources: string[]; capabilities: string[];
  };
- risk: {
- threatLevel: 'low' | 'medium' | 'high' | 'critical';
- riskFactors: string[];
- mitigationStrategies: string[];
- legalImplications: string[];
+ risk: { threatLevel: 'low' | 'medium' | 'high' | 'critical';
+ riskFactors: string[]; mitigationStrategies: string[]; legalImplications: string[];
  };
- metadata: {
- confidence: number;
- sources: string[];
- lastUpdated: string;
- generatedBy: string;
+ metadata: { confidence: number; sources: string[]; lastUpdated: string; generatedBy: string;
  };
 }
 
@@ -44,10 +21,9 @@ export const PERSON_OF_INTEREST_PROMPT = `You are a specialized Legal AI Assista
 
 Given the following information about a person, generate a comprehensive legal POI profile in valid JSON format.
 
-Input Information:
-- Name: {name}
-- Alias: {alias}
-- Description: {description}
+Input Information: -, Name: { name }
+- Alias: { alias }
+- Description: { description }
 
 Generate a structured POI profile with the following JSON schema:
 
@@ -102,8 +78,8 @@ export const PERSON_OF_INTEREST_FOLLOWUP_PROMPT = `You are a Legal AI Assistant 
 
 Given additional information about an existing POI, update their risk profile while maintaining legal accuracy.
 
-Existing POI: {existingProfile}
-New Information: {newInfo}
+Existing POI: { existingProfile }
+New Information: { newInfo }
 
 Update the risk assessment section and any relevant fields based on the new information. Consider:
 - Changes in threat level
@@ -124,7 +100,7 @@ Review the following POI profile for:
 5. Professional language and objectivity
 
 POI Profile: {profile}
-Source Information: {sourceInfo}
+Source Information: { sourceInfo }
 
 Provide validation results in JSON format:
 {
@@ -139,8 +115,8 @@ export function generatePersonPrompt(
  name: string, alias: string = '',
  description: string
 ): string {
- return PERSON_OF_INTEREST_PROMPT.replace('{name}', name)
- .replace('{alias}', alias || 'None provided')
+ return PERSON_OF_INTEREST_PROMPT.replace('{ name }', name)
+ .replace('{ alias }', alias || 'None provided')
  .replace('{description}', description);
 }
 
@@ -159,5 +135,9 @@ export function generateValidationPrompt(
  return PERSON_OF_INTEREST_VALIDATION_PROMPT.replace(
  '{profile}',
  JSON.stringify(profile, null, 2)
- ).replace('{sourceInfo}', sourceInfo);
+ ).replace('{ sourceInfo }', sourceInfo);
 }
+
+
+
+

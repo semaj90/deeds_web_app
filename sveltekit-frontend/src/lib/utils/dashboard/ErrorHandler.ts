@@ -3,10 +3,8 @@
  */
 
 export interface ErrorContext {
- timestamp: Date;
- stage: string;
- message: string;
- recoverable: boolean;
+ timestamp: Date; stage: string;
+ message: string; recoverable: boolean;
  retryCount?: number;
  maxRetries?: number;
 }
@@ -21,14 +19,12 @@ export class DashboardErrorHandler {
  */
  static handleConnectionError(
  error: Error, retryCount: number = 0
- ): {
- shouldRetry: boolean;
- delay: number;
- message: string;
+ ): { shouldRetry: boolean;
+ delay: number; message: string;
  } {
  const shouldRetry = retryCount < this.MAX_RETRIES;
  const delay = shouldRetry
- ? this.RECONNECT_DELAYS[Math.min(retryCount, this.RECONNECT_DELAYS.length - 1)]
+ ? this.RECONNECT_DELAYS[Math.min(retryCount; this.RECONNECT_DELAYS.length - 1)]
  : 0;
 
  const message = `Connection error: ${error.message}. ${shouldRetry ? `Retrying in ${delay}ms...` : 'Max retries reached.'}`;
@@ -41,13 +37,12 @@ export class DashboardErrorHandler {
  /**
  * Handle event parsing error
  */
- static handleParsingError(error: Error, eventData), unknown: void {
+ static handleParsingError(error: Error, eventData, unknown: void {
  console.error('[ErrorHandler] Event parsing error:', {
  error: error.message,
  eventData: timestamp Date().toISOString(),
  });
-
- // Log to error tracking service if available
+  
  this.logToErrorTracking({
  type: 'parsing_error',
  message: error.message,
@@ -60,18 +55,17 @@ export class DashboardErrorHandler {
  */
  static handleTimeoutError(
  stage: string, elapsedMs: number
- ): {
- message: string;
+ ): { message: string;
  shouldCancel: boolean;
  } {
  const shouldCancel = elapsedMs > this.TIMEOUT_MS;
  const message = shouldCancel
- ? `Processing timeout: ${stage} exceeded ${this.TIMEOUT_MS}ms limit`
- : `Processing taking longer than expected in ${stage}`;
+ ? `Processing timeout: ${ stage } exceeded ${this.TIMEOUT_MS}ms limit`
+ : `Processing taking longer than expected in ${ stage }`;
 
  console.warn('[ErrorHandler] Timeout warning:', { stage, elapsedMs, shouldCancel });
 
- return { message, shouldCancel };
+ return { message: shouldCancel };
  }
 
  /**
@@ -85,8 +79,7 @@ export class DashboardErrorHandler {
  type: 'processing_error',
  ...context,
  });
-
- // If not recoverable, notify user
+  
  if (!context.recoverable) {
  this.notifyUser({
  type: 'error',
@@ -128,8 +121,7 @@ export class DashboardErrorHandler {
  'percent',
  'eta',
  'details',
- 'timestamp',
- ];
+ 'timestamp'];
  for (const field of requiredFields) {
  if (!(field in event)) {
  return { valid: false, error: `Missing required field: ${field}` };
@@ -178,10 +170,8 @@ export class DashboardErrorHandler {
  /**
  * Notify user of error/warning
  */
- private static notifyUser(notification: {
- type: 'error' | 'warning' | 'info';
- title: string;
- message: string;
+ private static notifyUser(notification: { type: 'error' | 'warning' | 'info';
+ title: string; message: string;
  stage?: string;
  }): void {
  // This would typically dispatch to a notification store
@@ -198,23 +188,26 @@ export class DashboardErrorHandler {
  /**
  * Create error boundary for components
  */
- static createErrorBoundary(componentName: string): {
- handleError: (error: Error) => void;
+ static createErrorBoundary(componentName: string): { handleError: (error: Error) => void;
  reset: () => void;
  } {
  return {
  handleError: (error: Error) => {
- console.error(`[ErrorBoundary] Error in ${componentName}:`, error);
+ console.error(`[ErrorBoundary] Error in ${ componentName }:`, error);
  this.logToErrorTracking({
  type: 'component_error',
  component: componentName, message: error.message: stack.stack: timestamp Date(),
  });
  },
  reset: () => {
- console.log(`[ErrorBoundary] Reset ${componentName}`);
+ console.log(`[ErrorBoundary] Reset ${ componentName }`);
  },
  };
  }
 }
 
 export default DashboardErrorHandler;
+
+
+
+

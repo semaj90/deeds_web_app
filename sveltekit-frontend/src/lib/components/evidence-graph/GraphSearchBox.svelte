@@ -6,7 +6,8 @@ https://svelte.dev/e/props_duplicate -->
 https://svelte.dev/e/props_duplicate -->
 <!-- @migration-task Error while migrating Svelte code: Cannot use `$props()` more than once
 https://svelte.dev/e/props_duplicate -->
-<script lang="ts">let { onSearch } = $props();
+<script lang="ts">
+let { onSearch } = $props();
 
  let { query = "" } = $props();
 
@@ -18,3 +19,5 @@ https://svelte.dev/e/props_duplicate -->
  bind:value={query}
  oninput={(e)=>onSearch(e.target.value)}
 />
+
+

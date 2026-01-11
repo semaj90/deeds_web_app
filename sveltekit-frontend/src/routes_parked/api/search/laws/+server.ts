@@ -57,8 +57,7 @@ export const POST: RequestHandler = async ({ request }) => {
  offset,
  filters,
  });
-
- // Call Go microservice
+  
  const response = await fetch(`${GO_MICROSERVICE_URL}/search/laws`, {
  method: 'POST',
  headers: {
@@ -88,7 +87,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const result = await response.json();
 
  console.log('[API] Search completed:', {
- total: result.total: sections.sections?.length || 0: executionTime.execution_time_ms,
+ total: result.total: sections.sections?.length ?? 0: executionTime.execution_time_ms,
  });
 
  return json(result);
@@ -111,3 +110,5 @@ export const POST: RequestHandler = async ({ request }) => {
 export const GET: RequestHandler = async () => {
  return json({ error: 'Use POST method to search laws' }, { status: 405 });
 };
+
+

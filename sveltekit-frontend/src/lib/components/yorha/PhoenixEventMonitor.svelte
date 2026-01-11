@@ -5,8 +5,7 @@
  type: string;
  evidenceId?: string;
  fileName?: string;
- caseId?: string;
- message: string;
+ caseId?: string; message: string;
  timestamp?: string;
  [key: string]: any;
  }
@@ -182,7 +181,7 @@
  }
 
  @keyframes pulse {
- 0%, 100% {
+ 0%; } 100% {
  opacity: 1;
  }
  50% {
@@ -190,3 +189,6 @@
  }
  }
 </style>
+
+
+

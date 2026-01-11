@@ -1,0 +1,281 @@
+/**
+ * CHR-ROM Pattern Rendering Styles
+ * Optimal CSS for NES 8-bit and SNES 16-bit aesthetic rendering
+ */
+
+/* Base CHR-ROM pattern styles */
+.chr-rom-pattern {
+ display: inline-block;
+ user-select: none;
+ pointer-events: none;
+}
+
+/* SVG-specific rendering (SNES 16-bit + Modern) */
+.chr-rom-svg {
+ image-rendering: auto;
+ shape-rendering: geometricPrecision;
+ text-rendering: optimizeLegibility;
+}
+
+.chr-rom-svg.chr-rom-crisp {
+ image-rendering: -webkit-optimize-contrast;
+ image-rendering: -moz-crisp-edges;
+ image-rendering: crisp-edges;
+ shape-rendering: crispEdges;
+}
+
+/* PNG-specific rendering (NES 8-bit pixel art) */
+.chr-rom-png {
+ image-rendering: -webkit-optimize-contrast;
+ image-rendering: -moz-crisp-edges;
+ image-rendering: crisp-edges;
+ image-rendering: pixelated;
+}
+
+.chr-rom-png.chr-rom-pixelated {
+ /* Force pixel-perfect scaling for authentic NES feel */
+ image-rendering: pixelated;
+ image-rendering: -moz-crisp-edges;
+ image-rendering: -webkit-crisp-edges;
+ image-rendering: -o-crisp-edges;
+
+ /* Disable subpixel rendering */
+ -webkit-font-smoothing: none;
+ -moz-osx-font-smoothing: unset;
+
+ /* Ensure pixel boundaries */
+ image-rendering: optimizeSpeed;
+ image-rendering: -webkit-optimize-contrast;
+}
+
+/* Auto rendering (let browser decide) */
+.chr-rom-auto {
+ image-rendering: auto;
+}
+
+/* Size-specific optimizations */
+.chr-rom-xs {
+ /* 16x16 or smaller - prioritize crispness */
+ width: 16px;
+ height: 16px;
+ image-rendering: pixelated;
+}
+
+.chr-rom-sm {
+ /* 32x32 - balance crispness and smoothness */
+ width: 32px;
+ height: 32px;
+ image-rendering: crisp-edges;
+}
+
+.chr-rom-md {
+ /* Scalable - use smooth rendering */
+ width: auto;
+ height: auto;
+ min-width: 24px;
+ min-height: 24px;
+ image-rendering: auto;
+}
+
+/* Pattern-specific optimizations */
+
+/* Document icons - SNES 16-bit clean aesthetic */
+.chr-rom-doc-icon {
+ filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+ transition: filter 0.15s ease;
+}
+
+.chr-rom-doc-icon:hover {
+ filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Status indicators - NES 8-bit pixel perfect */
+.chr-rom-status {
+ image-rendering: pixelated;
+ /* Prevent anti-aliasing at any scale */
+ -webkit-interpolation-mode: nearest-neighbor;
+ interpolation-mode: nearest-neighbor;
+}
+
+/* Risk gauges - smooth animations */
+.chr-rom-gauge {
+ image-rendering: auto;
+}
+
+.chr-rom-gauge svg {
+ /* Enable smooth animations for SVG gauges */
+ shape-rendering: geometricPrecision;
+}
+
+/* Entity heatmaps - blocky pixel grid */
+.chr-rom-heatmap {
+ image-rendering: pixelated;
+ /* Force square pixels */
+ object-fit: none;
+ object-position: top left;
+}
+
+/* Confidence badges - crisp text */
+.chr-rom-badge {
+ image-rendering: crisp-edges;
+ font-smooth: never;
+ -webkit-font-smoothing: none;
+}
+
+/* Similarity graphs - mathematical precision */
+.chr-rom-graph {
+ image-rendering: crisp-edges;
+ shape-rendering: geometricPrecision;
+}
+
+/* Responsive scaling for different screen densities */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+ /* High-DPI displays */
+ .chr-rom-pixelated {
+ /* Maintain pixel art aesthetic on retina displays */
+ image-rendering: pixelated;
+ transform: scale(1);
+ transform-origin: top left;
+ }
+
+ .chr-rom-svg {
+ /* Allow SVG to use higher resolution */
+ image-rendering: auto;
+ }
+}
+
+@media (-webkit-min-device-pixel-ratio: 3), (min-resolution: 288dpi) {
+ /* Ultra high-DPI displays */
+ .chr-rom-xs.chr-rom-pixelated {
+ /* Scale up pixel art for ultra-high DPI */
+ transform: scale(1.5);
+ transform-origin: top left;
+ }
+}
+
+/* Animation classes for pattern updates */
+.chr-rom-fade-in {
+ animation: chrRomFadeIn 0.15s ease-out;
+}
+
+@keyframes chrRomFadeIn {
+ from {
+ opacity: 0;
+ transform: scale(0.95);
+ }
+ to {
+ opacity: 1;
+ transform: scale(1);
+ }
+}
+
+.chr-rom-pulse {
+ animation: chrRomPulse 2s ease-in-out infinite;
+}
+
+@keyframes chrRomPulse {
+ 0%,
+ 100% {
+ opacity: 1;
+ }
+ 50% {
+ opacity: 0.7;
+ }
+}
+
+/* Loading states */
+.chr-rom-loading {
+ background: linear-gradient(
+ 90deg,
+ rgba(203, 213, 225, 0.1) 25%,
+ rgba(203, 213, 225, 0.3) 50%,
+ rgba(203, 213, 225, 0.1) 75%
+ );
+ background-size: 200% 100%;
+ animation: chrRomShimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes chrRomShimmer {
+ 0% {
+ background-position: -200% 0;
+ }
+ 100% {
+ background-position: 200% 0;
+ }
+}
+
+/* Hover effects for interactive patterns */
+.chr-rom-interactive {
+ cursor: pointer;
+ transition:
+ transform 0.1s ease,
+ filter 0.1s ease;
+}
+
+.chr-rom-interactive:hover {
+ transform: scale(1.05);
+}
+
+.chr-rom-interactive:active {
+ transform: scale(0.98);
+}
+
+/* Error states */
+.chr-rom-error {
+ opacity: 0.5;
+ filter: grayscale(1) contrast(0.5);
+}
+
+/* Performance optimizations */
+.chr-rom-pattern {
+ /* GPU acceleration for smooth animations */
+ will-change: transform, opacity;
+ transform: translateZ(0);
+
+ /* Optimize paint and composite */
+ contain: layout style paint;
+}
+
+/* Container optimizations */
+.chr-rom-container {
+ /* Optimize for pattern grids */
+ contain: layout paint;
+
+ /* Prevent layout shifts */
+ min-height: 16px;
+ min-width: 16px;
+}
+
+/* Dark mode adaptations */
+@media (prefers-color-scheme: dark) {
+ .chr-rom-doc-icon {
+ filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.1));
+ }
+
+ .chr-rom-doc-icon:hover {
+ filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.2));
+ }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+ .chr-rom-pattern,
+ .chr-rom-interactive {
+ animation: none !important;
+ transition: none !important;
+ }
+
+ .chr-rom-pulse {
+ animation: none;
+ }
+}
+
+/* Print styles */
+@media print {
+ .chr-rom-pattern {
+ /* Ensure patterns print clearly */
+ -webkit-print-color-adjust: exact;
+ print-color-adjust: exact;
+ image-rendering: crisp-edges;
+ }
+}

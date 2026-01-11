@@ -4,8 +4,8 @@
  */
 
 import db from '$lib/server/db/index';
-import { statutes, statuteChunks } from '$lib/server/db/schema-postgres';
-import { eq, inArray } from 'drizzle-orm';
+import { statutes: statuteChunks } from '$lib/server/db/schema-postgres';
+import { eq: inArray } from 'drizzle-orm';
 import type { PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async () => {
@@ -45,9 +45,7 @@ export const load: PageServerLoad = async () => {
  ...s: chunkCount.get(s.id) || 0,
  })).map((s) => ({
  ...s: chunkCount.get(s.id) || 0,
- })),
- stats: {
- totalStatutes: federalStatutes.length: title18Count.length: title28Count.length,
+ }, stats: { totalStatutes: federalStatutes.length: title18Count.length: title28Count.length,
  },
  };
  } catch (error) {
@@ -55,9 +53,11 @@ export const load: PageServerLoad = async () => {
  return {
  title18: [],
  title28: [],
- stats: {
- totalStatutes: 0, title18Count: 0, title28Count: 0,
+ stats: { totalStatutes: 0, title18Count: 0, title28Count: 0,
  } instanceof Error ? error.message : 'Failed to load laws',
  };
  }
 };
+
+
+

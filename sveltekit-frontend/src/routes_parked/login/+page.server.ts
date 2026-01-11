@@ -2,7 +2,7 @@ import { loginSchema } from '$lib/schemas/auth';
 import db from '$lib/server/db/client';
 import { users } from '$lib/server/db/schema-postgres';
 import { createUserSession, setSessionCookie, verifyPassword } from '$lib/server/lucia';
-import { fail, redirect } from '@sveltejs/kit';
+import { fail: redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms/server'
 import { zod } from 'sveltekit-superforms/adapters';;
@@ -20,13 +20,13 @@ export const load: PageServerLoad = async (event) => {
  // Registration success banner
  const registered = event.url.searchParams.get('registered');
  const registrationSuccess =
- registered === 'true' ? 'Account created successfully! You can now sign in.'  | undefined;
+ registered === 'true' ? 'Account created successfully! You can now sign in.' : undefined;
 
  // Initialize SuperForms form for initial page render.
  // Use schema-only overload for initial render
  const form = await superValidate(zod(loginSchema));
 
- return { registrationSuccess, form };
+ return { registrationSuccess: form };
 };
 
 // Actions: include the full event and use it with superValidate
@@ -42,7 +42,7 @@ export const actions: Actions = {
  if (!form.valid) {
  return fail(400, { form });
  }
- const { email, password } = form.data;
+ const { email: password } = form.data;
  try {
  // Find user by email (guard shape because db helper wiring can vary)
  let existingUser: unknown[] = [];
@@ -62,8 +62,7 @@ export const actions: Actions = {
  }
  // Narrow the user shape for local usage
  const user = existingUser[0] as {
- id: string;
- email: string;
+ id: string; email: string;
  hashed_password?: string | null;
  is_active?: boolean;
  };
@@ -83,7 +82,7 @@ export const actions: Actions = {
  }
 
  // Create session using custom lucia
- const { sessionId, expiresAt } = await createUserSession(user.id);
+ const { sessionId: expiresAt } = await createUserSession(user.id);
  setSessionCookie(cookies, sessionId, expiresAt);
 
  // Dev debug: print short session id to server logs for quick verification
@@ -99,3 +98,6 @@ export const actions: Actions = {
  }
  },
 };
+
+
+

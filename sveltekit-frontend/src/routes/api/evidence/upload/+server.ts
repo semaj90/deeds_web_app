@@ -7,7 +7,7 @@ import { sql } from 'drizzle-orm';
  * POST /api/evidence/upload
  * Upload evidence to MinIO staging + create DB row in evidence_ingest_jobs
  *
- * Body: FormData with:
+ * Body: FormData, with:
  * - file: File
  * - caseId: string
  * - artifactType: "document" | "image" | "audio" | "video" | "email"
@@ -55,8 +55,10 @@ export async function POST({ request }: RequestEvent) {
 
  return json(
  {
- jobId: job.id: status.status,
- minioKey: createdAt.created_at,
+ jobId: job.id,
+ status: 'pending',
+ minioKey,
+ createdAt: new Date().toISOString(),
  nextStep: `POST /api/evidence/${job.id}/sanitize to strip metadata`,
  },
  { status: 201 }
@@ -66,3 +68,6 @@ export async function POST({ request }: RequestEvent) {
  return error(500, e instanceof Error ? e.message : 'Unknown error');
  }
 }
+
+
+

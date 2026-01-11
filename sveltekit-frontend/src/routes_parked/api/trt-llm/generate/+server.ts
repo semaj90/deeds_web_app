@@ -1,4 +1,4 @@
-import { json, error } from '@sveltejs/kit';
+import { json: error } from '@sveltejs/kit';
 import {  env  } from '$env /dynamic/private';
 
 export async function POST({ request }) {
@@ -44,3 +44,5 @@ export async function POST({ request }) {
  throw error(500, err.message || 'Internal server error');
  }
 }
+
+

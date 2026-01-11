@@ -18,12 +18,9 @@ export interface FileProcessingOptions {
 
 export interface ProcessedFile {
  file: File;
- preview?: string;
- metadata: {
- name: string;
- size: number;
- type: string;
- lastModified: number;
+ preview?: string; metadata: {
+ name: string; size: number;
+ type: string; lastModified: number;
  };
 }
 
@@ -48,7 +45,7 @@ export function formatFileSize(bytes: number): string {
  * @returns File extension (lowercase)
  */
 export function getFileExtension(filename: string): string {
- return filename.split('.').pop()?.toLowerCase() || '';
+ return filename.split('.').pop()?.toLowerCase() ?? '';
 }
 
 /**
@@ -174,7 +171,7 @@ export function validateFiles(
  if (maxFiles && files.length > maxFiles) {
  return files.map((_, index) => ({
  valid: false,
- error: `Maximum ${maxFiles} files allowed`,
+ error: `Maximum ${ maxFiles } files allowed`,
  }));
  }
 
@@ -213,8 +210,7 @@ export function createImagePreview(file: File): Promise<string> {
 export async function processFile(file: File, createPreview = false): Promise<ProcessedFile> {
  const processed: ProcessedFile = {
  file,
- metadata: {
- name: file.name,
+ metadata: { name: file.name,
  size: file.size,
  type: file.type,
  lastModified: file.lastModified,
@@ -366,8 +362,7 @@ export function isDocumentFile(file: File): boolean {
  'application/vnd.ms-excel',
  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
  'text/plain',
- 'application/rtf',
- ];
+ 'application/rtf'];
  return documentTypes.includes(file.type);
 }
 
@@ -394,7 +389,7 @@ export function getFileCategory(file: File): string {
 export function sanitizeFilename(filename: string): string {
  return filename
  .replace(/[^a-zA-Z0-9.\-_]/g, '_') // Replace special chars with underscore
- .replace(/_{2,}/g, '_') // Replace multiple underscores with single
+ .replace(/_{2}/g, '_') // Replace multiple underscores with single
  .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
 }
 
@@ -413,3 +408,7 @@ export function generateUniqueFilename(originalName: string, prefix = ''): strin
  const uniqueName = `${prefix}${baseName}_${timestamp}_${random}`;
  return extension ? `${uniqueName}.${extension}` : uniqueName;
 }
+
+
+
+

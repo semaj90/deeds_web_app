@@ -252,8 +252,7 @@
 		nodes; edges; viewport;
 		if (!readonly) setDirty(true);
 	});
-
-	// ===== Overlay geometry =====
+  
 	function selectedBounds(): { x: number; y: number; w: number; h: number } | null {
 		const ids = [...selected];
 		if (ids.length === 0) return null;
@@ -492,12 +491,12 @@
 		bind:this={canvasEl}
 		class="absolute inset-0 w-full h-full cursor-crosshair"
 		style:cursor={isPanning || spaceDown ? 'grab' : 'default'}
-		onpointerdown={onPointerDown}
-		onpointermove={onPointerMove}
-		onpointerup={onPointerUp}
-		onpointercancel={onPointerUp}
+		onpointerdown={ onPointerDown }
+		onpointermove={ onPointerMove }
+		onpointerup={ onPointerUp }
+		onpointercancel={ onPointerUp }
 		oncontextmenu={(e) => e.preventDefault()}
-		ondblclick={onDblClick}
+		ondblclick={ onDblClick }
 	/>
 
 	<!-- Layer 2: DOM overlay (selection, handles, editor) -->
@@ -561,3 +560,7 @@
 		</div>
 	</div>
 </div>
+
+
+
+

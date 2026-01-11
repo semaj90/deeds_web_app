@@ -1,8 +1,5 @@
-import { isDoclingAvailable, processWithDocling } from '$lib/server/docling';
-import {
-    createIBMVisionService,
-    isIBMVisionConfigured
-} from '$lib/server/ibm-vision';
+import { isDoclingAvailable: processWithDocling } from '$lib/server/docling';
+import { createIBMVisionService: isIBMVisionConfigured } from '$lib/server/ibm-vision';
 import { extractTextHybrid } from '$lib/server/ocr/hybrid';
 import { createONNXService } from '$lib/server/onnx';
 import { createYOLOService } from '$lib/server/yolo';
@@ -10,14 +7,12 @@ import { promises as fs } from 'fs';
 import * as path from 'path';
 
 export interface DocumentProcessingResult {
- text: string;
- metadata: {
+ text: string; metadata: {
  title?: string;
  author?: string;
  pages?: number;
  language?: string;
- confidence?: number;
- processingTime: number;
+ confidence?: number; processingTime: number;
  };
  entities?: {
  persons?: string[];
@@ -26,40 +21,31 @@ export interface DocumentProcessingResult {
  dates?: string[];
  legalCitations?: string[];
  };
- layout?: {
- regions: Array<{
- type: string;
- bbox: number[];
+ layout?: { regions: Array<{
+ type: string; bbox: number[];
  confidence: number;
  text?: string;
  }>;
  };
- objects?: Array<{
- class: string;
- bbox: number[];
+ objects?: Array<{ class: string;
+ bbox: number[]; confidence: number;
+ }>;
+ classifications?: Array<{ class: string;
  confidence: number;
  }>;
- classifications?: Array<{
- class: string;
- confidence: number;
- }>;
- faces?: Array<{
- bbox: number[];
+ faces?: Array<{ bbox: number[];
  age?: { min: number; max: number };
  gender?: string;
  emotions?: Record<string, number>;
  }>;
- tables?: Array<{
- content: string[][];
+ tables?: Array<{ content: string[][];
  bbox?: number[];
  }>;
- images?: Array<{
- content: Buffer;
+ images?: Array<{ content: Buffer;
  bbox?: number[];
  caption?: string;
  }>;
- method: string;
- engines: string[];
+ method: string; engines: string[];
 }
 
 export interface DocumentProcessingOptions {
@@ -123,8 +109,7 @@ export class DocumentProcessor {
  const ocrResult = await extractTextHybrid(fileBuffer, filename);
  results.push({
  text: ocrResult.text,
- metadata: {
- confidence: ocrResult.confidence,
+ metadata: { confidence: ocrResult.confidence,
  processingTime: ocrResult.processingTime,
  },
  method: ocrResult.method,
@@ -161,8 +146,7 @@ export class DocumentProcessor {
  const visionResult = await this.ibmVision.analyzeImage(fileBuffer, filename);
  results.push({
  text: visionResult.text,
- metadata: {
- confidence: visionResult.confidence,
+ metadata: { confidence: visionResult.confidence,
  language: visionResult.language,
  processingTime: visionResult.processingTime,
  },
@@ -185,8 +169,7 @@ export class DocumentProcessor {
  text: yoloResult.text,
  layout: yoloResult.layout,
  objects: yoloResult.objects,
- metadata: {
- processingTime: yoloResult.processingTime,
+ metadata: { processingTime: yoloResult.processingTime,
  },
  method: yoloResult.method,
  });
@@ -249,7 +232,7 @@ export class DocumentProcessor {
  // For speed priority, use fastest result
  if (priority === 'speed') {
  const fastest = results.reduce((prev, curr) =>
- (prev.metadata?.processingTime || 0) < (curr.metadata?.processingTime || 0) ? prev : curr
+ (prev.metadata?.processingTime ?? 0) < (curr.metadata?.processingTime ?? 0) ? prev : curr
  );
  return fastest as DocumentProcessingResult;
  }
@@ -257,7 +240,7 @@ export class DocumentProcessor {
  // For accuracy priority, use highest confidence
  if (priority === 'accuracy') {
  const mostAccurate = results.reduce((prev, curr) =>
- (prev.metadata?.confidence || 0) > (curr.metadata?.confidence || 0) ? prev : curr
+ (prev.metadata?.confidence ?? 0) > (curr.metadata?.confidence ?? 0) ? prev : curr
  );
  return mostAccurate as DocumentProcessingResult;
  }
@@ -277,8 +260,7 @@ export class DocumentProcessor {
  // Merge metadata (use best values)
  merged.metadata = {
  ...results[0]?.metadata,
- confidence: Math.max(...results.map((r) => r.metadata?.confidence || 0)),
- processingTime: results.reduce((sum, r) => sum + (r.metadata?.processingTime || 0), 0),
+ confidence: Math.max(...results.map((r) => r.metadata?.confidence ?? 0, processingTime: results.reduce((sum, r) => sum + (r.metadata?.processingTime ?? 0), 0),
  };
 
  // Combine entities, classifications, etc.
@@ -359,3 +341,7 @@ export async function processDocument(
  const processor = createDocumentProcessor();
  return processor.processDocument(filePath, mimeType, options);
 }
+
+
+
+

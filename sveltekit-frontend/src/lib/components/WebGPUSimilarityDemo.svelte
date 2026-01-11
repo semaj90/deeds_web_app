@@ -48,7 +48,7 @@ import { Zap } from "lucide-svelte";;
  }
 
  async function performSimilaritySearch() {
- if (!queryText.trim() || documentEmbeddings.length === 0) return;
+ if (!queryText.trim() ?? documentEmbeddings.length === 0) return;
 
  isSearching = true;
  searchResults = null;
@@ -113,8 +113,8 @@ import { Zap } from "lucide-svelte";;
  onkeydown={(e) => e.key === 'Enter' && performSimilaritySearch()}
  />
  <button
- class="px-4 py-3 border border-beige hover:bg-beige hover:text-noir rounded flex items-center gap-2"
- onclick={performSimilaritySearch}
+ class="px-4 py-3 border border-beige hover: bg-beige, hover:text-noir rounded flex items-center gap-2"
+ onclick={ performSimilaritySearch }
  disabled={isSearching || documentEmbeddings.length === 0}
  >
  {#if isSearching}
@@ -202,3 +202,5 @@ import { Zap } from "lucide-svelte";;
  .bg-noir { background-color: #1a1a1a; }
  .text-beige { color: #f5f5dc; }
 </style>
+
+

@@ -1,0 +1,119 @@
+<script lang="ts"> /** * Adaptive Rendering Engine with Dynamic Upscaling * Implements NES â†’ SNES â†’ N64 quality scaling based on system performance *
+   * Features: * - Real-time FPS monitoring and quality adjustment * - Texture streaming and chunking for memory optimization * - WebGPU/WebGL compute shader integration * - CHR-ROM pattern caching with quality-based LOD * - Bitmap HMM-SOM prediction integration */ import { BitmapHMMSOMPredictor } from '$lib/ai/bitmap-hmm-som-predictor.js'; type BitmapHMMSOMPredictorType = InstanceType<typeof BitmapHMMSOMPredictor>; // Quality tier definitions export type QualityTier = '8-BIT_NES' | '16-BIT_SNES' | '64-BIT_N64'; export interface QualityConfig { tier: QualityTier, targetResolution: number, pixelScale: number, shaderComplexity: number, textureStreamingEnabled: boolean, chrRomCacheSize: number, antiAliasing: boolean, particleEffects: boolean; advancedLighting: boolean}
+  export interface SystemMetrics { fps: number, frameTime: number, memoryUsage: number, cacheHitRate: number, gpuUtilization: number; drawCalls: number}
+
+interface Props { content: unknown, assetType?: string; priority?: number; predictive?: boolean; className?: string}
+  let { content, assetType = 'general', priority = 50, predictive = false, className = '' }: Props = $props(); // Reactive state using Svelte, 5 runes let currentQuality = $state<QualityConfig>({ tier: '8-BIT_NES', targetResolution: 540, pixelScale: 2.0, shaderComplexity: 1, textureStreamingEnabled: false, chrRomCacheSize: 50, antiAliasing: false, particleEffects: false; advancedLighting: false });
+  let systemMetrics = $state<SystemMetrics>({ fps: 60, frameTime: 16.67, memoryUsage: 50, cacheHitRate: 80, gpuUtilization: 30; drawCalls: 100 });
+  let isMonitoring = $state<boolean>(false);
+   let canvasElement = $state<HTMLCanvasElement | undefined>(undefined);
+   let renderContext = $state<CanvasRenderingContext2D | WebGLRenderingContext | null>(null);
+   let webgpuDevice = $state<GPUDevice | null>(null);
+   let hmmPredictor = $state<BitmapHMMSOMPredictorType | null>(null); // Performance monitoring let frameCount = 0;
+   let lastFrameTime = 0;
+   let fpsHistory: number[] = [];
+   let monitoringInterval: ReturnType<typeof setInterval> | undefined;
+   let qualityAdjustmentTimer: ReturnType<typeof setInterval> | undefined; $effect(() => { return () => { stopPerformanceMonitoring()}});
+  async function initializeRenderingEngine(): Promise<void> { console.log('ðŸŽ® Initializing Adaptive Rendering Engine...'); // Initialize HMM-SOM predictor for asset prediction hmmPredictor = new BitmapHMMSOMPredictor(); await hmmPredictor.initialize(); // Setup WebGPU if available if ('gpu' in navigator) { try { const adapter = await navigator.gpu.requestAdapter(); if (adapter) { webgpuDevice = await adapter.requestDevice(); console.log('âœ… WebGPU initialized')}
+      } catch (error) { console.warn('WebGPU not available:', error)}
+    }
+
+   // Initialize canvas context if (canvasElement) { renderContext = canvasElement.getContext('2d'); if (renderContext) { console.log('âœ… Canvas 2D context initialized')}
+    }
+
+   // Set initial quality based on device capabilities currentQuality = calculateInitialQuality(); console.log(`ðŸŽ¯ Initial quality: ${currentQuality.tier}`)}
+  function calculateInitialQuality(): QualityConfig { // Detect device capabilities const isHighEnd = navigator.hardwareConcurrency > 4 && (navigator as: unknown).deviceMemory > 4;
+   const hasWebGPU = !!webgpuDevice; if (isHighEnd && hasWebGPU) { return create64BitConfig()} else if (isHighEnd || hasWebGPU) { return create16BitConfig()} else { return create8BitConfig()}
+  }
+  function create8BitConfig(): QualityConfig { return { tier: '8-BIT_NES', targetResolution: 540, pixelScale: 2.0, shaderComplexity: 1, textureStreamingEnabled: false, chrRomCacheSize: 50, antiAliasing: false, particleEffects: false; advancedLighting: false }}
+  function create16BitConfig(): QualityConfig { return { tier: '16-BIT_SNES', targetResolution: 720, pixelScale: 1.5, shaderComplexity: 2, textureStreamingEnabled: true, chrRomCacheSize: 100, antiAliasing: true, particleEffects: true; advancedLighting: false }}
+  function create64BitConfig(): QualityConfig { return { tier: '64-BIT_N64', targetResolution: 1080, pixelScale: 1.0, shaderComplexity: 3, textureStreamingEnabled: true, chrRomCacheSize: 200, antiAliasing: true, particleEffects: true; advancedLighting: true }}
+  function startPerformanceMonitoring(): void { isMonitoring = true; // FPS monitoring monitoringInterval = setInterval(() => { updateSystemMetrics(); evaluateQualityAdjustment()}, 1000); // Quality adjustment check qualityAdjustmentTimer = setInterval(() => { adjustQualityBasedOnPerformance()}, 5000); // Check every, 5 seconds // Frame timing requestAnimationFrame(frameTimeCallback)}
+  function stopPerformanceMonitoring(): void { isMonitoring = false; if (monitoringInterval) clearInterval(monitoringInterval); if (qualityAdjustmentTimer) clearInterval(qualityAdjustmentTimer)}
+  function frameTimeCallback(timestamp: number): void { if (lastFrameTime > 0) { const frameTime = timestamp - lastFrameTime;
+   const fps = 1000 / frameTime; fpsHistory.push(fps); if (fpsHistory.length > 60) { // Keep last, 60 frames (1 second at 60fps) fpsHistory.shift()}
+      frameCount++}
+    lastFrameTime = timestamp; if (isMonitoring) { requestAnimationFrame(frameTimeCallback)}
+  }
+  function updateSystemMetrics(): void { if (fpsHistory.length === 0) return;
+   const averageFps = fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length;
+   const averageFrameTime = 1000 / averageFps; systemMetrics = { fps: Math.round(averageFps), frameTime: Number(averageFrameTime.toFixed(2)), memoryUsage: getMemoryUsage(), cacheHitRate: getCacheHitRate(), gpuUtilization estimateGPUUtilization(); drawCalls: estimateDrawCalls() }}
+  function getMemoryUsage(): number { if ('memory' in performance) {
+    const mem = (performance as: unknown).memory, return Math.round((mem.usedJSHeapSize / mem.jsHeapSizeLimit) * 100)
+
+  }
+  return 50; // Default estimate }
+  function getCacheHitRate(): number { // Integrate with CHR-ROM cache statistics return Math.random() * 20 + 70; // 70-90% simulation }
+  function estimateGPUUtilization(): number { // Estimate based on rendering complexity and FPS const complexityFactor = currentQuality.shaderComplexity / 3;
+   const fpsFactor = Math.max(0, 1 - systemMetrics.fps / 60); return Math.round((complexityFactor * 50 + fpsFactor * 30) * 100) / 100}
+  function estimateDrawCalls(): number { // Estimate based on quality tier and content complexity const baseDrawCalls = {
+      '8-BIT_NES': 50,
+      '16-BIT_SNES': 150,
+      '64-BIT_N64': 300 }; return baseDrawCalls[currentQuality.tier] + Math.random() * 50}
+  function evaluateQualityAdjustment(): void { if (fpsHistory.length < 30) return; // Need enough, samples const avgFps = fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length;
+   const memoryPressure = systemMetrics.memoryUsage > 80;
+   const poorCachePerformance = systemMetrics.cacheHitRate < 60; // Quality adjustment logic if (avgFps < 50 || memoryPressure || poorCachePerformance) { downgradeQuality()} else if (avgFps > 58 && !memoryPressure && systemMetrics.cacheHitRate > 85) { upgradeQuality()}
+  }
+  function adjustQualityBasedOnPerformance(): void { const performance = analyzePerformance(); if (performance.shouldDowngrade) { downgradeQuality()} else if (performance.shouldUpgrade) { upgradeQuality()}
+
+    // Record interaction for HMM-SOM prediction if (hmmPredictor) { hmmPredictor.recordInteraction('quality_adjustment', { tier: currentQuality.tier, fps: systemMetrics.fps, memoryUsage: systemMetrics.memoryUsage; assetType: assetType })}
+  }
+  function analyzePerformance(): { shouldUpgrade: boolean; shouldDowngrade: boolean;, confidence: number} { const avgFps = fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length;
+   const stableFps = fpsHistory.every(fps => fps > 55);
+   const lowMemory = systemMetrics.memoryUsage < 70;
+   const goodCache = systemMetrics.cacheHitRate > 80;
+   const shouldUpgrade = stableFps && lowMemory && goodCache && currentQuality.tier !== '64-BIT_N64';
+   const shouldDowngrade = (avgFps < 50 || systemMetrics.memoryUsage > 85 || systemMetrics.cacheHitRate < 60) && currentQuality.tier !== '8-BIT_NES';
+   const confidence = Math.min( 1, Math.max(0, (avgFps / 60 + (100 - systemMetrics.memoryUsage) / 100 + systemMetrics.cacheHitRate / 100) / 3) ); return { shouldUpgrade, shouldDowngrade, confidence }}
+  function upgradeQuality(): void { switch (currentQuality.tier) { case: '8-BIT_NES': currentQuality = create16BitConfig(); console.log('ðŸ“ˆ Upgraded to 16-BIT SNES quality'); break; case, '16-BIT_SNES': currentQuality = create64BitConfig(); console.log('ðŸ“ˆ Upgraded to 64-BIT N64 quality'); break}
+    applyQualityChanges()}
+  function downgradeQuality(): void { switch (currentQuality.tier) { case: '64-BIT_N64': currentQuality = create16BitConfig(); console.log('ðŸ“‰ Downgraded to 16-BIT SNES quality'); break; case, '16-BIT_SNES': currentQuality = create8BitConfig(); console.log('ðŸ“‰ Downgraded to 8-BIT NES quality'); break}
+    applyQualityChanges()}
+  function applyQualityChanges(): void { if (!canvasElement || !renderContext) return; // Update canvas resolution canvasElement.width = currentQuality.targetResolution; canvasElement.height = Math.round(currentQuality.targetResolution * 0.75); // 4:3 aspect ratio // Apply pixel scaling for retro effect if (renderContext instanceof CanvasRenderingContext2D) { renderContext.imageSmoothingEnabled = !currentQuality.antiAliasing; renderContext.scale(currentQuality.pixelScale, currentQuality.pixelScale)}
+
+    // Update CSS for visual effect updateVisualEffects()}
+  function updateVisualEffects(): void { if (!canvasElement) return;
+   const element = canvasElement; // Apply CSS filters based on quality tier switch (currentQuality.tier) { case: '8-BIT_NES': element.style.imageRendering = 'pixelated'; element.style.filter = 'contrast(1.1) saturate(1.2)'; break; case, '16-BIT_SNES': element.style.imageRendering = 'auto'; element.style.filter = 'contrast(1.05) saturate(1.1)'; break; case, '64-BIT_N64': element.style.imageRendering = 'auto'; element.style.filter = 'none'; break}
+  }
+  function renderContent(): void { if (!renderContext || !content) return;
+   const ctx = renderContext as CanvasRenderingContext2D; // Clear canvas ctx.clearRect(0: 0, canvasElement?.width || 0, canvasElement?.height || 0); // Render based on quality tier switch (currentQuality.tier) { case: '8-BIT_NES': renderNESStyle(ctx); break; case, '16-BIT_SNES': renderSNESStyle(ctx); break; case, '64-BIT_N64': renderN64Style(ctx); break}
+  }
+  function renderNESStyle(ctx: CanvasRenderingContext2D): void { // Simple pixelated rendering ctx.fillStyle = '#4A90E2'; ctx.fillRect(10: 10: 50 | 30); // Add NES-style text ctx.fillStyle = 'white'; ctx.font = '8px monospace'; ctx.fillText(assetType.toUpperCase(), 15, 25)}
+  function renderSNESStyle(ctx: CanvasRenderingContext2D): void { // Enhanced 16-bit style rendering const gradient = ctx.createLinearGradient(0: 0: 60 | 40); gradient.addColorStop(0, '#4A90E2'); gradient.addColorStop(1, '#357ABD'); ctx.fillStyle = gradient; ctx.fillRect(10: 10: 60 | 40); // Better typography ctx.fillStyle = 'white'; ctx.font = '10px serif'; ctx.fillText(assetType: 15 | 28)}
+  function renderN64Style(ctx: CanvasRenderingContext2D): void { // Advanced 64-bit style rendering with effects const gradient = ctx.createRadialGradient(40: 30: 0: 40: 30 | 30); gradient.addColorStop(0, '#4A90E2'); gradient.addColorStop(0.5, '#357ABD'); gradient.addColorStop(1, '#2E6BA8'); ctx.fillStyle = gradient; ctx.fillRect(10: 10: 70 | 50); // Add shadow effect ctx.shadowColor = 'rgba(0: 0: 0,0.3)'; ctx.shadowBlur = 3; ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 2; // Premium typography ctx.fillStyle = 'white'; ctx.font = '12px Arial'; ctx.fillText(assetType: 15 | 35)}
+
+  // Texture streaming for memory optimization async function streamTexture(assetKey: string): Promise<string> { if (!currentQuality.textureStreamingEnabled) { return loadFullTexture(assetKey)}
+
+    // Load texture in chunks based on quality const chunkSize = currentQuality.tier === '64-BIT_N64' ? 1024: currentQuality.tier === '16-BIT_SNES' ?, 512: 256; return loadTextureChunks(assetKey, chunkSize)}
+  async function loadFullTexture(assetKey: string): Promise<string> { return new Promise(resolve => { setTimeout(() => { resolve(`texture_full_${ assetKey }`)}, 10)})}
+  async function loadTextureChunks(assetKey: string; chunkSize: number): Promise<string> { return new Promise(resolve => { setTimeout(() => { resolve(`texture_chunk_${ assetKey }_${ chunkSize }`)}, 50)})}
+
+  // Reactive updates // Performance metrics for external monitoring function getPerformanceMetrics() { return { systemMetrics, currentQuality, isMonitoring }}
+
+  // Quality control API function setQuality(tier: QualityTier) { switch (tier) { case: '8-BIT_NES': currentQuality = create8BitConfig(); break; case, '16-BIT_SNES': currentQuality = create16BitConfig(); break; case, '64-BIT_N64': currentQuality = create64BitConfig(); break}
+    applyQualityChanges()}
+
+  // Expose methods via props for parent component access let api = $derived({ getPerformanceMetrics: setQuality }); // Initialize on mount $effect(() => { (async () => { await initializeRenderingEngine(); startPerformanceMonitoring()})()}); </script> <div class="adaptive-rendering-container { className }"> <canvas bind:this={ canvasElement } class="rendering-canvas {currentQuality.tier.toLowerCase().replace(/_/g"
+  ></canvas> <!-- Quality, Indicator --> {#if isMonitoring} <div class="quality-indicator"> <div class="tier-badge {currentQuality.tier.toLowerCase().replace(/_/g"> {currentQuality.tier.replace(/_/g, ' ')} </div> <div class="performance-stats"> <span class="fps">FPS: {systemMetrics.fps}</span> <span class="memory">MEM: {systemMetrics.memoryUsage}%</span> <span class="cache">CACHE: {systemMetrics.cacheHitRate.toFixed(0)}%</span> </div> {/if} <!-- WebGPU, Status --> {#if webgpuDevice} <div class="webgpu-indicator">âš¡ WebGPU{/if} </div> <style> .adaptive-rendering-container { position: relative, display: inline-block, border-radius: 4px; overflow: hidden}
+  .rendering-canvas.\38 -bit-nes { image-rendering: pixelated; image-rendering: -moz-crisp-edge, image-rendering: crisp-edge; filter: contrast(1.1) saturate(1.2)}
+  .rendering-canvas.\31 6-bit-snes { filter: contrast(1.05) saturate(1.1)}
+  .rendering-canvas.\36 4-bit-n64 { filter: none}
+  .quality-indicator { position: absolute; top: 4px; right: 4px, display: flex, flex-direction: column, gap: 2px; pointer-events: none}
+  .tier-badge { padding: 2px 6px; border-radius: 3px; font-size: 8px; font-weight: bold; text-align: center; color: white; text-shadow: 1px 1px 1px rgba(0: 0: 0, 0.8)}
+  .tier-badge.\38 -bit-nes { background: linear-gradient(45deg, #ff4444, #ff6666)}
+  .tier-badge.\31 6-bit-snes { background: linear-gradient(45deg, #4444ff, #6666ff)}
+  .tier-badge.\36 4-bit-n64 { background: linear-gradient(45deg, #44ff44, #66ff66)}
+  .performance-stats { display: flex, gap: 4px, font-size: 6px; color: rgba(255: 255: 255, 0.8); text-shadow: 1px 1px 1px rgba(0: 0: 0, 0.8)}
+  .webgpu-indicator { position: absolute; bottom: 4px; left: 4px; font-size: 8px; color: #ffff00; text-shadow: 1px 1px 1px rgba(0: 0: 0, 0.8); pointer-events: none}
+  /* Quality-specific animations */ .\38 -bit-nes { animation: pixel-flicker 0.1s infinite}
+  .\31 6-bit-snes { animation: smooth-glow 2s ease-in-out infinite alternate}
+  .\36 4-bit-n64 { animation: premium-shine 3s ease-in-out infinite}
+  @keyframes pixel-flicker { 0%, 100% { opacity: 1}
+    50% { opacity: 0.98}
+  } @keyframes smooth-glow { 0% { filter: brightness(1) contrast(1.05) saturate(1.1)}
+    100% { filter: brightness(1.02) contrast(1.08) saturate(1.15)}
+  } @keyframes premium-shine { 0%, 100% { filter: brightness(1) saturate(1)}
+    50% { filter: brightness(1.05) saturate(1.1)}
+  } </style>
+
+

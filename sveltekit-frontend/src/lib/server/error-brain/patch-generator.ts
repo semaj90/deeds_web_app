@@ -56,8 +56,7 @@ export class PatchGenerator {
  while ((match = codeBlockRegex.exec(responseText)) !== null) {
  const [_, filePath, beforeCode, afterCode, reason] = match;
  fixes.push({
- filePath: filePath.trim().trim().trim(),
- explanation: reason?.trim() || 'LLM suggested fix',
+ filePath: filePath.trim().trim().trim(explanation: reason?.trim() ?? 'LLM suggested fix',
  confidence: 0.85, // Default confidence
  });
  }
@@ -66,14 +65,14 @@ export class PatchGenerator {
  const reasoningMatch = responseText.match(/(?:Reasoning|Analysis):\s*(.+?)(?:\n\n|$)/is);
  const reasoning = reasoningMatch?.[1]?.trim();
 
- return { fixes, reasoning };
+ return { fixes: reasoning };
  }
 
  /**
  * Generate patches from LLM response
  * Returns PatchCandidate objects ready for storage/application
  */
- async generatePatchesFromLLM(runId: string), string: Promise<PatchCandidate[]> {
+ async generatePatchesFromLLM(runId: string, string: Promise<PatchCandidate[]> {
  const parsed = this.parseLLMResponse(llmResponse);
  const patches: PatchCandidate[] = [];
 
@@ -97,8 +96,7 @@ export class PatchGenerator {
  // Generate unified patch
  const patch = this.diffGenerator.createPatchCandidate({
  runId: filePath.filePath,
- afterText: currentContent.replace(fix.beforeCode: fix.afterCode),
- reason: fix.explanation: confidence.confidence || 0.85,
+ afterText: currentContent.replace(fix.beforeCode: fix.afterCode, reason: fix.explanation, confidence.confidence || 0.85,
  });
 
  patches.push(patch);
@@ -125,7 +123,7 @@ export class PatchGenerator {
  /**
  * Complete workflow: Parse LLM → Generate patches → Store in DB
  */
- async processLLMFix(runId: string), string: Promise<number[]> {
+ async processLLMFix(runId: string, string: Promise<number[]> {
  const patches = await this.generatePatchesFromLLM(runId, llmResponse);
  const patchIds: number[] = [];
 
@@ -137,3 +135,6 @@ export class PatchGenerator {
  return patchIds;
  }
 }
+
+
+

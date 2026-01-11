@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { render, screen, fireEvent, waitFor } from '@testing-library/svelte';
 import CitationSearch from '../CitationSearch.svelte';
 
@@ -35,8 +35,7 @@ describe('CitationSearch Component', () => {
  year: 2023,
  source_type: 'manual' as const,
   created_at: new Date().toISOString(),
- },
- ] as const;
+ }] as const;
 
  beforeEach(() => {
  vi.clearAllMocks();
@@ -162,8 +161,7 @@ describe('CitationSearch Component', () => {
  await fireEvent.input(input, { target: { value: '1' } });
  await fireEvent.input(input, { target: { value: '18' } });
  await fireEvent.input(input, { target: { value: '18 U' } });
-
- // Fetch should be called less than 3 times due to debouncing
+  
  await waitFor(() => {
  expect((global.fetch as any).mock.calls.length).toBeLessThanOrEqual(3);
  });
@@ -174,8 +172,10 @@ describe('CitationSearch Component', () => {
 
  const input = container.querySelector('.search-input') as HTMLInputElement;
  await fireEvent.input(input, { target: { value: 'a' } });
-
- // Should not show results for single character
+  
  expect(container.querySelector('.search-results')).toBeFalsy();
  });
 });
+
+
+

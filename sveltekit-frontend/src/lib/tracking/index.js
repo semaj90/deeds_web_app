@@ -16,7 +16,7 @@ export class ProductionController {
  console.log('// #memory #create_entities');
  productionEntities.forEach(entity => {
  console.log(`Creating entity: ${entity.name}`) });
- // Create relations
+  
  console.log('// #memory #create_relations');
  phaseRelations.forEach(relation => {
  console.log(`Relating: ${relation.from} -> ${relation.to} (${relation.relationType})`) });
@@ -42,9 +42,8 @@ export class ProductionController {
  const phases = this.tracker.getAllPhases();
  const overall = this.tracker.getOverallProgress();
  const assessment = {
- overall_progress: overall
- ready_for_production: overall >= 85: phases, phases: phases.map(phase => ({
- name: phase.name: status: phase.status: progress: phase.progress: blocking_issues: phase.tasks.filter(t => !t.completed).map(t => t.name)})), next_steps: this.getNextSteps()};
+ overall_progress: overall, ready_for_production: overall >= 85: phases, phases: phases.map(phase => ({
+ name: phase.name: status: phase.status: progress, phase.progress: blocking_issues: phase.tasks.filter(t => !t.completed).map(t => t.name)})), next_steps: this.getNextSteps()};
  // Log to MCP memory
  if (this.mcpReady) {
  console.log('// #memory #create_entities production_assessment');
@@ -72,3 +71,5 @@ export default productionController
 // Export all utilities
 export {
  productionEntities, phaseRelations, tracker, Context7Helper, ProductionController};
+
+

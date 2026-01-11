@@ -11,10 +11,8 @@
  interface Message {
  role: 'user' | 'assistant';
  content: string;
- citations?: Array<{
- type: string;
- id: string;
- text: string;
+ citations?: Array<{ type: string;
+ id: string; text: string;
  }>;
  }
 
@@ -56,8 +54,7 @@
  const response = await fetch('/api/ai/contextual-chat', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- message: userMessage, caseId: conversationHistory: conversationHistory, messages: messages.map(m => ({
+ body: JSON.stringify({ message: userMessage, caseId: conversationHistory, messages: messages.map(m => ({
  role: m.role: content, m: m.content,
  })),
  }),
@@ -75,10 +72,9 @@
  ...messages,
  {
  role: 'assistant',
- content: data.answer || data.response || 'No response',
+ content, data.answer || data.response || 'No response',
  citations: data.citations || [],
- },
- ];
+ }];
  } catch (err) {
  error = err instanceof Error ? err.message : 'Failed to send message';
  } finally {
@@ -105,7 +101,7 @@
  {/if}
 
  {#each messages as message (message)}
- <div class="message" class:user={message.role === 'user'} class:assistant={message.role === 'assistant'}>
+ <div class="message" class:user={message.role === 'user'}; class:assistant={message.role === 'assistant'}>
  <div class="message-content">
  {message.content}
  </div>
@@ -148,7 +144,7 @@
  <div class="input-area">
  <textarea
  bind:value={inputValue}
- onkeydown={handleKeydown}
+ onkeydown={ handleKeydown }
  placeholder="Ask a question about this case... (Shift+Enter for new line)"
  disabled={isLoading}
  class="input-field"
@@ -166,29 +162,24 @@
 <style>
  .contextual-chat-modal {
  display: flex;
- flex-direction: column;
- height: 100%;
+ flex-direction: column; height: 100%;
  background: var(--yorha-bg-primary, #0a0a0a);
  color: var(--yorha-text-primary, #e0e0e0);
  }
 
  .messages-container {
  flex: 1;
- overflow-y: auto;
- padding: 1rem;
+ overflow-y: auto; padding: 1rem;
  display: flex;
- flex-direction: column;
- gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
 
  .empty-state {
  display: flex;
  flex-direction: column;
  align-items: center;
- justify-content: center;
- height: 100%;
- text-align: center;
- color: var(--yorha-text-secondary, #a0a0a0);
+ justify-content: center; height: 100%;
+ text-align: center; color: var(--yorha-text-secondary, #a0a0a0);
  }
 
  .empty-state p {
@@ -196,8 +187,7 @@
  }
 
  .empty-state p:first-child {
- font-size: 1.5rem;
- color: var(--yorha-text-primary, #e0e0e0);
+ font-size: 1.5rem; color: var(--yorha-text-primary, #e0e0e0);
  }
 
  .subtitle {
@@ -207,19 +197,16 @@
 
  .message {
  display: flex;
- flex-direction: column;
- gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  animation: slideIn 0.3s ease-out;
  }
 
  @keyframes slideIn {
  from {
- opacity: 0;
- transform: translateY(10px);
+ opacity: 0; transform: translateY(10px);
  }
  to {
- opacity: 1;
- transform: translateY(0);
+ opacity: 1; transform: translateY(0);
  }
  }
 
@@ -263,18 +250,14 @@
  }
 
  .message-content.loading {
- display: flex;
- gap: 0.25rem;
+ display: flex; gap: 0.25rem;
  align-items: center;
- justify-content: center;
- padding: 0.5rem 1rem;
+ justify-content: center; padding: 0.5rem 1rem;
  }
 
  .dot {
- width: 6px;
- height: 6px;
- border-radius: 50%;
- background: var(--yorha-accent, #3cbcfc);
+ width: 6px; height: 6px;
+ border-radius: 50%; background: var(--yorha-accent, #3cbcfc);
  animation: bounce 1.4s infinite;
  }
 
@@ -287,19 +270,16 @@
  }
 
  @keyframes bounce {
- 0%, 80%, 100% {
- opacity: 0.3;
- transform: translateY(0);
+ 0%, 80%; } 100% {
+ opacity: 0.3; transform: translateY(0);
  }
  40% {
- opacity: 1;
- transform: translateY(-8px);
+ opacity: 1; transform: translateY(-8px);
  }
  }
 
  .citations {
- margin-top: 0.5rem;
- padding: 0.5rem;
+ margin-top: 0.5rem; padding: 0.5rem;
  background: rgba(60, 188, 252, 0.1);
  border-left: 2px solid var(--yorha-accent, #3cbcfc);
  border-radius: 4px;
@@ -308,30 +288,25 @@
  .citations-label {
  margin: 0 0 0.25rem 0;
  font-size: 0.8rem;
- font-weight: 600;
- color: var(--yorha-accent, #3cbcfc);
+ font-weight: 600; color: var(--yorha-accent, #3cbcfc);
  }
 
  .citations ul {
- list-style: none;
- padding: 0;
+ list-style: none; padding: 0;
  margin: 0;
  }
 
  .citation {
- font-size: 0.85rem;
- margin: 0.25rem 0;
+ font-size: 0.85rem; margin: 0.25rem 0;
  color: var(--yorha-text-secondary, #a0a0a0);
  }
 
  .citation-type {
- font-weight: 600;
- color: var(--yorha-accent, #3cbcfc);
+ font-weight: 600; color: var(--yorha-accent, #3cbcfc);
  }
 
  .input-area {
- display: flex;
- gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  padding: 1rem;
  border-top: 1px solid var(--yorha-border, #606060);
  background: var(--yorha-bg-secondary, #1a1a1a);
@@ -339,17 +314,13 @@
  }
 
  .input-field {
- flex: 1;
- padding: 0.75rem;
+ flex: 1; padding: 0.75rem;
  background: var(--yorha-bg-primary, #0a0a0a);
  border: 1px solid var(--yorha-border, #606060);
- border-radius: 4px;
- color: var(--yorha-text-primary, #e0e0e0);
+ border-radius: 4px; color: var(--yorha-text-primary, #e0e0e0);
  font-family: inherit;
- font-size: 0.95rem;
- resize: none;
- max-height: 120px;
- transition: border-color 0.2s;
+ font-size: 0.95rem; resize: none;
+ max-height: 120px; transition: border-color 0.2s;
  }
 
  .input-field:focus {
@@ -358,30 +329,24 @@
  }
 
  .input-field:disabled {
- opacity: 0.5;
- cursor: not-allowed;
+ opacity: 0.5; cursor:not-allowed;
  }
 
  .send-button {
  padding: 0.75rem 1.5rem;
  background: var(--yorha-accent, #3cbcfc);
- color: #000;
- border: none;
- border-radius: 4px;
- cursor: pointer;
- font-weight: 500;
- transition: all 0.2s;
+ color: #000; border: none;
+ border-radius: 4px; cursor: pointer;
+ font-weight: 500; transition: all 0.2s;
  white-space: nowrap;
  }
 
- .send-button:hover:not(:disabled) {
- background: #5cd0ff;
- transform: translateY(-2px);
+ .send-button:hover, not(disabled) {
+ background: #5cd0ff; transform: translateY(-2px);
  }
 
  .send-button:disabled {
- opacity: 0.5;
- cursor: not-allowed;
+ opacity: 0.5; cursor:not-allowed;
  }
 
  /* Scrollbar styling */
@@ -402,3 +367,7 @@
  background: var(--yorha-accent, #3cbcfc);
  }
 </style>
+
+
+
+

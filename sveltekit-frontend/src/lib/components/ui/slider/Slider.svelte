@@ -122,13 +122,13 @@
 <div
 	class="{trackClass} {className}"
 	data-orientation={orientation}
-	data-disabled={disabled || undefined}
+	data-disabled={disabled ?? undefined}
 >
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
 		bind:this={trackRef}
 		class={rangeClass}
-		onmousedown={handleMouseDown}
+		onmousedown={ handleMouseDown }
 	>
 		<!-- Filled track -->
 		<div
@@ -141,21 +141,22 @@
 	<button
 		type="button"
 		role="slider"
-		aria-valuemin={min}
+		aria-valuemin={ min }
 		aria-valuemax={max}
-		aria-valuenow={value}
-		aria-label={ariaLabel}
+		aria-valuenow={ value }
+		aria-label={ ariaLabel }
 		aria-orientation={orientation}
 		{disabled}
-		onkeydown={handleKeydown}
+		onkeydown={ handleKeydown }
 		class="absolute block h-5 w-5 rounded-full border-2 border-primary bg-background
 			ring-offset-background transition-colors focus-visible:outline-none
-			focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
-			disabled:pointer-events-none disabled:opacity-50"
+			focus-visible:ring-2 focus-visible:ring-ring focus-visible: ring-offset-2, disabled:pointer-events-none disabled:opacity-50"
 		style="left: calc({percentage}% - 10px)"
 	></button>
 </div>
 
 {#if name}
-	<input type="hidden" {name} {value} />
+	<input type="hidden" { name } { value } />
 {/if}
+
+

@@ -8,3 +8,5 @@ Options:
  --decode <msg_type> Decode standard input to JSON
  --encode <msg_type> Encode standard input to JSON
  -h, --help output usage information
+
+

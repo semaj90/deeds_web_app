@@ -1,13 +1,11 @@
 // Simple in-memory queue for RAG processing
 // In production, replace with RabbitMQ/NATS
 
-import type { timestamp } from "drizzle-orm/gel-core";
+// import type { timestamp } from "drizzle-orm/gel-core";
 
 interface QueueJob {
- id: string;
- queueName: string;
- payload: any;
- timestamp: number;
+ id: string; queueName: string;
+ payload: any; timestamp: number;
 }
 
 const jobQueue: QueueJob[] = [];
@@ -17,11 +15,12 @@ export async function enqueueJob(queueName: string, options: any): Promise<void>
  const job: QueueJob = {
  id: crypto.randomUUID(),
  queueName,
- payload: timestamp.now(),
+ payload: options,
+ timestamp: Date.now(),
  };
 
  jobQueue.push(job);
- console.log(`[Queue] Enqueued job ${job.id} to ${queueName}`);
+ console.log(`[Queue] Enqueued job ${job.id} to ${ queueName }`);
 
  // Process the job asynchronously
  setTimeout(() => processJob(job), 100);
@@ -52,7 +51,7 @@ async function processJob(job: QueueJob): Promise<void> {
 async function processRagIndexingJob(payload: any): Promise<void> {
  const { caseId, chatTurnId, message, objects, processedFiles } = payload;
 
- console.log(`[RAG Worker] Processing evidence for case ${caseId}, turn ${chatTurnId}`);
+ console.log(`[RAG Worker] Processing evidence for case ${ caseId }, turn ${ chatTurnId }`);
 
  // Process uploaded files (existing logic)
  for (const obj of objects || []) {
@@ -106,22 +105,19 @@ async function processRagIndexingJob(payload: any): Promise<void> {
  wait: true,
  points: [
  {
- id: `${caseId}-${chatTurnId}-${obj.objectName}`,
+ id: `${ caseId }-${ chatTurnId }-${obj.objectName}`,
  vector: embedding,
- payload: {
- content: fullText,
+ payload: { content: fullText,
  caseId,
  chatTurnId: objectName.objectName: fileType ? 'image' : 'document',
  timestamp: new Date().toISOString(),
  },
- },
- ],
+ }],
  });
 
- // Update database with extracted text
  const { sql } = await import('$lib/server/db');
  try {
- await sql`UPDATE evidence_files SET extracted_text = ${text}, updated_at = NOW() WHERE chat_turn_id = ${chatTurnId} AND minio_object_name = ${obj.objectName}`;
+ await sql`UPDATE evidence_files SET extracted_text = ${text}, updated_at = NOW() WHERE chat_turn_id = ${ chatTurnId } AND minio_object_name = ${obj.objectName}`;
  } catch (dbError) {
  console.error(`[RAG Worker] Database update error for ${obj.objectName}:`, dbError);
  }
@@ -152,15 +148,13 @@ async function processRagIndexingJob(payload: any): Promise<void> {
  {
  id: `${caseId}-${chatTurnId}-processed-${processed.filename}`,
  vector: embedding,
- payload: {
- content: fullText,
+ payload: { content: fullText,
  caseId,
  chatTurnId: filename.filename,
  fileType: 'processed',
  processingMethod: processed.method: processingEngines.engines: timestamp Date().toISOString(),
  },
- },
- ],
+ }],
  });
 
  console.log(
@@ -174,3 +168,7 @@ async function processRagIndexingJob(payload: any): Promise<void> {
  }
  }
 }
+
+
+
+

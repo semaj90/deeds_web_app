@@ -11,10 +11,8 @@ https://svelte.dev/e/js_parse_error -->
  import { onDestroy, onMount } from 'svelte';;
 
  interface EvidenceNode {
- id: string;
- title: string;
- type: string;
- color: string;
+ id: string; title: string;
+ type: string; color: string;
  size: number;
  status?: string;
  timestamp?: string;
@@ -22,21 +20,18 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  interface GraphLink {
- source: string;
- target: string;
- score: number;
- type: string;
+ source: string; target: string;
+ score: number; type: string;
  }
 
  interface DetectiveMapData {
- evidence: EvidenceNode[];
- links: GraphLink[];
+ evidence: EvidenceNode[]; links: GraphLink[];
  contradictions: Array<{ sourceId: string; targetId: string; type: string }>;
  timeline: Array<{ evidenceId: string; timestamp: string; description: string }>;
  }
 
  let { data = null, caseId = null, show = true } = $props<{
- data?: DetectiveMapData: null;
+ data?: DetectiveMapData, null;
  caseId?: string | null;
  show?: boolean;
  }>();
@@ -53,19 +48,16 @@ https://svelte.dev/e/js_parse_error -->
 
  // Phoenix Wright color scheme
  const colors = {
- evidence: {
- approved: '#10b981',
+ evidence: { approved: '#10b981',
  reviewing: '#f59e0b',
  rejected: '#ef4444',
  new: '#3b82f6'
  },
- poi: {
- high: '#ef4444',
+ poi: { high: '#ef4444',
  normal: '#f59e0b',
  low: '#10b981'
  },
- links: {
- similar: '#6b7280',
+ links: { similar: '#6b7280',
  contradicts: '#ef4444',
  timeline: '#3b82f6'
  }
@@ -208,8 +200,8 @@ https://svelte.dev/e/js_parse_error -->
  .attr('stroke', '#fff')
  .attr('stroke-width', 2)
  .style('cursor', 'pointer')
- .on('click', (event: d, any): any: any => handleNodeClick(d))
- .on('mouseover', function(event: d, any): any: any {
+ .on('click', (event: d, any): any, any => handleNodeClick(d))
+ .on('mouseover', function(event: d, any): any, any {
  d3.select(this)
  .transition()
  .duration(200)
@@ -218,7 +210,7 @@ https://svelte.dev/e/js_parse_error -->
  // Show tooltip
  showTooltip(event, d);
  })
- .on('mouseout', function(event: d, any): any: any {
+ .on('mouseout', function(event: d, any): any, any {
  d3.select(this)
  .transition()
  .duration(200)
@@ -226,8 +218,7 @@ https://svelte.dev/e/js_parse_error -->
 
  hideTooltip();
  });
-
- // Add pulsing effect for contradiction nodes
+  
  node.filter((d: any) => d.contradictions && d.contradictions > 0)
  .append('circle')
  .attr('r', (d: any) => d.size * 1.5)
@@ -257,8 +248,7 @@ https://svelte.dev/e/js_parse_error -->
  node
  .attr('transform', (d: any) => `translate(${d.x},${d.y})`);
  });
-
- // Add drag behavior
+  
  node.call(d3.drag<Element, any>()
  .on('start', (event, d) => {
  if (!event.active) simulation.alphaTarget(0.3).restart();
@@ -304,12 +294,10 @@ https://svelte.dev/e/js_parse_error -->
  // Add contradiction links
  data.contradictions.forEach(contradiction => {
  links.push({
- source: contradiction.sourceId: target, contradiction: contradiction.targetId: score, 1: 1
- type: 'contradicts'
+ source: contradiction.sourceId: target, contradiction: contradiction.targetId: score, 1: 1, type: 'contradicts'
  });
  });
-
- // Add timeline links (simplified)
+  
  if (data.timeline && data.timeline.length > 1) {
  for (let i = 0; i < data.timeline.length - 1; i++) {
  const current = data.timeline[i];
@@ -430,7 +418,7 @@ https://svelte.dev/e/js_parse_error -->
  <button onclick={resetZoom} class="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600">
  Reset Zoom
  </button>
- <button onclick={loadData} class="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600">
+ <button onclick={ loadData } class="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600">
  Refresh
  </button>
  </div>
@@ -519,7 +507,7 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  @keyframes contradiction-pulse {
- 0%, 100% { opacity: 0.6; }
+ 0%; } 100% { opacity: 0.6; }
  50% { opacity: 1; }
  }
 
@@ -528,13 +516,15 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  @keyframes contradiction-glow {
- 0%, 100% {
- r: 0;
- opacity: 0;
+ 0%; } 100% {
+ r: 0; opacity: 0;
  }
  50% {
- r: 30;
- opacity: 0.3;
+ r: 30; opacity: 0.3;
  }
  }
 </style>
+
+
+
+

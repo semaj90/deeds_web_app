@@ -43,9 +43,7 @@ export class ClientEmbeddingService {
  // For now, we'll use a simple tokenizer approach
  // In production, you'd want to use @xenova/transformers or similar
  this.tokenizer = {
- encode: (text: string) => this.simpleTokenize(text),
- decode: (tokens: number[]) => tokens.join(' '),
- config: tokenizerConfig,
+ encode: (text: string) => this.simpleTokenize(text, decode: (tokens: number[]) => tokens.join(' '), config: tokenizerConfig,
  };
 
  this.isInitialized = true;
@@ -85,11 +83,7 @@ export class ClientEmbeddingService {
  maxLength?: number;
  batchSize?: number;
  } = {}
- ): Promise<{
- embeddings: number[][];
- model: string;
- dimension: number;
- count: number;
+ ): Promise<{ embeddings: number[][]; model: string; dimension: number; count: number;
  }> {
  if (!this.isInitialized) {
  await this.initialize();
@@ -167,7 +161,7 @@ export class ClientEmbeddingService {
  return {
  embeddings,
  model: 'embeddinggemma_300m_onnx',
- dimension: embeddings[0]?.length || 0,
+ dimension: embeddings[0]?.length ?? 0,
  count: embeddings.length,
  };
  } catch (error) {
@@ -247,3 +241,7 @@ export function getClientEmbeddingService(): ClientEmbeddingService {
  }
  return clientEmbeddingService;
 }
+
+
+
+

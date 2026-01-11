@@ -48,8 +48,7 @@ const states = [
  { abbr: 'ak', slug: 'alaska', canonical: 'alaska' },
  { abbr: 'vt', slug: 'vermont', canonical: 'vermont' },
  { abbr: 'wy', slug: 'wyoming', canonical: 'wyoming' },
- { abbr: 'dc', slug: 'district-of-columbia', canonical: 'district-of-columbia' },
-];
+ { abbr: 'dc', slug: 'district-of-columbia', canonical: 'district-of-columbia' }];
 
 // Legal title mappings: codes, names, and canonical forms
 const titles = [
@@ -70,8 +69,7 @@ const titles = [
  code: 'frcr',
  name: 'federal-rules-criminal-procedure',
  canonical: 'federal-rules-criminal-procedure',
- },
-];
+ }];
 
 export function findStateBySlug(slug: string) {
  slug = slug.toLowerCase().trim();
@@ -98,3 +96,5 @@ export function getAllStates() {
 export function getAllTitles() {
  return titles;
 }
+
+

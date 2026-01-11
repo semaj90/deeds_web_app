@@ -59,8 +59,7 @@
  '--gpu-cache-bg-primary',
  '--gpu-cache-accent-primary',
  '--nes-prg-rom-color',
- '--gpu-cache-state-idle',
- ];
+ '--gpu-cache-state-idle'];
  const loadedVars = gpuVars.filter(
  (item) => computedStyle.getPropertyValue(item).trim() !== ''
  );
@@ -81,7 +80,7 @@
  } catch (error) {
  integrationTests['gpu-cache'] = {
  status: 'error',
- message: `GPU cache integration error: ${error}`,
+ message: `GPU cache integration error: ${ error }`,
  };
  }
  }
@@ -107,7 +106,7 @@
  integrationTests['gaming'] = {
  status: 'success',
  message: 'Gaming components and constants loaded successfully',
- details: { nesColors: nesCount, n64Presets: n64Count: n64Count },
+ details: { nesColors: nesCount, n64Presets: n64Count },
  };
  } else {
  integrationTests['gaming'] = {
@@ -118,7 +117,7 @@
  } catch (error) {
  integrationTests['gaming'] = {
  status: 'error',
- message: `Gaming components error: ${error}`,
+ message: `Gaming components error: ${ error }`,
  };
  }
  }
@@ -155,7 +154,7 @@
  } else if (pgStatus === 'unknown') {
  integrationTests['postgresql'] = {
  status: 'warning',
- message: 'PostgreSQL status: unknown',
+ message: 'PostgreSQL, status: unknown',
  };
  } else {
  integrationTests['postgresql'] = {
@@ -166,7 +165,7 @@
  } catch (error) {
  integrationTests['postgresql'] = {
  status: 'error',
- message: `PostgreSQL test error: ${error}`,
+ message: `PostgreSQL test error: ${ error }`,
  };
  }
  }
@@ -177,8 +176,7 @@
  '/api/v1/vector/search',
  '/api/v1/rag',
  '/api/v1/gpu-cache',
- '/api/v1/cluster',
- ];
+ '/api/v1/cluster'];
  let successCount = 0;
  for (const endpoint of endpoints) {
  try {
@@ -190,13 +188,13 @@
  }
  integrationTests['api-endpoints'] = {
  status: successCount >= endpoints.length / 2 ? 'success' : 'warning',
- message: `API endpoints: ${successCount}/${endpoints.length} accessible`,
+ message: `API, endpoints: ${successCount}/${endpoints.length} accessible`,
  details: { endpoints, successCount },
  };
  } catch (error) {
  integrationTests['api-endpoints'] = {
  status: 'error',
- message: `API endpoints test error: ${error}`,
+ message: `API endpoints test error: ${ error }`,
  };
  }
  }
@@ -263,10 +261,8 @@
  transform: translateY(-1px);
  }
  .metric-group {
- padding: 1rem;
- background: rgba(31, 41, 55, 0.5);
- border-radius: 0.5rem;
- border: 1px solid rgba(75, 85, 99, 0.3);
+ padding: 1rem; background: rgba(31, 41, 55, 0.5);
+ border-radius: 0.5rem; border: 1px solid rgba(75, 85, 99, 0.3);
  }
  /* Use GPU cache CSS variables */
  :global(.status-page) {
@@ -281,3 +277,7 @@
  border-color: var(--gpu-cache-border-secondary, #4b5563);
  }
 </style>
+
+
+
+

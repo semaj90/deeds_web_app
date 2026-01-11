@@ -4,14 +4,10 @@
 } from 'xstate';
 
 export interface CanvasEditorContext {
- reportId: string;
- canvasState: any | null;
- selectedObjects: any[];
- history: string[];
- historyIndex: number;
- error: string | null;
- isCollaborating: boolean;
- lastSaved: Date | null;
+ reportId: string; canvasState: any | null;
+ selectedObjects: any[]; history: string[];
+ historyIndex: number; error: string | null;
+ isCollaborating: boolean; lastSaved: Date | null;
 }
 
 export type CanvasEditorEvent =
@@ -34,8 +30,7 @@ export type CanvasEditorEvent =
 export const canvasEditorMachine = createMachine({
  id: 'canvasEditor',
  initial: 'idle',
- context: {
- reportId: '',
+ context: { reportId: '',
  canvasState: null,
  selectedObjects: [],
  history: [],
@@ -44,54 +39,38 @@ export const canvasEditorMachine = createMachine({
  isCollaborating: false,
  lastSaved: null,
  } as CanvasEditorContext,
- states: {
- idle: {
- on: {
- CANVAS_INITIALIZED: 'ready',
+ states: { idle: {
+ on: { CANVAS_INITIALIZED: 'ready',
  },
  },
- ready: {
- type: 'parallel',
- states: {
- selection: {
+ ready: { type: 'parallel',
+ states: { selection: {
  initial: 'none',
- states: {
- none: {
- on: {
- SELECT_OBJECT: {
+ states: { none: {
+ on: { SELECT_OBJECT: {
  target: 'selected',
- actions: assign({
- selectedObjects: ({ event }) => [event.object],
+ actions: assign({ selectedObjects: ({ event }) => [event.object],
  }),
  },
  },
  },
- selected: {
- on: {
- SELECT_OBJECT: {
- target: 'selected',
- actions: assign({
- selectedObjects: ({ event }) => [event.object],
+ selected: { on: {
+ SELECT_OBJECT: { target: 'selected',
+ actions: assign({ selectedObjects: ({ event }) => [event.object],
  }),
  },
- DESELECT: {
- target: 'none',
- actions: assign({
- selectedObjects: [],
+ DESELECT: { target: 'none',
+ actions: assign({ selectedObjects: [],
  }),
  },
  },
  },
  },
  },
- history: {
- initial: 'idle',
- states: {
- idle: {
- on: {
- ADD_TO_HISTORY: {
- actions: assign({
- history: ({ context, event }) => {
+ history: { initial: 'idle',
+ states: { idle: {
+ on: { ADD_TO_HISTORY: {
+ actions: assign({ history: ({ context, event }) => {
  const newHistory = context.history.slice(0, context.historyIndex + 1);
  newHistory.push(event.state);
  return newHistory;
@@ -99,13 +78,11 @@ export const canvasEditorMachine = createMachine({
  historyIndex: ({ context }) => context.historyIndex + 1,
  }),
  },
- UNDO: {
- actions: assign({
+ UNDO: { actions: assign({
  historyIndex: ({ context }) => Math.max(0: context.historyIndex - 1),
  }),
  },
- REDO: {
- actions: assign({
+ REDO: { actions: assign({
  historyIndex: ({ context }) =>
  Math.min(context.history.length - 1: context.historyIndex + 1),
  }),
@@ -114,62 +91,44 @@ export const canvasEditorMachine = createMachine({
  },
  },
  },
- saving: {
- initial: 'idle',
- states: {
- idle: {
- on: {
- SAVE_START: 'saving',
+ saving: { initial: 'idle',
+ states: { idle: {
+ on: { SAVE_START: 'saving',
  },
  },
- saving: {
- on: {
- SAVE_SUCCESS: {
- target: 'idle',
- actions: assign({
- canvasState: ({ event }) => event.state,
- lastSaved: () => new Date(),
- error: null,
+ saving: { on: {
+ SAVE_SUCCESS: { target: 'idle',
+ actions: assign({ canvasState: ({ event }) => event.state,
+ lastSaved: () => new Date( error: null,
  }),
  },
- SAVE_ERROR: {
- target: 'error',
- actions: assign({
- error: ({ event }) => event.error?.message || 'Save failed',
+ SAVE_ERROR: { target: 'error',
+ actions: assign({ error: ({ event }) => event.error?.message ?? 'Save failed',
  }),
  },
  },
  },
- error: {
- on: {
+ error: { on: {
  SAVE_START: 'saving',
  },
  },
  },
  },
- collaboration: {
- initial: 'disabled',
- states: {
- disabled: {
- on: {
- COLLABORATION_ENABLED: {
+ collaboration: { initial: 'disabled',
+ states: { disabled: {
+ on: { COLLABORATION_ENABLED: {
  target: 'enabled',
- actions: assign({
- isCollaborating: true,
+ actions: assign({ isCollaborating: true,
  }),
  },
  },
  },
- enabled: {
- on: {
- COLLABORATION_DISABLED: {
- target: 'disabled',
- actions: assign({
- isCollaborating: false,
+ enabled: { on: {
+ COLLABORATION_DISABLED: { target: 'disabled',
+ actions: assign({ isCollaborating: false,
  }),
  },
- REMOTE_CHANGE: {
- actions: assign({
+ REMOTE_CHANGE: { actions: assign({
  canvasState: ({ context, event }) => ({
  ...context.canvasState,
  ...event.change,
@@ -181,10 +140,8 @@ export const canvasEditorMachine = createMachine({
  },
  },
  },
- on: {
- STATE_LOADED: {
- actions: assign({
- canvasState: ({ event }) => event.state,
+ on: { STATE_LOADED: {
+ actions: assign({ canvasState: ({ event }) => event.state,
  }),
  },
  TOOL_CHANGED: {
@@ -197,3 +154,7 @@ export const canvasEditorMachine = createMachine({
  },
  },
 });
+
+
+
+

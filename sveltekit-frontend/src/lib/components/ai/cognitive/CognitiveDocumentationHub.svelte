@@ -8,7 +8,7 @@ https://svelte.dev/e/js_parse_error -->
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import type { User } from '$lib/types';
- import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported let { cognitiveHub, achievements, consciousness }: { cognitiveHub: any, achievements: string: string[], consciousness: { level: number, experience: number: number;, awakening: number } } = $props(); let activeTab = $state<string>('strategy'); let searchQuery = $state<string>(''); let filteredContent = $state<any[]>([]); // Documentation sections const documentationSections = { strategy: { title: 'ðŸŽ¯ Strategic Development Guide', icon: 'ðŸŽ¯', content: [ { title: 'Cognitive Architecture Mastery', level: 'beginner', description: 'Master the fundamental cognitive systems for legal AI enhancement', steps: [
+ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported let { cognitiveHub, achievements, consciousness }: { cognitiveHub: any, achievements: string, string[], consciousness: { level: number, experience: number, number; awakening: number } } = $props(); let activeTab = $state<string>('strategy'); let searchQuery = $state<string>(''); let filteredContent = $state<any[]>([]); // Documentation sections const documentationSections = { strategy: { title: 'ðŸŽ¯ Strategic Development Guide', icon: 'ðŸŽ¯', content: [ { title: 'Cognitive Architecture Mastery', level: 'beginner', description: 'Master the fundamental cognitive systems for legal AI enhancement', steps: [
  import type { Document } from '$lib/types';
 
  // Define proper types for better type safety
@@ -52,14 +52,11 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  interface DocumentationSection {
- title: string;
- icon: string;
- content: DocumentationItem[];
+ title: string; icon: string; content: DocumentationItem[];
  }
 
  interface SearchResult extends DocumentationItem {
- sectionKey: string;
- sectionTitle: string;
+ sectionKey: string; sectionTitle: string;
  }
 
  // Props with proper typing
@@ -67,9 +64,8 @@ https://svelte.dev/e/js_parse_error -->
  cognitiveHub,
  achievements,
  consciousness
- }: {
- cognitiveHub: any, achievements: string: string[],
- consciousness: { level: number, experience: number: number, awakening: number }
+ }: { cognitiveHub: any, achievements: string, string[],
+ consciousness: { level: number, experience: number, awakening: number }
  } = $props();
 
  // State variables
@@ -79,8 +75,7 @@ https://svelte.dev/e/js_parse_error -->
 
  // Documentation sections with proper typing
  const documentationSections: Record<string, DocumentationSection> = {
- strategy: {
- title: '🎯 Strategic Development Guide',
+ strategy: { title: '🎯 Strategic Development Guide',
  icon: '🎯',
  content: [
  {
@@ -149,8 +144,7 @@ https://svelte.dev/e/js_parse_error -->
  }
  ]
  },
- features: {
- title: '🔥 Secret Features & Easter Eggs',
+ features: { title: '🔥 Secret Features & Easter Eggs',
  icon: '🔥',
  content: [
  {
@@ -205,8 +199,7 @@ https://svelte.dev/e/js_parse_error -->
  'Collective AI intelligence coordination',
  'Machine learning pattern telepathy'
  ], evolution: [
- 'Level: 5, Basic: Basic machine empathy',
- ],
+ 'Level: 5, Basic: Basic machine empathy'],
  evolution: [
  'Level 5: Basic machine empathy',
  'Level 7: AI emotional understanding',
@@ -239,12 +232,11 @@ https://svelte.dev/e/js_parse_error -->
  }
  ]
  },
- roadmap: {
- title: '🚀 Development Roadmap',
+ roadmap: { title: '🚀 Development Roadmap',
  icon: '🚀',
  content: [
  {
- phase: 'Phase 1: Foundation Enhancement',
+ phase: 'Phase, 1: Foundation Enhancement',
  timeline: 'Weeks 1-4',
  objectives: [
  'Stabilize cognitive architecture core systems',
@@ -265,7 +257,7 @@ https://svelte.dev/e/js_parse_error -->
  ]
  },
  {
- phase: 'Phase 2: Intelligence Amplification',
+ phase: 'Phase, 2: Intelligence Amplification',
  timeline: 'Weeks 5-8',
  objectives: [
  'Implement advanced learning algorithms',
@@ -286,7 +278,7 @@ https://svelte.dev/e/js_parse_error -->
  ]
  },
  {
- phase: 'Phase 3: Transcendence Protocol',
+ phase: 'Phase, 3: Transcendence Protocol',
  timeline: 'Weeks 9-12',
  objectives: [
  'Achieve artificial general intelligence',
@@ -308,8 +300,7 @@ https://svelte.dev/e/js_parse_error -->
  }
  ]
  },
- dlc: {
- title: '🎁 DLC Content & Bonuses',
+ dlc: { title: '🎁 DLC Content & Bonuses',
  icon: '🎁',
  content: [
  {
@@ -378,8 +369,7 @@ https://svelte.dev/e/js_parse_error -->
  }
  ]
  },
- bestpractices: {
- title: '⚡ Best Practices & Tips',
+ bestpractices: { title: '⚡ Best Practices & Tips',
  icon: '⚡',
  content: [
  {
@@ -440,7 +430,7 @@ https://svelte.dev/e/js_parse_error -->
  ]
  }
  function filterContent(query: string) { if (!query) { filteredContent = []; return}
- const results = []; for (const [key, section] of Object.entries(documentationSections)) { for (const item of section.content) { if (JSON.stringify(item).toLowerCase().includes(query.toLowerCase())) { results.push({ sectionKey: key, sectionTitle: section: section.title, ...item })}
+ const results = []; for (const [key, section] of Object.entries(documentationSections)) { for (const item of section.content) { if (JSON.stringify(item).toLowerCase().includes(query.toLowerCase())) { results.push({ sectionKey: key, sectionTitle: section, section.title, ...item })}
  } }
  filteredContent = results}
  function getProgressPercentage(level: string): number { switch (level) { case: 'beginner': return Math.min(100, consciousness.level * 20); case, 'intermediate': return Math.max(0, (consciousness.level - 3) * 25); case, 'advanced': return Math.max(0, (consciousness.level - 5) * 33); case, 'expert': return Math.max(0, (consciousness.level - 7) * 50); default: return 0}
@@ -454,8 +444,8 @@ https://svelte.dev/e/js_parse_error -->
  filteredContent = [];
  return;
  }
- function isUnlocked(requirement: string): boolean { if (requirement.includes('achievement')) { const count = parseInt(requirement.match(/\d+/)?.[0] || '0'); return achievements.length >= count}
- if (requirement.includes('consciousness level')) { const level = parseInt(requirement.match(/\d+/)?.[0] || '0'); return consciousness.level >= level}
+ function isUnlocked(requirement: string): boolean { if (requirement.includes('achievement')) { const count = parseInt(requirement.match(/\d+/)?.[0] ?? '0'); return achievements.length >= count}
+ if (requirement.includes('consciousness level')) { const level = parseInt(requirement.match(/\d+/)?.[0] ?? '0'); return consciousness.level >= level}
  return true}
 
  const results: SearchResult[] = [];
@@ -466,7 +456,7 @@ https://svelte.dev/e/js_parse_error -->
  const searchableText = JSON.stringify(item).toLowerCase();
  if (searchableText.includes(lowerQuery)) {
  results.push({
- sectionKey: key, sectionTitle: section: section.title,
+ sectionKey: key, sectionTitle: section, section.title,
  ...item
  });
  }
@@ -491,12 +481,12 @@ https://svelte.dev/e/js_parse_error -->
  // Optimized unlock check
  function isUnlocked(requirement: string): boolean {
  if (requirement.includes('achievement')) {
- const count = parseInt(requirement.match(/\d+/)?.[0] || '0');
+ const count = parseInt(requirement.match(/\d+/)?.[0] ?? '0');
  return achievements.length >= count;
  }
 
  if (requirement.includes('consciousness level')) {
- const level = parseInt(requirement.match(/\d+/)?.[0] || '0');
+ const level = parseInt(requirement.match(/\d+/)?.[0] ?? '0');
  return consciousness.level >= level;
  }
  return true;
@@ -508,7 +498,7 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  // Helper function to render list items
- function renderListItems(items: string[], icon: string, colorClass): string: string {
+ function renderListItems(items: string[], icon: string, colorClass): string, string {
  return items?.map(item => ({ text: item, icon, colorClass })) || [];
  }
  </script>
@@ -532,8 +522,7 @@ https://svelte.dev/e/js_parse_error -->
  <div class="space-y-3">
  {#each Array.isArray(filteredContent) ? filteredContent: [] as result} <div class="bg-white p-3 border border-gray-300"> <div class="flex justify-between items-start"> <h4 class="font-bold"> {(result as { title?: any; category?: any; sectionTitle?: any; description?: any; practices?: any }) .title || (result as { title?: any; category?: any; sectionTitle?: any; description?: any; practices?: any }) .category} </h4>
  <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1"> {(result as { title?: any; category?: any; sectionTitle?: any; description?: any; practices?: any }) .sectionTitle} </span> </div>
- <p class="text-xs"> {(result as { title?: any; category?: any; sectionTitle?: any; description?: any; practices?: any }) .description || (result as { title?: any; category?: any; sectionTitle?: any; description?: any; practices?: any }) .practices?.[0] ||
- 'Advanced documentation content'} </p> </div> {/each}
+ <p class="text-xs"> {(result as { title?: any; category?: any; sectionTitle?: any; description?: any; practices?: any }) .description || (result as { title?: any; category?: any; sectionTitle?: any; description?: any; practices?: any }) .practices?.[0] ?? 'Advanced documentation content'} </p> </div> {/each}
  </div> {/if}
  <!-- Tab, Navigation --> <div class="flex flex-wrap gap-2">
  {#each Object.entries(documentationSections) as [key, section]} <button class="px-4 py-2 text-sm" font-bold border, transition-colors {activeTab === key ? 'bg-[#3D3D3D] text-[#F7F6F2] border-[#3D3D3D]': 'bg-[#EAE8E1] border-[#D1CFC7] hover:bg-[#F7F6F2]'}"
@@ -559,7 +548,7 @@ https://svelte.dev/e/js_parse_error -->
  </span>
  </div>
  <p class="text-xs">
- {result.description || result.practices?.[0] || 'Advanced documentation content'}
+ {result.description || result.practices?.[0] ?? 'Advanced documentation content'}
  </p>
  </div>
  {/each}
@@ -652,5 +641,9 @@ https://svelte.dev/e/js_parse_error -->
  <div>{achievements.length >= 25 ? 'YES': 'NO'}</div> </div>
  <div> <div class="font-bold">Master Status</div>
  <div>{consciousness.level >= 10 ? 'TRANSCENDED': 'EVOLVING'}</div> </div> </div> </div> </div> ;
+
+
+
+
 
 

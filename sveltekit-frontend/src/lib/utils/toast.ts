@@ -35,8 +35,7 @@ function showToast(message: string, type: string, options: ToastOptions = {}) {
  toastEl.style.transform = 'translateX(0)';
  toastEl.style.opacity = '1';
  });
-
- // Remove after duration
+  
  setTimeout(() => {
  toastEl.style.transform = 'translateX(100%)';
  toastEl.style.opacity = '0';
@@ -57,3 +56,5 @@ function getToastStyles(type: string): string {
  };
  return styles[type] || styles.info;
 }
+
+

@@ -2,10 +2,8 @@ import type { redis } from '$lib/server/redis';
 import type { publishToQueue } from '$lib/server/rabbitmq';
 import type { RagShardJob, DocStatus, DocStatusInfo } from './types.js';
 
-export async function enqueueDocumentForRag(params: {
- docId: string;
- minioBucket: string;
- minioKey: string;
+export async function enqueueDocumentForRag(params: { docId: string;
+ minioBucket: string; minioKey: string;
  fileSizeBytes: number;
  shardSizeBytes?: number;
 }): Promise<{ shardCount: number }> {
@@ -39,18 +37,17 @@ export async function enqueueDocumentForRag(params: {
 
 export async function getDocStatus(docId: string): Promise<DocStatusInfo> {
  const [statusRaw, shardCountRaw] = await redis.mGet([
- `rag:doc:${docId}:status`,
- `rag:doc:${docId}:shard_count`,
- ]);
+ `rag:doc:${ docId }:status`,
+ `rag:doc:${ docId }:shard_count`]);
 
- const shardCount = parseInt(shardCountRaw ?? '0', 10) || 0;
+ const shardCount = parseInt(shardCountRaw ?? '0', 10) ?? 0;
 
  // Count embedded shards
  let embeddedCount = 0;
  if (shardCount > 0) {
  const keys = [];
  for (let i = 0; i < shardCount; i++) {
- keys.push(`rag:doc:${docId}:shard:${i}:status`);
+ keys.push(`rag:doc:${ docId }:shard:${i}:status`);
  }
  const statuses = await redis.mGet(keys);
  embeddedCount = statuses.filter((s) => s === 'embedded').length;
@@ -72,7 +69,7 @@ export async function getDocStatus(docId: string): Promise<DocStatusInfo> {
 }
 
 export async function getShardChunks(docId: string, size: number): Promise<any[]> {
- const chunksKey = `rag:doc:${docId}:shard:${shardId}:chunks`;
+ const chunksKey = `rag:doc:${ docId }:shard:${ shardId }:chunks`;
  const chunksJson = await redis.get(chunksKey);
  return chunksJson ? JSON.parse(chunksJson) : [];
 }
@@ -81,11 +78,11 @@ export async function updateShardStatus(
  docId: string, shardId: number, status, string:
  metadata?: any
 ): Promise<void> {
- const statusKey = `rag:doc:${docId}:shard:${shardId}:status`;
+ const statusKey = `rag:doc:${ docId }:shard:${ shardId }:status`;
  await redis.set(statusKey, status);
 
  if (metadata) {
- const metaKey = `rag:doc:${docId}:shard:${shardId}:metadata`;
+ const metaKey = `rag:doc:${docId}:shard:${ shardId }:metadata`;
  await redis.set(metaKey, JSON.stringify(metadata));
  }
 }
@@ -94,3 +91,7 @@ export async function getAllDocIds(): Promise<string[]> {
  const keys = await redis.keys('rag:doc:*:status');
  return keys.map((key) => key.replace('rag:doc:', '').replace(':status', ''));
 }
+
+
+
+

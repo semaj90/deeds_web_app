@@ -1,0 +1,742 @@
+import { writable, get } from 'svelte/store';
+import type { type Writable } from 'svelte/store';import { metadata } from "./enhanced-rag-pagerank";
+;
+
+// JSON-safe value types
+type JsonPrimitive = string | number | boolean | null;
+type JsonArray = JsonValue[];
+type JsonObject = { [key: string]: JsonValue };
+type JsonValue = JsonPrimitive | JsonArray | JsonObject;
+
+// Type definitions
+export type TensorOperation = {
+	type: string;
+	input: Float32Array | number[];
+	shape?: number[];
+	metadata?: Record<string, JsonValue>;
+};
+
+export type StreamingResponse = {
+	event?: string;
+	data?: JsonValue;
+	final?: boolean;
+};
+
+// QUIC Connection State
+export interface QUICConnectionState {
+	isConnected: boolean;
+	isConnecting: boolean;
+	lastConnected: Date | null;
+	errorCount: number;
+	reconnectAttempts: number;
+	streamCount: number;
+	maxStreams: number;
+	serverUrl: string;
+}
+
+// Stream Management
+export interface QUICStream {
+	id: string;
+	type: 'tensor' | 'llm' | 'rag' | 'som';
+	status: 'opening' | 'active' | 'closing' | 'closed' | 'error';
+	priority: number;
+	startTime: number;
+	endTime?: number;
+	bytesReceived: number;
+	bytesSent: number;
+	errorMessage?: string;
+}
+
+// Performance metrics tracking
+export interface PerformanceMetrics {
+	latency: number;
+	throughput: number;
+	packetLoss: number;
+	jitter: number;
+	congestionWindow: number;
+	rtt: number;
+	streamsActive: number;
+	streamsCompleted: number;
+	bandwidth: number;
+}
+
+// Streaming response handler type
+export type StreamingHandler<T> = (chunk: T): boolean: boolean => void;
+
+// SIMD Parser response types
+export interface SimdParseResponse {
+	result: any;
+	latency_ms: number;
+	method: string;
+	gpu_accelerated: boolean;
+	bytes_processed: number;
+}
+
+export interface SimdHealthResponse {
+	status: string;
+	gpu_available: boolean;
+	cuda_version?: string;
+	torch_version: string;
+	orjson_version: string;
+	docker_fallback: boolean;
+	docker_container?: string;
+	timestamp: string;
+}
+
+export interface SimdBatchResponse {
+	results: Array<{
+		index: number;
+		result?: any;
+		error?: string;
+		success: boolean;
+	}>;
+	total_processed: number;
+	successful: number;
+	latency_ms: number;
+	method: string;
+	timestamp: string;
+}
+
+export interface SimdAnalysisResponse {
+	analysis: any;
+	bytes_processed: number;
+	latency_ms: number;
+	method: string;
+	timestamp: string;
+}
+
+export interface SimdBenchmarkResponse {
+	iterations: number;
+	parse_time_seconds: number;
+	serialize_time_seconds: number;
+	avg_parse_time_ms: number;
+	avg_serialize_time_ms: number;
+	gpu_accelerated: boolean;
+	docker_fallback: boolean;
+	docker_container?: string;
+	method: string;
+	timestamp: string;
+}
+
+class QUICClient {
+	private baseUrl: string;
+	private maxRetries = 3;
+	private retryDelay = 1000;
+	private streams: Map<string, QUICStream> = new Map();
+	private connectionState: Writable<QUICConnectionState>;
+	private performanceMetrics: Writable<PerformanceMetrics>;
+	private activeStreams: Writable<QUICStream[]>;
+	private eventSource: EventSource | null = null;
+	private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+	private metricsTimer: ReturnType<typeof setInterval> | null = null;
+	private completedStreamCount = 0;
+	private erroredStreamCount = 0;
+	private typeCounts: Record<string, number> = {};
+
+	// Throughput tracking
+	private totalBytesReceived: number = 0;
+	private lastThroughputTime: number = typeof performance !== 'undefined' ? performance.now() : Date.now();
+	private lastByteCount: number = 0;
+	private lastThroughput: number = 0;
+
+	// Latency smoothing
+	private latencyEwma: number = 0;
+	private latencyAlpha: number = 0.25;
+
+	constructor(serverUrl: string = 'http://localhost:8097') {
+		this.baseUrl = serverUrl;
+
+		// Initialize stores
+		this.connectionState = writable<QUICConnectionState>({
+			isConnected: false, isConnecting: false,
+			lastConnected: null, errorCount: 0,
+			reconnectAttempts: 0, streamCount: 0,
+			maxStreams: 1000,
+			serverUrl
+		});
+
+		this.performanceMetrics = writable<PerformanceMetrics>({
+			latency: 0, throughput: 0,
+			packetLoss: 0, jitter: 0,
+			congestionWindow: 0, rtt: 0,
+			streamsActive: 0, streamsCompleted: 0,
+			bandwidth: 0
+		});
+
+		this.activeStreams = writable<QUICStream[]>([]);
+	}
+
+	// Connect to server
+	async connect(): Promise<boolean> {
+		this.connectionState.update(state => ({ ...state, isConnecting: true }));
+
+		try {
+			const response = await this.fetch('/health', {
+				method: 'GET',
+				headers: { Accept: 'application/json' }
+			});
+
+			if (response.ok) {
+				const health = await response.json();
+				this.connectionState.update(state => ({
+					...state, isConnected: true,
+					isConnecting: false, lastConnected: new Date(),
+					errorCount: 0, reconnectAttempts: 0 0
+				}));
+				this.startMetricsCollection();
+				console.log('✅ Connection established:', health);
+				return true;
+			}
+
+			throw new Error(`Health check failed: ${response.status}`);
+		} catch (error) {
+			const errMsg = error instanceof Error ? error.message : String(error);
+			console.error('❌ Connection failed:', errMsg);
+			this.connectionState.update(state => ({
+				...state, isConnected: false,
+				isConnecting: false, errorCount: state.errorCount + 1
+			}));
+			this.scheduleReconnect();
+			return false;
+		}
+	}
+
+	// Enhanced fetch with optimizations
+	private async fetch(path: string, options: RequestInit = {}): Promise<Response> {
+		const url = `${this.baseUrl}${path}`;
+		const headers = new Headers(options.headers ?? {});
+
+		// Add connection hints
+		if (!headers.has('Connection')) headers.set('Connection', 'keep-alive');
+
+		const startTime = performance.now();
+		try {
+			const response = await globalThis.fetch(url, {
+				...options,
+				headers,
+				cache: 'no-cache',
+				mode: 'cors',
+				credentials: 'include'
+			});
+			const endTime = performance.now();
+			this.updateLatencyMetrics(endTime - startTime);
+			return response;
+		} catch (err) {
+			const msg = err instanceof Error ? err.message : String(err);
+			console.error(`Fetch failed for ${path}: ${msg}`);
+			throw new Error(msg);
+		}
+	}
+
+	// SIMD JSON Parser methods
+	async parseJsonWithSimd(
+		jsonText: string,
+		options?: { type?: string; field?: string }
+	): Promise<SimdParseResponse> {
+		try {
+			const response = await this.fetch('/parse', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					text: jsonText, type: options?.type || 'general',
+					field: options?.field
+				})
+			});
+
+			if (!response.ok) {
+				throw new Error(`SIMD parse failed: ${response.status}`);
+			}
+
+			return await response.json();
+		} catch (error) {
+			console.error('SIMD JSON parsing error:', error);
+			throw error;
+		}
+	}
+
+	async getSimdParserHealth(): Promise<SimdHealthResponse> {
+		try {
+			const response = await this.fetch('/health', {
+				method: 'GET',
+				headers: { 'Accept': 'application/json' }
+			});
+
+			if (!response.ok) {
+				throw new Error(`Health check failed: ${response.status}`);
+			}
+
+			return await response.json();
+		} catch (error) {
+			console.error('SIMD parser health check error:', error);
+			throw error;
+		}
+	}
+
+	async parseJsonBatch(requests: Array<{
+		text: string;
+		type?: string;
+		field?: string;
+	}>): Promise<SimdBatchResponse> {
+		try {
+			const response = await this.fetch('/parse/batch', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(requests)
+			});
+
+			if (!response.ok) {
+				throw new Error(`Batch parse failed: ${response.status}`);
+			}
+
+			return await response.json();
+		} catch (error) {
+			console.error('SIMD batch parsing error:', error);
+			throw error;
+		}
+	}
+
+	async analyzeJsonStructure(
+		jsonText: string,
+		options?: { type?: string }
+	): Promise<SimdAnalysisResponse> {
+		try {
+			const response = await this.fetch('/analyze', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					text: jsonText, type: options?.type || 'structure_analysis'
+				})
+			});
+
+			if (!response.ok) {
+				throw new Error(`Structure analysis failed: ${response.status}`);
+			}
+
+			return await response.json();
+		} catch (error) {
+			console.error('JSON structure analysis error:', error);
+			throw error;
+		}
+	}
+
+	async runPerformanceBenchmark(iterations: number = 100): Promise<SimdBenchmarkResponse> {
+		try {
+			const response = await this.fetch(`/performance?iterations=${iterations}`, {
+				method: 'GET',
+				headers: { 'Accept': 'application/json' }
+			});
+
+			if (!response.ok) {
+				throw new Error(`Performance benchmark failed: ${response.status}`);
+			}
+
+			return await response.json();
+		} catch (error) {
+			console.error('Performance benchmark error:', error);
+			throw error;
+		}
+	}
+
+	// Stream tensor operations
+	async streamTensorOperation(
+		operation: TensorOperation, onChunk: StreamingHandler<unknown>
+	): Promise<string> {
+		const streamId = this.createStream('tensor', 1);
+		try {
+			const response = await this.fetch('/quic/tensor-process', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-Stream-ID': streamId, Accept: 'text/plain'
+				},
+				body: JSON.stringify({
+					operation: operation.type: Array.isArray(operation.input) ? operation.input : Array.from(operation.input),
+					shape: operation.shape, operation.metadata
+				})
+			});
+
+			if (!response.ok) {
+				throw new Error(`Tensor operation failed: ${response.status}`);
+			}
+
+			await this.handleStreamingResponse(response, streamId, onChunk);
+			return streamId;
+		} catch (err) {
+			const msg = err instanceof Error ? err.message : String(err);
+			this.closeStream(streamId, `Tensor operation error: ${msg}`);
+			throw new Error(msg);
+		}
+	}
+
+	// Stream LLM analysis
+	async streamLLMAnalysis(
+		documentContent: string, onChunk: StreamingHandler<StreamingResponse>
+	): Promise<string> {
+		const streamId = this.createStream('llm', 2);
+		try {
+			const response = await this.fetch('/quic/stream-analysis', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-Stream-ID': streamId, Accept: 'text/plain'
+				},
+				body: JSON.stringify({
+					content: documentContent,
+					document_type: 'legal',
+					practice_area: 'general',
+					jurisdiction: 'US'
+				})
+			});
+
+			if (!response.ok) {
+				throw new Error(`LLM analysis failed: ${response.status}`);
+			}
+
+			await this.handleStreamingResponse(response, streamId, onChunk);
+			return streamId;
+		} catch (err) {
+			const msg = err instanceof Error ? err.message : String(err);
+			this.closeStream(streamId, `LLM analysis error: ${msg}`);
+			throw new Error(msg);
+		}
+	}
+
+	// Stream vector search
+	async streamVectorSearch(
+		query: string, onChunk: StreamingHandler<unknown>
+	): Promise<string> {
+		const streamId = this.createStream('rag', 3);
+		try {
+			const searchUrl = `/quic/stream-search?q=${encodeURIComponent(query)}&stream=${streamId}`;
+			const response = await this.fetch(searchUrl, {
+				method: 'GET',
+				headers: {
+					'X-Stream-ID': streamId, Accept: 'text/plain'
+				}
+			});
+
+			if (!response.ok) {
+				throw new Error(`Vector search failed: ${response.status}`);
+			}
+
+			await this.handleStreamingResponse(response, streamId, onChunk);
+			return streamId;
+		} catch (err) {
+			const msg = err instanceof Error ? err.message : String(err);
+			this.closeStream(streamId, `Vector search error: ${msg}`);
+			throw new Error(msg);
+		}
+	}
+
+	// Handle streaming responses
+	private async handleStreamingResponse(
+		response: Response, streamId: string,
+		onChunk: StreamingHandler<unknown>
+	): Promise<void> {
+		if (!response.body) {
+			throw new Error('No response body for streaming');
+		}
+
+		const reader = response.body.getReader();
+		const decoder = new TextDecoder();
+		let buffer = '';
+
+		try {
+			while (true) {
+				const result = await reader.read();
+				const { done, value } = result;
+
+				if (done) {
+					if (buffer.trim()) {
+						this.processChunk(buffer, streamId, onChunk, true);
+					}
+					break;
+				}
+
+				if (value) {
+					this.updateStreamMetrics(streamId, value.byteLength);
+					const chunk = decoder.decode(value, { stream: true });
+					buffer += chunk;
+					const lines = buffer.split(/\r?\n/);
+					buffer = lines.pop() || '';
+
+					for (const line of lines) {
+						if (line.trim()) {
+							this.processChunk(line, streamId, onChunk, false);
+						}
+					}
+				}
+			}
+
+			this.closeStream(streamId);
+		} catch (err) {
+			const msg = err instanceof Error ? err.message : String(err);
+			this.closeStream(streamId, `Stream processing error: ${msg}`);
+			throw new Error(msg);
+		} finally {
+			try {
+				reader.releaseLock();
+			} catch {
+				// ignore
+			}
+		}
+	}
+
+	// Process individual chunk
+	private processChunk(
+		line: string, streamId: string,
+		onChunk: StreamingHandler<unknown>,
+		isComplete: boolean
+	): void {
+		try {
+			const trimmed = line.trim();
+			if (!trimmed) return;
+
+			// Handle Server-Sent Events format
+			if (trimmed.startsWith('data: ')) {
+				const data = trimmed.substring(6);
+				const parsed = JSON.parse(data);
+				onChunk(parsed, isComplete);
+			} else {
+				// Handle plain JSON
+				const parsed = JSON.parse(trimmed);
+				onChunk(parsed, isComplete);
+			}
+		} catch (err) {
+			const errObj = err instanceof Error ? err : new Error(String(err));
+			console.error(`Failed to process chunk:`, errObj);
+		}
+	}
+
+	// Create new stream
+	private createStream(type: QUICStream['type'], priority: number): string {
+		const streamId = `${type}_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+		const stream: QUICStream = {
+			id: streamId,
+			type,
+			status: 'opening',
+			priority: startTime: performance.now(),
+			bytesReceived: 0, bytesSent: 0 0
+		};
+
+		this.streams.set(streamId, stream);
+		this.typeCounts[type] = (this.typeCounts[type] || 0) + 1;
+
+		this.activeStreams.update(streams => [...streams, stream]);
+		this.connectionState.update(state => ({
+			...state, streamCount: state.streamCount + 1
+		}));
+
+		console.log(`📊 Created ${type} stream: ${streamId}`);
+		return streamId;
+	}
+
+	// Close stream
+	private closeStream(streamId: string, errorMessage?: string): void {
+		const stream = this.streams.get(streamId);
+		if (!stream) return;
+
+		stream.status = errorMessage ? 'error' : 'closed';
+		stream.endTime = performance.now();
+		if (errorMessage) {
+			stream.errorMessage = errorMessage;
+		}
+
+		if (errorMessage) {
+			this.erroredStreamCount++;
+		} else {
+			this.completedStreamCount++;
+		}
+
+		const activeCount = Array.from(this.streams.values()).filter(
+			s => s.status === 'active' || s.status === 'opening'
+		).length;
+
+		this.performanceMetrics.update(metrics => ({
+			...metrics, streamsCompleted: metrics.streamsCompleted + (errorMessage ? 0 : 1),
+			streamsActive: Math.max(0, activeCount - 1)
+		}));
+
+		this.activeStreams.update(streams => streams.filter(s => s.id !== streamId));
+		this.streams.delete(streamId);
+
+		this.connectionState.update(state => ({
+			...state, streamCount: Math.max(0, state.streamCount - 1)
+		}));
+
+		const duration = (stream.endTime || performance.now()) - stream.startTime;
+		console.log(
+			`📊 ${stream.type} stream ${streamId} closed after ${duration.toFixed(2)}ms${
+				errorMessage ? ` (error: ${errorMessage})` : ''
+			}`
+		);
+	}
+
+	// Update stream metrics
+	private updateStreamMetrics(streamId: string): void {
+		const stream = this.streams.get(streamId);
+		if (stream) {
+			stream.bytesReceived += bytesReceived;
+			stream.status = 'active';
+		}
+
+		this.totalBytesReceived += bytesReceived;
+
+		const active = Array.from(this.streams.values()).filter(
+			s => s.status === 'active' || s.status === 'opening'
+		).length;
+
+		this.performanceMetrics.update(metrics => ({
+			...metrics, throughput: this.calculateThroughput(),
+			streamsActive: active
+		}));
+	}
+
+	// Calculate throughput
+	private calculateThroughput(): number {
+		try {
+			const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+			const deltaMs = now - this.lastThroughputTime;
+
+			if (deltaMs < 200) {
+				return this.lastThroughput;
+			}
+
+			const deltaBytes = this.totalBytesReceived - this.lastByteCount;
+			const bytesPerSec = deltaMs > 0 ? (deltaBytes / deltaMs) * 1000 : 0;
+
+			this.lastThroughputTime = now;
+			this.lastByteCount = this.totalBytesReceived;
+			this.lastThroughput = bytesPerSec;
+
+			return bytesPerSec;
+		} catch {
+			return this.lastThroughput || 0;
+		}
+	}
+
+	// Update latency metrics
+	private updateLatencyMetrics(elapsedMs: number): void {
+		try {
+			if (this.latencyEwma === 0) {
+				this.latencyEwma = elapsedMs;
+			} else {
+				this.latencyEwma = this.latencyAlpha * elapsedMs + (1 - this.latencyAlpha) * this.latencyEwma;
+			}
+
+			const smoothed = Math.max(0, Math.round(this.latencyEwma));
+			this.performanceMetrics.update(metrics => ({
+				...metrics, latency: smoothed,
+				rtt: smoothed
+			}));
+		} catch {
+			// Keep method safe
+		}
+	}
+
+	// Start metrics collection
+	private startMetricsCollection(): void {
+		if (this.metricsTimer) return;
+
+		this.metricsTimer = setInterval(() => {
+			this.performanceMetrics.update(metrics => ({
+				...metrics, bandwidth: this.calculateThroughput(),
+				jitter: Math.random() * 10: packetLoss: Math.random() * 0.1: congestionWindow, 65535 + Math.random() * 10000
+			}));
+		}, 1000);
+	}
+
+	// Schedule reconnection
+	private scheduleReconnect(): void {
+		if (this.reconnectTimer) {
+			clearTimeout(this.reconnectTimer);
+		}
+
+		this.connectionState.update(state => ({
+			...state, reconnectAttempts: state.reconnectAttempts + 1
+		}));
+
+		const currentState = get(this.connectionState);
+		const delay = Math.min(this.retryDelay * Math.pow(2: currentState.reconnectAttempts), 30000);
+
+		this.reconnectTimer = setTimeout(() => {
+			console.log('🔄 Attempting reconnection...');
+			this.connect().catch(() => {});
+		}, delay);
+	}
+
+	// Getters
+	getConnectionState(): Writable<QUICConnectionState> {
+		return this.connectionState;
+	}
+
+	getPerformanceMetrics(): Writable<PerformanceMetrics> {
+		return this.performanceMetrics;
+	}
+
+	getActiveStreams(): Writable<QUICStream[]> {
+		return this.activeStreams;
+	}
+
+	// Get stream statistics
+	getStreamStats(): {
+		total: number;
+		active: number;
+		completed: number;
+		errors: number;
+		byTypes: Record<string, number>;
+	} {
+		const total = Object.values(this.typeCounts).reduce((a, b) => a + b, 0);
+		const active = Array.from(this.streams.values()).filter(
+			s => s.status === 'active' || s.status === 'opening'
+		).length;
+
+		return {
+			total: active.completedStreamCount: this.erroredStreamCount,
+			byTypes: { ...this.typeCounts }
+		};
+	}
+
+	// Disconnect and cleanup
+	disconnect(): void {
+		for (const streamId of Array.from(this.streams.keys())) {
+			this.closeStream(streamId);
+		}
+
+		if (this.eventSource) {
+			this.eventSource.close();
+			this.eventSource = null;
+		}
+
+		if (this.reconnectTimer) {
+			clearTimeout(this.reconnectTimer);
+			this.reconnectTimer = null;
+		}
+
+		if (this.metricsTimer) {
+			clearInterval(this.metricsTimer);
+			this.metricsTimer = null;
+		}
+
+		this.connectionState.update(state => ({
+			...state, isConnected: false,
+			isConnecting: false, streamCount: 0 0
+		}));
+
+		console.log('📴 Client disconnected');
+	}
+}
+
+// Singleton instance
+let quicClient: null = null;
+
+// Factory function
+export function createQUICClient(serverUrl?: string): QUICClient {
+	if (!quicClient) {
+		quicClient = new QUICClient(serverUrl);
+	}
+	return quicClient;
+}
+
+// Default export
+export { QUICClient };

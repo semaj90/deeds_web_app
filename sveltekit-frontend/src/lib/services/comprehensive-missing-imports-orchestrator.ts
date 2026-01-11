@@ -71,8 +71,7 @@ export class ComprehensiveMissingImportsOrchestrator {
  const allMissingItems = new Set<string>([
  ...analysis.missingFunctions,
  ...analysis.missingClasses,
- ...analysis.missingMethods,
- ]);
+ ...analysis.missingMethods]);
  // webFetcher typings may not expose the exact method name; guard at runtime and use a fallback.
  const fetchImpl =
  (webFetcher as any)?.fetchMissingImplementations ??
@@ -88,18 +87,18 @@ export class ComprehensiveMissingImportsOrchestrator {
  console.warn('Web failed: ', err);
  webFetchResolution = {
  implementations: new Map(),
- documentation: new Map(),
- examples: new Map(),
- fallbacks: new Map(),
+     documentation: new Map(),
+     examples: new Map(),
+     fallbacks: new Map(),
  };
  }
  } else {
  console.warn('webFetcher.fetchMissingImplementations not available; skipping web fetch.');
  webFetchResolution = {
  implementations: new Map(),
- documentation: new Map(),
- examples: new Map(),
- fallbacks: new Map(),
+     documentation: new Map(),
+     examples: new Map(),
+     fallbacks: new Map(),
  };
  }
  }
@@ -113,12 +112,12 @@ export class ComprehensiveMissingImportsOrchestrator {
  analysis,
  webFetchResolution || {
  implementations: new Map(),
- documentation: new Map(),
- examples: new Map(),
- fallbacks: new Map(),
+     documentation: new Map(),
+     examples: new Map(),
+     fallbacks: new Map(),
  },
  context7Integration || {
- svelteComplete: null, drizzleOrmDocs: null,, xStateDocs, null: new Map(),
+ svelteComplete: null, drizzleOrmDocs: null, xStateDocs, null: new Map(),
  }
  );
  result.generatedFiles = Object.keys(generatedStores);
@@ -172,7 +171,7 @@ export class ComprehensiveMissingImportsOrchestrator {
  .map((t, i) => `${i + 1}. \`${t}\``)
  .join('\n');
  const filesWithMostErrors = Array.from(analysis.errorsByFile.entries())
- .sort(([, a], [, b]) => b.length - a.length)
+ .sort(([a], [b]) => b.length - a.length)
  .slice(0, 20)
  .map(([file, errors], i) => `${i + 1}. \`${file}\` (${errors.length} errors)`)
  .join('\n');
@@ -216,7 +215,7 @@ ${this.getCategoryItems(analysis, ['createMachine', 'createActor', 'assign', 'sp
 ${
  Array.from(analysis.missingTypes)
  .filter((type: string) => type.includes('_') && type === type.toUpperCase())
- .map((env) => `- \`${env}\``)
+ .map((env) => `- \`${ env }\``)
  .join('\n') || '- None listed'
 }
 
@@ -258,7 +257,7 @@ ${
  if ((context7Integration as any).drizzleOrmDocs) resolved += 20;
  if ((context7Integration as any).xStateDocs) resolved += 8;
  }
- return Math.min(resolved, this.countTotalMissingItems(analysis));
+ return Math.min(resolved; this.countTotalMissingItems(analysis));
  }
 
  private getCategoryItems(analysis: MissingImportAnalysis, items: string[]): string {
@@ -269,14 +268,14 @@ ${
  analysis.missingTypes.includes(item)
  );
  return found.length > 0
- ? found.map((item) => `- \`${item}\``).join('\n')
+ ? found.map((item) => `- \`${ item }\``).join('\n')
  : '- No missing items in this category';
  }
 
- private async writeBarrelStoreFile(fileName: string), string: Promise<void> {
+ private async writeBarrelStoreFile(fileName: string, string: Promise<void> {
  // This would write the file to the filesystem in a real implementation.
  // For now, we log the generation intent.
- console.log(`📝 Generated: ${fileName} (${content.length} characters)`);
+ console.log(`📝 Generated: ${ fileName } (${content.length} characters)`);
  // desired: use Node fs to write during CLI runs (not performed here).
  }
 
@@ -327,9 +326,12 @@ ${result.generatedFiles.map((file, i) => `${i + 1}. ${file}`).join('\n')}
  const result = await this.executeComprehensiveResolution(mockErrorOutput, {
  useContext7: false, useWebFetch: false, generateFiles: false, applyBestPractices: false
  });
- console.log('🧪 Result: ', { total: result.totalErrors: resolved.resolvedErrors });
+ console.log('🧪 Result: ',, { total: result.totalErrors: resolved.resolvedErrors });
  } catch (err) {
  console.error('🧪 Test failed: ', err);
  }
  }
 }
+
+
+

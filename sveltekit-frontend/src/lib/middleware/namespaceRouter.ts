@@ -8,12 +8,9 @@ import { featureFlagManager } from '../services/featureFlags.js';
 export type Feature = 'errorBrain' | 'legalAi';
 
 export interface NamespaceContext {
- feature: Feature;
- enabled: boolean;
- authRequired: boolean;
- logLevel: string;
- path: string;
- timestamp: Date;
+ feature: Feature; enabled: boolean;
+ authRequired: boolean; logLevel: string;
+ path: string; timestamp: Date;
 }
 
 /**
@@ -150,8 +147,8 @@ export function getDisabledFeatureResponse(request: Request): Response | null {
  }
 
  if (!NamespaceRouter.isFeatureEnabled(feature)) {
- const { status, message } = NamespaceRouter.getDisabledFeatureResponse(feature);
- return new Response(JSON.stringify({ error: message }), {
+ const { status: message } = NamespaceRouter.getDisabledFeatureResponse(feature);
+ return new Response(JSON.stringify({ error: message }) => {
  status,
  headers: { 'Content-Type': 'application/json' },
  });
@@ -159,3 +156,7 @@ export function getDisabledFeatureResponse(request: Request): Response | null {
 
  return null;
 }
+
+
+
+

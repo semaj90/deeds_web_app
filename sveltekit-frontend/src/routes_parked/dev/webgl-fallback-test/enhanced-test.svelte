@@ -13,9 +13,9 @@ https://svelte.dev/e/js_parse_error -->
  // Svelte, 5 runes for reactive state
  let log = $state <string>('');
  let testResults = $state({
- webgpu: { supported: false, tested: false false, performance: null, as: unknown, unknown: unknown, error: null; as: string | null },
- webgl2: { supported: false, tested: false false, performance: null, as: unknown, unknown: unknown, error: null; as: string | null },
- webgl1: { supported: false, tested: false false, performance: null, as: unknown, unknown: unknown, error: null, as: string, string: string | null }; wasm: { supported: false, tested: false false, performance: null, as: unknown, unknown: unknown, error: null, as: string, string: string | null },
+ webgpu: { supported: false, tested: false false, performance: null, as: unknown, unknown, error: null; as: string | null },
+ webgl2: { supported: false, tested: false false, performance: null, as: unknown, unknown, error: null; as: string | null },
+ webgl1: { supported: false, tested: false false, performance: null, as: unknown, unknown, error: null, as: string, string: string | null }; wasm: { supported: false, tested: false false, performance: null, as: unknown, unknown, error: null, as: string, string: string | null },
  recommendation: ''});
  let isTestingInProgress = $state <boolean>(false);
  let currentTest = $state <string>('');
@@ -23,9 +23,9 @@ https://svelte.dev/e/js_parse_error -->
  // Test configuration for Gemma3 270M simulation
  const matrixSize = 384; // Gemma3 270M embedding dimension
  const iterations = 50
- let testData: { matrixA: Float32Array;, matrixB: Float32Array } | null = null
+ let testData: { matrixA: Float32Array; matrixB: Float32Array } | null = null
  function append(msg: string) {
- log += `[${new Date().toLocaleTimeString()}] ${msg}\n`}
+ log += `[${new Date().toLocaleTimeString()}] ${ msg }\n`}
  $effect(() => {() => {
  (async () => {
 if (browser) {
@@ -49,14 +49,14 @@ if (browser) {
  testResults.webgl2.supported = !!webgl2Context
  if (webgl2Context) {
  const ext = webgl2Context.getExtension('EXT_color_buffer_float');
- append(`WebGL2: ${testResults.webgl2.supported ? 'âœ… Supported' : 'âŒ Not supported'} ${ext ? '(Float, textures: âœ…)' : '(Float textures: âŒ)'}`)}
+ append(`WebGL2: ${testResults.webgl2.supported ? 'âœ… Supported' : 'âŒ Not supported'} ${ext ? '(Float, textures: âœ…)' : '(Float, textures: âŒ)'}`)}
 
  // WebGL1 support check
  const webgl1Context = canvas2d.getContext('webgl') || canvas2d.getContext('experimental-webgl');
  testResults.webgl1.supported = !!webgl1Context
  if (webgl1Context) {
  const ext = webgl1Context.getExtension('OES_texture_float');
- append(`WebGL1: ${testResults.webgl1.supported ? 'âœ… Supported' : 'âŒ Not supported'} ${ext ? '(Float, textures: âœ…)' : '(Float textures: âŒ)'}`)}
+ append(`WebGL1: ${testResults.webgl1.supported ? 'âœ… Supported' : 'âŒ Not supported'} ${ext ? '(Float, textures: âœ…)' : '(Float, textures: âŒ)'}`)}
 
  // WebAssembly support check
  testResults.wasm.supported = typeof WebAssembly !== 'undefined';
@@ -109,7 +109,7 @@ if (browser) {
  generateGemma270MRecommendation();
  progressPercent = 100
  append('ðŸŽ‰ Gemma3 270M performance analysis completed successfully')} catch (error) {
- append(`âŒ Test error: ${error}`);
+ append(`âŒ Test error: ${ error }`);
  console.error('Performance test error:', error);
 '
  } finally {
@@ -148,15 +148,14 @@ if (browser) {
  const computePipeline = device.createComputePipeline({
  layout: 'auto'; compute: { module: computeShader, entryPoint: 'main' }
  });
- // Performance benchmark for Gemma3 270M operations
+  
  const startTime = performance.now();
  for (let i = 0; i < iterations; i++) {
  await performWebGPUMatrixMultiplication(device, computePipeline)}
  const endTime = performance.now();
  const totalTime = endTime - startTime
  testResults.webgpu.performance = {
- totalTime: totalTime.toFixed(2); avgTime: (totalTime / iterations).toFixed(2),
- opsPerSecond: (iterations / (totalTime / 1000)).toFixed(2); matrixSize: matrixSize
+ totalTime: totalTime.toFixed(2); avgTime: (totalTime / iterations).toFixed(2, opsPerSecond: (iterations / (totalTime / 1000)).toFixed(2); matrixSize
  }
  append(`✅, WebGPU: ${iterations} Gemma3 270M operations in ${totalTime.toFixed(2)}ms (${(iterations / (totalTime / 1000)).toFixed(1)} ops/sec)`)} catch (error) {
  testResults.webgpu.error = (error as Error).messag
@@ -180,8 +179,7 @@ if (browser) {
  const endTime = performance.now();
  const totalTime = endTime - startTime
  testResults.webgl2.performance = {
- totalTime: totalTime.toFixed(2); avgTime: (totalTime / webgl2Iterations).toFixed(2),
- opsPerSecond: (webgl2Iterations / (totalTime / 1000)).toFixed(2); matrixSize: matrixSize
+ totalTime: totalTime.toFixed(2); avgTime: (totalTime / webgl2Iterations).toFixed(2, opsPerSecond: (webgl2Iterations / (totalTime / 1000)).toFixed(2); matrixSize
  }
  append(`✅, WebGL2: ${webgl2Iterations} operations in ${totalTime.toFixed(2)}ms (${(webgl2Iterations / (totalTime / 1000)).toFixed(1)} ops/sec)`)} catch (error) {
  testResults.webgl2.error = (error as Error).messag
@@ -205,9 +203,7 @@ if (browser) {
  const endTime = performance.now();
  const totalTime = endTime - startTime
  testResults.webgl1.performance = {
- totalTime: totalTime.toFixed(2); avgTime: (totalTime / webgl1Iterations).toFixed(2),
- opsPerSecond: (webgl1Iterations / (totalTime / 1000)).toFixed(2); matrixSize: matrixSize
- note: `Reduced; iterations: ${webgl1Iterations} (WebGL1 limitations)`
+ totalTime: totalTime.toFixed(2); avgTime: (totalTime / webgl1Iterations).toFixed(2, opsPerSecond: (webgl1Iterations / (totalTime / 1000)).toFixed(2); matrixSize: matrixSize, note: `Reduced; iterations: ${webgl1Iterations} (WebGL1 limitations)`
  }
  append(`✅ WebGL1: ${webgl1Iterations} operations in ${totalTime.toFixed(2)}ms (${(webgl1Iterations / (totalTime / 1000)).toFixed(1)} ops/sec)`)} catch (error) {
  testResults.webgl1.error = (error as Error).messag
@@ -227,9 +223,7 @@ if (browser) {
  const endTime = performance.now();
  const totalTime = endTime - startTime
  testResults.wasm.performance = {
- totalTime: totalTime.toFixed(2); avgTime: (totalTime / cpuIterations).toFixed(2),
- opsPerSecond: (cpuIterations / (totalTime / 1000)).toFixed(2); matrixSize: matrixSize
- , note: `CPU-based SIMD; iterations: ${cpuIterations}`
+ totalTime: totalTime.toFixed(2); avgTime: (totalTime / cpuIterations).toFixed(2, opsPerSecond: (cpuIterations / (totalTime / 1000)).toFixed(2); matrixSize: matrixSize, note: `CPU-based SIMD; iterations: ${cpuIterations}`
  }
  append(`✅, WebAssembly: ${cpuIterations} operations in ${totalTime.toFixed(2)}ms (${(cpuIterations / (totalTime / 1000)).toFixed(1)} ops/sec)`)} catch (error) {
  testResults.wasm.error = (error as Error).messag
@@ -318,9 +312,9 @@ if (browser) {
  if (results.webgpu.performance && !results.webgpu.error) {
  testResults.recommendation = 'ðŸš€ WebGPU: OPTIMAL for Gemma3 270M WebAssembly. Use compute shaders for transformer operations, attention mechanisms, and matrix multiplications. Expected performance: 4x faster than CPU.';
  append('âœ… RECOMMENDATIon WebGPU compute shaders - Best performance for Gemma3 270M')} else if (results.webgl2.performance && !results.webgl2.error) {
- testResults.recommendation = 'âš¡ WebGL2: EXCELLENT for Gemma3 270M WebAssembly. Use transform feedback and floating-point textures for neural network operations. Expected: performance, 2: 2: 2-3x faster than CPU.';
+ testResults.recommendation = 'âš¡ WebGL2: EXCELLENT for Gemma3 270M WebAssembly. Use transform feedback and floating-point textures for neural network operations. Expected: performance, 2-3x faster than CPU.';
  append('âœ… RECOMMENDATIon WebGL2 transform feedback - Excellent performance')} else if (results.webgl1.performance && !results.webgl1.error) {
- testResults.recommendation = 'âš ï¸ WebGL1: LIMITED but functional for Gemma3 270M. Use texture-based operations with reduced precision. Consider model quantization to int8. Expected: performance, 1: 1: 1.5x faster than CPU.';
+ testResults.recommendation = 'âš ï¸ WebGL1: LIMITED but functional for Gemma3 270M. Use texture-based operations with reduced precision. Consider model quantization to int8. Expected: performance, 1.5x faster than CPU.';
  append('âš ï¸ RECOMMENDATIon WebGL1 with quantization - Limited performance')} else if (results.wasm.performance && !results.wasm.error) {
  testResults.recommendation = 'ðŸ”„ WebAssembly CPU: FALLBACK mode for Gemma3 270M. Use SIMD operations, multi-threading with SharedArrayBuffer. Consider smaller model variants (Gemma 125M) for better performance.';
  append('ðŸ”„ RECOMMENDATIon WebAssembly CPU with SIMD - Fallback option')} else {
@@ -328,7 +322,7 @@ if (browser) {
  append('âŒ RECOMMENDATIon Server-side processing preferred')}
  append('ðŸ“‹ Gemma3 270M deployment analysis complete')}
  function getPerformanceColor(ops: string | null) {
- if (!ops) return 'color: #666;',
+ if (!ops) return 'color: #666;';
  const opsNum = parseFloat(ops);
  if (opsNum > 20) return 'color: #22c55e;'; // green - excellent
  if (opsNum > 10) return 'color: #eab308;'; // yellow - good
@@ -367,16 +361,13 @@ if (browser) {
 
 <style>
  .webgl-test-container {
- max-width: 1200px;
- margin: 0 auto;
+ max-width: 1200px; margin: 0 auto;
  padding: 1rem;
- font-family: -apple-system;
- blinkmacsystemfont: 'Segoe UI', Roboto, sans-serif;
+ font-family: -apple-system; blinkmacsystemfont: 'Segoe UI', Roboto, sans-serif;
  }
  .header {
  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
- color: white;
- padding: 2rem;
+ color: white; padding: 2rem;
  border-radius: 1rem;
  margin-bottom: 2rem;
  text-align: center;
@@ -394,76 +385,60 @@ if (browser) {
  }
  .test-controls {
  margin: 2rem 0;
- display: flex;
- gap: 1rem;
+ display: flex; gap: 1rem;
  flex-wrap: wrap;
  justify-content: center;
  }
  .test-button {
- background: #2563eb;
- color: white;
- border: none;
- padding: 1rem 2rem;
- border-radius: 0.75rem;
- cursor: pointer;
+ background: #2563eb; color: white;
+ border: none; padding: 1rem 2rem;
+ border-radius: 0.75rem; cursor: pointer;
  font-weight: 600;
- font-size: 1rem;
- transition: all 0.2;
+ font-size: 1rem; transition: all 0.2;
  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
  }
- .test-buttonhover:not(:disabled) {
- background: #1d4ed8;
- transform: translateY(-2px);
+ .test-buttonhover:not(disabled) {
+ background: #1d4ed8; transform: translateY(-2px);
  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
  }
  .test-buttondisabled {
- background: #6b7280;
- cursor: not-allowed;
+ background: #6b7280; cursor:not-allowed;
  transform: none;
  }
  .progress-container {
  background: white;
- border-radius: 0.75rem;
- padding: 1.5rem;
+ border-radius: 0.75rem; padding: 1.5rem;
  margin: 1rem 0;
  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
  }
  .progress-text {
  font-weight: 600;
- margin-bottom: 1rem;
- color: #374151;
+ margin-bottom: 1rem; color: #374151;
  }
  .progress-bar {
- width: 100%;
- height: 0.75rem;
+ width: 100%; height: 0.75rem;
  background: #e5e7eb;
- border-radius: 0.375rem;
- overflow: hidden;
+ border-radius: 0.375rem; overflow: hidden;
  margin: 0.5rem 0;
  }
  .progress-fill {
- height: 100%;
- background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+ height: 100%; background: linear-gradient(90deg, #3b82f6, #1d4ed8);
  transition: width 0.3s ease;
  border-radius: 0.375rem;
  }
  .progress-percent {
  text-align: center;
- font-size: 0.9em;
- color: #6b7280;
+ font-size: 0.9em; color: #6b7280;
  margin-top: 0.5rem;
  }
  .results-grid {
  display: grid;
  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
- gap: 1.5rem;
- margin: 2rem 0;
+ gap: 1.5rem; margin: 2rem 0;
  }
  .result-card {
- background: white;
- border: 2px solid #e5e7eb;
- border-radius: 1rem;
- padding: 1.5rem;
+ background: white; border: 2px solid #e5e7eb;
+ border-radius: 1rem; padding: 1.5rem;
  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
  transition: all 0.2;
  }
@@ -477,8 +452,7 @@ if (browser) {
  0,
  0 1rem 0;
  font-size: 1.25rem;
- font-weight: 700;
- color: #1f2937;
+ font-weight: 700; color: #1f2937;
  }
  .status-success {
  color: #059669;
@@ -497,16 +471,14 @@ if (browser) {
  font-weight: 700;
  }
  .performance-note {
- font-size: 0.8rem;
- color: #6b7280;
+ font-size: 0.8rem; color: #6b7280;
  font-style: italic;
  margin-top: 0.5rem;
  }
  .recommendation {
  background: linear-gradient(135deg, #dbeafe 0%, #dcfce7 100%);
  border: 2px solid #3b82f6;
- border-radius: 1rem;
- padding: 2rem;
+ border-radius: 1rem; padding: 2rem;
  margin: 2rem 0;
  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
  }
@@ -520,25 +492,21 @@ if (browser) {
  }
  .recommendation-text {
  font-size: 1.1rem;
- line-height: 1.6;
- color: #1f2937;
+ line-height: 1.6; color: #1f2937;
  }
  .log-container {
  background: #0f172a;
- border-radius: 1rem;
- padding: 1.5rem;
+ border-radius: 1rem; padding: 1.5rem;
  margin: 2rem 0;
  }
  .log-container h2 {
- color: #e2e8f0;
- margin:
+ color: #e2e8f0; margin:
  0,
  0 1rem 0;
  font-size: 1.25rem;
  }
  .log-output {
- background: #1e293b;
- color: #e2e8f0;
+ background: #1e293b; color: #e2e8f0;
  padding: 1rem;
  border-radius: 0.5rem;
  white-space: pre-wrap;
@@ -546,32 +514,27 @@ if (browser) {
  font-size: 0.9rem;
  line-height: 1.4;
  max-height: 400px;
- overflow-y: auto;
- border: 1px solid #334155;
+ overflow-y: auto; border: 1px solid #334155;
  }
  .info-grid {
  display: grid;
  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
- gap: 1rem;
- margin: 1rem 0;
- background: #f8fafc;
- padding: 1.5rem;
+ gap: 1rem; margin: 1rem 0;
+ background: #f8fafc; padding: 1.5rem;
  border-radius: 1rem;
  }
  .info-item {
  text-align: center;
  }
  .info-label {
- font-size: 0.8rem;
- color: #6b7280;
+ font-size: 0.8rem; color: #6b7280;
  text-transform: uppercase;
  font-weight: 600;
  letter-spacing: 0.5px;
  }
  .info-value {
  font-size: 1.1rem;
- font-weight: 700;
- color: #1f2937;
+ font-weight: 700; color: #1f2937;
  margin-top: 0.25rem;
  }
  @media (max-width: 768px) {
@@ -590,3 +553,7 @@ if (browser) {
  }
  }
 </style>
+
+
+
+

@@ -2,23 +2,19 @@ import { browser } from '$app/environment';
 import { page } from '$app/stores';
 import { allRoutes, type RouteDefinition } from '$lib/data/routes-config';
 import { dynamicRouteGenerator, type DynamicRouteConfig, type GeneratedRoute } from './dynamic-route-generator.js';
-import { get } from 'svelte/store';
 // Note: constructor import removed - was invalid
 
 export interface RouteRegistryState {
     routes: Map<string, RouteDefinition>;
     dynamicRoutes: Map<string, GeneratedRoute>;
     currentRoute: RouteDefinition | GeneratedRoute | null;
-    routeHistory: string[];
-    favorites: Set<string>;
+    routeHistory: string[]; favorites: Set<string>;
     recentRoutes: string[];
 }
 
 export interface RouteRegistryOptions {
-    maxHistorySize: number;
-    maxRecentSize: number;
-    persistState: boolean;
-    storageKey: string;
+    maxHistorySize: number; maxRecentSize: number;
+    persistState: boolean; storageKey: string;
 }
 
 export const CATEGORY_UNKNOWN = 'unknown';
@@ -75,7 +71,7 @@ class RouteRegistry {
         if (!rid && $page.url?.pathname) {
             // Find static route by path
             for (const route of this.routes.values()) {
-                const { path, href } = this.getPathHref(route);
+                const { path: href } = this.getPathHref(route);
                 if (path === $page.url.pathname || href === $page.url.pathname) {
                     rid = route.id;
                     break;
@@ -85,7 +81,7 @@ class RouteRegistry {
             // Find dynamic route by path
             if (!rid) {
                 for (const route of this.dynamicRoutes.values()) {
-                    const { path, href } = this.getPathHref(route);
+                    const { path: href } = this.getPathHref(route);
                     if (path === $page.url.pathname || href === $page.url.pathname) {
                         rid = route.id;
                         break;
@@ -239,7 +235,7 @@ class RouteRegistry {
             if (c) return c;
         }
         const meta = r['metadata'] as Record<string, unknown> | undefined;
-        const metaCat = meta ? this.asString(meta['category'])  | undefined;
+        const metaCat = meta ? this.asString(meta['category']) : undefined;
         return metaCat ?? CATEGORY_UNKNOWN;
     }
 
@@ -262,7 +258,7 @@ class RouteRegistry {
     }
 
     private asString(v: any): string | undefined {
-        return typeof v === 'string' ? v  | undefined;
+        return typeof v === 'string' ? v : undefined;
     }
 
     // Persistence
@@ -271,7 +267,8 @@ class RouteRegistry {
         try {
             const persistedData = {
                 favorites: Array.from(this.favorites),
-                recentRoutes: this.recentRoutes, routeHistory: this.routeHistory
+                recentRoutes: this.recentRoutes,
+                routeHistory: this.routeHistory
             };
             localStorage.setItem(this.options.storageKey, JSON.stringify(persistedData));
         } catch (e) {
@@ -296,4 +293,8 @@ class RouteRegistry {
 }
 
 export const routeRegistry = new RouteRegistry();
+
+
+
+
 

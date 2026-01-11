@@ -27,12 +27,9 @@ interface CouchDBDoc {
 }
 
 interface ViewResult<T> {
-  total_rows: number;
-  offset: number;
-  rows: Array<{
-    id: string;
-    key: unknown;
-    value: T;
+  total_rows: number; offset: number;
+  rows: Array<{ id: string;
+    key: unknown; value: T;
     doc?: T;
   }>;
 }
@@ -51,7 +48,7 @@ class CouchDBClient {
     path: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const response = await fetch(`${this.baseUrl}${path}`, {
+    const response = await fetch(`${this.baseUrl}${ path }`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
@@ -81,7 +78,7 @@ class CouchDBClient {
    */
   async createDatabase(name: string): Promise<boolean> {
     try {
-      await this.request(`/${name}`, { method: 'PUT' });
+      await this.request(`/${ name }`, { method: 'PUT' });
       return true;
     } catch (error: any) {
       if (error.message.includes('file_exists')) {
@@ -96,7 +93,7 @@ class CouchDBClient {
    */
   async get<T extends CouchDBDoc>(database: string, docId: string): Promise<T | null> {
     try {
-      return await this.request<T>(`/${database}/${encodeURIComponent(docId)}`);
+      return await this.request<T>(`/${ database }/${encodeURIComponent(docId)}`);
     } catch {
       return null;
     }
@@ -107,7 +104,7 @@ class CouchDBClient {
    */
   async put<T extends CouchDBDoc>(database: string, doc: T): Promise<CouchDBResponse> {
     const docId = doc._id || crypto.randomUUID();
-    return this.request(`/${database}/${encodeURIComponent(docId)}`, {
+    return this.request(`/${ database }/${encodeURIComponent(docId)}`, {
       method: 'PUT',
       body: JSON.stringify({ ...doc, _id: docId })
     });
@@ -117,7 +114,7 @@ class CouchDBClient {
    * Bulk insert documents
    */
   async bulkDocs<T extends CouchDBDoc>(database: string, docs: T[]): Promise<CouchDBResponse[]> {
-    return this.request<CouchDBResponse[]>(`/${database}/_bulk_docs`, {
+    return this.request<CouchDBResponse[]>(`/${ database }/_bulk_docs`, {
       method: 'POST',
       body: JSON.stringify({ docs })
     });
@@ -127,7 +124,7 @@ class CouchDBClient {
    * Delete document
    */
   async delete(database: string, docId: string, rev: string): Promise<CouchDBResponse> {
-    return this.request(`/${database}/${encodeURIComponent(docId)}?rev=${rev}`, {
+    return this.request(`/${database}/${encodeURIComponent(docId)}?rev=${ rev }`, {
       method: 'DELETE'
     });
   }
@@ -160,7 +157,7 @@ class CouchDBClient {
     }
 
     const query = params.toString() ? `?${params.toString()}` : '';
-    return this.request<ViewResult<T>>(`/${database}/_design/${designDoc}/_view/${viewName}${query}`);
+    return this.request<ViewResult<T>>(`/${database}/_design/${designDoc}/_view/${ viewName }${query}`);
   }
 
   /**
@@ -172,7 +169,7 @@ class CouchDBClient {
     views: Record<string, { map: string; reduce?: string }>
   ): Promise<CouchDBResponse> {
     const designDoc = {
-      _id: `_design/${designName}`,
+      _id: `_design/${ designName }`,
       views
     };
 
@@ -212,12 +209,9 @@ class CouchDBClient {
   /**
    * Get database info
    */
-  async info(database: string): Promise<{
-    db_name: string;
-    doc_count: number;
-    doc_del_count: number;
-    update_seq: string;
-    disk_size: number;
+  async info(database: string): Promise<{ db_name: string;
+    doc_count: number; doc_del_count: number;
+    update_seq: string; disk_size: number;
   }> {
     return this.request(`/${database}`);
   }
@@ -228,10 +222,8 @@ export const couchdb = new CouchDBClient();
 
 // Convenience functions for ACE databases
 export const aceGraphs = {
-  async storeASTNode(node: {
-    file_path: string;
-    language: string;
-    node_type: string;
+  async storeASTNode(node: { file_path: string;
+    language: string; node_type: string;
     name: string;
     children?: unknown[];
     imports?: string[];
@@ -247,10 +239,8 @@ export const aceGraphs = {
     return couchdb.put('codebase_graph', doc);
   },
 
-  async storeFileGraph(graph: {
-    file_path: string;
-    imports: string[];
-    exports: string[];
+  async storeFileGraph(graph: { file_path: string;
+    imports: string[]; exports: string[];
     dependencies: string[];
   }) {
     const doc = {
@@ -262,14 +252,10 @@ export const aceGraphs = {
     return couchdb.put('codebase_graph', doc);
   },
 
-  async storeCluster(cluster: {
-    cluster_id: number;
-    collection: string;
-    size: number;
-    centroid_id: string;
-    summary: string;
-    tags: string[];
-    sample_ids: string[];
+  async storeCluster(cluster: { cluster_id: number;
+    collection: string; size: number;
+    centroid_id: string; summary: string;
+    tags: string[]; sample_ids: string[];
   }) {
     const doc = {
       _id: `cluster_${cluster.collection}_${cluster.cluster_id}`,
@@ -280,10 +266,8 @@ export const aceGraphs = {
     return couchdb.put('error_clusters', doc);
   },
 
-  async storeErrorRelation(relation: {
-    source_error: string;
-    target_error: string;
-    relation_type: 'caused_by' | 'similar_to' | 'fixed_by' | 'blocks';
+  async storeErrorRelation(relation: { source_error: string;
+    target_error: string; relation_type: 'caused_by' | 'similar_to' | 'fixed_by' | 'blocks';
     confidence: number;
     evidence?: string[];
   }) {
@@ -298,12 +282,9 @@ export const aceGraphs = {
 };
 
 export const aceLLM = {
-  async storeSummary(summary: {
-    source_type: 'cluster' | 'file' | 'component' | 'error_pattern';
-    source_id: string;
-    model: string;
-    summary_text: string;
-    tags: string[];
+  async storeSummary(summary: { source_type: 'cluster' | 'file' | 'component' | 'error_pattern';
+    source_id: string; model: string;
+    summary_text: string; tags: string[];
     confidence: number;
   }) {
     const doc = {
@@ -321,3 +302,7 @@ export const aceLLM = {
 };
 
 export { CouchDBClient };
+
+
+
+

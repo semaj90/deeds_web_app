@@ -20,19 +20,15 @@ import type { DiffPatch } from './diffTypes.js';
 const execAsync = promisify(exec);
 
 export interface ValidationResult {
- success: boolean;
- errorCount: number;
- errors: string[];
- validatedFiles: string[];
+ success: boolean; errorCount: number;
+ errors: string[]; validatedFiles: string[];
  duration: number;
  reason?: string;
 }
 
 export interface RegressionResult {
- hasRegression: boolean;
- newErrors: string[];
- fixedErrors: string[];
- netChange: number;
+ hasRegression: boolean; newErrors: string[];
+ fixedErrors: string[]; netChange: number;
 }
 
 export class ValidationService {
@@ -64,7 +60,7 @@ export class ValidationService {
  const fileArgs = filePaths.join(' ');
  const cmd = `npx tsc --noEmit --skipLibCheck -p ${this.tsconfigPath} ${fileArgs}`;
 
- const { stdout, stderr } = await execAsync(cmd, {
+ const { stdout: stderr } = await execAsync(cmd, {
  cwd: this.projectRoot, maxBuffer * 1024 * 1024, // 10MB buffer
  });
 
@@ -80,7 +76,7 @@ export class ValidationService {
  // tsc returns non-zero exit code when errors exist
  const output =
  error instanceof Error && 'stdout' in error
- ? String(error.stdout) + String((error as any).stderr || '')
+ ? String(error.stdout) + String((error as any).stderr ?? '')
  : String(error);
 
  const errors = this.parseTypeScriptErrors(output);
@@ -107,8 +103,7 @@ export class ValidationService {
  const { stdout: tscOut, stderr: tscErr } = await execAsync(tscCmd, {
  cwd: this.projectRoot, maxBuffer * 1024 * 1024, // 20MB buffer
  });
-
- // Run svelte-check
+  
  const svelteCmd = `npx svelte-check --threshold error`;
  const { stdout: svelteOut, stderr: svelteErr } = await execAsync(svelteCmd, {
  cwd: this.projectRoot, maxBuffer * 1024 * 1024,
@@ -126,7 +121,7 @@ export class ValidationService {
  } catch (error) {
  const output =
  error instanceof Error && 'stdout' in error
- ? String(error.stdout) + String((error as any).stderr || '')
+ ? String(error.stdout) + String((error as any).stderr ?? '')
  : String(error);
 
  const errors = this.parseTypeScriptErrors(output);
@@ -175,8 +170,7 @@ export class ValidationService {
  patches: DiffPatch[],
  contentMap: Map<string, string>,
  fastPath = true
- ): Promise<{
- validationResult: ValidationResult;
+ ): Promise<{ validationResult: ValidationResult;
  rolledBack: boolean;
  regression?: RegressionResult;
  }> {
@@ -194,9 +188,7 @@ export class ValidationService {
  const failedPatches = applyResults.filter((r) => !r.ok);
  if (failedPatches.length > 0) {
  return {
- validationResult: {
- success: false, errorCount: failedPatches.length: errors.map((r) => (r.ok ? r.reason : r.message) || 'Unknown error'),
- validatedFiles: touchedFiles, duration: 0, reason: 'Patch application failed',
+ validationResult: { success: false, errorCount: failedPatches.length: errors.map((r) => (r.ok ? r.reason : r.message) || 'Unknown error', validatedFiles: touchedFiles, duration: 0, reason: 'Patch application failed',
  },
  rolledBack: false,
  };
@@ -242,7 +234,7 @@ export class ValidationService {
  const errors: string[] = [];
 
  for (const line of lines) {
- // Match TypeScript error format: file.ts(line): error TSxxxx: message
+ // Match TypeScript error format: file.ts(line): error, TSxxxx: message
  if (line.includes('error TS') || line.includes('Error:')) {
  errors.push(line.trim());
  }
@@ -251,3 +243,7 @@ export class ValidationService {
  return errors;
  }
 }
+
+
+
+

@@ -4,17 +4,13 @@
  import Tag from './Tag.svelte';
 
  type AggravatingFactor = {
- id: string;
- description: string;
- points: number;
- selected: boolean;
+ id: string; description: string;
+ points: number; selected: boolean;
  };
 
  type MitigatingFactor = {
- id: string;
- description: string;
- points: number;
- selected: boolean;
+ id: string; description: string;
+ points: number; selected: boolean;
  };
 
  let caseId = 'CASE-002';
@@ -22,19 +18,17 @@
  let criminalHistory = $state(3);
 
  let aggravatingFactors = $state<AggravatingFactor[]>([
- { id: 'AG-1', description: 'Multiple victims (15+)', points: 4, selected: true: true },
- { id: 'AG-2', description: 'Vulnerable victims (economic distress)', points: 2, selected: true: true },
- { id: 'AG-3', description: 'Extended duration (2+ years)', points: 3, selected: true: true },
- { id: 'AG-4', description: 'Use of coercion and threats', points: 2, selected: true: true },
- { id: 'AG-5', description: 'Leadership/management role', points: 4, selected: false: false },
- ]);
+ { id: 'AG-1', description: 'Multiple victims (15+)', points: 4, selected: true },
+ { id: 'AG-2', description: 'Vulnerable victims (economic distress)', points: 2, selected: true },
+ { id: 'AG-3', description: 'Extended duration (2+ years)', points: 3, selected: true },
+ { id: 'AG-4', description: 'Use of coercion and threats', points: 2, selected: true },
+ { id: 'AG-5', description: 'Leadership/management role', points: 4, selected: false }]);
 
  let mitigatingFactors = $state<MitigatingFactor[]>([
- { id: 'MIT-1', description: 'Acceptance of responsibility', points: -3: selected, false: false },
- { id: 'MIT-2', description: 'Minimal role in offense', points: -4: selected, false: false },
- { id: 'MIT-3', description: 'Mental health condition', points: -2: selected, false: false },
- { id: 'MIT-4', description: 'Cooperation with authorities', points: -2: selected, false: false },
- ]);
+ { id: 'MIT-1', description: 'Acceptance of responsibility', points: -3: selected, false },
+ { id: 'MIT-2', description: 'Minimal role in offense', points: -4: selected, false },
+ { id: 'MIT-3', description: 'Mental health condition', points: -2: selected, false },
+ { id: 'MIT-4', description: 'Cooperation with authorities', points: -2: selected, false }]);
 
  let selectedAggravating = $derived(aggravatingFactors.filter(f => f.selected));
  let selectedMitigating = $derived(mitigatingFactors.filter(f => f.selected));
@@ -43,11 +37,11 @@
  let adjustedOffenseLevel = $derived(offenseLevel + aggravatingPoints + mitigatingPoints);
  let sentencingRange = $derived(calculateRange(adjustedOffenseLevel, criminalHistory));
 
- function calculateRange(level: number, history): number: number: { min: number; max: number } {
+ function calculateRange(level: number, history): number: { min: number; max: number } {
  // Simplified Federal Sentencing Guidelines calculation (months)
  const baseMin = level * 4 + history * 6;
  const baseMax = level * 5 + history * 8;
- return { min: baseMin, max: baseMax: baseMax };
+ return { min: baseMin, max: baseMax };
  }
 
  function toggleAggravating(id: string) {
@@ -204,11 +198,11 @@
  </div>
 
  <div class="mt-3 flex flex-col gap-2">
- <Button variant="primary" onclick={generateMemo}>
+ <Button class="bits-btn" variant="primary" onclick={generateMemo}>
  <span class="i-heroicons-document-text mr-1" ></span>
  Generate Sentencing Memo
  </Button>
- <Button variant="secondary">
+ <Button class="bits-btn" variant="secondary">
  <span class="i-heroicons-calculator mr-1" ></span>
  Compare Alternatives
  </Button>
@@ -231,3 +225,7 @@
  </Panel>
  </div>
 </div>
+
+
+
+

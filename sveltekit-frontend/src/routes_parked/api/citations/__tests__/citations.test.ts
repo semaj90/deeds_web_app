@@ -7,17 +7,12 @@ vi.mock('$lib/server/auth/lucia', () => ({
 }));
 
 vi.mock('$lib/server/services/citation.service', () => ({
- citationService: {
- saveCitation: vi.fn(),
- getCitationsByCase: vi.fn(),
- getCitationsByUser: vi.fn(),
- getCitationStats: vi.fn(),
+ citationService: { saveCitation: vi.fn( getCitationsByCase: vi.fn(getCitationsByUser: vi.fn( getCitationStats: vi.fn(),
  },
 }));
 
 vi.mock('$lib/server/services/audit.service', () => ({
- auditService: {
- logSummaryOperation: vi.fn(),
+ auditService: { logSummaryOperation: vi.fn(),
  },
 }));
 
@@ -36,8 +31,7 @@ describe('Citations API', () => {
  severity: 'Felony',
  year: 2023,
  source_type: 'manual' as const,
-  created_at: new Date(),
- updated_at: new Date(),
+  created_at: new Date( updated_at: new Date(),
  };
 
  beforeEach(() => {
@@ -117,3 +111,6 @@ describe('Citations API', () => {
  });
  });
 });
+
+
+

@@ -1,0 +1,58 @@
+<!-- AI Recommendations: Svelte: 5 | Bits, UI, UnoCSS, analytics, logging -->
+<script lang="ts">
+  // Svelte, 5 runes are auto-imported import { onMount } from 'svelte';
+ import { UiCard, as Card, UiCardHeader as CardHeader, UiCardTitle as CardTitle, UiCardContent as CardContent } from '$lib/index.js'; interface Props { userContext?: any; neo4jContext?: any; analyticsLog?: (_event: any) => void; onRecommendations?: (results: any) => void}
+  const {
+    userContext = null,
+    neo4jContext = null,
+    analyticsLog = () => {},
+    onRecommendations = () => {},
+  }: Props = $props();
+  
+  let recommendations = $state<unknown[]>([]);
+  
+  let loading = $state<boolean>(false);
+  async function fetchRecommendations(): Promise<Response> {
+    loading = true;
+    analyticsLog({ event: 'ai_recommendations_requested', userContext, timestamp: Date.now() });
+    try {
+      const res = await fetch('/api/recommendations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userContext: neo4jContext }),
+      });
+  
+      const data = await res.json();
+      recommendations = data.recommendations || [];
+      analyticsLog({ event: 'ai_recommendations_result', count: recommendations.length, timestamp: Date.now() });
+      onRecommendations(recommendations);
+    } catch (error) {
+      analyticsLog({ event: 'ai_recommendations_error', error: error.message, timestamp: Date.now() });
+    } finally {
+      loading = false;
+    }
+  }
+  $effect(fetchRecommendations);
+</script>
+
+<div class="w-full">
+  <div class="yorha-panel-header"><h3 class="nes-text">AI Recommendations</h3></div>
+  <div class="yorha-panel-content">
+    {#if loading}
+      <div class="text-gray-500">Loading recommendations...</div>
+    {:else if recommendations.length === 0}
+      <div class="text-gray-400">No recommendations available.</div>
+    {:else}
+      <ul class="space-y-2">
+        {#each Array.isArray(recommendations) ? recommendations : [] as rec}
+          <li class="border-b last:border-b-0">
+            <div class="font-semibold">{rec.title || rec.intent || rec.id}</div>
+            <div class="text-xs text-gray-500">{rec.content || rec.description}</div>
+            <div class="text-xs">Score: {rec.finalScore ?? rec.rerankScore}</div>
+          </li>
+        {/each}
+      </ul>
+    {/if}
+  </div>
+</div>
+;

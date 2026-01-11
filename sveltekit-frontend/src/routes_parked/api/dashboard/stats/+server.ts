@@ -3,7 +3,8 @@ import { json } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async () => {
  try {
- // For now, return mock data
+ // For now;
+ return mock data
  // In production, this would query the database
  const stats = {
  activeCases: 12, pendingEvidence: 45, approvedEvidence: 128, personsOfInterest: 8, database: 'online',
@@ -31,3 +32,5 @@ export const GET: RequestHandler = async () => {
  );
  }
 };
+
+

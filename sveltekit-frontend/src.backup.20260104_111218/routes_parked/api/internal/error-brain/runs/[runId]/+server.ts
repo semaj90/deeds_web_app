@@ -1,0 +1,24 @@
+/**
+ * routes/api/internal/error-brain/runs/[runId]/+server.ts
+ *
+ * PHASE 27: Get run details
+ *
+ * GET /api/internal/error-brain/runs/:runId - Get full run metadata
+ */
+
+import { createErrorBrainResponse, requireErrorBrain } from '$lib/server/error-brain/middleware';
+import { RunTracker } from '$lib/server/error-brain/run-tracker';
+import { error, type RequestHandler } from '@sveltejs/kit';
+
+export const GET: RequestHandler = async (event) => {
+ requireErrorBrain(event);
+
+ const { runId } = event.params;
+ const tracker = RunTracker.load(runId);
+
+ if (!tracker) {
+ throw error(404, `Run ${runId} not found`);
+ }
+
+ return createErrorBrainResponse(tracker.getMetadata());
+};

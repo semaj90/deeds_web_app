@@ -36,29 +36,21 @@ interface RedisClientExt {
 
 // Types
 interface GlyphData {
-  errorCode: string;
-  filePath: string;
-  line: number;
-  message: string;
-  clusterId: number;
-  tech: string[];
+  errorCode: string; filePath: string;
+  line: number; message: string;
+  clusterId: number; tech: string[];
 }
 
 interface SearchResult {
-  score: number;
-  message: string;
-  file: string;
-  code: string;
-  line: number;
-  clusterId: number;
+  score: number; message: string;
+  file: string; code: string;
+  line: number; clusterId: number;
   tech: string[];
 }
 
 interface ClusterInfo {
-  clusterId: number;
-  errorCount: number;
-  topCodes: string[];
-  topFiles: string[];
+  clusterId: number; errorCount: number;
+  topCodes: string[]; topFiles: string[];
   summary?: string;
 }
 
@@ -90,20 +82,16 @@ export const PHASE90_TOOLS = [
   {
     name: 'phase90_search_errors',
     description: 'Semantic search for TypeScript errors using CUDA embeddings. Returns top-k similar errors from the 73,313 indexed signatures.',
-    parameters: {
-      type: 'object',
-      properties: {
-        query: {
+    parameters: { type: 'object',
+      properties: { query: {
           type: 'string',
           description: 'Error message, pattern, or description to search for'
         },
-        topK: {
-          type: 'integer',
+        topK: { type: 'integer',
           default: 10,
           description: 'Number of results to return (1-100)'
         },
-        clusterId: {
-          type: 'integer',
+        clusterId: { type: 'integer',
           description: 'Optional: filter to specific cluster (0-11)'
         }
       },
@@ -113,10 +101,8 @@ export const PHASE90_TOOLS = [
   {
     name: 'phase90_get_cluster',
     description: 'Get detailed information about an error cluster including error count, top codes, top files, and LLM summary.',
-    parameters: {
-      type: 'object',
-      properties: {
-        clusterId: {
+    parameters: { type: 'object',
+      properties: { clusterId: {
           type: 'integer',
           description: 'Cluster ID (0-11)'
         }
@@ -127,27 +113,22 @@ export const PHASE90_TOOLS = [
   {
     name: 'phase90_get_fix_order',
     description: 'Get priority-ordered list of clusters to fix based on error count and dependencies.',
-    parameters: {
-      type: 'object',
+    parameters: { type: 'object',
       properties: {}
     }
   },
   {
     name: 'phase90_query_glyphs',
     description: 'Query Redis glyph cache for compact error signatures. Fast lookup by cluster or error code.',
-    parameters: {
-      type: 'object',
-      properties: {
-        clusterId: {
+    parameters: { type: 'object',
+      properties: { clusterId: {
           type: 'integer',
           description: 'Filter by cluster ID'
         },
-        errorCode: {
-          type: 'string',
+        errorCode: { type: 'string',
           description: 'Filter by error code (e.g., TS2345)'
         },
-        limit: {
-          type: 'integer',
+        limit: { type: 'integer',
           default: 50,
           description: 'Max results to return'
         }
@@ -157,23 +138,19 @@ export const PHASE90_TOOLS = [
   {
     name: 'phase90_get_stats',
     description: 'Get system statistics: Qdrant points, Redis keys, cluster counts.',
-    parameters: {
-      type: 'object',
+    parameters: { type: 'object',
       properties: {}
     }
   },
   {
     name: 'phase90_get_file_errors',
     description: 'Get all indexed errors for a specific file path.',
-    parameters: {
-      type: 'object',
-      properties: {
-        filePath: {
+    parameters: { type: 'object',
+      properties: { filePath: {
           type: 'string',
           description: 'File path (can be partial match)'
         },
-        limit: {
-          type: 'integer',
+        limit: { type: 'integer',
           default: 50
         }
       },
@@ -183,10 +160,8 @@ export const PHASE90_TOOLS = [
   {
     name: 'phase90_get_fix_recommendation',
     description: 'Get LLM-generated fix recommendation for a specific cluster.',
-    parameters: {
-      type: 'object',
-      properties: {
-        clusterId: {
+    parameters: { type: 'object',
+      properties: { clusterId: {
           type: 'integer',
           description: 'Cluster ID (0-11)'
         }
@@ -218,25 +193,24 @@ export async function phase90_search_errors(
     filter,
     with_payload: true
   });
-
-  // Filter by message content (basic text match as fallback)
+  
   const queryLower = query.toLowerCase();
   const filtered = results.points
     .filter(p => {
-      const msg = (p.payload?.message as string || '').toLowerCase();
-      const file = (p.payload?.filePath as string || '').toLowerCase();
+      const msg = (p.payload?.message as string ?? '').toLowerCase();
+      const file = (p.payload?.filePath as string ?? '').toLowerCase();
       return msg.includes(queryLower) || file.includes(queryLower);
     })
     .slice(0, topK);
 
   return filtered.map(p => ({
     score: 1.0,
-    message: p.payload?.message as string || '',
-    file: p.payload?.filePath as string || '',
-    code: p.payload?.errorCode as string || 'UNKNOWN',
-    line: p.payload?.line as number || 0,
-    clusterId: p.payload?.cluster_id as number || -1,
-    tech: p.payload?.tech as string[] || []
+    message: p.payload?.message as string ?? '',
+    file: p.payload?.filePath as string ?? '',
+    code: p.payload?.errorCode as string ?? 'UNKNOWN',
+    line: p.payload?.line as number ?? 0,
+    clusterId: p.payload?.cluster_id as number ?? -1,
+    tech: p.payload?.tech as string[] ?? []
   }));
 }
 
@@ -265,8 +239,8 @@ export async function phase90_get_cluster(clusterId: number): Promise<ClusterInf
     const files: Record<string, number> = {};
 
     for (const e of errors.points) {
-      const code = e.payload?.errorCode as string || 'UNKNOWN';
-      const file = e.payload?.filePath as string || '';
+      const code = e.payload?.errorCode as string ?? 'UNKNOWN';
+      const file = e.payload?.filePath as string ?? '';
       codes[code] = (codes[code] || 0) + 1;
       files[file] = (files[file] || 0) + 1;
     }
@@ -277,8 +251,7 @@ export async function phase90_get_cluster(clusterId: number): Promise<ClusterInf
       topCodes: Object.entries(codes)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5)
-        .map(([code]) => code),
-      topFiles: Object.entries(files)
+        .map(([code]) => code, topFiles: Object.entries(files)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5)
         .map(([file]) => file)
@@ -287,9 +260,9 @@ export async function phase90_get_cluster(clusterId: number): Promise<ClusterInf
 
   return {
     clusterId,
-    errorCount: cluster.payload?.error_count as number || 0,
-    topCodes: cluster.payload?.top_codes as string[] || [],
-    topFiles: cluster.payload?.top_files as string[] || [],
+    errorCount: cluster.payload?.error_count as number ?? 0,
+    topCodes: cluster.payload?.top_codes as string[] ?? [],
+    topFiles: cluster.payload?.top_files as string[] ?? [],
     summary: cluster.payload?.summary as string
   };
 }
@@ -304,9 +277,9 @@ export async function phase90_get_fix_order(): Promise<{ clusterId: number; erro
   });
 
   const clusters = results.points.map(p => ({
-    clusterId: p.payload?.cluster_id as number || 0,
-    errorCount: p.payload?.error_count as number || 0,
-    priority: (p.payload?.error_count as number || 0) * 10
+    clusterId: p.payload?.cluster_id as number ?? 0,
+    errorCount: p.payload?.error_count as number ?? 0,
+    priority: (p.payload?.error_count as number ?? 0) * 10
   }));
 
   // Sort by priority (error count)
@@ -342,7 +315,7 @@ export async function phase90_query_glyphs(
         glyphs.push({
           errorCode: parsed.errorCode || 'UNKNOWN',
           filePath: parsed.filePath || '',
-          line: parsed.line || 0,
+          line, parsed.line || 0,
           message: parsed.message || '',
           clusterId: parsed.cluster_id || -1,
           tech: parsed.tech || []
@@ -358,8 +331,7 @@ export async function phase90_query_glyphs(
   return glyphs;
 }
 
-export async function phase90_get_stats(): Promise<{
-  qdrant: { embeddings: number; clusters: number; recommendations: number };
+export async function phase90_get_stats(): Promise<{ qdrant: { embeddings: number; clusters: number; recommendations: number };
   redis: { totalKeys: number; glyphKeys: number; embedKeys: number };
 }> {
   const qdrantClient = await getQdrant();
@@ -381,9 +353,9 @@ export async function phase90_get_stats(): Promise<{
 
   return {
     qdrant: {
-      embeddings: embeddings.points_count || 0,
-      clusters: clusters.points_count || 0,
-      recommendations: recs.points_count || 0
+      embeddings, embeddings.points_count || 0,
+      clusters, clusters.points_count || 0,
+      recommendations, recs.points_count || 0
     },
     redis: {
       totalKeys,
@@ -409,26 +381,24 @@ export async function phase90_get_file_errors(
 
   const filtered = results.points
     .filter(p => {
-      const file = (p.payload?.filePath as string || '').toLowerCase().replace(/\\/g, '/');
+      const file = (p.payload?.filePath as string ?? '').toLowerCase().replace(/\\/g, '/');
       return file.includes(pathLower);
     })
     .slice(0, limit);
 
   return filtered.map(p => ({
     score: 1.0,
-    message: p.payload?.message as string || '',
-    file: p.payload?.filePath as string || '',
-    code: p.payload?.errorCode as string || 'UNKNOWN',
-    line: p.payload?.line as number || 0,
-    clusterId: p.payload?.cluster_id as number || -1,
-    tech: p.payload?.tech as string[] || []
+    message: p.payload?.message as string ?? '',
+    file: p.payload?.filePath as string ?? '',
+    code: p.payload?.errorCode as string ?? 'UNKNOWN',
+    line: p.payload?.line as number ?? 0,
+    clusterId: p.payload?.cluster_id as number ?? -1,
+    tech: p.payload?.tech as string[] ?? []
   }));
 }
 
-export async function phase90_get_fix_recommendation(clusterId: number): Promise<{
-  clusterId: number;
-  recommendation: string;
-  priority: string;
+export async function phase90_get_fix_recommendation(clusterId: number): Promise<{ clusterId: number;
+  recommendation: string; priority: string;
   affectedFiles: string[];
 } | null> {
   const client = await getQdrant();
@@ -444,9 +414,9 @@ export async function phase90_get_fix_recommendation(clusterId: number): Promise
 
   return {
     clusterId,
-    recommendation: rec.payload?.recommendation as string || rec.payload?.summary as string || '',
-    priority: rec.payload?.priority as string || 'medium',
-    affectedFiles: rec.payload?.affected_files as string[] || []
+    recommendation: rec.payload?.recommendation as string ?? rec.payload?.summary as string || '',
+    priority: rec.payload?.priority as string ?? 'medium',
+    affectedFiles: rec.payload?.affected_files as string[] ?? []
   };
 }
 
@@ -492,7 +462,7 @@ export async function executePhase90Tool(
       return phase90_get_fix_recommendation(params.clusterId as number);
 
     default:
-      throw new Error(`Unknown Phase 90 tool: ${toolName}`);
+      throw new Error(`Unknown Phase 90 tool: ${ toolName }`);
   }
 }
 
@@ -500,3 +470,7 @@ export async function executePhase90Tool(
 export function getPhase90ToolDefinitions() {
   return PHASE90_TOOLS;
 }
+
+
+
+

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { render, screen, fireEvent, waitFor } from '@testing-library/svelte';
 import LinkMetadataForm from '../LinkMetadataForm.svelte';
 
@@ -21,8 +21,7 @@ describe('LinkMetadataForm Component', () => {
  statute_code: '18 U.S.C. § 1001',
  link_type: 'CHARGED_UNDER',
  notes: 'Primary charge',
- created_at: new Date().toISOString(),
- updated_at: new Date().toISOString(),
+ created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
  };
 
  beforeEach(() => {
@@ -146,3 +145,6 @@ describe('LinkMetadataForm Component', () => {
  });
  });
 });
+
+
+

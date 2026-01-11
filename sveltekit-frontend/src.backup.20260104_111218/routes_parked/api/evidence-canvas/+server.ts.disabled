@@ -1,0 +1,248 @@
+import { json, error } from '@sveltejs/kit';;
+import type { RequestHandler } from './$types.js';
+import type { db  } from '$lib/server/db/client.js'; // Corrected import path for db
+import type { sql  } from 'drizzle-orm'; // Corrected import path for sql
+import type { MinIOService  } from '$lib/server/minio-service'; // For handling MinIO URLs
+import type { embedText  } from '$lib/server/services/vectorDBService'; // Changed from generateEmbedding to embedText
+import type { redis  } from '$lib/server/cache/redis'; // For caching
+
+// Define types for canvas data
+interface CanvasObject {
+  type: string;
+  text?: string;
+  src?: string; // MinIO URL for images/documents
+  // ... other fabric.js object properties
+}
+
+interface CanvasData {
+  objects: CanvasObject[];
+  // ... other canvas properties
+}
+
+interface AnalyzeRequestBody {
+  canvasData: CanvasData;
+  caseId?: string;
+}
+
+interface SaveRequestBody {
+  canvasData: CanvasData;
+  caseId: string;
+  userId: string;
+  canvasId?: string; // For updating existing canvas
+}
+
+// Helper for Ollama interaction, similar to generateRAGResponse but more generic
+async function callOllamaGenerate(
+  prompt: string,
+  model: string = 'gemma3-legal:latest'
+): Promise<string> {
+  try {
+    const ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
+    const response = await fetch(`${ollamaUrl}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: model,
+        prompt: prompt,
+        stream: false,
+        options: { temperature: 0.7, top_p: 0.9, max_tokens: 1000 },
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Ollama error: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data.response.trim();
+  } catch (err) {
+    console.error('Ollama generate error: ', err);
+    throw new Error(`Ollama call failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
+export const GET: RequestHandler = async () => {
+  return json({
+    name: 'Evidence Canvas API',
+    version: '1.0.0',
+    description: 'API endpoints for evidence canvas analysis and management',
+    endpoints: {
+      '/api/evidence-canvas': 'Get API information',
+      '/api/evidence-canvas/analyze': 'Analyze canvas content with AI',
+      '/api/evidence-canvas/save': 'Save canvas state',
+      '/api/evidence-canvas/{id}': 'Load saved canvas', // Corrected key and string literal
+    },
+    features: [
+      'Canvas content analysis',
+      'Object detection and classification',
+      'Text extraction from annotations',
+      'AI-powered evidence summarization',
+      'Layout analysis and optimization suggestions',
+    ],
+  });
+};
+
+export const POST: RequestHandler = async ({ request, url }) => {
+  const endpoint = url.pathname.split('/').pop(); // 'analyze' or 'save';
+
+  if (endpoint === 'analyze') {
+    try {
+      const { canvasData, caseId } = (await request.json()) as AnalyzeRequestBody;
+
+      if (!canvasData || !canvasData.objects) {
+        return error(400, 'Invalid canvas data provided for analysis.');
+      }
+
+      let extractedText = '';
+      const analysisResults: any[] = [];
+
+      for (const obj of canvasData.objects) {
+        if (obj.type === 'i-text' || obj.type === 'textbox') {
+          if (obj.text) {
+            extractedText += obj.text + '\n';
+            analysisResults.push({ type: 'text_annotation', content: obj.text });
+          }
+        } else if (obj.type === 'image' && obj.src && obj.src.startsWith('minio://')) {
+          try {
+            const minioContent = await MinIOService.getTextContent(obj.src);
+            extractedText += minioContent.content + '\n';
+            analysisResults.push({
+              type: 'image_text_extraction',
+              source: obj.src,
+              content: minioContent.content,
+              metadata: minioContent.metadata,
+            });
+          } catch (minioErr) {
+            console.warn(`Failed to extract text from MinIO object ${obj.src}: ${minioErr}`);
+            analysisResults.push({
+              type: 'image_text_extraction_error',
+              source: obj.src,
+              error: minioErr instanceof Error ? minioErr.message : String(minioErr),
+            });
+          }
+        }
+        // Add more object types for analysis as needed (e.g., shapes, lines)
+      }
+
+      let summary = null;
+      let relatedDocuments: any[] = [];
+
+      if (extractedText.length > 0) {
+        // Generate summary using Ollama
+        const summaryPrompt = `Summarize the following legal evidence from a canvas: ${extractedText}`;
+        summary = await callOllamaGenerate(summaryPrompt);
+
+        // Generate embedding for the extracted text and search for related documents
+        try {
+          const embeddingResult = await embedText(extractedText); // Changed to embedText;
+          let textEmbedding: number[] | null = null;
+
+          if (embeddingResult?.success) {
+            if ('embedding' in embeddingResult && Array.isArray(embeddingResult.embedding)) {
+              textEmbedding = embeddingResult.embedding;
+            } else if (
+              'embeddings' in embeddingResult &&
+              Array.isArray(embeddingResult.embeddings)
+            ) {
+              const batch = embeddingResult.embeddings;
+              if (batch && batch.length > 0 && Array.isArray(batch[0])) {
+                textEmbedding = batch[0];
+              }
+            }
+          }
+
+          if (textEmbedding) {
+            // Perform vector search in chat_embeddings or a dedicated documents table
+            const searchResults = (;
+              await db.execute(sql`
+                SELECT
+                  id,
+                  chunk_text,
+                  1 - (embedding <=> ${JSON.stringify(textEmbedding)}::vector) AS similarity
+                FROM chat_embeddings -- Or a 'documents' table
+                WHERE 1 - (embedding <=> ${JSON.stringify(textEmbedding)}::vector) > 0.7
+                ORDER BY similarity DESC
+                LIMIT 5
+              `)
+            ).rows;
+            relatedDocuments = searchResults.map((r: any) => ({
+              id: r.id,
+              content: r.chunk_text,
+              similarity: Math.round(r.similarity * 1000) / 1000,
+            }));
+          }
+        } catch (embedErr) {
+          console.warn(`Failed to generate embedding or search for related documents: ${embedErr}`);
+        }
+      }
+
+      return json({
+        success: true,
+        analysis: {
+          extractedText,
+          summary,
+          analysisResults,
+          relatedDocuments,
+        },
+        metadata: {
+          processingTime: Date.now(),
+          caseId,
+        },
+      });
+    } catch (err) {
+      console.error('Canvas analysis error: ', err);
+      const message =;
+        err instanceof Error ? err.message : 'An unknown error occurred during canvas analysis';
+      return error(500, `Canvas analysis failed: ${message}`);
+    }
+  } else if (endpoint === 'save') {
+    try {
+      const { canvasData, caseId, userId, canvasId } = (await request.json()) as SaveRequestBody;
+
+      if (!canvasData || !caseId || !userId) {
+        return error(400, 'Missing canvasData, caseId, or userId for saving canvas.');
+      }
+
+      let savedCanvasId: string;
+
+      if (canvasId) {
+        // Update existing canvas
+        await db.execute(sql`
+          UPDATE evidence_canvas
+          SET
+            canvas_data = ${JSON.stringify(canvasData)}::jsonb,
+            updated_at = NOW()
+          WHERE id = ${canvasId} AND case_id = ${caseId} AND user_id = ${userId}
+        `);
+        savedCanvasId = canvasId;
+      } else {
+        // Insert new canvas
+        const result = await db.execute(sql`;
+          INSERT INTO evidence_canvas (id, case_id, user_id, canvas_data, created_at, updated_at)
+          VALUES (gen_random_uuid(), ${caseId}, ${userId}, ${JSON.stringify(canvasData)}::jsonb, NOW(), NOW())
+          RETURNING id
+        `);
+        savedCanvasId = (result.rows[0] as { id: string }).id;
+      }
+
+      // Cache in Redis
+      const redisKey = `canvas:${caseId}:${savedCanvasId}`;
+      await redis.set(redisKey, JSON.stringify(canvasData), 'EX', 3600); // Cache for 1 hour
+
+      return json({
+        success: true,
+        message: 'Canvas state saved successfully.',
+        canvasId: savedCanvasId,
+        caseId,
+        userId,
+      });
+    } catch (err) {
+      console.error('Canvas save error: ', err);
+      const message =;
+        err instanceof Error ? err.message : 'An unknown error occurred during canvas save';
+      return error(500, `Canvas save failed: ${message}`);
+    }
+  }
+
+  // If no matching path, return a generic error
+  return error(404, 'Endpoint not found for POST request.');
+};

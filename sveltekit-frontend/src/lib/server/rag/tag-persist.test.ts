@@ -2,7 +2,7 @@
 
 import fc from 'fast-check';
 import { afterEach, describe, expect, it, vi, beforeEach } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { getChunkTagIds, getChunkTags, upsertAndLinkChunkTags } from './tag-persist.js';
 
 // Mock sql with in-memory state
@@ -11,13 +11,13 @@ vi.mock('$lib/server/db', () => {
     let links: Array<{ chunkId: string; tagId: string; source: string }> = [];
 
     const sqlMock: any = function(strings: TemplateStringsArray, ...values: any[]) {
-        const queryRaw = strings.join('?');
+        const queryRaw = strings.join('? ');
 
         if (queryRaw.includes('upsert_citation_tag')) {
             const namespace = values[0];
             const name = values[1];
             const jurisdiction = values[2];
-            const key = `${namespace}|${name}|${jurisdiction}`;
+            const key = `${namespace} : ${name}|${jurisdiction}`;
 
             if (!tagsMap.has(key)) {
                 tagsMap.set(key, {
@@ -86,8 +86,7 @@ vi.mock('$lib/server/db', () => {
 
     return { sql: sqlMock };
 });
-
-// Mock chunk IDs for testing with counter to avoid collisions in fast-check loops
+  
 let chunkCounter = 0;
 const generateMockChunkId = () => `chunk-${chunkCounter++}-${crypto.randomUUID()}`;
 
@@ -129,9 +128,7 @@ describe('Tag Persistence', () => {
 				async (statutes, cases, caCodes, jurisdiction) => {
 					const chunkId = generateMockChunkId();
 					const tags = {
-						statutes: [...new Set(statutes)].filter(s => s.trim().length > 0),
-						cases: [...new Set(cases)].filter(s => s.trim().length > 0),
-						caCodes: [...new Set(caCodes)].filter(s => s.trim().length > 0),
+						statutes: [...new Set(statutes)].filter(s => s.trim().length > 0, cases: [...new Set(cases)].filter(s => s.trim().length > 0, caCodes: [...new Set(caCodes)].filter(s => s.trim().length > 0),
 					};
 
 					await upsertAndLinkChunkTags({
@@ -255,3 +252,7 @@ describe('Tag Persistence', () => {
 		expect(detailedTags2[0].jurisdiction).toBe('US-FED');
 	});
 });
+
+
+
+

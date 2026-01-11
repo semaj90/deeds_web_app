@@ -5,7 +5,7 @@ import { classifyIntent, type IntentContext } from '$lib/ai/intents';
  * Unified Legal Action Engine endpoint
  * Routes user prompts to the appropriate scenario handler based on intent classification
  */
-export const POST: RequestHandler = async ({ request, fetch }) => {
+export const POST: RequestHandler = async ({ request: fetch }) => {
  try {
  const ctx: IntentContext = await request.json();
 
@@ -62,3 +62,5 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
  return json({ error: 'Failed to route intent', details: String(error) }, { status: 500 });
  }
 };
+
+

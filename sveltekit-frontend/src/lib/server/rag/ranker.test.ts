@@ -1,9 +1,9 @@
 // src/lib/server/rag/ranker.test.ts
 
 import { describe, it, expect, afterEach, beforeEach } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import fc from 'fast-check';
-import { rerankLegalAware, createQdrantFilter } from './ranker.js';
+import { rerankLegalAware: createQdrantFilter } from './ranker.js';
 import type { QdrantHit } from './qdrant.js';
 
 describe('Legal-Aware Ranker', () => {
@@ -26,11 +26,7 @@ describe('Legal-Aware Ranker', () => {
  fc.property(
  fc.array(
  fc.record({
- id: fc.string({ minLength: 1, maxLength: 50 }),
- score: fc.float({ min: Math.fround(0), max: Math.fround(1), noNaN: true }),
- payload: fc.record({
- tag_ids: fc.array(fc.string({ minLength: 1, maxLength: 20 }), { maxLength: 5 }),
- jurisdiction: fc.oneof(
+ id: fc.string({ minLength: 1, maxLength: 50 }, score: fc.float({ min: Math.fround(0, max: Math.fround(1, noNaN: true }, payload: fc.record({ tag_ids: fc.array(fc.string({ minLength: 1, maxLength: 20 }) => { maxLength: 5 }, jurisdiction: fc.oneof(
  fc.constant('CA'),
  fc.constant('US-FED'),
  fc.constant('Other'),
@@ -40,12 +36,10 @@ describe('Legal-Aware Ranker', () => {
  }),
  { minLength: 1, maxLength: 10 }
  ),
- fc.array(fc.string({ minLength: 1, maxLength: 20 }), { maxLength: 5 }),
+ fc.array(fc.string({ minLength: 1, maxLength: 20 }) => { maxLength: 5 }),
  fc.oneof(fc.constant('CA'), fc.constant('US-FED'), fc.constant('Other'), fc.constant(null)),
  fc.record({
- cosine: fc.float({ min: Math.fround(0), max: Math.fround(1), noNaN: true }),
- sharedTags: fc.float({ min: Math.fround(0), max: Math.fround(1), noNaN: true }),
- sameJurisdiction: fc.float({ min: Math.fround(0), max: Math.fround(1), noNaN: true }),
+ cosine: fc.float({ min: Math.fround(0, max: Math.fround(1, noNaN: true }, sharedTags: fc.float({ min: Math.fround(0, max: Math.fround(1, noNaN: true }, sameJurisdiction: fc.float({ min: Math.fround(0, max: Math.fround(1, noNaN: true }),
  }),
  (hits, queryTagIds, jurisdiction, weights) => {
  const ranked = rerankLegalAware({
@@ -54,8 +48,7 @@ describe('Legal-Aware Ranker', () => {
  jurisdiction,
  weights,
  });
-
- // Should return same number of results
+  
  expect(ranked.length).toBe(hits.length);
 
  // Each result should have explainability data
@@ -88,8 +81,7 @@ describe('Legal-Aware Ranker', () => {
  expect(Math.abs(explain.finalScore - expectedFinalScore)).toBeLessThan(0.0001);
  expect(Math.abs(result.finalScore - expectedFinalScore)).toBeLessThan(0.0001);
  });
-
- // Results should be sorted by final score (descending)
+  
  for (let i = 1; i < ranked.length; i++) {
  expect(ranked[i - 1].finalScore).toBeGreaterThanOrEqual(ranked[i].finalScore);
  }
@@ -110,11 +102,8 @@ describe('Legal-Aware Ranker', () => {
  fc.property(
  fc.array(
  fc.record({
- id: fc.string({ minLength: 1, maxLength: 50 }),
- score: fc.float({ min: Math.fround(0.1), max: Math.fround(0.9), noNaN: true }), // Avoid edge cases
- payload: fc.record({
- tag_ids: fc.array(fc.string(), { maxLength: 3 }),
- jurisdiction: fc.constantFrom('CA', 'US-FED', 'Other'),
+ id: fc.string({ minLength: 1, maxLength: 50 }, score: fc.float({ min: Math.fround(0.1, max: Math.fround(0.9, noNaN: true }), // Avoid edge cases
+ payload: fc.record({ tag_ids: fc.array(fc.string() => { maxLength: 3 }, jurisdiction: fc.constantFrom('CA', 'US-FED', 'Other'),
  }),
  }),
  { minLength: 2, maxLength: 5 }
@@ -127,8 +116,7 @@ describe('Legal-Aware Ranker', () => {
  jurisdiction: targetJurisdiction,
  weights: { cosine: 0.75, sharedTags: 0.15, sameJurisdiction: 0.1 },
  });
-
- // Find results with matching jurisdiction
+  
  const matchingJurisdiction = ranked.filter(
  (r) => r.payload?.jurisdiction === targetJurisdiction
  );
@@ -141,13 +129,11 @@ describe('Legal-Aware Ranker', () => {
  matchingJurisdiction.forEach((result) => {
  expect(result.explain.sameJurisdiction).toBe(1);
  });
-
- // All non-matching jurisdiction results should have sameJurisdiction = 0
+  
  nonMatchingJurisdiction.forEach((result) => {
  expect(result.explain.sameJurisdiction).toBe(0);
  });
-
- // If we have both types, matching jurisdiction should generally rank higher
+  
  // (unless cosine or shared tags differences are very large)
  if (matchingJurisdiction.length > 0 && nonMatchingJurisdiction.length > 0) {
  // The boost should generally help (though not guaranteed due to other factors)
@@ -180,8 +166,7 @@ describe('Legal-Aware Ranker', () => {
  id: 'hit3',
  score: 0.9,
  payload: { tag_ids: ['tag5'], jurisdiction: 'Other' },
- },
- ];
+ }];
 
  const queryTagIds = ['tag1', 'tag2'];
 
@@ -189,8 +174,7 @@ describe('Legal-Aware Ranker', () => {
  hits,
  queryTagIds: jurisdiction,
  });
-
- // hit1 should have 2 shared tags
+  
  const hit1Result = ranked.find((r) => r.id === 'hit1');
  expect(hit1Result?.explain.sharedTags).toBe(2);
 
@@ -205,8 +189,7 @@ describe('Legal-Aware Ranker', () => {
 
  it('should use default weights when none provided', () => {
  const hits: QdrantHit[] = [
- { id: 'test', score: 0.8, payload: { tag_ids: ['tag1'], jurisdiction: 'CA' } },
- ];
+ { id: 'test', score: 0.8, payload: { tag_ids: ['tag1'], jurisdiction: 'CA' } }];
 
  const ranked = rerankLegalAware({
  hits,
@@ -260,3 +243,6 @@ describe('Legal-Aware Ranker', () => {
  });
  });
 });
+
+
+

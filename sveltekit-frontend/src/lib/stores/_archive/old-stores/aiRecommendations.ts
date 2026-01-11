@@ -3,4 +3,7 @@ import type { aiRecommendationEngine } from '$lib/services/ai-recommendation-eng
 export const recommendations = writable<any[]>([]);
 export const partialRecommendations = writable<any[]>([]);
 export const engineState = writable<'idle' | 'processing' | 'success' | 'failure'>('idle');
-export const errorMessage = writable<string | null>(null); // wire engine partial stream -> partialRecommendations store const unsubscribePartial = aiRecommendationEngine.subscribeToPartial((recs) => { partialRecommendations.set(recs)}); // Keep subscription for app lifetime. If you need to cleanup call unsubscribePartial() export const runQuery = async (query: string) => { engineState.set('processing'); errorMessage.set(null); // clear prior partials partialRecommendations.set([]); recommendations.set([]); try { const results = await aiRecommendationEngine.generateRecommendations({ userQuery: query }); recommendations.set(results); engineState.set('success'); // ensure partials reflect final results partialRecommendations.set(aiRecommendationEngine.getPartialRecommendations())}catch (err) { console.error('runQuery error', err); errorMessage.set('Failed to fetch recommendations.'); engineState.set('failure')};
+export const errorMessage = writable<string | null>(null); // wire engine partial stream -> partialRecommendations store const unsubscribePartial = aiRecommendationEngine.subscribeToPartial((recs) => { partialRecommendations.set(recs)});
+  
+
+

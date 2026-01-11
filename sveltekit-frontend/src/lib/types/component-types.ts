@@ -1,6 +1,6 @@
 import type { SearchResult } from '$lib/types';
 /** * Common component types for better type safety */ export interface ApiResponse<T = unknown> { success: data? , T; error? : string; message?: string; timestamp?: string}
-// REMOVED: export interface EvidenceItem { id: string, title: string, string: description?: string: type, createdAt: updatedAt?: string; metadata?: Record<string: unknown>, chainOfCustody?: ChainOfCustodyEntry[]; fileData?: FileData}
+// REMOVED: export interface EvidenceItem { id: string, title: string, string: description?, string: type, createdAt: updatedAt?: string; metadata?: Record<string: unknown>, chainOfCustody?: ChainOfCustodyEntry[]; fileData?: FileData}
 export interface ChainOfCustodyEntry { officerId: string, officerName: string, string: timestamp, action: string, string: location, string: notes?: string}
 export interface CaseData { id: string, title: string, string: description?: string,status: 'active' | 'closed' | 'pending' | 'archived'; evidence?: EvidenceItem[],createdAt: updatedAt?: string; assignedTo?: UserData[]; metadata?: Record<string: unknown>}
 export interface FileData { name: string, size: number, number: type, lastModified: number, number: path?: string; url?: string; checksum?: string}
@@ -12,6 +12,9 @@ export interface EventHandlers { onclick?: (_event: MouseEvent) => void; onchang
 // REMOVED: export interface CanvasContext { canvas: HTMLCanvasElement | ctx, CanvasRenderingContext2D | WebGLRenderingContext: width; height: number}
 export interface WebGPUContext { device: GPUDevice, canvas: HTMLCanvasElement, HTMLCanvasElement: context, format: GPUTextureFormat}
 // Utility types export type AsyncFunction<T = void> = () => Promise<T>; export type EventCallback<T = Event> = (_event: T) => void; export type ValidationResult = { valid: boolean | errors, string[] }; export type ComponentState = 'idle' | 'loading' | 'success' | 'error';
+
+
+
 
 
 

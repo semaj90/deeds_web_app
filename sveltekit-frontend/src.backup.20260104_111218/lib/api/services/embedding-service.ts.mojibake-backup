@@ -1,0 +1,17 @@
+import type { apiFetch } from '../clients/api-client.js';
+import type { getOllamaEndpoint } from '$lib/utils/endpoints'; // Import the new utility
+
+export interface EmbedRequest {
+  text: string;
+  model?: string;
+}
+
+export async function embed({ text, model = 'embeddinggemma:latest' }: EmbedRequest) {
+  return apiFetch(getOllamaEndpoint() + '/api/embeddings', 'POST', {
+    body: {
+      model,
+      prompt: text,
+      stream: false,
+    },
+  });
+}

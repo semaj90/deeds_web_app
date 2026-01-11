@@ -1,0 +1,514 @@
+import { json, error } from '@sveltejs/kit';;
+import type { RequestHandler as SvelteKitRequestHandler } from '@sveltejs/kit';
+import type { db, usersTable, cases, evidence, legalDocuments  } from '$lib/server/database';
+import type { eq, desc, asc, and, count, gte, lte, sql, type SQL  } from 'drizzle-orm';
+
+// Define types
+type EvidenceSelect = typeof evidence.$inferSelect ;
+type CaseSelect = typeof cases.$inferSelect ;
+type UserSelect = typeof usersTable.$inferSelect ;
+type LegalDocumentSelect = typeof legalDocuments.$inferSelect ;
+
+type EvidenceQueryResult = EvidenceSelect & {
+  caseTitle: CaseSelect['title'] | null;
+};
+
+type LegalDocumentQueryResult = LegalDocumentSelect & {
+  caseTitle: CaseSelect['title'] | null;
+};
+
+export interface GalleryItem {
+  id: string;
+  type: 'evidence' | 'document' | 'image' | 'ai-generated' | 'upload';
+  title: string;
+  description?: string;
+  url: string;
+  thumbnailUrl?: string;
+  fileType: string;
+  size: number;
+  uploadedAt: string;
+  uploadedBy: string;
+  caseId?: string;
+  caseTitle?: string;
+  tags?: string[];
+  metadata?: Record<string, unknown>;
+  isPublic: boolean;
+  category: string;
+  searchableText?: string;
+}
+
+type RequestHandler = SvelteKitRequestHandler;
+
+export interface GalleryResponse {
+  items: GalleryItem[];
+  totalCount: number;
+  categories: Array<{ name: string; count: number }>;
+  filters: {
+    types: string[];
+    cases: Array<{ id: string; title: string }>;
+    users: Array<{ id: string; name: string }>;
+  };
+  pagination: {
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  };
+}
+
+interface GalleryFilters {
+  type?: string;
+  category?: string;
+  caseId?: string;
+  userId?: string;
+  search?: string;
+  tags?: string[];
+  dateFrom?: string;
+  dateTo?: string;
+  fileTypes?: string[];
+  isPublic?: boolean;
+}
+
+interface BulkActionPayload {
+  action: 'bulk_delete' | 'bulk_tag' | 'bulk_move';
+  ids: string[];
+  tags?: string[];
+  caseId?: string;
+}
+
+export const GET: RequestHandler = async ({ url, locals: _locals }) => {
+  try {
+    // Parse query parameters
+    const page = Math.max(1, parseInt(url.searchParams.get('page') || '1'));
+    const pageSize = Math.min(100, Math.max(10, parseInt(url.searchParams.get('pageSize') || '20')));
+    const sortBy = url.searchParams.get('sortBy') || 'uploadedAt';
+    const sortOrder = url.searchParams.get('sortOrder') || 'desc';
+
+    // Parse filters
+    const filters: GalleryFilters = {
+      type: url.searchParams.get('type') || undefined,
+      category: url.searchParams.get('category') || undefined,
+      caseId: url.searchParams.get('caseId') || undefined,
+      userId: url.searchParams.get('userId') || undefined,
+      search: url.searchParams.get('search') || undefined,
+      tags: url.searchParams.get('tags')?.split(',').filter(Boolean) || undefined,
+      dateFrom: url.searchParams.get('dateFrom') || undefined,
+      dateTo: url.searchParams.get('dateTo') || undefined,
+      fileTypes: url.searchParams.get('fileTypes')?.split(',').filter(Boolean) || undefined,
+      isPublic: url.searchParams.get('isPublic') ? url.searchParams.get('isPublic') === 'true' : undefined
+    };
+
+    const startTime = Date.now();
+
+    // Get gallery items from multiple sources
+    const [evidenceItems, documentItems, aiGeneratedItems, categories, casesData, usersData] = await Promise.all([;
+      getEvidenceItems(filters, page, pageSize, sortBy, sortOrder),
+      getDocumentItems(filters, page, pageSize, sortBy, sortOrder),
+      getAIGeneratedItems(filters, page, pageSize, sortBy, sortOrder),
+      getCategories(),
+      getCases(),
+      getUsers()
+    ]) as [
+      { items: GalleryItem[]; total: number },
+      { items: GalleryItem[]; total: number },
+      { items: GalleryItem[]; total: number },
+      Array<{ name: string; count: number }>,
+      CaseSelect[],
+      UserSelect[]
+    ];
+
+    // Combine and sort all items
+    const allItems = [...evidenceItems.items, ...documentItems.items, ...aiGeneratedItems.items];
+
+    // Sort combined items
+    allItems.sort((a, b) => {
+      const aVal = a[sortBy as keyof GalleryItem] || '';
+      const bVal = b[sortBy as keyof GalleryItem] || '';
+      if (sortOrder === 'desc') {
+        return bVal > aVal ? 1 : -1;
+      }
+      return aVal > bVal ? 1 : -1;
+    });
+
+    // Apply pagination to combined results
+    const offset = (page - 1) * pageSize;
+    const paginatedItems = allItems.slice(offset, offset + pageSize);
+    const totalCount = evidenceItems.total + documentItems.total + aiGeneratedItems.total;
+
+    // Prepare filter options
+    const filterOptions = {
+      types: ['evidence', 'document', 'image', 'ai-generated', 'upload'],
+      cases: casesData.map((c: CaseSelect) => ({ id: c.id, title: c.title })),
+      users: usersData.map((u: UserSelect) => ({ id: u.id, name: u.email || 'Unknown' }))
+    };
+
+    const processingTime = Date.now() - startTime;
+    const response: GalleryResponse = {
+      items: paginatedItems,
+      totalCount,
+      categories,
+      filters: filterOptions,
+      pagination: {
+        page,
+        pageSize,
+        totalPages: Math.ceil(totalCount / pageSize)
+      }
+    };
+
+    return json(response, {
+      headers: {
+        'X-Processing-Time': `${processingTime}ms`,
+        'X-Total-Items': totalCount.toString(),
+        'Cache-Control': 'public, max-age=60'
+      }
+    });
+  } catch (err) {
+    console.error('Gallery API error: ', err);
+    throw error(500, `Failed to fetch gallery data: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+};
+
+async function getEvidenceItems(
+  filters: GalleryFilters,
+  page: number,
+  pageSize: number,
+  sortBy: string,
+  sortOrder: string
+): Promise<{ items: GalleryItem[]; total: number }> {
+  try {
+    const conditions: SQL<unknown>[] = [];
+
+    if (filters.caseId) {
+      conditions.push(eq(evidence.caseId, filters.caseId));
+    }
+
+    if (filters.search) {
+      conditions.push(sql`(${evidence.title} LIKE ${`%${filters.search}%`} OR ${evidence.description} LIKE ${`%${filters.search}%`} OR ${evidence.contentText} LIKE ${`%${filters.search}%`})` as SQL<unknown>);
+    }
+
+    if (filters.fileTypes && filters.fileTypes.length > 0) {
+      conditions.push(sql`(${sql.join(filters.fileTypes.map(type => sql`${evidence.fileType} LIKE ${`%${type}%`}`), sql` OR `)})` as SQL<unknown>);
+    }
+
+    if (filters.isPublic !== undefined) {
+      conditions.push(eq(evidence.isPublic, filters.isPublic));
+    }
+
+    // Apply date filters
+    if (filters.dateFrom) {
+      conditions.push(gte(evidence.uploadedAt, new Date(filters.dateFrom)));
+    }
+
+    if (filters.dateTo) {
+      conditions.push(lte(evidence.uploadedAt, new Date(filters.dateTo)));
+    }
+
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    // Get total count before pagination
+    const totalResult = await db;
+      .select({ count: count() })
+      .from(evidence)
+      .leftJoin(cases, eq(evidence.caseId, cases.id))
+      .where(whereClause)
+      .execute();
+
+    const total = totalResult[0]?.count || 0;
+
+    const evidenceQuery = db;
+      .select({
+        id: evidence.id,
+        title: evidence.title,
+        description: evidence.description,
+        fileName: evidence.fileName,
+        fileSize: evidence.fileSize,
+        fileType: evidence.fileType,
+        filePath: evidence.filePath,
+        uploadedAt: evidence.uploadedAt,
+        caseId: evidence.caseId,
+        caseTitle: cases.title,
+        tags: evidence.tags,
+        metadata: evidence.metadata,
+        isPublic: evidence.isPublic,
+        contentText: evidence.contentText
+      })
+      .from(evidence)
+      .leftJoin(cases, eq(evidence.caseId, cases.id))
+      .where(whereClause)
+      .limit(pageSize)
+      .offset((page - 1) * pageSize);
+
+    // Apply sorting
+    const orderByColumn = evidence[sortBy as keyof typeof evidence];
+    if (orderByColumn) {
+      evidenceQuery.orderBy(sortOrder === 'desc' ? desc(orderByColumn) : asc(orderByColumn));
+    } else {
+      // Fallback to default sort if sortBy is not a valid column
+      evidenceQuery.orderBy(desc(evidence.uploadedAt));
+    }
+
+    const evidenceData = await evidenceQuery.execute() as EvidenceQueryResult[];
+    const items: GalleryItem[] = evidenceData.map(item => ({
+      id: item.id,
+      type: 'evidence' as const,
+      title: item.title || item.fileName || 'Untitled Evidence',
+      description: item.description || undefined,
+      url: `/api/files/evidence/${item.id}`,
+      thumbnailUrl: generateThumbnailUrl(item.filePath, item.fileType),
+      fileType: item.fileType || 'unknown',
+      size: item.fileSize || 0,
+      uploadedAt: item.uploadedAt?.toISOString() || new Date().toISOString(),
+      uploadedBy: 'System', // TODO: Add user tracking
+      caseId: item.caseId || undefined,
+      caseTitle: item.caseTitle || undefined,
+      tags: Array.isArray(item.tags) ? item.tags : [],
+      metadata: (item.metadata as Record<string, unknown>) || {},
+      isPublic: item.isPublic || false,
+      category: 'Legal Evidence',
+      searchableText: [item.title, item.description, item.contentText].filter(Boolean).join(' ')
+    }));
+
+    return { items, total };
+  } catch (err) {
+    console.error('Error fetching evidence items: ', err);
+    return { items: [], total: 0 };
+  }
+}
+
+async function getDocumentItems(
+  filters: GalleryFilters,
+  page: number,
+  pageSize: number,
+  sortBy: string,
+  sortOrder: string
+): Promise<{ items: GalleryItem[]; total: number }> {
+  try {
+    const conditions: SQL<unknown>[] = [];
+
+    if (filters.caseId) {
+      conditions.push(eq(legalDocuments.caseId, filters.caseId));
+    }
+
+    if (filters.search) {
+      conditions.push(sql`(${legalDocuments.title} LIKE ${`%${filters.search}%`} OR ${legalDocuments.description} LIKE ${`%${filters.search}%`} OR ${legalDocuments.contentText} LIKE ${`%${filters.search}%`})` as SQL<unknown>);
+    }
+
+    if (filters.fileTypes && filters.fileTypes.length > 0) {
+      conditions.push(sql`(${sql.join(filters.fileTypes.map(type => sql`${legalDocuments.fileType} LIKE ${`%${type}%`}`), sql` OR `)})` as SQL<unknown>);
+    }
+
+    if (filters.isPublic !== undefined) {
+      conditions.push(eq(legalDocuments.isPublic, filters.isPublic));
+    }
+
+    // Apply date filters
+    if (filters.dateFrom) {
+      conditions.push(gte(legalDocuments.uploadedAt, new Date(filters.dateFrom)));
+    }
+
+    if (filters.dateTo) {
+      conditions.push(lte(legalDocuments.uploadedAt, new Date(filters.dateTo)));
+    }
+
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    // Get total count before pagination
+    const totalResult = await db;
+      .select({ count: count() })
+      .from(legalDocuments)
+      .leftJoin(cases, eq(legalDocuments.caseId, cases.id))
+      .where(whereClause)
+      .execute();
+
+    const total = totalResult[0]?.count || 0;
+
+    const documentQuery = db;
+      .select({
+        id: legalDocuments.id,
+        title: legalDocuments.title,
+        description: legalDocuments.description,
+        fileName: legalDocuments.fileName,
+        fileSize: legalDocuments.fileSize,
+        fileType: legalDocuments.fileType,
+        filePath: legalDocuments.filePath,
+        uploadedAt: legalDocuments.uploadedAt,
+        caseId: legalDocuments.caseId,
+        caseTitle: cases.title,
+        tags: legalDocuments.tags,
+        metadata: legalDocuments.metadata,
+        isPublic: legalDocuments.isPublic,
+        contentText: legalDocuments.contentText
+      })
+      .from(legalDocuments)
+      .leftJoin(cases, eq(legalDocuments.caseId, cases.id))
+      .where(whereClause)
+      .limit(pageSize)
+      .offset((page - 1) * pageSize);
+
+    // Apply sorting
+    const orderByColumn = legalDocuments[sortBy as keyof typeof legalDocuments];
+    if (orderByColumn) {
+      documentQuery.orderBy(sortOrder === 'desc' ? desc(orderByColumn) : asc(orderByColumn));
+    } else {
+      // Fallback to default sort if sortBy is not a valid column
+      documentQuery.orderBy(desc(legalDocuments.uploadedAt));
+    }
+
+    const documentData = await documentQuery.execute() as LegalDocumentQueryResult[];
+    const items: GalleryItem[] = documentData.map(item => ({
+      id: item.id,
+      type: 'document' as const,
+      title: item.title || item.fileName || 'Untitled Document',
+      description: item.description || undefined,
+      url: `/api/files/document/${item.id}`,
+      thumbnailUrl: generateThumbnailUrl(item.filePath, item.fileType),
+      fileType: item.fileType || 'unknown',
+      size: item.fileSize || 0,
+      uploadedAt: item.uploadedAt?.toISOString() || new Date().toISOString(),
+      uploadedBy: 'System', // TODO: Add user tracking
+      caseId: item.caseId || undefined,
+      caseTitle: item.caseTitle || undefined,
+      tags: Array.isArray(item.tags) ? item.tags : [],
+      metadata: (item.metadata as Record<string, unknown>) || {},
+      isPublic: item.isPublic || false,
+      category: 'Case Documents',
+      searchableText: [item.title, item.description, item.contentText].filter(Boolean).join(' ')
+    }));
+
+    return { items, total };
+  } catch (err) {
+    console.error('Error fetching document items: ', err);
+    return { items: [], total: 0 };
+  }
+}
+
+async function getAIGeneratedItems(
+  _filters: GalleryFilters,
+  _page: number,
+  _pageSize: number,
+  _sortBy: string,
+  _sortOrder: string
+): Promise<{ items: GalleryItem[]; total: number }> {
+  try {
+    // Check if we have AI-generated content in local storage or service
+    // This would integrate with the image generation service we created
+    const aiItems: GalleryItem[] = [];
+    // TODO: Query AI-generated images from storage or database
+    // For now, return empty array - this will be populated by the image generation service
+    return { items: aiItems, total: aiItems.length };
+  } catch (err) {
+    console.error('Error fetching AI-generated items: ', err);
+    return { items: [], total: 0 };
+  }
+}
+
+async function getCategories(): Promise<Array<{ name: string; count: number }>> {
+  return [
+    { name: 'Legal Evidence', count: 0 },
+    { name: 'Case Documents', count: 0 },
+    { name: 'AI Generated', count: 0 },
+    { name: 'Uploads', count: 0 },
+    { name: 'Images', count: 0 },
+    { name: 'Videos', count: 0 },
+    { name: 'Audio', count: 0 },
+    { name: 'PDFs', count: 0 },
+    { name: 'Presentations', count: 0 },
+    { name: 'Spreadsheets', count: 0 }
+  ];
+}
+
+async function getCases(): Promise<CaseSelect[]> {
+  try {
+    return await db
+      .select({
+        id: cases.id,
+        title: cases.title
+      })
+      .from(cases)
+      .orderBy(asc(cases.title))
+      .execute();
+  } catch (err) {
+    console.error('Error fetching cases: ', err);
+    return [];
+  }
+}
+
+async function getUsers(): Promise<UserSelect[]> {
+  try {
+    return await db
+      .select({
+        id: usersTable.id,
+        email: usersTable.email
+      })
+      .from(usersTable)
+      .orderBy(asc(usersTable.email))
+      .execute();
+  } catch (err) {
+    console.error('Error fetching users: ', err);
+    return [];
+  }
+}
+
+function generateThumbnailUrl(filePath: string | null, fileType: string | null): string | undefined {
+  if (!filePath || !fileType) return undefined;
+  // For images, we can serve them directly as thumbnails
+  if (fileType.startsWith('image/')) {
+    return `/api/files/thumbnails/${encodeURIComponent(filePath)}`;
+  }
+  // For other file types, return appropriate icons
+  if (fileType.includes('pdf')) {
+    return '/icons/pdf-thumbnail.svg';
+  }
+  if (fileType.includes('video')) {
+    return '/icons/video-thumbnail.svg';
+  }
+  if (fileType.includes('audio')) {
+    return '/icons/audio-thumbnail.svg';
+  }
+  return '/icons/file-thumbnail.svg';
+}
+
+export const POST: RequestHandler = async ({ request, locals: _locals }) => {
+  try {
+    const data: BulkActionPayload = await request.json();
+    // Handle bulk operations like delete, move, tag
+    if (data.action === 'bulk_delete') {
+      return await handleBulkDelete(data.ids);
+    }
+    if (data.action === 'bulk_tag') {
+      return await handleBulkTag(data.ids, data.tags || []);
+    }
+    if (data.action === 'bulk_move') {
+      if (!data.caseId) throw error(400, 'caseId is required for bulk_move action');
+      return await handleBulkMove(data.ids, data.caseId);
+    }
+    throw error(400, 'Invalid action');
+  } catch (err) {
+    console.error('Gallery POST error: ', err);
+    throw error(500, `Gallery operation failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+};
+
+async function handleBulkDelete(ids: string[]): Promise<Response> {
+  // TODO: Implement bulk delete across different item types (evidence, documents, etc.)
+  // This should query the database to identify item types and delete accordingly
+  const deletedCount = ids.length; // Placeholder;
+  return json({ success: true, deleted: deletedCount });
+}
+
+async function handleBulkTag(ids: string[], tags: string[]): Promise<Response> {
+  // TODO: Implement bulk tagging across different item types
+  // Update tags for each item in the database
+  return json({ success: true, tagged: ids.length, tags });
+}
+
+async function handleBulkMove(ids: string[], caseId: string): Promise<Response> {
+  // TODO: Implement bulk move across different item types
+  // Update caseId for each item in the database
+  return json({ success: true, moved: ids.length, caseId });
+}
+
+
+
+
+
+

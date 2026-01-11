@@ -38,10 +38,10 @@ const { Pool } = pg;
 const CONFIG = {
   postgres: {
     host: '127.0.0.1',
-    port: 5434,
-    database: 'legal',
-    user: 'user',
-    password: 'pass'
+    port: 5432,
+    database: 'legal_ai_db',
+    user: 'legal_admin',
+    password: '123456'
   },
   redis: {
     url: 'redis://127.0.0.1:6379',
@@ -100,7 +100,7 @@ async function main() {
   console.log('✅ Connected to Postgres + Redis + Qdrant\n');
 
   const args = process.argv.slice(2);
-  let whereClause = `embedding IS NOT NULL
+  let whereClause = `1=1
     AND source NOT LIKE '.svelte-kit/%'
     AND source NOT LIKE 'node_modules/%'
     AND source NOT LIKE 'build/%'
@@ -167,14 +167,17 @@ async function main() {
     if (processed.has(error.id)) continue;
 
     // Find all similar errors
-    const similar = await db.query(`
-      SELECT id, raw_text, source
-      FROM raw_error_embeddings
-      WHERE embedding IS NOT NULL
-        AND id != $1
-        AND 1 - (embedding <=> $2::vector) >= $3
-      LIMIT $4
-    `, [error.id, error.embedding, CONFIG.fixing.similarityThreshold, CONFIG.fixing.topKSimilar]);
+    let similar = { rows: [] };
+    if (error.embedding) {
+      similar = await db.query(`
+        SELECT id, raw_text, source
+        FROM raw_error_embeddings
+        WHERE embedding IS NOT NULL
+          AND id != $1
+          AND 1 - (embedding <=> $2::vector) >= $3
+        LIMIT $4
+      `, [error.id, error.embedding, CONFIG.fixing.similarityThreshold, CONFIG.fixing.topKSimilar]);
+    }
 
     const cluster = {
       primary: error,

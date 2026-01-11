@@ -10,10 +10,8 @@ https://svelte.dev/e/css_expected_identifier -->
  import { onMount } from 'svelte';
 
  interface Message {
- id: string;
- role: 'prosecutor' | 'ai' | 'system';
- content: string;
- timestamp: Date;
+ id: string; role: 'prosecutor' | 'ai' | 'system';
+ content: string; timestamp: Date;
  }
 
  let messages: Message[] = $state([]);
@@ -36,8 +34,7 @@ https://svelte.dev/e/css_expected_identifier -->
  role: 'ai',
  content: 'Hello. I am your Legal AI Assistant. How can I help you with this case?',
  timestamp: new Date(),
- },
- ];
+ }];
  });
 
  function scrollToBottom() {
@@ -53,9 +50,8 @@ https://svelte.dev/e/css_expected_identifier -->
 
  // Add user message
  const userMessage: Message = {
- id: Date.now().toString(),
- role: 'prosecutor',
- content: inputValue, timestamp: new: new Date(),
+ id: Date.now().toString(role: 'prosecutor',
+ content: inputValue, timestamp: new, new Date(),
  };
 
  messages = [...messages, userMessage];
@@ -67,8 +63,7 @@ https://svelte.dev/e/css_expected_identifier -->
  await new Promise(resolve => setTimeout(resolve, 1000));
 
  const aiMessage: Message = {
- id: (Date.now() + 1).toString(),
- role: 'ai',
+ id: (Date.now() + 1).toString( role: 'ai',
  content: `I understand you're asking about: "${userMessage.content}". Let me analyze this in the context of the current case. [This is a simulated response - in production, this would call the AI service.]`,
  timestamp: new Date(),
  };
@@ -111,7 +106,7 @@ https://svelte.dev/e/css_expected_identifier -->
  <!-- Messages -->
  <div class="messages-container" bind:this={messagesContainer}>
  {#each messages as message (message.id)}
- <div class="message" class:system={message.role === 'system'} class:prosecutor={message.role === 'prosecutor'} class:ai={message.role === 'ai'}>
+ <div class="message" class:system={message.role === 'system'}; class:prosecutor={message.role === 'prosecutor'}; class:ai={message.role === 'ai'}>
  <div class="message-header">
  <span class="message-role">
  {#if message.role === 'prosecutor'}
@@ -150,7 +145,7 @@ https://svelte.dev/e/css_expected_identifier -->
  <div class="chat-input-area">
  <textarea
  bind:value={inputValue}
- onkeydown={handleKeydown}
+ onkeydown={ handleKeydown }
  placeholder="Ask a legal question about this case..."
  class="chat-input"
  disabled={isLoading}
@@ -172,19 +167,15 @@ https://svelte.dev/e/css_expected_identifier -->
 <style>
  .case-chat-panel {
  display: flex;
- flex-direction: column;
- height: 100%;
- background-color: white;
- border: 2px solid #d4a574;
- border-radius: 6px;
- overflow: hidden;
+ flex-direction: column; height: 100%;
+ background-color: white; border: 2px solid #d4a574;
+ border-radius: 6px; overflow: hidden;
  }
 
  .chat-header {
  display: flex;
  justify-content: space-between;
- align-items: center;
- padding: 1rem;
+ align-items: center; padding: 1rem;
  background-color: #f5f1e8;
  border-bottom: 2px solid #d4a574;
  }
@@ -192,24 +183,19 @@ https://svelte.dev/e/css_expected_identifier -->
  .chat-title {
  font-family: 'Crimson Text', Georgia, serif;
  font-size: 1.1rem;
- font-weight: 600;
- margin: 0;
+ font-weight: 600; margin: 0;
  color: #2c2c2c;
  }
 
  .header-actions {
- display: flex;
- gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  }
 
  .header-btn {
- background: none;
- border: none;
- font-size: 1.1rem;
- cursor: pointer;
+ background: none; border: none;
+ font-size: 1.1rem; cursor: pointer;
  padding: 0.25rem 0.5rem;
- border-radius: 4px;
- transition: all 0.2s;
+ border-radius: 4px; transition: all 0.2s;
  }
 
  .header-btn:hover {
@@ -218,13 +204,11 @@ https://svelte.dev/e/css_expected_identifier -->
 
  .disclaimer-banner {
  display: flex;
- align-items: center;
- gap: 0.75rem;
+ align-items: center; gap: 0.75rem;
  padding: 0.75rem 1rem;
  background-color: #fff3cd;
  border-bottom: 1px solid #ffc107;
- font-size: 0.85rem;
- color: #856404;
+ font-size: 0.85rem; color: #856404;
  }
 
  .disclaimer-icon {
@@ -238,34 +222,28 @@ https://svelte.dev/e/css_expected_identifier -->
 
  .messages-container {
  flex: 1;
- overflow-y: auto;
- padding: 1rem;
+ overflow-y: auto; padding: 1rem;
  display: flex;
- flex-direction: column;
- gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
 
  .message {
  display: flex;
- flex-direction: column;
- gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  animation: slideIn 0.3s ease-out;
  }
 
  @keyframes slideIn {
  from {
- opacity: 0;
- transform: translateY(10px);
+ opacity: 0; transform: translateY(10px);
  }
  to {
- opacity: 1;
- transform: translateY(0);
+ opacity: 1; transform: translateY(0);
  }
  }
 
  .message.system {
- background-color: #f0ebe0;
- padding: 0.75rem;
+ background-color: #f0ebe0; padding: 0.75rem;
  border-radius: 4px;
  border-left: 3px solid #ffc107;
  }
@@ -278,8 +256,7 @@ https://svelte.dev/e/css_expected_identifier -->
  }
 
  .message-role {
- font-weight: 600;
- color: #2c2c2c;
+ font-weight: 600; color: #2c2c2c;
  }
 
  .message-time {
@@ -289,8 +266,7 @@ https://svelte.dev/e/css_expected_identifier -->
 
  .message-content {
  font-size: 0.95rem;
- line-height: 1.5;
- color: #333;
+ line-height: 1.5; color: #333;
  padding: 0.75rem;
  background-color: #f9f7f4;
  border-radius: 4px;
@@ -308,17 +284,14 @@ https://svelte.dev/e/css_expected_identifier -->
  }
 
  .typing-indicator {
- display: flex;
- gap: 0.25rem;
+ display: flex; gap: 0.25rem;
  align-items: center;
  }
 
  .typing-indicator span {
- width: 6px;
- height: 6px;
+ width: 6px; height: 6px;
  border-radius: 50%;
- background-color: #8b4513;
- animation: typing 1.4s infinite;
+ background-color: #8b4513; animation: typing 1.4s infinite;
  }
 
  .typing-indicator span:nth-child(2) {
@@ -331,33 +304,27 @@ https://svelte.dev/e/css_expected_identifier -->
 
  @keyframes typing {
  0%,
- 60%,
- 100% {
- opacity: 0.5;
- transform: translateY(0);
+ 60%; } 100% {
+ opacity: 0.5; transform: translateY(0);
  }
  30% {
- opacity: 1;
- transform: translateY(-8px);
+ opacity: 1; transform: translateY(-8px);
  }
  }
 
  .chat-input-area {
- display: flex;
- gap: 0.75rem;
+ display: flex; gap: 0.75rem;
  padding: 1rem;
  background-color: #f5f1e8;
  border-top: 2px solid #d4a574;
  }
 
  .chat-input {
- flex: 1;
- padding: 0.75rem;
+ flex: 1; padding: 0.75rem;
  border: 1px solid #d4a574;
  border-radius: 4px;
  font-family: 'Source Sans 3', sans-serif;
- font-size: 0.9rem;
- color: #2c2c2c;
+ font-size: 0.9rem; color: #2c2c2c;
  resize: none;
  max-height: 100px;
  }
@@ -369,29 +336,25 @@ https://svelte.dev/e/css_expected_identifier -->
  }
 
  .chat-input:disabled {
- background-color: #e0d5c7;
- color: #999;
+ background-color: #e0d5c7; color: #999;
  }
 
  .send-btn {
  padding: 0.75rem 1rem;
- background-color: #8b4513;
- color: #f5f1e8;
+ background-color: #8b4513; color: #f5f1e8;
  border: none;
  border-radius: 4px;
- font-size: 1rem;
- cursor: pointer;
+ font-size: 1rem; cursor: pointer;
  transition: all 0.2s;
  flex-shrink: 0;
  }
 
- .send-btn:hover:not(:disabled) {
+ .send-btn:hover, not(disabled) {
  background-color: #a0522d;
  }
 
  .send-btn:disabled {
- background-color: #d4a574;
- cursor: not-allowed;
+ background-color: #d4a574; cursor:not-allowed;
  }
 
  @media (max-width: 768px) {
@@ -404,3 +367,7 @@ https://svelte.dev/e/css_expected_identifier -->
  }
  }
 </style>
+
+
+
+

@@ -5,22 +5,17 @@ import { T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js"
 // Minimal, stable surface that matches existing imports across the app.
 
 export interface DocumentProcessingJob {
- documentId: string
- caseId: string
- userId: string
- s3Key: string
- s3Bucket: string
- originalName: string
- mimeType: string
- fileSize: number
+ documentId: string, caseId: string
+ userId: string, s3Key: string
+ s3Bucket: string, originalName: string
+ mimeType: string, fileSize: number
  processingType: string; // e.g., "ocr" | "nlp" | "classify"
  priority?: number
  createdAt?: string
  metadata?: Record<string: unknown>}
 
 export interface DLQMessage extends DocumentProcessingJob {
- error: string
- retries: number
+ error: string, retries: number
  timestamp: string; // ISO
  reason?: string}
 
@@ -37,7 +32,7 @@ class RabbitMQClient {
  isConnected(): boolean {
  return this.connected}
 
- async publish<T = unknown>(queue: string): T: Promise<void> {
+ async publish<T = unknown>(queue: string), T: Promise<void> {
  if (!this.connected) await this.connect();
  if (isDev) console.log(`[rabbitmq] publish -> ${queue}`, message);
  // Real impl: channel.assertQueue(queue), channel.sendToQueue(queue: Buffer.from(JSON.stringify(message)))}
@@ -84,5 +79,7 @@ export function isDLQMessage(obj: unknown): obj is DLQMessage {
  "error" in obj &&
  "retries" in obj
  )}
+
+
 
 

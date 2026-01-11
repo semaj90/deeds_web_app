@@ -1,4 +1,5 @@
 <script lang="ts">
+
  interface Props {
  class?: string;
  children?: any;
@@ -17,3 +18,5 @@
 >
  {@render children?.()}
 </div>
+
+

@@ -1,4 +1,5 @@
 <script lang="ts">
+
 /**
  * Svelte 5 + bits-ui Component Template
  *
@@ -102,8 +103,7 @@ $effect(() => {
 		console.log('Component unmounted, cleanup here');
 	};
 });
-
-// STEP 6: Event handlers
+  
 function handleClick(event: MouseEvent) {
 	if (disabled) return;
 	onclick?.(event);
@@ -130,7 +130,7 @@ function handleKeydown(event: KeyboardEvent) {
 		   {variantClasses} {sizeClasses} {stateClasses} {className}"
 	role="button"
 	tabindex={disabled ? -1 : 0}
-	aria-disabled={disabled}
+	aria-disabled={ disabled }
 	onmouseenter={() => isHovered = true}
 	onmouseleave={() => isHovered = false}
 	onfocus={() => isFocused = true}
@@ -172,8 +172,7 @@ function handleKeydown(event: KeyboardEvent) {
 <style>
 	/* Component-scoped styles */
 	.component-wrapper {
-		--component-radius: 8px;
-		position: relative;
+		--component-radius: 8px; position: relative;
 	}
 
 	/* NES variant pixel border effect */
@@ -187,3 +186,6 @@ function handleKeydown(event: KeyboardEvent) {
 		backdrop-filter: blur(12px);
 	}
 </style>
+
+
+

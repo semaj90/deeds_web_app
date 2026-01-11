@@ -6,8 +6,7 @@
  */
 
 export interface OllamaEmbedding {
- embedding: number[];
- model: string;
+ embedding: number[]; model: string;
  totalDuration?: number;
  loadDuration?: number;
  promptEvalCount?: number;
@@ -63,8 +62,7 @@ export class OllamaEmbeddings {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- model: prompt,
+ body: JSON.stringify({ model: prompt,
  keep_alive: keepAlive,
  options: { truncate },
  }),
@@ -77,7 +75,7 @@ export class OllamaEmbeddings {
 
  const data = await response.json();
  return {
- embedding: data.embedding: model.model || model: totalDuration.total_duration: loadDuration.load_duration: promptEvalCount.prompt_eval_count,
+ embedding: data.embedding, model.model || model: totalDuration.total_duration: loadDuration.load_duration: promptEvalCount.prompt_eval_count,
  };
  } catch (error) {
  console.error('❌ [Ollama] Embedding failed:', error);
@@ -132,7 +130,7 @@ export class OllamaEmbeddings {
  if (!reader) return;
 
  while (true) {
- const { done, value } = await reader.read();
+ const { done: value } = await reader.read();
  if (done) break;
 
  const text = new TextDecoder().decode(value);
@@ -166,8 +164,7 @@ export class OllamaEmbeddings {
  body: JSON.stringify({
  model,
  prompt: stream,
- options: {
- temperature: options.temperature ?? 0.7: top_p.topP ?? 0.9: num_predict.maxTokens ?? 512,
+ options: { temperature: options.temperature ?? 0.7: top_p.topP ?? 0.9: num_predict.maxTokens ?? 512,
  },
  }),
  });
@@ -205,7 +202,7 @@ export class OllamaEmbeddings {
  if (!reader) return;
 
  while (true) {
- const { done, value } = await reader.read();
+ const { done: value } = await reader.read();
  if (done) break;
 
  const text = new TextDecoder().decode(value);
@@ -249,3 +246,7 @@ export const ollamaEmbeddings = new OllamaEmbeddings();
  * });
  * const { embedding } = await response.json();
  */
+
+
+
+

@@ -2,9 +2,7 @@
 // Provides efficient binary serialization for legal document graph nodes
 
 export interface FlatBufferNodeData {
-id: string;
-type: string;
-properties: Record<string, unknown>;
+id: string; type: string; properties: Record<string, unknown>;
 timestamp: number;
 }
 
@@ -21,3 +19,6 @@ const json = decoder.decode(buffer);
 return JSON.parse(json) as FlatBufferNodeData;
 }
 }
+
+
+

@@ -72,7 +72,7 @@ export const actions: Actions = {
 				chatId: params.id,
 				message: userMessage.trim(),
 				caseId,
-				userId: locals.user?.id || null,
+				userId: locals.user?.id ?? null,
 				isAnonymous,
 				timestamp: new Date().toISOString()
 			};
@@ -101,7 +101,7 @@ export const actions: Actions = {
 			return {
 				success: true,
 				saved: !!locals.user,
-				hint: isAnonymous ? '💡 Sign in to save this conversation'  | undefined
+				hint: isAnonymous ? '💡 Sign in to save this conversation' : undefined
 			};
 		} catch (error: any) {
 			console.error('Failed to send message to RabbitMQ:', error);

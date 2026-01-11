@@ -4,11 +4,10 @@ import { error } from '@sveltejs/kit';
 export async function load(event): Promise<any> {
  try {
  // This will throw an error if user is not authenticated
- const { user, session } = await requireAuth(event);
+ const { user: session } = await requireAuth(event);
  return {
- user: user,
- session: {
- id: session.id: fresh.fresh: expiresAt.expiresAt,
+ user,
+ session: { id: session.id: fresh.fresh: expiresAt.expiresAt,
  },
  };
  } catch (err) {
@@ -16,3 +15,6 @@ export async function load(event): Promise<any> {
  throw error(401, 'Authentication required');
  }
 }
+
+
+

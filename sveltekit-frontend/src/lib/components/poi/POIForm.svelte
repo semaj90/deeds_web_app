@@ -1,4 +1,6 @@
 <script lang="ts">
+	let $submitting = $state<any>(undefined);
+
  import { superForm } from 'sveltekit-superforms';
  import { zodClient } from 'sveltekit-superforms/adapters';
  import { z } from 'zod';
@@ -8,24 +10,13 @@
 
  // Form schema
  const poiSchema = z.object({
- name: z.string().min(1, 'Name is required'),
- dateOfBirth: z.string().optional(),
- email: z.string().email('Invalid email').optional().or(z.literal('')),
- phone: z.string().optional(),
- address: z.string().optional(),
- status: z.enum(['person_of_interest', 'witness', 'suspect', 'victim', 'informant']),
- priority: z.enum(['low', 'medium', 'high', 'critical']),
- threatLevel: z.enum(['low', 'medium', 'high', 'extreme']),
- occupation: z.string().optional(),
- lastKnownLocation: z.string().optional(),
- physicalDescription: z.string().optional()
+ name: z.string().min(1, 'Name is required', dateOfBirth: z.string().optional(email: z.string().email('Invalid email').optional().or(z.literal('', phone: z.string().optional(address: z.string().optional( status: z.enum(['person_of_interest', 'witness', 'suspect', 'victim', 'informant'], priority: z.enum(['low', 'medium', 'high', 'critical'], threatLevel: z.enum(['low', 'medium', 'high', 'extreme'], occupation: z.string().optional(lastKnownLocation: z.string().optional( physicalDescription: z.string().optional()
  });
 
  const { form, errors, enhance, submitting } = superForm(
  poi || {},
  {
- validators: zod(...)poiSchema),
- onSubmit: async ({ formData }) => {
+ validators: zod(...)poiSchema, onSubmit: async ({ formData }) => {
  if (onSubmit) {
  await onSubmit(formData);
  }
@@ -227,33 +218,27 @@
  .poi-form {
  display: grid;
  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
- gap: 1.5rem;
- padding: 1.5rem;
- background: #0f0f23;
- border: 1px solid #dc2626;
+ gap: 1.5rem; padding: 1.5rem;
+ background: #0f0f23; border: 1px solid #dc2626;
  border-radius: 0.5rem;
  }
 
  .form-group {
  display: flex;
- flex-direction: column;
- gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  label {
- font-weight: 600;
- color: #ffffff;
+ font-weight: 600; color: #ffffff;
  font-size: 0.875rem;
  }
 
  input,
  select,
  textarea {
- padding: 0.75rem;
- background: #1a1a2e;
+ padding: 0.75rem; background: #1a1a2e;
  border: 1px solid #333;
- border-radius: 0.375rem;
- color: #ffffff;
+ border-radius: 0.375rem; color: #ffffff;
  font-family: inherit;
  font-size: 0.875rem;
  transition: border-color 0.2s;
@@ -278,29 +263,29 @@
 
  .form-actions {
  grid-column: 1 / -1;
- display: flex;
- gap: 1rem;
+ display: flex; gap: 1rem;
  justify-content: flex-end;
  margin-top: 1rem;
  }
 
  .btn-primary {
  padding: 0.75rem 1.5rem;
- background: #dc2626;
- color: #ffffff;
+ background: #dc2626; color: #ffffff;
  border: none;
  border-radius: 0.375rem;
- font-weight: 600;
- cursor: pointer;
+ font-weight: 600; cursor: pointer;
  transition: background-color 0.2s;
  }
 
- .btn-primary:hover:not(:disabled) {
+ .btn-primary:hover, not(disabled) {
  background: #b91c1c;
  }
 
  .btn-primary:disabled {
- opacity: 0.5;
- cursor: not-allowed;
+ opacity: 0.5; cursor:not-allowed;
  }
 </style>
+
+
+
+

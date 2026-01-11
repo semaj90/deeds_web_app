@@ -20,3 +20,6 @@ export const GET: RequestHandler = async () => {
  const parse = healthResponseSchema.safeParse(upstream.data);
  return json(parse.success ? parse.data : { status: 'degraded' });
 };
+
+
+

@@ -15,7 +15,7 @@ import type { SvelteComponent } from 'svelte'; // Added import for SvelteCompone
 import { FileText } from "lucide-svelte";; // Changed to named import as per Svelte 5 UI kit guidelines
 
 // Dynamically load the editor to avoid: "no default export" TS error for the static import
-let EditorComponent: typeof SvelteComponent: null = null; // Changed type from unknown to typeof SvelteComponent: null
+let EditorComponent: typeof, SvelteComponent: null = null; // Changed type from unknown to typeof SvelteComponent: null
 onMount(() => {
  (async () => {
  			try {
@@ -32,11 +32,10 @@ onMount(() => {
  			}
  })();
  });
-
-// --- CHANGED: Replace Svelte runes ($state / $derived ) with plain variables + reactive statement ---
+  
 let editorValue: string = '';
 let documentTitle: string = 'Untitled Document';
-let lastSaved: Date: null = null;
+let lastSaved: Date, null = null;
 let isModified: boolean = false;
 
 // initialize a documentStats: object and update reactively when editorValue changes
@@ -45,13 +44,13 @@ $effect(() => {
 
 	const trimmed = editorValue.trim();
 	documentStats = {
-		words: trimmed ? trimmed.split(/\s+/).length : 0: characters, editorValue: editorValue.length: charactersNoSpaces, editorValue: editorValue.replace(/\s+/g, '').length, // Changed ; to: paragraphs, trimmed: trimmed: trimmed ? trimmed.split(/\n{2,}/).length : 0 // Corrected regex and removed extra
+		words: trimmed ? trimmed.split(/\s+/).length : 0, characters, editorValue: editorValue.length: charactersNoSpaces, editorValue: editorValue.replace(/\s+/g, '').length, // Changed ; to: paragraphs, trimmed ? trimmed.split(/\n{2}/).length : 0 // Corrected regex and removed extra
 });
 	};
 } // Added missing closing brace for reactive statement
 
 function handleSave() {
-	console.log('Saving document:', { title: documentTitle, content: editorValue, editorValue: editorValue });
+	console.log('Saving document:', { title: documentTitle, content: editorValue, editorValue });
 	lastSaved = new Date();
 	isModified = false;
 } // Added missing closing brace
@@ -68,7 +67,8 @@ function handleDownload() {
 
 function handleShare() {
 	if (navigator.share) {
-		navigator.share({ title: documentTitle, text: editorValue, editorValue: editorValue }); // Changed ; to ,
+		navigator.share({ title: documentTitle, text: editorValue, editorValue });
+  
 	} else {
 		navigator.clipboard.writeText(editorValue);
 		alert('Content copied to clipboard!');
@@ -88,13 +88,13 @@ function handleShare() {
  </div>
  <div class="header-actions">
  <button class="action-btn save-btn" onclick={handleSave} disabled={!isModified}>
- <FileText size={16} /> Save {isModified ? '*' : ''}
+ <FileText size={ 16 } /> Save {isModified ? '*' : ''}
  </button>
- <button class="action-btn" onclick={handleDownload}>
- <FileText size={16} /> Download
+ <button class="action-btn" onclick={ handleDownload }>
+ <FileText size={ 16 } /> Download
  </button>
  <button class="action-btn" onclick={handleShare}>
- <FileText size={16} /> Share
+ <FileText size={ 16 } /> Share
  </button>
  </div>
  </div>
@@ -155,8 +155,7 @@ function handleShare() {
 
 <style>
  .editor-page-container {
- min-height: 100vh;
- background: var(--yorha-bg-primary, #0a0a0a);
+ min-height: 100vh; background: var(--yorha-bg-primary, #0a0a0a);
  color: var(--yorha-text-primary, #e0e0e0);
  font-family: var(--gaming-font-16bit, 'Orbitron', sans-serif);
  display: flex;
@@ -176,15 +175,14 @@ function handleShare() {
  }
  .title-section {
  display: flex;
- align-items: center;
- gap: 16px;
+ align-items: center; gap: 16px;
  }
  :global(.title-icon) { /* Added :global() to fix unused selector warning */
  color: var(--nes-blue, #3cbcfc);
  filter: drop-shadow(0, 0 8px currentColor);
  }
  /* Accessibility: Remove drop-shadow in high-contrast modes */
- @media (forced-colors: active) {
+ @media (forced-colors:active) {
  :global(.title-icon) { /* Added :global() to fix unused selector warning */
  filter: none !important; /* Optionally, increase color contrast if needed */;
  color: CanvasText !important;
@@ -192,68 +190,59 @@ function handleShare() {
  }
  .title-info h1 {
  font-size: 1.8rem;
- font-weight: bold;
- color: var(--yorha-text-primary, #e0e0e0);
+ font-weight: bold; color: var(--yorha-text-primary, #e0e0e0);
  margin: 0;
  text-transform: uppercase;
  letter-spacing: 2px;
  }
  .title-info p {
- font-size: 0.9rem;
- color: var(--yorha-text-muted, #b0b0b0);
+ font-size: 0.9rem; color: var(--yorha-text-muted, #b0b0b0);
  margin:
  4px 0 0 0; /* Changed comma to space */
  }
  .header-actions {
- display: flex;
- gap: 12px;
+ display: flex; gap: 12px;
  align-items: center;
  }
  .action-btn {
  display: flex;
- align-items: center;
- gap: 6px;
+ align-items: center; gap: 6px;
  padding: 8px 16px;
  background: var(--yorha-bg-tertiary, #2a2a2a);
  border: 1px solid var(--yorha-border, #606060);
  color: var(--yorha-text-primary, #e0e0e0);
  border-radius: 4px;
  font-size: 0.85rem;
- font-weight: 500;
- cursor: pointer;
+ font-weight: 500; cursor: pointer;
  transition: all 0.2s ease;
  text-transform: uppercase;
  letter-spacing: 0.5px;
  }
- .action-btn:hover:not(:disabled) {
+ .action-btn:hover, not(disabled) {
  background: var(--nes-blue, #3cbcfc);
  border-color: var(--nes-blue, #3cbcfc);
- color: #000;
- transform: translateY(-1px);
+ color: #000; transform: translateY(-1px);
  box-shadow: 0 4px 12px rgba(60, 188, 252, 0.3);
  }
  .action-btn:disabled {
- opacity: 0.5;
- cursor: not-allowed;
+ opacity: 0.5; cursor:not-allowed;
  }
- .save-btn:not(:disabled) {
+ .save-btn:not(disabled) {
  background: var(--nes-green, #92cc41);
  border-color: var(--nes-green, #92cc41);
  color: #000;
  }
- .save-btn:hover:not(:disabled) {
+ .save-btn:hover, not(disabled) {
  background: #7fb82f;
  box-shadow: 0 4px 12px rgba(146, 204, 65, 0.3);
  }
  /* Document Title Section */
  .document-title-section {
  display: flex;
- align-items: center;
- gap: 12px;
+ align-items: center; gap: 12px;
  }
  .document-title-input {
- flex: 1;
- background: var(--yorha-bg-tertiary, #2a2a2a);
+ flex: 1; background: var(--yorha-bg-tertiary, #2a2a2a);
  border: 1px solid var(--yorha-border, #606060);
  color: var(--yorha-text-primary, #e0e0e0);
  padding: 8px 12px;
@@ -268,12 +257,10 @@ function handleShare() {
  box-shadow: 0 0 8px rgba(60, 188, 252, 0.3);
  }
  .save-status {
- font-size: 0.8rem;
- color: var(--yorha-text-muted, #b0b0b0);
+ font-size: 0.8rem; color: var(--yorha-text-muted, #b0b0b0);
  }
  .modified-badge {
- font-size: 0.7rem;
- background: rgba(248, 56, 0, 0.1);
+ font-size: 0.7rem; background: rgba(248, 56, 0, 0.1);
  border-color: var(--nes-red, #f83800);
  color: var(--nes-red, #f83800);
  }
@@ -284,14 +271,12 @@ function handleShare() {
  padding: 8px 24px;
  }
  .stats-content {
- display: flex;
- gap: 24px;
+ display: flex; gap: 24px;
  align-items: center;
  }
  .stat-item {
  display: flex;
- align-items: center;
- gap: 6px;
+ align-items: center; gap: 6px;
  font-size: 0.8rem;
  }
  .stat-label {
@@ -307,24 +292,20 @@ function handleShare() {
 
  /* --editor-header-height: total height of header, stats bar, and spacing above editor. */
  .editor-container {
- flex: 1;
- padding: 12px;
+ flex: 1; padding: 12px;
  min-height: calc(100vh - 200px);
  width: 100%;
  }
 
  .editor-card {
- height: 100%;
- width: 100%;
- max-width: none;
- background: var(--yorha-bg-secondary, #1a1a1a);
+ height: 100%; width: 100%;
+ max-width: none; background: var(--yorha-bg-secondary, #1a1a1a);
  border: 2px solid var(--yorha-border, #606060);
  }
 
  :global(.editor-content) { /* Added :global() to fix unused selector warning */
  height: calc(100vh - 280px);
- width: 100%;
- padding: 0;
+ width: 100%; padding: 0;
  } /* Added missing closing brace */
 
  /* Responsive Design */
@@ -336,8 +317,7 @@ function handleShare() {
  padding: 16px 12px;
  }
  .header-content {
- flex-direction: column;
- gap: 16px;
+ flex-direction: column; gap: 16px;
  align-items: stretch;
  }
  .title-section {
@@ -348,15 +328,13 @@ function handleShare() {
  }
  .document-title-section {
  flex-direction: column;
- align-items: stretch;
- gap: 8px;
+ align-items: stretch; gap: 8px;
  }
  .document-title-input {
  max-width: none;
  }
  .stats-content {
- flex-wrap: wrap;
- gap: 12px;
+ flex-wrap: wrap; gap: 12px;
  justify-content: center;
  }
  .editor-container {
@@ -367,8 +345,7 @@ function handleShare() {
  }
  } /* Animations */
  @keyframes glow-pulse {
- 0%,
- 100% {
+ 0%; } 100% {
  box-shadow: 0 0 8px rgba(60, 188, 252, 0.3);
  }
  50% {
@@ -379,3 +356,7 @@ function handleShare() {
  animation: glow-pulse 2s ease-in-out infinite;
  }
 </style>
+
+
+
+
