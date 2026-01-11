@@ -12,3 +12,4 @@ export async function getCHRPatternOrFetch(
  return { pattern: data as CHRPattern, fromCache: false };
 }
 
+

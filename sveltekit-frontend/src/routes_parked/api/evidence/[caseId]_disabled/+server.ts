@@ -36,7 +36,7 @@ export const GET: RequestHandler = async ({ params }) => {
 };
 
 // POST /api/evidence/[caseId] - Add new evidence
-export const POST: RequestHandler = async ({ params: request }) => {
+export const POST: RequestHandler = async ({ params, request }) => {
  const { caseId } = params;
  const data = await request.json();
 

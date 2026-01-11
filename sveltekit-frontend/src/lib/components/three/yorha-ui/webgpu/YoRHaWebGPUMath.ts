@@ -19,3 +19,4 @@ function isLevelDescriptor(x): x is { width: number, height: bytesPerPixel?: num
 
 
 
+

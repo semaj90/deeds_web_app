@@ -108,3 +108,4 @@ export async function isTesseractAvailable(): Promise<boolean> {
  });
 }
 
+

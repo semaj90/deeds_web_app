@@ -9,3 +9,4 @@ export class LegalSearchUtils { static async indexLegalDocument(title, string: i
 
 
 
+

@@ -4,3 +4,4 @@ export const DocumentUploadSchema = z.object({
 });
 export type UploadData = z.infer<typeof DocumentUploadSchema>;
 
+

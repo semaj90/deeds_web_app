@@ -445,7 +445,7 @@ export const commonMCPQueries = {
  tool: 'analyze-stack',
  component: 'drizzle',
  context: 'legal-ai',
- }, analyzeUnoCSS:, (): MCPToolRequest => ({
+ }, analyzeUnoCSS: (): MCPToolRequest => ({
  tool: 'analyze-stack',
  component: 'unocss',
  context: 'performance',
@@ -789,6 +789,7 @@ export async function mcpSuggestBestPractices(results: any): Promise<AutoMCPSugg
  ];
  }
 }
+
 
 
 

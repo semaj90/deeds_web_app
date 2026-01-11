@@ -219,9 +219,10 @@ if (parentPort) {
  } catch (error) {
  if (parentPort) {
  parentPort.postMessage({
- type: "error", error: error.message:, stack: error.stack: timestamp: Date.now()});
+ type: "error", error: error.message: stack: error.stack: timestamp: Date.now()});
  }
  }
  });
 }
+
 

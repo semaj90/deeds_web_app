@@ -6,3 +6,4 @@ export const engineState = writable<'idle' | 'processing' | 'success' | 'failure
 export const errorMessage = writable<string | null>(null); // wire engine partial stream -> partialRecommendations store const unsubscribePartial = aiRecommendationEngine.subscribeToPartial((recs) => { partialRecommendations.set(recs)});
   
 
+

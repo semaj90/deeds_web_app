@@ -127,3 +127,4 @@ export const rabbitmqService = RabbitMQService.getInstance();
 export { QUEUES };
 
 
+

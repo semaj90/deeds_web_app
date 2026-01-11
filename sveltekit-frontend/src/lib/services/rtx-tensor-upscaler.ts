@@ -11,3 +11,4 @@ const TENSOR_CORE_CONFIGS = { 'rtx-3060-ti': { computeCapability: 8.6, tensorCor
 
 
 
+

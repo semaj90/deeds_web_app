@@ -12,3 +12,4 @@ export class SOMGrid { private grid: IntentPoint[][], private width: number, pri
 
 
 
+

@@ -508,3 +508,5 @@ export function benchmarkOperation(operation: i32, dataSize: i32) {
  }
  return ops; // Return simulated operation count
 }
+
+

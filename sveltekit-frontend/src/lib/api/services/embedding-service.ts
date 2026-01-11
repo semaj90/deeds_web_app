@@ -16,3 +16,4 @@ export async function embed({ text, model = 'embeddinggemma:latest' }: EmbedRequ
  });
 }
 
+

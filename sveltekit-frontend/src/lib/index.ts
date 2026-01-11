@@ -145,3 +145,4 @@ export type { SearchCategory, SearchFilter, SearchOptions, SearchResult, SearchS
 
 // Default export for convenience
 export default { VERSION, BUILD_DATE, FRAMEWORK_INFO, FEATURES, DEV_TOOLS, barrelStore };
+

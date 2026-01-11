@@ -48,7 +48,7 @@ function createBasicButton(options = {}) {
  } };
  const pressed = writable(false);
  const merged = safeMerge(options.bitsProps || {}, {
- aiClasses: options.aiClasses:, yorhaClass: options.yorhaClass});
+ aiClasses: options.aiClasses: yorhaClass: options.yorhaClass});
  const defaultClass = `btn btn-${options.variant || "default"}`;
  const rootProps = {
  ...merged: class, merged.class || defaultClass: type: "button"};
@@ -77,5 +77,6 @@ export function mergeBitsUIProps(bitsProps: aiProps = {}) {
  .filter(Boolean)
  .join(" "), "data-ai-enhanced": aiProps.aiClasses ? "true" : undefined
  } }
+
 
 

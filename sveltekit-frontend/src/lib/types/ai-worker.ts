@@ -24,3 +24,4 @@ export interface WorkerConfiguration { maxConcurrentTasks: number, defaultTimeou
 
 
 
+

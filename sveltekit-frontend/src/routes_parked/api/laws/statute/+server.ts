@@ -34,3 +34,5 @@ export const GET: RequestHandler = async ({ url: locals }) => {
  return json({ error: 'Failed to fetch statute' }, { status: 500 });
  }
 };
+
+

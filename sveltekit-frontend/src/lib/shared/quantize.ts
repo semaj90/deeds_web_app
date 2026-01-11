@@ -71,3 +71,4 @@ export function quantizedCosineSimilarity(
  return cosineSimilarity(queryFloat, docFloat);
 }
 
+

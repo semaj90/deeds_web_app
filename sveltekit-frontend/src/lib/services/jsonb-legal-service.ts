@@ -1,1 +1,2 @@
 /** * JSONB Legal Service * * High-performance service for managing legal metadata using PostgreSQL JSONB. * Integrates with the unified dimensional storage system and provides * optimized query patterns for legal document operations. * * Features: * - Legal-specific JSONB schema operations * - Optimized query patterns with GIN indexes * - Integration with vector embeddings and graph data * - Real-time analytics and reporting * - Chain of custody verification for evidence * - Citation network analysis */ 
+

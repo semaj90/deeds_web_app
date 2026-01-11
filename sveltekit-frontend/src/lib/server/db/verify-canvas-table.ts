@@ -40,3 +40,4 @@ export function clearCanvasTableCache(): void {
     lastChecked = 0;
 }
 
+

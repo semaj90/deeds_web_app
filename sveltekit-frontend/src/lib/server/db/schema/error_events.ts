@@ -41,3 +41,4 @@ export const errorEventsTable = pgTable(
 export type ErrorEvent = typeof errorEventsTable.$inferSelect;
 export type ErrorEventInsert = typeof errorEventsTable.$inferInsert;
 
+

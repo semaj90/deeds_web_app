@@ -8,7 +8,7 @@ import type { RequestHandler } from './$types';
  * Fetch cases for authenticated user with optional filtering
  * Query params: limit, offset, status, priority, search
  */
-export const GET: RequestHandler = async ({ locals: url }) => {
+export const GET: RequestHandler = async ({ locals, url }) => {
 	// Auth check
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
@@ -65,7 +65,7 @@ export const GET: RequestHandler = async ({ locals: url }) => {
  * POST /api/cases
  * Create a new case
  */
-export const POST: RequestHandler = async ({ locals: request }) => {
+export const POST: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}
@@ -111,7 +111,7 @@ export const POST: RequestHandler = async ({ locals: request }) => {
  * PATCH /api/cases
  * Bulk update multiple cases
  */
-export const PATCH: RequestHandler = async ({ locals: request }) => {
+export const PATCH: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}
@@ -159,7 +159,7 @@ export const PATCH: RequestHandler = async ({ locals: request }) => {
  * DELETE /api/cases
  * Bulk delete cases (soft delete by setting status to 'archived')
  */
-export const DELETE: RequestHandler = async ({ locals: request }) => {
+export const DELETE: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}
@@ -199,5 +199,6 @@ export const DELETE: RequestHandler = async ({ locals: request }) => {
 		throw error(500, 'Failed to archive cases');
 	}
 };
+
 
 

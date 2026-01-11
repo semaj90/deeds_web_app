@@ -116,3 +116,4 @@ export function collectRoutes(): RouteEntry[] {
  return Array.from(map.values()).sort((a, b) => a.path.localeCompare(b.path));
 }
 
+

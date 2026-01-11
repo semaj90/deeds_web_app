@@ -9,3 +9,5 @@ declare module '*.wasm' {
  export default url;
 }
 declare const __VITE_PORT__: number;
+
+

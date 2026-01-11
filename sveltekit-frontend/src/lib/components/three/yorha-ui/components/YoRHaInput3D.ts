@@ -8,3 +8,4 @@ export class YoRHaInput3D extends YoRHa3DComponent { private textMesh?: THREE.Me
 
 
 
+

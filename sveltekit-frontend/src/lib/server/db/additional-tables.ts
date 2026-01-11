@@ -170,3 +170,4 @@ export const legalPrecedents = pgTable('legal_precedents', {
  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
 });
 
+

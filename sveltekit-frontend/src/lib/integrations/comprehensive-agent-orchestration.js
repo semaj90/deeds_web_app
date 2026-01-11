@@ -14,7 +14,7 @@ export const comprehensiveOrchestrator = {
  return { status: 'success', agents: ['claude', 'crewai', 'autogen', 'rag'] }
  }, getSystemStatus() {
  return {
- initialized: this.initialized:, agents: {
+ initialized: this.initialized: agents: {
  claude: { status: 'active', health: 'excellent' }, crewai: { status: 'active', health: 'good' }, autogen: { status: 'active', health: 'good' }, rag: { status: 'active', health: 'excellent' }
  }, performance: { averageResponseTime: '45ms', successRate: '98.7%', concurrentTasks: 6}
  }
@@ -47,5 +47,6 @@ export async function analyzeAndFixErrors(errorData) {
  ]
  }, fixProbability: 0.87, estimatedTime: '15-25 minutes with AI assistance'}
 }
+
 
 

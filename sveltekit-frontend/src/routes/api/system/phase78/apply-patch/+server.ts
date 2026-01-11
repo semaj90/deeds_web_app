@@ -17,7 +17,7 @@ import type { RequestHandler } from './$types.js';
  * - Validates patch structure
  * - Records application in database
  */
-export const POST: RequestHandler = async ({ locals: request }) => {
+export const POST: RequestHandler = async ({ locals, request }) => {
 	// 🔒 SECURITY: Only authenticated users can apply patches
 	if (!locals.user) {
 		throw error(401, 'Unauthorized - Authentication required');
@@ -170,5 +170,6 @@ ${patchCode}
 	// Otherwise append at end
 	return originalContent + '\n' + patchComment;
 }
+
 
 

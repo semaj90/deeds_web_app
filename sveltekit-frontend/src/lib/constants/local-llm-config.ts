@@ -2,3 +2,4 @@
  /** * Gets validated local Ollama URL */ export function getLocalOllamaUrl(): string { if (!validateLocalLLMAccess(LOCAL_LLM_CONFIG.OLLAMA_BASE_URL)) { throw new Error( "Only local Ollama LLMs are allowed. Remote access blocked." )} return LOCAL_LLM_CONFIG.OLLAMA_BASE_URL}
 /** * Memory note logged to console during development */ if (typeof console !== "undefined") { console.log($1$1$1
 
+

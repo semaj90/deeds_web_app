@@ -332,7 +332,7 @@ export class VectorSearchService {
             return data.result.map(item => ({
                 id: String(item.id, content:,,, String(item.payload.content || '', similarity: item.score,
                 metadata: item.payload,
-                documentId:, String(item.payload.document_id || '', source: 'qdrant' as const
+                documentId: String(item.payload.document_id || '', source: 'qdrant' as const
             }));
         } catch (error) {
             console.error('[VectorSearchService] Qdrant failed:', error);
@@ -538,6 +538,7 @@ export class VectorSearchService {
         }
     }
 }
+
 
 
 

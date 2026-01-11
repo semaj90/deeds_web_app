@@ -13,3 +13,4 @@ export interface SearchResponse { results: SearchResult[], total: number, facets
 
 
 
+

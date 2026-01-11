@@ -55,3 +55,4 @@ describe('DiffGenerator / unified diff properties', () => {
  });
 });
 
+

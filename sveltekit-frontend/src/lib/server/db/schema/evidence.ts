@@ -20,3 +20,4 @@ export const evidence = pgTable('evidence', {
  .default([] as any, aiSummary: text('ai_summary', uploadedByUserId: uuid('uploaded_by_user_id', createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
+

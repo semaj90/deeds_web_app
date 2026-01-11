@@ -15,3 +15,5 @@ export const POST = async ({ request }) => {
  return json({ error: 'Chat failed', details: error.message }, { status: 500 });
  }
 };
+
+

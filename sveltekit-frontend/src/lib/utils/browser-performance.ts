@@ -7,3 +7,4 @@
 // Detect and handle Chrome Windows specific features export function initializeChromeWindowsOptimizations(): void { if (typeof window === 'undefined') return; // Enable smooth scrolling globally document.documentElement.style.scrollBehavior = 'smooth'; // Apply Chrome-specific font rendering if (isChromeWindows()) { document.body.style.fontFeatureSettings = '"liga"'; document.body.style.fontKerning = 'auto'} // Log performance and compatibility info setTimeout(() => { const report = errorHandler.getCompatibilityReport(); // keep lightweight logging; components can import and use report console.log('ðŸŽ¯ Chrome Windows Optimization Report: ', report); if (report.recommendations.length > 0) { console.log('ðŸ’¡ Recommendations: ', report.recommendations)}, 1000)}
 // Initialize on import if (typeof window !== 'undefined') { initializeChromeWindowsOptimizations()}
 
+

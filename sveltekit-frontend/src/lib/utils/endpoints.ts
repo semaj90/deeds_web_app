@@ -7,3 +7,4 @@ export function getOllamaEndpoint(): string {
  return process.env.OLLAMA_URL || 'http://localhost:11434';
 }
 
+

@@ -6,3 +6,4 @@ import { env } from '$env /dynamic/private';
  return env.OLLAMA_EMBEDDING_MODEL || 'embeddinggemma: latest';
 }
 
+

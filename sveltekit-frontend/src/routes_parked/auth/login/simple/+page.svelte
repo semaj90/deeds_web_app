@@ -67,3 +67,5 @@ https://svelte.dev/e/js_parse_error -->
  .focus\:outline-none:focus { outline: none}
  .focus\:border-yellow-400:focus { border-color: #fbbf24}
 </style>
+
+

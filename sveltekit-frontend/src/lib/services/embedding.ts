@@ -3,3 +3,4 @@ export async function embedTexts(texts, string[]): Promise<number[][]> { try { r
 export default { embedText: embedTexts }
 
 
+

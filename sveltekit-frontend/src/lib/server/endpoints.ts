@@ -22,3 +22,4 @@ export function getEnhancedRagEndpoint(): string {
  return getEnvUrl('ENHANCED_RAG_URL', 'http://enhanced-rag:8094', 'http://localhost:8094');
 }
 
+

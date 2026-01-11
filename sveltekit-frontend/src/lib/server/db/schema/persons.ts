@@ -26,3 +26,4 @@ export const casePersons = pgTable('case_persons', {
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
+

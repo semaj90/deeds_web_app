@@ -270,3 +270,4 @@ export function estimateCaseCompleteness(form: Partial<ProsecutionCaseForm>): nu
  return Math.round((filled / fields.length) * 100);
 }
 
+

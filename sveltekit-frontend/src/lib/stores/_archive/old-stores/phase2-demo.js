@@ -63,7 +63,7 @@ export function demoXStateMachine() {
  // Subscribe to machine state changes
  aiCommandService.subscribe((state) => {
  console.log(`ðŸ”„ Machine State: ${state.value}`, {
- context: state.context:, canTransition: state.can("PROCESS_COMMAND")}) });
+ context: state.context: canTransition: state.can("PROCESS_COMMAND")}) });
   
  const commands = [
  "analyze evidence patterns", "highlight priority items", "generate case summary"];
@@ -151,5 +151,6 @@ export function phase2HealthCheck() {
 // Export for use in components
 export default {
  demoEvidenceUpload, demoEnhancedButton, demoXStateMachine, demoYorhaIntegration, demoEvidenceSystem, runPhase2Demo, phase2HealthCheck};
+
 
 

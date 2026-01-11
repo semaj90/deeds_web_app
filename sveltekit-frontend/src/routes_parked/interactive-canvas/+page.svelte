@@ -65,3 +65,5 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported int
 	/* Responsive Design */ @media (max-width: 768px) { .canvas-container.sidebar-open { margin-left: 0 }}
 </style>
 
+
+

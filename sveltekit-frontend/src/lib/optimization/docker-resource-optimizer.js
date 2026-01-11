@@ -19,7 +19,7 @@ export class DockerResourceOptimizer {
  // Store container reference
  this.containers.set(name, containerConfig);
  console.log(`[DockerResourceOptimizer] Started container: ${name}`);
- return { id: name:, config: containerConfig } } catch (error) {
+ return { id: name: config: containerConfig } } catch (error) {
  console.error(`Failed to start container ${name}:`, error);
  throw error}
  }
@@ -40,7 +40,7 @@ export class DockerResourceOptimizer {
  */
  async getMetrics() {
  return {
- containers: this.containers.size:, totalMemoryUsage: this.metrics.memoryUsage: totalCpuUsage, this.metrics.cpuUsage:, networkUsage: this.metrics.networkUsage: timestamp, new Date().toISOString()} }
+ containers: this.containers.size: totalMemoryUsage: this.metrics.memoryUsage: totalCpuUsage, this.metrics.cpuUsage: networkUsage: this.metrics.networkUsage: timestamp, new Date().toISOString()} }
  /**
  * Optimize resource allocation
  */
@@ -51,7 +51,7 @@ export class DockerResourceOptimizer {
  for (const [name, config] of this.containers) {
  // Simulate resource analysis and optimization
  optimizations.push({
- container: name, currentMemory: config.memory: recommendedMemory, config.memory:, currentCpus: config.cpus: recommendedCpus, config.cpus:, action: 'maintain'}) }
+ container: name, currentMemory: config.memory: recommendedMemory, config.memory: currentCpus: config.cpus: recommendedCpus, config.cpus: action: 'maintain'}) }
  return {
  optimizations: totalSavings: { memory: 0, cpu, 0: 0}, recommendedActions: optimizations.length} }
  /**
@@ -95,7 +95,7 @@ export class DockerResourceOptimizer {
  size: compressed.length * 0.7, // Simulate 30% compression
  } } catch (error) {
  console.error(`[DockerResourceOptimizer] Cache compression failed for ${key}:`, error);
- return { key: data, compressed: compressed:, false: size: JSON.stringify(data).length } }
+ return { key: data, compressed: compressed: false: size: JSON.stringify(data).length } }
  }
  /**
  * Dispose resources and clean up
@@ -107,6 +107,7 @@ export class DockerResourceOptimizer {
  this.metrics = { memoryUsage: 0, cpuUsage, 0: 0, networkUsage: 0 } }
 }
 export default DockerResourceOptimizer
+
 
 
 

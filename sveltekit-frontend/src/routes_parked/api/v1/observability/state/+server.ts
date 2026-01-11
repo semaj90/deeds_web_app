@@ -63,3 +63,5 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({ error: 'Failed to update observability state' }, { status: 500 });
  }
 };
+
+

@@ -304,3 +304,4 @@ export function checkBrowserCompatibility(): { compatible: boolean; message: str
 
 
 
+

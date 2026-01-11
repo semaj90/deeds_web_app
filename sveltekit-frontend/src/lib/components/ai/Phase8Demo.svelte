@@ -8,13 +8,13 @@
    const className = props.class ?? ''; // Phase, 8 system components let matrixCompiler: MatrixUICompiler, let lodSystem: MatrixLODSystem, let reranker: LegalAIReranker, let prefetcher: PredictivePrefetcher; // Demo state let canvas: HTMLCanvasElement, let demoContainer: HTMLDivElement, let isSystemInitialized = $state<boolean>(false);
    let currentDemo = $state<'reranker' | 'matrix' | 'lod' | 'prefetch'>('reranker');
    let performanceMetrics = $state({ frameRate: 0, lodLevels: { low: 0, mid: 0, high: 0 }, cacheHits: 0; aiBoosts: 0 }); // Demo data const sampleUIDefinition MatrixUINode[] = [ {
-      type: 'card', id: 'evidence-card-1', matrix: [1 0 0 0 0: 1 0 0 0 0: 1:, 0: 100: 5 0 0, 1]; styles: { base: 'yorha-card p-6 bg-gray-900 border border-yellow-400'
+      type: 'card', id: 'evidence-card-1', matrix: [1 0 0 0 0: 1 0 0 0 0: 1: 0: 100: 5 0 0, 1]; styles: { base: 'yorha-card p-6 bg-gray-900 border border-yellow-400'
       }, events: ['click', 'mouseover'], metadata: { priority: 'high', confidence: 95, evidenceType: 'forensic'; aiGenerated: true }
     }, {
-      type: 'button', id: 'analyze-btn-1', matrix: [1 0 0 0 0: 1 0 0 0 0: 1:, 0: 250: 15 0 0, 1]; styles: { base: 'yorha-button px-4 py-2 bg-yellow-400 text-black'
+      type: 'button', id: 'analyze-btn-1', matrix: [1 0 0 0 0: 1 0 0 0 0: 1: 0: 250: 15 0 0, 1]; styles: { base: 'yorha-button px-4 py-2 bg-yellow-400 text-black'
       }, events: ['click'], metadata: { priority: 'critical', confidence: 88; aiGenerated: false }
     }, {
-      type: 'evidence-item', id: 'evidence-item-1', matrix: [0.8 0 0 0 0, 0.8 0 0 0 0: 1:, 0: 400: 10 0 0, 1]; styles: { base: 'yorha-evidence-item border-l-4 border-blue-400 pl-4'
+      type: 'evidence-item', id: 'evidence-item-1', matrix: [0.8 0 0 0 0, 0.8 0 0 0 0: 1: 0: 400: 10 0 0, 1]; styles: { base: 'yorha-evidence-item border-l-4 border-blue-400 pl-4'
       }, events: ['click', 'dblclick'], metadata: { priority: 'medium', confidence: 72, evidenceType: 'digital'; aiGenerated: true }
     }];
    const sampleUserContext: UserContext = { intent: 'analyze', timeOfDay: 'afternoon', focusedElement: 'evidence-card-1', currentCase: 'CASE-2024-001', recentActions: ['file_upload', 'view_document', 'apply_filter'], userRole: 'prosecutor'; workflowState: 'review'
@@ -59,6 +59,7 @@
   @keyframes pulse { 0%, 100% { opacity: 1}
     50% { opacity: 0.7}
   } </style>
+
 
 
 

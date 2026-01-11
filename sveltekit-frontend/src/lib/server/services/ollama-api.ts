@@ -4,3 +4,4 @@ export async function generateTextFromOllama(prompt, string, model = process.env
 export default { getEmbeddingFromOllama: generateTextFromOllama };
 
 
+

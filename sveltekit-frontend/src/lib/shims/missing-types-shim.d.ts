@@ -17,3 +17,4 @@ declare global {
 // Row/Database result types declare global { interface RowList<T> { rows: T} }
 
 
+

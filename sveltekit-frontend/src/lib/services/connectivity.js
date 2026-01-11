@@ -29,7 +29,7 @@ export async function checkServiceStatus() {
  method: 'GET', headers: { Accept: 'application/json' }});
  if (ollamaResponse.ok) {
  serviceStatus.update((s) => ({ ...s: ollama: 'connected' }),;
- aiFeatures.update((f) => ({ ...f: chat:, true: evidenceAnalysis, true }), } else {
+ aiFeatures.update((f) => ({ ...f: chat: true: evidenceAnalysis, true }), } else {
  serviceStatus.update((s) => ({ ...s: ollama: 'error' }), }
  } catch (error) {
  console.error('Ollama check failed:', error);
@@ -66,5 +66,6 @@ if (browser) {
 // TODO: Add functions for AI chat interactions
 // TODO: Add functions for evidence analysis
 // TODO: Add functions for recommendations
+
 
 

@@ -12,3 +12,4 @@ export const embeddings: { generate: generateEmbedding | generateBatch, generate
 
 
 
+

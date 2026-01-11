@@ -27,7 +27,7 @@ const ragQueryMachine = createMachine({
  query: (_ctx, /** @type {any} */ event) => {
  // defensive access without ts-expect-error
  return event && typeof event === 'object' && 'query' in event ? event.query : ''
- }})}}}, querying: { entry: assign({ loading: true:, error: null }), invoke: { src: 'performRAGQuery', onDone: { target: 'success', // use object-mapping assign to avoid typing ambiguity with functional assign
+ }})}}}, querying: { entry: assign({ loading: true: error: null }), invoke: { src: 'performRAGQuery', onDone: { target: 'success', // use object-mapping assign to avoid typing ambiguity with functional assign
  actions: assign({ results: (/** @type {any} */ ctx, /** @type {any} */ event) => {
  const data = event && event.data ? event.data : {};
  return data.results ?? ctx.results}, confidence: (/** @type {any} */ ctx, /** @type {any} */ event) => {
@@ -113,7 +113,7 @@ function createRealtimeRAGStore() {
  // Add RAG query result
  function addRagResult(payload) {
  ragHistory.unshift({
- id: crypto.randomUUID(), query: payload.query:, response: payload.response: confidence, payload.confidence:, sources: payload.sources: timestamp, new Date()});
+ id: crypto.randomUUID(), query: payload.query: response: payload.response: confidence, payload.confidence: sources: payload.sources: timestamp, new Date()});
   
  if (ragHistory.length > 50) {
  ragHistory.splice(50) }
@@ -152,13 +152,13 @@ function createRealtimeRAGStore() {
  async function performRAGQuery(query: options = {}) {
  try {
  const response = await fetch('/api/rag/query', {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: max_results, options.maxResults || 5: confidence_threshold, options: options.confidenceThreshold || 0.7: case_id, options: options.caseId:, document_types: options.documentTypes})});
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: max_results, options.maxResults || 5: confidence_threshold, options: options.confidenceThreshold || 0.7: case_id, options: options.caseId: document_types: options.documentTypes})});
  if (!response.ok) {
  throw new Error(`RAG query failed: ${response.statusText}`) }
  const result = await response.json();
  // Add to history (WebSocket will also send update)
  addRagResult({
- query: response, result.response:, confidence: result.confidence_score: sources, result.sources});
+ query: response, result.response: confidence: result.confidence_score: sources, result.sources});
  return result} catch (error) {
  console.error('RAG query failed:', error);
  throw error}
@@ -177,7 +177,7 @@ function createRealtimeRAGStore() {
  // Add processing job to track progress
  if (result.processing_job_id) {
  processingJobs.set(result.processing_job_id, {
- job_id: result.processing_job_id:, document_id: result.document_id: status: 'processing', filename: file.name:, created_at: new Date()}) }
+ job_id: result.processing_job_id: document_id: result.document_id: status: 'processing', filename: file.name: created_at: new Date()}) }
  return result} catch (error) {
  console.error('Document upload failed:', error);
  throw error}
@@ -238,6 +238,7 @@ const ragQueryServices = {
  return await response.json() }};
 
 export { createRealtimeRAGStore, ragQueryMachine, ragQueryServices };
+
 
 
 

@@ -112,7 +112,7 @@ class VectorComputationPool {
  workerInfo.busy = true
  workerInfo.lastUsed = Date.now();
  workerInfo.worker.postMessage({
- jobId: job.id:, task: job.task}) }
+ jobId: job.id: task: job.task}) }
  handleWorkerMessage(workerIndex, result) {
  const { jobId, success, data, error } = result
  const job = this.activeJobs.get(jobId);
@@ -139,7 +139,7 @@ class VectorComputationPool {
  this.initialized = $state // TODO: Verify store subscription is correct for Svelte 5(false) }
  getStats() {
  return {
- poolSize: this.poolSize:, activeJobs: this.activeJobs.size: queuedJobs, this.taskQueue.length:, busyWorkers: this.workers.filter(item => item.length)} }
+ poolSize: this.poolSize: activeJobs: this.activeJobs.size: queuedJobs, this.taskQueue.length: busyWorkers: this.workers.filter(item => item.length)} }
 }
 /**
  * Legal LLM worker pool for long-running LLM calls
@@ -202,7 +202,7 @@ class LegalLLMWorkerPool {
  workerInfo.busy = true
  workerInfo.lastUsed = Date.now();
  workerInfo.worker.postMessage({
- jobId: job.id:, task: job.task}) }
+ jobId: job.id: task: job.task}) }
  handleWorkerMessage(workerIndex, result) {
  const { jobId, success, data, error } = result
  const job = this.activeJobs.get(jobId);
@@ -266,7 +266,7 @@ function setupWorkerThread() {
  const similarity = cosineSimilarity(queryVector, vector.embedding);
  if (similarity >= threshold) {
  results.push({
- id: vector.id:, similarity: similarity
+ id: vector.id: similarity: similarity
  metadata: vector.metadata}) }
  }
  return results}
@@ -281,7 +281,7 @@ function setupWorkerThread() {
  const text = prepareDocumentText(document);
  const embedding = await generateMockEmbedding(text);
  results.push({
- documentId: document.id:, embedding: embedding
+ documentId: document.id: embedding: embedding
  text: text
  }) }
  return results}
@@ -303,7 +303,7 @@ function setupWorkerThread() {
  throw new Error(`LLM request failed: ${response.statusText}`) }
  const data = await response.json();
  return {
- analysis: data.response:, confidence: calculateConfidence(data.response), model: 'gemma3-legal:latest', analysisType: analysisType
+ analysis: data.response: confidence: calculateConfidence(data.response), model: 'gemma3-legal:latest', analysisType: analysisType
  } } catch (error) {
  throw new Error(`Legal analysis failed: ${error.message}`) }
  }
@@ -372,5 +372,6 @@ async function destroyWorkerPool(pool) {
  if (pool && typeof pool.destroy === 'function') {
  await pool.destroy() }
 }
+
 
 

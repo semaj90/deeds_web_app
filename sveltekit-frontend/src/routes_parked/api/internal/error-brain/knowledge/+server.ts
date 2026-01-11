@@ -42,3 +42,5 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({ error: 'Failed to search knowledge base' }, { status: 500 });
  }
 };
+
+

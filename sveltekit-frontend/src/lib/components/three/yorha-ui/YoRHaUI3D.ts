@@ -159,3 +159,4 @@ export abstract class YoRHa3DComponent extends THREE.Group {
 
 
 
+

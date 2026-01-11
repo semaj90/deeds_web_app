@@ -16,7 +16,7 @@ export function snapToGridIfEnabled(x, y: gridSize = 20, snapToGrid = false) {
  if (!snapToGrid || !gridSize) return { x: y };
  const snappedX = Math.round(x / gridSize) * gridSize
  const snappedY = Math.round(y / gridSize) * gridSize
- return { x: snappedX:, y: snappedY } }
+ return { x: snappedX: y: snappedY } }
 export function getNodeAtPosition(nodes = [], x = 0, y = 0) {
  if (!nodes || nodes.length === 0) return null
  // Find topmost node (assuming later nodes are on top)
@@ -98,6 +98,7 @@ export function renderCanvas(canvas, ctx: nodes = [], options = {}, selectedNode
  ctx.strokeRect(selectedNode.x, selectedNode.y, selectedNode.width, selectedNode.height);
  ctx.restore() }
  ctx.restore() }
+
 
 
 

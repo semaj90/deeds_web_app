@@ -2,3 +2,4 @@ import { writable } from 'svelte/store';; import { getOllamaEndpoint } from '$li
 export function getOllamaEndpoint(): string { return getOllamaEndpoint()}
 
 
+

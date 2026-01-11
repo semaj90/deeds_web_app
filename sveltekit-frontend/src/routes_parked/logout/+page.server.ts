@@ -29,3 +29,5 @@ export const load: PageServerLoad = async ({ cookies: locals }) => {
 
  throw redirect(302, '/login');
 };
+
+

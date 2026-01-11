@@ -15,3 +15,4 @@ else { const resp = await fetch('/api/embeddings', { method: 'POST', headers: { 
 
 
 
+

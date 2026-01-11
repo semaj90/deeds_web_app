@@ -9,3 +9,4 @@ export interface ErrorBrainTransport {
  publish(evt: ErrorBrainEvent): Promise<void>;
 }
 
+

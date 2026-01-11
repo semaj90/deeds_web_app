@@ -19,3 +19,4 @@ export const load: PageServerLoad = async ({ locals }) => {
   }; // Corrected syntax: removed extra '}'
 };
 
+

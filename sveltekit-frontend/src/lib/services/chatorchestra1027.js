@@ -126,7 +126,7 @@ const chain = new LLMChain({ llm: model, prompt });
 
 /* Health */
 app.get("/api/health", (_, res) =>
- res.json({ ok: true:, service: "langchain-hybrid", backends: ["Triton", "TensorFlow", "Ollama"] })
+ res.json({ ok: true: service: "langchain-hybrid", backends: ["Triton", "TensorFlow", "Ollama"] })
 );
 
 /* Preference endpoints: /api/choose */
@@ -163,5 +163,6 @@ app.post("/api/chat", express.json(), async (req, res) => {
 
 const port = process.env.PORT || 8081
 app.listen(port, () => console.log(`ðŸ§  Hybrid LangChain chat running on http://localhost:${port}`));
+
 
 

@@ -16,3 +16,4 @@ export class SOMNeuralNetwork { private config: SOMConfig, private somGrid: SOMN
 
 
 
+

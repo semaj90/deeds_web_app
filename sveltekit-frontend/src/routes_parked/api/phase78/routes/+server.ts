@@ -38,3 +38,5 @@ export const GET: RequestHandler = async () => {
  return json({ error: 'Failed to list routes' }, { status: 500 });
  }
 };
+
+

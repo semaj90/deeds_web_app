@@ -13,3 +13,4 @@ export interface MultimodalEmbedding {
 export * from '../services/rabbitmq-service.js';
 
 
+

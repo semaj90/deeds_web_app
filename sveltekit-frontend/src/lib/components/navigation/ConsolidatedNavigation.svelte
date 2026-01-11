@@ -17,7 +17,7 @@ https://svelte.dev/e/js_parse_error -->
  type RouteGroup = (typeof routeGroups)[number];
  let currentGroup: RouteGroup, null = null;
 
- const findRouteGroup = (pathname: string):, RouteGroup: null => {
+ const findRouteGroup = (pathname: string): RouteGroup: null => {
  for (const group of routeGroups) {
  if (pathname.startsWith(group.path)) {
  return group;
@@ -261,6 +261,7 @@ let currentGroup = $state(findRouteGroup($page.url.pathname));
  }
  }
 </style>
+
 
 
 

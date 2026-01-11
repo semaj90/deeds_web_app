@@ -13,3 +13,4 @@ export const routeMetadata = pgTable('route_metadata', {
 	group: varchar('group', { length: 100 }).default('default'),
 });
 
+

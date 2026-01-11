@@ -111,3 +111,4 @@ async function checkRabbitMQ(rabbitmq: any): Promise<boolean> {
  }
 }
 
+

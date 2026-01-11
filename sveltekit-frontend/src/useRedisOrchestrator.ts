@@ -284,3 +284,5 @@ function isComplexQuery(query: string): boolean {
 		lowered.includes('detailed')
 	);
 }
+
+

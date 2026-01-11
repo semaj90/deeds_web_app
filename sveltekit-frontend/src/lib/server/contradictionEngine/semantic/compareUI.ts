@@ -22,3 +22,4 @@ export function compareUI(domSemantics: UISemanticSnapshot[], specs: UISpec[]): 
  return contradictions;
 }
 
+

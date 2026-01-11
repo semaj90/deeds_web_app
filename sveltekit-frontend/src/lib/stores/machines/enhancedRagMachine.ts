@@ -39,7 +39,7 @@ export const enhancedRagMachine = createMachine({
  retrieving: { entry: assign(() => ({
  loading: true,
  error: null,
- }, invoke:, {
+ }, invoke: {
  input: ({ context }) => ({ query: context.query }, src: fromPromise(async ({ input }) => {
  const response = await fetch('/api/rag/enhanced', {
  method: 'POST',
@@ -98,6 +98,7 @@ export const enhancedRagStore = writable({
  loading: false,
  error: null,
 });
+
 
 
 

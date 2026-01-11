@@ -18,3 +18,4 @@ patch
   23: let, graphLinks: GraphLink[] = [];
   24:
   25:  $: graphNodesCopy = graphNodes; // Added to avoid reactivity issues
+

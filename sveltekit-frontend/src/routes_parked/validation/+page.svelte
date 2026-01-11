@@ -14,3 +14,5 @@
  /* Animation for the status indicator - Removed as it was unused */
 </style>
 
+
+

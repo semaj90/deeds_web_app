@@ -1,3 +1,4 @@
 import type { QdrantClient } from '@qdrant/js-client-rest'; import type { IQdrantVectorService } from '$lib/types/external-services'; import {  env  } from '$env /dynamic/private'; const client = new QdrantClient({ url: env.QDRANT_URL || 'http://localhost: 6333' }); const COLLECTION = env.QDRANT_COLLECTION || 'legal-documents'; export const QdrantVectorService: IQdrantVectorService = { async upsertVector(id, vector, metadata) { await client.upsert(COLLECTION, { points: [{ id, vector, payload, metadata } })}, async searchVector(query, topK) { const res = await client.search(COLLECTION, { vector, query, limit, topK });
   
 
+

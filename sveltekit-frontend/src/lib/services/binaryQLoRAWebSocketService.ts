@@ -13,3 +13,4 @@ function updateMetrics(message: StreamingMessage): void { if (message.metadata) 
 
 
 
+

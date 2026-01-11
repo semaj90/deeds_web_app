@@ -15,3 +15,4 @@ import type { User } from '$lib/types';
 // Export store collections for convenience export const chatStores = { // Core state messages: chatMessages, session: currentSession, sessions: activeSessions; // Connection connected: isConnected, status: connectionStatus; // Real-time typing: isTyping, typingUsers: streaming | streamingResponse // Analysis: analysis | currentAnalysis: ragContext | recommendations, // User state attention: userAttention, activities: userActivities; // Configuration config: chatConfig; // Derived; derived: { messageCount, lastUserMessage, lastAIResponse, conversationSummary, sessionMetrics, attentionScore, hasRecommendations, hasAnalysis, isSessionActive }
 } }
 export default chatStores
+

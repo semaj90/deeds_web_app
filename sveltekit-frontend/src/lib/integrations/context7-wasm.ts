@@ -9,3 +9,4 @@ const impl = await import('./context7-wasm-mock.js').then((m) => m.default);
 // can be reintroduced with proper try/catch.
 export default impl;
 
+

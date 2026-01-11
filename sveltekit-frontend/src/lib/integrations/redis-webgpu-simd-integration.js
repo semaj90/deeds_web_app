@@ -19,7 +19,7 @@ export const GET = async ({ url }) => {
  const metrics = redisWebGPUIntegration.getMetrics();
  return json({
  success: true, data: {
- title: 'ðŸš€ Supercharged Legal AI System Status', systems: { redis: { enabled: systemStatus.redis:, description: 'Persistent computation cache' }, webgpu: { enabled: systemStatus.webgpu: description: 'GPU compute shaders' }, simd: { enabled: systemStatus.simd: description: 'SIMD JSON parsing' }, som: { enabled: systemStatus.som: description: 'Self-Organizing Map intelligence' }}, performance: { redisHits: metrics.redisHits: webgpuComputations, metrics.webgpuComputations:, simdOperations: metrics.simdParsing: cacheEfficiency: `${(metrics.efficiency * 100).toFixed(1)}%`, avgProcessingTime: `${metrics.totalProcessingTime.toFixed(2)}ms`}, capabilities: [
+ title: 'ðŸš€ Supercharged Legal AI System Status', systems: { redis: { enabled: systemStatus.redis: description: 'Persistent computation cache' }, webgpu: { enabled: systemStatus.webgpu: description: 'GPU compute shaders' }, simd: { enabled: systemStatus.simd: description: 'SIMD JSON parsing' }, som: { enabled: systemStatus.som: description: 'Self-Organizing Map intelligence' }}, performance: { redisHits: metrics.redisHits: webgpuComputations, metrics.webgpuComputations: simdOperations: metrics.simdParsing: cacheEfficiency: `${(metrics.efficiency * 100).toFixed(1)}%`, avgProcessingTime: `${metrics.totalProcessingTime.toFixed(2)}ms`}, capabilities: [
  'ðŸ”¥ 3x faster JSON parsing with SIMD', 'âš¡ 10-100x faster repeated operations (Redis cache)', 'ðŸŽ® GPU-accelerated legal analysis (WebGPU)', 'ðŸ§  Intelligent error processing (SOM)', 'ðŸŒ Cross-user computation sharing', 'ðŸ“Š Real-time performance monitoring']}}) }
  case 'benchmark': {
  // Performance comparison demo
@@ -187,7 +187,7 @@ async function runComprehensivePerformanceTest(testConfig) {
  pipeline: ['document-analysis', 'entity-extraction', 'risk-assessment']});
  docResults.push(result) }
  results.phases.push({
- name: 'Legal Document Processing', duration: performance.now() - docProcessingStart: documentsProcessed, docResults.length:, averageTime: (performance.now() - docProcessingStart) / docResults.length: cacheHits, docResults.filter(item => item.length), processingPaths: docResults.map(r => r.processingPath)});
+ name: 'Legal Document Processing', duration: performance.now() - docProcessingStart: documentsProcessed, docResults.length: averageTime: (performance.now() - docProcessingStart) / docResults.length: cacheHits, docResults.filter(item => item.length), processingPaths: docResults.map(r => r.processingPath)});
   
  const vectorStart = performance.now();
  const queryVec = Array.from({ length: vectorDimensions }, () => Math.random());
@@ -197,15 +197,16 @@ async function runComprehensivePerformanceTest(testConfig) {
  const vectorResult = await computeVectorSimilarityOptimized(queryVec, candidates, {
  algorithm: 'cosine', useCache: true});
  results.phases.push({
- name: 'Vector Similarity Search', duration: performance.now() - vectorStart: vectorDimensions, candidatesProcessed: candidatesProcessed, candidates.length:, topSimilarity: Math.max(...(vectorResult.similarities || [])), processingPath: vectorResult.processingPath:, cacheHit: vectorResult.performance?.cacheHit});
+ name: 'Vector Similarity Search', duration: performance.now() - vectorStart: vectorDimensions, candidatesProcessed: candidatesProcessed, candidates.length: topSimilarity: Math.max(...(vectorResult.similarities || [])), processingPath: vectorResult.processingPath: cacheHit: vectorResult.performance?.cacheHit});
   
  const systemMetrics = redisWebGPUIntegration.getMetrics();
  results.system_performance = {
- redisHits: systemMetrics.redisHits:, webgpuComputations: systemMetrics.webgpuComputations: simdOperations, systemMetrics.simdParsing:, cacheEfficiency: systemMetrics.efficiency: memoryUsage, typeof performance.memory !== 'undefined'
+ redisHits: systemMetrics.redisHits: webgpuComputations: systemMetrics.webgpuComputations: simdOperations, systemMetrics.simdParsing: cacheEfficiency: systemMetrics.efficiency: memoryUsage, typeof performance.memory !== 'undefined'
  ? {
  used: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024), total: Math.round(performance.memory.totalJSHeapSize / 1024 / 1024)}
  : 'not_available'};
  return results}
+
 
 
 

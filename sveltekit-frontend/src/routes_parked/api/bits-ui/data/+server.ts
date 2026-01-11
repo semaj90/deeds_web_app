@@ -8,3 +8,4 @@ async function getBatchData(locals): Promise<Response> { // Demonstrate batch lo
 
 
 
+

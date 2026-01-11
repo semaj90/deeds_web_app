@@ -21,3 +21,5 @@ export const GET: RequestHandler = async () => {
  return json(parse.success ? parse.data : { status: 'degraded' });
 };
 
+
+

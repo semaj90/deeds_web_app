@@ -27,3 +27,4 @@ export function getLegalGatewayUrl(): string {
  return process.env.DATABASE_URL || 'postgresql://legal_admin: 123456@localhost: 5434/legal_ai_db';
 }
 
+

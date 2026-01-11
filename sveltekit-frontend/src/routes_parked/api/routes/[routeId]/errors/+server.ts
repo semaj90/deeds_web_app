@@ -13,7 +13,7 @@ import {
 // Create error cluster for a route
 // ─────────────────────────────────────────────────────────
 
-export const POST: RequestHandler = async ({ params: request }) => {
+export const POST: RequestHandler = async ({ params, request }) => {
  try {
  const { routeId } = params;
  const body = await request.json();
@@ -96,7 +96,7 @@ export const POST: RequestHandler = async ({ params: request }) => {
 // List error clusters with pagination
 // ─────────────────────────────────────────────────────────
 
-export const GET: RequestHandler = async ({ params: url }) => {
+export const GET: RequestHandler = async ({ params, url }) => {
  try {
  const { routeId } = params;
 

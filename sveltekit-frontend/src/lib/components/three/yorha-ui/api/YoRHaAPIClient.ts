@@ -33,3 +33,4 @@ patch
  			clearTimeout(timeoutId);
  			const isLast = attempt === maxAttempts;
  			if (isLast) throw err;
+

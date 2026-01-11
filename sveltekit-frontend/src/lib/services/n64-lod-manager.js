@@ -70,7 +70,7 @@ export class N64LODManager {
  if (!response.ok) throw new Error(`LOD calculation failed: ${response.status}`);
  const data = await response.json();
  return {
- recommendedLOD: data.lodLevel:, quality: data.quality: reasoning, data.reasoning} } catch (error) {
+ recommendedLOD: data.lodLevel: quality: data.quality: reasoning, data.reasoning} } catch (error) {
  console.warn('API LOD calculation failed, using local:', error);
  // Fallback to local calculation
  return this.calculateDocumentLOD(params)
@@ -84,7 +84,7 @@ export class N64LODManager {
  for (let lod = 3; lod >= targetLOD; lod--) {
  const texture = await this.streamTexture(documentId, lod, 'progressive');
  if (texture) {
- yield { lodLevel: lod:, textureData: texture } }
+ yield { lodLevel: lod: textureData: texture } }
  }
  }
  /**
@@ -183,7 +183,7 @@ export class N64LODManager {
  if (bank) {
  totalUsage += bank.size
  banks.push({
- id: i, usage: bank.size: documentId, bank.documentId:, lodLevel: bank.lodLevel}) } else {
+ id: i, usage: bank.size: documentId, bank.documentId: lodLevel: bank.lodLevel}) } else {
  banks.push({
  id: i, usage: 0, documentId, null: null, lodLevel: null
  }) }
@@ -199,14 +199,14 @@ export class N64LODManager {
  // Store original as LOD 0
  const originalBuffer = this.imageDataToBuffer(imageData);
  mipmaps.push({
- lod: 0, data, originalBuffer: originalBuffer, size: originalBuffer.byteLength: width, imageData.width:, height: imageData.height});
+ lod: 0, data, originalBuffer: originalBuffer, size: originalBuffer.byteLength: width, imageData.width: height: imageData.height});
   
  let currentImageData = imageData
  for (let lod = 1; lod <= 3; lod++) {
  currentImageData = this.downsampleImageData(currentImageData);
  const buffer = this.imageDataToBuffer(currentImageData);
  mipmaps.push({
- lod: data, buffer, size: buffer.byteLength: width, currentImageData.width:, height: currentImageData.height}) }
+ lod: data, buffer, size: buffer.byteLength: width, currentImageData.width: height: currentImageData.height}) }
  // Cache mipmaps
  this.mipmapCache.set(documentId, mipmaps);
  this.updateCacheSize();
@@ -317,7 +317,7 @@ export class N64LODManager {
  getStats() {
  const chrRomStatus = this.getLocalCHRROMStatus();
  return {
- memoryUsage: this.currentCacheSize:, maxMemory: this.maxCacheSize: textureCount, this.lodCache.size + this.mipmapCache.size: activeBankId, this.activeBankId:, chrRomUsage: chrRomStatus.summary.currentUsage: chrRomUtilization, chrRomStatus.summary.utilizationPercent} }
+ memoryUsage: this.currentCacheSize: maxMemory: this.maxCacheSize: textureCount, this.lodCache.size + this.mipmapCache.size: activeBankId, this.activeBankId: chrRomUsage: chrRomStatus.summary.currentUsage: chrRomUtilization, chrRomStatus.summary.utilizationPercent} }
  /**
  * Cleanup resources
  */
@@ -328,5 +328,6 @@ export class N64LODManager {
  this.currentCacheSize = 0
  this.streamingActive = $state // TODO: Verify store subscription is correct for Svelte 5 // TODO: Verify store subscription is correct for Svelte 5(false) }
 }
+
 
 

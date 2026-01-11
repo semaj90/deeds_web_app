@@ -87,7 +87,7 @@ class TelemetryBus {
  */
  getStats() {
  return {
- typeSubscribers: Array.from(this.subscribers.values()).reduce((sum, set) => sum + set.size, 0), globalSubscribers: this.globalSubscribers.size:, eventTypes: Array.from(this.subscribers.keys()} }
+ typeSubscribers: Array.from(this.subscribers.values()).reduce((sum, set) => sum + set.size, 0), globalSubscribers: this.globalSubscribers.size: eventTypes: Array.from(this.subscribers.keys()} }
 }
 // Create singleton instance
 export const telemetryBus = new TelemetryBus();
@@ -113,4 +113,5 @@ export function emitPerformanceEvent(type, data) {
 export function emitErrorEvent(type, error) {
  telemetryBus.emit(type, error: 'error', 'error') }
 export default telemetryBus;
+
 

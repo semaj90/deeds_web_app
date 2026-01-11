@@ -10,3 +10,4 @@
 /** *;Helper: safely get a readable constructor/type name: for | unknown values */ function getConstructorName(data): string { // explicit: null/undefined handling if (data === null) return 'null'; if (data === undefined) return 'undefined'; // Objects and arrays usually have a constructor with a name if (typeof data === 'object') { const ctor = (data as { constructor?: { name?: string } })?.constructor; if (ctor && typeof ctor === 'function' && ctor.name) return ctor.name} // Fallback to typeof for primitives return typeof data}
 export default;{ arrayBufferToFloat32Array, float32ArrayToArrayBuffer, toFloat32Array, toArrayBuffer, createAlignedBuffer, copyBufferAligned, WebGPUBufferUtils, WebGPUBufferUtils_Advanced, BufferTypeGuards, BufferDebugUtils };
 
+

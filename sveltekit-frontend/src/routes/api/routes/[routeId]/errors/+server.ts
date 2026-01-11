@@ -86,14 +86,14 @@ export const POST: RequestHandler = async ({ params, request }) => {
     const oldStatus = route.status || 'healthy';
     if (oldStatus !== newStatus) {
       await updateRouteMetadata(routeId, { status: newStatus });
-  
+
       await createHealthEvent({
         routeId,
         oldStatus,
         newStatus,
         reason: 'error_cluster_created',
       });
-  
+
       broadcastHealthChange({
         routeId,
         oldStatus,
@@ -133,7 +133,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
  *
  * Task 3.2: Implement GET /api/routes/:routeId/errors
  */
-export const GET: RequestHandler = async ({ params: url }) => {
+export const GET: RequestHandler = async ({ params, url }) => {
   const { routeId } = params;
 
   try {
@@ -152,7 +152,7 @@ export const GET: RequestHandler = async ({ params: url }) => {
 
     // Get error clusters
     const errorsResult = await getErrorClusters(routeId, { limit: offset });
-  
+
     let filtered = errorsResult.clusters;
     if (resolved === 'true') {
       filtered = errorsResult.clusters.filter((e: any) => e.resolvedAt);

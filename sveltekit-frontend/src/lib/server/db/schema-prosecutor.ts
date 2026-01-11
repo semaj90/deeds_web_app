@@ -88,3 +88,4 @@ export const prosecutorReports = pgTable('prosecutor_reports', {
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
+

@@ -76,3 +76,4 @@ export class WebGPUVertexStreamer {
 export const webgpuVertexStreamer = new WebGPUVertexStreamer();
 
 
+

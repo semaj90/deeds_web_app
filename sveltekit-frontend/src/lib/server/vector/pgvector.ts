@@ -6,3 +6,4 @@ export type LegalCaseInfo = { id: string, jurisdiction: string, parties: Party[]
 
 
 
+

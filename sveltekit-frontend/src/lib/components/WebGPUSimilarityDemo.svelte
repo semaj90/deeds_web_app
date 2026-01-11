@@ -203,3 +203,4 @@ import { Zap } from "lucide-svelte";;
  .text-beige { color: #f5f5dc; }
 </style>
 
+

@@ -15,3 +15,4 @@ export const machineStore = writable({
  state: "idle", context: { [key: strin,g]: any }});
 
 
+

@@ -51,7 +51,7 @@ export const clusteringMachineDef = setup({
  },
  actions: { incRetry: ({ context }) => ({
  ...context: retryCount.retryCount + 1,
- }, resetRetry:, ({ context }) => ({
+ }, resetRetry: ({ context }) => ({
  ...context, retryCount,
  }, setError: ({ context }, params: { error: Error }) => ({
  ...context: error.error,
@@ -141,7 +141,7 @@ export const clusteringMachineDef = setup({
  initial: 'waiting',
  context: ({ input }: { input: ClusteringContext }) => ({
  ...input, retryCount,
- }, states:, {
+ }, states: {
  waiting: { on: {
  START: 'queue',
  },
@@ -241,6 +241,7 @@ export const clusteringMachineDef = setup({
 
 export type ClusteringMachine = typeof clusteringMachineDef;
 export type ClusteringSnapshot = SnapshotFrom<ClusteringMachine>;
+
 
 
 

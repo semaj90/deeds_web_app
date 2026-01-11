@@ -235,3 +235,5 @@ declare type RowListOfRecords = RowList<Record<string, unknown>[]>;
 declare type TableParam = string | { name?: string } | unknown;
 declare type ResultLike<T = Record<string, unknown>> = DBQueryResult<T> | RowList<T[]> | unknown;
 declare type ItemLike = Record<string, unknown> | unknown;
+
+

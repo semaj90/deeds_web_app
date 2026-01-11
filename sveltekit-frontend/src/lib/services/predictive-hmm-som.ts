@@ -9,3 +9,4 @@ class HiddenMarkovSOM { private transitions = new Map<BitmapSig, Map<BitmapSig, 
 
 
 
+

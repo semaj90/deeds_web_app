@@ -44,3 +44,5 @@ export const POST: RequestHandler = async ({ request }) => {
  throw error(500, 'Failed to upload POI photo');
  }
 };
+
+

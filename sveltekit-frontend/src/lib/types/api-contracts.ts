@@ -367,44 +367,44 @@ export const API_ENDPOINTS = {
  evidence: { list: {
  method: 'GET',
  path: '/api/evidence',
- contract | undefined as unknown as EvidenceList,
+ contract: {} as EvidenceList,
  } as ApiEndpoint<EvidenceList>,
  create: { method: 'POST',
  path: '/api/evidence',
- contract | undefined as unknown as EvidenceCreate,
+ contract: {} as EvidenceCreate,
  } as ApiEndpoint<EvidenceCreate>,
  update: { method: 'PUT',
  path: '/api/evidence',
- contract | undefined as unknown as EvidenceUpdate,
+ contract: {} as EvidenceUpdate,
  } as ApiEndpoint<EvidenceUpdate>,
  delete: { method: 'DELETE',
  path: '/api/evidence',
- contract | undefined as unknown as EvidenceDelete,
+ contract: {} as EvidenceDelete,
  } as ApiEndpoint<EvidenceDelete>,
  },
  // AI/Chat endpoints
  ai: { chat: {
  method: 'POST',
  path: '/api/ai/enhanced-chat',
- contract | undefined as unknown as Chat,
+ contract: {} as Chat,
  } as ApiEndpoint<Chat>,
  },
  // Vector search endpoints
  vectorSearch: { search: {
  method: 'POST',
  path: '/api/vector-search',
- contract | undefined as unknown as VectorSearchSearch,
+ contract: {} as VectorSearchSearch,
  } as ApiEndpoint<VectorSearchSearch>,
  },
  // Health endpoints
  health: { check: {
  method: 'GET',
  path: '/api/health',
- contract | undefined as unknown as Health,
+ contract: {} as Health,
  } as ApiEndpoint<Health>,
  maintenance: { method: 'POST',
  path: '/api/health',
- contract | undefined as unknown as Maintenance,
+ contract: {} as Maintenance,
  } as ApiEndpoint<Maintenance>,
  },
 } as const;
@@ -414,6 +414,7 @@ export const API_ENDPOINTS = {
 // Re-export validation schemas from the server for client-side validation
 // Note: These would typically be imported from a shared validation library
 export type ValidationSchema<T> = z.ZodType<T>;
+
 
 
 

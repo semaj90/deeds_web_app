@@ -11,3 +11,4 @@ export enum RiskLevel {
 // Export for use in other modules export { LegalDocumentBinarySerializer, as BinarySerializer }
 
 
+

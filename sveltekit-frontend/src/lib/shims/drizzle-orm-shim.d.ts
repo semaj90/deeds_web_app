@@ -3,3 +3,4 @@
 declare module, '$lib/server/db/*' { const _dbSchema: unknown, export default _dbSchema}
 declare module, '$lib/server/db/*/schema*' { const _dbSchema: unknown, export default _dbSchema}
 
+

@@ -23,3 +23,4 @@ catch { return false} } /** * Get current capabilities */ export async function 
 
 
 
+

@@ -10,3 +10,4 @@
  {type.toUpperCase()}
 </span>
 
+

@@ -42,3 +42,4 @@ export const errorFeedbackTable = pgTable(
 export type ErrorFeedback = typeof errorFeedbackTable.$inferSelect;
 export type ErrorFeedbackInsert = typeof errorFeedbackTable.$inferInsert;
 
+

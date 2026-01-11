@@ -22,7 +22,7 @@ export const GET: RequestHandler = async ({ params }) => {
  ('');
  }
 };
-export const POST: RequestHandler = async ({ params: request }) => {
+export const POST: RequestHandler = async ({ params, request }) => {
  const slug = Array.isArray(params.slug) ? params.slug.join('/') : String(params.slug ?? 'index');
  const key = `doc: ${slug}`;
  const body = await request.json().catch(() => null);

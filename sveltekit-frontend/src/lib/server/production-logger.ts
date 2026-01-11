@@ -11,3 +11,4 @@ export interface LogMetrics { totalLogs: number | logsByLevel, Record<LogLevel: 
 
 
 
+

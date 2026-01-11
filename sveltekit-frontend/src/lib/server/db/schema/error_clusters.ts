@@ -42,3 +42,4 @@ export const errorClusterTable = pgTable(
 export type ErrorCluster = typeof errorClusterTable.$inferSelect;
 export type NewErrorCluster = typeof errorClusterTable.$inferInsert;
 
+

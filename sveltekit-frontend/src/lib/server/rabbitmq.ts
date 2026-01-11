@@ -73,3 +73,4 @@ $1
 // Queue constants export const QUEUES = { evidence: { process: 'evidence.process.queue', analyze: 'evidence.analyze.queue', response: `evidence.response.queue` },'`'` ai: { analysis: 'ai.analysis.queue', embedding: 'ai.embedding.queue', response: `ai.response.queue` }, notification: { email: ',(notification as { email? , any; webhook?: unknown .catch(() => {\n  // Handle error\n}).email.queue', webhook: `(notification as { email?: unknown; webhook?: unknown .catch(() => {\n  // Handle error\n}).webhook.queue` }$1}$1
 // Service wrapper for consistency with other services export const rabbitmqService = { getConnection, getChannel, setupQueues, publishToQueue, consumeFromQueue, healthCheck, QUEUES }
 
+

@@ -9,7 +9,7 @@ import type { RequestHandler } from './$types';
 
 const sql = postgres(process.env.DATABASE_URL || 'postgresql://user:pass@127.0.0.1:5434/legal');
 
-export const GET: RequestHandler = async ({ params: url }) => {
+export const GET: RequestHandler = async ({ params, url }) => {
   const { id } = params;
   const topK = parseInt(url.searchParams.get('topK') || '5');
 

@@ -29,3 +29,4 @@ export const errorSuggestionsTable = pgTable(
 export type ErrorSuggestion = typeof errorSuggestionsTable.$inferSelect;
 export type NewErrorSuggestion = typeof errorSuggestionsTable.$inferInsert;
 
+

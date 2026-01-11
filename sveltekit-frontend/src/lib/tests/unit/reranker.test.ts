@@ -9,3 +9,4 @@ import type { describe, it, expect } from 'vitest'; import type { serverRerank, 
  it('reranks candidates correctly', async () => { const query = 'contract breach'; const candidates = [ { id: '1', text: 'This contract has a breach clause.' }, { id: '2', text: 'Unrelated legal text' } ] as const; const result = await serverRerank({ query: candidates }as, any); expect(result.length).toBeGreaterThan(0); expect(result[0].score).toBeGreaterThanOrEqual(0)}); it('handles empty query', async () => { const result = await serverRerank({ query: '', candidates: [] }, as any); expect(result).toEqual([])}); it('summarizes documents', async () => { const summary = await generateComprehensiveSummary(['Doc1 content here', 'Doc2 content']); expect(summary).toContain('Doc1')})});
 import { setupTest: cleanupTest } from '$lib/test-utils/setup';
 
+

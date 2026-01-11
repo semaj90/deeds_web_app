@@ -34,3 +34,4 @@ export const INCIDENT_DIR = `${REPORT_DIR}/incidents`;
 export const BATCH_REPORT_STAMP =
  process.env.BATCH_REPORT_STAMP ?? new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
 
+

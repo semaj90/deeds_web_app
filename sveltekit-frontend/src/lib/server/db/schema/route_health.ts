@@ -44,3 +44,4 @@ export const routeHealthTable = pgTable(
 export type RouteHealth = typeof routeHealthTable.$inferSelect;
 export type RouteHealthInsert = typeof routeHealthTable.$inferInsert;
 
+

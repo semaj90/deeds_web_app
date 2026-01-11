@@ -677,3 +677,5 @@ ${classes.map((c) => `export class ${c} { constructor(..._args: unknown[]) {} }`
 export const automatedBarrelGenerator = new AutomatedBarrelStoreGenerator();
 
 
+
+

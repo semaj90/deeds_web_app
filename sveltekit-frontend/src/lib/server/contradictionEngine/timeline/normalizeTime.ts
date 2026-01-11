@@ -10,3 +10,4 @@ export function normalizeTimelineFacts(facts: TimelineFact[]): TimelineFact[] {
  return facts.map(normalizeTimelineFact);
 }
 
+

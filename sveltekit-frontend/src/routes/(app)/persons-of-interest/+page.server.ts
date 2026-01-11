@@ -1,6 +1,6 @@
 import type { PageServerLoad } from './$types.js';
 
-export const load: PageServerLoad = async ({ locals: url }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
  // Get case ID from query params or session
  const caseId = url.searchParams.get('caseId') || locals.caseId;
 
@@ -12,4 +12,5 @@ export const load: PageServerLoad = async ({ locals: url }) => {
  caseId,
  };
 };
+
 

@@ -59,3 +59,5 @@ export const load: PageServerLoad = async ({ locals }) => {
  throw error(500, 'Failed to load dashboard data');
  }
 };
+
+

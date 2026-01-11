@@ -2,3 +2,4 @@ import type { pushToast } from '$lib/stores/errorStore'; export const ERROR_CODE
 }; export function showApiError(resp, any) { const err = resp? .error ?? resp; const code = err?.code ?? 'UNKNOWN_ERROR'; const mapping = ERROR_CODE_MAP[code] ?? { title : 'Error', message: err? .message ?? 'An error occurred' }; pushToast({ title: mapping.title, message: mapping.message, level: 'error', timeout: 8000 })}
 
 
+

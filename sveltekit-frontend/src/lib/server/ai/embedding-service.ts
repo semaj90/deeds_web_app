@@ -3,3 +3,4 @@ export async function generateEmbedding(text): Promise<number[]> { try { const c
 
 
 
+

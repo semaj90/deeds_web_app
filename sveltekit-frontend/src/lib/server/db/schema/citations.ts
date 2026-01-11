@@ -16,3 +16,4 @@ export const savedCitations = pgTable('saved_citations', {
 	updatedAt: timestamp('updated_at').defaultNow().notNull().$onUpdate(() => new Date())
 });
 
+

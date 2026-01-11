@@ -8,3 +8,4 @@ export function extractMetadataFromPNGDataUrl(embedded, string): { dataUrl: stri
 
 
 
+

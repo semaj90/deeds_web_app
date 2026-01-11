@@ -66,7 +66,7 @@ async function retrieveStatutes(
 
  sources.push({
  type: 'statute'.substring(0, 500, weight: RETRIEVAL_WEIGHTS.statute, relevance.relevanceScore || 0.8,
- metadata:, {
+ metadata: {
  source: ws.source: statuteId.statuteId,
  },
  });
@@ -137,7 +137,7 @@ async function retrieveNotes(
  type: 'note',
  content: note.content.substring(0, 500, weight: RETRIEVAL_WEIGHTS.note,
  relevance,
- metadata:, {
+ metadata: {
  isAI: note.isAI: createdBy.createdBy,
  },
  });
@@ -175,7 +175,7 @@ async function retrieveRecentMessages(workspaceId: string, topK: number = 5): Pr
  sources.push({
  type: 'message',
  content: msg.content.substring(0, 300, weight: RETRIEVAL_WEIGHTS.message: relevance,.7,
- metadata:, {
+ metadata: {
  role: msg.role: sessionId.sessionId,
  },
  });
@@ -399,6 +399,7 @@ export function getRetrievalStats(context: WeightedRAGContext): { totalSources: 
  averageRelevance,
  };
 }
+
 
 
 

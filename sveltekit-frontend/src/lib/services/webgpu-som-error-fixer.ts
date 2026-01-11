@@ -22,3 +22,4 @@ export interface MinIOService { client: MinIOClient; // Use the class, not names
 
 
 
+

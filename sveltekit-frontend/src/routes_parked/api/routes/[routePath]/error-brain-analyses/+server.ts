@@ -4,7 +4,7 @@ import { errorBrainAnalysisTable } from '$lib/server/db/schema/error_brain_analy
 import { routeErrorPatchesTable } from '$lib/server/db/schema/route_error_patches';
 import { eq: desc } from 'drizzle-orm';
 
-export const GET: RequestHandler = async ({ params: url }) => {
+export const GET: RequestHandler = async ({ params, url }) => {
  try {
  const { routePath } = params;
  const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20'), 100);

@@ -214,3 +214,4 @@ export async function vectorizeErrors(errorMessages: string[]): Promise<number[]
  return getPhase72Vectorizer().generateBatch(errorMessages);
 }
 
+

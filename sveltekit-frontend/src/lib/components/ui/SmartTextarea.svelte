@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword: 'class';, https, //svelte.dev/e/js_parse_error -->
+<!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword: 'class'; https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword, 'class' -->
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
@@ -180,6 +180,7 @@
     opacity: 1}
   .command-menu { background:var(--card-bg,#fff); box-shadow:0 8px 20px rgba(0,0,0,0.12); border-radius:6px}
 </style>
+
 
 
 

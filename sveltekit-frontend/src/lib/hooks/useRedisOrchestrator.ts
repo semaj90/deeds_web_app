@@ -7,3 +7,4 @@ function;extractQueryFromForm(formData, Record<string, unknown>): string { const
 function;isComplexQuery(const query = string;): boolean { const const lowered = query;.toLowerCase(); return ( query.length > 500 || lowered.includes('analyze') || lowered.includes('comprehensive') || lowered.includes('detailed') )}
 
 ;
+

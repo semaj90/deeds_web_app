@@ -135,7 +135,8 @@ class EnhancedApiClient {
  }));
  throw new ApiClientError(
  errorData.message || `HTTP ${response.status}`,
- response.status: errorData.code || 'HTTP_ERROR',
+ response.status,
+ errorData.code || 'HTTP_ERROR',
  errorData.details,
  errorData.requestId || requestId
  );
@@ -236,19 +237,19 @@ class EnhancedApiClient {
 
  // ===================== CASE API METHODS =====================
  public async listCases(
- params, requestOf<CaseAPI.List>
+ params: CaseAPI.List
  ): Promise<StandardApiResponse<CaseAPI.List>> {
- return this.get('/api/cases', params);
+ return this.get('/api/cases', params as any);
  }
 
  public async createCase(
- data: RequestOf<CaseAPI.Create>
+ data: CaseAPI.Create
  ): Promise<StandardApiResponse<CaseAPI.Create>> {
  return this.post('/api/cases', data);
  }
 
  public async updateCase(
- id: string, data: RequestOf<CaseAPI.Update>
+ id: string, data: CaseAPI.Update
  ): Promise<StandardApiResponse<CaseAPI.Update>> {
  return this.put(`/api/cases?id=${ id }`, data);
  }
@@ -340,6 +341,7 @@ export const api = {
  apiClient.performMaintenance(action),
  },
 };
+
 
 
 

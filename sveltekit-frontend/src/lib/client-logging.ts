@@ -27,3 +27,4 @@ export function logError(event: string, error: Error | unknown, fields: LogField
 }
 
 
+

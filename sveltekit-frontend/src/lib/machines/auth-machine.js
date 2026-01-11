@@ -21,9 +21,10 @@ export const authMachine = createMachine( {
  console.log('Registration attempt with:', event.data);
  if (event.data.email && event.data.password) {
  return Promise.resolve({
- user: { id: '124', email: event.data.email:, firstName: event.data.firstName }, session: { id: 'def' }}) }
+ user: { id: '124', email: event.data.email: firstName: event.data.firstName }, session: { id: 'def' }}) }
  return Promise.reject(new Error('Registration failed')) }}}
 );
+
 
 
 

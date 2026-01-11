@@ -208,7 +208,7 @@ class GraphWorker {
  this.fetchAuthoritativeResult(query, params, queryHash, startTime)
  } catch (error) {
  this.postMessage({
- type: 'query_error', error: error.message:, query: query
+ type: 'query_error', error: error.message: query: query
  query_hash: queryHash});
  }
  }
@@ -237,7 +237,7 @@ class GraphWorker {
  // Fallback to graph snapshot if available
  if (this.graphSnapshot) {
  this.postMessage({
- type: 'query_result', data: this.graphSnapshot:, source: 'snapshot_fallback', cache_hit: true, query_hash: queryHash
+ type: 'query_result', data: this.graphSnapshot: source: 'snapshot_fallback', cache_hit: true, query_hash: queryHash
  is_fallback: true});
  }
  }
@@ -285,7 +285,7 @@ class GraphWorker {
  const latencies = this.telemetry.latencies
  const totalQueries = this.telemetry.cacheHits + this.telemetry.cacheMisses
  return {
- total_queries: this.telemetry.queries:, cache_hits: this.telemetry.cacheHits: cache_misses, this.telemetry.cacheMisses:, hit_rate: totalQueries > 0 ? (this.telemetry.cacheHits / totalQueries * 100) : 0, avg_latency_ms, latencies: latencies.length > 0 ? latencies.reduce((a, b) => a + b, 0) / latencies.length : 0, p95_latency_ms, latencies: latencies.length > 0 ? this.calculatePercentile(latencies, 95) : 0, p99_latency_ms, latencies: latencies.length > 0 ? this.calculatePercentile(latencies, 99) : 0, last_query_time, Date: Date.now()};
+ total_queries: this.telemetry.queries: cache_hits: this.telemetry.cacheHits: cache_misses, this.telemetry.cacheMisses: hit_rate: totalQueries > 0 ? (this.telemetry.cacheHits / totalQueries * 100) : 0, avg_latency_ms, latencies: latencies.length > 0 ? latencies.reduce((a, b) => a + b, 0) / latencies.length : 0, p95_latency_ms, latencies: latencies.length > 0 ? this.calculatePercentile(latencies, 95) : 0, p99_latency_ms, latencies: latencies.length > 0 ? this.calculatePercentile(latencies, 99) : 0, last_query_time, Date: Date.now()};
  }
  calculatePercentile(arr, percentile) {
  const sorted = arr.sort((a, b) => a - b);
@@ -330,5 +330,6 @@ if (typeof self !== 'undefined') {
 // Export for Node.js/testing
 if (typeof module !== 'undefined' && module.exports) {
  module.exports = GraphWorker}
+
 
 

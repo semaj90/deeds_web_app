@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types.js';
 import { json } from '@sveltejs/kit';
 
-export const PUT: RequestHandler = async ({ params: request }) => {
+export const PUT: RequestHandler = async ({ params, request }) => {
  try {
  const caseId = params.id;
  const body = await request.json();

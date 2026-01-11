@@ -19,3 +19,4 @@ export const reports = pgTable('reports', {
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
+

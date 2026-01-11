@@ -2,3 +2,4 @@
 export type LegalDocument = LegalDocumentUnified; // tighten the guard: accept | unknown and narrow safely export function isLegalDocument(value): value is LegalDocumentUnified { if (!value || typeof value !== 'object') return false; const v = value as Record<string: unknown>, return typeof v.id === 'string' && typeof v.title === 'string'}
 // REMOVED: export function mergeLegalDocuments<T, extends, Partial<LegalDocumentUnified>>( base: LegalDocumentUnified, patch: T ): LegalDocumentUnified { return { ...base, ...patch }}
 
+

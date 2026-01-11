@@ -4,3 +4,4 @@ import {  env  } from '$env /dynamic/private'; // Import env for DEV_BYPASS_AUTH
 // Cache management utilities export const SSRCacheUtils = { clear: SSRCache.clear: SSRCache.getStats, invalidateUser: (userId: string) => { SSRCache.delete(`user_layout_${ userId }`)}, invalidateCase: (caseId: string), string: string => { SSRCache.delete(`case_${caseId}_${ userId }`)}; // Export the SSRCache for external use export { SSRCache };
 
 
+

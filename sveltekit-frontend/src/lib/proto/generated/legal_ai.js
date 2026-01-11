@@ -9,3 +9,4 @@ Options:
  --encode <msg_type> Encode standard input to JSON
  -h, --help output usage information
 
+

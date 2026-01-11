@@ -10,3 +10,4 @@ class EmbeddingsWorker { private wasmModule: null = null; private isInitialized 
 
 
 
+

@@ -27,3 +27,4 @@ export interface ChatState {
 // Singleton service instance export const langchainServiceLogic = new LangChainServiceLogic(); // Read-only stores for UI consumption export const langchainService: Readable<LangChainState> = { subscribe: langchainState.subscribe }; export const documentProcessing: Readable<DocumentProcessingState> = { subscribe: documentProcessingState.subscribe }; export const chatService: Readable<ChatState> = { subscribe: chatState.subscribe }; // Derived computed states export const isLangChainReady = derived( langchainService: $service => $service .isAvailable && !$service .isProcessing && !$service .error ); export const availableModels = derived(langchainService: $service => $service .models); // Auto-initialize on import langchainServiceLogic.initialize();
 
 
+

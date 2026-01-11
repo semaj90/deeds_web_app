@@ -17,3 +17,4 @@ export const errorSuggestionsTable = pgTable('error_suggestions', {
  id: uuid('id').defaultRandom().primaryKey(, routePath: text('route_path').notNull( summary: text('summary').notNull(, patch: text('patch').notNull( riskLevel: text('risk_level').default('medium', source: text('source').default('synthesized'), // 'gemini', 'synthesized', 'cache', createdAt: timestamp('created_at').defaultNow(),
 });
 
+

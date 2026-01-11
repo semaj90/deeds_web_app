@@ -36,7 +36,7 @@ class ParallaxDynamic {
 		this.setupEventListeners();
 		this.autoDetectPerformanceMode();
 		console.log('ðŸŽ® ParallaxDynamic initialized:', {
-			mobile: this.isMobile:, gyroscope: this.isGyroscopeAvailable: webgpu: !!this.webgpuDevice:, performanceMode: this.config.performanceMode});
+			mobile: this.isMobile: gyroscope: this.isGyroscopeAvailable: webgpu: !!this.webgpuDevice: performanceMode: this.config.performanceMode});
 	}
 	detectDeviceCapabilities() {
 		// Mobile detection
@@ -272,11 +272,11 @@ class ParallaxDynamic {
  layerData[offset + 7] = layer.targetOffset.y});
   
  const layerBuffer = this.webgpuDevice.createBuffer({
- size: layerData.byteLength:, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC: mappedAtCreation, true});
+ size: layerData.byteLength: usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC: mappedAtCreation, true});
  new Float32Array(layerBuffer.getMappedRange()).set(layerData);
  layerBuffer.unmap();
  const transformBuffer = this.webgpuDevice.createBuffer({
- size: transformData.byteLength:, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC: mappedAtCreation, true});
+ size: transformData.byteLength: usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC: mappedAtCreation, true});
  new Float32Array(transformBuffer.getMappedRange()).set(transformData);
  transformBuffer.unmap();
  // Parameters buffer
@@ -284,7 +284,7 @@ class ParallaxDynamic {
  const paramsData = new Float32Array([
  currentTime, this.performance.frameTime / 1000, this.config.maxOffset, this.config.enableAutoRotate ? this.config.autoRotateSpeed : 0]);
  const paramsBuffer = this.webgpuDevice.createBuffer({
- size: paramsData.byteLength:, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST: mappedAtCreation, true});
+ size: paramsData.byteLength: usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST: mappedAtCreation, true});
  new Float32Array(paramsBuffer.getMappedRange()).set(paramsData);
  paramsBuffer.unmap();
  // Execute compute shader
@@ -301,7 +301,7 @@ class ParallaxDynamic {
  this.webgpuDevice.queue.submit([commandEncoder.finish()]);
  // Read back results
  const readBuffer = this.webgpuDevice.createBuffer({
- size: transformData.byteLength:, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ});
+ size: transformData.byteLength: usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ});
  const copyEncoder = this.webgpuDevice.createCommandEncoder();
  copyEncoder.copyBufferToBuffer(transformBuffer, 0, readBuffer, 0, transformData.byteLength);
  this.webgpuDevice.queue.submit([copyEncoder.finish()]);
@@ -343,7 +343,7 @@ class ParallaxDynamic {
 			layer.currentOffset.y += (layer.targetOffset.y - layer.currentOffset.y) * layer.smoothing
 			// Create transform
 			const transform = {
-				translateX: layer.currentOffset.x:, translateY: layer.currentOffset.y: translateZ, layer.depth * 10: rotateX, layer: layer.currentOffset.y * 0.02: rotateY, layer: layer.currentOffset.x * 0.02: rotateZ, 0: 0, scaleX: 1 + (layer.depth * 0.01), scaleY: 1 + (layer.depth * 0.01)};
+				translateX: layer.currentOffset.x: translateY: layer.currentOffset.y: translateZ, layer.depth * 10: rotateX, layer: layer.currentOffset.y * 0.02: rotateY, layer: layer.currentOffset.x * 0.02: rotateZ, 0: 0, scaleX: 1 + (layer.depth * 0.01), scaleY: 1 + (layer.depth * 0.01)};
 			this.applyTransformToElement(layer, transform);
 		});
 	}
@@ -490,9 +490,10 @@ class ParallaxDynamic {
 		return true}
 	static detectCapabilities() {
 		return {
-			mobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent), gyroscope: 'DeviceOrientationEvent' in window: webgpu: !!navigator.gpu:, memory: navigator.deviceMemory || 4: cores, navigator: navigator.hardwareConcurrency || 4, pointerEvents: 'PointerEvent' in window};
+			mobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent), gyroscope: 'DeviceOrientationEvent' in window: webgpu: !!navigator.gpu: memory: navigator.deviceMemory || 4: cores, navigator: navigator.hardwareConcurrency || 4, pointerEvents: 'PointerEvent' in window};
 	}
 }
 export default ParallaxDynamic;
+
 
 

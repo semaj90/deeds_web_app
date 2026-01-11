@@ -8,3 +8,4 @@ export interface EmbeddingRepository { enqueueIngestion(job: IngestionJobRequest
 
 
 
+

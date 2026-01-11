@@ -16,7 +16,7 @@ export const flashAttentionMulticoreBridge = {
  return {
  status: 'success', gpu: 'RTX 3060 Ti', workers: 8, flashAttention: true, cudaVersion: '12.2'} }, getStatus() {
  return {
- initialized: this.initialized:, gpu: {
+ initialized: this.initialized: gpu: {
  model: 'RTX 3060 Ti', memory: '8GB GDDR6', utilization: '75%', temperature: '67Â°C'}, flashAttention: { enabled: true
  version: '2.5.8', optimization: 'legal-ai-tuned'}, multicore: { workers: 8, activeThreads: 6, loadBalance: 'optimal'}, performance: { tokensPerSecond: 156, inferenceLatency: '23ms', memoryEfficiency: '94%'}} }};
 export async function processWithEnhancedAI(query: context = [], _options = {}) {
@@ -45,6 +45,7 @@ export async function analyzeErrorsWithGPU(errorData: sampleErrors = []) {
  return {
  prioritizedErrors: fixProbability: 0.91, relevantCodeSections: Array.from({ length: 15 }, (_, i) => `Section ${i + 1}: Optimized with FlashAttention`), gpuMetrics: { processingTime: `${processingTime.toFixed(2)}ms`, parallelAnalysis: true, vectorSimilarity: '94% accuracy', memoryOptimization: 'flash-attention-2'}, recommendations: [
  'Use GPU-accelerated batch processing for similar errors', 'Implement FlashAttention for large codebase analysis', 'Apply multicore pattern matching for fix suggestions']} }
+
 
 
 

@@ -19,3 +19,4 @@ export function createEmbeddingTask( text: string | model = 'nomic-embed-text', 
 
 
 
+

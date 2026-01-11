@@ -21,3 +21,4 @@ else { reward -= 0.5} // Performance-based rewards if (outcome.responseTime) { /
 
 
 
+

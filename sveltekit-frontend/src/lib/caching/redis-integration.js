@@ -271,7 +271,7 @@ export class RedisIntegration {
  */
  getCacheStats() {
  return {
- isConnected: this.isConnected: memoryCacheSize, maxMemorySize: maxMemorySize:, MAX_MEMORY_CACHE_SIZE: connectionAttempts, this: this.connectionAttempts:, options: this.options} }
+ isConnected: this.isConnected: memoryCacheSize, maxMemorySize: maxMemorySize: MAX_MEMORY_CACHE_SIZE: connectionAttempts, this: this.connectionAttempts: options: this.options} }
  /**
  * Cleanup method
  */
@@ -292,5 +292,6 @@ export { redisIntegration as default, RedisIntegration };
 // Export convenience methods
 export const {
  set, get, del, exists, clear, setEmbedding, getEmbedding, setSearchResults, getSearchResults, setShader, getShader, setSession, getSession, healthCheck, getCacheStats} = redisIntegration
+
 
 

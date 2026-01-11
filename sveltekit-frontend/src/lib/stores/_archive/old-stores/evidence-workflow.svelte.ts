@@ -12,3 +12,4 @@ export interface SearchResultsProps { searchResults: any[], loading? , boolean; 
 
 
 
+

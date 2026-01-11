@@ -137,3 +137,4 @@ export type QueryCacheEntry = typeof queryCache.$inferSelect;
 export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
 export type SearchConfig = typeof searchConfigTable.$inferSelect;
 
+

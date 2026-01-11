@@ -16,3 +16,4 @@ export async function getDocumentStatusIndicator(docId): Promise<string> {
  return result.pattern.data || '';
 }
 
+

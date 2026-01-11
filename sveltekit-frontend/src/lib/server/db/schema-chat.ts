@@ -67,3 +67,4 @@ export const chatMetadata = pgTable('chat_metadata', {
 export type ChatMetadata = typeof chatMetadata.$inferSelect;
 export type NewChatMetadata = typeof chatMetadata.$inferInsert;
 
+

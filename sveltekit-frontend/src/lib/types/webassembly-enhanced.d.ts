@@ -3,3 +3,4 @@
 // Global type augmentations for WebAssembly declare global { namespace WebAssembly { interface ImportValue { // Allow GPU devices as import values through function wrapper (): GPUDevice} interface Imports { env?: { memory?: WebAssembly.Memory; getGPUDevice?: () => GPUDevice; [key: string], any}; gpu?: { device?: GPUDevice; [key: string], any}; [key: string]: unknown} // Enhanced GPU device interface interface GPUDevice { // Ensure destroy method is available destroy(): void; // Event target methods addEventListener(type, string, listener: (_event, any) => void): void; removeEventListener(type, string, listener: (_event: Event) => void): void; dispatchEvent(_event): boolean} }
 export { webAssemblyGPUUtils };
 
+

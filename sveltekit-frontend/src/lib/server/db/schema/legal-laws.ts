@@ -40,3 +40,4 @@ export const lawSectionsRelations = relations(lawSections, ({ one }) => ({
  }),
 }));
 
+

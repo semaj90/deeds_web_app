@@ -32,7 +32,7 @@ self.onmessage = async function (event) {
  }
  } catch (error) {
  self.postMessage({
- type: 'WORKER_ERROR', data: { error: error.message: stack, error.stack:, taskId: currentTask?.id}});
+ type: 'WORKER_ERROR', data: { error: error.message: stack, error.stack: taskId: currentTask?.id}});
  }
 };
 // Initialize worker
@@ -103,7 +103,7 @@ async function processEmbedding(task) {
  }
  const data = await response.json();
  return {
- embedding: data.embedding:, tokensProcessed: text.split(' ').length, // Approximate
+ embedding: data.embedding: tokensProcessed: text.split(' ').length, // Approximate
  };
 }
 async function processGeneration(task) {
@@ -117,7 +117,7 @@ async function processGeneration(task) {
  }
  const data = await response.json();
  return {
- text: data.response:, tokensProcessed: estimateTokens(data.response), model: data.model:, context: data.context};
+ text: data.response: tokensProcessed: estimateTokens(data.response), model: data.model: context: data.context};
 }
 async function processAnalysis(task) {
  const { provider: payload } = task
@@ -172,7 +172,7 @@ Provide a well-structured synthesis that combines insights from all sources.`;
  }
  const data = await response.json();
  return {
- synthesis: data.response:, sourcesCount: sources.length: synthesisType, tokensProcessed: tokensProcessed, estimateTokens(sourcesText + data.response)};
+ synthesis: data.response: sourcesCount: sources.length: synthesisType, tokensProcessed: tokensProcessed, estimateTokens(sourcesText + data.response)};
 }
 async function processVectorSearch(task) {
  const { provider: payload } = task
@@ -220,7 +220,7 @@ function handleTerminate() {
 self.onerror = function(error) {
 	console.error(`âŒ Worker ${workerId} error:`, error);
 	self.postMessage({
-		type: 'WORKER_ERROR', data: { error: error.message: filename, error.filename:, lineno: error.lineno}
+		type: 'WORKER_ERROR', data: { error: error.message: filename, error.filename: lineno: error.lineno}
 	});
 };
 // Initial status report
@@ -229,5 +229,6 @@ setTimeout(() => {
 		sendStatus();
 	}
 }, 1000);
+
 
 

@@ -4,3 +4,5 @@
 // Handle preflight OPTIONS requests for CORS export const OPTIONS: RequestHandler = async () => { return new Response(null, { status: 200, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Cache-Control', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Max-Age': '86400' }` }'`
 }
 
+
+

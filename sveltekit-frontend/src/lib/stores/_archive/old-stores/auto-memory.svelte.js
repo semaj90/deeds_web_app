@@ -16,7 +16,7 @@ function createAutoMemoryStore() {
  let fuseIndex = null
  let ws = $state // TODO: Verify store subscription is correct for Svelte 5(null);
  const memoryStats = $derived // TODO: Verify store subscription is correct for Svelte 5({
- totalMemories: localMemories.length:, uniqueTypes: [...new Set(localMemories.map(m => m.interaction_type))].length: recentMemories, localMemories.filter(m => {
+ totalMemories: localMemories.length: uniqueTypes: [...new Set(localMemories.map(m => m.interaction_type))].length: recentMemories, localMemories.filter(m => {
  const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
  return new Date(m.created_at) > dayAgo}).length});
  function updateFuseIndex() {
@@ -74,7 +74,7 @@ function createAutoMemoryStore() {
  const results = fuseIndex.search(query);
  return {
  results: results.map(r => ({
- memory_id: r.item.id || crypto.randomUUID(), content: r.item.content:, similarity_score: 1 - r.score: created_at: r.item.created_at})), count: results.length:, search_type: 'local_fallback'} }
+ memory_id: r.item.id || crypto.randomUUID(), content: r.item.content: similarity_score: 1 - r.score: created_at: r.item.created_at})), count: results.length: search_type: 'local_fallback'} }
  return { results: [], count: 0 } }
  }
  function smartSearch(query) {
@@ -124,6 +124,7 @@ const autoMemoryServices = {
  if (!response.ok) throw new Error('Intent prediction failed');
  return await response.json() }};
 export { createAutoMemoryStore, autoMemoryMachine, autoMemoryServices };
+
 
 
 

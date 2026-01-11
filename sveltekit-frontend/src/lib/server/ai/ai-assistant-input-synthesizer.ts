@@ -12,3 +12,4 @@ export async function webgpuRerankFallback(request: RerankRequest): Promise<any>
  return { rerankedItems, request.items || [], message: 'WebGPU rerank fallback placeholder' };
 }
 
+

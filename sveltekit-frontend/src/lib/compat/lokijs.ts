@@ -118,3 +118,4 @@ export default Loki;
 export type Collection<T extends Doc = Doc> = MemoryCollection<T>;
 
 
+

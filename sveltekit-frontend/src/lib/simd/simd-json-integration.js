@@ -314,3 +314,4 @@ export async function getSIMDMetrics() {
 // Auto-initialize status check on module load
 checkSIMDStatus().catch(e => console.warn('Initial SIMD status check failed:', e));
 
+

@@ -3,3 +3,4 @@ import type { type boolean, json, type pgTable, type serial, text, type timestam
 ; export const storage_files = pgTable('storage_files', { id: serial('id').primaryKey(, key: text('key').notNull( original_name: text('original_name').notNull(, bucket: text('bucket').notNull( user_id: text('user_id').notNull(, size: text('size').notNull( mime: text('mime').notNull(, deleted: boolean('deleted').default(false).notNull( created_at: timestamp('created_at').defaultNow().notNull() }); export const storage_audits = pgTable('storage_audits', { id: serial('id').primaryKey(, action: text('action').notNull( user_id: text('user_id').notNull(, target: text('target').notNull( bucket: text('bucket').notNull(, success: boolean('success').notNull( metadata: json('metadata', created_at: timestamp('created_at').defaultNow().notNull() });
   
 
+

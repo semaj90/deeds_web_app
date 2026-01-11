@@ -10,3 +10,4 @@ class SvelteKit2UniversalPolyfill implements SvelteKitWASMPolyfill { private isI
 
 
 
+

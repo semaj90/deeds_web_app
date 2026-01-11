@@ -14,3 +14,4 @@ interface LegalEmbeddingResult { embeddings: number[], dimensions: number, proce
 
 
 
+

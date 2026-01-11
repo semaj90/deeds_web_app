@@ -94,3 +94,4 @@
  .icon-container-2xl { @apply h-16 w-16; }
  }
 </style>
+

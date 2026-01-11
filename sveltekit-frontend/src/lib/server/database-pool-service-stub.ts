@@ -9,3 +9,4 @@ export async function initializePool(): Promise<Pool> {
 	throw new Error('Database pool initialization not configured');
 }
 
+

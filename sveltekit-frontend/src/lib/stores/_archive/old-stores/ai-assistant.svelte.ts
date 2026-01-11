@@ -13,3 +13,4 @@ export interface CaseAIContext { caseId: title?: string; messages : AIMessage[],
 
 
 
+

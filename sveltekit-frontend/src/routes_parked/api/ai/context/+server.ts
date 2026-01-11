@@ -3,3 +3,4 @@
 /* * POST endpoint for updating context with AI interactions */ export async function POST({ request }: RequestHandler): Promise<any> { try { const { contextUpdate: interactionType } = await request.json(); // Update context based on AI interaction if (interactionType === "chat_message") { await ContextService.updateChatContext(contextUpdate)} else if (interactionType === "case_analysis") { await ContextService.updateCaseContext(contextUpdate)} return json({ success: true, message: "Context updated successfully" })} catch (error: Error | unknown) { console.error("Context update error: ", error); return json({ success: false, error: "Failed to update context", message: error instanceof Error ? error.message : "Unknown error" }, { status: 500 })} }
 
 
+

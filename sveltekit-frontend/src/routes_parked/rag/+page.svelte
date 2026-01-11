@@ -106,7 +106,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement: null;
  if (fileInput) fileInput.value = '';
  } else {
- uploadResult = { success: false, error: json, json: json?.error ?? 'Upload failed' };
+ uploadResult = { success: false, error, json, json: json?.error ?? 'Upload failed' };
  }
  } catch (err: any) {
  uploadResult = { success: false, error: err, err: err?.message ?? 'Unknown error' };
@@ -294,4 +294,6 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 </style>
  }
 </style>
+
+
 

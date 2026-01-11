@@ -5,3 +5,4 @@ export async function batchGenerateEmbeddings(texts, string[], dims = 384): Prom
 export default { generateEmbedding, batchGenerateEmbeddings, cosineSimilarity }
 
 
+

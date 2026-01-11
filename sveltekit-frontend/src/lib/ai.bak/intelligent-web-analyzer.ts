@@ -15,3 +15,4 @@ export type TrainingChunk = { input_text: string, embeddings: number[]; // seria
 
 
 
+

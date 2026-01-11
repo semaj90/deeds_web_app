@@ -3,3 +3,4 @@ import {  env  } from '$env /dynamic/private';
  return env.OLLAMA_URL || 'http://localhost: 11434';
 }
 
+

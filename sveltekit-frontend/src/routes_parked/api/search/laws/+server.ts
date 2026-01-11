@@ -110,3 +110,5 @@ export const POST: RequestHandler = async ({ request }) => {
 export const GET: RequestHandler = async () => {
  return json({ error: 'Use POST method to search laws' }, { status: 405 });
 };
+
+

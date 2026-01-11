@@ -299,3 +299,5 @@ export function clearSessionCookies(event: RequestEvent): void {
 // Export singleton instance
 export const quicAuthClient = new QuicAuthClient();
 
+
+

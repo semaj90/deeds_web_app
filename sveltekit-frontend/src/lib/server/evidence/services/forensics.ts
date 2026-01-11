@@ -9,3 +9,4 @@ export function detectSuspiciousPatterns(text, string) {
  return findings;
 }
 
+

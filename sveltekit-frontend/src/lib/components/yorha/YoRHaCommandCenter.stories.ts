@@ -8,3 +8,4 @@ import type { Meta, StoryObj } from '@storybook/svelte'; import type { within, u
 }; // Interactive demo with actions export const Interactive: Story = { args: { systemData: { activeCases: 25, evidenceItems: 89, personsOfInterest: 15, aiQueries: 456, systemLoad: 55, gpuUtilization: 42, memoryUsage: 63, networkLatency: 38 } }, parameters: { docs: { description: { story: 'Interactive demo - test all quick actions and modal interactions' } } }, play: async ({ canvasElement: step }) => { const canvas = within(canvasElement); await step('Click new case action', async () => { const newCaseButton = canvas.getByText('Create New Case'); await userEvent.click(newCaseButton); // Modal should appear await expect(canvas.getByText('CREATE NEW CASE')).toBeInTheDocument()})};
 
 
+

@@ -561,3 +561,4 @@ export const rabbitmqEmbeddingWorker = new RabbitMQEmbeddingWorker();
 export default rabbitmqEmbeddingWorker;
 
 
+

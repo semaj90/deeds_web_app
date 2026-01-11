@@ -178,7 +178,7 @@ export class Context7Phase8Integrator {
  aiConfidence:,, Math.round((result?.score ?? 0) * 100, implementation: { component: query.component,
  timeEstimate: '2-4 hours',
  },
- benefits:, this.extractBenefits(result?.content ?? '', risks: [],
+ benefits: this.extractBenefits(result?.content ?? '', risks: [],
  })) || []
  );
  }
@@ -495,6 +495,7 @@ export const commonContext7Phase8Queries = {
 // Export singleton instance
 export const context7Phase8Integrator = new Context7Phase8Integrator();
 export default Context7Phase8Integrator;
+
 
 
 

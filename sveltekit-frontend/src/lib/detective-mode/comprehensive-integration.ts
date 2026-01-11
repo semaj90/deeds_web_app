@@ -18,3 +18,4 @@ export interface QdrantSearchResult { id: score? , number; payload? : Record<str
 
 
 
+

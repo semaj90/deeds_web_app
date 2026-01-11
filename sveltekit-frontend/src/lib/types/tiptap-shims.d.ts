@@ -13,3 +13,4 @@ declare;
 declare;
 (module, '@tiptap/extension-collaboration');
 
+

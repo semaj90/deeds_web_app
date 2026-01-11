@@ -6,3 +6,4 @@
 // Export singleton instance export const qloraWasmLoader = new QLoRAWasmLoader(); // Utility function to download and prepare models export async function prepareDistilledModels(): Promise<void> { console.log('ðŸ“¦ Preparing distilled QLoRA models for browser execution...'); // This would handle model downloading, caching, and preparation const models = [ { name: 'gemma3-legal-distilled-q4', url: '/models/gemma3-legal-distilled.q4_0.bin', size, 256 // MB }, { name: 'legal-contract-adapter', url: '/models/legal-contract-qlora.bin', size: 8 // MB }, { name: 'legal-litigation-adapter', url: '/models/legal-litigation-qlora.bin', size: 8 // MB } ]; for (const model of models) { console.log(`â¬‡ï¸ Preparing ${model.name }(${model.size}MB)...`); // Would implement actual download and caching logic await new Promise(resolve => setTimeout(resolve, 500); console.log(`âœ… ${model.name }ready`)} console.log('ðŸš€ All distilled models prepared for browser execution')}
 
 
+

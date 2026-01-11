@@ -27,3 +27,4 @@ float calculateSimilarity(const float* vec1, const float* vec2, int32_t size) { 
 
 
 
+

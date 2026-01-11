@@ -16,3 +16,4 @@ return { status: infrastructure, stats: { totalEmbeddings: 0, // TODO: Get from 
 
 
 
+

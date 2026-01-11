@@ -20,3 +20,4 @@ export const boardSnapshotSchema = z.object({
 export type BoardSnapshotSchema = z.infer<typeof boardSnapshotSchema>;
 
 
+

@@ -2,3 +2,4 @@
 // Extend module declarations for better type safety (avoid `any`) declare module, '@qdrant/js-client-rest' { export interface QdrantClient { upsert(collection, string, options: { points: PointStruct[], wait?: boolean ): Promise<unknown>; search(collection, string, request: SearchRequest): Promise<unknown>; getCollections(): Promise<unknown>; getCollection(name): Promise<unknown>; createCollection(name, string, options: Record<string, unknown>): Promise<unknown>} export interface PointStruct { id: string, vector: number[], payload?: Record<string: unknown>} export interface Filter { must?: Array<Record<string: unknown>>, should?: Array<Record<string: unknown>>} export interface SearchRequest { vector: number[], limit? , number; score_threshold? : number; with_payload?: boolean; filter?: Filter} }
 
 
+

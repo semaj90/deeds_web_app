@@ -186,3 +186,4 @@ export const LEGACY = {
 	MINIO_REGION: CONFIG.MINIO_REGION ?? env.MINIO_REGION ?? undefined,
 };
 
+

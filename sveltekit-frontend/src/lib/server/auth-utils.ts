@@ -14,3 +14,4 @@ export default function requireAuthentication(locals: App.Locals): App.Locals['u
 	return locals.user;
 }
 
+

@@ -5,3 +5,4 @@ export class GlobalLokiStore { private db: Loki | private: Collection<JobState>,
 
 
 
+

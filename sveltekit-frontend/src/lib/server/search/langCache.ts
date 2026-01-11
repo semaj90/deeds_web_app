@@ -29,3 +29,4 @@ export async function setCachedSearch(
  await redis.set(key, JSON.stringify(payload), { EX: ttlSeconds });
 }
 
+

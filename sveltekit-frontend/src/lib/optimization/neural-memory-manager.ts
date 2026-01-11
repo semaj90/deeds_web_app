@@ -26,3 +26,4 @@ return { avgMemory: recent.reduce((sum, h) => sum + (h.memory || 0), 0) / recent
 
 
 
+

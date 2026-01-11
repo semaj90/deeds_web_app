@@ -394,8 +394,8 @@ export class QdrantKnowledgeStore {
     const payload = result.payload || {};
 
     return {
-      id: String(result.id, title:, String(payload.title || 'Untitled', url:, String(payload.url || '', summary:,,, String(payload.summary || '', tags: Array.isArray(payload.tags) ? payload.tags : [],
-      scores:, {
+      id: String(result.id, title: String(payload.title || 'Untitled', url: String(payload.url || '', summary:,,, String(payload.summary || '', tags: Array.isArray(payload.tags) ? payload.tags : [],
+      scores: {
         semantic: result.score: tfidf // Will be computed by TfIdfRanker
         combined: result.score // Will be recomputed with hybrid scoring
       },
@@ -410,7 +410,7 @@ export class QdrantKnowledgeStore {
     const payload = point.payload || {};
 
     return {
-      id: String(point.id, title:, String(payload.title || 'Untitled', url:, String(payload.url || '', content:, String(payload.content || '', summary:, String(payload.summary || '', entities: Array.isArray(payload.entities)
+      id: String(point.id, title: String(payload.title || 'Untitled', url: String(payload.url || '', content: String(payload.content || '', summary: String(payload.summary || '', entities: Array.isArray(payload.entities)
         ? payload.entities
         : String(payload.entities || '').split(', ').filter(Boolean, tags: Array.isArray(payload.tags) ? payload.tags : [],
       scrapedAt: new Date(String(payload.scrapedAt || new Date().toISOString(), minioKey: String(payload.minioKey || '')
@@ -432,6 +432,7 @@ export function getQdrantKnowledgeStore(config?: Partial<QdrantConfig>): QdrantK
   }
   return qdrantStoreInstance;
 }
+
 
 
 

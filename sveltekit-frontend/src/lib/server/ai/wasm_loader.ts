@@ -4,3 +4,4 @@ import type { spawn } from 'child_process'; export async function runNativeEncod
 export async function loadWasmStub(_wasmPath): Promise<null> { // Placeholder for future WASM loader implementation return null}
 
 
+

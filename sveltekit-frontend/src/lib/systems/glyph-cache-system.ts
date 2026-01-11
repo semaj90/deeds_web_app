@@ -16,3 +16,4 @@ export async function generateLegalEmbedding(text): Promise<Float32Array> { retu
 
 
 
+

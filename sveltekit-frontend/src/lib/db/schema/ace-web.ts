@@ -138,3 +138,4 @@ export type NewAceEntity = typeof aceEntities.$inferInsert;
 export type AceEdge = typeof aceEdges.$inferSelect;
 export type NewAceEdge = typeof aceEdges.$inferInsert;
 
+

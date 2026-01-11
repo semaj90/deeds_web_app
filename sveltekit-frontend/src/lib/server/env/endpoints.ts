@@ -9,3 +9,4 @@ export function getOllamaEndpoint(): string {
  return raw.replace(/\/$/, '');
 }
 
+

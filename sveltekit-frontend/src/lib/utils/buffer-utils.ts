@@ -6,3 +6,4 @@ export const createLegalDocumentBuffer = ( device: GPUDevice, doc: LegalDocument
 
 
 
+

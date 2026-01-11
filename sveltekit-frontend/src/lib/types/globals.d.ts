@@ -30,3 +30,4 @@ declare module, '*.jpg' { const _: unknown, export default _}
 
 
 
+

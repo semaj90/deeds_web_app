@@ -274,3 +274,4 @@ let { placeholder = 'Search citations...', minChars = 2 } = $props();
 </style>
 
 
+

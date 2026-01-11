@@ -10,3 +10,4 @@ export async function embedText(text: string): Promise<number[]> {
  .map((_, i) => Math.sin(text.charCodeAt(i % text.length) || 0) + Math.random() * 0.1);
 }
 
+

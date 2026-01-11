@@ -12,3 +12,4 @@ catch { return 8} private detectQueryType(query): string { const lower = query.t
 
 
 
+

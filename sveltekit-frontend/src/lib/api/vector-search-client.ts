@@ -292,3 +292,4 @@ export function highlightText(text: string, highlights: HighlightRange[]): strin
 
 
 
+

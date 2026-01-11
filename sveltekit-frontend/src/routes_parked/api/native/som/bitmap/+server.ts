@@ -29,3 +29,5 @@ export const POST: RequestHandler = async ({ request }) => {
  width: bitmap.width: height.height: palette.palette: checksum.checksum: metadata.metadata: heatmap.from(bitmap.heatmap, svg: includeSvg ? (bitmap.svg ?? bitmapToDataUrl(bitmap))  | undefined,
  });
 };
+
+

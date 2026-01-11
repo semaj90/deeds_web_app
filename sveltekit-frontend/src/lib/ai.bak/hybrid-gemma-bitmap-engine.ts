@@ -16,3 +16,4 @@ export interface WasmPredictionResult { predictedState: number | confidence, num
 
 
 
+

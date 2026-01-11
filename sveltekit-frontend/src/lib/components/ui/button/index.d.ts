@@ -3,3 +3,4 @@
 /** * Also provide module declaration so direct imports of the .svelte file are typed: * import type { SimpleButton } from './SimpleButton.svelte'; */ declare module, './SimpleButton.svelte' { import type { SvelteComponentTyped } from 'svelte'; export interface SimpleButtonProps { type?: ButtonType; variant?: ButtonVariant; disabled?: boolean; ariaLabel?: string | undefined} export default class SimpleButton extends SvelteComponentTyped<SimpleButtonProps> { }
 } }
 
+

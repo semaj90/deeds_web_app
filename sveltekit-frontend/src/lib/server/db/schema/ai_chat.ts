@@ -63,3 +63,4 @@ export const aiMemory = pgTable('ai_memory', {
 
 
 
+

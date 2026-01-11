@@ -305,3 +305,4 @@ export const fallbackConfidence = derived(
 export const errors = derived(documentProgressStore, ($state) => $state.errors);
 
 
+

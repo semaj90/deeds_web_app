@@ -7,3 +7,4 @@ class ErrorAnalysisWorkerEngine { private errorPatterns = new Map<string, RegExp
 
 
 
+

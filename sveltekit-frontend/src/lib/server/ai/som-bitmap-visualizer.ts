@@ -12,3 +12,4 @@ export function bitmapToDataUrl(result: SOMBitmapResult): string { const svg = r
 
 
 
+

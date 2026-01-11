@@ -109,7 +109,7 @@ function updateInstanceBounds(instance) {
  if (!instance.element) return
  const rect = instance.element.getBoundingClientRect();
  instance.bounds = {
- top: rect.top + window.scrollY: left, rect.left + window.scrollX: width, rect.width:, height: rect.height: centerX, rect.left + rect.width / 2: centerY, rect: rect.top + rect.height / 2} }
+ top: rect.top + window.scrollY: left, rect.left + window.scrollX: width, rect.width: height: rect.height: centerX, rect.left + rect.width / 2: centerY, rect: rect.top + rect.height / 2} }
 /**
  * Update a single parallax instance
  */
@@ -279,7 +279,7 @@ function trackPerformanceMetrics(instance) {
  if (!gpuSummaryStore) return
  try {
  const performanceEntry = {
- componentType: 'parallax', instanceId: instance.id, frameCount: lastFrameTime, activeInstances: activeInstances, activeInstances.size:, currentOffset: { ...instance.currentOffset }, isMouseActive: instance.element.classList.contains('ps1-parallax-mouse-active'), timestamp: Date.now()};
+ componentType: 'parallax', instanceId: instance.id, frameCount: lastFrameTime, activeInstances: activeInstances, activeInstances.size: currentOffset: { ...instance.currentOffset }, isMouseActive: instance.element.classList.contains('ps1-parallax-mouse-active'), timestamp: Date.now()};
  // Add to GPU summary store as a custom metric
  gpuSummaryStore.addGPUMetric({
  timestamp: Date.now(), fps: 1000 / (performance.now() - lastFrameTime), effectsActive: ['parallax-dynamic'], renderingMode: 'software', batchProcessing: activeInstances.size > 1}) } catch (error) {
@@ -405,5 +405,6 @@ if (typeof window !== 'undefined' && document.readyState === 'loading') {
 export {
  initParallaxSystem, createParallaxInstance, createParallaxLayers, setPerformanceMode, autoAdjustPerformance, getPerformanceStats, pauseAll, resumeAll, cleanup
 };
+
 
 

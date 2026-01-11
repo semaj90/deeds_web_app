@@ -2,3 +2,4 @@
 export const db: PostgresJsDatabase<typeof, schema> = new Proxy({ }as, any, { get(target, prop, receiver) { const database = initializeDatabase(); if (!database) { throw new Error('Database not initialized')} return Reflect.get(database, prop, receiver)}); export const isPostgreSQL = true; export const isSQLite = false; export * from '$lib/server/db/schema-postgres'; export function closeDatabase() { if (_pool) { _pool.end()} }
 
 
+

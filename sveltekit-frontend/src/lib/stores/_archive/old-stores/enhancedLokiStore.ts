@@ -15,3 +15,4 @@ export interface IndexStrategy { field: string, type: "btree" | "hash" | "text" 
 
 
 
+

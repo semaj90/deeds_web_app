@@ -19,3 +19,4 @@
  <span class="font-mono text-xs text-accent">OPEN →</span>
 </a>
 
+

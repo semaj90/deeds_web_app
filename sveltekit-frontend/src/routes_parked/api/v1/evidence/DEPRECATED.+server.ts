@@ -2,3 +2,5 @@
 import type { type RequestHandler } from '@sveltejs/kit';; export const GET: RequestHandler = async () => { return json({ deprecated: true, route: '/api/v1/evidence', replaceWith: '/api/v2/evidence? action=list', message : 'This endpoint is deprecated. Please use /api/v2/evidence', migration: { list: 'GET /api/v2/evidence? action=list&caseId=xxx', create : 'POST /api/v2/evidence', search: 'GET /api/v2/evidence? action=search&q=xxx' }, documentation : '/EVIDENCE-API-MIGRATION-GUIDE.md', removalDate: '2025-11-14' }, { status: 410, // Gone headers: { 'X-Deprecated': 'true', 'X-Migrate-To': '/api/v2/evidence', 'X-Removal-Date': '2025-11-14' } })}; export const POST: RequestHandler = async () => { return json({ deprecated: true, message: 'This endpoint is deprecated. Please use POST /api/v2/evidence', replaceWith: '/api/v2/evidence' }, { status: 410 })};
 
 
+
+

@@ -50,3 +50,4 @@ export function process_batch_embeddings(embeddings: Float32Array, batchSize: nu
 
  return result;
 }
+

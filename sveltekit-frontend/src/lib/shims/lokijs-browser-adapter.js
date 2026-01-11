@@ -43,3 +43,4 @@ export const browserLokiConfig = {
  }, autosave: true, autosaveInterval: 4000, persistenceMethod: 'localStorage'};
 export default BrowserAdapter;
 
+

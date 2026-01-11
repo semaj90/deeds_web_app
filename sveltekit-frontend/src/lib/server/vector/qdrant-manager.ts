@@ -4,3 +4,4 @@ import type { QdrantClient } from '@qdrant/js-client-rest'; // import type { Poi
 // Singleton instance export const qdrant = new QdrantManager(); // Initialize collections on module load qdrant.initializeCollections().catch(console.error);
 
 
+

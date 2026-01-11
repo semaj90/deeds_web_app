@@ -21,3 +21,5 @@ export const GET = async () => {
  { status: redisOk ? 200 : 503 }
  );
 };
+
+

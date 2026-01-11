@@ -42,3 +42,5 @@ export const GET: RequestHandler = async () => {
  return json({ error: 'Failed to read routes' }, { status: 500 });
  }
 };
+
+

@@ -40,3 +40,5 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  .overflow-y-auto::-webkit-scrollbar-thumb:hover { background: var(--nier-accent-cool)}
 </style>
 
+
+

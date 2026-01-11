@@ -609,3 +609,5 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 export const somCache = new WebGPUSOMCache();
 
 
+
+

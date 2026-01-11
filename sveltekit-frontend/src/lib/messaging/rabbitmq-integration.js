@@ -66,7 +66,7 @@ export async function sendToQueue(queue, message: options = { persistent: true }
  * onMessage receives (parsedContent, rawMessage)
  * If onMessage resolves, message is acked; if it throws/rejects, message is nacked.
  * @param {string} queue
- * @param {(content: any:, raw: any) => Promise<void> | void} onMessage
+ * @param {(content: any: raw: any) => Promise<void> | void} onMessage
  * @param {object} [options]
  */
 export async function consume(queue, onMessage: options = { noAck: false }) {
@@ -106,4 +106,5 @@ export async function close() {
 export default {
  connect, sendToQueue, consume, close
 };
+
 

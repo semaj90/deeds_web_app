@@ -177,7 +177,7 @@
  }
  };
 
- const getNodeAtPoint = (x: number, y: number, number): number:, Evidence: null => {
+ const getNodeAtPoint = (x: number, y: number, number): number: Evidence: null => {
  for (const node of evidence) {
  if (
  x >= node.boardPosition.x &&
@@ -266,6 +266,7 @@
  display: block;
  }
 </style>
+
 
 
 

@@ -3,3 +3,4 @@ import type { Message } from '$lib/types';
 }; /** * Redis-Optimized Version * Same endpoint, but with automatic Redis caching, agent memory, and task queuing */ export const POST = redisOptimized.aiChat(originalChatHandler); /** * This pattern can be applied to ANY existing endpoint: * * Before: export const POST = originalHandler *, After: export const POST = redisOptimized.aiChat(originalHandler) * * The middleware automatically: * 1. Checks Redis cache first (2ms response for cache hits) * 2. Falls back to original handler if no cache * 3. Caches successful responses for future requests * 4. Manages agent memory for conversation continuity * 5. Queues complex requests for background processing * 6. Provides Nintendo-style memory optimization * 7. Adds comprehensive Redis statistics to responses */
 
 
+

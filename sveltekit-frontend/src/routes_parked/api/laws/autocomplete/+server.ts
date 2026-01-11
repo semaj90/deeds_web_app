@@ -18,3 +18,5 @@ export const GET: RequestHandler = async ({ url }) => {
  return json({ suggestions: [], error: 'Failed to fetch suggestions' }, { status: 500 });
  }
 };
+
+

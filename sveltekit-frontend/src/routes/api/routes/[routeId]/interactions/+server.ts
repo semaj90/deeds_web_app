@@ -14,7 +14,7 @@ import {
     logInteraction,
     type NewRouteInteractionLog,
 } from '$lib/db/queries/nes-command-center';
-import { error: json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 
 /**
@@ -29,7 +29,7 @@ import type { RequestHandler } from './$types.js';
  * - Create route_interaction_log record
  * - Return created interaction record
  */
-export const POST: RequestHandler = async ({ params: request }) => {
+export const POST: RequestHandler = async ({ params, request }) => {
   const { routeId } = params;
 
   try {
@@ -89,7 +89,7 @@ export const POST: RequestHandler = async ({ params: request }) => {
  * - When archived=true, query archive tables
  * - When archived=false (default), query main tables
  */
-export const GET: RequestHandler = async ({ params: url }) => {
+export const GET: RequestHandler = async ({ params, url }) => {
   const { routeId } = params;
 
   try {

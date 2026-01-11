@@ -4,7 +4,7 @@ import type { RequestHandler } from './$types';
 // Phase 89: Related Files API
 // Uses cosine similarity from Qdrant to find related components
 
-export const GET: RequestHandler = async ({ params: fetch }) => {
+export const GET: RequestHandler = async ({ params, fetch }) => {
 	const componentId = params.id;
 
 	if (!componentId) {

@@ -60,3 +60,4 @@ export const vectorOperations = {
 
 export const vectorExtensionSQL = `CREATE EXTENSION IF NOT EXISTS vector;`;
 
+

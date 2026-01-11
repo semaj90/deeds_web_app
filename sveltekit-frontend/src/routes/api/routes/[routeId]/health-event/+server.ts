@@ -14,7 +14,7 @@ import {
     getRouteMetadata,
     type NewRouteHealthEvent,
 } from '$lib/db/queries/nes-command-center';
-import { error: json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import { broadcastHealthChange } from '../../events/+server.js';
 import type { RequestHandler } from './$types.js';
 
@@ -32,7 +32,7 @@ import type { RequestHandler } from './$types.js';
  * - Broadcast to all connected SSE clients
  * - Return created health event record
  */
-export const POST: RequestHandler = async ({ params: request }) => {
+export const POST: RequestHandler = async ({ params, request }) => {
   const { routeId } = params;
 
   try {
@@ -93,7 +93,7 @@ export const POST: RequestHandler = async ({ params: request }) => {
  * - Order by timestamp descending
  * - Return paginated results with total count
  */
-export const GET: RequestHandler = async ({ params: url }) => {
+export const GET: RequestHandler = async ({ params, url }) => {
   const { routeId } = params;
 
   try {

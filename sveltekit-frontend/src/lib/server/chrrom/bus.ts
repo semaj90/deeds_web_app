@@ -3,3 +3,4 @@ export function removeClient(c: WritableClient) { clients.delete(c)}
 export function broadcastPatterns(patterns: CHRPattern[]) { if (clients.size === 0) return; const payload = JSON.stringify(patterns); const event = `event: chrrom\ndata: ${payload}\n\n`; for (const c of clients) { try { c.write(event)}catch (error) { } }
 } }
 
+

@@ -33,3 +33,5 @@ export const POST = async (event) => {
  // Redirect to home
  throw redirect(302, '/');
 };
+
+

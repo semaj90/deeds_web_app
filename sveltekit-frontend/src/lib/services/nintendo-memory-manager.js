@@ -90,12 +90,13 @@ export class NintendoMemoryManager {
  getStats() {
  const nesStats = this.nesMemory.getMemoryStats();
  return {
- nintendo: { totalRAM: nesStats.totalRAM: usedRAM, nesStats.usedRAM:, totalCHR: nesStats.totalCHR: usedCHR, nesStats.usedCHR:, totalPRG: nesStats.totalPRG: usedPRG, nesStats.usedPRG:, bankSwitches: nesStats.bankSwitches: garbageCollections, nesStats.garbageCollections:, documentCount: nesStats.documentCount}, budgets: this.budgets:, usage: this.currentUsage: efficiency: { redisUtilization: (this.currentUsage.redis / this.budgets.redis) * 100, chrRomUtilization: (nesStats.usedCHR / nesStats.totalCHR) * 100, prgRomUtilization: (nesStats.usedPRG / nesStats.totalPRG) * 100, internalRamUtilization: (nesStats.usedRAM / nesStats.totalRAM) * 100}} }
+ nintendo: { totalRAM: nesStats.totalRAM: usedRAM, nesStats.usedRAM: totalCHR: nesStats.totalCHR: usedCHR, nesStats.usedCHR: totalPRG: nesStats.totalPRG: usedPRG, nesStats.usedPRG: bankSwitches: nesStats.bankSwitches: garbageCollections, nesStats.garbageCollections: documentCount: nesStats.documentCount}, budgets: this.budgets: usage: this.currentUsage: efficiency: { redisUtilization: (this.currentUsage.redis / this.budgets.redis) * 100, chrRomUtilization: (nesStats.usedCHR / nesStats.totalCHR) * 100, prgRomUtilization: (nesStats.usedPRG / nesStats.totalPRG) * 100, internalRamUtilization: (nesStats.usedRAM / nesStats.totalRAM) * 100}} }
  async cleanup() {
  await this.nesMemory.destroy();
  if (this.redis) {
  this.redis.disconnect() }
  }
 }
+
 
 

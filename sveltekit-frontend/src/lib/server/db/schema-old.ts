@@ -7,3 +7,4 @@ sessions)}; // Legacy table aliases for backward compatibility export const case
 const lawParagraphs = cases; // Placeholder export const crimes = cases; // Placeholder export const statutes = cases;
 // Placeholder export const courtDecisions = cases; // Placeholder
 
+

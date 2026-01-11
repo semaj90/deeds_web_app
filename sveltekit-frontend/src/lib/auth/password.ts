@@ -20,3 +20,4 @@ import bcrypt from 'bcryptjs'; // Password hashing utilities using bcrypt // Sal
  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+

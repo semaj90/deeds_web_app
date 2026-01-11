@@ -115,3 +115,4 @@ export type NewGraphNode = typeof graphNodes.$inferInsert;
 export type GraphEdge = typeof graphEdges.$inferSelect;
 export type NewGraphEdge = typeof graphEdges.$inferInsert;
 
+

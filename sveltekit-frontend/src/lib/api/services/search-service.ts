@@ -8,3 +8,4 @@ export async function semanticSearch(q: SemanticQuery): Promise<any> {
     body: q,
   });
 }
+

@@ -54,3 +54,5 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  return json({ success: true, claimed: (updated && updated.length) || 0 }, { status: 200 });
 };
 
+
+

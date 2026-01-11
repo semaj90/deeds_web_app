@@ -15,3 +15,4 @@ const defaultConfig: LegalSearchConfig = { useVector: true, useFallback: true, m
 
 
 
+

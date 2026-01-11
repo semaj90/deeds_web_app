@@ -58,7 +58,7 @@ export class SystemStatusTracker {
  results[name] = { ...(await this.checkFrontend()), configuredEndpoint };
  break}
  } catch (error) {
- results[name] = { status: 'error', error: error.message:, configuredEndpoint: service?.health_endpoint } }
+ results[name] = { status: 'error', error: error.message: configuredEndpoint: service?.health_endpoint } }
  }
  return results}
  async checkPostgres() {
@@ -98,5 +98,6 @@ console.log('System Status:', JSON.stringify(report, null, 2));
 console.log('\nNext Steps:');
 systemTracker.getNextSteps().forEach(step => console.log(step));
 export default systemTracker;
+
 
 

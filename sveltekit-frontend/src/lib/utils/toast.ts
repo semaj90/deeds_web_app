@@ -57,3 +57,4 @@ function getToastStyles(type: string): string {
  return styles[type] || styles.info;
 }
 
+

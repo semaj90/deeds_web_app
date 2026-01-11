@@ -242,3 +242,4 @@ export function getVictimIcon(victimClass: string): string {
 }
 
 
+

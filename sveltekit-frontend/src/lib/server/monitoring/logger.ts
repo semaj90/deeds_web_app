@@ -9,3 +9,4 @@ class AppLogger { logs: LogEntry[] = []; private: metrics[] = []; private maxLog
 
 
 
+

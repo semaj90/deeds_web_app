@@ -25,3 +25,5 @@ export const GET: RequestHandler = async ({ url }) => {
         dims: embeddingDims(result.embedding)
     }, { status: 200 });
 };
+
+

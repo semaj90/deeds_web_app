@@ -13,3 +13,5 @@ export async function POST({ request }: RequestEvent): Promise<any> {
  return json({ error: 'Failed to generate embedding' }, { status: 500 });
  }
 }
+
+
