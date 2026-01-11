@@ -2,6 +2,9 @@ import { error, redirect } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { evidence } from '$lib/server/db/schema-unified';
+import { uploadFile } from '$lib/server/minio-client';
+import { Buffer } from 'node:buffer';
+import { randomUUID } from 'node:crypto';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ url, locals }) => {
@@ -67,8 +70,17 @@ export const actions: Actions = {
 				return { success: false, error: 'No file provided' };
 			}
 
-			// TODO: Process file via MinIO/QUIC upload
-			// For now, create evidence record
+            // 1. Upload to MinIO
+            const fileExt = file.name.split('.').pop() || 'bin';
+            const objectName = `evidence/${locals.user.id}/${randomUUID()}.${fileExt}`;
+            const buffer = Buffer.from(await file.arrayBuffer());
+
+            await uploadFile('legal-evidence', objectName, buffer, {
+                'Content-Type': file.type,
+                'Original-Filename': file.name
+            });
+
+			// 2. Create DB Record
 			const [newEvidence] = await db
 				.insert(evidence)
 				.values({
@@ -79,6 +91,8 @@ export const actions: Actions = {
 					fileName: file.name,
 					fileSize: file.size,
 					mimeType: file.type,
+                    // Use storagePath if schema supports it, otherwise rely on objectName convention
+                    // storagePath: objectName,
 					status: 'pending',
 					createdAt: new Date(),
 					updatedAt: new Date()

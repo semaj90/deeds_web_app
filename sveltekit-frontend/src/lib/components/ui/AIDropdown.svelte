@@ -1,6 +1,15 @@
 <script lang="ts">
   import { cn } from "$lib";
-  import * as DropdownMenu from 'bits-ui';
+  import {
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuPortal,
+    DropdownMenu as DropdownMenuRoot,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+  } from 'bits-ui';
   import Brain from "lucide-svelte/icons/brain";
   import ChevronDown from "lucide-svelte/icons/chevron-down";
   import FileText from "lucide-svelte/icons/file-text";
@@ -130,8 +139,8 @@
   });
 </script>
 
-<DropdownMenu.Root bind:open>
-  <DropdownMenu.Trigger
+<DropdownMenuRoot bind:open>
+  <DropdownMenuTrigger
     class={cn(
       "inline-flex items-center gap-2 px-4 py-2 rounded-md transition-all font-medium border",
       "bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-700 border-purple-100",
@@ -153,25 +162,25 @@
         aria-hidden="true"
       ></div>
     {/if}
-  </DropdownMenu.Trigger>
+  </DropdownMenuTrigger>
 
-  <DropdownMenu.Portal>
-    <DropdownMenu.Content
+  <DropdownMenuPortal>
+    <DropdownMenuContent
       class="z-50 min-w-[20rem] max-w-[24rem] bg-background border rounded-lg shadow-xl p-1"
       sideOffset={8}
       transition={fly}
       transitionConfig={{ duration: 150, y: -8 }}
     >
-      <DropdownMenu.Group>
-        <DropdownMenu.Label
+      <DropdownMenuGroup>
+        <DropdownMenuLabel
           class="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b"
         >
           <FileText size={14} />
           Generate Report
-        </DropdownMenu.Label>
+        </DropdownMenuLabel>
 
         {#each reportTypes as report (report.id)}
-          <DropdownMenu.Item
+          <DropdownMenuItem
             class={cn(
               "flex items-center justify-between px-3 py-2.5 rounded-md cursor-pointer outline-none transition-colors",
               "hover:bg-accent focus:bg-accent",
@@ -193,22 +202,22 @@
               class="ml-2 px-1.5 py-0.5 text-[10px] font-mono bg-muted border rounded shadow-sm shrink-0"
               >{report.shortcut}</kbd
             >
-          </DropdownMenu.Item>
+          </DropdownMenuItem>
         {/each}
-      </DropdownMenu.Group>
+      </DropdownMenuGroup>
 
-      <DropdownMenu.Separator class="h-px bg-muted my-1" />
+      <DropdownMenuSeparator class="h-px bg-muted my-1" />
 
-      <DropdownMenu.Group>
-        <DropdownMenu.Label
+      <DropdownMenuGroup>
+        <DropdownMenuLabel
           class="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b"
         >
           <Brain size={14} />
           AI Analysis
-        </DropdownMenu.Label>
+        </DropdownMenuLabel>
 
         {#each aiTools as tool (tool.id)}
-          <DropdownMenu.Item
+          <DropdownMenuItem
             class={cn(
               "flex items-center justify-between px-3 py-2.5 rounded-md cursor-pointer outline-none transition-colors",
               "hover:bg-accent focus:bg-accent",
@@ -236,16 +245,16 @@
               class="ml-2 px-1.5 py-0.5 text-[10px] font-mono bg-muted border rounded shadow-sm shrink-0"
               >{tool.shortcut}</kbd
             >
-          </DropdownMenu.Item>
+          </DropdownMenuItem>
         {/each}
-      </DropdownMenu.Group>
+      </DropdownMenuGroup>
 
-      <DropdownMenu.Separator class="h-px bg-muted my-1" />
+      <DropdownMenuSeparator class="h-px bg-muted my-1" />
 
       <div class="px-3 py-2 flex items-center gap-2 text-[10px] text-muted-foreground">
         <Keyboard size={12} />
         <span>Use shortcuts (Ctrl+Shift+Letter) for quick actions</span>
       </div>
-    </DropdownMenu.Content>
-  </DropdownMenu.Portal>
-</DropdownMenu.Root>
+    </DropdownMenuContent>
+  </DropdownMenuPortal>
+</DropdownMenuRoot>

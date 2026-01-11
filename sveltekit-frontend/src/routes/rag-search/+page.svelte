@@ -18,7 +18,7 @@
 import { page } from '$app/stores';
 import AnswerWithCitations from '$lib/components/rag/AnswerWithCitations.svelte';
 import SourceValidator from '$lib/components/rag/SourceValidator.svelte';
-import { default as generateAnswer, default as searchKnowledgeBase, default as validateSources } from '$lib/services/rag-source-validation';
+import { generateAnswer, searchKnowledgeBase, validateSources } from '$lib/services/rag-source-validation';
 import type { Component } from 'svelte';
 
 // Type assertions for Svelte 5 component compatibility
