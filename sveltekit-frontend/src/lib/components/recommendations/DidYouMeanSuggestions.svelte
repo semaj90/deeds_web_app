@@ -82,7 +82,8 @@ interface Props { query?: string; placeholder?: string; contextType?: string; us
   {#if includeAI} <p class="text-xs mt-1 text-blue-600"> AI learning in progress... suggestions will improve over time </p> {/if}
   </div> {/if}
   </div>
- <style> /* Ensure proper z-index stacking */:global(.melt-dialog-overlay) { z-index: 50; :global(.melt-dialog-content) { z-index: 51 }"
+ <style> /* Ensure proper z-index stacking */:global(.melt-dialog-overlay) { z-index: 50; }
+  :global(.melt-dialog-content) { z-index: 51; }
   /* Custom scrollbar for suggestions */ .suggestions-scroll::-webkit-scrollbar { width: 6px}
   .suggestions-scroll::-webkit-scrollbar-track { background: #f1f1f1}
   .suggestions-scroll::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px}

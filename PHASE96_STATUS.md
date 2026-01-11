@@ -26,9 +26,10 @@
 - **Metrics:** Neo4j graph metrics being pushed to ClickHouse.
 
 ### 4. Frameworks (CrewAI + LangChain)
-- **Status:** ✅ Installed and Ready
-- **Venv:** `crewai`, `langchain-ollama`, `langfuse` installed.
-- **Provider:** Ollama (gemma3-legal:latest) at http://172.23.32.1:11434
+- **Status:** ✅ VERIFIED & RUNNING
+- **Execution:** `scripts/crewai_hello_legal.py` successfully completed a task.
+- **Provider:** Ollama (gemma3-legal:latest) via LiteLLM integration.
+- **Environment:** Cleaned up corrupted `torch` (invalid distribution `~orch`) to ensure stable runtime.
 
 ---
 
@@ -42,12 +43,17 @@
 | Postgres 17 | ✅ Running | 5434 | Project & Langfuse metadata |
 | Neo4j | ✅ Running | 7687 | Knowledge graph |
 | Ollama | ✅ Ready | 11434 | Local inference engine |
+| Agent Workflows| ✅ Working | - | CrewAI 1.8.x + LiteLLM |
 
 ---
 
 ## 🚀 Getting Started with CrewAI
 
-I've created a baseline legal researcher agent that uses your local stack.
+I've created and verified a baseline legal researcher agent that uses your local stack.
+**To run:**
+```bash
+./.venv/Scripts/python.exe scripts/crewai_hello_legal.py
+```
 
 ### Example Agent: Legal Precedent Researcher
 1. **Traces:** Automatically sent to Langfuse.

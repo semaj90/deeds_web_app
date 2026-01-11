@@ -29,7 +29,8 @@
       enableVoiceCommands,
       progressiveDisclosure: showProgressiveDisclosure
       enhancedFocusIndicators: true
-      aiResultSummaries: true; contextualHelp: true
+      aiResultSummaries: true
+; contextualHelp: true
     });
     // Set up keyboard shortcuts for voice commands
     const handleKeyboard = (_event: KeyboardEvent) => {
@@ -217,7 +218,7 @@ interface with accessibility enhancements`}
     gap: 0.5rem}
   .spinner { animation: pulse 1.5s ease-in-out infinite}
   @keyframes pulse {
-0%, 0%
+    0%,
     100% {
       opacity: 1}
     50% {
