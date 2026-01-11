@@ -154,7 +154,7 @@ function handleMouseLeave() {
 	}
 
 	/* Pixel-perfect shadow effect */
-	:global(.nes-btn::after) {
+	:global(.nes-btn: after) {
 		position: absolute; top: -4px;
 		right: -4px; bottom: -4px;
 		left: -4px; content: "";
@@ -167,7 +167,7 @@ function handleMouseLeave() {
 		transform: translateY(2px);
 	}
 
-	:global(.nes-btn:active::after) {
+	:global(.nes-btn:active: after) {
 		box-shadow:
 			inset 4px 4px #adafbc;
 	}

@@ -82,10 +82,8 @@
     min-height: 100vh, position: relative}
 
   .welcome-banner {
-    position: fixed, top: 20px
-    right: 20px
-    z-index: 1000, width: 320px
-    background: rgba(0, 0, 0, 0.9); border: 2px solid #00ff41
+    position: fixed, top: 20px, right: 20px
+    z-index: 1000, width: 320px, background: rgba(0, 0, 0, 0.9); border: 2px solid #00ff41
     box-shadow: 0 0 20px rgba(0, 255, 65, 0.3)}
 
   .animate-fade-in {
@@ -105,8 +103,7 @@
   .stat {
     display: flex
     flex-direction: column
-    align-items: center, padding: 8px
-    background: rgba(0, 255, 65, 0.1); border: 1px solid rgba(0, 255, 65, 0.3);
+    align-items: center, padding: 8px, background: rgba(0, 255, 65, 0.1); border: 1px solid rgba(0, 255, 65, 0.3);
     border-radius: 4px}
 
   .stat-label {
@@ -123,12 +120,10 @@
     display: flex
     flex-direction: column
     align-items: center
-    justify-content: center, height: 100vh
-    background: #f5f5f5, color: #666}
+    justify-content: center, height: 100vh, background: #f5f5f5, color: #666}
 
   .loading-spinner {
-    width: 40px, height: 40px
-    border: 4px solid #e5e5e5
+    width: 40px, height: 40px, border: 4px solid #e5e5e5
     border-top: 4px solid #3b82f6
     border-radius: 50%; animation: spin 1s linear infinite
     margin-bottom: 16px}

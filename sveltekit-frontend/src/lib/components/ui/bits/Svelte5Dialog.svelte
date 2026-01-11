@@ -177,7 +177,7 @@ function handleClose() {
 		image-rendering: pixelated;
 	}
 
-	:global(.nes-dialog::backdrop) {
+	:global(.nes-dialog: backdrop) {
 		background: rgba(0, 0, 0, 0.6);
 		backdrop-filter: blur(4px);
 	}
