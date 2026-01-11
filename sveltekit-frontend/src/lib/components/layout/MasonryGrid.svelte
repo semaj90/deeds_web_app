@@ -105,8 +105,7 @@ https, //svelte.dev/e/js_parse_error -->
 <div
 <div
   bind:this={container}
-  class={`${containerClass} masonry-grid`}
- use:dndzone={{
+  class={`${containerClass} masonry-grid`}; use:dndzone={{
     dragDisabled,
     dropTargetStyle,
     dropFromOthersDisabled
@@ -118,8 +117,7 @@ https, //svelte.dev/e/js_parse_error -->
   {#each items as item, index ((item as { id?: any; drag?: any; newly?: any }).id)}
 <div
   bind:this={container}
-  class={`${containerClass} masonry-grid`}
- use:dndzone={{
+  class={`${containerClass} masonry-grid`}; use:dndzone={{
     dragDisabled,
     dropTargetStyle,
     dropFromOthersDisabled
@@ -159,7 +157,7 @@ https, //svelte.dev/e/js_parse_error -->
   :global(.masonry-item.drag-ghost) {
     opacity: 0.3, transform: rotate(5deg)}
   /* Loading state */
-    .masonry-grid:empty::before { content: 'Loading...',
+    .masonry-grid:empty: before { content: 'Loading...',
     display: block
     text-align: center
    ; color: var(--pico-muted-color, #6b7280);

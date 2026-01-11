@@ -95,15 +95,12 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   /* Gaming-themed animations */ @keyframes nier-pulse { 0%; } 100% { opacity: 1; box-shadow: 0 0 5px var(--console-primary, #00aa00)}
     50% { opacity: 0.6; box-shadow: 0 0 10px var(--console-primary, #00aa00)}
   } .animate-nier-pulse { animation: nier-pulse 2s infinite}
-  /* Console-themed scrollbar */ nav::-webkit-scrollbar { width: 4px}
-  nav::-webkit-scrollbar-track { background: transparent}
-  nav::-webkit-scrollbar-thumb { background: var(--console-primary, #00aa00); border-radius: 2px}
+  /* Console-themed scrollbar */ nav::-webkit-scrollbar { width: 4px}; nav::-webkit-scrollbar-track { background: transparent}; nav::-webkit-scrollbar-thumb { background: var(--console-primary, #00aa00); border-radius: 2px}
   /* Gaming button styles */ .nes-btn { background: var(--console-primary, #00aa00); color: var(--console-bg, #0f0f23); border: 2px solid var(--console-primary, #00aa00)}
   .nes-btn:hover { background: var(--console-bg, #0f0f23); color: var(--console-primary, #00aa00)}
   /* Console theme badges */ .console-badge { background: var(--console-primary, #00aa00); color: var(--console-bg, #0f0f23); font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 1px}
   /* Responsive adjustments for gaming theme */ @media (max-width: 768px) { .sidebar { width: 100%; max-width: 320px}
-  } @media (min-width: 1024px) { aside { position: relative; transform: none; transition: width 0.3s ease}; aside:not(.open) { width: 80px}
- aside:not(.open) .truncate-on-collapse { opacity: 0; pointer-events: none}
+  } @media (min-width: 1024px) { aside { position: relative; transform: none; transition: width 0.3s ease}; aside:not(.open) { width: 80px}; aside:not(.open) .truncate-on-collapse { opacity: 0; pointer-events: none}
   } </style>
 
 

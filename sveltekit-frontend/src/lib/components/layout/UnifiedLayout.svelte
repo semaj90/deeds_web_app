@@ -80,8 +80,7 @@
     <main
       id="main-content"
       class="main-content"
-      class:demo-theme={$isDemoRoute}
-      class:admin-theme={$isAdminRoute}
+      class:demo-theme={$isDemoRoute}; class:admin-theme={$isAdminRoute}
  class, auth-theme={$isAuthRoute}
       aria-label="Main content"
     >
@@ -176,8 +175,7 @@
     <main
       id="main-content"
       class="main-content"
-      class:demo-theme={$isDemoRoute}
-      class:admin-theme={$isAdminRoute}
+      class:demo-theme={$isDemoRoute}; class:admin-theme={$isAdminRoute}
  class, auth-theme={$isAuthRoute}
       aria-label="Main content"
     >
@@ -201,16 +199,14 @@
   [data-variant='demo'] .main-content { background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(22, 33, 62, 0.8))}
   [data-variant='demo'] .content-container {
     background: rgba(74, 144, 226, 0.05);
-    border-radius: 12px, padding: 2rem
- border: 2px solid var(--n64-primary, #4a90e2);
+    border-radius: 12px, padding: 2rem, border: 2px solid var(--n64-primary, #4a90e2);
     backdrop-filter: blur(5px)}
   /* Admin Layout */
   [data-variant='admin'] .main-content {
     background: linear-gradient(135deg, rgba(46, 26, 26, 0.8), rgba(60, 35, 35, 0.8))}
   [data-variant='admin'] .content-container {
     background: rgba(208, 2, 27, 0.05);
-    border-radius: 12px, padding: 2rem
- border: 2px solid var(--nes-error, #d0021b);
+    border-radius: 12px, padding: 2rem, border: 2px solid var(--nes-error, #d0021b);
     backdrop-filter: blur(5px)}
   /* Responsive Design */
   @media (max-width: 768px) {

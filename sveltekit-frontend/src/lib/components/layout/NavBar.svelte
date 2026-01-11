@@ -192,18 +192,14 @@ import type { User } from '$lib/types';
   .sidebar-toggle {
     display: flex
     align-items: center
-    justify-content: center, width: 40px
-    height: 40px, background: none
-    border: none, cursor: pointer
+    justify-content: center, width: 40px, height: 40px, background: none, border: none, cursor: pointer
     border-radius: 4px, transition: background 0.2s}
   .sidebar-toggle:hover { background: rgba(255, 255, 255, 0.1)}
   .hamburger {
     display: flex
-    flex-direction: column, width: 20px
-    height: 16px, position: relative}
+    flex-direction: column, width: 20px, height: 16px, position: relative}
   .hamburger span {
-    display: block, height: 2px
-    width: 100%; background: var(--console-fg, white);
+    display: block, height: 2px, width: 100%; background: var(--console-fg, white);
     margin: 2px 0
     transition: 0.3s
     transform-origin: center}
@@ -259,8 +255,7 @@ import type { User } from '$lib/types';
     padding: 0.5rem 0.75rem
    ;background: rgba(255, 255, 255, 0.1); border: 1px solid var(--console-primary, #00aa00);
     color: var(--console-fg, white);
-    border-radius: 6px, cursor: pointer
-    transition: all 0.2s
+    border-radius: 6px, cursor: pointer, transition: all 0.2s
     font-size: 0.9rem}
   .theme-btn:hover { background: rgba(255, 255, 255, 0.2)}
   .dropdown-arrow {
@@ -309,8 +304,7 @@ import type { User } from '$lib/types';
     padding: 0.5rem 0.75rem
    ;background: rgba(255, 255, 255, 0.1); border: 1px solid var(--console-primary, #00aa00);
     color: var(--console-fg, white);
-    border-radius: 9999px, cursor: pointer
-    transition: all 0.2s
+    border-radius: 9999px, cursor: pointer, transition: all 0.2s
     list-style: none}
   .profile-trigger:hover { background: rgba(255, 255, 255, 0.2)}
   .user-avatar {
@@ -346,8 +340,7 @@ import type { User } from '$lib/types';
     align-items: center, gap: 0.5rem
     padding: 0.5rem 0.75rem
    ;background: var(--console-error, #ff5555); border: none, color: white
-    border-radius: 6px, cursor: pointer
-    transition: all 0.2s
+    border-radius: 6px, cursor: pointer, transition: all 0.2s
     font-size: 0.9rem}
   .logout-btn:hover { background: var(--console-error, #cc4444)}
   .auth-buttons {
@@ -358,8 +351,7 @@ import type { User } from '$lib/types';
     padding: 0.5rem 1rem
    ;border: 1px solid var(--console-primary, #00aa00); color: var(--console-fg, white);
     background: none
-    border-radius: 6px, cursor: pointer
-    transition: all 0.2s
+    border-radius: 6px, cursor: pointer, transition: all 0.2s
     font-weight: 500}
   .signup-btn { background: var(--console-primary, #00aa00); color: var(--console-bg, #0f0f23)}
   .login-btn:hover { background: var(--console-primary, #00aa00); color: var(--console-bg, #0f0f23)}

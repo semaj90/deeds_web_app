@@ -8,8 +8,7 @@
     recommendations?: string[]}
 
   export interface ContractAnalysis {
-    id: string, title: string
-    type: 'employment' | 'service' | 'licensing' | 'nda' | 'vendor',status: 'draft' | 'review' | 'approved' | 'executed'; clauses: ContractClause[],
+    id: string, title: string, type: 'employment' | 'service' | 'licensing' | 'nda' | 'vendor',status: 'draft' | 'review' | 'approved' | 'executed'; clauses: ContractClause[],
     riskScore: number; lastModified: string}
 </script>
 
@@ -225,8 +224,7 @@
                   if (e.key === 'Enter' ?? e.key === ' ') {
                     e.preventDefault();
                     selectClause(clause.id)}
-                }}
-                in: scale={{ duration: 180 }}
+                }}; in: scale={{ duration: 180 }}
                 style="border-color: {getRiskBadgeStyle(clause.riskLevel).color}"
               >
                 <div class="clause-header">

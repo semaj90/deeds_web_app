@@ -30,8 +30,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
           ], potentialChallenges: [
             'Witness credibility questions',
             'Jurisdictional issues'
-          ] }
-      default: return baseResult}
+          ] }; default: return baseResult}
   }
 
    // Analysis type icons and colors const analysisConfig = { legal: { icon: 'âš–ï¸', color: '#4f46e5', bgColor: 'rgba(79, 70, 229, 0.1)' }, evidence: { icon: 'ðŸ”', color: '#059669', bgColor: 'rgba(5, 150, 105, 0.1)' }, document: { icon: 'ðŸ“„', color: '#dc2626', bgColor: 'rgba(220, 38, 38, 0.1)' }, caseItem: { icon: 'ðŸ“', color: '#7c2d12'; bgColor: 'rgba(124, 45, 18, 0.1)' } }

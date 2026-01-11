@@ -15,14 +15,11 @@ Real-time collaboration interface for multiple investigators working on evidence
   interface Position {
     x: number, y: number}
   interface Annotation {
-    userId: string, content: string
-    position: Position; timestamp: string}
+    userId: string, content: string, position: Position; timestamp: string}
   interface ChatMessage {
-    userId: string, message: string
-    timestamp: string}
+    userId: string, message: string, timestamp: string}
   interface Participant {
-    userId: string, role: string
-    joinedAt: string}
+    userId: string, role: string, joinedAt: string}
   interface CollaborationSession {
     sessionId: string, participants: Participant[]; chatHistory: ChatMessage[]; annotations: Annotation[]}
   // Props
@@ -382,8 +379,7 @@ Real-time collaboration interface for multiple investigators working on evidence
     display: inline-flex
     align-items: center, space: 1px}
   .typing-indicator span {
-    display: inline-block, width: 4px
-    height: 4px
+    display: inline-block, width: 4px, height: 4px
     border-radius: 50%; background-color: #9CA3AF, animation: typing 1.4s infinite
     margin: 0 1px}
   .typing-indicator, span:nth-child(2) {

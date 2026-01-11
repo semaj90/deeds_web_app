@@ -551,8 +551,7 @@ import { Plus } from "lucide-svelte";;
  title: "Command Executed",
  message: command.title, title: "Theme Changed",
  message: `Switched to ${isDark ? "light" : "dark"} mode`
- }
- type: "info",
+ }; type: "info",
  title: "Layout Toggle",
  message: "Layout toggled (feature to be implemented)"
  });
@@ -680,8 +679,7 @@ import { Plus } from "lucide-svelte";;
  <div class="search-container">
  <Command class="search-icon" />
  <input
- bind:this={commandInput}
- bind:value={searchQuery}
+ bind:this={commandInput}; bind:value={searchQuery}
  type="text"
  placeholder="Type a command or search..."
  class="search-input"
@@ -806,7 +804,7 @@ import { Plus } from "lucide-svelte";;
  color: #111827;
  }
 
- .search-input::placeholder {
+ .search-input: placeholder {
  color: #9ca3af;
  }
 
@@ -828,7 +826,7 @@ import { Plus } from "lucide-svelte";;
 
  .search-input { width: 100%; padding: 0.75rem 1rem 0.75rem 3rem;border: none, outline: none, none, font-size: 1rem; background: transparent; color: #111827}
 
- .search-input::placeholder { color: #9ca3af} .search-container:global(.close-button) { position: absolute; right: 0.5rem}
+ .search-input: placeholder { color: #9ca3af} .search-container:global(.close-button) { position: absolute; right: 0.5rem}
 
  .command-palette-body { flex: 1; overflow-y: auto; max-height: 400px}
 
@@ -846,7 +844,7 @@ import { Plus } from "lucide-svelte";;
 
  /* Screen reader only content */ .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;clip: rect(0,0,0,0); white-space: nowrap; border: 0}
 
- /* Dark mode */ @media (prefers-color-scheme: dark) { .command-palette { background: #1f2937; border: 1px solid #374151} .command-palette-header { border-bottom-color: #374151} .search-input { color: #f9fafb} .search-input::placeholder { color: #9ca3af} .command-item:hover, .command-item.selected { background: #374151} /* Removed unused .command-icon selector */ .command-title { color: #f9fafb} .command-description { color: #d1d5db} .command-palette-footer { background: #374151; border-top-color: #4b5563} .footer-hint kbd { background: #4b5563; color: #f9fafb} }
+ /* Dark mode */ @media (prefers-color-scheme: dark) { .command-palette { background: #1f2937; border: 1px solid #374151} .command-palette-header { border-bottom-color: #374151} .search-input { color: #f9fafb} .search-input: placeholder { color: #9ca3af} .command-item:hover, .command-item.selected { background: #374151} /* Removed unused .command-icon selector */ .command-title { color: #f9fafb} .command-description { color: #d1d5db} .command-palette-footer { background: #374151; border-top-color: #4b5563} .footer-hint kbd { background: #4b5563; color: #f9fafb} }
 
  /* Responsive design */ @media (max-width: 640px) { .command-palette-overlay { padding: 1rem; padding-top: 5vh} .command-palette { max-height: 80vh} .command-item { padding: 1rem} .footer-hint { flex-wrap: wrap; gap: 0.5rem} }
 
@@ -1280,8 +1278,7 @@ import { Plus } from "lucide-svelte";;
  <div class="search-container">
  <Command class="search-icon" />
  <input
- bind:this={commandInput}
- bind:value={searchQuery}
+ bind:this={commandInput}; bind:value={searchQuery}
  type="text"
  placeholder="Type a command or search..."
  class="search-input"
@@ -1406,7 +1403,7 @@ import { Plus } from "lucide-svelte";;
  color: #111827;
  }
 
- .search-input::placeholder {
+ .search-input: placeholder {
  color: #9ca3af;
  }
 
