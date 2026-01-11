@@ -103,7 +103,7 @@
   .premium-text strong { display: block; margin-bottom: 0.25rem; font-weight: 600}
   .premium-text p { margin: 0; font-size: 0.875rem; opacity: 0.9}
   .nier-border-glow { position: relative}
-  .nier-border-glow::before { content: ''; position: absolute; inset: -1px; padding: 1px;background: linear-gradient(45deg, var(--color-accent-crimson), transparent, var(--color-accent-gold)); border-radius: inherit; mask: linear-gradient(#fff, 0 0) content-box, linear-gradient(#fff, 0 0); mask-composite: exclud; opacity: 0.6}
+  .nier-border-glow: before { content: ''; position: absolute; inset: -1px; padding: 1px;background: linear-gradient(45deg, var(--color-accent-crimson), transparent, var(--color-accent-gold)); border-radius: inherit; mask: linear-gradient(#fff, 0 0) content-box, linear-gradient(#fff, 0 0); mask-composite: exclud; opacity: 0.6}
 </style>
 
 

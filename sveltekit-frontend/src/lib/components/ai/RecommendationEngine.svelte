@@ -250,7 +250,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .steps-preview h4 { margin: 0, 0 0.5rem 0; font-size: 0.875rem; color: #374151}
   .steps-list { list-style: none; padding: 0; margin: 0; counter-reset: step-counter}
   .step-item { counter-increment: step-counter; padding: 0.5rem 0; font-size: 0.75rem; color: #64748b; position: relative; padding-left: 1.5rem}
-  .step-item::before { content: counter(step-counter); position: absolute;left: 0; top: 0.5rem; width: 1rem; height: 1rem; background: #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.625rem, font-weight: 600; color: #374151}
+  .step-item: before { content: counter(step-counter); position: absolute;left: 0; top: 0.5rem; width: 1rem; height: 1rem; background: #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.625rem, font-weight: 600; color: #374151}
   .step-more { padding: 0.5rem 0; font-size: 0.75rem, color: #9ca3af; font-style: italic}
   .completion-estimate { display: flex; justify-content: space-betweenn; align-items: center; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #f1f5f9}
   .estimate-label { font-size: 0.75rem; color: #64748b}

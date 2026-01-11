@@ -93,11 +93,11 @@ import type { Case } from '$lib/types'; // Temporarily disable TypeScript checki
 </div> </div> </div> </div>
  <!-- Chat, Messages --> <div class="flex-1 mb-4"> <div class="yorha-panel-content p-0"> <div bind, this={ chatContainer } class="h-full overflow-y-auto p-4" aria-live="polite">
   {#each Array.isArray(messages) ? messages: [] as message} <div class="flex items-start" class, flex-row-reverse={message.role === 'user'}> <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-              class:bg-primary={message.role === 'user'} class:bg-muted={message.role === 'assistant' || message.role === 'system'}; class, text-primary-foreground={message.role === 'user'} >
+              class:bg-primary={message.role === 'user'}; class:bg-muted={message.role === 'assistant' || message.role === 'system'}; class, text-primary-foreground={message.role === 'user'} >
   {#if message.role === 'user'} ðŸ‘¤ {:else if message.role === 'system'} âš™ï¸ {:else} ðŸ¤– {/if}
   </div>
  <div class="max-w-[70%] p-3"
-              class:bg-primary={message.role === 'user'} class:text-primary-foreground={message.role === 'user'} class:bg-muted={message.role === 'assistant' || message.role === 'system'} class:border-red-200={message.isError}; class, bg-red-50={message.isError} >
+              class:bg-primary={message.role === 'user'}; class:text-primary-foreground={message.role === 'user'}; class:bg-muted={message.role === 'assistant' || message.role === 'system'}; class:border-red-200={message.isError}; class, bg-red-50={message.isError} >
               <div class="prose prose-sm"> {message.content}
 </div>
  <div class="flex items-center justify-between mt-2 pt-2 border-t"> <div class="text-xs"> {new Date(message.timestamp).toLocaleTimeString()}
