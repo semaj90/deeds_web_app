@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
 import type { Document } from '$lib/types';
   import type { Props } from "$lib/types/global";
   let {
@@ -151,7 +151,7 @@ import type { Document } from '$lib/types';
     min-width: 160px
     transition: box-shadow 0.2s}
   .select-trigger:focus { outline: none
-    box-shadow: 0, 0 0 2px #6366f1}
+    box-shadow: 0 0 0 2px #6366f1}
   /* Removed .select-menu rules (unused) to fix Svelte unused CSS warnings */
 </style>
 

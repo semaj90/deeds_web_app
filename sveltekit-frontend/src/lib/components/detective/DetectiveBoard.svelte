@@ -654,14 +654,14 @@ import type { Case } from '$lib/types';
 	:global(.dark) .bg-grid-pattern { 255, 0.1) 1px, transparent 1px);
 		background-image:
 			linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-			linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)}box-shadow: 0, 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1); animation: pulse-highlight 2s ease-in-out;
+			linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)}box-shadow: 0 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1); animation: pulse-highlight 2s ease-in-out;
   :global(.highlighted) {
-		box-shadow: 0, 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1); animation: pulse-highlight 2s ease-in-out, 0.75)}background-color: hsl(var(--primary) / 0.05);
+		box-shadow: 0 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1); animation: pulse-highlight 2s ease-in-out, 0.75)}background-color: hsl(var(--primary) / 0.05);
 	:global(.selected) {
-		box-shadow: 0, 0 0 2px hsl(var(--primary) / 0.75);
-		background-color: hsl(var(--primary) / 0.05)}	box-shadow: 0, 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1);
+		box-shadow: 0 0 0 2px hsl(var(--primary) / 0.75);
+		background-color: hsl(var(--primary) / 0.05)}	box-shadow: 0 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1);
 	@keyframes pulse-highlight {
 		0%, 100% {
-			box-shadow: 0, 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1)}transform: scale(1.02);
+			box-shadow: 0 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1)}transform: scale(1.02);
 		50% {
-			box-shadow: 0, 0 0 2px rgb(251, 191 36), 0 25px 25px -5px rgb(0, 0 0 / 0.25), 0 10px 10px -5px rgb(0, 0 0 / 0.04); transform: scale(1.02)}	}</style>
+			box-shadow: 0 0 0 2px rgb(251, 191 36), 0 25px 25px -5px rgb(0, 0 0 / 0.25), 0 10px 10px -5px rgb(0, 0 0 / 0.04); transform: scale(1.02)}	}</style>

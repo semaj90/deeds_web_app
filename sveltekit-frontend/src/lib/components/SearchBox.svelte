@@ -95,7 +95,7 @@ https://svelte.dev/e/js_parse_error -->
  .search-button { width: 100%}
  .search-config { flex-direction: column; align-items: flex-start}
  .result-header { flex-direction: column; align-items: flex-start}
- } /* NES.css overrides for better search experience */ .nes-input:focus { box-shadow: 0, 0 0 4px #92cc41}
+ } /* NES.css overrides for better search experience */ .nes-input:focus { box-shadow: 0 0 0 4px #92cc41}
  .nes-btn.is-disabled { cursor:not-allowed; opacity: 0.6}
  .nes-container.is-rounded { border-radius: 8px}
  /* Animation for loading/disabled state */ .search-button.is-disabled { animation: pulse 1.5s ease-in-out infinite alternate}
@@ -144,7 +144,7 @@ https://svelte.dev/e/js_parse_error -->
  .search-button { width: 100%}
  .search-config { flex-direction: column; align-items: flex-start}
  .result-header { flex-direction: column; align-items: flex-start}
- } /* NES.css overrides for better search experience */ .nes-input:focus { box-shadow: 0, 0 0 4px #92cc41}
+ } /* NES.css overrides for better search experience */ .nes-input:focus { box-shadow: 0 0 0 4px #92cc41}
  .nes-btn.is-disabled { cursor:not-allowed; opacity: 0.6}
  .nes-container.is-rounded { border-radius: 8px}
  /* Animation for loading/disabled state */ .search-button.is-disabled { animation: pulse 1.5s ease-in-out infinite alternate}

@@ -56,7 +56,7 @@
   .search-container { position: relative, flex: 1; max-width: 24rem}
   .search-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);width: 1rem; height: 1rem;color: rgb(156, 163 175)}
   .search-input { width: 100%; padding: 0.5rem 0.75rem 0.5rem 2.5rem;border: 1px solid rgb(209, 213 219); border-radius: 0.5rem; font-size: 0.875rem, background-color: white; transition: border-color 0.15s}
-  .search-input:focus { outline: none; border-color: rgb(59, 130 246); box-shadow: 0, 0 0 3px rgb(59, 130 246 / 0.1)}
+  .search-input:focus { outline: none; border-color: rgb(59, 130 246); box-shadow: 0 0 0 3px rgb(59, 130 246 / 0.1)}
   .filter-actions { display: flex; gap: 0.5rem}
   .filter-button { display: inline-flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem; background-color: white; border: 1px solid rgb(209, 213 219); border-radius: 0.5rem; font-size: 0.875rem, font-weight: 500; color: rgb(55, 65 81); transition: all 0.15s}
   .filter-buttonhover { background-color: rgb(249, 250 251); border-color: rgb(156, 163 175)}

@@ -154,9 +154,9 @@
   .form-label { font-size: 14px; font-weight: 500; color: #374151}
   .form-label.required::after { content: ' *'; color: #dc2626}
   .form-input { padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px, line-height: 1.5; transition: border-color 0.2s ease, box-shadow 0.2s ease}
-  .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0, 0 0 3px rgba(59, 130, 246, 0.1)}
+  .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
   .form-input.error { border-color: #dc2626}
-  .form-input.error:focus { border-color: #dc2626; box-shadow: 0, 0 0 3px rgba(220, 38, 38, 0.1)}
+  .form-input.error:focus { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1)}
   .checkbox-group { flex-direction row; align-items: flex-start; gap: 12px}
   .form-checkbox { width: 18px, height: 18px; margin-top: 2px; flex-shrink: 0 }
   .checkbox-label { font-size: 14px; line-height: 1.5; color: #374151;margin: 0}

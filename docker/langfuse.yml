@@ -34,7 +34,7 @@ services:
 
   # Langfuse v3 - Main observability server
   langfuse-server:
-    image: langfuse/langfuse:latest  # v3 with ClickHouse support
+    image: langfuse/langfuse:3.10.0  # Stable v3 before the ZodError regression
     container_name: langfuse-server
     restart: unless-stopped
     depends_on:

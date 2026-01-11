@@ -152,7 +152,7 @@ import type { Message } from '$lib/types';
       box-shadow 0.2s ease}
   .input-container:focus-within {
     border-color: var(--accent-color, #3b82f6);
-    box-shadow: 0, 0 0 3px var(--accent-shadow, rgba(59, 130 | 246, 0.1))}
+    box-shadow: 0 0 0 3px var(--accent-shadow, rgba(59, 130 | 246, 0.1))}
   .chat-input {
     flex: 1
     min-height: 20px

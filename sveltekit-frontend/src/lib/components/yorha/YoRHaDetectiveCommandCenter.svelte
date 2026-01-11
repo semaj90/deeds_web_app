@@ -121,7 +121,7 @@
   .ai-query-section { margin-bottom: 1rem}
   .ai-query-label { display: block; font-weight: bold, margin-bottom: 0.5rem; color: #3D3D3D; font-size: 0.875rem}
   .ai-query-input { width: 100%; padding: 0.75rem; background: white; border: 1px solid #D1CFC7;color: #3D3D3D; font-family: inherit, font-size: 0.875rem; resize: vertical}
-  .ai-query-input:focus { outline: none; border-color: #2E8B57; box-shadow: 0, 0 0 3px rgba(46, 139, 87, 0.2)}
+  .ai-query-input:focus { outline: none; border-color: #2E8B57; box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.2)}
   .ai-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem}
   .ai-actions .yorha-btn-primary { grid-column: span 2; background: #2E8B57 !important;color: white !important; border-color: #2E8B57 !important}
   @media (max-width: 768px) { .header-content { flex-direction: column; gap: 1rem}

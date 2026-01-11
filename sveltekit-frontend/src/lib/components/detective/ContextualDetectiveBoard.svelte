@@ -119,7 +119,7 @@
   .typing-indicator { padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem, font-weight: 500; color: #64748b; background: #f1f5f9; transition: all 0.2}
   .typing-indicator.active { color: #059669; background: #dcfce7}
   .analysis-input { width: 100%; padding: 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 1rem, line-height: 1.5, resize: vertical; font-family: inherit}
-  .analysis-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0, 0 0 3px rgba(59, 130, 246, 0.1)}
+  .analysis-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
   .input-actions { display: flex; gap: 1rem; margin-top: 1rem}
   .input-actions button { padding: 0.5rem 1rem; border: none; border-radius: 0.375rem, font-weight: 500; cursor: pointer; transition: all 0.2}
   .input-actions buttonfirst-child { background: #3b82f6; color: white}

@@ -182,7 +182,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   @keyframes pulse { 0%, 100% { opacity: 1} 50% { opacity: 0.7} }
   .input-wrapper { display: flex; gap: 0.5rem}
   .input-wrapper textarea { flex: 1; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px, resize: vertical; min-height: 2.5rem; font-family: inherit; font-size: 0.875rem; line-height: 1.5}
-  .input-wrapper textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0, 0 0 3px rgba(59, 130, 246, 0.1)}
+  .input-wrapper textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
   .submit-btn { padding: 0.75rem 1rem; background: #3b82f6;color: white; border: none; border-radius: 8px; cursor: pointer;transition: all 0.2}
   .submit-btn:hover:not(:disabled) { background: #2563eb}
   .submit-btn:disabled { opacity: 0.5; cursor:not-allowed}

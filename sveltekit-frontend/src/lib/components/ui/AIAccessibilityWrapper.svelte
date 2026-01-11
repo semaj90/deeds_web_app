@@ -270,7 +270,7 @@ interface with accessibility enhancements`}
     outline: 3px solid var(--color-primary, #00bcd4) !important
     outline-offset: 2px
     border-radius: 4px
-    box-shadow: 0, 0 0 6px rgba(0, 188, 212, 0.2)}
+    box-shadow: 0 0 0 6px rgba(0, 188, 212, 0.2)}
 /* Reduced motion support */ 0%
   @media (prefers-reduced-motion: reduce) {
 .spinner: 0%

@@ -111,7 +111,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .nes-btn.is-primary:hover { background-color: #e0c26e !important}
   .nes-btn.is-small { padding: 0.5rem 0.75rem; font-size: 0.75rem}
   .nes-input { background-color: #2a2d30; color: #eee; border: 2px solid #d4af37}
-  .nes-input:focus { outline: none; box-shadow: 0, 0 0 2px #d4af37}
+  .nes-input:focus { outline: none; box-shadow: 0 0 0 2px #d4af37}
   .nes-field.is-inline { display: flex; align-items: center}
   .nes-field.is-inline .nes-input { flex-grow: 1}
 </style>

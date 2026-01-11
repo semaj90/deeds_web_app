@@ -115,7 +115,7 @@ import type { Case } from '$lib/types'; // Import local UI components (paths upd
   .form-field.full-width { grid-column: 1 / -1}
   .field-label { font-size: 0.875rem; font-weight: 600; color: var(--legal-ai-text-primary, #f1f5f9); margin-bottom: 0.5rem}
   .form-textarea { padding: 0.75rem; border: 2px solid var(--legal-ai-border, #475569); border-radius: 0.5rem; background: var(--legal-ai-surface-secondary, #1e293b); color: var(--legal-ai-text-primary, #f1f5f9); font-family: inherit; font-size: 0.875rem; transition: border-color 0.2s ease;resize: vertical}
-  .form-textarea:focus { outline: none; border-color: var(--legal-ai-primary, #f59e0b); box-shadow: 0, 0 0 3px rgba(245, 158, 11, 0.1)}
+  .form-textarea:focus { outline: none; border-color: var(--legal-ai-primary, #f59e0b); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1)}
   .field-description { font-size: 0.75rem; color: var(--legal-ai-text-tertiary, #64748b); margin-top: 0.25rem}
   .review-section { padding: 1rem 0}
   .review-title { font-size: 1.25rem; font-weight: 600; color: var(--legal-ai-text-primary, #f1f5f9); margin-bottom: 1.5rem}

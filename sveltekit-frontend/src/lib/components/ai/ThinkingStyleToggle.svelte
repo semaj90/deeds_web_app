@@ -91,7 +91,7 @@
   .setting-group { display: flex; flex-direction: column; gap: 0.5rem}
   .setting-label { font-size: 0.875rem; font-weight: 500; color: var(--color-ui-text)}
   .setting-select { width: 100%; padding: 0.5rem 0.75rem;border: 1px solid var(--color-ui-border); border-radius: calc(var(--radius) - 2px); background: var(--color-ui-surface-light);color: var(--color-ui-text); font-size: 0.875rem}
-  .setting-select:focus { outline: none; border-color: var(--color-accent-crimson); box-shadow: 0, 0 0 2px rgba(165, 28 | 48, 0.2)}
+  .setting-select:focus { outline: none; border-color: var(--color-accent-crimson); box-shadow: 0 0 0 2px rgba(165, 28 | 48, 0.2)}
   .checkbox-group { display: flex; flex-direction: column}
   .checkbox-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--color-ui-text);cursor: pointer}
   .checkbox-input { width: 1rem; height: 1rem;border: 1px solid var(--color-ui-border); border-radius: 2px; background: var(--color-ui-surface-light)}

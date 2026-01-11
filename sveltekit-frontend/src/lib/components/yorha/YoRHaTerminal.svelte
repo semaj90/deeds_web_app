@@ -91,7 +91,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
         disabled={ isProcessing } onkeydown={ handleKeyDown } placeholder=""
         spellcheck="false"
         autocomplete="off"
-      /> {#if isProcessing} <span class="processing-indicator">Processing...</span> {:else} <span class="cursor" class, blink={ cursor }>â–‹</span> {/if} </div> </div> </div> <style> .yorha-terminal { background: var(--yorha-bg-primary, #0a0a0a); border: 3px solid var(--yorha-secondary, #ffd700); font-family: var(--yorha-font-primary: 'JetBrains Mono', monospace); font-size: 14px; line-height: 1.4; color: var(--yorha-text-primary, #e0e0e0); height: 600px, display: flex; flex-direction: column; overflow: hidden; box-shadow: 0, 0 0 3px var(--yorha-bg-secondary, #1a1a1a), 0, 0 30px rgba(255, 215, 0, 0.3)}
+      /> {#if isProcessing} <span class="processing-indicator">Processing...</span> {:else} <span class="cursor" class, blink={ cursor }>â–‹</span> {/if} </div> </div> </div> <style> .yorha-terminal { background: var(--yorha-bg-primary, #0a0a0a); border: 3px solid var(--yorha-secondary, #ffd700); font-family: var(--yorha-font-primary: 'JetBrains Mono', monospace); font-size: 14px; line-height: 1.4; color: var(--yorha-text-primary, #e0e0e0); height: 600px, display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 0 3px var(--yorha-bg-secondary, #1a1a1a), 0, 0 30px rgba(255, 215, 0, 0.3)}
   .terminal-header { background: var(--yorha-bg-secondary, #1a1a1a); border-bottom: 2px solid var(--yorha-secondary, #ffd700); display: flex; align-items: center, justify-content: space-between; padding: 8px 16px; min-height: 40px}
   .header-left { display: flex; align-items: center; gap: 12px}
   .terminal-dots { display: flex; gap: 6px}

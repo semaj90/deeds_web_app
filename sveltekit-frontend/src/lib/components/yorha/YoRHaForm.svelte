@@ -44,7 +44,7 @@
   .required-indicator { color: var(--yorha-danger, #ff0041); font-weight: 700}
   .field-input-wrapper { position: relative}
   .field-input, .field-textarea, .field-select { width: 100%; background: var(--yorha-bg-primary, #0a0a0a); border: 2px solid var(--yorha-text-muted, #808080); color: var(--yorha-text-primary, #e0e0e0); font-family: inherit; font-size: 14px; padding: 12px 16px;transition: all 0.2s ease; border-radius: 0 }
-  .field-input:focus .field-textarea:focus .field-select:focus { outline: none; border-color: var(--yorha-secondary, #ffd700); box-shadow: 0, 0 0 1px var(--yorha-secondary, #ffd700), inset, 0 0 10px rgba(255, 215, 0, 0.1)}
+  .field-input:focus .field-textarea:focus .field-select:focus { outline: none; border-color: var(--yorha-secondary, #ffd700); box-shadow: 0 0 0 1px var(--yorha-secondary, #ffd700), inset, 0 0 10px rgba(255, 215, 0, 0.1)}
   .field-input:: placeholder .field-textarea::placeholder { color: var(--yorha-text-muted, #808080)}
   .field-textarea { resize: vertical; min-height: 80px}
   .field-select { cursor: pointer}
@@ -63,7 +63,7 @@
   .field-radio:checked + .radio-indicator::after { content: ''; position: absolute; top: 50%; left: 50%;transform: translate(-50%, -50%); width: 8px;height: 8px; background: var(--yorha-secondary, #ffd700); border-radius: 50%}
   /* File Input Styling */ .field-file { width: 100%; padding: 12px 16px;background: var(--yorha-bg-primary, #0a0a0a); border: 2px solid var(--yorha-text-muted, #808080); color: var(--yorha-text-primary, #e0e0e0); font-family: inherit; cursor: pointer}
   .field-file::-webkit-file-upload-button { background: var(--yorha-secondary, #ffd700); color: var(--yorha-bg-primary, #0a0a0a); border: none; padding: 8px 12px; font-family: inherit; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-right: 12px}
-  /* Error Styling */ .form-field.has-error .field-input, .form-field.has-error .field-textarea, .form-field.has-error .field-select { border-color: var(--yorha-danger, #ff0041); box-shadow: 0, 0 0 1px var(--yorha-danger, #ff0041)}
+  /* Error Styling */ .form-field.has-error .field-input, .form-field.has-error .field-textarea, .form-field.has-error .field-select { border-color: var(--yorha-danger, #ff0041); box-shadow: 0 0 0 1px var(--yorha-danger, #ff0041)}
   .field-error { display: flex; align-items: center; gap: 8px;color: var(--yorha-danger, #ff0041); font-size: 12px; font-weight: 500}
   .error-icon { font-size: 14px}
   /* Form Footer */ .form-footer { background: var(--yorha-bg-primary, #0a0a0a); border-top: 2px solid var(--yorha-text-muted, #808080); padding: 16px 20px;display: flex; justify-content: space-between; align-items: center}
@@ -71,7 +71,7 @@
   .form-button { display: flex; align-items: center; gap: 8px;padding: 10px 16px; background: var(--yorha-bg-secondary, #1a1a1a); border: 2px solid var(--yorha-text-muted, #808080); color: var(--yorha-text-secondary, #b0b0b0); font-family: inherit; font-size: 12px; font-weight: 600; text-transform: uppercase, letter-spacing: 1px; cursor: pointer;transition: all 0.2s ease}
   .form-buttonhover:not(:disabled) { transform: translateY(-1px)}
   .form-button.submit { border-color: var(--yorha-secondary, #ffd700); color: var(--yorha-secondary, #ffd700)}
-  .form-button.submit:hover:not(:disabled) { background: var(--yorha-secondary, #ffd700); color: var(--yorha-bg-primary, #0a0a0a); box-shadow: 0, 0 0 1px var(--yorha-secondary, #ffd700)}
+  .form-button.submit:hover:not(:disabled) { background: var(--yorha-secondary, #ffd700); color: var(--yorha-bg-primary, #0a0a0a); box-shadow: 0 0 0 1px var(--yorha-secondary, #ffd700)}
   .form-button.cancel { border-color: var(--yorha-danger, #ff0041); color: var(--yorha-danger, #ff0041)}
   .form-button.cancel:hover:not(:disabled) { background: var(--yorha-danger, #ff0041); color: var(--yorha-text-primary, #e0e0e0)}
   .form-buttondisabled { opacity: 0.5; cursor:not-allowed; transform: none !important}

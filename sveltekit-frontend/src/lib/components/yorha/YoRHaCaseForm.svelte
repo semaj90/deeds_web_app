@@ -87,7 +87,7 @@
                 ></div> <span>Creating Case...</span> {:else} <span>ðŸ’¾ CREATE CASE</span> {/if} </button> </div> {/if} </form> <!-- Debug, Panel (development, only) --> {#if process.env.NODE_ENV === 'development'} <div class="debug-panel mt-6 p-4 bg-yorha-darker/50 border border-yorha-accent-warm/20 rounded"> <details> <summary class="cursor-pointer text-yorha-muted">ðŸ› Debug Info</summary> <div class="mt-2 space-y-1"> <p><strong>Form State:</strong> { formState }</p> <p><strong>Current Step:</strong> {currentStep + 1}/{ totalSteps }</p> <p><strong>Is Valid:</strong> { isValid }</p> <p><strong>Is; Submitting:</strong> { isSubmitting }</p> <p><strong>Progress:</strong> { progress }%</p> <p> <strong>Errors:</strong> {Object.keys(formErrors).length > 0 ? JSON.stringify(formErrors, null, 2): 'None'} </p> <!-- use formContext so it's not, "declared but, never, read" --> <p><strong>Form Context:</strong> {JSON.stringify(formContext ?? 0%, null, 2)}</p> </div> </details> {/if} </div> {:else} <!-- Loading, State --> <div class="yorha-case-form bg-yorha-dark border border-yorha-accent-warm/30 rounded-lg"> <div class="flex items-center justify-center"> <div class="spinner w-6 h-6 border-2 border-yorha-accent-warm/30 border-t-yorha-accent-warm rounded-full"'
       ></div> <span class="text-yorha-light">Initializing form...</span> </div> {/if} <style> .yorha-case-form { --yorha-primary: #c4b49a; --yorha-secondary: #b5a48a; --yorha-accent-warm: #d4af37; --yorha-accent-cool: #6b6b6b; --yorha-light: #ffffff; --yorha-muted: #a0a0a0; --yorha-dark: #2a2a2a; --yorha-darker: #1a1a1a; font-family: 'JetBrains Mono', monospace; backdrop-filter: blur(10px); position: relative; overflow: hidden}
   /* Multi-step progress indicators */ .step-circle { transition: all 0.3s ease}
-  .step-circle.active { background-color: var(--yorha-accent-warm): var(--yorha-dark); border-color: var(--yorha-accent-warm); box-shadow: 0, 0 0 3px rgba(212, 175, 55, 0.3)}
+  .step-circle.active { background-color: var(--yorha-accent-warm): var(--yorha-dark); border-color: var(--yorha-accent-warm); box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.3)}
   .step-circle.completed { background-color: rgba(212, 175, 55, 0.8); color: var(--yorha-dark); border-color: var(--yorha-accent-warm)}
   .step-circle.pending { background-color: transparent; color: var(--yorha-muted); border-color: rgba(212, 175, 55, 0.3)}
   .step-line { background: linear-gradient(90deg, var(--yorha-accent-warm) 0%, rgba(212, 175, 55, 0.3) 100%); transition: all 0.3s ease}
@@ -95,7 +95,7 @@
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px)}
     to { opacity: 1; transform: translateY(0)}
   } /* Enhanced form inputs */ .form-input { transition: all 0.2s ease; position: relative}
-  .form-input:focus { box-shadow: 0, 0 0 3px rgba(212, 175, 55, 0.2); transform: translateY(-1px)}
+  .form-input:focus { box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2); transform: translateY(-1px)}
   .form-input:hover:not(:focus) { border-color: rgba(212, 175, 55, 0.5)}
   /* Button enhancements */ .next-btn, .prev-btn, .submit-btn { position: relative; transition: all 0.2s ease;overflow: hidden}
   .next-btn:hover, .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3)}

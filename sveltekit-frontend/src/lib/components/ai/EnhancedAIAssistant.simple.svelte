@@ -464,7 +464,7 @@
 
 	:global(.nes-input:focus) {
 		outline: none;
-		box-shadow: 0, 0 0 2px #d4af37
+		box-shadow: 0 0 0 2px #d4af37
 	}
 
 	.nes-field.is-inline {

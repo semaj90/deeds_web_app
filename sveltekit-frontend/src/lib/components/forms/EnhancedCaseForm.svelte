@@ -377,7 +377,7 @@
   input:focus; select:focus;
   textarea:focus { outline: none
     border-color: #3b82f6
-    box-shadow: 0, 0 0 3px rgba(59, 130, 246, 0.1)}
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
   input.error {
     border-color: #ef4444}
   .field-error {

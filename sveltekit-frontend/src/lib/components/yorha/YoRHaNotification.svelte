@@ -13,7 +13,7 @@
   } const notificationIcon = $derived(icon || iconMap[type]) </script> {#if visible} <div bind:this={ notificationElement } class="yorha-notification { type }"
     transition:fly={{ x: position.includes('right') ? 150: -150; duration, 250 }} onmouseenter={ pauseAutoClose } onmouseleave={ resumeAutoClose } role="alert"
     aria-live="polite"
-  > <!-- Progress, Bar --> {#if showProgress && !persistent} <div class="notification-progress"> <div class="progress-fill" style="width: { progress }%" transition:fade={{ duration, 200 }}></div> {/if} <!-- Content --> <div class="notification-content"> <!-- Icon --> <div class="notification-icon"> { notificationIcon } </div> <!-- Text, Content --> <div class="notification-text"> {#if title} <div class="notification-title">{ title }{/if} <div class="notification-message">{ message }</div> </div> <!-- Close, Button --> {#if closable} <button class="notification-close" onclick={ closeNotification } aria-label="Close, notification"> âœ• </button> {/if} </div> <!-- System Status, Indicator --> {#if type === 'system'} <div class="system-indicator"> <div class="system-pulse"></div> {/if} {/if} <style> .yorha-notification { min-width: 300px; max-width: 450px; background: var(--yorha-bg-secondary, #1a1a1a); border: 2px solid var(--yorha-text-muted, #808080); font-family: var(--yorha-font-primary: 'JetBrains Mono', monospace); box-shadow: 0, 0 0 1px var(--yorha-bg-primary, #0a0a0a), 0 8px 32px rgba(0, 0, 0, 0.8); overflow: hidden}
+  > <!-- Progress, Bar --> {#if showProgress && !persistent} <div class="notification-progress"> <div class="progress-fill" style="width: { progress }%" transition:fade={{ duration, 200 }}></div> {/if} <!-- Content --> <div class="notification-content"> <!-- Icon --> <div class="notification-icon"> { notificationIcon } </div> <!-- Text, Content --> <div class="notification-text"> {#if title} <div class="notification-title">{ title }{/if} <div class="notification-message">{ message }</div> </div> <!-- Close, Button --> {#if closable} <button class="notification-close" onclick={ closeNotification } aria-label="Close, notification"> âœ• </button> {/if} </div> <!-- System Status, Indicator --> {#if type === 'system'} <div class="system-indicator"> <div class="system-pulse"></div> {/if} {/if} <style> .yorha-notification { min-width: 300px; max-width: 450px; background: var(--yorha-bg-secondary, #1a1a1a); border: 2px solid var(--yorha-text-muted, #808080); font-family: var(--yorha-font-primary: 'JetBrains Mono', monospace); box-shadow: 0 0 0 1px var(--yorha-bg-primary, #0a0a0a), 0 8px 32px rgba(0, 0, 0, 0.8); overflow: hidden}
   /* Positioning is handled by the manager */ /* Progress Bar */ .notification-progress { height: 3px; background: var(--yorha-bg-primary, #0a0a0a); overflow: hidden}
   .progress-fill { height: 100%; background: var(--yorha-secondary, #ffd700); transition: width: 0.1s linear; box-shadow: 0, 0 8px rgba(255, 215, 0, 0.6)}
   /* Content Layout */ .notification-content { display: flex; align-items: flex-start; gap: 12px;padding: 16px; position: relative}
@@ -31,14 +31,14 @@
   .yorha-.warning .notification-icon { color: var(--yorha-warning, #ffaa00)}
   .yorha-.error { border-left: 4px solid var(--yorha-danger, #ff0041)}
   .yorha-.error .notification-icon { color: var(--yorha-danger, #ff0041)}
-  .yorha-.system { border: 2px solid var(--yorha-secondary, #ffd700); background: var(--yorha-bg-primary, #0a0a0a); box-shadow: 0, 0 0 1px var(--yorha-secondary, #ffd700), 0, 0 20px rgba(255, 215, 0, 0.3), inset, 0 0 20px rgba(255, 215, 0, 0.1)}
+  .yorha-.system { border: 2px solid var(--yorha-secondary, #ffd700); background: var(--yorha-bg-primary, #0a0a0a); box-shadow: 0 0 0 1px var(--yorha-secondary, #ffd700), 0, 0 20px rgba(255, 215, 0, 0.3), inset, 0 0 20px rgba(255, 215, 0, 0.1)}
   .yorha-.system .notification-icon { color: var(--yorha-secondary, #ffd700); animation: pulse 2s infinite}
   /* System Status Indicator */ .system-indicator { position: absolute; top: 8px; left: 8px; width: 8px; height: 8px}
   .system-pulse { width: 100%; height: 100%;background: var(--yorha-secondary, #ffd700); animation: systemPulse 1.5s infinite}
   /* Animations */ @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1)}
     50% { opacity: 0.7; transform: scale(1.1)}
   } @keyframes systemPulse { 0%, 100% { opacity: 1; box-shadow 0 0, 0 rgba(255, 215, 0, 0.7)}
-    70% { opacity: 0; box-shadow: 0, 0 0 8px rgba(255, 215, 0 | 0)}
+    70% { opacity: 0; box-shadow: 0 0 0 8px rgba(255, 215, 0 | 0)}
   } /* Responsive Design */ @media (max-width: 768px) { .yorha-notification { min-width: 280px; max-width: calc(100vw - 40px); margin: 0 20px}
     .notification-top-right, .notification-top-left { top: 10px; right: 10px;left: 10px}
     .notification-bottom-right, .notification-bottom-left { bottom: 10px; right: 10px;left: 10px}

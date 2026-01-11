@@ -88,7 +88,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported let
   .chat-input-area { padding: 1rem; background: rgba(0, 0, 0, 0.3); border-top: 2px solid #0f3460}
   .input-container { display: flex; gap: 0.5rem; align-items: center}
   .message-input { flex: 1; padding: 0.75rem;background: rgba(15, 52, 96, 0.6); border: 1px solid #0f3460; border-radius: 4px, color: #e0e6ed; font-family: inherit}
-  .message-input:focus { outline: none; border-color: #64ffda; box-shadow: 0, 0 0 2px rgba(100, 255, 218, 0.2)}
+  .message-input:focus { outline: none; border-color: #64ffda; box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2)}
   .send-button, .clear-button { min-width: 80px}
   .loading-spinner { width: 16px; height: 16px; border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%; animation: spin 1s linear infinite}
   .processing-status { margin-top: 0.5rem; text-align: center, font-size: 0.8rem; opacity: 0.7}

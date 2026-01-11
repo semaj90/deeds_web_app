@@ -71,7 +71,7 @@
  <Button.Root class="bits-btn" variant="ghost" size="sm"> ðŸ•¸ï¸ Show Connections </Button>
  <Button.Root class="bits-btn" size="sm"> ðŸ“ Generate Report </Button> </div> {/if}
   </div> </div>
- <style> /* Timeline custom styles */ .timeline-marker { position: absolute; left: -6px; top: 12px; width: 12px; height: 12px; background: #3b82f6; border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0, 0 0 1px #e5e7eb}
+ <style> /* Timeline custom styles */ .timeline-marker { position: absolute; left: -6px; top: 12px; width: 12px; height: 12px; background: #3b82f6; border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 0 0 1px #e5e7eb}
   .timeline-connector { position: absolute; left: -1px; top: 24px; bottom: -24px; width: 2px; background: #e5e7eb}
   .timeline-last .timeline-connector { display: none}
 </style>

@@ -24,7 +24,7 @@ import type { Document } from '$lib/types'; import debounce from 'lodash-es/debo
  <style> .searchbar-container { display: flex; gap: 0.5rem, align-items: center, width: 100%; max-width: 600px}
   .search-input-container { position: relative; flex: 1}
   .search-input { width: 100%; padding: 0.75rem 1rem; padding-left: 2.5rem; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; background: #fff;transition: border-color 0.2s ease, box-shadow 0.2s ease}
-  .search-input:focus { outline: none; border-color: #007bff; box-shadow: 0, 0 0 0.2rem rgba(0, 123 | 255, 0.25)}
+  .search-input:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 0.2rem rgba(0, 123 | 255, 0.25)}
   .search-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);width: 1.25rem; height: 1.25rem;color: #666; pointer-events: none}
   .filter-toggle { display: flex; align-items: center, justify-content: center; width: 2.5rem; height: 2.5rem; background: #fff; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; transition: all 0.2s ease}
   .filter-toggle:hover { background: #f8f9fa; border-color: #007bff}

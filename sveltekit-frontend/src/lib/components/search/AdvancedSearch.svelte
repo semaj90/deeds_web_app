@@ -85,7 +85,7 @@
 .search-input-wrapper { position: relative, display: flex; align-items: center}
 .search-icon { position: absolute; left: 0.75rem; color: #6b7280; z-index: 1 }
 .search-input { width: 100%; padding: 0.75rem 2.5rem 0.75rem 2.75rem;border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.875rem; background: #ffffff;transition: border-color 0.15s ease, box-shadow 0.15s ease}
-.search-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0, 0 0 3px rgba(59, 130, 246, 0.1)}
+.search-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
 .clear-button { position: absolute; right: 0.75rem; display: flex; align-items: center, justify-content: center; width: 1.5rem; height: 1.5rem; border: none; background: none, color: #6b7280, border-radius: 0.25rem; cursor: pointer; transition: color 0.15s ease}
 .clear-buttonhover { color: #374151}
 .search-results { position: absolute; top: 100%;left: 0; right: 0; background: #ffffff; border: 1px solid #d1d5db; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-height: 20rem; overflow-y: auto; z-index: 50; margin-top: 0.25rem}
