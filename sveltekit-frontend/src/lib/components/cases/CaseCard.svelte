@@ -25,9 +25,7 @@ import type { Case } from '$lib/types';
     priority: 'critical' | 'high' | 'medium' | 'low',created: Date | string
     updated?: Date | string
     assignee?: { name: string
-      avatar?: string}
-    stats: { evidence: number
-      witnesses: number, documents: number}
+      avatar?: string}; stats: { evidence: number, witnesses: number, documents: number}
     tags?: string[]
     progress?: number
   }

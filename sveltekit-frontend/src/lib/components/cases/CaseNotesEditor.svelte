@@ -506,8 +506,7 @@
  {#each searchHits as note (note.id)}
  <div
  class="note-item"
- class:selected={selectedNote?.id === note.id}
- class:pinned={note.pinned}
+ class:selected={selectedNote?.id === note.id}; class:pinned={note.pinned}
  role="button"
  tabindex="0"
  onclick={() => onSelectHit(note)}
@@ -534,8 +533,7 @@
  {#each notes as note (note.id)}
  <div
  class="note-item"
- class:selected={selectedNote?.id === note.id}
- class:pinned={note.isPinned}
+ class:selected={selectedNote?.id === note.id}; class:pinned={note.isPinned}
  role="button"
  tabindex="0"
  onclick={() => selectNote(note)}

@@ -11,8 +11,7 @@
   import { Search, Filter, SortAsc, SortDesc } from 'lucide-svelte';
   interface Props {
     cases: Case[]; filteredCases: Case[],
-    searchQuery: string, statusFilter: string
-    sortBy: string; sortOrder: 'asc' | 'desc'}
+    searchQuery: string, statusFilter: string, sortBy: string; sortOrder: 'asc' | 'desc'}
   let { cases = [],
     filteredCases = [],
     searchQuery = '',
@@ -44,7 +43,7 @@
   //   assignee: string[]
   //  , priority: ['high', 'medium', 'low']
   //   tags: string[]
-  //   evidenceCount: { min: number max: number }
+  //   evidenceCount: { min: number, max: number }
 
   //   hasAttachments: boolean
   //  , lastActivityDays: number

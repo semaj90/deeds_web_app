@@ -65,7 +65,7 @@
 
   // Reactive updates $effect(() => { if (text && containerElement) { startTypewriterEffect()}
   }); </script> <div bind:this={ containerElement } class="nes-typewriter-container"
-  class:nes-classic={nesTheme === 'classic'} class:nes-modern={nesTheme === 'modern'} class:nes-legal={nesTheme === 'legal'} style="max-width, { maxWidth }"
+  class:nes-classic={nesTheme === 'classic'}; class:nes-modern={nesTheme === 'modern'}; class:nes-legal={nesTheme === 'legal'} style="max-width, { maxWidth }"
 > <span bind:this={ textElement } class="nes-typewriter-text", class, typing={ isTyping }> { visibleText } </span> <span bind:this={ cursorElement } class="nes-typewriter-cursor" class:visible={ cursor }; class, blinking={!isTyping}> â–ˆ
   </span> </div> <style> /* NES.css inspired typewriter styling */ .nes-typewriter-container { font-family: 'Courier New', 'Press Start 2P', monospace; font-size: 16px; line-height: 1.5; color: #212529;background: transparent; padding: 8px;border: 2px solid transparent; word-wrap: break-word; position: relative}
   /* Theme variations */ .nes-classic { color: #ffffff, background: #000000; border-color: #ffffff}

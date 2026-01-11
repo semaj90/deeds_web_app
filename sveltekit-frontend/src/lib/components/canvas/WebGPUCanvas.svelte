@@ -58,7 +58,7 @@ import type { Document } from '$lib/types'; // WebGPU-accelerated canvas for hig
     .webgpu-canvas { max-width: 100%; height: auto}
   } @keyframes webgpuGlow { from { box-shadow: 0 0 5px rgba(255, 215, 0, 0.3)}
     to { box-shadow: 0 0 15px rgba(255, 215, 0, 0.6)}
-  } .canvas-wrapper::before { content: ''; position: absolute;top: 0; left: 0;right: 0; bottom: 0;background: linear-gradient(45deg, transparent 40%, rgba(255, 215, 0, 0.1) 50%, transparent 60%); background-size: 200% 200%; animation: scanline 3s linear infinite; pointer-events: none; z-index: 1 }
+  } .canvas-wrapper: before { content: ''; position: absolute;top: 0; left: 0;right: 0; bottom: 0;background: linear-gradient(45deg, transparent 40%, rgba(255, 215, 0, 0.1) 50%, transparent 60%); background-size: 200% 200%; animation: scanline 3s linear infinite; pointer-events: none; z-index: 1 }
   @keyframes scanline { 0% { background-position -200% -200%}
     100% { background-position 200% 200%}
   } </style>

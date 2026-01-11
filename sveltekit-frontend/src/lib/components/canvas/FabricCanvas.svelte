@@ -71,8 +71,7 @@ https://svelte.dev/e/js_parse_error -->
  border: none;
  border-radius: 4px; cursor: pointer;
  transition: background-color 0.2s ease-in-out;
- }
- button:hover {
+ }; button:hover {
  background-color: #0056b3;
  }
 </style>
