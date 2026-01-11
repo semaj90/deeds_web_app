@@ -2,19 +2,16 @@
  import { createEventDispatcher, onMount } from 'svelte';
 
  interface Evidence {
- id: string;
- title: string;
+ id: string;, title: string;
  classification: 'public' | 'confidential' | 'sealed';
  status: 'pending' | 'approved' | 'locked' | 'rejected';
  type: 'document' | 'image' | 'audio' | 'video';
- boardPosition: { x: number; y: number };
+ boardPosition: {, x: number; y: number };
  }
 
  interface Relationship {
- id: string;
- sourceNodeId: string;
- targetNodeId: string;
- type: 'mentions' | 'contradicts' | 'supports' | 'references' | 'timeline';
+ id: string;, sourceNodeId: string;
+ targetNodeId: string;, type: 'mentions' | 'contradicts' | 'supports' | 'references' | 'timeline';
  confidence: number;
  }
 
@@ -29,7 +26,7 @@
  const dispatch = createEventDispatcher();
 
  let canvas: HTMLCanvasElement;
- let ctx: CanvasRenderingContext2D: null = null;
+ let ctx: CanvasRenderingContext2D, null = null;
  let isDragging = false;
  let draggedNodeId: string | null = null;
  let dragOffsetX = 0;
@@ -180,7 +177,7 @@
  }
  };
 
- const getNodeAtPoint = (x: number, y: number, number): number: Evidence: null => {
+ const getNodeAtPoint = (x: number, y: number, number): number:, Evidence: null => {
  for (const node of evidence) {
  if (
  x >= node.boardPosition.x &&

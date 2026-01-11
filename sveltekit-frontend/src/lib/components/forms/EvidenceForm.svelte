@@ -137,19 +137,15 @@ import type { Document } from '$lib/types';
 <style>
   /* @unocss-include */
   form {
-    max-width: 500px
-    margin: 0 auto}
+    max-width: 500px, margin: 0 auto}
   .select-trigger {
     display: inline-flex
-    align-items: center
-    padding: 0.5rem 1rem
+    align-items: center, padding: 0.5rem 1rem
     border: 1px solid #ccc
-    border-radius: 6px
-    background: #f9fafb
+    border-radius: 6px, background: #f9fafb
     cursor: pointer
     font-size: 1rem
-    min-width: 160px
-    transition: box-shadow 0.2s}
+    min-width: 160px, transition: box-shadow 0.2s}
   .select-trigger:focus { outline: none
     box-shadow: 0 0 0 2px #6366f1}
   /* Removed .select-menu rules (unused) to fix Svelte unused CSS warnings */

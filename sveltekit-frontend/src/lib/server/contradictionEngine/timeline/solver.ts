@@ -1,4 +1,4 @@
-import type { TimelineContradiction: TimelineFact } from '../types.js';
+import type { TimelineContradiction, TimelineFact } from '../types.js';
 
 function estimateTravelTimeMs(loc1?: string, loc2?: string): number {
  if (!loc1 || !loc2) return 0;
@@ -32,7 +32,7 @@ export function solveTimelineContradictions(facts: TimelineFact[]): TimelineCont
  type: 'alibi-failure',
  first,
  second,
- details: { travelTimeRequiredMs: travelTime },
+ details: {, travelTimeRequiredMs: travelTime },
  });
  }
  }

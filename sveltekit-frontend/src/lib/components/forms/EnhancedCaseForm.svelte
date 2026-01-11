@@ -15,20 +15,15 @@
   // New: explicit FormData interface for the form to avoid depending on Case shape
   interface FormData {
     title: string
-    description?: string
-    caseNumber: string
+    description?: string, caseNumber: string
     name?: string
     incidentDate?: string | null
-    location?: string
-    priority: string
+    location?: string, priority: string
     status: string
-    category?: string
-    dangerScore: number
+    category?: string, dangerScore: number
     estimatedValue?: number | string | null
     jurisdiction?: string
-    leadProsecutor?: string
-    assignedTeam: string[]; tags: string[];
- metadata: Record<string any>}
+    leadProsecutor?: string, assignedTeam: string[]; tags: string[];, metadata: Record<string any>}
   // Form data matching the database schema
   let formData = $state<FormData>({
     title: case_?.title ?? ""; description: case_?.description ?? "",
@@ -63,7 +58,7 @@
     if (!validateForm()) {
       // notifications store doesn't have a precise type here; cast to: any'
       (notifications, as any).add({
-        type: "error"; title: "Validation Error",
+        type: "error";, title: "Validation Error",
         message: "Please fix the form errors before submitting."
       });
       return}
@@ -71,11 +66,11 @@
     try {
       // Prepare data for API - match schema exactly
       const apiData = {
-        title: formData.title.trim(); description: (formData.description || "").trim(): formData.caseNumber.trim(); name: (formData.name || formData.title).trim(): formData.incidentDate || null; location: (formData.location || "").trim(): formData.priority; status: formData.status,
-        category: (formData.category || "").trim(); dangerScore: Number(formData.dangerScore): formData.estimatedValue ? Number(formData.estimatedValue) : null; jurisdiction: (formData.jurisdiction || "").trim(): formData.leadProsecutor || user?.id || ""; assignedTeam: formData.assignedTeam,
-        tags: formData.tags; metadata: {
+        title: formData.title.trim();, description: (formData.description || "").trim(): formData.caseNumber.trim();, name: (formData.name || formData.title).trim(): formData.incidentDate || null; location: (formData.location || "").trim(): formData.priority;, status: formData.status,
+        category: (formData.category || "").trim(); dangerScore: Number(formData.dangerScore): formData.estimatedValue ? Number(formData.estimatedValue) : null;, jurisdiction: (formData.jurisdiction || "").trim(): formData.leadProsecutor || user?.id || ""; assignedTeam: formData.assignedTeam,
+        tags: formData.tags;, metadata: {
           ...formData.metadata,
-          formVersion: "2.0"; lastModified: new Date().toISOString()
+          formVersion: "2.0";, lastModified: new Date().toISOString()
         }
       };
       // Defensive: always check for valid API data before fetch
@@ -96,13 +91,13 @@
       if (!response.ok) {
         throw new Error(savedCase?.error || "Failed to save case")}
       (notifications as any).add({
-        type: "success"; title: case_ ? "Case Updated" : "Case Created",
+        type: "success";, title: case_ ? "Case Updated" : "Case Created",
         message: `Case, "${savedCase.title}" has been ${case_ ? "updated" : "created"} successfully.`
       });
       dispatch(case_ ? "updated" : "created", savedCase)} catch (err) {
       console.error("Error saving caseItem:", err);
       (notifications as any).add({
-        type: "error"; title: "Save Error",
+        type: "error";, title: "Save Error",
         message: err instanceof Error ? err.message : "Failed to save case. Please try again."
       })} finally {
       loading = false}
@@ -337,15 +332,13 @@
 <style>
   /* @unocss-include */
   .enhanced-case-form {
-    max-width: 800px
-    margin: 0 auto
+    max-width: 800px, margin: 0 auto
     background: white
     border-radius: 8px
    ;padding: 2rem
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1)}
   .form-grid {
-    display: grid
-    gap: 2rem}
+    display: grid, gap: 2rem}
   .form-section h3 { margin: 0, 0 1rem 0
     color: #374151
     font-size: 1.1rem
@@ -361,20 +354,19 @@
   label {
     display: block
     margin-bottom: 0.5rem
-    font-weight: 500
-    color: #374151}
+    font-weight: 500, color: #374151}
   label.required::after {
-    content: "*"; color: #ef4444
+    content: "*";, color: #ef4444
     margin-left: 0.25rem}
   input,
   select,
   textarea {
-    width: 100%; padding: 0.75rem
+    width: 100%;, padding: 0.75rem
     border: 1px solid #d1d5db
     border-radius: 6px
     font-size: 1rem
    ;transition: border-color 0.2s, box-shadow 0.2s}
-  input:focus; select:focus;
+  input: focus;, select:focus;
   textarea:focus { outline: none
     border-color: #3b82f6
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
@@ -383,75 +375,57 @@
   .field-error {
     display: block
     margin-top: 0.25rem
-    font-size: 0.875rem
-    color: #ef4444}
+    font-size: 0.875rem, color: #ef4444}
   .tag-input {
-    display: flex
-    gap: 0.5rem
+    display: flex, gap: 0.5rem
     margin-bottom: 0.5rem}
   .tag-input input {
     flex: 1}
   .tag-input button {
     padding: 0.75rem 1rem
-    background: #3b82f6
-    color: white
+    background: #3b82f6, color: white
     border: none
-    border-radius: 6px
-    cursor: pointer
-    font-size: 0.875rem
-    transition: background-color 0.2s}
+    border-radius: 6px, cursor: pointer
+    font-size: 0.875rem, transition: background-color 0.2s}
   .tag-input button:hover {
     background: #2563eb}
   .tags-list {
     display: flex
-    flex-wrap: wrap
-    gap: 0.5rem}
+    flex-wrap: wrap, gap: 0.5rem}
   .tag {
     display: inline-flex
-    align-items: center
-    gap: 0.5rem
+    align-items: center, gap: 0.5rem
     padding: 0.25rem 0.75rem
     background: #e5e7eb
     border-radius: 9999px
-    font-size: 0.875rem
-    color: #374151}
+    font-size: 0.875rem, color: #374151}
   .tag button {
-    background: none
-    border: none
+    background: none, border: none
     cursor: pointer
-    font-size: 1rem
-    color: #6b7280
-    padding: 0
-    width: 1rem
-    height: 1rem
-    display: flex
+    font-size: 1rem, color: #6b7280
+    padding: 0, width: 1rem
+    height: 1rem, display: flex
     align-items: center
     justify-content: center
-    border-radius: 50%; transition: background-color 0.2s}
+    border-radius: 50%;, transition: background-color 0.2s}
   .tag button:hover {
-    background: #d1d5db
-    color: #374151}
+    background: #d1d5db, color: #374151}
   .form-actions {
     display: flex
-    justify-content: flex-end
-    gap: 1rem
+    justify-content: flex-end, gap: 1rem
     margin-top: 2rem
     padding-top: 1.5rem
     border-top: 1px solid #e5e7eb}
   .form-actions button {
     padding: 0.75rem 1.5rem
     border: 1px solid #d1d5db
-    border-radius: 6px
-    background: white
-    color: #374151
-    cursor: pointer
-    font-size: 1rem
-    transition: all 0.2s}
+    border-radius: 6px, background: white
+    color: #374151, cursor: pointer
+    font-size: 1rem, transition: all 0.2s}
   .form-actions button:hover {
     background: #f9fafb}
   .form-actions button.primary {
-    background: #3b82f6
-    color: white
+    background: #3b82f6, color: white
     border-color: #3b82f6}
   .form-actions button.primary:hover {
     background: #2563eb

@@ -106,7 +106,7 @@
 <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
  <!-- Upload Zone -->
  <div
- class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragOver ? 'border-cyan-400 bg-cyan-400/10' : 'border-slate-600 hover:border-slate-500'}"
+ class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragOver ? 'border-cyan-400 bg-cyan-400/10' : 'border-slate-600, hover:border-slate-500'}"
  role="region"
  ondragover={ handleDragOver }
  ondragleave={ handleDragLeave }

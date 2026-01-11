@@ -27,8 +27,7 @@
     // Initialize AI accessibility patterns
     aiAccessibilityPatterns?.updateOptions({
       enableVoiceCommands,
-      progressiveDisclosure: showProgressiveDisclosure
-      enhancedFocusIndicators: true
+      progressiveDisclosure: showProgressiveDisclosure, enhancedFocusIndicators: true
       aiResultSummaries: true
 ; contextualHelp: true
     });
@@ -74,8 +73,7 @@
       const summary = (obj as unknown).summary || `${operation} completed with ${Object.keys(obj).length} sections`;
 
       const levels = Object.entries(obj).map(([key, value], index) => ({
-        label: key.charAt(0).toUpperCase() + key.slice(1); content: value
- level: index + 1}));
+        label: key.charAt(0).toUpperCase() + key.slice(1); content: value, level: index + 1}));
       aiAccessibilityPatterns?.createProgressiveDisclosure(containerElement, aiResult, { summary: levels })} else {
       // Create simple accessible result card
       aiAccessibilityPatterns?.createAccessibleAIResult(aiResult, containerElement)}
@@ -175,8 +173,7 @@ interface with accessibility enhancements`}
 </div>
 <style>
   .ai-accessibility-wrapper {
-    position: relative
-    padding: 1rem
+    position: relative, padding: 1rem
    ;border: 1px solid var(--color-border, #333);
     border-radius: 8px
    ;background: var(--color-bg-secondary, #1a1a2e)}
@@ -190,8 +187,7 @@ interface with accessibility enhancements`}
   .voice-toggle {
     padding: 0.5rem 1rem
     font-size: 0.875rem
-    border-radius: 4px
-    cursor: pointer
+    border-radius: 4px, cursor: pointer
     transition: all 0.2s ease}
   .voice-status {
     font-size: 0.875rem
@@ -200,8 +196,7 @@ interface with accessibility enhancements`}
     border-radius: 4px
    ;border: 1px solid rgba(0, 188, 212, 0.3)}
   .ai-status-indicator {
-    margin-bottom: 1rem
-    padding: 0.75rem
+    margin-bottom: 1rem, padding: 0.75rem
     border-radius: 6px
     font-weight: 500}
   .ai-status-indicator.processing { background: rgba(255, 152, 0, 0.1); border: 1px solid rgba(255, 152, 0, 0.3);
@@ -214,8 +209,7 @@ interface with accessibility enhancements`}
 .success-indicator, 0%
   .error-indicator {
     display: flex
-    align-items: center
-    gap: 0.5rem}
+    align-items: center, gap: 0.5rem}
   .spinner { animation: pulse 1.5s ease-in-out infinite}
   @keyframes pulse {
     0%,
@@ -225,8 +219,7 @@ interface with accessibility enhancements`}
       opacity: 0.5}
   }
   .ai-content-area {
-    min-height: 100px
-    padding: 1rem
+    min-height: 100px, padding: 1rem
    ;border: 1px dashed var(--color-border, #444);
     border-radius: 6px
     margin-bottom: 1rem}
@@ -234,15 +227,11 @@ interface with accessibility enhancements`}
     border-top: 1px solid var(--color-border, #333);
     padding-top: 1rem}
   .help-toggle {
-    cursor: pointer
-    padding: 0.5rem
-    border-radius: 4px
-    background: transparent
+    cursor: pointer, padding: 0.5rem
+    border-radius: 4px, background: transparent
    ;border: 1px solid var(--color-border, #333); display: flex
-    align-items: center
-    gap: 0.5rem
-    font-weight: 500
-    transition: background-color 0.2s ease}
+    align-items: center, gap: 0.5rem
+    font-weight: 500, transition: background-color 0.2s ease}
   .help-toggle:hover { background: rgba(0, 188, 212, 0.1)}
   .help-content {
     padding: 1rem

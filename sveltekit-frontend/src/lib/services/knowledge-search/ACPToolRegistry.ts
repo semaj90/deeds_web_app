@@ -23,27 +23,24 @@ import { stream } from "glob";
 import { url } from "inspector";
 import { title } from "process";
 import nodejsOrchestrator from "../nodejs-orchestrator.js";
-import type { ACPTool: ToolResult } from './types.js';
+import type { ACPTool, ToolResult } from './types.js';
 
 // ═══════════════════════════════════════════════════════════════════════
 // Configuration
 // ═══════════════════════════════════════════════════════════════════════
 
 const CONFIG = {
-	endpoints: {
-		ollama: process.env.OLLAMA_URL || 'http://localhost:11434',
+	endpoints: {, ollama: process.env.OLLAMA_URL || 'http://localhost:11434',
 		qdrant: process.env.QDRANT_URL || 'http://localhost:6333',
 		redis: process.env.REDIS_URL || 'http://localhost:6379',
 		knowledgeMcp: process.env.KNOWLEDGE_MCP_URL || 'http://localhost:3004',
 		a2aProtocol: process.env.A2A_URL || 'http://localhost:3005',
 		aceMcp: process.env.ACE_MCP_URL || 'http://localhost:3002'
 	},
-	models: {
-		embedding: process.env.EMBEDDING_MODEL || 'embeddinggemma:latest',
+	models: {, embedding: process.env.EMBEDDING_MODEL || 'embeddinggemma:latest',
 		chat: process.env.OLLAMA_MODEL || 'gemma3-legal:latest'
 	},
-	timeouts: {
-		default: 30000, llm: 120000,
+	timeouts: {, default: 30000, llm: 120000,
 		crawl: 15000
 	}
 };
@@ -66,57 +63,47 @@ const TOOLS: Record<string, ACPTool> = {
 	// ─────────────────────────────────────────────────────────────────
 	// Knowledge Tools
 	// ─────────────────────────────────────────────────────────────────
-	'knowledge:search': {
-		name: 'knowledge:search',
+	'knowledge:search': {, name: 'knowledge:search',
 		description: 'Search knowledge base using semantic similarity with optional LLM synthesis',
 		category: 'search',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				query: { type: 'string', description: 'Search query' },
-				topK: { type: 'number', default: 10 },
-				threshold: { type: 'number', default: 0.5 },
-				synthesize: { type: 'boolean', default: false },
-				tags: { type: 'array', items: { type: 'string' } }
+		inputSchema: {, type: 'object',
+			properties: {, query: { type: 'string', description: 'Search query' },
+				topK: {, type: 'number', default: 10 },
+				threshold: {, type: 'number', default: 0.5 },
+				synthesize: {, type: 'boolean', default: false },
+				tags: {, type: 'array', items: {, type: 'string' } }
 			},
 			required: ['query']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				results: { type: 'array' },
-				synthesized: { type: 'string' }
+		outputSchema: {, type: 'object',
+			properties: {, results: { type: 'array' },
+				synthesized: {, type: 'string' }
 			}
 		},
 		examples: [
 			{
-				input: { query: 'Svelte 5 runes', topK: 5 },
-				output: { results: [], synthesized: null },
+				input: {, query: 'Svelte 5 runes', topK: 5 },
+				output: {, results: [], synthesized: null },
 				description: 'Basic semantic search'
 			}
 		],
 		handler: handlers.knowledgeSearch
 	},
 
-	'knowledge:index': {
-		name: 'knowledge:index',
+	'knowledge:index': {, name: 'knowledge:index',
 		description: 'Index a new document into the knowledge base',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				url: { type: 'string' },
-				title: { type: 'string' },
-				content: { type: 'string' },
-				tags: { type: 'array', items: { type: 'string' } }
+		inputSchema: {, type: 'object',
+			properties: {, url: { type: 'string' },
+				title: {, type: 'string' },
+				content: {, type: 'string' },
+				tags: {, type: 'array', items: {, type: 'string' } }
 			},
 			required: ['url', 'title', 'content']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				success: { type: 'boolean' },
-				id: { type: 'number' }
+		outputSchema: {, type: 'object',
+			properties: {, success: { type: 'boolean' },
+				id: {, type: 'number' }
 			}
 		},
 		examples: [],
@@ -126,71 +113,56 @@ const TOOLS: Record<string, ACPTool> = {
 	// ─────────────────────────────────────────────────────────────────
 	// Code Analysis Tools
 	// ─────────────────────────────────────────────────────────────────
-	'code:analyze': {
-		name: 'code:analyze',
+	'code:analyze': {, name: 'code:analyze',
 		description: 'Analyze code using svelte-check and tsc',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				filePath: { type: 'string', description: 'File path to analyze' },
-				tools: { type: 'array', items: { type: 'string' }, default: ['svelte-check', 'tsc'] }
+		inputSchema: {, type: 'object',
+			properties: {, filePath: { type: 'string', description: 'File path to analyze' },
+				tools: {, type: 'array', items: {, type: 'string' }, default: ['svelte-check', 'tsc'] }
 			},
 			required: ['filePath']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				errors: { type: 'array' },
-				warnings: { type: 'array' }
+		outputSchema: {, type: 'object',
+			properties: {, errors: { type: 'array' },
+				warnings: {, type: 'array' }
 			}
 		},
 		examples: [],
 		handler: handlers.codeAnalyze
 	},
 
-	'code:search': {
-		name: 'code:search',
+	'code:search': {, name: 'code:search',
 		description: 'Search codebase using ripgrep patterns',
 		category: 'search',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				pattern: { type: 'string' },
-				path: { type: 'string', default: 'src' },
-				fileTypes: { type: 'array', items: { type: 'string' } }
+		inputSchema: {, type: 'object',
+			properties: {, pattern: { type: 'string' },
+				path: {, type: 'string', default: 'src' },
+				fileTypes: {, type: 'array', items: {, type: 'string' } }
 			},
 			required: ['pattern']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				matches: { type: 'array' }
+		outputSchema: {, type: 'object',
+			properties: {, matches: { type: 'array' }
 			}
 		},
 		examples: [],
 		handler: handlers.codeSearch
 	},
 
-	'code:ast': {
-		name: 'code:ast',
+	'code:ast': {, name: 'code:ast',
 		description: 'Parse and analyze AST of a TypeScript/Svelte file',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				filePath: { type: 'string' },
-				includeImports: { type: 'boolean', default: true },
-				includeExports: { type: 'boolean', default: true }
+		inputSchema: {, type: 'object',
+			properties: {, filePath: { type: 'string' },
+				includeImports: {, type: 'boolean', default: true },
+				includeExports: {, type: 'boolean', default: true }
 			},
 			required: ['filePath']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				imports: { type: 'array' },
-				exports: { type: 'array' },
-				functions: { type: 'array' }
+		outputSchema: {, type: 'object',
+			properties: {, imports: { type: 'array' },
+				exports: {, type: 'array' },
+				functions: {, type: 'array' }
 			}
 		},
 		examples: [],
@@ -200,48 +172,38 @@ const TOOLS: Record<string, ACPTool> = {
 	// ─────────────────────────────────────────────────────────────────
 	// LLM Tools
 	// ─────────────────────────────────────────────────────────────────
-	'llm:generate': {
-		name: 'llm:generate',
+	'llm:generate': {, name: 'llm:generate',
 		description: 'Generate text using LLM (Ollama, Gemini, or Claude)',
 		category: 'llm',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				prompt: { type: 'string' },
-				provider: { type: 'string', enum: ['ollama', 'gemini', 'claude'], default: 'ollama' },
-				maxTokens: { type: 'number', default: 2048 },
-				temperature: { type: 'number', default: 0.3 }
+		inputSchema: {, type: 'object',
+			properties: {, prompt: { type: 'string' },
+				provider: {, type: 'string', enum: ['ollama', 'gemini', 'claude'], default: 'ollama' },
+				maxTokens: {, type: 'number', default: 2048 },
+				temperature: {, type: 'number', default: 0.3 }
 			},
 			required: ['prompt']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				text: { type: 'string' },
-				provider: { type: 'string' }
+		outputSchema: {, type: 'object',
+			properties: {, text: { type: 'string' },
+				provider: {, type: 'string' }
 			}
 		},
 		examples: [],
 		handler: handlers.llmGenerate
 	},
 
-	'llm:embed': {
-		name: 'llm:embed',
+	'llm:embed': {, name: 'llm:embed',
 		description: 'Generate embedding vector for text',
 		category: 'llm',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				text: { type: 'string' },
-				model: { type: 'string', default: 'embeddinggemma:latest' }
+		inputSchema: {, type: 'object',
+			properties: {, text: { type: 'string' },
+				model: {, type: 'string', default: 'embeddinggemma:latest' }
 			},
 			required: ['text']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				embedding: { type: 'array' },
-				dimension: { type: 'number' }
+		outputSchema: {, type: 'object',
+			properties: {, embedding: { type: 'array' },
+				dimension: {, type: 'number' }
 			}
 		},
 		examples: [],
@@ -251,47 +213,37 @@ const TOOLS: Record<string, ACPTool> = {
 	// ─────────────────────────────────────────────────────────────────
 	// Web Tools
 	// ─────────────────────────────────────────────────────────────────
-	'web:crawl': {
-		name: 'web:crawl',
+	'web:crawl': {, name: 'web:crawl',
 		description: 'Fetch and parse a web page',
 		category: 'external',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				url: { type: 'string' },
-				extractLinks: { type: 'boolean', default: true },
-				maxLinks: { type: 'number', default: 10 }
+		inputSchema: {, type: 'object',
+			properties: {, url: { type: 'string' },
+				extractLinks: {, type: 'boolean', default: true },
+				maxLinks: {, type: 'number', default: 10 }
 			},
 			required: ['url']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				content: { type: 'string' },
-				links: { type: 'array' }
+		outputSchema: {, type: 'object',
+			properties: {, content: { type: 'string' },
+				links: {, type: 'array' }
 			}
 		},
 		examples: [],
 		handler: handlers.webCrawl
 	},
 
-	'web:search': {
-		name: 'web:search',
+	'web:search': {, name: 'web:search',
 		description: 'Search the web using Gemini with Google Search grounding',
 		category: 'external',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				query: { type: 'string' },
-				siteFilter: { type: 'array', items: { type: 'string' } }
+		inputSchema: {, type: 'object',
+			properties: {, query: { type: 'string' },
+				siteFilter: {, type: 'array', items: {, type: 'string' } }
 			},
 			required: ['query']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				results: { type: 'array' },
-				sources: { type: 'array' }
+		outputSchema: {, type: 'object',
+			properties: {, results: { type: 'array' },
+				sources: {, type: 'array' }
 			}
 		},
 		examples: [],
@@ -301,66 +253,51 @@ const TOOLS: Record<string, ACPTool> = {
 	// ─────────────────────────────────────────────────────────────────
 	// Agent/A2A Tools
 	// ─────────────────────────────────────────────────────────────────
-	'agent:delegate': {
-		name: 'agent:delegate',
+	'agent:delegate': {, name: 'agent:delegate',
 		description: 'Delegate task to another agent via A2A protocol',
 		category: 'external',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				agentId: { type: 'string' },
-				task: { type: 'object' }
+		inputSchema: {, type: 'object',
+			properties: {, agentId: { type: 'string' },
+				task: {, type: 'object' }
 			},
 			required: ['agentId', 'task']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				result: { type: 'object' },
-				agentName: { type: 'string' }
+		outputSchema: {, type: 'object',
+			properties: {, result: { type: 'object' },
+				agentName: {, type: 'string' }
 			}
 		},
 		examples: [],
 		handler: handlers.agentDelegate
 	},
 
-	'agent:discover': {
-		name: 'agent:discover',
+	'agent:discover': {, name: 'agent:discover',
 		description: 'Discover available agents with specific capabilities',
 		category: 'external',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				capability: { type: 'string' },
-				type: { type: 'string' }
+		inputSchema: {, type: 'object',
+			properties: {, capability: { type: 'string' },
+				type: {, type: 'string' }
 			}
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				agents: { type: 'array' }
+		outputSchema: {, type: 'object',
+			properties: {, agents: { type: 'array' }
 			}
 		},
 		examples: [],
 		handler: handlers.agentDiscover
 	},
 
-	'agent:broadcast': {
-		name: 'agent:broadcast',
+	'agent:broadcast': {, name: 'agent:broadcast',
 		description: 'Broadcast task to all matching agents',
 		category: 'external',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				task: { type: 'object' },
-				filter: { type: 'object' }
+		inputSchema: {, type: 'object',
+			properties: {, task: { type: 'object' },
+				filter: {, type: 'object' }
 			},
 			required: ['task']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				results: { type: 'array' }
+		outputSchema: {, type: 'object',
+			properties: {, results: { type: 'array' }
 			}
 		},
 		examples: [],
@@ -370,51 +307,40 @@ const TOOLS: Record<string, ACPTool> = {
 	// ─────────────────────────────────────────────────────────────────
 	// Fix/Migration Tools
 	// ─────────────────────────────────────────────────────────────────
-	'fix:svelte5': {
-		name: 'fix:svelte5',
+	'fix:svelte5': {, name: 'fix:svelte5',
 		description: 'Apply Svelte 5 migration fixes to a file',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				filePath: { type: 'string' },
-				patterns: {
-					type: 'array',
-					items: { type: 'string' },
-					default: ['on:click', 'export let', '$:']
+		inputSchema: {, type: 'object',
+			properties: {, filePath: { type: 'string' },
+				patterns: {, type: 'array',
+					items: {, type: 'string' },
+					default: ['onclick', 'export let', '$:']
 				},
-				dryRun: { type: 'boolean', default: true }
+				dryRun: {, type: 'boolean', default: true }
 			},
 			required: ['filePath']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				fixes: { type: 'array' },
-				applied: { type: 'boolean' }
+		outputSchema: {, type: 'object',
+			properties: {, fixes: { type: 'array' },
+				applied: {, type: 'boolean' }
 			}
 		},
 		examples: [],
 		handler: handlers.fixSvelte5
 	},
 
-	'fix:suggest': {
-		name: 'fix:suggest',
+	'fix:suggest': {, name: 'fix:suggest',
 		description: 'Suggest fix for an error based on knowledge base',
 		category: 'llm',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				error: { type: 'object' },
-				context: { type: 'string' }
+		inputSchema: {, type: 'object',
+			properties: {, error: { type: 'object' },
+				context: {, type: 'string' }
 			},
 			required: ['error']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				suggestion: { type: 'object' },
-				confidence: { type: 'number' }
+		outputSchema: {, type: 'object',
+			properties: {, suggestion: { type: 'object' },
+				confidence: {, type: 'number' }
 			}
 		},
 		examples: [],
@@ -424,49 +350,39 @@ const TOOLS: Record<string, ACPTool> = {
 	// ─────────────────────────────────────────────────────────────────
 	// Database Tools (PostgreSQL via docker exec)
 	// ─────────────────────────────────────────────────────────────────
-	'db:query': {
-		name: 'db:query',
+	'db:query': {, name: 'db:query',
 		description: 'Execute a read-only SQL query against PostgreSQL',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				query: { type: 'string', description: 'SQL query to execute (SELECT only)' },
-				params: { type: 'array', items: { type: 'string' }, default: [] }
+		inputSchema: {, type: 'object',
+			properties: {, query: { type: 'string', description: 'SQL query to execute (SELECT only)' },
+				params: {, type: 'array', items: {, type: 'string' }, default: [] }
 			},
 			required: ['query']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				rows: { type: 'array' },
-				rowCount: { type: 'number' }
+		outputSchema: {, type: 'object',
+			properties: {, rows: { type: 'array' },
+				rowCount: {, type: 'number' }
 			}
 		},
 		examples: [
 			{
-				input: { query: 'SELECT * FROM users LIMIT 5' },
-				output: { rows: [], rowCount: 0 },
+				input: {, query: 'SELECT * FROM users LIMIT 5' },
+				output: {, rows: [], rowCount: 0 },
 				description: 'Basic SELECT query'
 			}
 		],
 		handler: handlers.dbQuery
 	},
 
-	'db:tables': {
-		name: 'db:tables',
+	'db:tables': {, name: 'db:tables',
 		description: 'List all tables in the database',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				schema: { type: 'string', default: 'public' }
+		inputSchema: {, type: 'object',
+			properties: {, schema: { type: 'string', default: 'public' }
 			}
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				tables: { type: 'array' }
+		outputSchema: {, type: 'object',
+			properties: {, tables: { type: 'array' }
 			}
 		},
 		examples: [],
@@ -476,72 +392,58 @@ const TOOLS: Record<string, ACPTool> = {
 	// ─────────────────────────────────────────────────────────────────
 	// Cache Tools (Redis via docker exec)
 	// ─────────────────────────────────────────────────────────────────
-	'cache:get': {
-		name: 'cache:get',
+	'cache:get': {, name: 'cache:get',
 		description: 'Get a value from Redis cache',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				key: { type: 'string', description: 'Cache key' },
-				parse: { type: 'boolean', default: true, description: 'Parse JSON if true' }
+		inputSchema: {, type: 'object',
+			properties: {, key: { type: 'string', description: 'Cache key' },
+				parse: {, type: 'boolean', default: true, description: 'Parse JSON if true' }
 			},
 			required: ['key']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				value: { type: 'any' },
-				exists: { type: 'boolean' }
+		outputSchema: {, type: 'object',
+			properties: {, value: { type: 'any' },
+				exists: {, type: 'boolean' }
 			}
 		},
 		examples: [
 			{
-				input: { key: 'knowledge:graph' },
-				output: { value: null, exists: false },
+				input: {, key: 'knowledge:graph' },
+				output: {, value: null, exists: false },
 				description: 'Get cached value'
 			}
 		],
 		handler: handlers.cacheGet
 	},
 
-	'cache:set': {
-		name: 'cache:set',
+	'cache:set': {, name: 'cache:set',
 		description: 'Set a value in Redis cache',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				key: { type: 'string' },
-				value: { type: 'any' },
-				ttl: { type: 'number', default: 3600, description: 'TTL in seconds' }
+		inputSchema: {, type: 'object',
+			properties: {, key: { type: 'string' },
+				value: {, type: 'any' },
+				ttl: {, type: 'number', default: 3600, description: 'TTL in seconds' }
 			},
 			required: ['key', 'value']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				success: { type: 'boolean' }
+		outputSchema: {, type: 'object',
+			properties: {, success: { type: 'boolean' }
 			}
 		},
 		examples: [],
 		handler: handlers.cacheSet
 	},
 
-	'cache:stats': {
-		name: 'cache:stats',
+	'cache:stats': {, name: 'cache:stats',
 		description: 'Get Redis cache statistics',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
+		inputSchema: {, type: 'object',
 			properties: {}
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				keys: { type: 'number' },
-				memory: { type: 'string' },
-				uptime: { type: 'number' }
+		outputSchema: {, type: 'object',
+			properties: {, keys: { type: 'number' },
+				memory: {, type: 'string' },
+				uptime: {, type: 'number' }
 			}
 		},
 		examples: [],
@@ -551,65 +453,51 @@ const TOOLS: Record<string, ACPTool> = {
 	// ─────────────────────────────────────────────────────────────────
 	// Storage Tools (MinIO via docker exec)
 	// ─────────────────────────────────────────────────────────────────
-	'minio:upload': {
-		name: 'minio:upload',
+	'minio:upload': {, name: 'minio:upload',
 		description: 'Upload a file to MinIO storage',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				bucket: { type: 'string', default: 'legal-documents' },
-				key: { type: 'string', description: 'Object key/path' },
-				content: { type: 'string', description: 'File content (base64 or text)' },
-				contentType: { type: 'string', default: 'application/octet-stream' }
+		inputSchema: {, type: 'object',
+			properties: {, bucket: { type: 'string', default: 'legal-documents' },
+				key: {, type: 'string', description: 'Object key/path' },
+				content: {, type: 'string', description: 'File content (base64 or text)' },
+				contentType: {, type: 'string', default: 'application/octet-stream' }
 			},
 			required: ['key', 'content']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				success: { type: 'boolean' },
-				url: { type: 'string' }
+		outputSchema: {, type: 'object',
+			properties: {, success: { type: 'boolean' },
+				url: {, type: 'string' }
 			}
 		},
 		examples: [],
 		handler: handlers.minioUpload
 	},
 
-	'minio:list': {
-		name: 'minio:list',
+	'minio:list': {, name: 'minio:list',
 		description: 'List objects in a MinIO bucket',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				bucket: { type: 'string', default: 'legal-documents' },
-				prefix: { type: 'string', default: '' }
+		inputSchema: {, type: 'object',
+			properties: {, bucket: { type: 'string', default: 'legal-documents' },
+				prefix: {, type: 'string', default: '' }
 			}
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				objects: { type: 'array' }
+		outputSchema: {, type: 'object',
+			properties: {, objects: { type: 'array' }
 			}
 		},
 		examples: [],
 		handler: handlers.minioList
 	},
 
-	'minio:stats': {
-		name: 'minio:stats',
+	'minio:stats': {, name: 'minio:stats',
 		description: 'Get MinIO storage statistics',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
+		inputSchema: {, type: 'object',
 			properties: {}
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				totalSize: { type: 'number' },
-				objectCount: { type: 'number' }
+		outputSchema: {, type: 'object',
+			properties: {, totalSize: { type: 'number' },
+				objectCount: {, type: 'number' }
 			}
 		},
 		examples: [],
@@ -619,18 +507,14 @@ const TOOLS: Record<string, ACPTool> = {
 	// ─────────────────────────────────────────────────────────────────
 	// LLM Model Management
 	// ─────────────────────────────────────────────────────────────────
-	'llm:models': {
-		name: 'llm:models',
+	'llm:models': {, name: 'llm:models',
 		description: 'List available Ollama models',
 		category: 'llm',
-		inputSchema: {
-			type: 'object',
+		inputSchema: {, type: 'object',
 			properties: {}
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				models: { type: 'array' }
+		outputSchema: {, type: 'object',
+			properties: {, models: { type: 'array' }
 			}
 		},
 		examples: [],
@@ -640,18 +524,14 @@ const TOOLS: Record<string, ACPTool> = {
 	// ─────────────────────────────────────────────────────────────────
 	// System Health Tool
 	// ─────────────────────────────────────────────────────────────────
-	'system:health': {
-		name: 'system:health',
+	'system:health': {, name: 'system:health',
 		description: 'Check health of all services',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
+		inputSchema: {, type: 'object',
 			properties: {}
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				services: { type: 'object' }
+		outputSchema: {, type: 'object',
+			properties: {, services: { type: 'object' }
 			}
 		},
 		examples: [],
@@ -661,49 +541,39 @@ const TOOLS: Record<string, ACPTool> = {
 	// ─────────────────────────────────────────────────────────────────
 	// Vector / Embedding Tools (Qdrant operations)
 	// ─────────────────────────────────────────────────────────────────
-	'vector:similarity': {
-		name: 'vector:similarity',
+	'vector:similarity': {, name: 'vector:similarity',
 		description: 'Find similar vectors in Qdrant collection',
 		category: 'search',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				collection: { type: 'string', default: 'phase76_knowledge_base' },
-				text: { type: 'string', description: 'Text to find similar vectors for' },
-				topK: { type: 'number', default: 10 },
-				threshold: { type: 'number', default: 0.5 }
+		inputSchema: {, type: 'object',
+			properties: {, collection: { type: 'string', default: 'phase76_knowledge_base' },
+				text: {, type: 'string', description: 'Text to find similar vectors for' },
+				topK: {, type: 'number', default: 10 },
+				threshold: {, type: 'number', default: 0.5 }
 			},
 			required: ['text']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				results: { type: 'array' },
-				count: { type: 'number' }
+		outputSchema: {, type: 'object',
+			properties: {, results: { type: 'array' },
+				count: {, type: 'number' }
 			}
 		},
 		examples: [],
 		handler: handlers.vectorSimilarity
 	},
 
-	'vector:index': {
-		name: 'vector:index',
+	'vector:index': {, name: 'vector:index',
 		description: 'Index a new vector into Qdrant collection',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				collection: { type: 'string', default: 'phase76_knowledge_base' },
-				text: { type: 'string', description: 'Text to embed and index' },
-				metadata: { type: 'object', default: {} }
+		inputSchema: {, type: 'object',
+			properties: {, collection: { type: 'string', default: 'phase76_knowledge_base' },
+				text: {, type: 'string', description: 'Text to embed and index' },
+				metadata: {, type: 'object', default: {} }
 			},
 			required: ['text']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				success: { type: 'boolean' },
-				id: { type: 'number' }
+		outputSchema: {, type: 'object',
+			properties: {, success: { type: 'boolean' },
+				id: {, type: 'number' }
 			}
 		},
 		examples: [],
@@ -713,51 +583,41 @@ const TOOLS: Record<string, ACPTool> = {
 	// ─────────────────────────────────────────────────────────────────
 	// AST Analysis Tools (ts-morph / svelte-parse)
 	// ─────────────────────────────────────────────────────────────────
-	'ast:parse': {
-		name: 'ast:parse',
+	'ast:parse': {, name: 'ast:parse',
 		description: 'Parse a TypeScript/Svelte file and return AST structure',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				filePath: { type: 'string', description: 'File path to parse' },
-				includeImports: { type: 'boolean', default: true },
-				includeExports: { type: 'boolean', default: true },
-				includeFunctions: { type: 'boolean', default: true }
+		inputSchema: {, type: 'object',
+			properties: {, filePath: { type: 'string', description: 'File path to parse' },
+				includeImports: {, type: 'boolean', default: true },
+				includeExports: {, type: 'boolean', default: true },
+				includeFunctions: {, type: 'boolean', default: true }
 			},
 			required: ['filePath']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				imports: { type: 'array' },
-				exports: { type: 'array' },
-				functions: { type: 'array' },
-				classes: { type: 'array' }
+		outputSchema: {, type: 'object',
+			properties: {, imports: { type: 'array' },
+				exports: {, type: 'array' },
+				functions: {, type: 'array' },
+				classes: {, type: 'array' }
 			}
 		},
 		examples: [],
 		handler: handlers.astParse
 	},
 
-	'ast:analyze': {
-		name: 'ast:analyze',
+	'ast:analyze': {, name: 'ast:analyze',
 		description: 'Analyze code complexity and patterns in a file',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				filePath: { type: 'string' },
-				detectPatterns: { type: 'array', items: { type: 'string' }, default: ['on:click', 'export let', '$:'] }
+		inputSchema: {, type: 'object',
+			properties: {, filePath: { type: 'string' },
+				detectPatterns: {, type: 'array', items: {, type: 'string' }, default: ['onclick', 'export let', '$:'] }
 			},
 			required: ['filePath']
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				complexity: { type: 'number' },
-				patterns: { type: 'array' },
-				suggestions: { type: 'array' }
+		outputSchema: {, type: 'object',
+			properties: {, complexity: { type: 'number' },
+				patterns: {, type: 'array' },
+				suggestions: {, type: 'array' }
 			}
 		},
 		examples: [],
@@ -767,62 +627,48 @@ const TOOLS: Record<string, ACPTool> = {
 	// ─────────────────────────────────────────────────────────────────
 	// Drizzle ORM Tools
 	// ─────────────────────────────────────────────────────────────────
-	'drizzle:migrate': {
-		name: 'drizzle:migrate',
+	'drizzle:migrate': {, name: 'drizzle:migrate',
 		description: 'Run Drizzle ORM migrations',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				dryRun: { type: 'boolean', default: true },
-				force: { type: 'boolean', default: false }
+		inputSchema: {, type: 'object',
+			properties: {, dryRun: { type: 'boolean', default: true },
+				force: {, type: 'boolean', default: false }
 			}
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				success: { type: 'boolean' },
-				migrationsRun: { type: 'array' }
+		outputSchema: {, type: 'object',
+			properties: {, success: { type: 'boolean' },
+				migrationsRun: {, type: 'array' }
 			}
 		},
 		examples: [],
 		handler: handlers.drizzleMigrate
 	},
 
-	'drizzle:generate': {
-		name: 'drizzle:generate',
+	'drizzle:generate': {, name: 'drizzle:generate',
 		description: 'Generate Drizzle migration from schema changes',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				name: { type: 'string', description: 'Migration name' }
+		inputSchema: {, type: 'object',
+			properties: {, name: { type: 'string', description: 'Migration name' }
 			}
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				success: { type: 'boolean' },
-				file: { type: 'string' }
+		outputSchema: {, type: 'object',
+			properties: {, success: { type: 'boolean' },
+				file: {, type: 'string' }
 			}
 		},
 		examples: [],
 		handler: handlers.drizzleGenerate
 	},
 
-	'drizzle:status': {
-		name: 'drizzle:status',
+	'drizzle:status': {, name: 'drizzle:status',
 		description: 'Check Drizzle migration status',
 		category: 'database',
-		inputSchema: {
-			type: 'object',
+		inputSchema: {, type: 'object',
 			properties: {}
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				pending: { type: 'array' },
-				applied: { type: 'array' }
+		outputSchema: {, type: 'object',
+			properties: {, pending: { type: 'array' },
+				applied: {, type: 'array' }
 			}
 		},
 		examples: [],
@@ -832,25 +678,20 @@ const TOOLS: Record<string, ACPTool> = {
 	// ─────────────────────────────────────────────────────────────────
 	// Playwright E2E Testing
 	// ─────────────────────────────────────────────────────────────────
-	'playwright:test': {
-		name: 'playwright:test',
+	'playwright:test': {, name: 'playwright:test',
 		description: 'Run Playwright E2E tests',
 		category: 'external',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				testFile: { type: 'string', default: '' },
-				grep: { type: 'string', default: '' },
-				headed: { type: 'boolean', default: false },
-				browser: { type: 'string', enum: ['chromium', 'firefox', 'webkit'], default: 'chromium' }
+		inputSchema: {, type: 'object',
+			properties: {, testFile: { type: 'string', default: '' },
+				grep: {, type: 'string', default: '' },
+				headed: {, type: 'boolean', default: false },
+				browser: {, type: 'string', enum: ['chromium', 'firefox', 'webkit'], default: 'chromium' }
 			}
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				passed: { type: 'number' },
-				failed: { type: 'number' },
-				skipped: { type: 'number' }
+		outputSchema: {, type: 'object',
+			properties: {, passed: { type: 'number' },
+				failed: {, type: 'number' },
+				skipped: {, type: 'number' }
 			}
 		},
 		examples: [],
@@ -873,8 +714,7 @@ Object.assign(handlers, {
 			const response = await fetch(`${CONFIG.endpoints.knowledgeMcp}/invoke`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					tool: 'knowledge:search',
+				body: JSON.stringify({, tool: 'knowledge:search',
 					params: { query, topK, threshold, synthesize, tags }
 				})
 			});
@@ -901,8 +741,7 @@ Object.assign(handlers, {
 			const response = await fetch(`${CONFIG.endpoints.knowledgeMcp}/invoke`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					tool: 'knowledge:index',
+				body: JSON.stringify({, tool: 'knowledge:index',
 					params: { url, title, content, tags }
 				})
 			});
@@ -930,9 +769,8 @@ Object.assign(handlers, {
 			const response = await fetch(`${CONFIG.endpoints.aceMcp}/function-call`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					functionName: 'code:analyze',
-					input: { filePath: tools }
+				body: JSON.stringify({, functionName: 'code:analyze',
+					input: {, filePath: tools }
 				})
 			});
 
@@ -959,8 +797,7 @@ Object.assign(handlers, {
 			const response = await fetch(`${CONFIG.endpoints.aceMcp}/function-call`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					functionName: 'code:search',
+				body: JSON.stringify({, functionName: 'code:search',
 					input: { pattern, path, fileTypes }
 				})
 			});
@@ -982,7 +819,7 @@ Object.assign(handlers, {
 		// Placeholder for ts-morph AST analysis
 		return {
 			success: true,
-			data: { imports: [], exports: [], functions: [] },
+			data: {, imports: [], exports: [], functions: [] },
 			duration: Date.now() - startTime
 		};
 	},
@@ -996,9 +833,8 @@ Object.assign(handlers, {
 			const response = await fetch(`${CONFIG.endpoints.ollama}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					model: CONFIG.models.chat,
-					options: { temperature: maxTokens }
+				body: JSON.stringify({, model: CONFIG.models.chat,
+					options: {, temperature: maxTokens }
 				})
 			});
 
@@ -1007,7 +843,7 @@ Object.assign(handlers, {
 			const data = await response.json();
 			return {
 				success: true,
-				data: { text: data.response, provider },
+				data: {, text: data.response, provider },
 				duration: Date.now() - startTime
 			};
 		} catch (error) {
@@ -1026,7 +862,7 @@ Object.assign(handlers, {
 			const response = await fetch(`${CONFIG.endpoints.ollama}/api/embeddings`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ model: text })
+				body: JSON.stringify({, model: text })
 			});
 
 			if (!response.ok) throw new Error(`Ollama embedding error: ${response.status}`);
@@ -1034,7 +870,7 @@ Object.assign(handlers, {
 			const data = await response.json();
 			return {
 				success: true,
-				data: { embedding: data.embedding: data.embedding?.length || 0 },
+				data: {, embedding: data.embedding: data.embedding?.length || 0 },
 				duration: Date.now() - startTime
 			};
 		} catch (error) {
@@ -1070,7 +906,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: { content: text.substring(0, 10000), links },
+				data: {, content: text.substring(0, 10000), links },
 				duration: Date.now() - startTime
 			};
 		} catch (error) {
@@ -1101,7 +937,7 @@ Object.assign(handlers, {
 			const genAI = new GoogleGenerativeAI(apiKey);
 			const model = genAI.getGenerativeModel({
 				model: 'gemini-2.0-flash-exp',
-				tools: [{ googleSearch: {} }]
+				tools: [{, googleSearch: {} }]
 			});
 
 			const result = await model.generateContent(query);
@@ -1110,8 +946,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: {
-					text: response.text( sources: groundingMetadata?.groundingChunks?.map((c: any) => ({
+				data: {, text: response.text( sources: groundingMetadata?.groundingChunks?.map((c: any) => ({
 						title: c.web?.title: uri, c.web?.uri
 					})) || []
 				},
@@ -1134,7 +969,7 @@ Object.assign(handlers, {
 			const response = await fetch(`${CONFIG.endpoints.a2aProtocol}/a2a/delegate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ agentId: task })
+				body: JSON.stringify({, agentId: task })
 			});
 
 			if (!response.ok) throw new Error(`A2A delegate error: ${response.status}`);
@@ -1183,7 +1018,7 @@ Object.assign(handlers, {
 			const response = await fetch(`${CONFIG.endpoints.a2aProtocol}/a2a/broadcast`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ task: filter })
+				body: JSON.stringify({, task: filter })
 			});
 
 			if (!response.ok) throw new Error(`A2A broadcast error: ${response.status}`);
@@ -1209,8 +1044,7 @@ Object.assign(handlers, {
 			const response = await fetch(`${CONFIG.endpoints.aceMcp}/function-call`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					functionName: 'svelte5:migrate',
+				body: JSON.stringify({, functionName: 'svelte5:migrate',
 					input: { filePath, patterns, dryRun }
 				})
 			});
@@ -1240,8 +1074,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: {
-					suggestion: searchResult.data?.synthesized, confidence: 0.7, sources: searchResult.data?.results
+				data: {, suggestion: searchResult.data?.synthesized, confidence: 0.7, sources: searchResult.data?.results
 				},
 				duration: Date.now() - startTime
 			};
@@ -1354,7 +1187,7 @@ Object.assign(handlers, {
 			if (output === '(nil)') {
 				return {
 					success: true,
-					data: { value: null, exists: false },
+					data: {, value: null, exists: false },
 					duration: Date.now() - startTime
 				};
 			}
@@ -1370,7 +1203,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: { value: true },
+				data: {, value: true },
 				duration: Date.now() - startTime
 			};
 		} catch (error) {
@@ -1399,7 +1232,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: { success: true },
+				data: {, success: true },
 				duration: Date.now() - startTime
 			};
 		} catch (error) {
@@ -1435,8 +1268,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: {
-					keys: memory: stats.used_memory_human || 'unknown',
+				data: {, keys: memory, stats.used_memory_human || 'unknown',
 					uptime: parseInt(stats.uptime_in_seconds || '0')
 				},
 				duration: Date.now() - startTime
@@ -1481,8 +1313,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: {
-					success: true,
+				data: {, success: true,
 					url: `http://localhost:9000/${bucket}/${key}`
 				},
 				duration: Date.now() - startTime
@@ -1550,8 +1381,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: {
-					totalSize: info.usage?.size || 0, objectCount: 0, info.usage?.objects || 0
+				data: {, totalSize: info.usage?.size || 0, objectCount: 0, info.usage?.objects || 0
 				},
 				duration: Date.now() - startTime
 			};
@@ -1576,8 +1406,7 @@ Object.assign(handlers, {
 			const data = await response.json();
 			return {
 				success: true,
-				data: {
-					models: data.models || []
+				data: {, models: data.models || []
 				},
 				duration: Date.now() - startTime
 			};
@@ -1652,7 +1481,7 @@ Object.assign(handlers, {
 			const embedResponse = await fetch(`${CONFIG.endpoints.ollama}/api/embeddings`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ model: CONFIG.models.embedding: text })
+				body: JSON.stringify({, model: CONFIG.models.embedding: text })
 			});
 
 			if (!embedResponse.ok) throw new Error('Embedding failed');
@@ -1662,8 +1491,7 @@ Object.assign(handlers, {
 			const searchResponse = await fetch(`${CONFIG.endpoints.qdrant}/collections/${collection}/points/search`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					vector: embedData.embedding, topK: score_threshold, threshold: true
+				body: JSON.stringify({, vector: embedData.embedding, topK: score_threshold, threshold: true
 				})
 			});
 
@@ -1672,8 +1500,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: {
-					results: searchData.result?.map((r: any) => ({
+				data: {, results: searchData.result?.map((r: any) => ({
 						score: r.score: r.payload?.title: url, r.payload?.url
 					})) || [],
 					count: searchData.result?.length || 0
@@ -1697,7 +1524,7 @@ Object.assign(handlers, {
 			const embedResponse = await fetch(`${CONFIG.endpoints.ollama}/api/embeddings`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ model: CONFIG.models.embedding: text })
+				body: JSON.stringify({, model: CONFIG.models.embedding: text })
 			});
 
 			if (!embedResponse.ok) throw new Error('Embedding failed');
@@ -1712,8 +1539,7 @@ Object.assign(handlers, {
 			const upsertResponse = await fetch(`${CONFIG.endpoints.qdrant}/collections/${collection}/points?wait=true`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					points: [{
+				body: JSON.stringify({, points: [{
 						id: nextId, vector: embedData.embedding,
 						payload: { ...metadata.substring(0, 500, indexedAt: new Date().toISOString() }
 					}]
@@ -1724,7 +1550,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: { success: true, id: nextId },
+				data: {, success: true, id: nextId },
 				duration: Date.now() - startTime
 			};
 		} catch (error) {
@@ -1796,7 +1622,7 @@ Object.assign(handlers, {
 
 	async astAnalyze(args: unknown): Promise<ToolResult> {
 		const startTime = Date.now();
-		const { filePath, detectPatterns = ['on:click', 'export let', '$:'] } = args as any;
+		const { filePath, detectPatterns = ['onclick', 'export let', '$:'] } = args as any;
 
 		try {
 			const fs = await import('fs');
@@ -1825,8 +1651,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: {
-					complexity: patterns.length > 0 ? ['Consider migrating Svelte 4 patterns to Svelte 5'] : []
+				data: {, complexity: patterns.length > 0 ? ['Consider migrating Svelte 4 patterns to Svelte 5'] : []
 				},
 				duration: Date.now() - startTime
 			};
@@ -1856,7 +1681,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: { success: true, output, dryRun },
+				data: {, success: true, output, dryRun },
 				duration: Date.now() - startTime
 			};
 		} catch (error) {
@@ -1882,7 +1707,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: { success: true, output },
+				data: {, success: true, output },
 				duration: Date.now() - startTime
 			};
 		} catch (error) {
@@ -1907,7 +1732,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: { status: 'synced', output },
+				data: {, status: 'synced', output },
 				duration: Date.now() - startTime
 			};
 		} catch (error) {
@@ -1944,8 +1769,7 @@ Object.assign(handlers, {
 				const results = JSON.parse(output);
 				return {
 					success: true,
-					data: {
-						passed: results.stats?.expected || 0, failed: 0: results.stats?.unexpected || 0, skipped: 0, results.stats?.skipped || 0
+					data: {, passed: results.stats?.expected || 0, failed: 0, results.stats?.unexpected || 0, skipped: 0, results.stats?.skipped || 0
 					},
 					duration: Date.now() - startTime
 				};
@@ -1979,7 +1803,7 @@ export async function executeACPTool(toolName: string, unknown: Promise<ToolResu
 	if (!tool) {
 		return {
 			success: false,
-			error: `Unknown tool: ${toolName}`,
+			error: `Unknown, tool: ${toolName}`,
 			duration: 0
 		};
 	}
@@ -2036,7 +1860,7 @@ export class ACPToolRegistry {
 		if (!tool) {
 			return {
 				success: false,
-				error: `Unknown tool: ${toolName}`,
+				error: `Unknown, tool: ${toolName}`,
 				duration: 0
 			};
 		}

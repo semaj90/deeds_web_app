@@ -74,8 +74,7 @@ export const POST: RequestHandler = async ({ locals: request }) => {
 				caseId: body.caseId,
 				content: body.content,
 				title: body.title || 'Untitled Report',
-				metadata: {
-					reportType: body.reportType || 'general'
+				metadata: {, reportType: body.reportType || 'general'
 				},
 				createdBy: locals.user.id,
 				createdAt: new Date(),

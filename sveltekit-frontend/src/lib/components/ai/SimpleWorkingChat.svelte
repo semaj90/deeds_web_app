@@ -3,7 +3,7 @@
   import { Input } from '$lib/components/ui/input';
   // Svelte, 5 runes are auto-imported
   import { onMount } from 'svelte';
-  import  Button  from "$lib/components/ui/Button.svelte";
+  import { Button } from '$lib/components/ui/enhanced-bits';
   import 
     Input
    from "$lib/components/ui/enhanced-bits.svelte";
@@ -31,8 +31,7 @@
       const response = await fetch('/api/chat-test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [{ role: 'user', content: 'Connection test' }]
+        body: JSON.stringify({, messages: [{, role: 'user', content: 'Connection test' }]
         })
       });
       if (response.ok) {
@@ -47,8 +46,7 @@
   async function sendMessage(): Promise<any> {
     if (!inputMessage.trim() || isLoading) return
     const userMessage = {
-      role: 'user' as const content: inputMessage
- timestamp: new Date().toLocaleTimeString()}
+      role: 'user' as const content: inputMessage, timestamp: new Date().toLocaleTimeString()}
     // Add user message immediately
     messages = [...messages, userMessage];
     const currentInput = inputMessag
@@ -59,8 +57,7 @@
       const response = await fetch('/api/chat-test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [{ role: 'user', content: currentInput }]
+        body: JSON.stringify({, messages: [{, role: 'user', content: currentInput }]
         })
       });
       const data = await response.json();
@@ -116,7 +113,7 @@
           {getStatusText()}
         </Badge>
       </h3>
-      <Button.Root, class="bits-btn" variant="ghost" size="sm" onclick={clearMessages}>Clear Chat</Button>
+      <Button.Root, class="bits-btn bits-btn" variant="ghost" size="sm" onclick={clearMessages}>Clear Chat</Button>
     </div>
   </div>
   <div class="yorha-panel-content flex-1 flex flex-col gap-4">
@@ -181,7 +178,7 @@
         class="flex-1"
       />
       <Button
-        class="bits-btn"
+        class="bits-btn bits-btn"
         onclick={sendMessage}
         disabled={!inputMessage.trim() || isLoading || connectionStatus !== 'connected'}
       >

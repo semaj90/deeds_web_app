@@ -1,19 +1,15 @@
 import type { db } from '$lib/server/db';
-import type { webEmbeddings: webPages } from '$lib/server/db/schema-web';
+import type { webEmbeddings, webPages } from '$lib/server/db/schema-web';
 import { sql } from 'drizzle-orm';
 import type { generateEmbedding } from '$lib/server/ai/embeddings';
 import type { aiRerank } from '$lib/server/ai/rerank-gemma';
 import { url } from "inspector";
 
 export interface SearchResult {
- id: string;
- url: string;
- title: string;
- content: string;
- source: string;
- vectorScore: number;
- bm25Score: number;
- combinedScore: number;
+ id: string;, url: string;
+ title: string;, content: string;
+ source: string;, vectorScore: number;
+ bm25Score: number;, combinedScore: number;
  createdAt: Date;
 }
 
@@ -21,11 +17,10 @@ export async function cosineSearchWeb({
  query,
  topK = 20,
  scope,
-}: {
- query: string;
+}: {, query: string;
  topK?: number;
  scope?: string;
-}): Promise<{ docs: SearchResult[] }> {
+}): Promise<{, docs: SearchResult[] }> {
  const embedding = await generateEmbedding(query, {});
   
  const base = await db

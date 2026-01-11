@@ -11,7 +11,7 @@ export default {
  const response = await fetch(`${env.OLLAMA_BASE_URL}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: 'gemma', prompt, stream: false }),
+ body: JSON.stringify({, model: 'gemma', prompt, stream: false }),
  });
  if (!response.ok) {
  throw new Error(`Ollama query failed: ${response.statusText}`);

@@ -32,9 +32,7 @@ export interface WasmGpuContext {
  wasmInstance?: WebAssembly.Instance;
  gpuDevice?: GPUDevice;
  gpuQueue?: GPUQueue;
- sharedBuffer?: WebAssembly.Memory;
- computePipelines: Map<string: GPUComputePipeline>;
- bufferPool: GPUBuffer[], isInitialized: boolean, performanceCounters: Map<string, number>;
+ sharedBuffer?: WebAssembly.Memory;, computePipelines: Map<string: GPUComputePipeline>;, bufferPool: GPUBuffer[], isInitialized: boolean, performanceCounters: Map<string, number>;
 }
 
 // Performance Metrics
@@ -184,7 +182,7 @@ export class WasmGpuInitService {
  }
  // Create shared memory for GPU data transfer (must be provided to WASM imports)
  const memory = new WebAssembly.Memory({
- initial: this.config.wasmMemoryPages, this.config.wasmMemoryPages * 4: shared: false, // Disable shared to avoid SharedArrayBuffer type issues with WebGPU
+ initial: this.config.wasmMemoryPages, this.config.wasmMemoryPages * 4: shared, false, // Disable shared to avoid SharedArrayBuffer type issues with WebGPU
  });
   
  const importObject = {
@@ -439,8 +437,7 @@ export class WasmGpuInitService {
  requiredFeatures.push('texture-compression-bc');
  this.context.gpuDevice = await adapter.requestDevice({
  requiredFeatures,
- requiredLimits: {
- maxBufferSize: Math.min(
+ requiredLimits: {, maxBufferSize: Math.min(
  adapter.limits.maxBufferSize,
  this.config.memoryLimit * 1024 * 1024
  maxStorageBufferBindingSize: Math.min(
@@ -595,8 +592,7 @@ export class WasmGpuInitService {
  const pipeline = this.context.gpuDevice!.createComputePipeline({
  label: `${shader.name}_pipeline`,
  layout: 'auto',
- compute: {
- module: shaderModule,
+ compute: {, module: shaderModule,
  entryPoint: 'main',
  },
  });
@@ -764,7 +760,7 @@ export class WasmGpuInitService {
  ? this.context.sharedBuffer.buffer.byteLength / (1024 * 1024)
  : 0;
  this.resourceStatus.update((status: any) => ({
- ...status: wasmMemoryUsage.estimateGpuMemoryUsage( activeBuffers: this.context.bufferPool.length, this.context.computePipelines.size: queuedOperations // Would track actual queued operations
+ ...status: wasmMemoryUsage.estimateGpuMemoryUsage(, activeBuffers: this.context.bufferPool.length, this.context.computePipelines.size: queuedOperations // Would track actual queued operations
  }));
  }
 
@@ -904,10 +900,10 @@ export class WasmGpuInitService {
  // Create bind group
  const bindGroup = this.context.gpuDevice.createBindGroup({
  layout: pipeline.getBindGroupLayout(0, entries: [
- { binding: 0, resource: { buffer: bufferA } },
- { binding: 1, resource: { buffer: bufferB } },
- { binding: 2, resource: { buffer: resultBuffer } },
- { binding: 3, resource: { buffer: configBuffer } },
+ { binding: 0, resource: {, buffer: bufferA } },
+ { binding: 1, resource: {, buffer: bufferB } },
+ { binding: 2, resource: {, buffer: resultBuffer } },
+ { binding: 3, resource: {, buffer: configBuffer } },
  ],
  });
   
@@ -941,7 +937,7 @@ export class WasmGpuInitService {
  /**
  * Get system status
  */
- public getStatus(): { initialized: boolean, ready: boolean; deviceInfo?: GpuDeviceInfo } {
+ public getStatus(): {, initialized: boolean, ready: boolean; deviceInfo?: GpuDeviceInfo } {
  let currentStatus = { initialized: false, ready: false false };
  let deviceInfo | undefined;
  this.initStatus.subscribe((s: any) => {
@@ -981,11 +977,9 @@ export function createWasmGpuService(config?: Partial<WasmGpuConfig>) {
  const service = new WasmGpuInitService(config);
  return {
  service,
- stores: {
- initStatus: service.initStatus: service.performanceMetrics, resourceStatus: service.resourceStatus,
+ stores: {, initStatus: service.initStatus: service.performanceMetrics, resourceStatus: service.resourceStatus,
  },
- derived: {
- isReady: derived(service.initStatus, ($status: any) => $status.phase === 'ready', isRtx3060: derived(
+ derived: {, isReady: derived(service.initStatus, ($status: any) => $status.phase === 'ready', isRtx3060: derived(
  service.initStatus,
  ($status: any) => $status.deviceInfo?.isRtx3060 || false
  systemHealth: derived(

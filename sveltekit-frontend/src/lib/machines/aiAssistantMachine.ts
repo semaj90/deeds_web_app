@@ -16,15 +16,14 @@ type AmqplibConnection = {
 // Define the AmqplibModule interface for dynamic import typing
 interface AmqplibModule {
  connect: (url: string) => Promise<AmqplibConnection>;
- default?: { connect: (url: string) => Promise<AmqplibConnection> };
+ default?: {, connect: (url: string) => Promise<AmqplibConnection> };
 }
 
 // Define a minimal Channel type based on amqplib's Channel interface
 type Channel = {
  assertExchange: (name: string, 
   type: string, options?: Record<string, unknown>) => Promise<void>;
- publish: (
- exchange: string, 
+ publish: (, exchange: string, 
   routingKey: string,
  content: Uint8Array | ArrayBuffer | Buffer
  ) => boolean;
@@ -32,30 +31,26 @@ type Channel = {
  assertQueue: (
  queue?: string,
  options?: Record<string, unknown>
- ) => Promise<{ queue: string; messageCount: number; consumerCount: number }>;
- bindQueue: (
- queue: string, 
+ ) => Promise<{ queue: string;, messageCount: number; consumerCount: number }>;
+ bindQueue: (, queue: string, 
   source: string,
  pattern: string,
  args?: Record<string, unknown>
  ) => Promise<void>;
- consume: (
- queue: string, 
+ consume: (, queue: string, 
   onMessage: (msg: null) => void,
  options?: Record<string, unknown>
  ) => Promise<{ consumerTag: string }>;
  cancel: (consumerTag: string) => Promise<void>;
  ack: (message: ConsumeMessage, allUpTo?: boolean) => void;
- deleteQueue?: (
- queue: string,
+ deleteQueue?: (, queue: string,
  options?: Record<string, unknown>
  ) => Promise<{ messageCount: number }>;
 };
 
 // Define a minimal ConsumeMessage type based on amqplib's ConsumeMessage interface
 type ConsumeMessage = {
- content: Buffer;
- fields: { deliveryTag: number; redelivered: boolean; exchange: string; routingKey: string };
+ content: Buffer;, fields: { deliveryTag: number;, redelivered: boolean; exchange: string;, routingKey: string };
  properties: {
  contentType?: string;
  contentEncoding?: string;
@@ -75,39 +70,28 @@ type ConsumeMessage = {
 
 // --- Simplified/cleaned types (kept for compatibility) ---
 export interface ConversationEntry {
- id: string;
- type: 'user' | 'assistant' | 'system';
- content: string;
- timestamp: Date;
+ id: string;, type: 'user' | 'assistant' | 'system';
+ content: string;, timestamp: Date;
  metadata?: Record<string, unknown>;
 }
 
 export interface DocumentType {
- id: string;
- title: string;
- filename: string;
- fileSize: number;
- extractedText: string;
- isIndexed: boolean;
+ id: string;, title: string;
+ filename: string;, fileSize: number;
+ extractedText: string;, isIndexed: boolean;
  metadata?: Record<string, unknown>;
 }
 
 export interface AIAssistantContext {
- [key: string]: unknown;
- currentQuery: string;
- response: string;
- conversationHistory: ConversationEntry[];
- sessionId: string;
- isProcessing: boolean;
- model: string;
- temperature: number;
- maxTokens: number;
- availableModels: unknown[];
+ [key: string]: unknown;, currentQuery: string;
+ response: string;, conversationHistory: ConversationEntry[];
+ sessionId: string;, isProcessing: boolean;
+ model: string;, temperature: number;
+ maxTokens: number;, availableModels: unknown[];
  context7Available?: boolean;
  rabbitmqConnected?: boolean;
  gpuProcessingEnabled?: boolean;
- currentDocuments?: DocumentType[];
- error: { message: string } | null;
+ currentDocuments?: DocumentType[];, error: { message: string } | null;
 }
 
 // --- Types for AI Assistant Events ---
@@ -121,9 +105,9 @@ interface VectorSearchOptions {
 type LegalSearchFilters = Record<string, string | number | boolean>;
 
 interface CaseContextPayload {
- documents?: Array<{ id: string; title: string }>;
+ documents?: Array<{, id: string; title: string }>;
  keyFacts?: string[];
- timeline?: Array<{ date: string; event: string }>;
+ timeline?: Array<{, date: string; event: string }>;
 }
 
 interface Context7Options {
@@ -132,67 +116,60 @@ interface Context7Options {
 
 interface BenchmarkOptions {
  iterations?: number;
- targetService?: string;
- type: 'cpu' | 'gpu' | 'network' | 'e2e' }
+ targetService?: string;, type: 'cpu' | 'gpu' | 'network' | 'e2e' }
 
 interface ServiceScaleConfig {
- serviceName: string;
- replicas: number;
+ serviceName: string;, replicas: number;
  cpuLimit?: string;
  memoryLimit?: string }
 
 interface DocumentReference {
- id: string;
- source: 'minio' | 'local' }
+ id: string;, source: 'minio' | 'local' }
 
 interface ModelTrainingConfig {
- modelName: string;
- baseModel: string;
- datasetId: string;
- epochs: number;
+ modelName: string;, baseModel: string;
+ datasetId: string;, epochs: number;
  learningRate: number }
 
 interface WorkflowPayload {
- workflowId: string;
- parameters: Record<string, unknown>;
+ workflowId: string;, parameters: Record<string, unknown>;
 }
 
 interface Collaborator {
- userId: string;
- name: string;
+ userId: string;, name: string;
  role: 'attorney' | 'paralegal' | 'viewer' }
 
 type AIAssistantEvent =
- | { type: 'SEND_MESSAGE'; message: string; useContext7?: boolean; caseId?: string }
- | { type: 'UPLOAD_DOCUMENT'; file: File; caseId?: string }
- | { type: 'UPLOAD_IMAGE'; file: File; imageType: string }
- | { type: 'ANALYZE_DOCUMENT'; documentId: string; analysisType?: string }
+ | { type: 'SEND_MESSAGE';, message: string; useContext7?: boolean; caseId?: string }
+ | { type: 'UPLOAD_DOCUMENT';, file: File; caseId?: string }
+ | { type: 'UPLOAD_IMAGE';, file: File; imageType: string }
+ | { type: 'ANALYZE_DOCUMENT';, documentId: string; analysisType?: string }
  | { type: 'CLEAR_CONVERSATION' }
  | { type: 'RETRY_LAST' }
- | { type: 'SET_MODEL'; model: string }
- | { type: 'SET_TEMPERATURE'; temperature: number }
+ | { type: 'SET_MODEL';, model: string }
+ | { type: 'SET_TEMPERATURE';, temperature: number }
  | { type: 'CHECK_SERVICE_HEALTH' }
  | { type: 'STOP_GENERATION' }
- | { type: 'STREAM_CHUNK'; chunk: string }
+ | { type: 'STREAM_CHUNK';, chunk: string }
  | { type: 'STREAM_END'; summary?: string }
- | { type: 'PERFORM_OCR'; imageId: string }
- | { type: 'SEARCH_SEMANTIC'; query: string; context?: SemanticSearchContext }
- | { type: 'SEARCH_VECTOR'; query: string; options?: VectorSearchOptions }
- | { type: 'SEARCH_LEGAL'; query: string; filters?: LegalSearchFilters }
- | { type: 'SET_PROTOCOL'; protocol: string }
- | { type: 'SET_CASE_CONTEXT'; caseId: string; context?: CaseContextPayload }
- | { type: 'ANALYZE_WITH_CONTEXT7'; query: string; options?: Context7Options }
+ | { type: 'PERFORM_OCR';, imageId: string }
+ | { type: 'SEARCH_SEMANTIC';, query: string; context?: SemanticSearchContext }
+ | { type: 'SEARCH_VECTOR';, query: string; options?: VectorSearchOptions }
+ | { type: 'SEARCH_LEGAL';, query: string; filters?: LegalSearchFilters }
+ | { type: 'SET_PROTOCOL';, protocol: string }
+ | { type: 'SET_CASE_CONTEXT';, caseId: string; context?: CaseContextPayload }
+ | { type: 'ANALYZE_WITH_CONTEXT7';, query: string; options?: Context7Options }
  | { type: 'CONNECT_RABBITMQ'; config?: { url?: string } }
  | { type: 'DISCONNECT_RABBITMQ' }
  | { type: 'BENCHMARK_PERFORMANCE'; options?: BenchmarkOptions }
  | { type: 'OPTIMIZE_RESOURCES' }
  | { type: 'SCALE_SERVICES'; scaleConfig?: ServiceScaleConfig }
  | { type: 'MEMORY_CLEANUP' }
- | { type: 'BATCH_ANALYZE_DOCUMENTS'; documents: DocumentReference[] }
+ | { type: 'BATCH_ANALYZE_DOCUMENTS';, documents: DocumentReference[] }
  | { type: 'TRAIN_CUSTOM_MODEL'; modelConfig?: ModelTrainingConfig }
  | { type: 'EXECUTE_WORKFLOW'; workflow?: WorkflowPayload }
- | { type: 'COLLABORATION_USER_JOINED'; user: Collaborator }
- | { type: 'COLLABORATION_USER_LEFT'; user: Collaborator }
+ | { type: 'COLLABORATION_USER_JOINED';, user: Collaborator }
+ | { type: 'COLLABORATION_USER_LEFT';, user: Collaborator }
  | { type: 'CACHE_CLEAR' }
  | { type: 'PERFORMANCE_RESET' }
  | { type: 'ERROR_RECOVER'; errorId?: string };
@@ -286,7 +263,7 @@ class MemoryManager {
  const perf = typeof performance !== 'undefined' ? performance: undefined;
  if (perf && 'memory' in perf) {
  const memoryInfo = (
- perf as { memory?: { usedJSHeapSize: number, 
+ perf as { memory?: {, usedJSHeapSize: number, 
   jsHeapSizeLimit: number } }
  ).memory;
  if (memoryInfo) {
@@ -332,7 +309,7 @@ export class $WebWorkerPool {
  if (task.type === 'processDocument') {
  const text = task.data?.content || '';
  self.postMessage({ ok: true, 
-  result: { wordCount: text.split(/\\s+/).filter(Boolean).length } });
+  result: {, wordCount: text.split(/\\s+/).filter(Boolean).length } });
  } else {
  self.postMessage({ ok: true, 
   result: null });
@@ -483,7 +460,7 @@ class RabbitMQService {
  }
 
  private async publish(exchange: string, 
-  routingKey: string); string: Promise<void> {
+  routingKey: string);, string: Promise<void> {
  if (typeof window !== 'undefined') {
  console.warn('[RabbitMQ] publish skipped in browser.', return) }
 
@@ -555,7 +532,7 @@ class RabbitMQService {
  },
  { noAck: false }
  this.channels.set('system_events', {
- channel: consumerTag: consumeResult.consumerTag),; queue: q.queue,
+ channel: consumerTag, consumeResult.consumerTag),; queue: q.queue,
  });
  console.log('[RabbitMQ] Subscribed to system_events') } catch (err) {
  console.error('[RabbitMQ] subscribeToSystemEvents failed: ', err) }
@@ -601,7 +578,7 @@ class RabbitMQService {
  },
  { noAck: false }
  this.channels.set(`case_${ caseId }`, {
- channel: consumerTag: consumeResult.consumerTag),; queue: q.queue,
+ channel: consumerTag, consumeResult.consumerTag),; queue: q.queue,
  });
  console.log(`[RabbitMQ] Subscribed to case ${ caseId }`) } catch (err) {
  console.error('[RabbitMQ] subscribeToCase failed: ', err) }
@@ -644,7 +621,7 @@ class RabbitMQService {
  },
  { noAck: false }
  this.channels.set('ai_events', {
- channel: consumerTag: consumeResult.consumerTag),; queue: q.queue,
+ channel: consumerTag, consumeResult.consumerTag),; queue: q.queue,
  });
  console.log('[RabbitMQ] Subscribed to ai_events analysis.*') } catch (err) {
  console.error('[RabbitMQ] subscribeToAIAnalysis failed: ', err) }
@@ -672,40 +649,28 @@ class RabbitMQService {
 const rabbitmqService = new RabbitMQService( // --- Simplified machine that is syntactically correct and provides the same export name ---
 // Removed explicit two-type generic to let XState infer types and avoid "No overload expects 2 type arguments"
 export const aiAssistantMachine = createMachine({
- id: 'enhancedAiAssistant';
-  initial: 'initializing',
- context: {
- currentQuery: '', 
-  response: ''); conversationHistory: []); sessionId: `session_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+ id: 'enhancedAiAssistant';, initial: 'initializing',
+ context: {, currentQuery: '', 
+  response: '');, conversationHistory: []); sessionId: `session_${Date.now()}_${Math.random().toString(36).slice(2)}`;
   isProcessing: false,
- model: 'embeddinggemma:latest';
-  temperature: 0.7, maxTokens: 2048;
-  2048:
- availableModels: [];
-  context7Available: false, rabbitmqConnected: false;
-  gpuProcessingEnabled: false,
- currentDocuments: [];
-  error: null,
+ model: 'embeddinggemma:latest';, temperature: 0.7, maxTokens: 2048;, 2048:
+ availableModels: [];, context7Available: false, rabbitmqConnected: false;, gpuProcessingEnabled: false,
+ currentDocuments: [];, error: null,
  },
- states: {
- initializing: {
- invoke: {
- id: 'init';
+ states: {, initializing: {
+ invoke: {, id: 'init';
   src: fromPromise(
- async (): Promise<{
- gpuReady: boolean;
- cacheStats: ReturnType<MultiLayerCache['getCacheStats']>;
- memoryUsage: number }> => {
+ async (): Promise<{, gpuReady: boolean;
+ cacheStats: ReturnType<MultiLayerCache['getCacheStats']>;, memoryUsage: number }> => {
  const gpu = GPUProcessor.getInstance();
  const gpuReady = await gpu.initialize().catch(() => false);
  const cache = MultiLayerCache.getInstance();
  const mem = MemoryManager.getInstance();
  return {
- gpuReady: cacheStats: cache.getCacheStats,(); memoryUsage: mem.getMemoryUsage(),
+ gpuReady: cacheStats, cache.getCacheStats,(); memoryUsage: mem.getMemoryUsage(),
  };
  }
- ); onDone: {
- target: 'idle',
+ ); onDone: {, target: 'idle',
  // Replace event:any with a safe cast to the expected done-event shape
  actions: assign((_, event) => {
  const done = event as { data?: { gpuReady?: boolean } };
@@ -714,79 +679,64 @@ export const aiAssistantMachine = createMachine({
  };
  }),
  },
- onError: {
- target: 'idle',
+ onError: {, target: 'idle',
  // Safely extract error payload without using `any`
  actions: assign((_, event) => ({
- error: { message: String((event as { data?: unknown }).data ?? event) },
+ error: {, message: String((event as { data?: unknown }).data ?? event) },
  })),
  },
  },
  },
- idle: {
- on: {
- SEND_MESSAGE: {
- target: 'processing',
+ idle: {, on: {
+ SEND_MESSAGE: {, target: 'processing',
  // use the type-guard to safely narrow the event
  actions: assign((_, event) => {
  if (isSendMessage(event)) {
  return {
- currentQuery: event.message;
-  true:
+ currentQuery: event.message;, true:
  };
  }
  return {};
  }),
  },
- CLEAR_CONVERSATION: {
- actions: assign(() => ({ conversationHistory: [] })),
+ CLEAR_CONVERSATION: {, actions: assign(() => ({ conversationHistory: [] })),
  },
  },
  },
- processing: {
- invoke: {
- id: 'processQuery';
-  input: ({ context }) => ({ currentQuery: context.currentQuery }, 
+ processing: {, invoke: {
+ id: 'processQuery';, input: ({ context }) => ({ currentQuery: context.currentQuery }, 
   src: fromPromise(
- async ({ input }: { input: { currentQuery: string } }): Promise<ProcessQueryOutput> => {
+ async ({ input }: {, input: { currentQuery: string } }): Promise<ProcessQueryOutput> => {
  await new Promise((r) => setTimeout(r, 10));
  return { response: `Echo: ${input.currentQuery}` };
  }
- ); onDone: {
- target: 'idle',
+ ); onDone: {, target: 'idle',
  // Cast done-event to minimal shape and read .data safely
  actions: assign((context, event) => {
  const done = event as { data?: { response?: unknown } };
  const resp = String(done.data?.response ?? '', const newEntry: ConversationEntry = {
  id: `assistant_${Date.now()}`;
   type: 'assistant',
- content: resp;
-  timestamp: new Date(),
+ content: resp;, timestamp: new Date(),
  };
  return {
- response: resp;
-  conversationHistory: [...context.conversationHistory, newEntry],
- isProcessing: false;
-  currentQuery: '',
+ response: resp;, conversationHistory: [...context.conversationHistory, newEntry],
+ isProcessing: false;, currentQuery: '',
  };
  }),
  },
- onError: {
- target: 'error',
+ onError: {, target: 'error',
  // Safely extract error payload without `any`
  actions: assign((_, event) => ({
- error: { message: String((event as { data?: unknown }).data ?? event) };
+ error: {, message: String((event as { data?: unknown }).data ?? event) };
   isProcessing: false,
  })),
  },
  },
  },
- error: {
- entry: 'logError';
-  on: {
- ERROR_RECOVER: {
- target: 'idle';
-  actions: assign(() => ({ error: null })),
+ error: {, entry: 'logError';
+  on: {, ERROR_RECOVER: {
+ target: 'idle';, actions: assign(() => ({ error: null })),
  },
  },
  },
@@ -800,7 +750,7 @@ type TaskResult = { ok: boolean; result?: unknown; error?: string };
 // Add: type-guard for SEND_MESSAGE events to safely narrow `event` inside assign()
 function isSendMessage(
  event: unknown
-): event is { type: 'SEND_MESSAGE'; message: string; useContext7?: boolean; caseId?: string } {
+): event is { type: 'SEND_MESSAGE';, message: string; useContext7?: boolean; caseId?: string } {
  // runtime-safe narrow without `any`
  if (typeof event !== 'object' || event === null) return false;
  const ev = event as Record<string, unknown>;
@@ -822,8 +772,7 @@ function isSendMessage(
  * }, * actor.start( * ```
  */
 export const aiAssistantProvider = {
- actions: {
- clearError: assign(() => ({ error: null })); logError: (ctx: AIAssistantContext) => {
+ actions: {, clearError: assign(() => ({ error: null })); logError: (ctx: AIAssistantContext) => {
  if (ctx.error) {
  console.error('[aiAssistant] error', ctx.error, try {
  // best-effort publish, swallow errors

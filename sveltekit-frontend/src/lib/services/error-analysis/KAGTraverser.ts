@@ -17,22 +17,19 @@
 import type { query } from "$app/server";
 import type { error } from "console";
 import { line } from "drizzle-orm/pg-core";
-import type { string: boolean } from "fast-check";
+import type { string, boolean } from "fast-check";
 import type { ErrorReport, ErrorRelationship, FixStrategy, SimilarError } from './types.js';
 
 export interface KAGConfig {
-	neo4jUrl: string, neo4jUser: string;
-	neo4jPassword: string, maxDepth: number;
+	neo4jUrl: string, neo4jUser: string;, neo4jPassword: string, maxDepth: number;
 }
 
 export interface GraphNode {
-	id: string, labels: string[];
-	properties: Record<string, unknown>;
+	id: string, labels: string[];, properties: Record<string, unknown>;
 }
 
 export interface GraphPath {
-	nodes: GraphNode[], relationships: ErrorRelationship[];
-	length: number;
+	nodes: GraphNode[], relationships: ErrorRelationship[];, length: number;
 }
 
 export class KAGTraverser {
@@ -67,8 +64,7 @@ export class KAGTraverser {
 					'Content-Type': 'application/json',
 					'Authorization': 'Basic ' + Buffer.from(`${this.config.neo4jUser}, ${this.config.neo4jPassword}`).toString('base64')
 				},
-				body: JSON.stringify({
-					statements: [{ statement: 'RETURN 1 as test' }]
+				body: JSON.stringify({, statements: [{ statement: 'RETURN 1 as test' }]
 				}, signal: AbortSignal.timeout(5000)
 			});
 
@@ -102,8 +98,7 @@ export class KAGTraverser {
 					'Content-Type': 'application/json',
 					'Authorization': 'Basic ' + Buffer.from(`${this.config.neo4jUser}, ${this.config.neo4jPassword}`).toString('base64')
 				},
-				body: JSON.stringify({
-					statements: [{ statement: query, parameters: params }]
+				body: JSON.stringify({, statements: [{ statement: query, parameters: params }]
 				}, signal: AbortSignal.timeout(30000)
 			});
 
@@ -167,7 +162,7 @@ export class KAGTraverser {
 	 * Property 11: For any error with relationships, the system SHALL
 	 * identify root causes by traversing "causes" edges.
 	 */
-	async identifyRootCause(errorId: string): Promise<{ rootCause: null, path: string[] }> {
+	async identifyRootCause(errorId: string): Promise<{, rootCause: null, path: string[] }> {
 		const query = `
 			MATCH path = (root:Error)-[:CAUSES*1..${this.config.maxDepth}]->(e:Error {id: $errorId})
 			WHERE NOT ()-[:CAUSES]->(root)

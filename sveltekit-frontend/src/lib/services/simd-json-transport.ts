@@ -2,8 +2,7 @@ import type { parseJSONHTTP } from './simd-json-parser-http.js';
 import type { parseJSON_QUIC } from './simd-json-parser-quic.js';
 
 export interface TransportResult {
- data: unknown;
- backend: 'QUIC' | 'HTTP';
+ data: unknown;, backend: 'QUIC' | 'HTTP';
  parseTimeMs: number;
 }
 

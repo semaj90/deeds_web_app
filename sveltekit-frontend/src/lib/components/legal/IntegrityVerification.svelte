@@ -16,19 +16,13 @@ Displays detailed integrity verification results with AI analysis
   type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
   type VerificationResults = {
     originalHash: string
-    currentHash?: string
-    hashMatch: boolean
-    metadataIntact: boolean
-    timestampValid: boolean
-    digitalSignatureValid: boolean
-    aiAnalysisScore: number
+    currentHash?: string, hashMatch: boolean
+    metadataIntact: boolean, timestampValid: boolean
+    digitalSignatureValid: boolean, aiAnalysisScore: number
     riskAssessment?: string};
   type AIAnalysis = {
-    authenticity: number
-    completeness: number
-    relevance: number
-    riskLevel: RiskLevel, recommendations: string[];
- flaggedAnomalies: string[]};
+    authenticity: number, completeness: number
+    relevance: number, riskLevel: RiskLevel, recommendations: string[];, flaggedAnomalies: string[]};
   // Exported props (clean, typed)
   const { integrityStatus } = $props<{ integrityStatus, 'pending' | 'verified' | 'compromised' | 'requires-attention' }>()
   const { verificationResults } = $props<{ verificationResults, VerificationResults | undefined }>()

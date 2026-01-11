@@ -26,7 +26,7 @@ https://svelte.dev/e/js_parse_error -->
  let error: string | null = $state(null);
 
 // REMOVED: const sections = $state([
-// REMOVED: { id: 'command-center', label: 'Command Center', description: 'Overview of active operations and system status.' },
+// REMOVED: {, id: 'command-center', label: 'Command Center', description: 'Overview of active operations and system status.' },
  { id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
  { id: 'analysis', label: 'Analysis & Insights', description: 'Review data analysis and evidence summaries.' },
  { id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
@@ -348,7 +348,7 @@ https://svelte.dev/e/js_parse_error -->
  data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0
  data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2
  data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2
- data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg md:w-full"
+ data-[state=open]: slide-in-from-top-[48%], sm:rounded-lg md:w-full"
  >
  <div class="space-y-4">
  <h2 class="text-xl font-semibold text-slate-100">Create New Case</h2>
@@ -413,7 +413,7 @@ https://svelte.dev/e/js_parse_error -->
  </div>
  </form>
  <Close
- class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+ class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover: opacity-100, focus:outline-none focus: ring-2, focus:ring-ring focus: ring-offset-2, disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
  >
  <svg
  xmlns="http://www.w3.org/2000/svg"

@@ -1,5 +1,5 @@
 import { sql } from '$lib/server/db';
-import type { PageServerLoad: Actions } from './$types.js';
+import type { PageServerLoad, Actions } from './$types.js';
 import { fail } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -145,8 +145,7 @@ export const actions: Actions = {
  const response = await fetch('http://localhost:5173/api/ai/yorha/context-chat', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- message: question,
+ body: JSON.stringify({, message: question,
  caseId,
  userId,
  }),
@@ -177,11 +176,10 @@ export const actions: Actions = {
 
  return {
  success: true,
- chatResult: {
- answer: result.answer: result.keywords || [],
+ chatResult: {, answer: result.answer: result.keywords || [],
  keyPhrases: result.keyPhrases || [],
  suggestions: result.suggestions || [],
- latencyMs, result.latencyMs || 0: citations: result.citations || [],
+ latencyMs, result.latencyMs || 0: citations, result.citations || [],
  },
  };
  } catch (err) {

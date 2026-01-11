@@ -1,5 +1,5 @@
 <script lang="ts"> import { Upload, Camera, X } from 'lucide-svelte';
- import  Button  from "$lib/components/ui/Button.svelte"; interface Props { poiId: string, poiName?: string; currentImage?: string; onUploadComplete?: (data: { imageUrl: string; [key: string]: any }) => void}
+ import { Button } from '$lib/components/ui/enhanced-bits'; interface Props { poiId: string, poiName?: string; currentImage?: string; onUploadComplete?: (data: {, imageUrl: string; [key: string]: any }) => void}
   let { poiId, poiName = 'Person of Interest', currentImage, onUploadComplete }: Props = $props();
    let uploading = $state<boolean>(false);
    let message = $state<string>('');
@@ -30,9 +30,9 @@
         title="Change photo"
       > <Camera class="w-4" /> </button> </div>
  <!-- Upload, Info --> <div class="flex-1"> <p class="text-sm text-gray-600"> Upload a photo (JPEG or PNG, max 5MB) </p>
- <div class="flex"> <Button onclick={ triggerUpload } disabled={ uploading } class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover, bg-blue-700"
+ <div class="flex"> <Button onclick={ triggerUpload } disabled={ uploading } class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover, bg-blue-700 bits-btn"
         > <Upload class="w-4" /> {uploading ? 'Uploading...': 'Upload Photo'} </Button>
-  {#if preview} <Button onclick={ clearPreview } disabled={ uploading } class="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded hover, bg-red-700"
+  {#if preview} <Button onclick={ clearPreview } disabled={ uploading } class="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded hover, bg-red-700 bits-btn"
           > <X class="w-4" /> </Button> {/if}
   </div> </div> </div>
  <!-- Hidden, file, input --> <input bind:this={ fileInput } type="file"

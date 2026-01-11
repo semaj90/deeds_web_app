@@ -11,22 +11,20 @@
 		uploadedCount?: number;
 		processedCount?: number;
 		chatImages?: string[];
-		history?: Array<{
-			turnId: string;
-			userMessage: string;
-			assistantResponse: string;
+		history?: Array<{, turnId: string;
+			userMessage: string;, assistantResponse: string;
 			timestamp: string;
 		}>;
 		error?: string;
 	}
 
-	let { form }: { form: ActionData: null } = $props();
+	let { form }: {, form: ActionData, null } = $props();
 
 	let message = $state('');
 	let caseId = $state('');
 	let uploadedFiles: File[] = $state([]);
 	let filePreviews: string[] = $state([]);
-	let messages: { role: 'user' | 'assistant'; text: string; turnId?: string; timestamp?: string; keywords?: string[]; keyPhrases?: string[]; suggestions?: string[] }[] = $state([]);
+	let messages: {, role: 'user' | 'assistant'; text: string; turnId?: string; timestamp?: string; keywords?: string[]; keyPhrases?: string[]; suggestions?: string[] }[] = $state([]);
 	let isSubmitting = $state(false);
 	let isLoadingHistory = $state(false);
 
@@ -329,8 +327,7 @@
 <style>
 	.terminal-interface {
 		display: flex;
-		flex-direction: column;
-		height: calc(100vh - 8rem);
+		flex-direction: column;, height: calc(100vh - 8rem);
 		background: linear-gradient(180deg, #0a0e17 0%, #1a1f2e 100%);
 		border: 2px solid rgba(34, 211, 238, 0.3);
 		border-radius: 4px;
@@ -345,17 +342,14 @@
 
 	.status-bar {
 		display: flex;
-		align-items: center;
-		gap: 1rem;
+		align-items: center;, gap: 1rem;
 		color: #22d3ee;
 		font-size: 0.875rem;
 	}
 
 	.status-indicator {
-		width: 8px;
-		height: 8px;
-		border-radius: 50%;
-		background: #10b981;
+		width: 8px;, height: 8px;
+		border-radius: 50%;, background: #10b981;
 		animation: pulse 2s infinite;
 	}
 
@@ -375,22 +369,18 @@
 	}
 
 	.model-info {
-		margin-left: auto;
-		color: #94a3b8;
+		margin-left: auto;, color: #94a3b8;
 	}
 
 	.chat-log {
 		flex: 1;
-		overflow-y: auto;
-		padding: 2rem;
+		overflow-y: auto;, padding: 2rem;
 		display: flex;
-		flex-direction: column;
-		gap: 1.5rem;
+		flex-direction: column;, gap: 1.5rem;
 	}
 
 	.welcome-message {
-		text-align: center;
-		color: #22d3ee;
+		text-align: center;, color: #22d3ee;
 		opacity: 0.8;
 	}
 
@@ -408,8 +398,7 @@
 
 	.message {
 		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
+		flex-direction: column;, gap: 0.5rem;
 		max-width: 80%;
 	}
 
@@ -423,15 +412,12 @@
 
 	.message-header {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.75rem;
-		color: #94a3b8;
+		align-items: center;, gap: 0.5rem;
+		font-size: 0.75rem;, color: #94a3b8;
 	}
 
 	.sender {
-		font-weight: bold;
-		color: #22d3ee;
+		font-weight: bold;, color: #22d3ee;
 	}
 
 	.turn-id {
@@ -446,8 +432,7 @@
 	}
 
 	.loading-message {
-		text-align: center;
-		padding: 1rem;
+		text-align: center;, padding: 1rem;
 		color: #94a3b8;
 		font-style: italic;
 	}
@@ -459,8 +444,7 @@
 	.message-content {
 		background: rgba(30, 41, 59, 0.5);
 		border: 1px solid rgba(148, 163, 184, 0.2);
-		border-radius: 4px;
-		padding: 1rem;
+		border-radius: 4px;, padding: 1rem;
 	}
 
 	.message-user .message-content {
@@ -471,8 +455,7 @@
 	.message-content pre {
 		color: #e2e8f0;
 		white-space: pre-wrap;
-		word-wrap: break-word;
-		margin: 0;
+		word-wrap: break-word;, margin: 0;
 		font-size: 0.875rem;
 		line-height: 1.5;
 	}
@@ -480,10 +463,8 @@
 	.chat-input-form {
 		background: rgba(15, 23, 42, 0.95);
 		border-top: 1px solid rgba(34, 211, 238, 0.5);
-		padding: 1.5rem;
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
+		padding: 1.5rem;, display: flex;
+		flex-direction: column;, gap: 1rem;
 	}
 
 	.input-row {
@@ -491,15 +472,12 @@
 	}
 
 	.message-input {
-		width: 100%;
-		background: rgba(30, 41, 59, 0.7);
+		width: 100%;, background: rgba(30, 41, 59, 0.7);
 		border: 1px solid rgba(148, 163, 184, 0.3);
-		border-radius: 4px;
-		padding: 0.75rem;
+		border-radius: 4px;, padding: 0.75rem;
 		color: #e2e8f0;
 		font-family: 'Courier New', monospace;
-		font-size: 0.875rem;
-		resize: vertical;
+		font-size: 0.875rem;, resize: vertical;
 	}
 
 	.message-input:focus {
@@ -509,17 +487,14 @@
 	}
 
 	.meta-row {
-		display: flex;
-		gap: 1rem;
+		display: flex;, gap: 1rem;
 		flex-wrap: wrap;
 	}
 
 	.input-group {
 		flex: 1;
-		min-width: 200px;
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
+		min-width: 200px;, display: flex;
+		flex-direction: column;, gap: 0.5rem;
 	}
 
 	.input-group label {
@@ -533,8 +508,7 @@
 	.file-input {
 		background: rgba(30, 41, 59, 0.7);
 		border: 1px solid rgba(148, 163, 184, 0.3);
-		border-radius: 4px;
-		padding: 0.5rem;
+		border-radius: 4px;, padding: 0.5rem;
 		color: #e2e8f0;
 		font-family: 'Courier New', monospace;
 		font-size: 0.875rem;
@@ -546,8 +520,7 @@
 
 	.file-list {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 0.75rem;
+		flex-wrap: wrap;, gap: 0.75rem;
 		margin-top: 0.5rem;
 		max-height: 200px;
 		overflow-y: auto;
@@ -558,39 +531,29 @@
 	}
 
 	.image-preview {
-		position: relative;
-		display: inline-block;
+		position: relative;, display: inline-block;
 		border: 1px solid rgba(34, 211, 238, 0.3);
-		border-radius: 4px;
-		overflow: hidden;
+		border-radius: 4px;, overflow: hidden;
 		background: rgba(30, 41, 59, 0.5);
 	}
 
 	.image-preview img {
-		width: 80px;
-		height: 80px;
-		object-fit: cover;
-		display: block;
+		width: 80px;, height: 80px;
+		object-fit: cover;, display: block;
 	}
 
 	.remove-file {
-		position: absolute;
-		top: -4px;
-		right: -4px;
-		width: 20px;
+		position: absolute;, top: -4px;
+		right: -4px;, width: 20px;
 		height: 20px;
-		border-radius: 50%;
-		background: #ef4444;
-		color: white;
-		border: none;
+		border-radius: 50%;, background: #ef4444;
+		color: white;, border: none;
 		font-size: 14px;
-		font-weight: bold;
-		cursor: pointer;
+		font-weight: bold;, cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		line-height: 1;
-		transition: background-color 0.2s;
+		line-height: 1;, transition: background-color 0.2s;
 	}
 
 	.remove-file:hover {
@@ -600,19 +563,15 @@
 	.file-tag {
 		background: rgba(34, 211, 238, 0.2);
 		border: 1px solid rgba(34, 211, 238, 0.4);
-		border-radius: 4px;
-		padding: 0.5rem;
-		font-size: 0.75rem;
-		color: #22d3ee;
+		border-radius: 4px;, padding: 0.5rem;
+		font-size: 0.75rem;, color: #22d3ee;
 		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
+		align-items: center;, gap: 0.5rem;
 		position: relative;
 	}
 
 	.file-tag .remove-file {
-		position: static;
-		width: 16px;
+		position: static;, width: 16px;
 		height: 16px;
 		font-size: 12px;
 		margin-left: 0.25rem;
@@ -620,16 +579,13 @@
 	}
 
 	.send-button {
-		align-self: flex-end;
-		background: linear-gradient(135deg, #22d3ee 0%, #0891b2 100%);
+		align-self: flex-end;, background: linear-gradient(135deg, #22d3ee 0%, #0891b2 100%);
 		border: none;
-		border-radius: 4px;
-		padding: 0.75rem 2rem;
+		border-radius: 4px;, padding: 0.75rem 2rem;
 		color: #0f172a;
 		font-weight: bold;
 		font-size: 0.875rem;
-		letter-spacing: 2px;
-		cursor: pointer;
+		letter-spacing: 2px;, cursor: pointer;
 		transition: all 0.2s;
 	}
 
@@ -645,17 +601,13 @@
 
 	.error-text {
 		color: #ef4444;
-		font-size: 0.75rem;
-		margin: -0.5rem 0 0 0;
+		font-size: 0.75rem;, margin: -0.5rem 0 0 0;
 	}
 
 	.sr-only {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		padding: 0;
-		margin: -1px;
-		overflow: hidden;
+		position: absolute;, width: 1px;
+		height: 1px;, padding: 0;
+		margin: -1px;, overflow: hidden;
 		clip: rect(0, 0, 0, 0);
 		white-space: nowrap;
 		border-width: 0;
@@ -682,8 +634,7 @@
 	/* Keyword chips and suggestions */
 	.keyword-chips {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
+		flex-wrap: wrap;, gap: 0.5rem;
 		margin-top: 0.75rem;
 		padding-top: 0.5rem;
 		border-top: 1px solid rgba(34, 211, 238, 0.2);
@@ -696,8 +647,7 @@
 		font-size: 0.75rem;
 		font-family: 'Courier New', monospace;
 		padding: 0.25rem 0.5rem;
-		border-radius: 12px;
-		cursor: pointer;
+		border-radius: 12px;, cursor: pointer;
 		transition: all 0.2s;
 		text-transform: lowercase;
 	}
@@ -710,8 +660,7 @@
 
 	.suggestion-buttons {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
+		flex-wrap: wrap;, gap: 0.5rem;
 		margin-top: 0.5rem;
 	}
 
@@ -722,13 +671,11 @@
 		font-size: 0.75rem;
 		font-family: 'Courier New', monospace;
 		padding: 0.375rem 0.75rem;
-		border-radius: 6px;
-		cursor: pointer;
+		border-radius: 6px;, cursor: pointer;
 		transition: all 0.2s;
 		text-align: left;
 		max-width: 300px;
-		white-space: nowrap;
-		overflow: hidden;
+		white-space: nowrap;, overflow: hidden;
 		text-overflow: ellipsis;
 	}
 

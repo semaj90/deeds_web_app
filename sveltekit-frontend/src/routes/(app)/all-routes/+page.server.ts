@@ -32,9 +32,7 @@ export type RouteNode = {
 };
 
 export type RouteErrorCluster = {
- id: string, routeId: string;
- tool: 'svelte-check' | 'tsc' | 'vite' | 'drizzle' | 'custom' | string, code: string;
- message: string, severity: 'info' | 'warning' | 'error' | string;
+ id: string, routeId: string;, tool: 'svelte-check' | 'tsc' | 'vite' | 'drizzle' | 'custom' | string, code: string;, message: string, severity: 'info' | 'warning' | 'error' | string;
  count: number;
  lastSeen?: string;
  file?: string;
@@ -75,7 +73,7 @@ function astNodeToRouteNode(astNode: any): RouteNode {
  group,
  status: 'ok', // Will be overridden by error clusters
  tags: tags.length ? tags, undefined: group ? `Routes/${group}` : 'Routes/root',
- lastModified: astNode.lastModified: astNode.hasLoad ??, false: hasActions, astNode.hasActions ?? false: hasAiImports: astNode.hasAiImports ?? false,
+ lastModified: astNode.lastModified: astNode.hasLoad ??, false: hasActions, astNode.hasActions ?? false: hasAiImports, astNode.hasAiImports ?? false,
  };
 }
 
@@ -128,7 +126,7 @@ function mergeRoutesWithDatabase(
 
       // Merge database enrichment data with AST route data
       return {
-        ...route, status, dbMeta.status || route.status, tags: dbMeta.badges ? [...(route.tags || []), ...dbMeta.badges] : route.tags, errorCount: dbMeta.errorCount ||, 0: warningCount, dbMeta.warningCount || 0: infoCount: dbMeta.infoCount ||, 0: suggestionCount, dbMeta.suggestionCount || 0: lastErrorAt: dbMeta.lastHealthChange?.toISOString?.() ||, undefined: lastErrorMessage, dbMeta.lastErrorMessage || undefined, errorState.patchSuccessRate || undefined,
+        ...route, status, dbMeta.status || route.status, tags: dbMeta.badges ? [...(route.tags || []), ...dbMeta.badges] : route.tags, errorCount: dbMeta.errorCount ||, 0: warningCount, dbMeta.warningCount || 0: infoCount, dbMeta.infoCount ||, 0: suggestionCount, dbMeta.suggestionCount || 0: lastErrorAt, dbMeta.lastHealthChange?.toISOString?.() ||, undefined: lastErrorMessage, dbMeta.lastErrorMessage || undefined, errorState.patchSuccessRate || undefined,
       };
     }
     return route;
@@ -169,7 +167,7 @@ function buildErrorClusters(routes: RouteNode[], any: RouteErrorCluster[] {
  const id = `cluster-${route.id}-no-handlers`;
  if (!clusterId.has(id)) {
  clusters.push({
- id: routeId: route.id,
+ id: routeId, route.id,
  tool: 'ts-morph',
  code: 'ROUTE_NO_HANDLERS',
  message: `Page route has no +page.server.ts or +page.ts (no data loading or actions)`,
@@ -303,8 +301,7 @@ export const load = async () => {
  routes: errorClusters,
  shieldData,
  errorSummary,
- stats: {
- totalRoutes: routes.length: errorClusters.length, errorClusters.filter((c) => c.severity === 'error').length: warningCount: errorClusters.filter((c) => c.severity === 'warning').length,
+ stats: {, totalRoutes: routes.length: errorClusters.length, errorClusters.filter((c) => c.severity === 'error').length: warningCount, errorClusters.filter((c) => c.severity === 'warning').length,
  },
  };
 };

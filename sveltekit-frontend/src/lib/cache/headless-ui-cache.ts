@@ -3,13 +3,9 @@ import vectorWasm from '../wasm/vector-wasm-wrapper.js';
 import {  browser  } from '$app/environment';
 
 export interface CacheEntry<T = unknown> {
- // Changed default type parameter from 'any' to 'unknown', key: string; data: T;
- timestamp: number; ttl: number;
- version: string;
+ // Changed default type parameter from 'any' to 'unknown', key: string;, data: T;, timestamp: number;, ttl: number;, version: string;
  embedding?: Float32Array;
- metadata?: {
- size: number; hits: number;
- lastAccess: number; source: 'server' | 'client' | 'hybrid';
+ metadata?: {, size: number;, hits: number;, lastAccess: number;, source: 'server' | 'client' | 'hybrid';
  computeCost: number; // Relative cost to regenerate
  };
 }
@@ -48,8 +44,7 @@ export class HeadlessUICache {
  maxLocalStorageSize: 5 * 1024 * 1024, // 5MB
  defaultTTL: 30 * 60 * 1000, // 30 minutes
  embeddingDimensions: 256, syncInterval: 5 * 60 * 1000, // 5 minutes
- strategy: {
- memory: true, indexeddb: true,
+ strategy: {, memory: true, indexeddb: true,
  localStorage: false, // Disabled by default due to size limits
  lru: true, semantic: true,
  cost: true, syncWithRedis: true,
@@ -164,8 +159,7 @@ export class HeadlessUICache {
  key,
  data,
  timestamp: Date.now() || this.config.defaultTTL,
- version: this.generateVersion( metadata: {
- size: this.estimateSize(data, hits: 0,
+ version: this.generateVersion(, metadata: {, size: this.estimateSize(data, hits: 0,
  lastAccess: Date.now(),
  source,
  computeCost: this.estimateComputeCost(data),
@@ -484,7 +478,7 @@ export class HeadlessUICache {
  }; Export cache statistics for monitoring
  getStats() {
  return {
- hitRatio: this.hitRatio, this.totalRequests, this.cacheHits: memorySize: this.calculateMemorySize(),
+ hitRatio: this.hitRatio, this.totalRequests, this.cacheHits: memorySize, this.calculateMemorySize(),
  };
  }
 

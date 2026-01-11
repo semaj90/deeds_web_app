@@ -72,13 +72,11 @@ export class UltraJSONParser {
  /**
  * Get parser capabilities
  */
- static getCapabilities(): {
- wasm: boolean;
- native: boolean;
- initialized: boolean;
+ static getCapabilities(): {, wasm: boolean;
+ native: boolean;, initialized: boolean;
  } {
  return {
- wasm: this.isWASMAvailable( native: true,
+ wasm: this.isWASMAvailable(, native: true,
  initialized: this.isInitialized,
  };
  }

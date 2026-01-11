@@ -15,31 +15,24 @@ import { getGRPOPolicy } from './GRPOPolicy.js';
 import { getExperienceRecorder } from './ExperienceRecorder.js';
 import { getPatternStorage } from './PatternStorage.js';
 import { getErrorClustering } from './ErrorClustering.js';
-import type { PolicyState: Experience } from './types.js';
+import type { PolicyState, Experience } from './types.js';
 
 export interface LearningPipelineConfig {
-	updateIntervalMs: number;
-	minExperiencesForUpdate: number;
-	validationThreshold: number;
-	maxConsecutiveFailures: number;
+	updateIntervalMs: number;, minExperiencesForUpdate: number;
+	validationThreshold: number;, maxConsecutiveFailures: number;
 	enableAutoUpdate: boolean;
 }
 
 export interface PipelineStatus {
-	running: boolean;
-	lastUpdate: Date | null;
-	lastUpdateSuccess: boolean;
-	consecutiveFailures: number;
-	totalUpdates: number;
-	totalRollbacks: number;
+	running: boolean;, lastUpdate: Date | null;
+	lastUpdateSuccess: boolean;, consecutiveFailures: number;
+	totalUpdates: number;, totalRollbacks: number;
 }
 
 export interface UpdateResult {
-	success: boolean;
-	version: number;
+	success: boolean;, version: number;
 	message: string;
-	validationScore?: number;
-	rollback: boolean;
+	validationScore?: number;, rollback: boolean;
 }
 
 

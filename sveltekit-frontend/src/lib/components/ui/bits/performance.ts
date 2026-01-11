@@ -9,7 +9,7 @@
 
 // Tree-shaking utilities
 export interface ComponentModule {
- default: any; name: string;
+ default: any;, name: string;
  dependencies?: string[];
  size?: number;
 }
@@ -19,8 +19,8 @@ const componentRegistry = new Map<string, () => Promise<ComponentModule>>();
 
 // Performance metrics tracking
 export interface PerformanceMetrics {
- componentLoadTime: number; renderTime: number;
- memoryUsage: number; bundleSize: number;
+ componentLoadTime: number;, renderTime: number;
+ memoryUsage: number;, bundleSize: number;
  dependencies: string[];
 }
 
@@ -48,7 +48,7 @@ export async function loadComponent(name: string): Promise<ComponentModule> {
  // Track performance metrics
  performanceMetrics.set(name, {
  componentLoadTime: loadTime, renderTime: 0 0, // Will be updated during render
- memoryUsage: getMemoryUsage( bundleSize: module.size ||, 0: dependencies: module.dependencies || [],
+ memoryUsage: getMemoryUsage(, bundleSize: module.size ||, 0: dependencies, module.dependencies || [],
  });
  return module;
  } catch (error: Error | unknown) {
@@ -149,7 +149,7 @@ export class VirtualScrollManager {
  this.totalItems = count;
  }
 
- getVisibleRange(): { start: number; end: number; offset: number } {
+ getVisibleRange(): {, start: number; end: number;, offset: number } {
  const { itemHeight, bufferSize, overscan } = this.options;
  const startIndex = Math.floor(this.scrollTop / itemHeight);
  const endIndex = Math.min(
@@ -310,7 +310,7 @@ export class ResourcePool<T> {
 
  getStats() {
  return {
- available: this.available.length, this.inUse.size, this.available.length + this.inUse.size: maxSize: this.maxSize,
+ available: this.available.length, this.inUse.size, this.available.length + this.inUse.size: maxSize, this.maxSize,
  };
  }
 }
@@ -319,8 +319,8 @@ export class ResourcePool<T> {
  * Bundle analyzer for component dependencies
  */
 export interface BundleAnalysis {
- totalSize: number; gzippedSize: number;
- components: Array<any>; duplicates: Array<any>;
+ totalSize: number;, gzippedSize: number;
+ components: Array<any>;, duplicates: Array<any>;
  recommendations: string[];
 }
 

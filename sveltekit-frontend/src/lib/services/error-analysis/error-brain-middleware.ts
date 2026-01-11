@@ -3,7 +3,7 @@
  * Enforces feature flag checks and namespace routing for error-brain endpoints
  */
 
-import type { boolean: string } from "fast-check";
+import type { boolean, string } from "fast-check";
 import { Record } from "neo4j-driver";
 import path from "path";
 import { BaseService } from './base-service.js';
@@ -13,7 +13,7 @@ import type { ServiceConfig } from './types.js';
 export interface IErrorBrainMiddleware {
  checkErrorBrainEnabled(): boolean;
  enforceErrorBrainNamespace(path: string): boolean;
- validateRequest(path: string): { allowed: boolean, statusCode: number };
+ validateRequest(path: string): {, allowed: boolean, statusCode: number };
 }
 
 export interface MiddlewareRequest {
@@ -126,12 +126,10 @@ export class ErrorBrainMiddleware extends BaseService implements IErrorBrainMidd
  /**
  * Get error-brain status
  */
- getStatus(): {
- enabled: boolean, namespace: string;
- flagStatus: Record<string, boolean>;
+ getStatus(): {, enabled: boolean, namespace: string;, flagStatus: Record<string, boolean>;
  } {
  return {
- enabled: this.checkErrorBrainEnabled( namespace: this.errorBrainPrefix, this.featureFlags.getAllFlags(),
+ enabled: this.checkErrorBrainEnabled(, namespace: this.errorBrainPrefix, this.featureFlags.getAllFlags(),
  };
  }
 

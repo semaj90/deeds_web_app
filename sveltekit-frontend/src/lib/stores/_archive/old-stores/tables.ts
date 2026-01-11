@@ -7,19 +7,15 @@ export interface TableState {
  sortColumn: string | null;
  sortDirection: 'asc' | 'desc';
  selectedRows: Set<string | number>;
- currentPage: number;
- pageSize: number;
- searchQuery: string;
- columnFilters: Map<string, string>;
+ currentPage: number;, pageSize: number;
+ searchQuery: string;, columnFilters: Map<string, string>;
  columnWidths: Map<string, number>;
  expandedRows: Set<string | number>;
 }
 
 export interface TableNotification {
- id: string;
- type: 'info' | 'success' | 'warning' | 'error';
- title?: string;
- message: string;
+ id: string;, type: 'info' | 'success' | 'warning' | 'error';
+ title?: string;, message: string;
  timestamp: Date;
  duration?: number;
  persistent?: boolean;
@@ -266,11 +262,11 @@ export function createTableStats(tableId: string) {
 // Export types and utilities // TableState and TableNotification are already exported as interfaces above
 // Legal AI specific table configurations
 export const legalAITableConfigs = {
- cases: { pageSize: 25, sortColumn: 'created_at', sortDirection: 'desc' as const },
- evidence: { pageSize: 50, sortColumn: 'date_collected', sortDirection: 'desc' as const },
- documents: { pageSize: 20, sortColumn: 'upload_date', sortDirection: 'desc' as const },
- users: { pageSize: 30, sortColumn: 'last_login', sortDirection: 'desc' as const },
- auditLog: { pageSize: 100, sortColumn: 'timestamp', sortDirection: 'desc' as const },
+ cases: {, pageSize: 25, sortColumn: 'created_at', sortDirection: 'desc' as const },
+ evidence: {, pageSize: 50, sortColumn: 'date_collected', sortDirection: 'desc' as const },
+ documents: {, pageSize: 20, sortColumn: 'upload_date', sortDirection: 'desc' as const },
+ users: {, pageSize: 30, sortColumn: 'last_login', sortDirection: 'desc' as const },
+ auditLog: {, pageSize: 100, sortColumn: 'timestamp', sortDirection: 'desc' as const },
 };
 
 // Utility functions

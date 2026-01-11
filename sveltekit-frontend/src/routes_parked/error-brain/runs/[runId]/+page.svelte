@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { Badge } from '$lib/components/ui/badge';
-	import { Button } from '$lib/components/ui/button';
-	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
+	import { Button } from '$lib/components/ui/enhanced-bits';
+	import { Card, CardHeader, CardTitle, CardContent } from '$lib/components/ui/enhanced-bits';
 	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
 	import { onMount } from 'svelte';
 
@@ -60,7 +60,7 @@
 <div class="space-y-6">
 	<div class="flex items-center justify-between">
 		<div>
-			<Button variant="ghost" onclick={() => window.history.back()}>← Back</Button>
+			<Button class="bits-btn" variant="ghost" onclick={() => window.history.back()}>← Back</Button>
 			<h2 class="text-2xl font-bold tracking-tight mt-2">Run Details</h2>
 			<p class="text-muted-foreground font-mono text-sm">{runId}</p>
 		</div>
@@ -161,7 +161,7 @@
 								{#each run.patches as patch}
 									<div class="border rounded p-4 space-y-2">
 										<p class="font-mono text-sm">{patch.filePath}</p>
-										<Badge variant="outline">{patch.status}</Badge>
+										<span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{patch.status}</span>
 									</div>
 								{/each}
 							</div>
@@ -207,7 +207,7 @@
 								{#each events.slice().reverse() as event}
 									<div class="border rounded p-3 text-sm">
 										<div class="flex items-center justify-between">
-											<Badge variant="outline">{event.type}</Badge>
+											<span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{event.type}</span>
 											<span class="text-xs text-muted-foreground">
 												{new Date(event.timestamp).toLocaleTimeString()}
 											</span>

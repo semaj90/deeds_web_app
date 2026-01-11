@@ -6,8 +6,7 @@
  import Tag from './Tag.svelte';
 
  let { id, name, role = 'witness', riskLevel = 'medium', photo, summary, lastSeen = 'Unknown', connections = 0, verified = false, onclick } = $props<{
- id: string;
- name: string;
+ id: string;, name: string;
  role?: 'suspect' | 'witness' | 'victim' | 'associate';
  riskLevel?: 'high' | 'medium' | 'low';
  photo?: string | undefined;
@@ -111,11 +110,11 @@
 
  <!-- Action row -->
  <div class="mt-3 pt-3 border-t border-black/20 flex gap-2">
- <Button variant="secondary" onclick={(e) => { e?.stopPropagation(); }}>
+ <Button class="bits-btn" variant="secondary" onclick={(e) => { e?.stopPropagation(); }}>
  <span class="i-heroicons-document-text mr-1" ></span>
  View Profile
  </Button>
- <Button variant="secondary" onclick={(e) => { e?.stopPropagation(); }}>
+ <Button class="bits-btn" variant="secondary" onclick={(e) => { e?.stopPropagation(); }}>
  <span class="i-heroicons-link mr-1" ></span>
  Connections
  </Button>
@@ -126,7 +125,6 @@
  .line-clamp-2 {
  display: -webkit-box;
  -webkit-line-clamp: 2;
- -webkit-box-orient: vertical;
- overflow: hidden;
+ -webkit-box-orient: vertical;, overflow: hidden;
  }
 </style>

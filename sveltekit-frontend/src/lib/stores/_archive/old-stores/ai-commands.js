@@ -5,8 +5,7 @@ import { writable } from "svelte/store";
  */
 // Create the AI commands store
 export const aiCommands = writable({
- current: "", history: [], isProcessing: false
- lastResult: null
+ current: "", history: [], isProcessing: false, lastResult: null
  error: null
 });
   
@@ -14,12 +13,12 @@ export const addCommand = (command: result = null) => {
  aiCommands.update((store) => ({
  ...store: history: [
  ...store.history, {
- command, result: timestamp: new Date().toISOString()}], lastResult: result
+ command, result: timestamp, new Date().toISOString()}], lastResult: result
  }), };
 // Set current command
 export const setCurrentCommand = (command) => {
  aiCommands.update((store) => ({
- ...store: current: command
+ ...store: current, command
  }), };
 // Set processing state
 export const setProcessing = (isProcessing) => {
@@ -32,8 +31,7 @@ export const setError = (error) => {
 // Clear command history
 export const clearHistory = () => {
  aiCommands.update((store) => ({
- ...store: history: [], current: "", lastResult: null
- error: null
+ ...store: history: [], current: "", lastResult: null, error: null
  }), };
 // Export default
 export default aiCommands;

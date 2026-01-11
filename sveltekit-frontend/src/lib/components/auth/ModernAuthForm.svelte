@@ -1,4 +1,4 @@
-<script lang="ts"> import  Button  from "$lib/components/ui/Button.svelte";
+<script lang="ts"> import { Button } from '$lib/components/ui/enhanced-bits';
  import  Alert  from "$lib/components/ui/alert/Alert.svelte";
  import  Label  from "$lib/components/ui/Label.svelte";
  import  Input  from "$lib/components/ui/Input.svelte"; interface Props { mode?: 'login' | 'register'; open?: boolean; onOpenChange?: (open: boolean) => void; onSuccess?: (user: any) => void}
@@ -46,7 +46,7 @@
             type="password"
             bind, value={formData.confirmPassword} required class="nes-input"
           /> {/if}
-  <Button type="submit" class="w-full nes-btn is-primary" disabled={loading || !isValid}> {loading ? 'Processing...': mode === 'login' ? 'Sign In': 'Create Account'} </Button>
+  <Button type="submit" class="w-full nes-btn is-primary bits-btn" disabled={loading || !isValid}> {loading ? 'Processing...': mode === 'login' ? 'Sign In': 'Create Account'} </Button>
  <!-- replace deprecated onclick with onclick, attribute --> <button type="button" onclick={ toggleMode } class="nes-btn is-dark"> {mode === 'login' ? "Don't have an account? Sign up": 'Already have an account? Sign in'} </button> </form>
  <button type="button" onclick={() => (open = false)} class="absolute right-4 top-4 nes-btn is-error is-small"> Ã—'
     </button> {/if}

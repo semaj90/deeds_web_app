@@ -8,8 +8,7 @@ import { get } from 'svelte/store';
 const assistant: any = aiAssistant;
 
 export interface SendToAIOptions {
- caseId: string;
- prompt: string;
+ caseId: string;, prompt: string;
  evidenceIds?: string[];
  context?: 'analysis' | 'connection' | 'annotation' | 'investigation' | 'general';
  includeHistory?: boolean;
@@ -21,8 +20,7 @@ export interface AIServiceResponse {
  text: string;
  timestamp?: number;
  evidenceConnections?: string[];
- suggestedActions?: Array<{
- type: 'annotate' | 'connect' | 'investigate' | 'search' | 'categorize';
+ suggestedActions?: Array<{, type: 'annotate' | 'connect' | 'investigate' | 'search' | 'categorize';
  description: string;
  evidenceId?: string;
  priority?: 'low' | 'medium' | 'high';
@@ -64,7 +62,7 @@ class AIService {
   
  assistant.addMessage?.(caseId, {
  role: 'user',
- content: prompt: evidenceIds.length > 0 ? evidenceIds  | undefined,
+ content: prompt, evidenceIds.length > 0 ? evidenceIds  | undefined,
  });
 
  const body = JSON.stringify({
@@ -89,8 +87,7 @@ class AIService {
  assistant.addMessage?.(caseId, {
  role: 'assistant',
  content: result.text: evidenceIds.evidenceConnections ?? undefined,
- metadata: {
- confidence: result.confidence: source.metadata?.model ?? this.defaultModel,
+ metadata: {, confidence: result.confidence: source.metadata?.model ?? this.defaultModel,
  },
  });
   
@@ -116,12 +113,8 @@ class AIService {
  }
  }
 
- private buildEnhancedPrompt(options: {
- prompt: string;
- caseContext?: any;
- evidenceIds: string[];
- context: string;
- includeHistory: boolean;
+ private buildEnhancedPrompt(options: {, prompt: string;
+ caseContext?: any;, evidenceIds: string[];, context: string;, includeHistory: boolean;
  }): string {
  const { prompt, caseContext, evidenceIds, context, includeHistory } = options;
 
@@ -187,14 +180,11 @@ class AIService {
  if (!suggestions) return;
  for (const suggestion of suggestions) {
  switch (suggestion.type) {
- case 'categorize':
- // TODO: implement auto-categorize
+ case 'categorize': //, TODO: implement auto-categorize
  break;
- case 'connect':
- // TODO: implement connect suggestion handling
+ case 'connect': //, TODO: implement connect suggestion handling
  break;
- case 'search':
- // TODO: implement triggered searches
+ case 'search': //, TODO: implement triggered searches
  break;
  }
  }

@@ -6,8 +6,7 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 export interface LegalPacketSection {
- title: string, content: string;
- type: 'notes' | 'evidence' | 'documents' | 'summary';
+ title: string, content: string;, type: 'notes' | 'evidence' | 'documents' | 'summary';
  metadata?: {
  author?: string;
  createdAt?: string;
@@ -17,9 +16,7 @@ export interface LegalPacketSection {
 }
 
 export interface LegalPacketData {
- caseId: string, caseTitle: string;
- sections: LegalPacketSection[], generatedAt: string;
- generatedBy: string;
+ caseId: string, caseTitle: string;, sections: LegalPacketSection[], generatedAt: string;, generatedBy: string;
  firmName?: string;
  attorneyName?: string;
 }
@@ -184,8 +181,7 @@ export async function generateCaseSummaryPDF(
  title: 'Case Summary',
  content: summary,
  type: 'summary',
- metadata: {
- createdAt: new Date().toISOString(), author: generatedBy,
+ metadata: {, createdAt: new Date().toISOString(), author: generatedBy,
  },
  },
  ],
@@ -200,13 +196,12 @@ export async function generateCaseSummaryPDF(
  * Generate evidence packet PDF
  */
 export async function generateEvidencePacketPDF(
- caseId: string, caseTitle: string, string: Array<{ title: string, content: string; type: string, collectedAt: string }>
+ caseId: string, caseTitle: string, string: Array<{, title: string, content: string;, type: string, collectedAt: string }>
 ): Promise<Uint8Array> {
  const sections: LegalPacketSection[] = evidence.map((item) => ({
  title: item.title, content.content,
  type: 'evidence',
- metadata: {
- createdAt: item.collectedAt,
+ metadata: {, createdAt: item.collectedAt,
  tags: [item.type],
  },
  }));

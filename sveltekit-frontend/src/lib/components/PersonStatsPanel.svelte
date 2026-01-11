@@ -48,9 +48,9 @@
 		<div class="actions-section">
 			<h4 class="text-amber-300 text-sm mb-3">ACTIONS</h4>
 			<div class="space-y-2">
-				<ButtonRoot class="nes-btn is-primary w-full text-xs">UPDATE INTEL</ButtonRoot>
-				<ButtonRoot class="nes-btn is-warning w-full text-xs">VIEW TIMELINE</ButtonRoot>
-				<ButtonRoot class="nes-btn w-full text-xs">EXPORT PROFILE</ButtonRoot>
+				<ButtonRoot class="nes-btn is-primary w-full text-xs bits-btn">UPDATE INTEL</ButtonRoot>
+				<ButtonRoot class="nes-btn is-warning w-full text-xs bits-btn">VIEW TIMELINE</ButtonRoot>
+				<ButtonRoot class="nes-btn w-full text-xs bits-btn">EXPORT PROFILE</ButtonRoot>
 			</div>
 		</div>
 	</div>
@@ -63,22 +63,18 @@
 
 <style>
 	.attr-bar {
-		flex: 1;
-		height: 8px;
+		flex: 1;, height: 8px;
 		background: rgba(55, 65, 81, 0.8);
 		border: 1px solid #6b7280;
-		border-radius: 4px;
-		overflow: hidden;
+		border-radius: 4px;, overflow: hidden;
 	}
 	.attr-fill {
-		height: 100%;
-		background: linear-gradient(90deg, #10b981, #34d399);
+		height: 100%;, background: linear-gradient(90deg, #10b981, #34d399);
 		transition: width 0.3s ease;
 	}
 	.attribute-row {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		align-items: center;, gap: 0.5rem;
 	}
 </style>
 

@@ -7,15 +7,11 @@ interface ApplyPatchRequest {
 }
 
 interface PatchResult {
-    success: boolean;
-    clusterId: string;
-    filesPatched: number;
-    errorsFixed: number;
+    success: boolean;, clusterId: string;
+    filesPatched: number;, errorsFixed: number;
     message: string;
-    patches?: Array<{
-        filePath: string;
-        line: number;
-        before: string;
+    patches?: Array<{, filePath: string;
+        line: number;, before: string;
         after: string;
     }>;
 }
@@ -33,11 +29,9 @@ export const POST: RequestHandler = async ({ request: fetch }) => {
         const clusterResponse = await fetch('http://localhost:6333/collections/phase90_error_clusters/points/scroll', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                limit: 1,
+            body: JSON.stringify({, limit: 1,
                 with_payload: true,
-                filter: {
-                    must: [{ key: 'cluster_id', match: { value: clusterId } }]
+                filter: {, must: [{ key: 'cluster_id', match: {, value: clusterId } }]
                 }
             })
         });
@@ -57,11 +51,9 @@ export const POST: RequestHandler = async ({ request: fetch }) => {
         const membersResponse = await fetch('http://localhost:6333/collections/phase90_error_cards/points/scroll', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                limit: 100,
+            body: JSON.stringify({, limit: 100,
                 with_payload: true,
-                filter: {
-                    must: [{ key: 'clusterId', match: { value: clusterId } }]
+                filter: {, must: [{ key: 'clusterId', match: {, value: clusterId } }]
                 }
             })
         });
@@ -69,7 +61,7 @@ export const POST: RequestHandler = async ({ request: fetch }) => {
         let members: Array<Record<string, unknown>> = [];
         if (membersResponse.ok) {
             const membersData = await membersResponse.json();
-            members = membersData.result.points.map((p: { payload: Record<string, unknown> }) => p.payload);
+            members = membersData.result.points.map((p: {, payload: Record<string, unknown> }) => p.payload);
         }
 
         // Generate safe patches based on error type
@@ -83,8 +75,8 @@ export const POST: RequestHandler = async ({ request: fetch }) => {
                 patches.push({
                     filePath: member.filePath as string,
                     line: member.line as number,
-                    before: `// Error: ${member.message}`,
-                    after: `// TODO: Fix syntax error - ${member.message}`
+                    before: `//, Error: ${member.message}`,
+                    after: `//, TODO: Fix syntax error - ${member.message}`
                 });
             }
         } else if (errorCode === 'TS2304') {
@@ -111,7 +103,7 @@ export const POST: RequestHandler = async ({ request: fetch }) => {
                         filePath: member.filePath as string,
                         line: member.line as number,
                         before: `import ... from '${match[1]}'`,
-                        after: `// TODO: Fix module path - ${match[1]}`
+                        after: `//, TODO: Fix module path - ${match[1]}`
                     });
                 }
             }

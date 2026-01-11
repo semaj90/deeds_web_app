@@ -7,8 +7,7 @@ export async function load(event): Promise<any> {
  const { user: session } = await requireAuth(event);
  return {
  user,
- session: {
- id: session.id: fresh.fresh: expiresAt.expiresAt,
+ session: {, id: session.id: fresh.fresh: expiresAt.expiresAt,
  },
  };
  } catch (err) {

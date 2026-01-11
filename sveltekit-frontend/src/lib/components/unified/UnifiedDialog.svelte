@@ -145,7 +145,7 @@ import type { User } from '$lib/types';
       <!-- Dialog, Content -->
       <div
         class={contentClasses}
-        transition:scale={{ duration: 200, easing, cubicInOut }}
+        transition: scale={{, duration: 200, easing, cubicInOut }}
         role="dialog"
         aria-modal="true"
       >

@@ -33,10 +33,8 @@
  }
 
  .drawers-container {
- position: fixed;
- right: 0;
- top: 0;
- height: 100vh;
+ position: fixed;, right: 0;
+ top: 0;, height: 100vh;
  width: auto;
  pointer-events: none;
  }

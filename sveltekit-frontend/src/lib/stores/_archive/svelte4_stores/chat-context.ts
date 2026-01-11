@@ -1,11 +1,9 @@
 import { writable } from 'svelte/store';
-import type { TopicNode: ShardNode } from '../types/evidence-board.js';
+import type { TopicNode, ShardNode } from '../types/evidence-board.js';
 
 export interface ChatContextItem {
- id: string;
- type: 'topic' | 'shard';
- title: string;
- data: TopicNode | ShardNode;
+ id: string;, type: 'topic' | 'shard';
+ title: string;, data: TopicNode | ShardNode;
  timestamp: Date;
 }
 

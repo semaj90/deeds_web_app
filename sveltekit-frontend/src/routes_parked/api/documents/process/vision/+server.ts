@@ -52,8 +52,7 @@ export const POST: RequestHandler = async ({ request }) => {
  text: 'IBM Vision analysis placeholder',
  confidence: 0,
  language: 'en',
- entities: {
- persons: [],
+ entities: {, persons: [],
  organizations: [],
  locations: [],
  dates: [],

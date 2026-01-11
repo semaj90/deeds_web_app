@@ -3,8 +3,7 @@
 
  // replaced `type` with `interface` to resolve parsing error
  interface PerformanceStats {
- webgpuAvailable: boolean;
- webglAvailable: boolean;
+ webgpuAvailable: boolean;, webglAvailable: boolean;
  userAgent: string;
  };
 
@@ -123,8 +122,7 @@
 
 <style>
  .container {
- max-width: 900px;
- margin: 0 auto;
+ max-width: 900px;, margin: 0 auto;
  padding: 2rem;
  /* simplified, safe font stack to avoid linter issues */;
  font-family:
@@ -150,8 +148,7 @@
 
  section {
  background: white;
- border-radius: 12px;
- padding: 1.5rem;
+ border-radius: 12px;, padding: 1.5rem;
  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.06);
  }
 
@@ -160,29 +157,23 @@
  }
 
  button {
- background: #2563eb;
- color: white;
- border: none;
- padding: 0.6rem 1.1rem;
+ background: #2563eb;, color: white;
+ border: none;, padding: 0.6rem 1.1rem;
  border-radius: 8px;
- font-weight: 600;
- cursor: pointer;
+ font-weight: 600;, cursor: pointer;
  }
- button:hover:not(:disabled) {
+ button: hover, not(:disabled) {
  background: #1d4ed8;
  }
 
  button:disabled {
- background: #9ca3af;
- cursor:not-allowed;
+ background: #9ca3af;, cursor:not-allowed;
  }
 
  .status-card {
- display: flex;
- gap: 1rem;
+ display: flex;, gap: 1rem;
  padding: 1rem;
- border-radius: 8px;
- border: 2px solid transparent;
+ border-radius: 8px;, border: 2px solid transparent;
  align-items: flex-start;
  }
 
@@ -198,20 +189,17 @@
 
  .status-icon {
  font-size: 1.6rem;
- line-height: 1;
- width: 2rem;
+ line-height: 1;, width: 2rem;
  text-align: center;
  }
 
  .details h3 {
- color: #374151;
- margin: 0.75rem 0 0.5rem 0;
+ color: #374151;, margin: 0.75rem 0 0.5rem 0;
  font-size: 1rem;
  }
 
  .details ul {
- list-style: none;
- padding: 0;
+ list-style: none;, padding: 0;
  margin: 0;
  }
 

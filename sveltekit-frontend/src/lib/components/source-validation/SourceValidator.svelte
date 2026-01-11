@@ -157,13 +157,13 @@ async function handleValidate() {
 				type="text"
 				bind:value={searchQuery}
 				placeholder="Enter your question (e.g., How do I use Svelte 5 runes?)"
-				class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+				class="flex-1 px-4 py-2 border rounded-lg focus: ring-2, focus:ring-blue-500"
 				disabled={isSearching}
 			/>
 			<button
 				type="submit"
 				disabled={isSearching || !searchQuery.trim()}
-				class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+				class="px-6 py-2 bg-blue-600 text-white rounded-lg hover: bg-blue-700, disabled:bg-gray-400"
 			>
 				{isSearching ? 'Searching...' : 'Search'}
 			</button>
@@ -260,7 +260,7 @@ async function handleValidate() {
 				<button
 					onclick={handleValidate}
 					disabled={!canValidate}
-					class="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-semibold"
+					class="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover: bg-blue-700, disabled:bg-gray-400 font-semibold"
 				>
 					{isValidating ? 'Validating...' : `Validate ${selectedChunks.size} Source${selectedChunks.size === 1 ? '' : 's'}`}
 				</button>
@@ -277,8 +277,7 @@ async function handleValidate() {
 
 <style>
 	.source-validator {
-		max-width: 1200px;
-		margin: 0 auto;
+		max-width: 1200px;, margin: 0 auto;
 		padding: 2rem;
 	}
 
@@ -289,22 +288,18 @@ async function handleValidate() {
 
 	.source-card.rejected {
 		border-color: #ef4444;
-		background-color: #fef2f2;
-		opacity: 0.6;
+		background-color: #fef2f2;, opacity: 0.6;
 	}
 
 	.confidence-green {
-		background-color: #d1fae5;
-		color: #065f46;
+		background-color: #d1fae5;, color: #065f46;
 	}
 
 	.confidence-yellow {
-		background-color: #fef3c7;
-		color: #92400e;
+		background-color: #fef3c7;, color: #92400e;
 	}
 
 	.confidence-red {
-		background-color: #fee2e2;
-		color: #991b1b;
+		background-color: #fee2e2;, color: #991b1b;
 	}
 </style>

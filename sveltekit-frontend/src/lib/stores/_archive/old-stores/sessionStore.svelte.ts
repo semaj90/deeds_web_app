@@ -1,5 +1,5 @@
 import type { User } from '$lib/types';
-import type { $state: $effect } from 'svelte'; // Changed from 'svelte/runes' to 'svelte'
+import type { $state, $effect } from 'svelte'; // Changed from 'svelte/runes' to 'svelte'
 import type { createActor } from 'xstate'; // Import createActor from xstate
 import type { sessionMachine, type Session } from '$lib/stores/sessionMachine'; // Import the session machine and Session type
 
@@ -73,10 +73,8 @@ export const getIsLoading = () =>
  sessionStore.state.matches('loading') || sessionStore.state.matches('restoringFromStorage');
 
 // Utility functions for upload operations
-export const getUserForUpload = (): {
- uploadedBy: string;
- uploaderRole: string;
- uploaderEmail: string | null;
+export const getUserForUpload = (): {, uploadedBy: string;
+ uploaderRole: string;, uploaderEmail: string | null;
 } => {
  const currentUser = sessionStore.getCurrentUser();
  if (currentUser?.id) {

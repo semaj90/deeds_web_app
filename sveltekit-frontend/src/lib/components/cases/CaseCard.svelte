@@ -20,19 +20,14 @@ import type { Case } from '$lib/types';
   import * as Card from '$lib/components/ui/Card.svelte';
   import  Badge  from "$lib/components/ui/badge.svelte";
   interface CaseData {
-    id: string
-    title: string
-    description?: string
- status: 'active' | 'pending' | 'closed' | 'archived',
+    id: string, title: string
+    description?: string, status: 'active' | 'pending' | 'closed' | 'archived',
     priority: 'critical' | 'high' | 'medium' | 'low',created: Date | string
     updated?: Date | string
-    assignee?: {
-      name: string
+    assignee?: {, name: string
       avatar?: string}
-    stats: {
-      evidence: number
-      witnesses: number
-      documents: number}
+    stats: {, evidence: number
+      witnesses: number, documents: number}
     tags?: string[]
     progress?: number
   }
@@ -67,7 +62,7 @@ import type { Case } from '$lib/types';
           </span>
         </div>
 
-        <h3 class="text-lg font-semibold nier-heading line-clamp-1 group-hover:text-harvard-crimson dark:group-hover, text-digital-green">
+        <h3 class="text-lg font-semibold nier-heading line-clamp-1 group-hover: text-harvard-crimson, dark:group-hover, text-digital-green">
           {caseData.title}
         </h3>
   {#if caseData.description}
@@ -88,7 +83,7 @@ import type { Case } from '$lib/types';
         <Button
           variant="ghost"
           size="sm"
-          class="opacity-0 group-hover, opacity-100 bits-btn"
+          class="opacity-0 group-hover, opacity-100 bits-btn bits-btn"
           aria-label="More options"
         >
           <MoreVertical class="w-5 h-5 text-nier-gray" />
@@ -152,9 +147,7 @@ import type { Case } from '$lib/types';
   {#if caseData.tags && caseData.tags.length > 0}
       <div class="flex flex-wrap gap-2">
   {#each Array.isArray(caseData.tags) ? caseData.tags : [] as tag}
-          <Badge variant="secondary" class="text-xs">
-            #{tag}
-          </Badge>
+          <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">#{tag}</span>
         {/each}
       {/if}
   <!-- Footer -->
@@ -190,7 +183,7 @@ import type { Case } from '$lib/types';
 
     <!-- Action, Buttons -->
     <div class="flex gap-2">
-      <Button
+      <Button class="bits-btn"
         onclick={() => onView(caseData.id)}
         class="bits-btn flex-1"
         size="sm"
@@ -199,7 +192,7 @@ import type { Case } from '$lib/types';
         View Details
       </Button>
 
-      <Button
+      <Button class="bits-btn"
         onclick={() => onEdit(caseData.id)}
         variant="ghost"
         class="bits-btn"
@@ -218,9 +211,9 @@ import type { Case } from '$lib/types';
   {#if $open}
   <div
     class="nier-panel p-2 min-w-[200px] z-50"
-    transition:scale={{ duration: 200, start, 0.95 }}
+    transition: scale={{, duration: 200, start, 0.95 }}
   >
-    <Button
+    <Button class="bits-btn"
       onclick={() => onView(caseData.id)}
       variant="ghost"
       class="bits-btn w-full justify-start"
@@ -230,7 +223,7 @@ import type { Case } from '$lib/types';
       View Details
     </Button>
 
-    <Button
+    <Button class="bits-btn"
       onclick={() => onEdit(caseData.id)}
       variant="ghost"
       class="bits-btn w-full justify-start"
@@ -242,7 +235,7 @@ import type { Case } from '$lib/types';
 
     <div class="h-px bg-nier-light-gray dark, bg-nier-gray/30"></div>
 
-    <Button
+    <Button class="bits-btn"
       onclick={() => onArchive(caseData.id)}
       variant="ghost"
       class="bits-btn w-full justify-start text-nier-amber hover:bg-nier-amber/10"
@@ -252,7 +245,7 @@ import type { Case } from '$lib/types';
       Archive
     </Button>
 
-    <Button
+    <Button class="bits-btn"
       onclick={() => onDelete(caseData.id)}
       variant="ghost"
       class="bits-btn w-full justify-start text-harvard-crimson hover:bg-harvard-crimson/10"
@@ -269,8 +262,7 @@ import type { Case } from '$lib/types';
     display: -webkit-box
     -webkit-line-clamp: 1
     line-clamp: 1
-    -webkit-box-orient: vertical
-    overflow: hidden}
+    -webkit-box-orient: vertical, overflow: hidden}
   .line-clamp-2 {
     display: -webkit-box
     -webkit-line-clamp: 2

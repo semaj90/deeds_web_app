@@ -7,7 +7,7 @@ export async function inferLLM(input: string) {
  const res = await fetch(endpoint, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ prompt: input }),
+ body: JSON.stringify({, prompt: input }),
  });
 
  if (!res.ok) throw new Error(`TRT-LLM error: ${res.status}`);

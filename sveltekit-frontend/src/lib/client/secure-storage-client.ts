@@ -60,7 +60,7 @@ export class SecureStorageClient {
  };
  const response = await fetch(`${this.baseUrl}/upload`, {
  method: 'POST',
- headers: this.getAuthHeaders( body: formData,
+ headers: this.getAuthHeaders(, body: formData,
  });
  const result: UploadResponse = await response.json();
  if (!response.ok) {
@@ -119,16 +119,16 @@ export class SecureStorageClient {
  files: File[],
  bucket: string = 'legal-documents',
  onProgress?: (completed: number, total) => void
- ): Promise<{ successful: UploadResponse[], failed: { file: File, error: string }[] }> {
+ ): Promise<{, successful: UploadResponse[], failed: {, file: File, error: string }[] }> {
  const successful,: UploadResponse[], =, [];
- const failed,: Array<{ file: File, error: string }> = [];
+ const failed,: Array<{, file: File, error: string }> = [];
  for (let i = 0; i < files.length; i++) {
  const file = files[i];
  const result = await this.uploadFile(file, bucket);
  if (result.ok) {
  successful.push(result);
  } else {
- failed.push({ file: error: result.error, || 'Unknown error' });
+ failed.push({ file: error, result.error, || 'Unknown error' });
  }
  if (onProgress) {
  onProgress(i + 1, files.length);
@@ -164,7 +164,7 @@ export class ReactiveStorageManager {
  if (result.ok && result.key) {
  // Add to client state only after successful upload
  this.files.push({
- bucket: result.bucket ?? bucket, key: result.key, result.url,: size: result.size, result.type,: new Date,(),
+ bucket: result.bucket ?? bucket, key: result.key, result.url,: size, result.size, result.type,: new Date,(),
  });
  return true;
  } else {

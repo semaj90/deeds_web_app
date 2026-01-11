@@ -2,8 +2,7 @@
  // --- CHANGES START ---
  // Provide local types (make neural_activity required)
  type SearchResult = {
- id: string;
- title: string;
+ id: string;, title: string;
  type?: string;
  relevance?: number;
  status?: string;
@@ -15,14 +14,11 @@
  };
 
  type SystemMetrics = {
- cpu_usage: number;
- memory_usage: number;
- gpu_utilization: number;
- network_latency: number;
+ cpu_usage: number;, memory_usage: number;
+ gpu_utilization: number;, network_latency: number;
  active_processes: number;
  security_level?: string;
- quantum_state?: string;
- neural_activity: number; // now required
+ quantum_state?: string;, neural_activity: number; // now required
  };
 
  type CommandResult = { id?: string; command?: string; result?: any; ts?: number };
@@ -74,7 +70,7 @@
   
  try {
  store.createIndex('title', 'title', { unique: false });
- } catch (_) {}
+ } catch (_)\s*{\n  }
  }
  };
  req.onsuccess = () => resolve(req.result);
@@ -201,7 +197,7 @@
  localLoadedFromCache = !!localIndexReady;
  try {
  db.close();
- } catch (_) {}
+ } catch (_)\s*{\n  }
  } catch (err) {
  console.warn('[YoRHa] initializeLocalIndex failed', err);
  localIndexReady = false;
@@ -216,11 +212,9 @@
  const resp = await fetch('/api/v1/legal/session/create', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- user_id: 'yorha-user-001',
+ body: JSON.stringify({, user_id: 'yorha-user-001',
  case_id: `case-${Date.now()}`,
- context: {
- jurisdiction: 'Global',
+ context: {, jurisdiction: 'Global',
  practice_area: ['AI Law', 'Tech Ethics', 'Data Privacy'],
  case_type: 'Investigation',
  priority_level: 8,

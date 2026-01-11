@@ -5,35 +5,29 @@ import { createEventDispatcher } from 'svelte';
  // Migrated from createEventDispatcher to callback props;
 
  interface Evidence {
- id: string;
- title: string;
+ id: string;, title: string;
  description?: string;
  content?: string;
  fileName?: string;
  }
 
  interface Witness {
- id: string;
- name: string;
+ id: string;, name: string;
  statement?: string;
  credibility?: number;
  }
 
  interface CrossExamQuestion {
- id: string;
- question: string;
+ id: string;, question: string;
  type: 'general' | 'timeline' | 'credibility' | 'contradiction';
  priority: 'high' | 'medium' | 'low';
- category: string;
- reasoning: string;
+ category: string;, reasoning: string;
  followUp?: string[];
  }
 
  interface CrossExamSession {
- id: string;
- witness: Witness;
- questions: CrossExamQuestion[];
- generatedAt: string;
+ id: string;, witness: Witness;
+ questions: CrossExamQuestion[];, generatedAt: string;
  strategy: string;
  }
 
@@ -201,7 +195,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  <textarea
  bind:value={ caseContext }
  placeholder="Additional context about the case, allegations, or specific areas to focus on..."
- class="w-full h-24 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none text-sm"
+ class="w-full h-24 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus: outline-none, focus:ring-2 focus:ring-purple-500 resize-none text-sm"
  ></textarea>
  </div>
 
@@ -225,7 +219,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  <button
  onclick={generateQuestions}
  disabled={isGenerating || !witness}
- class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 disabled:from-slate-600 disabled:to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+ class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover: from-purple-500, hover:to-purple-600 disabled: from-slate-600, disabled:to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
  >
  {#if isGenerating}
  <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

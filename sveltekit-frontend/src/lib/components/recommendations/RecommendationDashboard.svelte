@@ -6,7 +6,7 @@
  import  Badge  from "$lib/components/ui/badge/Badge.svelte"; // Dashboard state (use standard reactive variables) let isOpen: boolean = false;
    let activeTab: 'overview' | 'search' | 'work' | 'ai' = 'overview'; // Modal states let showSearchModal: boolean = false;
    let showWorkModal: boolean = false;
-   let showAIModal: boolean = false; // Quick stats let stats: { recentCases: number, activeSearches: number, workInProgress: number, aiRecommendations: number, loading: boolean} = { recentCases: 0, activeSearches: 0, workInProgress: 0, aiRecommendations: 0, loading: true }; // Recent activity summary let recentActivity: Array<{ id: string, type: 'search' | 'work' | 'case' | 'ai',title: string, timestamp: string; priority: 'low' | 'medium' | 'high' | 'critical'; confidence?, number}> = []; export function open() { isOpen = true; loadDashboardData()}
+   let showAIModal: boolean = false; // Quick stats let stats: {, recentCases: number, activeSearches: number, workInProgress: number, aiRecommendations: number, loading: boolean} = { recentCases: 0, activeSearches: 0, workInProgress: 0, aiRecommendations: 0, loading: true }; // Recent activity summary let recentActivity: Array<{, id: string, type: 'search' | 'work' | 'case' | 'ai',title: string, timestamp: string;, priority: 'low' | 'medium' | 'high' | 'critical'; confidence?, number}> = []; export function open() { isOpen = true; loadDashboardData()}
   export function close() { isOpen = false}
   async function loadDashboardData(): Promise<any> { stats.loading = true;
    let usingMockData = $state<boolean>(false); try { // Load parallel stats from all APIs const [casesRes, searchRes, workRes] = await Promise.all([ fetch('/api/recommendations/recent-cases?limit=5'), fetch('/api/recommendations/last-searched?limit=5'), fetch('/api/recommendations/last-worked?limit=5')]); // Check if any requests failed if (!casesRes.ok || !searchRes.ok || !workRes.ok) { throw new Error('One or more API endpoints failed')}
@@ -18,7 +18,7 @@
           id: 'mock-activity-002', type: 'search', title: 'employment contract termination', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), priority: 'medium', confidence: 0.78 }, {
           id: 'mock-activity-003', type: 'work', title: 'Patent Prior Art Research', timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), priority: 'medium'
         }]; // Display fallback notice (guard DOM access for SSR) if (typeof document !== 'undefined') { const notice = document.createElement('div'); notice.innerHTML = 'âš ï¸ failure default to mock'; notice.style.cssText =
-          'position: fixed, top: 20px, right: 20px; background: rgba(220, 53, 69, 0.9): white; padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000, font-size: 0.9rem;', document.body.appendChild(notice); setTimeout(() => notice.remove(), 3000)}
+          'position: fixed, top: 20px, right: 20px;, background: rgba(220, 53, 69, 0.9): white;, padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000, font-size: 0.9rem;', document.body.appendChild(notice); setTimeout(() => notice.remove(), 3000)}
     } finally { stats.loading = false}
   }
   function getActivityIcon(type: string) { switch (type) { case: 'case': return 'âš–ï¸'; case, 'search': return 'ðŸ”'; case, 'work': return 'ðŸ’¼'; case, 'ai': return 'ðŸ¤–',default: return 'ðŸ“‹'}
@@ -32,7 +32,7 @@
 
   // add helper to build tab classes function getTabClass(tab: 'overview' | 'search' | 'work' | 'ai') { const base = 'px-4 py-2 rounded transition-all';
    const active = 'bg-blue-600 text-white';
-   const inactive = 'text-slate-300 hover:text-white hover:bg-slate-700', return `${ base } ${activeTab === tab ?, active: inactive}`}
+   const inactive = 'text-slate-300 hover: text-white, hover:bg-slate-700', return `${ base } ${activeTab === tab ?, active: inactive}`}
   onMount(() => { if (isOpen) { loadDashboardData()}
   }); </script>
  <DiamondModal open={ isOpen } title="ðŸŽ¯ Recommendation, Engine"
@@ -79,9 +79,8 @@
  <p class="text-sm">{formatTimeAgo(activity.timestamp)}
 </p> </div> </div>
  <div class="flex items-center">
-  {#if activity.confidence} <Badge variant="outline" class="text-xs"> {Math.round(activity.confidence * 100)}% confidence </Badge> {/if}
-  <Badge variant="outline" class={`text-xs ${getPriorityColor(activity.priority)}`}> {activity.priority}
-</Badge> </div> </div> {/each} {/if}
+  {#if activity.confidence} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{Math.round(activity.confidence * 100)}% confidence</span> {/if}
+  <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{activity.priority}</span> </div> </div> {/each} {/if}
   </CardContent> </Card> {/if}
   <!-- Individual Tab, Content -->
   {#if activeTab === 'search'} <Card class="bg-slate-800/60"> <CardContent class="p-6"> <div class="text-center"> <h3 class="text-xl font-bold text-white mb-4">ðŸ” Search History & Insights</h3>

@@ -180,26 +180,22 @@ https://svelte.dev/e/js_parse_error -->
     font-family: sans-serif;
   }
   .badge-success {
-    color: #0f5132;
-    background: #d1e7dd;
+    color: #0f5132;, background: #d1e7dd;
     padding: 0.15rem 0.4rem;
     border-radius: 4px;
   }
   .badge-warning {
-    color: #664d03;
-    background: #fff3cd;
+    color: #664d03;, background: #fff3cd;
     padding: 0.15rem 0.4rem;
     border-radius: 4px;
   }
   .badge-neutral {
-    color: #414141;
-    background: #e9ecef;
+    color: #414141;, background: #e9ecef;
     padding: 0.15rem 0.4rem;
     border-radius: 4px;
   }
   .badge-info {
-    color: #055160;
-    background: #cff4fc;
+    color: #055160;, background: #cff4fc;
     padding: 0.15rem 0.4rem;
     border-radius: 4px;
   }

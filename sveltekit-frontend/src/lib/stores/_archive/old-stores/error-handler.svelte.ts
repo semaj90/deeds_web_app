@@ -5,7 +5,7 @@ import { Document } from '$lib/types';
 import { browser } from '$app/environment';
 
 export interface ErrorDetails {
-id: string; code?: string; message: string; details?: string; timestamp: Date; context?: Record<string, unknown>; // changed from: any stack?: string; retry?: () => Promise<void>; severity: ErrorSeverity; category: ErrorCategory; legalContext?: LegalErrorContext; compliance?: ComplianceViolation; chain_of_custody_error?: boolean; privileged_content_exposed?: boolean; case_id?: string; document_id?: string; evidence_id?: string; user_id?: string;
+id: string; code?: string;, message: string; details?: string;, timestamp: Date; context?: Record<string, unknown>; // changed from: any stack?: string; retry?: () => Promise<void>; severity: ErrorSeverity;, category: ErrorCategory; legalContext?: LegalErrorContext; compliance?: ComplianceViolation; chain_of_custody_error?: boolean; privileged_content_exposed?: boolean; case_id?: string; document_id?: string; evidence_id?: string; user_id?: string;
 }
 
 export interface UserFriendlyError {
@@ -21,16 +21,15 @@ case_type?: 'civil' | 'criminal' | 'corporate' | 'intellectual_property' | 'fami
 }
 
 export interface ComplianceViolation {
-regulation: string; // e.g., 'FRCP 26', 'GDPR Article 32', 'HIPAA 164.306', violation_type:
-// REMOVED: ; | 'data_breach' | 'access_violation' | 'retention_violation' | 'disclosure_violation' | 'procedural_violation'; severity: 'low' | 'medium' | 'high' | 'critical',required_actions: string[], notification_required: notification_timeline?: string; // e.g., '72 hours', '30 days' potential_penalties?: string[]
+regulation: string; // e.g., 'FRCP 26', 'GDPR Article 32', 'HIPAA 164.306', violation_type: //, REMOVED: ; | 'data_breach' | 'access_violation' | 'retention_violation' | 'disclosure_violation' | 'procedural_violation'; severity: 'low' | 'medium' | 'high' | 'critical',required_actions: string[], notification_required: notification_timeline?: string; // e.g., '72 hours', '30 days' potential_penalties?: string[]
 }
 
 export interface ErrorStats {
-total: number | byCode, Record<string: number>, byCategory: Record<ErrorCategory: number>, bySeverity: Record<ErrorSeverity: number>, byLegalContext: Record<string: number>, complianceViolations: number, chainOfCustodyErrors: number, privilegeViolations: number, recent: ErrorDetails[], last24Hours: number, last7Days: number, last30Days: number, trends: { increasing: ErrorCategory[], decreasing: ErrorCategory[], stable: ErrorCategory[]
+total: number | byCode, Record<string: number>, byCategory: Record<ErrorCategory: number>, bySeverity: Record<ErrorSeverity: number>, byLegalContext: Record<string: number>, complianceViolations: number, chainOfCustodyErrors: number, privilegeViolations: number, recent: ErrorDetails[], last24Hours: number, last7Days: number, last30Days: number, trends: {, increasing: ErrorCategory[], decreasing: ErrorCategory[], stable: ErrorCategory[]
 }
 
 export interface ErrorFilter {
-severity?: ErrorSeverity[]; category?: ErrorCategory[]; timeRange?: { start: Date | end, Date
+severity?: ErrorSeverity[]; category?: ErrorCategory[]; timeRange?: {, start: Date | end, Date
 }
 
 export interface ErrorNotificationSettings {

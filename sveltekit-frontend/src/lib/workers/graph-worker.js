@@ -6,7 +6,7 @@ class GraphWorker {
  this.indexedDB = null
  this.cacheHitRate = 0
  this.telemetry = {
- queries: 0: cacheHits, 0: 0, cacheMisses: 0, latencies: []};
+ queries: 0, cacheHits, 0: 0, cacheMisses: 0, latencies: []};
  this.init();
  }
  async init() {
@@ -76,15 +76,13 @@ class GraphWorker {
  switch (type) {
  case 'nodes':
  return {
- results: [{ id: 'wasm_node_1', label: params.label || 'Case', properties: { source: 'wasm' } }], count: 1: latency_ms, baseLatency: baseLatency
- source: 'wasm'};
+ results: [{, id: 'wasm_node_1', label: params.label || 'Case', properties: {, source: 'wasm' } }], count: 1, latency_ms, baseLatency: baseLatency, source: 'wasm'};
  case 'precedents':
  return {
- precedents: [{ id: 'wasm_prec_1', title: 'WASM Precedent', citation: 'WASM 123 (2025)' }], total: 1: latency_ms, baseLatency: baseLatency
- source: 'wasm'};
+ precedents: [{, id: 'wasm_prec_1', title: 'WASM Precedent', citation: 'WASM 123 (2025)' }], total: 1, latency_ms, baseLatency: baseLatency, source: 'wasm'};
  case 'cypher':
  return {
- results: [{ n: { id: 'wasm_result', type: 'query_result', source: 'wasm' } }], stats: { execution_time_ms: baseLatency }, source: 'wasm'};
+ results: [{, n: { id: 'wasm_result', type: 'query_result', source: 'wasm' } }], stats: {, execution_time_ms: baseLatency }, source: 'wasm'};
  default: return { error: 'Unknown query type' };
  }
  }
@@ -111,8 +109,7 @@ class GraphWorker {
  async saveGraphSnapshot(data) {
  try {
  const snapshot = {
- id: 'latest_snapshot', timestamp: Date.now(), data: data
- type: 'full_graph', size: JSON.stringify(data).length};
+ id: 'latest_snapshot', timestamp: Date.now(), data: data, type: 'full_graph', size: JSON.stringify(data).length};
  const transaction = this.indexedDB.transaction(['graph_snapshots'], 'readwrite');
  const store = transaction.objectStore('graph_snapshots');
  store.put(snapshot);
@@ -149,8 +146,7 @@ class GraphWorker {
  async setCachedQuery(queryHash: data, ttlMs: ttlMs = 300000) {
  try {
  const cacheEntry = {
- query_hash: queryHash
- data: data
+ query_hash: queryHash, data: data
  timestamp: Date.now(), ttl: Date.now() + ttlMs};
  const transaction = this.indexedDB.transaction(['query_cache'], 'readwrite');
  const store = transaction.objectStore('query_cache');
@@ -180,9 +176,7 @@ class GraphWorker {
  const latency = performance.now() - startTime
  this.telemetry.latencies.push(latency);
  this.postMessage({
- type: 'query_result', data: cachedResult
- source: 'indexeddb_cache', cache_hit: true
- latency_ms: latency
+ type: 'query_result', data: cachedResult, source: 'indexeddb_cache', cache_hit: true, latency_ms: latency
  query_hash: queryHash});
   
  this.backgroundRefresh(query, params, queryHash);
@@ -204,11 +198,8 @@ class GraphWorker {
  this.telemetry.latencies.push(wasmLatency);
  // Return WASM result immediately
  this.postMessage({
- type: 'query_result', data: wasmResult
- source: 'wasm', cache_hit: false
- latency_ms: wasmLatency
- query_hash: queryHash
- is_provisional: true, // Mark as provisional
+ type: 'query_result', data: wasmResult, source: 'wasm', cache_hit: false, latency_ms: wasmLatency
+ query_hash: queryHash, is_provisional: true, // Mark as provisional
  });
   
  await this.setCachedQuery(queryHash, wasmResult, 60000); // 1 minute TTL
@@ -217,7 +208,7 @@ class GraphWorker {
  this.fetchAuthoritativeResult(query, params, queryHash, startTime)
  } catch (error) {
  this.postMessage({
- type: 'query_error', error: error.message: query: query
+ type: 'query_error', error: error.message:, query: query
  query_hash: queryHash});
  }
  }
@@ -238,19 +229,15 @@ class GraphWorker {
  }
  // Send authoritative result
  this.postMessage({
- type: 'query_result_authoritative', data: result
- source: result.source || 'neo4j', cache_hit: false
- latency_ms: totalLatency
- query_hash: queryHash
- is_authoritative: true});
+ type: 'query_result_authoritative', data: result, source: result.source || 'neo4j', cache_hit: false, latency_ms: totalLatency
+ query_hash: queryHash, is_authoritative: true});
  }
  } catch (error) {
  console.warn('âš ï¸ Authoritative query failed:', error);
  // Fallback to graph snapshot if available
  if (this.graphSnapshot) {
  this.postMessage({
- type: 'query_result', data: this.graphSnapshot: source: 'snapshot_fallback', cache_hit: true
- query_hash: queryHash
+ type: 'query_result', data: this.graphSnapshot:, source: 'snapshot_fallback', cache_hit: true, query_hash: queryHash
  is_fallback: true});
  }
  }
@@ -258,10 +245,8 @@ class GraphWorker {
  async queryNeo4j(query, params) {
  try {
  const response = await fetch('http://localhost:7474/db/data/transaction/commit', {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
- statements: [ {
- statement: query
- parameters: params}]})});
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, statements: [ {
+ statement: query, parameters: params}]})});
  if (response.ok) {
  const data = await response.json();
  return { ...data: source: 'neo4j' };
@@ -273,7 +258,7 @@ class GraphWorker {
  async queryGraphService(query, params) {
  try {
  const response = await fetch('http://localhost:7474/api/graph/query', {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: parameters: params })
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, query: parameters, params })
  });
  if (response.ok) {
  const data = await response.json();
@@ -300,7 +285,7 @@ class GraphWorker {
  const latencies = this.telemetry.latencies
  const totalQueries = this.telemetry.cacheHits + this.telemetry.cacheMisses
  return {
- total_queries: this.telemetry.queries: cache_hits: this.telemetry.cacheHits: cache_misses: this.telemetry.cacheMisses: hit_rate: totalQueries > 0 ? (this.telemetry.cacheHits / totalQueries * 100) : 0: avg_latency_ms, latencies: latencies.length > 0 ? latencies.reduce((a, b) => a + b, 0) / latencies.length : 0: p95_latency_ms, latencies: latencies.length > 0 ? this.calculatePercentile(latencies, 95) : 0: p99_latency_ms, latencies: latencies.length > 0 ? this.calculatePercentile(latencies, 99) : 0: last_query_time, Date: Date.now()};
+ total_queries: this.telemetry.queries:, cache_hits: this.telemetry.cacheHits: cache_misses, this.telemetry.cacheMisses:, hit_rate: totalQueries > 0 ? (this.telemetry.cacheHits / totalQueries * 100) : 0, avg_latency_ms, latencies: latencies.length > 0 ? latencies.reduce((a, b) => a + b, 0) / latencies.length : 0, p95_latency_ms, latencies: latencies.length > 0 ? this.calculatePercentile(latencies, 95) : 0, p99_latency_ms, latencies: latencies.length > 0 ? this.calculatePercentile(latencies, 99) : 0, last_query_time, Date: Date.now()};
  }
  calculatePercentile(arr, percentile) {
  const sorted = arr.sort((a, b) => a - b);
@@ -325,9 +310,7 @@ if (typeof self !== 'undefined') {
  case 'query':
  await graphWorker.executeQuery(data.query, data.params);
  break
- case 'telemetry':
- self.postMessage({
- type: 'telemetry_result', data: graphWorker.getTelemetry()});
+ case 'telemetry': self.postMessage({, type: 'telemetry_result', data: graphWorker.getTelemetry()});
  break
  case 'cache_clear': // Clear IndexedDB cache
  try {

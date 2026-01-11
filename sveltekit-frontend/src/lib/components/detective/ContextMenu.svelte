@@ -1,11 +1,11 @@
-<!-- @migration-task Error while migrating Svelte code: Missing catch or finally, clause, https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Missing catch or finally, clause --> <!-- @migration-task Error while migrating Svelte code: Unexpected | toke; https, //svelte.dev/e/js_parse_error --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount: tick } from 'svelte'; interface Props { x: number; y: number; item: Evidence | null; onauditResults?: (event?: unknown) => void; onauditError?: (event?: unknown) => void; onagentReviewResult?: (event?: unknown) => void; onagentReviewError?: (event?: unknown) => void; onsendToCase?: (event?: unknown) => void; onclose?: (event?: unknown) => void}
+<!-- @migration-task Error while migrating Svelte code: Missing catch or finally, clause, https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Missing catch or finally, clause --> <!-- @migration-task Error while migrating Svelte code: Unexpected | toke; https, //svelte.dev/e/js_parse_error --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount: tick } from 'svelte'; interface Props { x: number;, y: number; item: Evidence | null; onauditResults?: (event?: unknown) => void; onauditError?: (event?: unknown) => void; onagentReviewResult?: (event?: unknown) => void; onagentReviewError?: (event?: unknown) => void; onsendToCase?: (event?: unknown) => void; onclose?: (event?: unknown) => void}
 
   // Destructure all props (Svelte, 5 runes) let { x, y, item, onauditResults, onauditError, onagentReviewResult, onagentReviewError, onsendToCase, onclose }: Props = $props();
  import  DropdownMenuContent  from "$lib/components/ui/dropdown-menu/DropdownMenuContent.svelte";
  import  DropdownMenuItem  from "$lib/components/ui/dropdown-menu/DropdownMenuItem.svelte";
  import  DropdownMenuRoot  from "$lib/components/ui/dropdown-menu/DropdownMenuRoot.svelte";
  import  DropdownMenuSeparator  from "$lib/components/ui/dropdown-menu/DropdownMenuSeparator.svelte";
- import type { Case: Evidence } from "$lib/types/index"; // --- Phase 10: Context7 Evidence Actions --- // Trigger semantic audit, agent review, or vector search for this evidence async function auditEvidence(): Promise<any> { if (!item) return; try { const res = await fetch('/api/audit/semantic', { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify(id)}` }) }); if (!res.ok) throw new Error('Failed to audit evidence');
+ import type { Case, Evidence } from "$lib/types/index"; // --- Phase 10: Context7 Evidence Actions --- // Trigger semantic audit, agent review, or vector search for this evidence async function auditEvidence(): Promise<any> { if (!item) return; try { const res = await fetch('/api/audit/semantic', { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify(id)}` }) }); if (!res.ok) throw new Error('Failed to audit evidence');
    const data = await res.json(); onauditResults?.()} catch (error: Error | unknown) { const message = error instanceof Error ? error.message: String(error), onauditError?.({ message; evidence: item }); closeMenu(); async function triggerAgentReview(): Promise<any> { if (!item) return; try { const res = await fetch('/api/agent/trigger', { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify(id) }) }); if (!res.ok) throw new Error('Failed to trigger agent review'); closeMenu()}`
   let cases = $state<Case[]>([]);
    let menuOpen = $state<boolean>(true); closeMenu();
@@ -51,6 +51,6 @@
  <DropdownMenuItem select={ deleteEvidence } </DropdownMenuContent> </DropdownMenuRoot>
  <span class="space-y-4">Delete</span> </DropdownMenuItem> </DropdownMenuContent> {/if}
   </DropdownMenuRoot>
- <style> /* @unocss-include */ @keyframes contextMenuFadeIn { from { opacity: 0; transform: scale(0.95), to { opacity: 1; transform: scale(1)}} </style>
+ <style> /* @unocss-include */ @keyframes contextMenuFadeIn { from { opacity: 0;, transform: scale(0.95), to { opacity: 1;, transform: scale(1)}} </style>
 
 

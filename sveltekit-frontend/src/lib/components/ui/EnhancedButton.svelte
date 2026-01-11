@@ -1,6 +1,6 @@
 <script lang="ts">
  import { onMount } from 'svelte';
- import type { Snippet: ComponentType } from 'svelte';
+ import type { Snippet, ComponentType } from 'svelte';
  import { cn } from '$lib/utils';
  import { buttonVariants, type ButtonVariantProps } from './button-variants';
    let { variant = 'default' as ButtonVariantProps['variant'], size = 'default' as ButtonVariantProps['size'], disabled = false, type = 'button' as 'button' | 'submit' | 'reset', href = undefined as string | undefined, target = undefined as string | undefined, loading = false, loadingText = 'Loading...'; class: className = '', useBits = false, ariaLabel = undefined as string | undefined, onclick, // content slot children }: { variant?: ButtonVariantProps['variant']; size?: ButtonVariantProps['size']; disabled?: boolean; type?: 'button' | 'submit' | 'reset'; href?: string; target?: string; loading?: boolean; loadingText?: string; class?: string; useBits?: boolean; ariaLabel?: string; onclick?: (evt: MouseEvent) => void; children?: Snippet} = $props();
@@ -55,21 +55,17 @@
   <style>
   .loader {
     display: inline-block;
-    margin-right: 0.5rem;
-    width: 1rem;
-    height: 1rem;
-    border: 2px solid currentColor;
+    margin-right: 0.5rem;, width: 1rem;
+    height: 1rem;, border: 2px solid currentColor;
     border-right-color: transparent;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    border-radius: 50%;, animation: spin 0.8s linear infinite;
   }
   @keyframes spin {
     to {
       transform: rotate(360deg);
     }
   }
-  : global([data-variant='yorha']) {
-    position: relative;
-    overflow: hidden;
+  :global([data-variant='yorha']) {
+    position: relative;, overflow: hidden;
   }
 </style>

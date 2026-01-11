@@ -19,7 +19,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <Dialog.RootPrimitive.Root bind, open> <Dialog.RootPrimitive.Content class="space-y-4"
   > <div class="space-y-4"> <!-- Header --> <div class="space-y-4"> <div> <Dialog.RootPrimitive.Title class="space-y-4"> Validate AI Analysis </DialogPrimitive.Title>
  <Dialog.RootPrimitive.Description class="space-y-4"> Review and validate the AI-generated analysis for this evidence </DialogPrimitive.Description> </div>
- <Dialog.RootPrimitive.Close let, builder> <Button.Root class="bits-btn"
+ <Dialog.RootPrimitive.Close let, builder> <Button.Root class="bits-btn bits-btn"
             {...builder} variant="ghost"
             size="sm"
             onclick={() => closeModal()} >
@@ -47,10 +47,10 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 </p> {/if} {/if}
   </div>
  <!-- Validation, Question --> <div class="space-y-4"> <h4 class="space-y-4">Is this AI analysis accurate?</h4>
- <div class="space-y-4"> <Button variant={validationChoice === "approve" ? "default", "outline"} class="space-y-4 bits-btn bits-btn"
+ <div class="space-y-4"> <Button variant={validationChoice === "approve" ? "default", "outline"} class="space-y-4 bits-btn bits-btn bits-btn"
                 onclick={() => handleValidationChoice("approve")} >
                 <CheckCircle class="space-y-4" /> Yes, it's accurate </Button>
- <Button variant={validationChoice === "reject" ? "danger", "outline"} class="space-y-4 bits-btn"'
+ <Button variant={validationChoice === "reject" ? "danger", "outline"} class="space-y-4 bits-btn bits-btn"'
                 onclick={() => handleValidationChoice("reject")} >
                 <XCircle class="space-y-4" /> No, needs correction </Button> </div> </div>
  <!-- Feedback, Section -->
@@ -95,18 +95,18 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
                     type="text"
                     placeholder="Add a tag..."
                     class="space-y-4"
-                    keydown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())} /> <Button.Root class="bits-btn"
+                    keydown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())} /> <Button.Root class="bits-btn bits-btn"
                     type="button"
                     variant="secondary"
                     size="sm"
                     onclick={() => addTag()} >
                     <Tag class="space-y-4" /> </Button> </div> </div> {/if}
   </div>
- <!-- Footer --> <div class="space-y-4"> <Button.Root class="bits-btn"
+ <!-- Footer --> <div class="space-y-4"> <Button.Root class="bits-btn bits-btn"
             variant="ghost"
             onclick={() => closeModal()} disabled={ isSubmitting } >
             Cancel </Button>
- <Button class="bits-btn"
+ <Button class="bits-btn bits-btn"
             onclick={() => submitValidation()} disabled={!validationChoice || isSubmitting} >
   {#if isSubmitting} <div class="space-y-4"
               ></div> Submitting... {:else} <Save class="space-y-4" /> Submit Validation {/if}

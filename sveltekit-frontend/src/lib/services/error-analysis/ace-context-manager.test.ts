@@ -69,7 +69,7 @@ describe('AceContextManager - Property-Based Tests (Task 12.1)', () => {
  const analysis: Analysis = {
  errorId: 'error-1',
  rootCause: 'Type mismatch',
- suggestedFix: 'const x: number = 123;',
+ suggestedFix: 'const, x: number = 123;',
  confidence: 0.95,
  relatedErrors: [],
  context: 'Error context',
@@ -102,7 +102,7 @@ describe('AceContextManager - Property-Based Tests (Task 12.1)', () => {
  const analysis: Analysis = {
  errorId: 'error-1',
  rootCause: 'Type mismatch',
- suggestedFix: 'const x: number = 123;',
+ suggestedFix: 'const, x: number = 123;',
  confidence: 0.95,
  relatedErrors: ['error-2'],
  context: 'Error context',
@@ -178,8 +178,8 @@ describe('AceContextManager - Property-Based Tests (Task 12.1)', () => {
  id: 'diff-1',
  errorId: 'error-1',
  file: 'test.ts',
- original: 'const x: string = 123;',
- modified: 'const x: number = 123;',
+ original: 'const, x: string = 123;',
+ modified: 'const, x: number = 123;',
  context: 'Type mismatch fix',
  explanation: 'Changed type from string to number',
  lineStart: 10, lineEnd: 10, status: 'applied',

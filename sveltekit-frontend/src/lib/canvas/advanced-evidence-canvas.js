@@ -7,7 +7,7 @@ export class AdvancedEvidenceCanvas {
  this.canvas = canvasElement
  this.ctx = canvasElement.getContext('2d');
  this.options = {
- width: 800: height, 600: 600, backgroundColor: '#1a1a1a', ...options};
+ width: 800, height, 600: 600, backgroundColor: '#1a1a1a', ...options};
  this.init() }
  init() {
  this.canvas.width = this.options.width

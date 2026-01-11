@@ -20,18 +20,13 @@ import type { Document } from '@langchain/core/documents';
 import type { PromptTemplate } from '@langchain/core/prompts';
 
 export interface RAGDocument {
- id: string;
- content: string;
+ id: string;, content: string;
  metadata?: Record<string, any>;
  embedding?: number[];
 }
 
 export interface RAGQueryResult {
- answer: string;
- sources: RAGDocument[];
- confidence: number;
- tokensGenerated: number;
- duration: number;
+ answer: string;, sources: RAGDocument[];, confidence: number;, tokensGenerated: number;, duration: number;
 }
 
 export interface RAGOptions {
@@ -83,7 +78,7 @@ export class BrowserRAGChain {
  * Add documents to the RAG knowledge base
  */
  async addDocuments(
- docs: Array<{ id: string; content: string; metadata?: Record<string, any> }>
+ docs: Array<{, id: string;, content: string; metadata?: Record<string, any> }>
  ): Promise<void> {
  if (!this.isInitialized) {
  await this.initialize();
@@ -159,7 +154,7 @@ export class BrowserRAGChain {
  */
  async *queryStream(
  question: string, options: RAGOptions = {}
- ): AsyncGenerator<{ text: string; done: boolean; sources?: RAGDocument[] }, void, unknown> {
+ ): AsyncGenerator<{, text: string;, done: boolean; sources?: RAGDocument[] }, void, unknown> {
  if (!this.isInitialized) {
  await this.initialize();
  }
@@ -267,7 +262,7 @@ Answer:`;
  /**
  * Get current knowledge base stats
  */
- getStats(): { documentCount: number; avgDocLength: number } {
+ getStats(): {, documentCount: number;, avgDocLength: number } {
  if (this.documents.length === 0) {
  return { documentCount: 0, avgDocLength: 0 };
  }
@@ -315,12 +310,12 @@ export const browserRAG = new BrowserRAGChain();
  * {
  * id: 'doc1',
  * content: 'Contract law states that...',
- * metadata: { type: 'contract', date: '2024-01-01' }
+ * metadata: {, type: 'contract', date: '2024-01-01' }
  * },
  * {
  * id: 'doc2',
  * content: 'Employment agreements must include...',
- * metadata: { type: 'employment', date: '2024-01-15' }
+ * metadata: {, type: 'employment', date: '2024-01-15' }
  * }
  * ]);
  *

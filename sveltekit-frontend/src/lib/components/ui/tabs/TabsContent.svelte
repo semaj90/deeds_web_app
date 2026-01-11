@@ -34,7 +34,7 @@
 		tabindex="0"
 		data-state={isActive ? 'active' : 'inactive'}
 		class="{defaultClass} { className }"
-		transition:fade={{ duration: 150 }}
+		transition: fade={{, duration: 150 }}
 		hidden={!isActive && forceMount}
 	>
 		{#if children}

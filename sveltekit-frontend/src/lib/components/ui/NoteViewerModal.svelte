@@ -23,13 +23,13 @@
   }
   function removeTag(tag: string) { editedTags = editedTags.filter((t) => t !== tag)}
   function handleEditorSave(_event: CustomEvent) { const { html: newHtml, markdown: newMarkdown, json newJson} = e(vent as CustomEvent).detail;
-   const updatedNote = { id:noteId, title: editedTitle content: newMarkdown || newHtml markdown: newMarkdown, html: newHtml contentJson newJson noteType, tags: editedTags userId, caseId }
+   const updatedNote = { id:noteId, title: editedTitle, content: newMarkdown || newHtml markdown: newMarkdown, html: newHtml contentJson newJson noteType, tags: editedTags userId, caseId }
     onSave?.(updatedNote); localMode = "view"; // Update local data localTitle = editedTitl; localContent = newMarkdown || newHtml; localMarkdown = newMarkdow; localHtml = newHtml; localContentJson = newJso; localTags = [...editedTags]}
   function startEdit() { localMode = "edit"; editedContent = content; editedTitle = titl; editedTags = [...tags]}
   function cancelEdit() { localMode = "view"; editedContent = content; editedTitle = titl; editedTags = [...tags]}
   function closeModal() { localIsOpen = false}
 </script>
-  {#if localIsOpen} <div class="space-y-4" transition:fade={{ duration, 150 }}> <div class="space-y-4" transition:fly={{ y: -20, duration, 200 }}> <!-- Header --> <div class="space-y-4"> <div class="space-y-4">
+  {#if localIsOpen} <div class="space-y-4" transition:fade={{ duration, 150 }}> <div class="space-y-4" transition: fly={{, y: -20, duration, 200 }}> <!-- Header --> <div class="space-y-4"> <div class="space-y-4">
   {#if localMode === "edit"} <input bind, value={ editedTitle } class="space-y-4"
               placeholder="Note title..."
             /> {:else} <h2 class="space-y-4"> {localTitle || "Untitled Note"} </h2> {/if}

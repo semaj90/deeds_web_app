@@ -62,8 +62,7 @@ declare module 'lokijs' {
  update(doc: T): T;
  remove(doc: T): void;
  removeWhere(query: unknown): void;
- count(query?: unknown): number;
- data: T[];
+ count(query?: unknown): number;, data: T[];
  chain(): {
  find(query?: unknown): unknown;
  where(filter: (obj: T) => boolean): unknown;

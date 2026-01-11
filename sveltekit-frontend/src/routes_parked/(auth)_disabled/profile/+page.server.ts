@@ -34,8 +34,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
  // Use the imported 'db' and table schemas directly, no need for 'as unknown' casts or custom types
  const profile = await db.query.users.findFirst({
- columns: {
- id: true,
+ columns: {, id: true,
  email: true,
  name: true,
  firstName: true,
@@ -66,8 +65,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
  return {
  profile, // Return the profile directly
- stats: {
- totalCases: asNumber(totalCasesRow, openCases: asNumber(openCasesRow, closedCases: asNumber(closedCasesRow, totalEvidence: asNumber(evidenceRow, personsOfInterest: asNumber(poiRow),
+ stats: {, totalCases: asNumber(totalCasesRow, openCases: asNumber(openCasesRow, closedCases: asNumber(closedCasesRow, totalEvidence: asNumber(evidenceRow, personsOfInterest: asNumber(poiRow),
  },
  };
 };

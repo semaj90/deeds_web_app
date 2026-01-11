@@ -69,8 +69,7 @@
  <p class="flex-grow">{alert.message}</p>
  <button
  onclick={() => removeAlert(alert.id)}
- class="ml-4 p-1 rounded-full hover:bg-opacity-20 focus:outline-none focus:ring-2 focus:ring-offset-2"
- class:text-blue-800={alert.type === 'info'}
+ class="ml-4 p-1 rounded-full hover: bg-opacity-20, focus: outline-none, focus: ring-2, focus: ring-offset-2", class:text-blue-800={alert.type === 'info'}
  class:text-green-800={alert.type === 'success'}
  class:text-yellow-800={alert.type === 'warning'}
  class:text-red-800={alert.type === 'error'}

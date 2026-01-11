@@ -155,18 +155,15 @@ https, //svelte.dev/e/js_parse_error -->
   :global(.masonry-item:not(.drag-disabled):active) {
     cursor: grabbing}
   :global(.masonry-item.drag-shadow) {
-    opacity: 0.5
- transform: scale(0.95)}
+    opacity: 0.5, transform: scale(0.95)}
   :global(.masonry-item.drag-ghost) {
-    opacity: 0.3
- transform: rotate(5deg)}
+    opacity: 0.3, transform: rotate(5deg)}
   /* Loading state */
     .masonry-grid:empty::before { content: 'Loading...',
     display: block
     text-align: center
    ; color: var(--pico-muted-color, #6b7280);
-    font-style: italic
- padding: 2rem}
+    font-style: italic, padding: 2rem}
   /* Animation for new items */
   :global(.masonry-item.newly-added) {
     animation: slideInUp 0.3s ease-out}

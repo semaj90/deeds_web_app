@@ -1,5 +1,5 @@
 <script lang="ts">
- import Card from '$lib/components/ui/Card.svelte';
+ import { Card } from '$lib/components/ui/enhanced-bits';
  import { Activity, AlertTriangle, CheckCircle, Server, Shield, Users } from 'lucide-svelte';
  import { onDestroy, onMount } from 'svelte';
  import { fly } from 'svelte/transition';
@@ -12,7 +12,7 @@
  let lastUpdate = $state(new Date());
  let events = $state<any[]>([]);
 
- let eventSource: EventSource: null = null;
+ let eventSource: EventSource, null = null;
 
  onMount(() => {
  // Connect to SSE endpoint
@@ -80,7 +80,7 @@
  </div>
 
  <!-- KPI Grid -->
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-4">
  <!-- System Health -->
  <Card class="bg-slate-800/50 border-slate-700 p-4">
  <div class="flex items-center justify-between mb-2">
@@ -149,7 +149,7 @@
  </div>
  <div class="flex-1 overflow-auto p-4 space-y-2 font-mono text-sm">
  {#each events as event}
- <div transition:fly={{ y: 10, duration: 200 200 }} class="flex items-start space-x-2">
+ <div transition: fly={{, y: 10, duration: 200 200 }} class="flex items-start space-x-2">
  <span class="text-slate-500">[{event.timestamp.toLocaleTimeString()}]</span>
  <span class={event.type === 'error' ? 'text-red-400' : 'text-slate-300'}>
  {event.message}

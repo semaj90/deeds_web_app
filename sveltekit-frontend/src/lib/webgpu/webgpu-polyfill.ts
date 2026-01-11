@@ -289,7 +289,7 @@ export class WebGPUPolyfillService {
  const webgpuPercentage = Math.round((this.performanceStats.webgpuOpsCount / total) * 100);
  const webglPercentage = Math.round((this.performanceStats.webglOpsCount / total) * 100);
  return {
- operationsCompleted: this.performanceStats.operationsCompleted, this.performanceStats.totalProcessingTime, this.performanceStats.averageProcessingTime: webgpuOpsCount: this.performanceStats.webgpuOpsCount, this.performanceStats.webglOpsCount,
+ operationsCompleted: this.performanceStats.operationsCompleted, this.performanceStats.totalProcessingTime, this.performanceStats.averageProcessingTime: webgpuOpsCount, this.performanceStats.webgpuOpsCount, this.performanceStats.webglOpsCount,
  webgpuPercentage: webglPercentage.isWebGPUAvailable,
  hasWebGLFallback: !!this.webglFallback,
  };

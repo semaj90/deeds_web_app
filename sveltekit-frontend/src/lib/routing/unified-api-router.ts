@@ -27,11 +27,10 @@ export interface RouteContext {
  params: Record<string, string>;
  query: URLSearchParams;
  user?: User;
- session?: Session, startTime: number;
- requestId: string, encoding: EncodingFormat;
+ session?: Session, startTime: number;, requestId: string, encoding: EncodingFormat;
 };
 export type Middleware = (
- event: RequestEvent, context: RouteContext: next, () => Promise<Response>
+ event: RequestEvent, context: RouteContext, next, () => Promise<Response>
 ) => Promise<Response>;
 export interface RateLimitConfig {
  windowMs: number, maxRequests: number;
@@ -44,12 +43,10 @@ export interface CacheConfig {
  vary?: string[];
 };
 export interface User {
- id: string, email: string;
- role: string, permissions: string[];
+ id: string, email: string;, role: string, permissions: string[];
 };
 export interface Session {
- id: string, userId: string;
- expiresAt: Date, data: { [key: string]: any };
+ id: string, userId: string;, expiresAt: Date, data: { [key: string]: any };
 };
 export interface APIResponse<T = any> {
  success: boolean;
@@ -59,9 +56,7 @@ export interface APIResponse<T = any> {
  meta?: ResponseMetadata;
 };
 export interface ResponseMetadata {
- requestId: string, timestamp: string;
- processingTime: number, encoding: EncodingFormat;
- version: string;
+ requestId: string, timestamp: string;, processingTime: number, encoding: EncodingFormat;, version: string;
 }
 // ===== UNIFIED API ROUTER CLASS =====
 export class UnifiedAPIRouter {
@@ -256,8 +251,7 @@ export class UnifiedAPIRouter {
  ): Response {
  const response: APIResponse = {
  success: false, error: message,
- meta: {
- requestId: context.requestId || 'unknown',
+ meta: {, requestId: context.requestId || 'unknown',
  timestamp: new Date().toISOString(); processingTime: context.startTime ? Date.now() - context.startTime : 0, encoding: context.encoding || 'json',
  version: '2.0.0',
  },
@@ -333,7 +327,7 @@ export class UnifiedAPIRouter {
  path: '/api/routes',
  method: 'GET', handler: async (event, context) => {
  const routes = Array.from(this.routes.entries()).map(([key, config]) => ({
- key: path: config.path, method: config.method, auth: config.auth || false,
+ key: path, config.path, method: config.method, auth: config.auth || false,
  rateLimit: !!config.rateLimit,
  cache: !!config.cache,
  }));
@@ -348,8 +342,7 @@ export interface RateLimitTracker {
  requests: number[], windowMs: number;
 };
 export interface CachedResponse {
- body: ArrayBuffer, status: number;
- headers: Record<string, string>;
+ body: ArrayBuffer, status: number;, headers: Record<string, string>;
  expiresAt: number;
 };
 class ServiceRegistry {
@@ -376,8 +369,7 @@ class ServiceRegistry {
  }
 };
 export interface ServiceInfo {
- name: string, url: string;
- protocol: 'http' | 'https' | 'grpc' | 'quic' | 'websocket';
+ name: string, url: string;, protocol: 'http' | 'https' | 'grpc' | 'quic' | 'websocket';
  version: string;
  health?: string;
 };
@@ -404,8 +396,7 @@ export function createAPIResponse<T>(
  return {
  success: success ? data  | undefined: success ? undefined : (data as any),
  message,
- meta: {
- requestId: 'unknown',
+ meta: {, requestId: 'unknown',
  timestamp: new Date().toISOString(); processingTime: 0,
  encoding: 'json',
  version: '2.0.0',

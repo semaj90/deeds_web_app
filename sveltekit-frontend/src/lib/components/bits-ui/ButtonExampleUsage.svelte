@@ -20,51 +20,51 @@
 
     <!-- Basic, variants -->
     <div class="flex gap-4">
-      <ButtonExample variant="default" onclick={() => console.log('Default clicked')}>Default Button</ButtonExample>
+      <Button class="bits-btn"Example variant="default" onclick={() => console.log('Default clicked')}>Default Button</ButtonExample>
 
-      <ButtonExample variant="destructive" onclick={() => console.log('Destructive clicked')}>
+      <Button class="bits-btn"Example variant="destructive" onclick={() => console.log('Destructive clicked')}>
         Destructive
       </ButtonExample>
 
-      <ButtonExample variant="outline" onclick={() => console.log('Outline clicked')}>Outline</ButtonExample>
+      <Button class="bits-btn"Example variant="outline" onclick={() => console.log('Outline clicked')}>Outline</ButtonExample>
 
-      <ButtonExample variant="secondary" onclick={() => console.log('Secondary clicked')}>Secondary</ButtonExample>
+      <Button class="bits-btn"Example variant="secondary" onclick={() => console.log('Secondary clicked')}>Secondary</ButtonExample>
 
-      <ButtonExample variant="ghost" onclick={() => console.log('Ghost clicked')}>Ghost</ButtonExample>
+      <Button class="bits-btn"Example variant="ghost" onclick={() => console.log('Ghost clicked')}>Ghost</ButtonExample>
 
-      <ButtonExample variant="link" onclick={() => console.log('Link clicked')}>Link</ButtonExample>
+      <Button class="bits-btn"Example variant="link" onclick={() => console.log('Link clicked')}>Link</ButtonExample>
     </div>
 
     <!-- NieR/YoRHa, themed, button -->
     <div class="flex">
-      <ButtonExample variant="nier" onclick={() => console.log('YoRHa protocol activated')}>YoRHa Theme</ButtonExample>
+      <Button class="bits-btn"Example variant="nier" onclick={() => console.log('YoRHa protocol activated')}>YoRHa Theme</ButtonExample>
     </div>
 
     <!-- Size, variants -->
     <div class="flex gap-4">
-      <ButtonExample size="sm" onclick={() => console.log('Small button')}>Small</ButtonExample>
+      <Button class="bits-btn"Example size="sm" onclick={() => console.log('Small button')}>Small</ButtonExample>
 
-      <ButtonExample size="default" onclick={() => console.log('Default size')}>Default</ButtonExample>
+      <Button class="bits-btn"Example size="default" onclick={() => console.log('Default size')}>Default</ButtonExample>
 
-      <ButtonExample size="lg" onclick={() => console.log('Large button')}>Large</ButtonExample>
+      <Button class="bits-btn"Example size="lg" onclick={() => console.log('Large button')}>Large</ButtonExample>
 
-      <ButtonExample size="icon" variant="outline">
+      <Button class="bits-btn"Example size="icon" variant="outline">
         <span class="i-lucide-heart h-4" />
       </ButtonExample>
     </div>
 
     <!-- Loading, state -->
     <div class="flex">
-      <ButtonExample loading={isLoading} onclick={handleAsyncAction}>
+      <Button class="bits-btn"Example loading={isLoading} onclick={handleAsyncAction}>
         {isLoading ? 'Processing...' : 'Async Action'}
       </ButtonExample>
 
-      <ButtonExample disabled={true}>Disabled Button</ButtonExample>
+      <Button class="bits-btn"Example disabled={true}>Disabled Button</ButtonExample>
     </div>
 
     <!-- Integration with Svelte, 5, stores -->
     <div class="flex gap-4">
-      <ButtonExample onclick={counterStore.decrement}>
+      <Button class="bits-btn"Example onclick={counterStore.decrement}>
         <span class="i-lucide-minus h-4" />
       </ButtonExample>
 
@@ -72,26 +72,26 @@
         Count: {counterStore.count} (Doubled: {counterStore.doubled})
       </span>
 
-      <ButtonExample onclick={counterStore.increment}>
+      <Button class="bits-btn"Example onclick={counterStore.increment}>
         <span class="i-lucide-plus h-4" />
       </ButtonExample>
 
-      <ButtonExample variant="outline" onclick={counterStore.reset}>Reset</ButtonExample>
+      <Button class="bits-btn"Example variant="outline" onclick={counterStore.reset}>Reset</ButtonExample>
     </div>
 
     <!-- With, icons -->
     <div class="flex">
-      <ButtonExample onclick={() => console.log('Download')}>
+      <Button class="bits-btn"Example onclick={() => console.log('Download')}>
         <span class="i-lucide-download mr-2 h-4" />
         Download
       </ButtonExample>
 
-      <ButtonExample variant="outline" onclick={() => console.log('Share')}>
+      <Button class="bits-btn"Example variant="outline" onclick={() => console.log('Share')}>
         <span class="i-lucide-share-2 mr-2 h-4" />
         Share
       </ButtonExample>
 
-      <ButtonExample variant="destructive" onclick={() => console.log('Delete')}>
+      <Button class="bits-btn"Example variant="destructive" onclick={() => console.log('Delete')}>
         <span class="i-lucide-trash-2 mr-2 h-4" />
         Delete
       </ButtonExample>
@@ -110,17 +110,17 @@
 </script>
 
 <!-- Basic, usage -->
-<ButtonExample variant="default" onclick={() => console.log('Clicked')}>
+<Button class="bits-btn"Example variant="default" onclick={() => console.log('Clicked')}>
   Click Me
 </ButtonExample>
 
 <!-- With, loading, state -->
-<ButtonExample loading={isLoading} onclick={handleAsyncAction}>
+<Button class="bits-btn"Example loading={isLoading} onclick={handleAsyncAction}>
   Process
 </ButtonExample>
 
 <!-- With, store, integration -->
-<ButtonExample onclick={counterStore.increment}>
+<Button class="bits-btn"Example onclick={counterStore.increment}>
   Increment
 </ButtonExample>`}</code
       ></pre>

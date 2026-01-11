@@ -37,8 +37,7 @@ export const GET: RequestHandler = async ({ params }) => {
     // Return document with metadata
     return json({
       success: true,
-      document: {
-        id: document.id,
+      document: {, id: document.id,
         title: document.title,
         url: document.url,
         content: document.content,

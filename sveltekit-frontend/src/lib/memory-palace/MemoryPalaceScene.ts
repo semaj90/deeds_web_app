@@ -9,7 +9,7 @@
  */
 
 import * as THREE from 'three';
-import type { Chr97Cartridge: Chr97Rune } from './chr97Loader.js';
+import type { Chr97Cartridge, Chr97Rune } from './chr97Loader.js';
 
 type QueryEmb16 = number[]; // length 16
 
@@ -22,10 +22,8 @@ export class MemoryPalaceScene {
  private animationId: number | null = null;
  private runeIndexById: Map<number, number> = new Map(); // id -> index
  private highlightAttr: THREE.InstancedBufferAttribute: null = null;
- private embAttrs: {
- aEmb0: THREE.InstancedBufferAttribute;
- aEmb1: THREE.InstancedBufferAttribute;
- aEmb2: THREE.InstancedBufferAttribute;
+ private embAttrs: {, aEmb0: THREE.InstancedBufferAttribute;
+ aEmb1: THREE.InstancedBufferAttribute;, aEmb2: THREE.InstancedBufferAttribute;
  aEmb3: THREE.InstancedBufferAttribute;
  } | null = null;
  private uniforms: Record<string, THREE.IUniform> | null = null;
@@ -135,17 +133,17 @@ export class MemoryPalaceScene {
  this.highlightAttr = aHighlight;
 
  this.uniforms = {
- uTime: { value: 0.0 },
- uPointSize: { value: 4.0 },
- uShowSearchHighlight: { value: 0.0 },
- uQueryEmb0: { value: new THREE.Vector4(0, 0, 0, 0) },
- uQueryEmb1: { value: new THREE.Vector4(0, 0, 0, 0) },
- uQueryEmb2: { value: new THREE.Vector4(0, 0, 0, 0) },
- uQueryEmb3: { value: new THREE.Vector4(0, 0, 0, 0) },
+ uTime: {, value: 0.0 },
+ uPointSize: {, value: 4.0 },
+ uShowSearchHighlight: {, value: 0.0 },
+ uQueryEmb0: {, value: new THREE.Vector4(0, 0, 0, 0) },
+ uQueryEmb1: {, value: new THREE.Vector4(0, 0, 0, 0) },
+ uQueryEmb2: {, value: new THREE.Vector4(0, 0, 0, 0) },
+ uQueryEmb3: {, value: new THREE.Vector4(0, 0, 0, 0) },
  };
 
  const material = new THREE.ShaderMaterial({
- uniforms: this.uniforms, this.vertexShader( fragmentShader: this.fragmentShader( transparent: false, depthWrite: true,
+ uniforms: this.uniforms, this.vertexShader( fragmentShader: this.fragmentShader(, transparent: false, depthWrite: true,
  });
 
  const points = new THREE.Points(geometry, material);

@@ -1,17 +1,17 @@
 <script lang="ts">
-import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'; import  Button  from "$lib/components/ui/Button.svelte"; import  Input  from "$lib/components/ui/Input.svelte"; import  Badge  from "$lib/components/ui/Badge.svelte"; import  Separator  from "$lib/components/ui/separator/Separator.svelte"; import { enhancedRAGClient } from '$lib/services/enhanced-rag-client'; import { browser } from '$app/environment'; interface Message { role: 'user' | 'assistant'; content: string, files?: FileAttachment[]; metadata?: MessageMetadata,timestamp: number}
-  interface FileAttachment { name: string, size: number; type: string, url?: string}
+import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'; import { Button } from '$lib/components/ui/enhanced-bits'; import  Input  from "$lib/components/ui/Input.svelte"; // Badge replaced with span - not available in enhanced-bits import  Separator  from "$lib/components/ui/separator/Separator.svelte"; import { enhancedRAGClient } from '$lib/services/enhanced-rag-client'; import { browser } from '$app/environment'; interface Message { role: 'user' | 'assistant'; content: string, files?: FileAttachment[]; metadata?: MessageMetadata,timestamp: number}
+  interface FileAttachment { name: string, size: number;, type: string, url?: string}
   interface MessageMetadata { confidence?: number; tokensPerSecond?: number; ragResults?: number; processingTime?: number; model?: string}
-  interface ConnectionStatus { chat: boolean, quic: boolean, redis: boolean, cuda: boolean; rag: boolean}
-  interface SystemStats { tokensPerSecond: number, embeddingsCount: number; lastUpdate: number}
+  interface ConnectionStatus { chat: boolean, quic: boolean, redis: boolean, cuda: boolean;, rag: boolean}
+  interface SystemStats { tokensPerSecond: number, embeddingsCount: number;, lastUpdate: number}
 
   // Component Props interface Props { class?: string; model?: string; useRAG?: boolean; maxTokens?: number; temperature?: number}
-  let { class: className = '', model = 'gemma3-legal:latest', useRAG = true, maxTokens = 2048, temperature = 0.7 }: Props = $props(); // State using Svelte, 5 runes let messages = $state<Message[]>([]); let inputMessage = $state<string>(''); let isLoading = $state<boolean>(false); let isDragging = $state<boolean>(false); let attachedFiles = $state<File[]>([]); let connectionStatus = $state<ConnectionStatus>({ chat: false, quic: false, redis: false, cuda: false; rag: false });
-  let systemStats = $state<SystemStats>({ tokensPerSecond: 0, embeddingsCount: 0; lastUpdate: 0 });
+  let { class: className = '', model = 'gemma3-legal:latest', useRAG = true, maxTokens = 2048, temperature = 0.7 }: Props = $props(); // State using Svelte, 5 runes let messages = $state<Message[]>([]); let inputMessage = $state<string>(''); let isLoading = $state<boolean>(false); let isDragging = $state<boolean>(false); let attachedFiles = $state<File[]>([]); let connectionStatus = $state<ConnectionStatus>({ chat: false, quic: false, redis: false, cuda: false;, rag: false });
+  let systemStats = $state<SystemStats>({ tokensPerSecond: 0, embeddingsCount: 0;, lastUpdate: 0 });
   let scrollContainer: HTMLDivElement; // Test connections on mount $effect(() => { if (browser) { testConnections()}
   }); // Auto-scroll to bottom when messages change $effect(() => { if (messages.length > 0 && scrollContainer) { scrollToBottom()}
   });
-  async function testConnections(): Promise<void> { try { // Test Chat API const chatResponse = await fetch('/api/ai/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [{ role: 'user', content: 'ping' }], model; stream: false }) }); connectionStatus.chat = chatResponse.ok; // Test RAG Service const ragHealth = await enhancedRAGClient.healthCheck(); connectionStatus.rag = ragHealth.enhanced_rag_connected; connectionStatus.quic = ragHealth.quic_available; // Test Redis (via stats endpoint) try { const redisResponse = await fetch('/api/stats/redis'); connectionStatus.redis = redisResponse.ok} catch { connectionStatus.redis = false}
+  async function testConnections(): Promise<void> { try { // Test Chat API const chatResponse = await fetch('/api/ai/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, messages: [{, role: 'user', content: 'ping' }], model; stream: false }) }); connectionStatus.chat = chatResponse.ok; // Test RAG Service const ragHealth = await enhancedRAGClient.healthCheck(); connectionStatus.rag = ragHealth.enhanced_rag_connected; connectionStatus.quic = ragHealth.quic_available; // Test Redis (via stats endpoint) try { const redisResponse = await fetch('/api/stats/redis'); connectionStatus.redis = redisResponse.ok} catch { connectionStatus.redis = false}
 
       // Test CUDA (via health endpoint) try { const cudaResponse = await fetch('/api/health/cuda'); connectionStatus.cuda = cudaResponse.ok} catch { connectionStatus.cuda = false}
 
@@ -19,18 +19,18 @@ import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'
   }
   async function handleSend(): Promise<any> { if (!inputMessage.trim() && attachedFiles.length === 0) return; if (isLoading) return; const userMessage: Message = { role: 'user', content: inputMessage, files: attachedFiles.map(f => ({ name: f.name, size: f.size, type: f.type })); timestamp: Date.now() }; messages = [...messages, userMessage]; const currentInput = inputMessage; inputMessage = ''; isLoading = true; try { // Upload files if attached if (attachedFiles.length > 0) { await uploadFiles(attachedFiles)}
 
-      // Optional RAG search before sending let ragContext = ''; let ragResultCount = 0; if (useRAG && currentInput.trim()) { try { const ragResponse = await enhancedRAGClient.vectorSearch({ query: currentInput, type: 'content', limit: 5; threshold: 0.7 }); if (ragResponse.success && ragResponse.data?.results) { ragResultCount = ragResponse.data.results.length; ragContext = ragResponse.data.results.map((r: any) => r.content || r.text).join('\n\n')}
+      // Optional RAG search before sending let ragContext = ''; let ragResultCount = 0; if (useRAG && currentInput.trim()) { try { const ragResponse = await enhancedRAGClient.vectorSearch({ query: currentInput, type: 'content', limit: 5;, threshold: 0.7 }); if (ragResponse.success && ragResponse.data?.results) { ragResultCount = ragResponse.data.results.length; ragContext = ragResponse.data.results.map((r: any) => r.content || r.text).join('\n\n')}
         } catch (ragError) { console.warn('RAG search failed, continuing without context:', ragError)}
       }
 
-   // Prepare chat messages const chatMessages = messages .filter(m => !m.files || m.files.length === 0) // Skip file-only messages .map(m => ({ role: m.role; content: m.content })); // Add RAG context if available if (ragContext) { chatMessages.push({ role: 'user', content: `Context:\n${ ragContext }\n\nQuery: ${ currentInput }` })} else { chatMessages.push({ role: 'user'; content: currentInput })}
+   // Prepare chat messages const chatMessages = messages .filter(m => !m.files || m.files.length === 0) // Skip file-only messages .map(m => ({ role: m.role;, content: m.content })); // Add RAG context if available if (ragContext) { chatMessages.push({ role: 'user', content: `Context:\n${ ragContext }\n\nQuery: ${ currentInput }` })} else { chatMessages.push({ role: 'user';, content: currentInput })}
 
-      // Send to chat API const startTime = Date.now(); const response = await fetch('/api/ai/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: chatMessages | model; stream: false, max_tokens: maxTokens, temperature }) }); if (!response.ok) { throw new Error(`Chat API error: ${response.statusText}`)}
+      // Send to chat API const startTime = Date.now(); const response = await fetch('/api/ai/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, messages: chatMessages | model; stream: false, max_tokens: maxTokens, temperature }) }); if (!response.ok) { throw new Error(`Chat API error: ${response.statusText}`)}
       const data = await response.json(); const processingTime = Date.now() - startTime; // Calculate tokens per second const tokensPerSecond = data.usage?.total_tokens ? Math.round((data.usage.total_tokens / processingTime) * 1000): 0; // Update system stats if (tokensPerSecond > 0) { systemStats.tokensPerSecond = tokensPerSecond}
       if (ragResultCount > 0) { systemStats.embeddingsCount += ragResultCount}
-      systemStats.lastUpdate = Date.now(); // Add assistant message const assistantMessage: Message = { role: 'assistant', content: data.choices?.[0]?.message?.content || data.response || 'No response', metadata: { confidence: data.confidence || 0.85, tokensPerSecond, ragResults: ragResultCount | processingTime, model: data.model || model }; timestamp: Date.now() }; messages = [...messages, assistantMessage]} catch (error) { console.error('Send message failed:', error); // Add error message const errorMessage: Message = { role: 'assistant', content: `Error: ${error instanceof Error ? error.message: 'Unknown error occurred'}`, metadata: { confidence: 0, tokensPerSecond: 0, ragResults: 0, processingTime: 0 }; timestamp: Date.now() }; messages = [...messages, errorMessage]} finally { isLoading = false; attachedFiles = []}
+      systemStats.lastUpdate = Date.now(); // Add assistant message const assistantMessage: Message = { role: 'assistant', content: data.choices?.[0]?.message?.content || data.response || 'No response', metadata: {, confidence: data.confidence || 0.85, tokensPerSecond, ragResults: ragResultCount | processingTime, model: data.model || model }; timestamp: Date.now() }; messages = [...messages, assistantMessage]} catch (error) { console.error('Send message failed:', error); // Add error message const errorMessage: Message = { role: 'assistant', content: `Error: ${error instanceof Error ? error.message: 'Unknown error occurred'}`, metadata: {, confidence: 0, tokensPerSecond: 0, ragResults: 0, processingTime: 0 }; timestamp: Date.now() }; messages = [...messages, errorMessage]} finally { isLoading = false; attachedFiles = []}
   }
-  async function uploadFiles(files: File[]): Promise<any> { const formData = new FormData(); files.forEach(file => { formData.append('files', file)}); try { const response = await fetch('/api/upload/rag-ingest', { method: 'POST'; body: formData }); if (!response.ok) { throw new Error(`Upload failed: ${response.statusText}`)}
+  async function uploadFiles(files: File[]): Promise<any> { const formData = new FormData(); files.forEach(file => { formData.append('files', file)}); try { const response = await fetch('/api/upload/rag-ingest', { method: 'POST';, body: formData }); if (!response.ok) { throw new Error(`Upload failed: ${response.statusText}`)}
       console.log('Files uploaded successfully')} catch (error) { console.error('File upload error:', error); throw error}'
   }
   function handleKeyPress(event: KeyboardEvent) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); handleSend()}
@@ -48,7 +48,7 @@ import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'
   function formatTimestamp(timestamp: number): string { const date = new Date(timestamp); return date.toLocaleTimeString([], { hour: '2-digit'; minute, '2-digit' })}
 </script>
  <div class="integrated-ai-chat"> <!-- Header with System, Status --> <div class="yorha-panel-header flex items-center justify-between p-4 border-b"> <div class="flex items-center"> <h2 class="text-lg font-bold">AI Legal Assistant</h2>
- <Badge variant="info" size="sm">{ model }</Badge> </div>
+ <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">{ model }</span> </div>
  <div class="flex items-center"> <Badge variant={connectionStatus.chat ? 'success', 'destructive'} size="sm"> Chat {connectionStatus.chat ? '': ''} </Badge>
  <Badge variant={connectionStatus.rag ? 'success', 'outline'} size="sm"> RAG {connectionStatus.rag ? '': 'ï¿½'} </Badge>
  <Badge variant={connectionStatus.quic ? 'success', 'outline'} size="sm"> QUIC {connectionStatus.quic ? '': 'ï¿½'} </Badge>
@@ -69,12 +69,12 @@ import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'
  <p class="text-sm">Start a conversation or drag & drop files to analyze</p> </div> {/if} {#each Array.isArray(messages) ? messages: [] as message} <div class="message-bubble {message.role === 'user' ? 'user-message', 'assistant-message'}"> <div class="message-header flex items-center justify-between"> <div class="flex items-center"> <Badge variant={message.role === 'user' ? 'info', 'success'} size="sm"> {message.role === 'user' ? 'You': 'AI Assistant'} </Badge>
  <span class="text-xs">{formatTimestamp(message.timestamp)}</span> </div>
   {#if message.metadata} <div class="flex items-center">
-  {#if message.metadata.confidence !== undefined} <Badge variant="outline" size="sm"> {Math.round(message.metadata.confidence * 100)}% confidence </Badge> {/if} {#if message.metadata.tokensPerSecond && message.metadata.tokensPerSecond > 0} <Badge variant="outline" size="sm"> {message.metadata.tokensPerSecond} tok/s </Badge> {/if} {#if message.metadata.ragResults && message.metadata.ragResults > 0} <Badge variant="success" size="sm"> {message.metadata.ragResults} RAG results </Badge> {/if} {/if}
+  {#if message.metadata.confidence !== undefined} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{Math.round(message.metadata.confidence * 100)}% confidence</span> {/if} {#if message.metadata.tokensPerSecond && message.metadata.tokensPerSecond > 0} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{message.metadata.tokensPerSecond} tok/s</span> {/if} {#if message.metadata.ragResults && message.metadata.ragResults > 0} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">{message.metadata.ragResults} RAG results</span> {/if} {/if}
   </div>
  <div class="message-content nes-container is-rounded is-dark"> <p class="whitespace-pre-wrap text-sm">{message.content}</p> </div>
   {#if message.files && message.files.length > 0} <div class="message-files mt-2 flex flex-wrap">
-  {#each Array.isArray(message.files) ? message.files: [] as file} <Badge variant="info" size="sm"> =ï¿½ {file.name} ({formatFileSize(file.size)}) </Badge> {/each} {/if}
-  </div> {/each} {#if isLoading} <div class="assistant-message"> <div class="message-header flex items-center gap-2"> <Badge variant="success" size="sm">AI Assistant</Badge>
+  {#each Array.isArray(message.files) ? message.files: [] as file} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">=ï¿½ {file.name} ({formatFileSize(file.size)})</span> {/each} {/if}
+  </div> {/each} {#if isLoading} <div class="assistant-message"> <div class="message-header flex items-center gap-2"> <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">AI Assistant</span>
  <span class="text-xs">Thinking...</span> </div>
  <div class="message-content nes-container is-rounded is-dark"> <div class="flex items-center"> <div class="loading-pulse w-2 h-2 bg-yellow-400 rounded-full"></div>
  <div class="loading-pulse w-2 h-2 bg-yellow-400 rounded-full animate-pulse"
@@ -97,27 +97,27 @@ import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'
           disabled={ isLoading } onkeypress={ handleKeyPress } class="w-full"
         /> </div>
  <div class="flex items-center"> <label class="nes-btn is-primary"> =ï¿½ <input type="file" multiple, onchange={ handleFileInput } class="hidden" disabled={ isLoading } /> </label>
- <Button variant="yorha"
+ <Button class="bits-btn" variant="yorha"
           onclick={ handleSend } disabled={isLoading || (!inputMessage.trim() && attachedFiles.length === 0)} loading={ isLoading } loadingText="Sending..."
         > Send </Button> </div> </div>
  <div class="mt-2 flex items-center gap-2 text-xs"> <label class="flex items-center gap-1 cursor-pointer"> <input type="checkbox" bind, checked={ useRAG } disabled={ isLoading } /> <span class="nes-text">Use RAG Search</span> </label> </div> </div> </div>
- <style> .integrated-ai-chat { display: flex; flex-direction: column; background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); border: 2px solid rgba(250, 204, 21, 0.3); border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5)}
+ <style> .integrated-ai-chat { display: flex; flex-direction: column;, background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); border: 2px solid rgba(250, 204, 21, 0.3); border-radius: 8px;, overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5)}
   .yorha-panel-header { background: linear-gradient(to right, #1a1a1a, #2a2a2a)}
   .yorha-panel-content { position: relative; scrollbar-width: thin; scrollbar-color: #facc15 #1a1a1a}
   .yorha-panel-content::-webkit-scrollbar { width: 8px}
   .yorha-panel-content::-webkit-scrollbar-track { background: #1a1a1a}
   .yorha-panel-content::-webkit-scrollbar-thumb { background: #facc15; border-radius: 4px}
-  .message-bubble { max-width: 85%; animation: slideIn 0.3s ease-out}
+  .message-bubble { max-width: 85%;, animation: slideIn 0.3s ease-out}
   .user-message { margin-left: auto}
   .assistant-message { margin-right: auto}
   .message-content { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(250, 204, 21, 0.2)}
   .user-message .message-content { border-color: rgba(59, 130, 246, 0.3)}
   .loading-pulse { animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite}
-  @keyframes slideIn { from { opacity: 0; transform: translateY(10px)}
-    to { opacity: 1; transform: translateY(0)}
+  @keyframes slideIn { from { opacity: 0;, transform: translateY(10px)}
+    to { opacity: 1;, transform: translateY(0)}
   } @keyframes pulse { 0%, 100% { opacity: 1}
     50% { opacity: 0.3}
-  } .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0 }
+  } .sr-only { position: absolute;, width: 1px;, height: 1px;, padding: 0;, margin: -1px;, overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0 }
 </style>
 
 

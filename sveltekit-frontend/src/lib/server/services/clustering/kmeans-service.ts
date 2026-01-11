@@ -4,24 +4,20 @@
  */
 
 export interface KMeansConfig {
- k: number;
- maxIterations: number;
+ k: number;, maxIterations: number;
  tolerance: number;
 }
 
 export interface KMeansCluster {
- id: number;
- centroid: number[];
+ id: number;, centroid: number[];
  members: string[];
  label?: string;
  avgConfidence?: number;
 }
 
 export interface ClusterAssignment {
- statuteId: string;
- clusterId: number;
- label: string;
- confidence: number;
+ statuteId: string;, clusterId: number;
+ label: string;, confidence: number;
  flaggedForReview: boolean;
 }
 
@@ -82,7 +78,7 @@ function initializeCentroids(data: number[][], k: number): number[][] {
 function assignToClusters(
  data: number[][],
  centroids: number[][]
-): { assignments: number[]; distances: number[] } {
+): {, assignments: number[]; distances: number[] } {
  const assignments: number[] = [];
  const distances: number[] = [];
 
@@ -218,7 +214,7 @@ export async function runKMeans(
  * Assign statutes to clusters with confidence
  */
 export async function assignStatutesToClusters(
- statutes: Array<{ id: string; embedding?: number[] }>,
+ statutes: Array<{, id: string; embedding?: number[] }>,
  clusters: KMeansCluster[],
  confidenceThreshold: number = 0.7
 ): Promise<ClusterAssignment[]> {
@@ -260,7 +256,7 @@ export async function assignStatutesToClusters(
  */
 export async function generateClusterLabels(
  clusters: KMeansCluster[],
- statutes: Array<{ id: string; heading?: string; text?: string }>
+ statutes: Array<{, id: string; heading?: string; text?: string }>
 ): Promise<Map<number, string>> {
  const labels = new Map<number, string>();
 
@@ -288,13 +284,11 @@ export async function generateClusterLabels(
  * Calculate cluster quality metrics
  */
 export function calculateClusterQuality(
- statutes: Array<{ id: string; embedding?: number[] }>,
+ statutes: Array<{, id: string; embedding?: number[] }>,
  assignments: ClusterAssignment[],
  clusters: KMeansCluster[]
-): {
- silhouetteScore: number;
- daviesBouldinIndex: number;
- avgConfidence: number;
+): {, silhouetteScore: number;
+ daviesBouldinIndex: number;, avgConfidence: number;
 } {
  let silhouetteSum = 0;
  let daviesBouldinSum = 0;
@@ -353,10 +347,8 @@ export function calculateClusterQuality(
 /**
  * Get cluster statistics
  */
-export function getClusterStats(clusters: KMeansCluster[]): {
- clusterSizes: number[];
- avgClusterSize: number;
- minClusterSize: number;
+export function getClusterStats(clusters: KMeansCluster[]): {, clusterSizes: number[];
+ avgClusterSize: number;, minClusterSize: number;
  maxClusterSize: number;
 } {
  const clusterSizes = clusters.map((c) => c.members.length);

@@ -10,16 +10,15 @@
 
   // Define buttonVariants
   const buttonVariants = cva(
-    'inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none nes-focus disabled:opacity-50 disabled:pointer-events-none cursor-pointer',
+    'inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none nes-focus disabled: opacity-50, disabled:pointer-events-none cursor-pointer',
     {
-      variants: {
-        variant: {
+      variants: {, variant: {
           default: 'btn-nes-primary',
           destructive: 'btn-nes-danger',
-          outline: 'border-2 border-gray-400 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800',
+          outline: 'border-2 border-gray-400 bg-transparent hover: bg-gray-100, dark: hover, bg-gray-800',
           secondary: 'btn-nes-secondary',
-          ghost: 'hover:bg-gray-100 dark:hover:bg-gray-800 rounded-none',
-          link: 'text-blue-500 underline-offset-4 hover:underline hover:text-blue-600',
+          ghost: 'hover:bg-gray-100, dark: hover, bg-gray-800 rounded-none',
+          link: 'text-blue-500 underline-offset-4 hover: underline, hover:text-blue-600',
           legal: 'nes-legal-priority-medium yorha-3d-button',
           evidence: 'nes-legal-priority-critical yorha-3d-button',
           caseItem: 'nes-legal-priority-high yorha-3d-button',
@@ -27,8 +26,7 @@
           yorha: 'yorha-3d-button bg-black/80 text-yellow-400 border-2 border-yellow-400',
           neural: 'neural-sprite-active bg-gradient-to-r from-purple-600 to-blue-600 text-white border-2 border-purple-400'
         },
-        size: {
-          default: 'h-10 px-4 py-2',
+        size: {, default: 'h-10 px-4 py-2',
           sm: 'h-9 rounded-md px-3',
           lg: 'h-11 rounded-md px-8',
           icon: 'h-8 w-8',
@@ -37,8 +35,7 @@
           xs: 'h-8 rounded px-2 text-xs'
         }
       },
-      defaultVariants: {
-        variant: 'default',
+      defaultVariants: {, variant: 'default',
         size: 'default'
       }
     }
@@ -97,9 +94,8 @@
   }: BitsButtonProps = $props();
 
   const dispatch = createEventDispatcher<{
-    click: MouseEvent;
-    analytics: ButtonAnalyticsEvent;
-    cache: { key: string; action: string };
+    click: MouseEvent;, analytics: ButtonAnalyticsEvent;
+    cache: {, key: string; action: string };
   }>();
 
   let isDisabled = $derived(disabled || loading);

@@ -11,14 +11,10 @@
 		updateInterval?: number}
 	let { showOverlay = false, autoHide = true, updateInterval = 1000 }: Props = $props();
 	interface PerformanceMetrics {
-		fps: number
-		memoryUsage: number
-		cpuUsage: number
-		gpuUsage: number
-		webGPUActive: boolean
-		activeOperations: number
-		responseTime: number
-		timestamp: number}
+		fps: number, memoryUsage: number
+		cpuUsage: number, gpuUsage: number
+		webGPUActive: boolean, activeOperations: number
+		responseTime: number, timestamp: number}
 	const metrics = writable<PerformanceMetrics>({ fps: 0,
 		memoryUsage: 0,
 		cpuUsage: 0,

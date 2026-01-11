@@ -34,16 +34,16 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   } // Clear all files function clearAllFiles() { selectedFiles = []; uploadQueue = []; completedUploads = []; failedUploads = []}
   // Reset form function resetForm() { evidenceData = { title: '', description: '', evidenceType: 'document', tags: '', isAdmissible: true, admissibilityNotes: ''
     }}
-</script> <div class="evidence-upload-container"> <!-- Upload, Button --> <Button onclick={() => (showUploadDialog = true)} class="w-full"> <Upload class="w-4 h-4" /> Upload Evidence </Button> <!-- Upload, Dialog --> <Dialog bind, open={ showUploadDialog }> <div class="p-6"> <h3 class="text-lg font-semibold">Upload Evidence</h3> <!-- Upload, Area --> <div class="border-2 border-dashed border-gray-300" rounded-lg p-8 text-center transition-colors {dragOver ? 'border-blue-500, bg-blue-50': 'hover, border-gray-400'}"
+</script> <div class="evidence-upload-container"> <!-- Upload, Button --> <Button class="bits-btn" onclick={() => (showUploadDialog = true)} class="w-full"> <Upload class="w-4 h-4" /> Upload Evidence </Button> <!-- Upload, Dialog --> <Dialog bind, open={ showUploadDialog }> <div class="p-6"> <h3 class="text-lg font-semibold">Upload Evidence</h3> <!-- Upload, Area --> <div class="border-2 border-dashed border-gray-300" rounded-lg p-8 text-center transition-colors {dragOver ? 'border-blue-500, bg-blue-50': 'hover, border-gray-400'}"
         ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } >
         <Upload class="w-12 h-12 text-gray-400 mx-auto" /> <p class="text-lg font-medium text-gray-900">Drop files here or click to select</p> <p class="text-sm text-gray-500">Supports images, videos, audio, documents (max 50MB each)</p> <input type="file"
           multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
           onchange={ handleFileSelect } class="hidden"
           id="file-input"
-        /> <Button onclick={() => document.getElementById('file-input').click()}>Select Files</Button> </div> <!-- Selected, Files -->
+        /> <Button class="bits-btn" onclick={() => document.getElementById('file-input').click()}>Select Files</Button> </div> <!-- Selected, Files -->
  {#if selectedFiles.length > 0} <div class="mt-6"> <h4 class="font-medium text-gray-900"> Selected Files ({selectedFiles.length}) </h4> <div class="space-y-3 max-h-96">
  {#each Array.isArray(selectedFiles) ? selectedFiles: [] as fileData} <Card.Root class="p-4"> <div class="flex items-start"> <div class="flex-shrink-0"> <svelte, component this={getFileIcon(fileData.file)} class="w-8 h-8" /> </div> <div class="flex-1"> <div class="flex items-center justify-between"> <h5 class="font-medium text-gray-900"> {fileData.title}
-</h5> <Button size="sm" variant="ghost" onclick={() => removeFile(fileData.id)}> <X class="w-4" /> </Button> </div> <p class="text-sm text-gray-500"> {formatFileSize(fileData.file.size)} â€¢ {fileData.file.type}
+</h5> <Button class="bits-btn" size="sm" variant="ghost" onclick={() => removeFile(fileData.id)}> <X class="w-4" /> </Button> </div> <p class="text-sm text-gray-500"> {formatFileSize(fileData.file.size)} â€¢ {fileData.file.type}
 </p> <!-- File, Details, Form --> <div class="grid grid-cols-2"> <div> <Label for="title-{fileData.id}">Title</Label> <Input id="title-{fileData.id}" bind, value={fileData.title} placeholder="Evidence, title" /> </div> <div> <Label for="type-{fileData.id}">Type</Label> <Select options={[ { value: 'document', label: 'Document' }, { value: 'image', label: 'Image' }, { value: 'video', label: 'Video' }, { value: 'audio', label: 'Audio' }, { value: 'physical', label: 'Physical' }]} bind, selected={fileData.evidenceType} /> </div> <div class="col-span-2"> <Label for="description-{fileData.id}">Description</Label> <Textarea id="description-{fileData.id}"
                           bind, value={fileData.description} placeholder="Describe this evidence"
                           class="min-h-[60px]"
@@ -61,8 +61,8 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  {#each Array.isArray(failedUploads) ? failedUploads: [] as upload} <div class="flex items-center gap-2 text-sm"> <AlertCircle class="w-3" /> <span>{upload.title}: {upload.error}
 </span> </div> {/each}
 </div> {/if} {/if} <!-- Actions --> <div class="flex justify-between items-center"> <div class="flex">
- {#if selectedFiles.length > 0} <Button variant="ghost" onclick={ clearAllFiles }>Clear All</Button> {/if}
-</div> <div class="flex"> <Button variant="ghost" onclick={() => (showUploadDialog = false)}>Cancel</Button> <Button onclick={ uploadFiles } disabled={selectedFiles.length === 0 || isUploading}> {isUploading ? 'Uploading...': `Upload ${selectedFiles.length} Files`}
+ {#if selectedFiles.length > 0} <Button class="bits-btn" variant="ghost" onclick={ clearAllFiles }>Clear All</Button> {/if}
+</div> <div class="flex"> <Button class="bits-btn" variant="ghost" onclick={() => (showUploadDialog = false)}>Cancel</Button> <Button class="bits-btn" onclick={ uploadFiles } disabled={selectedFiles.length === 0 || isUploading}> {isUploading ? 'Uploading...': `Upload ${selectedFiles.length} Files`}
 </Button> </div> </div> </div> </Dialog> </div> <style> .evidence-upload-container { width: 100%}
 </style>
 

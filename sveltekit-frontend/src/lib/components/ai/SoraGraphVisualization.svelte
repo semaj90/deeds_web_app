@@ -79,25 +79,25 @@ https, //svelte.dev/e/js_parse_error -->
   let reranker: LegalAIReranker | null = null
   // Theme configurations
   const themes = {
-    dark: { backgroundColor: '#1a1a1a'; nodeColors: { document: '#4CAF50', caseItem: '#2196F3', evidence: '#FF5722', entity: '#9C27B0', concept: '#FFC107', relationship: '#607D8B' },
-      edgeColors: { cites: '#FF9800', contains: '#8BC34A', related: '#03DAC6', similar: '#E91E63', references: '#00BCD4'; contradicts: '#F44336' }
+    dark: {, backgroundColor: '#1a1a1a';, nodeColors: {, document: '#4CAF50', caseItem: '#2196F3', evidence: '#FF5722', entity: '#9C27B0', concept: '#FFC107', relationship: '#607D8B' },
+      edgeColors: {, cites: '#FF9800', contains: '#8BC34A', related: '#03DAC6', similar: '#E91E63', references: '#00BCD4';, contradicts: '#F44336' }
     },
-    light: { backgroundColor: '#ffffff'; nodeColors: { document: '#2E7D32', caseItem: '#1565C0', evidence: '#D32F2F', entity: '#7B1FA2', concept: '#F57C00', relationship: '#455A64' },
-      edgeColors: { cites: '#E65100', contains: '#558B2F', related: '#00695C', similar: '#AD1457', references: '#0097A7'; contradicts: '#C62828' }
+    light: {, backgroundColor: '#ffffff';, nodeColors: {, document: '#2E7D32', caseItem: '#1565C0', evidence: '#D32F2F', entity: '#7B1FA2', concept: '#F57C00', relationship: '#455A64' },
+      edgeColors: {, cites: '#E65100', contains: '#558B2F', related: '#00695C', similar: '#AD1457', references: '#0097A7';, contradicts: '#C62828' }
     },
-    legal: { backgroundColor: '#0f1419'; nodeColors: { document: '#4a9eff', caseItem: '#ff6b35', evidence: '#f7931e', entity: '#c77dff', concept: '#06ffa5', relationship: '#87ceeb' },
-      edgeColors: { cites: '#ff9f40', contains: '#4bc0c0', related: '#ff6384', similar: '#36a2eb', references: '#9966ff'; contradicts: '#ff4757' }
+    legal: {, backgroundColor: '#0f1419';, nodeColors: {, document: '#4a9eff', caseItem: '#ff6b35', evidence: '#f7931e', entity: '#c77dff', concept: '#06ffa5', relationship: '#87ceeb' },
+      edgeColors: {, cites: '#ff9f40', contains: '#4bc0c0', related: '#ff6384', similar: '#36a2eb', references: '#9966ff';, contradicts: '#ff4757' }
     }
   };
 
   const currentTheme = themes[theme] ?? themes.legal
   // Default configs merged with user config (keep plain objects to avoid type errors)
   const traversalConfig = {
-    maxDepth: 5; maxNodes: 100,
-    scoreThreshold: 0.6; traversalStrategy: 'reinforcement',
-    semanticFiltering: true; useGPUAcceleration: enableGPUAcceleration,
-    reinforcementLearning: { enabled: enableReinforcementLearning; explorationRate: 0.1,
-      learningRate: 0.01; discountFactor: 0.95
+    maxDepth: 5;, maxNodes: 100,
+    scoreThreshold: 0.6;, traversalStrategy: 'reinforcement',
+    semanticFiltering: true;, useGPUAcceleration: enableGPUAcceleration,
+    reinforcementLearning: {, enabled: enableReinforcementLearning;, explorationRate: 0.1,
+      learningRate: 0.01;, discountFactor: 0.95
     },
     ...config
   };
@@ -105,17 +105,17 @@ https, //svelte.dev/e/js_parse_error -->
   const visualizationConfig = {
     width,
     height,
-    backgroundColor: currentTheme.backgroundColor; nodeColors: currentTheme.nodeColors,
-    edgeColors: currentTheme.edgeColors; nodeSize: { min: 8, max: 32 },
-    edgeThickness: { min: 1, max: 6 }; meshDimensions: { width: 100, height: 100, depth: 100 },
-    vertexCount: 10000; lodLevels: 4,
-    colorScheme: 'semantic'; layout: 'legal-context',
-    physics: { gravity: 0.1, repulsion: 100, attraction: 0.05, damping: 0.9 }; reinforcementLearning: { enabled: enableReinforcementLearning,
-      showTrainingProgress: true; highlightOptimalPaths: true,
-      showRewardHeatmap: true; qValueVisualization: true
+    backgroundColor: currentTheme.backgroundColor;, nodeColors: currentTheme.nodeColors,
+    edgeColors: currentTheme.edgeColors;, nodeSize: {, min: 8, max: 32 },
+    edgeThickness: {, min: 1, max: 6 }; meshDimensions: {, width: 100, height: 100, depth: 100 },
+    vertexCount: 10000;, lodLevels: 4,
+    colorScheme: 'semantic';, layout: 'legal-context',
+    physics: {, gravity: 0.1, repulsion: 100, attraction: 0.05, damping: 0.9 }; reinforcementLearning: {, enabled: enableReinforcementLearning,
+      showTrainingProgress: true;, highlightOptimalPaths: true,
+      showRewardHeatmap: true;, qValueVisualization: true
     },
-    useWebGL: true; useWasm: true,
-    enableCaching: true; qualityLevel: 'high',
+    useWebGL: true;, useWasm: true,
+    enableCaching: true;, qualityLevel: 'high',
     ...config
   };
   onMount(() => {
@@ -140,8 +140,8 @@ https, //svelte.dev/e/js_parse_error -->
       memoryArch = new NESMemoryArchitecture();
       semanticPipeline = new SemanticAnalysisPipeline();
       tensorStore = new DimensionalTensorStore({
-        documents: 1000; chunks: 10000,
-        representations: 100; maxLOD: 4
+        documents: 1000;, chunks: 10000,
+        representations: 100;, maxLOD: 4
       });
       somCache = new SOMWebGPUCache();
       reranker = new LegalAIReranker();
@@ -180,24 +180,24 @@ https, //svelte.dev/e/js_parse_error -->
         const viz2D = await moogleSynthesizer.synthesize2D(traversalPaths, visualizationConfig);
         visualization2D.set(viz2D);
         renderCanvas2D(viz2D);
-        dispatch('visualization', { mode: '2d'; viz: viz2D })}
+        dispatch('visualization', { mode: '2d';, viz: viz2D })}
       if (mode === '3d' || mode === 'both') {
         const viz3D = await moogleSynthesizer.synthesize3D(traversalPaths, visualizationConfig);
         visualization3D.set(viz3D);
         renderCanvas3D(viz3D);
-        dispatch('visualization', { mode: '3d'; viz: viz3D })}
-      const reinforcementStats = soraTraversal.getReinforcementStats?.() ?? { totalNodes: 0; avgVisitCount: 0 };
+        dispatch('visualization', { mode: '3d';, viz: viz3D })}
+      const reinforcementStats = soraTraversal.getReinforcementStats?.() ?? { totalNodes: 0;, avgVisitCount: 0 };
 
       const tensorStats = (await (soraTraversal.getTensorStats?.() ?? Promise.resolve({ totalSlices: 0 })));
 
-      const cacheStats = await (moogleSynthesizer.getEnhancedCacheStats?.() ?? Promise.resolve({ renderingCache: { hitRate: 0 } }));
+      const cacheStats = await (moogleSynthesizer.getEnhancedCacheStats?.() ?? Promise.resolve({ renderingCache: {, hitRate: 0 } }));
 
       const viz2 = get(visualization2D);
 
       const viz3 = get(visualization3D);
       stats.set({
-        paths: traversalPaths.length; totalNodes: reinforcementStats.totalNodes,
-        avgVisitCount: reinforcementStats.avgVisitCount; tensorSlices: tensorStats.totalSlices,
+        paths: traversalPaths.length;, totalNodes: reinforcementStats.totalNodes,
+        avgVisitCount: reinforcementStats.avgVisitCount;, tensorSlices: tensorStats.totalSlices,
         cacheHitRate: cacheStats.renderingCache?.hitRate ?? 0; renderTime: (viz2?.metadata?.renderTime ?? viz3?.metadata?.renderTime ?? 0)
       })} catch (err) {
       const message = err instanceof Error ? err.message : String(err),
@@ -224,7 +224,7 @@ https, //svelte.dev/e/js_parse_error -->
     ctx.fillStyle = visualizationConfig.backgroundColor
     ctx.fillRect(0, 0, canvas3D.width, canvas3D.height);
     renderSimple3DProjection(ctx, viz)}
-  function addInteractiveOverlays2D(ctx: CanvasRenderingContext2D; viz: Moogle2DOutput): void {
+  function addInteractiveOverlays2D(ctx: CanvasRenderingContext2D;, viz: Moogle2DOutput): void {
     const nodePositions = viz.metadata?.nodePositions ?? [];
     nodePositions.forEach((nodePos: unknown) => {
       const nodeSize = 16
@@ -233,7 +233,7 @@ https, //svelte.dev/e/js_parse_error -->
       ctx.beginPath();
       ctx.arc(nodePos.x, nodePos.y, nodeSize, 0, 2 * Math.PI);
       ctx.stroke()})}
-  function renderSimple3DProjection(ctx: CanvasRenderingContext2D; viz: Moogle3DMesh): void {
+  function renderSimple3DProjection(ctx: CanvasRenderingContext2D;, viz: Moogle3DMesh): void {
     const nodePositions = viz.metadata?.nodePositions ?? [];
     nodePositions.forEach((nodePos: unknown) => {
       const projectedX = nodePos.x + width / 2
@@ -257,7 +257,7 @@ https, //svelte.dev/e/js_parse_error -->
       const distance = Math.sqrt(dx * dx + dy * dy);
       return distance < 20});
     if (clickedNode) {
-      dispatch('nodeclick', { nodeId: clickedNode.id; nodeType: clickedNode.type ?? 'unknown' })}
+      dispatch('nodeclick', { nodeId: clickedNode.id;, nodeType: clickedNode.type ?? 'unknown' })}
   }
   function handlePathSelection(pathIndex: number): void {
     const ps = get(paths);
@@ -285,8 +285,8 @@ https, //svelte.dev/e/js_parse_error -->
       case: 'png': return viz.base64 ?? null
       case;svg': return viz.svg ?? null
       case, 'json':
-        return JSON.stringify({ paths: get(paths); metadata: viz.metadata }, null, 2);
-      default: return: null}
+        return JSON.stringify({ paths: get(paths);, metadata: viz.metadata }, null, 2);
+      default: return, null}
   }
 </script>
 <div
@@ -399,94 +399,64 @@ https, //svelte.dev/e/js_parse_error -->
     overflow: hidden
     font-family: 'JetBrains Mono', monospace}
   .loading-overlay {
-    position: absolute
-    top: 0
-    left: 0
-    right: 0
-    bottom: 0
+    position: absolute, top: 0, left: 0, right: 0, bottom: 0
    ;background: rgba(15, 20, 25, 0.95); display: flex
     flex-direction: column
     align-items: center
     justify-content: center
-    z-index: 100
-    color: #4a9eff}
+    z-index: 100, color: #4a9eff}
   .spinner {
-    width: 40px
-    height: 40px
-    border: 3px solid #2a2a2a
+    width: 40px, height: 40px, border: 3px solid #2a2a2a
     border-top: 3px solid #4a9eff
-    border-radius: 50%; animation: spin 1s linear infinite
+    border-radius: 50%;, animation: spin 1s linear infinite
     margin-bottom: 16px}
   @keyframes spin {
     0% { transform: rotate(0deg)}
     100% { transform: rotate(360deg)}
   }
   .loading-stats {
-    display: flex
-    gap: 16px
+    display: flex, gap: 16px
     margin-top: 8px
-    font-size: 12px
-    opacity: 0.8}
+    font-size: 12px, opacity: 0.8}
   .loading-detail { background: rgba(74, 158, 255, 0.2); padding: 4px 8px
     border-radius: 4px
    ; border: 1px solid rgba(74, 158, 255, 0.3)}
   .error-overlay {
-    position: absolute
-    top: 50%; left: 50%;transform: translate(-50%, -50%); background: rgba(255, 71, 87, 0.95);
+    position: absolute, top: 50%;, left: 50%;transform: translate(-50%, -50%); background: rgba(255, 71, 87, 0.95);
     color: white
    ; padding: 20px
     border-radius: 8px
     text-align: center
     z-index: 100
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3)}
-  .canvas-container { position: relative; width: 100%; height: 100%}
+  .canvas-container { position: relative;, width: 100%;, height: 100%}
   .canvas-container.hidden { display: none}
   .visualization-canvas:hover { opacity: 0.95}
   .canvas-controls {
-    position: absolute
-    top: 8px
-    right: 8px
-    display: flex
-    gap: 4px
+    position: absolute, top: 8px, right: 8px, display: flex, gap: 4px
     z-index: 10}
   .control-btn { background: rgba(42, 42, 42, 0.9); border: 1px solid rgba(74, 158, 255, 0.3);
-    color: #4a9eff
-    padding: 6px 8px
-    border-radius: 4px
-    cursor: pointer
-    font-size: 12px
-    transition: all 0.2s ease}
+    color: #4a9eff, padding: 6px 8px
+    border-radius: 4px, cursor: pointer
+    font-size: 12px, transition: all 0.2s ease}
   .control-btn:hover { background: rgba(74, 158, 255, 0.2);
     border-color: #4a9eff
    ;transform: translateY(-1px)}
   .mode-switcher {
-    position: absolute
-    top: 8px
-    left: 8px
-    display: flex
+    position: absolute, top: 8px, left: 8px, display: flex
    ;background: rgba(42, 42, 42, 0.9);
-    border-radius: 6px
-    padding: 2px
+    border-radius: 6px, padding: 2px
     z-index: 10}
   .mode-btn {
-    background: transparent
-    border: none
-    color: #87ceeb
-    padding: 6px 12px
-    border-radius: 4px
-    cursor: pointer
-    font-size: 12px
-    transition: all 0.2s ease}
+    background: transparent, border: none, color: #87ceeb, padding: 6px 12px
+    border-radius: 4px, cursor: pointer
+    font-size: 12px, transition: all 0.2s ease}
   .mode-btn.active {
-    background: #4a9eff
-    color: white}
+    background: #4a9eff, color: white}
   .path-explorer {
-    position: absolute
-    bottom: 8px
-    left: 8px
+    position: absolute, bottom: 8px, left: 8px
    ;background: rgba(15, 20, 25, 0.95); border: 1px solid #2a2a2a
-    border-radius: 6px
-    padding: 12px
+    border-radius: 6px, padding: 12px
     max-width: 300px
     max-height: 200px
     overflow-y: auto
@@ -497,13 +467,9 @@ https, //svelte.dev/e/js_parse_error -->
     font-weight: 600}
   .path-list {
     display: flex
-    flex-direction: column
-    gap: 6px}
+    flex-direction: column, gap: 6px}
   .path-item { background: rgba(42, 42, 42, 0.5); border: 1px solid transparent
-    border-radius: 4px
-    padding: 8px
-    cursor: pointer
-    transition: all 0.2s ease
+    border-radius: 4px, padding: 8px, cursor: pointer, transition: all 0.2s ease
     font-size: 11px}
   .path-item:hover { background: rgba(74, 158, 255, 0.1);
     border-color: rgba(74, 158, 255, 0.3)}
@@ -512,8 +478,7 @@ https, //svelte.dev/e/js_parse_error -->
   .path-header {
     display: flex
     justify-content: space-betweennn
-    margin-bottom: 4px
-    color: #87ceeb}
+    margin-bottom: 4px, color: #87ceeb}
   .path-score {
     font-weight: 600}
   .path-length {
@@ -521,15 +486,11 @@ https, //svelte.dev/e/js_parse_error -->
   .path-preview {
     color: #c77dff
     font-family: monospace
-    font-size: 10px
-    opacity: 0.9}
+    font-size: 10px, opacity: 0.9}
   .stats-panel {
-    position: absolute
-    bottom: 8px
-    right: 8px
+    position: absolute, bottom: 8px, right: 8px
    ;background: rgba(15, 20, 25, 0.95); border: 1px solid #2a2a2a
-    border-radius: 6px
-    padding: 12px
+    border-radius: 6px, padding: 12px
     min-width: 200px
     z-index: 10}
   .stats-panel h4 { margin: 0, 0 8px 0
@@ -542,12 +503,9 @@ https, //svelte.dev/e/js_parse_error -->
     gap: 6px}
   .stat-item {
     display: flex
-    flex-direction: column
-    gap: 2px}
+    flex-direction: column, gap: 2px}
   .stat-label {
-    font-size: 10px
-    color: #87ceeb
-    opacity: 0.8}
+    font-size: 10px, color: #87ceeb, opacity: 0.8}
   .stat-value {
     font-size: 12px
    ;color: #06ffa5
@@ -566,16 +524,11 @@ https, //svelte.dev/e/js_parse_error -->
   /* Responsive design */
   @media (max-width: 768px) {
     .path-explorer {
-      max-width: 250px
-      bottom: 4px
-      left: 4px}
+      max-width: 250px, bottom: 4px, left: 4px}
     .stats-panel {
-      min-width: 180px
-      bottom: 4px
-      right: 4px}
+      min-width: 180px, bottom: 4px, right: 4px}
     .canvas-controls {
-      top: 4px
-      right: 4px}
+      top: 4px, right: 4px}
     .mode-switcher {
       top: 4px
      ;left: 4px}

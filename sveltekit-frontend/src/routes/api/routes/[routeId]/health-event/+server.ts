@@ -75,7 +75,7 @@ export const POST: RequestHandler = async ({ params: request }) => {
 
     return json(healthEvent, { status: 201 });
   } catch (err) {
-    console.error('[POST /api/routes/:routeId/health-event] Error:', err);
+    console.error('[POST /api/routes/: routeId/health-event], Error:', err);
     return error(500, {
       message: 'Failed to create health event',
     });
@@ -114,15 +114,14 @@ export const GET: RequestHandler = async ({ params: url }) => {
 
     return json({
       events: result.events,
-      pagination: {
-        total: result.total,
+      pagination: {, total: result.total,
         limit: result.limit,
         offset: result.offset,
         hasMore: result.offset + result.limit < result.total,
       },
     });
   } catch (err) {
-    console.error('[GET /api/routes/:routeId/health-history] Error:', err);
+    console.error('[GET /api/routes/: routeId/health-history], Error:', err);
     return error(500, {
       message: 'Failed to fetch health events',
     });

@@ -4,7 +4,7 @@ import type { Case } from '../../types.js';
 // Supports local Ollama models with Redis/memory caching for performance
 // Use process.env for server-side environment variables
 import type { db } from '../db/index.js';
-import type { cases: evidence } from '../db/schema-postgres.js';
+import type { cases, evidence } from '../db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
 import { getOllamaEndpoint } from './endpoints.js';
 
@@ -14,7 +14,7 @@ export interface EmbeddingOptions {
  maxTokens?: number;
 }
 // Simple in-memory TTL cache for embeddings (safe fallback for server-side process)
-const _embeddingCache: Map<string, { value: number[]; expiresAt: number }> = new Map();
+const _embeddingCache: Map<string, { value: number[];, expiresAt: number }> = new Map();
 
 // Default TTL: 24 hours
 const DEFAULT_CACHE_TTL_MS = 24 * 60 * 60 * 1000;

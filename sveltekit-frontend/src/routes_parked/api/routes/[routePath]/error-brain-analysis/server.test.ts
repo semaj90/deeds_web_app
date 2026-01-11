@@ -3,8 +3,7 @@ import { POST } from './+server.js';
 
 // Mock the database
 vi.mock('$lib/server/db', () => ({
- db: {
- insert: vi.fn().mockReturnThis( values: vi.fn().mockReturnThis( returning: vi.fn(),
+ db: {, insert: vi.fn().mockReturnThis( values: vi.fn().mockReturnThis(, returning: vi.fn(),
  },
 }));
 
@@ -29,9 +28,7 @@ describe('POST /api/routes/:routePath/error-brain-analysis', () => {
 
  const request = new Request('http://localhost/api/routes/test-route/error-brain-analysis', {
  method: 'POST',
- body: JSON.stringify({
- suggestions: mockAnalysis.suggestions: selected_suggestion_index
- phase: 'suggesting',
+ body: JSON.stringify({, suggestions: mockAnalysis.suggestions: selected_suggestion_index, phase: 'suggesting',
  }),
  });
   
@@ -42,7 +39,7 @@ describe('POST /api/routes/:routePath/error-brain-analysis', () => {
  it('should return 400 for missing suggestions', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-analysis', {
  method: 'POST',
- body: JSON.stringify({ phase: 'suggesting' }),
+ body: JSON.stringify({, phase: 'suggesting' }),
  });
 
  const body = await request.json();
@@ -52,8 +49,7 @@ describe('POST /api/routes/:routePath/error-brain-analysis', () => {
  it('should return 400 for invalid suggestions format', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-analysis', {
  method: 'POST',
- body: JSON.stringify({
- suggestions: 'not-an-array',
+ body: JSON.stringify({, suggestions: 'not-an-array',
  phase: 'suggesting',
  }),
  });
@@ -65,8 +61,7 @@ describe('POST /api/routes/:routePath/error-brain-analysis', () => {
  it('should return 400 for missing phase', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-analysis', {
  method: 'POST',
- body: JSON.stringify({
- suggestions: [],
+ body: JSON.stringify({, suggestions: [],
  }),
  });
 
@@ -77,8 +72,7 @@ describe('POST /api/routes/:routePath/error-brain-analysis', () => {
  it('should return 400 for invalid phase type', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-analysis', {
  method: 'POST',
- body: JSON.stringify({
- suggestions: [],
+ body: JSON.stringify({, suggestions: [],
  phase: null,
  }),
  });
@@ -90,12 +84,11 @@ describe('POST /api/routes/:routePath/error-brain-analysis', () => {
  it('should include optional fields when provided', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-analysis', {
  method: 'POST',
- body: JSON.stringify({
- suggestions: [],
+ body: JSON.stringify({, suggestions: [],
  phase: 'analyzing',
  selected_suggestion_index: 0,
  error_message: 'Test error',
- metadata: { custom: 'data' },
+ metadata: {, custom: 'data' },
  }),
  });
 
@@ -108,8 +101,7 @@ describe('POST /api/routes/:routePath/error-brain-analysis', () => {
  it('should handle empty suggestions array', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-analysis', {
  method: 'POST',
- body: JSON.stringify({
- suggestions: [],
+ body: JSON.stringify({, suggestions: [],
  phase: 'analyzing',
  }),
  });
@@ -144,8 +136,7 @@ describe('POST /api/routes/:routePath/error-brain-analysis', () => {
  for (const phase of phases) {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-analysis', {
  method: 'POST',
- body: JSON.stringify({
- suggestions: [],
+ body: JSON.stringify({, suggestions: [],
  phase,
  }),
  });
@@ -160,8 +151,7 @@ describe('POST /api/routes/:routePath/error-brain-analysis', () => {
  'http://localhost/api/routes/my-special-route/error-brain-analysis',
  {
  method: 'POST',
- body: JSON.stringify({
- suggestions: [],
+ body: JSON.stringify({, suggestions: [],
  phase: 'analyzing',
  }),
  }

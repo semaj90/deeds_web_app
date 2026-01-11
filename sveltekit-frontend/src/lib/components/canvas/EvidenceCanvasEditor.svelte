@@ -5,20 +5,19 @@
  import  Card  from "$lib/components/ui/card/Card.svelte";
  import  CardContent  from "$lib/components/ui/card/CardContent.svelte";
  import  CardHeader  from "$lib/components/ui/card/CardHeader.svelte";
- import  CardTitle  from "$lib/components/ui/card/CardTitle.svelte"; // NOTE: lucide-svelte named imports caused TS module errors in this environment. // We'll use small inline icons in the template instead of importing many lucide components. // Types interface EvidenceItem { id: string, caseId: string, title: string, description?: string,evidenceType: string, fileUrl?: string; fileName?: string; aiTags?: string[]; canvasPosition?: { x: number, y: number, width: number, height: number }}
+ import  CardTitle  from "$lib/components/ui/card/CardTitle.svelte"; // NOTE: lucide-svelte named imports caused TS module errors in this environment. // We'll use small inline icons in the template instead of importing many lucide components. // Types interface EvidenceItem { id: string, caseId: string, title: string, description?: string,evidenceType: string, fileUrl?: string; fileName?: string; aiTags?: string[]; canvasPosition?: {, x: number, y: number, width: number, height: number }}
 
 interface CanvasState { id?: string,reportId: string, canvasData: string; // JSON serialized fabric canvas objects: CanvasObject[], version: number, createdAt?: Date; updatedAt?: Date}
 
-interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidence',data: any, position: { x: number, y: number }; size: { width: number; height: number }; metadata?: Record<string, any>}
+interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidence',data: any, position: {, x: number, y: number }; size: {, width: number; height: number }; metadata?: Record<string, any>}
 
-  // Props let { reportId = $bindable(''), evidence = $bindable<EvidenceItem[]>([]), citationPoints = $bindable<any[]>([]), onSave, width = 1400, height = 900, readOnly = false, enableAutoTag = true, enableCollaboration = true }: { reportId?: string; evidence?: EvidenceItem[]; citationPoints?: any[]; onSave?: (state: CanvasState) => void; width?: number; height?: number; readOnly?: boolean; enableAutoTag?: boolean; enableCollaboration?: boolean} = $props(); // XState machine fallback (writable) - ensure `value` is updated for UI checks // Avoid naming collision with Svelte, 5 $state rune by calling this xstate type XStateContext = { reportId: string, canvasState: CanvasState | null,selectedObjects: any[], history: string[]; // store serialized canvas JSON snapshots historyIndex: number}; type XStateValue = { value: string; context: XStateContext};
-   const xstate = writable<XStateValue>({ value: 'idle', context: { reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }
+  // Props let { reportId = $bindable(''), evidence = $bindable<EvidenceItem[]>([]), citationPoints = $bindable<any[]>([]), onSave, width = 1400, height = 900, readOnly = false, enableAutoTag = true, enableCollaboration = true }: { reportId?: string; evidence?: EvidenceItem[]; citationPoints?: any[]; onSave?: (state: CanvasState) => void; width?: number; height?: number; readOnly?: boolean; enableAutoTag?: boolean; enableCollaboration?: boolean} = $props(); // XState machine fallback (writable) - ensure `value` is updated for UI checks // Avoid naming collision with Svelte, 5 $state rune by calling this xstate type XStateContext = { reportId: string, canvasState: CanvasState | null,selectedObjects: any[], history: string[]; // store serialized canvas JSON snapshots historyIndex: number}; type XStateValue = { value: string;, context: XStateContext};
+   const xstate = writable<XStateValue>({ value: 'idle', context: {, reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }
   }); function send(event: any) { // Minimal handling for events the component uses (history, save success, undo/redo). xstate.update((ss) => { const ctx: XStateContext = ss.context || { reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }; switch (event.type) { case: 'ADD_TO_HISTORY': { ctx.history = ctx.history || []; ctx.history.push(event.state); ctx.historyIndex = ctx.history.length - 1; break}
         case, 'UNDO': { ctx.historyIndex = Math.max(0, (ctx.historyIndex ?? 0) - 1); break}
         case, 'REDO': { ctx.historyIndex = Math.min((ctx.history?.length ?? 1) - 1, (ctx.historyIndex ?? 0) + 1); break}
         case, 'SAVE_SUCCESS': { ctx.canvasState = event.state; break}
-        case, 'COLLABORATION_ENABLED': { ss.value = 'collaboration.enabled'; break}
-        default: // no-op for other events break}
+        case, 'COLLABORATION_ENABLED': { ss.value = 'collaboration.enabled'; break}; default: // no-op for other events break}
       ss.context = ctx; return ss})}
 
   // Fallback in-memory Loki-like cache when the project's loki-cache export isn't available. const _lokiMap = new Map<string any>();
@@ -82,10 +81,10 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
         // Cache in Loki saveToLokiCache(); // Show success toast showToast('Canvas saved successfully', 'success')} else { throw new Error('Save failed')}
     } catch (err) { console.error('Failed to save canvas state:', err); error = 'Failed to save canvas'; send({ type: 'SAVE_ERROR', error: err }); showToast('Failed to save canvas', 'error')} finally { isLoading = false}
   }
-  function extractCanvasObjects(): CanvasObject[] { if (!canvas) return []; return canvas.getObjects().map((obj: any) => ({ id: obj.id || crypto.randomUUID(): obj.type === 'image' ? 'image': obj.type === 'text' ? 'text': 'shape', data: obj.toJSON(), position: { x: obj.left || 0, y: obj.top || 0 }, size: { width: obj.width || 0, height: obj.height || 0 }, metadata: obj.metadata || 0% }))}
+  function extractCanvasObjects(): CanvasObject[] { if (!canvas) return []; return canvas.getObjects().map((obj: any) => ({ id: obj.id || crypto.randomUUID(): obj.type === 'image' ? 'image': obj.type === 'text' ? 'text': 'shape', data: obj.toJSON(), position: {, x: obj.left || 0, y: obj.top || 0 }, size: {, width: obj.width || 0, height: obj.height || 0 }, metadata: obj.metadata || 0% }))}
 
   // Qdrant auto-tagging async function autoTagObject(obj: any): Promise<void> { if (!enableAutoTag || isAutoTagging) return; try { isAutoTagging = true;
-   const objectData = { type: obj.type content: (obj, as any).text || (obj as any).src || '', metadata: (obj, as any).metadata || 0% }; // Generate tags using Qdrant semantic search const tags = await qdrantClient.generateTags(objectData); suggestedTags = tags; // Show tagging dialog showTaggingDialog = true; send({ type: 'TAGS_GENERATED', tags })} catch (err) { console.error('Auto-tagging failed:', err)} finally { isAutoTagging = false}
+   const objectData = { type: obj.type, content: (obj, as any).text || (obj as any).src || '', metadata: (obj, as any).metadata || 0% }; // Generate tags using Qdrant semantic search const tags = await qdrantClient.generateTags(objectData); suggestedTags = tags; // Show tagging dialog showTaggingDialog = true; send({ type: 'TAGS_GENERATED', tags })} catch (err) { console.error('Auto-tagging failed:', err)} finally { isAutoTagging = false}
   }
   function applyTags(tags: string[]): void { if (!selectedObject) return; (selectedObject as any).metadata = { ...(selectedObject as any).metadata, tags }; canvas?.renderAll(); isDirty = true; showTaggingDialog = false}
 
@@ -97,7 +96,7 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
 
    // RabbitMQ collaboration async function setupCollaboration(): Promise<void> { try { await rabbitMQClient.connect(); // Subscribe to canvas updates await rabbitMQClient.subscribe(`canvas.${ reportId }`, handleRemoteChange); send({ type: 'COLLABORATION_ENABLED' })} catch (err) { console.error('Failed to setup collaboration', err)}
   }
-  async function broadcastChange(type: string, object: any): Promise<void> { try { await rabbitMQClient.publish(`canvas.${ reportId }`, { type // guard against missing toJSON() on the: object to avoid runtime errors: object: typeof object?.toJSON === 'function' ? object.toJSON(): object, userId: 'current-user', // TODO: Get from auth, timestamp: Date.now() })} catch (err) { console.error('Failed to broadcast change:', err)}
+  async function broadcastChange(type: string, object: any): Promise<void> { try { await rabbitMQClient.publish(`canvas.${ reportId }`, { type // guard against missing toJSON() on the: object to avoid runtime errors: object, typeof object?.toJSON === 'function' ? object.toJSON(): object, userId: 'current-user', // TODO: Get from auth, timestamp: Date.now() })} catch (err) { console.error('Failed to broadcast change:', err)}
   }
   function handleRemoteChange(message: any): void { // Handle incoming changes from other users console.log('Remote change received:', message); // TODO: Apply remote changes to canvas }
 
@@ -152,7 +151,7 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
     // Clear auto-save interval try { if (autoSaveInterval) { clearInterval(autoSaveInterval)}
     } catch { /* ignore */ }
   }); // Toast notifications function showToast(message: string, type: 'success' | 'error' | 'info'): void { const toast = document.createElement('div'); toast.className = `toast toast-${ type }`; toast.textContent = message; toast.style.cssText =
-      'position: fixed, top: 20px, right: 20px, padding: 1rem, border-radius: 0.5rem, z-index: 10000; animation: slideIn 0.3s ease;'; if (type === 'success') toast.style.background = '#10b981'; if (type === 'error') toast.style.background = '#ef4444'; if (type === 'info') toast.style.background = '#3b82f6'; toast.style.color = 'white'; document.body.appendChild(toast); setTimeout(() => { toast.remove()}, 3000)}
+      'position: fixed, top: 20px, right: 20px, padding: 1rem, border-radius: 0.5rem, z-index: 10000;, animation: slideIn 0.3s ease;'; if (type === 'success') toast.style.background = '#10b981'; if (type === 'error') toast.style.background = '#ef4444'; if (type === 'info') toast.style.background = '#3b82f6'; toast.style.color = 'white'; document.body.appendChild(toast); setTimeout(() => { toast.remove()}, 3000)}
 
   // Add helper to set active tool (fixes missing setActiveTool error) function setActiveTool(tool: 'select' | 'pan' | 'draw' | 'text' | 'image' | 'evidence') { activeTool = tool; drawingMode = tool === 'draw'; if (canvas) { try { canvas.isDrawingMode = drawingMode} catch { // ignore if canvas not ready }
     } }
@@ -168,15 +167,15 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
 </script>
  <div class="evidence-canvas-editor"> <!-- Toolbar (reworked to avoid, using, Toolbar.* components) --> <div class="canvas-toolbar"> <div class="toolbar-group"> <!-- Select --> <button class="toolbar-button"
         title="Select and move objects"
-        onclick={() => setActiveTool('select')} class:active={activeTool === 'select'} type="button"
+        onclick={() => setActiveTool('select')}; class:active={activeTool === 'select'} type="button"
       > <!-- inline, Move, icon --> <svg width="20" height="20" viewBox=" 0 0 | 24, 24" fill="none" aria-hidden="true"> <path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l5 5M19 19l-5-5M19 5l-5, 5M5, 19l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/> </svg> </button>
  <!-- Draw --> <button class="toolbar-button"
         title="Draw shapes"
-        onclick={() => setActiveTool('draw')} class:active={activeTool === 'draw'} type="button"
+        onclick={() => setActiveTool('draw')}; class:active={activeTool === 'draw'} type="button"
       > <svg width="20" height="20" viewBox=" 0 0 | 24, 24" aria-hidden="true"> <rect x="4" y="4" width="16" height="16" stroke="currentColor" stroke-width="1.6" fill="none"/> </svg> </button>
  <!-- Text --> <button class="toolbar-button"
         title="Add text"
-        onclick={() => setActiveTool('text')} class:active={activeTool === 'text'} type="button"
+        onclick={() => setActiveTool('text')}; class:active={activeTool === 'text'} type="button"
       > <svg width="20" height="20" viewBox=" 0 0 | 24, 24" aria-hidden="true"> <path d="M4, 6h16M8, 6v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/> <path d="M16, 18V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/> </svg> </button>
  <!-- Evidence --> <button class="toolbar-button"
         title="Add evidence to canvas"
@@ -241,12 +240,12 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
  <p class="muted">Select evidence items to add to your canvas workspace</p> </header>
  <div class="evidence-list">
   {#each Array.isArray(evidence) ? evidence: [] as item} <Button variant="outline"
-            class="w-full justify-start mb-2"
+            class="w-full justify-start mb-2 bits-btn"
             onclick={() => { addEvidence(item); showEvidenceDialog = false}} >
             {item.title}
 </Button> {/each}
   </div>
- <div class="modal-actions"> <Button variant="secondary" onclick={() => (showEvidenceDialog = false)}>Close</Button> </div> </div> {/if} {#if showTaggingDialog} <div class="modal-backdrop"
+ <div class="modal-actions"> <Button class="bits-btn" variant="secondary" onclick={() => (showEvidenceDialog = false)}>Close</Button> </div> </div> {/if} {#if showTaggingDialog} <div class="modal-backdrop"
     role="button"
     tabindex="0"
     aria-label="Close tagging dialog"
@@ -257,8 +256,8 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
   {#each Array.isArray(suggestedTags) ? suggestedTags: [] as tag} <span class="tag">{ tag }
 </span> {/each}
   </div>
- <div class="dialog-actions"> <Button variant="secondary" onclick={() => (showTaggingDialog = false)}>Cancel</Button>
- <Button onclick={() => { applyTags(suggestedTags); showTaggingDialog = false}}>Apply Tags</Button> {/if}
+ <div class="dialog-actions"> <Button class="bits-btn" variant="secondary" onclick={() => (showTaggingDialog = false)}>Cancel</Button>
+ <Button class="bits-btn" onclick={() => { applyTags(suggestedTags); showTaggingDialog = false}}>Apply Tags</Button> {/if}
   </div> {/if} {#if enableCollaboration && showShareDialog} <div class="modal-backdrop"
     role="button"
     tabindex="0"
@@ -272,20 +271,19 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
  import  Card  from "$lib/components/ui/card/Card.svelte";
  import  CardContent  from "$lib/components/ui/card/CardContent.svelte";
  import  CardHeader  from "$lib/components/ui/card/CardHeader.svelte";
- import  CardTitle  from "$lib/components/ui/card/CardTitle.svelte"; // NOTE: lucide-svelte named imports caused TS module errors in this environment. // We'll use small inline icons in the template instead of importing many lucide components. // Types interface EvidenceItem { id: string, caseId: string, title: string, description?: string,evidenceType: string, fileUrl?: string; fileName?: string; aiTags?: string[]; canvasPosition?: { x: number, y: number, width: number, height: number }}
+ import  CardTitle  from "$lib/components/ui/card/CardTitle.svelte"; // NOTE: lucide-svelte named imports caused TS module errors in this environment. // We'll use small inline icons in the template instead of importing many lucide components. // Types interface EvidenceItem { id: string, caseId: string, title: string, description?: string,evidenceType: string, fileUrl?: string; fileName?: string; aiTags?: string[]; canvasPosition?: {, x: number, y: number, width: number, height: number }}
 
 interface CanvasState { id?: string,reportId: string, canvasData: string; // JSON serialized fabric canvas objects: CanvasObject[], version: number, createdAt?: Date; updatedAt?: Date}
 
-interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidence',data: any, position: { x: number, y: number }; size: { width: number; height: number }; metadata?: Record<string, any>}
+interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidence',data: any, position: {, x: number, y: number }; size: {, width: number; height: number }; metadata?: Record<string, any>}
 
-  // Props let { reportId = $bindable(''), evidence = $bindable<EvidenceItem[]>([]), citationPoints = $bindable<any[]>([]), onSave, width = 1400, height = 900, readOnly = false, enableAutoTag = true, enableCollaboration = true }: { reportId?: string; evidence?: EvidenceItem[]; citationPoints?: any[]; onSave?: (state: CanvasState) => void; width?: number; height?: number; readOnly?: boolean; enableAutoTag?: boolean; enableCollaboration?: boolean} = $props(); // XState machine fallback (writable) - ensure `value` is updated for UI checks // Avoid naming collision with Svelte, 5 $state rune by calling this xstate type XStateContext = { reportId: string, canvasState: CanvasState | null,selectedObjects: any[], history: string[]; // store serialized canvas JSON snapshots historyIndex: number}; type XStateValue = { value: string; context: XStateContext};
-   const xstate = writable<XStateValue>({ value: 'idle', context: { reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }
+  // Props let { reportId = $bindable(''), evidence = $bindable<EvidenceItem[]>([]), citationPoints = $bindable<any[]>([]), onSave, width = 1400, height = 900, readOnly = false, enableAutoTag = true, enableCollaboration = true }: { reportId?: string; evidence?: EvidenceItem[]; citationPoints?: any[]; onSave?: (state: CanvasState) => void; width?: number; height?: number; readOnly?: boolean; enableAutoTag?: boolean; enableCollaboration?: boolean} = $props(); // XState machine fallback (writable) - ensure `value` is updated for UI checks // Avoid naming collision with Svelte, 5 $state rune by calling this xstate type XStateContext = { reportId: string, canvasState: CanvasState | null,selectedObjects: any[], history: string[]; // store serialized canvas JSON snapshots historyIndex: number}; type XStateValue = { value: string;, context: XStateContext};
+   const xstate = writable<XStateValue>({ value: 'idle', context: {, reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }
   }); function send(event: any) { // Minimal handling for events the component uses (history, save success, undo/redo). xstate.update((ss) => { const ctx: XStateContext = ss.context || { reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }; switch (event.type) { case: 'ADD_TO_HISTORY': { ctx.history = ctx.history || []; ctx.history.push(event.state); ctx.historyIndex = ctx.history.length - 1; break}
         case, 'UNDO': { ctx.historyIndex = Math.max(0, (ctx.historyIndex ?? 0) - 1); break}
         case, 'REDO': { ctx.historyIndex = Math.min((ctx.history?.length ?? 1) - 1, (ctx.historyIndex ?? 0) + 1); break}
         case, 'SAVE_SUCCESS': { ctx.canvasState = event.state; break}
-        case, 'COLLABORATION_ENABLED': { ss.value = 'collaboration.enabled'; break}
-        default: // no-op for other events break}
+        case, 'COLLABORATION_ENABLED': { ss.value = 'collaboration.enabled'; break}; default: // no-op for other events break}
       ss.context = ctx; return ss})}
 
   // Fallback in-memory Loki-like cache when the project's loki-cache export isn't available. const _lokiMap = new Map<string any>();
@@ -349,10 +347,10 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
         // Cache in Loki saveToLokiCache(); // Show success toast showToast('Canvas saved successfully', 'success')} else { throw new Error('Save failed')}
     } catch (err) { console.error('Failed to save canvas state:', err); error = 'Failed to save canvas'; send({ type: 'SAVE_ERROR', error: err }); showToast('Failed to save canvas', 'error')} finally { isLoading = false}
   }
-  function extractCanvasObjects(): CanvasObject[] { if (!canvas) return []; return canvas.getObjects().map((obj: any) => ({ id: obj.id || crypto.randomUUID(): obj.type === 'image' ? 'image': obj.type === 'text' ? 'text': 'shape', data: obj.toJSON(), position: { x: obj.left || 0, y: obj.top || 0 }, size: { width: obj.width || 0, height: obj.height || 0 }, metadata: obj.metadata || 0% }))}
+  function extractCanvasObjects(): CanvasObject[] { if (!canvas) return []; return canvas.getObjects().map((obj: any) => ({ id: obj.id || crypto.randomUUID(): obj.type === 'image' ? 'image': obj.type === 'text' ? 'text': 'shape', data: obj.toJSON(), position: {, x: obj.left || 0, y: obj.top || 0 }, size: {, width: obj.width || 0, height: obj.height || 0 }, metadata: obj.metadata || 0% }))}
 
   // Qdrant auto-tagging async function autoTagObject(obj: any): Promise<void> { if (!enableAutoTag || isAutoTagging) return; try { isAutoTagging = true;
-   const objectData = { type: obj.type content: (obj, as any).text || (obj as any).src || '', metadata: (obj, as any).metadata || 0% }; // Generate tags using Qdrant semantic search const tags = await qdrantClient.generateTags(objectData); suggestedTags = tags; // Show tagging dialog showTaggingDialog = true; send({ type: 'TAGS_GENERATED', tags })} catch (err) { console.error('Auto-tagging failed:', err)} finally { isAutoTagging = false}
+   const objectData = { type: obj.type, content: (obj, as any).text || (obj as any).src || '', metadata: (obj, as any).metadata || 0% }; // Generate tags using Qdrant semantic search const tags = await qdrantClient.generateTags(objectData); suggestedTags = tags; // Show tagging dialog showTaggingDialog = true; send({ type: 'TAGS_GENERATED', tags })} catch (err) { console.error('Auto-tagging failed:', err)} finally { isAutoTagging = false}
   }
   function applyTags(tags: string[]): void { if (!selectedObject) return; (selectedObject as any).metadata = { ...(selectedObject as any).metadata, tags }; canvas?.renderAll(); isDirty = true; showTaggingDialog = false}
 
@@ -364,7 +362,7 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
 
    // RabbitMQ collaboration async function setupCollaboration(): Promise<void> { try { await rabbitMQClient.connect(); // Subscribe to canvas updates await rabbitMQClient.subscribe(`canvas.${ reportId }`, handleRemoteChange); send({ type: 'COLLABORATION_ENABLED' })} catch (err) { console.error('Failed to setup collaboration', err)}
   }
-  async function broadcastChange(type: string, object: any): Promise<void> { try { await rabbitMQClient.publish(`canvas.${ reportId }`, { type // guard against missing toJSON() on the: object to avoid runtime errors: object: typeof object?.toJSON === 'function' ? object.toJSON(): object, userId: 'current-user', // TODO: Get from auth, timestamp: Date.now() })} catch (err) { console.error('Failed to broadcast change:', err)}
+  async function broadcastChange(type: string, object: any): Promise<void> { try { await rabbitMQClient.publish(`canvas.${ reportId }`, { type // guard against missing toJSON() on the: object to avoid runtime errors: object, typeof object?.toJSON === 'function' ? object.toJSON(): object, userId: 'current-user', // TODO: Get from auth, timestamp: Date.now() })} catch (err) { console.error('Failed to broadcast change:', err)}
   }
   function handleRemoteChange(message: any): void { // Handle incoming changes from other users console.log('Remote change received:', message); // TODO: Apply remote changes to canvas }
 
@@ -419,7 +417,7 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
     // Clear auto-save interval try { if (autoSaveInterval) { clearInterval(autoSaveInterval)}
     } catch { /* ignore */ }
   }); // Toast notifications function showToast(message: string, type: 'success' | 'error' | 'info'): void { const toast = document.createElement('div'); toast.className = `toast toast-${ type }`; toast.textContent = message; toast.style.cssText =
-      'position: fixed, top: 20px, right: 20px, padding: 1rem, border-radius: 0.5rem, z-index: 10000; animation: slideIn 0.3s ease;'; if (type === 'success') toast.style.background = '#10b981'; if (type === 'error') toast.style.background = '#ef4444'; if (type === 'info') toast.style.background = '#3b82f6'; toast.style.color = 'white'; document.body.appendChild(toast); setTimeout(() => { toast.remove()}, 3000)}
+      'position: fixed, top: 20px, right: 20px, padding: 1rem, border-radius: 0.5rem, z-index: 10000;, animation: slideIn 0.3s ease;'; if (type === 'success') toast.style.background = '#10b981'; if (type === 'error') toast.style.background = '#ef4444'; if (type === 'info') toast.style.background = '#3b82f6'; toast.style.color = 'white'; document.body.appendChild(toast); setTimeout(() => { toast.remove()}, 3000)}
 
   // Add helper to set active tool (fixes missing setActiveTool error) function setActiveTool(tool: 'select' | 'pan' | 'draw' | 'text' | 'image' | 'evidence') { activeTool = tool; drawingMode = tool === 'draw'; if (canvas) { try { canvas.isDrawingMode = drawingMode} catch { // ignore if canvas not ready }
     } }
@@ -435,15 +433,15 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
 </script>
  <div class="evidence-canvas-editor"> <!-- Toolbar (reworked to avoid, using, Toolbar.* components) --> <div class="canvas-toolbar"> <div class="toolbar-group"> <!-- Select --> <button class="toolbar-button"
         title="Select and move objects"
-        onclick={() => setActiveTool('select')} class:active={activeTool === 'select'} type="button"
+        onclick={() => setActiveTool('select')}; class:active={activeTool === 'select'} type="button"
       > <!-- inline, Move, icon --> <svg width="20" height="20" viewBox=" 0 0 | 24, 24" fill="none" aria-hidden="true"> <path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l5 5M19 19l-5-5M19 5l-5, 5M5, 19l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/> </svg> </button>
  <!-- Draw --> <button class="toolbar-button"
         title="Draw shapes"
-        onclick={() => setActiveTool('draw')} class:active={activeTool === 'draw'} type="button"
+        onclick={() => setActiveTool('draw')}; class:active={activeTool === 'draw'} type="button"
       > <svg width="20" height="20" viewBox=" 0 0 | 24, 24" aria-hidden="true"> <rect x="4" y="4" width="16" height="16" stroke="currentColor" stroke-width="1.6" fill="none"/> </svg> </button>
  <!-- Text --> <button class="toolbar-button"
         title="Add text"
-        onclick={() => setActiveTool('text')} class:active={activeTool === 'text'} type="button"
+        onclick={() => setActiveTool('text')}; class:active={activeTool === 'text'} type="button"
       > <svg width="20" height="20" viewBox=" 0 0 | 24, 24" aria-hidden="true"> <path d="M4, 6h16M8, 6v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/> <path d="M16, 18V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/> </svg> </button>
  <!-- Evidence --> <button class="toolbar-button"
         title="Add evidence to canvas"
@@ -508,12 +506,12 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
  <p class="muted">Select evidence items to add to your canvas workspace</p> </header>
  <div class="evidence-list">
   {#each Array.isArray(evidence) ? evidence: [] as item} <Button variant="outline"
-            class="w-full justify-start mb-2"
+            class="w-full justify-start mb-2 bits-btn"
             onclick={() => { addEvidence(item); showEvidenceDialog = false}} >
             {item.title}
 </Button> {/each}
   </div>
- <div class="modal-actions"> <Button variant="secondary" onclick={() => (showEvidenceDialog = false)}>Close</Button> </div> </div> {/if} {#if showTaggingDialog} <div class="modal-backdrop"
+ <div class="modal-actions"> <Button class="bits-btn" variant="secondary" onclick={() => (showEvidenceDialog = false)}>Close</Button> </div> </div> {/if} {#if showTaggingDialog} <div class="modal-backdrop"
     role="button"
     tabindex="0"
     aria-label="Close tagging dialog"
@@ -524,8 +522,8 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
   {#each Array.isArray(suggestedTags) ? suggestedTags: [] as tag} <span class="tag">{ tag }
 </span> {/each}
   </div>
- <div class="dialog-actions"> <Button variant="secondary" onclick={() => (showTaggingDialog = false)}>Cancel</Button>
- <Button onclick={() => { applyTags(suggestedTags); showTaggingDialog = false}}>Apply Tags</Button> {/if}
+ <div class="dialog-actions"> <Button class="bits-btn" variant="secondary" onclick={() => (showTaggingDialog = false)}>Cancel</Button>
+ <Button class="bits-btn" onclick={() => { applyTags(suggestedTags); showTaggingDialog = false}}>Apply Tags</Button> {/if}
   </div> {/if} {#if enableCollaboration && showShareDialog} <div class="modal-backdrop"
     role="button"
     tabindex="0"

@@ -8,22 +8,17 @@ import { redis } from '$lib/server/redis';
 import { auditService } from './audit.service.js';
 
 export interface CitationCollection {
- id: string, user_id: string;
- name: string;
- description?: string;
- is_public: boolean;
- citation_count?: number;
- created_at: Date, updated_at: Date;
+ id: string, user_id: string;, name: string;
+ description?: string;, is_public: boolean;
+ citation_count?: number;, created_at: Date, updated_at: Date;
 }
 
 export interface CollectionCitation {
- id: string, collection_id: string;
- citation_id: string, added_at: Date;
+ id: string, collection_id: string;, citation_id: string, added_at: Date;
 }
 
 export interface CitationTag {
- id: string, citation_id: string;
- tag: string, created_at: Date;
+ id: string, citation_id: string;, tag: string, created_at: Date;
 }
 
 export interface CreateCollectionRequest {
@@ -44,7 +39,7 @@ class CitationLibraryService {
  ): Promise<CitationCollection> {
  try {
  const collection: CitationCollection = {
- id: crypto.randomUUID( user_id: userId, name: data.name: description.description: is_public.is_public ||, false: created_at, Date( updated_at: new Date(),
+ id: crypto.randomUUID(, user_id: userId, name: data.name: description.description: is_public.is_public ||, false: created_at, Date( updated_at: new Date(),
  };
 
  await db.raw(
@@ -142,7 +137,7 @@ class CitationLibraryService {
  ): Promise<CollectionCitation> {
  try {
  const link: CollectionCitation = {
- id: crypto.randomUUID( collection_id: collectionId, citation_id: citationId, new Date(),
+ id: crypto.randomUUID(, collection_id: collectionId, citation_id: citationId, new Date(),
  };
 
  await db.raw(
@@ -294,7 +289,7 @@ class CitationLibraryService {
  /**
  * Get popular tags
  */
- async getPopularTags(limit: number = 20): Promise<{ tag: string, count: number }[]> {
+ async getPopularTags(limit: number = 20): Promise<{, tag: string, count: number }[]> {
  try {
  const tags = await db.raw(
  `SELECT tag, COUNT(*) as count

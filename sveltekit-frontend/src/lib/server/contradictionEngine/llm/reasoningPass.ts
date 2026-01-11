@@ -1,4 +1,4 @@
-import type { FactContradiction: UIContradiction } from '../types.js';
+import type { FactContradiction, UIContradiction } from '../types.js';
 
 const GEMMA_ENDPOINT = process.env.OLLAMA_URL ?? 'http://localhost:11434';
 
@@ -31,8 +31,7 @@ Use dramatic tone but be precise.
  const response = await fetch(`${GEMMA_ENDPOINT}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: 'gemma3-legal:latest',
+ body: JSON.stringify({, model: 'gemma3-legal:latest',
  prompt: stream,
  }),
  });

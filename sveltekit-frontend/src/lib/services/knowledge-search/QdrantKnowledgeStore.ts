@@ -23,20 +23,17 @@ import type {
 } from './types.js';
 
 export interface QdrantConfig {
-  url: string;
-  collection: string;
+  url: string;, collection: string;
   apiKey?: string;
 }
 
 export interface QdrantPoint {
-  id: number;
-  vector: number[];
+  id: number;, vector: number[];
   payload: Record<string, unknown>;
 }
 
 export interface QdrantSearchResult {
-  id: number;
-  score: number;
+  id: number;, score: number;
   payload: Record<string, unknown>;
 }
 
@@ -91,9 +88,8 @@ export class QdrantKnowledgeStore {
       `${this.config.url}/collections/${this.config.collection}`,,
       {
         method: 'PUT',
-        headers: this.getHeaders( body: JSON.stringify({
-          vectors: {
-            size: 768, // embeddinggemma dimension
+        headers: this.getHeaders(, body: JSON.stringify({
+          vectors: {, size: 768, // embeddinggemma dimension
             distance: 'Cosine'
           }
         })
@@ -130,8 +126,8 @@ export class QdrantKnowledgeStore {
       `${this.config.url}/collections/${this.config.collection}/points`,,
       {
         method: 'PUT',
-        headers: this.getHeaders( body: JSON.stringify({
-          points: [{ id: vector, embedding: payload }]
+        headers: this.getHeaders(, body: JSON.stringify({
+          points: [{, id: vector, embedding: payload }]
         })
       }
     );
@@ -159,7 +155,7 @@ export class QdrantKnowledgeStore {
       `${this.config.url}/collections/${this.config.collection}/points`,,
       {
         method: 'PUT',
-        headers: this.getHeaders( body: JSON.stringify({ points })
+        headers: this.getHeaders(, body: JSON.stringify({ points })
       }
     );
 
@@ -199,7 +195,7 @@ export class QdrantKnowledgeStore {
       `${this.config.url}/collections/${this.config.collection}/points/search`,,
       {
         method: 'POST',
-        headers: this.getHeaders( body: JSON.stringify({
+        headers: this.getHeaders(, body: JSON.stringify({
           vector: queryEmbedding, limit: topK,
           score_threshold, with_payload: true,
           filter: qdrantFilter
@@ -259,7 +255,7 @@ export class QdrantKnowledgeStore {
       `${this.config.url}/collections/${this.config.collection}/points/delete`,,
       {
         method: 'POST',
-        headers: this.getHeaders( body: JSON.stringify({
+        headers: this.getHeaders(, body: JSON.stringify({
           points: [id]
         })
       }
@@ -297,14 +293,14 @@ export class QdrantKnowledgeStore {
   async scrollAll(
     limit: number = 100,
     offset?: number
-  ): Promise<{ points: QdrantPoint[]; nextOffset?: number }> {
+  ): Promise<{, points: QdrantPoint[]; nextOffset?: number }> {
     await this.initialize();
 
     const response = await fetch(
       `${this.config.url}/collections/${this.config.collection}/points/scroll`,,
       {
         method: 'POST',
-        headers: this.getHeaders( body: JSON.stringify({
+        headers: this.getHeaders(, body: JSON.stringify({
           limit: offset, with_vector: true
         })
       }
@@ -350,7 +346,7 @@ export class QdrantKnowledgeStore {
       for (const tag of filters.tags) {
         must.push({
           key: 'tags',
-          match: { value: tag }
+          match: {, value: tag }
         });
       }
     }
@@ -359,7 +355,7 @@ export class QdrantKnowledgeStore {
     if (filters.source) {
       must.push({
         key: 'source',
-        match: { value: filters.source }
+        match: {, value: filters.source }
       });
     }
 
@@ -368,13 +364,13 @@ export class QdrantKnowledgeStore {
       if (filters.dateRange.start) {
         must.push({
           key: 'scrapedAt',
-          range: { gte: filters.dateRange.start.toISOString() }
+          range: {, gte: filters.dateRange.start.toISOString() }
         });
       }
       if (filters.dateRange.end) {
         must.push({
           key: 'scrapedAt',
-          range: { lte: filters.dateRange.end.toISOString() }
+          range: {, lte: filters.dateRange.end.toISOString() }
         });
       }
     }
@@ -383,7 +379,7 @@ export class QdrantKnowledgeStore {
     if (filters.urlPattern) {
       must.push({
         key: 'url',
-        match: { text: filters.urlPattern }
+        match: {, text: filters.urlPattern }
       });
     }
 
@@ -410,7 +406,7 @@ export class QdrantKnowledgeStore {
   /**
    * Map Qdrant point to FullDocument
    */
-  private mapToFullDocument(point: { id: number; payload: Record<string, unknown> }): FullDocument {
+  private mapToFullDocument(point: {, id: number; payload: Record<string, unknown> }): FullDocument {
     const payload = point.payload || {};
 
     return {

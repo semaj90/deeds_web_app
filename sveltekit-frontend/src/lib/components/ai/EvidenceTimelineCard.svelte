@@ -4,25 +4,25 @@
  import  Separator  from "$lib/components/ui/separator/Separator.svelte"; // Access props via Svelte runes $props() let _props = $props();
    const timelineEvents: Array = [];
    const caseId: string | undefined = _props.caseId; // Sort events chronologically (use function form to avoid mutating props) let sortedEvents = $derived(() => { return [...timelineEvents].sort((a, b) => new Date(a.date + ' ' + (a.time || '0 0 00')).getTime() - new Date(b.date + ' ' + (b.time || '0 0 00')).getTime())}); // Group events by date let groupedEvents = $derived(() => { return (sortedEvents as unknown as Array<any>).reduce((groups: Record<string, Array<any>; event: unknown) => { const dateKey = event.dat; if (!groups[dateKey]) { groups[dateKey] = []}
-      groups[dateKey].push(event); return group}, as Record<string, Array<any>)}); // Category styling const categoryConfig = { crime: { color: 'bg-red-100 text-red-800 border-red-200', icon: 'ðŸš¨'; label: 'Crime Event'
-    }, witness: { color: 'bg-blue-100 text-blue-800 border-blue-200', icon: 'ðŸ‘ï¸'; label: 'Witness Account'
-    }, discovery: { color: 'bg-green-100 text-green-800 border-green-200', icon: 'ðŸ”'; label: 'Evidence Discovery'
-    }, movement: { color: 'bg-purple-100 text-purple-800 border-purple-200', icon: 'ðŸ“'; label: 'Movement/Location'
-    }, communication { color: 'bg-orange-100 text-orange-800 border-orange-200', icon: 'ðŸ“ž'; label: 'Communication'
+      groups[dateKey].push(event); return group}, as Record<string, Array<any>)}); // Category styling const categoryConfig = { crime: {, color: 'bg-red-100 text-red-800 border-red-200', icon: 'ðŸš¨';, label: 'Crime Event'
+    }, witness: {, color: 'bg-blue-100 text-blue-800 border-blue-200', icon: 'ðŸ‘ï¸';, label: 'Witness Account'
+    }, discovery: {, color: 'bg-green-100 text-green-800 border-green-200', icon: 'ðŸ”';, label: 'Evidence Discovery'
+    }, movement: {, color: 'bg-purple-100 text-purple-800 border-purple-200', icon: 'ðŸ“';, label: 'Movement/Location'
+    }, communication { color: 'bg-orange-100 text-orange-800 border-orange-200', icon: 'ðŸ“ž';, label: 'Communication'
     } }
 
-  // Format date for display function formatDate(dateStr: string): string { const date = new Date(dateStr); return date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long'; day: 'numeric'
+  // Format date for display function formatDate(dateStr: string): string { const date = new Date(dateStr); return date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long';, day: 'numeric'
     })}
 
   // Format time for display function formatTime(timeStr?: string): string { if (!timeStr) return '';
    const [hours, minutes] = timeStr.split(':');
-   const date = new Date()); date.setHours(parseInt(hours), parseInt(minutes)); return date.toLocaleTimeString('en-US', { hour: 'numeric'; minute: '2-digit', hour12: true })}
+   const date = new Date()); date.setHours(parseInt(hours), parseInt(minutes)); return date.toLocaleTimeString('en-US', { hour: 'numeric';, minute: '2-digit', hour12: true })}
   let expandedDates = new Set<string>(); function toggleDate(date: string) { if (expandedDates.has(date)) { expandedDates.delete(date)} else { expandedDates.add(date)}
     expandedDates = expandedDates; // Trigger reactivity }
 </script>
  <div class="w-full max-w-4xl"> <div class="yorha-panel-header"> <div class="flex items-center"> <h3 class="nes-text is-primary text-xl font-semibold flex items-center"> â° Evidence Timeline <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{timelineEvents.length} events</span> </h3>
- <div class="flex"> <Button.Root class="bits-btn" variant="ghost" size="sm"> ðŸ“Š Timeline Analysis </Button>
- <Button.Root class="bits-btn" variant="ghost" size="sm"> ðŸ—‚ï¸ Export Timeline </Button> </div> </div>
+ <div class="flex"> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm"> ðŸ“Š Timeline Analysis </Button>
+ <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm"> ðŸ—‚ï¸ Export Timeline </Button> </div> </div>
   {#if caseId} <p class="text-sm">case { caseId }
 </p> {/if}
   </div>
@@ -67,12 +67,12 @@
   </div> </div>
  <!-- Timeline, actions --> <Separator class="my-6" /> <div class="flex items-center"> <div class="text-sm"> {timelineEvents.length} events across {Object.keys(errors).length} day{Object.keys(errors).length !== 1 ? 's': ''}
 </div>
- <div class="flex"> <Button.Root class="bits-btn" variant="ghost" size="sm"> ðŸ” Find Gaps </Button>
- <Button.Root class="bits-btn" variant="ghost" size="sm"> ðŸ•¸ï¸ Show Connections </Button>
- <Button.Root class="bits-btn" size="sm"> ðŸ“ Generate Report </Button> </div> {/if}
+ <div class="flex"> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm"> ðŸ” Find Gaps </Button>
+ <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm"> ðŸ•¸ï¸ Show Connections </Button>
+ <Button.Root class="bits-btn bits-btn" size="sm"> ðŸ“ Generate Report </Button> </div> {/if}
   </div> </div>
- <style> /* Timeline custom styles */ .timeline-marker { position: absolute; left: -6px; top: 12px; width: 12px; height: 12px; background: #3b82f6; border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 0 0 1px #e5e7eb}
-  .timeline-connector { position: absolute; left: -1px; top: 24px; bottom: -24px; width: 2px; background: #e5e7eb}
+ <style> /* Timeline custom styles */ .timeline-marker { position: absolute;, left: -6px;, top: 12px;, width: 12px;, height: 12px;, background: #3b82f6;, border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 0 0 1px #e5e7eb}
+  .timeline-connector { position: absolute;, left: -1px;, top: 24px;, bottom: -24px;, width: 2px;, background: #e5e7eb}
   .timeline-last .timeline-connector { display: none}
 </style>
 

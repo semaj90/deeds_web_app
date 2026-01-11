@@ -2,25 +2,17 @@ import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types.js';
 
 type DashboardStats = {
- activeCases: number;
- activeChats: number;
- ragQueries: number;
- documentsAnalyzed: number;
- citationsFound: number;
- casesProcessed: number;
- assistantSessions: number;
- evidenceUploaded: number;
- tasksCompleted: number;
- recentActivity: number;
+ activeCases: number;, activeChats: number;
+ ragQueries: number;, documentsAnalyzed: number;
+ citationsFound: number;, casesProcessed: number;
+ assistantSessions: number;, evidenceUploaded: number;
+ tasksCompleted: number;, recentActivity: number;
 };
 
 type RecentCase = {
- id: string;
- title: string;
- caseType: string;
- status: string;
- priority: string;
- lastUpdated: string;
+ id: string;, title: string;
+ caseType: string;, status: string;
+ priority: string;, lastUpdated: string;
 };
 
 export const load: PageServerLoad = async ({ locals }) => {

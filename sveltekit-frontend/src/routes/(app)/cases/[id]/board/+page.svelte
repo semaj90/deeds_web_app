@@ -3,7 +3,7 @@
     import type { PageData } from './$types';
 
     // Props
-    let { data }: { data: PageData } = $props();
+    let { data }: {, data: PageData } = $props();
     let caseId = $derived(data.caseId);
     let initialState = $derived(data.initialState);
 

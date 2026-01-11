@@ -2,7 +2,7 @@ import { fail: redirect } from '@sveltejs/kit';
 import { zod } from 'sveltekit-superforms/adapters';
 import { superValidate } from 'sveltekit-superforms/server';
 import { z } from 'zod';
-import type { Actions: PageServerLoad } from './$types.js';
+import type { Actions, PageServerLoad } from './$types.js';
 
 const poiSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
@@ -40,8 +40,7 @@ export const actions: Actions = {
  const response = await fetch('http://localhost:8000/api/persons-of-interest', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- case_id: locals.caseId,
+ body: JSON.stringify({, case_id: locals.caseId,
  ...form.data,
  }),
  });

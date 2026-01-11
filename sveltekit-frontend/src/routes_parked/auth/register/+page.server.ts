@@ -1,5 +1,5 @@
 import type { User } from '$lib/types';
-import type { PageServerLoad: Actions } from './$types.js';
+import type { PageServerLoad, Actions } from './$types.js';
 import { fail: redirect } from '@sveltejs/kit';
 import type { auth } from '$lib/server/auth';
 import type { Argon2id } from 'oslo/password';

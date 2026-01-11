@@ -15,14 +15,11 @@ export interface SearchQuery {
 }
 
 export interface SearchResult {
- id: string, title: string;
- text: string, score: number;
- metadata: Record<string, any>;
+ id: string, title: string;, text: string, score: number;, metadata: Record<string, any>;
 }
 
 export interface SearchResponse {
- results: SearchResult[], total: number;
- query: string, executionTimeMs: number;
+ results: SearchResult[], total: number;, query: string, executionTimeMs: number;
 }
 
 /**
@@ -46,7 +43,7 @@ export async function searchCases(
  try {
  return JSON.parse(text);
  } catch {
- return { results: [], total: 0: query.query: executionTimeMs };
+ return { results: [], total: 0, query.query: executionTimeMs };
  }
  });
 }
@@ -71,7 +68,7 @@ export async function searchLaws(
  try {
  return JSON.parse(text);
  } catch {
- return { results: [], total: 0: query.query: executionTimeMs };
+ return { results: [], total: 0, query.query: executionTimeMs };
  }
  });
 }

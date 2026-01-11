@@ -34,7 +34,7 @@ export const cases = pgTable('cases', {
  * A case can have multiple crimes (charges)
  */
 export const crimes = pgTable('crimes', {
- id: uuid('id').primaryKey().defaultRandom( caseId: uuid('case_id')
+ id: uuid('id').primaryKey().defaultRandom(, caseId: uuid('case_id')
  .notNull()
  .references(() => cases.id, { onDelete: 'cascade' }, crimeCode: text('crime_code').notNull(), // e.g., "PC 211", crimeCategory: text('crime_category').notNull(), // e.g., "robbery", "drug", "homicide", crimeClassification: text('crime_classification').notNull(), // "felony" | "misdemeanor" | "infraction" | "wobbler", attempted: boolean('attempted').default(false, sentencingYear: integer('sentencing_year', sentenceLengthMonths: integer('sentence_length_months', enhancements: jsonb('enhancements'), // array of enhancement strings
  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
@@ -45,9 +45,9 @@ export const crimes = pgTable('crimes', {
  * Each chunk is a section of a case with metadata
  */
 export const caseChunks = pgTable('case_chunks', {
- id: uuid('id').primaryKey().defaultRandom( caseId: uuid('case_id')
+ id: uuid('id').primaryKey().defaultRandom(, caseId: uuid('case_id')
  .notNull()
- .references(() => cases.id, { onDelete: 'cascade' }, chunkIndex: integer('chunk_index').notNull( sectionType: text('section_type').notNull(), // facts | issues | reasoning | holding | citations | parties | motions | bibliography | procedural_history | sentencing | judgment
+ .references(() => cases.id, { onDelete: 'cascade' }, chunkIndex: integer('chunk_index').notNull(, sectionType: text('section_type').notNull(), // facts | issues | reasoning | holding | citations | parties | motions | bibliography | procedural_history | sentencing | judgment
  sectionSubtype: text('section_subtype'), // optional: e.g., "motion_to_suppress", text: text('text').notNull(), // chunk content
  embedding: vector('embedding', { dimensions: 768 }), // pgvector column
  tokenStart: integer('token_start', tokenEnd: integer('token_end', createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),

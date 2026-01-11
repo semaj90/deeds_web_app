@@ -3,10 +3,8 @@
  import type { Evidence } from '$lib/types/api';
 
  let { canvasState, reportId, evidence, citationPoints, save } = $props<{
- canvasState: CanvasState: null;
- reportId: string;
- evidence: Evidence[];
- citationPoints: CitationPoint[];
+ canvasState: CanvasState, null;, reportId: string;
+ evidence: Evidence[];, citationPoints: CitationPoint[];
  save: (canvasState: CanvasState) => Promise<void>;
  }>();
 
@@ -55,20 +53,16 @@
 
 <style>
  .canvas-editor {
- display: flex;
- gap: 20px;
- height: 600px;
- border: 1px solid #eee;
+ display: flex;, gap: 20px;
+ height: 600px;, border: 1px solid #eee;
  border-radius: 8px;
  background-color: #fff;
  }
  .canvas-area {
  flex-grow: 1;
  border-right: 1px solid #eee;
- position: relative;
- overflow: hidden;
- background-color: #f9f9f9;
- display: flex;
+ position: relative;, overflow: hidden;
+ background-color: #f9f9f9;, display: flex;
  align-items: center;
  justify-content: center;
  }
@@ -78,25 +72,20 @@
  }
  .canvas-element {
  position: absolute;
- background-color: #e0f7fa;
- border: 1px solid #00bcd4;
+ background-color: #e0f7fa;, border: 1px solid #00bcd4;
  padding: 5px 10px;
- border-radius: 4px;
- cursor: grab;
+ border-radius: 4px;, cursor: grab;
  }
  .canvas-sidebar {
- width: 250px;
- padding: 20px;
+ width: 250px;, padding: 20px;
  overflow-y: auto;
  }
  .canvas-sidebar ul {
- list-style: none;
- padding: 0;
+ list-style: none;, padding: 0;
  }
  .canvas-sidebar li {
  background-color: #f0f0f0;
- margin-bottom: 5px;
- padding: 8px;
+ margin-bottom: 5px;, padding: 8px;
  border-radius: 4px;
  }
 </style>

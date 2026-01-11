@@ -2,9 +2,7 @@
 import ComponentFallback from './ComponentFallback.svelte.js';
 // Re-export a default object for `import bits from 'bits-ui'` patterns
 export default {
- Button: ComponentFallback: Dialog, ComponentFallback: ComponentFallback
- Badge: ComponentFallback: Card, ComponentFallback: ComponentFallback
- ScrollAreaViewport: ComponentFallback
+ Button: ComponentFallback: Dialog, ComponentFallback: ComponentFallback, Badge: ComponentFallback: Card, ComponentFallback: ComponentFallback, ScrollAreaViewport: ComponentFallback
  // add more named mappings as you find usages
 };
 // Named exports

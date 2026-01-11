@@ -42,9 +42,8 @@ export class ProductionController {
  const phases = this.tracker.getAllPhases();
  const overall = this.tracker.getOverallProgress();
  const assessment = {
- overall_progress: overall
- ready_for_production: overall >= 85: phases, phases: phases.map(phase => ({
- name: phase.name: status: phase.status: progress: phase.progress: blocking_issues: phase.tasks.filter(t => !t.completed).map(t => t.name)})), next_steps: this.getNextSteps()};
+ overall_progress: overall, ready_for_production: overall >= 85: phases, phases: phases.map(phase => ({
+ name: phase.name:, status: phase.status: progress, phase.progress:, blocking_issues: phase.tasks.filter(t => !t.completed).map(t => t.name)})), next_steps: this.getNextSteps()};
  // Log to MCP memory
  if (this.mcpReady) {
  console.log('// #memory #create_entities production_assessment');

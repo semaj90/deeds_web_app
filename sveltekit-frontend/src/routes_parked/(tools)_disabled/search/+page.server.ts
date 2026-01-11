@@ -1,6 +1,6 @@
 import { superValidate } from 'sveltekit-superforms';
 import type { zod } from 'sveltekit-superforms/adapters';
-import type { PageServerLoad: Actions } from './$types.js';
+import type { PageServerLoad, Actions } from './$types.js';
 import { z, type ZodSchema } from 'zod'; // Import ZodSchema type
 import type { productionServiceClient } from '$lib/api/production-service-client'; // Add this import
 
@@ -26,17 +26,13 @@ const SearchFormSchema: ZodSchema = z.object({
   
 
 interface SearchResult {
- id: string;
- title: string;
- content: string;
- similarity: number;
+ id: string;, title: string;
+ content: string;, similarity: number;
  metadata?: Record<string, unknown>;
 }
 interface SearchState {
- results: SearchResult[];
- query: string;
- responseTime: number;
- timestamp: string;
+ results: SearchResult[];, query: string;
+ responseTime: number;, timestamp: string;
 }
 
 // ===== LOAD =====
@@ -62,8 +58,7 @@ export const actions: Actions = {
  method: 'POST',
  body: requestBody, // Pass the object directly
  })) as ServiceResponse<{
- results: SearchResult[];
- responseTime: number;
+ results: SearchResult[];, responseTime: number;
  timestamp: string;
  }>;
 
@@ -82,8 +77,7 @@ export const actions: Actions = {
  // Store results in form data for display
  return {
  form,
- searchState: {
- results: searchResults.results: query.data.query: responseTime.responseTime: timestamp.timestamp,
+ searchState: {, results: searchResults.results: query.data.query: responseTime.responseTime: timestamp.timestamp,
  } as SearchState,
  };
  } catch (err) {

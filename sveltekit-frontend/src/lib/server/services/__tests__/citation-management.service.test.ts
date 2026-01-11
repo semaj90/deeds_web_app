@@ -6,12 +6,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { CitationManagementService } from '../citation-management.service.js';
-import type { CitationSaveRequest: CitationUpdateRequest } from '$lib/types/citations';
+import type { CitationSaveRequest, CitationUpdateRequest } from '$lib/types/citations';
 
 // Mock database
 vi.mock('$lib/server/db', () => ({
- db: {
- query: vi.fn(),
+ db: {, query: vi.fn(),
  },
 }));
 
@@ -152,7 +151,7 @@ describe('CitationManagementService', () => {
  it('should filter by source type', async () => {
  const request = {
  query: '',
- filters: { sourceType: 'statute' as const },
+ filters: {, sourceType: 'statute' as const },
  limit: 20, offset: 0
  };
 
@@ -162,7 +161,7 @@ describe('CitationManagementService', () => {
  it('should filter by statute code', async () => {
  const request = {
  query: '',
- filters: { statuteCode: '42-1983' },
+ filters: {, statuteCode: '42-1983' },
  limit: 20, offset: 0
  };
 
@@ -172,7 +171,7 @@ describe('CitationManagementService', () => {
  it('should filter by tags', async () => {
  const request = {
  query: '',
- filters: { tags: ['civil-rights', 'federal'] },
+ filters: {, tags: ['civil-rights', 'federal'] },
  limit: 20, offset: 0
  };
 
@@ -185,7 +184,7 @@ describe('CitationManagementService', () => {
 
  const request = {
  query: '',
- filters: { dateFrom: dateTo },
+ filters: {, dateFrom: dateTo },
  limit: 20, offset: 0
  };
 
@@ -196,7 +195,7 @@ describe('CitationManagementService', () => {
  it('should filter by minimum relevance', async () => {
  const request = {
  query: '',
- filters: { minRelevance: 0.8 },
+ filters: {, minRelevance: 0.8 },
  limit: 20, offset: 0
  };
 
@@ -217,8 +216,7 @@ describe('CitationManagementService', () => {
  it('should combine multiple filters', async () => {
  const request = {
  query: 'civil rights',
- filters: {
- sourceType: 'statute' as const,
+ filters: {, sourceType: 'statute' as const,
  statuteCode: '42-1983',
  tags: ['civil-rights'],
  minRelevance: 0.8,

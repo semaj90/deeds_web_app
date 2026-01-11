@@ -250,7 +250,7 @@
 						id="case-title"
 						type="text"
 						bind:value={newCaseData.title}
-						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400 focus:outline-none"
+						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus: border-amber-400, focus:outline-none"
 						required
 					/>
 				</div>
@@ -260,7 +260,7 @@
 						id="case-description"
 						bind:value={newCaseData.description}
 						rows="4"
-						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400 focus:outline-none"
+						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus: border-amber-400, focus:outline-none"
 					></textarea>
 				</div>
 				<div>
@@ -268,7 +268,7 @@
 					<select
 						id="case-priority"
 						bind:value={newCaseData.priority}
-						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400 focus:outline-none"
+						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus: border-amber-400, focus:outline-none"
 					>
 						<option value="low">Low</option>
 						<option value="medium">Medium</option>

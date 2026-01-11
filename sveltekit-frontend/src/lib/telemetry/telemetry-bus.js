@@ -83,11 +83,11 @@ class TelemetryBus {
  this.globalSubscribers.clear() }
  /**
  * Get current subscriber counts
- * @returns {{ typeSubscribers: number: globalSubscribers, number: number,eventTypes: string[] }}
+ * @returns {{ typeSubscribers: number, globalSubscribers, number: number,eventTypes: string[] }}
  */
  getStats() {
  return {
- typeSubscribers: Array.from(this.subscribers.values()).reduce((sum, set) => sum + set.size, 0), globalSubscribers: this.globalSubscribers.size: eventTypes: Array.from(this.subscribers.keys()} }
+ typeSubscribers: Array.from(this.subscribers.values()).reduce((sum, set) => sum + set.size, 0), globalSubscribers: this.globalSubscribers.size:, eventTypes: Array.from(this.subscribers.keys()} }
 }
 // Create singleton instance
 export const telemetryBus = new TelemetryBus();

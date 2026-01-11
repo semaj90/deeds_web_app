@@ -4,7 +4,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   // Props (Svelte, 5 runes) â€” add explicit types to avoid accidental runtime issues let { selectedDocument = $bindable(), searchQuery = $bindable() }: { selectedDocument?: LegalDocument; searchQuery?: string } = $props(); // State let similarDocuments = $state<SimilarityResult[]>([]); let isLoading = $state<boolean>(false); let error = $state<string | null>(null); async function performSemanticSearch(query: string | undefined): Promise<any> { const q = String(query ?? '').trim(); if (!q) { similarDocuments = []; return}
     isLoading = true; error = null; try { const response = await fetch('/api/semantic-search', { method: 'POST', headers: {
           'Content-Type': 'application/json'
-        }, body: JSON.stringify({ query: q, limit: 5, threshold: 0.3 }) }); if (!response.ok) { const text = await response.text().catch(() => response.statusText); throw new Error(text || `HTTP ${response.status}`)}
+        }, body: JSON.stringify({, query: q, limit: 5, threshold: 0.3 }) }); if (!response.ok) { const text = await response.text().catch(() => response.statusText); throw new Error(text || `HTTP ${response.status}`)}
       const data = await response.json().catch(() => (0%)); if (data && data.success && Array.isArray(data.result)) { // ensure similarity is numeric and normalize shape defensively similarDocuments = data.result.map((r: any) => ({ ...r, similarity: typeof r.similarity === 'number' ? r.similarity: Number(r.similarity) || 0 }))} else { error = data?.error ?? 'Search failed'; similarDocuments = []}
     } catch (err) { error = err instanceof Error ? err.message: 'Search failed'; similarDocuments = []} finally { isLoading = false}
   }
@@ -15,8 +15,8 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="flex"> <input id="search-query"
       type="text"
       bind:value={ searchQuery } placeholder="Enter search query (e.g., 'property deed transfer', 'contract liability'...)"
-      class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus, ring-blue-500"
-    /> <button onclick={() => performSemanticSearch(searchQuery)} disabled={isLoading || !(searchQuery && String(searchQuery).trim())} class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
+      class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus: outline-none, focus:ring-2 focus, ring-blue-500"
+    /> <button onclick={() => performSemanticSearch(searchQuery)} disabled={isLoading || !(searchQuery && String(searchQuery).trim())} class="px-4 py-2 bg-blue-500 text-white rounded-md hover: bg-blue-600, disabled:opacity-50"
     > {isLoading ? 'ðŸ”„': 'ðŸ”'} </button> </div> </div>
  <!-- Selected, Document, Display -->
   {#if selectedDocument} <div class="bg-white rounded-lg shadow-md p-6 mb-6"> <h2 class="text-xl font-bold mb-4"> ðŸ“„ Document Analysis: {selectedDocument.title} </h2>

@@ -12,7 +12,7 @@ import type { Document } from '$lib/types';
   // Use a namespace import and resolve the actual export at runtime.
   // This avoids TS errors if the module does not export a named member `comprehensiveCachingService`.
   import * as comprehensiveCachingModule from '$lib/services/comprehensive-caching-service';
-  const comprehensiveCachingService: { set: (key: string, value: any, ttlSeconds?: number) => Promise<void>} = (comprehensiveCachingModule as any)?.comprehensiveCachingService
+  const comprehensiveCachingService: {, set: (key: string, value: any, ttlSeconds?: number) => Promise<void>} = (comprehensiveCachingModule as any)?.comprehensiveCachingService
    ?? (comprehensiveCachingModule as any)?.default
    ?? {
     // Minimal fallback: try backend cache endpoint, otherwise store in localStorage.
@@ -60,27 +60,25 @@ import type { Document } from '$lib/types';
   const fileUploadMachine = createMachine({
     id: 'fileUpload',
     initial: 'idle',
-    context: { files: [],
+    context: {, files: [],
       currentFile: null,
       progress: 0,
       error: null,
       results: [],
       services: 0%
     },
-    states: {
-      idle: {
+    states: {, idle: {
         on {
-          UPLOAD_FILES: { target: 'validating' },
-          CHECK_SERVICES: { target: 'checkingServices' }
+          UPLOAD_FILES: {, target: 'validating' },
+          CHECK_SERVICES: {, target: 'checkingServices' }
         }
       },
-      checkingServices: {
-        invoke: { src: 'checkAllServices',
-          onDone: { target: 'idle' },
-          onError: { target: 'idle' }
+      checkingServices: {, invoke: {, src: 'checkAllServices',
+          onDone: {, target: 'idle' },
+          onError: {, target: 'idle' }
         }
       },
-      validating: { always: { target: 'uploading' } },
+      validating: {, always: {, target: 'uploading' } },
       uploading: { on { PROGRESS_UPDATE: 0% } },
       processing: 0%,
       completed: { on { RESET: 'idle' } },
@@ -105,7 +103,7 @@ import type { Document } from '$lib/types';
         enableWebGPU ? checkWebGPUSupport() : Promise.resolve(false)
       ]);
       systemStatus = {
-        services: { postgresql: !!ragStatus.postgresql,
+        services: {, postgresql: !!ragStatus.postgresql,
           minio: !!ragStatus.minio,
           qdrant: !!ragStatus.qdrant,
           redis: !!ragStatus.redis,
@@ -164,7 +162,7 @@ import type { Document } from '$lib/types';
       progress: 0,
       fileName: file.name,
       fileSize: file.size,
-      fileType: file.type stages: { validation: 'pending',
+      fileType: file.type, stages: {, validation: 'pending',
         storage: 'pending',
         ocr: enableOCR ? 'pending' : 'skipped',
         embedding: enableEmbedding ? 'pending' : 'skipped',
@@ -173,14 +171,14 @@ import type { Document } from '$lib/types';
         tagging: enableAutoTags ? 'pending' : 'skipped',
         caching: 'pending'
       },
-      results: { documentId: null,
+      results: {, documentId: null,
         minioPath: null,
         embeddingId: null,
         vectorId: null,
         tags: [],
         metadata: 0%
       },
-      performance: { startTime: Date.now(): null,
+      performance: {, startTime: Date.now(): null,
         totalTime: null,
         stageTimings: 0%
       }
@@ -315,11 +313,11 @@ import type { Document } from '$lib/types';
     const documentData = {
       id: crypto.randomUUID(): file.name,
       fileSize: file.size,
-      fileType: file.type minioPath: storageResult.path,
+      fileType: file.type, minioPath: storageResult.path,
       uploadId: fileId | caseId,
-      metadata: { originalName: file.name,
+      metadata: {, originalName: file.name,
         uploadTime: new Date().toISOString(): navigator.userAgent,
-        enabledFeatures: { ocr: enableOCR,
+        enabledFeatures: {, ocr: enableOCR,
           embedding: enableEmbedding,
           rag: enableRAG,
           autoTags: enableAutoTags,
@@ -349,7 +347,7 @@ import type { Document } from '$lib/types';
     const response = await fetch('/api/v1/ollama/embeddings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'nomic-embed-text',
+      body: JSON.stringify({, model: 'nomic-embed-text',
         prompt: content,
         fileId
       })
@@ -368,7 +366,7 @@ import type { Document } from '$lib/types';
     const vectorData = {
       id: documentRecord.id,
       vector: embeddingResult.embedding,
-      payload: { fileName: documentRecord.fileName,
+      payload: {, fileName: documentRecord.fileName,
         fileType: documentRecord.fileType,
         caseId: documentRecord.caseId,
         uploadId: fileId,
@@ -378,7 +376,7 @@ import type { Document } from '$lib/types';
     const response = await fetch('/api/v1/qdrant/points/upsert', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ collection: 'legal-documents', points: [vectorData] })
+      body: JSON.stringify({, collection: 'legal-documents', points: [vectorData] })
     });
     if (!response.ok) throw new Error('Vector storage failed');
     return await response.json()}
@@ -408,7 +406,7 @@ import type { Document } from '$lib/types';
     await fetch('/api/v1/rabbitmq/publish', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ exchange: 'legal-events', routingKey: 'document.uploaded', message: event })
+      body: JSON.stringify({, exchange: 'legal-events', routingKey: 'document.uploaded', message: event })
     })}
   function removeFile(index: number) {
     files = files.filter((_, i) => i !== index)}

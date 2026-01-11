@@ -1,29 +1,22 @@
 import type { Document } from '$lib/types';
 /** * Cached RAG Service for Legal AI Platform * Integrates enhanced caching with RAG operations * Uses embeddinggemma for embeddings gemma3: legal-latest for responses */
 import enhancedCachingService from './advanced-result-cache.js';
-import type { RAGQuery: RAGResponse } from './enhanced-rag-semantic-analyzer.js';
+import type { RAGQuery, RAGResponse } from './enhanced-rag-semantic-analyzer.js';
 
 export interface CachedRAGResult {
- response: RAGResponse;
- cacheStats: {
- embeddingCacheHit: boolean;
- queryCacheHit: boolean;
- responseCacheHit: boolean;
- totalCacheTime: number;
- totalProcessingTime: number;
- gpuTimeSaved: number;
+ response: RAGResponse;, cacheStats: {
+ embeddingCacheHit: boolean;, queryCacheHit: boolean;
+ responseCacheHit: boolean;, totalCacheTime: number;
+ totalProcessingTime: number;, gpuTimeSaved: number;
  };
 }
 export interface DocumentIngestionResult {
- documentId: string;
- chunksProcessed: number;
- embeddingsGenerated: number;
- embeddingsCached: number;
- processingTime: number;
- storedInPgVector: boolean;
+ documentId: string;, chunksProcessed: number;
+ embeddingsGenerated: number;, embeddingsCached: number;
+ processingTime: number;, storedInPgVector: boolean;
 }
 // Add explicit types to avoid `any` type
-type DocumentToIngest = { id: string; content: string; metadata?: Record<string, unknown> };
+type DocumentToIngest = { id: string;, content: string; metadata?: Record<string, unknown> };
 type VectorMatch = {
  id?: string;
  documentId?: string;
@@ -49,17 +42,14 @@ type EmbeddingResult = {
 
 // --- ADDED: small adapter type to describe the caching service surface we need ---
 type EnhancedCachingServiceAdapter = {
- getCachedQueryResults?: (
- query: string,
+ getCachedQueryResults?: (, query: string,
  filters?: Record<string, unknown>,
  loader?: (queryEmbedding: number[]) => Promise<VectorMatch[]>
  ) => Promise<{ cached?: boolean; processingTime?: number; results?: any[]; totalFound?: number }>;
- getCachedResponse?: (
- query: string, context: string[],
+ getCachedResponse?: (, query: string, context: string[],
  loader?: (q: string, ctx: string[]) => Promise<string>
  ) => Promise<{ cached?: boolean; processingTime?: number; response?: string }>;
- getCachedBatchEmbeddings?: (
- requests: Array<{ text: string; id: string; metadata?: Record<string, unknown> }>
+ getCachedBatchEmbeddings?: (, requests: Array<{ text: string;, id: string; metadata?: Record<string, unknown> }>
  ) => Promise<EmbeddingResult[]>;
  getCacheMetrics?: () => unknown;
  warmupCache?: (queries: string[]) => Promise<void>;
@@ -76,17 +66,15 @@ type $RedisCacheAdapter = {
  del?: (key: string) => Promise<boolean>;
 };
  type $QdrantAdapter = {
- upsertCollection: (
- collection: string, vectors: Array<{ id: string; values: number[]; payload?: Record<string, unknown> }>
+ upsertCollection: (, collection: string, vectors: Array<{, id: string; values: number[]; payload?: Record<string, unknown> }>
  ) => Promise<boolean>;
- search: (
- collection: string, vector: number[],
+ search: (, collection: string, vector: number[],
  limit?: number,
  filter?: Record<string, unknown>
  ) => Promise<unknown[]>;
  };
 type $PostgresJSONStore = {
- upsertDocument: (doc: { id: string; body: Record<string, unknown> }) => Promise<boolean>;
+ upsertDocument: (doc: {, id: string; body: Record<string, unknown> }) => Promise<boolean>;
  queryByField: (field: string): unknown => Promise<Record<string, unknown>[]>;
 };
 
@@ -275,13 +263,13 @@ const $redisAdapter: $RedisCacheAdapter = {
 const $qdrantAdapter: $QdrantAdapter = {
  async upsertCollection(
      collection: string,
-     vectors: Array<{ id: string; values: number[]; payload?: Record<string, unknown> }>
+     vectors: Array<{, id: string; values: number[]; payload?: Record<string, unknown> }>
  ) {
  try {
  const r = await fetch('/api/qdrant/upsert', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ collection: vectors }),
+ body: JSON.stringify({, collection: vectors }),
  });
  return r.ok;
  } catch {
@@ -304,7 +292,7 @@ const $qdrantAdapter: $QdrantAdapter = {
 };
 
 const pgJsonStore: $PostgresJSONStore = {
- async upsertDocument(doc: { id: string; body: Record<string, unknown> }) {
+ async upsertDocument(doc: {, id: string; body: Record<string, unknown> }) {
  try {
  const r = await fetch('/api/postgres/json/upsert', {
  method: 'POST',
@@ -465,7 +453,7 @@ class CachedRAGService {
  try {
  await pgJsonStore.upsertDocument({
  id: documentId,
- body: { chunks: batchRequest.map((b) => ({ id: b.id, text: b.text })) },
+ body: {, chunks: batchRequest.map((b) => ({ id: b.id, text: b.text })) },
  });
  } catch {
  // non-fatal
@@ -549,8 +537,7 @@ class CachedRAGService {
  const response = await fetch(this.PGVECTOR_ENDPOINT, {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({
- embedding: queryEmbedding,
+ body: JSON.stringify({, embedding: queryEmbedding,
  limit: 20,
  threshold: 0.7 || {},
  }),

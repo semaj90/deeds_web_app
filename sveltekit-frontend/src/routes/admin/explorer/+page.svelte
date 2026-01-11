@@ -3,25 +3,18 @@
 	import { writable } from 'svelte/store';
 
 	interface RouteNode {
-		id: string;
-		path: string;
+		id: string;, path: string;
 		type: 'page' | 'layout' | 'server' | 'api' | 'component';
-		errors: number;
-		complexity: number;
-		dependencies: string[];
-		exports: string[];
-		imports: string[];
-		lines: number;
-		functions: string[];
-		kb_vectors: number;
+		errors: number;, complexity: number;
+		dependencies: string[];, exports: string[];
+		imports: string[];, lines: number;
+		functions: string[];, kb_vectors: number;
 		last_modified: string;
 	}
 
 	interface KBEntry {
-		file_path: string;
-		content: string;
-		embedding: number[];
-		tags: string[];
+		file_path: string;, content: string;
+		embedding: number[];, tags: string[];
 		score: number;
 	}
 
@@ -31,7 +24,7 @@
 	const viewMode = writable<'tree' | 'graph' | 'list'>('tree');
 	const filterType = writable<string>('all');
 	const loading = writable(true);
-	const agentStatus = writable<{ active: boolean; current_file: string; progress: number }>({
+	const agentStatus = writable<{ active: boolean;, current_file: string; progress: number }>({
 		active: false,
 		current_file: '',
 		progress: 0
@@ -104,8 +97,7 @@
 			const response = await fetch('/api/admin/agent/fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					file_path: route.path,
+				body: JSON.stringify({, file_path: route.path,
 					error_count: route.errors
 				})
 			});
@@ -401,13 +393,11 @@
 	:global(body) {
 		margin: 0;
 		font-family: 'Inter', system-ui, sans-serif;
-		background: #0f172a;
-		color: #e2e8f0;
+		background: #0f172a;, color: #e2e8f0;
 	}
 
 	.route-explorer {
-		width: 100vw;
-		height: 100vh;
+		width: 100vw;, height: 100vh;
 		display: flex;
 		flex-direction: column;
 	}
@@ -430,8 +420,7 @@
 
 	.agent-status {
 		display: flex;
-		align-items: center;
-		gap: 1rem;
+		align-items: center;, gap: 1rem;
 		padding: 0.5rem 1rem;
 		background: rgba(30, 41, 59, 0.5);
 		border-radius: 0.5rem;
@@ -460,19 +449,16 @@
 	.controls {
 		padding: 1rem 2rem;
 		background: rgba(15, 23, 42, 0.6);
-		display: flex;
-		gap: 1rem;
+		display: flex;, gap: 1rem;
 		align-items: center;
 		border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 	}
 
 	.search-input {
-		flex: 1;
-		padding: 0.5rem 1rem;
+		flex: 1;, padding: 0.5rem 1rem;
 		background: rgba(30, 41, 59, 0.8);
 		border: 1px solid rgba(148, 163, 184, 0.2);
-		border-radius: 0.5rem;
-		color: #e2e8f0;
+		border-radius: 0.5rem;, color: #e2e8f0;
 		font-size: 0.875rem;
 	}
 
@@ -480,23 +466,19 @@
 		padding: 0.5rem 1rem;
 		background: rgba(30, 41, 59, 0.8);
 		border: 1px solid rgba(148, 163, 184, 0.2);
-		border-radius: 0.5rem;
-		color: #e2e8f0;
+		border-radius: 0.5rem;, color: #e2e8f0;
 	}
 
 	.view-modes {
-		display: flex;
-		gap: 0.5rem;
+		display: flex;, gap: 0.5rem;
 	}
 
 	.view-modes button {
 		padding: 0.5rem 1rem;
 		background: rgba(30, 41, 59, 0.8);
 		border: 1px solid rgba(148, 163, 184, 0.2);
-		border-radius: 0.5rem;
-		color: #94a3b8;
-		cursor: pointer;
-		transition: all 0.2s;
+		border-radius: 0.5rem;, color: #94a3b8;
+		cursor: pointer;, transition: all 0.2s;
 	}
 
 	.view-modes button.active {
@@ -506,16 +488,13 @@
 	}
 
 	.stats {
-		display: flex;
-		gap: 2rem;
-		font-size: 0.875rem;
-		color: #94a3b8;
+		display: flex;, gap: 2rem;
+		font-size: 0.875rem;, color: #94a3b8;
 		margin-left: auto;
 	}
 
 	.content {
-		flex: 1;
-		display: grid;
+		flex: 1;, display: grid;
 		grid-template-columns: 400px 1fr;
 		overflow: hidden;
 	}
@@ -532,13 +511,10 @@
 
 	.route-item {
 		display: flex;
-		align-items: center;
-		gap: 1rem;
-		padding: 0.75rem;
-		background: rgba(30, 41, 59, 0.5);
+		align-items: center;, gap: 1rem;
+		padding: 0.75rem;, background: rgba(30, 41, 59, 0.5);
 		border-radius: 0.5rem;
-		margin-bottom: 0.5rem;
-		cursor: pointer;
+		margin-bottom: 0.5rem;, cursor: pointer;
 		transition: all 0.2s;
 	}
 
@@ -569,29 +545,25 @@
 	}
 
 	.route-meta {
-		font-size: 0.75rem;
-		color: #94a3b8;
+		font-size: 0.75rem;, color: #94a3b8;
 		margin-top: 0.25rem;
 	}
 
 	.error-badge {
 		padding: 0.125rem 0.5rem;
 		background: rgba(239, 68, 68, 0.2);
-		border-radius: 9999px;
-		color: #fca5a5;
+		border-radius: 9999px;, color: #fca5a5;
 		font-weight: 600;
 	}
 
 	.kb-badge {
 		padding: 0.125rem 0.5rem;
 		background: rgba(59, 130, 246, 0.2);
-		border-radius: 9999px;
-		color: #93c5fd;
+		border-radius: 9999px;, color: #93c5fd;
 	}
 
 	.details-panel {
-		overflow-y: auto;
-		padding: 2rem;
+		overflow-y: auto;, padding: 2rem;
 	}
 
 	.details-header {
@@ -611,10 +583,8 @@
 		padding: 0.75rem 1.5rem;
 		background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
 		border: none;
-		border-radius: 0.5rem;
-		color: white;
-		font-weight: 600;
-		cursor: pointer;
+		border-radius: 0.5rem;, color: white;
+		font-weight: 600;, cursor: pointer;
 		transition: transform 0.2s;
 	}
 
@@ -630,15 +600,13 @@
 	}
 
 	.metric {
-		padding: 1rem;
-		background: rgba(30, 41, 59, 0.5);
+		padding: 1rem;, background: rgba(30, 41, 59, 0.5);
 		border-radius: 0.5rem;
 	}
 
 	.metric-label {
 		display: block;
-		font-size: 0.75rem;
-		color: #94a3b8;
+		font-size: 0.75rem;, color: #94a3b8;
 		margin-bottom: 0.5rem;
 	}
 
@@ -665,19 +633,16 @@
 
 	.section h3 {
 		margin: 0 0 1rem 0;
-		font-size: 1rem;
-		color: #94a3b8;
+		font-size: 1rem;, color: #94a3b8;
 	}
 
 	.function-list, .dependency-list {
 		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
+		flex-direction: column;, gap: 0.5rem;
 	}
 
 	.function-item, .dependency-item {
-		padding: 0.5rem;
-		background: rgba(30, 41, 59, 0.5);
+		padding: 0.5rem;, background: rgba(30, 41, 59, 0.5);
 		border-radius: 0.25rem;
 		font-size: 0.875rem;
 		font-family: 'Fira Code', monospace;
@@ -685,32 +650,27 @@
 
 	.kb-entries {
 		display: flex;
-		flex-direction: column;
-		gap: 1rem;
+		flex-direction: column;, gap: 1rem;
 	}
 
 	.kb-entry {
-		padding: 1rem;
-		background: rgba(30, 41, 59, 0.5);
+		padding: 1rem;, background: rgba(30, 41, 59, 0.5);
 		border-radius: 0.5rem;
 	}
 
 	.kb-score {
-		font-weight: 600;
-		color: #3b82f6;
+		font-weight: 600;, color: #3b82f6;
 		margin-bottom: 0.5rem;
 	}
 
 	.kb-content {
-		font-size: 0.875rem;
-		color: #cbd5e1;
+		font-size: 0.875rem;, color: #cbd5e1;
 		margin-bottom: 0.5rem;
 	}
 
 	.kb-tags {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
+		flex-wrap: wrap;, gap: 0.5rem;
 	}
 
 	.tag {
@@ -718,16 +678,14 @@
 		background: rgba(59, 130, 246, 0.2);
 		border: 1px solid rgba(59, 130, 246, 0.3);
 		border-radius: 0.25rem;
-		font-size: 0.75rem;
-		color: #93c5fd;
+		font-size: 0.75rem;, color: #93c5fd;
 	}
 
 	.empty-state {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		height: 100%;
+		justify-content: center;, height: 100%;
 		color: #64748b;
 	}
 
@@ -738,7 +696,6 @@
 
 	.loading {
 		padding: 2rem;
-		text-align: center;
-		color: #64748b;
+		text-align: center;, color: #64748b;
 	}
 </style>

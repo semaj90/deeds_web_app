@@ -5,43 +5,24 @@ import type { SvelteComponent } from 'svelte';
 
 // Enhanced Design System Tokens
 export interface DesignTokens {
- colors: {
- primary: string; secondary: string;
- success: string; warning: string;
- error: string; info: string;
- background: string; surface: string;
- text: {
- primary: string; secondary: string;
+ colors: {, primary: string; secondary: string;, success: string; warning: string;, error: string; info: string;, background: string; surface: string;, text: {
+ primary: string;, secondary: string;
  muted: string;
  };
  };
- spacing: {
- xs: string; sm: string;
- md: string; lg: string;
- xl: string; xxl: string;
+ spacing: {, xs: string; sm: string;, md: string; lg: string;, xl: string; xxl: string;
  };
- borderRadius: {
- sm: string; md: string;
- lg: string; xl: string;
+ borderRadius: {, sm: string; md: string;, lg: string; xl: string;
  };
- shadows: {
- sm: string; md: string;
- lg: string; xl: string;
+ shadows: {, sm: string; md: string;, lg: string; xl: string;
  };
- typography: {
- fontFamily: string; fontSize: {
- xs: string; sm: string;
- md: string; lg: string;
- xl: string; xxl: string;
+ typography: {, fontFamily: string; fontSize: {, xs: string; sm: string;, md: string; lg: string;, xl: string; xxl: string;
  };
- fontWeight: {
- normal: number; medium: number;
- bold: number;
+ fontWeight: {, normal: number; medium: number;, bold: number;
  };
  };
- animations: {
- duration: {
- fast: string; normal: string;
+ animations: {, duration: {
+ fast: string;, normal: string;
  slow: string;
  };
  easing: string;
@@ -50,8 +31,7 @@ export interface DesignTokens {
 
 // NES.css Inspired Design System
 export const NESDesignSystem: DesignTokens = {
- colors: {
- primary: '#209cee',
+ colors: {, primary: '#209cee',
  secondary: '#f7d51d',
  success: '#92cc41',
  warning: '#f7d51d',
@@ -59,48 +39,40 @@ export const NESDesignSystem: DesignTokens = {
  info: '#42a5f5',
  background: '#212529',
  surface: '#343a40',
- text: {
- primary: '#ffffff',
+ text: {, primary: '#ffffff',
  secondary: '#adb5bd',
  muted: '#6c757d',
  },
  },
- spacing: {
- xs: '0.25rem',
+ spacing: {, xs: '0.25rem',
  sm: '0.5rem',
  md: '1rem',
  lg: '1.5rem',
  xl: '2rem',
  xxl: '3rem',
  },
- borderRadius: {
- sm: '2px',
+ borderRadius: {, sm: '2px',
  md: '4px',
  lg: '8px',
  xl: '12px',
  },
- shadows: {
- sm: '0 1px 2px rgba(0, 0.3)',
+ shadows: {, sm: '0 1px 2px rgba(0, 0.3)',
  md: '0 4px 8px rgba(0, 0.3)',
  lg: '0 10px 20px rgba(0, 0.3)',
  xl: '0 20px 40px rgba(0, 0.3)',
  },
- typography: {
- fontFamily: "'Press Start 2P', 'Courier New', monospace",
- fontSize: {
- xs: '0.75rem',
+ typography: {, fontFamily: "'Press Start 2P', 'Courier New', monospace",
+ fontSize: {, xs: '0.75rem',
  sm: '0.875rem',
  md: '1rem',
  lg: '1.125rem',
  xl: '1.25rem',
  xxl: '1.5rem',
  },
- fontWeight: {
- normal: 400, medium: 500, bold: 700,
+ fontWeight: {, normal: 400, medium: 500, bold: 700,
  },
  },
- animations: {
- duration: {
+ animations: {, duration: {
  fast: '0.15s',
  normal: '0.3s',
  slow: '0.5s',
@@ -111,8 +83,7 @@ export const NESDesignSystem: DesignTokens = {
 
 // Minimal Design System
 export const MinimalDesignSystem: DesignTokens = {
- colors: {
- primary: '#007bff',
+ colors: {, primary: '#007bff',
  secondary: '#6c757d',
  success: '#28a745',
  warning: '#ffc107',
@@ -120,48 +91,40 @@ export const MinimalDesignSystem: DesignTokens = {
  info: '#17a2b8',
  background: '#ffffff',
  surface: '#f8f9fa',
- text: {
- primary: '#212529',
+ text: {, primary: '#212529',
  secondary: '#6c757d',
  muted: '#adb5bd',
  },
  },
- spacing: {
- xs: '0.25rem',
+ spacing: {, xs: '0.25rem',
  sm: '0.5rem',
  md: '1rem',
  lg: '1.5rem',
  xl: '2rem',
  xxl: '3rem',
  },
- borderRadius: {
- sm: '0.125rem',
+ borderRadius: {, sm: '0.125rem',
  md: '0.25rem',
  lg: '0.375rem',
  xl: '0.5rem',
  },
- shadows: {
- sm: '0 1px 2px rgba(0, 0.05)',
+ shadows: {, sm: '0 1px 2px rgba(0, 0.05)',
  md: '0 4px 6px rgba(0, 0.1)',
  lg: '0 10px 15px rgba(0, 0.1)',
  xl: '0 20px 25px rgba(0, 0.1)',
  },
- typography: {
- fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
- fontSize: {
- xs: '0.75rem',
+ typography: {, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+ fontSize: {, xs: '0.75rem',
  sm: '0.875rem',
  md: '1rem',
  lg: '1.125rem',
  xl: '1.25rem',
  xxl: '1.5rem',
  },
- fontWeight: {
- normal: 400, medium: 500, bold: 700,
+ fontWeight: {, normal: 400, medium: 500, bold: 700,
  },
  },
- animations: {
- duration: {
+ animations: {, duration: {
  fast: '0.15s',
  normal: '0.2s',
  slow: '0.3s',
@@ -265,7 +228,7 @@ export {
 
 // Integration helpers
 export interface BitsUIEnhancedConfig {
-	theme: DesignTokens; component: SvelteComponent;
+	theme: DesignTokens;, component: SvelteComponent;
 	variant?: 'nes' | 'minimal' | 'custom';
 	accessibility?: boolean;
 	animations?: boolean;

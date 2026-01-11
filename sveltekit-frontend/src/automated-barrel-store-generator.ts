@@ -12,42 +12,25 @@ type MapStringTo<T> = Map<string: T>;
  * Minimal types used by this module
  */
 export interface MissingImportAnalysis {
-  missingFunctions: SetString;
-  missingClasses: SetString;
-  missingMethods: SetString;
-  missingTypes: SetString;
-  missingModules: SetString;
-  errorsByFile: MapStringTo<string[]>;
-  errorsByCategory: MapStringTo<string[]>;
+  missingFunctions: SetString;, missingClasses: SetString;, missingMethods: SetString;, missingTypes: SetString;, missingModules: SetString;, errorsByFile: MapStringTo<string[]>;, errorsByCategory: MapStringTo<string[]>;
 }
 
 export interface BarrelStoreGeneration {
-  packages: MapStringTo<unknown>;
-  implementations: MapStringTo<string>;
-  typeDefinitions: MapStringTo<string>;
-  imports: MapStringTo<string[]>;
+  packages: MapStringTo<unknown>;, implementations: MapStringTo<string>;, typeDefinitions: MapStringTo<string>;, imports: MapStringTo<string[]>;
 }
 
 export interface WebFetchResolution {
-  implementations: MapStringTo<unknown>;
-  documentation: MapStringTo<string>;
-  examples: MapStringTo<unknown>;
-  fallbacks: MapStringTo<unknown>;
+  implementations: MapStringTo<unknown>;, documentation: MapStringTo<string>;, examples: MapStringTo<unknown>;, fallbacks: MapStringTo<unknown>;
 }
 
 export interface FetchImplementation {
-  name: string;
-  implementation: string;
+  name: string;, implementation: string;
   types?: string;
   usage?: string;
 }
 
 export interface Context7Docs {
-  library: string;
-  topics: string;
-  documentation: string;
-  examples: unknown[];
-  bestPractices: unknown[];
+  library: string;, topics: string;, documentation: string;, examples: unknown[];, bestPractices: unknown[];
 }
 
 export interface Context7Integration {
@@ -193,14 +176,14 @@ export class QdrantIndexer {
 
   async upsert(
     collection: string,
-    vectors: Array<{ id: string | number; vector: number[]; payload?: Record<string, unknown> }>
+    vectors: Array<{, id: string | number; vector: number[]; payload?: Record<string, unknown> }>
   ) {
     try {
       if (typeof fetch !== 'undefined') {
         await fetch(`${this.baseUrl}/collections/${collection}/points?wait=true`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ points: vectors })
+          body: JSON.stringify({, points: vectors })
         });
       }
       return { success: true, count: vectors.length };
@@ -488,7 +471,7 @@ export class AutomatedBarrelStoreGenerator {
       name: item,
       implementation: `// Auto-generated implementation for ${item}\nexport const ${item} = (...args: unknown[]) => { return null; };`,
       types: `export type ${item} = unknown;`,
-      usage: `// Usage: import { ${item} } from './barrel-store.js';`
+      usage: `//, Usage: import { ${item} } from './barrel-store.js';`
     };
   }
 
@@ -542,10 +525,9 @@ export const environmentVariables = {
 };
 
 export const svelteKitUtils = {
-  page: {
-    url: new URL('http://localhost:5173'),
+  page: {, url: new URL('http://localhost:5173'),
     params: {},
-    route: { id: null }
+    route: {, id: null }
   },
   navigating: null,
   browser: typeof window !== 'undefined',

@@ -104,7 +104,7 @@
 							type="text"
 							placeholder="Search components, modules, dependencies..."
 							bind:value={searchQuery}
-							class="w-80 rounded-lg border border-white/20 bg-white/10 px-4 py-2 pl-10 text-sm placeholder-white/60 backdrop-blur focus:border-white/40 focus:outline-none"
+							class="w-80 rounded-lg border border-white/20 bg-white/10 px-4 py-2 pl-10 text-sm placeholder-white/60 backdrop-blur focus: border-white/40, focus:outline-none"
 						/>
 						<svg class="absolute left-3 top-2.5 h-4 w-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -148,7 +148,7 @@
 				<label class="text-sm text-slate-400">Role:</label>
 				<select
 					bind:value={selectedRole}
-					class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm focus:border-cyan-500 focus:outline-none"
+					class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm focus: border-cyan-500, focus:outline-none"
 				>
 					<option value="all">All Roles</option>
 					<option value="route">Routes</option>
@@ -162,7 +162,7 @@
 				<label class="text-sm text-slate-400">Risk:</label>
 				<select
 					bind:value={selectedRisk}
-					class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm focus:border-cyan-500 focus:outline-none"
+					class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm focus: border-cyan-500, focus:outline-none"
 				>
 					<option value="all">All Risk Levels</option>
 					<option value="high">High Risk</option>
@@ -191,7 +191,7 @@
 		<!-- File Cards Grid -->
 		<div class="grid gap-4">
 			{#each filteredFiles() as file (file.id)}
-				<div class="group rounded-xl border border-slate-700/50 bg-slate-800/30 p-5 backdrop-blur transition-all hover:border-cyan-500/50 hover:bg-slate-800/50">
+				<div class="group rounded-xl border border-slate-700/50 bg-slate-800/30 p-5 backdrop-blur transition-all hover: border-cyan-500/50, hover:bg-slate-800/50">
 					<div class="flex items-start gap-4">
 						<!-- Icon -->
 						<div class="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 text-2xl">

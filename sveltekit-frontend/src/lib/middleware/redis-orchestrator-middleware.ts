@@ -7,10 +7,8 @@ type MemoryBank = 'INTERNAL_RAM' | 'CHR_ROM' | 'PRG_ROM' | 'SAVE_RAM';
 
 export function withRedisOrchestrator(
  originalHandler: RequestHandler,
- config: {
- endpointName: string;
- cacheStrategy: CacheStrategy;
- memoryBank: MemoryBank;
+ config: {, endpointName: string;
+ cacheStrategy: CacheStrategy;, memoryBank: MemoryBank;
  requiresFresh?: boolean;
  }
 ): RequestHandler {
@@ -60,8 +58,7 @@ export const redisMiddleware = {
  */
 export interface RedisOptimizedMiddleware {
  documentProcessing: (handler: RequestHandler) => RequestHandler;
- // Add other middleware methods here as they are implemented, e.g.:
- // minimal: (handler: RequestHandler) => RequestHandler;
+ // Add other middleware methods here as they are implemented, e.g.: //, minimal: (handler: RequestHandler) => RequestHandler;
  // cacheManagement: (handler: RequestHandler) => RequestHandler;
 }
 

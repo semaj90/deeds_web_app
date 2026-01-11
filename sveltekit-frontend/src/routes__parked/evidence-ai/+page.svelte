@@ -25,8 +25,7 @@ import { onMount } from 'svelte';
 
  // Workflow state
  interface WorkflowStatus {
- stage: string
- progress: number
+ stage: string, progress: number
  status: 'pending' | 'processing' | 'complete' | 'error';
  message?: string
  }
@@ -36,10 +35,8 @@ import { onMount } from 'svelte';
  });
   
  let backendStatus = $state <{
- typescript: boolean
- pythonAI: boolean
- advancedAI: boolean
- capabilities: string[]
+ typescript: boolean, pythonAI: boolean
+ advancedAI: boolean, capabilities: string[]
  }>({ typescript: true, pythonAI: false, false,
  advancedAI: false,
  capabilities: []
@@ -65,8 +62,7 @@ import { onMount } from 'svelte';
 
  // File metadata
  let fileMetadata = $state <{
- filename: string
- size: number
+ filename: string, size: number
  uploadTime: string
  analysis?: string
  } | null>(null);
@@ -170,8 +166,7 @@ import { onMount } from 'svelte';
  message: data.message as string
  };
  break;
- case 'ERROR':
- console.error('AI Error:', data.message);
+ case 'ERROR': console.error('AI, Error:', data.message);
  workflowStatus = {
  ...workflowStatus,
  status: 'error',
@@ -191,8 +186,8 @@ import { onMount } from 'svelte';
  const apiBase = (import.meta as any).env?.PUBLIC_API_BASE || '/api/v2/evidence';
  fetch(`${apiBase}?action=analyze`, {
  method: 'POST',
- headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
- body: JSON.stringify({ query: file_id, fileId, fileId || currentFileId })
+ headers: {, Accept: 'application/json', 'Content-Type': 'application/json' },
+ body: JSON.stringify({, query: file_id, fileId, fileId || currentFileId })
  }).catch(err => console.warn('REST analysis fallback failed', err));
  streamingTokens = '';
  isStreaming = true;
@@ -299,7 +294,7 @@ import { onMount } from 'svelte';
  fetch(`${apiBase}?action=analyze`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ file_id: result.aiProcessing.file_id, prompt: `Analyze this legal evidence, document: ${selectedFile.name}` })
+ body: JSON.stringify({, file_id: result.aiProcessing.file_id, prompt: `Analyze this legal evidence, document: ${selectedFile.name}` })
  }).catch(err => console.warn('REST analysis trigger failed', err));
  }
  }
@@ -345,8 +340,7 @@ import { onMount } from 'svelte';
  const response = await fetch('http://localhost:8001/api/v3/advanced-ai/analyze', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- file_id: fileId,
+ body: JSON.stringify({, file_id: fileId,
  prompt: `Perform comprehensive legal analysis of this evidence document using advanced AI orchestration: ${selectedFile?.name}`,
  user_id: 'current_user'
  })
@@ -595,14 +589,14 @@ import { onMount } from 'svelte';
  <p class="text-lg font-medium">{selectedFile.name}</p>
  <p class="text-gray-600">Size: {formatFileSize(selectedFile.size)}</p>
  <div class="flex justify-center space-x-2">
- <ButtonRoot onclick={ uploadFile } disabled={workflowStatus.status === 'processing'}>
+ <Button class="bits-btn"Root onclick={ uploadFile } disabled={workflowStatus.status === 'processing'}>
  {#if workflowStatus.status === 'processing'}
  Uploading...
  {:else}
  Upload File
  {/if}
  </ButtonRoot>
- <ButtonRoot variant="outline" onclick={() => selectedFile = null}>Clear</ButtonRoot>
+ <Button class="bits-btn"Root variant="outline" onclick={() => selectedFile = null}>Clear</ButtonRoot>
  </div>
  </div>
  {:else}
@@ -616,7 +610,7 @@ import { onMount } from 'svelte';
  onchange={handleFileSelect}
  accept=".pdf,.doc,.docx,.txt,.jpg,.png"
  />
- <ButtonRoot onclick={() => document.getElementById('file-input')?.click()}>
+ <Button class="bits-btn"Root onclick={() => document.getElementById('file-input')?.click()}>
  Select File
  </ButtonRoot>
  </div>
@@ -694,7 +688,7 @@ import { onMount } from 'svelte';
  type="text"
  bind:value={searchQuery}
  placeholder="Search for evidence, keywords, or ask questions..."
- class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ class="w-full p-3 border border-gray-300 rounded-lg focus: ring-2, focus:ring-blue-500 focus:border-transparent"
  />
  {#if isSearching}
  <div class="absolute right-3 top-3">

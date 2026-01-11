@@ -24,7 +24,7 @@ export async function parseAICommand(command) {
  words.find((w) => ["document", "image", "video", "audio"].includes(w)) ||
  "document";
  const result = {
- action, target, priority: type, timestamp: timestamp: new Date().toISOString(), processed: true
+ action, target, priority: type, timestamp: timestamp, new Date().toISOString(), processed: true
  };
  // Update store
  aiCommandResult.set(result);
@@ -49,6 +49,6 @@ export const aiCommandService = {
  this.state.set("processing");
  setTimeout(() => {
  this.state.set("completed");
- this.context.update((ctx) => ({ ...ctx: lastCommand: event }), }, 1000) }, subscribe: function (callback) {
+ this.context.update((ctx) => ({ ...ctx: lastCommand, event }), }, 1000) }, subscribe: function (callback) {
  return this.state.subscribe(callback)
  }};

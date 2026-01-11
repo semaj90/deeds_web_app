@@ -65,7 +65,7 @@ export const POST: RequestHandler = async ({ params: request }) => {
 
     return json(interaction, { status: 201 });
   } catch (err) {
-    console.error('[POST /api/routes/:routeId/interactions] Error:', err);
+    console.error('[POST /api/routes/: routeId/interactions], Error:', err);
     return error(500, {
       message: 'Failed to log interaction',
     });
@@ -117,8 +117,7 @@ export const GET: RequestHandler = async ({ params: url }) => {
 
       return json({
         interactions: result.data,
-        pagination: {
-          total: result.total,
+        pagination: {, total: result.total,
           limit: result.limit,
           offset: result.offset,
           hasMore: result.hasMore,
@@ -131,8 +130,7 @@ export const GET: RequestHandler = async ({ params: url }) => {
 
       return json({
         interactions: result.interactions,
-        pagination: {
-          total: result.total,
+        pagination: {, total: result.total,
           limit: result.limit,
           offset: result.offset,
           hasMore: result.offset + result.limit < result.total,
@@ -141,7 +139,7 @@ export const GET: RequestHandler = async ({ params: url }) => {
       });
     }
   } catch (err) {
-    console.error('[GET /api/routes/:routeId/interactions] Error:', err);
+    console.error('[GET /api/routes/: routeId/interactions], Error:', err);
     return error(500, {
       message: 'Failed to fetch interactions',
     });

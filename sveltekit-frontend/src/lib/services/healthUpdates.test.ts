@@ -45,7 +45,7 @@ describe('Phase 10.3: Health Updates Service', () => {
  });
   
  global.EventSource = vi.fn(() => ({
- addEventListener: vi.fn( close: vi.fn( readyState: 0,
+ addEventListener: vi.fn(, close: vi.fn( readyState: 0,
  })) as any;
 
  // Mock fetch for SSE

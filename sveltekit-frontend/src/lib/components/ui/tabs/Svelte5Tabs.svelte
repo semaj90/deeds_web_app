@@ -9,8 +9,7 @@ import type { Snippet } from 'svelte';
 import { setContext, getContext } from 'svelte';
 
 interface TabItem {
-	id: string;
-	label: string;
+	id: string;, label: string;
 	disabled?: boolean;
 	icon?: string;
 }
@@ -67,21 +66,21 @@ function getTabClasses(tab: TabItem) {
 	const isActive = value === tab.id;
 	const isDisabled = tab.disabled;
 
-	const base = 'px-4 py-2 text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500';
+	const base = 'px-4 py-2 text-sm font-medium transition-all duration-150 focus: outline-none, focus:ring-2 focus:ring-blue-500';
 
 	const variants = {
 		default: isActive
 			? 'bg-blue-600 text-white rounded-md'
-			: 'text-slate-400 hover:text-white hover:bg-slate-700 rounded-md',
+			: 'text-slate-400, hover:text-white hover:bg-slate-700 rounded-md',
 		pills: isActive
 			? 'bg-blue-600 text-white rounded-full'
-			: 'text-slate-400 hover:text-white hover:bg-slate-700 rounded-full',
+			: 'text-slate-400, hover:text-white hover:bg-slate-700 rounded-full',
 		underline: isActive
 			? 'text-blue-400 border-b-2 border-blue-400 -mb-px'
-			: 'text-slate-400 hover:text-white border-b-2 border-transparent',
+			: 'text-slate-400, hover:text-white border-b-2 border-transparent',
 		nes: isActive
 			? 'bg-blue-600 text-white border-2 border-blue-400'
-			: 'text-slate-400 hover:text-white hover:bg-slate-700 border-2 border-transparent'
+			: 'text-slate-400, hover:text-white hover:bg-slate-700 border-2 border-transparent'
 	}[variant];
 
 	const disabled = isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer';

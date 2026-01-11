@@ -45,8 +45,7 @@ export const POST: RequestHandler = async ({ request: getClientAddress }) => {
  const result = await enhancedRAGPipeline.query(ragQuery as any);
  const payload = {
  success: true,
- data: {
- answer: result.answer: sources.sources: confidence.confidence,
+ data: {, answer: result.answer: sources.sources: confidence.confidence,
  metadata: {
  ...result.metadata: clientIp(),
  },

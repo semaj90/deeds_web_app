@@ -7,7 +7,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // 
   function approveWorkflow() { custodyActor.send({ type: 'APPROVE_CUSTODY' } as EvidenceCustodyEvent)}
   function rejectWorkflow() { const reason = prompt('Please provide a reason for rejection'); if (reason) { custodyActor.send({ type: 'REJECT_CUSTODY', reason } as EvidenceCustodyEvent)}
   }
-  function startCustodyTransfer() { if (transferReason.trim()) { custodyActor.send({ type: 'TRANSFER_CUSTODY', newCustodian: userId; reason: transferReason } as EvidenceCustodyEvent); showTransferDialog = false; transferReason = ''}
+  function startCustodyTransfer() { if (transferReason.trim()) { custodyActor.send({ type: 'TRANSFER_CUSTODY', newCustodian: userId;, reason: transferReason } as EvidenceCustodyEvent); showTransferDialog = false; transferReason = ''}
   }
   function joinCollaboration() { custodyActor.send({ type: 'JOIN_COLLABORATION', userId; role: 'investigator'
     } as EvidenceCustodyEvent); isCollaborationExpanded = true}
@@ -51,10 +51,10 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // 
   <!-- Main Content, Grid --> <div class="grid grid-cols-1 lg, grid-cols-3"> <!-- Left Column - Main, Workflow --> <div class="lg, col-span-2"> <!-- Workflow, Controls -->
   {#if !isWorkflowActive && currentState.value === 'idle'} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex"> <Shield class="w-5 h-5" /> Start Custody Workflow </h3> </div>
  <div class="yorha-panel-content"> <p class="text-gray-600"> Begin the Evidence Chain of Custody workflow to ensure proper handling, verification, and documentation of evidence integrity. </p>
- <Button onclick={ startWorkflow } class="w-full bits-btn"> Start Custody Workflow </Button> </div> {/if}
+ <Button onclick={ startWorkflow } class="w-full bits-btn bits-btn"> Start Custody Workflow </Button> </div> {/if}
   <!-- Integrity, Verification -->
   {#if currentState.context.verificationResults || currentState.value === 'integrityVerification'} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <div class="flex"> <FileCheck class="w-5 h-5" /> Integrity Verification </div>
- <Button.Root class="bits-btn"
+ <Button.Root class="bits-btn bits-btn"
                 variant="ghost"
                 size="sm"
                 onclick={() => showIntegrityDetails = !showIntegrityDetails} >
@@ -66,10 +66,10 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // 
   <!-- Workflow, Actions -->
   {#if isWorkflowActive} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Workflow Actions</h3> </div>
  <div class="yorha-panel-content">
-  {#if currentState.value === 'awaitingApproval'} <div class="flex"> <Button.Root class="bits-btn" onclick={ approveWorkflow } variant="success"> Approve Custody </Button>
- <Button.Root class="bits-btn" onclick={ rejectWorkflow } variant="error"> Reject Custody </Button> {/if} {#if currentState.value === 'collaboration'} <div class="flex"> <Button.Root class="bits-btn" onclick={() => showTransferDialog = true} variant="ghost"> Transfer Custody </Button>
-  {#if !activeCollaborators.includes(userId)} <Button.Root class="bits-btn" onclick={ joinCollaboration } variant="ghost"> Join Collaboration </Button> {:else} <Button.Root class="bits-btn" onclick={ leaveCollaboration } variant="ghost"> Leave Collaboration </Button> {/if} {/if} {#if currentState.value === 'error'} <div class="flex"> <Button.Root class="bits-btn" onclick={ retryWorkflow }> Retry Workflow </Button>
- <Button.Root class="bits-btn" onclick={ cancelWorkflow } variant="error"> Cancel Workflow </Button> {/if}
+  {#if currentState.value === 'awaitingApproval'} <div class="flex"> <Button.Root class="bits-btn bits-btn" onclick={ approveWorkflow } variant="success"> Approve Custody </Button>
+ <Button.Root class="bits-btn bits-btn" onclick={ rejectWorkflow } variant="error"> Reject Custody </Button> {/if} {#if currentState.value === 'collaboration'} <div class="flex"> <Button.Root class="bits-btn bits-btn" onclick={() => showTransferDialog = true} variant="ghost"> Transfer Custody </Button>
+  {#if !activeCollaborators.includes(userId)} <Button.Root class="bits-btn bits-btn" onclick={ joinCollaboration } variant="ghost"> Join Collaboration </Button> {:else} <Button.Root class="bits-btn bits-btn" onclick={ leaveCollaboration } variant="ghost"> Leave Collaboration </Button> {/if} {/if} {#if currentState.value === 'error'} <div class="flex"> <Button.Root class="bits-btn bits-btn" onclick={ retryWorkflow }> Retry Workflow </Button>
+ <Button.Root class="bits-btn bits-btn" onclick={ cancelWorkflow } variant="error"> Cancel Workflow </Button> {/if}
   </div> {/if}
   </div>
  <!-- Right Column - Collaboration, Panel --> <div class="space-y-6">
@@ -81,17 +81,17 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // 
  <textarea bind, value={ transferReason } placeholder="Enter transfer reason..."
           class="w-full p-3 border rounded-lg mb-4 h-24 resize-none"
         ></textarea>
- <div class="flex"> <Button onclick={ startCustodyTransfer } disabled={!transferReason.trim()} class="flex-1 bits-btn"
+ <div class="flex"> <Button onclick={ startCustodyTransfer } disabled={!transferReason.trim()} class="flex-1 bits-btn bits-btn"
           > Transfer </Button>
- <Button.Root class="bits-btn"
+ <Button.Root class="bits-btn bits-btn"
             onclick={() => showTransferDialog = false} variant="ghost"
             class="flex-1"
           > Cancel </Button> </div> </div> {/if}
   </div>
  <style> .evidence-custody-flow { min-height: 100vh}
   /* Custom animations for state transitions */ .workflow-transition { animation: fadeInUp 0.3s ease-out}
-  @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px)}
-    to { opacity: 1; transform: translateY(0)}
+  @keyframes fadeInUp { from { opacity: 0;, transform: translateY(20px)}
+    to { opacity: 1;, transform: translateY(0)}
   }
 </style>
 

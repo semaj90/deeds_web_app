@@ -21,7 +21,7 @@
  <!-- Header -->
  <header class="mb-8">
  <a href="/ai/dashboard" class="inline-flex items-center">
- <ButtonRoot class="bits-btn" variant="ghost" size="sm">
+ <ButtonRoot class="bits-btn bits-btn" variant="ghost" size="sm">
  <span class="mr-2">⬅️</span>
  Back to Dashboard
  </ButtonRoot>

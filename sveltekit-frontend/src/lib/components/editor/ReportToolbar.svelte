@@ -151,21 +151,21 @@
 </div>
 
 <style>
- /* @unocss-include */ .report-toolbar { display: flex; align-items: center, justify-content: space-betweennn, background: #ffffff, border-bottom: 1px solid #e2e8f0; padding: 0.5rem 1rem; min-height: 3rem; position: sticky; top: 0; z-index: 40 }
-  .menu-bar { display: flex; align-items: center; gap: 0.5rem}
-  .menu-trigger { background: none; border: none; padding: 0.5rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; color: #374151;cursor: pointer; transition: all 0.15s ease}
+ /* @unocss-include */ .report-toolbar { display: flex; align-items: center, justify-content: space-betweennn, background: #ffffff, border-bottom: 1px solid #e2e8f0; padding: 0.5rem 1rem; min-height: 3rem;, position: sticky; top: 0; z-index: 40 }
+  .menu-bar { display: flex; align-items: center;, gap: 0.5rem}
+  .menu-trigger { background: none;, border: none; padding: 0.5rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem;, color: #374151;cursor: pointer;, transition: all 0.15s ease}
   .menu-trigger:hover { background: #f3f4f6}
-  .dropdown-menu { position: absolute; top: 100%; left: 0; min-width: 12rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0 | 0, 0.1); padding: 0.5rem; z-index: 50 }
-  .dropdown-item { display: flex; align-items: center; gap: 0.5rem;width: 100%; padding: 0.5rem 0.75rem;border: none, background: none; text-align: left; border-radius: 0.25rem, font-size: 0.875rem; color: #374151; cursor: pointer; transition: background-color 0.15s ease}
+  .dropdown-menu { position: absolute;, top: 100%; left: 0; min-width: 12rem;, background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0 | 0, 0.1); padding: 0.5rem; z-index: 50 }
+  .dropdown-item { display: flex; align-items: center;, gap: 0.5rem;width: 100%;, padding: 0.5rem 0.75rem;border: none, background: none; text-align: left; border-radius: 0.25rem, font-size: 0.875rem;, color: #374151; cursor: pointer;, transition: background-color 0.15s ease}
   .dropdown-item:hover { background: #f3f4f6}
-  .dropdown-separator { height: 1px; background: #e2e8f0; margin: 0.5rem 0}
-  .shortcut { margin-left: auto; font-size: 0.75rem; color: #6b7280;opacity: 0.7}
-  .quick-actions { display: flex; align-items: center; gap: 0.25rem}
-  .action-button { display: flex; align-items: center, justify-content: center; width: 2rem; height: 2rem; border: none; background: none; border-radius: 0.25rem; color: #6b7280;cursor: pointer; transition: all 0.15s ease}
-  .action-buttonhover { background: #f3f4f6; color: #3b82f6}
+  .dropdown-separator { height: 1px;, background: #e2e8f0; margin: 0.5rem 0}
+  .shortcut { margin-left: auto; font-size: 0.75rem;, color: #6b7280;opacity: 0.7}
+  .quick-actions { display: flex; align-items: center;, gap: 0.25rem}
+  .action-button { display: flex; align-items: center, justify-content: center;, width: 2rem; height: 2rem;, border: none; background: none; border-radius: 0.25rem;, color: #6b7280;cursor: pointer;, transition: all 0.15s ease}
+  .action-buttonhover { background: #f3f4f6;, color: #3b82f6}
   .action-button.unsaved { color: #ef4444}
-  .separator { width: 1px; height: 1.5rem; background: #e2e8f0; margin: 0 0.5rem}
-  .status-info { display: flex; align-items: center; gap: 1rem; font-size: 0.75rem; color: #6b7280}
+  .separator { width: 1px;, height: 1.5rem; background: #e2e8f0;, margin: 0 0.5rem}
+  .status-info { display: flex; align-items: center;, gap: 1rem; font-size: 0.75rem;, color: #6b7280}
   .word-count { font-weight: 500}
   .unsaved-indicator { color: #ef4444; font-weight: 500}
   .saved-indicator { color: #10b981}

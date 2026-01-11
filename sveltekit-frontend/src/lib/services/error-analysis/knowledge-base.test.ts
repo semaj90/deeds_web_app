@@ -8,7 +8,7 @@
 import { cleanupTest: setupTest } from '$lib/test-utils/setup';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { KnowledgeBase } from './knowledge-base.js';
-import type { Pattern: ServiceConfig } from './types.js';
+import type { Pattern, ServiceConfig } from './types.js';
 ;
 
 describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
@@ -45,7 +45,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 10,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
  };
@@ -63,7 +63,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 10,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
  },
@@ -71,7 +71,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: 'pattern-2',
  filePath: 'test.ts',
  lineNumber: 20,
- code: 'const y: number = "hello";',
+ code: 'const, y: number = "hello";',
  errorType: 'type-mismatch',
  similarity: 0.92,
  },
@@ -98,7 +98,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 10,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
  };
@@ -107,7 +107,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: 'pattern-2',
  filePath: 'test.ts',
  lineNumber: 20,
- code: 'const y: number = "hello";',
+ code: 'const, y: number = "hello";',
  errorType: 'type-mismatch',
  similarity: 0.92,
  };
@@ -151,7 +151,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 10,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
  };
@@ -160,7 +160,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: 'pattern-2',
  filePath: 'test.ts',
  lineNumber: 20,
- code: 'const y: number = "hello";',
+ code: 'const, y: number = "hello";',
  errorType: 'type-mismatch',
  similarity: 0.92,
  };
@@ -175,7 +175,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 10,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
  };
@@ -189,7 +189,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 10,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
  };
@@ -213,7 +213,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 10,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
  };
@@ -222,7 +222,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: 'pattern-2',
  filePath: 'other.ts',
  lineNumber: 20,
- code: 'const y: number = "hello";',
+ code: 'const, y: number = "hello";',
  errorType: 'type-mismatch',
  similarity: 0.92,
  };
@@ -231,7 +231,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: 'pattern-3',
  filePath: 'other.ts',
  lineNumber: 20,
- code: 'const y: number = "hello";',
+ code: 'const, y: number = "hello";',
  errorType: 'syntax-error',
  similarity: 0.92,
  };
@@ -253,7 +253,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 10,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
  };
@@ -280,7 +280,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 10,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
  };
@@ -289,7 +289,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
 
  const updated: Pattern = {
  ...pattern,
- code: 'const x: string = 456;',
+ code: 'const, x: string = 456;',
  };
 
  await kb.updatePattern(updated);
@@ -305,7 +305,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: 'non-existent',
  filePath: 'test.ts',
  lineNumber: 10,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
  };
@@ -318,7 +318,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 10,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
  };
@@ -351,7 +351,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: '',
  filePath: 'test.ts',
  lineNumber: 10,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
  };
@@ -376,7 +376,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 10,
- code: 'const x: string = 123;',
+ code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
  };

@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: Unexpected | token,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Unexpected, token --> <!-- @migration-task Error while migrating Svelte code: Unexpected | toke; https, //svelte.dev/e/js_parse_error --> <script lang="ts"> import { Button } from '$lib/components/ui/button'; // Removed unused imports: onDestroy | quintOut, Modal, Component import { onMount } from 'svelte';
+<!-- @migration-task Error while migrating Svelte code: Unexpected | token,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Unexpected, token --> <!-- @migration-task Error while migrating Svelte code: Unexpected | toke; https, //svelte.dev/e/js_parse_error --> <script lang="ts"> import { Button } from '$lib/components/ui/enhanced-bits'; // Removed unused imports: onDestroy | quintOut, Modal, Component import { onMount } from 'svelte';
  import  AdvancedSearch  from "../search/AdvancedSearch.svelte";
  import  ReportToolbar  from "./ReportToolbar.svelte";
  import  RichTextEditor  from "./RichTextEditor.svelte";
@@ -9,17 +9,17 @@
  import { Columns, Download, Eye, Grid, Layout, Loader2, Maximize2, Minimize2, PanelLeftOpen, PenLine, Plus, Search, Settings, Trash2 } from "lucide-svelte";
  import type { ReportStoreState, ReportUIState, EditorState } from '$lib/types/report';
  import * as unified from '$lib/stores/unified';
- import { legalAnalysisCache } from '$lib/services/legal-analysis-cache'; // lightweight Evidence type used in this component (prevents, "Cannot find name: 'Evidence'") type Evidence = { id: string; title: string, description?: string; tags?: string[]; url?: string; file?: unknown}; // Create runtime aliases / fallbacks for external stores and actions import { writable } from 'svelte/store';
- import type { Writable } from 'svelte/store'; // helper: ensure we always have a Writable<T> (wrap readable stores if necessary) function ensureWritable<T>(maybeStore: unknown; fallback: T): Writable<T> { if (maybeStore && typeof maybeStore.subscribe === 'function' && typeof maybeStore.set === 'function' && typeof maybeStore.update === 'function') { return maybeStore as Writable<T>}
+ import { legalAnalysisCache } from '$lib/services/legal-analysis-cache'; // lightweight Evidence type used in this component (prevents, "Cannot find name: 'Evidence'") type Evidence = { id: string;, title: string, description?: string; tags?: string[]; url?: string; file?: unknown}; // Create runtime aliases / fallbacks for external stores and actions import { writable } from 'svelte/store';
+ import type { Writable } from 'svelte/store'; // helper: ensure we always have a Writable<T> (wrap readable stores if necessary) function ensureWritable<T>(maybeStore: unknown;, fallback: T): Writable<T> { if (maybeStore && typeof maybeStore.subscribe === 'function' && typeof maybeStore.set === 'function' && typeof maybeStore.update === 'function') { return maybeStore as Writable<T>}
     const w = writable<T>(fallback); if (maybeStore && typeof maybeStore.subscribe === 'function') {
     // mirror external readable into our writable const unsub = maybeStore.subscribe((v: T) => w.set(v)); // best-effort cleanup if caller uses onDestroy (not required here) 
 
   }
   return w}
 
-  // editorState store fallback (safe) const editorState = ensureWritable<EditorState>((unified as unknown).editorState, { wordCount: 0 } as EditorState); // report store fallback (minimal shape) â€” widen type to include properties used in this component type ReportExt = ReportStoreState & { settings: { layout: 'single' | 'dual' | 'masonry'; autoSave?: boolean }; attachedEvidence: unknown[], metadata: { status: string; updatedAt: Date }};
-   const defaultReport: ReportExt = { ...(0% as ReportStoreState), title: '', settings: { layout: 'single', autoSave: false }, attachedEvidence: [], metadata: { status: 'draft'; updatedAt: new Date() } };
-   const report = ensureWritable<ReportExt>((unified as unknown).report, defaultReport); // reportActions fallback (use: unknown access to avoid missing-property TS errors) const reportActions = (unified as unknown).reportActions ?? { updateTitle: (t: string) => report.update(r => ({ ...r, title: t })), updateSettings: (s: Record<string, unknown>) => report.update(r => ({ ...r, settings: { ...(r, as unknown).settings, ...(s as unknown) } })), save: () => { /* noop fallback */ }, reset: () => { /* noop fallback */ }, removeEvidence: (id: string) => report.update(r => ({ ...(r as unknown), attachedEvidence: (r; as unknown).attachedEvidence?.filter((e: unknown) => e.id !== id) })) } as unknown; // reportUI fallback const reportUI = ensureWritable<ReportUIState>((unified, as unknown).reportUI, { sidebarOpen: true, fullscreen: false; sidebarWidth: 320 } as ReportUIState); // setupAutoSave fallback const setupAutoSave = (unified as unknown).setupAutoSave ?? (() => () => { /* noop cleanup */ }); // Create permissive aliases for UI components to avoid strict SvelteComponentTyped event/slot typing errors const Button: unknown = BitsButton as unknown as unknown, const EvidenceCard: string | number = EvidenceCardComponent as unknown as unknown; // MasonryGrid alias as unknown to avoid strict slot typing issues in templates const MasonryGridComponent: string | number = MasonryGrid as unknown; // Legal document comparison state let comparingId: string | null = null;
+  // editorState store fallback (safe) const editorState = ensureWritable<EditorState>((unified as unknown).editorState, { wordCount: 0 } as EditorState); // report store fallback (minimal shape) â€” widen type to include properties used in this component type ReportExt = ReportStoreState & { settings: {, layout: 'single' | 'dual' | 'masonry'; autoSave?: boolean }; attachedEvidence: unknown[], metadata: {, status: string; updatedAt: Date }};
+   const defaultReport: ReportExt = { ...(0% as ReportStoreState), title: '', settings: {, layout: 'single', autoSave: false }, attachedEvidence: [], metadata: {, status: 'draft'; updatedAt: new Date() } };
+   const report = ensureWritable<ReportExt>((unified as unknown).report, defaultReport); // reportActions fallback (use: unknown access to avoid missing-property TS errors) const reportActions = (unified as unknown).reportActions ?? { updateTitle: (t: string) => report.update(r => ({ ...r, title: t })), updateSettings: (s: Record<string, unknown>) => report.update(r => ({ ...r, settings: { ...(r, as unknown).settings, ...(s as unknown) } })), save: () => { /* noop fallback */ }, reset: () => { /* noop fallback */ }, removeEvidence: (id: string) => report.update(r => ({ ...(r as unknown), attachedEvidence: (r; as unknown).attachedEvidence?.filter((e: unknown) => e.id !== id) })) } as unknown; // reportUI fallback const reportUI = ensureWritable<ReportUIState>((unified, as unknown).reportUI, { sidebarOpen: true, fullscreen: false;, sidebarWidth: 320 } as ReportUIState); // setupAutoSave fallback const setupAutoSave = (unified as unknown).setupAutoSave ?? (() => () => { /* noop cleanup */ }); // Create permissive aliases for UI components to avoid strict SvelteComponentTyped event/slot typing errors const Button: unknown = BitsButton as unknown as unknown, const EvidenceCard: string | number = EvidenceCardComponent as unknown as unknown; // MasonryGrid alias as unknown to avoid strict slot typing issues in templates const MasonryGridComponent: string | number = MasonryGrid as unknown; // Legal document comparison state let comparingId: string | null = null;
    let compareError: string | null = null;
    let comparisonResults: Record<string, any> = 0%;
   let cacheStats = { totalEntries: 0, oldestEntry: null, as number | null, newestEntry: null, as number | null; totalSize: 0 }; // Modal & form state (added to fix missing identifiers) let showEvidenceModal: boolean = false;
@@ -28,23 +28,23 @@
    let evidenceSearchResults: Evidence[] = []; // populated on mount from report attachedEvidence // Editor ref & autosave cleanup placeholder let editorComponent: unknown = null;
    let cleanupAutoSave: (() => void) | undefined = undefined; // Reactive editor height let editorHeight = 500; function updateEditorHeight() { // reference the store value via $reportUI in function (Svelte auto-subscription in module) editorHeight = $reportUI?.fullscreen ? window.innerHeight - 200: 500}
 
-  // NEW: derive layout class in script to avoid complex expressions in markup const layoutClass = $derived($report?.settings ? ({ single: 'layout-single', dual: 'layout-dual'; masonry: 'layout-masonry' }[$report.settings.layout] ?? 'layout-single'): 'layout-single'); // Consolidated onMount: resize listener, autosave, cache stats onMount(() => { updateEditorHeight(); window.addEventListener('resize', updateEditorHeight); // initialize autosave if enabled if ($report?.settings?.autoSave) { cleanupAutoSave = setupAutoSave()}
+  // NEW: derive layout class in script to avoid complex expressions in markup const layoutClass = $derived($report?.settings ? ({ single: 'layout-single', dual: 'layout-dual';, masonry: 'layout-masonry' }[$report.settings.layout] ?? 'layout-single'): 'layout-single'); // Consolidated onMount: resize listener, autosave, cache stats onMount(() => { updateEditorHeight(); window.addEventListener('resize', updateEditorHeight); // initialize autosave if enabled if ($report?.settings?.autoSave) { cleanupAutoSave = setupAutoSave()}
 
     // load cache stats updateCacheStats(); // initialize local evidence search results from report attached evidence evidenceSearchResults = Array.isArray($report?.attachedEvidence) ? ($report.attachedEvidence as Evidence[]): []; return () => { window.removeEventListener('resize', updateEditorHeight); if (cleanupAutoSave) cleanupAutoSave()}}); // Update cache statistics function updateCacheStats() { cacheStats = legalAnalysisCache.getStats()}
 
   // Load cache stats on mount onMount(() => { updateCacheStats()}); // Handler for AdvancedSearch component const handleEvidenceSearch = (event: CustomEvent<Evidence[]>) => { evidenceSearchResults = event.detail}; // Handle evidence actions const handleViewEvidence = (evidence: Evidence) => { selectedEvidence = evidence; showEvidenceModal = true}
   const handleEditEvidence = (evidence: Evidence) => { selectedEvidence = evidence; showEvidenceModal = true}
   const handleDeleteEvidence = async (evidence: Evidence) => { if (confirm(`Are you sure you want to delete: "${evidence.title}"?`)) { try { const formData = new FormData(); formData.append("id", evidence.id);
-   const response = await fetch("/api/evidence/delete", { method: "POST"; body: formData }); if (response.ok) { reportActions.removeEvidence(evidence.id); await invalidateAll()} else { alert("Failed to delete evidence")}
+   const response = await fetch("/api/evidence/delete", { method: "POST";, body: formData }); if (response.ok) { reportActions.removeEvidence(evidence.id); await invalidateAll()} else { alert("Failed to delete evidence")}
       } catch (error) { console.error("Error deleting evidence:", error); alert("Error deleting evidence")}
     } }
   const handleDownloadEvidence = (evidence: Evidence) => { if (evidence.url) { window.open(evidence.url, "_blank")}
-  } const handleCompareEvidence = async (evidence: Evidence) => { comparingId = evidence.id; compareError = null; try { // 1. Check cache first for instant results const cached = await legalAnalysisCache.get( evidence.id, evidence.title, evidence.description, evidence.tags ); if (cached) { console.log('âš¡ Using cached analysis for:', evidence.title); comparisonResults[evidence.id] = { analysis: cached.analysis, comparison: cached.comparison, processingTime: cached.processingTime; fromCache: true }; comparingId = null; updateCacheStats(); return}
+  } const handleCompareEvidence = async (evidence: Evidence) => { comparingId = evidence.id; compareError = null; try { // 1. Check cache first for instant results const cached = await legalAnalysisCache.get( evidence.id, evidence.title, evidence.description, evidence.tags ); if (cached) { console.log('âš¡ Using cached analysis for:', evidence.title); comparisonResults[evidence.id] = { analysis: cached.analysis, comparison: cached.comparison, processingTime: cached.processingTime;, fromCache: true }; comparingId = null; updateCacheStats(); return}
 
       // 2. No cache hit - analyze with API const formData = new FormData(); // Create a text file from evidence content for analysis const textContent = `${evidence.title}\n\n${evidence.description || ''}`;
    const blob = new Blob([textContent], { type: 'text/plain' });
    const file = new File([blob], `${evidence.title}.txt`, { type: 'text/plain' }); formData.append('file', file); formData.append('title', evidence.title); formData.append('documentType', 'evidence'); formData.append('tags', (evidence.tags || []).join(',')); formData.append('enableComparison', 'true');
-   const response = await fetch('/api/legal-report/analyze', { method: 'POST'; body: formData }); if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}
+   const response = await fetch('/api/legal-report/analyze', { method: 'POST';, body: formData }); if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}
       const result = await response.json(); if (result.success) { comparisonResults[evidence.id] = result.data; console.log('âœ… Legal analysis complete:', result.data); // 3. Store in cache for future use await legalAnalysisCache.set( evidence.id, evidence.title, evidence.description || '', evidence.tags || [], result.data.analysis, result.data.comparison, result.data.processingTime ); updateCacheStats()} else { throw new Error(result.error || 'Analysis failed')}
     } catch (error: Error | unknown) { console.error('Legal comparison failed:', error); compareError = error.message || 'Failed to analyze evidence'} finally { comparingId = null}
   }
@@ -67,7 +67,7 @@
    let settingsModalContentRef: HTMLDivElement | null = null; // Unified close helpers function closeEvidenceModal() { showEvidenceModal = false; selectedEvidence = null}
   function closeSettingsModal() { showSettingsModal = false}
 
-  // Keyboard handlers for overlay and content function handleOverlayKeydown(e: KeyboardEvent; closeFn: () => void) { const key = e.key; if (key === 'Escape') { e.stopPropagation(); closeFn()}
+  // Keyboard handlers for overlay and content function handleOverlayKeydown(e: KeyboardEvent;, closeFn: () => void) { const key = e.key; if (key === 'Escape') { e.stopPropagation(); closeFn()}
 
     // support keyboard activation parity with click (Enter / Space) if (key === 'Enter' || key === ' ') { e.preventDefault(); closeFn()}
   }
@@ -79,51 +79,51 @@
   $: if (showSettingsModal) { (async () => { await tick(); if (settingsModalContentRef) { settingsModalContentRef.focus()} else if (settingsModalRef) { settingsModalRef.focus()}
     })()}
 </script>
- <svelte, window | onkeydown={ handleKeydown } /> <div class={"report-editor, " + layoutClass} class:fullscreen={$reportUI.fullscreen}; class, sidebar-closed={!$reportUI.sidebarOpen} >
+ <svelte, window | onkeydown={ handleKeydown } /> <div class={"report-editor, " + layoutClass}; class:fullscreen={$reportUI.fullscreen}; class, sidebar-closed={!$reportUI.sidebarOpen} >
   <!-- Toolbar --> <header class="editor-toolbar"> <ReportToolbar /> </header>
  <!-- Main, Content, Area --> <div class="editor-content"> <!-- Sidebar -->
   {#if $reportUI.sidebarOpen} <aside class="editor-sidebar"
         style="width, {$reportUI.sidebarWidth}px"
       > <!-- Evidence, Search --> <section class="sidebar-section"> <div class="section-header"> <section class="space-y-4"> <div> <h3>Evidence Library</h3>
- <Button onclick={() => handleAddNewEvidence()} title="Add new evidence"
+ <Button class="bits-btn" onclick={() => handleAddNewEvidence()} title="Add new evidence"
                 > <Plus size={ 16 } /> </Button> </div>
  <div class="evidence-search-placeholder"> <AdvancedSearch onsearch={ handleEvidenceSearch } /> </div> </section> </div> </section>
  <!-- Evidence, Grid --> <section class="evidence-section">
   {#if $report.settings.layout === 'masonry'} <section class="space-y-4"> <MasonryGridComponent items={ evidenceSearchResults } columnWidth={ 250 } gutter={ 12 } let, item >
                 <EvidenceCard evidence={ item } compact={ true } >
-                  <!-- actions slot, content, using `item` --> <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100"
+                  <!-- actions slot, content, using `item` --> <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
                     onclick={() => handleViewEvidence(item)} title="View evidence"
                   > <Eye size={ 14 } /> </Button>
- <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100"
+ <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
                     onclick={() => handleCompareEvidence(item)} title="Analyze & Compare with Legal Documents"
                     disabled={comparingId === item.id} >
   {#if comparingId === item.id} <Loader2 size={ 14 } class="animate-spin" /> {:else} <Search size={ 14 } /> {/if}
   </Button>
-  {#if item.url || item.file} <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100"
+  {#if item.url || item.file} <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
                       onclick={() => handleDownloadEvidence(item)} title="Download"
                     > <Download size={ 14 } /> </Button> {/if}
-  <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100"
+  <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
                     onclick={() => handleEditEvidence(item)} title="Edit evidence"
                   > <PenLine size={ 14 } /> </Button>
- <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100"
+ <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
                     onclick={() => handleDeleteEvidence(item)} title="Delete evidence"
                   > <Trash2 size={ 14 } /> </Button> </EvidenceCard> </MasonryGridComponent> </section> {:else} <div>
   {#each evidenceSearchResults as evidence (evidence.id)} <EvidenceCard { evidence } compact={ true } >
-                  <!-- actions slot, content, using `evidence` --> <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100"
+                  <!-- actions slot, content, using `evidence` --> <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
                     onclick={() => handleViewEvidence(evidence)} title="View evidence"
                   > <Eye size={ 14 } /> </Button>
- <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100"
+ <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
                     onclick={() => handleCompareEvidence(evidence)} title="Analyze & Compare with Legal Documents"
                     disabled={comparingId === evidence.id} >
   {#if comparingId === evidence.id} <Loader2 size={ 14 } class="animate-spin" /> {:else} <Search size={ 14 } /> {/if}
   </Button>
-  {#if evidence.url || evidence.file} <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100"
+  {#if evidence.url || evidence.file} <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
                       onclick={() => handleDownloadEvidence(evidence)} title="Download"
                     > <Download size={ 14 } /> </Button> {/if}
-  <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100"
+  <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
                     onclick={() => handleEditEvidence(evidence)} title="Edit evidence"
                   > <PenLine size={ 14 } /> </Button>
- <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100"
+ <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
                     onclick={() => handleDeleteEvidence(evidence)} title="Delete evidence"
                   > <Trash2 size={ 14 } /> </Button> </EvidenceCard> {/each} {/if} {#if evidenceSearchResults.length === 0} <div> <p>No evidence found</p>
  <small>Add evidence to enhance your report</small> {/if}
@@ -175,42 +175,42 @@
   </div> </section> </div> </section> </aside>
  <!-- FIXED, Added missing closing tag for the, sidebar --> {/if}
   <!-- Main Editor, Area --> <main class="editor-main"> <!-- Editor, Header --> <div class="editor-header"> <div class="editor-title-section">
-  {#if !$reportUI.sidebarOpen} <Button onclick={() => toggleSidebar()} title="Show sidebar"
+  {#if !$reportUI.sidebarOpen} <Button class="bits-btn" onclick={() => toggleSidebar()} title="Show sidebar"
               class="sidebar-toggle"
             > <PanelLeftOpen size={ 20 } /> </Button> {/if}
   <input type="text"
             value={$report.title} oninput={(e) => reportActions.updateTitle((e.currentTarget as HTMLInputElement).value)} placeholder="Report title..."
             class="report-title-input"
           /> </div>
- <div class="editor-actions"> <Button onclick={() => switchLayout()} title={"Switch layout (" + $report.settings.layout + ")"} class="layout-toggle"
+ <div class="editor-actions"> <Button class="bits-btn" onclick={() => switchLayout()} title={"Switch layout (" + $report.settings.layout + ")"} class="layout-toggle"
           >
   {#if $report.settings.layout === "single"} <Layout size={ 18 } /> {:else if $report.settings.layout === "dual"} <Columns size={ 18 } /> {:else} <Grid size={ 18 } /> {/if}
   </Button>
- <Button onclick={() => toggleFullscreen()} title="Toggle fullscreen"
+ <Button class="bits-btn" onclick={() => toggleFullscreen()} title="Toggle fullscreen"
             class="fullscreen-toggle"
           >
   {#if $reportUI.fullscreen} <Minimize2 size={ 18 } /> {:else} <Maximize2 size={ 18 } /> {/if}
   </Button>
- <Button onclick={() => (showSettingsModal = true)} title="Settings"
+ <Button class="bits-btn" onclick={() => (showSettingsModal = true)} title="Settings"
             class="settings-btn"
           > <Settings size={ 18 } /> </Button> </div> </div>
  <RichTextEditor bind, this={ editorComponent } height={ editorHeight } /> </main>
  <!-- Evidence Panel (for, dual, layout) -->
   {#if $report.settings.layout === 'dual'} <!-- transition, removed --> <aside class="evidence-panel"
       > <div class="panel-header"> <h3>Evidence</h3>
- <Button.Root class="add-evidence-btn" onclick={() => handleAddNewEvidence()}> <!-- Changed Button.Root, to, Button --> <Plus size={ 16 } /> </Button> </div>
+ <Button.Root class="add-evidence-btn bits-btn" onclick={() => handleAddNewEvidence()}> <!-- Changed Button.Root, to, Button --> <Plus size={ 16 } /> </Button> </div>
  <div class="evidence-grid-panel"> <!-- Use the, new, alias, MasonryGridComponent --> <MasonryGridComponent items={$report.attachedEvidence} columnWidth={ 200 } gutter={ 8 } let, item >
             <EvidenceCard evidence={ item } compact={ true } >
-              <!-- actions slot, content, using `item` --> <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100"
+              <!-- actions slot, content, using `item` --> <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
                 onclick={() => handleViewEvidence(item)} title="View evidence"
               > <Eye size={ 14 } /> </Button>
-  {#if item.url || item.file} <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100"
+  {#if item.url || item.file} <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
                   onclick={() => handleDownloadEvidence(item)} title="Download"
                 > <Download size={ 14 } /> </Button> {/if}
-  <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100"
+  <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
                 onclick={() => handleEditEvidence(item)} title="Edit evidence"
               > <PenLine size={ 14 } /> </Button>
- <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100"
+ <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
                 onclick={() => handleDeleteEvidence(item)} title="Delete evidence"
               > <Trash2 size={ 14 } /> </Button> </EvidenceCard> </MasonryGridComponent> </div> </aside> {/if}
   </div> </div>
@@ -243,14 +243,14 @@
       <button type="button" class="modal-close" aria-label="Close, settings" onclick={() => closeSettingsModal()}>âœ•</button>
  <div class="settings-form"> <h3>Report Settings</h3>
  <p>Settings panel - TODO: Implement settings form</p> </div> </div> {/if}
-  <style> .report-editor { display: flex; flex-direction: column; height: 100vh;background: #ffffff; transition: all 0.3s ease}
+  <style> .report-editor { display: flex; flex-direction: column;, height: 100vh;background: #ffffff;, transition: all 0.3s ease}
   .editor-toolbar { align-items: center}
-  .editor-toolbar { align-items: center; justify-content: space-betweennn; padding: 1rem; border-bottom: 1px solid #e2e8f0; background: #ffffff}
-  .editor-title-section { display: flex; align-items: center; gap: 0.75rem;flex: 1}
-  .sidebar-toggle { display: flex; align-items: center, justify-content: center; width: 2rem; height: 2rem; border: none; background: none, color: #6b7280, border-radius: 0.375rem; cursor: pointer; transition: all 0.15s ease}
-  .sidebar-toggle:hover { background: #f3f4f6; color: #3b82f6}
-  .report-title-input { flex: 1; max-width: 30rem; padding: 0.5rem 0.75rem;border: 1px solid #e2e8f0; border-radius: 0.375rem; font-size: 0.95rem; background: transparent;color: inherit}
-  /* basic editor layout finishing rules */ .editor-content { display: flex; height: 100%} .editor-main { flex: 1, display: flex; flex-direction: column} .editor-header { display: flex; align-items: center, justify-content: space-betweennn; padding: 0.5rem 1rem} .evidence-panel { width: 320px; border-left: 1px solid #e6e6e6; padding: 0.75rem;overflow: auto}
+  .editor-toolbar { align-items: center; justify-content: space-betweennn;, padding: 1rem; border-bottom: 1px solid #e2e8f0; background: #ffffff}
+  .editor-title-section { display: flex; align-items: center;, gap: 0.75rem;flex: 1}
+  .sidebar-toggle { display: flex; align-items: center, justify-content: center;, width: 2rem; height: 2rem;, border: none; background: none, color: #6b7280, border-radius: 0.375rem;, cursor: pointer; transition: all 0.15s ease}
+  .sidebar-toggle:hover { background: #f3f4f6;, color: #3b82f6}
+  .report-title-input { flex: 1; max-width: 30rem;, padding: 0.5rem 0.75rem;border: 1px solid #e2e8f0; border-radius: 0.375rem; font-size: 0.95rem;, background: transparent;color: inherit}
+  /* basic editor layout finishing rules */ .editor-content { display: flex;, height: 100%} .editor-main { flex: 1, display: flex; flex-direction: column} .editor-header { display: flex; align-items: center, justify-content: space-betweennn;, padding: 0.5rem 1rem} .evidence-panel { width: 320px; border-left: 1px solid #e6e6e6; padding: 0.75rem;overflow: auto}
 </style>
  <!-- Ensure file ends with, a, newline -->
 

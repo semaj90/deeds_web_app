@@ -6,27 +6,20 @@ https, //svelte.dev/e/js_parse_error -->
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
   interface LegalPrecedent {
-    id: string
-    caseTitle: string
-    citation: string
-    court: string
-    year: number
-    jurisdiction: string
-    summary: string
-    relevanceScore: number
+    id: string, caseTitle: string
+    citation: string, court: string
+    year: number, jurisdiction: string
+    summary: string, relevanceScore: number
     legalPrinciples: string[],
     linkedCases: string[]}
   interface SearchFilters {
-    query: string
-    jurisdiction: string
-    court: string
-    yearfrom: number | null
+    query: string, jurisdiction: string
+    court: string, yearfrom: number | null
     yearTo: number | null}
   let searchFilters: SearchFilters = { query: '',
     jurisdiction: '',
     court: '',
-    yearfrom: null
-    yearTo: null}
+    yearfrom: null, yearTo: null}
   let precedents: LegalPrecedent[] = [];
   let loading = $state<boolean>(false);
   let error = '';
@@ -81,8 +74,7 @@ https, //svelte.dev/e/js_parse_error -->
       query: '',
       jurisdiction: '',
       court: '',
-      yearfrom: null
- yearTo: null}
+      yearfrom: null, yearTo: null}
     precedents = [];
     totalCount = 0
     currentPage = 1}
@@ -284,7 +276,7 @@ bind:value={searchFilters.yearTo}
                 type="button"
                 onclick={() => changePage(currentPage + 1)}
                 disabled={currentPage >= totalPages}
-                class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                class="px-3 py-1 border border-gray-300 rounded-md hover: bg-gray-50, disabled:opacity-50"
               >
                 Next
               </button>

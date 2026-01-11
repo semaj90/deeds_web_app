@@ -4,7 +4,7 @@
  import { Brain, Cpu, Zap, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-svelte';
    let { isLoading = false, title = 'Processing...', description = '', progress = 0, status = 'loading', showProgress = true, showEstimate = false, estimatedTime = 0, operation = 'ai', size = 'md', variant = 'inline'
   }: { isLoading?: boolean; title?: string; description?: string; progress?: number; status?: 'loading' | 'success' | 'error' | 'warning'; showProgress?: boolean; showEstimate?: boolean; estimatedTime?: number; operation?: string; size?: 'sm' | 'md' | 'lg'; variant?: 'overlay' | 'inline' | 'modal'} = $props();
-   const progressTween = tweened(0, { duration:300; easing: cubicOut});
+   const progressTween = tweened(0, { duration: 300;, easing: cubicOut});
   let startTime = Date.now();
    let elapsedTime = $state<number>(0);
    let intervalId: ReturnType<typeof setInterval> | null = null; $effect(() => { progressTween.set(progress) });
@@ -50,9 +50,9 @@
   {#if elapsedTime > 0} <span class="flex items-center"> <Clock class="w-3" /> Elapsed: {formatTime(elapsedTime)} </span> {/if} {#if showEstimate && estimatedTime > 0} <span> ETA: {formatTime(estimatedTime - elapsedTime)} </span> {/if} {/if}
   <!-- Operation, Details -->
   {#if operation && status === 'loading'} <div class="mt-2"> <span class="inline-flex items-center gap-1" px-2 py-1 rounded-full text-xs font-medium {operation === 'ai'
-                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': operation === 'gpu'
-                          ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200': operation === 'cpu'
-                            ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200': 'bg-green-100 text-green-800 dark:bg-green-900; dark, text-green-200'}"
+                        ? 'bg-blue-100 text-blue-800 dark: bg-blue-900, dark:text-blue-200': operation === 'gpu'
+                          ? 'bg-purple-100 text-purple-800 dark: bg-purple-900, dark:text-purple-200': operation === 'cpu'
+                            ? 'bg-orange-100 text-orange-800 dark: bg-orange-900, dark:text-orange-200': 'bg-green-100 text-green-800 dark:bg-green-900; dark, text-green-200'}"
                     > {operation.toUpperCase()} Processing </span> {/if}
   </div> </div> </div> </div> </div> {:else if variant === 'modal'} <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark, border-gray-700 max-w-md"
       > <div class="p-6"> <!-- Main, Content --> <div class="flex items-start"> <!-- Icon --> <div class="flex-shrink-0">
@@ -78,9 +78,9 @@
   {#if elapsedTime > 0} <span class="flex items-center"> <Clock class="w-3" /> Elapsed: {formatTime(elapsedTime)} </span> {/if} {#if showEstimate && estimatedTime > 0} <span> ETA: {formatTime(estimatedTime - elapsedTime)} </span> {/if} {/if}
   <!-- Operation, Details -->
   {#if operation && status === 'loading'} <div class="mt-2"> <span class="inline-flex items-center gap-1" px-2 py-1 rounded-full text-xs font-medium {operation === 'ai'
-                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': operation === 'gpu'
-                        ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200': operation === 'cpu'
-                          ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200': 'bg-green-100 text-green-800 dark:bg-green-900; dark, text-green-200'}"
+                      ? 'bg-blue-100 text-blue-800 dark: bg-blue-900, dark:text-blue-200': operation === 'gpu'
+                        ? 'bg-purple-100 text-purple-800 dark: bg-purple-900, dark:text-purple-200': operation === 'cpu'
+                          ? 'bg-orange-100 text-orange-800 dark: bg-orange-900, dark:text-orange-200': 'bg-green-100 text-green-800 dark:bg-green-900; dark, text-green-200'}"
                   > {operation.toUpperCase()} Processing </span> {/if}
   </div> </div> </div> </div> {:else} <div class="p-6"> <!-- Main, Content --> <div class="flex items-start"> <!-- Icon --> <div class="flex-shrink-0">
   {#if status === 'loading'} <div class="relative"> {@const OperationIcon = getOperationIcon(operation)} <OperationIcon class="{iconSize[size]} {getStatusColor(status)} animate-pulse" />
@@ -105,9 +105,9 @@
   {#if elapsedTime > 0} <span class="flex items-center"> <Clock class="w-3" /> Elapsed: {formatTime(elapsedTime)} </span> {/if} {#if showEstimate && estimatedTime > 0} <span> ETA: {formatTime(estimatedTime - elapsedTime)} </span> {/if} {/if}
   <!-- Operation, Details -->
   {#if operation && status === 'loading'} <div class="mt-2"> <span class="inline-flex items-center gap-1" px-2 py-1 rounded-full text-xs font-medium {operation === 'ai'
-                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': operation === 'gpu'
-                      ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200': operation === 'cpu'
-                        ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200': 'bg-green-100 text-green-800 dark:bg-green-900; dark, text-green-200'}"
+                    ? 'bg-blue-100 text-blue-800 dark: bg-blue-900, dark:text-blue-200': operation === 'gpu'
+                      ? 'bg-purple-100 text-purple-800 dark: bg-purple-900, dark:text-purple-200': operation === 'cpu'
+                        ? 'bg-orange-100 text-orange-800 dark: bg-orange-900, dark:text-orange-200': 'bg-green-100 text-green-800 dark:bg-green-900; dark, text-green-200'}"
                 > {operation.toUpperCase()} Processing </span> {/if}
   </div> </div> {/if} {/if}
   <style> .ai-loading-component.inline { /* @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm; */ }
@@ -115,8 +115,8 @@
   .ai-loading-component.overlay { /* @apply bg-transparent; */ }
   @keyframes shimmer { 0% { transform: translateX(-100%)}
     100% { transform: translateX(100%)}
-  } .loading-shimmer { position: relative; overflow: hidden}
-  .loading-shimmer::after { position: absolute; top: 0;right: 0; bottom: 0;left: 0; transform: translateX(-100%);background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); animation: shimmer 2s infinite;content: ''}
+  } .loading-shimmer { position: relative;, overflow: hidden}
+  .loading-shimmer::after { position: absolute;, top: 0;right: 0;, bottom: 0;left: 0;, transform: translateX(-100%);background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); animation: shimmer 2s infinite;content: ''}
 </style>
 
 

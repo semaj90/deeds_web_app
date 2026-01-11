@@ -6,8 +6,7 @@
 
 	// Define missing types
 	type SearchResult = {
-		status: string;
-		sessionId: string;
+		status: string;, sessionId: string;
 		analysisResults: {
 			summary?: string;
 			confidence?: number;
@@ -21,16 +20,14 @@
 			model?: string;
 			processedAt?: string;
 			documentType?: string;
-			personsOfInterest?: { name: string; role: string; confidence: number }[];
-			timeline?: { event: string; date: string; importance: string }[];
+			personsOfInterest?: {, name: string; role: string;, confidence: number }[];
+			timeline?: {, event: string; date: string;, importance: string }[];
 			legalImplications?: string;
 			confidenceScore?: number;
 			nextSteps?: string[];
 		};
-		metadata?: {
-			source: string;
-			processingTime: string;
-			model: string;
+		metadata?: {, source: string;
+			processingTime: string;, model: string;
 		};
 	};
 
@@ -107,8 +104,7 @@
 			const response = await fetch('/api/v1/evidence/analyze', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					evidenceId: crypto.randomUUID(),
+				body: JSON.stringify({, evidenceId: crypto.randomUUID(),
 					filename: evidenceFile?.name || 'uploaded_evidence.txt',
 					content: evidenceContent,
 					type: evidenceType,
@@ -127,8 +123,7 @@
 			results = {
 				status: 'completed',
 				sessionId: data.data?.evidenceId || 'ai-session-' + Date.now(),
-     analysisResults: {
-					summary: data.data?.analysis?.summary || 'Analysis completed',
+     analysisResults: {, summary: data.data?.analysis?.summary || 'Analysis completed',
 					confidence: data.data?.analysis?.confidence || 0.5,
 					keyFactsCount: data.data?.analysis?.keyFindings?.length || 0,
 					relevantLaws: data.data?.analysis?.relevantLaws || [],
@@ -146,7 +141,7 @@
 			// Show fallback notice
 			const notice = document.createElement('div');
 			notice.innerHTML = '⚠️ Failure, defaulting to mock';
-			notice.style.cssText = 'position: fixed; top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
+			notice.style.cssText = 'position: fixed;, top: 20px; right: 20px;, background: rgba(220, 53, 69, 0.9); color: white;, padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
 			document.body.appendChild(notice);
 			setTimeout(() => notice.remove(), 3000);
 			// Generate mock analysis results
@@ -156,8 +151,7 @@
 			results = {
 				status: 'completed',
 				sessionId: 'mock-session-' + Date.now(),
-     analysisResults: {
-					documentType: evidenceType,
+     analysisResults: {, documentType: evidenceType,
 					keyFactsCount: Math.floor(Math.random() * 10) + 5,
 					personsOfInterest: [
 						{ name: 'John Doe', role: 'witness', confidence: 0.85 },
@@ -167,12 +161,11 @@
 						{ event: 'Mock incident occurred', date: '2024-01-15', importance: 'high' },
 						{ event: 'Mock evidence collected', date: '2024-01-16', importance: 'medium' }
 					],
-					legalImplications: 'Mock analysis: Strong evidence pattern suggesting liability. Recommend further investigation of contract terms.',
+					legalImplications: 'Mock, analysis: Strong evidence pattern suggesting liability. Recommend further investigation of contract terms.',
 					confidenceScore: 0.78,
 					nextSteps: ['Review additional witness statements', 'Obtain security footage', 'Examine financial records']
 				},
-				metadata: {
-					source: 'mock-evidence-analyzer',
+				metadata: {, source: 'mock-evidence-analyzer',
 					processingTime: '45 seconds',
 					model: 'Legal Evidence AI v2.0 (Simulated)'
 				}
@@ -221,7 +214,7 @@
 				</div>
 				<div>
 					<Label htmlFor="evidenceType">Evidence Type</Label>
-					<select id="evidenceType" bind:value={evidenceType} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus:border-[#ffd700] focus:outline-none">
+					<select id="evidenceType" bind:value={evidenceType} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus: border-[#ffd700], focus:outline-none">
 						<option value="" disabled>Select type</option>
 						{#each evidenceTypes as type}
 							<option value={type.value}>{type.label}</option>
@@ -239,7 +232,7 @@
 			</div>
 			<div class="mb-4">
 			<Label htmlFor="priority">Priority</Label>
-				<select id="priority" bind:value={priority} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus:border-[#ffd700] focus:outline-none">
+				<select id="priority" bind:value={priority} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus: border-[#ffd700], focus:outline-none">
 					<option value="" disabled>Select priority</option>
 					{#each priorityOptions as option}
 						<option value={option.value}>{option.label}</option>
@@ -248,10 +241,10 @@
 			</div>
 		</CardContent>
 		<CardFooter>
-			<Button onclick={startAnalysis} disabled={analyzing || !caseId || !evidenceContent} class="bg-[#ffd700] text-[#0a0a0a] hover:bg-[#ffed4a] disabled:opacity-50 disabled:cursor-not-allowed">
+			<Button onclick={startAnalysis} disabled={analyzing || !caseId || !evidenceContent} class="bg-[#ffd700] text-[#0a0a0a] hover: bg-[#ffed4a], disabled:opacity-50 disabled:cursor-not-allowed bits-btn">
 				{analyzing ? 'Analyzing...' : 'Start Analysis'}
 			</Button>
-			<Button onclick={ resetForm } variant="outline" class="bg-[#f7d51d] text-[#0a0a0a] hover:bg-[#e5c51b]">Reset</Button>
+			<Button onclick={ resetForm } variant="outline" class="bg-[#f7d51d] text-[#0a0a0a] hover:bg-[#e5c51b] bits-btn">Reset</Button>
 		</CardFooter>
 	</Card>
 
@@ -322,7 +315,7 @@
 				{/if}
 			</CardContent>
 			<CardFooter>
-				<Button onclick={() => viewDetailedResults(results!)}>View Details</Button>
+				<Button class="bits-btn" onclick={() => viewDetailedResults(results!)}>View Details</Button>
 			</CardFooter>
 		</Card>
 	{/if}

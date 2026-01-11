@@ -18,7 +18,7 @@
 		preventScroll = true,
 	}: Props = $props();
 
-	const dialogContext = getContext<{ open: boolean; close: () => void }>('dialog');
+	const dialogContext = getContext<{ open: boolean;, close: () => void }>('dialog');
 
 	let contentRef = $state<HTMLDivElement | null>(null);
 	let previousActiveElement: Element | null = null;
@@ -70,7 +70,7 @@
 		-translate-x-1/2 -translate-y-1/2
 		gap-4 border border-slate-700 bg-slate-900
 		p-6 shadow-lg duration-200
-		sm:rounded-lg md:w-full
+		sm: rounded-lg, md:w-full
 	`.replace(/\s+/g, ' ').trim();
 </script>
 
@@ -79,7 +79,7 @@
 	<div
 		bind:this={contentRef}
 		class="{defaultClass} { className }"
-		transition:scale={{ duration: 150, start: 0.95 }}
+		transition: scale={{, duration: 150, start: 0.95 }}
 		onclick={ handleClick }
 		onkeydown={ handleKeydown }
 		role="dialog"

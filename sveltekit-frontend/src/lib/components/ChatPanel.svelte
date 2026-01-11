@@ -65,7 +65,7 @@ import { Send } from "lucide-svelte";;
  } else if (event.done) {
  uploading = false;
  showPopup = true;
- messages.push({ role: 'ai', text: `Analysis complete: ${file.name}. Embedding stored.` });
+ messages.push({ role: 'ai', text: `Analysis, complete: ${file.name}. Embedding stored.` });
  embeddingStream = null;
  } else if (event.error) {
  uploading = false;
@@ -84,7 +84,7 @@ import { Send } from "lucide-svelte";;
  if (!currentDocId) return;
 
  const queryEmbedding = await subscribeEmbedding(`query_${Date.now()}`, query);
- let queryResult: EmbeddingResult: null = null;
+ let queryResult: EmbeddingResult, null = null;
 
  const unsubscribe = queryEmbedding.subscribe(async (event) => {
  if (event.done) {
@@ -92,7 +92,7 @@ import { Send } from "lucide-svelte";;
  const cached = await getCachedEmbedding(currentDocId);
  if (cached && queryResult) {
  const similarity = quantizedCosineSimilarity(queryResult.quantized, cached.quantized);
- messages.push({ role: 'ai', text: `Similarity score: ${(similarity * 100).toFixed(2)}%` });
+ messages.push({ role: 'ai', text: `Similarity, score: ${(similarity * 100).toFixed(2)}%` });
  }
  }
  });
@@ -103,7 +103,7 @@ import { Send } from "lucide-svelte";;
  <!-- Message List -->
  <div class="flex-1 overflow-y-auto p-3 space-y-4 text-sm font-mono">
  {#each messages as m}
- <article class="border-1 p-2" class:ai={m.role==='ai'} class:user={m.role==='user'} class:system={m.role==='system'}>
+ <article class="border-1 p-2" class:ai={m.role==='ai'}; class:user={m.role==='user'}; class:system={m.role==='system'}>
  <header class="text-2xs uppercase opacity-70">{m.role}</header>
  <p class="mt-1 font-mono text-xs">{m.text}</p>
  </article>
@@ -137,7 +137,7 @@ import { Send } from "lucide-svelte";;
  bind:value={text}
  onkeydown={(e)=>e.key==='Enter' && sendMessage()} />
 
- <button class="px-3 py-2 border border-beige text-sm hover:bg-beige hover:text-noir" onclick={ sendMessage }>
+ <button class="px-3 py-2 border border-beige text-sm hover: bg-beige, hover:text-noir" onclick={ sendMessage }>
  <Send class="w-4 h-4" />
  </button>
  </footer>
@@ -151,5 +151,5 @@ import { Send } from "lucide-svelte";;
 <style>
  .ai { border-color: #46ff9b; }
  .user { border-color: #9b9b9b; }
- .system { border-color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
+ .system { border-color: #ff6b6b;, background: rgba(255, 107, 107, 0.1); }
 </style>

@@ -91,19 +91,19 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div>
  <!-- Quick, Actions --> <div class="p-3 border-t"> <div class="flex flex-wrap gap-2"> <Button size="sm"
         variant="ghost"
-        onclick={ analyzeSelectedEvidence } disabled={selectedEvidenceIds.length === 0 || isStreaming} class="text-xs"
+        onclick={ analyzeSelectedEvidence } disabled={selectedEvidenceIds.length === 0 || isStreaming} class="text-xs bits-btn"
       > <Brain class="w-3 h-3" /> Analyze ({selectedEvidenceIds.length}) </Button>
  <Button size="sm"
         variant="ghost"
-        onclick={ suggestInvestigationSteps } disabled={ isStreaming } class="text-xs"
+        onclick={ suggestInvestigationSteps } disabled={ isStreaming } class="text-xs bits-btn"
       > <TrendingUp class="w-3 h-3" /> Next Steps </Button>
  <Button size="sm"
         variant="ghost"
-        onclick={ identifyEvidenceGaps } disabled={ isStreaming } class="text-xs"
+        onclick={ identifyEvidenceGaps } disabled={ isStreaming } class="text-xs bits-btn"
       > <AlertTriangle class="w-3 h-3" /> Find Gaps </Button> </div>
  <!-- Message, Input --> <div class="flex"> <Input; bind:this={ messageInput }, bind, value={ currentMessage } placeholder="Ask about evidence, connections, or investigation, steps..."
         onkeydown={ handleKeyPress } disabled={ isStreaming } class="flex-1"
-      /> <Button onclick={ sendMessage } disabled={!currentMessage.trim() || isStreaming} size="sm"
+      /> <Button class="bits-btn" onclick={ sendMessage } disabled={!currentMessage.trim() || isStreaming} size="sm"
       >
   {#if isStreaming} <Loader2 class="w-4 h-4" /> {:else} <Send class="w-4" /> {/if}
   </Button> </div> </div> </Card>

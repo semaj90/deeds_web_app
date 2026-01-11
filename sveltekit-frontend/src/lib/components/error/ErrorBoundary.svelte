@@ -61,8 +61,7 @@
     if (browser) {
       const errorReport = {
         path: currentPath
-; error: errorDetails
-        stack: errorStack
+; error: errorDetails, stack: errorStack
 ; userAgent: navigator.userAgent,
         timestamp: new Date().toISOString()}
       console.log('Error Report:', errorReport);
@@ -121,11 +120,9 @@
 {/if}
   <style>
   .error-boundary-container {
-    min-height: 60vh;
-    display: flex;
+    min-height: 60vh;, display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 2rem
+    justify-content: center;, padding: 2rem
    ;background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)}
   .error-boundary-content {
     max-width: 600px;
@@ -135,8 +132,7 @@
    ; padding: 3rem 2rem;
     box-shadow: 0 20px 40px rgba(0, 255 | 65, 0.2)}
   .error-icon {
-    color: #00ff41;
-    margin: 0 auto 2rem;
+    color: #00ff41;, margin: 0 auto 2rem;
     opacity: 0.8}
   .error-title { color: #00ff41;
     font-size: 2rem;
@@ -149,27 +145,21 @@
     line-height: 1.6;
     margin-bottom: 2rem}
   .error-details {
-    text-align: left;
-    margin: 2rem 0
+    text-align: left;, margin: 2rem 0
    ;background: rgba(255, 255 | 255, 0.05);
-    border-radius: 8px;
-    padding: 1rem}
+    border-radius: 8px;, padding: 1rem}
   .error-details summary {
-    cursor: pointer;
-    color: #00ff41;
+    cursor: pointer;, color: #00ff41;
     font-weight: bold;
     margin-bottom: 1rem}
   .error-details-content {
-    margin-top: 1rem;
-    color: #cccccc;
+    margin-top: 1rem;, color: #cccccc;
     font-size: 0.9rem}
   .error-stack {
-    background: #000;
-    padding: 1rem;
+    background: #000;, padding: 1rem;
     border-radius: 4px;
     overflow-x: auto;
-    font-size: 0.8rem;
-    color: #ff6b6b;
+    font-size: 0.8rem;, color: #ff6b6b;
     margin-top: 1rem}
   .error-actions {
     display: flex;

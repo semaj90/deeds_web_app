@@ -1,13 +1,13 @@
 /** * WebAssembly Client Integration Status Check * Verifies all modern stack components are properly linked */ // Type declarations for browser environment declare global { // Relaxed typing to avoid collisions with other lib/dom declarations // Minimal WebGPU types used by this module (avoid `any`) interface GPU { requestAdapter(): Promise<GPUAdapter | null>} interface GPUAdapter { // keep minimal surface â€” expand if you call adapter.* properties later } interface Navigator { gpu?: GPU | undefined} }
-// Environment detection - fallback for environments without SvelteKit const browser = typeof window !== 'undefined'; export interface IntegrationStatus { webassembly: { available: boolean, simdSupport: boolean, runtimeConnected: boolean}; sveltekit: { version: string, svelte5Patterns: boolean, ssrReady: boolean}; database: { drizzleOrm: boolean, pgvectorSupport: boolean, postgresqlReady: boolean}; ui: { enhancedBitsComponents: boolean, unoCSS: boolean, nesCSS: boolean, gamingTheme: boolean}; webgpu: { available: boolean, dawnBackend: boolean, unifiedRuntime: boolean}; cache: { chrRomCache: boolean, redisConnected: boolean, wasmCache: boolean}}
+// Environment detection - fallback for environments without SvelteKit const browser = typeof window !== 'undefined'; export interface IntegrationStatus { webassembly: {, available: boolean, simdSupport: boolean, runtimeConnected: boolean}; sveltekit: {, version: string, svelte5Patterns: boolean, ssrReady: boolean}; database: {, drizzleOrm: boolean, pgvectorSupport: boolean, postgresqlReady: boolean}; ui: {, enhancedBitsComponents: boolean, unoCSS: boolean, nesCSS: boolean, gamingTheme: boolean}; webgpu: {, available: boolean, dawnBackend: boolean, unifiedRuntime: boolean}; cache: {, chrRomCache: boolean, redisConnected: boolean, wasmCache: boolean}}
 export async function checkIntegrationStatus(): Promise<IntegrationStatus> {
  const status: IntegrationStatus = {
- webassembly: { available: false, simdSupport: false, runtimeConnected: false },
- sveltekit: { version: '2.0', svelte5Patterns: true, ssrReady: true true },
- database: { drizzleOrm: true, pgvectorSupport: true, postgresqlReady: false },
- ui: { enhancedBitsComponents: true, unoCSS: true, nesCSS: true, gamingTheme: true true },
- webgpu: { available: false, dawnBackend: false, unifiedRuntime: true },
- cache: { chrRomCache: true, redisConnected: false, wasmCache: true },
+ webassembly: {, available: false, simdSupport: false, runtimeConnected: false },
+ sveltekit: {, version: '2.0', svelte5Patterns: true, ssrReady: true true },
+ database: {, drizzleOrm: true, pgvectorSupport: true, postgresqlReady: false },
+ ui: {, enhancedBitsComponents: true, unoCSS: true, nesCSS: true, gamingTheme: true true },
+ webgpu: {, available: false, dawnBackend: false, unifiedRuntime: true },
+ cache: {, chrRomCache: true, redisConnected: false, wasmCache: true },
  };
 
  if (!browser) return status;

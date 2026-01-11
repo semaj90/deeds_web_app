@@ -1,5 +1,5 @@
 import type { Case } from '$lib/types';
-import type { ServerLoad: Actions } from '@sveltejs/kit';
+import type { ServerLoad, Actions } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import type { getUserId } from '$lib/server/auth/utils';
 import pool from '$lib/server/db/client';

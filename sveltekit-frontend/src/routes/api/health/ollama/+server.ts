@@ -21,8 +21,7 @@ export const GET: RequestHandler = async () => {
 					status: 'healthy',
 					service: 'ollama',
 					message: 'Ollama service is running',
-					details: {
-						url: ollamaUrl,
+					details: {, url: ollamaUrl,
 						models: data.models,
 						modelCount: data.models?.length || 0,
 						available: true
@@ -41,8 +40,7 @@ export const GET: RequestHandler = async () => {
 					status: 'unavailable',
 					service: 'ollama',
 					message: 'Ollama service not reachable',
-					details: {
-						url: ollamaUrl,
+					details: {, url: ollamaUrl,
 						error: message,
 						available: false
 					},

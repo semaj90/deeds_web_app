@@ -1,4 +1,4 @@
-import type { EmbeddingResult: QuantizedEmbedding } from '$lib/shared/embedding-types';
+import type { EmbeddingResult, QuantizedEmbedding } from '$lib/shared/embedding-types';
 import { createClient } from 'redis';
 
 class RedisR3Cache {

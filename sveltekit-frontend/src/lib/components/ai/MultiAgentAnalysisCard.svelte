@@ -73,16 +73,16 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   {#each Array.isArray(synthesis.legalStrategy.viableCharges) ? synthesis.legalStrategy.viableCharges: [] as charge} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{ charge }
 </span> {/each}
   </div> {/if} {/if}
-  <!-- Action, Buttons --> <div class="flex items-center gap-3 pt-4"> <Button.Root class="bits-btn" variant="ghost" size="sm" onclick={() => (showDetails = !showDetails)}> {showDetails ? 'Hide': 'Show'} Full Analysis </Button>
- <Button.Root class="bits-btn" variant="ghost" size="sm">ðŸ“Š View Timeline</Button>
- <Button.Root class="bits-btn" variant="ghost" size="sm">ðŸ•¸ï¸ Relationship Graph</Button>
- <Button.Root class="bits-btn" size="sm">ðŸ“ Generate Report</Button> </div>
+  <!-- Action, Buttons --> <div class="flex items-center gap-3 pt-4"> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => (showDetails = !showDetails)}> {showDetails ? 'Hide': 'Show'} Full Analysis </Button>
+ <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm">ðŸ“Š View Timeline</Button>
+ <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm">ðŸ•¸ï¸ Relationship Graph</Button>
+ <Button.Root class="bits-btn bits-btn" size="sm">ðŸ“ Generate Report</Button> </div>
  <!-- Detailed, View -->
   {#if showDetails} <div class="mt-6 p-4 bg-gray-50"> <h4 class="font-medium">Detailed Analysis Data</h4>
  <pre class="text-xs overflow-auto max-h-96 bg-white p-3 rounded"> {JSON.stringify(analysisData, null, 2)}
 </pre> {/if}
   </div> </div>
- <style> /* Custom scrollbar for JSON display */ pre::-webkit-scrollbar { width: 6px; height: 6px}
+ <style> /* Custom scrollbar for JSON display */ pre::-webkit-scrollbar { width: 6px;, height: 6px}
   pre::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px}
   pre::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px}
   pre::-webkit-scrollbar-thumb:hover { background: #a8a8a8}

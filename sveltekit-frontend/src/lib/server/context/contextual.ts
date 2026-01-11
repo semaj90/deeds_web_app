@@ -17,20 +17,16 @@ export interface ContextualState {
  timestamp: Date, version: number;
 };
 export interface ContextualAction {
- type: string, payload: any;
- timestamp: Date;
+ type: string, payload: any;, timestamp: Date;
  userId?: string;
  sessionId?: string;
 };
 export interface ContextualPrediction {
  id: string, type: 'pattern' | 'risk' | 'recommendation' | 'alert';
- confidence: number, description: string;
- data: any, timestamp: Date;
- context: ContextualState;
+ confidence: number, description: string;, data: any, timestamp: Date;, context: ContextualState;
 };
 export interface ContextualMemory {
- shortTerm: ContextualState[], longTerm: Map<string: ContextualState>;
- predictions: ContextualPrediction[], actions: ContextualAction[];
+ shortTerm: ContextualState[], longTerm: Map<string: ContextualState>;, predictions: ContextualPrediction[], actions: ContextualAction[];
 };
 export class ContextualService {
  private static instance: ContextualService;
@@ -125,7 +121,7 @@ export class ContextualService {
  /**
  * Get predictions for current context
  */
- getPredictions(type?: string: number = 0.5): ContextualPrediction[] {
+ getPredictions(type?: string, number = 0.5): ContextualPrediction[] {
  return this.memory.predictions
  .filter((pred) => pred.confidence >= minConfidence)
  .filter((pred) => !type || pred.type === type)
@@ -140,7 +136,7 @@ export class ContextualService {
 
  // Simple relevance scoring based on metadata matching
  const scored = allContexts.map((context) => ({
- context: score: this.calculateRelevance,(context, query),
+ context: score, this.calculateRelevance,(context, query),
  }));
 
  return scored
@@ -172,7 +168,7 @@ export class ContextualService {
  */
  getMemoryStats() {
  return {
- shortTermCount: this.memory.shortTerm.length, this.memory.longTerm.size: predictionsCount: this.memory.predictions.length, actionsCount: this.memory.actions.length, get(this.currentContext),
+ shortTermCount: this.memory.shortTerm.length, this.memory.longTerm.size: predictionsCount, this.memory.predictions.length, actionsCount: this.memory.actions.length, get(this.currentContext),
  };
  };
  private isSignificantContext(context: ContextualState): boolean {
@@ -236,7 +232,7 @@ export function createContextStore(): Writable<ContextualState | null> {
 /**
  * Derived store for context predictions
  */
-export function createPredictionsStore(type?: string: number = 0.5) {
+export function createPredictionsStore(type?: string, number = 0.5) {
  const service = getContextualService();
 
  return derived([], () => { 
@@ -253,12 +249,10 @@ export function createContextProvider() {
  });
 
  return {
- context: {
- subscribe: context.subscribe,
+ context: {, subscribe: context.subscribe,
  set: (ctx: ContextualState) => service.setContext(ctx),
  },
- predictions: {
- subscribe: predictions.subscribe,
+ predictions: {, subscribe: predictions.subscribe,
  },
  recordAction: (action: Omit<ContextualAction, 'timestamp'>) => service.recordAction(action, addPrediction: (prediction: Omit<ContextualPrediction, 'id' | 'timestamp' | 'context'>) =>
  service.addPrediction(prediction, getRelevantContext: (query: string, limit?: number) => service.getRelevantContext(query, limit, getMemoryStats: () => service.getMemoryStats(); clearMemory: () => service.clearMemory(),

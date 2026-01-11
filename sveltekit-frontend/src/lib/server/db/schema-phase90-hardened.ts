@@ -97,12 +97,10 @@ export const legalDocuments = pgTable(
  caseId: uuid('case_id').references(() => cases.id),
  userId: uuid('user_id').notNull(),
 
- // Phase 90: Immutability
- version: integer('version').notNull().default(1),
+ // Phase 90: Immutability, version: integer('version').notNull().default(1),
  contentHash: text('content_hash').notNull(),
 
- // Phase 90: Lifecycle
- isActive: boolean('is_active').notNull().default(true),
+ // Phase 90: Lifecycle, isActive: boolean('is_active').notNull().default(true),
  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  deletedAt: timestamp('deleted_at', { withTimezone: true }),
@@ -140,8 +138,7 @@ export const cases = pgTable(
  caseNumber: text('case_number'),
  status: text('status').notNull().default('open'),
 
- // Phase 90: Lifecycle
- isActive: boolean('is_active').notNull().default(true),
+ // Phase 90: Lifecycle, isActive: boolean('is_active').notNull().default(true),
  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  deletedAt: timestamp('deleted_at', { withTimezone: true }),
@@ -172,12 +169,10 @@ export const evidence = pgTable(
  .references(() => cases.id),
  documentId: uuid('document_id').references(() => legalDocuments.id),
 
- // Phase 90: Immutability
- version: integer('version').notNull().default(1),
+ // Phase 90: Immutability, version: integer('version').notNull().default(1),
  contentHash: text('content_hash'),
 
- // Phase 90: Lifecycle
- isActive: boolean('is_active').notNull().default(true),
+ // Phase 90: Lifecycle, isActive: boolean('is_active').notNull().default(true),
  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  deletedAt: timestamp('deleted_at', { withTimezone: true }),
@@ -222,8 +217,7 @@ export const phase72ErrorVector = pgTable(
  embeddingModel: text('embedding_model').default('embeddinggemma:latest'),
  embeddingUpdatedAt: timestamp('embedding_updated_at', { withTimezone: true }),
 
- // Phase 90: Lifecycle
- isActive: boolean('is_active').notNull().default(true),
+ // Phase 90: Lifecycle, isActive: boolean('is_active').notNull().default(true),
  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  deletedAt: timestamp('deleted_at', { withTimezone: true }),
 
@@ -251,8 +245,7 @@ export const phase72Error = pgTable(
  message: text('message').notNull(),
  severity: text('severity').notNull().default('error'),
 
- // Phase 90: Lifecycle
- isActive: boolean('is_active').notNull().default(true),
+ // Phase 90: Lifecycle, isActive: boolean('is_active').notNull().default(true),
  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  deletedAt: timestamp('deleted_at', { withTimezone: true }) },

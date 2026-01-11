@@ -8,5 +8,5 @@ export interface CaseFilterOptions {
  status?: CaseStatus[];
  priority?: CasePriority[];
  assignedTo?: string;
- dateRange?: { start: Date; end: Date };
+ dateRange?: {, start: Date; end: Date };
 }

@@ -37,7 +37,7 @@ export const GET: RequestHandler = async () => {
  });
  } catch (error: any) {
  console.error('[observability-state] error: ', error);
- return json({ ok: false: error.message }, { status: 500 });
+ return json({ ok: false, error.message }, { status: 500 });
  }
 };
 

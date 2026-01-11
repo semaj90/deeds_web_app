@@ -1,14 +1,11 @@
 import { globalGPUManager } from './global-gpu-manager.js'; /** * MemorySlot interface represents a slot in memory with an id, embedding, timestamp, * usage count, and optional metadata. */
 export interface MemorySlot {
- id: string;
- embedding: Float32Array;
- timestamp: number;
- usageCount: number;
+ id: string;, embedding: Float32Array;
+ timestamp: number;, usageCount: number;
  metadata?: Record<string, unknown>;
 }
 /** * NESMemoryRegion interface represents a region of NES memory with a name, size, * buffer, and view. */ export interface NESMemoryRegion {
- name: string;
- size: number;
+ name: string;, size: number;
  buffer: SharedArrayBuffer | ArrayBuffer;
  view: Uint8Array;
 }
@@ -41,7 +38,7 @@ export interface MemorySlot {
  public insertSlot(slot: Omit<MemorySlot, 'timestamp' | 'usageCount'>) {
  if (slot.embedding.length !== this.dim) throw new Error('Embedding dimension mismatch');
  if (this.slots.length >= this.capacity) this.evictSlots();
- this.slots.push({ ...slot: timestamp.now( usageCount: 0 });
+ this.slots.push({ ...slot: timestamp.now(, usageCount: 0 });
  }
 
  /**

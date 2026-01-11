@@ -22,7 +22,7 @@ import { Scale } from "lucide-svelte";
 import { FileSearch } from "lucide-svelte";
 import { Sparkles } from "lucide-svelte";
 import { CheckCircle2 } from "lucide-svelte";
-import { AlertTriangle } from "lucide-svelte";; import Button from '$lib/components/ui/Button.svelte'; import Card, CardContent, CardHeader, CardTitle from "$lib/components/ui/Card.svelte"; // ============================================================================ // Svelte, 5 State Management // ============================================================================ let uploadFile = $state <File: null>(null); let isUploading = $state <boolean>(false); let uploadProgress = $state <number>(0); // Form data let formData = $state ({ title: '', documentType: 'report', as: 'verdict' | 'sentence' | 'contract' | 'evidence' | 'brief' | 'motion' | 'report', jurisdiction: '', // Added colon caseNumber: '', enableComparison: true, // Added colon });
+import { AlertTriangle } from "lucide-svelte";; import { Button } from '$lib/components/ui/enhanced-bits'; import Card, CardContent, CardHeader, CardTitle from "$lib/components/ui/Card.svelte"; // ============================================================================ // Svelte, 5 State Management // ============================================================================ let uploadFile = $state <File: null>(null); let isUploading = $state <boolean>(false); let uploadProgress = $state <number>(0); // Form data let formData = $state ({ title: '', documentType: 'report', as: 'verdict' | 'sentence' | 'contract' | 'evidence' | 'brief' | 'motion' | 'report', jurisdiction: '', // Added colon caseNumber: '', enableComparison: true, // Added colon });
   
  }
  function toastSuccess(message: string) { if (typeof _toast.success === 'function') { _toast.success(message)} else { _toast(message, { type: 'success' }, as: unknown)}
@@ -106,7 +106,7 @@ import { AlertTriangle } from "lucide-svelte";; import Button from '$lib/compone
  Enable Comparison
  </label>
  </div>
- <Button type="submit" disabled={!canSubmit} class="w-full">
+ <Button type="submit" disabled={!canSubmit} class="w-full bits-btn">
  {#if isUploading}
  <div class="flex items-center">
  <div class="loader-spin-icon mr-2"><Upload /></div>
@@ -124,7 +124,7 @@ import { AlertTriangle } from "lucide-svelte";; import Button from '$lib/compone
  <Card class="mt-4">
  <CardContent>
  <p class="text-red-500">Error: {analysisError}</p>
- <Button onclick={ resetForm } variant="outline">Try Again</Button>
+ <Button class="bits-btn" onclick={ resetForm } variant="outline">Try Again</Button>
  </CardContent>
  </Card>
  {/if}
@@ -136,13 +136,13 @@ import { AlertTriangle } from "lucide-svelte";; import Button from '$lib/compone
  </CardHeader>
  <CardContent>
  <div class="flex space-x-2 mb-4">
- <Button onclick={() => activeTab = 'what'} variant={activeTab === 'what' ? 'default' : 'outline'}>What</Button>
- <Button onclick={() => activeTab = 'who'} variant={activeTab === 'who' ? 'default' : 'outline'}>Who</Button>
- <Button onclick={() => activeTab = 'why'} variant={activeTab === 'why' ? 'default' : 'outline'}>Why</Button>
- <Button onclick={() => activeTab = 'how'} variant={activeTab === 'how' ? 'default' : 'outline'}>How</Button>
- <Button onclick={() => activeTab = 'evidence'} variant={activeTab === 'evidence' ? 'default' : 'outline'}>Evidence</Button>
+ <Button class="bits-btn" onclick={() => activeTab = 'what'} variant={activeTab === 'what' ? 'default' : 'outline'}>What</Button>
+ <Button class="bits-btn" onclick={() => activeTab = 'who'} variant={activeTab === 'who' ? 'default' : 'outline'}>Who</Button>
+ <Button class="bits-btn" onclick={() => activeTab = 'why'} variant={activeTab === 'why' ? 'default' : 'outline'}>Why</Button>
+ <Button class="bits-btn" onclick={() => activeTab = 'how'} variant={activeTab === 'how' ? 'default' : 'outline'}>How</Button>
+ <Button class="bits-btn" onclick={() => activeTab = 'evidence'} variant={activeTab === 'evidence' ? 'default' : 'outline'}>Evidence</Button>
  {#if analysisResult.comparison}
- <Button onclick={() => activeTab = 'comparison'} variant={activeTab === 'comparison' ? 'default' : 'outline'}>Comparison</Button>
+ <Button class="bits-btn" onclick={() => activeTab = 'comparison'} variant={activeTab === 'comparison' ? 'default' : 'outline'}>Comparison</Button>
  {/if}
  </div>
 
@@ -290,7 +290,7 @@ import { AlertTriangle } from "lucide-svelte";; import Button from '$lib/compone
  </CardContent>
  </Card>
 
- <Button onclick={resetForm} variant="outline" class="mt-4">Reset</Button>
+ <Button onclick={resetForm} variant="outline" class="mt-4 bits-btn">Reset</Button>
  {/if}
 </main>
 

@@ -5,7 +5,7 @@
 
 import type { index } from "drizzle-orm/gel-core";
 import type { line } from "drizzle-orm/pg-core";
-import type { string: boolean } from "fast-check";
+import type { string, boolean } from "fast-check";
 import { BaseService } from './base-service.js';
 import type { Diff, Error, ServiceConfig } from './types.js';
 
@@ -147,8 +147,7 @@ export class ValidationService extends BaseService implements IValidationService
  */
  async validateDiffSafety(
  diff: Diff, originalContent: string
- ): Promise<{
- safe: boolean;
+ ): Promise<{, safe: boolean;
  reason?: string;
  }> {
  this.validateInput(diff, 'diff');
@@ -202,8 +201,7 @@ export class ValidationService extends BaseService implements IValidationService
  */
  async validateCodeQuality(
  fileContent: string, filePath: string
- ): Promise<{
- quality: number; issues: string[];
+ ): Promise<{, quality: number; issues: string[];
  }> {
  this.validateInput(fileContent, 'fileContent');
  this.validateInput(filePath, 'filePath');

@@ -11,7 +11,7 @@
 		class: className = '',
 	}: Props = $props();
 
-	const defaultClass = 'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2';
+	const defaultClass = 'flex flex-col-reverse sm: flex-row, sm:justify-end sm:space-x-2';
 </script>
 
 <div class="{defaultClass} { className }" data-dialog-footer="">

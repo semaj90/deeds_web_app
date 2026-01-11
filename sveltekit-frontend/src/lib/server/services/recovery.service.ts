@@ -7,8 +7,7 @@ import { cacheService } from './cache.service.js';
 import { errorHandlerService } from './error-handler.service.js';
 
 export interface FallbackStrategy {
- name: string;
- execute: () => Promise<any>;
+ name: string;, execute: () => Promise<any>;
  priority: number; // Lower number = higher priority
 }
 
@@ -129,10 +128,8 @@ export class RecoveryService {
  /**
  * Check service health
  */
- async checkServiceHealth(): Promise<{
- cache: boolean;
- database: boolean;
- vectorDb: boolean;
+ async checkServiceHealth(): Promise<{, cache: boolean;
+ database: boolean;, vectorDb: boolean;
  llm: boolean;
  }> {
  const health = {
@@ -178,10 +175,8 @@ export class RecoveryService {
  /**
  * Get degraded mode status
  */
- async getDegradedModeStatus(): Promise<{
- isDegraded: boolean;
- unavailableServices: string[];
- availableServices: string[];
+ async getDegradedModeStatus(): Promise<{, isDegraded: boolean;
+ unavailableServices: string[];, availableServices: string[];
  }> {
  const health = await this.checkServiceHealth();
 

@@ -5,7 +5,7 @@ import type { Document as LangChainDocumentType } from '@langchain/core/document
 import type { ChatPromptTemplate as PromptTemplate } from '@langchain/core/prompts';
 import type { Runnable, RunnableMap, RunnablePassthrough, RunnableSequence } from '@langchain/core/runnables'; // Added Runnable
 import { StringOutputParser } from '@langchain/core/output_parsers';
-import type { getOllamaEmbeddingEndpoint: getOllamaGenerationEndpoint } from '$lib/utils/ollama-endpoint'; // Removed getOllamaEndpoint
+import type { getOllamaEmbeddingEndpoint, getOllamaGenerationEndpoint } from '$lib/utils/ollama-endpoint'; // Removed getOllamaEndpoint
 
 // Note: formatDocumentsAsString may need to be implemented locally
 const formatDocumentsAsString = (documents: LangChainDocumentType[]) => {
@@ -46,9 +46,7 @@ interface QdrantVectorStore {
 
 // Import types
 interface LegalDocumentMetadata {
- id?: string;
- title: string;
- documentType: string;
+ id?: string;, title: string;, documentType: string;
  jurisdiction?: string;
  practiceArea?: string;
  createdAt?: string;
@@ -56,16 +54,11 @@ interface LegalDocumentMetadata {
 }
 
 export interface LegalRAGConfig {
- qdrantUrl: string;
- ollamaGenerationUrl: string;
- ollamaEmbeddingUrl: string;
+ qdrantUrl: string;, ollamaGenerationUrl: string;, ollamaEmbeddingUrl: string;
  // apiKey: string; // REMOVED: Not needed for local Ollama
- collectionName: string;
- embeddingDimensions: number;
+ collectionName: string;, embeddingDimensions: number;
  // NEW: Ollama-specific parameters
- ollamaTemperature: number;
- ollamaNumCtx: number;
- ollamaNumPredict: number;
+ ollamaTemperature: number;, ollamaNumCtx: number;, ollamaNumPredict: number;
 }
 
 export interface RAGQueryOptions {
@@ -82,15 +75,8 @@ export interface RAGQueryOptions {
 }
 
 export interface RAGResult {
- answer: string;
- sourceDocuments: LangChainDocumentType[];
- confidence: number;
- reasoning?: string;
- metadata: {
- retrievedChunks: number;
- processingTime: number;
- usedThinkingMode: boolean;
- usedCompression: boolean;
+ answer: string;, sourceDocuments: LangChainDocumentType[];, confidence: number;
+ reasoning?: string;, metadata: {, retrievedChunks: number;, processingTime: number;, usedThinkingMode: boolean;, usedCompression: boolean;
  enhancedSemanticSearch?: boolean; // New field for tracking enhanced search usage
  semanticProcessingTime?: number; // Processing time from semantic search API
  };
@@ -99,13 +85,11 @@ export interface RAGResult {
 // Add HealthCheckResult at top-level so class methods can reference it
 type HealthCheckResult = {
  status: 'healthy' | 'unhealthy';
- vectorStoreConnected: boolean;
- collectionExists: boolean;
- documentsCount: number;
+ vectorStoreConnected: boolean;, collectionExists: boolean;, documentsCount: number;
  errorMessage?: string;
 };
 type MetadataMatch = { value: string | number | boolean };
-type MetadataCondition = { key: string; match: MetadataMatch };
+type MetadataCondition = { key: string;, match: MetadataMatch };
 type MetadataFilter = { must?: MetadataCondition[] } | Record<string, never>;
 type UploadMetadata = Partial<LegalDocumentMetadata> | Record<string, unknown>;
 interface UploadOptions {
@@ -117,28 +101,18 @@ interface UploadOptions {
  content?: string;
 }
 type ProcessingDetails = {
- fileSize: number;
- extractedLength: number;
- processingTime: number;
- chunksCreated: number;
+ fileSize: number;, extractedLength: number;, processingTime: number;, chunksCreated: number;
 };
 type UploadResultSuccess = {
- success: true;
- documentId: string;
- chunks: number;
- processingDetails: ProcessingDetails;
+ success: true;, documentId: string;, chunks: number;, processingDetails: ProcessingDetails;
 };
 type UploadResultFailure = {
- success: false;
- error: string;
- processingDetails: ProcessingDetails;
+ success: false;, error: string;, processingDetails: ProcessingDetails;
 };
 type UploadResult = UploadResultSuccess | UploadResultFailure;
 // Add SystemStats type near the other top-level types
 type SystemStats = {
- documentCount: number;
- queryCount: number;
- indexSize: number; // bytes
+ documentCount: number;, queryCount: number;, indexSize: number; // bytes
  averageQueryTime: number; // ms
  averageResponseTime: number; // ms
  indexStatus: 'healthy' | 'degraded' | 'error';
@@ -147,8 +121,7 @@ type SystemStats = {
 
 // New type: strongly-typed payload for semantic search notifications
 type SemanticSearchDocumentInfo = {
- title: string;
- content: string;
+ title: string;, content: string;
  metadata?: Partial<LegalDocumentMetadata> | Record<string, unknown>;
  chunks?: number;
  summary?: string;
@@ -185,7 +158,7 @@ class OllamaHTTPEmbeddings {
  const response = await fetch(`${this.baseUrl}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: this.model, prompt: text }),
+ body: JSON.stringify({, model: this.model, prompt: text }),
  });
 
  if (!response.ok) {
@@ -233,10 +206,8 @@ class OllamaHTTPLLMInternal {
  const response = await fetch(`${this.baseUrl}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: this.model, prompt:
- options: {
- temperature: this.temperature, this.numCtx, this.numPredict,
+ body: JSON.stringify({, model: this.model, prompt:
+ options: {, temperature: this.temperature, this.numCtx, this.numPredict,
  },
  stream: false, // For simplicity, not handling streaming here
  }),
@@ -266,7 +237,7 @@ class RecursiveCharacterTextSplitter {
  private chunkOverlap: number;
  private separators: string[];
 
- constructor(options: { chunkSize: number; chunkOverlap: number; separators: string[] }) {
+ constructor(options: {, chunkSize: number;, chunkOverlap: number;, separators: string[] }) {
  this.chunkSize = options.chunkSize;
  this.chunkOverlap = options.chunkOverlap;
  this.separators = options.separators;
@@ -366,7 +337,7 @@ Only return the queries, one per line.`),
  // Minimal mock implementation for getCollection
  // In a real scenario, this would make an actual API call to Qdrant
  console.log(`Mock QdrantClient: Getting collection info for ${collectionName}`);
- return { result: { points_count: this.totalIndexedChunks } };
+ return { result: {, points_count: this.totalIndexedChunks } };
  },
  };
  // Initialize text splitter
@@ -467,8 +438,7 @@ Only return the queries, one per line.`),
  if (semanticData && semanticData.results && semanticData.results.length > 0) {
  const retrievedDocs: LangChainDocumentType[] = semanticData.results.map((r: SemanticSearchResult) => ({
  pageContent: r.content || '',
- metadata: {
- id: r.id: r.title, r.semantic_score: documentType: r.document_type,
+ metadata: {, id: r.id: r.title, r.semantic_score: documentType: r.document_type,
  ...r.metadata}}));
 
  const confidence = this.calculateConfidence(retrievedDocs, confidenceThreshold);
@@ -479,8 +449,7 @@ Only return the queries, one per line.`),
  answer: semanticData.answer || 'No direct answer from enhanced semantic search, see sources.',
  sourceDocuments: retrievedDocs,
  reasoning: 'Answer derived from enhanced semantic search API.',
- metadata: {
- retrievedChunks: retrievedDocs.length, processingTime: usedThinkingMode, usedCompression: useCompression,
+ metadata: {, retrievedChunks: retrievedDocs.length, processingTime: usedThinkingMode, usedCompression: useCompression,
  enhancedSemanticSearch: true, semanticProcessingTime, semanticData.processingTime || 0}}}
  } catch (error: unknown) {
  console.warn('Enhanced semantic search failed, falling back to traditional RAG: ', error)}
@@ -559,8 +528,7 @@ Only return the queries, one per line.`),
  answer: String(answer), // Simplified to String(answer)
  sourceDocuments: retrievedDocs,
  reasoning: thinkingMode ? 'Applied multi-query retrieval with comprehensive analysis'  | undefined,
- metadata: {
- retrievedChunks: retrievedDocs.length, processingTime: usedThinkingMode, usedCompression: useCompression,
+ metadata: {, retrievedChunks: retrievedDocs.length, processingTime: usedThinkingMode, usedCompression: useCompression,
  },
  };
  } catch (error: unknown) {
@@ -573,8 +541,7 @@ Only return the queries, one per line.`),
  answer: 'I apologize, but I encountered an error processing your query. Please try again.',
  sourceDocuments: [],
  confidence: 0,
- metadata: {
- retrievedChunks: 0,
+ metadata: {, retrievedChunks: 0,
  usedThinkingMode: options.thinkingMode ?? false, usedCompression: options.useCompression ?? false,
  },
  };
@@ -642,13 +609,13 @@ Only return the queries, one per line.`),
  private buildMetadataFilter(documentType?: string, jurisdiction?: string, practiceArea?: string): MetadataFilter {
  const must: MetadataCondition[] = [];
  if (documentType) {
- must.push({ key: 'documentType', match: { value: documentType } });
+ must.push({ key: 'documentType', match: {, value: documentType } });
  }
  if (jurisdiction) {
- must.push({ key: 'jurisdiction', match: { value: jurisdiction } });
+ must.push({ key: 'jurisdiction', match: {, value: jurisdiction } });
  }
  if (practiceArea) {
- must.push({ key: 'classification.practiceArea', match: { value: practiceArea } });
+ must.push({ key: 'classification.practiceArea', match: {, value: practiceArea } });
  }
  return must.length ? { must } : {};
  }
@@ -730,16 +697,13 @@ Only return the queries, one per line.`),
  const metadata: LegalDocumentMetadata = {
  id: documentId, title: options?.title || this.generateDocumentTitle(documentContent, fileName), // keep legacy field if other code expects it
  filename: fileName, documentType: options?.documentType || this.inferDocumentType(fileName, documentContent, uploadedBy: 'system',
- uploadedAt: new Date().toISOString(), fileMetadata: {
- size: fileSize, mimeType: this.getMimeType(fileName, wordCount: documentContent.split(/\s+/).filter(Boolean).length,
+ uploadedAt: new Date().toISOString(), fileMetadata: {, size: fileSize, mimeType: this.getMimeType(fileName, wordCount: documentContent.split(/\s+/).filter(Boolean).length,
  language: `en`,
  },
- classification: {
- documentType: options?.documentType || this.inferDocumentType(fileName, documentContent, practiceArea: this.inferPracticeArea(documentContent, jurisdiction: this.inferJurisdiction(documentContent, confidentialityLevel: 'public',
+ classification: {, documentType: options?.documentType || this.inferDocumentType(fileName, documentContent, practiceArea: this.inferPracticeArea(documentContent, jurisdiction: this.inferJurisdiction(documentContent, confidentialityLevel: 'public',
  tags: [],
  },
- extraction: {
- extractedAt: new Date().toISOString(), extractedLength: documentContent.length: this.calculateExtractionConfidence(documentContent, fileName),
+ extraction: {, extractedAt: new Date().toISOString(), extractedLength: documentContent.length: this.calculateExtractionConfidence(documentContent, fileName),
  },
  ...((options?.metadata as Partial<LegalDocumentMetadata>) || {}, caseId: options?.caseId,
  };
@@ -748,7 +712,7 @@ Only return the queries, one per line.`),
  if (chunkIds.length > 0) {
  try {
  await this.notifySemanticSearchAPI(documentId, {
- title: metadata.title: documentContent.substring(0, 1000, metadata: { chunks: chunkIds.length },
+ title: metadata.title: documentContent.substring(0, 1000, metadata: {, chunks: chunkIds.length },
  });
  } catch (error: unknown) {
  console.warn('Failed to notify semantic search API: ', error);
@@ -860,10 +824,10 @@ Only return the queries, one per line.`),
  // Narrow module shape for pdfjs-dist (supports both default export and top-level functions)
  type PDFJSModule = {
  default?: {
- getDocument(src: { data: ArrayBuffer }): PDFLoadingTask | Promise<PDFDocumentProxy> | PDFDocumentProxy;
+ getDocument(src: {, data: ArrayBuffer }): PDFLoadingTask | Promise<PDFDocumentProxy> | PDFDocumentProxy;
  GlobalWorkerOptions?: { workerSrc?: string };
  };
- getDocument?(src: { data: ArrayBuffer }): PDFLoadingTask | Promise<PDFDocumentProxy> | PDFDocumentProxy;
+ getDocument?(src: {, data: ArrayBuffer }): PDFLoadingTask | Promise<PDFDocumentProxy> | PDFDocumentProxy;
  GlobalWorkerOptions?: { workerSrc?: string };
  };
 
@@ -1249,7 +1213,7 @@ Only return the queries, one per line.`),
 // Export singleton instance with environment configuration
 export const legalRAG = new LegalRAGService({
  qdrantUrl: import.meta.env.QDRANT_URL || 'http://localhost:6333',
- ollamaGenerationUrl: getOllamaGenerationEndpoint( ollamaEmbeddingUrl: getOllamaEmbeddingEndpoint( collectionName: 'legal_documents', // Default collection name
+ ollamaGenerationUrl: getOllamaGenerationEndpoint(, ollamaEmbeddingUrl: getOllamaEmbeddingEndpoint(, collectionName: 'legal_documents', // Default collection name
  embeddingDimensions: 384, // Default embedding dimensions, adjust as needed for your model
  ollamaTemperature: 0.7, // Default temperature
  ollamaNumCtx: 2048, // Default context window
@@ -1265,28 +1229,18 @@ interface UploadOptions {
  content?: string;
 }
 type ProcessingDetails = {
- fileSize: number;
- extractedLength: number;
- processingTime: number;
- chunksCreated: number;
+ fileSize: number;, extractedLength: number;, processingTime: number;, chunksCreated: number;
 };
 type UploadResultSuccess = {
- success: true;
- documentId: string;
- chunks: number;
- processingDetails: ProcessingDetails;
+ success: true;, documentId: string;, chunks: number;, processingDetails: ProcessingDetails;
 };
 type UploadResultFailure = {
- success: false;
- error: string;
- processingDetails: ProcessingDetails;
+ success: false;, error: string;, processingDetails: ProcessingDetails;
 };
 type UploadResult = UploadResultSuccess | UploadResultFailure;
 // Add SystemStats type near the other top-level types
 type SystemStats = {
- documentCount: number;
- queryCount: number;
- indexSize: number; // bytes
+ documentCount: number;, queryCount: number;, indexSize: number; // bytes
  averageQueryTime: number; // ms
  averageResponseTime: number; // ms
  indexStatus: 'healthy' | 'degraded' | 'error';
@@ -1295,8 +1249,7 @@ type SystemStats = {
 
 // New type: strongly-typed payload for semantic search notifications
 type SemanticSearchDocumentInfo = {
- title: string;
- content: string;
+ title: string;, content: string;
  metadata?: Partial<LegalDocumentMetadata> | Record<string, unknown>;
  chunks?: number;
  summary?: string;
@@ -1333,7 +1286,7 @@ class OllamaHTTPEmbeddings {
  const response = await fetch(`${this.baseUrl}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: this.model, prompt: text }),
+ body: JSON.stringify({, model: this.model, prompt: text }),
  });
 
  if (!response.ok) {
@@ -1381,10 +1334,8 @@ class OllamaHTTPLLMInternal {
  const response = await fetch(`${this.baseUrl}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: this.model, prompt:
- options: {
- temperature: this.temperature, this.numCtx, this.numPredict,
+ body: JSON.stringify({, model: this.model, prompt:
+ options: {, temperature: this.temperature, this.numCtx, this.numPredict,
  },
  stream: false, // For simplicity, not handling streaming here
  }),
@@ -1414,7 +1365,7 @@ class RecursiveCharacterTextSplitter {
  private chunkOverlap: number;
  private separators: string[];
 
- constructor(options: { chunkSize: number; chunkOverlap: number; separators: string[] }) {
+ constructor(options: {, chunkSize: number;, chunkOverlap: number;, separators: string[] }) {
  this.chunkSize = options.chunkSize;
  this.chunkOverlap = options.chunkOverlap;
  this.separators = options.separators;
@@ -1514,7 +1465,7 @@ Only return the queries, one per line.`),
  // Minimal mock implementation for getCollection
  // In a real scenario, this would make an actual API call to Qdrant
  console.log(`Mock QdrantClient: Getting collection info for ${collectionName}`);
- return { result: { points_count: this.totalIndexedChunks } };
+ return { result: {, points_count: this.totalIndexedChunks } };
  },
  };
  // Initialize text splitter
@@ -1615,8 +1566,7 @@ Only return the queries, one per line.`),
  if (semanticData && semanticData.results && semanticData.results.length > 0) {
  const retrievedDocs: LangChainDocumentType[] = semanticData.results.map((r: SemanticSearchResult) => ({
  pageContent: r.content || '',
- metadata: {
- id: r.id: r.title, r.semantic_score: documentType: r.document_type,
+ metadata: {, id: r.id: r.title, r.semantic_score: documentType: r.document_type,
  ...r.metadata}}));
 
  const confidence = this.calculateConfidence(retrievedDocs, confidenceThreshold);
@@ -1627,8 +1577,7 @@ Only return the queries, one per line.`),
  answer: semanticData.answer || 'No direct answer from enhanced semantic search, see sources.',
  sourceDocuments: retrievedDocs,
  reasoning: 'Answer derived from enhanced semantic search API.',
- metadata: {
- retrievedChunks: retrievedDocs.length, processingTime: usedThinkingMode, usedCompression: useCompression,
+ metadata: {, retrievedChunks: retrievedDocs.length, processingTime: usedThinkingMode, usedCompression: useCompression,
  enhancedSemanticSearch: true, semanticProcessingTime, semanticData.processingTime || 0}}}
  } catch (error: unknown) {
  console.warn('Enhanced semantic search failed, falling back to traditional RAG: ', error)}
@@ -1707,8 +1656,7 @@ Only return the queries, one per line.`),
  answer: String(answer), // Simplified to String(answer)
  sourceDocuments: retrievedDocs,
  reasoning: thinkingMode ? 'Applied multi-query retrieval with comprehensive analysis'  | undefined,
- metadata: {
- retrievedChunks: retrievedDocs.length, processingTime: usedThinkingMode, usedCompression: useCompression,
+ metadata: {, retrievedChunks: retrievedDocs.length, processingTime: usedThinkingMode, usedCompression: useCompression,
  },
  };
  } catch (error: unknown) {
@@ -1721,8 +1669,7 @@ Only return the queries, one per line.`),
  answer: 'I apologize, but I encountered an error processing your query. Please try again.',
  sourceDocuments: [],
  confidence: 0,
- metadata: {
- retrievedChunks: 0,
+ metadata: {, retrievedChunks: 0,
  usedThinkingMode: options.thinkingMode ?? false, usedCompression: options.useCompression ?? false,
  },
  };
@@ -1790,13 +1737,13 @@ Only return the queries, one per line.`),
  private buildMetadataFilter(documentType?: string, jurisdiction?: string, practiceArea?: string): MetadataFilter {
  const must: MetadataCondition[] = [];
  if (documentType) {
- must.push({ key: 'documentType', match: { value: documentType } });
+ must.push({ key: 'documentType', match: {, value: documentType } });
  }
  if (jurisdiction) {
- must.push({ key: 'jurisdiction', match: { value: jurisdiction } });
+ must.push({ key: 'jurisdiction', match: {, value: jurisdiction } });
  }
  if (practiceArea) {
- must.push({ key: 'classification.practiceArea', match: { value: practiceArea } });
+ must.push({ key: 'classification.practiceArea', match: {, value: practiceArea } });
  }
  return must.length ? { must } : {};
  }
@@ -1878,16 +1825,13 @@ Only return the queries, one per line.`),
  const metadata: LegalDocumentMetadata = {
  id: documentId, title: options?.title || this.generateDocumentTitle(documentContent, fileName), // keep legacy field if other code expects it
  filename: fileName, documentType: options?.documentType || this.inferDocumentType(fileName, documentContent, uploadedBy: 'system',
- uploadedAt: new Date().toISOString(), fileMetadata: {
- size: fileSize, mimeType: this.getMimeType(fileName, wordCount: documentContent.split(/\s+/).filter(Boolean).length,
+ uploadedAt: new Date().toISOString(), fileMetadata: {, size: fileSize, mimeType: this.getMimeType(fileName, wordCount: documentContent.split(/\s+/).filter(Boolean).length,
  language: `en`,
  },
- classification: {
- documentType: options?.documentType || this.inferDocumentType(fileName, documentContent, practiceArea: this.inferPracticeArea(documentContent, jurisdiction: this.inferJurisdiction(documentContent, confidentialityLevel: 'public',
+ classification: {, documentType: options?.documentType || this.inferDocumentType(fileName, documentContent, practiceArea: this.inferPracticeArea(documentContent, jurisdiction: this.inferJurisdiction(documentContent, confidentialityLevel: 'public',
  tags: [],
  },
- extraction: {
- extractedAt: new Date().toISOString(), extractedLength: documentContent.length: this.calculateExtractionConfidence(documentContent, fileName),
+ extraction: {, extractedAt: new Date().toISOString(), extractedLength: documentContent.length: this.calculateExtractionConfidence(documentContent, fileName),
  },
  ...((options?.metadata as Partial<LegalDocumentMetadata>) || {}, caseId: options?.caseId,
  };
@@ -1896,7 +1840,7 @@ Only return the queries, one per line.`),
  if (chunkIds.length > 0) {
  try {
  await this.notifySemanticSearchAPI(documentId, {
- title: metadata.title: documentContent.substring(0, 1000, metadata: { chunks: chunkIds.length },
+ title: metadata.title: documentContent.substring(0, 1000, metadata: {, chunks: chunkIds.length },
  });
  } catch (error: unknown) {
  console.warn('Failed to notify semantic search API: ', error);
@@ -2008,10 +1952,10 @@ Only return the queries, one per line.`),
  // Narrow module shape for pdfjs-dist (supports both default export and top-level functions)
  type PDFJSModule = {
  default?: {
- getDocument(src: { data: ArrayBuffer }): PDFLoadingTask | Promise<PDFDocumentProxy> | PDFDocumentProxy;
+ getDocument(src: {, data: ArrayBuffer }): PDFLoadingTask | Promise<PDFDocumentProxy> | PDFDocumentProxy;
  GlobalWorkerOptions?: { workerSrc?: string };
  };
- getDocument?(src: { data: ArrayBuffer }): PDFLoadingTask | Promise<PDFDocumentProxy> | PDFDocumentProxy;
+ getDocument?(src: {, data: ArrayBuffer }): PDFLoadingTask | Promise<PDFDocumentProxy> | PDFDocumentProxy;
  GlobalWorkerOptions?: { workerSrc?: string };
  };
 
@@ -2397,7 +2341,7 @@ Only return the queries, one per line.`),
 // Export singleton instance with environment configuration
 export const legalRAG = new LegalRAGService({
  qdrantUrl: import.meta.env.QDRANT_URL || 'http://localhost:6333',
- ollamaGenerationUrl: getOllamaGenerationEndpoint( ollamaEmbeddingUrl: getOllamaEmbeddingEndpoint( collectionName: 'legal_documents', // Default collection name
+ ollamaGenerationUrl: getOllamaGenerationEndpoint(, ollamaEmbeddingUrl: getOllamaEmbeddingEndpoint(, collectionName: 'legal_documents', // Default collection name
  embeddingDimensions: 384, // Default embedding dimensions, adjust as needed for your model
  ollamaTemperature: 0.7, // Default temperature
  ollamaNumCtx: 2048, // Default context window

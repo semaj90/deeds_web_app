@@ -15,7 +15,7 @@ import { Upload } from "lucide-svelte";;
  onDelete
  } = $props();
 
- function handlePhotoClick(photo: any, index): number: number {
+ function handlePhotoClick(photo: any, index): number, number {
  onView({ photo, index });
  }
 
@@ -35,7 +35,7 @@ import { Upload } from "lucide-svelte";;
  <Camera class="w-5 h-5" />
  POI Photos ({photos.length})
  </h3>
- <Button onclick={handleUpload} variant="outline" size="sm">
+ <Button class="bits-btn" onclick={handleUpload} variant="outline" size="sm">
  <Upload class="w-4 h-4 mr-2" />
  Upload Photo
  </Button>
@@ -52,14 +52,14 @@ import { Upload } from "lucide-svelte";;
  <Camera class="w-12 h-12 text-gray-400 mx-auto mb-4" />
  <p class="text-gray-500 mb-4">No photos uploaded yet</p>
  {#if editable}
- <Button onclick={handleUpload} variant="outline">
+ <Button class="bits-btn" onclick={handleUpload} variant="outline">
  <Upload class="w-4 h-4 mr-2" />
  Upload First Photo
  </Button>
  {/if}
  </div>
  {:else}
- <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+ <div class="grid grid-cols-2 md: grid-cols-3, lg:grid-cols-4 gap-4">
  {#each photos as photo, index}
  <div class="relative group">
  <div
@@ -81,7 +81,7 @@ import { Upload } from "lucide-svelte";;
  <Button
  size="sm"
  variant="secondary"
- class="opacity-0 group-hover:opacity-100 transition-opacity"
+ class="opacity-0 group-hover:opacity-100 transition-opacity bits-btn"
  onclick={() => handlePhotoClick(photo, index)}
  >
  <Eye class="w-4 h-4" />
@@ -90,7 +90,7 @@ import { Upload } from "lucide-svelte";;
  <Button
  size="sm"
  variant="destructive"
- class="opacity-0 group-hover:opacity-100 transition-opacity"
+ class="opacity-0 group-hover:opacity-100 transition-opacity bits-btn"
  onclick={() => handleDelete(index)}
  >
  <Trash2 class="w-4 h-4" />
@@ -101,9 +101,7 @@ import { Upload } from "lucide-svelte";;
  <!-- AI Analysis Badge -->
  {#if photo.ai && photo.ai.caption}
  <div class="absolute bottom-2 left-2">
- <Badge variant="secondary" class="text-xs bg-black bg-opacity-75 text-white">
- AI Analyzed
- </Badge>
+ <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">AI Analyzed</span>
  </div>
  {/if}
  </div>

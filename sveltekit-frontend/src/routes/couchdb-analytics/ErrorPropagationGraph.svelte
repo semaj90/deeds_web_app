@@ -12,8 +12,7 @@
 	let { apiBase }: Props = $props();
 
 	interface ErrorNode {
-		file_path: string;
-		error_count: number;
+		file_path: string;, error_count: number;
 		imports: string[];
 	}
 
@@ -281,14 +280,12 @@
 	}
 
 	.description {
-		margin: 0;
-		color: #6b7280;
+		margin: 0;, color: #6b7280;
 		font-size: 0.875rem;
 	}
 
 	.loading, .empty-state {
-		text-align: center;
-		padding: 3rem;
+		text-align: center;, padding: 3rem;
 		color: #6b7280;
 	}
 
@@ -300,8 +297,7 @@
 	.content-grid {
 		display: grid;
 		grid-template-columns: 1fr 300px;
-		gap: 1.5rem;
-		height: calc(100% - 80px);
+		gap: 1.5rem;, height: calc(100% - 80px);
 	}
 
 	.graph-panel {
@@ -309,49 +305,39 @@
 	}
 
 	.legend {
-		position: absolute;
-		top: 10px;
-		right: 10px;
-		background: white;
+		position: absolute;, top: 10px;
+		right: 10px;, background: white;
 		padding: 0.75rem;
-		border-radius: 8px;
-		border: 2px solid #e5e7eb;
-		z-index: 10;
-		display: flex;
+		border-radius: 8px;, border: 2px solid #e5e7eb;
+		z-index: 10;, display: flex;
 		gap: 1rem;
 	}
 
 	.legend-item {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		align-items: center;, gap: 0.5rem;
 		font-size: 0.75rem;
 	}
 
 	.legend-color {
-		width: 12px;
-		height: 12px;
+		width: 12px;, height: 12px;
 		border-radius: 50%;
 	}
 
 	.graph-wrapper {
-		width: 100%;
-		height: 600px;
+		width: 100%;, height: 600px;
 		border: 2px solid #e5e7eb;
-		border-radius: 8px;
-		overflow: hidden;
+		border-radius: 8px;, overflow: hidden;
 		background: #f9fafb;
 	}
 
 	.detail-panel, .info-panel {
 		border: 2px solid #e5e7eb;
-		border-radius: 8px;
-		overflow: hidden;
+		border-radius: 8px;, overflow: hidden;
 	}
 
 	.panel-header {
-		background: #f9fafb;
-		padding: 1rem;
+		background: #f9fafb;, padding: 1rem;
 		border-bottom: 2px solid #e5e7eb;
 		display: flex;
 		justify-content: space-between;
@@ -360,19 +346,14 @@
 
 	.panel-header h4 {
 		margin: 0;
-		font-size: 1rem;
-		color: #1f2937;
+		font-size: 1rem;, color: #1f2937;
 	}
 
 	.close-btn {
-		background: none;
-		border: none;
-		font-size: 1.25rem;
-		cursor: pointer;
-		color: #6b7280;
-		width: 28px;
-		height: 28px;
-		display: flex;
+		background: none;, border: none;
+		font-size: 1.25rem;, cursor: pointer;
+		color: #6b7280;, width: 28px;
+		height: 28px;, display: flex;
 		align-items: center;
 		justify-content: center;
 		border-radius: 4px;
@@ -392,8 +373,7 @@
 
 	.detail-item .label {
 		display: block;
-		font-size: 0.75rem;
-		color: #6b7280;
+		font-size: 0.75rem;, color: #6b7280;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 		margin-bottom: 0.25rem;
@@ -401,16 +381,13 @@
 
 	.detail-item .value {
 		display: block;
-		font-size: 0.875rem;
-		color: #1f2937;
+		font-size: 0.875rem;, color: #1f2937;
 		word-break: break-all;
 	}
 
 	.error-badge {
-		display: inline-block;
-		background: #dc2626;
-		color: white;
-		padding: 0.25rem 0.75rem;
+		display: inline-block;, background: #dc2626;
+		color: white;, padding: 0.25rem 0.75rem;
 		border-radius: 12px;
 		font-weight: bold;
 	}
@@ -421,8 +398,7 @@
 	}
 
 	.import-item {
-		padding: 0.5rem;
-		background: #f9fafb;
+		padding: 0.5rem;, background: #f9fafb;
 		border-radius: 4px;
 		font-size: 0.75rem;
 		font-family: monospace;
@@ -432,8 +408,7 @@
 	.import-item.more {
 		background: #e5e7eb;
 		text-align: center;
-		font-family: inherit;
-		color: #6b7280;
+		font-family: inherit;, color: #6b7280;
 	}
 
 	.no-imports {
@@ -446,10 +421,8 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		padding: 2rem;
-		text-align: center;
-		color: #6b7280;
+		justify-content: center;, padding: 2rem;
+		text-align: center;, color: #6b7280;
 	}
 
 	.info-panel .icon {

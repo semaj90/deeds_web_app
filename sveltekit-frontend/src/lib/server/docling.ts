@@ -13,21 +13,18 @@ import { join } from 'node:path';
 
 export type DoclingBlock = {
  type: 'paragraph' | 'heading' | 'table' | 'list' | 'equation' | 'image' | 'other';
- text: string;
- page: number;
+ text: string;, page: number;
  bbox?: [number, number, number, number];
 };
 
 export type DoclingResult = {
- fullText: string;
- blocks: DoclingBlock[];
+ fullText: string;, blocks: DoclingBlock[];
  pageCount?: number;
  processingTimeMs?: number;
 };
 
 type AnalyzeArgs = {
- fileBuffer: Buffer;
- mimeType: string;
+ fileBuffer: Buffer;, mimeType: string;
 };
 
 /**
@@ -100,10 +97,8 @@ export async function analyzeDocumentWithDocling(args: AnalyzeArgs): Promise<Doc
  * Batch analyze multiple documents
  */
 export async function analyzeDocumentsWithDocling(
- documents: Array<{
- fileBuffer: Buffer;
- mimeType: string;
- filename: string;
+ documents: Array<{, fileBuffer: Buffer;
+ mimeType: string;, filename: string;
  }>
 ): Promise<Array<DoclingResult & { filename: string }>> {
  console.log(`📦 Analyzing ${documents.length} documents with Docling...`);
@@ -155,8 +150,7 @@ export function extractHeadingsFromBlocks(blocks: DoclingBlock[]): DoclingBlock[
 /**
  * Get block statistics
  */
-export function getBlockStatistics(blocks: DoclingBlock[]): {
- total: number;
+export function getBlockStatistics(blocks: DoclingBlock[]): {, total: number;
  byType: Record<string, number>;
  pageCount: number;
 } {
@@ -191,22 +185,18 @@ export async function isDoclingAvailable(): Promise<boolean> {
  * Process document with Docling (file path version for document processor)
  * Returns standardized DocumentProcessingResult format
  */
-export async function processWithDocling(filePath: string): Promise<{
- text: string;
+export async function processWithDocling(filePath: string): Promise<{, text: string;
  metadata: {
  title?: string;
  author?: string;
  pages?: number;
  language?: string;
- confidence?: number;
- processingTime: number;
+ confidence?: number;, processingTime: number;
  };
- tables?: Array<{
- content: string[][];
+ tables?: Array<{, content: string[][];
  bbox?: number[];
  }>;
- images?: Array<{
- content: Buffer;
+ images?: Array<{, content: Buffer;
  bbox?: number[];
  caption?: string;
  }>;
@@ -233,8 +223,7 @@ export async function processWithDocling(filePath: string): Promise<{
 
  return {
  text: result.fullText,
- metadata: {
- pages: result.pageCount,
+ metadata: {, pages: result.pageCount,
  processingTime,
  }.length > 0 ? tables  | undefined,
  method: 'docling',

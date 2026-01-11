@@ -15,8 +15,7 @@ export const GET: RequestHandler = async ({ request }) => {
  // This route documents the endpoint but actual upgrade is handled by the server
  return new Response('WebSocket upgrade should be handled by server', {
  status: 426,
- headers: {
- Upgrade: 'WebSocket',
+ headers: {, Upgrade: 'WebSocket',
  Connection: 'Upgrade',
  'Sec-WebSocket-Accept': '',
  },
@@ -35,8 +34,7 @@ export const GET: RequestHandler = async ({ request }) => {
  status: 'Ready',
  description: 'Real-time binary compressed QLoRA topology predictions',
  upgrade: 'Use WebSocket upgrade headers to connect',
- example: {
- request: {
+ example: {, request: {
  query: 'analyze legal contract',
  topologyType: 'legal',
  accuracyTarget: 90,

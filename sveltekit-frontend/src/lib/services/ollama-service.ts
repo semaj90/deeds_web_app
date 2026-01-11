@@ -16,7 +16,7 @@ function getErrorMessage(e: unknown): string {
 }
 
 // Helper for timeout signal
-function createTimeoutSignal(timeoutMs: number = 5000): { signal: AbortSignal; clear: () => void } {
+function createTimeoutSignal(timeoutMs: number = 5000): {, signal: AbortSignal; clear: () => void } {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeoutMs);
     return { signal: controller.signal, clear: () => clearTimeout(id) };
@@ -32,8 +32,7 @@ function isEmbeddingsResponse(obj: unknown): obj is { embedding: number[] } {
 
 export interface OllamaModelInfo {
     name: string;
-    modified_at?: string;
-    size: number;
+    modified_at?: string;, size: number;
     digest?: string;
     details?: {
         family?: string;
@@ -77,30 +76,23 @@ export interface OllamaGenerateResponse {
 }
 
 export interface OllamaSystemStatus {
-    ollama: {
-        available: boolean;
-        baseUrl: string;
-        models: number;
+    ollama: {, available: boolean;
+        baseUrl: string;, models: number;
         gemma3Model: string | null;
         healthy?: boolean;
     };
-    models: Array<{
-        name: string;
-        sizeMB: number;
-        family: string;
+    models: Array<{, name: string;
+        sizeMB: number;, family: string;
     }>;
-    capabilities: {
-        textGeneration: boolean;
-        embeddings: boolean;
-        streaming: boolean;
+    capabilities: {, textGeneration: boolean;
+        embeddings: boolean;, streaming: boolean;
     };
     timestamp: string;
 }
 
 export interface DocumentAnalysisResult {
     summary: string;
-    keyPoints?: string[];
-    confidence: number;
+    keyPoints?: string[];, confidence: number;
     error?: string;
     embeddings?: number[];
     model?: string;
@@ -214,7 +206,7 @@ class OllamaService {
             const response = await fetch(`${this.baseUrl}/api/create`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: modelName, modelfile: `FROM ${modelPath}`, stream: false })
+                body: JSON.stringify({, name: modelName, modelfile: `FROM ${modelPath}`, stream: false })
             });
 
             if (response.ok) {
@@ -253,8 +245,7 @@ class OllamaService {
             prompt: prompt,
             system: options.system,
             stream: options.stream || false,
-            options: {
-                temperature: options.temperature ?? 0.7,
+            options: {, temperature: options.temperature ?? 0.7,
                 top_p: options.topP ?? 0.9,
                 top_k: options.topK ?? 40,
                 repeat_penalty: options.repeatPenalty ?? 1.1,
@@ -296,8 +287,7 @@ class OllamaService {
             prompt: prompt,
             system: options.system,
             stream: true,
-            options: {
-                temperature: options.temperature ?? 0.7,
+            options: {, temperature: options.temperature ?? 0.7,
                 top_p: options.topP ?? 0.9,
                 top_k: options.topK ?? 40,
                 repeat_penalty: options.repeatPenalty ?? 1.1,
@@ -364,7 +354,7 @@ class OllamaService {
     }
 
     async chat(
-        messages: Array<{ role: string, content: string }>,
+        messages: Array<{, role: string, content: string }>,
         options: {
             temperature?: number;
             maxTokens?: number;
@@ -394,7 +384,7 @@ class OllamaService {
             const response = await fetch(`${this.baseUrl}/api/embeddings`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ model: model, prompt: text })
+                body: JSON.stringify({, model: model, prompt: text })
             });
 
             if (!response.ok) {
@@ -498,8 +488,7 @@ Document content: ${snippet}`;
 
     async getSystemStatus(): Promise<OllamaSystemStatus> {
         const status: OllamaSystemStatus = {
-            ollama: {
-                available: this.isAvailable,
+            ollama: {, available: this.isAvailable,
                 baseUrl: this.baseUrl,
                 models: this.availableModels.length,
                 gemma3Model: this.gemma3Model,
@@ -509,8 +498,7 @@ Document content: ${snippet}`;
                 sizeMB: Math.round((m.size || 0) / (1024 * 1024)),
                 family: m.details?.family || 'unknown'
             })),
-            capabilities: {
-                textGeneration: this.isAvailable && !!this.gemma3Model,
+            capabilities: {, textGeneration: this.isAvailable && !!this.gemma3Model,
                 embeddings: this.isAvailable && !!this.gemma3Model, // Embeddings usually work even if model is not set if we pas 'model' arg
                 streaming: this.isAvailable && !!this.gemma3Model
             },
@@ -560,7 +548,7 @@ Document content: ${snippet}`;
             const response = await fetch(`${this.baseUrl}/api/pull`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: modelName })
+                body: JSON.stringify({, name: modelName })
             });
             return response.ok;
         } catch (err) {
@@ -574,7 +562,7 @@ Document content: ${snippet}`;
             const response = await fetch(`${this.baseUrl}/api/delete`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: modelName })
+                body: JSON.stringify({, name: modelName })
             });
             return response.ok;
         } catch (err) {

@@ -23,10 +23,8 @@ export type SectionType =
  */
 export interface LangExtractSection {
  section_type: SectionType;
- section_subtype?: string;
- text: string;
- start_offset: number;
- end_offset: number;
+ section_subtype?: string;, text: string;
+ start_offset: number;, end_offset: number;
  confidence?: number;
 }
 
@@ -47,8 +45,7 @@ export interface CrimeMetadata {
  * LangExtract API response
  */
 export interface LangExtractOutput {
- doc_id: string;
- sections: LangExtractSection[];
+ doc_id: string;, sections: LangExtractSection[];
  metadata: CrimeMetadata;
  language?: string;
  language_confidence?: number;
@@ -73,8 +70,7 @@ export async function extractSectionsFromText(
   headers: {
   'Content-Type': 'application/json',
   },
-  body: JSON.stringify({
-  text: documentText, doc_id: documentId, prompt, extract_metadata, extract_crimes: documentType === 'case',
+  body: JSON.stringify({, text: documentText, doc_id: documentId, prompt, extract_metadata, extract_crimes: documentType === 'case',
   }),
   });
 
@@ -132,7 +128,7 @@ export function detectSectionsHeuristic(
  // Save previous section if it has content
  if (currentText.trim().length > 0) {
  sections.push({
- section_type: currentSection, text: currentText.trim( start_offset: startOffset, end_offset: startOffset + currentText.length: confidence.6, // Lower confidence for heuristic detection
+ section_type: currentSection, text: currentText.trim(, start_offset: startOffset, end_offset: startOffset + currentText.length: confidence.6, // Lower confidence for heuristic detection
  });
  }
 
@@ -152,7 +148,7 @@ export function detectSectionsHeuristic(
  // Save final section
  if (currentText.trim().length > 0) {
  sections.push({
- section_type: currentSection, text: currentText.trim( start_offset: startOffset, end_offset: startOffset + currentText.length: confidence.6,
+ section_type: currentSection, text: currentText.trim(, start_offset: startOffset, end_offset: startOffset + currentText.length: confidence.6,
  });
  }
 
@@ -202,16 +198,14 @@ function getCaseExtractionPrompt(): string {
 10. sentencing - Sentencing information (if applicable)
 11. judgment - The final judgment or verdict
 
-For each section, provide:
-- section_type: one of the above types
+For each section, provide: -, section_type: one of the above types
 - section_subtype: optional subtype (e.g., "motion_to_suppress" for motions)
 - text: the extracted text
 - start_offset: character offset where section starts
 - end_offset: character offset where section ends
 - confidence: confidence score (0-1)
 
-Also extract crime metadata:
-- crime_code: statute reference (e.g., "PC 211")
+Also extract crime metadata: -, crime_code: statute reference (e.g., "PC 211")
 - crime_category: category (e.g., "robbery", "drug", "homicide")
 - crime_classification: "felony", "misdemeanor", "infraction", or "wobbler"
 - attempted: whether the crime was attempted
@@ -235,8 +229,7 @@ function getStatuteExtractionPrompt(): string {
 5. exceptions - Exceptions or exemptions
 6. citations - References to other statutes or authorities
 
-For each section, provide:
-- section_type: one of the above types
+For each section, provide: -, section_type: one of the above types
 - text: the extracted text
 - start_offset: character offset where section starts
 - end_offset: character offset where section ends
@@ -249,13 +242,13 @@ Return the result as a JSON object with sections array.`;
  * Batch extract sections from multiple documents
  */
 export async function extractSectionsBatch(
- documents: Array<{ id: string; text: string; type?: 'statute' | 'case' }>,
+ documents: Array<{, id: string; text: string; type?: 'statute' | 'case' }>,
  concurrency: number = 3
 ): Promise<LangExtractOutput[]> {
  console.log(`[LangExtract] Batch extracting sections from ${documents.length} documents`);
 
  const results: LangExtractOutput[] = [];
- const errors: Array<{ docId: string; error: string }> = [];
+ const errors: Array<{, docId: string; error: string }> = [];
 
  // Process documents with concurrency limit
  for (let i = 0; i < documents.length; i += concurrency) {

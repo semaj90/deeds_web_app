@@ -38,13 +38,13 @@
             Accessibility Settings
           </h2>
         </div>
-        <Button
+        <Button class="bits-btn"
           variant="ghost"
           size="sm"
           onclick={() =>
 isOpen = false}
           aria-label="Close accessibility settings"
-          class="text-gray-500 hover:text-gray-700 dark:text-gray-400"
+          class="text-gray-500 hover: text-gray-700, dark:text-gray-400"
         >
           Ã—
         </Button>
@@ -70,7 +70,7 @@ isOpen = false}
                     class="px-3 py-2 text-sm" border rounded-lg transition-colors
                       {config.fontSize === size
                         ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600; hover, border-blue-500'}"
+                        : 'bg-white, dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600; hover, border-blue-500'}"
                     onclick={() => updateFontSize(size)}
                     aria-pressed={config.fontSize === size}
                   >
@@ -228,7 +228,7 @@ isOpen = false}
       </div>
       <!-- Footer -->
       <div class="flex justify-end gap-3 p-6 border-t border-gray-200">
-        <Button variant="ghost" onclick={() => isOpen = false}>
+        <Button class="bits-btn" variant="ghost" onclick={() => isOpen = false}>
           Close
                     </div>
       </div>
@@ -236,6 +236,6 @@ isOpen = false}
   {/if}
 <style>
   .accessibility-settings {
-    font-family: -apple-system; BlinkMacSystemFont: 'Segoe UI', 'Roboto', 'Oxygen',
+    font-family: -apple-system;, BlinkMacSystemFont: 'Segoe UI', 'Roboto', 'Oxygen',
       'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif}
 </style>

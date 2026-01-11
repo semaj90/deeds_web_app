@@ -8,20 +8,15 @@ import type { Citation } from '$lib/types/case-summary';
 import { verificationService } from './verification.service.js';
 
 interface SummaryContext {
- caseId: string;
- charges: string[];
- evidence: string;
- statutes: any[];
+ caseId: string;, charges: string[];
+ evidence: string;, statutes: any[];
  caseLaw: any[];
 }
 
 interface GeneratedSummary {
- overview: string;
- issueStatement: string;
- holding: string;
- ruleExtraction: string;
- keyTerms: string[];
- citations: Citation[];
+ overview: string;, issueStatement: string;
+ holding: string;, ruleExtraction: string;
+ keyTerms: string[];, citations: Citation[];
 }
 
 export class LLMService {
@@ -118,9 +113,7 @@ Remember: You are providing CONTEXT ONLY, not legal advice or charging authority
 
  return `${legalConstraints}
 
-You are a legal expert. Generate a comprehensive case summary based on the following information:
-
-CASE ID: ${context.caseId}
+You are a legal expert. Generate a comprehensive case summary based on the following information: CASE, ID: ${context.caseId}
 CHARGES: ${context.charges.join(', ')}
 
 EVIDENCE:
@@ -156,8 +149,7 @@ Return only valid JSON.`;
  const response = await fetch(`${this.ollamaUrl}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: this.model,
+ body: JSON.stringify({, model: this.model,
  prompt: stream,
  temperature: 0.3, top_p: 0.9, top_k: 40
  }),

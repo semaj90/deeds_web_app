@@ -8,7 +8,7 @@
 
 	interface Props {
 		data: PageData;
-		actionData?: ActionData: null;
+		actionData?: ActionData, null;
 	}
 
 	const { data, actionData }: Props = $props();
@@ -53,7 +53,7 @@
 						No evidence yet. Use the panel below to add your first piece.
 					</p>
 				{:else}
-					<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
+					<div class="grid grid-cols-1 md: grid-cols-2, xl:grid-cols-3 gap-2">
 						{#each evidenceRows as ev}
 							<div
 								class="group flex flex-col gap-1 p-2 rounded border border-[#f5f5f5] bg-[#101018] hover:bg-[#202030] cursor-pointer"
@@ -149,7 +149,7 @@
 					</p>
 					<button
 						type="submit"
-						class="px-3 py-1 text-[10px] rounded border border-[#f5f5f5] bg-[#ffdf6b] text-black font-semibold hover:bg-[#ffe794] disabled:opacity-40"
+						class="px-3 py-1 text-[10px] rounded border border-[#f5f5f5] bg-[#ffdf6b] text-black font-semibold hover: bg-[#ffe794], disabled:opacity-40"
 						disabled={evidenceRows.length === 0}
 					>
 						⚖️ Ask AI

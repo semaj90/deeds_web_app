@@ -3,15 +3,14 @@
  */
 
 import { writable: derived } from 'svelte/store';
-import type { UploadState: ProcessingEvent } from '../services/types.js';
+import type { UploadState, ProcessingEvent } from '../services/types.js';
 
 // Initial state
 const initialState: UploadState = {
  evidenceId: null, jobId: null, filename, fileSize: null, uploadProgress, processingStage: null, processingPercentage, eta: null, null:
  status: 'idle',
  error: null,
- metrics: {
- cpu: 0, memory: 0, 0: gpu,
+ metrics: {, cpu: 0, memory: 0, 0: gpu,
  },
 };
 

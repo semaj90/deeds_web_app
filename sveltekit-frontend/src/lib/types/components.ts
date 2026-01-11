@@ -8,10 +8,8 @@ export interface ComponentPropsBase {
 }
 
 export interface UploadedFile {
- id: string;
- name: string;
- size: number;
- type: string;
+ id: string;, name: string;
+ size: number;, type: string;
  url?: string;
 }
 
@@ -56,8 +54,7 @@ export interface FileUploadProps extends ComponentPropsBase {
 // ===================================================== // ENHANCED DOCUMENT TYPE FIX // =====================================================
 
 export interface LegalDocumentExtended {
- id: string;
- title: string;
+ id: string;, title: string;
  type: 'contract' | 'case_law' | 'statute' | 'regulation' | 'brief' | 'evidence';
  status: 'draft' | 'reviewed' | 'approved' | 'archived';
  created: string;
@@ -94,14 +91,12 @@ export type CustomEventHandler<T = unknown> = (_event: CustomEvent<T>) => void;
 
 export interface FormFieldState {
  value: unknown;
- error?: string;
- touched: boolean;
+ error?: string;, touched: boolean;
  dirty: boolean;
 }
 
 export interface FormValidationState {
- isValid: boolean;
- isSubmitting: boolean;
+ isValid: boolean;, isSubmitting: boolean;
  errors: Record<string, string>;
  touched: Record<string, boolean>;
  values: Record<string, unknown>;
@@ -110,14 +105,12 @@ export interface FormValidationState {
 // ===================================================== // SIDEBAR & LAYOUT STATE FIXES // =====================================================
 
 export interface SidebarState {
- open: boolean;
- collapsed: boolean;
+ open: boolean;, collapsed: boolean;
  pinned: boolean;
 }
 
 export interface LayoutState {
- sidebar: SidebarState;
- theme: 'light' | 'dark' | 'auto';
+ sidebar: SidebarState;, theme: 'light' | 'dark' | 'auto';
  fullscreen: boolean;
 }
 
@@ -126,39 +119,33 @@ export interface LayoutState {
 export interface SearchFilters {
  type?: string;
  caseId?: string;
- dateRange?: { start: string; end: string };
+ dateRange?: {, start: string; end: string };
  status?: string[];
  tags?: string[];
 }
 
 export interface SearchFacets {
- types: string[];
- statuses: string[];
+ types: string[];, statuses: string[];
  dates: string[];
 }
 
 // ===================================================== // AI & ML COMPONENT FIXES // =====================================================
 
 export interface AIModel {
- id: string;
- name: string;
+ id: string;, name: string;
  type: 'chat' | 'embedding' | 'completion';
- available: boolean;
- config: Record<string, unknown>;
+ available: boolean;, config: Record<string, unknown>;
 }
 
 export interface TokenUsage {
- prompt_tokens: number;
- completion_tokens: number;
+ prompt_tokens: number;, completion_tokens: number;
  total_tokens: number;
  cost?: number;
 }
 
 export interface ModelAvailability {
- ollama: boolean;
- openai: boolean;
- claude: boolean;
- local: boolean;
+ ollama: boolean;, openai: boolean;
+ claude: boolean;, local: boolean;
 }
 
 // ===================================================== // NOTIFICATION FIXES // =====================================================
@@ -172,16 +159,13 @@ export interface ToastAction {
 }
 
 export interface Toast {
- id: string;
- type: 'success' | 'error' | 'warning' | 'info';
- title: string;
- message: string;
+ id: string;, type: 'success' | 'error' | 'warning' | 'info';
+ title: string;, message: string;
  duration?: number;
  actions?: ToastAction[];
 }
 
 export interface Notification extends Toast {
- read: boolean;
- timestamp: string;
+ read: boolean;, timestamp: string;
  category: string;
 }

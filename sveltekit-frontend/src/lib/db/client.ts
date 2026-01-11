@@ -33,7 +33,7 @@ function buildConnectionString() {
 
 // Create PostgreSQL connection pool
 const pool = new Pool({
- connectionString: buildConnectionString( max: 20, // Connection pool size
+ connectionString: buildConnectionString(, max: 20, // Connection pool size
  idleTimeoutMillis: 30000, connectionTimeoutMillis: 2000
 });
   

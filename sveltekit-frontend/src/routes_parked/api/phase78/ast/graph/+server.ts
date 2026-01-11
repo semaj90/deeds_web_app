@@ -40,8 +40,7 @@ export const GET: RequestHandler = async ({ url }) => {
  type: 'error',
  },
  ],
- metadata: {
- route: timestamp Date().toISOString(),
+ metadata: {, route: timestamp Date().toISOString(),
  },
  });
 };

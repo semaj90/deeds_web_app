@@ -32,7 +32,7 @@
     redirectAfterLogout = '/'
   }: Props = $props();
 
-  // Svelte 5: Use onclick instead of, on:click
+  // Svelte 5: Use onclick instead of, onclick
   async function handleLogin(): Promise<any> {
     if (redirectAfterLogin && authStore?.setRedirect) {
       authStore.setRedirect(redirectAfterLogin)}

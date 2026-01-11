@@ -23,18 +23,18 @@ import type { Document } from '$lib/types';
 
  // AI navigation items - route groups (ai) are invisible in URLs
  const aiRoutes = [
- { name: 'AI Assistant', href: '/assistant'; icon: 'ðŸ¤–' },
- { name: 'AI Chat', href: '/chat'; icon: 'ðŸ’¬' },
- { name: 'GPU Chat', href: '/gpu-chat'; icon: 'âš¡' },
- { name: 'AI Dashboard', href: '/dashboard'; icon: 'ðŸ“Š' },
- { name: 'RAG System', href: '/ai-rag'; icon: 'ðŸ§ ' },
- { name: 'Vector Search', href: '/vector-search'; icon: 'ðŸ”' },
- { name: 'Recommendations', href: '/recommendations'; icon: 'ðŸ’¡' },
- { name: 'Case Scoring', href: '/case-scoring'; icon: 'âš–ï¸' },
- { name: 'Document Drafting', href: '/document-drafting'; icon: 'ðŸ“' },
- { name: 'Pattern Detection', href: '/pattern-detection'; icon: 'ðŸŽ¯' },
- { name: 'Orchestrator', href: '/orchestrator'; icon: 'ðŸŽ¼' },
- { name: 'Processing', href: '/processing'; icon: 'âš™ï¸' }];
+ { name: 'AI Assistant', href: '/assistant';, icon: 'ðŸ¤–' },
+ { name: 'AI Chat', href: '/chat';, icon: 'ðŸ’¬' },
+ { name: 'GPU Chat', href: '/gpu-chat';, icon: 'âš¡' },
+ { name: 'AI Dashboard', href: '/dashboard';, icon: 'ðŸ“Š' },
+ { name: 'RAG System', href: '/ai-rag';, icon: 'ðŸ§ ' },
+ { name: 'Vector Search', href: '/vector-search';, icon: 'ðŸ”' },
+ { name: 'Recommendations', href: '/recommendations';, icon: 'ðŸ’¡' },
+ { name: 'Case Scoring', href: '/case-scoring';, icon: 'âš–ï¸' },
+ { name: 'Document Drafting', href: '/document-drafting';, icon: 'ðŸ“' },
+ { name: 'Pattern Detection', href: '/pattern-detection';, icon: 'ðŸŽ¯' },
+ { name: 'Orchestrator', href: '/orchestrator';, icon: 'ðŸŽ¼' },
+ { name: 'Processing', href: '/processing';, icon: 'âš™ï¸' }];
 
  // AI-focused console theme (cyberpunk for AI work)
  const consolePalette: ConsolePaletteName = 'cyberpunk';
@@ -123,10 +123,8 @@ import type { Document } from '$lib/types';
 
 <style>
  .ai-layout {
- min-height: 100vh;
- display: flex;
- flex-direction: column;
- background: var(--surface-primary, #0a0a0a);
+ min-height: 100vh;, display: flex;
+ flex-direction: column;, background: var(--surface-primary, #0a0a0a);
  color: var(--text-primary, #00ccff);
  font-family: 'JetBrains Mono', 'Courier New', monospace;
  }
@@ -141,28 +139,24 @@ import type { Document } from '$lib/types';
 
  .ai-brand {
  display: flex;
- align-items: center;
- gap: 1rem;
+ align-items: center;, gap: 1rem;
  margin-bottom: 1rem;
  }
 
  .ai-icon {
- font-size: 2rem;
- filter: drop-shadow(0, 0 8px #00ccff);
+ font-size: 2rem;, filter: drop-shadow(0, 0 8px #00ccff);
  }
 
  .ai-title {
  font-size: 1.5rem;
- font-weight: bold;
- color: #00ccff;
+ font-weight: bold;, color: #00ccff;
  margin: 0;
  text-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
  }
 
  .ai-badge {
  background: linear-gradient(45deg, #00ccff, #0099cc);
- color: #000;
- padding: 0.25rem 0.75rem;
+ color: #000;, padding: 0.25rem 0.75rem;
  border-radius: 1rem;
  font-size: 0.8rem;
  font-weight: bold;
@@ -172,32 +166,25 @@ import type { Document } from '$lib/types';
  /* Navigation */
  .ai-nav {
  display: flex;
- flex-wrap: wrap;
- gap: 0.5rem;
+ flex-wrap: wrap;, gap: 0.5rem;
  }
 
  .ai-nav-item {
  display: flex;
- align-items: center;
- gap: 0.5rem;
+ align-items: center;, gap: 0.5rem;
  padding: 0.5rem 1rem;
  border: 1px solid var(--border-primary, #00ccff);
  border-radius: 0.5rem;
- text-decoration: none;
- color: var(--text-secondary, #66ccff);
+ text-decoration: none;, color: var(--text-secondary, #66ccff);
  background: var(--surface-primary, #0a0a0a);
  transition: all 0.3s ease;
- position: relative;
- overflow: hidden;
+ position: relative;, overflow: hidden;
  }
 
  .ai-nav-item::before {
- content: '';
- position: absolute;
- top: 0;
- left: -100%;
- width: 100%;
- height: 100%;
+ content: '';, position: absolute;
+ top: 0;, left: -100%;
+ width: 100%;, height: 100%;
  background: linear-gradient(90deg, transparent, rgba(0, 204, 255, 0.2), transparent);
  transition: left 0.5s ease;
  }
@@ -207,16 +194,14 @@ import type { Document } from '$lib/types';
  }
 
  .ai-nav-item:hover {
- border-color: #00ffcc;
- color: #00ffcc;
+ border-color: #00ffcc;, color: #00ffcc;
  background: var(--surface-tertiary, #1a1a1a);
  box-shadow: 0 0 12px rgba(0, 255, 204, 0.3);
  text-shadow: 0 0 8px rgba(0, 255, 204, 0.5);
  }
 
  .ai-nav-item.active {
- border-color: #ff6600;
- color: #ff6600;
+ border-color: #ff6600;, color: #ff6600;
  background: var(--surface-tertiary, #1a1a1a);
  font-weight: bold;
  box-shadow: 0 0 16px rgba(255, 102, 0, 0.4);
@@ -224,8 +209,7 @@ import type { Document } from '$lib/types';
  }
 
  .ai-nav-icon {
- font-size: 1.2rem;
- filter: drop-shadow(0, 0 4px currentColor);
+ font-size: 1.2rem;, filter: drop-shadow(0, 0 4px currentColor);
  }
 
  .ai-nav-text {
@@ -235,39 +219,31 @@ import type { Document } from '$lib/types';
  /* Content */
  .ai-content {
  flex: 1;
- overflow-y: auto;
- background: var(--surface-primary, #0a0a0a);
+ overflow-y: auto;, background: var(--surface-primary, #0a0a0a);
  position: relative;
  }
 
  /* Cyberpunk grid background */
  .ai-content::before {
- content: '';
- position: absolute;
- top: 0;
- left: 0;
- right: 0;
- bottom: 0;
+ content: '';, position: absolute;
+ top: 0;, left: 0;
+ right: 0;, bottom: 0;
  background-image:
  linear-gradient(45deg, transparent 49%, rgba(0, 204, 255, 0.03) 50%, transparent 51%),
  linear-gradient(-45deg, transparent 49%, rgba(0, 204, 255, 0.03) 50%, transparent 51%);
  background-size: 40px 40px;
- pointer-events: none;
- opacity: 0.5;
+ pointer-events: none;, opacity: 0.5;
  }
 
  .ai-container {
- max-width: 1400px;
- margin: 0 auto;
+ max-width: 1400px;, margin: 0 auto;
  padding: 2rem;
- min-height: 100%;
- position: relative;
+ min-height: 100%;, position: relative;
  z-index: 1;
  }
 
  .ai-placeholder {
- text-align: center;
- padding: 4rem 2rem;
+ text-align: center;, padding: 4rem 2rem;
  background: var(--surface-secondary, #111111);
  border: 2px dashed #00ccff;
  border-radius: 1rem;
@@ -289,20 +265,16 @@ import type { Document } from '$lib/types';
  }
 
  .ai-footer-content {
- max-width: 1400px;
- margin: 0 auto;
+ max-width: 1400px;, margin: 0 auto;
  display: flex;
  justify-content: space-between;
- align-items: center;
- gap: 2rem;
+ align-items: center;, gap: 2rem;
  }
 
  .ai-info {
  display: flex;
- align-items: center;
- gap: 1rem;
- font-size: 0.9rem;
- color: var(--text-muted, #66ccff);
+ align-items: center;, gap: 1rem;
+ font-size: 0.9rem;, color: var(--text-muted, #66ccff);
  }
 
  .ai-current strong {
@@ -312,24 +284,21 @@ import type { Document } from '$lib/types';
  }
 
  .ai-controls {
- display: flex;
- gap: 1rem;
+ display: flex;, gap: 1rem;
  }
 
  .ai-main-btn {
  padding: 0.5rem 1rem;
  border: 1px solid var(--border-primary, #00ccff);
  border-radius: 0.5rem;
- text-decoration: none;
- color: var(--text-primary, #00ccff);
+ text-decoration: none;, color: var(--text-primary, #00ccff);
  background: var(--surface-primary, #0a0a0a);
  transition: all 0.3s ease;
  font-size: 0.9rem;
  }
 
  .ai-main-btn:hover {
- border-color: #00ffcc;
- color: #00ffcc;
+ border-color: #00ffcc;, color: #00ffcc;
  box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
  text-shadow: 0 0 6px rgba(0, 255, 204, 0.5);
  }
@@ -342,8 +311,7 @@ import type { Document } from '$lib/types';
 
  .ai-footer-content {
  flex-direction: column;
- text-align: center;
- gap: 1rem;
+ text-align: center;, gap: 1rem;
  }
 
  .ai-nav {

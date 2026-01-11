@@ -38,9 +38,9 @@
  <div class="px-4 py-2 border-b border-black/50 flex items-center justify-between">
  <div class="heading-sub">AI CHAT INTERFACE</div>
  <div class="flex gap-2">
- <Button variant="secondary">Terminal</Button>
- <Button variant="primary">AI Chat</Button>
- <Button variant="danger">Clear</Button>
+ <Button class="bits-btn" variant="secondary">Terminal</Button>
+ <Button class="bits-btn" variant="primary">AI Chat</Button>
+ <Button class="bits-btn" variant="danger">Clear</Button>
  </div>
  </div>
 
@@ -63,8 +63,8 @@
  bind:value={input}
  placeholder="Ask AI about aggravating factors, sentencing guidelines, or evidence conflicts..."
  class="flex-1 bg-panelSoft text-sand px-3 py-2 rounded border border-black/60 text-sm font-mono
- focus:outline-none focus:ring-2 focus:ring-accent/50"
+ focus: outline-none, focus:ring-2 focus:ring-accent/50"
  />
- <Button type="submit" variant="primary">Send</Button>
+ <Button class="bits-btn" type="submit" variant="primary">Send</Button>
  </form>
 </div>

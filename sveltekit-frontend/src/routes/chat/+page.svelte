@@ -40,14 +40,12 @@
 <style>
     .chat-window {
         border: 1px solid #ccc;
-        padding: 1rem;
-        height: 300px;
+        padding: 1rem;, height: 300px;
         overflow-y: auto;
         margin-bottom: 1rem;
     }
     .msg {
-        margin-bottom: 0.5rem;
-        padding: 0.5rem;
+        margin-bottom: 0.5rem;, padding: 0.5rem;
         border-radius: 4px;
     }
     .msg.user {
@@ -59,7 +57,6 @@
         text-align: left;
     }
     .loading {
-        font-style: italic;
-        color: #666;
+        font-style: italic;, color: #666;
     }
 </style>

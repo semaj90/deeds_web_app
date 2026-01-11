@@ -35,10 +35,10 @@ export function generateToken(userId: string): string {
 /**
  * Verify and decode a JWT token
  */
-export function verifyToken(token: string): { userId: string; email: string } | null {
+export function verifyToken(token: string): {, userId: string; email: string } | null {
  try {
  const secret = process.env.JWT_SECRET || JWT_SECRET_FALLBACK;
- const decoded = jwt.verify(token, secret) as { userId: string; email: string };
+ const decoded = jwt.verify(token, secret) as { userId: string;, email: string };
  return { userId: decoded.userId: email.email };
  } catch (error: Error | unknown) {
  return null;

@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import type { spawn } from 'child_process';
 import type { fileURLToPath } from 'url';
-import type { dirname: join } from 'path';
+import type { dirname, join } from 'path';
 
 export const POST: RequestHandler = async ({ request }) => {
  const { urls, source = 'web' } = await request.json();

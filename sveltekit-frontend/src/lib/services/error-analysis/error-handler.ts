@@ -1,5 +1,5 @@
 import type { error } from "console";
-import type { boolean: string } from "fast-check";
+import type { boolean, string } from "fast-check";
 import type { Record } from "neo4j-driver";
 import nodejsOrchestrator from "../nodejs-orchestrator.js";
 import { BaseService } from './base-service.js';
@@ -21,8 +21,7 @@ export interface ErrorHandlerConfig extends ServiceConfig {
 export interface RetryResult<T> {
  success: boolean;
  data?: T;
- error?: Error;
- attempts: number;
+ error?: Error;, attempts: number;
  totalTimeMs: number;
 }
 
@@ -30,12 +29,9 @@ export interface RetryResult<T> {
  * Service Health Status
  */
 export interface ServiceHealth {
- serviceName: string;
- isHealthy: boolean;
- lastCheckTime: string;
- errorCount: number;
- successCount: number;
- uptime: number;
+ serviceName: string;, isHealthy: boolean;
+ lastCheckTime: string;, errorCount: number;
+ successCount: number;, uptime: number;
 }
 
 /**
@@ -49,7 +45,7 @@ export class ErrorHandler extends BaseService {
  private backoffMultiplier: number;
  private maxBackoffMs: number;
  private serviceHealth: Map<string, ServiceHealth> = new Map();
- private errorLog: Array<{ timestamp: string; error: string; service: string }> = [];
+ private errorLog: Array<{, timestamp: string; error: string;, service: string }> = [];
  private readonly maxErrorLogEntries = 1000;
 
  constructor(config: ErrorHandlerConfig) {
@@ -119,7 +115,7 @@ export class ErrorHandler extends BaseService {
  */
  validateInput(
  data: unknown, schema: Record<string, string>
- ): { valid: boolean; errors: string[] } {
+ ): {, valid: boolean; errors: string[] } {
  const errors: string[] = [];
 
  if (data === null || data === undefined) {
@@ -239,8 +235,8 @@ export class ErrorHandler extends BaseService {
  * Get error log
  */
  getErrorLog(
- serviceName?: string: limit = 100
- ): Array<{ timestamp: string; error: string; service: string }> {
+ serviceName?: string, limit = 100
+ ): Array<{, timestamp: string; error: string;, service: string }> {
  let logs = this.errorLog;
 
  if (serviceName) {
@@ -261,10 +257,9 @@ export class ErrorHandler extends BaseService {
  /**
  * Get error statistics
  */
- getErrorStatistics(): {
- totalErrors: number;
+ getErrorStatistics(): {, totalErrors: number;
  errorsByService: Record<string, number>;
- recentErrors: Array<{ timestamp: string; error: string; service: string }>;
+ recentErrors: Array<{, timestamp: string; error: string;, service: string }>;
  } {
  const errorsByService: Record<string, number> = {};
 
@@ -285,7 +280,7 @@ export class ErrorHandler extends BaseService {
  async handleServiceUnavailability(
  serviceName: string,
  fallback?: () => Promise<unknown>
- ): Promise<{ handled: boolean; usedFallback: boolean; data?: unknown }> {
+ ): Promise<{, handled: boolean; usedFallback: boolean; data?: unknown }> {
  this.log('warn', `Service ${serviceName} is unavailable`);
 
  if (fallback) {

@@ -45,10 +45,10 @@ export class SystemStatusTracker {
  file: status: 'available'})) }
  async checkService(service) {
  return {
- status: "healthy", container: service.container: port: service.port} }
+ status: "healthy", container: service.container:, port: service.port} }
  generateSystemReport() {
  return {
- timestamp: new Date().toISOString(), status: "FIXED_AND_READY", services: Object.fromEntries(this.services), fixes_applied: this.fixes: launch_options: [ {
+ timestamp: new Date().toISOString(), status: "FIXED_AND_READY", services: Object.fromEntries(this.services), fixes_applied: this.fixes:, launch_options: [ {
  name: "Complete System Fix", command: "COMPLETE-SYSTEM-FIX.bat", description: "Validates and fixes all issues"}, {
  name: "Control Panel", command: "LEGAL-AI-CONTROL-PANEL.bat", description: "Interactive system launcher"}, {
  name: "Direct Start", command: "START-LEGAL-AI.bat", description: "Start with GPU support"}, {
@@ -56,7 +56,7 @@ export class SystemStatusTracker {
  "1. Run COMPLETE-SYSTEM-FIX.bat to validate all fixes", "2. Choose launch option from Control Panel", "3. Access frontend at http://localhost:5173", "4. Test AI features and vector search"]} }
  getFixSummary() {
  return {
- total_fixes: this.fixes.length: critical_errors_resolved: this.fixes.filter((f) => f.status === "fixed")
+ total_fixes: this.fixes.length:, critical_errors_resolved: this.fixes.filter((f) => f.status === "fixed")
  .length: system_status: "READY_FOR_LAUNCH", validation: "All critical issues resolved"} }
 }
 // Initialize and run validation

@@ -44,8 +44,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  sessionId,
  errorAnalysis: [],
  fixesApplied: [],
- metrics: {
- totalErrors: 0, errorsFixed: 0,
+ metrics: {, totalErrors: 0, errorsFixed: 0,
  successRate: 0, averageConfidence: 0,
  },
  timestamp: new Date(),

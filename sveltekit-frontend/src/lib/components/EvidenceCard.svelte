@@ -128,8 +128,7 @@
 <style>
  .evidence-card {
  border: 1px solid #e0e0e0;
- border-radius: 8px;
- padding: 16px;
+ border-radius: 8px;, padding: 16px;
  background: #fff;
  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
  transition: box-shadow 0.2s;
@@ -157,17 +156,14 @@
  }
 
  .evidence-type {
- display: inline-block;
- padding: 2px 8px;
+ display: inline-block;, padding: 2px 8px;
  background: #f0f0f0;
  border-radius: 4px;
- font-size: 12px;
- color: #666;
+ font-size: 12px;, color: #666;
  }
 
  .actions {
- display: flex;
- gap: 8px;
+ display: flex;, gap: 8px;
  }
 
  .btn-ask-ai,
@@ -175,14 +171,12 @@
  padding: 6px 12px;
  border: none;
  border-radius: 4px;
- font-size: 12px;
- cursor: pointer;
+ font-size: 12px;, cursor: pointer;
  transition: background 0.2s;
  }
 
  .btn-ask-ai {
- background: #007bff;
- color: white;
+ background: #007bff;, color: white;
  }
 
  .btn-ask-ai:hover {
@@ -190,8 +184,7 @@
  }
 
  .btn-delete {
- background: #dc3545;
- color: white;
+ background: #dc3545;, color: white;
  }
 
  .btn-delete:hover {
@@ -199,8 +192,7 @@
  }
 
  .summary {
- margin-bottom: 12px;
- padding: 8px;
+ margin-bottom: 12px;, padding: 8px;
  background: #f9f9f9;
  border-left: 3px solid #007bff;
  }
@@ -208,8 +200,7 @@
  .summary h4 {
  margin: 0 0 4px 0;
  font-size: 12px;
- font-weight: 600;
- color: #666;
+ font-weight: 600;, color: #666;
  }
 
  .summary p {
@@ -232,8 +223,7 @@
  }
 
  .meta-item .label {
- font-weight: 600;
- color: #666;
+ font-weight: 600;, color: #666;
  }
 
  .meta-item .value {
@@ -249,37 +239,31 @@
  .ai-tags h4 {
  margin: 0 0 6px 0;
  font-size: 12px;
- font-weight: 600;
- color: #666;
+ font-weight: 600;, color: #666;
  }
 
  .tag-list {
  display: flex;
- flex-wrap: wrap;
- gap: 6px;
+ flex-wrap: wrap;, gap: 6px;
  }
 
  .tag,
  .ai-tag {
- display: inline-block;
- padding: 4px 8px;
+ display: inline-block;, padding: 4px 8px;
  border-radius: 4px;
  font-size: 12px;
  }
 
  .tag {
- background: #e3f2fd;
- color: #1976d2;
+ background: #e3f2fd;, color: #1976d2;
  }
 
  .ai-tag {
- background: #f3e5f5;
- color: #7b1fa2;
+ background: #f3e5f5;, color: #7b1fa2;
  }
 
  .chat-insights {
- margin-bottom: 12px;
- padding: 8px;
+ margin-bottom: 12px;, padding: 8px;
  background: #fff3cd;
  border-left: 3px solid #ffc107;
  }
@@ -287,8 +271,7 @@
  .chat-insights h4 {
  margin: 0 0 8px 0;
  font-size: 14px;
- font-weight: 600;
- color: #856404;
+ font-weight: 600;, color: #856404;
  }
 
  .keywords,
@@ -300,24 +283,19 @@
  .suggestions h5 {
  margin: 0 0 4px 0;
  font-size: 12px;
- font-weight: 600;
- color: #856404;
+ font-weight: 600;, color: #856404;
  }
 
  .keyword-list {
  display: flex;
- flex-wrap: wrap;
- gap: 4px;
+ flex-wrap: wrap;, gap: 4px;
  }
 
  .keyword-chip {
- display: inline-block;
- padding: 2px 6px;
+ display: inline-block;, padding: 2px 6px;
  border-radius: 3px;
- font-size: 11px;
- background: #fff;
- color: #856404;
- border: 1px solid #ffc107;
+ font-size: 11px;, background: #fff;
+ color: #856404;, border: 1px solid #ffc107;
  }
 
  .suggestion-list {
@@ -327,8 +305,7 @@
 
  .suggestion-item {
  font-size: 12px;
- line-height: 1.4;
- color: #333;
+ line-height: 1.4;, color: #333;
  margin-bottom: 2px;
  }
 

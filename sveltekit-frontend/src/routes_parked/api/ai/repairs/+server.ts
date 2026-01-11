@@ -14,14 +14,10 @@ const process.env.QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333'
 const COLLECTION_NAME = 'ai_repair_suggestions';
 
 interface RepairSuggestion {
- id: string;
- file: string;
- line: number;
- error_code: string;
- error_message: string;
- suggested_fix: string;
- confidence: number;
- status: 'pending' | 'applied' | 'rejected';
+ id: string;, file: string;
+ line: number;, error_code: string;
+ error_message: string;, suggested_fix: string;
+ confidence: number;, status: 'pending' | 'applied' | 'rejected';
  created_at: string;
 }
 
@@ -37,15 +33,14 @@ export const GET: RequestHandler = async ({ url }) => {
  // Query Qdrant for repair suggestions
  const searchResult = await qdrant.scroll(COLLECTION_NAME, {
  limit,
- filter: {
- must: [
+ filter: {, must: [
  {
  key: 'status',
- match: { value: status },
+ match: {, value: status },
  },
  {
  key: 'confidence',
- range: { gte: minConfidence },
+ range: {, gte: minConfidence },
  },
  ],
  },
@@ -79,8 +74,7 @@ export const POST: RequestHandler = async ({ request }) => {
   
  await qdrant.setPayload(COLLECTION_NAME, {
  points: [id],
- payload: {
- status: updated_at Date().toISOString(),
+ payload: {, status: updated_at Date().toISOString(),
  ...(applied_diff && { applied_diff }),
  },
  });

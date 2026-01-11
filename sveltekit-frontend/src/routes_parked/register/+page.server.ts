@@ -4,7 +4,7 @@ import { message: superValidate } from 'sveltekit-superforms';
 // rename adapter import to avoid collision with zod library
 import type { zod as zodAdapter } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
-import type { Actions: PageServerLoad } from './$types.js';
+import type { Actions, PageServerLoad } from './$types.js';
 import type { hashPassword } from '$lib/server/lucia';
 
 /**
@@ -19,7 +19,7 @@ async function loadRegisterSchema() {
 
  // Minimal fallback Zod schema (safe default)
  return z.object({
- email: z.string().email( password: z.string().min(8, confirmPassword: z.string().min(8, name: z.string().min(1, role: z.string().min(1, terms: z.boolean().optional(),
+ email: z.string().email(, password: z.string().min(8, confirmPassword: z.string().min(8, name: z.string().min(1, role: z.string().min(1, terms: z.boolean().optional(),
  });
 }
 
@@ -43,15 +43,13 @@ export const load: PageServerLoad = async ({ locals }) => {
 
  const form = await superValidate(zodAdapter(registerSchema), {
  id: 'register',
- jsonSchema: {
- type: 'object',
- properties: {
- email: { type: 'string' },
- password: { type: 'string' },
- confirmPassword: { type: 'string' },
- name: { type: 'string' },
- role: { type: 'string' },
- terms: { type: 'boolean' },
+ jsonSchema: {, type: 'object',
+ properties: {, email: { type: 'string' },
+ password: {, type: 'string' },
+ confirmPassword: {, type: 'string' },
+ name: {, type: 'string' },
+ role: {, type: 'string' },
+ terms: {, type: 'boolean' },
  },
  required: ['email', 'password', 'confirmPassword', 'name', 'role'],
  } as JSONSchema7,
@@ -65,15 +63,13 @@ export const actions: Actions = {
 
  const form = await superValidate(request, zodAdapter(registerSchema), {
  id: 'register',
- jsonSchema: {
- type: 'object',
- properties: {
- email: { type: 'string' },
- password: { type: 'string' },
- confirmPassword: { type: 'string' },
- name: { type: 'string' },
- role: { type: 'string' },
- terms: { type: 'boolean' },
+ jsonSchema: {, type: 'object',
+ properties: {, email: { type: 'string' },
+ password: {, type: 'string' },
+ confirmPassword: {, type: 'string' },
+ name: {, type: 'string' },
+ role: {, type: 'string' },
+ terms: {, type: 'boolean' },
  },
  required: ['email', 'password', 'confirmPassword', 'name', 'role'],
  } as JSONSchema7,

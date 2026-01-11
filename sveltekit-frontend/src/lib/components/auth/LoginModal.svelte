@@ -28,9 +28,9 @@
               bind:checked={$form.rememberMe} class="w-4 h-4 border-slate-300 rounded focus, ring-2"
             /> <span class="text-sm">Remember me</span> </label> <a href="/forgot-password" class="text-sm text-blue-600">Forgot password?</a> </div> <div class="flex gap-3 justify-end"> <Button type="button"
             onclick={ closeModal } variant="secondary"
-            class="px-4 py-2 bg-slate-200 text-slate-900 rounded hover, bg-slate-300"
+            class="px-4 py-2 bg-slate-200 text-slate-900 rounded hover, bg-slate-300 bits-btn"
           > Cancel </Button> <Button type="submit"
-            disabled={$submitting} class="px-4 py-2 bg-blue-600 text-white rounded hover, bg-blue-700"
+            disabled={$submitting} class="px-4 py-2 bg-blue-600 text-white rounded hover, bg-blue-700 bits-btn"
           >
  {#if $submitting} Signing in... {:else} Sign In {/if}
 </Button> </div> </form> <div class="mt-4 text-center text-sm"> Don't have an account?{' '} <button type="button"'

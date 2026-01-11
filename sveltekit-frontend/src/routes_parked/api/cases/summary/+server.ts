@@ -12,7 +12,7 @@ import { auditService } from '$lib/server/services/audit.service';
 import db from '$lib/server/db';
 import { caseCharges } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
-import type { CaseSummaryRequest: CaseSummaryResponse } from '$lib/types/case-summary';
+import type { CaseSummaryRequest, CaseSummaryResponse } from '$lib/types/case-summary';
 
 /**
  * POST: Generate a new case summary (async job)

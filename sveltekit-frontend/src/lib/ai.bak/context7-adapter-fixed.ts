@@ -14,36 +14,28 @@ export interface Context7SearchOptions {
 }
 
 export interface Context7SearchResult {
- id: string;
- content: string;
- score: number;
+ id: string;, content: string;, score: number;
  type?: 'code' | 'doc' | 'symbol';
  metadata?: Record<string, unknown>;
 }
 
 export interface Context7AgentTrigger {
- todoId?: string;
- action: string;
+ todoId?: string;, action: string;
  payload?: Record<string, unknown>;
 }
 
 export interface Context7AgentResult {
- result: string;
- status: 'completed' | 'failed' | 'pending';
+ result: string;, status: 'completed' | 'failed' | 'pending';
  metadata?: Record<string, unknown>;
 }
 
 export interface Context7AuditEntry {
- component: string;
- action: string;
- timestamp: number;
+ component: string;, action: string;, timestamp: number;
  details?: Record<string, unknown>;
 }
 
 export interface Context7AuditResult {
- id: string;
- step: string;
- status: 'ok' | 'warning' | 'error';
+ id: string;, step: string;, status: 'ok' | 'warning' | 'error';
  message: string;
  suggestedFix?: string;
 }

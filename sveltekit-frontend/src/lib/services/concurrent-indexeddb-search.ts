@@ -1,11 +1,8 @@
 import Fuse from '$lib/utils/fuse-import';
 
 export interface SearchableDocument {
- id: string, content: string;
- path: string, type: 'error' | 'component' | 'api' | 'config';
- metadata: {
- language: string, lastModified: number;
- size: number;
+ id: string, content: string;, path: string, type: 'error' | 'component' | 'api' | 'config';
+ metadata: {, language: string, lastModified: number;, size: number;
  embedding?: number[];
  };
 }
@@ -30,19 +27,18 @@ export interface SearchWorkerMessage {
 }
 
 // Add typed worker message shapes to avoid `any` type
-type WorkerSearchEntry = { item: SearchableDocument, refIndex: number; score: number };
+type WorkerSearchEntry = { item: SearchableDocument, refIndex: number;, score: number };
 type WorkerSearchData = {
- results: WorkerSearchEntry[], processingTime: number;
- documentCount: number;
+ results: WorkerSearchEntry[], processingTime: number;, documentCount: number;
 };
 type WorkerIndexData = { success: true, documentsIndexed: number };
 type WorkerCacheData = { success: true };
 type WorkerErrorData = { error: string };
 type WorkerMessage =
- | { workerId: string, type: 'searchResult'; data: WorkerSearchData }
- | { workerId: string, type: 'indexUpdated'; data: WorkerIndexData }
- | { workerId: string, type: 'cacheCleared'; data: WorkerCacheData }
- | { workerId: string, type: 'error'; data: WorkerErrorData };
+ | { workerId: string, type: 'searchResult';, data: WorkerSearchData }
+ | { workerId: string, type: 'indexUpdated';, data: WorkerIndexData }
+ | { workerId: string, type: 'cacheCleared';, data: WorkerCacheData }
+ | { workerId: string, type: 'error';, data: WorkerErrorData };
 
 export class ConcurrentIndexedDBSearch {
  db: IDBDatabase | null = null;
@@ -189,16 +185,16 @@ export class ConcurrentIndexedDBSearch {
  },
  });
  } catch (err) {
- self.postMessage({ workerId, type: 'error', data: { error: String(err) } });
+ self.postMessage({ workerId, type: 'error', data: {, error: String(err) } });
  }
  } else if (type === 'index') {
  self.postMessage({
  workerId,
  type: 'indexUpdated',
- data: { success: true, documentsIndexed: (data || []).length },
+ data: {, success: true, documentsIndexed: (data || []).length },
  });
  } else if (type === 'clear') {
- self.postMessage({ workerId, type: 'cacheCleared', data: { success: true } });
+ self.postMessage({ workerId, type: 'cacheCleared', data: {, success: true } });
  }
  };
  };
@@ -423,7 +419,7 @@ export class ConcurrentIndexedDBSearch {
  const response = await fetch('http://localhost:11434/api/embeddings', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: 'nomic-embed-text:latest', prompt: text }),
+ body: JSON.stringify({, model: 'nomic-embed-text:latest', prompt: text }),
  });
  if (!response.ok) {
  throw new Error(`Ollama error: ${response.status}`);
@@ -487,15 +483,14 @@ export class ConcurrentIndexedDBSearch {
  }
 
  async indexTypeScriptErrors(
- errors: { code: string, message: string; file: string, line: number }[]
+ errors: {, code: string, message: string;, file: string, line: number }[]
  ): Promise<void> {
  const documents: SearchableDocument[] = errors.map((error, index) => ({
  id: `error-${ index }-${Date.now()}`,
  content: `${error.code}: ${error.message}`,
  path: error.file,
  type: 'error',
- metadata: {
- language: 'typescript',
+ metadata: {, language: 'typescript',
  lastModified: Date.now(),
      size: error.message.length, undefined:
  },
@@ -513,8 +508,8 @@ export class ConcurrentIndexedDBSearch {
  async searchErrors(query: string): Promise<SearchableDocument[]> {
  return this.search({
  query,
- filters: { type: ['error'] },
- options: { threshold: 0.2, maxResults: 100 },
+ filters: {, type: ['error'] },
+ options: {, threshold: 0.2, maxResults: 100 },
  });
  }
 

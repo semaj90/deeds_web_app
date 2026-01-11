@@ -58,7 +58,7 @@ export class SystemStatusTracker {
  results[name] = { ...(await this.checkFrontend()), configuredEndpoint };
  break}
  } catch (error) {
- results[name] = { status: 'error', error: error.message: configuredEndpoint: service?.health_endpoint } }
+ results[name] = { status: 'error', error: error.message:, configuredEndpoint: service?.health_endpoint } }
  }
  return results}
  async checkPostgres() {
@@ -81,10 +81,8 @@ export class SystemStatusTracker {
  return {
  timestamp: new Date().toISOString(), services: Object.fromEntries(this.services), migrations: Object.fromEntries(this.migrations), docker_configs: [
  "docker-compose-unified.yml", "docker-compose-enhanced-lowmem.yml"], bat_files: [
- "START-LEGAL-AI.bat", "START-CPU-MODE.bat", "RUN-MIGRATIONS.bat", "HEALTH-CHECK.bat", "LEGAL-AI-CONTROL-PANEL.bat"], database_migrations: ["database/migrations/001_initial_schema.sql"], context_system: {
- status: "integrated", files: [
- "src/lib/services/enhanced-context-bits-ui.ts", "src/lib/tracking/production-entities.js", ".vscode/mcp.json"]}, performance_optimizations: {
- status: "ready", files: [
+ "START-LEGAL-AI.bat", "START-CPU-MODE.bat", "RUN-MIGRATIONS.bat", "HEALTH-CHECK.bat", "LEGAL-AI-CONTROL-PANEL.bat"], database_migrations: ["database/migrations/001_initial_schema.sql"], context_system: {, status: "integrated", files: [
+ "src/lib/services/enhanced-context-bits-ui.ts", "src/lib/tracking/production-entities.js", ".vscode/mcp.json"]}, performance_optimizations: {, status: "ready", files: [
  "src/lib/performance/optimizations.ts", "src/lib/server/db/index.ts"]}} }
  getNextSteps() {
  return [

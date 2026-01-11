@@ -3,10 +3,8 @@
  */
 
 export interface ErrorContext {
- timestamp: Date;
- stage: string;
- message: string;
- recoverable: boolean;
+ timestamp: Date;, stage: string;
+ message: string;, recoverable: boolean;
  retryCount?: number;
  maxRetries?: number;
 }
@@ -21,10 +19,8 @@ export class DashboardErrorHandler {
  */
  static handleConnectionError(
  error: Error, retryCount: number = 0
- ): {
- shouldRetry: boolean;
- delay: number;
- message: string;
+ ): {, shouldRetry: boolean;
+ delay: number;, message: string;
  } {
  const shouldRetry = retryCount < this.MAX_RETRIES;
  const delay = shouldRetry
@@ -59,8 +55,7 @@ export class DashboardErrorHandler {
  */
  static handleTimeoutError(
  stage: string, elapsedMs: number
- ): {
- message: string;
+ ): {, message: string;
  shouldCancel: boolean;
  } {
  const shouldCancel = elapsedMs > this.TIMEOUT_MS;
@@ -110,7 +105,7 @@ export class DashboardErrorHandler {
  /**
  * Validate event data
  */
- static validateEventData(data: unknown): { valid: boolean; error?: string } {
+ static validateEventData(data: unknown): {, valid: boolean; error?: string } {
  if (typeof data !== 'object' || data === null) {
  return { valid: false, error: 'Event data is not an object' };
  }
@@ -176,10 +171,8 @@ export class DashboardErrorHandler {
  /**
  * Notify user of error/warning
  */
- private static notifyUser(notification: {
- type: 'error' | 'warning' | 'info';
- title: string;
- message: string;
+ private static notifyUser(notification: {, type: 'error' | 'warning' | 'info';
+ title: string;, message: string;
  stage?: string;
  }): void {
  // This would typically dispatch to a notification store
@@ -196,8 +189,7 @@ export class DashboardErrorHandler {
  /**
  * Create error boundary for components
  */
- static createErrorBoundary(componentName: string): {
- handleError: (error: Error) => void;
+ static createErrorBoundary(componentName: string): {, handleError: (error: Error) => void;
  reset: () => void;
  } {
  return {

@@ -6,14 +6,12 @@
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
 
 export type QdrantPoint = {
-	id: string;
-	vector: number[];
+	id: string;, vector: number[];
 	payload?: Record<string, any>;
 };
 
 export type QdrantHit = {
-	id: string;
-	score: number;
+	id: string;, score: number;
 	payload?: Record<string, any>;
 };
 
@@ -30,14 +28,13 @@ export async function getCollections(): Promise<string[]> {
 /**
  * Scroll through points in a collection (with optional filter)
  */
-export async function scrollPoints(opts: {
-	collection: string;
+export async function scrollPoints(opts: {, collection: string;
 	limit?: number;
 	withPayload?: boolean;
 	withVector?: boolean;
 	filter?: any;
 	offset?: string;
-}): Promise<{ points: QdrantHit[]; nextOffset?: string }> {
+}): Promise<{, points: QdrantHit[]; nextOffset?: string }> {
 	const body: any = {
 		limit: opts.limit ?? 100,
 		with_payload: opts.withPayload ?? true,
@@ -65,8 +62,7 @@ export async function scrollPoints(opts: {
 /**
  * Search for similar vectors
  */
-export async function searchVector(opts: {
-	collection: string;
+export async function searchVector(opts: {, collection: string;
 	vector: number[];
 	limit?: number;
 	scoreThreshold?: number;
@@ -96,8 +92,7 @@ export async function searchVector(opts: {
 /**
  * Upsert points to a collection
  */
-export async function upsertPoints(opts: {
-	collection: string;
+export async function upsertPoints(opts: {, collection: string;
 	points: QdrantPoint[];
 	wait?: boolean;
 }): Promise<any> {
@@ -106,7 +101,7 @@ export async function upsertPoints(opts: {
 		{
 			method: 'PUT',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ points: opts.points })
+			body: JSON.stringify({, points: opts.points })
 		}
 	);
 

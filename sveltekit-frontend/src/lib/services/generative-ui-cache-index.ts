@@ -6,23 +6,19 @@ import { QLoRAReinforcementLearningService } from '$lib/services/qlora-rl-traini
 
 // Generative UI component metadata
 export interface UIComponentMetadata {
-    id: string;
-    type: 'widget' | 'chart' | 'form' | 'visualization' | 'animation';
+    id: string;, type: 'widget' | 'chart' | 'form' | 'visualization' | 'animation';
     complexity: number; // 1-10 scale
     renderTime: number; // ms
     memoryFootprint: number; // bytes
-    dependencies: string[];
-    generationParams: Record<string, unknown>;
+    dependencies: string[];, generationParams: Record<string, unknown>;
     quality: 'low' | 'medium' | 'high';
-    lastAccessed: number;
-    accessCount: number;
+    lastAccessed: number;, accessCount: number;
     userRating: number; // 1-5 stars
 }
 
 // Indexed cache entry with multiple representations
 export interface CachedUIComponent {
-    metadata: UIComponentMetadata;
-    representations: {
+    metadata: UIComponentMetadata;, representations: {
         svg: string; // Vector
         bitmap?: Uint8Array; // Compressed bitmap
         webgl?: string; // WebGL shader code
@@ -46,18 +42,14 @@ export interface SearchQuery {
 }
 
 export interface SearchResult {
-    component: CachedUIComponent;
-    relevanceScore: number;
+    component: CachedUIComponent;, relevanceScore: number;
     explanation: string;
 }
 
 export interface IndexStats {
-    totalComponents: number;
-    cacheHitRate: number;
-    averageCompressionRatio: number;
-    totalMemorySaved: number;
-    searchLatency: number;
-    predictionAccuracy: number;
+    totalComponents: number;, cacheHitRate: number;
+    averageCompressionRatio: number;, totalMemorySaved: number;
+    searchLatency: number;, predictionAccuracy: number;
 }
 
 export class GenerativeUICacheIndex {
@@ -214,7 +206,7 @@ export class GenerativeUICacheIndex {
                         resultMap.set(componentId, {
                             component,
                             relevanceScore: similarity,
-                            explanation: `Semantic match: ${(similarity * 100).toFixed(1)}% similar`
+                            explanation: `Semantic, match: ${(similarity * 100).toFixed(1)}% similar`
                         });
                     }
                 }
@@ -233,7 +225,7 @@ export class GenerativeUICacheIndex {
                             resultMap.set(id, {
                                 component,
                                 relevanceScore: 0.8,
-                                explanation: `Keyword match: "${keyword}"`
+                                explanation: `Keyword, match: "${keyword}"`
                             });
                         }
                     }
@@ -252,7 +244,7 @@ export class GenerativeUICacheIndex {
                     resultMap.set(component.metadata.id, {
                         component,
                         relevanceScore: 0.9,
-                        explanation: `Type match: ${query.type}`
+                        explanation: `Type, match: ${query.type}`
                     });
                 }
             }
@@ -285,8 +277,7 @@ export class GenerativeUICacheIndex {
     /**
      * Adaptive quality optimization based on system performance
      */
-    async optimizeForPerformance(systemMetrics: {
-        fps: number, memoryUsage: number, cacheHitRate: number
+    async optimizeForPerformance(systemMetrics: {, fps: number, memoryUsage: number, cacheHitRate: number
     }): Promise<void> {
         // Mock optimization logic
         const qualityConfig = { qualityTier: systemMetrics.fps > 30 ? 'high' : 'low' };
@@ -640,13 +631,13 @@ export class GenerativeUICacheIndex {
         }
     }
 
-    private hexToRgb(hex: string): { r: number, g: number, b: number } {
+    private hexToRgb(hex: string): {, r: number, g: number, b: number } {
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result ? {
             r: parseInt(result[1], 16) / 255.0,
             g: parseInt(result[2], 16) / 255.0,
             b: parseInt(result[3], 16) / 255.0
-        } : { r: 0.5, g: 0.5, b: 0.5 };
+        } : {, r: 0.5, g: 0.5, b: 0.5 };
     }
 
     /**

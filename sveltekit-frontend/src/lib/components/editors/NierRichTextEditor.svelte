@@ -22,26 +22,20 @@
 
 <style>
  .nier-rich-text-editor {
- width: 100%;
- height: 100%;
+ width: 100%;, height: 100%;
  background: var(--yorha-bg-secondary, #1a1a1a);
  border: 1px solid var(--yorha-border, #606060);
- border-radius: 4px;
- padding: 16px;
- box-sizing: border-box;
- color: var(--yorha-text-primary, #e0e0e0);
+ border-radius: 4px;, padding: 16px;
+ box-sizing: border-box;, color: var(--yorha-text-primary, #e0e0e0);
  font-family: var(--gaming-font-16bit, 'Orbitron', sans-serif);
  }
 
  .editor-textarea {
- width: 100%;
- height: 100%;
- background: transparent;
- border: none;
+ width: 100%;, height: 100%;
+ background: transparent;, border: none;
  color: inherit;
  font-family: inherit;
- font-size: 1rem;
- resize: none;
+ font-size: 1rem;, resize: none;
  outline: none;
  }
 

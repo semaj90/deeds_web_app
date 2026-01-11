@@ -78,7 +78,7 @@
 		<!-- AI Button -->
 		<div class="mt-8">
 			<Button
-				class="nes-btn is-primary w-full"
+				class="nes-btn is-primary w-full bits-btn"
 				onclick={() => onOpenAIModal(selectedPerson)}
 			>
 				AI REPORT

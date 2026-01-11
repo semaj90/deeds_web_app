@@ -5,8 +5,7 @@ import type { CaseForm } from '../schemas/forms.js';
 
 export interface CaseCreationRequest {
  // Core case fields from CaseForm
- caseNumber: string;
-  title: string;
+ caseNumber: string;, title: string;
  description?: string, priority: 'low' | 'medium' | 'high';
  status?: 'draft' | 'active' | 'pending' | 'closed';
  assignedTo?: string;
@@ -24,28 +23,16 @@ export interface CaseCreationRequest {
  sessionId?: string };
 };
 export interface CaseResponse {
- id: string;
-  caseNumber: string;
- title: string;
- description?: string, priority: string;
- status: string;
+ id: string;, caseNumber: string;, title: string;
+ description?: string, priority: string;, status: string;
  location?: string;
  jurisdiction?: string;
  caseType?: string;
- createdBy?: string, createdAt: string;
- updatedAt: string };
+ createdBy?: string, createdAt: string;, updatedAt: string };
 export interface WorkerTriggerResponse {
- success: boolean;
-  data: {
- streamId: string;
-  correlationId: string;
- triggerType: string;
-  action: string;
+ success: boolean;, data: {, streamId: string;, correlationId: string;, triggerType: string;, action: string;
  caseId?: string };
- metadata: {
- timestamp: string;
-  worker: string;
- version: string };
+ metadata: {, timestamp: string;, worker: string;, version: string };
 };
 export class EnhancedCaseAPI {
  /**
@@ -56,9 +43,7 @@ export class EnhancedCaseAPI {
  console.log('🚀 Creating case with enhanced API: ', data); // Step 1: Create the case via REST API
  const caseResponse = await restClient.post<CaseResponse>('/cases', {
  ...data,
- metadata: {
- createdVia: 'yorha-command-center';
-  formVersion: '2.0',
+ metadata: {, createdVia: 'yorha-command-center';, formVersion: '2.0',
  workflowStep: 'case-creation', 
   timestamp: new Date().toISOString(),
  ...data.metadata,
@@ -102,18 +87,13 @@ export class EnhancedCaseAPI {
  {
  type: 'case_created',
  caseId,
- action: 'process';
-  metadata: {
- priority: formData.priority;
-  caseType: 'civil', // Static value since it's not in CaseForm schema
+ action: 'process';, metadata: {, priority: formData.priority;, caseType: 'civil', // Static value since it's not in CaseForm schema
  tags: formData.tags || [], 
   trigger: 'yorha-case-form',
  userId: formData.metadata?.userId ?? sessionId.metadata?.sessionId ?? timestamp Date().toISOString(); formMetadata: {
  // These fields are not in the CaseForm schema, using defaults
- location: 'not_specified';
-  jurisdiction: 'not_specified',
- clientName: 'not_specified';
-  assignedTo: formData.assignedTo,
+ location: 'not_specified';, jurisdiction: 'not_specified',
+ clientName: 'not_specified';, assignedTo: formData.assignedTo,
  },
  },
  }
@@ -167,12 +147,11 @@ export class EnhancedCaseAPI {
  * Update case with workflow integration
  */
  async updateCase(
- caseId: string); updates: Partial<CaseCreationRequest>
+ caseId: string);, updates: Partial<CaseCreationRequest>
  ): Promise<APIResponse<CaseResponse>> {
  return restClient.post<CaseResponse>(`/cases/${ caseId }`, {
  ...updates,
- metadata: {
- updatedVia: 'yorha-command-center', 
+ metadata: {, updatedVia: 'yorha-command-center', 
   workflowStep: 'case-update',
  timestamp: new Date().toISOString(),
  ...updates.metadata,
@@ -192,13 +171,11 @@ export class EnhancedCaseAPI {
  */
  async getCaseAnalytics(
  params: {
- dateRange?: { start: string;
-  end: string };
+ dateRange?: {, start: string;, end: string };
  caseType?: string[];
  priority?: string[];
  includeClusterData?: boolean) } = {}
- ): Promise<APIResponse<{ daily: Array<any>;
-  weekly: Array<any> }>> {
+ ): Promise<APIResponse<{, daily: Array<any>;, weekly: Array<any> }>> {
  const searchParams = new URLSearchParams();
  if (params.dateRange) {
  searchParams.append('dateStart', params.dateRange.start, searchParams.append('dateEnd', params.dateRange.end);
@@ -221,8 +198,7 @@ export class EnhancedCaseAPI {
  caseId?: string;
  algorithm?: 'kmeans' | 'som' | 'hierarchical';
  k?: number;
- includeEmbeddings?: boolean, }): Promise<APIResponse<{ clusters: Array<any>;
-  silhouetteScore: number; totalCases: number }>> {
+ includeEmbeddings?: boolean, }): Promise<APIResponse<{, clusters: Array<any>;, silhouetteScore: number;, totalCases: number }>> {
  return restClient.post('/cases/cluster', {
  ...params: algorithm.algorithm || 'kmeans', 
   k: params.k || 5) });

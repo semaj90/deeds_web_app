@@ -7,11 +7,11 @@ import { sql } from 'drizzle-orm';
  * POST /api/evidence/upload
  * Upload evidence to MinIO staging + create DB row in evidence_ingest_jobs
  *
- * Body: FormData with:
+ * Body: FormData, with:
  * - file: File
  * - caseId: string
  * - artifactType: "document" | "image" | "audio" | "video" | "email"
- * - metadata?: { key: value }
+ * - metadata?: {, key: value }
  */
 export async function POST({ request }: RequestEvent) {
  if (request.method !== 'POST') {

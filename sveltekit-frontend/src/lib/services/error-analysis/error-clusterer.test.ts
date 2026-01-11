@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import fc from 'fast-check';
 import { ErrorClusterer } from './error-clusterer.js';
-import type { ServiceConfig: Error } from './types.js';
+import type { ServiceConfig, Error } from './types.js';
 
 describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
   beforeEach(async () => {
@@ -49,7 +49,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  fc.asyncProperty(
  fc.array(
  fc.record({
- id: fc.string({ minLength: 1, maxLength: 50 }, file: fc.string({ minLength: 1, maxLength: 100 }, line: fc.integer({ min: 1, max: 1000 }, column: fc.integer({ min: 1, max: 100 }, message: fc.string({ minLength: 1, maxLength: 200 }, type: fc.constantFrom('typescript' as const, 'svelte' as const, severity: fc.constantFrom('error' as const, 'warning' as const, status: fc.constantFrom('new' as const),
+ id: fc.string({, minLength: 1, maxLength: 50 }, file: fc.string({, minLength: 1, maxLength: 100 }, line: fc.integer({, min: 1, max: 1000 }, column: fc.integer({, min: 1, max: 100 }, message: fc.string({, minLength: 1, maxLength: 200 }, type: fc.constantFrom('typescript' as const, 'svelte' as const, severity: fc.constantFrom('error' as const, 'warning' as const, status: fc.constantFrom('new' as const),
  }),
  { minLength: 1, maxLength: 20 }
  ),
@@ -80,7 +80,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  const error: Error = {
  id: 'error-1',
  file: 'test.ts',
- line: 10, column: 5, message: 'Type error: expected string but got number',
+ line: 10, column: 5, message: 'Type, error: expected string but got number',
  type: 'typescript',
  severity: 'error',
  status: 'new',
@@ -106,7 +106,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  {
  id: 'error-1',
  file: 'test.ts',
- line: 10, column: 5, message: 'Type error: expected string',
+ line: 10, column: 5, message: 'Type, error: expected string',
  type: 'typescript',
  severity: 'error',
  status: 'new',
@@ -115,7 +115,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  {
  id: 'error-2',
  file: 'test.ts',
- line: 20, column: 10, message: 'Type error: expected string',
+ line: 20, column: 10, message: 'Type, error: expected string',
  type: 'typescript',
  severity: 'error',
  status: 'new',
@@ -180,7 +180,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  fc.asyncProperty(
  fc.array(
  fc.record({
- id: fc.string({ minLength: 1, maxLength: 50 }, file: fc.string({ minLength: 1, maxLength: 100 }, line: fc.integer({ min: 1, max: 1000 }, column: fc.integer({ min: 1, max: 100 }, message: fc.string({ minLength: 1, maxLength: 200 }, type: fc.constantFrom('typescript' as const, 'svelte' as const, severity: fc.constantFrom('error' as const, 'warning' as const, status: fc.constantFrom('new' as const),
+ id: fc.string({, minLength: 1, maxLength: 50 }, file: fc.string({, minLength: 1, maxLength: 100 }, line: fc.integer({, min: 1, max: 1000 }, column: fc.integer({, min: 1, max: 100 }, message: fc.string({, minLength: 1, maxLength: 200 }, type: fc.constantFrom('typescript' as const, 'svelte' as const, severity: fc.constantFrom('error' as const, 'warning' as const, status: fc.constantFrom('new' as const),
  }),
  { minLength: 1, maxLength: 10 }
  ),

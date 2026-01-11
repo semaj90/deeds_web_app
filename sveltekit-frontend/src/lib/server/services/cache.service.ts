@@ -215,12 +215,9 @@ export class CacheService {
  /**
  * Get cache statistics
  */
- async getStats(): Promise<{
- summaries: number;
- similarCases: number;
- ragResults: number;
- citations: number;
- statutes: number;
+ async getStats(): Promise<{, summaries: number;
+ similarCases: number;, ragResults: number;
+ citations: number;, statutes: number;
  total: number;
  }> {
  try {

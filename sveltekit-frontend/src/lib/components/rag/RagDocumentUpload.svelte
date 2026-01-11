@@ -3,14 +3,10 @@ import type { Document } from '$lib/types';
   import { Upload, X, CheckCircle, AlertCircle } from 'lucide-svelte';
   import  Button  from "$lib/components/ui/button/Button.svelte";
   interface UploadResult {
-    success: boolean
-    message: string
-    document?: {
-      id: string
-      filename: string
-      title: string
-      chunks: number
-      hasOCR: boolean
+    success: boolean, message: string
+    document?: {, id: string
+      filename: string, title: string
+      chunks: number, hasOCR: boolean
  embeddingModel: string};
     error?: string}
   let files = $state<FileList | null>(null);
@@ -117,7 +113,7 @@ import type { Document } from '$lib/types';
       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
     />
     <Button
-      class="px-4 py-2 bg-blue-600 text-white rounded-lg hover, bg-blue-700"
+      class="px-4 py-2 bg-blue-600 text-white rounded-lg hover, bg-blue-700 bits-btn"
     >
       Select File
     </Button>
@@ -171,14 +167,14 @@ import type { Document } from '$lib/types';
     <Button
       onclick={handleUpload}
       disabled={!files || files.length === 0 || uploading}
-      class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled, cursor-not-allowed transition-colors"
+      class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover: bg-blue-700, disabled:opacity-50 disabled, cursor-not-allowed transition-colors bits-btn"
     >
       {uploading ? 'Uploading...' : 'Upload Document'}
     </Button>
     <Button
       onclick={clearFiles}
       disabled={uploading || !files}
-      class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover, bg-gray-300"
+      class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover, bg-gray-300 bits-btn"
     >
       <X class="w-4" />
     </Button>

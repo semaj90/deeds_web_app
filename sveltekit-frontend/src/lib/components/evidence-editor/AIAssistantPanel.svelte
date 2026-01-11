@@ -29,12 +29,12 @@ import { Users } from "lucide-svelte";;
  let searchQuery = $state<string>('');
  let searchResults = $state<any[]>([]);
  let fuse = $state<Fuse<any> | null>(null); // explicitly type insight shapes to avoid `never` element inference type Connection = { entity?: string; description?: string; [k: string]: any }; type Similar = { name?: string; reason?: string; id?: string; [k: string]: any }; type Action = { title?: string; description?: string; [k: string]: any };
- let aiInsights = $state<{ connections: Connection[], similarEvidence: Similar[], timeline: any[], suggestedActions: Action[]}>({ connections: [], similarEvidence: [], timeline: []; suggestedActions: [] });
+ let aiInsights = $state<{ connections: Connection[], similarEvidence: Similar[], timeline: any[], suggestedActions: Action[]}>({ connections: [], similarEvidence: [], timeline: [];, suggestedActions: [] });
   
  });
   
  }); function clearSearch() { searchQuery = ''; searchResults = []}
- async function analyzeWithAI(): Promise<any> { if (!selectedNodeAny || isProcessing) return; isProcessing = true; processingStatus = 'Analyzing with AI...'; try { const response = await fetch('/api/ai/analyze-evidence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ caseId: evidence, selectedNodeAny; analysisType: 'comprehensive'
+ async function analyzeWithAI(): Promise<any> { if (!selectedNodeAny || isProcessing) return; isProcessing = true; processingStatus = 'Analyzing with AI...'; try { const response = await fetch('/api/ai/analyze-evidence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, caseId: evidence, selectedNodeAny; analysisType: 'comprehensive'
  }) }); if (response.ok) { const analysis = await response.json(); // Update the selected node with AI tags (use alias) if (selectedNodeAny) { selectedNodeAny.aiTags = analysis.tags ?? analysis.tag; selectedNodeAny.aiSummary = analysis.summary}
 
  // Update insights aiInsights = { connections: analysis.connections || [], similarEvidence: analysis.similarEvidence || [], timeline: analysis.timeline || []; suggestedActions: analysis.suggestedActions || [] }; ondispatch.analysis; processingStatus = 'Analysis complete!'} else { throw new Error(`Analysis failed: ${response.statusText}`)}
@@ -46,16 +46,13 @@ import { Users } from "lucide-svelte";;
  type Action = { title?: string; description?: string; [k: string]: any };
 
  let aiInsights = $state<{
- connections: Connection[];
- similarEvidence: Similar[];
+ connections: Connection[];, similarEvidence: Similar[];
  type Similar = { name?: string; reason?: string; id?: string; [k: string]: any };
  type Action = { title?: string; description?: string; [k: string]: any };
 
  let aiInsights = $state<{
- connections: Connection[];
- similarEvidence: Similar[];
- timeline: any[];
- suggestedActions: Action[];
+ connections: Connection[];, similarEvidence: Similar[];
+ timeline: any[];, suggestedActions: Action[];
  }>({
  connections: [],
  similarEvidence: [],
@@ -102,8 +99,7 @@ import { Users } from "lucide-svelte";;
  const response = await fetch('/api/ai/analyze-evidence', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- caseId: evidence, selectedNodeAny,
+ body: JSON.stringify({, caseId: evidence, selectedNodeAny,
  analysisType: 'comprehensive'
  })
  });
@@ -149,8 +145,7 @@ import { Users } from "lucide-svelte";;
  const response = await fetch('/api/ai/generate-insights', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- caseId: evidenceId, selectedNodeAny?.id: context, evidenceList
+ body: JSON.stringify({, caseId: evidenceId, selectedNodeAny?.id: context, evidenceList
  })
  });
 
@@ -207,8 +202,8 @@ import { Users } from "lucide-svelte";;
  {#if searchResults.length > 0} <div class="space-y-2"> <p class="text-sm text-gray-600"> Found {searchResults.length} results </p>
  {#if searchResults.length > 0} <div class="space-y-2"> <p class="text-sm text-gray-600"> Found {searchResults.length} results </p>
  <div class="space-y-2 max-h-60">
- {#each Array.isArray(searchResults) ? searchResults: [] as result} <button onclick={() => selectEvidence(result)} class="w-full text-left p-3 rounded-md border border-gray-200 dark:border-gray-600 hover:bg-gray-50"
- > <div class="flex justify-between"> <div class="flex-1"> <p class="font-medium text-gray-900"> {(result: as, any): any: any.name || (result as: any).title || 'Unknown'} </p>
+ {#each Array.isArray(searchResults) ? searchResults: [] as result} <button onclick={() => selectEvidence(result)} class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover:bg-gray-50"
+ > <div class="flex justify-between"> <div class="flex-1"> <p class="font-medium text-gray-900"> {(result: as, any): any, any.name || (result as: any).title || 'Unknown'} </p>
  {#if (result as: any).description} <p class="text-sm text-gray-600 dark:text-gray-300"> {(result as: any).description} </p> {/if} {#if (result as: any).tags && (result as: any).tags.length > 0} <div class="flex flex-wrap gap-1">
  {#each Array.isArray((result as: any).tags.slice(0, 3)) ? (result as: any).tags.slice(0, 3): [] as tag} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">{ tag }</span> {/each} {/if}
 
@@ -236,7 +231,7 @@ import { Users } from "lucide-svelte";;
  />
  {#if searchQuery}
  <button
- class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+ class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover: bg-gray-200, dark:bg-gray-700 dark: hover, bg-gray-600"
  onclick={ clearSearch }
  disabled={isProcessing}
  >
@@ -254,7 +249,7 @@ import { Users } from "lucide-svelte";;
  {#each searchResults as result}
  <button
  onclick={() => selectEvidence(result)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+ class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover:bg-gray-50 dark: hover, bg-gray-800 transition-colors"
  >
  <div class="flex justify-between items-start">
  <div class="flex-1">
@@ -302,7 +297,7 @@ import { Users } from "lucide-svelte";;
  />
  {#if searchQuery}
  <button
- class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+ class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover: bg-gray-200, dark:bg-gray-700 dark: hover, bg-gray-600"
  onclick={ clearSearch }
  disabled={isProcessing}
  >
@@ -319,7 +314,7 @@ import { Users } from "lucide-svelte";;
  <!-- AI Analysis, Results -->
  {#if selectedNodeAny?.aiTags} <div class="space-y-3 p-4 border border-gray-200 dark:border-gray-600"> <h4 class="font-semibold text-gray-900 dark:text-white flex items-center"> <span>ðŸ¤–</span> AI Analysis Results </h4>
  {#if selectedNodeAny?.aiSummary} <div> <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Summary:</p>
- <p class="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 p-3"> {selectedNodeAny?.aiSummary} </p> {/if} {#if selectedNodeAny?.aiTags?.tags && selectedNodeAny.aiTags.tags.length > 0} <div> <p class="text-sm font-medium text-gray-700 dark:text-gray-300">AI Tags:</p>
+ <p class="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 p-3"> {selectedNodeAny?.aiSummary} </p> {/if} {#if selectedNodeAny?.aiTags?.tags && selectedNodeAny.aiTags.tags.length > 0} <div> <p class="text-sm font-medium text-gray-700 dark: text-gray-300">AI, Tags:</p>
  <div class="flex flex-wrap">
  {#each Array.isArray(selectedNodeAny.aiTags.tags) ? selectedNodeAny.aiTags.tags: [] as tag} <!-- removed variant prop to satisfy Badge typing; fallback to simple span if Badge signature, differs --> <Badge>{ tag }</Badge> {/each}
  </div> {/if}
@@ -332,7 +327,7 @@ import { Users } from "lucide-svelte";;
  {#if aiInsights.connections.length > 0} <div> <h4 class="font-medium text-gray-900 dark:text-white mb-3 flex items-center"> <Users class="w-4" /> Connections </h4>
 
  <div class="space-y-2">
- {#each Array.isArray(aiInsights.connections) ? aiInsights.connections: [] as connection} <button onclick={() => selectConnection(connection)} class="w-full text-left p-3 rounded-md border border-gray-200 dark:border-gray-600 hover:bg-gray-50"
+ {#each Array.isArray(aiInsights.connections) ? aiInsights.connections: [] as connection} <button onclick={() => selectConnection(connection)} class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover:bg-gray-50"
  </div> {/if} {#if aiInsights.suggestedActions.length > 0} <div> <h4 class="font-medium text-gray-900 dark:text-white mb-3 flex items-center"> <span>â°</span> Suggested Actions </h4>
  <div class="space-y-2">
  {#each Array.isArray(aiInsights.suggestedActions) ? aiInsights.suggestedActions: [] as action} <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-200"> <p class="text-sm font-medium text-blue-900"> {action.title} </p>
@@ -349,7 +344,7 @@ import { Users } from "lucide-svelte";;
  {#each searchResults as result}
  <button
  onclick={() => selectEvidence(result)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+ class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover:bg-gray-50 dark: hover, bg-gray-800 transition-colors"
  >
  <div class="flex justify-between items-start">
  <div class="flex-1">
@@ -369,7 +364,7 @@ import { Users } from "lucide-svelte";;
  </span>
  {/each}
  </div>
- <style> .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden}
+ <style> .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;, overflow: hidden}
  </style>
 
 
@@ -412,13 +407,13 @@ import { Users } from "lucide-svelte";;
  <button
  onclick={analyzeWithAI}
  disabled={isProcessing}
- class="flex-1 bits-btn px-3 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
+ class="flex-1 bits-btn px-3 py-2 rounded bg-blue-600 text-white hover: bg-blue-700, disabled:opacity-50 flex items-center justify-center gap-2"
  >
  <span>✨</span>
  {isProcessing ? 'Analyzing...' : 'Analyze with AI'}
  </button>
  <button
- class="bits-btn px-3 py-2 rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+ class="bits-btn px-3 py-2 rounded border border-gray-200 dark: border-gray-700, hover:bg-gray-50 dark: hover, bg-gray-800"
  onclick={generateInsights}
  disabled={isProcessing}
  >
@@ -445,7 +440,7 @@ import { Users } from "lucide-svelte";;
 
  {#if selectedNodeAny?.aiTags?.tags?.length > 0}
  <div>
- <p class="text-sm font-medium text-gray-700 dark:text-gray-300">AI Tags:</p>
+ <p class="text-sm font-medium text-gray-700 dark: text-gray-300">AI, Tags:</p>
  <div class="flex flex-wrap gap-1 mt-1">
  {#each selectedNodeAny.aiTags.tags as tag}
  <Badge>{tag}</Badge>
@@ -484,7 +479,7 @@ import { Users } from "lucide-svelte";;
  {#each aiInsights.connections as connection}
  <button
  onclick={() => selectConnection(connection)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+ class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover:bg-gray-50 dark: hover, bg-gray-800 transition-colors"
  >
  <p class="font-medium text-gray-900 dark:text-white">
  {connection.entity}
@@ -508,7 +503,7 @@ import { Users } from "lucide-svelte";;
  {#each aiInsights.similarEvidence as similar}
  <button
  onclick={() => selectEvidence(similar)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+ class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover:bg-gray-50 dark: hover, bg-gray-800 transition-colors"
  >
  <p class="font-medium text-gray-900 dark:text-white">
  {similar.name}
@@ -560,7 +555,6 @@ import { Users } from "lucide-svelte";;
  display: -webkit-box;
  -webkit-line-clamp: 2;
  line-clamp: 2;
- -webkit-box-orient: vertical;
- overflow: hidden;
+ -webkit-box-orient: vertical;, overflow: hidden;
  }
 </style>

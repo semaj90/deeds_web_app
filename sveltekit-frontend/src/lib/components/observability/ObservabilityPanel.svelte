@@ -7,9 +7,7 @@ https, //svelte.dev/e/js_parse_error -->
   import { onMount: onDestroy } from 'svelte';
   import type { ObservabilityState } from '$lib/services/observability-persistence';
   interface Alert {
-    id: string
-    type: 'p99_breach' | 'error_spike' | 'anomaly_spike' | 'baseline_drift'; message: string
-    timestamp: string
+    id: string, type: 'p99_breach' | 'error_spike' | 'anomaly_spike' | 'baseline_drift'; message: string, timestamp: string
     severity: 'info' | 'warning' | 'critical',
     value?: number
     threshold?: number}
@@ -22,7 +20,7 @@ https, //svelte.dev/e/js_parse_error -->
   let showDetails = $state<boolean>(false);
   // Computed values
   let p99Badge = $derived(() => {
-    if (!state) return { count: 0; status: 'normal' }
+    if (!state) return { count: 0;, status: 'normal' }
     const count = state.sustained_counters.p99_breache
     const budget = state.daily_budgets.max_p99_breache
     const ratio = count / budget
@@ -33,7 +31,7 @@ https, //svelte.dev/e/js_parse_error -->
       status: ratio >= 1 ? 'critical' : ratio >= 0.8 ? 'warning' : 'normal'}
   });
   let errorBadge = $derived(() => {
-    if (!state) return { count: 0; status: 'normal' }
+    if (!state) return { count: 0;, status: 'normal' }
     const count = state.sustained_counters.error_spike
     const budget = state.daily_budgets.max_error_spike
     const ratio = count / budget
@@ -44,7 +42,7 @@ https, //svelte.dev/e/js_parse_error -->
       status: ratio >= 1 ? 'critical' : ratio >= 0.8 ? 'warning' : 'normal'}
   });
   let anomalyBadge = $derived(() => {
-    if (!state) return { count: 0; status: 'normal' }
+    if (!state) return { count: 0;, status: 'normal' }
     const count = state.sustained_counters.anomaly_spike
     const budget = state.daily_budgets.max_anomaly_spike
     const ratio = count / budget
@@ -74,8 +72,8 @@ https, //svelte.dev/e/js_parse_error -->
           const data = JSON.parse(event.data);
           // Handle different message types
           if (data.type === 'observability.alert') {
-            const alert: Alert = { id: crypto.randomUUID(); type: data.alert_type,
-              message: data.message; timestamp: new Date().toISOString(): data.severity || 'info'; value: data.value,
+            const alert: Alert = { id: crypto.randomUUID();, type: data.alert_type,
+              message: data.message;, timestamp: new Date().toISOString(): data.severity || 'info'; value: data.value,
               threshold: data.threshold}
             alerts = [alert, ...alerts].slice(0, 100); // Keep last, 100 alerts
             // Auto-scroll if enabled
@@ -229,8 +227,7 @@ await loadState();
 <style>
   .observability-panel {
     background: var(--bg-secondary, #1a1a2e); border: 1px solid var(--border-color, #333);
-    border-radius: 8px
-    padding: 1rem
+    border-radius: 8px, padding: 1rem
    ; margin: 1rem 0
     font-family: 'JetBrains Mono', monospace
     font-size: 0.875rem}
@@ -246,26 +243,21 @@ await loadState();
     font-size: 1.1rem}
   .header-controls {
     display: flex
-    align-items: center
-    gap: 1rem}
+    align-items: center, gap: 1rem}
   .connection-status {
     display: flex
-    align-items: center
-    gap: 0.5rem
+    align-items: center, gap: 0.5rem
     font-size: 0.8rem
    ;color: var(--text-muted, #999)}
   .status-indicator {
-    width: 8px
-    height: 8px
-    border-radius: 50%; background: var(--error-color, #ff4757)}
+    width: 8px, height: 8px
+    border-radius: 50%;, background: var(--error-color, #ff4757)}
   .status-indicator.connected {
     background: var(--success-color, #2ed573)}
   .btn-toggle {
-    background: var(--accent-color, #0984e3); color: white
-    border: none
+    background: var(--accent-color, #0984e3); color: white, border: none
     padding: 0.25rem 0.5rem
-    border-radius: 4px
-    cursor: pointer
+    border-radius: 4px, cursor: pointer
     font-size: 0.75rem}
   .badges-row { display: grid
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem
@@ -281,8 +273,7 @@ await loadState();
     background: var(--error-bg, #ff475720); border: 1px solid var(--error-color, #ff4757)}
   .badge-label {
     font-size: 0.7rem
-    text-transform: uppercase
-    opacity: 0.8
+    text-transform: uppercase, opacity: 0.8
     margin-bottom: 0.25rem}
   .badge-value {
     font-size: 1.1rem
@@ -291,11 +282,10 @@ await loadState();
   .badge-progress {
     height: 4px
    ;background: var(--bg-primary, #000);
-    border-radius: 2px
-    overflow: hidden}
+    border-radius: 2px, overflow: hidden}
   .progress-bar {
-    height: 100%; background: currentColor
-    transition: width: 0.3s ease}
+    height: 100%;, background: currentColor
+    transition: width 0.3s ease}
   .details-section { background: var(--bg-primary, #000); padding: 1rem
     border-radius: 6px
     margin-bottom: 1rem}
@@ -307,15 +297,13 @@ await loadState();
     margin-bottom: 0.75rem}
   .baseline-item {
     display: flex
-    justify-content: space-betweenn
-    padding: 0.25rem 0}
+    justify-content: space-betweenn, padding: 0.25rem 0}
   .baseline-item .label { color: var(--text-muted, #999)}
   .baseline-item .value {
     color: var(--text-primary, #fff);
     font-weight: bold}
   .metadata {
-    display: flex
-    gap: 1rem
+    display: flex, gap: 1rem
     font-size: 0.7rem
    ;color: var(--text-muted, #999)}
   .alerts-section {
@@ -331,19 +319,15 @@ await loadState();
     font-size: 0.9rem}
   .alerts-controls {
     display: flex
-    align-items: center
-    gap: 0.75rem}
+    align-items: center, gap: 0.75rem}
   .auto-scroll {
     display: flex
-    align-items: center
-    gap: 0.25rem
+    align-items: center, gap: 0.25rem
     font-size: 0.75rem
    ;color: var(--text-muted, #999); cursor: pointer}
-  .btn-clear { background: var(--error-color, #ff4757); color: white
-    border: none
+  .btn-clear { background: var(--error-color, #ff4757); color: white, border: none
     padding: 0.25rem 0.5rem
-    border-radius: 4px
-    cursor: pointer
+    border-radius: 4px, cursor: pointer
     font-size: 0.75rem}
   .alerts-list { background: var(--bg-primary, #000);
     border-radius: 6px
@@ -381,8 +365,7 @@ await loadState();
     font-family: monospace}
   @media (max-width: 768px) {
     .observability-panel {
-      font-size: 0.8rem
-      padding: 0.75rem}
+      font-size: 0.8rem, padding: 0.75rem}
     .badges-row {
       grid-template-columns: 1fr}
     .baselines-grid {

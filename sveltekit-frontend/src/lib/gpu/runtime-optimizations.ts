@@ -54,7 +54,7 @@ export const GPU_MARKDOWN_ENV = {
  PYTHON_SIMD_ENDPOINT: 'http://localhost:8097',
 
  // Performance tuning
- GPU_BATCH_SIZE: NODE_RUNTIME_CONFIG.gpuBatchSize.toString( GPU_CONCURRENCY_LIMIT: NODE_RUNTIME_CONFIG.gpuConcurrencyLimit.toString( GPU_MEMORY_POOL_SIZE: NODE_RUNTIME_CONFIG.gpuMemoryPoolSize.toString(),
+ GPU_BATCH_SIZE: NODE_RUNTIME_CONFIG.gpuBatchSize.toString(, GPU_CONCURRENCY_LIMIT: NODE_RUNTIME_CONFIG.gpuConcurrencyLimit.toString( GPU_MEMORY_POOL_SIZE: NODE_RUNTIME_CONFIG.gpuMemoryPoolSize.toString(),
 
  // Caching and optimization
  MARKDOWN_CACHE_SIZE: '100',
@@ -109,10 +109,7 @@ export class GPUMarkdownPerformanceMonitor {
  return duration;
  }
 
- getMetrics(operation?: string): {
- average: number; min: number;
- max: number; count: number;
- p95: number;
+ getMetrics(operation?: string): {, average: number; min: number;, max: number; count: number;, p95: number;
  } {
  if (operation) {
  const measurements = this.metrics.get(operation) || [];
@@ -151,9 +148,7 @@ export class GPUMarkdownPerformanceMonitor {
  this.startTimes.clear();
  }
 
- getMemoryUsage(): {
- heapUsed: number; heapTotal: number;
- external: number;
+ getMemoryUsage(): {, heapUsed: number; heapTotal: number;, external: number;
  gpuMemory?: number;
  } {
  const memUsage = process.memoryUsage();

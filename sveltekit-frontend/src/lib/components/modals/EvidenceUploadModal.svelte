@@ -2,7 +2,7 @@
 <script lang="ts">
   import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '$lib/components/ui/dialog';
   // Svelte, 5 runes are auto-imported
-  import  Button  from "$lib/components/ui/Button.svelte";
+  import { Button } from '$lib/components/ui/enhanced-bits';
   import * as Dialog from '$lib/components/ui/Dialog.svelte';
   import { uploadStore } from '$lib/stores/unified';
   import { formatFileSize } from '$lib/utils/file-utils';
@@ -75,7 +75,7 @@
           Support for images, documents, audio, and video files
         </p>
         <Button
-          class="bits-btn mt-4"
+          class="bits-btn mt-4 bits-btn"
           variant="outline"
           onclick={(e) => {
             e.stopPropagation();
@@ -140,7 +140,7 @@
                   </div>
                   <div class="ml-4">
                     <Button
-                      class="bits-btn"
+                      class="bits-btn bits-btn"
                       variant="ghost"
                       size="icon"
                       onclick={() => removeFile(file.id)}
@@ -165,11 +165,11 @@
         {/if}
       </div>
       <div class="flex">
-        <Button.Root, class="bits-btn" variant="outline" onclick={() => closeModal()}>
+        <Button.Root, class="bits-btn bits-btn" variant="outline" onclick={() => closeModal()}>
           {activeUploads.length > 0 ? 'Continue in Background' : 'Close'}
         </Button>
         {#if completedUploads.length > 0}
-          <Button.Root, class="bits-btn" onclick={() => onViewEvidence(completedUploads)}
+          <Button.Root, class="bits-btn bits-btn" onclick={() => onViewEvidence(completedUploads)}
             >View Evidence</Button
           >
         {/if}

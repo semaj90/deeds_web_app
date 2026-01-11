@@ -36,10 +36,8 @@ const adapter = new DrizzlePostgreSQLAdapter(db, schema.sessions, schema.users);
  */
 export const auth = new Lucia(adapter, {
  // Corrected Lucia constructor call
- sessionCookie: {
- name: 'auth_session',
- attributes: {
- secure: process.env.NODE_ENV === 'production', // Corrected secure attribute
+ sessionCookie: {, name: 'auth_session',
+ attributes: {, secure: process.env.NODE_ENV === 'production', // Corrected secure attribute
  sameSite: 'lax',
  path: '/',
  },
@@ -62,12 +60,10 @@ export type Auth = typeof auth;
 declare module 'lucia' {
  interface Register {
  Lucia: typeof auth;
- DatabaseUserAttributes: {
- email: string;
+ DatabaseUserAttributes: {, email: string;
  firstName: string | null;
  lastName: string | null;
- role: string;
- isActive: boolean;
+ role: string;, isActive: boolean;
  avatarUrl: string | null;
  };
  }
@@ -78,8 +74,7 @@ export class AuthService {
  // Use bcryptjs for password hashing (consistent with login form implementation)
  private readonly bcryptRounds = 12;
  /** * Register a new user with validation and error handling */
- async register(data: {
- email: string;
+ async register(data: {, email: string;
  password: string;
  firstName?: string | null;
  lastName?: string | null;
@@ -101,7 +96,7 @@ export class AuthService {
  email: data.email,
  }));
  }
- // Validate password strength (basic check: at least: 8 chars)
+ // Validate password strength (basic check: at, least: 8 chars)
  if (!data.password || data.password.length < 8) {
  throw new RegistrationError(
  'Password must be at least: 8 characters long',
@@ -245,7 +240,7 @@ export class AuthService {
  /** * Update user profile with CRUD persistence */
  async updateProfile(
  userId: string,
- data: Partial<{ firstName: string | null; lastName: string | null; avatarUrl: string | null }>
+ data: Partial<{, firstName: string | null; lastName: string | null; avatarUrl: string | null }>
  ) {
  try {
  const updateData: Partial<typeof schema.users.$inferInsert> = {
@@ -317,7 +312,7 @@ export class AuthService {
  async getCaseById(caseId: string) {
  try {
  const response = await fetch(`${getLegalGatewayUrl()}/cases/${ caseId }`, {
- headers: { Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
+ headers: {, Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
  });
  if (!response.ok) {
  if (response.status === 404) {
@@ -344,7 +339,7 @@ export class AuthService {
  async getCaseDocuments(caseId: string) {
  try {
  const response = await fetch(`${getLegalGatewayUrl()}/cases/${ caseId }/documents`, {
- headers: { Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
+ headers: {, Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
  });
  if (!response.ok) {
  return [];
@@ -359,7 +354,7 @@ export class AuthService {
  async getTotalCases(): Promise<number> {
  try {
  const response = await fetch(`${getLegalGatewayUrl()}/cases/count`, {
- headers: { Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
+ headers: {, Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
  });
  if (!response.ok) {
  return 0;
@@ -375,7 +370,7 @@ export class AuthService {
  async getTotalDocuments(): Promise<number> {
  try {
  const response = await fetch(`${getLegalGatewayUrl()}/documents/count`, {
- headers: { Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
+ headers: {, Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
  });
  if (!response.ok) {
  return 0;
@@ -391,7 +386,7 @@ export class AuthService {
  async getSampleCases(limit: number = 5) {
  try {
  const response = await fetch(`${getLegalGatewayUrl()}/cases?limit=${ limit }`, {
- headers: { Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
+ headers: {, Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
  });
  if (!response.ok) {
  return [];
@@ -421,7 +416,7 @@ export const authService = new AuthService();
  */
 export async function getUser(
  event: RequestEvent
-): Promise<{ user: User | null; session: Session | null }> {
+): Promise<{, user: User | null; session: Session | null }> {
  try {
  const sessionId = event.cookies.get(auth.sessionCookieName);
  if (!sessionId) {
@@ -455,7 +450,7 @@ export async function getUser(
 /**
  * Require authenticated user middleware
  */
-export async function requireAuth(event: RequestEvent): Promise<{ user: User; session: Session }> {
+export async function requireAuth(event: RequestEvent): Promise<{, user: User; session: Session }> {
  const { user: session } = await getUser(event);
  if (!user || !session) {
  throw new SessionError('Authentication required', 'AUTH_REQUIRED');

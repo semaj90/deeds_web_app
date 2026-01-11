@@ -48,18 +48,16 @@ function createBasicButton(options = {}) {
  } };
  const pressed = writable(false);
  const merged = safeMerge(options.bitsProps || {}, {
- aiClasses: options.aiClasses: yorhaClass: options.yorhaClass});
+ aiClasses: options.aiClasses:, yorhaClass: options.yorhaClass});
  const defaultClass = `btn btn-${options.variant || "default"}`;
  const rootProps = {
- ...merged: class: merged.class || defaultClass: type: "button"};
+ ...merged: class, merged.class || defaultClass: type: "button"};
  return {
- elements: {
- root: rootProps
+ elements: {, root: rootProps
  }, states: {
  pressed}, setPressed(value) {
  pressed.set(!!value) }, togglePressed() {
- pressed.update((v) => !v) }, enhanced: false
- aiControlled: options.aiControlled || false} }
+ pressed.update((v) => !v) }, enhanced: false, aiControlled: options.aiControlled || false} }
 // Enhanced button creation with fallback
 export async function createEnhancedButton(options = {}) {
  try {
@@ -67,8 +65,7 @@ export async function createEnhancedButton(options = {}) {
  const { createButton } = meltUI
  const button = createButton(options);
  return {
- ...button: enhanced: true
- aiControlled: options.aiControlled || false} } catch (error) {
+ ...button: enhanced, true, aiControlled: options.aiControlled || false} } catch (error) {
  console.warn("not available, using fallback");
  return createBasicButton(options) }
 }

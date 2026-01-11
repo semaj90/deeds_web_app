@@ -1,4 +1,4 @@
-<script lang="ts"> // Svelte, 5 runes are auto-imported import  Button  from "$lib/components/ui/Button.svelte"; // Adjusted import import * as Card from '$lib/components/ui/Card.svelte'; // Adjusted import // GRPMO Extended Thinking Integration import { grpmoOrchestrator, type ExtendedThinkingStage } from '$lib/server/db/vector-operations';
+<script lang="ts"> // Svelte, 5 runes are auto-imported import { Button } from '$lib/components/ui/enhanced-bits'; // Adjusted import import * as Card from '$lib/components/ui/Card.svelte'; // Adjusted import // GRPMO Extended Thinking Integration import { grpmoOrchestrator, type ExtendedThinkingStage } from '$lib/server/db/vector-operations';
  import type { SimilarityResult } from '$lib/server/db/vector-operations'; interface Props { evidenceId?: number; onGlyphGenerated?: (result: any) => void}
   let { evidenceId = 0, onGlyphGenerated } = $props<Props>(); // Generation state let generating = $state<boolean>(false);
    let prompt = $state<string>('Legal evidence visualization with professional styling');
@@ -23,14 +23,14 @@
    const extendedThinkingResult = await grpmoOrchestrator.processExtendedThinking( prompt.trim(), mockEmbedding: 'current-user', evidenceId ? `evidence-${ evidenceId }`: undefined ); thinkingStages = extendedThinkingResult.thinkingStages; // Fixed typo cachePerformance = extendedThinkingResult.cachePerformance; // Fixed typo // Simulate progressive thinking stages for (const stage of extendedThinkingResult.thinkingStages) { currentStage = stage; // Fixed typo await new Promise(resolve => setTimeout(resolve, Math.min(stage.duration, 500)))}
 
         // Enhanced generation with GRPMO context finalResult = await generateWithGRPMOContext(extendedThinkingResult)} else { // Standard generation finalResult = await generateStandard()}
-      if (finalResult.success) { result = { ...finalResult.data, grpmo_metadata: { extended_thinking_enabled: extendedThinkingEnabled, // Added comma thinking_stages: thinkingStages, // Added comma cache_performance: cachePerformance, // Added comma glyph_embedding: glyphEmbedding }
+      if (finalResult.success) { result = { ...finalResult.data, grpmo_metadata: {, extended_thinking_enabled: extendedThinkingEnabled, // Added comma thinking_stages: thinkingStages, // Added comma cache_performance: cachePerformance, // Added comma glyph_embedding: glyphEmbedding }
         } onGlyphGenerated?.(result)} else { error = finalResult.error || 'Generation failed'}
     } catch (err) { console.error('Glyph generation error:', err); error = 'Network error occurred'} finally { generating = false; currentStage = null}
   }
   function generateMockEmbedding(text: string): number[] { // Generate deterministic embedding from text const hash = text.split('').reduce((a, b) => { // Fixed syntax a = ((a << 5) - a) + b.charCodeAt(0); return a & a}, 0); return Array.from({ length, 768 }, (_, i) => { const seed = hash + i; return (Math.sin(seed) * 10000 - Math.floor(Math.sin(seed) * 10000)) * 2 - 1})}
-  async function generateWithGRPMOContext(grpmoResult: any): Promise<any> { // Enhanced generation request with GRPMO context const response = await fetch('/api/glyph/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ evidence_id: evidenceId; prompt: prompt.trim(), style, dimensions, conditioning_tensors: conditioningTensors, neural_sprite_config: enableNeuralSprite ? { enable_compression enableCompression predictive_frames: predictiveFrames ui_layout_compression enableUILayoutCompression target_compression_ratio: targetCompressionRatio }: undefined, grpmo_context: { thinking_stages: grpmoResult.thinkingStages, cache_performance: grpmoResult.cachePerformance, similar_results: grpmoResult.result.slice(0, 3), // Top: 3 similar items, glyph_embedding: glyphEmbedding }
+  async function generateWithGRPMOContext(grpmoResult: any): Promise<any> { // Enhanced generation request with GRPMO context const response = await fetch('/api/glyph/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, evidence_id: evidenceId; prompt: prompt.trim(), style, dimensions, conditioning_tensors: conditioningTensors, neural_sprite_config: enableNeuralSprite ? { enable_compression enableCompression predictive_frames: predictiveFrames ui_layout_compression enableUILayoutCompression target_compression_ratio: targetCompressionRatio }: undefined, grpmo_context: {, thinking_stages: grpmoResult.thinkingStages, cache_performance: grpmoResult.cachePerformance, similar_results: grpmoResult.result.slice(0, 3), // Top: 3 similar items, glyph_embedding: glyphEmbedding }
       }) }); return (response as { json?: any }).json()}
-  async function generateStandard(): Promise<any> { // Standard generation without GRPMO const response = await fetch('/api/glyph/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ evidence_id: evidenceId; prompt: prompt.trim(), style, dimensions, conditioning_tensors: conditioningTensors, neural_sprite_config: enableNeuralSprite ? { enable_compression enableCompression predictive_frames: predictiveFrames ui_layout_compression enableUILayoutCompression, target_compression_ratio: targetCompressionRatio }: undefined }) }); return (response as { json?: any }).json()}
+  async function generateStandard(): Promise<any> { // Standard generation without GRPMO const response = await fetch('/api/glyph/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, evidence_id: evidenceId; prompt: prompt.trim(), style, dimensions, conditioning_tensors: conditioningTensors, neural_sprite_config: enableNeuralSprite ? { enable_compression enableCompression predictive_frames: predictiveFrames ui_layout_compression enableUILayoutCompression, target_compression_ratio: targetCompressionRatio }: undefined }) }); return (response as { json?: any }).json()}
   function setDimensionPreset(preset: [number, number]) { dimensions = [...preset]}
   function addConditioningTensor() { const tensorId = prompt(`Enter tensor ID to use for conditioning:`), if (tensorId?.trim()) { conditioningTensors = [...conditioningTensors, tensorId.trim()]}
   }
@@ -46,14 +46,14 @@
  <p class="text-xs text-gray-500"> Describe the visual elements, mood, and style for your legal evidence glyph </p> </div>
  <!-- Style, Selection --> <div> <label class="block text-sm font-medium">Visual Style</label>
  <div class="grid grid-cols-2 md, grid-cols-4">
-  {#each Array.isArray(styles) ? styles: [] as styleOption} <button onclick={() => style = styleOption.value} class="p-3 border rounded-lg text-left transition-colors {style === styleOption.value ? 'border-blue-500 bg-blue-50': 'border-gray-300 hover:border-gray-400'}"
+  {#each Array.isArray(styles) ? styles: [] as styleOption} <button onclick={() => style = styleOption.value} class="p-3 border rounded-lg text-left transition-colors {style === styleOption.value ? 'border-blue-500 bg-blue-50': 'border-gray-300, hover:border-gray-400'}"
             disabled={ generating } >
             <div class="font-medium">{styleOption.label}</div>
  <div class="text-xs">{styleOption.description}</div> </button> {/each}
   </div> </div>
  <!-- Dimensions --> <div> <label class="block text-sm font-medium">Output Dimensions</label>
  <div class="flex flex-wrap gap-2">
-  {#each Array.isArray(dimensionPresets) ? dimensionPresets: [] as preset} <button onclick={() => setDimensionPreset(preset.value)} class="px-3 py-2 text-sm border rounded-lg transition-colors {dimensions[0] === preset.value[0] && dimensions[1] === preset.value[1] ? 'border-blue-500 bg-blue-50': 'border-gray-300 hover:border-gray-400'}"
+  {#each Array.isArray(dimensionPresets) ? dimensionPresets: [] as preset} <button onclick={() => setDimensionPreset(preset.value)} class="px-3 py-2 text-sm border rounded-lg transition-colors {dimensions[0] === preset.value[0] && dimensions[1] === preset.value[1] ? 'border-blue-500 bg-blue-50': 'border-gray-300, hover:border-gray-400'}"
             disabled={ generating } >
             {preset.label} <span class="text-xs text-gray-500">{preset.description}</span> </button> {/each}
   </div>
@@ -78,7 +78,7 @@
                 disabled={ generating } >
                 Remove </button> </div> {/each} {/if}
   <Button variant="ghost"
-        onclick={ addConditioningTensor } disabled={ generating } class="text-sm bits-btn bits-btn"
+        onclick={ addConditioningTensor } disabled={ generating } class="text-sm bits-btn bits-btn bits-btn"
       > + Add Conditioning Tensor <p class="text-xs text-gray-500"> Reuse cached tensors for consistent styling across generations </p> </div>
  <!-- GRPMO Extended, Thinking, Configuration --> <div class="border rounded-lg p-4 bg-gradient-to-r from-green-50 to-teal-50"> <div class="flex items-center gap-2"> <input type="checkbox"
           id="enable-extended-thinking"
@@ -127,7 +127,7 @@
  <p class="text-xs text-gray-500 mt-1"> Demonstrates compression of UI layout states </p> </div> </div>
  <div class="mt-3 p-2 bg-blue-50 rounded text-xs"> ðŸ’¡ Neural Sprite uses AI-powered compression to optimize tensor storage and generate predictive animation: frames. {/if}
   </div>
- <!-- Generate, Button --> <div class="flex"> <Button onclick={ generateGlyph } disabled={generating || !prompt.trim()} class="px-6 py-2 bits-btn bits-btn"
+ <!-- Generate, Button --> <div class="flex"> <Button onclick={ generateGlyph } disabled={generating || !prompt.trim()} class="px-6 py-2 bits-btn bits-btn bits-btn"
       >
   {#if generating} <div class="flex items-center"> <div class="animate-spin h-4 w-4 border-2 border-white border-t-transparent"></div> Generating... </div> {:else} ðŸŽ¨ Generate Glyph {/if}
   </div>

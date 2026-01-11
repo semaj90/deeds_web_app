@@ -18,11 +18,10 @@ export const POST: RequestHandler = async ({ request }) => {
 
  const result = await new Promise<{
  code: number | null;
- stdout: string;
- stderr: string;
+ stdout: string;, stderr: string;
  }>((resolve) => {
  const child = spawn(cmd, args, {
- cwd: process.cwd( shell: process.platform === 'win32',
+ cwd: process.cwd(, shell: process.platform === 'win32',
  });
 
  let stdout = '';

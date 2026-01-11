@@ -2,41 +2,18 @@
 // Uses Gemma 3 Legal model for structured JSON output
 
 export interface PersonOfInterestData {
- name: string;
- aliases: string[];
- description: string;
- who: {
- identity: string;
- background: string;
- occupation: string;
- affiliations: string[];
+ name: string;, aliases: string[];, description: string;, who: {, identity: string;, background: string;, occupation: string;, affiliations: string[];
  };
- what: {
- activities: string[];
- knownActions: string[];
- patterns: string[];
+ what: {, activities: string[];, knownActions: string[];, patterns: string[];
  };
- why: {
- motivations: string[];
- objectives: string[];
- drivingFactors: string[];
+ why: {, motivations: string[];, objectives: string[];, drivingFactors: string[];
  };
- how: {
- methods: string[];
- resources: string[];
- capabilities: string[];
+ how: {, methods: string[];, resources: string[];, capabilities: string[];
  };
- risk: {
- threatLevel: 'low' | 'medium' | 'high' | 'critical';
- riskFactors: string[];
- mitigationStrategies: string[];
- legalImplications: string[];
+ risk: {, threatLevel: 'low' | 'medium' | 'high' | 'critical';
+ riskFactors: string[];, mitigationStrategies: string[];, legalImplications: string[];
  };
- metadata: {
- confidence: number;
- sources: string[];
- lastUpdated: string;
- generatedBy: string;
+ metadata: {, confidence: number;, sources: string[];, lastUpdated: string;, generatedBy: string;
  };
 }
 
@@ -44,8 +21,7 @@ export const PERSON_OF_INTEREST_PROMPT = `You are a specialized Legal AI Assista
 
 Given the following information about a person, generate a comprehensive legal POI profile in valid JSON format.
 
-Input Information:
-- Name: { name }
+Input Information: -, Name: { name }
 - Alias: { alias }
 - Description: { description }
 

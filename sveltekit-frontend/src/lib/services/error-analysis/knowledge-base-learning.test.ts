@@ -426,7 +426,7 @@ describe('KnowledgeBaseLearning', () => {
  fc.asyncProperty(
  fc.array(
  fc.record({
- errorType: fc.constantFrom('typescript', 'svelte', errorMessage: fc.string({ minLength: 1, maxLength: 100 }, filePath: fc.string({ minLength: 1, maxLength: 50 }, originalCode: fc.string({ minLength: 1, maxLength: 100 }, fixedCode: fc.string({ minLength: 1, maxLength: 100 }),
+ errorType: fc.constantFrom('typescript', 'svelte', errorMessage: fc.string({, minLength: 1, maxLength: 100 }, filePath: fc.string({, minLength: 1, maxLength: 50 }, originalCode: fc.string({, minLength: 1, maxLength: 100 }, fixedCode: fc.string({, minLength: 1, maxLength: 100 }),
  }),
  { minLength: 1, maxLength: 10 }
  ),

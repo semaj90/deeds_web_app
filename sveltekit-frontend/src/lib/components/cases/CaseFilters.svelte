@@ -10,10 +10,9 @@
 
   import { Search, Filter, SortAsc, SortDesc } from 'lucide-svelte';
   interface Props {
-    cases: Case[]; filteredCases: Case[],
-    searchQuery: string
-    statusFilter: string
-    sortBy: string; sortOrder: 'asc' | 'desc'}
+    cases: Case[];, filteredCases: Case[],
+    searchQuery: string, statusFilter: string
+    sortBy: string;, sortOrder: 'asc' | 'desc'}
   let { cases = [],
     filteredCases = [],
     searchQuery = '',
@@ -40,12 +39,12 @@
   // TODO: Enhanced filter interface
   // interface AdvancedFilters {
   //   status: string[]
-  //   dateRange: { start: Date; end: Date }
+  //   dateRange: {, start: Date; end: Date }
 
   //   assignee: string[]
   //  , priority: ['high', 'medium', 'low']
   //   tags: string[]
-  //   evidenceCount: { min: number max: number }
+  //   evidenceCount: {, min: number max: number }
 
   //   hasAttachments: boolean
   //  , lastActivityDays: number
@@ -135,7 +134,7 @@
   <Button
     variant="ghost"
     size="sm"
-    class="bits-btn"
+    class="bits-btn bits-btn"
     onclick={() => sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'}
   >
   {#if sortOrder === 'asc'}
@@ -152,10 +151,9 @@
   .case-filters {
     margin-bottom: 1rem}
   .filter-row {
-    display: flex
-    gap: 1rem
+    display: flex, gap: 1rem
     align-items: center}
-  .search-input { flex: 1; padding: 0.5rem
+  .search-input { flex: 1;, padding: 0.5rem
     border: 1px solid #ccc
     border-radius: 4px}
   .filter-select {

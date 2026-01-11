@@ -6,7 +6,7 @@ https, //svelte.dev/e/js_parse_error -->
   const { onclose } = $props<{ onclose: ((event?, any) }>()
   import { aiService } from '$lib/services/aiService';
   import * as Dialog from '$lib/components/ui/Dialog.svelte';
-  import  Button  from "$lib/components/ui/Button.svelte";
+  import { Button } from '$lib/components/ui/enhanced-bits';
   // use icon components from the icons subpath (lucide-svelte exports individual files)
   import  Copy  from "lucide-svelte/icons/copy.svelte";
   import X from 'lucide-svelte/icons/x.svelte';
@@ -68,7 +68,7 @@ https, //svelte.dev/e/js_parse_error -->
           <div class="flex items-center">
             <div class="flex items-center">
               <Button
-                class="bits-btn"
+                class="bits-btn bits-btn"
                 onclick={copyToClipboard}
                 variant="ghost"
                 size="sm"
@@ -95,7 +95,7 @@ https, //svelte.dev/e/js_parse_error -->
         <div>No summary available.{/if}
     </div>
     <div class="dialog-footer mt-4 flex">
-      <Button class="bits-btn" onclick={closeModal} variant="secondary" aria-label="Close, summary, modal">
+      <Button class="bits-btn bits-btn" onclick={closeModal} variant="secondary" aria-label="Close, summary, modal">
         <X />
         <span>Close</span>
       </Button>

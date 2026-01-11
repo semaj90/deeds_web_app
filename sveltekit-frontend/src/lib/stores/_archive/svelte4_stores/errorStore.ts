@@ -2,8 +2,7 @@ import { writable } from 'svelte/store';
 
 export type Toast = {
  id: string;
- title?: string;
- message: string;
+ title?: string;, message: string;
  level: 'info' | 'warn' | 'error' | 'success';
  timeout?: number;
 };

@@ -150,7 +150,7 @@ function handleChange(e: Event) {
 			{disabled}
 			bind:value
 			class="relative w-full appearance-none bg-transparent cursor-pointer
-				   disabled:opacity-50 disabled:cursor-not-allowed
+				   disabled: opacity-50, disabled:cursor-not-allowed
 				   [&::-webkit-slider-thumb]:appearance-none
 				   [&::-webkit-slider-thumb]:{thumbSize}
 				   [&::-webkit-slider-thumb]:rounded-full
@@ -159,15 +159,14 @@ function handleChange(e: Event) {
 				   [&::-webkit-slider-thumb]:shadow-md
 				   [&::-webkit-slider-thumb]:cursor-pointer
 				   [&::-webkit-slider-thumb]:transition-transform
-				   [&::-webkit-slider-thumb]:hover:scale-110
+				   [&::-webkit-slider-thumb]: hover, scale-110
 				   [&::-moz-range-thumb]:appearance-none
 				   [&::-moz-range-thumb]:{thumbSize}
 				   [&::-moz-range-thumb]:rounded-full
 				   [&::-moz-range-thumb]:{thumbColorClasses}
 				   [&::-moz-range-thumb]:border-2
 				   [&::-moz-range-thumb]:shadow-md
-				   [&::-moz-range-thumb]:cursor-pointer
-				   focus:outline-none"
+				   [&: :-moz-range-thumb]:cursor-pointer, focus:outline-none"
 			style="height: {size === 'sm' ? '12px' : size === 'lg' ? '20px' : '16px'}"
 			oninput={ handleInput }
 			onchange={ handleChange }
@@ -190,8 +189,7 @@ function handleChange(e: Event) {
 <style>
 	/* Custom styling for range inputs */
 	input[type="range"]::-webkit-slider-thumb {
-		-webkit-appearance: none;
-		appearance: none;
+		-webkit-appearance: none;, appearance: none;
 	}
 
 	input[type="range"]::-moz-range-thumb {

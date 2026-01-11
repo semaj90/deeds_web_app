@@ -81,7 +81,7 @@ export const evidenceTags = pgTable(
  },
  (table) => ({
  // Composite primary key
- pk: primaryKey({ columns: [table.evidenceId, table.tagId]  }),
+ pk: primaryKey({, columns: [table.evidenceId, table.tagId]  }),
  // Index for evidence lookup
  evidenceIdx: index('evidence_tags_evidence_id_idx').on(table.evidenceId),
  // Index for tag lookup

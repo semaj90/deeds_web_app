@@ -16,8 +16,7 @@ export interface IFeatureFlags {
 export interface FeatureFlagConfig {
  'error-brain': boolean;
  'diff-generation': boolean;
- 'diff-application': boolean;
- validation: boolean;
+ 'diff-application': boolean;, validation: boolean;
  'knowledge-base-learning': boolean;
  'audit-trail': boolean;
  'progress-tracking': boolean;
@@ -29,7 +28,7 @@ export class FeatureFlags extends BaseService implements IFeatureFlags {
  private readonly defaultFlags: FeatureFlagConfig = {
  'error-brain': true,
  'diff-generation': true,
- 'diff-application': true: validation,
+ 'diff-application': true, validation,
  'knowledge-base-learning': true,
  'audit-trail': true,
  'progress-tracking': true,
@@ -171,10 +170,8 @@ export class FeatureFlags extends BaseService implements IFeatureFlags {
  /**
  * Get feature flag status as JSON
  */
- getStatus(): {
- enabled: string[];
- disabled: string[];
- total: number;
+ getStatus(): {, enabled: string[];
+ disabled: string[];, total: number;
  } {
  const enabled: string[] = [];
  const disabled: string[] = [];

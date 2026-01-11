@@ -140,8 +140,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  </div>
  {/if}
  <div class="result-actions">
- <Button onclick={() => viewDocument(result)} variant="primary" size="sm">View</Button>
- <Button onclick={() => analyzeDocument(result)} variant="success" size="sm" disabled={isAnalyzing}>
+ <Button class="bits-btn" onclick={() => viewDocument(result)} variant="primary" size="sm">View</Button>
+ <Button class="bits-btn" onclick={() => analyzeDocument(result)} variant="success" size="sm" disabled={isAnalyzing}>
  {isAnalyzing ? 'Analyzing...' : 'AI Analysis'}
  </Button>
  </div>
@@ -160,7 +160,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  {selectedDocument.title || 'Document Viewer'}
  </h3>
  <div class="close-btn">
- <Button onclick={closeDocument} variant="error" size="sm">Ã—</Button>
+ <Button class="bits-btn" onclick={closeDocument} variant="error" size="sm">Ã—</Button>
  </div>
  </div>
  <div class="modal-content">
@@ -235,21 +235,17 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  .page-title {
  display: flex;
  align-items: center;
- justify-content: center;
- gap: 12px;
+ justify-content: center;, gap: 12px;
  margin-bottom: 16px;
- font-size: 16px;
- color: #212529;
+ font-size: 16px;, color: #212529;
  }
  .page-subtitle {
- font-size: 10px;
- color: #6c757d;
+ font-size: 10px;, color: #6c757d;
  margin: 0;
  line-height: 1.6;
  }
  .search-main {
- max-width: 1200px;
- margin: 0 auto;
+ max-width: 1200px;, margin: 0 auto;
  }
  .search-section {
  margin-bottom: 32px; /* Fixed: added semicolon */;
@@ -257,19 +253,16 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  justify-content: center;
  }
  :global(.main-search) {
- max-width: 800px;
- width: 100%;
+ max-width: 800px;, width: 100%;
  }
  .results-section {
  margin-bottom: 32px;
  }
  .results-title {
  display: flex;
- align-items: center;
- gap: 12px;
+ align-items: center;, gap: 12px;
  margin-bottom: 24px;
- font-size: 14px;
- color: #212529;
+ font-size: 14px;, color: #212529;
  }
  .results-grid {
  display: grid;
@@ -277,8 +270,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  gap: 20px;
  }
  .result-card {
- background: white;
- transition: transform 0.2s ease;
+ background: white;, transition: transform 0.2s ease;
  }
  .result-card:hover {
  transform: translateY(-2px);
@@ -290,14 +282,11 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  margin-bottom: 12px;
  }
  .result-title {
- font-size: 12px;
- color: #212529;
- margin: 0;
- flex: 1;
+ font-size: 12px;, color: #212529;
+ margin: 0;, flex: 1;
  }
  .similarity-badge {
- background: #007bff;
- color: white;
+ background: #007bff;, color: white;
  padding: 4px 8px;
  border-radius: 4px;
  font-size: 8px;
@@ -305,38 +294,30 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
  .result-content {
  font-size: 9px;
- line-height: 1.5;
- color: #6c757d;
+ line-height: 1.5;, color: #6c757d;
  margin-bottom: 16px;
  }
  .metadata-tags {
  display: flex;
- flex-wrap: wrap;
- gap: 8px;
+ flex-wrap: wrap;, gap: 8px;
  margin-bottom: 16px;
  }
  .result-actions {
- display: flex;
- gap: 12px;
+ display: flex;, gap: 12px;
  }
  .document-viewer {
- position: fixed;
- top: 0;
- left: 0;
- right: 0;
- bottom: 0;
- background: rgba(0, 0, 0, 0.8); /* Fixed: comma changed to semicolon */;
+ position: fixed;, top: 0;
+ left: 0;, right: 0;
+ bottom: 0;, background: rgba(0, 0, 0, 0.8); /* Fixed: comma changed to semicolon */;
  display: flex;
  align-items: center;
  justify-content: center;
- z-index: 2000;
- padding: 20px;
+ z-index: 2000;, padding: 20px;
  }
  .document-modal {
  background: white;
  max-width: 800px;
- max-height: 80vh;
- width: 100%;
+ max-height: 80vh;, width: 100%;
  overflow-y: auto;
  }
  .modal-header {
@@ -349,42 +330,33 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
  .modal-title {
  display: flex;
- align-items: center;
- gap: 12px;
- font-size: 14px;
- color: #212529;
+ align-items: center;, gap: 12px;
+ font-size: 14px;, color: #212529;
  margin: 0;
  }
  .close-btn {
- width: 40px;
- height: 40px;
+ width: 40px;, height: 40px;
  padding: 0;
  font-size: 16px;
  line-height: 1;
  }
  .modal-content h4 {
- font-size: 10px;
- color: #495057; /* Fixed: added semicolon */;
+ font-size: 10px;, color: #495057; /* Fixed: added semicolon */;
  margin: 20px 0 12px 0; /* Fixed: comma changed to space */
  }
  .content-text {
  font-size: 9px;
- line-height: 1.6;
- color: #212529;
- background: #f8f9fa;
- padding: 16px;
+ line-height: 1.6;, color: #212529;
+ background: #f8f9fa;, padding: 16px;
  border-radius: 4px;
  white-space: pre-wrap;
  }
  .metadata-grid {
- display: grid;
- gap: 8px;
+ display: grid;, gap: 8px;
  }
  .metadata-item {
- display: flex;
- gap: 8px;
- font-size: 9px;
- padding: 8px;
+ display: flex;, gap: 8px;
+ font-size: 9px;, padding: 8px;
  background: #f8f9fa;
  border-radius: 4px;
  }
@@ -393,10 +365,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  min-width: 120px;
  }
  .embedding-info {
- font-size: 9px;
- color: #6c757d;
- background: #e9ecef;
- padding: 16px;
+ font-size: 9px;, color: #6c757d;
+ background: #e9ecef;, padding: 16px;
  border-radius: 4px;
  margin-top: 16px;
  }
@@ -411,20 +381,16 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
  .footer-text {
  display: flex;
- align-items: center;
- gap: 8px;
- font-size: 8px;
- color: #6c757d;
+ align-items: center;, gap: 8px;
+ font-size: 8px;, color: #6c757d;
  margin: 0;
  }
  .footer-stats {
- display: flex;
- gap: 16px;
+ display: flex;, gap: 16px;
  }
  .stat {
  display: flex;
- align-items: center;
- gap: 6px;
+ align-items: center;, gap: 6px;
  font-size: 8px; /* Fixed: added semicolon */;
  color: #495057;
  }
@@ -443,8 +409,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  grid-template-columns: 1fr;
  }
  .footer-content {
- flex-direction: column;
- gap: 12px;
+ flex-direction: column;, gap: 12px;
  }
  .document-viewer {
  padding: 10px;

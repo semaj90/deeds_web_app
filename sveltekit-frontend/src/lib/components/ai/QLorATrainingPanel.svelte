@@ -23,22 +23,22 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <p class="text-gray-400"> Train legal AI models on .case files with Low-Rank Adaptation </p> </div>
  <label class="relative inline-flex items-center"> <input type="checkbox"
           class="sr-only peer"
-          bind, checked={ trainingEnabled } onclick={ handleTrainingToggle } /> <div class="w-14 h-8 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-cyan-300/20 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-6 after:w-6 after, transition-all"></div> </label> </div>
+          bind, checked={ trainingEnabled } onclick={ handleTrainingToggle } /> <div class="w-14 h-8 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-cyan-300/20 rounded-full peer peer-checked: after, translate-x-6 peer-checked: after, border-white, after: content-[''], after: absolute, after: top-1, after: left-1, after: bg-white, after: rounded-full, after: h-6, after:w-6 after, transition-all"></div> </label> </div>
  <!-- File, Upload, Area --> <div class="border-2 border-dashed border-cyan-500/30 rounded-lg p-8 text-center transition-all duration-200 {dragActive ? 'border-cyan-400"
       role="region" aria-label="Drop zone" ondragover={(e) => { e.preventDefault(); dragActive = true }} ondragleave={() => dragActive = false} ondrop={ handleFileDrop } >
       <div class="space-y-4"> <div class="text-6xl">ðŸ“„</div>
  <div class="space-y-2"> <h3 class="text-xl font-semibold">Drop .case files here</h3>
  <p class="text-gray-400">or click to select files for training</p> </div>
- <label for="file-input" class="inline-block"> <Button class="bg-cyan-600 hover, bg-cyan-700 bits-btn"> Select Files </Button> </label>
+ <label for="file-input" class="inline-block"> <Button class="bg-cyan-600 hover, bg-cyan-700 bits-btn bits-btn"> Select Files </Button> </label>
  <input id="file-input"
           type="file"
           multiple accept=".case,.json"
           class="hidden"
           onchange={ handleFileInput } /> </div> </div>
  <!-- Selected, Files -->
-  {#if selectedFiles.length > 0} <div class="space-y-3" transition:fly={{ y: 20, duration, 300 }}> <h4 class="text-lg font-semibold">Selected Files ({selectedFiles.length})</h4>
+  {#if selectedFiles.length > 0} <div class="space-y-3" transition: fly={{, y: 20, duration, 300 }}> <h4 class="text-lg font-semibold">Selected Files ({selectedFiles.length})</h4>
  <div class="grid gap-2 max-h-40">
-  {#each selectedFiles as file, index} <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded border" transition:fly={{ x: -20, duration, 200 }}> <div class="flex items-center"> <span class="text-2xl">ðŸ“‹</span>
+  {#each selectedFiles as file, index} <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded border" transition: fly={{, x: -20, duration, 200 }}> <div class="flex items-center"> <span class="text-2xl">ðŸ“‹</span>
  <div> <p class="text-white">{file.name}
 </p>
  <p class="text-gray-400">{formatFileSize(file.size)}
@@ -90,16 +90,16 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <p class="text-purple-300">{currentJob.reinforcementLearning.bestReward.toFixed(3)}
 </p> </div> </div> {/if}
   <!-- Training, Controls --> <div class="flex">
-  {#if currentJob.status === 'running'} <Button.Root class="bits-btn" onclick={ pauseTraining } variant="ghost" size="sm"> â¸ï¸ Pause </Button>
- <Button.Root class="bits-btn" onclick={ stopTraining } variant="error" size="sm"> â¹ï¸ Stop </Button> {:else if currentJob.status === 'paused'} <Button.Root class="bits-btn" onclick={ resumeTraining } variant="default" size="sm"> â–¶ï¸ Resume </Button>
- <Button.Root class="bits-btn" onclick={ stopTraining } variant="error" size="sm"> â¹ï¸ Stop </Button> {/if}
-  <Button.Root class="bits-btn"
+  {#if currentJob.status === 'running'} <Button.Root class="bits-btn bits-btn" onclick={ pauseTraining } variant="ghost" size="sm"> â¸ï¸ Pause </Button>
+ <Button.Root class="bits-btn bits-btn" onclick={ stopTraining } variant="error" size="sm"> â¹ï¸ Stop </Button> {:else if currentJob.status === 'paused'} <Button.Root class="bits-btn bits-btn" onclick={ resumeTraining } variant="default" size="sm"> â–¶ï¸ Resume </Button>
+ <Button.Root class="bits-btn bits-btn" onclick={ stopTraining } variant="error" size="sm"> â¹ï¸ Stop </Button> {/if}
+  <Button.Root class="bits-btn bits-btn"
             onclick={() => showAdvancedConfig = !showAdvancedConfig} variant="ghost"
             size="sm"
             class="ml-auto"
           > âš™ï¸ Advanced Config </Button> </div> {/if}
   <!-- Advanced, Configuration -->
-  {#if showAdvancedConfig} <div class="space-y-4 border-t border-gray-700" transition:fly={{ y: -20, duration, 300 }}> <h4 class="text-lg font-semibold">Advanced Configuration</h4>
+  {#if showAdvancedConfig} <div class="space-y-4 border-t border-gray-700" transition: fly={{, y: -20, duration, 300 }}> <h4 class="text-lg font-semibold">Advanced Configuration</h4>
  <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <label class="text-sm font-medium" for="lora-rank">LoRA Rank</label>
 <input id="lora-rank"
               type="number"

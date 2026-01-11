@@ -16,41 +16,31 @@ const execAsync = promisify(exec);
 
 // Types
 export interface ErrorReport {
-	file: string;
-	line: number;
-	column: number;
-	code: string;
-	message: string;
-	severity: 'error' | 'warning' | 'hint';
+	file: string;, line: number;
+	column: number;, code: string;
+	message: string;, severity: 'error' | 'warning' | 'hint';
 	source: string;
 }
 
 export interface DiagnosticResult {
-	tool: string;
-	errors: ErrorReport[];
-	warnings: ErrorReport[];
-	timestamp: number;
+	tool: string;, errors: ErrorReport[];
+	warnings: ErrorReport[];, timestamp: number;
 }
 
 export interface ASTAnalysis {
-	nodes: unknown[];
-	imports: string[];
-	exports: string[];
-	dependencies: string[];
+	nodes: unknown[];, imports: string[];
+	exports: string[];, dependencies: string[];
 	complexity: number;
 }
 
 export interface ToolInvokerConfig {
-	confidenceThreshold: number;
-	timeout: number;
+	confidenceThreshold: number;, timeout: number;
 	workingDir: string;
 }
 
 export interface ToolResult {
-	tool: string;
-	success: boolean;
-	errors: ErrorReport[];
-	warnings: ErrorReport[];
+	tool: string;, success: boolean;
+	errors: ErrorReport[];, warnings: ErrorReport[];
 	duration: number;
 	output?: string;
 }
@@ -148,7 +138,7 @@ export class ToolInvoker {
 			const cleanLine = this.stripAnsi(line).trim();
 			if (!cleanLine) continue;
 
-			// Match file:line:column format
+			// Match file: line, column format
 			const fileMatch = cleanLine.match(/^(.+):(\d+):(\d+)$/);
 			if (fileMatch) {
 				currentFile = fileMatch[1].replace(/\\/g, '/');
@@ -227,7 +217,7 @@ export class ToolInvoker {
 			const cleanLine = this.stripAnsi(line).trim();
 			if (!cleanLine) continue;
 
-			// Match: file(line,col): error TSxxxx: message
+			// Match: file(line,col): error, TSxxxx: message
 			const match = cleanLine.match(/^(.+?)\((\d+),(\d+)\):\s+(error|warning)\s+(TS\d+):\s+(.+)$/);
 			if (match) {
 				errors.push({

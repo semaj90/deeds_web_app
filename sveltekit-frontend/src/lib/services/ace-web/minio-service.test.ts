@@ -116,7 +116,7 @@ describe('MinIOService', () => {
         title: 'Test Document',
         summary: 'This is a test summary',
         entities: ['Entity1', 'Entity2'],
-        relations: [{ src: 'Entity1', rel: 'relates_to', dst: 'Entity2' }],
+        relations: [{, src: 'Entity1', rel: 'relates_to', dst: 'Entity2' }],
       };
 
       const key = await service.storeSummary(docId, summary);
@@ -144,8 +144,8 @@ describe('MinIOService', () => {
 
       const docId = 'doc-456';
       const chunks = [
-        { text: 'Chunk 1 content', metadata: { index: 0 } },
-        { text: 'Chunk 2 content', metadata: { index: 1 } },
+        { text: 'Chunk 1 content', metadata: {, index: 0 } },
+        { text: 'Chunk 2 content', metadata: {, index: 1 } },
       ];
 
       const key = await service.storeChunks(docId, chunks);
@@ -177,8 +177,7 @@ describe('MinIOService', () => {
     it('should retrieve object successfully', async () => {
       const mockContent = 'Test content';
       mockSend.mockResolvedValueOnce({
-        Body: {
-          transformToString: async () => mockContent,
+        Body: {, transformToString: async () => mockContent,
         },
       });
 

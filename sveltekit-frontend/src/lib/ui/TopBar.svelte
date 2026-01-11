@@ -12,14 +12,14 @@ import Button from './Button.svelte';
  <div class="relative">
  <input
  class="bg-sandDark text-black px-3 py-1.5 pr-8 rounded border border-black/40 text-xs font-mono w-64
- focus:outline-none focus:ring-2 focus:ring-accent/50"
+ focus: outline-none, focus:ring-2 focus:ring-accent/50"
  placeholder="Search cases, evidence, persons..."
  type="search"
  />
  <span class="i-heroicons-magnifying-glass-20-solid absolute right-2 top-1.5 text-black/70" ></span>
  </div>
 
- <Button variant="secondary">Login</Button>
- <Button variant="primary">Register</Button>
+ <Button class="bits-btn" variant="secondary">Login</Button>
+ <Button class="bits-btn" variant="primary">Register</Button>
  </div>
 </header>

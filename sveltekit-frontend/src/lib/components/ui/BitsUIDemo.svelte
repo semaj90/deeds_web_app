@@ -101,7 +101,7 @@ import type { Case } from '$lib/types';
       ðŸ’¬ Dialog Components
     </h2>
     <!-- Dialog, Trigger, Button -->
-    <Button.Root, class="bits-btn"
+    <Button.Root, class="bits-btn bits-btn"
       variant="primary"
       size="md"
       onclick={() =>
@@ -151,13 +151,13 @@ showDialog = true}
         </div>
       {/snippet}
 {#snippet footer()}
-  <Button.Root, class="bits-btn"
+  <Button.Root, class="bits-btn bits-btn"
     variant="ghost"
     onclick={() => showDialog = false}
   >
     Cancel
   </Button>
-  <Button.Root, class="bits-btn"
+  <Button.Root, class="bits-btn bits-btn"
     variant="primary"
     onclick={handleCreateCase}
     disabled={!caseName || !clientName || !selectedCaseType}
@@ -184,10 +184,10 @@ showDialog = true}
                 {sampleCase.type} â€¢ {sampleCase.status}
               </p>
 <div class="flex">
-  <Button.Root, class="bits-btn" variant="ghost" size="sm">
+  <Button.Root, class="bits-btn bits-btn" variant="ghost" size="sm">
     <Eye class="w-4" />
   </Button>
-  <Button.Root, class="bits-btn" variant="ghost" size="sm">
+  <Button.Root, class="bits-btn bits-btn" variant="ghost" size="sm">
     <Edit class="w-4" />
   </Button>
 </div>

@@ -17,16 +17,16 @@
     isDemoRoute = currentPath.startsWith('/demo')});
   
   const quickLinks = [
-    { path: '/help', label: 'Help'; icon: 'â“' },
-    { path: '/privacy', label: 'Privacy'; icon: 'ðŸ”’' },
-    { path: '/terms', label: 'Terms'; icon: 'ðŸ“„' },
-    { path: '/contact', label: 'Contact'; icon: 'ðŸ“§' }
+    { path: '/help', label: 'Help';, icon: 'â“' },
+    { path: '/privacy', label: 'Privacy';, icon: 'ðŸ”’' },
+    { path: '/terms', label: 'Terms';, icon: 'ðŸ“„' },
+    { path: '/contact', label: 'Contact';, icon: 'ðŸ“§' }
   ];
   
   const socialLinks = [
-    { href: '#', label: 'GitHub'; icon: 'ðŸ”—' },
-    { href: '#', label: 'Documentation'; icon: 'ðŸ“š' },
-    { href: '#', label: 'Community'; icon: 'ðŸ‘¥' }
+    { href: '#', label: 'GitHub';, icon: 'ðŸ”—' },
+    { href: '#', label: 'Documentation';, icon: 'ðŸ“š' },
+    { href: '#', label: 'Community';, icon: 'ðŸ‘¥' }
   ];
 </script>
 <footer class="app-footer nes-container" data-variant={variant}>
@@ -160,8 +160,7 @@
     border-top: 3px solid var(--n64-primary, #4a90e2) !important
     font-family: 'Press Start 2P', cursive}
   .footer-content {
-    max-width: 1200px
-    margin: 0 auto
+    max-width: 1200px, margin: 0 auto
     padding: 1rem 0.5rem 0.5rem}
   /* Full Footer Layout */
   .footer-sections { display: grid
@@ -169,8 +168,7 @@
     margin-bottom: 1rem}
   .footer-section {
     display: flex
-    flex-direction: column
-    gap: 0.5rem}
+    flex-direction: column, gap: 0.5rem}
   .footer-title {
     font-size: 0.625rem !important
     margin: 0 !important
@@ -186,13 +184,11 @@
   .footer-description {
     font-size: 0.5rem
    ;color: var(--nier-text-secondary, #94a3b8);
-    line-height: 1.3
-    margin: 0}
+    line-height: 1.3, margin: 0}
   /* Gaming Badges */
   .gaming-badges {
     display: flex
-    flex-wrap: wrap
-    gap: 0.5rem}
+    flex-wrap: wrap, gap: 0.5rem}
   .badge {
     font-size: 0.4rem !important}
   /* Footer Navigation */
@@ -213,12 +209,10 @@
   /* Status Indicators */
   .status-indicators {
     display: flex
-    flex-direction: column
-    gap: 0.75rem}
+    flex-direction: column, gap: 0.75rem}
   .status-item {
     display: flex
-    align-items: center
-    gap: 0.5rem}
+    align-items: center, gap: 0.5rem}
   .status-dot {
     width: 8px !important
     height: 8px !important
@@ -232,8 +226,7 @@
   /* Resource Links */
   .resource-links {
     display: flex
-    flex-direction: column
-    gap: 0.5rem}
+    flex-direction: column, gap: 0.5rem}
   .resource-link {
     display: flex !important
     align-items: center !important
@@ -262,8 +255,7 @@
    ;color: var(--nier-text-muted, #64748b) !important}
   .tech-stack {
     display: flex
-    flex-wrap: wrap
-    gap: 0.5rem}
+    flex-wrap: wrap, gap: 0.5rem}
   .tech-badge {
     font-size: 0.4rem !important}
   /* Minimal Footer */
@@ -271,14 +263,12 @@
     display: flex
     justify-content: space-between
     align-items: center
-    flex-wrap: wrap
-    gap: 0.5rem
+    flex-wrap: wrap, gap: 0.5rem
     padding: 0.5rem 0
     font-size: 0.5rem !important
     margin: 0 !important}
   .minimal-links {
-    display: flex
-    gap: 1rem}
+    display: flex, gap: 1rem}
   /* Demo Footer */
   .demo-footer { background: linear-gradient(135deg, var(--n64-primary, #4a90e2), var(--n64-secondary, #7ed321)) !important
     margin: 1rem, 0 !important}
@@ -288,13 +278,11 @@
     margin-bottom: 1rem !important}
   .demo-info {
     display: flex
-    flex-direction: column
-    gap: 1rem
+    flex-direction: column, gap: 1rem
     align-items: center}
   .demo-text {
     font-size: 0.5rem !important
-    text-align: center
-    margin: 0 !important
+    text-align: center, margin: 0 !important
     color: white !important}
   .demo-actions {
     display: flex
@@ -304,8 +292,7 @@
   /* Responsive Design */
   @media (max-width: 768px) {
     .footer-sections {
-      grid-template-columns: 1fr
-      gap: 1.5rem}
+      grid-template-columns: 1fr, gap: 1.5rem}
     .footer-bottom {
       flex-direction: column
       align-items: flex-start}

@@ -12,18 +12,13 @@ import type { Case } from '$lib/types';
   import  Users  from "lucide-svelte/icons/users.svelte";
   import { cn } from '$lib/utils';
   export interface LegalPrecedent {
-    id: string
-    caseNumber: string
-    caseName: string
-    court: string
-    jurisdiction: 'federal' | 'state' | 'local' | 'international',date: Date, judge: string
-    summary: string
+    id: string, caseNumber: string
+    caseName: string, court: string
+    jurisdiction: 'federal' | 'state' | 'local' | 'international',date: Date, judge: string, summary: string
     keyIssues: string[],
-    holding: string
-    reasoning: string[],
+    holding: string, reasoning: string[],
     legalAreas: string[],
-    citations: number
-    relevanceScore: number; // 0-100
+    citations: number, relevanceScore: number; // 0-100
     similarityScore?: number; // 0-100 for current case relevance
     precedentType: 'binding' | 'persuasive' | 'distinguishable';
     overruled?: boolean
@@ -56,25 +51,25 @@ import type { Case } from '$lib/types';
   let expanded = $state<boolean>(false);
   // Precedent type configurations (use className to avoid JS reserved word)
   const precedentTypeConfig = {
-    binding: { label: 'Binding Precedent',
+    binding: {, label: 'Binding Precedent',
       className: 'bg-green-500/20 text-green-400 border-green-500/30',
       priority: 1
     },
-    persuasive: { label: 'Persuasive Authority',
+    persuasive: {, label: 'Persuasive Authority',
       className: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
       priority: 2
     },
-    distinguishable: { label: 'Distinguishable',
+    distinguishable: {, label: 'Distinguishable',
       className: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
       priority: 3
     }
   };
   // Jurisdiction configurations
   const jurisdictionConfig = {
-    federal: { label: 'Federal', icon: Scale, color: 'text-blue-400' },
-    state: { label: 'State', icon: MapPin, color: 'text-green-400' },
-    local: { label: 'Local', icon: MapPin, color: 'text-yellow-400' },
-    international: { label: 'International', icon: Scale, color: 'text-purple-400' }
+    federal: {, label: 'Federal', icon: Scale, color: 'text-blue-400' },
+    state: {, label: 'State', icon: MapPin, color: 'text-green-400' },
+    local: {, label: 'Local', icon: MapPin, color: 'text-yellow-400' },
+    international: {, label: 'International', icon: Scale, color: 'text-purple-400' }
   };
   // Reactive derived values (avoid using {@const} in template)
   const relevanceLevel = $derived((() => {

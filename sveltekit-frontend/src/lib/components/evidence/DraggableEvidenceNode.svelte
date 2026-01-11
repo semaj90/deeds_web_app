@@ -13,12 +13,10 @@
 
   import { FileText, Image, Video, Mic, Zap, Bot } from 'lucide-svelte';
   interface EvidenceNode {
-    id: string
-    title: string
+    id: string, title: string
     type: 'document' | 'image' | 'video' | 'audio' | 'transcript';
     content?: string
-    url?: string
-    x: number
+    url?: string, x: number
     y: number
     metadata?: {
       fileSize?: number
@@ -219,7 +217,7 @@ interface Props {
           <Button
             size="sm"
             variant="ghost"
-            class="p-1 h-6 w-6"
+            class="p-1 h-6 w-6 bits-btn"
             onclick={(e) => { e.stopPropagation(); analyzeEvidence()}}
 
    // Fixed: removed extra comma
@@ -329,8 +327,7 @@ interface Props {
   .line-clamp-2 {
     display: -webkit-box
     -webkit-line-clamp: 2
-    -webkit-box-orient: vertical
-    overflow: hidden
+    -webkit-box-orient: vertical, overflow: hidden
     line-clamp: 2; /*, Fixed: Added standard property */
   }
 </style>

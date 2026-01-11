@@ -2,29 +2,24 @@ import type { Project, SourceFile, SyntaxKind, Node, TypeChecker } from 'ts-morp
 import { getOllamaEndpoint } from '$lib/utils/ollama-endpoints';
 
 export interface ASTNode {
- id: string; kind: SyntaxKind;
- text: string; start: number;
- end: number; children: ASTNode[];
+ id: string;, kind: SyntaxKind;, text: string;, start: number;, end: number;, children: ASTNode[];
  type?: string;
  symbol?: string;
 }
 
 export interface AutosuggestContext {
- filePath: string; position: number;
- prefix: string; scope: 'global' | 'class' | 'function' | 'method';
+ filePath: string;, position: number;, prefix: string;, scope: 'global' | 'class' | 'function' | 'method';
  contextNode?: ASTNode;
 }
 
 export interface AutosuggestResult {
- suggestions: Autosuggestion[]; confidence: number;
- context: AutosuggestContext;
+ suggestions: Autosuggestion[];, confidence: number;, context: AutosuggestContext;
 }
 
 export interface Autosuggestion {
- text: string; kind: 'variable' | 'function' | 'class' | 'interface' | 'import' | 'property';
+ text: string;, kind: 'variable' | 'function' | 'class' | 'interface' | 'import' | 'property';
  type?: string;
- description?: string;
- score: number;
+ description?: string;, score: number;
 }
 
 /**
@@ -68,7 +63,7 @@ export class ASTProcessor {
 
  return {
  id: `${node.getKind()}_${node.getStart()}`,
- kind: node.getKind( text: node.getText( start: node.getStart( end: node.getEnd(),
+ kind: node.getKind(, text: node.getText(, start: node.getStart(, end: node.getEnd(),
  children,
  type: this.getNodeType(node, symbol: this.getNodeSymbol(node),
  };
@@ -239,7 +234,7 @@ export class ASTProcessor {
  suggestions.push({
  text: name,
  kind: 'property',
- type: prop.getType()?.getText( score: 0.9,
+ type: prop.getType()?.getText(, score: 0.9,
  });
  }
  }
@@ -251,7 +246,7 @@ export class ASTProcessor {
  suggestions.push({
  text: name,
  kind: 'function',
- type: method.getReturnType()?.getText( score: 0.85,
+ type: method.getReturnType()?.getText(, score: 0.85,
  });
  }
  }
@@ -300,7 +295,7 @@ export class ASTProcessor {
  suggestions.push({
  text: name,
  kind: 'variable',
- type: param.getType()?.getText( score: 0.85,
+ type: param.getType()?.getText(, score: 0.85,
  });
  }
  }
@@ -315,7 +310,7 @@ export class ASTProcessor {
  suggestions.push({
  text: name,
  kind: 'variable',
- type: decl.getType()?.getText( score: 0.8,
+ type: decl.getType()?.getText(, score: 0.8,
  });
  }
  }
@@ -390,12 +385,11 @@ Response:`;
  const response = await fetch(`${endpoints.primary}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: 'gemma3-legal:latest',
+ body: JSON.stringify({, model: 'gemma3-legal:latest',
  prompt,
  format: 'json',
- options: { temperature: 0.3, num_predict: 100 },
- options: { temperature: 0.3, num_predict: 100 },
+ options: {, temperature: 0.3, num_predict: 100 },
+ options: {, temperature: 0.3, num_predict: 100 },
  }),
  });
 
@@ -432,8 +426,7 @@ Response:`;
  /**
  * Get completion statistics for monitoring
  */
- getStats(): {
- filesProcessed: number; suggestionsGenerated: number;
+ getStats(): {, filesProcessed: number;, suggestionsGenerated: number;
  return {
  filesProcessed: this.project.getSourceFiles().length,
  suggestionsGenerated: 0, // Would track this in a real implementation

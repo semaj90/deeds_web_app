@@ -4,10 +4,8 @@
  import { onMount } from 'svelte';
 
  interface Props {
- evidenceId: string;
- fileName: string;
- documentType: string;
- confidence: number;
+ evidenceId: string;, fileName: string;
+ documentType: string;, confidence: number;
  metadata: Record<string, unknown>;
  onGenerateSummary: () => void;
  onReject: () => void;
@@ -96,7 +94,7 @@
  <button
  onclick={onGenerateSummary}
  disabled={isGenerating}
- class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-medium transition"
+ class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover: bg-blue-700, disabled:bg-gray-400 font-medium transition"
  >
  {isGenerating ? 'Generating...' : 'Generate Suggested Summary'}
  </button>

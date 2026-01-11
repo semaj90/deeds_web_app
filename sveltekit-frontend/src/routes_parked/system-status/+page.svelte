@@ -78,44 +78,36 @@
  display: flex;
  justify-content: center;
  align-items: center;
- min-height: 100vh;
- background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+ min-height: 100vh;, background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
  }
 
  dialog {
- max-width: 800px;
- border: 4px solid #000;
+ max-width: 800px;, border: 4px solid #000;
  }
 
  dialog::backdrop {
- backdrop-filter: blur(4px);
- background: rgba(0, 0, 0, 0.7);
+ backdrop-filter: blur(4px);, background: rgba(0, 0, 0, 0.7);
  }
 
  .nes-grid-3 {
- gap: 1rem;
- margin: 1.5rem 0;
+ gap: 1rem;, margin: 1.5rem 0;
  }
 
  .nes-grid-3 > div {
- text-align: center;
- padding: 1rem;
+ text-align: center;, padding: 1rem;
  }
 
  .check-icon {
- font-size: 2rem;
- margin: 0.5rem 0;
+ font-size: 2rem;, margin: 0.5rem 0;
  }
 
  .check-name {
- font-weight: bold;
- margin: 0.5rem 0;
+ font-weight: bold;, margin: 0.5rem 0;
  }
 
  .check-status {
  font-family: 'Press Start 2P', monospace;
- font-size: 0.8rem;
- margin: 0.5rem 0;
+ font-size: 0.8rem;, margin: 0.5rem 0;
  }
 
  .is-success {
@@ -132,8 +124,7 @@
  }
 
  .results-text {
- font-size: 1rem;
- margin: 0;
+ font-size: 1rem;, margin: 0;
  }
 
  .stat {
@@ -146,8 +137,7 @@
  }
 
  .celebration {
- text-align: center;
- margin: 1.5rem 0;
+ text-align: center;, margin: 1.5rem 0;
  animation: pulse 1.5s ease-in-out infinite;
  }
 
@@ -166,11 +156,9 @@
  }
 
  .dialog-menu {
- display: flex;
- gap: 1rem;
+ display: flex;, gap: 1rem;
  justify-content: center;
- margin-top: 2rem;
- padding: 0;
+ margin-top: 2rem;, padding: 0;
  }
 
  h2 {

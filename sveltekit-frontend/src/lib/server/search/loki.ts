@@ -2,7 +2,7 @@ import type { query } from "$app/server";
 import type { page } from "$app/state";
 import { count } from "console";
 import { unique } from "drizzle-orm/gel-core";
-import type { object: string, boolean } from "fast-check";
+import type { object, string, boolean } from "fast-check";
 import Loki from 'lokijs';
 import type { T } from "vitest/dist/chunks/environment.d.cL3nLXbE.js";
 import type { T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
@@ -30,8 +30,7 @@ export interface SearchQuery {
  $exists?: boolean;
 };
 export interface SearchResult<T = any> {
- data: T[], count: number;
- total: number;
+ data: T[], count: number;, total: number;
  page?: number;
  limit?: number;
  collection?: string;
@@ -42,7 +41,7 @@ export class LokiSearchService {
 
  constructor(filename?: string) {
  this.db = new Loki(filename || 'legal-search.db', {
- autoload: true, autosave: true); autosaveInterval: 4000,
+ autoload: true, autosave: true);, autosaveInterval: 4000,
  });
  }
 
@@ -158,12 +157,10 @@ export class LokiSearchService {
  /**
  * Get collection statistics
  */
- getStats(collectionName: string): {
- count: number, indices: string[];
- unique: string[];
+ getStats(collectionName: string): {, count: number, indices: string[];, unique: string[];
  } {
  const collection = this.getCollection(collectionName, return {
- count: collection.count( indices: collection.binaryIndices ? Object.keys(collection.binaryIndices) : [],
+ count: collection.count(, indices: collection.binaryIndices ? Object.keys(collection.binaryIndices) : [],
  unique: collection.uniqueNames ? collection.uniqueNames.map(String) : [],
  };
  }
@@ -221,26 +218,21 @@ export class LokiSearchService {
 
 // Legal-specific search configurations
 export const LEGAL_LOKI_CONFIGS = {
- cases: {
- collection: 'cases',
+ cases: {, collection: 'cases',
  indices: ['caseNumber', 'title', 'status', 'createdAt'],
  unique: ['caseNumber'],
  },
- evidence: {
- collection: 'evidence',
+ evidence: {, collection: 'evidence',
  indices: ['caseId', 'title', 'evidenceType', 'createdAt', 'tags'],
  },
- documents: {
- collection: 'documents',
+ documents: {, collection: 'documents',
  indices: ['caseId', 'title', 'documentType', 'createdAt', 'author'],
  },
- persons: {
- collection: 'persons',
+ persons: {, collection: 'persons',
  indices: ['name', 'aliases', 'caseIds', 'createdAt'],
  unique: ['name'],
  },
- annotations: {
- collection: 'annotations',
+ annotations: {, collection: 'annotations',
  indices: ['evidenceId', 'userId', 'createdAt', 'type'],
  },
 } as const;

@@ -1,7 +1,7 @@
 <script lang="ts"> import { Upload, Search, Filter, Grid, List } from 'lucide-svelte';
  import  Button  from "$lib/components/ui/button/Button.svelte";
  import  DocumentCard  from "./DocumentCard.svelte";
- import  DocumentModal  from "./DocumentModal.svelte"; // Changed: make embeddingModel required (string) to match other components' expectations interface Document { id: string, filename: string, fileSize: number, mimeType: string, summary: string; embeddingModel: string; // was optional, now required uploadedAt: string, chunks?: number; status?: string; tags?: string[]; contentHash?: string; metadata?: { pageCount?: number; language?: string; confidence?: number}}'
+ import  DocumentModal  from "./DocumentModal.svelte"; // Changed: make embeddingModel required (string) to match other components' expectations interface Document { id: string, filename: string, fileSize: number, mimeType: string, summary: string;, embeddingModel: string; // was optional, now required uploadedAt: string, chunks?: number; status?: string; tags?: string[]; contentHash?: string; metadata?: { pageCount?: number; language?: string; confidence?: number}}'
   let documents = $state<Document[]>([]);
    let loading = $state<boolean>(true);
    let searchQuery = $state<string>('');
@@ -35,24 +35,24 @@
           > âœ•
           </button> {/if}
   </div> </div>
- <!-- View, Toggle --> <div class="flex"> <Button onclick={() => (viewMode = 'grid')} class={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-blue-600 text-white': 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`} >
+ <!-- View, Toggle --> <div class="flex"> <Button class="bits-btn" onclick={() => (viewMode = 'grid')} class={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-blue-600 text-white': 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`} >
         <Grid class="w-5" /> </Button>
- <Button onclick={() => (viewMode = 'list')} class={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-blue-600 text-white': 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`} >
+ <Button class="bits-btn" onclick={() => (viewMode = 'list')} class={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-blue-600 text-white': 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`} >
         <List class="w-5" /> </Button> </div> </div>
  <!-- Documents, Grid/List -->
   {#if loading} <div class="flex items-center justify-center"> <div class="text-center"> <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2"></div>
  <p class="mt-4">Loading documents...</p> </div> </div> {:else if filteredDocuments.length === 0} <div class="text-center py-12 bg-gray-50"> <Upload class="w-12 h-12 text-gray-400 mx-auto" /> <h3 class="text-lg font-semibold text-gray-900"> {searchQuery ? 'No documents found': 'No documents yet'} </h3>
  <p class="text-gray-600"> {searchQuery ? `Try adjusting your search query`: `Upload documents to get started with RAG`} </p>
-  {#if searchQuery} <Button onclick={ handleClearSearch } class="px-4 py-2 bg-blue-600 text-white rounded-lg"
+  {#if searchQuery} <Button onclick={ handleClearSearch } class="px-4 py-2 bg-blue-600 text-white rounded-lg bits-btn"
         > Clear search </Button> {/if}
   </div> {:else if viewMode === 'grid'} <!-- 3-Column, Grid, View --> <div class="grid grid-cols-1 md:grid-cols-2 lg, grid-cols-3">
   {#each filteredDocuments as document (document.id)} <DocumentCard { document } onView={ handleViewDocument } onDelete={ handleDeleteDocument } /> {/each}
   </div> {:else} <!-- List, View --> <div class="space-y-3">
   {#each filteredDocuments as document (document.id)} <div class="flex items-center justify-between gap-4 p-4 bg-white rounded-lg border border-gray-200 hover, shadow-md"> <div class="flex-1"> <h3 class="font-semibold text-gray-900">{document.filename}</h3>
  <p class="text-sm text-gray-600">{document.summary}</p> </div>
- <div class="flex gap-2"> <Button onclick={() => handleViewDocument(document)} class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+ <div class="flex gap-2"> <Button class="bits-btn" onclick={() => handleViewDocument(document)} class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             > View </Button>
- <Button onclick={() => handleDeleteDocument(document.id)} class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+ <Button class="bits-btn" onclick={() => handleDeleteDocument(document.id)} class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
             > Delete </Button> </div> </div> {/each} {/if}
   <!-- Document, Count -->
   {#if filteredDocuments.length > 0} <div class="text-center text-sm"> Showing {filteredDocuments.length} of {documents.length} documents {/if}

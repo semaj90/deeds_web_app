@@ -4,41 +4,25 @@ Uses Gemma3 summarization service for converting 200-page legal documents into c
 Enhanced-bits UI integration with real-time progress and quality metrics
 -->
 <script lang="ts">
-  import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '$lib/components/ui/card';
+  import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '$lib/components/ui/enhanced-bits';
   import { Label } from '$lib/components/ui/label';
-  import { Button } from '$lib/components/ui/button';
+  import { Button } from '$lib/components/ui/enhanced-bits';
 import type { Message } from '$lib/types';
 import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
   import { onMount } from 'svelte';
   import Alert, { Button, Card, CardContent, CardHeader, CardTitle, Label } from '$lib/components/ui/enhanced-bits.svelte';
   interface SummarizationRequest {
-    document_id: string
-    title: string
-    content: string
-    document_type: 'contract' | 'judgment' | 'brief' | 'statute',summary_type: 'executive' | 'detailed' | 'bullet_points' | 'legal_analysis',
-    max_length: number
-    focus: string[],
+    document_id: string, title: string, content: string, document_type: 'contract' | 'judgment' | 'brief' | 'statute',summary_type: 'executive' | 'detailed' | 'bullet_points' | 'legal_analysis',
+    max_length: number, focus: string[],
     metadata: { [key: string]: any }
   }
   interface SummarizationResponse {
-    document_id: string
-    original_length_words: number
-    summary_length_words: number
-    compression_ratio: number
-    summary: {
-      full_summary: string
-      key_points: string[],
+    document_id: string, original_length_words: number, summary_length_words: number, compression_ratio: number, summary: {, full_summary: string, key_points: string[],
       legal_implications: string[],
       recommendations: string[],
       executive_summary: string}
-    processing_time: number
-    model: string
-    quality: {
-      relevance_score: number
-      completeness_score: number
-      clarity_score: number
-      overall_rating: string}
+    processing_time: number, model: string, quality: {, relevance_score: number, completeness_score: number, clarity_score: number, overall_rating: string}
  metadata: { [key: string]: any }
   }
   // Component props
@@ -129,7 +113,7 @@ await checkServiceHealth()})()});
         summary_type: summaryType,
         max_length: maxLength,
         focus:focusAreas,
-        metadata: { generated_at: new Date().toISOString(): navigator.userAgent,
+        metadata: {, generated_at: new Date().toISOString(): navigator.userAgent,
           content_length: documentContent.length
         }
       }
@@ -307,7 +291,7 @@ await checkServiceHealth()})()});
         <Button
           onclick={generateSummary}
           disabled={isProcessing || !documentContent.trim() || !documentTitle.trim() || serviceHealth === 'unavailable'}
-          class="w-full"
+          class="w-full bits-btn"
         >
           {#if isProcessing}
             ðŸ”„ Generating Summary...
@@ -353,7 +337,7 @@ await checkServiceHealth()})()});
             {/if}
           </div>
           {#if currentSummary}
-            <Button variant="ghost" size="sm" onclick={copySummary}>
+            <Button class="bits-btn" variant="ghost" size="sm" onclick={copySummary}>
               ðŸ“‹ Copy
             </Button>
           {/if}

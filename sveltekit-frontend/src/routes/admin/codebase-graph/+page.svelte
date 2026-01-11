@@ -4,32 +4,24 @@
 	import { onMount } from 'svelte';
 
 	interface VectorCluster {
-		id: number;
-		cluster_id: number;
-		pattern: string;
-		error_count: number;
-		avg_similarity: number;
-		file_paths: string[];
-		summary: string;
-		tags: string[];
+		id: number;, cluster_id: number;
+		pattern: string;, error_count: number;
+		avg_similarity: number;, file_paths: string[];
+		summary: string;, tags: string[];
 		embedding: number[];
 	}
 
 	interface GraphNode {
-		id: string;
-		label: string;
+		id: string;, label: string;
 		type: 'file' | 'error' | 'cluster' | 'fix';
 		cluster_id?: number;
-		similarity?: number;
-		tags: string[];
+		similarity?: number;, tags: string[];
 		fix_status?: 'pending' | 'in-progress' | 'applied' | 'failed';
 	}
 
 	interface GraphEdge {
-		source: string;
-		target: string;
-		weight: number;
-		type: 'similarity' | 'dependency' | 'fix-attempt';
+		source: string;, target: string;
+		weight: number;, type: 'similarity' | 'dependency' | 'fix-attempt';
 	}
 
 	let clusters = $state<VectorCluster[]>([]);
@@ -107,8 +99,7 @@
 			const response = await fetch('/api/phase89/vector-search', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					query: searchQuery,
+				body: JSON.stringify({, query: searchQuery,
 					limit: 10,
 					threshold: 0.7
 				})
@@ -127,8 +118,7 @@
 			const response = await fetch('/api/phase89/similar-clusters', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					cluster_id: cluster.cluster_id,
+				body: JSON.stringify({, cluster_id: cluster.cluster_id,
 					embedding: cluster.embedding,
 					limit: 5
 				})
@@ -150,12 +140,10 @@
 			const response = await fetch('/api/phase89/agentic-fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					cluster_id: cluster.cluster_id,
+				body: JSON.stringify({, cluster_id: cluster.cluster_id,
 					pattern: cluster.pattern,
 					file_paths: cluster.file_paths,
-					context: {
-						summary: cluster.summary,
+					context: {, summary: cluster.summary,
 						tags: cluster.tags,
 						similar_clusters: similarClusters.map((c) => c.pattern)
 					}
@@ -224,12 +212,12 @@
 					bind:value={searchQuery}
 					placeholder="Search errors, patterns, or tags..."
 					class="flex-1 px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white
-					       placeholder-gray-500 focus:border-purple-500 focus:outline-none"
+					       placeholder-gray-500 focus: border-purple-500, focus:outline-none"
 					onkeydown={(e) => e.key === 'Enter' && performVectorSearch()}
 				/>
 				<Button
 					class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
-					       font-medium transition-colors"
+					       font-medium transition-colors bits-btn"
 					onclick={ performVectorSearch }
 				>
 					Search
@@ -285,7 +273,7 @@
 					Loading clusters...
 				</div>
 			{:else}
-				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+				<div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-3 gap-4">
 					{#each clusters as cluster}
 						<button
 							class="p-6 bg-gray-800/50 hover:bg-gray-800 rounded-xl border border-gray-700
@@ -415,7 +403,7 @@
 							<div class="flex gap-3 pt-4 border-t border-gray-700">
 								<Button
 									class="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
-									       font-medium transition-colors flex items-center justify-center gap-2"
+									       font-medium transition-colors flex items-center justify-center gap-2 bits-btn"
 									onclick={() => initiateAgenticFix(selectedCluster)}
 								>
 									<div class="i-carbon-machine-learning"></div>
@@ -423,7 +411,7 @@
 								</Button>
 								<Button
 									class="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
-									       transition-colors"
+									       transition-colors bits-btn"
 									onclick={() => (detailsOpen = false)}
 								>
 									Close
@@ -462,7 +450,7 @@
 
 					<Button
 						class="w-full px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
-						       transition-colors"
+						       transition-colors bits-btn"
 						onclick={() => (fixDialogOpen = false)}
 					>
 						Close

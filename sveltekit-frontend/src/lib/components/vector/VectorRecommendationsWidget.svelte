@@ -69,7 +69,7 @@ Compact AI recommendations component for sidebar/dashboard use
     try {
       const result = await vectorIntelligenceService.generateRecommendations({
         context,
-        userProfile: { role: userRole,
+        userProfile: {, role: userRole,
           experience: 'senior',
           specialization: ['legal-analysis', 'case-management']
         },
@@ -80,7 +80,7 @@ Compact AI recommendations component for sidebar/dashboard use
               status: 'active'
             }
           : undefined,
-        preferences: { preferredActions: ['research', 'analysis', 'documentation'],
+        preferences: {, preferredActions: ['research', 'analysis', 'documentation'],
           workflowStyle: 'systematic'
         }
       });
@@ -116,8 +116,7 @@ Compact AI recommendations component for sidebar/dashboard use
       case, 'warning':
         return 'border-l-red-500 bg-red-50/50 dark:bg-red-900/10',
       case, 'opportunity':
-        return 'border-l-purple-500 bg-purple-50/50 dark:bg-purple-900/10';
- default: return 'border-l-gray-500 bg-gray-50/50 dark:bg-gray-900/10'}
+        return 'border-l-purple-500 bg-purple-50/50 dark: bg-purple-900/10';, default: return 'border-l-gray-500 bg-gray-50/50 dark:bg-gray-900/10'}
   }
   function getPriorityIcon(priority: string) {
     switch (priority) {
@@ -138,7 +137,7 @@ Compact AI recommendations component for sidebar/dashboard use
       case, 'medium':
         return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30, dark:text-yellow-400',
       case, 'low':
-        return 'text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400';
+        return 'text-green-600 bg-green-100 dark: bg-green-900/30, dark:text-green-400';
  default: return 'text-gray-600 bg-gray-100 dark:bg-gray-900/30, dark:text-gray-400'}
   }
   function getConfidenceColor(confidence: number) {
@@ -173,7 +172,7 @@ Compact AI recommendations component for sidebar/dashboard use
           size="sm"
           onclick={loadRecommendations}
           disabled={isLoading}
-          class="h-7 w-7 p-0 bits-btn bits-btn"
+          class="h-7 w-7 p-0 bits-btn bits-btn bits-btn"
         >
           <RefreshCw class="h-3" />
         </Button>

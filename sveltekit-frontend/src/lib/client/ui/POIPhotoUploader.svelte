@@ -3,7 +3,7 @@
  import { Camera } from "lucide-svelte";
 import { Upload } from "lucide-svelte";;
 
- let { poiId, disabled = false, onUpload, onError } = $props<{ poiId: number; disabled?: boolean; onUpload: (data: any) => void; onError: (error: any) => void }>();
+ let { poiId, disabled = false, onUpload, onError } = $props<{ poiId: number; disabled?: boolean;, onUpload: (data: any) => void; onError: (error: any) => void }>();
 
  let dragging = $state(false);
  let uploading = $state(false);
@@ -110,7 +110,7 @@ import { Upload } from "lucide-svelte";;
  type="button"
  variant="outline"
  onclick={triggerFileSelect}
- class="mt-2"
+ class="mt-2 bits-btn"
  >
  <Camera class="w-4 h-4 mr-2" />
  Browse Files

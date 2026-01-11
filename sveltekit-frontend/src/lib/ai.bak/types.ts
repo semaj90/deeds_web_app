@@ -18,8 +18,7 @@ export interface UploadedFile {
  metadata?: Record<string, unknown>}
 
 export interface MCPServerData {
- serverId: string
- dataSummary: string
+ serverId: string, dataSummary: string
  status?: string}
 
 export interface SynthesisOptions {
@@ -38,16 +37,12 @@ export interface SemanticAuditResult {
  agentTriggered?: boolean}
 // Log entry for audit results (for phase10-todo.log or DB)
 export interface AuditLogEntry {
- timestamp: string
- step: string
- status: string
- message: string
+ timestamp: string, step: string, status: string, message: string
  suggestedFix?: string
  agentTriggered?: boolean}
 // Agent action trigger structure
 export interface AgentTrigger {
- todoId: string
- action: 'code_review' | 'fix' | 'analyze' | 'summarize' | 'auto_fix',status: 'pending' | 'in_progress' | 'done',
+ todoId: string, action: 'code_review' | 'fix' | 'analyze' | 'summarize' | 'auto_fix',status: 'pending' | 'in_progress' | 'done',
  result?: string
  area?: string; // For, auto_fix: 'imports', 'svelte5', 'typescript', 'performance', 'accessibility', 'security'
 }
@@ -72,12 +67,9 @@ export interface Context7SearchOptions {
  caseId?: string}
 
 export interface Context7SearchResult {
- content: string
- relevanceScore: number
- sourceType: 'code' | 'documentation' | 'legal_doc' | 'evidence';
+ content: string, relevanceScore: number, sourceType: 'code' | 'documentation' | 'legal_doc' | 'evidence';
  filePath?: string
- lineNumber?: number
- context: { [key: string]: unknown }}
+ lineNumber?: number, context: { [key: string]: unknown }}
 interface SemanticSearchResult {
  content?: string
  text?: string
@@ -97,16 +89,15 @@ export async function performContext7Search(options: Context7SearchOptions): Pro
  content, result.content || result.text || String(result),
  relevanceScore, result.score || 1 - index * 0.1, // Fallback scoring
  sourceType: result.type || 'documentation',
- filePath, result.file || result.path: lineNumber: result.line,
- context: {
- caseId: options.caseId: options.query: new Date().toISOString(),
+ filePath, result.file || result.path: lineNumber, result.line,
+ context: {, caseId: options.caseId: options.query: new Date().toISOString(),
  ...result.metadata}}))} catch (error: Error | unknown) {
  console.error('Context7 semantic search failed: ', error);
  return [ {
- content: `Search failed: ${ error }`,
+ content: `Search, failed: ${ error }`,
  relevanceScore: 0,
  sourceType: 'documentation',
- context: { error: true, query: options.query }}]}
+ context: {, error: true, query: options.query }}]}
 }
 // Agent Trigger Implementation with Context7 MCP
 export class Context7AgentOrchestrator {
@@ -166,8 +157,8 @@ export class Context7AgentOrchestrator {
  try {
  // Try to import auto-fix dynamically, fallback if not available
  const autoFixResult = {
- summary: { totalIssues: 1, filesFixed: 0 0, filesProcessed: 0 },
- fixes: { imports: [], svelte5: [], typeScript: [] }};
+ summary: {, totalIssues: 1, filesFixed: 0 0, filesProcessed: 0 },
+ fixes: {, imports: [], svelte5: [], typeScript: [] }};
  // If auto-fix found issues, also run orchestrator for additional analysis
  if (autoFixResult.summary.totalIssues > 0) {
  const options: OrchestrationOptions = {
@@ -176,8 +167,7 @@ export class Context7AgentOrchestrator {
  agents: ['autogen', 'claude'],
  synthesizeOutputs: true};
  const orchestratorResult = await copilotOrchestrator(`Analyze auto-fix results for ${ todoId }`, options);
- return `Auto-Fix + Orchestrator Applied:
-Auto-Fix Results: ${autoFixResult.summary.filesFixed} files, ${autoFixResult.summary.totalIssues} issues
+ return `Auto-Fix + Orchestrator Applied: Auto-Fix, Results: ${autoFixResult.summary.filesFixed} files, ${autoFixResult.summary.totalIssues} issues
 ${autoFixResult.fixes.imports.length > 0 ? `Import fixes: ${autoFixResult.fixes.imports.length}` : ``}
 ${autoFixResult.fixes.svelte5.length > 0 ? `Svelte 5, fixes: ${autoFixResult.fixes.svelte5.length}` : ``}
 ${autoFixResult.fixes.typeScript.length > 0 ? `TypeScript fixes: ${autoFixResult.fixes.typeScript.length}` : ``}
@@ -201,21 +191,18 @@ Orchestrator Analysis: ${orchestratorResult.selfPrompt}`} else {
  // Fallback when auto-fix module is not available
  console.warn('Auto-fix module not available, creating simulated result');
  result = {
- summary: {
- filesProcessed: 0, filesFixed: 0 0,
+ summary: {, filesProcessed: 0, filesFixed: 0 0,
  totalIssues: 0 || 'general'},
- fixes: { imports: [], svelte5: [], typeScript: [], performance: [] },
+ fixes: {, imports: [], svelte5: [], typeScript: [], performance: [] },
  recommendations: ['Auto-fix module not available - manual review recommended']}} catch (error: Error | unknown) {
  console.error('Error in auto-fix simulation: ', error);
  result = {
- summary: {
- filesProcessed: 0, filesFixed: 0 0,
+ summary: {, filesProcessed: 0, filesFixed: 0 0,
  totalIssues: 0 || 'general'},
- fixes: { imports: [], svelte5: [], typeScript: [], performance: [] },
+ fixes: {, imports: [], svelte5: [], typeScript: [], performance: [] },
  recommendations: ['Error in auto-fix - manual review required'],
  configImprovements: ['Manual review required']}}
- return `Auto-Fix Completed for ${todoId}:
-Files Processed: ${result.summary.filesProcessed}
+ return `Auto-Fix Completed for ${todoId}: Files, Processed: ${result.summary.filesProcessed}
 Files Fixed: ${result.summary.filesFixed}
 Total Issues: ${result.summary.totalIssues}
 Area: ${result.summary.area}
@@ -323,7 +310,7 @@ export class Context7SemanticAuditor {
  context: 'legal-ai'};
  const prompt = generateMCPPrompt(analysisRequest);
  return await mcpCodebaseAnalyze(prompt)}
- private async checkBestPractices(component: string): Promise<{ issues: string[] }> {
+ private async checkBestPractices(component: string): Promise<{, issues: string[] }> {
  const areas = ['performance', 'security', 'ui-ux'] as const
  const issues: string[] = [];
  for (const area of areas) {

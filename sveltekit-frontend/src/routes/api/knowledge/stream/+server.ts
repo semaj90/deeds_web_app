@@ -129,12 +129,10 @@ async function streamOllamaResponse(
 	const response = await fetch(`${OLLAMA_URL}/api/generate`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			model: MODEL,
+		body: JSON.stringify({, model: MODEL,
 			prompt,
 			stream: true,
-			options: {
-				temperature: 0.3,
+			options: {, temperature: 0.3,
 				num_predict: 2048
 			}
 		})

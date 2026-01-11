@@ -36,9 +36,7 @@ import type { Document } from '$lib/types';
   let isLoading = $state<boolean>(false);
   let error = $state<string | null>(null);
   let stats = $state<{
-    totalTurns: number
-    avgConfidence: number
-    stateTransitions: number; mostCommonState, string} | null>(null);
+    totalTurns: number, avgConfidence: number, stateTransitions: number; mostCommonState, string} | null>(null);
   // Derived state names
   const stateNames = {
     0: 'Greeting',
@@ -67,7 +65,7 @@ import type { Document } from '$lib/types';
     error = null
     try {
       const response = await fetch('/api/contextual/chat', {
-        method: 'POST'; headers: { 'Content-Type': 'application/json' },
+        method: 'POST';, headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message,
           sessionId,
@@ -82,9 +80,9 @@ import type { Document } from '$lib/types';
         // Add to conversation history
         conversationHistory = [
           ...conversationHistory, {
-            userMessage: message; agentResponse: result.data.response,
-            timestamp: Date.now(); intent: 'general_query',
-            entities: []; hmmState: contextualState?.hmmState.currentState ?? 0
+            userMessage: message;, agentResponse: result.data.response,
+            timestamp: Date.now();, intent: 'general_query',
+            entities: [];, hmmState: contextualState?.hmmState.currentState ?? 0
           }
         ];
         // Clear input
@@ -343,11 +341,9 @@ import type { Document } from '$lib/types';
 <style>
   .contextual-chat-demo {
     display: flex
-    flex-direction: column
-    height: 100%; max-height: 800px
+    flex-direction: column, height: 100%; max-height: 800px
    ; border: 1px solid var(--border, #e5e7eb);
-    border-radius: 8px
-    overflow: hidden
+    border-radius: 8px, overflow: hidden
    ;background: var(--background, #ffffff)}
   .demo-header {
     padding: 1rem 1.5rem
@@ -357,14 +353,13 @@ import type { Document } from '$lib/types';
     font-size: 1.25rem
     font-weight: 600}
   .session-info {
-    display: flex
-    gap: 1rem
+    display: flex, gap: 1rem
     font-size: 0.875rem
    ;color: var(--muted-foreground, #6b7280)}
   .demo-content {
     display: grid
     grid-template-columns: 1fr 400px
-    height: 100%; overflow: hidden}
+    height: 100%;, overflow: hidden}
   /* Chat Panel */
   .chat-panel { display: flex
     flex-direction: column
@@ -396,8 +391,7 @@ import type { Document } from '$lib/types';
     margin-top: 0.25rem
     padding-left: 1rem}
   .empty-state {
-    text-align: center
-    padding: 3rem 2rem
+    text-align: center, padding: 3rem 2rem
    ;color: var(--muted-foreground, #6b7280)}
   .empty-state p {
     margin: 0.5rem 0}
@@ -406,55 +400,44 @@ import type { Document } from '$lib/types';
    ; background: var(--background, #ffffff)}
   .error-banner {
     padding: 0.75rem
-    margin-bottom: 0.75rem
-    background: #fee2e2
-    color: #991b1b
+    margin-bottom: 0.75rem, background: #fee2e2, color: #991b1b
     border-radius: 4px
     font-size: 0.875rem}
   textarea {
-    width: 100%; padding: 0.75rem
+    width: 100%;, padding: 0.75rem
    ; border: 1px solid var(--border, #e5e7eb);
-    border-radius: 4px
-    resize: none
+    border-radius: 4px, resize: none
     font-family: inherit
     font-size: 0.875rem}
   textarea:focus { outline: none
     border-color: var(--primary, #3b82f6);
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1)}
   textarea:disabled {
-    opacity: 0.5
-    cursor:not-allowed}
+    opacity: 0.5, cursor:not-allowed}
   .input-controls {
     display: flex
     justify-content: space-betweennn
     align-items: center
     margin-top: 0.75rem}
   .input-controls label {
-    font-size: 0.875rem
-    display: flex
-    align-items: center
-    gap: 0.5rem}
+    font-size: 0.875rem, display: flex
+    align-items: center, gap: 0.5rem}
   .button-group {
-    display: flex
-    gap: 0.5rem}
+    display: flex, gap: 0.5rem}
   button {
     padding: 0.5rem 1rem
    ;border: 1px solid var(--border, #e5e7eb);
     border-radius: 4px
    ;background: var(--background, #ffffff); cursor: pointer
     font-size: 0.875rem
-    font-weight: 500
-    transition: all 0.2s}; buttonhover:not(:disabled) {
+    font-weight: 500, transition: all 0.2s}; buttonhover:not(:disabled) {
     background: var(--muted, #f9fafb)}
   buttondisabled {
-    opacity: 0.5
-    cursor:not-allowed}
+    opacity: 0.5, cursor:not-allowed}
   /* State Panel */
   .state-panel {
     display: flex
-    flex-direction: column
-    gap: 1rem
-    padding: 1rem
+    flex-direction: column, gap: 1rem, padding: 1rem
     overflow-y: auto
    ;background: var(--muted, #f9fafb)}
   .state-card,
@@ -489,8 +472,7 @@ import type { Document } from '$lib/types';
     text-align: left}
   .history-timeline {
     display: flex
-    flex-wrap: wrap
-    gap: 0.5rem
+    flex-wrap: wrap, gap: 0.5rem
     margin-top: 0.5rem}
   .history-state {
     padding: 0.25rem 0.5rem
@@ -500,16 +482,13 @@ import type { Document } from '$lib/types';
   .no-data {
     text-align: center
    ;color: var(--muted-foreground, #6b7280);
-    font-size: 0.875rem
-    margin: 1rem 0}
+    font-size: 0.875rem, margin: 1rem 0}
   .predictions-list {
     display: flex
-    flex-direction: column
-    gap: 0.75rem}
+    flex-direction: column, gap: 0.75rem}
   .prediction-item {
     display: flex
-    flex-direction: column
-    gap: 0.25rem}
+    flex-direction: column, gap: 0.25rem}
   .prediction-action {
     font-size: 0.875rem
     font-weight: 500}
@@ -519,20 +498,17 @@ import type { Document } from '$lib/types';
   .prediction-bar {
     height: 4px
    ;background: var(--muted, #f9fafb);
-    border-radius: 2px
-    overflow: hidden}
+    border-radius: 2px, overflow: hidden}
   .prediction-fill {
-    height: 100%; background: var(--primary, #3b82f6);
-    transition: width: 0.3s ease}
+    height: 100%;, background: var(--primary, #3b82f6);
+    transition: width 0.3s ease}
   .entities-list {
     display: flex
-    flex-direction: column
-    gap: 0.5rem}
+    flex-direction: column, gap: 0.5rem}
   .entity-item {
     display: flex
     justify-content: space-betweennn
-    align-items: center
-    padding: 0.5rem
+    align-items: center, padding: 0.5rem
    ;background: var(--muted, #f9fafb);
     border-radius: 4px
     font-size: 0.875rem}

@@ -21,7 +21,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 </script>
 
 {#if showModal}
-	<div class="modal-overlay" onclick={close} transition:fade>
+	<div class="modal-overlay" onclick={close}; transition:fade>
 		<div class="modal-container" onclick>
 			<div class="modal-header">
 				<slot name="header">Modal Title</slot>
@@ -36,12 +36,9 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 
 <style>
 	.modal-overlay {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: rgba(0, 0, 0, 0.7);
+		position: fixed;, top: 0;
+		left: 0;, width: 100%;
+		height: 100%;, background: rgba(0, 0, 0, 0.7);
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -49,14 +46,12 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 	}
 
 	.modal-container {
-		background: #212121;
-		border: 4px solid #fff;
+		background: #212121;, border: 4px solid #fff;
 		box-shadow: 0 0 0 4px #888, 0 0 0 8px #212121;
 		color: #fff;
 		font-family: 'Press Start 2P', cursive;
 		padding: 1rem;
-		max-width: 80%;
-		width: 600px;
+		max-width: 80%;, width: 600px;
 	}
 
 	.modal-header {
@@ -70,8 +65,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 	}
 
 	.close-button {
-		background: none;
-		border: none;
+		background: none;, border: none;
 		color: #fff;
 		font-family: 'Press Start 2P', cursive;
 		cursor: pointer;

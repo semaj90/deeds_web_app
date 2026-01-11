@@ -20,8 +20,7 @@ export type FileType = (typeof FILE_TYPES)[number];
 export type ProcessingStatus = (typeof PROCESSING_STATUSES)[number];
 
 export interface ValidationResult {
- valid: boolean;
- errors: string[];
+ valid: boolean;, errors: string[];
 }
 
 export interface EvidenceInput {

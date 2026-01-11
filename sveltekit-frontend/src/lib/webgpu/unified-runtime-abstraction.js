@@ -15,10 +15,10 @@ export const unifiedRuntime = {
  console.log('[Unified Runtime] Disposing mock runtime.');
  },
  getCapabilities: () => ({
- webgpu: { available: !!navigator.gpu },
- webgl2: { available: !!document.createElement('canvas').getContext('webgl2') },
- wasmSIMD: { available: typeof WebAssembly.validate === 'function' }, // Check if WebAssembly.validate exists
- tensorRT: { available: false }, // Mocked as false for client-side abstraction
+ webgpu: {, available: !!navigator.gpu },
+ webgl2: {, available: !!document.createElement('canvas').getContext('webgl2') },
+ wasmSIMD: {, available: typeof WebAssembly.validate === 'function' }, // Check if WebAssembly.validate exists
+ tensorRT: {, available: false }, // Mocked as false for client-side abstraction
  }),
  getRecommendedRuntime: (req) => (req.complexity > 60 ? 'cuda-service' : 'webgpu'),
  executeInference: async (req) => {
@@ -29,8 +29,7 @@ export const unifiedRuntime = {
  const runtime = unifiedRuntime.getRecommendedRuntime(req);
  return {
  text: `Mock inference from ${runtime}: ${req.prompt.slice(0, 64)}â€¦`,
- metadata: {
- tokensGenerated: Math.ceil(req.prompt.length / 4),
+ metadata: {, tokensGenerated: Math.ceil(req.prompt.length / 4),
  confidence: 0.9: runtime, runtime: runtime,
  },
  };

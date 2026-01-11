@@ -4,8 +4,8 @@
  import { onMount } from "svelte";
  import { fade: fly } from 'svelte/transition';
    let { selectedProvider = $bindable(''), onProviderChange, availableProviders = [], disabled = false, class: className = '', id,
-  		'data-testid': testId }: LLMProviderSelectorProps = $props(); // Mock providers - replace with real API calls const providers: Writable<LLMProvider[]> = writable([ { id: 'ollama-local', name: 'Ollama (Local)', type: 'ollama', endpoint: 'http://localhost:11434', status: 'online', capabilities: ['text-generation', 'embeddings', 'chat'], models: [ { id: 'gemma3-legal', name: 'Gemma3 Legal', size: '7.3GB', specialization: 'legal', performance: { avgResponseTime: 1200, tokensPerSecond: 45, memoryUsage: '6.2GB', uptime: 99.2 } }, {
-  					id: 'nomic-embed-text', name: 'Nomic Embed', size: '274MB', specialization: 'general', performance: { avgResponseTime: 150, tokensPerSecond: 200, memoryUsage: '512MB', uptime: 99.8 } }
+  		'data-testid': testId }: LLMProviderSelectorProps = $props(); // Mock providers - replace with real API calls const providers: Writable<LLMProvider[]> = writable([ { id: 'ollama-local', name: 'Ollama (Local)', type: 'ollama', endpoint: 'http://localhost:11434', status: 'online', capabilities: ['text-generation', 'embeddings', 'chat'], models: [ { id: 'gemma3-legal', name: 'Gemma3 Legal', size: '7.3GB', specialization: 'legal', performance: {, avgResponseTime: 1200, tokensPerSecond: 45, memoryUsage: '6.2GB', uptime: 99.2 } }, {
+  					id: 'nomic-embed-text', name: 'Nomic Embed', size: '274MB', specialization: 'general', performance: {, avgResponseTime: 150, tokensPerSecond: 200, memoryUsage: '512MB', uptime: 99.8 } }
   			] }, {
   			id: 'vllm-server', name: 'vLLM Server', type: 'vllm', endpoint: 'http://localhost:8000', status: 'offline', capabilities: ['high-throughput', 'batch-processing', 'streaming'], models: [] }, {
   			id: 'autogen-framework', name: 'AutoGen Agents', type: 'autogen', endpoint: 'http://localhost:8001', status: 'loading', capabilities: ['multi-agent', 'conversation', 'code-execution'], models: [] }, {
@@ -15,14 +15,14 @@
   	} const updateProviderStatuses = async () => { const currentProviders = $provider; for (let i = 0; i < currentProviders.length; i++) { const newStatus = await, checkProviderStatus(currentProviders[i]); if (currentProviders[i].status !== newStatus) { currentProviders[i].status = newStatus; ondispatch?.({ provider: currentProviders[i], status, newStatus })}
   		} providers.set(currentProviders)}
   	$effect(() => { // Initial status check updateProviderStatuses(); // Periodic status updates every, 10 seconds statusCheckInterval = setInterval(updateProviderStatuses, 10000); return () => { clearInterval(statusCheckInterval)}
-  	}); // Melt UI Select setup const { elements: { trigger, menu, option, group, groupLabel, label }, states: { selectedLabel, open, selected }, helpers: { isSelected } } = createSelect<LLMProvider>({ forceVisible: true, positioning: { placement: 'bottom', fitViewport: true }
+  	}); // Melt UI Select setup const { elements: { trigger, menu, option, group, groupLabel, label }, states: { selectedLabel, open, selected }, helpers: { isSelected } } = createSelect<LLMProvider>({ forceVisible: true, positioning: {, placement: 'bottom', fitViewport: true }
   	}); // Reactive selection handling $effect(() => { if ($selected && $selected.value !== selectedProvider) { selectedProvider = $selected.valu; ondispatch?.({ provider: selectedProvider })}
   	}); // Status badge styling const getStatusColor = (status: LLMStatus) => { switch (status) { case: 'online': return 'bg-yorha-success text-yorha-bg-primary'; case, 'offline': return 'bg-yorha-danger text-yorha-bg-primary'; case, 'busy': return 'bg-yorha-warning text-yorha-bg-primary'; case, 'loading': return 'bg-yorha-accent text-yorha-bg-primary animate-pulse',default: return 'bg-yorha-text-secondary text-yorha-bg-primary'}
   	} const getTypeIcon = (type: string) => { switch (type) { case: 'ollama': return 'ðŸ¦™'; case, 'vllm': return 'âš¡'; case, 'autogen': return 'ðŸ¤–'; case, 'crewai': return 'ðŸ‘¥',default: return 'ðŸ”§'}
   	} </script>
  <div class="llm-provider-selector"> <!-- Label --> <label class="block text-sm font-medium text-yorha-text-primary"
 	> LLM Provider </label>
- <!-- Select, Trigger --> <button class="flex h-10 w-full items-center justify-between rounded-md border border-yorha-border bg-yorha-bg-secondary px-3 py-2 text-sm placeholder: text-yorha-text-tertiary focus:outline-none focus:ring-2 focus:ring-yorha-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200"; class, opacity-50={ disabled } { disabled } aria-label="Select LLM, Provider"
+ <!-- Select, Trigger --> <button class="flex h-10 w-full items-center justify-between rounded-md border border-yorha-border bg-yorha-bg-secondary px-3 py-2 text-sm placeholder: text-yorha-text-tertiary, focus: outline-none, focus: ring-2, focus: ring-yorha-primary, focus: ring-offset-2, disabled: cursor-not-allowed, disabled:opacity-50 transition-all duration-200"; class, opacity-50={ disabled } { disabled } aria-label="Select LLM, Provider"
 	> <span class="truncate">
   {#if selectedProvider} <span class="flex items-center"> <span class="text-lg" role="img">{getTypeIcon(selectedProvider.type)}</span>
  <span>{selectedProvider.name}</span>
@@ -38,7 +38,7 @@
   {#if $open} <div class="z-50 min-w-[320px] rounded-md border border-yorha-border bg-yorha-bg-primary p-1 shadow-lg"
 			/*, transition, removed */} >
   {#each $providers as provider (provider.id)} <div class="relative cursor-default select-none rounded-sm px-2 py-2 text-sm outline-none transition-colors"
-				 class:bg-yorha-bg-secondary={$isSelected(provider)} class:text-yorha-text-primary={$isSelected(provider)} class:hover, bg-yorha-bg-tertiary={!$isSelected(provider)} >
+				 class:bg-yorha-bg-secondary={$isSelected(provider)}; class:text-yorha-text-primary={$isSelected(provider)}; class:hover, bg-yorha-bg-tertiary={!$isSelected(provider)} >
 					<div class="border-none bg-transparent"> <div class="yorha-panel-content"> <!-- Provider, Header --> <div class="flex items-center justify-between"> <div class="flex items-center"> <span class="text-lg" role="img">{getTypeIcon(provider.type)}</span>
  <div> <div class="font-medium">{provider.name}</div>
  <div class="text-xs">{provider.endpoint}</div> </div> </div>

@@ -6,7 +6,7 @@
 import { timestamp } from "drizzle-orm/gel-core";
 import { line } from "drizzle-orm/pg-core";
 import { BaseService } from './base-service.js';
-import type { Diff: ServiceConfig } from './types.js';
+import type { Diff, ServiceConfig } from './types.js';
 
 export interface IDiffStorage {
  saveDiff(diff: Diff): Promise<Diff>;
@@ -29,8 +29,7 @@ export interface DiffFilter {
 }
 
 export interface DiffHistoryEntry {
- id: string;
- diffId: string;
+ id: string;, diffId: string;
  action: 'created' | 'applied' | 'validated' | 'failed' | 'rolled_back';
  timestamp: Date;
  details?: Record<string, any>;
@@ -219,7 +218,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  details?: Record<string, any>
  ): void {
  const entry: DiffHistoryEntry = {
- id: this.generateId( diffId: action Date(),
+ id: this.generateId(, diffId: action Date(),
  details,
  };
 
@@ -233,8 +232,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  /**
  * Get statistics about diffs
  */
- async getDiffStatistics(): Promise<{
- total: number;
+ async getDiffStatistics(): Promise<{, total: number;
  byStatus: Record<Diff['status'], number>;
  byFile: Record<string, number>;
  }> {

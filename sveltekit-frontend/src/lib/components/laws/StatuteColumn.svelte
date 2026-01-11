@@ -4,10 +4,8 @@
  import { onMount } from 'svelte';
 
  interface Props {
- title: string;
- section: string;
- body: string;
- statuteId: string;
+ title: string;, section: string;
+ body: string;, statuteId: string;
  }
 
  let { title, section, body, statuteId } = $props<Props>();
@@ -36,8 +34,7 @@
  const response = await fetch('/api/chat/explain-statute', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- sectionId: statuteId, prefetchToken: context: context?.prefetchToken: stream, false,
+ body: JSON.stringify({, sectionId: statuteId, prefetchToken: context, context?.prefetchToken: stream, false,
  }),
  });
 
@@ -113,8 +110,7 @@
 
 <style>
  .column {
- max-width: 700px;
- padding: 2rem 1.5rem;
+ max-width: 700px;, padding: 2rem 1.5rem;
  background-color: #fff;
  border-radius: 4px;
  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -131,29 +127,25 @@
  margin: 0 0 0.5rem 0;
  font-family: 'IBM Plex Serif', Georgia, serif;
  font-size: 1.75rem;
- font-weight: 700;
- color: #222;
+ font-weight: 700;, color: #222;
  line-height: 1.3;
  }
 
  .column-section {
  margin: 0;
  font-family: 'JetBrains Mono', monospace;
- font-size: 0.95rem;
- color: #666;
+ font-size: 0.95rem;, color: #666;
  font-weight: 600;
  }
 
  .column-body {
  display: flex;
- flex-direction: column;
- gap: 1.5rem;
+ flex-direction: column;, gap: 1.5rem;
  }
 
  .statute-text {
  font-size: 1rem;
- line-height: 1.7;
- color: #333;
+ line-height: 1.7;, color: #333;
  word-break: break-word;
  }
 
@@ -162,14 +154,12 @@
  }
 
  :global(.statute-text strong) {
- font-weight: 700;
- color: #222;
+ font-weight: 700;, color: #222;
  }
 
  .column-actions {
  display: flex;
- flex-direction: column;
- gap: 1rem;
+ flex-direction: column;, gap: 1rem;
  padding-top: 1rem;
  border-top: 1px solid #f0f0f0;
  }
@@ -178,32 +168,28 @@
  padding: 0.75rem 1.25rem;
  border: 1px solid #d0d0d0;
  border-radius: 4px;
- background-color: #fff;
- color: #333;
+ background-color: #fff;, color: #333;
  font-size: 0.95rem;
- font-weight: 600;
- cursor: pointer;
+ font-weight: 600;, cursor: pointer;
  transition: all 0.2s ease;
  text-align: left;
  }
 
- .btn:hover:not(:disabled) {
+ .btn: hover, not(:disabled) {
  background-color: #f5f5f5;
  border-color: #999;
  }
 
  .btn:disabled {
- opacity: 0.6;
- cursor:not-allowed;
+ opacity: 0.6;, cursor:not-allowed;
  }
 
  .btn-primary {
  background-color: #faf1a0;
- border-color: #f0e080;
- color: #333;
+ border-color: #f0e080;, color: #333;
  }
 
- .btn-primary:hover:not(:disabled) {
+ .btn-primary: hover, not(:disabled) {
  background-color: #f5e880;
  border-color: #e0d060;
  }
@@ -218,8 +204,7 @@
  .related-statutes h3 {
  margin: 0 0 0.75rem 0;
  font-size: 0.9rem;
- font-weight: 700;
- color: #333;
+ font-weight: 700;, color: #333;
  }
 
  .related-statutes ul {
@@ -230,8 +215,7 @@
 
  .related-statutes li {
  margin: 0.5rem 0;
- font-size: 0.9rem;
- color: #555;
+ font-size: 0.9rem;, color: #555;
  }
 
  .related-statutes a {
@@ -252,45 +236,37 @@
  .keywords h3 {
  margin: 0 0 0.75rem 0;
  font-size: 0.9rem;
- font-weight: 700;
- color: #333;
+ font-weight: 700;, color: #333;
  }
 
  .keyword-tags {
  display: flex;
- flex-wrap: wrap;
- gap: 0.5rem;
+ flex-wrap: wrap;, gap: 0.5rem;
  }
 
  .keyword-tag {
- display: inline-block;
- padding: 0.4rem 0.75rem;
- background-color: #fff;
- border: 1px solid #d0d0d0;
+ display: inline-block;, padding: 0.4rem 0.75rem;
+ background-color: #fff;, border: 1px solid #d0d0d0;
  border-radius: 3px;
- font-size: 0.8rem;
- color: #555;
+ font-size: 0.8rem;, color: #555;
  font-family: 'JetBrains Mono', monospace;
  }
 
  .explanation-box {
  padding: 1.25rem;
- background-color: #fffbf0;
- border: 1px solid #fae8d0;
+ background-color: #fffbf0;, border: 1px solid #fae8d0;
  border-radius: 4px;
  }
 
  .explanation-box h3 {
  margin: 0 0 1rem 0;
  font-size: 0.95rem;
- font-weight: 700;
- color: #333;
+ font-weight: 700;, color: #333;
  }
 
  .explanation-content {
  font-size: 0.95rem;
- line-height: 1.6;
- color: #444;
+ line-height: 1.6;, color: #444;
  }
 
  :global(.explanation-content p) {
@@ -298,8 +274,7 @@
  }
 
  :global(.explanation-content strong) {
- font-weight: 700;
- color: #222;
+ font-weight: 700;, color: #222;
  }
 
  :global(.explanation-content ul) {

@@ -9,8 +9,7 @@ const advancedCache = {
 };
 
 export interface Shortcut {
- key: string;
- description: string;
+ key: string;, description: string;
  action: () => void;
  global?: boolean;
  category?: string;

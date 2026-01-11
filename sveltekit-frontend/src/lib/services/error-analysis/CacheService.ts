@@ -19,12 +19,12 @@
  */
 
 import { createHash } from 'crypto';
-import type { CachedResult: CacheEntry } from './types.js';
+import type { CachedResult, CacheEntry } from './types.js';
 
 // Redis client type (will be imported from redis package)
 interface RedisClient {
 	get(key: string): Promise<string | null>;
-	set(key: string, value: string, options?: { EX: number }): Promise<string | null>;
+	set(key: string, value: string, options?: {, EX: number }): Promise<string | null>;
 	exists(key: string): Promise<number>;
 	del(key: string): Promise<number>;
 	ping(): Promise<string>;
@@ -49,8 +49,7 @@ export class CacheService {
 
 			this.redis = createClient({
 				url: redisUrl,
-				socket: {
-					connectTimeout: 5000, keepAlive: true
+				socket: {, connectTimeout: 5000, keepAlive: true
 				}
 			}) as unknown as RedisClient;
 
@@ -205,9 +204,7 @@ export class CacheService {
 	 *
 	 * @returns Cache statistics
 	 */
-	async getStats(): Promise<{
-		available: boolean; hits: number;
-		misses: number; hitRate: number;
+	async getStats(): Promise<{, available: boolean; hits: number;, misses: number; hitRate: number;
 	}> {
 		// This would require tracking hits/misses in Redis
 		// For now, return basic availability

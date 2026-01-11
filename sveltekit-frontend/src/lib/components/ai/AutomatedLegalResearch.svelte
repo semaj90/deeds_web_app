@@ -22,8 +22,7 @@ import { createEventDispatcher } from 'svelte';
 		query?: string;
 		jurisdiction?: string;
 		caseType?: string;
-		depth?: string;
-		research: Research;
+		depth?: string;, research: Research;
 		researchHistory?: ResearchHistoryItem[];
 		error?: string | null;
 	}>();
@@ -33,30 +32,23 @@ import { createEventDispatcher } from 'svelte';
 	// Type Definitions
 	interface ResearchMetadata {
 		confidence_level?: 'high' | 'medium' | 'low';
-		disclaimer?: string;
-		research_timestamp: string;
-		model_used: string;
+		disclaimer?: string;, research_timestamp: string;, model_used: string;
 	}
 
 	interface LegalPrinciple {
-		principle: string;
-		explanation: string;
+		principle: string;, explanation: string;
 		application?: string;
 		authority?: string;
 	}
 
 	interface StatutoryAnalysisItem {
-		statute: string;
-		provision: string;
+		statute: string;, provision: string;
 		interpretation?: string;
 		relevance?: string;
 	}
 
 	interface CaseLawItem {
-		citation: string;
-		case_name: string;
-		year: string;
-		holding: string;
+		citation: string;, case_name: string;, year: string;, holding: string;
 		relevance?: string;
 	}
 
@@ -79,10 +71,7 @@ import { createEventDispatcher } from 'svelte';
 	}
 
 	interface Research {
-		query: string;
-		jurisdiction: string;
-		case_type: string;
-		research_depth: string;
+		query: string;, jurisdiction: string;, case_type: string;, research_depth: string;
 		legal_principles?: LegalPrinciple[];
 		statutory_analysis?: StatutoryAnalysisItem[];
 		case_law?: CaseLawItem[];
@@ -90,15 +79,13 @@ import { createEventDispatcher } from 'svelte';
 		research_gaps?: ResearchGaps;
 		metadata?: {
 			confidence_level?: string;
-			disclaimer?: string;
-			research_timestamp: string;
-			model_used: string;
+			disclaimer?: string;, research_timestamp: string;, model_used: string;
 		};
 	}
 
 	// Reactive state
 	let isResearching = false;
-	let currentResearch: ResearchResult: null = null;
+	let currentResearch: ResearchResult, null = null;
 	let currentError: string | null = null;
 	let includePrecedents = true;
 	let includeStatutes = true;
@@ -123,8 +110,7 @@ import { createEventDispatcher } from 'svelte';
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({
-					query: query.trim(),
+				body: JSON.stringify({, query: query.trim(),
 					jurisdiction,
 					caseType,
 					depth,
@@ -141,7 +127,7 @@ import { createEventDispatcher } from 'svelte';
 
 			// Add to history
 			currentResearchHistory = [{
-				query: query.trim( timestamp: new Date().toISOString(),
+				query: query.trim(, timestamp: new Date().toISOString(),
 				result
 			}, ...currentResearchHistory.slice(0, 9)]; // Keep last 10
 
@@ -204,7 +190,7 @@ import { createEventDispatcher } from 'svelte';
 			<select
 				id="jurisdiction"
 				bind:value={ jurisdiction }
-				class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+				class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
 			>
 				<option value="federal">Federal</option>
 				<option value="state">State</option>
@@ -221,7 +207,7 @@ import { createEventDispatcher } from 'svelte';
 			<select
 				id="caseType"
 				bind:value={caseType}
-				class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+				class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
 			>
 				<option value="civil">Civil</option>
 				<option value="criminal">Criminal</option>
@@ -240,7 +226,7 @@ import { createEventDispatcher } from 'svelte';
 			<select
 				id="depth"
 				bind:value={ depth }
-				class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+				class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
 			>
 				<option value="brief">Brief Overview</option>
 				<option value="standard">Standard Analysis</option>
@@ -280,7 +266,7 @@ import { createEventDispatcher } from 'svelte';
 			bind:value={query}
 			placeholder="Enter your legal research question (e.g., 'What are the requirements for establishing undue influence in contract formation?')"
 			rows="3"
-			class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical"
+			class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500 resize-vertical"
 		></textarea>
 	</div>
 
@@ -290,7 +276,7 @@ import { createEventDispatcher } from 'svelte';
 			type="button"
 			onclick={performResearch}
 			disabled={isResearching || !query.trim()}
-			class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+			class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover: bg-blue-700, focus: outline-none, focus: ring-2, focus: ring-blue-500, disabled: opacity-50, disabled:cursor-not-allowed"
 		>
 			{#if isResearching}
 				<span class="flex items-center justify-center">
@@ -309,7 +295,7 @@ import { createEventDispatcher } from 'svelte';
 			<button
 				type="button"
 				onclick={clearResearch}
-				class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+				class="px-4 py-2 bg-gray-600 text-white rounded-md hover: bg-gray-700, focus: outline-none, focus: ring-2, focus:ring-gray-500"
 			>
 				Clear
 			</button>
@@ -317,7 +303,7 @@ import { createEventDispatcher } from 'svelte';
 			<button
 				type="button"
 				onclick={ exportResearch }
-				class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+				class="px-4 py-2 bg-green-600 text-white rounded-md hover: bg-green-700, focus: outline-none, focus: ring-2, focus:ring-green-500"
 			>
 				Export
 			</button>
@@ -333,7 +319,7 @@ import { createEventDispatcher } from 'svelte';
 					<button
 						type="button"
 						onclick={() => loadPreviousResearch(item)}
-						class="w-full text-left p-3 border rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+						class="w-full text-left p-3 border rounded-md hover: bg-gray-50, focus: outline-none, focus: ring-2, focus:ring-blue-500"
 					>
 						<div class="font-medium text-gray-900 truncate">{item.query}</div>
 						<div class="text-sm text-gray-500">{new Date(item.timestamp).toLocaleString()}</div>

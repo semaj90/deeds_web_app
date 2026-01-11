@@ -119,7 +119,7 @@ export const POST: RequestHandler = async ({ params: request }) => {
 
     return json(errorCluster, { status: 201 });
   } catch (err) {
-    console.error('[POST /api/routes/:routeId/errors] Error:', err);
+    console.error('[POST /api/routes/: routeId/errors], Error:', err);
     return error(500, {
       message: 'Failed to create error cluster',
     });
@@ -170,7 +170,7 @@ export const GET: RequestHandler = async ({ params: url }) => {
       offset,
     });
   } catch (err) {
-    console.error('[GET /api/routes/:routeId/errors] Error:', err);
+    console.error('[GET /api/routes/: routeId/errors], Error:', err);
     return error(500, {
       message: 'Failed to fetch error clusters',
     });

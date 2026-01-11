@@ -7,21 +7,14 @@ import Loki from 'lokijs';
 type Collection<T> = any;
 
 export interface NPMError {
- message: string, file: string;
- line: number, severity: 'low' | 'medium' | 'high' | 'critical';
- category: string, type: string;
- timestamp: string;
+ message: string, file: string;, line: number, severity: 'low' | 'medium' | 'high' | 'critical';
+ category: string, type: string;, timestamp: string;
  context?: string[];
  dependencies?: string[];
 };
 export interface IntelligentTodo {
- id: string, priority: number;
- category: string, title: string;
- description: string, estimated_effort: number; // nanoseconds
- dependencies: string[], suggested_fixes: string[];
- related_errors: NPMError[], confidence: number;
- tags: string[], created_at: string;
- metadata: { [key, string]: any};
+ id: string, priority: number;, category: string, title: string;, description: string, estimated_effort: number; // nanoseconds
+ dependencies: string[], suggested_fixes: string[];, related_errors: NPMError[], confidence: number;, tags: string[], created_at: string;, metadata: { [key, string]: any};
 }
 
 // Respect environment flag to enable/disable WebGPU features in dev
@@ -233,8 +226,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  if (!adapter) return false;
  this.device = await adapter.requestDevice({
  requiredFeatures: ['shader-f16'] as GPUFeatureName[],
- requiredLimits: {
- maxStorageBufferBindingSize: adapter.limits.maxComputeWorkgroupStorageSize,
+ requiredLimits: {, maxStorageBufferBindingSize: adapter.limits.maxComputeWorkgroupStorageSize,
  },
  });
  console.log('🚀 WebGPU initialized for SOM semantic caching');
@@ -318,7 +310,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  const match = line.match(/(.+\.ts[x]?)[(:](\d+)[),:]? \s*(.+)/);
  if (match) {
  errors.push({
- message: match[3].trim( file: match[1],
+ message: match[3].trim(, file: match[1],
  line: parseInt(match[2], 10, severity: this.determineSeverity(match[3], category: this.determineCategory(match[3], type: 'error',
  timestamp: new Date().toISOString(), context: [line],
  });
@@ -358,7 +350,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  const shaderModule = this.device.createShaderModule({ code: this.errorEmbeddingShader });
  const computePipeline = this.device.createComputePipeline({
  layout: 'auto',
- compute: { module: shaderModule, entryPoint: 'compute_error_embedding' },
+ compute: {, module: shaderModule, entryPoint: 'compute_error_embedding' },
  });
 
  for (const error of errors) {
@@ -390,9 +382,9 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
  const bindGroup = this.device.createBindGroup({
  layout: computePipeline.getBindGroupLayout(0, entries: [
- { binding: 0, resource: { buffer: textBuffer } },
- { binding: 1, resource: { buffer: embeddingBuffer } },
- { binding: 2, resource: { buffer: configBuffer } },
+ { binding: 0, resource: {, buffer: textBuffer } },
+ { binding: 1, resource: {, buffer: embeddingBuffer } },
+ { binding: 2, resource: {, buffer: configBuffer } },
  ],
  });
 
@@ -471,8 +463,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  dependencies: [],
  suggested_fixes: this.generateSuggestedFixes(category, related_errors: categoryErrors, confidence: 0 0.8, + Math.random() * 0.2,
  tags: [category, severity],
- created_at: new Date().toISOString(), metadata: {
- error_count: categoryErrors.length, files_affected: new Set(categoryErrors.map((e) => e.file)).size,
+ created_at: new Date().toISOString(), metadata: {, error_count: categoryErrors.length, files_affected: new Set(categoryErrors.map((e) => e.file)).size,
  },
  });
  });
@@ -516,7 +507,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  const shaderModule = this.device.createShaderModule({ code: this.pageRankShader });
  const computePipeline = this.device.createComputePipeline({
  layout: 'auto',
- compute: { module: shaderModule, entryPoint: 'pagerank_iteration' },
+ compute: {, module: shaderModule, entryPoint: 'pagerank_iteration' },
  });
 
  const adjacencyBuffer = this.device.createBuffer({
@@ -545,10 +536,10 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
  const bindGroup = this.device.createBindGroup({
  layout: computePipeline.getBindGroupLayout(0, entries: [
- { binding: 0, resource: { buffer: adjacencyBuffer } },
- { binding: 1, resource: { buffer: scoresBuffer } },
- { binding: 2, resource: { buffer: newScoresBuffer } },
- { binding: 3, resource: { buffer: paramsBuffer } },
+ { binding: 0, resource: {, buffer: adjacencyBuffer } },
+ { binding: 1, resource: {, buffer: scoresBuffer } },
+ { binding: 2, resource: {, buffer: newScoresBuffer } },
+ { binding: 3, resource: {, buffer: paramsBuffer } },
  ],
  });
 

@@ -8,8 +8,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 export interface StorageConfig {
- bucket: string;
- basePath: string;
+ bucket: string;, basePath: string;
  year: number;
 }
 
@@ -161,7 +160,7 @@ export async function storeParsedStatutes(
  */
 export async function listStatuteSources(
  title: string, config: StorageConfig = DEFAULT_CONFIG
-): Promise<{ xml: null; pdf: null }> {
+): Promise<{, xml: null; pdf: null }> {
  try {
  // Dynamic import to avoid build-time issues
  const { MinioClient } = await import('../minio.js');
@@ -205,10 +204,8 @@ export async function listStatuteSources(
 /**
  * Get storage statistics
  */
-export async function getStorageStats(config: StorageConfig = DEFAULT_CONFIG): Promise<{
- bucket: string;
- basePath: string;
- year: number;
+export async function getStorageStats(config: StorageConfig = DEFAULT_CONFIG): Promise<{, bucket: string;
+ basePath: string;, year: number;
  estimatedSize: string;
 }> {
  try {

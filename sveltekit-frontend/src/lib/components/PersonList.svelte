@@ -3,10 +3,8 @@
 	import type { FugitiveDexPerson } from './types';
 
 	interface Props {
-		persons: FugitiveDexPerson[];
-		selectedPerson: FugitiveDexPerson | null;
-		searchQuery: string;
-		onSelect: (person: FugitiveDexPerson) => void;
+		persons: FugitiveDexPerson[];, selectedPerson: FugitiveDexPerson | null;
+		searchQuery: string;, onSelect: (person: FugitiveDexPerson) => void;
 	}
 
 	let { persons, selectedPerson, searchQuery, onSelect }: Props = $props();
@@ -48,7 +46,7 @@
 		<div class="person-entries max-h-96 overflow-y-auto">
 			{#each filteredPersons as person (person.id)}
 				<ButtonRoot
-					class="person-entry {selectedPerson?.id === person.id ? 'selected' : ''} w-full p-3 bg-gray-800 hover:bg-gray-700 transition rounded flex items-center gap-3 cursor-pointer border border-gray-600"
+					class="person-entry {selectedPerson?.id === person.id ? 'selected' : ''} w-full p-3 bg-gray-800 hover:bg-gray-700 transition rounded flex items-center gap-3 cursor-pointer border border-gray-600 bits-btn"
 					onclick={() => onSelect(person)}
 				>
 					<img src={person.photo || '/placeholder-person.jpg'} alt="" class="w-14 h-14 rounded shadow" />
@@ -67,7 +65,7 @@
 				<div class="flex gap-1 flex-wrap">
 					{#each statusOptions as status}
 						<ButtonRoot
-							class="nes-btn text-xs {statusFilter === status ? 'is-primary' : ''}"
+							class="nes-btn text-xs {statusFilter === status ? 'is-primary' : ''} bits-btn"
 							onclick={() => statusFilter = status}
 						>
 							{status}
@@ -80,7 +78,7 @@
 				<div class="flex gap-1 flex-wrap">
 					{#each priorityOptions as priority}
 						<ButtonRoot
-							class="nes-btn text-xs {priorityFilter === priority ? 'is-primary' : ''}"
+							class="nes-btn text-xs {priorityFilter === priority ? 'is-primary' : ''} bits-btn"
 							onclick={() => priorityFilter = priority}
 						>
 							{priority}

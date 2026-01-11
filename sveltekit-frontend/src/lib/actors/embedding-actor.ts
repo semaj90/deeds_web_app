@@ -16,30 +16,23 @@ export interface EmbeddingInput {
 }
 
 export interface EmbeddingOutput {
-  embedding: number[];
-  dimension: number;
-  model: string;
-  metadata: {
-    textLength: number;
-    processingTime: number;
+  embedding: number[];, dimension: number;, model: string;, metadata: {, textLength: number;, processingTime: number;
     caseId?: string;
     evidenceId?: string;
     documentType?: string;
-    priority?: string;
-    timestamp: Date;
+    priority?: string;, timestamp: Date;
   };
 }
 
 export interface EmbeddingError {
-  message: string;
-  code: 'OLLAMA_UNAVAILABLE' | 'TIMEOUT' | 'INVALID_INPUT' | 'MODEL_ERROR';
+  message: string;, code: 'OLLAMA_UNAVAILABLE' | 'TIMEOUT' | 'INVALID_INPUT' | 'MODEL_ERROR';
   details?: any;
 }
 
 /**
  * XState v5 actor for generating embeddings with legal context
  */
-export const embeddingActor = fromPromise(async ({ input }: { input: EmbeddingInput }): Promise<EmbeddingOutput> => {
+export const embeddingActor = fromPromise(async ({ input }: {, input: EmbeddingInput }): Promise<EmbeddingOutput> => {
   const startTime = Date.now();
   try {
     // Validate input
@@ -71,8 +64,7 @@ export const embeddingActor = fromPromise(async ({ input }: { input: EmbeddingIn
 			embedding,
 			dimension: embedding.length,
 			model: 'nomic-embed-text',
-			metadata: {
-				textLength: input.text.length,
+			metadata: {, textLength: input.text.length,
 				processingTime,
 				caseId: input.context?.caseId,
 				evidenceId: input.context?.evidenceId,
@@ -119,7 +111,7 @@ export const embeddingActor = fromPromise(async ({ input }: { input: EmbeddingIn
  * Batch embedding actor for multiple texts
  */
 export const batchEmbeddingActor = fromPromise(
-  async ({ input }: { input: EmbeddingInput[] }): Promise<EmbeddingOutput[]> => {
+  async ({ input }: {, input: EmbeddingInput[] }): Promise<EmbeddingOutput[]> => {
     try {
       // Process embeddings in parallel with concurrency limit
       const batchSize = 5; // Prevent overwhelming Ollama

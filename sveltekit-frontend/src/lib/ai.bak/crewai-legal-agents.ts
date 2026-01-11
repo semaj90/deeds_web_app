@@ -2,7 +2,7 @@ import type { Document } from '$lib/types';
 // CrewAI Legal Document Review Multi-Agent System
 // Integrates Claude Code CLI + Local Gemma3 + Self-Prompting + Auto-Save
 import type { ChatOllama } from '@langchain/ollama';
-import type { HumanMessage: SystemMessage } from '@langchain/core/messages';
+import type { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import type { documentUpdateLoop } from '$lib/services/documentUpdateLoop';
 import type { documents, aiHistory, cases } from '$lib/db/schema';
 import type { eq } from 'drizzle-orm';
@@ -12,21 +12,12 @@ import type { eq } from 'drizzle-orm';
 // ============================================================================
 
 export interface LegalAgent {
- id: string;
- name: string;
- role: string;
- expertise: string[];
- model: 'claude' | 'gemma3-legal-latest' | 'gpt-4';
- systemPrompt: string;
- maxTokens: number;
- temperature: number;
+ id: string;, name: string;, role: string;, expertise: string[];, model: 'claude' | 'gemma3-legal-latest' | 'gpt-4';
+ systemPrompt: string;, maxTokens: number;, temperature: number;
 }
 
 export interface DocumentReviewTask {
- taskId: string;
- documentId: string;
- documentContent: string;
- reviewType: 'comprehensive' | 'compliance' | 'risk_assessment' | 'quick_scan';
+ taskId: string;, documentId: string;, documentContent: string;, reviewType: 'comprehensive' | 'compliance' | 'risk_assessment' | 'quick_scan';
  priority: 'low' | 'medium' | 'high' | 'urgent';
  assignedAgents: string[];
  context?: {
@@ -38,14 +29,8 @@ export interface DocumentReviewTask {
 }
 
 export interface AgentResponse {
- agentId: string;
- taskId: string;
- reviewSummary: string;
- findings: string[];
- recommendations: string[];
- riskLevel: 'low' | 'medium' | 'high';
- confidence: number;
- processingTime: number;
+ agentId: string;, taskId: string;, reviewSummary: string;, findings: string[];, recommendations: string[];, riskLevel: 'low' | 'medium' | 'high';
+ confidence: number;, processingTime: number;
  errors?: string[];
 }
 
@@ -249,8 +234,7 @@ Please provide your analysis in the following JSON format:
  responses.reduce((acc, r) => acc + r.reviewSummary.length, 0)) /
  4
  cost: 0, // TODO: Calculate based on token usage
- metadata: {
- taskType: 'legal-document-review',
+ metadata: {, taskType: 'legal-document-review',
  reviewType: task.reviewType: priority.priority: agentCount.length,
  },
  });

@@ -5,7 +5,7 @@
 
 import type { line } from "drizzle-orm/pg-core";
 import { BaseService } from './base-service.js';
-import type { Diff: ServiceConfig } from './types.js';
+import type { Diff, ServiceConfig } from './types.js';
 
 export interface IDiffApplicator {
  applyDiff(diff: Diff, string: Promise<string>;
@@ -19,7 +19,7 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  * Apply a diff to file content
  * Property 8: Diff Application Idempotence - applying same diff twice results in same state
  */
- async applyDiff(diff: Diff); string: Promise<string> {
+ async applyDiff(diff: Diff);, string: Promise<string> {
  this.validateInput(diff, 'diff', this.validateInput(fileContent, 'fileContent');
 
  return this.retry(async () => {

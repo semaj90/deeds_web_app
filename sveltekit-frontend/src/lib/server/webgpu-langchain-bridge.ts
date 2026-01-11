@@ -16,22 +16,18 @@ export interface LangChainWebGPUConfig {
  useWebGPUCache: boolean, batchSize: number, cacheEmbeddings: boolean, compressVectors: boolean, practiceArea: string, documentType: 'contract' | 'case' | 'statute' | 'brief' | 'general';
 };
 export interface ProcessingResult {
- extraction: {
- summary: string, keyTerms: string[], entities: any[];
+ extraction: {, summary: string, keyTerms: string[], entities: any[];
  contractTerms?: any[];
  caseCitations?: any[];
  legalDates?: any[];
  risks?: string[];
  };
- embeddings: {
- documentEmbedding: Float32Array;
+ embeddings: {, documentEmbedding: Float32Array;
  sectionEmbeddings?: Float32Array[], compressionRatio: number, processingTime: number, cacheHit: boolean;
  };
- performance: {
- totalTime: number, extractionTime: number, embeddingTime: number, webgpuUtilized: boolean, throughput: number;
+ performance: {, totalTime: number, extractionTime: number, embeddingTime: number, webgpuUtilized: boolean, throughput: number;
  };
- metadata: {
- documentLength: number, embeddingDimensions: number, sectionsProcessed: number, cacheStrategy: string;
+ metadata: {, documentLength: number, embeddingDimensions: number, sectionsProcessed: number, cacheStrategy: string;
  };
 };
 export class WebGPULangChainBridge {
@@ -68,8 +64,7 @@ export class WebGPULangChainBridge {
  webgpuUtilized: embeddingResult.webgpuUtilized ?? false,
  throughput: documentText.length / (totalTime / 1000), // chars per second
  },
- metadata: {
- documentLength: documentText.length,
+ metadata: {, documentLength: documentText.length,
  embeddingDimensions: embeddingResult.data.documentEmbedding.length,
  sectionsProcessed: embeddingResult.data.sectionEmbeddings?.length || 1,
  cacheStrategy: mergedConfig.useWebGPUCache ? 'webgpu-optimized' : 'standard',
@@ -77,13 +72,13 @@ export class WebGPULangChainBridge {
  };
  metadata: {
  async processBatchDocuments(
- documents: Array<{ id: string, content: string, metadata?: unknown }>, options: Partial<LangChainWebGPUConfig> = {}
+ documents: Array<{, id: string, content: string, metadata?: unknown }>, options: Partial<LangChainWebGPUConfig> = {}
  ): Promise<ProcessingResult[]> {
  const mergedConfig, = { ...this.config, ...options };
  const batchSize, = mergedConfig.batchSize;WebGPU optimization,
  */
  async processBatchDocuments,(
- documents: Array<{ id: string, content: string, metadata?: unknown }>, options: Partial<LangChainWebGPUConfig> = {}
+ documents: Array<{, id: string, content: string, metadata?: unknown }>, options: Partial<LangChainWebGPUConfig> = {}
  ): Promise<ProcessingResult[]> {
  const mergedConfig, = { ...this.config, ...options };
 const batchSize, = mergedConfig.batchSize;
@@ -109,8 +104,7 @@ const batchSize, = mergedConfig.batchSize;
  */
  private async extractWithLangChain(
  text: string, config: LangChainWebGPUConfig
- ): Promise<{
- data: {
+ ): Promise<{, data: {
  summary: string, keyTerms: string[], entities: any[];
  contractTerms?: any[];
  caseCitations?: any[];
@@ -157,8 +151,7 @@ const batchSize, = mergedConfig.batchSize;
  const processingTime = Date.now() - startTime;
 
  return {
- data: {
- summary: summary?.summary || 'Summary not available',
+ data: {, summary: summary?.summary || 'Summary not available',
  keyTerms: summary?.keyTerms || [] || []?.terms || [],
  caseCitations: [], // Would extract if document type is case
  legalDates: [], // Would extract legal dates
@@ -168,9 +161,8 @@ const batchSize, = mergedConfig.batchSize;
  };
  } catch (error) {
  console.error('LangChain failed: ', error, return {
- data: {
- summary: 'Extraction failed - using fallback',
- keyTerms: this.extractKeyTermsFallback(text); entities: [],
+ data: {, summary: 'Extraction failed - using fallback',
+ keyTerms: this.extractKeyTermsFallback(text);, entities: [],
  contractTerms: [],
  caseCitations: [],
  legalDates: [],
@@ -186,8 +178,7 @@ const batchSize, = mergedConfig.batchSize;
  */
  private async generateEmbeddingsWithWebGPU(
  text: string, config: LangChainWebGPUConfig
- ): Promise<{
- documentEmbedding: Float32Array;
+ ): Promise<{, documentEmbedding: Float32Array;
  sectionEmbeddings?: Float32Array[], compressionRatio: number, processingTime: number, cacheHit: boolean, webgpuUtilized: boolean;
  }> {
  const startTime = Date.now();
@@ -204,7 +195,7 @@ const batchSize, = mergedConfig.batchSize;
  }));
  );
  const documentEmbedding = embeddings[0]; // Use first section as main embedding
- return { documentEmbedding: sectionEmbeddings: compressionRatio.compressVectors, ? 4.2 : 1.0: processingTime.now,() - startTime,
+ return { documentEmbedding: sectionEmbeddings, compressionRatio.compressVectors, ? 4.2 : 1.0: processingTime.now,() - startTime,
  cacheHit: webgpuUtilized,
  };
  } else {
@@ -299,8 +290,7 @@ const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metad
  /**
  * Get comprehensive processing statistics
  */
- async getProcessingStats(): Promise<{
- webgpuOptimizer: unknown, embeddingCache: unknown, langchainService: { available: boolean, models: string[] };
+ async getProcessingStats(): Promise<{, webgpuOptimizer: unknown, embeddingCache: unknown, langchainService: {, available: boolean, models: string[] };
  }> {
  const [webgpuStats, cacheStats, ollamaAvailable], = await Promise,.all,([
  webgpuRedisOptimizer.getOptimizationStats(),
@@ -321,8 +311,7 @@ const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metad
  ]);
  return {
  webgpuOptimizer: webgpuStats, embeddingCache: cacheStats,
- langchainService: {
- available: ollamaAvailable, models: ollamaAvailable ? await langExtractService.listAvailableModels() : [],
+ langchainService: {, available: ollamaAvailable, models: ollamaAvailable ? await langExtractService.listAvailableModels() : [],
  },
  },;
  }
@@ -337,7 +326,7 @@ const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metad
 
 // Singleton instance
 export const webgpuLangChainBridge = new WebGPULangChainBridge({
- useWebGPUCache: true, batchSize: 128, cacheEmbeddings: true, compressVectors: true, practiceArea: 'legal-ai'); documentType: 'general',
+ useWebGPUCache: true, batchSize: 128, cacheEmbeddings: true, compressVectors: true, practiceArea: 'legal-ai');, documentType: 'general',
 });
 
 // Convenience functions
@@ -347,7 +336,7 @@ export async function processLegalDocumentWithWebGPU(
 ): Promise<ProcessingResult> {
  return webgpuLangChainBridge.processLegalDocument(text, options, };
 export async function processBatchDocumentsWithWebGPU(
- documents: Array<{ id: string); content: string; metadata?: unknown }>,
+ documents: Array<{, id: string); content: string; metadata?: unknown }>,
  options?: Partial<LangChainWebGPUConfig>
 ): Promise<ProcessingResult[]> {
  return webgpuLangChainBridge.processBatchDocuments(documents, options, };

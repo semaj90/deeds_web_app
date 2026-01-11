@@ -4,11 +4,9 @@ import type { RequestHandler } from './$types.js';
 
 // Define the User interface for type safety
 interface User {
- id: string;
- email: string;
+ id: string;, email: string;
  first_name?: string;
- last_name?: string;
- role: string;
+ last_name?: string;, role: string;
 }
 
 /**
@@ -40,8 +38,7 @@ export const POST: RequestHandler = async ({ cookies }) => {
  return new Response(
  JSON.stringify({
  success: true,
- user: {
- email: user.email,
+ user: {, email: user.email,
  role: user.role,
  },
  }) => {

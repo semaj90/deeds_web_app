@@ -6,7 +6,7 @@
 
 <!-- Hidden showcase that activates all, CSS, selectors -->
 <div
-  style="position: absolute, left: -9999px, top: -9999px; visibility: hidden, pointer-events, none;"
+  style="position: absolute, left: -9999px, top: -9999px;, visibility: hidden, pointer-events, none;"
   aria-hidden="true"
 >
   <NESElementsShowcase visible={true} />
@@ -225,7 +225,7 @@
 
 <style>
   /* Ensure this component doesn't affect layout */'
-  : global(.css-activator-hidden) {
+  :global(.css-activator-hidden) {
     position absolute !important
     left: -9999px !important
     top: -9999px !important

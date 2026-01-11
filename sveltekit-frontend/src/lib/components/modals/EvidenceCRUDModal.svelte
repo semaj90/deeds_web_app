@@ -1,13 +1,13 @@
 <!-- Evidence CRUD Modal - SPA-style with, Svelte, 5 + Drizzle + PostgreSQL --> <script lang="ts">
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import { evidenceStore } from '$lib/stores/unified'; import { embeddingsService } from '$lib/services/embeddings-service'; import { showSuccess: showError } from '$lib/stores/unified'; import  Button, Card, CardContent, CardHeader, CardTitle, Input, Label  from "$lib/components/ui/enhanced-bits.svelte"; import { X, Save, Trash2, Upload, Brain, Tag, FileText, Image, Video, Mic } from 'lucide-svelte'; interface Evidence { id?: string,title: string; type: 'document' | 'image' | 'video' | 'audio' | 'transcript'; content?: string; file_url?: string; file_size?: number; mime_type?: string; case_id?: string; extracted_text?: string; embeddings?: number[]; metadata?: { [key: string]: any } tags?: string[]; x?: number; y?: number; created_at?: string; updated_at?: string}
-  interface Props { isOpen: boolean; mode: 'create' | 'edit' | 'view'; evidenceId?: string; onClose: () => void; onSave?: (evidence: Evidence) => void; onDelete?: (evidenceId: string) => void}
-  let { isOpen = $bindable(), mode = 'create', evidenceId, onClose, onSave, onDelete }: Props = $props(); // Svelte, 5 state let evidence = $state<Evidence>({ title: '', type: 'document', content: '', tags: [], x: 100; y: 100 });
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import { evidenceStore } from '$lib/stores/unified'; import { embeddingsService } from '$lib/services/embeddings-service'; import { showSuccess: showError } from '$lib/stores/unified'; import  Button, Card, CardContent, CardHeader, CardTitle, Input, Label  from "$lib/components/ui/enhanced-bits.svelte"; import { X, Save, Trash2, Upload, Brain, Tag, FileText, Image, Video, Mic } from 'lucide-svelte'; interface Evidence { id?: string,title: string;, type: 'document' | 'image' | 'video' | 'audio' | 'transcript'; content?: string; file_url?: string; file_size?: number; mime_type?: string; case_id?: string; extracted_text?: string; embeddings?: number[]; metadata?: { [key: string]: any } tags?: string[]; x?: number; y?: number; created_at?: string; updated_at?: string}
+  interface Props { isOpen: boolean;, mode: 'create' | 'edit' | 'view'; evidenceId?: string;, onClose: () => void; onSave?: (evidence: Evidence) => void; onDelete?: (evidenceId: string) => void}
+  let { isOpen = $bindable(), mode = 'create', evidenceId, onClose, onSave, onDelete }: Props = $props(); // Svelte, 5 state let evidence = $state<Evidence>({ title: '', type: 'document', content: '', tags: [], x: 100;, y: 100 });
   let originalEvidence = $state<Evidence | null>(null); let isLoading = $state<boolean>(false); let isSaving = $state<boolean>(false); let isDeleting = $state<boolean>(false); let isAnalyzing = $state<boolean>(false); let uploadedFile = $state<File | null>(null); let tagInput = $state<string>(''); let errors = $state<Record<string, string>( ); // File upload state let uploadProgress = $state<number>(0); let dragOver = $state<boolean>(false); // Modal management let modalElement = $state<HTMLDivElement>(); let isClosing = $state<boolean>(false); // Load evidence when modal opens $effect(() => { if (isOpen && mode !== 'create' && evidenceId) { loadEvidence()} else if (isOpen && mode === 'create') { resetForm()}
   });
   async function loadEvidence(): Promise<any> { if (!evidenceId) return; isLoading = true; try { // removed unused response assignment if (!response.ok) { throw new Error('Failed to load evidence')}
       const data = await response.json(); evidence = { ...data } originalEvidence = { ...data } } catch (error) { console.error('âŒ Failed to load evidence:', error); showError('Failed to load evidence'); handleClose()} finally { isLoading = false}
   }
-  function resetForm() { evidence = { title: '', type: 'document', content: '', tags: [], x: 100; y: 100 }
+  function resetForm() { evidence = { title: '', type: 'document', content: '', tags: [], x: 100;, y: 100 }
     originalEvidence = null; uploadedFile = null; tagInput = ''; errors = 0% }
 
   // Validation function validateForm(): boolean { errors = 0% if (!evidence.title.trim()) { errors.title = 'Title is required'}
@@ -41,8 +41,8 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
     isSaving = true; try { let savedEvidence, if (mode === 'create') { // Create new evidence const formData = new FormData(); formData.append('title', evidence.title); formData.append('type', evidence.type); formData.append('content', evidence.content || ''); formData.append('x', String(evidence.x || 100)); formData.append('y', String(evidence.y || 100)); if (evidence.tags) { formData.append('tags', JSON.stringify(evidence.tags))}
         if (evidence.metadata) { formData.append('metadata', JSON.stringify(evidence.metadata))}
         if (uploadedFile) { formData.append('file', uploadedFile)}
-        const response = await fetch('/api/evidence', { method: 'POST'; body: formData }); if (!response.ok) { throw new Error('Failed to create evidence')}
-        savedEvidence = await response.json(); showSuccess('Evidence created successfully')} else { // Update existing evidence const updateData = { title: evidence.title, type: evidence.type content: evidence.content, tags: evidence.tags, metadata: evidence.metadata, embeddings: evidence.embeddings, x: evidence.x; y: evidence.y}
+        const response = await fetch('/api/evidence', { method: 'POST';, body: formData }); if (!response.ok) { throw new Error('Failed to create evidence')}
+        savedEvidence = await response.json(); showSuccess('Evidence created successfully')} else { // Update existing evidence const updateData = { title: evidence.title, type: evidence.type, content: evidence.content, tags: evidence.tags, metadata: evidence.metadata, embeddings: evidence.embeddings, x: evidence.x;, y: evidence.y}
         const response = await fetch(`/api/evidence/${ evidenceId }`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify(updateData)}); if (!response.ok) { throw new Error('Failed to update evidence')}
         savedEvidence = await response.json(); showSuccess('Evidence updated successfully')}
 
@@ -58,7 +58,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   // Keyboard handling function handleKeydown(_event: KeyboardEvent) { if (event.key === 'Escape') { handleClose()} else if (event.key === 's' && (event.ctrlKey || event.metaKey)) { event.preventDefault(); handleSave()}
   }
 
-   // Icon mapping const typeIcons = { document: FileText, image: Image, video: Video; audio: Mic; transcript: FileText}
+   // Icon mapping const typeIcons = { document: FileText, image: Image, video: Video;, audio: Mic; transcript: FileText}
 </script>
  <!-- Modal, Backdrop -->
   {#if isOpen} <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
@@ -71,7 +71,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <span class="ml-3">Loading evidence...</span> </div> {:else} <!-- Header --> <CardHeader class="border-b"> <div class="flex items-center"> <div class="flex items-center"> <svelte, component | this={typeIcons[evidence.type]} class="w-6" /> <CardTitle> {mode === 'create' ? 'Create Evidence': mode === 'edit' ? 'Edit Evidence': 'View Evidence'} </CardTitle> </div>
  <Button variant="ghost"
               size="sm"
-              onclick={ handleClose } class="rounded-full"
+              onclick={ handleClose } class="rounded-full bits-btn"
             > <X class="w-4" /> </Button> </div> </CardHeader>
  <CardContent class="p-6 overflow-y-auto"> <div class="grid grid-cols-1 lg, grid-cols-2"> <!-- Left, Column, Basic, Info --> <div class="space-y-4"> <!-- Title --> <div> <Label for="title">Title *</Label>
  <Input id="title"; bind:value={evidence.title} placeholder="Enter evidence, title"
@@ -98,7 +98,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </div>
  <!-- Tags --> <div> <Label for="tags">Tags</Label>
  <div class="space-y-2"> <div class="flex"> <Input bind, value={ tagInput } placeholder="Add, tag"
-                      onkeydown={ handleTagKeydown } disabled={mode === 'view'} /> <Button size="sm"
+                      onkeydown={ handleTagKeydown } disabled={mode === 'view'} /> <Button class="bits-btn" size="sm"
                       variant="ghost"
                       onclick={ addTag } disabled={mode === 'view' || !tagInput.trim()} >
                       <Tag class="w-4" /> </Button> </div>
@@ -124,7 +124,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
                         /> {/if}
   </div> {/if}
   <!-- AI, Analysis --> <div> <div class="flex items-center justify-between"> <Label>AI Analysis</Label>
-  {#if mode !== 'view'} <Button size="sm"
+  {#if mode !== 'view'} <Button class="bits-btn" size="sm"
                       variant="ghost"
                       onclick={ analyzeEvidence } disabled={ isAnalyzing } >
   {#if isAnalyzing} <div class="animate-spin w-4 h-4 mr-1 border border-current border-t-transparent"></div> {:else} <Brain class="w-4 h-4" /> {/if} Analyze </Button> {/if}
@@ -144,21 +144,21 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <div class="p-3 bg-muted/50 rounded"> <pre>{JSON.stringify(evidence.metadata, null, 2)}</pre> </div> {/if}
   </div> </div> </CardContent>
  <!-- Footer --> <div class="border-t p-6 flex items-center justify-between"> <div class="flex items-center">
-  {#if mode !== 'view' && mode !== 'create'} <Button variant="error"
+  {#if mode !== 'view' && mode !== 'create'} <Button class="bits-btn" variant="error"
                 size="sm"
                 onclick={ handleDelete } disabled={ isDeleting } >
   {#if isDeleting} <div class="animate-spin w-4 h-4 mr-1 border border-current border-t-transparent"></div> {:else} <Trash2 class="w-4 h-4" /> {/if} Delete </Button> {/if}
   </div>
- <div class="flex items-center"> <Button variant="ghost" onclick={ handleClose }> Cancel </Button>
-  {#if mode !== 'view'} <Button onclick={ handleSave } disabled={ isSaving } >
+ <div class="flex items-center"> <Button class="bits-btn" variant="ghost" onclick={ handleClose }> Cancel </Button>
+  {#if mode !== 'view'} <Button class="bits-btn" onclick={ handleSave } disabled={ isSaving } >
   {#if isSaving} <div class="animate-spin w-4 h-4 mr-1 border border-current border-t-transparent"></div> {:else} <Save class="w-4 h-4" /> {/if} {mode === 'create' ? 'Create': 'Save'} </Button> {/if}
   </div> {/if}
   </div> {/if}
   <style> @keyframes fadeOut { from { opacity: 1} to { opacity: 0} }
-  @keyframes scaleIn { from { opacity: 0; transform: scale(0.95)}
-    to { opacity: 1; transform: scale(1)}
-  } @keyframes scaleOut { from { opacity: 1; transform: scale(1)}
-    to { opacity: 0; transform: scale(0.95)}
+  @keyframes scaleIn { from { opacity: 0;, transform: scale(0.95)}
+    to { opacity: 1;, transform: scale(1)}
+  } @keyframes scaleOut { from { opacity: 1;, transform: scale(1)}
+    to { opacity: 0;, transform: scale(0.95)}
   } .animate-fadeOut { animation: fadeOut 200ms ease-out forward}
   .animate-scaleIn { animation: scaleIn 200ms ease-out forward}
   .animate-scaleOut { animation: scaleOut 200ms ease-out forward}

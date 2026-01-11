@@ -6,18 +6,15 @@
  */
 
 export interface EmbeddingRequest {
- model: string;
- prompt: string;
+ model: string;, prompt: string;
 }
 
 export interface EmbeddingResponse {
- embedding: number[];
- model: string;
+ embedding: number[];, model: string;
 }
 
 export interface BatchEmbeddingResponse {
- embeddings: number[][];
- model: string;
+ embeddings: number[][];, model: string;
  count: number;
 }
 
@@ -82,8 +79,7 @@ export async function embedTextsBatch(
 /**
  * Check Ollama health and model availability
  */
-export async function checkOllamaHealth(): Promise<{
- healthy: boolean;
+export async function checkOllamaHealth(): Promise<{, healthy: boolean;
  models: string[];
  error?: string;
 }> {

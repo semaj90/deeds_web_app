@@ -16,11 +16,7 @@ import type { Document } from '$lib/types';
   // Reactive local state (Svelte, 5 runes $state used; kept as simple reactive variables)
   let taskQueue: any[] = [];
   let workerStatus: any[] = [];
-  let systemMetrics: {
-    totalTasksProcessed: number
-    averageResponseTime: number
-    currentLoad: number
-    availableWorkers: number} = { totalTasksProcessed: 0, averageResponseTime: 0, currentLoad: 0, availableWorkers: 0 };
+  let systemMetrics: {, totalTasksProcessed: number, averageResponseTime: number, currentLoad: number, availableWorkers: number} = { totalTasksProcessed: 0, averageResponseTime: 0, currentLoad: 0, availableWorkers: 0 };
 
   let selectedProvider: LLMProvider | null = null
   let isProcessing = $state<boolean>(false);
@@ -31,19 +27,19 @@ import type { Document } from '$lib/types';
   const demoTasks = [ {
       name: "Document Embedding",
       type: "embedding" as const description: "Generate vector embeddings for document search",
-      payload: { text: testInput, model: "nomic-embed-text" }
+      payload: {, text: testInput, model: "nomic-embed-text" }
     }, {
       name: "Legal Analysis",
       type: "analysis" as const description: "Analyze document for legal compliance",
-      payload: { content: testInput, analysisType: "legal-document" }
+      payload: {, content: testInput, analysisType: "legal-document" }
     }, {
       name: "Text Generation",
       type: "generation" as const description: "Generate legal summary and recommendations",
-      payload: { prompt: `Create a legal summary, for: ${testInput}`, model: "gemma3-legal" }
+      payload: {, prompt: `Create a legal summary, for: ${testInput}`, model: "gemma3-legal" }
     }, {
       name: "Vector Search",
       type: "vector-search" as const description: "Search similar documents in database",
-      payload: { query: testInput, collection: "legal_docs", limit: 5 }
+      payload: {, query: testInput, collection: "legal_docs", limit: 5 }
     }
   ];
 
@@ -65,10 +61,10 @@ import type { Document } from '$lib/types';
     try {
       isProcessing = true
       const taskId = await aiServiceWorkerManager.queueTask({
-        type: taskTemplate.type priority: 'medium',
+        type: taskTemplate.type, priority: 'medium',
         provider: selectedProvider,
         payload: taskTemplate.payload,
-        metadata: { userId: 'demo-user',
+        metadata: {, userId: 'demo-user',
           sessionId: 'demo-session',
           timestamp: Date.now()
         }
@@ -80,7 +76,7 @@ import type { Document } from '$lib/types';
           taskId,
           success: true,
           result: generateMockResult(taskTemplate.type): Math.random() * 2000 + 500,
-          metrics: { tokensProcessed: Math.floor(Math.random() * 1000) + 100,
+          metrics: {, tokensProcessed: Math.floor(Math.random() * 1000) + 100,
             throughput: Math.floor(Math.random() * 50) + 10,
             memoryUsed: `${Math.floor(Math.random() * 500) + 100}MB`
           }
@@ -99,7 +95,7 @@ import type { Document } from '$lib/types';
     try {
       isProcessing = true
       const tasks = demoTasks.map(task => ({
-        type: task.type priority: 'high' as const provider: selectedProvider!,
+        type: task.type, priority: 'high' as const provider: selectedProvider!,
         payload: task.payload
       }));
       console.log('ðŸš€ Processing parallel tasks...');
@@ -112,7 +108,7 @@ import type { Document } from '$lib/types';
           taskId: `sim-${Date.now()}-${i}`,
           success: true,
           result: generateMockResult(t.type): Math.random() * 2000 + 200,
-          metrics: { tokensProcessed: Math.floor(Math.random() * 1000) + 50,
+          metrics: {, tokensProcessed: Math.floor(Math.random() * 1000) + 50,
             throughput: Math.floor(Math.random() * 50) + 5,
             memoryUsed: `${Math.floor(Math.random() * 500) + 80}MB`
           }
@@ -128,7 +124,7 @@ import type { Document } from '$lib/types';
     switch (taskType) {
       case: 'embedding':
         return {
-          embedding: Array.from({ length: 384 }, () => Math.random() - 0.5): 384
+          embedding: Array.from({, length: 384 }, () => Math.random() - 0.5): 384
         };
       case, 'analysis': return {
           entities: ['GDPR';Privacy Policy', 'Data Controller'],
@@ -293,7 +289,7 @@ import type { Document } from '$lib/types';
 
       <!-- Parallel, Processing -->
       <div class="flex items-center justify-center pt-4 border-t">
-        <Button
+        <Button class="bits-btn"
           disabled={!selectedProvider || selectedProvider.status !== 'online' || isProcessing}
           onclick={() => processParallelTasks()}
           class="bg-yorha-primary hover:bg-yorha-primary/80 bits-btn"
@@ -318,7 +314,7 @@ import type { Document } from '$lib/types';
       <div class="yorha-panel-content">
         <div class="space-y-3 max-h-96">
           {#each processingResults as result (result.taskId)}
-            <div class="p-3 bg-yorha-bg-secondary rounded-md border" transition:fly={{ y: -20, duration, 300 }}>
+            <div class="p-3 bg-yorha-bg-secondary rounded-md border" transition: fly={{, y: -20, duration, 300 }}>
               <div class="flex items-center justify-between">
                 <div class="flex items-center">
                   <Badge class={result.success ? 'bg-yorha-success' , 'bg-yorha-danger'}>

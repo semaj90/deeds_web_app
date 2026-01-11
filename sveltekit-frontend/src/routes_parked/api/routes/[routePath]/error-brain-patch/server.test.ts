@@ -4,7 +4,7 @@ describe('POST /api/routes/:routePath/error-brain-patch', () => {
  it('should validate patch_content is required', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch', {
  method: 'POST',
- body: JSON.stringify({ file_path: 'src/test.ts' }),
+ body: JSON.stringify({, file_path: 'src/test.ts' }),
  });
 
  const body = await request.json();
@@ -14,7 +14,7 @@ describe('POST /api/routes/:routePath/error-brain-patch', () => {
  it('should validate file_path is required', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch', {
  method: 'POST',
- body: JSON.stringify({ patch_content: 'some patch' }),
+ body: JSON.stringify({, patch_content: 'some patch' }),
  });
 
  const body = await request.json();
@@ -24,8 +24,7 @@ describe('POST /api/routes/:routePath/error-brain-patch', () => {
  it('should accept valid patch data', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch', {
  method: 'POST',
- body: JSON.stringify({
- file_path: 'src/routes/test/+page.svelte',
+ body: JSON.stringify({, file_path: 'src/routes/test/+page.svelte',
  patch_content: 'import { Type } from './types.js';',
  description: 'Fix import statement',
  risk_level: 'low',
@@ -40,8 +39,7 @@ describe('POST /api/routes/:routePath/error-brain-patch', () => {
  it('should handle optional fields', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch', {
  method: 'POST',
- body: JSON.stringify({
- file_path: 'src/test.ts',
+ body: JSON.stringify({, file_path: 'src/test.ts',
  patch_content: 'patch content',
  description: 'Optional description',
  analysis_id: '123e4567-e89b-12d3-a456-426614174000',
@@ -60,8 +58,7 @@ describe('POST /api/routes/:routePath/error-brain-patch', () => {
  it('should default risk_level to medium', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch', {
  method: 'POST',
- body: JSON.stringify({
- file_path: 'src/test.ts',
+ body: JSON.stringify({, file_path: 'src/test.ts',
  patch_content: 'patch',
  }),
  });
@@ -77,8 +74,7 @@ describe('POST /api/routes/:routePath/error-brain-patch', () => {
  for (const riskLevel of riskLevels) {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch', {
  method: 'POST',
- body: JSON.stringify({
- file_path: 'src/test.ts',
+ body: JSON.stringify({, file_path: 'src/test.ts',
  patch_content: 'patch',
  risk_level: riskLevel,
  }),
@@ -100,8 +96,7 @@ describe('POST /api/routes/:routePath/error-brain-patch', () => {
 
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch', {
  method: 'POST',
- body: JSON.stringify({
- file_path: 'src/test.ts',
+ body: JSON.stringify({, file_path: 'src/test.ts',
  patch_content: multilinePatch,
  }),
  });
@@ -114,8 +109,7 @@ describe('POST /api/routes/:routePath/error-brain-patch', () => {
  it('should handle special characters in file paths', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch', {
  method: 'POST',
- body: JSON.stringify({
- file_path: 'src/routes/[id]/special-chars-@#$%/+page.svelte',
+ body: JSON.stringify({, file_path: 'src/routes/[id]/special-chars-@#$%/+page.svelte',
  patch_content: 'patch',
  }),
  });
@@ -128,8 +122,7 @@ describe('POST /api/routes/:routePath/error-brain-patch', () => {
  it('should handle empty description', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch', {
  method: 'POST',
- body: JSON.stringify({
- file_path: 'src/test.ts',
+ body: JSON.stringify({, file_path: 'src/test.ts',
  patch_content: 'patch',
  description: '',
  }),
@@ -142,8 +135,7 @@ describe('POST /api/routes/:routePath/error-brain-patch', () => {
  it('should handle null optional fields', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch', {
  method: 'POST',
- body: JSON.stringify({
- file_path: 'src/test.ts',
+ body: JSON.stringify({, file_path: 'src/test.ts',
  patch_content: 'patch',
  description: null, analysis_id: null,
  cluster_id: null,
@@ -157,8 +149,7 @@ describe('POST /api/routes/:routePath/error-brain-patch', () => {
  it('should preserve route path from URL', async () => {
  const request = new Request('http://localhost/api/routes/my-route/error-brain-patch', {
  method: 'POST',
- body: JSON.stringify({
- file_path: 'src/test.ts',
+ body: JSON.stringify({, file_path: 'src/test.ts',
  patch_content: 'patch',
  }),
  });

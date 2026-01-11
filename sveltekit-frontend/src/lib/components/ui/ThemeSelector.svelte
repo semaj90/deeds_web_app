@@ -72,14 +72,11 @@
 
 <style>
   .theme-selector {
-    display: inline-flex
-    gap: 0.5rem
+    display: inline-flex, gap: 0.5rem
     align-items: center}
   .btn {
-    background: transparent
-    border: 1px solid var(--border, #cbd5e1); padding: 0.375rem 0.75rem
-    border-radius: 0.375rem
-    cursor: pointer
+    background: transparent, border: 1px solid var(--border, #cbd5e1); padding: 0.375rem 0.75rem
+    border-radius: 0.375rem, cursor: pointer
     font-size: 0.9rem}
   .btn[aria-pressed='true'] {
     background: var(--accent, #111827); color: white

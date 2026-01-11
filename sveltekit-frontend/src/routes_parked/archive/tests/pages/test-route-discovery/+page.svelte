@@ -124,7 +124,7 @@
  <div class="flex flex-wrap gap-4">
  <a
  href="/all-routes"
- class="flex-1 min-w-[200px] px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-medium transition-all hover:shadow-lg hover:shadow-blue-500/20 text-center"
+ class="flex-1 min-w-[200px] px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover: from-blue-700, hover:to-blue-800 text-white rounded-xl font-medium transition-all hover: shadow-lg, hover:shadow-blue-500/20 text-center"
  >
  <div class="text-2xl mb-2">🎮</div>
  <div>View All Routes</div>
@@ -132,7 +132,7 @@
  </a>
  <a
  href="/command/routes"
- class="flex-1 min-w-[200px] px-6 py-4 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white rounded-xl font-medium transition-all hover:shadow-lg hover:shadow-amber-500/20 text-center"
+ class="flex-1 min-w-[200px] px-6 py-4 bg-gradient-to-r from-amber-600 to-amber-700 hover: from-amber-700, hover:to-amber-800 text-white rounded-xl font-medium transition-all hover: shadow-lg, hover:shadow-amber-500/20 text-center"
  >
  <div class="text-2xl mb-2">📟</div>
  <div>NES Command Center</div>
@@ -141,7 +141,7 @@
  <a
  href="/api/routes/all"
  target="_blank"
- class="flex-1 min-w-[200px] px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-xl font-medium transition-all hover:shadow-lg hover:shadow-purple-500/20 text-center"
+ class="flex-1 min-w-[200px] px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover: from-purple-700, hover:to-purple-800 text-white rounded-xl font-medium transition-all hover: shadow-lg, hover:shadow-purple-500/20 text-center"
  >
  <div class="text-2xl mb-2">🔌</div>
  <div>API Endpoint</div>

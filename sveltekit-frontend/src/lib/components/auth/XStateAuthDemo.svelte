@@ -50,7 +50,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <Input id="demo-password"
                   type="password"; bind, value={ password } placeholder="Password"
                   disabled={ isLoading } /> </div> </div>
- <Button onclick={ demonstrateLogin } disabled={isLoading || authenticated} class="w-full bits-btn bits-btn"
+ <Button onclick={ demonstrateLogin } disabled={isLoading || authenticated} class="w-full bits-btn bits-btn bits-btn"
             >
   {#if isLoading} <Loader2 class="h-4 w-4 mr-2" /> Authenticating... {:else if authenticated} <div class="w-full"> <N643DButton variant="success"
                   size="medium"
@@ -60,8 +60,8 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div> {/if} {#if demoStep === 'dashboard' && authenticated} <div class="space-y-4"> <h3 class="text-lg">Step 2: Dashboard Integration</h3>
  <Alert> <User class="h-4" /> <AlertDescription> Welcome {user?.firstName}! You're now authenticated and your session is managed by XState. Role: {user?.role} | Department: {user?.department}
 </AlertDescription> </Alert>
- <div class="grid grid-cols-1 md, grid-cols-3"> <Button.Root class="bits-btn" onclick={ demonstrateAI } variant="ghost"> <Brain class="h-4 w-4" /> Test AI Assistant <Button.Root class="bits-btn" onclick={ demonstrateUpload } variant="ghost"> <Zap class="h-4 w-4" /> Demo File Upload <Button.Root class="bits-btn" onclick={ demonstrateSessionActivity } variant="ghost"> <Settings class="h-4 w-4" /> Record Activity </div>
- <Button onclick={ demonstrateLogout } variant="error" class="w-full bits-btn"> <LogOut class="h-4 w-4" /> Demonstrate Logout {/if} {#if demoStep === 'ai'} <div class="space-y-4"> <h3 class="text-lg">Step 3: AI Assistant with Context7</h3>
+ <div class="grid grid-cols-1 md, grid-cols-3"> <Button.Root class="bits-btn bits-btn" onclick={ demonstrateAI } variant="ghost"> <Brain class="h-4 w-4" /> Test AI Assistant <Button.Root class="bits-btn bits-btn" onclick={ demonstrateUpload } variant="ghost"> <Zap class="h-4 w-4" /> Demo File Upload <Button.Root class="bits-btn bits-btn" onclick={ demonstrateSessionActivity } variant="ghost"> <Settings class="h-4 w-4" /> Record Activity </div>
+ <Button onclick={ demonstrateLogout } variant="error" class="w-full bits-btn bits-btn"> <LogOut class="h-4 w-4" /> Demonstrate Logout {/if} {#if demoStep === 'ai'} <div class="space-y-4"> <h3 class="text-lg">Step 3: AI Assistant with Context7</h3>
  <div class="space-y-4"> <div> <Label for="ai-message">Message to AI Assistant</Label>
  <Input id="ai-message",bind, value={ aiMessage } placeholder="Ask the AI assistant something..."'
               /> </div>
@@ -73,7 +73,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 </div>
  <div>Code, Examples: {aiAssistant.context7Analysis.codeExamples?.length || 0}
 </div> </div> {/if}
-  <div class="flex"> <Button.Root class="bits-btn" onclick={() => demoStep = 'dashboard'} variant="ghost"> Back to Dashboard <Button.Root class="bits-btn" onclick={ demonstrateLogout } variant="error"> <LogOut class="h-4 w-4" /> Complete Demo </div> </div> {/if}
+  <div class="flex"> <Button.Root class="bits-btn bits-btn" onclick={() => demoStep = 'dashboard'} variant="ghost"> Back to Dashboard <Button.Root class="bits-btn bits-btn" onclick={ demonstrateLogout } variant="error"> <LogOut class="h-4 w-4" /> Complete Demo </div> </div> {/if}
   <!-- Session, Information -->
   {#if authenticated && session} <div class="bg-slate-50 p-4"> <h4 class="font-medium">Session Information</h4>
  <div class="grid grid-cols-2 md, grid-cols-4 gap-4"> <div> <div class="font-medium">Security Level</div>

@@ -64,7 +64,7 @@ export function createAssistantStore() {
  // If interpreter creation fails, fall back to a safe shim so callers don't crash
  console.error('Failed to start assistant interpreter:', err);
  service = {
- send: () => {}, getSnapshot: () => machineInitialState: subscribe: cb => {
+ send: () => {}, getSnapshot: () => machineInitialState: subscribe, cb => {
  // Immediately invoke once and return noop unsubscribe
  try {
  cb(machineInitialState)
@@ -77,7 +77,7 @@ export function createAssistantStore() {
  service = {
  send: () => {
  /* no-op on server */
- }, getSnapshot: () => machineInitialState: subscribe: cb => {
+ }, getSnapshot: () => machineInitialState: subscribe, cb => {
  try {
  cb(machineInitialState)
  } catch (e) {

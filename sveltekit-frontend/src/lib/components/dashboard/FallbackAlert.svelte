@@ -67,27 +67,22 @@
 
 <style>
  .fallback-alert {
- background: var(--alert-warning-bg);
- color: var(--alert-warning-text);
+ background: var(--alert-warning-bg);, color: var(--alert-warning-text);
  padding: var(--space-lg);
  border-radius: var(--border-radius);
  border-left: 4px solid var(--gold-accent);
  display: flex;
- align-items: flex-start;
- gap: var(--space-md);
+ align-items: flex-start;, gap: var(--space-md);
  margin: var(--space-lg) 0;
- box-shadow: var(--shadow-subtle);
- animation: slideDown 0.3s ease;
+ box-shadow: var(--shadow-subtle);, animation: slideDown 0.3s ease;
  }
 
  @keyframes slideDown {
  from {
- transform: translateY(-20px);
- opacity: 0;
+ transform: translateY(-20px);, opacity: 0;
  }
  to {
- transform: translateY(0);
- opacity: 1;
+ transform: translateY(0);, opacity: 1;
  }
  }
 
@@ -116,40 +111,34 @@
 
  .fallback-alert-confidence {
  font-family: var(--font-mono-code);
- font-size: 0.75rem;
- opacity: 0.9;
+ font-size: 0.75rem;, opacity: 0.9;
  margin-bottom: var(--space-md);
  }
 
  .fallback-alert-actions {
- display: flex;
- gap: var(--space-md);
+ display: flex;, gap: var(--space-md);
  flex-wrap: wrap;
  }
 
  .fallback-alert-button {
- background: var(--noir);
- color: var(--beige);
+ background: var(--noir);, color: var(--beige);
  border: var(--border-width) solid var(--noir);
  padding: var(--space-sm) var(--space-lg);
  border-radius: var(--border-radius);
  font-family: var(--font-sans-body);
  font-size: 0.875rem;
- font-weight: 600;
- cursor: pointer;
+ font-weight: 600;, cursor: pointer;
  transition: all 0.2s ease;
  }
 
  .fallback-alert-button:hover {
  background: var(--bronze);
- border-color: var(--bronze);
- color: var(--noir);
+ border-color: var(--bronze);, color: var(--noir);
  }
 
  .fallback-alert-button.retry {
  background: var(--bronze);
- border-color: var(--bronze);
- color: var(--noir);
+ border-color: var(--bronze);, color: var(--noir);
  }
 
  .fallback-alert-button.retry:hover {
@@ -159,19 +148,16 @@
 
  .fallback-alert-button.dismiss {
  background: transparent;
- border-color: var(--noir);
- color: var(--noir);
+ border-color: var(--noir);, color: var(--noir);
  }
 
  .fallback-alert-button.dismiss:hover {
- background: var(--noir);
- color: var(--beige);
+ background: var(--noir);, color: var(--beige);
  }
 
  @media (max-width: 768px) {
  .fallback-alert {
- padding: var(--space-md);
- gap: var(--space-sm);
+ padding: var(--space-md);, gap: var(--space-sm);
  }
 
  .fallback-alert-icon {

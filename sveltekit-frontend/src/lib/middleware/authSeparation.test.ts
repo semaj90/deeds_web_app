@@ -110,7 +110,7 @@ describe('AuthSeparation', () => {
  it('should create 401 response for auth failure', () => {
  const result = {
  authenticated: false, status: 401, message: 'Authentication required',
- context: { feature: 'legalAi', authType: 'production' as const },
+ context: {, feature: 'legalAi', authType: 'production' as const },
  };
 
  const response = AuthSeparation.createAuthErrorResponse(result);
@@ -120,7 +120,7 @@ describe('AuthSeparation', () => {
  it('should include WWW-Authenticate header', () => {
  const result = {
  authenticated: false, status: 401, message: 'Authentication required',
- context: { feature: 'legalAi', authType: 'production' as const },
+ context: {, feature: 'legalAi', authType: 'production' as const },
  };
 
  const response = AuthSeparation.createAuthErrorResponse(result);
@@ -130,7 +130,7 @@ describe('AuthSeparation', () => {
  it('should include error details in response body', async () => {
  const result = {
  authenticated: false, status: 401, message: 'Authentication required',
- context: { feature: 'legalAi', authType: 'production' as const },
+ context: {, feature: 'legalAi', authType: 'production' as const },
  };
 
  const response = AuthSeparation.createAuthErrorResponse(result);
@@ -152,8 +152,7 @@ describe('AuthSeparation', () => {
  describe('Token Extraction', () => {
  it('should extract Bearer token from Authorization header', () => {
  const request = new Request('http://localhost/api/legal-ai/citations', {
- headers: {
- Authorization: 'Bearer token123',
+ headers: {, Authorization: 'Bearer token123',
  },
  });
 
@@ -169,8 +168,7 @@ describe('AuthSeparation', () => {
 
  it('should return undefined for invalid Authorization format', () => {
  const request = new Request('http://localhost/api/legal-ai/citations', {
- headers: {
- Authorization: 'InvalidFormat token123',
+ headers: {, Authorization: 'InvalidFormat token123',
  },
  });
 
@@ -180,8 +178,7 @@ describe('AuthSeparation', () => {
 
  it('should return undefined for malformed Bearer token', () => {
  const request = new Request('http://localhost/api/legal-ai/citations', {
- headers: {
- Authorization: 'Bearer',
+ headers: {, Authorization: 'Bearer',
  },
  });
 
@@ -258,8 +255,7 @@ describe('AuthSeparation', () => {
  describe('Helper Functions', () => {
  it('should check if request is authenticated', () => {
  const request = new Request('http://localhost/api/legal-ai/citations', {
- headers: {
- Authorization: 'Bearer token123',
+ headers: {, Authorization: 'Bearer token123',
  'X-User-ID': 'user123',
  },
  });
@@ -285,8 +281,7 @@ describe('AuthSeparation', () => {
 
  it('should return null for authenticated request', () => {
  const request = new Request('http://localhost/api/legal-ai/citations', {
- headers: {
- Authorization: 'Bearer token123',
+ headers: {, Authorization: 'Bearer token123',
  'X-User-ID': 'user123',
  },
  });
@@ -340,15 +335,13 @@ describe('AuthSeparation', () => {
 
  it('should handle multiple legal-ai requests with auth', () => {
  const request1 = new Request('http://localhost/api/legal-ai/citations', {
- headers: {
- Authorization: 'Bearer token123',
+ headers: {, Authorization: 'Bearer token123',
  'X-User-ID': 'user123',
  },
  });
 
  const request2 = new Request('http://localhost/api/legal-ai/authorities', {
- headers: {
- Authorization: 'Bearer token456',
+ headers: {, Authorization: 'Bearer token456',
  'X-User-ID': 'user456',
  },
  });

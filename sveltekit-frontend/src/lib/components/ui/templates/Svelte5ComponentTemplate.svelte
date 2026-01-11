@@ -172,8 +172,7 @@ function handleKeydown(event: KeyboardEvent) {
 <style>
 	/* Component-scoped styles */
 	.component-wrapper {
-		--component-radius: 8px;
-		position: relative;
+		--component-radius: 8px;, position: relative;
 	}
 
 	/* NES variant pixel border effect */

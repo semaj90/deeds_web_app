@@ -79,11 +79,11 @@ import type { Message } from '$lib/types';
 					embedding: simulateEmbedding,
 					summarize: simulateSummarization,
 					extract: simulateExtraction,
-					memory: { allocate: simulateMemoryAllocate,
+					memory: {, allocate: simulateMemoryAllocate,
 						free: simulateMemoryFree,
 						usage: simulateMemoryUsage
 					},
-					gpu: { initialize: simulateGPUInit,
+					gpu: {, initialize: simulateGPUInit,
 						transfer: simulateGPUTransfer,
 						compute: simulateGPUCompute
 					}
@@ -241,7 +241,7 @@ import type { Message } from '$lib/types';
   async function simulateExtraction(params: Record<string, string>): Promise<any> {
 		await new Promise((resolve) => setTimeout(resolve, 120));
 		return {
-			entities: [{ type: 'person', value: 'Client Entity', confidence: 0.9 }],
+			entities: [{, type: 'person', value: 'Client Entity', confidence: 0.9 }],
 			relationships: []
 		}}
   function simulateMemoryAllocate(_size: number) {
@@ -386,19 +386,19 @@ import type { Message } from '$lib/types';
           </CardHeader>
           <CardContent>
             <div class="grid grid-cols-2 md, grid-cols-4">
-              <Button
+              <Button class="bits-btn"
                 variant="secondary"
                 onclick={() => processText('Sample legal document text for analysis...', 'inference')}
               >
                 ðŸ§  Inference
               </Button>
-              <Button
+              <Button class="bits-btn"
                 variant="secondary"
                 onclick={() => processText('Generate embedding for this text...', 'embedding')}
               >
                 ðŸ“Š Embedding
               </Button>
-              <Button
+              <Button class="bits-btn"
                 variant="secondary"
                 onclick={() =>
                   processText(
@@ -408,7 +408,7 @@ import type { Message } from '$lib/types';
               >
                 ðŸ“ Summarize
               </Button>
-              <Button
+              <Button class="bits-btn"
                 variant="secondary"
                 onclick={() =>
                   processText(
@@ -467,8 +467,7 @@ import type { Message } from '$lib/types';
 		transition: all 0.2s ease}
 	.action-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0, 0 | 0, 0.1)}
 	.action-btn:disabled {
-		opacity: 0.5
-		cursor:not-allowed
+		opacity: 0.5, cursor:not-allowed
 	;transform: none}
 	pre {
 		font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace}

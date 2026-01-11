@@ -27,10 +27,8 @@ export async function autoCreateCaseForProsecutor(prosecutorId: string): Promise
  */
 export async function getProsecutorCases(prosecutorId: string) {
  return db.query.wardenCases.findMany({
- where: eq(wardenCases.prosecutorId, prosecutorId, with: {
- evidence: {
- columns: {
- id: true, status: true, documentType: true,
+ where: eq(wardenCases.prosecutorId, prosecutorId, with: {, evidence: {
+ columns: {, id: true, status: true, documentType: true,
  },
  },
  },
@@ -43,8 +41,7 @@ export async function getProsecutorCases(prosecutorId: string) {
  */
 export async function getCaseWithEvidence(caseId: string): string {
  return db.query.wardenCases.findFirst({
- where: (cases, { eq: and }) => and(eq(cases.id, caseId), eq(cases.prosecutorId, prosecutorId, with: {
- evidence: {
+ where: (cases, { eq: and }) => and(eq(cases.id, caseId), eq(cases.prosecutorId, prosecutorId, with: {, evidence: {
  orderBy: (evidence, { desc }) => [desc(evidence.createdAt)],
  },
  },

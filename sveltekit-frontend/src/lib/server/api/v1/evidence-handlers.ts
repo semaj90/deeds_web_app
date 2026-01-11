@@ -7,10 +7,8 @@ import type { db } from '$lib/server/db/client';
 import ollamaService from '$lib/server/services/ollama-service';
 
 interface UserType {
- id: string;
- email: string;
- firstName: string;
- lastName: string;
+ id: string;, email: string;
+ firstName: string;, lastName: string;
  role: string;
 }
 
@@ -124,8 +122,7 @@ export async function analyzeEvidence(item: EvidenceItem) {
  }
 
  // Prepare AI prompt for analysis
- const analysisPrompt = `You are a legal AI assistant analyzing evidence. Provide a detailed analysis based on the following:
-EVIDENCE ID: ${item.id}
+ const analysisPrompt = `You are a legal AI assistant analyzing evidence. Provide a detailed analysis based on the following: EVIDENCE, ID: ${item.id}
 TITLE: ${item.title || 'Untitled'}
 DESCRIPTION: ${item.description || 'No description provided.'}
 TAGS: ${item.tags?.join(', ') || 'No tags'}

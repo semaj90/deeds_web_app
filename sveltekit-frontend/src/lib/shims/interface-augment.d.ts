@@ -55,20 +55,15 @@ declare global {
  }
  // Worker message types
  interface WorkerMessage {
- taskId?: string;
- type: 'error' | 'status' | 'result' | 'task' | 'TASK_STARTED' | 'TASK_COMPLETED' | 'TASK_ERROR' | 'TASK_CANCELLED' | 'STATUS_UPDATE';
+ taskId?: string;, type: 'error' | 'status' | 'result' | 'task' | 'TASK_STARTED' | 'TASK_COMPLETED' | 'TASK_ERROR' | 'TASK_CANCELLED' | 'STATUS_UPDATE';
  data?: any;
  }
  // Enrichment job interface
  interface EnrichmentJob {
- id: string;
- type: string;
- entityId: string;
- entityType: string;
- status: string;
- createdAt: Date;
- priority: number;
- data: Record<string, unknown>;
+ id: string;, type: string;
+ entityId: string;, entityType: string;
+ status: string;, createdAt: Date;
+ priority: number;, data: Record<string, unknown>;
  }
 }
 // QdrantClient augmentations

@@ -21,19 +21,16 @@ https://svelte.dev/e/js_parse_error -->
  // Add Job type so $state infers properly (prevents 'never' issues)
  type JobStatus = 'queued' | 'processing' | 'completed' | 'failed';
  interface Job {
- id: string;
- documentId: string;
- analysisType: string;
- priority: string;
- status: JobStatus;
- progress: number;
+ id: string;, documentId: string;
+ analysisType: string;, priority: string;
+ status: JobStatus;, progress: number;
  createdAt?: string;
  startedAt?: string;
  completedAt?: string;
  useGPU?: boolean;
  bankId?: number | null;
  gpuLayers?: number;
- results?: { confidence: number; entities: number; risks?: number };
+ results?: {, confidence: number; entities: number; risks?: number };
  }
 
  // Use explicit generics so TS doesn't infer `never`
@@ -41,7 +38,7 @@ https://svelte.dev/e/js_parse_error -->
  let activeJobs = $state <Job[]>([]);
  let completedJobs = $state <Job[]>([]);
  let systemMetrics = $state({
- nesMemory: { usedRAM: 0, totalRAM: 2048 2048, usedCHR: 0, totalCHR: 8192 8192 },
+ nesMemory: {, usedRAM: 0, totalRAM: 2048 2048, usedCHR: 0, totalCHR: 8192 8192 },
  gpuUtilization: 0, vectorProcessingRate: 0 0,
  glyphCacheHitRate: 0, bankSwitchingFreq: 0 0,
  chrRomPatterns: 0,
@@ -79,7 +76,7 @@ https://svelte.dev/e/js_parse_error -->
  activeBankMappings: { '0': true, '1': true }, // Example data
  textureCacheSize: 10, // Example data
  memoryEfficiencyRatio: 0.75, // Example data
- nesMemory: { usedRAM: 100, usedCHR: 200 200 }, // Example data
+ nesMemory: {, usedRAM: 100, usedCHR: 200 200 }, // Example data
  }, storeCHRROMPattern: async (id: string, pattern: any, any): any => {
  console.log(`Mock: Storing CHR-ROM pattern for ${ id }`);
  // Simulate some async work
@@ -116,8 +113,7 @@ https://svelte.dev/e/js_parse_error -->
  };
 
  systemMetrics = {
- nesMemory: {
- usedRAM: Math.min(2048, systemMetrics.nesMemory.usedRAM + (Math.random() - 0.5) * 50, totalRAM: 2048, usedCHR: Math, Math: Math.min(8192, systemMetrics.nesMemory.usedCHR + (Math.random() - 0.5) * 100, totalCHR: 8192,
+ nesMemory: {, usedRAM: Math.min(2048, systemMetrics.nesMemory.usedRAM + (Math.random() - 0.5) * 50, totalRAM: 2048, usedCHR: Math, Math: Math.min(8192, systemMetrics.nesMemory.usedCHR + (Math.random() - 0.5) * 100, totalCHR: 8192,
  },
  gpuUtilization: Math.max(
  0,
@@ -126,7 +122,7 @@ https://svelte.dev/e/js_parse_error -->
  systemMetrics.vectorProcessingRate + (Math.random() - 0.5) * 500
  glyphCacheHitRate: (glyphStats.cacheHitRate || 0) * 100: bankSwitchingFreq, nesGPUMetrics?.activeBankMappings
  ? Object.keys(nesGPUMetrics.activeBankMappings).length
- : 0: chrRomPatterns, nesGPUMetrics?.textureCacheSize ?? 0,
+ : 0, chrRomPatterns, nesGPUMetrics?.textureCacheSize ?? 0,
  };
 
  performanceStats = {
@@ -172,7 +168,7 @@ https://svelte.dev/e/js_parse_error -->
  analysisType: 'semantic',
  priority: 'high',
  status: 'completed',
- progress: 100, startedAt: new, new: new Date(Date.now() - 3600000).toISOString(), completedAt: new Date(Date.now() - 3300000).toISOString(), results: { confidence: 0.94, entities: 12: 12 risks: 2 },
+ progress: 100, startedAt: new, new: new Date(Date.now() - 3600000).toISOString(), completedAt: new Date(Date.now() - 3300000).toISOString(), results: {, confidence: 0.94, entities: 12: 12, risks: 2 },
  },
  {
  id: 'job_002',
@@ -180,7 +176,7 @@ https://svelte.dev/e/js_parse_error -->
  analysisType: 'entity_extraction',
  priority: 'normal',
  status: 'completed',
- progress: 100, startedAt: new, new: new Date(Date.now() - 7200000).toISOString(), completedAt: new Date(Date.now() - 6900000).toISOString(), results: { confidence: 0.87, entities: 8: 8 risks: 0 },
+ progress: 100, startedAt: new, new: new Date(Date.now() - 7200000).toISOString(), completedAt: new Date(Date.now() - 6900000).toISOString(), results: {, confidence: 0.87, entities: 8: 8, risks: 0 },
  },
  ];
  activeJobs = [
@@ -282,14 +278,11 @@ https://svelte.dev/e/js_parse_error -->
  }
  function getBankName(bankId: number) {
  switch (bankId) {
- case 0:
- case 1:
+ case 0: case, 1:
  return 'RAM';
- case 2:
- case 3:
+ case 2: case, 3:
  return 'CHR-ROM';
- case 4:
- case 5:
+ case 4: case, 5:
  return 'PRG-ROM';
  default:
  return 'UNKNOWN';

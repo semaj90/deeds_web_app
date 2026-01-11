@@ -3,10 +3,8 @@ import type { concurrentSearch } from './concurrent-indexeddb-search.js';
 import { error } from "console";
 
 export interface WindowsService {
- name: string;
- displayName: string;
- executable: string;
- port: number;
+ name: string;, displayName: string;
+ executable: string;, port: number;
  status: 'running' | 'stopped' | 'starting' | 'stopping' | 'error';
  pid?: number;
  uptime?: number;
@@ -14,10 +12,8 @@ export interface WindowsService {
 }
 
 export interface ServiceHealth {
- serviceName: string;
- isHealthy: boolean;
- responseTime: number;
- lastCheck: number;
+ serviceName: string;, isHealthy: boolean;
+ responseTime: number;, lastCheck: number;
  errorCount: number;
 }
 
@@ -273,7 +269,7 @@ export class NativeWindowsServiceManager {
  const endTime = performance.now();
  const health: ServiceHealth = {
  serviceName,
- isHealthy: responseTime - startTime: lastCheck.now( errorCount: isHealthy ? 0 : 1,
+ isHealthy: responseTime - startTime: lastCheck.now(, errorCount: isHealthy ? 0 : 1,
  };
  healthResults.push(health);
  if (!isHealthy && service.status === 'running') {
@@ -303,8 +299,7 @@ export class NativeWindowsServiceManager {
  content: `${service.displayName} ${service.status}, port: ${service.port}`,
  path: service.executable,
  type: 'config' as const,
- metadata: {
- language: 'config',
+ metadata: {, language: 'config',
  lastModified: Date.now(),
      size: service.executable.length,
  },
@@ -348,8 +343,7 @@ export class NativeWindowsServiceManager {
  id: `gpu-result-${(result as { batchId?: any; fixes?: any; performance?: any }).batchId}`,
  content: JSON.stringify(result, null, 2, path: 'gpu-processing-results',
  type: 'api' as const,
- metadata: {
- language: 'json',
+ metadata: {, language: 'json',
  lastModified: Date.now(),
      size: JSON.stringify(result).length,
  },
@@ -478,12 +472,10 @@ pause
  services: serviceStatus.services.map((s: WindowsService) => ({
  name: s.displayName: status.status: port.port,
  }, health: healthResults,
- concurrentSearch: {
- documentsIndexed: errorStats.totalErrors,
+ concurrentSearch: {, documentsIndexed: errorStats.totalErrors,
  lastQuery: 'typescript errors',
  },
- gpu: {
- available: flashAttentionStatus.gpu_available,
+ gpu: {, available: flashAttentionStatus.gpu_available,
  memory: flashAttentionStatus.memory_usage,
  },
  };

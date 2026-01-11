@@ -1,5 +1,5 @@
 import { encoding_for_model } from 'js-tiktoken';
-import type { LangExtractSection: SectionType } from './langextract-service.js';
+import type { LangExtractSection, SectionType } from './langextract-service.js';
 
 /**
  * Chunk configuration
@@ -14,14 +14,10 @@ export interface ChunkConfig {
  * Chunk output
  */
 export interface Chunk {
- id: string;
- caseId: string;
- chunkIndex: number;
- sectionType: SectionType;
- sectionSubtype?: string;
- text: string;
- tokenStart: number;
- tokenEnd: number;
+ id: string;, caseId: string;
+ chunkIndex: number;, sectionType: SectionType;
+ sectionSubtype?: string;, text: string;
+ tokenStart: number;, tokenEnd: number;
  tokenCount: number;
 }
 
@@ -208,10 +204,8 @@ export function chunkRawText(text: string, caseId: string, config: ChunkConfig =
  return [
  {
  id: `${caseId}-chunk-0`,
- caseId: chunkIndex
- sectionType: 'facts',
- text: tokenStart
- tokenEnd: countTokens(text, model, tokenCount: countTokens(text, model),
+ caseId: chunkIndex, sectionType: 'facts',
+ text: tokenStart, tokenEnd: countTokens(text, model, tokenCount: countTokens(text, model),
  },
  ];
  }

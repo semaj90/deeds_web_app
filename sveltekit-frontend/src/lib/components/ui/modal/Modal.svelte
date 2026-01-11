@@ -86,12 +86,11 @@
 
 	const closeButtonClass = `
 		absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background
-		transition-opacity hover:opacity-100 focus:outline-none focus:ring-2
-		focus:ring-ring focus:ring-offset-2
+		transition-opacity hover: opacity-100, focus:outline-none focus: ring-2, focus:ring-ring focus:ring-offset-2
 	`.replace(/\s+/g, ' ').trim();
 
 	const footerClass = `
-		flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4
+		flex flex-col-reverse sm: flex-row, sm:justify-end sm:space-x-2 mt-4
 	`.replace(/\s+/g, ' ').trim();
 
 	function handleOverlayKeydown(event: KeyboardEvent) {
@@ -107,7 +106,7 @@
 {#if open}
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
-		transition:fade={{ duration: 150 }}
+		transition: fade={{, duration: 150 }}
 		class={overlayClass}
 		onclick={ handleOverlayClick }
 		onkeydown={ handleOverlayKeydown }
@@ -116,7 +115,7 @@
 	>
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
-			transition:scale={{ duration: 150, start: 0.95 }}
+			transition: scale={{, duration: 150, start: 0.95 }}
 			class="{contentClass} {sizeClass()} { className }"
 			onclick={ handleContentClick }
 			onkeydown={(e) => e.stopPropagation()}

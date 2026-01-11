@@ -11,22 +11,16 @@ import path from 'node:path';
 
 /** Raw TypeScript diagnostic from compiler */
 export interface TSDiagnostic {
- file: string;
- line: number;
- column: number;
- code: number;
- message: string;
- category: 'error' | 'warning';
+ file: string;, line: number;
+ column: number;, code: number;
+ message: string;, category: 'error' | 'warning';
 }
 
 /** Parsed error with fix context */
 export interface ErrorRecord {
- file: string;
- line: number;
- column: number;
- code: number;
- message: string;
- category: 'error' | 'warning';
+ file: string;, line: number;
+ column: number;, code: number;
+ message: string;, category: 'error' | 'warning';
  /** Original line content */
  originalLine: string;
  /** Line before (if exists) */
@@ -70,7 +64,7 @@ export function runTypeScriptCheck(tsconfigPath: string, filterCodes?: number[])
 /**
  * Parse tsc stderr output into structured diagnostics.
  *
- * Format: src/file.ts(line): error TS1234: message
+ * Format: src/file.ts(line): error, TS1234: message
  */
 function parseTSCOutput(stderr: string): TSDiagnostic[] {
  const diagnostics: TSDiagnostic[] = [];

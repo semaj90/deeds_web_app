@@ -1,8 +1,7 @@
 declare module 'fabric';
 
 interface MemoryInfo {
- totalJSHeapSize: number;
- usedJSHeapSize: number;
+ totalJSHeapSize: number;, usedJSHeapSize: number;
  jsHeapSizeLimit: number;
 }
 interface Performance {

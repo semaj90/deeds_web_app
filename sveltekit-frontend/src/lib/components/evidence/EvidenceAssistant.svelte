@@ -23,7 +23,7 @@ import { createEventDispatcher } from 'svelte';
  let suggestions: string[] = [];
 
  const dispatch = createEventDispatcher<{
- update: { nodeId: string; updates: Partial<EvidenceNode> };
+ update: {, nodeId: string; updates: Partial<EvidenceNode> };
  close: void;
  }>();
 
@@ -52,7 +52,7 @@ import { createEventDispatcher } from 'svelte';
  // This could update metadata, confidence, or other properties
  dispatch('update', {
  nodeId: node.id,
- updates: { description: suggestion },
+ updates: {, description: suggestion },
  });
  }
 
@@ -122,7 +122,7 @@ import { createEventDispatcher } from 'svelte';
  <div class="ai-analysis">
  <div class="analysis-header">
  <h4>AI Analysis</h4>
- <Button
+ <Button class="bits-btn"
  onclick={analyzeEvidence}
  disabled={isAnalyzing}
  variant="outline"
@@ -152,7 +152,7 @@ import { createEventDispatcher } from 'svelte';
  <h5>AI Suggestions:</h5>
  <div class="suggestion-list">
  {#each suggestions as suggestion}
- <Button
+ <Button class="bits-btn"
  variant="ghost"
  size="sm"
  onclick={() => applySuggestion(suggestion)}
@@ -179,9 +179,7 @@ import { createEventDispatcher } from 'svelte';
  </label>
 
  <label>
- Description:
- <Textarea
- bind:value={node.description}
+ Description: <Textarea, bind:value={node.description}
  onchange={(e) => updateNode({ description: e.currentTarget.value })}
  rows={ 3 }
  />
@@ -213,8 +211,7 @@ import { createEventDispatcher } from 'svelte';
 
  .dialog-body {
  display: flex;
- flex-direction: column;
- gap: 1.5rem;
+ flex-direction: column;, gap: 1.5rem;
  }
 
  .node-details h4 {
@@ -230,8 +227,7 @@ import { createEventDispatcher } from 'svelte';
 
  .metadata-section h5 {
  margin: 1rem 0 0.5rem 0;
- font-size: 0.9rem;
- color: #374151;
+ font-size: 0.9rem;, color: #374151;
  }
 
  .metadata-section dl {
@@ -241,8 +237,7 @@ import { createEventDispatcher } from 'svelte';
  }
 
  .metadata-section dt {
- font-weight: 600;
- color: #374151;
+ font-weight: 600;, color: #374151;
  }
 
  .metadata-section dd {
@@ -251,8 +246,7 @@ import { createEventDispatcher } from 'svelte';
 
  .ai-analysis {
  border: 1px solid #e5e7eb;
- border-radius: 8px;
- padding: 1rem;
+ border-radius: 8px;, padding: 1rem;
  background: #f9fafb;
  }
 
@@ -264,8 +258,7 @@ import { createEventDispatcher } from 'svelte';
  }
 
  .analysis-header h4 {
- margin: 0;
- color: #374151;
+ margin: 0;, color: #374151;
  }
 
  .analysis-content {
@@ -274,14 +267,12 @@ import { createEventDispatcher } from 'svelte';
 
  .suggestions h5 {
  margin: 1rem 0 0.5rem 0;
- font-size: 0.9rem;
- color: #374151;
+ font-size: 0.9rem;, color: #374151;
  }
 
  .suggestion-list {
  display: flex;
- flex-wrap: wrap;
- gap: 0.5rem;
+ flex-wrap: wrap;, gap: 0.5rem;
  }
 
  .edit-section h4 {
@@ -291,22 +282,18 @@ import { createEventDispatcher } from 'svelte';
 
  .edit-form {
  display: flex;
- flex-direction: column;
- gap: 1rem;
+ flex-direction: column;, gap: 1rem;
  }
 
  .edit-form label {
  display: flex;
- flex-direction: column;
- gap: 0.5rem;
- font-weight: 500;
- color: #374151;
+ flex-direction: column;, gap: 0.5rem;
+ font-weight: 500;, color: #374151;
  }
 
  .edit-form input,
  .edit-form textarea {
- padding: 0.5rem;
- border: 1px solid #d1d5db;
+ padding: 0.5rem;, border: 1px solid #d1d5db;
  border-radius: 4px;
  font-size: 0.9rem;
  }

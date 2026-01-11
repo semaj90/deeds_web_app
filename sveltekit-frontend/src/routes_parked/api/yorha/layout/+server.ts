@@ -17,7 +17,7 @@ export const GET: RequestHandler = async () => {
  position: [0, 0, 0],
  rotation: [0, 0, 0],
  scale: [1, 1, 1],
- style: { theme: 'yorha' },
+ style: {, theme: 'yorha' },
  },
  {
  id: 'metricPanel',

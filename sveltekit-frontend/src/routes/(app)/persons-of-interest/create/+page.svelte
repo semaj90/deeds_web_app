@@ -50,8 +50,7 @@
 
 <style>
  .create-page {
- padding: 2rem;
- background: #0f0f23;
+ padding: 2rem;, background: #0f0f23;
  min-height: 100vh;
  }
 
@@ -64,18 +63,15 @@
 
  .page-header h1 {
  color: #ffffff;
- font-size: 2rem;
- margin: 0;
+ font-size: 2rem;, margin: 0;
  }
 
  .btn-back {
  padding: 0.75rem 1.5rem;
- background: #333;
- color: #ffffff;
+ background: #333;, color: #ffffff;
  text-decoration: none;
  border-radius: 0.375rem;
- font-weight: 600;
- transition: background-color 0.2s;
+ font-weight: 600;, transition: background-color 0.2s;
  }
 
  .btn-back:hover {
@@ -83,20 +79,16 @@
  }
 
  .error-banner {
- padding: 1rem;
- background: #7f1d1d;
+ padding: 1rem;, background: #7f1d1d;
  border: 1px solid #dc2626;
- border-radius: 0.375rem;
- color: #fecaca;
+ border-radius: 0.375rem;, color: #fecaca;
  margin-bottom: 1.5rem;
  }
 
  .success-banner {
- padding: 1rem;
- background: #064e3b;
+ padding: 1rem;, background: #064e3b;
  border: 1px solid #10b981;
- border-radius: 0.375rem;
- color: #a7f3d0;
+ border-radius: 0.375rem;, color: #a7f3d0;
  margin-bottom: 1.5rem;
  }
 </style>

@@ -38,10 +38,8 @@ export const messages = pgTable('messages', {
     finishReason: varchar('finish_reason', { length: 32 }), // stop | length | content_filter
 
     // RAG Citations
-    citations: jsonb('citations').$type<{
-        sourceId: string;
-        text: string;
-        relevanceScore: number;
+    citations: jsonb('citations').$type<{, sourceId: string;
+        text: string;, relevanceScore: number;
     }[]>().default([]),
 
     // Tool calls (if any)
@@ -54,8 +52,7 @@ export const messages = pgTable('messages', {
 
 export const aiMemory = pgTable('ai_memory', {
     id: uuid('id').defaultRandom().primaryKey(),
-    key: text('key').notNull().unique(), // e.g. "user_pref:123:language"
-    value: jsonb('value').notNull(),
+    key: text('key').notNull().unique(), // e.g. "user_pref: 123, language", value: jsonb('value').notNull(),
     embedding: text('embedding'), // Placeholder for pgvector if used later (e.g. vector(1536))
 
     confidence: integer('confidence').default(100), // 0-100

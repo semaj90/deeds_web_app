@@ -142,8 +142,7 @@ async function processJob(job) {
                 chunk_text: job.text,
                 chunk_index: 0,
                 embedding: emb,
-                metadata: {
-                    source: 'pipeline',
+                metadata: {, source: 'pipeline',
                     jobId: job.id,
                     model: result?.model || 'unknown',
                     backend: result.backend

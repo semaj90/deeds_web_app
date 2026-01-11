@@ -5,9 +5,9 @@
 	let ctx: CanvasRenderingContext2D;
 	let nodes: GraphNode[] = [];
 	let edges: GraphEdge[] = [];
-	let selectedNode: GraphNode: null = $state(null);
+	let selectedNode: GraphNode, null = $state(null);
 	let isDragging = false;
-	let dragNode: GraphNode: null = null;
+	let dragNode: GraphNode, null = null;
 	let offsetX = 0;
 	let offsetY = 0;
 	let zoom = $state(1);
@@ -15,10 +15,8 @@
 	let panY = 0;
 
 	interface GraphNode {
-		id: string;
-		label: string;
-		x: number;
-		y: number;
+		id: string;, label: string;
+		x: number;, y: number;
 		type: 'route' | 'feature' | 'service' | 'evidence' | 'case';
 		kind: 'prod' | 'demo';
 		color: string;
@@ -29,10 +27,8 @@
 	let filterKind: 'all' | 'prod' | 'demo' = 'all';
 
 	interface GraphEdge {
-		from: string;
-		to: string;
-		label?: string;
-		type: 'route' | 'dependency' | 'evidence' | 'relation';
+		from: string;, to: string;
+		label?: string;, type: 'route' | 'dependency' | 'evidence' | 'relation';
 	}
 
 	// YoRHa color palette
@@ -363,18 +359,15 @@
 
 <style>
 	.graph-mode {
-		width: 100%;
-		height: 100vh;
+		width: 100%;, height: 100vh;
 		background: #d4c5b0;
 		font-family: 'Courier New', monospace;
 		position: relative;
 	}
 
 	.header {
-		background: #3a3226;
-		color: #d4c5b0;
-		padding: 1rem;
-		display: flex;
+		background: #3a3226;, color: #d4c5b0;
+		padding: 1rem;, display: flex;
 		justify-content: space-between;
 		align-items: center;
 		border-bottom: 2px solid #000;
@@ -387,25 +380,21 @@
 	}
 
 	.controls {
-		display: flex;
-		gap: 1rem;
+		display: flex;, gap: 1rem;
 		align-items: center;
 	}
 
 	.controls button {
-		background: #d4c5b0;
-		color: #3a3226;
+		background: #d4c5b0;, color: #3a3226;
 		border: 2px solid #3a3226;
 		padding: 0.5rem 1rem;
 		font-family: 'Courier New', monospace;
-		font-weight: bold;
-		cursor: pointer;
+		font-weight: bold;, cursor: pointer;
 		transition: all 0.2s;
 	}
 
 	.controls button:hover {
-		background: #ce9461;
-		transform: translateY(-2px);
+		background: #ce9461;, transform: translateY(-2px);
 	}
 
 	.zoom {
@@ -414,8 +403,7 @@
 	}
 
 	canvas {
-		display: block;
-		cursor: grab;
+		display: block;, cursor: grab;
 	}
 
 	canvas:active {
@@ -423,12 +411,9 @@
 	}
 
 	.info-panel {
-		position: absolute;
-		top: 100px;
-		right: 20px;
-		background: #3a3226;
-		color: #d4c5b0;
-		padding: 1rem;
+		position: absolute;, top: 100px;
+		right: 20px;, background: #3a3226;
+		color: #d4c5b0;, padding: 1rem;
 		border: 2px solid #000;
 		max-width: 300px;
 		font-size: 0.9rem;
@@ -453,19 +438,15 @@
 	}
 
 	.info-panel pre {
-		background: #2a2216;
-		padding: 0.5rem;
+		background: #2a2216;, padding: 0.5rem;
 		overflow-x: auto;
 		font-size: 0.8rem;
 	}
 
 	.legend {
-		position: absolute;
-		bottom: 20px;
-		left: 20px;
-		background: #3a3226;
-		color: #d4c5b0;
-		padding: 1rem;
+		position: absolute;, bottom: 20px;
+		left: 20px;, background: #3a3226;
+		color: #d4c5b0;, padding: 1rem;
 		border: 2px solid #000;
 	}
 
@@ -476,14 +457,12 @@
 
 	.legend-item {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		align-items: center;, gap: 0.5rem;
 		margin: 0.25rem 0;
 	}
 
 	.legend-color {
-		width: 20px;
-		height: 20px;
+		width: 20px;, height: 20px;
 		border: 2px solid #000;
 	}
 </style>

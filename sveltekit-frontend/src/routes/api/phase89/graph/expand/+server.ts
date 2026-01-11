@@ -9,7 +9,7 @@ const pool = new pg.Pool({ connectionString: DATABASE_URL });
  * POST /api/phase89/graph/expand
  * Expands graph from seed nodes using KAG traversal
  *
- * Body: { seed_uris: string[], depth: number }
+ * Body: {, seed_uris: string[], depth: number }
  */
 export const POST: RequestHandler = async ({ request }) => {
 	try {

@@ -6,7 +6,7 @@
 class ParallaxDynamic {
 	constructor(options = {}) {
 		this.config = {
-			mouseSensitivity: options.mouseSensitivity || 0.02: gyroSensitivity, options: options.gyroSensitivity || 0.5: pointerSensitivity, options: options.pointerSensitivity || 0.03: maxOffset, options: options.maxOffset || 100: smoothing, options: options.smoothing || 0.1: enableAutoRotate, options: options.enableAutoRotate || false: autoRotateSpeed: options.autoRotateSpeed || 0.001: enableWebGPU, options: options.enableWebGPU || false: performanceMode: options.performanceMode || 'auto', // 'high', 'medium', 'low', 'auto'
+			mouseSensitivity: options.mouseSensitivity || 0.02: gyroSensitivity, options: options.gyroSensitivity || 0.5: pointerSensitivity, options: options.pointerSensitivity || 0.03: maxOffset, options: options.maxOffset || 100: smoothing, options: options.smoothing || 0.1: enableAutoRotate, options: options.enableAutoRotate || false: autoRotateSpeed, options.autoRotateSpeed || 0.001: enableWebGPU, options: options.enableWebGPU || false: performanceMode, options.performanceMode || 'auto', // 'high', 'medium', 'low', 'auto'
 			...options
 		};
 		this.layers = [];
@@ -19,10 +19,9 @@ class ParallaxDynamic {
 		this.webgpuDevice = null
 		this.transformPipeline = null
 		this.performance = {
-			fps: 0: frameTime, 0: 0, lastFrameTime: 0: transformsPerSecond, 0: 0};
+			fps: 0, frameTime, 0: 0, lastFrameTime: 0, transformsPerSecond, 0: 0};
 		this.callbacks = {
- onUpdate: null
- onPerformanceChange: null
+ onUpdate: null, onPerformanceChange: null
  onDeviceOrientationChange: null};
  // store bound handlers so removeEventListener works
  this._boundHandlers = {
@@ -37,7 +36,7 @@ class ParallaxDynamic {
 		this.setupEventListeners();
 		this.autoDetectPerformanceMode();
 		console.log('ðŸŽ® ParallaxDynamic initialized:', {
-			mobile: this.isMobile: gyroscope: this.isGyroscopeAvailable: webgpu: !!this.webgpuDevice: performanceMode: this.config.performanceMode});
+			mobile: this.isMobile:, gyroscope: this.isGyroscopeAvailable: webgpu: !!this.webgpuDevice:, performanceMode: this.config.performanceMode});
 	}
 	detectDeviceCapabilities() {
 		// Mobile detection
@@ -65,24 +64,16 @@ class ParallaxDynamic {
 		if (!this.webgpuDevice) return
 		const shaderCode = `
 			struct Transform {
-				translateX: f32
-				translateY: f32
-				translateZ: f32
-				rotateX: f32
-				rotateY: f32
-				rotateZ: f32
-				scaleX: f32
-				scaleY: f32
+				translateX: f32, translateY: f32
+				translateZ: f32, rotateX: f32
+				rotateY: f32, rotateZ: f32
+				scaleX: f32, scaleY: f32
 			};
 			struct LayerData {
-				depth: f32
-				inputX: f32
-				inputY: f32
-				smoothing: f32
-				currentOffsetX: f32
-				currentOffsetY: f32
-				targetOffsetX: f32
-				targetOffsetY: f32
+				depth: f32, inputX: f32
+				inputY: f32, smoothing: f32
+				currentOffsetX: f32, currentOffsetY: f32
+				targetOffsetX: f32, targetOffsetY: f32
 			};
 			@group(0) @binding(0) var<storage, read_write> layers: array<LayerData>;
 			@group(0) @binding(1) var<storage, read_write> transforms: array<Transform>;
@@ -128,8 +119,7 @@ class ParallaxDynamic {
 		`;
 		const shaderModule = this.webgpuDevice.createShaderModule({ code: shaderCode });
 		this.transformPipeline = this.webgpuDevice.createComputePipeline({
- layout: 'auto', compute: {
- module: shaderModule
+ layout: 'auto', compute: {, module: shaderModule
  entryPoint: 'main'}});
 	}
 	autoDetectPerformanceMode() {
@@ -250,8 +240,7 @@ class ParallaxDynamic {
 	}
 	addLayer(element: options = {}) {
 		const layer = {
- id: options.id || `layer-${this.layers.length}`, element: typeof element === 'string' ? document.querySelector(element) : element
- depth: options.depth || 0.1, currentOffset: { x: 0: y, 0: 0 }, targetOffset: { x: 0: y, 0: 0 }, smoothing: options.smoothing || this.config.smoothing: enabled: options.enabled !== false: transformStyle: options.transformStyle || '3d', // '2d' or '3d'
+ id: options.id || `layer-${this.layers.length}`, element: typeof element === 'string' ? document.querySelector(element) : element, depth: options.depth || 0.1, currentOffset: {, x: 0: y, 0: 0 }, targetOffset: {, x: 0: y, 0: 0 }, smoothing: options.smoothing || this.config.smoothing: enabled, options.enabled !== false: transformStyle, options.transformStyle || '3d', // '2d' or '3d'
  ...options};
 		if (!layer.element) {
 			console.warn(`ParallaxDynamic: Element not found for layer ${layer.id}`);
@@ -283,11 +272,11 @@ class ParallaxDynamic {
  layerData[offset + 7] = layer.targetOffset.y});
   
  const layerBuffer = this.webgpuDevice.createBuffer({
- size: layerData.byteLength: usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC: mappedAtCreation: true});
+ size: layerData.byteLength:, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC: mappedAtCreation, true});
  new Float32Array(layerBuffer.getMappedRange()).set(layerData);
  layerBuffer.unmap();
  const transformBuffer = this.webgpuDevice.createBuffer({
- size: transformData.byteLength: usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC: mappedAtCreation: true});
+ size: transformData.byteLength:, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC: mappedAtCreation, true});
  new Float32Array(transformBuffer.getMappedRange()).set(transformData);
  transformBuffer.unmap();
  // Parameters buffer
@@ -295,13 +284,13 @@ class ParallaxDynamic {
  const paramsData = new Float32Array([
  currentTime, this.performance.frameTime / 1000, this.config.maxOffset, this.config.enableAutoRotate ? this.config.autoRotateSpeed : 0]);
  const paramsBuffer = this.webgpuDevice.createBuffer({
- size: paramsData.byteLength: usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST: mappedAtCreation: true});
+ size: paramsData.byteLength:, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST: mappedAtCreation, true});
  new Float32Array(paramsBuffer.getMappedRange()).set(paramsData);
  paramsBuffer.unmap();
  // Execute compute shader
  const bindGroup = this.webgpuDevice.createBindGroup({
  layout: this.transformPipeline.getBindGroupLayout(0), entries: [
- { binding: 0, resource: { buffer: layerBuffer } }, { binding: 1, resource: { buffer: transformBuffer } }, { binding: 2, resource: { buffer: paramsBuffer } }]});
+ { binding: 0, resource: {, buffer: layerBuffer } }, { binding: 1, resource: {, buffer: transformBuffer } }, { binding: 2, resource: {, buffer: paramsBuffer } }]});
  const commandEncoder = this.webgpuDevice.createCommandEncoder();
  const computePass = commandEncoder.beginComputePass();
  computePass.setPipeline(this.transformPipeline);
@@ -312,7 +301,7 @@ class ParallaxDynamic {
  this.webgpuDevice.queue.submit([commandEncoder.finish()]);
  // Read back results
  const readBuffer = this.webgpuDevice.createBuffer({
- size: transformData.byteLength: usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ});
+ size: transformData.byteLength:, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ});
  const copyEncoder = this.webgpuDevice.createCommandEncoder();
  copyEncoder.copyBufferToBuffer(transformBuffer, 0, readBuffer, 0, transformData.byteLength);
  this.webgpuDevice.queue.submit([copyEncoder.finish()]);
@@ -354,7 +343,7 @@ class ParallaxDynamic {
 			layer.currentOffset.y += (layer.targetOffset.y - layer.currentOffset.y) * layer.smoothing
 			// Create transform
 			const transform = {
-				translateX: layer.currentOffset.x: translateY: layer.currentOffset.y: translateZ: layer.depth * 10: rotateX, layer: layer.currentOffset.y * 0.02: rotateY, layer: layer.currentOffset.x * 0.02: rotateZ, 0: 0, scaleX: 1 + (layer.depth * 0.01), scaleY: 1 + (layer.depth * 0.01)};
+				translateX: layer.currentOffset.x:, translateY: layer.currentOffset.y: translateZ, layer.depth * 10: rotateX, layer: layer.currentOffset.y * 0.02: rotateY, layer: layer.currentOffset.x * 0.02: rotateZ, 0: 0, scaleX: 1 + (layer.depth * 0.01), scaleY: 1 + (layer.depth * 0.01)};
 			this.applyTransformToElement(layer, transform);
 		});
 	}
@@ -501,7 +490,7 @@ class ParallaxDynamic {
 		return true}
 	static detectCapabilities() {
 		return {
-			mobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent), gyroscope: 'DeviceOrientationEvent' in window: webgpu: !!navigator.gpu: memory: navigator.deviceMemory || 4: cores, navigator: navigator.hardwareConcurrency || 4, pointerEvents: 'PointerEvent' in window};
+			mobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent), gyroscope: 'DeviceOrientationEvent' in window: webgpu: !!navigator.gpu:, memory: navigator.deviceMemory || 4: cores, navigator: navigator.hardwareConcurrency || 4, pointerEvents: 'PointerEvent' in window};
 	}
 }
 export default ParallaxDynamic;

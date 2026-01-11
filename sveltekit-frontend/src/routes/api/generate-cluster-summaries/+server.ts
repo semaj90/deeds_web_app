@@ -47,8 +47,7 @@ export async function POST() {
 		return json({
 			success: true,
 			summaries,
-			stats: {
-				totalClusters: summaries.length,
+			stats: {, totalClusters: summaries.length,
 				cudaAccelerated: clusterAnalysis.cudaAccelerated,
 				redisCached: true,
 				neo4jSynced: true,
@@ -153,8 +152,7 @@ Be concise and actionable.`;
 	const response = await fetch(`${OLLAMA_URL}/api/chat`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			model: 'gemma3-legal:latest',
+		body: JSON.stringify({, model: 'gemma3-legal:latest',
 			messages: [
 				{
 					role: 'system',
@@ -166,7 +164,7 @@ Be concise and actionable.`;
 				}
 			],
 			stream: false,
-			options: { temperature: 0.4, num_predict: 300 }
+			options: {, temperature: 0.4, num_predict: 300 }
 		})
 	});
 
@@ -222,8 +220,7 @@ async function updateQdrantTags(summaries: any[]) {
 		const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: 'embeddinggemma:latest',
+			body: JSON.stringify({, model: 'embeddinggemma:latest',
 				prompt: summary.summary
 			})
 		});
@@ -238,8 +235,7 @@ async function updateQdrantTags(summaries: any[]) {
 				{
 					id: `cluster_${summary.id}_${Date.now()}`,
 					vector: embedding,
-					payload: {
-						cluster_id: summary.id,
+					payload: {, cluster_id: summary.id,
 						summary: summary.summary,
 						tags: summary.tags,
 						error_count: summary.errorCount,

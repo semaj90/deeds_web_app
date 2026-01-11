@@ -3,7 +3,7 @@
 
 	interface Props {
 		data: PageData;
-		actionData?: ActionData: null;
+		actionData?: ActionData, null;
 	}
 
 	const { data }: Props = $props();

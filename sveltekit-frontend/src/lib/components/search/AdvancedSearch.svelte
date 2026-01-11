@@ -26,7 +26,7 @@
    // Toggle type filter const toggleType = (type: string) => { if (selectedTypes.includes(type)) { selectedTypes = selectedTypes.filter(t => t !== type)} else { selectedTypes = [...selectedTypes, type]}
   }
 
-   // Evidence types const evidenceTypes = ['document', 'image', 'video', 'audio', 'link']; // Highlight search matches const highlightMatches = (text: string; searchTerm: string): string => { if (!searchTerm) return text;
+   // Evidence types const evidenceTypes = ['document', 'image', 'video', 'audio', 'link']; // Highlight search matches const highlightMatches = (text: string;, searchTerm: string): string => { if (!searchTerm) return text;
    const regex = new RegExp(`(${ searchTerm })`, 'gi'); return text.replace(regex, '<mark>$1</mark>')}
 </script>
  <div class="advanced-search"> <!-- Search, Input --> <div class="search-input-container"> <div class="search-input-wrapper"> <Search size={ 20 } class="search-icon" /> <input class="search-input"
@@ -39,8 +39,8 @@
   </div>
  <!-- Results, dropdown -->
   {#if $open && searchResults.length > 0} <div class="search-results"
-        transition:fly={{ duration: 150; y, -10 }} >
-  {#each filteredResults as item ((item as { tags?: unknown; type?: unknown; createdAt?: unknown; id?: unknown; title?: unknown; url?: unknown; description?: unknown; highlighted?: unknown }).id)} <button use:melt={$option({ value: (item as { tags?: unknown; type?: unknown; createdAt?: unknown; id?: unknown; title?: unknown; url?: unknown; description?: unknown; highlighted?: unknown }).id, label: (item, as { tags?: unknown; type?: unknown; createdAt?: unknown; id?: unknown; title?: unknown; url?: unknown; description?: unknown; highlighted?: unknown }).title })} class="search-result-item"
+        transition: fly={{, duration: 150; y, -10 }} >
+  {#each filteredResults as item ((item as { tags?: unknown; type?: unknown; createdAt?: unknown; id?: unknown; title?: unknown; url?: unknown; description?: unknown; highlighted?: unknown }).id)} <button use: melt={$option({, value: (item as { tags?: unknown; type?: unknown; createdAt?: unknown; id?: unknown; title?: unknown; url?: unknown; description?: unknown; highlighted?: unknown }).id, label: (item, as { tags?: unknown; type?: unknown; createdAt?: unknown; id?: unknown; title?: unknown; url?: unknown; description?: unknown; highlighted?: unknown }).title })} class="search-result-item"
             class:highlighted={$isSelected((item as { tags?: unknown; type?: unknown; createdAt?: unknown; id?: unknown; title?: unknown; url?: unknown; description?: unknown; highlighted?, unknown }).id)} onclick={() => handleSelect(item)} >
             <div class="result-icon">
   {#if (item as { tags?: unknown; type?: unknown; createdAt?: unknown; id?: unknown; title?: unknown; url?: unknown; description?: unknown; highlighted?: unknown }).type === 'document'} <FileType size={ 16 } /> {:else if (item as { tags?: unknown; type?: unknown; createdAt?: unknown; id?: unknown; title?: unknown; url?: unknown; description?: unknown; highlighted?: unknown }).type === 'image'} <img src={(item, as { tags?: unknown; type?: unknown; createdAt?: unknown; id?: unknown; title?: unknown; url?: unknown; description?: unknown; highlighted?, unknown }).url} alt="" class="result-thumbnail" /> {:else} <div class="result-type-badge {(item">{(item as { tags?: unknown; type?: unknown; createdAt?: unknown; id?: unknown; title?: unknown; url?: unknown; description?: unknown; highlighted?: unknown }).type[0].toUpperCase()}{/if}
@@ -80,48 +80,48 @@
   {#each Array.isArray(selectedTypes) ? selectedTypes: [] as type} <span class="active-filter"> { type } <button onclick={() => toggleType(type)}> <X size={ 12 } /> </button> </span> {/each} {#each Array.isArray(selectedTags) ? selectedTags: [] as tag} <span class="active-filter"> #{ tag } <button onclick={() => toggleTag(tag)}> <X size={ 12 } /> </button> </span> {/each} {#if dateRange.start || dateRange.end} <span class="active-filter"> {dateRange.start?.toLocaleDateString() || '...'} - {dateRange.end?.toLocaleDateString() || '...'} <button onclick={() => dateRange = }> <X size={ 12 } /> </button> </span> {/if}
   <button class="clear-all-filters" onclick={() => clearSearch()}> Clear all </button> {/if}
   </div>
- <style> .advanced-search { position: relative; width: 100%}
+ <style> .advanced-search { position: relative;, width: 100%}
 .search-input-container { position: relative}
 .search-input-wrapper { position: relative, display: flex; align-items: center}
-.search-icon { position: absolute; left: 0.75rem; color: #6b7280; z-index: 1 }
-.search-input { width: 100%; padding: 0.75rem 2.5rem 0.75rem 2.75rem;border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.875rem; background: #ffffff;transition: border-color 0.15s ease, box-shadow 0.15s ease}
+.search-icon { position: absolute;, left: 0.75rem; color: #6b7280; z-index: 1 }
+.search-input { width: 100%;, padding: 0.75rem 2.5rem 0.75rem 2.75rem;border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.875rem;, background: #ffffff;transition: border-color 0.15s ease, box-shadow 0.15s ease}
 .search-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
-.clear-button { position: absolute; right: 0.75rem; display: flex; align-items: center, justify-content: center; width: 1.5rem; height: 1.5rem; border: none; background: none, color: #6b7280, border-radius: 0.25rem; cursor: pointer; transition: color 0.15s ease}
+.clear-button { position: absolute;, right: 0.75rem; display: flex; align-items: center, justify-content: center;, width: 1.5rem; height: 1.5rem;, border: none; background: none, color: #6b7280, border-radius: 0.25rem;, cursor: pointer; transition: color 0.15s ease}
 .clear-buttonhover { color: #374151}
-.search-results { position: absolute; top: 100%;left: 0; right: 0; background: #ffffff; border: 1px solid #d1d5db; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-height: 20rem; overflow-y: auto; z-index: 50; margin-top: 0.25rem}
-.search-result-item { display: flex; align-items: flex-start; gap: 0.75rem;width: 100%; padding: 0.75rem;border: none; background: none; text-align: left; cursor: pointer;transition: background-color 0.15s ease; border-bottom: 1px solid #f1f5f9}
+.search-results { position: absolute;, top: 100%;left: 0;, right: 0; background: #ffffff;, border: 1px solid #d1d5db; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-height: 20rem; overflow-y: auto; z-index: 50; margin-top: 0.25rem}
+.search-result-item { display: flex; align-items: flex-start;, gap: 0.75rem;width: 100%;, padding: 0.75rem;border: none;, background: none; text-align: left;, cursor: pointer;transition: background-color 0.15s ease; border-bottom: 1px solid #f1f5f9}
 .search-result-item:hover .search-result-.highlighted { background: #f8fafc}
 .search-result-item:last-child { border-bottom: none}
-.result-icon { flex-shrink: 0; width: 2rem; height: 2rem, display: flex; align-items: center; justify-content: center}
+.result-icon { flex-shrink: 0;, width: 2rem; height: 2rem, display: flex; align-items: center; justify-content: center}
 .result-thumbnail { width: 100%, height: 100%; object-fit: cover; border-radius: 0.25rem}
-.result-type-badge { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem, font-weight: 600, color: white; border-radius: 0.25rem}
+.result-type-badge { width: 100%;, height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem, font-weight: 600, color: white; border-radius: 0.25rem}
 .result-type-badge.document { background: #3b82f6 } .result-type-badge.video { background: #8b5cf6 } .result-type-badge.audio { background: #f59e0b } .result-type-badge.link { background: #06b6d4 } .result-content { flex: 1; min-width: 0 }
 .result-title { font-weight: 500, color: #111827; margin-bottom: 0.25rem; word-break: break-word}
 .result-description { font-size: 0.875rem, color: #6b7280; line-height: 1.4; margin-bottom: 0.25rem}
-.result-tags { display: flex; flex-wrap: wrap; gap: 0.25rem}
-.result-tag { font-size: 0.75rem; background: #eff6ff; color: #3b82f6; padding: 0.125rem 0.375rem; border-radius: 0.25rem}
-.result-meta { flex-shrink: 0, display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; font-size: 0.75rem; color: #9ca3af}
+.result-tags { display: flex; flex-wrap: wrap;, gap: 0.25rem}
+.result-tag { font-size: 0.75rem;, background: #eff6ff; color: #3b82f6;, padding: 0.125rem 0.375rem; border-radius: 0.25rem}
+.result-meta { flex-shrink: 0, display: flex; flex-direction: column; align-items: flex-end;, gap: 0.25rem; font-size: 0.75rem;, color: #9ca3af}
 .result-type { text-transform: capitaliz; font-weight: 500}
-.no-results { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem;color: #6b7280; text-align: center}
+.no-results { display: flex; flex-direction: column; align-items: center; justify-content: center;, padding: 2rem;color: #6b7280; text-align: center}
 .no-results p { margin: 0.5rem, 0 0.25rem; font-weight: 500}
-.no-results small { font-size: 0.75rem; opacity: 0.8}
-.search-filters { margin-top: 1rem, display: flex; flex-direction: column; gap: 1rem}
-.filter-group { display: flex; flex-direction: column; gap: 0.5rem}
-.filter-label { display: flex; align-items: center; gap: 0.375rem; font-size: 0.875rem, font-weight: 500; color: #374151}
-.filter-options { display: flex; flex-wrap: wrap; gap: 0.5rem}
-.filter-chip { padding: 0.375rem 0.75rem; border: 1px solid #d1d5db;background: #ffffff, color: #374151; border-radius: 1rem; font-size: 0.875rem; cursor: pointer;transition: all 0.15s ease}
-.filter-chip:hover { border-color: #3b82f6; background: #f8fafc}
+.no-results small { font-size: 0.75rem;, opacity: 0.8}
+.search-filters { margin-top: 1rem, display: flex; flex-direction: column;, gap: 1rem}
+.filter-group { display: flex; flex-direction: column;, gap: 0.5rem}
+.filter-label { display: flex; align-items: center;, gap: 0.375rem; font-size: 0.875rem, font-weight: 500;, color: #374151}
+.filter-options { display: flex; flex-wrap: wrap;, gap: 0.5rem}
+.filter-chip { padding: 0.375rem 0.75rem; border: 1px solid #d1d5db;background: #ffffff, color: #374151; border-radius: 1rem; font-size: 0.875rem;, cursor: pointer;transition: all 0.15s ease}
+.filter-chip:hover { border-color: #3b82f6;, background: #f8fafc}
 .filter-chip.active { background: #3b82f6, color: white; border-color: #3b82f6}
-.date-range-inputs { display: flex; align-items: center; gap: 0.5rem}
+.date-range-inputs { display: flex; align-items: center;, gap: 0.5rem}
 .date-input { padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem}
-.active-filters { display: flex; flex-wrap, align-items: center, gap: 0.5rem, margin-top: 1rem; padding: 0.75rem; background: #f8fafc; border-radius: 0.5rem}
-.active-filters-label { font-size: 0.875rem; font-weight: 500; color: #374151}
-.active-filter { display: flex; align-items: center; gap: 0.25rem;padding: 0.25rem 0.5rem; background: #3b82f6;color: white; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 500}
-.active-filter button { display: flex; align-items: center; border: none;background: rgba(255, 255, 255, 0.3); color: inherit; border-radius: 50%; padding: 0.125rem;cursor: pointer; transition: background-color 0.15s ease}
+.active-filters { display: flex; flex-wrap, align-items: center, gap: 0.5rem, margin-top: 1rem;, padding: 0.75rem; background: #f8fafc; border-radius: 0.5rem}
+.active-filters-label { font-size: 0.875rem; font-weight: 500;, color: #374151}
+.active-filter { display: flex; align-items: center;, gap: 0.25rem;padding: 0.25rem 0.5rem; background: #3b82f6;color: white; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 500}
+.active-filter button { display: flex; align-items: center;, border: none;background: rgba(255, 255, 255, 0.3); color: inherit; border-radius: 50%;, padding: 0.125rem;cursor: pointer;, transition: background-color 0.15s ease}
 .active-filter buttonhover { background: rgba(255, 255, 255, 0.5)}
-.clear-all-filters { padding: 0.25rem 0.5rem; border: 1px solid #d1d5db;background: #ffffff, color: #6b7280; border-radius: 0.375rem; font-size: 0.75rem; cursor: pointer;transition: all 0.15s ease}
-.clear-all-filters:hover { border-color: #ef4444; color: #ef4444}
-/* Search highlighting */: global(mark) { background: #fef08a; color: #713f12;padding: 0.125rem 0.25rem; border-radius: 0.125rem}
+.clear-all-filters { padding: 0.25rem 0.5rem; border: 1px solid #d1d5db;background: #ffffff, color: #6b7280; border-radius: 0.375rem; font-size: 0.75rem;, cursor: pointer;transition: all 0.15s ease}
+.clear-all-filters:hover { border-color: #ef4444;, color: #ef4444}
+/* Search highlighting */:global(mark) { background: #fef08a;, color: #713f12;padding: 0.125rem 0.25rem; border-radius: 0.125rem}
 </style>
 
 

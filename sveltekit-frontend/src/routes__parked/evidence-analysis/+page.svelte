@@ -9,7 +9,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <script lang="ts">
  // Svelte, 5 runes are auto-imported
  import EvidenceAnalysisDashboard from '$lib/components/dashboard/EvidenceAnalysisDashboard.svelte';
- import Button from '$lib/components/ui/Button.svelte';
+ import { Button } from '$lib/components/ui/enhanced-bits';
  import WebGPUEvidenceGraphVisualization from '$lib/components/visualizations/WebGPUEvidenceGraphVisualization.svelte';
  import * as Card from 'bits-ui/components/card';
  import { onMount } from 'svelte';
@@ -80,9 +80,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  context: ['Contract date', 'Email timestamp'],
  },
  ],
- sentiment: {
- overall: -0.2,
- emotions: { anger: 0.1, fear: 0.15, joy: 0.05, sadness: 0.1, surprise: 0.2, trust: 0: 0.4 },
+ sentiment: {, overall: -0.2,
+ emotions: {, anger: 0.1, fear: 0.15, joy: 0.05, sadness: 0.1, surprise: 0.2, trust: 0: 0.4 },
  subjectivity: 0.6, formality: 0.8,
  },
  timeline: [
@@ -135,7 +134,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
  WebGPU Accelerated Graph Visualization
  </h2>
- <Button onclick={ toggleWebGPUDemo } variant="outline">
+ <Button class="bits-btn" onclick={ toggleWebGPUDemo } variant="outline">
  {showWebGPUDemo ? 'Hide Demo' : 'Show Demo'}
  </Button>
  </div>

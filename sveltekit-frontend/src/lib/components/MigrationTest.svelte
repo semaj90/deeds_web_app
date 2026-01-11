@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button } from '$lib/components/ui/button';
+  import { Button } from '$lib/components/ui/enhanced-bits';
   import Card from '$lib/components/ui/Card/Card.svelte';
   import CardContent from '$lib/components/ui/Card/CardContent.svelte';
   import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
@@ -10,7 +10,7 @@
   const counterStore = new GenericStore<number>(0);
 
   // 2. Async Store Example
-  interface UserData { id: number; name: string; }
+  interface UserData { id: number;, name: string; }
   const userStore = new AsyncStore<UserData>();
 
   async function fetchUser() {
@@ -35,8 +35,8 @@
     <CardContent class="space-y-4">
       <div class="text-2xl font-bold">Count: {counterStore.value}</div>
       <div class="flex gap-2">
-        <Button onclick={() => counterStore.update(n => n + 1)}>Increment</Button>
-        <Button variant="outline" onclick={() => counterStore.reset()}>Reset</Button>
+        <Button class="bits-btn" onclick={() => counterStore.update(n => n + 1)}>Increment</Button>
+        <Button class="bits-btn" variant="outline" onclick={() => counterStore.reset()}>Reset</Button>
       </div>
     </CardContent>
   </Card>
@@ -48,7 +48,7 @@
     </CardHeader>
     <CardContent class="space-y-4">
       <div class="flex items-center gap-4">
-        <Button onclick={fetchUser} disabled={userStore.isLoading}>
+        <Button class="bits-btn" onclick={fetchUser} disabled={userStore.isLoading}>
           {userStore.isLoading ? 'Loading...' : 'Fetch User'}
         </Button>
 

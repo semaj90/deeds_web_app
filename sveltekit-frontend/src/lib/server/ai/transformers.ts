@@ -8,8 +8,7 @@ env.allowRemoteModels = false;
 env.useFS = false; // Use in-memory models for browser compatibility
 
 export interface TransformerConfig {
- model: string;
- task:
+ model: string;, task:
  | 'text-classification'
  | 'token-classification'
  | 'question-answering'
@@ -107,24 +106,20 @@ export class TransformersService {
 
 // Legal-specific transformer configurations
 export const LEGAL_TRANSFORMER_CONFIGS = {
- legalClassifier: {
- model: 'nlpaueb/legal-bert-base-uncased',
+ legalClassifier: {, model: 'nlpaueb/legal-bert-base-uncased',
  task: 'text-classification' as const,
- options: { max_length: 512 },
+ options: {, max_length: 512 },
  },
- entityExtractor: {
- model: 'dbmdz/bert-large-cased-finetuned-conll03-english',
+ entityExtractor: {, model: 'dbmdz/bert-large-cased-finetuned-conll03-english',
  task: 'token-classification' as const,
- options: { aggregation_strategy: 'simple' },
+ options: {, aggregation_strategy: 'simple' },
  },
- legalQA: {
- model: 'deepset/roberta-base-squad2',
+ legalQA: {, model: 'deepset/roberta-base-squad2',
  task: 'question-answering' as const,
- options: { max_answer_length: 100 },
+ options: {, max_answer_length: 100 },
  },
- legalSummarizer: {
- model: 'facebook/bart-large-cnn',
+ legalSummarizer: {, model: 'facebook/bart-large-cnn',
  task: 'summarization' as const,
- options: { max_length: 150, min_length: 50 },
+ options: {, max_length: 150, min_length: 50 },
  },
 } as const;

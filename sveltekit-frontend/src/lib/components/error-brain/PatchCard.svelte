@@ -1,15 +1,12 @@
 <script lang="ts">
  import { Badge } from '$lib/components/ui/badge';
- import { Button } from '$lib/components/ui/button';
- import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
+ import { Button } from '$lib/components/ui/enhanced-bits';
+ import { Card, CardHeader, CardTitle, CardContent } from '$lib/components/ui/enhanced-bits';
 
  interface Props {
- id: number;
- filePath: string;
- diffText: string;
- reason: string;
- confidence: number;
- applied: boolean;
+ id: number;, filePath: string;
+ diffText: string;, reason: string;
+ confidence: number;, applied: boolean;
  appliedAt?: Date | null;
  createdAt: Date;
  onApply?: (id: number) => void;
@@ -48,9 +45,7 @@
  {confidencePercent}% confidence
  </Badge>
  {#if applied}
- <Badge variant="default" class="bg-green-600 dark:bg-green-700">
- Applied
- </Badge>
+ <span class="px-2 py-1 rounded text-xs font-medium bg-blue-500 text-white">Applied</span>
  {/if}
  </div>
  </div>
@@ -72,12 +67,12 @@
  </div>
  <div class="flex gap-2">
  {#if !applied && onApply}
- <Button size="sm" onclick={() => onApply.id}>
+ <Button class="bits-btn" size="sm" onclick={() => onApply.id}>
  Apply Patch
  </Button>
  {/if}
  {#if applied && onRollback}
- <Button size="sm" variant="destructive" onclick={() => onRollback.id}>
+ <Button class="bits-btn" size="sm" variant="destructive" onclick={() => onRollback.id}>
  Rollback
  </Button>
  {/if}

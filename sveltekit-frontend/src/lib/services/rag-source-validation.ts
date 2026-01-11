@@ -9,9 +9,9 @@
  */
 
 import type {
+    AnswerRequest,
     AnswerWithCitations,
     ApprovedContext,
-    GenerateAnswerRequest,
     RetrieveCandidatesRequest,
     RetrieveCandidatesResponse,
     ValidateSourcesRequest

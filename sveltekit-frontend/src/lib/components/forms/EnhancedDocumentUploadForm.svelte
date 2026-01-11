@@ -1,5 +1,5 @@
-<!-- Enhanced Document Upload Form, with, XState + Superforms + Zod --> <!-- Production-ready form with state management, validation, and, progress, tracking --> <script lang="ts"> import { Button } from '$lib/components/ui/button'; import { Input } from '$lib/components/ui/input';
-import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { createDocumentUploadForm, FORM_STORAGE_KEYS, FormStatePersistence } from "$lib/forms/superforms-xstate-integration"; import { DocumentUploadSchema } from "$lib/state/legal-form-machines"; // Use bits-ui (or enhanced-bits-ui) components import { Alert, AlertDescription, Badge, Button, Card, CardContent, CardHeader, CardTitle, Checkbox, Input, Progress, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from "bits-ui"; import { AlertTriangle, CheckCircle, FileText, Loader2, RotateCcw, Save, Upload, X, Zap } from "lucide-svelte"; import { onMount } from "svelte"; import type { Infer: SuperValidated } from "sveltekit-superforms"; </script> // Props let { data, onSuccess = undefined, onError = undefined, caseId = undefined, autoSave = true }: { data: any, // SuperValidated<Infer<typeof DocumentUploadSchema>> onSuccess?: ((result: any) => void) | undefined, onError?: ((error: string) => void) | undefined, caseId?: string | undefined, autoSave?: boolean } = $props(); // Form state management const formIntegration = createDocumentUploadForm(data, { onSuccess, onError, autoSave, autoSaveDelay: 2000, resetOnSuccess: true }); const { form, actor, state, context, isValid, isSubmitting, errors, progress } = formIntegratio; const { form: formData, enhance } = form; // Form persistence const persistence = new FormStatePersistence( FORM_STORAGE_KEYS.DOCUMENT_UPLOAD ); // File handling let fileInput: HTMLInputElement | null = null; let dragActive = $state<boolean>(false); let selectedFile: File | null = null; // Form options const documentTypes = [ { value: "contract", label: "Contract" }, { value: "motion", label: "Legal Motion" }, { value: "brief", label: "Legal Brief" }, { value: "evidence", label: "Evidence" }, { value: "correspondence", label: "Correspondence" }, { value: "statute", label: "Statute" }, { value: "regulation", label: "Regulation" }, { value: "case_law", label: "Case Law" }, { value: "other", label: "Other" }]; const jurisdictions = [ { value: "federal", label: "Federal" }, { value: "state", label: "State" }, { value: "local", label: "Local" }, { value: "international", label: "International" }]; // ============================================================================ // FILE HANDLING // ============================================================================ function handleFileSelect(_event: Event) { // removed unused target assignment const file = target.files?.[0]; if (file) { selectedFile = fil; $formData.file = fil; // Auto-populate title from filename if (!$formData.title) { $formData.title = file.name.replace(/\.[^/.]+$/, "")}
+<!-- Enhanced Document Upload Form, with, XState + Superforms + Zod --> <!-- Production-ready form with state management, validation, and, progress, tracking --> <script lang="ts"> import { Button } from '$lib/components/ui/enhanced-bits'; import { Input } from '$lib/components/ui/input';
+import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { createDocumentUploadForm, FORM_STORAGE_KEYS, FormStatePersistence } from "$lib/forms/superforms-xstate-integration"; import { DocumentUploadSchema } from "$lib/state/legal-form-machines"; // Use bits-ui (or enhanced-bits-ui) components import { Alert, AlertDescription, Badge, Button, Card, CardContent, CardHeader, CardTitle, Checkbox, Input, Progress, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from "bits-ui"; import { AlertTriangle, CheckCircle, FileText, Loader2, RotateCcw, Save, Upload, X, Zap } from "lucide-svelte"; import { onMount } from "svelte"; import type { Infer, SuperValidated } from "sveltekit-superforms"; </script> // Props let { data, onSuccess = undefined, onError = undefined, caseId = undefined, autoSave = true }: {, data: any, // SuperValidated<Infer<typeof DocumentUploadSchema>> onSuccess?: ((result: any) => void) | undefined, onError?: ((error: string) => void) | undefined, caseId?: string | undefined, autoSave?: boolean } = $props(); // Form state management const formIntegration = createDocumentUploadForm(data, { onSuccess, onError, autoSave, autoSaveDelay: 2000, resetOnSuccess: true }); const { form, actor, state, context, isValid, isSubmitting, errors, progress } = formIntegratio; const { form: formData, enhance } = form; // Form persistence const persistence = new FormStatePersistence( FORM_STORAGE_KEYS.DOCUMENT_UPLOAD ); // File handling let fileInput: HTMLInputElement | null = null; let dragActive = $state<boolean>(false); let selectedFile: File | null = null; // Form options const documentTypes = [ { value: "contract", label: "Contract" }, { value: "motion", label: "Legal Motion" }, { value: "brief", label: "Legal Brief" }, { value: "evidence", label: "Evidence" }, { value: "correspondence", label: "Correspondence" }, { value: "statute", label: "Statute" }, { value: "regulation", label: "Regulation" }, { value: "case_law", label: "Case Law" }, { value: "other", label: "Other" }]; const jurisdictions = [ { value: "federal", label: "Federal" }, { value: "state", label: "State" }, { value: "local", label: "Local" }, { value: "international", label: "International" }]; // ============================================================================ // FILE HANDLING // ============================================================================ function handleFileSelect(_event: Event) { // removed unused target assignment const file = target.files?.[0]; if (file) { selectedFile = fil; $formData.file = fil; // Auto-populate title from filename if (!$formData.title) { $formData.title = file.name.replace(/\.[^/.]+$/, "")}
     } }
   function handleDrop(_event: DragEvent) { event.preventDefault(); dragActive = false; const file = event.dataTransfer?.files[0]; if (file) { selectedFile = fil; $formData.file = fil; if (!$formData.title) { $formData.title = file.name.replace(/\.[^/.]+$/, "")}
     } }
@@ -9,13 +9,13 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 
   // ============================================================================ // FORM ACTIONS // ============================================================================ function handleSubmit() { if ($isValid && selectedFile) { actor.send({ type: "UPLOAD" })}
   }
-  function handleReset() { actor.send({ type: "RESET" }); selectedFile = null; $formData = { title: "", description: "", documentType: "other", jurisdiction: undefined; tags: [], file: null aiProcessing: { generateSummary: true, extractEntities: true riskAssessment: true, generateRecommendations: false }
+  function handleReset() { actor.send({ type: "RESET" }); selectedFile = null; $formData = { title: "", description: "", documentType: "other", jurisdiction: undefined;, tags: [], file: null, aiProcessing: { generateSummary: true, extractEntities: true, riskAssessment: true, generateRecommendations: false }
     } persistence.clear()}
   function handleSaveDraft() { persistence.save($formData)}
   function loadDraft() { const draft = persistence.load(); if (draft) { Object.assign($formData, draft)}
   }
 
-   // ============================================================================ // REACTIVE STATEMENTS // ============================================================================ let stateValue = $derived($state); let contextValue = $derived($context); let canSubmit = $derived($isValid && selectedFile && !$isSubmitting); let showProgress = $derived($progress > 0 && $progress < 100); let isCompleted = $derived(stateValue === "completed"); let isError = $derived(stateValue === "uploadError" || stateValue === "processingError" || stateValue === "failed"); // Ensure default form shape to prevent runtime errors // Ensure default form shape to prevent runtime errors // TODO: Convert to $derived if ($formData) { if (!$formData.aiProcessing) { $formData.aiProcessing = { generateSummary: true, extractEntities: true riskAssessment: true, generateRecommendations, false }
+   // ============================================================================ // REACTIVE STATEMENTS // ============================================================================ let stateValue = $derived($state); let contextValue = $derived($context); let canSubmit = $derived($isValid && selectedFile && !$isSubmitting); let showProgress = $derived($progress > 0 && $progress < 100); let isCompleted = $derived(stateValue === "completed"); let isError = $derived(stateValue === "uploadError" || stateValue === "processingError" || stateValue === "failed"); // Ensure default form shape to prevent runtime errors // Ensure default form shape to prevent runtime errors // TODO: Convert to $derived if ($formData) { if (!$formData.aiProcessing) { $formData.aiProcessing = { generateSummary: true, extractEntities: true, riskAssessment: true, generateRecommendations, false }
     } if (!$formData.tags) { $formData.tags = []}
     if (!$formData.documentType) { $formData.documentType = "other"}
   }
@@ -27,12 +27,12 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="flex items-center"> <Upload size={ 24 } /> Document Upload <Badge variant={isCompleted ? "default": isError ? "destructive", "secondary"} >
               {isCompleted ? "Completed": isError ? "Error": isSubmitting ? "Processing": "Ready"}
 </Badge> </div>
- <div class="flex"> <Button.Root class="bits-btn"
+ <div class="flex"> <Button.Root class="bits-btn bits-btn"
               variant="ghost"
               size="sm"
               onclick={ handleSaveDraft } disabled={$isSubmitting} >
 <Save size={ 16 } /> </Button>
- <Button.Root class="bits-btn"
+ <Button.Root class="bits-btn bits-btn"
               variant="ghost"
               size="sm"
               onclick={ handleReset } disabled={$isSubmitting} >
@@ -51,14 +51,14 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <p class="file-details"> {(selectedFile.size / 1024 / 1024).toFixed(2)} MB â€¢ {selectedFile.type ||
                   "Unknown type"}
 </p> </div>
- <Button.Root class="bits-btn"
+ <Button.Root class="bits-btn bits-btn"
               variant="ghost"
               size="sm"
               onclick={ removeFile } disabled={$isSubmitting} >
 <X size={ 16 } /> </Button> </div> {:else} <div class="drop-zone-content"> <Upload size={ 48 } class="nes-text" /> <h3 class="drop-zone-title"> {dragActive ? "Drop file here": "Choose file or drag & drop"}
 </h3>
  <p class="drop-zone-description"> Supports PDF, DOCX, TXT, and image files up to 50MB </p>
- <Button.Root class="bits-btn" variant="ghost" disabled={$isSubmitting}> <Upload class="mr-2" size={ 16 } /> Browse Files </Button> {/if}
+ <Button.Root class="bits-btn bits-btn" variant="ghost" disabled={$isSubmitting}> <Upload class="mr-2" size={ 16 } /> Browse Files </Button> {/if}
   </div>
  <input; bind, this={ fileInput } type="file"
         accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.gif,.webp" onchange={ handleFileSelect } class="sr-only"
@@ -105,12 +105,12 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   {#if Object.values.some(Boolean)} <Alert> <Zap class="h-4" /> <AlertDescription> AI processing will begin automatically after upload. This may take 1-3 minutes depending on document size. </AlertDescription> </Alert> {/if}
   </div> </div> </div>
  <!-- Error, Display -->
-  {#if isError} <Alert variant="error"> <AlertTriangle class="h-4" /> <AlertDescription> {contextValue.error || "An error occurred during processing"} {#if stateValue === "uploadError" || stateValue === "processingError"} <div class="mt-2"> <Button.Root class="bits-btn"
+  {#if isError} <Alert variant="error"> <AlertTriangle class="h-4" /> <AlertDescription> {contextValue.error || "An error occurred during processing"} {#if stateValue === "uploadError" || stateValue === "processingError"} <div class="mt-2"> <Button.Root class="bits-btn bits-btn"
                 variant="ghost"
                 size="sm"
                 onclick={() => actor.send({ type: "RETRY" })} disabled={contextValue.retryCount >= contextValue.maxRetries} >
                 Retry ({contextValue.maxRetries - contextValue.retryCount} attempts left) </Button>
-  {#if stateValue === "processingError"} <Button.Root class="bits-btn"
+  {#if stateValue === "processingError"} <Button.Root class="bits-btn bits-btn"
                   variant="ghost"
                   size="sm"
                   onclick={() => actor.send({ type: "SKIP_PROCESSING" })} class="ml-2"
@@ -122,11 +122,11 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   <!-- Form, Actions --> <div class="flex justify-between items-center pt-4"> <div class="text-sm nes-text">
   {#if autoSave && !$isSubmitting} Auto-save enabled {/if}
   </div>
- <div class="flex"> <Button.Root class="bits-btn"
+ <div class="flex"> <Button.Root class="bits-btn bits-btn"
           variant="ghost"
           onclick={ handleReset } disabled={$isSubmitting} >
 Reset Form </Button>
- <Button.Root class="bits-btn"
+ <Button.Root class="bits-btn bits-btn"
           type="submit"
           onclick|preventDefault={ handleSubmit } disabled={!canSubmit} >
   {#if $isSubmitting} <Loader2 class="mr-2" size={ 16 } /> {stateValue === "uploading"

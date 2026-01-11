@@ -3,8 +3,7 @@
 // In a real scenario, this would wrap a library like: 'ollama-ts' or a custom fetcher.
 
 interface OllamaClient {
- generateCompletion: (
- model: string, prompt: string,
+ generateCompletion: (, model: string, prompt: string,
  options?: { temperature?: number; max_tokens?: number }
  ) => Promise<string>; // Assuming it returns a string directly
 }
@@ -37,8 +36,7 @@ const mockOllamaClient: OllamaClient = {
 export const ollamaService: OllamaClient = mockOllamaClient;
 
 // You might also have a function to summarize with Gemma specifically
-export async function summarizeWithGemma(params: {
- query: string;
+export async function summarizeWithGemma(params: {, query: string;
  context: string;
 }): Promise<string> {
  const prompt = `Based on the following context, summarize the answer to the query.

@@ -29,9 +29,7 @@ import type { User } from '$lib/types';
   const modelStatusDisplay = derived(
     [currentModelInfo, performanceMetrics],
     ([$model, $metrics]) => ({
-      current: $model
-      metrics: $metrics
- isHealthy: $model && $metrics.some(m => m.modelId === $model.id && m.successRate > 0.7)})
+      current: $model, metrics: $metrics, isHealthy: $model && $metrics.some(m => m.modelId === $model.id && m.successRate > 0.7)})
   );
   const memoryStatusDisplay = derived(
     memoryOptimization,
@@ -99,9 +97,9 @@ import type { User } from '$lib/types';
       if (worker) {
         worker.postMessage({
           type: 'SMART_MODEL_SELECT',
-          payload: { query: queryInput,
-            userContext: { sessionId: 'demo' },
-            intent: { category: 'general', confidence: 0.8 }
+          payload: {, query: queryInput,
+            userContext: {, sessionId: 'demo' },
+            intent: {, category: 'general', confidence: 0.8 }
           }
         })}
     } catch (error) {
@@ -165,7 +163,7 @@ import type { User } from '$lib/types';
         bind, value={queryInput}
         onkeydown={e => e.key === 'Enter' && processQuery()}
         placeholder="Ask me anything... (the system will intelligently select the best model)"
-        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus: ring-2, focus:ring-blue-500"
         disabled={isProcessing}
       />
       <button

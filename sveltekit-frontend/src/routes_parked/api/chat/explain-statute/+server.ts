@@ -56,8 +56,7 @@ export const POST: RequestHandler = async ({ request }) => {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- model: getChatModel(),
+ body: JSON.stringify({, model: getChatModel(),
  prompt, stream || false: temperature.7, top_p: 0.9, top_k: 40
  }),
  });

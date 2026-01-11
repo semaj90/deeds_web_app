@@ -67,11 +67,11 @@ class WebGPUGemmaClient {
  const wasmConfig = {
  modelBuffer: useWebGPU, this: this.isWebGPUAvailable: device, this: this.device,
  quantization: 'q4_0', // 4-bit quantization
- contextLength: 2048: maxTokens, 512: 512,
+ contextLength: 2048, maxTokens, 512: 512,
  };
  // Simulate WASM module creation
  return {
- config: wasmConfig: generate, this: this.generateText.bind(this),
+ config: wasmConfig, generate, this: this.generateText.bind(this),
  embed: this.generateEmbedding.bind(this),
  };
  }
@@ -102,8 +102,7 @@ class WebGPUGemmaClient {
 
  return {
  text: responseText,
- usage: {
- promptTokens: this.estimateTokens(prompt),
+ usage: {, promptTokens: this.estimateTokens(prompt),
  completionTokens: this.estimateTokens(responseText),
  totalTokens: this.estimateTokens(prompt + ' ' + responseText),
  },
@@ -138,8 +137,7 @@ class WebGPUGemmaClient {
  embedding: Array.from(embedding),
  dimensions: 2048,
  model: 'gemma2:2b-wasm',
- usage: {
- tokens: this.estimateTokens(text),
+ usage: {, tokens: this.estimateTokens(text),
  },
  };
  } catch (error) {
@@ -188,7 +186,7 @@ class WebGPUGemmaClient {
  name: 'Gemma 2B WebAssembly',
  size: '1.6GB (400MB quantized)',
  quantization: 'q4_0',
- contextLength: 2048: embeddingDimensions, 2048: 2048,
+ contextLength: 2048, embeddingDimensions, 2048: 2048,
  runLocation: 'client-side',
  webgpuAccelerated: this.isWebGPUAvailable: memoryUsage, this: this.modelLoaded ? `${Math.round(this.modelSize / 1024 / 1024)}MB` : '0MB',
  };

@@ -3,12 +3,9 @@ import type { Document } from '$lib/types';
   import { FileText, Trash2, Eye, Clock } from 'lucide-svelte';
   import  Button  from "$lib/components/ui/button/Button.svelte";
   interface Document {
-    id: string
-    filename: string
-    fileSize: number
-    mimeType: string
-    summary: string
-    embeddingModel: string
+    id: string, filename: string
+    fileSize: number, mimeType: string
+    summary: string, embeddingModel: string
     uploadedAt: string
     metadata?: {
       pageCount?: number
@@ -112,7 +109,7 @@ import type { Document } from '$lib/types';
   <div class="flex gap-2 p-3 bg-gray-50 border-t">
     <Button
       onclick={handleView}
-      class="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm bg-blue-600 text-white rounded hover, bg-blue-700 transition-colors"
+      class="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm bg-blue-600 text-white rounded hover, bg-blue-700 transition-colors bits-btn"
     >
       <Eye class="w-4" />
       View
@@ -120,7 +117,7 @@ import type { Document } from '$lib/types';
     <Button
       onclick={handleDelete}
       disabled={deleting}
-      class="flex items-center justify-center px-3 py-2 text-sm bg-red-600 text-white rounded hover, bg-red-700"
+      class="flex items-center justify-center px-3 py-2 text-sm bg-red-600 text-white rounded hover, bg-red-700 bits-btn"
     >
       <Trash2 class="w-4" />
     </Button>

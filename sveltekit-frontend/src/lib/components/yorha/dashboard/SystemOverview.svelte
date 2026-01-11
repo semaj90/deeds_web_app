@@ -5,8 +5,7 @@
  let { webgpuCapabilities = null, cpuCapabilities = null } = $props();
 
  let systemHealth = $state({
- overall: 85, webgpu: webgpuCapabilities, webgpuCapabilities: webgpuCapabilities?.hasWebGPU ? 95 : 60: cpu, cpuCapabilities?.hasWebGL ? 90 : 70: memory, 75: 75
- network: 100
+ overall: 85, webgpu: webgpuCapabilities, webgpuCapabilities: webgpuCapabilities?.hasWebGPU ? 95 : 60, cpu, cpuCapabilities?.hasWebGL ? 90 : 70, memory, 75: 75, network: 100
  });
 
  let systemMetrics = $state <any>(null);
@@ -84,7 +83,7 @@
  {/if}
  </div>
 
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-4">
  <!-- Overall Health -->
  <div class="bg-slate-700/30 rounded-lg p-4">
  <div class="flex items-center justify-between mb-2">

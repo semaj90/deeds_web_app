@@ -14,15 +14,11 @@ export class EvidenceDetectiveService {
  this.ollamaService = new OllamaService();
  }
 
- async analyzeEvidence(params: {
- caseId: string;
+ async analyzeEvidence(params: {, caseId: string;
  query: string;
- evidenceIds?: string[];
- userId: string;
- }): Promise<{
- analysis: string;
- evidence: any[];
- connections: any[];
+ evidenceIds?: string[];, userId: string;
+ }): Promise<{, analysis: string;
+ evidence: any[];, connections: any[];
  recommendations: string[];
  }> {
  const { caseId, query, evidenceIds, userId } = params;
@@ -44,9 +40,7 @@ export class EvidenceDetectiveService {
  const evidenceText = evidence.map((e) => `${e.title}: ${e.description}`).join('\n');
 
  const analysisPrompt = `
-Evidence Detective Analysis Request:
-
-Case ID: ${ caseId }
+Evidence Detective Analysis Request: Case, ID: ${ caseId }
 Query: ${ query }
 
 Available Evidence:

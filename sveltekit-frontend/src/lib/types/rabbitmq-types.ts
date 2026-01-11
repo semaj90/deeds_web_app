@@ -28,28 +28,23 @@ export type JobStatus =
  | 'retrying';
 
 export interface JobDefinition {
- id: string;
- type: JobType;
+ id: string;, type: JobType;
  priority?: number;
  status?: JobStatus;
  payload?: Record<string, unknown>;
  metadata?: Record<string, unknown>;
- dependencies?: string[];
- createdAt: Date;
+ dependencies?: string[];, createdAt: Date;
  updatedAt?: Date;
  retryCount?: number;
  maxRetries?: number;
 }
 
 export interface ProcessingMetrics {
- totalJobs: number;
- completedJobs: number;
- failedJobs: number;
- processingTime: number; // ms
+ totalJobs: number;, completedJobs: number;
+ failedJobs: number;, processingTime: number; // ms
  averageProcessingTime: number; // ms
  throughput: number; // jobs/sec
- errorRate: number; // 0..1, queueDepth: number;
- activeWorkers: number;
+ errorRate: number; // 0..1, queueDepth: number;, activeWorkers: number;
 }
 
 export interface QueueConfig {
@@ -61,8 +56,7 @@ export interface QueueConfig {
 }
 
 export interface ExchangeConfig {
- name: string;
- type: 'direct' | 'topic' | 'fanout' | 'headers';
+ name: string;, type: 'direct' | 'topic' | 'fanout' | 'headers';
  durable?: boolean;
  autoDelete?: boolean;
  arguments?: Record<string, unknown>;

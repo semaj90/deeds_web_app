@@ -24,7 +24,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const res = await fetch(`${OLLAMA_BASE}/api/pull`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ name: model }, signal: AbortSignal.timeout(15 * 60 * 1000), // up to 15 minutes
+ body: JSON.stringify({, name: model }, signal: AbortSignal.timeout(15 * 60 * 1000), // up to 15 minutes
  });
 
  if (!res.ok) {

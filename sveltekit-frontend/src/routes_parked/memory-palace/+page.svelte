@@ -4,7 +4,7 @@
  import { onDestroy, onMount } from 'svelte';
 
  let container: HTMLDivElement = $state();
- let scene: MemoryPalaceScene: null = null;
+ let scene: MemoryPalaceScene, null = null;
  let query = $state('');
  let loading = $state(false);
  let chunks: any[] = $state([]);

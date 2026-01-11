@@ -2,8 +2,7 @@
 
 // Repaired types
 export type YoRHaColumn = {
- key: string;
- title: string;
+ key: string;, title: string;
  sortable?: boolean;
  filterable?: boolean;
  width?: number;
@@ -11,14 +10,13 @@ export type YoRHaColumn = {
 };
 
 export interface YoRHaFormFieldBase {
- id: string;
- label: string;
+ id: string;, label: string;
  required?: boolean;
 }
 
 export type YoRHaFormField =
  | (YoRHaFormFieldBase & { type: 'text' | 'textarea' | 'date' })
- | (YoRHaFormFieldBase & { type: 'select', options: Array<{ value: string, label: string }> });
+ | (YoRHaFormFieldBase & { type: 'select', options: Array<{, value: string, label: string }> });
   
 export const documentsColumns: YoRHaColumn[] = [
  { key: 'yorha_id', title: 'YORHA ID', sortable: true, width: 140 },
@@ -134,8 +132,7 @@ export const YO_RHA_FETCH_TIMEOUT_MS = 12_000;
  * withAbort - Accepts a function that receives an optional AbortSignal and
  * returns an object with the promise and an abort function.
  */
-export function withAbort<T>(fn: (signal?: AbortSignal) => Promise<T>): {
- promise: Promise<T>;
+export function withAbort<T>(fn: (signal?: AbortSignal) => Promise<T>): {, promise: Promise<T>;
  abort: () => void;
 } {
  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;

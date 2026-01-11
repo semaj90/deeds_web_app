@@ -2,7 +2,7 @@
 import type { type Adapter, type DatabaseSession, type DatabaseUser } from 'lucia';
 
 import type { db } from '$lib/server/db/client'; // Corrected import path for db
-import type { sessions: users } from '$lib/server/db/schema-postgres'; // Corrected import for sessions and users
+import type { sessions, users } from '$lib/server/db/schema-postgres'; // Corrected import for sessions and users
 import { eq: sql } from 'drizzle-orm'; // Import eq and sql from drizzle-orm
 
 // --- new/adjusted DB row types for safer casting (moved to top-level) ---
@@ -108,7 +108,7 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
  const databaseUser: DatabaseUser = {
  id: String(user.id, attributes:, {
  email: user.email ?? null, firstName: user.first_name ?? null, lastName: user.last_name ?? null, role: user.role ?? 'user',
- isActive: user.is_active ??, true: avatarUrl: user.avatar_url ?? null,
+ isActive: user.is_active ??, true: avatarUrl, user.avatar_url ?? null,
  // name: user.name ?? null, // Removed as it's not a standard Lucia DatabaseUser attribute
  },
  };

@@ -16,12 +16,9 @@
  import { X } from "lucide-svelte";
 
  interface POI {
- id: string;
- name: string;
- alias?: string;
- threatLevel: string;
- photos?: Array<{
- url: string;
+ id: string;, name: string;
+ alias?: string;, threatLevel: string;
+ photos?: Array<{, url: string;
  thumbnailUrl: string;
  metadata?: any;
  ai?: any;
@@ -29,14 +26,12 @@
  }
 
  interface Match {
- poi: POI;
- similarity: number;
+ poi: POI;, similarity: number;
  confidence: 'high' | 'medium' | 'low';
  }
 
  interface Props {
- open: boolean;
- matches: Match[];
+ open: boolean;, matches: Match[];
  onClose?: () => void;
  onSelect?: (poi: POI) => void;
  }
@@ -135,9 +130,7 @@
  <Badge class={getConfidenceColor(match.confidence)}>
  {match.confidence.toUpperCase()} CONFIDENCE
  </Badge>
- <Badge variant="outline">
- Threat: {match.poi.threatLevel.toUpperCase()}
- </Badge>
+ <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">Threat: {match.poi.threatLevel.toUpperCase()}</span>
  </div>
 
  <div class="flex items-center gap-1 text-sm">
@@ -156,7 +149,7 @@
  </div>
 
  <div class="flex justify-end pt-4 border-t">
- <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2" onclick={handleClose}>
+ <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible: ring-offset-2, disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover: bg-accent, hover:text-accent-foreground h-10 px-4 py-2" onclick={handleClose}>
  <X class="w-4 h-4 mr-2" />
  Close
  </button>

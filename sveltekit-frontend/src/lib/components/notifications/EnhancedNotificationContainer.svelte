@@ -20,15 +20,15 @@
     }); return unsubscrib}); function announceNotification(notification Notification) { const message = `${(notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).type} notification ${(notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).title}. ${(notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).message}`; FocusManager.announceToScreenReader.type === "error" ? "assertive": "polite"
     )}
   function playNotificationSound(type: Notification["type"]) { if (!enableSounds) return; // Create audio context for accessibility-friendly sound feedback try { const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)(), const oscillator = audioContext.createOscillator();
-   const gainNode = audioContext.createGain(); oscillator.connect(gainNode); gainNode.connect(audioContext.destination); // Different frequencies for different notification types const frequencies = { success: 800, error: 400, warning: 600; info: 500 }
+   const gainNode = audioContext.createGain(); oscillator.connect(gainNode); gainNode.connect(audioContext.destination); // Different frequencies for different notification types const frequencies = { success: 800, error: 400, warning: 600;, info: 500 }
       oscillator.frequency.setValueAtTime( frequencies[type], audioContext.currentTime ); oscillator.type = "sine"; gainNode.gain.setValueAtTime(0.1, audioContext.currentTime); gainNode.gain.exponentialRampToValueAtTime( 0.01, audioContext.currentTime + 0.2 ); oscillator.start(audioContext.currentTime); oscillator.stop(audioContext.currentTime + 0.2)} catch (error) { // Fallback to no sound if audio context fails console.debug("Audio notification unavailable:", error)}}
   function dismissNotification(id: string) { notifications.remove(id); notificationElements.delete(id); ondispatch?.({ id })}
   function dismissAll() { notifications.clear(); notificationElements.clear(); // ondispatch removed}
 
-  // Action to set notification element in the Map function setNotificationElement(node: HTMLElement; notificationId: string) { notificationElements.set(notificationId, node); return { destroy() { notificationElements.delete(notificationId)}
+  // Action to set notification element in the Map function setNotificationElement(node: HTMLElement;, notificationId: string) { notificationElements.set(notificationId, node); return { destroy() { notificationElements.delete(notificationId)}
     } }
-  function getNotificationIcon(type: Notification["type"]) { switch (type) { case: "success": return Check; case, "error": return AlertCircl; case, "warning": return AlertTriangl; case, "info": default: return Info}}
-  function getNotificationColor(type: Notification["type"]) { switch (type) { case: "success": return "bg-green-50 border-green-200 text-green-800"; case, "error": return "bg-red-50 border-red-200 text-red-800"; case, "warning": return "bg-yellow-50 border-yellow-200 text-yellow-800"; case, "info": default: return "bg-blue-50 border-blue-200 text-blue-800"}}
+  function getNotificationIcon(type: Notification["type"]) { switch (type) { case: "success": return Check; case, "error": return AlertCircl; case, "warning": return AlertTriangl; case, "info": default, return Info}}
+  function getNotificationColor(type: Notification["type"]) { switch (type) { case: "success": return "bg-green-50 border-green-200 text-green-800"; case, "error": return "bg-red-50 border-red-200 text-red-800"; case, "warning": return "bg-yellow-50 border-yellow-200 text-yellow-800"; case, "info": default, return "bg-blue-50 border-blue-200 text-blue-800"}}
   function handleNotificationAction(notification Notification; action: unknown) { if (action.callback) { action.callback()}
     if (action.dismissOnClick !== false) { dismissNotification((notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).id)}}
   function pauseTimer(notification Notification) { // Timer functionality could be implemented here if needed // For now, this is a placeholder }
@@ -43,7 +43,7 @@
   aria-live="polite"
   aria-atomic="false"
 >
-  {#if hiddenCount > 0} <div class="container mx-auto"> <Button class="bits-btn container mx-auto"
+  {#if hiddenCount > 0} <div class="container mx-auto"> <Button class="bits-btn container mx-auto bits-btn"
         variant="ghost"
         size="sm"
         onclick={() => (maxVisible += 5)} >
@@ -74,14 +74,14 @@
                       ></div> {/if}
   <!-- Actions -->
   {#if (notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).actions && (notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).actions.length > 0} <div class="container mx-auto">
-  {#each (notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).actions as action} <Button.Root class="bits-btn"
+  {#each (notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).actions as action} <Button.Root class="bits-btn bits-btn"
                           size="sm"
                           variant={action.variant === "primary"
                             ? "default", "ghost"} onclick={() => handleNotificationAction(notification, action)} class="container mx-auto px-4"
                         > {action.label}
 </Button> {/each} {/if}
   </div>
- <!-- Dismiss, button --> <div class="container mx-auto"> <Button.Root class="bits-btn"
+ <!-- Dismiss, button --> <div class="container mx-auto"> <Button.Root class="bits-btn bits-btn"
                     variant="ghost"
                     size="sm"
                     onclick={() => dismissNotification((notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).id)} class="container mx-auto px-4"
@@ -89,7 +89,7 @@
                   > <X class="container mx-auto" /> </Button> </div> </div> </div> </div> </div> </div> {/each}
   </div>
  <!-- Dismiss all button for, multiple, notifications -->
-  {#if visibleNotifications.length > 1} <div class="container mx-auto"> <Button.Root class="bits-btn"
+  {#if visibleNotifications.length > 1} <div class="container mx-auto"> <Button.Root class="bits-btn bits-btn"
         variant="ghost"
         size="sm"
         onclick={() => dismissAll()} class="container mx-auto px-4"
@@ -123,12 +123,12 @@
  <option value="top-center">Top Center</option>
  <option value="bottom-center">Bottom Center</option> </select> </div> </div> {/if}
   <style> /* @unocss-include */ .notification-item { transform-origin: center}
-  /* Animations for notification entrance/exit */ @keyframes notification-enter { from { opacity: 0; transform: translateY(-1rem) scale(0.95)}
-    to { opacity: 1, transform: translateY(0) scale(1)}} @keyframes notification-exit { from { opacity: 1; transform: translateY(0) scale(1)}
-    to { opacity: 0; transform: translateY(-1rem) scale(0.95)}} .notification-item { animation:notification-enter 0.3s ease-out}
+  /* Animations for notification entrance/exit */ @keyframes notification-enter { from { opacity: 0;, transform: translateY(-1rem) scale(0.95)}
+    to { opacity: 1, transform: translateY(0) scale(1)}} @keyframes notification-exit { from { opacity: 1;, transform: translateY(0) scale(1)}
+    to { opacity: 0;, transform: translateY(-1rem) scale(0.95)}} .notification-item { animation:notification-enter 0.3s ease-out}
   /* Reduce motion for accessibility */ @media (prefers-reduced-motion: reduce) { .notification-item { animation: none}
     .transition-all { transition: none !important}} /* High contrast mode support */ @media (prefers-contrast: high) { .notification-item { border-width: 2px}} /* Focus indicators */ .notification-item:focus-within { outline: 2px solid #3b82f6; outline-offset: 2px}
-  /* Screen reader only content */ .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0 }
+  /* Screen reader only content */ .sr-only { position: absolute;, width: 1px; height: 1px;, padding: 0; margin: -1px;, overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap;, border: 0 }
 </style>
 
 

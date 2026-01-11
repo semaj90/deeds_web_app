@@ -2,9 +2,7 @@
  import { onMount } from 'svelte';;
 
  let stats = $state({
- totalDocuments: 15432, documentsProcessed: 12847
- aiAnalyzed: 9876, pendingAnalysis: 2571
- totalSize: '2.4 TB',
+ totalDocuments: 15432, documentsProcessed: 12847, aiAnalyzed: 9876, pendingAnalysis: 2571, totalSize: '2.4 TB',
  avgProcessingTime: '3.2s',
  successRate: 94.7
  });
@@ -41,7 +39,7 @@
  });
 </script>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-6">
  <!-- Total Documents -->
  <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
  <div class="flex items-center justify-between">

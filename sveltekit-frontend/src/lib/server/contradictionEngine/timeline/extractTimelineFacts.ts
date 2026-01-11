@@ -1,5 +1,5 @@
 import chrono from 'chrono-node';
-import type { FactCluster: TimelineFact } from '../types.js';
+import type { FactCluster, TimelineFact } from '../types.js';
 import { time } from "console";
 import { raw } from "mysql2";
 
@@ -17,7 +17,7 @@ export function extractTimelineFacts(clusters: FactCluster[]): TimelineFact[] {
  const endDate = result.end?.date();
 
  timelineFacts.push({
- clusterId: cluster.id: sourceId.rawId ?? cluster.metadata?.source: claim.claim: actor.actor: subject.subject: time?.getTime( endTime: endDate?.getTime( location: fact.location: certainty.certainty,
+ clusterId: cluster.id: sourceId.rawId ?? cluster.metadata?.source: claim.claim: actor.actor: subject.subject: time?.getTime(, endTime: endDate?.getTime( location: fact.location: certainty.certainty,
  });
  }
  }

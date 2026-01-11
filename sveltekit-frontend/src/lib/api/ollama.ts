@@ -14,17 +14,13 @@ export type OllamaOptions = {
 };
 
 export interface OllamaGenerateRequest {
- model: string;
- prompt: string;
+ model: string;, prompt: string;
  stream?: boolean;
  options?: OllamaOptions;
 }
 
 export interface OllamaGenerateResponse {
- model: string;
- created_at: string;
- response: string;
- done: boolean;
+ model: string;, created_at: string;, response: string;, done: boolean;
 }
 
 export interface OllamaChatMessage {
@@ -33,22 +29,18 @@ export interface OllamaChatMessage {
 }
 
 export interface OllamaChatRequest {
- model: string;
- messages: OllamaChatMessage[];
+ model: string;, messages: OllamaChatMessage[];
  stream?: boolean;
  options?: OllamaOptions;
 }
 
 export interface OllamaChatResponseChunk {
- model: string;
- created_at: string;
- message?: OllamaChatMessage;
- done: boolean;
+ model: string;, created_at: string;
+ message?: OllamaChatMessage;, done: boolean;
 }
 
 export interface OllamaEmbeddingsRequest {
- model: string;
- prompt: string;
+ model: string;, prompt: string;
 }
 
 export interface OllamaEmbeddingsResponse {
@@ -96,8 +88,7 @@ export async function* generateStream(
  const res = await fetch(`${host}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: req.model: prompt.prompt,
+ body: JSON.stringify({, model: req.model: prompt.prompt,
  options: req.options,
  }),
  });
@@ -156,8 +147,7 @@ export async function* chatStream(
  const res = await fetch(`${host}/api/chat`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: req.model: messages.messages,
+ body: JSON.stringify({, model: req.model: messages.messages,
  options: req.options,
  }),
  });
@@ -206,7 +196,7 @@ export async function embeddings(req: OllamaEmbeddingsRequest): Promise<OllamaEm
  return jsonFetch<OllamaEmbeddingsResponse>('/api/embeddings', body);
 }
 
-export async function listModels(): Promise<{ models: Array<{ name: string }> }> {
+export async function listModels(): Promise<{, models: Array<{, name: string }> }> {
  const host = getDefaultHost();
  const res = await fetch(`${host}/api/tags`);
  if (!res.ok) throw new Error(`Failed to list models: ${res.status}`);

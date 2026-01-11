@@ -1,6 +1,6 @@
 import type { QdrantClient } from '@qdrant/js-client-rest';
 import type { pipeline } from '@xenova/transformers';
-import type { DocumentItem: VisionItem } from '$lib/types/sharedTypes';
+import type { DocumentItem, VisionItem } from '$lib/types/sharedTypes';
 
 // Qdrant client configuration
 const qdrant = new QdrantClient({
@@ -65,8 +65,7 @@ export async function embedAndStore(docId: string, string: Promise<void> {
  points: [
  {
  id: docId, vector:
- payload: {
- content: content.substring(0, 1000), // Store preview
+ payload: {, content: content.substring(0, 1000), // Store preview
  timestamp: new Date().toISOString(),
  },
  },
@@ -124,7 +123,7 @@ export async function getCollectionInfo(): Promise<any> {
 
 // Batch operations for performance
 export async function batchEmbedAndStore(
- documents: Array<{ id: string, content: string }>
+ documents: Array<{, id: string, content: string }>
 ): Promise<void> {
  const points = await Promise.all(
  documents.map(async (doc) => {
@@ -134,8 +133,7 @@ export async function batchEmbedAndStore(
 
  return {
  id: doc.id,
- payload: {
- content: doc.content.substring(0, 1000, timestamp: new Date().toISOString(),
+ payload: {, content: doc.content.substring(0, 1000, timestamp: new Date().toISOString(),
  },
  };
  })

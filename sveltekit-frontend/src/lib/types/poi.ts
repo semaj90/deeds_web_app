@@ -9,67 +9,50 @@ export type POIThreatLevel = 'low' | 'medium' | 'high' | 'extreme';
 export type RelationshipType = 'family' | 'colleague' | 'friend' | 'suspect' | 'unknown';
 
 export interface PersonOfInterest {
- id: string;
- caseId: string;
+ id: string;, caseId: string;
  name: string;
  dateOfBirth?: string;
  email?: string;
  phone?: string;
- address?: string;
- status: POIStatus;
- priority: POIPriority;
- threatLevel: POIThreatLevel;
+ address?: string;, status: POIStatus;
+ priority: POIPriority;, threatLevel: POIThreatLevel;
  occupation?: string;
  lastKnownLocation?: string;
  physicalDescription?: string;
- embedding?: number[];
- createdAt: string;
+ embedding?: number[];, createdAt: string;
  updatedAt: string;
 }
 
 export interface KnownAssociate {
- id: string;
- poiId: string;
- associateId: string;
- relationshipType: RelationshipType;
- notes?: string;
- createdAt: string;
+ id: string;, poiId: string;
+ associateId: string;, relationshipType: RelationshipType;
+ notes?: string;, createdAt: string;
  associate?: PersonOfInterest;
 }
 
 export interface POIAlias {
- id: string;
- poiId: string;
- aliasName: string;
- createdAt: string;
+ id: string;, poiId: string;
+ aliasName: string;, createdAt: string;
 }
 
 export interface POISearchResult {
- poiId: string;
- name: string;
- status: POIStatus;
- priority: POIPriority;
- threatLevel: POIThreatLevel;
- similarityScore: number;
+ poiId: string;, name: string;
+ status: POIStatus;, priority: POIPriority;
+ threatLevel: POIThreatLevel;, similarityScore: number;
 }
 
 export interface POIListResponse {
- pois: PersonOfInterest[];
- total: number;
- limit: number;
- offset: number;
+ pois: PersonOfInterest[];, total: number;
+ limit: number;, offset: number;
 }
 
 export interface POICreateRequest {
- caseId: string;
- name: string;
+ caseId: string;, name: string;
  dateOfBirth?: string;
  email?: string;
  phone?: string;
- address?: string;
- status: POIStatus;
- priority: POIPriority;
- threatLevel: POIThreatLevel;
+ address?: string;, status: POIStatus;
+ priority: POIPriority;, threatLevel: POIThreatLevel;
  occupation?: string;
  lastKnownLocation?: string;
  physicalDescription?: string;
@@ -90,8 +73,7 @@ export interface POIUpdateRequest {
 }
 
 export interface AssociateCreateRequest {
- associateId: string;
- relationshipType: RelationshipType;
+ associateId: string;, relationshipType: RelationshipType;
  notes?: string;
 }
 

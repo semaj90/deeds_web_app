@@ -4,16 +4,12 @@ import * as path from 'path';
 import { tmpdir } from 'os';
 
 export interface YOLOResult {
- text: string, layout: {
- regions: Array<{
- type: 'text' | 'image' | 'table' | 'header' | 'footer' | 'signature', bbox: number[];
- confidence: number;
+ text: string, layout: {, regions: Array<{
+ type: 'text' | 'image' | 'table' | 'header' | 'footer' | 'signature', bbox: number[];, confidence: number;
  text?: string;
  }>;
  };
- objects: Array<{
- class: string, bbox: number[];
- confidence: number;
+ objects: Array<{, class: string, bbox: number[];, confidence: number;
  }>;
  processingTime: number, method: 'yolo';
 }
@@ -62,8 +58,7 @@ export class YOLOService {
  const processingTime = Date.now() - startTime;
 
  return {
- text: this.extractTextFromRegions(yoloData.regions || [], layout: {
- regions: yoloData.regions || [],
+ text: this.extractTextFromRegions(yoloData.regions || [], layout: {, regions: yoloData.regions || [],
  },
  objects: yoloData.objects || [],
  processingTime,

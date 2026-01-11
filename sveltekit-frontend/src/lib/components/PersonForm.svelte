@@ -3,10 +3,8 @@
  import { onMount } from 'svelte';
 
  interface PersonFormData {
- name: string;
- alias: string;
- description: string;
- caseId: string;
+ name: string;, alias: string;
+ description: string;, caseId: string;
  }
 
  let aiHealthy: boolean = true;
@@ -187,25 +185,19 @@
 
 <style>
  .person-form-overlay {
- position: fixed;
- top: 0;
- left: 0;
- right: 0;
- bottom: 0;
- background: rgba(0, 0, 0, 0.8);
- backdrop-filter: blur(5px);
- display: flex;
+ position: fixed;, top: 0;
+ left: 0;, right: 0;
+ bottom: 0;, background: rgba(0, 0, 0, 0.8);
+ backdrop-filter: blur(5px);, display: flex;
  align-items: center;
  justify-content: center;
- z-index: 1000;
- padding: 2rem;
+ z-index: 1000;, padding: 2rem;
  }
 
  .person-form-modal {
  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
  border: 1px solid #333;
- border-radius: 16px;
- width: 100%;
+ border-radius: 16px;, width: 100%;
  max-width: 600px;
  max-height: 90vh;
  overflow-y: auto;
@@ -222,30 +214,23 @@
 
  .form-title {
  font-size: 1.5rem;
- font-weight: 700;
- color: #e0e0e0;
- margin: 0;
- display: flex;
- align-items: center;
- gap: 0.75rem;
+ font-weight: 700;, color: #e0e0e0;
+ margin: 0;, display: flex;
+ align-items: center;, gap: 0.75rem;
  }
 
  .form-subtitle {
- font-size: 0.9rem;
- color: #b0b0b0;
+ font-size: 0.9rem;, color: #b0b0b0;
  margin: 0.25rem 0 0 0;
  grid-column: 1 / -1;
  }
 
  .close-btn {
- background: none;
- border: none;
+ background: none;, border: none;
  color: #888;
- font-size: 1.5rem;
- cursor: pointer;
+ font-size: 1.5rem;, cursor: pointer;
  padding: 0.25rem;
- border-radius: 4px;
- transition: all 0.2s ease;
+ border-radius: 4px;, transition: all 0.2s ease;
  }
 
  .close-btn:hover {
@@ -260,8 +245,7 @@
 
  .status-indicator {
  display: flex;
- align-items: center;
- gap: 0.5rem;
+ align-items: center;, gap: 0.5rem;
  margin-bottom: 0.5rem;
  }
 
@@ -278,8 +262,7 @@
  }
 
  .status-description {
- font-size: 0.85rem;
- color: #b0b0b0;
+ font-size: 0.85rem;, color: #b0b0b0;
  margin: 0;
  line-height: 1.4;
  }
@@ -291,13 +274,10 @@
  .error-message {
  background: rgba(255, 107, 107, 0.1);
  border: 1px solid #ff6b6b;
- border-radius: 8px;
- padding: 1rem;
+ border-radius: 8px;, padding: 1rem;
  display: flex;
- align-items: center;
- gap: 0.75rem;
- margin-bottom: 1.5rem;
- color: #ff6b6b;
+ align-items: center;, gap: 0.75rem;
+ margin-bottom: 1.5rem;, color: #ff6b6b;
  }
 
  .form-group {
@@ -306,28 +286,23 @@
 
  .form-label {
  display: block;
- font-weight: 600;
- color: #e0e0e0;
+ font-weight: 600;, color: #e0e0e0;
  margin-bottom: 0.5rem;
  }
 
  .label-hint {
  display: block;
- font-size: 0.8rem;
- color: #888;
+ font-size: 0.8rem;, color: #888;
  font-weight: 400;
  margin-top: 0.25rem;
  }
 
  .form-input, .form-textarea {
- width: 100%;
- padding: 0.75rem;
+ width: 100%;, padding: 0.75rem;
  background: rgba(255, 255, 255, 0.05);
  border: 1px solid #333;
- border-radius: 8px;
- color: #e0e0e0;
- font-size: 0.9rem;
- transition: all 0.2s ease;
+ border-radius: 8px;, color: #e0e0e0;
+ font-size: 0.9rem;, transition: all 0.2s ease;
  }
 
  .form-input:focus, .form-textarea:focus {
@@ -344,21 +319,18 @@
  .preview-section {
  background: rgba(0, 212, 255, 0.05);
  border: 1px solid rgba(0, 212, 255, 0.2);
- border-radius: 8px;
- padding: 1rem;
+ border-radius: 8px;, padding: 1rem;
  margin-top: 1.5rem;
  }
 
  .preview-title {
  font-size: 1rem;
- font-weight: 600;
- color: #00d4ff;
+ font-weight: 600;, color: #00d4ff;
  margin: 0 0 0.75rem 0;
  }
 
  .preview-content {
- font-size: 0.85rem;
- color: #b0b0b0;
+ font-size: 0.85rem;, color: #b0b0b0;
  margin-bottom: 0.75rem;
  }
 
@@ -367,8 +339,7 @@
  }
 
  .preview-note {
- font-size: 0.8rem;
- color: #888;
+ font-size: 0.8rem;, color: #888;
  margin: 0;
  font-style: italic;
  }
@@ -376,8 +347,7 @@
  .form-actions {
  padding: 1.5rem 2rem 2rem 2rem;
  border-top: 1px solid rgba(255, 255, 255, 0.1);
- display: flex;
- gap: 1rem;
+ display: flex;, gap: 1rem;
  justify-content: flex-end;
  }
 
@@ -385,12 +355,10 @@
  padding: 0.75rem 1.5rem;
  border: none;
  border-radius: 8px;
- font-weight: 600;
- cursor: pointer;
+ font-weight: 600;, cursor: pointer;
  transition: all 0.2s ease;
  display: flex;
- align-items: center;
- gap: 0.5rem;
+ align-items: center;, gap: 0.5rem;
  }
 
  .cancel-btn {
@@ -398,7 +366,7 @@
  color: #b0b0b0;
  }
 
- .cancel-btn:hover:not(:disabled) {
+ .cancel-btn: hover, not(:disabled) {
  background: rgba(255, 255, 255, 0.2);
  color: #e0e0e0;
  }
@@ -408,24 +376,21 @@
  color: white;
  }
 
- .submit-btn:hover:not(:disabled) {
+ .submit-btn: hover, not(:disabled) {
  transform: translateY(-1px);
  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
  }
 
  .submit-btn:disabled {
- opacity: 0.5;
- cursor:not-allowed;
+ opacity: 0.5;, cursor:not-allowed;
  transform: none;
  }
 
  .spinner {
- width: 16px;
- height: 16px;
+ width: 16px;, height: 16px;
  border: 2px solid rgba(255, 255, 255, 0.3);
  border-top: 2px solid white;
- border-radius: 50%;
- animation: spin 1s linear infinite;
+ border-radius: 50%;, animation: spin 1s linear infinite;
  }
 
  @keyframes spin {

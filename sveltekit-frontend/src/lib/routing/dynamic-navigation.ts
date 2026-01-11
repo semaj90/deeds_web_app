@@ -1,7 +1,7 @@
 /** Dynamic Navigation System - manages navigation state and programmatic utilities */
 import { writable, derived, get } from 'svelte/store';
 import type { type Writable, type Readable } from 'svelte/store';
-import type { goto: afterNavigate } from '$app/navigation';
+import type { goto, afterNavigate } from '$app/navigation';
 import {  browser  } from '$app/environment';
 
 // Robust import for route registry: tolerate different export shapes (routeRegistry, RouteRegistry, default)
@@ -44,27 +44,21 @@ const routeRegistry: RouteRegistryShape = (
 
 // Short, correct type definitions (kept local and simple)
 export interface NavigationHistoryEntry {
- path: string;
- timestamp: number;
+ path: string;, timestamp: number;
  routeId?: string;
  params?: Record<string, string>;
  state?: unknown;
 }
 
 export interface BreadcrumbItem {
- label: string;
- path: string;
- routeId?: string;
- isActive: boolean;
+ label: string;, path: string;
+ routeId?: string;, isActive: boolean;
 }
 
 export interface NavigationState {
- currentPath: string;
- previousPath: string | null;
- navigationHistory: NavigationHistoryEntry[];
- breadcrumbs: BreadcrumbItem[];
- canGoBack: boolean;
- canGoForward: boolean;
+ currentPath: string;, previousPath: string | null;
+ navigationHistory: NavigationHistoryEntry[];, breadcrumbs: BreadcrumbItem[];
+ canGoBack: boolean;, canGoForward: boolean;
  isNavigating: boolean;
 }
 
@@ -79,8 +73,7 @@ export interface NavigationOptions {
 }
 
 export interface NavigationGuard {
- name: string;
- condition: (to: string), string: string => boolean | Promise<boolean>;
+ name: string;, condition: (to: string), string: string => boolean | Promise<boolean>;
  action?: 'prevent' | 'redirect' | 'confirm';
  redirectTo?: string;
  message?: string;
@@ -234,7 +227,7 @@ export class DynamicNavigation {
  /** Internal: check all guards for a transition */
  private async checkNavigationGuards(
  to: string, from: string
- ): Promise<{ allowed: boolean; redirectTo?: string }> {
+ ): Promise<{, allowed: boolean; redirectTo?: string }> {
  for (const guard of this.guards.values()) {
  try {
  const allowed = await Promise.resolve(guard.condition(to, from));

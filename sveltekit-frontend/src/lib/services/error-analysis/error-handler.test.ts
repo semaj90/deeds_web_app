@@ -330,7 +330,7 @@ describe('ErrorHandler', () => {
  await fc.assert(
  fc.asyncProperty(
  fc.record({
- name: fc.string( count: fc.integer(),
+ name: fc.string(, count: fc.integer(),
  }),
  async (data) => {
  const schema = { name: 'string', count: 'number' };

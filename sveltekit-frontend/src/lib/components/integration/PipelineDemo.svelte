@@ -1,7 +1,7 @@
 <!-- @migration-task Error while migrating Svelte code: 'default' is a reserved word in JavaScript and cannot be, used, her, https, //svelte.dev/e/unexpected_reserved_word --> <!-- @migration-task Error while migrating Svelte, code, 'default' is a reserved word in JavaScript and cannot be, used, here -->
   {#snippet default} <script lang="ts"> // Svelte, 5 runes are auto-imported import { pipelineManager, type PipelineType, type PipelineResult } from '$lib/services/pipeline-manager';
  import { PipelineVisualizer } from '$lib/services/pipeline-visualizer';
- import  Button  from "$lib/components/ui/Button.svelte";
+ import { Button } from '$lib/components/ui/enhanced-bits';
  import  Card, CardHeader, CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; // Reactive state using Svelte, 5 runes let isProcessing = $state<boolean>(false);
    let results = $state<PipelineResult[]>([]);
    let systemHealth = $state<any>(null);
@@ -18,7 +18,7 @@
   }
 
    // Batch processing demo async function batchProcess(): Promise<any> { if (isProcessing) return; isProcessing = true; try { console.log('ðŸ“¦ Starting batch processing');
-   const batchRequests = [ { cacheKey: 'contracts_batch', config: { type: 'optimized' as PipelineType } }, { cacheKey: 'evidence_batch', config: { type: 'advanced' as PipelineType } }, { cacheKey: 'cases_batch', config: { type: 'end-to-end' as PipelineType } } ];
+   const batchRequests = [ { cacheKey: 'contracts_batch', config: {, type: 'optimized' as PipelineType } }, { cacheKey: 'evidence_batch', config: {, type: 'advanced' as PipelineType } }, { cacheKey: 'cases_batch', config: {, type: 'end-to-end' as PipelineType } } ];
    const batchResults = await pipelineManager.batchProcess(batchRequests); results = [...batchResults, ...results.slice(0, 7)]; updateMetrics()} catch (error) { console.error('Batch processing failed:', error)} finally { isProcessing = false}
   }
 
@@ -59,24 +59,24 @@
             type="text"; bind, value={ cacheKey } class="w-full p-2 border rounded-md"
             placeholder="Enter cache key..."
             disabled={ isProcessing } /> </div>
- <div class="flex"> <Button onclick={ executePipeline } disabled={ isProcessing } class="w-full bits-btn"
+ <div class="flex"> <Button onclick={ executePipeline } disabled={ isProcessing } class="w-full bits-btn bits-btn"
           > {isProcessing ? 'â³ Processing...': 'ðŸš€ Execute Pipeline'}
 </div> </div>
- <!-- Advanced, Controls --> <div class="flex flex-wrap"> <Button.Root class="bits-btn"
+ <!-- Advanced, Controls --> <div class="flex flex-wrap"> <Button.Root class="bits-btn bits-btn"
           onclick={ autoExecutePipeline } disabled={ isProcessing } variant="ghost"
-        > ðŸ§  Auto-Select Optimal <Button.Root class="bits-btn"
+        > ðŸ§  Auto-Select Optimal <Button.Root class="bits-btn bits-btn"
           onclick={ batchProcess } disabled={ isProcessing } variant="ghost"
-        > ðŸ“¦ Batch Process <Button.Root class="bits-btn"
+        > ðŸ“¦ Batch Process <Button.Root class="bits-btn bits-btn"
           onclick={ checkSystemHealth } variant="ghost"
-        > ðŸ¥ Health Check <Button.Root class="bits-btn"
+        > ðŸ¥ Health Check <Button.Root class="bits-btn bits-btn"
           onclick={ generateReport } variant="ghost"
-        > ðŸ“ˆ Performance Report <Button.Root class="bits-btn"
+        > ðŸ“ˆ Performance Report <Button.Root class="bits-btn bits-btn"
           onclick={ cleanup } variant="error"
         > ðŸ§¹ Cleanup </div> </div> </div>
  <!-- Search, Interface --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Cross-Pipeline Search</h3> </div>
  <div class="yorha-panel-content"> <div class="flex"> <input type="text" ; bind, value={ searchQuery } class="flex-1 p-2 border"
           placeholder="Search across all pipelines..."
-          onkeypress={(e) => e.key === 'Enter' && searchPipelines()} /> <Button.Root class="bits-btn" onclick={ searchPipelines }> ðŸ” Search </div>
+          onkeypress={(e) => e.key === 'Enter' && searchPipelines()} /> <Button.Root class="bits-btn bits-btn" onclick={ searchPipelines }> ðŸ” Search </div>
   {#if searchResults} <div class="mt-4"> <h4 class="font-semibold">Search Results ({searchResults.combinedResults.length})</h4>
  <div class="space-y-2">
   {#each Array.isArray(searchResults.combinedResults.slice(0, 5)) ? searchResults.combinedResults.slice(0, 5): [] as result} <div class="p-2 bg-gray-50 rounded border-l-4"> <div class="flex justify-between"> <div class="flex-1"> <p class="font-medium">{(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).id}

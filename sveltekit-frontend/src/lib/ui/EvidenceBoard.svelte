@@ -15,17 +15,13 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  type EvidenceType = 'video' | 'document' | 'photo' | 'note';
 
  type EvidenceItem = {
- id: string;
- title: string;
- type: EvidenceType;
- summary: string;
- x: number;
- y: number;
+ id: string;, title: string;
+ type: EvidenceType;, summary: string;
+ x: number;, y: number;
  };
 
  type EvidenceConnection = {
- id: string;
- from: string; // evidence id
+ id: string;, from: string; // evidence id
  to: string; // evidence id
  label?: string;
  };
@@ -171,18 +167,18 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <div class="flex items-center justify-between">
  <div class="heading-sub">Evidence Board – Case Investigation</div>
  <div class="flex gap-2">
- <Button
+ <Button class="bits-btn"
  variant={showConnections ? 'primary' : 'secondary'}
  onclick={() => showConnections = !showConnections}
  >
  <span class="i-heroicons-link mr-1" ></span>
  {showConnections ? 'Hide' : 'Show'} Lines
  </Button>
- <Button variant="secondary" onclick={ resetBoard }>
+ <Button class="bits-btn" variant="secondary" onclick={ resetBoard }>
  <span class="i-heroicons-arrow-path mr-1" ></span>
  Reset
  </Button>
- <Button variant="primary" onclick={addEvidence}>
+ <Button class="bits-btn" variant="primary" onclick={addEvidence}>
  <span class="i-heroicons-plus-20-solid mr-1" ></span>
  Add
  </Button>
@@ -303,7 +299,6 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  .line-clamp-4 {
  display: -webkit-box;
  -webkit-line-clamp: 4;
- -webkit-box-orient: vertical;
- overflow: hidden;
+ -webkit-box-orient: vertical;, overflow: hidden;
  }
 </style>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { toastStore } from '$lib/stores/toast';
-  // helper: build; class: string safely to avoid inline expression parsing issues
+  // helper: build;, class: string safely to avoid inline expression parsing issues
   function toastClass(t: unknown) {
     return [
       'toast-item',
@@ -29,18 +29,13 @@
 
 <style>
   .toast-container {
-    position: fixed;
-    top: 20px;
+    position: fixed;, top: 20px;
     right: 20px;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-width: 420px;
-    width: 100%; pointer-events: none}
+    z-index: 9999;, display: flex;
+    flex-direction: column;, gap: 12px;
+    max-width: 420px;, width: 100%; pointer-events: none}
   .toast-item {
-    pointer-events: auto;
-    animation: slideInRight: 0.3s ease-out;
+    pointer-events: auto;, animation: slideInRight: 0.3s ease-out;
     padding: 16px;
     min-width: 200px}
   .toast-item.is-success {
@@ -61,13 +56,12 @@
     font-weight: normal;
     word-wrap: break-word}
   @keyframes slideInRight {
-    from { transform: translateX(100%); opacity: 0}
-    to { transform: translateX(0); opacity: 1}
+    from { transform: translateX(100%);, opacity: 0}
+    to { transform: translateX(0);, opacity: 1}
   }
   @media (max-width: 768px) {
     .toast-container {
-      top: 10px;
-      right: 10px;
+      top: 10px;, right: 10px;
       left: 10px;
       max-width: none}
     .toast-item {

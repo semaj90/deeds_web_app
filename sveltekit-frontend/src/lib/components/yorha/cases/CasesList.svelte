@@ -7,8 +7,7 @@
  status: 'active',
  priority: 'high',
  assignee: 'Detective A2',
- created: new Date('2024-01-15', updated: new Date( evidenceCount: 1247, progress: 75
- description: 'Investigation into financial irregularities at TechCorp Inc.'
+ created: new Date('2024-01-15', updated: new Date( evidenceCount: 1247, progress: 75, description: 'Investigation into financial irregularities at TechCorp Inc.'
  },
  {
  id: 'CASE-2024-002',
@@ -16,8 +15,7 @@
  status: 'active',
  priority: 'medium',
  assignee: 'Detective B7',
- created: new Date('2024-01-20', updated: new Date(Date.now() - 86400000, evidenceCount: 892, progress: 45
- description: 'Patent infringement case involving software algorithms.'
+ created: new Date('2024-01-20', updated: new Date(Date.now() - 86400000, evidenceCount: 892, progress: 45, description: 'Patent infringement case involving software algorithms.'
  },
  {
  id: 'CASE-2024-003',
@@ -25,8 +23,7 @@
  status: 'review',
  priority: 'low',
  assignee: 'Detective C3',
- created: new Date('2024-01-10', updated: new Date(Date.now() - 7200000, evidenceCount: 567, progress: 90
- description: 'Analysis of contractual obligations and breach claims.'
+ created: new Date('2024-01-10', updated: new Date(Date.now() - 7200000, evidenceCount: 567, progress: 90, description: 'Analysis of contractual obligations and breach claims.'
  },
  {
  id: 'CASE-2024-004',
@@ -34,8 +31,7 @@
  status: 'active',
  priority: 'high',
  assignee: 'Detective D9',
- created: new Date('2024-01-25', updated: new Date(Date.now() - 3600000, evidenceCount: 2156, progress: 30
- description: 'GDPR compliance investigation and data breach analysis.'
+ created: new Date('2024-01-25', updated: new Date(Date.now() - 3600000, evidenceCount: 2156, progress: 30, description: 'GDPR compliance investigation and data breach analysis.'
  }
  ];
 
@@ -44,7 +40,7 @@
  let sortOrder = $state('desc');
 
  let sortedCases = $derived([...cases].sort((a, b) => {
- let aVal: any, bVal: any: any;
+ let aVal: any, bVal: any, any;
 
  switch (sortBy) {
  case 'title':
@@ -56,7 +52,7 @@
  bVal = b.status;
  break;
  case 'priority':
- const priorityOrder = { high: 3, medium: 2 low: 1 };
+ const priorityOrder = { high: 3, medium: 2, low: 1 };
  aVal = priorityOrder[a.priority as keyof typeof priorityOrder];
  bVal = priorityOrder[b.priority as keyof typeof priorityOrder];
  break;

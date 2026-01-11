@@ -4,7 +4,7 @@ https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
-  import  Button  from "$lib/components/ui/Button.svelte";
+  import { Button } from '$lib/components/ui/enhanced-bits';
   import  Label  from "$lib/components/ui/label.svelte";
   import  Progress  from "$lib/components/ui/progress.svelte";
   import  Alert, AlertDescription, AlertTitle  from "$lib/components/ui/alert.svelte";
@@ -143,7 +143,7 @@ import type { Document } from '$lib/types';
         </div>
       </div>
 
-      <Button onclick={handleUpload} disabled={isUploading} class="w-full">
+      <Button onclick={handleUpload} disabled={isUploading} class="w-full bits-btn">
         {#if isUploading}
           <Loader2 class="mr-2 h-4 w-4" />
           Uploading...

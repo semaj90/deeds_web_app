@@ -5,8 +5,7 @@ import type { RequestHandler } from './$types.js';
 
 // Document templates with pre-filled content
 const documentTemplates = {
- brief: {
- title: 'Criminal Case Brief',
+ brief: {, title: 'Criminal Case Brief',
  content: `# Criminal Case Brief
 ## Case Overview
 [Case Name] v. [Defendant Name]
@@ -33,8 +32,7 @@ Date: [Date]
  tags: ['brief', 'criminal', 'template'],
  citations: [],
  },
- motion: {
- title: 'Motion to [Action]',
+ motion: {, title: 'Motion to [Action]',
  content: `# Motion to [Action]
 ## Introduction
 [Defendant/Plaintiff] respectfully moves this Court to [specific action requested] on the grounds that [brief reason].
@@ -59,8 +57,7 @@ Respectfully submitted,
  tags: ['motion', 'template'],
  citations: [],
  },
- contract: {
- title: 'Legal Contract',
+ contract: {, title: 'Legal Contract',
  content: `# [Contract Title]
 **Parties:** This agreement is entered into between [Party 1 Name] ("[Party 1 Short Name]") and [Party 2 Name] ("[Party 2 Short Name]").
 **Date:** [Date]
@@ -94,12 +91,10 @@ Signature: _________________________, Date: __________
  tags: ['contract', 'template'],
  citations: [],
  },
- evidence: {
- title: 'Evidence Analysis Report',
+ evidence: {, title: 'Evidence Analysis Report',
  content: `# Evidence Analysis Report
 ## Case Number: [Case Number]
-Date of Analysis: [Date]
-Analyst: [Analyst Name]
+Date of Analysis: [Date], Analyst: [Analyst Name]
 ## Executive Summary
 [Brief overview of the evidence and key findings]
 ## Evidence Inventory
@@ -127,8 +122,7 @@ Analyst: [Analyst Name]
  tags: ['evidence', 'analysis', 'template'],
  citations: [],
  },
- memo: {
- title: 'Legal Memorandum',
+ memo: {, title: 'Legal Memorandum',
  content: `# Legal Memorandum
 **TO:** [Recipient]
 **FROM:** [Your Name]
@@ -152,8 +146,7 @@ Analyst: [Analyst Name]
  tags: ['memo', 'memorandum', 'template'],
  citations: [],
  },
- pleading: {
- title: 'Legal Pleading',
+ pleading: {, title: 'Legal Pleading',
  content: `# [Type of Pleading]
 **IN THE [COURT NAME]**
 **[JURISDICTION]**

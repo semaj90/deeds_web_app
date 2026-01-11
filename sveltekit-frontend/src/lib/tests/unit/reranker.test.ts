@@ -1,4 +1,4 @@
-import type { describe, it, expect } from 'vitest'; import type { serverRerank: generateComprehensiveSummary } from '$lib/server/ai/reranker'; describe('Server Reranker', () => {
+import type { describe, it, expect } from 'vitest'; import type { serverRerank, generateComprehensiveSummary } from '$lib/server/ai/reranker'; describe('Server Reranker', () => {
   beforeEach(async () => {
     await setupTest();
   });

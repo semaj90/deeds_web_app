@@ -13,8 +13,8 @@ import { db } from '../db/drizzle.js';
 import { errorBrainDiffs } from '../db/schema-postgres.js';
 
 interface LLMCodeFix {
- filePath: string; beforeCode: string;
- afterCode: string; explanation: string;
+ filePath: string;, beforeCode: string;
+ afterCode: string;, explanation: string;
  confidence?: number;
 }
 
@@ -56,7 +56,7 @@ export class PatchGenerator {
  while ((match = codeBlockRegex.exec(responseText)) !== null) {
  const [_, filePath, beforeCode, afterCode, reason] = match;
  fixes.push({
- filePath: filePath.trim().trim().trim( explanation: reason?.trim() || 'LLM suggested fix',
+ filePath: filePath.trim().trim().trim(, explanation: reason?.trim() || 'LLM suggested fix',
  confidence: 0.85, // Default confidence
  });
  }

@@ -43,7 +43,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <div class="yorha-panel-content"> <div class="flex items-center"> <div class="flex items-center"> <div class={`w-3 h-3, rounded-full ${isInitialized ? 'bg-green-500', 'bg-red-500'}`}></div>
  <span class="font-medium"> {isInitialized ? 'âœ… System Initialized': 'âŒ Not Initialized'}
 </span> </div>
-  {#if !isInitialized && !isProcessing} <Button.Root class="bits-btn" onclick={ initializeSystem } size="sm"> ðŸ”„ Initialize System </Button> {/if} {#if isProcessing} <span class="text-blue-600">â³ Processing...</span> {/if}
+  {#if !isInitialized && !isProcessing} <Button.Root class="bits-btn bits-btn" onclick={ initializeSystem } size="sm"> ðŸ”„ Initialize System </Button> {/if} {#if isProcessing} <span class="text-blue-600">â³ Processing...</span> {/if}
   </div> </div> </div>
  <!-- Configuration --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Mipmap Configuration</h3> </div>
  <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-3"> <div> <label class="block text-sm font-medium" for="max-mip-levels">Max Mip Levels</label>
@@ -72,14 +72,14 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 </div>
  <div class="text-xs"> Size: {document.textureSize} â€¢, Complexity: {document.estimatedComplexity}
 </div> </div>
- <Button.Root class="bits-btn"
+ <Button.Root class="bits-btn bits-btn"
                 onclick={() => processDocument(index)} disabled={!isInitialized || isProcessing} size="sm"
               > ðŸ”¥ Process </Button> </div> {/each}
   </div>
- <!-- Batch, Operations --> <div class="flex gap-2 pt-4"> <Button.Root class="bits-btn"
+ <!-- Batch, Operations --> <div class="flex gap-2 pt-4"> <Button.Root class="bits-btn bits-btn"
             onclick={ batchProcessDocuments } disabled={!isInitialized || isProcessing} >
 ðŸš€ Batch Process All </Button>
- <Button.Root class="bits-btn"
+ <Button.Root class="bits-btn bits-btn"
             onclick={ generateMipmapDemo } disabled={!isInitialized || isProcessing} variant="ghost"
           > ðŸ”¥ Mipmap Demo </Button> </div> </div> </div> </div>
  <!-- Performance, Metrics --> <div class="grid grid-cols-1 md:grid-cols-2 lg, grid-cols-5"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{performanceMetrics.totalTexturesProcessed}

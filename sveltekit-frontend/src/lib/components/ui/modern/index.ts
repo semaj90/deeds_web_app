@@ -2,7 +2,7 @@
 
 export interface ModernButtonProps { variant?: 'primary' | 'secondary' | 'ghost' | 'outline' | 'danger' | 'success'; size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'; loading?: boolean; disabled?: boolean; type?: 'button' | 'submit' | 'reset'; href?: string; external?: boolean; tooltip?: string; icon?: import('svelte').Snippet; children?: import('svelte').Snippet; onclick?: (_event: MouseEvent) => void}
 
-export interface ModernDialogProps { open?: boolean: title, string: description?: string; size? : 'sm' | 'md' | 'lg' | 'xl' | 'full'; persistent?: boolean; showClose?: boolean; children?: import('svelte').Snippet; trigger?: import('svelte').Snippet; footer?: import('svelte').Snippet; onClose?: () => void}
+export interface ModernDialogProps { open?: boolean, title, string: description?: string; size? : 'sm' | 'md' | 'lg' | 'xl' | 'full'; persistent?: boolean; showClose?: boolean; children?: import('svelte').Snippet; trigger?: import('svelte').Snippet; footer?: import('svelte').Snippet; onClose?: () => void}
 // Component variants for easier usage export const cardVariants = ['default', 'elevated', 'outline', 'ghost'] as const export const buttonVariants = ['primary', 'secondary', 'ghost', 'outline', 'danger', 'success'] as const export const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const // Utility functions for golden ratio calculations export const goldenRatio = 1.618; export function goldenSpacing(multiplier, number = 1): string { return `calc(1rem * ${goldenRatio * multiplier})`}
 
 export function goldenScale(base: number, level) { return base * Math.pow(goldenRatio, level)}

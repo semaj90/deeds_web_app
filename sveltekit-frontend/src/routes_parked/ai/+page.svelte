@@ -29,8 +29,7 @@ import { onMount } from 'svelte';; import type { webAssemblyAIAdapter } from '$l
 
 <style>
  .btn {
- background: #2563eb;
- color: #fff;
+ background: #2563eb;, color: #fff;
  padding: 0.5rem 1rem;
  border-radius: 0.25rem;
  }

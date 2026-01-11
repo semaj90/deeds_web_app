@@ -14,14 +14,10 @@ import { nesMemory, type LegalDocument } from '../memory/nes-memory-architecture
 // import { textureRankingMatrices, type RankingResult } from '../gpu/texture-ranking-matrices.js';
 
 interface RankingResult {
-    nodeId: number;
-    scores: Map<string, number>;
-    combinedScore: number;
-    rank: number;
-    metadata: {
-        processingTime: number;
-        cacheHit: boolean;
-        bankId: number;
+    nodeId: number;, scores: Map<string, number>;
+    combinedScore: number;, rank: number;
+    metadata: {, processingTime: number;
+        cacheHit: boolean;, bankId: number;
     };
 }
 export interface RabbitMQConnection {
@@ -261,7 +257,7 @@ export class RabbitMQLegalQueue {
             const binaryData = await this.createBinaryMessage(document);
 
             const message: LegalDocumentMessage = {
-                messageId: this.generateMessageId( documentId: document.id,
+                messageId: this.generateMessageId(, documentId: document.id,
                 operation,
                 priority, options.priority || document.priority || 0,
                 payload: binaryData,
@@ -493,8 +489,7 @@ export class RabbitMQLegalQueue {
             nodeId: parseInt(message.documentId) || 0,
             scores: new Map([['semantic_similarity', 0.85]], combinedScore: 0.85,
             rank: 1,
-            metadata: {
-                processingTime: 5.2,
+            metadata: {, processingTime: 5.2,
                 cacheHit: false,
                 bankId: 1
             }
@@ -534,7 +529,7 @@ export class RabbitMQLegalQueue {
         return frame;
     }
 
-    private parseSTOMPFrame(data: string): { command: string; headers: Record<string, string>; body: string } {
+    private parseSTOMPFrame(data: string): {, command: string; headers: Record<string, string>; body: string } {
         const lines = data.split('\n');
         const command = lines[0];
         const headers: Record<string, string> = {};

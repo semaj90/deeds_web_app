@@ -25,8 +25,7 @@ export const GET: RequestHandler = async () => {
  {
  healthy: false,
  status: 'Go microservice unavailable',
- services: {
- go_microservice: false,
+ services: {, go_microservice: false,
  },
  },
  { status: 503 }

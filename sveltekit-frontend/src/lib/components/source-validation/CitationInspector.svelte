@@ -117,25 +117,21 @@ function handleBackdropClick(event: MouseEvent) {
 
 <style>
 	.modal-backdrop {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
+		position: fixed;, top: 0;
+		left: 0;, width: 100%;
 		height: 100%;
 		background-color: rgba(0, 0, 0, 0.5);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		z-index: 1000;
-		padding: 1rem;
+		z-index: 1000;, padding: 1rem;
 		overflow-y: auto;
 	}
 
 	.modal-content {
 		background: white;
 		border-radius: 12px;
-		max-width: 800px;
-		width: 100%;
+		max-width: 800px;, width: 100%;
 		max-height: 90vh;
 		overflow-y: auto;
 		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
@@ -145,43 +141,34 @@ function handleBackdropClick(event: MouseEvent) {
 
 	@keyframes slideIn {
 		from {
-			opacity: 0;
-			transform: translateY(-20px);
+			opacity: 0;, transform: translateY(-20px);
 		}
 		to {
-			opacity: 1;
-			transform: translateY(0);
+			opacity: 1;, transform: translateY(0);
 		}
 	}
 
 	.modal-header {
 		display: flex;
 		justify-content: space-between;
-		align-items: start;
-		padding: 1.5rem;
+		align-items: start;, padding: 1.5rem;
 		border-bottom: 1px solid #e5e7eb;
 	}
 
 	.close-button {
-		width: 32px;
-		height: 32px;
-		border-radius: 6px;
-		border: none;
-		background: #f3f4f6;
-		cursor: pointer;
-		font-size: 1.25rem;
-		color: #6b7280;
+		width: 32px;, height: 32px;
+		border-radius: 6px;, border: none;
+		background: #f3f4f6;, cursor: pointer;
+		font-size: 1.25rem;, color: #6b7280;
 		transition: all 0.2s;
 	}
 
 	.close-button:hover {
-		background: #e5e7eb;
-		color: #374151;
+		background: #e5e7eb;, color: #374151;
 	}
 
 	.metadata-section {
-		padding: 1.5rem;
-		background: #f9fafb;
+		padding: 1.5rem;, background: #f9fafb;
 		border-bottom: 1px solid #e5e7eb;
 	}
 
@@ -193,21 +180,18 @@ function handleBackdropClick(event: MouseEvent) {
 
 	.metadata-item {
 		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
+		flex-direction: column;, gap: 0.25rem;
 	}
 
 	.metadata-item .label {
 		font-size: 0.75rem;
 		font-weight: 600;
-		text-transform: uppercase;
-		color: #6b7280;
+		text-transform: uppercase;, color: #6b7280;
 		letter-spacing: 0.05em;
 	}
 
 	.metadata-item .value {
-		font-size: 0.875rem;
-		color: #111827;
+		font-size: 0.875rem;, color: #111827;
 	}
 
 	.content-section {
@@ -217,21 +201,18 @@ function handleBackdropClick(event: MouseEvent) {
 	.section-title {
 		font-size: 0.875rem;
 		font-weight: 600;
-		text-transform: uppercase;
-		color: #6b7280;
+		text-transform: uppercase;, color: #6b7280;
 		letter-spacing: 0.05em;
 		margin-bottom: 1rem;
 	}
 
 	.content-text {
-		padding: 1rem;
-		background: #f9fafb;
+		padding: 1rem;, background: #f9fafb;
 		border: 1px solid #e5e7eb;
 		border-radius: 8px;
 		font-family: 'Courier New', monospace;
 		font-size: 0.875rem;
-		line-height: 1.6;
-		color: #374151;
+		line-height: 1.6;, color: #374151;
 		white-space: pre-wrap;
 		overflow-x: auto;
 	}
@@ -240,7 +221,6 @@ function handleBackdropClick(event: MouseEvent) {
 		padding: 1.5rem;
 		border-top: 1px solid #e5e7eb;
 		display: flex;
-		justify-content: flex-end;
-		gap: 0.75rem;
+		justify-content: flex-end;, gap: 0.75rem;
 	}
 </style>

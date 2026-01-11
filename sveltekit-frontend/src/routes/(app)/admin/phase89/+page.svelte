@@ -52,21 +52,16 @@
 	let eventSource: EventSource | null = null;
 
 	interface SearchResult {
-		id: string;
-		score: number;
-		text: string;
-		source: string;
+		id: string;, score: number;
+		text: string;, source: string;
 		tags: string[];
 		cluster_id?: number;
 	}
 
 	interface Cluster {
-		cluster_id: number;
-		error_count: number;
-		first_seen: string;
-		last_seen: string;
-		sample_message: string;
-		sample_source: string;
+		cluster_id: number;, error_count: number;
+		first_seen: string;, last_seen: string;
+		sample_message: string;, sample_source: string;
 		// Optional fields from KB cards
 		title?: string;
 		description?: string;
@@ -74,15 +69,13 @@
 	}
 
 	interface GraphNode {
-		id: string;
-		label: string;
+		id: string;, label: string;
 		type: 'component' | 'module' | 'route' | 'error';
 		errorCount: number;
 	}
 
 	interface GraphEdge {
-		from: string;
-		to: string;
+		from: string;, to: string;
 		type: 'imports' | 'uses' | 'depends';
 	}
 
@@ -96,7 +89,7 @@
 			const embedRes = await fetch('http://localhost:11434/api/embed', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ model: 'embeddinggemma:latest', input: searchQuery })
+				body: JSON.stringify({, model: 'embeddinggemma:latest', input: searchQuery })
 			});
 
 			if (!embedRes.ok) throw new Error('Embedding failed');
@@ -139,7 +132,7 @@
 			const res = await fetch('http://localhost:6333/collections/phase89_error_clusters/points/scroll', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ limit: 50, with_payload: true })
+				body: JSON.stringify({, limit: 50, with_payload: true })
 			});
 
 			if (!res.ok) return;
@@ -185,7 +178,7 @@
 			const res = await fetch('/api/phase89/pipeline', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ action: 'cluster', chunkSize: 500 })
+				body: JSON.stringify({, action: 'cluster', chunkSize: 500 })
 			});
 
 			if (res.ok) {
@@ -219,8 +212,7 @@
 			const res = await fetch('/api/phase89/fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					cluster_id: cluster.cluster_id,
+				body: JSON.stringify({, cluster_id: cluster.cluster_id,
 					strategy: cluster.fix_strategy,
 					ace_context: true
 				})
@@ -461,7 +453,7 @@
 					<h3>Pipeline Configuration</h3>
 					<ul>
 						<li>🔥 GPU: RTX 3060 Ti (CUDA)</li>
-						<li>📊 Embeddings: embeddinggemma:latest (768-dim)</li>
+						<li>📊 Embeddings: embeddinggemma, latest (768-dim)</li>
 						<li>💾 Cache: Redis (7-day TTL)</li>
 						<li>🎯 Clustering: DBSCAN with cosine similarity</li>
 						<li>🧠 Summarization: gemma3-legal</li>
@@ -474,10 +466,8 @@
 
 <style>
 	.container {
-		min-height: 100vh;
-		background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%);
-		color: #e0e0e0;
-		padding: 1.5rem;
+		min-height: 100vh;, background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%);
+		color: #e0e0e0;, padding: 1.5rem;
 		font-family: 'Inter', system-ui, sans-serif;
 	}
 
@@ -487,12 +477,10 @@
 	}
 
 	.header h1 {
-		font-size: 2rem;
-		background: linear-gradient(135deg, #00d4ff, #7c3aed, #ff6b6b);
+		font-size: 2rem;, background: linear-gradient(135deg, #00d4ff, #7c3aed, #ff6b6b);
 		-webkit-background-clip: text;
 		background-clip: text;
-		-webkit-text-fill-color: transparent;
-		margin: 0;
+		-webkit-text-fill-color: transparent;, margin: 0;
 	}
 
 	.subtitle {
@@ -501,8 +489,7 @@
 	}
 
 	.tabs {
-		display: flex;
-		gap: 0.5rem;
+		display: flex;, gap: 0.5rem;
 		margin-bottom: 1.5rem;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 		padding-bottom: 0.5rem;
@@ -510,47 +497,39 @@
 
 	.tab {
 		padding: 0.75rem 1.5rem;
-		background: transparent;
-		border: none;
-		color: #888;
-		cursor: pointer;
+		background: transparent;, border: none;
+		color: #888;, cursor: pointer;
 		border-radius: 8px 8px 0 0;
 		transition: all 0.2s;
 	}
 
 	.tab:hover {
-		color: #fff;
-		background: rgba(255, 255, 255, 0.05);
+		color: #fff;, background: rgba(255, 255, 255, 0.05);
 	}
 
 	.tab.active {
-		color: #00d4ff;
-		background: rgba(0, 212, 255, 0.1);
+		color: #00d4ff;, background: rgba(0, 212, 255, 0.1);
 		border-bottom: 2px solid #00d4ff;
 	}
 
 	.main-content {
 		background: rgba(255, 255, 255, 0.02);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;
-		padding: 1.5rem;
+		border-radius: 12px;, padding: 1.5rem;
 		min-height: 60vh;
 	}
 
 	/* Search Section */
 	.search-box {
-		display: flex;
-		gap: 1rem;
+		display: flex;, gap: 1rem;
 		margin-bottom: 1.5rem;
 	}
 
 	.search-input {
-		flex: 1;
-		padding: 1rem 1.5rem;
+		flex: 1;, padding: 1rem 1.5rem;
 		background: rgba(0, 0, 0, 0.3);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;
-		color: #fff;
+		border-radius: 12px;, color: #fff;
 		font-size: 1rem;
 	}
 
@@ -563,10 +542,8 @@
 		padding: 1rem 2rem;
 		background: linear-gradient(135deg, #7c3aed, #00d4ff);
 		border: none;
-		border-radius: 12px;
-		color: #fff;
-		font-weight: 600;
-		cursor: pointer;
+		border-radius: 12px;, color: #fff;
+		font-weight: 600;, cursor: pointer;
 	}
 
 	.results-grid {
@@ -578,8 +555,7 @@
 	.result-card {
 		background: rgba(255, 255, 255, 0.03);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;
-		padding: 1rem;
+		border-radius: 12px;, padding: 1rem;
 		border-left: 3px solid hsl(calc(var(--score, 0.5) * 120), 70%, 50%);
 	}
 
@@ -600,29 +576,25 @@
 	}
 
 	.result-text {
-		font-size: 0.875rem;
-		color: #ccc;
+		font-size: 0.875rem;, color: #ccc;
 		margin: 0.5rem 0;
 	}
 
 	.result-tags, .cluster-tags {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 0.25rem;
+		flex-wrap: wrap;, gap: 0.25rem;
 	}
 
 	.tag {
 		padding: 0.125rem 0.5rem;
 		background: rgba(0, 212, 255, 0.2);
 		border-radius: 4px;
-		font-size: 0.625rem;
-		color: #00d4ff;
+		font-size: 0.625rem;, color: #00d4ff;
 	}
 
 	.no-results {
 		grid-column: 1 / -1;
-		text-align: center;
-		color: #888;
+		text-align: center;, color: #888;
 		padding: 3rem;
 	}
 
@@ -642,11 +614,9 @@
 	.cluster-card {
 		background: rgba(255, 255, 255, 0.03);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;
-		padding: 1rem;
+		border-radius: 12px;, padding: 1rem;
 		cursor: pointer;
-		text-align: left;
-		transition: all 0.2s;
+		text-align: left;, transition: all 0.2s;
 		color: inherit;
 	}
 
@@ -673,32 +643,27 @@
 	.cluster-header {
 		display: flex;
 		justify-content: space-between;
-		font-size: 0.75rem;
-		color: #888;
+		font-size: 0.75rem;, color: #888;
 		margin-bottom: 0.5rem;
 	}
 
 	.cluster-card h3 {
-		font-size: 0.875rem;
-		margin: 0 0 0.5rem 0;
+		font-size: 0.875rem;, margin: 0 0 0.5rem 0;
 	}
 
 	.root-cause {
-		font-size: 0.75rem;
-		color: #aaa;
+		font-size: 0.75rem;, color: #aaa;
 		margin: 0 0 0.5rem 0;
 	}
 
 	.cluster-detail {
 		background: rgba(255, 255, 255, 0.03);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;
-		padding: 1.5rem;
+		border-radius: 12px;, padding: 1.5rem;
 	}
 
 	.cluster-detail h2 {
-		font-size: 1.25rem;
-		margin: 0 0 1rem 0;
+		font-size: 1.25rem;, margin: 0 0 1rem 0;
 	}
 
 	.detail-grid {
@@ -717,14 +682,11 @@
 	}
 
 	.fix-btn {
-		width: 100%;
-		padding: 1rem;
+		width: 100%;, padding: 1rem;
 		background: linear-gradient(135deg, #10b981, #00d4ff);
 		border: none;
-		border-radius: 8px;
-		color: #fff;
-		font-weight: 600;
-		cursor: pointer;
+		border-radius: 8px;, color: #fff;
+		font-weight: 600;, cursor: pointer;
 	}
 
 	/* Graph Section */
@@ -735,8 +697,7 @@
 	}
 
 	.graph-stats {
-		display: flex;
-		gap: 1rem;
+		display: flex;, gap: 1rem;
 		grid-column: 1 / -1;
 	}
 
@@ -749,55 +710,45 @@
 
 	.stat-value {
 		font-size: 1.5rem;
-		font-weight: 700;
-		color: #00d4ff;
+		font-weight: 700;, color: #00d4ff;
 	}
 
 	.stat-label {
-		font-size: 0.75rem;
-		color: #888;
+		font-size: 0.75rem;, color: #888;
 	}
 
 	.graph-container {
 		background: rgba(0, 0, 0, 0.3);
 		border-radius: 12px;
-		min-height: 400px;
-		display: flex;
+		min-height: 400px;, display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
 	.graph-placeholder {
-		text-align: center;
-		color: #888;
+		text-align: center;, color: #888;
 	}
 
 	.graph-link {
 		display: inline-block;
-		margin-top: 1rem;
-		padding: 0.5rem 1rem;
+		margin-top: 1rem;, padding: 0.5rem 1rem;
 		background: linear-gradient(135deg, #7c3aed, #00d4ff);
-		border-radius: 6px;
-		color: #fff;
+		border-radius: 6px;, color: #fff;
 		text-decoration: none;
 	}
 
 	.node-list {
 		background: rgba(255, 255, 255, 0.03);
-		border-radius: 12px;
-		padding: 1rem;
+		border-radius: 12px;, padding: 1rem;
 	}
 
 	.node-list h3 {
-		font-size: 0.875rem;
-		margin: 0 0 1rem 0;
+		font-size: 0.875rem;, margin: 0 0 1rem 0;
 	}
 
 	.node-item {
-		display: flex;
-		gap: 0.5rem;
-		align-items: center;
-		padding: 0.5rem 0;
+		display: flex;, gap: 0.5rem;
+		align-items: center;, padding: 0.5rem 0;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 	}
 
@@ -824,8 +775,7 @@
 
 	/* Pipeline Section */
 	.pipeline-controls {
-		display: flex;
-		gap: 1rem;
+		display: flex;, gap: 1rem;
 		margin-bottom: 1.5rem;
 	}
 
@@ -833,49 +783,40 @@
 		padding: 1rem 2rem;
 		background: linear-gradient(135deg, #ff6b6b, #ffc107);
 		border: none;
-		border-radius: 12px;
-		color: #fff;
-		font-weight: 600;
-		cursor: pointer;
+		border-radius: 12px;, color: #fff;
+		font-weight: 600;, cursor: pointer;
 	}
 
 	.refresh-btn {
 		padding: 1rem 2rem;
 		background: rgba(255, 255, 255, 0.1);
 		border: none;
-		border-radius: 12px;
-		color: #fff;
+		border-radius: 12px;, color: #fff;
 		cursor: pointer;
 	}
 
 	.progress-bar {
-		height: 24px;
-		background: rgba(255, 255, 255, 0.1);
-		border-radius: 12px;
-		overflow: hidden;
+		height: 24px;, background: rgba(255, 255, 255, 0.1);
+		border-radius: 12px;, overflow: hidden;
 		position: relative;
 		margin-bottom: 1.5rem;
 	}
 
 	.progress-fill {
-		height: 100%;
-		background: linear-gradient(90deg, #7c3aed, #00d4ff);
+		height: 100%;, background: linear-gradient(90deg, #7c3aed, #00d4ff);
 		transition: width 0.3s;
 	}
 
 	.progress-text {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
+		position: absolute;, top: 50%;
+		left: 50%;, transform: translate(-50%, -50%);
 		font-size: 0.75rem;
 		font-weight: 600;
 	}
 
 	.pipeline-logs {
 		background: rgba(0, 0, 0, 0.3);
-		border-radius: 12px;
-		padding: 1rem;
+		border-radius: 12px;, padding: 1rem;
 		margin-bottom: 1.5rem;
 	}
 
@@ -893,8 +834,7 @@
 
 	.pipeline-info {
 		background: rgba(255, 255, 255, 0.03);
-		border-radius: 12px;
-		padding: 1rem;
+		border-radius: 12px;, padding: 1rem;
 	}
 
 	.pipeline-info h3 {
@@ -903,8 +843,7 @@
 	}
 
 	.pipeline-info ul {
-		list-style: none;
-		padding: 0;
+		list-style: none;, padding: 0;
 		margin: 0;
 	}
 

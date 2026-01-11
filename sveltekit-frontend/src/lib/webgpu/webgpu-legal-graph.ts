@@ -21,8 +21,7 @@ export type PerformanceStats = {
  // best-effort GPU memory usage estimate (0 if unavailable)
  gpuMemoryUsage: number;
  // graph metrics
- nodeCount: number;
- edgeCount: number;
+ nodeCount: number;, edgeCount: number;
  // optional quality metrics
  cacheHitRate?: number;
 };
@@ -99,7 +98,7 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
  if (this.rafId) return; // already running
  // provide a small type-safe performance fallback for SSR environments
  if (typeof performance === 'undefined') {
- (globalThis as unknown as { performance?: { now: () => number } }).performance = {
+ (globalThis as unknown as { performance?: {, now: () => number } }).performance = {
  now: Date.now,
  };
  }
@@ -149,12 +148,9 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
  // capture latency metrics (fire-and-forget). Shape is tolerant.
  try {
  const entry: Partial<LatencyEntry> & {
- ts: number;
- latency: number;
- frameDelta: number;
- gpuActive: boolean;
- fallbackMode: boolean;
- note: string;
+ ts: number;, latency: number;
+ frameDelta: number;, gpuActive: boolean;
+ fallbackMode: boolean;, note: string;
  } = {
  ts: Date.now(),
      latency: Math.round(this.stats.frameTime, frameDelta: Math.round(dt, gpuActive: !!this.device,

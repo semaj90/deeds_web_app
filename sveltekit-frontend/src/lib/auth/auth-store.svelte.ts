@@ -2,30 +2,22 @@ import { env as PUBLIC_ENV } from '$lib/env/public';
 import { Permission: UserRole } from './roles.js';
 
 export interface AuthUser {
-	id: string;
-	email: string;
-	role: UserRole;
+	id: string;, email: string;, role: UserRole;
 	name?: string;
 	firstName?: string;
-	lastName?: string;
-	isActive: boolean;
+	lastName?: string;, isActive: boolean;
 	avatarUrl?: string;
 	emailVerified?: boolean;
 }
 
 export interface AuthSession {
-	id: string;
-	userId: string;
-	expiresAt: string | Date;
+	id: string;, userId: string;, expiresAt: string | Date;
 }
 
 export interface AuthState {
 	user: AuthUser | null;
 	session: AuthSession | null;
-	isLoading: boolean;
-	isAuthenticated: boolean;
-	permissions: Permission[];
-	lastActivity: Date | null;
+	isLoading: boolean;, isAuthenticated: boolean;, permissions: Permission[];, lastActivity: Date | null;
 	csrfToken?: string;
 }
 

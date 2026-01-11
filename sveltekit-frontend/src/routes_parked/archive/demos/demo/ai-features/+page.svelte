@@ -186,8 +186,7 @@ The security footage from **Camera 3** (Main Entrance) shows the following seque
 
 <style>
  .demo-page {
- min-height: 100vh;
- padding: 2rem;
+ min-height: 100vh;, padding: 2rem;
  background: var(--yorha-bg, #1a1a1a);
  color: var(--yorha-text, #d4d4d4);
  }
@@ -199,8 +198,7 @@ The security footage from **Camera 3** (Main Entrance) shows the following seque
 
  .demo-header h1 {
  font-size: 2rem;
- font-weight: 600;
- margin: 0 0 0.5rem;
+ font-weight: 600;, margin: 0 0 0.5rem;
  color: var(--yorha-accent, #c8a84b);
  }
 
@@ -213,15 +211,13 @@ The security footage from **Camera 3** (Main Entrance) shows the following seque
  display: grid;
  grid-template-columns: repeat(2, 1fr);
  gap: 2rem;
- max-width: 1400px;
- margin: 0 auto;
+ max-width: 1400px;, margin: 0 auto;
  }
 
  .demo-section {
  background: var(--yorha-bg-secondary, #2a2a2a);
  border: 1px solid var(--yorha-border, #4a4a4a);
- border-radius: 8px;
- padding: 1.5rem;
+ border-radius: 8px;, padding: 1.5rem;
  }
 
  .demo-section.full-width {
@@ -230,26 +226,22 @@ The security footage from **Camera 3** (Main Entrance) shows the following seque
 
  .demo-section h2 {
  font-size: 1.25rem;
- font-weight: 600;
- margin: 0 0 0.5rem;
+ font-weight: 600;, margin: 0 0 0.5rem;
  color: var(--yorha-text, #d4d4d4);
  }
 
  .section-desc {
  color: var(--yorha-text-muted, #888);
- font-size: 0.9rem;
- margin: 0 0 1.5rem;
+ font-size: 0.9rem;, margin: 0 0 1.5rem;
  }
 
  .demo-btn {
- margin-top: 1rem;
- padding: 0.5rem 1rem;
+ margin-top: 1rem;, padding: 0.5rem 1rem;
  background: var(--yorha-accent, #c8a84b);
  color: var(--yorha-bg, #1a1a1a);
  border: none;
  border-radius: 4px;
- font-weight: 500;
- cursor: pointer;
+ font-weight: 500;, cursor: pointer;
  transition: background 0.2s;
  }
 

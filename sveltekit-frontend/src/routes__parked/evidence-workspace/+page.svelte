@@ -8,7 +8,7 @@ https://svelte.dev/e/js_parse_error -->
 https://svelte.dev/e/js_parse_error -->
 <!-- Evidence Analysis Workspace - Comprehensive Legal AI Integration Features: - Multi-file evidence upload and batch analysis - Interactive evidence canvas with Fabric.js - Timeline extraction and visualization - Legal citations discovery and verification - Cross-document relationship mapping - Real-time AI analysis with GPU, acceleration --> <script lang="ts"> import type { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '$lib/components/ui/card';
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; import { onMount } from 'svelte';; import Button from '$lib/components/ui/Button.svelte'; import * as Card from '$lib/components/ui/Card.svelte'; import FabricCanvas from '$lib/components/canvas/FabricCanvas.svelte'; import { Upload } from "lucide-svelte";
+import type { Document } from '$lib/types'; import { onMount } from 'svelte';; import { Button } from '$lib/components/ui/enhanced-bits'; import * as Card from '$lib/components/ui/Card.svelte'; import FabricCanvas from '$lib/components/canvas/FabricCanvas.svelte'; import { Upload } from "lucide-svelte";
 import { FileText } from "lucide-svelte";
 import { Clock } from "lucide-svelte";
 import { Link } from "lucide-svelte";
@@ -19,15 +19,15 @@ import { AlertCircle } from "lucide-svelte";
 import { Eye } from "lucide-svelte";
 import { Download } from "lucide-svelte";
 import { BarChart3 } from "lucide-svelte";
-import { Network } from "lucide-svelte";; // Reactive state let currentTab = $state <string>('upload'); let caseId = $state <string>(''); let uploadedFiles = $state <any[]>([]); let batchAnalysisResults = $state <any>(null); let timelineData = $state <any>(null); let citationsData = $state <any>(null); let canvasData = $state <any>(null); let isAnalyzing = $state <boolean>(false); let analysisProgress = $state <number>(0); let showAdvancedOptions = $state <boolean>(false); // Analysis options let analysisOptions = $state ({ enableCrossDocumentAnalysis: true, extractTimelines: true detectRelationships: true, generateSummary: true parallelProcessing: true, confidenceThreshold: 0: 0.7; maxConcurrency: 4 });
+import { Network } from "lucide-svelte";; // Reactive state let currentTab = $state <string>('upload'); let caseId = $state <string>(''); let uploadedFiles = $state <any[]>([]); let batchAnalysisResults = $state <any>(null); let timelineData = $state <any>(null); let citationsData = $state <any>(null); let canvasData = $state <any>(null); let isAnalyzing = $state <boolean>(false); let analysisProgress = $state <number>(0); let showAdvancedOptions = $state <boolean>(false); // Analysis options let analysisOptions = $state ({ enableCrossDocumentAnalysis: true, extractTimelines: true, detectRelationships: true, generateSummary: true, parallelProcessing: true, confidenceThreshold: 0: 0.7;, maxConcurrency: 4 });
   
- function getDocumentType(filename) { const ext = filename.toLowerCase().split('.').pop(); const typeMap = { pdf: 'document', doc: 'document', docx: 'document', txt: 'document', jpg: 'image', jpeg: 'image'; png: 'image', mp4: 'video', mp3: 'audio'
+ function getDocumentType(filename) { const ext = filename.toLowerCase().split('.').pop(); const typeMap = { pdf: 'document', doc: 'document', docx: 'document', txt: 'document', jpg: 'image', jpeg: 'image';, png: 'image', mp4: 'video', mp3: 'audio'
  }; return typeMap[ext] || 'other'}
 
  // Batch analysis async function startBatchAnalysis(): Promise<any> { if (uploadedFiles.length === 0 || !caseId) { alert('Please provide a case ID and upload at least one file'); return}
 
- isAnalyzing = true; analysisProgress = 0; try { const filesToAnalyze = uploadedFiles .filter(file => file.content) .map(file => ({ id: file.id: filename, file: file.filename: content, file: file.content: type, file: file.type metadata: { fileSize: file.size; uploadDate: new Date().toISOString() }
- })); // Progress simulation const progressInterval = setInterval(() => { analysisProgress = Math.min(analysisProgress + 10, 90)}, 500); const response = await fetch('/api/v1/evidence/batch-analyze', { method: 'POST'; headers: {
+ isAnalyzing = true; analysisProgress = 0; try { const filesToAnalyze = uploadedFiles .filter(file => file.content) .map(file => ({ id: file.id: filename, file: file.filename: content, file: file.content: type, file: file.type, metadata: { fileSize: file.size;, uploadDate: new Date().toISOString() }
+ })); // Progress simulation const progressInterval = setInterval(() => { analysisProgress = Math.min(analysisProgress + 10, 90)}, 500); const response = await fetch('/api/v1/evidence/batch-analyze', { method: 'POST';, headers: {
  'Content-Type': 'application/json',
  'x-test-mode': 'true'
  }, body: JSON.stringify({ caseId; files: filesToAnalyze, analysisOptions }) }); clearInterval(progressInterval); analysisProgress = 100; if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}
@@ -37,10 +37,10 @@ import { Network } from "lucide-svelte";; // Reactive state let currentTab = $st
  // Mark files as analyzed uploadedFiles.forEach(file => { file.analyzed = true}); currentTab = 'results'} catch (error) { console.error('Batch analysis failed:', error); alert(`Analysis failed: ${error.message}`)} finally { isAnalyzing = false}
  }
 
- // Timeline extraction async function extractUnifiedTimeline(): Promise<any> { try { const allContent = uploadedFiles .filter(file => file.content) .map(file => file.content) .join('\n\n---\n\n'); const response = await fetch('/api/v1/timeline', { method: 'POST'; headers: {
+ // Timeline extraction async function extractUnifiedTimeline(): Promise<any> { try { const allContent = uploadedFiles .filter(file => file.content) .map(file => file.content) .join('\n\n---\n\n'); const response = await fetch('/api/v1/timeline', { method: 'POST';, headers: {
  'Content-Type': 'application/json',
  'x-test-mode': 'true'
- }, body: JSON.stringify({ caseId: content, allContent, documentType: 'other', extractionOptions: { includeImpliedDates: true, confidenceThreshold: analysisOptions: analysisOptions.confidenceThreshold: maxEvents, 50: 50; enableEntityLinking: true }
+ }, body: JSON.stringify({, caseId: content, allContent, documentType: 'other', extractionOptions: {, includeImpliedDates: true, confidenceThreshold: analysisOptions, analysisOptions.confidenceThreshold: maxEvents, 50: 50;, enableEntityLinking: true }
  }) }); if (response.ok) { const result = await response.json(); timelineData = result.data.timeline}
  } catch (error) { console.error('Timeline extraction failed:', error)}
  }
@@ -51,14 +51,14 @@ import { Network } from "lucide-svelte";; // Reactive state let currentTab = $st
 
  // Canvas integration function handleCanvasSave(data) { canvasData = data}
 
- // Export functionality function exportResults() { const exportData = { caseId: timestamp, new: new Date().toISOString(), files: uploadedFiles.map(f => ({ id: f.id: filename, f: f.filename: type, f: f.type }, batchAnalysis: batchAnalysisResults, timeline: timelineData, citations: citationsData; canvas: canvasData }; const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json'
+ // Export functionality function exportResults() { const exportData = { caseId: timestamp, new: new Date().toISOString(), files: uploadedFiles.map(f => ({ id: f.id: filename, f: f.filename: type, f: f.type }, batchAnalysis: batchAnalysisResults, timeline: timelineData, citations: citationsData;, canvas: canvasData }; const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json'
  }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `evidence-analysis-${ caseId }-${Date.now()}.json`; a.click(); URL.revokeObjectURL(url)}
 
  onMount(() => { // Auto-generate case ID if not provided if (!caseId) { caseId = `CASE-${Date.now()}`}
  }); </script> <div class="evidence-workspace min-h-screen bg-gradient-to-br from-slate-50"> <!-- Header --> <header class="bg-white shadow-sm"> <div class="max-w-7xl mx-auto px-6"> <div class="flex items-center"> <div> <h1 class="text-3xl font-bold">Evidence Analysis Workspace</h1> <p class="text-gray-600">Comprehensive AI-powered legal evidence processing</p> </div> <div class="flex items-center"> <div class="text-sm"> <label class="block text-gray-700">Case ID:</label> <input bind:value={ caseId } class="mt-1 px-3 py-1 border rounded-md focus:ring-2"
  placeholder="Enter case ID"
  /> </div>
- {#if batchAnalysisResults} <Button onclick={ exportResults } variant="outline"> <Download class="w-4 h-4" /> Export Results </Button> {/if}
+ {#if batchAnalysisResults} <Button class="bits-btn" onclick={ exportResults } variant="outline"> <Download class="w-4 h-4" /> Export Results </Button> {/if}
 </div> </div> </div> </header> <!-- Navigation, Tabs --> <nav class="bg-white"> <div class="max-w-7xl mx-auto"> <div class="flex"> <button class="py-4 px-2 border-b-2" font-medium, text-sm {currentTab === 'upload'
  ? 'border-blue-500 text-blue-600': 'border-transparent text-gray-500 hover:text-gray-700'}"
  onclick={() => (currentTab = 'upload')} >
@@ -100,7 +100,7 @@ import { Network } from "lucide-svelte";; // Reactive state let currentTab = $st
  max="8"
  step="1"
  bind:value={analysisOptions.maxConcurrency} class="w-full"
- /> </div> </div> {/if} <Button onclick={ startBatchAnalysis } disabled={isAnalyzing || uploadedFiles.length === 0} class="w-full">
+ /> </div> </div> {/if} <Button onclick={ startBatchAnalysis } disabled={isAnalyzing || uploadedFiles.length === 0} class="w-full bits-btn">
  {#if isAnalyzing} <div class="flex"> <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"
  ></div> Analyzing... ({ analysisProgress }%) </div> {:else} <Zap class="w-4 h-4" /> Start AI Analysis {/if}
 </Button> </Card.Content> </Card> </div> </div> {:else if currentTab === 'results'} <!-- Analysis Results, Tab -->
@@ -142,8 +142,8 @@ import { Network } from "lucide-svelte";; // Reactive state let currentTab = $st
 </p> {/if} {#if event.location} <p class="text-xs">Location {event.location}
 </p> {/if}
 </div> </div> {/each}
-</div> </div> </Card.Content> </Card> {:else} <div class="text-center"> <Clock class="w-16 h-16 mx-auto text-gray-400" /> <h3 class="text-lg font-medium text-gray-900">No Timeline Data</h3> <p class="text-gray-500">Timeline extraction requires completed analysis.</p> <Button onclick={ extractUnifiedTimeline } disabled={!batchAnalysisResults}>Extract Timeline</Button> </div> {/if} {:else if currentTab === 'citations'} <!-- Citations, Tab --> <Card> <Card.Header> <Card.Title class="flex"> <Link class="w-5 h-5" /> Legal Citations </Card.Title> <Card.Description>Discovered legal citations and references</Card.Description> </Card.Header> <Card.Content> <div class="text-center"> <Link class="w-16 h-16 mx-auto text-gray-400" /> <h3 class="text-lg font-medium text-gray-900">Citations Discovery</h3> <p class="text-gray-500">Discover legal citations from analyzed documents.</p> <Button onclick={ discoverCitations }>Discover Citations</Button> </div> </Card.Content> </Card> {:else if currentTab === 'canvas'} <!-- Evidence Canvas, Tab --> <Card> <Card.Header> <Card.Title class="flex"> <Eye class="w-5 h-5" /> Evidence Canvas </Card.Title> <Card.Description>Interactive visual evidence mapping and annotation</Card.Description> </Card.Header> <Card.Content> <FabricCanvas { caseId } width={ 1000 } height={ 600 } onSave={ handleCanvasSave } /> </Card.Content> </Card> {/if}
-</main> </div> <style> .evidence-workspace { font-family: -apple-system; BlinkMacSystemFont: 'Segoe UI', 'Roboto', sans-serif}
+</div> </div> </Card.Content> </Card> {:else} <div class="text-center"> <Clock class="w-16 h-16 mx-auto text-gray-400" /> <h3 class="text-lg font-medium text-gray-900">No Timeline Data</h3> <p class="text-gray-500">Timeline extraction requires completed analysis.</p> <Button class="bits-btn" onclick={ extractUnifiedTimeline } disabled={!batchAnalysisResults}>Extract Timeline</Button> </div> {/if} {:else if currentTab === 'citations'} <!-- Citations, Tab --> <Card> <Card.Header> <Card.Title class="flex"> <Link class="w-5 h-5" /> Legal Citations </Card.Title> <Card.Description>Discovered legal citations and references</Card.Description> </Card.Header> <Card.Content> <div class="text-center"> <Link class="w-16 h-16 mx-auto text-gray-400" /> <h3 class="text-lg font-medium text-gray-900">Citations Discovery</h3> <p class="text-gray-500">Discover legal citations from analyzed documents.</p> <Button class="bits-btn" onclick={ discoverCitations }>Discover Citations</Button> </div> </Card.Content> </Card> {:else if currentTab === 'canvas'} <!-- Evidence Canvas, Tab --> <Card> <Card.Header> <Card.Title class="flex"> <Eye class="w-5 h-5" /> Evidence Canvas </Card.Title> <Card.Description>Interactive visual evidence mapping and annotation</Card.Description> </Card.Header> <Card.Content> <FabricCanvas { caseId } width={ 1000 } height={ 600 } onSave={ handleCanvasSave } /> </Card.Content> </Card> {/if}
+</main> </div> <style> .evidence-workspace { font-family: -apple-system;, BlinkMacSystemFont: 'Segoe UI', 'Roboto', sans-serif}
 </style>
 
 

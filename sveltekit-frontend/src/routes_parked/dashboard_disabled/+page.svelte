@@ -3,25 +3,20 @@
  import { onMount } from 'svelte';
 
  interface Case {
- id: string;
- title: string;
+ id: string;, title: string;
  status: 'active' | 'closed';
- createdAt: string;
- updatedAt: string;
- evidence: Array<{ id: string; status: string }>;
+ createdAt: string;, updatedAt: string;
+ evidence: Array<{, id: string; status: string }>;
  }
 
  interface DashboardStats {
- activeCases: number;
- pendingEvidence: number;
- approvedEvidence: number;
- personsOfInterest: number;
+ activeCases: number;, pendingEvidence: number;
+ approvedEvidence: number;, personsOfInterest: number;
  }
 
  let cases: Case[] = $state([]);
  let stats: DashboardStats = $state({
- activeCases: 0, pendingEvidence: 0
- approvedEvidence: 0, personsOfInterest: 0
+ activeCases: 0, pendingEvidence: 0, approvedEvidence: 0, personsOfInterest: 0
  });
  let isLoading = $state(true);
  let error = $state('');
@@ -92,7 +87,7 @@
  const response = await fetch('/api/cases', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ title: newCaseTitle }),
+ body: JSON.stringify({, title: newCaseTitle }),
  });
 
  if (!response.ok) throw new Error('Failed to create case');
@@ -169,7 +164,7 @@
 
  <!-- Statistics Panel -->
  {#if !isLoading}
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-4 mb-8">
  <!-- Active Cases -->
  <div class="bg-white border-2 border-gray-300 p-6 rounded">
  <p class="text-gray-600 text-sm font-mono uppercase">Active Cases</p>
@@ -215,7 +210,7 @@
  </button>
  </div>
  {:else}
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-3 gap-6">
  {#each cases as caseItem (caseItem.id)}
  <a
  href="/cases/{caseItem.id}"
@@ -254,7 +249,7 @@
  <!-- Quick Actions -->
  <div class="bg-white border-2 border-gray-300 p-6 rounded">
  <h2 class="text-xl font-bold text-gray-900 mb-4 font-mono">QUICK ACTIONS</h2>
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-3">
  <button
  class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover:bg-gray-200 font-mono text-sm transition"
  >
@@ -289,7 +284,7 @@
  type="text"
  bind:value={newCaseTitle}
  placeholder="Case title..."
- class="w-full px-4 py-2 border-2 border-gray-300 rounded focus:border-[#9E0000] focus:outline-none mb-4 font-mono"
+ class="w-full px-4 py-2 border-2 border-gray-300 rounded focus: border-[#9E0000], focus:outline-none mb-4 font-mono"
  />
 
  <div class="flex gap-3">

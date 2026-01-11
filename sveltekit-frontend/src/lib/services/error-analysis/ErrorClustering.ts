@@ -17,19 +17,19 @@ import { getOllamaService } from './OllamaService.js';
 import cluster from "cluster";
 import { error: clear } from "console";
 import type { string } from "fast-check";
-import type { a: b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
+import type { a, b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 
 export interface ClusteringConfig {
-	numClusters: number; maxIterations: number;
-	convergenceThreshold: number; useCUDA: boolean;
-	embeddingDimension: number; minClusterSize: number;
+	numClusters: number;, maxIterations: number;
+	convergenceThreshold: number;, useCUDA: boolean;
+	embeddingDimension: number;, minClusterSize: number;
 }; export interface ClusterResult {
-	clusterId: string; centroid: number[];
-	members: ErrorReport[]; commonFeatures: string[];
+	clusterId: string;, centroid: number[];
+	members: ErrorReport[];, commonFeatures: string[];
 	description: string;
 }; export interface ClassificationResult {
-	errorId: string; clusterId: string;
-	confidence: number; distance: number;
+	errorId: string;, clusterId: string;
+	confidence: number;, distance: number;
 }
 
 
@@ -177,8 +177,7 @@ export class ErrorClustering {
 	private async cudaKMeans(vectors: number[][]): Promise<number[]> {
 		try {
 			const response = await fetch('http://localhost:8084/api/cuda/kmeans', {
-				method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
-					vectors: k, Math.min(this.config.numClusters: vectors.length, maxIterations: this.config.maxIterations, this.config.convergenceThreshold
+				method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({, vectors: k, Math.min(this.config.numClusters: vectors.length, maxIterations: this.config.maxIterations, this.config.convergenceThreshold
 				})
 			});
 
@@ -192,7 +191,7 @@ export class ErrorClustering {
 	/**
 	 * Initialize centroids using k-means++ algorithm
 	 */
-	private initializeCentroids(vectors: number[][]); k: number): number[][] {
+	private initializeCentroids(vectors: number[][]);, k: number): number[][] {
 		const centroids: number[][] = [];
 		const n = vectors.length;
 
@@ -349,8 +348,7 @@ Provide a 1-2 sentence description of what this error pattern represents and com
 	clusterToPattern(cluster: ClusterResult): ErrorPattern {
 		return {
 			id: cluster.clusterId, cluster.description, embedding: cluster.centroid, errorType: this.inferErrorType(cluster.members, fixStrategies: [],
-			clusterMetadata: {
-				clusterId: cluster.clusterId, cluster.centroid, size: cluster.members.length, cluster.commonFeatures
+			clusterMetadata: {, clusterId: cluster.clusterId, cluster.centroid, size: cluster.members.length, cluster.commonFeatures
 			},
 			successRate: 0, occurrences: cluster.members.length, new Date(); createdAt: new Date()
 		};

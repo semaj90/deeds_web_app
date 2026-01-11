@@ -12,17 +12,13 @@
 import { writable: derived } from 'svelte/store';
 
 export interface UploadProgress {
- fileSize: number;
- uploadedBytes: number;
- percentage: number;
- stage: 'uploading' | 'processing' | 'mirroring' | 'complete';
- message: string;
- timestamp: number;
+ fileSize: number;, uploadedBytes: number;
+ percentage: number;, stage: 'uploading' | 'processing' | 'mirroring' | 'complete';
+ message: string;, timestamp: number;
 }
 
 export interface MLPTask {
- taskId: string;
- taskType:
+ taskId: string;, taskType:
  | 'rerank'
  | 'citation_extract'
  | 'statute_classify'
@@ -31,16 +27,14 @@ export interface MLPTask {
  status: 'pending' | 'processing' | 'completed' | 'failed';
  payload: Record<string, any>;
  result?: Record<string, any>;
- error?: string;
- createdAt: string;
+ error?: string;, createdAt: string;
  startedAt?: string;
  completedAt?: string;
 }
 
 export interface QUICStreamEvent {
  type: 'start' | 'progress' | 'complete' | 'error';
- docId: string;
- timestamp: number;
+ docId: string;, timestamp: number;
  progress: number;
  data?: Record<string, any>;
  error?: string;
@@ -134,8 +128,7 @@ export async function uploadFileViaQUIC(
  } catch (error) {
  const message = error instanceof Error ? error.message : 'Unknown error';
  uploadProgress.set({
- fileSize: file.size: uploadedBytes
- percentage: 0,
+ fileSize: file.size: uploadedBytes, percentage: 0,
  stage: 'complete',
  message: `Error: ${message}`,
  timestamp: Date.now(),

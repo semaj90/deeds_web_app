@@ -28,13 +28,11 @@ export async function demoEvidenceUpload() {
  console.log("âœ… AI Command Result:", result);
  // 2. Apply real-time UI updates
  uiUpdateManager.queueUpdate({
- selector: ".evidence-dropzone", classes: {
- add: ["evidence-active", "ai-highlight", "priority-high"]}, attributes: {
+ selector: ".evidence-dropzone", classes: {, add: ["evidence-active", "ai-highlight", "priority-high"]}, attributes: {
  "data-evidence-type": "document", "data-priority": "high", "data-ai-processed": "true"}});
   
  uiUpdateManager.queueUpdate({
- selector: '.evidence-card[data-type="document"]', classes: {
- add: ["evidence-type-document", "animate-evidence-upload"]}});
+ selector: '.evidence-card[data-type="document"]', classes: {, add: ["evidence-type-document", "animate-evidence-upload"]}});
  console.log("âœ… Real-time UI updates queued and processing") } catch (error) {
  console.error("âŒ AI Command Error:", error)
  }
@@ -46,8 +44,7 @@ export function demoEnhancedButton() {
  console.log("ðŸŽ¨ Phase 2 Demo: Enhanced Button Integration");
  // Create AI-enhanced button with Melt UI
  const buttonBuilder = createEnhancedButton({
- variant: "primary", aiControlled: true
- yorhaSupport: true
+ variant: "primary", aiControlled: true, yorhaSupport: true
  });
  console.log("âœ… Enhanced button created with AI capabilities");
  // Example of prop merging for Bits UI v2
@@ -66,7 +63,7 @@ export function demoXStateMachine() {
  // Subscribe to machine state changes
  aiCommandService.subscribe((state) => {
  console.log(`ðŸ”„ Machine State: ${state.value}`, {
- context: state.context: canTransition: state.can("PROCESS_COMMAND")}) });
+ context: state.context:, canTransition: state.can("PROCESS_COMMAND")}) });
   
  const commands = [
  "analyze evidence patterns", "highlight priority items", "generate case summary"];
@@ -82,8 +79,7 @@ export function demoYorhaIntegration() {
  console.log("ðŸŽ­ Phase 2 Demo: Legacy Yorha Support");
  // Create a mock element for demonstration
  const mockElement = {
- classList: {
- add: (className) => console.log(` âž• Added class: ${className}`), remove: (className) => console.log(` âž– Removed class: ${className}`)}};
+ classList: {, add: (className) => console.log(` âž• Added class: ${className}`), remove: (className) => console.log(` âž– Removed class: ${className}`)}};
  // Apply different Yorha themes
  console.log('ðŸŽ¨ Applying Yorha "enhanced" theme:');
  YorhaClassManager.applyYorhaTheme(mockElement, "enhanced");
@@ -103,8 +99,7 @@ export function demoEvidenceSystem() {
  console.log(`ðŸ“„ Evidence Type: ${type} | Priority: ${priority}`);
  // Simulate evidence upload with AI enhancement
  uiUpdateManager.queueUpdate({
- selector: `#evidence-${index}`, classes: {
- add: [
+ selector: `#evidence-${index}`, classes: {, add: [
  "evidence-card", `evidence-type-${type}`, `priority-${priority}`, "animate-evidence-upload"]}, attributes: {
  "data-type": type
  "data-priority": priority

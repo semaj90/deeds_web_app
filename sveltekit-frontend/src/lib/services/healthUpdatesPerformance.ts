@@ -145,8 +145,7 @@ export function getMetrics(): PerformanceMetrics {
  */
 export function getMetricsSummary(): string {
  const summary = `
-Performance Metrics Summary:
- Messages Processed: ${metrics.messagesProcessed}
+Performance Metrics Summary: Messages, Processed: ${metrics.messagesProcessed}
  Batches Processed: ${metrics.batchesProcessed}
  Average Latency: ${metrics.averageLatency.toFixed(2)}ms
  Average Batch Time: ${metrics.averageBatchTime.toFixed(2)}ms

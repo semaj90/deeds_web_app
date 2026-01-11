@@ -49,7 +49,6 @@ export interface AlertDialogCancelProps {
 }
 
 export interface AlertDialogContext {
-	readonly open: boolean;
-	setOpen: (open: boolean) => void;
+	readonly open: boolean;, setOpen: (open: boolean) => void;
 	close: () => void;
 }

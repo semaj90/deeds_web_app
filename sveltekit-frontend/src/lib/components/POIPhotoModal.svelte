@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui';
 	import { Badge } from '$lib/components/ui/badge';
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from '$lib/components/ui/enhanced-bits';
 	import { Dialog, DialogContent } from '$lib/components/ui/dialog';
 	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
 	import Camera from 'lucide-svelte/icons/camera';
@@ -120,13 +120,13 @@
 
  <!-- Zoom Controls -->
  <div class="absolute top-4 right-4 flex gap-2">
- <Button variant="secondary" size="sm" onclick={zoomOut} disabled={zoomLevel <= 0.5}>
+ <Button class="bits-btn" variant="secondary" size="sm" onclick={zoomOut} disabled={zoomLevel <= 0.5}>
  <ZoomOut class="w-4 h-4" />
  </Button>
- <Button variant="secondary" size="sm" onclick={zoomIn} disabled={zoomLevel >= 3}>
+ <Button class="bits-btn" variant="secondary" size="sm" onclick={zoomIn} disabled={zoomLevel >= 3}>
  <ZoomIn class="w-4 h-4" />
  </Button>
- <Button variant="secondary" size="sm" onclick={downloadPhoto}>
+ <Button class="bits-btn" variant="secondary" size="sm" onclick={downloadPhoto}>
  <Download class="w-4 h-4" />
  </Button>
  </div>
@@ -145,7 +145,7 @@
  <div class="p-6">
  <div class="flex items-center justify-between mb-4">
  <h3 class="text-lg font-semibold">Photo Analysis</h3>
- <Button variant="ghost" size="sm" onclick={close}>
+ <Button class="bits-btn" variant="ghost" size="sm" onclick={close}>
  <X class="w-4 h-4" />
  </Button>
  </div>
@@ -234,7 +234,7 @@
  <CardContent>
  <div class="flex flex-wrap gap-2">
  {#each currentPhoto.aiTags as tag}
- <Badge variant="outline">{tag}</Badge>
+ <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{tag}</span>
  {/each}
  </div>
  </CardContent>
@@ -256,7 +256,7 @@
  {#if currentPhoto.forensicData.lightingConditions}
  <div class="flex justify-between">
  <span class="text-gray-600">Lighting:</span>
- <Badge variant="outline">{currentPhoto.forensicData.lightingConditions}</Badge>
+ <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{currentPhoto.forensicData.lightingConditions}</span>
  </div>
  {/if}
  </CardContent>

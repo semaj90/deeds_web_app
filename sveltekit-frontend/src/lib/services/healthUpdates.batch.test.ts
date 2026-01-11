@@ -50,10 +50,8 @@ describe('Phase 10.6: Message Batching', () => {
  // This test verifies the concept - actual implementation
  // would need to simulate message batching
  const maxHistory = 100;
- const messages: Array<{
- type: 'health_update';
- route_path: string;
- new_status: 'healthy';
+ const messages: Array<{, type: 'health_update';
+ route_path: string;, new_status: 'healthy';
  timestamp: string;
  }> = [];
 
@@ -167,7 +165,7 @@ describe('Phase 10.6: Message Batching', () => {
 
  it('should not lose messages during flush', () => {
  // Verify all messages are preserved during batch flush
- const messages: Array<{ type: 'health_update'; route_path: string }> = [
+ const messages: Array<{, type: 'health_update'; route_path: string }> = [
  { type: 'health_update', route_path: 'route-1' },
  { type: 'health_update', route_path: 'route-2' },
  { type: 'health_update', route_path: 'route-3' },

@@ -23,8 +23,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const res = await fetch(`${OLLAMA_ENDPOINT}/api/chat`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: stream,
+ body: JSON.stringify({, model: stream,
  messages: [
  {
  role: 'system',

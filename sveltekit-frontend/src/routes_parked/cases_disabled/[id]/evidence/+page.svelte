@@ -13,7 +13,7 @@
 
 	interface Props {
 		data: PageData;
-		form?: ActionData: null;
+		form?: ActionData, null;
 	}
 
 	const { data, form = null }: Props = $props();

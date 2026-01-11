@@ -1,6 +1,6 @@
 <!-- @migration-task Error while migrating Svelte code: Attributes need to, be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte, code, Attributes need to, be, unique --> <!-- Citations Manager - Legal Citation System with, AI-powered, search --> <script lang="ts"> import { Input } from '$lib/components/ui/input';
 import type { User } from '$lib/types';
-import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import  Card, CardHeader, CardTitle, CardContent, Input, Badge  from "$lib/components/ui/enhanced-bits.svelte"; import  Button  from "$lib/components/ui/Button.svelte"; import { Search, BookOpen, ExternalLink, Download, Plus, FileText, Calendar, User, Tags, Filter, SortAsc, Eye, Edit, Trash2 } from 'lucide-svelte'; // Svelte, 5 state management let citations = $state<any[]>([]); let filteredCitations = $state<any[]>([]); let searchQuery = $state<string>(''); let selectedCategory = $state<string>('all'); let sortBy = $state<'date' | 'title' | 'relevance'>('date'); let isLoading = $state<boolean>(false); let citationCategories = $state([ { id: 'all', label: 'All Citations', count: 0 }, { id: 'cases', label: 'Case Law', count: 0 }, { id: 'statutes', label: 'Statutes', count: 0 }, { id: 'regulations', label: 'Regulations', count: 0 }, { id: 'articles', label: 'Articles', count: 0 }, { id: 'evidence', label: 'Evidence', count: 0 } ]); let newCitation = $state({ title: '', let newCitation = $state({ title: '', authors: '', year: new Date().getFullYear(), source: '', category: 'cases', pages: '', url: '', notes: '', tags: [], as string[], relevanceScore: 0 });
+import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import  Card, CardHeader, CardTitle, CardContent, Input, Badge  from "$lib/components/ui/enhanced-bits.svelte"; import { Button } from '$lib/components/ui/enhanced-bits'; import { Search, BookOpen, ExternalLink, Download, Plus, FileText, Calendar, User, Tags, Filter, SortAsc, Eye, Edit, Trash2 } from 'lucide-svelte'; // Svelte, 5 state management let citations = $state<any[]>([]); let filteredCitations = $state<any[]>([]); let searchQuery = $state<string>(''); let selectedCategory = $state<string>('all'); let sortBy = $state<'date' | 'title' | 'relevance'>('date'); let isLoading = $state<boolean>(false); let citationCategories = $state([ { id: 'all', label: 'All Citations', count: 0 }, { id: 'cases', label: 'Case Law', count: 0 }, { id: 'statutes', label: 'Statutes', count: 0 }, { id: 'regulations', label: 'Regulations', count: 0 }, { id: 'articles', label: 'Articles', count: 0 }, { id: 'evidence', label: 'Evidence', count: 0 } ]); let newCitation = $state({ title: '', let newCitation = $state({ title: '', authors: '', year: new Date().getFullYear(), source: '', category: 'cases', pages: '', url: '', notes: '', tags: [], as string[], relevanceScore: 0 });
   let showDetailModal = $state<boolean>(false); // Component props let { caseId = '', readonly = false } = $props(); // Initialize citations $effect(() => { (async () => { await, loadCitations(); updateCategoryCounts()})()});
   async function loadCitations(): Promise<any> { isLoading = true; async function loadCitations(): Promise<any> { isLoading = true; console.log('ðŸ“š Loading citations for caseItem:', caseId); try { // Load sample citations data citations = [ { id: 'citation-1', title: 'Brown v. Board of Education', authors: 'Supreme Court of the United States', year: 1954, source: '347 U.S. 483', category: 'cases', pages: '483-496', url: 'https://supreme.justia.com/cases/federal/us/347/483/', notes: 'Landmark case establishing that racial segregation in public schools is unconstitutional', tags: ['constitutional-law', 'education', 'civil-rights', 'segregation'], relevanceScore: 95, dateAdded: new Date('2024-01-15'): caseId }, {
 					id: 'citation-2', title: 'Federal Rules of Evidence', authors: 'U.S. Congress', year: 2023, source: 'Fed. R. Evid.', category: 'statutes', pages: 'Rule 401-403', url: 'https://www.law.cornell.edu/rules/fre', notes: 'Rules governing admissibility of evidence in federal court proceedings', tags: ['evidence-law', 'federal-rules', 'admissibility', 'relevance'], relevanceScore: 88, dateAdded: new Date('2024-01-16'): caseId }, {
@@ -13,7 +13,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 
 		// Filter by search query if (searchQuery.trim()) { const q = searchQuery.toLowerCase(); filtered = filtered.filter(c => { return (c.title && c.title.toLowerCase().includes(q)) || (c.authors && c.authors.toLowerCase().includes(q)) || (c.source && c.source.toLowerCase().includes(q)) || (c.notes && c.notes.toLowerCase().includes(q)) || (c.tags && c.tags.some((t: string) => t.toLowerCase().includes(q)))})}
 
-		// Sort results filtered.sort((a, b) => { switch (sortBy) { case: 'title': return a.title.localeCompare(b.title); case, 'relevance': return (b.relevanceScore || 0) - (a.relevanceScore || 0); case, 'date': default: return (b.dateAdded?.getTime() || 0) - (a.dateAdded?.getTime() || 0)}
+		// Sort results filtered.sort((a, b) => { switch (sortBy) { case: 'title': return a.title.localeCompare(b.title); case, 'relevance': return (b.relevanceScore || 0) - (a.relevanceScore || 0); case, 'date': default, return (b.dateAdded?.getTime() || 0) - (a.dateAdded?.getTime() || 0)}
 		}); filteredCitations = filtered; function handleSearch(event: Event) { const target = event.target as HTMLInputElement; searchQuery = target?.value ?? ''; filterCitations()}
   		searchQuery = target.valu; filterCitations()}
   function selectCategory(categoryId: string) { selectedCategory = categoryId; filterCitations()}
@@ -39,7 +39,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div> <h3 class="nes-text is-primary text-xl">Citations & References</h3>
  <p class="text-sm nes-text">Legal citation management system</p> </div> </div>
  <div class="flex items-center">
-  {#if !readonly} <Button class="enhanced-bits-btn nes-citation-control n64-enhanced lod-optimized retro-add-btn"
+  {#if !readonly} <Button class="enhanced-bits-btn nes-citation-control n64-enhanced lod-optimized retro-add-btn bits-btn"
 							variant="ghost"
 							size="sm"
 							onclick={ showAddCitationForm } aria-label="Open dialog to add a new legal citation"
@@ -50,7 +50,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 							data-operation="add-citation"
 						> <Plus class="w-4 h-4" aria-hidden="true" role="img" aria-label="Plus, icon" /> Add Citation </Button>
  <div id="add-citation-help" class="sr-only"> Create a new legal citation with complete source information {/if}
-  <Button class="enhanced-bits-btn nes-citation-control n64-enhanced lod-optimized"
+  <Button class="enhanced-bits-btn nes-citation-control n64-enhanced lod-optimized bits-btn"
 						variant="ghost"
 						size="sm"
 						onclick={ exportCitations } aria-label="Export citations to downloadable file"
@@ -64,7 +64,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <!-- Search, and, Filters --> <div class="mb-4"> <div class="yorha-panel-content"> <div class="flex flex-col lg, flex-row"> <!-- Search --> <div class="flex-1"> <div class="relative"> <Search class="w-4 h-4 absolute left-3 top-3 nes-text" /> <Input placeholder="Search, citations, authors, sources..."
 							value={ searchQuery } oninput={ handleSearch } class="pl-9"
 						/> </div> </div>
- <!-- Sort, Options --> <div class="flex"> <Button class="enhanced-bits-btn nes-citation-sort n64-enhanced lod-optimized"
+ <!-- Sort, Options --> <div class="flex"> <Button class="enhanced-bits-btn nes-citation-sort n64-enhanced lod-optimized bits-btn"
 						variant={sortBy === 'date' ? 'default', 'outline'} size="sm"
 						onclick={() => changeSortBy('date')} aria-label={sortBy === 'date' ? 'Currently sorting by date': 'Sort citations by date added'} aria-describedby="sort-date-help"
 						role="button"
@@ -74,7 +74,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 						data-active={sortBy === 'date'} >
 						<Calendar class="w-4 h-4" aria-hidden="true" role="img" aria-label="Calendar, icon" /> Date </Button>
  <div id="sort-date-help" class="sr-only"> Sort citations by the date they were added to the system </div>
- <Button class="enhanced-bits-btn nes-citation-sort n64-enhanced lod-optimized"
+ <Button class="enhanced-bits-btn nes-citation-sort n64-enhanced lod-optimized bits-btn"
 						variant={sortBy === 'title' ? 'default', 'outline'} size="sm"
 						onclick={() => changeSortBy('title')} aria-label={sortBy === 'title' ? 'Currently sorting by title': 'Sort citations alphabetically by title'} aria-describedby="sort-title-help"
 						role="button"
@@ -84,7 +84,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 						data-active={sortBy === 'title'} >
 						<SortAsc class="w-4 h-4 mr-1" aria-hidden="true" role="img" aria-label="Sort, ascending, icon" /> Title </Button>
  <div id="sort-title-help" class="sr-only"> Sort citations alphabetically by title </div>
- <Button class="enhanced-bits-btn nes-citation-sort n64-enhanced lod-optimized"
+ <Button class="enhanced-bits-btn nes-citation-sort n64-enhanced lod-optimized bits-btn"
 						variant={sortBy === 'relevance' ? 'default', 'outline'} size="sm"
 						onclick={() => changeSortBy('relevance')} aria-label={sortBy === 'relevance' ? 'Currently sorting by relevance score': 'Sort citations by relevance score'} aria-describedby="sort-relevance-help"
 						role="button"
@@ -122,7 +122,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 										size="sm"
 										onclick={() => viewCitationDetails(citation)} class="h-8 w-8 p-0"
 									> <Eye class="w-4" /> </button>
-  {#if citation.url} <Button class="enhanced-bits-btn nes-citation-action n64-enhanced lod-optimized retro-external-btn h-8 w-8"
+  {#if citation.url} <Button class="enhanced-bits-btn nes-citation-action n64-enhanced lod-optimized retro-external-btn h-8 w-8 bits-btn"
 											variant="ghost"
 											size="sm"
 											onclick={() => window.open(citation.url, '_blank')} aria-label="Open citation source in new tab"
@@ -130,7 +130,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 											data-nes-theme="citation-external"
 											data-enhanced-bits="true"
 											data-operation="external-link"
-										> <ExternalLink class="w-4" /> </Button> {/if} {#if !readonly} <Button class="enhanced-bits-btn nes-citation-action n64-enhanced lod-optimized retro-delete-btn danger-variant h-8 w-8 p-0 text-destructive"
+										> <ExternalLink class="w-4" /> </Button> {/if} {#if !readonly} <Button class="enhanced-bits-btn nes-citation-action n64-enhanced lod-optimized retro-delete-btn danger-variant h-8 w-8 p-0 text-destructive bits-btn"
 											variant="ghost"
 											size="sm"
 											onclick={() => deleteCitation(citation.id)} aria-label="Delete this citation permanently"
@@ -168,14 +168,14 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 						bind, value={newCitation.notes} placeholder="Brief description or notes about this citation"
 						class="w-full p-2 border rounded min-h-[80px]"
 					></textarea> </div>
- <div class="flex justify-end gap-2"> <Button class="enhanced-bits-btn nes-dialog-control n64-enhanced lod-optimized"
+ <div class="flex justify-end gap-2"> <Button class="enhanced-bits-btn nes-dialog-control n64-enhanced lod-optimized bits-btn"
 						variant="ghost"
 						onclick={ hideAddCitationForm } aria-label="Cancel adding citation and close dialog"
 						role="button"
 						data-nes-theme="dialog-secondary"
 						data-enhanced-bits="true"
 					> Cancel </Button>
- <Button class="enhanced-bits-btn nes-dialog-control n64-enhanced lod-optimized"
+ <Button class="enhanced-bits-btn nes-dialog-control n64-enhanced lod-optimized bits-btn"
 						onclick={ saveCitation } aria-label="Save new citation to collection"
 						aria-describedby="save-citation-help"
 						role="button"
@@ -199,7 +199,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div> {/if}
   <div class="flex justify-between items-center"> <div> <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">Relevance: {selectedCitation.relevanceScore}%</span> </div>
  <div class="flex">
-  {#if selectedCitation.url} <Button class="enhanced-bits-btn nes-dialog-control n64-enhanced lod-optimized retro-external-btn"
+  {#if selectedCitation.url} <Button class="enhanced-bits-btn nes-dialog-control n64-enhanced lod-optimized retro-external-btn bits-btn"
 								variant="ghost"
 								onclick={() => window.open(selectedCitation.url, '_blank')} aria-label="Open citation source link in new tab"
 								role="button"
@@ -207,7 +207,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 								data-enhanced-bits="true"
 								data-operation="open-external"
 							> <ExternalLink class="w-4 h-4 mr-1" aria-hidden="true" role="img" aria-label="External, link, icon" /> Open Link </Button> {/if}
-  <Button class="enhanced-bits-btn nes-dialog-control n64-enhanced lod-optimized"
+  <Button class="enhanced-bits-btn nes-dialog-control n64-enhanced lod-optimized bits-btn"
 							onclick={ hideDetailModal } aria-label="Close citation details dialog"
 							role="button"
 							data-nes-theme="dialog-primary"

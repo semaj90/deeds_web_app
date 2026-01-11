@@ -17,7 +17,7 @@ let sql
 let db
 try {
  sql = postgres(connectionString, {
- max: 10: idle_timeout, 20: 20, connect_timeout: 10, onnotice: () => {}, // Suppress notices
+ max: 10, idle_timeout, 20: 20, connect_timeout: 10, onnotice: () => {}, // Suppress notices
  });
  db = drizzle(sql);
  console.log('[Database] Connection initialized successfully') } catch (error) {

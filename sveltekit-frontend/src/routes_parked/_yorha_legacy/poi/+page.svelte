@@ -7,14 +7,10 @@
  type RiskLevel = 'high' | 'medium' | 'low';
 
  type Person = {
- id: string;
- name: string;
- role: PersonRole;
- riskLevel: RiskLevel;
- photo?: string;
- summary: string;
- lastSeen: string;
- connections: number;
+ id: string;, name: string;
+ role: PersonRole;, riskLevel: RiskLevel;
+ photo?: string;, summary: string;
+ lastSeen: string;, connections: number;
  verified: boolean;
  };
 
@@ -28,7 +24,7 @@
  role: 'suspect',
  riskLevel: 'high',
  summary: 'Primary suspect in corporate espionage case. Former employee with access to sensitive systems. Flight risk.',
- lastSeen: '2024-12-05 14:30',
+ lastSeen: '2024-12-05, 14:30',
  connections: 8, verified: true
  },
  {
@@ -37,7 +33,7 @@
  role: 'witness',
  riskLevel: 'low',
  summary: 'Security guard who witnessed suspect entering building on night of incident. Cooperative with investigation.',
- lastSeen: '2024-12-06 09:15',
+ lastSeen: '2024-12-06, 09:15',
  connections: 3, verified: true
  },
  {
@@ -46,7 +42,7 @@
  role: 'suspect',
  riskLevel: 'medium',
  summary: 'Associate of Chen. Financial records show suspicious transactions. Currently under surveillance.',
- lastSeen: '2024-12-04 18:45',
+ lastSeen: '2024-12-04, 18:45',
  connections: 5, verified: false
  },
  {
@@ -55,7 +51,7 @@
  role: 'victim',
  riskLevel: 'low',
  summary: 'Corporate VP whose credentials were compromised. Full cooperation with investigation.',
- lastSeen: '2024-12-06 10:00',
+ lastSeen: '2024-12-06, 10:00',
  connections: 12, verified: true
  },
  {
@@ -64,7 +60,7 @@
  role: 'associate',
  riskLevel: 'high',
  summary: 'Unidentified individual seen with Chen multiple times. Facial recognition pending.',
- lastSeen: '2024-12-03 22:10',
+ lastSeen: '2024-12-03, 22:10',
  connections: 2, verified: false
  },
  ];
@@ -90,7 +86,7 @@
  <Panel>
  <div class="flex items-center justify-between mb-3">
  <div class="heading-sub">Persons of Interest</div>
- <Button variant="primary">
+ <Button class="bits-btn" variant="primary">
  <span class="i-heroicons-plus-20-solid mr-1" ></span>
  Add Person
  </Button>
@@ -191,15 +187,15 @@
  <div class="heading-sub mb-3">Quick Actions</div>
 
  <div class="flex flex-col gap-2">
- <Button variant="secondary">
+ <Button class="bits-btn" variant="secondary">
  <span class="i-heroicons-map mr-1" ></span>
  Relationship Map
  </Button>
- <Button variant="secondary">
+ <Button class="bits-btn" variant="secondary">
  <span class="i-heroicons-clock mr-1" ></span>
  Timeline View
  </Button>
- <Button variant="secondary">
+ <Button class="bits-btn" variant="secondary">
  <span class="i-heroicons-document-chart-bar mr-1" ></span>
  Generate Report
  </Button>

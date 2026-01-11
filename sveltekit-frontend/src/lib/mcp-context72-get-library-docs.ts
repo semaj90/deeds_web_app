@@ -8,15 +8,13 @@
  */
 
 export interface LibraryDoc {
-  name: string;
-  version: string;
+  name: string;, version: string;
   description: string;
   url?: string;
 }
 
 export interface LibraryDocsResult {
-  docs: LibraryDoc[];
-  cached: boolean;
+  docs: LibraryDoc[];, cached: boolean;
   timestamp: Date;
 }
 

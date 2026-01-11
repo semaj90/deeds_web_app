@@ -56,8 +56,7 @@ export const GET: RequestHandler = async () => {
 
 		return json({
 			routes: enrichedRoutes,
-			summary: {
-				total: enrichedRoutes.length,
+			summary: {, total: enrichedRoutes.length,
 				with_errors: enrichedRoutes.filter(r => r.errors > 0).length,
 				in_kb: enrichedRoutes.filter(r => r.kb_vectors > 0).length
 			}
@@ -188,8 +187,7 @@ async function getKBCounts(): Promise<Map<string, number>> {
 		const response = await fetch('http://localhost:6333/collections/phase76_knowledge_base/points/scroll', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				limit: 10000,
+			body: JSON.stringify({, limit: 10000,
 				with_payload: true,
 				with_vector: false
 			})

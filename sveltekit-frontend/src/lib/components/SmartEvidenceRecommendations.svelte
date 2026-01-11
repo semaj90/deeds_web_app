@@ -28,9 +28,9 @@ import { Target } from "lucide-svelte";;
 	}>();
 
 	const dispatch = createEventDispatcher<{
-		generate: { evidenceId: string; caseId?: string };
-		apply: { recommendationId: string };
-		dismiss: { recommendationId: string };
+		generate: {, evidenceId: string; caseId?: string };
+		apply: {, recommendationId: string };
+		dismiss: {, recommendationId: string };
 	}>();
 
 	function generateRecommendations() {
@@ -178,8 +178,7 @@ import { Target } from "lucide-svelte";;
 	.evidence-recommendations {
 		background: linear-gradient(135deg, #1a1d20 0%, #0f1215 100%);
 		border: 1px solid #2a2d30;
-		border-radius: 12px;
-		padding: 1.5rem;
+		border-radius: 12px;, padding: 1.5rem;
 		margin: 1rem 0;
 	}
 
@@ -194,72 +193,59 @@ import { Target } from "lucide-svelte";;
 
 	.title-section {
 		display: flex;
-		align-items: center;
-		gap: 0.75rem;
+		align-items: center;, gap: 0.75rem;
 	}
 
 	.icon {
-		width: 24px;
-		height: 24px;
+		width: 24px;, height: 24px;
 		color: #a78bfa;
 	}
 
 	.title-section h3 {
-		margin: 0;
-		color: #e8e8e8;
+		margin: 0;, color: #e8e8e8;
 		font-size: 1.2rem;
 		font-weight: 600;
 	}
 
 	.subtitle {
-		font-size: 0.8rem;
-		color: #888;
+		font-size: 0.8rem;, color: #888;
 		margin: 0;
 	}
 
 	.generate-btn {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		align-items: center;, gap: 0.5rem;
 		padding: 0.75rem 1.25rem;
 		background: linear-gradient(135deg, #a78bfa, #8b5cf6);
-		color: white;
-		border: none;
-		border-radius: 8px;
-		cursor: pointer;
-		font-weight: 600;
-		transition: all 0.3s ease;
+		color: white;, border: none;
+		border-radius: 8px;, cursor: pointer;
+		font-weight: 600;, transition: all 0.3s ease;
 	}
 
-	.generate-btn:hover:not(:disabled) {
+	.generate-btn: hover, not(:disabled) {
 		transform: translateY(-1px);
 		box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 	}
 
 	.generate-btn:disabled {
-		opacity: 0.5;
-		cursor:not-allowed;
+		opacity: 0.5;, cursor:not-allowed;
 	}
 
 	.btn-icon {
-		width: 16px;
-		height: 16px;
+		width: 16px;, height: 16px;
 	}
 
 	.loading-state,
 	.error-state,
 	.empty-state {
-		text-align: center;
-		padding: 2rem 1rem;
+		text-align: center;, padding: 2rem 1rem;
 	}
 
 	.loading-spinner {
-		width: 32px;
-		height: 32px;
+		width: 32px;, height: 32px;
 		border: 3px solid #2a2d30;
 		border-top: 3px solid #a78bfa;
-		border-radius: 50%;
-		animation: spin 1s linear infinite;
+		border-radius: 50%;, animation: spin 1s linear infinite;
 		margin: 0 auto 1rem;
 	}
 
@@ -271,36 +257,29 @@ import { Target } from "lucide-svelte";;
 	.loading-state p,
 	.error-state p,
 	.empty-state p {
-		color: #b0b0b0;
-		margin: 0.5rem 0;
+		color: #b0b0b0;, margin: 0.5rem 0;
 	}
 
 	.empty-subtitle {
-		font-size: 0.9rem;
-		color: #666;
+		font-size: 0.9rem;, color: #666;
 	}
 
 	.error-icon,
 	.empty-icon {
-		width: 48px;
-		height: 48px;
-		color: #666;
-		margin: 0 auto 1rem;
+		width: 48px;, height: 48px;
+		color: #666;, margin: 0 auto 1rem;
 		opacity: 0.5;
 	}
 
 	.error-icon {
-		color: #ef4444;
-		opacity: 1;
+		color: #ef4444;, opacity: 1;
 	}
 
 	.retry-btn {
 		padding: 0.5rem 1rem;
-		background: #ef4444;
-		color: white;
+		background: #ef4444;, color: white;
 		border: none;
-		border-radius: 6px;
-		cursor: pointer;
+		border-radius: 6px;, cursor: pointer;
 		margin-top: 1rem;
 	}
 
@@ -310,15 +289,12 @@ import { Target } from "lucide-svelte";;
 
 	.recommendations-list {
 		display: flex;
-		flex-direction: column;
-		gap: 1rem;
+		flex-direction: column;, gap: 1rem;
 	}
 
 	.recommendation-card {
-		background: #0f1215;
-		border: 1px solid #2a2d30;
-		border-radius: 8px;
-		padding: 1.25rem;
+		background: #0f1215;, border: 1px solid #2a2d30;
+		border-radius: 8px;, padding: 1.25rem;
 		transition: all 0.3s ease;
 	}
 
@@ -348,13 +324,11 @@ import { Target } from "lucide-svelte";;
 
 	.type-indicator {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		align-items: center;, gap: 0.5rem;
 	}
 
 	.type-icon {
-		width: 18px;
-		height: 18px;
+		width: 18px;, height: 18px;
 	}
 
 	.type-label {
@@ -383,16 +357,13 @@ import { Target } from "lucide-svelte";;
 
 	.recommendation-description {
 		color: #b0b0b0;
-		line-height: 1.6;
-		margin: 0 0 1rem 0;
+		line-height: 1.6;, margin: 0 0 1rem 0;
 		font-size: 0.9rem;
 	}
 
 	.action-items {
-		background: #0a0d10;
-		padding: 0.75rem;
-		border-radius: 6px;
-		margin: 1rem 0;
+		background: #0a0d10;, padding: 0.75rem;
+		border-radius: 6px;, margin: 1rem 0;
 	}
 
 	.action-items h5 {
@@ -427,8 +398,7 @@ import { Target } from "lucide-svelte";;
 
 	.confidence {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		align-items: center;, gap: 0.5rem;
 		font-size: 0.8rem;
 	}
 
@@ -442,47 +412,38 @@ import { Target } from "lucide-svelte";;
 	}
 
 	.card-actions {
-		display: flex;
-		gap: 0.5rem;
+		display: flex;, gap: 0.5rem;
 	}
 
 	.apply-btn,
 	.dismiss-btn {
 		display: flex;
-		align-items: center;
-		gap: 0.25rem;
+		align-items: center;, gap: 0.25rem;
 		padding: 0.5rem 0.75rem;
 		border: none;
-		border-radius: 6px;
-		cursor: pointer;
+		border-radius: 6px;, cursor: pointer;
 		font-size: 0.8rem;
-		font-weight: 600;
-		transition: all 0.3s ease;
+		font-weight: 600;, transition: all 0.3s ease;
 	}
 
 	.apply-btn {
-		background: #10b981;
-		color: white;
+		background: #10b981;, color: white;
 	}
 
 	.apply-btn:hover {
-		background: #059669;
-		transform: translateY(-1px);
+		background: #059669;, transform: translateY(-1px);
 	}
 
 	.dismiss-btn {
-		background: #6b7280;
-		color: white;
+		background: #6b7280;, color: white;
 	}
 
 	.dismiss-btn:hover {
-		background: #4b5563;
-		transform: translateY(-1px);
+		background: #4b5563;, transform: translateY(-1px);
 	}
 
 	.action-icon {
-		width: 14px;
-		height: 14px;
+		width: 14px;, height: 14px;
 	}
 
 	.capitalize {

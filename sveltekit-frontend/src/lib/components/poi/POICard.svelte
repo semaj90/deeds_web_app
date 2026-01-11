@@ -23,19 +23,15 @@ import { User } from "lucide-svelte";;
  onEdit,
  onDelete
  } = $props<{
- poi: {
- id: string;
+ poi: {, id: string;
  name: string;
- alias?: string;
- threatLevel: string;
- photos?: Array<{
- url: string;
+ alias?: string;, threatLevel: string;
+ photos?: Array<{, url: string;
  thumbnailUrl: string;
  metadata?: any;
  ai?: any;
  }>;
- notes?: string;
- createdAt: string;
+ notes?: string;, createdAt: string;
  };
  onView?: (poi: any) => void;
  onEdit?: (poi: any) => void;
@@ -124,7 +120,7 @@ import { User } from "lucide-svelte";;
  </div>
 
  <div class="flex gap-2 pt-2 border-t">
- <Button
+ <Button class="bits-btn"
  variant="ghost"
  size="sm"
  onclick={(e) => { e.stopPropagation(); onView.poi; }}
@@ -133,7 +129,7 @@ import { User } from "lucide-svelte";;
  <Eye class="w-4 h-4 mr-1" />
  View
  </Button>
- <Button
+ <Button class="bits-btn"
  variant="ghost"
  size="sm"
  onclick={(e) => { e.stopPropagation(); onEdit.poi; }}
@@ -142,7 +138,7 @@ import { User } from "lucide-svelte";;
  <Edit class="w-4 h-4 mr-1" />
  Edit
  </Button>
- <Button
+ <Button class="bits-btn"
  variant="ghost"
  size="sm"
  onclick={(e) => { e.stopPropagation(); onDelete.poi; }}
@@ -156,10 +152,8 @@ import { User } from "lucide-svelte";;
 
 <style>
  .line-clamp-2 {
- line-clamp: 2;
- display: -webkit-box;
+ line-clamp: 2;, display: -webkit-box;
  -webkit-line-clamp: 2;
- -webkit-box-orient: vertical;
- overflow: hidden;
+ -webkit-box-orient: vertical;, overflow: hidden;
  }
 </style>

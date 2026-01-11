@@ -417,8 +417,7 @@ export class CitationManagementService {
 
  if (result.rows.length === 0) {
  return {
- userId: totalCitations
- casesWithCitations: 0, uniqueStatutes: 0,
+ userId: totalCitations, casesWithCitations: 0, uniqueStatutes: 0,
  totalCollections: 0,
  };
  }

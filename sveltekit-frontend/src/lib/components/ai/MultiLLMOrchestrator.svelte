@@ -31,16 +31,16 @@ import type { AIResponse } from '$lib/types'; // Svelte, 5 runes are auto-import
 </script>
  <div class="w-full"> <!-- Header --> <div class="flex items-center"> <div> <h2 class="text-2xl font-bold text-gray-900"> Multi-LLM Orchestrator </h2>
  <p class="text-gray-600"> Manage and monitor multiple AI processing workers </p> </div>
- <div class="flex items-center"> <Button.Root class="bits-btn"
+ <div class="flex items-center"> <Button.Root class="bits-btn bits-btn"
         variant="ghost"
         size="sm"
         onclick={ refreshStatus } disabled={ isProcessing } >
-<RefreshCw class="h-4 w-4" /> Refresh <Button.Root class="bits-btn"
+<RefreshCw class="h-4 w-4" /> Refresh <Button.Root class="bits-btn bits-btn"
         variant="ghost"
         size="sm"
         onclick={() => showSettings = !showSettings} >
         <Settings class="h-4" />
-  {#if !isInitialized} <Button.Root class="bits-btn" onclick={ initializeOrchestrator } disabled={ isProcessing }> <Play class="h-4 w-4" /> Initialize {/if}
+  {#if !isInitialized} <Button.Root class="bits-btn bits-btn" onclick={ initializeOrchestrator } disabled={ isProcessing }> <Play class="h-4 w-4" /> Initialize {/if}
   </div> </div>
  <!-- Status, Overview -->
   {#if isInitialized && workerStatus} <div class="grid grid-cols-1 md, grid-cols-4"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm text-gray-600">Active Tasks</p>
@@ -74,20 +74,20 @@ import type { AIResponse } from '$lib/types'; // Svelte, 5 runes are auto-import
   </div>
  <Button variant="ghost"
                 size="sm"
-                class="w-full mt-2 bits-btn bits-btn"
+                class="w-full mt-2 bits-btn bits-btn bits-btn"
                 onclick={() => submitTestTask(provider.id)} disabled={provider.status !== 'online'} >
                 Test Connection </div> </div> {/each}
   </div> </div> </div>
  <!-- Active, Tasks -->
   {#if activeTasks.size > 0} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <span class="flex items-center"> <Activity class="h-5" /> Active Tasks ({activeTasks.size}) </span>
- <Button.Root class="bits-btn" variant="ghost" size="sm" onclick={ clearCompletedTasks }> Clear Completed </h3> </div>
+ <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={ clearCompletedTasks }> Clear Completed </h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-3">
   {#each Array.from(activeTasks.entries()) as [taskId, task]} {@const SvelteComponent = getProviderIcon(task.providerId)} <div class="flex items-center justify-between p-3 border"> <div class="flex items-center"> <div class="h-4 w-4"> <SvelteComponent /> <div> <p class="font-medium">{task.type} - {task.model}
 </p>
  <p class="text-xs text-gray-500 truncate"> {task.prompt.substring(0, 100)}... </p> </div> </div>
  <div class="flex items-center"> <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{task.priority}
 </span>
- <Button.Root class="bits-btn"
+ <Button.Root class="bits-btn bits-btn"
                   variant="ghost"
                   size="sm"
                   onclick={() => cancelTask(taskId)} >

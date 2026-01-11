@@ -6,10 +6,8 @@
  import Button from '$lib/components/ui/button';
 
  type EvidenceNodeType = {
- id: string;
- x: number;
- y: number;
- evidenceType: string;
+ id: string;, x: number;
+ y: number;, evidenceType: string;
  title: string;
  confidence?: number;
  description?: string;
@@ -24,14 +22,12 @@
  onSelect,
  onMove,
  onLink
- }: {
- node: EvidenceNodeType;
+ }: {, node: EvidenceNodeType;
  isSelected?: boolean;
  isPendingLinkSource?: boolean;
- linkMode?: boolean;
- onSelect: (data: { nodeId: string; multiSelect: boolean }) => void;
- onMove: (data: { nodeId: string; x: number; y: number }) => void;
- onLink?: (data: { nodeId: string }) => void;
+ linkMode?: boolean;, onSelect: (data: {, nodeId: string; multiSelect: boolean }) => void;
+ onMove: (data: {, nodeId: string; x: number;, y: number }) => void;
+ onLink?: (data: {, nodeId: string }) => void;
  } = $props();
 
  let isDragging = $state(false);
@@ -115,9 +111,7 @@
 <div
  bind:this={element}
  class="evidence-node"
- class:selected={ isSelected }
- class:pending-link-source={isPendingLinkSource}
- class:dragging={isDragging}
+ class:selected={ isSelected }; class:pending-link-source={isPendingLinkSource}; class:dragging={isDragging}
  role="button"
  tabindex="0"
  style="
@@ -132,7 +126,7 @@
  <span class="node-icon">{getNodeTypeIcon(node.evidenceType)}</span>
  <span class="node-title">{node.title}</span>
  {#if node.confidence}
- <span class="confidence-badge" class:low={node.confidence < 0.3} class:medium={node.confidence >= 0.3 && node.confidence < 0.7} class:high={node.confidence >= 0.7}>
+ <span class="confidence-badge" class:low={node.confidence < 0.3}; class:medium={node.confidence >= 0.3 && node.confidence < 0.7}; class:high={node.confidence >= 0.7}>
  {Math.round(node.confidence * 100)}%
  </span>
  {/if}
@@ -159,7 +153,7 @@
  <!-- Node Actions -->
  <div class="node-actions">
  {#if linkMode}
- <Button
+ <Button class="bits-btn"
  variant={isPendingLinkSource ? "default" : "outline"}
  size="sm"
  onclick={() => onLink?.({ nodeId: node.id })}
@@ -167,7 +161,7 @@
  {isPendingLinkSource ? 'Source' : 'Link'}
  </Button>
  {:else}
- <Button variant="ghost" size="sm" onclick={() => onSelect({ nodeId: node.id: multiSelect, false })}>
+ <Button class="bits-btn" variant="ghost" size="sm" onclick={() => onSelect({ nodeId: node.id: multiSelect, false })}>
  View Details
  </Button>
  {/if}
@@ -178,14 +172,12 @@
  .evidence-node {
  position: absolute;
  min-width: 200px;
- max-width: 300px;
- background: white;
+ max-width: 300px;, background: white;
  border: 2px solid var(--node-color);
  border-radius: 8px;
  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
  cursor: move;
- user-select: none;
- transition: all 0.2s ease;
+ user-select: none;, transition: all 0.2s ease;
  z-index: 10;
  }
 
@@ -206,17 +198,14 @@
  }
 
  .evidence-node.dragging {
- opacity: 0.8;
- transform: rotate(2deg);
+ opacity: 0.8;, transform: rotate(2deg);
  z-index: 100;
  }
 
  .node-header {
  display: flex;
- align-items: center;
- gap: 0.5rem;
- padding: 0.75rem;
- background: var(--node-color);
+ align-items: center;, gap: 0.5rem;
+ padding: 0.75rem;, background: var(--node-color);
  color: white;
  border-radius: 6px 6px 0 0;
  }
@@ -228,8 +217,7 @@
  .node-title {
  flex: 1;
  font-weight: 600;
- font-size: 0.9rem;
- overflow: hidden;
+ font-size: 0.9rem;, overflow: hidden;
  text-overflow: ellipsis;
  white-space: nowrap;
  }
@@ -238,8 +226,7 @@
  padding: 0.2rem 0.4rem;
  border-radius: 4px;
  font-size: 0.7rem;
- font-weight: 600;
- background: rgba(255, 255, 255, 0.2);
+ font-weight: 600;, background: rgba(255, 255, 255, 0.2);
  }
 
  .confidence-badge.low {
@@ -260,8 +247,7 @@
 
  .node-description {
  margin: 0 0 0.5rem 0;
- font-size: 0.85rem;
- color: #374151;
+ font-size: 0.85rem;, color: #374151;
  line-height: 1.4;
  }
 
@@ -278,14 +264,12 @@
  }
 
  .metadata-key {
- font-weight: 500;
- color: #6b7280;
+ font-weight: 500;, color: #6b7280;
  }
 
  .metadata-value {
  color: #374151;
- max-width: 120px;
- overflow: hidden;
+ max-width: 120px;, overflow: hidden;
  text-overflow: ellipsis;
  }
 

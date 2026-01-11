@@ -15,8 +15,7 @@ export interface GemmaInferenceOptions {
 }
 
 export interface EmbeddingResult {
- embedding: number[];
- dimensions: number;
+ embedding: number[];, dimensions: number;
 }
 
 export class ClientGemmaInference {

@@ -14,8 +14,7 @@ describe('PUT /api/routes/:routePath/error-brain-patch/:patchId', () => {
  it('should validate verification_status is a string', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch/123', {
  method: 'PUT',
- body: JSON.stringify({
- verification_status: null,
+ body: JSON.stringify({, verification_status: null,
  }),
  });
 
@@ -26,8 +25,7 @@ describe('PUT /api/routes/:routePath/error-brain-patch/:patchId', () => {
  it('should accept passed status', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch/123', {
  method: 'PUT',
- body: JSON.stringify({
- verification_status: 'passed',
+ body: JSON.stringify({, verification_status: 'passed',
  verification_message: 'All tests pass',
  }),
  });
@@ -39,8 +37,7 @@ describe('PUT /api/routes/:routePath/error-brain-patch/:patchId', () => {
  it('should accept failed status', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch/123', {
  method: 'PUT',
- body: JSON.stringify({
- verification_status: 'failed',
+ body: JSON.stringify({, verification_status: 'failed',
  verification_message: 'Tests failed',
  }),
  });
@@ -69,8 +66,7 @@ describe('PUT /api/routes/:routePath/error-brain-patch/:patchId', () => {
  it('should handle optional verification_message', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch/123', {
  method: 'PUT',
- body: JSON.stringify({
- verification_status: 'passed',
+ body: JSON.stringify({, verification_status: 'passed',
  verification_message: 'Custom message',
  }),
  });
@@ -82,8 +78,7 @@ describe('PUT /api/routes/:routePath/error-brain-patch/:patchId', () => {
  it('should handle null verification_message', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch/123', {
  method: 'PUT',
- body: JSON.stringify({
- verification_status: 'passed',
+ body: JSON.stringify({, verification_status: 'passed',
  verification_message: null,
  }),
  });
@@ -95,8 +90,7 @@ describe('PUT /api/routes/:routePath/error-brain-patch/:patchId', () => {
  it('should handle empty verification_message', async () => {
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch/123', {
  method: 'PUT',
- body: JSON.stringify({
- verification_status: 'passed',
+ body: JSON.stringify({, verification_status: 'passed',
  verification_message: '',
  }),
  });
@@ -113,8 +107,7 @@ describe('PUT /api/routes/:routePath/error-brain-patch/:patchId', () => {
 
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch/123', {
  method: 'PUT',
- body: JSON.stringify({
- verification_status: 'passed',
+ body: JSON.stringify({, verification_status: 'passed',
  verification_message,
  }),
  });
@@ -130,8 +123,7 @@ describe('PUT /api/routes/:routePath/error-brain-patch/:patchId', () => {
  `http://localhost/api/routes/test-route/error-brain-patch/${patchId}`,
  {
  method: 'PUT',
- body: JSON.stringify({
- verification_status: 'passed',
+ body: JSON.stringify({, verification_status: 'passed',
  }),
  }
  );
@@ -144,8 +136,7 @@ describe('PUT /api/routes/:routePath/error-brain-patch/:patchId', () => {
  'http://localhost/api/routes/my-special-route/error-brain-patch/123',
  {
  method: 'PUT',
- body: JSON.stringify({
- verification_status: 'passed',
+ body: JSON.stringify({, verification_status: 'passed',
  }),
  }
  );
@@ -159,8 +150,7 @@ describe('PUT /api/routes/:routePath/error-brain-patch/:patchId', () => {
  `http://localhost/api/routes/test-route/error-brain-patch/${uuid}`,
  {
  method: 'PUT',
- body: JSON.stringify({
- verification_status: 'passed',
+ body: JSON.stringify({, verification_status: 'passed',
  }),
  }
  );
@@ -173,8 +163,7 @@ describe('PUT /api/routes/:routePath/error-brain-patch/:patchId', () => {
  'http://localhost/api/routes/test-route/error-brain-patch/patch-123',
  {
  method: 'PUT',
- body: JSON.stringify({
- verification_status: 'passed',
+ body: JSON.stringify({, verification_status: 'passed',
  }),
  }
  );
@@ -187,8 +176,7 @@ describe('PUT /api/routes/:routePath/error-brain-patch/:patchId', () => {
 
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch/123', {
  method: 'PUT',
- body: JSON.stringify({
- verification_status: 'passed',
+ body: JSON.stringify({, verification_status: 'passed',
  verification_message,
  }),
  });
@@ -203,8 +191,7 @@ describe('PUT /api/routes/:routePath/error-brain-patch/:patchId', () => {
 
  const request = new Request('http://localhost/api/routes/test-route/error-brain-patch/123', {
  method: 'PUT',
- body: JSON.stringify({
- verification_status: 'passed',
+ body: JSON.stringify({, verification_status: 'passed',
  verification_message: longMessage,
  }),
  });

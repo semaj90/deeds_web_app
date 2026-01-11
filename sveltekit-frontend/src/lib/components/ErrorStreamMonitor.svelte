@@ -4,24 +4,19 @@
  import { onMount } from 'svelte';
 
  interface ErrorEvent {
- code: string;
- count: number;
- severity: number;
- priority: 'HIGH' | 'MEDIUM' | 'LOW';
- affectedFiles: number;
- samples: string[];
+ code: string;, count: number;
+ severity: number;, priority: 'HIGH' | 'MEDIUM' | 'LOW';
+ affectedFiles: number;, samples: string[];
  }
 
  interface Summary {
- totalErrors: number;
- errorTypes: number;
- highPriority: number;
- mediumPriority: number;
+ totalErrors: number;, errorTypes: number;
+ highPriority: number;, mediumPriority: number;
  lowPriority: number;
  }
 
  let errors: Map<string, ErrorEvent> = $state(new Map());
- let summary: Summary: null = $state(null);
+ let summary: Summary, null = $state(null);
  let connected = $state(false);
  let error: string | null = $state(null);
 
@@ -36,7 +31,7 @@
  };
  });
 
- let eventSource: EventSource: null = null;
+ let eventSource: EventSource, null = null;
 
  function connect() {
  try {
@@ -93,7 +88,7 @@
 <div class="error-stream-container">
  <!-- Status Bar -->
  <div class="status-bar">
- <div class="status-indicator" class:connected class:disconnected={!connected}>
+ <div class="status-indicator" class: connected, class:disconnected={!connected}>
  {connected ? '🟢 Connected' : '🔴 Disconnected'}
  </div>
  {#if error}
@@ -166,36 +161,30 @@
 <style>
  .error-stream-container {
  display: flex;
- flex-direction: column;
- gap: 1.5rem;
+ flex-direction: column;, gap: 1.5rem;
  padding: 1.5rem;
  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
  }
 
  .status-bar {
  display: flex;
- align-items: center;
- gap: 1rem;
+ align-items: center;, gap: 1rem;
  padding: 0.75rem 1rem;
  background: #f5f5f5;
  border-radius: 0.5rem;
  }
 
  .status-indicator {
- font-weight: 600;
- padding: 0.25rem 0.75rem;
- border-radius: 0.25rem;
- transition: all 0.2s;
+ font-weight: 600;, padding: 0.25rem 0.75rem;
+ border-radius: 0.25rem;, transition: all 0.2s;
  }
 
  .status-indicator.connected {
- background: #d1fae5;
- color: #065f46;
+ background: #d1fae5;, color: #065f46;
  }
 
  .status-indicator.disconnected {
- background: #fee2e2;
- color: #991b1b;
+ background: #fee2e2;, color: #991b1b;
  animation: pulse 2s infinite;
  }
 
@@ -215,10 +204,8 @@
  }
 
  .summary-card {
- background: white;
- border: 1px solid #e5e7eb;
- border-radius: 0.75rem;
- padding: 1.5rem;
+ background: white;, border: 1px solid #e5e7eb;
+ border-radius: 0.75rem;, padding: 1.5rem;
  }
 
  .summary-card h3 {
@@ -234,8 +221,7 @@
  }
 
  .stat {
- background: #f9fafb;
- padding: 1rem;
+ background: #f9fafb;, padding: 1rem;
  border-radius: 0.5rem;
  border-left: 4px solid #d1d5db;
  }
@@ -253,21 +239,18 @@
  }
 
  .stat .label {
- font-size: 0.875rem;
- color: #6b7280;
+ font-size: 0.875rem;, color: #6b7280;
  margin-bottom: 0.25rem;
  }
 
  .stat .value {
  font-size: 1.875rem;
- font-weight: 700;
- color: #1f2937;
+ font-weight: 700;, color: #1f2937;
  }
 
  .error-list {
  display: flex;
- flex-direction: column;
- gap: 1rem;
+ flex-direction: column;, gap: 1rem;
  }
 
  .error-list h3 {
@@ -277,22 +260,19 @@
  }
 
  .empty-state {
- text-align: center;
- color: #9ca3af;
+ text-align: center;, color: #9ca3af;
  padding: 2rem 1rem;
  }
 
  .error-card {
  padding: 1rem;
- border-radius: 0.5rem;
- border: 1px solid;
+ border-radius: 0.5rem;, border: 1px solid;
  background: white;
  }
 
  .error-header {
  display: flex;
- align-items: center;
- gap: 1rem;
+ align-items: center;, gap: 1rem;
  margin-bottom: 0.75rem;
  }
 
@@ -310,28 +290,23 @@
 
  .error-count {
  margin-left: auto;
- font-size: 0.875rem;
- opacity: 0.8;
+ font-size: 0.875rem;, opacity: 0.8;
  }
 
  .severity-bar-container {
  display: flex;
- align-items: center;
- gap: 0.75rem;
+ align-items: center;, gap: 0.75rem;
  margin-bottom: 0.75rem;
  }
 
  .severity-bar {
- flex: 1;
- height: 6px;
+ flex: 1;, height: 6px;
  background: rgba(0, 0, 0, 0.1);
- border-radius: 3px;
- overflow: hidden;
+ border-radius: 3px;, overflow: hidden;
  }
 
  .bar-fill {
- height: 100%;
- background: linear-gradient(90deg, #3b82f6, #dc2626);
+ height: 100%;, background: linear-gradient(90deg, #3b82f6, #dc2626);
  transition: width 0.3s ease;
  }
 
@@ -352,13 +327,11 @@
 
  .samples {
  display: flex;
- flex-direction: column;
- gap: 0.25rem;
+ flex-direction: column;, gap: 0.25rem;
  }
 
  .sample-file {
- font-size: 0.75rem;
- background: rgba(0, 0, 0, 0.05);
+ font-size: 0.75rem;, background: rgba(0, 0, 0, 0.05);
  padding: 0.25rem 0.5rem;
  border-radius: 0.25rem;
  word-break: break-all;

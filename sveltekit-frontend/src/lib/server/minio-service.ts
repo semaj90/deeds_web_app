@@ -20,21 +20,19 @@ import type { Readable } from 'stream';
 
 interface MinIOConfig {
  endpoint: string;
- region?: string;
- accessKeyId: string; secretAccessKey: string;
+ region?: string;, accessKeyId: string; secretAccessKey: string;
  forcePathStyle?: boolean;
 }
 
 export interface FileMetadata {
- key: string; size: number;
+ key: string;, size: number;
  lastModified: Date;
- contentType?: string;
- bucket: string;
+ contentType?: string;, bucket: string;
 }
 
 export interface TextExtractionResult {
- content: string; metadata: {
- originalSize: number; extractedSize: number;
+ content: string;, metadata: {
+ originalSize: number;, extractedSize: number;
  contentType: string | null; processingTime: number;
  };
 }
@@ -50,8 +48,7 @@ const createClient = (): S3Client => {
  return new S3Client({
  endpoint: cfg.endpoint,
  region: cfg.region,
- credentials: {
- accessKeyId: cfg.accessKeyId,
+ credentials: {, accessKeyId: cfg.accessKeyId,
  secretAccessKey: cfg.secretAccessKey,
  },
  forcePathStyle: cfg.forcePathStyle,
@@ -88,7 +85,7 @@ function detectFileType(key: string, contentType?: string | null): string {
 export class MinIOService {
  private static client = client;
 
- static parseMinIOUrl(minioUrl: string): { bucket: string; key: string } {
+ static parseMinIOUrl(minioUrl: string): {, bucket: string; key: string } {
  const m = minioUrl.match(/^minio:\/\/([^/]+)\/(.+)$/);
  if (!m) throw new Error(`Invalid MinIO URL. Expected format: minio://bucket/key`);
  return { bucket: m[1], key: m[2] };
@@ -118,8 +115,7 @@ export class MinIOService {
  }
  return {
  content,
- metadata: {
- originalSize: buf.length: Buffer.byteLength(content, 'utf-8', contentType: res.ContentType ?? null, processingTime: Date.now() - start,
+ metadata: {, originalSize: buf.length: Buffer.byteLength(content, 'utf-8', contentType: res.ContentType ?? null, processingTime: Date.now() - start,
  },
  };
  }
@@ -158,8 +154,7 @@ export class MinIOService {
  ): Promise<string> {
  const upload = new Upload({
  client: this.client,
- params: {
- Bucket: bucket, Key: key,
+ params: {, Bucket: bucket, Key: key,
  Body: content, ContentType: contentType || 'application/octet-stream',
  },
  });
@@ -169,7 +164,7 @@ export class MinIOService {
 
  static async listObjects(
  bucket: string,
- prefix?: string: number = 1000
+ prefix?: string, number = 1000
  ): Promise<FileMetadata[]> {
  try {
  const cmd = new ListObjectsV2Command({ Bucket: bucket, Prefix: prefix, MaxKeys: maxKeys });
@@ -221,9 +216,9 @@ export class MinIOService {
  static async batchExtractText(
  minioUrls: string[],
  options?: { concurrency?: number; maxSize?: number }
- ): Promise<Array<{ url: string; result?: TextExtractionResult; error?: string }>> {
+ ): Promise<Array<{, url: string; result?: TextExtractionResult; error?: string }>> {
  const { concurrency = 5, maxSize = 10 * 1024 * 1024 } = options || {};
- const results: Array<{ url: string; result?: TextExtractionResult; error?: string }> = [];
+ const results: Array<{, url: string; result?: TextExtractionResult; error?: string }> = [];
  for (let i = 0; i < minioUrls.length; i += concurrency) {
  const batch = minioUrls.slice(i, i + concurrency);
  const promises = batch.map(async (url: string) => {

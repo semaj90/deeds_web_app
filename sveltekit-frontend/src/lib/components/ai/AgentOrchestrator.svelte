@@ -14,8 +14,8 @@
  import { Users, Brain, Database, Play, Pause, Square, RefreshCw, MessageSquare, FileText, Gavel, Search, Shield, Clock, CheckCircle, AlertCircle, Activity, Settings, Download } from 'lucide-svelte';
  import { autoGenService, analyzeCaseWithAgents, reviewEvidenceWithAgents, researchLegalPrecedents } from '$lib/services/autogen-service.js';
  import { crewAIService, analyzeLegalCaseWithCrew, analyzeContractWithCrew } from '$lib/services/crewai-service.js';
- import type { AutoGenConversation: AutoGenMessage } from '$lib/services/autogen-service.js';
- import type { CrewExecution: CrewTaskResult } from '$lib/services/crewai-service.js'; interface Props { defaultWorkflow?: string; showAdvancedControls?: boolean; autoStartServices?: boolean}
+ import type { AutoGenConversation, AutoGenMessage } from '$lib/services/autogen-service.js';
+ import type { CrewExecution, CrewTaskResult } from '$lib/services/crewai-service.js'; interface Props { defaultWorkflow?: string; showAdvancedControls?: boolean; autoStartServices?: boolean}
   let { defaultWorkflow = 'case_analysis', showAdvancedControls = true, autoStartServices = true }: Props = $props(); // Component state let selectedWorkflow = $state(defaultWorkflow);
    let isLoading = $state<boolean>(false);
    let selectedProvider = $state<'autogen' | 'crewai'>('autogen');
@@ -93,7 +93,7 @@
 </Badge>
  <Badge class="flex items-center"> <Database class="h-3" /> CrewAI {serviceStatus.crewai ? 'Online': 'Offline'}
 </Badge>
- <Button.Root class="bits-btn"
+ <Button.Root class="bits-btn bits-btn"
         variant="ghost"
         size="sm"
   onclick={(_event, MouseEvent) => checkServiceStatus} >
@@ -122,12 +122,12 @@
  <Textarea id="orchestrator-input"; bind, value={ inputText } placeholder="Enter your legal case description, evidence details, or contract text..."
           rows={ 4 } class="w-full"
         /> </div>
- <div class="flex"> <Button onclick={(_event, MouseEvent) => executeWorkflow} disabled={isProcessing || !inputText.trim() || (!serviceStatus.autogen && selectedProvider === 'autogen') || (!serviceStatus.crewai && selectedProvider === 'crewai')} class="flex-1 bits-btn bits-btn"
+ <div class="flex"> <Button class="bits-btn" onclick={(_event, MouseEvent) => executeWorkflow} disabled={isProcessing || !inputText.trim() || (!serviceStatus.autogen && selectedProvider === 'autogen') || (!serviceStatus.crewai && selectedProvider === 'crewai')} class="flex-1 bits-btn bits-btn"
         >
   {#if isProcessing} <Pause class="h-4 w-4" /> Processing... {:else} <Play class="h-4 w-4" /> Execute Workflow {/if}
   </Button>
-  {#if isProcessing} <Button.Root class="bits-btn" variant="ghost" onclick={(_event, MouseEvent) => cancelExecution}> <Square class="h-4" /> </Button> {/if} {#if conversationMessages.length > 0 || executionResults.length > 0} <Button.Root class="bits-btn" variant="ghost" onclick={(_event, MouseEvent) => clearResults}> Clear </Button>
- <Button.Root class="bits-btn" variant="ghost" onclick={(_event, MouseEvent) => downloadResults}> <Download class="h-4" /> </Button> {/if}
+  {#if isProcessing} <Button.Root class="bits-btn bits-btn" variant="ghost" onclick={(_event, MouseEvent) => cancelExecution}> <Square class="h-4" /> </Button> {/if} {#if conversationMessages.length > 0 || executionResults.length > 0} <Button.Root class="bits-btn bits-btn" variant="ghost" onclick={(_event, MouseEvent) => clearResults}> Clear </Button>
+ <Button.Root class="bits-btn bits-btn" variant="ghost" onclick={(_event, MouseEvent) => downloadResults}> <Download class="h-4" /> </Button> {/if}
   </div> </div> </div>
  <!-- Execution, Status -->
   {#if isProcessing || lastUpdate} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Activity class="h-5" /> Execution Status </h3> </div>
@@ -169,25 +169,25 @@
   <!-- Workflow, Templates -->
   {#if showAdvancedControls} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <FileText class="h-5" /> Quick Start Templates </h3> </div>
  <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-2"> <Button variant="ghost"
-            class="h-auto p-4 justify-start bits-btn bits-btn"
+            class="h-auto p-4 justify-start bits-btn bits-btn bits-btn"
             onclick={(_event, MouseEvent) => ) => {
               selectedWorkflow = 'case_analysis'; selectedProvider = 'autogen'; inputText = 'John Smith was accused of embezzling $50,000 from his employer over a 6-month period. Evidence includes suspicious bank transfers, altered financial records, and witness testimony from colleagues who noticed unusual behavior.'}} >
             <div class="text-left"> <p class="font-medium">Criminal Case Analysis</p>
  <p class="text-xs">AutoGen multi-agent analysis</p> </div> </Button>
  <Button variant="ghost"
-            class="h-auto p-4 justify-start bits-btn bits-btn"
+            class="h-auto p-4 justify-start bits-btn bits-btn bits-btn"
             onclick={(_event, MouseEvent) => ) => {
               selectedWorkflow = 'contract_analysis'; selectedProvider = 'crewai'; inputText = 'Software licensing agreement between TechCorp and ClientCorp for enterprise SaaS platform. Contract includes liability limitations, data processing clauses, and termination provisions. Review for compliance and negotiation opportunities.'}} >
             <div class="text-left"> <p class="font-medium">Contract Review</p>
  <p class="text-xs">CrewAI specialized team</p> </div> </Button>
  <Button variant="ghost"
-            class="h-auto p-4 justify-start bits-btn bits-btn"
+            class="h-auto p-4 justify-start bits-btn bits-btn bits-btn"
             onclick={(_event, MouseEvent) => ) => {
               selectedWorkflow = 'evidence_review'; selectedProvider = 'autogen'; inputText = 'Digital evidence package includes: smartphone data extraction, email communications, cloud storage files, and network logs. Chain of custody maintained by certified technician. Need admissibility assessment for federal court.'}} >
             <div class="text-left"> <p class="font-medium">Digital Evidence Review</p>
  <p class="text-xs">Forensic analysis workflow</p> </div> </Button>
  <Button variant="ghost"
-            class="h-auto p-4 justify-start bits-btn bits-btn"
+            class="h-auto p-4 justify-start bits-btn bits-btn bits-btn"
             onclick={(_event, MouseEvent) => ) => {
               selectedWorkflow = 'legal_research'; selectedProvider = 'autogen'; inputText = 'Research precedents for cryptocurrency fraud cases involving privacy coins. Focus on 4th Amendment protections, blockchain analysis admissibility, and international cooperation in digital asset recovery.'}} >
             <div class="text-left"> <p class="font-medium">Legal Research</p>

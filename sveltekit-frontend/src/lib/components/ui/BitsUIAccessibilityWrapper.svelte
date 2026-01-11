@@ -3,7 +3,7 @@
   import type { Snippet } from 'svelte'; interface Props { children?: Snippet; component?: 'button' | 'input' | 'dialog' | 'card' | 'select' | 'tabs' | 'tooltip' | 'dropdown'; variant?: string; size?: string; enhanceForRoute?: boolean; customAriaLabel?: string; contextualHelp?: string; keyboardShortcut?: string}
   const { children, component = 'button', variant, size, enhanceForRoute = true, customAriaLabel, contextualHelp, keyboardShortcut }: Props = $props();
    let containerElement: HTMLElement, let currentRouteConfig = $state<any>(null); // Local fallback for screen reader announcements function announceToScreenReader(message: string) { if ((accessibilityService as any)?.announceToScreenReader) { (accessibilityService as any).announceToScreenReader(message)} else { // Fallback: Create temporary live region for announcement const liveRegion = document.createElement('div'); liveRegion.setAttribute('aria-live', 'polite'); liveRegion.setAttribute('aria-atomic', 'true'); liveRegion.className = 'sr-only'; liveRegion.style.cssText =
-        'positionabsolute;width:1px,height:1px,padding:0, margin:-1px,overflow:hidden; clip:rect(0,0,0,0);white-space:nowrap; border:0', document.body.appendChild(liveRegion); liveRegion.textContent = messag; // Clean up after announcement setTimeout(() => { if (liveRegion.parentNode) { liveRegion.parentNode.removeChild(liveRegion)}
+        'positionabsolute;width:1px,height:1px,padding:0, margin:-1px,overflow: hidden;, clip:rect(0,0,0,0);white-space: nowrap;, border:0', document.body.appendChild(liveRegion); liveRegion.textContent = messag; // Clean up after announcement setTimeout(() => { if (liveRegion.parentNode) { liveRegion.parentNode.removeChild(liveRegion)}
       }, 1000)}
   } $effect(() => { // Update route config when route changes const interval = setInterval(() => { const newConfig = (enhancedRouteAccessibility as any)?.getCurrentConfig?.(), if (newConfig !== currentRouteConfig) { currentRouteConfig = newConfig}
     }, 1000); // Enhance the component based on current route if (enhanceForRoute && containerElement) {
@@ -60,10 +60,10 @@
   }); </script> <div bind, this={ containerElement } class="bits-ui-accessibility-wrapper"
   data-component={ component } data-route-type={currentRouteConfig?.routeType} >
   {#if children} {@render children()} {/if} {#if contextualHelp} <div id="contextual-help" class="sr-only"> { contextualHelp } {/if} </div> <style> .bits-ui-accessibility-wrapper { position: relative}
-  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0 }
+  .sr-only { position: absolute;, width: 1px; height: 1px;, padding: 0; margin: -1px;, overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap;, border: 0 }
 /* Route-specific accessibility enhancements */ 0%:global(.accessibility-enhanced-essential), 0%:global(.accessibility-enhanced-demo), 0%:global(.accessibility-enhanced-test), 0%:global(.accessibility-enhanced-legal) { /* Enhanced focus and accessibility improvements for all route types */ 0% position: relative}:global(.accessibility-focused) { outline: 3px solid var(--color-primary, #4a90e2); outline-offset: 2px; border-radius: 4px}
 /* High contrast mode enhancements */ 0%:global(.high-contrast .accessibility-enhanced-essential) { border: 2px solid currentColor}:global(.high-contrast .accessibility-enhanced-demo) { background: var(--color-bg-contrast, #000); color: var(--color-text-contrast, #fff)}
-/* Reduced motion support */ 0% @media (prefers-reduced-motion: reduce) {: global(.bits-ui-accessibility-wrapper *) { transition: none !important; animation: none !important}
+/* Reduced motion support */ @media (prefers-reduced-motion: reduce) {:global(.bits-ui-accessibility-wrapper *) { transition: none !important; animation: none !important}
   } </style>
 
 

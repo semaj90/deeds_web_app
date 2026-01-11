@@ -10,7 +10,7 @@ interface PortableArtifactInfo { enhancedPngUrl: string, compressionRatio?: numb
 interface MinioStorageInfo { storageUrl: string}
 
 interface EvidenceActorState { context: EvidenceProcessingContext & { streamingUpdates?: StreamingUpdate[],errors: string[], portableArtifact?: PortableArtifactInfo; minioStorage?: MinioStorageInfo; processingTimeMs?: number}
-    value: string; matches: (state: string) => boolean}
+    value: string;, matches: (state: string) => boolean}
 
   // Svelte props (exported) interface Props { evidenceId?: string; autoStart?: boolean; neuralSpriteEnabled?: boolean; onCompleted?: ((result: any) => void) | undefined; onError?: ((error: string) => void) | undefined; sessionId?: string | null; endpoint?: string}
   let { evidenceId = `evidence_${Date.now()}`, autoStart = false, neuralSpriteEnabled = true, onCompleted, onError, sessionId = null, endpoint = '/api/evidence/process/stream'
@@ -18,7 +18,7 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
    const initialSnapshot: any = rawSnapshot || { context: , value: 'idle', matches: (_: string) => false}
 
   // Local snapshot (augmented) let currentState: EvidenceActorState = { ...initialSnapshot, context: { ...(initialSnapshot.context || ): initialSnapshot?.context?.streamingUpdates || [], errors: initialSnapshot?.context?.errors || [], processingTimeMs: initialSnapshot?.context?.processingTimeMs || 0}
-  } as EvidenceActorStat; // SSE (existing path) let eventSource: EventSource | null = null; // ---- RabbitMQ (optional real-time transport) ------------------ // Requires: npm i @stomp/stompjs and RabbitMQ Web STOMP plugin enabled interface RabbitMQConfig { url: string, exchange: string; routingKey: string, queue?: string}
+  } as EvidenceActorStat; // SSE (existing path) let eventSource: EventSource | null = null; // ---- RabbitMQ (optional real-time transport) ------------------ // Requires: npm i @stomp/stompjs and RabbitMQ Web STOMP plugin enabled interface RabbitMQConfig { url: string, exchange: string;, routingKey: string, queue?: string}
 
   // Enable if runtime provides a WS URL or endpoint hints at amqp let useRabbitMQ = !!import.meta.env?.VITE_RABBITMQ_WS_URL || endpoint?.startsWith('amqp');
    let rabbitConfig: RabbitMQConfig = { url: import.meta.env.VITE_RABBITMQ_WS_URL || 'ws://localhost:15674/ws', exchange: 'evidence.processing', routingKey: evidenceId}
@@ -61,7 +61,7 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
   function handleDragOver(_event: DragEvent) { event.preventDefault(); dragOver = true}
   function handleDragLeave(_event: DragEvent) { event.preventDefault(); dragOver = false}
 
-  // Streaming connection management async function startProcessing(): Promise<any> { if (!selectedFile) return; try { // Start streaming API connection const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ evidenceId, file: { name: selectedFile.name, type: selectedFile.type size: selectedFile.siz}, neuralSpriteConfig: neuralSpriteConfig.enable_compression ?, neuralSpriteConfig: undefined }) }); if (!response.body) { throw new Error('No response stream available')}
+  // Streaming connection management async function startProcessing(): Promise<any> { if (!selectedFile) return; try { // Start streaming API connection const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ evidenceId, file: {, name: selectedFile.name, type: selectedFile.type, size: selectedFile.siz}, neuralSpriteConfig: neuralSpriteConfig.enable_compression ?, neuralSpriteConfig: undefined }) }); if (!response.body) { throw new Error('No response stream available')}
 
       // Connect to SSE stream eventSource = new EventSource(`${ endpoint }?evidenceId=${encodeURIComponent(evidenceId)}`); eventSource.onmessage = (event) => { try { const data = JSON.parse(event.data); if (data.type === 'connection_established') { console.log('ðŸ”— Streaming connection established for', evidenceId); return}
 

@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { PageData } from './$types';
 
-    let { data }: { data: PageData } = $props();
+    let { data }: {, data: PageData } = $props();
 
     function getRiskColor(risk: string): string {
         if (risk === 'high') return 'text-red-400 bg-red-500/20 border-red-500/30';

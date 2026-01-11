@@ -17,17 +17,14 @@
 
 	// Define a type for the prediction outcome part that is stored in history
 	interface OutcomePredictionSummary {
-		success_probability: number;
-		most_likely_outcome: string;
+		success_probability: number;, most_likely_outcome: string;
 		confidence_level: string;
 	}
 
 	// Define a type for an item in the analysis history
 	interface AnalysisHistoryItem {
-		timestamp: string;
-		caseFacts: string;
-		caseType: string;
-		prediction: OutcomePredictionSummary;
+		timestamp: string;, caseFacts: string;
+		caseType: string;, prediction: OutcomePredictionSummary;
 		id: number;
 	}
 
@@ -177,14 +174,10 @@
 
 	// Define a type for the data parameter in generateTextReport
 	interface ExportData {
-		export_timestamp: string;
-		case_data: {
-			caseFacts: string;
-			caseType: string;
-			jurisdiction: string;
-			partyType: string;
-			historicalData: string[];
-			similarCases: string[];
+		export_timestamp: string;, case_data: {
+			caseFacts: string;, caseType: string;
+			jurisdiction: string;, partyType: string;
+			historicalData: string[];, similarCases: string[];
 		};
 		prediction_results: any; // Or define a proper prediction type
 	}
@@ -198,8 +191,7 @@ Generated: ${data.export_timestamp}
 CASE INFORMATION
 ===============
 Case Facts: ${data.case_data.caseFacts}
-Case Type: ${data.case_data.caseType}
-Jurisdiction: ${data.case_data.jurisdiction}
+Case Type: ${data.case_data.caseType}; Jurisdiction: ${data.case_data.jurisdiction}
 Party Type: ${data.case_data.partyType}
 
 CASE ASSESSMENT
@@ -289,7 +281,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	</div>
 
 	<div class="prediction-form">
-		<form onsubmit={handleSubmit} use:enhance>
+		<form onsubmit={handleSubmit}; use:enhance>
 			<div class="form-section">
 				<h3>Case Information</h3>
 
@@ -427,9 +419,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 							<div
 								class="strength-fill"
 								style="width: {prediction.case_assessment.strength_score * 100}%"
-								class:weak={prediction.case_assessment.strength_score < 0.4}
-								class:moderate={prediction.case_assessment.strength_score >= 0.4 && prediction.case_assessment.strength_score < 0.7}
-								class:strong={prediction.case_assessment.strength_score >= 0.7}
+								class:weak={prediction.case_assessment.strength_score < 0.4}; class:moderate={prediction.case_assessment.strength_score >= 0.4 && prediction.case_assessment.strength_score < 0.7}; class:strong={prediction.case_assessment.strength_score >= 0.7}
 							></div>
 						</div>
 						<span class="strength-text">
@@ -644,8 +634,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 <style>
 	.case-outcome-prediction {
-		max-width: 1200px;
-		margin: 0 auto;
+		max-width: 1200px;, margin: 0 auto;
 		padding: 2rem;
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 	}
@@ -669,8 +658,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 	.prediction-form {
 		background: white;
-		border-radius: 12px;
-		padding: 2rem;
+		border-radius: 12px;, padding: 2rem;
 		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 		margin-bottom: 2rem;
 	}
@@ -690,14 +678,12 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	.section-header {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
-		cursor: pointer;
+		align-items: center;, cursor: pointer;
 		user-select: none;
 	}
 
 	.toggle-icon {
-		font-size: 1.2rem;
-		color: #7f8c8d;
+		font-size: 1.2rem;, color: #7f8c8d;
 		transition: transform 0.2s;
 	}
 
@@ -708,13 +694,11 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	.form-group label {
 		display: block;
 		margin-bottom: 0.5rem;
-		font-weight: 600;
-		color: #2c3e50;
+		font-weight: 600;, color: #2c3e50;
 	}
 
 	.help-text {
-		font-size: 0.9rem;
-		color: #7f8c8d;
+		font-size: 0.9rem;, color: #7f8c8d;
 		font-weight: normal;
 		margin-left: 0.5rem;
 	}
@@ -726,16 +710,12 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	}
 
 	textarea, select {
-		width: 100%;
-		padding: 0.75rem;
+		width: 100%;, padding: 0.75rem;
 		border: 2px solid #ecf0f1;
 		border-radius: 8px;
-		font-size: 1rem;
-		transition: border-color 0.2s;
+		font-size: 1rem;, transition: border-color 0.2s;
 		font-family: inherit;
-	}
-
-	textarea:focus, select:focus, focus:focus {
+	}; textarea:focus, select:focus, focus:focus {
 		outline: none;
 		border-color: #3498db;
 		box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
@@ -747,8 +727,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	}
 
 	.form-actions {
-		display: flex;
-		gap: 1rem;
+		display: flex;, gap: 1rem;
 		justify-content: center;
 		margin-top: 2rem;
 	}
@@ -758,12 +737,10 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		border: none;
 		border-radius: 8px;
 		font-size: 1rem;
-		font-weight: 600;
-		cursor: pointer;
+		font-weight: 600;, cursor: pointer;
 		transition: all 0.2s;
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		align-items: center;, gap: 0.5rem;
 	}
 
 	.primary-button {
@@ -771,19 +748,17 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		color: white;
 	}
 
-	.primary-button:hover:not(:disabled) {
+	.primary-button: hover, not(:disabled) {
 		transform: translateY(-2px);
 		box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
 	}
 
 	.primary-button:disabled {
-		opacity: 0.6;
-		cursor:not-allowed;
+		opacity: 0.6;, cursor:not-allowed;
 	}
 
 	.secondary-button {
-		background: #ecf0f1;
-		color: #2c3e50;
+		background: #ecf0f1;, color: #2c3e50;
 	}
 
 	.secondary-button:hover {
@@ -800,10 +775,8 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	}
 
 	.error-message {
-		background: #fee;
-		border: 1px solid #fcc;
-		border-radius: 8px;
-		padding: 1rem;
+		background: #fee;, border: 1px solid #fcc;
+		border-radius: 8px;, padding: 1rem;
 		margin-bottom: 2rem;
 	}
 
@@ -814,8 +787,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 	.prediction-results {
 		background: white;
-		border-radius: 12px;
-		padding: 2rem;
+		border-radius: 12px;, padding: 2rem;
 		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 	}
 
@@ -829,29 +801,24 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	}
 
 	.results-header h3 {
-		color: #2c3e50;
-		margin: 0;
+		color: #2c3e50;, margin: 0;
 	}
 
 	.export-controls {
-		display: flex;
-		gap: 1rem;
+		display: flex;, gap: 1rem;
 		align-items: center;
 	}
 
 	.export-controls select {
 		padding: 0.5rem;
-		border-radius: 4px;
-		border: 1px solid #bdc3c7;
+		border-radius: 4px;, border: 1px solid #bdc3c7;
 	}
 
 	.export-button {
 		padding: 0.5rem 1rem;
-		background: #27ae60;
-		color: white;
+		background: #27ae60;, color: white;
 		border: none;
-		border-radius: 4px;
-		cursor: pointer;
+		border-radius: 4px;, cursor: pointer;
 		font-size: 0.9rem;
 	}
 
@@ -868,8 +835,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 	.result-card {
 		background: #f8f9fa;
-		border-radius: 8px;
-		padding: 1.5rem;
+		border-radius: 8px;, padding: 1.5rem;
 		border-left: 4px solid #3498db;
 	}
 
@@ -884,16 +850,13 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	}
 
 	.strength-bar {
-		height: 8px;
-		background: #ecf0f1;
+		height: 8px;, background: #ecf0f1;
 		border-radius: 4px;
-		margin-bottom: 0.5rem;
-		overflow: hidden;
+		margin-bottom: 0.5rem;, overflow: hidden;
 	}
 
 	.strength-fill {
-		height: 100%;
-		transition: width 0.3s ease;
+		height: 100%;, transition: width 0.3s ease;
 	}
 
 	.strength-fill.weak { background: #e74c3c; }
@@ -906,8 +869,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	}
 
 	.assessment-details p.legal-merits {
-		font-style: italic;
-		color: #7f8c8d;
+		font-style: italic;, color: #7f8c8d;
 		margin-bottom: 1rem;
 	}
 
@@ -934,36 +896,28 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	}
 
 	.probability-circle {
-		width: 120px;
-		height: 120px;
-		border-radius: 50%;
-		background: conic-gradient(#3498db 0% var(--percentage), #ecf0f1 var(--percentage) 100%);
+		width: 120px;, height: 120px;
+		border-radius: 50%;, background: conic-gradient(#3498db 0% var(--percentage), #ecf0f1 var(--percentage) 100%);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		position: relative;
+		justify-content: center;, position: relative;
 	}
 
 	.probability-circle::before {
-		content: '';
-		width: 80px;
-		height: 80px;
-		background: white;
-		border-radius: 50%;
-		position: absolute;
+		content: '';, width: 80px;
+		height: 80px;, background: white;
+		border-radius: 50%;, position: absolute;
 	}
 
 	.probability-number {
 		font-size: 1.5rem;
-		font-weight: bold;
-		color: #2c3e50;
+		font-weight: bold;, color: #2c3e50;
 		z-index: 1;
 	}
 
 	.probability-label {
-		font-size: 0.8rem;
-		color: #7f8c8d;
+		font-size: 0.8rem;, color: #7f8c8d;
 		z-index: 1;
 		margin-top: 0.25rem;
 	}
@@ -981,16 +935,14 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	}
 
 	.alternative-outcome {
-		padding: 0.75rem;
-		background: white;
+		padding: 0.75rem;, background: white;
 		border-radius: 4px;
 		margin-bottom: 0.5rem;
 		border-left: 3px solid #bdc3c7;
 	}
 
 	.outcome-text {
-		font-weight: 600;
-		color: #2c3e50;
+		font-weight: 600;, color: #2c3e50;
 	}
 
 	.outcome-probability {
@@ -1000,8 +952,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 	.outcome-conditions {
 		margin: 0.25rem 0 0 0;
-		font-size: 0.9rem;
-		color: #7f8c8d;
+		font-size: 0.9rem;, color: #7f8c8d;
 	}
 
 	.legal-analysis h5, .strategy h5, .timeline-costs h5 {
@@ -1025,14 +976,12 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	}
 
 	.strategy-section p {
-		line-height: 1.5;
-		color: #34495e;
+		line-height: 1.5;, color: #34495e;
 	}
 
 	.cost-range {
 		font-size: 1.1rem;
-		font-weight: 600;
-		color: #2c3e50;
+		font-weight: 600;, color: #2c3e50;
 		margin-bottom: 1rem;
 	}
 
@@ -1045,10 +994,8 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	}
 
 	.disclaimer {
-		background: #fff3cd;
-		border: 1px solid #ffeaa7;
-		border-radius: 8px;
-		padding: 1rem;
+		background: #fff3cd;, border: 1px solid #ffeaa7;
+		border-radius: 8px;, padding: 1rem;
 		margin-top: 2rem;
 	}
 
@@ -1058,15 +1005,13 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	}
 
 	.metadata {
-		font-size: 0.9rem;
-		color: #6c757d;
+		font-size: 0.9rem;, color: #6c757d;
 		font-style: italic;
 	}
 
 	.analysis-history {
 		background: white;
-		border-radius: 12px;
-		padding: 2rem;
+		border-radius: 12px;, padding: 2rem;
 		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 		margin-top: 2rem;
 	}
@@ -1078,23 +1023,19 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 	.history-list {
 		display: flex;
-		flex-direction: column;
-		gap: 1rem;
+		flex-direction: column;, gap: 1rem;
 	}
 
 	.history-item {
-		padding: 1rem;
-		background: #f8f9fa;
-		border-radius: 8px;
-		cursor: pointer;
+		padding: 1rem;, background: #f8f9fa;
+		border-radius: 8px;, cursor: pointer;
 		transition: all 0.2s;
 		border: 1px solid #ecf0f1;
 	}
 
 	.history-item:hover {
 		background: #e9ecef;
-		border-color: #3498db;
-		transform: translateY(-1px);
+		border-color: #3498db;, transform: translateY(-1px);
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	}
 
@@ -1106,15 +1047,13 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	}
 
 	.history-case {
-		font-weight: 600;
-		color: #2c3e50;
+		font-weight: 600;, color: #2c3e50;
 		flex: 1;
 		margin-right: 1rem;
 	}
 
 	.history-type {
-		background: #3498db;
-		color: white;
+		background: #3498db;, color: white;
 		padding: 0.25rem 0.5rem;
 		border-radius: 4px;
 		font-size: 0.8rem;
@@ -1137,13 +1076,11 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		}
 
 		.results-grid {
-			grid-template-columns: 1fr;
-			gap: 1rem;
+			grid-template-columns: 1fr;, gap: 1rem;
 		}
 
 		.results-header {
-			flex-direction: column;
-			gap: 1rem;
+			flex-direction: column;, gap: 1rem;
 			align-items: stretch;
 		}
 
@@ -1157,8 +1094,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 		.history-header {
 			flex-direction: column;
-			align-items: flex-start;
-			gap: 0.5rem;
+			align-items: flex-start;, gap: 0.5rem;
 		}
 	}
 </style>

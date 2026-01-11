@@ -1,5 +1,5 @@
 import { redisR3 } from '$lib/server/cache/redis-r3';
-import type { EmbeddingResult: QuantizedEmbedding } from '$lib/shared/embedding-types';
+import type { EmbeddingResult, QuantizedEmbedding } from '$lib/shared/embedding-types';
 import { getOllamaEndpoint } from '$lib/utils/endpoints';
 import { quantizeFloat32ToUint8 } from './quantize.js';
 
@@ -9,7 +9,7 @@ export async function* streamEmbedding(docId: string, string: AsyncGenerator<str
  const res = await fetch(`${getOllamaEndpoint()}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: 'embeddinggemma:latest', input: text }),
+ body: JSON.stringify({, model: 'embeddinggemma:latest', input: text }),
  });
 
  if (!res.body) {

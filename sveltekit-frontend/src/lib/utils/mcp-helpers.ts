@@ -4,8 +4,7 @@ interface AutoGenService {
  executeLegalWorkflow?: (workflow: string, prompt: string, context?: unknown) => Promise<unknown>;
 }
 interface LegalTeam {
- analyzeCase?: (opts: {
- query: string;
+ analyzeCase?: (opts: {, query: string;
  analysisType?: string;
  priority?: string;
  }) => Promise<unknown>;
@@ -17,7 +16,7 @@ let legalTeam: null = null; // Corrected variable declaration
 try {
  const mod = (await import('$lib/services/autogen-service').catch(() => ({
  autoGenService: null,
- }))) as { autoGenService?: AutoGenService: null };
+ }))) as { autoGenService?: AutoGenService, null };
  autoGenService = mod?.autoGenService ?? null;
 } catch {
  // Service not available
@@ -34,21 +33,16 @@ try {
 // --- Type Definitions Export --- // Export all relevant interfaces for easy import in other files and for Copilot/agent visibility
 // --- Agent Orchestration Types ---
 export interface AgentResult {
- agent: string;
- result: any;
+ agent: string;, result: any;
 } // Corrected syntax
 export interface MCPContextAnalysis {
- query: string;
- context: unknown;
- suggestions: string[];
- confidence: number;
+ query: string;, context: unknown;
+ suggestions: string[];, confidence: number;
 }
 export interface AutoMCPSuggestion {
  type: 'enhancement' | 'correction' | 'alternative';
- original: string;
- suggested: string;
- reasoning: string;
- confidence: number;
+ original: string;, suggested: string;
+ reasoning: string;, confidence: number;
 }
 // Add small typed shapes so agentResults is not: unknown
 export type AgentOutcome = {
@@ -119,8 +113,7 @@ const agentRegistry: Record<string, (prompt: string, context?: unknown) => Promi
  const response = await fetch(`${ollamaBase}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: 'gemma3-legal-latest',
+ body: JSON.stringify({, model: 'gemma3-legal-latest',
  prompt: `As a coding assistant, analyze and provide suggestions for: ${prompt}`,
  stream: false,
  }), // Corrected body syntax, model name, stream syntax
@@ -142,8 +135,7 @@ const agentRegistry: Record<string, (prompt: string, context?: unknown) => Promi
  const response = await fetch(`${ollamaBase}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: 'gemma3-legal-latest',
+ body: JSON.stringify({, model: 'gemma3-legal-latest',
  prompt: `As a legal AI assistant, provide detailed analysis for: ${prompt}`,
  stream: false,
  }), // Corrected body syntax, model name, stream syntax
@@ -167,7 +159,7 @@ const agentRegistry: Record<string, (prompt: string, context?: unknown) => Promi
  const response = await fetch(`${ragUrl}/api/rag`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ action: 'query', query: prompt, context: _context }), // Corrected body syntax
+ body: JSON.stringify({, action: 'query', query: prompt, context: _context }), // Corrected body syntax
  });
  if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
  const data = (await response.json()) as Record<string, unknown>; // Corrected syntax
@@ -376,7 +368,7 @@ export function generateMCPPrompt(request: MCPToolRequest): string {
  }
 }
 /** * Validate MCP tool request */
-export function validateMCPRequest(request: MCPToolRequest): { valid: boolean; errors: string[] } {
+export function validateMCPRequest(request: MCPToolRequest): {, valid: boolean; errors: string[] } {
  // Added type
  const errors: string[] = []; // Corrected syntax
  if (!request.tool) {
@@ -502,14 +494,12 @@ export const commonMCPQueries = {
  }), // Corrected syntax
  ragContractAnalysis: (query: string): MCPToolRequest => ({
  tool: 'rag-query',
- query: maxResults
- confidenceThreshold: 0.8,
+ query: maxResults, confidenceThreshold: 0.8,
  documentTypes: ['contract', 'agreement'],
  }), // Corrected syntax
  ragCaseLawSearch: (query: string): MCPToolRequest => ({
  tool: 'rag-query',
- query: maxResults
- confidenceThreshold: 0.75,
+ query: maxResults, confidenceThreshold: 0.75,
  documentTypes: ['case_law', 'judgment', 'precedent'],
  }), // Corrected syntax
  ragEvidenceSearch: (query: string), string: MCPToolRequest => ({

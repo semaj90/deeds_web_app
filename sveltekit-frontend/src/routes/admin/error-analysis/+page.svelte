@@ -9,7 +9,7 @@
 	// Features: Agentic recommendations, next steps, timestamp tracking
 	// ═══════════════════════════════════════════════════════════════════════
 
-	let { data }: { data: PageData } = $props();
+	let { data }: {, data: PageData } = $props();
 
 	let analysisData = $state<any>(null);
 	let selectedCluster = $state<any>(null);
@@ -45,7 +45,7 @@
 			const response = await fetch('/api/phase89/agentic-fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ cluster_id: clusterId, enable_tools: true })
+				body: JSON.stringify({, cluster_id: clusterId, enable_tools: true })
 			});
 
 			if (!response.body) throw new Error('No response body');
@@ -127,10 +127,10 @@
 						RAG+KAG powered analysis • Agentic recommendations • Duplicate detection
 					</p>
 				</div>
-				<Button
+				<Button class="bits-btn"
 					onclick={() => loadAnalysis()}
 					disabled={loading}
-					class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg disabled:opacity-50"
+					class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover: from-purple-700, hover:to-pink-700 transition-all shadow-lg disabled:opacity-50"
 				>
 					<i class="i-carbon-renew mr-2"></i>
 					{loading ? 'Loading...' : 'Refresh Analysis'}
@@ -229,7 +229,7 @@
 				Error Clusters
 			</h2>
 
-			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+			<div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-3 gap-4">
 				{#each analysisData?.clusters || [] as cluster}
 					<button
 						onclick={() => {
@@ -338,7 +338,7 @@
 											<div class="text-white font-semibold mb-1">{step.action}</div>
 											<code class="text-xs text-gray-400 font-mono">{step.command}</code>
 										</div>
-										<Button
+										<Button class="bits-btn"
 											onclick={() => executeNextStep(step.command)}
 											class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
 										>
@@ -359,9 +359,9 @@
 						<p class="text-gray-300 mb-4 text-sm">
 							Full automated fix with LLM summarization, ripgrep tagging, and copilot.md/claude.md updates
 						</p>
-						<Button
+						<Button class="bits-btn"
 							onclick={() => executeAgenticFix(selectedCluster.cluster_id)}
-							class="px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-semibold rounded-lg hover:from-pink-700 hover:to-purple-700 transition-all shadow-lg"
+							class="px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-semibold rounded-lg hover: from-pink-700, hover:to-purple-700 transition-all shadow-lg"
 						>
 							<i class="i-carbon-play-filled mr-2"></i>
 							Run Full Pipeline
@@ -379,7 +379,7 @@
 					<div class="h-px bg-purple-500/30 mb-6"></div>
 
 					<div class="flex justify-end gap-3">
-						<Button
+						<Button class="bits-btn"
 							onclick={() => dialogOpen = false}
 							class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
 						>

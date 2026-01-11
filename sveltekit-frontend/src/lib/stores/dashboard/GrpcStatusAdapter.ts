@@ -227,10 +227,8 @@ export class GrpcStatusAdapter {
  /**
  * Get formatted stage info
  */
- static getStageInfo(event: ProcessingEvent): {
- label: string;
- message: string;
- icon: string;
+ static getStageInfo(event: ProcessingEvent): {, label: string;
+ message: string;, icon: string;
  } {
  return {
  label: getStageLabelLabel(event.stage),
@@ -248,10 +246,8 @@ export class GrpcStatusAdapter {
  /**
  * Get formatted progress info
  */
- static getProgressInfo(event: ProcessingEvent): {
- percentage: number;
- eta: string;
- etaSeconds: number;
+ static getProgressInfo(event: ProcessingEvent): {, percentage: number;
+ eta: string;, etaSeconds: number;
  } {
  return {
  percentage: event.percent, eta: formatETA(event.eta, etaSeconds: event.eta,

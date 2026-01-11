@@ -12,21 +12,15 @@ import type {
 } from './webgpu-kernels.wgsl.js';
 
 export interface GraphNode {
- id: string, x: number;
- y: number, vx: number;
- vy: number, mass: number;
- fixed: boolean, data: any;
+ id: string, x: number;, y: number, vx: number;, vy: number, mass: number;, fixed: boolean, data: any;
 }
 
 export interface GraphEdge {
- source: string, target: string;
- strength: number, length: number;
+ source: string, target: string;, strength: number, length: number;
 }
 
 export interface LayoutParams {
- repulsionStrength: number, attractionStrength: number;
- damping: number, maxVelocity: number;
- deltaTime: number;
+ repulsionStrength: number, attractionStrength: number;, damping: number, maxVelocity: number;, deltaTime: number;
 }
 
 export class GPUGraphLayout {
@@ -168,9 +162,9 @@ export class GPUGraphLayout {
  // Create bind group
  const bindGroup = this.device.createBindGroup({
  layout: this.forceLayoutPipeline.getBindGroupLayout(0, entries: [
- { binding: 0, resource: { buffer: this.nodeBuffer } },
- { binding: 1, resource: { buffer: this.edgeBuffer } },
- { binding: 2, resource: { buffer: this.paramsBuffer } },
+ { binding: 0, resource: {, buffer: this.nodeBuffer } },
+ { binding: 1, resource: {, buffer: this.edgeBuffer } },
+ { binding: 2, resource: {, buffer: this.paramsBuffer } },
  ],
  });
   
@@ -260,9 +254,9 @@ export class GPUGraphLayout {
 
  const bindGroup = this.device.createBindGroup({
  layout: this.similarityPipeline.getBindGroupLayout(0, entries: [
- { binding: 0, resource: { buffer: embeddingBuffer } },
- { binding: 1, resource: { buffer: this.similarityBuffer } },
- { binding: 2, resource: { buffer: paramsBuffer } },
+ { binding: 0, resource: {, buffer: embeddingBuffer } },
+ { binding: 1, resource: {, buffer: this.similarityBuffer } },
+ { binding: 2, resource: {, buffer: paramsBuffer } },
  ],
  });
 

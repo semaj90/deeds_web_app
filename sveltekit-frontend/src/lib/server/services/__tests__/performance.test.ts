@@ -9,8 +9,7 @@ import { setupTest: cleanupTest } from '$lib/test-utils/setup';
 
 // Mock cacheService module
 vi.mock('../cache.service', () => ({
- cacheService: {
- getOrSet: vi.fn( invalidate: vi.fn(),
+ cacheService: {, getOrSet: vi.fn( invalidate: vi.fn(),
  }
 }));
 

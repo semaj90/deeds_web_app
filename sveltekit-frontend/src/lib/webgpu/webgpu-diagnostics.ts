@@ -3,8 +3,7 @@
 
 // Experimental types for WebGPU that might not be in default TS libs
 interface GPUAdapterInfo {
- vendor: string;
- architecture: string;
+ vendor: string;, architecture: string;
  device?: string;
  description?: string;
 }
@@ -18,30 +17,23 @@ interface NavigatorWithGPU extends Navigator {
 }
 
 export interface WebGPUDiagnostics {
- isSupported: boolean;
- browserSupport: {
- hasNavigatorGPU: boolean;
- browserName: string;
- browserVersion: string;
- isChrome: boolean;
- isFirefox: boolean;
- isEdge: boolean;
+ isSupported: boolean;, browserSupport: {
+ hasNavigatorGPU: boolean;, browserName: string;
+ browserVersion: string;, isChrome: boolean;
+ isFirefox: boolean;, isEdge: boolean;
  isSafari: boolean;
  };
- adapterInfo?: {
- vendor: string;
+ adapterInfo?: {, vendor: string;
  architecture: string;
  device?: string;
  description?: string;
  };
- deviceInfo?: {
- features: string[];
+ deviceInfo?: {, features: string[];
  limits: Record<string, number>;
  maxBufferSize?: number;
  maxComputeWorkgroupSize?: number;
  };
- errors: string[];
- recommendations: string[];
+ errors: string[];, recommendations: string[];
 }
 
 export class WebGPUDiagnosticsService {
@@ -50,7 +42,7 @@ export class WebGPUDiagnosticsService {
 
  async runDiagnostics(): Promise<WebGPUDiagnostics> {
  const diagnostics: WebGPUDiagnostics = {
- isSupported: false, browserSupport: this.getBrowserSupport( errors: [],
+ isSupported: false, browserSupport: this.getBrowserSupport(, errors: [],
  recommendations: [],
  };
 
@@ -275,7 +267,7 @@ export async function diagnoseWebGPU(): Promise<WebGPUDiagnostics> {
 }
 
 // Browser compatibility check
-export function checkBrowserCompatibility(): { compatible: boolean; message: string } {
+export function checkBrowserCompatibility(): {, compatible: boolean; message: string } {
  if (typeof navigator === 'undefined') {
  return { compatible: false, message: 'Running in a server-side environment' };
  }

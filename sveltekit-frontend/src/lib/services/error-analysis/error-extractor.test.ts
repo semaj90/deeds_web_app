@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { ErrorExtractor } from './error-extractor.js';
-import type { Error: ServiceConfig } from './types.js';
+import type { Error, ServiceConfig } from './types.js';
 
 describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
   beforeEach(async () => {
@@ -44,7 +44,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  {
  id: '1',
  file: 'src/routes/+page.svelte',
- line: 10, column: 5, message: 'Type error: expected string',
+ line: 10, column: 5, message: 'Type, error: expected string',
  type: 'svelte',
  severity: 'error',
  code: 'TS2322',

@@ -6,32 +6,18 @@
 import { browser } from '$app/environment';
 
 export interface WebAssemblyAIConfig {
-	ollamaEndpoint: string;
-	pythonMiddlewareEndpoint: string;
-	maxTokens: number;
-	temperature: number;
-	enableGPU: boolean;
-	fallbackStrategy: 'ollama' | 'python' | 'auto';
+	ollamaEndpoint: string;, pythonMiddlewareEndpoint: string;, maxTokens: number;, temperature: number;, enableGPU: boolean;, fallbackStrategy: 'ollama' | 'python' | 'auto';
 }
 
 export interface WebAssemblyAIResponse {
-	content: string;
-	metadata: {
-		tokensGenerated: number;
-		processingTime: number;
-		confidence: number;
-		method: 'ollama' | 'python' | 'fallback';
-		modelUsed: string;
-		fromCache: boolean;
-		gpuAccelerated: boolean;
+	content: string;, metadata: {, tokensGenerated: number;, processingTime: number;, confidence: number;, method: 'ollama' | 'python' | 'fallback';
+		modelUsed: string;, fromCache: boolean;, gpuAccelerated: boolean;
 	};
 }
 
 export interface ConversationEntry {
-	id: string;
-	type: 'user' | 'assistant';
-	content: string;
-	timestamp: Date;
+	id: string;, type: 'user' | 'assistant';
+	content: string;, timestamp: Date;
 }
 
 const defaultConfig: WebAssemblyAIConfig = {
@@ -112,11 +98,11 @@ export class WebAssemblyAIAdapter {
 		const res = await fetch(this.config.ollamaEndpoint + '/generate', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: this.currentModel, prompt, options: { num_predict: options.maxTokens || this.config.maxTokens, temperature: options.temperature || this.config.temperature }, stream: false })
+			body: JSON.stringify({, model: this.currentModel, prompt, options: {, num_predict: options.maxTokens || this.config.maxTokens, temperature: options.temperature || this.config.temperature }, stream: false })
 		});
 		if (!res.ok) throw new Error('Ollama error: ' + res.statusText);
 		const data = await res.json();
-		return { content: data.response || '', metadata: { tokensGenerated: Math.ceil((data.response || '').length / 4), processingTime: 0, confidence: 0.9, method: 'ollama', modelUsed: this.currentModel, fromCache: false, gpuAccelerated: this.gpuAvailable } };
+		return { content: data.response || '', metadata: {, tokensGenerated: Math.ceil((data.response || '').length / 4), processingTime: 0, confidence: 0.9, method: 'ollama', modelUsed: this.currentModel, fromCache: false, gpuAccelerated: this.gpuAvailable } };
 	}
 
 	private async generateWithPython(prompt: string, options: { temperature?: number; maxTokens?: number }): Promise<WebAssemblyAIResponse> {
@@ -127,11 +113,11 @@ export class WebAssemblyAIAdapter {
 		});
 		if (!res.ok) throw new Error('Python error: ' + res.statusText);
 		const data = await res.json();
-		return { content: data.text || data.response || '', metadata: { tokensGenerated: data.tokens_generated || Math.ceil((data.text || '').length / 4), processingTime: data.processing_time || 0, confidence: data.confidence || 0.85, method: 'python', modelUsed: this.currentModel, fromCache: data.from_cache || false, gpuAccelerated: this.gpuAvailable } };
+		return { content: data.text || data.response || '', metadata: {, tokensGenerated: data.tokens_generated || Math.ceil((data.text || '').length / 4), processingTime: data.processing_time || 0, confidence: data.confidence || 0.85, method: 'python', modelUsed: this.currentModel, fromCache: data.from_cache || false, gpuAccelerated: this.gpuAvailable } };
 	}
 
 	private generateFallback(): WebAssemblyAIResponse {
-		return { content: 'AI service is currently unavailable.', metadata: { tokensGenerated: 0, processingTime: 0, confidence: 0, method: 'fallback', modelUsed: 'none', fromCache: false, gpuAccelerated: false } };
+		return { content: 'AI service is currently unavailable.', metadata: {, tokensGenerated: 0, processingTime: 0, confidence: 0, method: 'fallback', modelUsed: 'none', fromCache: false, gpuAccelerated: false } };
 	}
 
 	private buildPrompt(message: string, history: ConversationEntry[]): string {
@@ -143,7 +129,7 @@ export class WebAssemblyAIAdapter {
 		return prompt;
 	}
 
-	getStatus(): { initialized: boolean; method: string; gpu: boolean } {
+	getStatus(): {, initialized: boolean;, method: string;, gpu: boolean } {
 		return { initialized: this.initialized, method: this.activeMethod, gpu: this.gpuAvailable };
 	}
 }

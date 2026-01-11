@@ -13,14 +13,11 @@ import type { FixStrategy, ValidationRule, ErrorReport, SimilarError } from './t
 import { getOllamaService } from './OllamaService.js';
 
 export interface FixSynthesizerConfig {
-  maxRetries: number;
-  validationTimeout: number;
-  backupDir: string;
+  maxRetries: number;, validationTimeout: number;, backupDir: string;
 }
 
 export interface FixResult {
-  success: boolean;
-  strategy: FixStrategy | null;
+  success: boolean;, strategy: FixStrategy | null;
   error?: string;
   validationErrors?: string[];
 }
@@ -175,7 +172,7 @@ export class FixSynthesizer {
   async validateFix(
     strategy: FixStrategy,
     error: ErrorReport
-  ): Promise<{ valid: boolean; errors: string[] }> {
+  ): Promise<{, valid: boolean;, errors: string[] }> {
     const errors: string[] = [];
 
     for (const rule of strategy.validationRules) {

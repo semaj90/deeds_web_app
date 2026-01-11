@@ -4,7 +4,7 @@
  import { createEventDispatcher } from 'svelte';
 
  const dispatch = createEventDispatcher<{
- select: { src: string };
+ select: {, src: string };
  }>();
 
  interface Props {

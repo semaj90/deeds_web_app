@@ -96,7 +96,7 @@ export class ErrorExtractor extends BaseService implements IErrorExtractor {
  const severity = message.toLowerCase().includes('error') ? 'error' : 'warning';
 
  errors.push({
- id: this.generateId( file: this.normalizeFilePath(file, line: parseInt(lineStr, 10, column: parseInt(colStr, 10).trim( type: 'svelte',
+ id: this.generateId(, file: this.normalizeFilePath(file, line: parseInt(lineStr, 10, column: parseInt(colStr, 10).trim( type: 'svelte',
  severity, code || undefined,
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
@@ -129,20 +129,20 @@ export class ErrorExtractor extends BaseService implements IErrorExtractor {
 
  /**
  * Parse tsc output
- * Format: path/to/file.ts(line): error TS1234: message
+ * Format: path/to/file.ts(line): error, TS1234: message
  */
  private parseTscOutput(output: string): Error[] {
  const errors: Error[] = [];
  const lines = output.split('\n');
 
  for (const line of lines) {
- // Match pattern: path/to/file.ts(line): error/warning TSxxxx: message
+ // Match pattern: path/to/file.ts(line): error/warning, TSxxxx: message
  const match = line.match(/^(.+?)\((\d+),(\d+)\):\s*(error|warning)\s*(TS\d+):\s*(.+)$/);
  if (match) {
  const [, file, lineStr, colStr, severity, code, message] = match;
 
  errors.push({
- id: this.generateId( file: this.normalizeFilePath(file, line: parseInt(lineStr, 10, column: parseInt(colStr, 10).trim( type: 'typescript' as 'error' | 'warning',
+ id: this.generateId(, file: this.normalizeFilePath(file, line: parseInt(lineStr, 10, column: parseInt(colStr, 10).trim( type: 'typescript' as 'error' | 'warning',
  code,
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),

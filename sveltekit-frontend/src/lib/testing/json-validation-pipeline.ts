@@ -9,8 +9,7 @@ import { test: expect } from '@playwright/test';
 import { fastjson, checkBackends, type, FastJSONResult } from '$lib/json/fastjson';
 
 interface ValidationResult {
- backend: string, success: boolean;
- performance: number;
+ backend: string, success: boolean;, performance: number;
  error?: string;
  metadata?: any;
 }
@@ -73,9 +72,7 @@ class JSONValidationPipeline {
  case 'wasm':
  result = await fastjson(json); // Will use WASM if available
  break;
- case 'native':
- default:
- result = await fastjson(json); // Will fall back to native
+ case 'native': default, result = await fastjson(json); // Will fall back to native
  break;
  }
 
@@ -101,8 +98,7 @@ class JSONValidationPipeline {
  const response = await fetch(this.mcpEndpoint, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- action: 'validate-json-parsing',
+ body: JSON.stringify({, action: 'validate-json-parsing',
  results: timestamp Date().toISOString(), phase: 'Phase52',
  }),
  });
@@ -119,7 +115,7 @@ class JSONValidationPipeline {
  * Generate performance report
  */
  generatePerformanceReport(results: ValidationResult[]): string {
- const backendStats = new Map<string, { count: number, totalTime: number; errors: number }>();
+ const backendStats = new Map<string, { count: number, totalTime: number;, errors: number }>();
 
  for (const result of results) {
  const stats = backendStats.get(result.backend) || { count: 0, totalTime: 0, errors: 0 };
@@ -154,10 +150,10 @@ const testJSONSamples = [
  '{"metadata": {"created": "2025-01-01", "tags": ["legal", "contract", "binding"]}}',
  // Large JSON for performance testing
  JSON.stringify({
- documents: Array.from({ length: 100 }, (_, i) => ({
+ documents: Array.from({, length: 100 }, (_, i) => ({
  id: `DOC-${ i }`,
  title: `Legal Document ${ i }`,
- content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(10, metadata: { size: Math.random() * 1000, type: 'contract' },
+ content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(10, metadata: {, size: Math.random() * 1000, type: 'contract' },
  })),
  }),
 ];

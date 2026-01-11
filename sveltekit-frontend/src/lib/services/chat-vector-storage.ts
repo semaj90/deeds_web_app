@@ -7,9 +7,7 @@ import { chatEmbeddings } from '$lib/server/db/schema';
 import { Base64FP32Quantizer } from '../text/base64-fp32-quantizer.js';
 
 export interface ChatMessage {
-    id: string, userId: string;
-    content: string, timestamp: Date;
-    sessionId: string, messageType: 'user' | 'assistant' | 'system';
+    id: string, userId: string;, content: string, timestamp: Date;, sessionId: string, messageType: 'user' | 'assistant' | 'system';
     metadata: {
         intent?: string;
         confidence?: number;
@@ -25,22 +23,16 @@ export interface ChatMessage {
 }
 
 export interface SemanticSearchResult {
-    message: ChatMessage, similarity: number;
-    temporalRelevance: number, combinedScore: number;
+    message: ChatMessage, similarity: number;, temporalRelevance: number, combinedScore: number;
     embedding?: unknown;
     reasonForMatch?: string;
 }
 
 export interface IntentPrediction {
-    predictedIntent: string, confidence: number;
-    suggestedQuestions: string[], didYouMean: string[];
-    contextualRecommendations: {
-        similarPastQueries: ChatMessage[], relatedTopics: string[];
-        nextSteps: string[];
+    predictedIntent: string, confidence: number;, suggestedQuestions: string[], didYouMean: string[];, contextualRecommendations: {
+        similarPastQueries: ChatMessage[], relatedTopics: string[];, nextSteps: string[];
     };
-    temporalInsights: {
-        commonAtThisTime: string[], seasonalTrends: string[];
-        userPatterns: string[];
+    temporalInsights: {, commonAtThisTime: string[], seasonalTrends: string[];, userPatterns: string[];
     };
 }
 
@@ -58,20 +50,18 @@ class ChatVectorStorage {
             confidence: 0.3,
             suggestedQuestions: ['How can I help you with legal matters?'],
             didYouMean: [],
-            contextualRecommendations: { similarPastQueries: [], relatedTopics: [], nextSteps: [] },
-            temporalInsights: { commonAtThisTime: [], seasonalTrends: [], userPatterns: [] }
+            contextualRecommendations: {, similarPastQueries: [], relatedTopics: [], nextSteps: [] },
+            temporalInsights: {, commonAtThisTime: [], seasonalTrends: [], userPatterns: [] }
         };
     }
 
-    async searchChatHistory(_userId: string, _query: string, _options?: { timeRange?: { start: Date, end: Date }; intentFilter?: string[]; minSimilarity?: number; maxResults?: number }): Promise<SemanticSearchResult[]> {
+    async searchChatHistory(_userId: string, _query: string, _options?: { timeRange?: {, start: Date, end: Date }; intentFilter?: string[]; minSimilarity?: number; maxResults?: number }): Promise<SemanticSearchResult[]> {
         return [];
     }
 
-    async getChatAnalytics(_userId: string, _timeRange?: { start: Date, end: Date }): Promise<{
-        totalMessages: number, mostCommonIntents: { intent: string, count: number }[];
+    async getChatAnalytics(_userId: string, _timeRange?: {, start: Date, end: Date }): Promise<{, totalMessages: number, mostCommonIntents: {, intent: string, count: number }[];
         temporalPatterns: Record<string, unknown>;
-        topTopics: string[], averageSessionLength: number;
-        lastActive: Date;
+        topTopics: string[], averageSessionLength: number;, lastActive: Date;
     }> {
         return {
             totalMessages: 0,

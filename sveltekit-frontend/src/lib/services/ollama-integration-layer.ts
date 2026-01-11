@@ -23,21 +23,16 @@ export interface IntegratedChatRequest {
   caseId?: string;
   useRAG?: boolean;
   stream?: boolean;
-  documentContext?: {
-    type: 'document' | 'case' | 'evidence' | 'legal-brief' | 'contract';
+  documentContext?: {, type: 'document' | 'case' | 'evidence' | 'legal-brief' | 'contract';
     content?: string;
     metadata?: Record<string, unknown>;
   };
-  summaryOptions?: {
-    includeSummary: boolean;
-    includeKeyPoints: boolean;
-    includeLegalAnalysis: boolean;
+  summaryOptions?: {, includeSummary: boolean;
+    includeKeyPoints: boolean;, includeLegalAnalysis: boolean;
     includeEmbeddings: boolean;
   };
-  advancedOptions?: {
-    useGPU: boolean;
-    enableStreaming: boolean;
-    enableCaching: boolean;
+  advancedOptions?: {, useGPU: boolean;
+    enableStreaming: boolean;, enableCaching: boolean;
     fallbackModel?: string;
   };
 }
@@ -45,24 +40,19 @@ export interface IntegratedChatRequest {
 export interface IntegratedChatResponse {
   response?: string;
   streaming?: boolean;
-  summary?: {
-    summary: string;
+  summary?: {, summary: string;
     keyPoints: string[];
     processingTime?: number;
   };
-  integration?: {
-    servicesUsed: string[];
-    processingPath: string;
-    performance: {
+  integration?: {, servicesUsed: string[];
+    processingPath: string;, performance: {
       totalTime: number;
       summaryTime?: number;
       chatTime?: number;
     };
   };
-  performance?: {
-    duration: number;
-    tokens: number;
-    tokensPerSecond: number;
+  performance?: {, duration: number;
+    tokens: number;, tokensPerSecond: number;
     model: string;
   };
   relatedCases?: string[];
@@ -70,23 +60,21 @@ export interface IntegratedChatResponse {
 }
 
 export interface OllamaServiceStatus {
-  comprehensive: { status: string; health: number };
-  langchain: { status: string; connected: boolean };
-  cuda: { status: string; available: boolean };
-  gemma3: { status: string; model?: string };
-  cluster: { status: string; nodes: number };
-  streaming: { status: string; active: number };
+  comprehensive: {, status: string; health: number };
+  langchain: {, status: string; connected: boolean };
+  cuda: {, status: string; available: boolean };
+  gemma3: {, status: string; model?: string };
+  cluster: {, status: string; nodes: number };
+  streaming: {, status: string; active: number };
 }
 
 export interface SummarizerStats {
-  services: {
-    cuda: { status: string };
-    gemma3: { status: string };
-    cluster: { status: string; nodes: number };
-    streaming: { status: string; activeStreams: number };
+  services: {, cuda: { status: string };
+    gemma3: {, status: string };
+    cluster: {, status: string; nodes: number };
+    streaming: {, status: string; activeStreams: number };
   };
-  models: {
-    loaded: string[];
+  models: {, loaded: string[];
   };
 }
 
@@ -106,12 +94,12 @@ class OllamaIntegrationLayer {
 
   constructor() {
     this.serviceStatus = writable({
-      comprehensive: { status: 'initializing', health: 0 },
-      langchain: { status: 'initializing', connected: false },
-      cuda: { status: 'initializing', available: false },
-      gemma3: { status: 'initializing' },
-      cluster: { status: 'initializing', nodes: 0 },
-      streaming: { status: 'initializing', active: 0 },
+      comprehensive: {, status: 'initializing', health: 0 },
+      langchain: {, status: 'initializing', connected: false },
+      cuda: {, status: 'initializing', available: false },
+      gemma3: {, status: 'initializing' },
+      cluster: {, status: 'initializing', nodes: 0 },
+      streaming: {, status: 'initializing', active: 0 },
     });
     this.isInitialized = writable(false);
     this.stats = writable(null);
@@ -145,12 +133,12 @@ class OllamaIntegrationLayer {
     try {
       // Mock status update - in production, would query actual services
       this.serviceStatus.set({
-        comprehensive: { status: 'healthy', health: 100 },
-        langchain: { status: 'healthy', connected: true },
-        cuda: { status: 'healthy', available: true },
-        gemma3: { status: 'healthy', model: 'gemma3-legal:latest' },
-        cluster: { status: 'healthy', nodes: 1 },
-        streaming: { status: 'healthy', active: 0 },
+        comprehensive: {, status: 'healthy', health: 100 },
+        langchain: {, status: 'healthy', connected: true },
+        cuda: {, status: 'healthy', available: true },
+        gemma3: {, status: 'healthy', model: 'gemma3-legal:latest' },
+        cluster: {, status: 'healthy', nodes: 1 },
+        streaming: {, status: 'healthy', active: 0 },
       });
     } catch (error) {
       console.warn('Failed to update service status:', error);
@@ -194,8 +182,7 @@ class OllamaIntegrationLayer {
       response.integration = {
         servicesUsed: this.getServicesUsed(strategy),
         processingPath: strategy,
-        performance: {
-          totalTime: Date.now() - startTime,
+        performance: {, totalTime: Date.now() - startTime,
           summaryTime: response.summary?.processingTime,
           chatTime: Date.now() - startTime - (response.summary?.processingTime || 0),
         },
@@ -250,8 +237,7 @@ class OllamaIntegrationLayer {
       // Mock RAG processing
       return {
         response: `RAG-enhanced response for: ${request.message}`,
-        performance: {
-          duration: 200,
+        performance: {, duration: 200,
           tokens: 150,
           tokensPerSecond: 750,
           model: request.model || 'langchain-ollama',

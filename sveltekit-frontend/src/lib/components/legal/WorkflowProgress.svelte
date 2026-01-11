@@ -4,8 +4,7 @@ Visual progress indicator for the Evidence Chain of Custody workflow
 -->
 <script lang="ts">
   interface Props {
-    progress: number
-    stage: string
+    progress: number, stage: string
  stageName: string}
   let { progress, stage, stageName }: { progress; stage; stageName: any } = $props();
   import  Progress  from "$lib/components/ui/progress/Progress.svelte";

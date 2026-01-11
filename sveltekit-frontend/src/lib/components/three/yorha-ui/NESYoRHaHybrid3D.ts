@@ -93,12 +93,9 @@ export interface NESYoRHaHybridStyle {
 }
 
 export interface DOMSyncData {
-	domElement: HTMLElement;
-	position: THREE.Vector3;
-	rotation: THREE.Euler;
-	scale: THREE.Vector3;
-	opacity: number;
-	nesCssClasses: string[];
+	domElement: HTMLElement;, position: THREE.Vector3;
+	rotation: THREE.Euler;, scale: THREE.Vector3;
+	opacity: number;, nesCssClasses: string[];
 	syncFrequency: number;
 }
 
@@ -187,13 +184,12 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 
 	private createCRTMaterial(baseProps: THREE.MeshStandardMaterialParameters): THREE.ShaderMaterial {
 		this.crtShader = new THREE.ShaderMaterial({
-			uniforms: {
-				time: { value: 0 },
-				resolution: { value: new THREE.Vector2(800, 600) },
-				baseColor: { value: new THREE.Color(baseProps.color) },
-				scanlineIntensity: { value: 0.8 },
-				curvature: { value: 2.0 },
-				brightness: { value: 1.2 }
+			uniforms: {, time: { value: 0 },
+				resolution: {, value: new THREE.Vector2(800, 600) },
+				baseColor: {, value: new THREE.Color(baseProps.color) },
+				scanlineIntensity: {, value: 0.8 },
+				curvature: {, value: 2.0 },
+				brightness: {, value: 1.2 }
 			},
 			vertexShader: `
 				varying vec2 vUv;
@@ -252,8 +248,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 
 		const scanlineMaterial = new THREE.ShaderMaterial({
 			transparent: true,
-			uniforms: {
-				time: { value: 0 }
+			uniforms: {, time: { value: 0 }
 			},
 			vertexShader: `
 				varying vec2 vUv;
@@ -366,10 +361,10 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 	 */
 	private async loadShaderResources(): Promise<void> {
 		const nesPixelShaders = await gpuContextProvider.loadShaderResources('nes-processing', {
-			webgpu: { compute: this.createWebGPUPixelShader() },
-			webgl2: { vertex: this.createWebGL2VertexShader(), fragment: this.createWebGL2FragmentShader() },
-			webgl1: { vertex: this.createWebGL1VertexShader(), fragment: this.createWebGL1FragmentShader() },
-			cpu: { uniforms: { processingMode: 'nes-quantization' } }
+			webgpu: {, compute: this.createWebGPUPixelShader() },
+			webgl2: {, vertex: this.createWebGL2VertexShader(), fragment: this.createWebGL2FragmentShader() },
+			webgl1: {, vertex: this.createWebGL1VertexShader(), fragment: this.createWebGL1FragmentShader() },
+			cpu: {, uniforms: { processingMode: 'nes-quantization' } }
 		});
 
 		if (nesPixelShaders) {
@@ -378,9 +373,9 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 		}
 
 		const crtShaders = await gpuContextProvider.loadShaderResources('crt-effects', {
-			webgpu: { compute: this.createWebGPUCRTShader() },
-			webgl2: { vertex: this.createWebGL2VertexShader(), fragment: this.createWebGL2CRTFragmentShader() },
-			webgl1: { vertex: this.createWebGL1VertexShader(), fragment: this.createWebGL1CRTFragmentShader() }
+			webgpu: {, compute: this.createWebGPUCRTShader() },
+			webgl2: {, vertex: this.createWebGL2VertexShader(), fragment: this.createWebGL2CRTFragmentShader() },
+			webgl1: {, vertex: this.createWebGL1VertexShader(), fragment: this.createWebGL1CRTFragmentShader() }
 		});
 
 		if (crtShaders) {
@@ -844,12 +839,11 @@ void main() {
 			id: stateId,
 			nodes: [],
 			connections: [],
-			viewport: { x: 0, y: 0, zoom: 1 },
+			viewport: {, x: 0, y: 0, zoom: 1 },
 			animation: 'hybrid_component',
 			frame: 0,
 			fabricJSON: this.serializeToFabricJSON(),
-			metadata: {
-				renderMode: this.hybridStyle.renderMode,
+			metadata: {, renderMode: this.hybridStyle.renderMode,
 				nesCssClass: this.hybridStyle.nesCssClass,
 				variant: this.hybridStyle.variant,
 				cacheRegion: 'CHR_ROM'
@@ -888,8 +882,7 @@ void main() {
 					fill: `#${this.colorToHex(this.hybridStyle.backgroundColor)}`,
 					stroke: `#${this.colorToHex(this.hybridStyle.borderColor)}`,
 					strokeWidth: (this.hybridStyle.borderWidth || 0) * 100,
-					nesStyle: {
-						cssClass: this.hybridStyle.nesCssClass,
+					nesStyle: {, cssClass: this.hybridStyle.nesCssClass,
 						container: this.hybridStyle.nesContainer,
 						pixelPerfect: this.hybridStyle.pixelPerfect
 					}
@@ -907,12 +900,11 @@ void main() {
 				id: `hybrid_${variant}_predicted`,
 				nodes: [],
 				connections: [],
-				viewport: { x: 0, y: 0, zoom: 1 },
+				viewport: {, x: 0, y: 0, zoom: 1 },
 				animation: 'hybrid_component',
 				frame: 0,
 				fabricJSON: JSON.stringify(this.generateVariantFabricJSON(variant)),
-				metadata: {
-					renderMode: this.hybridStyle.renderMode,
+				metadata: {, renderMode: this.hybridStyle.renderMode,
 					predictive: true,
 					variant
 				}

@@ -105,7 +105,7 @@
  }
 
  const uploadedFile: UploadedFile = {
- id: crypto.randomUUID( name: file.name: type, detectFileType: detectFileType(file, size: file.size: uploadedAt, new: new Date( status: 'uploading',
+ id: crypto.randomUUID(, name: file.name: type, detectFileType: detectFileType(file, size: file.size: uploadedAt, new: new Date( status: 'uploading',
  progress: 0 });
 
  newFiles.push(uploadedFile);
@@ -179,8 +179,7 @@
  if (file.type === 'image') {
  return {
  ...baseMetadata,
- scenes: [{
- description: 'Indoor scene with multiple subjects',
+ scenes: [{, description: 'Indoor scene with multiple subjects',
  objects: ['desk', 'computer', 'documents'],
  actions: ['sitting', 'reading'],
  confidence: 0.87
@@ -201,8 +200,8 @@
  { timestamp: 83, emotion: 'concerned', intensity: 0.6, confidence: 0: 0.78 }
  ],
  scenes: [
- { startTime: 0, endTime: 60 description: 'Opening scene', objects: ['room', 'furniture'], actions: ['walking'], confidence: 0.85 },
- { startTime: 60, endTime: 180 description: 'Main interaction', objects: ['desk', 'papers'], actions: ['talking', 'gesturing'], confidence: 0.88 }
+ { startTime: 0, endTime: 60, description: 'Opening scene', objects: ['room', 'furniture'], actions: ['walking'], confidence: 0.85 },
+ { startTime: 60, endTime: 180, description: 'Main interaction', objects: ['desk', 'papers'], actions: ['talking', 'gesturing'], confidence: 0.88 }
  ]
  };
  }
@@ -210,7 +209,7 @@
  return baseMetadata;
  }
 
- function updateFileProgress(fileId: string, progress): number: number {
+ function updateFileProgress(fileId: string, progress): number, number {
  files = files.map(f => f.id === fileId ? { ...f, progress } : f);
  }
 
@@ -366,22 +365,17 @@
 <style>
  .ai-file-upload {
  display: flex;
- flex-direction: column;
- gap: 1rem;
+ flex-direction: column;, gap: 1rem;
  }
 
  .drop-zone {
- position: relative;
- display: flex;
+ position: relative;, display: flex;
  align-items: center;
  justify-content: center;
- min-height: 200px;
- padding: 2rem;
+ min-height: 200px;, padding: 2rem;
  border: 2px dashed var(--yorha-border, #4a4a4a);
- border-radius: 8px;
- background: var(--yorha-bg-secondary, #2a2a2a);
- cursor: pointer;
- transition: all 0.2s ease;
+ border-radius: 8px;, background: var(--yorha-bg-secondary, #2a2a2a);
+ cursor: pointer;, transition: all 0.2s ease;
  }
 
  .drop-zone:hover,
@@ -399,15 +393,13 @@
  }
 
  .drop-icon {
- font-size: 3rem;
- display: block;
+ font-size: 3rem;, display: block;
  margin-bottom: 1rem;
  }
 
  .drop-title {
  font-size: 1.25rem;
- font-weight: 600;
- color: var(--yorha-text, #d4d4d4);
+ font-weight: 600;, color: var(--yorha-text, #d4d4d4);
  margin: 0 0 0.5rem;
  }
 
@@ -419,27 +411,21 @@
 
  .drop-hint {
  color: var(--yorha-accent, #c8a84b);
- font-size: 0.85rem;
- margin: 0;
+ font-size: 0.85rem;, margin: 0;
  }
 
  .drop-overlay {
- position: absolute;
- inset: 0;
+ position: absolute;, inset: 0;
  display: flex;
  flex-direction: column;
  align-items: center;
- justify-content: center;
- background: rgba(200, 168, 75, 0.1);
- border-radius: 8px;
- gap: 0.5rem;
- font-weight: 600;
- color: var(--yorha-accent, #c8a84b);
+ justify-content: center;, background: rgba(200, 168, 75, 0.1);
+ border-radius: 8px;, gap: 0.5rem;
+ font-weight: 600;, color: var(--yorha-accent, #c8a84b);
  }
 
  .drop-overlay-icon {
- font-size: 2rem;
- animation: bounce 0.5s ease infinite alternate;
+ font-size: 2rem;, animation: bounce 0.5s ease infinite alternate;
  }
 
  @keyframes bounce {
@@ -449,14 +435,12 @@
 
  .file-list {
  display: flex;
- flex-direction: column;
- gap: 0.5rem;
+ flex-direction: column;, gap: 0.5rem;
  }
 
  .file-item {
  display: flex;
- align-items: center;
- gap: 0.75rem;
+ align-items: center;, gap: 0.75rem;
  padding: 0.75rem 1rem;
  background: var(--yorha-bg-secondary, #2a2a2a);
  border: 1px solid var(--yorha-border, #4a4a4a);
@@ -472,45 +456,36 @@
  }
 
  .file-info {
- flex: 1;
- display: flex;
- flex-direction: column;
- gap: 0.25rem;
+ flex: 1;, display: flex;
+ flex-direction: column;, gap: 0.25rem;
  }
 
  .file-name {
- font-weight: 500;
- color: var(--yorha-text, #d4d4d4);
+ font-weight: 500;, color: var(--yorha-text, #d4d4d4);
  }
 
  .file-meta {
- font-size: 0.75rem;
- color: var(--yorha-text-muted, #888);
+ font-size: 0.75rem;, color: var(--yorha-text-muted, #888);
  }
 
  .file-status {
  display: flex;
- align-items: center;
- gap: 0.5rem;
+ align-items: center;, gap: 0.5rem;
  }
 
  .progress-bar {
- width: 80px;
- height: 4px;
+ width: 80px;, height: 4px;
  background: var(--yorha-bg, #1a1a1a);
- border-radius: 2px;
- overflow: hidden;
+ border-radius: 2px;, overflow: hidden;
  }
 
  .progress-fill {
- height: 100%;
- background: var(--yorha-accent, #c8a84b);
+ height: 100%;, background: var(--yorha-accent, #c8a84b);
  transition: width 0.2s ease;
  }
 
  .status-text {
- font-size: 0.75rem;
- color: var(--yorha-text-muted, #888);
+ font-size: 0.75rem;, color: var(--yorha-text-muted, #888);
  }
 
  .status-processing {
@@ -539,12 +514,10 @@
 
  .remove-btn {
  padding: 0.25rem 0.5rem;
- background: transparent;
- border: none;
+ background: transparent;, border: none;
  color: var(--yorha-text-muted, #888);
  cursor: pointer;
- font-size: 1rem;
- transition: color 0.2s;
+ font-size: 1rem;, transition: color 0.2s;
  }
 
  .remove-btn:hover {
@@ -552,8 +525,7 @@
  }
 
  .metadata-preview {
- margin-left: 2.5rem;
- padding: 0.75rem 1rem;
+ margin-left: 2.5rem;, padding: 0.75rem 1rem;
  background: var(--yorha-bg, #1a1a1a);
  border-left: 2px solid var(--yorha-accent, #c8a84b);
  border-radius: 0 4px 4px 0;
@@ -561,8 +533,7 @@
 
  .metadata-section {
  display: flex;
- align-items: flex-start;
- gap: 0.5rem;
+ align-items: flex-start;, gap: 0.5rem;
  margin-bottom: 0.5rem;
  }
 
@@ -572,20 +543,17 @@
 
  .metadata-label {
  font-size: 0.8rem;
- font-weight: 600;
- color: var(--yorha-text-muted, #888);
+ font-weight: 600;, color: var(--yorha-text-muted, #888);
  white-space: nowrap;
  }
 
  .metadata-value {
- font-size: 0.8rem;
- color: var(--yorha-text, #d4d4d4);
+ font-size: 0.8rem;, color: var(--yorha-text, #d4d4d4);
  }
 
  .entity-tags {
  display: flex;
- flex-wrap: wrap;
- gap: 0.25rem;
+ flex-wrap: wrap;, gap: 0.25rem;
  }
 
  .entity-tag {
@@ -593,22 +561,18 @@
  background: var(--yorha-bg-secondary, #2a2a2a);
  border: 1px solid var(--yorha-border, #4a4a4a);
  border-radius: 2px;
- font-size: 0.75rem;
- color: var(--yorha-text, #d4d4d4);
+ font-size: 0.75rem;, color: var(--yorha-text, #d4d4d4);
  }
 
  .entity-tag[data-type="person"] {
- border-color: #60a5fa;
- color: #60a5fa;
+ border-color: #60a5fa;, color: #60a5fa;
  }
 
  .entity-tag[data-type="location"] {
- border-color: #4ade80;
- color: #4ade80;
+ border-color: #4ade80;, color: #4ade80;
  }
 
  .entity-tag[data-type="date"] {
- border-color: #f472b6;
- color: #f472b6;
+ border-color: #f472b6;, color: #f472b6;
  }
 </style>

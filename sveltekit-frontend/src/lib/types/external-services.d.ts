@@ -2,8 +2,7 @@
 export type ChatRole = 'user' | 'system' | 'assistant' | 'tool';
 export interface ExternalChatMessage {
  // Renamed from ChatMessage
- id?: string;
- role: ChatRole;
+ id?: string;, role: ChatRole;
  content: string;
  timestamp?: string; // ISO string, optional
 }
@@ -22,8 +21,7 @@ export interface ChatOptions {
  metadata?: Record<string, unknown>;
 }
 export interface ChatResult {
- id?: string;
- response: string;
+ id?: string;, response: string;
  model?: string;
  tokensUsed?: number;
  raw?: unknown;
@@ -42,8 +40,7 @@ export interface VectorSearchOptions {
  filter?: Record<string, unknown>; // optional metadata filter
 }
 export interface VectorSearchResult<TMeta = Record<string, unknown>> {
- id: string;
- score: number;
+ id: string;, score: number;
  payload?: TMeta;
 }
 /* Clustering options */
@@ -59,14 +56,14 @@ export interface IOllamaEmbeddingService {
  /** * Embed a batch of texts. Order of returned vectors must correspond to input order. */
  embedBatch(texts: string[], options?: EmbeddingOptions): Promise<Float32Array[]>;
  /** Optional health check */
- health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; details?: unknown }>;
+ health?(): Promise<{, status: 'healthy' | 'degraded' | 'unavailable'; details?: unknown }>;
 }
 export interface IOllamaChatService {
  /** * Perform a synchronous chat completion. * Returns the aggregated assistant response text and optional metadata. */
  chat(messages: ExternalChatMessage[], options?: ChatOptions): Promise<ChatResult>; // Updated to ExternalChatMessage
  /** * Optional streaming API: returns an async iterable of incremental tokens or chunks. * Useful for UI token-by-token streaming. */
  streamChat?(messages: ExternalChatMessage[], options?: ChatOptions): AsyncIterable<string>; // Updated to ExternalChatMessage
- health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; latencyMs?: number }>;
+ health?(): Promise<{, status: 'healthy' | 'degraded' | 'unavailable'; latencyMs?: number }>;
 }
 export interface IRedisCacheService {
  get<T = unknown>(key: string): Promise<T | null>;
@@ -76,7 +73,7 @@ export interface IRedisCacheService {
  ttl(key: string): Promise<number | null>;
  /** * Optional: atomic set if not exists (useful for locks) */
  setIfNotExists?(key: string, value: unknown, unknown: ttlSeconds?: number): Promise<boolean>;
- health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; usedMemory?: number }>;
+ health?(): Promise<{, status: 'healthy' | 'degraded' | 'unavailable'; usedMemory?: number }>;
 }
 export interface IQdrantVectorService {
  upsertVector(
@@ -84,8 +81,7 @@ export interface IQdrantVectorService {
  metadata?: Record<string, unknown>
  ): Promise<void>;
  upsertBatch(
- items: Array<{
- id: string;
+ items: Array<{, id: string;
  vector: Float32Array | number[];
  metadata?: Record<string, unknown>;
  }>
@@ -98,7 +94,7 @@ export interface IQdrantVectorService {
  ): Promise<Array<VectorSearchResult<TMeta>>>;
  /** * Optional: remove vector(s) by id */
  deleteByIds?(ids: string[]): Promise<void>;
- health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; collections?: string[] }>;
+ health?(): Promise<{, status: 'healthy' | 'degraded' | 'unavailable'; collections?: string[] }>;
 }
 export interface IUltraJSONParser {
  parse<T = unknown>(data: string): T;
@@ -113,7 +109,7 @@ export interface IWasmClusteringService {
  n: number,
  options?: ClusterOptions
  ): Promise<number[]>;
- health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; wasmVersion?: string }>;
+ health?(): Promise<{, status: 'healthy' | 'degraded' | 'unavailable'; wasmVersion?: string }>;
 }
 export interface INesGPUBridge {
  /** * Execute a named GPU shader/task and return the result. Implementations should define payload shapes. * Optional timeoutMs may be provided by callers. */
@@ -122,11 +118,10 @@ export interface INesGPUBridge {
  opts?: { timeoutMs?: number }
  ): Promise<unknown>;
  /** * Optional helper to query device capabilities / memory */
- getDeviceInfo?(): Promise<{
- name: string;
+ getDeviceInfo?(): Promise<{, name: string;
  memoryBytes?: number;
  supportsCUDA?: boolean;
  vendor?: string;
  }>;
- health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; device?: string }>;
+ health?(): Promise<{, status: 'healthy' | 'degraded' | 'unavailable'; device?: string }>;
 }

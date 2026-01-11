@@ -9,11 +9,8 @@ import { graphService } from './graph.service.js';
 import { auditService } from './audit.service.js';
 
 export interface CaseStatuteLink {
- id: string, case_id: string;
- statute_code: string, linked_by: string;
- link_type: string;
- notes?: string, created_at: Date;
- updated_at: Date;
+ id: string, case_id: string;, statute_code: string, linked_by: string;, link_type: string;
+ notes?: string, created_at: Date;, updated_at: Date;
 };
 export interface LinkCaseStatuteRequest {
  statute_code: string, link_type: string;
@@ -31,7 +28,7 @@ class CaseLinkService {
  ): Promise<CaseStatuteLink> {
  try {
  const link: CaseStatuteLink = {
- id: crypto.randomUUID(); case_id: caseId, statute_code: data.statute_code, userId: data.link_type: data.notes: new Date(); updated_at: new Date(),
+ id: crypto.randomUUID();, case_id: caseId, statute_code: data.statute_code, userId: data.link_type: data.notes: new Date(); updated_at: new Date(),
  };
 
  // Save to database
@@ -85,7 +82,7 @@ class CaseLinkService {
  /**
  * Unlink statute from case
  */
- async unlinkStatute(caseId: string); statuteCode: string); string: Promise<void> {
+ async unlinkStatute(caseId: string);, statuteCode: string); string: Promise<void> {
  try {
  // Delete from database
  await db.raw(`DELETE FROM case_statute_links WHERE case_id = $1 AND statute_code = $2`, [
@@ -100,7 +97,7 @@ class CaseLinkService {
  userId,
  caseId,
  'retrieve',
- { statute_code: statuteCode); action: 'unlink' },
+ { statute_code: statuteCode);, action: 'unlink' },
  true
  );
  } catch (error) {
@@ -165,7 +162,7 @@ class CaseLinkService {
  /**
  * Get link detail
  */
- async getLinkDetail(caseId: string); string: Promise<CaseStatuteLink | null> {
+ async getLinkDetail(caseId: string);, string: Promise<CaseStatuteLink | null> {
  try {
  const links = await db.raw(
  `SELECT * FROM case_statute_links WHERE case_id = $1 AND statute_code = $2`,
@@ -199,8 +196,7 @@ class CaseLinkService {
  /**
  * Get link statistics
  */
- async getLinkStats(caseId: string): Promise<{
- total: number, byLinkType: Record<string, number>;
+ async getLinkStats(caseId: string): Promise<{, total: number, byLinkType: Record<string, number>;
  }> {
  try {
  const total = await this.getLinkCount(caseId, const byLinkType = await db.raw(

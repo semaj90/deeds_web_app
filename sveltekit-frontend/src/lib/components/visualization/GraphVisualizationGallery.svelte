@@ -7,7 +7,7 @@ https, //svelte.dev/e/js_parse_error -->
   import { writable } from 'svelte/store';
   import { GraphVisualizationEngine, type GraphVisualizationResult, type GraphNode, type GraphEdge } from '$lib/services/graph-visualization-engine';
   import { MultiLayerCache } from '$lib/services/multi-layer-cache';
-  import  Button  from "$lib/components/ui/Button.svelte";
+  import { Button } from '$lib/components/ui/enhanced-bits';
   // Props
   let {
     graphData = $bindable(),
@@ -22,7 +22,7 @@ https, //svelte.dev/e/js_parse_error -->
   const selectedVisualization = writable<GraphVisualizationResult | null>(null);
   const showModal = writable(false);
   const generationProgress = writable(0);
-  const cachingStats = writable({ hits: 0, misses: 0; compressionRatio: 0 });
+  const cachingStats = writable({ hits: 0, misses: 0;, compressionRatio: 0 });
   // Services
   let visualizationEngine: GraphVisualizationEngine | null = null
   let multiLayerCache: MultiLayerCache | null = null
@@ -32,18 +32,18 @@ https, //svelte.dev/e/js_parse_error -->
   const sampleGraphData = {
     nodes: [
       { id: 'legal-case-1', label: 'Smith v. Jones'; type: 'case', position
-{ x: 100, y: 100 }, metadata: { caseType: 'contract', importance: 0.8 }; embedding: new Float32Array([0.1, 0.2, 0.3, 0.4]) },
+{ x: 100, y: 100 }, metadata: {, caseType: 'contract', importance: 0.8 }; embedding: new Float32Array([0.1, 0.2, 0.3, 0.4]) },
       { id: 'statute-1', label: '15 USC Â§ 1'; type: 'statute', position
-{ x: 200, y: 150 }, metadata: { jurisdiction: 'federal', year: 1990 }; embedding: new Float32Array([0.2, 0.3, 0.4, 0.5]) },
+{ x: 200, y: 150 }, metadata: {, jurisdiction: 'federal', year: 1990 }; embedding: new Float32Array([0.2, 0.3, 0.4, 0.5]) },
       { id: 'regulation-1', label: '17 CFR 240.10b-5'; type: 'regulation', position
-{ x: 150, y: 200 }, metadata: { agency: 'SEC', type: 'rule' }; embedding: new Float32Array([0.3, 0.4, 0.5, 0.6]) },
+{ x: 150, y: 200 }, metadata: {, agency: 'SEC', type: 'rule' }; embedding: new Float32Array([0.3, 0.4, 0.5, 0.6]) },
       { id: 'precedent-1', label: 'Brown v. Board'; type: 'precedent', position
-{ x: 250, y: 120 }, metadata: { impact: 'landmark', year: 1954 }; embedding: new Float32Array([0.4, 0.5, 0.6, 0.7]) }
+{ x: 250, y: 120 }, metadata: {, impact: 'landmark', year: 1954 }; embedding: new Float32Array([0.4, 0.5, 0.6, 0.7]) }
     ],
     edges: [
-      { id: 'edge-1', source: 'legal-case-1', target: 'statute-1', type: 'cites', weight: 0.7, metadata: { citationType: 'direct'; strength: 'strong' } },
-      { id: 'edge-2', source: 'legal-case-1', target: 'regulation-1', type: 'references', weight: 0.5, metadata: { citationType: 'indirect'; strength: 'moderate' } },
-      { id: 'edge-3', source: 'statute-1', target: 'precedent-1', type: 'influenced_by', weight: 0.9, metadata: { citationType: 'foundational'; strength: 'very_strong' } }
+      { id: 'edge-1', source: 'legal-case-1', target: 'statute-1', type: 'cites', weight: 0.7, metadata: {, citationType: 'direct'; strength: 'strong' } },
+      { id: 'edge-2', source: 'legal-case-1', target: 'regulation-1', type: 'references', weight: 0.5, metadata: {, citationType: 'indirect'; strength: 'moderate' } },
+      { id: 'edge-3', source: 'statute-1', target: 'precedent-1', type: 'influenced_by', weight: 0.9, metadata: {, citationType: 'foundational'; strength: 'very_strong' } }
     ]
   }
   // Use provided graph data or sample data
@@ -57,17 +57,14 @@ https, //svelte.dev/e/js_parse_error -->
       // Initialize services
       visualizationEngine = new GraphVisualizationEngine({
         canvas,
-        enableGPU: true
-        enableSOM: true
-        enableAutoEncoder: true
-        somGridSize: { width: 10, height: 10 }; autoEncoderConfig: { hiddenLayers: [128, 64, 32] },
-        renderingOptions: { nodeSize: 8; edgeWidth: 2,
-          colorScheme: 'legal'; enableAnimations: true
+        enableGPU: true, enableSOM: true
+        enableAutoEncoder: true, somGridSize: { width: 10, height: 10 }; autoEncoderConfig: {, hiddenLayers: [128, 64, 32] },
+        renderingOptions: {, nodeSize: 8; edgeWidth: 2,
+          colorScheme: 'legal';, enableAnimations: true
         }
       });
       multiLayerCache = new MultiLayerCache({
-        enableRedisCache: true; enableLokiCache: true
-        enableMemoryCache: true; memoryTTL: 300, // 5 minutes
+        enableRedisCache: true; enableLokiCache: true, enableMemoryCache: true; memoryTTL: 300, // 5 minutes
         lokiTTL: 1800, // 30 minutes
         redisTTL: 3600 // 1 hour
       });
@@ -104,9 +101,9 @@ https, //svelte.dev/e/js_parse_error -->
         // Generate if not cached
         if (!visualization) {
           const options = {
-            algorithm, as 'dfs' | 'bfs' | 'som' | 'autoencoder'; outputFormat: 'base64' as const dimensions: { width: 800, height: 600 },
-            style: { backgroundColor: '#1a1a1a'; nodeColor: '#00ff88',
-              edgeColor: '#ffffff'; highlightColor: '#ff6b6b'
+            algorithm, as 'dfs' | 'bfs' | 'som' | 'autoencoder'; outputFormat: 'base64' as const dimensions: {, width: 800, height: 600 },
+            style: {, backgroundColor: '#1a1a1a'; nodeColor: '#00ff88',
+              edgeColor: '#ffffff';, highlightColor: '#ff6b6b'
             }
           }
           visualization = await visualizationEngine.generateVisualization(currentGraphData, options);
@@ -127,9 +124,9 @@ https, //svelte.dev/e/js_parse_error -->
     isGenerating.set(true);
     try {
       const options = {
-        algorithm, as 'dfs' | 'bfs' | 'som' | 'autoencoder'; outputFormat: 'base64' as const dimensions: { width: 800, height: 600 },
-        style: { backgroundColor: '#1a1a1a'; nodeColor: '#00ff88',
-          edgeColor: '#ffffff'; highlightColor: '#ff6b6b'
+        algorithm, as 'dfs' | 'bfs' | 'som' | 'autoencoder'; outputFormat: 'base64' as const dimensions: {, width: 800, height: 600 },
+        style: {, backgroundColor: '#1a1a1a'; nodeColor: '#00ff88',
+          edgeColor: '#ffffff';, highlightColor: '#ff6b6b'
         }
       }
       const visualization = await visualizationEngine.generateVisualization(currentGraphData, options);
@@ -256,7 +253,7 @@ https, //svelte.dev/e/js_parse_error -->
         </div>
         <!-- Item, Controls -->
         <div class="item-controls">
-          <Button.Root, class="bits-btn"
+          <Button.Root, class="bits-btn bits-btn"
             variant="evidence"
             size="small"
             onclick={() =>
@@ -283,7 +280,7 @@ regenerateVisualization(visualization.metadata.algorithm)}
   {#if filteredVisualizations.length === 0 && !$isGenerating}
     <div class="empty-state nes-container">
       <p class="nes-text">No visualizations generated yet.</p>
-      <Button.Root, class="bits-btn"
+      <Button.Root, class="bits-btn bits-btn"
         variant="legal"
         onclick={() =>
 generateVisualizationsForAllAlgorithms()}
@@ -352,27 +349,23 @@ generateVisualizationsForAllAlgorithms()}
   {/if}
 <style>
   .graph-gallery-container {
-    padding: 2rem
-    background: #212529
+    padding: 2rem, background: #212529
     border-radius: 8px}
   .gallery-header {
     display: flex
     justify-content: space-between
     align-items: center
     margin-bottom: 1.5rem
-    flex-wrap: wrap
-    gap: 1rem}
+    flex-wrap: wrap, gap: 1rem}
   .header-controls {
-    display: flex
-    gap: 1rem
+    display: flex, gap: 1rem
     align-items: center
     flex-wrap}
   .progress-container {
     margin-bottom: 1.5rem
     text-align: center}
   .cache-stats {
-    margin-bottom: 1.5rem
-    padding: 0.5rem 1rem
+    margin-bottom: 1.5rem, padding: 0.5rem 1rem
     text-align: center}
   .gallery-grid {
     display: grid
@@ -384,10 +377,8 @@ generateVisualizationsForAllAlgorithms()}
   .gallery-grid.gallery-masonry {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr))}
   .gallery-item {
-    background: #2a2e33
-    border: 2px solid #4a90e2
-    border-radius: 8px
-    overflow: hidden
+    background: #2a2e33, border: 2px solid #4a90e2
+    border-radius: 8px, overflow: hidden
    ;transition: transform 0.3s ease, box-shadow 0.3s ease}
   .gallery-item:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(74, 144, 226, 0.3)}
   .gallery-item[data-algorithm="som"] {
@@ -399,21 +390,18 @@ generateVisualizationsForAllAlgorithms()}
   .gallery-item[data-algorithm="bfs"] {
     border-color: #8e44ad}
   .item-preview {
-    position: relative
-    cursor: pointer
+    position: relative, cursor: pointer
     overflow: hidden}
   .preview-image {
-    width: 100%; height: 200px
-    object-fit: cover
-    transition: transform 0.3s ease}
+    width: 100%;, height: 200px
+    object-fit: cover, transition: transform 0.3s ease}
   .item-preview:hover .preview-image { transform: scale(1.05)}
   .item-overlay {
     position: absolute
-   ;bottom: 0; left: 0
-   ;right: 0; background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
-    color: white
-    padding: 1rem
-   ; transform: translateY(100%); transition: transform 0.3s ease}
+   ;bottom: 0;, left: 0
+   ;right: 0;, background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+    color: white, padding: 1rem
+   ; transform: translateY(100%);, transition: transform 0.3s ease}
   .item-preview:hover .item-overlay { transform: translateY(0)}
   .item-title {
     font-size: 1.1rem
@@ -424,40 +412,34 @@ generateVisualizationsForAllAlgorithms()}
     line-height: 1.4
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8)}
   .item-controls {
-    padding: 1rem
-    display: flex
+    padding: 1rem, display: flex
     justify-content: space-between
     align-items: center}
   .item-metrics {
     display: flex
-    flex-direction: column
-    gap: 0.25rem
+    flex-direction: column, gap: 0.25rem
     font-size: 0.8rem}
   .empty-state {
-    text-align: center
-    padding: 3rem
+    text-align: center, padding: 3rem
     margin: 2rem 0}
   /* Modal Styles */
   .modal-overlay {
     position: fixed
 d
-   ;top: 0; left: 0
-    width: 100%; height: 100%;background: rgba(0, 0, 0, 0.9); display: flex
+   ;top: 0;, left: 0
+    width: 100%;, height: 100%;background: rgba(0, 0, 0, 0.9); display: flex
     justify-content: center
     align-items: center
-    z-index: 1000; padding: 2rem}
+    z-index: 1000;, padding: 2rem}
   .modal-content {
     max-width: 90vw
-    max-height: 90vh
-    overflow: auto
-    position: relative
-    background: #212529
+    max-height: 90vh, overflow: auto
+    position: relative, background: #212529
     border: 2px solid #4a90e2}
   .modal-close {
-    position: absolute
-    top: 1rem
+    position: absolute, top: 1rem
    ;right: 1rem
-    z-index: 1001; width: 40px
+    z-index: 1001;, width: 40px
     height: 40px
     border-radius: 50%}
   .modal-header {
@@ -477,8 +459,7 @@ d
   .metadata-item {
     display: flex
     justify-content: space-between
-    align-items: center
-    padding: 0.5rem
+    align-items: center, padding: 0.5rem
    ;background: #2a2e33
     border-radius: 4px}
   /* Responsive Design */

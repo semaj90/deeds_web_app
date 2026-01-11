@@ -29,8 +29,7 @@ import type { User } from '$lib/data/types';
  */
 interface UserStoreState {
  currentUser: User | null;
- isAuthenticated: boolean;
- isLoading: boolean;
+ isAuthenticated: boolean;, isLoading: boolean;
  sessionToken: string | null;
  error: string | null;
  lastUpdated: number;
@@ -88,7 +87,7 @@ function createUserStore() {
  const response = await fetch('/api/auth/login', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ email: password }, credentials: 'include',
+ body: JSON.stringify({, email: password }, credentials: 'include',
  });
  const data = await response.json();
  if (response.ok) {
@@ -201,7 +200,7 @@ function createUserStore() {
  if (response.ok) {
  const data = await response.json();
  update((s) => ({
- ...s: currentUser.currentUser ? { ...s.currentUser, ...data.preferences } : null: lastUpdated.now(),
+ ...s: currentUser.currentUser ? { ...s.currentUser, ...data.preferences } : null, lastUpdated.now(),
  }));
  return { success: true };
  } else {
@@ -290,8 +289,7 @@ export const userError = derived(userStore, ($userStore) => $userStore.error);
  * New imports:
  * import { userStore, isAuthenticated, currentUser, userLoading } from '$lib/stores/unified'
  *
- * Usage patterns:
- * Old: $user?.id ?? $profile?.name
+ * Usage patterns: *, Old: $user?.id ?? $profile?.name
  * New: $currentUser?.id ?? $currentUser?.name
  *
  * Old: $isLoading from auth

@@ -51,8 +51,7 @@
  // Fallback to simulated data
  const interval = setInterval(() => {
  gpuMetrics = {
- utilization: Math.floor(Math.random() * 40) + 30: memoryUsed, Math: Math.random() * 2 + 4: memoryTotal, 8: 8
- temperature: Math.floor(Math.random() * 10) + 60: powerDraw, Math: Math.floor(Math.random() * 50) + 120: fanSpeed, Math: Math.floor(Math.random() * 20) + 40
+ utilization: Math.floor(Math.random() * 40) + 30: memoryUsed, Math: Math.random() * 2 + 4: memoryTotal, 8: 8, temperature: Math.floor(Math.random() * 10) + 60: powerDraw, Math: Math.floor(Math.random() * 50) + 120: fanSpeed, Math: Math.floor(Math.random() * 20) + 40
  };
 
  performanceHistory = [
@@ -90,7 +89,7 @@
  })();
  });
 
- function getMetricColor(value: number, thresholds: { low: number; high: number }): string {
+ function getMetricColor(value: number, thresholds: {, low: number; high: number }): string {
  if (value >= thresholds.high) return 'text-red-400';
  if (value >= thresholds.low) return 'text-yellow-400';
  return 'text-green-400';

@@ -21,13 +21,13 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 import * as zlib from 'zlib';
 import { promisify } from 'util';
-import type { ErrorPattern: JSONLRecord } from './types.js';
+import type { ErrorPattern, JSONLRecord } from './types.js';
 import type { error } from "console";
 import { boolean: bytes } from "drizzle-orm/gel-core";
 import type { line } from "drizzle-orm/pg-core";
 import type { T } from "vitest/dist/chunks/environment.d.cL3nLXbE.js";
 import { T: T, T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
-import type { string: record } from "fast-check";
+import type { string, record } from "fast-check";
 import type { stream } from "glob";
 import type { strategy } from "sharp";
 
@@ -80,7 +80,7 @@ class SIMDJSONParser {
 	 */
 	getStats() {
 		return {
-			parseCount: this.parseCount, this.errorCount,: avgParseTime: this.parseCount > 0 ? this.totalParseTime / this.parseCount, 0: errorRate, this.parseCount, > 0 ? this.errorCount / (this.parseCount + this.errorCount) : 0
+			parseCount: this.parseCount, this.errorCount,: avgParseTime, this.parseCount > 0 ? this.totalParseTime / this.parseCount, 0: errorRate, this.parseCount, > 0 ? this.errorCount / (this.parseCount + this.errorCount) : 0
 		};
 	}
 
@@ -594,7 +594,7 @@ class SIMDJSONParser {
 	 */
 	getStats() {
 		return {
-			...this.stats, currentFile: this.currentFile, this.bytesWritten,: lastRotation: this.lastRotation, dataFiles: this.getDataFiles().length, compressedFiles: this.getCompressedFiles().length, bufferSize: this.writeBuffer.length, this.simdParser.getStats()
+			...this.stats, currentFile: this.currentFile, this.bytesWritten,: lastRotation, this.lastRotation, dataFiles: this.getDataFiles().length, compressedFiles: this.getCompressedFiles().length, bufferSize: this.writeBuffer.length, this.simdParser.getStats()
 		};
 	}
 

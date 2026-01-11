@@ -7,18 +7,23 @@
  * Phase: Agentic RAG Source Validation (Task 1.3)
  */
 
-import {
-  type KBSearchResult,
-  type SourceValidatorProps
-} from '$lib/types/source-validation';
+import type {
+  ConfidenceLevel,
+  RetrievedChunk
+} from '$lib/types/rag-source-validation';
 
-// Type for confidence levels
-type ConfidenceLevel = 'high' | 'medium' | 'low' | 'marginal';
+interface SourceValidatorProps {
+  chunks: RetrievedChunk[];, caseId: string;
+  initialQuery?: string;
+  query?: string;
+  isLoading?: boolean;
+  onValidate?: (selectedIds: string[]) => void;
+  onCancel?: () => void;
+}
 
 // Svelte 5 props
 let {
 	caseId,
-	onValidationComplete,
 	initialQuery = '',
 	chunks = [],
 	query = '',
@@ -82,7 +87,7 @@ function handleValidate() {
 }
 
 // Confidence badge styling
-function getConfidenceBadge(confidence: ConfidenceLevel): { class: string; label: string } {
+function getConfidenceBadge(confidence: ConfidenceLevel): {, class: string; label: string } {
   switch (confidence) {
     case 'high':
       return { class: 'badge-success', label: 'High' };
@@ -150,7 +155,7 @@ function truncate(text: string, maxLength: number = 200): string {
       {@const badge = getConfidenceBadge(chunk.confidence)}
 
       <div
-        class="chunk-card p-3 rounded-lg border transition-all cursor-pointer {isSelected ? 'border-primary bg-primary-5' : 'border-base-300 hover:border-primary-50'}"
+        class="chunk-card p-3 rounded-lg border transition-all cursor-pointer {isSelected ? 'border-primary bg-primary-5' : 'border-base-300, hover:border-primary-50'}"
         onclick={() => toggleChunk(chunk.chunk_id)}
         role="button"
         tabindex="0"

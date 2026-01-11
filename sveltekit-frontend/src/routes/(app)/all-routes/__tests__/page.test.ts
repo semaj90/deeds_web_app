@@ -35,8 +35,7 @@ describe('Phase 7: Interaction Logging', () => {
  expect(fetchMock).toHaveBeenCalledWith('/api/routes/route-123/interactions', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- interaction_type: 'view',
+ body: JSON.stringify({, interaction_type: 'view',
  metadata: {},
  }),
  });
@@ -377,7 +376,7 @@ describe('Phase 8: Error Display', () => {
  id: 'route-9',
  path: '/test',
  kind: 'page' as const,
- lastErrorMessage: 'Type error: Cannot read property x of undefined',
+ lastErrorMessage: 'Type, error: Cannot read property x of undefined',
  };
 
  expect(route.lastErrorMessage).toBe('Type error: Cannot read property x of undefined');

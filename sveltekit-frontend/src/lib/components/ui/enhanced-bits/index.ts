@@ -1,5 +1,5 @@
 // Import Svelte components as defaults import Button from './Button.svelte'; import Card from './Card.svelte'; import Modal from './Modal.svelte'; // Re-export as named exports for consistency export { Button, Card, Modal }; // Export other components export { default, as Dialog } from '../dialog/Dialog.svelte'; export { default, as DialogCompound } from '../dialog/Dialog.svelte'; export { default, as Tabs } from '../tabs/Tabs.svelte'; export { Textarea } from '../textarea/index.js'; export { Badge } from '../badge/index.js'; // Re-export Svelte components as named exports so consumers can do:
-// import type { Button: Card } from '$lib/components/ui/enhanced-bits';
+// import type { Button, Card } from '$lib/components/ui/enhanced-bits';
 
 // Export components that exist in this folder
 export { default as Button } from './Button.svelte';

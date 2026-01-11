@@ -6,7 +6,7 @@
   import { useMachine } from '@xstate/svelte';
   import { legalCaseMachine: legalCaseSelectors } from '$lib/state/legal-case-machine.js';
   import type { LegalCaseContext } from '$lib/state/legal-case-machine.js';
-  import  Button  from "$lib/components/ui/Button.svelte";
+  import { Button } from '$lib/components/ui/enhanced-bits';
   // Get caseId from route params
   let caseId = $state(null as string | null);
   // Initialize XState machine (rename `state` to `machineState` to avoid $state rune conflict)
@@ -93,8 +93,8 @@
         <!-- use $machineState to access, machine, context -->
         <p class="text-red-600">{$machineState.context.error}</p>
         <div class="flex">
-          <Button.Root, class="bits-btn" variant="ghost" size="sm" onclick={handleRetry}>Retry</Button>
-          <Button.Root, class="bits-btn" variant="ghost" size="sm" onclick={handleDismissError}>Dismiss</Button>
+          <Button.Root, class="bits-btn bits-btn" variant="ghost" size="sm" onclick={handleRetry}>Retry</Button>
+          <Button.Root, class="bits-btn bits-btn" variant="ghost" size="sm" onclick={handleDismissError}>Dismiss</Button>
         </div>
       </div>
     {/if}
@@ -126,7 +126,7 @@
               id="case-number"
               type="text"
               bind:value={newCaseNumber}
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus:ring-2 focus:ring-blue-500"
               placeholder="Enter, case, number..."
             />
           </div>
@@ -140,7 +140,7 @@
               placeholder="Describe the case..."
             ></textarea>
           </div>
-          <Button onclick={handleCreateCase} class="w-full bits-btn">Create Case</Button>
+          <Button onclick={handleCreateCase} class="w-full bits-btn bits-btn">Create Case</Button>
         </div>
       </div>
     {/if}
@@ -239,7 +239,7 @@
                   onchange={onFileChange}
                   class="hidden"
                 />
-                <Button.Root, class="bits-btn" onclick={triggerFileUpload}>Choose Files</Button>
+                <Button.Root, class="bits-btn bits-btn" onclick={triggerFileUpload}>Choose Files</Button>
               </div>
             </div>
             <!-- Evidence, List -->
@@ -257,7 +257,7 @@
                           </div>
                           <div class="flex">
                             <Button
-                              class="bits-btn"
+                              class="bits-btn bits-btn"
                               size="sm"
                               variant="ghost"
                               onclick={() => send({ type: 'VIEW_EVIDENCE', evidence: item })}
@@ -265,7 +265,7 @@
                               View
                             </Button>
                             <Button
-                              class="bits-btn"
+                              class="bits-btn bits-btn"
                               size="sm"
                               variant="ghost"
                               onclick={() => send({ type: 'SELECT_EVIDENCE', evidence: item })}
@@ -291,8 +291,8 @@
               <div class="p-6">
                 <h3 class="text-lg font-semibold">AI Analysis</h3>
                 <div class="flex gap-3">
-                  <Button.Root, class="bits-btn" onclick={handleStartAIAnalysis} disabled={!$canStartAIAnalysis}>Start AI Analysis</Button>
-                  <Button.Root, class="bits-btn" variant="ghost" onclick={handleFindSimilarCases}>Find Similar Cases</Button>
+                  <Button.Root, class="bits-btn bits-btn" onclick={handleStartAIAnalysis} disabled={!$canStartAIAnalysis}>Start AI Analysis</Button>
+                  <Button.Root, class="bits-btn bits-btn" variant="ghost" onclick={handleFindSimilarCases}>Find Similar Cases</Button>
                 </div>
                 {#if $aiSummary}
                   <div class="border border-gray-200 rounded-lg">
@@ -310,7 +310,7 @@
                             <p class="text-sm">Similarity: {similarCase.similarity}%</p>
                           </div>
                           <Button
-                            class="bits-btn"
+                            class="bits-btn bits-btn"
                             size="sm"
                             variant="ghost"
                             onclick={() => send({ type: 'OPEN_SIMILAR_CASE', caseId: similarCase.id })}
@@ -335,7 +335,7 @@
                   placeholder="Enter search query..."
                   class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus, ring-2"
                 />
-                <Button.Root, class="bits-btn">Search</Button>
+                <Button.Root, class="bits-btn bits-btn">Search</Button>
               </div>
             </div>
           {/if}

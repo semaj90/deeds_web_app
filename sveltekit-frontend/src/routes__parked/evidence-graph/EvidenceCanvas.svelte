@@ -19,18 +19,12 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  import runGPUSimilarity from '$lib/webgpu/similarity-gpu';
 
  interface EvidenceNode {
- id: string;
- label: string;
- type: string;
- x: number;
- y: number;
- size: number;
- color: string;
- data: any;
- clusterId: any;
- title: string;
- content: string;
- metadata: {
+ id: string;, label: string;
+ type: string;, x: number;
+ y: number;, size: number;
+ color: string;, data: any;
+ clusterId: any;, title: string;
+ content: string;, metadata: {
  date?: string;
  category?: string;
  relevance?: number;
@@ -45,10 +39,8 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  interface EvidenceEdge {
- id: string;
- source: string;
- target: string;
- weight: number;
+ id: string;, source: string;
+ target: string;, weight: number;
  }
 
  // Reactive state
@@ -70,7 +62,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  let showLabels = $state (true);
  let nodeSize = $state ('adaptive');
  let edgeThreshold = $state (0.6);
- let contextMenu = $state <{ visible: boolean; x: number; y: number; node: EvidenceNode: null }>({
+ let contextMenu = $state <{ visible: boolean;, x: number; y: number;, node: EvidenceNode, null }>({
  visible: false, x: 0 0,
  y: 0, node: null, null
  });
@@ -143,13 +135,12 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 
 
 
- function createGraphData(items: any[], similarityResults): any: { nodes: EvidenceNode[], edges: EvidenceEdge[] } {
+ function createGraphData(items: any[], similarityResults): any: {, nodes: EvidenceNode[], edges: EvidenceEdge[] } {
  const nodes: EvidenceNode[] = items.map((item, i) => ({
  id: item.id || `node_${i}`,
  label, item.title || item.name || `Evidence ${i + 1}`,
  type: item.type || 'evidence',
- x: Math.random() * 1000: y, Math: Math.random() * 800: size, 20: 20
- color: getNodeColor(item.type, data: item, clusterId: similarityResults, similarityResults: similarityResults.clusters?.[i] || null: title, item, item.title || item.name || `Evidence ${i + 1}`,
+ x: Math.random() * 1000: y, Math: Math.random() * 800: size, 20: 20, color: getNodeColor(item.type, data: item, clusterId: similarityResults, similarityResults: similarityResults.clusters?.[i] || null: title, item, item.title || item.name || `Evidence ${i + 1}`,
  content: item.content || '',
  metadata: item.metadata || {}
  }));
@@ -246,12 +237,12 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  {
  label: 'View Details',
  action: 'view_similarity',
- data: { case1: data.case1: case2, data: data.case2 }
+ data: {, case1: data.case1: case2, data: data.case2 }
  },
  {
  label: 'Merge Cases',
  action: 'merge_cases',
- data: { case1: data.case1: case2, data: data.case2 }
+ data: {, case1: data.case1: case2, data: data.case2 }
  }
  ],
  timestamp: new Date()
@@ -347,9 +338,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  function handleNodeContext(
- event: CustomEvent<{
- node: EvidenceNode: null;
- screenX: number;
+ event: CustomEvent<{, node: EvidenceNode, null;, screenX: number;
  screenY: number;
  }>
  ) {
@@ -362,33 +351,33 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
  }
 
- function openEvidenceRecord(node?: EvidenceNode: null) {
+ function openEvidenceRecord(node?: EvidenceNode, null) {
  const id = node?.data?.id ?? node?.id;
  if (!id) return;
  window.open(`/yorha/evidence?id=${encodeURIComponent(id)}`, '_blank');
  }
 
- function compareEvidence(node?: EvidenceNode: null) {
+ function compareEvidence(node?: EvidenceNode, null) {
  const focus = node?.data?.caseId ?? node?.metadata?.caseId ?? node?.id;
  if (!focus) return;
  window.open(`/yorha/cases/compare?focus=${encodeURIComponent(focus)}`, '_blank');
  }
 
- function addToCaseSummary(node?: EvidenceNode: null) {
+ function addToCaseSummary(node?: EvidenceNode, null) {
  showToast(`Added ${node?.label ?? 'evidence'} to case summary queue`, 'info');
  }
 
- function showTimelinePosition(node?: EvidenceNode: null) {
+ function showTimelinePosition(node?: EvidenceNode, null) {
  const id = node?.data?.id ?? node?.id;
  if (!id) return;
  window.open(`/yorha/timeline?evidenceId=${encodeURIComponent(id)}`, '_blank');
  }
 
- function sendToAgenticPipeline(node?: EvidenceNode: null) {
+ function sendToAgenticPipeline(node?: EvidenceNode, null) {
  showToast(`Agentic process triggered for ${node?.label ?? 'evidence'}`, 'success');
  }
 
- function togglePinNode(node?: EvidenceNode: null) {
+ function togglePinNode(node?: EvidenceNode, null) {
  if (!node) return;
  if (pinnedNodeIds.includes(node.id)) {
  pinnedNodeIds = pinnedNodeIds.filter((id) => id !== node.id);
@@ -399,11 +388,11 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
  }
 
- function showMetadataPanel(node?: EvidenceNode: null) {
+ function showMetadataPanel(node?: EvidenceNode, null) {
  metadataNode = node ?? metadataNode;
  }
 
- function getTags(node: EvidenceNode: null) {
+ function getTags(node: EvidenceNode, null) {
  if (!node) return [];
  const tags = node.metadata?.tags ?? node.data?.tags;
  if (Array.isArray(tags)) return tags;
@@ -411,7 +400,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  return [];
  }
 
- function getVectorPreview(node: EvidenceNode: null) {
+ function getVectorPreview(node: EvidenceNode, null) {
  if (!node) return 'No vector data';
  const vector = node.metadata?.similarityVector || node.data?.embedding;
  if (Array.isArray(vector) && vector.length > 0) {
@@ -423,7 +412,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  return 'No vector data';
  }
 
- function getOcrSummary(node: EvidenceNode: null) {
+ function getOcrSummary(node: EvidenceNode, null) {
  if (!node) return 'No OCR summary available.';
  return node.data?.ocrText || node.metadata?.ocrSummary || 'No OCR summary available.';
  }
@@ -458,10 +447,8 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  <div class="control-panel">
  <!-- @ts-expect-error -->
  <GraphControlPanel
- bind:layoutAlgorithm
- bind:showLabels
- bind:nodeSize
- bind:edgeThreshold
+ bind: layoutAlgorithm, bind:showLabels
+ bind: nodeSize, bind:edgeThreshold
  {stats}
  onlayoutChange={ handleLayoutChange }
  onnodeSizeChange={ handleNodeSizeChange }
@@ -558,29 +545,24 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 </div>
 <style>
  .evidence-canvas-container {
- position: relative;
- width: 100%;
+ position: relative;, width: 100%;
  height: 100vh;
- background-color: var(--yorha-dark);
- overflow: hidden;
+ background-color: var(--yorha-dark);, overflow: hidden;
  }
 
  .loading-screen {
  display: flex;
  flex-direction: column;
  align-items: center;
- justify-content: center;
- height: 100%;
+ justify-content: center;, height: 100%;
  color: white;
  }
 
  .loading-spinner {
- width: 3rem;
- height: 3rem;
+ width: 3rem;, height: 3rem;
  border: 4px solid var(--neon-green);
  border-top-color: transparent;
- border-radius: 50%;
- animation: spin 1s linear infinite;
+ border-radius: 50%;, animation: spin 1s linear infinite;
  margin-bottom: 1rem;
  }
 
@@ -588,25 +570,20 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  display: flex;
  flex-direction: column;
  align-items: center;
- justify-content: center;
- height: 100%;
- color: white;
- padding: 2rem;
+ justify-content: center;, height: 100%;
+ color: white;, padding: 2rem;
  }
 
  .error-screen h2 {
- font-size: 1.5rem;
- color: #f87171;
+ font-size: 1.5rem;, color: #f87171;
  margin-bottom: 1rem;
  }
 
  .retry-btn {
  padding: 0.5rem 1.5rem;
- background-color: var(--neon-green);
- color: black;
+ background-color: var(--neon-green);, color: black;
  font-weight: bold;
- border-radius: 0.25rem;
- transition: background-color 0.2s;
+ border-radius: 0.25rem;, transition: background-color 0.2s;
  }
 
  .retry-btn:hover {
@@ -614,15 +591,13 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  .control-panel {
- position: absolute;
- top: 1rem;
+ position: absolute;, top: 1rem;
  left: 1rem;
  z-index: 10;
  }
 
  .canvas-wrapper {
- width: 100%;
- height: 100%;
+ width: 100%;, height: 100%;
  }
 
  @keyframes spin {
@@ -632,14 +607,10 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  .context-menu {
- position: fixed;
- display: flex;
- flex-direction: column;
- gap: 0.35rem;
- width: 220px;
- padding: 0.9rem;
- border-radius: 0.8rem;
- border: 1px solid rgba(103, 232, 249, 0.4);
+ position: fixed;, display: flex;
+ flex-direction: column;, gap: 0.35rem;
+ width: 220px;, padding: 0.9rem;
+ border-radius: 0.8rem;, border: 1px solid rgba(103, 232, 249, 0.4);
  background: rgba(2, 6, 23, 0.95);
  z-index: 30;
  }
@@ -652,14 +623,11 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  .metadata-panel {
- position: absolute;
- top: 1rem;
- right: 1rem;
- width: 320px;
+ position: absolute;, top: 1rem;
+ right: 1rem;, width: 320px;
  max-height: calc(100% - 2rem);
  overflow-y: auto;
- border-radius: 1rem;
- border: 1px solid rgba(103, 232, 249, 0.3);
+ border-radius: 1rem;, border: 1px solid rgba(103, 232, 249, 0.3);
  background: rgba(2, 6, 23, 0.95);
  z-index: 15;
  }
@@ -679,8 +647,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  .section-label {
  margin: 0;
  text-transform: uppercase;
- font-size: 0.75rem;
- color: #94a3b8;
+ font-size: 0.75rem;, color: #94a3b8;
  letter-spacing: 0.08em;
  }
 
@@ -701,14 +668,12 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 
  .tag-group {
  display: flex;
- flex-wrap: wrap;
- gap: 0.35rem;
+ flex-wrap: wrap;, gap: 0.35rem;
  }
 
  .tag {
  padding: 0.1rem 0.6rem;
- border-radius: 9999px;
- border: 1px solid rgba(148, 163, 184, 0.5);
+ border-radius: 9999px;, border: 1px solid rgba(148, 163, 184, 0.5);
  font-size: 0.75rem;
  }
 </style>

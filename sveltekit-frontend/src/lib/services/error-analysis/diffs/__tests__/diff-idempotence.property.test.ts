@@ -117,11 +117,11 @@ describe('Diff Idempotence Property Tests', () => {
 	describe('Validation Cycle', () => {
 		it('detects no regression when errors decrease', () => {
 			const beforeErrors = [
-				'test.ts(1): error TS2304: Cannot find name "foo"',
-				'test.ts(2): error TS2304: Cannot find name "bar"'
+				'test.ts(1): error, TS2304: Cannot find name "foo"',
+				'test.ts(2): error, TS2304: Cannot find name "bar"'
 			];
 			const afterErrors = [
-				'test.ts(1): error TS2304: Cannot find name "foo"'
+				'test.ts(1): error, TS2304: Cannot find name "foo"'
 			];
 
 			const regression = validator.detectRegression(beforeErrors, afterErrors);
@@ -134,11 +134,11 @@ describe('Diff Idempotence Property Tests', () => {
 
 		it('detects regression when new errors appear', () => {
 			const beforeErrors = [
-				'test.ts(1): error TS2304: Cannot find name "foo"'
+				'test.ts(1): error, TS2304: Cannot find name "foo"'
 			];
 			const afterErrors = [
-				'test.ts(1): error TS2304: Cannot find name "foo"',
-				'test.ts(3): error TS2304: Cannot find name "baz"'
+				'test.ts(1): error, TS2304: Cannot find name "foo"',
+				'test.ts(3): error, TS2304: Cannot find name "baz"'
 			];
 
 			const regression = validator.detectRegression(beforeErrors, afterErrors);
@@ -151,8 +151,8 @@ describe('Diff Idempotence Property Tests', () => {
 
 		it('detects no regression when errors stay the same', () => {
 			const errors = [
-				'test.ts(1): error TS2304: Cannot find name "foo"',
-				'test.ts(2): error TS2304: Cannot find name "bar"'
+				'test.ts(1): error, TS2304: Cannot find name "foo"',
+				'test.ts(2): error, TS2304: Cannot find name "bar"'
 			];
 
 			const regression = validator.detectRegression(errors, errors);
@@ -229,8 +229,8 @@ describe('Diff Idempotence Property Tests', () => {
 	describe('Error Parsing', () => {
 		it('parses TypeScript error output correctly', () => {
 			const output = `
-src/test.ts(10): error TS2304: Cannot find name 'foo'.
-src/test.ts(15): error TS2322: Type 'string' is not assignable to type 'number'.
+src/test.ts(10): error, TS2304: Cannot find name 'foo'.
+src/test.ts(15): error, TS2322: Type 'string' is not assignable to type 'number'.
 Found 2 errors in 1 file.
 			`;
 

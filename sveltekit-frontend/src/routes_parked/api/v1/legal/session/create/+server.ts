@@ -73,8 +73,7 @@ export const GET: RequestHandler = async () => {
  service: 'Legal AI Session Manager',
  version: '1.0.0',
  active_sessions: activeSessions.size,
- supported_context_fields: {
- jurisdiction: 'string',
+ supported_context_fields: {, jurisdiction: 'string',
  practice_area: 'string[]',
  case_type: 'string',
  priority_level: 'number (1-10)',
@@ -84,8 +83,7 @@ export const GET: RequestHandler = async () => {
  },
  session_statuses: ['ACTIVE', 'IDLE', 'PAUSED', 'TERMINATED', 'ERROR'],
  security_levels: ['MINIMUM', 'STANDARD', 'HIGH', 'MAXIMUM', 'CLASSIFIED'],
- endpoints: {
- create_session: 'POST /api/v1/legal/session/create',
+ endpoints: {, create_session: 'POST /api/v1/legal/session/create',
  get_session: 'GET /api/v1/legal/session/{session_id}',
  update_session: 'PUT /api/v1/legal/session/{session_id}',
  terminate_session: 'DELETE /api/v1/legal/session/{session_id}',

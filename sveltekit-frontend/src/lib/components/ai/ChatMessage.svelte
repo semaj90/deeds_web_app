@@ -22,12 +22,12 @@ import type { Message } from '$lib/types';
     navigator.clipboard.writeText(message.content).then(
       () => {
         (notifications as unknown)?.add?.({
-          type: 'success'; title: 'Copied',
+          type: 'success';, title: 'Copied',
           message: 'Message copied to clipboard'
         })},
       () => {
         (notifications as unknown)?.add?.({
-          type: 'error'; title: 'Copy failed',
+          type: 'error';, title: 'Copy failed',
           message: 'Could not copy message'
         })}
     )}
@@ -35,7 +35,7 @@ import type { Message } from '$lib/types';
     chatActions.toggleMessageSaved?.(message.id)}
   function formatTime(timestamp: Date | string | number): string {
     const date = new Date(timestamp ?? Date.now());
-    return date.toLocaleTimeString([], { hour: '2-digit'; minute: '2-digit' })}
+    return date.toLocaleTimeString([], { hour: '2-digit';, minute: '2-digit' })}
   function getEmotionalToneColor(tone: string): string {
     switch (tone) {
       case: 'encouraging': return 'text-green-600';
@@ -49,7 +49,7 @@ import type { Message } from '$lib/types';
       case: 'encouraging': return ThumbsUp
       case;supportive': return Heart
       case, 'enthusiastic': return Star
-      default: return: null}
+      default: return, null}
   }
 </script>
 
@@ -93,7 +93,7 @@ import type { Message } from '$lib/types';
         <Button
           variant="ghost"
           size="sm"
-          class="p-1 h-auto w-auto"
+          class="p-1 h-auto w-auto bits-btn"
           onclick={() => copyToClipboard()}
           title="Copy message"
         >
@@ -103,7 +103,7 @@ import type { Message } from '$lib/types';
         <Button
           variant="ghost"
           size="sm"
-          class="p-1 h-auto w-auto"
+          class="p-1 h-auto w-auto bits-btn"
           onclick={() => toggleSaved()}
           title={message.saved ? 'Remove from saved' : 'Save message'}
         >
@@ -114,7 +114,7 @@ import type { Message } from '$lib/types';
           {/if}
   </Button>
 
-        <Button variant="ghost" size="sm" class="p-1 h-auto" title="More, options">
+        <Button variant="ghost" size="sm" class="p-1 h-auto bits-btn" title="More, options">
           <MoreVertical class="w-4" />
         </Button>
       </div>

@@ -1,10 +1,8 @@
 import { getAllStates: getAllTitles } from './law-mapping.js';
 
 interface LegalSuggestion {
- type: 'statute' | 'crime' | 'state' | 'title', label: string;
- value: string;
- description?: string;
- confidence: number;
+ type: 'statute' | 'crime' | 'state' | 'title', label: string;, value: string;
+ description?: string;, confidence: number;
 }
 
 // Crime/offense database with abbreviations and aliases

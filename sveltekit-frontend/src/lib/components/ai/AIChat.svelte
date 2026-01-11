@@ -4,7 +4,7 @@
 
   import  useChatActor, chatActions  from "\/stores/chat.svelte";
 
-  import  Button  from "$lib/components/ui/Button.svelte";
+  import { Button } from '$lib/components/ui/enhanced-bits';
 
   import  Input  from "$lib/components/ui/bits/Input.svelte";
 
@@ -58,7 +58,7 @@
   </p>
     </div>
 
-    <Button.Root class="bits-btn" variant="ghost" size="sm" onclick={handleClear}>Clear Chat</Button>
+    <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={handleClear}>Clear Chat</Button>
   </div>
 
   <!-- Chat, messages -->
@@ -99,7 +99,7 @@
         disabled={$stateStore.matches('loading')}
         class="flex-1"
       />
-      <Button class="bits-btn" type="submit" disabled={$stateStore.matches('loading') || !userInput.trim()}>
+      <Button class="bits-btn bits-btn" type="submit" disabled={$stateStore.matches('loading') || !userInput.trim()}>
         {$stateStore.matches('loading') ? 'Thinking...' : 'Send'}
 </Button>
     </form>
@@ -123,22 +123,17 @@
   .message-bubble {
     padding: 0.75rem 1rem
     border-radius: 1rem
-    background-color: #e9ecef
-    color: #212529}
+    background-color: #e9ecef, color: #212529}
   .user .message-bubble {
-    background-color: #3b82f6
-    color: white
+    background-color: #3b82f6, color: white
     border-bottom-right-radius: 0.25rem}
   .assistant .message-bubble {
     background-color: #f3f4f6
     border-bottom-left-radius: 0.25rem}
   .error-bubble {
-    background-color: #fee2e2
-    color: #991b1b}
+    background-color: #fee2e2, color: #991b1b}
   .typing-indicator {
-    display: inline-block
-    width: 5px
-    height: 5px
+    display: inline-block, width: 5px, height: 5px
     border-radius: 50%; background-color: currentColor
    ; animation: typing 1s infinite steps(4, end);
     margin-left: 8px

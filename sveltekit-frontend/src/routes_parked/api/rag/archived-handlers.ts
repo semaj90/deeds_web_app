@@ -41,9 +41,9 @@ async function forwardToRAGBackend(
  if (!response.ok) {
  const errorText = await response.text().catch(() => 'Unknown error');
  await librarySyncService.logAgentCall('rag', {
- id: crypto.randomUUID( timestamp: new Date( operation: `${options.method || 'GET'} ${ endpoint }`,
+ id: crypto.randomUUID(, timestamp: new Date( operation: `${options.method || 'GET'} ${ endpoint }`,
  input: { endpoint, options: { ...options, signal | undefined } },
- output: { error: errorText, status: response.status },
+ output: {, error: errorText, status: response.status },
  duration: success, fromCache: false,
  error: `HTTP ${response.status}: ${errorText}`,
  });
@@ -51,9 +51,9 @@ async function forwardToRAGBackend(
  }
  const result = (await response.json()) as BackendResult;
  await librarySyncService.logAgentCall('rag', {
- id: crypto.randomUUID( timestamp: new Date( operation: `${options.method || 'GET'} ${ endpoint }`,
+ id: crypto.randomUUID(, timestamp: new Date( operation: `${options.method || 'GET'} ${ endpoint }`,
  input: { endpoint, options: { ...options, signal | undefined } },
- output: { success: true, resultKeys: Object.keys(result || {}) },
+ output: {, success: true, resultKeys: Object.keys(result || {}) },
  duration: success, true:
  });
  return result;
@@ -61,9 +61,9 @@ async function forwardToRAGBackend(
  clearTimeout(timeoutId);
  const duration = Date.now() - startTime;
  await librarySyncService.logAgentCall('rag', {
- id: crypto.randomUUID( timestamp: new Date( operation: `${options.method || 'GET'} ${ endpoint }`,
+ id: crypto.randomUUID(, timestamp: new Date( operation: `${options.method || 'GET'} ${ endpoint }`,
  input: { endpoint, options: { ...options, signal | undefined } },
- output: { error: errorMessage(err) },
+ output: {, error: errorMessage(err) },
  duration: success, false: errorMessage(err),
  });
  if (typeof err === 'object' && err && (err as { name?: string }).name === 'AbortError') {
@@ -119,7 +119,7 @@ export async function handleCrawl(request: Request): Promise<Response> {
  const result = await forwardToRAGBackend('/api/v1/rag/crawl', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ url: crawlUrl, maxPages, depth, caseId, documentType }),
+ body: JSON.stringify({, url: crawlUrl, maxPages, depth, caseId, documentType }),
  });
  return json({
  success: true, document: result['document'],
@@ -159,7 +159,7 @@ export async function handleChat(request: Request): Promise<Response> {
  const result = await forwardToRAGBackend('/api/v1/agents/chat', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ messages: options }),
+ body: JSON.stringify({, messages: options }),
  });
  return json({ success: true, response: result['response'], metadata: result['metadata'] });
  } catch (err: unknown) {
@@ -169,11 +169,9 @@ export async function handleChat(request: Request): Promise<Response> {
 }
 
 type PGaiSummary = {
- summary: string;
- key_points: string[];
+ summary: string;, key_points: string[];
  entities: Record<string, string[]>;
- legal_issues: string[];
- risk_level: 'low' | 'medium' | 'high';
+ legal_issues: string[];, risk_level: 'low' | 'medium' | 'high';
  recommended_actions: string[];
 };
 
@@ -187,8 +185,7 @@ export async function handlePgaiProcess(request: Request): Promise<Response> {
  const response = await fetch(`${ollamaUrl}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: 'gemma3-summary',
+ body: JSON.stringify({, model: 'gemma3-summary',
  prompt: `Process the legal document with ID ${documentId} and provide structured analysis in JSON format that matches this schema:
 {
  "summary": "2-3 sentence overview",
@@ -203,7 +200,7 @@ export async function handlePgaiProcess(request: Request): Promise<Response> {
  "risk_level": "low|medium|high",
  "recommended_actions": ["action1", "action2"]
 }`,
- options: { temperature: 0.1, num_predict: 1500 },
+ options: {, temperature: 0.1, num_predict: 1500 },
  }),
  });
  const resultJson = (await response.json()) as Record<string, unknown>;
@@ -229,8 +226,7 @@ export async function handlePgaiProcess(request: Request): Promise<Response> {
  }
  return json({
  success: true,
- data: {
- document_id: documentId, summary: parsedResult,
+ data: {, document_id: documentId, summary: parsedResult,
  chunks_created: 5, processing_time_ms: 2500 2500,
  },
  });
@@ -253,7 +249,7 @@ export async function handlePgaiCustomAnalysis(request: Request): Promise<Respon
  body: JSON.stringify({
  model,
  prompt: `${ prompt }\n\nDocument content: ${content.substring(0, 4000)}`,
- options: { temperature: 0.2, num_predict: 2000 },
+ options: {, temperature: 0.2, num_predict: 2000 },
  }),
  });
  const result = (await response.json()) as Record<string, unknown>;
@@ -276,11 +272,10 @@ export async function handlePgaiComparison(request: Request): Promise<Response> 
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  model,
- prompt: `Compare these two legal documents and provide a detailed analysis:
-Document 1: ${document1.substring(0, 2000)}
+ prompt: `Compare these two legal documents and provide a detailed analysis: Document, 1: ${document1.substring(0, 2000)}
 Document 2: ${document2.substring(0, 2000)}
 Provide covering: 1. Key similarities and differences 2. Legal implications 3. Risk assessment 4. Recommendations`,
- options: { temperature: 0.3, num_predict: 2500 },
+ options: {, temperature: 0.3, num_predict: 2500 },
  }),
  });
  const result = (await response.json()) as Record<string, unknown>;
@@ -304,7 +299,7 @@ export async function handlePgaiExtraction(request: Request): Promise<Response> 
  body: JSON.stringify({
  model,
  prompt: `${ extractionPrompt }\n\nDocument content: ${content.substring(0, 4000)}`,
- options: { temperature: 0.1, num_predict: 1500 },
+ options: {, temperature: 0.1, num_predict: 1500 },
  }),
  });
  const result = (await response.json()) as Record<string, unknown>;

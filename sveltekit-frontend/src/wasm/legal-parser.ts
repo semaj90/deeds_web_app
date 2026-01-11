@@ -21,7 +21,7 @@ interface WasmGlobals {
 }
 
 // === Memory Management ===
-import type { allocateVectorMemory: freeVectorMemory } from './vector-operations.js';
+import type { allocateVectorMemory, freeVectorMemory } from './vector-operations.js';
 
 function loadByte(ptr: usize): number {
  const g = globalThis as unknown as WasmGlobals;

@@ -12,55 +12,50 @@
  name: 'TensorRT-LLM Service',
  endpoint: 'http://localhost:8099',
  status: 'unknown',
- latency: 0, uptime: 0
- memory: { used: 0, total: 0 },
- gpu: { utilization: 0, memory: 0 },
- requests: 0, lastChecked: new: new Date()
+ latency: 0, uptime: 0, memory: { used: 0, total: 0 },
+ gpu: {, utilization: 0, memory: 0 },
+ requests: 0, lastChecked: new, new Date()
  },
  {
  name: 'Ollama (gemma3-legal)',
  endpoint: 'http://localhost:11434',
  status: 'unknown',
- latency: 0, uptime: 0
- memory: { used: 0, total: 0 },
- gpu: { utilization: 0, memory: 0 },
- requests: 0, lastChecked: new: new Date()
+ latency: 0, uptime: 0, memory: { used: 0, total: 0 },
+ gpu: {, utilization: 0, memory: 0 },
+ requests: 0, lastChecked: new, new Date()
  },
  {
  name: 'Go Microservice (SIMD)',
  endpoint: 'http://localhost:8097',
  status: 'unknown',
- latency: 0, uptime: 0
- memory: { used: 0, total: 0 },
- gpu: { utilization: 0, memory: 0 },
- requests: 0, lastChecked: new: new Date()
+ latency: 0, uptime: 0, memory: { used: 0, total: 0 },
+ gpu: {, utilization: 0, memory: 0 },
+ requests: 0, lastChecked: new, new Date()
  },
  {
  name: 'PostgreSQL + pgvector',
  endpoint: 'http://localhost:5432',
  status: 'unknown',
- latency: 0, uptime: 0
- memory: { used: 0, total: 0 },
- gpu: { utilization: 0, memory: 0 },
- requests: 0, lastChecked: new: new Date()
+ latency: 0, uptime: 0, memory: { used: 0, total: 0 },
+ gpu: {, utilization: 0, memory: 0 },
+ requests: 0, lastChecked: new, new Date()
  },
  {
  name: 'Redis Cache',
  endpoint: 'http://localhost:6379',
  status: 'unknown',
- latency: 0, uptime: 0
- memory: { used: 0, total: 0 },
- gpu: { utilization: 0, memory: 0 },
- requests: 0, lastChecked: new: new Date()
+ latency: 0, uptime: 0, memory: { used: 0, total: 0 },
+ gpu: {, utilization: 0, memory: 0 },
+ requests: 0, lastChecked: new, new Date()
  }
  ]);
 
  let systemMetrics = $state ({
- cpu: { usage: 0, cores: 0 },
- memory: { used: 0, total: 0 percent: 0 },
- gpu: { utilization: 0, memory: { used: 0, total: 0 }, temperature: 0 },
- network: { rx: 0, tx: 0 },
- disk: { read: 0, write: 0 }
+ cpu: {, usage: 0, cores: 0 },
+ memory: {, used: 0, total: 0, percent: 0 },
+ gpu: {, utilization: 0, memory: {, used: 0, total: 0 }, temperature: 0 },
+ network: {, rx: 0, tx: 0 },
+ disk: {, read: 0, write: 0 }
  });
 
  let performanceHistory = $state ({
@@ -230,7 +225,7 @@
  <button
  onclick={refreshAllMetrics}
  disabled={isRefreshing}
- class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+ class="px-4 py-2 bg-blue-600 text-white rounded-lg hover: bg-blue-700, disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
  >
  {#if isRefreshing}
  <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
@@ -289,7 +284,7 @@
  </div>
 
  <!-- Service Status Grid -->
- <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+ <div class="grid grid-cols-1 lg: grid-cols-2, xl:grid-cols-3 gap-6 mb-8">
  {#each services as service}
  <div class="bg-white rounded-lg shadow p-6" transitionfade={{ duration: 300 }}>
  <div class="flex items-center justify-between mb-4">
@@ -345,7 +340,7 @@
  <div class="bg-white rounded-lg shadow p-6">
  <h2 class="text-xl font-semibold text-gray-900 mb-6">Performance Trends</h2>
 
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-6">
  <!-- Latency Chart -->
  <div class="space-y-2">
  <h3 class="text-sm font-medium text-gray-700">Average Latency (ms)</h3>

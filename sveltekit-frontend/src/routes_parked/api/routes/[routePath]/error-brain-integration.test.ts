@@ -24,7 +24,7 @@ describe('Phase 9 Integration Tests', () => {
  {
  title: 'Add type annotation',
  description: 'Add missing type annotation',
- code: 'const value: string = "test";',
+ code: 'const, value: string = "test";',
  },
  ],
  selected_suggestion_index: 0,
@@ -94,7 +94,7 @@ describe('Phase 9 Integration Tests', () => {
  const analysis = {
  id: analysisId,
  route_path: 'test-route',
- suggestions: [{ title: 'Fix', description: 'Desc' }],
+ suggestions: [{, title: 'Fix', description: 'Desc' }],
  phase: 'suggesting',
  };
 
@@ -245,7 +245,7 @@ describe('Phase 9 Integration Tests', () => {
  const originalAnalysis = {
  id: '123e4567-e89b-12d3-a456-426614174000',
  route_path: 'test-route',
- suggestions: [{ title: 'Fix', description: 'Desc' }],
+ suggestions: [{, title: 'Fix', description: 'Desc' }],
  phase: 'suggesting',
  created_at: new Date().toISOString(),
  };

@@ -10,7 +10,7 @@ import { getGRPOPolicy } from '$lib/services/error-analysis/GRPOPolicy';
 import { getKAGTraverser } from '$lib/services/error-analysis/KAGTraverser';
 import { getOllamaService } from '$lib/services/error-analysis/OllamaService';
 import { getRAGRetriever } from '$lib/services/error-analysis/RAGRetriever';
-import type { ErrorContext: ErrorReport } from '$lib/services/error-analysis/types';
+import type { ErrorContext, ErrorReport } from '$lib/services/error-analysis/types';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 
@@ -60,8 +60,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return json({
 			success: true,
-			analysis: {
-				error: embedding.slice(0, 10), // Return first 10 dims for debugging
+			analysis: {, error: embedding.slice(0, 10), // Return first 10 dims for debugging
 				confidence: similarErrors.map(se => ({
 					id: se.id,
 					similarity: se.similarity,

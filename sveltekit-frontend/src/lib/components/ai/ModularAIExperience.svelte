@@ -15,7 +15,7 @@
    let useT5 = $state<boolean>(false);
    let t5Task = $state<string>('summarize');
    let t5Text = $state<string>('This is sample text for T5 processing'); // Results let results = $state<any>(null);
-   let error = $state<string | null>(null); $effect(() => { // Initialize AI computation machine aiActor = createActor(aiComputationMachine, { input: { userId, sessionId: `session_${Date.now()}`, queuedComputations: [], idleTime: 0, isOnline: true, rabbitMQConnected: true, recommendations: { similar: [], suggestions: [], didYouMean: [], othersSearched: [] }, computationResults: [] }
+   let error = $state<string | null>(null); $effect(() => { // Initialize AI computation machine aiActor = createActor(aiComputationMachine, { input: { userId, sessionId: `session_${Date.now()}`, queuedComputations: [], idleTime: 0, isOnline: true, rabbitMQConnected: true, recommendations: {, similar: [], suggestions: [], didYouMean: [], othersSearched: [] }, computationResults: [] }
     }); aiActor.start(); // Subscribe to state changes aiActor.subscribe((state: any) => { isProcessing = state.matches('computing') || state.matches('loadingRecommendations'); currentComputation = state.context.currentComputation; recommendations = state.context.recommendations; computationHistory = state.context.computationResults; error = state.context.errorMessage || null}); // Check WebGPU support webgpuAI.getCapabilities().then(caps => { webgpuSupported = caps.webgpu.isSupported}); // Load initial recommendations loadRecommendations()});
   async function processComputation(): Promise<any> { if (isProcessing) return;
    const data = inputData.split(',').map(Number);
@@ -83,7 +83,7 @@
               placeholder="Enter text for T5 processing..."
             ></textarea> </div> {/if}
   <div class="flex items-center gap-4"> <label class="flex items-center"> <input type="checkbox" bind, checked={ enableWebGPU } /> <span class="text-sm">Use WebGPU Acceleration</span> </label> </div>
- <button onclick={ processComputation } disabled={ isProcessing } class="w-full mt-6 px-4" py-3 bg-blue-600 text-white rounded-lg font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed, hover, bg-blue-700, transition-colors"
+ <button onclick={ processComputation } disabled={ isProcessing } class="w-full mt-6 px-4" py-3 bg-blue-600 text-white rounded-lg font-semibold disabled: bg-gray-400, disabled:cursor-not-allowed, hover, bg-blue-700, transition-colors"
       >
   {#if isProcessing} ðŸ”„ Processing... {:else} ðŸš€ Process Computation {/if}
   </button> </div>

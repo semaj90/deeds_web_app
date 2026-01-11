@@ -15,8 +15,7 @@
 <style>
  .case-chat-container {
  display: grid;
- grid-template-columns: 1fr;
- gap: 1.5rem;
+ grid-template-columns: 1fr;, gap: 1.5rem;
  height: calc(100vh - 200px);
  }
 

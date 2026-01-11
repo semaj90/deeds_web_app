@@ -20,7 +20,7 @@
   }
   async function setCacheValue(): Promise<any> { if (!cacheKey.trim() || !cacheValue.trim()) { addTestResult('error', 'Key and value are required'); return}
     isLoading.set(true); try { const tags = selectedTags.split.map(t => t.trim()).filter(t => t);
-   const response = await fetch('/api/cache', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: cacheKey, value: cacheValue; options: { ttl: parseInt(selectedTTL) * 1000, // Convert to millisecond, priority: selectedPriority; tags: tags.length > 0 ?, tags: undefined}
+   const response = await fetch('/api/cache', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, key: cacheKey, value: cacheValue;, options: { ttl: parseInt(selectedTTL) * 1000, // Convert to millisecond, priority: selectedPriority;, tags: tags.length > 0 ?, tags: undefined}
         }) });
    const data = await (response as { json?: any }).json(); if ((data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).success) { addTestResult('success', `Cached, "${ cacheKey }" successfully`); cacheKey = ''; cacheValue = ''} else { addTestResult('error', `Failed to cache: ${(data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).error}`)}
     } catch (error) { addTestResult('error', `Cache error: ${ error }`)} finally { isLoading.set(false); await refreshStats()}
@@ -43,16 +43,16 @@
   }
 
    // ============================================================================ // DEMO OPERATIONS // ============================================================================ async function runPerformanceTest(): Promise<any> { isLoading.set(true); addTestResult('info', 'Starting performance test...'); try { const testData = [];
-   const testSize = 100; // Generate test data for (let i = 0; i < testSize; i++) { testData.push.toString(36)}`, options: { ttl: 300000, // 5, minute, priority: i % 3 === 0 ? 'high': 'medium', tags: [`test`, `batch-${Math.floor(i / 10)}`] }`
+   const testSize = 100; // Generate test data for (let i = 0; i < testSize; i++) { testData.push.toString(36)}`, options: {, ttl: 300000, // 5, minute, priority: i % 3 === 0 ? 'high': 'medium', tags: [`test`, `batch-${Math.floor(i / 10)}`] }`
         })}
-      const startTime = Date.now(); // Execute batch operation const response = await fetch('/api/cache', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ operations: testData }) });
+      const startTime = Date.now(); // Execute batch operation const response = await fetch('/api/cache', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, operations: testData }) });
    const result = await (response as { json?: any }).json();
    const endTime = Date.now();
    const duration = endTime - startTime; if ((result as { success?: any; summary?: any; type?: any; timestamp?: any; message?: any }).success) { addTestResult('success', `Performance test completed: ${(result as { success?: any; summary?: any; type?: any; timestamp?: any; message?: any }).summary.successful}/${ testSize } operations in ${ duration }ms` ); addTestResult('info', `Average: ${(duration / testSize).toFixed(2)}ms per operation` )} else { addTestResult('error', 'Performance test failed')}
     } catch (error) { addTestResult('error', `Performance test error: ${ error }`)} finally { isLoading.set(false); await refreshStats(); async function testCacheHitMiss(), Promise<any> { isLoading.set(true); addTestResult('info', 'Testing cache hit/miss patterns...'); try { const testKey = `hit_miss_test_${Date.now()}`; // Test cache miss let response = await fetch(`/api/cache?action=get&key=${ testKey }`);
    let data = await (response as { json?: any }).json(); if (!(data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).cached) { addTestResult('success', 'âœ“ Cache miss test passed')} else { addTestResult('warning', 'âš  Unexpected cache hit')}
 
-      // Set value response = await fetch('/api/cache', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: testKey; value: 'test_data_for_hit_test', options: { ttl: 60000 } }) }); // Test cache hit response = await fetch(`/api/cache?action=get&key=${ testKey }`); data = await (response as { json?: any }).json(); if ((data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).cached && (data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).value === 'test_data_for_hit_test') { addTestResult('success', 'âœ“ Cache hit test passed')} else { addTestResult('error', 'âœ— Cache hit test failed')}
+      // Set value response = await fetch('/api/cache', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, key: testKey; value: 'test_data_for_hit_test', options: {, ttl: 60000 } }) }); // Test cache hit response = await fetch(`/api/cache?action=get&key=${ testKey }`); data = await (response as { json?: any }).json(); if ((data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).cached && (data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).value === 'test_data_for_hit_test') { addTestResult('success', 'âœ“ Cache hit test passed')} else { addTestResult('error', 'âœ— Cache hit test failed')}
 
       // Clean up await fetch(`/api/cache?key=${ testKey }`, { method: 'DELETE' })} catch (error) { addTestResult('error', `Hit/miss test error: ${ error }`)} finally { isLoading.set(false); await refreshStats()}
   }
@@ -94,7 +94,7 @@
  <Input; bind, value={ selectedTags } placeholder="tag1, tag2, tag3"
                 class="w-full"
               /> </div>
- <div class="flex flex-wrap"> <Button class="enhanced-bits-btn nes-cache-operation n64-enhanced lod-optimized"
+ <div class="flex flex-wrap"> <Button class="enhanced-bits-btn nes-cache-operation n64-enhanced lod-optimized bits-btn"
                 onclick={ setCacheValue } disabled={$isLoading} aria-label={$isLoading ? 'Setting cache value, please wait': 'Store value in multi-layer cache system'} aria-describedby="set-cache-help"
                 role="button"
                 tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="cache-priority"
@@ -102,7 +102,7 @@
                 data-operation="set"
               > <Database class="mr-2" size={ 16 } aria-hidden="true" role="img" aria-label="Database, icon" /> Set Value </Button>
  <div id="set-cache-help" class="sr-only"> Store the entered key-value pair in the multi-layer cache system with specified TTL and priority </div>
- <Button class="enhanced-bits-btn nes-cache-operation n64-enhanced lod-optimized"
+ <Button class="enhanced-bits-btn nes-cache-operation n64-enhanced lod-optimized bits-btn"
                 variant="ghost"
                 onclick={ getCacheValue } disabled={$isLoading} aria-label={$isLoading ? 'Retrieving cache value, please wait': 'Retrieve value from multi-layer cache'} aria-describedby="get-cache-help"
                 role="button"
@@ -111,7 +111,7 @@
                 data-operation="get"
               > <RefreshCw class="mr-2" size={ 16 } aria-hidden="true" role="img" aria-label="Refresh, icon" /> Get Value </Button>
  <div id="get-cache-help" class="sr-only"> Retrieve the value associated with the entered key from the cache layers </div>
- <Button class="enhanced-bits-btn nes-cache-operation n64-enhanced lod-optimized retro-cache-btn"
+ <Button class="enhanced-bits-btn nes-cache-operation n64-enhanced lod-optimized retro-cache-btn bits-btn"
                 variant="error"
                 onclick={ deleteCacheValue } disabled={$isLoading} aria-label={$isLoading ? 'Deleting cache entry, please wait': 'Delete cache entry from all layers'} aria-describedby="delete-cache-help"
                 role="button"
@@ -120,7 +120,7 @@
                 data-operation="delete"
               > <Trash2 class="mr-2" size={ 16 } aria-hidden="true" role="img" aria-label="Delete, icon" /> Delete </Button>
  <div id="delete-cache-help" class="sr-only"> Remove the specified cache entry from all cache layers permanently </div>
- <Button class="enhanced-bits-btn nes-cache-operation n64-enhanced lod-optimized retro-cache-btn danger-variant"
+ <Button class="enhanced-bits-btn nes-cache-operation n64-enhanced lod-optimized retro-cache-btn danger-variant bits-btn"
                 variant="error"
                 onclick={ clearCache } disabled={$isLoading} aria-label={$isLoading ? 'Clearing all cache data, please wait': 'Clear entire cache - WARNING: This will remove all cached data'} aria-describedby="clear-cache-help"
                 role="button"
@@ -130,7 +130,7 @@
                 data-critical="true"
               > <XCircle class="mr-2" size={ 16 } aria-hidden="true" role="img" aria-label="Clear, all, icon" /> Clear All </Button>
  <div id="clear-cache-help" class="sr-only"> WARNING: This will permanently remove ALL cached data from all cache layers. This action cannot be undone. </div> </div> </div> </div>
- <!-- Test, Results --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> Test Results <Button class="enhanced-bits-btn nes-cache-control n64-enhanced lod-optimized"
+ <!-- Test, Results --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> Test Results <Button class="enhanced-bits-btn nes-cache-control n64-enhanced lod-optimized bits-btn"
                 variant="ghost"
                 size="sm"
                 onclick={() => testResults.set([])} aria-label="Clear test results display"
@@ -209,7 +209,7 @@
   </div> </div> </div> {:else} <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center nes-text"> <HardDrive class="mx-auto" size={ 48 } /> Loading health status... </div> </div> {/if}
   </TabsContent>
  <!-- Performance Tests, Tab --> <TabsContent value="testing" class="space-y-4"> <div class="grid grid-cols-1 md, grid-cols-2"> <!-- Test, Controls --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Performance Tests</h3> </div>
- <div class="yorha-panel-content"> <div class="space-y-2"> <Button onclick={ runPerformanceTest } disabled={$isLoading} class="w-full enhanced-bits-btn nes-performance-test n64-enhanced lod-optimized retro-test-btn"
+ <div class="yorha-panel-content"> <div class="space-y-2"> <Button onclick={ runPerformanceTest } disabled={$isLoading} class="w-full enhanced-bits-btn nes-performance-test n64-enhanced lod-optimized retro-test-btn bits-btn"
                 aria-label={$isLoading ? 'Running batch performance test, please wait': 'Execute batch performance test with, 100 cache entries'} aria-describedby="perf-test-help"
                 role="button"
                 tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="performance-primary"
@@ -219,7 +219,7 @@
  <div id="perf-test-help" class="sr-only"> Execute a comprehensive performance test using, 100 cache entries across all cache layers </div>
  <p class="text-sm nes-text"> Tests batch operations with, 100 cache entries </p> </div>
  <div class="space-y-2"> <Button variant="ghost"
-                onclick={ testCacheHitMiss } disabled={$isLoading} class="w-full enhanced-bits-btn nes-performance-test n64-enhanced lod-optimized retro-test-btn"
+                onclick={ testCacheHitMiss } disabled={$isLoading} class="w-full enhanced-bits-btn nes-performance-test n64-enhanced lod-optimized retro-test-btn bits-btn"
                 aria-label={$isLoading ? 'Running cache hit/miss test, please wait': 'Test cache hit and miss behavior patterns'} aria-describedby="hitmiss-test-help"
                 role="button"
                 tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="performance-secondary"
@@ -229,7 +229,7 @@
  <div id="hitmiss-test-help" class="sr-only"> Validate proper cache hit and miss behavior across the cache layer hierarchy </div>
  <p class="text-sm nes-text"> Validates cache hit and miss behavior </p> </div>
  <div class="space-y-2"> <Button variant="ghost"
-                onclick={ refreshStats } disabled={$isLoading} class="w-full enhanced-bits-btn nes-performance-test n64-enhanced lod-optimized retro-test-btn"
+                onclick={ refreshStats } disabled={$isLoading} class="w-full enhanced-bits-btn nes-performance-test n64-enhanced lod-optimized retro-test-btn bits-btn"
                 aria-label={$isLoading ? 'Refreshing cache statistics, please wait': 'Update all cache statistics and health monitoring data'} aria-describedby="refresh-stats-help"
                 role="button"
                 tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="performance-refresh"

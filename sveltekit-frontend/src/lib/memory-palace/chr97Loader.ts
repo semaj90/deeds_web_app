@@ -9,21 +9,16 @@
  */
 
 export type Chr97Rune = {
- id: number;
- tileIndex: number;
- clusterId: number;
- case_id: string;
- chunk_index: number;
- manifold_float32: [number, number, number, number]; // [u, v, w, t]
- heat_u16: number;
- emb16: number[]; // length 16
+ id: number;, tileIndex: number;
+ clusterId: number;, case_id: string;
+ chunk_index: number;, manifold_float32: [number, number, number, number]; // [u, v, w, t]
+ heat_u16: number;, emb16: number[]; // length 16
  tag?: string;
  label?: string;
 };
 
 export type Chr97Cartridge = {
- case_id: string;
- runes: Chr97Rune[];
+ case_id: string;, runes: Chr97Rune[];
 };
 
 export async function loadChr97Cartridge(url: string): Promise<Chr97Cartridge> {

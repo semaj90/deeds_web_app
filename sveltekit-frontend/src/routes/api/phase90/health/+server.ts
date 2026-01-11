@@ -39,8 +39,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
         return json({
             status: 'ok',
             qdrant: true,
-            collections: {
-                fastmcp_file_profiles: data.result?.points_count || 0,
+            collections: {, fastmcp_file_profiles: data.result?.points_count || 0,
                 phase90_error_cards: errorCardsCount,
                 phase90_error_clusters: clustersCount
             },

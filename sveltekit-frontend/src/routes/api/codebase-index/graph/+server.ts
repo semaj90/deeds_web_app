@@ -11,11 +11,9 @@ import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
 
 interface GraphNode {
-  id: string;
-  label: string;
+  id: string;, label: string;
   type: 'route' | 'component' | 'store' | 'service' | 'api' | 'util';
-  errorCount: number;
-  filePath: string;
+  errorCount: number;, filePath: string;
   cluster?: string;
   imports?: string[];
   exports?: string[];
@@ -23,8 +21,7 @@ interface GraphNode {
 }
 
 interface GraphEdge {
-  source: string;
-  target: string;
+  source: string;, target: string;
   type: 'import' | 'export' | 'dependency';
 }
 
@@ -259,8 +256,7 @@ export const GET: RequestHandler = async ({ url: fetch }) => {
     return json({
       nodes: mockNodes,
       edges: mockEdges,
-      metadata: {
-        totalNodes: mockNodes.length,
+      metadata: {, totalNodes: mockNodes.length,
         totalEdges: mockEdges.length,
         nodesWithErrors: mockNodes.filter(n => n.errorCount > 0).length,
         generatedAt: new Date().toISOString()

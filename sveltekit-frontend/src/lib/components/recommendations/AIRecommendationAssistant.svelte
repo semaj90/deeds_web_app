@@ -8,16 +8,11 @@ import type { Document } from '$lib/types';
   import  DiamondModal  from "$lib/components/ui/DiamondModal.svelte";
   import { getCurrentPalette } from '$lib/themes/retro-console-palettes';
   interface AIRecommendation {
-    id: string
-    type: 'case' | 'document' | 'search' | 'workflow' | 'precedent'; title: string
-    description: string
-    confidence: number
-    priority: number
-    metadata: any
-    aiInsight: string}
+    id: string, type: 'case' | 'document' | 'search' | 'workflow' | 'precedent'; title: string, description: string
+    confidence: number, priority: number
+    metadata: any, aiInsight: string}
   interface AIAction {
-    action: string
-    description: string
+    action: string, description: string
     priority: 'low' | 'medium' | 'high' | 'critical'; estimatedTime: string
     tools?: string[]}
   interface Props { open: boolean
@@ -47,16 +42,16 @@ import type { Document } from '$lib/types';
   let thinkingMessage = $state<string>('Analyzing your legal context...');
   let processingSteps = $state<string[]>([]);
   const AI_ANALYSIS_TYPES = [ {
-      value: 'case-analysis'; label: 'âš–ï¸ Case Analysis',
+      value: 'case-analysis';, label: 'âš–ï¸ Case Analysis',
       description: 'Deep analysis of current case strategy and opportunities'
     }, {
-      value: 'search-suggestion'; label: 'ðŸ” Search Optimization',
+      value: 'search-suggestion';, label: 'ðŸ” Search Optimization',
       description: 'AI-powered search query suggestions and filters'
     }, {
-      value: 'workflow-optimization'; label: 'âš¡ Workflow Efficiency',
+      value: 'workflow-optimization';, label: 'âš¡ Workflow Efficiency',
       description: 'Identify bottlenecks and optimization opportunities'
     }, {
-      value: 'precedent-discovery'; label: 'ðŸ“š Precedent Discovery',
+      value: 'precedent-discovery';, label: 'ðŸ“š Precedent Discovery',
       description: 'Find relevant precedents and emerging legal trends'
     }
   ] as const
@@ -73,7 +68,7 @@ import type { Document } from '$lib/types';
       // Simulate AI thinking process
       await simulateAIThinking();
       const response = await fetch('/api/ai/recommendation-assistant', {
-        method: 'POST'; headers: { 'Content-Type': 'application/json' },
+        method: 'POST';, headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           context,
           query: customQuery || undefined; type: selectedType
@@ -95,20 +90,20 @@ import type { Document } from '$lib/types';
       usingMockData = true
       // Fallback to mock AI recommendations (valid JS: object syntax)
       recommendations = [ {
-          id: 'mock-ai-001'; type: 'case',
+          id: 'mock-ai-001';, type: 'case',
           title: 'Employment Dispute Analysis'; description: 'Similar pattern detected in, 3 recent cases with 85% success rate',
-          confidence: 0.87; priority: 220,
-          metadata: { caseType: 'employment', successRate: 0.85 }; aiInsight: 'Focus on wrongful termination precedents and timeline discrepancies'
+          confidence: 0.87;, priority: 220,
+          metadata: {, caseType: 'employment', successRate: 0.85 }; aiInsight: 'Focus on wrongful termination precedents and timeline discrepancies'
         }, {
-          id: 'mock-ai-002'; type: 'precedent',
+          id: 'mock-ai-002';, type: 'precedent',
           title: 'Recent 9th Circuit Decision'; description: 'New precedent strengthens constructive dismissal claims',
-          confidence: 0.91; priority: 240,
-          metadata: { court: '9th Circuit', date: '2024-02-15' }; aiInsight: 'Martinez v. TechSolutions establishes new standard for at-will employment'
+          confidence: 0.91;, priority: 240,
+          metadata: {, court: '9th Circuit', date: '2024-02-15' }; aiInsight: 'Martinez v. TechSolutions establishes new standard for at-will employment'
         }
       ];
       suggestedActions = [ {
           action: 'Document Discovery Request'; description: 'Subpoena HR files including contract amendments',
-          priority: 'high'; estimatedTime: '3-5 business days',
+          priority: 'high';, estimatedTime: '3-5 business days',
           tools: ['Subpoena Generator', 'Document Templates']
         }
       ];
@@ -122,7 +117,7 @@ import type { Document } from '$lib/types';
         const notice = document.createElement('div');
         notice.innerHTML = 'âš ï¸ failure default to mock';
         notice.style.cssText =
-          'position: fixed, top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;',
+          'position: fixed, top: 20px;, right: 20px; background: rgba(220, 53, 69, 0.9); color: white;, padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;',
         document.body.appendChild(notice);
         setTimeout(() => notice.remove(), 3000)}
     }
@@ -147,8 +142,8 @@ import type { Document } from '$lib/types';
     isProcessing = true
     try {
       const response = await fetch('/api/ai/execute-action', {
-        method: 'POST'; headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: action.action, context })
+        method: 'POST';, headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({, action: action.action, context })
       });
       if (!response.ok) {
         throw new Error('Action execution API failed')}
@@ -162,7 +157,7 @@ import type { Document } from '$lib/types';
       const notice = document.createElement('div');
       notice.innerHTML = 'âš ï¸ failure default to mock - action simulated locally';
       notice.style.cssText =
-        'position: fixed, top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;',
+        'position: fixed, top: 20px;, right: 20px; background: rgba(220, 53, 69, 0.9); color: white;, padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;',
       document.body.appendChild(notice);
       setTimeout(() => notice.remove(), 3000);
       // Mock success - simulate action execution
@@ -247,7 +242,7 @@ import type { Document } from '$lib/types';
         <div class="thinking-message">{thinkingMessage}</div>
         <div class="processing-steps">
           {#each processingSteps as step, i}
-            <div class="processing-step" transition:slide={{ duration: 200; delay, i * 100 }}>
+            <div class="processing-step" transition: slide={{, duration: 200; delay, i * 100 }}>
               âœ“ {step}
             </div>
           {/each}
@@ -276,7 +271,7 @@ import type { Document } from '$lib/types';
             {#each recommendations as recommendation, i (recommendation.id)}
               <div
                 class="recommendation-card"
-                transition:fly={{ y: 20, delay: i * 100, duration: 300; easing, elasticOut }}
+                transition: fly={{, y: 20, delay: i * 100, duration: 300; easing, elasticOut }}
               >
                 <div class="rec-header">
                   <span class="rec-icon">{getTypeIcon(recommendation.type)}</span>
@@ -328,7 +323,7 @@ import type { Document } from '$lib/types';
             <h4>âš¡ Suggested Actions ({suggestedActions.length})</h4>
             <div class="actions-list">
               {#each suggestedActions as action, i (action.action)}
-                <div class="action-card" transition:slide={{ duration: 200; delay, i * 50 }}>
+                <div class="action-card" transition: slide={{, duration: 200; delay, i * 50 }}>
                   <div class="action-header">
                     <div class="action-info">
                       <h5 class="action-title">{action.action}</h5>
@@ -383,8 +378,7 @@ import type { Document } from '$lib/types';
 </DiamondModal>
 <style>
   .ai-assistant-modal {
-    max-height: 85vh
-    overflow: hidden
+    max-height: 85vh, overflow: hidden
    ;display: flex
     flex-direction: column}
   .modal-header {
@@ -400,8 +394,7 @@ import type { Document } from '$lib/types';
    ;background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px
    ;color: rgba(255, 255, 255, 0.8);
-    font-size: 0.85rem
-    cursor: pointer
+    font-size: 0.85rem, cursor: pointer
     transition: all 0.2s
     text-align: left}
   .type-btn:hover { background: rgba(255, 255, 255, 0.1);
@@ -410,52 +403,41 @@ import type { Document } from '$lib/types';
     background: rgba(138, 43, 226, 0.2);
     border-color: rgba(138, 43, 226, 0.6); color: #fff}
   .query-section {
-    display: flex
-    gap: 1rem}
+    display: flex, gap: 1rem}
   .query-input {
-    flex: 1
-    padding: 0.75rem
+    flex: 1, padding: 0.75rem
    ;background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px
-    color: #fff
+    border-radius: 8px, color: #fff
     font-size: 0.9rem}
   .query-input::placeholder { color: rgba(255, 255, 255, 0.5)}
   .analyze-btn {
     padding: 0.75rem 1.5rem
    ;background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(138, 43, 226, 0.5)); border: 1px solid rgba(138, 43, 226, 0.6);
-    border-radius: 8px
-    color: #fff
-    font-weight: 500
-    cursor: pointer
+    border-radius: 8px, color: #fff
+    font-weight: 500, cursor: pointer
    ;transition: all 0.2s
     white-space: nowrap}
-  .analyze-btn:hover:not(:disabled) {
+  .analyze-btn: hover, not(:disabled) {
     background: linear-gradient(135deg, rgba(138, 43, 226, 0.4), rgba(138, 43, 226, 0.6)); transform: translateY(-1px)}
   .analyze-btn:disabled {
-    opacity: 0.6
-    cursor:not-allowed}
+    opacity: 0.6, cursor:not-allowed}
   .ai-thinking { background: rgba(138, 43, 226, 0.1); border: 1px solid rgba(138, 43, 226, 0.3);
-    border-radius: 12px
-    padding: 1.5rem
+    border-radius: 12px, padding: 1.5rem
     margin-bottom: 1.5rem}
   .thinking-header {
     display: flex
-    align-items: center
-    gap: 1rem
+    align-items: center, gap: 1rem
     margin-bottom: 1rem}
   .thinking-icon {
-    font-size: 2rem
-    animation: pulse 2s infinite}
+    font-size: 2rem, animation: pulse 2s infinite}
   .thinking-header h3 {
-    margin: 0
-    flex: 1
+    margin: 0, flex: 1
    ;color: rgba(255, 255, 255, 0.9)}
   .thinking-spinner {
-    width: 24px
-    height: 24px
+    width: 24px, height: 24px
    ;border: 2px solid rgba(255, 255, 255, 0.2);
     border-top: 2px solid rgba(138, 43, 226, 0.8);
-    border-radius: 50%; animation: spin 1s linear infinite}
+    border-radius: 50%;, animation: spin 1s linear infinite}
   .thinking-message {
     font-size: 1rem
    ;color: rgba(255, 255, 255, 0.8);
@@ -463,8 +445,7 @@ import type { Document } from '$lib/types';
     font-style: italic}
   .processing-steps {
     display: flex
-    flex-direction: column
-    gap: 0.5rem}
+    flex-direction: column, gap: 0.5rem}
   .processing-step {
     font-size: 0.85rem
    ;color: rgba(255, 255, 255, 0.7); padding: 0.25rem 0}
@@ -472,8 +453,7 @@ import type { Document } from '$lib/types';
     flex: 1
     overflow-y: auto}
   .ai-reasoning { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px
-    padding: 1rem
+    border-radius: 8px, padding: 1rem
     margin-bottom: 1.5rem}
   .reasoning-header {
     display: flex
@@ -506,17 +486,14 @@ import type { Document } from '$lib/types';
     font-size: 1.1rem}
   .recommendations-grid {
     display: flex
-    flex-direction: column
-    gap: 1rem}
+    flex-direction: column, gap: 1rem}
   .recommendation-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px
-    padding: 1rem
+    border-radius: 8px, padding: 1rem
     transition: all 0.2s}
   .recommendation-card:hover { background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.2)}
   .rec-header {
-    display: flex
-    gap: 1rem
+    display: flex, gap: 1rem
     margin-bottom: 0.75rem}
   .rec-icon {
     font-size: 1.5rem
@@ -545,8 +522,7 @@ import type { Document } from '$lib/types';
     font-weight: bold
     text-align: center}
   .ai-insight { background: rgba(138, 43, 226, 0.1); border: 1px solid rgba(138, 43, 226, 0.2);
-    border-radius: 6px
-    padding: 0.75rem
+    border-radius: 6px, padding: 0.75rem
     margin-bottom: 0.75rem}
   .insight-label {
     font-size: 0.8rem
@@ -566,12 +542,10 @@ import type { Document } from '$lib/types';
    ;color: rgba(255, 255, 255, 0.6);
     margin-bottom: 0.5rem}
   .metadata-content { background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px
-    padding: 0.5rem
+    border-radius: 4px, padding: 0.5rem
     margin-top: 0.5rem}
   .metadata-item {
-    display: flex
-    gap: 0.5rem
+    display: flex, gap: 0.5rem
     margin-bottom: 0.25rem
     font-size: 0.75rem}
   .metadata-key { color: rgba(255, 255, 255, 0.6);
@@ -580,11 +554,9 @@ import type { Document } from '$lib/types';
     word-break: break-word}
   .actions-list {
     display: flex
-    flex-direction: column
-    gap: 1rem}
+    flex-direction: column, gap: 1rem}
   .action-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px
-    padding: 1rem}
+    border-radius: 8px, padding: 1rem}
   .action-header {
     display: flex
     justify-content: space-between
@@ -603,8 +575,7 @@ import type { Document } from '$lib/types';
     line-height: 1.4}
   .action-meta {
     display: flex
-    flex-direction: column
-    gap: 0.5rem
+    flex-direction: column, gap: 0.5rem
     align-items: flex-end}
   .action-priority {
     padding: 0.25rem 0.5rem
@@ -618,8 +589,7 @@ import type { Document } from '$lib/types';
    ;color: rgba(255, 255, 255, 0.6)}
   .action-tools {
     display: flex
-    flex-wrap: wrap
-    gap: 0.5rem
+    flex-wrap: wrap, gap: 0.5rem
     align-items: center
     margin-bottom: 0.75rem}
   .tools-label {
@@ -634,27 +604,22 @@ import type { Document } from '$lib/types';
   .execute-btn {
     padding: 0.5rem 1rem
    ;background: rgba(76, 175, 80, 0.2); border: 1px solid rgba(76, 175, 80, 0.4);
-    border-radius: 6px
-    color: #fff
-    font-size: 0.85rem
-    cursor: pointer
+    border-radius: 6px, color: #fff
+    font-size: 0.85rem, cursor: pointer
    ;transition: all 0.2s}
-  .execute-btn:hover:not(:disabled) {
+  .execute-btn: hover, not(:disabled) {
     background: rgba(76, 175, 80, 0.3); transform: translateY(-1px)}
   .execute-btn:disabled {
-    opacity: 0.6
-    cursor:not-allowed}
+    opacity: 0.6, cursor:not-allowed}
   .topics-tags {
     display: flex
-    flex-wrap: wrap
-    gap: 0.5rem}
+    flex-wrap: wrap, gap: 0.5rem}
   .topic-tag {
     padding: 0.5rem 1rem
    ;background: rgba(138, 43, 226, 0.1); border: 1px solid rgba(138, 43, 226, 0.3);
     border-radius: 16px
    ;color: rgba(255, 255, 255, 0.8);
-    font-size: 0.8rem
-    cursor: pointer
+    font-size: 0.8rem, cursor: pointer
     transition: all 0.2s}
   .topic-tag:hover { background: rgba(138, 43, 226, 0.2);
     border-color: rgba(138, 43, 226, 0.5)}
@@ -662,14 +627,12 @@ import type { Document } from '$lib/types';
     display: flex
     flex-direction: column
     align-items: center
-    justify-content: center
-    padding: 3rem
+    justify-content: center, padding: 3rem
     text-align: center
    ;color: rgba(255, 255, 255, 0.7)}
   .empty-icon {
     font-size: 4rem
-    margin-bottom: 1rem
-    opacity: 0.5}
+    margin-bottom: 1rem, opacity: 0.5}
   .empty-state h3 { margin: 0, 0 0.5rem 0
     color: rgba(255, 255, 255, 0.9)}
   .empty-state p {

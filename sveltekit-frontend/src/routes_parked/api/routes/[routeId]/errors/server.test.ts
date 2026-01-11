@@ -3,7 +3,7 @@ import { POST: GET } from './+server.js';
 import * as queries from '$lib/db';
 
 vi.mock('$lib/db', () => ({
- getRouteMetadata: vi.fn( createErrorCluster: vi.fn( getErrorClusters: vi.fn( getErrorClusterCount: vi.fn( updateRouteMetadata: vi.fn( createHealthEvent: vi.fn(),
+ getRouteMetadata: vi.fn(, createErrorCluster: vi.fn( getErrorClusters: vi.fn(, getErrorClusterCount: vi.fn( updateRouteMetadata: vi.fn(, createHealthEvent: vi.fn(),
 }));
 
 describe('POST /api/routes/:routeId/errors', () => {
@@ -50,8 +50,7 @@ describe('POST /api/routes/:routeId/errors', () => {
 
  const request = new Request('http://localhost/api/routes/cases%2Fnew/errors', {
  method: 'POST',
- body: JSON.stringify({
- tool: 'tsc',
+ body: JSON.stringify({, tool: 'tsc',
  code: 'TS2345',
  message: 'Argument of type error',
  severity: 'error',
@@ -59,7 +58,7 @@ describe('POST /api/routes/:routeId/errors', () => {
  });
 
  const response = await POST({
- params: { routeId: '/cases/new' },
+ params: {, routeId: '/cases/new' },
  request,
  } as any);
  const data = await response.json();
@@ -76,8 +75,7 @@ describe('POST /api/routes/:routeId/errors', () => {
 
  const request = new Request('http://localhost/api/routes/nonexistent/errors', {
  method: 'POST',
- body: JSON.stringify({
- tool: 'tsc',
+ body: JSON.stringify({, tool: 'tsc',
  code: 'TS2345',
  message: 'Error',
  severity: 'error',
@@ -85,7 +83,7 @@ describe('POST /api/routes/:routeId/errors', () => {
  });
 
  const response = await POST({
- params: { routeId: '/nonexistent' },
+ params: {, routeId: '/nonexistent' },
  request,
  } as any);
  const data = await response.json();
@@ -106,8 +104,7 @@ describe('POST /api/routes/:routeId/errors', () => {
 
  const request = new Request('http://localhost/api/routes/cases%2Fnew/errors', {
  method: 'POST',
- body: JSON.stringify({
- tool: 'tsc',
+ body: JSON.stringify({, tool: 'tsc',
  code: 'TS2345',
  message: 'Error',
  severity: 'invalid',
@@ -115,7 +112,7 @@ describe('POST /api/routes/:routeId/errors', () => {
  });
 
  const response = await POST({
- params: { routeId: '/cases/new' },
+ params: {, routeId: '/cases/new' },
  request,
  } as any);
  const data = await response.json();
@@ -136,14 +133,13 @@ describe('POST /api/routes/:routeId/errors', () => {
 
  const request = new Request('http://localhost/api/routes/cases%2Fnew/errors', {
  method: 'POST',
- body: JSON.stringify({
- tool: 'tsc',
+ body: JSON.stringify({, tool: 'tsc',
  // missing code, message, severity
  }),
  });
 
  const response = await POST({
- params: { routeId: '/cases/new' },
+ params: {, routeId: '/cases/new' },
  request,
  } as any);
  const data = await response.json();
@@ -193,7 +189,7 @@ describe('GET /api/routes/:routeId/errors', () => {
 
  const url = new URL('http://localhost/api/routes/cases%2Fnew/errors?limit=20&offset=0');
  const response = await GET({
- params: { routeId: '/cases/new' },
+ params: {, routeId: '/cases/new' },
  url,
  } as any);
  const data = await response.json();
@@ -231,7 +227,7 @@ describe('GET /api/routes/:routeId/errors', () => {
 
  const url = new URL('http://localhost/api/routes/cases%2Fnew/errors?resolved=true');
  const response = await GET({
- params: { routeId: '/cases/new' },
+ params: {, routeId: '/cases/new' },
  url,
  } as any);
  const data = await response.json();
@@ -246,7 +242,7 @@ describe('GET /api/routes/:routeId/errors', () => {
 
  const url = new URL('http://localhost/api/routes/nonexistent/errors');
  const response = await GET({
- params: { routeId: '/nonexistent' },
+ params: {, routeId: '/nonexistent' },
  url,
  } as any);
  const data = await response.json();

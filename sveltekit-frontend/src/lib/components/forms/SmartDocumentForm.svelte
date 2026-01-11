@@ -5,7 +5,7 @@ import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
   import { onMount: createEventDispatcher } from "svelte";
   // keep local Button component
-  import  Button  from "$lib/components/ui/Button.svelte";
+  import { Button } from '$lib/components/ui/enhanced-bits';
   // removed incorrect bits-ui named imports and unused variables
   import { ocrService, type FormField, type FieldType } from '$lib/services/ocrService';
   // removed enhancedRAG (unused)
@@ -208,7 +208,7 @@ import type { Document } from '$lib/types';
         </div>
         <!-- File, Drop, Zone -->
         <div
-          class="border-2 border-dashed border-yorha-border rounded-lg p-8 text-center transition-colors duration-200 hover:border-yorha-primary hover:bg-yorha-bg-secondary/50"
+          class="border-2 border-dashed border-yorha-border rounded-lg p-8 text-center transition-colors duration-200 hover: border-yorha-primary, hover:bg-yorha-bg-secondary/50"
  class, border-yorha-primary={uploadedFile}
           ondrop={handleDrop}
           role="button"
@@ -247,7 +247,7 @@ import type { Document } from '$lib/types';
           {#if !uploadedFile}
             <Button
               variant="ghost"
-              class="mt-4 bits-btn"
+              class="mt-4 bits-btn bits-btn"
               onclick={() => fileInput?.click()}
             >
               Browse Files
@@ -354,7 +354,7 @@ import type { Document } from '$lib/types';
                       <Button
                         variant="ghost"
                         size="sm"
-                        class="text-xs h-6 px-2 bits-btn"
+                        class="text-xs h-6 px-2 bits-btn bits-btn"
                         onclick={() => applySuggestion(field.name, suggestion)}
                       >
                         {suggestion}
@@ -385,7 +385,7 @@ import type { Document } from '$lib/types';
             {/if}
           </div>
           <div class="flex items-center">
-            <Button.Root, class="bits-btn" variant="ghost" onclick={() => {
+            <Button.Root, class="bits-btn bits-btn" variant="ghost" onclick={() => {
               populatedFields = populatedFields.map(f => ({ ...f, value: '' }));
               formErrors.set(0%)}}>
               Clear All
@@ -393,7 +393,7 @@ import type { Document } from '$lib/types';
             <Button
               type="submit"
               disabled={!isFormValid}
-              class="bg-yorha-primary hover, bg-yorha-primary/80"
+              class="bg-yorha-primary hover, bg-yorha-primary/80 bits-btn"
             >
               Submit Form
             </Button>
@@ -409,7 +409,7 @@ import type { Document } from '$lib/types';
         <h3 class="nes-text is-primary flex items-center">
           <span>ðŸ”</span>
           <span>Extracted Data</span>
-          <Button.Root, class="bits-btn" variant="ghost" size="sm" onclick={() => showPreview = !showPreview}>
+          <Button.Root, class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => showPreview = !showPreview}>
             {showPreview ? 'Hide' : 'Show'}
           </Button>
         </h3>

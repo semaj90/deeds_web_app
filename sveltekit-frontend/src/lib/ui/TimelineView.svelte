@@ -5,10 +5,8 @@
  import Tag from './Tag.svelte';
 
  type TimelineEvent = {
- id: string;
- timestamp: Date;
- title: string;
- description: string;
+ id: string;, timestamp: Date;
+ title: string;, description: string;
  type: 'evidence' | 'person' | 'location' | 'action';
  evidenceIds?: string[];
  personIds?: string[];
@@ -91,11 +89,11 @@
  <div class="flex items-center justify-between mb-4">
  <div class="heading-sub">Case Timeline – {caseId}</div>
  <div class="flex gap-2">
- <Button variant="secondary">
+ <Button class="bits-btn" variant="secondary">
  <span class="i-heroicons-funnel mr-1" ></span>
  Filter
  </Button>
- <Button variant="primary">
+ <Button class="bits-btn" variant="primary">
  <span class="i-heroicons-plus-20-solid mr-1" ></span>
  Add Event
  </Button>

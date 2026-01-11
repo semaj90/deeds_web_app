@@ -59,7 +59,7 @@ let sizeClasses = $derived({
 
 // Variant classes (UnoCSS-style)
 let variantClasses = $derived({
-	default: 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl',
+	default: 'bg-white, dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl',
 	nes: 'bg-gray-900 border-4 border-white shadow-[4px_4px_0_0_#000] font-["Press_Start_2P",monospace]',
 	glass: 'bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl'
 }[variant]);
@@ -123,8 +123,8 @@ function handleClose() {
 			<!-- Close button -->
 			<DialogClose
 				class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center
-					   text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white
-					   rounded-md hover:bg-gray-100 dark:hover:bg-gray-700
+					   text-gray-500 hover: text-gray-700, dark:text-gray-400 dark: hover, text-white
+					   rounded-md hover: bg-gray-100, dark: hover, bg-gray-700
 					   transition-colors duration-150"
 				aria-label="Close dialog"
 			>
@@ -171,11 +171,9 @@ function handleClose() {
 <style>
 	/* NES.css dialog fallback styles */
 	:global(.nes-dialog) {
-		position: fixed;
-		padding: 1.5rem;
+		position: fixed;, padding: 1.5rem;
 		border: 4px solid #fff;
-		background: #212529;
-		color: #fff;
+		background: #212529;, color: #fff;
 		image-rendering: pixelated;
 	}
 
@@ -187,8 +185,7 @@ function handleClose() {
 	/* Glass morphism variant */
 	:global(.glass-dialog) {
 		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(20px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
+		backdrop-filter: blur(20px);, border: 1px solid rgba(255, 255, 255, 0.2);
 		border-radius: 1rem;
 	}
 </style>

@@ -17,10 +17,8 @@ https, //svelte.dev/e/attribute_invalid_name -->
   // Props
   let { item,
     open = $bindable(false)
-   }: {
-    item: {
-      jsonData: {
-        title: string
+   }: {, item: {
+      jsonData: {, title: string
  description: string
         tags?: string[];
         tagsString?: string
@@ -42,8 +40,7 @@ https, //svelte.dev/e/attribute_invalid_name -->
     id: 'evidence',
     initial: 'view',
     context: { item },
-    states: {
-      view: { on { EDIT: 'edit' } },
+    states: {, view: { on { EDIT: 'edit' } },
       edit: { on { SAVE: 'view', CANCEL: 'view' } }
     }
   });
@@ -96,7 +93,7 @@ form = await superValidate(zod(evidenceSchema), { initialValues: item
       </div>
 
       <div class="flex gap-2">
-        <Button.Root class="bits-btn" onclick={handleEdit}>
+        <Button.Root class="bits-btn bits-btn" onclick={handleEdit}>
 Edit
       </div>
     {:else}
@@ -106,15 +103,15 @@ Edit
         <input name="jsonData.tags" bind, value={tagsString} placeholder="Tags (comma, separated)" class="input" />
         <input name="jsonData.type" bind, value={type} placeholder="Type" class="input" />
         <div class="flex gap-2">
-          <Button type="submit" class="uno-bg-green-600 uno-text-white uno-px-3 uno-py-1 uno-rounded bits-btn">
+          <Button type="submit" class="uno-bg-green-600 uno-text-white uno-px-3 uno-py-1 uno-rounded bits-btn bits-btn">
 Save
-          <Button.Root class="bits-btn" variant="ghost" onclick={handleCancel}>
+          <Button.Root class="bits-btn bits-btn" variant="ghost" onclick={handleCancel}>
 Cancel
         </div>
       </form>
     {/if}
   <div class="mt-4 flex">
-      <Button.Root class="bits-btn" onclick={() =>
+      <Button.Root class="bits-btn bits-btn" onclick={() =>
 (open = false)} variant="ghost">Close
     </div>
   </div>

@@ -1,5 +1,5 @@
 <!-- Legal AI Chat Component - Svelte, 5 with, TensorRT, integration --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from 'svelte';
- import  Button  from "$lib/components/ui/Button.svelte";
+ import { Button } from '$lib/components/ui/enhanced-bits';
  import  Card, CardContent, CardHeader, CardTitle  from "$lib/components/ui/Card.svelte"; interface LegalQuery { id?: number,prompt: string, response?: string; model_used?: string; tokens?: number; inference_time?: number; total_time?: number; similar_documents_found?: number; timestamp?: Date}
 
   // Svelte, 5 state let prompt = $state<string>('');
@@ -15,10 +15,10 @@
     "Assess data protection requirements under GDPR for a SaaS platform",
     "Identify potential risks in a merger and acquisition agreement",
     "Evaluate intellectual property clauses in a partnership contract"
-  ]; async function submitQuery(): Promise<any> { if (!canSubmit) return; isLoading = true; error = null; currentResponse = null; try { const response = await fetch('/api/legal-ai', { method: 'POST'; headers: {
+  ]; async function submitQuery(): Promise<any> { if (!canSubmit) return; isLoading = true; error = null; currentResponse = null; try { const response = await fetch('/api/legal-ai', { method: 'POST';, headers: {
           'Content-Type': 'application/json'
-        }, body: JSON.stringify({ prompt, context: context || undefined, max_tokens: 512; temperature: 0.3, use_vector_search: useVectorSearch}) });
-   const data = await response.json(); if (data.success) { const newQuery: LegalQuery = { id: data.result.query_id, prompt, response: data.result.response, model_used: data.result.model_used, tokens: data.result.tokens, inference_time: data.result.inference_time, total_time: data.result.total_time, similar_documents_found: data.result.similar_documents_found; timestamp: new Date() }
+        }, body: JSON.stringify({ prompt, context: context || undefined, max_tokens: 512;, temperature: 0.3, use_vector_search: useVectorSearch}) });
+   const data = await response.json(); if (data.success) { const newQuery: LegalQuery = { id: data.result.query_id, prompt, response: data.result.response, model_used: data.result.model_used, tokens: data.result.tokens, inference_time: data.result.inference_time, total_time: data.result.total_time, similar_documents_found: data.result.similar_documents_found;, timestamp: new Date() }
         queries = [newQuery, ...queries]; currentResponse = newQuery; // Clear form prompt = ''; context = ''} else { error = data.error || 'Failed to process legal query'}
     } catch (err) { error = 'Network error: Failed to connect to legal AI service'; console.error('Legal AI, error:', err)} finally { isLoading = false}'
   }
@@ -46,7 +46,7 @@
  <!-- Options --> <div class="flex items-center"> <label class="flex"> <input type="checkbox"
             bind, checked={ useVectorSearch } disabled={ isLoading } class="rounded border-gray-300 text-blue-600"
           /> <span class="ml-2 text-sm"> Search similar documents </span> </label>
- <Button onclick={ submitQuery } disabled={!canSubmit} class="px-6">
+ <Button onclick={ submitQuery } disabled={!canSubmit} class="px-6 bits-btn">
   {#if isLoading} <span class="flex"> <svg class="animate-spin -ml-1 mr-3 h-4 w-4"
                 xmlns="http, //www.w3.org/2000/svg"
                 fill="none"
@@ -59,7 +59,7 @@
   </Button> </div> </CardContent> </Card>
  <!-- Sample, Prompts --> <Card.Root class="mb-8"> <CardHeader> <CardTitle>Sample Legal Queries</CardTitle> </CardHeader>
  <CardContent> <div class="grid grid-cols-1 md, grid-cols-2">
-  {#each Array.isArray(samplePrompts) ? samplePrompts: [] as sample} <button onclick={() => useSamplePrompt(sample)} class="p-3 text-left border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors"
+  {#each Array.isArray(samplePrompts) ? samplePrompts: [] as sample} <button onclick={() => useSamplePrompt(sample)} class="p-3 text-left border border-gray-200 rounded-lg hover: border-blue-300, hover:bg-blue-50 transition-colors"
             disabled={ isLoading } >
             <p class="text-sm">{ sample }
 </p> </button> {/each}
@@ -106,7 +106,7 @@
   </div> {/each}
   </div> </CardContent> </Card> {/if}
   </div>
- <style> .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden}
+ <style> .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;, overflow: hidden}
   .prose { line-height: 1.6}
 </style>
 

@@ -8,7 +8,7 @@
  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
  }
 
- let { icon: Icon, class: className: className = '', size = 'md' }: Props = $props();
+ let { icon: Icon, class: className, className = '', size = 'md' }: Props = $props();
 
  // Base size classes for different breakpoints
  const sizeClasses = {

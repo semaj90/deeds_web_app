@@ -52,8 +52,7 @@ export const POST: RequestHandler = async ({ request }) => {
   // Allow adding feedback to improve future exports
   try {
     const body = await request.json() as {
-      log_id: string;
-      feedback: 'positive' | 'negative';
+      log_id: string;, feedback: 'positive' | 'negative';
       notes?: string;
     };
 

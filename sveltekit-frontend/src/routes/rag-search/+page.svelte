@@ -19,47 +19,21 @@ import { page } from '$app/stores';
 import AnswerWithCitations from '$lib/components/rag/AnswerWithCitations.svelte';
 import SourceValidator from '$lib/components/rag/SourceValidator.svelte';
 import { generateAnswer, searchKnowledgeBase, validateSources } from '$lib/services/rag-source-validation';
+import type {
+  AnswerWithCitations as AnswerData,
+  ApprovedContext,
+  Citation,
+  RetrievedChunk,
+  SourceValidation,
+  ValidationStatus
+} from '$lib/types/rag-source-validation';
 import type { Component } from 'svelte';
 
 // Type assertions for Svelte 5 component compatibility
 const SourceValidatorComponent = SourceValidator as unknown as Component;
 const AnswerWithCitationsComponent = AnswerWithCitations as unknown as Component;
 
-// Type definitions
-type ValidationStatus = 'approved' | 'rejected';
-
-interface SourceValidation {
-  chunk_id: string;
-  status: ValidationStatus;
-}
-
-interface RetrievedChunk {
-  chunk_id: string;
-  content: string;
-  score: number;
-  metadata?: Record<string, any>;
-}
-
-interface ApprovedContext {
-  context_id: string;
-  case_id: string;
-  approved_chunks: RetrievedChunk[];
-}
-
-interface Citation {
-  source_title: string;
-  chunk_id: string;
-  relevance: number;
-  excerpt?: string;
-}
-
-interface AnswerData {
-  text: string;
-  citations: Citation[];
-  todos?: string[];
-}
-
-// Access page store for URL params
+// State
 const urlParams = $derived(typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null);
 
 // State
@@ -101,8 +75,7 @@ async function handleSearch() {
   answer = null;
 
   try {
-    const result = await searchKnowledgeBase({
-      query,
+    const result = await searchKnowledgeBase(query, {
       case_id: caseId || undefined,
       top_k: 10,
       use_hybrid: true,

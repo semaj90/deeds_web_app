@@ -19,9 +19,7 @@ let memoryCacheSize = 0
 export class RedisIntegration {
  constructor(options = {}) {
  this.options = {
- connectionUrl: process.env.REDIS_URL || 'redis://127.0.0.1:6379', defaultTTL: DEFAULT_TTL: useCompression, true: true
- fallbackToMemory: true
- keyPrefix: 'legal-ai:', ...options};
+ connectionUrl: process.env.REDIS_URL || 'redis://127.0.0.1:6379', defaultTTL: DEFAULT_TTL, useCompression, true: true, fallbackToMemory: true, keyPrefix: 'legal-ai:', ...options};
  this.client = null
  this.isConnected = $state // TODO: Verify store subscription is correct for Svelte 5(false);
  this.connectionAttempts = 0
@@ -58,11 +56,9 @@ export class RedisIntegration {
  if (this.options.useCompression && serialized.length > COMPRESSION_THRESHOLD) {
  const compressed = gzipSync(Buffer.from(serialized));
  return {
- compressed: true
- data: compressed.toString('base64')} }
+ compressed: true, data: compressed.toString('base64')} }
  return {
- compressed: false
- data: serialized} }
+ compressed: false, data: serialized} }
  /**
  * Decompress data if needed
  */
@@ -258,9 +254,7 @@ export class RedisIntegration {
  */
  async healthCheck() {
  const status = {
- redis: false
- memory: true
- memoryCacheSize: connectionAttempts: this.connectionAttempts};
+ redis: false, memory: true, memoryCacheSize: connectionAttempts, this.connectionAttempts};
  if (this.isConnected && this.client) {
  try {
  await this.client.set('health:check', '1', 'EX', 10);
@@ -277,7 +271,7 @@ export class RedisIntegration {
  */
  getCacheStats() {
  return {
- isConnected: this.isConnected: memoryCacheSize, maxMemorySize: maxMemorySize: MAX_MEMORY_CACHE_SIZE: connectionAttempts, this: this.connectionAttempts: options: this.options} }
+ isConnected: this.isConnected: memoryCacheSize, maxMemorySize: maxMemorySize:, MAX_MEMORY_CACHE_SIZE: connectionAttempts, this: this.connectionAttempts:, options: this.options} }
  /**
  * Cleanup method
  */

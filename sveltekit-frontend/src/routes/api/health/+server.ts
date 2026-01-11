@@ -33,8 +33,7 @@ export const GET = async () => {
  status: 'ok',
  time: new Date().toISOString(),
  checks,
- services: {
- frontend: true,
+ services: {, frontend: true,
  node: true,
  ...checks,
  },

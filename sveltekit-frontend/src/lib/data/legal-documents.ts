@@ -1,12 +1,9 @@
 // Mock legal documents data for Fuse.js search
 // This provides immediate search functionality while backend services are being configured
 export interface LegalDocument {
- id: string;
- title: string;
- description: string;
- content: string;
- jurisdiction: string;
- category: string;
+ id: string;, title: string;
+ description: string;, content: string;
+ jurisdiction: string;, category: string;
  code: string;
  url?: string;
  sections?: string[];
@@ -33,7 +30,7 @@ export const legalDocuments: LegalDocument[] = [
  jurisdiction: 'california',
  category: 'criminal',
  code: 'PEN 211',
- url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml? sectionNum: 211.&lawCode=PEN',
+ url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?, sectionNum: 211.&lawCode=PEN',
  sections: ['211'],
  },
  {
@@ -45,7 +42,7 @@ export const legalDocuments: LegalDocument[] = [
  jurisdiction: 'california',
  category: 'contract',
  code: 'CIV 1549',
- url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml? sectionNum: 1549.&lawCode=CIV',
+ url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?, sectionNum: 1549.&lawCode=CIV',
  sections: ['1549', '1550', '1551'],
  },
  {
@@ -57,7 +54,7 @@ export const legalDocuments: LegalDocument[] = [
  jurisdiction: 'california',
  category: 'contract',
  code: 'CIV 1624',
- url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml? sectionNum: 1624.&lawCode=CIV',
+ url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?, sectionNum: 1624.&lawCode=CIV',
  sections: ['1624(a)', '1624(b)'],
  },
  {
@@ -69,7 +66,7 @@ export const legalDocuments: LegalDocument[] = [
  jurisdiction: 'california',
  category: 'evidence',
  code: 'EVID 352',
- url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml? sectionNum: 352.&lawCode=EVID',
+ url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?, sectionNum: 352.&lawCode=EVID',
  sections: ['352'],
  },
  {
@@ -125,7 +122,7 @@ export const legalDocuments: LegalDocument[] = [
  title: 'California Family Code Section, 3011 - Best Interest of Child',
  description: 'Factors for determining the best interest of the child in custody cases',
  content:
- 'In making a determination of the best interest of the child, the court shall consider: the health: safety welfare of the child; any history of abuse; the nature and amount of contact with both parents; and the habitual or continual illegal use of controlled substances or alcohol by either parent.',
+ 'In making a determination of the best interest of the child, the court shall consider: the, health: safety welfare of the child; any history of abuse; the nature and amount of contact with both parents; and the habitual or continual illegal use of controlled substances or alcohol by either parent.',
  jurisdiction: 'california',
  category: 'family',
  code: 'FAM 3011',

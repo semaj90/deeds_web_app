@@ -91,7 +91,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * User createdAt.
- * @member {google.protobuf.ITimestamp: null: undefined} createdAt
+ * @member {google.protobuf.ITimestamp: null, undefined} createdAt
  * @memberof legal.api.User
  * @instance
  */
@@ -99,7 +99,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * User updatedAt.
- * @member {google.protobuf.ITimestamp: null: undefined} updatedAt
+ * @member {google.protobuf.ITimestamp: null, undefined} updatedAt
  * @memberof legal.api.User
  * @instance
  */
@@ -107,7 +107,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * User preferences.
- * @member {legal.api.IUserPreferences: null: undefined} preferences
+ * @member {legal.api.IUserPreferences: null, undefined} preferences
  * @memberof legal.api.User
  * @instance
  */
@@ -956,7 +956,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * AuthResponse user.
- * @member {legal.api.IUser: null: undefined} user
+ * @member {legal.api.IUser: null, undefined} user
  * @memberof legal.api.AuthResponse
  * @instance
  */
@@ -1324,7 +1324,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * LegalDocument metadata.
- * @member {legal.api.IDocumentMetadata: null: undefined} metadata
+ * @member {legal.api.IDocumentMetadata: null, undefined} metadata
  * @memberof legal.api.LegalDocument
  * @instance
  */
@@ -1332,7 +1332,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * LegalDocument createdAt.
- * @member {google.protobuf.ITimestamp: null: undefined} createdAt
+ * @member {google.protobuf.ITimestamp: null, undefined} createdAt
  * @memberof legal.api.LegalDocument
  * @instance
  */
@@ -1340,7 +1340,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * LegalDocument updatedAt.
- * @member {google.protobuf.ITimestamp: null: undefined} updatedAt
+ * @member {google.protobuf.ITimestamp: null, undefined} updatedAt
  * @memberof legal.api.LegalDocument
  * @instance
  */
@@ -1573,14 +1573,10 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.type) {
  default:
  return 'type: enum value expected';
- case 0:
- case 1:
- case 2:
- case 3:
- case 4:
- case 5:
- case 6:
- case 7:
+ case 0: case, 1:
+ case 2: case, 3:
+ case 4: case, 5:
+ case 6: case, 7:
  case 8:
  break;
  }
@@ -1613,10 +1609,8 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.status) {
  default:
  return 'status: enum value expected';
- case 0:
- case 1:
- case 2:
- case 3:
+ case 0: case, 1:
+ case 2: case, 3:
  case 4:
  break;
  }
@@ -1624,10 +1618,8 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.securityLevel) {
  default:
  return 'securityLevel: enum value expected';
- case 0:
- case 1:
- case 2:
- case 3:
+ case 0: case, 1:
+ case 2: case, 3:
  break;
  }
  return null;
@@ -1655,40 +1647,31 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  break;
  }
  break;
- case 'DOCUMENT_TYPE_UNKNOWN':
- case 0:
+ case 'DOCUMENT_TYPE_UNKNOWN': case, 0:
  message.type = 0;
  break;
- case 'DOCUMENT_TYPE_CONTRACT':
- case 1:
+ case 'DOCUMENT_TYPE_CONTRACT': case, 1:
  message.type = 1;
  break;
- case 'DOCUMENT_TYPE_BRIEF':
- case 2:
+ case 'DOCUMENT_TYPE_BRIEF': case, 2:
  message.type = 2;
  break;
- case 'DOCUMENT_TYPE_EVIDENCE':
- case 3:
+ case 'DOCUMENT_TYPE_EVIDENCE': case, 3:
  message.type = 3;
  break;
- case 'DOCUMENT_TYPE_CITATION':
- case 4:
+ case 'DOCUMENT_TYPE_CITATION': case, 4:
  message.type = 4;
  break;
- case 'DOCUMENT_TYPE_RULING':
- case 5:
+ case 'DOCUMENT_TYPE_RULING': case, 5:
  message.type = 5;
  break;
- case 'DOCUMENT_TYPE_MOTION':
- case 6:
+ case 'DOCUMENT_TYPE_MOTION': case, 6:
  message.type = 6;
  break;
- case 'DOCUMENT_TYPE_PLEADING':
- case 7:
+ case 'DOCUMENT_TYPE_PLEADING': case, 7:
  message.type = 7;
  break;
- case 'DOCUMENT_TYPE_CORRESPONDENCE':
- case 8:
+ case 'DOCUMENT_TYPE_CORRESPONDENCE': case, 8:
  message.type = 8;
  break;
  }
@@ -1728,24 +1711,19 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  break;
  }
  break;
- case 'DOCUMENT_STATUS_DRAFT':
- case 0:
+ case 'DOCUMENT_STATUS_DRAFT': case, 0:
  message.status = 0;
  break;
- case 'DOCUMENT_STATUS_REVIEW':
- case 1:
+ case 'DOCUMENT_STATUS_REVIEW': case, 1:
  message.status = 1;
  break;
- case 'DOCUMENT_STATUS_APPROVED':
- case 2:
+ case 'DOCUMENT_STATUS_APPROVED': case, 2:
  message.status = 2;
  break;
- case 'DOCUMENT_STATUS_ARCHIVED':
- case 3:
+ case 'DOCUMENT_STATUS_ARCHIVED': case, 3:
  message.status = 3;
  break;
- case 'DOCUMENT_STATUS_DELETED':
- case 4:
+ case 'DOCUMENT_STATUS_DELETED': case, 4:
  message.status = 4;
  break;
  }
@@ -1756,20 +1734,16 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  break;
  }
  break;
- case 'SECURITY_LEVEL_PUBLIC':
- case 0:
+ case 'SECURITY_LEVEL_PUBLIC': case, 0:
  message.securityLevel = 0;
  break;
- case 'SECURITY_LEVEL_INTERNAL':
- case 1:
+ case 'SECURITY_LEVEL_INTERNAL': case, 1:
  message.securityLevel = 1;
  break;
- case 'SECURITY_LEVEL_CONFIDENTIAL':
- case 2:
+ case 'SECURITY_LEVEL_CONFIDENTIAL': case, 2:
  message.securityLevel = 2;
  break;
- case 'SECURITY_LEVEL_RESTRICTED':
- case 3:
+ case 'SECURITY_LEVEL_RESTRICTED': case, 3:
  message.securityLevel = 3;
  break;
  }
@@ -2050,7 +2024,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * DocumentMetadata caseInfo.
- * @member {legal.api.ICaseInformation: null: undefined} caseInfo
+ * @member {legal.api.ICaseInformation: null, undefined} caseInfo
  * @memberof legal.api.DocumentMetadata
  * @instance
  */
@@ -2465,7 +2439,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * Party contact.
- * @member {legal.api.IContactInfo: null: undefined} contact
+ * @member {legal.api.IContactInfo: null, undefined} contact
  * @memberof legal.api.Party
  * @instance
  */
@@ -3118,10 +3092,8 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.type) {
  default:
  return 'type: enum value expected';
- case 0:
- case 1:
- case 2:
- case 3:
+ case 0: case, 1:
+ case 2: case, 3:
  break;
  }
  return null;
@@ -3148,20 +3120,16 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  break;
  }
  break;
- case 'CITATION_TYPE_CASE_LAW':
- case 0:
+ case 'CITATION_TYPE_CASE_LAW': case, 0:
  message.type = 0;
  break;
- case 'CITATION_TYPE_STATUTE':
- case 1:
+ case 'CITATION_TYPE_STATUTE': case, 1:
  message.type = 1;
  break;
- case 'CITATION_TYPE_REGULATION':
- case 2:
+ case 'CITATION_TYPE_REGULATION': case, 2:
  message.type = 2;
  break;
- case 'CITATION_TYPE_SECONDARY':
- case 3:
+ case 'CITATION_TYPE_SECONDARY': case, 3:
  message.type = 3;
  break;
  }
@@ -3294,7 +3262,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * CaseInformation filingDate.
- * @member {google.protobuf.ITimestamp: null: undefined} filingDate
+ * @member {google.protobuf.ITimestamp: null, undefined} filingDate
  * @memberof legal.api.CaseInformation
  * @instance
  */
@@ -3454,12 +3422,9 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.status) {
  default:
  return 'status: enum value expected';
- case 0:
- case 1:
- case 2:
- case 3:
- case 4:
- case 5:
+ case 0: case, 1:
+ case 2: case, 3:
+ case 4: case, 5:
  break;
  }
  if (message.judges != null && message.hasOwnProperty('judges')) {
@@ -3495,28 +3460,22 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  break;
  }
  break;
- case 'CASE_STATUS_PENDING':
- case 0:
+ case 'CASE_STATUS_PENDING': case, 0:
  message.status = 0;
  break;
- case 'CASE_STATUS_ACTIVE':
- case 1:
+ case 'CASE_STATUS_ACTIVE': case, 1:
  message.status = 1;
  break;
- case 'CASE_STATUS_SETTLED':
- case 2:
+ case 'CASE_STATUS_SETTLED': case, 2:
  message.status = 2;
  break;
- case 'CASE_STATUS_DISMISSED':
- case 3:
+ case 'CASE_STATUS_DISMISSED': case, 3:
  message.status = 3;
  break;
- case 'CASE_STATUS_DECIDED':
- case 4:
+ case 'CASE_STATUS_DECIDED': case, 4:
  message.status = 4;
  break;
- case 'CASE_STATUS_APPEALED':
- case 5:
+ case 'CASE_STATUS_APPEALED': case, 5:
  message.status = 5;
  break;
  }
@@ -3701,7 +3660,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * SearchRequest sort.
- * @member {legal.api.ISortOptions: null: undefined} sort
+ * @member {legal.api.ISortOptions: null, undefined} sort
  * @memberof legal.api.SearchRequest
  * @instance
  */
@@ -3882,10 +3841,8 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.type) {
  default:
  return 'type: enum value expected';
- case 0:
- case 1:
- case 2:
- case 3:
+ case 0: case, 1:
+ case 2: case, 3:
  case 4:
  break;
  }
@@ -3932,24 +3889,19 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  break;
  }
  break;
- case 'SEARCH_TYPE_FULL_TEXT':
- case 0:
+ case 'SEARCH_TYPE_FULL_TEXT': case, 0:
  message.type = 0;
  break;
- case 'SEARCH_TYPE_SEMANTIC':
- case 1:
+ case 'SEARCH_TYPE_SEMANTIC': case, 1:
  message.type = 1;
  break;
- case 'SEARCH_TYPE_VECTOR':
- case 2:
+ case 'SEARCH_TYPE_VECTOR': case, 2:
  message.type = 2;
  break;
- case 'SEARCH_TYPE_HYBRID':
- case 3:
+ case 'SEARCH_TYPE_HYBRID': case, 3:
  message.type = 3;
  break;
- case 'SEARCH_TYPE_LEGAL_CITATION':
- case 4:
+ case 'SEARCH_TYPE_LEGAL_CITATION': case, 4:
  message.type = 4;
  break;
  }
@@ -4598,7 +4550,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * SearchResponse metadata.
- * @member {legal.api.ISearchMetadata: null: undefined} metadata
+ * @member {legal.api.ISearchMetadata: null, undefined} metadata
  * @memberof legal.api.SearchResponse
  * @instance
  */
@@ -4899,7 +4851,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * SearchResult document.
- * @member {legal.api.ILegalDocument: null: undefined} document
+ * @member {legal.api.ILegalDocument: null, undefined} document
  * @memberof legal.api.SearchResult
  * @instance
  */
@@ -4923,7 +4875,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * SearchResult similarity.
- * @member {legal.api.IVectorSimilarity: null: undefined} similarity
+ * @member {legal.api.IVectorSimilarity: null, undefined} similarity
  * @memberof legal.api.SearchResult
  * @instance
  */
@@ -6330,7 +6282,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * ChatMessage timestamp.
- * @member {google.protobuf.ITimestamp: null: undefined} timestamp
+ * @member {google.protobuf.ITimestamp: null, undefined} timestamp
  * @memberof legal.api.ChatMessage
  * @instance
  */
@@ -6338,7 +6290,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * ChatMessage metadata.
- * @member {legal.api.IMessageMetadata: null: undefined} metadata
+ * @member {legal.api.IMessageMetadata: null, undefined} metadata
  * @memberof legal.api.ChatMessage
  * @instance
  */
@@ -6506,10 +6458,8 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.type) {
  default:
  return 'type: enum value expected';
- case 0:
- case 1:
- case 2:
- case 3:
+ case 0: case, 1:
+ case 2: case, 3:
  case 4:
  break;
  }
@@ -6553,24 +6503,19 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  break;
  }
  break;
- case 'MESSAGE_TYPE_USER':
- case 0:
+ case 'MESSAGE_TYPE_USER': case, 0:
  message.type = 0;
  break;
- case 'MESSAGE_TYPE_ASSISTANT':
- case 1:
+ case 'MESSAGE_TYPE_ASSISTANT': case, 1:
  message.type = 1;
  break;
- case 'MESSAGE_TYPE_SYSTEM':
- case 2:
+ case 'MESSAGE_TYPE_SYSTEM': case, 2:
  message.type = 2;
  break;
- case 'MESSAGE_TYPE_ERROR':
- case 3:
+ case 'MESSAGE_TYPE_ERROR': case, 3:
  message.type = 3;
  break;
- case 'MESSAGE_TYPE_FUNCTION_CALL':
- case 4:
+ case 'MESSAGE_TYPE_FUNCTION_CALL': case, 4:
  message.type = 4;
  break;
  }
@@ -7063,7 +7008,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * ChatRequest context.
- * @member {legal.api.IChatContext: null: undefined} context
+ * @member {legal.api.IChatContext: null, undefined} context
  * @memberof legal.api.ChatRequest
  * @instance
  */
@@ -7071,7 +7016,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * ChatRequest options.
- * @member {legal.api.IChatOptions: null: undefined} options
+ * @member {legal.api.IChatOptions: null, undefined} options
  * @memberof legal.api.ChatRequest
  * @instance
  */
@@ -8364,7 +8309,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * ActionItem dueDate.
- * @member {google.protobuf.ITimestamp: null: undefined} dueDate
+ * @member {google.protobuf.ITimestamp: null, undefined} dueDate
  * @memberof legal.api.ActionItem
  * @instance
  */
@@ -8502,10 +8447,8 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.priority) {
  default:
  return 'priority: enum value expected';
- case 0:
- case 1:
- case 2:
- case 3:
+ case 0: case, 1:
+ case 2: case, 3:
  break;
  }
  if (message.dueDate != null && message.hasOwnProperty('dueDate')) {
@@ -8536,20 +8479,16 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  break;
  }
  break;
- case 'ACTION_PRIORITY_LOW':
- case 0:
+ case 'ACTION_PRIORITY_LOW': case, 0:
  message.priority = 0;
  break;
- case 'ACTION_PRIORITY_MEDIUM':
- case 1:
+ case 'ACTION_PRIORITY_MEDIUM': case, 1:
  message.priority = 1;
  break;
- case 'ACTION_PRIORITY_HIGH':
- case 2:
+ case 'ACTION_PRIORITY_HIGH': case, 2:
  message.priority = 2;
  break;
- case 'ACTION_PRIORITY_CRITICAL':
- case 3:
+ case 'ACTION_PRIORITY_CRITICAL': case, 3:
  message.priority = 3;
  break;
  }
@@ -9008,7 +8947,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * AnalysisRequest options.
- * @member {legal.api.IAnalysisOptions: null: undefined} options
+ * @member {legal.api.IAnalysisOptions: null, undefined} options
  * @memberof legal.api.AnalysisRequest
  * @instance
  */
@@ -9155,12 +9094,9 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.type) {
  default:
  return 'type: enum value expected';
- case 0:
- case 1:
- case 2:
- case 3:
- case 4:
- case 5:
+ case 0: case, 1:
+ case 2: case, 3:
+ case 4: case, 5:
  break;
  }
  if (message.specificQueries != null && message.hasOwnProperty('specificQueries')) {
@@ -9197,28 +9133,22 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  break;
  }
  break;
- case 'ANALYSIS_TYPE_RISK_ASSESSMENT':
- case 0:
+ case 'ANALYSIS_TYPE_RISK_ASSESSMENT': case, 0:
  message.type = 0;
  break;
- case 'ANALYSIS_TYPE_CLAUSE_EXTRACTION':
- case 1:
+ case 'ANALYSIS_TYPE_CLAUSE_EXTRACTION': case, 1:
  message.type = 1;
  break;
- case 'ANALYSIS_TYPE_COMPLIANCE_CHECK':
- case 2:
+ case 'ANALYSIS_TYPE_COMPLIANCE_CHECK': case, 2:
  message.type = 2;
  break;
- case 'ANALYSIS_TYPE_PRECEDENT_ANALYSIS':
- case 3:
+ case 'ANALYSIS_TYPE_PRECEDENT_ANALYSIS': case, 3:
  message.type = 3;
  break;
- case 'ANALYSIS_TYPE_ENTITY_EXTRACTION':
- case 4:
+ case 'ANALYSIS_TYPE_ENTITY_EXTRACTION': case, 4:
  message.type = 4;
  break;
- case 'ANALYSIS_TYPE_SENTIMENT_ANALYSIS':
- case 5:
+ case 'ANALYSIS_TYPE_SENTIMENT_ANALYSIS': case, 5:
  message.type = 5;
  break;
  }
@@ -9688,7 +9618,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * AnalysisResponse createdAt.
- * @member {google.protobuf.ITimestamp: null: undefined} createdAt
+ * @member {google.protobuf.ITimestamp: null, undefined} createdAt
  * @memberof legal.api.AnalysisResponse
  * @instance
  */
@@ -9854,12 +9784,9 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.type) {
  default:
  return 'type: enum value expected';
- case 0:
- case 1:
- case 2:
- case 3:
- case 4:
- case 5:
+ case 0: case, 1:
+ case 2: case, 3:
+ case 4: case, 5:
  break;
  }
  if (message.results != null && message.hasOwnProperty('results')) {
@@ -9905,28 +9832,22 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  break;
  }
  break;
- case 'ANALYSIS_TYPE_RISK_ASSESSMENT':
- case 0:
+ case 'ANALYSIS_TYPE_RISK_ASSESSMENT': case, 0:
  message.type = 0;
  break;
- case 'ANALYSIS_TYPE_CLAUSE_EXTRACTION':
- case 1:
+ case 'ANALYSIS_TYPE_CLAUSE_EXTRACTION': case, 1:
  message.type = 1;
  break;
- case 'ANALYSIS_TYPE_COMPLIANCE_CHECK':
- case 2:
+ case 'ANALYSIS_TYPE_COMPLIANCE_CHECK': case, 2:
  message.type = 2;
  break;
- case 'ANALYSIS_TYPE_PRECEDENT_ANALYSIS':
- case 3:
+ case 'ANALYSIS_TYPE_PRECEDENT_ANALYSIS': case, 3:
  message.type = 3;
  break;
- case 'ANALYSIS_TYPE_ENTITY_EXTRACTION':
- case 4:
+ case 'ANALYSIS_TYPE_ENTITY_EXTRACTION': case, 4:
  message.type = 4;
  break;
- case 'ANALYSIS_TYPE_SENTIMENT_ANALYSIS':
- case 5:
+ case 'ANALYSIS_TYPE_SENTIMENT_ANALYSIS': case, 5:
  message.type = 5;
  break;
  }
@@ -10283,10 +10204,8 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.riskLevel) {
  default:
  return 'riskLevel: enum value expected';
- case 0:
- case 1:
- case 2:
- case 3:
+ case 0: case, 1:
+ case 2: case, 3:
  break;
  }
  return null;
@@ -10330,20 +10249,16 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  break;
  }
  break;
- case 'RISK_LEVEL_LOW':
- case 0:
+ case 'RISK_LEVEL_LOW': case, 0:
  message.riskLevel = 0;
  break;
- case 'RISK_LEVEL_MEDIUM':
- case 1:
+ case 'RISK_LEVEL_MEDIUM': case, 1:
  message.riskLevel = 1;
  break;
- case 'RISK_LEVEL_HIGH':
- case 2:
+ case 'RISK_LEVEL_HIGH': case, 2:
  message.riskLevel = 2;
  break;
- case 'RISK_LEVEL_CRITICAL':
- case 3:
+ case 'RISK_LEVEL_CRITICAL': case, 3:
  message.riskLevel = 3;
  break;
  }
@@ -10650,20 +10565,16 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.type) {
  default:
  return 'type: enum value expected';
- case 0:
- case 1:
- case 2:
- case 3:
+ case 0: case, 1:
+ case 2: case, 3:
  break;
  }
  if (message.priority != null && message.hasOwnProperty('priority'))
  switch (message.priority) {
  default:
  return 'priority: enum value expected';
- case 0:
- case 1:
- case 2:
- case 3:
+ case 0: case, 1:
+ case 2: case, 3:
  break;
  }
  if (message.steps != null && message.hasOwnProperty('steps')) {
@@ -10694,20 +10605,16 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  break;
  }
  break;
- case 'RECOMMENDATION_TYPE_ACTION':
- case 0:
+ case 'RECOMMENDATION_TYPE_ACTION': case, 0:
  message.type = 0;
  break;
- case 'RECOMMENDATION_TYPE_RESEARCH':
- case 1:
+ case 'RECOMMENDATION_TYPE_RESEARCH': case, 1:
  message.type = 1;
  break;
- case 'RECOMMENDATION_TYPE_REVIEW':
- case 2:
+ case 'RECOMMENDATION_TYPE_REVIEW': case, 2:
  message.type = 2;
  break;
- case 'RECOMMENDATION_TYPE_COMPLIANCE':
- case 3:
+ case 'RECOMMENDATION_TYPE_COMPLIANCE': case, 3:
  message.type = 3;
  break;
  }
@@ -10718,20 +10625,16 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  break;
  }
  break;
- case 'ACTION_PRIORITY_LOW':
- case 0:
+ case 'ACTION_PRIORITY_LOW': case, 0:
  message.priority = 0;
  break;
- case 'ACTION_PRIORITY_MEDIUM':
- case 1:
+ case 'ACTION_PRIORITY_MEDIUM': case, 1:
  message.priority = 1;
  break;
- case 'ACTION_PRIORITY_HIGH':
- case 2:
+ case 'ACTION_PRIORITY_HIGH': case, 2:
  message.priority = 2;
  break;
- case 'ACTION_PRIORITY_CRITICAL':
- case 3:
+ case 'ACTION_PRIORITY_CRITICAL': case, 3:
  message.priority = 3;
  break;
  }
@@ -11106,7 +11009,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * HealthCheckResponse timestamp.
- * @member {google.protobuf.ITimestamp: null: undefined} timestamp
+ * @member {google.protobuf.ITimestamp: null, undefined} timestamp
  * @memberof legal.api.HealthCheckResponse
  * @instance
  */
@@ -11464,7 +11367,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * SystemStatus lastUpdated.
- * @member {google.protobuf.ITimestamp: null: undefined} lastUpdated
+ * @member {google.protobuf.ITimestamp: null, undefined} lastUpdated
  * @memberof legal.api.SystemStatus
  * @instance
  */
@@ -11820,7 +11723,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * BatchRequest options.
- * @member {legal.api.IBatchOptions: null: undefined} options
+ * @member {legal.api.IBatchOptions: null, undefined} options
  * @memberof legal.api.BatchRequest
  * @instance
  */
@@ -12676,7 +12579,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * BatchResponse startedAt.
- * @member {google.protobuf.ITimestamp: null: undefined} startedAt
+ * @member {google.protobuf.ITimestamp: null, undefined} startedAt
  * @memberof legal.api.BatchResponse
  * @instance
  */
@@ -12684,7 +12587,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
 
  /**
  * BatchResponse completedAt.
- * @member {google.protobuf.ITimestamp: null: undefined} completedAt
+ * @member {google.protobuf.ITimestamp: null, undefined} completedAt
  * @memberof legal.api.BatchResponse
  * @instance
  */
@@ -12842,10 +12745,8 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.status) {
  default:
  return 'status: enum value expected';
- case 0:
- case 1:
- case 2:
- case 3:
+ case 0: case, 1:
+ case 2: case, 3:
  case 4:
  break;
  }
@@ -12888,24 +12789,19 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  break;
  }
  break;
- case 'BATCH_STATUS_PENDING':
- case 0:
+ case 'BATCH_STATUS_PENDING': case, 0:
  message.status = 0;
  break;
- case 'BATCH_STATUS_RUNNING':
- case 1:
+ case 'BATCH_STATUS_RUNNING': case, 1:
  message.status = 1;
  break;
- case 'BATCH_STATUS_COMPLETED':
- case 2:
+ case 'BATCH_STATUS_COMPLETED': case, 2:
  message.status = 2;
  break;
- case 'BATCH_STATUS_FAILED':
- case 3:
+ case 'BATCH_STATUS_FAILED': case, 3:
  message.status = 3;
  break;
- case 'BATCH_STATUS_CANCELLED':
- case 4:
+ case 'BATCH_STATUS_CANCELLED': case, 4:
  message.status = 4;
  break;
  }

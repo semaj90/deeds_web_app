@@ -42,8 +42,7 @@
 
 <div
   class="upload-zone"
-  class:dragging
-  on:drop={handleDrop}
+  class: dragging, on:drop={handleDrop}
   on:dragover={handleDragOver}
   on:dragleave={handleDragLeave}
   role="button"
@@ -54,7 +53,7 @@
     type="file"
     multiple
     {accept}
-    on:change={handleChange}
+    onchange={handleChange}
     style="display: none;"
     id="file-upload"
   />
@@ -74,10 +73,8 @@
 <style>
   .upload-zone {
     border: 2px dashed #ccc;
-    border-radius: 8px;
-    padding: 2rem;
-    text-align: center;
-    transition: all 0.2s;
+    border-radius: 8px;, padding: 2rem;
+    text-align: center;, transition: all 0.2s;
   }
   .upload-zone.dragging {
     border-color: var(--primary, blue);

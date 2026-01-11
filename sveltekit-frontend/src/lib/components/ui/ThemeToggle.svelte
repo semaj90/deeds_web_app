@@ -18,7 +18,7 @@
  onChange: class, className: className = ''
  }: Props = $props();
 
- const themes: Array<{ id: Theme; label: string; icon: string }> = [
+ const themes: Array<{, id: Theme; label: string;, icon: string }> = [
  { id: 'light', label: 'Light', icon: '☀️' },
  { id: 'dark', label: 'Dark', icon: '🌙' },
  { id: 'yorha', label: 'YoRHa', icon: '🤖' },
@@ -57,25 +57,19 @@
  }
 
  .theme-options {
- display: flex;
- gap: 0.5rem;
- padding: 0.5rem;
- background: var(--yorha-bg-secondary, #2a2a2a);
+ display: flex;, gap: 0.5rem;
+ padding: 0.5rem;, background: var(--yorha-bg-secondary, #2a2a2a);
  border: 1px solid var(--yorha-border, #4a4a4a);
  border-radius: 4px;
  }
 
  .theme-btn {
  display: flex;
- align-items: center;
- gap: 0.5rem;
+ align-items: center;, gap: 0.5rem;
  padding: 0.5rem 0.75rem;
- background: transparent;
- border: 1px solid transparent;
- border-radius: 3px;
- color: var(--yorha-text-muted, #888);
- cursor: pointer;
- transition: all 0.2s;
+ background: transparent;, border: 1px solid transparent;
+ border-radius: 3px;, color: var(--yorha-text-muted, #888);
+ cursor: pointer;, transition: all 0.2s;
  font-size: 0.85rem;
  }
 

@@ -63,7 +63,7 @@ describe('Phase 9 Property-Based Tests', () => {
  it('should preserve metadata', () => {
  const metadata = {
  custom: 'value',
- nested: { key: 'value' },
+ nested: {, key: 'value' },
  array: [1, 2, 3],
  };
 
@@ -201,8 +201,7 @@ describe('Phase 9 Property-Based Tests', () => {
  });
 
  it('should preserve verification_message content', () => {
- const message = `Test Results:
-- Unit: PASS
+ const message = `Test Results: -, Unit: PASS
 - Integration: PASS
 - E2E: PASS`;
 
@@ -351,7 +350,7 @@ describe('Phase 9 Property-Based Tests', () => {
  const analysis = {
  id: '123e4567-e89b-12d3-a456-426614174000',
  route_path: 'test-route',
- suggestions: [{ title: 'Fix', description: 'Desc' }],
+ suggestions: [{, title: 'Fix', description: 'Desc' }],
  phase: 'suggesting',
  };
 

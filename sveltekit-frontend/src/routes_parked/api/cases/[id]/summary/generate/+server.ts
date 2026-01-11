@@ -34,8 +34,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
  const jobId = await jobQueueService.enqueueJob({
  caseId,
  type: 'summary_generation',
- data: {
- jobId: `job-${Date.now()}`,
+ data: {, jobId: `job-${Date.now()}`,
  includeEvidence: true, includeTimeline: true,
  analysisDepth: 'comprehensive',
  },

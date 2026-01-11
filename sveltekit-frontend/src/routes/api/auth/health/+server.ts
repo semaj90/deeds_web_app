@@ -16,13 +16,11 @@ declare global {
 }
 
 interface HealthWarning {
- code: string;
- message: string;
+ code: string;, message: string;
 }
 
 interface RecentSession {
- id: string;
- userId: string;
+ id: string;, userId: string;
  expiresAt: Date;
 }
 
@@ -92,8 +90,7 @@ export const GET: RequestHandler = async () => {
  {
  status: new Date().toISOString(),
  durationMs,
- adapter: {
- sessionCookieName: lucia.sessionCookieName,
+ adapter: {, sessionCookieName: lucia.sessionCookieName,
  luciaInstanceReused,
  },
  schemaIdentity: {
@@ -106,8 +103,7 @@ export const GET: RequestHandler = async () => {
  recentSessions,
  countsError,
  },
- environment: {
- nodeVersion: process.version,
+ environment: {, nodeVersion: process.version,
  pid: process.pid,
  uptime: process.uptime(),
  platform: process.platform,

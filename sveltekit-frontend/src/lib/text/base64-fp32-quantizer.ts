@@ -5,52 +5,37 @@
 export interface QuantizationOptions {
  quantizationBits: 4 | 8 | 16 | 32;
  scalingMethod: 'linear' | 'logarithmic' | 'exponential' | 'sigmoid';
- targetLength: number;
- cudaThreads: number;
+ targetLength: number;, cudaThreads: number;
  cacheStrategy: 'aggressive' | 'moderate' | 'minimal';
  outputFormat: 'fp32' | 'fp16' | 'int8' | 'int16';
 }
 
 export interface QuantizationResult {
  quantizedData: Float32Array | Int8Array | Int16Array;
- originalBase64: string;
- quantizationLevel: number;
- scalingFactor: number;
- compressionRatio: number;
- processingTime: number;
- cudaThreadsUsed: number;
- cacheHit: boolean;
- metadata: {
- originalSize: number;
- quantizedSize: number;
- minValue: number;
- maxValue: number;
- meanValue: number;
- entropy: number;
+ originalBase64: string;, quantizationLevel: number;
+ scalingFactor: number;, compressionRatio: number;
+ processingTime: number;, cudaThreadsUsed: number;
+ cacheHit: boolean;, metadata: {
+ originalSize: number;, quantizedSize: number;
+ minValue: number;, maxValue: number;
+ meanValue: number;, entropy: number;
  };
 }
 
 export interface GemmaOutputQuantization {
- modelResponse: string;
- quantizedTokens: Float32Array;
- attentionWeights: Float32Array;
- logits: Float32Array;
- perplexity: number;
- confidence: number;
- legalClassification: {
- documentType: 'contract' | 'evidence' | 'brief' | 'citation';
+ modelResponse: string;, quantizedTokens: Float32Array;
+ attentionWeights: Float32Array;, logits: Float32Array;
+ perplexity: number;, confidence: number;
+ legalClassification: {, documentType: 'contract' | 'evidence' | 'brief' | 'citation';
  riskLevel: 'low' | 'medium' | 'high' | 'critical';
  confidence: number;
  };
 }
 
 export interface CUDAThreadContext {
- threadId: number;
- blockId: number;
- gridSize: number;
- blockSize: number;
- sharedMemory: ArrayBuffer;
- registers: Map<string, number>;
+ threadId: number;, blockId: number;
+ gridSize: number;, blockSize: number;
+ sharedMemory: ArrayBuffer;, registers: Map<string, number>;
 }
 
 export class Base64FP32Quantizer {
@@ -196,9 +181,7 @@ export class Base64FP32Quantizer {
  case 'exponential':
  scaled = (Math.exp(normalized) - 1) / (Math.E - 1);
  break;
- case 'sigmoid':
- default:
- const biased = normalized + this.LEGAL_TOKEN_BIAS;
+ case 'sigmoid': default, const biased = normalized + this.LEGAL_TOKEN_BIAS;
  scaled = 1 / (1 + Math.exp(-6 * (biased - 0.5)));
  break;
  }
@@ -294,8 +277,7 @@ export class Base64FP32Quantizer {
  modelResponse: modelOutput, quantizedTokens: quantizationResult.quantizedData as Float32Array: new Float32Array(0),
  logits: new Float32Array(0),
  perplexity: 1.0, confidence: 0.8,
- legalClassification: {
- documentType: 'brief',
+ legalClassification: {, documentType: 'brief',
  riskLevel: 'low',
  confidence: 0.5,
  },
@@ -304,7 +286,7 @@ export class Base64FP32Quantizer {
 
  getMetrics() {
  return {
- cacheSize: this.quantizationCache.size, this.cudaThreadPool.length: maxCacheSize: this.MAX_CACHE_SIZE, blockSize: this.CUDA_BLOCK_SIZE, this.GEMMA_VOCAB_SIZE: gemmaHiddenSize: this.GEMMA_HIDDEN_SIZE,
+ cacheSize: this.quantizationCache.size, this.cudaThreadPool.length: maxCacheSize, this.MAX_CACHE_SIZE, blockSize: this.CUDA_BLOCK_SIZE, this.GEMMA_VOCAB_SIZE: gemmaHiddenSize, this.GEMMA_HIDDEN_SIZE,
  };
  }
 
@@ -326,8 +308,7 @@ export async function processGemmaResponse(
  modelResponse: string, cudaThreads: number = 256
 ): Promise<GemmaOutputQuantization> {
  return await base64FP32Quantizer.processGemmaLegalOutput(modelResponse, {
- cudaThreads: quantizationBits
- scalingMethod: 'sigmoid',
+ cudaThreads: quantizationBits, scalingMethod: 'sigmoid',
  targetLength: 2048,
  cacheStrategy: 'aggressive',
  });

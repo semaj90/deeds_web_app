@@ -7,20 +7,20 @@
    let messages = $state<any[]>([]);
    let isProcessing = $state<boolean>(false);
    let isInitialized = $state<boolean>(false);
-   let error = $state<string | null>(null); // System status let systemStatus = $state({ webgpu: false, webasm: false, model: false; adapter: false }); // Quick prompts let quickPrompts = [
+   let error = $state<string | null>(null); // System status let systemStatus = $state({ webgpu: false, webasm: false, model: false;, adapter: false }); // Quick prompts let quickPrompts = [
     'What are the key legal considerations for AI in healthcare?',
     'Explain GDPR compliance for AI systems.',
     'How do AI liability laws work?',
     'What are the privacy risks of machine learning?'
   ]; async function initializeAI(): Promise<void> { try { console.log('ðŸ¤– Initializing client-side AI...');
-   const initialized = await webAssemblyAIAdapter.initialize(); if (initialized) { // await health in case adapter exposes async status const health = await webAssemblyAIAdapter.getHealthStatus(); systemStatus = { webgpu: health.webgpuEnabled || false, webasm: health.wasmSupported || false, model: health.modelLoaded || false; adapter: health.initialized || false }; isInitialized = true; console.log('âœ… Client-side AI, ready:', health); // Add welcome message messages.push({ id: 'welcome', role: 'assistant'; content:
+   const initialized = await webAssemblyAIAdapter.initialize(); if (initialized) { // await health in case adapter exposes async status const health = await webAssemblyAIAdapter.getHealthStatus(); systemStatus = { webgpu: health.webgpuEnabled || false, webasm: health.wasmSupported || false, model: health.modelLoaded || false; adapter: health.initialized || false }; isInitialized = true; console.log('âœ… Client-side AI, ready:', health); // Add welcome message messages.push({ id: 'welcome', role: 'assistant';, content:
             "Hello! I'm running locally in your browser using WebAssembly and the Gemma 270MB model. Ask me anything about legal AI, compliance, or contract analysis.", timestamp: Date.now() }); messages = [...messages]} else { throw new Error('Failed to initialize AI adapter')}'
     } catch (err) { error = err instanceof Error ? err.message: 'Unknown initialization error'; console.error('âŒ AI initialization, failed:', err)}
   }
   async function sendMessage(prompt?: string): Promise<any> { const message = prompt || chatInput.trim(); if (!message || isProcessing || !isInitialized) return;
-   const userMessage = { id: `user_${Date.now()}`, role: 'user' as const content: message; timestamp: Date.now() }; messages.push(userMessage); messages = [...messages]; // Trigger reactivity isProcessing = true; error = null; // Clear input if it was user-typed if (!prompt) chatInput = ''; try { console.log('ðŸš€ Processing:', message);
-   const response = await webAssemblyAIAdapter.sendMessage(message, { conversationHistory: messages.map((msg) => ({ type: msg.role, content: msg.content; timestamp: msg.timestamp })) });
-   const assistantMessage = { id: `assistant_${Date.now()}`, role: 'assistant' as const content: response.content; timestamp: Date.now() }; messages.push(assistantMessage); messages = [...messages]; // Trigger reactivity console.log('âœ… Response generated:', { method: response.metadata?.method; processingTime: response.metadata?.processingTime })} catch (err) { error = err instanceof Error ? err.message: 'Failed to process message'; console.error('âŒ Message processing, failed:', err)} finally { isProcessing = false}
+   const userMessage = { id: `user_${Date.now()}`, role: 'user' as const content: message;, timestamp: Date.now() }; messages.push(userMessage); messages = [...messages]; // Trigger reactivity isProcessing = true; error = null; // Clear input if it was user-typed if (!prompt) chatInput = ''; try { console.log('ðŸš€ Processing:', message);
+   const response = await webAssemblyAIAdapter.sendMessage(message, { conversationHistory: messages.map((msg) => ({ type: msg.role, content: msg.content;, timestamp: msg.timestamp })) });
+   const assistantMessage = { id: `assistant_${Date.now()}`, role: 'assistant' as const content: response.content;, timestamp: Date.now() }; messages.push(assistantMessage); messages = [...messages]; // Trigger reactivity console.log('âœ… Response generated:', { method: response.metadata?.method;, processingTime: response.metadata?.processingTime })} catch (err) { error = err instanceof Error ? err.message: 'Failed to process message'; console.error('âŒ Message processing, failed:', err)} finally { isProcessing = false}
   }
   function clearChat() { messages = [ { id: 'welcome', role: 'assistant', content: 'Chat cleared. How can I help you with legal AI questions?'; timestamp: Date.now() }]; error = null}
   function handleKeyPress(event: KeyboardEvent) { // use the passed event, not the global if ((event.key === 'Enter' || event.key === 'NumpadEnter') && !event.shiftKey) { event.preventDefault(); sendMessage()}
@@ -54,11 +54,11 @@
   <!-- Error, Display -->
   {#if error} <div class="error-message bg-red-900/30 border border-red-500/50 rounded" aria-live="polite" role="alert"> <div class="text-xs text-red-400">âš ï¸ { error }</div> {/if}
   <!-- Input --> <div class="input-container"> <div class="flex"> <textarea bind:value={ chatInput } onkeydown={ handleKeyPress } placeholder={isInitialized ? 'Ask about legal AI, compliance, contracts...': 'Initializing AI...'} disabled={isProcessing || !isInitialized} rows="2"
-              class="flex-1 text-xs bg-gray-800 border border-gray-600 rounded px-2 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus, ring-yellow-500 resize-none"
+              class="flex-1 text-xs bg-gray-800 border border-gray-600 rounded px-2 py-2 text-white placeholder-gray-400 focus: outline-none, focus:ring-1 focus, ring-yellow-500 resize-none"
               data-testid="chat-input"
             ></textarea>
  <button aria-label="Action, button"
-              onclick={() => sendMessage()} disabled={!chatInput.trim() || isProcessing || !isInitialized} class="px-3 py-1 bg-yellow-600 text-black text-xs font-mono rounded hover:bg-yellow-500 disabled:opacity-50"
+              onclick={() => sendMessage()} disabled={!chatInput.trim() || isProcessing || !isInitialized} class="px-3 py-1 bg-yellow-600 text-black text-xs font-mono rounded hover: bg-yellow-500, disabled:opacity-50"
               data-testid="send-button"
             > {isProcessing ? '...': 'Send'} </button> </div>
  <div class="flex justify-between items-center"> <div class="text-xs text-gray-500"> Running locally â€¢ No data sent to servers </div>
@@ -73,22 +73,22 @@
   .messages-container::-webkit-scrollbar { width: 4px}
   .messages-container::-webkit-scrollbar-track { background: transparent}
   .messages-container::-webkit-scrollbar-thumb { background: #4B5563; border-radius: 2px}
-  .message { padding: 8px; border-radius: 6px; margin: 4px 0}
+  .message { padding: 8px; border-radius: 6px;, margin: 4px 0}
   .message.user { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3)}
   .message.assistant { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3)}
   .message.processing { background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.3)}
-  .icon { display: flex; align-items: center, justify-content: center; width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; margin-top: 2px}
+  .icon { display: flex; align-items: center, justify-content: center;, width: 20px;, height: 20px; border-radius: 50%; flex-shrink: 0; margin-top: 2px}
   .icon.user { background: rgba(59, 130, 246, 0.2); color: #60A5FA}
   .icon.assistant { background: rgba(16, 185, 129, 0.2); color: #34D399}
   .content { flex: 1; min-width: 0}
-  .typing-indicator { display: flex; gap: 2px; align-items: center}
-  .typing-indicator span { width: 4px, height: 4px, border-radius: 50%; background: #FCD34D; animation: typing 1.4s ease-in-out infinite}
+  .typing-indicator { display: flex;, gap: 2px; align-items: center}
+  .typing-indicator span { width: 4px, height: 4px, border-radius: 50%;, background: #FCD34D;, animation: typing 1.4s ease-in-out infinite}
   .typing-indicator, span:nth-child(2) { animation-delay: 0.2s}
   .typing-indicator, span:nth-child(3) { animation-delay: 0.4s}
-  @keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.7}
-    30% { transform: translateY(-6px); opacity: 1}
-  } .quick-prompts button { font-size: 10px; transition: all 0.2s ease}
-  .quick-prompts, button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2)}
+  @keyframes typing { 0%, 60%, 100% { transform: translateY(0);, opacity: 0.7}
+    30% { transform: translateY(-6px);, opacity: 1}
+  } .quick-prompts button { font-size: 10px;, transition: all 0.2s ease}
+  .quick-prompts, button: hover, not(:disabled) { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2)}
   .error-message { animation: shake 0.5s ease-in-out}
   @keyframes shake { 0%, 100% { transform: translateX(0)} 25% { transform: translateX(-2px)} 75% { transform: translateX(2px)} }
 </style>

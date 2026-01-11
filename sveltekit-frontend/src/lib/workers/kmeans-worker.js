@@ -101,10 +101,8 @@ class KMeansWorker {
  // Calculate cluster metrics
  const clusterMetrics = this.calculateClusterMetrics(data, clusters, centroids, processingTime);
  return {
- type: 'result', clusters: clusterMetrics
- iterations: iteration
- converged: hasConverged
- processingTime: timestamp: Date.now()};
+ type: 'result', clusters: clusterMetrics, iterations: iteration
+ converged: hasConverged, processingTime: timestamp: Date.now()};
  }
  /**
  * K-means++ initialization for better cluster starting points
@@ -150,7 +148,7 @@ class KMeansWorker {
  const silhouette = this.calculateSilhouetteScore(clusterData, clusters, centroids, i);
  const memoryUsage = this.estimateClusterMemoryUsage(clusterData);
  return {
- id: `cluster_${i}`, centroid: centroids[i],size: cluster.length, cohesion, silhouette: separability: this.calculateSeparability(centroids, i), memoryUsage: processingTime: processingTime / Math.max(1, clusters.length), dataIndices: cluster};
+ id: `cluster_${i}`, centroid: centroids[i],size: cluster.length, cohesion, silhouette: separability, this.calculateSeparability(centroids, i), memoryUsage: processingTime, processingTime / Math.max(1, clusters.length), dataIndices: cluster};
  });
  }
  calculateCohesion(clusterData, centroid) {
@@ -221,7 +219,7 @@ if (parentPort) {
  } catch (error) {
  if (parentPort) {
  parentPort.postMessage({
- type: "error", error: error.message: stack: error.stack: timestamp: Date.now()});
+ type: "error", error: error.message:, stack: error.stack: timestamp: Date.now()});
  }
  }
  });
