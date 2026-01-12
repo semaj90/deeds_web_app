@@ -164,7 +164,7 @@ class AuthSessionStore {
 	 * Initialize session from server data
 	 * Called in +layout.svelte with data from +layout.server.ts
 	 */
-	initialize(data: { user: User | null; session: Session | null }) {
+	initialize(data: { user: User | null, session: Session | null }) {
 		this.user = data.user;
 		this.session = data.session;
 		this.isLoading = false;

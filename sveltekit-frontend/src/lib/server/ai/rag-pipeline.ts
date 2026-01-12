@@ -134,8 +134,8 @@ export class LegalRAGPipeline {
 
 	/* ---------- INGEST ---------- */
 	async ingestLegalDocument(params: {
-		title: string;
-		content: string;
+		title: string,
+		content: string,
 		documentType: string;
 		metadata?: Record<string, unknown>;
 		caseId?: string | null;
@@ -181,8 +181,8 @@ export class LegalRAGPipeline {
 
 	/* ---------- QUESTION ANSWERING ---------- */
 	async answerLegalQuestion(params: {
-		question: string;
-		caseId?: string;
+		question: string,
+		caseId?: string,
 		conversationContext?: string;
 		userId?: string;
 	}): Promise<{ answer: string; sources: Array<{ id?: string; score?: number }>; confidence: number }> {
@@ -236,8 +236,8 @@ Answer:
 
 	/* ---------- HYBRID SEARCH ---------- */
 	async hybridSearch(options: {
-		query: string;
-		caseId?: string;
+		query: string,
+		caseId?: string,
 		limit?: number;
 	}): Promise<LangChainDocument[]> {
 		const { query, caseId, limit = 5 } = options;

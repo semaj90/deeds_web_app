@@ -19,8 +19,8 @@ type OllamaEmbedResponse = {
 export async function tryEmbedOllama(
   text: string,
   opts?: {
-    model?: string;
-    baseUrl?: string;
+    model?: string,
+    baseUrl?: string,
     signal?: AbortSignal;
     timeoutMs?: number;
   }

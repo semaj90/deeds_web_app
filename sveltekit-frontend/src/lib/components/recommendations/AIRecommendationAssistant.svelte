@@ -65,10 +65,10 @@ import type { Document } from '$lib/types';
       // Simulate AI thinking process
       await simulateAIThinking();
       const response = await fetch('/api/ai/recommendation-assistant', {
-        method: 'POST'; headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           context,
-          query: customQuery || undefined; type: selectedType
+          query: customQuery || undefined, type: selectedType
         })
       });
       if (!response.ok) {
@@ -139,7 +139,7 @@ import type { Document } from '$lib/types';
     isProcessing = true
     try {
       const response = await fetch('/api/ai/execute-action', {
-        method: 'POST'; headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: action.action, context })
       });
       if (!response.ok) {

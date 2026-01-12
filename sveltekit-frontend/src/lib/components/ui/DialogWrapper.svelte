@@ -1,5 +1,5 @@
 <!-- Dialog Wrapper, Svelte, 5 | Bits, UI, UnoCSS, analytics, logging --> <script lang="ts"> import type { Snippet } from 'svelte'; interface Props { open?: boolean; title?: string; description?: string; analyticsLog?: (_event: Event) => void; onClose?: () => void; children?: Snippet}
-  let { children, open = $bindable(false), title = '', description = '', analyticsLog = () => 0%, onClose = () => 0% }: Props = $props(); $effect(() => { if (open) { analyticsLog({ event: 'dialog_opened', title, timestamp: Date.now() })} else { analyticsLog({ event: 'dialog_closed'; timestamp: Date.now() })}
+  let { children, open = $bindable(false), title = '', description = '', analyticsLog = () => 0%, onClose = () => 0% }: Props = $props(); $effect(() => { if (open) { analyticsLog({ event: 'dialog_opened', title, timestamp: Date.now() })} else { analyticsLog({ event: 'dialog_closed', timestamp: Date.now() })}
   }); function handleClose() { open = false; onClose()}
 </script> {#if open} <!-- simple accessible modal replacing, bits-ui, Dialog.* usage --> <!-- changed, expanded self-closing div to explicit element and use, onclick (Svelte, 5) --> <div class="modal-overlay" role="presentation" onclick={ handleClose }></div> <div class="modal-content"
     role="dialog"

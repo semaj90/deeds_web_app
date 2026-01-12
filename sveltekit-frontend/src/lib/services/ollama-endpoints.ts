@@ -54,8 +54,8 @@ export async function checkOllamaHealth(): Promise<boolean> {
 export async function generateWithGemma3Legal(
  prompt: string,
  options: {
- max_tokens?: number;
- temperature?: number;
+ max_tokens?: number,
+ temperature?: number,
  top_p?: number;
  stream?: boolean;
  } = {}
@@ -169,7 +169,7 @@ export async function getAvailableModels(): Promise<string[]> {
  * Contextual chat with robust fetch calls
  */
 export async function contextualChat(
- messages: Array<{ role: string; content, string }>,
+ messages: Array<{ role: string, content, string }>,
  context?: any
 ): Promise<string> {
  try {

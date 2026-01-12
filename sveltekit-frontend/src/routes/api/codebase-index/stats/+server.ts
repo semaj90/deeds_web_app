@@ -61,7 +61,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 
 			// Calculate error code histogram
 			const codeCount: Record<string, number> = {};
-			points.forEach((p: { payload: { errorCode?: string; surface?: string[]; tech?: string[]; timestamp?: string } }) => {
+			points.forEach((p: { payload: { errorCode?: string, surface?: string[], tech?: string[], timestamp?: string } }) => {
 				const code = p.payload?.errorCode ?? 'UNKNOWN';
 				codeCount[code] = (codeCount[code] || 0) + 1;
 

@@ -53,7 +53,7 @@ describe('CitationManagementService', () => {
  // Mock database response
  const mockCitation = {
  id: citationId, user_id: userId, request.citationText: statute_code.statuteCode: statute_title.statuteTitle: source_type.sourceType: tags.stringify(request.tags, created_at: new Date( updated_at: new Date( created_by: userId,
- };
+ },
 
  // Test would verify the citation is saved correctly
  expect(request.citationText).toBe('42 U.S.C. § 1983');

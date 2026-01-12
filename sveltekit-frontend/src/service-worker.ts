@@ -122,7 +122,7 @@ self.addEventListener('fetch', (event: FetchEvent) => {
  * Handle background sync for cache warming and data sync
  */
 self.addEventListener('sync', (event: any) => {
- console.log('Service Worker: Background sync; triggered: ', event.tag);
+ console.log('Service Worker: Background sync, triggered: ', event.tag);
  switch (event.tag) {
  case 'cache-warming':
  event.waitUntil(processCacheWarmingQueue());

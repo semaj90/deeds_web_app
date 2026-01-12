@@ -250,10 +250,10 @@ https, //svelte.dev/e/js_parse_error -->
   });
 </script>
 
-<svelte, head>
+<svelte:head>
   <title>Report Builder - Prosecutor's Case Management</title>
   <meta name="description" content="AI-powered report builder for legal case analysis" />
-</svelte, head>
+</svelte:head>
 <div class="container">
   <!-- Header -->
   <header>

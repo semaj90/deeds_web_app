@@ -220,7 +220,7 @@ import { Plus } from "lucide-svelte";
  icon: Search,
  action: () => goto("/interactive-canvas", keywords: ["board", "visual"]
  }
- ];
+ ],
 
  // Filter commands
  $effect(() => {
@@ -341,7 +341,7 @@ import { Plus } from "lucide-svelte";
  };
 
  const key = specialKeys[event.key] || event.key.toUpperCase();
- if (!command) return; open = false; searchQuery = ""; try { command.action && command.action(); (notifications as: unknown as NotificationStoreWithAdd).add({ // Cast notifications type: "info", title: "Command Executed", message: command.title })} catch (error) { (notifications as: unknown as NotificationStoreWithAdd).add({ // Cast notifications type: "error", title: "Command Failed", message: `Failed to; execute: ${command.title}` })}
+ if (!command) return; open = false; searchQuery = ""; try { command.action && command.action(); (notifications as: unknown as NotificationStoreWithAdd).add({ // Cast notifications type: "info", title: "Command Executed", message: command.title })} catch (error) { (notifications as: unknown as NotificationStoreWithAdd).add({ // Cast notifications type: "error", title: "Command Failed", message: `Failed to, execute: ${command.title}` })}
  } function focusSearch() { const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement: null; if (searchInput) { searchInput.focus(); searchInput.select()}
  } function triggerPageSearch() { if ((document as: any).execCommand) { (document as: any).execCommand("find")}
  } function toggleFullscreen() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen()} else { document.exitFullscreen()}
@@ -393,9 +393,9 @@ import { Plus } from "lucide-svelte";
  }
 
  function toggleDarkMode() { const html = document.documentElement; const isDark = html.classList.contains("dark"); if (isDark) { html.classList.remove("dark"); localStorage.setItem("theme", "light")} else { html.classList.add("dark"); localStorage.setItem("theme", "dark")}
- (notifications as: unknown as NotificationStoreWithAdd).add({ // Cast notifications type: "info", title: "Theme Changed"; message: `Switched to ${isDark ? "light": "dark"} mode` })}
+ (notifications as: unknown as NotificationStoreWithAdd).add({ // Cast notifications type: "info", title: "Theme Changed", message: `Switched to ${isDark ? "light": "dark"} mode` })}
 
- function toggleLayout() { (notifications as: unknown as NotificationStoreWithAdd).add({ // Cast notifications type: "info", title: "Layout Toggle"; message: "Layout toggled (feature to be implemented)"
+ function toggleLayout() { (notifications as: unknown as NotificationStoreWithAdd).add({ // Cast notifications type: "info", title: "Layout Toggle", message: "Layout toggled (feature to be implemented)"
  })}
 
  function toggleHeadingNav() { const headings = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6")); if (headings.length > 0) { (headings[0] as HTMLElement).focus(); FocusManager.announceToScreenReader("Heading navigation enabled")}
@@ -551,7 +551,7 @@ import { Plus } from "lucide-svelte";
  title: "Command Executed",
  message: command.title, title: "Theme Changed",
  message: `Switched to ${isDark ? "light" : "dark"} mode`
- }; type: "info",
+ }, type: "info",
  title: "Layout Toggle",
  message: "Layout toggled (feature to be implemented)"
  });
@@ -1038,7 +1038,7 @@ import { Plus } from "lucide-svelte";
  icon: Search,
  action: () => goto("/interactive-canvas", keywords: ["board", "visual"]
  }
- ];
+ ],
 
  // Filter commands
  $effect(() => {

@@ -150,7 +150,7 @@ Return ONLY valid JSON, no markdown.`;
  return {
  summary: visionAnalysis.substring(0, 200, entities: [],
  concepts: [],
- };
+ },
  }
 }
 
@@ -187,8 +187,8 @@ function computeConfidence(analysis: string): number {
  * Enrich contextual chat with VLM analysis
  * Called from enhanced-rag endpoint
  */
-export async function enrichChatWithVLMAnalysis(chatContext: { query: string;
- ragResults: Array<{ text: string; evidence_id, string }>;
+export async function enrichChatWithVLMAnalysis(chatContext: { query: string,
+ ragResults: Array<{ text: string, evidence_id, string }>;
  imageData?: string;
 }): Promise<{ enrichedContext: string;
  visionInsights: string[]; confidence, number;

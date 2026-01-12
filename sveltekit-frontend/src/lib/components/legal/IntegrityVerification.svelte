@@ -159,7 +159,7 @@ Displays detailed integrity verification results with AI analysis
             />
             <svelte, component | this={BadgeComponent} variant={verificationResults.hashMatch ? 'success' , 'destructive'}>
               {verificationResults.hashMatch ? 'Pass' : 'Fail'}
-            </svelte, component>
+            </svelte:component>
           </div>
         </div>
         <!-- Metadata, Integrity -->
@@ -175,7 +175,7 @@ Displays detailed integrity verification results with AI analysis
               variant={verificationResults.metadataIntact ? 'success' , 'destructive'}
             >
               {verificationResults.metadataIntact ? 'Pass' : 'Fail'}
-            </svelte, component>
+            </svelte:component>
           </div>
         </div>
         <!-- Timestamp, Validation -->
@@ -191,7 +191,7 @@ Displays detailed integrity verification results with AI analysis
               variant={verificationResults.timestampValid ? 'success' , 'destructive'}
             >
               {verificationResults.timestampValid ? 'Pass' : 'Fail'}
-            </svelte, component>
+            </svelte:component>
           </div>
         </div>
         <!-- Digital, Signature -->
@@ -207,7 +207,7 @@ Displays detailed integrity verification results with AI analysis
               variant={verificationResults.digitalSignatureValid ? 'success' , 'destructive'}
             >
               {verificationResults.digitalSignatureValid ? 'Pass' : 'Fail'}
-            </svelte, component>
+            </svelte:component>
           </div>
         </div>
         <!-- AI, Analysis, Score -->
@@ -222,7 +222,7 @@ Displays detailed integrity verification results with AI analysis
               variant={(verificationResults.aiAnalysisScore ?? 0) > 0.7 ? 'success' : 'warning'}
             >
               {(verificationResults.aiAnalysisScore ?? 0) > 0.7 ? 'Good' : 'Review'}
-            </svelte, component>
+            </svelte:component>
           </div>
         </div>
       </div>

@@ -383,8 +383,8 @@ export class DecisionEngine {
 	/**
 	 * Update thresholds dynamically
 	 */
-	updateThresholds(thresholds: Partial<{ high: number;
-		medium: number; low: number;
+	updateThresholds(thresholds: Partial<{ high: number,
+		medium: number, low: number;
 		critical, number;
 	}>): void {
 		if (thresholds.high !== undefined) {

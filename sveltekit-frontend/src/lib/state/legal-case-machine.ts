@@ -339,7 +339,7 @@ const hasAIAnalysis = ({ context: _context }: { context: LegalCaseContext }) => 
 // === Main state machine ===
 export const legalCaseMachine = setup({
  types: {} as {
- context: LegalCaseContext, events: LegalCaseEvents;
+ context: LegalCaseContext, events: LegalCaseEvents,
  },
  guards: { isValidCaseData, hasEvidence, hasAIAnalysis },
  actions: { assignCaseData: ({ context, event }) => {

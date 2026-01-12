@@ -79,7 +79,7 @@ export class WebAssemblyAIAdapter {
 		return 'fallback';
 	}
 
-	async sendMessage(message: string, options: { conversationHistory?: ConversationEntry[]; temperature?: number; maxTokens?: number } = {}): Promise<WebAssemblyAIResponse> {
+	async sendMessage(message: string, options: { conversationHistory?: ConversationEntry[], temperature?: number, maxTokens?: number } = {}): Promise<WebAssemblyAIResponse> {
 		if (!this.initialized) await this.initialize();
 		const startTime = performance.now();
 		const prompt = this.buildPrompt(message, options.conversationHistory || []);
@@ -94,7 +94,7 @@ export class WebAssemblyAIAdapter {
 		return response;
 	}
 
-	private async generateWithOllama(prompt: string, options: { temperature?: number; maxTokens?: number }): Promise<WebAssemblyAIResponse> {
+	private async generateWithOllama(prompt: string, options: { temperature?: number, maxTokens?: number }): Promise<WebAssemblyAIResponse> {
 		const res = await fetch(this.config.ollamaEndpoint + '/generate', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -105,7 +105,7 @@ export class WebAssemblyAIAdapter {
 		return { content: data.response || '', metadata: { tokensGenerated: Math.ceil((data.response || '').length / 4), processingTime: 0, confidence: 0.9, method: 'ollama', modelUsed: this.currentModel, fromCache: false, gpuAccelerated: this.gpuAvailable } };
 	}
 
-	private async generateWithPython(prompt: string, options: { temperature?: number; maxTokens?: number }): Promise<WebAssemblyAIResponse> {
+	private async generateWithPython(prompt: string, options: { temperature?: number, maxTokens?: number }): Promise<WebAssemblyAIResponse> {
 		const res = await fetch(this.config.pythonMiddlewareEndpoint + '/generate', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },

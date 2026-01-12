@@ -195,7 +195,7 @@ class EvidenceGlobalStore {
  }
 
  // === Node Positioning (for drag & drop) ===
- updateNodePosition(nodeId: string, position: { x: number; y: number }) {
+ updateNodePosition(nodeId: string, position: { x: number, y: number }) {
  if (!this.currentCase) return;
  const node = this.currentCase.nodes.find((n) => n.id === nodeId);
  if (node) {

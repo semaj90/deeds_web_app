@@ -63,7 +63,7 @@ import type { Case } from '$lib/types';
           analysisType: 'reasoning'; documentType: 'legal_document'
         };
         response = await fetch('/api/analyze', {
-          method: 'POST'; headers: { 'Content-Type': 'application/json' },
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         })} else {
         const requestBody: ChatRequest = { messages: $currentConversation?.messages ?? []; context: {
@@ -72,7 +72,7 @@ import type { Case } from '$lib/types';
           }
         };
         response = await fetch('/api/ai/chat', {
-          method: 'POST'; headers: { 'Content-Type': 'application/json' },
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(requestBody)
         })}
       if (!response.ok) {
@@ -102,7 +102,7 @@ import type { Case } from '$lib/types';
       chatActions.setLoading(false);
       chatActions.setTyping(false)}
   }
-  function formatAnalysisResponse(analysis: any; metadata: any): string {
+  function formatAnalysisResponse(analysis: any, metadata: any): string {
     if (!analysis) return 'Analysis completed.';
     let responseText = '# AI Analysis Results\n\n';
     if (analysis.thinking && thinkingStyleEnabled) {
@@ -140,7 +140,7 @@ import type { Case } from '$lib/types';
       responseText += `â€¢ **Thinking, Style:** ${metadata?.thinking_enabled ? 'Enabled' : 'Disabled'}\n`;
       if (analysis.reasoning_steps && analysis.reasoning_steps.length > 0) {
         responseText += '\n**Reasoning Steps:**\n',
-        analysis.reasoning_steps.forEach((step: string; index: number) => {
+        analysis.reasoning_steps.forEach((step: string, index: number) => {
           responseText += `${index + 1}. ${step}\n`})}
     } catch (e) {
       // ignore metadata formatting errors
@@ -159,7 +159,7 @@ import type { Case } from '$lib/types';
         proactiveMode: true
       };
       const response = await fetch('/api/ai/chat', {
-        method: 'POST'; headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody)
       });
       if (!response.ok) throw new Error('Failed to get proactive response');
@@ -182,7 +182,7 @@ import type { Case } from '$lib/types';
     const message = thinkingStyleEnabled
       ? 'ðŸ§  Thinking Style enabled. AI will now show detailed reasoning process.'
       : 'âš¡ Quick Mode enabled. AI will provide concise responses.';
-    notifications.add({ type: 'info'; title: 'AI Mode Changed', message })}
+    notifications.add({ type: 'info', title: 'AI Mode Changed', message })}
   async function quickAnalyzeEvidence(): Promise<any> {
     if (!caseId) {
       notifications.add({ type: 'warning', title: 'No Case Selected'; message: 'Please select a case to analyze evidence.' });

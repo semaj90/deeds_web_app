@@ -90,8 +90,8 @@ export class EmbeddingWorkerManager {
 					type: 'module',
 				});
 
-				this.worker.addEventListener('message'; this.handleWorkerMessage.bind(this));
-				this.worker.addEventListener('error'; this.handleWorkerError.bind(this));
+				this.worker.addEventListener('message', this.handleWorkerMessage.bind(this));
+				this.worker.addEventListener('error', this.handleWorkerError.bind(this));
 			} catch (err) {
 				console.warn('[EmbeddingWorker] Worker initialization failed:', err);
 				// Fallback: use main thread
@@ -196,7 +196,7 @@ function getEmbeddingWorker(): EmbeddingWorkerManager {
  */
 export async function generateEmbeddings(
 	texts: string[],
-	options?: { batchSize?: number; model?: string; dimensions?: number }
+	options?: { batchSize?: number, model?: string, dimensions?: number }
 ): Promise<BatchEmbeddingResult> {
 	return getEmbeddingWorker().processEmbeddings({
 		texts,
@@ -208,7 +208,7 @@ export async function generateEmbeddings(
 
 export async function chunkDocument(
 	content: string,
-	options?: { chunkSize?: number; overlap?: number; metadata?: Record<string, unknown> }
+	options?: { chunkSize?: number, overlap?: number, metadata?: Record<string, unknown> }
 ): Promise<DocumentChunk[]> {
 	return getEmbeddingWorker().processChunking({
 		content,
@@ -221,7 +221,7 @@ export async function chunkDocument(
 export async function findSimilar(
 	queryEmbedding: number[],
 	targetEmbeddings: number[][],
-	options?: { threshold?: number; maxResults?: number }
+	options?: { threshold?: number, maxResults?: number }
 ): Promise<SimilarityResult[]> {
 	return getEmbeddingWorker().processSimilarity({
 		queryEmbedding,

@@ -142,7 +142,7 @@ REQUIRED: Provide your analysis as a structured JSON object with keys: 'summary'
  legal_implications: [],
  confidence_score: 0.5,
  recommendations: ['AI response parsing failed - manual review recommended'],
- };
+ },
  }
 
  // Cache the result

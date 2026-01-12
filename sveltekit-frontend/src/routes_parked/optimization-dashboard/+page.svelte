@@ -116,7 +116,7 @@ import { onMount } from 'svelte';
  // Cast options: to, unknown: unknown to avoid strict RAGSearchOptions mismatch
  await rag.search('legal AI optimization neural networks', {
  limit: 5,
- // useMLRanking may be optional on some implementations; pass through if accepted
+ // useMLRanking may be optional on some implementations, pass through if accepted
  ...({ useMLRanking: true } as any)
  } as any),
  systemStatus.recommendations = (rag.intelligentSuggestions?.() ?? []) as string[]} catch (err) {

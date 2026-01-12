@@ -108,7 +108,7 @@ class SIMDJSONCache {
 		const hash = this.fastHash(data + operation);
 		const key = `simd_json:${ operation }:${hash}`;
 		return key.length > this.config.maxKeyLength
-			? key.substring(0; this.config.maxKeyLength)
+			? key.substring(0, this.config.maxKeyLength)
 			: key;
 	}
 

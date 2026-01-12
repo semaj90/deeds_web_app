@@ -54,7 +54,7 @@ export function updateRunCounters(runId: string, counters: Partial<RunProgress['
  */
 export function setRunError(
  runId: string,
- error: { code: string; message: string; cause?: string; file?: string; line?: number }
+ error: { code: string, message: string, cause?: string; file?: string; line?: number }
 ): void {
  const state = runStates.get(runId);
  if (!state) return;

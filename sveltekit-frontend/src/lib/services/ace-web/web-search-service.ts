@@ -31,7 +31,7 @@ export class WebSearchService {
   private provider: 'duckduckgo' | 'brave' | 'mock';
   private braveApiKey?: string;
 
-  constructor(config?: { provider?: 'duckduckgo' | 'brave' | 'mock'; braveApiKey?: string }) {
+  constructor(config?: { provider?: 'duckduckgo' | 'brave' | 'mock', braveApiKey?: string }) {
     this.minioService = new MinIOService();
     this.provider = config?.provider ?? 'mock'; // Default to mock for development
     this.braveApiKey = config?.braveApiKey ?? process.env.BRAVE_API_KEY;
@@ -84,7 +84,7 @@ export class WebSearchService {
 
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; ACE-Bot/1.0)',
+        'User-Agent': 'Mozilla/5.0 (compatible, ACE-Bot/1.0)',
       },
     });
 

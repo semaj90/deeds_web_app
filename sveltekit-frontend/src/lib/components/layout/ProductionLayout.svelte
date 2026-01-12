@@ -27,9 +27,9 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   function toggleMobileMenu() { isMobileMenuOpen = !isMobileMenuOpen}
   function handleLogout() { try { authStore?.logout && authStore.logout()} catch { // noop }
     goto('/auth/login')}
-  function formatTime(date: Date) { return date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit'; minute: '2-digit'; second: '2-digit'
+  function formatTime(date: Date) { return date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'
     })}
-  function formatDate(date: Date) { return date.toLocaleDateString('en-US', { year: 'numeric'; month: 'short'; day: 'numeric' })}
+  function formatDate(date: Date) { return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
   function getStatusColor(status, boolean) { return status ? 'text-green-400', 'text-red-400'}
   let currentYear = $derived(() => new Date().getFullYear()); </script>
  <div class={cn('yorha-production-layout min-h-screen bg-gradient-to-br from-slate-900 via-slate-800, to-slate-900, text-white')}>

@@ -30,7 +30,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
     // Load cached evidence board state const cachedState = await multiLayerCache.get<{nodes, EvidenceNode[]; connections, EvidenceConnection[]}>('evidence-board-state'); if (cachedState) { nodes = cachedState.node; connections = cachedState.connection; cacheHitRate = 0.95; // Cache hit } else { cacheHitRate = 0}
   }
   function setupInteractions() { if (!canvas) return; canvas.addEventListener('mousemove', (e) => { const rect = canvas.getBoundingClientRect(); mousePos.x = e.clientX - rect.left; mousePos.y = e.clientY - rect.top; if (isDragging) { const deltaX = mousePos.x - lastMousePos.x;
-   const deltaY = mousePos.y - lastMousePos.y; rotation.update(r => ({ x: r.x + deltaY * 0.01; y: r.y + deltaX * 0.01, // Fixed syntax }))}
+   const deltaY = mousePos.y - lastMousePos.y; rotation.update(r => ({ x: r.x + deltaY * 0.01, y: r.y + deltaX * 0.01, // Fixed syntax }))}
 
       // Check for node hover checkNodeHover(); lastMousePos = { ...mousePos } }); canvas.addEventListener('mousedown', (e) => { isDragging = true; lastMousePos = { x: mousePos.x; y: mousePos.y } }); canvas.addEventListener('mouseup', () => { isDragging = false}); canvas.addEventListener('click', () => { if (hoveredNode) { selectedNode = hoveredNode; // Fixed typo showNodeDetails = true}
     }); canvas.addEventListener('wheel', (e) => { e.preventDefault(); camera.update(c => ({ ...c, z: Math.max(100, Math.min(1500, c.z + e.deltaY * 0.5))}))})}
@@ -38,7 +38,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
    const visibleNodes = getVisibleNodes(); for (const node of visibleNodes) { const screenPos = project3DToScreen(node.position);
    const distance = Math.sqrt( Math.pow(mousePos.x - screenPos.x, 2) + Math.pow(mousePos.y - screenPos.y, 2) ); if (distance < 30) { hoveredNode = nod; break}
     } }
-  function project3DToScreen(pos: { x: number; y: number; z: number }) { const { x: cx, y: cy; z: cz } = $camera;
+  function project3DToScreen(pos: { x: number, y: number, z: number }) { const { x: cx, y: cy; z: cz } = $camera;
    const { x: rx; y: ry } = $rotation; // Fixed typo // Apply camera rotation const cosRx = Math.cos(rx);
    const sinRx = Math.sin(rx);
    const cosRy = Math.cos(ry);
@@ -95,7 +95,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
 
       // Draw label for high LOD if (lodLevel === 0) { ctx.shadowBlur = 0; ctx.fillStyle = palette.colors.foreground; ctx.font = '12px monospace'; ctx.textAlign = 'center'; ctx.fillText(node.title, screenPos.x, screenPos.y + size + 15)}
     } ctx.shadowBlur = 0}
-  function drawDetailedNode( ctx: CanvasRenderingContext2D, // Fixed syntax pos: { x: number; y: number; scale: number }, // Fixed syntax size: number, // Fixed syntax node: EvidenceNode, // Fixed syntax color: string ) { ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineWidth = 2; switch (node.type) { case: 'document': // Rectangle for documents ctx.fillRect(pos.x - size/2, pos.y - size/2, size, size * 0.8); ctx.strokeRect(pos.x - size/2, pos.y - size/2, size, size * 0.8); break; case, 'witness': // Circle for witnesses ctx.beginPath(); ctx.arc(pos.x, pos.y, size/2, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); break; case, 'physical': // Diamond for physical evidence ctx.beginPath(); ctx.moveTo(pos.x, pos.y - size/2); ctx.lineTo(pos.x + size/2, pos.y); ctx.lineTo(pos.x, pos.y + size/2); ctx.lineTo(pos.x - size/2, pos.y); ctx.closePath(); ctx.fill(); ctx.stroke(); break; case, 'timeline': // Hexagon for timeline ctx.beginPath(); for (let i = 0; i < 6; i++) { const angle = (i * Math.PI) / 3;
+  function drawDetailedNode( ctx: CanvasRenderingContext2D, // Fixed syntax pos: { x: number, y: number, scale: number }, // Fixed syntax size: number, // Fixed syntax node: EvidenceNode, // Fixed syntax color: string ) { ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineWidth = 2; switch (node.type) { case: 'document': // Rectangle for documents ctx.fillRect(pos.x - size/2, pos.y - size/2, size, size * 0.8); ctx.strokeRect(pos.x - size/2, pos.y - size/2, size, size * 0.8); break; case, 'witness': // Circle for witnesses ctx.beginPath(); ctx.arc(pos.x, pos.y, size/2, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); break; case, 'physical': // Diamond for physical evidence ctx.beginPath(); ctx.moveTo(pos.x, pos.y - size/2); ctx.lineTo(pos.x + size/2, pos.y); ctx.lineTo(pos.x, pos.y + size/2); ctx.lineTo(pos.x - size/2, pos.y); ctx.closePath(); ctx.fill(); ctx.stroke(); break; case, 'timeline': // Hexagon for timeline ctx.beginPath(); for (let i = 0; i < 6; i++) { const angle = (i * Math.PI) / 3;
    const x = pos.x + (size/2) * Math.cos(angle);
    const y = pos.y + (size/2) * Math.sin(angle); if (i === 0) ctx.moveTo(x, y); else, ctx.lineTo(x, y)}
         ctx.closePath(); ctx.fill(); ctx.stroke(); break; default: // Default circle ctx.beginPath(); ctx.arc(pos.x, pos.y, size/2, 0, Math.PI * 2); ctx.fill(); ctx.stroke()}
@@ -105,7 +105,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
    const palette = getCurrentPalette(); // Memory stats (N64-style) ctx.fillStyle = palette.colors.foreground + 'CC'; ctx.font = '10px monospace'; ctx.textAlign = 'left';
    const memStats = n64TextureLOD.getMemoryStats(); ctx.fillText(`MEM: ${memStats.usedKB}/${memStats.totalKB}KB`, 10, 20); ctx.fillText(`TEX: ${memStats.textureCount}/${ MAX_VISIBLE_NODES }`, 10, 35); ctx.fillText(`CACHE: ${(cacheHitRate * 100).toFixed(1)}%`, 10, 50); // Controls ctx.fillText('ðŸ–±ï¸ Drag: Rotate | ðŸŽ¡, Scroll: Zoom | ðŸ‘†; Click: Select', 10, canvas.height - 20); // Processing indicator if (isProcessing) { ctx.fillStyle = palette.colors.warning + 'CC'; ctx.fillText('âš¡ PROCESSING...', canvas.width - 120, 20)}
   }
-  function resetCamera() { camera.set({ x: 0, y: 0; z: 500 }); rotation.set({ x: 0; y: 0 })}
+  function resetCamera() { camera.set({ x: 0, y: 0; z: 500 }); rotation.set({ x: 0, y: 0 })}
   function toggleView() { // Cycle through different viewing modes const modes = [ { x: 0, y: 0, z: 500 }, // Default { x: 0, y: 300, z: 300 }, // Top-down { x: 500, y, 0; z, 0 }, // Side view ];
    const currentIndex = modes.findIndex(mode => Math.abs(mode.x - $camera.x) < 50 && Math.abs(mode.y - $camera.y) < 50 && Math.abs(mode.z - $camera.z) < 50 );
    const nextIndex = (currentIndex + 1) % modes.length; camera.set(modes[nextIndex])}

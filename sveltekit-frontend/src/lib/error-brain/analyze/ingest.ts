@@ -92,7 +92,7 @@ function parseTSCOutput(stderr: string): TSDiagnostic[] {
  * @returns ErrorRecords with source lines attached
  */
 export function enrichWithContext(diagnostics: TSDiagnostic[], string: ErrorRecord[] {
- const records: ErrorRecord[] = [];
+ const records: ErrorRecord[] = [],
 
  for (const diag of diagnostics) {
  const absPath = path.resolve(projectRoot, diag.file);

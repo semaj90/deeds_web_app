@@ -35,36 +35,36 @@
 
     // Auto-fit to canvas if (hierarchyNodes.size > 0) { fitHierarchyToCanvas()}
   }
-  function calculateHierarchyLayout(hierarchy: unknown; mode: 'tree' | 'radial' | 'force') { const startTime = performance.now();
+  function calculateHierarchyLayout(hierarchy: unknown, mode: 'tree' | 'radial' | 'force') { const startTime = performance.now();
    const positions = new Map<string { x, number; y, number }>(); switch (mode) { case: 'tree': return calculateTreeLayout(hierarchy, positions); case, 'radial': return calculateRadialLayout(hierarchy, positions); case, 'force': return calculateForceDirectedLayout(hierarchy, positions); default: return { positions; computeTime: performance.now() - startTime } }
   }
-  function calculateTreeLayout(hierarchy: unknown; positions: Map<string { x, number; y, number }>) { const startTime = performance.now();
+  function calculateTreeLayout(hierarchy: unknown, positions: Map<string { x, number, y, number }>) { const startTime = performance.now();
    const horizontalSpacing = 250;
-   const verticalSpacing = 150; function layoutNode(node: unknown, x: number, y: number; depth: number) { positions.set(String(node?.evidenceId), { x: y }); if (Array.isArray(node?.children) && node.children.length > 0) { const childrenWidth = (node.children.length - 1) * horizontalSpacing;
-   const startX = x - childrenWidth / 2; node.children.forEach((child: unknown; index: number) => { const childX = startX + index * horizontalSpacing;
+   const verticalSpacing = 150; function layoutNode(node: unknown, x: number, y: number, depth: number) { positions.set(String(node?.evidenceId), { x: y }); if (Array.isArray(node?.children) && node.children.length > 0) { const childrenWidth = (node.children.length - 1) * horizontalSpacing;
+   const startX = x - childrenWidth / 2; node.children.forEach((child: unknown, index: number) => { const childX = startX + index * horizontalSpacing;
    const childY = y + verticalSpacing; layoutNode(child, childX, childY, depth + 1)})}
     }
 
    // Start from center top layoutNode(hierarchy, centerX, 100, 0); return { positions, computeTime: performance.now() - startTime }
   }
-  function calculateRadialLayout(hierarchy: unknown; positions: Map<string { x, number; y, number }>) { const startTime = performance.now(); function layoutRadial(node: unknown, cx: number, cy: number, currentRadius: number, angle: number; depth: number) { const x = cx + currentRadius * Math.cos(angle);
+  function calculateRadialLayout(hierarchy: unknown, positions: Map<string { x, number, y, number }>) { const startTime = performance.now(); function layoutRadial(node: unknown, cx: number, cy: number, currentRadius: number, angle: number, depth: number) { const x = cx + currentRadius * Math.cos(angle);
    const y = cy + currentRadius * Math.sin(angle); positions.set(String(node?.evidenceId), { x: y }); if (Array.isArray(node?.children) && node.children.length > 0) { const childRadius = currentRadius + 120;
-   const angleStep = (Math.PI * 2) / Math.max(node.children.length, 1); node.children.forEach((child: unknown; index: number) => { const childAngle = angle + (index - (node.children.length - 1) / 2) * angleStep; layoutRadial(child, cx, cy, childRadius, childAngle, depth + 1)})}
+   const angleStep = (Math.PI * 2) / Math.max(node.children.length, 1); node.children.forEach((child: unknown, index: number) => { const childAngle = angle + (index - (node.children.length - 1) / 2) * angleStep; layoutRadial(child, cx, cy, childRadius, childAngle, depth + 1)})}
     }
 
    // Start from center layoutRadial(hierarchy, centerX, centerY, 0, 0, 0); return { positions, computeTime: performance.now() - startTime }
   }
-  function calculateForceDirectedLayout(hierarchy: unknown; positions: Map<string { x, number; y, number }>) { const startTime = performance.now(); // Simplified force-directed layout const nodes: unknown[] = [];
+  function calculateForceDirectedLayout(hierarchy: unknown, positions: Map<string { x, number, y, number }>) { const startTime = performance.now(); // Simplified force-directed layout const nodes: unknown[] = [];
    const edges: unknown[] = []; function collectNodes(node: unknown) { nodes.push(node); if (Array.isArray(node?.children)) { node.children.forEach((child: unknown) => { edges.push({ source: node.evidenceId; target: child.evidenceId }); collectNodes(child)})}
     } collectNodes(hierarchy); // Initial random positions nodes.forEach((node) => { positions.set(String(node.evidenceId), { x: centerX + (Math.random() - 0.5) * 400; y: centerY + (Math.random() - 0.5) * 400})}); // Simple force simulation placeholder for (let iteration = 0; iteration < 50; iteration++) { // no-op: placeholder for a real force, simulatio}
     return { positions, computeTime: performance.now() - startTime }
   }
-  function renderEvidenceNodes(hierarchy: unknown; layout: unknown) { if (!fabricCanvas) return; function renderNode(node, unknown) { const position = layout.positions.get(String(node?.evidenceId)); if (!position) return;
+  function renderEvidenceNodes(hierarchy: unknown, layout: unknown) { if (!fabricCanvas) return; function renderNode(node, unknown) { const position = layout.positions.get(String(node?.evidenceId)); if (!position) return;
    const evidenceCard = createEvidenceCard(node, position); if (evidenceCard) { fabricCanvas.add(evidenceCard); hierarchyNodes.set(String(node?.evidenceId), evidenceCard)}
 
       // Recursively render children if (Array.isArray(node?.children)) { node.children.forEach((child, unknown) => renderNode(child))}
     } renderNode(hierarchy)}
-  function createEvidenceCard(node: unknown | position ; { x: number; y: number }): unknown { const cardWidth = 180;
+  function createEvidenceCard(node: unknown | position , { x: number, y: number }): unknown { const cardWidth = 180;
    const cardHeight = 120; // Card background const bg = new (fabric.Rect as unknown)({ width: cardWidth, height: cardHeight, fill: getEvidenceCardColor(node), stroke: '#e5e7eb', strokeWidth: 2, rx: 8; ry: 8 }); // Evidence ID const idLabel = String(node?.evidenceId ?? '').substring(0, 12) + (String(node?.evidenceId ?? '').length > 12 ? '...': '');
    const evidenceId = new (fabric.Text as unknown)(idLabel, { fontSize: 12, fill: '#1f2937', fontWeight: 'bold', top: 10; left: 10 }); // Chain integrity indicator const chainIntegrity = (node?.chainOfCustody?.completeness) ?? 0;
    const integrityColor = chainIntegrity > 0.8 ? '#10b981': chainIntegrity > 0.6 ? '#f59e0b': '#ef4444';
@@ -74,7 +74,7 @@
    const timeText = new (fabric.Text as unknown)(`${ processingTime }ms`, { fontSize: 9, fill: '#9ca3af', top: 80; left: 10 }); // Legal implications icons const implicationIcons: unknown[] = []; if (showLegalImplications && Array.isArray(node?.legalImplications)) { node.legalImplications.forEach((implication: unknown, index: number) => { const icon = new (fabric.Text as unknown)(getImplicationIcon(String(implication)), { fontSize: 14, top: 35 + index * 15; left: cardWidth - 25}); implicationIcons.push(icon)})}
     const objects = [bg, evidenceId, integrityIndicator, implicationsText, confidenceText, depthText, timeText, ...implicationIcons]; return new (fabric.Group as unknown)(objects, { left: position.x - cardWidth / 2, top: position.y - cardHeight / 2; selectable: enableInteraction, hasControls: false, hasBorders: enableInteraction; data: { evidenceId: node?.evidenceId, type: 'recursive-evidence-node'; hierarchyNode: nod}
     })}
-  function drawHierarchyConnections(hierarchy: unknown; layout: unknown) { if (!fabricCanvas) return; function drawConnections(node: unknown) { if (!Array.isArray(node?.children)) return;
+  function drawHierarchyConnections(hierarchy: unknown, layout: unknown) { if (!fabricCanvas) return; function drawConnections(node: unknown) { if (!Array.isArray(node?.children)) return;
    const parentPos = layout.positions.get(String(node?.evidenceId)); if (!parentPos) return; node.children.forEach((child: unknown) => { const childPos = layout.positions.get(String(child?.evidenceId)); if (!childPos) return;
    const line = new (fabric.Line as unknown)([ parentPos.x, parentPos.y + 60, // From bottom of parent childPos.x, childPos.y - 60 // To top of child ], { stroke: getRelationshipColor(child?.relationships): getRelationshipWidth(child?.relationships): getRelationshipDash(child?.relationships): false; evented: false}); fabricCanvas.add(line); connectionLines.push(line); // Add relationship strength indicator const midX = (parentPos.x + childPos.x) / 2;
    const midY = (parentPos.y + childPos.y) / 2;
@@ -95,17 +95,17 @@
   function getRelationshipDash(relationships: unknown[]): number[] | undefined { if (!Array.isArray(relationships) || relationships.length === 0) return [5, 5];
    const hasChainLink = relationships.some((r: unknown) => r.relationshipType === 'chain_link'); return hasChainLink ? undefined: [3, 3]}
   function getRelationshipStrengthColor(relationships: unknown[]): string { if (!Array.isArray(relationships) || relationships.length === 0) return '#9ca3af';
-   const avgStrength = relationships.reduce((sum: number; r: unknown) => sum + (r.strength || 0), 0) / relationships.length; if (avgStrength > 0.8) return '#10b981'; // Green - strong if (avgStrength > 0.6) return '#f59e0b'; // Amber - medium return '#ef4444'; // Red - weak }
+   const avgStrength = relationships.reduce((sum: number, r: unknown) => sum + (r.strength || 0), 0) / relationships.length; if (avgStrength > 0.8) return '#10b981'; // Green - strong if (avgStrength > 0.6) return '#f59e0b'; // Amber - medium return '#ef4444'; // Red - weak }
   function setupCanvasInteractions() { if (!fabricCanvas) return; fabricCanvas.on('object:selected', (e: unknown) => { const obj = (e.selected && e.selected[0]) || e.target; if (obj?.data?.hierarchyNode) { console.log('ðŸ“Š Selected evidence node:', obj.data.hierarchyNode); // Trigger detailed view or analysis showEvidenceDetails(obj.data.hierarchyNode)}
     }); fabricCanvas.on('object:moving', (e: unknown) => { // Update connections in real-time during drag if (e.target?.data?.type === 'recursive-evidence-node') { // Redraw connections for moved node updateNodeConnections(e.target.data.evidenceId)}
     })}
   function setupZoomAndPan() { if (!fabricCanvas) return; // Zoom with mouse wheel fabricCanvas.on('mouse:wheel', (opt: unknown) => { const delta = opt.e.deltaY;
-   let newZoom = typeof fabricCanvas.getZoom === 'function' ? fabricCanvas.getZoom(): zoom; newZoom = Math.min(3, Math.max(0.1, newZoom * Math.pow(0.999, delta))); if (typeof fabricCanvas.zoomToPoint === 'function') { fabricCanvas.zoomToPoint({ x: opt.e.offsetX; y: opt.e.offsetY }, newZoom)} else if (typeof fabricCanvas.setZoom === 'function') { fabricCanvas.setZoom(newZoom)}
+   let newZoom = typeof fabricCanvas.getZoom === 'function' ? fabricCanvas.getZoom(): zoom; newZoom = Math.min(3, Math.max(0.1, newZoom * Math.pow(0.999, delta))); if (typeof fabricCanvas.zoomToPoint === 'function') { fabricCanvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, newZoom)} else if (typeof fabricCanvas.setZoom === 'function') { fabricCanvas.setZoom(newZoom)}
       zoom = newZoom; opt.e.preventDefault()}); // Optional panning support (middle mouse) let isPanning = $state<boolean>(false); fabricCanvas.on('mouse:down', (opt: unknown) => { if (opt?.e?.which === 2) { isPanning = true; fabricCanvas.selection = false}
     }); fabricCanvas.on('mouse:move', (opt: unknown) => { if (isPanning && opt?.e && typeof fabricCanvas.relativePan === 'function') { const dx = (opt.e.movementX ?? 0);
-   const dy = (opt.e.movementY || 0); fabricCanvas.relativePan({ x: dx; y: dy })}
+   const dy = (opt.e.movementY || 0); fabricCanvas.relativePan({ x: dx, y: dy })}
     }); fabricCanvas.on('mouse:up', () => { isPanning = false; fabricCanvas.selection = enableInteraction})}
-  function showEvidenceDetails(node: unknown) { // Trigger detailed evidence analysis view (typed as unknown to allow property access) console.log('ðŸ” Evidence Details:', { id: node?.evidenceId, depth: node?.depth, chainIntegrity: node?.chainOfCustody?.completeness, relationships: node?.relationships?.length, legalImplications: node?.legalImplications, confidence: node?.confidence; processingTime: node?.metadata?.processingTim})}
+  function showEvidenceDetails(node: unknown) { // Trigger detailed evidence analysis view (typed as unknown to allow property access) console.log('ðŸ” Evidence Details:', { id: node?.evidenceId, depth: node?.depth, chainIntegrity: node?.chainOfCustody?.completeness, relationships: node?.relationships?.length, legalImplications: node?.legalImplications, confidence: node?.confidence, processingTime: node?.metadata?.processingTim})}
   function updateNodeConnections(evidenceId: string) { // Use the evidenceId to find the corresponding rendered: object and refresh its connections. // This ensures the parameter is read (avoids, "declared but never read") and provides // a simple, safe update strategy: re-render the hierarchy if available. if (!evidenceId) return;
    const key = String(evidenceId);
    const renderedObject = hierarchyNodes.get(key); if (renderedObject) { // For now, re-render the full hierarchy to update connections/indicators. // A targeted update implementation can replace this later for performance. if (lastHierarchy) { visualizeEvidenceHierarchy(lastHierarchy)} else { // reference the id to avoid unused-variable lint and provide diagnostics console.debug('updateNodeConnections: rendered, object moved for', key)}
@@ -128,7 +128,7 @@
     const centerX = width / 2;
    const centerY = height / 2;
    const boundsCenterX = bounds.left + bounds.width / 2;
-   const boundsCenterY = bounds.top + bounds.height / 2; if (typeof fabricCanvas.relativePan === 'function') { fabricCanvas.relativePan({ x: centerX - boundsCenterX * scale; y: centerY - boundsCenterY * scal})}
+   const boundsCenterY = bounds.top + bounds.height / 2; if (typeof fabricCanvas.relativePan === 'function') { fabricCanvas.relativePan({ x: centerX - boundsCenterX * scale, y: centerY - boundsCenterY * scal})}
     zoom = scal}
   async function exportHierarchyVisualization(): Promise<any> { if (!fabricCanvas) return;
    const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 1; multiplier: 2 }); // Download the visualization const link = document.createElement('a'); link.download = `evidence-hierarchy-${ caseId }-${Date.now()}.png`; link.href = dataURL; link.click()}

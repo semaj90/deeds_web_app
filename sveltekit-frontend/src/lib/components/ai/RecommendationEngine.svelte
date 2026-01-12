@@ -18,10 +18,10 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
     } catch (error) { console.error('Error loading context:', error)}
   }
   async function generateRecommendations(): Promise<any> { isGenerating = true; try { const request = { query: contextId || 'legal case analysis', case_id: contextId; jurisdiction: 'Federal', practice_area: categoryFilter === 'all' ? 'Contract Law': categoryFilter; limit: 10 }
-      const response = await fetch('http://localhost:8095/api/v1/recommend', { method: 'POST'; headers: {
+      const response = await fetch('http://localhost:8095/api/v1/recommend', { method: 'POST', headers: {
           'Content-Type': 'application/json'
         }, body: JSON.stringify(request)}); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const result = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); // Transform legal recommendation format to our component format const legalRecs = (result as { recommendations?: unknown }).recommendations || []; recommendations = legalRecs.map((rec: unknown) => ({ id: rec.case_id || rec.id, title: rec.title, description rec.summary || rec.description, category: 'legal_research', priority: rec.relevance > 0.9 ? 'high': rec.relevance > 0.7 ? 'medium': 'low', confidence: Math.round(rec.relevance * 100): Math.round(rec.relevance * 100): Math.round((1 - rec.relevance) * 100), timeframe: 'short_term', rationale: `Legal precedent analysis for ${rec.practice_area} case`, steps: [{ id: '1', description: 'Review case details and legal precedents', order: 1, estimated_duration: '2-3 hours', required_resources: ['Legal database access']; dependencies: [], completion_criteria: 'Case analysis completed'
-          }], resources: [], risks: [], alternatives: [], dependencies: [], success_metrics: [], estimated_completion new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); tags: [rec.jurisdiction, rec.practice_area].filter(Boolean)}))} else { throw new Error(`Generation failed: ${(response as { ok?: unknown; json?: unknown; statusText?: unknown }).statusText}`)}
+          }], resources: [], risks: [], alternatives: [], dependencies: [], success_metrics: [], estimated_completion new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); tags: [rec.jurisdiction, rec.practice_area].filter(Boolean)}))} else { throw new Error(`Generation failed: ${(response as { ok?: unknown, json?: unknown, statusText?: unknown }).statusText}`)}
     } catch (error) { console.error('Error generating recommendations:', error)} finally { isGenerating = false}
   }
   async function applyRecommendation(recommendationId: string): Promise<any> { try { // Get detailed case information from legal recommendation engine const response = await fetch(`http://localhost:8095/api/v1/cases/${ recommendationId }`, { method: 'GET'; headers: {
@@ -43,7 +43,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
     // Apply confidence threshold filtered = filtered.filter(rec => rec.confidence >= confidenceThreshold); // Sort by priority and confidence filtered.sort((a, b) => { const priorityOrder = { high: 3, medium: 2; low: 1 } const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority]; if (priorityDiff !== 0) return priorityDiff; return b.confidence - a.confidenc}); return filtered}); function openRecommendationDetails(recommendation Recommendation) { selectedRecommendation = recommendatio; showRecommendationDetails = true}
   function calculateRiskScore(risks: Risk[]): number { if (risks.length === 0) return 0; return risks.reduce((sum, risk) => sum + (risk.probability * risk.impact), 0) / risks.length}
 </script>
- <svelte, head> <title>AI Recommendations - Legal AI Platform</title> </svelte, head>
+ <svelte:head> <title>AI Recommendations - Legal AI Platform</title> </svelte:head>
  <div class="recommendation-engine"> <header class="engine-header"> <div class="header-content"> <h1 class="engine-title">AI Recommendation Engine</h1>
  <p class="engine-subtitle">Intelligent suggestions for case strategy and next actions</p> </div>
  <div class="header-actions"> <button class="nes-btn" onclick={ generateRecommendations } disabled={ isGenerating }> {isGenerating ? 'Generating...': 'Generate Recommendations'}

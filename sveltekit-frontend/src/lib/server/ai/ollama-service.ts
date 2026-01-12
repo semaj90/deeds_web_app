@@ -160,7 +160,7 @@ class EnhancedOllamaService extends Events {
         return out;
     }
 
-    async analyzeLegalDocument(doc: { content: string; id: string }): Promise<AnalysisResult> {
+    async analyzeLegalDocument(doc: { content: string, id: string }): Promise<AnalysisResult> {
          const summary = await this.generate(`Summarize this legal document: ${doc.content.slice(0, 500)}`);
          return {
             documentId: doc.id,

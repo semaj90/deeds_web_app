@@ -43,7 +43,7 @@ async function startAgentReview({ input }: { input: { task: DocumentReviewTask }
 }
 
 // Auto-save document changes
-async function autoSaveDocument({ input }: { input: { documentId: string; content: string } }): Promise<{ saved: boolean; timestamp, string }> {
+async function autoSaveDocument({ input }: { input: { documentId: string, content: string } }): Promise<{ saved: boolean; timestamp, string }> {
   await new Promise((resolve) => setTimeout(resolve, 500));
   return { saved: true, timestamp: new Date().toISOString() };
 }

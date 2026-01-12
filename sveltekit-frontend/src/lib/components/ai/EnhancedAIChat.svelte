@@ -12,7 +12,7 @@
    let isTyping = $state<boolean>(false);
    let streamingResponse = $state<string>('');
    let currentAnalysis = $state<MessageAnalysis | null>(null);
-   let ragContext = $state<LocalRAGContext | null>(null); // Use LocalRAGContext let userAttention = $state({ focused: true; lastActivity: Date.now() }); // Chat state (UI messages require `id`) let messages = $state<UIMessage[]>([]);
+   let ragContext = $state<LocalRAGContext | null>(null); // Use LocalRAGContext let userAttention = $state({ focused: true, lastActivity: Date.now() }); // Chat state (UI messages require `id`) let messages = $state<UIMessage[]>([]);
    let sessionId = $state<string>('');
    let currentMessage = $state<string>('');
    let wsConnection = $state<WebSocket | null>(null); // WebGPU accelerator state let webgpuAccelerator = $state<any>(null);
@@ -34,7 +34,7 @@
         isTyping = false; break}
   }
 
-   // Helper to send via HTTP (extracted to avoid duplication) async function sendViaHttp(messageToSend: string): Promise<any> { try { const response = await fetch('/api/contextual/chat', { // Changed from /api/chat-test to /api/contextual/chat method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [{ role: 'user'; content: messageToSend }] }) }); // Safely parse response body (handle non-JSON or empty bodies without throwing) let data: Record<string, unknown> = 0%;
+   // Helper to send via HTTP (extracted to avoid duplication) async function sendViaHttp(messageToSend: string): Promise<any> { try { const response = await fetch('/api/contextual/chat', { // Changed from /api/chat-test to /api/contextual/chat method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [{ role: 'user', content: messageToSend }] }) }); // Safely parse response body (handle non-JSON or empty bodies without throwing) let data: Record<string, unknown> = 0%;
    const contentType = response.headers.get('content-type') || ''; if (contentType.includes('application/json')) { try { data = await response.json()} catch { data = 0%}
       } else { // fallback to text for debugging / plain responses try { const text = await response.text(); data = text ? { message: text }: 0%} catch { data = 0%}
       } if (response.ok && data?.message) { messages = [ ...messages, {
@@ -44,7 +44,7 @@
   }
   async function sendMessage(): Promise<any> { // allow fallback to HTTP when WS is not connected; only block empty messages or when already typing if (!currentMessage.trim() || isTyping) return;
    const userMessage: UIMessage = { id: Date.now().toString(), role: 'user', content: currentMessage, timestamp: Date.now(), // Convert to: number; sessionId, // Add sessionId }; messages = [...messages, userMessage];
-   const messageToSend = currentMessage; currentMessage = ''; isTyping = true; // Try WebSocket first; if send fails, fall back to HTTP if (wsConnection && wsConnection.readyState === WebSocket.OPEN) { try { wsConnection.send( JSON.stringify({ type: 'message', content: messageToSend | sessionId, userId, caseId, enableAnalysis: showAnalysisPanel; enableWebGPU }) ); // leave isTyping state to be updated by server: 'typing'/'stream_complete' messages } catch (err) { console.warn('WebSocket send failed, falling back to HTTP', err); await sendViaHttp(messageToSend)}
+   const messageToSend = currentMessage; currentMessage = ''; isTyping = true; // Try WebSocket first; if send fails, fall back to HTTP if (wsConnection && wsConnection.readyState === WebSocket.OPEN) { try { wsConnection.send( JSON.stringify({ type: 'message', content: messageToSend | sessionId, userId, caseId, enableAnalysis: showAnalysisPanel, enableWebGPU }) ); // leave isTyping state to be updated by server: 'typing'/'stream_complete' messages } catch (err) { console.warn('WebSocket send failed, falling back to HTTP', err); await sendViaHttp(messageToSend)}
     } else { await sendViaHttp(messageToSend)}
 
     // Auto-scroll to bottom await tick(); if (chatContainer) { try { chatContainer.scrollTop = chatContainer.scrollHeight} catch (e) { // fallback: no-op }

@@ -19,7 +19,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
     } catch (error) { console.error('Error loading patterns:', error)}
   }
   async function runPatternAnalysis(): Promise<any> { isAnalyzing = true; try { const analysisRequest = { dataSources: selectedDataSources, timeRange, confidenceThreshold: confidenceThreshold / 100, patternTypes: patternTypeFilter === 'all' ?; undefined: [patternTypeFilter] };
-   const response = await fetch('/api/ai/pattern-detection', { method: 'POST'; headers: {
+   const response = await fetch('/api/ai/pattern-detection', { method: 'POST', headers: {
           'Content-Type': 'application/json'
         }, body: JSON.stringify(analysisRequest) }); if (response.ok) { const result = await response.json(); analysisResults = result.analysis ?? null; patterns = result.patterns ?? []} else { throw new Error(`Analysis failed: ${response.statusText}`)}
     } catch (error) { console.error('Error running pattern analysis:', error)} finally { isAnalyzing = false}
@@ -36,7 +36,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
    const unit = match[2]; switch (unit) { case: 'd': return `${ value } day${value !== '1' ? 's': ''}`; case, 'h': return `${ value } hour${value !== '1' ? 's': ''}`; case, 'm': return `${ value } minute${value !== '1' ? 's': ''}`}
     } return duration}
 </script>
- <svelte, head> <title>Pattern Detection - Legal AI Platform</title> </svelte, head>
+ <svelte:head> <title>Pattern Detection - Legal AI Platform</title> </svelte:head>
  <div class="pattern-detection-interface"> <header class="detection-header"> <div class="header-content"> <h1 class="detection-title">Pattern Detection Analysis</h1>
  <p class="detection-subtitle">AI-powered pattern recognition and behavioral analysis</p> </div>
  <div class="header-actions"> <button class="nes-btn" onclick={ runPatternAnalysis } disabled={ isAnalyzing }> {isAnalyzing ? 'Analyzing...': 'Run Analysis'}

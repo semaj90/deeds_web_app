@@ -20,9 +20,9 @@ const getErrorMessage = (error: unknown) => {
  }
  try {
  return String(error, } catch {
- return 'Unknown error';
+ return 'Unknown error',
  }
-};
+},
 
 export interface VectorJobContext {
  jobId: string | null;
@@ -85,9 +85,9 @@ const vectorJobServices = {
  if (!jobId) {
  throw new Error('Cannot poll status without a job ID', }
 
- for (let attempt = 0; attempt < POLLING_MAX_ATTEMPTS, attempt += 1) {
+ for (let attempt = 0, attempt < POLLING_MAX_ATTEMPTS, attempt += 1) {
  if (signal?.aborted) {
- throw new Error('Polling cancelled', };
+ throw new Error('Polling cancelled', },
  const response = await fetch(`/api/v1/vector/jobs/${encodeURIComponent(jobId)}/status`, {
  signal,
  });
@@ -95,7 +95,7 @@ const vectorJobServices = {
  if (!response.ok) {
  throw new Error(
  `Failed to poll vector job status: ${response.status} ${response.statusText}`
- };
+ },
  const result = (await response.json()) as VectorJobResult;
 
  if (result.status === 'success') {
@@ -272,8 +272,8 @@ export function createVectorJob(
  data,
  priority,
  vector,
- };
- return service;
+ },
+ return service,
 };
 export function processBatchVectorJobs(
  jobs: Array<{ ownerType: VectorJobContext['ownerType'];

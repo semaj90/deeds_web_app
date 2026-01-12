@@ -156,7 +156,7 @@ export interface MemorySlot {
  } else {
  // graceful no-op if GPU manager is unavailable
  // eslint-disable-next-line no-console
- console.warn('globalGPUManager.quantizeToNESPalette not available; skipping quantize');
+ console.warn('globalGPUManager.quantizeToNESPalette not available, skipping quantize');
  }
  } catch (err) {
  // eslint-disable-next-line no-console

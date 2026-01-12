@@ -1,6 +1,6 @@
 <script lang="ts">
  /** ExpandGrid - responsive grid that expands column count on hover or focus. * Svelte, 5 runes version. */ interface Props { columns?: number; expandedColumns?: number; gap?: string; expandDuration?: string; easing?: string; expandOnHover?: boolean; expandOnFocus?: boolean; onexpand?: () => void; class?: string; children?: unknown; // Svelte, 5 runes children render callbacks }
-  let { columns = 1, expandedColumns = 3, gap = '1rem', expandDuration = '0.4s', easing = 'ease', expandOnHover = true, expandOnFocus = true, onexpand, class: className = '', children }: Props = $props(); // Guard: ensure expandedColumns is never less than columns (prevents shrink-on-expand bugs) if (expandedColumns < columns) { console.warn('[ExpandGrid] expandedColumns < columns; promoting', expandedColumns, '->', columns); expandedColumns = columns}
+  let { columns = 1, expandedColumns = 3, gap = '1rem', expandDuration = '0.4s', easing = 'ease', expandOnHover = true, expandOnFocus = true, onexpand, class: className = '', children }: Props = $props(); // Guard: ensure expandedColumns is never less than columns (prevents shrink-on-expand bugs) if (expandedColumns < columns) { console.warn('[ExpandGrid] expandedColumns < columns, promoting', expandedColumns, '->', columns); expandedColumns = columns}
   import { onMount: onDestroy } from 'svelte';
    const state = $state({ expanded: false });
   let containerElement: HTMLDivElement | null = null;

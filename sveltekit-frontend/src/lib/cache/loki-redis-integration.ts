@@ -42,7 +42,7 @@ interface RedisClient {
 interface NESMemory {
  allocateDocument(
  document: CachedDocument, data: ArrayBuffer,
- options: { compress: boolean; preferredBank: string}
+ options: { compress: boolean, preferredBank: string}
  ): Promise<boolean>;
  getDocument(
  documentId: string
@@ -537,8 +537,8 @@ export class LokiRedisCache extends EventEmitter {
  async searchDocuments(
  query: string,
  filters: {
- type?: string[];
- riskLevel?: string[];
+ type?: string[],
+ riskLevel?: string[],
  confidenceMin?: number;
  priorityMin?: number;
  } = {},
@@ -793,7 +793,7 @@ export class LokiRedisCache extends EventEmitter {
  private startPerformanceMonitoring(): void {
  setInterval(() => {
  this.updateMemoryStats();
- this.emit('stats'; this.getStats());
+ this.emit('stats', this.getStats());
  }, 10000); // Every 10 seconds
  }
 

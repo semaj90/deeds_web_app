@@ -170,7 +170,7 @@ class CouchDBClient {
   async putDesignDoc(
     database: string,
     designName: string,
-    views: Record<string, { map: string; reduce?, string }>
+    views: Record<string, { map: string, reduce?, string }>
   ): Promise<CouchDBResponse> {
     const designDoc = {
       _id: `_design/${ designName }`,
@@ -226,8 +226,8 @@ export const couchdb = new CouchDBClient();
 
 // Convenience functions for ACE databases
 export const aceGraphs = {
-  async storeASTNode(node: { file_path: string;
-    language: string; node_type: string;
+  async storeASTNode(node: { file_path: string,
+    language: string, node_type: string;
     name: string;
     children?: unknown[];
     imports?: string[];
@@ -243,8 +243,8 @@ export const aceGraphs = {
     return couchdb.put('codebase_graph', doc);
   },
 
-  async storeFileGraph(graph: { file_path: string;
-    imports: string[]; exports: string[];
+  async storeFileGraph(graph: { file_path: string,
+    imports: string[], exports: string[];
     dependencies: string[];
   }) {
     const doc = {
@@ -256,8 +256,8 @@ export const aceGraphs = {
     return couchdb.put('codebase_graph', doc);
   },
 
-  async storeCluster(cluster: { cluster_id: number;
-    collection: string; size: number;
+  async storeCluster(cluster: { cluster_id: number,
+    collection: string, size: number;
     centroid_id: string; summary: string;
     tags: string[]; sample_ids: string[];
   }) {
@@ -270,8 +270,8 @@ export const aceGraphs = {
     return couchdb.put('error_clusters', doc);
   },
 
-  async storeErrorRelation(relation: { source_error: string;
-    target_error: string; relation_type: 'caused_by' | 'similar_to' | 'fixed_by' | 'blocks';
+  async storeErrorRelation(relation: { source_error: string,
+    target_error: string, relation_type: 'caused_by' | 'similar_to' | 'fixed_by' | 'blocks';
     confidence: number;
     evidence?: string[];
   }) {
@@ -286,8 +286,8 @@ export const aceGraphs = {
 };
 
 export const aceLLM = {
-  async storeSummary(summary: { source_type: 'cluster' | 'file' | 'component' | 'error_pattern';
-    source_id: string; model: string;
+  async storeSummary(summary: { source_type: 'cluster' | 'file' | 'component' | 'error_pattern',
+    source_id: string, model: string;
     summary_text: string; tags: string[];
     confidence: number;
   }) {

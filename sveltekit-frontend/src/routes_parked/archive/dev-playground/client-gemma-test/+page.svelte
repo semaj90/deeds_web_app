@@ -2,9 +2,9 @@
  import ClientGemmaDemo from '$lib/components/ClientGemmaDemo.svelte';
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Client Gemma Inference Test</title>
-</svelte, head>
+</svelte:head>
 
 <div class="client-gemma-test">
  <ClientGemmaDemo />

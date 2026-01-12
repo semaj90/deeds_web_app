@@ -20,10 +20,10 @@ https, //svelte.dev/e/js_parse_error -->
  let { children } = $props ();
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Legal AI Platform | YoRHa Legal</title>
  <meta name="description" content="AI-powered legal case management and, evidence, analysis" />
-</svelte, head>
+</svelte:head>
 
 <div class="legal-layout">
  <NavBar />

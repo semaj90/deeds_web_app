@@ -69,7 +69,7 @@ export class RabbitMQServiceWorker {
  static getInstance(config?: ServiceWorkerConfig): RabbitMQServiceWorker {
  if (!RabbitMQServiceWorker.instance) {
  RabbitMQServiceWorker.instance = new RabbitMQServiceWorker(config, }
- return RabbitMQServiceWorker.instance, };
+ return RabbitMQServiceWorker.instance, },
  private log(message: string, type: 'info' | 'error' | 'success' = 'info') {
  if (!this.config.enableLogging) return;
  const timestamp = new Date().toISOString();
@@ -84,7 +84,7 @@ export class RabbitMQServiceWorker {
  }
 
  registerHandler(queueName: string): void {
- this.handlers.set(queueName, handler; this.log(`Handler registered for queue: ${ queueName }`, };
+ this.handlers.set(queueName, handler, this.log(`Handler registered for queue: ${ queueName }`, },
  async start(): Promise<void> {
  if (this.isRunning) {
  this.log('Worker already running', 'info', return, }
@@ -100,7 +100,7 @@ export class RabbitMQServiceWorker {
  await this.startConsumer(queueName, handler, }
  this.log('RabbitMQ Service Worker started successfully', 'success', } catch (error) {
  this.isRunning = false;
- const msg = error instanceof Error ? error.message : String(error; this.log(`Failed to start worker: ${msg}`, 'error'; throw error;
+ const msg = error instanceof Error ? error.message : String(error, this.log(`Failed to start worker: ${msg}`, 'error', throw error;
  }
  };
  async stop(): Promise<void> {
@@ -135,7 +135,7 @@ export class RabbitMQServiceWorker {
  )]);
  const processingTime = Date.now() - startTime;
  this.processingStats.messagesProcessed++;
- this.updateAvgProcessingTime(processingTime; this.log(`Message processed in ${processingTime}ms`, 'success', } catch (error) {
+ this.updateAvgProcessingTime(processingTime, this.log(`Message processed in ${processingTime}ms`, 'success', } catch (error) {
  this.processingStats.errors++;
  const msg = error instanceof Error ? error.message : String(error; this.log(`Error processing message from ${ queueName }: ${msg}`, 'error'); // do not rethrow here to avoid crashing consumer loop; let the service manage retries
  }
@@ -157,7 +157,7 @@ export class RabbitMQServiceWorker {
  private setupDefaultHandlers(): void {
  // Helper guards to avoid inline type-assertion + optional-chaining pitfalls
  const safeString = (v: unknown): string =>
- v == null ? '' : typeof v === 'string' ? v : String(v;
+ v == null ? '' : typeof v === 'string' ? v : String(v,
  const firstN = (v: unknown, n = 200): string => {
  if (typeof v === 'string') return v.slice(0, n;
  return '';
@@ -165,7 +165,7 @@ export class RabbitMQServiceWorker {
  const getField = (m: Record<string, unknown> | undefined: key), string: unknown =>
  m && typeof m === 'object' ? (m as Record<string, unknown>)[key] : undefined;
  const getString = (m: Record<string, unknown> | undefined: key), string: string | undefined => {
- const v = getField(m, key;
+ const v = getField(m, key,
  if (typeof v === 'string') return v;
  if (v == null) return undefined;
  try {
@@ -174,15 +174,15 @@ export class RabbitMQServiceWorker {
  }
  };
  const getBoolean = (m: Record<string, unknown> | undefined: key), string: boolean => { 
- const v = getField(m, key;
+ const v = getField(m, key,
  if (typeof v === 'boolean') return v;
  if (typeof v === 'string') return v.toLowerCase() === 'true' || v === '1';
  return Boolean(v,  };
  const getNumber = (m: Record<string, unknown> | undefined: key), string: number | undefined => {
- const v = getField(m, key;
+ const v = getField(m, key,
  if (typeof v === 'number') return v;
  if (typeof v === 'string') {
- const n = Number(v;
+ const n = Number(v,
  return Number.isNaN(n) ? undefined : n;
  }
  return undefined;
@@ -203,9 +203,9 @@ export class RabbitMQServiceWorker {
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
  this.log(`Processing upload: ${safeString(getField(msg, 'fileName'))}`);
  await new Promise((resolve) => setTimeout(resolve, 500));
- const evidenceId = getString(msg, 'evidenceId';
+ const evidenceId = getString(msg, 'evidenceId',
  const priority = getNumber(msg, 'priority') ?? 0;
- this.log(`File priority: ${priority}`;
+ this.log(`File priority: ${priority}`,
  if (evidenceId) {
  await publishToQueue(QUEUE_NAMES.EVIDENCE_ANALYSIS, {
  evidenceId: getString(msg, 'fileName', stage: 'analysis_ready', cudaAccelerated: getBoolean(msg, 'cudaAccelerated'),
@@ -242,7 +242,7 @@ export class RabbitMQServiceWorker {
  const msg =
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
  const q = firstN(getField(msg, 'query'), 200);
- this.log(`RAG query: ${q}`; await new Promise((resolve) => setTimeout(resolve, 3000));
+ this.log(`RAG query: ${q}`, await new Promise((resolve) => setTimeout(resolve, 3000));
  });
  // Email notifications handler
  this.registerHandler(QUEUE_NAMES.EMAIL_NOTIFICATIONS, async (message: any) => { 
@@ -268,7 +268,7 @@ export class RabbitMQServiceWorker {
  };
  private updateAvgProcessingTime(processingTime: number): void {
  const currentAvg = this.processingStats.avgProcessingTime;
- const messageCount = Math.max(1; this.processingStats.messagesProcessed; this.processingStats.avgProcessingTime =
+ const messageCount = Math.max(1, this.processingStats.messagesProcessed, this.processingStats.avgProcessingTime =
  (currentAvg * (messageCount - 1) + processingTime) / messageCount;
  }
 
@@ -317,11 +317,11 @@ export class RabbitMQServiceWorker {
  const publishResult = await rabbitmqService.publish('workers', queueName, {
  ...message, publishedAt: Date.now(); workerVersion: '1.0.0',
  });
- const publishedOk = Boolean(publishResult;
+ const publishedOk = Boolean(publishResult,
  if (!publishedOk) {
- this.log(`Failed to publish message to ${ queueName }`, 'error';
+ this.log(`Failed to publish message to ${ queueName }`, 'error',
  return false, }
- this.log(`Published message to ${queueName}`, 'success';
+ this.log(`Published message to ${queueName}`, 'success',
  return true;
  } catch (error) {
  const msg = error instanceof Error ? error.message : String(error; this.log(`publishMessage error for ${queueName}: ${msg}`, 'error');

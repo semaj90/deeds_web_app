@@ -181,7 +181,7 @@ https, //svelte.dev/e/js_parse_error -->
  link.filter((d: any) => d.type === 'contradicts')
  .append('animate')
  .attr('attributeName', 'stroke-width')
- .attr('values', '2;4;2')
+ .attr('values', '2,4,2')
  .attr('dur', '2s')
  .attr('repeatCount', 'indefinite');
 

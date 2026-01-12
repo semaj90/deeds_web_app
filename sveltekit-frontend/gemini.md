@@ -1,30 +1,35 @@
-# Phase 89-96 Progress Summary - Gemini Knowledge Base
+# Phase 89-97 Progress Summary - Gemini Knowledge Base
 
-## 🎯 Mission Status (2026-01-11)
+## 🎯 Mission Status (2026-01-12)
 
-**Current Focus:** RabbitMQ Background Job Integration + Chunking/Streaming Fixes
+**Current Focus:** RAG/KAG/DAG Streaming + ACE Error Fixing
 
 ### Latest Updates
 ```
+✅ Phase 97: RAG/KAG Streaming Integration (2026-01-12)
+   ├─ Created phase97-rag-kag-ace-todo.md documentation
+   ├─ Web searched: LangChain.js chunking best practices 2025
+   ├─ Web searched: KAG vs RAG comparison 2025
+   ├─ Deleted corrupted predictive-asset-engine.ts (unsalvageable)
+   └─ Streaming test spec: tests/phase97-streaming-test.spec.ts
+
+✅ Critical Syntax Fixes Applied
+   ├─ tokenUsage.svelte.ts: Math.max(0; → Math.max(0,
+   ├─ webgpu-cpu-fallback.ts: maxThreads, → maxThreads:
+   ├─ pool.ts: Fixed type annotations (| → :)
+   ├─ routeGraphAdapter.ts: Full regeneration
+   └─ +page.server.ts (all-routes): Fixed ternary operators
+
 ✅ XState v5 Case Machines Rebuilt
-   ├─ case-creation-machine.ts: RabbitMQ job handler for async case creation
-   ├─ enhanced-legal-case-machine.ts: Full case management (load/create/evidence/AI)
+   ├─ case-creation-machine.ts: RabbitMQ job handler
+   ├─ enhanced-legal-case-machine.ts: Full case management
    └─ Both machines: Clean fromPromise<Output, Input> generics
 
-✅ RabbitMQ Integration Documentation
-   ├─ Work Queues pattern: Round-robin task distribution
-   ├─ Message acknowledgment: Manual ack with {noAck: false}
-   ├─ Message durability: {durable: true} + {persistent: true}
-   └─ Fair dispatch: channel.prefetch(1) for load balancing
-
-🔄 Knowledge Base Enhancement (Current)
-   ├─ RAG: Retrieval-Augmented Generation patterns
-   ├─ KAG: Knowledge-Augmented Generation workflows
-   ├─ DAG: Directed Acyclic Graph processing
-   └─ Streaming/Chunking: Response optimization
-
-⏳ Idle Detection Machine
-   └─ Needs corruption cleanup (pervasive syntax errors)
+🔄 Knowledge Base Enhancement (In Progress)
+   ├─ RAG: Retrieval-Augmented Generation (unstructured text)
+   ├─ KAG: Knowledge-Augmented Generation (knowledge graphs)
+   ├─ DAG: Directed Acyclic Graph (workflow orchestration)
+   └─ Streaming: SSE + chunking (256-512 tokens optimal)
 ```
 
 ---
@@ -94,6 +99,75 @@ User Active → User Idle (5min) → Generate Prompts → Queue Jobs
 - **Fault Tolerance:** Message acknowledgment prevents job loss
 - **Scalability:** Add workers dynamically during high load
 - **Durability:** Messages survive RabbitMQ restarts ({durable: true})
+
+### RabbitMQ 4.0 Streams (Updated 2026)
+
+**What is a Stream?**
+Streams are immutable, append-only disk logs that support non-destructive reads and replayability. Use them when:
+- Multiple consumers need to read the same messages
+- Time-travel queries are required (replay from any offset)
+- High-throughput logging is needed
+
+**Declaring a Stream:**
+```javascript
+// Using AMQP 0.9.1
+channel.queueDeclare('my-stream', {
+  durable: true,
+  arguments: {
+    'x-queue-type': 'stream',
+    'x-max-length-bytes': 20_000_000_000, // 20GB max
+    'x-max-age': '7D' // 7 days retention
+  }
+});
+```
+
+**Super Streams (Partitioned Streams):**
+```bash
+# Create super stream with 3 partitions
+rabbitmq-streams add_super_stream invoices --partitions 3
+```
+
+**Single Active Consumer Feature:**
+- Provides exclusive consumption and continuity
+- Messages processed in order
+- Consumer from group takes over if active one fails
+
+### RabbitMQ 4.0 Quorum Queues
+
+**Overview:**
+- Modern queue type based on Raft consensus algorithm
+- Default choice for replicated, highly available queues
+- Optimized for data safety with fast leader election
+
+**When to Use:**
+```
+✅ Quorum Queues: Traditional queue semantics, at-most-once delivery
+✅ Streams: Append-only logs, non-destructive reads, replayable
+```
+
+**Declaring a Quorum Queue:**
+```javascript
+channel.queueDeclare('my-quorum-queue', {
+  durable: true,
+  arguments: {
+    'x-queue-type': 'quorum',
+    'x-quorum-initial-group-size': 3 // 3-node cluster
+  }
+});
+```
+
+**Key Features:**
+- Poison message handling (dead-letter after N redeliveries)
+- At-least-once dead-lettering
+- Modified outcome support with AMQP
+- Faster leader election than mirrored classic queues
+
+**Cluster Size Best Practices:**
+| Nodes | Fault Tolerance | Recommended |
+|-------|-----------------|-------------|
+| 3     | 1 failure       | Small apps  |
+| 5     | 2 failures      | Production  |
+| 7     | 3 failures      | Enterprise  |
 
 ---
 

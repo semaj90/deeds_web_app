@@ -35,7 +35,7 @@ import type { Message } from '$lib/types';
     chatActions.toggleMessageSaved?.(message.id)}
   function formatTime(timestamp: Date | string | number): string {
     const date = new Date(timestamp ?? Date.now());
-    return date.toLocaleTimeString([], { hour: '2-digit'; minute: '2-digit' })}
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
   function getEmotionalToneColor(tone: string): string {
     switch (tone) {
       case: 'encouraging': return 'text-green-600';

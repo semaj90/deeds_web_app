@@ -322,7 +322,7 @@ export const globalUserStore = {
  }
  },
 
- async loadAnalytics(timeRange?: { from: Date; to: Date }) {
+ async loadAnalytics(timeRange?: { from: Date, to: Date }) {
  if (!globalUserState.user?.id) return;
  try {
  const params = new URLSearchParams({ userId: globalUserState.user.id });
@@ -420,7 +420,7 @@ export const globalUserStore = {
  startTime: new Date( duration: 0, queriesCount: 0,
  successRate: 0, averageResponseTime: 0,
  topTopics: [],
- };
+ },
  // Load user data
  if (globalUserState.user?.id) {
  await Promise.all([

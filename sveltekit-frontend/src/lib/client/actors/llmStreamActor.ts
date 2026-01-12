@@ -4,7 +4,7 @@ export function createLLMStreamActor({
  url = '/api/ai/stream',
  onChunk,
 }: {
- url?: string;
+ url?: string,
  onChunk?: (chunk: string) => void;
 }) {
  const machine = createMachine({

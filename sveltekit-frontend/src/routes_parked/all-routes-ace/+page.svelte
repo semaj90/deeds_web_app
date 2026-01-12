@@ -191,9 +191,9 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  });
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>ACE System - Agentic Error Fixing | Legal AI</title>
-</svelte, head>
+</svelte:head>
 
 <div class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white">
  <!-- Header -->

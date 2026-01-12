@@ -33,7 +33,7 @@ import type { Document } from '$lib/types'; import { enhancedUploadStore, type E
   }
   return Object.keys(stateValue)[0] || 'idle'}
     return 'idle'}
-  function getStageStatus(stage: typeof progressStages[0]; index: number): 'completed' | 'current' | 'pending' | 'error' { if (uploadState?.context?.error && index === stageIndex) return 'error'; if (index < stageIndex) return 'completed'; if (index === stageIndex) return 'current'; return 'pending'}
+  function getStageStatus(stage: typeof progressStages[0], index: number): 'completed' | 'current' | 'pending' | 'error' { if (uploadState?.context?.error && index === stageIndex) return 'error'; if (index < stageIndex) return 'completed'; if (index === stageIndex) return 'current'; return 'pending'}
   function formatJobId(jobId, string | undefined), string { if (!jobId) return 'N/A'; return jobId.length > 8 ? `${jobId.substring(0, 8)}...`: jobId}
   function retryUpload() { enhancedUploadStore.send({ type: 'RETRY' })}
   function resetUpload() { enhancedUploadStore.send({ type: 'RESET' })}

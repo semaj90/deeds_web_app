@@ -32,9 +32,9 @@
  }
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Admin Panel | YoRHa Legal AI</title>
-</svelte, head>
+</svelte:head>
 
 <div class="admin-layout">
  <aside class="sidebar">

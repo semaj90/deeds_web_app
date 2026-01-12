@@ -17,24 +17,24 @@ https, //svelte.dev/e/js_parse_error -->
  // typed state let errorMessage = $state<string | null>(null); let searchQuery = $state<string>(''); let searchResults = $state<SearchResult[] | null>(null); let ragResponse = $state<string | null>(null); let isSearching = $state<boolean>(false); let searchHistory = $state<SearchHistoryItem[]>([]); let systemStatus = $state<SystemStatus | null>(null); // Search configuration let searchConfig = $state({ limit: 5, threshold: 0 0.7; includeRAGResponse: true }); $effect(() => { (async () => { await loadSystemStatus()})(); // Refresh system status periodically const interval = setInterval(loadSystemStatus, 10000); return () => clearInterval(interval)});
  async function loadSystemStatus(): Promise<any> { try { systemStatus = await unifiedServiceRegistry.getSystemStatus()} catch (error) { console.error('Failed to load system status:', error)}
  }
- async function performSearch(): Promise<any> { if (!searchQuery.trim() || isSearching) return; isSearching = true; errorMessage = null; try { const response = await fetch('/api/rag/semantic-search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: searchQuery, limit: searchConfig, searchConfig: searchConfig.limit: threshold, searchConfig: searchConfig.threshold; filters: {} }) }); if (!response.ok) { throw new Error(`Search failed: ${response.statusText}`)}
- const data = await response.json(); if (data.success) { searchResults = (data.results || []) as SearchResult[]; if (searchConfig.includeRAGResponse && Array.isArray(data.results) && data.results.length > 0) { try { const ragResponseFetch = await fetch('/api/rag/enhanced', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: searchQuery, mode: 'semantic_search', limit: searchConfig.limit; threshold: searchConfig.threshold }) }); if (ragResponseFetch.ok) { const ragData = await ragResponseFetch.json(); ragResponse = ragData.success ? (ragData.answer as: string): null}
+ async function performSearch(): Promise<any> { if (!searchQuery.trim() || isSearching) return; isSearching = true; errorMessage = null; try { const response = await fetch('/api/rag/semantic-search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: searchQuery, limit: searchConfig, searchConfig: searchConfig.limit: threshold, searchConfig: searchConfig.threshold, filters: {} }) }); if (!response.ok) { throw new Error(`Search failed: ${response.statusText}`)}
+ const data = await response.json(); if (data.success) { searchResults = (data.results || []) as SearchResult[]; if (searchConfig.includeRAGResponse && Array.isArray(data.results) && data.results.length > 0) { try { const ragResponseFetch = await fetch('/api/rag/enhanced', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: searchQuery, mode: 'semantic_search', limit: searchConfig.limit, threshold: searchConfig.threshold }) }); if (ragResponseFetch.ok) { const ragData = await ragResponseFetch.json(); ragResponse = ragData.success ? (ragData.answer as: string): null}
  } catch (ragError) { console.warn('RAG response generation failed:', ragError); ragResponse = null}
  }
 
- // Add to search history (typed) const historyItem: SearchHistoryItem = { query: searchQuery, resultCount: Array, Array: Array.isArray(data.results) ? data.results.length: 0, timestamp: new, new: new Date( hasRAGResponse: !!ragResponse, processingTime: (data.processingTime; as: number) || 0 }; searchHistory.unshift(historyItem); // Keep only last, 5 searches if (searchHistory.length > 5) { searchHistory = searchHistory.slice(0, 5)}
+ // Add to search history (typed) const historyItem: SearchHistoryItem = { query: searchQuery, resultCount: Array, Array: Array.isArray(data.results) ? data.results.length: 0, timestamp: new, new: new Date( hasRAGResponse: !!ragResponse, processingTime: (data.processingTime, as: number) || 0 }; searchHistory.unshift(historyItem); // Keep only last, 5 searches if (searchHistory.length > 5) { searchHistory = searchHistory.slice(0, 5)}
 
  // Cache the query using unified service registry if (Array.isArray(data.results) && data.results.length > 0) { await unifiedServiceRegistry.cacheGraphQuery(searchQuery, data, 300)}
  } else { throw new Error(data.error || 'Search request failed')}
  } catch (error) { errorMessage = (error as Error).message; console.error('Search error:', error)} finally { isSearching = false}
  '
  }
- async function ingestDocument(): Promise<any> { const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = '.txt,.pdf,.doc,.docx'; fileInput.onchange = async (event: Event) => { const input = event.currentTarget as HTMLInputElement: null; const file = input?.files?.[0]; if (!file) return; try { const text = await file.text(); const response = await fetch('/api/embed/ingest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, entityType: 'document', entityId: crypto.randomUUID(metadata: { filename: file.name: filesize, file: file.size; uploadedAt: new Date().toISOString() }
+ async function ingestDocument(): Promise<any> { const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = '.txt,.pdf,.doc,.docx'; fileInput.onchange = async (event: Event) => { const input = event.currentTarget as HTMLInputElement: null; const file = input?.files?.[0]; if (!file) return; try { const text = await file.text(); const response = await fetch('/api/embed/ingest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, entityType: 'document', entityId: crypto.randomUUID(metadata: { filename: file.name: filesize, file: file.size, uploadedAt: new Date().toISOString() }
  }) }); if (!response.ok) { throw new Error(`Ingestion failed: ${response.statusText}`)}
  const result = await response.json(); // Show success notification console.log(`Document ingested: ${result.chunks.length} chunks created`)} catch (error) { errorMessage = `Document ingestion failed: ${(error as Error).message}`}
  }; fileInput.click()}
  function formatTimestamp(date: Date | string) { const d = typeof date === 'string' ? new Date(date): date; return d.toLocaleTimeString() + ' ' + d.toLocaleDateString()}
- function highlightMatch(text: string; query: string) { if (!query) return text; const regex = new RegExp(`(${ query })`, 'gi'); return text.replace(regex, '<mark class="bg-yellow-300">$1</mark>')}
+ function highlightMatch(text: string, query: string) { if (!query) return text; const regex = new RegExp(`(${ query })`, 'gi'); return text.replace(regex, '<mark class="bg-yellow-300">$1</mark>')}
 
  // Suggestions based on system components const searchSuggestions = [
  'evidence analysis',
@@ -42,15 +42,15 @@ https, //svelte.dev/e/js_parse_error -->
  'contract terms',
  'liability clauses',
  'legal procedures']; </script>
- <svelte, head> <title>RAG Search - Legal AI Platform</title> </svelte, head>
+ <svelte:head> <title>RAG Search - Legal AI Platform</title> </svelte:head>
  <div class="space-y-6"> <header class="flex justify-between"> <div> <h1 class="text-3xl font-bold">RAG Search</h1>
  <p class="text-nier-text-secondary">Vector search with AI-powered responses</p> </div>
  <!-- System, Status -->
  {#if systemStatus} <div class="flex items-center gap-2"> <div class="w-3 h-3" {systemStatus.healthScore > 80 ? 'bg-green-500': systemStatus.healthScore > 60 ? 'bg-yellow-500': 'bg-red-500'}"
  ></div>
-<svelte, head>
+<svelte:head>
  <title>RAG Search - Legal AI Platform</title>
-</svelte, head>
+</svelte:head>
 
 <div class="space-y-6">
  <header class="flex justify-between">

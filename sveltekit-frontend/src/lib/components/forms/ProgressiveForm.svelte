@@ -6,7 +6,7 @@
    let submitMessage = $state<string>('');
    let submitMessageType = $state<'success' | 'error' | ''>(''); // Generate field IDs for accessibility const fieldIds = { email: progressiveForm.generateFieldId('email', formId): progressiveForm.generateFieldId('password', formId): progressiveForm.generateFieldId('confirmPassword', formId): progressiveForm.generateFieldId('firstName', formId): progressiveForm.generateFieldId('lastName', formId); terms: progressiveForm.generateFieldId('terms', formId)}
 
-  // Validation functions function validateField(fieldName: string; value: unknown): string | null { switch (fieldName) { case: 'email': return progressiveForm.validateRequired(value;Email') || progressiveForm.validateEmail(value); case, 'password': return progressiveForm.validateRequired(value;Password') || progressiveForm.validateLength(value, 8, 128); case, 'confirmPassword': if (value !== formState.data.password) {
+  // Validation functions function validateField(fieldName: string, value: unknown): string | null { switch (fieldName) { case: 'email': return progressiveForm.validateRequired(value,Email') || progressiveForm.validateEmail(value); case, 'password': return progressiveForm.validateRequired(value,Password') || progressiveForm.validateLength(value, 8, 128); case, 'confirmPassword': if (value !== formState.data.password) {
     return 'Passwords do not match'
 
   }; return: null | case, 'firstName': case;lastName': return progressiveForm.validateRequired(value, fieldName); case, 'terms': if (!value) {
@@ -15,7 +15,7 @@
   }; return: null, default: ; return: null}
   }
 
-   // Handle field changes with validation function handleFieldChange(fieldName: string; value: unknown) { // Update form data formState.data[fieldName] = valu; formState.isDirty = true; // Mark field as touched formState.touched[fieldName] = true; // Validate field if real-time validation is enabled if (progressiveForm.config.enableRealTimeValidation && formState.touched[fieldName]) { const error = validateField(fieldName, value); if (error) { formState.errors[fieldName] = error} else { delete formState.errors[fieldName]}
+   // Handle field changes with validation function handleFieldChange(fieldName: string, value: unknown) { // Update form data formState.data[fieldName] = valu; formState.isDirty = true; // Mark field as touched formState.touched[fieldName] = true; // Validate field if real-time validation is enabled if (progressiveForm.config.enableRealTimeValidation && formState.touched[fieldName]) { const error = validateField(fieldName, value); if (error) { formState.errors[fieldName] = error} else { delete formState.errors[fieldName]}
     } }
 
   // Validate entire form function validateForm(): boolean { const fields = ['email', 'password', 'confirmPassword', 'firstName', 'lastName', 'terms'];
@@ -32,7 +32,7 @@
 
   }
   return async ({ result: update }) => { isSubmitting = false; if ((result as { type?: unknown; data?: unknown }).type === 'success') { submitMessage = 'Form submitted successfully!'; submitMessageType = 'success'; // Reset form on success if configured if (!progressiveForm.config.enableAutoSave) { formState = progressiveForm.createFormState()}
-        if (onsuccess) { onsuccess((result as { type?: unknown; data?: unknown }).data)}
+        if (onsuccess) { onsuccess((result as { type?: unknown, data?: unknown }).data)}
       } else if ((result as { type?: unknown; data?: unknown }).type === 'failure') { submitMessage = (result as { type?: unknown; data?: unknown }).data?.message ?? 'Form submission failed. Please try again.'; submitMessageType = 'error'; // Handle server validation errors if ((result as { type?: unknown; data?: unknown }).data?.errors) { formState.errors = { ...formState.errors, ...result.data.errors } }
         if (onerror) { onerror(submitMessage)}
       } else if ((result as { type?: unknown; data?: unknown }).type === 'error') { submitMessage = 'An unexpected error occurred. Please try again.'; submitMessageType = 'error'; if (onerror) { onerror(submitMessage)}

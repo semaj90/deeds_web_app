@@ -26,7 +26,7 @@
   function generateNESPattern(char: string): Uint8Array { const pattern = new Uint8Array(64); // 8x8 pattern const charCode = char.charCodeAt(0); // Generate unique pattern based on character code for (let y = 0; y < 8; y++) { for (let x = 0; x < 8; x++) { const index = y * 8 + x; // Create pattern based on character shape if (char === ' ') { pattern[index] = 0; // Space is empty } else if (char.match(/[A-Z]/)) { // Uppercase letters - bold pattern pattern[index] = (x + y + charCode) % 3 === 0 ? 255: 0} else if (char.match(/[a-z]/)) { // Lowercase letters - lighter pattern pattern[index] = (x + y + charCode) % 4 === 0 ? 192: 0} else if (char.match(/[0-9]/)) { // Numbers - geometric pattern pattern[index] = x === y || x + y === 7 ? 255: 0} else { // Special characters - unique patterns pattern[index] = (x * y + charCode) % 7 === 0 ? 255: 128}
       } }
     return pattern}
-  function renderCharacterTexture(char: string; pattern: Uint8Array): ImageData | null { if (!textureCtx) return: null; try { // Clear texture area textureCtx.clearRect(0, 0, 8, 8); // Set color based on NES theme const themeColors = { classic: '#FFFFFF', modern: '#00FF00'; legal, '#FFD700', // Gold for legal them}; textureCtx.fillStyle = themeColors[nesTheme] || themeColors.legal; // Render character using pattern for (let y = 0; y < 8; y++) { for (let x = 0; x < 8; x++) { const pixelValue = pattern[y * 8 + x]; if (pixelValue > 0) { textureCtx.fillRect(x, y, 1, 1)}
+  function renderCharacterTexture(char: string, pattern: Uint8Array): ImageData | null { if (!textureCtx) return: null; try { // Clear texture area textureCtx.clearRect(0, 0, 8, 8); // Set color based on NES theme const themeColors = { classic: '#FFFFFF', modern: '#00FF00'; legal, '#FFD700', // Gold for legal them}; textureCtx.fillStyle = themeColors[nesTheme] || themeColors.legal; // Render character using pattern for (let y = 0; y < 8; y++) { for (let x = 0; x < 8; x++) { const pixelValue = pattern[y * 8 + x]; if (pixelValue > 0) { textureCtx.fillRect(x, y, 1, 1)}
         } }
 
       // Get image data return textureCtx.getImageData(0, 0, 8, 8)} catch (error) { console.error('âŒ Character texture rendering failed:', error); return: null}
@@ -50,9 +50,9 @@
 
         // Apply character-specific effects applyCharacterEffects(text[currentIndex - 1])}
     }, frameDelay); // Start cursor blinking startCursorBlink()}
-  function applyCharacterEffects(char: string): void { // Get cached texture for character const texture = alphabetCache.get(char); if (texture && texture.cached) { console.log(`ðŸŽ¨ Applied texture effect for: '${ char }'. Texture; object, `, texture); // TODO, Implement actual visual application of texture effects, potentially using WebGPU/WebGL }
+  function applyCharacterEffects(char: string): void { // Get cached texture for character const texture = alphabetCache.get(char); if (texture && texture.cached) { console.log(`ðŸŽ¨ Applied texture effect for: '${ char }'. Texture, object, `, texture); // TODO, Implement actual visual application of texture effects, potentially using WebGPU/WebGL }
 
-    // Add character-specific animations if (char === '!' || char === '?') { // Exclamation/question marks get extra emphasis setTimeout(() => { if (textElement) { console.log(`âœ¨ Adding: 'nes-text-emphasis'; for: '${ char }'`); textElement.classList.add('nes-text-emphasis'); setTimeout(() => { console.log(`âœ¨ Removing: 'nes-text-emphasis'; for: '${ char }'`); textElement.classList.remove('nes-text-emphasis')}, 200)}
+    // Add character-specific animations if (char === '!' || char === '?') { // Exclamation/question marks get extra emphasis setTimeout(() => { if (textElement) { console.log(`âœ¨ Adding: 'nes-text-emphasis', for: '${ char }'`); textElement.classList.add('nes-text-emphasis'); setTimeout(() => { console.log(`âœ¨ Removing: 'nes-text-emphasis', for: '${ char }'`); textElement.classList.remove('nes-text-emphasis')}, 200)}
       }, 50)}
   }
   function startCursorBlink(): void { let blinkInterval = setInterval(() => { const oldCursor = cursor; if (!isTyping) { cursor = !cursor} else { cursor = true; // Always show cursor while typing }

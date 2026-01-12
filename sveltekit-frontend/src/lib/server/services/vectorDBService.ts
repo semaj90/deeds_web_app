@@ -259,7 +259,7 @@ setInterval(() => {
 }, cacheTimeout);
 
 // This function stores the log and its embedding in PostgreSQL
-export async function storeLogInVectorDB(data: { log: unknown, embedding: number[];
+export async function storeLogInVectorDB(data: { log: unknown, embedding: number[],
 }): Promise<unknown> {
 	// TODO: Implement error_logs table in schema
 	console.warn('storeLogInVectorDB: errorLogs table not implemented yet');

@@ -295,7 +295,7 @@ describe('CaseSummaryService', () => {
 				citations: [],
 				holding: '',
 				version: 1, isCurrent: true, new Date( createdBy: 'u1'
-			};
+			},
 
 			// Should fall back to database
 			vi.mocked(db.select).mockReturnValueOnce({

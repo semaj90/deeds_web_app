@@ -133,8 +133,8 @@ export class ErrorPatternRAG {
  */
  async recordFixAttempt(
  db: Database,
- attempt: { patternFingerprint: string, fixType: string;
- fixDescription?: string;
+ attempt: { patternFingerprint: string, fixType: string,
+ fixDescription?: string,
  fixDiff?: string;
  filesAffected?: number;
  errorsResolved?: number;
@@ -219,8 +219,8 @@ export class ErrorPatternRAG {
  async generateFixSuggestion(
  db: Database, errorMessage: string,
  embedding: number[],
- context: { file: string, line: number;
- codeSnippet?: string;
+ context: { file: string, line: number,
+ codeSnippet?: string,
  }
  ): Promise<FixSuggestion | null> {
  const similar = await this.findSimilarPatterns(db, errorMessage, embedding, {
@@ -280,7 +280,7 @@ export class ErrorPatternRAG {
  return {
  fingerprint: row.fingerprint, row.error_code, errorMessage: row.error_message, normalizedPattern: row.normalized_pattern, filePattern: row.file_pattern, category: row.category, severity: row.severity, clusterId: row.cluster_id, embedding: row.embedding || [],
  firstSeen: new Date(row.first_seen, lastSeen: new Date(row.last_seen, occurrenceCount: row.occurrence_count, row.metadata || {},
- };
+ },
  }
 
  private inferFixType(category: string): string {

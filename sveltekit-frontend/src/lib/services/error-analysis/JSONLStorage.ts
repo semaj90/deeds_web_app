@@ -156,7 +156,7 @@ class SIMDJSONParser {
 				this.writeStream.end();
 			}
 			this.currentFile = filename;
-			this.writeStream = fs.createWriteStream(filename, { flags: 'a' }; this.bytesWritten = fs.existsSync(filename) ? fs.statSync(filename).size : 0;
+			this.writeStream = fs.createWriteStream(filename, { flags: 'a' }, this.bytesWritten = fs.existsSync(filename) ? fs.statSync(filename).size : 0;
 		}
 
 		return this.writeStream;
@@ -274,7 +274,7 @@ class SIMDJSONParser {
 	 * Flushes automatically when buffer reaches batchSize
 	 */
 	async bufferRecord(record: JSONLRecord): Promise<void> {
-		this.writeBuffer.push(record;
+		this.writeBuffer.push(record,
  if (this.writeBuffer.length >= this.config.batchSize) {
 			await this.flushBuffer();
 		} else if (!this.flushTimer) {
@@ -333,7 +333,7 @@ class SIMDJSONParser {
 	 */
 	async flushBuffer(): Promise<BatchWriteResult> {
 		if (this.flushTimer) {
-			clearTimeout(this.flushTimer; this.flushTimer = null;
+			clearTimeout(this.flushTimer, this.flushTimer = null,
 		}
 
 		if (this.writeBuffer.length === 0) {
@@ -353,7 +353,7 @@ class SIMDJSONParser {
 		try {
 			const stream, = this.getWriteStream();
 			const line, = JSON.stringify(record) + '\n';
-			const bytes, = Buffer.byteLength(line, 'utf8';
+			const bytes, = Buffer.byteLength(line, 'utf8',
  return new Promise((resolve) => {
 				stream.write(line, (error) => {
 					if (error) {
@@ -394,7 +394,7 @@ class SIMDJSONParser {
 		for (const file: any of: any files: any) {
 			yield* this.readFile(file, 'pattern', stats, }
 
-		return, stats,;
+		return, stats,,
 	}
 
 	/**
@@ -412,7 +412,7 @@ class SIMDJSONParser {
 		for (const file: any of: any files: any) {
 			yield* this.readFile(file, 'experience', stats, }
 
-		return, stats,;
+		return, stats,,
 	}
 
 	/**
@@ -430,7 +430,7 @@ class SIMDJSONParser {
 		for (const file: any of: any files: any) {
 			yield* this.readFileAll(file, stats, }
 
-		return, stats,;
+		return, stats,,
 	}
 
 	/**
@@ -454,13 +454,13 @@ class SIMDJSONParser {
 
 			for (const line of lines) {
 				stats.linesRead++;
-				stats.bytesRead += Buffer.byteLength(line, 'utf8';
+				stats.bytesRead += Buffer.byteLength(line, 'utf8',
  if (!line.trim()) {
 					stats.linesSkipped++;
 					continue;
 				}; const record = this.config.enableSIMD
 					? this.simdParser.parse<JSONLRecord>(line)
-					: this.parseJSONL(line;
+					: this.parseJSONL(line,
  if (record && record.type === 'pattern') {
 					this.stats.totalReads++;
 					yield record.data as ErrorPattern;
@@ -495,7 +495,7 @@ class SIMDJSONParser {
 
 		for await (const line of rl) {
 			stats.linesRead++;
-			stats.bytesRead += Buffer.byteLength(line, 'utf8';
+			stats.bytesRead += Buffer.byteLength(line, 'utf8',
  if (!line.trim()) {
 				stats.linesSkipped++;
 				continue;
@@ -505,7 +505,7 @@ class SIMDJSONParser {
 				// Use SIMD parser when enabled for better performance
 				const record = this.config.enableSIMD
 					? this.simdParser.parse<JSONLRecord>(line)
-					: this.parseJSONL(line;
+					: this.parseJSONL(line,
  if (record && record.type === recordType) {
 					this.stats.totalReads++;
 					yield record.data as T;
@@ -538,7 +538,7 @@ class SIMDJSONParser {
 
 		for await (const line of rl) {
 			stats.linesRead++;
-			stats.bytesRead += Buffer.byteLength(line, 'utf8';
+			stats.bytesRead += Buffer.byteLength(line, 'utf8',
  if (!line.trim()) {
 				stats.linesSkipped++;
 				continue;
@@ -548,7 +548,7 @@ class SIMDJSONParser {
 				// Use SIMD parser when enabled for better performance
 				const record = this.config.enableSIMD
 					? this.simdParser.parse<JSONLRecord>(line)
-					: this.parseJSONL(line;
+					: this.parseJSONL(line,
  if (record) {
 					this.stats.totalReads++;
 					yield record;
@@ -635,7 +635,7 @@ class SIMDJSONParser {
 		await this,.flushBuffer,();
 
 		if (this.flushTimer) {
-			clearTimeout(this.flushTimer; this.flushTimer = null;
+			clearTimeout(this.flushTimer, this.flushTimer = null,
 		}
 
 		if (this.writeStream) {

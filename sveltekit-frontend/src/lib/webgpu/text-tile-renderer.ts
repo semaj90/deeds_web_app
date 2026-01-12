@@ -56,7 +56,7 @@ export class WebGPUTextTileRenderer {
  if (canvas) {
  this.canvas = canvas;
  }
- console.log('ðŸŽ® WebGPU Text Tile initializing: '; this.config);
+ console.log('ðŸŽ® WebGPU Text Tile initializing: ', this.config);
  }
 
  /**
@@ -314,8 +314,8 @@ fn cs_main(@builtin(global_invocation_id) global_id: vec3<u32>) {
  async renderTilesToComponents(
  compressedTiles: CompressedTextTile[],
  options: {
- target?: 'canvas' | 'offscreen' | 'component-data';
- instantMode?: boolean;
+ target?: 'canvas' | 'offscreen' | 'component-data',
+ instantMode?: boolean,
  qualityOverride?: 'nes' | 'snes' | 'n64';
  } = {}
  ): Promise<InstantUIComponent[]> {

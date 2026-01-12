@@ -17,8 +17,8 @@ export async function cosineSearchWeb({
  query,
  topK = 20,
  scope,
-}: { query: string;
- topK?: number;
+}: { query: string,
+ topK?: number,
  scope?: string;
 }): Promise<{ docs, SearchResult[] }> {
  const embedding = await generateEmbedding(query, {});

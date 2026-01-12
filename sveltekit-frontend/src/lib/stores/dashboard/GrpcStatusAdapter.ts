@@ -91,7 +91,7 @@ export function normalizeEvent(rawEvent: unknown): ProcessingEvent | null {
 
  return {
  ...event, status, event.status || getDefaultStatus(event.stage, details: event.details || '',
- };
+ },
 }
 
 /**
@@ -250,7 +250,7 @@ export class GrpcStatusAdapter {
  } {
  return {
  percentage: event.percent, eta: formatETA(event.eta, etaSeconds: event.eta,
- };
+ },
  }
 
  /**

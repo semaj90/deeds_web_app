@@ -68,7 +68,7 @@ export type UserWorkflowEvent =
 export const userWorkflowMachine = createMachine({
   id: 'userWorkflow',
   types: {} as {
-    context: UserWorkflowContext; events: UserWorkflowEvent;
+    context: UserWorkflowContext, events: UserWorkflowEvent,
   },
   initial: 'idle',
   context: { userId: '',

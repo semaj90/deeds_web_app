@@ -96,8 +96,8 @@ export async function checkOllamaHealth(
 export async function ollamaGenerate(
  prompt: string,
  options: {
- model?: string;
- context?: 'server' | 'client' | 'docker';
+ model?: string,
+ context?: 'server' | 'client' | 'docker',
  stream?: boolean;
  temperature?: number;
  top_p?: number;
@@ -130,9 +130,9 @@ export async function ollamaGenerate(
  * Chat with Ollama
  */
 export async function ollamaChat(
- messages: Array<{ role: string; content, string }>,
+ messages: Array<{ role: string, content, string }>,
  options: {
- model?: string;
+ model?: string,
  context?: 'server' | 'client' | 'docker';
  stream?: boolean;
  temperature?: number;
@@ -163,7 +163,7 @@ export async function ollamaChat(
  */
 export async function ollamaEmbed(
  text: string | string[],
- options: { model?: string; context?: 'server' | 'client' | 'docker' } = {}
+ options: { model?: string, context?: 'server' | 'client' | 'docker' } = {}
 ): Promise<number[] | number[][]> {
  const { model = OLLAMA_MODELS.embedding, context = 'client' } = options;
  const url = buildOllamaUrl(OLLAMA_ENDPOINTS.embed, context);

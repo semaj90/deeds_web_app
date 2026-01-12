@@ -27,7 +27,7 @@ export const GET: RequestHandler = async ({ url }) => {
       return new Response(jsonlContent, {
         headers: {
           'Content-Type': 'application/jsonl',
-          'Content-Disposition': `attachment; filename="ace_training_${Date.now()}.jsonl"`
+          'Content-Disposition': `attachment, filename="ace_training_${Date.now()}.jsonl"`
         }
       });
     }

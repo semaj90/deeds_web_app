@@ -169,7 +169,7 @@ export const recommendationActions = {
  /** * Generate AI-powered recommendations based on user behavior */
  async generateRecommendations(
  userId: string,
- context?: { caseId?: string; currentTask?: string; recentActivity?: string[] }
+ context?: { caseId?: string, currentTask?: string, recentActivity?: string[] }
  ): Promise<void> {
  recommendationStore.update((state) => ({ ...state, isAnalyzing: true, error: null }));
  const startTime = Date.now();
@@ -203,7 +203,7 @@ export const recommendationActions = {
  /** * Analyze user behavior and update analytics */
  async analyzeUserBehavior(
  userId: string,
- activityData: { action: string; context: any; timestamp: number; duration?: number }
+ activityData: { action: string, context: any, timestamp: number; duration?: number }
  ): Promise<void> {
  if (!initialState.enableRealTimeAnalysis) return;
  try {
@@ -224,7 +224,7 @@ export const recommendationActions = {
  /** * Accept a recommendation and provide feedback */
  async acceptRecommendation(
  recommendationId: string,
- feedback?: { helpful: boolean; implemented: boolean; notes?: string }
+ feedback?: { helpful: boolean, implemented: boolean, notes?: string }
  ): Promise<void> {
  try {
  await productionServiceClient.makeRequest('recommendations.feedback', {
@@ -283,7 +283,7 @@ export const recommendationActions = {
  }
  },
  /** * Track recommendation accuracy based on user feedback */
- updateAccuracyMetrics(feedback: Array<{ helpful: boolean; confidence, number }>): void {
+ updateAccuracyMetrics(feedback: Array<{ helpful: boolean, confidence, number }>): void {
  if (!feedback || feedback.length === 0) return;
  const accuracy =
  feedback.reduce((sum, f) => sum + (f.helpful ? f.confidence : 1 - f.confidence), 0) /

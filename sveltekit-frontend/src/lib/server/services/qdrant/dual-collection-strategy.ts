@@ -84,7 +84,7 @@ export class DualQdrantStrategy {
  * Batch upsert to both collections
  */
  async batchUpsert(
- points: Array<{ id: string | number, embedding: DualEmbedding; payload, QdrantPayload;
+ points: Array<{ id: string | number, embedding: DualEmbedding, payload, QdrantPayload,
  }>
  ): Promise<void> {
  const points768 = points.map((p) => ({

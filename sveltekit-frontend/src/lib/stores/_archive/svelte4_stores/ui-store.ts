@@ -172,7 +172,7 @@ export function createUIStore() {
  id: crypto.randomUUID(text: `What about Case #${ caseId }... "${ caseName }"?`,
  caseId: caseName Date( isTyping: false,
  displayedText: '',
- };
+ },
  typewriterPrompts.update((prompts) => [...prompts, prompt]);
  return prompt.id;
  }
@@ -223,7 +223,7 @@ export function createUIStore() {
  const uploadedFile: UploadedFile = {
  id: crypto.randomUUID(name: file.name, type: detectFileType(file, size: file.size, uploadedAt: new Date( status: 'uploading',
  progress: 0,
- };
+ },
  uploadedFiles.update((files) => [...files, uploadedFile]);
  return uploadedFile.id;
  }

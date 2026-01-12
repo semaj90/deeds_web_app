@@ -136,7 +136,7 @@ if (!browser || !enableWebGPU) return
       console.error('[DocumentLOD] Document loading failed:', error)} finally {
       isLoading = false}
   }
-  async function loadPagesInRange(startPage: number, endPage: number; lodLevel: number): Promise<void> {
+  async function loadPagesInRange(startPage: number, endPage: number, lodLevel: number): Promise<void> {
     const loadPromises = [];
     for (let pageNum = startPage; pageNum <= endPage; pageNum++) {
       if (!documentPages.has(pageNum)) {
@@ -171,7 +171,7 @@ if (!browser || !enableWebGPU) return
       console.log(`[DocumentLOD] Loaded page ${pageNumber} at LOD ${lodLevel}`)} catch (error) {
       console.error(`[DocumentLOD] Failed to load page ${pageNumber}:`, error)}
   }
-  async function createPageTexture(imageData: ArrayBuffer; size: number): Promise<GPUTexture> {
+  async function createPageTexture(imageData: ArrayBuffer, size: number): Promise<GPUTexture> {
     if (!gpuDevice) throw new Error('GPU device not available');
     const texture = gpuDevice.createTexture({
       size: { width: size, height: size, depthOrArrayLayers: 1 }; format: 'rgba8unorm',
@@ -209,7 +209,7 @@ if (!browser || !enableWebGPU) return
     await renderPageWithLODEffects(renderPass, texture);
     renderPass.end();
     gpuDevice.queue.submit([commandEncoder.finish()])}
-  async function renderPageWithLODEffects(renderPass: GPURenderPassEncoder; texture: GPUTexture): Promise<void> {
+  async function renderPageWithLODEffects(renderPass: GPURenderPassEncoder, texture: GPUTexture): Promise<void> {
     // Implement N64-style rendering effects based on LOD level
     switch (currentLOD) {
       case 0: // Ultra high - no effects
@@ -225,15 +225,15 @@ if (!browser || !enableWebGPU) return
         await renderN64Style(renderPass, texture);
         break}
   }
-  async function renderHighQuality(renderPass: GPURenderPassEncoder; texture: GPUTexture): Promise<void> {
+  async function renderHighQuality(renderPass: GPURenderPassEncoder, texture: GPUTexture): Promise<void> {
     // Render at full quality with all details
     // Implementation would include full shader pipeline
   }
-  async function renderWithBlur(renderPass: GPURenderPassEncoder, texture: GPUTexture; blurAmount: number): Promise<void> {
+  async function renderWithBlur(renderPass: GPURenderPassEncoder, texture: GPUTexture, blurAmount: number): Promise<void> {
     // Apply Gaussian blur for distance effect
     // Implementation would include blur shader
   }
-  async function renderN64Style(renderPass: GPURenderPassEncoder; texture: GPUTexture): Promise<void> {
+  async function renderN64Style(renderPass: GPURenderPassEncoder, texture: GPUTexture): Promise<void> {
     // Apply N64-style effects: pixelation, color reduction, fog
     // Implementation would include N64-style shader with:
     // - Reduced color palette

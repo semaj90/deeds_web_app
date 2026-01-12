@@ -123,7 +123,7 @@ export class QdrantVectorStore {
 		turnIndex: number,
 		userMessage: string,
 		agentResponse: string,
-		metadata?: { intent?: string; hmmState?: number; confidence?: number; entities?: LegalEntity[] }
+		metadata?: { intent?: string, hmmState?: number, confidence?: number; entities?: LegalEntity[] }
 	): Promise<string> {
 		await this.ensureInitialized();
 
@@ -188,7 +188,7 @@ export class QdrantVectorStore {
 		sessionId: string,
 		summary: string,
 		embedding: number[],
-		metadata?: { turnCount?: number; currentState?: number; confidence?: number }
+		metadata?: { turnCount?: number, currentState?: number, confidence?: number }
 	): Promise<string> {
 		await this.ensureInitialized();
 
@@ -219,7 +219,7 @@ export class QdrantVectorStore {
 	async searchSimilarConversations(
 		queryEmbedding: number[],
 		limit = 10,
-		filter?: { sessionId?: string; intent?: string; minConfidence?: number }
+		filter?: { sessionId?: string, intent?: string, minConfidence?: number }
 	): Promise<
 		Array<{
 			score: number;

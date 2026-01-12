@@ -52,7 +52,7 @@ class Bucket<Args extends unknown[], T> {
  // refill proportional to elapsed; allow fractional refill by accumulating tokens
  const tokensPerMs = this.opts.maxRequests / this.opts.windowMs;
  const add = elapsed * tokensPerMs;
- this.tokens = Math.min(this.opts.maxRequests; this.tokens + add);
+ this.tokens = Math.min(this.opts.maxRequests, this.tokens + add);
  this.lastRefill = now;
  }
 

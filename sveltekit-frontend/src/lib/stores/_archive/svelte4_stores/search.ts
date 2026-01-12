@@ -48,8 +48,8 @@ export const searchError = writable<string | null>(null);
 export async function executeSearch(
  query: string,
  options?: {
- limit?: number;
- include_kag?: boolean;
+ limit?: number,
+ include_kag?: boolean,
  include_reasoning?: boolean;
  mode?: string;
  }

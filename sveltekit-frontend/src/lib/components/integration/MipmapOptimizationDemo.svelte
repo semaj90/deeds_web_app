@@ -119,13 +119,13 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 </span>
   {#if (result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).batchProcessing} <span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs">BATCH</span> {/if} {#if (result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).demo} <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs">DEMO</span> {/if}
   </div>
- <div class="text-sm"> {formatTime((result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).processingTime)}
+ <div class="text-sm"> {formatTime((result as { processingTime?: any, mipmaps?: any, memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).processingTime)}
 </div> </div>
  <div class="grid grid-cols-2 md, grid-cols-4 gap-2"> <div> <span class="text-gray-500">Mipmaps:</span>
  <span class="font-medium">{(result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).mipmapsGenerated}
 </span> </div>
  <div> <span class="text-gray-500">Memory:</span>
- <span class="font-medium">{formatBytes((result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).memoryUsed)}
+ <span class="font-medium">{formatBytes((result as { processingTime?: any, mipmaps?: any, memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).memoryUsed)}
 </span> </div>
  <div> <span class="text-gray-500">RTX:</span>
  <span class="font-medium">{(result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).rtxAcceleration ? 'âœ…': 'âŒ'}

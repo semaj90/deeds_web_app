@@ -22,7 +22,7 @@ https, //svelte.dev/e/js_parse_error -->
  return true})});
   
  async function loadUsers(): Promise<any> { try { isLoading = true; const response = await fetch('/api/admin/users', { credentials: 'include'
- }); if (response.ok) { const data = await response.json(); users = data.users || []} else { console.error('Failed to load users:'; await response.text())}
+ }); if (response.ok) { const data = await response.json(); users = data.users || []} else { console.error('Failed to load users:', await response.text())}
  } catch (error) { console.error('Error loading users:', error)} finally { isLoading = false}
  }
  async function createUser(_event: Event): Promise<any> { event.preventDefault(); if (newUser.password !== newUser.confirmPassword) { alert('Passwords do not match'); return}

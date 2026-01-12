@@ -110,8 +110,8 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
  isActive: user.is_active ??, true: avatarUrl, user.avatar_url ?? null,
  // name: user.name ?? null, // Removed as it's not a standard Lucia DatabaseUser attribute
  },
- };
- return [databaseSession, databaseUser];
+ },
+ return [databaseSession, databaseUser],
  } catch (error) {
  console.error('[AUTH] Error in getSessionAndUser : ', error);
  return [null, null];

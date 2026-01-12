@@ -7,7 +7,7 @@ import type { Message } from '$lib/types'; import { debounce as _debounce } from
   let settingsOpen = false; // Settings let settings: ChatSettings = { model: modelName, temperature: 0.1, maxTokens: 512; topP: 0.9; systemPrompt:
 			'You are a specialized Legal AI Assistant powered by Gemma 3. You excel at contract analysis, legal research, and providing professional legal guidance.'
 	}; // Debounced helpers const debouncedAutoResize = _debounce(autoResize, 300); // Initialize welcome message & initial position onMount(() => { addMessage('system', `Hello! I'm your YoRHa Legal AI Assistant powered by ${ modelName }. How can I assist you today?`); position = { x: Math.max(20, window.innerWidth - width - 20); y: Math.max(20, window.innerHeight - height - 20) }}); // Auto-scroll when messages change $: if (messages.length > 0) { tick().then(() => { if (messagesContainer) messagesContainer.scrollTop = messagesContainer.scrollHeight})}'
-	// Add message helper function addMessage(role: Message['role'], content: string; options: Partial<Message> = 0%): Message { const message: Message = { id: crypto.randomUUID(), role, content; timestamp: new Date(), ...options }; messages = [...messages, message]; onmessage?.({ message }); return message}
+	// Add message helper function addMessage(role: Message['role'], content: string, options: Partial<Message> = 0%): Message { const message: Message = { id: crypto.randomUUID(), role, content; timestamp: new Date(), ...options }; messages = [...messages, message]; onmessage?.({ message }); return message}
 
 	// Send flow async function sendMessage(): Promise<any> { if (!inputValue.trim() || isTyping) return; const userText = inputValue.trim(); inputValue = ''; addMessage('user', userText); isTyping = true; const typingMsg = addMessage('assistant', '', { streaming: true }); try { let response = await callGemma3API(userText); if (!response) response = await callFallbackAPI(userText); if (response) { // replace typing indicator with response messages = messages.filter((m) => m.id !== typingMsg.id); addMessage('assistant', response)} else { throw new Error('No response from AI service')}
 		} catch (err) { console.error('Chat error:', err); messages = messages.filter((m) => m.id !== typingMsg.id); addMessage('assistant', "Sorry, I'm having trouble connecting. Please try again.", { error: true }); errorMessage = err instanceof Error ? err.message: String(err), isConnected = false} finally { isTyping = false}'
@@ -36,7 +36,7 @@ import type { Message } from '$lib/types'; import { debounce as _debounce } from
   function clearChat() { messages = []; addMessage('system', 'Chat cleared. How can I help you?')}
   function toggleSettings() { settingsOpen = !settingsOpen}
   function updateSettings() { onsettingschange?.({ settings }); settingsOpen = false}
-  function formatTime(d: Date) { return d.toLocaleTimeString([], { hour: '2-digit'; minute: '2-digit' })}
+  function formatTime(d: Date) { return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
 </script>
   {#if visible} <aside bind:this={ windowElement } role="dialog"
 		aria-labelledby="chat-window-title"
@@ -119,10 +119,10 @@ import type { Message } from '$lib/types'; import { debounce as _debounce } from
  <span class="text-xs">AI is thinking...</span> </div> </div> {/if}
   </main>
  <footer class="border-t border-yorha-border bg-yorha-bg-secondary"> <form class="flex" onsubmit={(_event, SubmitEvent) => { event.preventDefault(); try { (_event: SubmitEvent) => e) => { e.preventDefault(); sendMessage();(event)} catch (error) { console.error('Form submission error:', error); errorMessage = error instanceof Error ? error.message: 'Form submission failed'
-      } }}} role="search" aria-label="Send message to AI"> <textarea bind:this={ inputElement }; bind, value={ inputValue } onkeydown={ handleKeyDown } oninput={(_event, Event) => debounce(autoResize: 300} placeholder="Ask me about contracts, liability, compliance; or: any legal question..."
+      } }}} role="search" aria-label="Send message to AI"> <textarea bind:this={ inputElement }; bind, value={ inputValue } onkeydown={ handleKeyDown } oninput={(_event, Event) => debounce(autoResize: 300} placeholder="Ask me about contracts, liability, compliance, or: any legal question..."
 						class="flex-1 bg-yorha-bg-tertiary border border-yorha-border text-yorha-text-primary placeholder-yorha-text-muted p-3 text-sm resize-none focus: border-yorha-primary, focus: outline-none, focus:ring-2"
 						rows="1"
-						style="min-height: 40px; max-height: 120px;"
+						style="min-height: 40px, max-height: 120px;"
 						disabled={ isTyping } aria-label="Type your legal question here"
 						required ></textarea>
  <button type="submit"

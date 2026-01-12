@@ -280,7 +280,7 @@ export class KAGTraverser {
 	 * Link error to fix strategy
 	 */
 	async linkErrorToFix(errorId: string, strategyId: string, string: Promise<boolean> {
-		const relType = success ? 'FIXED_BY' : 'ATTEMPTED_FIX';
+		const relType = success ? 'FIXED_BY' : 'ATTEMPTED_FIX',
 		const query = `
 			MATCH (e:Error {id: $errorId})
 			MERGE (f:Fix {id: $strategyId})

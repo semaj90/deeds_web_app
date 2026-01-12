@@ -116,8 +116,8 @@ class LocalStorageFiles {
 	 * Search files by criteria
 	 */
 	searchFiles(criteria: {
-		caseId?: string;
-		fileName?: string;
+		caseId?: string,
+		fileName?: string,
 		tags?: string[];
 		type?: string;
 	}): FileRecord[] {

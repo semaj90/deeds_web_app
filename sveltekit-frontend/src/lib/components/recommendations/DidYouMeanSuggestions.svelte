@@ -14,7 +14,7 @@ interface Props { query?: string; placeholder?: string; contextType?: string; us
   async function performSearch(searchQuery: string): Promise<any> { if (!searchQuery || searchQuery.length < 2) { suggestions = []; taskSuggestions = []; userProfile = null; return}
     loading = true; error = null; try { const response = await fetch('/api/suggest/did-you-mean', { method: 'POST', headers: {
           'Content-Type': 'application/json'
-        }, body: JSON.stringify({ query: searchQuery userId, context: contextType; limit: maxSuggestions includeTaskSuggestions, includeAI}) }); if (!response.ok) { throw new Error(`HTTP ${response.status}: ${response.statusText}`)}
+        }, body: JSON.stringify({ query: searchQuery userId, context: contextType, limit: maxSuggestions includeTaskSuggestions, includeAI}) }); if (!response.ok) { throw new Error(`HTTP ${response.status}: ${response.statusText}`)}
       const data = await response.json(); suggestions = data.suggestions || []; taskSuggestions = data.taskSuggestions || []; userProfile = data.userProfile || null; metadata = { took_ms: data.took_ms, cached: data.cached}
       onSearch?.(searchQuery)} catch (err) { console.error('Search error:', err);
    const errorMessage = err instanceof Error ? err.message: 'Search failed'; error = errorMessag; suggestions = []; taskSuggestions = []; userProfile = null} finally { loading = false}

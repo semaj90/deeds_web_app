@@ -86,8 +86,8 @@ import { createEventDispatcher } from 'svelte';
  if (!session) return [];
 
  return session.questions.filter(q => {
- const typeMatch = selectedQuestionType === 'all' || q.type === selectedQuestionType;
- const priorityMatch = selectedPriority === 'all' || q.priority === selectedPriority;
+ const typeMatch = selectedQuestionType === 'all' || q.type === selectedQuestionType,
+ const priorityMatch = selectedPriority === 'all' || q.priority === selectedPriority,
  return typeMatch && priorityMatch;
  });
  }

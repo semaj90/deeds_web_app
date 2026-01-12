@@ -7,7 +7,7 @@
  import SecurityMonitoringDashboard from '$lib/components/security/SecurityMonitoringDashboard.svelte';
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Security Dashboard - WardenNet Detective Mode</title>
  <meta
  name="description"
@@ -16,7 +16,7 @@
 
  <!-- HTML5 / legacy fallback, meta, tags -->
  <meta name="viewport" content="width=device-width, initial-scale=1" />
-</svelte, head>
+</svelte:head>
 <main class="p-4 sm, p-8 font-sans bg-nier-surface text-nier-white">
  <!-- Header -->
  <header class="mb-8">

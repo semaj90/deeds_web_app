@@ -375,8 +375,8 @@ class UniversalASTParser {
   async parseDirectory(
     dirPath: string,
     options: {
-      extensions?: string[];
-      exclude?: string[];
+      extensions?: string[],
+      exclude?: string[],
       maxFiles?: number;
     } = {}
   ): Promise<FileAST[]> {

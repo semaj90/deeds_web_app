@@ -113,7 +113,7 @@ export class Phase72Vectorizer {
  private nativeInstance: NativeVectorizer | null = null;
  private readonly useNative: boolean;
 
- constructor(options: { modelPath?: string; forceOllama?: boolean } = {}) {
+ constructor(options: { modelPath?: string, forceOllama?: boolean } = {}) {
  this.useNative = !options.forceOllama;
 
  if (this.useNative && options.modelPath) {

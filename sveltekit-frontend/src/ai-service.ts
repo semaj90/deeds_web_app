@@ -12,7 +12,7 @@ import { db } from '../database/index.js';
 type OllamaClient = {
   generateCompletion(
     prompt: string,
-    opts?: { systemPrompt?: string; temperature?: number; maxTokens?: number }
+    opts?: { systemPrompt?: string, temperature?: number, maxTokens?: number }
   ): Promise<string>;
   generateEmbedding(text: string): Promise<number[]>;
 };
@@ -347,8 +347,8 @@ Format your response as JSON with the structure:
   /**
    * Log AI query to database
    */
-  private async logQuery(data: { userId: string;
-    caseId?: string; query: string; response: string; model: string; confidence: number; processingTime: number; contextUsed: string[];
+  private async logQuery(data: { userId: string,
+    caseId?: string, query: string; response: string; model: string; confidence: number; processingTime: number; contextUsed: string[];
     embedding?: number[];
     isSuccessful?: boolean;
     errorMessage?: string;
@@ -482,7 +482,7 @@ Format your response as JSON with the structure:
     return matches
       ? matches.flatMap((m) =>
           m
-            .split(/[;/]/)
+            .split(/[,/]/)
             .map((t) => t.trim().toLowerCase())
             .filter(Boolean)
         )
@@ -495,7 +495,7 @@ Format your response as JSON with the structure:
     return matches
       ? matches.flatMap((m) =>
           m
-            .split(/[;/]/)
+            .split(/[,/]/)
             .map((t) => t.trim())
             .filter(Boolean)
         )
@@ -508,7 +508,7 @@ Format your response as JSON with the structure:
     return matches
       ? matches.flatMap((m) =>
           m
-            .split(/[;/]/)
+            .split(/[,/]/)
             .map((t) => t.trim())
             .filter(Boolean)
         )

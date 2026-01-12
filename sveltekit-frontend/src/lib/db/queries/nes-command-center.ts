@@ -191,8 +191,8 @@ export async function getErrorClusterCount(routeId: string): Promise<number> {
 export async function getErrorClusters(
   routeId: string,
   options: {
-    resolved?: boolean;
-    limit?: number;
+    resolved?: boolean,
+    limit?: number,
     offset?: number;
   } = {}
 ) {
@@ -334,8 +334,8 @@ export async function getLastError(routeId: string) {
 export async function getHealthEvents(
   routeId: string,
   options: {
-    limit?: number;
-    offset?: number;
+    limit?: number,
+    offset?: number,
   } = {}
 ) {
   const db = getDb();
@@ -513,8 +513,8 @@ export async function logInteraction(data: NewRouteInteractionLog) {
 export async function getInteractions(
   routeId: string,
   options: {
-    limit?: number;
-    offset?: number;
+    limit?: number,
+    offset?: number,
   } = {}
 ) {
   const db = getDb();

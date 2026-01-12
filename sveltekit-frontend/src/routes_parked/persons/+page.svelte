@@ -331,9 +331,9 @@
  });
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Persons of Interest - Legal AI Platform</title>
-</svelte, head>
+</svelte:head>
 
 <div class="yorha-detective-interface min-h-screen p-6 text-gray-100 font-mono">
  <header class="flex justify-between items-center mb-6 pb-4 border-b border-yellow-600/30">

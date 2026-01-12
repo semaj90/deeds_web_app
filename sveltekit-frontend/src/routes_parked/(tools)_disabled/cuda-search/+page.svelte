@@ -21,11 +21,11 @@ import type { Document } from '$lib/types';
  }
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>CUDA Legal AI Search - Test</title>
  <link href="https, //unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet" ></li>
  <link href="https, //fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet" ></li>
-</svelte, head>
+</svelte:head>
 <main class="container">
  <section class="hero nes-container">
  <h1 class="title">âš¡ CUDA Legal AI Search</h1>

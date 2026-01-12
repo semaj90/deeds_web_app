@@ -86,10 +86,10 @@ https, //svelte.dev/e/js_parse_error -->
  });
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Legal Document Processing Dashboard</title>
  <link rel="stylesheet" href="/styles/courthouse-theme.css" ></li>
-</svelte, head>
+</svelte:head>
 
 <div class="courthouse-dashboard">
  <div class="dashboard-header">

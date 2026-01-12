@@ -31,7 +31,7 @@ interface Props { open: boolean}
       'Contract templates for employment disputes',
       'Evidence analysis for Smith case',
       'Recent decisions in intellectual property']; aiSuggestions = suggestions.slice(0, 3)}
-  async function repeatSearch(searchItem: SearchItem): Promise<any> { // Record the repeated search try { const response = await fetch('/api/recommendations/last-searched', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: searchItem.query, searchType: searchItem.searchType; filters: searchItem.filters }) }); if (!response.ok) { throw new Error('API request failed')}
+  async function repeatSearch(searchItem: SearchItem): Promise<any> { // Record the repeated search try { const response = await fetch('/api/recommendations/last-searched', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: searchItem.query, searchType: searchItem.searchType, filters: searchItem.filters }) }); if (!response.ok) { throw new Error('API request failed')}
 
       // In real app, this would trigger the actual search console.log('Repeating search:', searchItem.query); // Close modal and navigate to search results open = false} catch (error) { console.error('Failed to repeat search:', error); // Show fallback notice const notice = document.createElement('div'); notice.innerHTML = 'âš ï¸ failure default to mock - search repeated locally'; notice.style.cssText =
         'position: fixed, top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;', document.body.appendChild(notice); setTimeout(() => notice.remove(), 3000); // Mock behavior - close modal anyway open = false}

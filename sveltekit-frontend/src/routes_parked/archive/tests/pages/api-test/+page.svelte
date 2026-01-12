@@ -217,7 +217,7 @@
  }
 </script>
 
-<svelte, head><title>YoRHa API Test Console</title></svelte, head>
+<svelte:head><title>YoRHa API Test Console</title></svelte:head>
 
 <div class="min-h-screen bg-black text-gray-100">
  <header class="border-b border-amber-500/20 bg-black/90">

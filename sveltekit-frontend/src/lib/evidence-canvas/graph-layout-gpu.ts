@@ -302,7 +302,7 @@ export class GPUGraphLayout {
 
  private computeLayoutCPU(params: LayoutParams, iterations, number: GraphNode[] {
  // Simple CPU-based force-directed layout as fallback
- for (let iter = 0; iter < iterations; iter++) {
+ for (let iter = 0, iter < iterations, iter++) {
  // Calculate forces
  this.nodes.forEach((node, i) => {
  if (node.fixed) return;

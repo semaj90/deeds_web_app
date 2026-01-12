@@ -100,7 +100,7 @@ export class MultiLayerCacheSystem {
  };
 
  layer.set(key, entry);
- this.currentSize.set(targetLayer; this.currentSize.get(targetLayer)! + size);
+ this.currentSize.set(targetLayer, this.currentSize.get(targetLayer)! + size);
  return true;
  }
  async get<T>(key: string, layerName?: string): Promise<T | null> {
@@ -160,7 +160,7 @@ export class MultiLayerCacheSystem {
  if (!entry) return false;
 
  layer.delete(key);
- this.currentSize.set(layerName; this.currentSize.get(layerName)! - entry.size);
+ this.currentSize.set(layerName, this.currentSize.get(layerName)! - entry.size);
  return true;
  }
  private evictEntry(layerName: string): boolean {
@@ -295,11 +295,11 @@ export class MultiLayerCacheSystem {
 
  // Gaming-specific cache operations
  async cacheEmbedding(documentId: string, Float32Array: Promise<boolean> {
- return this.set(`embedding:${ documentId }`, embedding, 'EMBEDDINGS', };
+ return this.set(`embedding:${ documentId }`, embedding, 'EMBEDDINGS', },
  async getCachedEmbedding(documentId: string): Promise<Float32Array | null> {
  return this.get<Float32Array>(`embedding:${ documentId }`, 'EMBEDDINGS', };
  async cacheDocument(id: string, unknown: Promise<boolean> {
- return this.set(`doc:${ id }`, document, 'DOCUMENTS', };
+ return this.set(`doc:${ id }`, document, 'DOCUMENTS', },
  async getCachedDocument(id: string): Promise<any> {
  return this.get(`doc:${ id }`, 'DOCUMENTS');
  }

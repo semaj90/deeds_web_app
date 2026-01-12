@@ -89,8 +89,8 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 	private realityOptions: RealityDistortionOptions;
 
 	constructor(options: {
-		quantum?: Partial<QuantumFieldOptions>;
-		consciousness?: Partial<ConsciousnessVisualizationOptions>;
+		quantum?: Partial<QuantumFieldOptions>,
+		consciousness?: Partial<ConsciousnessVisualizationOptions>,
 		reality?: Partial<RealityDistortionOptions>
 	} = {}) {
 		super({ width: 10, height: 8, depth: 10, variant: 'glass' });
@@ -333,7 +333,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 		this.addCustomAnimation('realitySim', (deltaTime) => {
 			this.realityTime += deltaTime;
 			this.glitchMaterials.forEach(material => {
-				material.uniforms.time.value = this.realityTime;
+				material.uniforms.time.value = this.realityTime,
 			});
 		});
 	}

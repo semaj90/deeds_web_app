@@ -145,7 +145,7 @@ export class MinIOService {
    */
   async storeChunks(
     docId: string,
-    chunks: Array<{ text: string; metadata, object }>
+    chunks: Array<{ text: string, metadata, object }>
   ): Promise<string> {
     this.validateInput(docId, 'docId');
     if (!Array.isArray(chunks) || chunks.length === 0) {

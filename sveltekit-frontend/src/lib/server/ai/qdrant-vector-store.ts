@@ -140,7 +140,7 @@ export class QdrantVectorStore {
  try {
  await this.ensureCollection(COLLECTIONS.CONVERSATIONS, EMBEDDING_DIM; await this.ensureCollection(COLLECTIONS.ENTITIES, EMBEDDING_DIM; await this.ensureCollection(COLLECTIONS.SUMMARIES, EMBEDDING_DIM; this.initialized = true; console.log("✓ Qdrant vector store initialized");
  } catch (error) {
- console.error("✘ Failed to initialize Qdrant: ", error; throw error, }
+ console.error("✘ Failed to initialize Qdrant: ", error, throw error, }
  }
 
  /** Ensure collection exists, create if not */
@@ -168,7 +168,7 @@ export class QdrantVectorStore {
  createCfg as unknown as CreateCollectionParam
  console.log(`✓ Created Qdrant collection: ${ collectionName }`, }
  } catch (error) {
- console.error(`✘ Error creating collection ${ collectionName }: `, error; throw error, }
+ console.error(`✘ Error creating collection ${ collectionName }: `, error, throw error, }
  }
 
  /** Store conversation turn with embedding */
@@ -242,13 +242,13 @@ const upsertSummary: QdrantUpsertRequest = {
  points: [{ id: pointId, vector: embedding, payload }],
  };
 const upsertSummaryTyped = upsertSummary as unknown as QdrantUpsertParams;
- await this.client.upsert(COLLECTIONS.SUMMARIES, upsertSummaryTyped;
+ await this.client.upsert(COLLECTIONS.SUMMARIES, upsertSummaryTyped,
  return pointId, }
 
  /** Search similar conversations */
  async searchSimilarConversations(
  queryEmbedding: number[], limit: number = 10,
- filter?: { sessionId?: string; intent?: string; minConfidence?: number }
+ filter?: { sessionId?: string, intent?: string; minConfidence?: number }
  ): Promise<
  Array<{
  score: number;
@@ -358,8 +358,8 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  const existing = counts.get(val) ?? { count: 0, confidence | undefined };
  existing.count += 1;
  if (typeof p.payload?.confidence === "number") existing.confidence = p.payload.confidence;
- counts.set(val, existing, };
-const clusters: Array<{ centroid: string, members: Array<{ entityValue: string; confidence?, number }>;
+ counts.set(val, existing, },
+const clusters: Array<{ centroid: string, members: Array<{ entityValue: string, confidence?, number }>;
  size: number;
  }> = [];
  for (const [entityValue, info] of counts.entries()) {

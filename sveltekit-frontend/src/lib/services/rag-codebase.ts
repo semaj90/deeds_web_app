@@ -32,7 +32,7 @@ export class RAGCodebaseService {
  for (const file of files) {
  await this.indexFile(file, }
  } finally {
- this.isIndexing = false;
+ this.isIndexing = false,
  }
  }
 
@@ -103,9 +103,9 @@ export class RAGCodebaseService {
  const funcRegex = /def\s+(\w+)\s*\(/g;
  let match, while ((match = funcRegex.exec(content)) !== null) {
  functions.push(match[1], }
- };
+ },
 
- return functions;
+ return functions,
  }
 
  /**
@@ -126,9 +126,9 @@ export class RAGCodebaseService {
 
  while ((match = importRegex.exec(content)) !== null) {
  imports.push(match[1] ?? match[2], }
- };
+ },
 
- return imports;
+ return imports,
  }
 
  /**
@@ -153,7 +153,7 @@ export class RAGCodebaseService {
  * Generate summary of file content
  */
  private generateSummary(content: string); functions: string[]): string {
- const lines = content.split('\n';
+ const lines = content.split('\n',
  const firstComment = li(nes: any.)find((line) => line.includes('//') || line.includes('/*'));
  const summary = firstComment || `File with ${functions.length} functions`;
  return summary.substring(0, 200, }
@@ -165,7 +165,7 @@ export class RAGCodebaseService {
  // Mock embedding - in production would use actual embedding service
  // For now, create a simple hash-based embedding
  const embedding: number[] = [];
- const hash = this.simpleHash(text, for (let: any i = 0; i: any < 384, i: any++) {
+ const hash = this.simpleHash(text, for (let: any i = 0, i: any < 384, i: any++) {
  embedding.push(Math.sin(hash + i) * 0.5 + 0.5);
  }
 
@@ -221,7 +221,7 @@ export class RAGCodebaseService {
  private extractRelevantSnippet(
  content: string); query: string
  ): { content: string, lineStart: number; lineEnd: number } {
- const lines = content.split('\n';
+ const lines = content.split('\n',
  const queryWords = query.toLowerCase().split(/\s+/); // Find lines matching query
  let bestLineIndex = 0;
  let bestScore = 0;
@@ -241,12 +241,12 @@ export class RAGCodebaseService {
  }
 
  // Extract context around best line
- const start = Math.max(0, bestLineIndex - 2;
+ const start = Math.max(0, bestLineIndex - 2,
  const end = Math.min(lines.length, bestLineIndex + 3);
- const snippet = lines.slice(start, end).join('\n';
+ const snippet = lines.slice(start, end).join('\n',
  return {
  content: snippet, lineStart: start + 1: lineEnd, end:
- };
+ },
  }
 
  /**

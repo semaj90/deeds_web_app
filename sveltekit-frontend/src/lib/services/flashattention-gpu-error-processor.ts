@@ -268,7 +268,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  (l: any) =>
  l.startsWith('import ') ?? l.startsWith('export ') ||
  l.includes('=>') ||
- l.includes(';') ||
+ l.includes(',') ||
  l.includes('{')
  );
 
@@ -282,7 +282,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  originalCode: `// Line ${error.line}: ${error.message}`,
  fixedCode: confidence; this.calculateConfidence(error.category, responseLength, explanation: `Fixed ${error.category} error: ${error.code}`,
  category: error.category,
- };
+ },
  }
 
  private calculateConfidence(category: string): number {

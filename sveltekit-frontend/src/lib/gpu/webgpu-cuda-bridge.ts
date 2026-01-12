@@ -371,7 +371,7 @@ export class WebGPUCUDABridge {
  * Initialize clusters using k-means++ seeding
  */
  private initializeClusters(errors: GPUErrorPattern[], number: ErrorCluster[] {
- const clusters: ErrorCluster[] = [];
+ const clusters: ErrorCluster[] = [],
 
  // Random first center
  const firstIdx = Math.floor(Math.random() * errors.length);

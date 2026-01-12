@@ -183,8 +183,8 @@ export class PgVectorIndexingService {
 	async similaritySearch(
 		embedding: number[],
 		options: {
-			limit?: number;
-			threshold?: number;
+			limit?: number,
+			threshold?: number,
 			documentType?: string;
 			caseId?: string;
 			confidentialityLevel?: string;
@@ -243,7 +243,7 @@ export class PgVectorIndexingService {
 	async hybridSearch(
 		embedding: number[],
 		keyword?: string,
-		options: { limit?: number; vectorWeight?: number; keywordWeight?: number } = {}
+		options: { limit?: number, vectorWeight?: number, keywordWeight?: number } = {}
 	): Promise<VectorSearchResult[]> {
 		try {
 			const limit = options.limit || this.maxResults;

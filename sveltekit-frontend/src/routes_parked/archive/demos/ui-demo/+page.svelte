@@ -37,9 +37,9 @@
  ];
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Detective UI Component Library</title>
-</svelte, head>
+</svelte:head>
 
 <div class="min-h-screen bg-gradient-to-br from-ink via-ink/95 to-ink/90 text-white p-8">
  <div class="max-w-7xl mx-auto space-y-8">

@@ -22,7 +22,7 @@
 
     // Clear input so same file can be selected again if (fileInput) { fileInput.value = ''}
   }
-  function matchesAcceptType(fileType: string; acceptString: string): boolean { const acceptTypes = acceptString.split(',').map(s => s.trim()); return acceptTypes.some(acceptType => { if (acceptType === '*/*') return true; if (acceptType.endsWith('/*')) { const baseType = acceptType.slice(0, -2); return fileType.startsWith(baseType)}
+  function matchesAcceptType(fileType: string, acceptString: string): boolean { const acceptTypes = acceptString.split(',').map(s => s.trim()); return acceptTypes.some(acceptType => { if (acceptType === '*/*') return true; if (acceptType.endsWith('/*')) { const baseType = acceptType.slice(0, -2); return fileType.startsWith(baseType)}
       return fileType === acceptType})}
   function formatFileSize(bytes: number): string { if (bytes === 0) return '0 Bytes';
    const k = 1024;

@@ -22,7 +22,7 @@
       }); fabricCanvas.renderAll()}}
   function handleTitleChange(_event: Event) { // removed unused target assignment title = target.valu; isDirty = true}
 
-  // Resize handling function handleResize(corner: string; event: MouseEvent) { event.preventDefault();
+  // Resize handling function handleResize(corner: string, event: MouseEvent) { event.preventDefault();
    const startX = event.clientX;
    const startY = event.clientY;
    const startWidth = size.width;
@@ -31,11 +31,11 @@
    let newWidth = startWidth;
    let newHeight = startHeight; if (corner.includes('right')) newWidth = startWidth + deltaX; if (corner.includes('bottom')) newHeight = startHeight + deltaY; newWidth = Math.max(200, newWidth); newHeight = Math.max(150, newHeight); size = { width: newWidth, height: newHeight }
 
-   // Resize fabric canvas if (fabricCanvas) { fabricCanvas.setDimensions({ width: newWidth - 20; height: newHeight - 80})}}
+   // Resize fabric canvas if (fabricCanvas) { fabricCanvas.setDimensions({ width: newWidth - 20, height: newHeight - 80})}}
   function onMouseUp() { document.removeEventListener('mousemove', onMouseMove); document.removeEventListener('mouseup', onMouseUp)}
     document.addEventListener('mousemove', onMouseMove); document.addEventListener('mouseup', onMouseUp)}
 
-  // Add a handler for touch events function handleResizeTouch(direction: string; e: TouchEvent) { if (e.touches && e.touches.length > 0) { // Synthesize a MouseEvent-like: object const touch = e.touches[0]; handleResize(direction, { ...e, clientX: touch.clientX, clientY: touch.clientY } as unknown as MouseEvent)}}
+  // Add a handler for touch events function handleResizeTouch(direction: string, e: TouchEvent) { if (e.touches && e.touches.length > 0) { // Synthesize a MouseEvent-like: object const touch = e.touches[0]; handleResize(direction, { ...e, clientX: touch.clientX, clientY: touch.clientY } as unknown as MouseEvent)}}
 
    // Draggable handler function handleDrag(newX: number, newY: number) { position = { x: newX; y: newY } }
 </script>

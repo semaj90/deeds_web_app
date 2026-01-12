@@ -44,8 +44,8 @@ export interface RagQueryResponse {
  * @param opts.jurisdiction - Optional jurisdiction to filter results (CA, NY, TX, Fed-US, Other)
  * @returns Context text and citations
  */
-export async function getContextFromRag(opts: { query: string;
-    caseId?: string | null;
+export async function getContextFromRag(opts: { query: string,
+    caseId?: string | null,
     tags?: string[] | null;
     jurisdiction?: string | null;
 }): Promise<RagQueryResponse> {

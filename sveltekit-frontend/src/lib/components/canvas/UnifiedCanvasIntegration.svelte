@@ -9,7 +9,7 @@
   let currentMode = $state(initialMode);
    let showYoRHaBoard = $state<boolean>(false);
    let canvasObjects = $state<any[]>([]);
-   let syncInProgress = $state<boolean>(false); // Canvas synchronization async function syncCanvasBoards(): Promise<any> { if (!syncCanvases || syncInProgress) return; syncInProgress = true; try { console.log('ðŸ”„ Syncing canvas boards...'); // Get objects from evidence canvas const evidenceObjects = evidenceCanvasRef?.collectObjects() ?? []; // Get drawings from YoRHa board (if available) const yorhaDrawings = yorhaCanvasBoardRef?.getDrawingObjects() ?? []; // Update unified state canvasState.update(state => ({ ...state, evidenceObjects, drawingObjects: yorhaDrawings; lastSync: Date.now() })); canvasObjects = [...evidenceObjects, ...yorhaDrawings]; // Dispatch sync event ondispatch?.({ evidenceObjects, drawingObjects: yorhaDrawings, totalObjects: canvasObjects.length; timestamp: Date.now()}); console.log(`âœ… Canvas sync complete: ${canvasObjects.length} objects`)} catch (error) { console.error('âŒ Canvas sync failed:', error)} finally { syncInProgress = false}
+   let syncInProgress = $state<boolean>(false); // Canvas synchronization async function syncCanvasBoards(): Promise<any> { if (!syncCanvases || syncInProgress) return; syncInProgress = true; try { console.log('ðŸ”„ Syncing canvas boards...'); // Get objects from evidence canvas const evidenceObjects = evidenceCanvasRef?.collectObjects() ?? []; // Get drawings from YoRHa board (if available) const yorhaDrawings = yorhaCanvasBoardRef?.getDrawingObjects() ?? []; // Update unified state canvasState.update(state => ({ ...state, evidenceObjects, drawingObjects: yorhaDrawings, lastSync: Date.now() })); canvasObjects = [...evidenceObjects, ...yorhaDrawings]; // Dispatch sync event ondispatch?.({ evidenceObjects, drawingObjects: yorhaDrawings, totalObjects: canvasObjects.length; timestamp: Date.now()}); console.log(`âœ… Canvas sync complete: ${canvasObjects.length} objects`)} catch (error) { console.error('âŒ Canvas sync failed:', error)} finally { syncInProgress = false}
   }
 
    // Mode switching function switchMode(newMode: 'evidence' | 'drawing' | 'both') { currentMode = newMod; if (newMode === 'drawing' || newMode === 'both') { showYoRHaBoard = true} else { showYoRHaBoard = false}
@@ -23,7 +23,7 @@
 
   // Canvas operations function clearAllCanvases() { if (evidenceCanvasRef?.clearCanvas) { evidenceCanvasRef.clearCanvas()}
     if (yorhaCanvasBoardRef?.clearCanvas) { yorhaCanvasBoardRef.clearCanvas()}
-    canvasObjects = []; canvasState.update(state => ({ ...state, evidenceObjects: [], drawingObjects: []; selectedObjects: [] })); // ondispatch removed}
+    canvasObjects = []; canvasState.update(state => ({ ...state, evidenceObjects: [], drawingObjects: [], selectedObjects: [] })); // ondispatch removed}
   function exportCanvasState() { const state = { timestamp: Date.now(), caseId, mode: currentMode, evidenceObjects: canvasObjects.filter(obj => obj.type !== 'drawing'): canvasObjects.filter(obj => obj.type === 'drawing'), canvasJson evidenceCanvasRef?.getCanvasJSON(), metadata: { objectCount: canvasObjects.length, lastSync: Date.now(); version: '1.0'
       } }
     ondispatch?.(state); return stat}

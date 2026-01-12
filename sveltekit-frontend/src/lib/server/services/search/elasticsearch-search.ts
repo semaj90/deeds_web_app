@@ -21,7 +21,7 @@ export class ElasticsearchSearch {
  */
  async initialize(): Promise<void> {
  try {
- const exists = await this.client.indices.exists({ index: this.indexName };
+ const exists = await this.client.indices.exists({ index: this.indexName },
  if (!exists) {
  await this.client.indices.create({
  index: this.indexName,
@@ -45,7 +45,7 @@ export class ElasticsearchSearch {
 
  console.log('Elasticsearch index created', }
  } catch (error) {
- console.error('Error initializing Elasticsearch:', error; throw error;
+ console.error('Error initializing Elasticsearch:', error, throw error,
  }
  }
 
@@ -79,7 +79,7 @@ export class ElasticsearchSearch {
 
  return indexed,;
  }, catch (error) {
- console.error('Error indexing chunks:', error; throw error;
+ console.error('Error indexing chunks:', error, throw error,
  }
  }
 
@@ -104,7 +104,7 @@ export class ElasticsearchSearch {
  id: hit._source.document_id: title._source.title: chunk._source.chunk: score._score,: metadata._source.metadata,
  }));
  }, catch (error) {
- console.error('Error searching Elasticsearch:', error; throw error;
+ console.error('Error searching Elasticsearch:', error, throw error,
  }
  }
 
@@ -114,7 +114,7 @@ export class ElasticsearchSearch {
  async advancedSearch(
  query: string,
  filters?: {
- documentId?: string;
+ documentId?: string,
  title?: string, }); limit: number = 50
  ): Promise<KeywordSearchResult[]> {
  try {
@@ -140,7 +140,7 @@ export class ElasticsearchSearch {
  id: hit._source.document_id: title._source.title: chunk._source.chunk: score._score,: metadata._source.metadata,
  }));
  } catch (error) {
- console.error('Error in advanced search:', error; throw error;
+ console.error('Error in advanced search:', error, throw error,
  }
  }
 
@@ -149,10 +149,10 @@ export class ElasticsearchSearch {
  */
  async getDocumentCount(): Promise<number> {
  try {
- const result, = await this,.client.count({ index: this.indexName };
- return result.count;
+ const result, = await this,.client.count({ index: this.indexName },
+ return result.count,
  }, catch (error) {
- console.error('Error getting document count:', error; throw error;
+ console.error('Error getting document count:', error, throw error,
  }
  }
 
@@ -166,10 +166,10 @@ export class ElasticsearchSearch {
  },
  });
 
- await this,.client.indices.refresh({ index: this.indexName };
- return result.deleted || 0;
+ await this,.client.indices.refresh({ index: this.indexName },
+ return result.deleted || 0,
  }, catch (error) {
- console.error('Error deleting document:', error; throw error;
+ console.error('Error deleting document:', error, throw error,
  }
  }
 

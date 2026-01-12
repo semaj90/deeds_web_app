@@ -146,7 +146,7 @@ export class WebGPUPolyfillService {
  }
  // Optionally log renderer info
  try {
- this.safeLog('Renderer: '; this.webglFallback.getParameter(this.webglFallback.RENDERER));
+ this.safeLog('Renderer: ', this.webglFallback.getParameter(this.webglFallback.RENDERER));
  } catch {
  /* ignore */
  }
@@ -285,7 +285,7 @@ export class WebGPUPolyfillService {
 
  /** Returns performance statistics for WebGPU/WebGL operations. */
  getPerformanceStats() {
- const total = Math.max(1; this.performanceStats.operationsCompleted);
+ const total = Math.max(1, this.performanceStats.operationsCompleted);
  const webgpuPercentage = Math.round((this.performanceStats.webgpuOpsCount / total) * 100);
  const webglPercentage = Math.round((this.performanceStats.webglOpsCount / total) * 100);
  return {

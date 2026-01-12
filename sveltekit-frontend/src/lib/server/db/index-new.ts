@@ -5,7 +5,7 @@ dotenv.config({ path: envFile });
   
 initializeQdrantCollection().catch(err => { console.error('Qdrant tag seeding failed: ', err)});
   
-// Schema exports export * from '$lib/server/db/schema-postgres'; // Graceful shutdown export async function closeDatabase(): Promise<any> { if (_pool) { console.log('Closing PostgreSQL connection pool...'); try { // Prefer calling end() on the current pool without using: "any" casts if (typeof _pool.end === 'function') { await _pool.end()}else if (typeof (poolShim as PoolLike).end === 'function') { // fallback to the imported pool shim await (poolShim as PoolLike).end!()}else if (typeof _pool.close === 'function') { await _pool.close()}else { console.warn('No end/close method found on pool or poolShim; nothing to close.')}catch (err) { console.warn('Error closing pool shim: ', err)}
+// Schema exports export * from '$lib/server/db/schema-postgres'; // Graceful shutdown export async function closeDatabase(): Promise<any> { if (_pool) { console.log('Closing PostgreSQL connection pool...'); try { // Prefer calling end() on the current pool without using: "any" casts if (typeof _pool.end === 'function') { await _pool.end()}else if (typeof (poolShim as PoolLike).end === 'function') { // fallback to the imported pool shim await (poolShim as PoolLike).end!()}else if (typeof _pool.close === 'function') { await _pool.close()}else { console.warn('No end/close method found on pool or poolShim, nothing to close.')}catch (err) { console.warn('Error closing pool shim: ', err)}
 } }
 
 

@@ -132,8 +132,8 @@ class AuthStore {
 	/**
 	 * Register new user
 	 */
-	async register(data: { email: string;
-		password: string;
+	async register(data: { email: string,
+		password: string,
 		firstName?: string;
 		lastName?: string;
 	}): Promise<boolean> {

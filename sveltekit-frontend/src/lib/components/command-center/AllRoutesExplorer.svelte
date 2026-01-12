@@ -108,7 +108,7 @@
 </div>
 
 <!-- Route Tree Node Component (recursive) -->
-{#snippet RouteTreeNode(props: { route: RouteNode; expandedPaths: Set<string>; toggleExpand: (path: string) => void; openFile: (file: string, line?: number) => void; searchQuery: string })}
+{#snippet RouteTreeNode(props: { route: RouteNode, expandedPaths: Set<string>, toggleExpand: (path: string) => void; openFile: (file: string, line?: number) => void; searchQuery: string })}
 	<div class="route-node">
 		<div class="route-header">
 			{#if props.route.children && props.route.children.length > 0}

@@ -171,13 +171,13 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  });
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Legal Document Summarization - Legal AI Platform</title>
  <meta
  name="description"
  content="AI-powered legal document summarization using advanced language models"
  />
-</svelte, head>
+</svelte:head>
 <div class="summarization-container">
  <header class="page-header">
  <h1>⚖️ Legal Document Summarization</h1>

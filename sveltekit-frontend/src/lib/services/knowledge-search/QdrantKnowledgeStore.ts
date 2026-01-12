@@ -400,7 +400,7 @@ export class QdrantKnowledgeStore {
   /**
    * Map Qdrant point to FullDocument
    */
-  private mapToFullDocument(point: { id: number; payload: Record<string, unknown> }): FullDocument {
+  private mapToFullDocument(point: { id: number, payload: Record<string, unknown> }): FullDocument {
     const payload = point.payload || {};
 
     return {

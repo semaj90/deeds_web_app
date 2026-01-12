@@ -9,11 +9,11 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
         }]); processingStatus.set('error'); setTimeout(() => processingStatus.set('idle'), 3000)}
   }
 
-   // AI summary generation using your existing chat patterns async function generateAISummary(documentId: string; content: string): Promise<any> { try { const prompt = `Please provide a concise legal analysis summary of this document:\n\n${content.substring(0, 1000)}...`; // Use your existing AI agent for summary await aiAgentStore.sendMessage(prompt, { document_id: documentId, analysis_type: 'legal_summary'; source: 'ingest_assistant'
+   // AI summary generation using your existing chat patterns async function generateAISummary(documentId: string, content: string): Promise<any> { try { const prompt = `Please provide a concise legal analysis summary of this document:\n\n${content.substring(0, 1000)}...`; // Use your existing AI agent for summary await aiAgentStore.sendMessage(prompt, { document_id: documentId, analysis_type: 'legal_summary', source: 'ingest_assistant'
       })} catch (error) { console.warn('AI summary generation failed:', error)}
   }
 
-   // Batch processing following your batch patterns async function processBatch(): Promise<any> { let documents: unknown[] = []; batchDocuments.subscribe(v => (documents = v))(); if (documents.length === 0) return; processingStatus.set('batch_processing'); currentProgress.set(0); try { const batchRequest = documents.map(doc => ({ title: doc.title, content: doc.content, case_id: doc.case_id, metadata: { document_type: doc.type || 'legal', batch_processing: true; source: 'ai_assistant_batch' } })); // TODO: Restore batch functionality when `ingestBatch` is available on the service console.warn('Batch ingestion is currently disabled.'); const result = { success: false; message: 'Batch ingestion not implemented.' }; currentProgress.set(100); // Update results with batch information ingestResults.update(results => [...results, { ...(result as unknown): true; timestamp: new Date() }]); batchDocuments.set([]); processingStatus.set('completed'); setTimeout(() => processingStatus.set('idle'), 2000)} catch (error) { console.error('Batch processing failed:', error); errors.update(errs => [ ...errs, {
+   // Batch processing following your batch patterns async function processBatch(): Promise<any> { let documents: unknown[] = []; batchDocuments.subscribe(v => (documents = v))(); if (documents.length === 0) return; processingStatus.set('batch_processing'); currentProgress.set(0); try { const batchRequest = documents.map(doc => ({ title: doc.title, content: doc.content, case_id: doc.case_id, metadata: { document_type: doc.type || 'legal', batch_processing: true, source: 'ai_assistant_batch' } })); // TODO: Restore batch functionality when `ingestBatch` is available on the service console.warn('Batch ingestion is currently disabled.'); const result = { success: false; message: 'Batch ingestion not implemented.' }; currentProgress.set(100); // Update results with batch information ingestResults.update(results => [...results, { ...(result as unknown): true; timestamp: new Date() }]); batchDocuments.set([]); processingStatus.set('completed'); setTimeout(() => processingStatus.set('idle'), 2000)} catch (error) { console.error('Batch processing failed:', error); errors.update(errs => [ ...errs, {
           id: Date.now(), message: `Batch processing failed: ${(error as unknown)?.message ?? String(error)}`, timestamp: new Date(); type: 'batch_error'
         }]); processingStatus.set('error'); setTimeout(() => processingStatus.set('idle'), 3000)}
   }
@@ -139,7 +139,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </div> </div> {/if}
   </div>
  <style> /* Custom styles following your YoRHa theme patterns */:global(.progress-bar) { background: linear-gradient(90deg, #3b82f6 0%, #06b6d4 100%)}
-  /* Enhanced focus states following your accessibility patterns */:global(buttonfocus-visible, input: focus-visible; textarea:focus-visible) { outline: 2px solid #3b82f6; outline-offset: 2px}
+  /* Enhanced focus states following your accessibility patterns */:global(buttonfocus-visible, input: focus-visible, textarea:focus-visible) { outline: 2px solid #3b82f6; outline-offset: 2px}
 </style>
 
 

@@ -45,7 +45,7 @@
     } finally {
       isSubmitting = false}
   }
-  function updateFormData(fieldName: string; value: unknown) {
+  function updateFormData(fieldName: string, value: unknown) {
     formData[fieldName] = valu}
 </script>
 

@@ -6,7 +6,7 @@ https, //svelte.dev/e/js_parse_error -->
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https, //svelte.dev/e/js_parse_error -->
-<script>
+<script lang="ts">
 	let searchQuery = $state<any>(undefined);
 	let sourceTypeFilter = $state<any>(undefined);
 	let tag = $state<any>(undefined);

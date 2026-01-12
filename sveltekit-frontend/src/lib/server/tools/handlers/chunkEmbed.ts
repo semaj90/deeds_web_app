@@ -98,7 +98,7 @@ async function generateEmbedding(text: string, model: string): Promise<number[]>
 
 async function upsertToQdrant(
   collection: string,
-  points: Array<{ id: string; vector: number[]; payload: Record<string, unknown> }>
+  points: Array<{ id: string, vector: number[], payload: Record<string, unknown> }>
 ): Promise<void> {
   const response = await fetch(`${QDRANT_URL}/collections/${collection}/points`, {
     method: 'PUT',

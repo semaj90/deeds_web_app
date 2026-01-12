@@ -64,8 +64,8 @@ export class ClientEmbeddingGemma {
  async generateEmbeddings(
  texts: string | string[],
  options: {
- normalize?: boolean;
- maxLength?: number;
+ normalize?: boolean,
+ maxLength?: number,
  } = {}
  ): Promise<{ embeddings: number[][]; model: string; dimension: number; count, number;
  }> {

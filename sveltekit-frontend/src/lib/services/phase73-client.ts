@@ -53,8 +53,8 @@ export class Phase73Client {
  async search(
  query: string,
  options?: {
- limit?: number;
- offset?: number;
+ limit?: number,
+ offset?: number,
  includeMetadata?: boolean;
  clusterFilter?: string[];
  }

@@ -158,7 +158,7 @@ export class OllamaAdapter implements OllamaClient {
 
   async generateText(
     prompt: string,
-    opts?: { model?: string; maxTokens?: number }
+    opts?: { model?: string, maxTokens?: number }
   ): Promise<string> {
     const model = opts?.model ?? this.config.chatModel || 'gemma3:legal-latest';
     const url = `${this.config.baseUrl || 'http://localhost:11434'}/api/generate`;
@@ -182,8 +182,8 @@ export class OllamaAdapter implements OllamaClient {
   }
 
   async chat(
-    messages: Array<{ role: string; content, string }>,
-    opts?: { model?: string; stream?: boolean }
+    messages: Array<{ role: string, content, string }>,
+    opts?: { model?: string, stream?: boolean }
   ): Promise<string | AsyncIterable<string>> {
     const model = opts?.model ?? this.config.chatModel || 'gemma3:legal-latest';
     const url = `${this.config.baseUrl || 'http://localhost:11434'}/api/chat`;
@@ -444,7 +444,7 @@ export class PgVectorAdapter implements PgVectorClient {
 
   async insert(
     collection: string,
-    vectors: Array<{ id: string; vector: number[]; metadata?: Record<string, unknown> }>
+    vectors: Array<{ id: string, vector: number[], metadata?: Record<string, unknown> }>
   ): Promise<void> {
     const values = vectors
       .map((_, i) => `($${i * 3 + 1}, $${i * 3 + 2}::vector, $${i * 3 + 3}::jsonb)`)
@@ -566,7 +566,7 @@ export class Neo4jAdapter implements Neo4jClient {
     const { driver, auth } = await import('neo4j-driver');
     this.driver = driver(
       this.config.uri,
-      auth.basic(this.config.user; this.config.password)
+      auth.basic(this.config.user, this.config.password)
     );
     this.session = this.driver.session({ database: this.config.database || 'neo4j' });
   }

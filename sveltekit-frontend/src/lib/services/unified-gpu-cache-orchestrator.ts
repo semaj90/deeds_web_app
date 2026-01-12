@@ -99,7 +99,7 @@ export class UnifiedGPUCacheOrchestrator {
      */
     async semanticSearch(
         query: string,
-        options: { topK?: number; useCache?: boolean; enableGPUAcceleration?: boolean; filters?: Record<string, unknown> } = {}
+        options: { topK?: number, useCache?: boolean, enableGPUAcceleration?: boolean; filters?: Record<string, unknown> } = {}
     ): Promise<{ results: unknown[]; metrics: { totalTime: number; cacheHitRate: number; gpuAcceleration: boolean; compressionSavings, number } }> {
         const startTime = performance.now();
         try {

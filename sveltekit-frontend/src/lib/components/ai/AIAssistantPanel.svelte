@@ -6,7 +6,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
     } catch (error) { console.error('Failed to initialize acceleration', error); accelerationStatus = 'error'}
   }
 
-   // Handle user input submission with optional acceleration async function handleSendMessage(): Promise<any> { if (!userInput.trim() || isLoading) return; const prompt = userInput.trim(); userInput = ''; isLoading = true; try { // Use the unified store's sendMessage method with acceleration support await aiAssistant.sendMessage(caseId, prompt, selectedEvidenceIds, { useAcceleration useAcceleration && accelerationStatus === 'ready', includeHistory: true, legalContext: `Evidence; IDs: ${selectedEvidenceIds.join(', ')}` })} catch (error) { console.error('Failed to send message:', error)} finally { isLoading = false}'
+   // Handle user input submission with optional acceleration async function handleSendMessage(): Promise<any> { if (!userInput.trim() || isLoading) return; const prompt = userInput.trim(); userInput = ''; isLoading = true; try { // Use the unified store's sendMessage method with acceleration support await aiAssistant.sendMessage(caseId, prompt, selectedEvidenceIds, { useAcceleration useAcceleration && accelerationStatus === 'ready', includeHistory: true, legalContext: `Evidence, IDs: ${selectedEvidenceIds.join(', ')}` })} catch (error) { console.error('Failed to send message:', error)} finally { isLoading = false}'
   }
 
    // Quick action handlers using unified store async function analyzeSelectedEvidence(): Promise<any> { if (selectedEvidenceIds.length === 0) return; isLoading = true; try { const prompt = selectedEvidenceIds.length === 1 ? `Please analyze evidence item ${selectedEvidenceIds[0]} and provide insights.`: `Please analyze the connections between evidence items: ${selectedEvidenceIds.join(', ')}`; await aiAssistant.sendMessage(caseId, prompt, selectedEvidenceIds, { useAcceleration useAcceleration && accelerationStatus === 'ready', legalContext: 'Evidence analysis request'
@@ -17,7 +17,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   }
   function handleKeydown(_event: KeyboardEvent) { if (_event.key === 'Enter' && !_event.shiftKey) { _event.preventDefault(); handleSendMessage()}
   }
-  function formatTimestamp(timestamp: number): string { return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit'; minute: '2-digit' })}
+  function formatTimestamp(timestamp: number): string { return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
   function handleInsightClick(insight: unknown) { if (insight.evidenceIds && insight.evidenceIds.length > 0) { onEvidenceHighlight?.({ evidenceIds: insight.evidenceIds })}
   }
   function setContext(context: typeof currentContext) { currentContext = context}

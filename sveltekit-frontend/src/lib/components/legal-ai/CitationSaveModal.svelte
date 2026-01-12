@@ -36,9 +36,9 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  year: new Date().getFullYear( highlighted_text: highlightedText || '',
  notes: '',
  case_id: caseId || '',
- };
+ },
 
- let isSaving = false;
+ let isSaving = false,
  let error: string | null = null;
 
  const jurisdictions = ['Federal', 'State', 'Local', 'International'];
@@ -53,8 +53,8 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  year: new Date().getFullYear( highlighted_text: highlightedText || '',
  notes: '',
  case_id: caseId || '',
- };
- error = null;
+ },
+ error = null,
  }
 
  function closeModal() {

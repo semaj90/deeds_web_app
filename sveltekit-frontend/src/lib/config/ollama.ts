@@ -91,7 +91,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
  */
 export async function generateLegalAnalysis(
 	prompt: string,
-	options: { temperature?: number; maxTokens?: number } = {}
+	options: { temperature?: number, maxTokens?: number } = {}
 ): Promise<string> {
 	const endpoint = await getOllamaEndpoint('legal');
 

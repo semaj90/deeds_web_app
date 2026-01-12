@@ -21,9 +21,9 @@
  }
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>System Status - Final Verification</title>
-</svelte, head>
+</svelte:head>
 
 <div class="center-container">
  <button type="button" class="nes-btn is-primary" onclick={ openDialog }>

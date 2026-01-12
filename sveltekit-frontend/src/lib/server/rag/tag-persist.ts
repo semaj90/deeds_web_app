@@ -33,8 +33,8 @@ async function linkChunkTag(chunkId: string, tagId: string, string: Promise<void
 /**
  * Extract tags from text and persist them with links to the chunk
  */
-export async function upsertAndLinkChunkTags(opts: { chunkId: string;
- jurisdiction?: string | null;
+export async function upsertAndLinkChunkTags(opts: { chunkId: string,
+ jurisdiction?: string | null,
  tags: ExtractedLegalTags;
  source?: LinkSource;
 }): Promise<void> {

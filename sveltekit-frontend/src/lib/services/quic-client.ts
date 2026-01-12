@@ -204,7 +204,7 @@ class QUICClient {
 	// SIMD JSON Parser methods
 	async parseJsonWithSimd(
 		jsonText: string,
-		options?: { type?: string; field?: string }
+		options?: { type?: string, field?: string }
 	): Promise<SimdParseResponse> {
 		try {
 			const response = await this.fetch('/parse', {
@@ -244,8 +244,8 @@ class QUICClient {
 		}
 	}
 
-	async parseJsonBatch(requests: Array<{ text: string;
-		type?: string;
+	async parseJsonBatch(requests: Array<{ text: string,
+		type?: string,
 		field?, string;
 	}>): Promise<SimdBatchResponse> {
 		try {

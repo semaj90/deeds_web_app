@@ -131,9 +131,9 @@
  }
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Phase 72 Hybrid - Evidence Canvas Demo</title>
-</svelte, head>
+</svelte:head>
 
 <div class="demo-container">
  <header class="demo-header">

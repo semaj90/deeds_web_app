@@ -44,7 +44,7 @@ export class WebGPUDiagnosticsService {
  const diagnostics: WebGPUDiagnostics = {
  isSupported: false, browserSupport: this.getBrowserSupport(errors: [],
  recommendations: [],
- };
+ },
 
  try {
  // Step 1: Check navigator.gpu availability

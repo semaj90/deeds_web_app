@@ -279,8 +279,8 @@ export async function searchSimilarEvidence(
 /**
  * Insert chat message with vector embedding
  */
-export async function insertChatMessageWithEmbedding(messageData: { id: string;
-    sessionId: string; role: string;
+export async function insertChatMessageWithEmbedding(messageData: { id: string,
+    sessionId: string, role: string;
     content: string; embedding: number[];
     metadata?: Record<string, unknown>;
 }): Promise<boolean> {
@@ -343,7 +343,7 @@ export async function updateEvidenceEmbeddings(
  */
 export async function searchAcrossAllVectors(
     queryEmbedding: number[],
-    options: VectorSearchOptions & { includeMessages?: boolean; includeEvidence?: boolean; caseId?: string } = {}
+    options: VectorSearchOptions & { includeMessages?: boolean, includeEvidence?: boolean, caseId?: string } = {}
 ): Promise<VectorSearchResult[]> {
     const { limit = 20, threshold = 0.6, includeMessages = true, includeEvidence = true, caseId } = options;
     const searchPromises: Promise<VectorSearchResult[]>[] = [];

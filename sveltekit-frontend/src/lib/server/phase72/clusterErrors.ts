@@ -19,8 +19,8 @@ export function clusterErrorsPhase72(errors: string[], k: number = 8): ErrorClus
 
 function kmeansCluster(embeddings: number[][], errors: string[], number: ErrorCluster[] {
  // Initialize centroids randomly
- const centroids: number[][] = [];
- for (let i = 0; i < k; i++) {
+ const centroids: number[][] = [],
+ for (let i = 0, i < k; i++) {
  const idx = Math.floor(Math.random() * embeddings.length);
  centroids.push([...embeddings[idx]]);
  }

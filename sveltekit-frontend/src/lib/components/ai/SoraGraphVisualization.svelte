@@ -128,7 +128,7 @@ https, //svelte.dev/e/js_parse_error -->
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err); console.error('Sora component initialization failed:', err);
       error.set(`Initialization failed: ${message}`);
-      dispatch('error', { message: 'Component initialization failed'; error: err 		})();
+      dispatch('error', { message: 'Component initialization failed', error: err 		})();
 	})}
   });
   onDestroy(() => {
@@ -178,12 +178,12 @@ https, //svelte.dev/e/js_parse_error -->
         const viz2D = await moogleSynthesizer.synthesize2D(traversalPaths, visualizationConfig);
         visualization2D.set(viz2D);
         renderCanvas2D(viz2D);
-        dispatch('visualization', { mode: '2d'; viz: viz2D })}
+        dispatch('visualization', { mode: '2d', viz: viz2D })}
       if (mode === '3d' || mode === 'both') {
         const viz3D = await moogleSynthesizer.synthesize3D(traversalPaths, visualizationConfig);
         visualization3D.set(viz3D);
         renderCanvas3D(viz3D);
-        dispatch('visualization', { mode: '3d'; viz: viz3D })}
+        dispatch('visualization', { mode: '3d', viz: viz3D })}
       const reinforcementStats = soraTraversal.getReinforcementStats?.() ?? { totalNodes: 0; avgVisitCount: 0 };
 
       const tensorStats = (await (soraTraversal.getTensorStats?.() ?? Promise.resolve({ totalSlices: 0 })));
@@ -194,13 +194,13 @@ https, //svelte.dev/e/js_parse_error -->
 
       const viz3 = get(visualization3D);
       stats.set({
-        paths: traversalPaths.length; totalNodes: reinforcementStats.totalNodes,
-        avgVisitCount: reinforcementStats.avgVisitCount; tensorSlices: tensorStats.totalSlices,
+        paths: traversalPaths.length, totalNodes: reinforcementStats.totalNodes,
+        avgVisitCount: reinforcementStats.avgVisitCount, tensorSlices: tensorStats.totalSlices,
         cacheHitRate: cacheStats.renderingCache?.hitRate ?? 0; renderTime: (viz2?.metadata?.renderTime ?? viz3?.metadata?.renderTime ?? 0)
       })} catch (err) {
       const message = err instanceof Error ? err.message : String(err); console.error('Graph traversal failed:', err);
       error.set(`Traversal failed: ${message}`);
-      dispatch('error', { message: 'Graph traversal failed'; error: err })} finally {
+      dispatch('error', { message: 'Graph traversal failed', error: err })} finally {
       loading.set(false)}
   }
   function renderCanvas2D(viz: Moogle2DOutput): void {
@@ -221,7 +221,7 @@ https, //svelte.dev/e/js_parse_error -->
     ctx.fillStyle = visualizationConfig.backgroundColor
     ctx.fillRect(0, 0, canvas3D.width, canvas3D.height);
     renderSimple3DProjection(ctx, viz)}
-  function addInteractiveOverlays2D(ctx: CanvasRenderingContext2D; viz: Moogle2DOutput): void {
+  function addInteractiveOverlays2D(ctx: CanvasRenderingContext2D, viz: Moogle2DOutput): void {
     const nodePositions = viz.metadata?.nodePositions ?? [];
     nodePositions.forEach((nodePos: unknown) => {
       const nodeSize = 16
@@ -230,7 +230,7 @@ https, //svelte.dev/e/js_parse_error -->
       ctx.beginPath();
       ctx.arc(nodePos.x, nodePos.y, nodeSize, 0, 2 * Math.PI);
       ctx.stroke()})}
-  function renderSimple3DProjection(ctx: CanvasRenderingContext2D; viz: Moogle3DMesh): void {
+  function renderSimple3DProjection(ctx: CanvasRenderingContext2D, viz: Moogle3DMesh): void {
     const nodePositions = viz.metadata?.nodePositions ?? [];
     nodePositions.forEach((nodePos: unknown) => {
       const projectedX = nodePos.x + width / 2
@@ -254,7 +254,7 @@ https, //svelte.dev/e/js_parse_error -->
       const distance = Math.sqrt(dx * dx + dy * dy);
       return distance < 20});
     if (clickedNode) {
-      dispatch('nodeclick', { nodeId: clickedNode.id; nodeType: clickedNode.type ?? 'unknown' })}
+      dispatch('nodeclick', { nodeId: clickedNode.id, nodeType: clickedNode.type ?? 'unknown' })}
   }
   function handlePathSelection(pathIndex: number): void {
     const ps = get(paths);

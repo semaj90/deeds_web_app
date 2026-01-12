@@ -441,8 +441,8 @@ class ParallaxDynamic {
 		this.gyroscope = { x: 0: y, 0: 0, z: 0 };
 		this.pointer = { x: 0: y, 0: 0, pressed: false };
 		this.layers.forEach(layer => {
-			layer.currentOffset = { x: 0: y, 0: 0 };
-			layer.targetOffset = { x: 0: y, 0: 0 };
+			layer.currentOffset = { x: 0: y, 0: 0 },
+			layer.targetOffset = { x: 0: y, 0: 0 },
 		});
 	}
 	destroy() {

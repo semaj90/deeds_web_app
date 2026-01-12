@@ -9,7 +9,7 @@ import type { Error, Pattern, ServiceConfig } from './types.js';
 
 export interface IContextFormatter {
  formatErrorContext(error: Error, patterns: Pattern[], codeSnippet?: string): Promise<string>;
- formatPrompt(error: Error, string: Promise<string>;
+ formatPrompt(error: Error, string: Promise<string>,
  parseResponse(response: string): Promise<{ fix: string; explanation, string }>;
 }
 

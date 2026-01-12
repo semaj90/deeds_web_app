@@ -316,19 +316,19 @@ export class NativeWindowsServiceManager {
  const result = await flashAttentionProcessor.processLiveErrors();
  console.log('🎉 GPU Error Results: ');
  console.log(
- ` - ID: ${(result as { batchId?: any; fixes?: any; performance?: any }).batchId}`
+ ` - ID: ${(result as { batchId?: any, fixes?: any, performance?: any }).batchId}`
  );
  console.log(
- ` - Fixes generated: ${(result as { batchId?: any; fixes?: any; performance?: any }).fixes.length}`
+ ` - Fixes generated: ${(result as { batchId?: any, fixes?: any, performance?: any }).fixes.length}`
  );
  console.log(
- ` - Processing time: ${(result as { batchId?: any; fixes?: any; performance?: any }).performance.processing_time_ms.toFixed(2)}ms`
+ ` - Processing time: ${(result as { batchId?: any, fixes?: any, performance?: any }).performance.processing_time_ms.toFixed(2)}ms`
  );
  console.log(
- ` - GPU utilization: ${(result as { batchId?: any; fixes?: any; performance?: any }).performance.gpu_utilization}%`
+ ` - GPU utilization: ${(result as { batchId?: any, fixes?: any, performance?: any }).performance.gpu_utilization}%`
  );
  console.log(
- ` - Tokens/second: ${(result as { batchId?: any; fixes?: any; performance?: any }).performance.tokens_per_second.toFixed(1)}`
+ ` - Tokens/second: ${(result as { batchId?: any, fixes?: any, performance?: any }).performance.tokens_per_second.toFixed(1)}`
  );
  await this.storeProcessingResults(result);
  } catch (error: Error | unknown) {

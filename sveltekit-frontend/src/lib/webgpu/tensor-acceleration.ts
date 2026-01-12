@@ -506,7 +506,7 @@ export class WebGPUTensorAccelerator {
     async calculateVectorSimilarityWithSIMDTiling(
         vectorA: Float32Array,
         vectorB: Float32Array,
-        options: { enableTiling?: boolean; tileSize?: number; useEvidenceAnalysis?: boolean } = {}
+        options: { enableTiling?: boolean, tileSize?: number, useEvidenceAnalysis?: boolean } = {}
     ): Promise<Record<string, unknown>> {
         const start = performance.now();
         const { enableTiling = true, tileSize = 256, useEvidenceAnalysis = false } = options;

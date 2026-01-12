@@ -56,8 +56,8 @@ export function createLegalCaseStore() {
  });
   
  const auditService = {
- async logAction(action: { type: string;
- entityType: string; entityId: string;
+ async logAction(action: { type: string,
+ entityType: string, entityId: string;
  userId: string;
  details?: any;
  }): Promise<void> {

@@ -146,7 +146,7 @@ export class QdrantQUICClient {
  async connect(): Promise<void> {
  if (typeof WebTransport === 'undefined') {
  // Removed (globalThis as unknown)
- console.warn('WebTransport not available; using HTTP fallback');
+ console.warn('WebTransport not available, using HTTP fallback');
  return;
  }
  try {

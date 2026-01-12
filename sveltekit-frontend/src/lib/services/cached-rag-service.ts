@@ -264,7 +264,7 @@ const $redisAdapter: $RedisCacheAdapter = {
 const $qdrantAdapter: $QdrantAdapter = {
  async upsertCollection(
      collection: string,
-     vectors: Array<{ id: string; values: number[]; payload?: Record<string, unknown> }>
+     vectors: Array<{ id: string, values: number[], payload?: Record<string, unknown> }>
  ) {
  try {
  const r = await fetch('/api/qdrant/upsert', {
@@ -293,7 +293,7 @@ const $qdrantAdapter: $QdrantAdapter = {
 };
 
 const pgJsonStore: $PostgresJSONStore = {
- async upsertDocument(doc: { id: string; body: Record<string, unknown> }) {
+ async upsertDocument(doc: { id: string, body: Record<string, unknown> }) {
  try {
  const r = await fetch('/api/postgres/json/upsert', {
  method: 'POST',

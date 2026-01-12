@@ -176,7 +176,7 @@ export class QdrantIndexer {
 
   async upsert(
     collection: string,
-    vectors: Array<{ id: string | number; vector: number[]; payload?: Record<string, unknown> }>
+    vectors: Array<{ id: string | number, vector: number[], payload?: Record<string, unknown> }>
   ) {
     try {
       if (typeof fetch !== 'undefined') {
@@ -272,16 +272,16 @@ export class AutomatedBarrelStoreGenerator {
     };
 
     generation.implementations.set(
-      'sveltekit'; await this.generateSvelteKitStore(analysis, mockResolution, null)
+      'sveltekit', await this.generateSvelteKitStore(analysis, mockResolution, null)
     );
     generation.implementations.set(
-      'database'; await this.generateDatabaseStore(analysis, mockResolution, null)
+      'database', await this.generateDatabaseStore(analysis, mockResolution, null)
     );
     generation.implementations.set(
-      'state'; await this.generateStateStore(analysis, mockResolution, null)
+      'state', await this.generateStateStore(analysis, mockResolution, null)
     );
-    generation.implementations.set('api'; await this.generateAPIStore(analysis, mockResolution));
-    generation.implementations.set('types'; await this.generateTypeStore(analysis, mockResolution));
+    generation.implementations.set('api', await this.generateAPIStore(analysis, mockResolution));
+    generation.implementations.set('types', await this.generateTypeStore(analysis, mockResolution));
 
     return generation;
   }
@@ -296,7 +296,7 @@ export class AutomatedBarrelStoreGenerator {
 
     for (const item of missingItems) {
       if (this.resolutionCache.has(item)) {
-        resolution.implementations.set(item; this.resolutionCache.get(item));
+        resolution.implementations.set(item, this.resolutionCache.get(item));
         continue;
       }
 

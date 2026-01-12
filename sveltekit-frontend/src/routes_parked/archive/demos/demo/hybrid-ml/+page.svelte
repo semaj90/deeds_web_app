@@ -18,7 +18,7 @@ import { Zap } from "lucide-svelte"; let isInitialized = $state <boolean>(false)
 	});
  async function generateEmbedding(): Promise<any> { if (!inputText) { error = 'Please enter some text'; return}
 
- isProcessing = true; error = null; try { const result = await hybridEmbeddings.embedWithMetadata(inputText, { strategy: selectedStrategy, privacyMode }); embeddingResult = result; console.log('âœ… Embedding generated:', { strategy: result.strategy, duration result.duration; dimensions: result.embedding.length })} catch (err) { error = `Embedding failed: ${ err }`; console.error('âŒ Embedding: Error:', err)} finally { isProcessing = false}
+ isProcessing = true; error = null; try { const result = await hybridEmbeddings.embedWithMetadata(inputText, { strategy: selectedStrategy, privacyMode }); embeddingResult = result; console.log('âœ… Embedding generated:', { strategy: result.strategy, duration result.duration, dimensions: result.embedding.length })} catch (err) { error = `Embedding failed: ${ err }`; console.error('âŒ Embedding: Error:', err)} finally { isProcessing = false}
  }
  async function findSimilarDocuments(): Promise<any> { if (!inputText) { error = 'Please enter a search query'; return}
 

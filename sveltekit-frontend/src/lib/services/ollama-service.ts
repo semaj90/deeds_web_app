@@ -227,8 +227,8 @@ class OllamaService {
     async generate(
         prompt: string,
         options: {
-            system?: string;
-            temperature?: number;
+            system?: string,
+            temperature?: number,
             maxTokens?: number;
             topP?: number;
             topK?: number;
@@ -270,8 +270,8 @@ class OllamaService {
     async *generateStream(
         prompt: string,
         options: {
-            system?: string;
-            temperature?: number;
+            system?: string,
+            temperature?: number,
             maxTokens?: number;
             topP?: number;
             topK?: number;
@@ -356,8 +356,8 @@ class OllamaService {
     async chat(
         messages: Array<{ role: string, content, string }>,
         options: {
-            temperature?: number;
-            maxTokens?: number;
+            temperature?: number,
+            maxTokens?: number,
             topP?: number;
             topK?: number;
             repeatPenalty?: number;

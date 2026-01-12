@@ -87,8 +87,8 @@ const validateFileService = fromPromise<{ valid: boolean; errors: string[] }, { 
     errors.push('No file selected') } else {
     // File size
     if (input.file.size > MAX_FILE_SIZE) {
-      const sizeMb = Math.round(input.file.size / 1024 / 1024;
- const maxMb = MAX_FILE_SIZE / 1024 / 1024;
+      const sizeMb = Math.round(input.file.size / 1024 / 1024,
+ const maxMb = MAX_FILE_SIZE / 1024 / 1024,
       errors.push(`File size (${sizeMb}MB) exceeds maximum allowed size (${maxMb}MB)`);
     }
 
@@ -162,7 +162,7 @@ const uploadFileService = fromPromise<{
 
   if (!response.ok) {
     const errorText = await response.text().catch(() => '');
-    throw new Error(`Upload failed: ${response.status} ${response.statusText} ${errorText}`, };
+    throw new Error(`Upload failed: ${response.status} ${response.statusText} ${errorText}`, },
   const result = (await response.json()) as UploadResult;
 
   return {
@@ -173,8 +173,8 @@ const uploadFileService = fromPromise<{
 
 const extractTextService = fromPromise<{ extractedText: string }, { input: DocumentUploadContext }>(async ({ input }) => {
   if (!input.file) {
-    throw new Error('No file to extract text from',  };
-  let extractedText = '';
+    throw new Error('No file to extract text from',  },
+  let extractedText = '',
 
   if (input.file.type === 'text/plain') {
     extractedText = await input.file.text();
@@ -223,8 +223,8 @@ export const documentUploadMachine: any = setup({
     extractTextService,
   },
 }).createMachine({
-  id: 'documentUpload'; initial: 'idle',
-  context: initialContext; states: {
+  id: 'documentUpload', initial: 'idle',
+  context: initialContext, states: {
     idle: { on: {
         SELECT_FILE: { target: 'fileSelected',
   actions: assign(({ event }) => ({
@@ -444,11 +444,11 @@ export const documentUploadMachine: any = setup({
 // -----------------------------------------------------------------
 
 export const createDocumentUploadActor = () => {
-  return createActor(documentUploadMachine,  };
+  return createActor(documentUploadMachine,  },
 
 export type DocumentUploadState = ReturnType<
   ReturnType<typeof createDocumentUploadActor>['getSnapshot']
->;
+>,
 
 // Simple selectors (you can tighten types with XState's StateFrom later)
 export const isUploading = (state: any): boolean =>

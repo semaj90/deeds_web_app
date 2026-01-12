@@ -37,7 +37,7 @@ export class RouteOperationLogger {
  logPhase72Error(
  route: string, category: string, string:
  priority: 'high' | 'medium' | 'low',
- error: { code: string; message: string; count: number;
+ error: { code: string, message: string, count: number;
  },
  suggestion?: string
  ) {
@@ -60,7 +60,7 @@ export class RouteOperationLogger {
  logPhase82Upgrade(
  route: string, category: string, string:
  priority: 'high' | 'medium' | 'low',
- result: { filesUpgraded: number; patternsFixed: string[];
+ result: { filesUpgraded: number, patternsFixed: string[],
  errors?: string[];
  },
  duration?: number
@@ -84,7 +84,7 @@ export class RouteOperationLogger {
  logConsolidation(
  fromRoute: string, toRoute: string, string: category,
  priority: 'high' | 'medium' | 'low',
- result: { redirectCreated: boolean; filesUpdated: number;
+ result: { redirectCreated: boolean, filesUpdated: number,
  errors?: string[];
  }
  ) {
@@ -107,7 +107,7 @@ export class RouteOperationLogger {
  logArchive(
  route: string, category: string, string:
  priority: 'high' | 'medium' | 'low',
- result: { archived: boolean; archivePath: string;
+ result: { archived: boolean, archivePath: string,
  errors?: string[];
  }
  ) {

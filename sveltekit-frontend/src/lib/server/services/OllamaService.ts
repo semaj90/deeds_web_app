@@ -67,7 +67,7 @@ export class OllamaService {
 
  async generate(
  model: string, prompt: string,
- options: { temperature?: number; max_tokens?: number; stream?: boolean } = {}
+ options: { temperature?: number, max_tokens?: number, stream?: boolean } = {}
  ): Promise<string> {
  try {
  const body = {
@@ -99,7 +99,7 @@ const res = await fetch(`${this.baseUrl}/api/generate`, {
  // Backwards-compatible alias
  async generateCompletion(
  model: string, prompt: string,
- options?: { temperature?: number; max_tokens?: number }
+ options?: { temperature?: number, max_tokens?: number }
  ) {
  return this.generate(model, prompt, options);
  }

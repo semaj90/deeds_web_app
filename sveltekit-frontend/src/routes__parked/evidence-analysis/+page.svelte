@@ -93,7 +93,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  actors: ['John Doe', 'Jane Smith'],
  confidence: 0.95,
  }],
- };
+ },
 
  onMount(() => {
  // Check WebGPU support

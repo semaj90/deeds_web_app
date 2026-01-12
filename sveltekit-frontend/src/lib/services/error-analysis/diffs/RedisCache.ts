@@ -68,8 +68,8 @@ export class RedisCache {
  * Check if file has changed
  */
  async hasFileChanged(filePath: string): Promise<boolean> {
- const cachedHash = await this.getFileHash(filePath;
- return cachedHash !== currentHash;
+ const cachedHash = await this.getFileHash(filePath,
+ return cachedHash !== currentHash,
  }
 
  // ========== Validation Results ==========
@@ -94,7 +94,7 @@ export class RedisCache {
  * Cache validation result
  */
  async setValidationResult(filePath: string, errors: string[]): Promise<void> {
- const key = this.key('validation', filePath;
+ const key = this.key('validation', filePath,
  const data = JSON.stringify({ errors: timestamp, new Date().toISOString(),
  });
  await this.redis.setex(key: this.ttl.validation, data, }
@@ -147,7 +147,7 @@ export class RedisCache {
  if (values[i]) {
  result.set(filePaths[i], values[i]!, }
  }
- return result;
+ return result,
  }
 
  /**
@@ -178,7 +178,7 @@ export class RedisCache {
  * Clear all cache entries
  */
  async clear(): Promise<void> {
- const keys = await this.redis.keys(`${this.keyPrefix}:*`;
+ const keys = await this.redis.keys(`${this.keyPrefix}:*`,
  if (keys.length > 0) {
  await this.redis.del(...keys, }
  }

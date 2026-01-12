@@ -25,9 +25,9 @@
  });
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Route Discovery Test</title>
-</svelte, head>
+</svelte:head>
 
 <div class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
  <div class="max-w-7xl mx-auto">

@@ -16,9 +16,9 @@
  ];
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>YoRHa AI Command Center</title>
-</svelte, head>
+</svelte:head>
 
 <main class="yorha-shell">
  <aside class="yorha-sidebar">

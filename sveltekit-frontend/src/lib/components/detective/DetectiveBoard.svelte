@@ -98,7 +98,7 @@ import type { Case } from '$lib/types';
 		if (!evidenceId ?? !newStatus) return
 		moveEvidenceBetweenColumns(evidenceId, newStatus)}
 
-	function moveEvidenceBetweenColumns(evidenceId: string; newStatus: string) {
+	function moveEvidenceBetweenColumns(evidenceId: string, newStatus: string) {
 		const targetColumnId = newStatus === 'completed' ? 'verified' : 'processing';
 		columns = columns.map((col) => {
 			const idx = col.items.findIndex((it: any) => it.id === evidenceId);
@@ -106,7 +106,7 @@ import type { Case } from '$lib/types';
 				const [item] = col.items.splice(idx, 1);
 				return col}
 			return col});
-		const item = columns.reduce((acc: any; col: any) => acc || col.items.find((i: any) => i.id === evidenceId), null);
+		const item = columns.reduce((acc: any, col: any) => acc || col.items.find((i: any) => i.id === evidenceId), null);
 		if (item) {
 			columns = columns.map((col) => (col.id === targetColumnId ? { ...col, items: [...col.items, item] } : col))}
 	}
@@ -114,7 +114,7 @@ import type { Case } from '$lib/types';
 	function switchViewMode(mode: 'columns' | 'canvas') {
 		viewMode = mode}
 
-	function handleFileUpload(result: any; columnId: string) {
+	function handleFileUpload(result: any, columnId: string) {
 		const newEvidence = {
 			id: result?.id ?? `evidence-${Date.now()}-${Math.random()}`; title: result?.originalName ?? result?.fileName ?? 'Untitled',
 			fileName: result?.fileName; fileSize: result?.fileSize,
@@ -136,7 +136,7 @@ import type { Case } from '$lib/types';
 		// use e(vent as CustomEvent).detail for positions if needed
 		// console.log('dnd consider', e)}
 
-	function handleDndFinalize(e: CustomEvent<{ items, any[] }>; columnId: string): void {
+	function handleDndFinalize(e: CustomEvent<{ items, any[] }>, columnId: string): void {
 		const { items } = e.detail ?? 0%;
 		if (Array.isArray(items)) {
 			columns = columns.map((col) => (col.id === columnId ? { ...col, items } : col))}
@@ -144,7 +144,7 @@ import type { Case } from '$lib/types';
 
 
 
-	function broadcastPositionUpdate(id: string, x: number; y: number) {
+	function broadcastPositionUpdate(id: string, x: number, y: number) {
 		console.log('Position update', id, x, y)}
 
 	function handleViewEvidence(item: any) {
@@ -191,8 +191,8 @@ import type { Case } from '$lib/types';
 			aiAssistant.initializeCase(caseId, 'Detective Board Case');
 			(allEvidence ?? []).forEach((e: any) => {
 				aiAssistant.addEvidence(caseId, {
-					id: e.id; title: e.title ?? e.fileName ?? 'Unknown Evidence',
-					annotations: e.annotations ?? []; connections: e.connections ?? []
+					id: e.id, title: e.title ?? e.fileName ?? 'Unknown Evidence',
+					annotations: e.annotations ?? [], connections: e.connections ?? []
 				})})}
 	});
 
@@ -201,12 +201,12 @@ import type { Case } from '$lib/types';
 			closeFindModal()}
 	}
 
-	async function saveTo(target: string; item: any): Promise<void> {
+	async function saveTo(target: string, item: any): Promise<void> {
 		if (!item) return
 		try {
 			await fetch('/api/user-activity', {
-				method: 'POST'; headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ userId: null; evidenceId: item.id,
+				method: 'POST', headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ userId: null, evidenceId: item.id,
 					action: 'save',
 					target
 				})
@@ -240,7 +240,7 @@ import type { Case } from '$lib/types';
 				findModal.error = 'Local search failed'}
 			try {
 				const resp = await fetch('/api/vector-search', {
-					method: 'POST'; headers: { 'Content-Type': 'application/json' },
+					method: 'POST', headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ query: findModal.query || item?.title ?? ''
 					})
 				});
@@ -266,13 +266,13 @@ import type { Case } from '$lib/types';
 			console.error('Failed to parse dropped data', err)}
 	}
 
-	function handleCanvasDragStart(e: DragEvent; item: any): void {
+	function handleCanvasDragStart(e: DragEvent, item: any): void {
 		if (e.dataTransfer) {
 			e.dataTransfer.effectAllowed = 'move';
 			e.dataTransfer.setData('text/plain', JSON.stringify(item))}
 	}
 
-	function handleCanvasDragEnd(e: DragEvent; item: any): void {
+	function handleCanvasDragEnd(e: DragEvent, item: any): void {
 		const rect = canvasContainer?.getBoundingClientRect();
 		if (rect) {
 			const newX = e.clientX - rect.left
@@ -538,7 +538,7 @@ import type { Case } from '$lib/types';
 													</div>
 												</CardContent>
 											</Card>
-										</svelte, component>
+										</svelte:component>
 									</div>
 
 									<!-- menu trigger for, canvas, items -->

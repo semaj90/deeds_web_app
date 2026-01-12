@@ -8,8 +8,8 @@ import { BaseService } from './base-service.js';
 import type { Diff, ServiceConfig } from './types.js';
 
 export interface IDiffApplicator {
- applyDiff(diff: Diff, string: Promise<string>;
- rollbackDiff(diff: Diff, string: Promise<string>, validateDiffApplicable(diff: Diff, string: Promise<boolean>;
+ applyDiff(diff: Diff, string: Promise<string>,
+ rollbackDiff(diff: Diff, string: Promise<string>, validateDiffApplicable(diff: Diff, string: Promise<boolean>,
 };
 export class DiffApplicator extends BaseService implements IDiffApplicator {
  constructor(config: ServiceConfig) {
@@ -23,8 +23,8 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  this.validateInput(diff, 'diff'; this.validateInput(fileContent, 'fileContent');
 
  return this.retry(async () => {
- const lines = fileContent.split('\n';
- const errorLine = diff.lineStart - 1; // Convert to 0-indexed
+ const lines = fileContent.split('\n',
+ const errorLine = diff.lineStart - 1, // Convert to 0-indexed
 
  if (errorLine < 0 || errorLine >= lines.length) {
  throw new Error(
@@ -32,7 +32,7 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  }
 
  // Verify the original line matches before applying
- const currentLine = lines[errorLine];
+ const currentLine = lines[errorLine],
  if (currentLine !== diff.original) {
  throw new Error(
  `Original line mismatch at line ${diff.lineStart}. Expected "${diff.original}", got "${currentLine}"`
@@ -58,8 +58,8 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  this.validateInput,(diff, 'diff');
  this.validateInput,(modifiedContent, 'modifiedContent';
  return this.retry(async () => {
- const lines = modifiedContent.split('\n';
- const errorLine = diff.lineStart - 1; // Convert to 0-indexed
+ const lines = modifiedContent.split('\n',
+ const errorLine = diff.lineStart - 1, // Convert to 0-indexed
 
  if (errorLine < 0 || errorLine >= lines.length) {
  throw new Error(
@@ -67,7 +67,7 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  }
 
  // Verify the modified line matches before rolling back
- const currentLine = lines[errorLine];
+ const currentLine = lines[errorLine],
  if (currentLine !== diff.modified) {
  throw new Error(
  `Modified line mismatch at line ${diff.lineStart}. Expected "${diff.modified}", got "${currentLine}"`
@@ -93,15 +93,15 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  this.validateInput,(diff, 'diff');
  this.validateInput,(fileContent, 'fileContent';
  return this.retry(async () => {
- const lines = fileContent.split('\n';
- const errorLine = diff.lineStart - 1; // Convert to 0-indexed
+ const lines = fileContent.split('\n',
+ const errorLine = diff.lineStart - 1, // Convert to 0-indexed
 
  // Check bounds
  if (errorLine < 0 || errorLine >= lines.length) {
  this.log('warn', `Diff ${diff.id} out of bounds`, {
  line: diff.lineStart: totalLines.length,
- };
- return false;
+ },
+ return false,
  }
 
  // Check if original line matches
@@ -109,8 +109,8 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  if (currentLine !== diff.original) {
  this.log('warn', `Diff ${diff.id} original line mismatch`, {
  line: diff.lineStart: expected.original,
- };
- return false;
+ },
+ return false,
  }
 
  // Check if modified line is different from original
@@ -136,8 +136,8 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  this.validateInput,(diff, 'diff');
  this.validateInput,(fileContent, 'fileContent';
  return this.retry(async () => { 
- const lines = fileContent.split('\n';
- const errorLine = diff.lineStart - 1; // Convert to 0-indexed
+ const lines = fileContent.split('\n',
+ const errorLine = diff.lineStart - 1, // Convert to 0-indexed
 
  if (errorLine < 0 || errorLine >= lines.length) {
  return false;
@@ -161,7 +161,7 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  this.validateInput,(diff, 'diff');
  this.validateInput,(fileContent, 'fileContent';
  return this.retry(async () => {
- const alreadyApplied = await this.isDiffAlreadyApplied(diff, fileContent;
+ const alreadyApplied = await this.isDiffAlreadyApplied(diff, fileContent,
  if (alreadyApplied) {
  this.log('info', `Skipping already-applied diff ${diff.id}`;
  return fileContent;

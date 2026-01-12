@@ -171,8 +171,8 @@ export async function pullOllamaModel(modelName: string): Promise<boolean> {
 export async function generateWithOllama(
   prompt: string,
   options?: {
-    model?: string;
-    temperature?: number;
+    model?: string,
+    temperature?: number,
     topK?: number;
     topP?: number;
   }
@@ -212,8 +212,8 @@ export async function generateWithOllama(
 export async function* streamGenerateWithOllama(
   prompt: string,
   options?: {
-    model?: string;
-    temperature?: number;
+    model?: string,
+    temperature?: number,
     topK?: number;
     topP?: number;
   }

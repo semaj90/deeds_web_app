@@ -79,8 +79,8 @@ export class ClientEmbeddingService {
  async generateEmbeddings(
  texts: string[],
  options: {
- normalize?: boolean;
- maxLength?: number;
+ normalize?: boolean,
+ maxLength?: number,
  batchSize?: number;
  } = {}
  ): Promise<{ embeddings: number[][]; model: string; dimension: number; count, number;

@@ -4,9 +4,9 @@
   }
   function getProgressBarColor(value: number): string { if (value > 85) return 'bg-red-500'; if (value > 70) return 'bg-yellow-500'; return 'bg-green-500'}
   function formatUptime(seconds: number): string { const hours = Math.floor(seconds / 3600); const minutes = Math.floor((seconds % 3600) / 60); const secs = seconds % 60; return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`}
-  function formatTime(date: Date): string { return date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit'; second: '2-digit'
+  function formatTime(date: Date): string { return date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'
     })}
-  function formatDate(date: Date): string { return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short'; day: '2-digit'
+  function formatDate(date: Date): string { return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit'
     })}
 </script> <!-- System, Status, Bar --> <div class="yorha-status-bar flex items-center justify-between text-xs text-yorha-light bg-yorha-darker p-4"> <!-- Left, Section - System, Metrics --> <div class="status-left flex items-center"> <!-- System, Status, Indicator --> <div class="flex items-center"> <div class="status-dot w-2 h-2" rounded-full, animate-pulse {systemStatus === 'normal'
           ? 'bg-green-400', systemStatus === 'warning'

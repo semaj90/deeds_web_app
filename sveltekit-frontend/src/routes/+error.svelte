@@ -86,11 +86,12 @@
 
   .error-icon {
     font-size: 4rem;
-    margin-bottom: 1rem; animation: pulse 2s ease-in-out infinite;
+    margin-bottom: 1rem;
+    animation: pulse 2s ease-in-out infinite;
   }
 
   @keyframes pulse {
-    0%; } 100% { transform: scale(1); }
+    0%, 100% { transform: scale(1); }
     50% { transform: scale(1.1); }
   }
 

@@ -10,9 +10,9 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
         averageLatency = (averageLatency * (totalRequests - 1) + typedResult.latency) / totalRequests}
       const totalTime = performance.now() - startTime; console.log(`âœ… Prefetch completed in ${totalTime.toFixed(1)}ms (${batchResults.length} patterns)`)} catch (error) { console.error('Prefetch failed:', error)}
   } /** * Start performance monitoring */ function startPerformanceMonitoring(): void { setInterval(() => { performanceStats = chrROMCacheReader.getPerformanceStats()}, 5000)}
-  function getPattern(docId: string; patternType: string): CHRROMPattern | null { return documentPatterns.get(docId)?.get(patternType) ?? null}
-  /** * Get pattern data (the actual HTML/SVG content) */ function getPatternData(docId: string; patternType: string): string { const pattern = getPattern(docId, patternType); return pattern?.data ?? ''}
-  /** * Get CSS class for optimal rendering */ function getPatternRenderingClass(docId: string; patternType: string): string { const pattern = getPattern(docId, patternType); if (!pattern) return 'chr-rom-pattern chr-rom-auto'; return 'chr-rom-pattern, ' + chrROMPatternOptimizer.getOptimizedClass(pattern)}
+  function getPattern(docId: string, patternType: string): CHRROMPattern | null { return documentPatterns.get(docId)?.get(patternType) ?? null}
+  /** * Get pattern data (the actual HTML/SVG content) */ function getPatternData(docId: string, patternType: string): string { const pattern = getPattern(docId, patternType); return pattern?.data ?? ''}
+  /** * Get CSS class for optimal rendering */ function getPatternRenderingClass(docId: string, patternType: string): string { const pattern = getPattern(docId, patternType); if (!pattern) return 'chr-rom-pattern chr-rom-auto'; return 'chr-rom-pattern, ' + chrROMPatternOptimizer.getOptimizedClass(pattern)}
   async function handleDocumentHover(docId: string): Promise<void> { hoveredDocument = docId; // Check if we need additional patterns for hover state const hoverPatterns = ['entity_heatmap', 'similarity_graph']; for (const patternType of hoverPatterns) { const result = await chrROMCacheReader.get(docId, patternType); if (!documentPatterns.has(docId)) { documentPatterns.set(docId, new Map())}
       const typedResult = result as { pattern: CHRROMPattern | null; latency: number }; documentPatterns.get(docId)!.set(patternType, typedResult.pattern); // Log sub-millisecond performance if (typedResult.latency < 1) { // Intentionally empty for now }
     } }

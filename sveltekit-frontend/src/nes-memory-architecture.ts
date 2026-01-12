@@ -231,7 +231,7 @@ export class NESMemoryArchitecture {
 	async allocateDocument(
 		document: Omit<LegalDocument, 'lastAccessed'>,
 		data: ArrayBuffer,
-		options: { preferredBank?: string; compress?: boolean } = {}
+		options: { preferredBank?: string, compress?: boolean } = {}
 	): Promise<boolean> {
 		const { preferredBank = this.selectOptimalBank(document, data.byteLength), compress = true } =
 			options;
@@ -719,7 +719,7 @@ class PlannerMemoryManager {
 	}
 
 	selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
-		const parentVisits = Math.max(1; this.visits[parentHandle]);
+		const parentVisits = Math.max(1, this.visits[parentHandle]);
 		let bestHandle: number | null = null;
 		let bestScore = -Infinity;
 
@@ -776,8 +776,8 @@ export const plannerMemory = new PlannerMemoryManager(4096);
 
 // Convenience bridge API for Neo4jAlphaGoPlanner
 export const nesPlannerBridge = {
-	allocateNode(params: { graphNodeId: string;
-		parentHandle: number; prior: number;
+	allocateNode(params: { graphNodeId: string,
+		parentHandle: number, prior: number;
 		depth: number;
 	}) {
 		return plannerMemory.allocate(

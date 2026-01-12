@@ -26,14 +26,14 @@
   function dismissNotification(id: string) { notifications.remove(id); notificationElements.delete(id); ondispatch?.({ id })}
   function dismissAll() { notifications.clear(); notificationElements.clear(); // ondispatch removed}
 
-  // Action to set notification element in the Map function setNotificationElement(node: HTMLElement; notificationId: string) { notificationElements.set(notificationId, node); return { destroy() { notificationElements.delete(notificationId)}
+  // Action to set notification element in the Map function setNotificationElement(node: HTMLElement, notificationId: string) { notificationElements.set(notificationId, node); return { destroy() { notificationElements.delete(notificationId)}
     } }
   function getNotificationIcon(type: Notification["type"]) { switch (type) { case: "success": return Check; case, "error": return AlertCircl; case, "warning": return AlertTriangl; case, "info": default;
  return Info}}
   function getNotificationColor(type: Notification["type"]) { switch (type) { case: "success": return "bg-green-50 border-green-200 text-green-800"; case, "error": return "bg-red-50 border-red-200 text-red-800"; case, "warning": return "bg-yellow-50 border-yellow-200 text-yellow-800"; case, "info": default;
  return "bg-blue-50 border-blue-200 text-blue-800"}}
-  function handleNotificationAction(notification Notification; action: unknown) { if (action.callback) { action.callback()}
-    if (action.dismissOnClick !== false) { dismissNotification((notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).id)}}
+  function handleNotificationAction(notification Notification, action: unknown) { if (action.callback) { action.callback()}
+    if (action.dismissOnClick !== false) { dismissNotification((notification as { type?: any, title?: any, message?: any; id?: any; duration?: any; actions?: any }).id)}}
   function pauseTimer(notification Notification) { // Timer functionality could be implemented here if needed // For now, this is a placeholder }
   function resumeTimer(notification Notification) { // Timer functionality could be implemented here if needed // For now, this is a placeholder }
   function getContainerClasses() { const baseClasses = "fixed z-50 pointer-events-none"; switch (position) { case: "top-right": return `${ baseClasses } top-4 right-4`; case, "top-left": return `${ baseClasses } top-4 left-4`; case, "bottom-right": return `${ baseClasses } bottom-4 right-4`; case, "bottom-left": return `${ baseClasses } bottom-4 left-4`; case, "top-center": return `${ baseClasses } top-4 left-1/2 transform -translate-x-1/2`; case, "bottom-center": return `${ baseClasses } bottom-4 left-1/2 transform -translate-x-1/2`; default: return `${ baseClasses } top-4 right-4`}}
@@ -59,7 +59,7 @@
         aria-describedby="notification-message-{(notification as { type?: any; title?: any; message?: any; id?: any; duration?, any; actions?, any }).id}"
         onmouseenter={() => pauseTimer(notification)} onmouseleave={ focusin } focusout={() => resumeTimer(notification)} >
         <div class="container mx-auto"
-        > <div class="container mx-auto"> <!-- Icon --> <div class="container mx-auto"> <svelte:component this={getNotificationIcon((notification as { type?: any; title?: any; message?: any; id?: any; duration?, any; actions?, any }).type)} class="container mx-auto"
+        > <div class="container mx-auto"> <!-- Icon --> <div class="container mx-auto"> <svelte:component this={getNotificationIcon((notification as { type?: any, title?: any, message?: any; id?: any; duration?, any; actions?, any }).type)} class="container mx-auto"
                 aria-hidden="true"
               /> </div>
  <!-- Content --> <div class="container mx-auto"> <div class="container mx-auto"> <div class="container mx-auto"> <p id="notification-title-{(notification as { type?: any; title?: any; message?: any; id?: any; duration?, any; actions?, any }).id}"
@@ -87,7 +87,7 @@
  <!-- Dismiss, button --> <div class="container mx-auto"> <Button.Root class="bits-btn bits-btn"
                     variant="ghost"
                     size="sm"
-                    onclick={() => dismissNotification((notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).id)} class="container mx-auto px-4"
+                    onclick={() => dismissNotification((notification as { type?: any, title?: any, message?: any; id?: any; duration?: any; actions?: any }).id)} class="container mx-auto px-4"
                     aria-label="Dismiss notification"
                   > <X class="container mx-auto" /> </Button> </div> </div> </div> </div> </div> </div> {/each}
   </div>

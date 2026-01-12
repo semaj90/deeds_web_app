@@ -242,8 +242,8 @@ export class LegalAIPipeline {
  async ragQuery(
  query: string,
  options?: {
- topK?: number;
- filter?: Record<string, unknown>;
+ topK?: number,
+ filter?: Record<string, unknown>,
  systemPrompt?: string;
  temperature?: number;
  maxTokens?: number;
@@ -326,8 +326,8 @@ export class LegalAIPipeline {
  async *streamRAG(
  query: string,
  options?: {
- topK?: number;
- filter?: Record<string, unknown>;
+ topK?: number,
+ filter?: Record<string, unknown>,
  systemPrompt?: string;
  temperature?: number;
  maxTokens?: number;
@@ -376,8 +376,8 @@ export class LegalAIPipeline {
  * Batch ingest documents (with parallelization)
  */
  async batchIngest(
- documents: Array<{ content: string;
- metadata: DocumentMetadata;
+ documents: Array<{ content: string,
+ metadata: DocumentMetadata,
  file?, Buffer;
  }>,
  batchSize: number = 10

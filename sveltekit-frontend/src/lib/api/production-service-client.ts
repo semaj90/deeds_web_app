@@ -209,7 +209,7 @@ class ProductionServiceClient {
  return {
  averageLatency: avg, minLatency: Math.min(...latencies, maxLatency: Math.max(...latencies, successRate: successCount / iterations,
  results,
- };
+ },
  }
 }
 

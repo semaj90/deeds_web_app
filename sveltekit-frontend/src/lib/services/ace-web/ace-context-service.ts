@@ -96,8 +96,8 @@ export class AceContextService {
    * Build context bundle with RAG + KAG
    * Implements hybrid scoring: 0.65*cosine + 0.10*freshness + 0.05*graph
    */
-  async buildContextBundle(params: { query: string;
-    filters?: ContextFilters;
+  async buildContextBundle(params: { query: string,
+    filters?: ContextFilters,
     limit?: number;
   }): Promise<ContextBundle> {
     const { query, filters = {}, limit = 10 } = params;

@@ -5,7 +5,7 @@
    let isSaving = $state<boolean>(false);
    let collections = $state<CitationCollection[]>([]);
    let showCollectionSelector = $state<boolean>(false); // Check if citation is already saved $effect(() => { if (isAuthenticated) { const savedCitations = citationsManager.getSavedCitations(); isSaved = savedCitations.some(c => c.id === citation.id); collections = citationsManager.getCollections()}
-  }); // Listen for authentication changes citationsManager.onAuthChange(user => { isAuthenticated = user?.isAuthenticated ?? false; if (isAuthenticated) { const savedCitations = citationsManager.getSavedCitations(); isSaved = savedCitations.some(c => c.id === citation.id); collections = citationsManager.getCollections()} else { isSaved = false; collections = []}
+  }); // Listen for authentication changes citationsManager.onAuthChange(user => { isAuthenticated = user?.isAuthenticated ?? false, if (isAuthenticated) { const savedCitations = citationsManager.getSavedCitations(); isSaved = savedCitations.some(c => c.id === citation.id); collections = citationsManager.getCollections()} else { isSaved = false; collections = []}
   });
   async function handleSave(): Promise<void> { if (!isAuthenticated) { ondispatch?.({ citation, error: 'Please sign in to save citations'
       }); return}

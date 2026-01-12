@@ -34,8 +34,8 @@ async function generateEmbedding(text: string, model: string = 'embeddinggemma:l
 async function searchQdrant(
   collection: string,
   embedding: number[],
-  options: { limit: number;
-    threshold: number;
+  options: { limit: number,
+    threshold: number,
     filters?: Record<string, unknown>;
   }
 ): Promise<Array<{ id: string; score: number; payload: Record<string, unknown> }>> {

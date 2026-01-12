@@ -80,7 +80,7 @@ describe('Performance Tests', () => {
  holding: 'Holding',
  version: 1, createdAt: new Date( createdBy: 'user-123',
  isCurrent: true,
- };
+ },
 
  (cacheService.getOrSet as any).mockResolvedValue(cachedSummary);
 

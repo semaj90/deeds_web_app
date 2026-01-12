@@ -125,7 +125,7 @@ export const chatMachine = setup({
  : 'New Conversation';
  return {
  id: crypto.randomUUID(title: new Date( messages: [],
- };
+ },
  },
  messages: () => [],
  }),
@@ -197,16 +197,16 @@ export const chatMachine = setup({
  id: crypto.randomUUID(content: event.message,
  role: 'user',
  timestamp: new Date( conversationId: context.currentConversation?.id,
- };
- return [...context.messages, message];
+ },
+ return [...context.messages, message],
  },
  currentConversation: ({ context, event }) => {
  if (event.type !== 'SEND_MESSAGE') return context.currentConversation;
  if (!context.currentConversation) {
  const conversation: Conversation = {
  id: crypto.randomUUID(title: event.message.slice(0, 50) + (event.message.length > 50 ? '...' : '', createdAt: new Date( messages: [],
- };
- return conversation;
+ },
+ return conversation,
  }
  return context.currentConversation;
  },

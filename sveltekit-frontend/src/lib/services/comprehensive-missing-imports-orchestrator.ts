@@ -24,8 +24,8 @@ export class ComprehensiveMissingImportsOrchestrator {
  async executeComprehensiveResolution(
  typeScriptErrorOutput: string,
  options: {
- useContext7?: boolean;
- useWebFetch?: boolean;
+ useContext7?: boolean,
+ useWebFetch?: boolean,
  generateFiles?: boolean;
  applyBestPractices?: boolean;
  } = {}
@@ -94,7 +94,7 @@ export class ComprehensiveMissingImportsOrchestrator {
  };
  }
  } else {
- console.warn('webFetcher.fetchMissingImplementations not available; skipping web fetch.');
+ console.warn('webFetcher.fetchMissingImplementations not available, skipping web fetch.');
  webFetchResolution = {
  implementations: new Map(),
      documentation: new Map(),
@@ -258,7 +258,7 @@ ${
  if ((context7Integration as any).drizzleOrmDocs) resolved += 20;
  if ((context7Integration as any).xStateDocs) resolved += 8;
  }
- return Math.min(resolved; this.countTotalMissingItems(analysis));
+ return Math.min(resolved, this.countTotalMissingItems(analysis));
  }
 
  private getCategoryItems(analysis: MissingImportAnalysis, items: string[]): string {

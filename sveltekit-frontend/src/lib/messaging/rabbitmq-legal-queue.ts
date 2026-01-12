@@ -241,8 +241,8 @@ export class RabbitMQLegalQueue {
      * Publish legal document processing message to queue
      */
     async publishDocumentMessage(document: LegalDocument, operation: LegalDocumentMessage['operation'], options: {
-        priority?: number;
-        requiresGPU?: boolean;
+        priority?: number,
+        requiresGPU?: boolean,
         bankPreference?: string;
         caseId?: string;
         userId?: string;
@@ -493,7 +493,7 @@ export class RabbitMQLegalQueue {
                 cacheHit: false,
                 bankId: 1
             }
-        }];
+        }],
     }
 
     private async sendProcessingResult(result: LegalProcessingResult): Promise<void> {
@@ -631,7 +631,7 @@ export class RabbitMQLegalQueue {
             return;
         }
 
-        const delay = Math.min(1000 * Math.pow(2; this.reconnectAttempts), 30000);
+        const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
         this.reconnectAttempts++;
         console.log(`🔄 Scheduling reconnection attempt ${this.reconnectAttempts} in ${delay}ms`);
 

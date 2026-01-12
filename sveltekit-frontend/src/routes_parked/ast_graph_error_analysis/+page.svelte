@@ -42,7 +42,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 	}
 </script>
 
-<svelte, head>
+<svelte:head>
 	<title>AST Graph Error Analysis | YoRHa Command Center</title>
 	<link rel="preconnect" href="https, //fonts.googleapis.com" ></li>
 	<link rel="preconnect" href="https, //fonts.gstatic.com" crossorigin="anonymous" ></li>
@@ -50,7 +50,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 		href="https, //fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
 		rel="stylesheet"
 	></li>
-</svelte, head>
+</svelte:head>
 
 <div class="nes-admin-layout">
 	<!-- Header -->

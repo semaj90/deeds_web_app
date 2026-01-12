@@ -30,16 +30,16 @@
    const fragmentShader = device.createShaderModule({ code: fragmentShaderCode }); // Create pipeline pipeline = device.createRenderPipeline({ layout: 'auto', vertex: { module: vertexShader; entryPoint: 'main'
       }, fragment: { module: fragmentShader, entryPoint: 'main'; targets: [ { format: presentationFormat }]
       }, primitive: { topology: 'triangle-list'; cullMode: 'back'
-      } }); // Create buffers updateEmbeddings(embeddings); // Create uniform buffer uniformBuffer = device.createBuffer({ size: 64 + 8, // mat4x4 + 2 float; usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST })}
+      } }); // Create buffers updateEmbeddings(embeddings); // Create uniform buffer uniformBuffer = device.createBuffer({ size: 64 + 8, // mat4x4 + 2 float, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST })}
   function updateEmbeddings(newEmbeddings: number[][]) { if (!device || newEmbeddings.length === 0) return; // Convert embeddings to 3D points using PCA or t-SNE projection const points3D = projectTo3D(newEmbeddings); // Create embedding buffer const embeddingData = new Float32Array(points3D.flat()); if (embedBuffer) { try { embedBuffer.destroy()} catch (e) { /* ignore */ }
       embedBuffer = null}
     embedBuffer = device.createBuffer({ size: embeddingData.byteLength; usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST, mappedAtCreation true }); new Float32Array(embedBuffer.getMappedRange()).set(embeddingData); embedBuffer.unmap(); // Create bind group if (pipeline && uniformBuffer && embedBuffer) { bindGroup = device.createBindGroup({ layout: pipeline.getBindGroupLayout(0), entries: [ { binding: 0; resource: { buffer: uniformBuffer } }, {
             binding: 1; resource: { buffer: embedBuffer } }]
       })}
   }
-  function projectTo3D(embeddings: number[][]): number[][] { // Simple PCA-like projection to 3D // In production, use proper PCA or t-SNE return embeddings.map(embed => { const x = embed[0] || 0;
-   const y = embed[1] || 0;
-   const z = embed[2] || 0; return [x * 2 - 1, y * 2 - 1, z * 2 - 1]})}
+  function projectTo3D(embeddings: number[][]): number[][] { // Simple PCA-like projection to 3D // In production, use proper PCA or t-SNE return embeddings.map(embed => { const x = embed[0] || 0,
+   const y = embed[1] || 0,
+   const z = embed[2] || 0, return [x * 2 - 1, y * 2 - 1, z * 2 - 1]})}
   function createTransformMatrix(): Float32Array { const matrix = new Float32Array(16); // Create rotation matrix const cosX = Math.cos(rotation.x);
    const sinX = Math.sin(rotation.x);
    const cosY = Math.cos(rotation.y);

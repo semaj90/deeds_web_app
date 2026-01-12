@@ -3,7 +3,7 @@ import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { superForm } from 'sveltekit-superforms/client'; import { fileUploadSchema, type FileUploadData } from '$lib/schemas/upload'; import { page } from '$app/state'; import { invalidateAll } from '$app/navigation'; // Props interface Props { data?: unknown; caseId?: string; onUploadComplete?: (result: UploadResult) => void; onUploadError?: (error: string) => void; multiple?: boolean; disabled?: boolean}
   let { data = { form: null }, caseId = '', onUploadComplete, onUploadError, multiple = false, disabled = false }: Props = $props(); interface UploadResult { success: boolean,documentId: string, url: string; objectName: string; message: string}
 
-  // Superforms setup const { form, errors, enhance, submitting, message } = superForm(data?.form, { dataType: 'form', multipleFiles: true; validators: { file: (value) => { if (!value || !(value instanceof File)) return 'File is required'; const maxSize = 100 * 1024 * 1024; // 100MB if (value.size > maxSize) return 'File must be less than 100MB'; const allowedTypes = [
+  // Superforms setup const { form, errors, enhance, submitting, message } = superForm(data?.form, { dataType: 'form', multipleFiles: true, validators: { file: (value) => { if (!value || !(value instanceof File)) return 'File is required'; const maxSize = 100 * 1024 * 1024; // 100MB if (value.size > maxSize) return 'File must be less than 100MB'; const allowedTypes = [
           'application/pdf',
           'application/msword',
           'application/vnd.openxmlformats-officedocument.wordprocessingml.document',

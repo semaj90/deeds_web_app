@@ -87,7 +87,7 @@ export class VectorSearchService {
         errorCount: 0,
         successCount: 0,
         successRate: 0
-    };
+    },
 
     qdrantStatus: VectorStoreStatus = {
         provider: 'qdrant',
@@ -96,7 +96,7 @@ export class VectorSearchService {
         errorCount: 0,
         successCount: 0,
         successRate: 0
-    };
+    },
 
     private healthCheckInterval?: NodeJS.Timeout;
 
@@ -178,8 +178,8 @@ export class VectorSearchService {
         embedding: number[],
         keyword: string,
         options?: {
-            limit?: number;
-            vectorWeight?: number;
+            limit?: number,
+            vectorWeight?: number,
             keywordWeight?: number;
             threshold?: number;
         }
@@ -339,8 +339,8 @@ export class VectorSearchService {
         }
     }
 
-    async indexDocument(doc: { id: string;
-        content: string; embedding: number[];
+    async indexDocument(doc: { id: string,
+        content: string, embedding: number[];
         metadata?: Record<string, unknown>;
         documentId?: string;
     }): Promise<void> {
@@ -367,8 +367,8 @@ export class VectorSearchService {
         }
     }
 
-    private async indexPgVector(doc: { id: string;
-        content: string; embedding: number[];
+    private async indexPgVector(doc: { id: string,
+        content: string, embedding: number[];
         metadata?: Record<string, unknown>;
         documentId?: string;
     }): Promise<void> {
@@ -383,8 +383,8 @@ export class VectorSearchService {
         `;
     }
 
-    private async indexQdrant(doc: { id: string;
-        content: string; embedding: number[];
+    private async indexQdrant(doc: { id: string,
+        content: string, embedding: number[];
         metadata?: Record<string, unknown>;
         documentId?: string;
     }): Promise<void> {
@@ -413,8 +413,8 @@ export class VectorSearchService {
     }
 
     async batchIndex(
-        documents: Array<{ id: string;
-            content: string; embedding: number[];
+        documents: Array<{ id: string,
+            content: string, embedding: number[];
             metadata?: Record<string, unknown>;
             documentId?: string;
         }>,

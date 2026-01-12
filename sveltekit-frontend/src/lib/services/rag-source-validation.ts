@@ -98,8 +98,8 @@ export async function fullRagPipeline(
     caseId: string,
     approvedChunkIds: string[],
     options: {
-        model?: string;
-        temperature?: number;
+        model?: string,
+        temperature?: number,
         maxTokens?: number;
     } = {}
 ): Promise<AnswerWithCitations> {

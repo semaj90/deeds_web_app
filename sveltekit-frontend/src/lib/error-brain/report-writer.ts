@@ -51,8 +51,8 @@ export async function readRunProgress(runId: string): Promise<RunProgress | null
  */
 export async function writeIncidentReport(
  incidentId: string,
- report: { title: string;
- timestamp: string; detectionQueries: string[];
+ report: { title: string,
+ timestamp: string, detectionQueries: string[];
  fixRules: Array<{ id: string; pattern: string; description, string }>;
  topOffenders: Array<{ file: string; count, number }>;
  filesChanged: Array<{ file: string; changes, number }>;

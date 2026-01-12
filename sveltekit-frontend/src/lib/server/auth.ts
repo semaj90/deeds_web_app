@@ -74,8 +74,8 @@ export class AuthService {
  // Use bcryptjs for password hashing (consistent with login form implementation)
  private readonly bcryptRounds = 12;
  /** * Register a new user with validation and error handling */
- async register(data: { email: string;
- password: string;
+ async register(data: { email: string,
+ password: string,
  firstName?: string | null;
  lastName?: string | null;
  displayName?: string | null;
@@ -240,7 +240,7 @@ export class AuthService {
  /** * Update user profile with CRUD persistence */
  async updateProfile(
  userId: string,
- data: Partial<{ firstName: string | null; lastName: string | null; avatarUrl, string | null }>
+ data: Partial<{ firstName: string | null, lastName: string | null, avatarUrl, string | null }>
  ) {
  try {
  const updateData: Partial<typeof schema.users.$inferInsert> = {

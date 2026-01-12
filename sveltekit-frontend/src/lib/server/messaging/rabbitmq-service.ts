@@ -244,8 +244,8 @@ export function createDocumentProcessingJob(
     s3Bucket: string, originalName: string,
     mimeType: string, fileSize: number,
     options: {
-        caseId?: string;
-        userId?: string;
+        caseId?: string,
+        userId?: string,
         processingType?: DocumentProcessingJob['processingType'];
         priority?: number;
     } = {}

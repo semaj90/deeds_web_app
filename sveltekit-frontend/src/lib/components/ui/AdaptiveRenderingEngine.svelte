@@ -57,7 +57,7 @@ interface Props { content: unknown, assetType?: string; priority?: number; predi
   }
   function adjustQualityBasedOnPerformance(): void { const performance = analyzePerformance(); if (performance.shouldDowngrade) { downgradeQuality()} else if (performance.shouldUpgrade) { upgradeQuality()}
 
-    // Record interaction for HMM-SOM prediction if (hmmPredictor) { hmmPredictor.recordInteraction('quality_adjustment', { tier: currentQuality.tier, fps: systemMetrics.fps, memoryUsage: systemMetrics.memoryUsage; assetType })}
+    // Record interaction for HMM-SOM prediction if (hmmPredictor) { hmmPredictor.recordInteraction('quality_adjustment', { tier: currentQuality.tier, fps: systemMetrics.fps, memoryUsage: systemMetrics.memoryUsage, assetType })}
   }
   function analyzePerformance(): { shouldUpgrade: boolean; shouldDowngrade: boolean; confidence: number} { const avgFps = fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length;
    const stableFps = fpsHistory.every(fps => fps > 55);
@@ -87,7 +87,7 @@ interface Props { content: unknown, assetType?: string; priority?: number; predi
 
     // Load texture in chunks based on quality const chunkSize = currentQuality.tier === '64-BIT_N64' ? 1024: currentQuality.tier === '16-BIT_SNES' ?, 512: 256; return loadTextureChunks(assetKey, chunkSize)}
   async function loadFullTexture(assetKey: string): Promise<string> { return new Promise(resolve => { setTimeout(() => { resolve(`texture_full_${ assetKey }`)}, 10)})}
-  async function loadTextureChunks(assetKey: string; chunkSize: number): Promise<string> { return new Promise(resolve => { setTimeout(() => { resolve(`texture_chunk_${ assetKey }_${ chunkSize }`)}, 50)})}
+  async function loadTextureChunks(assetKey: string, chunkSize: number): Promise<string> { return new Promise(resolve => { setTimeout(() => { resolve(`texture_chunk_${ assetKey }_${ chunkSize }`)}, 50)})}
 
   // Reactive updates // Performance metrics for external monitoring function getPerformanceMetrics() { return { systemMetrics, currentQuality, isMonitoring }}
 

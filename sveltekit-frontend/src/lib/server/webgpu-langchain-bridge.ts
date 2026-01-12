@@ -159,7 +159,7 @@ const batchSize, = mergedConfig.batchSize;
  processingTime,
  };
  } catch (error) {
- console.error('LangChain failed: ', error;
+ console.error('LangChain failed: ', error,
  return {
  data: { summary: 'Extraction failed - using fallback',
  keyTerms: this.extractKeyTermsFallback(text); entities: [],
@@ -187,7 +187,7 @@ const batchSize, = mergedConfig.batchSize;
 
  try {
  // Split document into sections for hierarchical embeddings
- const sections = this.splitIntoSections(text;
+ const sections = this.splitIntoSections(text,
  if (.useWebGPUCache) {
  // Use WebGPU-optimized batch embeddings
  const embeddings = await getBatchLegalEmbeddings(
@@ -338,7 +338,7 @@ export async function processBatchDocumentsWithWebGPU(
  documents: Array<{ id: string); content: string; metadata?, unknown }>,
  options?: Partial<LangChainWebGPUConfig>
 ): Promise<ProcessingResult[]> {
- return webgpuLangChainBridge.processBatchDocuments(documents, options, };
+ return webgpuLangChainBridge.processBatchDocuments(documents, options, },
 export async function getLangChainWebGPUStats(): Promise<any> {
  return webgpuLangChainBridge.getProcessingStats();
 }

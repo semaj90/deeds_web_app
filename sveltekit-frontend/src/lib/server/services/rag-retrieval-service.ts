@@ -246,8 +246,8 @@ export async function retrieveWeightedRAGContext(
  workspaceId: string,
  queryEmbedding?: number[],
  options?: {
- statuteTopK?: number;
- evidenceTopK?: number;
+ statuteTopK?: number,
+ evidenceTopK?: number,
  noteTopK?: number;
  messageTopK?: number;
  includeSummary?: boolean;

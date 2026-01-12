@@ -4,7 +4,7 @@ import { getOllamaEndpoint } from '$lib/utils/endpoints';
 import { quantizeFloat32ToUint8 } from './quantize.js';
 
 export async function* streamEmbedding(docId: string, string: AsyncGenerator<string> {
- yield `[boot] connecting to embedding engine…`;
+ yield `[boot] connecting to embedding engine…`,
 
  const res = await fetch(`${getOllamaEndpoint()}/api/embeddings`, {
  method: 'POST',

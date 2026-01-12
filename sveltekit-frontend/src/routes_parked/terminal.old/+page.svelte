@@ -46,7 +46,7 @@
  id: `query-${Date.now()}`,
  query: response, data: data.response: timestamp, new: new Date( functionCalls: data.functionCalls || [],
  },
- ...queryHistory];
+ ...queryHistory],
  } catch (err) {
  error = err instanceof Error ? err.message : 'Failed to process query';
  } finally {

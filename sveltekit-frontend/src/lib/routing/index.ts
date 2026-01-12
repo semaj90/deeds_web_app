@@ -122,8 +122,8 @@ export { DynamicNavigation as dynamicNavigation, DynamicNavigation };
 /** * Initialize the complete routing system */
 export async function initializeRouting(
  options: {
- enableGuards?: boolean;
- enableNavigation?: boolean;
+ enableGuards?: boolean,
+ enableNavigation?: boolean,
  globalGuards?: string[];
  persistState?: boolean;
  } = {}
@@ -185,7 +185,7 @@ export class RouteBuilder {
  }
 
  params(
- params: Record<string, unknown> | Record<string, { optional?: boolean; type?, string }>
+ params: Record<string, unknown> | Record<string, { optional?: boolean, type?, string }>
  ): RouteBuilder {
  // If every value looks like a descriptor (object with optional/type) keep as-is,
  // otherwise convert the plain record into a descriptor map with inferred types.
@@ -220,7 +220,7 @@ export class RouteBuilder {
  // registerDynamicRoute is expected to return a GeneratedRoute
  // Use the compatibility helper above
  return registerDynamicRoute(
- this.routeId: this.routePath; this.config
+ this.routeId: this.routePath, this.config
  ) as unknown as GeneratedRoute;
  }
 
@@ -238,7 +238,7 @@ export function createRoute(id: string, path, string: RouteBuilder {
 
 /** * Batch route registration utility */
 export function registerRoutes(
- routes: Array<{ id: string, path: string; config?: Partial<DynamicRouteConfig> }>
+ routes: Array<{ id: string, path: string, config?: Partial<DynamicRouteConfig> }>
 ): GeneratedRoute[] {
  return routes.map((route) => {
  const cfg = route.config ?? {};

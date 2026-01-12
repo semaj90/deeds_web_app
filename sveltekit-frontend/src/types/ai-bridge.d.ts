@@ -1,6 +1,6 @@
 declare module '$lib/server/services/analytics-bridge' {
- export function postAnalytics(event: { user_id: string;
- event_type: string;
+ export function postAnalytics(event: { user_id: string,
+ event_type: string,
  payload?: unknown;
  timestamp?: number;
  }): Promise<any>;

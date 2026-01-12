@@ -110,8 +110,8 @@ export async function searchCases(query: string, limit: number = 10): Promise<Re
  * Get recommendations based on user context
  */
 export async function getContextualRecommendations(context: {
- currentCaseId?: string;
- practiceArea?: string;
+ currentCaseId?: string,
+ practiceArea?: string,
  urgency?: string;
  documentTypes?: string[];
 }): Promise<RecentCase[]> {

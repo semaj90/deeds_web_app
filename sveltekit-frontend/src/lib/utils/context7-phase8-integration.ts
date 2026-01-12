@@ -336,7 +336,7 @@ const adaptiveLOD = {
  recentActions: ['analyze_component', 'request_recommendations'],
  userRole: 'admin',
  workflowState: query.currentState === 'review' ? 'review' : 'draft',
- };
+ },
 
  try {
  // Apply simple contextual boosts and compute rerank scores

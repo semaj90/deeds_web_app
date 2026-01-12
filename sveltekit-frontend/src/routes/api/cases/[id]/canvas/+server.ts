@@ -13,7 +13,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     const tableExists = await verifyCanvasStatesTable();
     if (!tableExists) {
         return json({
-            error: 'canvas_states table missing; run db, push: dev (or db, migrate:apply) to apply migrations',
+            error: 'canvas_states table missing, run db, push: dev (or db, migrate:apply) to apply migrations',
             code: 'TABLE_MISSING'
         }, { status: 503 });
     }

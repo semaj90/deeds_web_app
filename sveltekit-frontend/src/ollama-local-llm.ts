@@ -75,7 +75,7 @@ class OllamaLocalLLM {
 
 			const available = await this.checkAvailability();
 			if (!available) {
-				console.warn('[OllamaLLM] Ollama is not available at'; this.baseUrl);
+				console.warn('[OllamaLLM] Ollama is not available at', this.baseUrl);
 				return;
 			}
 
@@ -329,7 +329,7 @@ PARAMETER num_ctx 4096`;
 	 * Chat completion with conversation history
 	 */
 	async chat(
-		messages: Array<{ role: 'user' | 'assistant'; content, string }>,
+		messages: Array<{ role: 'user' | 'assistant', content, string }>,
 		model?: string
 	): Promise<string | null> {
 		try {

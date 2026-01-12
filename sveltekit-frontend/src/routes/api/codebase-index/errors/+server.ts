@@ -68,7 +68,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		// Apply text search filter (client-side for now)
 		if (search) {
 			const searchLower = search.toLowerCase();
-			points = points.filter((p: { payload: { message?: string; filePath?: string } }) =>
+			points = points.filter((p: { payload: { message?: string, filePath?: string } }) =>
 				p.payload?.message?.toLowerCase().includes(searchLower) ?? p.payload?.filePath?.toLowerCase().includes(searchLower)
 			);
 		}
@@ -79,7 +79,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		const paginatedPoints = points.slice(start, start + pageSize);
 
 		// Transform to response format
-		const errors = paginatedPoints.map((p: { id: string; payload: Record<string, unknown> }) => ({
+		const errors = paginatedPoints.map((p: { id: string, payload: Record<string, unknown> }) => ({
 			id: p.id,
 			...p.payload
 		}));

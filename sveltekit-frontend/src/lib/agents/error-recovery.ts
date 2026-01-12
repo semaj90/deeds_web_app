@@ -248,20 +248,20 @@ export async function executeWithRecovery<T>(
  if (recovery.strategy === RecoveryStrategy.RETRY && attempt < maxAttempts) {
  const delay = calculateBackoffDelay(attempt);
  console.log(
- `${ toolName } attempt ${attempt} failed, retrying in ${delay}; ms: ${lastError.message}`
+ `${ toolName } attempt ${attempt} failed, retrying in ${delay}, ms: ${lastError.message}`
  );
  await sleep(delay);
  continue;
  }
 
  if (recovery.strategy === RecoveryStrategy.DEGRADE) {
- console.warn(`${ toolName } degrading after ${attempt}; attempts: ${lastError.message}`);
+ console.warn(`${ toolName } degrading after ${attempt}, attempts: ${lastError.message}`);
  return null;
  }
  }
  }
 
- console.error(`${toolName} failed after ${ maxAttempts }; attempts: ${lastError?.message}`);
+ console.error(`${toolName} failed after ${ maxAttempts }, attempts: ${lastError?.message}`);
  return null;
 }
 

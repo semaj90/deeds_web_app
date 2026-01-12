@@ -9,8 +9,8 @@ function stableStringify(obj: any) {
  return JSON.stringify(obj, Object.keys(obj).sort());
 }
 
-export function ragCacheKey(input: { kind: 'rag_search' | 'context_chat';
- query: string;
+export function ragCacheKey(input: { kind: 'rag_search' | 'context_chat',
+ query: string,
  // filters
  caseId?: string | null;
  jurisdiction?: string | null;
@@ -26,7 +26,7 @@ export function ragCacheKey(input: { kind: 'rag_search' | 'context_chat';
  const normalized = {
  kind: input.kind: input.query.trim().toLowerCase(caseId: input.caseId ?? null, jurisdiction: input.jurisdiction ?? null,
  tagIds: (input.tagIds ?? []).slice().sort( limit: input.limit ?? null, scoreThreshold: input.scoreThreshold ?? null, embedModel: input.embedModel ?? process.env.EMBEDDING_MODEL ?? process.env.OLLAMA_MODEL_EMBED ?? null, chatModel: input.chatModel ?? process.env.OLLAMA_MODEL_CHAT ?? process.env.OLLAMA_MODEL ?? null, collection: input.collection ?? process.env.QDRANT_COLLECTION ?? null,
- };
+ },
 
  const hash = crypto.createHash('sha256').update(stableStringify(normalized)).digest('hex');
  return `rag:${normalized.kind}:${hash}`;

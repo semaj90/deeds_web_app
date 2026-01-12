@@ -95,7 +95,7 @@
  </div>
 
  <nav class="sidebar-nav">
- <a href="/command" class="nav-item active">
+ <a href="/command-center" class="nav-item active">
  <span class="nav-icon">📋</span> COMMAND CENTER
  </a>
  <a href="/" class="nav-item">
@@ -110,10 +110,10 @@
  <a href="/analysis-center" class="nav-item">
  <span class="nav-icon">🔍</span> ANALYSIS CENTER
  </a>
- <a href="/aichat" class="nav-item">
+ <a href="/chat" class="nav-item">
  <span class="nav-icon">🤖</span> AI ASSISTANT
  </a>
- <a href="/all-routes" class="nav-item">
+ <a href="/terminal" class="nav-item">
  <span class="nav-icon">🔧</span> TERMINAL
  </a>
  </nav>

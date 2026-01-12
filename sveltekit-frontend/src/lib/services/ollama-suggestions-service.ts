@@ -62,8 +62,8 @@ export class OllamaSuggestionsService {
 		model = 'gemma3-legal:latest',
 		timeout = 30000
 	}: {
-		baseUrl?: string;
-		model?: string;
+		baseUrl?: string,
+		model?: string,
 		timeout?: number;
 	} = {}) {
 		this.baseUrl = baseUrl;

@@ -77,8 +77,8 @@ export const enhancedLegalCaseMachine = createMachine(
 		id: 'enhancedLegalCase',
 		initial: 'initializing',
 		types: {} as {
-			context: EnhancedLegalCaseContext;
-			events: EnhancedLegalCaseEvent;
+			context: EnhancedLegalCaseContext,
+			events: EnhancedLegalCaseEvent,
 		},
 		context: initialContext,
 		states: {

@@ -200,8 +200,8 @@
 
 		// Draw nodes
 		nodes.forEach(node => {
-			const isSelected = selectedNode?.id === node.id;
-			const radius = 30;
+			const isSelected = selectedNode?.id === node.id,
+			const radius = 30,
 
 			// Node circle
 			ctx.fillStyle = isSelected ? colors.selected : node.color;
@@ -234,8 +234,8 @@
 		const y = (e.clientY - rect.top - panY) / zoom;
 
 		const node = nodes.find(n => {
-			const dx = n.x - x;
-			const dy = n.y - y;
+			const dx = n.x - x,
+			const dy = n.y - y,
 			return Math.sqrt(dx * dx + dy * dy) < 30;
 		});
 
@@ -279,8 +279,8 @@
 		const y = (e.clientY - rect.top - panY) / zoom;
 
 		const node = nodes.find(n => {
-			const dx = n.x - x;
-			const dy = n.y - y;
+			const dx = n.x - x,
+			const dy = n.y - y,
 			return Math.sqrt(dx * dx + dy * dy) < 30;
 		});
 

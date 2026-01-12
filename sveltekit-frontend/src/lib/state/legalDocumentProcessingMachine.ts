@@ -38,7 +38,7 @@ export type LegalDocumentEvent =
  | { type: 'RESET' };
 
 // OCR Service
-async function performOCR(input: { fileContent: ArrayBuffer; fileName: string }) {
+async function performOCR(input: { fileContent: ArrayBuffer, fileName: string }) {
  const formData = new FormData();
  formData.append('file', new Blob([input.fileContent]), input.fileName);
 
@@ -210,7 +210,7 @@ export function isProcessing(state: { value: string }): boolean {
  return ['ocr', 'chunking', 'embedding'].includes(state.value);
 }
 
-export function canRetry(state: { context: LegalDocumentContext; value: string }): boolean {
+export function canRetry(state: { context: LegalDocumentContext, value: string }): boolean {
  return state.value === 'failed' && state.context.retryCount < state.context.maxRetries;
 }
 

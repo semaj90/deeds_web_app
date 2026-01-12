@@ -187,7 +187,7 @@ describe('POST /api/routes/:routeId/interactions', () => {
  routeId: '/cases/new',
  status: 'healthy',
  createdAt: new Date( updatedAt: new Date( archivedAt: null,
- };
+ },
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
 
@@ -213,7 +213,7 @@ describe('POST /api/routes/:routeId/interactions', () => {
  routeId: '/cases/new',
  status: 'healthy',
  createdAt: new Date( updatedAt: new Date( archivedAt: null,
- };
+ },
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
 

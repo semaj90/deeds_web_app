@@ -63,7 +63,7 @@ export class YOLOService {
  objects: yoloData.objects || [],
  processingTime,
  method: 'yolo',
- };
+ },
  } finally {
  // Clean up temp files
  await Promise.all([

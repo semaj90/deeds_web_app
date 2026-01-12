@@ -345,8 +345,8 @@ export async function logLLMCall(
   taskType: LLMLog['task_type'],
   prompt: string,
   response: string,
-  metrics: { tokensIn: number;
-    tokensOut: number; latencyMs: number;
+  metrics: { tokensIn: number,
+    tokensOut: number, latencyMs: number;
   },
   evaluation: { success: boolean;
     errorsFixed?: number;

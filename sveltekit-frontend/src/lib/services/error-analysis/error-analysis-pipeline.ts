@@ -20,7 +20,7 @@ import type { Error, Analysis, Cluster, ServiceConfig, ACEContext } from './type
 
 export interface IErrorAnalysisPipeline {
  analyzeErrors(sessionId: string, errors: Error[]): Promise<ACEContext>;
- analyzeError(sessionId: string, Error: Promise<Analysis>;
+ analyzeError(sessionId: string, Error: Promise<Analysis>,
  getSessionContext(sessionId: string): Promise<ACEContext | null>;
 }
 

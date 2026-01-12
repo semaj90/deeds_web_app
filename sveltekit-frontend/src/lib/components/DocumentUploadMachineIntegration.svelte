@@ -148,13 +148,13 @@
         <div class="actions flex justify-end gap-3 mt-6">
             <Button
                 variant="outline"
-                on:click={handleReset}
+                onclick={handleReset}
                 disabled={snapshot.matches('validating')}
             >
                 RESET
             </Button>
             <Button
-                on:click={handleSubmit}
+                onclick={handleSubmit}
                 disabled={!snapshot.matches('ready')}
                 class="px-8"
             >
@@ -212,7 +212,7 @@
                 {/if}
             </div>
 
-            <Button on:click={handleReset} class="w-full">
+            <Button onclick={handleReset} class="w-full">
                 PROCESS_NEW_DOCUMENTS
             </Button>
         </div>
@@ -227,8 +227,8 @@
             </div>
 
             <div class="flex gap-4">
-                <Button variant="outline" on:click={handleReset} class="flex-1">ABORT</Button>
-                <Button on:click={handleRetry} class="flex-1">RETRY_TRANSMISSION</Button>
+                <Button variant="outline" onclick={handleReset} class="flex-1">ABORT</Button>
+                <Button onclick={handleRetry} class="flex-1">RETRY_TRANSMISSION</Button>
             </div>
         </div>
     {/if}

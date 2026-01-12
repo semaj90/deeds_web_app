@@ -96,10 +96,10 @@ https://svelte.dev/e/element_invalid_closing_tag -->
   }
 </script>
 
-<svelte, head>
+<svelte:head>
   <title>Report Builder - Prosecutor's Case Management</title>
   <meta name="description" content="AI-powered report builder for legal case, analysis" />
-</svelte, head>
+</svelte:head>
 <div class="container">
   <!-- Header -->
   <header class="space-y-4">

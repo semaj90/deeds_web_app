@@ -338,7 +338,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  function handleNodeContext(
- event: CustomEvent<{ node: EvidenceNode, null; screenX: number; screenY, number;
+ event: CustomEvent<{ node: EvidenceNode, null, screenX: number, screenY, number;
  }>
  ) {
  contextMenu = {

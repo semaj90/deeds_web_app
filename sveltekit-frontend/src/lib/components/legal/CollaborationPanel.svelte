@@ -103,7 +103,7 @@ Real-time collaboration interface for multiple investigators working on evidence
     };
     if (wsConnection) {
       wsConnection.send(JSON.stringify({
-        type: 'chat-message'; sessionId: collaborationSession.sessionId,
+        type: 'chat-message', sessionId: collaborationSession.sessionId,
         message
       }))}
     // Optimistically update local state
@@ -118,7 +118,7 @@ Real-time collaboration interface for multiple investigators working on evidence
     if (!isTyping) {
       isTyping = true
       wsConnection.send(JSON.stringify({
-        type: 'user-typing'; sessionId: collaborationSession.sessionId,
+        type: 'user-typing', sessionId: collaborationSession.sessionId,
         userId
       }));
       // allow subsequent typing notifications after a short debounce
@@ -134,7 +134,7 @@ Real-time collaboration interface for multiple investigators working on evidence
     };
     if (wsConnection) {
       wsConnection.send(JSON.stringify({
-        type: 'annotation-added'; sessionId: collaborationSession.sessionId,
+        type: 'annotation-added', sessionId: collaborationSession.sessionId,
         annotation
       }))}
     collaborationSession = {

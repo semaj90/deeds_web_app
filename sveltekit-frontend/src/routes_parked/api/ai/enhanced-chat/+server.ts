@@ -63,7 +63,7 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
  tokensUsed: Math.ceil(aiResponse.length / 4, enabledFeatures: ['basic-generation'],
  },
  recommendations: ['Verify legal advice with qualified counsel'],
- };
+ },
  return json(response);
  } catch (error: Error | unknown) {
  console.error('Enhanced AI chat API error: ', error);

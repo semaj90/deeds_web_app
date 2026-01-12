@@ -47,7 +47,7 @@ export class StackCache {
  }
 
  async set(_key: string, value, unknown: Promise<void> {
- const key = _key;
+ const key = _key,
  if (this.redis) {
  await (this.redis as any).setex(key, ttl, JSON.stringify(value));
  }

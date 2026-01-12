@@ -139,8 +139,8 @@ function getPriorityForJobType(jobType: JobType): number {
  */
 export const idleDetectionMachine = setup({
 	types: {} as {
-		context: IdleContext;
-		events: IdleEvent;
+		context: IdleContext,
+		events: IdleEvent,
 	},
 	actors: {
 		checkIdleStatus,

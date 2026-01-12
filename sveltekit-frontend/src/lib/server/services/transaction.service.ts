@@ -173,8 +173,8 @@ export async function withDeadlockRetry<T>(
 export async function handleConstraintViolation(
  error: any,
  context: {
- userId?: string;
- operationName?: string;
+ userId?: string,
+ operationName?: string,
  affectedData?: any;
  }
 ): Promise<void> {

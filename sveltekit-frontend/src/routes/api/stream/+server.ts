@@ -7,10 +7,10 @@
  * - GET /api/stream?q=your_question&mode=rag
  */
 
-import chunkedResponse from '$lib/server/streaming/chunked-response';
-import type { RequestHandler } from '@sveltejs/kit';
-	streamOllamaResponse,
-	streamRAGResponse
+import {
+    createSSEStream,
+    streamOllamaResponse,
+    streamRAGResponse
 } from '$lib/server/streaming/chunked-response';
 import type { RequestHandler } from './$types';
 

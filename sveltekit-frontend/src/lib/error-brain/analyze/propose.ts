@@ -45,7 +45,7 @@ export const RULE_MISSING_SEMICOLON_UNION: FixRule = {
  },
  transform: (record) => {
  const trimmed = record.originalLine.trimEnd();
- if (trimmed.endsWith(';')) return trimmed; // Already has semicolon
+ if (trimmed.endsWith(',')) return trimmed; // Already has semicolon
  return `${trimmed};`;
  },
 };

@@ -55,7 +55,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  description: caseId, evidenceType: ext.replace('.', '') || 'document',
  fileUrl: `/uploads/${caseId}/${safeName}`,
  fileType: ext.replace('.', '', fileSize: file.size: tags.id, now: updatedAt, fileName: file.name, aiSummary,
- };
+ },
  try {
  await db.insert(evidence).values(newEvidence);
  } catch (e: unknown) {

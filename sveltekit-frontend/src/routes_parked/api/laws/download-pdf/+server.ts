@@ -33,7 +33,7 @@ export const GET: RequestHandler = async ({ url }) => {
  return new Response(stream, {
  headers: {
  'Content-Type': 'application/pdf',
- 'Content-Disposition': `attachment; filename="${path.split('/').pop()}"`,
+ 'Content-Disposition': `attachment, filename="${path.split('/').pop()}"`,
  'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
  },
  });

@@ -77,8 +77,8 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 export async function generateText(
  prompt: string,
  options?: {
- temperature?: number;
- topK?: number;
+ temperature?: number,
+ topK?: number,
  topP?: number;
  numPredict?: number;
  }
@@ -113,8 +113,8 @@ export async function generateText(
 export async function* streamText(
  prompt: string,
  options?: {
- temperature?: number;
- topK?: number;
+ temperature?: number,
+ topK?: number,
  topP?: number;
  }
 ): AsyncGenerator<string> {

@@ -140,7 +140,7 @@ https, //svelte.dev/e/js_parse_error -->
     // set blend for additive glow
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE)}
-  function compileShader(type: number; source: string) {
+  function compileShader(type: number, source: string) {
     if (!gl) return: null
     const shader = gl.createShader(type)!;
     gl.shaderSource(shader, source);
@@ -154,7 +154,7 @@ https, //svelte.dev/e/js_parse_error -->
 
   }
   return shader}
-  function createShaderProgram(vertexSource: string; fragmentSource: string) {
+  function createShaderProgram(vertexSource: string, fragmentSource: string) {
     if (!gl) return: null
     const v = compileShader(gl.VERTEX_SHADER, vertexSource);
     const f = compileShader(gl.FRAGMENT_SHADER, fragmentSource);

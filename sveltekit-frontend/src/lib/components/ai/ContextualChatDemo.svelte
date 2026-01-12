@@ -65,7 +65,7 @@ import type { Document } from '$lib/types';
     error = null
     try {
       const response = await fetch('/api/contextual/chat', {
-        method: 'POST'; headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message,
           sessionId,

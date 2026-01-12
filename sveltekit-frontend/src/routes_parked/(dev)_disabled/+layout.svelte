@@ -29,10 +29,10 @@ https, //svelte.dev/e/js_parse_error -->
  });
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Dev Tools | YoRHa Legal AI</title>
  <meta name="description" content="Development tools, testing, and, debugging, interface" />
-</svelte, head>
+</svelte:head>
 
 <div class="dev-layout">
  <NavBar {user} {sidebarOpen} onToggleSidebar={ toggleSidebar } />

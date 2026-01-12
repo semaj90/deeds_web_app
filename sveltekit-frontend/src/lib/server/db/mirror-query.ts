@@ -91,8 +91,8 @@ async function generateEmbedding(text: string): Promise<number[]> {
 export async function mirrorQuery(
     queryText: string,
     options: {
-        topK?: number;
-        includeGraphContext?: boolean;
+        topK?: number,
+        includeGraphContext?: boolean,
         graphDepth?: number;
         includeBlobs?: boolean;
         sourceFilter?: string; // e.g., 'svelte-docs'
@@ -175,7 +175,7 @@ export async function mirrorQuery(
 
             graph_context = {
                 nodes: Array.from(allNodes.values(neighbors: neighborsMap, traversal_depth: graphDepth
-            };
+            },
 
             performance.couchdb_ms = Date.now() - couchStart;
         }
@@ -262,8 +262,8 @@ export async function mirrorQuery(
 export async function hybridQuery(
     queryText: string,
     options: {
-        topK?: number;
-        vectorWeight?: number; // 0-1 (1 = vector only, 0 = text only)
+        topK?: number,
+        vectorWeight?: number, // 0-1 (1 = vector only, 0 = text only)
         includeGraphContext?: boolean;
     } = {}
 ): Promise<MirrorQueryResult> {

@@ -38,8 +38,8 @@ export const caseCreationMachine = createMachine(
 		id: 'caseCreation',
 		initial: 'idle',
 		types: {} as {
-			context: CaseCreationContext;
-			events: CaseCreationEvent;
+			context: CaseCreationContext,
+			events: CaseCreationEvent,
 		},
 		context: {
 			formData: {

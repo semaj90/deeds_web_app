@@ -123,7 +123,7 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
                 ).prompt.substring(0, 50)}... </p>
  <p class="history-meta"> {( result as { id?: unknown; prompt?: unknown; imageUrl?: unknown; provider?: unknown; parameters?: unknown; timestamp?: unknown; metadata?: unknown}
                 ).provider} â€¢ {new Date( (
-                    result as { id?: unknown; prompt?: unknown; imageUrl?: unknown; provider?: unknown; parameters?: unknown; timestamp?: unknown; metadata?: unknown}
+                    result as { id?: unknown, prompt?: unknown, imageUrl?: unknown; provider?: unknown; parameters?: unknown; timestamp?: unknown; metadata?: unknown}
                   ).timestamp ).toLocaleTimeString()} </p> </div> </div> {/each} {/if}
   </div>
  <!-- Selected Image, Modal -->

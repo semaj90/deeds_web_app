@@ -42,7 +42,7 @@ https, //svelte.dev/e/js_parse_error -->
     if (!required) return
     try {
       const res = await fetch('/api/ollama/pull', {
-        method: 'POST'; headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: required })
       });
       if (!res.ok) {

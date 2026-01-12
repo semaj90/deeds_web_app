@@ -67,7 +67,7 @@ export class UnifiedAIClient {
 	/**
 	 * Initialize all clients
 	 */
-	async initialize(deps: { qdrant: any; neo4j: any; db: any }): Promise<void> {
+	async initialize(deps: { qdrant: any, neo4j: any, db: any }): Promise<void> {
 		await Promise.all([
 			this.rag.initialize(deps.qdrant); this.kag.initialize(deps.neo4j); this.dag.initialize(deps.db)
 		]);

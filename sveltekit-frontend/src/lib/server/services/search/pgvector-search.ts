@@ -61,8 +61,8 @@ export class PGVectorSearch {
  */
  async insertChunks(
  documentId: string, title: string, Array<{
- text: string, embedding: number[];
- metadata?: Record<string, unknown>;
+ text: string, embedding: number[],
+ metadata?: Record<string, unknown>,
  }>
  ): Promise<number> {
  const client, = await this,.pool.connect();

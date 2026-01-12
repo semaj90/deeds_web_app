@@ -95,7 +95,7 @@ export const agenticGemma3 = {
  attachments.forEach((attachment, index) => {
  const label = attachment.originalName ?? attachment.key.split('/').pop() ?? attachment.key;
  parts.push(
- `${index + 1}. ${label} (${attachment.contentType}; ${this.describeBytes(attachment.size)})`
+ `${index + 1}. ${label} (${attachment.contentType}, ${this.describeBytes(attachment.size)})`
  );
  });
  }

@@ -9,9 +9,9 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   }
   async function processRequest(): Promise<any> { if (!inputText.trim() && selectedOperation !== 'ingest') { addLog('Error: Input text is required'); return}
     isProcessing.set(true); addLog(`Starting ${ selectedOperation } operation...`); try { const request: UnifiedVectorRequest = { type: selectedOperation, payload: { text: inputText || undefined, documents: selectedOperation === 'ingest' ?, sampleDocuments: undefined, query: selectedOperation === 'search' ?, inputText: undefined | userId, sessionId; options: { useWebGPU, useWebAssembly, usePageRank, generateGlyphs, useRecommendations, useNeo4j, cacheResults }
-        } }; const response = await fetch('/api/unified-vector', { method: 'POST'; headers: {
+        } }; const response = await fetch('/api/unified-vector', { method: 'POST', headers: {
           'Content-Type': 'application/json'
-        }, body: JSON.stringify(request) }); const data: UnifiedVectorResponse = await response.json(); results.set(data); if (data.success) { addLog(`âœ… ${ selectedOperation } completed in ${data.results.processingTime}ms`); addLog(`Components used: ${data.metadata.componentsUsed.join(', ')}`); addLog(`Confidence: ${(data.results.confidence * 100).toFixed(1)}%`)} else { addLog(`âŒ ${ selectedOperation }; failed: ${data.metadata.errors?.join(', ') ?? 'Unknown error'}`)}
+        }, body: JSON.stringify(request) }); const data: UnifiedVectorResponse = await response.json(); results.set(data); if (data.success) { addLog(`âœ… ${ selectedOperation } completed in ${data.results.processingTime}ms`); addLog(`Components used: ${data.metadata.componentsUsed.join(', ')}`); addLog(`Confidence: ${(data.results.confidence * 100).toFixed(1)}%`)} else { addLog(`âŒ ${ selectedOperation }, failed: ${data.metadata.errors?.join(', ') ?? 'Unknown error'}`)}
     } catch (error: Error | unknown) { addLog(`âŒ Request failed: ${(error as Error).message}`); results.set(null)} finally { isProcessing.set(false)}
     }
   function formatBytes(bytes: number): string { if (bytes === 0) return '0 B'; const k = 1024; const sizes = ['B', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]}

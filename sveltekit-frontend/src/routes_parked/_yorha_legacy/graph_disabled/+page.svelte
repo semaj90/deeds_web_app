@@ -2,9 +2,9 @@
  import RelationshipGraph from '$lib/ui/RelationshipGraph.svelte';
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Relationship Graph - YoRHa Detective</title>
-</svelte, head>
+</svelte:head>
 
 <RelationshipGraph />
 

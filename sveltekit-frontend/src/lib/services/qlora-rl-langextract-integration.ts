@@ -144,7 +144,7 @@ export class QLoRARLLangExtractIntegration {
     async processLegalDocument(
         document: LegalDocument,
         extractionSchema: Record<string, unknown>,
-        userFeedback?: { correct: boolean; comments?: string }
+        userFeedback?: { correct: boolean, comments?: string }
     ): Promise<IntegratedProcessingResult> {
         console.log(`⚡ Processing legal document ${getDocId(document)} with RL+QLoRA integration`);
 

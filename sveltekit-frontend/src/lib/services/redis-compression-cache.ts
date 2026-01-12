@@ -57,7 +57,7 @@ export class RedisCompressionCache {
     key: string,
     value: any,
     ttlSeconds = 3600,
-    options?: { batch?: boolean; format?: 'json' | 'msgpack' }
+    options?: { batch?: boolean, format?: 'json' | 'msgpack' }
   ): Promise<void> {
     try {
       // Serialize value
@@ -152,7 +152,7 @@ export class RedisCompressionCache {
    * Batch set multiple values with compression
    */
   async batchSet(
-    items: Array<{ key: string; value: any; ttl?, number }>,
+    items: Array<{ key: string, value: any, ttl?, number }>,
     options?: { parallel?: number }
   ): Promise<void> {
     const parallel = options?.parallel ?? 5;

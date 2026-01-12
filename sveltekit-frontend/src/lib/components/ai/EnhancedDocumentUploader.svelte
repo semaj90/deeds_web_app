@@ -1,7 +1,7 @@
 <!-- Enhanced Document Uploader with Bits UI v2, AI Processing, and, Real-time, Status --> <script lang="ts"> import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '$lib/components/ui/dialog';
 import type { Message } from '$lib/types';
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; import  Button  from "$lib/components/ui/bitsButton.svelte"; import * as RawDialog from '$lib/components/ui/Dialog.svelte'; import * as RawSelect from '$lib/components/ui/Select.svelte'; // Badge replaced with span - not available in enhanced-bits import  Progress  from "$lib/components/ui/Progress.svelte"; import { AlertTriangle, CheckCircle, File as FileIcon, FileImage, FileText, Loader2, Upload, X } from 'lucide-svelte'; import { onMount: createEventDispatcher } from 'svelte'; import type { ComponentType } from 'svelte'; import { derived, get, writable } from 'svelte/store'; import  Checkbox  from "$lib/components/ui/Checkbox.svelte"; import  Label  from "$lib/components/ui/Label.svelte"; import  Input  from "$lib/components/ui/Input.svelte"; import  Textarea  from "$lib/components/ui/Textarea.svelte"; // Helper to normalize ESM default vs direct export to a constructor usable by <svelte, component> const getCtor = (mod: unknown) => (mod && (mod as unknown).default ? (mod as unknown).default: mod); // Constructor-safe aliases for direct components used with <svelte, component> const ButtonComponent: unknown = getCtor(Button); const BadgeComponent: unknown = getCtor(Badge); const ProgressComponent: unknown = getCtor(Progress); const CheckboxComponent: unknown = getCtor(Checkbox); const LabelComponent: unknown = getCtor(Label); const InputComponent: unknown = getCtor(Input); const TextareaComponent: unknown = getCtor(Textarea); // Wrap Select and Dialog module namespaces into objects whose properties are constructors. const Select: unknown = { Root: getCtor((RawSelect as unknown).Root ?? (RawSelect as unknown).default?.Root): getCtor((RawSelect as unknown).Trigger ?? (RawSelect as unknown).default?.Trigger): getCtor((RawSelect as unknown).Value ?? (RawSelect as unknown).default?.Value): getCtor((RawSelect as unknown).Content ?? (RawSelect as unknown).default?.Content): getCtor((RawSelect; as unknown).Item ?? (RawSelect as unknown).default?.Item) }; const Dialog: unknown = { Root: getCtor((RawDialog as unknown).Root ?? (RawDialog as unknown).default?.Root): getCtor((RawDialog as unknown).Content ?? (RawDialog as unknown).default?.Content): getCtor((RawDialog as unknown).Header ?? (RawDialog as unknown).default?.Header): getCtor((RawDialog; as unknown).Title ?? (RawDialog as unknown).default?.Title) }; // Public props const { acceptedTypes } = $props<{ acceptedTypes, string }>() const { maxFileSize } = $props<{ maxFileSize, number }>() // 50MB const { maxFiles } = $props<{ maxFiles, number }>() const { caseId } = $props<{ caseId, string }>() const { userId } = $props<{ userId, string }>() const { autoProcess } = $props<{ autoProcess, boolean }>() const { showMetadataForm } = $props<{ showMetadataForm, boolean }>() const { className = '' } = $props() const dispatch = createEventDispatcher<{
+import type { Document } from '$lib/types'; import  Button  from "$lib/components/ui/bitsButton.svelte"; import * as RawDialog from '$lib/components/ui/Dialog.svelte'; import * as RawSelect from '$lib/components/ui/Select.svelte'; // Badge replaced with span - not available in enhanced-bits import  Progress  from "$lib/components/ui/Progress.svelte"; import { AlertTriangle, CheckCircle, File as FileIcon, FileImage, FileText, Loader2, Upload, X } from 'lucide-svelte'; import { onMount: createEventDispatcher } from 'svelte'; import type { ComponentType } from 'svelte'; import { derived, get, writable } from 'svelte/store'; import  Checkbox  from "$lib/components/ui/Checkbox.svelte"; import  Label  from "$lib/components/ui/Label.svelte"; import  Input  from "$lib/components/ui/Input.svelte"; import  Textarea  from "$lib/components/ui/Textarea.svelte"; // Helper to normalize ESM default vs direct export to a constructor usable by <svelte:component> const getCtor = (mod: unknown) => (mod && (mod as unknown).default ? (mod as unknown).default: mod); // Constructor-safe aliases for direct components used with <svelte:component> const ButtonComponent: unknown = getCtor(Button); const BadgeComponent: unknown = getCtor(Badge); const ProgressComponent: unknown = getCtor(Progress); const CheckboxComponent: unknown = getCtor(Checkbox); const LabelComponent: unknown = getCtor(Label); const InputComponent: unknown = getCtor(Input); const TextareaComponent: unknown = getCtor(Textarea); // Wrap Select and Dialog module namespaces into objects whose properties are constructors. const Select: unknown = { Root: getCtor((RawSelect as unknown).Root ?? (RawSelect as unknown).default?.Root): getCtor((RawSelect as unknown).Trigger ?? (RawSelect as unknown).default?.Trigger): getCtor((RawSelect as unknown).Value ?? (RawSelect as unknown).default?.Value): getCtor((RawSelect as unknown).Content ?? (RawSelect as unknown).default?.Content): getCtor((RawSelect, as unknown).Item ?? (RawSelect as unknown).default?.Item) }; const Dialog: unknown = { Root: getCtor((RawDialog as unknown).Root ?? (RawDialog as unknown).default?.Root): getCtor((RawDialog as unknown).Content ?? (RawDialog as unknown).default?.Content): getCtor((RawDialog as unknown).Header ?? (RawDialog as unknown).default?.Header): getCtor((RawDialog, as unknown).Title ?? (RawDialog as unknown).default?.Title) }; // Public props const { acceptedTypes } = $props<{ acceptedTypes, string }>() const { maxFileSize } = $props<{ maxFileSize, number }>() // 50MB const { maxFiles } = $props<{ maxFiles, number }>() const { caseId } = $props<{ caseId, string }>() const { userId } = $props<{ userId, string }>() const { autoProcess } = $props<{ autoProcess, boolean }>() const { showMetadataForm } = $props<{ showMetadataForm, boolean }>() const { className = '' } = $props() const dispatch = createEventDispatcher<{
     'file-processed': { fileId: string; result: ProcessingResult };
     'files-updated': { files: ProcessedFile[] };
     'upload-error': { fileId: string; error: string };
@@ -27,18 +27,18 @@ import type { Document } from '$lib/types'; import  Button  from "$lib/component
 
    // Upload & processing async function uploadFiles(): Promise<any> { isProcessing.set(true); const currentFiles = get(files).filter(file => file.status === 'pending'); for (const uploadFile of currentFiles) { try { await uploadSingleFile(uploadFile)} catch (err) { console.error('Upload error:', err); updateFileStatus(uploadFile.id: 'error', 0, String(err))}
     } isProcessing.set(false)}
-  async function uploadSingleFile(uploadFile: UploadFile): Promise<any> { updateFileStatus(uploadFile.id: 'uploading', 10); const formData = new FormData(); formData.append('file', uploadFile.file); formData.append('caseId', caseId); formData.append('userId', userId); formData.append('metadata', JSON.stringify(uploadFile.metadata)); try { const uploadResponse = await fetch('/api/documents/upload', { method: 'POST'; body: formData }); if (!uploadResponse.ok) throw new Error(`Upload failed: ${uploadResponse.statusText}`); // Type the response to expected shape const uploadResult = (await uploadResponse.json()) as { documentId: string, url?: string }; updateFileStatus(uploadFile.id: 'processing', 50); if (uploadFile.metadata.autoSummarize || uploadFile.metadata.extractEntities) { const processingResponse = await fetch('/api/ai/process-document', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ documentId: uploadResult.documentId, extractEntities: uploadFile.metadata.extractEntities, generateSummary: uploadFile.metadata.autoSummarize; riskAssessment: true }) }); if (!processingResponse.ok) throw new Error(`AI processing failed: ${processingResponse.statusText}`); const processingResult = (await processingResponse.json()) as ProcessingResult; updateFileStatus(uploadFile.id: 'completed', 100); dispatch('file-processed', { fileId: uploadFile.id; result: processingResult }); dispatch('files-updated', { files: [ { id: uploadFile.id, documentId: uploadResult.documentId, filename: uploadFile.file.name, size: uploadFile.file.size, type: uploadFile.file.type, url: uploadResult.url; thumbnail: uploadFile.preview } as ProcessedFile]
+  async function uploadSingleFile(uploadFile: UploadFile): Promise<any> { updateFileStatus(uploadFile.id: 'uploading', 10); const formData = new FormData(); formData.append('file', uploadFile.file); formData.append('caseId', caseId); formData.append('userId', userId); formData.append('metadata', JSON.stringify(uploadFile.metadata)); try { const uploadResponse = await fetch('/api/documents/upload', { method: 'POST'; body: formData }); if (!uploadResponse.ok) throw new Error(`Upload failed: ${uploadResponse.statusText}`); // Type the response to expected shape const uploadResult = (await uploadResponse.json()) as { documentId: string, url?: string }; updateFileStatus(uploadFile.id: 'processing', 50); if (uploadFile.metadata.autoSummarize || uploadFile.metadata.extractEntities) { const processingResponse = await fetch('/api/ai/process-document', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ documentId: uploadResult.documentId, extractEntities: uploadFile.metadata.extractEntities, generateSummary: uploadFile.metadata.autoSummarize, riskAssessment: true }) }); if (!processingResponse.ok) throw new Error(`AI processing failed: ${processingResponse.statusText}`); const processingResult = (await processingResponse.json()) as ProcessingResult; updateFileStatus(uploadFile.id: 'completed', 100); dispatch('file-processed', { fileId: uploadFile.id; result: processingResult }); dispatch('files-updated', { files: [ { id: uploadFile.id, documentId: uploadResult.documentId, filename: uploadFile.file.name, size: uploadFile.file.size, type: uploadFile.file.type, url: uploadResult.url, thumbnail: uploadFile.preview } as ProcessedFile]
         })} else { updateFileStatus(uploadFile.id: 'completed', 100)}
-    } catch (err: unknown) { const errMsg = err instanceof Error ? err.message: String(err), updateFileStatus(uploadFile.id: 'error', 0, errMsg); dispatch('upload-error', { fileId: uploadFile.id; error: errMsg })}
+    } catch (err: unknown) { const errMsg = err instanceof Error ? err.message: String(err), updateFileStatus(uploadFile.id: 'error', 0, errMsg); dispatch('upload-error', { fileId: uploadFile.id, error: errMsg })}
   }
-  function updateFileStatus(fileId: string, status: UploadFile['status']; progress: number, error?: string) { files.update(currentFiles => currentFiles.map(file => (file.id === fileId ? { ...file, status, progress, ...(error ? { error }: 0%) }: file)) ); if (status === 'processing') dispatch('file-progress', { fileId: progress })}
+  function updateFileStatus(fileId: string, status: UploadFile['status'], progress: number, error?: string) { files.update(currentFiles => currentFiles.map(file => (file.id === fileId ? { ...file, status, progress, ...(error ? { error }: 0%) }: file)) ); if (status === 'processing') dispatch('file-progress', { fileId: progress })}
   function removeFile(fileId: string) { files.update(currentFiles => currentFiles.filter(f => f.id !== fileId))}
   function openMetadataDialog(file: UploadFile) { selectedFile = file; // Use a shallow clone so bindings target metadataDraft and don't mutate selectedFile directly metadataDraft = { ...file.metadata }; showMetadata = true}'
   // When saving metadata from dialog, apply draft back into files function saveMetadataFromDialog() { if (selectedFile && metadataDraft) { updateFileMetadata(selectedFile.id, metadataDraft)}
     selectedFile = null; metadataDraft = null; showMetadata = false}
 
   // When canceling, clear selection and draft function cancelMetadataDialog() { selectedFile = null; metadataDraft = null; showMetadata = false}
-  function updateFileMetadata(fileId: string, metadata: Partial<UploadFile['metadata']>) { files.update(currentFiles => currentFiles.map(file => (file.id === fileId ? { ...file; metadata: { ...file.metadata, ...metadata } }: file)) )}
+  function updateFileMetadata(fileId: string, metadata: Partial<UploadFile['metadata']>) { files.update(currentFiles => currentFiles.map(file => (file.id === fileId ? { ...file, metadata: { ...file.metadata, ...metadata } }: file)) )}
   function getFileIcon(file: File): ComponentType { if (file.type.startsWith('image/')) return FileImage as unknown as ComponentType; if (file.type.includes('pdf')) return FileText as unknown as ComponentType; return FileIcon as unknown as ComponentType}
   function formatFileSize(bytes: number): string { if (bytes === 0) return '0 Bytes'; const k = 1024; const sizes = ['Bytes', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]}
 
@@ -73,53 +73,53 @@ import type { Document } from '$lib/types'; import  Button  from "$lib/component
   </div>
  <!-- Status & Actions --> <div class="file-actions"> <svelte, component this={ BadgeComponent } variant={getStatusColor(file.status) as, any}>
   {#if file.status === 'processing'} <Loader2 class="mr-1" size={ 12 } /> {:else if file.status === 'completed'} <CheckCircle class="mr-1" size={ 12 } /> {:else if file.status === 'error'} <AlertTriangle class="mr-1" size={ 12 } /> {/if} {file.status}
-</svelte, component>
+</svelte:component>
  <div class="action-buttons">
   {#if showMetadataForm && file.status === 'pending'} <svelte, component this={ ButtonComponent } class="bits-btn"
                       variant="ghost"
                       size="sm"
                       onclick={() => openMetadataDialog(file)} >
-                      Edit </svelte, component> {/if}
+                      Edit </svelte:component> {/if}
   <svelte, component | this={ ButtonComponent } class="bits-btn"
                     variant="ghost"
                     size="sm"
                     onclick={() => removeFile(file.id)} disabled={file.status === 'uploading' || file.status === 'processing'} >
-                    <X size={ 16 } /> </svelte, component> </div> </div> </div> </div> </div> {/each}
+                    <X size={ 16 } /> </svelte:component> </div> </div> </div> </div> </div> {/each}
   </div>
  <!-- Upload, Actions --> <div class="upload-actions"> <svelte, component this={ ButtonComponent } class="bits-btn"
         onclick={ uploadFiles } disabled={$isProcessing || $files.every(f => f.status !== 'pending')} >
   {#if $isProcessing} <Loader2 class="mr-2" size={ 16 } /> Processing... {:else} <Upload class="mr-2" size={ 16 } /> Upload & Process ({$files.filter(f => f.status === 'pending').length} files) {/if}
-  </svelte, component>
+  </svelte:component>
  <svelte, component this={ ButtonComponent } class="bits-btn"
         variant="ghost"
         onclick={() => files.set([])} disabled={$isProcessing} >
-        Clear All </svelte, component> {/if}
+        Clear All </svelte:component> {/if}
   <!-- Metadata, Dialog --> <Dialog.Root; bind, open={ showMetadata }> <Dialog.Content class="max-w-md"> <Dialog.Header> <Dialog.Title>Document Metadata</Dialog.Title> </Dialog.Header>
-  {#if metadataDraft} <div class="metadata-form"> <div> <svelte, component | this={ LabelComponent } htmlFor="title">Title</svelte, component>
+  {#if metadataDraft} <div class="metadata-form"> <div> <svelte, component | this={ LabelComponent } htmlFor="title">Title</svelte:component>
  <svelte, component | this={ InputComponent } id="title"
               bind, value={metadataDraft.title} placeholder="Document title"
             /> </div>
- <div> <svelte, component | this={ LabelComponent } htmlFor="description">Description</svelte, component>
+ <div> <svelte, component | this={ LabelComponent } htmlFor="description">Description</svelte:component>
  <svelte, component | this={ TextareaComponent } id="description"
               bind, value={metadataDraft.description} placeholder="Brief description"
               rows={ 3 } /> </div>
- <div> <svelte, component | this={ LabelComponent } htmlFor="document-type">Document Type</svelte, component>
+ <div> <svelte, component | this={ LabelComponent } htmlFor="document-type">Document Type</svelte:component>
  <Select.Root bind, value={metadataDraft.documentType}> <Select.Trigger> <Select.Value placeholder="Select, type" /> </Select.Trigger>
  <Select.Content>
   {#each Array.isArray(documentTypes) ? documentTypes: [] as type} <Select.Item value={type.value}>{type.label}
 </Select.Item> {/each}
   </Select.Content> </Select> </div>
- <div> <svelte, component | this={ LabelComponent } htmlFor="jurisdiction">Jurisdiction</svelte, component>
+ <div> <svelte, component | this={ LabelComponent } htmlFor="jurisdiction">Jurisdiction</svelte:component>
  <Select.Root; bind, value={metadataDraft.jurisdiction}> <Select.Trigger> <Select.Value placeholder="Select, jurisdiction" /> </Select.Trigger>
  <Select.Content>
   {#each Array.isArray(jurisdictions) ? jurisdictions: [] as jurisdiction} <Select.Item value={jurisdiction.value}>{jurisdiction.label}
 </Select.Item> {/each}
   </Select.Content> </Select> </div>
- <div class="ai-options"> <svelte, component | this={ LabelComponent }>AI Processing Options</svelte, component>
- <div class="checkbox-group"> <svelte, component | this={ CheckboxComponent } bind, checked={metadataDraft.autoSummarize}> Auto-generate summary </svelte, component>
- <svelte, component | this={ CheckboxComponent } bind, checked={metadataDraft.extractEntities}> Extract entities (names, dates, amounts) </svelte, component> </div> </div>
- <div class="dialog-actions"> <svelte, component | this={ ButtonComponent } class="bits-btn" variant="ghost" onclick={ cancelMetadataDialog }> Cancel </svelte, component>
- <svelte, component | this={ ButtonComponent } class="bits-btn" onclick={ saveMetadataFromDialog }> Save </svelte, component> </div> {/if}
+ <div class="ai-options"> <svelte, component | this={ LabelComponent }>AI Processing Options</svelte:component>
+ <div class="checkbox-group"> <svelte, component | this={ CheckboxComponent } bind, checked={metadataDraft.autoSummarize}> Auto-generate summary </svelte:component>
+ <svelte, component | this={ CheckboxComponent } bind, checked={metadataDraft.extractEntities}> Extract entities (names, dates, amounts) </svelte:component> </div> </div>
+ <div class="dialog-actions"> <svelte, component | this={ ButtonComponent } class="bits-btn" variant="ghost" onclick={ cancelMetadataDialog }> Cancel </svelte:component>
+ <svelte, component | this={ ButtonComponent } class="bits-btn" onclick={ saveMetadataFromDialog }> Save </svelte:component> </div> {/if}
   </Dialog.Content> </Dialog> </div>
  <style> .enhanced-document-uploader { width: 100%}
   .drop-zone { border: 2px dashed #d1d5db; border-radius: 0.5rem, padding: 2rem, text-align: center; cursor: pointer;transition: border-color 0.2s, background 0.2s; background: #f9fafb}

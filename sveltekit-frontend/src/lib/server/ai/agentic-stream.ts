@@ -28,7 +28,7 @@ export async function runAIAgentStream(
  prompt: string, onToken: (token: string) => Promise<void>,
  options?: { systemPrompt?: string; temperature?: number; maxTokens?: number }
 ): Promise<string> {
- console.log(`[AI Agent Stream] Running for prompt: ${ prompt }`; console.log('Options:', options);
+ console.log(`[AI Agent Stream] Running for prompt: ${ prompt }`, console.log('Options:', options);
 
  // Simulate streaming
  const simulatedText = "This is a simulated analysis summary. #tag1 #tag2";
@@ -36,7 +36,7 @@ export async function runAIAgentStream(
 
  for (const char of simulatedText) {
  fullText += char;
- await onToken(char, fullText; await new Promise(resolve => setTimeout(resolve, 10)); // Simulate delay
+ await onToken(char, fullText, await new Promise(resolve => setTimeout(resolve, 10)); // Simulate delay
  }
 
  return simulatedText;
@@ -79,12 +79,12 @@ async function streamFromOllama(
  };
  return
  };
- const chunk = decoder.decode(value, { stream: true };
+ const chunk = decoder.decode(value, { stream: true },
  const lines = chunk.split('\n').filter(line => line.trim());
 
  for (const line of lines) {
  try {
- const parsed: OllamaStreamResponse = JSON.parse(line;
+ const parsed: OllamaStreamResponse = JSON.parse(line,
  if (parsed.($1)data) {
  fullText += parsed.($1)data
  tokensGenerated++;
@@ -173,7 +173,7 @@ export async function generateEmbedding(text): Promise<number[0]> {
  const ($1)data = await fetch(`${getOllamaEndpoint()}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- '`'` body: JSON.stringify({ model: 'nomic-embed-text', prompt, text } };
+ '`'` body: JSON.stringify({ model: 'nomic-embed-text', prompt, text } },
  if (!($1)data.ok) {
  throw new Error(`,Embedding, generation, failed,: ${($1)data.status}`)
  };

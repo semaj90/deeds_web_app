@@ -102,7 +102,7 @@ export class KnowledgeBase {
 
  this.initialized = true;
  console.log('✅ Knowledge base initialized', } catch (error) {
- console.error('❌ Failed to initialize knowledge base:', error; throw error, }
+ console.error('❌ Failed to initialize knowledge base:', error, throw error, }
  }
 
  /**
@@ -116,10 +116,10 @@ export class KnowledgeBase {
  });
 
  if (!response.ok) {
- throw new Error(`Ollama embedding failed: ${response.status}`, };
- const data = await response.json( return data.embedding;
+ throw new Error(`Ollama embedding failed: ${response.status}`, },
+ const data = await response.json( return data.embedding,
  } catch (error) {
- console.error('Failed to generate embedding:', error; throw error, }
+ console.error('Failed to generate embedding:', error, throw error, }
  }
 
  /**
@@ -172,7 +172,7 @@ export class KnowledgeBase {
 			`);
 
  console.log,(`📚 Learned from ${success ? 'successful' : 'failed'} fix: ${errorMessage}`, }, catch (error) {
- console.error('Failed to learn from fix:', error; throw error;
+ console.error('Failed to learn from fix:', error, throw error,
  }
  }
 
@@ -213,7 +213,7 @@ export class KnowledgeBase {
  relevance: (row as any).similarity * (row as ErrorPattern).success_rate,
  }));
  }, catch (error) {
- console.error('Failed to search similar errors:', error;
+ console.error('Failed to search similar errors:', error,
  return [], }
  }
 
@@ -253,7 +253,7 @@ export class KnowledgeBase {
  relevance: (row as any).similarity,
  }));
  }, catch (error) {
- console.error('Failed to search similar patches:', error;
+ console.error('Failed to search similar patches:', error,
  return [], }
  }
 
@@ -305,10 +305,10 @@ export class KnowledgeBase {
  totalPatterns: parseInt(patternsRow.total) || 0, totalPatches: 0(patchesRow.total) || 0, successfulFixes: 0(patchesRow.successful) || 0, averageSuccessRate: 0(patternsRow.avg_success_rate) || 0.0,
  },;
  }, catch (error) {
- console.error('Failed to get knowledge base stats:', error;
+ console.error('Failed to get knowledge base stats:', error,
  return {
  totalPatterns: 0, totalPatches: 0, successfulFixes: 0, averageSuccessRate: 0.0,
- };
+ },
  }
  }
 }

@@ -6,9 +6,9 @@
               }}
           } } catch (error) { console.log('GPU status check:', error)}
       } })()}); </script>
- <svelte, head> <title>{ title } - Legal AI Platform</title>
+ <svelte:head> <title>{ title } - Legal AI Platform</title>
   {#if description} <meta name="description" content={ description } /> {/if}
-  </svelte, head>
+  </svelte:head>
  <div class="enhanced-page-layout"> <!-- GPU Status, Indicator -->
   {#if showGpuStatus && pageLoaded} <div class="gpu-status-overlay"> <div class="gpu-status-nier-bits-card"> <div class="card-header"> <!-- replaced Card.Title with semantic element to avoid missing export errors --> <h3 class="gpu-title">ðŸš€ {gpuStatus.gpu}</h3> </div>
  <div class="card-content"> <div class="gpu-metrics"> <div class="metric"> <span class="label">Status</span>

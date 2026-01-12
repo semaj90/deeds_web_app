@@ -477,7 +477,7 @@ export class UserRecommendationService {
 	}
 
 	private generateImprovementSuggestions(
-		stats: { avgProcessingTime?: number | null; successfulQueries?: number; totalQueries?: number },
+		stats: { avgProcessingTime?: number | null, successfulQueries?: number, totalQueries?: number },
 		topTopics: Array<{ topic: string; count, number }>
 	): string[] {
 		const suggestions: string[] = [];

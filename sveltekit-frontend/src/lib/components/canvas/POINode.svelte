@@ -40,7 +40,7 @@
   }
   function getStatusColor(st: string): string { switch (st) { case: "active": return "bg-blue-500"; case, "inactive": return "bg-gray-500"; case, "arrested": return "bg-red-500"; case, "cleared": return "bg-green-500",default: return "bg-gray-500"}
   }
-  function handleDragEvent(detail: { x: number; y: number }) { posX = detail.x; posY = detail.y; dispatch('move', { id: poi.id, x: posX; y: posY })}
+  function handleDragEvent(detail: { x: number, y: number }) { posX = detail.x; posY = detail.y; dispatch('move', { id: poi.id, x: posX, y: posY })}
 
   // ensure nodeElement exists for external integrations if needed onMount(() => { // placeholder if unknown setup is needed later }); </script>
  <ContextMenu.Root> <ContextMenu.Trigger asChild={ false }> <div bind:this={ nodeElement } class="container mx-auto"

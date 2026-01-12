@@ -203,63 +203,95 @@ export async function* streamOllamaResponse(
 
 /**
  * Example: RAG-enhanced streaming with Qdrant context injection
+ * ✅ Phase 97: Added error handling and graceful fallbacks
  */
 export async function* streamRAGResponse(
 	query: string,
 	qdrantCollection: string = 'knowledge_base'
 ): AsyncGenerator<StreamChunk> {
-	// 1. Get embeddings
-	yield {
-		type: 'metadata',
-		metadata: { stage: 'embedding' },
-		timestamp: Date.now()
-	};
+	try {
+		// 1. Get embeddings
+		yield {
+			type: 'metadata',
+			metadata: { stage: 'embedding' },
+			timestamp: Date.now()
+		};
 
-	const embeddingResponse = await fetch('http://localhost:11434/api/embeddings', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			model: 'embeddinggemma:latest',
-			prompt: query
-		})
-	});
+		let embedding: number[] = [];
+		try {
+			const embeddingResponse = await fetch('http://localhost:11434/api/embeddings', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					model: 'nomic-embed-text:latest',
+					prompt: query
+				})
+			});
 
-	const { embedding } = await embeddingResponse.json();
+			if (embeddingResponse.ok) {
+				const data = await embeddingResponse.json();
+				embedding = data.embedding || [];
+			}
+		} catch (err) {
+			console.warn('Embedding generation failed, using direct query:', err);
+			// Continue without embeddings - will use direct Ollama
+		}
 
-	// 2. Vector search
-	yield {
-		type: 'metadata',
-		metadata: { stage: 'search' },
-		timestamp: Date.now()
-	};
+		// 2. Vector search (optional - skip if no embeddings)
+		yield {
+			type: 'metadata',
+			metadata: { stage: 'search' },
+			timestamp: Date.now()
+		};
 
-	const searchResponse = await fetch(`http://localhost:6333/collections/${qdrantCollection}/points/search`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			vector: embedding,
-			limit: 5,
-			with_payload: true
-		})
-	});
+		let context = '';
+		if (embedding.length > 0) {
+			try {
+				const searchResponse = await fetch(`http://localhost:6333/collections/${qdrantCollection}/points/search`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						vector: embedding,
+						limit: 5,
+						with_payload: true
+					})
+				});
 
-	const searchResults = await searchResponse.json();
+				if (searchResponse.ok) {
+					const searchResults = await searchResponse.json();
+					context = searchResults.result
+						?.map((r: any) => r.payload?.text || '')
+						.join('\n\n') || '';
+				}
+			} catch (err) {
+				console.warn('Vector search failed, using query-only mode:', err);
+				// Continue without context
+			}
+		}
 
-	// 3. Build context
-	const context = searchResults.result
-		.map((r: any) => r.payload?.text || '')
-		.join('\n\n');
+		// 3. Build enhanced prompt
+		yield {
+			type: 'metadata',
+			metadata: { stage: 'generate', contextSize: context.length },
+			timestamp: Date.now()
+		};
 
-	yield {
-		type: 'metadata',
-		metadata: { stage: 'generate', contextSize: context.length },
-		timestamp: Date.now()
-	};
+		// 4. Stream LLM response with injected context
+		const enhancedPrompt = context
+			? `Context:\n${context}\n\nQuestion: ${query}\n\nAnswer:`
+			: `Question: ${query}\n\nAnswer:`;
 
-	// 4. Stream LLM response with injected context
-	const enhancedPrompt = `Context:\n${context}\n\nQuestion: ${query}\n\nAnswer:`;
-
-	yield* streamOllamaResponse(enhancedPrompt);
+		yield* streamOllamaResponse(enhancedPrompt);
+	} catch (error) {
+		console.error('RAG streaming error:', error);
+		yield {
+			type: 'error',
+			error: error instanceof Error ? error.message : 'RAG streaming failed',
+			timestamp: Date.now()
+		};
+		// Fallback to direct query
+		yield* streamOllamaResponse(query);
+	}
 }
 
 /**

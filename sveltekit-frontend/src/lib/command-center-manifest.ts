@@ -209,7 +209,7 @@ export function enrichRoutesWithPhase72(
  errorSummary: Record<
  string,
  {
- totalErrors: number; lastSeen, string | null;
+ totalErrors: number, lastSeen, string | null,
  }
  >
 ): CommandCenterRoute[] {

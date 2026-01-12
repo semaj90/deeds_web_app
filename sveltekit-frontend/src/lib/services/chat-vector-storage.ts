@@ -52,10 +52,10 @@ class ChatVectorStorage {
             didYouMean: [],
             contextualRecommendations: { similarPastQueries: [], relatedTopics: [], nextSteps: [] },
             temporalInsights: { commonAtThisTime: [], seasonalTrends: [], userPatterns: [] }
-        };
+        },
     }
 
-    async searchChatHistory(_userId: string, _query: string, _options?: { timeRange?: { start: Date, end: Date }; intentFilter?: string[]; minSimilarity?: number; maxResults?: number }): Promise<SemanticSearchResult[]> {
+    async searchChatHistory(_userId: string, _query: string, _options?: { timeRange?: { start: Date, end: Date }, intentFilter?: string[]; minSimilarity?: number; maxResults?: number }): Promise<SemanticSearchResult[]> {
         return [];
     }
 

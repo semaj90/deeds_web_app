@@ -23,7 +23,7 @@ describe('POST /api/routes/metadata', () => {
  priority: 50,
  badges: ['ai'],
  createdAt: new Date( updatedAt: new Date( archivedAt: null,
- };
+ },
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(undefined);
  vi.mocked(queries.createRouteMetadata).mockResolvedValue(mockRoute);

@@ -245,7 +245,7 @@ class EmbeddingCacheService {
      * Batch cache multiple embeddings efficiently
      */
     async batchCacheEmbeddings(
-        items: Array<{ text: string, embedding: number[]; model?, string }>
+        items: Array<{ text: string, embedding: number[], model?, string }>
     ): Promise<void> {
         if (!typedRedisService.isHealthy() || !items || items.length === 0) return;
         try {

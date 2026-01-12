@@ -80,7 +80,7 @@ let variantClasses = $derived({
 	{/if}
 </div>
 
-{#snippet AccordionItemComponent({ item, variant }: { item: AccordionItem; variant: string })}
+{#snippet AccordionItemComponent({ item, variant }: { item: AccordionItem, variant: string })}
 	{@const ctx = getContext<{ isOpen: (id, string) => boolean; toggle: (id: string) => void }>('accordion')}
 	{@const isOpen = ctx?.isOpen(item.id) ?? false}
 

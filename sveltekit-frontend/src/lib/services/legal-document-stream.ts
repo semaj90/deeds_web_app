@@ -201,8 +201,8 @@ export class LegalDocumentStreamService {
         connectionId: string,
         document: LegalDocument,
         analysisOptions: {
-            includeReasoning?: boolean;
-            enableSimilaritySearch?: boolean;
+            includeReasoning?: boolean,
+            enableSimilaritySearch?: boolean,
             streamProgress?: boolean;
         } = {}
     ): Promise<void> {
@@ -354,8 +354,8 @@ export class LegalDocumentStreamService {
         connectionId: string,
         documents: LegalDocument[],
         batchOptions: {
-            batchSize?: number;
-            parallelProcessing?: boolean;
+            batchSize?: number,
+            parallelProcessing?: boolean,
             priorityOrder?: 'fifo' | 'complexity' | 'size';
         } = {}
     ): Promise<void> {

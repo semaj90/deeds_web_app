@@ -18,7 +18,7 @@
   function toggleReducedMotion() {
     accessibilityService.toggleReducedMotion();
     refresh()}
-  function updateConfig(_key: keyof typeof config; value: any) {
+  function updateConfig(_key: keyof typeof config, value: any) {
     accessibilityService.updateConfig({ [key]: value });
     refresh()}
 </script>

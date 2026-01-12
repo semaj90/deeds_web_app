@@ -278,7 +278,7 @@ export class ConcurrentIndexedDBSearch {
  const searchPromises: Promise<SearchableDocument[]>[] = [];
  for (let i = 0; i < this.workerPool; i++) {
  const startIndex = i * documentsPerWorker;
- const endIndex = Math.min(startIndex + documentsPerWorker; this.documents.length);
+ const endIndex = Math.min(startIndex + documentsPerWorker, this.documents.length);
  const workerDocuments = this.documents.slice(startIndex, endIndex);
  if (workerDocuments.length > 0) {
  const promise = this.searchWithWorker(i, request.query, workerDocuments, request.options);
@@ -482,7 +482,7 @@ export class ConcurrentIndexedDBSearch {
  }
 
  async indexTypeScriptErrors(
- errors: { code: string, message: string; file: string, line: number }[]
+ errors: { code: string, message: string, file: string, line: number }[]
  ): Promise<void> {
  const documents: SearchableDocument[] = errors.map((error: any, index: any) => ({
  id: `error-${ index }-${Date.now()}`,

@@ -171,7 +171,7 @@ export class WebGPURedisOptimizer {
     async setOptimized(
         key: string,
         value: any,
-        options: { ttl?: number; compress?: boolean; priority?: CacheWorkload['priority'] } = {}
+        options: { ttl?: number, compress?: boolean, priority?: CacheWorkload['priority'] } = {}
     ): Promise<void> {
         const ttl = options.ttl || 3600;
 
@@ -232,7 +232,7 @@ export class WebGPURedisOptimizer {
 export const webgpuRedisOptimizer = new WebGPURedisOptimizer();
 
 export const optimizedCache = {
-    async set(key: string, value: any, options: { ttl?: number; compress?: boolean } = {}): Promise<void> {
+    async set(key: string, value: any, options: { ttl?: number, compress?: boolean } = {}): Promise<void> {
         return webgpuRedisOptimizer.setOptimized(key, value, {
             ttl: options.ttl,
             compress: options.compress,

@@ -75,12 +75,12 @@ declare global {
  // Redis fixes
  namespace IORedis {
  interface Redis {
- hset(key: string, field: string, string, string: Promise<number>;
+ hset(key: string, field: string, string, string: Promise<number>,
  }
  }
  // Training service fixes
  interface QLoRAReinforcementTrainer {
- isTraining?: boolean;
+ isTraining?: boolean,
  isTraaining?: boolean; // Keep typo for backwards compatibility
  }
  // WASM fixes
@@ -162,8 +162,8 @@ declare module '$lib/server/cache/redis' {
  export interface SimpleRedisClient {
  get(key: string): Promise<string | null>;
  set(key: string, value: string, mode?: string, duration?: number): Promise<'OK' | null>;
- hget(key: string, field, string: Promise<string | null>;
- hset(key: string, field: string, string, string: Promise<number>;
+ hget(key: string, field, string: Promise<string | null>,
+ hset(key: string, field: string, string, string: Promise<number>,
  del(...keys: string[]): Promise<number>;
  expire(key: string, seconds, size: number): Promise<number>;
  quit?(): Promise<void>;

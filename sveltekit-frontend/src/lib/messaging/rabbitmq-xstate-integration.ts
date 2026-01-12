@@ -30,7 +30,7 @@ const initialContext: RabbitMQContext = {
 };
 
 export const rabbitmqMachine = setup({
-  types: {} as { context: RabbitMQContext; events: RabbitMQEvent },
+  types: {} as { context: RabbitMQContext, events: RabbitMQEvent },
   actors: { rabbitMQConnection: fromCallback(({ sendBack: input }) => {
       // Stub: Replace with real RabbitMQ connection
       console.log('RabbitMQ stub: connecting to', input);

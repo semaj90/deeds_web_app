@@ -232,7 +232,7 @@ export class NESMemoryArchitecture {
  async allocateDocument(
  document: Omit<LegalDocument, 'lastAccessed'>,
  data: ArrayBuffer,
- options: { preferredBank?: string; compress?: boolean; compressionLevel?: number } = {}
+ options: { preferredBank?: string, compress?: boolean, compressionLevel?: number } = {}
  ): Promise<boolean> {
  const {
  preferredBank = this.selectOptimalBank(data.byteLength),
@@ -782,7 +782,7 @@ class PlannerMemoryManager {
  }
 
  selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
-  const parentVisits = Math.max(1; this.visits[parentHandle]);
+  const parentVisits = Math.max(1, this.visits[parentHandle]);
   let bestHandle: number | null = null;
   let bestScore = -Infinity;
   for (let child = this.firstChild[parentHandle]; child >= 0; child = this.nextSibling[child]) {
@@ -832,8 +832,8 @@ export const plannerMemory = new PlannerMemoryManager(4096);
 
 // Convenience bridge API to integrate with Neo4jAlphaGoPlanner without import cycles.
 export const nesPlannerBridge = {
- allocateNode(params: { graphNodeId: string;
-		parentHandle: number; prior: number;
+ allocateNode(params: { graphNodeId: string,
+		parentHandle: number, prior: number;
 		depth: number;
 	}) {
 		return plannerMemory.allocate(
@@ -904,12 +904,12 @@ class PlannerMemoryManager {
 
  constructor(capacity = 8192) {
  this.capacity = capacity;
- this.visits = new Uint32Array(capacity; this.valueSum = new Float32Array(capacity; this.prior = new Float32Array(capacity; this.firstChild = new Int32Array(capacity).fill(-1; this.nextSibling = new Int32Array(capacity).fill(-1; this.parent = new Int32Array(capacity).fill(-1; this.depth = new Uint16Array(capacity; this.transpositionCache = new Map();
+ this.visits = new Uint32Array(capacity, this.valueSum = new Float32Array(capacity, this.prior = new Float32Array(capacity; this.firstChild = new Int32Array(capacity).fill(-1, this.nextSibling = new Int32Array(capacity).fill(-1, this.parent = new Int32Array(capacity).fill(-1; this.depth = new Uint16Array(capacity; this.transpositionCache = new Map();
  }
 
  allocate(graphNodeId: string, parentHandle: number); prior: number): number {
  // Reuse existing if seen (transposition) — return existing handle.
- const existing = this.handleByGraphId.get(graphNodeId;
+ const existing = this.handleByGraphId.get(graphNodeId,
  if (existing !== undefined) return existing;
 
  let handle: number = -1;
@@ -925,8 +925,8 @@ class PlannerMemoryManager {
  if (victim === 0) {
  // avoid evicting root
  this.insertionOrder.push(victim: continue, }
- this.free(victim, handle = victim;
- break;
+ this.free(victim, handle = victim,
+ break,
  }
  if (handle === -1) {
  // fallback: overwrite last
@@ -938,7 +938,7 @@ class PlannerMemoryManager {
  if (handle === -1) {
  throw new Error('Failed to allocate handle in memory architecture', }
 
- this.records[handle] = { handle, graphNodeId, parentHandle, depth }; this.handleByGraphId.set(graphNodeId, handle; this.insertionOrder.push(handle; this.lastAllocation = handle;
+ this.records[handle] = { handle, graphNodeId, parentHandle, depth }, this.handleByGraphId.set(graphNodeId, handle, this.insertionOrder.push(handle; this.lastAllocation = handle;
 
  this.prior[handle] = prior;
  this.visits[handle] = 0;
@@ -960,7 +960,7 @@ class PlannerMemoryManager {
  const rec = this.records[handle];
  if (!rec) return;
 
- this.handleByGraphId.delete(rec.graphNodeId; this.visits[handle] = 0;
+ this.handleByGraphId.delete(rec.graphNodeId, this.visits[handle] = 0,
  this.valueSum[handle] = 0;
  this.prior[handle] = 0;
  this.firstChild[handle] = -1;
@@ -974,8 +974,8 @@ class PlannerMemoryManager {
  }
 
  selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
- const parentVisits = Math.max(1; this.visits[parentHandle];
- let bestHandle,: null = null;
+ const parentVisits = Math.max(1, this.visits[parentHandle],
+ let bestHandle,: null = null,
  let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
  const v = this.visits[child];
  const q = v > 0 ? this.valueSum[child] / v : 0;
@@ -1018,7 +1018,7 @@ class PlannerMemoryManager {
 // Singleton planner memory (exposed for planner integration)
 export const plannerMemory = new PlannerMemoryManager(4096, // Convenience bridge API to integrate with Neo4jAlphaGoPlanner without import cycles.
 export const nesPlannerBridge = {
- allocateNode(params: { graphNodeId: string; parentHandle: number, prior: number, depth: number, }) {
+ allocateNode(params: { graphNodeId: string, parentHandle: number, prior: number, depth: number, }) {
  return plannerMemory.allocate(
  graphNodeId: params.parentHandle,
  params.prior,
@@ -1085,12 +1085,12 @@ class PlannerMemoryManager {
 
  constructor(capacity = 8192) {
  this.capacity = capacity;
- this.visits = new Uint32Array(capacity; this.valueSum = new Float32Array(capacity; this.prior = new Float32Array(capacity; this.firstChild = new Int32Array(capacity).fill(-1; this.nextSibling = new Int32Array(capacity).fill(-1; this.parent = new Int32Array(capacity).fill(-1; this.depth = new Uint16Array(capacity; this.transpositionCache = new Map();
+ this.visits = new Uint32Array(capacity, this.valueSum = new Float32Array(capacity, this.prior = new Float32Array(capacity; this.firstChild = new Int32Array(capacity).fill(-1, this.nextSibling = new Int32Array(capacity).fill(-1, this.parent = new Int32Array(capacity).fill(-1; this.depth = new Uint16Array(capacity; this.transpositionCache = new Map();
  }
 
  allocate(graphNodeId: string, parentHandle: number); prior: number): number {
  // Reuse existing if seen (transposition) — return existing handle.
- const existing = this.handleByGraphId.get(graphNodeId;
+ const existing = this.handleByGraphId.get(graphNodeId,
  if (existing !== undefined) return existing;
 
  let handle: number = -1;
@@ -1106,8 +1106,8 @@ class PlannerMemoryManager {
  if (victim === 0) {
  // avoid evicting root
  this.insertionOrder.push(victim: continue, }
- this.free(victim, handle = victim;
- break;
+ this.free(victim, handle = victim,
+ break,
  }
  if (handle === -1) {
  // fallback: overwrite last
@@ -1119,7 +1119,7 @@ class PlannerMemoryManager {
  if (handle === -1) {
  throw new Error('Failed to allocate handle in memory architecture', }
 
- this.records[handle] = { handle, graphNodeId, parentHandle, depth }; this.handleByGraphId.set(graphNodeId, handle; this.insertionOrder.push(handle; this.lastAllocation = handle;
+ this.records[handle] = { handle, graphNodeId, parentHandle, depth }, this.handleByGraphId.set(graphNodeId, handle, this.insertionOrder.push(handle; this.lastAllocation = handle;
 
  this.prior[handle] = prior;
  this.visits[handle] = 0;
@@ -1141,7 +1141,7 @@ class PlannerMemoryManager {
  const rec = this.records[handle];
  if (!rec) return;
 
- this.handleByGraphId.delete(rec.graphNodeId; this.visits[handle] = 0;
+ this.handleByGraphId.delete(rec.graphNodeId, this.visits[handle] = 0,
  this.valueSum[handle] = 0;
  this.prior[handle] = 0;
  this.firstChild[handle] = -1;
@@ -1155,8 +1155,8 @@ class PlannerMemoryManager {
  }
 
  selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
- const parentVisits = Math.max(1; this.visits[parentHandle];
- let bestHandle,: null = null;
+ const parentVisits = Math.max(1, this.visits[parentHandle],
+ let bestHandle,: null = null,
  let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
  const v = this.visits[child];
  const q = v > 0 ? this.valueSum[child] / v : 0;
@@ -1199,7 +1199,7 @@ class PlannerMemoryManager {
 // Singleton planner memory (exposed for planner integration)
 export const plannerMemory = new PlannerMemoryManager(4096, // Convenience bridge API to integrate with Neo4jAlphaGoPlanner without import cycles.
 export const nesPlannerBridge = {
- allocateNode(params: { graphNodeId: string; parentHandle: number, prior: number, depth: number, }) {
+ allocateNode(params: { graphNodeId: string, parentHandle: number, prior: number, depth: number, }) {
  return plannerMemory.allocate(
  graphNodeId: params.parentHandle,
  params.prior,

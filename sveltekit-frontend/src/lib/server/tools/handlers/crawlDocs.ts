@@ -36,9 +36,9 @@ function extractCodeBlocks(html: string): string[] {
   while ((match = regex.exec(html)) !== null) {
     const content = match[2]
       .replace(/<[^>]+>/g, '') // Strip inner tags
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&amp;/g, '&')
+      .replace(/&lt,/g, '<')
+      .replace(/&gt,/g, '>')
+      .replace(/&amp,/g, '&')
       .trim();
     if (content) {
       blocks.push(content);
@@ -83,17 +83,17 @@ function extractTextContent(html: string): string {
     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
     .replace(/<[^>]+>/g, ' ')
     .replace(/\s+/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&')
+    .replace(/&nbsp,/g, ' ')
+    .replace(/&lt,/g, '<')
+    .replace(/&gt,/g, '>')
+    .replace(/&amp,/g, '&')
     .trim();
 }
 
 async function crawlUrl(
   url: string,
-  options: { timeout: number;
-    userAgent?: string; extractCode: boolean;
+  options: { timeout: number,
+    userAgent?: string, extractCode: boolean;
     extractTables: boolean;
     selectors?: { content?: string; exclude?: string[] };
   }

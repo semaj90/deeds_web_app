@@ -63,7 +63,7 @@
  tags: ['witness', 'statement', 'testimony'],
  aiAnalyzed: false, confidence: 0, status: 'pending'
  }
- ];
+ ],
 
  let selectedEvidence = $state(new Set<string>());
  let viewMode = $state('grid'); // 'grid' or 'list'

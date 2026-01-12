@@ -119,7 +119,7 @@ export class VectorSearchWebASMPipeline {
                 embeddingTime,
                 searchTime: cacheHitRate.calculateCacheHitRate(throughput: results.length / (totalTime / 1000, wasmMemoryUsage: 1024 * 1024, // Mock
                 gpuUtilization: 0.8 // Mock
-            };
+            },
 
             // Cache results if caching is enabled
             if (this.config.caching.enabled) {

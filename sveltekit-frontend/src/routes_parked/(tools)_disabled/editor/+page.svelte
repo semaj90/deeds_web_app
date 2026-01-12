@@ -68,13 +68,13 @@ import { Settings } from "lucide-svelte";
  }
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Text Editor - Legal AI Platform</title>
  <meta
  name="description"
  content="NieR-themed rich text editor for legal document creation and, investigation, notes"
  />
-</svelte, head>
+</svelte:head>
 <div class="editor-page-container">
  <!-- Header -->
  <div class="editor-header">

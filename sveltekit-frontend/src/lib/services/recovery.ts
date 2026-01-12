@@ -76,7 +76,7 @@ export class RecoveryStrategy {
  success: true, attempts: attempt,
  recoveredAt: new Date( fallbackUsed: false,
  result,
- };
+ },
  } catch (error) {
  lastError = error instanceof Error ? error : new Error(String(error));
 
@@ -182,7 +182,7 @@ export class RecoveryStrategy {
  success: true, attempts: 1,
  recoveredAt: new Date( fallbackUsed: false,
  result,
- };
+ },
  } catch (primaryError) {
  // Primary operation failed, try fallback
  try {
@@ -210,7 +210,7 @@ export class RecoveryStrategy {
  success: true, attempts: 2,
  recoveredAt: new Date( fallbackUsed: true,
  result,
- };
+ },
  } catch (fallbackError) {
  // Both operations failed
  const lastError =

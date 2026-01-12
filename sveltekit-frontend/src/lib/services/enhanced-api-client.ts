@@ -174,8 +174,8 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  */
  async getCases(
  _options: {
- page?: number;
- limit?: number;
+ page?: number,
+ limit?: number,
  sortBy?: 'title' | 'created_at' | 'updated_at' | 'status' | 'priority';
  sortOrder?: 'asc' | 'desc';
  status?: 'open' | 'closed' | 'pending' | 'archived';
@@ -198,8 +198,8 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Create new case
  */
  async createCase(
- caseData: { title: string;
- description?: string;
+ caseData: { title: string,
+ description?: string,
  caseNumber?: string;
  status?: 'open' | 'closed' | 'pending' | 'archived';
  priority?: 'low' | 'medium' | 'high' | 'urgent';
@@ -215,7 +215,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Update case
  */
  async updateCase(
- id: string, caseData: Partial<{ title: string, description: string; caseNumber: string, status: 'open' | 'closed' | 'pending' | 'archived';
+ id: string, caseData: Partial<{ title: string, description: string, caseNumber: string, status: 'open' | 'closed' | 'pending' | 'archived',
  priority: 'low' | 'medium' | 'high' | 'urgent', category: string; metadata: Record<string, unknown>;
  }>,
  signal?: AbortSignal
@@ -240,8 +240,8 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  */
  async getEvidence(
  _options: {
- page?: number;
- limit?: number;
+ page?: number,
+ limit?: number,
  caseId?: string;
  evidenceType?: string;
  isPublic?: boolean;
@@ -263,7 +263,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Create new evidence
  */
  async createEvidence(
- evidenceData: { caseId: string, title: string; evidenceType: string;
+ evidenceData: { caseId: string, title: string, evidenceType: string,
  description?: string;
  fileUrl?: string;
  fileName?: string;
@@ -290,7 +290,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Update evidence
  */
  async updateEvidence(
- id: string, evidenceData: Partial<{ title: string, evidenceType: string; description: string, fileUrl: string; fileName: string, fileSize: number; mimeType: string, hash: string; tags: string[], chainOfCustody: unknown[]; aiSummary: string, summary: string; isAdmissible: boolean, confidentialityLevel, string;
+ id: string, evidenceData: Partial<{ title: string, evidenceType: string, description: string, fileUrl: string, fileName: string, fileSize: number; mimeType: string, hash: string; tags: string[], chainOfCustody: unknown[]; aiSummary: string, summary: string; isAdmissible: boolean, confidentialityLevel, string;
  }>,
  signal?: AbortSignal
  ): Promise<ApiResponse<unknown>> {
@@ -314,8 +314,8 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  */
  async getReports(
  _options: {
- page?: number;
- limit?: number;
+ page?: number,
+ limit?: number,
  caseId?: string;
  reportType?: string;
  status?: string;
@@ -337,8 +337,8 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Create new report
  */
  async createReport(
- reportData: { title: string;
- description?: string; reportType: string;
+ reportData: { title: string,
+ description?: string, reportType: string;
  caseId?: string;
  content?: string;
  status?: string;
@@ -357,7 +357,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Update report
  */
  async updateReport(
- id: string, reportData: Partial<{ title: string, description: string; reportType: string, caseId: string; content: string, status: string; metadata: Record<string, unknown>;
+ id: string, reportData: Partial<{ title: string, description: string, reportType: string, caseId: string, content: string, status: string; metadata: Record<string, unknown>;
  }>,
  signal?: AbortSignal
  ): Promise<ApiResponse<unknown>> {
@@ -381,8 +381,8 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  */
  async getPersonsOfInterest(
  _options: {
- page?: number;
- limit?: number;
+ page?: number,
+ limit?: number,
  riskLevel?: string;
  caseId?: string;
  signal?: AbortSignal;
@@ -403,8 +403,8 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Create new person of interest
  */
  async createPersonOfInterest(
- personData: { name: string;
- description?: string; riskLevel: string;
+ personData: { name: string,
+ description?: string, riskLevel: string;
  caseId?: string;
  contactInfo?: Record<string, unknown>;
  aliases?: string[];
@@ -423,7 +423,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Update person of interest
  */
  async updatePersonOfInterest(
- id: string, personData: Partial<{ name: string, description: string; riskLevel: string, caseId: string; contactInfo: Record<string, unknown>;
+ id: string, personData: Partial<{ name: string, description: string, riskLevel: string, caseId: string, contactInfo: Record<string, unknown>;
  aliases: string[], metadata: Record<string, unknown>;
  }>,
  signal?: AbortSignal

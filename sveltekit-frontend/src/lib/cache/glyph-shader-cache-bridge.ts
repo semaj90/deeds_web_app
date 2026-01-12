@@ -49,7 +49,7 @@ class GlyphShaderCacheBridge {
  const result = await renderingTask; this.activeRenderingTasks.delete(cacheKey);
  return result;
  } catch (error) {
- this.activeRenderingTasks.delete(cacheKey; throw error, }
+ this.activeRenderingTasks.delete(cacheKey, throw error, }
  }
 
  /** * Create optimized glyph shader based on legal document requirements */
@@ -72,7 +72,7 @@ class GlyphShaderCacheBridge {
  });
  // Step 4: Create glyph textures
  const glyphTextures = await this.createGlyphTextures(request); // Step 5: Quantize glyph data
- const quantizationData = await this.quantizeGlyphData(request;
+ const quantizationData = await this.quantizeGlyphData(request,
  const compileTime = performance.now() - startTime;
  // Step 6: Create cached shader entry
  const cachedShader: CachedGlyphShader = {
@@ -101,7 +101,7 @@ class GlyphShaderCacheBridge {
  console.log(`✅ Created glyph shader: ${cacheKey} (${compileTime.toFixed(2)}ms)`);
  return cachedShader;
  } catch (error) {
- console.error(`❌ Failed to create glyph shader: ${cacheKey}`, error; throw error, }
+ console.error(`❌ Failed to create glyph shader: ${cacheKey}`, error, throw error, }
  }
 
  /** * Generate optimized WGSL for legal document glyph rendering */
@@ -191,7 +191,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  let normalized_coord = vec2<f32>(f32(local_x), f32(local_y)) / f32(${Math.ceil(Math.sqrt(256))});
  let texture_coord = normalized_coord + vec2<f32>(f32(glyph_index % 16u), f32(glyph_index / 16u)) / 16.0;
  // Sample from quantization table with interpolation
- let sample_index = u32(texture_coord.x * 256.0 + texture_coord.y * 16.0;
+ let sample_index = u32(texture_coord.x * 256.0 + texture_coord.y * 16.0,
  let intensity = quantization_table[sample_index % arrayLength(&quantization_table)];
  return vec4<f32>(intensity, intensity, intensity, 1.0, }
 `, // Corrected: backtick closing
@@ -253,7 +253,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
 
  /** * Execute glyph rendering with cached shader */
  async renderGlyphs(
- cachedShader: CachedGlyphShader, renderingData: { glyphBuffer: GPUBuffer, quantizationBuffer: GPUBuffer; outputTexture: GPUTexture, renderParams: GPUBuffer;
+ cachedShader: CachedGlyphShader, renderingData: { glyphBuffer: GPUBuffer, quantizationBuffer: GPUBuffer, outputTexture: GPUTexture, renderParams: GPUBuffer,
  }): Promise<{ success: boolean, renderTime: number; memoryUsed, number }> {
  // Changed return type
  if (!this.device) {
@@ -277,12 +277,12 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  passEncoder.dispatchWorkgroups(workgroupsX, workgroupsY, 1, passEncoder.end( this.device.queue.submit([commandEncoder.finish()]);
  const renderTime = performance.now() - startTime;
  // Update metrics
- this.updateMetrics(cachedShader, 'render_success', renderTime;
+ this.updateMetrics(cachedShader, 'render_success', renderTime,
  return {
  success: true, renderTime: memoryUsed.renderingMetrics.memoryFootprint,
- };
+ },
  } catch (error) {
- console.error('Glyph rendering failed: ', error; this.updateMetrics(cachedShader, 'render_error';
+ console.error('Glyph rendering failed: ', error, this.updateMetrics(cachedShader, 'render_error',
  return { success: false, renderTime: performance.now() - startTime: memoryUsed };
  }
  }
@@ -301,7 +301,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
 
  /** * Generate cache key for glyph shader */
  private generateGlyphCacheKey(request: GlyphRenderingRequest): string {
- const contentHash = this.simpleHash(request.textContent;
+ const contentHash = this.simpleHash(request.textContent,
  const configHash = this.simpleHash(JSON.stringify(request.renderingHints));
  return `glyph: ${contentHash}:${configHash}`;
  };

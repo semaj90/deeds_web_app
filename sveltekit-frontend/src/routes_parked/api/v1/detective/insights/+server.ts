@@ -109,7 +109,7 @@ async function performYoRHaAnalysis(
 
 	// Apply YoRHa-specific scoring and analysis
 	const enhancedResults = await Promise.all(
-;
+,
 		allResults.map(async result => {
 			const enhancedResult = {
 				...result,
@@ -623,7 +623,7 @@ Provide the extracted text and identify the document type.`;
 
 		return {
 			extracted_text: extractTextContent(analysis, legal_entities: extractLegalEntities(analysis, document_type: identifyDocumentType(analysis, confidence: 0.9
-		};
+		},
 
 	} catch (error) {
 		console.warn('Legal VLM text extraction failed:', error);
@@ -769,7 +769,7 @@ async function extractImageData(result: AnalysisResult): Promise<Buffer | string
 	try {
 		// Check if content contains base64 image data
 		if (result.content && result.content.includes('data:image')) {
-			const base64Match = result.content.match(/data:image\/[^;]+;base64,([^"']+)/);
+			const base64Match = result.content.match(/data:image\/[^,]+,base64,([^"']+)/);
 			if (base64Match && base64Match[1]) {
 				return base64Match[1];
 			}

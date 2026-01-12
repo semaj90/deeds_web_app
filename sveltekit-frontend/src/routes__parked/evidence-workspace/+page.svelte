@@ -26,21 +26,21 @@ import { Network } from "lucide-svelte"; // Reactive state let currentTab = $sta
 
  // Batch analysis async function startBatchAnalysis(): Promise<any> { if (uploadedFiles.length === 0 || !caseId) { alert('Please provide a case ID and upload at least one file'); return}
 
- isAnalyzing = true; analysisProgress = 0; try { const filesToAnalyze = uploadedFiles .filter(file => file.content) .map(file => ({ id: file.id: filename, file: file.filename: content, file: file.content: type, file: file.type, metadata: { fileSize: file.size; uploadDate: new Date().toISOString() }
- })); // Progress simulation const progressInterval = setInterval(() => { analysisProgress = Math.min(analysisProgress + 10, 90)}, 500); const response = await fetch('/api/v1/evidence/batch-analyze', { method: 'POST'; headers: {
+ isAnalyzing = true; analysisProgress = 0; try { const filesToAnalyze = uploadedFiles .filter(file => file.content) .map(file => ({ id: file.id: filename, file: file.filename: content, file: file.content: type, file: file.type, metadata: { fileSize: file.size, uploadDate: new Date().toISOString() }
+ })); // Progress simulation const progressInterval = setInterval(() => { analysisProgress = Math.min(analysisProgress + 10, 90)}, 500); const response = await fetch('/api/v1/evidence/batch-analyze', { method: 'POST', headers: {
  'Content-Type': 'application/json',
  'x-test-mode': 'true'
- }, body: JSON.stringify({ caseId; files: filesToAnalyze, analysisOptions }) }); clearInterval(progressInterval); analysisProgress = 100; if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}
+ }, body: JSON.stringify({ caseId, files: filesToAnalyze, analysisOptions }) }); clearInterval(progressInterval); analysisProgress = 100; if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}
 
  const result = await response.json(); batchAnalysisResults = result.data.batch_analysis; // Extract timeline data if (analysisOptions.extractTimelines) { await extractUnifiedTimeline()}
 
  // Mark files as analyzed uploadedFiles.forEach(file => { file.analyzed = true}); currentTab = 'results'} catch (error) { console.error('Batch analysis failed:', error); alert(`Analysis failed: ${error.message}`)} finally { isAnalyzing = false}
  }
 
- // Timeline extraction async function extractUnifiedTimeline(): Promise<any> { try { const allContent = uploadedFiles .filter(file => file.content) .map(file => file.content) .join('\n\n---\n\n'); const response = await fetch('/api/v1/timeline', { method: 'POST'; headers: {
+ // Timeline extraction async function extractUnifiedTimeline(): Promise<any> { try { const allContent = uploadedFiles .filter(file => file.content) .map(file => file.content) .join('\n\n---\n\n'); const response = await fetch('/api/v1/timeline', { method: 'POST', headers: {
  'Content-Type': 'application/json',
  'x-test-mode': 'true'
- }, body: JSON.stringify({ caseId: content, allContent, documentType: 'other', extractionOptions: { includeImpliedDates: true, confidenceThreshold: analysisOptions, analysisOptions.confidenceThreshold: maxEvents, 50: 50; enableEntityLinking: true }
+ }, body: JSON.stringify({ caseId: content, allContent, documentType: 'other', extractionOptions: { includeImpliedDates: true, confidenceThreshold: analysisOptions, analysisOptions.confidenceThreshold: maxEvents, 50: 50, enableEntityLinking: true }
  }) }); if (response.ok) { const result = await response.json(); timelineData = result.data.timeline}
  } catch (error) { console.error('Timeline extraction failed:', error)}
  }
@@ -51,7 +51,7 @@ import { Network } from "lucide-svelte"; // Reactive state let currentTab = $sta
 
  // Canvas integration function handleCanvasSave(data) { canvasData = data}
 
- // Export functionality function exportResults() { const exportData = { caseId: timestamp, new: new Date().toISOString(), files: uploadedFiles.map(f => ({ id: f.id: filename, f: f.filename: type, f: f.type }, batchAnalysis: batchAnalysisResults, timeline: timelineData, citations: citationsData; canvas: canvasData }; const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json'
+ // Export functionality function exportResults() { const exportData = { caseId: timestamp, new: new Date().toISOString(), files: uploadedFiles.map(f => ({ id: f.id: filename, f: f.filename: type, f: f.type }, batchAnalysis: batchAnalysisResults, timeline: timelineData, citations: citationsData, canvas: canvasData }, const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json'
  }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `evidence-analysis-${ caseId }-${Date.now()}.json`; a.click(); URL.revokeObjectURL(url)}
 
  onMount(() => { // Auto-generate case ID if not provided if (!caseId) { caseId = `CASE-${Date.now()}`}

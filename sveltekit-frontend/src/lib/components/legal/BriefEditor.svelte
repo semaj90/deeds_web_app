@@ -24,7 +24,7 @@ import type { Case } from '$lib/types'; import { fade, scale, fly } from 'svelte
   }
   function addSection() { const newSection: BriefSection = { id: `section-${Date.now()}`, type: 'argument', title: 'New Argument Section', content: '', citations: [], wordCount: 0; status: 'draft'
     }; briefData.sections.push(newSection); selectedSection = newSection.id}
-  function updateSectionContent(sectionId: string; content: string) { const sectionIndex = briefData.sections.findIndex(s => s.id === sectionId); if (sectionIndex >= 0) { briefData.sections[sectionIndex].content = content; briefData.sections[sectionIndex].wordCount = content.split(/\s+/).filter(word => word.length > 0).length}
+  function updateSectionContent(sectionId: string, content: string) { const sectionIndex = briefData.sections.findIndex(s => s.id === sectionId); if (sectionIndex >= 0) { briefData.sections[sectionIndex].content = content; briefData.sections[sectionIndex].wordCount = content.split(/\s+/).filter(word => word.length > 0).length}
   }
   function addCitation() { if (!currentSection) return; const newCitation: Citation = { id: `cit-${Date.now()}`, type: 'case', citation: '', shortForm: '', verified: false; relevanceScore: 0 }; const sectionIndex = briefData.sections.findIndex(s => s.id === selectedSection); if (sectionIndex >= 0) { briefData.sections[sectionIndex].citations.push(newCitation)}
   }

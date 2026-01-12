@@ -888,7 +888,7 @@ Object.assign(handlers, {
 
 		try {
 			const response = await fetch(url, {
-				headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Phase76Bot/1.0)' }
+				headers: { 'User-Agent': 'Mozilla/5.0 (compatible, Phase76Bot/1.0)' }
 			});
 
 			if (!response.ok) throw new Error(`Crawl error: ${response.status}`);
@@ -1798,7 +1798,7 @@ Object.assign(handlers, {
  * Execute an ACP tool
  */
 export async function executeACPTool(toolName: string, unknown: Promise<ToolResult> {
-	const tool = TOOLS[toolName];
+	const tool = TOOLS[toolName],
 
 	if (!tool) {
 		return {

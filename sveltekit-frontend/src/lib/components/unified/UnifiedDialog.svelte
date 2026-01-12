@@ -96,7 +96,7 @@ import type { User } from '$lib/types';
     if (!webgpuEffects) return
     // graceful fallback if not supported
     if (!canvas || typeof (navigator as unknown).gpu === 'undefined') {
-      console.info('WebGPU not supported or not available; using CSS fallback for background effects.');
+      console.info('WebGPU not supported or not available, using CSS fallback for background effects.');
       return}
     try {
       const adapter = await (navigator as unknown).gpu.requestAdapter();

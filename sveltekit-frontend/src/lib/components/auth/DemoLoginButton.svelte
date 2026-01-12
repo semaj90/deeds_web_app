@@ -5,7 +5,7 @@
    let isLoading = $state<boolean>(false);
    let error = $state<string | null>(null);
    let selectedRole = $state<'user' | 'admin'>('user'); async function handleDemoLogin(role: 'user' | 'admin'): Promise<any> { try { isLoading = true; error = null; selectedRole = role;
-   const response = await fetch('/api/auth/demo-login', { method: 'POST'; headers: {
+   const response = await fetch('/api/auth/demo-login', { method: 'POST', headers: {
           'Content-Type': 'application/json'
         }, body: JSON.stringify({ email: `demo-${ role }@legal.ai.dev`, role }) }); if (!response.ok) { const data = await response.json(); throw new Error(data.message || 'Demo login failed')}
       const data = await response.json(); console.log('âœ… Demo login successful:', data); // Redirect to dashboard await goto('/dashboard')} catch (err) { error = err instanceof Error ? err.message: 'Login failed'; console.error('[Demo Login Error]', error)} finally { isLoading = false}

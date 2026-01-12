@@ -14,8 +14,8 @@ export interface IAceContextManager {
  saveContext(context: ACEContext): Promise<ACEContext>;
  loadContext(sessionId: string): Promise<ACEContext | null>;
  updateMetrics(sessionId: string, metrics: Partial<Metrics>): Promise<ACEContext>;
- addAnalysis(sessionId: string, Analysis: Promise<ACEContext>;
- addFix(sessionId: string, Diff: Promise<ACEContext>;
+ addAnalysis(sessionId: string, Analysis: Promise<ACEContext>,
+ addFix(sessionId: string, Diff: Promise<ACEContext>,
  getContextStats(sessionId: string): Promise<Metrics>;
  deleteContext(sessionId: string): Promise<void>;
  listContexts(limit?: number, offset?: number): Promise<ACEContext[]>;

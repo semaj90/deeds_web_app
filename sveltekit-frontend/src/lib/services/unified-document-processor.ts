@@ -476,8 +476,8 @@ class UnifiedDocumentProcessor extends EventEmitter {
 	public async semanticSearch(
 		query: string,
 		options: {
-			caseId?: string;
-			documentType?: string;
+			caseId?: string,
+			documentType?: string,
 			limit?: number;
 			threshold?: number;
 			includeMetadata?: boolean;

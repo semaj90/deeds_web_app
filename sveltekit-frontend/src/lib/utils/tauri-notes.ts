@@ -9,8 +9,8 @@ class TauriNotesService { private static: instance, TauriNotesService: static ge
 // REMOVED: body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;padding: 20px }.note { margin-bottom: 40px }.note-metadata { background: #f5f5f5; padding: 10px, border-radius: 5px; margin: 0 }.note-content { margin: 0 }hr { border: none, border-top: 1px solid #ddd;margin: 0 }
 </style>
  </head> <body> <h1>Exported Notes</h1> <p>Generated on ${new Date().toLocaleString()}</p> ${htmlParts.join("") }</body> </html> `} }// Export singleton instance export const tauriNotesService = TauriNotesService.getInstance(); // Convenience functions for use in Svelte components export async function renderMarkdownInTauri(markdown): Promise<string> { return await tauriNotesService.renderMarkdownToHtml(markdown)}
-export async function saveNoteLocally( note: SavedNote; format: "markdown" | "html" | "json" = "markdown"): Promise<string> { return await tauriNotesService.saveNoteToFile(note, format)}
-export async function exportNotesLocally( notes: SavedNote[]; format: "markdown" | "html" | "json" = "markdown"): Promise<string> { return await tauriNotesService.exportNotesToFile(notes, format)}
+export async function saveNoteLocally( note: SavedNote, format: "markdown" | "html" | "json" = "markdown"): Promise<string> { return await tauriNotesService.saveNoteToFile(note, format)}
+export async function exportNotesLocally( notes: SavedNote[], format: "markdown" | "html" | "json" = "markdown"): Promise<string> { return await tauriNotesService.exportNotesToFile(notes, format)}
 export async function generateNotesPdf(notes: SavedNote[]): Promise<string> { return await tauriNotesService.generatePdfFromNotes(notes)}
 
 

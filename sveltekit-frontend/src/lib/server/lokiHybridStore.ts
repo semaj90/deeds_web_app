@@ -214,7 +214,7 @@ export class LokiHybridStore {
 
  remove(
  collection: KnowledgeCollectionName, id: string,
- options?: { persist?: boolean; broadcast?: boolean }
+ options?: { persist?: boolean, broadcast?: boolean }
  ): boolean {
  const ctx = this.getContext(collection);
  const existing = ctx.collection.by('id', id); // Changed findOne to by
@@ -237,7 +237,7 @@ export class LokiHybridStore {
 
  clear(
  collection?: KnowledgeCollectionName,
- options?: { persist?: boolean; broadcast?: boolean }
+ options?: { persist?: boolean, broadcast?: boolean }
  ): void {
  const persist = options?.persist ?? this.config.autoPersistToRedis;
  const broadcast = options?.broadcast ?? this.config.autoBroadcast;
@@ -439,7 +439,7 @@ export class LokiHybridStore {
  ): Promise<void> {
  if (!this.redis) return;
  const key = this.redisKey(collection);
- await this.redis.hset(key: item.id; this.serialize(item)).catch((error: unknown) => {
+ await this.redis.hset(key: item.id, this.serialize(item)).catch((error: unknown) => {
  // Changed type to unknown
  console.error(
  `[kgcl] Failed to persist item ${item.id} to Redis for collection ${collection}:`,
@@ -525,7 +525,7 @@ export class LokiHybridStore {
  // This ensures it's only loaded when needed.
  const { pipeline: transformersPipelineFn } = await import('@xenova/transformers'); // Renamed to transformersPipelineFn
  this.summarizer = transformersPipelineFn(
- 'summarization'; this.transformersModel
+ 'summarization', this.transformersModel
  ) as SummarizationPipeline; // Call the function
  } catch (error: unknown) {
  // Changed type to unknown

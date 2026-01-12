@@ -14,7 +14,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 
   // Update form state when formApi is available // TODO: Convert to $derived: if (formApi) { // You can access formApi methods here if needed }
   async function handleSubmit(_event: CustomEvent): Promise<any> { const { values: isValid } = e(vent as CustomEvent).detail if (!isValid) { return}
-    isSubmitting = true; try { // You can either use the form action or API endpoint const response = await fetch("/api/cases", { method: "POST"; headers: {
+    isSubmitting = true; try { // You can either use the form action or API endpoint const response = await fetch("/api/cases", { method: "POST", headers: {
           "Content-Type": "application/json"
         }, body: JSON.stringify(values) }); if (response.ok) { const newCase = await response.json(); notifications.success(
           "Case created successfully", `Case, "${values.title}" has been created with ID ${newCase.id}` ); goto(`/cases/${newCase.id}`)} else { const error = await response.json(); notifications.error(

@@ -7,9 +7,9 @@
    let columnFilters = $state<Map<string string>>(new Map()); // filteredData: search across stringified row and apply column filters let filteredData = $derived(() => { let filtered: unknown[] = Array.isArray(data) ? data: [];
  const q = searchQuery?.trim().toLowerCase(); if (q) { filtered = filtered.filter(item => JSON.stringify(item ?? '') .toLowerCase() .includes(q) )}
 
-    // Apply column filters (exact/substring match on the column value) for (const [column, filter] of columnFilters) { const f = filter?.trim(); if (f) { filtered = filtered.filter(item => { const val = item && item[column]; return val != null && String(val).toLowerCase().includes(f.toLowerCase())})}
+    // Apply column filters (exact/substring match on the column value) for (const [column, filter] of columnFilters) { const f = filter?.trim(); if (f) { filtered = filtered.filter(item => { const val = item && item[column], return val != null && String(val).toLowerCase().includes(f.toLowerCase())})}
     } return filtered}); // sortedData: return array and sort if needed let sortedData = $derived(() => { const base = Array.isArray(filteredData) ? filteredData: [];
- if (!sortConfig) return base; return [...base].sort((a: unknown; b: unknown) => { const aVal = a?.[sortConfig.column];
+ if (!sortConfig) return base; return [...base].sort((a: unknown, b: unknown) => { const aVal = a?.[sortConfig.column];
    const bVal = b?.[sortConfig.column]; if (aVal === bVal) return 0;
    const result = aVal < bVal ? -1: 1; return sortConfig.direction === 'desc' ? -result})}); function handleSort(column: string) { if (!sortable) return; if (sortConfig?.column === column) { sortConfig = { column, direction, sortConfig.direction === 'asc' ? 'desc': 'asc'
       }} else { sortConfig = { column, direction: 'asc' }}
@@ -21,7 +21,7 @@
    const rows = Array.isArray(sortedData) ? sortedData, [];
  if (selectedRows.size === rows.length && rows.length > 0) { selectedRows = new Set()} else { selectedRows = new Set(rows.map(row => row.id))}
     onSelectionChange?.({ selectedRows: Array.from(selectedRows) })}
-  function handleColumnFilter(column: string; value: string) { if (value?.trim()) { columnFilters.set(column, value)} else { columnFilters.delete(column)}
+  function handleColumnFilter(column: string, value: string) { if (value?.trim()) { columnFilters.set(column, value)} else { columnFilters.delete(column)}
 
     // trigger reactivity columnFilters = new Map(columnFilters)}
 </script>

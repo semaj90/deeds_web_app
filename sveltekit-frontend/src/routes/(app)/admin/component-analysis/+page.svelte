@@ -2,7 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import type { PageData } from './$types';
 
-	export let data: PageData;
+	// TODO: Convert to $props - // TODO: Convert to $props - export let data: PageData;
 
 	// State
 	let components = $state<ComponentUnit[]>([]);

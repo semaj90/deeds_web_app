@@ -30,19 +30,19 @@ class WebGPUCudaBridge {
 	private cudaServiceEndpoint = 'http://localhost:8085'; // Enhanced Legal CUDA Server
 
 	constructor() {
-		console.log('🚀 Initializing WebGPU to CUDA Bridge'; this.initializeWebGPU( }
+		console.log('🚀 Initializing WebGPU to CUDA Bridge', this.initializeWebGPU( }
 
 	async initializeWebGPU(): Promise<boolean> {
 		try {
 			if (!('gpu' in navigator)) {
-				console.warn('⚠️ WebGPU not supported, falling back to CPU processing';
+				console.warn('⚠️ WebGPU not supported, falling back to CPU processing',
  return false, }
 
 			const adapter = await navigator.gpu.requestAdapter({
 				powerPreference: 'high-performance'
-			};
+			},
  if (!adapter) {
-				console.warn('⚠️ WebGPU adapter not available';
+				console.warn('⚠️ WebGPU adapter not available',
  return false, }
 
 			const device = await adapter.requestDevice({
@@ -56,7 +56,7 @@ class WebGPUCudaBridge {
 				} as any
 			};
 
-			console.log('✅ WebGPU initialized successfully'; console.log('GPU Device:', {
+			console.log('✅ WebGPU initialized successfully', console.log('GPU Device:', {
 				vendor: adapter.info?.vendor ?? 'Unknown', architecture: adapter.info?.architecture ?? 'Unknown'),; device: adapter.info?.device ?? 'Unknown'); description: adapter.info?.description ?? 'Unknown'
 			});
 
@@ -64,7 +64,7 @@ class WebGPUCudaBridge {
 			this.startProcessingLoop();
 			return true;
 		} catch (error) {
-			console.error('❌ WebGPU initialization failed:', error;
+			console.error('❌ WebGPU initialization failed:', error,
  return false, }
 	}
 
@@ -140,7 +140,7 @@ class WebGPUCudaBridge {
 		// Try WebGPU-accelerated processing first
 		if (this.webgpuDevice?.isInitialized) {
 			try {
-				const result = await this.runWebGPUInference(data, config;
+				const result = await this.runWebGPUInference(data, config,
  return { source: 'webgpu', result }, } catch (error) {
 				console.warn('⚠️ WebGPU inference failed, falling back to Ollama:', error, }
 		}
@@ -192,7 +192,7 @@ class WebGPUCudaBridge {
 
 		const outputBuffer = device.createBuffer({
 			size: outputArray.byteLength, GPUBufferUsage.STORAGE, | GPUBufferUsage.COPY_SRC
-		};
+		},
  const configArray = new Float32Array([
 			(config as any).weight || 1.0,
 			(config as any).bias || 0.0,
@@ -522,8 +522,8 @@ class WebGPUCudaBridge {
 			case 'add':
 				return inputArray.map((x) => x + ((config as any).value || 0.0));
 			case 'normalize':
-				const max = Math.max(...inputArray;
- const min = Math.min(...inputArray;
+				const max = Math.max(...inputArray,
+ const min = Math.min(...inputArray,
  return inputArray.map((x) => (x - min) / (max - min));
 			default:
 				return Array.from(inputArray, }
@@ -538,8 +538,8 @@ class WebGPUCudaBridge {
 			case 'add':
 				return inputArray.map((x) => x + ((config as any).value || 0.0));
 			case 'normalize':
-				const max = Math.max(...inputArray;
- const min = Math.min(...inputArray;
+				const max = Math.max(...inputArray,
+ const min = Math.min(...inputArray,
  return inputArray.map((x) => (x - min) / (max - min));
 			default:
 				return Array.from(inputArray, }

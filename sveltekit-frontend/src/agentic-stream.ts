@@ -44,7 +44,7 @@ export async function runAIAgentStream(
 async function streamFromOllama(
   prompt: string,
   onChunk: StreamCallback,
-  options?: { model?: string; temperature?: number; maxTokens?: number; systemPrompt?: string }
+  options?: { model?: string, temperature?: number, maxTokens?: number; systemPrompt?: string }
 ): Promise<AIResponse> {
   const startTime = Date.now();
   let fullText = '';
@@ -114,7 +114,7 @@ async function streamFromOllama(
 async function streamFromTensorRT(
   prompt: string,
   onChunk: StreamCallback,
-  options?: { model?: string; temperature?: number; maxTokens?: number; systemPrompt?: string }
+  options?: { model?: string, temperature?: number, maxTokens?: number; systemPrompt?: string }
 ): Promise<AIResponse> {
   const startTime = Date.now();
 
@@ -214,7 +214,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 // Chat completion (non-streaming)
 export async function chatCompletion(
   messages: ChatMessage[],
-  options?: { model?: string; temperature?: number }
+  options?: { model?: string, temperature?: number }
 ): Promise<AIResponse> {
   const startTime = Date.now();
   const response = await fetch(`${getOllamaEndpoint()}/api/chat`, {

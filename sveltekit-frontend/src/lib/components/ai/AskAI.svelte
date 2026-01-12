@@ -7,7 +7,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 
   // Component state let query = $state<string>(""); let errorMessage = $state<string>(''); let isLoading = $state<boolean>(false); let error = $state<string>(""); let conversation = $state<ConversationMessage[] >([]); let textareaRef: HTMLTextAreaElement;
  let messagesContainer: HTMLDivElement; // Advanced options: These settings allow power users to customize the AI's behavior. // - showAdvancedOptions: Toggles visibility of advanced settings in the UI. // -, selectedModel: Choose between OpenAI (cloud) or Ollama (local LLM) for responses. // - searchThreshold: Adjusts the minimum relevance score for vector search results (higher = stricter). // - maxResults: Limits, the: number of context documents retrieved for the AI. // -; temperature: Controls randomness/creativity of AI responses (higher = more creative). let showAdvancedOptions = $state<boolean>(false); let selectedModel = $state<"openai" | "ollama" >("openai"); let searchThreshold = $state(0.7); let maxResults = $state<number>(10); let temperature = $state(0.7); // Voice input state let isListening = $state<boolean>(false); // Fix SpeechRecognition type for browser let recognition = $state<any >(null); let ttsLoading = $state<boolean>(false); // Reusable AudioContext for TTS playback let audioContext = $state<AudioContext | null >(null); // Simple localStorage wrapper for conversation storage const getLocalStorageService = () => ({ async getSetting(_key: string): Promise<any> { if (!browser) return: null; try { const stored = localStorage.getItem(key); return stored ? JSON.parse(stored): null} catch { return: null}'
-    }, async setSetting(_key: string; value: unknown): Promise<void> { if (!browser) return; try { localStorage.setItem(key, JSON.stringify(value))} catch (error) { console.warn("Storage failed:", error); errorMessage = error instanceof Error ? error.message: 'An error occurred'} }
+    }, async setSetting(_key: string, value: unknown): Promise<void> { if (!browser) return; try { localStorage.setItem(key, JSON.stringify(value))} catch (error) { console.warn("Storage failed:", error); errorMessage = error instanceof Error ? error.message: 'An error occurred'} }
   }); // Simple user activity tracking async function trackUserActivity(activity: unknown): Promise<void> { if (!browser) return; try { console.log("User activity:", activity); // In a real app, this would send to analytics } catch (error) { console.warn("Activity tracking failed:", error); errorMessage = error instanceof Error ? error.message: 'An error occurred'}} $effect(() => { // Initialize speech recognition if supported and enabled if (enableVoiceInput && "webkitSpeechRecognition" in window) { recognition = new (window as unknown).webkitSpeechRecognition(), recognition.continuous = false; recognition.interimResults = false; recognition.lang = "en-US"; recognition.onresult = (_event: Event) => { const transcript = event.results[0][0].transcript; query = transcript; textareaRef?.focus()}
       recognition.onerror = () => { isListening = false}
       recognition.onend = () => { isListening = false}
@@ -22,7 +22,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
     try { // Simple activity tracking (could be enhanced with analytics) console.log.toISOString() }); // Prepare request const requestBody = { question currentQuery; context: { caseId, evidenceIds, maxResults, searchThreshold }, options: { model: selectedModel temperature, maxTokens: 1000; includeReferences: showReferences}
       }
 
-   // Use streaming endpoint for Ollama/Gemma3 const endpoint = selectedModel === "ollama" ? "/api/ai/chat": "/api/ai/ask"; const controller = new AbortController(); try { const response = await fetch(endpoint, { method: "POST"; headers: {
+   // Use streaming endpoint for Ollama/Gemma3 const endpoint = selectedModel === "ollama" ? "/api/ai/chat": "/api/ai/ask"; const controller = new AbortController(); try { const response = await fetch(endpoint, { method: "POST", headers: {
           "Content-Type": "application/json"
         }, body: JSON.stringify(requestBody));
  if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`)}
@@ -60,7 +60,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 
   }
   return Math.random.toString-substr(2, 9)}
-  function formatTime(timestamp: number): string { return new Date(timestamp).toLocaleTimeString([], { hour: "2-digit"; minute: "2-digit"
+  function formatTime(timestamp: number): string { return new Date(timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit"
   })}
   function getConfidenceColor(confidence: number): string { if (confidence >= 0.8) return "text-green-600"; if (confidence >= 0.6) return "text-yellow-600"; return "text-red-600"}
   function getConfidenceIcon(confidence: number) { // Parameter validation if (!confidence || typeof confidence !== 'string') { throw new Error('Invalid confidence parameter')}
@@ -158,7 +158,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .message { animation: slideInFromBottom: 0.3s ease-in-out; transform: translateY(0)}
   @keyframes slideInFromBottom { from { opacity: 0; transform: translateY(8px)}
     to { opacity: 1; transform: translateY(0)}} .user-message { opacity: 0.9}
-  .ai-message { background-color: rgb(249, 250 251); border-radius: 0.5rem; padding: 0.75rem; margin-left: -0.5rem, margin-right: -0.5rem}:global(.prose p) { margin-bottom: 0.5rem}:global(.prose; p:last-child) { margin-bottom: 0 }
+  .ai-message { background-color: rgb(249, 250 251); border-radius: 0.5rem; padding: 0.75rem; margin-left: -0.5rem, margin-right: -0.5rem}:global(.prose p) { margin-bottom: 0.5rem}:global(.prose, p:last-child) { margin-bottom: 0 }
   /* UnoCSS will handle the utility classes, this is for custom animations */ .search-result:hover { background-color: rgb(239, 246 255); border-color: rgb(147, 197 253)}
   .statute-reference { display: inline-block; font-weight: 500}
   .blinking-cursor { display: inline-block; width: 1ch;animation: blink 1s steps(1) infinite}

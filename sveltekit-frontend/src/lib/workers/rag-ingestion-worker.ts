@@ -47,8 +47,8 @@ interface AnalyzeResultItem {
 }
 
 interface AdvancedEvidenceAnalyzer {
- analyzeEvidence(args: { evidenceId: string;
- analysisTypes: string[];
+ analyzeEvidence(args: { evidenceId: string,
+ analysisTypes: string[],
  priority?: string;
  textOverride?: string;
  }): Promise<{ summary?: string; analyses?, AnalyzeResultItem[] }>;
@@ -88,7 +88,7 @@ class VectorEmbeddingCache {
  async retrieve(k: string) {
  return this.c.get(k) ?? null;
  }
- async search(q: Float32Array, opts: { limit?: number; threshold?: number }) {
+ async search(q: Float32Array, opts: { limit?: number, threshold?: number }) {
  const out: Array<{ key: string; similarity, number }> = [];
  for (const [k, v] of this.c.entries()) {
  if (!v || v.length !== q.length) continue;
@@ -180,7 +180,7 @@ class RAGIngestionWorker {
  const type = typeof obj['type'] === 'string' ? (obj['type'] as string) : 'unknown';
  return { name: type };
  }
- return { name: String(item, type: `unknown` };
+ return { name: String(item, type: `unknown` },
  }
 
  // Helper to safely extract an id from an unknown message without using `any`
@@ -411,7 +411,7 @@ class RAGIngestionWorker {
  private formatGraphData(
  evidenceId: string,
  caseId?: string | null,
- entities?: Array<{ name: string; type?, string | null }>
+ entities?: Array<{ name: string, type?, string | null }>
  ) {
  const nodes: GraphNode[] = [];
  const edges: GraphEdge[] = [];

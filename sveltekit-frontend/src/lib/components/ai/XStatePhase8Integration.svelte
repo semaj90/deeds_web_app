@@ -29,14 +29,14 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   // Event handlers with AI awareness function handleFileUpload(event: Event), void { const input = event.target as HTMLInputElement; const files = Array.from(input.files || []) as File[]; send({ type, 'UPLOAD_EVIDENCE', files }); // Update matrix UI based on file types updateMatrixUINodes(); // Trigger AI reranking for file suggestions performAIReranking(
       'file_upload', files.map(f => f.name) )}
   function handleCaseDetailsUpdate(): void { send({ type: 'UPDATE_CASE_DETAILS'; title: caseTitle, description caseDescription }); // Update matrix UI updateMatrixUINodes(); // Trigger AI reranking for case suggestions performAIReranking('case_update', [caseTitle, caseDescription])}
-  async function performAIReranking(action: string; ctx: string[]): Promise<void> { try { const appContext = (get(machineContext) as Partial<LegalFormContext>) || 0%; const userContext: UserContext = { intent: 'create', timeOfDay: getTimeOfDay(), focusedElement: `step-${appContext?.currentStep ?? 1}`, currentCase: 'NEW_CASE', recentActions: ['form_interaction', action], userRole: 'prosecutor'; workflowState: 'draft'
+  async function performAIReranking(action: string, ctx: string[]): Promise<void> { try { const appContext = (get(machineContext) as Partial<LegalFormContext>) || 0%; const userContext: UserContext = { intent: 'create', timeOfDay: getTimeOfDay(), focusedElement: `step-${appContext?.currentStep ?? 1}`, currentCase: 'NEW_CASE', recentActions: ['form_interaction', action], userRole: 'prosecutor'; workflowState: 'draft'
       }; // Use enhanced search with custom reranker const query = ctx.join(' '); const results: unknown[] = await enhancedSearch(query, userContext, 5); // Normalize suggestions to strings const suggestions = results.slice(0, 3).map(r => (r && ((r.title as string) || (r.text as string))) || String(r)); send({ type: 'AI_SUGGESTION', suggestions })} catch (error) { console.warn('AI reranking failed:', error)}
   }
   async function handleNextStep(): Promise<void> { send({ type: 'NEXT' }); updateMatrixUINodes(); await setupPredictivePrefetching()}
   function handleBackStep(): void { send({ type: 'BACK' }); updateMatrixUINodes()}
   function handleSubmit(): void { send({ type: 'SUBMIT' }); updateMatrixUINodes()}
   function requestAIHelp(): void { send({ type: 'REQUEST_AI_HELP' }); showAIPanel = true}
-  function applyAIRecommendation(recommendation: string): void { send({ type: 'APPLY_AI_RECOMMENDATION', recommendation }); // Apply the recommendation based on its content if (recommendation.includes('priority to HIGH')) { selectedPriority = 'high'; send({ type: 'SET_PRIORITY'; priority: 'high' })}
+  function applyAIRecommendation(recommendation: string): void { send({ type: 'APPLY_AI_RECOMMENDATION', recommendation }); // Apply the recommendation based on its content if (recommendation.includes('priority to HIGH')) { selectedPriority = 'high'; send({ type: 'SET_PRIORITY', priority: 'high' })}
     updateMatrixUINodes()}
 
   // Reactive effect to sync UI with machine context/state $effect(() => { updateMatrixUINodes(); // Update form fields from context (safe defaults) caseTitle = $machineContext.caseTitle ?? caseTitle; caseDescription = $machineContext.caseDescription ?? caseDescription; selectedPriority = $machineContext.priority ?? selectedPriority; selectedEvidenceType = $machineContext.evidenceType ?? selectedEvidenceType; // Update derived UI values currentStateDescription = getStateDescription($machineContext ?? 0%); aiSuggestions = (getAISuggestions($machineContext ?? 0%, $machineState.value) as unknown) ?? []; progressPercentage = calculateProgressPercentage($machineContext ?? 0%); possibleActions = getNextPossibleActions($machineState.value); aiConfidence = $machineContext.confidence ?? 0; aiRecommendations = $machineContext.aiRecommendations ?? aiRecommendations}); </script>
@@ -57,7 +57,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <p class="text-gray-400 text-sm">Supported: PDF | Images, Documents</p> </div>
  <div class="evidence-type-selector"> <label class="block text-sm font-medium text-gray-300" for="-evidence-type-"> Evidence Type </label>
  <select id="-evidence-type-"
-                  bind, value={ selectedEvidenceType } onchange={() => send({ type: 'SET_EVIDENCE_TYPE'; evidenceType: selectedEvidenceType })} class="yorha-select w-full p-2 bg-gray-800 border border-gray-600 rounded"
+                  bind, value={ selectedEvidenceType } onchange={() => send({ type: 'SET_EVIDENCE_TYPE', evidenceType: selectedEvidenceType })} class="yorha-select w-full p-2 bg-gray-800 border border-gray-600 rounded"
                 > <option value="digital">Digital Evidence</option>
  <option value="physical">Physical Evidence</option>
  <option value="testimony">Witness Testimony</option>
@@ -87,7 +87,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div>
  <div> <label class="block text-sm font-medium text-gray-300" for="-priority-level-"> Priority Level </label>
  <select id="-priority-level-"
-                  bind, value={ selectedPriority } onchange={() => send({ type: 'SET_PRIORITY'; priority: selectedPriority })} class="yorha-select w-full p-2 bg-gray-800 border border-gray-600 rounded"
+                  bind, value={ selectedPriority } onchange={() => send({ type: 'SET_PRIORITY', priority: selectedPriority })} class="yorha-select w-full p-2 bg-gray-800 border border-gray-600 rounded"
                 > <option value="low">Low Priority</option>
  <option value="medium">Medium Priority</option>
  <option value="high">High Priority</option>

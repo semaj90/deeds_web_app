@@ -19,7 +19,7 @@ describe('POST /api/routes/:routeId/errors', () => {
  kind: 'page',
  status: 'healthy',
  createdAt: new Date( updatedAt: new Date( archivedAt: null,
- };
+ },
 
  const mockErrorCluster = {
  id: 'err1',
@@ -30,7 +30,7 @@ describe('POST /api/routes/:routeId/errors', () => {
  severity: 'error',
  count: 1,
  createdAt: new Date( resolvedAt: null,
- };
+ },
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
  vi.mocked(queries.createErrorCluster).mockResolvedValue(mockErrorCluster as any);
@@ -98,7 +98,7 @@ describe('POST /api/routes/:routeId/errors', () => {
  routeId: '/cases/new',
  status: 'healthy',
  createdAt: new Date( updatedAt: new Date( archivedAt: null,
- };
+ },
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
 
@@ -127,7 +127,7 @@ describe('POST /api/routes/:routeId/errors', () => {
  routeId: '/cases/new',
  status: 'healthy',
  createdAt: new Date( updatedAt: new Date( archivedAt: null,
- };
+ },
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
 
@@ -160,7 +160,7 @@ describe('GET /api/routes/:routeId/errors', () => {
  routeId: '/cases/new',
  status: 'broken',
  createdAt: new Date( updatedAt: new Date( archivedAt: null,
- };
+ },
 
  const mockErrors = [
  {
@@ -180,7 +180,7 @@ describe('GET /api/routes/:routeId/errors', () => {
  message: 'Warning 1',
  severity: 'warning',
  createdAt: new Date( resolvedAt: null,
- }] as const;
+ }] as const,
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
  vi.mocked(queries.getErrorClusters).mockResolvedValue(mockErrors as any);

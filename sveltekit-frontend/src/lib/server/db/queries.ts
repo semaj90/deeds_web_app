@@ -26,8 +26,8 @@ export async function getUserByEmail(email: string): Promise<User | null> {
  }
 }
 
-export async function createUser(userData: { email: string;
- hashedPassword: string;
+export async function createUser(userData: { email: string,
+ hashedPassword: string,
  name?: string;
  firstName?: string;
  lastName?: string;

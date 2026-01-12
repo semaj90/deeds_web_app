@@ -253,7 +253,7 @@ export class AIPipelineClient {
 			console.warn('[AIPipelineClient] Analysis service unavailable');
 			return {
 				analysis: this.getFallbackAnalysis(content, documentType, cached: false
-			};
+			},
 		}
 
 		// Try live API
@@ -280,7 +280,7 @@ export class AIPipelineClient {
 
 		return {
 			analysis: this.getFallbackAnalysis(content, documentType, cached: false
-		};
+		},
 	}
 
 	/**
@@ -288,7 +288,7 @@ export class AIPipelineClient {
 	 */
 	async semanticSearch(
 		query: string,
-		options: { limit?: number; caseId?: string } = {}
+		options: { limit?: number, caseId?: string } = {}
 	): Promise<{ results: unknown[]; cached, boolean }> {
 		const cacheKey = `${CACHE_KEYS.SEARCH_CACHE}:${this.hashText(query)}:${options.caseId || 'all'}`;
 		const cached = this.storage.get<any[]>(cacheKey);
@@ -333,8 +333,8 @@ export class AIPipelineClient {
 	/**
 	 * Queue operation for retry when offline
 	 */
-	queueOfflineOperation(operation: { type: 'upload' | 'analyze' | 'search';
-		data: Record<string, unknown>;
+	queueOfflineOperation(operation: { type: 'upload' | 'analyze' | 'search',
+		data: Record<string, unknown>,
 		timestamp: number;
 	}): void {
 		const queue = this.storage.get<any[]>(CACHE_KEYS.OFFLINE_QUEUE) || [];

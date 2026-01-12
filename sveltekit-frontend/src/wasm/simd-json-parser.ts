@@ -18,8 +18,8 @@ export class SIMDStringOps {
  // Corrected type annotations
  // Simplified implementation for TypeScript compatibility
  // In actual WASM, this would use SIMD instructions
- const textLen = text.length;
- const patternLen = pattern.length;
+ const textLen = text.length,
+ const patternLen = pattern.length,
  if (patternLen > textLen) return -1;
  // Optimized: string search that can be compiled to WASM with SIMD
  for (let i = 0; i <= textLen - patternLen; i++) {
@@ -212,7 +212,7 @@ export async function initializeWasm(modulePath?: string): Promise<void> {
  // const response = await fetch(modulePath || '/wasm/simd_parser.wasm');
  // const { instance } = await WebAssembly.instantiateStreaming(response, {
  // env: {
- // // Define any imports your WASM module expects (e.g.; console.log, Math.random)
+ // // Define any imports your WASM module expects (e.g., console.log, Math.random)
  // }
  // });
   

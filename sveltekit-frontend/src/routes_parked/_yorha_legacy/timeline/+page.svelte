@@ -2,9 +2,9 @@
  import TimelineView from '$lib/ui/TimelineView.svelte';
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Timeline - YoRHa Detective</title>
-</svelte, head>
+</svelte:head>
 
 <TimelineView />
 

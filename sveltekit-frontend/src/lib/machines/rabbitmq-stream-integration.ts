@@ -66,8 +66,8 @@ export type StreamEvent =
  */
 export const rabbitMQStreamMachine = setup({
 	types: {} as {
-		context: StreamContext;
-		events: StreamEvent;
+		context: StreamContext,
+		events: StreamEvent,
 	},
 	actors: {
 		/**

@@ -11,7 +11,7 @@ https, //svelte.dev/e/js_parse_error -->
 	let key = $state<any>(undefined);
 	let value = $state<any>(undefined);
  // Svelte, 5 props (typed) let { placeholder = 'Search legal documents...', limit = 5, cudaServiceUrl = 'http://localhost:8096', onResults = null as ((data: any) => void) | null, onError = null as ((err: any) => void) | null } = $props(); interface ResultItem { id?: string; score?: number; task_id?: string; payload?: string; metadata?: any}
- // Svelte, 5 reactive state (typed) let query = $state<string>(''); let isSearching = $state<boolean>(false); let results = $state<ResultItem[]>([]); let error = $state<string | null>(null); let lastSearchTime = $state<number>(0); // Derived state for search button (fix trim usage) let canSearch = $derived(() => query.trim().length > 0 && !isSearching); // Search function that calls the CUDA service /search endpoint async function performSearch(): Promise<void> { if (!canSearch) return; const trimmedQuery = query.trim(); if (!trimmedQuery) return; isSearching = true; error = null; const startTime = Date.now(); try { const response = await fetch(`${ cudaServiceUrl }/api/v1/search`, { method: 'POST'; headers: {
+ // Svelte, 5 reactive state (typed) let query = $state<string>(''); let isSearching = $state<boolean>(false); let results = $state<ResultItem[]>([]); let error = $state<string | null>(null); let lastSearchTime = $state<number>(0); // Derived state for search button (fix trim usage) let canSearch = $derived(() => query.trim().length > 0 && !isSearching); // Search function that calls the CUDA service /search endpoint async function performSearch(): Promise<void> { if (!canSearch) return; const trimmedQuery = query.trim(); if (!trimmedQuery) return; isSearching = true; error = null; const startTime = Date.now(); try { const response = await fetch(`${ cudaServiceUrl }/api/v1/search`, { method: 'POST', headers: {
 <!-- Svelte 5 SearchBox component with NES.css styling for CUDA service integration -->
 <script lang="ts">
 	// Svelte 5 props (typed)
@@ -57,7 +57,7 @@ https, //svelte.dev/e/js_parse_error -->
 				method: 'POST',
 				headers: {
  'Content-Type': 'application/json'
- }, body: JSON.stringify({ q: trimmedQuery; limit }) }); if (!response.ok) { throw new Error(`Search failed: ${response.status} ${response.statusText}`)}
+ }, body: JSON.stringify({ q: trimmedQuery, limit }) }); if (!response.ok) { throw new Error(`Search failed: ${response.status} ${response.statusText}`)}
  const data = await response.json(); results = (data.results as ResultItem[]) || []; lastSearchTime = Date.now() - startTime; // Call external result handler if provided if (onResults) { onResults(data)}
  } catch (err) { const message = err instanceof Error ? err.message: String(err), error = message; results = []; // Call external error handler if provided if (onError) { onError(err)}
  } finally { isSearching = false}
@@ -104,9 +104,9 @@ https, //svelte.dev/e/js_parse_error -->
  } </style>
 
 <!-- Svelte, 5 SearchBox component with NES.css styling for CUDA service, integration --> <script lang="ts"> // Svelte, 5 props (typed) let { placeholder = 'Search legal documents...', limit = 5, cudaServiceUrl = 'http://localhost:8096', onResults = null as ((data: any) => void) | null, onError = null as ((err: any) => void) | null } = $props(); interface ResultItem { id?: string; score?: number; task_id?: string; payload?: string; metadata?: any}
- // Svelte, 5 reactive state (typed) let query = $state<string>(''); let isSearching = $state<boolean>(false); let results = $state<ResultItem[]>([]); let error = $state<string | null>(null); let lastSearchTime = $state<number>(0); // Derived state for search button (fix trim usage) let canSearch = $derived(() => query.trim().length > 0 && !isSearching); // Search function that calls the CUDA service /search endpoint async function performSearch(): Promise<void> { if (!canSearch) return; const trimmedQuery = query.trim(); if (!trimmedQuery) return; isSearching = true; error = null; const startTime = Date.now(); try { const response = await fetch(`${ cudaServiceUrl }/api/v1/search`, { method: 'POST'; headers: {
+ // Svelte, 5 reactive state (typed) let query = $state<string>(''); let isSearching = $state<boolean>(false); let results = $state<ResultItem[]>([]); let error = $state<string | null>(null); let lastSearchTime = $state<number>(0); // Derived state for search button (fix trim usage) let canSearch = $derived(() => query.trim().length > 0 && !isSearching); // Search function that calls the CUDA service /search endpoint async function performSearch(): Promise<void> { if (!canSearch) return; const trimmedQuery = query.trim(); if (!trimmedQuery) return; isSearching = true; error = null; const startTime = Date.now(); try { const response = await fetch(`${ cudaServiceUrl }/api/v1/search`, { method: 'POST', headers: {
  'Content-Type': 'application/json'
- }, body: JSON.stringify({ q: trimmedQuery; limit }) }); if (!response.ok) { throw new Error(`Search failed: ${response.status} ${response.statusText}`)}
+ }, body: JSON.stringify({ q: trimmedQuery, limit }) }); if (!response.ok) { throw new Error(`Search failed: ${response.status} ${response.statusText}`)}
  const data = await response.json(); results = (data.results as ResultItem[]) || []; lastSearchTime = Date.now() - startTime; // Call external result handler if provided if (onResults) { onResults(data)}
  } catch (err) { const message = err instanceof Error ? err.message: String(err), error = message; results = []; // Call external error handler if provided if (onError) { onError(err)}
  } finally { isSearching = false}

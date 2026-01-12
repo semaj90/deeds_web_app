@@ -8,7 +8,7 @@ import type { ServiceConfig } from './types.js';
 
 export interface IFeatureFlags {
  isEnabled(flagName: string): boolean;
- setFlag(flagName: string, boolean: void;
+ setFlag(flagName: string, boolean: void,
  getAllFlags(): Record<string, boolean>;
  resetFlags(): void;
 }

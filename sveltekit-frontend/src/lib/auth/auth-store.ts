@@ -202,7 +202,7 @@ export class AuthStore {
     /**
      * Register a new user account
      */
-    static async register(userData: { email: string; password: string;
+    static async register(userData: { email: string, password: string,
         firstName?: string;
         lastName?: string;
         role?: UserRole;

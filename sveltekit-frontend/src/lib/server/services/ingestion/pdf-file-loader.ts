@@ -208,7 +208,7 @@ export class PDFFileLoader {
  return {
  localPDFCount: this.getLocalPDFCount(localPath: this.localBasePath,
  minioConfigured: !!this.minioClient && !!this.minioBucket,
- };
+ },
  }
 }
 

@@ -110,14 +110,14 @@
  <div class="yorha-panel-content"> <div class="space-y-3">
   {#each Array.isArray(results.slice(0, 5)) ? results.slice(0, 5): [] as result} <div class="p-3 border"> <div class="flex justify-between items-start"> <div class="flex items-center"> <span class="font-semibold">{(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).type}
 </span>
- <span class={getStatusColor((result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?, any; error?, any }).success)}> {(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).success ? 'âœ…': 'âŒ'}
+ <span class={getStatusColor((result as { id?: any, content?: any, score?: any; source?: any; type?: any; success?: any; metrics?, any; error?, any }).success)}> {(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).success ? 'âœ…': 'âŒ'}
 </span> </div>
- <div class="text-sm"> {formatTime((result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.totalProcessingTime)}
+ <div class="text-sm"> {formatTime((result as { id?: any, content?: any, score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.totalProcessingTime)}
 </div> </div>
  <div class="grid grid-cols-2 md, grid-cols-4 gap-2"> <div> <span class="text-gray-500">Cache Hit:</span>
  <span class="font-medium">{(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.cacheHitRate.toFixed(1)}%</span> </div>
  <div> <span class="text-gray-500">Memory:</span>
- <span class="font-medium">{formatMemory((result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.memoryUsageMB)}
+ <span class="font-medium">{formatMemory((result as { id?: any, content?: any, score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.memoryUsageMB)}
 </span> </div>
  <div> <span class="text-gray-500">GPU:</span>
  <span class="font-medium">{(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.gpuUtilization.toFixed(0)}%</span> </div>

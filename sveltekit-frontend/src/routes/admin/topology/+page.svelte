@@ -149,8 +149,8 @@
 		const avgX = nodes.reduce((sum, n) => sum + n.x, 0) / nodes.length;
 		const avgY = nodes.reduce((sum, n) => sum + n.y, 0) / nodes.length;
 		nodes.forEach(n => {
-			n.x = n.x - avgX + 400;
-			n.y = n.y - avgY + 300;
+			n.x = n.x - avgX + 400,
+			n.y = n.y - avgY + 300,
 		});
 	}
 
@@ -237,8 +237,8 @@
 		const y = (e.clientY - rect.top - panY) / scale;
 
 		const node = $topology.nodes.find(n => {
-			const dx = n.x - x;
-			const dy = n.y - y;
+			const dx = n.x - x,
+			const dy = n.y - y,
 			const radius = 5 + (n.errors / 5);
 			return Math.sqrt(dx * dx + dy * dy) <= radius;
 		});

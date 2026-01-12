@@ -21,7 +21,7 @@ interface VectorStore {
 }
 
 interface CacheStore {
- set(key: string, value: string, string: Promise<void>;
+ set(key: string, value: string, string: Promise<void>,
  get(key: string): Promise<string | null>;
 }
 
@@ -55,7 +55,7 @@ const redisCache: CacheStore = {
 
 async function analyzeWithAI({
  context,
-}: { context: WorkflowContext;
+}: { context: WorkflowContext,
 }): Promise<EvidenceAnalysisResult> {
  if (!context.currentFile) {
  throw new Error('No file to analyze');
@@ -100,7 +100,7 @@ async function analyzeWithAI({
 
 async function generateEmbeddings({
  context,
-}: { context: WorkflowContext;
+}: { context: WorkflowContext,
 }): Promise<EvidenceAnalysisResult> {
  if (!context.result?.summary) {
  throw new Error('No summary to embed');
@@ -117,7 +117,7 @@ async function generateEmbeddings({
 
 async function storeVectors({
  context,
-}: { context: WorkflowContext;
+}: { context: WorkflowContext,
 }): Promise<EvidenceAnalysisResult> {
  if (!context.result?.embedding) {
  throw new Error('No embedding to store');

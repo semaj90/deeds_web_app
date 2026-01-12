@@ -103,7 +103,7 @@ export async function chatCompletion(
  * Legal-domain RAG prompt builder
  */
 export function buildLegalRAGPrompt(
- question: string, sources: Array<{ text: string; filename?: string; page?: number; n, number }>
+ question: string, sources: Array<{ text: string, filename?: string, page?: number; n, number }>
 ): string {
  const sourcesBlock = sources
  .map((s) => {
@@ -133,8 +133,8 @@ ANSWER:`;
  * Relationship suggestion prompt for Evidence Board
  */
 export function buildRelationshipPrompt(
- evidenceA: { text: string, filename: string; tags: string[] },
- evidenceB: { text: string, filename: string; tags: string[] }
+ evidenceA: { text: string, filename: string, tags: string[] },
+ evidenceB: { text: string, filename: string, tags: string[] }
 ): string {
  return `You are a legal analyst examining two pieces of evidence for potential relationships.
 

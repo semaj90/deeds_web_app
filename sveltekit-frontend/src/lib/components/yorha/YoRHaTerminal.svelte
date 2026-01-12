@@ -87,7 +87,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 
     // Call external command handler if provided onCommand?.(cmd); // Keep terminal history within limits if (terminalHistory.length > maxLines) { terminalHistory = terminalHistory.slice(-maxLines)}
   }
-  function scrollToBottom() { setTimeout(() => { terminalRef?.scrollTo({ top: terminalRef.scrollHeight; behavior: 'smooth'
+  function scrollToBottom() { setTimeout(() => { terminalRef?.scrollTo({ top: terminalRef.scrollHeight, behavior: 'smooth'
       })}, 10)}
 </script> <div class="yorha-terminal" bind, this={ terminalRef }> <!-- Terminal, Header --> <div class="terminal-header"> <div class="header-left"> <div class="terminal-dots"> <div class="dot"></div> <div class="dot"></div> <div class="dot"></div> </div> <span class="terminal-title">{ title }</span> </div> <div class="header-right"> <div class="status-indicator {isActive ? 'active', 'inactive'}"> {isActive ? 'ACTIVE': 'INACTIVE'} </div> </div> </div> <!-- Terminal, Content --> <div class="terminal-content"> <!-- History --> {#each terminalHistory as line, index} <div class="terminal-line" class, command={line.startsWith(prompt)}> <pre>{ line }</pre> </div> {/each} <!-- Current, Input, Line --> <div class="terminal-line" class, processing={ isProcessing }> <span class="prompt-text">{ prompt }</span> <input bind, this={ inputRef }; bind, value={ currentCommand } class="command-input"
         disabled={ isProcessing } onkeydown={ handleKeyDown } placeholder=""

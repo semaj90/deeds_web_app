@@ -66,7 +66,7 @@ class MinIOService {
     /** * Upload legal document files with real-time progress tracking */
     async uploadDocuments(
         files: FileList | File[],
-        options: { autoProcess?: boolean; priority?: number; caseId?: string; documentType?: string } = {}
+        options: { autoProcess?: boolean, priority?: number, caseId?: string; documentType?: string } = {}
     ): Promise<MinIOFile[]> {
         const { autoProcess = true, priority = 128, caseId, documentType } = options;
         const uploadPromises: Promise<MinIOFile>[] = [];
@@ -81,7 +81,7 @@ class MinIOService {
     /** * Upload single document with comprehensive processing pipeline */
     private async uploadSingleDocument(
         file: File,
-        options: { autoProcess?: boolean; priority?: number; caseId?: string; documentType?: string } = {}
+        options: { autoProcess?: boolean, priority?: number, caseId?: string; documentType?: string } = {}
     ): Promise<MinIOFile> {
         const uploadId = `upload_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         try {

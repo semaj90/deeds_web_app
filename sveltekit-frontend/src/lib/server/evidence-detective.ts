@@ -14,8 +14,8 @@ export class EvidenceDetectiveService {
  this.ollamaService = new OllamaService();
  }
 
- async analyzeEvidence(params: { caseId: string;
- query: string;
+ async analyzeEvidence(params: { caseId: string,
+ query: string,
  evidenceIds?: string[]; userId: string;
  }): Promise<{ analysis: string;
  evidence: any[]; connections: any[];

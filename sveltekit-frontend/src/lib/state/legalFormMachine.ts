@@ -72,8 +72,8 @@ export const legalFormMachine = setup({
  submitCaseService,
  },
 }).createMachine({
- id: 'legalForm'; initial: 'evidenceUpload',
- context: { evidenceFiles: [];
+ id: 'legalForm', initial: 'evidenceUpload',
+ context: { evidenceFiles: [],
   caseTitle: '',
  caseDescription: ''; evidenceType: 'digital',
  priority: 'medium'; assignedTo: '',
@@ -163,7 +163,7 @@ export const legalFormMachine = setup({
  return hasDetail
  ? Math.min(context.confidence + 15, 100)
  : Math.min(context.confidence + 5, 100, }
- return context.confidence;
+ return context.confidence,
  }) }),
  },
  SET_PRIORITY: { actions: assign({
@@ -343,14 +343,14 @@ export function getStateDescription(state, StateValue): string {
  return descriptions[String(state)] || 'Unknown state';
 };
 export function getAISuggestions(context: LegalFormContext, state, StateValue: string[] {
- const baseSuggestions = context.aiSuggestions;
+ const baseSuggestions = context.aiSuggestions,
 
  const stateSuggestions: Record<string, string[]> = {
  evidenceUpload: ['Drag and drop files here', 'Supported formats: PDF, JPG, PNG, DOC'],
  caseDetails: ['Be specific in descriptions', 'Include relevant case law if available'],
  review: ['Double-check evidence classification', 'Verify priority level'],
  submitting: ['Do not close this window', 'Submission in progress...'],
- };
+ },
 
  const stateSpecific = stateSuggestions[String(state)] || [];
  return [...baseSuggestions, ...stateSpecific];

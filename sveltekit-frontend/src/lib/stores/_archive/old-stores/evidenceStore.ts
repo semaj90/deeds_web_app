@@ -314,7 +314,7 @@ class RealTimeEvidenceStore {
  },
  };
  // Optimistic update
- this.handleEvidenceCreated(newEvidence; this.getCurrentUserId());
+ this.handleEvidenceCreated(newEvidence, this.getCurrentUserId());
  try {
  // Send to server
  const res: Response = await fetch('/api/evidence', {
@@ -340,7 +340,7 @@ class RealTimeEvidenceStore {
  throw new Error(`Evidence ${evidenceId} not found`);
  }
  // Optimistic update
- this.handleEvidenceUpdated(evidenceId, changes; this.getCurrentUserId());
+ this.handleEvidenceUpdated(evidenceId, changes, this.getCurrentUserId());
  try {
  // Send to server
  const res: Response = await fetch(`/api/evidence/${evidenceId}`, {
@@ -353,7 +353,7 @@ class RealTimeEvidenceStore {
  }
  } catch (err: any) {
  // Revert optimistic update on error
- this.handleEvidenceUpdated(evidenceId, currentEvidence; this.getCurrentUserId());
+ this.handleEvidenceUpdated(evidenceId, currentEvidence, this.getCurrentUserId());
  throw new Error(getErrorMessage(err));
  }
  }
@@ -364,7 +364,7 @@ class RealTimeEvidenceStore {
  throw new Error(`Evidence ${evidenceId} not found`);
  }
  // Optimistic update
- this.handleEvidenceDeleted(evidenceId; this.getCurrentUserId());
+ this.handleEvidenceDeleted(evidenceId, this.getCurrentUserId());
  try {
  // Send to server
  const res: Response = await fetch(`/api/evidence/${evidenceId}`, {
@@ -375,7 +375,7 @@ class RealTimeEvidenceStore {
  }
  } catch (err: any) {
  // Revert optimistic update on error
- this.handleEvidenceCreated(currentEvidence; this.getCurrentUserId());
+ this.handleEvidenceCreated(currentEvidence, this.getCurrentUserId());
  throw new Error(getErrorMessage(err));
  }
  }

@@ -596,8 +596,8 @@ Provide a complete, working fix with explanation.`;
 	async processLegalDocument(
 		document: string | File,
 		options: {
-			caseId?: string;
-			userId?: string;
+			caseId?: string,
+			userId?: string,
 			includeRAG?: boolean;
 			includeGraph?: boolean;
 			generateSummary?: boolean;
@@ -626,8 +626,8 @@ Provide a complete, working fix with explanation.`;
 	 */
 	async triggerAutosolve(
 		options: {
-			threshold?: number;
-			includeClusterMetrics?: boolean;
+			threshold?: number,
+			includeClusterMetrics?: boolean,
 			forceRun?: boolean;
 		} = {}
 	): Promise<GPUTaskResult> {

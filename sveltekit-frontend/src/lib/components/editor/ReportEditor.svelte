@@ -29,7 +29,7 @@
    let evidenceSearchResults: Evidence[] = []; // populated on mount from report attachedEvidence // Editor ref & autosave cleanup placeholder let editorComponent: unknown = null;
    let cleanupAutoSave: (() => void) | undefined = undefined; // Reactive editor height let editorHeight = 500; function updateEditorHeight() { // reference the store value via $reportUI in function (Svelte auto-subscription in module) editorHeight = $reportUI?.fullscreen ? window.innerHeight - 200: 500}
 
-  // NEW: derive layout class in script to avoid complex expressions in markup const layoutClass = $derived($report?.settings ? ({ single: 'layout-single', dual: 'layout-dual'; masonry: 'layout-masonry' }[$report.settings.layout] ?? 'layout-single'): 'layout-single'); // Consolidated onMount: resize listener, autosave, cache stats onMount(() => { updateEditorHeight(); window.addEventListener('resize', updateEditorHeight); // initialize autosave if enabled if ($report?.settings?.autoSave) { cleanupAutoSave = setupAutoSave()}
+  // NEW: derive layout class in script to avoid complex expressions in markup const layoutClass = $derived($report?.settings ? ({ single: 'layout-single', dual: 'layout-dual', masonry: 'layout-masonry' }[$report.settings.layout] ?? 'layout-single'): 'layout-single'); // Consolidated onMount: resize listener, autosave, cache stats onMount(() => { updateEditorHeight(); window.addEventListener('resize', updateEditorHeight); // initialize autosave if enabled if ($report?.settings?.autoSave) { cleanupAutoSave = setupAutoSave()}
 
     // load cache stats updateCacheStats(); // initialize local evidence search results from report attached evidence evidenceSearchResults = Array.isArray($report?.attachedEvidence) ? ($report.attachedEvidence as Evidence[]): []; return () => { window.removeEventListener('resize', updateEditorHeight); if (cleanupAutoSave) cleanupAutoSave()}}); // Update cache statistics function updateCacheStats() { cacheStats = legalAnalysisCache.getStats()}
 
@@ -68,7 +68,7 @@
    let settingsModalContentRef: HTMLDivElement | null = null; // Unified close helpers function closeEvidenceModal() { showEvidenceModal = false; selectedEvidence = null}
   function closeSettingsModal() { showSettingsModal = false}
 
-  // Keyboard handlers for overlay and content function handleOverlayKeydown(e: KeyboardEvent; closeFn: () => void) { const key = e.key; if (key === 'Escape') { e.stopPropagation(); closeFn()}
+  // Keyboard handlers for overlay and content function handleOverlayKeydown(e: KeyboardEvent, closeFn: () => void) { const key = e.key; if (key === 'Escape') { e.stopPropagation(); closeFn()}
 
     // support keyboard activation parity with click (Enter / Space) if (key === 'Enter' || key === ' ') { e.preventDefault(); closeFn()}
   }

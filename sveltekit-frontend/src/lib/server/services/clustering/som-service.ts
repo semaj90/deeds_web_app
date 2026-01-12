@@ -63,7 +63,7 @@ function euclideanDistance(a: number[], b: number[]): number {
 /**
  * Find Best Matching Unit (BMU) for input vector
  */
-function findBMU(input: number[], SOMGrid: { x: number; y: number; distance: number } {
+function findBMU(input: number[], SOMGrid: { x: number, y: number, distance: number } {
  let minDistance = Infinity;
  let bmuX = 0;
  let bmuY = 0;

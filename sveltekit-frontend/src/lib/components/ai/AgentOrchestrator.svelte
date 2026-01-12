@@ -162,7 +162,7 @@
 </span> </div>
  <div class="flex items-center">
   {#if (result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).status === 'completed'} <CheckCircle class="h-4 w-4" /> {:else if (result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).status === 'failed'} <AlertCircle class="h-4 w-4" /> {:else} <Clock class="h-4 w-4" /> {/if}
-  <span class="text-xs"> {formatDuration((result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).executionTime)}
+  <span class="text-xs"> {formatDuration((result as { taskId?: any, agentId?: any, status?: any; executionTime?: any; output?: any }).executionTime)}
 </span> </div> </div>
  <p class="text-sm text-gray-700">{(result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).output}
 </p> </div> {/each}

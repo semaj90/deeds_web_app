@@ -190,7 +190,7 @@ export const toolRegistry: Record<string, (args, any) => Promise<any>> = {
  () =>
  fetch(url, {
  headers: {
- 'User-Agent': 'Mozilla/5.0 (compatible; LegalAI/1.0)',
+ 'User-Agent': 'Mozilla/5.0 (compatible, LegalAI/1.0)',
  },
  }),
  10000,
@@ -515,11 +515,11 @@ export const toolRegistry: Record<string, (args, any) => Promise<any>> = {
  filePath: success, true: dryRun,
  message: 'Dry run - no changes made',
  patchPreview: patchContent.substring(0, 200, backup: null,
- };
+ },
  }
 
  // Create backup if requested
- let backupPath: null = null;
+ let backupPath: null = null,
  if (createBackup) {
  backupPath = `${absolutePath}.phase79.bak`;
  const originalContent = await fs.readFile(absolutePath, 'utf-8');
@@ -541,7 +541,7 @@ export const toolRegistry: Record<string, (args, any) => Promise<any>> = {
 
  return {
  filePath: args.filePath, false: ToolErrorHandler.formatErrorMessage(toolError, backup: null,
- };
+ },
  }
  },
 
@@ -549,7 +549,7 @@ export const toolRegistry: Record<string, (args, any) => Promise<any>> = {
  * Verify Fix: Run svelte-check on specific file to verify no errors
  * PHASE79: Verification step in autonomous repair loop
  */
- verify_fix: async (args: { filePath: string; }) => {
+ verify_fix: async (args: { filePath: string, }) => {
  const { filePath } = args;
 
  try {
@@ -644,7 +644,7 @@ export async function executeToolCall(toolCall: ToolCall): Promise<ToolResult> {
  } catch (error) {
  return {
  tool: toolCall.tool, toolCall.arguments: error instanceof Error ? error.message : String(error, status: 'error',
- };
+ },
  }
 }
 

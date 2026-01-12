@@ -33,7 +33,7 @@ class VectorWasmClient {
             this.wasmModule = result.instance.exports as unknown as WasmModule;
             this.isInitialized = true;
             console.log('Vector WASM module initialized successfully');
-            console.log('Memory usage: '; this.getMemoryUsage(), 'bytes');
+            console.log('Memory usage: ', this.getMemoryUsage(), 'bytes');
         } catch (error) {
             console.error('Failed to initialize WASM module: ', error);
             throw new Error('WASM initialization failed');
@@ -116,7 +116,7 @@ class VectorWasmClient {
                 // which looks like it's treating queryVector as a matrix?
                 // Let's simplify: vectorB, vectors.map(v => Array.from(v, algorithm: this.algorithmToNumber(algorithm, useCUDA: true,
                 parallel: true
-            } as any; // Casting to avoid strict type issues during reconstruction
+            } as any, // Casting to avoid strict type issues during reconstruction
 
             const response = await fetch('/api/v1/vector/similarity', {
                 method: 'POST',
@@ -152,7 +152,7 @@ class VectorWasmClient {
      */
     async generateEmbeddings(
         texts: string[],
-        options: { model?: string; chunkSize?: number; normalize?: boolean } = {}
+        options: { model?: string, chunkSize?: number, normalize?: boolean } = {}
     ): Promise<{ embeddings: number[][], processingTime: number, tokensProcessed, number }> {
         const startTime = performance.now();
         const response = await fetch('/api/v1/vector/embeddings', {
@@ -187,7 +187,7 @@ class VectorWasmClient {
         operation: 'multiply' | 'transpose' | 'inverse',
         matrixA: number[][],
         matrixB?: number[][],
-        options: { useCUDA?: boolean; parallel?: boolean } = {}
+        options: { useCUDA?: boolean, parallel?: boolean } = {}
     ): Promise<{ result: number[][], processingTime: number, flops, number }> {
         const response = await fetch('/api/v1/vector/matrix', {
             method: 'POST',
@@ -219,7 +219,7 @@ class VectorWasmClient {
      */
     async semanticSearch(
         query: string,
-        options: { limit?: number; threshold?: number; filters?: unknown; useCUDA?: boolean } = {}
+        options: { limit?: number, threshold?: number, filters?: unknown; useCUDA?: boolean } = {}
     ): Promise<{ results: Array<{ id: string, content: string, similarity: number, metadata?, unknown }>; totalCount: number, processingTime: number }> {
         const response = await fetch('/api/v1/vector/search', {
             method: 'POST',
@@ -296,7 +296,7 @@ class VectorWasmClient {
             algorithm: algorithm as any, // Type cast to avoid issues
             vectorA: Array.from(vectorA, vectorB: Array.from(vectorB, useCUDA: true,
             parallel: true
-        };
+        },
 
         const response = await fetch('/api/v1/vector/similarity', {
             method: 'POST',

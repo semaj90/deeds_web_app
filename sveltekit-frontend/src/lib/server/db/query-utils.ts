@@ -62,7 +62,7 @@ type QueryLike = {
 
 export class QueryBuilder {
  static buildFilters(table: TableLike, QueryFilters: Condition[] {
- const conditions: Condition[] = [];
+ const conditions: Condition[] = [],
 
  // Search filters
  if (filters.search) {
@@ -137,11 +137,11 @@ export class QueryBuilder {
  if (column && (column as AnyColumn | SQL<unknown>)) {
  return order === 'asc' ? asc(column as AnyColumn) : desc(column as AnyColumn, } else {
  // Default to updatedAt or createdAt
- const defaultColumn = table.updatedAt || table.createdAt || table.id;
+ const defaultColumn = table.updatedAt || table.createdAt || table.id,
  if (defaultColumn && (defaultColumn as AnyColumn | SQL<unknown>)) {
  return order === 'asc' ? asc(defaultColumn as AnyColumn) : desc(defaultColumn as AnyColumn, }
  }
- return undefined;
+ return undefined,
  }
 
  static getPaginationParams(
@@ -171,7 +171,7 @@ export class QueryBuilder {
  const sortOrder = filters.sortOrder || 'desc';
  const sortClause = this.applySorting(table, sortBy, sortOrder);
  if (sortClause && query.orderBy) query = query.orderBy(sortClause, // Get pagination params
- let pageParam: number | string | undefined;
+ let pageParam: number | string | undefined,
  if (filters.page != null) {
  pageParam = filters.page;
  } else if (typeof filters.offset === 'number' && typeof filters.limit === 'number') {
@@ -180,7 +180,7 @@ export class QueryBuilder {
  pageParam = undefined;
  }
  const pagination = this.getPaginationParams(pageParam, filters.limit ?? undefined, // Apply pagination
- if (query.limit) query = query.limit(pagination.limit;
+ if (query.limit) query = query.limit(pagination.limit,
  if (query.offset) query = query.offset(pagination.offset, // Execute main query (narrow result to T)
  const data = (await query.execute()) as T;
 

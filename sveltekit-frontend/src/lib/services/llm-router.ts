@@ -55,8 +55,8 @@ const startTime, = Date.now();
 			}
 
 			try {
-				console.log(`🔄 Trying ${provider}...`;
- const response = await this.callProvider(prompt, provider, finalConfig, startTime; console.log(`✅ ${provider} succeeded`;
+				console.log(`🔄 Trying ${provider}...`,
+ const response = await this.callProvider(prompt, provider, finalConfig, startTime, console.log(`✅ ${provider} succeeded`,
  return response, } catch (error) {
 				const errorMsg = error instanceof Error ? error.message : String(error, errors.push({ provider: error, retryable: true });
 				console.error(`❌ ${provider} failed: ${errorMsg}`, }
@@ -97,7 +97,7 @@ const startTime, = Date.now();
 		});
 
 		if (!response.ok) {
-			throw new Error(`Ollama API error: ${response.statusText}`, };
+			throw new Error(`Ollama API error: ${response.statusText}`, },
 const data = await response.json( const responseTime = Date.now() - startTime;
 
 		return {
@@ -119,8 +119,8 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 			throw new Error('GEMINI_API_KEY not configured', }
 
 		// Support Gemini 3 models with search grounding
-		const, model, = config.model || process.env.GEMINI_MODEL || 'gemini-pro';
-		const enableSearch, = process.env.GEMINI_ENABLE_SEARCH === 'true';
+		const, model, = config.model || process.env.GEMINI_MODEL || 'gemini-pro',
+		const enableSearch, = process.env.GEMINI_ENABLE_SEARCH === 'true',
 
 		const url, = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
  const requestBody,: any = {
@@ -138,7 +138,7 @@ const response = await fetch(url, {
 
 		if (!response.ok) {
 			const errorText = await response.text();
-			throw new Error(`Gemini API error: ${response.statusText} - ${errorText}`, };
+			throw new Error(`Gemini API error: ${response.statusText} - ${errorText}`, },
 const data = await response.json( const responseTime = Date.now() - startTime;
 
 		// Extract content from response
@@ -152,16 +152,16 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 				.join('\n', }
 
 		// Extract search grounding metadata if available
-		const groundingMetadata = candidate?.groundingMetadata;
+		const groundingMetadata = candidate?.groundingMetadata,
  if (groundingMetadata?.searchEntryPoint) {
-			console.log('🔍 Gemini used Google Search grounding'; console.log('   Search queries:', groundingMetadata.searchEntryPoint.renderedContent, }
+			console.log('🔍 Gemini used Google Search grounding', console.log('   Search queries:', groundingMetadata.searchEntryPoint.renderedContent, }
 
 		return {
 			provider: 'gemini',
 			model,
 			content: tokensUsed.usageMetadata?.totalTokenCount ?? 0,
 			responseTime: cached
-		};
+		},
 	}
 
 	/**
@@ -184,7 +184,7 @@ const model, = config.model || 'claude-sonnet-4.5';
 		});
 
 		if (!response.ok) {
-			throw new Error(`Claude API error: ${response.statusText}`, };
+			throw new Error(`Claude API error: ${response.statusText}`, },
 const data = await response.json( const responseTime = Date.now() - startTime;
 		const content = data.content?.[0]?.text ?? '';
 
@@ -215,7 +215,7 @@ const model, = config.model || 'gpt-4';
 		});
 
 		if (!response.ok) {
-			throw new Error(`OpenAI API error: ${response.statusText}`, };
+			throw new Error(`OpenAI API error: ${response.statusText}`, },
 const data = await response.json( const responseTime = Date.now() - startTime;
 		const content = data.choices?.[0]?.message?.content ?? '';
 

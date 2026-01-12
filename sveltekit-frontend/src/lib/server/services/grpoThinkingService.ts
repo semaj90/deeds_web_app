@@ -237,8 +237,8 @@ export async function storeGrpoThinkingResponse(response: GrpoThinkingResponse):
 export async function searchGrpoThinkingResponses(
  query: string,
  options: {
- limit?: number;
- threshold?: number;
+ limit?: number,
+ threshold?: number,
  thinkingType?: string;
  timeRange?: { from: Date; to: Date };
  includeRecentBias?: boolean;

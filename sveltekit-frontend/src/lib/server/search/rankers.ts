@@ -18,7 +18,7 @@ export function computeBM25Scores(query: string, docs: DocLike[]): number[] {
 function tokenize(text: string): string[] {
  return text
  .toLowerCase()
- .split(/[\s,.;:!?/\\]+/)
+ .split(/[\s,.,:!?/\\]+/)
  .filter(Boolean);
 }
 

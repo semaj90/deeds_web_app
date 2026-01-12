@@ -24,8 +24,8 @@ import { getDb } from '../pool.js';
 export async function getArchivedErrorClusters(
   routeId: string,
   options: {
-    limit?: number;
-    offset?: number;
+    limit?: number,
+    offset?: number,
     startDate?: Date;
     endDate?: Date;
   } = {}
@@ -106,8 +106,8 @@ export async function getArchivedErrorClusters(
 export async function getArchivedInteractions(
   routeId: string,
   options: {
-    limit?: number;
-    offset?: number;
+    limit?: number,
+    offset?: number,
     startDate?: Date;
     endDate?: Date;
     interactionType?, string;
@@ -190,8 +190,8 @@ export async function getArchivedInteractions(
 export async function getCombinedErrorClusters(
   routeId: string,
   options: {
-    limit?: number;
-    offset?: number;
+    limit?: number,
+    offset?: number,
     includeArchived?: boolean;
   } = {}
 ) {
@@ -339,8 +339,8 @@ export async function getCombinedErrorClusters(
 export async function getCombinedInteractions(
   routeId: string,
   options: {
-    limit?: number;
-    offset?: number;
+    limit?: number,
+    offset?: number,
     includeArchived?: boolean;
   } = {}
 ) {

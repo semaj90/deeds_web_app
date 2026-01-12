@@ -5,7 +5,7 @@
   import { Menu, MenuButton, MenuItems, MenuItem } from '@rgossiaux/svelte-headlessui';
 
   // Props from server load
-  export let data;
+  // TODO: Convert to $props - // TODO: Convert to $props - export let data;
 
   interface GraphNode {
     id: string; label: string;
@@ -188,8 +188,8 @@
   }
 
   // Filter nodes
-  $: filteredNodes = topologyData.nodes.filter(node => {
-    if (filterSource !== 'all' && !node.id.includes(filterSource)) return false;
+  let filteredNodes = $derived(topologyData.nodes.filter(node => {
+    if (filterSource !== 'all' && !node.id.includes(filterSource)) return false);
     if (searchQuery && !node.id.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     return true;
   });

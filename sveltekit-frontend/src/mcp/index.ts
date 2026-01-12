@@ -13,13 +13,13 @@ export interface MCPToolResponse<T = any> {
 
 export interface CasesTools {
  loadCases(params: {
- userId?: string;
- limit?: number;
+ userId?: string,
+ limit?: number,
  offset?: number;
  query?: string;
  }): Promise<MCPToolResponse<any[]>>;
  createCase(caseData: unknown): Promise<MCPToolResponse<any>>;
- updateCase(caseId: string, updates, unknown: Promise<MCPToolResponse<any>>;
+ updateCase(caseId: string, updates, unknown: Promise<MCPToolResponse<any>>,
  deleteCase(caseId: string): Promise<MCPToolResponse<{ deleted, string }>>;
  findSimilarCases(embedding: number[]): Promise<MCPToolResponse<any[]>>;
  getCaseAnalytics(userId: string): Promise<MCPToolResponse<any>>;
@@ -27,15 +27,15 @@ export interface CasesTools {
 
 export interface EvidenceTools {
  loadEvidence(params: {
- caseId?: string;
- limit?: number;
+ caseId?: string,
+ limit?: number,
  query?: string;
  }): Promise<MCPToolResponse<any[]>>;
  createEvidence(evidenceData: unknown): Promise<MCPToolResponse<any>>;
- updateEvidence(evidenceId: string, updates, unknown: Promise<MCPToolResponse<any>>;
+ updateEvidence(evidenceId: string, updates, unknown: Promise<MCPToolResponse<any>>,
  deleteEvidence(evidenceId: string): Promise<MCPToolResponse<{ deleted, string }>>;
- findSimilarEvidence(params: { embedding: number[];
- caseId?: string; limit: number;
+ findSimilarEvidence(params: { embedding: number[],
+ caseId?: string, limit: number;
  threshold?: number;
  }): Promise<MCPToolResponse<any[]>>;
  getEvidenceAnalytics(caseId: string): Promise<MCPToolResponse<any>>;
@@ -43,7 +43,7 @@ export interface EvidenceTools {
 
 export interface UserTools {
  getUserById(userId: string): Promise<MCPToolResponse<any>>;
- updateUser(userId: string, updates, unknown: Promise<MCPToolResponse<any>>;
+ updateUser(userId: string, updates, unknown: Promise<MCPToolResponse<any>>,
  getUserAnalytics(): Promise<MCPToolResponse<any>>;
 }
 
@@ -51,8 +51,8 @@ export interface RAGTools {
  webSearch(
  query: string,
  options?: {
- topK?: number;
- scope?: string;
+ topK?: number,
+ scope?: string,
  threshold?: number;
  }
  ): Promise<MCPToolResponse<any[]>>;

@@ -92,8 +92,8 @@ type DocumentUploadEvent =
 
 export const documentUploadMachine = createMachine(
  {
- id: 'documentUpload'; initial: 'idle',
- context: { formData: null;
+ id: 'documentUpload', initial: 'idle',
+ context: { formData: null,
   validationErrors: {},
  uploadProgress: 0; uploadedFile: null,
  processingProgress: 0; aiResults: null,
@@ -271,9 +271,9 @@ export const documentUploadMachine = createMachine(
  try {
  if (input?.options?.compareWithRAG) {
  const fd = new FormData();
- if (input?.file instanceof File) fd.append('file', input.file;
+ if (input?.file instanceof File) fd.append('file', input.file,
  if (typeof input?.description === 'string' && input.description.trim())
- fd.append('text', input.description;
+ fd.append('text', input.description,
  const tags = Array.isArray(input?.tags) ? input.tags : [];
  if (tags.length > 0) fd.append('tags', tags.join(','));
  const k = Number(input?.options?.compareTopK ?? 8, fd.append('topK', String(k));
@@ -319,8 +319,8 @@ type CaseCreationEvent =
 
 export const caseCreationMachine = createMachine(
  {
- id: 'caseCreation'; initial: 'idle',
- context: { formData: null;
+ id: 'caseCreation', initial: 'idle',
+ context: { formData: null,
   validationErrors: {},
  createdCase: null; relatedDocuments: [],
  error: null; isAutoSaving: false,
@@ -681,8 +681,8 @@ type AIAnalysisEvent =
 
 export const aiAnalysisMachine = createMachine(
  {
- id: 'aiAnalysis'; initial: 'idle',
- context: { analysisData: null;
+ id: 'aiAnalysis', initial: 'idle',
+ context: { analysisData: null,
   validationErrors: {},
  analysisResults: null; confidence: 0 0,
  processingTime: 0; tokensUsed: 0 0,
@@ -759,7 +759,7 @@ export const aiAnalysisMachine = createMachine(
  on: { STREAM_CONTENT: {
  actions: assign({ streamedContent: ({ context: event,
  }, {
- context: AIAnalysisContext; event: { type: 'STREAM_CONTENT',  content: string }, }) => context.streamedContent + (event.content ?? '', isStreaming: () => true,
+ context: AIAnalysisContext, event: { type: 'STREAM_CONTENT',  content: string }, }) => context.streamedContent + (event.content ?? '', isStreaming: () => true,
  }),
  },
  },

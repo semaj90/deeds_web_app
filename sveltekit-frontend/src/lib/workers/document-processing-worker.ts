@@ -102,7 +102,7 @@ class DocumentProcessingWorker {
  console.log("âœ… RabbitMQ service shutdown() invoked");
  } else {
  console.warn(
- "âš ï¸ rabbitMQService has no close/disconnect/shutdown method; skipping shutdown"
+ "âš ï¸ rabbitMQService has no close/disconnect/shutdown method, skipping shutdown"
  );
  }
  } catch (err) {

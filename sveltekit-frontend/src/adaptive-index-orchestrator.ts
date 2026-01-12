@@ -63,7 +63,7 @@ export class AdaptiveIndexOrchestrator {
 	/**
 	 * Decide routing based on context
 	 */
-	async decideRouting(context: { caseId: string; fileSize: number; textLength: number;
+	async decideRouting(context: { caseId: string, fileSize: number, textLength: number;
 	}): Promise<RoutingDecision> {
 		// Simple heuristic-based routing
 		if (context.fileSize > 1024 * 256) return 'gpu';

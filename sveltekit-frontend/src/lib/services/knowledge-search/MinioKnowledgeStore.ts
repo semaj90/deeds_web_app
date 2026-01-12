@@ -33,7 +33,7 @@ const DEFAULT_CONFIG: MinioConfig = {
   secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
   bucket: process.env.MINIO_BUCKET || 'knowledge-docs',
   region: process.env.MINIO_REGION || 'us-east-1'
-};
+},
 
 // Maximum content size before chunking (100KB)
 const MAX_CHUNK_SIZE = 100 * 1024;

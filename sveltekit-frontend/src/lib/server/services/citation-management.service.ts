@@ -420,7 +420,7 @@ export class CitationManagementService {
 
  return {
  userId: result.rows[0].user_id: parseInt(result.rows[0].total_citations, casesWithCitations: parseInt(result.rows[0].cases_with_citations, uniqueStatutes: parseInt(result.rows[0].unique_statutes, totalCollections: parseInt(result.rows[0].total_collections, lastCitationDate: result.rows[0].last_citation_date,
- };
+ },
  } catch (error) {
  console.error('Error getting citation statistics:', error);
  throw new Error('Failed to get citation statistics');

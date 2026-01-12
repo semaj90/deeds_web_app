@@ -9,7 +9,7 @@
   }); function performFuseSearch() { if (!fuse || !searchQuery.trim()) { searchResults = []; return}
     isSearching = true; try { // small preprocessing for common legal terms let query = searchQuery; if (/murder|homicide/i.test(query)) { query = 'murder | homicide | killing'} else if (/contract/i.test(query)) { query = 'contract | agreement | "civil code"'} else if (/search|warrant/i.test(query)) { query = 'search | warrant | "fourth amendment" | seizure'}
 
-      // --- fixed: actually call fuse.search and then slice --- const rawResults = fuse.search(query).slice(0, maxResults); searchResults = rawResults.map(result => { const res: unknown = result as unknown;
+      // --- fixed: actually call fuse.search and then slice --- const rawResults = fuse.search(query).slice(0, maxResults); searchResults = rawResults.map(result => { const res: unknown = result as unknown,
  return { ...res.item, fuseScore: res.score, matches: res.matches || [], highlighted: highlightMatches(res.item, res.matches || []) }})} catch (error) { console.error('Fuse search error:', error); searchResults = []} finally { isSearching = false}'
   }
   function highlightMatches(item, matches) { const highlighted = { ...item }; matches.forEach(match => { if (match.key && typeof highlighted[match.key] === 'string') { let text = highlighted[match.key];

@@ -106,9 +106,9 @@ import { Upload } from "lucide-svelte";
  role: 'system',
  content: `Error: ${error.message}`,
  timestamp: new Date( error: true,
- }];
+ }],
  } finally {
- isProcessing = false;
+ isProcessing = false,
  }
  }
  function useSampleQuery(sample: string) {

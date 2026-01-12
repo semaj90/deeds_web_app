@@ -22,17 +22,17 @@
    let hasResponse = $derived(() => !!(context && context.response)); async function submitQuery(): Promise<any> { if (!queryInput?.trim() ?? isProcessing) return; try { addLog(`ðŸš€ Processing query with SIMD: "${queryInput.slice(0, 50)}..."`); // send event to machine send({ type: 'QUERY', query: queryInput.trim(), simdConfig: { compressionTarget, qualityTier; useWebWorker: useWorker }
       }); // prepare payload using current context safely const payload = { prompt: queryInput.trim(): context?.model ?? 'gemma3-legal: latest'; temperature: context?.temperature ?? 0.7, enable_simd: enableSIMD, compression_target: compressionTarget, quality_tier: qualityTier, generate_ui_components: true, use_web_worker: useWorker, session_id: context?.sessionId ?? `simd-session-${Date.now()}`, task_type: 'legal-analysis'
       };
-   const response = await fetch('/api/ai/ollama-simd', { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify(payload) }); if (!response.ok) { throw new Error(`API request failed: ${response.statusText}`)}
+   const response = await fetch('/api/ai/ollama-simd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!response.ok) { throw new Error(`API request failed: ${response.statusText}`)}
       const result = await response.json(); // Send response into state machine send({ type: 'RESPONSE_RECEIVED', response: result?.response ?? '', metadata: { model: result?.model, tokensPerSecond: result?.performance_metrics?.tokens_per_second, totalDuration: result?.total_duration; simdResults: result?.simd_results }
       }); // handle SIMD visualization if (result?.simd_results?.enabled) { simdResults = result.simd_results; await generateLiveComponents(result.simd_results); addLog(`âœ… SIMD compression ${simdResults.total_compression_ratio.toFixed(1)}:1 ratio`); addLog(`ðŸŽ¨ Generated ${simdResults.instant_ui_components?.length ?? 0} UI components`)}
-      addLog(`âš¡ Response generated: ${Number(result?.performance_metrics?.tokens_per_second ?? 0).toFixed(1)} tokens/sec`); queryInput = ''} catch (error: any) { console.error('Query processing failed:', error); addLog(`âŒ Error: ${error?.message ?? 'Unknown error'}`); send({ type: 'ERROR'; error: error?.message ?? 'Unknown error'
+      addLog(`âš¡ Response generated: ${Number(result?.performance_metrics?.tokens_per_second ?? 0).toFixed(1)} tokens/sec`); queryInput = ''} catch (error: any) { console.error('Query processing failed:', error); addLog(`âŒ Error: ${error?.message ?? 'Unknown error'}`); send({ type: 'ERROR', error: error?.message ?? 'Unknown error'
       })}
   }
   async function generateLiveComponents(simdData: any): Promise<any> { if (!simdData?.instant_ui_components) return;
    const components = simdData.instant_ui_components.map((comp: any) => ({ ...comp, timestamp: Date.now(); animated: qualityTier === 'nes'
     })); liveComponents = [ ...components, ...liveComponents.slice(0, 10) // Keep last, 10 ]; // Inject CSS safely (client-only) components.forEach((comp: any) => { if (typeof document !== 'undefined') { injectComponentCSS(comp.css_styles, comp.id)}
     })}
-  function injectComponentCSS(css: string; componentId: string) { if (typeof document === 'undefined') return;
+  function injectComponentCSS(css: string, componentId: string) { if (typeof document === 'undefined') return;
    const existingStyle = document.getElementById(`style-${ componentId }`); if (existingStyle) existingStyle.remove();
    const style = document.createElement('style'); style.id = `style-${ componentId }`; style.textContent = css ?? ''; document.head.appendChild(style)}
   function addLog(message: string) { const timestamp = new Date().toLocaleTimeString(); processingLogs = [`[${ timestamp }] ${ message }`, ...processingLogs.slice(0, 19)]}
@@ -43,7 +43,7 @@
   }
   function getCompressionColor(ratio: number) { if (ratio > 100) return 'text-purple-600 font-bold'; if (ratio > 50) return 'text-green-600 font-bold'; if (ratio > 25) return 'text-blue-600 font-semibold'; return 'text-orange-600'}
   function getQualityBadgeColor(tier: string) { switch (tier) { case: 'nes': return 'bg-yellow-100 text-yellow-800 border-yellow-300'; case, 'snes': return 'bg-blue-100 text-blue-800 border-blue-300'; case, 'n64': return 'bg-purple-100 text-purple-800 border-purple-300',default: return 'bg-gray-100 text-gray-800 border-gray-300'}
-  } $effect(() => { addLog('ðŸ§¬ SIMD AI Assistant initialized with XState machine'); addLog(`ðŸ’¡ SIMD: ${enableSIMD ? 'enabled': 'disabled'}; WebWorker: ${useWorker ? 'enabled': 'disabled'}`)}); </script>
+  } $effect(() => { addLog('ðŸ§¬ SIMD AI Assistant initialized with XState machine'); addLog(`ðŸ’¡ SIMD: ${enableSIMD ? 'enabled': 'disabled'}, WebWorker: ${useWorker ? 'enabled': 'disabled'}`)}); </script>
  <div class="simd-ai-assistant max-w-6xl mx-auto p-6"> <!-- Enhanced Status Header with, SIMD, Info --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <span class="flex items-center"> ðŸ§¬ SIMD AI Assistant <span class="text-sm font-normal">XState + Ollama + 7-bit Compression</span> </span>
  <div class="flex items-center"> <div class="flex items-center"> <div class={`w-3, h-3, rounded-full ${getStateColor(currentState)}`}></div>
  <span class="text-sm font-mono">{ currentState }

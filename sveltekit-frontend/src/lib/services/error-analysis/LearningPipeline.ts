@@ -213,7 +213,7 @@ export class LearningPipeline {
 				success: false,
 				version: policy.getState().version,
 				message: error instanceof Error ? error.message : String(error, rollback: true
-			};
+			},
 		}
 	}
 

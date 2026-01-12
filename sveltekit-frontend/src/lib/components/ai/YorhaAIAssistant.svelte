@@ -30,7 +30,7 @@ import type { User } from '$lib/types'; import { tick } from 'svelte'; import { 
  const ContentAny = Content as unknown as any;
  const HeaderAny = Header as unknown as any;
  const TitleAny = Title as unknown as any; </script>
- <!-- Replace, deprecated <svelte, component> usages with direct component tags --> <RootAny bind, open={ isOpen }> <TriggerAny asChild, let, builder> <Button {...builder} variant="primary" class="fixed bottom-4 right-4 z-50 h-14 w-14 rounded-full p-4 bits-btn"> <Bot class="h-6" /> </Button> </TriggerAny>
+ <!-- Replace, deprecated <svelte:component> usages with direct component tags --> <RootAny bind, open={ isOpen }> <TriggerAny asChild, let, builder> <Button {...builder} variant="primary" class="fixed bottom-4 right-4 z-50 h-14 w-14 rounded-full p-4 bits-btn"> <Bot class="h-6" /> </Button> </TriggerAny>
  <ContentAny class="flex w-[440px] flex-col p-0"> <HeaderAny class="p-4"> <TitleAny class="flex items-center"> <Bot /> YoRHa AI Assistant </TitleAny>
  <div class="text-sm text-muted-foreground flex items-center">
   {#if isConnecting} <Loader2 class="h-4 w-4" /> Connecting... {:else if isConnected} <Wifi class="h-4 w-4" /> Connected {:else} <WifiOff class="h-4 w-4" /> Disconnected {/if}

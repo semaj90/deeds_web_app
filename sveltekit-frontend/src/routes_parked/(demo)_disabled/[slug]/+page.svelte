@@ -132,10 +132,10 @@
 	);
 </script>
 
-<svelte, head>
+<svelte:head>
 	<title>{metadata.title} - Legal AI Demo</title>
 	<meta name="description" content={metadata.description} />
-</svelte, head>
+</svelte:head>
 
 <div class="demo-page">
 	<header class="demo-page-header">

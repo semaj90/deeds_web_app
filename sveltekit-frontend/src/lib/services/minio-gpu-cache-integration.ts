@@ -114,7 +114,7 @@ export class MinIOGPUCacheService {
         console.log('✅ MinIO GPU Cache Service initialized');
     }
 
-    async put(data: Uint8Array, options: { contentType?: string; ttl?: number; tags?: string[]; bucket?: string } = {}): Promise<void> {
+    async put(data: Uint8Array, options: { contentType?: string, ttl?: number, tags?: string[]; bucket?: string } = {}): Promise<void> {
 
         try {
             const dataBytes = this.toUint8Array(data);

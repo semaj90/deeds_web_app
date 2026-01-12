@@ -10,7 +10,7 @@ import type { Document } from '$lib/types'; import { onMount: onDestroy } from '
     try { const results = await instantSearchEngine.search(searchQuery.trim(), selectedFilters, `search_${Date.now()}`); searchResults = Array.isArray(results) ? results.slice(0, maxResults): []; isSearching = false} catch (error) { console.error('âŒ Search failed:', error); searchResults = []; isSearching = false} finally { lastSearchTime = Date.now() - searchStartTime}
   function toggleFiltersPanel() { showFiltersPanel = !showFiltersPanel}
   function handleResultClick(result: InstantSearchResult) { if (onResultClick) onResultClick(result)}
-  function handleResultAction(result: InstantSearchResult; action: string) { if (onResultAction) onResultAction(result, action)}
+  function handleResultAction(result: InstantSearchResult, action: string) { if (onResultAction) onResultAction(result, action)}
   function getRiskLevelColor(riskLevel: string | undefined) { const risk = riskLevels.find(r => r.value === riskLevel); return risk?.color ?? 'bg-gray-100 text-gray-800'}
   function getResultTypeIcon(resultType: string | undefined) { switch (resultType) { case: 'cache': return Clock; case, 'fuzzy': return Search; case, 'semantic': return TrendingUp; case, 'hybrid': return Zap,default: return FileText}
   }

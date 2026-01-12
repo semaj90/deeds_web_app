@@ -436,7 +436,7 @@ export class WasmGpuInitService {
  this.context.gpuDevice = await adapter.requestDevice({
  requiredFeatures,
  requiredLimits: { maxBufferSize: Math.min(
- adapter.limits.maxBufferSize; this.config.memoryLimit * 1024 * 1024
+ adapter.limits.maxBufferSize, this.config.memoryLimit * 1024 * 1024
  maxStorageBufferBindingSize: Math.min(
  adapter.limits.maxStorageBufferBindingSize,
  512 * 1024 * 1024
@@ -756,7 +756,7 @@ export class WasmGpuInitService {
  ? this.context.sharedBuffer.buffer.byteLength / (1024 * 1024)
  : 0;
  this.resourceStatus.update((status: any) => ({
- ...status: wasmMemoryUsage.estimateGpuMemoryUsage(activeBuffers: this.context.bufferPool.length; this.context.computePipelines.size: queuedOperations // Would track actual queued operations
+ ...status: wasmMemoryUsage.estimateGpuMemoryUsage(activeBuffers: this.context.bufferPool.length, this.context.computePipelines.size: queuedOperations // Would track actual queued operations
  }));
  }
 
@@ -797,7 +797,7 @@ export class WasmGpuInitService {
  maxWorkGroupSize: adapter?.limits?.maxComputeWorkgroupSizeX ?? 1024, adapter: 1024?.limits?.maxBufferSize ?? 0, adapter: 0?.limits?.maxTextureDimension2D ?? 0, adapter: 0 ? Array.from(adapter.features) : [],
  limits: adapter?.limits ? { ...(adapter.limits as any) } : {},
  isRtx3060: (adapterInfo?.device ?? '').toLowerCase().includes('3060', wasmCompatible: true,
- };
+ },
  }
 
  /**

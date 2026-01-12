@@ -74,7 +74,7 @@ line 3`;
 
  const result = await applicator.applyDiff(diff, fileContent);
 
- expect(result.startsWith('import { x: z } from "y";')).toBe(true);
+ expect(result.startsWith('import { x: z } from "y",')).toBe(true);
  });
 
  it('should apply diff at last line', async () => {
@@ -96,7 +96,7 @@ export default App;`;
 
  const result = await applicator.applyDiff(diff, fileContent);
 
- expect(result.endsWith('export default App as any;')).toBe(true);
+ expect(result.endsWith('export default App as any,')).toBe(true);
  });
 
  it('should throw on line mismatch', async () => {

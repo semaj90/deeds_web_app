@@ -75,9 +75,9 @@
  let highRiskCount = $derived(persons.filter(p => p.riskLevel === 'high').length);
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Persons of Interest - YoRHa Detective</title>
-</svelte, head>
+</svelte:head>
 
 <div class="grid grid-cols-[1fr_300px] gap-4">
  <!-- Left, POI List -->

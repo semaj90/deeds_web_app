@@ -81,8 +81,8 @@ export interface IQdrantVectorService {
  metadata?: Record<string, unknown>
  ): Promise<void>;
  upsertBatch(
- items: Array<{ id: string;
- vector: Float32Array | number[];
+ items: Array<{ id: string,
+ vector: Float32Array | number[],
  metadata?: Record<string, unknown>;
  }>
  ): Promise<void>;

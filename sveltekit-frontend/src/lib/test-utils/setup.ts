@@ -270,8 +270,8 @@ export function initializeFetchMocks(): void {
  * Complete test setup - call in beforeEach
  */
 export async function setupTest(options: {
-	env?: Record<string, string>;
-	skipQdrant?: boolean;
+	env?: Record<string, string>,
+	skipQdrant?: boolean,
 	skipRedis?: boolean;
 	skipOllama?: boolean;
 	skipPostgreSQL?: boolean;

@@ -28,8 +28,8 @@ export async function getCollections(): Promise<string[]> {
 /**
  * Scroll through points in a collection (with optional filter)
  */
-export async function scrollPoints(opts: { collection: string;
-	limit?: number;
+export async function scrollPoints(opts: { collection: string,
+	limit?: number,
 	withPayload?: boolean;
 	withVector?: boolean;
 	filter?: any;
@@ -62,8 +62,8 @@ export async function scrollPoints(opts: { collection: string;
 /**
  * Search for similar vectors
  */
-export async function searchVector(opts: { collection: string;
-	vector: number[];
+export async function searchVector(opts: { collection: string,
+	vector: number[],
 	limit?: number;
 	scoreThreshold?: number;
 	filter?: any;
@@ -92,8 +92,8 @@ export async function searchVector(opts: { collection: string;
 /**
  * Upsert points to a collection
  */
-export async function upsertPoints(opts: { collection: string;
-	points: QdrantPoint[];
+export async function upsertPoints(opts: { collection: string,
+	points: QdrantPoint[],
 	wait?: boolean;
 }): Promise<any> {
 	const r = await fetch(

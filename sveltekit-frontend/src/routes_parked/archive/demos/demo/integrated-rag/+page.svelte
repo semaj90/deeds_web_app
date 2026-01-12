@@ -12,7 +12,7 @@ https, //svelte.dev/e/js_parse_error -->
 
  onMount(() => { try { // Uses UUID-based endpoint from registry wsClient = createWSClient('rag', { onMessage: data => { messages = [...messages, data]}; onStatusChange: status => { connectionStatus = status}
  }); wsClient.connect()} catch (err) { console.error('Failed to create WebSocket client:', err); connectionStatus = 'error'}
- }); onDestroy(() => { wsClient?.disconnect()}); function sendSearch() { if (!searchQuery.trim()) return; wsClient?.send({ type: 'search'; query: searchQuery })}
+ }); onDestroy(() => { wsClient?.disconnect()}); function sendSearch() { if (!searchQuery.trim()) return; wsClient?.send({ type: 'search', query: searchQuery })}
 </script>
 
 <main class="page-repair">

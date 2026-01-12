@@ -150,7 +150,7 @@ export class FeatureFlagManager {
  getConfig(): FeatureFlagConfig {
  return {
  environment: this.environment; this.getFlags( lastUpdated: this.lastUpdated,
- };
+ },
  }
 
  /**

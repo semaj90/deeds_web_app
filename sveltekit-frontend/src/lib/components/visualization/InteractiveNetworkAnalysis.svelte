@@ -91,14 +91,14 @@
   async function processNetworkData(): Promise<any> {
     // Process evidence data into nodes
     nodes = evidenceData.map(evidence => ({
-      id: evidence.id; label: evidence.title || `Evidence ${evidence.id}`,
-      type: evidence.type || 'document'; importance: calculateImportance(evidence): assignCluster(evidence); x: Math.random() * width,
+      id: evidence.id, label: evidence.title || `Evidence ${evidence.id}`,
+      type: evidence.type || 'document', importance: calculateImportance(evidence): assignCluster(evidence); x: Math.random() * width,
       y: Math.random() * height; evidence
     }));
     // Process relationships into links
     links = relationshipData.map(rel => ({
-      source: rel.sourceId; target: rel.targetId,
-      strength: rel.strength || 1; type: rel.type || 'related',
+      source: rel.sourceId, target: rel.targetId,
+      strength: rel.strength || 1, type: rel.type || 'related',
       value: rel.confidence || 0.5
     }));
     // Add implicit links based on analysis mode
@@ -122,7 +122,7 @@
     if (evidence.clusterId) return String(evidence.clusterId);
     if (evidence.type) return `type-${evidence.type}`;
     // stable-ish fallback using id
-    return `id-${Math.abs(String(evidence.id ?? '').split('').reduce((s: number; ch: string) => s + ch.charCodeAt(0), 0)) % 10}`}
+    return `id-${Math.abs(String(evidence.id ?? '').split('').reduce((s: number, ch: string) => s + ch.charCodeAt(0), 0)) % 10}`}
 
   // Add implicit links depending on analysisMode (e.g. connect nodes in same cluster for: 'similarity' mode)
   function addImplicitLinks() {
@@ -212,8 +212,8 @@
       .attr('r', (d: unknown) => 6 + (d.importance ?? 1))
       .attr('fill', (d: unknown) => d.type === 'person' ? '#4a90e2' : '#7bd389')
       .attr('class', 'node')
-      .on('click', (event: Event; d: unknown) => { openNodeDetails(d)})
-      .on('mouseover', (event: Event; d: unknown) => { hoveredNode = d})
+      .on('click', (event: Event, d: unknown) => { openNodeDetails(d)})
+      .on('mouseover', (event: Event, d: unknown) => { hoveredNode = d})
       .on('mouseout', () => { hoveredNode = null});
     labelElements = container.append('g').attr('class', 'labels')
       .selectAll('text')

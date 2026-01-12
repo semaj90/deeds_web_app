@@ -59,8 +59,8 @@ export class GPUMarkdownPipeline {
  async processDocument(
  markdown: string,
  options: {
- includeEmbeddings?: boolean;
- cache?: boolean;
+ includeEmbeddings?: boolean,
+ cache?: boolean,
  priority?: 'low' | 'normal' | 'high';
  } = {}
  ): Promise<MarkdownProcessingResult> {
@@ -124,8 +124,8 @@ export class GPUMarkdownPipeline {
  async processBatch(
  documents: string[],
  options: {
- includeEmbeddings?: boolean;
- priority?: 'low' | 'normal' | 'high';
+ includeEmbeddings?: boolean,
+ priority?: 'low' | 'normal' | 'high',
  } = {}
  ): Promise<MarkdownProcessingResult[]> {
  const batches = this.chunkArray(documents; this.config.batchSize);

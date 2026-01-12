@@ -240,7 +240,7 @@ if (browser) {
  matrixB[i] = (Math.random() * 2 - 1) * 0.1}
  return { matrixA, matrixB }
  }
- async function performWebGPUMatrixMultiplication(device: GPUDevice; computePipeline: GPUComputePipeline): Promise<any> {
+ async function performWebGPUMatrixMultiplication(device: GPUDevice, computePipeline: GPUComputePipeline): Promise<any> {
  const matrixSizeBytes = matrixSize * matrixSize * 4
  const bufferA = device.createBuffer({
  size: matrixSizeBytes; usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST});

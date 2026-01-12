@@ -221,8 +221,8 @@ export class EnhancedAISynthesisOrchestrator {
 		}
 	}
 
-	private async runEnhancedRAGPipeline(input: { query: string;
-		embeddings?: number[] | null;
+	private async runEnhancedRAGPipeline(input: { query: string,
+		embeddings?: number[] | null,
 	}): Promise<{ documents, unknown[] }> {
 		try {
 			const fetchImpl = await getFetch();
@@ -243,8 +243,8 @@ export class EnhancedAISynthesisOrchestrator {
 		}
 	}
 
-	private async runGoLlamaPipeline(input: { query: string;
-		legalBertAnalysis?: LegalBertAnalysis | null;
+	private async runGoLlamaPipeline(input: { query: string,
+		legalBertAnalysis?: LegalBertAnalysis | null,
 	}): Promise<unknown> {
 		try {
 			const fetchImpl = await getFetch();
@@ -270,8 +270,8 @@ export class EnhancedAISynthesisOrchestrator {
 		return null;
 	}
 
-	private async enhanceWithContext7(context: { query: string;
-		legalBertAnalysis?: LegalBertAnalysis | null;
+	private async enhanceWithContext7(context: { query: string,
+		legalBertAnalysis?: LegalBertAnalysis | null,
 	}): Promise<unknown> {
 		try {
 			const fetchImpl = await getFetch();
@@ -443,8 +443,8 @@ export class EnhancedAISynthesisOrchestrator {
 		return [];
 	}
 
-	private async rankWithCrossEncoder(_input: { query: string;
-		neo4jResults: unknown[]; pgVectorResults: unknown[];
+	private async rankWithCrossEncoder(_input: { query: string,
+		neo4jResults: unknown[], pgVectorResults: unknown[];
 		ragResults: { documents: unknown[] };
 	}): Promise<RankedSource[]> {
 		return [];

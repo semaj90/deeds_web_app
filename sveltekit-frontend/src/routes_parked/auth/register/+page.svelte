@@ -13,9 +13,9 @@
  let showPassword = $state<boolean>(false);
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Register - Legal AI Platform</title>
-</svelte, head>
+</svelte:head>
 <div class="min-h-screen flex items-center justify-center bg-gray-900 px-4">
  <div class="w-full">
  <div class="bg-gray-800 p-8 rounded-lg border">

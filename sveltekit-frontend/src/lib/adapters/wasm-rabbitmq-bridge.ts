@@ -37,8 +37,8 @@ export async function initializeWASMBridge(): Promise<boolean> {
 export function createWASMHandler(
   baseHandler: MessageHandler,
   wasmOperations?: {
-    vectorSimilarity?: boolean;
-    batchNormalization?: boolean;
+    vectorSimilarity?: boolean,
+    batchNormalization?: boolean,
     tensorCompression?: boolean;
   }
 ): (message: unknown) => Promise<void> {
@@ -93,8 +93,8 @@ function shouldUseWASM(message: unknown): boolean {
 async function enhanceMessageWithWASM(
   message: unknown,
   operations?: {
-    vectorSimilarity?: boolean;
-    batchNormalization?: boolean;
+    vectorSimilarity?: boolean,
+    batchNormalization?: boolean,
     tensorCompression?: boolean;
   }
 ): Promise<Record<string, unknown>> {

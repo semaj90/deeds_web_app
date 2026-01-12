@@ -77,10 +77,10 @@ https://svelte.dev/e/style_duplicate -->
  }
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Register - Legal AI Platform</title>
  <meta name="description" content="Create your legal AI platform account" />
-</svelte, head>
+</svelte:head>
 
 <main class="register-page">
  <div class="register-container">

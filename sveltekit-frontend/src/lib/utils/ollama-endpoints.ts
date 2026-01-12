@@ -123,8 +123,8 @@ export async function generateEmbeddings(
 export async function generateLegalAnalysis(
  documentText: string, analysisType: string = 'contract_review',
  options: {
- maxTokens?: number;
- temperature?: number;
+ maxTokens?: number,
+ temperature?: number,
  } = {}
 ): Promise<{ analysis: string;
  confidence: number; keyFindings: string[];

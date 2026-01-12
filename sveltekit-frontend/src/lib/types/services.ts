@@ -18,7 +18,7 @@ export interface UserChatRecommendationEngine {
  getUserAnalytics(userId: string): Promise<Record<string, unknown>>;
  searchUserChats(
  userId: string, query: string, string:
- options: { limit: number; useSemanticSearch: boolean }
+ options: { limit: number, useSemanticSearch: boolean }
  ): Promise<Record<string, unknown>[]>;
  generateRecommendations(chat: Record<string, unknown>): Promise<Record<string, unknown>[]>;
  storeUserChat(

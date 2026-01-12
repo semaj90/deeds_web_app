@@ -78,7 +78,7 @@ const mockCaseData = {
  }],
  reports: [],
  },
-};
+},
 
 /** * Simulate AI analysis with realistic responses */
 export async function demoQueryLLM(query: RAGDemoQuery): Promise<RAGDemoResponse> {

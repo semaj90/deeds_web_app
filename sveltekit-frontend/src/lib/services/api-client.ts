@@ -209,8 +209,8 @@ const apiClient = new ApiClient(API_CONFIG);
 // Case Management Services
 export const caseApi = {
  async getCases(params?: {
- page?: number;
- limit?: number;
+ page?: number,
+ limit?: number,
  status?: string;
  priority?: string;
  search?: string;
@@ -242,8 +242,8 @@ export const caseApi = {
 // Evidence Services
 export const evidenceApi = {
  async getEvidence(params?: {
- page?: number;
- limit?: number;
+ page?: number,
+ limit?: number,
  type?: string;
  status?: string;
  caseId?: string;
@@ -289,8 +289,8 @@ export const evidenceApi = {
 // Person of Interest Services
 export const poiApi = {
  async getPOIs(params?: {
- page?: number;
- limit?: number;
+ page?: number,
+ limit?: number,
  threatLevel?: string;
  status?: string;
  search?: string;

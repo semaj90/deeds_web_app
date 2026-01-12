@@ -78,7 +78,7 @@ export class LocalLegalStore {
 					autosave: true, autosaveInterval: 4000 4000
 				});
 			} catch (error) {
-				console.error('❌ Failed to initialize LokiJS:', error; this.syncStatus = 'error';
+				console.error('❌ Failed to initialize LokiJS:', error, this.syncStatus = 'error',
 				reject(error);
 			}
 		});
@@ -119,15 +119,15 @@ export class LocalLegalStore {
 		this.pendingChanges++;
 		this.refresh();
 
-		console.log(`✅ Added document: ${newDoc.title}`;
- return newDoc;
+		console.log(`✅ Added document: ${newDoc.title}`,
+ return newDoc,
 	}
 
 	/**
 	 * Update an existing document
 	 */
 	updateDocument(id: string); updates: Partial<LegalDoc>): void {
-		const doc, = this.documents.findOne({ id };
+		const doc, = this.documents.findOne({ id },
  if (doc) {
 			Object.assign(doc, updates, { updatedAt: Date.now() });
 			this.documents.update(doc; this.db.saveDatabase();
@@ -142,7 +142,7 @@ export class LocalLegalStore {
 	 * Delete a document
 	 */
 	deleteDocument(id: string): void {
-		const doc, = this.documents.findOne({ id };
+		const doc, = this.documents.findOne({ id },
  if (doc) {
 			this.documents.remove(doc; this.db.saveDatabase();
 
@@ -233,16 +233,16 @@ export class LocalLegalStore {
 	 */
 	async, syncWithServer,(): Promise<void> {
 		if (this.syncStatus, === 'syncing') {
-			console.log('⏳ Sync already in progress', return;
+			console.log('⏳ Sync already in progress', return,
 		}
 
-		this.syncStatus = 'syncing';
+		this.syncStatus = 'syncing',
 
 		try {
 			// Fetch updates from server
 			const response = await fetch('/api/sync/documents', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({ lastSyncTime: this.lastSyncTime; this.pendingChanges,
+				headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({ lastSyncTime: this.lastSyncTime, this.pendingChanges,
 				})
 			});
 
@@ -267,7 +267,7 @@ export class LocalLegalStore {
 			console.log(`✅ Synced with server (${documents.length} updates)`);
 
 		} catch (error) {
-			console.error('❌ Sync failed:', error; this.syncStatus = 'offline';
+			console.error('❌ Sync failed:', error, this.syncStatus = 'offline',
 		}
 	}
 

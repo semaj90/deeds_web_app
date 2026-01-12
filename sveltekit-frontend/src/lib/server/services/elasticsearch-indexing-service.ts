@@ -263,7 +263,7 @@ export async function indexLawSection(
  * Batch index case chunks
  */
 export async function batchIndexCaseChunks(
- documents: Array<{ id: string; document, CaseChunkDocument;
+ documents: Array<{ id: string, document, CaseChunkDocument,
  }>,
  batchSize: number = 100
 ): Promise<void> {
@@ -319,7 +319,7 @@ export async function batchIndexCaseChunks(
  * Batch index law sections
  */
 export async function batchIndexLawSections(
- documents: Array<{ id: string; document, LawSectionDocument;
+ documents: Array<{ id: string, document, LawSectionDocument,
  }>,
  batchSize: number = 100
 ): Promise<void> {

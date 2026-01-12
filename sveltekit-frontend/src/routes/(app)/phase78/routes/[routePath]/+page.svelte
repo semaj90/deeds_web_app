@@ -8,9 +8,9 @@
  });
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Route Errors: { routePath }</title>
-</svelte, head>
+</svelte:head>
 
 <div class="min-h-screen bg-gray-50">
  <!-- Header -->

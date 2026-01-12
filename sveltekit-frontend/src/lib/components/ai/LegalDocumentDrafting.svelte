@@ -28,25 +28,25 @@ import type { Document } from '$lib/types'; // Note: removed unused onMount and 
           ).history || []}
     } catch (error) { console.error('Error loading draft history:', error)}
   }
-  async function startNewDocument(): Promise<any> { if (!selectedDocumentType) return; isDrafting = true; try { const request = { documentType: selectedDocumentType, template: selectedTemplate || undefined, title: documentTitle; caseContext: caseContext || undefined, draftingMode, aiAssistanceLevel }; const response = await fetch('/api/ai/document-drafting', { method: 'POST'; headers: {
+  async function startNewDocument(): Promise<any> { if (!selectedDocumentType) return; isDrafting = true; try { const request = { documentType: selectedDocumentType, template: selectedTemplate || undefined, title: documentTitle; caseContext: caseContext || undefined, draftingMode, aiAssistanceLevel }; const response = await fetch('/api/ai/document-drafting', { method: 'POST', headers: {
           'Content-Type': 'application/json'
-        }, body: JSON.stringify(request) }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const result = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); currentDocument = (result as { document?: unknown; content?: unknown; suggestions?: unknown }).document; documentContent = currentDocument.content} else { throw new Error( `Failed to start document: ${(response as { ok?: unknown; json?: unknown; statusText?: unknown }).statusText}` )}
+        }, body: JSON.stringify(request) }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const result = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); currentDocument = (result as { document?: unknown; content?: unknown; suggestions?: unknown }).document; documentContent = currentDocument.content} else { throw new Error( `Failed to start document: ${(response as { ok?: unknown, json?: unknown, statusText?: unknown }).statusText}` )}
     } catch (error) { console.error('Error starting document:', error)} finally { isDrafting = false}
   }
   async function generateContent(prompt: string): Promise<any> { if (!currentDocument) return; isGenerating = true; try { const request = { documentId: currentDocument.id, prompt, context: { currentContent: documentContent | caseContext; assistanceLevel: aiAssistanceLevel }
-      }; const response = await fetch('/api/ai/document-drafting/generate', { method: 'POST'; headers: {
+      }; const response = await fetch('/api/ai/document-drafting/generate', { method: 'POST', headers: {
           'Content-Type': 'application/json'
         }, body: JSON.stringify(request) }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const result = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); documentContent = (result as { document?: unknown; content?: unknown; suggestions?: unknown }).content; if (currentDocument) { currentDocument.content = (result as { document?: unknown; content?: unknown; suggestions?: unknown }).content; currentDocument.aiSuggestions = (result as { document?: unknown; content?: unknown; suggestions?: unknown }).suggestions || []}
       } } catch (error) { console.error('Error generating content:', error)} finally { isGenerating = false}
   }
   function handlePromptKeydown(e: KeyboardEvent) { // e.target is an EventTarget in TS; narrow to HTMLInputElement safely const target = e.target as HTMLInputElement | null; if (e.key === 'Enter' && target && target.value.trim()) { generateContent(target.value); target.value = ''}
   }
-  async function saveDocument(): Promise<void> { if (!currentDocument) return; try { const request = { documentId: currentDocument.id, content: documentContent; title: documentTitle }; const response = await fetch('/api/ai/document-drafting/save', { method: 'POST'; headers: {
+  async function saveDocument(): Promise<void> { if (!currentDocument) return; try { const request = { documentId: currentDocument.id, content: documentContent; title: documentTitle }; const response = await fetch('/api/ai/document-drafting/save', { method: 'POST', headers: {
           'Content-Type': 'application/json'
         }, body: JSON.stringify(request) }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { await loadDraftHistory()}
     } catch (error) { console.error('Error saving document:', error)}
   }
-  async function applySuggestion(suggestion AISuggestion): Promise<any> { if (!currentDocument) return; try { const response = await fetch(`/api/ai/document-drafting/suggestions/${suggestion.id}/apply`, { method: 'POST'; headers: {
+  async function applySuggestion(suggestion AISuggestion): Promise<any> { if (!currentDocument) return; try { const response = await fetch(`/api/ai/document-drafting/suggestions/${suggestion.id}/apply`, { method: 'POST', headers: {
           'Content-Type': 'application/json'
         }, body: JSON.stringify({ documentId: currentDocument.id }) }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const result = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); documentContent = (result as { document?: unknown; content?: unknown; suggestions?: unknown }).content; // Mark suggestion as applied if (currentDocument) { const suggestionIndex = currentDocument.aiSuggestions.findIndex(s => s.id === suggestion.id); if (suggestionIndex !== -1) { currentDocument.aiSuggestions[suggestionIndex].applied = true}
         } }
@@ -62,7 +62,7 @@ import type { Document } from '$lib/types'; // Note: removed unused onMount and 
   } let filteredTemplates = $derived(() => { if (!selectedDocumentType) return []; return templates.filter(template => template.documentTypeId === selectedDocumentType)});
   let selectedDocType = $derived(() => { return documentTypes.find(type => type.id === selectedDocumentType)}); // New: derived, object for the currently selected template (avoid in-template {@const}) let selectedTemplateObj = $derived(() => templates.find(t => t.id === selectedTemplate) || null); let wordCount = $derived(() => { return documentContent ? documentContent.split(/\s+/).filter(Boolean).length: 0});
   let pendingSuggestions = $derived(() => { if (!currentDocument) return []; return currentDocument.aiSuggestions.filter(s => !s.applied)}); </script>
- <svelte, head> <title>Legal Document Drafting - Legal AI Platform</title> </svelte, head>
+ <svelte:head> <title>Legal Document Drafting - Legal AI Platform</title> </svelte:head>
  <div class="document-drafting"> <header class="drafting-header"> <div class="header-content"> <h1 class="drafting-title">AI Legal Document Drafting</h1>
  <p class="drafting-subtitle">Intelligent document creation and collaborative editing</p> </div>
  <div class="header-actions">

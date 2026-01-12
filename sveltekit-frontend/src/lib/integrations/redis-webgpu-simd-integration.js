@@ -128,7 +128,7 @@ async function runPerformanceBenchmark() {
  const cpuSimStart = performance.now();
  const $_cpuSimilarities // TODO: Verify store subscription is correct for Svelte 5 = candidateVectors.map(candidate => {
  let dot = 0, normA = 0, normB = 0
- for (let i = 0; i < 768; i++) {
+ for (let i = 0, i < 768, i++) {
  dot += queryVector[i] * candidate[i];
  normA += queryVector[i] * queryVector[i];
  normB += candidate[i] * candidate[i] }

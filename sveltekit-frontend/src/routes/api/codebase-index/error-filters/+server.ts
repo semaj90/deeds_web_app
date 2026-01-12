@@ -38,7 +38,7 @@ export const GET: RequestHandler = async () => {
 		const surfaces = new Set<string>();
 		const techs = new Set<string>();
 
-		points.forEach((p: { payload: { errorCode?: string; surface?: string[]; tech?: string[] } }) => {
+		points.forEach((p: { payload: { errorCode?: string, surface?: string[], tech?: string[] } }) => {
 			if (p.payload?.errorCode) {
 				errorCodes.add(p.payload.errorCode);
 			}

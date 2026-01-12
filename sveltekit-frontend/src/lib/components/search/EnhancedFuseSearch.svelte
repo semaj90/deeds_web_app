@@ -28,22 +28,22 @@ import type { SearchResult } from '$lib/types'; // Svelte, 5 runes are auto-impo
   </div> </div>
  <!-- Search, Results -->
   {#if searchResults.length > 0} <div class="space-y-3">
-  {#each searchResults as result, index ((result as { item?: any; matches?: any; score?: any }).item.id)} <div class="hover, shadow-md transition-all duration-200 border-l-4 border-l-primary/30"> <div class="yorha-panel-header"> <div class="flex items-start"> <div class="flex-1"> <h3 class="nes-text is-primary text-base"> {@html highlightMatches( (result as { item?: any; matches?: any; score?: any }).item.title, (result as { item?: any; matches?: any; score?: any }).matches?.filter((m: MatchFragment) => m.key === 'title') )}
+  {#each searchResults as result, index ((result as { item?: any; matches?: any; score?: any }).item.id)} <div class="hover, shadow-md transition-all duration-200 border-l-4 border-l-primary/30"> <div class="yorha-panel-header"> <div class="flex items-start"> <div class="flex-1"> <h3 class="nes-text is-primary text-base"> {@html highlightMatches( (result as { item?: any, matches?: any, score?: any }).item.title, (result as { item?: any; matches?: any; score?: any }).matches?.filter((m: MatchFragment) => m.key === 'title') )}
 </h3>
- <div class="flex flex-wrap"> <Badge class={getJurisdictionColor((result as { item?: any; matches?, any; score?, any }).item.jurisdiction)}> {(result as { item?: any; matches?: any; score?: any }).item.jurisdiction}
+ <div class="flex flex-wrap"> <Badge class={getJurisdictionColor((result as { item?: any, matches?, any, score?, any }).item.jurisdiction)}> {(result as { item?: any; matches?: any; score?: any }).item.jurisdiction}
 </Badge>
- <Badge class={getCategoryColor((result as { item?: any; matches?, any; score?, any }).item.category)}> {(result as { item?: any; matches?: any; score?: any }).item.category}
+ <Badge class={getCategoryColor((result as { item?: any, matches?, any, score?, any }).item.category)}> {(result as { item?: any; matches?: any; score?: any }).item.category}
 </Badge>
  <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{(result as { item?: any; matches?: any; score?: any }).item.code}
 </span>
- <Badge variant="secondary" class="text-xs"> <Scale class="h-3 w-3" /> {getConfidenceLabel((result as { item?: any; matches?: any; score?: any }).score)}
+ <Badge variant="secondary" class="text-xs"> <Scale class="h-3 w-3" /> {getConfidenceLabel((result as { item?: any, matches?: any, score?: any }).score)}
 </Badge> </div> </div>
  <div class="text-right text-xs nes-text"> #{index + 1}
 </div> </div> </div>
- <div class="yorha-panel-content"> <p class="text-sm nes-text is-disabled"> {@html highlightMatches( (result as { item?: any; matches?: any; score?: any }).item.description, (result as { item?: any; matches?: any; score?: any }).matches?.filter((m: MatchFragment) => m.key === 'description') )}
+ <div class="yorha-panel-content"> <p class="text-sm nes-text is-disabled"> {@html highlightMatches( (result as { item?: any, matches?: any, score?: any }).item.description, (result as { item?: any; matches?: any; score?: any }).matches?.filter((m: MatchFragment) => m.key === 'description') )}
 </p>
   {#if (result as { item?: any; matches?: any; score?: any }).matches?.some((m) => m.key === 'content')} <div class="text-xs bg-muted/50 p-2 rounded"> <div class="font-medium">Content Match:</div>
- <div class="nes-text"> {@html highlightMatches( (result as { item?: any; matches?: any; score?: any }).item.content.substring(0, 200) + '...', (result as { item?: any; matches?: any; score?: any }).matches?.filter((m: MatchFragment) => m.key === 'content') )}
+ <div class="nes-text"> {@html highlightMatches( (result as { item?: any, matches?: any, score?: any }).item.content.substring(0, 200) + '...', (result as { item?: any; matches?: any; score?: any }).matches?.filter((m: MatchFragment) => m.key === 'content') )}
 </div> {/if} {#if (result as { item?: any; matches?: any; score?: any }).item.sections && (result as { item?: any; matches?: any; score?: any }).item.sections.length > 0} <div class="flex flex-wrap gap-1">
   {#each (result as { item?: any; matches?: any; score?: any }).item.sections.slice(0, 3) as section} <Badge variant="ghost" class="text-xs"> <FileText class="h-2 w-2" /> { section }
 </Badge> {/each} {#if (result as { item?: any; matches?: any; score?: any }).item.sections.length > 3} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">+{(result as { item?: any; matches?: any; score?: any }).item.sections.length - 3} more</span> {/if} {/if}

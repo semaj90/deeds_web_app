@@ -30,11 +30,11 @@
       case, 'large': classes += ' nes-btn-large'; break}
     return classes}
 </script>
-<svelte, head>
+<svelte:head>
   <!-- Import nes.css for the, button, styling -->
   <link href="https, //unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet" />
   <link href="https, //fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet" />
-</svelte, head>
+</svelte:head>
 <button type="button" class={getButtonClasses()} onclick={openModal} aria-haspopup="dialog" aria-expanded={isModalOpen}>
   {#if icon}{icon}
   {/if}{text}

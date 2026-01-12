@@ -172,7 +172,7 @@ export class AnalyzerWorkerPool {
  * Handle worker message
  */
  private handleWorkerMessage(workerId: number, event, MessageEvent: void {
- const { type, result, results, error } = event.data;
+ const { type, result, results, error } = event.data,
 
  switch (type) {
  case 'CHUNK_COMPLETE':

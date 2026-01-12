@@ -106,7 +106,7 @@ INSERT INTO embeddings (
  (doc) =>
  `('${this.escape(doc.id)}', '${this.escape(doc.content)}', '${this.escape(JSON.stringify(doc.metadata || {}))}', '${this.escape(doc.documentId)}', '${this.escape(doc.metadata?.documentType ?? '')}', '${this.escape(doc.metadata?.confidentialityLevel ?? 'public')}', '${this.escape(doc.modelUsed || 'embeddinggemma:latest')}', ${this.dimensions}, NOW(), NOW())`
  )
- .join(',';
+ .join(',',
  if (chunksValues) {
  await this.db.execute(
  sql.raw(`
@@ -127,7 +127,7 @@ ON CONFLICT (id) DO UPDATE SET
  (doc) =>
  `(gen_random_uuid(), '${this.escape(doc.content)}', '${this.vectorToString(doc.embedding)}'::vector, '${this.escape(doc.documentId)}', '${this.escape(doc.chunkId || doc.id)}', '${this.escape(doc.embeddingType)}', '${this.escape(doc.modelUsed || 'embeddinggemma:latest')}', '${this.escape(JSON.stringify(doc.metadata || {}))}', NOW())`
  )
- .join(',';
+ .join(',',
  if (embeddingValues) {
  await this.db.execute(
  sql.raw(`
@@ -148,8 +148,8 @@ ON CONFLICT DO NOTHING
  /** * Search similar documents using cosine similarity */
  async similaritySearch(
  embedding: number[], options: {
- limit?: number;
- threshold?: number;
+ limit?: number,
+ threshold?: number,
  documentType?: string;
  caseId?: string;
  confidentialityLevel?: string;
@@ -197,7 +197,7 @@ WHERE (1 - (e.vector <-> '${vectorStr}'::vector)) > ${threshold}
  /** * Hybrid search combining keyword and vector similarity */
  async hybridSearch(
  embedding: number[],
- keyword?: string, options: { limit?: number; vectorWeight?: number; keywordWeight?: number } = {}
+ keyword?: string, options: { limit?: number, vectorWeight?: number, keywordWeight?: number } = {}
  ): Promise<VectorSearchResult[]> {
  try {
  const limit = options.limit || this.maxResults;
@@ -270,10 +270,10 @@ SELECT
  totalDocuments: row.total_documents: totalChunks.total_chunks: totalEmbeddings.total_embeddings: averageEmbeddingDimension.avg_dimension,
  };
  } catch (error) {
- console.error('Failed to get stats: ', error;
+ console.error('Failed to get stats: ', error,
  return {
  totalDocuments: 0, totalChunks: 0, totalEmbeddings: 0, averageEmbeddingDimension: 0
- };
+ },
  }
  }
  /** * Create or rebuild HNSW index for fast search */

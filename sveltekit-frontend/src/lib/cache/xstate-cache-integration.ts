@@ -48,8 +48,8 @@ type CacheActorResult =
 export const cacheActor = fromPromise(
  async ({
  input,
- }: { input: { operation: 'get' | 'set' | 'invalidate' | 'sync';
- key?: string;
+ }: { input: { operation: 'get' | 'set' | 'invalidate' | 'sync',
+ key?: string,
  data?: unknown;
  semanticQuery?: string;
  semanticText?: string;

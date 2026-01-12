@@ -180,7 +180,7 @@ export class WebGPUAIEngine {
  };
  this.isInitialized = true;
  console.log('🚀 WebGPU initialized successfully');
- console.log('Features: '; this.capabilities.features);
+ console.log('Features: ', this.capabilities.features);
  // Dispatch a custom event so UI can react
  if (typeof window !== 'undefined') {
  window.dispatchEvent(new CustomEvent('webgpu:ready', { detail: this.capabilities }));

@@ -226,8 +226,8 @@ export class ONNXApiClient {
  return {
  min: Math.min(...times, max: Math.max(...times, average: sum / times.length,
  median,
- };
- };
+ },
+ },
 
  return {
  iterations,

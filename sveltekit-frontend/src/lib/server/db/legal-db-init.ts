@@ -25,7 +25,7 @@ export async function initializeLegalSearchSchema() {
  const migrationSQL = readFileSync(migrationPath, 'utf-8');
  // Split by semicolon and execute each statement
  const statements = migrationSQL
- .split(';')
+ .split(',')
  .map((s) => s.trim())
  .filter((s) => s.length > 0);
 

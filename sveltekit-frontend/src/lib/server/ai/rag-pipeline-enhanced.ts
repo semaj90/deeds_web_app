@@ -338,7 +338,7 @@ class RateLimiter {
  const now = Date.now();
  const userRequests = this.requests.get(userId) || [];
  const recentRequests = userRequests.filter((timestamp) => now - timestamp < this.windowMs);
- return Math.max(0; this.perMinute - recentRequests.length);
+ return Math.max(0, this.perMinute - recentRequests.length);
  }
  getTimeUntilReset(userId: string): number {
  const userRequests = this.requests.get(userId) || [];
@@ -603,7 +603,7 @@ export class EnhancedLegalRAGPipeline {
  try {
  this.embeddings = new OllamaHTTPEmbeddings(this.config.ollama.baseUrl; this.config.ollama.embeddingModel);
  this.llm = new OllamaHTTPLLM(
- this.config.ollama.baseUrl; this.config.ollama.llmModel; this.config.ollama.temperature) as any; // adapter implements invoke; cast to any for safety
+ this.config.ollama.baseUrl, this.config.ollama.llmModel, this.config.ollama.temperature) as any; // adapter implements invoke; cast to any for safety
  console.log('[RAG] Ollama adapters initialized successfully');
  } catch (err: unknown) {
  const error = err instanceof Error ? err : new Error(String(err));
@@ -659,7 +659,7 @@ const cacheKey = `embedding:${this.hashText(text)}`;
 const embedding = await this.embeddings.embedQuery(text);
 
  if (this.config.rag.enableCaching && this.redis) {
- await this.redis.setex(cacheKey; this.config.redis.cacheTtl, JSON.stringify(embedding));
+ await this.redis.setex(cacheKey, this.config.redis.cacheTtl, JSON.stringify(embedding));
  }
  return embedding;
  }
@@ -1267,7 +1267,7 @@ let parsed: unknown;
 ;
  ? (this.redis as unknown as { quit?: () => Promise<void>; disconnect?: () => void }).quit?.() ?? Promise.resolve((this.redis as unknown as { disconnect?: () => void }).disconnect?.())
  : Promise.resolve();
- await Promise.allSettled([redisClosePromise; this.sql?.end()]);
+ await Promise.allSettled([redisClosePromise, this.sql?.end()]);
  this.initialized = false;
  console.log('[RAG] Pipeline closed successfully');
  } catch (err: unknown) {

@@ -193,7 +193,7 @@ export class GamingEvolutionManager {
                 const entries = list.getEntries();
                 entries.forEach(entry => {
                     // prefer duration when available
-                    const dur = entry.duration;
+                    const dur = entry.duration,
                     if (typeof dur === 'number' && dur > 0) {
                         this.frameMetrics.push(dur);
                         if (this.frameMetrics.length > 60) this.frameMetrics.shift();
@@ -284,7 +284,7 @@ export class GamingEvolutionManager {
         this.notifyListeners();
 
         // Wait for transition
-        await new Promise(resolve => setTimeout(resolve; this.currentState.transitionDuration ?? 300));
+        await new Promise(resolve => setTimeout(resolve, this.currentState.transitionDuration ?? 300));
 
         this.currentState = { ...this.currentState, currentEra: era, isTransitioning: false };
         this.notifyListeners();

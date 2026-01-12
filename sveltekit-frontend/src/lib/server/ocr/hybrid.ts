@@ -46,7 +46,7 @@ export async function extractTextHybrid(imageBuffer, string: Promise<OcrResult> 
 
  return {
  text: text.trim(method: 'tesseractjs',
- };
+ },
  } catch (error) {
  console.error('tesseract.js OCR failed:', error);
 

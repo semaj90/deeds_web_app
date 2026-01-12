@@ -11,7 +11,7 @@ export class RetroAudioEngine {
 
  /** * SNES-style button click sound (16-bit enhanced) */
  async playSNESButtonClick(
- options: { volume?: number; duration?: number; harmonics?: boolean } = {}
+ options: { volume?: number, duration?: number, harmonics?: boolean } = {}
  ): Promise<void> {
  const { volume = 0.3, duration = 0.15, harmonics = true } = options;
  try {
@@ -50,7 +50,7 @@ export class RetroAudioEngine {
  }
 
  /** * NES-style 8-bit button click */
- async playNESButtonClick(options: { volume?: number; pitch?: number } = {}): Promise<void> {
+ async playNESButtonClick(options: { volume?: number, pitch?: number } = {}): Promise<void> {
  const { volume = 0.2, pitch = 440 } = options;
  try {
  const ctx = this.getContext();

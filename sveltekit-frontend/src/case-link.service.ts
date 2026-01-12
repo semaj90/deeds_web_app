@@ -141,7 +141,7 @@ class CaseLinkService {
   async updateLinkMetadata(
     caseId: string,
     statuteCode: string,
-    data: { link_type?: string; notes?: string },
+    data: { link_type?: string, notes?: string },
     userId: string
   ): Promise<CaseStatuteLink> {
     try {
@@ -253,7 +253,7 @@ class CaseLinkService {
       return {
         total,
         byLinkType: Object.fromEntries(
-          byLinkType.map((row: { link_type: string; count: number }) => [row.link_type, row.count])
+          byLinkType.map((row: { link_type: string, count: number }) => [row.link_type, row.count])
         )
       };
     } catch (error) {

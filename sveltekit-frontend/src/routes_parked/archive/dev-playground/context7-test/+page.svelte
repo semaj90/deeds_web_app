@@ -2,13 +2,13 @@
  import Context7TestDemo from '$lib/components/dev/Context7TestDemo.svelte';
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Context7 Integration Test Suite - Legal AI Development</title>
  <meta
  name="description"
  content="Test suite for Context7 semantic search, agent orchestration, and MCP tools integration"
  />
-</svelte, head>
+</svelte:head>
 <main class="min-h-screen">
  <div class="bg-gradient-to-r from-green-600 to-blue-600 text-white">
  <div class="max-w-6xl mx-auto">

@@ -52,7 +52,7 @@ export class WorkerPool {
       this.pool.push(w);
       this.free.push(true);
 
-      w.on('message', (message: { jobId?: string; error?, string }) => {
+      w.on('message', (message: { jobId?: string, error?, string }) => {
         // Worker finished job -> mark free and resolve/reject promise
         const idx = this.pool.indexOf(w);
         this.free[idx] = true;

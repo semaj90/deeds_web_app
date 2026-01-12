@@ -6,7 +6,7 @@
    let sanitizedContent = $derived(() => DOMPurify.sanitize(message.content));
    let isUser = $derived(message.role === 'user');
    let isAssistant = $derived(message.role === 'assistant');
-   let formattedTime = $derived(() => message.timestamp ? new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit'; minute: '2-digit'
+   let formattedTime = $derived(() => message.timestamp ? new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'
         }): ''
   ); </script>
  <div class="chat-message" class, user={ isUser }; class, assistant={ isAssistant } data-role={message.role}> <div class="message-wrapper">

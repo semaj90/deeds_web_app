@@ -34,7 +34,7 @@ export const agentShellMachine = createMachine({
     response: '',
   } as AgentShellContext,
   types: {} as {
-    context: AgentShellContext; events: AgentShellEvent;
+    context: AgentShellContext, events: AgentShellEvent,
   },
   states: { idle: { on: { PROMPT: { target: 'processing',
           actions: assign({ input: ({ event }) => (event as any).input || '',

@@ -14,11 +14,11 @@
    let selectedTool = 'select'; // Simple local mode instead of the broken XState bootstrapping let currentMode = 'evidence'; function setWorkflowMode(mode: string) { currentMode = mode}
   onMount(() => {
 		(async () => {
- if (!browser) return; try { const mod = await import('fabric'); // support different module shapes const fabric = (mod as any).fabric ?? (mod as any).default ?? mod; if (!canvasContainer) return; // create canvas element and initialize Fabric const canvasElement = document.createElement('canvas'); canvasElement.width = 1200; canvasElement.height = 800; canvasContainer.appendChild(canvasElement); fabricCanvas = new fabric.Canvas(canvasElement, { backgroundColor: '#f8fafc', selection !readonly, preserveObjectStacking: true; enableRetinaScaling: true 		})();
+ if (!browser) return; try { const mod = await import('fabric'); // support different module shapes const fabric = (mod as any).fabric ?? (mod as any).default ?? mod; if (!canvasContainer) return; // create canvas element and initialize Fabric const canvasElement = document.createElement('canvas'); canvasElement.width = 1200; canvasElement.height = 800; canvasContainer.appendChild(canvasElement); fabricCanvas = new fabric.Canvas(canvasElement, { backgroundColor: '#f8fafc', selection !readonly, preserveObjectStacking: true, enableRetinaScaling: true 		})();
 	}); // listen to changes so we can save state to history fabricCanvas.on && fabricCanvas.on('object:modified', saveCanvasState); fabricCanvas.on && fabricCanvas.on('object:removed', saveCanvasState); // load initial evidence items if any if (evidenceItems && evidenceItems.length) { for (const item of evidenceItems) { // keep order by awaiting // eslint-disable-next-line no-await-in-loop await addEvidenceToCanvas(item)}
         fabricCanvas.renderAll()}
 
-      // push initial state saveCanvasState(); fabricLoaded = true} catch (error) { console.error('Failed to initialize Fabric.js:', error); notifications.add({ type: 'error', title: 'Canvas Error'; message: 'Failed to initialize canvas. Some features may not work.'
+      // push initial state saveCanvasState(); fabricLoaded = true} catch (error) { console.error('Failed to initialize Fabric.js:', error); notifications.add({ type: 'error', title: 'Canvas Error', message: 'Failed to initialize canvas. Some features may not work.'
       })}
   }); onDestroy(() => { if (fabricCanvas && typeof fabricCanvas.dispose === 'function') { fabricCanvas.dispose()}
   });
@@ -61,13 +61,13 @@
   }
   async function saveCanvas(): Promise<void> { if (!fabricCanvas) return; try { const canvasData = JSON.stringify(fabricCanvas.toJSON(['evidenceId', 'evidenceType', 'customType']));
    const positions = (fabricCanvas.getObjects ? fabricCanvas.getObjects(): []) .filter((obj: any) => obj.evidenceId) .map((obj: any) => ({ evidenceId: obj.evidenceId, x: obj.left, y: obj.top, width: (obj.width ?? (obj.getScaledWidth ? obj.getScaledWidth(): 0)) * (obj.scaleX ?? 1); height: (obj.height ?? (obj.getScaledHeight ? obj.getScaledHeight(): 0)) * (obj.scaleY ?? 1) }));
-   const response = await fetch('/api/canvas/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify({ caseId, canvasData, positions }) }); if (!response.ok) throw new Error('Failed to save canvas'); notifications.add({ type: 'success', title: 'Canvas Saved'; message: 'Evidence board saved successfully.'
+   const response = await fetch('/api/canvas/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ caseId, canvasData, positions }) }); if (!response.ok) throw new Error('Failed to save canvas'); notifications.add({ type: 'success', title: 'Canvas Saved', message: 'Evidence board saved successfully.'
       })} catch (error) { notifications.add({ type: 'error', title: 'Save Failed'; message: 'Failed to save evidence board.'
       }); console.error('Save error:', error)}'
   }
   async function exportCanvas(): Promise<any> { if (!fabricCanvas) return; try { const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 0.9; multiplier: 2 });
-   const link = document.createElement('a'); link.download = `evidence-board-${caseId ?? 'canvas'}-${Date.now()}.png`; link.href = dataURL; link.click(); notifications.add({ type: 'success', title: 'Export Complete'; message: 'Evidence board exported successfully.'
-      })} catch (error) { console.error('Export error:', error); notifications.add({ type: 'error', title: 'Export Failed'; message: 'Failed to export evidence board.'
+   const link = document.createElement('a'); link.download = `evidence-board-${caseId ?? 'canvas'}-${Date.now()}.png`; link.href = dataURL; link.click(); notifications.add({ type: 'success', title: 'Export Complete', message: 'Evidence board exported successfully.'
+      })} catch (error) { console.error('Export error:', error); notifications.add({ type: 'error', title: 'Export Failed', message: 'Failed to export evidence board.'
       })}
   }
   function clearCanvas() { if (!fabricCanvas || readonly) return; if (confirm('Are you sure you want to clear the entire canvas?')) { fabricCanvas.clear(); fabricCanvas.backgroundColor = '#f8fafc'; saveCanvasState()}

@@ -68,8 +68,8 @@ export const appActions = {
 
   // Cases
   async loadCases(params?: {
-    page?: number;
-    limit?: number;
+    page?: number,
+    limit?: number,
     status?: string;
     priority?: string;
     search?: string;
@@ -155,8 +155,8 @@ export const appActions = {
 
   // Evidence
   async loadEvidence(params?: {
-    page?: number;
-    limit?: number;
+    page?: number,
+    limit?: number,
     type?: string;
     status?: string;
     caseId?: string;
@@ -222,8 +222,8 @@ export const appActions = {
 
   // Persons of Interest
   async loadPOIs(params?: {
-    page?: number;
-    limit?: number;
+    page?: number,
+    limit?: number,
     threatLevel?: string;
     status?: string;
     search?: string;
@@ -280,8 +280,8 @@ export const appActions = {
   async search(
     query: string,
     filters?: {
-      type?: string[];
-      tags?: string[];
+      type?: string[],
+      tags?: string[],
       dateFrom?: string;
       dateTo?: string;
       caseId?: string;

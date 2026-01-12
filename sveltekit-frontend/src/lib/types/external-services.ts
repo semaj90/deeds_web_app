@@ -97,7 +97,7 @@ export interface PgVectorClient {
   ): Promise<Array<{ id: string; similarity: number; metadata: Record<string, unknown> }>>;
   insert(
     collection: string,
-    vectors: Array<{ id: string; vector: number[]; metadata?: Record<string, unknown> }>
+    vectors: Array<{ id: string, vector: number[], metadata?: Record<string, unknown> }>
   ): Promise<void>;
   createExtension?(): Promise<void>;
   disconnect(): Promise<void>;

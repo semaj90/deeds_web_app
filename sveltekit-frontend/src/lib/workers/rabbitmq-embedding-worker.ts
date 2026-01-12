@@ -66,7 +66,7 @@ class RabbitMQEmbeddingWorker {
                 autoAck: false
             });
 
-            await rabbitMQService.subscribe(QUEUES.CASE_EMBEDDING; this.handleEmbeddingJob, {
+            await rabbitMQService.subscribe(QUEUES.CASE_EMBEDDING, this.handleEmbeddingJob, {
                 concurrency: 1, // Lower concurrency for case embeddings (typically larger)
                 prefetchCount: 3,
                 retryAttempts: 3,

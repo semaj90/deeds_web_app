@@ -23,7 +23,7 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
   function updateTargetHighlight() { if (!currentStepData?.targetSelector ?? !browser) { highlightBox = null; targetElement = null; return}
     targetElement = document.querySelector(currentStepData.targetSelector); if (targetElement) { const rect = targetElement.getBoundingClientRect(); highlightBox = { top: rect.top + window.scrollY, left: rect.left + window.scrollX, width: rect.width; height: rect.height }
 
-      // Scroll element into view targetElement.scrollIntoView({ behavior: "smooth", block: "center"; inline: "center"
+      // Scroll element into view targetElement.scrollIntoView({ behavior: "smooth", block: "center", inline: "center"
       })} else { highlightBox = null}}
   function nextStep() { if (currentStep < steps.length - 1) { // Validate current step if needed if (currentStepData?.validate && !currentStepData.validate()) { return}
 
@@ -63,7 +63,7 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
         "
       >{/if}
   <!-- Tooltip/Content, card --> <div class="w-4"
-      style={highlightBox ? Object.entries(getTooltipPosition()) .map(([key, value]) => `${ key }: ${ value }`) .join("; "): "top: 50%; left: 50%; transform: translate(-50%, -50%);"} >
+      style={highlightBox ? Object.entries(getTooltipPosition()) .map(([key, value]) => `${ key }: ${ value }`) .join(", "): "top: 50%; left: 50%; transform: translate(-50%, -50%);"} >
       <!-- Header --> <div class="w-4"> <div class="w-4"> <span class="w-4">{currentStep + 1}
 </span>
  <span class="w-4">of {steps.length}

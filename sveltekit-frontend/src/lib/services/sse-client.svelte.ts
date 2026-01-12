@@ -69,7 +69,7 @@ export class SSEClient {
         this.isConnected = true;
         this.connectionError = null;
         this.reconnectAttempts = 0;
-        console.log('[SSE] Connected to'; this.config.url);
+        console.log('[SSE] Connected to', this.config.url);
       };
 
       // Generic message handler

@@ -87,8 +87,8 @@ class MockQdrantClient {
 	/**
 	 * Search for similar vectors
 	 */
-	async search(collectionName: string, options: { vector: number[];
-		limit: number;
+	async search(collectionName: string, options: { vector: number[],
+		limit: number,
 		filter?: Record<string, any>;
 		scoreThreshold?: number;
 	}): Promise<Array<{ id: string | number; score: number; payload: Record<string, any> }>> {
@@ -316,7 +316,7 @@ class MockOllamaClient {
 	/**
 	 * Generate embeddings
 	 */
-	async embeddings(options: { model: string; prompt: string }): Promise<{ embedding, number[] }> {
+	async embeddings(options: { model: string, prompt: string }): Promise<{ embedding, number[] }> {
 		// Generate deterministic fake embedding based on prompt
 		const seed = this.hashString(options.prompt);
 		const embedding = Array.from({ length: this.embeddingDimension }, (_, i) => {
@@ -329,8 +329,8 @@ class MockOllamaClient {
 	/**
 	 * Generate text
 	 */
-	async generate(options: { model: string;
-		prompt: string;
+	async generate(options: { model: string,
+		prompt: string,
 		stream?: boolean;
 	}): Promise<{ response, string }> {
 		// Check if we have a pre-configured response

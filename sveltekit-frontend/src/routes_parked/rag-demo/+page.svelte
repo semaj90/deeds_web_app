@@ -83,9 +83,9 @@ https, //svelte.dev/e/attribute_invalid_name -->
  });
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>RAG Pipeline Demo</title>
-</svelte, head>
+</svelte:head>
 
 <div class="container mx-auto p-8">
  <h1 class="text-3xl font-bold mb-8">Legal AI RAG Pipeline Demo</h1>

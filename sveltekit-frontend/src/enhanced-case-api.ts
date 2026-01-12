@@ -149,8 +149,8 @@ export class EnhancedCaseAPI {
    * Search cases with enhanced filtering
    */
   async searchCases(params: {
-    query?: string;
-    status?: string[];
+    query?: string,
+    status?: string[],
     priority?: string[];
     caseType?: string[];
     page?: number;
@@ -200,7 +200,7 @@ export class EnhancedCaseAPI {
    */
   async getCaseAnalytics(
     params: {
-      dateRange?: { start: string; end: string };
+      dateRange?: { start: string, end: string },
       caseType?: string[];
       priority?: string[];
       includeClusterData?: boolean;
@@ -227,8 +227,8 @@ export class EnhancedCaseAPI {
    * Cluster similar cases using enhanced REST architecture
    */
   async clusterSimilarCases(params: {
-    caseId?: string;
-    algorithm?: 'kmeans' | 'som' | 'hierarchical';
+    caseId?: string,
+    algorithm?: 'kmeans' | 'som' | 'hierarchical',
     k?: number;
     includeEmbeddings?: boolean;
   }): Promise<APIResponse<{ clusters: Array<unknown>; silhouetteScore: number; totalCases: number }>> {

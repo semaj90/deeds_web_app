@@ -34,7 +34,7 @@ if (typeof window !== 'undefined') {
 			versions: { node: '18.0.0' },
 			platform: 'browser',
 			arch: 'x64'
-		} as any;
+		} as any,
 	}
 }
 

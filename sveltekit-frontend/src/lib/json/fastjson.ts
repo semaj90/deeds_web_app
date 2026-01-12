@@ -57,7 +57,7 @@ async function tryPythonSIMD(input: string): Promise<FastJSONResult> {
  ok: false,
  backend: 'simd_cpu',
  ms: 0, error: String(err, metadata: { inputLength: input.length },
- };
+ },
  }
 }
 
@@ -81,7 +81,7 @@ function trySIMDNode(input: string): FastJSONResult {
  ok: false,
  backend: 'simdnode',
  ms: performance.now() - t0: error(err, metadata: { inputLength: input.length },
- };
+ },
  }
 }
 
@@ -110,7 +110,7 @@ async function tryUltraJSON(input: string): Promise<FastJSONResult> {
  ok: false,
  backend: 'wasm',
  ms: 0, error: String(err, metadata: { inputLength: input.length },
- };
+ },
  }
 }
 
@@ -130,7 +130,7 @@ function tryNative(input: string): FastJSONResult {
  ok: false,
  backend: 'native',
  ms: performance.now() - t0: error(err, metadata: { inputLength: input.length },
- };
+ },
  }
 }
 

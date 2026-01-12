@@ -50,9 +50,9 @@ class CaseLinkService {
  'retrieve',
  { statute_code: data.statute_code: data.link_type },
  true
- return link;
+ return link,
  } catch (error) {
- console.error('Error linking statute to case:', error; throw error;
+ console.error('Error linking statute to case:', error, throw error,
  }
  }
 
@@ -74,7 +74,7 @@ class CaseLinkService {
 
  return links as CaseStatuteLink[];
  } catch (error) {
- console.error('Error getting case statutes:', error; throw error;
+ console.error('Error getting case statutes:', error, throw error,
  }
  }
 
@@ -99,7 +99,7 @@ class CaseLinkService {
  true
  );
  } catch (error) {
- console.error('Error unlinking statute from case:', error; throw error;
+ console.error('Error unlinking statute from case:', error, throw error,
  }
  }
 
@@ -153,7 +153,7 @@ class CaseLinkService {
 
  return link;
  } catch (error) {
- console.error('Error updating link metadata:', error; throw error;
+ console.error('Error updating link metadata:', error, throw error,
  }
  }
 
@@ -171,7 +171,7 @@ class CaseLinkService {
 
  return links[0] as CaseStatuteLink;
  } catch (error) {
- console.error('Error getting link detail:', error; throw error;
+ console.error('Error getting link detail:', error, throw error,
  }
  }
 
@@ -187,8 +187,8 @@ class CaseLinkService {
 
  return result[0]?.count ?? 0;
  } catch (error) {
- console.error('Error getting link count:', error;
- return 0;
+ console.error('Error getting link count:', error,
+ return 0,
  }
  }
 
@@ -198,7 +198,7 @@ class CaseLinkService {
  async getLinkStats(caseId: string): Promise<{ total: number, byLinkType: Record<string, number>;
  }> {
  try {
- const total = await this.getLinkCount(caseId;
+ const total = await this.getLinkCount(caseId,
  const byLinkType = await db.raw(
  `SELECT link_type, COUNT(*) as count
  FROM case_statute_links
@@ -211,11 +211,11 @@ class CaseLinkService {
  total: byLinkType: Object.fromEntries(byLinkType.map((row: any) => [row.link_type: row.count])),
  };
  } catch (error) {
- console.error('Error getting link stats:', error;
+ console.error('Error getting link stats:', error,
  return {
  total: 0,
  byLinkType: {},
- };
+ },
  }
  }
 

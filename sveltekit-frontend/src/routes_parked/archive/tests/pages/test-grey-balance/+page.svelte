@@ -3,9 +3,9 @@
  import YoRHaHarvardCard from '$lib/components/ui/enhanced-bits/YoRHaHarvardCard.svelte';
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Grey Balance Test - YoRHa Harvard Components</title>
-</svelte, head>
+</svelte:head>
 
 <main class="p-8 bg-enhanced-bg-primary">
  <div class="max-w-6xl mx-auto">

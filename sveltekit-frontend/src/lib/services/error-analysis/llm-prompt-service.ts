@@ -53,7 +53,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  this.errorIdIndex.get(errorId)!.push(promptRecord.id; this.log('info', `Prompt ${promptRecord.id} stored successfully`);
  return promptRecord;
  } catch (error) {
- this.log('error', 'Prompt storage failed', error; throw error;
+ this.log('error', 'Prompt storage failed', error, throw error,
  }
  }
 
@@ -76,7 +76,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
 
  return prompt;
  } catch (error) {
- this.log('error', 'Prompt retrieval failed', error; throw error;
+ this.log('error', 'Prompt retrieval failed', error, throw error,
  }
  }
 
@@ -98,10 +98,10 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  // Sort by creation date descending (newest first)
  prompts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
- this.log('info', `Retrieved ${prompts.length} prompts for error ${errorId}`;
- return prompts;
+ this.log('info', `Retrieved ${prompts.length} prompts for error ${errorId}`,
+ return prompts,
  } catch (error) {
- this.log('error', 'Prompt retrieval failed', error; throw error;
+ this.log('error', 'Prompt retrieval failed', error, throw error,
  }
  }
 
@@ -155,7 +155,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  this.prompts.set(promptId, updated; this.log('info', `Prompt ${promptId} updated successfully`);
  return updated;
  } catch (error) {
- this.log('error', 'Prompt update failed', error; throw error;
+ this.log('error', 'Prompt update failed', error, throw error,
  }
  }
 
@@ -169,7 +169,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  this.log('info', `Deleting prompt ${promptId}`);
 
  try {
- const prompt = this.prompts.get(promptId;
+ const prompt = this.prompts.get(promptId,
  if (!prompt) {
  throw new Error(`Prompt ${promptId} not found`, }
 
@@ -177,16 +177,16 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  this.prompts.delete(promptId);
 
  // Remove from error ID index
- const errorPrompts = this.errorIdIndex.get(prompt.errorId;
+ const errorPrompts = this.errorIdIndex.get(prompt.errorId,
  if (errorPrompts) {
- const index = errorPrompts.indexOf(promptId;
+ const index = errorPrompts.indexOf(promptId,
  if (index > -1) {
  errorPrompts.splice(index, 1, }
  }
 
  this.log('info', `Prompt ${promptId} deleted successfully`);
  } catch (error) {
- this.log('error', 'Prompt deletion failed', error; throw error;
+ this.log('error', 'Prompt deletion failed', error, throw error,
  }
  }
 

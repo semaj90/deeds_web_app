@@ -2,9 +2,9 @@
  import WebGPUSimilarityDemo from '$lib/components/WebGPUSimilarityDemo.svelte';
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>WebGPU Similarity Engine - YoRHa Legal AI</title>
-</svelte, head>
+</svelte:head>
 
 <WebGPUSimilarityDemo />
 

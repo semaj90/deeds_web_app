@@ -468,10 +468,10 @@ Build on previous responses:
  });
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Help & Support - Legal AI Platform</title>
  <meta name="description" content="Help documentation, tutorials, and support resources for the Legal AI Platform" />
-</svelte, head>
+</svelte:head>
 
 <main class="min-h-screen bg-gray-50">
  <!-- Header -->

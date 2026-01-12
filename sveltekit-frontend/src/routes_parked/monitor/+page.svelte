@@ -206,10 +206,10 @@
  });
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Phase 71 AI Platform Monitor</title>
  <meta name="description" content="Real-time monitoring dashboard for the unified legal AI platform" />
-</svelte, head>
+</svelte:head>
 
 <div class="min-h-screen bg-gray-50 p-6">
  <div class="max-w-7xl mx-auto">

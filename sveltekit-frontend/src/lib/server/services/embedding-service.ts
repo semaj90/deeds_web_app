@@ -158,7 +158,7 @@ export async function storeLawSectionEmbedding(
  * Generate and store embeddings for case chunks
  */
 export async function embedAndStoreCaseChunks(
- chunks: Array<{ id: string; text, string }>,
+ chunks: Array<{ id: string, text, string }>,
  concurrency: number = 5
 ): Promise<void> {
  try {
@@ -183,7 +183,7 @@ export async function embedAndStoreCaseChunks(
  * Generate and store embeddings for law sections
  */
 export async function embedAndStoreLawSections(
- sections: Array<{ id: string; text, string }>,
+ sections: Array<{ id: string, text, string }>,
  concurrency: number = 5
 ): Promise<void> {
  try {

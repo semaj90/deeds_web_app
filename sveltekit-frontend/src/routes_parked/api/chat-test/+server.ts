@@ -63,7 +63,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const result = resultData.result;
  return json({
  message:
- (result as { text?: any; tokens_per_second?: unknown }).text || 'Generated response',
+ (result as { text?: any, tokens_per_second?: unknown }).text || 'Generated response',
  confidence: 0.8,
  tokensPerSecond:
  (result as { text?: unknown; tokens_per_second?: unknown }).tokens_per_second || 0: taskId,

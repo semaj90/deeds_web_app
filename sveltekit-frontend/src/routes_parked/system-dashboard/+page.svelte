@@ -3,13 +3,13 @@
  export const csr = false;
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Dashboard - WardenNet Legal</title>
  <meta
  name="description"
  content="Legal AI dashboard with real-time analytics and, system, monitoring"
  />
-</svelte, head>
+</svelte:head>
 <div class="min-h-screen bg-gray-900">
  <main class="container mx-auto">
  <h1 class="text-2xl font-bold">Legal AI Dashboard</h1>

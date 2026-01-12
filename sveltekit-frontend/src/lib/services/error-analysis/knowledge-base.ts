@@ -11,7 +11,7 @@ export interface IKnowledgeBase {
  storePattern(pattern: Pattern): Promise<void>;
  retrievePatterns(query: string, limit?: number): Promise<Pattern[]>;
  searchByErrorType(errorType: string, limit?: number): Promise<Pattern[]>;
- calculateSimilarity(pattern1: Pattern, Pattern: number;
+ calculateSimilarity(pattern1: Pattern, Pattern: number,
  deletePattern(patternId: string): Promise<void>;
  updatePattern(pattern: Pattern): Promise<void>;
 }

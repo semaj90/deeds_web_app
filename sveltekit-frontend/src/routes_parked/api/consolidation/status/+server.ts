@@ -91,7 +91,7 @@ export const GET: RequestHandler = async () => {
  { name: 'Deploy to staging', done: false },
  { name: 'Deploy to production', done: false }],
  }],
- };
+ },
 
  return json(status);
 };

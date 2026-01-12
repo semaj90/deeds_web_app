@@ -47,7 +47,7 @@ function validateAndBuildEnv(): EnvConfig {
 		GPU_DEBUG: RAW_ENV.VITE_GPU_DEBUG === 'true',
 		SHADER_DEBUG: RAW_ENV.VITE_SHADER_DEBUG === 'true',
 		REDUCTION_MODE: RAW_ENV.VITE_REDUCTION_MODE === 'gpu' || RAW_ENV.VITE_REDUCTION_MODE === 'cpu' ? RAW_ENV.VITE_REDUCTION_MODE : 'auto'
-	};
+	},
 
 	if (cfg.GPU_DEBUG) {
 		console.log('[ENV] Loaded configuration', cfg);

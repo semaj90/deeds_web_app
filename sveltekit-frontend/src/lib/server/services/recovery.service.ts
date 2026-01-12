@@ -125,7 +125,7 @@ export class RecoveryService {
  holding: '[Holding unavailable]',
  version: 0, createdAt: new Date( createdBy: 'system',
  isCurrent: false, isTemplate: true,
- };
+ },
  }
 
  /**

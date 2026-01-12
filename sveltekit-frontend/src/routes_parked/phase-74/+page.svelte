@@ -34,7 +34,7 @@
  caseName: 'State v. Johnson',
  timestamp: new Date( isTyping: false,
  displayedText: ''
- };
+ },
 
  let demoScene: MarkdownScene = {
  id: 'scene-1',
@@ -44,7 +44,7 @@
  aiGenerated: true,
  confidence: 0.87,
  sourceFiles: ['camera3.mp4']
- };
+ },
 
  let demoForm: AutoPopulatedForm = {
  caseNumber: '2025-CR-001234',
@@ -99,9 +99,9 @@
  }
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Phase 74: SvelteKit Frontend | YoRHa Legal AI</title>
-</svelte, head>
+</svelte:head>
 
 <div class="phase-74-layout">
  <!-- Header -->

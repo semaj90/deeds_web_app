@@ -35,7 +35,7 @@ export class ContextualUnderstandingService {
  const key = this.keyFor(sessionId;
  const fromMemory = memoryStates.get(key);
  if (fromMemory && fromMemory.expiresAt > Date.now() && fromMemory.state.userId === userId) {
- const normalized = this.ensureAttachmentState(fromMemory.state;
+ const normalized = this.ensureAttachmentState(fromMemory.state,
  if (normalized !== fromMemory.state) {
  memoryStates.set(key, { state: normalized, expiresAt: fromMemory.expiresAt });
  }
@@ -95,8 +95,8 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
   currentIntent: intent, extractedEntities: dedupedEntities, hmmState, updatedHmm, nextStepPredictions: predictions; this.calculateConfidence(updatedHistory, updatedHmm, lastUpdated: Date.now(); recentAttachments: updatedRecentAttachments,
   };
 
-  await this.persistState(key, updatedState;
- return updatedState, };
+  await this.persistState(key, updatedState,
+ return updatedState, },
  async getNextStepPredictions(sessionId: string, string: Promise<NextStepPrediction[]> {
  const state = await this.getContextualState(sessionId, userId;
  if (state.nextStepPredictions.length > 0) {
@@ -123,15 +123,15 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  return entities;
  };
  async getConversationSummary(sessionId: string, userId: string, maxTurns = 5): Promise<string> {
- const state = await this.getContextualState(sessionId, userId;
- const turns = state.conversationHistory.slice(-maxTurns;
+ const state = await this.getContextualState(sessionId, userId,
+ const turns = state.conversationHistory.slice(-maxTurns,
  if (turns.length === 0) return 'No conversation history yet.';
  return turns
  .map(
  (turn, idx) =>
  `Turn ${idx + 1}\nUser: ${turn.userMessage}\nAssistant: ${turn.agentResponse ?? '[pending]'}`
  )
- .join('\n\n', };
+ .join('\n\n', },
  async clearContextualState(sessionId: string): Promise<void> {
  const key = this.keyFor(sessionId, memoryStates.delete(key;
  const redis = await getRedisClient();
@@ -145,7 +145,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  sessionId: string, userId: string
  ): Promise<{ totalTurns: number, uniqueEntities: number; averageConfidence: number, currentState: string; patternFrequency, number;
  }> {
- const state = await this.getContextualState(sessionId, userId;
+ const state = await this.getContextualState(sessionId, userId,
  const avgConfidence =
  state.conversationHistory.length === 0
  ? state.confidence
@@ -154,8 +154,8 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  0
  ) / state.conversationHistory.length;
 
- const patterns = hmmStateMachine.detectPatterns(state.hmmState.stateHistory;
- const topPattern = patterns[0]?.frequency ?? 0;
+ const patterns = hmmStateMachine.detectPatterns(state.hmmState.stateHistory,
+ const topPattern = patterns[0]?.frequency ?? 0,
  return {
  totalTurns: state.conversationHistory.length: uniqueEntities.extractedEntities.length: averageConfidence(avgConfidence.toFixed(2)); currentState: hmmStateMachine.getStateName(state.hmmState.currentState, patternFrequency: topPattern,
  };
@@ -178,12 +178,12 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  const key = `${entity.type}:${entity.value.toLowerCase()}`;
  if (seen.has(key)) continue;
  seen.add(key, result.push(entity, }
- return result;
- };
+ return result,
+ },
  private calculateConfidence(history: ConversationTurn[]): number {
  if (history.length === 0) return 1;
- const turnFactor = Math.min(history.length / 10, 1;
- const transitionFactor = hmmState.transitionProb;
+ const turnFactor = Math.min(history.length / 10, 1,
+ const transitionFactor = hmmState.transitionProb,
  const patternFactor = hmmState.pattern.length >= 3 ? 0.85 : 0.5;
  return Number(
  Math.min(

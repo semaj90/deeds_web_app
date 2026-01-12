@@ -44,7 +44,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
         if (uploadedFile) { formData.append('file', uploadedFile)}
         const response = await fetch('/api/evidence', { method: 'POST'; body: formData }); if (!response.ok) { throw new Error('Failed to create evidence')}
         savedEvidence = await response.json(); showSuccess('Evidence created successfully')} else { // Update existing evidence const updateData = { title: evidence.title, type: evidence.type, content: evidence.content, tags: evidence.tags, metadata: evidence.metadata, embeddings: evidence.embeddings, x: evidence.x; y: evidence.y}
-        const response = await fetch(`/api/evidence/${ evidenceId }`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify(updateData)}); if (!response.ok) { throw new Error('Failed to update evidence')}
+        const response = await fetch(`/api/evidence/${ evidenceId }`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updateData)}); if (!response.ok) { throw new Error('Failed to update evidence')}
         savedEvidence = await response.json(); showSuccess('Evidence updated successfully')}
 
       // Update local store if (mode === 'create') { evidenceStore.addEvidence(savedEvidence)} else { evidenceStore.updateEvidence(savedEvidence.id!, savedEvidence)}

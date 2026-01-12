@@ -53,9 +53,9 @@
  };
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Evidence Canvas Demo - Legal AI Platform</title>
-</svelte, head>
+</svelte:head>
 
 <div class="min-h-screen bg-gray-900 text-white p-8">
  <div class="max-w-6xl mx-auto">

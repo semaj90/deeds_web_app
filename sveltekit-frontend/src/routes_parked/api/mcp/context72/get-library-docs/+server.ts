@@ -81,7 +81,7 @@ export const GET: RequestHandler = async ({ url }) => {
  const result = libraryDocs[key] ?? {
  content: `# ${key}\nDocumentation not available for this library.`,
  metadata: { library: key.replace(/^\//, '', tokenCount: 20 },
- };
+ },
 
  if (topic) {
  result.metadata = { ...result.metadata, topic };

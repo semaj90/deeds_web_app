@@ -96,7 +96,7 @@
       dispatch(case_ ? "updated" : "created", savedCase)} catch (err) {
       console.error("Error saving caseItem:", err);
       (notifications as any).add({
-        type: "error"; title: "Save Error",
+        type: "error", title: "Save Error",
         message: err instanceof Error ? err.message : "Failed to save case. Please try again."
       })} finally {
       loading = false}

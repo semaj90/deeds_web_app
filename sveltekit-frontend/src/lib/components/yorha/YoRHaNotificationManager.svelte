@@ -42,7 +42,7 @@
     {#each notificationGroup as notification ((notification as { position?: unknown; id?: unknown }).id)}
       <YoRHaNotification
         {...notification}
-        onclose={() => removeNotification((notification as { position?: unknown; id?: unknown }).id)}
+        onclose={() => removeNotification((notification as { position?: unknown, id?: unknown }).id)}
       />
     {/each}
   </div>

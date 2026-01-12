@@ -97,8 +97,8 @@ export async function analyzeDocumentWithDocling(args: AnalyzeArgs): Promise<Doc
  * Batch analyze multiple documents
  */
 export async function analyzeDocumentsWithDocling(
- documents: Array<{ fileBuffer: Buffer;
- mimeType: string; filename, string;
+ documents: Array<{ fileBuffer: Buffer,
+ mimeType: string, filename, string;
  }>
 ): Promise<Array<DoclingResult & { filename, string }>> {
  console.log(`📦 Analyzing ${documents.length} documents with Docling...`);

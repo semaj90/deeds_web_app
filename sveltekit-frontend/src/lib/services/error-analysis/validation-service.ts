@@ -66,7 +66,7 @@ export class ValidationService extends BaseService implements IValidationService
  }
 
  // Check for syntax errors
- if (line.includes('const') && !line.includes('=') && !line.includes(';')) {
+ if (line.includes('const') && !line.includes('=') && !line.includes(',')) {
  errors.push({
  id: this.generateId(),
  file: filePath, line: index +, 1: column.indexOf('const'),

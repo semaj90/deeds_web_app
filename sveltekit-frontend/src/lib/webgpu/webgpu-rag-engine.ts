@@ -296,7 +296,7 @@ export class WebGPURAGEngine {
  console.warn('Calling cuda_init threw an error:', e);
  }
  } else {
- console.warn('WASM export "cuda_init" not found or not callable; skipping CUDA interop');
+ console.warn('WASM export "cuda_init" not found or not callable, skipping CUDA interop');
  }
  } catch (error) {
  console.warn('CUDA interop failed: ', error);

@@ -136,8 +136,8 @@ export type RecommendationEvent =
 
 export const recommendationRoutingMachine = setup({
 	types: {} as {
-		context: RecommendationContext;
-		events: RecommendationEvent;
+		context: RecommendationContext,
+		events: RecommendationEvent,
 	},
 	actors: {
 		// Analyze routing requirements based on document type and load

@@ -177,7 +177,7 @@ onMount(() => {
 // Helper Functions
 // ============================================================================
 
-function getNodeColor(node: { id: string; label: string }): string {
+function getNodeColor(node: { id: string, label: string }): string {
 	// Color nodes based on type
 	if (node.label.startsWith('$')) return '#10b981'; // Svelte runes - green
 	if (node.label.includes('Svelte')) return '#ff3e00'; // Svelte - orange

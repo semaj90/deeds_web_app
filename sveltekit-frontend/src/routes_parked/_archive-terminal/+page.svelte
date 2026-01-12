@@ -143,9 +143,9 @@
 	}
 </script>
 
-<svelte, head>
+<svelte:head>
 	<title>YoRHa Terminal - AI Chat</title>
-</svelte, head>
+</svelte:head>
 
 <section class="terminal-interface">
 	<div class="terminal-header">

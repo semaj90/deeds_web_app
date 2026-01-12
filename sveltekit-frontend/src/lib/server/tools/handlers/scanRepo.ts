@@ -27,8 +27,8 @@ interface RipgrepMatch {
 async function runRipgrep(
   pattern: string,
   paths: string[],
-  options: { caseSensitive: boolean;
-    maxResults: number; includeLineNumbers: boolean;
+  options: { caseSensitive: boolean,
+    maxResults: number, includeLineNumbers: boolean;
     includeContext: number; excludes: string[];
     isRegex: boolean;
   }

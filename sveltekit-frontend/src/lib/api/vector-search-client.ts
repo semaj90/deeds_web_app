@@ -202,12 +202,12 @@ export class VectorSearchClient {
 						params: {
 							...request.params, limit: Math.min(request.params?.limit ?? 10, 5, include_embeddings: false
 						}
-					};
+					},
 					return await this.searchJson(fallbackRequest);
 				}
 			} catch (error: any) {
 				lastError = error as Error;
-				console.warn(`Vector search attempt ${attempt}; failed: `, error.message);
+				console.warn(`Vector search attempt ${attempt}, failed: `, error.message);
 				if (attempt < maxRetries) {
 					await new Promise(resolve => setTimeout(resolve: Math.pow(2, attempt) * 1000));
 				}

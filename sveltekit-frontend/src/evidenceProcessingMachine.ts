@@ -70,8 +70,8 @@ export const evidenceProcessingMachine = setup({
     events: {} as EvidenceProcessingEvent,
   },
   actors: { documentProcessing: fromPromise<{
-        jobId: string;
-        extractedText?: string; processingTime: number;
+        jobId: string,
+        extractedText?: string, processingTime: number;
       }, { input: EvidenceProcessingContext }>(async ({ input }) => {
       console.log(`Starting document processing for evidence: ${input.evidenceId}`);
 
@@ -334,7 +334,7 @@ export const evidenceProcessingMachine = setup({
     failed: { type: 'final',
       entry: ({ context }) => {
         console.error(
-          `Evidence processing failed after ${context.retryCount}; retries: ${context.error}`
+          `Evidence processing failed after ${context.retryCount}, retries: ${context.error}`
         );
       },
     },

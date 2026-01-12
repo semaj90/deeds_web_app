@@ -137,7 +137,7 @@ export class WebGPULangChainBridge {
 	 * Process batch of documents with WebGPU optimization
 	 */
 	async processBatchDocuments(
-		documents: Array<{ id: string; content: string; metadata?, unknown }>,
+		documents: Array<{ id: string, content: string, metadata?, unknown }>,
 		options: Partial<LangChainWebGPUConfig> = {}
 	): Promise<ProcessingResult[]> {
 		await loadServices();
@@ -452,7 +452,7 @@ export class WebGPULangChainBridge {
 	 */
 	updateConfig(newConfig: Partial<LangChainWebGPUConfig>): void {
 		this.config = { ...this.config, ...newConfig };
-		console.log('🔧 WebGPU-LangChain Bridge config updated:'; this.config);
+		console.log('🔧 WebGPU-LangChain Bridge config updated:', this.config);
 	}
 }
 
@@ -475,7 +475,7 @@ export async function processLegalDocumentWithWebGPU(
 }
 
 export async function processBatchDocumentsWithWebGPU(
-	documents: Array<{ id: string; content: string; metadata?, unknown }>,
+	documents: Array<{ id: string, content: string, metadata?, unknown }>,
 	options?: Partial<LangChainWebGPUConfig>
 ): Promise<ProcessingResult[]> {
 	return webgpuLangChainBridge.processBatchDocuments(documents, options);

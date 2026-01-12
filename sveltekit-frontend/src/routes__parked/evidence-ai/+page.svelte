@@ -178,7 +178,7 @@ import { onMount } from 'svelte';
  }
  function sendQuery(query: string, fileId?: string) {
  if (!ws || !wsConnected || ws.readyState !== WebSocket.OPEN) {
- console.warn('WebSocket not open; falling back to REST query where available');
+ console.warn('WebSocket not open, falling back to REST query where available');
  // Optionally call REST endpoint for analysis if WS not available (server must support)
  const apiBase = (import.meta as any).env?.PUBLIC_API_BASE ?? '/api/v2/evidence';
  fetch(`${apiBase}?action=analyze`, {

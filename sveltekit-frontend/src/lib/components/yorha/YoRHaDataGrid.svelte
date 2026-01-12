@@ -10,7 +10,7 @@
     className?: string
     actionsSnippet?: Snippet<[any, number]>}
   let { columns = [], data = [], loading = false, className = '', actionsSnippet }: DataGridProps = $props();
-  function format(_value: unknown, col: GridColumn; row: unknown) {
+  function format(_value: unknown, col: GridColumn, row: unknown) {
     return col.formatter ? col.formatter(value, row) : valu}
 </script>
 <div class="yorha-data-grid {className}">

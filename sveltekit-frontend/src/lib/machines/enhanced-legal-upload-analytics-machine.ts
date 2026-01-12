@@ -151,7 +151,7 @@ type AnalyzeDocResult = {
 // Enhanced Production Services (replaced fromPromise with plain async functions)
 export async function analyzeUserBehaviorService({
  input,
-}: { input: { userAnalytics: UserAnalytics; context: UploadContext };
+}: { input: { userAnalytics: UserAnalytics, context: UploadContext },
 }): Promise<{ updatedAnalytics: UserAnalytics; insights: unknown; behaviorScore, number }> {
  try {
  // Production API call to user behavior analysis service
@@ -190,7 +190,7 @@ export async function analyzeUserBehaviorService({
 }
 export async function generateContextualPromptsService({
  input,
-}: { input: { context: UploadContext; timing: string };
+}: { input: { context: UploadContext, timing: string },
 }): Promise<ContextualPrompt[]> {
  try {
  // Production Ollama service call
@@ -247,7 +247,7 @@ export async function generateContextualPromptsService({
 }
 export async function performAIAnalysisService({
  input,
-}: { input: { files: File[]; context: UploadContext };
+}: { input: { files: File[], context: UploadContext },
 }): Promise<UploadResult[]> {
  try {
  // Production legal AI analysis service
@@ -331,7 +331,7 @@ export async function performAIAnalysisService({
 }
 export async function saveToDatabaseService({
  input,
-}: { input: { results: UploadResult[]; context: UploadContext };
+}: { input: { results: UploadResult[], context: UploadContext },
 }): Promise<void> {
  try {
  // Production Drizzle ORM integration

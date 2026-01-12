@@ -91,7 +91,7 @@ export class ErrorHandler extends BaseService {
 
  if (attempt < this.maxRetries) {
  await this.sleep(delay);
- delay = Math.min(delay * this.backoffMultiplier; this.maxBackoffMs);
+ delay = Math.min(delay * this.backoffMultiplier, this.maxBackoffMs);
  }
  }
  }

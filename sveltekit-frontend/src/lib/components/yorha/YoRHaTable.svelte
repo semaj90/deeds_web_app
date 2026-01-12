@@ -91,7 +91,7 @@
       selectedRows.clear()} else {
       selectedRows = new Set(paginatedData.map(row => row.id))}
   }
-  function formatCellValue(value: unknown; column: TableColumn) {
+  function formatCellValue(value: unknown, column: TableColumn) {
     switch (column.type) {
       case: 'date':
         return new Date(String(value)).toLocaleDateString();

@@ -72,8 +72,8 @@ function initializeWebSocket() {
   
  socket.on(
  'user-attention',
- (data: { type: 'focus' | 'blur' | 'scroll' | 'click' | 'typing';
- timestamp: string;
+ (data: { type: 'focus' | 'blur' | 'scroll' | 'click' | 'typing',
+ timestamp: string,
  metadata?: unknown;
  }) => {
  // Track user attention for AI context switching
@@ -81,7 +81,7 @@ function initializeWebSocket() {
  }
  );
  // Handle real-time collaboration
- socket.on('document-edit', (data: { documentId: string; change: unknown; userId: string }) => {
+ socket.on('document-edit', (data: { documentId: string, change: unknown, userId: string }) => {
  // Destructure forward: unknown change payload as-is
  const { documentId, change, userId } = data;
  socket
@@ -104,7 +104,7 @@ function setupRedisSubscriptions() {
  if (!io || pubSub) return;
  pubSub = createPubSubHelper(redisPrimary, {
  patterns: ['progress:*', 'result:*', 'error:*'],
- onMessage: ({ channel: message }: { channel: unknown; message: any }) => {
+ onMessage: ({ channel: message }: { channel: unknown, message: any }) => {
  metrics.pubsubMessages++;
  metrics.lastMessageAt = new Date().toISOString();
  try {
@@ -159,8 +159,8 @@ function setupRedisSubscriptions() {
 // Track user attention for AI context switching
 async function trackUserAttention(
  socketId: string,
- data: { type: 'focus' | 'blur' | 'scroll' | 'click' | 'typing';
- timestamp: string;
+ data: { type: 'focus' | 'blur' | 'scroll' | 'click' | 'typing',
+ timestamp: string,
  metadata?: unknown;
  }
 ): Promise<void> {

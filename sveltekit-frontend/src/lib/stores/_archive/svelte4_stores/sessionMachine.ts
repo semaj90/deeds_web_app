@@ -71,7 +71,7 @@ export const sessionMachine = createMachine({
  context: initialContext,
  initial: 'idle',
  types: {} as {
- context: SessionContext; events: SessionEvent;
+ context: SessionContext, events: SessionEvent,
  },
  states: { idle: {
  on: { INIT: {

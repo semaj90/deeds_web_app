@@ -145,7 +145,7 @@ class CitationService {
 			if (!citation) return null;
 
 			// Cache result
-			await redis.setex(cacheKey; this.CACHE_TTL, JSON.stringify(citation));
+			await redis.setex(cacheKey, this.CACHE_TTL, JSON.stringify(citation));
 
 			return citation as Citation;
 		} catch (error) {

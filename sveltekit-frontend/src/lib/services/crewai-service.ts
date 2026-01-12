@@ -261,8 +261,8 @@ export class CrewAIService {
  crew: CrewAICrew,
  inputs: { [key: string]: any } = {},
  options: {
- timeout?: number;
- priority?: 'low' | 'medium' | 'high';
+ timeout?: number,
+ priority?: 'low' | 'medium' | 'high',
  streamResults?: boolean;
  } = {}
  ): Promise<CrewExecution> {

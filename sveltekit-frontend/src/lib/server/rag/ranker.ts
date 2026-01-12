@@ -16,8 +16,8 @@ export type RankedHit = QdrantHit & {
 /**
  * Rerank search results using legal-aware scoring
  */
-export function rerankLegalAware(opts: { hits: QdrantHit[];
- queryTagIds?: string[];
+export function rerankLegalAware(opts: { hits: QdrantHit[],
+ queryTagIds?: string[],
  jurisdiction?: string | null;
  weights?: { cosine: number; sharedTags: number; sameJurisdiction: number };
 }): RankedHit[] {
@@ -56,8 +56,8 @@ export function rerankLegalAware(opts: { hits: QdrantHit[];
  * Create Qdrant filter for jurisdiction and case filtering
  */
 export function createQdrantFilter(opts: {
- jurisdiction?: string | null;
- caseId?: string | null;
+ jurisdiction?: string | null,
+ caseId?: string | null,
  tagIds?: string[];
 }): any | undefined {
  const conditions: any[] = [];

@@ -78,8 +78,8 @@ export const GET: RequestHandler = async () => {
  *
  * @param data - Health change event data
  */
-export function broadcastHealthChange(data: { routeId: string;
-  oldStatus: string; newStatus: string;
+export function broadcastHealthChange(data: { routeId: string,
+  oldStatus: string, newStatus: string;
   timestamp: string;
   reason?: string;
 }) {
@@ -113,8 +113,8 @@ export function broadcastHealthChange(data: { routeId: string;
  *
  * @param data - Error count change event data
  */
-export function broadcastErrorCountChange(data: { routeId: string;
-  errorCount: number;
+export function broadcastErrorCountChange(data: { routeId: string,
+  errorCount: number,
   warningCount?: number;
   infoCount?: number; timestamp: string;
 }) {

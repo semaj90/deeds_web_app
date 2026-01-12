@@ -17,11 +17,11 @@
   });
 </script>
 
-<svelte, head>
+<svelte:head>
   <title>Evidence Board - Legal AI Assistant</title>
 
   <meta name="description" content="AI-powered evidence management with Ollama integration" />
-</svelte, head>
+</svelte:head>
 
 <div class="evidence-page-container">
   {#if showWelcome && pageLoaded}

@@ -167,7 +167,7 @@ export class SvelteKitGPUCacheIntegration {
 				return data;
 			}
 
-			console.log(`🔄 SSR cache miss; fetching: ${key}`);
+			console.log(`🔄 SSR cache miss, fetching: ${key}`);
 			const data = await fetcher();
 
 			// Store in cache
@@ -216,8 +216,8 @@ export class SvelteKitGPUCacheIntegration {
 	async get(
 		key: string,
 		options: {
-			userId?: string;
-			useGPUCache?: boolean;
+			userId?: string,
+			useGPUCache?: boolean,
 			enablePrefetch?: boolean;
 			priority?: 'high' | 'normal' | 'low';
 		} = {}
@@ -312,8 +312,8 @@ export class SvelteKitGPUCacheIntegration {
 		key: string,
 		data: Record<string, unknown>,
 		options: {
-			userId?: string;
-			tags?: string[];
+			userId?: string,
+			tags?: string[],
 			storeOnServer?: boolean;
 			compression?: boolean;
 			ttl?: number;

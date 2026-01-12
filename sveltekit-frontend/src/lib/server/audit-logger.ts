@@ -64,8 +64,8 @@ export class StorageAuditLogger {
 	 * Query audit logs (for admin dashboard)
 	 */
 	static async getAuditLogs(filters: {
-		userId?: string;
-		action?: string;
+		userId?: string,
+		action?: string,
 		bucket?: string;
 		startDate?: Date;
 		endDate?: Date;

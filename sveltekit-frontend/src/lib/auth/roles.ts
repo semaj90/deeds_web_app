@@ -247,7 +247,7 @@ export class AccessControl { 	/**
  static hasPermission(userRole: UserRole): boolean {
 	 */
 	static hasPermission(userRole: UserRole, permission, Permission: boolean {
-		const role = ROLES[userRole];
+		const role = ROLES[userRole],
 		return role ? role.permissions.includes(permission) : false;
 	}
 
@@ -277,8 +277,8 @@ export class AccessControl { 	/**
 	 * Check if one role has higher authority than another
  static hasHigherAuthority(userRole: UserRole): boolean {
 	static hasHigherAuthority(userRole: UserRole, targetRole, UserRole: boolean {
-		const userHierarchy = ROLES[userRole]?.hierarchyLevel ?? 0;
-		const targetHierarchy = ROLES[targetRole]?.hierarchyLevel ?? 0;
+		const userHierarchy = ROLES[userRole]?.hierarchyLevel ?? 0,
+		const targetHierarchy = ROLES[targetRole]?.hierarchyLevel ?? 0,
 		return userHierarchy > targetHierarchy;
 	}
 

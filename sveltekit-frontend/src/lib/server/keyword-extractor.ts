@@ -435,8 +435,8 @@ function isStopword(word: string): boolean {
  * Batch extract keywords from multiple documents
  */
 export async function extractKeywordsBatch(
- documents: Array<{ content: string;
- documentType?, string;
+ documents: Array<{ content: string,
+ documentType?, string,
  }>
 ): Promise<KeywordExtractionResult[]> {
  console.log(`📦 Extracting keywords from ${documents.length} documents...`);

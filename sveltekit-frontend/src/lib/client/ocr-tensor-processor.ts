@@ -231,7 +231,7 @@ export class OCRTensorProcessor {
  /** * Process image with OCR and convert to embeddings */
  async processImage(
  imageData: ImageData | HTMLCanvasElement | File,
- options: { language?: string; oem?: number; psm?: number; useCache?: boolean } = {}
+ options: { language?: string, oem?: number, psm?: number; useCache?: boolean } = {}
  ): Promise<ProcessingResult> {
  const startTime = performance.now();
  try {

@@ -67,8 +67,8 @@ export interface RagSyncResult {
 export async function addEvidenceToRagIndex(
  evidenceId: string,
  options?: {
- userId?: string;
- logAudit?: boolean;
+ userId?: string,
+ logAudit?: boolean,
  }
 ): Promise<RagSyncResult> {
  const startTime = Date.now();
@@ -311,8 +311,8 @@ export async function addEvidenceToRagIndex(
 export async function updateRagIndexTags(
  evidenceId: string, newTags: string[],
  options?: {
- userId?: string;
- logAudit?: boolean;
+ userId?: string,
+ logAudit?: boolean,
  }
 ): Promise<RagSyncResult> {
  console.log(`[RAG Sync] Updating tags for evidence ${evidenceId}...`);
@@ -425,8 +425,8 @@ export async function updateRagIndexTags(
 export async function removeEvidenceFromRagIndex(
  evidenceId: string,
  options?: {
- userId?: string;
- logAudit?: boolean;
+ userId?: string,
+ logAudit?: boolean,
  }
 ): Promise<RagSyncResult> {
  console.log(`[RAG Sync] Removing evidence ${evidenceId} from RAG index...`);
@@ -526,8 +526,8 @@ export async function removeEvidenceFromRagIndex(
 export async function regenerateEvidenceEmbeddings(
  evidenceId: string,
  options?: {
- userId?: string;
- logAudit?: boolean;
+ userId?: string,
+ logAudit?: boolean,
  }
 ): Promise<RagSyncResult> {
  console.log(`[RAG Sync] Regenerating embeddings for evidence ${evidenceId}...`);

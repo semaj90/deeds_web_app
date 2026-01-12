@@ -18,8 +18,8 @@ type RedisClient = ReturnType<typeof createClient>;
 // Extended Qdrant client interface to work around TypeScript module resolution issues
 interface QdrantClientExt extends QdrantClient {
   scroll(collection_name: string, args?: {
-    limit?: number;
-    filter?: unknown;
+    limit?: number,
+    filter?: unknown,
     with_payload?: boolean;
   }): Promise<{ points: Array<{ id: string | number; payload?: Record<string, unknown> }> }>;
   getCollection(collection_name: string): Promise<{ points_count?, number }>;

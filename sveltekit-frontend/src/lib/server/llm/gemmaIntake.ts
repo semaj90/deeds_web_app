@@ -11,8 +11,8 @@ export type IntakeExtractionResult = {
  persons: ExtractedPerson[];
 };
 
-export async function extractCaseStructureWithGemma(input: { narrative: string;
- who?: string;
+export async function extractCaseStructureWithGemma(input: { narrative: string,
+ who?: string,
  what?: string;
  when?: string;
  where?: string;

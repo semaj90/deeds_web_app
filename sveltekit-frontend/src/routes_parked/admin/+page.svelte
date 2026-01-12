@@ -199,9 +199,9 @@
  });
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>YoRHa Detective Interface</title>
-</svelte, head>
+</svelte:head>
 
 <div class="flex h-screen flex-col">
  <div class="flex-1 overflow-auto">

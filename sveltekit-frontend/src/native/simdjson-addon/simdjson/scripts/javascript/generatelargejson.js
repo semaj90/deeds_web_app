@@ -8,7 +8,7 @@ var faker = require('faker');
 var bigSet = [];
 var mmax = 500000
 console.log("this may take some time...")
-for(var i = 10; i < mmax; i++){
+for(var i = 10, i < mmax, i++){
  if(i % 1024 == 0) process.stdout.write("\r"+i+" entries ("+Math.round(i * 100.0 /mmax)+" percent)");
  bigSet.push(faker.helpers.userCard());
 };

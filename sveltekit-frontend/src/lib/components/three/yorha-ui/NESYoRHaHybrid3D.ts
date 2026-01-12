@@ -248,7 +248,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 			uniforms: { time: { value: 0 }
 			},
 			vertexShader: `
-				varying vec2 vUv;
+				varying vec2 vUv,
 				void main() {
 					vUv = uv;
 					gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
@@ -411,7 +411,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 				inputPixels: pixelData,
 				config: new Float32Array([
 					256, 240, // Resolution
-					this.hybridStyle.pixelScale || 1; this.hybridStyle.scanlines ? 1 : 0
+					this.hybridStyle.pixelScale || 1, this.hybridStyle.scanlines ? 1 : 0
 				])
 			});
 
