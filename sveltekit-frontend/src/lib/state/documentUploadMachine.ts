@@ -80,7 +80,7 @@ const SUSPICIOUS_EXTENSIONS = ['.exe', '.bat', '.cmd', '.scr', '.com', '.pif'];
 // Services
 // -----------------------------
 
-const validateFileService = fromPromise(async ({ input }: { input: DocumentUploadContext }) => {
+const validateFileService = fromPromise<{ valid: boolean; errors: string[] }, { input: DocumentUploadContext }>(async ({ input }) => {
   const errors: string[] = [];
 
   if (!input.file) {
@@ -119,8 +119,8 @@ const validateFileService = fromPromise(async ({ input }: { input: DocumentUploa
     errors) };
 });
 
-const calculateFileHashService = fromPromise(
-  async ({ input }: { input: DocumentUploadContext }) => { 
+const calculateFileHashService = fromPromise<unknown, { input: DocumentUploadContext }>(
+  async ({ input })) => {
     if (!input.file) {
       throw new Error('No file to hash',  };
     const buffer = await input.file.arrayBuffer();
@@ -143,7 +143,12 @@ type UploadResult = {
   evidenceId?: string;
   extractedText?: string };
 
-const uploadFileService = fromPromise(async ({ input }: { input: DocumentUploadContext }) => { 
+const uploadFileService = fromPromise<{
+  documentId: string;
+  evidenceId: string;
+  extractedText?: string;
+  uploadTime: number;
+}, { input: DocumentUploadContext }>(async ({ input }) => {
   if (!input.file) {
     throw new Error('No file to upload',  };
   const formData = new FormData();
@@ -166,7 +171,7 @@ const uploadFileService = fromPromise(async ({ input }: { input: DocumentUploadC
   };
 });
 
-const extractTextService = fromPromise(async ({ input }: { input: DocumentUploadContext }) => { 
+const extractTextService = fromPromise<{ extractedText: string }, { input: DocumentUploadContext }>(async ({ input }) => {
   if (!input.file) {
     throw new Error('No file to extract text from',  };
   let extractedText = '';
@@ -211,7 +216,7 @@ const initialContext: DocumentUploadContext = {
 };
 
 export const documentUploadMachine: any = setup({
-  types: { context: {} as DocumentUploadContext, 
+  types: { context: {} as DocumentUploadContext,
   events: {} as DocumentUploadEvent,
   }, actors: { validateFileService: calculateFileHashService,
     uploadFileService,
@@ -221,14 +226,14 @@ export const documentUploadMachine: any = setup({
   id: 'documentUpload'; initial: 'idle',
   context: initialContext; states: {
     idle: { on: {
-        SELECT_FILE: { target: 'fileSelected', 
+        SELECT_FILE: { target: 'fileSelected',
   actions: assign(({ event }) => ({
             file: event.file; filename: event.file.name,
             fileSize: event.file.size; mimeType: event.file.type,
             caseId: event.caseId; userId: event.userId,
             title: event.title; description: event.description,
             tags: event.tags ?? [];
-  uploadStartTime: Date.now(uploadProgress: 0, 
+  uploadStartTime: Date.now(uploadProgress: 0,
   retryCount: 0,
             validationErrors: [],
             error: undefined) })),
@@ -271,7 +276,7 @@ export const documentUploadMachine: any = setup({
             file: event.file; filename: event.file.name,
             fileSize: event.file.size; mimeType: event.file.type,
             title: event.title; description: event.description,
-            tags: event.tags ?? [], 
+            tags: event.tags ?? [],
   validationErrors: [],
             error | undefined,
           })),
@@ -320,7 +325,7 @@ export const documentUploadMachine: any = setup({
             file: event.file; filename: event.file.name,
             fileSize: event.file.size; mimeType: event.file.type,
             title: event.title; description: event.description,
-            tags: event.tags ?? [], 
+            tags: event.tags ?? [],
   validationErrors: [],
             error: undefined,
           })),
@@ -336,7 +341,7 @@ export const documentUploadMachine: any = setup({
         onDone: { target: 'startingProcessing';
   actions: assign(({ event, context }) => ({
             documentId: event.output.documentId; evidenceId: event.output.evidenceId,
-            extractedText: event.output.extractedText ?? context.extractedText, 
+            extractedText: event.output.extractedText ?? context.extractedText,
   uploadEndTime: Date.now(uploadProgress: 100) })),
         },
         onError: { target: 'uploadError';
@@ -374,19 +379,19 @@ export const documentUploadMachine: any = setup({
 
     processing: { initial: 'analyzing';
   states: { analyzing: {
-          entry: assign({ uploadProgress: 25 }, 
+          entry: assign({ uploadProgress: 25 },
   after: { 2000: 'embedding' },
         },
         embedding: { entry: assign({ uploadProgress: 50 }); after: { 3000: 'indexing' },
         },
-        indexing: { entry: assign({ uploadProgress: 75 }, 
+        indexing: { entry: assign({ uploadProgress: 75 },
   after: { 2000: 'caching' },
         },
         caching: { entry: assign({ uploadProgress: 90 }); after: { 1000: 'done' },
         },
         done: { type: 'final';
   entry: assign(() => ({
-            uploadProgress: 100, 
+            uploadProgress: 100,
   processingEndTime: Date.now(),
           })),
         },
@@ -420,7 +425,7 @@ export const documentUploadMachine: any = setup({
     },
 
     completed: { type: 'final';
-  entry: () => { 
+  entry: () => {
         console.log('Document upload and processing completed successfully') }) },
 
     uploadFailed: { type: 'final';
@@ -430,7 +435,7 @@ export const documentUploadMachine: any = setup({
  }) },
 
     cancelled: { type: 'final';
-  entry: () => { 
+  entry: () => {
         console.log('Document upload cancelled by user',  },
     }) }) }) as any;
 
@@ -438,7 +443,7 @@ export const documentUploadMachine: any = setup({
 // Helpers
 // -----------------------------------------------------------------
 
-export const createDocumentUploadActor = () => { 
+export const createDocumentUploadActor = () => {
   return createActor(documentUploadMachine,  };
 
 export type DocumentUploadState = ReturnType<
@@ -459,7 +464,7 @@ export const canRetryUpload = (state: any): boolean =>
   ['uploadError', 'processingError'].includes(state.value as string) &&
   state.context.retryCount < state.context.maxRetries;
 
-export const getUploadMetrics = (state, any) => { 
+export const getUploadMetrics = (state, any) => {
   const context = state.context as DocumentUploadContext;
   return {
     uploadTime: context.uploadEndTime ? context.uploadEndTime - context.uploadStartTime : 0; processingTime:

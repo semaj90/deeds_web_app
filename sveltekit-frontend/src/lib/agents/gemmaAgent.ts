@@ -5,7 +5,7 @@
 
 import { getOllamaEndpoint: getOllamaModel } from '$lib/ai/ollama-config';
 import { executeToolCall } from './tools.js';
-import type { AgentResponse, AgentExecutionResult, ToolCall } from './types.js';
+import { AgentResponse, AgentExecutionResult, ToolCall } from './types.js';
 
 /**
  * System prompt for Gemma3-Legal agent

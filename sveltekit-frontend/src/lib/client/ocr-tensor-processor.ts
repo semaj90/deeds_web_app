@@ -1,6 +1,6 @@
 /** * Client-side OCR + Tensor Processing Pipeline * OCR.js â†’ Text Extraction â†’ Node API â†’ Embeddings â†’ Multi-dimensional Tensors * SIMD parsing via Service Worker for streaming performance */
 import { browser } from '$app/environment';
-import type { ShaderCacheManager } from '$lib/webgpu/shader-cache-manager.js';
+import { ShaderCacheManager } from '$lib/webgpu/shader-cache-manager.js';
 import { Record } from "neo4j-driver";
 
 // Placeholder definitions to resolve compilation errors if gaming-constants.js is missing or incorrect

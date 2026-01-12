@@ -23,6 +23,7 @@ let totalFixes = 0;
 
 /**
  * Extract type annotation from fromPromise inline pattern
+ * ENHANCED VERSION with better type extraction
  */
 function extractInlineType(code, matchStart) {
   // Find the full fromPromise call with balanced parentheses
@@ -63,8 +64,10 @@ function extractInlineType(code, matchStart) {
 
   const fullCall = code.slice(matchStart, i + 1);
 
-  // More robust pattern matching for inline types
-  // Pattern: async ({ input, ...rest }: { input: TypeDef, ...other })
+  // ENHANCED: Handle multiple inline type patterns
+  // Pattern 1: async ({ input }: { input: Type })
+  // Pattern 2: async ({ input, context }: { input: Type, context: Context })
+  // Pattern 3: async ({ input }: { input?: Type })
   const asyncMatch = fullCall.match(/async\s*\(\s*\{([^}]+)\}\s*:\s*\{([^}]+)\}/s);
 
   if (!asyncMatch) {
@@ -74,29 +77,61 @@ function extractInlineType(code, matchStart) {
   const destructuredParams = asyncMatch[1];
   const typeAnnotation = asyncMatch[2];
 
-  // Extract just the input type
-  const inputMatch = typeAnnotation.match(/input:\s*([^,;}]+)/);
-  if (!inputMatch) {
-    return null;
+  // ENHANCED: Extract input type with better handling of complex types
+  let inputType = 'unknown';
+  const inputMatch = typeAnnotation.match(/input\??\s*:\s*([^,;}]+)/);
+
+  if (inputMatch) {
+    inputType = inputMatch[1].trim();
+
+    // Clean up type - remove trailing punctuation but preserve generics
+    inputType = inputType
+      .replace(/[;,]\s*$/, '')  // Remove trailing semicolons/commas
+      .replace(/\s+/g, ' ')      // Normalize whitespace
+      .trim();
+
+    // Handle nested generic types (e.g., Promise<Result<T>>)
+    if (inputType.includes('<') && !inputType.includes('>')) {
+      // Type definition likely cut off, try to extract from broader context
+      const extendedMatch = fullCall.match(new RegExp(`input\\s*:\\s*([^,;}]+(?:<[^>]+>)?)`));
+      if (extendedMatch) {
+        inputType = extendedMatch[1].trim();
+      }
+    }
   }
 
-  let inputType = inputMatch[1].trim();
-
-  // Clean up type - remove trailing semicolons, comments
-  inputType = inputType.replace(/[;,].*$/, '').trim();
-
-  // Try to infer output type from return statement or type context
+  // ENHANCED: Try to infer output type from return statements
   let outputType = 'unknown';
 
-  // Look for explicit return type
-  const returnMatch = fullCall.match(/return\s+([^;]+)/);
-  if (returnMatch) {
-    const returnValue = returnMatch[1].trim();
+  // Look for explicit Promise return type
+  const promiseReturnMatch = fullCall.match(/:\s*Promise<([^>]+)>/);
+  if (promiseReturnMatch) {
+    outputType = promiseReturnMatch[1].trim();
+  } else {
+    // Infer from return statements
+    const returns = [...fullCall.matchAll(/return\s+(\{[^}]*\}|[^;}\n]+)/g)];
 
-    // Infer from common patterns
-    if (returnValue.includes('fetch(')) outputType = 'Response';
-    else if (returnValue.match(/await\s+\w+\./)) outputType = 'unknown';
-    else outputType = 'unknown';
+    if (returns.length > 0) {
+      const lastReturn = returns[returns.length - 1][1].trim();
+
+      // Pattern matching for common return types
+      if (lastReturn.startsWith('{')) {
+        // Object literal return
+        outputType = 'Record<string, unknown>';
+      } else if (lastReturn.match(/await\s+fetch/)) {
+        outputType = 'Response';
+      } else if (lastReturn.match(/await\s+.*\.json\(\)/)) {
+        outputType = 'unknown';
+      } else if (lastReturn.match(/^\d+$/)) {
+        outputType = 'number';
+      } else if (lastReturn.match(/^(true|false)$/)) {
+        outputType = 'boolean';
+      } else if (lastReturn.match(/^['"`]/)) {
+        outputType = 'string';
+      } else if (lastReturn.match(/^\[/)) {
+        outputType = 'unknown[]';
+      }
+    }
   }
 
   return {

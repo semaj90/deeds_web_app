@@ -169,8 +169,8 @@ export const evidenceProcessingMachine = setup({
  }
  }),
  // Vector similarity search
- searchSimilarEvidence: fromPromise(
- async ({ input }: { input: { embeddings: number[]; limit?: number } }) => {
+ searchSimilarEvidence: fromPromise<unknown, { input: { embeddings: number[] }>(
+ async ({ input }) }) => {
  try {
  const response = await fetch('/api/vector/search', {
  method: 'POST',
@@ -187,7 +187,7 @@ export const evidenceProcessingMachine = setup({
  }
  ),
  // Graph relationship discovery
- discoverRelationships: fromPromise(async ({ input }: { input: { evidenceId: string } }) => {
+ discoverRelationships: fromPromise<unknown, { input: { evidenceId: string }>(async ({ input }) }) => {
  try {
  const response = await fetch(`/api/graph/discover/${input.evidenceId}`, {
  method: 'POST',

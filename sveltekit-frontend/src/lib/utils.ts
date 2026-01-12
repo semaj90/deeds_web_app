@@ -1,4 +1,4 @@
-import type { clsx, type ClassValue } from 'clsx';
+import { clsx, type ClassValue } from 'clsx';
 
 /** * Utility function to merge CSS classes * Now using UnoCSS instead of Tailwind */
 export function cn(...inputs: ClassValue[]) {

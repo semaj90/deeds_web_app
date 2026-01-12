@@ -4,7 +4,7 @@ import { browser } from '$app/environment';
 import { derived, get, writable } from 'svelte/store';
 /* Replace static import (may not exist at build time) with dynamic public env */
 import { env as PUBLIC_ENV } from '$lib/env/public';
-import type { Permission, UserRole } from './roles.js';
+import { Permission, UserRole } from './roles.js';
 
 // Add a minimal ServerUser shape to satisfy Partial<ServerUser>
 interface ServerUser {

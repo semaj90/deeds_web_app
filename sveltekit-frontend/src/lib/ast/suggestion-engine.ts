@@ -3,7 +3,7 @@
  * Provides intelligent code fix suggestions using RAG, web search, and AI
  */
 
-import type { ASTError } from './svelte-check-analyzer.js';
+import { ASTError } from './svelte-check-analyzer.js';
 
 export interface Suggestion {
  id: string; title: string; description: string; code: string; confidence: number; cluster: ClusterInfo; sources: SuggestionSource[];

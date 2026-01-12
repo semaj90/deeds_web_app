@@ -1,4 +1,4 @@
-import type { uploadWithXhr } from './xhr.js';
+import { uploadWithXhr } from './xhr.js';
 
 export type SubmitResult = {
 	status: number;

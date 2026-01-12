@@ -23,7 +23,7 @@ export const focusMode = writable(false);
 export const focusSettings = writable(defaultFocusSettings);
 
 export class FocusManager {
- private isActive = $state(false);
+ private isActive = false;
  private originalStyles: Map<Element, string> = new Map();
  private settings: FocusSettings;
  private observer: MutationObserver | null = null;

@@ -39,7 +39,7 @@ export class WebGPUTensorAccelerator {
         totalOperations: 0,
         errorCount: 0,
     };
-    private isInitialized = $state(false);
+    private isInitialized = false;
     operationQueue: TensorOperation[] = [];
     private simdTilingEngine: SIMDGPUTilingEngine; // Fix: Declare instance of SIMDGPUTilingEngine
 

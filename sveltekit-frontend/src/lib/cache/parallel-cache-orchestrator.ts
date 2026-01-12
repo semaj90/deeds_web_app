@@ -1,9 +1,9 @@
 /** * Parallel Cache Orchestrator * Unifies all cache layers for maximum parallel performance * Optimizes resource allocation across GPU, CPU, and memory tiers */
 
-import type { shaderCacheManager } from '$lib/webgpu/shader-cache-manager.js';
-import type { cacheActor, getCacheStats } from './xstate-cache-integration.js';
+import { shaderCacheManager } from '$lib/webgpu/shader-cache-manager.js';
+import { cacheActor, getCacheStats } from './xstate-cache-integration.js';
 import MultiTierCache from '$lib/ai/cache/multiTierCache.js';
-import type { getCache, setCache } from '$lib/server/utils/server-cache.js';
+import { getCache, setCache } from '$lib/server/utils/server-cache.js';
 import {  browser  } from '$app/environment';
 
 export interface CacheResourceAllocation {

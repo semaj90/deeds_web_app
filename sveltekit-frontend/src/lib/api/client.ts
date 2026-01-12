@@ -1,6 +1,6 @@
 // Type-Safe API Client for SvelteKit 2
 // Production-ready client with comprehensive error handling
-import type {
+import {
  CaseAPI,
  EvidenceAPI,
  ChatAPI,

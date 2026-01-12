@@ -1,6 +1,6 @@
-import type { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { setupTest: cleanupTest } from '$lib/test-utils/setup';
-import type {
+import {
   getBitsOverrides,
   registerOverride,
 } from '../components/ui/wrappers/bits/bits-overrides.js';

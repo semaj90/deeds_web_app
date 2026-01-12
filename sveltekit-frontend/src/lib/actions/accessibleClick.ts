@@ -1,4 +1,4 @@
-import type { Action } from 'svelte/action'; /** * Accessible Click Action * Makes: unknown element accessible by adding proper ARIA attributes and keyboard support * Part of the Presentation Layer - decoupled from component logic */ // Define the parameters our action will accept. // This allows us to specify a role and the handler function.
+import { Action } from 'svelte/action'; /** * Accessible Click Action * Makes: unknown element accessible by adding proper ARIA attributes and keyboard support * Part of the Presentation Layer - decoupled from component logic */ // Define the parameters our action will accept. // This allows us to specify a role and the handler function.
 interface AccessibleClickParams {
   role?: string; handler: (e: Event) => void; // Corrected handler type
   label?: string;

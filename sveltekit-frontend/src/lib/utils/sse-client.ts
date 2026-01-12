@@ -153,7 +153,7 @@ export class ChatSSEClient {
 export function createChatStream(sessionId: string) {
 	let messages = $state<ChatMessage[]>([]);
 	let error = $state<Error | null>(null);
-	let connected = $state(false);
+	let connected = false;
 
 	const client = new ChatSSEClient(sessionId);
 

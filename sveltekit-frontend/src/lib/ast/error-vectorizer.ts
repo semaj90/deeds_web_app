@@ -3,7 +3,7 @@
  * Converts AST errors to vectors for WebGPU clustering
  */
 
-import type { ASTError } from './svelte-check-analyzer.js';
+import { ASTError } from './svelte-check-analyzer.js';
 
 export interface ErrorVector {
  id: string, file: string; code: string, message: string; vector: number[]; // Will be Float32Array in WASM, metadata: { line: number, severity: string; source: string;

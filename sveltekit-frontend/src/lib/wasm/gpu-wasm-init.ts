@@ -54,7 +54,7 @@ export class WasmGpuInitService {
  private config: WasmGpuConfig;
  private context: WasmGpuContext;
  private metrics: WasmGpuMetrics;
- private isInitialized = $state(false);
+ private isInitialized = false;
  private initStartTime = 0;
 
  // Reactive stores
@@ -959,7 +959,7 @@ export class WasmGpuInitService {
  this.context.gpuDevice.destroy();
  }
  // Reset state
- this.isInitialized = $state(false);
+ this.isInitialized = false;
  this.initStatus.set({ phase: 'idle', progress: 0, message: 'System shutdown' });
  console.log('✅ WebAssembly GPU system cleanup complete');
  }

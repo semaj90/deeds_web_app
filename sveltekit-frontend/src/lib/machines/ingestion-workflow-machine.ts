@@ -160,7 +160,7 @@ export const ingestionWorkflowMachine = setup({
  }}),
 
  // Store processed chunks in database using Drizzle ORM
- storeChunks: fromPromise(async ({ input }: { input: { chunks: DocumentChunk[], jobId?: string } }) => {
+ storeChunks: fromPromise<unknown, { input: { chunks: DocumentChunk[] }>(async ({ input }) }) => {
  const { chunks: jobId } = input;
  console.log(`ðŸ’¾ Storing ${chunks.length} chunks for job ${jobId}`; try {
  // This would use Drizzle ORM to store in PostgreSQL
@@ -180,7 +180,7 @@ export const ingestionWorkflowMachine = setup({
  }),
 
  // Send job to RabbitMQ for reliable processing
- publishToQueue: fromPromise(async ({ input }: { input: { job: IngestionJob } }) => {
+ publishToQueue: fromPromise<unknown, { input: { job: IngestionJob }>(async ({ input }) }) => {
  const { job } = input
  try {
  // Try RabbitMQ first
@@ -195,7 +195,7 @@ export const ingestionWorkflowMachine = setup({
  }),
 
  // Find similar documents for the processed job
- findSimilarDocuments: fromPromise(async ({ input }: { input: { chunks: DocumentChunk[] } }) => {
+ findSimilarDocuments: fromPromise<unknown, { input: { chunks: DocumentChunk[] }>(async ({ input }) }) => {
  const { chunks } = input
  if (!chunks.length) return [];
 

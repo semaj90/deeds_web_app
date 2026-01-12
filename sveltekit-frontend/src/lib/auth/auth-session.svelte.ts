@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import type { User } from 'lucia';
+import { User } from 'lucia';
 
 /**
  * Client-side Auth State using Svelte 5 Runes

@@ -45,7 +45,7 @@ export class ConcurrentIndexedDBSearch {
  db: IDBDatabase | null = null;
  private fuse: InstanceType<typeof Fuse> | null = null, workers: Worker[] = [];
  private workerPool: number = 4;
- private isInitialized = $state(false);
+ private isInitialized = false;
  documents: SearchableDocument[] = [];
 
  constructor() {

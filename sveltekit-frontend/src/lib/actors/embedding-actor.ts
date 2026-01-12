@@ -32,7 +32,7 @@ export interface EmbeddingError {
 /**
  * XState v5 actor for generating embeddings with legal context
  */
-export const embeddingActor = fromPromise(async ({ input }: { input: EmbeddingInput }): Promise<EmbeddingOutput> => {
+export const embeddingActor = fromPromise<unknown, { input: EmbeddingInput }>(async ({ input })): Promise<EmbeddingOutput> => {
   const startTime = Date.now();
   try {
     // Validate input
@@ -110,8 +110,8 @@ export const embeddingActor = fromPromise(async ({ input }: { input: EmbeddingIn
 /**
  * Batch embedding actor for multiple texts
  */
-export const batchEmbeddingActor = fromPromise(
-  async ({ input }: { input: EmbeddingInput[] }): Promise<EmbeddingOutput[]> => {
+export const batchEmbeddingActor = fromPromise<unknown, { input: EmbeddingInput[] }>(
+  async ({ input })): Promise<EmbeddingOutput[]> => {
     try {
       // Process embeddings in parallel with concurrency limit
       const batchSize = 5; // Prevent overwhelming Ollama

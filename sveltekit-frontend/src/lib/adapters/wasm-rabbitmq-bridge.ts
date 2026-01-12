@@ -4,7 +4,7 @@
  * Enables high-performance tensor processing within RabbitMQ workflows
  */
 
-import type { RabbitMQServiceWorker } from '$lib/workers/rabbitmq-service-worker.js';
+import { RabbitMQServiceWorker } from '$lib/workers/rabbitmq-service-worker.js';
 import type { MessageHandler } from '$lib/server/messaging/rabbitmq-service';
 import { enhanceRabbitMQMessage } from '$lib/simd/simd-json-integration.js';
 

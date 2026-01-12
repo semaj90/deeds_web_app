@@ -1,4 +1,4 @@
-import type { Project, SourceFile, SyntaxKind, Node, TypeChecker } from 'ts-morph';
+import { Project, SourceFile, SyntaxKind, Node, TypeChecker } from 'ts-morph';
 import { getOllamaEndpoint } from '$lib/utils/ollama-endpoints';
 
 export interface ASTNode {

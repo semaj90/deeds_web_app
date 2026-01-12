@@ -109,11 +109,15 @@ const promiseLogic = fromPromise<User, { userId: string }>(
 - **Detailed report:** `reports/xstate-migration/latest.md`
 
 **Fixes Applied (2026-01-12):**
-- ✅ `src/evidenceProcessingMachine.ts`: 4 fromPromise actors migrated to XState v5
+- ✅ `src/evidenceProcessingMachine.ts`: 4 fromPromise actors migrated + syntax fix
   - documentProcessing, embeddingGeneration, aiAnalysis, cacheResults
-  - Applied explicit type parameters: `fromPromise<OutputType, { input: InputType }>`
-- 📊 **Progress:** 1/39 high-priority files completed (2.6%)
-- 🎯 **Next:** Apply automated fixer to remaining 38 files
+  - Fixed malformed type: `embedding?, number[]` → `embedding?: number[]`
+- ✅ `src/lib/state/evidenceCustodyMachine.ts`: 1 fromPromise actor migrated
+  - aiAnalysisService with proper generic types
+- ✅ `src/lib/state/legal-case-machine.ts`: 4 fromPromise actors migrated
+  - uploadEvidence, aiSummarizeCase, updateCase, deleteCase
+- 📊 **Progress:** 3/39 high-priority files completed (7.7%, 9 actors fixed)
+- 🎯 **Next:** Continue with remaining 36 files
 
 ---
 

@@ -10,7 +10,7 @@ export interface EvidenceProcessingContext {
 
   // Processing results
   extractedText?: string;
-  chunks?: Array<{ text: string; embedding?, number[] }>;
+  chunks?: Array<{ text: string; embedding?: number[] }>;
   embeddings?: number[][];
   analysis?: { summary: string; entities: unknown[]; sentiment: string; classification: string;
     riskAssessment?: string;

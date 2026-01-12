@@ -11,8 +11,8 @@ import type { SearchResult } from '$lib/types';
  */
 
 import Loki from 'lokijs';
-import type { Collection } from 'lokijs';
-import type { EventEmitter } from 'events';
+import { Collection } from 'lokijs';
+import { EventEmitter } from 'events';
 import crypto from 'crypto';
 
 // Conditional imports to avoid circular dependencies

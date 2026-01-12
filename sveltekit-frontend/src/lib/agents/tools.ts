@@ -12,7 +12,7 @@ import {
     withRetry,
     withTimeout,
 } from './error-handler.js';
-import type {
+import {
     RagLookupResult,
     ToolCall,
     ToolResult,

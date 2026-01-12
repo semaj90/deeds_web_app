@@ -20,7 +20,7 @@ export interface ServiceHealth {
 export class NativeWindowsServiceManager {
  private services: Map<string, WindowsService> = new Map();
  private healthMonitor: NodeJS.Timeout | null = null;
- private isInitialized = $state(false);
+ private isInitialized = false;
 
  constructor() {
  this.initializeServiceDefinitions();

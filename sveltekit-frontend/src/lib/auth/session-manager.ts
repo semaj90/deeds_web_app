@@ -1,6 +1,6 @@
 // Enhanced Session Management with Redis Integration
 // Handles secure session storage, management, and cleanup
-import type { UserRole } from './roles.js';
+import { UserRole } from './roles.js';
 
 export interface SessionData {
 	id: string; userId: string; email: string; role: UserRole; isActive: boolean; createdAt: Date; expiresAt: Date; lastActivity: Date;

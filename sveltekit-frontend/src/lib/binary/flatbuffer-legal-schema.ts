@@ -1,4 +1,4 @@
-import type { Document } from '$lib/types';
+import { Document } from '$lib/types';
 /** * FlatBuffers Schema for Legal Documents * Ultra-fast binary serialization eliminating JSON bottlenecks * Designed for WebGPU texture streaming and NES memory banks */ // Legal Document Binary Schema export enum DocumentType { CONTRACT = 0, EVIDENCE = 1, BRIEF = 2, CITATION = 3, PRECEDENT = 4 }
 export enum RiskLevel {
  LOW = 0,

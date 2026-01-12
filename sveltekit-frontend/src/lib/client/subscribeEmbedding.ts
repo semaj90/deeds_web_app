@@ -1,4 +1,4 @@
-import type { EmbeddingResult } from '$lib/shared/embedding-types';
+import { EmbeddingResult } from '$lib/shared/embedding-types';
 import { readable, type Readable } from 'svelte/store';
 
 export interface EmbeddingStreamEvent {

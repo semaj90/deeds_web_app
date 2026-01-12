@@ -27,7 +27,7 @@ export { default as Svelte5Button } from './Svelte5Button.svelte';
  * |---------------------------|-------------------------------|
  * | export let prop           | let { prop } = $props()       |
  * | $: derived = expr         | let derived = $derived(expr)  |
- * | let state = value         | let state = $state(value)     |
+ * | let state = value         | let state = value     |
  * | bind:value                | bind:value (still works)      |
  * | export let value          | let { value = $bindable() }   |
  * | <slot />                  | {#if children}{@render children()}{/if} |

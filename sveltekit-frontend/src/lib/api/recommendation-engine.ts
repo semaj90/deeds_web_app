@@ -1,5 +1,5 @@
-import type { Case } from '$lib/types';
-import type { Document } from '$lib/types';
+import { Case } from '$lib/types';
+import { Document } from '$lib/types';
 
 /**
  * 🎯 Recommendation Engine API Client

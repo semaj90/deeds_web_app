@@ -62,7 +62,7 @@ export const aiAssistantMachine = createMachine({
     states: {
         initializing: {
             invoke: {
-                src: fromPromise(async () => {
+                src: fromPromise<{ gpuReady: boolean }, void>(async () => {
                     // Check for GPU availability or other services
                     const gpuReady = typeof navigator !== 'undefined' && 'gpu' in navigator;
                     return { gpuReady };
@@ -106,7 +106,8 @@ export const aiAssistantMachine = createMachine({
         processing: {
             entry: assign({ isProcessing: true, response: '' }),
             invoke: {
-                src: fromPromise(async ({ input }: { input: { prompt: string; model: string } }) => {
+                src: fromPromise<string>(async (params) => {
+                    const { input } = params as { input: { prompt: string; model: string } };
                     const response = await fetch('/api/ai/chat', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },

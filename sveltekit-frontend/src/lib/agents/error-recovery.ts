@@ -5,7 +5,7 @@
  * Validates: Requirements 11.1, 11.4
  */
 
-import type { ToolResult } from './types.js';
+import { ToolResult } from './types.js';
 
 /**
  * Error recovery strategies for different failure modes
