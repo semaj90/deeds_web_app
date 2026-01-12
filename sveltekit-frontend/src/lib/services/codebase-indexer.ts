@@ -12,6 +12,9 @@ import { glob } from 'glob';
 import { Client } from 'minio';
 import path from 'path';
 import postgres from 'postgres';
+import { process } from "node:process";
+import { fs } from "node:fs";
+import { path } from "node:path";
 
 // Configuration
 const CONFIG = {

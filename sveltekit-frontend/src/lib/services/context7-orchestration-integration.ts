@@ -4,7 +4,7 @@
  */
 import { metrics } from "@opentelemetry/api";
 import { productionServiceRegistry } from './production-service-registry.js';
-
+import { process } from "node:process";
 
 // Define types for the mapping and category data
 interface ServiceMapping {

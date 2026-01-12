@@ -1,5 +1,6 @@
 import logger from '$lib/server/logger';
 import fetch from 'node-fetch';
+import { process } from "node:process";
 
 const AGENTIC_URL = process.env.AGENTIC_URL || 'http://agentic-bridge:8088/invoke';
 

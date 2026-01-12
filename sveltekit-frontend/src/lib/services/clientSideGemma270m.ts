@@ -1,4 +1,6 @@
 /** * Client-Side Gemma3: 270m Integration with GPU Lifecycle Management * Optimized for browser execution with WebAssembly + WebGPU acceleration */ import {  browser  } from '$app/environment'; import { writable, derived, get } from 'svelte/store'; import type { forceUserActivity } from '$lib/stores/userActivityStore'; import type { webLlamaService } from '../ai/webasm-llamacpp.js'; import type { webAssemblyAIAdapter, type WebAssemblyAIResponse } from '../adapters/webasm-ai-adapter.js'; import type { ConversationEntry } from '../stores/aiAssistant.svelte.js';import type { config } from "process";
+import { process } from "node:process";
+
  interface Gemma270mConfig { preferredMethod: 'server' | 'webassembly' | 'webgpu' | 'tensorrt' | 'auto',maxTokens: number, temperature: number, topP: number, topK: number, repeatPenalty: number, enableTensorRT: boolean, enableCaching: boolean, enableGPUAcceleration: boolean, fallbackToServer: boolean}
 interface InferenceRequest { prompt: string, requestId: string, config: Partial<Gemma270mConfig>, timestamp: number}
 interface InferenceResponse { requestId: string, text: string, tokens: number, latencyMs: number, source: 'server' | 'webassembly' | 'webgpu' | 'tensorrt' | 'onnx'; memoryUsageMB?: number confidence?: number fromCache?: boolean}

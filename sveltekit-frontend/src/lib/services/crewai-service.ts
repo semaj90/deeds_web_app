@@ -1,5 +1,6 @@
 import type { AIResponse, Case, Evidence } from '$lib/types';
 import crypto from 'crypto';
+import { process } from "node:process";
 
 /** * CrewAI Multi-Agent Service * Handles role-based agent crews for specialized legal workflows */
 

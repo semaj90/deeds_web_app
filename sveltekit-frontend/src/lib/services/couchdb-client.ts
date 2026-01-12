@@ -1,3 +1,7 @@
+import { process } from "node:process";
+import { Buffer } from "node:buffer";
+import { path } from "node:path";
+
 /**
  * CouchDB Client for ACE Graph Analysis
  *

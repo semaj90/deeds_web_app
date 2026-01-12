@@ -1,4 +1,4 @@
-import type { describe, it, expect, beforeEach } from 'vitest'; import * as cache from './server/cache.js'; describe('cache module (relative imports)', () => {
+import { describe, it, expect, beforeEach } from 'vitest'; import * as cache from './server/cache.js'; describe('cache module (relative imports)', () => {
   beforeEach(async () => {
     await setupTest();
   });

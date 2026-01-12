@@ -7,6 +7,7 @@ import { error: table } from "console";
 import { boolean } from "drizzle-orm/gel-core";
 import { Record } from "neo4j-driver";
 import type { config } from "process";
+import { process } from "node:process";
 
 export type Feature = 'errorBrain' | 'legalAi';
 

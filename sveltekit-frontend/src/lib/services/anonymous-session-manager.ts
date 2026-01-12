@@ -1,3 +1,5 @@
+import { path } from "node:path";
+
 /**
  * Phase 79: Anonymous Session Manager
  *

@@ -4,7 +4,10 @@
  * Handles concurrent access patterns for legal AI database operations
  */
 import { browser } from '$app/environment';
-import { createHash } from 'crypto'; // For SHA256 hashing on the server (value import, not type)
+import { createHash } from 'crypto';
+import { process } from "node:process";
+import { path } from "node:path";
+
 // Type imports removed - using proper types
 
 // Define a minimal RedisClientType to satisfy type-checking without a direct dependency on 'redis'.

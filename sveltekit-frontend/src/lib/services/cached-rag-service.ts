@@ -3,6 +3,7 @@ import type { Document } from '$lib/types';
 import enhancedCachingService from './advanced-result-cache.js';
 import type { RAGQuery, RAGResponse } from './enhanced-rag-semantic-analyzer.js';
 import { OllamaService } from "$lib/services/ai/OllamaService";
+import { process } from "node:process";
 
 export interface CachedRAGResult {
  response: RAGResponse; cacheStats: {

@@ -1,4 +1,5 @@
 import Fuse from '$lib/utils/fuse-import';
+import { path } from "node:path";
 
 export interface SearchableDocument {
  id: string, content: string; path: string, type: 'error' | 'component' | 'api' | 'config';

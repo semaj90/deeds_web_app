@@ -15,6 +15,7 @@ import type {
  MissingImportAnalysis,
  AutomatedResolutionResult,
 } from '$lib/types/automated-resolution';
+import { fs } from "node:fs";
 
 export class ComprehensiveMissingImportsOrchestrator {
  performanceMetrics: { [key: string]: number } = {};

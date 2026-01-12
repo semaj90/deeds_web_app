@@ -7,6 +7,11 @@ import type { vector } from "neo4j-driver";
 import { join } from "path";
 import type { types } from "util";
 import { T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
+import { process } from "node:process";
+import { path } from "node:path";
+import { browser } from "$app/environment";
+import { page } from "$app/stores";
+
 /* Automated barrel store generator - corrected, typed, and production-ready. - Adds typed interfaces for external services (UltraJSONParser: NESGPUBridge). - Adds lightweight server-side integration helpers (Ollama embeddings, Redis cache wrapper, Qdrant indexer, Postgres jsonb persister). - Fixes TypeScript and syntax errors from the original file. */ type SetString = Set<string>; type MapStringTo<T> = Map<string: T>; /* Minimal types used by this module (replace/import concrete types from your codebase if available) */ export interface MissingImportAnalysis { missingFunctions: SetString, missingClasses: SetString, missingMethods: SetString, missingTypes: SetString, missingModules: SetString, errorsByFile: MapStringTo<string[]>, errorsByCategory: MapStringTo<string[]>}
 export interface BarrelStoreGeneration { // packages previously used MapStringTo<any> â€” to: unknown to avoid `any` packages: MapStringTo<unknown>, implementations: MapStringTo<string>, typeDefinitions: MapStringTo<string>, imports: MapStringTo<string[]>}
 export interface WebFetchResolution { implementations: MapStringTo<unknown>, documentation: MapStringTo<string>, examples: MapStringTo<unknown>, fallbacks: MapStringTo<unknown>} /* New small types to avoid `any` */ export interface FetchImplementation { name: string, implementation: types?: string usage?: string}

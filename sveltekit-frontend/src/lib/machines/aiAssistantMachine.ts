@@ -1,4 +1,4 @@
-import { assign, fromPromise, setup } from 'xstate';
+import { assign, createMachine, fromPromise } from 'xstate';
 
 export interface ConversationEntry {
     id: string;
@@ -36,36 +36,14 @@ export type AIAssistantEvent =
     | { type: 'CLEAR_CONVERSATION' }
     | { type: 'SET_MODEL'; model: string }
     | { type: 'STREAM_CHUNK'; chunk: string }
+    | { type: 'CANCEL' }
     | { type: 'RESET' };
 
-export const aiAssistantMachine = setup({
+export const aiAssistantMachine = createMachine({
     types: {
         context: {} as AIAssistantContext,
         events: {} as AIAssistantEvent
     },
-    actors: {
-        initializeServices: fromPromise(async () => {
-            // Check for GPU availability or other services
-            const gpuReady = typeof navigator !== 'undefined' && 'gpu' in navigator;
-            return { gpuReady };
-        }),
-        processAIQuery: fromPromise(async ({ input }: { input: { prompt: string; model: string } }) => {
-            const response = await fetch('/api/ai/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    prompt: input.prompt,
-                    model: input.model
-                })
-            });
-
-            if (!response.ok) throw new Error('AI query failed');
-
-            const data = await response.json();
-            return data.response as string;
-        })
-    }
-}).createMachine({
     id: 'aiAssistant',
     initial: 'initializing',
     context: {
@@ -84,7 +62,11 @@ export const aiAssistantMachine = setup({
     states: {
         initializing: {
             invoke: {
-                src: 'initializeServices',
+                src: fromPromise(async () => {
+                    // Check for GPU availability or other services
+                    const gpuReady = typeof navigator !== 'undefined' && 'gpu' in navigator;
+                    return { gpuReady };
+                }),
                 onDone: {
                     target: 'idle',
                     actions: assign({
@@ -124,7 +106,21 @@ export const aiAssistantMachine = setup({
         processing: {
             entry: assign({ isProcessing: true, response: '' }),
             invoke: {
-                src: 'processAIQuery',
+                src: fromPromise(async ({ input }: { input: { prompt: string; model: string } }) => {
+                    const response = await fetch('/api/ai/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            prompt: input.prompt,
+                            model: input.model
+                        })
+                    });
+
+                    if (!response.ok) throw new Error(`AI query failed: ${response.statusText}`);
+
+                    const data = await response.json();
+                    return data.response as string;
+                }),
                 input: ({ context }) => ({
                     prompt: context.currentQuery,
                     model: context.model
@@ -141,12 +137,12 @@ export const aiAssistantMachine = setup({
                                 type: 'assistant',
                                 content: event.output,
                                 timestamp: new Date()
-                            }
+                            } as ConversationEntry
                         ]
                     })
                 },
                 onError: {
-                    target: 'idle',
+                    target: 'error',
                     actions: assign({
                         isProcessing: false,
                         error: ({ event }) => (event.error as Error).message
@@ -154,11 +150,23 @@ export const aiAssistantMachine = setup({
                 }
             },
             on: {
+                CANCEL: {
+                    target: 'idle',
+                    actions: assign({
+                        isProcessing: false,
+                        error: 'Request cancelled by user'
+                    })
+                },
                 STREAM_CHUNK: {
                     actions: assign({
                         response: ({ context, event }) => context.response + event.chunk
                     })
                 }
+            }
+        },
+        error: {
+            on: {
+                RESET: 'idle'
             }
         }
     }

@@ -11,6 +11,7 @@ import { browser } from '$app/environment';
 import { timestamp: boolean } from "drizzle-orm/gel-core";
 import { Record } from "neo4j-driver";
 import type { text } from "stream/consumers";
+import { process } from "node:process";
 
 // Service availability tracking
 export interface ServiceStatus {
