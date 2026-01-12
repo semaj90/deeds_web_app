@@ -2,6 +2,20 @@
 
 ## 📊 Implementation Summary
 
+### ✅ New Features: Native Windows RabbitMQ Support
+
+**Automatic Fallback Connection** - The system now tries multiple RabbitMQ configurations:
+1. 🐳 **Docker RabbitMQ** (localhost:5672) - Default, no credentials
+2. 🪟 **Native Windows RabbitMQ** (localhost:5672 with guest/guest)
+3. 🌐 **Environment-configured** (custom URL from .env)
+
+**Benefits:**
+- ✅ Works with Docker RabbitMQ containers
+- ✅ Works with native Windows RabbitMQ service
+- ✅ Automatic reconnection with exponential backoff
+- ✅ Connection health monitoring
+- ✅ Graceful error handling
+
 ### ✅ Completed Components
 
 #### 1. **State Machines (XState v5)**
@@ -127,6 +141,104 @@ Frontend (EventSource → SSE)
 
 ## 🛠️ Setup Instructions
 
+### Quick Start (Automatic)
+
+```powershell
+# Auto-detect and start RabbitMQ (tries Docker first, then Native Windows)
+.\scripts\setup-rabbitmq.ps1
+```
+
+### Option 1: Docker RabbitMQ (Recommended)
+
+```powershell
+# Start Docker RabbitMQ
+.\scripts\setup-rabbitmq.ps1 -Docker
+
+# Or manually:
+docker run -d --name rabbitmq `
+  -p 5672:5672 `
+  -p 15672:15672 `
+  rabbitmq:3-management
+```
+
+**Management UI**: http://localhost:15672 (guest/guest)
+
+### Option 2: Native Windows RabbitMQ
+
+#### Installation Steps
+
+1. **Install Erlang** (RabbitMQ requires Erlang)
+   - Download: https://www.erlang.org/downloads
+   - Install to: `C:\Program Files\erl-26.2` (or latest version)
+
+### 5. Test Integration
+
+**Health Check:**
+```powershell
+# PowerShell
+Invoke-RestMethod -Uri http://localhost:5175/api/rabbitmq/publish
+
+# Expected output:
+# {
+#   "status": "connected",
+#   "connection": "Docker RabbitMQ (default)" OR "Native Windows RabbitMQ (guest credentials)",
+#   "timestamp": 1736582400000
+# }
+```
+
+**Queue Job:**
+```powershell
+$body = @{
+  queue = "case_creation_queue"
+  message = @{
+    jobId = "test-123"
+    type = "case_creation"
+    payload = @{
+      title = "Test Case"
+      description = "Test description"
+    }
+  }
+  options = @{
+    persistent = $true
+    priority = 10
+  }
+} | ConvertTo-Json -Depth 10
+
+Invoke-RestMethod -Uri http://localhost:5175/api/rabbitmq/publish `
+  -Method POST `
+  -Body $body `
+  -ContentType "application/json"
+```
+
+**Test Streaming:**
+```powershell
+# PowerShell
+Invoke-WebRequest -Uri "http://localhost:5175/api/stream?q=hello&mode=ollama" -Method GET
+
+# Or visit in browser:
+Start-Process "http://localhost:5175/demo/streaming"
+```
+
+### 6. Stop RabbitMQ
+
+```powershell
+# Stop all RabbitMQ instances
+.\scripts\setup-rabbitmq.ps1 -Stop
+
+# Or manually:
+# Docker
+docker stop rabbitmq
+
+# Native Windows
+net stop RabbitMQ
+```
+```bash
+RABBITMQ_URL=amqp://localhost:5672
+RABBITMQ_USERNAME=guest
+RABBITMQ_PASSWORD=guest
+RABBITMQ_VHOST=/
+```
+
 ### 1. Install Dependencies
 
 ```bash
@@ -134,16 +246,9 @@ npm install amqplib
 npm install @types/amqplib --save-dev
 ```
 
-### 2. Start RabbitMQ
+### 2. Start RabbitMQ (Choose One)
 
-```bash
-docker run -d --name rabbitmq \
-  -p 5672:5672 \
-  -p 15672:15672 \
-  rabbitmq:3-management
-```
-
-**Management UI**: http://localhost:15672 (guest/guest)
+See Quick Start section above.
 
 ### 3. Start SvelteKit Dev Server
 
@@ -251,6 +356,140 @@ export const GET: RequestHandler = async ({ url }) => {
 
 ## 🧪 Testing Checklist
 
+- [ ] RabbitMQ connection established (Docker OR Native Windows)
+- [ ] Health check endpoint responds with connection type (GET /api/rabbitmq/publish)
+- [ ] Job publishing works (POST /api/rabbitmq/publish)
+- [ ] Worker consumes messages (check logs: `node workers/case-creation-worker.mjs`)
+- [ ] Message acknowledgment works (no duplicate processing)
+- [ ] Retry logic triggers on failure (3 attempts with exponential backoff)
+- [ ] Automatic fallback works (disconnect Docker, should try Native Windows)
+- [ ] Auto-reconnection works (stop/start RabbitMQ, connection recovers)
+- [ ] SSE streaming endpoint works (GET /api/stream)
+- [ ] RAG mode injects Qdrant context
+- [ ] Ollama mode streams directly
+- [ ] Frontend demo displays streaming responses
+- [ ] Idle detection machine triggers jobs after 5min
+
+---
+
+## 🔧 Troubleshooting
+
+### Issue: "Failed to connect to RabbitMQ"
+
+**Solutions:**
+
+1. **Check if RabbitMQ is running:**
+   ```powershell
+   .\scripts\setup-rabbitmq.ps1 -Status
+   ```
+
+2. **Start RabbitMQ:**
+   ```powershell
+   # Try Docker first
+   .\scripts\setup-rabbitmq.ps1 -Docker
+
+   # Or Native Windows
+   .\scripts\setup-rabbitmq.ps1 -Native
+   ```
+
+3. **Check port availability:**
+   ```powershell
+   netstat -an | findstr "5672"
+   # Should show: TCP 0.0.0.0:5672 LISTENING
+   ```
+
+4. **Check credentials (Native Windows):**
+   - Default username: `guest`
+   - Default password: `guest`
+   - Management UI: http://localhost:15672
+
+### Issue: "Worker not consuming messages"
+
+**Solutions:**
+
+1. **Check worker is running:**
+   ```powershell
+   # Terminal should show: "👷 Worker ready. Waiting for jobs in case_creation_queue..."
+   ```
+
+2. **Check queue exists:**
+   - Visit: http://localhost:15672/#/queues
+   - Look for `case_creation_queue`
+
+3. **Check message count:**
+   - Queues tab → `case_creation_queue` → Should show message count
+
+4. **Restart worker:**
+   ```powershell
+   # Stop: Ctrl+C
+   # Start: node workers/case-creation-worker.mjs
+   ```
+
+### Issue: "Connection keeps dropping"
+
+**Solutions:**
+
+1. **Check heartbeat settings:**
+   - Default: 60 seconds
+   - Increase in connection config if needed
+
+2. **Check firewall:**
+   ```powershell
+   # Add firewall rule for port 5672
+   New-NetFirewallRule -DisplayName "RabbitMQ AMQP" -Direction Inbound -LocalPort 5672 -Protocol TCP -Action Allow
+   ```
+
+3. **Check RabbitMQ logs:**
+   - Docker: `docker logs rabbitmq`
+   - Windows: `C:\Program Files\RabbitMQ Server\rabbitmq_server-3.13.1\log\`
+
+---
+
+## 📚 Connection Fallback Details
+
+The system implements a **3-tier fallback strategy**:
+
+### Tier 1: Docker RabbitMQ (Default)
+- **URL**: `amqp://localhost:5672`
+- **Credentials**: None (default Docker setup)
+- **Best for**: Development, isolated environment
+- **Start**: `docker run -d -p 5672:5672 rabbitmq:3-management`
+
+### Tier 2: Native Windows RabbitMQ
+- **URL**: `amqp://guest:guest@localhost:5672/`
+- **Credentials**: guest/guest
+- **Best for**: Windows development without Docker
+- **Start**: `net start RabbitMQ` or `.\scripts\setup-rabbitmq.ps1 -Native`
+
+### Tier 3: Environment-configured
+- **URL**: From `RABBITMQ_URL` env variable
+- **Credentials**: From `RABBITMQ_USERNAME`, `RABBITMQ_PASSWORD` env variables
+- **Best for**: Production, custom deployments
+- **Configure**: Add to `.env` file
+
+### How Fallback Works
+
+1. System attempts connection to Tier 1 (Docker)
+2. If fails, attempts Tier 2 (Native Windows)
+3. If fails, attempts Tier 3 (Environment)
+4. If all fail, throws descriptive error with setup instructions
+5. On connection loss, auto-reconnects with exponential backoff (max 5 attempts)
+
+### Auto-Reconnection Logic
+
+```
+Attempt 1: Immediate retry
+Attempt 2: Wait 2 seconds
+Attempt 3: Wait 4 seconds
+Attempt 4: Wait 8 seconds
+Attempt 5: Wait 16 seconds
+After 5 failures: Manual intervention required
+```
+
+---
+
+## 🧪 Testing Checklist
+
 - [ ] RabbitMQ connection established (port 5672)
 - [ ] Health check endpoint responds (GET /api/rabbitmq/publish)
 - [ ] Job publishing works (POST /api/rabbitmq/publish)
@@ -316,19 +555,34 @@ export const GET: RequestHandler = async ({ url }) => {
 2. ✅ `case-creation-machine.ts` (rebuilt, RabbitMQ integration)
 3. ✅ `enhanced-legal-case-machine.ts` (rebuilt, lifecycle management)
 4. ✅ `chunked-response.ts` (streaming/chunking library)
-5. ✅ `/api/rabbitmq/publish/+server.ts` (publisher endpoint)
+5. ✅ `/api/rabbitmq/publish/+server.ts` (publisher endpoint with fallback)
 6. ✅ `/api/stream/+server.ts` (SSE endpoint)
-7. ✅ `case-creation-worker.mjs` (RabbitMQ consumer)
+7. ✅ `case-creation-worker.mjs` (RabbitMQ consumer with fallback)
 8. ✅ `/demo/streaming/+page.svelte` (frontend demo)
 9. ✅ `gemini.md` (updated with RabbitMQ patterns)
 10. ✅ `claude.md` (updated with RAG/KAG/DAG + streaming)
+11. ✅ **NEW**: `src/lib/server/rabbitmq/connection.ts` (fallback connection manager)
+12. ✅ **NEW**: `scripts/setup-rabbitmq.ps1` (Windows setup script)
 
 **System Status:**
-- ✅ RabbitMQ integration complete
+- ✅ RabbitMQ integration complete with **automatic fallback**
+- ✅ **Docker + Native Windows support**
+- ✅ **Auto-reconnection with exponential backoff**
+- ✅ **Connection health monitoring**
 - ✅ Streaming/chunking strategies implemented
 - ✅ State machines rebuilt with XState v5
 - ✅ Knowledge bases enhanced with production patterns
 - ✅ Workers ready for deployment
 - ✅ Demo page functional
+- ✅ **PowerShell setup script for Windows**
 
 **Ready for Production:** 🚀
+
+### Windows-Specific Features
+
+✅ **Native Windows RabbitMQ Service Support**
+✅ **PowerShell Setup Script** (`.\scripts\setup-rabbitmq.ps1`)
+✅ **Automatic Fallback** (Docker → Native → Custom)
+✅ **Health Check with Connection Type Display**
+✅ **Windows Service Management** (net start/stop RabbitMQ)
+✅ **Comprehensive Troubleshooting Guide**

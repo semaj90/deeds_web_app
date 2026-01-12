@@ -74,6 +74,40 @@ let doubled = $derived(count * 2);
 - Always `saveSync()` after modifications
 - Handle edge cases like dynamic imports gracefully
 
+### 🐰 RabbitMQ 4.0 Streaming (2025)
+
+**Key Changes:**
+- Quorum queues replace classic mirrored queues
+- Default redelivery limit: 20 (configure DLX!)
+- Streams for append-only, replayable logs
+
+**TypeScript Client:**
+```typescript
+import { connect } from 'rabbitmq-stream-js-client';
+const client = await connect({ hostname: 'localhost', port: 5552 });
+const producer = await client.declarePublisher({ stream: 'docs' });
+await producer.send(Buffer.from(JSON.stringify({ id: '123' })));
+```
+
+### 📄 LangChain.js Chunking (2025)
+
+**Recommended Strategy:**
+```typescript
+import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+
+const splitter = new RecursiveCharacterTextSplitter({
+  chunkSize: 512,    // 256-512 tokens optimal
+  chunkOverlap: 50,  // 10-20% overlap
+});
+```
+
+**Streaming SSE:**
+```typescript
+for await (const chunk of chain.stream({ input })) {
+  res.write(`data: ${JSON.stringify(chunk)}\n\n`);
+}
+```
+
 ---
 
 ## 📊 Previous Findings (January 9, 2026)

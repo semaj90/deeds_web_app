@@ -40,6 +40,84 @@ Property missing: 3,065 (3%) → Interface mismatch
 
 ---
 
+## 🐰 RabbitMQ 4.0 Streaming (January 2026)
+
+### Quorum Queues (Recommended for HA)
+```typescript
+// npm install rabbitmq-stream-js-client amqplib
+import { connect } from 'rabbitmq-stream-js-client';
+
+const client = await connect({
+  hostname: 'localhost',
+  port: 5552,
+  username: 'guest',
+  password: 'guest',
+  vhost: '/'
+});
+
+// Create stream
+await client.createStream({ stream: 'legal-documents' });
+
+// Producer
+const producer = await client.declarePublisher({
+  stream: 'legal-documents',
+  publisherRef: 'legal-ai-producer'
+});
+
+await producer.send(Buffer.from(JSON.stringify({ docId: '123', content: '...' })));
+```
+
+### Best Practices
+| Practice | Description |
+|----------|-------------|
+| **Multi-node cluster** | 3, 5, or 7 nodes for Raft consensus |
+| **Dead-letter exchange** | Configure DLX for messages exceeding 20 retries |
+| **Retention policy** | Set `max-length` or TTL to prevent buildup |
+| **Queue length** | Keep queues short for optimal RAM usage |
+
+### Stream vs Queue
+- **Streams**: Append-only logs, non-destructive reads, replayable
+- **Quorum Queues**: Traditional queue semantics with HA
+
+---
+
+## 📄 LangChain.js Document Chunking (2025)
+
+### Chunking Strategies Comparison
+| Strategy | Best For | Accuracy | Speed |
+|----------|----------|----------|-------|
+| **Semantic** | Knowledge bases | 70% better | Slower |
+| **Recursive Character** | General RAG | Balanced | Fast |
+| **Token-based** | Cost optimization | Good | Fastest |
+
+### Optimal Parameters
+```typescript
+import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+
+const splitter = new RecursiveCharacterTextSplitter({
+  chunkSize: 512,      // Sweet spot: 256-512 tokens
+  chunkOverlap: 50,    // 10-20% overlap
+  separators: ['\n\n', '\n', '. ', ' ', '']
+});
+
+const chunks = await splitter.splitText(legalDocument);
+```
+
+### Streaming with SSE
+```typescript
+// Server-Sent Events for real-time updates
+import { JsonOutputParser } from '@langchain/core/output_parsers';
+
+const parser = new JsonOutputParser();
+const stream = await chain.stream({ input: query });
+
+for await (const chunk of stream) {
+  res.write(`data: ${JSON.stringify(chunk)}\n\n`);
+}
+```
+
+---
+
 ## Environment Assumptions
 
 ## FastMCP Tools Relevant to Phase72
@@ -1220,7 +1298,7 @@ await channel.consume('my-stream', (msg) => {
   if (msg) {
     // Process message
     console.log(msg.content.toString());
-    
+
     // Manual ack (advances offset)
     channel.ack(msg);
   }
@@ -1326,7 +1404,7 @@ await channel.publish('invoices-exchange', 'invoice-123', buffer);
 // Producer: Chunk large documents
 async function publishDocumentChunks(docId: string, content: string) {
   const chunks = chunkDocument(content, 1000); // 1KB chunks
-  
+
   for (let i = 0; i < chunks.length; i++) {
     await channel.publish('', 'doc-stream', Buffer.from(JSON.stringify({
       docId,
@@ -1391,7 +1469,7 @@ const streamMachine = setup({
   actors: {
     rabbitMQStream: fromCallback(({ sendBack }) => {
       const channel = await createChannel();
-      
+
       channel.consume('case-stream', (msg) => {
         if (msg) {
           sendBack({ type: 'CASE_RECEIVED', data: JSON.parse(msg.content.toString()) });
@@ -1400,7 +1478,7 @@ const streamMachine = setup({
       }, {
         arguments: { 'x-stream-offset': 'last' }
       });
-      
+
       return () => channel.close();
     })
   }

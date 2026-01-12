@@ -11,13 +11,60 @@
  * - Manual message acknowledgment
  * - Retry logic with exponential backoff
  * - Graceful shutdown
+ * - Automatic fallback (Docker → Native Windows → Remote)
  */
 
 import amqp from 'amqplib';
 
 const QUEUE_NAME = 'case_creation_queue';
-const RABBITMQ_URL = 'amqp://localhost:5672';
 const MAX_RETRIES = 3;
+
+// RabbitMQ connection configurations with fallback
+const RABBITMQ_CONFIGS = [
+	{
+		url: 'amqp://localhost:5672',
+		description: 'Docker RabbitMQ (default)'
+	},
+	{
+		url: 'amqp://guest:guest@localhost:5672/',
+		description: 'Native Windows RabbitMQ (guest credentials)'
+	},
+	{
+		url: process.env.RABBITMQ_URL || 'amqp://localhost:5672',
+		description: 'Environment-configured RabbitMQ'
+	}
+];
+
+/**
+ * Connect to RabbitMQ with automatic fallback
+ */
+async function connectWithFallback() {
+	const errors = [];
+
+	for (const config of RABBITMQ_CONFIGS) {
+		try {
+			console.log(`🔌 Attempting to connect: ${config.description}`);
+			const connection = await amqp.connect(config.url);
+			console.log(`✅ Connected to RabbitMQ: ${config.description}`);
+			return connection;
+		} catch (error) {
+			console.warn(`⚠️  Failed: ${config.description}`, error.message);
+			errors.push(error);
+			continue;
+		}
+	}
+
+	console.error('❌ All RabbitMQ connection attempts failed:');
+	errors.forEach((err, i) => {
+		console.error(`   ${i + 1}. ${RABBITMQ_CONFIGS[i].description}: ${err.message}`);
+	});
+
+	throw new Error(
+		'Failed to connect to RabbitMQ. Ensure RabbitMQ is running:\n' +
+		'  Docker: docker run -d -p 5672:5672 rabbitmq:3-management\n' +
+		'  Windows: net start RabbitMQ'
+	);
+}
 
 /**
  * Process case creation job
@@ -59,9 +106,8 @@ async function processCaseCreation(job) {
  */
 async function startWorker() {
 	try {
-		// Connect to RabbitMQ
-		const connection = await amqp.connect(RABBITMQ_URL);
-		console.log('✅ Connected to RabbitMQ');
+		// Connect to RabbitMQ with fallback
+		const connection = await connectWithFallback();
 
 		const channel = await connection.createChannel();
 		console.log('✅ Channel created');
