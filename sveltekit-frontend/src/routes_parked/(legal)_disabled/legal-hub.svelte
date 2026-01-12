@@ -62,7 +62,7 @@ import type { Document } from '$lib/types'; import Card from '$lib/components/ui
  margin-bottom: 3rem;
  }
 
- /* Change selectors: to, global: global so Svelte recognizes classes applied to component roots */
+ /* Change selectors: to, global:global so Svelte recognizes classes applied to component roots */
  :global(.stat-card) {
  background: rgba(212, 175, 55, 0.1);
  border: 1px solid rgba(212, 175, 55, 0.3);

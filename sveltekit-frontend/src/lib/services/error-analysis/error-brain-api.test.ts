@@ -367,7 +367,7 @@ describe('ErrorBrainAPI', () => {
             }),
             { minLength: 1, maxLength: 10 }
           ),
-          async (errors) => {
+          async (errors: any) => {
             const result = await api.analyzeErrors(errors as unknown as AnalysisError[]);
 
             expect(result).toHaveProperty('success');
@@ -412,7 +412,7 @@ describe('ErrorBrainAPI', () => {
         fc.asyncProperty(
           fc.constantFrom('error-brain', 'diff-generation', 'diff-application', 'validation'),
           fc.boolean(),
-          async (flag, value) => {
+          async (flag: any, value: any) => {
             await api.setFeature(flag, value);
             const features = await api.getFeatures();
 
@@ -455,7 +455,7 @@ describe('ErrorBrainAPI', () => {
   describe('Property: Error Response Consistency', () => {
     it('failed requests should always return error message', async () => {
       await fc.assert(
-        fc.asyncProperty(fc.array(fc.object(), { maxLength: 0 }), async (errors) => {
+        fc.asyncProperty(fc.array(fc.object(), { maxLength: 0 }), async (errors: any) => {
           const result = await api.analyzeErrors(errors as unknown as AnalysisError[]);
 
           if (!result.success) {

@@ -125,7 +125,7 @@ export class ErrorPatternRAG {
 
  const results = await db.execute(query);
 
- return results.rows.map((row) => this.mapToFixSuggestion(row));
+ return results.rows.map((row: any) => this.mapToFixSuggestion(row));
  }
 
  /**
@@ -210,7 +210,7 @@ export class ErrorPatternRAG {
  `;
 
  const results = await db.execute(query);
- return results.rows.map((row) => this.mapToErrorPattern(row));
+ return results.rows.map((row: any) => this.mapToErrorPattern(row));
  }
 
  /**

@@ -53,7 +53,7 @@ export class ContextFormatter extends BaseService implements IContextFormatter {
  // Similar patterns
  if (patterns.length > 0) {
  sections.push('## Similar Patterns\n');
- patterns.forEach((pattern, index) => {
+ patterns.forEach((pattern: any, : anyindex) => {
  sections.push(`### Pattern ${index + 1}`);
  sections.push(`**File:** ${pattern.filePath}`);
  sections.push(`**Line:** ${pattern.lineNumber}`);
@@ -122,7 +122,7 @@ Format your response as:
  * Parse LLM response to extract fix and explanation
  */
  async parseResponse(response: string): Promise<{ fix: string; explanation: string }> {
- if (!response || typeof response !== 'string') {
+ if (!response: any || typeof response !== 'string') {
  throw new Error('Invalid input: response must be a non-empty string');
  }
 

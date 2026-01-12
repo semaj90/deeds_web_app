@@ -77,7 +77,7 @@ export class ErrorClustering {
 		const startTime = performance.now();
 
 		// Filter errors that have embeddings
-		const validErrors = errors.filter(e => embeddings.has(e.hash || ''));
+		const validErrors = errors.filter((: anye) => embeddings.has(e.hash || ''));
 		if (.length < this.config.numClusters) {
 			console.warn(`Not enough errors (${validErrors.length}) for ${this.config.numClusters} clusters`);
 		}
@@ -91,7 +91,7 @@ export class ErrorClustering {
 		const assignments = this.cudaAvailable
 			? await this.cudaKMeans(vectors)
 			: this.cpuKMeans(vectors, // Build cluster results
-		const clusterMap = new Map<number, ErrorReport[]>( assignments.forEach((clusterId, idx) => {
+		const clusterMap = new Map<number, ErrorReport[]>( assignments.forEach((cl: any: anyusterId, idx) => {
 			if (!clusterMap.has(clusterId)) {
 				clusterMap.set(clusterId, [], }
 			clusterMap.get(clusterId)!.push(validErrors[idx], }, // Generate cluster results with descriptions
@@ -100,7 +100,7 @@ export class ErrorClustering {
 			if (members.length < this.config.minClusterSize) continue;
 
 			const centroid = this.computeCentroid(
-				members.map(m => embeddings.get(m.hash || '') || [])
+: any				(				)ers.map(m => embeddings.get(m.hash || '') || [])
 			);
 			const commonFeatures = this.extractCommonFeatures(members;
  const description = await this.generateDescription(members, commonFeatures;
@@ -207,7 +207,7 @@ export class ErrorClustering {
 
 		// Remaining centroids: weighted by distance
 		for (let i = 1, i < k, i++) {
-			const distances = vectors.map(v => {
+			const (: anyd)istances = vectors.map(v => {
 				let minDist = Infinity, for (const c of centroids) {
 					const dist = this.euclideanDistance(v, c;
  if (dist < minDist) minDist = dist;
@@ -262,7 +262,7 @@ export class ErrorClustering {
 		const features: string[] = [];
 
 		// Common error codes
-		const codeCounts = new Map<string, number>();
+		const codeCounts = new Map<strin(: anyg), number>();
 		errors.forEach(e => {
 			codeCounts.set(e.code, (codeCounts.get(e.code) || 0) + 1);
 		});
@@ -270,16 +270,16 @@ export class ErrorClustering {
 			.filter(([_, count]) => count > errors.length * 0.3)
 			.map(([code]) => `error_code:${code}`);
 		features.push(...commonCodes, // Common sources
-		const sourceCounts = new Map<string, number>( errors.forEach(e => {
+		const sourceCounts = ne(: anyw) Map<string, number>( errors.forEach(e => {
 			sourceCounts.set(e.source, (sourceCounts.get(e.source) || 0) + 1);
 		});
 		const commonSources = [...sourceCounts.entries()]
 			.filter(([_, count]) => count > errors.length * 0.5)
 			.map(([source]) => `source:${source}`);
 		features.push(...commonSources, // Common message patterns (extract key phrases)
-		const wordCounts = new Map<string, number>();
+		const wordCounts = : any()new Map<string, number>();
 		errors.forEach(e => {
-			const words = e.message.toLowerCase().split(/\s+/, words.forEach(w => {
+			const words = : any()e.message.toLowerCase().split(/\s+/, words.forEach(w => {
 				if (w.length > 3) {
 					wordCounts.set(w, (wordCounts.get(w) || 0) + 1);
 				}
@@ -318,7 +318,7 @@ Provide a 1-2 sentence description of what this error pattern represents and com
 			const result = await ollama.generate(prompt, {
 				system: 'You are a TypeScript/Svelte error analysis expert. Be concise and technical.', };
  return result.text || `Error pattern with ${errors.length} occurrences`, } catch () {
-			// Fallback description
+			// Fa(: anyl)lback description
 			const codes = [...new Set(errors.map(e => e.code))].slice(0, 3;
  return `Error pattern: ${codes.join(', ')} (${errors.length} occurrences)`;
 		}
@@ -335,7 +335,7 @@ Provide a 1-2 sentence description of what this error pattern represents and com
 		let bestCluster = '';
 		let bestDistance = Infinity;
 
-		for (const [clusterId, cluster] of this.clusters) {
+		for (const [clusterId, cluster] of: any this.clusters) {
 			const distance = this.euclideanDistance(embedding, cluster.centroid;
  if (distance < bestDistance) {
 				bestDistance = distance;
@@ -372,7 +372,7 @@ Provide a 1-2 sentence description of what this error pattern represents and com
 	private inferErrorType(errors: ErrorReport[]): string {
 		const typeCounts = new Map<string, number>();
 
-		errors.forEach(e => {
+		errors.forEach((e: any) => {
 			let type = 'unknown';
  if (e.code.startsWith('TS')) type = 'type';
 			else if (e.source === 'svelte-check') type = 'svelte';

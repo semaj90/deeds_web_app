@@ -98,8 +98,8 @@ export class MultiLanguageDetector {
 			);
 
 			const parsed = this.parseClangTidyOutput(stdout);
-			errors.push(...parsed.filter(e => e.severity === 'error'));
-			warnings.push(...parsed.filter(e => e.severity === 'warning'));
+			errors.push(...parsed.filter((e: any) => e.severity === 'error'));
+			warnings.push(...parsed.filter((e: any) => e.severity === 'warning'));
 		} catch {
 			// Try cppcheck as fallback
 			try {
@@ -109,8 +109,8 @@ export class MultiLanguageDetector {
 				);
 
 				const parsed = this.parseCppcheckOutput(stdout);
-				errors.push(...parsed.filter(e => e.severity === 'error'));
-				warnings.push(...parsed.filter(e => e.severity === 'warning'));
+				errors.push(...parsed.filter((e: any) => e.severity === 'error'));
+				warnings.push(...parsed.filter((e: any) => e.severity === 'warning'));
 			} catch {
 				// C++ tools not available
 			}
@@ -144,8 +144,8 @@ export class MultiLanguageDetector {
 			);
 
 			const parsed = this.parseMypyOutput(stdout);
-			errors.push(...parsed.filter(e => e.severity === 'error'));
-			warnings.push(...parsed.filter(e => e.severity === 'warning'));
+			errors.push(...parsed.filter((e: any) => e.severity === 'error'));
+			warnings.push(...parsed.filter((e: any) => e.severity === 'warning'));
 		} catch {
 			// Try ruff as fallback
 			try {
@@ -155,8 +155,8 @@ export class MultiLanguageDetector {
 				);
 
 				const parsed = this.parseRuffOutput(stdout);
-				errors.push(...parsed.filter(e => e.severity === 'error'));
-				warnings.push(...parsed.filter(e => e.severity === 'warning'));
+				errors.push(...parsed.filter((e: any) => e.severity === 'error'));
+				warnings.push(...parsed.filter((e: any) => e.severity === 'warning'));
 			} catch {
 				// Python tools not available
 			}
@@ -184,24 +184,24 @@ export class MultiLanguageDetector {
 		try {
 			// Try go vet
 			const { stdout } = await execAsync(
-				`go vet ${this.config.goPaths.map(p => p + '/...').join(' ')} 2>&1 || true`,
+				`go vet ${this.config.goPaths.map((p: any) => p + '/...').join(' ')} 2>&1 || true`,
 				{ timeout: this.config.timeout }
 			);
 
 			const parsed = this.parseGoVetOutput(stdout);
-			errors.push(...parsed.filter(e => e.severity === 'error'));
-			warnings.push(...parsed.filter(e => e.severity === 'warning'));
+			errors.push(...parsed.filter((e: any) => e.severity === 'error'));
+			warnings.push(...parsed.filter((e: any) => e.severity === 'warning'));
 		} catch {
 			// Try staticcheck as fallback
 			try {
 				const { stdout } = await execAsync(
-					`staticcheck ${this.config.goPaths.map(p => p + '/...').join(' ')} 2>&1 || true`,
+					`staticcheck ${this.config.goPaths.map((p: any) => p + '/...').join(' ')} 2>&1 || true`,
 					{ timeout: this.config.timeout }
 				);
 
 				const parsed = this.parseStaticcheckOutput(stdout);
-				errors.push(...parsed.filter(e => e.severity === 'error'));
-				warnings.push(...parsed.filter(e => e.severity === 'warning'));
+				errors.push(...parsed.filter((e: any) => e.severity === 'error'));
+				warnings.push(...parsed.filter((e: any) => e.severity === 'warning'));
 			} catch {
 				// Go tools not available
 			}

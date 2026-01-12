@@ -164,7 +164,7 @@ class UniversalASTParser {
         type = 'default';
       }
       if (namedImports) {
-        specifiers.push(...namedImports.split(',').map(s => s.trim().split(' as ')[0]));
+        specifiers.push(...namedImports.split(',').map((s: any) => s.trim().split(' as ')[0]));
         type = specifiers.length > 0 ? 'named' : type;
       }
       if (namespaceImport) {
@@ -240,7 +240,7 @@ class UniversalASTParser {
         end: match.index + fullMatch.length,
         children: [],
         metadata: { extends: extendsClass,
-          implements: implementsInterfaces?.split(',').map(s => s.trim())
+          implements: implementsInterfaces?.split(',').map((s: any) => s.trim())
         }
       });
     }
@@ -256,7 +256,7 @@ class UniversalASTParser {
         start: match.index,
         end: match.index + fullMatch.length,
         children: [],
-        metadata: { extends: extendsInterfaces?.split(',').map(s => s.trim())
+        metadata: { extends: extendsInterfaces?.split(',').map((s: any) => s.trim())
         }
       });
     }
@@ -389,11 +389,11 @@ class UniversalASTParser {
       for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);
 
-        if (exclude.some(ex => fullPath.includes(ex))) continue;
+        if (exclude.some((ex: any) => fullPath.includes(ex))) continue;
 
         if (entry.isDirectory()) {
           yield* walkDir(fullPath);
-        } else if (entry.isFile() && extensions.some(ext => entry.name.endsWith(ext))) {
+        } else if (entry.isFile() && extensions.some((ext: any) => entry.name.endsWith(ext))) {
           yield fullPath;
         }
       }
@@ -437,7 +437,7 @@ class UniversalASTParser {
     const graph = new Map<string, string[]>();
 
     for (const ast of fileASTs) {
-      const deps = ast.imports.map(imp => imp.source);
+      const deps = ast.imports.map((imp: any) => imp.source);
       graph.set(ast.file_path, deps);
     }
 

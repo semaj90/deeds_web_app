@@ -46,14 +46,14 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
 
  // Run K-means clustering
  const clusterAssignments = await this.kMeansClustering(
- embeddings.map((e) => e.vector),
+ embeddings.map((e: any) => e.vector),
  k
  );
 
  // Group errors by cluster assignment
  const clusters: Cluster[] = [];
  for (let i = 0; i < k; i++) {
- const clusterErrors = errors.filter((_, idx) => clusterAssignments[idx] === i);
+ const clusterErrors = errors.filter((_: any, idx: any) => clusterAssignments[idx] === i);
 
  if (clusterErrors.length > 0) {
  const cluster: Cluster = {
@@ -102,7 +102,7 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
 
  // Initialize centroids randomly from data points
  let centroids: number[][] = [];
- const indices = Array.from({ length: embeddings.length }, (_, i) => i);
+ const indices = Array.from({ length: embeddings.length }, (_: any, i: any) => i);
  for (let i = 0; i < k; i++) {
  const randomIdx = indices[Math.floor(Math.random() * indices.length)];
  centroids.push([...embeddings[randomIdx]]);
@@ -114,7 +114,7 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
 
  while (!converged && iteration < maxIterations) {
  // Assign each point to nearest centroid
- const newAssignments = embeddings.map((embedding) => {
+ const newAssignments = embeddings.map((embedding: any) => {
  let minDistance = Infinity;
  let nearestCluster = 0;
 
@@ -135,7 +135,7 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
  // Update centroids
  const newCentroids: number[][] = [];
  for (let i = 0; i < k; i++) {
- const clusterPoints = embeddings.filter((_, idx) => assignments[idx] === i);
+ const clusterPoints = embeddings.filter((_: any, idx: any) => assignments[idx] === i);
 
  if (clusterPoints.length > 0) {
  const centroid = new Array(dimension).fill(0);
@@ -220,7 +220,7 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
 
  try {
  // Sort by impact descending
- const prioritized = clusters.sort((a, b) => b.impact - a.impact);
+ const prioritized = clusters.sort((a: any, b: any) => b.impact - a.impact);
  this.log('info', 'Clusters prioritized successfully');
  return prioritized;
  } catch (error) {

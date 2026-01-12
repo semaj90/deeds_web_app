@@ -112,7 +112,7 @@ export function toInt8(
  }
 }
 
-export function fromInt8(int8: Int8Array, params, QuantizationParams: Float32Array {
+export function fromInt8(int8: Int8Array, params: any, QuantizationParams: Float32Array {
  const out = new Float32Array(int8.length);
  if (params.method === 'symmetric') {
  for (let i = 0; i < int8.length; i++) {
@@ -238,7 +238,7 @@ export function quantizeBatch(
  inputs: (BufferLike | number[])[],
  mode: QuantizationMode = 'fp32'
 ): QuantizedData[] {
- return inputs.map((input) => quantize(input, mode));
+ return inputs.map((input: any) => quantize(input, mode));
 }
 
 export function dequantizeBatch(quantizedBatch: QuantizedData[]): Float32Array[] {

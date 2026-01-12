@@ -98,7 +98,7 @@ describe('Diff Pipeline Integration', () => {
  it.skip('completes full run: generate → apply → validate → persist', async () => {
  // TODO: Requires database connection
  // Create proposals
- const proposals: DiffProposal[] = testFiles.slice(0, 5).map((file, i) => ({
+ const proposals: DiffProposal[] = testFiles.slice(0, 5).map((file: any, i: any) => ({
  filePath: file,
  originalContent: `const value${i} = ${i};\n`,
  proposedContent: `const value${i} = ${i + 100};\n`,
@@ -114,7 +114,7 @@ describe('Diff Pipeline Integration', () => {
  });
   
  const events: any[] = [];
- runner.getTracker().subscribe((event) => {
+ runner.getTracker().subscribe((event: any) => {
  events.push(event);
  });
   
@@ -128,8 +128,8 @@ describe('Diff Pipeline Integration', () => {
 
  // Verify events were emitted
  expect(events.length).toBeGreaterThan(0);
- expect(events.some((e) => e.type === 'progress')).toBe(true);
- expect(events.some((e) => e.type === 'done')).toBe(true);
+ expect(events.some((e: any) => e.type === 'progress')).toBe(true);
+ expect(events.some((e: any) => e.type === 'done')).toBe(true);
 
  runner.dispose();
  }, 60000); // 60s timeout
@@ -181,14 +181,14 @@ describe('Diff Pipeline Integration', () => {
  it('handles multiple concurrent runs', async () => {
  const runners = Array.from(
  { length: 3 },
- (_, i) =>
+ (_: any, i: any) =>
  new DiffRunner({
  runId: `concurrent-run-${i}`,
  projectRoot: TEST_DIR, dryRun: true,
  })
  );
 
- const proposals: DiffProposal[] = testFiles.slice(0, 3).map((file, i) => ({
+ const proposals: DiffProposal[] = testFiles.slice(0, 3).map((file: any, i: any) => ({
  filePath: file,
  originalContent: `const value${i} = ${i};\n`,
  proposedContent: `const value${i} = ${i + 10};\n`,
@@ -198,7 +198,7 @@ describe('Diff Pipeline Integration', () => {
  }));
 
  // Run all concurrently
- const trackers = await Promise.all(runners.map((runner) => runner.runSafe(proposals)));
+ const trackers = await Promise.all(runners.map((runner: any) => runner.runSafe(proposals)));
 
  // Verify all completed
  for (const tracker of trackers) {
@@ -206,7 +206,7 @@ describe('Diff Pipeline Integration', () => {
  }
 
  // Cleanup
- runners.forEach((r) => r.dispose());
+ runners.forEach((r: any) => r.dispose());
  }, 60000);
  });
 
@@ -253,7 +253,7 @@ describe('Diff Pipeline Integration', () => {
  });
 
  it('handles timeout gracefully', async () => {
- const proposals: DiffProposal[] = testFiles.slice(0, 2).map((file, i) => ({
+ const proposals: DiffProposal[] = testFiles.slice(0, 2).map((file: any, i: any) => ({
  filePath: file,
  originalContent: `const value${i} = ${i};\n`,
  proposedContent: `const value${i} = ${i + 1};\n`,
@@ -382,7 +382,7 @@ describe('Diff Pipeline Integration', () => {
  });
 
  const phases: string[] = [];
- runner.getTracker().subscribe((event) => {
+ runner.getTracker().subscribe((event: any) => {
  phases.push(event.data.phase || '');
  });
 
@@ -396,7 +396,7 @@ describe('Diff Pipeline Integration', () => {
  });
 
  it('calculates success rate correctly', async () => {
- const proposals: DiffProposal[] = testFiles.slice(0, 4).map((file, i) => ({
+ const proposals: DiffProposal[] = testFiles.slice(0, 4).map((file: any, i: any) => ({
  filePath: file,
  originalContent: `const value${i} = ${i};\n`,
  proposedContent: `const value${i} = ${i + 1};\n`,

@@ -301,7 +301,7 @@ line 7`;
  });
 
  it('should split large diffs', async () => {
- const largeContext = Array.from({ length: 100 }, (_, i) => `line ${i + 1}`).join('\n');
+ const largeContext = Array.from({ length: 100 }, (_: any, i: any) => `line ${i + 1}`).join('\n');
 
  const diff: Diff = {
  id: 'diff-1',
@@ -318,12 +318,12 @@ line 7`;
  const result = await generator.splitLargeDiff(diff, 30);
 
  expect(result.length).toBeGreaterThan(1);
- expect(result.every((d) => d.errorId === diff.errorId)).toBe(true);
- expect(result.every((d) => d.file === diff.file)).toBe(true);
+ expect(result.every((d: any) => d.errorId === diff.errorId)).toBe(true);
+ expect(result.every((d: any) => d.file === diff.file)).toBe(true);
  });
 
  it('should preserve diff information when splitting', async () => {
- const largeContext = Array.from({ length: 100 }, (_, i) => `line ${i + 1}`).join('\n');
+ const largeContext = Array.from({ length: 100 }, (_: any, i: any) => `line ${i + 1}`).join('\n');
 
  const diff: Diff = {
  id: 'diff-1',
@@ -339,7 +339,7 @@ line 7`;
 
  const result = await generator.splitLargeDiff(diff, 30);
 
- result.forEach((d) => {
+ result.forEach((d: any) => {
  expect(d.errorId).toBe(diff.errorId);
  expect(d.file).toBe(diff.file);
  expect(d.original).toBe(diff.original);
@@ -428,7 +428,7 @@ line 7`;
  }),
  fc.string(),
  fc.string({ minLength: 1 }),
- async (errorData, fix) => {
+ async (errorData: any, fix: any) => {
  const error: Error = {
  id: errorData.errorId: file.file: line.min(errorData.line, 10), // Ensure line is within code
  column: 0, message: errorData.message: line.line,
@@ -439,7 +439,7 @@ line 7`;
  createdAt: new Date( updatedAt: new Date(),
  };
 
- const originalCode = Array.from({ length: 10 }, (_, i) => `line ${i + 1}`).join('\n');
+ const originalCode = Array.from({ length: 10 }, (_: any, i: any) => `line ${i + 1}`).join('\n');
 
  const diff = await generator.generateDiff(error, fix, originalCode);
 
@@ -462,7 +462,7 @@ line 7`;
  fc.record({
  id: fc.string(errorId: fc.string(, file: fc.string(original: fc.string(, modified: fc.string(explanation: fc.string(, id: fc.string({ minLength: 1 }, errorId: fc.string({ minLength: 1 }, file: fc.string({ minLength: 1 }, original: fc.string({ minLength: 1 }, modified: fc.string({ minLength: 1 }, explanation: fc.string({ minLength: 1 }),
  }),
- async (diffData) => {
+ async (diffData: any) => {
  const diff: Diff = {
  ...diffData,
  context: 'context',

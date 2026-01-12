@@ -133,7 +133,7 @@ describe('AuditTrail', () => {
  const results = await auditTrail.queryHistory({ operation: 'analyze' });
 
  expect(results.length).toBe(2);
- expect(results.every((e) => e.operation === 'analyze')).toBe(true);
+ expect(results.every((e: any) => e.operation === 'analyze')).toBe(true);
  });
 
  it('should sort by timestamp descending', async () => {
@@ -229,7 +229,7 @@ describe('AuditTrail', () => {
  const results = await auditTrail.getEntriesByOperation('analyze');
 
  expect(results.length).toBe(2);
- expect(results.every((e) => e.operation === 'analyze')).toBe(true);
+ expect(results.every((e: any) => e.operation === 'analyze')).toBe(true);
  });
 
  it('should return empty array for non-existent operation', async () => {
@@ -250,14 +250,14 @@ describe('AuditTrail', () => {
  const results = await auditTrail.getEntriesByStatus('success');
 
  expect(results.length).toBe(2);
- expect(results.every((e) => e.status === 'success')).toBe(true);
+ expect(results.every((e: any) => e.status === 'success')).toBe(true);
  });
 
  it('should return failed entries', async () => {
  const results = await auditTrail.getEntriesByStatus('failure');
 
  expect(results.length).toBe(1);
- expect(results.every((e) => e.status === 'failure')).toBe(true);
+ expect(results.every((e: any) => e.status === 'failure')).toBe(true);
  });
  });
 
@@ -325,7 +325,7 @@ describe('AuditTrail', () => {
  'for any operation, audit trail should record it',
  fc.asyncProperty(
  fc.constantFrom('analyze', 'fix', 'validate', 'rollback'),
- async (operation) => {
+ async (operation: any) => {
  let entry: AuditEntry;
 
  switch (operation) {
@@ -367,7 +367,7 @@ describe('AuditTrail', () => {
  'querying with no filters should return all entries',
  fc.asyncProperty(
  fc.array(fc.record({ count: fc.integer() }), { minLength: 1, maxLength: 10 }),
- async (detailsArray) => {
+ async (detailsArray: any) => {
  for (const details of detailsArray) {
  await auditTrail.logAnalysis(details, 'success');
  }
@@ -386,7 +386,7 @@ describe('AuditTrail', () => {
  'success rate should be between 0 and 100',
  fc.asyncProperty(
  fc.array(fc.boolean(), { minLength: 1, maxLength: 20 }),
- async (statuses) => {
+ async (statuses: any) => {
  for (const status of statuses) {
  await auditTrail.logAnalysis({}, status ? 'success' : 'failure');
  }

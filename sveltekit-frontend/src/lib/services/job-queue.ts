@@ -107,7 +107,7 @@ export class LegalAIJobQueue {
         return async (job: RabbitMQJob<LegalJobData>) => {
             const { id } = job;
             console.log(`🚀 Processing job ${ id } in ${ queueName }`);
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise((resolve: any) => setTimeout(resolve, 1000));
             return { status: 'completed', queue: queueName, jobId: id };
         };
     }
@@ -128,8 +128,8 @@ export class LegalAIJobQueue {
     }
 
     public async close() {
-        await Promise.all([...this.queues.values()].map(q => q.close()));
-        await Promise.all([...this.workers.values()].map(w => w.close()));
+        await Promise.all([...this.queues.values()].map((q: any) => q.close()));
+        await Promise.all([...this.workers.values()].map((w: any) => w.close()));
     }
 }
 

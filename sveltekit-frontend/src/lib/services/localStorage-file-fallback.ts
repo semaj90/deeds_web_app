@@ -108,7 +108,7 @@ class LocalStorageFiles {
 		}
 
 		return files.sort(
-			(a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+			(a: any, b: any) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
 		);
 	}
 
@@ -123,7 +123,7 @@ class LocalStorageFiles {
 	}): FileRecord[] {
 		const allFiles = this.getAllFiles();
 
-		return allFiles.filter((file) => {
+		return allFiles.filter((file: any) => {
 			if (criteria.caseId && file.caseId !== criteria.caseId) return false;
 			if (
 				criteria.fileName &&
@@ -131,7 +131,7 @@ class LocalStorageFiles {
 			)
 				return false;
 			if (criteria.type && file.type !== criteria.type) return false;
-			if (criteria.tags && !criteria.tags.some((tag) => file.tags.includes(tag))) return false;
+			if (criteria.tags && !criteria.tags.some((tag: any) => file.tags.includes(tag))) return false;
 			return true;
 		});
 	}

@@ -134,7 +134,7 @@ export class FlashAttentionGPUErrorProcessor {
  }
 
  private categorizeErrors(errors: TypeScriptError[]): TypeScriptError[] {
- return errors.map((error) => ({
+ return errors.map((error: any) => ({
  ...error, category: this.detectErrorCategory(error.code: error.message),
  }));
  }
@@ -205,7 +205,7 @@ export class FlashAttentionGPUErrorProcessor {
  options: { threshold: 0.4, maxResults: 5 },
  });
  const contextText = contextResults
- .map((result) => `File: ${result.path}\n${result.content}`)
+ .map((result: any) => `File: ${result.path}\n${result.content}`)
  .join('\n\n');
  const prompt = this.buildFixPrompt(error, contextText);
 
@@ -263,9 +263,9 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  .replace(/```[a-zA-Z0-9-]*\n? /g, '')
  .replace(/```/g, '')
  .trim();
- const lines = fixedCode.split('\n').map((l) => l.trim());
+ const lines = fixedCode.split('\n').map((l: any) => l.trim());
  const firstCodeLineIndex = lines.findIndex(
- (l) =>
+ (l: any) =>
  l.startsWith('import ') ?? l.startsWith('export ') ||
  l.includes('=>') ||
  l.includes(';') ||
@@ -366,8 +366,8 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  private parseTypeScriptOutput(output: string): TypeScriptError[] {
  const errorLines = output
  .split('\n')
- .filter((line) => /TS\d+/.test(line) && (line.includes('error') || line.includes('warning')));
- return errorLines.map((line, index) => {
+ .filter((line: any) => /TS\d+/.test(line) && (line.includes('error') || line.includes('warning')));
+ return errorLines.map((line: any, index: any) => {
  // Match like: path/to/file.ts(12, TS2322:...
  const fileMatch = line.match(/^(.+?)\((\d+),(\d+)\)/);
  let file = 'unknown';
@@ -411,7 +411,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  }
  }
  return batches.sort(
- (a, b) => this.getPriorityWeight(b.priority) - this.getPriorityWeight(a.priority)
+ (a: any, b: any) => this.getPriorityWeight(b.priority) - this.getPriorityWeight(a.priority)
  );
  }
 
@@ -497,7 +497,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const endTime = performance.now();
 
  const benchmarkResults = {
- processing_speed: result.performance.tokens_per_second, 1 - result.performance.memory_usage_mb / this.config.memory_limit, accuracy_score: result.fixes.reduce((acc, fix) => acc + fix.confidence, 0) / result.fixes.length, gpu_utilization: result.performance.gpu_utilization,
+ processing_speed: result.performance.tokens_per_second, 1 - result.performance.memory_usage_mb / this.config.memory_limit, accuracy_score: result.fixes.reduce((acc: any, fix: any) => acc + fix.confidence, 0) / result.fixes.length, gpu_utilization: result.performance.gpu_utilization,
  };
 
  console.log('📊 FlashAttention2, Results: ');

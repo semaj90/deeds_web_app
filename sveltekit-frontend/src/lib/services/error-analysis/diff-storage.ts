@@ -95,10 +95,10 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  this.validateInput(errorId, 'errorId');
 
  return this.retry(async () => {
- const diffs = Array.from(this.diffs.values()).filter((d) => d.errorId === errorId);
+ const diffs = Array.from(this.diffs.values()).filter((d: any) => d.errorId === errorId);
 
  this.log('info', `Retrieved ${diffs.length} diffs for error ${errorId}`);
- return diffs.map((d) => ({ ...d }));
+ return diffs.map((d: any) => ({ ...d }));
  });
  }
 
@@ -166,23 +166,23 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  // Apply filters
  if (filters) {
  if (filters.errorId) {
- diffs = diffs.filter((d) => d.errorId === filters.errorId);
+ diffs = diffs.filter((d: any) => d.errorId === filters.errorId);
  }
 
  if (filters.file) {
- diffs = diffs.filter((d) => d.file === filters.file);
+ diffs = diffs.filter((d: any) => d.file === filters.file);
  }
 
  if (filters.status) {
- diffs = diffs.filter((d) => d.status === filters.status);
+ diffs = diffs.filter((d: any) => d.status === filters.status);
  }
 
  if (filters.startDate) {
- diffs = diffs.filter((d) => d.createdAt >= filters.startDate!);
+ diffs = diffs.filter((d: any) => d.createdAt >= filters.startDate!);
  }
 
  if (filters.endDate) {
- diffs = diffs.filter((d) => d.createdAt <= filters.endDate!);
+ diffs = diffs.filter((d: any) => d.createdAt <= filters.endDate!);
  }
 
  // Apply pagination
@@ -192,7 +192,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  }
 
  this.log('info', `Listed ${diffs.length} diffs`, { filters });
- return diffs.map((d) => ({ ...d }));
+ return diffs.map((d: any) => ({ ...d }));
  });
  }
 
@@ -246,7 +246,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
 
  const byFile: Record<string, number> = {};
 
- diffs.forEach((diff) => {
+ diffs.forEach((diff: any) => {
  byStatus[diff.status]++;
  byFile[diff.file] = (byFile[diff.file] || 0) + 1;
  });

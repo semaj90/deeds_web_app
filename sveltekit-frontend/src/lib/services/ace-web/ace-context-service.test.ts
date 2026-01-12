@@ -202,7 +202,7 @@ describe('AceContextService', () => {
       const plan = await service.buildToolPlan(insufficientBundle, 'test query');
 
       expect(plan.shouldProceed).toBe(false);
-      expect(plan.actions.some((a) => a.reason.includes('Insufficient'))).toBe(true);
+      expect(plan.actions.some((a: any) => a.reason.includes('Insufficient'))).toBe(true);
     });
 
     it('should suggest web_search when no context found', async () => {
@@ -370,7 +370,7 @@ describe('AceContextService', () => {
     });
 
     it('should limit chunks to top 5', async () => {
-      const chunks = Array.from({ length: 10 }, (_, i) => ({
+      const chunks = Array.from({ length: 10 }, (_: any, i: any) => ({
         id: `chunk-${i}`,
         text: `Content ${i}`,
         score: 0.9 - i * 0.05,
@@ -402,7 +402,7 @@ describe('AceContextService', () => {
     });
 
     it('should limit edges to top 10', async () => {
-      const edges = Array.from({ length: 20 }, (_, i) => ({
+      const edges = Array.from({ length: 20 }, (_: any, i: any) => ({
         src: `Entity${i}`,
         rel: 'RELATES_TO',
         dst: `Entity${i + 1}`,

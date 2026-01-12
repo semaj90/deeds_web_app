@@ -161,7 +161,7 @@ const ed = errorData as Record<string, unknown>;
  }
 
 const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
- await new Promise((resolve) => setTimeout(resolve, delay));
+ await new Promise((resolve: any) => setTimeout(resolve, delay));
  }
  }
  throw lastError;
@@ -457,7 +457,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  const formData = new FormData();
  formData.append('file', file);
 
- return new Promise((resolve, reject) => {
+ return new Promise((resolve: any, reject: any) => {
  const xhr = new XMLHttpRequest();
 
  if (signal) {
@@ -468,7 +468,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  signal.addEventListener('abort', onAbort, { once: true });
  }
 
- xhr.upload.addEventListener('progress', (event) => {
+ xhr.upload.addEventListener('progress', (event: any) => {
  if (event.lengthComputable && onProgress) {
  const progress = (event.loaded / event.total) * 100;
  onProgress(progress);

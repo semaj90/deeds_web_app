@@ -160,7 +160,7 @@ export class LegalDocumentReranker {
  };
  });
  // Sort by combined relevance score
- return rerankedDocs.sort((a, b) => b.relevanceScore - a.relevanceScore);
+ return rerankedDocs.sort((a: any, b: any) => b.relevanceScore - a.relevanceScore);
  }
 
  private calculateLegalRelevanceScore(
@@ -216,8 +216,8 @@ export class LegalDocumentReranker {
 
  private calculateTermMatchScore(queryTerms: string[], docTerms: string[]): number {
  if (queryTerms.length === 0) return 0;
-        const matches = queryTerms.filter((term) =>
-            docTerms.some((docTerm) => docTerm.toLowerCase() === term.toLowerCase())
+        const matches = queryTerms.filter((term: any) =>
+            docTerms.some((docTerm: any) => docTerm.toLowerCase() === term.toLowerCase())
         );
  return matches.length / queryTerms.length;
  }
@@ -306,7 +306,7 @@ let cacheHit = false;
 
         // simple string conditions to avoid nested sql-tag templates which caused parser issues.
         const documentTypesCond = query.documentTypes && query.documentTypes.length
-            ? `AND ld.document_type IN (${query.documentTypes.map((t) => `'${t.replace(/'/g, "''")}'`).join(',')})`
+            ? `AND ld.document_type IN (${query.documentTypes.map((t: any) => `'${t.replace(/'/g, "''")}'`).join(',')})`
             : '';
         const jurisdictionCond = query.jurisdiction
             ? `AND ld.jurisdiction = '${query.jurisdiction.replace(/'/g, "''")}'`
@@ -351,7 +351,7 @@ let cacheHit = false;
             const rows = result.rows || [];
 
             // Map database rows to RetrievedDocument interface
-            return rows.map((row) => ({
+            return rows.map((row: any) => ({
                 id: row.document_id,
                 content: row.content,
                 title: row.title,
@@ -417,7 +417,7 @@ let cacheHit = false;
         // Generate context for the LLM
         const context = rerankedDocuments
             .map(
-                (doc, i) =>
+                (doc: any, i: any) =>
                     `[${i + 1}] ${doc.title || 'Document'} (${doc.documentType}${doc.citation ? ` - ${doc.citation}` : ''})\n${doc.content}`
             )
             .join('\n\n---\n\n');
@@ -529,7 +529,7 @@ let cacheHit = false;
 
  if (Array.isArray(content)) {
  return content
- .map((item) => {
+ .map((item: any) => {
  if (typeof item === 'string') return item;
  if (item && typeof item === 'object') {
  const it = item as Record<string, unknown>;
@@ -598,15 +598,15 @@ let cacheHit = false;
         if (documents.length === 0) return 0;
 
         const avgRelevanceScore =
-            documents.reduce((sum, doc) => sum + doc.relevanceScore, 0) / documents.length;
+            documents.reduce((sum: any, doc: any) => sum + doc.relevanceScore, 0) / documents.length;
 
         const jurisdictionMatch = query.jurisdiction &&
-            documents.some((doc) => doc.jurisdiction?.toLowerCase() === query.jurisdiction?.toLowerCase())
+            documents.some((doc: any) => doc.jurisdiction?.toLowerCase() === query.jurisdiction?.toLowerCase())
             ? 0.1
             : 0;
 
         const documentTypeMatch = query.documentTypes &&
-            documents.some((doc) => query.documentTypes!.includes(doc.documentType))
+            documents.some((doc: any) => query.documentTypes!.includes(doc.documentType))
             ? 0.1
             : 0;
 
@@ -726,7 +726,7 @@ let cacheHit = false;
                 queryType: 'rag_legal',
                 confidence: response.confidence,
                 processingTime: response.metadata.totalTime,
-                sources: response.sources.map((s) => ({
+                sources: response.sources.map((s: any) => ({
                     documentId: s.id,
                     relevanceScore: s.relevanceScore,
                     documentType: s.documentType,

@@ -142,7 +142,7 @@ export class MetricsCollector {
 		const cutoff = Date.now() - this.config.retentionPeriodMs;
 
 		for (const key of Object.keys(this.history) as (keyof typeof this.history)[]) {
-			this.history[key] = this.history[key].filter(p => p.timestamp > cutoff);
+			this.history[key] = this.history[key].filter((p: any) => p.timestamp > cutoff);
 		}
 	}
 

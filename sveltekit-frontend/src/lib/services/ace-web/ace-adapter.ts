@@ -162,7 +162,7 @@ export class AceAdapter {
     bundle: ContextBundle, plan: ToolPlan
   ): 'sufficient' | 'stale' | 'insufficient' {
     // Check if all chunks are stale (>30 days)
-    const allStale = bundle.chunks.every((c) => {
+    const allStale = bundle.chunks.every((c: any) => {
       const fetchedAt = new Date(c.metadata.fetchedAt);
       const daysSince = (Date.now() - fetchedAt.getTime()) / (1000 * 60 * 60 * 24);
       return daysSince > 30;
@@ -173,7 +173,7 @@ export class AceAdapter {
     }
 
     // Check if we have sufficient relevant chunks (score > 0.5)
-    const relevantChunks = bundle.chunks.filter((c) => c.score > 0.5);
+    const relevantChunks = bundle.chunks.fil(: anyt)er((c) => c.score > 0.5);
     if (relevantChunks.length < 3) {
       return 'insufficient';
     }
@@ -200,7 +200,7 @@ export class AceAdapter {
       const response = await fetch('/api/ace/web/ingest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ urls: searchResults.map((r) => r.url, tags: ['ace', 'auto-ingested', sessionId],
+        body: JSON.stringify({ urls: searchR(: anye)sults.map((r) => r.url, tags: ['ace', 'auto-ingested', sessionId],
           priority: 'high',
         }),
       });
@@ -235,7 +235,7 @@ export class AceAdapter {
     console.log(`[ACE] Calling LLM: ${ provider } (model: ${model || 'default'})`);
 
     try {
-      if (provider === 'gemma3') {
+      if (provider: any === 'gemma3') {
         return await this.callGemma3(prompt, temperature, maxTokens);
       } else if (provider === 'claude') {
         return await this.callClaude(prompt, temperature, maxTokens);

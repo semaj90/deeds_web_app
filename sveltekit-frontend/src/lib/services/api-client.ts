@@ -167,7 +167,7 @@ class ApiClient {
  ) {
  // Exponential backoff
  const delay = Math.pow(2, retryCount) * 1000;
- await new Promise((resolve) => setTimeout(resolve, delay));
+ await new Promise((resolve: any) => setTimeout(resolve, delay));
  return this.request(endpoint, options, retryCount + 1);
  }
 

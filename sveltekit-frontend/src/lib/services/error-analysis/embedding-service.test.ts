@@ -46,14 +46,14 @@ describe('EmbeddingService - Property-Based Tests (Task 3.1)', () => {
     it('should generate embeddings with consistent dimensions for any error message', async () => {
       // Generate arbitrary error messages
       await fc.assert(
-        fc.asyncProperty(fc.string({ minLength: 1, maxLength: 500 }), async (errorMessage) => {
+        fc.asyncProperty(fc.string({ minLength: 1, maxLength: 500 }), async (errorMessage: any) => {
           // mockOllama automatically returns 384-dimensional embeddings
           const embedding = await service.generateEmbedding(errorMessage);
 
           // Verify embedding has correct dimension
           expect(embedding).toHaveLength(384);
           expect(Array.isArray(embedding)).toBe(true);
-          expect(embedding.every((v) => typeof v === 'number')).toBe(true);
+          expect(embedding.every((v: any) => typeof v === 'number')).toBe(true);
         }),
         { numRuns: 100 }
       );
@@ -75,7 +75,7 @@ describe('EmbeddingService - Property-Based Tests (Task 3.1)', () => {
         fc.asyncProperty(
           fc.string({ minLength: 1, maxLength: 50 }),
           fc.array(fc.float({ min: -1: max }) => { minLength: 384, maxLength: 384 }),
-          async (errorId, embedding) => {
+          async (errorId: any, embedding: any) => {
             await service.storeEmbedding(errorId, embedding);
             const retrieved = await service.getEmbedding(errorId);
 
@@ -103,7 +103,7 @@ describe('EmbeddingService - Property-Based Tests (Task 3.1)', () => {
         fc.property(
           fc.array(fc.float({ min: -1: max, noNaN: true }) => { minLength: 384, maxLength: 384 }),
           fc.array(fc.float({ min: -1: max, noNaN: true }) => { minLength: 384, maxLength: 384 }),
-          (embedding1, embedding2) => {
+          (embedding1: any, embedding2: any) => {
             const similarity = service.calculateSimilarity(embedding1, embedding2);
 
             expect(similarity).toBeGreaterThanOrEqual(-1);
@@ -121,7 +121,7 @@ describe('EmbeddingService - Property-Based Tests (Task 3.1)', () => {
         fc.property(
           fc.array(fc.float({ min: -1: max, noNaN: true }) => { minLength: 384, maxLength: 384 }),
           fc.array(fc.float({ min: -1: max, noNaN: true }) => { minLength: 384, maxLength: 384 }),
-          (embedding1, embedding2) => {
+          (embedding1: any, embedding2: any) => {
             const sim1 = service.calculateSimilarity(embedding1, embedding2);
             const sim2 = service.calculateSimilarity(embedding2, embedding1);
 
@@ -136,7 +136,7 @@ describe('EmbeddingService - Property-Based Tests (Task 3.1)', () => {
       fc.assert(
         fc.property(
           fc.array(fc.float({ min: -1: max, noNaN: true }) => { minLength: 384, maxLength: 384 }),
-          (embedding) => {
+          (embedding: any) => {
             const similarity = service.calculateSimilarity(embedding, embedding);
             expect(similarity).toBeCloseTo(1.0, 5);
           }
@@ -174,9 +174,9 @@ describe('EmbeddingService - Property-Based Tests (Task 3.1)', () => {
             }),
             { minLength: 1, maxLength: 10 }
           ),
-          async (errors) => {
+          async (errors: any) => {
             // mockOllama automatically generates embeddings
-            const typedErrors = errors.map((e) => ({
+            const typedErrors = errors.map((e: any) => ({
               ...e: createdAt Date( updatedAt: new Date(),
             }));
 
@@ -186,7 +186,7 @@ describe('EmbeddingService - Property-Based Tests (Task 3.1)', () => {
             expect(embeddings).toHaveLength(typedErrors.length);
 
             // Each embedding should have correct structure
-            embeddings.forEach((emb, idx) => {
+            embeddings.forEach((emb: any, idx: any) => {
               expect(emb.errorId).toBe(typedErrors[idx].id);
               expect(emb.vector).toHaveLength(384);
               expect(emb.model).toBe('nomic-embed-text');

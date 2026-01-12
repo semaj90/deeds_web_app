@@ -199,11 +199,11 @@ export class RedisRAGCache {
  }
 
  // Sort by timestamp (oldest first)
- entries.sort((a, b) => a.timestamp - b.timestamp);
+ entries.sort((a: any, b: any) => a.timestamp - b.timestamp);
 
  // Remove oldest entries
  const toRemove = entries.slice(0, keys.length - this.config.maxEntries);
- const keysToRemove = toRemove.map((entry) => entry.key);
+ const keysToRemove = toRemove.map((entry: any) => entry.key);
 
  if (keysToRemove.length > 0) {
  await this.redis.del(...keysToRemove);

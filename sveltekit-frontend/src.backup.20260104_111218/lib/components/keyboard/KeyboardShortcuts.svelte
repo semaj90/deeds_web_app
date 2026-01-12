@@ -855,7 +855,7 @@ import { Plus } from "lucide-svelte";;
 
  .search-input { width: 100%; padding: 0.75rem 1rem 0.75rem 3rem;border: none, outline: none, none: none, font-size: 1rem; background: transparent; color: #111827}
 
- .search-input::placeholder { color: #9ca3af} .search-container: global(.close-button) { position: absolute; right: 0.5rem}
+ .search-input::placeholder { color: #9ca3af} .search-container:global(.close-button) { position: absolute; right: 0.5rem}
 
  .command-palette-body { flex: 1; overflow-y: auto; max-height: 400px}
 

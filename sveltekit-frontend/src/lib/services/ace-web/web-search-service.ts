@@ -323,7 +323,7 @@ export class WebSearchService {
       const objects = await this.minioService.listObjects('ace-web-raw', prefix);
 
       // Sort by timestamp descending
-      objects.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
+      objects.sort((a: any, b: any) => b.lastModified.getTime() - a.lastModified.getTime());
 
       // Load snapshots
       const snapshots: SearchSnapshot[] = [];

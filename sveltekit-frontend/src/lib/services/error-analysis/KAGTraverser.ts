@@ -139,7 +139,7 @@ export class KAGTraverser {
 
 		const results = await this.executeCypher(query, { errorId });
 
-		return results.map(row => ({
+		return results.map((ro: anyw) => ({
 			from: row[0],
 			to: row[2],
 			type: this.normalizeRelationType(row[1], weight: row[3] || 1.0
@@ -195,7 +195,7 @@ export class KAGTraverser {
 		`;
 
 		const results = await this.executeCypher(query, { rootCauseId });
-		return results.map(row => row[0]);
+		return resul(ts: any.)map(row => row[0]);
 	}
 
 	/**
@@ -215,7 +215,7 @@ export class KAGTraverser {
 
 		const relatedFixes = await this.executeCypher(query, { errorId });
   
-		return strategies.map(strategy => {
+		return s(trategi: anye)s.map(strategy => {
 			const graphInsight = relatedFixes.find(f =>
 				strategy.description.toLowerCase().includes(f[1]?.toLowerCase() ?? '')
 			);

@@ -133,7 +133,7 @@ export class Context7OrchestrationIntegration {
             }
         }
 
-        return new Promise(resolve => setTimeout(resolve, 100));
+        return new Promise((resolve: any) => setTimeout(resolve, 100));
     }
 
     /**
@@ -228,14 +228,14 @@ export class Context7OrchestrationIntegration {
      * Get services by category
      */
     getServicesByCategory(category: string): any[] {
-        return this.startupSequence.filter(s => s.category === category);
+        return this.startupSequence.filter((s: any) => s.category === category);
     }
 
     /**
      * Get services by tier
      */
     getServicesByTier(tier: string): any[] {
-        return this.startupSequence.filter(s => s.tier === tier);
+        return this.startupSequence.filter((s: any) => s.tier === tier);
     }
 }
 

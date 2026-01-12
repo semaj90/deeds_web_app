@@ -172,7 +172,7 @@ export class AccessibilityUtils {
  const rgb = this.hexToRgb(color);
  if (!rgb) return 0;
 
- const [r, g, b] = rgb.map((c) => {
+ const [r, g, b] = rgb.map((c: any) => {
  c = c / 255;
  return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
  });
@@ -208,7 +208,7 @@ export class AccessibilityUtils {
  /**
  * Create accessible tooltip
  */
- static createAccessibleTooltip(element: HTMLElement, text, string: void {
+ static createAccessibleTooltip(element: HTMLElement, text: any, string: void {
  element.setAttribute('aria-describedby', `tooltip-${Math.random().toString(36).substr(2, 9)}`);
 
  const tooltip = document.createElement('div');

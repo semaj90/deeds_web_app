@@ -81,11 +81,11 @@ class ChatService {
  onToken: (token: string) => void,
  onError?: (error: Error) => void
  ): Promise<void> {
- return new Promise((resolve, reject) => {
+ return new Promise((resolve: any, reject: any) => {
  try {
  const eventSource = new EventSource(streamUrl);
 
- eventSource.addEventListener('token', (event) => {
+ eventSource.addEventListener('token', (event: any) => {
  try {
  const data = JSON.parse(event.data);
  onToken(data.token || '');
@@ -94,12 +94,12 @@ class ChatService {
  }
  });
 
- eventSource.addEventListener('done', (event) => {
+ eventSource.addEventListener('done', (event: any) => {
  eventSource.close();
  resolve();
  });
 
- eventSource.addEventListener('error', (event) => {
+ eventSource.addEventListener('error', (event: any) => {
  eventSource.close();
  const error = new Error('Streaming error');
  if (onError) onError(error);

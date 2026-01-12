@@ -76,8 +76,8 @@ describe('LLMPromptService - Unit Tests (Task 11.1)', () => {
  const prompts = await service.retrievePromptsByError(errorId);
 
  expect(prompts.length).toBe(2);
- expect(prompts.map((p) => p.id)).toContain(prompt1.id);
- expect(prompts.map((p) => p.id)).toContain(prompt2.id);
+ expect(prompts.map((p: any) => p.id)).toContain(prompt1.id);
+ expect(prompts.map((p: any) => p.id)).toContain(prompt2.id);
  });
 
  it('should preserve prompt metadata', async () => {
@@ -195,7 +195,7 @@ describe('LLMPromptService - Unit Tests (Task 11.1)', () => {
  const originalUpdatedAt = stored.updatedAt;
 
  // Wait a bit to ensure timestamp difference
- await new Promise((resolve) => setTimeout(resolve, 10));
+ await new Promise((resolve: any) => setTimeout(resolve, 10));
 
  const updated = await service.updatePrompt(stored.id, { confidence: 0.9 });
 
@@ -320,9 +320,9 @@ describe('LLMPromptService - Unit Tests (Task 11.1)', () => {
  expect(page2.length).toBe(5);
 
  // Ensure no overlap
- const page1Ids = page1.map((p) => p.id);
- const page2Ids = page2.map((p) => p.id);
- const overlap = page1Ids.filter((id) => page2Ids.includes(id));
+ const page1Ids = page1.map((p: any) => p.id);
+ const page2Ids = page2.map((p: any) => p.id);
+ const overlap = page1Ids.filter((id: any) => page2Ids.includes(id));
 
  expect(overlap).toEqual([]);
  });
@@ -340,7 +340,7 @@ describe('LLMPromptService - Unit Tests (Task 11.1)', () => {
  prompts.push(p);
 
  // Small delay to ensure different timestamps
- await new Promise((resolve) => setTimeout(resolve, 5));
+ await new Promise((resolve: any) => setTimeout(resolve, 5));
  }
 
  const history = await service.retrievePromptHistory(10, 0);

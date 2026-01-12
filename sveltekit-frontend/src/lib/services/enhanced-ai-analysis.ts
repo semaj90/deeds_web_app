@@ -292,12 +292,12 @@ Analysis:`;
  async batchAnalyzeDocuments(documents: LegalDocument[]): Promise<SemanticAnalysis[]> {
   console.log(`🔄 Starting batch analysis of ${documents.length} documents`);
   const results = await Promise.allSettled(
-   documents.map(doc => this.analyzeDocument(doc))
+   documents.map((doc: any) => this.analyzeDocument(doc))
   );
   const successful = results
-   .filter(item => item.status === 'fulfilled')
-   .map(result => (result as PromiseFulfilledResult<SemanticAnalysis>).value);
-  const failed = results.filter(item => item.status === 'rejected').length;
+   .filter((item: any) => item.status === 'fulfilled')
+   .map((result: any) => (result as PromiseFulfilledResult<SemanticAnalysis>).value);
+  const failed = results.filter((item: any) => item.status === 'rejected').length;
 
   console.log(`✅ Batch complete: ${successful.length} successful, ${failed} failed`);
   return successful;

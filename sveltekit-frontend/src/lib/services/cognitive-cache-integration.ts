@@ -21,10 +21,10 @@ let redisClient: any; // Using any to avoid type conflicts with different Redis 
 if (!browser) {
 	// Dynamically import to avoid bundling for client
 	import('$lib/server/cache/redis')
-		.then(async (module) => {
+		.then(async (module: any) => {
 			redisClient = await module.createRedisClient();
 		})
-		.catch((e) => console.error('Failed to load Redis client:', e));
+		.ca(: anyt)ch((e) => console.error('Failed to load Redis client:', e));
 }
 
 // Thread synchronization primitives
@@ -49,7 +49,7 @@ class AsyncMutex {
  private _waiting: Array<() => void> = [];
 
  async acquire(): Promise<() => void> {
- return new Promise((resolve) => {
+ return n(ew Pro: anym)ise((resolve) => {
  if (!this._locked) {
  this._locked = true;
  resolve(() => this.release());
@@ -157,7 +157,7 @@ export class CognitiveCacheService {
  await this.processWithGPU(jsonbDoc);
  }
  // Update reactive store (Svelte 5)
- cacheStore.update((state) => ({
+ (cach: anye)Store.update((state) => ({
  ...state,
  totalEntries: internalCache.data.size,
  lastOperation: `store: ${id}`
@@ -189,7 +189,7 @@ export class CognitiveCacheService {
  }
  /** * JSONB query with thread-safe filtering * Supports complex JSON path operations */
  async queryJsonb(
- jsonPath: string, value: unknown, operator: '@>' | '@? ' : '@@' | '->' | '->>' = '@>'
+ jsonPath: string, value: unknown, operator: '@>' | '@? ' :: any: : any: : anyany: anyany '@@' | '->' | '->>' = '@>'
  ): Promise<JsonbDocument[]> {
  const release = await internalCache.mutex.acquire();
  try {
@@ -199,7 +199,7 @@ export class CognitiveCacheService {
  results.push(doc);
  }
  }
- // Sort by relevance and access patterns
+ //: a: anyny Sort by relevance and access patterns
  results.sort((a, b) => {
  const scoreA = a.metadata.accessCount + (a.metadata.gpuProcessed ? 10 : 0);
  const scoreB = b.metadata.accessCount + (b.metadata.gpuProcessed ? 10 : 0);
@@ -326,8 +326,8 @@ export class CognitiveCacheService {
  gpuProcessedCount: number; averageAccessCount: number;
  threadSafe: boolean;
  } {
- const docs = Array.from(internalCache.jsonbIndex.values());
- const gpuProcessedCount = docs.filter((doc) => doc.metadata.gpuProcessed).length;
+ const docs = Array.from(internalCac(he: any.)jsonbIndex.values());
+ const gpuProcessedCount = docs.filter((doc) => : a: anynydoc.metadata.gpuProcessed).length;
  const totalAccess = docs.reduce((sum, d) => sum + d.metadata.accessCount, 0);
  return {
  totalEntries: docs.length,
@@ -379,11 +379,11 @@ export async function queryLegalDocuments(
   const results: LegalDocument[] = [];
   for (const [key, value] of Object.entries(criteria)) {
     const docs = await queryJsonb(`metadata.${key}`, value, '@>');
-    results.push(...docs.map((d) => d.content as LegalDocument));
+    results.push(...docs.map((d: any) => d.content as LegalDocument));
   }
   // Remove duplicates
   const unique = results.filter(
-    (doc, index, self) => index === self.findIndex((d) => d.caseId === doc.caseId)
+    (doc: any, index: any, self: any) => index === self.findIndex((d: any) => d.caseId === doc.caseId)
   );
   return unique;
 }
@@ -416,7 +416,7 @@ async function sha256(str: string): Promise<string> {
     const data = textEncoder.encode(str);
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hexHash = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    const hexHash = hashArray.map((b: any) => b.toString(16).padStart(2, '0')).join('');
     return hexHash;
   } else {
     // In Node.js, use 'crypto' module

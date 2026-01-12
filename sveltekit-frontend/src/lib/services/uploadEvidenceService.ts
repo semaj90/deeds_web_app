@@ -89,11 +89,11 @@ export async function uploadFileToMinIO(
  presignedUrl: string, file: File,
  onProgress?: (progress: number) => void
 ): Promise<void> {
- return new Promise((resolve, reject) => {
+ return new Promise((resolve: any, reject: any) => {
  const xhr = new XMLHttpRequest();
 
  // Track upload progress
- xhr.upload.addEventListener('progress', (event) => {
+ xhr.upload.addEventListener('progress', (event: any) => {
  if (event.lengthComputable && onProgress) {
  const progress = (event.loaded / event.total) * 100;
  onProgress(progress);
@@ -167,10 +167,10 @@ export async function streamProcessingEvents(
  onEvent: (event: ProcessingEvent) => void,
  onError?: (error: Error) => void
 ): Promise<void> {
- return new Promise((resolve, reject) => {
+ return new Promise((resolve: any, reject: any) => {
  const eventSource = new EventSource(`${API_BASE}/${ jobId }/stream`);
 
- eventSource.onmessage = (event) => {
+ eventSource.onmessage = (event: any) => {
  try {
  const data = JSON.parse(event.data);
  onEvent(data);
@@ -185,7 +185,7 @@ export async function streamProcessingEvents(
  }
  };
 
- eventSource.onerror = (error) => {
+ eventSource.onerror = (error: any) => {
  eventSource.close();
  const err = new Error('SSE connection failed');
  if (onError) {
@@ -223,7 +223,7 @@ export async function uploadEvidence(
 
  // Stream processing events
  if (onProcessingEvent) {
- streamProcessingEvents(completion.job_id, onProcessingEvent, onError).catch((error) => {
+ streamProcessingEvents(completion.job_id, onProcessingEvent, onError).catch((error: any) => {
  if (onError) {
  onError(error);
  }

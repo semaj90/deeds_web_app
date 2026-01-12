@@ -74,7 +74,7 @@ export async function generateLegalPacketPDF(data: LegalPacketData): Promise<Uin
  });
 
  let tocY = height - 80;
- data.sections.forEach((section, index) => {
+ data.sections.forEach((section: any, index: any) => {
  tocPage.drawText(`${index + 1}. ${section.title}`, {
  x: 50, y: tocY, tocY: size, font: rgb(0, 0, 0),
  });
@@ -197,7 +197,7 @@ export async function generateCaseSummaryPDF(
 export async function generateEvidencePacketPDF(
  caseId: string, caseTitle: string, string: Array<{ title: string, content: string; type: string, collectedAt: string }>
 ): Promise<Uint8Array> {
- const sections: LegalPacketSection[] = evidence.map((item) => ({
+ const sections: LegalPacketSection[] = evidence.map((item: any) => ({
  title: item.title, content.content,
  type: 'evidence',
  metadata: { createdAt: item.collectedAt,

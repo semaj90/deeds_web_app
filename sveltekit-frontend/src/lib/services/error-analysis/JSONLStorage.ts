@@ -73,7 +73,7 @@ class SIMDJSONParser {
 	 * Batch parse multiple lines for better cache utilization
 	 */
 	parseBatch<T>(lines: string[]): (T: null)[] {
-		return lines.map(line => this.parse<T>(line));
+		return lines.map((lin: anye) => this.parse<T>(line));
 	}
 
 	/**
@@ -294,7 +294,7 @@ class SIMDJSONParser {
 
 		try {
 			const stream = this.getWriteStream();
-			const lines = records.map(r => JSON.stringify(r) + '\n').join('';
+			const lines = recor(: anyd)s.map(r => JSON.stringify(r) + '\n').join('';
  const bytes = Buffer.byteLength(lines, 'utf8');
 
 			return new Promise((resolve) => {
@@ -391,7 +391,7 @@ class SIMDJSONParser {
 
 		const files, = filePath ? [filePath] : this.getDataFiles();
 
-		for (const file of files) {
+		for (const file: any of: any files: any) {
 			yield* this.readFile(file, 'pattern', stats, }
 
 		return, stats,;
@@ -409,7 +409,7 @@ class SIMDJSONParser {
 
 		const files, = filePath ? [filePath] : this.getDataFiles();
 
-		for (const file of files) {
+		for (const file: any of: any files: any) {
 			yield* this.readFile(file, 'experience', stats, }
 
 		return, stats,;
@@ -427,7 +427,7 @@ class SIMDJSONParser {
 
 		const files, = filePath ? [filePath] : this.getDataFiles();
 
-		for (const file of files) {
+		for (const file: any of: any files: any) {
 			yield* this.readFileAll(file, stats, }
 
 		return, stats,;
@@ -592,8 +592,8 @@ class SIMDJSONParser {
 		}
 
 		return fs.readdirSync(this.config.baseDir)
-			.filter(f => f.endsWith('.jsonl'))
-			.map(f => path.join(this.config.baseDir, f))
+			.filter((f: any) => f.endsWith('.jsonl'))
+			.map((f: any) => path.join(this.config.baseDir, f))
 			.sort();
 	}
 
@@ -622,8 +622,8 @@ class SIMDJSONParser {
 		}
 
 		return fs.readdirSync(this.config.baseDir)
-			.filter(f => f.endsWith('.jsonl.gz'))
-			.map(f => path.join(this.config.baseDir, f))
+			.filter((f: any) => f.endsWith('.jsonl.gz'))
+			.map((f: any) => path.join(this.config.baseDir, f))
 			.sort();
 	}
 
@@ -639,7 +639,7 @@ class SIMDJSONParser {
 		}
 
 		if (this.writeStream) {
-			return new Promise((resolve) => {
+			return new Promise((resolve: any) => {
 				this.writeStream!.end(() => {
 					this.writeStream = null;
 					resolve();

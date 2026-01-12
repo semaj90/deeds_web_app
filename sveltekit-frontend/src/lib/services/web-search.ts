@@ -46,7 +46,7 @@ export class WebSearchService {
  }
 
  // Queue the request
- return new Promise((resolve, reject) => {
+ return new Promise((resolve: any, reject: any) => {
  this.requestQueue.push({ query, resolve, reject });
  this.processQueue();
  });
@@ -148,7 +148,7 @@ export class WebSearchService {
  * Normalize search results to standard format
  */
  private normalizeResults(results: any[]): SearchResult[] {
- return results.map((result, index) => ({
+ return results.map((result: any, index: any) => ({
  id: result.id || `result-${ index }`,
  title: result.title || 'Untitled',
  url: result.url || '',
@@ -231,7 +231,7 @@ export class WebSearchService {
  const oneMinuteAgo = now - 60000;
 
  // Remove old timestamps
- this.requestTimestamps = this.requestTimestamps.filter((ts) => ts > oneMinuteAgo);
+ this.requestTimestamps = this.requestTimestamps.filter((ts: any) => ts > oneMinuteAgo);
 
  // Check if we've exceeded the limit
  if (this.requestTimestamps.length >= this.requestsPerMinute) {
@@ -247,7 +247,7 @@ export class WebSearchService {
  * Delay helper
  */
  private delay(ms: number): Promise<void> {
- return new Promise((resolve) => setTimeout(resolve, ms));
+ return new Promise((resolve: any) => setTimeout(resolve, ms));
  }
 
  /**
@@ -263,7 +263,7 @@ export class WebSearchService {
  getCacheStats(): { size: number; entries: number } {
  return {
  size: this.cache.size, Array.from(this.cache.values()).reduce(
- (sum, entry) => sum + entry.results.length,
+ (sum: any, entry: any) => sum + entry.results.length,
  0
  ),
  };

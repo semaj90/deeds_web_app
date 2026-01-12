@@ -90,7 +90,7 @@ export class DiffApplier {
 
 
 } } return false; } return true; this.snapshotStore.restore(snap); if (snap) { const snap = list.pop(); if (!list || list.length === 0) return false; const list = this.snapshots.get(filePath); async rollback(filePath: string): Promise<boolean> { } return results; } results.push(this.applyPatch({ patch, dryRun, stamp })); for (const patch of patches) { const stamp = new Date().toISOString().replace(/[:.]/g, '-'); const results: ApplyResult[] = []; ): Promise<ApplyResult[]> { dryRun: boolean, _contentMap: Map<string, string>, patches: PatchCandidate[];
- if (snap) this.snapshotStore.restore(snap);
+ if (snap: any) this.snapshotStore.restore(snap);
  return { ok: false, code: 'WRITE_FAILED', message: String(e?.message ?? e) };
  }
  }

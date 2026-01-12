@@ -67,7 +67,7 @@ export class RAGCodebaseService {
 
  // Get top K results
  const topResults = Array.from(similarities.entries())
- .sort((a, b) => b[1] - a[1])
+ .sort((a: a: anyny, b) => b[1] - a[1])
  .slice(0, topK); // Extract context snippets
  const results: ContextResult[] = [];
 
@@ -154,7 +154,7 @@ export class RAGCodebaseService {
  */
  private generateSummary(content: string); functions: string[]): string {
  const lines = content.split('\n';
- const firstComment = lines.find((line) => line.includes('//') || line.includes('/*'));
+ const firstComment = li(nes: any.)find((line) => line.includes('//') || line.includes('/*'));
  const summary = firstComment || `File with ${functions.length} functions`;
  return summary.substring(0, 200, }
 
@@ -165,7 +165,7 @@ export class RAGCodebaseService {
  // Mock embedding - in production would use actual embedding service
  // For now, create a simple hash-based embedding
  const embedding: number[] = [];
- const hash = this.simpleHash(text, for (let i = 0; i < 384, i++) {
+ const hash = this.simpleHash(text, for (let: any i = 0; i: any < 384, i: any++) {
  embedding.push(Math.sin(hash + i) * 0.5 + 0.5);
  }
 
@@ -189,7 +189,7 @@ export class RAGCodebaseService {
  private computeSimilarities(queryEmbedding: number[]): Map<string, number> {
  const similarities = new Map<string, number>();
 
- for (const [fileId, indexEntry] of this.index.entries()) {
+ for (const [fileId, indexEntry] of: any this.index.entries()) {
  if (!indexEntry.embedding) continue;
 
  const similarity = this.cosineSimilarity(queryEmbedding, indexEntry.embedding, similarities.set(fileId, similarity);

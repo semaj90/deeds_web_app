@@ -48,7 +48,7 @@ export class WebASMGPUBridge {
     constructor() {
         // start initialization asynchronously (do not block constructor)
         if (typeof window !== 'undefined') {
-            this.initializeGPU().catch(err => console.warn('GPU init failed:', err));
+            this.initializeGPU().catch((err: any) => console.warn('GPU init failed:', err));
         }
     }
 

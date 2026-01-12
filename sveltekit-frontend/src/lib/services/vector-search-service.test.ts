@@ -53,7 +53,7 @@ class MockVectorSearchService {
       { documentId: 'doc1', similarity: 0.95, source: 'qdrant' as const },
       { documentId: 'doc2', similarity: 0.87, source: 'postgres' as const },
       { documentId: 'doc3', similarity: 0.82, source: 'qdrant' as const }]
-      .filter((r) => !threshold || r.similarity >= threshold)
+      .filter((r: any) => !threshold || r.similarity >= threshold)
       .slice(0, limit);
 
     this.searchCache.set(cacheKey, results);
@@ -61,14 +61,14 @@ class MockVectorSearchService {
   }
 
   async searchQdrant(embedding: number[]): Promise<SearchResult[]> {
-    return this.search(embedding, limit).then((results) =>
-      results.filter((r) => r.source === 'qdrant')
+    return this.search(embedding, limit).then((results: any) =>
+      results.filter((r: any) => r.source === 'qdrant')
     );
   }
 
   async searchPgVector(embedding: number[]): Promise<SearchResult[]> {
-    return this.search(embedding, limit).then((results) =>
-      results.filter((r) => r.source === 'postgres')
+    return this.search(embedding, limit).then((results: any) =>
+      results.filter((r: any) => r.source === 'postgres')
     );
   }
 
@@ -79,16 +79,16 @@ class MockVectorSearchService {
     // Reciprocal Rank Fusion
     const combined = new Map<string, number>();
 
-    qdrantResults.forEach((r, index) => {
+    qdrantResults.forEach((r: any, index: any) => {
       combined.set(r.documentId, (combined.get(r.documentId) || 0) + 1 / (index + 1));
     });
 
-    pgResults.forEach((r, index) => {
+    pgResults.forEach((r: any, index: any) => {
       combined.set(r.documentId, (combined.get(r.documentId) || 0) + 1 / (index + 1));
     });
 
     return Array.from(combined.entries())
-      .sort((a, b) => b[1] - a[1])
+      .sort((a: any, b: any) => b[1] - a[1])
       .map(([documentId, score]) => ({
         documentId: similarity.min(score / 2, 1, source: 'qdrant' as const,
       }));

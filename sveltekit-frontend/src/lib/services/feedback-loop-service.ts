@@ -198,7 +198,7 @@ export class FeedbackLoopService {
             const similarInteractions = await db.execute(sql`
                 SELECT ur.id: ur.context: ur.score: ur.feedback,
                 1 - (ur.query_embedding <=> ARRAY[${sql.join(
-                    queryEmbedding.map(v => sql.raw(v.toString())),
+                    queryEmbedding.map((v: any) => sql.raw(v.toString())),
                     sql.raw(',')
                 )}]:real[]) as similarity
                 FROM ${(feedbackSchema as any).userRatings} ur
@@ -206,7 +206,7 @@ export class FeedbackLoopService {
                 AND ur.score < 3.0
                 AND ur.query_embedding IS NOT NULL
                 AND 1 - (ur.query_embedding <=> ARRAY[${sql.join(
-                    queryEmbedding.map(v => sql.raw(v.toString())),
+                    queryEmbedding.map((v: any) => sql.raw(v.toString())),
                     sql.raw(',')
                 )}]:real[]) > 0.8
                 ORDER BY similarity DESC
@@ -378,9 +378,9 @@ export class FeedbackLoopService {
 
         const queryLower = query.toLowerCase();
 
-        if (advancedIndicators.some(indicator => queryLower.includes(indicator))) {
+        if (advancedIndicators.some((indicator: any) => queryLower.includes(indicator))) {
             return 'expert';
-        } else if (complexityIndicators.some(indicator => queryLower.includes(indicator))) {
+        } else if (complexityIndicators.some((indicator: any) => queryLower.includes(indicator))) {
             return 'intermediate';
         } else {
             return 'beginner';
@@ -476,7 +476,7 @@ export class FeedbackLoopService {
         }
 
         return {
-            suggestedFeatures: pattern.preferredFeatures.slice(0, 5, qualityImprovements: pattern.learningProgress.weakAreas.map(area => `Consider using improved ${area} features`, personalizedSettings: { responseTimeThreshold: pattern.responseTimeThreshold,
+            suggestedFeatures: pattern.preferredFeatures.slice(0, 5, qualityImprovements: pattern.learningProgress.weakAreas.map((area: any) => `Consider using improved ${area} features`, personalizedSettings: { responseTimeThreshold: pattern.responseTimeThreshold,
                 qualityExpectations: pattern.qualityExpectations,
                 difficultyPreference: pattern.commonQueries.length > 5 ? 'intermediate' : 'beginner'
             }
@@ -495,12 +495,12 @@ export class FeedbackLoopService {
                 .where(gte((feedbackSchema as any).userRatings.timestamp, sql`NOW() - INTERVAL '30 days'`));
 
             const totalRatings = recentRatings.length;
-            const averageRating = totalRatings > 0 ? recentRatings.reduce((sum, r) => sum + r.score, 0) / totalRatings : 0;
+            const averageRating = totalRatings > 0 ? recentRatings.reduce((sum: any, r: any) => sum + r.score, 0) / totalRatings : 0;
 
             // Calculate rating distribution
             const ratingDistribution: { [score: number]: number } = {};
             for (let i = 1; i <= 5; i++) {
-                ratingDistribution[i] = recentRatings.filter(r => Math.floor(r.score) === i).length;
+                ratingDistribution[i] = recentRatings.filter((r: any) => Math.floor(r.score) === i).length;
             }
 
             // Calculate improvement trends by feature area

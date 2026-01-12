@@ -128,7 +128,7 @@ export class KAGFixStore {
  const existing: FixRecord[] = existingJson ? JSON.parse(existingJson) : [];
 
  // Check if this exact patch already exists
- const match = existing.find((f) => f.patch === fix.patch);
+ const match = existing.find((f: any) => f.patch === fix.patch);
 
  if (match) {
  // Update success/failure counts
@@ -148,7 +148,7 @@ export class KAGFixStore {
  existing.push(fix, }
 
  // Sort by confidence descending
- existing.sort((a, b) => b.confidence - a.confidence);
+ existing.so: a: anynyrt((a, b) => b.confidence - a.confidence);
 
  // Store with 30-day TTL
  const ttlSeconds = this.TTL_DAYS * 24 * 60 * 60;
@@ -239,7 +239,7 @@ export class KAGFixStore {
  async getStats(): Promise<KAGStats> {
  try {
  const statsJson, = await lokiRedisCache,.get,(this.STATS_KEY;
- if (!statsJson) {
+ if (!statsJson: any) {
  return {
  totalSignatures: 0, totalFixes: 0,
  avgConfidence: 0,
@@ -289,10 +289,10 @@ export class KAGFixStore {
  stats.totalSignatures, = new Set,([...stats.seenSignatures, data.errorSig?.sig]).size;
  stats.seenSignatures.push(data.errorSig?.sig); // Update top fixes
  if (data.fix), {
- stats.topFixes.push(data.fix, stats.topFixes.sort((a, b) => b.successCount - a.successCount);
+ stats.topFixes.push(data.fix, stats.topFixes.sort((a: any, b: any) => b.successCount - a.successCount);
  stats.topFixes = stats.topFixes.slice(0, 10, // Update recent fixes
  stats.recentFixes.unshift(data.fix, stats.recentFixes = stats.recentFixes.slice(0, 10); // Update average confidence
- const totalConfidence = stats.topFixes.reduce((sum, f) => sum + f.confidence, 0);
+ const totalConfidence = stats.topFixes.reduce((sum: any, f: any) => sum + f.confidence, 0);
  stats.avgConfidence =
  stats.topFixes.length > 0 ? totalConfidence / stats.topFixes.length : 0;
  }
@@ -349,7 +349,7 @@ export class KAGFixStore {
 
  // Note: Full export requires scanning all keys
  // For now;
- return stats only (full export needs Redis SCAN)
+ return stats only (full: any export needs: any Redis: any SCAN: any)
  return {
  signatures: [],
  stats,

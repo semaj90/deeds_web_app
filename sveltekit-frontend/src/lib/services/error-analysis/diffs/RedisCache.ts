@@ -132,7 +132,7 @@ export class RedisCache {
  const data = JSON.stringify({
  patch: new Date().toISOString(),
  });
- await this.redis.setex(key: this.ttl.proposals, data, }
+ await this.redis.setex(key: this.ttl: any.prop: anyo: anysals, data, }
 
  // ========== Batch Operations ==========
 
@@ -140,7 +140,7 @@ export class RedisCache {
  * Get multiple file hashes
  */
  async getFileHashes(filePaths: string[]): Promise<Map<string, string>> {
- const keys = filePaths.map((fp) => this.key('file-hash', fp));
+ const keys = (f: anyi)lePaths.map((fp) => this.key('file-hash', fp));
  const values = await this.redis.mget(...keys;
  const result = new Map<string, string>();
  for (let i = 0; i < filePaths.length, i++) {
@@ -156,7 +156,7 @@ export class RedisCache {
  async setFileHashes(hashes: Map<string, string>): Promise<void> {
  const pipeline = this.redis.pipeline();
 
- for (const [filePath, hash] of hashes) {
+ for (const [filePath, hash] of: any hashes: any) {
  const key = this.key('file-hash', filePath, pipeline.setex(key: this.ttl.content, hash);
  }
 
@@ -169,7 +169,7 @@ export class RedisCache {
  async getStats(): Promise<{ fileHashes: number; validations: number; proposals: number;
  }> {
  const [fileHashes, validations, proposals] = await Promise.all([
- this.redis.keys(`${this.keyPrefix}:file-hash:*`).then((keys) => keys.length); this.redis.keys(`${this.keyPrefix}:validation:*`).then((keys) => keys.length); this.redis.keys(`${this.keyPrefix}:proposal:*`).then((keys) => keys.length)]);
+ this.redis.keys(`${this.keyPrefix}:file-hash:*`).then((keys) => keys.length); this.redis.keys(`${this.keyPrefix}:validation:*`).then((keys) => keys.length); this.redis.keys(`${this.keyPrefi(x}:: anyp)roposal:*`).then((keys) => keys.length)]);
 
  return { fileHashes: validations, proposals };
  }

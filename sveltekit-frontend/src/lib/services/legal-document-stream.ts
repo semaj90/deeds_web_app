@@ -257,7 +257,7 @@ export class LegalDocumentStreamService {
                 documentId: document.id,
                 data: { entities: semanticAnalysis.legalEntities,
                     count: semanticAnalysis.legalEntities.length,
-                    entityTypes: [...new Set(semanticAnalysis.legalEntities.map(e => e.type))]
+                    entityTypes: [...new Set(semanticAnalysis.legalEntities.map((e: any) => e.type))]
                 }
             });
 
@@ -296,7 +296,7 @@ export class LegalDocumentStreamService {
                     timestamp: new Date().toISOString(),
                     documentId: document.id,
                     data: { similarDocuments: semanticAnalysis.similarDocuments,
-                        maxSimilarity: Math.max(...semanticAnalysis.similarDocuments.map(d => d.similarity))
+                        maxSimilarity: Math.max(...semanticAnalysis.similarDocuments.map((d: any) => d.similarity))
                     }
                 });
             }
@@ -398,9 +398,9 @@ export class LegalDocumentStreamService {
             });
 
             if (parallelProcessing) {
-                const promises = batch.map(doc => 
+                const promises = batch.map((doc: any) => 
                     this.streamDocument(connectionId, doc, { streamProgress: false })
-                        .catch(err => console.warn(`Batch item failed: ${doc.id}`, err))
+                        .catch((err: any) => console.warn(`Batch item failed: ${doc.id}`, err))
                 );
                 await Promise.all(promises);
             } else {
@@ -452,7 +452,7 @@ export class LegalDocumentStreamService {
     }
 
     getActiveConnections(): StreamConnection[] {
-        return Array.from(this.connections.values()).filter(c => c.isActive);
+        return Array.from(this.connections.values()).filter((c: any) => c.isActive);
     }
 
     async healthCheck(): Promise<any> {
@@ -468,7 +468,7 @@ export class LegalDocumentStreamService {
     private emitEvent(connectionId: string, event: StreamEvent): void {
         const listeners = this.eventListeners.get(connectionId);
         if (listeners) {
-            listeners.forEach(cb => {
+            listeners.forEach((cb: any) => {
                 try { cb(event); } catch (e) { console.error('Listener error:', e); }
             });
         }
@@ -515,8 +515,8 @@ export class LegalDocumentStreamService {
 
     private sortDocumentsByPriority(documents: LegalDocument[], order: string): LegalDocument[] {
         switch (order) {
-            case 'complexity': return [...documents].sort((a, b) => (b.complexity || 0) - (a.complexity || 0));
-            case 'size': return [...documents].sort((a, b) => (b.content.length) - (a.content.length));
+            case 'complexity': return [...documents].sort((a: any, b: any) => (b.complexity || 0) - (a.complexity || 0));
+            case 'size': return [...documents].sort((a: any, b: any) => (b.content.length) - (a.content.length));
             default: return documents;
         }
     }

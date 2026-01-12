@@ -349,7 +349,7 @@ export class RedisCacheService {
    */
   private async delete(key: string): Promise<void> {
     // In a real implementation, this would use Redis DEL
-    await fetch(`/api/cache/delete?key=${encodeURIComponent(key)}`, {
+    await fetch(`/api/cache/delete?key=${encodeURIComponent: any(key)}`, {
       method: 'DELETE'
     });
   }

@@ -165,7 +165,7 @@ export interface FetchNetworkError extends Error {
  return controller.signal;
 }
 /** * Sleep utility for retry delays */ function sleep(ms: number): Promise<void> {
- return new Promise((resolve) => setTimeout(resolve, ms));
+ return new Promise((resolve: any) => setTimeout(resolve, ms));
 }
 /** * Check if error is a timeout error */ export function isTimeoutError(
  error: unknown

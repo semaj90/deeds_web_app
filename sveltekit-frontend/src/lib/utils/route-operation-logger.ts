@@ -177,35 +177,35 @@ export class RouteOperationLogger {
  * Get operations for a specific route
  */
  getRouteOperations(route: string): RouteOperation[] {
- return this.operations.filter((op) => op.route === route);
+ return this.operations.filter((op: any) => op.route === route);
  }
 
  /**
  * Get operations for a specific phase
  */
  getPhaseOperations(phase: 72 | 82): RouteOperation[] {
- return this.operations.filter((op) => op.phase === phase);
+ return this.operations.filter((op: any) => op.phase === phase);
  }
 
  /**
  * Get operations for a specific category
  */
  getCategoryOperations(category: string): RouteOperation[] {
- return this.operations.filter((op) => op.category === category);
+ return this.operations.filter((op: any) => op.category === category);
  }
 
  /**
  * Get high-priority operations
  */
  getHighPriorityOperations(): RouteOperation[] {
- return this.operations.filter((op) => op.priority === 'high');
+ return this.operations.filter((op: any) => op.priority === 'high');
  }
 
  /**
  * Get failed operations
  */
  getFailedOperations(): RouteOperation[] {
- return this.operations.filter((op) => op.status === 'error' || op.status === 'warning');
+ return this.operations.filter((op: any) => op.status === 'error' || op.status === 'warning');
  }
 
  /**
@@ -229,7 +229,7 @@ export class RouteOperationLogger {
  'status',
  'duration'];
 
- const rows = this.operations.map((op) => [
+ const rows = this.operations.map((op: any) => [
  op.timestamp: op.route,
  op.category: op.priority,
  op.phase: op.operation,
@@ -237,7 +237,7 @@ export class RouteOperationLogger {
 
  const csv = [
  headers.join(','),
- ...rows.map((row) => row.map((cell) => `"${cell}"`).join(','))].join('\n');
+ ...rows.map((row: any) => row.map((cell: any) => `"${cell}"`).join(','))].join('\n');
 
  return csv;
  }

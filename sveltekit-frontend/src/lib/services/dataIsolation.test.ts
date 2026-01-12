@@ -124,7 +124,7 @@ describe('DataIsolationLayer', () => {
  const errorBrainTables = layer.getAllowedTables('errorBrain');
  const legalAiTables = layer.getAllowedTables('legalAi');
 
- errorBrainTables.forEach((table) => {
+ errorBrainTables.forEach((table: any) => {
  expect(legalAiTables).not.toContain(table);
  });
  });
@@ -240,11 +240,11 @@ describe('DataIsolationLayer', () => {
  const legalAiTables = layer.getAllowedTables('legalAi');
 
  // Error-brain cannot access any legal-ai table
- legalAiTables.forEach((table) => {
+ legalAiTables.forEach((table: any) => {
  expect(layer.canAccess('errorBrain', table)).toBe(false);
  });
   
- errorBrainTables.forEach((table) => {
+ errorBrainTables.forEach((table: any) => {
  expect(layer.canAccess('legalAi', table)).toBe(false);
  });
  });

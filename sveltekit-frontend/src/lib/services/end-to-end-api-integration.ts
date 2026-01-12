@@ -67,13 +67,13 @@ export class LegalAIWorkflowOrchestrator {
             lastUpdated: Date.now(),
             progress: 0
         };
-        this.workflows.update(w => ({ ...w, [id]: workflow }));
+        this.workflows.update((w: any) => ({ ...w, [id]: workflow }));
         this.currentWorkflow.set(id);
         return id;
     }
 
     private updateWorkflow(id: string, update: Partial<WorkflowState>) {
-        this.workflows.update(w => {
+        this.workflows.update((w: any) => {
             if (!w[id]) return w;
             return {
                 ...w,
@@ -87,9 +87,9 @@ export class LegalAIWorkflowOrchestrator {
         this.updateWorkflow(id, { status: 'processing', message: 'Starting research...', progress: 10 });
 
         // Simulate async work
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve: any) => setTimeout(resolve, 1000));
         this.updateWorkflow(id, { progress: 50, message: 'Analyzing precedents...' });
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve: any) => setTimeout(resolve, 1000));
 
         const result = { success: true, results: [] };
         this.updateWorkflow(id, { status: 'completed', progress: 100, message: 'Complete', result });
@@ -100,7 +100,7 @@ export class LegalAIWorkflowOrchestrator {
         const id = this.createWorkflow('document-processing');
         this.updateWorkflow(id, { status: 'processing', message: 'Processing document...', progress: 20 });
 
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        await new Promise((resolve: any) => setTimeout(resolve, 1500));
 
         const result = { success: true, documentId: request.documentId };
         this.updateWorkflow(id, { status: 'completed', progress: 100, message: 'Processed', result });
@@ -111,7 +111,7 @@ export class LegalAIWorkflowOrchestrator {
         const id = this.createWorkflow('case-creation');
         this.updateWorkflow(id, { status: 'processing', message: 'Creating case...', progress: 30 });
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve: any) => setTimeout(resolve, 1000));
 
         const result = { success: true, caseId: 'case_' + Date.now() };
         this.updateWorkflow(id, { status: 'completed', progress: 100, message: 'Case created', result });
@@ -127,8 +127,8 @@ export const workflowStore = workflowOrchestrator.workflows;
 export const currentWorkflowStore = workflowOrchestrator.currentWorkflow;
 export const healthStore = legalAI.healthStatus;
 
-export const isSystemHealthy = derived(healthStore, ($health) => {
-    return Object.values($health).every(status => status);
+export const isSystemHealthy = derived(healthStore, ($health: any) => {
+    return Object.values($health).every((status: any) => status);
 });
 
 

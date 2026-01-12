@@ -126,7 +126,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
 
  const typeMatches = await kb.searchByErrorType('type-mismatch', 10);
  expect(typeMatches.length).toBe(2);
- expect(typeMatches.every((p) => p.errorType === 'type-mismatch')).toBe(true);
+ expect(typeMatches.every((p: any) => p.errorType === 'type-mismatch')).toBe(true);
  });
 
  it('should return empty array for non-existent error type', async () => {

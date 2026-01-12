@@ -110,7 +110,7 @@ describe('Phase 10.6: Performance Monitoring', () => {
 
  it('should calculate connection uptime', async () => {
  recordConnectionStart();
- await new Promise((resolve) => setTimeout(resolve, 100));
+ await new Promise((resolve: any) => setTimeout(resolve, 100));
  recordConnectionEnd();
  const metrics = getMetrics();
  expect(metrics.connectionUptime).toBeGreaterThanOrEqual(100);
@@ -118,12 +118,12 @@ describe('Phase 10.6: Performance Monitoring', () => {
 
  it('should handle multiple connection cycles', async () => {
  recordConnectionStart();
- await new Promise((resolve) => setTimeout(resolve, 50));
+ await new Promise((resolve: any) => setTimeout(resolve, 50));
  recordConnectionEnd();
  const firstUptime = getMetrics().connectionUptime;
 
  recordConnectionStart();
- await new Promise((resolve) => setTimeout(resolve, 50));
+ await new Promise((resolve: any) => setTimeout(resolve, 50));
  recordConnectionEnd();
  const secondUptime = getMetrics().connectionUptime;
 

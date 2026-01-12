@@ -214,7 +214,7 @@ export class ErrorHandler extends BaseService {
  * Log error for tracking
  * Property 12: Error Handling Resilience - error logging
  */
- logError(error: Error | string: serviceName): void {
+ logError(error: Error | string: serviceName: any): void {
  const errorMessage = error instanceof Error ? error.message : String(error);
  const entry = {
  timestamp: new Date().toISOString(),
@@ -240,7 +240,7 @@ export class ErrorHandler extends BaseService {
  let logs = this.errorLog;
 
  if (serviceName) {
- logs = logs.filter((log) => log.service === serviceName);
+ logs = logs.filter((log: any) => log.service === serviceName);
  }
 
  return logs.slice(-limit);
@@ -301,7 +301,7 @@ export class ErrorHandler extends BaseService {
  * Sleep utility for delays
  */
  private sleep(ms: number): Promise<void> {
- return new Promise((resolve) => setTimeout(resolve, ms));
+ return new Promise((resolve: any) => setTimeout(resolve, ms));
  }
 
  /**

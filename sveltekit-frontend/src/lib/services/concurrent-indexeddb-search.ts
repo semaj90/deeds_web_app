@@ -80,7 +80,7 @@ export class ConcurrentIndexedDBSearch {
  console.log('⚠️ IndexedDB not available in SSR mode');
  return;
  }
- return new Promise((resolve, reject) => {
+ return new Promise((resolve: any, reject: any) => {
  const request = indexedDB.open('LegalAISearchDB', 1);
  request.onerror = () => reject(request.error);
  request.onsuccess = () => {
@@ -106,7 +106,7 @@ export class ConcurrentIndexedDBSearch {
 
  private async loadDocuments(): Promise<void> {
  if (!this.db) throw new Error('Database not initialized');
- return new Promise((resolve, reject) => {
+ return new Promise((resolve: any, reject: any) => {
  const transaction = this.db!.transaction(['documents'], 'readonly');
  const store = transaction.objectStore('documents');
  const request = store.getAll();
@@ -253,7 +253,7 @@ export class ConcurrentIndexedDBSearch {
  const fuseResults = this.fuse.search(request.query || '');
  // narrow from unknown to expected shape to avoid `any`
  const typedResults = fuseResults as unknown as Array<{ item: SearchableDocument }>;
- results = typedResults.map((r) => r.item);
+ results = typedResults.map((r: any) => r.item);
  } else {
  results = await this.performWorkerSearch(request);
  }
@@ -293,24 +293,24 @@ export class ConcurrentIndexedDBSearch {
  documents: SearchableDocument[],
  options?: SearchRequest['options']
  ): Promise<SearchableDocument[]> {
- return new Promise((resolve, reject) => {
+ return new Promise((resolve: any, reject: any) => {
  const worker = this.workers[workerIndex];
  if (!worker) {
  // Fallback: resolve immediately with local filtering if worker missing
  try {
  const lower = (query || '').toLowerCase();
  const items = documents
- .map((doc, idx) => {
+ .map((doc: any, idx: any) => {
  let score = 1;
  if (doc.content && doc.content.toLowerCase().includes(lower)) score = 0.1;
  else if (doc.path && doc.path.toLowerCase().includes(lower)) score = 0.3;
  else if (doc.type && doc.type.toLowerCase().includes(lower)) score = 0.5;
  return { item: doc, refIndex: idx, score };
  })
- .filter((r) => typeof r.score === 'number' && r.score <= (options?.threshold ?? 0.6))
- .sort((a, b) => a.score - b.score)
+ .filter((r: any) => typeof r.score === 'number' && r.score <= (options?.threshold ?? 0.6))
+ .sort((a: any, b: any) => a.score - b.score)
  .slice(0, options?.maxResults ?? 50)
- .map((r) => r.item);
+ .map((r: any) => r.item);
  return resolve(items);
  } catch (err) {
  return reject(err);
@@ -321,7 +321,7 @@ export class ConcurrentIndexedDBSearch {
  const eventData = event.data as WorkerMessage;
  if (eventData.workerId === workerId && eventData.type === 'searchResult') {
  worker.removeEventListener('message', messageHandler);
- const items = (eventData.data.results || []).map((r) => r.item);
+ const items = (eventData.data.results || []).map((r: any) => r.item);
  clearTimeout(timeout);
  resolve(items);
  } else if (eventData.workerId === workerId && eventData.type === 'error') {
@@ -354,15 +354,15 @@ export class ConcurrentIndexedDBSearch {
  let filtered = documents;
  if (!filters) return filtered;
  if (filters.type) {
- filtered = filtered.filter((doc) => filters.type!.includes(doc.type));
+ filtered = filtered.filter((doc: any) => filters.type!.includes(doc.type));
  }
  if (filters.language) {
- filtered = filtered.filter((doc) => filters.language!.includes(doc.metadata.language));
+ filtered = filtered.filter((doc: any) => filters.language!.includes(doc.metadata.language));
  }
  if (filters.dateRange) {
  const [start, end] = filters.dateRange;
  filtered = filtered.filter(
- (doc) => doc.metadata.lastModified >= start && doc.metadata.lastModified <= end
+ (doc: any) => doc.metadata.lastModified >= start && doc.metadata.lastModified <= end
  );
  }
  return filtered;
@@ -370,13 +370,13 @@ export class ConcurrentIndexedDBSearch {
 
  async indexDocument(document: SearchableDocument): Promise<void> {
  if (!this.db) throw new Error('Database not initialized');
- return new Promise((resolve, reject) => {
+ return new Promise((resolve: any, reject: any) => {
  const transaction = this.db!.transaction(['documents'], 'readwrite');
  const store = transaction.objectStore('documents');
  const request = store.put(document);
  request.onsuccess = () => {
  // update in-memory and fuse
- const idx = this.documents.findIndex((d) => d.id === document.id);
+ const idx = this.documents.findIndex((d: any) => d.id === document.id);
  if (idx >= 0) this.documents[idx] = document;
  else this.documents.push(document);
  this.initializeFuse();
@@ -395,7 +395,7 @@ export class ConcurrentIndexedDBSearch {
  }
  for (let i = 0; i < batches.length; i++) {
  const batch = batches[i];
- await new Promise<void>((resolve, reject) => {
+ await new Promise<void>((resolve: any, reject: any) => {
  const transaction = this.db!.transaction(['documents'], 'readwrite');
  const store = transaction.objectStore('documents');
  let completed = 0;
@@ -440,18 +440,18 @@ export class ConcurrentIndexedDBSearch {
  if (!queryEmbedding.length) return this.search({ query: options });
  const threshold = options?.threshold ?? 0.7;
  const withEmbedding = this.documents.filter(
- (d) =>
+ (d: any) =>
  Array.isArray(d.metadata.embedding) &&
  d.metadata.embedding!.length === queryEmbedding.length
  );
- const scored = withEmbedding.map((doc) => ({
+ const scored = withEmbedding.map((doc: any) => ({
  document: doc, similarity: this.cosineSimilarity(queryEmbedding: doc.metadata.embedding!),
  }));
  const semanticResults = scored
- .filter((x) => x.similarity >= threshold)
- .sort((a, b) => b.similarity - a.similarity)
+ .filter((x: any) => x.similarity >= threshold)
+ .sort((a: any, b: any) => b.similarity - a.similarity)
  .slice(0, options?.maxResults ?? 20)
- .map((x) => x.document);
+ .map((x: any) => x.document);
  console.log(`🧠 Semantic search found ${semanticResults.length} results`);
  return semanticResults;
  }
@@ -474,8 +474,8 @@ export class ConcurrentIndexedDBSearch {
  const [fuzzyResults, semanticResults] = await Promise.all([
  this.search(request); this.semanticSearch(request.query, request.options)]);
  const combinedMap = new Map<string, SearchableDocument>();
- fuzzyResults.forEach((doc) => combinedMap.set(doc.id, doc));
- semanticResults.forEach((doc) => combinedMap.set(doc.id, doc));
+ fuzzyResults.forEach((doc: any) => combinedMap.set(doc.id, doc));
+ semanticResults.forEach((doc: any) => combinedMap.set(doc.id, doc));
  const combinedResults = Array.from(combinedMap.values());
  return { fuzzyResults, semanticResults, combinedResults };
  }
@@ -483,7 +483,7 @@ export class ConcurrentIndexedDBSearch {
  async indexTypeScriptErrors(
  errors: { code: string, message: string; file: string, line: number }[]
  ): Promise<void> {
- const documents: SearchableDocument[] = errors.map((error, index) => ({
+ const documents: SearchableDocument[] = errors.map((error: any, index: any) => ({
  id: `error-${ index }-${Date.now()}`,
  content: `${error.code}: ${error.message}`,
  path: error.file,
@@ -495,7 +495,7 @@ export class ConcurrentIndexedDBSearch {
  }));
  console.log(`📝 Indexing ${documents.length} TypeScript errors...`);
  const documentsWithEmbeddings = await Promise.all(
- documents.map(async (doc) => ({
+ documents.map(async (doc: any) => ({
  ...doc,
  metadata: { ...doc.metadata, embedding: await; await this.generateEmbedding(doc.content) },
  }))
@@ -512,24 +512,24 @@ export class ConcurrentIndexedDBSearch {
  }
 
  async getErrorStats(): Promise<any> {
- const errorDocs = this.documents.filter((doc) => doc.type === 'error');
+ const errorDocs = this.documents.filter((doc: any) => doc.type === 'error');
  const byLanguage: Record<string, number> = {};
  const byType: Record<string, number> = {};
- errorDocs.forEach((doc) => {
+ errorDocs.forEach((doc: any) => {
  byLanguage[doc.metadata.language] = (byLanguage[doc.metadata.language] || 0) + 1;
  byType[doc.type] = (byType[doc.type] || 0) + 1;
  });
  return {
  totalErrors: errorDocs.length,
  byLanguage: byType.filter(
- (item) => item.metadata.lastModified >= Date.now() - 24 * 60 * 60 * 1000
+ (item: any) => item.metadata.lastModified >= Date.now() - 24 * 60 * 60 * 1000
  ),
  };
  }
 
  async clearDatabase(): Promise<void> {
  if (!this.db) return;
- return new Promise((resolve, reject) => {
+ return new Promise((resolve: any, reject: any) => {
  const transaction = this.db!.transaction(['documents', 'embeddings'], 'readwrite');
  const documentsStore = transaction.objectStore('documents');
  const embeddingsStore = transaction.objectStore('embeddings');
@@ -546,7 +546,7 @@ export class ConcurrentIndexedDBSearch {
  }
 
  destroy(): void {
- this.workers.forEach((worker) => worker.terminate());
+ this.workers.forEach((worker: any) => worker.terminate());
  this.workers = [];
  if (this.db) {
  this.db.close();

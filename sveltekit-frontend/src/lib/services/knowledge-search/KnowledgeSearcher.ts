@@ -94,7 +94,7 @@ export class KnowledgeSearcher {
     }
 
     // Sort by combined score (Property 2)
-    hybridResults.sort((a, b) => b.scores.combined - a.scores.combined);
+    hybridResults.sort((a: any, b: any) => b.scores.combined - a.scores.combined);
 
     // Take top K
     const topResults = hybridResults.slice(0, topK);
@@ -102,7 +102,7 @@ export class KnowledgeSearcher {
     // Fetch full content from MinIO if requested
     if (includeContent) {
       await Promise.all(
-        topResults.map(async (result) => {
+        topResults.map(async (result: any) => {
           try {
             const doc = await this.getDocument(result.id);
             if (doc) {
@@ -216,7 +216,7 @@ export class KnowledgeSearcher {
     // Build context from top results
     const context = results
       .slice(0, 5) // Use top 5 results
-      .map((r, idx) => {
+      .map((r: any, idx: any) => {
         const content = r.content || r.summary;
         return `[${idx + 1}] ${r.title}\nURL: ${r.url}\n${content}\n`;
       })

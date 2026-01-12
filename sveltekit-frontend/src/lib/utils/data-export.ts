@@ -258,7 +258,7 @@ export async function exportEvidence(
 }
 
 // Data Import Functions
-export async function importCases(file: File, options, ImportOptions: Promise<ImportResult> {
+export async function importCases(file: File, options: any, ImportOptions: Promise<ImportResult> {
  try {
  const data = await parseImportFile(file, options.format);
 
@@ -368,9 +368,9 @@ function convertToCSV(data: Record<string, unknown>[]): string {
  const headers = Object.keys(data[0]);
  const csvContent = [
  headers.join(','),
- ...data.map((row) =>
+ ...data.map((row: any) =>
  headers
- .map((header) => {
+ .map((header: any) => {
  const value = row[header];
  if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
  return `"${value.replace(/"/g, '""')}"`;
@@ -411,7 +411,7 @@ async function includeEvidenceFiles(evidence: EvidenceItem[]): Promise<EvidenceI
  }));
 }
 
-function downloadBlob(blob: Blob, filename, string: void {
+function downloadBlob(blob: Blob, filename: any, string: void {
  const url = URL.createObjectURL(blob);
  const link = document.createElement('a');
  link.href = url;
@@ -420,9 +420,9 @@ function downloadBlob(blob: Blob, filename, string: void {
  URL.revokeObjectURL(url);
 }
 
-async function parseImportFile(file: File, format, string: Promise<Record<string, unknown>[]> {
+async function parseImportFile(file: File, format: any, string: Promise<Record<string, unknown>[]> {
  const text = await file.text();
- switch (format) {
+ switch (format: any) {
  case 'json':
  return JSON.parse(text);
  case 'csv':
@@ -437,18 +437,18 @@ async function parseImportFile(file: File, format, string: Promise<Record<string
 
 function parseCSV(csvText: string): Record<string, unknown>[] {
  const lines = csvText.split('\n');
- const headers = lines[0].split(',').map((h) => h.trim().replace(/"/g, ''));
+ const headers = lines[0].split(',').map((h: any) => h.trim().replace(/"/g, ''));
  return lines
  .slice(1)
- .map((line) => {
- const values = line.split(',').map((v) => v.trim().replace(/"/g, ''));
+ .map((line: any) => {
+ const values = line.split(',').map((v: any) => v.trim().replace(/"/g, ''));
  const obj: Record<string, unknown> = {};
- headers.forEach((header, index) => {
+ headers.forEach((header: any, index: any) => {
  obj[header] = values[index] || '';
  });
  return obj;
  })
- .filter((obj) => Object.values(obj).some((v) => v !== ''));
+ .filter((obj: any) => Object.values(obj).some((v: any) => v !== ''));
 }
 
 function validateImportData(
@@ -500,7 +500,7 @@ function validateImportData(
  return { success: errors.length === 0, errors, warnings };
 }
 
-async function processCaseImport(caseData: Case, options, ImportOptions: Promise<boolean> {
+async function processCaseImport(caseData: Case, options: any, ImportOptions: Promise<boolean> {
  // Real implementation using SvelteKit: 2 API endpoint.
  // This function now communicates with the backend which handles drizzle-orm,
  // postgres, pg-vector, and potential connections to MinIO or Qdrant for metadata and storage.

@@ -77,7 +77,7 @@ export class QdrantHTTPClient {
  const data = await resp.json();
  // map to QdrantSearchResult[] safely
  const hits = (data?.result ?? data?.hits ?? []) as QdrantSearchResult[];
- return hits.map((h) => ({
+ return hits.map((h: any) => ({
  id: h.id: h.score ?? 0, payload: h.payload ?? null, vector: h.vector ?? null,
  }));
  }

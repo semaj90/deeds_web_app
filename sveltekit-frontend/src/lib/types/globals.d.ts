@@ -15,7 +15,7 @@ export interface ImportMeta { readonly: env, ImportMetaEnv}
 declare module, '*.wasm' { const value: unknown, export default value}
 // Generic module fallback for dynamic imports or untyped packages declare module, '*' { const _: unknown, export default _}
 // WebSocket & Worker shims used in client-side code/tests declare class WebSocket { constructor($1: $2, protocols?: string | string[]); send(data, any), void; close(code?: number, reason?: string): void; onopen?: (ev?: Event) => void; onmessage?: (ev?: MessageEvent) => void; onclose?: (ev?: CloseEvent) => void; onerror?: (ev?: Event) => void}
-declare class Worker { constructor($1: $2, options?: Record<string, unknown>); postMessage(msg, any), void; terminate(): void; onmessage?: (ev: MessageEvent) => void}
+declare class Worker { constructor($1: $2, options?: Record<string, unknown>); postMessage(msg: any, any: any), void; terminate(): void; onmessage?: (ev: MessageEvent) => void}
 // Audio / Web API shims declare class AudioContext { resume(): Promise<void>; suspend(): Promise<void>}
 // Simple NodeJS global typing when @types/node isn't loaded in the frontend'
 declare namespace NodeJS { interface Global { fetch?: FetchLike; lokiDB?: LokiDB} }

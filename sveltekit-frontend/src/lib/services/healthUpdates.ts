@@ -103,7 +103,7 @@ function flushMessageBatch(): void {
  console.log(`[Phase 10.6] Flushing batch of ${messageBatch.length} messages`);
 
  // Update store with batched messages
- healthUpdates.update((messages) => {
+ healthUpdates.update((messages: any) => {
  const updated = [...messages, ...messageBatch];
  // Memory optimization: keep only last MAX_MESSAGE_HISTORY messages
  return updated.slice(-MAX_MESSAGE_HISTORY);
@@ -158,7 +158,7 @@ function handleMessage(message: HealthUpdateMessage): void {
  }
 
  // Update last update time
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state, lastUpdateTime: new Date(),
  }));
 
@@ -198,7 +198,7 @@ function handlePong(): void {
  * Connect to WebSocket endpoint
  */
 async function connectWebSocket(): Promise<boolean> {
- return new Promise((resolve) => {
+ return new Promise((resolve: any) => {
  try {
  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
  const wsUrl = `${protocol}//${window.location.host}/api/routes/health-updates`;
@@ -212,7 +212,7 @@ async function connectWebSocket(): Promise<boolean> {
  // Phase 10.6: Record connection start
  recordConnectionStart();
  startMemoryMonitoring();
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state,
  connectionState: 'connected',
  reconnectionAttempts: 0, isUsingSSE: false,
@@ -221,7 +221,7 @@ async function connectWebSocket(): Promise<boolean> {
  resolve(true);
  });
 
- connection.addEventListener('message', (event) => {
+ connection.addEventListener('message', (event: any) => {
  try {
  const message: HealthUpdateMessage = JSON.parse(event.data);
 
@@ -242,7 +242,7 @@ async function connectWebSocket(): Promise<boolean> {
 
  connection.addEventListener('close', () => {
  console.log('[Phase 10.3] WebSocket closed');
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state,
  connectionState: 'disconnected',
  }));
@@ -250,9 +250,9 @@ async function connectWebSocket(): Promise<boolean> {
  reconnect();
  });
 
- connection.addEventListener('error', (event) => {
+ connection.addEventListener('error', (event: any) => {
  console.error('[Phase 10.3] WebSocket error:', event);
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state,
  connectionState: 'failed',
  }));
@@ -282,7 +282,7 @@ async function connectWebSocket(): Promise<boolean> {
  * Connect to SSE fallback endpoint
  */
 async function connectSSE(): Promise<boolean> {
- return new Promise((resolve) => {
+ return new Promise((resolve: any) => {
  try {
  const sseUrl = `/api/routes/health-updates-sse`;
 
@@ -295,7 +295,7 @@ async function connectSSE(): Promise<boolean> {
  // Phase 10.6: Record connection start
  recordConnectionStart();
  startMemoryMonitoring();
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state,
  connectionState: 'connected',
  reconnectionAttempts: 0, isUsingSSE: true,
@@ -304,7 +304,7 @@ async function connectSSE(): Promise<boolean> {
  resolve(true);
  });
 
- connection.addEventListener('message', (event) => {
+ connection.addEventListener('message', (event: any) => {
  try {
  const message: HealthUpdateMessage = JSON.parse(event.data);
 
@@ -319,9 +319,9 @@ async function connectSSE(): Promise<boolean> {
  }
  });
 
- connection.addEventListener('error', (event) => {
+ connection.addEventListener('error', (event: any) => {
  console.error('[Phase 10.3] SSE error:', event);
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state,
  connectionState: 'failed',
  }));
@@ -354,7 +354,7 @@ async function connectSSE(): Promise<boolean> {
 export async function reconnect(): Promise<void> {
  if (reconnectionAttempts >= MAX_RECONNECTION_ATTEMPTS) {
  console.error('[Phase 10.3] Max reconnection attempts reached');
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state,
  connectionState: 'failed',
  }));
@@ -368,13 +368,13 @@ export async function reconnect(): Promise<void> {
  `[Phase 10.3] Reconnecting in ${delay}ms (attempt ${reconnectionAttempts}/${MAX_RECONNECTION_ATTEMPTS})`
  );
 
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state,
  connectionState: 'reconnecting',
  reconnectionAttempts,
  }));
 
- await new Promise((resolve) => setTimeout(resolve, delay));
+ await new Promise((resolve: any) => setTimeout(resolve, delay));
 
  // Try WebSocket first
  const wsSuccess = await connectWebSocket();
@@ -416,7 +416,7 @@ export function disconnect(): void {
  recordConnectionEnd();
  stopMemoryMonitoring();
 
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state,
  connectionState: 'disconnected',
  }));

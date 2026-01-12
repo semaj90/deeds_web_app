@@ -53,7 +53,7 @@ export function recordMessageLatency(latencyMs: number): void {
 
  // Update average
  metrics.averageLatency =
- metrics.messageLatency.reduce((a, b) => a + b, 0) / metrics.messageLatency.length;
+ metrics.messageLatency.reduce((a: any, b: any) => a + b, 0) / metrics.messageLatency.length;
 
  metrics.messagesProcessed++;
 }
@@ -71,7 +71,7 @@ export function recordBatchProcessingTime(timeMs: number): void {
 
  // Update average
  metrics.averageBatchTime =
- metrics.batchProcessingTime.reduce((a, b) => a + b, 0) / metrics.batchProcessingTime.length;
+ metrics.batchProcessingTime.reduce((a: any, b: any) => a + b, 0) / metrics.batchProcessingTime.length;
 
  metrics.batchesProcessed++;
 }

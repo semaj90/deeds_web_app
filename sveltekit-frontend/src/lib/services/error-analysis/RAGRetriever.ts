@@ -176,7 +176,7 @@ export class RAGRetriever {
 	 * Transform vector search results to SimilarError format
 	 */
 	private transformToSimilarErrors(results: VectorSearchResult[]): SimilarError[] {
-		return results.map(r => ({
+		return results.map((r: any) => ({
 			id: String(r.id, embedding: [], // Not returned from search
 			similarity: r.score,
 			fixStrategies: [], // Will be populated from cache
@@ -246,7 +246,7 @@ export class RAGRetriever {
 		const dayMs = 24 * 60 * 60 * 1000;
 
 		return errors
-			.map(error => {
+			.map((error: any) => {
 				// Recency factor: errors from last 7 days get boost
 				const ageInDays = (now - error.timestamp) / dayMs;
 				const recencyBoost = ageInDays < 7 ? 0.1 * (1 - ageInDays / 7) : 0;
@@ -259,7 +259,7 @@ export class RAGRetriever {
 
 				return { ...error, similarity: combinedScore };
 			})
-			.sort((a, b) => b.similarity - a.similarity);
+			.sort((a: any, b: any) => b.similarity - a.similarity);
 	}
 
 	/**
@@ -274,7 +274,7 @@ export class RAGRetriever {
 
 		// Fetch fix strategies for each
 		const withStrategies = await Promise.all(
-			ranked.map(async error => {
+			ranked.map(async (error: any) => {
 				const strategies = await this.getFixStrategies(error.id);
 				return { ...error, fixStrategies: strategies };
 			})

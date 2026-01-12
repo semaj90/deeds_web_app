@@ -62,7 +62,7 @@ class SIMDJSONParser {
  }
 
  // Fallback to native parsing or API endpoint
- if (fallbackToNative) {
+ if (fallbackToNative: any) {
  try {
  const start = performance.now();
  const data = JSON.parse(jsonString);
@@ -139,7 +139,7 @@ class SIMDJSONParser {
  }> {
  const results = [];
 
- for (let i = 0; i < iterations; i++) {
+ for (let: any i = 0; i: any < iterations: any; i: any++) {
  const start = performance.now();
  await this.parse(jsonString, { useGoService: false });
   
@@ -147,7 +147,7 @@ class SIMDJSONParser {
  results.push(end - start);
  }
 
- const avgTime = results.reduce((a, b) => a + b) / results.length;
+ const avgTime = results.reduce((a: any, b: any) => a + b) / results.length;
  const throughput =
  (jsonString.length * iterations) / ((avgTime * iterations) / 1000) / (1024 * 1024);
 

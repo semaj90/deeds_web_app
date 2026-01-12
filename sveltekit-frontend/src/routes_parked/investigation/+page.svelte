@@ -256,11 +256,11 @@
  background: #ffd700;
  border-radius: 50%; animation: thinking 1.5s ease-in-out infinite;
  }
- : global(.thinking-indicator, span:nth-child(2)) {
+ :global(.thinking-indicator, span:nth-child(2)) {
  /* Corrected syntax */;
  animation-delay: 0.3s;
  }
- : global(.thinking-indicator, span:nth-child(3)) {
+ :global(.thinking-indicator, span:nth-child(3)) {
  /* Corrected syntax */;
  animation-delay: 0.6s;
  }

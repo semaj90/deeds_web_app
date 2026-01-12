@@ -85,8 +85,8 @@ export class ToolInvoker {
 			return {
 				tool: 'svelte-check',
 				success: true,
-				errors: errors.filter(e => e.severity === 'error'),
-				warnings: errors.filter(e => e.severity === 'warning'),
+				errors: errors.filter((e: any) => e.severity === 'error'),
+				warnings: errors.filter((e: any) => e.severity === 'warning'),
 				duration: Date.now() - startTime,
 				output: stdout
 			};
@@ -99,8 +99,8 @@ export class ToolInvoker {
 			return {
 				tool: 'svelte-check',
 				success: errors.length === 0,
-				errors: errors.filter(e => e.severity === 'error'),
-				warnings: errors.filter(e => e.severity === 'warning'),
+				errors: errors.filter((e: any) => e.severity === 'error'),
+				warnings: errors.filter((e: any) => e.severity === 'warning'),
 				duration: Date.now() - startTime,
 				output
 			};
@@ -185,8 +185,8 @@ export class ToolInvoker {
 			return {
 				tool: 'tsc',
 				success: errors.length === 0,
-				errors: errors.filter(e => e.severity === 'error'),
-				warnings: errors.filter(e => e.severity === 'warning'),
+				errors: errors.filter((e: any) => e.severity === 'error'),
+				warnings: errors.filter((e: any) => e.severity === 'warning'),
 				duration: Date.now() - startTime,
 				output
 			};
@@ -257,11 +257,11 @@ export class ToolInvoker {
 		}
 
 		// Aggregate results
-		const allErrors = results.flatMap(r => r.errors);
-		const allWarnings = results.flatMap(r => r.warnings);
+		const allErrors = results.flatMap((r: any) => r.errors);
+		const allWarnings = results.flatMap((r: any) => r.warnings);
 
 		return {
-			tool: results.map(r => r.tool).join('+'),
+			tool: results.map((r: any) => r.tool).join('+'),
 			errors: allErrors,
 			warnings: allWarnings,
 			timestamp: Date.now()

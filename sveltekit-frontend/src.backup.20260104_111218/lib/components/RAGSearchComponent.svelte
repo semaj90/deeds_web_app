@@ -136,7 +136,7 @@ https://svelte.dev/e/js_parse_error -->
  </ButtonBits> {/each}
  </div> </CardBits> {/if}
  </div>
- <style> /* Enhanced bits-ui styling for legal AI search */: global(.legal-ai-search-input) { background: var(--nier-bg-primary); border: 2px solid var(--nier-border-muted);transition: all 0.3s ease}:global(.legal-ai-search-input:focus) { border-color: var(--nier-accent-warm); box-shadow: 0, 0 0 3px rgba(245, 158, 11, 0.1)}:global(.legal-ai-search-btn) { transition: all 0.2s ease; box-shadow: var(--legal-ai-shadow-md)}:global(.legal-ai-search-btn:hover) { transform: translateY(-1px), box-shadow: var(--legal-ai-shadow-lg)}: global(.legal-search-result) { border-left: 4px solid var(--nier-accent-warm); transition: transform 0.2s ease}:global(.legal-search-result:hover) { transform: translateY(-2px)}
+ <style> /* Enhanced bits-ui styling for legal AI search */:global(.legal-ai-search-input) { background: var(--nier-bg-primary); border: 2px solid var(--nier-border-muted);transition: all 0.3s ease}:global(.legal-ai-search-input:focus) { border-color: var(--nier-accent-warm); box-shadow: 0, 0 0 3px rgba(245, 158, 11, 0.1)}:global(.legal-ai-search-btn) { transition: all 0.2s ease; box-shadow: var(--legal-ai-shadow-md)}:global(.legal-ai-search-btn:hover) { transform: translateY(-1px), box-shadow: var(--legal-ai-shadow-lg)}:global(.legal-search-result) { border-left: 4px solid var(--nier-accent-warm); transition: transform 0.2s ease}:global(.legal-search-result:hover) { transform: translateY(-2px)}
  /* Custom scrollbar for results */ .space-y-4::-webkit-scrollbar { width: 6px}
  .space-y-4::-webkit-scrollbar-track { background: var(--nier-bg-tertiary)}
  .space-y-4::-webkit-scrollbar-thumb { background: var(--nier-accent-warm); border-radius: 3px}

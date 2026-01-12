@@ -143,7 +143,7 @@ export function validateFile(
  if (allowedExtensions.length > 0 && !allowedExtensions.includes(extension)) {
  return {
  valid: false,
- error: `File extension ".${extension}" is not allowed. Allowed extensions: ${allowedExtensions.map((ext) => `.${ext}`).join(', ')}`,
+ error: `File extension ".${extension}" is not allowed. Allowed extensions: ${allowedExtensions.map((ext: any) => `.${ext}`).join(', ')}`,
  mimeType: file.type,
  };
  }
@@ -169,13 +169,13 @@ export function validateFiles(
 
  // Check number of files
  if (maxFiles && files.length > maxFiles) {
- return files.map((_, index) => ({
+ return files.map((_: any, index: any) => ({
  valid: false,
  error: `Maximum ${ maxFiles } files allowed`,
  }));
  }
 
- return files.map((file) => validateFile(file, options));
+ return files.map((file: any) => validateFile(file, options));
 }
 
 /**
@@ -184,14 +184,14 @@ export function validateFiles(
  * @returns Promise resolving to preview URL
  */
 export function createImagePreview(file: File): Promise<string> {
- return new Promise((resolve, reject) => {
+ return new Promise((resolve: any, reject: any) => {
  if (!file.type.startsWith('image/')) {
  reject(new Error('File is not an image'));
  return;
  }
 
  const reader = new FileReader();
- reader.onload = (e) => {
+ reader.onload = (e: any) => {
  resolve(e.target?.result as string);
  };
  reader.onerror = () => {
@@ -238,7 +238,7 @@ export async function processFiles(
  files: File[],
  createPreviews = false
 ): Promise<ProcessedFile[]> {
- const promises = files.map((file) => processFile(file, createPreviews));
+ const promises = files.map((file: any) => processFile(file, createPreviews));
  return Promise.all(promises);
 }
 
@@ -275,9 +275,9 @@ export function downloadBlob(blob: Blob): void {
  * @returns Promise resolving to file content as string
  */
 export function readFileAsText(file: File, encoding = 'utf-8'): Promise<string> {
- return new Promise((resolve, reject) => {
+ return new Promise((resolve: any, reject: any) => {
  const reader = new FileReader();
- reader.onload = (e) => {
+ reader.onload = (e: any) => {
  resolve(e.target?.result as string);
  };
  reader.onerror = () => {
@@ -293,9 +293,9 @@ export function readFileAsText(file: File, encoding = 'utf-8'): Promise<string> 
  * @returns Promise resolving to array buffer
  */
 export function readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
- return new Promise((resolve, reject) => {
+ return new Promise((resolve: any, reject: any) => {
  const reader = new FileReader();
- reader.onload = (e) => {
+ reader.onload = (e: any) => {
  resolve(e.target?.result as ArrayBuffer);
  };
  reader.onerror = () => {
@@ -315,7 +315,7 @@ export async function getFileChecksum(file: File): Promise<string> {
  const buffer = await readFileAsArrayBuffer(file);
  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
  const hashArray = Array.from(new Uint8Array(hashBuffer));
- return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+ return hashArray.map((b: any) => b.toString(16).padStart(2, '0')).join('');
  } catch (error) {
  console.error('Failed to calculate file checksum:', error);
  return '';

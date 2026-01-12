@@ -273,7 +273,7 @@ class LLMLogger {
         sort: [{ 'evaluation.ace_score': 'desc' }]
       });
 
-      return docs.map(log => ({
+      return docs.map((log: any) => ({
         instruction: this.generateInstruction(log, input: log.input.prompt,
         output: log.output.response,
         metadata: { source: log.log_id,

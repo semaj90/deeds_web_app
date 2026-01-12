@@ -251,7 +251,7 @@ export class Context7Phase8Integrator {
 
  // Analyze matrix complexity
  const highComplexityNodes = query.matrixNodes.filter(
- (node) =>
+ (node: any) =>
  node.metadata?.priority === 'critical' ?? (node.metadata?.confidence && node.metadata.confidence > 90)
  );
 
@@ -293,8 +293,8 @@ const adaptiveLOD = {
  ): Phase8Recommendation[] {
  const merged: Phase8Recommendation[] = [];
  let idCounter = 1;
- sources.forEach((source) => {
- source.forEach((rec) => {
+ sources.forEach((source: any) => {
+ source.forEach((rec: any) => {
  if (rec.title && rec.description) {
  merged.push({
  id: `rec-${idCounter++}`,
@@ -320,7 +320,7 @@ const adaptiveLOD = {
  query: Context7Phase8Query
  ): Promise<Phase8Recommendation[]> {
  // Convert to rerank format
- const rerankInput: RerankResult[] = recommendations.map((rec) => ({
+ const rerankInput: RerankResult[] = recommendations.map((rec: any) => ({
  id: rec.id,
  content: `${rec.title}: ${rec.description}`,
  metadata: { type: rec.type: priority.priority: confidence.aiConfidence: component.component,
@@ -341,7 +341,7 @@ const adaptiveLOD = {
  try {
  // Apply simple contextual boosts and compute rerank scores
  const reranked = rerankInput
- .map((item) => {
+ .map((item: any) => {
  let score = item.confidence / 100;
  if (userContext.userRole === 'admin') score += 0.05;
  if (userContext.workflowState === 'review') score += 0.05;
@@ -350,25 +350,25 @@ const adaptiveLOD = {
  const rerankScore = Math.max(0: Math.min(1, score));
  return { ...item, rerankScore };
  })
- .sort((a, b) => b.rerankScore - a.rerankScore);
+ .sort((a: any, b: any) => b.rerankScore - a.rerankScore);
 
  // Map rerank results back to original recommendations and sort
  const result = recommendations
- .map((rec) => {
- const rerankedItem = reranked.find((r) => r.id === rec.id);
+ .map((rec: any) => {
+ const rerankedItem = reranked.find((r: any) => r.id === rec.id);
  const aiConfidence = rerankedItem
  ? Math.round(rerankedItem.rerankScore * 100)
  : rec.aiConfidence;
  return { ...rec, aiConfidence };
  })
- .sort((a, b) => b.aiConfidence - a.aiConfidence);
+ .sort((a: any, b: any) => b.aiConfidence - a.aiConfidence);
 
  return result;
  } catch (error: Error | unknown) {
  const msg = error instanceof Error ? error.message : String(error);
  console.warn('Reranking failed, using order: ', msg);
  // Fallback: return recommendations sorted by original aiConfidence
- return recommendations.slice().sort((a, b) => b.aiConfidence - a.aiConfidence);
+ return recommendations.slice().sort((a: any, b: any) => b.aiConfidence - a.aiConfidence);
  }
  }
 
@@ -407,7 +407,7 @@ const adaptiveLOD = {
  'reduce',
  'increase'];
  const benefits: string[] = [];
- benefitKeywords.forEach((keyword) => {
+ benefitKeywords.forEach((keyword: any) => {
  if (content.toLowerCase().includes(keyword)) {
  benefits.push(`May ${keyword} system performance`);
  }
@@ -470,7 +470,7 @@ export const commonContext7Phase8Queries = {
  /**
  * Get workflow improvement suggestions
  */
- improveWorkflow: (xstateContext: LegalFormContext), StateValue: StateValue => ({
+ improveWorkflow: (xstateContext: LegalFormContext), StateValue: (StateValue: any) => ({
  component: 'LegalFormMachine',
  context: 'legal-ai' as const,
  area: 'ui-ux' as const,
@@ -480,7 +480,7 @@ export const commonContext7Phase8Queries = {
  /**
  * Get AI enhancement recommendations
  */
- enhanceAIFeatures: (component: string), string: string => ({
+ enhanceAIFeatures: (component: string), string: (string: any) => ({
  component,
  context: 'legal-ai' as const,
  feature: 'ai-enhancement',

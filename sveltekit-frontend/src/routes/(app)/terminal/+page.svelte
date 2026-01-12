@@ -314,12 +314,12 @@
  color: #10b981 !important;
  }
 
- : global(.ai-chat, textarea:focus) {
+ :global(.ai-chat, textarea:focus) {
  border-color: #10b981 !important;
  box-shadow: 0 0 0 1px #10b981 !important;
  }
 
- : global(.ai-chat, textarea::placeholder) {
+ :global(.ai-chat, textarea::placeholder) {
  color: #065f46 !important;
  }
 </style>

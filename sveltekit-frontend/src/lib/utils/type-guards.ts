@@ -119,15 +119,15 @@ export function isNumber(value: unknown): value is number {
 export function isBoolean(value: unknown): value is boolean {
     return typeof value === 'boolean';
 }
-export function isObject(_value): value is Record<string, unknown> { return typeof value === 'object' && value !== null && !Array.isArray(value)}
-export function isArray(_value): value is, unknown[] { return Array.isArray(value)}
-export function isRecord(_value): value is { [key, string], any }{ return isObject(value)}
+export function isObject(_value: any): value is Record<string, unknown> { return typeof value === 'object' && value !== null && !Array.isArray(value)}
+export function isArray(_value: any): value is, unknown[] { return Array.isArray(value)}
+export function isRecord(_value: any): value is { [key, string], any }{ return isObject(value)}
 // --- Enhanced Discrimination Helpers --- export function discriminateWorkerMessage(message: WorkerMessage): { isAITask: boolean, isWorkerStatus: boolean, boolean: isAPIResponse<any>,: boolean; aiTask?: AITask; workerStatus?: WorkerStatus; apiResponse?: APIResponse<any>}{ const result = { isAITask: false, isWorkerStatus: false, isAPIResponse: false }, as any; if (message.payload) { if (isAITask(message.payload)) { (result as { isAITask?: unknown; aiTask?: unknown; isWorkerStatus?: unknown; workerStatus?: unknown; isAPIResponse?: unknown; apiResponse?: unknown }).isAITask = true; (result as { isAITask?: unknown; aiTask?: unknown; isWorkerStatus?: unknown; workerStatus?: unknown; isAPIResponse?: unknown; apiResponse?: unknown }).aiTask = message.payload}else if (isWorkerStatus(message.payload)) { (result as { isAITask?: unknown; aiTask?: unknown; isWorkerStatus?: unknown; workerStatus?: unknown; isAPIResponse?: unknown; apiResponse?: unknown }).isWorkerStatus = true; (result as { isAITask?: unknown; aiTask?: unknown; isWorkerStatus?: unknown; workerStatus?: unknown; isAPIResponse?: unknown; apiResponse?: unknown }).workerStatus = message.payload}else if (isAPIResponse(message.payload)) { (result as { isAITask?: unknown; aiTask?: unknown; isWorkerStatus?: unknown; workerStatus?: unknown; isAPIResponse?: unknown; apiResponse?: unknown }).isAPIResponse = true; (result as { isAITask?: unknown; aiTask?: unknown; isWorkerStatus?: unknown; workerStatus?: unknown; isAPIResponse?: unknown; apiResponse?: unknown }).apiResponse = message.payload} return result}
 // --- Safe Property Access --- export function safeGet<T>(obj: unknown, path: string): T { try { const keys = path.split('.'); let current: unknown = obj; for (const key of keys) { if (current == null || typeof current !== 'object') { return defaultValue} current = current[key]} return current !== undefined ? current: defaultValue}catch { return defaultValue} }
 // REMOVED: export function hasProperty<K, extends, string>( obj: unknown, prop: K; ): obj is Record<K, unknown> { return typeof obj === 'object' && obj !== null && prop in obj}
 // --- Type Assertion Helpers --- export function assertIsAITask(_value): asserts value is AITask { if (!isAITask(value)) { throw new Error('Value is not a valid AITask')} }
-export function assertIsWorkerStatus(_value): asserts value is WorkerStatus { if (!isWorkerStatus(value)) { throw new Error('Value is not a valid WorkerStatus')} }
-export function assertIsAPIResponse(_value): asserts value is APIResponse<any> { if (!isAPIResponse(value)) { throw new Error('Value is not a valid APIResponse')}
+export function assertIsWorkerStatus(_value: any): asserts value is WorkerStatus { if (!isWorkerStatus(value)) { throw new Error('Value is not a valid WorkerStatus')} }
+export function assertIsAPIResponse(_value: any): asserts value is APIResponse<any> { if (!isAPIResponse(value)) { throw new Error('Value is not a valid APIResponse')}
 
 
 

@@ -123,7 +123,7 @@ class StorageManager {
 		try {
 			if (this.isAvailable) {
 				// Only clear our app's keys
-				Object.values(CACHE_KEYS).forEach((key) => localStorage.removeItem(key));
+				Object.values(CACHE_KEYS).forEach((key: any) => localStorage.removeItem(key));
 			} else {
 				(window as any).__memoryStorage = {};
 			}
@@ -419,10 +419,10 @@ export class AIPipelineClient {
 			'judge',
 			'attorney'
 		];
-		const keywords = words.filter((w) => legalKeywords.includes(w)).slice(0, 5);
+		const keywords = words.filter((w: any) => legalKeywords.includes(w)).slice(0, 5);
 
 		return {
-			summary: `${ documentType } document with approximately ${wordCount} words. Offline analysis mode.`,
+			summary:: any `${ documentType: any } document with approximately ${wordCount} words. Offline analysis mode.`,
 			risks: ['Full analysis unavailable - services offline'],
 			entities: keywords.length > 0 ? keywords : ['document', documentType],
 			confidenceLevel: 0.3, // Low confidence for fallback

@@ -27,7 +27,7 @@ function isEmbeddingsResponse(obj: unknown): obj is { embedding: number[] } {
     if (typeof obj !== 'object' || obj === null) return false;
     const maybe = obj as Record<string, unknown>;
     if (!Array.isArray(maybe.embedding)) return false;
-    return maybe.embedding.every((item) => typeof item === 'number');
+    return maybe.embedding.every((item: any) => typeof item === 'number');
 }
 
 export interface OllamaModelInfo {
@@ -178,7 +178,7 @@ class OllamaService {
         if (!this.availableModels || this.availableModels.length === 0) return;
 
         // prefer custom legal model
-        const customLegal = this.availableModels.find((m) => m.name === 'gemma3-legal');
+        const customLegal = this.availableModels.find((m: any) => m.name === 'gemma3-legal');
         if (customLegal) {
             this.gemma3Model = customLegal.name;
             return;
@@ -186,14 +186,14 @@ class OllamaService {
 
         // fallback: find any gemma family
         const gemmaCandidates = this.availableModels.filter(
-            (m) =>
+            (m: any) =>
                 (m.name || '').toLowerCase().includes('gemma') ||
                 (m.details?.family ?? '').toLowerCase().includes('gemma')
         );
 
         if (gemmaCandidates.length > 0) {
             const q4 = gemmaCandidates.find(
-                (m) =>
+                (m: any) =>
                     (m.name || '').toLowerCase().includes('q4') ||
                     (m.details?.quantization_level ?? '').toLowerCase().includes('q4')
             );
@@ -363,8 +363,8 @@ class OllamaService {
             repeatPenalty?: number;
         } = {}
     ): Promise<string> {
-        const systemMessage = messages.find((m) => m.role === 'system')?.content;
-        const lastUser = [...messages].reverse().find((m) => m.role === 'user')?.content ?? messages.slice(-1)[0]?.content ?? '';
+        const systemMessage = messages.find((m: any) => m.role === 'system')?.content;
+        const lastUser = [...messages].reverse().find((m: any) => m.role === 'user')?.content ?? messages.slice(-1)[0]?.content ?? '';
 
         return this.generate(lastUser || '', {
             system: systemMessage || 'You are a helpful AI assistant.',
@@ -493,7 +493,7 @@ Document content: ${snippet}`;
                 models: this.availableModels.length,
                 gemma3Model: this.gemma3Model,
             },
-            models: this.availableModels.map((m) => ({
+            models: this.availableModels.map((m: any) => ({
                 name: m.name,
                 sizeMB: Math.round((m.size || 0) / (1024 * 1024)),
                 family: m.details?.family ?? 'unknown'

@@ -20,7 +20,7 @@ export function createFileUploader(url: string): MockUploader {
  const listeners: { [K in keyof UploaderEvents]?: UploaderEvents[K][] } = {};
 
  const mockUploader: MockUploader = {
- on: (event, callback) => {
+ on: (event: any, callback: any) => {
  if (!listeners[event]) {
  listeners[event] = [];
  }
@@ -30,20 +30,20 @@ export function createFileUploader(url: string): MockUploader {
  console.log(`Mock uploading file: ${file.name} to ${ url }`);
  // Simulate upload progress
  for (let i = 0; i <= 100; i += 20) {
- await new Promise((resolve) => setTimeout(resolve, 200));
- listeners.progress?.forEach((cb) => cb(i));
+ await new Promise((resolve: any) => setTimeout(resolve, 200));
+ listeners.progress?.forEach((cb: any) => cb(i));
  }
 
- await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network delay
+ await new Promise((resolve: any) => setTimeout(resolve, 500)); // Simulate network delay
 
  // Simulate success or failure
  if (Math.random() > 0.1) {
  // 90% success rate
  const response = { url: `${ url }/${file.name}`, fileName: file.name, size: file.size };
- listeners.success?.forEach((cb) => cb(response));
+ listeners.success?.forEach((cb: any) => cb(response));
  } else {
  const error = new Error('Mock upload failed');
- listeners.error?.forEach((cb) => cb(error));
+ listeners.error?.forEach((cb: any) => cb(error));
  }
  },
  };

@@ -355,7 +355,7 @@ describe('ErrorBrainMiddleware', () => {
  });
 
  it('should handle multiple concurrent requests', () => {
- const requests = Array.from({ length: 10 }, (_, i) => ({
+ const requests = Array.from({ length: 10 }, (_: any, i: any) => ({
  path: `/api/error-brain/endpoint${i}`,
  method: 'GET' as const,
  }));
@@ -363,7 +363,7 @@ describe('ErrorBrainMiddleware', () => {
  const results = middleware.validateRequests(requests);
 
  expect(results).toHaveLength(10);
- expect(results.every((r) => r.allowed)).toBe(true);
+ expect(results.every((r: any) => r.allowed)).toBe(true);
  });
 
  it('should handle rapid enable/disable cycles', () => {

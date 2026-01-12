@@ -282,7 +282,7 @@ export class TfIdfRanker {
       'these', 'give', 'day', 'most', 'being'
     ]);
 
-    return words.filter(word => !stopWords.has(word));
+    return words.filter((word: any) => !stopWords.has(word));
   }
 }
 

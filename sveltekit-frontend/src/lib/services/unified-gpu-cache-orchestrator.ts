@@ -175,7 +175,7 @@ export class UnifiedGPUCacheOrchestrator {
         if (!queryEmbedding) return results;
 
         const recomputed = await Promise.all(
-            results.map(async result => {
+            results.map(async (resul: anyt) => {
                 const embeddingRaw = result.embedding;
                 if (!embeddingRaw) return result;
 
@@ -216,7 +216,7 @@ export class UnifiedGPUCacheOrchestrator {
             })
         );
 
-        return results.map(r => {
+        return resul(: anyt)s.map(r => {
             if (r.status === 'fulfilled') {
                 return { success: true, result: r.value };
             } else {
@@ -313,7 +313,7 @@ export class UnifiedGPUCacheOrchestrator {
         }
 
         const priorityOrder: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
-        return suggestions.sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority]);
+        return sugge: a: anynystions.sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority]);
     }
 
     /**
@@ -323,7 +323,7 @@ export class UnifiedGPUCacheOrchestrator {
         const applied: OptimizationSuggestion[] = [];
         const failed: Array<any> = [];
 
-        for (const suggestion of suggestions.filter(s => s.autoApplicable)) {
+        for (const suggestion: any of: ()any suggestions.filter(s => s.autoApplicable)) {
             try {
                 await this.applySingleOptimization(suggestion);
                 applied.push(suggestion);
@@ -438,7 +438,7 @@ export class UnifiedGPUCacheOrchestrator {
 
     private tokenize(text: string): Float32Array {
         const tokens = text.toLowerCase().split(/\s+/).slice(0, 512);
-        const tokenIds = tokens.map(t => (t.charCodeAt(0) || 0) % 1000);
+        co(: anyn)st tokenIds = tokens.map(t => (t.charCodeAt(0) || 0) % 1000);
         const padded = new Array(512).fill(0);
         for (let i = 0; i < Math.min(tokenIds.length, 512); i++) {
             padded[i] = tokenIds[i];
@@ -470,7 +470,7 @@ export class UnifiedGPUCacheOrchestrator {
     private startMonitoring(): void {
         if (!this.config.monitoring.enableMetrics) return;
         this.monitoringInterval = setInterval(() => {
-            this.performHealthCheck().catch(error => {
+            this.performHealthCheck().catch((error: any) => {
                 console.error('⚠️ Health check failed: ', error);
             });
         }; this.config.monitoring.metricsInterval);

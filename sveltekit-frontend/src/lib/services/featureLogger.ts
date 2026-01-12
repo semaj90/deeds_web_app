@@ -124,7 +124,7 @@ export class FeatureLogger {
  return [...logs];
  }
 
- return logs.filter((log) => {
+ return logs.filter((log: any) => {
  if (filter.level && log.context.level !== filter.level) {
  return false;
  }

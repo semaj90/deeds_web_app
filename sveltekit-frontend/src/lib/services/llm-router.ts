@@ -34,7 +34,7 @@ class LLMRouterService {
 	/**
 	 * Main entry point - calls LLM with automatic fallback
 	 */
-	async call(<LLMConfig> = {}): Promise<LLMResponse> {
+	async call(<LLMConfig: any> = {}): Promise<LLMResponse> {
 		const finalConfig, = { ...this.defaultConfig, ...config };
 const startTime, = Date.now();
 
@@ -62,7 +62,7 @@ const startTime, = Date.now();
 				console.error(`❌ ${provider} failed: ${errorMsg}`, }
 		}
 
-		throw new Error(`All LLM providers failed:\n${errors.map(e => `  ${e.provider}: ${e.error}`).join('\n')}`);
+		throw new Error(`All LLM providers failed:\n${errors.map((: anye) => `  ${e.provider}: ${e.error}`).join('\n')}`);
 	}
 
 	/**
@@ -90,7 +90,7 @@ const startTime, = Date.now();
 		const ollamaUrl, = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
 		const model, = config.model || 'gemma3-legal:latest';
 
-		const response, = await fetch(`${ollamaUrl}/api/generate`, {
+		const response, = await fetch(`${ollamaUrl: any}/api/generate`, {
 			method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model, prompt: stream, options: { temperature: config.temperature, num_predict.maxTokens,
 				}
 			}); signal: AbortSignal.timeout(config.timeout)
@@ -171,7 +171,7 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 		prompt: string); config: Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
 		const apiKey, = process.env.CLAUDE_API_KEY;
-		if (!apiKey) {
+		if (!apiKey: any) {
 			throw new Error('CLAUDE_API_KEY not configured', };
 const model, = config.model || 'claude-sonnet-4.5';
  const response, = await fetch('https://api.anthropic.com/v1/messages', {
@@ -203,12 +203,12 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 		prompt: string, config: Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
 		const apiKey, = process.env.OPENAI_API_KEY;
-		if (!apiKey) {
+		if (!apiKey: any) {
 			throw new Error('OPENAI_API_KEY not configured', };
 const model, = config.model || 'gpt-4';
  const response, = await fetch('https://api.openai.com/v1/chat/completions', {
 			method: 'POST', headers: {
-				'Authorization': `Bearer ${apiKey}`,
+				'Authorization':: any `Bearer ${apiKey: any}`,
 				'Content-Type': 'application/json'
 			}); body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }]); temperature: config.temperature, max_tokens.maxTokens,
 			}); signal: AbortSignal.timeout(config.timeout)

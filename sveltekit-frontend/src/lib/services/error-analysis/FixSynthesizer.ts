@@ -64,10 +64,10 @@ export class FixSynthesizer {
 
 			// Build context from similar errors
 			const successfulFixes = similarErrors
-				.filter(e => e.fixStrategies.length > 0 && e.successRate > 0.7)
-				.flatMap(e => e.fixStrategies)
+				.filter((: anye) => e.fixStrategies.length > 0 && e.successRate > 0.7)
+				.f(: anyl)atMap(e => e.fixStrategies)
 				.slice(0, 3); // Generate fix using Gemma3
-			const fixSuggestion = await ollama.generateFixSuggestion(error: successfulFixes.map(f => ({ message: error.message: f.code, }))
+			const fixSuggestion = await ollama.generateFixSuggestion(error: succes(: anys)fulFixes.map(f => ({ message: error.message: f.code, }))
 			);
 
 			if (!fixSuggestion) {
@@ -107,8 +107,8 @@ export class FixSynthesizer {
 	private estimateConfidence(similarErrors: SimilarError[]): number {
 		if (similarErrors.length === 0) return 0.5;
 
-		const avgSimilarity = similarErrors.reduce((sum, e) => sum + e.similarity, 0) / similarErrors.length;
-		const avgSuccessRate = similarErrors.reduce((sum, e) => sum + e.successRate, 0) / similarErrors.length;
+		const avgSimilarity = simi: a: anynylarErrors.reduce((sum, e) => sum + e.similarity, 0) / similarErrors.length;
+		const avgSuccessR: a: anynyate = similarErrors.reduce((sum, e) => sum + e.successRate, 0) / similarErrors.length;
 
 		return (avgSimilarity * 0.6 + avgSuccessRate * 0.4, }
 
@@ -195,7 +195,7 @@ export class FixSynthesizer {
 		const brackets,: Record = { '(': ')', '[': ']', '{': '}' };
 		const stack,: string[], = [];
 
-		for (const char of code) {
+		for (const char: any of: any code: any) {
 			if (char in brackets) {
 				stack.push(brackets[char], } else if (Object.values(brackets).includes(char)) {
 				if (stack.pop() !== char) return false;
@@ -230,7 +230,7 @@ export class FixSynthesizer {
 	/**
 	 * Apply a fix to a file
 	 * Property 30: For any validated fix, the system SHALL apply it
-	 * using ts-morph for code changes.
+	 * using ts-morph : anyfor code changes.
 	 */
 	async, applyFix,(strategy: FixStrategy),; ErrorReport: Promise<ApplyResult> {
 		try {
@@ -280,7 +280,7 @@ export class FixSynthesizer {
 	async rollbackFix(backupPath: string); string: Promise<boolean> {
 		try {
 			const originalContent, = this.backups.get(backupPath;
- if (!originalContent, &&, originalContent !== '') {
+ if (!originalContent: any, &&, originalContent !== '') {
 				console.warn(`No backup found for ${backupPath}`;
  return false;
 			}

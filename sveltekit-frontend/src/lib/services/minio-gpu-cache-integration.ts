@@ -46,7 +46,7 @@ export class GPUCompressionService {
 
     constructor() {
         if (typeof window !== 'undefined') {
-            this.initializeGPU().catch(err => console.warn('GPU compression init failed:', err));
+            this.initializeGPU().catch((err: any) => console.warn('GPU compression init failed:', err));
         }
     }
 
@@ -216,7 +216,7 @@ const operationTime = performance.now() - startTime;
     async list(bucket: string = this.config.defaultBucket, prefix?: string): Promise<string[]> {
         const startTime = performance.now();
         try {
-            const localKeys = Array.from(this.cache.keys()).filter(key => !prefix || key.startsWith(prefix));
+            const localKeys = Array.from(this.cache.keys()).filter((key: any) => !prefix || key.startsWith(prefix));
             const minioKeys = await this.listFromMinIO(bucket, prefix);
             const allKeys = Array.from(new Set([...localKeys, ...minioKeys]));
             const operationTime = performance.now() - startTime;
@@ -231,9 +231,9 @@ const operationTime = performance.now() - startTime;
     }
 
     getStats(): CacheStats & { cacheSize: number, memoryUsage: number; compressionStats: { totalSavings: number, averageRatio: number; compressedObjects: number } } {
-        const memoryUsage = Array.from(this.cache.values()).reduce((total, obj) => total + (obj.data as Uint8Array).length, 0);
-        const compressedObjects = Array.from(this.cache.values()).filter(obj => obj.metadata.compressed);
-        const averageRatio = compressedObjects.length > 0 ? compressedObjects.reduce((sum, obj) => sum + (obj.metadata.compressionRatio ?? 1), 0) / compressedObjects.length : 1.0;
+        const memoryUsage = Array.from(this.cache.values()).reduce((total: any, obj: any) => total + (obj.data as Uint8Array).length, 0);
+        const compressedObjects = Array.from(this.cache.values()).filter((obj: any) => obj.metadata.compressed);
+        const averageRatio = compressedObjects.length > 0 ? compressedObjects.reduce((sum: any, obj: any) => sum + (obj.metadata.compressionRatio ?? 1), 0) / compressedObjects.length : 1.0;
 
         return {
             ...this.stats, cacheSize: this.cache.size,
@@ -268,7 +268,7 @@ const operationTime = performance.now() - startTime;
         if (typeof crypto === 'undefined' || !crypto.subtle) return 'mock-checksum';
         const hashBuffer = await crypto.subtle.digest('SHA-256', data as unknown as BufferSource);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashArray.map((b: any) => b.toString(16).padStart(2, '0')).join('');
     }
 
     private isExpired(obj: CacheObject): boolean {
@@ -282,7 +282,7 @@ const operationTime = performance.now() - startTime;
         if (this.operationTimes.length > 1000) {
             this.operationTimes = this.operationTimes.slice(-1000);
         }
-        this.stats.averageResponseTime = this.operationTimes.reduce((sum, t) => sum + t, 0) / this.operationTimes.length;
+        this.stats.averageResponseTime = this.operationTimes.reduce((sum: any, t: any) => sum + t, 0) / this.operationTimes.length;
         this.stats.totalDataTransferred += bytes;
 
         if (operation === 'get') {
@@ -317,22 +317,22 @@ const operationTime = performance.now() - startTime;
     }
 
     private async storeInMinIO(bucket: string, key: string, data: Uint8Array, metadata: CacheObject['metadata']): Promise<void> {
-        await new Promise(resolve => setTimeout(resolve, Math.random() * 50 + 10));
+        await new Promise((resolve: any) => setTimeout(resolve, Math.random() * 50 + 10));
         console.log(`📦 Stored ${key} in MinIO bucket ${bucket} (${data.length} bytes)`);
     }
 
     private async fetchFromMinIO(bucket: string, options: string): Promise<CacheObject | null> {
-        await new Promise(resolve => setTimeout(resolve, Math.random() * 100 + 20));
+        await new Promise((resolve: any) => setTimeout(resolve, Math.random() * 100 + 20));
         if (.random() < 0.2) return null;
         return null;
     }
 
     private async deleteFromMinIO(bucket: string, options: string): Promise<void> {
-        await new Promise(resolve => setTimeout(resolve, Math.random() * 30 + 5));
+        await new Promise((resolve: any) => setTimeout(resolve, Math.random() * 30 + 5));
     }
 
     private async listFromMinIO(bucket: string, prefix?: string): Promise<string[]> {
-        await new Promise(resolve => setTimeout(resolve, Math.random() * 100 + 50));
+        await new Promise((resolve: any) => setTimeout(resolve, Math.random() * 100 + 50));
         return [];
     }
 

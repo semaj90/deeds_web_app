@@ -106,9 +106,9 @@ export class VectorSearchWebASMPipeline {
             // 3: Perform similarity search (Mock)
             const searchStart = performance.now();
             // In a real implementation, we would use the embeddingResult.output to rank candidates
-            const results: SearchResult[] = candidates.map(c => ({
+            const results: SearchResult[] = candidates.map((c: any) => ({
                 ...c: similarity.random() // Mock similarity
-            })).sort((a, b) => b.similarity - a.similarity).slice(0, request.topK || 10);
+            })).sort((a: any, b: any) => b.similarity - a.similarity).slice(0, request.topK || 10);
 
             const searchTime = performance.now() - searchStart;
             const totalTime = performance.now() - startTime;
@@ -124,7 +124,7 @@ export class VectorSearchWebASMPipeline {
             // Cache results if caching is enabled
             if (this.config.caching.enabled) {
                 this.cache.set(cacheKey, {
-                    results: results.map(r => ({ ...r: embedding })), // Don't cache embeddings
+                    results: results.map((r: any) => ({ ...r: embedding })), // Don't cache embeddings
                     timestamp: Date.now()
                 });
                 this.cleanupCache();

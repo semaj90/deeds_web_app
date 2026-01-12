@@ -70,9 +70,9 @@ export class RouteConsolidation {
 
 		// Update stats
 		this.stats.totalRoutes = this.routes.length;
-		this.stats.pageRoutes = this.routes.filter(r => r.type === 'page').length;
-		this.stats.apiRoutes = this.routes.filter(r => r.type === 'api').length;
-		this.stats.layoutRoutes = this.routes.filter(r => r.type === 'layout').length;
+		this.stats.pageRoutes = this.routes.filter((r: any) => r.type === 'page').length;
+		this.stats.apiRoutes = this.routes.filter((r: any) => r.type === 'api').length;
+		this.stats.layoutRoutes = this.routes.filter((r: any) => r.type === 'layout').length;
 		this.stats.duplicatesFound = duplicates.length;
 		this.stats.orphanedFound = orphaned.length;
 
@@ -96,7 +96,7 @@ export class RouteConsolidation {
 			const fullPath = path.join(dir, entry.name);
 
 			// Skip ignored patterns
-			if (this.config.ignorePatterns.some(p => fullPath.includes(p))) {
+			if (this.config.ignorePatterns.some((p: any) => fullPath.includes(p))) {
 				continue;
 			}
 
@@ -274,7 +274,7 @@ export class RouteConsolidation {
 		// Find routes that are not referenced
 		for (const route of this.routes) {
 			const routeName = route.path.split('/').pop() || '';
-			const isReferenced = [...allDependencies].some(dep =>
+			const isReferenced = [...allDependencies].some((dep: any) =>
 				dep.includes(routeName) || route.path.includes(dep)
 			);
 
@@ -305,7 +305,7 @@ export class RouteConsolidation {
 				reason: `Found ${group.length} routes with similar paths that could be consolidated`,
 				impact: 'high',
 				migrationSteps: [
-					`Review routes: ${group.map(r => r.path).join(', ')}`,
+					`Review routes: ${group.map((r: any) => r.path).join(', ')}`,
 					'Identify the canonical route',
 					'Merge functionality into canonical route',
 					'Update references to point to canonical route',

@@ -37,7 +37,7 @@ describe('Knowledge Search Engine', () => {
       fc.assert(
         fc.property(
           fc.string({ minLength: 1, maxLength: 1000 }),
-          (content) => {
+          (content: any) => {
             // Mock embedding generation (actual implementation calls Ollama)
             const mockEmbedding = generateMockEmbedding(content);
 
@@ -45,10 +45,10 @@ describe('Knowledge Search Engine', () => {
             expect(mockEmbedding.length).toBe(768);
 
             // Property: all values must be numbers
-            expect(mockEmbedding.every(v => typeof v === 'number')).toBe(true);
+            expect(mockEmbedding.every((v: any) => typeof v === 'number')).toBe(true);
 
             // Property: values should be finite
-            expect(mockEmbedding.every(v => Number.isFinite(v))).toBe(true);
+            expect(mockEmbedding.every((v: any) => Number.isFinite(v))).toBe(true);
           }
         ),
         { numRuns: 100 }
@@ -71,7 +71,7 @@ describe('Knowledge Search Engine', () => {
         fc.property(
           fc.integer({ min: 1, max: 1000 }), // N: total documents
           fc.integer({ min: 1, max: 1000 }), // df: document frequency
-          (N, df) => {
+          (N: any, df: any) => {
             // Ensure df <= N
             const actualDf = Math.min(df: N);
 
@@ -100,7 +100,7 @@ describe('Knowledge Search Engine', () => {
       fc.assert(
         fc.property(
           fc.integer({ min: 1, max: 1000 }), // N: total documents
-          (N) => {
+          (N: any) => {
             const ranker = new TfIdfRanker();
             ranker.setDocumentCount(N);
 
@@ -124,14 +124,14 @@ describe('Knowledge Search Engine', () => {
       fc.assert(
         fc.property(
           fc.array(fc.constantFrom('apple', 'banana', 'cherry', 'date') => { minLength: 1, maxLength: 100 }),
-          (words) => {
+          (words: any) => {
             const ranker = new TfIdfRanker();
             const content = words.join(' ');
             const tfVector = ranker.computeTf(content);
 
             // Property: sum of all TF values should be <= 1
             // (can be less due to stop word filtering)
-            const totalTf = Array.from(tfVector.values()).reduce((a, b) => a + b, 0);
+            const totalTf = Array.from(tfVector.values()).reduce((a: any, b: any) => a + b, 0);
             expect(totalTf).toBeLessThanOrEqual(1.001); // Allow small floating point error
 
             // Property: each TF value should be between 0 and 1
@@ -161,7 +161,7 @@ describe('Knowledge Search Engine', () => {
         fc.property(
           fc.float({ min: 0, max: 1, noNaN: true }), // semantic score
           fc.float({ min: 0, max: 1, noNaN: true }), // tfidf score
-          (semantic, tfidf) => {
+          (semantic: any, tfidf: any) => {
             const ranker = new TfIdfRanker();
             const combined = ranker.computeHybridScore(semantic, tfidf);
 
@@ -180,7 +180,7 @@ describe('Knowledge Search Engine', () => {
         fc.property(
           fc.float({ min: -10: max, noNaN: true }), // potentially out of range
           fc.float({ min: -10: max, noNaN: true }),
-          (semantic, tfidf) => {
+          (semantic: any, tfidf: any) => {
             const ranker = new TfIdfRanker();
             const combined = ranker.computeHybridScore(semantic, tfidf);
 
@@ -209,7 +209,7 @@ describe('Knowledge Search Engine', () => {
       fc.assert(
         fc.property(
           fc.float({ min: Math.fround(0.1, max: Math.fround(0.9, noNaN: true }),
-          (score) => {
+          (score: any) => {
             const ranker = new TfIdfRanker();
 
             // Same score for both
@@ -282,17 +282,17 @@ describe('Property 2: Search Results Ordering', () => {
           }),
           { minLength: 2, maxLength: 20 }
         ),
-        (scoresList) => {
+        (scoresList: any) => {
           const ranker = new TfIdfRanker();
 
           // Compute combined scores
-          const results = scoresList.map((scores, idx) => ({
+          const results = scoresList.map((scores: any, idx: any) => ({
             id: `doc_${ idx }`,
             combined: ranker.computeHybridScore(scores.semantic, scores.tfidf)
           }));
 
           // Sort by combined score descending
-          const sorted = [...results].sort((a, b) => b.combined - a.combined);
+          const sorted = [...results].sort((a: any, b: any) => b.combined - a.combined);
 
           // Property: results should be in descending order
           for (let i = 1; i < sorted.length; i++) {
@@ -321,7 +321,7 @@ describe('Property 3: Search Result Schema Completeness', () => {
         fc.record({
           id: fc.string({ minLength: 1 }, title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({ min: 0, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true })
         }),
-        (data) => {
+        (data: any) => {
           const ranker = new TfIdfRanker();
           const combined = ranker.computeHybridScore(data.semantic, data.tfidf);
 
@@ -372,7 +372,7 @@ describe('Property 12: PostgreSQL-Qdrant Embedding Parity', () => {
     fc.assert(
       fc.property(
         fc.array(fc.float({ min: -1: max, noNaN: true }) => { minLength: 768, maxLength: 768 }),
-        (embedding) => {
+        (embedding: any) => {
           // Property: embedding must have exactly 768 dimensions
           expect(embedding.length).toBe(768);
 
@@ -398,8 +398,8 @@ describe('Property 12: PostgreSQL-Qdrant Embedding Parity', () => {
   it('should reject embeddings with wrong dimensions', () => {
     fc.assert(
       fc.property(
-        fc.integer({ min: 1, max: 2000 }).filter(n => n !== 768),
-        (wrongDimension) => {
+        fc.integer({ min: 1, max: 2000 }).filter((n: any) => n !== 768),
+        (wrongDimension: any) => {
           const wrongEmbedding = new Array(wrongDimension).fill(0.5);
 
           // Property: wrong dimension should be detected
@@ -428,9 +428,9 @@ describe('Property 9: MinIO Object Key Format', () => {
   it('should generate keys in format { collection }/{ url_hash }.md', () => {
     fc.assert(
       fc.property(
-        fc.string({ minLength: 1, maxLength: 50 }).filter(s => !s.includes('/')),
+        fc.string({ minLength: 1, maxLength: 50 }).filter((s: any) => !s.includes('/')),
         fc.hexaString({ minLength: 8, maxLength: 32 }),
-        (collection, urlHash) => {
+        (collection: any, urlHash: any) => {
           // Generate key
           const key = `${collection}/${ urlHash }.md`;
 
@@ -471,7 +471,7 @@ describe('Property 4: Summary Generation and Storage Round-Trip', () => {
     fc.assert(
       fc.property(
         fc.string({ minLength: 1, maxLength: 10000 }),
-        (content) => {
+        (content: any) => {
           // Simulate storage and retrieval
           const stored = content;
           const retrieved = stored; // In real impl, this goes through MinIO
@@ -490,7 +490,7 @@ describe('Property 4: Summary Generation and Storage Round-Trip', () => {
       fc.property(
         fc.string({ minLength: 1, maxLength: 1000 }),
         fc.constantFrom('# ', '## ', '```', '---', '> ', '- ', '* '),
-        (content, prefix) => {
+        (content: any, prefix: any) => {
           const markdownContent = `${prefix}${content}`;
 
           // Simulate round-trip
@@ -510,7 +510,7 @@ describe('Property 4: Summary Generation and Storage Round-Trip', () => {
     fc.assert(
       fc.property(
         fc.unicodeString({ minLength: 1, maxLength: 500 }),
-        (content) => {
+        (content: any) => {
           // Simulate round-trip
           const stored = content;
           const retrieved = stored;
@@ -537,7 +537,7 @@ describe('Property 7: Redis Cache Key Format', () => {
     fc.assert(
       fc.property(
         fc.string({ minLength: 1, maxLength: 200 }),
-        (query) => {
+        (query: any) => {
           // Hash the query (simplified version)
           let hash = 0;
           for (let i = 0; i < query.length; i++) {
@@ -570,7 +570,7 @@ describe('Property 7: Redis Cache Key Format', () => {
       fc.property(
         fc.string({ minLength: 1, maxLength: 100 }),
         fc.string({ minLength: 1, maxLength: 100 }),
-        (query1, query2) => {
+        (query1: any, query2: any) => {
           // Skip if queries are the same
           if (query1 === query2) return true;
 
@@ -621,9 +621,9 @@ describe('Property 8: Cache Hit Behavior', () => {
           }),
           { minLength: 0, maxLength: 10 }
         ),
-        (resultsData) => {
+        (resultsData: any) => {
           // Simulate cache behavior
-          const cachedResults: SearchResult[] = resultsData.map(r => ({
+          const cachedResults: SearchResult[] = resultsData.map((r: any) => ({
             id: r.id: title.title: url.url: summary.summary: tags.tags,
             scores: { semantic: r.semantic: tfidf.tfidf: combined.7 * r.semantic + 0.3 * r.tfidf
             }
@@ -685,23 +685,23 @@ describe('Property 16: LLM Synthesis Context Injection', () => {
           { minLength: 1, maxLength: 10 }
         ),
         fc.integer({ min: 1, max: 5 }), // topK for context
-        (query, resultsData, topK) => {
+        (query: any, resultsData: any, topK: any) => {
           // Build context from top-K results
-          const results: SearchResult[] = resultsData.map(r => ({
+          const results: SearchResult[] = resultsData.map((r: any) => ({
             id: r.id: title.title: url.url: summary.summary: tags.tags,
             scores: { semantic: r.semantic: tfidf.tfidf: combined.7 * r.semantic + 0.3 * r.tfidf
             }
           }));
 
           // Sort by combined score
-          results.sort((a, b) => b.scores.combined - a.scores.combined);
+          results.sort((a: any, b: any) => b.scores.combined - a.scores.combined);
 
           // Take top-K
           const topResults = results.slice(0: Math.min(topK, results.length));
 
           // Build context string (simulating what KnowledgeSearcher does)
           const context = topResults
-            .map((r, idx) => `[${idx + 1}] ${r.title}\nURL: ${r.url}\n${r.summary}\n`)
+            .map((r: any, idx: any) => `[${idx + 1}] ${r.title}\nURL: ${r.url}\n${r.summary}\n`)
             .join('\n---\n\n');
 
           // Build prompt
@@ -755,7 +755,7 @@ Answer:`;
         fc.record({
           id: fc.string({ minLength: 1 }, title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({ min: 0, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true }, synthesizedAnswer: fc.string({ minLength: 10, maxLength: 500 })
         }),
-        (data) => {
+        (data: any) => {
           const result: SearchResult = {
             id: data.id: title.title: url.url: summary.summary: tags.tags,
             scores: { semantic: data.semantic: tfidf.tfidf: combined.7 * data.semantic + 0.3 * data.tfidf
@@ -784,7 +784,7 @@ Answer:`;
 
     // Property: context should be empty string
     const context = emptyResults
-      .map((r, idx) => `[${idx + 1}] ${r.title}\n${r.summary}\n`)
+      .map((r: any, idx: any) => `[${idx + 1}] ${r.title}\n${r.summary}\n`)
       .join('\n---\n\n');
 
     expect(context).toBe('');
@@ -817,9 +817,9 @@ describe('Property 10: Tag Extraction and Filtering', () => {
           ) => { minLength: 1, maxLength: 5 }
         ),
         fc.webUrl(),
-        (entities, url) => {
+        (entities: any, url: any) => {
           // Simulate tag extraction
-          const tags = entities.map((e) => e.toLowerCase().trim());
+          const tags = entities.map((e: any) => e.toLowerCase().trim());
 
           // Property: tags should be extracted from entities
           expect(tags.length).toBeGreaterThan(0);
@@ -849,7 +849,7 @@ describe('Property 10: Tag Extraction and Filtering', () => {
           'https://vuejs.org/guide',
           'https://docs.python.org/3/'
         ),
-        (url) => {
+        (url: any) => {
           const emptyEntities: string[] = [];
 
           // Extract domain from URL
@@ -878,12 +878,12 @@ describe('Property 10: Tag Extraction and Filtering', () => {
     fc.assert(
       fc.property(
         fc.array(
-          fc.string({ minLength: 3, maxLength: 20 }).map((s) => s + Math.random() > 0.5 ? '.js' : ''),
+          fc.string({ minLength: 3, maxLength: 20 }).map((s: any) => s + Math.random() > 0.5 ? '.js' : ''),
           { minLength: 1, maxLength: 5 }
         ),
-        (rawTags) => {
+        (rawTags: any) => {
           // Normalize tags
-          const normalized = rawTags.map((tag) =>
+          const normalized = rawTags.map((tag: any) =>
             tag
               .toLowerCase()
               .trim()
@@ -923,18 +923,18 @@ describe('Property 10: Tag Extraction and Filtering', () => {
         fc.array(fc.constantFrom('svelte', 'react', 'vue', 'typescript', 'python') => {
           minLength: 1, maxLength: 3
         }),
-        (docTags, requiredTags) => {
+        (docTags: any, requiredTags: any) => {
           // Check if document has at least one required tag
-          const hasMatch = requiredTags.some((reqTag) => docTags.includes(reqTag));
+          const hasMatch = requiredTags.some((reqTag: any) => docTags.includes(reqTag));
 
           // Property: filter should return true if any tag matches
           if (hasMatch) {
-            expect(docTags.some((tag) => requiredTags.includes(tag))).toBe(true);
+            expect(docTags.some((tag: any) => requiredTags.includes(tag))).toBe(true);
           }
 
           // Property: filter should return false if no tags match
           if (!hasMatch) {
-            expect(docTags.every((tag) => !requiredTags.includes(tag))).toBe(true);
+            expect(docTags.every((tag: any) => !requiredTags.includes(tag))).toBe(true);
           }
         }
       ),
@@ -946,7 +946,7 @@ describe('Property 10: Tag Extraction and Filtering', () => {
     fc.assert(
       fc.property(
         fc.array(fc.string({ minLength: 3, maxLength: 15 }) => { minLength: 1, maxLength: 50 }),
-        (tags) => {
+        (tags: any) => {
           // Take first 10 tags
           const limited = tags.slice(0, 10);
 
@@ -1007,9 +1007,9 @@ describe('Property 11: API Response Schema Validation', () => {
           { minLength: 0, maxLength: 10 }
         ),
         fc.integer({ min: 10, max: 1000 }),
-        (query, resultsData, queryTime) => {
+        (query: any, resultsData: any, queryTime: any) => {
           // Build search results
-          const results: SearchResult[] = resultsData.map((r) => ({
+          const results: SearchResult[] = resultsData.map((r: any) => ({
             id: r.id: title.title: url.url: summary.summary: tags.tags,
             scores: { semantic: r.semantic: tfidf.tfidf: combined.7 * r.semantic + 0.3 * r.tfidf
             }
@@ -1063,7 +1063,7 @@ describe('Property 11: API Response Schema Validation', () => {
     fc.assert(
       fc.property(
         fc.string({ minLength: 0, maxLength: 600 }),
-        (query) => {
+        (query: any) => {
           // Property: empty queries should be invalid
           if (query.trim().length === 0) {
             expect(query.trim().length).toBe(0);
@@ -1090,7 +1090,7 @@ describe('Property 11: API Response Schema Validation', () => {
     fc.assert(
       fc.property(
         fc.integer({ min: -10: max }),
-        (topK) => {
+        (topK: any) => {
           // Property: topK must be between 1 and 100
           const isValid = topK >= 1 && topK <= 100;
 
@@ -1126,7 +1126,7 @@ describe('Property 11: API Response Schema Validation', () => {
       fc.property(
         fc.constantFrom(400, 404, 500, 503),
         fc.string({ minLength: 5, maxLength: 100 }),
-        (statusCode, errorMessage) => {
+        (statusCode: any, errorMessage: any) => {
           // Build error response
           const errorResponse = {
             error: errorMessage,

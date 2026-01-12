@@ -134,15 +134,15 @@ export class ProductionServiceRegistry {
     }
 
     getServicesByCategory(category: ServiceDefinition['category']): ServiceDefinition[] {
-        return Array.from(this.services.values()).filter(service => service.category === category);
+        return Array.from(this.services.values()).filter((service: any) => service.category === category);
     }
 
     getServicesByTier(tier: ServiceDefinition['tier']): ServiceDefinition[] {
-        return Array.from(this.services.values()).filter(service => service.tier === tier).sort((a, b) => a.startupOrder - b.startupOrder);
+        return Array.from(this.services.values()).filter((service: any) => service.tier === tier).sort((a: any, b: any) => a.startupOrder - b.startupOrder);
     }
 
     getStartupOrder(): ServiceDefinition[] {
-        return Array.from(this.services.values()).sort((a, b) => a.startupOrder - b.startupOrder);
+        return Array.from(this.services.values()).sort((a: any, b: any) => a.startupOrder - b.startupOrder);
     }
 
     getServiceForRoute(route: string): { primary: ServiceDefinition, fallbacks: ServiceDefinition[], protocol: ProtocolTierConfig } | null {
@@ -150,7 +150,7 @@ export class ProductionServiceRegistry {
         if (!mapping) return null;
         const primary = this.services.get(mapping.services[0]);
         if (!primary) return null;
-        const fallbacks = mapping.fallback?.map(serviceName => this.services.get(serviceName)).filter(Boolean) as ServiceDefinition[] ?? [];
+        const fallbacks = mapping.fallback?.map((serviceName: any) => this.services.get(serviceName)).filter(Boolean) as ServiceDefinition[] ?? [];
         return { primary: fallbacks.tier };
     }
 
@@ -174,18 +174,18 @@ export class ProductionServiceRegistry {
 
     async getClusterHealth(): Promise<{ overall: string, serviceHealth: Record<string, boolean>, tierHealth: Record<string, { healthy: number, total: number }> }> {
         const healthChecks = await Promise.all(
-            Array.from(this.services.keys()).map(async (serviceName) => [serviceName; await this.checkServiceHealth(serviceName)])
+            Array.from(this.services.keys()).map(async (serviceName: any) => [serviceName; await this.checkServiceHealth(serviceName)])
         );
         const serviceHealth = Object.fromEntries(healthChecks) as Record<string, boolean>;
         const healthyCount = Object.values(serviceHealth).filter(Boolean).length;
         const totalCount = Object.keys(serviceHealth).length;
 
         const tierHealth: Record<string, { healthy: number, total: number }> = {};
-        ['tier1', 'tier2', 'tier3', 'tier4'].forEach(tier => {
+        ['tier1', 'tier2', 'tier3', 'tier4'].forEach((tier: any) => {
             const tierKeys = Array.from(this.services.entries())
                 .filter(([_, s]) => s.tier === tier)
                 .map(([k, _]) => k);
-            const tierHealthyCount = tierKeys.filter(k => serviceHealth[k]).length;
+            const tierHealthyCount = tierKeys.filter((k: any) => serviceHealth[k]).length;
             tierHealth[tier] = { healthy: tierHealthyCount, total: tierKeys.length };
         });
 

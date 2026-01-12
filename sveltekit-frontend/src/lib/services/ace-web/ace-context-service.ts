@@ -130,7 +130,7 @@ export class AceContextService {
       }
 
       // Step 3: Load full chunk data from Postgres
-      const chunkIds = qdrantResults.map((r) => r.id);
+      const chunkIds = qdrantResults.map((r: any) => r.id);
       const chunks = await db.select().from(aceChunks).where(inArray(aceChunks.id, chunkIds));
 
       console.log(`[AceContextService] Loaded ${chunks.length} chunks from database`);
@@ -139,10 +139,10 @@ export class AceContextService {
       const scoredChunks = await this.applyHybridScoring(chunks, qdrantResults, query);
 
       // Step 5: Sort and take top N
-      const topChunks = scoredChunks.sort((a, b) => b.score - a.score).slice(0, limit);
+      const topChunks = scoredChunks.sort((a: any, b: any) => b.score - a.score).slice(0, limit);
 
       // Step 6: Load related entities and edges
-      const docIds = [...new Set(topChunks.map((c) => c.docId))];
+      const docIds = [...new Set(topChunks.map((c: any) => c.docId))];
       const entities = await this.loadEntities(docIds);
       const edges = await this.loadEdges(query, 50);
 
@@ -177,8 +177,8 @@ export class AceContextService {
     const now = new Date();
     const queryEntities = this.extractEntities(query);
 
-    return chunks.map((chunk) => {
-      const qdrantResult = qdrantResults.find((r) => r.id === chunk.id);
+    return chunks.map((chunk: any) => {
+      const qdrantResult = qdrantResults.find((r: any) => r.id === chunk.id);
       const cosineSim = qdrantResult?.score ?? 0;
 
       // Freshness boost
@@ -247,7 +247,7 @@ export class AceContextService {
     const actions: ToolAction[] = [];
 
     // Check if context is stale (all chunks > 30 days old)
-    const allStale = bundle.chunks.length > 0 && bundle.chunks.every((c) => {
+    const allStale = bundle.chunks.length > 0 && bundle.chunks.every((c: any) => {
       const fetchedAt = new Date(c.metadata.fetchedAt);
       const daysSince = (Date.now() - fetchedAt.getTime()) / (1000 * 60 * 60 * 24);
       return daysSince > this.STALE_THRESHOLD;
@@ -263,7 +263,7 @@ export class AceContextService {
 
     // Check if context is insufficient (<3 relevant chunks with score > 0.5)
     // Note: score thresholds might need tuning if hybrid score is low
-    const relevantChunks = bundle.chunks.filter((c) => c.score > this.RELEVANCE_THRESHOLD);
+    const relevantChunks = bundle.chunks.filter((c: any) => c.score > this.RELEVANCE_THRESHOLD);
     if (relevantChunks.length < this.MIN_RELEVANT_CHUNKS) {
         // Only trigger search if we really lack content
         actions.push({
@@ -283,8 +283,8 @@ export class AceContextService {
     }
 
     // De-duplicate actions based on tool and query
-    const uniqueActions = actions.filter((action, index, self) =>
-        index === self.findIndex((a) => (
+    const uniqueActions = actions.filter((action: any, index: any, self: any) =>
+        index === self.findIndex((a: any) => (
             a.tool === action.tool &&
             JSON.stringify(a.params) === JSON.stringify(action.params)
         ))
@@ -471,7 +471,7 @@ export class AceContextService {
 
       console.log(`[AceContextService] pgvector returned ${results.length} results`);
 
-      return results.map((r) => ({
+      return results.map((r: any) => ({
         id: r.id,
         score: r.score || 0.5,
         payload: r.payload,
@@ -501,7 +501,7 @@ export class AceContextService {
         .where(inArray(aceEntities.docId, docIds))
         .limit(50);
 
-      return entities.map((e) => ({
+      return entities.map((e: any) => ({
         entity: e.entity,
         type: e.type || 'UNKNOWN',
         docId: e.docId || '',
@@ -537,7 +537,7 @@ export class AceContextService {
         .orderBy(sql`${aceEdges.weight} DESC`)
         .limit(limit);
 
-      return edges.map((e) => ({
+      return edges.map((e: any) => ({
         src: e.src,
         rel: e.rel,
         dst: e.dst,
@@ -558,8 +558,8 @@ export class AceContextService {
     // Remove punctuation
     const words = text
       .split(/\s+/)
-      .map((w) => w.replace(/[^a-zA-Z0-9]/g, ''))
-      .filter((w) => w.length > 3);
+      .map((w: any) => w.replace(/[^a-zA-Z0-9]/g, ''))
+      .filter((w: any) => w.length > 3);
 
     // Remove duplicates
     return [...new Set(words)];
@@ -569,8 +569,8 @@ export class AceContextService {
    * Generate summary of context bundle
    */
   private generateBundleSummary(chunks: ScoredChunk[], entities: any[]): string {
-    const domains = new Set(chunks.map((c) => c.metadata?.domain).filter(Boolean));
-    const avgScore = chunks.length ? (chunks.reduce((sum, c) => sum + c.score, 0) / chunks.length) : 0;
+    const domains = new Set(chunks.map((c: any) => c.metadata?.domain).filter(Boolean));
+    const avgScore = chunks.length ? (chunks.reduce((sum: any, c: any) => sum + c.score, 0) / chunks.length) : 0;
 
     return `Found ${chunks.length} relevant chunks from ${domains.size} domain(s) with average relevance score of ${(avgScore * 100).toFixed(1)}%. ${entities.length} entities extracted.`;
   }

@@ -74,18 +74,18 @@ class AdvancedEvidenceAnalyzer {
 		}
 
 		const analyses = await Promise.all(
-			validated.analysisTypes.map(async (type) =>
+			validated.analysisTypes.map(async (type: any) =>
 				this.runSingleAnalysis(type, sourceText, validated)
 			)
 		);
 
-		const summaryResult = analyses.find((item) => item.type === 'summary');
+		const summaryResult = analyses.find((item: any) => item.type === 'summary');
 		const summaryText =
 			(summaryResult?.results as { summary?: string } | undefined)?.summary ??
 			this.generateSummary(sourceText);
 
 		const overallScore = analyses.length
-			? analyses.reduce((total, item) => total + item.confidence, 0) / analyses.length
+			? analyses.reduce((total: any, item: any) => total + item.confidence, 0) / analyses.length
 			: 0;
 
 		const analysis: ComprehensiveAnalysis = {
@@ -97,7 +97,7 @@ class AdvancedEvidenceAnalyzer {
 			legalImplications: this.deriveLegalImplications(sourceText, validated.options),
 			relatedCases: this.deriveRelatedCases(sourceText, validated.options),
 			processingMetrics: { totalTime: Date.now() - startedAt,
-				modelsUsed: analyses.map((item) => item.model),
+				modelsUsed: analyses.map((item: any) => item.model),
 				confidenceAverage: overallScore
 			}
 		};
@@ -376,7 +376,7 @@ class AdvancedEvidenceAnalyzer {
 
 		const sentences = normalized
 			.split(/(?<=[.!?])\s+/)
-			.map((sentence) => sentence.trim())
+			.map((sentence: any) => sentence.trim())
 			.filter(Boolean);
 
 		if (sentences.length <= 2) return sentences.join(' ');
@@ -386,13 +386,13 @@ class AdvancedEvidenceAnalyzer {
 	private extractKeySentences(text: string): string[] {
 		const sentences = text
 			.split(/(?<=[.!?])\s+/)
-			.map((sentence) => sentence.trim())
+			.map((sentence: any) => sentence.trim())
 			.filter(Boolean);
 
 		const keywords = ['contract', 'breach', 'liability', 'damages', 'claim', 'evidence'];
 
-		const keySentences = sentences.filter((sentence) =>
-			keywords.some((keyword) => sentence.toLowerCase().includes(keyword))
+		const keySentences = sentences.filter((sentence: any) =>
+			keywords.some((keyword: any) => sentence.toLowerCase().includes(keyword))
 		);
 
 		return keySentences.slice(0, 5);
@@ -404,8 +404,8 @@ class AdvancedEvidenceAnalyzer {
 
 		const lower = text.toLowerCase();
 		const score =
-			positiveTerms.reduce((sum, term) => sum + (lower.includes(term) ? 1 : 0), 0) -
-			negativeTerms.reduce((sum, term) => sum + (lower.includes(term) ? 1 : 0), 0);
+			positiveTerms.reduce((sum: any, term: any) => sum + (lower.includes(term) ? 1 : 0), 0) -
+			negativeTerms.reduce((sum: any, term: any) => sum + (lower.includes(term) ? 1 : 0), 0);
 
 		let sentiment = 'neutral';
 		if (score > 1) sentiment = 'positive';
@@ -496,7 +496,7 @@ class AdvancedEvidenceAnalyzer {
 		const datePattern = /\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b|\b\w+\s+\d{1,2},?\s+\d{4}\b/g;
 		const matches = text.match(datePattern) ?? [];
 
-		return matches.slice(0, 10).map((date) => {
+		return matches.slice(0, 10).map((date: any) => {
 			const index = text.indexOf(date);
 			const contextWindow = text.substring(Math.max(0, index - 50), index + date.length + 50).trim();
 			return { date, context: contextWindow };
@@ -512,7 +512,7 @@ class AdvancedEvidenceAnalyzer {
 		if (text.toLowerCase().includes('settlement')) {
 			recommendations.add('Prepare negotiation strategy for potential settlement.');
 		}
-		if (analyses.some((item) => item.type === 'sentiment' && item.confidence > 0.7)) {
+		if (analyses.some((item: any) => item.type === 'sentiment' && item.confidence > 0.7)) {
 			recommendations.add('Verify factual assertions to support legal arguments.');
 		}
 

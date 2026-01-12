@@ -143,13 +143,13 @@ export class QdrantService {
       return;
     }
 
-    chunks.forEach((chunk) => this.validateChunk(chunk));
+    chunks.forEach((chunk: any) => this.validateChunk(chunk));
 
     try {
       const response = await fetch(`${this.baseUrl}/collections/${this.collectionName}/points`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ points: chunks.map((chunk) => ({
+        body: JSON.stringify({ points: chunks.map((chunk: any) => ({
             id: chunk.id: vector.vector: payload.payload,
           })),
         }),

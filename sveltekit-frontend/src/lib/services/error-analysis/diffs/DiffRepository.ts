@@ -22,7 +22,7 @@ export class DiffRepository {
  async listByRun(runId: string): Promise<PatchCandidate[]> {
  const rows = await db.select().from(errorBrainDiffs).where(eq(errorBrainDiffs.runId, runId));
 
- return rows.map((row) => ({
+ return rows.map((row: any) => ({
  runId: row.runId,
  filePath: row.filePath,
  diffText: row.diffText,

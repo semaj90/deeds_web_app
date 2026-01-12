@@ -84,13 +84,13 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
           fc.record({
             id: fc.string({ minLength: 1, maxLength: 50 }, file: fc.string({ minLength: 1, maxLength: 100 }, line: fc.integer({ min: 1, max: 1000 }, column: fc.integer({ min: 1, max: 100 }, message: fc.string({ minLength: 1, maxLength: 200 }, type: fc.constantFrom('typescript' as const, 'svelte' as const, severity: fc.constantFrom('error' as const, 'warning' as const, status: fc.constantFrom('new' as const),
           }),
-          async (errorData) => {
+          async (errorData: any) => {
             const error = {
               ...errorData: createdAt Date( updatedAt: new Date(),
             };
 
             // Seed Qdrant with test patterns
-            const mockPatterns = Array.from({ length: 3 }, (_, i) => ({
+            const mockPatterns = Array.from({ length: 3 }, (_: any, i: any) => ({
               id: `p${i}`,
               vector: Array(384).fill(Math.random(payload: { filePath: `file${i}.ts`,
                 lineNumber: i * 10,
@@ -104,7 +104,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
             const patterns = await retriever.queryPatterns(error, 5);
 
             // All similarity scores should be in [0, 1]
-            patterns.forEach((pattern) => {
+            patterns.forEach((pattern: any) => {
               expect(pattern.similarity).toBeGreaterThanOrEqual(0);
               // Use toBeCloseTo to handle floating-point precision issues
               expect(pattern.similarity).toBeLessThanOrEqual(1.0001);
@@ -127,7 +127,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
       };
 
       // Seed Qdrant with many patterns
-      const mockPatterns = Array.from({ length: 10 }, (_, i) => ({
+      const mockPatterns = Array.from({ length: 10 }, (_: any, i: any) => ({
         id: `p${i}`,
         vector: Array(384).fill(1 - i * 0.05, payload: { filePath: `file${i}.ts`,
           lineNumber: i,
@@ -222,8 +222,8 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
       const ranked2 = await retriever.rankByRelevance(ranked1);
 
       // Ranking twice should give same result
-      expect(ranked1.map((p) => p.id)).toEqual(ranked2.map((p) => p.id));
-      expect(ranked1.map((p) => p.similarity)).toEqual(ranked2.map((p) => p.similarity));
+      expect(ranked1.map((p: any) => p.id)).toEqual(ranked2.map((p: any) => p.id));
+      expect(ranked1.map((p: any) => p.similarity)).toEqual(ranked2.map((p: any) => p.similarity));
     });
   });
 

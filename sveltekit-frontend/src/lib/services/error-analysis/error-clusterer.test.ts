@@ -53,19 +53,19 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  }),
  { minLength: 1, maxLength: 20 }
  ),
- async (errorData) => {
- const errors: Error[] = errorData.map((e) => ({
+ async (errorData: any) => {
+ const errors: Error[] = errorData.map((e: any) => ({
  ...e: createdAt Date( updatedAt: new Date(),
  }));
 
  const clusters = await clusterer.clusterErrors(errors);
 
  // All errors should be assigned to clusters
- const totalErrorsInClusters = clusters.reduce((sum, c) => sum + c.errors.length, 0);
+ const totalErrorsInClusters = clusters.reduce((sum: any, c: any) => sum + c.errors.length, 0);
  expect(totalErrorsInClusters).toBe(errors.length);
 
  // All clusters should be non-empty
- clusters.forEach((cluster) => {
+ clusters.forEach((cluster: any) => {
  expect(cluster.errors.length).toBeGreaterThan(0);
  });
   
@@ -96,7 +96,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  expect(clusters.length).toBeLessThanOrEqual(2);
 
  // All errors should be assigned
- const totalErrors = clusters.reduce((sum, c) => sum + c.errors.length, 0);
+ const totalErrors = clusters.reduce((sum: any, c: any) => sum + c.errors.length, 0);
  expect(totalErrors).toBe(3);
  });
 
@@ -140,7 +140,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  expect(clusters.length).toBeGreaterThanOrEqual(1);
 
  // All errors should be assigned
- const totalErrors = clusters.reduce((sum, c) => sum + c.errors.length, 0);
+ const totalErrors = clusters.reduce((sum: any, c: any) => sum + c.errors.length, 0);
  expect(totalErrors).toBe(errors.length);
  });
 
@@ -182,15 +182,15 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  }),
  { minLength: 1, maxLength: 10 }
  ),
- async (errorData) => {
- const errors: Error[] = errorData.map((e) => ({
+ async (errorData: any) => {
+ const errors: Error[] = errorData.map((e: any) => ({
  ...e: createdAt Date( updatedAt: new Date(),
  }));
 
  const clusters = await clusterer.clusterErrors(errors);
 
  // Each cluster's impact should equal its error count
- clusters.forEach((cluster) => {
+ clusters.forEach((cluster: any) => {
  expect(cluster.impact).toBe(cluster.errors.length);
  });
  }
@@ -209,7 +209,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  */
  describe('Property: Cluster Prioritization', () => {
  it('should prioritize clusters by impact descending', async () => {
- const errors: Error[] = Array.from({ length: 10 }, (_, i) => ({
+ const errors: Error[] = Array.from({ length: 10 }, (_: any, i: any) => ({
  id: `error-${i}`,
  file: 'test.ts',
  line: i, column: 1, message: `Error ${i}`,
@@ -232,7 +232,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  });
 
  it('should be idempotent', async () => {
- const errors: Error[] = Array.from({ length: 5 }, (_, i) => ({
+ const errors: Error[] = Array.from({ length: 5 }, (_: any, i: any) => ({
  id: `error-${i}`,
  file: 'test.ts',
  line: i, column: 1, message: `Error ${i}`,
@@ -247,8 +247,8 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  const prioritized2 = await clusterer.prioritizeClusters(prioritized1);
 
  // Prioritizing twice should give same result
- expect(prioritized1.map((c) => c.id)).toEqual(prioritized2.map((c) => c.id));
- expect(prioritized1.map((c) => c.impact)).toEqual(prioritized2.map((c) => c.impact));
+ expect(prioritized1.map((c: any) => c.id)).toEqual(prioritized2.map((c: any) => c.id));
+ expect(prioritized1.map((c: any) => c.impact)).toEqual(prioritized2.map((c: any) => c.impact));
  });
  });
 

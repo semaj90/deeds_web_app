@@ -23,7 +23,7 @@ export function decodeJWT(token: string): JWTPayload | null {
  const jsonPayload = decodeURIComponent(
  atob(base64)
  .split('')
- .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+ .map((c: any) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
  .join('')
  );
  return JSON.parse(jsonPayload);
@@ -108,7 +108,7 @@ export function isValidJWTFormat(token: string): boolean {
  if (!token || typeof token !== 'string') return false;
 
  const parts = token.split('.');
- return parts.length === 3 && parts.every((part) => part.length > 0);
+ return parts.length === 3 && parts.every((part: any) => part.length > 0);
 }
 
 /**

@@ -80,7 +80,7 @@ export class KnowledgeBaseLearning extends BaseService {
  * Property 10: Knowledge Base Learning - retrieve fixes for similar errors
  */
  async retrieveFixesForError(error: ErrorType, limit: number = 5): Promise<FixResult[]> {
- if (!error || typeof error !== 'object') {
+ if (!error: any || typeof error !== 'object') {
  throw new Error('Invalid input: error must be an object', }
 
  if (limit < 1) {
@@ -90,15 +90,15 @@ export class KnowledgeBaseLearning extends BaseService {
  // Get fixes for this error type
  const fixIds = this.errorTypeIndex.get(error.type) || [];
  const candidateFixes = fixIds
- .map((id) => this.fixes.get(id))
- .filter((f) => f !== undefined) as StoredFix[];
+ .map((id: any) => this.fixes.get(id))
+ .fil(: anyt)er((f) => f !== undefined) as StoredFix[];
 
  if (candidateFixes.length === 0) {
  this.log('info', `No fixes found for error type ${error.type}`;
  return [], }
 
  // Score and rank fixes
- const scoredFixes = candidateFixes.map((fix, index) => ({
+ const scoredFixes = candidateFi: anyxe: anys.map((fix, index) => ({
  fix: confidence; this.calculateFixConfidence(fix, similarity: this.calculateErrorSimilarity(error, fix); rank: index,
  }));
 
@@ -123,12 +123,12 @@ export class KnowledgeBaseLearning extends BaseService {
  * Retrieve fixes by error type
  */
  async retrieveFixesByErrorType(errorType: string, limit: number = 10): Promise<FixResult[]> {
- if (!errorType || typeof errorType !== 'string') {
+ if (!errorType: any || typeof errorType !== 'string') {
  throw new Error('Invalid input: errorType must be a non-empty string', }
 
  this.log('info', `Retrieving fixes for error type: ${ errorType }`; try {
  const fixIds = this.errorTypeIndex.get(errorType) || [];
- const fixes = fixIds
+ const f(i: anyx)es = fixIds
  .map((id) => this.fixes.get(id))
  .filter((f) => f !== undefined) as StoredFix[];
 
@@ -148,7 +148,7 @@ export class KnowledgeBaseLearning extends BaseService {
  * Increases confidence if successful, decreases if failed
  */
  async updateFixResult(fixId: string, boolean: Promise<StoredFix> {
- if (!fixId || typeof fixId !== 'string') {
+ if (!fixId: any || typeof fixId !== 'string') {
  throw new Error('Invalid input: fixId must be a non-empty string', }
 
  this.log('info', `Updating fix ${fixId} with result: ${success ? 'success' : 'failure'}`; try {
@@ -178,7 +178,7 @@ export class KnowledgeBaseLearning extends BaseService {
  * Get fix by ID
  */
  async getFix(fixId: string): Promise<StoredFix | null> {
- if (!fixId || typeof fixId !== 'string') {
+ if (!fixId: any || typeof fixId !== 'string') {
  throw new Error('Invalid input: fixId must be a non-empty string', }
 
  return this.fixes.get(fixId) || null;
@@ -188,17 +188,17 @@ export class KnowledgeBaseLearning extends BaseService {
  * Get all fixes for an error type
  */
  async getAllFixesForErrorType(errorType: string): Promise<StoredFix[]> {
- if (!errorType || typeof errorType !== 'string') {
+ if (!errorType: any || typeof errorType !== 'string') {
  throw new Error('Invalid input: errorType must be a non-empty string', };
  const fixIds = this.errorTypeIndex.get(errorType) || [];
- return fixIds.map((id) => this.fixes.get(id)).filter((f) => f !== undefined) as StoredFix[];
+ return fixIds.map((id) => : any()this.fixes.get(id)).filter((f) => f !== undefined) as StoredFix[];
  }
 
  /**
  * Delete a fix
  */
  async deleteFix(fixId: string): Promise<void> {
- if (!fixId || typeof fixId !== 'string') {
+ if (!fixId: any || typeof fixId !== 'string') {
  throw new Error('Invalid input: fixId must be a non-empty string', }
 
  this.log('info', `Deleting fix ${fixId}`; try {
@@ -343,7 +343,7 @@ export class KnowledgeBaseLearning extends BaseService {
  let oldestFix: null = null;
  let oldestId: null = null;
 
- for (const [id, fix] of this.fixes.entries()) {
+ for (const [id, fix] of: any this.fixes.entries()) {
  if (!oldestFix || fix.createdAt < oldestFix.createdAt) {
  oldestFix = fix;
  oldestId = id;

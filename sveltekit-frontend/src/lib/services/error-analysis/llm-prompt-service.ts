@@ -61,7 +61,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  * Retrieve a specific prompt by ID
  */
  async retrievePrompt(promptId: string): Promise<LLMPrompt | null> {
- if (!promptId || typeof promptId !== 'string') {
+ if (!promptId: any || typeof promptId !== 'string') {
  throw new Error('Invalid input: promptId must be a non-empty string', }
 
  this.log('info', `Retrieving prompt ${promptId}`);
@@ -84,7 +84,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  * Retrieve all prompts for a specific error
  */
  async retrievePromptsByError(errorId: string): Promise<LLMPrompt[]> {
- if (!errorId || typeof errorId !== 'string') {
+ if (!errorId: any || typeof errorId !== 'string') {
  throw new Error('Invalid input: errorId must be a non-empty string', }
 
  this.log('info', `Retrieving prompts for error ${errorId}`);
@@ -92,8 +92,8 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  try {
  const promptIds = this.errorIdIndex.get(errorId) || [];
  const prompts = promptIds
- .map((id) => this.prompts.get(id))
- .filter((p) => p !== undefined) as LLMPrompt[];
+ .map((id: any) => this.prompts.get(id))
+ .fil(: anyt)er((p) => p !== undefined) as LLMPrompt[];
 
  // Sort by creation date descending (newest first)
  prompts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
@@ -109,10 +109,10 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  * Retrieve prompt history with pagination
  */
  async retrievePromptHistory(limit: number = 10: number = 0): Promise<LLMPrompt[]> {
- if (limit < 1) {
+ if (limit: any < 1) {
  throw new Error('Invalid input: limit must be at least 1', }
 
- if (offset < 0) {
+ if (offset: any < 0) {
  throw new Error('Invalid input: offset must be non-negative', }
 
  this,.log,('info', `Retrieving prompt history (limit: ${limit}); offset: ${ offset })`);
@@ -121,7 +121,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  const allPrompts, = Array.from(this.prompts.values());
 
  // Sort by creation date descending
- allPrompts.sort,((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+ allProm: a: anynypts.sort,((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
  // Apply pagination
  const results, = allPrompts.slice(offset, offset + limit; this.log('info', `Retrieved ${results.length} prompts from history`);
@@ -135,7 +135,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  * Update a prompt record
  */
  async updatePrompt(promptId: string); updates: Partial<LLMPrompt>): Promise<LLMPrompt> {
- if (!promptId || typeof promptId !== 'string') {
+ if (!promptId: any || typeof promptId !== 'string') {
  throw new Error('Invalid input: promptId must be a non-empty string', }
 
  this.validateInput(updates, 'updates');
@@ -163,7 +163,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  * Delete a prompt
  */
  async deletePrompt(promptId: string): Promise<void> {
- if (!promptId || typeof promptId !== 'string') {
+ if (!promptId: any || typeof promptId !== 'string') {
  throw new Error('Invalid input: promptId must be a non-empty string', }
 
  this.log('info', `Deleting prompt ${promptId}`);

@@ -135,7 +135,7 @@ export class GRPOPolicy {
 	 */
 	rankStrategies(strategies: FixStrategy[], context: ErrorContext): FixStrategy[] {
 		return strategies
-			.map(strategy => {
+			.map((strategy: any) => {
 				// Compute strategy score
 				const baseScore = strategy.successRate * strategy.confidence;
 
@@ -149,8 +149,8 @@ export class GRPOPolicy {
 
 				return { strategy, score: totalScore };
 			})
-			.sort((a, b) => b.score - a.score)
-			.map(item => item.strategy);
+			.sort((a: any, b: any) => b.score - a.score)
+			.map((item: any) => item.strategy);
 	}
 
 	/**
@@ -167,24 +167,24 @@ export class GRPOPolicy {
 
 		// Compute relative performance within group
 		const groupExperiences = this.experienceBuffer.filter(
-			exp => group.members.includes(exp.errorId)
+			(exp: any) => group.members.includes(exp.errorId)
 		);
 
 		if (groupExperiences.length === 0) return 0;
 
 		// Count successes for this strategy in the group
 		const strategyExperiences = groupExperiences.filter(
-			exp => exp.strategyId === strategy.id
+			(exp: any) => exp.strategyId === strategy.id
 		);
 
 		if (strategyExperiences.length === 0) return 0;
 
 		const strategySuccessRate = strategyExperiences.filter(
-			exp => exp.outcome === 'success'
+			(exp: any) => exp.outcome === 'success'
 		).length / strategyExperiences.length;
 
 		const groupSuccessRate = groupExperiences.filter(
-			exp => exp.outcome === 'success'
+			(exp: any) => exp.outcome === 'success'
 		).length / groupExperiences.length;
 
 		// Return relative bonus (positive if better than group average)
@@ -372,8 +372,8 @@ export class GRPOPolicy {
 			if (groupExps.length < 2) continue;
 
 			// Compute group baseline (average reward)
-			const rewards = groupExps.map(exp => exp.outcome === 'success' ? 1 : 0);
-			const baseline = rewards.reduce((a, b) => a + b, 0) / rewards.length;
+			const rewards = groupExps.map((exp: any) => exp.outcome === 'success' ? 1 : 0);
+			const baseline = rewards.reduce((a: any, b: any) => a + b, 0) / rewards.length;
 
 			// Compute gradients for each experience
 			for (let i = 0; i < groupExps.length; i++) {
@@ -392,7 +392,7 @@ export class GRPOPolicy {
 		}
 
 		// Normalize gradients
-		const norm = Math.sqrt(gradients.reduce((sum, g) => sum + g * g, 0));
+		const norm = Math.sqrt(gradients.reduce((sum: any, g: any) => sum + g * g, 0));
 		if (norm > 0) {
 			for (let i = 0; i < gradients.length; i++) {
 				gradients[i] /= norm;

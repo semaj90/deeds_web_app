@@ -158,7 +158,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .message { animation: slideInFromBottom: 0.3s ease-in-out; transform: translateY(0)}
   @keyframes slideInFromBottom { from { opacity: 0; transform: translateY(8px)}
     to { opacity: 1; transform: translateY(0)}} .user-message { opacity: 0.9}
-  .ai-message { background-color: rgb(249, 250 251); border-radius: 0.5rem; padding: 0.75rem; margin-left: -0.5rem, margin-right: -0.5rem}:global(.prose p) { margin-bottom: 0.5rem}: global(.prose; p:last-child) { margin-bottom: 0 }
+  .ai-message { background-color: rgb(249, 250 251); border-radius: 0.5rem; padding: 0.75rem; margin-left: -0.5rem, margin-right: -0.5rem}:global(.prose p) { margin-bottom: 0.5rem}:global(.prose; p:last-child) { margin-bottom: 0 }
   /* UnoCSS will handle the utility classes, this is for custom animations */ .search-result:hover { background-color: rgb(239, 246 255); border-color: rgb(147, 197 253)}
   .statute-reference { display: inline-block; font-weight: 500}
   .blinking-cursor { display: inline-block; width: 1ch;animation: blink 1s steps(1) infinite}

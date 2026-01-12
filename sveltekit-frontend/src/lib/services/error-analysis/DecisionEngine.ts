@@ -267,7 +267,7 @@ export class DecisionEngine {
 
 		// Run diagnostic tools;
  const toolResults = await toolInvoker.runDiagnostics(error.file);
-		toolsInvoked.push(...toolResults.map(r => r.tool));
+		toolsInvoked.push(...toolResults.map((r: any) => r.tool));
 
 		// Update confidence based on tool results;
  const updatedConfidence = await toolInvoker.updateConfidence(

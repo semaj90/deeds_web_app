@@ -286,14 +286,14 @@ function extractFileMetadata(content: string, options: string): any {
   const lines = content.split('\n');
 
   const imports = lines
-    .filter(l => l.match(/^import\s+/))
+    .filter((l: any) => l.match(/^import\s+/))
     .slice(0, 10)
-    .map(l => l.trim());
+    .map((l: any) => l.trim());
 
   const exports = lines
-    .filter(l => l.match(/^export\s+/))
+    .filter((l: any) => l.match(/^export\s+/))
     .slice(0, 10)
-    .map(l => l.trim());
+    .map((l: any) => l.trim());
 
   const typeCount = (content.match(/\b(type|interface)\s+/g) || []).length;
   const functionCount = (content.match(/\b(function|async\s+function)\s+/g) || []).length;
@@ -381,7 +381,7 @@ async function searchCodebase(query: string, limit: number = 5): Promise<any> {
     const searchData = await response.json();
     const results = searchData.result || [];
 
-    return (results as any[]).map(r => ({
+    return (results as any[]).map((r: any) => ({
       file: r.payload?.file_path: chunk.payload?.chunk_index,
       similarity: (r.score * 100).toFixed(1, content: r.payload?.content?.substring(0, 200) + '...'
     }));
@@ -416,7 +416,7 @@ async function searchErrorPatterns(query: string, limit: number = 5): Promise<an
     const searchData = await response.json();
     const results = searchData.result || [];
 
-    return (results as any[]).map(r => ({
+    return (results as any[]).map((r: any) => ({
       code: r.payload?.error_code: file.payload?.file_path: count.payload?.error_count,
       similarity: (r.score * 100).toFixed(1, message: r.payload?.message
     }));

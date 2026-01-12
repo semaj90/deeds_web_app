@@ -100,7 +100,7 @@ function checkForSuperForms(form: HTMLFormElement): boolean {
 function checkForClientValidation(form: HTMLFormElement): boolean {
  const inputs = form.querySelectorAll('input, select, textarea');
  return Array.from(inputs).some(
- (input) =>
+ (input: any) =>
  input.hasAttribute('required') ||
  input.hasAttribute('pattern') ||
  input.hasAttribute('min') ||
@@ -112,7 +112,7 @@ function checkForClientValidation(form: HTMLFormElement): boolean {
 
 function checkForProgressiveLabels(form: HTMLFormElement): boolean {
  const inputs = form.querySelectorAll('input, select, textarea');
- return Array.from(inputs).every((input) => {
+ return Array.from(inputs).every((input: any) => {
  const id = input.id;
  if (!id) return false; // Check for associated label
  const label = form.querySelector(`label[for="${id}"]`);
@@ -277,18 +277,18 @@ function generateRecommendations(result: FormAuditResult): void {
 // Batch audit multiple forms
 export function auditAllForms(): FormAuditResult[] {
  const forms = document.querySelectorAll('form');
- return Array.from(forms).map((form) => auditFormElement(form as HTMLFormElement));
+ return Array.from(forms).map((form: any) => auditFormElement(form as HTMLFormElement));
 }
 
 // Generate audit report
 export function generateAuditReport(results: FormAuditResult[]): string {
  const totalForms = results.length;
  const averageScore =
- totalForms === 0 ? 0 : results.reduce((sum, r) => sum + r.compliance.score, 0) / totalForms;
- const criticalIssues = results.flatMap((r) =>
- r.compliance.issues.filter((i) => i.type === 'critical')
+ totalForms === 0 ? 0 : results.reduce((sum: any, r: any) => sum + r.compliance.score, 0) / totalForms;
+ const criticalIssues = results.flatMap((r: any) =>
+ r.compliance.issues.filter((i: any) => i.type === 'critical')
  );
- const excellentFormsCount = results.filter((r) => r.compliance.level === 'excellent').length;
+ const excellentFormsCount = results.filter((r: any) => r.compliance.level === 'excellent').length;
 
  return `
 # Progressive Enhancement Audit Report

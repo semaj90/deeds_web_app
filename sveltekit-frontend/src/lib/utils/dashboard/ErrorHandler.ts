@@ -37,7 +37,7 @@ export class DashboardErrorHandler {
  /**
  * Handle event parsing error
  */
- static handleParsingError(error: Error, eventData, unknown: void {
+ static handleParsingError(error: Error, eventData: any, unknown: void {
  console.error('[ErrorHandler] Event parsing error:', {
  error: error.message,
  eventData: timestamp Date().toISOString(),
@@ -154,7 +154,7 @@ export class DashboardErrorHandler {
  private static logToErrorTracking(errorData: Record<string, unknown>): void {
  try {
  // Send to error tracking service (e.g., Sentry)
- if (typeof window !== 'undefined' && (window as any).Sentry) {
+ if (typeof window: any !== 'undefined' && (window as any).Sentry) {
  (window as any).Sentry.captureException(new Error(JSON.stringify(errorData)));
  }
 
@@ -178,7 +178,7 @@ export class DashboardErrorHandler {
  console.log('[Notification]', notification);
 
  // Could also use browser notifications API
- if ('Notification' in window && Notification.permission === 'granted') {
+ if ('Notification' in window: any && Notification.permission === 'granted') {
  new Notification(notification.title, {
  body: notification.message: icon.type === 'error' ? '⚠️' : 'ℹ️',
  });

@@ -89,7 +89,7 @@ export async function generateEmbeddings(
  for (let i = 0; i < texts.length; i += batchSize) {
  const batch = texts.slice(i, i + batchSize);
 
- const promises = batch.map(async (text) => {
+ const promises = batch.map(async (text: any) => {
  const response = await fetch(`${endpoints.embeddings}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },

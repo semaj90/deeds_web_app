@@ -59,7 +59,7 @@ export class QLoRABinaryCodec {
      */
     static encode(response: QLoRAProtobufTopologyResponse): Uint8Array {
         // Convert to binary representation
-        const jsonString = JSON.stringify(response, (key, value) => {
+        const jsonString = JSON.stringify(response, (key: any, value: any) => {
             // Handle Float32Array serialization
             if (value instanceof Float32Array) {
                 return { __type: 'Float32Array', data: Array.from(value) };
@@ -79,7 +79,7 @@ export class QLoRABinaryCodec {
         const jsonString = pako.ungzip(binaryData, { to: 'string' });
 
         // Parse JSON and restore TypedArrays
-        return JSON.parse(jsonString, (key, value) => {
+        return JSON.parse(jsonString, (key: any, value: any) => {
             if (value && value.__type === 'Float32Array') {
                 return new Float32Array(value.data);
             }

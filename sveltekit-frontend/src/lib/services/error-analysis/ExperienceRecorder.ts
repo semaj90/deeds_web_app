@@ -237,7 +237,7 @@ export class ExperienceRecorder {
 		}
 
 		// Sort by similarity
-		similarGroups.sort((a, b) => b.similarity - a.similarity);
+		similarGroups.sort((a: any, b: any) => b.similarity - a.similarity);
 
 		// Collect strategies from similar groups
 		const strategyScores = new Map<string, {
@@ -303,7 +303,7 @@ export class ExperienceRecorder {
 		}
 
 		// Sort by success rate, then by total attempts
-		rankings.sort((a, b) => {
+		rankings.sort((a: any, b: any) => {
 			if (Math.abs(a.successRate - b.successRate) > 0.1) {
 				return b.successRate - a.successRate;
 			}
@@ -321,8 +321,8 @@ export class ExperienceRecorder {
 		if (!group) return [];
 
 		return group.members
-			.map(id => this.experiences.get(id))
-			.filter((e): e is Experience => e !== undefined);
+			.map((id: any) => this.experiences.get(id))
+			.filter((e: any): e is Experience => e !== undefined);
 	}
 
 	/**
@@ -343,14 +343,14 @@ export class ExperienceRecorder {
 	 * Get experiences by outcome
 	 */
 	getExperiencesByOutcome(outcome: 'success' | 'failure'): Experience[] {
-		return [...this.experiences.values()].filter(e => e.outcome === outcome);
+		return [...this.experiences.values()].filter((e: any) => e.outcome === outcome);
 	}
 
 	/**
 	 * Get human-provided fixes (high-value training examples)
 	 */
 	getHumanFixes(): Experience[] {
-		return [...this.experiences.values()].filter(e => e.humanIntervention);
+		return [...this.experiences.values()].filter((e: any) => e.humanIntervention);
 	}
 
 	/**

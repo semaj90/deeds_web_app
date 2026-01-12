@@ -352,9 +352,9 @@ describe('AceContextManager - Property-Based Tests (Task 12.1)', () => {
  expect(page2.length).toBe(5);
 
  // Ensure no overlap
- const page1Ids = page1.map((c) => c.sessionId);
- const page2Ids = page2.map((c) => c.sessionId);
- const overlap = page1Ids.filter((id) => page2Ids.includes(id));
+ const page1Ids = page1.map((c: any) => c.sessionId);
+ const page2Ids = page2.map((c: any) => c.sessionId);
+ const overlap = page1Ids.filter((id: any) => page2Ids.includes(id));
 
  expect(overlap).toEqual([]);
  });
@@ -367,7 +367,7 @@ describe('AceContextManager - Property-Based Tests (Task 12.1)', () => {
  contexts.push(c);
 
  // Small delay to ensure different timestamps
- await new Promise((resolve) => setTimeout(resolve, 5));
+ await new Promise((resolve: any) => setTimeout(resolve, 5));
  }
 
  const listed = await manager.listContexts(10, 0);

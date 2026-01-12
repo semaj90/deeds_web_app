@@ -72,7 +72,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  expect(errors).toEqual(mockErrors);
 
  // Property: Each error should have required fields
- errors.forEach((error) => {
+ errors.forEach((error: any) => {
  expect(error.id).toBeDefined();
  expect(error.file).toBeDefined();
  expect(error.line).toBeGreaterThan(0);
@@ -151,8 +151,8 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
 
  const errors = await extractor.extractErrors();
 
- const svelteErrors = errors.filter((e) => e.type === 'svelte');
- const tsErrors = errors.filter((e) => e.type === 'typescript');
+ const svelteErrors = errors.filter((e: any) => e.type === 'svelte');
+ const tsErrors = errors.filter((e: any) => e.type === 'typescript');
 
  expect(svelteErrors).toHaveLength(1);
  expect(tsErrors).toHaveLength(1);
@@ -186,8 +186,8 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
 
  const errors = await extractor.extractErrors();
 
- const errorSeverity = errors.filter((e) => e.severity === 'error');
- const warningSeverity = errors.filter((e) => e.severity === 'warning');
+ const errorSeverity = errors.filter((e: any) => e.severity === 'error');
+ const warningSeverity = errors.filter((e: any) => e.severity === 'warning');
 
  expect(errorSeverity).toHaveLength(1);
  expect(warningSeverity).toHaveLength(1);

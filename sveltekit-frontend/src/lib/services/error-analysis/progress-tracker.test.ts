@@ -224,7 +224,7 @@ describe('ProgressTracker', () => {
  await tracker.updateAnalysis(true, 0.8);
 
  // Wait a bit to accumulate time
- await new Promise((resolve) => setTimeout(resolve, 10));
+ await new Promise((resolve: any) => setTimeout(resolve, 10));
 
  const remaining = await tracker.getEstimatedTimeRemaining();
  expect(remaining).toBeGreaterThanOrEqual(0);
@@ -273,7 +273,7 @@ describe('ProgressTracker', () => {
  describe('Property: Progress Metric Monotonicity', () => {
  it(
  'errors fixed should never decrease',
- fc.asyncProperty(fc.array(fc.boolean(), { minLength: 1, maxLength: 20 }), async (results) => {
+ fc.asyncProperty(fc.array(fc.boolean(), { minLength: 1, maxLength: 20 }), async (results: any) => {
  await tracker.start(results.length);
 
  let previousFixed = 0;
@@ -290,7 +290,7 @@ describe('ProgressTracker', () => {
 
  it(
  'success rate should be between 0 and 100',
- fc.asyncProperty(fc.array(fc.boolean(), { minLength: 1, maxLength: 20 }), async (results) => {
+ fc.asyncProperty(fc.array(fc.boolean(), { minLength: 1, maxLength: 20 }), async (results: any) => {
  await tracker.start(results.length);
 
  for (const result of results) {
@@ -305,7 +305,7 @@ describe('ProgressTracker', () => {
 
  it(
  'completion percentage should be monotonically increasing',
- fc.asyncProperty(fc.array(fc.boolean(), { minLength: 1, maxLength: 20 }), async (results) => {
+ fc.asyncProperty(fc.array(fc.boolean(), { minLength: 1, maxLength: 20 }), async (results: any) => {
  await tracker.start(results.length);
 
  let previousCompletion = 0;

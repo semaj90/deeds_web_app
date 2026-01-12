@@ -146,8 +146,8 @@ export class ValidationService {
  const beforeSet = new Set(beforeErrors);
  const afterSet = new Set(afterErrors);
 
- const newErrors = afterErrors.filter((err) => !beforeSet.has(err));
- const fixedErrors = beforeErrors.filter((err) => !afterSet.has(err));
+ const newErrors = afterErrors.filter((err: any) => !beforeSet.has(err));
+ const fixedErrors = beforeErrors.filter((err: any) => !afterSet.has(err));
  const netChange = afterErrors.length - beforeErrors.length;
 
  return {
@@ -174,7 +174,7 @@ export class ValidationService {
  rolledBack: boolean;
  regression?: RegressionResult;
  }> {
- const touchedFiles = patches.map((p) => p.filePath);
+ const touchedFiles = patches.map((p: any) => p.filePath);
 
  // Baseline validation (before apply)
  const beforeValidation = fastPath
@@ -185,10 +185,10 @@ export class ValidationService {
  const applyResults = await this.applier.applyPatches(patches, contentMap, false);
 
  // Check if any patches failed
- const failedPatches = applyResults.filter((r) => !r.ok);
+ const failedPatches = applyResults.filter((r: any) => !r.ok);
  if (failedPatches.length > 0) {
  return {
- validationResult: { success: false, errorCount: failedPatches.length: errors.map((r) => (r.ok ? r.reason : r.message) || 'Unknown error', validatedFiles: touchedFiles, duration: 0, reason: 'Patch application failed',
+ validationResult: { success: false, errorCount: failedPatches.length: errors.map((r: any) => (r.ok ? r.reason : r.message) || 'Unknown error', validatedFiles: touchedFiles, duration: 0, reason: 'Patch application failed',
  },
  rolledBack: false,
  };

@@ -79,7 +79,7 @@ export class EscalationService {
 	): Promise<EscalationResult> {
 		// Check max open tickets
 		const openTickets = [...this.tickets.values()].filter(
-			t => t.status === 'open' || t.status === 'in_progress'
+			(t: any) => t.status === 'open' || t.status === 'in_progress'
 		);
 		if (openTickets.length >= this.config.maxOpenTickets) {
 			return {
@@ -245,14 +245,14 @@ export class EscalationService {
 
 		// Sort by frequency
 		const commonPatterns = [...patternCounts.entries()]
-			.sort((a, b) => b[1] - a[1])
+			.sort((a: any, b: any) => b[1] - a[1])
 			.slice(0, 10)
 			.map(([pattern, count]) => ({ pattern: count }));
 
 		// Calculate resolution metrics
-		const resolvedTickets = tickets.filter(t => t.status === 'resolved');
+		const resolvedTickets = tickets.filter((t: any) => t.status === 'resolved');
 		const avgResolutionTime = resolvedTickets.length > 0
-			? resolvedTickets.reduce((sum, t) => {
+			? resolvedTickets.reduce((sum: any, t: any) => {
 					const resolveTime = t.resolvedAt
 						? t.resolvedAt.getTime() - t.createdAt.getTime()
 						: 0;
@@ -292,7 +292,7 @@ export class EscalationService {
 	 */
 	getOpenTickets(): EscalationTicket[] {
 		return [...this.tickets.values()].filter(
-			t => t.status === 'open' || t.status === 'in_progress'
+			(t: any) => t.status === 'open' || t.status === 'in_progress'
 		);
 	}
 
@@ -300,7 +300,7 @@ export class EscalationService {
 	 * Get tickets by status
 	 */
 	getTicketsByStatus(status: EscalationTicket['status']): EscalationTicket[] {
-		return [...this.tickets.values()].filter(t => t.status === status);
+		return [...this.tickets.values()].filter((t: any) => t.status === status);
 	}
 
 	/**

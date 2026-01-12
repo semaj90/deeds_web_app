@@ -11,21 +11,24 @@ Reduce error count through targeted iterations of Clustering + AI Fixing.
 
 **Iteration 2:** ✅ Complete (Phantom Commas)
 - Fixed `{, ` pattern in 2080 files.
-- Errors: 123,791 → **89,294** (-34,497)
+- Errors: 123,791 → **89,280** (-34,511)
 
-**Total Reduction:** -61,631 errors (41%).
+**Iteration 3:** ✅ Complete (Import Auto-fix)
+- Used `ts-morph` for known types.
+- Errors: 89,294 → 89,280 (-14)
+
+**Total Reduction:** -61,645 errors (41%).
 
 ---
 
-## 🔄 Iteration 3: Type Alignments (Next)
-**Tools:** `ts-morph` (Verified v27.0.2 installed)
-**Focus:** TypeScript Interface & Import Mismatches
-**Goal:** -20,000 errors.
+## 🔄 Iteration 4: Explicit Any Strategy (In Progress)
+**Focus:** Implicit `any` errors (TS7006)
+**Goal:** -30,000 errors.
 
-1.  **Cluster C: Missing Imports**
-    *   *Analysis:* 89k errors likely include thousands of `Cannot find name 'X'`.
-    *   *Action:* Run `scripts/fix-missing-imports.ts` using `ts-morph` (AST) to safely inject imports.
-    *   *Target:* `src/lib/`
+1.  **Cluster D: Implicit Any**
+    *   *Analysis:* Large volume of `Parameter 'x' implicitly has an 'any' type`.
+    *   *Action:* Run `scripts/fix-implicit-any.ts` using `ts-morph` to add `: any` to untyped parameters.
+    *   *Rationale:* Stabilize build now, refine types later.
 
 ---
 
@@ -33,9 +36,10 @@ Reduce error count through targeted iterations of Clustering + AI Fixing.
 
 ### Completed Scripts
 - `scripts/fix-syntax-corruption.mjs`: The MVP of Phase 67. Fixed 3000+ files.
+- `scripts/fix-missing-imports.ts`: Proof of concept for AST fixes.
 
 ### Next Step
 ```bash
-# Run AST-based import fixer
-npx tsx scripts/fix-missing-imports.ts
+# Run Implicit Any Fixer
+npx tsx scripts/fix-implicit-any.ts
 ```

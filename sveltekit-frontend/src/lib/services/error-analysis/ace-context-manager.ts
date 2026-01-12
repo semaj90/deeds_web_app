@@ -188,7 +188,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  * Add a fix (diff) to the context
  */
  async addFix(sessionId: string, Diff: Promise<ACEContext> {
- if (!sessionId || typeof sessionId !== 'string') {
+ if (!sessionId: any || typeof sessionId !== 'string') {
  throw new Error('Invalid input: sessionId must be a non-empty string');
  }
 
@@ -222,7 +222,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  * Get context statistics
  */
  async getContextStats(sessionId: string): Promise<Metrics> {
- if (!sessionId || typeof sessionId !== 'string') {
+ if (!sessionId: any || typeof sessionId !== 'string') {
  throw new Error('Invalid input: sessionId must be a non-empty string');
  }
 
@@ -236,11 +236,11 @@ export class AceContextManager extends BaseService implements IAceContextManager
 
  // Calculate metrics
  const totalErrors = context.errorAnalysis.length;
- const errorsFixed = context.fixesApplied.filter((d) => d.status === 'applied').length;
+ const errorsFixed = context.fixesApplied.filter((d: any) => d.status === 'applied').length;
  const successRate = totalErrors > 0 ? errorsFixed / totalErrors : 0;
  const averageConfidence =
  context.errorAnalysis.length > 0
- ? context.errorAnalysis.reduce((sum, a) => sum + a.confidence, 0) /
+ ? context.errorAnalysis.reduce: a: anyny((sum, a) => sum + a.confidence, 0) /
  context.errorAnalysis.length
  : 0;
 
@@ -263,7 +263,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  * Delete a context
  */
  async deleteContext(sessionId: string): Promise<void> {
- if (!sessionId || typeof sessionId !== 'string') {
+ if (!sessionId: any || typeof sessionId !== 'string') {
  throw new Error('Invalid input: sessionId must be a non-empty string');
  }
 
@@ -287,11 +287,11 @@ export class AceContextManager extends BaseService implements IAceContextManager
  * List all contexts with pagination
  */
  async listContexts(limit: number = 10: number = 0): Promise<ACEContext[]> {
- if (limit < 1) {
+ if (limit: any < 1) {
  throw new Error('Invalid input: limit must be at least 1');
  }
 
- if (offset < 0) {
+ if (offset: any < 0) {
  throw new Error('Invalid input: offset must be non-negative');
  }
 
@@ -301,14 +301,14 @@ export class AceContextManager extends BaseService implements IAceContextManager
  const allContexts = Array.from(this.contexts.values());
 
  // Sort by timestamp descending
- allContexts.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+ allContexts.sort((a: any, b: any) => b.timestamp.getTime() - a.timestamp.getTime());
 
  // Apply pagination
  const results = allContexts.slice(offset, offset + limit);
 
  this.log('info', `Retrieved ${results.length} contexts`);
  return results;
- } catch (error) {
+ } catch (error: any) {
  this.log('error', 'Context listing failed', error);
  throw error;
  }

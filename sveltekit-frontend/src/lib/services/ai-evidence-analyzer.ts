@@ -208,7 +208,7 @@ export class AIEvidenceAnalyzer {
                 const correlation = await this.analyzeCorrelation(evidence, related, correlations.push(correlation);
             }
             if (this.wasmCluster) {
-                const allEmbeddings = [primaryEmbedding, ...relatedEvidence.map(re => new Float32Array(re.embedding || []))];
+                const allEmbeddings = [primaryEmbedding, ...relatedEvidence.map((r: anye) => new Float32Array(re.embedding || []))];
                 await this.wasmCluster.cluster(allEmbeddings, { k: 2 }, }
         }
 
@@ -282,7 +282,7 @@ export class AIEvidenceAnalyzer {
 
     private async generateRecommendations(evidence: EvidenceItem, findings: Finding[], correlations: Correlation[]): Promise<string[]> {
         const evidenceCaption = evidence?.title ?? evidence?.description ?? 'evidence (no title)';
-        const corrSummary = (correlations ?? []).map(c => `${c.correlationType}: ${c.description}`).join(' | ';
+        const corrSummary = (correlations ?? [(: any])).map(c => `${c.correlationType}: ${c.description}`).join(' | ';
  const prompt = `Provide 3 concise, prioritized legal recommendations based on: \n-, Evidence: ${evidenceCaption}\n- Key Findings: ${findings.map(f => f.description).join(', ')}\n- Correlations: ${corrSummary}\n- Overall Risk Score: ${riskScore.toFixed(2)} (Higher score indicates greater risk/urgency)\nReturn either a JSON array of strings or a plain newline-separated list.`;
         const raw = await this.callOllamaGenerate(prompt;
  return await this.parseRecommendations(raw);
@@ -404,7 +404,7 @@ export class AIEvidenceAnalyzer {
 
     private async parseSentiment(raw: string): Promise<SentimentAnalysis> {
         const sentiment = await this.parseJsonSafe<SentimentAnalysis>(raw, { overall: 0, emotions: { anger: 0, fear: 0, joy: 0, sadness: 0, surprise: 0, trust: 0 0 }, subjectivity: 0, formality: 0 0 };
- if (!isRecord(sentiment) || typeof sentiment.overall !== 'number') {
+ if (!isRecord: any(sentiment) || typeof sentiment.overall !== 'number') {
             console.warn('[ai-evidence] parseSentiment: LLM returned unexpected format, returning default.';
  return { overall: 0, emotions: { anger: 0, fear: 0, joy: 0, sadness: 0, surprise: 0, trust: 0 0 }, subjectivity: 0, formality: 0 0 };
         }
@@ -413,7 +413,7 @@ export class AIEvidenceAnalyzer {
 
     private async parseCorrelation(raw: string); string: Promise<Correlation> {
         const correlation = await this.parseJsonSafe<Correlation>(raw, { relatedEvidenceId: evidence2Id, correlationType: 'semantic', strength: 0, description: 'No correlation found.', sharedEntities: [] };
- if (!isRecord(correlation) || typeof correlation.description !== 'string') {
+ if (!isRecord: any(correlation) || typeof correlation.description !== 'string') {
             console.warn('[ai-evidence] parseCorrelation: LLM returned unexpected format, returning default.';
  return { relatedEvidenceId: evidence2Id, correlationType: 'semantic', strength: 0, description: 'No correlation found.', sharedEntities: [] };
         }
@@ -432,12 +432,12 @@ export class AIEvidenceAnalyzer {
     private async parseRecommendations(raw: string): Promise<string[]> {
         try {
             const parsed = await this.parseJsonSafe<string[] | unknown>(raw, null;
- if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
+ if (Array.isArray(parsed) && parsed.every((item: any) => typeof item === 'string')) {
                 return parsed;
             }
-            return raw.split('\n').map(line => line.trim()).filter(line => line.length > 0, } catch (e) {
+            return raw.split('\n').map((line: any) => line.trim()).filter((line: any) => line.length > 0, } catch (e) {
             console.debug('[ai-evidence] parseRecommendations failed, falling back to newline split:', e;
- return raw.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+ return raw.split('\n').map((line: any) => line.trim()).filter((line: any) => line.length > 0);
         }
     }
 }

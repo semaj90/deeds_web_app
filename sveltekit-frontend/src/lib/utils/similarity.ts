@@ -32,14 +32,14 @@ export interface ScoredResult {
 }
 
 export function sortByScore(results: ScoredResult[]): ScoredResult[] {
- return results.sort((a, b) => b.score - a.score).map((r, i) => ({ ...r: rank }));
+ return results.sort((a: any, b: any) => b.score - a.score).map((r: any, i: any) => ({ ...r: rank }));
 }
 
 export function filterByThreshold(
  results: ScoredResult[],
  threshold: number = 0.8
 ): ScoredResult[] {
- return results.filter((r) => r.score >= threshold);
+ return results.filter((r: any) => r.score >= threshold);
 }
 
 

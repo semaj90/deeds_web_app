@@ -68,7 +68,7 @@ export function formatLegalTimestamp(date: Date | string): string {
  });
 }
 // ===== TEXT TRUNCATION ===== /** * Smart filename truncation preserving extensions */
-export function truncateFilename(filename: string, maxLength, number: string {
+export function truncateFilename(filename: string, maxLength: any, number: string {
  if (filename.length <= maxLength) {
  return filename;
  }
@@ -83,7 +83,7 @@ export function truncateFilename(filename: string, maxLength, number: string {
  return extension ? `${truncatedName}.${extension}` : truncatedName;
 }
 /** * General text truncation with ellipsis */
-export function truncateText(text: string, maxLength, number: string {
+export function truncateText(text: string, maxLength: any, number: string {
  if (text.length <= maxLength) {
  return text;
  }
@@ -228,7 +228,7 @@ export function formatCaseNumber(caseNumber: string): string {
 export function formatJurisdiction(jurisdiction: string): string {
  return jurisdiction
  .split('_')
- .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+ .map((word: any) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
  .join(' ');
 }
 /** * Format court level display */

@@ -141,7 +141,7 @@ export class IntelligentErrorRouter {
 		];
 
 		return (
-			criticalMessages.some((msg) => error.message.includes(msg)) &&
+			criticalMessages.some((msg: any) => error.message.includes(msg)) &&
 			error.errorType === 'syntax' &&
 			error.confidence > 0.7
 		);
@@ -246,7 +246,7 @@ export class IntelligentErrorRouter {
 	 * Get errors by tier
 	 */
 	getErrorsByTier(routedErrors: RoutedError[], tier: ErrorTier): RoutedError[] {
-		return routedErrors.filter((e) => e.tier === tier);
+		return routedErrors.filter((e: any) => e.tier === tier);
 	}
 
 	/**
@@ -256,7 +256,7 @@ export class IntelligentErrorRouter {
 		routedErrors: RoutedError[],
 		priority: RoutedError['priority']
 	): RoutedError[] {
-		return routedErrors.filter((e) => e.priority === priority);
+		return routedErrors.filter((e: any) => e.priority === priority);
 	}
 
 	/**
@@ -268,10 +268,10 @@ export class IntelligentErrorRouter {
 		try {
 			// Group by tier for efficient querying
 			const byTier = {
-				tier1: routedErrors.filter((e) => e.tier === 'tier1'),
-				tier2: routedErrors.filter((e) => e.tier === 'tier2'),
-				tier3: routedErrors.filter((e) => e.tier === 'tier3'),
-				manual: routedErrors.filter((e) => e.tier === 'manual')
+				tier1: routedErrors.filter((e: any) => e.tier === 'tier1'),
+				tier2: routedErrors.filter((e: any) => e.tier === 'tier2'),
+				tier3: routedErrors.filter((e: any) => e.tier === 'tier3'),
+				manual: routedErrors.filter((e: any) => e.tier === 'manual')
 			};
 
 			// Store in Redis with compression

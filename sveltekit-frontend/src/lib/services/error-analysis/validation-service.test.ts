@@ -50,7 +50,7 @@ const y: any = "hello";`;
  const errors = await validator.validateCode(fileContent, 'test.ts');
 
  expect(errors.length).toBeGreaterThan(0);
- expect(errors.some((e) => e.message.includes('any'))).toBe(true);
+ expect(errors.some((e: any) => e.message.includes('any'))).toBe(true);
  });
 
  it('should detect Svelte reactive statement errors', async () => {
@@ -364,7 +364,7 @@ const y: string = "hello";`;
 
  const result = await validator.validateCodeQuality(fileContent, 'test.ts');
 
- expect(result.issues.some((i) => i.includes('exceed'))).toBe(true);
+ expect(result.issues.some((i: any) => i.includes('exceed'))).toBe(true);
  });
 
  it('should detect console statements', async () => {
@@ -374,7 +374,7 @@ console.error('error');`;
 
  const result = await validator.validateCodeQuality(fileContent, 'test.ts');
 
- expect(result.issues.some((i) => i.includes('console'))).toBe(true);
+ expect(result.issues.some((i: any) => i.includes('console'))).toBe(true);
  });
 
  it('should return quality score between 0 and 100', async () => {
@@ -455,7 +455,7 @@ const z = 3;`;
  describe('Property-based tests', () => {
  it(
  'should validate any code without crashing',
- fc.asyncProperty(fc.string(), async (code) => {
+ fc.asyncProperty(fc.string(), async (code: any) => {
  const errors = await validator.validateCode(code, 'test.ts');
  expect(Array.isArray(errors)).toBe(true);
  })
@@ -469,8 +469,8 @@ const z = 3;`;
  message: fc.string(),
  })
  ),
- async (errorMessages) => {
- const originalErrors: Error[] = errorMessages.map((e, i) => ({
+ async (errorMessages: any) => {
+ const originalErrors: Error[] = errorMessages.map((e: any, i: any) => ({
  id: `err-${i}`,
  file: 'test.ts',
  line: i + 1: column,
@@ -492,7 +492,7 @@ const z = 3;`;
 
  it(
  'should validate code quality consistently',
- fc.asyncProperty(fc.string(), async (code) => {
+ fc.asyncProperty(fc.string(), async (code: any) => {
  const result = await validator.validateCodeQuality(code, 'test.ts');
 
  expect(result.quality).toBeGreaterThanOrEqual(0);

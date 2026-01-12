@@ -54,26 +54,26 @@ export class ChatSSEClient {
 		this.eventSource = new EventSource(url);
 
 		// Handle connection events
-		this.eventSource.addEventListener('connected', (event) => {
+		this.eventSource.addEventListener('connected', (event: any) => {
 			console.log('SSE connected:', JSON.parse(event.data));
 			this.connected = true;
 		});
 
 		// Handle messages
-		this.eventSource.addEventListener('message', (event) => {
+		this.eventSource.addEventListener('message', (event: any) => {
 			try {
 				const message = JSON.parse(event.data) as ChatMessage;
-				this.messageHandlers.forEach(handler => handler(message));
+				this.messageHandlers.forEach((handler: any) => handler(message));
 			} catch (error) {
 				console.error('Failed to parse SSE message:', error);
 			}
 		});
 
 		// Handle errors
-		this.eventSource.addEventListener('error', (event) => {
+		this.eventSource.addEventListener('error', (event: any) => {
 			console.error('SSE error:', event);
 			const error = new Error('SSE connection error');
-			this.errorHandlers.forEach(handler => handler(error));
+			this.errorHandlers.forEach((handler: any) => handler(error));
 
 			// Auto-reconnect after 3 seconds
 			setTimeout(() => {
@@ -85,7 +85,7 @@ export class ChatSSEClient {
 		});
 
 		// Handle ping (keep-alive)
-		this.eventSource.addEventListener('ping', (event) => {
+		this.eventSource.addEventListener('ping', (event: any) => {
 			const data = JSON.parse(event.data);
 			console.debug('SSE ping:', data.timestamp);
 		});
@@ -157,11 +157,11 @@ export function createChatStream(sessionId: string) {
 
 	const client = new ChatSSEClient(sessionId);
 
-	client.onMessage((msg) => {
+	client.onMessage((msg: any) => {
 		messages = [...messages, msg];
 	});
 
-	client.onError((err) => {
+	client.onError((err: any) => {
 		error = err;
 	});
 

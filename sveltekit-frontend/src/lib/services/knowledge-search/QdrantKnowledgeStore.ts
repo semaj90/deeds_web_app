@@ -210,7 +210,7 @@ export class QdrantKnowledgeStore {
 
     // Property 2: Results are already sorted by Qdrant in descending score order
     // Property 3: Map to SearchResult with all required fields
-    return results.map(r => this.mapToSearchResult(r));
+    return results.map((r: any) => this.mapToSearchResult(r));
   }
 
   /**

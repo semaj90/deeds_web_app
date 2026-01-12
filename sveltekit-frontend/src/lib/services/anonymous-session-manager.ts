@@ -160,7 +160,7 @@ export class AnonymousSessionManager {
 		if (!this.session) return null;
 
 		let messageCount = 0;
-		this.session.chats.forEach(messages => {
+		this.session.chats.forEach((messages: any) => {
 			messageCount += messages.length;
 		});
 
@@ -189,7 +189,7 @@ export class AnonymousSessionManager {
 		const chatHistory = this.session.chats.get(chatId);
 		if (!chatHistory) return;
 
-		chatHistory.forEach(msg => {
+		chatHistory.forEach((msg: any) => {
 			if (messageIds.includes(msg.id)) {
 				msg.saved = true;
 			}
@@ -213,7 +213,7 @@ export class AnonymousSessionManager {
 		if (!this.session) return false;
 
 		for (const [_, messages] of this.session.chats) {
-			if (messages.some(m => !m.saved)) {
+			if (messages.some((m: any) => !m.saved)) {
 				return true;
 			}
 		}
@@ -229,7 +229,7 @@ export class AnonymousSessionManager {
 
 		let count = 0;
 		for (const [_, messages] of this.session.chats) {
-			count += messages.filter(m => !m.saved).length;
+			count += messages.filter((m: any) => !m.saved).length;
 		}
 
 		return count;

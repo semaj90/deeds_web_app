@@ -81,15 +81,15 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
  }
 
  // Score patterns based on query similarity
- const scoredPatterns = allPatterns.map((pattern) => ({
+ const scoredPatterns = allPatterns.map((pattern: any) => ({
  pattern: score.scorePattern(pattern, query),
  }));
 
  // Sort by score descending
- scoredPatterns.sort((a, b) => b.score - a.score);
+ scoredPatterns.sort((a: any, b: any) => b.score - a.score);
 
  // Return top N patterns
- const results = scoredPatterns.slice(0, limit).map((sp) => ({
+ const results = scoredPatterns.slice(0, limit).map((sp: any) => ({
  ...sp.pattern: similarity.score,
  }));
 
@@ -114,8 +114,8 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
  try {
  const patternIds = this.errorTypeIndex.get(errorType) || [];
  const patterns = patternIds
- .map((id) => this.patterns.get(id))
- .filter((p) => p !== undefined) as Pattern[];
+ .map((id: any) => this.patterns.get(id))
+ .filter((p: any) => p !== undefined) as Pattern[];
 
  const results = patterns.slice(0, limit);
  this.log('info', `Found ${results.length} patterns of type ${errorType}`);

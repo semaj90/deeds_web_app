@@ -277,7 +277,7 @@ describe('FeatureFlags', () => {
  describe('Property-based tests', () => {
  it(
  'should handle any flag name without crashing',
- fc.property(fc.string(), (flagName) => {
+ fc.property(fc.string(), (flagName: any) => {
  try {
  flags.isEnabled(flagName);
  } catch (e) {
@@ -288,7 +288,7 @@ describe('FeatureFlags', () => {
 
  it(
  'should maintain consistency when toggling flags',
- fc.property(fc.array(fc.tuple(fc.string(), fc.boolean())), (operations) => {
+ fc.property(fc.array(fc.tuple(fc.string(), fc.boolean())), (operations: any) => {
  operations.forEach(([flagName, value]) => {
  try {
  flags.setFlag(flagName, value);
@@ -303,7 +303,7 @@ describe('FeatureFlags', () => {
 
  it(
  'should reset to consistent state',
- fc.property(fc.array(fc.tuple(fc.string(), fc.boolean())), (operations) => {
+ fc.property(fc.array(fc.tuple(fc.string(), fc.boolean())), (operations: any) => {
  const original = flags.getAllFlags();
 
  operations.forEach(([flagName, value]) => {

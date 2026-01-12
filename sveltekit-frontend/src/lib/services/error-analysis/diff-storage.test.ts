@@ -140,8 +140,8 @@ describe('DiffStorage', () => {
  const diffs = await storage.getDiffsByError('err-1');
 
  expect(diffs).toHaveLength(2);
- expect(diffs.map((d) => d.id)).toContain('diff-1');
- expect(diffs.map((d) => d.id)).toContain('diff-2');
+ expect(diffs.map((d: any) => d.id)).toContain('diff-1');
+ expect(diffs.map((d: any) => d.id)).toContain('diff-2');
  });
 
  it('should return empty array for error with no diffs', async () => {
@@ -335,7 +335,7 @@ describe('DiffStorage', () => {
  const diffs = await storage.listDiffs({ status: 'applied' });
 
  expect(diffs.length).toBeGreaterThanOrEqual(1);
- expect(diffs.every((d) => d.status === 'applied')).toBe(true);
+ expect(diffs.every((d: any) => d.status === 'applied')).toBe(true);
  });
 
  it('should filter diffs by file', async () => {
@@ -369,7 +369,7 @@ describe('DiffStorage', () => {
  const diffs = await storage.listDiffs({ file: 'test.ts' });
 
  expect(diffs.length).toBeGreaterThanOrEqual(1);
- expect(diffs.every((d) => d.file === 'test.ts')).toBe(true);
+ expect(diffs.every((d: any) => d.file === 'test.ts')).toBe(true);
  });
 
  it('should apply pagination', async () => {
@@ -417,8 +417,8 @@ describe('DiffStorage', () => {
  const history = await storage.getDiffHistory('diff-1');
 
  expect(history.length).toBeGreaterThanOrEqual(2);
- expect(history.some((h) => h.action === 'created')).toBe(true);
- expect(history.some((h) => h.action === 'applied')).toBe(true);
+ expect(history.some((h: any) => h.action === 'created')).toBe(true);
+ expect(history.some((h: any) => h.action === 'applied')).toBe(true);
  });
 
  it('should return empty array for non-existent diff', async () => {

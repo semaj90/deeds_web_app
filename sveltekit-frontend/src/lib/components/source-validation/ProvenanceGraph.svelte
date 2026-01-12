@@ -270,7 +270,7 @@ function truncateLabel(label: string, maxLength: number = 15): string {
 		cursor: pointer; transition: r 0.2s;
 	}
 
-	: global(.knowledge-graph-svg, circle:hover) {
+	:global(.knowledge-graph-svg, circle:hover) {
 		r: 25;
 	}
 </style>

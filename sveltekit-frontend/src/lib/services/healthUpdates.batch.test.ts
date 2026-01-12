@@ -100,7 +100,7 @@ describe('Phase 10.6: Message Batching', () => {
  const batchTimeout = 100; // ms
  const startTime = Date.now();
 
- await new Promise<void>((resolve) => setTimeout(resolve, batchTimeout + 50));
+ await new Promise<void>((resolve: any) => setTimeout(resolve, batchTimeout + 50));
 
  const elapsed = Date.now() - startTime;
  expect(elapsed).toBeGreaterThanOrEqual(batchTimeout);
@@ -192,7 +192,7 @@ describe('Phase 10.6: Message Batching', () => {
  { id: 3, timestamp: '2025-12-15T02Z' }];
 
  const sorted = messages.sort(
- (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+ (a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
  );
 
  expect(sorted[0].id).toBe(1);

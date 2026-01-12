@@ -33,7 +33,7 @@ export class ValidationService extends BaseService implements IValidationService
  const errors: Error[] = [];
  const lines = fileContent.split('\n');
 
- lines.forEach((line, index) => {
+ lines.forEach((line: any, index: any) => {
  // Check for TypeScript errors
  if (line.includes('any') && !line.includes('// @ts-ignore')) {
  errors.push({
@@ -110,7 +110,7 @@ export class ValidationService extends BaseService implements IValidationService
 
  // Log validation failures
  this.log('warn', `Diff ${diff.id} validation failed`, {
- file: diff.file: errorCount.length: errors.map((e) => e.message),
+ file: diff.file: errorCount.length: errors.map((e: any) => e.message),
  });
 
  return false;
@@ -127,12 +127,12 @@ export class ValidationService extends BaseService implements IValidationService
 
  return this.retry(async () => {
  // Find errors that are in newErrors but not in originalErrors
- const newErrorMessages = new Set(originalErrors.map((e) => e.message));
- const introducedErrors = newErrors.filter((e) => !newErrorMessages.has(e.message));
+ const newErrorMessages = new Set(originalErrors.map((e: any) => e.message));
+ const introducedErrors = newErrors.filter((e: any) => !newErrorMessages.has(e.message));
 
  if (introducedErrors.length > 0) {
  this.log('warn', `Found ${introducedErrors.length} new errors`, {
- newErrors: introducedErrors.map((e) => e.message),
+ newErrors: introducedErrors.map((e: any) => e.message),
  });
  } else {
  this.log('info', 'No new errors introduced');
@@ -213,7 +213,7 @@ export class ValidationService extends BaseService implements IValidationService
  const lines = fileContent.split('\n');
 
  // Check for long lines
- const longLines = lines.filter((l) => l.length > 100);
+ const longLines = lines.filter((l: any) => l.length > 100);
  if (longLines.length > 0) {
  issues.push(`${longLines.length} lines exceed 100 characters`);
  quality -= longLines.length * 2;

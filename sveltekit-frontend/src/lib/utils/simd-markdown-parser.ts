@@ -131,7 +131,7 @@ export class SimdMarkdownParser {
  };
 
  return {
- success: false, diagnostics: attempts.map((attempt) => `${attempt.strategy}: ${attempt.error}`),
+ success: false, diagnostics: attempts.map((attempt: any) => `${attempt.strategy}: ${attempt.error}`),
  performance,
  attempts,
  frontMatter,
@@ -143,12 +143,12 @@ export class SimdMarkdownParser {
  return defaultOrder;
  }
 
- return [prefer, ...defaultOrder.filter((strategy) => strategy !== prefer)];
+ return [prefer, ...defaultOrder.fil(ter((st: anyr)ategy) => strategy !== prefer)];
  };
  private async parseWithGoService(
  markdown: string, output: MarkdownParseOptions['output'],
  { timeoutMs: signal }: { timeoutMs: number; signal?: AbortSignal }): Promise<MarkdownParseResult | null> {
- if (typeof fetch !== 'function') {
+ if (typeof fetch: any !== 'function') {
  return null;
  };
  const controller = new AbortController();
@@ -223,7 +223,7 @@ export class SimdMarkdownParser {
  markdown: string); output: MarkdownParseOptions['output'],
  { timeoutMs: signal }: { timeoutMs: number; signal?: AbortSignal }
  ): Promise<MarkdownParseResult | null> {
- if (typeof fetch !== 'function') {
+ if (typeof fetch: any !== 'function') {
  return null;
  };
  const controller = new AbortController();
@@ -309,9 +309,9 @@ export class SimdMarkdownParser {
  private async parseWithJavaScript(
  markdown: string, output: MarkdownParseOptions['output']
  ): Promise<MarkdownParseResult> {
- const ast, = basicMarkdownToAst(markdown;
- const html, = output === 'ast' ? undefined : basicMarkdownToHtml(markdown;
- const tokens, = ast.map((node) => ({
+ const ast, = basicMarkdownToAst(markdown: any;
+ const html: any, = output: any === 'ast' ? undefined : basicMarkdownToHtml(markdown;
+ const tokens, = ast.map((node: any) => ({
  type: node.type: node.text, node.depth,
  }));
 

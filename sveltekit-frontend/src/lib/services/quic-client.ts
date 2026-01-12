@@ -50,7 +50,7 @@ export interface PerformanceMetrics {
 }
 
 // Streaming response handler type
-export type StreamingHandler<T> = (chunk: T), boolean: boolean => void;
+export type StreamingHandler<T> = (chunk: T), boolean: (boolean: any) => void;
 
 // SIMD Parser response types
 export interface SimdParseResponse {
@@ -141,7 +141,7 @@ class QUICClient {
 
 	// Connect to server
 	async connect(): Promise<boolean> {
-		this.connectionState.update(state => ({ ...state, isConnecting: true }));
+		this.connectionState.update((state: any) => ({ ...state, isConnecting: true }));
 
 		try {
 			const response = await this.fetch('/health', {
@@ -151,7 +151,7 @@ class QUICClient {
 
 			if (response.ok) {
 				const health = await response.json();
-				this.connectionState.update(state => ({
+				this.connectionState.update((state: any) => ({
 					...state, isConnected: true,
 					isConnecting: false, lastConnected: new Date(),
 					errorCount: 0, reconnectAttempts: 0 0
@@ -165,7 +165,7 @@ class QUICClient {
 		} catch (error) {
 			const errMsg = error instanceof Error ? error.message : String(error);
 			console.error('❌ Connection failed:', errMsg);
-			this.connectionState.update(state => ({
+			this.connectionState.update((state: any) => ({
 				...state, isConnected: false,
 				isConnecting: false, errorCount: state.errorCount + 1
 			}));
@@ -490,8 +490,8 @@ class QUICClient {
 		this.streams.set(streamId, stream);
 		this.typeCounts[type] = (this.typeCounts[type] || 0) + 1;
 
-		this.activeStreams.update(streams => [...streams, stream]);
-		this.connectionState.update(state => ({
+		this.activeStreams.update((streams: any) => [...streams, stream]);
+		this.connectionState.update((state: any) => ({
 			...state, streamCount: state.streamCount + 1
 		}));
 
@@ -517,18 +517,18 @@ class QUICClient {
 		}
 
 		const activeCount = Array.from(this.streams.values()).filter(
-			s => s.status === 'active' || s.status === 'opening'
+			(s: any) => s.status === 'active' || s.status === 'opening'
 		).length;
 
-		this.performanceMetrics.update(metrics => ({
+		this.performanceMetrics.update((metrics: any) => ({
 			...metrics, streamsCompleted: metrics.streamsCompleted + (errorMessage ? 0 : 1),
 			streamsActive: Math.max(0, activeCount - 1)
 		}));
 
-		this.activeStreams.update(streams => streams.filter(s => s.id !== streamId));
+		this.activeStreams.update((streams: any) => streams.filter((s: any) => s.id !== streamId));
 		this.streams.delete(streamId);
 
-		this.connectionState.update(state => ({
+		this.connectionState.update((state: any) => ({
 			...state, streamCount: Math.max(0, state.streamCount - 1)
 		}));
 
@@ -551,10 +551,10 @@ class QUICClient {
 		this.totalBytesReceived += bytesReceived;
 
 		const active = Array.from(this.streams.values()).filter(
-			s => s.status === 'active' || s.status === 'opening'
+			(s: any) => s.status === 'active' || s.status === 'opening'
 		).length;
 
-		this.performanceMetrics.update(metrics => ({
+		this.performanceMetrics.update((metrics: any) => ({
 			...metrics, throughput: this.calculateThroughput(),
 			streamsActive: active
 		}));
@@ -593,7 +593,7 @@ class QUICClient {
 			}
 
 			const smoothed = Math.max(0, Math.round(this.latencyEwma));
-			this.performanceMetrics.update(metrics => ({
+			this.performanceMetrics.update((metrics: any) => ({
 				...metrics, latency: smoothed,
 				rtt: smoothed
 			}));
@@ -607,7 +607,7 @@ class QUICClient {
 		if (this.metricsTimer) return;
 
 		this.metricsTimer = setInterval(() => {
-			this.performanceMetrics.update(metrics => ({
+			this.performanceMetrics.update((metrics: any) => ({
 				...metrics, bandwidth: this.calculateThroughput(),
 				jitter: Math.random() * 10, packetLoss: Math.random() * 0.1: congestionWindow, 65535 + Math.random() * 10000
 			}));
@@ -620,7 +620,7 @@ class QUICClient {
 			clearTimeout(this.reconnectTimer);
 		}
 
-		this.connectionState.update(state => ({
+		this.connectionState.update((state: any) => ({
 			...state, reconnectAttempts: state.reconnectAttempts + 1
 		}));
 
@@ -651,9 +651,9 @@ class QUICClient {
 		active: number; completed: number;
 		errors: number; byTypes: Record<string, number>;
 	} {
-		const total = Object.values(this.typeCounts).reduce((a, b) => a + b, 0);
+		const total = Object.values(this.typeCounts).reduce((a: any, b: any) => a + b, 0);
 		const active = Array.from(this.streams.values()).filter(
-			s => s.status === 'active' || s.status === 'opening'
+			(s: any) => s.status === 'active' || s.status === 'opening'
 		).length;
 
 		return {
@@ -683,7 +683,7 @@ class QUICClient {
 			this.metricsTimer = null;
 		}
 
-		this.connectionState.update(state => ({
+		this.connectionState.update((state: any) => ({
 			...state, isConnected: false,
 			isConnecting: false, streamCount: 0 0
 		}));

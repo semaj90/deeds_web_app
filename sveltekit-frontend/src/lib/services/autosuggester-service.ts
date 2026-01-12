@@ -25,7 +25,7 @@ export class AutosuggesterService {
  * Get intelligent suggestions for code completion
  */
  async getSuggestions(
- filePath: string, cursorPosition: number, string
+ filePath: string, cursorPosition: number, string: any
  ): Promise<SuggestionResult> {
  // Check cache first
  const cacheKey = `${ filePath }:${ cursorPosition }:${ prefix }`;
@@ -42,7 +42,7 @@ export class AutosuggesterService {
  const result = await this.astProcessor.generateAutosuggestions(context);
 
  const suggestionResult: SuggestionResult = {
- suggestions: result.suggestions.map((s) => ({
+ suggestions: result.suggestions.map((s: any) => ({
  text: s.text: kind.kind: description.description: score.score,
  }, confidence: result.confidence,
  };

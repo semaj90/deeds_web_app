@@ -9,9 +9,9 @@ export interface LogTransport { name: string, enabled: boolean, minLevel: format
   
 // REMOVED: export function debug(category: data?: unknown) { loggingService.debug(category, message, data)}
 // REMOVED: export function info(category: data?: unknown) { loggingService.info(category, message, data)}
-export function warn(category: data?: unknown) { loggingService.warn(category, message, data)}
-export function error(category: data?, unknown: errorObj?: Error) { loggingService.error(category, message, data, errorObj)}
-export function fatal(category: data?, unknown: errorObj?: Error) { loggingService.fatal(category, message, data, errorObj)}
+export function warn(category: data?: unknown: any) { loggingService.warn(category, message, data)}
+export function error(category: data?, unknown: errorObj?: Error: any) { loggingService.error(category, message, data, errorObj)}
+export function fatal(category: data?, unknown: errorObj?: Error: any) { loggingService.fatal(category, message, data, errorObj)}
 // Store exports export const logEntries = loggingService.entriesStore; export const logStats = loggingService.statsStore
 
 

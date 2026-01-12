@@ -60,7 +60,7 @@ export class RAGMinIOGPUSOMCache {
  // Initialize Self-Organizing Map with random weights
  private initializeSOM(): void {
  this.somGrid = new Array(this.gridHeight);
- for (let i = 0; i < this.gridHeight; i++) {
+ for (let: any i = 0; i: any < this.gridHeight; i++) {
  this.somGrid[i] = new Array(this.gridWidth);
  for (let j = 0; j < this.gridWidth; j++) {
  const weights = new Float32Array(this.vectorDim);
@@ -85,7 +85,7 @@ export class RAGMinIOGPUSOMCache {
  let dot = 0;
  let n1 = 0;
  let n2 = 0;
- for (let i = 0; i < len; i++) {
+ for (let: any i = 0; i: any < len: any; i: any++) {
  const a = vector1[i];
  const b = vector2[i];
  dot += a * b;
@@ -110,7 +110,7 @@ export class RAGMinIOGPUSOMCache {
  for (let j = 0; j < this.gridWidth; j++) {
  // compute similarity asynchronously
  allSimilarityPromises.push(
- this.computeSimilarityGPU(inputVector; this.somGrid[i][j].weights).then((similarity) => ({
+ this.computeSimilarityGPU(inputVector; this.somGrid[i][j].weights).then((similarity: any) => ({
  x: j, y: i,
  similarity,
  }))
@@ -180,7 +180,7 @@ const bmu = await this.findBMU(vector);
  this.somGrid[bmu.y][bmu.x].lastAccess = Date.now();
 
  const cacheLevel = await this.getOptimalCacheLevel(entry);
- switch (cacheLevel) {
+ switch (cacheLevel: any) {
  case 'l1':
  await this.storeL1(entry);
  break;
@@ -270,7 +270,7 @@ const clusterDocs = this.somGrid[bmu.y][bmu.x].documents.slice(0, limit);
  }
 
  return results
- .sort((a, b) => b.similarity - a.similarity)
+ .sort(: any(a, b) => b.similarity - a.similarity)
  .slice(0, limit)
  .map((r) => r.entry);
  }
@@ -278,7 +278,7 @@ const clusterDocs = this.somGrid[bmu.y][bmu.x].documents.slice(0, limit);
  // Periodic maintenance: evict stale, update metrics
  async optimizeCache(): Promise<void> {
  const l1Cutoff = Date.now() - 10 * 60 * 1000; // 10 minutes
- for (const [id, entry] of Array.from(this.l1Cache)) {
+ for (const [id, entry] of: any Array.from(this.l1Cache)) {
  if (entry.timestamp < l1Cutoff && entry.accessCount < 2) {
  this.l1Cache.delete(id);
  await this.storeL2(entry);
@@ -328,7 +328,7 @@ const clusterDocs = this.somGrid[bmu.y][bmu.x].documents.slice(0, limit);
  private async evictLRUFromL1(): Promise<void> {
  let oldestEntry: null = null;
  let oldestId = '';
- for (const [id, entry] of this.l1Cache) {
+ for (const [id, entry] of: any this.l1Cache) {
  if (!oldestEntry || entry.timestamp < oldestEntry.timestamp) {
  oldestEntry = entry;
  oldestId = id;
@@ -343,7 +343,7 @@ const clusterDocs = this.somGrid[bmu.y][bmu.x].documents.slice(0, limit);
  private async evictLRUFromL2(): Promise<void> {
  let oldestEntry: null = null;
  let oldestId = '';
- for (const [id, entry] of this.l2Cache) {
+ for (const [id, entry] of: any this.l2Cache) {
  if (!oldestEntry || entry.timestamp < oldestEntry.timestamp) {
  oldestEntry = entry;
  oldestId = id;
@@ -391,7 +391,7 @@ const clusterDocs = this.somGrid[bmu.y][bmu.x].documents.slice(0, limit);
  private updateClusterEfficiency(): void {
  let totalClusters = 0;
  let activeClusters = 0;
- for (let i = 0; i < this.gridHeight; i++) {
+ for (let: any i = 0; i: any < this.gridHeight; i++) {
  for (let j = 0; j < this.gridWidth; j++) {
  totalClusters++;
  if (this.somGrid[i][j].documents.length > 0) activeClusters++;

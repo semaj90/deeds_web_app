@@ -100,13 +100,13 @@ export class TagExtractor {
     // Requirement 9.2: Fallback to URL domain
     if (tags.size === 0) {
       const domainTags = this.extractFromUrl(url);
-      domainTags.forEach((tag) => tags.add(tag));
+      domainTags.forEach((tag: any) => tags.add(tag));
     }
 
     // 3. Extract from content if provided
     if (content && tags.size < 5) {
       const contentTags = this.extractFromContent(content);
-      contentTags.forEach((tag) => tags.add(tag));
+      contentTags.forEach((tag: any) => tags.add(tag));
     }
 
     // Convert to array and limit to top 10 tags
@@ -169,7 +169,7 @@ export class TagExtractor {
       }
 
       // Extract from path (e.g., "docs" from "/docs/getting-started")
-      const pathParts = urlObj.pathname.split('/').filter((p) => p.length > 0);
+      const pathParts = urlObj.pathname.split('/').filter((p: any) => p.length > 0);
       if (pathParts.length > 0) {
         const firstPath = pathParts[0];
         if (this.isValidTag(firstPath)) {
@@ -210,10 +210,10 @@ export class TagExtractor {
     }
 
     // Check if document has at least one of the required tags
-    const normalizedDocTags = tags.map((t) => this.normalizeTag(t));
-    const normalizedRequiredTags = requiredTags.map((t) => this.normalizeTag(t));
+    const normalizedDocTags = tags.map((t: any) => this.normalizeTag(t));
+    const normalizedRequiredTags = requiredTags.map((t: any) => this.normalizeTag(t));
 
-    return normalizedRequiredTags.some((reqTag) => normalizedDocTags.includes(reqTag));
+    return normalizedRequiredTags.some((reqTag: any) => normalizedDocTags.includes(reqTag));
   }
 
   /**
@@ -225,7 +225,7 @@ export class TagExtractor {
 
     // Filter existing tags that match
     const suggestions = existingTags
-      .filter((tag) => this.normalizeTag(tag).includes(normalized))
+      .filter((tag: any) => this.normalizeTag(tag).includes(normalized))
       .slice(0, 10);
 
     return suggestions;

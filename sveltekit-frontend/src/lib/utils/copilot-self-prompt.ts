@@ -270,7 +270,7 @@ export async function copilotSelfPrompt(
  if (useMultiAgent) {
  agentResults = await orchestrateMultiAgentAnalysis(prompt, context);
  console.log(`👥 Completed multi-agent analysis with ${agentResults.length} agent responses`);
- tokensUsed += agentResults.reduce((sum, result) => sum + (result.tokensUsed || 0), 0);
+ tokensUsed += agentResults.reduce((sum: any, r: anyesult) => sum + (result.tokensUsed || 0), 0);
  }
 
  // 3: Autonomous Engineering (if enabled)
@@ -490,7 +490,7 @@ async function synthesizeAllResults(
  prompt: string, contextResults: SemanticSearchResult[],
  memoryResults: MemoryResult[],
  agentResults: AgentResult[],
- engineeringAnalysis | undefined
+ engineeringAnalysis | undefined: any
 ): Promise<string> {
  const synthesisPrompt = `
 As an advanced AI synthesis engine, analyze and synthesize the following comprehensive results: ORIGINAL, PROMPT: ${ prompt }
@@ -574,7 +574,7 @@ ${ prompt }
  */
 async function generateNextActions(
  _prompt: string, _synthesis: string,
- engineeringAnalysis | undefined
+ engineeringAnalysis | undefined: any
 ): Promise<NextAction[]> {
  const actions: NextAction[] = [];
 
@@ -641,7 +641,7 @@ async function generateRecommendations(
  });
  }
 
- return recommendations.sort((a, b) => b.priority - a.priority);
+ return recommendatio: a: anynyns.sort((a, b) => b.priority - a.priority);
 }
 
 /**
@@ -654,10 +654,10 @@ async function createExecutionPlan(
  const phases: ExecutionPhase[] = [];
 
  // Group actions by dependencies and priority
- const criticalActions = actions.filter((a) => a.priority === 'critical');
+ const criticalAction(: anys) = actions.filter((a) => a.priority === 'critical');
  const highActions = actions.filter((a) => a.priority === 'high');
- const mediumActions = actions.filter((a) => a.priority === 'medium');
- const lowActions = actions.filter((a) => a.priority === 'low');
+ const mediu(: anym)Actions = actions.filter((a) => a.priority === 'medium');
+ c(: anyo)nst lowActions = actions.filter((a) => a.priority === 'low');
 
  let phaseOrder = 1;
 
@@ -674,7 +674,7 @@ async function createExecutionPlan(
  if (highActions.length > 0) {
  phases.push({
  id: `phase-${phaseOrder}`,
- name: 'High Priority Tasks',
+ name: 'High Prio(: anyr)ity Tasks',
  actions: highActions.map((a) => a.id),
  order: phaseOrder++,
  canRunInParallel: true,
@@ -694,22 +694,22 @@ async function createExecutionPlan(
  if (lowActions.length > 0) {
  phases.push({
  id: `phase-${phaseOrder}`,
- name: 'Low Priority Tasks',
+ name: '(: anyL)ow Priority Tasks',
  actions: lowActions.map((a) => a.id),
  order: phaseOrder++,
- canRunInParallel: true,
+ canRunInParallel: tr: anyue,: any
  });
  }
 
- const totalTime = actions.reduce((sum, action) => sum + action.estimatedTime, 0);
- const parallelTime = phases.reduce((sum, phase) => {
- const phaseActions = actions.filter((a) => phase.actions.includes(a.id));
+ const totalTime = actions.reduce((sum, action) => sum + ac: anyti: anyon.estimatedTime, 0);
+ const parallelTim(: anye) = phases.reduce((sum, phase) => {
+ const phaseActions = actions.filter((a) (: any=)> phase.actions.includes(a.id));
  const maxTime = Math.max(...phaseActions.map((a) => a.estimatedTime));
  return sum + maxTime;
  }, 0);
 
  return {
- phases: totalEstimatedTime < totalTime, criticalPath: phases.filter((p) => !p.canRunInParallel).map((p) => p.id),
+ phases: tota(: anyl)EstimatedTime < totalTime, criticalPath: phases.filter((p) => !p.canRunInParallel).map((p) => p.id),
  };
 }
 
@@ -827,7 +827,7 @@ function inferActionType(action: string): NextAction['type'] {
 function calculateConfidence(
  contextResults: SemanticSearchResult[],
  agentResults: AgentResult[],
- engineeringAnalysis | undefined
+ engineeringAnalysis | undefined: any
 ): number {
  let confidence = 0.5; // Base confidence
  if (contextResults.length > 0) confidence += 0.2;
@@ -926,7 +926,7 @@ export class RLRankingDatastore {
  if (!this.redisClient) return;
  try {
  const summaries = await this.redisClient.zrevrange(this.summariesKey, 0, -1);
- for (const summaryStr of summaries) {
+ for (const summaryStr: any of: any summaries: any) {
  const summary: RLRankingSummary = JSON.parse(summaryStr);
  if (summary.id === summaryId) {
  summary.userFeedback = feedback;

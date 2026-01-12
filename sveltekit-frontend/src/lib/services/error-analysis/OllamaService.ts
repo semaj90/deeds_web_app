@@ -139,7 +139,7 @@ export class OllamaService {
 	 * Sleep helper for retry delays
 	 */
 	private sleep(ms: number): Promise<void> {
-		return new Promise(resolve => setTimeout(resolve, ms));
+		return new Promise((resolve: any) => setTimeout(resolve, ms));
 	}
 
 	/**
@@ -207,7 +207,7 @@ export class OllamaService {
 		for (let i = 0; i < texts.length; i += concurrency) {
 			const batch = texts.slice(i, i + concurrency);
 			const batchResults = await Promise.all(
-				batch.map(text => this.generateEmbedding(text))
+				batch.map((text: any) => this.generateEmbedding(text))
 			);
 			results.push(...batchResults);
 
@@ -280,9 +280,9 @@ export class OllamaService {
 	 */
 	async generateFixSuggestion(error: ErrorReport, similarErrors: { message: string; fix?: string }[] = []): Promise<string | null> {
 		const fewShotExamples = similarErrors
-			.filter(e => e.fix)
+			.filter((e: any) => e.fix)
 			.slice(0, 3)
-			.map((e, i) => `Example ${i + 1}:\nError: ${e.message}\nFix: ${e.fix}`)
+			.map((e: any, i: any) => `Example ${i + 1}:\nError: ${e.message}\nFix: ${e.fix}`)
 			.join('\n\n');
 
 		const prompt = `You are a TypeScript/Svelte expert. Analyze this error and suggest a fix.

@@ -113,7 +113,7 @@ class RabbitMQService implements IRabbitMQService {
                 console.log(`Connecting to RabbitMQ (Attempt ${attempt}/${maxRetries})...`);
                 this.connection = await amqp.connect(this.config.url);
 
-                this.connection.on('error', (err) => {
+                this.connection.on('error', (err: any) => {
                     console.error('RabbitMQ Connection Error:', err);
                     this.isConnected = false;
                 });
@@ -151,7 +151,7 @@ class RabbitMQService implements IRabbitMQService {
                     this.isInitializing = false;
                     throw error;
                 }
-                await new Promise(resolve => setTimeout(resolve, retryDelay));
+                await new Promise((resolve: any) => setTimeout(resolve, retryDelay));
             }
         }
     }
@@ -229,7 +229,7 @@ class RabbitMQService implements IRabbitMQService {
         if (!this.channel) throw new Error('Channel not available');
 
         const queueName = this.config.queues[queueType];
-        await this.channel.consume(queueName, async (msg) => {
+        await this.channel.consume(queueName, async (msg: any) => {
             const ack = () => this.channel?.ack(msg!);
             const nack = (requeue = false) => this.channel?.nack(msg!, false, requeue);
             await onMessage(msg, ack, nack);

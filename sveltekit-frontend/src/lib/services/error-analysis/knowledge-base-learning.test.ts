@@ -430,7 +430,7 @@ describe('KnowledgeBaseLearning', () => {
  }),
  { minLength: 1, maxLength: 10 }
  ),
- async (errorSpecs) => {
+ async (errorSpecs: any) => {
  const freshService = new KnowledgeBaseLearning(mockConfig);
 
  // Store fixes
@@ -506,7 +506,7 @@ describe('KnowledgeBaseLearning', () => {
  }),
  { minLength: 1, maxLength: 20 }
  ),
- async (results) => {
+ async (results: any) => {
  const freshService = new KnowledgeBaseLearning(mockConfig);
 
  const diff: Diff = {
@@ -570,7 +570,7 @@ describe('KnowledgeBaseLearning', () => {
  }),
  { minLength: 1, maxLength: 10 }
  ),
- async (specs) => {
+ async (specs: any) => {
  const freshService = new KnowledgeBaseLearning(mockConfig);
 
  // Store fixes

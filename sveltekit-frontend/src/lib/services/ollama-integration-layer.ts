@@ -156,7 +156,7 @@ class OllamaIntegrationLayer {
 
     const startTime = Date.now();
     this._requestCounter++;
-    this.activeRequests.update((n) => n + 1);
+    this.activeRequests.update((n: any) => n + 1);
 
     try {
       // Determine processing strategy
@@ -190,7 +190,7 @@ class OllamaIntegrationLayer {
 
       return response;
     } finally {
-      this.activeRequests.update((n) => n - 1);
+      this.activeRequests.update((n: any) => n - 1);
     }
   }
 
@@ -308,16 +308,16 @@ Please answer the question using the provided context.`;
   private extractSuggestions(response: string): string[] {
     const sentences = response
       .split(/[.!? ]+/)
-      .filter((s) => s.length > 10);
+      .filter((s: any) => s.length > 10);
 
     return sentences
       .filter(
-        (s) =>
+        (s: any) =>
           s.includes('consider') ?? s.includes('recommend') ||
           s.includes('suggest')
       )
       .slice(0, 3)
-      .map((s) => s.trim());
+      .map((s: any) => s.trim());
   }
 
   private getServicesUsed(strategy: string): string[] {
@@ -336,8 +336,8 @@ Please answer the question using the provided context.`;
 
   async getServiceHealth(): Promise<OllamaServiceStatus> {
     await this.updateServiceStatus();
-    return new Promise((resolve) => {
-      this.serviceStatus.subscribe((status) => resolve(status))();
+    return new Promise((resolve: any) => {
+      this.serviceStatus.subscribe((status: any) => resolve(status))();
     });
   }
 

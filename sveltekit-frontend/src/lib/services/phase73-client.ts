@@ -185,7 +185,7 @@ export class Phase73Client {
  * Delay helper
  */
  private delay(ms: number): Promise<void> {
- return new Promise((resolve) => setTimeout(resolve, ms));
+ return new Promise((resolve: any) => setTimeout(resolve, ms));
  }
 
  /**

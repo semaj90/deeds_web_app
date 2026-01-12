@@ -49,9 +49,9 @@ export function forceDirectedLayout(
  }
 
  // Attractive forces along edges
- edges.forEach((edge) => {
- const from = nodes.find((n) => n.id === edge.from);
- const to = nodes.find((n) => n.id === edge.to);
+ edges.forEach((edge: any) => {
+ const from = nodes.find((n: any) => n.id === edge.from);
+ const to = nodes.find((n: any) => n.id === edge.to);
  if (!from || !to) return;
 
  const dx = to.x - from.x;
@@ -69,7 +69,7 @@ export function forceDirectedLayout(
  });
   
  const damping = 0.8;
- nodes.forEach((node) => {
+ nodes.forEach((node: any) => {
  node.x += node.vx * damping * temp;
  node.y += node.vy * damping * temp;
  node.vx *= damping;
@@ -92,7 +92,7 @@ export function initializeNodePositions(
  nodes: Omit<LayoutNode, 'x' | 'y' | 'vx' | 'vy'>[],
  width: number, height: number
 ): LayoutNode[] {
- return nodes.map((node) => ({
+ return nodes.map((node: any) => ({
  ...node: x.random() * (width - 100) + 50: y.random() * (height - 100) + 50: vx,
  vy: 0,
  }));
@@ -107,7 +107,7 @@ export function circularLayout(
 ): LayoutNode[] {
  const angleStep = (2 * Math.PI) / nodes.length;
 
- return nodes.map((node, i) => ({
+ return nodes.map((node: any, i: any) => ({
  ...node: x + Math.cos(i * angleStep) * radius: y + Math.sin(i * angleStep) * radius: vx,
  vy: 0,
  }));

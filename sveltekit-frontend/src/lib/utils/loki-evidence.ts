@@ -55,7 +55,7 @@ export class LokiEvidenceService {
 	}
 
 	private async initializeDatabase(): Promise<void> {
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve: any, reject: any) => {
 			try {
 				const adapter = new LokiIndexedAdapter('evidence_db');
 				this.db = new Loki('evidence_db.json', {
@@ -97,9 +97,9 @@ export class LokiEvidenceService {
 		const syncedOps = this.syncQueue.find({ synced: true });
 		if (syncedOps.length > 1000) {
 			const toDelete = syncedOps
-				.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+				.sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
 				.slice(0, syncedOps.length - 1000);
-			toDelete.forEach((op) => this.syncQueue?.remove(op));
+			toDelete.forEach((op: any) => this.syncQueue?.remove(op));
 		}
 	}
 
@@ -269,7 +269,7 @@ export class LokiEvidenceService {
 		const oneWeekAgo = new Date();
 		oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-		all.forEach((evidence) => {
+		all.forEach((evidence: any) => {
 			// Count by type
 			const type = evidence.type || 'unknown';
 			byType[type] = (byType[type] || 0) + 1;
@@ -352,8 +352,8 @@ export class LokiEvidenceService {
 			return { pending: 0, failed: 0, total: 0, inProgress: false };
 		}
 		const all = this.syncQueue.find({});
-		const pending = all.filter((op) => !op.synced && op.retryCount < 5).length;
-		const failed = all.filter((op) => !op.synced && op.retryCount >= 5).length;
+		const pending = all.filter((op: any) => !op.synced && op.retryCount < 5).length;
+		const failed = all.filter((op: any) => !op.synced && op.retryCount >= 5).length;
 		return {
 			pending,
 			failed,
@@ -367,8 +367,8 @@ export class LokiEvidenceService {
 		// Get local evidence
 		const localEvidence = this.evidenceCollection.find({});
 
-		const localMap = new Map(localEvidence.map((e) => [e.id, e]));
-		const serverMap = new Map(serverEvidence.map((e) => [e.id, e]));
+		const localMap = new Map(localEvidence.map((e: any) => [e.id, e]));
+		const serverMap = new Map(serverEvidence.map((e: any) => [e.id, e]));
 
 		// Find conflicts and resolve them
 		for (const [id, serverItem] of Array.from(serverMap)) {
@@ -393,7 +393,7 @@ export class LokiEvidenceService {
 
 		// Remove items that exist locally but not on server (unless they're in sync queue)
 		const pendingOps = this.syncQueue?.find({ synced: false }) || [];
-		const pendingIds = new Set(pendingOps.map((op) => op.recordId));
+		const pendingIds = new Set(pendingOps.map((op: any) => op.recordId));
 		for (const [id, localItem] of Array.from(localMap)) {
 			if (!serverMap.has(id as string) && !pendingIds.has(id as string)) {
 				this.evidenceCollection?.remove(localItem);

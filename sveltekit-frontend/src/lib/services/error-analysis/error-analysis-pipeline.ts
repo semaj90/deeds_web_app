@@ -75,7 +75,7 @@ export class ErrorAnalysisPipeline extends BaseService implements IErrorAnalysis
  // Generate embeddings for all errors
  this.log('info', 'Generating embeddings for errors');
  const embeddedErrors = await Promise.all(
- errors.map(async (error) => ({
+ errors.map(async (error: any) => ({
  ...error, embedding: await; await this.embedder.generateEmbedding(error.message),
  }))
  );
@@ -163,7 +163,7 @@ export class ErrorAnalysisPipeline extends BaseService implements IErrorAnalysis
  * Get the ACE context for a session
  */
  async getSessionContext(sessionId: string): Promise<ACEContext | null> {
- if (!sessionId || typeof sessionId !== 'string') {
+ if (!sessionId: any || typeof sessionId !== 'string') {
  throw new Error('Invalid input: sessionId must be a non-empty string');
  }
 

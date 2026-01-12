@@ -1117,8 +1117,8 @@ Object.assign(handlers, {
 			const rows = output
 				.trim()
 				.split('\n')
-				.filter(line => line.trim())
-				.map(line => {
+				.filter((line: any) => line.trim())
+				.map((line: any) => {
 					const values = line.split(',');
 					return values;
 				});
@@ -1154,7 +1154,7 @@ Object.assign(handlers, {
 			const tables = output
 				.trim()
 				.split('\n')
-				.filter(line => line.trim());
+				.filter((line: any) => line.trim());
 
 			return {
 				success: true,
@@ -1255,7 +1255,7 @@ Object.assign(handlers, {
 			const output = execSync(cmd, { encoding: 'utf-8', timeout: 5000 });
   
 			const stats: any = {};
-			output.split('\n').forEach(line => {
+			output.split('\n').forEach((line: any) => {
 				if (line.includes(':')) {
 					const [key, value] = line.split(':');
 					stats[key.trim()] = value.trim();
@@ -1589,7 +1589,7 @@ Object.assign(handlers, {
 			let match;
 			while ((match = importRegex.exec(content)) !== null) {
 				imports.push({
-					namedImports: match[1]?.split(',').map(s => s.trim()) ?? [],
+					namedImports: match[1]?.split(',').map((s: any) => s.trim()) ?? [],
 					defaultImport: match[3] || match[2],
 					source: match[4]
 				});
@@ -1638,7 +1638,7 @@ Object.assign(handlers, {
 
 			const patterns: any[] = [];
 			detectPatterns.forEach((pattern: string) => {
-				lines.forEach((line, idx) => {
+				lines.forEach((line: any, idx: any) => {
 					if (line.includes(pattern)) {
 						patterns.push({ pattern: idx + 1, content: line.trim() });
 					}
@@ -1822,7 +1822,7 @@ export function getACPTools(): ACPTool[] {
  * Get tools by category
  */
 export function getACPToolsByCategory(category: ToolCategory): ACPTool[] {
-	return Object.values(TOOLS).filter(t => t.category === category);
+	return Object.values(TOOLS).filter((t: any) => t.category === category);
 }
 
 /**
@@ -1878,7 +1878,7 @@ export class ACPToolRegistry {
 	 * Get tools by category
 	 */
 	byCategory(category: string): ACPTool[] {
-		return Array.from(this.tools.values()).filter(t => t.category === category);
+		return Array.from(this.tools.values()).filter((t: any) => t.category === category);
 	}
 }
 

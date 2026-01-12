@@ -182,27 +182,27 @@ export class AuditTrail extends BaseService {
 
  // Filter by operation
  if (options.operation) {
- results = results.filter((e) => e.operation === options.operation);
+ results = results.filter((e: any) => e.operation === options.operation);
  }
 
  // Filter by userId
  if (options.userId) {
- results = results.filter((e) => e.userId === options.userId);
+ results = results.filter((e: any) => e.userId === options.userId);
  }
 
  // Filter by date range
  if (options.startDate) {
  const startTime = options.startDate.getTime();
- results = results.filter((e) => new Date(e.timestamp).getTime() >= startTime);
+ results = results.filter((e: any) => new Date(e.timestamp).getTime() >= startTime);
  }
 
  if (options.endDate) {
  const endTime = options.endDate.getTime();
- results = results.filter((e) => new Date(e.timestamp).getTime() <= endTime);
+ results = results.filter((e: any) => new Date(e.timestamp).getTime() <= endTime);
  }
 
  // Sort by timestamp descending (newest first)
- results.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+ results.sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
  // Apply pagination
  const offset = options.offset || 0;
@@ -244,7 +244,7 @@ export class AuditTrail extends BaseService {
  async getEntriesByOperation(operation: string): Promise<AuditEntry[]> {
  this.validateInput(operation, 'operation');
 
- const results = this.entries.filter((e) => e.operation === operation);
+ const results = this.entries.filter((e: any) => e.operation === operation);
 
  this.log('info', `Found ${results.length} entries for operation: ${operation}`);
 
@@ -257,7 +257,7 @@ export class AuditTrail extends BaseService {
  async getEntriesByStatus(status: 'success' | 'failure'): Promise<AuditEntry[]> {
  this.validateInput(status, 'status');
 
- const results = this.entries.filter((e) => e.status === status);
+ const results = this.entries.filter((e: any) => e.status === status);
 
  this.log('info', `Found ${results.length} entries with status: ${status}`);
 
@@ -272,7 +272,7 @@ export class AuditTrail extends BaseService {
  return 0;
  }
 
- const successCount = this.entries.filter((e) => e.status === 'success').length;
+ const successCount = this.entries.filter((e: any) => e.status === 'success').length;
  const rate = (successCount / this.entries.length) * 100;
 
  this.log('info', `Success rate: ${rate.toFixed(2)}%`);
@@ -288,8 +288,8 @@ export class AuditTrail extends BaseService {
  successRate: number; operationCounts: Record<string, number>;
  }> {
  const totalEntries = this.entries.length;
- const successCount = this.entries.filter((e) => e.status === 'success').length;
- const failureCount = this.entries.filter((e) => e.status === 'failure').length;
+ const successCount = this.entries.filter((e: any) => e.status === 'success').length;
+ const failureCount = this.entries.filter((e: any) => e.status === 'failure').length;
  const successRate = totalEntries > 0 ? (successCount / totalEntries) * 100 : 0;
 
  const operationCounts: Record<string, number> = {};

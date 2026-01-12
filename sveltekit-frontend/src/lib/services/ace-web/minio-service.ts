@@ -156,7 +156,7 @@ export class MinIOService {
 
     try {
       // Convert to JSONL format (one JSON object per line)
-      const jsonl = chunks.map((chunk) => JSON.stringify(chunk)).join('\n');
+      const jsonl = chunks.map((chunk: any) => JSON.stringify(chunk)).join('\n');
       await this.putObject(this.buckets.derived, key, jsonl, {
         contentType: 'application/x-ndjson'
       });
@@ -338,7 +338,7 @@ export class MinIOService {
           error
         );
         if (attempt < maxRetries - 1) {
-          await new Promise((resolve) => setTimeout(resolve, delayMs));
+          await new Promise((resolve: any) => setTimeout(resolve, delayMs));
         }
       }
     }

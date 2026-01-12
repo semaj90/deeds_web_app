@@ -295,7 +295,7 @@ export class RAGKnowledgePipeline {
 			return {
 				summary: doc.content.substring(0, 200) + '...',
 				keyPoints: [doc.title],
-				keywords: doc.title.split(' ').filter((w) => w.length > 5).slice(0, 5),
+				keywords: doc.title.split(' ').filter((w: any) => w.length > 5).slice(0, 5),
 				entities: { people: [],
 					organizations: [],
 					locations: [],
@@ -405,11 +405,11 @@ export class RAGKnowledgePipeline {
 
 		for (const pattern of patterns) {
 			const matches = doc.content.match(pattern) ?? [];
-			matches.forEach((match) => keywords.add(match));
+			matches.forEach((match: any) => keywords.add(match));
 		}
 
 		// Also include Gemma-extracted keywords
-		doc.keywords.forEach((kw) => keywords.add(kw));
+		doc.keywords.forEach((kw: any) => keywords.add(kw));
 
 		return Array.from(keywords).slice(0, 50); // Top 50 keywords
 	}
@@ -469,10 +469,10 @@ export class RAGKnowledgePipeline {
 		}
 
 		// Sort by combined score
-		ranked.sort((a, b) => b.combinedScore - a.combinedScore);
+		ranked.sort((a: any, b: any) => b.combinedScore - a.combinedScore);
 
 		// Assign rankings
-		ranked.forEach((doc, index) => {
+		ranked.forEach((doc: any, index: any) => {
 			doc.ranking = index + 1;
 		});
 
@@ -502,8 +502,8 @@ export class RAGKnowledgePipeline {
 	private calculateKeywordScore(query: string, doc: IndexedDocument): number {
 		const queryTokens = query.toLowerCase().split(/\s+/);
 		const docKeywords = [
-			...(doc.keywords || []).map((k) => k.toLowerCase()),
-			...(doc.ripgrepKeywords || []).map((k) => k.toLowerCase())
+			...(doc.keywords || []).map((k: any) => k.toLowerCase()),
+			...(doc.ripgrepKeywords || []).map((k: any) => k.toLowerCase())
 		];
 
 		if (queryTokens.length === 0) return 0;
@@ -513,7 +513,7 @@ export class RAGKnowledgePipeline {
 		for (const token of queryTokens) {
 			if (docKeywords.includes(token)) {
 				matches += 1.0;
-			} else if (docKeywords.some((kw) => kw.includes(token) || token.includes(kw))) {
+			} else if (docKeywords.some((kw: any) => kw.includes(token) || token.includes(kw))) {
 				matches += 0.5;
 			} else if (doc.searchableText.toLowerCase().includes(token)) {
 				matches += 0.2;

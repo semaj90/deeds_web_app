@@ -89,7 +89,7 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
  // Similar patterns
  if (patterns.length > 0) {
  sections.push('## Similar Patterns');
- patterns.forEach((pattern, index) => {
+ patterns.forEach((pattern: any, index: any) => {
  sections.push(
  `### Pattern ${index + 1} (${(pattern.similarity * 100).toFixed(1)}% similar)`
  );
@@ -237,8 +237,8 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
  const relatedText = relatedMatch ? relatedMatch[1].trim() : '';
  const relatedErrors = relatedText
  .split(',')
- .map((e) => e.trim())
- .filter((e) => e.length > 0);
+ .map((e: any) => e.trim())
+ .filter((e: any) => e.length > 0);
 
  const analysis: Analysis = {
  errorId: '', // Will be set by caller

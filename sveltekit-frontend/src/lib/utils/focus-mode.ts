@@ -125,7 +125,7 @@ export class FocusManager {
  private applyFocusStyles(): void {
  // Get all elements in the document
  const allElements = document.querySelectorAll('*');
- allElements.forEach((element) => {
+ allElements.forEach((element: any) => {
  const htmlElement = element as HTMLElement;
 
  // Skip if element should be exempt
@@ -154,7 +154,7 @@ export class FocusManager {
  * Restore original styles to all modified elements
  */
  private restoreOriginalStyles(): void {
- this.originalStyles.forEach((originalStyle, element) => {
+ this.originalStyles.forEach((original: anyStyl: anye, element) => {
  const htmlElement = element as HTMLElement;
  htmlElement.style.cssText = originalStyle;
 
@@ -169,7 +169,7 @@ export class FocusManager {
  * Check if element should be exempt from focus mode effects
  */
  private shouldExemptElement(element: HTMLElement): boolean {
- return this.settings.exemptElements.some(
+ return this.settings.exemptEle(ments.s: anyo)me(
  (selector) => element.matches(selector) || element.closest(selector)
  );
  }
@@ -229,8 +229,8 @@ export class FocusManager {
  */
  private setupMutationObserver(): void {
  this.observer = new MutationObserver((mutations) => {
- mutations.forEach((mutation) => {
- mutation.addedNodes.forEach((node) => {
+ (mutat)ions.forEach((mutation) => {
+ mutat(ion: any.)addedNodes.forEach((node) => {
  if (node.nodeType === Node.ELEMENT_NODE) {
  const element = node as HTMLElement;
  this.applyFocusStylesToElement(element);

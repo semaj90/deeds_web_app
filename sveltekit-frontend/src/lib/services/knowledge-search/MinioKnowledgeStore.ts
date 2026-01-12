@@ -238,7 +238,7 @@ export class MinioKnowledgeStore {
     try {
       const objects = await this.listObjects(`${collection}/`);
       // Filter out chunk files
-      return objects.filter(key => !key.includes('_chunk_'));
+      return objects.filter((key: any) => !key.includes('_chunk_'));
     } catch (error) {
       console.error(`❌ Failed to list documents in ${collection}`, error);
       return [];

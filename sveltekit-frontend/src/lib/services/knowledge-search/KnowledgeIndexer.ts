@@ -297,7 +297,7 @@ Summary:`;
     for (const pattern of techPatterns) {
       const matches = content.match(pattern);
       if (matches) {
-        matches.forEach(m => entities.add(m));
+        matches.forEach((m: any) => entities.add(m));
       }
     }
 
@@ -311,7 +311,7 @@ Summary:`;
     const tags: Set<string> = new Set();
 
     // Add entities as tags (lowercase)
-    entities.forEach(e => tags.add(e.toLowerCase()));
+    entities.forEach((e: any) => tags.add(e.toLowerCase()));
 
     // Fallback: extract from URL domain (Requirement 9.5)
     if (tags.size === 0) {
@@ -339,12 +339,12 @@ Summary:`;
     if (totalWords === 0) return tfVector;
 
     const wordCounts = new Map<string, number>();
-    words.forEach(word => {
+    words.forEach((word: any) => {
       wordCounts.set(word, (wordCounts.get(word) || 0) + 1);
     });
 
     // Compute TF (term frequency)
-    wordCounts.forEach((count, word) => {
+    wordCounts.forEach((count: any, word: any) => {
       tfVector.set(word, count / totalWords);
     });
 

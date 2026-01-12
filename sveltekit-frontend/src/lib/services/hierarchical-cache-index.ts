@@ -302,7 +302,7 @@ export class HierarchicalCacheIndex {
 	 */
 	private calculateSemanticPriority(tags: string[]): number {
 		const importantLegalTerms = ['contract', 'evidence', 'precedent', 'statute', 'judgment'];
-		const matches = tags.filter(tag => importantLegalTerms.some(term => tag.includes(term)));
+		const matches = tags.filter((tag: any) => importantLegalTerms.some((term: any) => tag.includes(term)));
 		return Math.min(1.0, matches.length / 3.0);
 	}
 
@@ -310,20 +310,20 @@ export class HierarchicalCacheIndex {
 	 * Calculate legal document type priority
 	 */
 	private calculateLegalPriority(key: string, tags: string[]): number {
-		const allTerms = [key.toLowerCase(), ...tags.map(t => t.toLowerCase())];
+		const allTerms = [key.toLowerCase(), ...tags.map((t: any) => t.toLowerCase())];
 
 		// Critical legal documents get highest priority
-		if (allTerms.some(term => ['supreme', 'constitutional', 'precedent'].includes(term))) {
+		if (allTerms.some((term: any) => ['supreme', 'constitutional', 'precedent'].includes(term))) {
 			return 1.0;
 		}
 
 		// Important documents get high priority
-		if (allTerms.some(term => ['contract', 'evidence', 'judgment'].includes(term))) {
+		if (allTerms.some((term: any) => ['contract', 'evidence', 'judgment'].includes(term))) {
 			return 0.8;
 		}
 
 		// Regular legal documents get medium priority
-		if (allTerms.some(term => ['legal', 'court', 'law'].includes(term))) {
+		if (allTerms.some((term: any) => ['legal', 'court', 'law'].includes(term))) {
 			return 0.6;
 		}
 

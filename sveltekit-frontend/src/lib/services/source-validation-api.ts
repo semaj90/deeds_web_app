@@ -219,16 +219,16 @@ function extractEntities(text: string): string[] {
 		/CouchDB/g
 	];
 
-	patterns.forEach((pattern) => {
+	patterns.forEach((pattern: any) => {
 		const matches = text.match(pattern);
 		if (matches) {
-			matches.forEach((match) => entities.add(match));
+			matches.forEach((match: any) => entities.add(match));
 		}
 	});
   
 	const capitalizedWords = text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g);
 	if (capitalizedWords) {
-		capitalizedWords.forEach((word) => {
+		capitalizedWords.forEach((word: any) => {
 			if (word.length > 3) {
 				// Ignore short words
 				entities.add(word);

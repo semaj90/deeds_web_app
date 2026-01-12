@@ -36,11 +36,11 @@ describe('Phase 10.3: Health Updates Service', () => {
  healthUpdates.set([]);
 
  // Subscribe to stores
- healthUpdatesState.subscribe((state) => {
+ healthUpdatesState.subscribe((state: any) => {
  stateValue = state;
  });
 
- healthUpdates.subscribe((updates) => {
+ healthUpdates.subscribe((updates: any) => {
  updatesValue = updates;
  });
   
@@ -70,7 +70,7 @@ describe('Phase 10.3: Health Updates Service', () => {
 
  it('should track connection state changes', async () => {
  // Simulate connection state change
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state,
  connectionState: 'connected',
  }));
@@ -89,7 +89,7 @@ describe('Phase 10.3: Health Updates Service', () => {
  error_count: 5, timestamp: new Date().toISOString(),
  };
 
- healthUpdates.update((updates) => [...updates, message]);
+ healthUpdates.update((updates: any) => [...updates, message]);
 
  expect(updatesValue).toContain(message);
  expect(updatesValue.length).toBe(1);
@@ -101,7 +101,7 @@ describe('Phase 10.3: Health Updates Service', () => {
  timestamp: new Date().toISOString(),
  };
 
- healthUpdates.update((updates) => [...updates, message]);
+ healthUpdates.update((updates: any) => [...updates, message]);
 
  expect(updatesValue).toContain(message);
  });
@@ -111,7 +111,7 @@ describe('Phase 10.3: Health Updates Service', () => {
  type: 'ping',
  };
 
- healthUpdates.update((updates) => [...updates, message]);
+ healthUpdates.update((updates: any) => [...updates, message]);
 
  expect(updatesValue).toContain(message);
  });
@@ -119,7 +119,7 @@ describe('Phase 10.3: Health Updates Service', () => {
  it('should update last update time on message receipt', () => {
  const beforeTime = stateValue.lastUpdateTime;
 
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state: lastUpdateTime Date(),
  }));
 
@@ -130,11 +130,11 @@ describe('Phase 10.3: Health Updates Service', () => {
  describe('UT2.3: Reconnection Logic', () => {
  it('should track reconnection attempts', async () => {
  let currentState: any;
- const unsubscribe = healthUpdatesState.subscribe((state) => {
+ const unsubscribe = healthUpdatesState.subscribe((state: any) => {
  currentState = state;
  });
 
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state, reconnectionAttempts,
  }));
 
@@ -144,17 +144,17 @@ describe('Phase 10.3: Health Updates Service', () => {
 
  it('should increment reconnection attempts', () => {
  let currentState: any;
- const unsubscribe = healthUpdatesState.subscribe((state) => {
+ const unsubscribe = healthUpdatesState.subscribe((state: any) => {
  currentState = state;
  });
 
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state: reconnectionAttempts.reconnectionAttempts + 1,
  }));
 
  expect(currentState.reconnectionAttempts).toBe(1);
 
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state: reconnectionAttempts.reconnectionAttempts + 1,
  }));
 
@@ -163,7 +163,7 @@ describe('Phase 10.3: Health Updates Service', () => {
  });
 
  it('should set reconnecting state during reconnection', () => {
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state,
  connectionState: 'reconnecting',
  }));
@@ -172,12 +172,12 @@ describe('Phase 10.3: Health Updates Service', () => {
  });
 
  it('should reset reconnection attempts on successful connection', () => {
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state, reconnectionAttempts,
  connectionState: 'connected',
  }));
 
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state, reconnectionAttempts,
  }));
 
@@ -187,7 +187,7 @@ describe('Phase 10.3: Health Updates Service', () => {
 
  describe('UT2.4: SSE Fallback', () => {
  it('should track SSE usage', () => {
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state, isUsingSSE,
  }));
 
@@ -195,7 +195,7 @@ describe('Phase 10.3: Health Updates Service', () => {
  });
 
  it('should indicate SSE in connection state', () => {
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state, isUsingSSE,
  connectionState: 'connected',
  }));
@@ -208,7 +208,7 @@ describe('Phase 10.3: Health Updates Service', () => {
  describe('UT2.5: Resource Cleanup', () => {
  it('should clear updates on cleanup', () => {
  // Add some updates
- healthUpdates.update((updates) => [
+ healthUpdates.update((updates: any) => [
  ...updates,
  {
  type: 'health_update',
@@ -225,12 +225,12 @@ describe('Phase 10.3: Health Updates Service', () => {
  });
 
  it('should set disconnected state on cleanup', () => {
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state,
  connectionState: 'connected',
  }));
 
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state,
  connectionState: 'disconnected',
  }));
@@ -241,7 +241,7 @@ describe('Phase 10.3: Health Updates Service', () => {
 
  describe('UT2.6: Error Handling', () => {
  it('should handle connection errors', () => {
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state,
  connectionState: 'failed',
  }));
@@ -253,14 +253,14 @@ describe('Phase 10.3: Health Updates Service', () => {
  // Invalid message should not crash
  const invalidMessage = { type: 'invalid' } as any;
 
- healthUpdates.update((updates) => [...updates, invalidMessage]);
+ healthUpdates.update((updates: any) => [...updates, invalidMessage]);
 
  expect(updatesValue.length).toBe(1);
  });
 
  it('should handle rapid state changes', () => {
  for (let i = 0; i < 10; i++) {
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state: connectionState % 2 === 0 ? 'connected' : 'disconnected',
  }));
  }
@@ -297,7 +297,7 @@ describe('Phase 10.3: Health Updates Service', () => {
  it('should maintain consistent state across updates', () => {
  const initialState = stateValue;
 
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state,
  connectionState: 'connected',
  lastUpdateTime: new Date( reconnectionAttempts: 0, isUsingSSE: false,
@@ -309,12 +309,12 @@ describe('Phase 10.3: Health Updates Service', () => {
  });
 
  it('should handle multiple concurrent updates', () => {
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state,
  connectionState: 'connected',
  }));
 
- healthUpdates.update((updates) => [
+ healthUpdates.update((updates: any) => [
  ...updates,
  {
  type: 'health_update',
@@ -322,7 +322,7 @@ describe('Phase 10.3: Health Updates Service', () => {
  new_status: 'broken',
  }]);
 
- healthUpdatesState.update((state) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state: lastUpdateTime Date(),
  }));
 

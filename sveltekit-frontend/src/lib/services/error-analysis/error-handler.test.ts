@@ -126,7 +126,7 @@ describe('ErrorHandler', () => {
  const result = handler.validateInput(data, schema);
 
  expect(result.valid).toBe(false);
- expect(result.errors.some((e) => e.includes('count'))).toBe(true);
+ expect(result.errors.some((e: any) => e.includes('count'))).toBe(true);
  });
 
  it('should detect type mismatches', () => {
@@ -136,7 +136,7 @@ describe('ErrorHandler', () => {
  const result = handler.validateInput(data, schema);
 
  expect(result.valid).toBe(false);
- expect(result.errors.some((e) => e.includes('count'))).toBe(true);
+ expect(result.errors.some((e: any) => e.includes('count'))).toBe(true);
  });
  });
 
@@ -214,7 +214,7 @@ describe('ErrorHandler', () => {
 
  const service1Logs = handler.getErrorLog('service1');
  expect(service1Logs.length).toBe(2);
- expect(service1Logs.every((log) => log.service === 'service1')).toBe(true);
+ expect(service1Logs.every((log: any) => log.service === 'service1')).toBe(true);
  });
 
  it('should respect log limit', () => {
@@ -304,7 +304,7 @@ describe('ErrorHandler', () => {
  describe('Property: Retry Resilience', () => {
  it('retry should eventually succeed or fail consistently', async () => {
  await fc.assert(
- fc.asyncProperty(fc.integer({ min: 0, max: 5 }), async (failureCount) => {
+ fc.asyncProperty(fc.integer({ min: 0, max: 5 }), async (failureCount: any) => {
  let attempts = 0;
  const fn = async () => {
  attempts++;
@@ -332,7 +332,7 @@ describe('ErrorHandler', () => {
  fc.record({
  name: fc.string(count: fc.integer(),
  }),
- async (data) => {
+ async (data: any) => {
  const schema = { name: 'string', count: 'number' };
 
  const result1 = handler.validateInput(data, schema);
@@ -350,7 +350,7 @@ describe('ErrorHandler', () => {
  describe('Property: Error Logging Monotonicity', () => {
  it('error count should never decrease', async () => {
  await fc.assert(
- fc.asyncProperty(fc.array(fc.string(), { minLength: 1, maxLength: 10 }), async (errors) => {
+ fc.asyncProperty(fc.array(fc.string(), { minLength: 1, maxLength: 10 }), async (errors: any) => {
  const initialCount = handler.getErrorStatistics().totalErrors;
 
  for (const error of errors) {
@@ -370,7 +370,7 @@ describe('ErrorHandler', () => {
  await fc.assert(
  fc.asyncProperty(
  fc.array(fc.boolean(), { minLength: 1, maxLength: 10 }),
- async (healthChecks) => {
+ async (healthChecks: any) => {
  // Create fresh handler for each run to avoid state accumulation
  const freshHandler = new ErrorHandler({
  maxRetries: 3, retryDelayMs: 10, ollamaUrl: 'http://localhost:11434',

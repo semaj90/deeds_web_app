@@ -70,7 +70,7 @@ class UploadService {
  onEvent: (event: ProgressEvent) => void,
  onError?: (error: Error) => void
  ): Promise<void> {
- return new Promise((resolve, reject) => {
+ return new Promise((resolve: any, r: anyeject) => {
  try {
  const eventSource = new EventSource(`${API_BASE}/progress/${docId}`);
 
@@ -157,7 +157,7 @@ class UploadService {
  try {
  const response = await fetch(`${API_BASE}/health`);
  return response.ok;
- } catch (error) {
+ } catch (error: any) {
  return false;
  }
  }

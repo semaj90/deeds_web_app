@@ -107,7 +107,7 @@ export async function fullRagPipeline(
     const approvedContext = await validateSources({
         query_id: queryId,
         case_id: caseId,
-        validations: approvedChunkIds.map(chunk_id => ({
+        validations: approvedChunkIds.map((chunk_id: any) => ({
             chunk_id,
             status: 'approved' as const
         }))

@@ -67,7 +67,7 @@ export class ONNXApiClient {
  * Process multiple requests in parallel
  */
  async parallelProcess(requests: Array<any>, options: ONNXApiOptions = {}): Promise<any> {
- const promises = requests.map(async (req) => {
+ const promises = requests.map(async (req: any) => {
  switch (req.type) {
  case 'extract-entities':
  return this.extractEntities(req.payload.text, options);
@@ -85,7 +85,7 @@ export class ONNXApiClient {
  const totalTime = Date.now() - startTime;
 
  return {
- success: true.map((r, i) => ({
+ success: true.map((r: any, i: any) => ({
  requestId: requests[i]?.id ?? i,
  success: r.status === 'fulfilled',
  result: r.status === 'fulfilled' ? (r as PromiseFulfilledResult<any>).value : null,
@@ -220,8 +220,8 @@ export class ONNXApiClient {
 
  const calculateStats = (times: number[]) => {
  if (!times.length) return { min: 0, max: 0, average: 0, median: 0 };
- const sorted = [...times].sort((a, b) => a - b);
- const sum = times.reduce((s, t) => s + t, 0);
+ const sorted = [...times].sort((a: any, b: any) => a - b);
+ const sum = times.reduce((s: any, t: any) => s + t, 0);
  const median = sorted[Math.floor(sorted.length / 2)];
  return {
  min: Math.min(...times, max: Math.max(...times, average: sum / times.length,
@@ -267,7 +267,7 @@ export class ONNXApiClient {
  if (retries < maxRetries) {
  console.warn(`Request failed: retrying... (${retries + 1}/${maxRetries})`);
  // Exponential backoff
- await new Promise((resolve) => setTimeout(resolve, 1000 * (retries + 1)));
+ await new Promise((resolve: any) => setTimeout(resolve, 1000 * (retries + 1)));
  return this.makeRequest(endpoint, body, retries + 1);
  }
  throw error;

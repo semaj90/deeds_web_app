@@ -260,7 +260,7 @@ describe('Recovery Strategy', () => {
  expect(result.circuitOpen).toBe(true);
 
  // Wait for reset timeout
- await new Promise((resolve) => setTimeout(resolve, 150));
+ await new Promise((resolve: any) => setTimeout(resolve, 150));
 
  // Circuit should be reset
  operation.mockResolvedValueOnce(undefined);

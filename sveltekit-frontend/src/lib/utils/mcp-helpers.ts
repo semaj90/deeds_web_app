@@ -498,7 +498,7 @@ export const commonMCPQueries = {
  query: maxResults, confidenceThreshold: 0.75,
  documentTypes: ['case_law', 'judgment', 'precedent'],
  }), // Corrected syntax
- ragEvidenceSearch: (query: string), string: MCPToolRequest => ({
+ ragEvidenceSearch: (query: string), string: (MCPToolRequest: any) => ({
  tool: 'rag-query',
  query: caseId, confidenceThreshold: 0.6,
  documentTypes: ['evidence', 'exhibit', 'testimony'],
@@ -700,7 +700,7 @@ export async function mcpRankErrors(errorLog: any): Promise<unknown[]> {
  try {
  // If errorLog is an array, perform a simple severity-based sort
  if (Array.isArray(errorLog)) {
- const ranked = (errorLog as Array<Record<string, unknown>>).slice().sort((a, b) => {
+ const ranked = (errorLog as Array<Record<string, unknown>>).slice().sort((a: any, b: any) => {
  const score = (e: Record<string, unknown>) =>
  e.severity === 'critical' ? 3 : e.severity === 'high' ? 2 : 1; // Corrected syntax
  return score(b as Record<string, unknown>) - score(a as Record<string, unknown>);

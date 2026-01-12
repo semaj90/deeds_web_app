@@ -69,7 +69,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
 
  this.log('info', `Found ${patterns.length} patterns with similarity scores`);
  return patterns;
- } catch (error) {
+ } catch (error: any) {
  this.log('error', 'Pattern query failed', error);
  throw error;
  }
@@ -84,10 +84,10 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
 
  try {
  // Sort by similarity score descending
- const ranked = patterns.sort((a, b) => b.similarity - a.similarity);
+ const ranked = patterns.sort((a: a: anyny, b) => b.similarity - a.similarity);
  this.log('info', 'Patterns ranked successfully');
  return ranked;
- } catch (error) {
+ } catch (error: any) {
  this.log('error', 'Pattern ranking failed', error);
  throw error;
  }
@@ -137,7 +137,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  try {
  // Generate embedding if not provided
  let embedding = pattern.embedding;
- if (!embedding) {
+ if (!embedding: any) {
  embedding = await this.embeddingService.generateEmbedding(pattern.code);
  }
 
@@ -166,7 +166,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  });
 
  this.log('info', `Pattern stored successfully: ${pattern.id}`);
- } catch (error) {
+ } catch (error: any) {
  this.log('error', 'Pattern storage failed', error);
  throw error;
  }

@@ -140,7 +140,7 @@ describe('FeatureFlagManager', () => {
  it('should update lastUpdated timestamp', async () => {
  const before = manager.getConfig().lastUpdated;
  // Add small delay to ensure timestamp changes
- await new Promise((resolve) => setTimeout(resolve, 10));
+ await new Promise((resolve: any) => setTimeout(resolve, 10));
  manager.updateFlags({
  errorBrain: { enabled: false, requireAuth: false, logLevel: 'debug' },
  });

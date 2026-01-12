@@ -73,7 +73,7 @@ export class SSEClient {
       };
 
       // Generic message handler
-      this.eventSource.onmessage = (event) => {
+      this.eventSource.onmessage = (event: any) => {
         try {
           const message: SSEMessage = JSON.parse(event.data);
           this.lastMessage = message;
@@ -89,7 +89,7 @@ export class SSEClient {
       };
 
       // Connection error
-      this.eventSource.onerror = (error) => {
+      this.eventSource.onerror = (error: any) => {
         this.isConnected = false;
         this.connectionError = 'Connection lost';
         console.error('[SSE] Connection error:', error);
@@ -112,7 +112,7 @@ export class SSEClient {
 
     // Also register with EventSource for named events
     if (this.eventSource) {
-      this.eventSource.addEventListener(messageType, (event) => {
+      this.eventSource.addEventListener(messageType, (event: any) => {
         try {
           const data = JSON.parse((event as MessageEvent).data);
           handler(data);

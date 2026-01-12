@@ -368,7 +368,7 @@ export async function ragWithSourceValidation(
   
   const approvedIds = await onCandidates(searchResult.chunks);
 
-  const validations = searchResult.chunks.map(chunk => ({
+  const validations = searchResult.chunks.map((chunk: any) => ({
     chunk_id: chunk.chunk_id,
     status: approvedIds.includes(chunk.chunk_id) ? 'approved' : 'rejected' as ValidationStatus,
   }));

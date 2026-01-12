@@ -368,7 +368,7 @@ export class WebGPUSIMDAccelerator {
         for (let i = 0; i < jsonStrings.length; i += batchSize) {
             const batch = jsonStrings.slice(i, i + batchSize);
             const batchResults = await Promise.all(
-                batch.map((json) => this.webgpuAcceleratedParse(json, mode))
+                batch.map((json: any) => this.webgpuAcceleratedParse(json, mode))
             );
             results.push(...batchResults);
         }
@@ -402,7 +402,7 @@ export class WebGPUSIMDAccelerator {
         jsonStrings: string[],
         _mode: ParseMode
     ): Promise<AccelerationResult[]> {
-        return jsonStrings.map((json) => ({
+        return jsonStrings.map((json: any) => ({
             data: JSON.parse(json),
             processing_time_ms: 0,
             acceleration_method: 'Standard_Batch',

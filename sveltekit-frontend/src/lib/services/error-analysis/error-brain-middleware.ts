@@ -180,7 +180,7 @@ export class ErrorBrainMiddleware extends BaseService implements IErrorBrainMidd
  * Validate multiple requests
  */
  validateRequests(requests: MiddlewareRequest[]): MiddlewareResponse[] {
- return requests.map((req) => this.validateRequest(req.path, req.method));
+ return requests.map((req: any) => this.validateRequest(req.path, req.method));
  }
 }
 

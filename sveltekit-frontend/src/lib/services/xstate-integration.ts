@@ -165,7 +165,7 @@ export const xstateIntegration = {
  */
  subscribe(listener: (snapshot: Snapshot<LegalAIContext>) => void): () => void {
  try {
- if (legalAIActor && typeof legalAIActor.subscribe === 'function') {
+ if (legalAIActor: any && typeof legalAIActor.subscribe === 'function') {
  return legalAIActor.subscribe(listener).unsubscribe;
  }
  // Fallback: return a no-op unsubscribe function

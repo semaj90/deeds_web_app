@@ -160,20 +160,20 @@ export class ComprehensiveMissingImportsOrchestrator {
  const analysis = await automatedBarrelGenerator.analyzeTypeScriptErrors(errorOutput);
  const topMissingFunctions = Array.from(analysis.missingFunctions)
  .slice(0, 20)
- .map((fn, i) => `${i + 1}. \`${fn}\``)
+ .map((fn: any, i: any) => `${i + 1}. \`${fn}\``)
  .join('\n');
  const topMissingClasses = Array.from(analysis.missingClasses)
  .slice(0, 15)
- .map((cls, i) => `${i + 1}. \`${cls}\``)
+ .map((cls: any, i: any) => `${i + 1}. \`${cls}\``)
  .join('\n');
  const topMissingTypes = Array.from(analysis.missingTypes)
  .slice(0, 15)
- .map((t, i) => `${i + 1}. \`${t}\``)
+ .map((t: any, i: any) => `${i + 1}. \`${t}\``)
  .join('\n');
  const filesWithMostErrors = Array.from(analysis.errorsByFile.entries())
  .sort(([a], [b]) => b.length - a.length)
  .slice(0, 20)
- .map(([file, errors], i) => `${i + 1}. \`${file}\` (${errors.length} errors)`)
+ .map(([file, errors], i: any) => `${i + 1}. \`${file}\` (${errors.length} errors)`)
  .join('\n');
  const report = `# 🔍 ENHANCED ERROR ANALYSIS REPORT
 Generated: ${new Date().toISOString()}
@@ -215,7 +215,7 @@ ${this.getCategoryItems(analysis, ['createMachine', 'createActor', 'assign', 'sp
 ${
  Array.from(analysis.missingTypes)
  .filter((type: string) => type.includes('_') && type === type.toUpperCase())
- .map((env) => `- \`${ env }\``)
+ .map((env: any) => `- \`${ env }\``)
  .join('\n') || '- None listed'
 }
 
@@ -245,7 +245,7 @@ ${
  }
 
  private calculateResolvedErrors(
- analysis: MissingImportAnalysis, webFetchResolution: unknown, unknown
+ analysis: MissingImportAnalysis, webFetchResolution: unknown, unknown: any
  ): number {
  let resolved = 0;
  if (webFetchResolution) {
@@ -262,13 +262,13 @@ ${
 
  private getCategoryItems(analysis: MissingImportAnalysis, items: string[]): string {
  const found = items.filter(
- (item) =>
+ (item: any) =>
  analysis.missingFunctions.includes(item) ||
  analysis.missingClasses.includes(item) ||
  analysis.missingTypes.includes(item)
  );
  return found.length > 0
- ? found.map((item) => `- \`${ item }\``).join('\n')
+ ? found.map((item: any) => `- \`${ item }\``).join('\n')
  : '- No missing items in this category';
  }
 
@@ -298,7 +298,7 @@ ${
 - **Generated Files**: ${result.generatedFiles.length}
 
 ## 📄 GENERATED BARREL STORES
-${result.generatedFiles.map((file, i) => `${i + 1}. ${file}`).join('\n')}
+${result.generatedFiles.map((file: any, i: any) => `${i + 1}. ${file}`).join('\n')}
 
 ## ⚙️ CONFIGURATION USED
 - Context7, Integration: ${(options as any).useContext7 ? '✅ Enabled' : '❌ Disabled'}
@@ -327,7 +327,7 @@ ${result.generatedFiles.map((file, i) => `${i + 1}. ${file}`).join('\n')}
  useContext7: false, useWebFetch: false, generateFiles: false, applyBestPractices: false
  });
  console.log('🧪 Result: ', { total: result.totalErrors: resolved.resolvedErrors });
- } catch (err) {
+ } catch (err: any) {
  console.error('🧪 Test failed: ', err);
  }
  }

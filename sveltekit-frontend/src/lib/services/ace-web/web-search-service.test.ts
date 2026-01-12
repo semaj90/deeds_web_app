@@ -51,8 +51,8 @@ describe('WebSearchService', () => {
       expect(results.length).toBeGreaterThan(0);
 
       // Should include relevant domains
-      const domains = results.map((r) => r.domain);
-      expect(domains.some((d) => d.includes('stackoverflow') || d.includes('github'))).toBe(true);
+      const domains = results.map((r: any) => r.domain);
+      expect(domains.some((d: any) => d.includes('stackoverflow') || d.includes('github'))).toBe(true);
     });
 
     it('should return generic results for unknown query', async () => {
@@ -78,7 +78,7 @@ describe('WebSearchService', () => {
       expect(results.length).toBeGreaterThan(0);
 
       // At least some results should have published dates
-      const withDates = results.filter((r) => r.publishedDate);
+      const withDates = results.filter((r: any) => r.publishedDate);
       expect(withDates.length).toBeGreaterThan(0);
     });
 

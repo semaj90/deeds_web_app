@@ -253,7 +253,7 @@ export class GenerativeUICacheIndex {
         // Sort by relevance and prediction score
         const finalResults = Array.from(resultMap.values());
         finalResults.sort(
-            (a, b) => (b.relevanceScore + b.component.predictionScore) - (a.relevanceScore + a.component.predictionScore)
+            (a: any, b: any) => (b.relevanceScore + b.component.predictionScore) - (a.relevanceScore + a.component.predictionScore)
         );
 
         const searchTime = performance.now() - startTime;
@@ -299,8 +299,8 @@ export class GenerativeUICacheIndex {
     async getSystemStats(): Promise<IndexStats> {
         const totalComponents = this.componentIndex.size;
         const cacheHitRate = 0.85; // Mock
-        const compressionRatios = Array.from(this.componentIndex.values()).map(c => c.compressionRatio);
-        const averageCompressionRatio = compressionRatios.length > 0 ? compressionRatios.reduce((a, b) => a + b, 0) / compressionRatios.length : 1;
+        const compressionRatios = Array.from(this.componentIndex.values()).map((c: any) => c.compressionRatio);
+        const averageCompressionRatio = compressionRatios.length > 0 ? compressionRatios.reduce((a: any, b: any) => a + b, 0) / compressionRatios.length : 1;
         const totalMemorySaved = await this.getMemoryUsage(); // Mock metric
 
         return {
@@ -424,9 +424,9 @@ export class GenerativeUICacheIndex {
             embedding[i % 384] += text.charCodeAt(i);
         }
 
-        const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
+        const magnitude = Math.sqrt(embedding.reduce((sum: any, val: any) => sum + val * val, 0));
         if (magnitude === 0) return embedding;
-        return embedding.map(v => v / magnitude);
+        return embedding.map((v: any) => v / magnitude);
     }
 
     private inferComponentType(params: Record<string, unknown>): UIComponentMetadata['type'] {
@@ -481,7 +481,7 @@ export class GenerativeUICacheIndex {
             .toLowerCase()
             .replace(/[^\w\s]/g, '')
             .split(/\s+/)
-            .filter(word => word.length > 2);
+            .filter((word: any) => word.length > 2);
     }
 
     private hashString(str: string): string {
@@ -544,7 +544,7 @@ export class GenerativeUICacheIndex {
                  // Load in batches is better, but simple loop for now
                  const values = await this.redis.mget(...keys);
                  let loaded = 0;
-                 values.forEach(val => {
+                 values.forEach((val: any) => {
                     if (val) {
                         try {
                             const component = JSON.parse(val) as CachedUIComponent;
@@ -600,7 +600,7 @@ export class GenerativeUICacheIndex {
         const memoryUsage = this.getMemoryUsage();
         if (memoryUsage > 500 * 1024 * 1024) { // 500MB
             const sorted = Array.from(this.componentIndex.values()).sort(
-                (a, b) => a.metadata.accessCount - b.metadata.accessCount
+                (a: any, b: any) => a.metadata.accessCount - b.metadata.accessCount
             );
             const toRemove = sorted.slice(0, Math.floor(sorted.length * 0.1));
             for (const component of toRemove) {

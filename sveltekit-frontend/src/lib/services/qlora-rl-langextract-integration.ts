@@ -209,7 +209,7 @@ export class QLoRARLLangExtractIntegration {
             return this.getDefaultStrategy(document);
         }
 
-        return new Promise((resolve) => {
+        return new Promise((resolve: any) => {
             // One-time listener for the response to this specific action request
             const handler = (evt: MessageEvent<RLWorkerOutboundMessage>) => {
                 const { type } = evt.data;

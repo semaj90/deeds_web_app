@@ -14,7 +14,7 @@ vi.mock('@aws-sdk/client-s3', () => {
   return {
     S3Client: vi.fn(() => ({
       send: mockSend,
-    }, PutObjectCommand: vi.fn((input) => ({ input }, GetObjectCommand: vi.fn((input) => ({ input }, HeadObjectCommand: vi.fn((input) => ({ input }, DeleteObjectCommand: vi.fn((input) => ({ input })),
+    }, PutObjectCommand: vi.fn((input: any) => ({ input }, GetObjectCommand: vi.fn((input: any) => ({ input }, HeadObjectCommand: vi.fn((input: any) => ({ input }, DeleteObjectCommand: vi.fn((input: any) => ({ input })),
   };
 });
 

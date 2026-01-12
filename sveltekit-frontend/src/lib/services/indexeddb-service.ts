@@ -19,7 +19,7 @@ export class IndexedDBService {
 
  constructor() {
  this.db = openDB(DB_NAME, DB_VERSION, {
- upgrade(db) {
+ upgrade(db: any) {
  // Create an object store for documents if it doesn't exist
  if (!db.objectStoreNames.contains(STORE_NAME)) {
  db.createObjectStore(STORE_NAME, { keyPath: 'id' });

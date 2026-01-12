@@ -132,13 +132,13 @@ export async function ollamaEmbed(
  });
 
  if (!resp.ok) {
- const bodyText = await resp.text().catch((error) => '');
+ const bodyText = await resp.text().catch((error: any) => '');
  console.error(`ollamaEmbed error: ${resp.status} ${bodyText}`);
  // return placeholder shaped results to preserve callers' expectations
  return texts.map(() => ({}) as EmbeddingResult);
  }
 
- const body = await resp.json().catch((error) => ({}) as Record<string, unknown>);
+ const body = await resp.json().catch((error: any) => ({}) as Record<string, unknown>);
 
  // Ollama may respond as { embedding: [...], model: `...` } for single,
  // or { embeddings: [[...], [...]], model: `...` } for batch, or variations.
@@ -156,9 +156,9 @@ export async function ollamaEmbed(
  if (singleEmbedding) {
  // map single embedding across single input or if multiple inputs were sent, keep only first
  const emb = (((body as Record<string, unknown>)['embedding'] as unknown[]) ?? []).map(Number);
- return texts.map((_t, i) => (i === 0 ? { embedding: emb, model } : ({} as EmbeddingResult)));
+ return texts.map((_t: any, i: any) => (i === 0 ? { embedding: emb, model } : ({} as EmbeddingResult)));
  } else if (batchEmbeddings) {
- return (((body as Record<string, unknown>)['embeddings'] as unknown[]) ?? []).map((e) => ({
+ return (((body as Record<string, unknown>)['embeddings'] as unknown[]) ?? []).map((e: any) => ({
  embedding: Array.isArray(e) ? (e as unknown[]).map(Number) : undefined,
  model,
  }));
@@ -205,7 +205,7 @@ export async function ollamaGenerate(
          headers: { 'Content-Type': `application/json` },
          body: JSON.stringify({ model, stream: false }),
      }); if (!resp.ok) {
- const txt = await resp.text().catch((error) => '');
+ const txt = await resp.text().catch((error: any) => '');
  console.error(`Ollama failed: ${resp.status} ${txt}`);
  throw new Error(`Ollama failed: ${resp.status}`);
  }
@@ -213,7 +213,7 @@ export async function ollamaGenerate(
  // Expect JSON for non-streaming responses; fallback to text parsing
  const result = (await resp.json().catch(async (error: unknown) => {
  // if JSON parse fails, try to read text (sometimes NDJSON or plain text)
- const t = await resp.text().catch((error) => '');
+ const t = await resp.text().catch((error: any) => '');
  return { response: t } as Record<string, unknown>;
  })) as Record<string, unknown>;
 
@@ -241,7 +241,7 @@ const $redisAdapter: $RedisCacheAdapter = {
  try {
  const r = await fetch(`/api/redis/get?key=${encodeURIComponent(key)}`);
  if (!r.ok) return null;
- return await r.json().catch((error) => null);
+ return await r.json().catch((error: any) => null);
  } catch {
  return null;
  }
@@ -284,7 +284,7 @@ const $qdrantAdapter: $QdrantAdapter = {
  body: JSON.stringify({ collection, vector, limit, filter }),
  });
  if (!r.ok) return [];
- return (await r.json().catch((error) => [])) as unknown[];
+ return (await r.json().catch((error: any) => [])) as unknown[];
  } catch {
  return [];
  }
@@ -312,7 +312,7 @@ const pgJsonStore: $PostgresJSONStore = {
  body: JSON.stringify({ [field]: value }),
  });
  if (!r.ok) return [];
- return (await r.json().catch((error) => [])) as Record<string, unknown>[];
+ return (await r.json().catch((error: any) => [])) as Record<string, unknown>[];
  } catch {
  return [];
  }
@@ -366,7 +366,7 @@ class CachedRAGService {
  // 2: Get cached response using gemma3:legal-latest
  const rawResults: any[] = Array.isArray(queryResult?.results) ? queryResult.results : [];
  const contextTexts: string[] = rawResults
- .map((r) => {
+ .map((r: any) => {
  const rr = r as Record<string, unknown> | null;
  return String(this.extractResultField(rr, 'excerpt', 'content') ?? '').trim();
  })
@@ -389,7 +389,7 @@ class CachedRAGService {
  // Format response according to RAGResponse interface
  const ragResponse: RAGResponse = {
      query: query.query,
-     results: rawResults.map((item) => {
+     results: rawResults.map((item: any) => {
  const r = item as Record<string, unknown> | null;
  const docId = String(this.extractResultField(r, 'documentId', 'id') ?? 'unknown');
  return {
@@ -439,7 +439,7 @@ class CachedRAGService {
  console.log(`✂️ Split document into ${chunks.length} chunks`);
 
  // 2: Generate embeddings with caching (batch)
- const batchRequest = chunks.map((chunk, index) => ({
+ const batchRequest = chunks.map((chunk: any, index: any) => ({
  text: chunk,
  id: `${ documentId }_chunk_${ index }`,
  metadata: { ...(metadata ?? {}, chunkIndex: index, documentId },
@@ -453,19 +453,19 @@ class CachedRAGService {
  try {
  await pgJsonStore.upsertDocument({
  id: documentId,
- body: { chunks: batchRequest.map((b) => ({ id: b.id, text: b.text })) },
+ body: { chunks: batchRequest.map((b: any) => ({ id: b.id, text: b.text })) },
  });
  } catch {
  // non-fatal
  }
 
- const embeddingsGenerated = embeddingResults.filter((it) =>
+ const embeddingsGenerated = embeddingResults.filter((it: any) =>
  Array.isArray(it.embedding)
  ).length;
- const embeddingsCached = embeddingResults.filter((it) => !!it.cached).length;
+ const embeddingsCached = embeddingResults.filter((it: any) => !!it.cached).length;
 
  // 3: Store in pgvector database
- const vectorRecords = embeddingResults.map((result, index) => ({
+ const vectorRecords = embeddingResults.map((result: any, index: any) => ({
  id: `${ documentId }_chunk_${ index }`,
  chunkIndex: index,
  content: chunks[index] ?? '',
@@ -521,8 +521,8 @@ class CachedRAGService {
  });
  const summary = {
  totalDocuments: documents.length,
- successful: results.filter((r) => r.storedInPgVector).length,
- totalChunks: results.reduce((sum, r) => sum + r.chunksProcessed, 0, totalEmbeddingsGenerated: results.reduce((sum, r) => sum + r.embeddingsGenerated, 0, totalEmbeddingsCached: results.reduce((sum, r) => sum + r.embeddingsCached, 0),
+ successful: results.filter((r: any) => r.storedInPgVector).length,
+ totalChunks: results.reduce((sum: any, r: any) => sum + r.chunksProcessed, 0, totalEmbeddingsGenerated: results.reduce((sum: any, r: any) => sum + r.embeddingsGenerated, 0, totalEmbeddingsCached: results.reduce((sum: any, r: any) => sum + r.embeddingsCached, 0),
  };
  console.log(`✅ Batch ingestion completed: `, summary);
  return results;
@@ -544,11 +544,11 @@ class CachedRAGService {
  });
 
  if (!response.ok) {
- const body = await response.text().catch((error) => '');
+ const body = await response.text().catch((error: any) => '');
  throw new Error(`Vector search failed: ${response.status} ${body}`);
  }
 
- const results = await response.json().catch((error) => ({}) as Record<string, unknown>);
+ const results = await response.json().catch((error: any) => ({}) as Record<string, unknown>);
  // normalize to VectorMatch[]
  const matches = (results?.matches ?? results?.results ?? []) as VectorMatch[];
  return Array.isArray(matches) ? matches : [];
