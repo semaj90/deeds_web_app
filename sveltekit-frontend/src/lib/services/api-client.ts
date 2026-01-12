@@ -1,6 +1,7 @@
 import {  browser  } from '$app/environment';
 import {  env  } from '$env /dynamic/public';
 import type { timestamp } from "drizzle-orm/gel-core";
+import { Case, Evidence } from "$lib/types";
 
 // API Configuration
 export const API_CONFIG = {

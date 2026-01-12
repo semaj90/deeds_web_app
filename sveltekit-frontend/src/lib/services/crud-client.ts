@@ -1,4 +1,4 @@
-import type { User } from '$lib/types';
+import type { User, Evidence } from '$lib/types';
 import type { Case } from '$lib/types';
 import { boolean } from "drizzle-orm/gel-core";
 import nodejsOrchestrator from "./nodejs-orchestrator";

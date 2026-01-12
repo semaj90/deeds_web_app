@@ -1,49 +1,41 @@
-# Phase 67: Cluster & Solve Strategy (150k Errors)
+# Phase 67: Cluster & Solve Strategy (150k Errors -> 89k)
 
 ## 🎯 Objective
-Reduce error count from **150,925** to **<50,000** through 3 targeted iterations of Clustering + AI Fixing.
+Reduce error count through targeted iterations of Clustering + AI Fixing.
 
 ## 🟢 Current Status
-**Iteration 1:** ✅ Complete
-**Errors:** 150,925 → **123,791** (-27,134 reduction)
-**Actions:**
-- Archived `src/lib/ai.bak/` (Legacy Cluster A)
-- Fixed syntax corruption in 1000+ files (Cluster B/C)
+**Iteration 1:** ✅ Complete (Legacy + Syntax 1)
+- Archived `src/lib/ai.bak/`
+- Fixed trailing commas.
+- Errors: 150,925 → 123,791 (-27,134)
+
+**Iteration 2:** ✅ Complete (Phantom Commas)
+- Fixed `{, ` pattern in 2080 files.
+- Errors: 123,791 → **89,294** (-34,497)
+
+**Total Reduction:** -61,631 errors (41%).
 
 ---
 
-## 🔄 Iteration 2: Svelte 5 Props Migration (In Progress)
-**Focus:** `src/lib/components/`
+## 🔄 Iteration 3: Type Alignments (Next)
+**Tools:** `ts-morph` (Verified v27.0.2 installed)
+**Focus:** TypeScript Interface & Import Mismatches
 **Goal:** -20,000 errors.
 
-1.  **Cluster B: Svelte 5 Props**
-    *   *Pattern:* `export let` (Svelte 4) vs `$props()` (Svelte 5)
-    *   *Action:* Run `scripts/fix-svelte5-props.mjs` (New Script)
-    *   *Target:* Migrating `export let` syntax to runes.
-
----
-
-## 🔄 Iteration 3: Type Alignments
-**Focus:** TypeScript Interface Mismatches
-**Goal:** -40,000 errors.
-
-1.  **Cluster C: Import Resolution**
-    *   *Pattern:* `Cannot find module '$lib/...'`
-    *   *Action:* Fix `tsconfig.json` paths and generate missing `.d.ts` shims.
-
-2.  **Cluster D: Explicit `any` Strategy**
-    *   *Analysis:* Thousands of `implicitly has 'any' type`.
-    *   *Action:* Batch-apply explicit types or `unknown` where inference fails.
+1.  **Cluster C: Missing Imports**
+    *   *Analysis:* 89k errors likely include thousands of `Cannot find name 'X'`.
+    *   *Action:* Run `scripts/fix-missing-imports.ts` using `ts-morph` (AST) to safely inject imports.
+    *   *Target:* `src/lib/`
 
 ---
 
 ## 🚀 Execution Guide
 
-### Completed
-- `fix-object-literals.mjs`: Fixed 35k patterns
-- `fix-syntax-corruption.mjs`: Fixed 1k+ files
+### Completed Scripts
+- `scripts/fix-syntax-corruption.mjs`: The MVP of Phase 67. Fixed 3000+ files.
 
 ### Next Step
 ```bash
-node scripts/fix-svelte5-props.mjs
+# Run AST-based import fixer
+npx tsx scripts/fix-missing-imports.ts
 ```

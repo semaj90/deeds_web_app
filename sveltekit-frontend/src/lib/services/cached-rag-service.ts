@@ -2,6 +2,7 @@ import type { Document } from '$lib/types';
 /** * Cached RAG Service for Legal AI Platform * Integrates enhanced caching with RAG operations * Uses embeddinggemma for embeddings gemma3: legal-latest for responses */
 import enhancedCachingService from './advanced-result-cache.js';
 import type { RAGQuery, RAGResponse } from './enhanced-rag-semantic-analyzer.js';
+import { OllamaService } from "$lib/services/ai/OllamaService";
 
 export interface CachedRAGResult {
  response: RAGResponse; cacheStats: {

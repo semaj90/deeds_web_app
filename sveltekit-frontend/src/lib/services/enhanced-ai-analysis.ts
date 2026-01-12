@@ -3,6 +3,7 @@ import { getOptimalEmbeddingModel } from '../server/ai/embedding-config.js';
 import { ollamaService } from '../server/ai/ollama-service.js';
 import type { LegalDocument } from '../server/ai/types.js';
 import drizzleVectorConfig from '../server/db/drizzle-vector-config.js';
+import { Case, Document } from "$lib/types";
 
 export interface LegalEntity {
  type: 'case' | 'statute' | 'precedent' | 'regulation' | 'contract' | 'person' | 'organization', name: string;

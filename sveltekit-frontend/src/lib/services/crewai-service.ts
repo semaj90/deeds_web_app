@@ -1,4 +1,4 @@
-import type { AIResponse } from '$lib/types';
+import type { AIResponse, Case, Evidence } from '$lib/types';
 import crypto from 'crypto';
 
 /** * CrewAI Multi-Agent Service * Handles role-based agent crews for specialized legal workflows */

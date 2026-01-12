@@ -9,6 +9,7 @@ import { getHealthStatus } from "$lib/server/ai/rag-pipeline-enhanced";
 import type { Record } from "neo4j-driver";
 import type { id } from "zod/v4/locales";
 import type { query } from "$app/server";
+import { Case, Evidence } from "$lib/types";
 
 // Base API configuration
 const API_BASE_URL = '/api/v1';

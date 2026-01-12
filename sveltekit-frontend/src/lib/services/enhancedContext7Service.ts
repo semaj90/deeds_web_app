@@ -1,4 +1,4 @@
-import type { Case } from '$lib/types';
+import type { Case, Evidence } from '$lib/types';
 import type { Document } from '$lib/types';
 import { boolean } from "drizzle-orm/gel-core";
 import { url } from "inspector";

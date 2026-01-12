@@ -1,6 +1,7 @@
 import { env } from '$lib/env';
 import { timestamp } from "drizzle-orm/gel-core";
 import { type } from "os";
+import { Evidence } from "$lib/types";
 
 // Local small type guards used by parser helpers
 function isRecord(v: any): v is Record<string, unknown> {

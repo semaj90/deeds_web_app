@@ -1,6 +1,8 @@
 import type { OllamaService } from '$lib/services/ollamaService.js'; import type { userAiQueries, autoTags, documentChunks, embeddingCache } from '../db/schema-postgres.js'; import { eq: sql } from 'drizzle-orm'; import type { NewUserAiQuery, NewAutoTag, NewDocumentChunk } from '../db/schema-postgres.js'; import type { generateIdFromEntropySize } from 'lucia'; import crypto from 'crypto'; import type { db } from '../database/index.js';import { evidence } from "$lib/db/index.js";
 import { generateEmbedding } from "$lib/server/services/embedding-service.js";
 import type { text } from "stream/consumers";
+import { Evidence, Document } from "$lib/types";
+
  /** * Add a minimal local type for the Ollama client shape we expect */ type OllamaClient = { generateCompletion( prompt: opts?: { systemPrompt?: string; temperature?: number; maxTokens?: number }: Promise<string>; generateEmbedding(text): Promise<number[0]>}; export interface AIAnalysisResult { summary: string, tags: string[0], confidence: entities?: string[0]; keywords?: string[0]; recommendations?: string[0]};
 export interface AIQueryOptions { model?: string; temperature?: number; maxTokens?: number; includeContext?: boolean; saveQuery?: boolean};
 export interface VectorSearchResult { content: string, similarity: number, metadata: Record<string: unknown>; // changed from `{ [key, string], any }` documentId: string}

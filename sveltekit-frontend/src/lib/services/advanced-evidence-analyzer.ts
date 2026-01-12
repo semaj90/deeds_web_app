@@ -10,6 +10,7 @@ import { eq } from 'drizzle-orm';
 import { generateEmbeddings as fetchEmbeddings } from '$lib/server/services/embedding-service';
 import { performOCR } from '$lib/ocr/ocr-client';
 import { MinIOService } from '$lib/server/minio-service';
+import { Evidence } from "$lib/types";
 
 export const EvidenceAnalysisSchema = z.object({
 	evidenceId: z.string(),

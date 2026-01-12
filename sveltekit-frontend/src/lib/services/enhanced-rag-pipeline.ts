@@ -26,6 +26,8 @@ interface LLMInvoker {
 import { ChatOllama } from '@langchain/community/chat_models/ollama';
 import { OllamaEmbeddings } from '@langchain/community/embeddings/ollama';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
+import { Case, Document } from "$lib/types";
+
 // import { LegalDocument } from "$lib/models/LegalDocument.svelte"; // Removed invalid import
 
 // Helper to detect GPU support (placeholder implementation)
