@@ -126,10 +126,10 @@
 	}
 </script>
 
-<svelte, head>
+<svelte:head>
 	<title>ACP Tool Dashboard | Phase 76</title>
 	<meta name="description" content="Agent Communication Protocol Tool Dashboard" />
-</svelte, head>
+</svelte:head>
 
 <div class="dashboard">
 	<!-- Header -->
@@ -585,6 +585,7 @@
 		}
 	}
 </style>
+
 
 
 

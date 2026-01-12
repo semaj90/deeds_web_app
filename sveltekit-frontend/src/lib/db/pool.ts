@@ -147,7 +147,7 @@ export async function closePool(): Promise<void> {
  * ```
  */
 export async function withRetry<T>(queryFn: () => Promise<T>, maxRetries: number = 3): Promise<T> {
-  let lastError | undefined;
+  let lastError: Error | undefined;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
@@ -190,7 +190,7 @@ export async function withRetry<T>(queryFn: () => Promise<T>, maxRetries: number
  */
 export async function healthCheck(): Promise<{ healthy: boolean;
   responseTime: number;
-  error?, string;
+  error?: string;
 }> {
   const startTime = Date.now();
 

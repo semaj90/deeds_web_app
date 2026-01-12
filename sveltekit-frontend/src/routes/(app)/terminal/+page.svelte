@@ -92,9 +92,9 @@
  }
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>YoRHa Terminal - AI Chat</title>
-</svelte, head>
+</svelte:head>
 
 <div class="ai-chat h-screen flex bg-gray-900 text-green-400 font-mono">
  <!-- Shared Sidebar -->
@@ -323,6 +323,7 @@
  color: #065f46 !important;
  }
 </style>
+
 
 
 

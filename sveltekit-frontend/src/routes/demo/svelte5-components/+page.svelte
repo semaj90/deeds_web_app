@@ -69,9 +69,9 @@ const tabs = [
 ];
 </script>
 
-<svelte, head>
+<svelte:head>
 	<title>Svelte 5 Components Demo</title>
-</svelte, head>
+</svelte:head>
 
 <div class="min-h-screen bg-slate-900 text-white p-8">
 	<header class="max-w-4xl mx-auto mb-8">
@@ -268,5 +268,6 @@ const tabs = [
 		font-family: 'Fira Code', 'Courier New', monospace;
 	}
 </style>
+
 
 

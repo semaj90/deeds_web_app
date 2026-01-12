@@ -19,9 +19,9 @@
 	}
 </script>
 
-<svelte, head>
+<svelte:head>
 	<title>Error Analysis - Phase 89</title>
-</svelte, head>
+</svelte:head>
 
 <div class="space-y-6">
 	<!-- Header -->
@@ -232,5 +232,6 @@
 		background: linear-gradient(to bottom right, #1a1a2e, #16213e);
 	}
 </style>
+
 
 

@@ -85,9 +85,9 @@
  };
 </script>
 
-<svelte, head>
+<svelte:head>
  <title>Phase 78 Monitoring Dashboard</title>
-</svelte, head>
+</svelte:head>
 
 <div class="min-h-screen bg-gray-50">
  <!-- Header -->
@@ -328,6 +328,7 @@
  {/if}
  </div>
 </div>
+
 
 
 

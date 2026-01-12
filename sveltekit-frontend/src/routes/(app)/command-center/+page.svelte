@@ -364,9 +364,9 @@
 	let activeAlertsCount = $derived(systemAlerts.filter(a => !a.dismissed).length);
 </script>
 
-<svelte, head>
+<svelte:head>
 	<title>Command Center - YoRHa Legal AI</title>
-</svelte, head>
+</svelte:head>
 
 <div class="command-center">
 	<!-- Header -->
@@ -1287,6 +1287,7 @@
 		}
 	}
 </style>
+
 
 
 

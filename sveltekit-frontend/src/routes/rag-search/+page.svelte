@@ -175,9 +175,9 @@ function startNewSearch() {
 }
 </script>
 
-<svelte, head>
+<svelte:head>
   <title>RAG Search | Legal AI</title>
-</svelte, head>
+</svelte:head>
 
 <div class="container mx-auto px-4 py-8 max-w-4xl">
   <!-- Header -->
@@ -358,5 +358,6 @@ function startNewSearch() {
 <style>
   /* Custom styles */
 </style>
+
 
 

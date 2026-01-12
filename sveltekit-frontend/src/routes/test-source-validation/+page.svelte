@@ -150,9 +150,9 @@ function extractRelationships(
 }
 </script>
 
-<svelte, head>
+<svelte:head>
 	<title>Source Validation RAG - Integration Test</title>
-</svelte, head>
+</svelte:head>
 
 <div class="test-page">
 	<!-- Header -->
@@ -364,6 +364,7 @@ function extractRelationships(
 		font-family: 'Courier New', monospace;
 	}
 </style>
+
 
 
 

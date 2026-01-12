@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { page } from '$app/stores';
   import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
 
   // Get error from page store
   const errorPage = $derived($page.error);
   const status = $derived($page.status);
 </script>
 
-<svelte, head>
+<svelte:head>
   <title>Error {status} | Legal AI</title>
-</svelte, head>
+</svelte:head>
 
 <main class="error-page">
   <div class="error-container">

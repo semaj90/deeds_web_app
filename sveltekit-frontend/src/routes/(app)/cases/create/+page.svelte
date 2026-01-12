@@ -133,9 +133,9 @@
 	});
 </script>
 
-<svelte, head>
+<svelte:head>
 	<title>Create Case | YoRHa Detective</title>
-</svelte, head>
+</svelte:head>
 
 <div class="flex h-screen flex-col bg-slate-950 text-slate-100">
 	<header class="border-b border-slate-700 bg-black/60">
@@ -295,5 +295,6 @@
 		</div>
 	</div>
 {/if}
+
 
 

@@ -227,9 +227,9 @@
   }
 </script>
 
-<svelte, head>
+<svelte:head>
   <title>AST Topology Explorer | Phase 89</title>
-</svelte, head>
+</svelte:head>
 
 <div class="topology-explorer">
   <!-- Header -->
@@ -710,6 +710,7 @@
     }
   }
 </style>
+
 
 
 

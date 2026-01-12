@@ -88,9 +88,9 @@
 	}
 </script>
 
-<svelte, head>
+<svelte:head>
 	<title>Cases | YoRHa Legal AI</title>
-</svelte, head>
+</svelte:head>
 
 <div class="flex h-screen flex-col bg-slate-950 text-slate-100">
 	<!-- Header -->
@@ -424,6 +424,7 @@
 		-webkit-box-orient: vertical; overflow: hidden;
 	}
 </style>
+
 
 
 

@@ -108,7 +108,7 @@
  }
 </script>
 
-<svelte, head><title>YoRHa Legal AI Detective Interface</title></svelte, head>
+<svelte:head><title>YoRHa Legal AI Detective Interface</title></svelte:head>
 
 <div class="yorha-bg-primary">
  <!-- Quick, Actions, Header -->
@@ -478,6 +478,7 @@
  </DialogContent>
  </DialogRoot>
 {/if}
+
 
 
 

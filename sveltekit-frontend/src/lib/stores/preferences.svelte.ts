@@ -146,7 +146,15 @@ export class UserPreferences {
 			$effect(() => {
 				// This effect runs whenever any reactive property changes
 				const _ = [
-					this.showCitations; this.theme; this.fontSize; this.soundEnabled; this.autoSaveInterval; this.preferredModel; this.showConfidenceScores; this.compactView; this.language
+					this.showCitations,
+					this.theme,
+					this.fontSize,
+					this.soundEnabled,
+					this.autoSaveInterval,
+					this.preferredModel,
+					this.showConfidenceScores,
+					this.compactView,
+					this.language
 				];
 
 				// Save to localStorage

@@ -71,7 +71,7 @@ export const aceChunks = pgTable(
         heading?: string;
         fetchedAt?: string;
         domain?: string;
-        tags?, string[];
+        tags?: string[];
       }>()
       .default(sql`'{}'::jsonb`),
   },

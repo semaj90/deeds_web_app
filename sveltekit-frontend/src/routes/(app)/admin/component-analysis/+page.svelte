@@ -197,9 +197,9 @@
 	}
 </script>
 
-<svelte, head>
+<svelte:head>
 	<title>Phase 89: Component Analysis | Admin</title>
-</svelte, head>
+</svelte:head>
 
 <div class="container">
 	<header class="header">
@@ -806,6 +806,7 @@
 		to { transform: rotate(360deg); }
 	}
 </style>
+
 
 
 

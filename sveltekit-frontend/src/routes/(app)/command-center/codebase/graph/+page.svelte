@@ -171,9 +171,9 @@
 	}
 </script>
 
-<svelte, head>
+<svelte:head>
 	<title>Dependency Graph - YoRHa Legal AI</title>
-</svelte, head>
+</svelte:head>
 
 <div class="graph-page">
 	<!-- Header -->
@@ -559,6 +559,7 @@
 		font-size: 0.75rem; color: #f87171;
 	}
 </style>
+
 
 
 

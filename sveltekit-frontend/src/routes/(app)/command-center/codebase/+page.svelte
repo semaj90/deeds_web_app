@@ -119,9 +119,9 @@
 	}
 </script>
 
-<svelte, head>
+<svelte:head>
 	<title>Codebase Intelligence - YoRHa Legal AI</title>
-</svelte, head>
+</svelte:head>
 
 <div class="codebase-dashboard">
 	<!-- Header -->
@@ -630,6 +630,7 @@
 		}
 	}
 </style>
+
 
 
 

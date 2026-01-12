@@ -36,9 +36,9 @@
 	});
 </script>
 
-<svelte, head>
+<svelte:head>
 	<title>CouchDB Analytics Dashboard</title>
-</svelte, head>
+</svelte:head>
 
 <div class="analytics-dashboard">
 	<header class="dashboard-header">
@@ -269,6 +269,7 @@
 		min-height: 500px;
 	}
 </style>
+
 
 
 

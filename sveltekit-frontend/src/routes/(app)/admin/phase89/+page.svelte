@@ -262,9 +262,9 @@
 	});
 </script>
 
-<svelte, head>
+<svelte:head>
 	<title>Phase 89: ACE Admin | Vector Search & Analysis</title>
-</svelte, head>
+</svelte:head>
 
 <div class="container">
 	<header class="header">
@@ -856,6 +856,7 @@
 	.priority-medium { color: #ffc107; }
 	.priority-low { color: #10b981; }
 </style>
+
 
 
 

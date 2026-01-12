@@ -78,9 +78,9 @@
 	}
 </script>
 
-<svelte, head>
+<svelte:head>
 	<title>Codebase Index | ACE Admin</title>
-</svelte, head>
+</svelte:head>
 
 <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100">
 	<!-- Header -->
@@ -261,5 +261,6 @@
 		{/if}
 	</main>
 </div>
+
 
 
