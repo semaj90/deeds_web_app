@@ -1,11 +1,11 @@
 /**
  * RabbitMQ Connection Manager with Fallback Support
- * 
+ *
  * Attempts to connect to RabbitMQ in the following order:
  * 1. Docker container (localhost:5672)
  * 2. Native Windows RabbitMQ (localhost:5672 with credentials)
  * 3. Remote RabbitMQ (configurable via env)
- * 
+ *
  * Features:
  * - Automatic connection pooling
  * - Graceful error handling with fallback
@@ -13,7 +13,7 @@
  * - Automatic reconnection on failure
  */
 
-import amqp from 'amqplib';
+import amqp, { type ConfirmChannel, type Connection } from 'amqplib';
 
 interface RabbitMQConfig {
 	url: string;
@@ -48,8 +48,8 @@ const RABBITMQ_CONFIGS: RabbitMQConfig[] = [
 ];
 
 // Connection pool
-let connection: Awaited<ReturnType<typeof amqp.connect>> | null = null;
-let channel: Awaited<ReturnType<NonNullable<typeof connection>['createConfirmChannel']>> | null = null;
+let connection: Connection | null = null;
+let channel: ConfirmChannel | null = null;
 let currentConfig: RabbitMQConfig | null = null;
 let connectionAttempts = 0;
 let isConnecting = false;/**
@@ -71,14 +71,14 @@ function buildConnectionUrl(config: RabbitMQConfig): string {
 /**
  * Attempt connection with a specific configuration
  */
-async function tryConnect(config: RabbitMQConfig): Promise<Awaited<ReturnType<typeof amqplib.connect>>> {
+async function tryConnect(config: RabbitMQConfig): Promise<Connection> {
 	const url = buildConnectionUrl(config);
 	const options = config.heartbeat ? { heartbeat: config.heartbeat } : undefined;
 
 	console.log(`🔌 Attempting to connect: ${config.description}`);
 
 	try {
-		const conn = await amqplib.connect(url, options);
+		const conn = await amqp.connect(url, options);
 		console.log(`✅ Connected to RabbitMQ: ${config.description}`);
 		return conn;
 	} catch (error) {
@@ -90,7 +90,7 @@ async function tryConnect(config: RabbitMQConfig): Promise<Awaited<ReturnType<ty
 /**
  * Connect to RabbitMQ with automatic fallback
  */
-async function connectWithFallback(): Promise<Awaited<ReturnType<typeof amqplib.connect>>> {
+async function connectWithFallback(): Promise<Connection> {
 	const errors: Error[] = [];
 
 	// Try each configuration in order

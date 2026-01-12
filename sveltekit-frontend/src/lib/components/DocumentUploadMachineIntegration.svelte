@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { Button } from '$lib/components/ui/enhanced-bits';
-    import { documentUploadMachine } from '$lib/machines/document-upload-machine';
+    import Button from '$lib/components/ui/enhanced-bits/Button.svelte';
+    import documentUploadMachine from '$lib/machines/document-upload-machine';
     import { onMount } from 'svelte';
     import { fade, slide } from 'svelte/transition';
     import { createActor } from 'xstate';
@@ -23,7 +23,7 @@
     const context = $derived(snapshot.context);
     const value = $derived(snapshot.value);
 
-    let fileInput: HTMLInputElement = $state(null!);
+    let fileInput = $state<HTMLInputElement>();
     let dragOver = $state(false);
 
     function handleFileChange(e: Event) {
@@ -38,6 +38,22 @@
         dragOver = false;
         if (e.dataTransfer?.files) {
             actor.send({ type: 'SELECT_FILES', files: Array.from(e.dataTransfer.files) });
+        }
+    }
+
+    function handleDragOver(e: DragEvent) {
+        e.preventDefault();
+        dragOver = true;
+    }
+
+    function handleDragLeave() {
+        dragOver = false;
+    }
+
+    function handleKeyDown(e: KeyboardEvent) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            fileInput?.click();
         }
     }
 
@@ -69,17 +85,28 @@
 
     {#if snapshot.matches('idle') || snapshot.matches('validating') || snapshot.matches('ready')}
         <div
-            class="drop-zone border-2 border-dashed border-gray-400 p-10 text-center transition-colors mb-4"
-            class, drag-over={dragOver}
-            ondragover={() => (dragOver = true)}
+            role="button"
+            tabindex="0"
+            class="drop-zone border-2 border-dashed border-gray-400 p-10 text-center transition-colors mb-4 cursor-pointer"
+            class:drag-over={dragOver}
+            ondragover={(e: DragEvent) => {
+                e.preventDefault();
+                dragOver = true;
+            }}
             ondragleave={() => (dragOver = false)}
             ondrop={handleDrop}
-            onclick={() => fileInput.click()}
+            onclick={() => fileInput?.click()}
+            onkeydown={(e: KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    fileInput?.click();
+                }
+            }}
         >
             <input
                 type="file"
                 multiple
-                bind, this={fileInput}
+                bind:this={fileInput}
                 onchange={handleFileChange}
                 class="hidden"
             />
@@ -97,7 +124,7 @@
         </div>
 
         {#if context.files.length > 0}
-            <div class="file-list mb-4 space-y-2" in, slide>
+            <div class="file-list mb-4 space-y-2" in:slide>
                 <h3 class="text-xs font-bold uppercase text-gray-400 mb-2">Selected_Queue:</h3>
                 {#each context.files as file}
                     <div class="file-item flex justify-between bg-gray-50 p-2 text-xs border border-gray-200">
@@ -107,7 +134,7 @@
                 {/each}
 
                 {#if Object.keys(context.validationErrors).length > 0}
-                    <div class="errors mt-2 p-2 bg-red-50 border border-red-200 text-red-600 text-[10px]" in, fade>
+                    <div class="errors mt-2 p-2 bg-red-50 border border-red-200 text-red-600 text-[10px]" in:fade>
                         {#each Object.entries(context.validationErrors) as [field, msgs]}
                             {#each msgs as msg}
                                 <div>[VALIDATION_ERROR: {msg}]</div>
@@ -121,13 +148,13 @@
         <div class="actions flex justify-end gap-3 mt-6">
             <Button
                 variant="outline"
-                onclick={handleReset}
+                on:click={handleReset}
                 disabled={snapshot.matches('validating')}
             >
                 RESET
             </Button>
             <Button
-                onclick={handleSubmit}
+                on:click={handleSubmit}
                 disabled={!snapshot.matches('ready')}
                 class="px-8"
             >
@@ -136,7 +163,7 @@
         </div>
 
     {:else if snapshot.matches('uploading') || snapshot.matches('processing')}
-        <div class="status-overlay py-12 text-center" in, fade>
+        <div class="status-overlay py-12 text-center" in:fade>
             <div class="mb-8">
                 <div class="text-xl font-bold mb-2 uppercase tracking-widest animate-pulse">
                     {snapshot.matches('uploading') ? 'TRANSMITTING_DATA' : 'NEURAL_PROCESSING'}
@@ -145,7 +172,7 @@
                 <div class="progress-bar-container w-full h-4 border-2 border-black bg-gray-100 relative overflow-hidden">
                     <div
                         class="progress-fill h-full bg-black transition-all duration-300"
-                        style="width: {snapshot.matches('uploading') ? context.uploadProgress , context.processingProgress}%"
+                        style="width: {snapshot.matches('uploading') ? context.uploadProgress : context.processingProgress}%"
                     ></div>
                 </div>
 
@@ -160,16 +187,18 @@
                 {#if snapshot.matches('uploading')}
                     <div>> UPLOADING_DOCUMENT_PACKETS...</div>
                     <div>> PACKET_COUNT: {context.files.length}</div>
+                    <div>> TARGET: PostgreSQL17 + MinIO + Qdrant</div>
                 {:else}
                     <div>> CONNECTION_ESTABLISHED.</div>
                     <div>> ANALYZING_DOCUMENT_TOPOLOGY...</div>
                     <div>> EXTRACTING_LEGAL_ENTITIES...</div>
+                    <div>> STORING: PostgreSQL → Neo4j → CouchDB</div>
                 {/if}
             </div>
         </div>
 
     {:else if snapshot.matches('completed')}
-        <div class="success-result p-6 border-2 border-green-500 bg-green-50" in, fade>
+        <div class="success-result p-6 border-2 border-green-500 bg-green-50" in:fade>
             <div class="text-green-700 font-bold text-center mb-4">
                 [SYSTEM_SUCCESS: ALL_DATA_PROCESSED]
             </div>
@@ -183,13 +212,13 @@
                 {/if}
             </div>
 
-            <Button onclick={handleReset} class="w-full">
+            <Button on:click={handleReset} class="w-full">
                 PROCESS_NEW_DOCUMENTS
             </Button>
         </div>
 
     {:else if snapshot.matches('error')}
-        <div class="error-result p-6 border-2 border-red-500 bg-red-50" in, fade>
+        <div class="error-result p-6 border-2 border-red-500 bg-red-50" in:fade>
             <div class="text-red-700 font-bold text-center mb-4 uppercase">
                 [SYSTEM_CRITICAL_FAILURE]
             </div>
@@ -198,8 +227,8 @@
             </div>
 
             <div class="flex gap-4">
-                <Button variant="outline" onclick={handleReset} class="flex-1">ABORT</Button>
-                <Button onclick={handleRetry} class="flex-1">RETRY_TRANSMISSION</Button>
+                <Button variant="outline" on:click={handleReset} class="flex-1">ABORT</Button>
+                <Button on:click={handleRetry} class="flex-1">RETRY_TRANSMISSION</Button>
             </div>
         </div>
     {/if}

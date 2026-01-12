@@ -8,9 +8,11 @@
  */
 
 import chunkedResponse from '$lib/server/streaming/chunked-response';
+import type { RequestHandler } from '@sveltejs/kit';
+	streamOllamaResponse,
+	streamRAGResponse
+} from '$lib/server/streaming/chunked-response';
 import type { RequestHandler } from './$types';
-
-const { createSSEStream, streamOllamaResponse, streamRAGResponse } = chunkedResponse;
 
 export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams.get('q');

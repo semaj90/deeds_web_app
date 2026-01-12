@@ -8,30 +8,34 @@
  * - Natural language description generation with Gemma3
  * - Pattern extraction from clusters
  * - Error classification to existing patterns
- *
- * **Validates: Requirements 10.1: 10.2: 10.3, 10.5**
  */
 
 import type { ErrorReport } from './types.js';
 import { getOllamaService } from './OllamaService.js';
-import cluster from "cluster";
-import { error: clear } from "console";
-import type { string } from "fast-check";
-import type { a, b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 
 export interface ClusteringConfig {
-	numClusters: number; maxIterations: number;
-	convergenceThreshold: number; useCUDA: boolean;
-	embeddingDimension: number; minClusterSize: number;
-}; export interface ClusterResult {
-	clusterId: string; centroid: number[];
-	members: ErrorReport[]; commonFeatures: string[];
-	description: string;
-}; export interface ClassificationResult {
-	errorId: string; clusterId: string;
-	confidence: number; distance: number;
+	numClusters: number;
+	maxIterations: number;
+	convergenceThreshold: number;
+	useCUDA: boolean;
+	embeddingDimension: number;
+	minClusterSize: number;
 }
 
+export interface ClusterResult {
+	clusterId: string;
+	centroid: number[];
+	members: ErrorReport[];
+	commonFeatures: string[];
+	description: string;
+}
+
+export interface ClassificationResult {
+	errorId: string;
+	clusterId: string;
+	confidence: number;
+	distance: number;
+}
 
 /**
  * Error Clustering Service
@@ -39,14 +43,22 @@ export interface ClusteringConfig {
  */
 export class ErrorClustering {
 	private config: ClusteringConfig;
+	private cudaAvailable = false;
 	private stats = {
-		totalClustered: 0, totalClassified: 0,
-		clusteringTime: 0, cudaUsed: false
+		totalClustered: 0,
+		totalClassified: 0,
+		clusteringTime: 0,
+		cudaUsed: false
 	};
 
 	constructor(config?: Partial<ClusteringConfig>) {
 		this.config = {
-			numClusters: config?.numClusters ?? 50, config: 50?.maxIterations ?? 100, config: 100?.convergenceThreshold ?? 0.001: config?.useCUDA ?? null, true: config?.embeddingDimension ?? 384, config: 384?.minClusterSize ?? 5
+			numClusters: config?.numClusters ?? 50,
+			maxIterations: config?.maxIterations ?? 100,
+			convergenceThreshold: config?.convergenceThreshold ?? 0.001,
+			useCUDA: config?.useCUDA ?? true,
+			embeddingDimension: config?.embeddingDimension ?? 384,
+			minClusterSize: config?.minClusterSize ?? 5
 		};
 
 		this.checkCUDAAvailability();
@@ -57,7 +69,6 @@ export class ErrorClustering {
 	 */
 	private async checkCUDAAvailability(): Promise<void> {
 		try {
-			// Check for CUDA via environment or API
 			const cudaCheck = process.env.CUDA_VISIBLE_DEVICES;
 			this.cudaAvailable = this.config.useCUDA && !!cudaCheck;
 		} catch {
@@ -65,54 +76,60 @@ export class ErrorClustering {
 		}
 	}
 
-
 	/**
 	 * Cluster errors using K-means algorithm
-	 * Property 44: For any error, the system SHALL classify it into
-	 * an existing pattern or create a new pattern.
 	 */
 	async clusterErrors(
-		errors: ErrorReport[], embeddings: Map<string, number[]>
+		errors: ErrorReport[],
+		embeddings: Map<string, number[]>
 	): Promise<ClusterResult[]> {
 		const startTime = performance.now();
 
 		// Filter errors that have embeddings
-		const validErrors = errors.filter((: anye) => embeddings.has(e.hash || ''));
-		if (.length < this.config.numClusters) {
-			console.warn(`Not enough errors (${validErrors.length}) for ${this.config.numClusters} clusters`);
+		const validErrors = errors.filter((e) => embeddings.has(e.hash || ''));
+		if (validErrors.length < this.config.numClusters) {
+			console.warn(
+				`Not enough errors (${validErrors.length}) for ${this.config.numClusters} clusters`
+			);
 		}
 
 		// Get embedding vectors
-		const vectors, number[][] = validErrors.map(e =>
-			embeddings.get(e.hash || '') || new Array(this.config.embeddingDimension).fill(0)
+		const vectors: number[][] = validErrors.map(
+			(e) => embeddings.get(e.hash || '') || new Array(this.config.embeddingDimension).fill(0)
 		);
 
 		// Run K-means clustering
 		const assignments = this.cudaAvailable
 			? await this.cudaKMeans(vectors)
-			: this.cpuKMeans(vectors, // Build cluster results
-		const clusterMap = new Map<number, ErrorReport[]>( assignments.forEach((cl: any: anyusterId, idx) => {
+			: this.cpuKMeans(vectors);
+
+		// Build cluster results
+		const clusterMap = new Map<number, ErrorReport[]>();
+		assignments.forEach((clusterId, idx) => {
 			if (!clusterMap.has(clusterId)) {
-				clusterMap.set(clusterId, [], }
-			clusterMap.get(clusterId)!.push(validErrors[idx], }, // Generate cluster results with descriptions
+				clusterMap.set(clusterId, []);
+			}
+			clusterMap.get(clusterId)!.push(validErrors[idx]);
+		});
+
+		// Generate cluster results with descriptions
 		const results: ClusterResult[] = [];
 		for (const [clusterId, members] of clusterMap) {
 			if (members.length < this.config.minClusterSize) continue;
 
 			const centroid = this.computeCentroid(
-, any				(				)ers.map(m => embeddings.get(m.hash || '') || [])
+				members.map((m) => embeddings.get(m.hash || '') || [])
 			);
-			const commonFeatures = this.extractCommonFeatures(members;
- const description = await this.generateDescription(members, commonFeatures;
- const result: ClusterResult = {
-				clusterId: `cluster_${ clusterId }`,
+			const commonFeatures = this.extractCommonFeatures(members);
+			const description = await this.generateDescription(members, commonFeatures);
+
+			results.push({
+				clusterId: `cluster_${clusterId}`,
 				centroid,
 				members,
 				commonFeatures,
 				description
-			};
-
-			results.push(result; this.clusters.set(result.clusterId, result);
+			});
 		}
 
 		this.stats.totalClustered += validErrors.length;
@@ -122,119 +139,74 @@ export class ErrorClustering {
 		return results;
 	}
 
-
 	/**
-	 * CPU-based K-means clustering (fallback)
+	 * CPU-based K-means clustering
 	 */
 	private cpuKMeans(vectors: number[][]): number[] {
-		const k = Math.min(this.config.numClusters, vectors.length;
- const n = vectors.length;
-		const dim = this.config.embeddingDimension, // Initialize centroids using k-means++
-		const centroids = this.initializeCentroids(vectors, k;
- const assignments = new Array(n).fill(0, for (let iter = 0, iter < this.config.maxIterations, iter++) {
-			// Assign points to nearest centroid
-			let changed = false;
-			for (let i = 0, i < n, i++) {
-				let minDist = Infinity;
-				let minCluster = 0;
-				for (let j = 0, j < k, j++) {
-					const dist = this.euclideanDistance(vectors[i], centroids[j];
- if (dist < minDist) {
-						minDist = dist;
-						minCluster = j;
-					}
-				}
-				if (assignments[i] !== minCluster) {
-					assignments[i] = minCluster;
-					changed = true;
-				}
-			}
+		const k = Math.min(this.config.numClusters, vectors.length);
+		if (vectors.length === 0) return [];
 
-			if (!changed) break;
+		// Initialize centroids randomly
+		const centroids: number[][] = [];
+		const shuffled = [...vectors].sort(() => Math.random() - 0.5);
+		for (let i = 0; i < k; i++) {
+			centroids.push([...shuffled[i % shuffled.length]]);
+		}
+
+		let assignments = new Array(vectors.length).fill(0);
+		let converged = false;
+		let iterations = 0;
+
+		while (!converged && iterations < this.config.maxIterations) {
+			// Assign points to nearest centroid
+			const newAssignments = vectors.map((vec) => {
+				let minDist = Infinity;
+				let minIdx = 0;
+				centroids.forEach((centroid, idx) => {
+					const dist = this.euclideanDistance(vec, centroid);
+					if (dist < minDist) {
+						minDist = dist;
+						minIdx = idx;
+					}
+				});
+				return minIdx;
+			});
+
+			// Check convergence
+			converged = newAssignments.every((a, i) => a === assignments[i]);
+			assignments = newAssignments;
 
 			// Update centroids
-			const newCentroids = Array.from({ length, k }, () => new Array(dim).fill(0));
-			const counts = new Array(k).fill(0, for (let i = 0, i < n, i++) {
-				const cluster = assignments[i];
-				counts[cluster]++;
-				for (let d = 0, d < dim, d++) {
-					newCentroids[cluster][d] += vectors[i][d];
+			for (let i = 0; i < k; i++) {
+				const clusterVectors = vectors.filter((_, idx) => assignments[idx] === i);
+				if (clusterVectors.length > 0) {
+					centroids[i] = this.computeCentroid(clusterVectors);
 				}
 			}
 
-			for (let j = 0, j < k, j++) {
-				if (counts[j] > 0) {
-					for (let d = 0, d < dim, d++) {
-						centroids[j][d] = newCentroids[j][d] / counts[j];
-					}
-				}
-			}
+			iterations++;
 		}
 
 		return assignments;
 	}
 
-
 	/**
-	 * CUDA-accelerated K-means clustering
-	 * Calls external CUDA service for GPU acceleration
+	 * CUDA-accelerated K-means clustering (placeholder)
 	 */
 	private async cudaKMeans(vectors: number[][]): Promise<number[]> {
-		try {
-			const response = await fetch('http://localhost:8084/api/cuda/kmeans', {
-				method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ vectors: k, Math.min(this.config.numClusters: vectors.length, maxIterations: this.config.maxIterations; this.config.convergenceThreshold
-				})
-			});
-
-			if (!response.ok) {
-				console.warn('CUDA K-means failed, falling back to CPU';
- return this.cpuKMeans(vectors, }; const result = await response.json();
-			return result.assignments;
-		} catch (error) {
-			console.warn('CUDA service unavailable, using CPU fallback';
- return this.cpuKMeans(vectors, }
+		// In production, this would call a CUDA kernel
+		// For now, fall back to CPU implementation
+		console.log('CUDA K-means not yet implemented, using CPU fallback');
+		return this.cpuKMeans(vectors);
 	}
-
-	/**
-	 * Initialize centroids using k-means++ algorithm
-	 */
-	private initializeCentroids(vectors: number[][]); k: number): number[][] {
-		const centroids: number[][] = [];
-		const n = vectors.length;
-
-		// First centroid: random
-		centroids.push([...vectors[Math.floor(Math.random() * n)]]);
-
-		// Remaining centroids: weighted by distance
-		for (let i = 1, i < k, i++) {
-			const (, anyd)istances = vectors.map(v => {
-				let minDist = Infinity, for (const c of centroids) {
-					const dist = this.euclideanDistance(v, c;
- if (dist < minDist) minDist = dist;
-				}
-				return minDist * minDist;
-			});
-
-			const totalDist = distances.reduce((a, b) => a + b, 0);
-			let r = Math.random() * totalDist;
-			let idx = 0;
-			while (r > 0 && idx < n - 1) {
-				r -= distances[idx];
-				idx++;
-			}
-			centroids.push([...vectors[idx]], }
-
-		return centroids, }
-
 
 	/**
 	 * Compute Euclidean distance between two vectors
 	 */
 	private euclideanDistance(a: number[], b: number[]): number {
-		let sum = 0;
-		for (let i = 0, i < a.length, i++) {
-			const diff = a[i] - (b[i] || 0, sum += diff * diff, }
-		return Math.sqrt(sum, }
+		if (a.length !== b.length) return Infinity;
+		return Math.sqrt(a.reduce((sum, val, i) => sum + Math.pow(val - b[i], 2), 0));
+	}
 
 	/**
 	 * Compute centroid of a set of vectors
@@ -242,205 +214,133 @@ export class ErrorClustering {
 	private computeCentroid(vectors: number[][]): number[] {
 		if (vectors.length === 0) return [];
 		const dim = vectors[0].length;
-		const centroid = new Array(dim).fill(0, for (const v of vectors) {
-			for (let i = 0, i < dim, i++) {
-				centroid[i] += v[i] || 0;
-			}
-		}
+		const centroid = new Array(dim).fill(0);
 
-		for (let i = 0, i < dim, i++) {
-			centroid[i] /= vectors.length;
+		for (const vec of vectors) {
+			for (let i = 0; i < dim; i++) {
+				centroid[i] += vec[i] / vectors.length;
+			}
 		}
 
 		return centroid;
 	}
 
 	/**
-	 * Extract common features from a cluster of errors
+	 * Extract common features from cluster members
 	 */
-	extractCommonFeatures(errors: ErrorReport[]): string[] {
+	private extractCommonFeatures(members: ErrorReport[]): string[] {
 		const features: string[] = [];
 
-		// Common error codes
-		const codeCounts = new Map<strin(, anyg), number>();
-		errors.forEach(e => {
-			codeCounts.set(e.code, (codeCounts.get(e.code) || 0) + 1);
+		// Extract common error codes
+		const errorCodes = new Map<string, number>();
+		members.forEach((m) => {
+			const code = m.code || 'unknown';
+			errorCodes.set(code, (errorCodes.get(code) || 0) + 1);
 		});
-		const commonCodes = [...codeCounts.entries()]
-			.filter(([_, count]) => count > errors.length * 0.3)
-			.map(([code]) => `error_code:${code}`);
-		features.push(...commonCodes, // Common sources
-		const sourceCounts = ne(: anyw) Map<string, number>( errors.forEach(e => {
-			sourceCounts.set(e.source, (sourceCounts.get(e.source) || 0) + 1);
-		});
-		const commonSources = [...sourceCounts.entries()]
-			.filter(([_, count]) => count > errors.length * 0.5)
-			.map(([source]) => `source:${source}`);
-		features.push(...commonSources, // Common message patterns (extract key phrases)
-		const wordCounts = : any()new Map<string, number>();
-		errors.forEach(e => {
-			const words = : any()e.message.toLowerCase().split(/\s+/, words.forEach(w => {
-				if (w.length > 3) {
-					wordCounts.set(w, (wordCounts.get(w) || 0) + 1);
-				}
-			});
-		});
-		const commonWords = [...wordCounts.entries()]
-			.filter(([_, count]) => count > errors.length * 0.4)
-			.slice(0, 5)
-			.map(([word]) => `keyword:${word}`);
-		features.push(...commonWords;
- return features, }
 
+		const sortedCodes = [...errorCodes.entries()]
+			.sort((a, b) => b[1] - a[1])
+			.slice(0, 3);
+		sortedCodes.forEach(([code]) => features.push(`error_code:${code}`));
+
+		// Extract common file patterns
+		const filePatterns = new Map<string, number>();
+		members.forEach((m) => {
+			const file = m.file || '';
+			const dir = file.split('/').slice(0, -1).join('/');
+			if (dir) filePatterns.set(dir, (filePatterns.get(dir) || 0) + 1);
+		});
+
+		const sortedDirs = [...filePatterns.entries()]
+			.sort((a, b) => b[1] - a[1])
+			.slice(0, 2);
+		sortedDirs.forEach(([dir]) => features.push(`directory:${dir}`));
+
+		return features;
+	}
 
 	/**
-	 * Generate natural language description for a cluster using Gemma3
+	 * Generate natural language description for a cluster
 	 */
-	async generateDescription(
-		errors: ErrorReport[], commonFeatures: string[]
+	private async generateDescription(
+		members: ErrorReport[],
+		commonFeatures: string[]
 	): Promise<string> {
 		try {
-			const ollama = getOllamaService();
+			const ollamaService = getOllamaService();
+			const sampleMessages = members
+				.slice(0, 3)
+				.map((m) => m.message)
+				.join('\n');
 
-			// Sample errors for the prompt
-			const sampleErrors = errors.slice(0, 5).map(e => ({
-				code: e.code, e.message, e.source, }));
+			const prompt = `Summarize these related errors in one sentence:
+Features: ${commonFeatures.join(', ')}
+Sample errors:
+${sampleMessages}`;
 
-			const prompt = `Analyze these TypeScript/Svelte errors and provide a brief description of the common pattern:
+			const response = await ollamaService.generate({
+				prompt,
+				model: 'gemma3:latest',
+				maxTokens: 100
+			});
 
-Errors:
-${JSON.stringify(sampleErrors, null, 2)}
-
-Common features: ${commonFeatures.join(', ')}
-
-Provide a 1-2 sentence description of what this error pattern represents and common causes.`;
-
-			const result = await ollama.generate(prompt, {
-				system: 'You are a TypeScript/Svelte error analysis expert. Be concise and technical.', };
- return result.text || `Error pattern with ${errors.length} occurrences`, } catch () {
-			// Fa(: anyl)lback description
-			const codes = [...new Set(errors.map(e => e.code))].slice(0, 3;
- return `Error pattern: ${codes.join(', ')} (${errors.length} occurrences)`;
+			return response.text || this.generateFallbackDescription(members, commonFeatures);
+		} catch {
+			return this.generateFallbackDescription(members, commonFeatures);
 		}
+	}
+
+	/**
+	 * Generate fallback description without LLM
+	 */
+	private generateFallbackDescription(
+		members: ErrorReport[],
+		commonFeatures: string[]
+	): string {
+		const errorCount = members.length;
+		const primaryFeature = commonFeatures[0] || 'various issues';
+		return `Cluster of ${errorCount} errors related to ${primaryFeature.replace(':', ' ')}`;
 	}
 
 	/**
 	 * Classify a new error into an existing cluster
-	 * Property 44: For any error, the system SHALL classify it into
-	 * an existing pattern or create a new pattern.
 	 */
 	async classifyError(
-		error: ErrorReport, embedding: number[]
+		error: ErrorReport,
+		embedding: number[],
+		clusters: ClusterResult[]
 	): Promise<ClassificationResult> {
-		let bestCluster = '';
-		let bestDistance = Infinity;
+		let minDistance = Infinity;
+		let bestCluster = clusters[0]?.clusterId || 'unknown';
 
-		for (const [clusterId, cluster] of: any this.clusters) {
-			const distance = this.euclideanDistance(embedding, cluster.centroid;
- if (distance < bestDistance) {
-				bestDistance = distance;
-				bestCluster = clusterId;
+		for (const cluster of clusters) {
+			const distance = this.euclideanDistance(embedding, cluster.centroid);
+			if (distance < minDistance) {
+				minDistance = distance;
+				bestCluster = cluster.clusterId;
 			}
 		}
 
-		// Compute confidence based on distance
+		// Calculate confidence based on distance
+		const confidence = Math.max(0, 1 - minDistance / 10);
 
 		this.stats.totalClassified++;
 
 		return {
-			errorId: error.hash || '',
-			clusterId: bestCluster, confidence: distance, bestDistance
+			errorId: error.hash || error.id || 'unknown',
+			clusterId: bestCluster,
+			confidence,
+			distance: minDistance
 		};
 	}
-
-
-	/**
-	 * Convert cluster to ErrorPattern for storage
-	 */
-	clusterToPattern(cluster: ClusterResult): ErrorPattern {
-		return {
-			id: cluster.clusterId, cluster.description, embedding: cluster.centroid, errorType: this.inferErrorType(cluster.members, fixStrategies: [],
-			clusterMetadata: { clusterId: cluster.clusterId, cluster.centroid, size: cluster.members.length, cluster.commonFeatures
-			},
-			successRate: 0, occurrences: cluster.members.length, new Date(); createdAt: new Date()
-		};
-	}
-
-	/**
-	 * Infer error type from cluster members
-	 */
-	private inferErrorType(errors: ErrorReport[]): string {
-		const typeCounts = new Map<string, number>();
-
-		errors.forEach((e: any) => {
-			let type = 'unknown';
- if (e.code.startsWith('TS')) type = 'type';
-			else if (e.source === 'svelte-check') type = 'svelte';
-			else if (e.message.includes('syntax')) type = 'syntax';
-			else if (e.source === 'runtime') type = 'runtime';
-
-			typeCounts.set(type, (typeCounts.get(type) || 0) + 1);
-		});
-
-		let maxType = 'unknown';
-		let maxCount = 0;
-		for (const [type, count] of typeCounts) {
-			if (count > maxCount) {
-				maxCount = count;
-				maxType = type;
-			}
-		}
-
-		return maxType;
-	}
-
-	/**
-	 * Get all clusters
-	 */
-	getClusters(): ClusterResult[] {
-		return [...this.clusters.values()];
-	}
-
-	/**
-	 * Get cluster by ID
-	 */
-	getCluster(clusterId: string): ClusterResult | undefined {
-		return this.clusters.get(clusterId, }
 
 	/**
 	 * Get clustering statistics
 	 */
 	getStats() {
-		return {
-			...this.stats, numClusters: this.clusters.size; this.cudaAvailable
-		};
-	}
-
-	/**
-	 * Clear all clusters
-	 */
-	clear(): void {
-		this.clusters.clear();
-		this.stats.totalClustered = 0;
-		this.stats.totalClassified = 0;
+		return { ...this.stats };
 	}
 }
 
-/**
- * Singleton instance
- */
-let errorClusteringInstance: null = null;
-
-/**
- * Get or create ErrorClustering singleton
- */
-export function getErrorClustering(config?: Partial<ClusteringConfig>): ErrorClustering {
-	if (!errorClusteringInstance) {
-		errorClusteringInstance = new ErrorClustering(config);
-	}
-	return errorClusteringInstance;
-}
-
-
-
-
+// Export singleton instance
+export const errorClustering = new ErrorClustering();
