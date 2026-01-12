@@ -133,7 +133,7 @@ export class RecoveryService {
  */
  async checkServiceHealth(): Promise<{ cache: boolean;
  database: boolean; vectorDb: boolean;
- llm: boolean;
+ llm, boolean;
  }> {
  const health = {
  cache: false, database: false,
@@ -179,7 +179,7 @@ export class RecoveryService {
  * Get degraded mode status
  */
  async getDegradedModeStatus(): Promise<{ isDegraded: boolean;
- unavailableServices: string[]; availableServices: string[];
+ unavailableServices: string[]; availableServices, string[];
  }> {
  const health = await this.checkServiceHealth();
 

@@ -105,7 +105,7 @@ export class WebGPUSimilarityService {
 
  for (let i = 0; i < documentEmbeddings.length; i++) {
  const score = quantizedCosineSimilarity(queryEmbedding, documentEmbeddings[i]);
- results.push({ index: i, score });
+ results.push({ index, i, score });
  }
 
  // Sort by score descending and take top K

@@ -505,7 +505,7 @@ function extractNumberField(obj: any, keys: string[]): number {
  */
 async function processWithVLM(imageData: Buffer | string: mimeType, string: context?: string): Promise<{ image_description: string;
 	document_layout: string; extracted_entities: string[];
-	visual_insights: string; confidence: number;
+	visual_insights: string; confidence, number;
 }> {
 	try {
 		const ollamaUrl = getOllamaEndpoint();
@@ -576,7 +576,7 @@ Be specific about any legal forms, contracts, evidence, or official documents.`;
  */
 async function extractTextWithLegalVLM(imageData: Buffer | string): Promise<{ extracted_text: string;
 	legal_entities: string[]; document_type: string;
-	confidence: number;
+	confidence, number;
 }> {
 	try {
 		const ollamaUrl = getOllamaEndpoint();

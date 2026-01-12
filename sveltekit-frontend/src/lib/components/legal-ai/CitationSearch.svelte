@@ -86,7 +86,7 @@ let { placeholder = 'Search citations...', minChars = 2 } = $props();
  }
 </script>
 
-<svelte:window onclick={ handleClickOutside } />
+<svelte, window onclick={ handleClickOutside } />
 
 <div class="citation-search">
  <div class="search-input-wrapper">

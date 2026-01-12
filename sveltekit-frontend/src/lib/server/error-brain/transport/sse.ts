@@ -9,7 +9,7 @@ import type { ErrorBrainTransport } from './interface.js';
 
 export class SSETransport implements ErrorBrainTransport {
  name = 'sse';
- private subscribers = new Set<(evt: ErrorBrainEvent) => void>();
+ private subscribers = new Set<(evt, ErrorBrainEvent) => void>();
 
  async publish(evt: ErrorBrainEvent): Promise<void> {
  // Fanout to all active SSE connections

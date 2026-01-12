@@ -132,7 +132,7 @@
         <input
           id="title"
           type="text"
-          bind:value={formData.title}
+          bind, value={formData.title}
           placeholder="Enter case title"
  class, error={!!errors.title}
           required
@@ -146,7 +146,7 @@
         <input
           id="caseNumber"
           type="text"
-          bind:value={formData.caseNumber}
+          bind, value={formData.caseNumber}
           placeholder="e.g., CASE-2024-001"
           class, error={errors.caseNumber}
           required
@@ -215,7 +215,7 @@
             type="number"
             min="0"
             max="10"
-            bind:value={formData.dangerScore}; class, error={errors.dangerScore}
+            bind, value={formData.dangerScore}; class, error={errors.dangerScore}
           />
           {#if errors.dangerScore}
             <span class="container mx-auto">{errors.dangerScore}</span>
@@ -227,7 +227,7 @@
             id="estimatedValue"
             type="number"
             step="0.01"
-            bind:value={formData.estimatedValue}
+            bind, value={formData.estimatedValue}
             placeholder="0.00"
  class, error={errors.estimatedValue}
           />

@@ -32,8 +32,8 @@ class AIAssistantStore {
 	isProcessing = $state(false);
 	isStreaming = $state(false);
 	activeContext = $state<AnalysisContext>({});
-	contextDocuments = $state<Array<{ id: string; title: string; type: string }>>([]);
-	relevantCitations = $state<Array<{ id: string; text: string }>>([]);
+	contextDocuments = $state<Array<{ id: string; title: string; type, string }>>([]);
+	relevantCitations = $state<Array<{ id: string; text, string }>>([]);
 	aiModel = $state<AIModel>('gemma3');
 	temperature = $state(0.7);
 	topP = $state(0.9);
@@ -45,7 +45,7 @@ class AIAssistantStore {
 	messageHistory = $state<Message[]>([]);
 	conversationHistory = $state<Conversation[]>([]);
 	suggestedQueries = $state<string[]>([]);
-	suggestedActions = $state<Array<{ label: string; action: string }>>([]);
+	suggestedActions = $state<Array<{ label: string; action, string }>>([]);
 	tokenUsage = $state(0);
 	costEstimate = $state(0);
 	isLoading = $state(false);

@@ -26,7 +26,7 @@
 <div
   bind:this={containerElement}
   class={`expand-grid ${state.expanded ? 'expanded' : ''} ${className}`}
-  style={`--columns:${currentColumns};--gap:${gap};--expand-duration${expandDuration};--easing, ${easing};`}
+  style={`--columns:${currentColumns};--gap, ${gap};--expand-duration${expandDuration};--easing, ${easing};`}
   role="grid"
   tabindex={0}
 >

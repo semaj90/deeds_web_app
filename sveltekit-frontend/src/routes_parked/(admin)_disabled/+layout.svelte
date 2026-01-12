@@ -13,10 +13,10 @@
  let { data, children } = $props<Props>();
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Admin Panel | YoRHa Legal AI</title>
  <meta name="description" content="System administration and, monitoring, dashboard" />
-</svelte:head>
+</svelte, head>
 
 <div class="admin-layout">
  <NavBar user={data.user} />

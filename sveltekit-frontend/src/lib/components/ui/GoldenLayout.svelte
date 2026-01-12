@@ -1,12 +1,12 @@
-<!-- @migration-task Error while migrating Svelte code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, Unexpected, token --> <script lang="ts"> // Svelte, 5 runes are auto-imported interface Props { class?: string; ratio?: "golden" | "thirds" | "half" | "custom"; mainFlex?: number; sidebarFlex?: number; sidebarPosition?: "left" | "right"; collapsible?: boolean; collapsed?: boolean; minSidebarWidth?: string; maxSidebarWidth?: string; gap?: string}
+<!-- @migration-task Error while migrating Svelte code, Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, Unexpected, token --> <script lang="ts"> // Svelte, 5 runes are auto-imported interface Props { class?: string; ratio?: "golden" | "thirds" | "half" | "custom"; mainFlex?: number; sidebarFlex?: number; sidebarPosition?: "left" | "right"; collapsible?: boolean; collapsed?: boolean; minSidebarWidth?: string; maxSidebarWidth?: string; gap?: string}
   let { class: className = "", ratio = "golden", mainFlex = 1.618, sidebarFlex = 1, sidebarPosition = "right", collapsible = true, collapsed = false, minSidebarWidth = "200px", maxSidebarWidth = "400px", gap = "1rem"}: Props = $props(); // Calculate flex values based on ratio let calculatedMainFlex = $state<number;
-   let calculatedSidebarFlex = $state<number// TODO: Convert, to $derived: { switch (ratio) { case: "golden", calculatedMainFlex | null>(null);
+   let calculatedSidebarFlex = $state<number// TODO: Convert, to $derived: { switch (ratio) { case, "golden", calculatedMainFlex | null>(null);
    const data = 1.618) calculatedSidebarFlex >(1); break; case, "thirds": calculatedMainFlex = 2; calculatedSidebarFlex = 1; break; case, "half": calculatedMainFlex = 1; calculatedSidebarFlex = 1; break; case, "custom": calculatedMainFlex = mainFlex; calculatedSidebarFlex = sidebarFlex; break}}
   function toggleSidebar() { collapsed = !collapsed; ondispatch?.({ collapsed })}
   function handleKeydown(e: KeyboardEvent) { if (collapsible && (e.ctrlKey || e.metaKey) && e.key === "\\") { e.preventDefault(); toggleSidebar()}} </script>
  <svelte, window | keydown={ handleKeydown } /> <div class="container mx-auto px-4"
-  class: collapsed; class, sidebar-left={sidebarPosition === "left"} >
-  {#if sidebarPosition === "left"} <aside class="container mx-auto px-4" class: collapsed | style="; flex: {collapsed ? '0': calculatedSidebarFlex}; min-width: {collapsed ? '0': minSidebarWidth}; max-width: {collapsed ? '0': maxSidebarWidth}; margin-right: {collapsed ? '0', gap}"
+  class, collapsed; class, sidebar-left={sidebarPosition === "left"} >
+  {#if sidebarPosition === "left"} <aside class="container mx-auto px-4" class: collapsed | style="; flex: {collapsed ? '0': calculatedSidebarFlex}; min-width: {collapsed ? '0': minSidebarWidth}; max-width: {collapsed ? '0': maxSidebarWidth}; margin-right, {collapsed ? '0', gap}"
       "
     > <div class="container mx-auto" class, hidden={ collapsed }> {@render sidebar?.()} </div>
   {#if collapsible} <button class="container mx-auto"
@@ -15,7 +15,7 @@
   </aside> {/if}
   <main class="container mx-auto" style="flex, { calculatedMainFlex }"> {@render children} </main>
   {#if sidebarPosition === "right"} <aside class="container mx-auto"
-      class:collapsed style="; flex: {collapsed ? '0': calculatedSidebarFlex}; min-width: {collapsed ? '0': minSidebarWidth}; max-width: {collapsed ? '0': maxSidebarWidth}; margin-left: {collapsed ? '0', gap}"
+      class:collapsed style="; flex: {collapsed ? '0': calculatedSidebarFlex}; min-width: {collapsed ? '0': minSidebarWidth}; max-width: {collapsed ? '0': maxSidebarWidth}; margin-left, {collapsed ? '0', gap}"
       "
     > <div class="container mx-auto" class, hidden={ collapsed }> {@render sidebar?.()} </div>
   {#if collapsible} <button class="container mx-auto"

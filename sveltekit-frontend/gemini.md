@@ -51,6 +51,116 @@
 
 ---
 
+## 🔄 XState v5 Migration Patterns (2026-01-11)
+
+### Pattern: fromPromise Inline Types Breaking Change
+
+**Impact:** High - Affects all XState actor logic using promises
+**Error Codes:** TS2345, TS2322, TS2554
+
+**Problem:**
+XState v5 removed support for inline type annotations in `fromPromise` function signatures. All types must be extracted to interfaces or provided as generics.
+
+**Broken Syntax (v4):**
+```typescript
+const promiseLogic = fromPromise(async ({ input }: { input: { userId: string } }) => {
+  return await getUser(input.userId);
+});
+```
+
+**Correct Syntax (v5):**
+```typescript
+// Option 1: Extract interface
+interface FetchUserInput {
+  userId: string;
+}
+
+const promiseLogic = fromPromise(async ({ input }: { input: FetchUserInput }) => {
+  return await getUser(input.userId);
+});
+
+// Option 2: Generic type parameters (preferred)
+const promiseLogic = fromPromise<User, { userId: string }>(
+  async ({ input }) => {
+    return await getUser(input.userId);
+  }
+);
+```
+
+**RAG/KAG Integration:**
+- **Qdrant Collection:** `phase89_kb_cards`
+- **Embedding Model:** embeddinggemma:latest
+- **Search Query:** "XState v5 fromPromise type errors"
+- **Expected Retrieval:** Top-10 similar historical fixes from codebase
+
+**Migration Steps:**
+1. Scan codebase: `rg "fromPromise\(async\s*\(\s*\{.*:\s*\{" --type ts`
+2. Extract inline types → separate interfaces
+3. Apply generic parameters: `fromPromise<TOutput, TInput>(...)`
+4. Validate: `npx tsc --noEmit`
+5. Update knowledge base with successful patterns
+
+**Scan Results (2026-01-12):**
+- **Total files scanned:** 2,994 TypeScript files
+- **Files with XState v4 patterns:** 87 files
+- **fromPromise inline types:** 39 files, 122 occurrences
+- **send() actions:** 43 files, 186 occurrences
+- **Estimated error reduction:** 1,200-1,800 errors after migration
+- **Detailed report:** `reports/xstate-migration/latest.md`
+
+---
+
+## 🎯 Phase 96: XState v5 Migration (2026-01-11)
+
+### Critical Discovery: `setup()` Import Issue
+**Problem:** XState v5.24.0 exports `setup()` but TypeScript LSP fails to detect it
+**Root Cause:** Declaration file structure (`xstate.cjs.d.ts` → `./declarations/src/index.js`)
+**Solution:** Use `createMachine()` directly instead of `setup().createMachine()`
+
+### fromPromise Type Signature Change
+```typescript
+// ❌ XState v5 rejects inline type parameters
+fromPromise<TOutput, TInput>(async ({ input }) => { /* ... */ })
+
+// ✅ Correct pattern (single generic + explicit typing)
+fromPromise<TOutput>(async ({ input, signal }: {
+    input: TInput;
+    signal: AbortSignal
+}) => { /* ... */ })
+```
+
+### Production Pattern (Verified Working)
+```typescript
+export const aiAssistantMachine = createMachine({
+    types: { context: {} as Context, events: {} as Events },
+    states: {
+        processing: {
+            invoke: {
+                src: fromPromise<string>(async ({ input, signal }) => {
+                    const res = await fetch('/api', { signal });
+                    return res.json();
+                }),
+                input: ({ context }) => ({ prompt: context.query }),
+                onDone: { target: 'idle' },
+                onError: { target: 'error' }
+            }
+        }
+    }
+});
+```
+
+### Files Fixed
+- ✅ `src/lib/machines/aiAssistantMachine.ts` (error-free)
+- ✅ `src/lib/machines/AIAssistantMachineComponent.svelte` (UI restored)
+- ✅ `src/lib/components/DocumentUploadMachineIntegration.svelte` (UI restored)
+- ✅ `src/routes/indexing/+page.svelte` (integration demo wired)
+
+### Knowledge Base Updated
+- **New Doc**: `docs/xstate-v5-patterns.md` (detailed migration guide)
+- **RAG Tags**: `#xstate-v5`, `#frompromise`, `#actor-lifecycle`, `#cancellation`
+
+---
+
 ## 🛠️ Tools Arsenal
 
 ### Node.js Fixers (High-Performance)

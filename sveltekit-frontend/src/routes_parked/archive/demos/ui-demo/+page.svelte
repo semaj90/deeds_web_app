@@ -37,9 +37,9 @@
  ];
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Detective UI Component Library</title>
-</svelte:head>
+</svelte, head>
 
 <div class="min-h-screen bg-gradient-to-br from-ink via-ink/95 to-ink/90 text-white p-8">
  <div class="max-w-7xl mx-auto space-y-8">
@@ -61,7 +61,7 @@
  <!-- Search Bar -->
  <SectionHeader title="Search & Navigation" subtitle="Interactive components for data discovery" />
  <Card>
- <SearchBar bind:value={searchValue} placeholder="Search cases, evidence, suspects..." />
+ <SearchBar bind, value={searchValue} placeholder="Search cases, evidence, suspects..." />
  <p class="mt-2 text-sm opacity-70">Search value: {searchValue || 'none'}</p>
  </Card>
 
@@ -78,7 +78,7 @@
  <p class="text-sm opacity-80">Semi-transparent panel with backdrop blur.</p>
  </Panel>
 
- <Terminal prompt="detective@terminal:~$">
+ <Terminal prompt="detective@terminal, ~$">
  <div class="space-y-1">
  <div>Initializing case analysis...</div>
  <div>Loading evidence database...</div>
@@ -137,7 +137,7 @@
  <!-- Tabs Panel -->
  <SectionHeader title="Navigation" subtitle="Tabbed interface for organized content" />
  <Card>
- <TabsPanel bind:activeTab {tabs}>
+ <TabsPanel bind, activeTab {tabs}>
  {#snippet content({ tab, index })}
  <div class="p-4">
  <h4 class="font-serif text-lg mb-2">{tab.label} Content</h4>
@@ -152,7 +152,7 @@
  <Card>
  <div class="space-y-4">
  <TimelineEvent
- time="2025-11-17 14:30"
+ time="2025-11-17 14, 30"
  title="Crime Scene Discovery"
  description="Body found in abandoned warehouse. Initial forensic analysis suggests time of death between 10-12 PM."
  type="evidence"
@@ -160,11 +160,11 @@
  <TimelineEvent
  time="2025-11-17 16:45"
  title="Witness Interview"
- description="Neighbor reports seeing suspicious vehicle around 11 AM. Vehicle description: Black sedan, tinted windows."
+ description="Neighbor reports seeing suspicious vehicle around 11 AM. Vehicle description, Black sedan, tinted windows."
  type="testimony"
  />
  <TimelineEvent
- time="2025-11-17 18:20"
+ time="2025-11-17 18, 20"
  title="Evidence Collection"
  description="Fingerprints and DNA samples collected from scene. Preliminary analysis shows unknown male DNA."
  type="timeline"
@@ -186,7 +186,7 @@
 </div>
 
 <!-- Modal Demo -->
-<Modal bind:open={modalOpen} title="Detective Modal" size="md">
+<Modal bind, open={modalOpen} title="Detective Modal" size="md">
  <p>This modal demonstrates the full UI component integration.</p>
  <p>All components are working together in the Detective Mode interface!</p>
 </Modal>

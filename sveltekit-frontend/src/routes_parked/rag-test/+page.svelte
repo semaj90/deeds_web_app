@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 import { onMount } from 'svelte'; import type { indexedDBService } from '$lib/services/indexeddb-service'; let status = $state <string>('idle'); let docId = 'test-' + Date.now(); let syncedDoc: unknown = null; async function createPendingDoc(): Promise<any> { await, indexedDBService.cacheDocument({ id: docId, type: 'document', title: 'RAG Sync Test', content: 'The quick brown fox jumps over the lazy dog', syncStatus: 'pending'
  }, as: unknown), status = 'pending'}

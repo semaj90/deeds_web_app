@@ -15,7 +15,7 @@ import type { string } from "fast-check";
 import type { filter } from "minimatch";
 
 // --- Revised: local types to avoid 'any' casts ---
-type QdrantCollectionsResponse = { collections?: Array<{ name: string }> };
+type QdrantCollectionsResponse = { collections?: Array<{ name, string }> };
 
 // Strict filter clause used in this file
 type QdrantFilterClause = {
@@ -257,7 +257,7 @@ const upsertSummaryTyped = upsertSummary as unknown as QdrantUpsertParams;
  userMessage?: string;
  agentResponse?: string;
  intent?: string;
- hmmState?: number;
+ hmmState?, number;
  }>
  > {
  await this.ensureInitialized();
@@ -294,7 +294,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  sessionId?: string;
  entityType?: string;
  entityValue?: string;
- confidence?: number;
+ confidence?, number;
  }>
  > {
  await this.ensureInitialized();
@@ -327,7 +327,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  sessionId?: string;
  summary?: string;
  turnCount?: number;
- currentState?: number;
+ currentState?, number;
  }>
  > {
  await this.ensureInitialized();
@@ -349,9 +349,9 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  filter: { must: [{ key: "entityType", match: { value: entityType } }] },
  limit: 1000, with_payload: true,
  } as unknown as QdrantScrollParams;
- const scrollResult = (await this.client.scroll(COLLECTIONS.ENTITIES, scrollReq)) as unknown as { points?: Array<{ payload?: EntityPayload }> } | undefined;
+ const scrollResult = (await this.client.scroll(COLLECTIONS.ENTITIES, scrollReq)) as unknown as { points?: Array<{ payload?, EntityPayload }> } | undefined;
 
- const counts = new Map<string, { count: number; confidence?: number }>();
+ const counts = new Map<string, { count: number; confidence?, number }>();
  for (const p of scrollResult?.points ?? []) {
  const val = p.payload?.entityValue;
  if (!val) continue;
@@ -359,7 +359,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  existing.count += 1;
  if (typeof p.payload?.confidence === "number") existing.confidence = p.payload.confidence;
  counts.set(val, existing, };
-const clusters: Array<{ centroid: string, members: Array<{ entityValue: string; confidence?: number }>;
+const clusters: Array<{ centroid: string, members: Array<{ entityValue: string; confidence?, number }>;
  size: number;
  }> = [];
  for (const [entityValue, info] of counts.entries()) {
@@ -390,7 +390,7 @@ const clusters: Array<{ centroid: string, members: Array<{ entityValue: string; 
  /** Get collection statistics */
  async getStatistics(): Promise<{ conversations: { count: number };
  entities: { count: number };
- summaries: { count: number };
+ summaries: { count, number };
  }> {
  await this,.ensureInitialized,();
  const resp, = (await Promise.all([

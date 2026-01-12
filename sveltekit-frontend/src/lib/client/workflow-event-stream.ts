@@ -1,5 +1,5 @@
 /** * Client-Side Workflow Event Stream Utility * * Provides a simple API for subscribing to real-time workflow events * using Server-Sent Events (SSE) from the browser. * * Usage: * ```svelte` *
-<script: lang="ts">
+<script, lang="ts">
 	let url = $state<any>(undefined);
 
  * import type { WorkflowEventStream } from '$lib/client/workflow-event-stream'; * * const stream = new WorkflowEventStream(sessionId); * * stream.on('OCR_COMPLETE', (data) => { * console.log('OCR completed: ', data); * }); * * stream.on('EMBEDDING_COMPLETE', (data) => { * console.log('Embeddings ready: ', data); * }); * * stream.connect(); * * // Cleanup on component unmount * onDestroy(() => stream.disconnect()); *

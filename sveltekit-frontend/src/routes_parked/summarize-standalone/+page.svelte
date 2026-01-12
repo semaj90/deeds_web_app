@@ -1,7 +1,6 @@
 <!--
  Legal Document Summarization Interface
- Advanced UI for LangChain-powered document summarization with:
- - Legal-specific options and settings
+ Advanced UI for LangChain-powered document summarization with, - Legal-specific options and settings
  - Real-time processing feedback
  - Professional legal document handling
  - Integration with your existing legal AI platform
@@ -125,7 +124,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  options: {
  summaryLength,
  includeKeyTerms,
- includeLegalAnalysis: temperature, chunkSize, 2000, chunkOverlap: 200
+ includeLegalAnalysis: temperature, chunkSize, 2000, chunkOverlap, 200
  },
  }),
  });
@@ -172,13 +171,13 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  });
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Legal Document Summarization - Legal AI Platform</title>
  <meta
  name="description"
  content="AI-powered legal document summarization using advanced language models"
  />
-</svelte:head>
+</svelte, head>
 <div class="summarization-container">
  <header class="page-header">
  <h1>⚖️ Legal Document Summarization</h1>
@@ -197,13 +196,13 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  </header>
  <div class="tab-navigation">
  <button
- class="tab {activeTab === 'input' ? 'active' : ''}"
+ class="tab {activeTab === 'input' ? 'active' , ''}"
  onclick={() => (activeTab = 'input')}
  >
  📄 Document Input
  </button>
  <button
- class="tab {activeTab === 'summary' ? 'active' : ''}"
+ class="tab {activeTab === 'summary' ? 'active' , ''}"
  onclick={() => (activeTab = 'summary')}
  disabled={!summary && !isLoading}
  >
@@ -213,7 +212,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  {/if}
  </button>
  <button
- class="tab {activeTab === 'analysis' ? 'active' : ''}"
+ class="tab {activeTab === 'analysis' ? 'active' , ''}"
  onclick={() => (activeTab = 'analysis')}
  disabled={!metadata?.legalRiskAnalysis}
  >
@@ -237,7 +236,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  <div class="options-grid">
  <div class="option-group">
  <label for="summary-length">Summary Length:</label>
- <select id="summary-length" bind:value={summaryLength}>
+ <select id="summary-length" bind, value={summaryLength}>
  <option value="short">Short (150 tokens)</option>
  <option value="medium">Medium (300 tokens)</option>
  <option value="long">Long (500 tokens)</option>
@@ -251,19 +250,19 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  min="0"
  max="1"
  step="0.1"
- bind:value={temperature}
+ bind, value={temperature}
  />
  <span class="range-value">{temperature}</span>
  </div>
  <div class="option-group">
  <label>
- <input type="checkbox" bind:checked={includeKeyTerms} />
+ <input type="checkbox" bind, checked={includeKeyTerms} />
  Extract Key Legal Terms
  </label>
  </div>
  <div class="option-group">
  <label>
- <input type="checkbox" bind:checked={includeLegalAnalysis} />
+ <input type="checkbox" bind, checked={includeLegalAnalysis} />
  Include Risk Analysis
  </label>
  </div>
@@ -272,7 +271,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  <div class="text-input-area">
  <textarea
  id="document-input"
- bind:value={reportText}
+ bind, value={reportText}
  placeholder="Paste your legal document here, or upload a file above. The AI will analyze and summarize using advanced legal understanding..."
  disabled={isLoading}
  rows="20"
@@ -300,7 +299,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  <h3>🧠 AI Processing in Progress</h3>
  <div class="processing-steps">
  {#each processingSteps as step, i}
- <div class="step {i === processingSteps.length - 1 ? 'current' : 'completed'}">
+ <div class="step {i === processingSteps.length - 1 ? 'current' , 'completed'}">
  { step }
  </div>
  {/each}

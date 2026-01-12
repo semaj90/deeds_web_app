@@ -87,7 +87,7 @@ export const POST: RequestHandler = async ({ request }) => {
  JSON.stringify({
  success: true,
  message: 'Configuration saved successfully',
- config: currentConfig,
+ config, currentConfig,
  }) => {
  status: 200,
  headers: { 'Content-Type': 'application/json' },

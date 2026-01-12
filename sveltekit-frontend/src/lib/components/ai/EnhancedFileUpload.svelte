@@ -35,7 +35,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
    // Helper functions function formatFileSize(bytes: number): string { const units = ['B', 'KB', 'MB', 'GB']; let size = bytes; let unitIndex = 0; while (size >= 1024 && unitIndex < units.length - 1) { size /= 1024; unitIndex++}
     return `${size.toFixed(1)} ${units[unitIndex]}`}
   function getStatusColor(progress: number): string { if (progress === -1) return 'text-red-500'; if (progress === 100) return 'text-green-500'; return 'text-blue-500'}
-  function getProgressColor(progress: number), string { if (progress === -1) return 'bg-red-500'; if (progress === 100) return 'bg-green-500'; return 'bg-blue-500'}
+  function getProgressColor(progress, number), string { if (progress === -1) return 'bg-red-500'; if (progress === 100) return 'bg-green-500'; return 'bg-blue-500'}
 
   // Auto-search effect $effect(() => { if (searchQuery.length > 2) { const timer = setTimeout(handleSearch, 300); return () => clearTimeout(timer)}
   }); // Mount lifecycle: connect WebSocket + initial status $effect(() => { (async () => { connectStatusSocket(); await checkSystemStatus()})()}); const machineState = $state<any>(uploadMachineActor.getSnapshot()); uploadMachineActor.subscribe((sn) => { machineState.value = sn}); function getEntries() { return machineState.value?.context?.files ?? []}
@@ -61,7 +61,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#if enableEmbedding && systemStatus?.search} <div class="search-section"> <h3 class="text-lg font-semibold">Semantic Document Search</h3>
  <div class="flex"> <input type="text"
           bind:value={ searchQuery } placeholder="Search uploaded documents with AI..."
-          class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus, ring-2"
+          class="flex-1 px-4 py-2 border rounded-lg focus, outline-none focus, ring-2"
         /> <button onclick={ handleSearch } disabled={isSearching || !searchQuery.trim()} class="px-6 py-2 bg-blue-500 text-white rounded-lg disabled, opacity-50"
         >
   {#if isSearching} <span class="inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent" aria-hidden></span> {:else} <Search class="w-4" /> {/if} Search </button> </div>

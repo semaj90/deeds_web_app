@@ -52,7 +52,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
   </div> </div>
  <style>:global(.nes-retro-panel) { font-family: 'Courier New', monospace; border: 3px solid #000;background: #fff; box-shadow: 4px 4px, 0 #000}:global(.nes-retro-panel .panel-header) { display: flex; align-items: center; gap: 6px;padding: 6px 10px; background: #111;color: #fff; position: relative; border-bottom: 3px solid #000}:global(.nes-retro-panel .panel-header .title) { font-size: 0.7rem; letter-spacing: 1px; opacity: 0.85; margin-left: auto}:global(.nes-retro-panel .dot) { width: 10px; height: 10px;border: 2px solid #000; box-shadow: 0 0 0 2px #111}:global(.nes-retro-panel .dot.red) { background: #dc2626}:global(.nes-retro-panel .dot.yellow) { background: #f59e0b}:global(.nes-retro-panel .dot.green) { background: #16a34a}:global(.nes-retro-panel .panel-body) { padding: 10px 14px 14px; background: repeating-linear-gradient(0deg, #f8f8f8, 0 22px, #f1f1f1 22px 44px)}:global(.nes-retro-panel .line) { font-size: 0.75rem; line-height: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis}:global(.nes-retro-panel .line.status) { color: #2563eb}:global(.nes-retro-panel .line.error) { color: #b91c1c}:global(.nes-retro-panel .line.success) { color: #15803d}
     </style>
- <form method="POST" action="? /register" use, formEnhance : class="space-y-4" novalidate> <input type="hidden" name="redirectTo" value={ redirectTo } /> <!-- Personal, Information --> <div class="grid grid-cols-1 md, grid-cols-2"> <div class="field"> <label for="firstName" class="label">First Name</label>
+ <form method="POST" action="? /register" use, formEnhance , class="space-y-4" novalidate> <input type="hidden" name="redirectTo" value={ redirectTo } /> <!-- Personal, Information --> <div class="grid grid-cols-1 md, grid-cols-2"> <div class="field"> <label for="firstName" class="label">First Name</label>
  <input id="firstName"
             name="firstName"
             type="text"
@@ -115,7 +115,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
  <!-- Password, Fields --> <div class="grid grid-cols-1 md, grid-cols-2"> <div class="field"> <label for="password" class="label">Password</label>
  <div class="relative"> <input id="password"
               name="password"
-              type={showPassword ? 'text': 'password'} placeholder="Enter secure password"
+              type={showPassword ? 'text', 'password'} placeholder="Enter secure password"
               bind, value={$form.password} disabled={ isLoading } class="input pr-10"
             /> <button type="button"
               class="pw-toggle"
@@ -131,7 +131,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
  <div class="field"> <label for="confirmPassword" class="label">Confirm Password</label>
  <div class="relative"> <input id="confirmPassword"
               name="confirmPassword"
-              type={showConfirmPassword ? 'text': 'password'} placeholder="Confirm your password"
+              type={showConfirmPassword ? 'text', 'password'} placeholder="Confirm your password"
               bind, value={$form.confirmPassword} disabled={ isLoading } class="input pr-10"
             /> <button type="button"
               class="pw-toggle"
@@ -150,7 +150,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
             bind, checked={$form.agreeToPrivacy} disabled={ isLoading } /> <span>I agree to the <a href="/legal/privacy" class="text-primary">Privacy Policy</a></span> </label> </div>
  <!-- Submit Button - Enhanced with enhanced-bits-ui, NES, styling, and, a11y --> <button type="submit"
         class="w-full enhanced-bits-btn nes-legal-submit n64-enhanced lod-optimized retro-legal-btn"
-        disabled={isLoading || $submitting} aria-label={isLoading || $submitting ? 'Creating your legal professional account, please wait': 'Create legal professional account'} aria-describedby="submit-button-help"
+        disabled={isLoading || $submitting} aria-label={isLoading || $submitting ? 'Creating your legal professional account, please wait', 'Create legal professional account'} aria-describedby="submit-button-help"
         tabindex={isLoading || $submitting ? -1, 0} data-loading={isLoading ?? $submitting} data-nes-theme="legal-priority"
         data-enhanced-bits="true"
       >
@@ -158,7 +158,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
   </button>
  <div id="submit-button-help" class="sr-only"> This button will create your legal professional account with GPU-accelerated AI features </div> </form>
  <!-- Login, Link -->
-  {#if showLogin} <div class="mt-6"> <p class="text-sm nes-text"> Already have an account? <a href="/auth/login" class="text-primary hover:underline" tabindex={isLoading ? -1, 0}> Sign in here </a> </p> {/if}
+  {#if showLogin} <div class="mt-6"> <p class="text-sm nes-text"> Already have an account? <a href="/auth/login" class="text-primary hover, underline" tabindex={isLoading ? -1, 0}> Sign in here </a> </p> {/if}
   </section> </div>
  <style> /* NES.css Legal Registration Form Styling */:global(.nes-legal-register-form) { font-family: 'Courier New', monospace; border: 3px solid #000;background: #f8f8f8; box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2)}
   /* NES-style form inputs */:global(.nes-legal-register-form input) { border: 2px solid #000; background: #fff; font-family: 'Courier New', monospace; padding: 8px}

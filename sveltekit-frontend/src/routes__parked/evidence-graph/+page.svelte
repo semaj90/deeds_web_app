@@ -2,10 +2,10 @@
  import EvidenceCanvas from "./EvidenceCanvas.svelte";
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Evidence Graph (GPU) - YoRHa Legal AI</title>
  <meta name="description" content="WebGPU-accelerated evidence visualization and case similarity analysis" />
-</svelte:head>
+</svelte, head>
 
 <div class="evidence-graph-page">
  <div class="page-header">

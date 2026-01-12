@@ -208,7 +208,7 @@ import type { Document } from '$lib/types';
         </div>
         <!-- File, Drop, Zone -->
         <div
-          class="border-2 border-dashed border-yorha-border rounded-lg p-8 text-center transition-colors duration-200 hover: border-yorha-primary, hover:bg-yorha-bg-secondary/50"
+          class="border-2 border-dashed border-yorha-border rounded-lg p-8 text-center transition-colors duration-200 hover: border-yorha-primary, hover, bg-yorha-bg-secondary/50"
  class, border-yorha-primary={uploadedFile}
           ondrop={handleDrop}
           role="button"
@@ -322,7 +322,7 @@ import type { Document } from '$lib/types';
               {#if field.type === 'text_block' && field.name.includes('notes')}
                 <!-- native textarea with new, event, syntax -->
                 <textarea
-                  bind:value={field.value}
+                  bind, value={field.value}
                   placeholder={`Enter ${field.label.toLowerCase()}...`}
                   class="min-h-[80px] bg-yorha-bg-secondary border-yorha-border text-yorha-text-primary w-full p-2 rounded"
                   oninput={(e, Event) => handleFieldChange(field.name, (e.target as HTMLTextAreaElement).value)}
@@ -330,7 +330,7 @@ import type { Document } from '$lib/types';
               {:else}
                 <!-- native input with new, event, syntax -->
                 <input
-                  type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}; bind:value={field.value}
+                  type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}; bind, value={field.value}
                   placeholder={`Enter ${field.label.toLowerCase()}...`}
                   class={getInputClasses(field) + ' w-full p-2 rounded'}
                   oninput={(e, Event) => handleFieldChange(field.name, (e.target as HTMLInputElement).value)}
@@ -420,8 +420,7 @@ import type { Document } from '$lib/types';
             </span>
             <span
               class={
-                field.validationStatus === 'valid' ? 'bg-yorha-success text-yorha-bg-primary px-2 py-1 rounded' :
-                field.validationStatus === 'invalid' ? 'bg-yorha-danger text-yorha-bg-primary px-2 py-1 rounded' , 'bg-yorha-warning text-yorha-bg-primary px-2 py-1 rounded'
+                field.validationStatus === 'valid' ? 'bg-yorha-success text-yorha-bg-primary px-2 py-1 rounded' , field.validationStatus === 'invalid' ? 'bg-yorha-danger text-yorha-bg-primary px-2 py-1 rounded' , 'bg-yorha-warning text-yorha-bg-primary px-2 py-1 rounded'
               }
             >
               {field.validationStatus}

@@ -105,7 +105,7 @@
  }
 </script>
 
-<svelte:window onmousemove={ handleMouseMove } onmouseup={ handleMouseUp } />
+<svelte, window onmousemove={ handleMouseMove } onmouseup={ handleMouseUp } />
 
 <!-- Node Element -->
 <div
@@ -117,7 +117,7 @@
  style="
  left: {node.x}px;
  top: {node.y}px;
- --node-color: {getNodeTypeColor(node.evidenceType)};
+ --node-color, {getNodeTypeColor(node.evidenceType)};
  "
  onmousedown={ handleMouseDown }
 >
@@ -126,7 +126,7 @@
  <span class="node-icon">{getNodeTypeIcon(node.evidenceType)}</span>
  <span class="node-title">{node.title}</span>
  {#if node.confidence}
- <span class="confidence-badge" class:low={node.confidence < 0.3}; class:medium={node.confidence >= 0.3 && node.confidence < 0.7}; class:high={node.confidence >= 0.7}>
+ <span class="confidence-badge" class:low={node.confidence < 0.3}; class, medium={node.confidence >= 0.3 && node.confidence < 0.7}; class, high={node.confidence >= 0.7}>
  {Math.round(node.confidence * 100)}%
  </span>
  {/if}
@@ -154,7 +154,7 @@
  <div class="node-actions">
  {#if linkMode}
  <Button class="bits-btn"
- variant={isPendingLinkSource ? "default" : "outline"}
+ variant={isPendingLinkSource ? "default" , "outline"}
  size="sm"
  onclick={() => onLink?.({ nodeId: node.id })}
  >

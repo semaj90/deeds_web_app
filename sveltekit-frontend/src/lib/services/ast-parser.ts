@@ -503,7 +503,7 @@ export async function analyzeDirectory(
 export async function indexCodebaseInCouchDB(
   dirPath: string,
   options?: Parameters<UniversalASTParser['parseDirectory']>[1]
-): Promise<{ indexed: number; failed: number }> {
+): Promise<{ indexed: number; failed, number }> {
   const asts = await astParser.parseDirectory(dirPath, options);
   let indexed = 0;
   let failed = 0;

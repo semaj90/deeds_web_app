@@ -194,7 +194,7 @@
  <nav class="config-tabs">
  {#each tabs as tab}
  <button
- class="tab-btn {activeTab === tab.id ? 'active' : ''}"
+ class="tab-btn {activeTab === tab.id ? 'active' , ''}"
  onclick={() => activeTab = tab.id}
  >
  <span class="tab-icon">{tab.icon}</span>
@@ -212,7 +212,7 @@
  <div class="settings-grid">
  <div class="setting-group">
  <label class="setting-label" for="theme-select">Theme</label>
- <select id="theme-select" class="setting-input" bind:value={config.general.theme}>
+ <select id="theme-select" class="setting-input" bind, value={config.general.theme}>
  <option value="yorha">YoRHa Command Center</option>
  <option value="dark">Dark Professional</option>
  <option value="light">Light Professional</option>
@@ -221,7 +221,7 @@
 
  <div class="setting-group">
  <label class="setting-label" for="language-select">Language</label>
- <select id="language-select" class="setting-input" bind:value={config.general.language}>
+ <select id="language-select" class="setting-input" bind, value={config.general.language}>
  <option value="en">English</option>
  <option value="es">Spanish</option>
  <option value="fr">French</option>
@@ -231,7 +231,7 @@
 
  <div class="setting-group">
  <label class="setting-label" for="timezone-select">Timezone</label>
- <select id="timezone-select" class="setting-input" bind:value={config.general.timezone}>
+ <select id="timezone-select" class="setting-input" bind, value={config.general.timezone}>
  <option value="UTC">UTC</option>
  <option value="EST">Eastern Time</option>
  <option value="PST">Pacific Time</option>
@@ -242,7 +242,7 @@
  <div class="setting-group">
  <label class="setting-label" for="auto-save">Auto Save</label>
  <label class="toggle" for="auto-save">
- <input id="auto-save" type="checkbox" bind:checked={config.general.autoSave} />
+ <input id="auto-save" type="checkbox" bind, checked={config.general.autoSave} />
  <span class="toggle-slider"></span>
  </label>
  </div>
@@ -250,7 +250,7 @@
  <div class="setting-group">
  <label class="setting-label" for="notifications">Notifications</label>
  <label class="toggle" for="notifications">
- <input id="notifications" type="checkbox" bind:checked={config.general.notifications} />
+ <input id="notifications" type="checkbox" bind, checked={config.general.notifications} />
  <span class="toggle-slider"></span>
  </label>
  </div>
@@ -265,7 +265,7 @@
  <div class="settings-grid">
  <div class="setting-group">
  <label class="setting-label" for="model-select">Primary Model</label>
- <select id="model-select" class="setting-input" bind:value={config.ai.model}>
+ <select id="model-select" class="setting-input" bind, value={config.ai.model}>
  <option value="gemma3-legal">Gemma 3 Legal</option>
  <option value="llama2-legal">Llama 2 Legal</option>
  <option value="mistral-legal">Mistral Legal</option>
@@ -281,7 +281,7 @@
  min="0"
  max="2"
  step="0.1"
- bind:value={config.ai.temperature}
+ bind, value={config.ai.temperature}
  />
  <span class="slider-value">{config.ai.temperature}</span>
  </div>
@@ -291,7 +291,7 @@
  id="max-tokens"
  type="number"
  class="setting-input"
- bind:value={config.ai.maxTokens}
+ bind, value={config.ai.maxTokens}
  min="512"
  max="8192"
  step="512"
@@ -304,12 +304,12 @@
  type="url"
  class="setting-input"
  bind:value={config.ai.ollamaEndpoint}
- placeholder="http://localhost:11434"
+ placeholder="http://localhost, 11434"
  />
  </div>
  <div class="setting-group">
  <label class="setting-label" for="embedding-model">Embedding Model</label>
- <select id="embedding-model" class="setting-input" bind:value={config.ai.embeddingModel}>
+ <select id="embedding-model" class="setting-input" bind, value={config.ai.embeddingModel}>
  <option value="embeddinggemma">Embedding Gemma</option>
  <option value="all-minilm">All MiniLM</option>
  <option value="text-embedding-ada">OpenAI Ada</option>
@@ -319,7 +319,7 @@
  <div class="setting-group">
  <label class="setting-label" for="enable-fallback">Enable Fallback</label>
  <label class="toggle" for="enable-fallback">
- <input id="enable-fallback" type="checkbox" bind:checked={config.ai.enableFallback} />
+ <input id="enable-fallback" type="checkbox" bind, checked={config.ai.enableFallback} />
  <span class="toggle-slider"></span>
  </label>
  </div>
@@ -334,7 +334,7 @@
  <div class="settings-grid">
  <div class="setting-group">
  <label class="setting-label" for="db-type">Database Type</label>
- <select id="db-type" class="setting-input" bind:value={config.database.type}>
+ <select id="db-type" class="setting-input" bind, value={config.database.type}>
  <option value="postgresql">PostgreSQL</option>
  <option value="mysql">MySQL</option>
  <option value="mongodb">MongoDB</option>
@@ -346,7 +346,7 @@
  id="db-host"
  type="text"
  class="setting-input"
- bind:value={config.database.host}
+ bind, value={config.database.host}
  placeholder="localhost"
  />
  </div>
@@ -356,7 +356,7 @@
  id="db-port"
  type="number"
  class="setting-input"
- bind:value={config.database.port}
+ bind, value={config.database.port}
  min="1"
  max="65535"
  />
@@ -367,14 +367,14 @@
  id="db-name"
  type="text"
  class="setting-input"
- bind:value={config.database.database}
+ bind, value={config.database.database}
  placeholder="legal_ai_db"
  />
  </div>
  <div class="setting-group">
  <label class="setting-label" for="db-ssl">SSL Enabled</label>
  <label class="toggle" for="db-ssl">
- <input id="db-ssl" type="checkbox" bind:checked={config.database.ssl} />
+ <input id="db-ssl" type="checkbox" bind, checked={config.database.ssl} />
  <span class="toggle-slider"></span>
  </label>
  </div>
@@ -384,7 +384,7 @@
  id="db-pool"
  type="number"
  class="setting-input"
- bind:value={config.database.connectionPool}
+ bind, value={config.database.connectionPool}
  min="1"
  max="100"
  />
@@ -400,7 +400,7 @@
  <div class="gpu-status">
  <div class="status-card">
  <h3>WebGPU Status</h3>
- <span class="status {webgpuCapabilities?.hasWebGPU ? 'active' : 'inactive'}">
+ <span class="status {webgpuCapabilities?.hasWebGPU ? 'active' , 'inactive'}">
  {webgpuCapabilities?.hasWebGPU ? 'ENABLED' : 'DISABLED'}
  </span>
  </div>
@@ -417,14 +417,14 @@
  <div class="setting-group">
  <label class="setting-label" for="enable-webgpu">Enable WebGPU</label>
  <label class="toggle" for="enable-webgpu">
- <input id="enable-webgpu" type="checkbox" bind:checked={config.gpu.enableWebGPU} />
+ <input id="enable-webgpu" type="checkbox" bind, checked={config.gpu.enableWebGPU} />
  <span class="toggle-slider"></span>
  </label>
  </div>
  <div class="setting-group">
  <label class="setting-label" for="enable-cuda">Enable CUDA</label>
  <label class="toggle" for="enable-cuda">
- <input id="enable-cuda" type="checkbox" bind:checked={config.gpu.enableCUDA} />
+ <input id="enable-cuda" type="checkbox" bind, checked={config.gpu.enableCUDA} />
  <span class="toggle-slider"></span>
  </label>
  </div>
@@ -436,7 +436,7 @@
  class="setting-slider"
  min="10"
  max="95"
- bind:value={config.gpu.memoryLimit}
+ bind, value={config.gpu.memoryLimit}
  />
  <span class="slider-value">{config.gpu.memoryLimit}%</span>
  </div>
@@ -446,14 +446,14 @@
               id="batch-size"
               type="number"
               class="setting-input"
-              bind:value={config.gpu.batchSize}
+              bind, value={config.gpu.batchSize}
               min="1"
               max="256"
             />
           </div>
           <div class="setting-group">
             <label class="setting-label" for="precision-select">Precision</label>
-            <select id="precision-select" class="setting-input" bind:value={config.gpu.precision}>
+            <select id="precision-select" class="setting-input" bind, value={config.gpu.precision}>
               <option value="fp32">FP32 (High Precision)</option>
               <option value="fp16">FP16 (Balanced)</option>
               <option value="int8">INT8 (Fast)</option>
@@ -471,7 +471,7 @@
  <div class="settings-grid">
  <div class="setting-group">
  <label class="setting-label" for="encryption-select">Encryption</label>
- <select id="encryption-select" class="setting-input" bind:value={config.security.encryption}>
+ <select id="encryption-select" class="setting-input" bind, value={config.security.encryption}>
  <option value="AES256">AES-256</option>
  <option value="AES128">AES-128</option>
  <option value="ChaCha20">ChaCha20</option>
@@ -483,7 +483,7 @@
  id="session-timeout"
  type="number"
  class="setting-input"
- bind:value={config.security.sessionTimeout}
+ bind, value={config.security.sessionTimeout}
  min="300"
  max="86400"
  />
@@ -491,20 +491,20 @@
  <div class="setting-group">
  <label class="setting-label" for="two-factor">Two-Factor Authentication</label>
  <label class="toggle" for="two-factor">
- <input id="two-factor" type="checkbox" bind:checked={config.security.twoFactor} />
+ <input id="two-factor" type="checkbox" bind, checked={config.security.twoFactor} />
  <span class="toggle-slider"></span>
  </label>
  </div>
  <div class="setting-group">
  <label class="setting-label" for="audit-logging">Audit Logging</label>
  <label class="toggle" for="audit-logging">
- <input id="audit-logging" type="checkbox" bind:checked={config.security.auditLogging} />
+ <input id="audit-logging" type="checkbox" bind, checked={config.security.auditLogging} />
  <span class="toggle-slider"></span>
  </label>
  </div>
  <div class="setting-group">
  <label class="setting-label" for="backup-frequency">Backup Frequency</label>
- <select id="backup-frequency" class="setting-input" bind:value={config.security.backupFrequency}>
+ <select id="backup-frequency" class="setting-input" bind, value={config.security.backupFrequency}>
  <option value="hourly">Hourly</option>
  <option value="daily">Daily</option>
  <option value="weekly">Weekly</option>
@@ -525,7 +525,7 @@
  <span class="metric-label">CPU Usage</span>
  <span class="metric-value">{systemInfo.cpu.usage}%</span>
  <div class="metric-bar">
- <div class="metric-fill cpu" style="width: {systemInfo.cpu.usage}%"></div>
+ <div class="metric-fill cpu" style="width, {systemInfo.cpu.usage}%"></div>
  </div>
  </div>
 
@@ -533,7 +533,7 @@
  <span class="metric-label">Memory</span>
  <span class="metric-value">{systemInfo.memory.percentage}%</span>
  <div class="metric-bar">
- <div class="metric-fill memory" style="width: {systemInfo.memory.percentage}%"></div>
+ <div class="metric-fill memory" style="width, {systemInfo.memory.percentage}%"></div>
  </div>
  </div>
 
@@ -541,7 +541,7 @@
  <span class="metric-label">Disk Usage</span>
  <span class="metric-value">{systemInfo.disk.percentage}%</span>
  <div class="metric-bar">
- <div class="metric-fill disk" style="width: {systemInfo.disk.percentage}%"></div>
+ <div class="metric-fill disk" style="width, {systemInfo.disk.percentage}%"></div>
  </div>
  </div>
 
@@ -566,7 +566,7 @@
  <h3>QUICK ACTIONS</h3>
         <label class="quick-action file-input" for="import-config">
           📥 IMPORT CONFIG
-          <input id="import-config" type="file" accept=".json" onchange={importConfig} style="display: none;" />
+          <input id="import-config" type="file" accept=".json" onchange={importConfig} style="display, none;" />
         </label>
         <button class="quick-action" onclick={ exportConfig }>
           📤 EXPORT CONFIG

@@ -252,7 +252,7 @@ import type { Document } from '$lib/types';
   <div class="nes-field">
           <textarea
             name="message"
-            bind:value={$form.message}
+            bind, value={$form.message}
             class="nes-textarea"
  class, is-error={$errors.message}
             placeholder="Ask about legal cases, documents, or risk assessment..."

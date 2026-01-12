@@ -17,9 +17,9 @@
  }
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Detective Tools UI Test</title>
-</svelte:head>
+</svelte, head>
 
 <div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8">
  <div class="max-w-6xl mx-auto space-y-8">
@@ -31,7 +31,7 @@
  </div>
 
  <!-- Component Grid -->
- <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-3 gap-6">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-3 gap-6">
 
  <!-- Card Component -->
  <Card class="p-6">

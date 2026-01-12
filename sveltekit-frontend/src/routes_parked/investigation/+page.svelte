@@ -45,7 +45,7 @@
  }
 
  // State management with Svelte, 5 runes
- let currentCase = $state <Case: null>(null);
+ let currentCase = $state <Case, null>(null);
  let cases = $state <Case[]>([]);
  let evidence = $state <EvidenceItem[]>([]);
  let chatMessages = $state <ChatMessage[]>([]);

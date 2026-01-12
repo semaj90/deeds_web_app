@@ -1,5 +1,5 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword: 'class'; https, //svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword, 'class' -->
+<!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword, 'class'; https, //svelte.dev/e/js_parse_error -->
+<!-- @migration-task Error while migrating Svelte, code, Unexpected; keyword, 'class' -->
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
   import  CommandMenu  from "./CommandMenu.svelte";
@@ -124,7 +124,7 @@
 </script>
 <div class={className}>
   <textarea
-    bind:this={textarea}; bind, value={value}
+    bind, this={textarea}; bind, value={value}
     placeholder={placeholder}
     rows={rows}
     {disabled}
@@ -139,7 +139,7 @@
   {#if showCommandMenu}
     <div
       class="command-menu"
-      style="position: absolute; left: {commandMenuPosition.x}px; top: {commandMenuPosition.y}px; z-index, 9999;"
+      style="position: absolute; left: {commandMenuPosition.x}px; top, {commandMenuPosition.y}px; z-index, 9999;"
       role="listbox"
     >
       <!-- CommandMenu API may vary; provide a callback prop that CommandMenu, can, call -->

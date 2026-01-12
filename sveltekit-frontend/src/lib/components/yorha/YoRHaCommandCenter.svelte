@@ -136,7 +136,7 @@
  clusterHealth.thresholds.cpu_warning,
  clusterHealth.thresholds.cpu_critical
  ) === 'warning'}
- class:critical={getMetricStatus(
+ class, critical={getMetricStatus(
  clusterHealth.metrics.cpu_usage || 0,
  clusterHealth.thresholds.cpu_warning,
  clusterHealth.thresholds.cpu_critical
@@ -163,7 +163,7 @@
  clusterHealth.thresholds.memory_warning,
  clusterHealth.thresholds.memory_critical
  ) === 'warning'}
- class:critical={getMetricStatus(
+ class, critical={getMetricStatus(
  clusterHealth.metrics.memory_usage || 0,
  clusterHealth.thresholds.memory_warning,
  clusterHealth.thresholds.memory_critical
@@ -190,7 +190,7 @@
  clusterHealth.thresholds.gpu_warning,
  clusterHealth.thresholds.gpu_critical
  ) === 'warning'}
- class:critical={getMetricStatus(
+ class, critical={getMetricStatus(
  clusterHealth.metrics.gpu_usage || 0,
  clusterHealth.thresholds.gpu_warning,
  clusterHealth.thresholds.gpu_critical

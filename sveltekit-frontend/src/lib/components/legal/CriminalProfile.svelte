@@ -46,9 +46,9 @@ import type { Case } from '$lib/types';
   const { viewMode } = $props<{ viewMode, 'full' | 'summary' | 'identification' }>()
   const { showSensitiveInfo = $state(false) } = $props()
   const { interactive = true } = $props()
-  const { onViewFullRecord } = $props<{ onViewFullRecord: ((recordId, string) }>()
-  const { onUpdateProfile } = $props<{ onUpdateProfile: ((profile, CriminalProfile) }>()
-  const { onViewMugshot } = $props<{ onViewMugshot: ((mugshotUrl, string) }>()
+  const { onViewFullRecord } = $props<{ onViewFullRecord, ((recordId, string) }>()
+  const { onUpdateProfile } = $props<{ onUpdateProfile, ((profile, CriminalProfile) }>()
+  const { onViewMugshot } = $props<{ onViewMugshot, ((mugshotUrl, string) }>()
   const { className } = $props<{ className, string }>()
   // Configs - consistent property names
   const riskConfig = {
@@ -205,7 +205,7 @@ import type { Case } from '$lib/types';
     {#if viewMode === 'full' || viewMode === 'identification'}
       <div>
         <h3 class="text-sm font-semibold text-yorha-text-primary font-mono mb-3">Personal Information</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg, grid-cols-3 gap-3 text-sm">
+        <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-3 gap-3 text-sm">
           <div>
             <span class="text-yorha-text-secondary">Date of Birth:</span>
             <div class="text-yorha-text-primary">{formatDate(profile.personalInfo.dateOfBirth)}</div>

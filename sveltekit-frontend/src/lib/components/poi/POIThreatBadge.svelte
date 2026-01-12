@@ -5,7 +5,7 @@
  let { threatLevel, size = 'md', showIcon = true } = $props<{
  threatLevel: string;
  size?: 'sm' | 'md' | 'lg';
- showIcon?: boolean;
+ showIcon?, boolean;
  }>();
 
  function getThreatConfig(level: string) {

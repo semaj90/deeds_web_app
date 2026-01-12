@@ -251,7 +251,7 @@ export interface DocumentEventData {
 export interface AIAnalysisEventData {
  analysis_id: string;
  case_id?: string;
- document_id?: string; analysis_type?? 'summary'
+ document_id?: string; analysis_type?: 'summary'
  | 'classification'
  | 'entity_extraction'
  | 'sentiment'

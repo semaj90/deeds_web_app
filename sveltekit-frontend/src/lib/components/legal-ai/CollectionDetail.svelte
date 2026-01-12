@@ -8,7 +8,7 @@
  }
 
  let { collection } = $props<{
- collection: Collection;
+ collection, Collection;
  }>();
 
  const dispatch = createEventDispatcher();

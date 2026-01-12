@@ -77,7 +77,7 @@
 	let currentStep = $derived(steps.findIndex(s => progress > steps.indexOf(s) * 25 && progress <= (steps.indexOf(s) + 1) * 25));
 
 	// File upload handler
-	function handleFileUpload(event: Event) {
+	function handleFileUpload(event, Event) {
 		const target = event.target as HTMLInputElement;
 		if (target.files && target.files.length > 0) {
 			evidenceFile = target.files[0];
@@ -207,14 +207,14 @@
 			<CardDescription>Upload or paste evidence content for AI-powered legal analysis.</CardDescription>
 		</CardHeader>
 		<CardContent>
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+			<div class="grid grid-cols-1 md, grid-cols-2 gap-4 mb-4">
 				<div>
 					<Label htmlFor="caseId">Case ID</Label>
-					<Input id="caseId" bind:value={caseId} placeholder="Enter case ID" />
+					<Input id="caseId" bind, value={caseId} placeholder="Enter case ID" />
 				</div>
 				<div>
 					<Label htmlFor="evidenceType">Evidence Type</Label>
-					<select id="evidenceType" bind:value={evidenceType} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus: border-[#ffd700], focus:outline-none">
+					<select id="evidenceType" bind:value={evidenceType} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus: border-[#ffd700], focus, outline-none">
 						<option value="" disabled>Select type</option>
 						{#each evidenceTypes as type}
 							<option value={type.value}>{type.label}</option>
@@ -224,15 +224,15 @@
 			</div>
 			<div class="mb-4">
 			<Label htmlFor="evidenceFile">Upload File (optional)</Label>
-				<input type="file" id="evidenceFile" onchange={handleFileUpload} class="w-full p-3 my-2 bg-[#0a0d10] border-2 border-dashed border-gray-700 rounded-lg text-white cursor-pointer transition-all duration-300 hover:border-[#ffd700]" />
+				<input type="file" id="evidenceFile" onchange={handleFileUpload} class="w-full p-3 my-2 bg-[#0a0d10] border-2 border-dashed border-gray-700 rounded-lg text-white cursor-pointer transition-all duration-300 hover, border-[#ffd700]" />
 			</div>
 			<div class="mb-4">
 			<Label htmlFor="evidenceContent">Evidence Content</Label>
-				<textarea id="evidenceContent" bind:value={evidenceContent} placeholder="Paste or upload evidence content here..." rows="6" ></textarea>
+				<textarea id="evidenceContent" bind, value={evidenceContent} placeholder="Paste or upload evidence content here..." rows="6" ></textarea>
 			</div>
 			<div class="mb-4">
 			<Label htmlFor="priority">Priority</Label>
-				<select id="priority" bind:value={priority} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus: border-[#ffd700], focus:outline-none">
+				<select id="priority" bind:value={priority} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus: border-[#ffd700], focus, outline-none">
 					<option value="" disabled>Select priority</option>
 					{#each priorityOptions as option}
 						<option value={option.value}>{option.label}</option>
@@ -241,10 +241,10 @@
 			</div>
 		</CardContent>
 		<CardFooter>
-			<Button onclick={startAnalysis} disabled={analyzing || !caseId || !evidenceContent} class="bg-[#ffd700] text-[#0a0a0a] hover: bg-[#ffed4a], disabled: opacity-50, disabled:cursor-not-allowed bits-btn">
+			<Button onclick={startAnalysis} disabled={analyzing || !caseId || !evidenceContent} class="bg-[#ffd700] text-[#0a0a0a] hover: bg-[#ffed4a], disabled: opacity-50, disabled, cursor-not-allowed bits-btn">
 				{analyzing ? 'Analyzing...' : 'Start Analysis'}
 			</Button>
-			<Button onclick={ resetForm } variant="outline" class="bg-[#f7d51d] text-[#0a0a0a] hover:bg-[#e5c51b] bits-btn">Reset</Button>
+			<Button onclick={ resetForm } variant="outline" class="bg-[#f7d51d] text-[#0a0a0a] hover, bg-[#e5c51b] bits-btn">Reset</Button>
 		</CardFooter>
 	</Card>
 
@@ -255,9 +255,9 @@
 			</CardHeader>
 			<CardContent>
 				<Progress value={progress} class="mb-4" />
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div class="grid grid-cols-1 md, grid-cols-2 gap-4">
 					{#each steps as step, index}
-						<div class="step flex items-center gap-2 {currentStep === index ? 'animate-pulse-glow' : ''}">
+						<div class="step flex items-center gap-2 {currentStep === index ? 'animate-pulse-glow' , ''}">
 							<span class="text-lg">{step.icon}</span>
 							<div>
 								<p class="font-semibold">{step.name}</p>
@@ -281,7 +281,7 @@
 					<h3 class="text-lg font-semibold">Summary</h3>
 					<p>{results.analysisResults.summary || 'No summary available'}</p>
 				</div>
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div class="grid grid-cols-1 md, grid-cols-2 gap-4">
 					<div>
 						<h4 class="font-semibold">Key Metrics</h4>
 						<ul class="list-disc list-inside">

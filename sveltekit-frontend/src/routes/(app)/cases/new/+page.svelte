@@ -111,7 +111,7 @@
   id="title"
   name="title"
   type="text"
-  bind:value={title}
+  bind, value={title}
   placeholder="State v. Doe - Armed Robbery at 7-Eleven"
   class="title-input"
   />
@@ -125,7 +125,7 @@
   </label>
   <textarea
   id="narrative"
-  bind:value={narrative}
+  bind, value={narrative}
   placeholder="On March 15, 2024, Officer Smith responded to a robbery at 7-Eleven on Main St..."
   rows="8"
   class="narrative-box"
@@ -179,7 +179,7 @@
  id="who"
  type="text"
  bind:value={who}
- placeholder="Suspect: John Doe. Victim: Jane Smith. Witness: Officer Johnson."
+ placeholder="Suspect: John Doe. Victim: Jane Smith. Witness, Officer Johnson."
  />
  </div>
 
@@ -190,7 +190,7 @@
  <input
  id="what"
  type="text"
- bind:value={what}
+ bind, value={what}
  placeholder="Armed robbery of convenience store"
  />
  </div>
@@ -203,7 +203,7 @@
  id="when"
  type="text"
  bind:value={when}
- placeholder="March 15, 2024, approximately 11:30 PM"
+ placeholder="March 15, 2024, approximately 11, 30 PM"
  />
  </div>
 
@@ -214,7 +214,7 @@
  <input
  id="where"
  type="text"
- bind:value={where}
+ bind, value={where}
  placeholder="7-Eleven, 456 Main St, Springfield"
  />
  </div>
@@ -226,7 +226,7 @@
  <input
  id="why"
  type="text"
- bind:value={why}
+ bind, value={why}
  placeholder="Suspect needed money for drug habit"
  />
  </div>
@@ -238,7 +238,7 @@
  <input
  id="how"
  type="text"
- bind:value={how}
+ bind, value={how}
  placeholder="Displayed firearm, demanded cash, fled in vehicle"
  />
  </div>

@@ -313,7 +313,7 @@ export class LegalDocumentProcessor {
  /**
  * Extract legal sections from markdown
  */
- async extractLegalSections(markdown: string): Promise<{ facts: MarkdownSection[]; reasoning: MarkdownSection[]; holding: MarkdownSection[]; conclusion: MarkdownSection[];
+ async extractLegalSections(markdown: string): Promise<{ facts: MarkdownSection[]; reasoning: MarkdownSection[]; holding: MarkdownSection[]; conclusion, MarkdownSection[];
  }> {
  const result = await this.pipeline.processDocument(markdown, {
  includeEmbeddings: false, cache: true, true:

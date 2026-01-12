@@ -253,7 +253,7 @@ export class ConcurrentIndexedDBSearch {
  if (this.fuse) {
  const fuseResults = this.fuse.search(request.query || '');
  // narrow from unknown to expected shape to avoid `any`
- const typedResults = fuseResults as unknown as Array<{ item: SearchableDocument }>;
+ const typedResults = fuseResults as unknown as Array<{ item, SearchableDocument }>;
  results = typedResults.map((r: any) => r.item);
  } else {
  results = await this.performWorkerSearch(request);
@@ -309,7 +309,7 @@ export class ConcurrentIndexedDBSearch {
  return { item: doc, refIndex: idx, score };
  })
  .filter((r: any) => typeof r.score === 'number' && r.score <= (options?.threshold ?? 0.6))
- .sort((a: any, b: any) => a.score - b.score)
+ .sort((a: any, b, any) => a.score - b.score)
  .slice(0, options?.maxResults ?? 50)
  .map((r: any) => r.item);
  return resolve(items);

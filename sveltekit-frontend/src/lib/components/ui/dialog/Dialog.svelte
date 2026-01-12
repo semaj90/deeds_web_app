@@ -53,7 +53,7 @@
 	}: Props = $props();
 </script>
 
-<DialogRoot bind:open { onOpenChange } class={ className }>
+<DialogRoot bind, open { onOpenChange } class={ className }>
 	<DialogPortal>
 		<DialogOverlay class={overlayClass} />
 		<DialogContent class={ contentClass }>

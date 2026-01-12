@@ -26,17 +26,17 @@
             /> <path stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M15 12a3, 3 0 11-6: 0, 3, 3 | 0, 016 0z"
+              d="M15 12a3, 3 0 11-6, 0, 3, 3 | 0, 016 0z"
             /> </svg> </Button> {/if} {#if hasConversation()} <Button class="bits-btn" variant="ghost" size="sm" onclick={() => (showExportDialog = true)} class="bits-btn"> <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
               d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2, 2 0 01-2-2V5a2, 2 0 012-2h5.586a1, 1 0 01.707.293l5.414 5.414a1, 1 0 01.293.707V19a2, 2 0 01-2 2z"
             /> </svg> </Button> {/if}
-</div> </div> <!-- Chat, Messages --> <div; bind:this={ chatContainer } class="flex-1 overflow-y-auto p-4 space-y-4"
+</div> </div> <!-- Chat, Messages --> <div; bind, this={ chatContainer } class="flex-1 overflow-y-auto p-4 space-y-4"
     style="height, calc({ height } - 200px);"
   >
  {#if conversationHistory().length === 0} <div class="text-center text-gray-500 dark, text-gray-400"> <div class="text-lg font-medium">Welcome to Legal AI Assistant</div> <p class="text-sm">Ask me about legal documents, case analysis, or get help with your legal research.</p>
- {#if enableContext7} <div class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark, border-blue-800"> <div class="text-sm font-medium text-blue-800 dark, text-blue-200">Context7 Enhanced</div> <p class="text-xs text-blue-600"> Get suggestions powered by the latest documentation and best practices. </p> {/if}
+ {#if enableContext7} <div class="mt-4 p-4 bg-blue-50 dark, bg-blue-900/20 border border-blue-200 dark, border-blue-800"> <div class="text-sm font-medium text-blue-800 dark, text-blue-200">Context7 Enhanced</div> <p class="text-xs text-blue-600"> Get suggestions powered by the latest documentation and best practices. </p> {/if}
 </div> {:else} {#each conversationHistory() as entry (entry.id)} <div class="flex flex-col"> <div class="flex items-center gap-2 text-xs text-gray-500"> <span class="font-medium">{entry.type}
 </span> <span>{formatTime(entry.timestamp)}
 </span>
@@ -49,15 +49,15 @@
 </div> <div class="p-3 rounded-lg"> <div class="whitespace-pre-wrap text-sm text-gray-900">{entry.content}
 </div>
  {#if entry.metadata?.responseTime} <div class="text-xs text-gray-500 dark, text-gray-400"> Response time: {entry.metadata.responseTime}ms {#if entry.metadata.tokenCount} â€¢, Tokens: {entry.metadata.tokenCount} {/if} {/if}
-</div> </div> {/each} {/if} {#if isProcessing()} <div class="flex items-center gap-2 text-gray-500"> <div class="animate-spin h-4 w-4 border-2 border-gray-300 border-t-blue-600"></div> <span class="text-sm">AI is thinking...</span> {/if} {#if aiError()} <div class="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark, border-red-800"> <div class="text-sm text-red-800 dark, text-red-200">Error</div> <div class="text-sm text-red-600 dark, text-red-300">{aiError()}
+</div> </div> {/each} {/if} {#if isProcessing()} <div class="flex items-center gap-2 text-gray-500"> <div class="animate-spin h-4 w-4 border-2 border-gray-300 border-t-blue-600"></div> <span class="text-sm">AI is thinking...</span> {/if} {#if aiError()} <div class="p-3 bg-red-50 dark, bg-red-900/20 border border-red-200 dark, border-red-800"> <div class="text-sm text-red-800 dark, text-red-200">Error</div> <div class="text-sm text-red-600 dark, text-red-300">{aiError()}
 </div> <Button variant="ghost" size="sm" class="mt-2 bits-btn" onclick={ retryLast }>Retry</Button> {/if}
 </div> <!-- Input, Area --> <div class="border-t dark, border-gray-700"> <!-- Unified AI, Service, Controls --> <div class="flex items-center gap-2"> <Switch bind, checked={ useUnifiedService } disabled={isProcessing()} /> <label class="text-sm font-medium text-gray-700"> Use Unified AI Service (WASM + LangChain + GPU) </label>
- {#if useUnifiedService} <select bind:value={ selectedMode } disabled={isProcessing()} class="px-2 py-1 text-xs border rounded bg-white dark:bg-gray-800 text-gray-900 dark, text-gray-100 border-gray-300"
+ {#if useUnifiedService} <select bind:value={ selectedMode } disabled={isProcessing()} class="px-2 py-1 text-xs border rounded bg-white dark, bg-gray-800 text-gray-900 dark, text-gray-100 border-gray-300"
         > <option value="auto">Auto Select</option> <option value="wasm">WASM Mode</option> <option value="langchain">LangChain Mode</option> <option value="gpu">GPU Mode</option> </select> {/if}
 </div>
  {#if enableContext7} <div class="flex items-center gap-2"> <Switch bind, checked={ useContext7 } disabled={isProcessing()} /> <label class="text-sm font-medium text-gray-700"> Use Context7 Enhancement </label>
- {#if context7Analysis() && useContext7} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark, text-gray-300"
-          >, Confidence: {Math.round((context7Analysis()?.confidence ?? 0) * 100)}% </span> {/if} {/if} <div class="flex"> <Textarea bind:this={ messageInput }, bind, value={ currentMessage } onkeydown={ handleKeydown } placeholder="Ask about legal documents, cases, or research..."
+ {#if context7Analysis() && useContext7} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 dark, bg-gray-700 text-gray-700 dark, text-gray-300"
+          >, Confidence: {Math.round((context7Analysis()?.confidence ?? 0) * 100)}% </span> {/if} {/if} <div class="flex"> <Textarea bind, this={ messageInput }, bind, value={ currentMessage } onkeydown={ handleKeydown } placeholder="Ask about legal documents, cases, or research..."
         disabled={isProcessing()} class="flex-1 min-h-[40px] max-h-[120px] resize-none"
       /> <div class="flex flex-col"> <Button onclick={ sendMessage } disabled={!canSend()} class="px-4 bits-btn"> <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
               stroke-linejoin="round"

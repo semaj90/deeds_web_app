@@ -355,7 +355,7 @@ export class EscalationService {
 		const openCount = this.getOpenTickets().length;
 		return {
 			...this.stats, openTickets: openCount,
-			resolutionRate: this.stats.totalCreated > 0
+			resolutionRate, this.stats.totalCreated > 0
 				? this.stats.totalResolved / this.stats.totalCreated
 				: 0
 		};

@@ -139,7 +139,7 @@ export class KAGTraverser {
 
 		const results = await this.executeCypher(query, { errorId });
 
-		return results.map((ro: anyw) => ({
+		return results.map((ro, anyw) => ({
 			from: row[0],
 			to: row[2],
 			type: this.normalizeRelationType(row[1], weight: row[3] || 1.0
@@ -162,7 +162,7 @@ export class KAGTraverser {
 	 * Property 11: For any error with relationships, the system SHALL
 	 * identify root causes by traversing "causes" edges.
 	 */
-	async identifyRootCause(errorId: string): Promise<{ rootCause: null, path: string[] }> {
+	async identifyRootCause(errorId: string): Promise<{ rootCause: null, path, string[] }> {
 		const query = `
 			MATCH path = (root:Error)-[:CAUSES*1..${this.config.maxDepth}]->(e:Error {id: $errorId})
 			WHERE NOT ()-[:CAUSES]->(root)

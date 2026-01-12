@@ -46,7 +46,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   ); </script>
  <div class="intelligent-analysis-demo"> <div class="demo-header"> <h2>ðŸ§  Intelligent Web Analysis Pipeline</h2>
  <p>Complete AI-aware system: DOM â†’ OCR â†’ Chunks â†’ Embeddings â†’ QLoRA â†’ Cache</p>
- <div class="status-bar" class:initialized={ isInitialized }, class, analyzing={ isAnalyzing }> <div class="status-dot"></div>
+ <div class="status-bar" class, initialized={ isInitialized }, class, analyzing={ isAnalyzing }> <div class="status-dot"></div>
   {#if isAnalyzing} Analyzing... ({analysisState.progress}%) {:else if isInitialized} Ready - { totalInteractions } interactions tracked {:else} Initializing... {/if}
   </div> </div>
  <div class="demo-grid"> <!-- Control, Panel --> <div class="panel"> <h3>ðŸŽ›ï¸ Control Panel</h3>

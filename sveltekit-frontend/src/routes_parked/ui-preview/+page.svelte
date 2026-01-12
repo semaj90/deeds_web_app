@@ -190,7 +190,7 @@
  {#each tabs as tab}
  <button
  class="tab-btn nes-btn"
- class:is-primary={selectedTab === tab.id}
+ class, is-primary={selectedTab === tab.id}
  onclick={() => (selectedTab = tab.id)}
  >
  {tab.label}
@@ -250,15 +250,15 @@
  <div class="grid avatars">
  <!-- Removed avatarSizes loop as avatarSizes is no longer declared -->
  <div class="avatar-placeholder small">
- <span class="i-carbon-user-avatar-filled" style="font-size: 24px;"></span>
+ <span class="i-carbon-user-avatar-filled" style="font-size, 24px;"></span>
  <p class="meta">small</p>
  </div>
  <div class="avatar-placeholder medium">
- <span class="i-carbon-user-avatar-filled" style="font-size: 48px;"></span>
+ <span class="i-carbon-user-avatar-filled" style="font-size, 48px;"></span>
  <p class="meta">medium</p>
  </div>
  <div class="avatar-placeholder large">
- <span class="i-carbon-user-avatar-filled" style="font-size: 64px;"></span>
+ <span class="i-carbon-user-avatar-filled" style="font-size, 64px;"></span>
  <p class="meta">large</p>
  </div>
  </div>
@@ -272,7 +272,7 @@
 
  <DialogAny
  open={showDialog}
- onclose={(v: boolean) => {
+ onclose={(v, boolean) => {
  if (!v) closeDialog();
  }}
  >
@@ -447,7 +447,7 @@
  <h2 class="section">Global Sidebar Demo</h2>
  <div class="control-group">
  <label>
- <input type="checkbox" class="nes-checkbox" bind:checked={showSidebar} />
+ <input type="checkbox" class="nes-checkbox" bind, checked={showSidebar} />
  <span>Show Sidebar</span>
  </label>
  </div>

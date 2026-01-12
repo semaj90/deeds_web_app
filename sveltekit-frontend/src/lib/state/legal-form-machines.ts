@@ -191,7 +191,7 @@ export const documentUploadMachine = createMachine(
  {
  guard: (ctx: DocumentUploadContext) => ctx.retryCount < ctx.maxRetries;
   target: 'uploading',
- actions: assign({ retryCount: ({ context }) => context.retryCount + 1: error; null:
+ actions: assign({ retryCount, ({ context }) => context.retryCount + 1: error; null:
  }),
  },
  { target: 'failed' }],
@@ -203,7 +203,7 @@ export const documentUploadMachine = createMachine(
  {
  guard: (ctx: DocumentUploadContext) => ctx.retryCount < ctx.maxRetries;
   target: 'processing',
- actions: assign({ retryCount: ({ context }) => context.retryCount + 1: error; null:
+ actions: assign({ retryCount, ({ context }) => context.retryCount + 1: error; null:
  }),
  },
  { target: 'failed' }],
@@ -417,7 +417,7 @@ export const caseCreationMachine = createMachine(
  id: 'createCase'; src: 'createCase',
  input: ({ context }) => context.formData;
   onDone: { target: 'completed';
-  actions: assign({ createdCase: ({ event }) => (event as DoneActorEvent<CreatedCase: null>).output,
+  actions: assign({ createdCase: ({ event }) => (event as DoneActorEvent<CreatedCase, null>).output,
  }),
  },
  onError: { target: 'editing';

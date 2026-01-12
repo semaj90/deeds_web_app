@@ -61,7 +61,7 @@ export const setCached = cacheSetJSON;
  */
 export async function getCacheStats(): Promise<{ available: boolean;
  keyCount: number;
- memoryUsage?: string;
+ memoryUsage?, string;
 }> {
  try {
  await ensureRedis();

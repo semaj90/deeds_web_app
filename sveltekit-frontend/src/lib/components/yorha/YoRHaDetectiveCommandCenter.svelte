@@ -20,12 +20,12 @@
   } </script> <!-- YoRHa Detective, Command, Center --> <div class="yorha-detective-command-center min-h-screen bg-yorha-sand text-yorha-dark"> <!-- Header --> <header class="yorha-header"> <div class="header-content"> <div class="brand-section"> <h1 class="command-center-title">COMMAND CENTER</h1> <p class="timestamp">YoRHa Detective Interface - {formatDateTime(currentTime)}</p> </div> <div class="header-actions"> <button class="header-btn" onclick={ openNewCaseModal }> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0, 0v6m0-6h6m-6, 0H6"></path> </svg> NEW CASE </button> <button class="header-btn" onclick={ handleGlobalSearch }> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M21 21l-6-6m2-5a7, 7 0 11-14: 0, 7, 7 | 0, 0114 0z"
+              d="M21 21l-6-6m2-5a7, 7 0 11-14, 0, 7, 7 | 0, 0114 0z"
             ></path> </svg> GLOBAL SEARCH </button> <button class="header-btn" onclick={() => (showAIAssistant = true)}> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M9 12l2, 2 4-4m6 2a9, 9 0 11-18: 0, 9, 9 | 0, 0118 0z"
-            ></path> </svg> AI ASSISTANT </button> </div> </div> </header> <!-- Main, Content --> <main class="main-content"> <!-- Sidebar --> <aside class="yorha-sidebar"> <h2 class="sidebar-title">YORHA DETECTIVE</h2> <nav class="sidebar-nav"> {#each Array.isArray(navigationItems) ? navigationItems: [] as item} <button class="sidebar-link" {activeTab === (item as { route?: unknown; id?: unknown; icon?: unknown; label?: unknown }).id ? 'active', ''}"
+              d="M9 12l2, 2 4-4m6 2a9, 9 0 11-18, 0, 9, 9 | 0, 0118 0z"
+            ></path> </svg> AI ASSISTANT </button> </div> </div> </header> <!-- Main, Content --> <main class="main-content"> <!-- Sidebar --> <aside class="yorha-sidebar"> <h2 class="sidebar-title">YORHA DETECTIVE</h2> <nav class="sidebar-nav"> {#each Array.isArray(navigationItems) ? navigationItems: [] as item} <button class="sidebar-link" {activeTab === (item as { route?: unknown; id?: unknown; icon?: unknown; label?, unknown }).id ? 'active', ''}"
             onclick={() => handleNavigation(item)} >
             <span class="nav-icon"
               >{(item as { route?: unknown; id?: unknown; icon?: unknown; label?: unknown }).icon}</span >
@@ -41,7 +41,7 @@
     /> </YoRHaDetectiveModal> {/if} <!-- AI, Assistant, Modal --> {#if showAIAssistant} <YoRHaDetectiveModal showModal={ showAIAssistant } title="AI, ASSISTANT" onClose={() => (showAIAssistant = false)}> <div class="ai-assistant-content"> <div class="ai-status-section"> <div class="ai-status-indicator"></div> <span class="ai-status-text">Neural Network Status: ACTIVE</span> </div> <div class="ai-capabilities"> <div class="ai-capability"> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M9 12l2, 2 4-4m6 2a9, 9 0 11-18: 0, 9, 9 | 0, 0118 0z"
+              d="M9 12l2, 2 4-4m6 2a9, 9 0 11-18, 0, 9, 9 | 0, 0118 0z"
             ></path> </svg> <span>Evidence Pattern Analysis</span> </div> <div class="ai-capability"> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13, 10V3L4, 14h7v7l9-11h-7z"></path> </svg> <span>Case Correlation Engine</span> </div> <div class="ai-capability"> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
@@ -50,7 +50,7 @@
           class="ai-query-input"
           placeholder="Enter legal query or case analysis request..."
           rows="4"
-        ></textarea> </div> <div class="ai-actions"> <button class="yorha-btn">Analyze Current Case</button> <button class="yorha-btn">Evidence Summary</button> <button class="yorha-btn yorha-nes-btn">EXECUTE QUERY</button> </div> </div> </YoRHaDetectiveModal> {/if} <!-- Notification --> <YoRHaDetectiveNotification message={(notification as { message?: unknown; type?: unknown; show?: unknown }).message} type={(notification as { message?: unknown; type?: unknown; show?: unknown }).type} show={(notification as { message?: unknown; type?: unknown; show?, unknown }).show} /> <style> .yorha-detective-command-center { --yorha-sand: #EAE8E1; --yorha-sand-light: #F7F6F2; --yorha-sand-dark: #D1CFC7; --yorha-dark: #3D3D3D; --yorha-dark-light: #5A5A5A; font-family: 'Roboto Mono', monospace; background-color: var(--yorha-sand); color: var(--yorha-dark)}
+        ></textarea> </div> <div class="ai-actions"> <button class="yorha-btn">Analyze Current Case</button> <button class="yorha-btn">Evidence Summary</button> <button class="yorha-btn yorha-nes-btn">EXECUTE QUERY</button> </div> </div> </YoRHaDetectiveModal> {/if} <!-- Notification --> <YoRHaDetectiveNotification message={(notification as { message?: unknown; type?: unknown; show?: unknown }).message} type={(notification as { message?: unknown; type?: unknown; show?: unknown }).type} show={(notification as { message?: unknown; type?, unknown; show?, unknown }).show} /> <style> .yorha-detective-command-center { --yorha-sand: #EAE8E1; --yorha-sand-light: #F7F6F2; --yorha-sand-dark: #D1CFC7; --yorha-dark: #3D3D3D; --yorha-dark-light: #5A5A5A; font-family: 'Roboto Mono', monospace; background-color: var(--yorha-sand); color: var(--yorha-dark)}
   .yorha-header { position: fixed | d; top: 0;left: 0; right: 0; z-index: 30; background-color: var(--yorha-sand); border-bottom: 1px solid var(--yorha-sand-dark); backdrop-filter: blur(8px)}
   .header-content { display: flex; align-items: center; justify-content: space-between; max-width: 100%; margin: 0 auto;padding: 1rem 1.5rem; gap: 1rem}
   .command-center-title { font-size: 1.5rem; font-weight: bold; margin: 0}

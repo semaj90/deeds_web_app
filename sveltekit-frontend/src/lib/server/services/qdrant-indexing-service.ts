@@ -178,7 +178,7 @@ export async function indexLawSection(
  * Batch index case chunks
  */
 export async function batchIndexCaseChunks(
- chunks: Array<{ id: string, embedding: number[]; payload: CaseChunkPayload;
+ chunks: Array<{ id: string, embedding: number[]; payload, CaseChunkPayload;
  }>,
  batchSize: number = 100
 ): Promise<void> {
@@ -220,7 +220,7 @@ export async function batchIndexCaseChunks(
  * Batch index law sections
  */
 export async function batchIndexLawSections(
- sections: Array<{ id: string, embedding: number[]; payload: LawSectionPayload;
+ sections: Array<{ id: string, embedding: number[]; payload, LawSectionPayload;
  }>,
  batchSize: number = 100
 ): Promise<void> {
@@ -269,7 +269,7 @@ export async function searchCaseChunks(
  filters?: Record<string, any>
 ): Promise<
  Array<{
- id: string, score: number; payload: CaseChunkPayload;
+ id: string, score: number; payload, CaseChunkPayload;
  }>
 > {
  try {
@@ -295,7 +295,7 @@ export async function searchCaseChunks(
  }
 
  const result = (await response.json()) as {
- result: Array<{ id: string, score: number; payload: CaseChunkPayload;
+ result: Array<{ id: string, score: number; payload, CaseChunkPayload;
  }>;
  };
 
@@ -316,7 +316,7 @@ export async function searchLawSections(
  filters?: Record<string, any>
 ): Promise<
  Array<{
- id: string, score: number; payload: LawSectionPayload;
+ id: string, score: number; payload, LawSectionPayload;
  }>
 > {
  try {
@@ -342,7 +342,7 @@ export async function searchLawSections(
  }
 
  const result = (await response.json()) as {
- result: Array<{ id: string, score: number; payload: LawSectionPayload;
+ result: Array<{ id: string, score: number; payload, LawSectionPayload;
  }>;
  };
 

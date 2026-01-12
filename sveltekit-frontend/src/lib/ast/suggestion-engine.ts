@@ -44,8 +44,8 @@ const CLUSTER_TYPES: Record<string, ClusterInfo> = {
  * Agentic Suggestion Engine
  */
 export class SuggestionEngine {
- private webSearchCache = new Map<string, { results: WebSearchResult[]; timestamp: number }>();
- private ragCache = new Map<string, { context: string[]; timestamp: number }>();
+ private webSearchCache = new Map<string, { results: WebSearchResult[]; timestamp, number }>();
+ private ragCache = new Map<string, { context: string[]; timestamp, number }>();
  private cacheTTL = 24 * 60 * 60 * 1000; // 24 hours
 
  /**
@@ -297,7 +297,7 @@ export class SuggestionEngine {
  private convertWebResultsToSuggestions(
  results: WebSearchResult[],
  _error: ASTError
- ): Suggestion[] {
+ ), Suggestion[] {
  return results.map((result, index) => ({
   id: `web-${index}`,
   title: result.title,

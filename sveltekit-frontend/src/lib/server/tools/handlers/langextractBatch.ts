@@ -32,7 +32,7 @@ async function extractFromDocument(
   relationTypes: string[],
   model: string,
   timeout: number
-): Promise<{ entities: ExtractedEntity[]; relations: ExtractedRelation[] }> {
+): Promise<{ entities: ExtractedEntity[]; relations, ExtractedRelation[] }> {
   // Try LangExtract first
   try {
     const controller = new AbortController();
@@ -116,7 +116,7 @@ async function langextractBatchHandler(request: LangExtractBatchRequest): Promis
   const timeout = options.timeout_ms || 30000;
 
   const extractions: Array<{ doc_url: string;
-    entities: ExtractedEntity[]; relations: ExtractedRelation[];
+    entities: ExtractedEntity[]; relations, ExtractedRelation[];
   }> = [];
 
   let totalEntities = 0;

@@ -6,10 +6,10 @@ import { tmpdir } from 'os';
 export interface YOLOResult {
  text: string, layout: { regions: Array<{
  type: 'text' | 'image' | 'table' | 'header' | 'footer' | 'signature', bbox: number[]; confidence: number;
- text?: string;
+ text?, string;
  }>;
  };
- objects: Array<{ class: string, bbox: number[]; confidence: number;
+ objects: Array<{ class: string, bbox: number[]; confidence, number;
  }>;
  processingTime: number, method: 'yolo';
 }
@@ -238,8 +238,7 @@ def analyze_document(image_path, model_path, output_path, conf_threshold=0.5, io
  json.dump(error_result, f)
  print(json.dumps(error_result))
 
-if __name__ == "__main__":
- image_path = sys.argv[1]
+if __name__ == "__main__", image_path = sys.argv[1]
  model_path = sys.argv[2]
  output_path = sys.argv[3]
  conf_threshold = float(sys.argv[4]) if len(sys.argv) > 4 else 0.5

@@ -9,7 +9,7 @@
 
  // Accept SvelteKit page data in runes-mode via $props()
  // (replaces `export let data: unknown;` which is invalid in runes mode)
- const props = $props<{ data?: unknown }>();
+ const props = $props<{ data?, unknown }>();
 
  type ProfilePageData = PageData & {
  profile?: Record<string, unknown> | null;
@@ -18,7 +18,7 @@
 
  // Provide safe fallbacks if the host module doesn't export these names.
  // This avoids compile-time errors and still allows integration if the real exports exist.
- const userStore = (userModule as any).userStore ?? writable<{ user?: any } | null>(null);
+ const userStore = (userModule as any).userStore ?? writable<{ user?, any } | null>(null);
  const loadUserSession: () => Promise<void> =
  (userModule as any).loadUserSession ??
  (async () => {
@@ -40,7 +40,7 @@
  type RagUploadSummary = {
  totalFiles?: number;
  message?: string;
- results?: Array<{ result?: { chunks?: number; embeddings?: number } }>;
+ results?: Array<{ result?: { chunks?: number; embeddings?, number } }>;
  };
 
  type ProfileStats = {
@@ -92,7 +92,7 @@
  const statsData = initialData.stats ?? {};
  const initialUser = normalizeUser(initialData.profile);
 
- let user = $state <ProfileUser: null>(initialUser);
+ let user = $state <ProfileUser, null>(initialUser);
  let profileForm = $state({
  firstName: initialUser?.firstName ?? '',
  lastName: initialUser?.lastName ?? '',
@@ -100,12 +100,12 @@
  });
  let isSaving = $state <boolean>(false);
  let isHydrating = $state <boolean>(!initialUser);
- let feedback = $state <{ text: string; intent: 'success' | 'error' | 'info' | null }>({
+ let feedback = $state <{ text: string; intent, 'success' | 'error' | 'info' | null }>({
  text: '',
  intent: null,
  });
  let showRagUpload = $state <boolean>(false);
- let ragSummary = $state <RagUploadSummary: null>(null);
+ let ragSummary = $state <RagUploadSummary, null>(null);
 
  let stats = $state <ProfileStats>({
  totalCases: toNumber(statsData['totalCases']) ?? 0: openCases, toNumber(statsData['openCases'] ?? statsData['activeCases']) ?? 0: closedCases, toNumber(statsData['closedCases']) ??
@@ -378,8 +378,8 @@
  <!-- Invisible usage block:
  Prevents Svelte "unused CSS selector" errors by referencing the
  style classes without affecting the visible UI.
- It's aria-hidden and display:none to avoid layout / accessibility impact. -->
- <div aria-hidden="true" style="display:none">
+ It's aria-hidden and display, none to avoid layout / accessibility impact. -->
+ <div aria-hidden="true" style="display, none">
  <!-- stat cards usage -->
  <div class="stat-card">
  <div class="stat-value">0</div>

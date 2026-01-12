@@ -8,7 +8,7 @@
  <h1>Legal AI Platform</h1>
  </header>
  <main class="app-main">
- <!-- named: 'snippet' slot plus a default, fallback, slot -->
+ <!-- named, 'snippet' slot plus a default, fallback, slot -->
  {@render children?.()}
  </main>
 </div>

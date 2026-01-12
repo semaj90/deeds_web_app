@@ -95,7 +95,7 @@
                 class="w-full"
               /> </div>
  <div class="flex flex-wrap"> <Button class="enhanced-bits-btn nes-cache-operation n64-enhanced lod-optimized bits-btn"
-                onclick={ setCacheValue } disabled={$isLoading} aria-label={$isLoading ? 'Setting cache value, please wait': 'Store value in multi-layer cache system'} aria-describedby="set-cache-help"
+                onclick={ setCacheValue } disabled={$isLoading} aria-label={$isLoading ? 'Setting cache value, please wait', 'Store value in multi-layer cache system'} aria-describedby="set-cache-help"
                 role="button"
                 tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="cache-priority"
                 data-enhanced-bits="true"
@@ -104,7 +104,7 @@
  <div id="set-cache-help" class="sr-only"> Store the entered key-value pair in the multi-layer cache system with specified TTL and priority </div>
  <Button class="enhanced-bits-btn nes-cache-operation n64-enhanced lod-optimized bits-btn"
                 variant="ghost"
-                onclick={ getCacheValue } disabled={$isLoading} aria-label={$isLoading ? 'Retrieving cache value, please wait': 'Retrieve value from multi-layer cache'} aria-describedby="get-cache-help"
+                onclick={ getCacheValue } disabled={$isLoading} aria-label={$isLoading ? 'Retrieving cache value, please wait', 'Retrieve value from multi-layer cache'} aria-describedby="get-cache-help"
                 role="button"
                 tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="cache-secondary"
                 data-enhanced-bits="true"
@@ -113,7 +113,7 @@
  <div id="get-cache-help" class="sr-only"> Retrieve the value associated with the entered key from the cache layers </div>
  <Button class="enhanced-bits-btn nes-cache-operation n64-enhanced lod-optimized retro-cache-btn bits-btn"
                 variant="error"
-                onclick={ deleteCacheValue } disabled={$isLoading} aria-label={$isLoading ? 'Deleting cache entry, please wait': 'Delete cache entry from all layers'} aria-describedby="delete-cache-help"
+                onclick={ deleteCacheValue } disabled={$isLoading} aria-label={$isLoading ? 'Deleting cache entry, please wait', 'Delete cache entry from all layers'} aria-describedby="delete-cache-help"
                 role="button"
                 tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="cache-destructive"
                 data-enhanced-bits="true"
@@ -122,7 +122,7 @@
  <div id="delete-cache-help" class="sr-only"> Remove the specified cache entry from all cache layers permanently </div>
  <Button class="enhanced-bits-btn nes-cache-operation n64-enhanced lod-optimized retro-cache-btn danger-variant bits-btn"
                 variant="error"
-                onclick={ clearCache } disabled={$isLoading} aria-label={$isLoading ? 'Clearing all cache data, please wait': 'Clear entire cache - WARNING: This will remove all cached data'} aria-describedby="clear-cache-help"
+                onclick={ clearCache } disabled={$isLoading} aria-label={$isLoading ? 'Clearing all cache data, please wait': 'Clear entire cache - WARNING, This will remove all cached data'} aria-describedby="clear-cache-help"
                 role="button"
                 tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="cache-critical"
                 data-enhanced-bits="true"
@@ -142,13 +142,13 @@
               > Clear </Button>
  <div id="clear-results-help" class="sr-only"> Clear the test results display panel </div> </h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-2 max-h-80">
-  {#each Array.isArray($testResults) ? $testResults: [] as result} <div class="flex items-start gap-2" p-2 rounded, border-l-4 {(result as { success?: any; summary?: any; type?: any; timestamp?: any; message?: any }).type === 'success' ? 'border-green-500 bg-green-50': (result as { success?: any; summary?: any; type?: any; timestamp?: any; message?: any }).type === 'error' ? 'border-red-500 bg-red-50': (result as { success?: any; summary?: any; type?: any; timestamp?: any; message?: any }).type === 'warning' ? 'border-yellow-500, bg-yellow-50', 'border-blue-500 bg-blue-50'}"> <div class="text-xs nes-text is-disabled"> {(result as { success?: any; summary?: any; type?: any; timestamp?: any; message?: any }).timestamp}
+  {#each Array.isArray($testResults) ? $testResults: [] as result} <div class="flex items-start gap-2" p-2 rounded, border-l-4 {(result as { success?: any; summary?: any; type?: any; timestamp?: any; message?: any }).type === 'success' ? 'border-green-500 bg-green-50': (result as { success?: any; summary?: any; type?: any; timestamp?: any; message?: any }).type === 'error' ? 'border-red-500 bg-red-50': (result as { success?: any; summary?: any; type?: any; timestamp?: any; message?, any }).type === 'warning' ? 'border-yellow-500, bg-yellow-50', 'border-blue-500 bg-blue-50'}"> <div class="text-xs nes-text is-disabled"> {(result as { success?: any; summary?: any; type?: any; timestamp?: any; message?: any }).timestamp}
 </div>
  <div class="text-sm"> {(result as { success?: any; summary?: any; type?: any; timestamp?: any; message?: any }).message}
 </div> </div> {/each} {#if $testResults.length === 0} <div class="text-center nes-text is-disabled"> No test results yet. Try some cache operations! {/if}
   </div> </div> </div> </div> </TabsContent>
  <!-- Statistics, Tab --> <TabsContent value="statistics" class="space-y-4">
-  {#if $cacheStats} <div class="grid grid-cols-1 md:grid-cols-2 lg, grid-cols-4"> <!-- Service, Stats --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary">Service Stats</h3> </div>
+  {#if $cacheStats} <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-4"> <!-- Service, Stats --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary">Service Stats</h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-2"> <div class="flex"> <span class="text-sm">Requests:</span>
  <span class="font-mono">{$cacheStats.service.requests}
 </span> </div>
@@ -210,7 +210,7 @@
   </TabsContent>
  <!-- Performance Tests, Tab --> <TabsContent value="testing" class="space-y-4"> <div class="grid grid-cols-1 md, grid-cols-2"> <!-- Test, Controls --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Performance Tests</h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-2"> <Button onclick={ runPerformanceTest } disabled={$isLoading} class="w-full enhanced-bits-btn nes-performance-test n64-enhanced lod-optimized retro-test-btn bits-btn"
-                aria-label={$isLoading ? 'Running batch performance test, please wait': 'Execute batch performance test with, 100 cache entries'} aria-describedby="perf-test-help"
+                aria-label={$isLoading ? 'Running batch performance test, please wait', 'Execute batch performance test with, 100 cache entries'} aria-describedby="perf-test-help"
                 role="button"
                 tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="performance-primary"
                 data-enhanced-bits="true"
@@ -220,7 +220,7 @@
  <p class="text-sm nes-text"> Tests batch operations with, 100 cache entries </p> </div>
  <div class="space-y-2"> <Button variant="ghost"
                 onclick={ testCacheHitMiss } disabled={$isLoading} class="w-full enhanced-bits-btn nes-performance-test n64-enhanced lod-optimized retro-test-btn bits-btn"
-                aria-label={$isLoading ? 'Running cache hit/miss test, please wait': 'Test cache hit and miss behavior patterns'} aria-describedby="hitmiss-test-help"
+                aria-label={$isLoading ? 'Running cache hit/miss test, please wait', 'Test cache hit and miss behavior patterns'} aria-describedby="hitmiss-test-help"
                 role="button"
                 tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="performance-secondary"
                 data-enhanced-bits="true"
@@ -230,7 +230,7 @@
  <p class="text-sm nes-text"> Validates cache hit and miss behavior </p> </div>
  <div class="space-y-2"> <Button variant="ghost"
                 onclick={ refreshStats } disabled={$isLoading} class="w-full enhanced-bits-btn nes-performance-test n64-enhanced lod-optimized retro-test-btn bits-btn"
-                aria-label={$isLoading ? 'Refreshing cache statistics, please wait': 'Update all cache statistics and health monitoring data'} aria-describedby="refresh-stats-help"
+                aria-label={$isLoading ? 'Refreshing cache statistics, please wait', 'Update all cache statistics and health monitoring data'} aria-describedby="refresh-stats-help"
                 role="button"
                 tabindex={$isLoading ? -1, 0} data-loading={$isLoading} data-nes-theme="performance-refresh"
                 data-enhanced-bits="true"

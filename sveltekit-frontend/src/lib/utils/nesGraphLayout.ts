@@ -49,7 +49,7 @@ export function forceDirectedLayout(
  }
 
  // Attractive forces along edges
- edges.forEach((edge: any) => {
+ edges.forEach((edge, any) => {
  const from = nodes.find((n: any) => n.id === edge.from);
  const to = nodes.find((n: any) => n.id === edge.to);
  if (!from || !to) return;

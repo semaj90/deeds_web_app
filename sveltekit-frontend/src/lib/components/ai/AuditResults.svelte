@@ -1,4 +1,4 @@
-<!-- Phase 10: Audit Results UI, Scaffold (Context7) This Svelte component displays semantic audit results and TODOs from the backend. TODO, After initial test, wire up real Context7 audit API, agent triggers, and live updates. --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from 'svelte';
+<!-- Phase 10, Audit Results UI, Scaffold (Context7) This Svelte component displays semantic audit results and TODOs from the backend. TODO, After initial test, wire up real Context7 audit API, agent triggers, and live updates. --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from 'svelte';
  import type { SemanticAuditResult } from '$lib/ai/types';
    let auditResults: SemanticAuditResult[] = $state([]);
    let loading = $state<boolean>(true);

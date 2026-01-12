@@ -34,7 +34,7 @@ export interface RabbitMQConfig {
 export interface IRabbitMQService {
     initialize(retries?: number, delay?: number): Promise<void>;
     publishDocumentProcessingJob(job: DocumentProcessingJob): Promise<boolean>;
-    publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{ success: number; failed: number }>;
+    publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{ success: number; failed, number }>;
     purgeQueue(queueType: keyof RabbitMQConfig['queues']): Promise<boolean>;
     close(): Promise<void>;
     healthCheck(): Promise<any>;
@@ -178,7 +178,7 @@ class RabbitMQService implements IRabbitMQService {
         }
     }
 
-    async publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{ success: number; failed: number }> {
+    async publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{ success: number; failed, number }> {
         let success = 0;
         let failed = 0;
 

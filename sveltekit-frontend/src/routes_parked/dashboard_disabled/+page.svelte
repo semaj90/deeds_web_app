@@ -6,7 +6,7 @@
  id: string; title: string;
  status: 'active' | 'closed';
  createdAt: string; updatedAt: string;
- evidence: Array<{ id: string; status: string }>;
+ evidence: Array<{ id: string; status, string }>;
  }
 
  interface DashboardStats {
@@ -146,7 +146,7 @@
  >
  + NEW CASE
  </button>
- <a href="/api/auth/logout" class="text-gray-600 hover:text-[#9E0000] font-medium">
+ <a href="/api/auth/logout" class="text-gray-600 hover, text-[#9E0000] font-medium">
  LOGOUT
  </a>
  </div>
@@ -163,7 +163,7 @@
 
  <!-- Statistics Panel -->
  {#if !isLoading}
- <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-4 mb-8">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-4 gap-4 mb-8">
  <!-- Active Cases -->
  <div class="bg-white border-2 border-gray-300 p-6 rounded">
  <p class="text-gray-600 text-sm font-mono uppercase">Active Cases</p>
@@ -209,11 +209,11 @@
  </button>
  </div>
  {:else}
- <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-3 gap-6">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-3 gap-6">
  {#each cases as caseItem (caseItem.id)}
  <a
  href="/cases/{caseItem.id}"
- class="bg-white border-2 border-gray-300 hover:border-[#9E0000] transition p-6 cursor-pointer rounded {getStatusColor(
+ class="bg-white border-2 border-gray-300 hover, border-[#9E0000] transition p-6 cursor-pointer rounded {getStatusColor(
  caseItem.status)}"
  >
  <div class="flex items-start justify-between mb-3">
@@ -247,24 +247,24 @@
  <!-- Quick Actions -->
  <div class="bg-white border-2 border-gray-300 p-6 rounded">
  <h2 class="text-xl font-bold text-gray-900 mb-4 font-mono">QUICK ACTIONS</h2>
- <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-3">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-4 gap-3">
  <button
- class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover:bg-gray-200 font-mono text-sm transition"
+ class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover, bg-gray-200 font-mono text-sm transition"
  >
  TIMELINE ANALYSIS
  </button>
  <button
- class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover:bg-gray-200 font-mono text-sm transition"
+ class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover, bg-gray-200 font-mono text-sm transition"
  >
  EVIDENCE SUMMARY
  </button>
  <button
- class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover:bg-gray-200 font-mono text-sm transition"
+ class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover, bg-gray-200 font-mono text-sm transition"
  >
  SUSPECT CONNECTIONS
  </button>
  <button
- class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover:bg-gray-200 font-mono text-sm transition"
+ class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover, bg-gray-200 font-mono text-sm transition"
  >
  GENERATE REPORT
  </button>
@@ -282,7 +282,7 @@
  type="text"
  bind:value={newCaseTitle}
  placeholder="Case title..."
- class="w-full px-4 py-2 border-2 border-gray-300 rounded focus: border-[#9E0000], focus:outline-none mb-4 font-mono"
+ class="w-full px-4 py-2 border-2 border-gray-300 rounded focus: border-[#9E0000], focus, outline-none mb-4 font-mono"
  />
 
  <div class="flex gap-3">
@@ -294,7 +294,7 @@
  </button>
  <button
  onclick={createNewCase}
- class="flex-1 px-4 py-2 bg-[#9E0000] text-white rounded hover:bg-[#7a0000] font-mono transition"
+ class="flex-1 px-4 py-2 bg-[#9E0000] text-white rounded hover, bg-[#7a0000] font-mono transition"
  >
  CREATE
  </button>

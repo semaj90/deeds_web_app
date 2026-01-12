@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte, code, Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code, Unexpected, token -->
 <!-- AI Processing, Dashboard - Integration, Demo -->
@@ -264,7 +264,7 @@ import type { Document } from '$lib/types';
         <textarea
           id="-test-input-"
           bind:value={testInput}
-          class="w-full h-20 px-3 py-2 bg-yorha-bg-secondary border border-yorha-border rounded-md text-yorha-text-primary placeholder-yorha-text-tertiary focus:outline-none focus, ring-2"
+          class="w-full h-20 px-3 py-2 bg-yorha-bg-secondary border border-yorha-border rounded-md text-yorha-text-primary placeholder-yorha-text-tertiary focus, outline-none focus, ring-2"
           placeholder="Enter text to process..."
         ></textarea>
       </div>
@@ -314,7 +314,7 @@ import type { Document } from '$lib/types';
       <div class="yorha-panel-content">
         <div class="space-y-3 max-h-96">
           {#each processingResults as result (result.taskId)}
-            <div class="p-3 bg-yorha-bg-secondary rounded-md border" transition: fly={{ y: -20, duration, 300 }}>
+            <div class="p-3 bg-yorha-bg-secondary rounded-md border" transition: fly={{ y, -20, duration, 300 }}>
               <div class="flex items-center justify-between">
                 <div class="flex items-center">
                   <Badge class={result.success ? 'bg-yorha-success' , 'bg-yorha-danger'}>
@@ -353,15 +353,14 @@ import type { Document } from '$lib/types';
         <h3 class="nes-text">Worker Status</h3>
       </div>
       <div class="yorha-panel-content">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg, grid-cols-4">
+        <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-4">
           {#each workerStatus as worker (worker.id)}
             <div class="p-3 bg-yorha-bg-secondary rounded">
               <div class="flex items-center justify-between">
                 <span class="font-medium">{worker.id}</span>
                 <Badge class={
                   worker.status === 'idle' ? 'bg-yorha-success' :
-                  worker.status === 'busy' ? 'bg-yorha-warning' :
-                  worker.status === 'error' ? 'bg-yorha-danger' , 'bg-yorha-text-secondary'
+                  worker.status === 'busy' ? 'bg-yorha-warning' , worker.status === 'error' ? 'bg-yorha-danger' , 'bg-yorha-text-secondary'
                 }>
                   {String(worker.status).toUpperCase()}
                 </Badge>

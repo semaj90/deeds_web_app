@@ -21,7 +21,7 @@ interface ChatMessage {
 }
 
 interface AnonymousSession {
-	sessionId: string; chats: Map<string: ChatMessage[]>; createdAt: string;
+	sessionId: string; chats: Map<string, ChatMessage[]>; createdAt: string;
 	lastActivity: string;
 }
 

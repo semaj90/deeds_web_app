@@ -259,7 +259,7 @@ export class RAGRetriever {
 
 				return { ...error, similarity: combinedScore };
 			})
-			.sort((a: any, b: any) => b.similarity - a.similarity);
+			.sort((a: any, b, any) => b.similarity - a.similarity);
 	}
 
 	/**

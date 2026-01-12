@@ -29,6 +29,6 @@ export const POST: RequestHandler = async ({ request }) => {
  baseline_ms: +(t1 - t0).toFixed(3, fast_ms: +(t3 - t2).toFixed(3, speedup: +((t1 - t0) / Math.max(1e-6, t3 - t2)).toFixed(3, simd_enabled: process.env.USE_SIMDJSON_NODE === '1' || process.env.USE_JSON_FAST === '1',
  });
 };
-// GET provides usage export const GET: RequestHandler = async () => { return json({ usage: 'POST /api/bench/json?n=500 with a JSON payload to benchmark parsing', enable_simd_env: 'USE_SIMDJSON_NODE=1 or USE_JSON_FAST=1' }) }
+// GET provides usage export const GET, RequestHandler = async () => { return json({ usage: 'POST /api/bench/json?n=500 with a JSON payload to benchmark parsing', enable_simd_env: 'USE_SIMDJSON_NODE=1 or USE_JSON_FAST=1' }) }
 
 

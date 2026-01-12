@@ -24,7 +24,7 @@
 	const viewMode = writable<'tree' | 'graph' | 'list'>('tree');
 	const filterType = writable<string>('all');
 	const loading = writable(true);
-	const agentStatus = writable<{ active: boolean; current_file: string; progress: number }>({
+	const agentStatus = writable<{ active: boolean; current_file: string; progress, number }>({
 		active: false,
 		current_file: '',
 		progress: 0
@@ -162,7 +162,7 @@
 	<!-- Header -->
 	<div class="header">
 		<h1>🗺️ Route Explorer & Agent Control</h1>
-		<div class="agent-status" class:active={$agentStatus.active}>
+		<div class="agent-status" class, active={$agentStatus.active}>
 			{#if $agentStatus.active}
 				<span class="pulse">🤖</span>
 				<span>Fixing: {$agentStatus.current_file}</span>
@@ -178,11 +178,11 @@
 		<input
 			type="text"
 			placeholder="Search routes..."
-			bind:value={searchQuery}
+			bind, value={searchQuery}
 			class="search-input"
 		/>
 
-		<select bind:value={$filterType} class="filter-select">
+		<select bind, value={$filterType} class="filter-select">
 			<option value="all">All Types</option>
 			<option value="page">Pages</option>
 			<option value="layout">Layouts</option>
@@ -193,13 +193,13 @@
 
 		<div class="view-modes">
 			<button
-				class:active={$viewMode === 'tree'}
+				class, active={$viewMode === 'tree'}
 				onclick={() => viewMode.set('tree')}
 			>
 				📁 Tree
 			</button>
 			<button
-				class:active={$viewMode === 'list'}
+				class, active={$viewMode === 'list'}
 				onclick={() => viewMode.set('list')}
 			>
 				📋 List
@@ -215,7 +215,7 @@
 
 	<!-- Main Content -->
 	<div class="content">
-		<!-- Left Panel: Route Tree/List -->
+		<!-- Left Panel, Route Tree/List -->
 		<div class="routes-panel">
 			{#if $loading}
 				<div class="loading">Loading routes...</div>
@@ -231,7 +231,7 @@
 						<div
 							class="route-item"
 							class:selected={$selectedRoute?.id === route.id}
-							class:has-errors={route.errors > 0}
+							class, has-errors={route.errors > 0}
 							onclick={() => selectRoute(route)}
 						>
 							<div class="route-icon">{route.type === 'page' ? '📄' : route.type === 'api' ? '🔌' : '⚙️'}</div>
@@ -253,7 +253,7 @@
 			{/if}
 		</div>
 
-		<!-- Right Panel: Details & KB -->
+		<!-- Right Panel, Details & KB -->
 		{#if $selectedRoute}
 			<div class="details-panel">
 				<div class="details-header">
@@ -271,7 +271,7 @@
 					</div>
 					<div class="metric">
 						<span class="metric-label">Errors</span>
-						<span class="metric-value error" class:high={$selectedRoute.errors > 10}>
+						<span class="metric-value error" class, high={$selectedRoute.errors > 10}>
 							{$selectedRoute.errors}
 						</span>
 					</div>
@@ -374,7 +374,7 @@
 					<div
 						class="tree-route"
 						class:selected={selectedPath === route.path}
-						class:has-errors={route.errors > 0}
+						class, has-errors={route.errors > 0}
 						onclick={() => selectRoute(route)}
 					>
 						<span class="route-icon">{route.type === 'page' ? '📄' : '⚙️'}</span>

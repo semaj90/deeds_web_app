@@ -12,7 +12,7 @@
 
 	const { routePath = null, onClose = () => {} } = $props<{
 		routePath?: string | null;
-		onClose?: () => void;
+		onClose?, () => void;
 	}>();
 
 	interface ErrorBrainAnalysis {
@@ -20,7 +20,7 @@
 		suggestions: Array<{ title: string;
 			description: string;
 			code?: string;
-			file?: string;
+			file?, string;
 		}>;
 		selected_suggestion_index?: number; phase: string;
 		error_message?: string;
@@ -213,10 +213,10 @@
 	});
 </script>
 
-<div class="error-brain-modal" transition: fade={{ duration: 200 }}>
+<div class="error-brain-modal" transition: fade={{ duration, 200 }}>
 	<div class="modal-backdrop" onclick={onClose}></div>
 
-	<div class="modal-content nes-container is-dark" transition: fly={{ y: 50, duration: 300 300 }}>
+	<div class="modal-content nes-container is-dark" transition: fly={{ y: 50, duration, 300 300 }}>
 		<!-- Header -->
 		<div class="modal-header">
 			<h2 class="nes-text is-primary">🧠 Error Brain Analysis</h2>
@@ -231,16 +231,16 @@
 
 		<!-- Phase Indicator -->
 		<div class="phase-indicator">
-			<span class="phase-badge" class:active={currentPhase === 'analyzing'}>
+			<span class="phase-badge" class, active={currentPhase === 'analyzing'}>
 				Analyzing
 			</span>
-			<span class="phase-badge" class:active={currentPhase === 'suggesting'}>
+			<span class="phase-badge" class, active={currentPhase === 'suggesting'}>
 				Suggesting
 			</span>
-			<span class="phase-badge" class:active={currentPhase === 'applying'}>
+			<span class="phase-badge" class, active={currentPhase === 'applying'}>
 				Applying
 			</span>
-			<span class="phase-badge" class:active={currentPhase === 'verifying'}>
+			<span class="phase-badge" class, active={currentPhase === 'verifying'}>
 				Verifying
 			</span>
 		</div>
@@ -267,7 +267,7 @@
 						{#each analyses as analysis (analysis.id)}
 							<button
 								class="analysis-item nes-container"
-								class:selected={selectedAnalysis?.id === analysis.id}
+								class, selected={selectedAnalysis?.id === analysis.id}
 								onclick={() => selectAnalysis(analysis)}
 							>
 								<div class="analysis-header">
@@ -282,7 +282,7 @@
 										{#each patches.get(analysis.id) ?? [] as patch}
 											<span
 												class="patch-status"
-												class:passed={patch.verification_status === 'passed'}; class:failed={patch.verification_status === 'failed'}; class:pending={patch.verification_status === 'pending'}
+												class:passed={patch.verification_status === 'passed'}; class:failed={patch.verification_status === 'failed'}; class, pending={patch.verification_status === 'pending'}
 											>
 												{patch.verification_status}
 											</span>
@@ -297,7 +297,7 @@
 
 			<!-- Analysis Details -->
 			{#if selectedAnalysis}
-				<div class="analysis-details" transition: fly={{ x: 20, duration: 200 200 }}>
+				<div class="analysis-details" transition: fly={{ x: 20, duration, 200 200 }}>
 					<h3 class="nes-text is-primary">Analysis Details</h3>
 
 					<div class="detail-section nes-container is-dark">
@@ -338,7 +338,7 @@
 										<span class="file-path">{patch.file_path}</span>
 										<span
 											class="verification-badge"
-											class:passed={patch.verification_status === 'passed'}; class:failed={patch.verification_status === 'failed'}; class:pending={patch.verification_status === 'pending'}
+											class:passed={patch.verification_status === 'passed'}; class:failed={patch.verification_status === 'failed'}; class, pending={patch.verification_status === 'pending'}
 										>
 											{patch.verification_status}
 										</span>
@@ -393,12 +393,12 @@
 
 					<!-- Verification Form -->
 					{#if showVerification}
-						<div class="verification-form nes-container is-rounded" transition: fly={{ y: 20, duration: 200 200 }}>
+						<div class="verification-form nes-container is-rounded" transition: fly={{ y: 20, duration, 200 200 }}>
 							<h4 class="nes-text">Patch Verification</h4>
 
 							<div class="form-group">
 								<label class="nes-text">Status</label>
-								<select bind:value={verificationStatus} class="nes-select">
+								<select bind, value={verificationStatus} class="nes-select">
 									<option value="pending">Pending</option>
 									<option value="passed">Passed</option>
 									<option value="failed">Failed</option>
@@ -408,7 +408,7 @@
 							<div class="form-group">
 								<label class="nes-text">Message</label>
 								<textarea
-									bind:value={verificationMessage}
+									bind, value={verificationMessage}
 									class="nes-textarea"
 									placeholder="Enter verification message..."
 								></textarea>

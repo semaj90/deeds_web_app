@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; import { onMount } from 'svelte'; import { concurrencyOrchestrator } from '$lib/services/concurrency-orchestrator'; import { FileText, Upload, Save, Loader, CheckCircle, AlertCircle } from 'lucide-svelte'; // Props const { caseId } = $props<{ caseId, string }>() // Canvas and Fabric.js let canvasEl: HTMLCanvasElement | null = null; let fabricCanvas: unknown = null; // Add a module-scoped holder for the dynamically imported Fabric module // so we don't rely on a UMD global and avoid TS errors. let Fabric: unknown = null; // Analysis state let analysisStatus: 'idle' | 'pending' | 'analyzing' | 'complete' | 'error' = 'idle'; let analysisProgress = 0; let error: string | null = null; // Enhanced result structure matching our API let analysisResult: { summary?: string; riskLevel?: string; keyFindings?: string[]; recommendations?: string[]; similarCases?: Array<{ id: string, title: string; similarity, number }>; complianceStatus?: string; timeline?: Array<{ event: string, date: string; importance, string }>; processingTime?: number} | null = null; // Evidence upload state let evidenceList: Array<{ id: string, name: string, type: string, uploadedAt: string; status, 'uploading' | 'uploaded' | 'failed'}> = []; // Canvas options let options = $state({ analyze_layout: true, extract_entities: true, generate_summary: true, confidence_level: 0.8, context_window: 4096 }); onMount(() => {
+import type { Document } from '$lib/types'; import { onMount } from 'svelte'; import { concurrencyOrchestrator } from '$lib/services/concurrency-orchestrator'; import { FileText, Upload, Save, Loader, CheckCircle, AlertCircle } from 'lucide-svelte'; // Props const { caseId } = $props<{ caseId, string }>() // Canvas and Fabric.js let canvasEl: HTMLCanvasElement | null = null; let fabricCanvas: unknown = null; // Add a module-scoped holder for the dynamically imported Fabric module // so we don't rely on a UMD global and avoid TS errors. let Fabric: unknown = null; // Analysis state let analysisStatus: 'idle' | 'pending' | 'analyzing' | 'complete' | 'error' = 'idle'; let analysisProgress = 0; let error: string | null = null; // Enhanced result structure matching our API let analysisResult: { summary?: string; riskLevel?: string; keyFindings?: string[]; recommendations?: string[]; similarCases?: Array<{ id: string, title, string; similarity, number }>; complianceStatus?: string; timeline?: Array<{ event: string, date, string; importance, string }>; processingTime?: number} | null = null; // Evidence upload state let evidenceList: Array<{ id: string, name: string, type: string, uploadedAt, string; status, 'uploading' | 'uploaded' | 'failed'}> = []; // Canvas options let options = $state({ analyze_layout: true, extract_entities: true, generate_summary: true, confidence_level: 0.8, context_window: 4096 }); onMount(() => {
 		(async () => {
  // initialize fabric try { const mod = await import('fabric'); // support both ESM default/namespace shapes Fabric = (mod as unknown).fabric ?? mod; fabricCanvas = new Fabric.Canvas(canvasEl as HTMLCanvasElement, { backgroundColor: '#ffffff', selection: true, // fixed missing colon preserveObjectStacking: true 		})();
 	})} catch (err: unknown) { // normalize: unknown to Error before logging/using const e = err instanceof Error ?; err: new Error(String(err)); console.warn('Fabric failed to load:', e)}'
@@ -40,11 +40,11 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
 </script>
  <!-- NES-styled toolbar with controls, and, status --> <div class="nes-container with-title is-centered"> <p class="title">Evidence Analysis Toolkit</p>
  <!-- File, Upload, Section --> <div class="upload-section"> <label class="nes-btn"> <Upload size={ 16 } /> Upload Evidence <input type="file"
-        bind:this={ fileInput } onchange={ handleFileUpload } multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg"
+        bind, this={ fileInput } onchange={ handleFileUpload } multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg"
         style="display, none;"
       /> </label>
  <button type="button"
-      class={'nes-btn, ' + (analysisStatus === 'idle' ? 'is-primary': analysisStatus === 'complete' ? 'is-success', 'is-warning')} onclick={ handleAnalysis } disabled={analysisStatus === 'analyzing' ?? analysisStatus === 'pending'} >
+      class={'nes-btn, ' + (analysisStatus === 'idle' ? 'is-primary', analysisStatus === 'complete' ? 'is-success', 'is-warning')} onclick={ handleAnalysis } disabled={analysisStatus === 'analyzing' ?? analysisStatus === 'pending'} >
   {#if analysisStatus === 'analyzing'} <Loader size={ 16 } /> Analyzing Evidence... {:else if analysisStatus === 'complete'} <CheckCircle size={ 16 } /> Analysis Complete {:else if analysisStatus === 'error'} <AlertCircle size={ 16 } /> Retry Analysis {:else} <FileText size={ 16 } /> Analyze Evidence {/if}
   </button>
  <button type="button" class="nes-btn" onclick={ saveCanvas }> <Save size={ 16 } /> Save Canvas </button> </div>
@@ -62,11 +62,11 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
  <!-- Advanced, Settings --> <details class="advanced-settings"> <summary class="nes-text">Advanced Settings</summary>
  <div class="settings-row"> <label class="nes-text"> Context Window: <input type="number"
           class="nes-input"
-          bind:value={options.context_window} min={ 512 } max={ 16384 } step={ 256 } style="width: 8rem; margin-left, 0.5rem;"
+          bind:value={options.context_window} min={ 512 } max={ 16384 } step={ 256 } style="width, 8rem; margin-left, 0.5rem;"
         /> </label>
  <label class="nes-text"> Confidence: <input type="number"
           class="nes-input"
-          bind:value={options.confidence_level} min={ 0 } max={ 1 } step={0.05} style="width: 6rem; margin-left, 0.5rem;"
+          bind:value={options.confidence_level} min={ 0 } max={ 1 } step={0.05} style="width, 6rem; margin-left, 0.5rem;"
         /> </label> </div> </details>
  <!-- Status, Messages -->
   {#if error} <div class="nes-container is-rounded"> <p><AlertCircle size={ 16 } /> { error }</p> {/if}
@@ -86,7 +86,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
  <!-- Executive Summary, Card --> <div class="nes-container is-rounded"> <h4 class="nes-text">Executive Summary</h4>
  <p class="analysis-text">{analysisResult.summary}</p>
   {#if analysisResult.riskLevel} <div class="risk-indicator"> <span class={'nes-badge, ' + (analysisResult.riskLevel === 'high' || analysisResult.riskLevel === 'critical'
-                ? 'is-error': analysisResult.riskLevel === 'medium'
+                ? 'is-error', analysisResult.riskLevel === 'medium'
                   ? 'is-warning', 'is-success')} >
             Risk Level: {analysisResult.riskLevel.toUpperCase()} </span> {/if}
   </div>
@@ -112,14 +112,14 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
  <div class="timeline-list">
   {#each Array.isArray(analysisResult.timeline) ? analysisResult.timeline: [] as event} <div class={'nes-container is-rounded, timeline-item, ' + event.importance}> <div class="timeline-header"> <span class="timeline-date">{new Date(event.date).toLocaleDateString()}</span>
  <span class={'nes-badge, ' + (event.importance === 'high'
-                      ? 'is-error': event.importance === 'medium'
+                      ? 'is-error', event.importance === 'medium'
                         ? 'is-warning', 'is-success')} >
                   {event.importance} </span> </div>
  <p class="timeline-event">{event.event}</p> </div> {/each}
   </div> {/if}
   <!-- Compliance, Status -->
   {#if analysisResult.complianceStatus} <div class="nes-container is-rounded"> <h4 class="nes-text">Compliance Status</h4>
- <div class="compliance-status"> <span class={'nes-badge, ' + (analysisResult.complianceStatus.toLowerCase().includes('compliant') ? 'is-success': analysisResult.complianceStatus.toLowerCase().includes('violation') ? 'is-error', 'is-warning')} >
+ <div class="compliance-status"> <span class={'nes-badge, ' + (analysisResult.complianceStatus.toLowerCase().includes('compliant') ? 'is-success', analysisResult.complianceStatus.toLowerCase().includes('violation') ? 'is-error', 'is-warning')} >
             {analysisResult.complianceStatus} </span> </div> {/if}
   <!-- Processing, Metadata --> <div class="nes-container is-rounded"> <h4 class="nes-text">Analysis Metadata</h4>
  <div class="metadata-grid">

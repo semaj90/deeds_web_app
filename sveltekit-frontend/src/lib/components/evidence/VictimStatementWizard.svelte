@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import Button from '$lib/components/ui/button';
  import type { Dialog,
@@ -146,7 +146,7 @@ https://svelte.dev/e/js_parse_error -->
  });
 </script>
 
-<Dialog bind:open onopenChange={(e) => !e.detail && cancelWizard()}>
+<Dialog bind, open onopenChange={(e) => !e.detail && cancelWizard()}>
  <DialogContent class="victim-wizard-dialog">
  <DialogHeader>
  <DialogTitle>Victim Statement Wizard</DialogTitle>
@@ -157,12 +157,12 @@ https://svelte.dev/e/js_parse_error -->
 
  <!-- Progress Bar -->
  <div class="wizard-progress">
- <Progress bind:value={stepProgress} class="progress-bar" />
+ <Progress bind, value={stepProgress} class="progress-bar" />
  <div class="step-indicators">
  {#each steps as step, index}
  <div
  class="step-indicator"
- class:active={step.id === currentStep}; class:completed={getCurrentStepIndex() > index}
+ class:active={step.id === currentStep}; class, completed={getCurrentStepIndex() > index}
  >
  <span class="step-number">{index + 1}</span>
  <span class="step-title">{step.title}</span>
@@ -273,7 +273,7 @@ https://svelte.dev/e/js_parse_error -->
  </div>lass="form-group">
  <label for="financialImpact">Financial Impact:</label>
  <textarea
- bind:value={statement.financialImpact}
+ bind, value={statement.financialImpact}
  placeholder="Any financial losses or costs incurred?"
  rows={4}
  ></textarea>
@@ -285,7 +285,7 @@ https://svelte.dev/e/js_parse_error -->
  <div class="step-content">
  <h3>Evidence Links</h3>
  <p>Link this statement to existing evidence in the case:</p>
- <!-- TODO: Add evidence selection component -->
+ <!-- TODO, Add evidence selection component -->
  <div class="evidence-links-placeholder">
  Evidence selection component will be implemented here
  </div>

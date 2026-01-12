@@ -64,7 +64,7 @@ export class RecoveryStrategy {
  static async retryWithExponentialBackoff<T>(
  operation: () => Promise<T>,
  config: Partial<RetryConfig> = {}
- ): Promise<RecoveryResult & { result?: T }> {
+ ): Promise<RecoveryResult & { result?, T }> {
  const finalConfig = { ...this.DEFAULT_RETRY_CONFIG, ...config };
  let lastError | undefined;
  let delay = finalConfig.initialDelayMs;
@@ -155,7 +155,7 @@ export class RecoveryStrategy {
  fallbackOperation: () => Promise<T>,
  feature: 'errorBrain' | 'legalAi',
  userId?: string
- ): Promise<RecoveryResult & { result?: T }> {
+ ): Promise<RecoveryResult & { result?, T }> {
  try {
  // Try primary operation
  const result = await primaryOperation();
@@ -256,7 +256,7 @@ export class RecoveryStrategy {
  let isOpen = false;
 
  return {
- async execute(): Promise<{ success: boolean; circuitOpen: boolean }> {
+ async execute(): Promise<{ success: boolean; circuitOpen, boolean }> {
  // Check if circuit should be reset
  if (isOpen && lastFailureTime) {
  const timeSinceLastFailure = Date.now() - lastFailureTime.getTime();
@@ -368,7 +368,7 @@ export function createRetryConfig(overrides: Partial<RetryConfig> = {}): RetryCo
 export async function retryWithBackoff<T>(
  operation: () => Promise<T>,
  config?: Partial<RetryConfig>
-): Promise<RecoveryResult & { result?: T }> {
+): Promise<RecoveryResult & { result?, T }> {
  return RecoveryStrategy.retryWithExponentialBackoff(operation, config);
 }
 
@@ -387,7 +387,7 @@ export async function gracefulDegrade<T>(
  fallbackOperation: () => Promise<T>,
  feature: 'errorBrain' | 'legalAi',
  userId?: string
-): Promise<RecoveryResult & { result?: T }> {
+): Promise<RecoveryResult & { result?, T }> {
  return RecoveryStrategy.gracefulDegrade(primaryOperation, fallbackOperation, feature, userId);
 }
 

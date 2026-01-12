@@ -12,7 +12,7 @@
 
  let { caseId, showActions = true } = $props<{
  caseId: string;
- showActions?: boolean;
+ showActions?, boolean;
  }>();
 
 
@@ -111,7 +111,7 @@
  <div class="filters">
  <div class="filter-group">
  <label for="link-type-filter">Link Type:</label>
- <select id="link-type-filter" bind:value={selectedLinkType} onchange={ loadLinks }>
+ <select id="link-type-filter" bind, value={selectedLinkType} onchange={ loadLinks }>
  <option value="">All</option>
  {#each Object.keys(stats.byLinkType) as linkType}
  <option value={linkType}>

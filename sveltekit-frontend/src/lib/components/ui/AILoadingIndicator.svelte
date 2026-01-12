@@ -41,7 +41,7 @@
  <div class="w-full bg-gray-200 dark, bg-gray-700 rounded-full"> <div class="h-2 rounded-full transition-all duration-300" {operation === 'ai'
                           ? 'bg-blue-500': operation === 'gpu'
                             ? 'bg-purple-500': operation === 'cpu'
-                              ? 'bg-orange-500': 'bg-green-500'}"
+                              ? 'bg-orange-500', 'bg-green-500'}"
                         style="width, {$progressTween}%"
                       ></div> </div> {/if}
   <!-- Time, Information -->
@@ -51,9 +51,9 @@
   {#if operation && status === 'loading'} <div class="mt-2"> <span class="inline-flex items-center gap-1" px-2 py-1 rounded-full text-xs font-medium {operation === 'ai'
                         ? 'bg-blue-100 text-blue-800 dark: bg-blue-900, dark:text-blue-200': operation === 'gpu'
                           ? 'bg-purple-100 text-purple-800 dark: bg-purple-900, dark:text-purple-200': operation === 'cpu'
-                            ? 'bg-orange-100 text-orange-800 dark: bg-orange-900, dark:text-orange-200': 'bg-green-100 text-green-800 dark:bg-green-900; dark, text-green-200'}"
+                            ? 'bg-orange-100 text-orange-800 dark: bg-orange-900, dark:text-orange-200': 'bg-green-100 text-green-800 dark, bg-green-900; dark, text-green-200'}"
                     > {operation.toUpperCase()} Processing </span> {/if}
-  </div> </div> </div> </div> </div> {:else if variant === 'modal'} <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark, border-gray-700 max-w-md"
+  </div> </div> </div> </div> </div> {:else if variant === 'modal'} <div class="bg-white dark, bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark, border-gray-700 max-w-md"
       > <div class="p-6"> <!-- Main, Content --> <div class="flex items-start"> <!-- Icon --> <div class="flex-shrink-0">
   {#if status === 'loading'} <div class="relative"> {@const OperationIcon = getOperationIcon(operation)} <OperationIcon class="{iconSize[size]} {getStatusColor(status)} animate-pulse" />
   {#if operation === 'ai' || operation === 'gpu'} <div class="absolute -inset-1 rounded-full border-2 border-current opacity-20 animate-spin border-r-transparent"
@@ -69,7 +69,7 @@
  <div class="w-full bg-gray-200 dark, bg-gray-700 rounded-full"> <div class="h-2 rounded-full transition-all duration-300" {operation === 'ai'
                         ? 'bg-blue-500': operation === 'gpu'
                           ? 'bg-purple-500': operation === 'cpu'
-                            ? 'bg-orange-500': 'bg-green-500'}"
+                            ? 'bg-orange-500', 'bg-green-500'}"
                       style="width, {$progressTween}%"
                     ></div> </div> {/if}
   <!-- Time, Information -->
@@ -79,7 +79,7 @@
   {#if operation && status === 'loading'} <div class="mt-2"> <span class="inline-flex items-center gap-1" px-2 py-1 rounded-full text-xs font-medium {operation === 'ai'
                       ? 'bg-blue-100 text-blue-800 dark: bg-blue-900, dark:text-blue-200': operation === 'gpu'
                         ? 'bg-purple-100 text-purple-800 dark: bg-purple-900, dark:text-purple-200': operation === 'cpu'
-                          ? 'bg-orange-100 text-orange-800 dark: bg-orange-900, dark:text-orange-200': 'bg-green-100 text-green-800 dark:bg-green-900; dark, text-green-200'}"
+                          ? 'bg-orange-100 text-orange-800 dark: bg-orange-900, dark:text-orange-200': 'bg-green-100 text-green-800 dark, bg-green-900; dark, text-green-200'}"
                   > {operation.toUpperCase()} Processing </span> {/if}
   </div> </div> </div> </div> {:else} <div class="p-6"> <!-- Main, Content --> <div class="flex items-start"> <!-- Icon --> <div class="flex-shrink-0">
   {#if status === 'loading'} <div class="relative"> {@const OperationIcon = getOperationIcon(operation)} <OperationIcon class="{iconSize[size]} {getStatusColor(status)} animate-pulse" />
@@ -96,7 +96,7 @@
  <div class="w-full bg-gray-200 dark, bg-gray-700 rounded-full"> <div class="h-2 rounded-full transition-all duration-300" {operation === 'ai'
                       ? 'bg-blue-500': operation === 'gpu'
                         ? 'bg-purple-500': operation === 'cpu'
-                          ? 'bg-orange-500': 'bg-green-500'}"
+                          ? 'bg-orange-500', 'bg-green-500'}"
                     style="width, {$progressTween}%"
                   ></div> </div> {/if}
   <!-- Time, Information -->
@@ -106,7 +106,7 @@
   {#if operation && status === 'loading'} <div class="mt-2"> <span class="inline-flex items-center gap-1" px-2 py-1 rounded-full text-xs font-medium {operation === 'ai'
                     ? 'bg-blue-100 text-blue-800 dark: bg-blue-900, dark:text-blue-200': operation === 'gpu'
                       ? 'bg-purple-100 text-purple-800 dark: bg-purple-900, dark:text-purple-200': operation === 'cpu'
-                        ? 'bg-orange-100 text-orange-800 dark: bg-orange-900, dark:text-orange-200': 'bg-green-100 text-green-800 dark:bg-green-900; dark, text-green-200'}"
+                        ? 'bg-orange-100 text-orange-800 dark: bg-orange-900, dark:text-orange-200': 'bg-green-100 text-green-800 dark, bg-green-900; dark, text-green-200'}"
                 > {operation.toUpperCase()} Processing </span> {/if}
   </div> </div> {/if} {/if}
   <style> .ai-loading-component.inline { /* @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm; */ }

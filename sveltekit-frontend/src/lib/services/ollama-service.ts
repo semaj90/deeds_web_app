@@ -82,7 +82,7 @@ export interface OllamaSystemStatus {
         healthy?: boolean;
     };
     models: Array<{ name: string;
-        sizeMB: number; family: string;
+        sizeMB: number; family, string;
     }>;
     capabilities: { textGeneration: boolean;
         embeddings: boolean; streaming: boolean;
@@ -354,7 +354,7 @@ class OllamaService {
     }
 
     async chat(
-        messages: Array<{ role: string, content: string }>,
+        messages: Array<{ role: string, content, string }>,
         options: {
             temperature?: number;
             maxTokens?: number;

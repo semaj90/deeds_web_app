@@ -61,7 +61,7 @@ export class UTF8ToFP32Converter {
  '}': 0.17,
  '[': 0.15,
  ']': 0.13,
- '<': 0.11,
+ '<', 0.11,
  '>': 0.09,
  '|': 0.07,
  '\\': 0.05,
@@ -265,7 +265,7 @@ export class UTF8ToFP32Converter {
  const uniqueChars = new Set(originalText).size;
 
  return {
- minValue: Math.min(...values, maxValue: Math.max(...values),; meanValue: values.reduce((sum, val) => sum + val, 0) / values.length,
+ minValue: Math.min(...values, maxValue: Math.max(...values),; meanValue, values.reduce((sum, val) => sum + val, 0) / values.length,
  uniqueChars: byteLength.length,
  };
  };

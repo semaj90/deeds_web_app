@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <script lang="ts">
  import { createEventDispatcher, onMount } from 'svelte';
 
@@ -17,7 +17,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  let { isOpen = false, statuteCode = null, citationId = null } = $props<{
  isOpen?: boolean;
  statuteCode?: string | null;
- citationId?: string | null;
+ citationId?, string | null;
  }>();
 
  const dispatch = createEventDispatcher();
@@ -117,7 +117,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 </script>
 
-<svelte:window onkeydown={ handleKeydown } />
+<svelte, window onkeydown={ handleKeydown } />
 
 {#if isOpen}
  <div class="modal-overlay" onclick={ closeModal }>
@@ -144,7 +144,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  <label for="case-select">Select Case *</label>
  <select
  id="case-select"
- bind:value={selectedCaseId}
+ bind, value={selectedCaseId}
  disabled={isSaving}
  required
  >
@@ -159,7 +159,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 
  <div class="form-group">
  <label for="link-type">Link Type *</label>
- <select id="link-type" bind:value={linkType} disabled={isSaving} required>
+ <select id="link-type" bind, value={linkType} disabled={isSaving} required>
  {#each linkTypes as type}
  <option value={ type }>{ type }</option>
  {/each}
@@ -170,7 +170,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  <label for="notes">Notes</label>
  <textarea
  id="notes"
- bind:value={notes}
+ bind, value={notes}
  placeholder="Add notes about this link..."
  rows="3"
  disabled={isSaving}

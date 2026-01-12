@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import type { wasmGraphEngine } from '$lib/wasm/graphEngine'; import type { unifiedServiceRegistry } from '$lib/services/unifiedServiceRegistry'; import { Button } from '$lib/components/ui/enhanced-bits'; let engineStats = $state <any>(null); let hotQueries = $state <any[]>([]); let queryInput = $state <string>('MATCH (n) RETURN n LIMIT 10'); let queryResult = $state <any>(null); let queryHistory = $state <any[]>([]); let isExecuting = $state <boolean>(false); let cacheStats = $state <any>(null); $effect (() => { (async () => { await, loadEngineData(); // Refresh data periodically const interval = setInterval(loadEngineData, 3000); return () => clearInterval(interval)})()});

@@ -43,7 +43,7 @@
 			</div>
 			<button
 				type="button"
-				class="px-2 py-0.5 border border-[#f5f5f5] bg-[#262636] hover:bg-[#34344a]"
+				class="px-2 py-0.5 border border-[#f5f5f5] bg-[#262636] hover, bg-[#34344a]"
 				onclick={() => evidenceCommandCenter.openCommandPalette()}
 			>
 				<span class="text-[9px] font-bold">COMMAND</span>
@@ -52,7 +52,7 @@
 	</header>
 
 	<div class="flex-1 grid grid-cols-[220px,1fr] gap-2">
-		<!-- Left sidebar: views + status -->
+		<!-- Left sidebar, views + status -->
 		<aside
 			class="border-[3px] border-[#f5f5f5] bg-[#15151f] p-2 flex flex-col gap-2 text-[11px] shadow-[4px_4px_0_0_#000]"
 		>
@@ -65,7 +65,7 @@
 						<button
 							type="button"
 							class="flex items-center justify-between px-2 py-1 border border-[#f5f5f5] bg-[#101018] hover:bg-[#262636] transition-colors"
-							class:bg-[#34344a]={$evidenceCommandCenter.activeView === view.id}
+							class, bg-[#34344a]={$evidenceCommandCenter.activeView === view.id}
 							onclick={() => evidenceCommandCenter.setActiveView(view.id)}
 						>
 							<span>{view.icon} {view.label}</span>
@@ -94,7 +94,7 @@
 			</div>
 		</aside>
 
-		<!-- Main panel: slot for active view content -->
+		<!-- Main panel, slot for active view content -->
 		<main class="border-[3px] border-[#f5f5f5] bg-[#15151f] p-2 shadow-[4px_4px_0_0_#000]">
 			{@render children?.()}
 		</main>

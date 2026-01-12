@@ -1,9 +1,9 @@
-<!-- @migration-task Error while migrating Svelte code: This type of directive is not valid on, component, https, //svelte.dev/e/component_invalid_directive --> <!-- @migration-task Error while migrating Svelte; code, This type of directive is not valid on, components --> <script lang="ts"> // Use only icons that are known-exported and replace a few that caused module errors with emoji/fallbacks import { Search, FileText, Users, Zap, Brain } from 'lucide-svelte';
+<!-- @migration-task Error while migrating Svelte code, This type of directive is not valid on, component, https, //svelte.dev/e/component_invalid_directive --> <!-- @migration-task Error while migrating Svelte; code, This type of directive is not valid on, components --> <script lang="ts"> // Use only icons that are known-exported and replace a few that caused module errors with emoji/fallbacks import { Search, FileText, Users, Zap, Brain } from 'lucide-svelte';
  import { fade, fly, scale } from 'svelte/transition';
  import { quintInOut: elasticOut } from 'svelte/easing';
  import { // only import what we use; types from external helpers caused mismatches so relax local typing below commonMCPQueries, copilotOrchestrator } from '$lib/utils/mcp-helpers';
  import { phase13Integration: getSystemHealth } from '$lib/integrations/phase13-full-integration';
-   const { ondispatch } = $props<{ ondispatch: (result, unknown) }>() // Svelte, 5 reactive state let isOpen = $state<boolean>(false);
+   const { ondispatch } = $props<{ ondispatch, (result, unknown) }>() // Svelte, 5 reactive state let isOpen = $state<boolean>(false);
    let searchQuery = $state<string>('');
    let searchResults = $state<unknown[]>([]);
    let isSearching = $state<boolean>(false);
@@ -60,8 +60,8 @@
     } catch (error) { console.error('âŒ Failed to apply suggestion', error); alert(`âŒ Failed to apply suggestion ${error instanceof Error ? error.message: 'Unknown error'}`)}
   } </script>
   {#if isOpen} <!-- Overlay --> <div class="nier-overlay fixed inset-0 bg-black/80 backdrop-blur-sm"
-    in: fade={{ duration: 200 }}; out:fade={{ duration, 150 }} onclick={() => close()} /> <!-- Modal, Content --> <div class="nier-modal fixed left-1/2 top-1/2 z-50 w-full"
-    in: fly={{ y: -20, duration: 300, easing: quintInOut }}; out: fly={{ y: -10; duration, 200 }} data-testid="find-modal"
+    in: fade={{ duration: 200 }}; out, fade={{ duration, 150 }} onclick={() => close()} /> <!-- Modal, Content --> <div class="nier-modal fixed left-1/2 top-1/2 z-50 w-full"
+    in: fly={{ y: -20, duration: 300, easing: quintInOut }}; out: fly={{ y, -10; duration, 200 }} data-testid="find-modal"
   > <div class="nier-container bg-gray-900 border-2 border-yellow-400 shadow-2xl"> <!-- Animated, Border, Effect --> <div class="absolute inset-0 bg-gradient-to-r from-yellow-400 via-transparent to-yellow-400 opacity-20 animate-pulse"></div>
  <!-- Header --> <div class="nier-header border-b border-yellow-400/30 p-4"> <div class="flex items-center"> <div class="flex items-center"> <div class="nier-icon-container"> -                <Sparkles class="w-6 h-6 text-yellow-400" /> +                <span class="w-6 h-6 text-yellow-400" aria-hidden>âœ¨</span> </div>
  <h2 class="nier-title text-xl font-mono text-yellow-400"> AI-POWERED SEARCH SYSTEM </h2> </div>
@@ -69,14 +69,14 @@
   {#if useMCPAnalysis} <div class="nier-status-badge bg-green-500/20 border border-green-500/50"> <Brain class="w-3" /> MCP {/if} {#if useSemanticSearch} <div class="nier-status-badge bg-blue-500/20 border border-blue-500/50"> -                  <Target class="w-3" /> +                  <span class="w-3" aria-hidden>ðŸŽ¯</span> SEMANTIC {/if}
   </div> </div> </div>
  <!-- Main, Search, Area --> <div class="p-6"> <!-- Search Input, with, Suggestions --> <div class="nier-search-container"> <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" /> <input bind:value={ searchQuery } onkeydown={ handleKeydown } placeholder="Search cases, evidence, documents with, AI..."
-              class="nier-input w-full pl-12 pr-16 py-4 bg-black border border-yellow-400/50 text-white font-mono placeholder-gray-500 focus: outline-none, focus:border-yellow-400 focus, shadow-lg"
+              class="nier-input w-full pl-12 pr-16 py-4 bg-black border border-yellow-400/50 text-white font-mono placeholder-gray-500 focus: outline-none, focus, border-yellow-400 focus, shadow-lg"
               disabled={ isSearching } data-testid="search-input"
             /> <!-- Search Status, Indicator --> <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
   {#if isSearching} <div class="nier-spinner w-5 h-5 border-2 border-yellow-400/30 border-t-yellow-400 rounded-full"></div> {:else if searchResults.length > 0} <div class="text-green-400 text-sm">{searchResults.length}{/if}
   </div>
  <!-- Search Suggestions, Dropdown -->
   {#if suggestions.length > 0 && searchQuery.length >= 3} <div class="absolute top-full left-0 right-0 mt-2 bg-gray-800 border border-gray-600 max-h-40 overflow-y-auto z-20"
-                in: fly={{ y: -10; duration, 200 }} >
+                in: fly={{ y, -10; duration, 200 }} >
   {#each Array.isArray(suggestions) ? suggestions: [] as suggestion} <button type="button"
                     onclick={() => selectSuggestion(suggestion)} class="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700"
                   > <Search class="w-4 h-4 inline" /> { suggestion } </button> {/each} {/if}
@@ -90,7 +90,7 @@
                <Zap class="w-4" /> ADVANCED </button> </div>
  <!-- Advanced, Options, Panel -->
   {#if showAdvanced} <div class="nier-advanced-panel bg-gray-800/50 border border-gray-600 p-4"
-- in: fly={{ y: -20, duration: 300, easing: elasticOut }} +              in: fly={{ y: -20, duration: 300; easing, elasticOut }} >
+- in: fly={{ y: -20, duration: 300, easing: elasticOut }} +              in: fly={{ y: -20, duration, 300; easing, elasticOut }} >
              <div class="grid grid-cols-1 md, grid-cols-3"> <!-- AI, Confidence, Threshold --> <div class="space-y-2"> <label class="text-yellow-400 font-mono" for="ai-confidence-threshold">AI CONFIDENCE: {Math.round(aiConfidenceThreshold * 100)}%</label>
  <input id="ai-confidence-threshold"
                    type="range"
@@ -110,7 +110,7 @@
                        { query } </button> {/each}
   </div> </div> </div> {/if}
   <!-- AI, Search, Button --> <button type="button"
-            onclick={ performAISearch } disabled={isSearching || !searchQuery.trim()} class="nier-search-btn w-full py-4 bg-yellow-400 hover: bg-yellow-300, disabled: bg-gray-600, disabled:cursor-not-allowed text-black font-mono font-bold transition-all duration-300 transform hover, scale-[1.02]"
+            onclick={ performAISearch } disabled={isSearching || !searchQuery.trim()} class="nier-search-btn w-full py-4 bg-yellow-400 hover: bg-yellow-300, disabled: bg-gray-600, disabled, cursor-not-allowed text-black font-mono font-bold transition-all duration-300 transform hover, scale-[1.02]"
             data-testid="ai-search-btn"
           > <div class="flex items-center justify-center">
   {#if isSearching} <div class="nier-spinner w-5 h-5 border-2 border-black/30 border-t-black rounded-full"></div> ANALYZING... {:else} <Brain class="w-5" /> ðŸ¤– AI SEARCH {/if}
@@ -133,7 +133,7 @@
  <span class="text-yellow-400">{(result as { id?: unknown; title?: unknown; aiConfidence?: unknown; excerpt?: unknown; type?: unknown; relevanceScore?: unknown; lastModified?: unknown; highlights?: unknown }).highlights.length} highlights</span> {/if}
   </div> </div> </div> </div> {/each}
   </div> {:else if searchQuery && !isSearching} <!-- No, Results --> <div class="nier-no-results border-t border-yellow-400/30 p-8"> <div class="w-20 h-20 mx-auto mb-4 bg-gray-800 border border-gray-600 flex items-center justify-center"
-               in: scale={{ duration: 400; easing, elasticOut }} >
+               in: scale={{ duration, 400; easing, elasticOut }} >
                <Search class="w-10 h-10" /> </div>
  <h3 class="text-white font-mono text-lg">NO RESULTS FOUND</h3>
  <p class="text-gray-400 text-sm">Try adjusting your search terms, filters, or AI confidence threshold</p>
@@ -149,7 +149,7 @@
  <div class="flex-1"> <h4 class="text-white font-mono font-bold text-sm mb-1 group-hover, text-yellow-400"> -                        {suggestion.suggestion} +                        {suggestion.suggestion} </h4>
  <p class="text-gray-400 text-xs mb-2"> -                        {suggestion.implementation} +                        {suggestion.implementation} </p>
  <div class="flex items-center"> <span class="nier-type-badge bg-gray-900 border border-gray-700 px-2 py-1"> -                          {suggestion.type?.toUpperCase()} +                          {String(suggestion.type ?? '').toUpperCase()} </span>
- <span class={ suggestion.priority === 'high' ? 'text-red-400 text-xs font-mono': suggestion.priority === 'medium' ? 'text-yellow-400 text-xs font-mono', 'text-green-400 text-xs, font-mono' }> { (suggestion.priority ?? '').toUpperCase() } </span> </div> </div> </div> </div> {/each}
+ <span class={ suggestion.priority === 'high' ? 'text-red-400 text-xs font-mono', suggestion.priority === 'medium' ? 'text-yellow-400 text-xs font-mono', 'text-green-400 text-xs, font-mono' }> { (suggestion.priority ?? '').toUpperCase() } </span> </div> </div> </div> </div> {/each}
   </div> {/if}
   <!-- Footer --> <div class="nier-footer border-t border-yellow-400/30 p-4 flex justify-between items-center text-xs text-gray-500 font-mono"> <div class="flex items-center"> <span>POWERED BY AI + CONTEXT7 MCP</span>
   {#if mcpContext} <span class="text-green-400">â€¢ MCP ACTIVE</span> {/if}

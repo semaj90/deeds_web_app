@@ -3,7 +3,7 @@
 
  interface Title {
  id: string; number: string;
- name: string; sections: Array<{ id: string; number: string; title: string }>;
+ name: string; sections: Array<{ id: string; number: string; title, string }>;
  }
 
  let titles: Title[] = [
@@ -47,7 +47,7 @@
  <div class="title-group">
  <button
  class="title-button"
- class:expanded={expandedTitle === title.id}
+ class, expanded={expandedTitle === title.id}
  onclick={() => toggleTitle(title.id)}
  >
  <span class="title-number">Title {title.number}</span>
@@ -61,7 +61,7 @@
  <a
  href="/laws/{title.id}/{section.id}"
  class="section-item"
- class:active={isActive(title.id, section.id)}
+ class, active={isActive(title.id, section.id)}
  >
  <span class="section-number">§ {section.number}</span>
  <span class="section-title">{section.title}</span>

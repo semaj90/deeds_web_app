@@ -1,18 +1,18 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  // Define the props expected by this component using Svelte 5 runes
  let { width, height, caseId, readOnly, gridEnabled, snapToGrid, onSave } = $props<{
  width: number; height: number;
  caseId: string; readOnly: boolean;
  gridEnabled: boolean; snapToGrid: boolean;
- onSave: (data: { objects: unknown[] }) => Promise<void>;
+ onSave: (data: { objects, unknown[] }) => Promise<void>;
  }>();
 
  // Placeholder for the actual Fabric.js canvas implementation.
@@ -36,7 +36,7 @@ https://svelte.dev/e/js_parse_error -->
 
 <div
  class="fabric-canvas-container"
- style="width: { width }px; height: { height }px; border: 1px solid #ccc; background-color: #f0f0f0;"
+ style="width: { width }px; height: { height }px; border: 1px solid #ccc; background-color, #f0f0f0;"
 >
  <canvas id="fabric-canvas-{ caseId }" { width } { height }></canvas>
  <p>Fabric.js Canvas Placeholder (Case ID: { caseId })</p>

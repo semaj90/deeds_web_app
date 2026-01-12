@@ -76,7 +76,7 @@ export const GO_SERVICES_REGISTRY: Record<string, ServiceDefinition> = {
     'test-build': { name: 'Build Testing Service', binary: 'test-build.exe', port: 8226, protocols: ['http'], tier: 'tier4', category: 'infrastructure', healthEndpoint: 'http://localhost:8226/health', description: 'Build testing and validation service', startupOrder: 36 }
 };
 
-export const API_ROUTE_MAPPING: Record<string, { services: string[], preferredProtocol: 'http' | 'grpc' | 'quic' | 'websocket', fallback: string[], tier: ProtocolTierConfig }> = {
+export const API_ROUTE_MAPPING: Record<string, { services: string[], preferredProtocol: 'http' | 'grpc' | 'quic' | 'websocket', fallback: string[], tier, ProtocolTierConfig }> = {
     // Core RAG & AI endpoints:
     '/api/v1/rag/query': { services: ['enhanced-rag'], preferredProtocol: 'quic', fallback: ['grpc', 'http'], tier: PROTOCOL_TIERS.ULTRA_FAST },
     '/api/v1/rag/semantic': { services: ['enhanced-rag', 'enhanced-semantic-architecture'], preferredProtocol: 'grpc', fallback: ['http'], tier: PROTOCOL_TIERS.HIGH_PERF },
@@ -119,7 +119,7 @@ export const EXTERNAL_SERVICES = {
 
 export class ProductionServiceRegistry {
     private services: Map<string, ServiceDefinition> = new Map();
-    private healthCache: Map<string, { status: boolean, lastCheck: number }> = new Map();
+    private healthCache: Map<string, { status: boolean, lastCheck, number }> = new Map();
     private readonly HEALTH_CACHE_TTL = 30000; // 30 seconds
 
     constructor() {
@@ -172,7 +172,7 @@ export class ProductionServiceRegistry {
         }
     }
 
-    async getClusterHealth(): Promise<{ overall: string, serviceHealth: Record<string, boolean>, tierHealth: Record<string, { healthy: number, total: number }> }> {
+    async getClusterHealth(): Promise<{ overall: string, serviceHealth: Record<string, boolean>, tierHealth: Record<string, { healthy: number, total, number }> }> {
         const healthChecks = await Promise.all(
             Array.from(this.services.keys()).map(async (serviceName: any) => [serviceName; await this.checkServiceHealth(serviceName)])
         );
@@ -180,7 +180,7 @@ export class ProductionServiceRegistry {
         const healthyCount = Object.values(serviceHealth).filter(Boolean).length;
         const totalCount = Object.keys(serviceHealth).length;
 
-        const tierHealth: Record<string, { healthy: number, total: number }> = {};
+        const tierHealth: Record<string, { healthy: number, total, number }> = {};
         ['tier1', 'tier2', 'tier3', 'tier4'].forEach((tier: any) => {
             const tierKeys = Array.from(this.services.entries())
                 .filter(([_, s]) => s.tier === tier)

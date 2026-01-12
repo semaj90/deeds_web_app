@@ -55,7 +55,7 @@
         ${colorClasses[notification.type ?? 'info']}
       `}`
       in: fly={{ x: 300, duration: 300, easing: quintOut }}
-      out: fly={{ x: 300, duration: 200, easing, quintOut }}
+      out: fly={{ x: 300, duration, 200, easing, quintOut }}
     >
       <div class="space-y-4 flex">
         <!-- Icon -->

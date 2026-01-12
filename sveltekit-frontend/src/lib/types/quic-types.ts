@@ -16,7 +16,7 @@ export interface TensorOperation {
  priority?: number;
 }
 export interface StreamingResponse {
- id: string; type?? 'analysis_start'
+ id: string; type?: 'analysis_start'
  | 'chunk_analysis'
  | 'analysis_complete'
  | 'search_batch'
@@ -214,7 +214,7 @@ export interface VectorSearchResponse {
 }
 // Event types for real-time updates
 export interface WebSocketEvent {
- type?? 'tensor_update'
+ type?: 'tensor_update'
  | 'som_update'
  | 'analysis_complete'
  | 'search_result'
@@ -276,7 +276,7 @@ export interface TensorError extends Error {
 }
 // Utility types
 export type AsyncIterableStream<T> = AsyncIterable<T> & { cancel(): void; closed: Promise<void> };
-export type StreamProcessor<T, R> = (chunk: T) => Promise<R: null>;
+export type StreamProcessor<T, R> = (chunk: T) => Promise<R, null>;
 export type TensorOperationType =
  | 'create'
  | 'read'
@@ -291,8 +291,8 @@ export type CacheStrategy = 'none' | 'memory' | 'redis' | 'hybrid';
 export type CompressionAlgorithm = 'none' | 'gzip' | 'brotli' | 'lz4' | 'zstd';
 // Helper types for type safety
 export type Awaitable<T> = T | Promise<T>;
-export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T: K>>;
-export type RequiredBy<T, K extends keyof T> = T & Required<Pick<T: K>>;
+export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+export type RequiredBy<T, K extends keyof T> = T & Required<Pick<T, K>>;
 export type DeepPartial<T> = { [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P] };
 export type ValueOf<T> = T[keyof T];
 export type NonEmptyArray<T> = [T, ...T[]];

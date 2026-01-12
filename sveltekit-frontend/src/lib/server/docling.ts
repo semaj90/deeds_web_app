@@ -98,9 +98,9 @@ export async function analyzeDocumentWithDocling(args: AnalyzeArgs): Promise<Doc
  */
 export async function analyzeDocumentsWithDocling(
  documents: Array<{ fileBuffer: Buffer;
- mimeType: string; filename: string;
+ mimeType: string; filename, string;
  }>
-): Promise<Array<DoclingResult & { filename: string }>> {
+): Promise<Array<DoclingResult & { filename, string }>> {
  console.log(`📦 Analyzing ${documents.length} documents with Docling...`);
 
  const results = await Promise.allSettled(
@@ -194,11 +194,11 @@ export async function processWithDocling(filePath: string): Promise<{ text: stri
  confidence?: number; processingTime: number;
  };
  tables?: Array<{ content: string[][];
- bbox?: number[];
+ bbox?, number[];
  }>;
  images?: Array<{ content: Buffer;
  bbox?: number[];
- caption?: string;
+ caption?, string;
  }>;
  method: string;
 }> {

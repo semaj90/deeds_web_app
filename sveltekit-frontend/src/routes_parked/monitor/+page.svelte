@@ -4,7 +4,7 @@
  import { onDestroy, onMount } from 'svelte';
  import type { PageData } from './$types';
 
- let { data } = $props<{ data: PageData }>();
+ let { data } = $props<{ data, PageData }>();
 
  // Service health and metrics state
  let services = $state ([
@@ -206,10 +206,10 @@
  });
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Phase 71 AI Platform Monitor</title>
  <meta name="description" content="Real-time monitoring dashboard for the unified legal AI platform" />
-</svelte:head>
+</svelte, head>
 
 <div class="min-h-screen bg-gray-50 p-6">
  <div class="max-w-7xl mx-auto">
@@ -225,7 +225,7 @@
  <button
  onclick={refreshAllMetrics}
  disabled={isRefreshing}
- class="px-4 py-2 bg-blue-600 text-white rounded-lg hover: bg-blue-700, disabled: opacity-50, disabled:cursor-not-allowed flex items-center gap-2"
+ class="px-4 py-2 bg-blue-600 text-white rounded-lg hover: bg-blue-700, disabled: opacity-50, disabled, cursor-not-allowed flex items-center gap-2"
  >
  {#if isRefreshing}
  <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
@@ -241,7 +241,7 @@
  </div>
 
  <!-- System Overview -->
- <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+ <div class="grid grid-cols-1 md, grid-cols-4 gap-6 mb-8">
  <div class="bg-white rounded-lg shadow p-6">
  <div class="flex items-center justify-between">
  <div>
@@ -284,9 +284,9 @@
  </div>
 
  <!-- Service Status Grid -->
- <div class="grid grid-cols-1 lg: grid-cols-2, xl:grid-cols-3 gap-6 mb-8">
+ <div class="grid grid-cols-1 lg: grid-cols-2, xl, grid-cols-3 gap-6 mb-8">
  {#each services as service}
- <div class="bg-white rounded-lg shadow p-6" transitionfade={{ duration: 300 }}>
+ <div class="bg-white rounded-lg shadow p-6" transitionfade={{ duration, 300 }}>
  <div class="flex items-center justify-between mb-4">
  <h3 class="text-lg font-semibold text-gray-900">{service.name}</h3>
  <span class="px-2 py-1 rounded-full text-xs font-medium {getStatusColor(service.status)}">
@@ -340,7 +340,7 @@
  <div class="bg-white rounded-lg shadow p-6">
  <h2 class="text-xl font-semibold text-gray-900 mb-6">Performance Trends</h2>
 
- <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-6">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-4 gap-6">
  <!-- Latency Chart -->
  <div class="space-y-2">
  <h3 class="text-sm font-medium text-gray-700">Average Latency (ms)</h3>
@@ -348,7 +348,7 @@
  {#each performanceHistory.latency as value, i}
  <div
  class="bg-blue-500 rounded-t flex-1 min-w-[4px]"
- style="height: {(value / Math.max(...performanceHistory.latency)) * 100}%"
+ style="height, {(value / Math.max(...performanceHistory.latency)) * 100}%"
  title={`${value.toFixed(0)}ms`}
  ></div>
  {/each}
@@ -362,7 +362,7 @@
  {#each performanceHistory.throughput as value, i}
  <div
  class="bg-green-500 rounded-t flex-1 min-w-[4px]"
- style="height: {(value / Math.max(...performanceHistory.throughput)) * 100}%"
+ style="height, {(value / Math.max(...performanceHistory.throughput)) * 100}%"
  title={`${value.toLocaleString()}`}
  ></div>
  {/each}
@@ -376,7 +376,7 @@
  {#each performanceHistory.memory as value, i}
  <div
  class="bg-yellow-500 rounded-t flex-1 min-w-[4px]"
- style="height: { value }%"
+ style="height, { value }%"
  title={`${value.toFixed(1)}%`}
  ></div>
  {/each}
@@ -390,7 +390,7 @@
  {#each performanceHistory.gpu as value, i}
  <div
  class="bg-purple-500 rounded-t flex-1 min-w-[4px]"
- style="height: {value}%"
+ style="height, {value}%"
  title={`${value.toFixed(1)}%`}
  ></div>
  {/each}

@@ -342,7 +342,7 @@ class XStateStoreManager {
  }
  private handleCrossTabSync(data: any): void {
  // Handle synchronization between tabs
- if (!data || typeof data !== 'object' || !('type' in (data as Record<string: unknown>))) return;
+ if (!data || typeof data !== 'object' || !('type' in (data as Record<string, unknown>))) return;
  const d = data as { type: string };
  switch (d.type) {
  case 'app-state-change': // Optionally merge or rehydrate the appActor state break;

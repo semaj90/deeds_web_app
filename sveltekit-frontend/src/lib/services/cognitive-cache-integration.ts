@@ -430,7 +430,7 @@ async function sha256(str: string): Promise<string> {
 class CognitiveCacheManager {
  private localCache = new Map<
  string,
- { data: unknown, metadata: CacheEntryMetadata, options: CacheOptions, timestamp: number }
+ { data: unknown, metadata: CacheEntryMetadata, options: CacheOptions, timestamp, number }
  >();
 
  constructor() {

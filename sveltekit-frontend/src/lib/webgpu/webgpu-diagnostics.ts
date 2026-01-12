@@ -9,7 +9,7 @@ interface GPUAdapterInfo {
 }
 
 interface GPUAdapterWithInfo extends GPUAdapter {
- requestAdapterInfo: () => Promise<GPUAdapterInfo: null>;
+ requestAdapterInfo: () => Promise<GPUAdapterInfo, null>;
 }
 
 interface NavigatorWithGPU extends Navigator {

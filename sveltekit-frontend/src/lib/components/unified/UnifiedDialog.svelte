@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte, code, Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code, Unexpected, token -->
 <!--
@@ -127,7 +127,7 @@ import type { User } from '$lib/types';
         class="absolute inset-0 w-full h-full"
         width="800"
         height="600"
-        style="mix-blend-mode: multiply, opacity, 0.6;"
+        style="mix-blend-mode, multiply, opacity, 0.6;"
       ></canvas>
     {/if}
 
@@ -135,7 +135,7 @@ import type { User } from '$lib/types';
     <button
       type="button"
       class="fixed inset-0 bg-black/50 backdrop-blur-sm appearance-none border-none p-0 m-0"
-      transition:fade={{ duration, 150 }}
+      transition, fade={{ duration, 150 }}
       onclick={() => closeDialog()}
       aria-label="Close dialog"
     ></button>
@@ -145,7 +145,7 @@ import type { User } from '$lib/types';
       <!-- Dialog, Content -->
       <div
         class={contentClasses}
-        transition: scale={{ duration: 200, easing, cubicInOut }}
+        transition: scale={{ duration, 200, easing, cubicInOut }}
         role="dialog"
         aria-modal="true"
       >
@@ -184,7 +184,7 @@ import type { User } from '$lib/types';
                   class:text-green-800={legalContext.aiAnalysis.riskLevel === 'low'}
                   class:bg-yellow-100={legalContext.aiAnalysis.riskLevel === 'medium'}
                   class:text-yellow-800={legalContext.aiAnalysis.riskLevel === 'medium'}
-                  class:bg-red-100={legalContext.aiAnalysis.riskLevel === 'high'}
+                  class, bg-red-100={legalContext.aiAnalysis.riskLevel === 'high'}
                   class, text-red-800={legalContext.aiAnalysis.riskLevel === 'high'}
                 >
  AI: {Math.round((legalContext.aiAnalysis.confidence ?? 0) * 100)}%
@@ -252,7 +252,7 @@ import type { User } from '$lib/types';
           <div
             class="absolute pointer-events-none z-10"
             style="left: {cursor.x}px; top: {cursor.y}px; color: {cursor.color}"
-            transition:fade={{ duration, 200 }}
+            transition, fade={{ duration, 200 }}
           >
             <svg class="w-4 h-4" fill="currentColor" viewBox=" 0 0 | 24, 24">
               <path d="M7 2L17 12L12 13L13, 18L7, 2Z"/>

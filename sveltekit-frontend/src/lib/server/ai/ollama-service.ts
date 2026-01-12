@@ -206,7 +206,7 @@ class EnhancedOllamaService extends Events {
         }
     }
 
-    private startQueueProcessor(): void {
+    private startQueueProcessor(), void {
         if (!this.queueIntervalId) {
             this.queueIntervalId = setInterval(() => this.processQueue(), 100);
         }

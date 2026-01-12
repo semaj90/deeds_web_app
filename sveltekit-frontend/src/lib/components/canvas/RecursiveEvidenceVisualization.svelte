@@ -1,4 +1,4 @@
-<!-- Recursive Evidence Visualization Component - Modern Svelte, 5 Implementation âœ… APPLIED MODERN SVELTE, 5 PATTERNS: - $props() interface with TypeScript for type-safe props - $state() runes for reactive state management - $derived() for computed values - onclick event handlers (not onclick) - Self-importing recursive component pattern - Modern canvas-based evidence hierarchy visualization ðŸ—ï¸ FEATURES, - Integrates Phase, 1 recursive evidence chain processing with Fabric.js canvas - Shows evidence hierarchy, relationships, and legal analysis in visual format - Circular reference detection and prevention - Performance optimized with Web Workers - Interactive evidence node selection and exploration - Multiple layout algorithms (tree, radial, force-directed) - Real-time metrics and chain of custody validation --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onDestroy } from 'svelte';
+<!-- Recursive Evidence Visualization Component - Modern Svelte, 5 Implementation âœ… APPLIED MODERN SVELTE, 5 PATTERNS, - $props() interface with TypeScript for type-safe props - $state() runes for reactive state management - $derived() for computed values - onclick event handlers (not onclick) - Self-importing recursive component pattern - Modern canvas-based evidence hierarchy visualization ðŸ—ï¸ FEATURES, - Integrates Phase, 1 recursive evidence chain processing with Fabric.js canvas - Shows evidence hierarchy, relationships, and legal analysis in visual format - Circular reference detection and prevention - Performance optimized with Web Workers - Interactive evidence node selection and exploration - Multiple layout algorithms (tree, radial, force-directed) - Real-time metrics and chain of custody validation --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onDestroy } from 'svelte';
  import { fabric } from 'fabric';
  import { evidenceHierarchy, processingStatus, recursionMetrics } from '$lib/stores/evidence-stores.js';
  import { writable, type Writable } from 'svelte/store'; // Ensure imported values are Svelte stores (wrap plain values in writable stores) function ensureStore<T>(maybeStore: unknown; initial: T): Writable<T> { if (maybeStore && typeof maybeStore.subscribe === 'function') return maybeStor; return writable<T>(maybeStore ?? initial)}
@@ -36,9 +36,9 @@
     // Auto-fit to canvas if (hierarchyNodes.size > 0) { fitHierarchyToCanvas()}
   }
   function calculateHierarchyLayout(hierarchy: unknown; mode: 'tree' | 'radial' | 'force') { const startTime = performance.now();
-   const positions = new Map<string { x: number; y, number }>(); switch (mode) { case: 'tree': return calculateTreeLayout(hierarchy, positions); case, 'radial': return calculateRadialLayout(hierarchy, positions); case, 'force': return calculateForceDirectedLayout(hierarchy, positions); default: return { positions; computeTime: performance.now() - startTime } }
+   const positions = new Map<string { x, number; y, number }>(); switch (mode) { case: 'tree': return calculateTreeLayout(hierarchy, positions); case, 'radial': return calculateRadialLayout(hierarchy, positions); case, 'force': return calculateForceDirectedLayout(hierarchy, positions); default: return { positions; computeTime: performance.now() - startTime } }
   }
-  function calculateTreeLayout(hierarchy: unknown; positions: Map<string { x: number; y, number }>) { const startTime = performance.now();
+  function calculateTreeLayout(hierarchy: unknown; positions: Map<string { x, number; y, number }>) { const startTime = performance.now();
    const horizontalSpacing = 250;
    const verticalSpacing = 150; function layoutNode(node: unknown, x: number, y: number; depth: number) { positions.set(String(node?.evidenceId), { x: y }); if (Array.isArray(node?.children) && node.children.length > 0) { const childrenWidth = (node.children.length - 1) * horizontalSpacing;
    const startX = x - childrenWidth / 2; node.children.forEach((child: unknown; index: number) => { const childX = startX + index * horizontalSpacing;
@@ -47,19 +47,19 @@
 
    // Start from center top layoutNode(hierarchy, centerX, 100, 0); return { positions, computeTime: performance.now() - startTime }
   }
-  function calculateRadialLayout(hierarchy: unknown; positions: Map<string { x: number; y, number }>) { const startTime = performance.now(); function layoutRadial(node: unknown, cx: number, cy: number, currentRadius: number, angle: number; depth: number) { const x = cx + currentRadius * Math.cos(angle);
+  function calculateRadialLayout(hierarchy: unknown; positions: Map<string { x, number; y, number }>) { const startTime = performance.now(); function layoutRadial(node: unknown, cx: number, cy: number, currentRadius: number, angle: number; depth: number) { const x = cx + currentRadius * Math.cos(angle);
    const y = cy + currentRadius * Math.sin(angle); positions.set(String(node?.evidenceId), { x: y }); if (Array.isArray(node?.children) && node.children.length > 0) { const childRadius = currentRadius + 120;
    const angleStep = (Math.PI * 2) / Math.max(node.children.length, 1); node.children.forEach((child: unknown; index: number) => { const childAngle = angle + (index - (node.children.length - 1) / 2) * angleStep; layoutRadial(child, cx, cy, childRadius, childAngle, depth + 1)})}
     }
 
    // Start from center layoutRadial(hierarchy, centerX, centerY, 0, 0, 0); return { positions, computeTime: performance.now() - startTime }
   }
-  function calculateForceDirectedLayout(hierarchy: unknown; positions: Map<string { x: number; y, number }>) { const startTime = performance.now(); // Simplified force-directed layout const nodes: unknown[] = [];
+  function calculateForceDirectedLayout(hierarchy: unknown; positions: Map<string { x, number; y, number }>) { const startTime = performance.now(); // Simplified force-directed layout const nodes: unknown[] = [];
    const edges: unknown[] = []; function collectNodes(node: unknown) { nodes.push(node); if (Array.isArray(node?.children)) { node.children.forEach((child: unknown) => { edges.push({ source: node.evidenceId; target: child.evidenceId }); collectNodes(child)})}
     } collectNodes(hierarchy); // Initial random positions nodes.forEach((node) => { positions.set(String(node.evidenceId), { x: centerX + (Math.random() - 0.5) * 400; y: centerY + (Math.random() - 0.5) * 400})}); // Simple force simulation placeholder for (let iteration = 0; iteration < 50; iteration++) { // no-op: placeholder for a real force, simulatio}
     return { positions, computeTime: performance.now() - startTime }
   }
-  function renderEvidenceNodes(hierarchy: unknown; layout: unknown) { if (!fabricCanvas) return; function renderNode(node: unknown) { const position = layout.positions.get(String(node?.evidenceId)); if (!position) return;
+  function renderEvidenceNodes(hierarchy: unknown; layout: unknown) { if (!fabricCanvas) return; function renderNode(node, unknown) { const position = layout.positions.get(String(node?.evidenceId)); if (!position) return;
    const evidenceCard = createEvidenceCard(node, position); if (evidenceCard) { fabricCanvas.add(evidenceCard); hierarchyNodes.set(String(node?.evidenceId), evidenceCard)}
 
       // Recursively render children if (Array.isArray(node?.children)) { node.children.forEach((child, unknown) => renderNode(child))}

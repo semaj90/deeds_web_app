@@ -48,7 +48,7 @@
 
  <!-- AI Status -->
  <div class="ai-status-section">
- <div class="status-indicator" class:healthy={aiHealthy}>
+ <div class="status-indicator" class, healthy={aiHealthy}>
  {#if aiHealthy}
  <span class="status-icon">🟢</span>
  <span class="status-text">AI Service Ready</span>
@@ -83,7 +83,7 @@
  <input
  id="name"
  type="text"
- bind:value={formData.name}
+ bind, value={formData.name}
  placeholder="e.g., Johnathan Michael Smith"
  class="form-input"
  required
@@ -99,7 +99,7 @@
  <input
  id="alias"
  type="text"
- bind:value={formData.alias}
+ bind, value={formData.alias}
  placeholder="e.g., Johnny, The Shadow"
  class="form-input"
  disabled={loading}
@@ -113,7 +113,7 @@
  </label>
  <textarea
  id="description"
- bind:value={formData.description}
+ bind, value={formData.description}
  placeholder="Provide comprehensive details about this person of interest. Include their background, known activities, affiliations, and any relevant case information. The AI will use this to generate a structured legal profile."
  class="form-textarea"
  rows="6"
@@ -130,7 +130,7 @@
  <input
  id="caseId"
  type="text"
- bind:value={formData.caseId}
+ bind, value={formData.caseId}
  placeholder="e.g., CASE-2024-001"
  class="form-input"
  disabled={loading}

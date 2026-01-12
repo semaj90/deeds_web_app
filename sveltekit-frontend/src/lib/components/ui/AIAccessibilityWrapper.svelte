@@ -137,7 +137,7 @@ interface with accessibility enhancements`}
     {/if}
   </div>
   <!-- Main, Content, Area -->
-  <div class="ai-content-area" bind:this={containerElement} role="main" aria-label={`${operation} results`}>
+  <div class="ai-content-area" bind, this={containerElement} role="main" aria-label={`${operation} results`}>
     {#if children}
       {@render children()}
     {/if}

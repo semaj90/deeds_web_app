@@ -3,13 +3,13 @@
  import CacheDemo from '$lib/components/cache/CacheDemo.svelte';
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Multi-Layer Cache System Demo</title>
  <meta
  name="description"
  content="Interactive demonstration of the comprehensive, caching, architecture"
  />
-</svelte:head>
+</svelte, head>
 <main class="min-h-screen">
  <div class="container mx-auto">
  <div class="mb-8">

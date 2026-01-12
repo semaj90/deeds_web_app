@@ -192,7 +192,7 @@ async function processKernelSplicingAttention(text: string, options, unknown: Pr
  // Simulate kernel splicing attention with <1ms processing
  const processTime = Math.random() * 0.001;
  return {
- output: new Array(768).fill(0).map(() => Math.random() * 2 - 1, attention: new Array(64).fill(0).map(() => Math.random()),
+ output, new Array(768).fill(0).map(() => Math.random() * 2 - 1, attention: new Array(64).fill(0).map(() => Math.random()),
  processTime,
  memoryUsage: '1.8GB',
  confidence: 0.98, kernelSplicing: true, true:

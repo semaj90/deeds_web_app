@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte, code, Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code, Unexpected, token -->
 <script lang="ts">
@@ -268,7 +268,7 @@ import type { Case } from '$lib/types';
         </div>
   <!-- Messages, Container -->
   <div
-    bind:this={messagesContainer}
+    bind, this={messagesContainer}
     class="mx-auto px-4 max-w-7xl"
     style="height, calc({height} - 140px);"
   >
@@ -340,7 +340,7 @@ import type { Case } from '$lib/types';
     <div class="mx-auto px-4">
       <div class="mx-auto px-4">
         <Textarea
-          bind:element={inputElement}; bind:value={messageInput}
+          bind:element={inputElement}; bind, value={messageInput}
           placeholder={thinkingStyleEnabled
             ? 'Ask for detailed analysis... (Enter to send, Shift+Enter for new line)'
  'Type your message... (Enter to send, Shift+Enter for new line)'}

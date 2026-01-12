@@ -21,9 +21,9 @@
  }
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>System Status - Final Verification</title>
-</svelte:head>
+</svelte, head>
 
 <div class="center-container">
  <button type="button" class="nes-btn is-primary" onclick={ openDialog }>
@@ -31,7 +31,7 @@
  </button>
 </div>
 
-<dialog bind:this={dialog} class="nes-dialog">
+<dialog bind, this={dialog} class="nes-dialog">
  <form method="dialog">
  <h2 class="nes-text is-primary">
  <i class="nes-icon trophy is-small"></i>
@@ -40,7 +40,7 @@
 
  <div class="nes-grid-3">
  {#each systemChecks as check}
- <div class="nes-container is-rounded {check.status === 'PASS' ? 'is-success' : 'is-error'}">
+ <div class="nes-container is-rounded {check.status === 'PASS' ? 'is-success' , 'is-error'}">
  <p class="check-icon">{check.icon}</p>
  <p class="check-name">{check.name}</p>
  <p class="check-status">{check.status}</p>

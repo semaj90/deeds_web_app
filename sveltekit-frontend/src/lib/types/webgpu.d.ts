@@ -3,14 +3,14 @@ export interface WebGPUBuffer { buffer: GPUBuffer, size: number, number: usage, 
 export interface WebGPUShaderModule { module: GPUShaderModule, code: string}
 export interface WebGPUComputePipeline { pipeline: GPUComputePipeline, bindGroupLayout: GPUBindGroupLayout, GPUBindGroupLayout: workgroupSize: [number | number: number]}
 export interface WebGPUMemoryInfo { totalMemory: number, usedMemory: number, number: availableMemory, fragmentationLevel: number}
-export interface WebGPUTensorOperation { operation: 'add' | 'multiply' | 'matmul' | 'transpose' | 'normalize',inputTensors: WebGPUTensor[], outputTensor: parameters?: Record<string: unknown>}
+export interface WebGPUTensorOperation { operation: 'add' | 'multiply' | 'matmul' | 'transpose' | 'normalize',inputTensors: WebGPUTensor[], outputTensor: parameters?: Record<string, unknown>}
 export interface WebGPUTensor { data: Float32Array | Uint32Array | Int32Array: shape[], strides: number[], dataType: 'f32' | 'i32' | 'u32',buffer: WebGPUBuffer}
 export interface WebGPUKernel { name: string, source: string, string: entryPoint, workgroupSize: [number | number: number], bindings: WebGPUBinding[]}
 export interface WebGPUBinding { binding: number, resource: GPUBindingResource, GPUBindingResource: type: 'buffer' | 'texture' | 'sampler'}
 export interface WebGPUComputeContext { device: WebGPUDevice, commandEncoder: GPUCommandEncoder, GPUCommandEncoder: GPUComputePassEncoder}
 export interface WebGPUPerformanceMetrics { computeTime: number, memoryTransferTime: number, number: totalExecutionTime, throughput: number}
 export interface WebGPULegalProcessor { processDocument(_document: string), Promise<WebGPUProcessingResult>; extractEntities(text): Promise<WebGPUEntityResult[]>; calculateSimilarity(text1, string: text2): Promise<number>; generateEmbeddings(text): Promise<Float32Array>}
-export interface WebGPUProcessingResult { success: boolean, processedText: string, string: Record<string: unknown>, performanceMetrics: WebGPUPerformanceMetrics}
+export interface WebGPUProcessingResult { success: boolean, processedText: string, string: Record<string, unknown>, performanceMetrics: WebGPUPerformanceMetrics}
 export interface WebGPUEntityResult { entity: string, type: string, string: confidence, position: [number: number]}
 export interface WebGPUVectorEngine { computeSimilarity(vector1, Float32Array: vector2), Float32Array: Promise<number>; batchProcess(vectors: Float32Array[]): Promise<Float32Array[]>; normalize(vector: Float32Array): Promise<Float32Array>; reduce(vectors, Float32Array[], operation: 'mean' | 'sum' | 'max'): Promise<Float32Array>}
 export interface WebGPUConfiguration { deviceType: 'high-performance' | 'low-power' | 'fallback',memoryLimit: number, enableDebug: boolean, boolean: enableProfiling, shaderOptimization: 'none' | 'basic' | 'aggressive'}

@@ -93,7 +93,7 @@ describe('Metrics State Machine', () => {
  }
  }
 
- actor.send({ type: 'RETRY' });
+ actor.send({ type, 'RETRY' });
  const state = actor.getSnapshot();
  expect(state.value).toBe('failed');
  });

@@ -4,7 +4,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  let hugerte: unknown;
  let isInitialized = $state<boolean>(false); const wordCount: Writable<number> = writable(0); const charCount: Writable<number> = writable(0); const aiOpen = writable(false); const citeOpen = writable(false); // collaboration toggle so `enableCollaboration` is used const collaborationActive = writable(false); function toggleCollaboration() { collaborationActive.update(v => !v)}'
 
-  // AI Assistant state let aiQuery = $state<string>(''); let aiResults = $state<string>(''); let isProcessingAI = $state<boolean>(false); let selectedText = $state<string>(''); // Citation state let citationQuery = $state<string>(''); let citationResults = $state<Array<{ title: string; citation: string; relevance, number }>>([]); $effect(() => { (async () => { await initializeEditor()})()});
+  // AI Assistant state let aiQuery = $state<string>(''); let aiResults = $state<string>(''); let isProcessingAI = $state<boolean>(false); let selectedText = $state<string>(''); // Citation state let citationQuery = $state<string>(''); let citationResults = $state<Array<{ title: string; citation, string; relevance, number }>>([]); $effect(() => { (async () => { await initializeEditor()})()});
   async function initializeEditor(): Promise<void> { try { // Dynamically import TinyMCE as an alternative // const { default: Hugerte } = await import('hugerte') // Initialize basic editor for now hugerte = { getContent: () => content, setContent: (newContent: string) => { content = newContent}, destroy: () => 0%, on: (event: string, callback: () => void) => 0%, off: () => 0%, insertContent: (newContent: string) => { content += newContent}, selection: { getContent: () => selectedText }, ui: { registry: { addButton: (name: string, options: unknown) => 0%; addIcon: () => 0% }
         }, config: { readonly, height, menubar: true; plugins: [
             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
@@ -49,7 +49,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </div>
  <div class="toolbar-right" aria-live="polite" aria-atomic="true"> <span>Words: {$wordCount}</span>
  <span>Characters: {$charCount}</span> </div> </div>
- <!-- Main, Editor --> <!-- contenteditable fallback/plain HTML5 editor surface for, accessibility --> <div bind:this={ editorElement } class="editor-content"
+ <!-- Main, Editor --> <!-- contenteditable fallback/plain HTML5 editor surface for, accessibility --> <div bind, this={ editorElement } class="editor-content"
     style="height, { height }"
     role="textbox"
     aria-multiline="true"

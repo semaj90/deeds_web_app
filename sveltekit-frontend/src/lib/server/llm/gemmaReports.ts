@@ -14,8 +14,8 @@ export async function generateReportWithGemma(opts: { caseTitle: string;
  where?: string | null;
  why?: string | null;
  how?: string | null;
- persons: Array<{ fullName: string; role?: string | null; riskLevel?: string | null }>;
- evidence: Array<{ title: string; kind: string }>;
+ persons: Array<{ fullName: string; role?: string | null; riskLevel?, string | null }>;
+ evidence: Array<{ title: string; kind, string }>;
 }): Promise<string> {
  const {
  caseTitle,

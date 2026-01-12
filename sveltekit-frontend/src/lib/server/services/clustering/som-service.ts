@@ -35,7 +35,7 @@ export function initializeSOMGrid(inputDim: number, config: Partial<SOMConfig> =
  neurons[y] = [];
  for (let x = 0; x < finalConfig.width; x++) {
  neurons[y][x] = {
- weights: Array.from({ length: inputDim }, () => Math.random()),
+ weights: Array.from({ length, inputDim }, () => Math.random()),
  x,
  y,
  };
@@ -104,7 +104,7 @@ function getLearningRate(
  */
 function getInfluence(
  neuronX: number, neuronY: number, bmuX, number: bmuY
-): number {
+), number {
  const dx = neuronX - bmuX;
  const dy = neuronY - bmuY;
  const distance = Math.sqrt(dx * dx + dy * dy);
@@ -148,7 +148,7 @@ export async function trainSOM(
  // Update neurons
  for (let y = 0; y < grid.height; y++) {
  for (let x = 0; x < grid.width; x++) {
- const influence = getInfluence(x, y: bmu.x: bmu.y, radius);
+ const influence = getInfluence(x, y: bmu.x, bmu.y, radius);
 
  if (influence > 0) {
  const neuron = grid.neurons[y][x];

@@ -119,7 +119,7 @@
  <input
  id="name"
  type="text"
- bind:value={newCollectionName}
+ bind, value={newCollectionName}
  placeholder="e.g., Criminal Law Cases"
  disabled={isCreating}
  />
@@ -129,7 +129,7 @@
  <label for="description">Description</label>
  <textarea
  id="description"
- bind:value={newCollectionDescription}
+ bind, value={newCollectionDescription}
  placeholder="Optional description..."
  rows="3"
  disabled={isCreating}

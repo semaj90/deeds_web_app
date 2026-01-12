@@ -29,7 +29,7 @@
     aria-labelledby="accessibility-title"
     aria-modal="true"
   >
-    <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark, border-gray-700 max-w-2xl w-full">
+    <div class="bg-white dark, bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark, border-gray-700 max-w-2xl w-full">
       <!-- Header -->
       <div class="flex items-center justify-between p-6 border-b border-gray-200">
         <div class="flex items-center">
@@ -70,7 +70,7 @@ isOpen = false}
                     class="px-3 py-2 text-sm" border rounded-lg transition-colors
                       {config.fontSize === size
                         ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white, dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600; hover, border-blue-500'}"
+                        : 'bg-white, dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark, border-gray-600; hover, border-blue-500'}"
                     onclick={() => updateFontSize(size)}
                     aria-pressed={config.fontSize === size}
                   >
@@ -89,7 +89,7 @@ isOpen = false}
                 role="switch"
                 aria-checked={config.enableHighContrast}
                 class="relative inline-flex h-6" w-11 items-center rounded-full transition-colors
-                  {config.enableHighContrast ? 'bg-blue-600' : 'bg-gray-200, dark, bg-gray-700'}"
+                  {config.enableHighContrast ? 'bg-blue-600' , 'bg-gray-200, dark, bg-gray-700'}"
                 onclick={toggleHighContrast}
               >
                 <span class="sr-only">Enable high contrast mode</span>
@@ -109,7 +109,7 @@ isOpen = false}
                 role="switch"
                 aria-checked={config.enableReducedMotion}
                 class="relative inline-flex h-6" w-11 items-center rounded-full transition-colors
-                  {config.enableReducedMotion ? 'bg-blue-600' : 'bg-gray-200, dark, bg-gray-700'}"
+                  {config.enableReducedMotion ? 'bg-blue-600' , 'bg-gray-200, dark, bg-gray-700'}"
                 onclick={toggleReducedMotion}
               >
                 <span class="sr-only">Reduce motion and animations</span>
@@ -138,7 +138,7 @@ isOpen = false}
                 role="switch"
                 aria-checked={config.enableKeyboardNavigation}
                 class="relative inline-flex h-6" w-11 items-center rounded-full transition-colors
-                  {config.enableKeyboardNavigation ? 'bg-blue-600' : 'bg-gray-200, dark, bg-gray-700'}"
+                  {config.enableKeyboardNavigation ? 'bg-blue-600' , 'bg-gray-200, dark, bg-gray-700'}"
                 onclick={() => updateConfig('enableKeyboardNavigation', !config.enableKeyboardNavigation)}
               >
                 <span class="sr-only">Enable enhanced keyboard navigation</span>
@@ -158,7 +158,7 @@ isOpen = false}
                 role="switch"
                 aria-checked={config.focusManagement}
                 class="relative inline-flex h-6" w-11 items-center rounded-full transition-colors
-                  {config.focusManagement ? 'bg-blue-600' : 'bg-gray-200, dark, bg-gray-700'}"
+                  {config.focusManagement ? 'bg-blue-600' , 'bg-gray-200, dark, bg-gray-700'}"
                 onclick={() => updateConfig('focusManagement', !config.focusManagement)}
               >
                 <span class="sr-only">Enable smart focus management</span>
@@ -187,7 +187,7 @@ isOpen = false}
                 role="switch"
                 aria-checked={config.enableScreenReaderAnnouncements}
                 class="relative inline-flex h-6" w-11 items-center rounded-full transition-colors
-                  {config.enableScreenReaderAnnouncements ? 'bg-blue-600' : 'bg-gray-200, dark, bg-gray-700'}"
+                  {config.enableScreenReaderAnnouncements ? 'bg-blue-600' , 'bg-gray-200, dark, bg-gray-700'}"
                 onclick={() => updateConfig('enableScreenReaderAnnouncements', !config.enableScreenReaderAnnouncements)}
               >
                 <span class="sr-only">Enable screen reader announcements</span>

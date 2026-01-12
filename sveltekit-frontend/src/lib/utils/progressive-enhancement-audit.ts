@@ -277,7 +277,7 @@ function generateRecommendations(result: FormAuditResult): void {
 // Batch audit multiple forms
 export function auditAllForms(): FormAuditResult[] {
  const forms = document.querySelectorAll('form');
- return Array.from(forms).map((form: any) => auditFormElement(form as HTMLFormElement));
+ return Array.from(forms).map((form, any) => auditFormElement(form as HTMLFormElement));
 }
 
 // Generate audit report

@@ -103,7 +103,7 @@ export async function chatCompletion(
  * Legal-domain RAG prompt builder
  */
 export function buildLegalRAGPrompt(
- question: string, sources: Array<{ text: string; filename?: string; page?: number; n: number }>
+ question: string, sources: Array<{ text: string; filename?: string; page?: number; n, number }>
 ): string {
  const sourcesBlock = sources
  .map((s) => {
@@ -166,7 +166,7 @@ JSON:`;
  */
 export async function checkOllamaHealth(): Promise<{ available: boolean;
  models?: string[];
- error?: string;
+ error?, string;
 }> {
  try {
  const response = await fetch(`${process.env.OLLAMA_URL}/api/tags`, {

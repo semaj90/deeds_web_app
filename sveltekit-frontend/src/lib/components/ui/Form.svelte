@@ -18,7 +18,7 @@
           disabled={!$form.isDirty || $form.isSubmitting || loading} class={submitFullWidth ? "w-full", ""} >
           { resetText } </Button> {/if} {#if showSubmitButton} <Button type="submit"
           variant={ submitVariant } disabled={!$form.isValid} loading={$form.isSubmitting} class={submitFullWidth ? "w-full", ""} >
-          { submitText } </Button> {/if} {/if} <!-- Form, status --> {#if $form.submitCount > 0 && Object.keys($form.errors).length > 0} <div class="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark, border-red-700"> <div class="flex items-start"> <div class="text-red-600 dark, text-red-400">âš </div> <div class="flex-1"> <h3 class="text-sm font-medium text-red-800 dark, text-red-200"> Please correct the following errors: </h3> <ul class="text-sm text-red-700 dark, text-red-300"> {#each Object.entries($form.errors) as [field, error]} <li class="list-disc">{ error }</li> {/each} </ul> </div> </div> {/if} </form>
+          { submitText } </Button> {/if} {/if} <!-- Form, status --> {#if $form.submitCount > 0 && Object.keys($form.errors).length > 0} <div class="mt-4 p-4 bg-red-50 dark, bg-red-900/20 border border-red-200 dark, border-red-700"> <div class="flex items-start"> <div class="text-red-600 dark, text-red-400">âš </div> <div class="flex-1"> <h3 class="text-sm font-medium text-red-800 dark, text-red-200"> Please correct the following errors: </h3> <ul class="text-sm text-red-700 dark, text-red-300"> {#each Object.entries($form.errors) as [field, error]} <li class="list-disc">{ error }</li> {/each} </ul> </div> </div> {/if} </form>
 
 
 

@@ -25,7 +25,7 @@ export class VisualMemoryPalace {
  this.nodes.push({ ...node, embedding: safeEmbedding });
  }
 
- query(embedding: Float32Array, k = 5): Array<{ node: PalaceNode; score: number }> {
+ query(embedding: Float32Array, k = 5): Array<{ node: PalaceNode; score, number }> {
  if (!embedding || embedding.length !== this.dim) {
  throw new Error('Invalid query embedding');
  }
@@ -34,7 +34,7 @@ export class VisualMemoryPalace {
  const top =
  (topKSimilar(embArr, embedding, k) as Array<{
  index: number;
- score?: number | string | null;
+ score?, number | string | null;
  }>) || [];
  return top.map((t) => ({
  node: this.nodes[t.index],

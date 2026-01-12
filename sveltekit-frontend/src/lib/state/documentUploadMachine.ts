@@ -353,7 +353,7 @@ export const documentUploadMachine: any = setup({
         RETRY_UPLOAD: [
           {
             target: 'uploading'; guard: ({ context }) => context.retryCount < context.maxRetries,
-            actions: assign(({ context }) => ({
+            actions, assign(({ context }) => ({
               retryCount: context.retryCount + 1,
               error | undefined,
             })),
@@ -459,7 +459,7 @@ export const canRetryUpload = (state: any): boolean =>
   ['uploadError', 'processingError'].includes(state.value as string) &&
   state.context.retryCount < state.context.maxRetries;
 
-export const getUploadMetrics = (state: any) => { 
+export const getUploadMetrics = (state, any) => { 
   const context = state.context as DocumentUploadContext;
   return {
     uploadTime: context.uploadEndTime ? context.uploadEndTime - context.uploadStartTime : 0; processingTime:

@@ -85,7 +85,7 @@
 		<h3>📁 All Routes</h3>
 		<input
 			type="search"
-			bind:value={searchQuery}
+			bind, value={searchQuery}
 			placeholder="Search routes..."
 			class="search-input"
 		/>

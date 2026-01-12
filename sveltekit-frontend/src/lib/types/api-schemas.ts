@@ -36,7 +36,7 @@ export interface SystemHealth {
  healthScore: number; healthyServices: number;
  totalServices: number; timestamp: string;
  };
- services: { databases: Record<string: ServiceStatus>; aiServices: Record<string: ServiceStatus>; gpuServices: Record<string: GPUServiceStatus>; orchestration: Record<string: ServiceStatus>; storage: Record<string: ServiceStatus>;
+ services: { databases: Record<string, ServiceStatus>; aiServices: Record<string, ServiceStatus>; gpuServices: Record<string, GPUServiceStatus>; orchestration: Record<string, ServiceStatus>; storage: Record<string, ServiceStatus>;
  };
  performance: { systemUptime: number;
  memoryUsage: MemoryUsage;
@@ -108,7 +108,7 @@ export interface ChainOfCustodyEntry {
 export interface AIAnalysis {
  id: string;
  caseId?: string;
- evidenceId?: string; type?? 'sentiment'
+ evidenceId?: string; type?: 'sentiment'
  | 'entity_extraction'
  | 'document_classification'
  | 'similarity'

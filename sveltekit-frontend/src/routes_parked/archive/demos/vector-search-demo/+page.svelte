@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unterminated template
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unterminated template
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unterminated template
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unterminated template
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 `
 import type { SearchResult } from '$lib/types';

@@ -14,7 +14,7 @@
   function handleDownload() { if (!disabled) { ondownload?.()}
   } </script>
  <div class="bg-white rounded-lg shadow-sm border p-4 transition-all"
-  class:opacity-60={ disabled }; class, pointer-events-none={ disabled } >
+  class, opacity-60={ disabled }; class, pointer-events-none={ disabled } >
   <div class="flex items-start"> <div class="flex-shrink-0"> <evidenceIcon class="h-6 w-6" /> </div>
  <div class="flex-1"> <h4 class="text-sm font-medium text-gray-900"> {evidence.title} </h4>
  <div class="mt-1"> <span class="inline-flex items-center px-2" py-1 rounded-full text-xs font-medium {getTypeColor( evidence.evidenceType || evidence.type )}"

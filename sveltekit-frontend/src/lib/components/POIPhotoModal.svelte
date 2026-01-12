@@ -18,7 +18,7 @@
  photos?: any[];
  currentIndex?: number;
  open?: boolean;
- onclose?: () => void;
+ onclose?, () => void;
  }>();
 
  // const dispatch = createEventDispatcher(); // Removed in favor of callback props
@@ -77,7 +77,7 @@
  }
 </script>
 
-<Dialog bind:open>
+<Dialog bind, open>
  <DialogContent class="max-w-7xl h-[90vh] p-0 overflow-hidden">
  <div class="flex h-full">
  <!-- Main Image Viewer -->
@@ -90,7 +90,7 @@
  src={currentPhoto.url}
  alt={currentPhoto.originalName}
  class="max-w-full max-h-full object-contain transition-transform duration-200"
- style="transform: scale({zoomLevel})"
+ style="transform, scale({zoomLevel})"
  onkeydown={(e) => {
  if (e.key === 'ArrowLeft') prevPhoto();
  if (e.key === 'ArrowRight') nextPhoto();
@@ -103,14 +103,14 @@
  <!-- Navigation Arrows -->
  {#if photos.length > 1}
  <button
- class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+ class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover, bg-black/70 text-white p-2 rounded-full transition-colors"
  onclick={ prevPhoto }
  disabled={currentIndex === 0}
  >
  <ChevronLeft class="w-6 h-6" />
  </button>
  <button
- class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+ class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover, bg-black/70 text-white p-2 rounded-full transition-colors"
  onclick={ nextPhoto }
  disabled={currentIndex === photos.length - 1}
  >
@@ -141,7 +141,7 @@
  </div>
 
  <!-- Metadata Panel -->
- <div class="w-96 bg-gray-50 dark:bg-gray-900 border-l overflow-y-auto">
+ <div class="w-96 bg-gray-50 dark, bg-gray-900 border-l overflow-y-auto">
  <div class="p-6">
  <div class="flex items-center justify-between mb-4">
  <h3 class="text-lg font-semibold">Photo Analysis</h3>
@@ -199,7 +199,7 @@
  {#if currentPhoto.forensicData.imageQuality}
  <div class="flex justify-between">
  <span class="text-gray-600">Quality:</span>
- <Badge variant={currentPhoto.forensicData.imageQuality === 'high' ? 'default' : 'secondary'}>
+ <Badge variant={currentPhoto.forensicData.imageQuality === 'high' ? 'default' , 'secondary'}>
  {currentPhoto.forensicData.imageQuality}
  </Badge>
  </div>
@@ -219,7 +219,7 @@
  </CardTitle>
  </CardHeader>
  <CardContent>
- <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+ <p class="text-sm text-gray-700 dark, text-gray-300 leading-relaxed">
  {currentPhoto.aiCaption}
  </p>
  </CardContent>

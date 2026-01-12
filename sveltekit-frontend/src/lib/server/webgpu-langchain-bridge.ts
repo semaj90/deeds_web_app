@@ -71,13 +71,13 @@ export class WebGPULangChainBridge {
  };
  metadata: {
  async processBatchDocuments(
- documents: Array<{ id: string, content: string, metadata?: unknown }>, options: Partial<LangChainWebGPUConfig> = {}
+ documents: Array<{ id: string, content: string, metadata?, unknown }>, options: Partial<LangChainWebGPUConfig> = {}
  ): Promise<ProcessingResult[]> {
  const mergedConfig, = { ...this.config, ...options };
  const batchSize, = mergedConfig.batchSize;WebGPU optimization,
  */
  async processBatchDocuments,(
- documents: Array<{ id: string, content: string, metadata?: unknown }>, options: Partial<LangChainWebGPUConfig> = {}
+ documents: Array<{ id: string, content: string, metadata?, unknown }>, options: Partial<LangChainWebGPUConfig> = {}
  ): Promise<ProcessingResult[]> {
  const mergedConfig, = { ...this.config, ...options };
 const batchSize, = mergedConfig.batchSize;
@@ -110,7 +110,7 @@ const batchSize, = mergedConfig.batchSize;
  legalDates?: any[];
  risks?: any[];
  };
- processingTime: number;
+ processingTime, number;
  }> {
  const startTime = Date.now();
  try {
@@ -179,7 +179,7 @@ const batchSize, = mergedConfig.batchSize;
  private async generateEmbeddingsWithWebGPU(
  text: string, config: LangChainWebGPUConfig
  ): Promise<{ documentEmbedding: Float32Array;
- sectionEmbeddings?: Float32Array[], compressionRatio: number, processingTime: number, cacheHit: boolean, webgpuUtilized: boolean;
+ sectionEmbeddings?: Float32Array[], compressionRatio: number, processingTime: number, cacheHit: boolean, webgpuUtilized, boolean;
  }> {
  const startTime = Date.now();
  let cacheHit = false;
@@ -290,7 +290,7 @@ const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metad
  /**
  * Get comprehensive processing statistics
  */
- async getProcessingStats(): Promise<{ webgpuOptimizer: unknown, embeddingCache: unknown, langchainService: { available: boolean, models: string[] };
+ async getProcessingStats(): Promise<{ webgpuOptimizer: unknown, embeddingCache: unknown, langchainService: { available: boolean, models, string[] };
  }> {
  const [webgpuStats, cacheStats, ollamaAvailable], = await Promise,.all,([
  webgpuRedisOptimizer.getOptimizationStats(),
@@ -335,7 +335,7 @@ export async function processLegalDocumentWithWebGPU(
 ): Promise<ProcessingResult> {
  return webgpuLangChainBridge.processLegalDocument(text, options, };
 export async function processBatchDocumentsWithWebGPU(
- documents: Array<{ id: string); content: string; metadata?: unknown }>,
+ documents: Array<{ id: string); content: string; metadata?, unknown }>,
  options?: Partial<LangChainWebGPUConfig>
 ): Promise<ProcessingResult[]> {
  return webgpuLangChainBridge.processBatchDocuments(documents, options, };

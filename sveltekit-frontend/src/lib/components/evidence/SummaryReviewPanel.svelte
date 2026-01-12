@@ -3,10 +3,10 @@
 
  interface Props {
  summaryId: string; holding: string;
- reasoning: string; citations: Array<{ text: string; caseId?: string }>;
+ reasoning: string; citations: Array<{ text: string; caseId?, string }>;
  keywords: string[]; confidence: number;
  onApprove: (data: { holding: string;
- reasoning: string; citations: Array<{ text: string; caseId?: string }>;
+ reasoning: string; citations: Array<{ text: string; caseId?, string }>;
  keywords: string[];
  }) => void;
  onReject: () => void;
@@ -68,7 +68,7 @@
  {#if showEditMode}
  <textarea
  bind:value={editedHolding}
- class="w-full px-3 py-2 border border-gray-300 rounded-lg focus: ring-2, focus: ring-blue-500, focus:border-transparent"
+ class="w-full px-3 py-2 border border-gray-300 rounded-lg focus: ring-2, focus: ring-blue-500, focus, border-transparent"
  rows="3"
  ></textarea>
  {:else}
@@ -86,7 +86,7 @@
  {#if showEditMode}
  <textarea
  bind:value={editedReasoning}
- class="w-full px-3 py-2 border border-gray-300 rounded-lg focus: ring-2, focus: ring-blue-500, focus:border-transparent"
+ class="w-full px-3 py-2 border border-gray-300 rounded-lg focus: ring-2, focus: ring-blue-500, focus, border-transparent"
  rows="4"
  ></textarea>
  {:else}
@@ -160,13 +160,13 @@
  <button
  onclick={handleApprove}
  disabled={isApproving}
- class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover: bg-green-700, disabled:bg-gray-400 font-medium transition"
+ class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover: bg-green-700, disabled, bg-gray-400 font-medium transition"
  >
  {isApproving ? 'Approving...' : 'Approve & Save'}
  </button>
  <button
  onclick={ onReject }
- class="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 font-medium transition"
+ class="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover, bg-red-50 font-medium transition"
  >
  Reject
  </button>

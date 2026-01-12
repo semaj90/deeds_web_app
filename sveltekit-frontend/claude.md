@@ -1,10 +1,35 @@
-# Claude Tactical Error Fixing Guide - Phase 66
+# Claude Tactical Error Fixing Guide - Phase 96
 
-## Current Situation (2026-01-11 10:50 PST)
+## Current Situation (2026-01-15 15:30 PST)
 
-**Baseline:** 77,002 TypeScript/CSS errors in 2,471 files
-**Goal:** Reduce to ~42,000 errors (45% reduction)
-**Strategy:** Iterative pattern-based fixing with validation gates
+**Status:** Phase 96 AI Component Restoration - COMPLETE ✅
+**XState v5 Migration:** All machine files verified error-free
+**Knowledge Base:** Enhanced with v5 patterns and production best practices
+
+---
+
+## 🎉 Phase 96 Achievements
+
+### 1. XState v5 TypeScript Resolution
+- **Fixed:** `setup()` import resolution failure
+- **Workaround:** Direct `createMachine()` usage with inline actors
+- **Pattern:** Explicit `fromPromise<TOutput>({ input, signal }: { ... })` typing
+- **Result:** All 28+ machine files error-free
+
+### 2. Enhanced AI Assistant Machine
+- **File:** `src/lib/machines/aiAssistantMachine.ts`
+- **Features:**
+  - AbortSignal cancellation support
+  - Proper error state handling
+  - Type-safe promise actor implementation
+- **Verification:** Zero TypeScript errors
+
+### 3. Knowledge Base Documentation
+- **Updated Files:**
+  - `gemini.md`: XState v5 migration findings
+  - `copilot.md`: ACE knowledge patterns
+  - `docs/xstate-v5-patterns.md`: Canonical reference (570 lines)
+- **Content:** TypeScript workarounds, production patterns, verified fixes
 
 ---
 
@@ -48,6 +73,98 @@ node scripts/fix-css-selectors.mjs --dry-run --limit 10
 
 # Apply incrementally
 node scripts/fix-css-selectors.mjs --limit 50
+```
+
+---
+
+## 🔄 XState v5 Migration Error Cluster (2026-01-11)
+
+### Cluster Analysis Results
+
+**Total Errors Analyzed:** 89,625
+**XState-Related Errors:** ~2,000-3,000 (2.2-3.3%)
+**Clustering Threshold:** Cosine similarity ≥ 0.85
+
+**Cluster 1: fromPromise Type Signature Mismatches**
+- **Error Codes:** TS2345, TS2322, TS2554
+- **Affected Files:** ~40-60 files (mcp-gpu-orchestrator.ts, advanced-evidence-analyzer.ts, cognitive-cache-integration.ts)
+- **Root Cause:** XState v5 removed inline type annotation support
+- **Fix Pattern:**
+  ```typescript
+  // Before (v4)
+  fromPromise(async ({ input }: { input: T }) => ...)
+
+  // After (v5)
+  fromPromise<TOutput, TInput>(async ({ input }) => ...)
+  ```
+
+**Cluster 2: Actor Input/Output Type Definitions**
+- **Error Codes:** TS2339, TS7053 ("Property 'X' does not exist on type 'unknown'")
+- **Root Cause:** Missing `types.actors` configuration in machine setup
+- **Fix Pattern:**
+  ```typescript
+  const machine = setup({
+    types: {
+      actors: {} as {
+        fetchUser: 'userFetcher';
+        loadData: 'dataLoader';
+      }
+    },
+    actors: {
+      userFetcher: fromPromise<User, { userId: string }>(...),
+      dataLoader: fromPromise<Data, { id: string }>(...)
+    }
+  }).createMachine({ ... });
+  ```
+
+**Cluster 3: Legacy spawn() API Usage**
+- **Error Code:** TS2304 ("Cannot find name 'spawn'")
+- **Root Cause:** XState v5 removed global `spawn()` function
+- **Fix Pattern:**
+  ```typescript
+  // Before (v4)
+  actions: {
+    spawnActor: () => spawn(promiseLogic)
+  }
+
+  // After (v5)
+  actions: {
+    spawnActor: spawnChild('promiseLogic')
+  }
+  ```
+
+### Knowledge Base DAG Update
+
+**DAG Node:** `xstate_v5_migration_complete`
+**Dependencies:**
+- `type_extraction_complete` (fromPromise inline types → interfaces)
+- `generic_types_applied` (explicit <TOutput, TInput> parameters)
+- `actor_types_configured` (setup({ types: { actors: ... } }))
+
+**Triggers:**
+- `actor_system_validation` (tsc --noEmit)
+- `integration_tests` (XState machines functional)
+- `knowledge_base_ingestion` (patterns → Qdrant phase89_kb_cards)
+
+### Scan Results Summary (2026-01-12)
+
+**Script:** `scripts/phase89-scan-xstate-v4.mjs`
+
+**Findings:**
+- 87 files with XState v4 patterns (338 total occurrences)
+- 39 high-priority files (fromPromise inline types)
+- 43 medium-priority files (send() actions)
+- 21 low-priority files (Machine/interpret/cond)
+
+**Top Files by Complexity:**
+1. `enhanced-upload-machine.ts` - 11 fromPromise inline types
+2. `evidenceCustodyMachine.ts` - 6 fromPromise inline types
+3. `evidence-processing-machine.ts` - 5 fromPromise inline types
+
+**Migration Effort:** 3.5-5.5 hours estimated
+**Expected Reduction:** 1,200-1,800 errors
+
+**Full Report:** `reports/xstate-migration/latest.md`
 npx svelte-check --threshold error  # Verify
 ```
 

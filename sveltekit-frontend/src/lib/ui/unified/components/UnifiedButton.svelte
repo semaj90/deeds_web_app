@@ -5,7 +5,7 @@
  variant?: 'primary' | 'secondary' | 'danger';
  size?: 'small' | 'medium' | 'large';
  disabled?: boolean;
- onClick?: (() => void) | undefined;
+ onClick?, (() => void) | undefined;
  }>();
 </script>
 

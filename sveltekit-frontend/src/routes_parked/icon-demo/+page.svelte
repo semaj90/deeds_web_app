@@ -2,9 +2,9 @@
  import IconContainerDemo from '$lib/components/ui/IconContainerDemo.svelte';
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Container Query Icons Demo</title>
-</svelte:head>
+</svelte, head>
 
 <div class="min-h-screen bg-gray-50 py-8">
  <div class="max-w-6xl mx-auto px-4">

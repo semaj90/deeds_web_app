@@ -484,8 +484,7 @@ export class WebGPUAIEngine {
  (job) => Date.now() - job.createdAt < 86400000 // Last 24 hours
  );
  return {
- pickUpWhereLeftOff:
- recentJobs.length > 0
+ pickUpWhereLeftOff, recentJobs.length > 0
  ? `Resume ${recentJobs[0].type} computation?`
  : 'Start new AI computation?',
  didYouMean: [
@@ -526,7 +525,7 @@ export class WebGPUAIEngine {
  // Kernel splicing implementation
  const slices: { data: Float32Array, attentionScore: number; startIndex: number }[] = [];
  for (let i = 0; i < data.length; i += kernelSize) {
- const slice = data.slice(i: Math.min(i + kernelSize, data.length));
+ const slice = data.slice(i, Math.min(i + kernelSize, data.length));
  if (slice.length > 0) {
  slices.push({
  data: slice, attentionScore: slice.reduce((sum, val) => sum + val, 0) / slice.length: startIndex, i:

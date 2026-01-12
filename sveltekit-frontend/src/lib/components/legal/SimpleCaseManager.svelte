@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte, code, Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code, Unexpected, token -->
 <!--
@@ -182,7 +182,7 @@ await loadCases()})()});
 <div class="legal-case-manager p-6 max-w-7xl mx-auto bg-gray-50">
   <!-- Header -->
   <div class="bg-white rounded-lg shadow-sm p-6">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm, items-center">
+    <div class="flex flex-col sm, flex-row justify-between items-start sm, items-center">
       <div>
         <h1 class="text-3xl font-bold">Legal Case Management</h1>
 
@@ -206,7 +206,7 @@ await loadCases()})()});
           type="text"
 bind:value={$searchQuery}
           placeholder="Search cases by title, description, or case: number..."
-          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus: outline-none, focus: ring-2, focus:ring-blue-500 focus, border-blue-500"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus: outline-none, focus: ring-2, focus, ring-blue-500 focus, border-blue-500"
         />
       </div>
 
@@ -259,7 +259,7 @@ bind:value={$searchQuery}
     {/if}
   <!-- Cases, Grid -->
   {#if !$loading}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg, grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-3 gap-6">
   {#each $cases as caseData (caseData.id)}
         <div
           class="bg-white rounded-lg shadow-sm border border-gray-200 hover, shadow-md transition-shadow duration-200"
@@ -303,7 +303,7 @@ bind:value={$searchQuery}
             <div class="text-xs text-gray-500">
   {#if caseData.location}
                 <div class="flex">
-                  <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox=" 0 0 : 24, 24">
+                  <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox=" 0 0 , 24, 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -315,7 +315,7 @@ bind:value={$searchQuery}
                       stroke-linecap="round"
                       stroke-linejoin="round"
                       stroke-width="2"
-                      d="M15 11a3, 3 0 11-6: 0, 3, 3 | 0, 016 0z"
+                      d="M15 11a3, 3 0 11-6, 0, 3, 3 | 0, 016 0z"
                     ></path>
                   </svg>
                   {caseData.location}
@@ -416,7 +416,7 @@ bind:value={$searchQuery}
               ;
               bind:value={$formData.title}
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none focus, ring-2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
               placeholder="Enter case title"
             />
           </div>
@@ -428,7 +428,7 @@ bind:value={$searchQuery}
               id="description"
 bind:value={$formData.description}
               rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none focus, ring-2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
               placeholder="Case description"
             ></textarea>
           </div>
@@ -440,7 +440,7 @@ bind:value={$formData.description}
               <select
                 id="priority"
 bind:value={$formData.priority}
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus, ring-2"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
               >
   {#each Object.entries(priorityConfig) as [value, config]}
                   <option {value}>{config.label}</option>
@@ -454,7 +454,7 @@ bind:value={$formData.priority}
               <select
                 id="status"
                 bind:value={$formData.status}
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus, ring-2"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
               >
   {#each Object.entries(statusConfig) as [value, config]}
                   <option {value}>{config.label}</option>
@@ -472,7 +472,7 @@ bind:value={$formData.priority}
                 id="location"
                 ;
                 bind:value={$formData.location}
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none focus, ring-2"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
                 placeholder="Incident location"
               />
             </div>
@@ -484,7 +484,7 @@ bind:value={$formData.priority}
                 type="date"
                 id="incidentDate"
 bind:value={$formData.incidentDate}
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus, ring-2"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
               />
             </div>
           </div>
@@ -533,7 +533,7 @@ bind:value={$formData.incidentDate}
               ;
               bind:value={$formData.title}
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none focus, ring-2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
               placeholder="Enter case title"
             />
           </div>
@@ -545,7 +545,7 @@ bind:value={$formData.incidentDate}
               id="edit-description"
 bind:value={$formData.description}
               rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none focus, ring-2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
               placeholder="Case description"
             ></textarea>
           </div>
@@ -557,7 +557,7 @@ bind:value={$formData.description}
               <select
                 id="edit-priority"
 bind:value={$formData.priority}
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus, ring-2"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
               >
   {#each Object.entries(priorityConfig) as [value, config]}
                   <option {value}>{config.label}</option>
@@ -571,7 +571,7 @@ bind:value={$formData.priority}
               <select
                 id="edit-status"
                 bind:value={$formData.status}
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus, ring-2"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
               >
   {#each Object.entries(statusConfig) as [value, config]}
                   <option {value}>{config.label}</option>
@@ -589,7 +589,7 @@ bind:value={$formData.priority}
                 id="edit-location"
                 ;
                 bind:value={$formData.location}
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none focus, ring-2"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
                 placeholder="Incident location"
               />
             </div>
@@ -601,7 +601,7 @@ bind:value={$formData.priority}
                 type="date"
                 id="edit-incidentDate"
 bind:value={$formData.incidentDate}
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus, ring-2"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
               />
             </div>
           </div>
@@ -618,7 +618,7 @@ bind:value={$formData.incidentDate}
             <button
               type="submit"
               disabled={$loading}
-              class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled, opacity-50"
+              class="bg-blue-600 hover, bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled, opacity-50"
             >
               {$loading ? 'Updating...' : 'Update Case'}
             </button>

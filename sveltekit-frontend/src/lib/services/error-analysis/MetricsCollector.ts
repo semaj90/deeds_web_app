@@ -166,7 +166,7 @@ export class MetricsCollector {
 	 */
 	async checkServiceHealth(): Promise<{ redis: boolean;
 		qdrant: boolean; neo4j: boolean;
-		ollama: boolean;
+		ollama, boolean;
 	}> {
 		const health = {
 			redis: false,

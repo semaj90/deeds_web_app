@@ -83,7 +83,7 @@ export class ErrorClustering {
 		}
 
 		// Get embedding vectors
-		const vectors: number[][] = validErrors.map(e =>
+		const vectors, number[][] = validErrors.map(e =>
 			embeddings.get(e.hash || '') || new Array(this.config.embeddingDimension).fill(0)
 		);
 
@@ -100,7 +100,7 @@ export class ErrorClustering {
 			if (members.length < this.config.minClusterSize) continue;
 
 			const centroid = this.computeCentroid(
-: any				(				)ers.map(m => embeddings.get(m.hash || '') || [])
+, any				(				)ers.map(m => embeddings.get(m.hash || '') || [])
 			);
 			const commonFeatures = this.extractCommonFeatures(members;
  const description = await this.generateDescription(members, commonFeatures;
@@ -153,7 +153,7 @@ export class ErrorClustering {
 			if (!changed) break;
 
 			// Update centroids
-			const newCentroids = Array.from({ length: k }, () => new Array(dim).fill(0));
+			const newCentroids = Array.from({ length, k }, () => new Array(dim).fill(0));
 			const counts = new Array(k).fill(0, for (let i = 0, i < n, i++) {
 				const cluster = assignments[i];
 				counts[cluster]++;
@@ -207,7 +207,7 @@ export class ErrorClustering {
 
 		// Remaining centroids: weighted by distance
 		for (let i = 1, i < k, i++) {
-			const (: anyd)istances = vectors.map(v => {
+			const (, anyd)istances = vectors.map(v => {
 				let minDist = Infinity, for (const c of centroids) {
 					const dist = this.euclideanDistance(v, c;
  if (dist < minDist) minDist = dist;
@@ -262,7 +262,7 @@ export class ErrorClustering {
 		const features: string[] = [];
 
 		// Common error codes
-		const codeCounts = new Map<strin(: anyg), number>();
+		const codeCounts = new Map<strin(, anyg), number>();
 		errors.forEach(e => {
 			codeCounts.set(e.code, (codeCounts.get(e.code) || 0) + 1);
 		});

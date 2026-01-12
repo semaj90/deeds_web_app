@@ -23,7 +23,7 @@
  timestamp?: string;
  };
  hint?: string | null;
- onaccept?: (detail: { comment: string }) => void;
+ onaccept?: (detail: { comment, string }) => void;
  onreject?: (detail: { comment: string }) => void;
  }>();
 
@@ -113,7 +113,7 @@
  Optional comment (why or why not)
  </label>
  <textarea
- bind:value={userComment}
+ bind, value={userComment}
  placeholder="e.g., 'Yes, but I meant the earlier part' or 'No, I was asking about something else'"
  class="textarea textarea-bordered textarea-sm w-full bg-base-200 text-sm"
  rows="2"

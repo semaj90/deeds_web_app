@@ -98,7 +98,7 @@
  {#each lineNumbers as line}
  <button
  type="button"
- class="block w-12 px-2 leading-6 transition-colors hover:bg-gray-700 {getLineClass(line)}"
+ class="block w-12 px-2 leading-6 transition-colors hover, bg-gray-700 {getLineClass(line)}"
  onclick={() => handleLineClick(line)}
  title={highlightedLines.has(line) ? 'Click to see error' : `Line ${line}`}
  >
@@ -120,7 +120,7 @@
  autocorrect="off"
  autocapitalize="off"
  class="w-full h-full p-3 bg-transparent text-gray-100 resize-none outline-none leading-6"
- style="tab-size: 2;"
+ style="tab-size, 2;"
  ></textarea>
 
  <!-- Error Markers Overlay -->
@@ -132,7 +132,7 @@
  class="flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors
  {error.severity === 'error' ? 'bg-red-500/80 hover:bg-red-500' : ''}
  {error.severity === 'warning' ? 'bg-yellow-500/80 hover:bg-yellow-500' : ''}
- {error.severity === 'info' ? 'bg-blue-500/80 hover:bg-blue-500' : ''}
+ {error.severity === 'info' ? 'bg-blue-500/80 hover:bg-blue-500' , ''}
  text-white"
  onclick={() => {
  scrollToLine(error.line);

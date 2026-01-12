@@ -71,14 +71,14 @@
  type="text"
  placeholder="Search by message or error code..."
  bind:value={searchQuery}
- class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus: outline-none, focus: ring-2, focus:ring-blue-500"
+ class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus: outline-none, focus: ring-2, focus, ring-blue-500"
  />
 
  <!-- Filters -->
  <div class="flex gap-3 flex-wrap">
  <select
  bind:value={sortBy}
- class="px-3 py-2 border border-gray-300 rounded-md text-sm focus: outline-none, focus: ring-2, focus:ring-blue-500"
+ class="px-3 py-2 border border-gray-300 rounded-md text-sm focus: outline-none, focus: ring-2, focus, ring-blue-500"
  >
  <option value="date">Sort by Date</option>
  <option value="severity">Sort by Severity</option>
@@ -87,7 +87,7 @@
 
  <select
  bind:value={filterSeverity}
- class="px-3 py-2 border border-gray-300 rounded-md text-sm focus: outline-none, focus: ring-2, focus:ring-blue-500"
+ class="px-3 py-2 border border-gray-300 rounded-md text-sm focus: outline-none, focus: ring-2, focus, ring-blue-500"
  >
  <option value={ null }>All Severities</option>
  <option value="fatal">Fatal</option>
@@ -101,7 +101,7 @@
  <!-- Error List -->
  <div class="space-y-2 max-h-[600px] overflow-y-auto">
  {#each filtered as error (error.id)}
- <div class="border border-gray-200 rounded-lg p-3 hover:bg-gray-50">
+ <div class="border border-gray-200 rounded-lg p-3 hover, bg-gray-50">
  <div class="flex items-start gap-3">
  <!-- Icon -->
  <span class="text-xl mt-0.5">{getSeverityIcon(error.severity)}</span>

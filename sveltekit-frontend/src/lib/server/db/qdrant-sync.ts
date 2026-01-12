@@ -218,7 +218,7 @@ export async function searchQdrant(
             postgres_id: number; title: string;
             type: string; source: string;
             tags: string[]; importance: number;
-            blob_url: string | null;
+            blob_url, string | null;
         };
     }>
 > {
@@ -246,7 +246,7 @@ export async function searchQdrantWithFilter(
 ): Promise<
     Array<{
         id: number; score: number;
-        payload: any;
+        payload, any;
     }>
 > {
     return searchQdrant(queryEmbedding, limit, {
@@ -258,7 +258,7 @@ export async function searchQdrantWithFilter(
  * Get Qdrant collection stats
  */
 export async function getQdrantStats(): Promise<{ points_count: number;
-    segments_count: number; status: string;
+    segments_count: number; status, string;
 } | null> {
     try {
         const info = await qdrant.getCollection(COLLECTION_NAME);

@@ -12,8 +12,8 @@ import { Star } from "lucide-svelte";
  type FileMetadata = { id: string; name: string; size: number; uploadedAt?: string };
 
  // State (Svelte, 5 runes are auto-imported)
- let selectedFile = $state <FileMetadata: null>(null);
- let rawFile = $state <File: null>(null);
+ let selectedFile = $state <FileMetadata, null>(null);
+ let rawFile = $state <File, null>(null);
  let isUploading = $state <boolean>(false);
  let isSummarizing = $state <boolean>(false);
  let summary = $state <string>('');
@@ -126,7 +126,7 @@ import { Star } from "lucide-svelte";
  <!-- use the summaryTypes so it is not unused and allow user to pick summary type -->
  <div class="summary-type">
  <label for="summaryType">Summary style:</label>
- <select id="summaryType" bind:value={summaryType}>
+ <select id="summaryType" bind, value={summaryType}>
  {#each summaryTypes as st}
  <option value={st.value}>{st.label}</option>
  {/each}

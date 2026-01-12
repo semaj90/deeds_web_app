@@ -135,7 +135,7 @@ export class GRPOPolicy {
 	 */
 	rankStrategies(strategies: FixStrategy[], context: ErrorContext): FixStrategy[] {
 		return strategies
-			.map((strategy: any) => {
+			.map((strategy, any) => {
 				// Compute strategy score
 				const baseScore = strategy.successRate * strategy.confidence;
 
@@ -208,7 +208,7 @@ export class GRPOPolicy {
 	private findErrorGroup(embedding: number[]): string | null {
 		if (embedding.length === 0) return null;
 
-		let bestGroup: null = null;
+		let bestGroup, null = null;
 		let bestSimilarity = 0;
 
 		for (const [groupId, group] of this.errorGroups) {
@@ -246,7 +246,7 @@ export class GRPOPolicy {
 	 * Record an experience
 	 * Property 1: Experience Recording Completeness
 	 */
-	recordExperience(experience: Experience): void {
+	recordExperience(experience: Experience), void {
 		// Add to buffer
 		this.experienceBuffer.push(experience);
 		this.state.experienceCount++;
@@ -299,7 +299,7 @@ export class GRPOPolicy {
 	 * Update policy from experiences
 	 * Property 5: Experience Replay Prevents Forgetting
 	 */
-	async updatePolicy(): Promise<{ success: boolean; message: string }> {
+	async updatePolicy(): Promise<{ success: boolean; message, string }> {
 		if (this.experienceBuffer.length < this.config.minExperiencesForUpdate) {
 			return {
 				success: false,
@@ -308,7 +308,7 @@ export class GRPOPolicy {
 		}
 
 		// Save current state for potential rollback
-		this.previousState = { ...this.state, weights: [...this.state.weights] };
+		this.previousState = { ...this.state, weights, [...this.state.weights] };
 
 		// Split into training and validation
 		const shuffled = [...this.experienceBuffer].sort(() => Math.random() - 0.5);
@@ -372,7 +372,7 @@ export class GRPOPolicy {
 			if (groupExps.length < 2) continue;
 
 			// Compute group baseline (average reward)
-			const rewards = groupExps.map((exp: any) => exp.outcome === 'success' ? 1 : 0);
+			const rewards = groupExps.map((exp, any) => exp.outcome === 'success' ? 1 : 0);
 			const baseline = rewards.reduce((a: any, b: any) => a + b, 0) / rewards.length;
 
 			// Compute gradients for each experience
@@ -392,7 +392,7 @@ export class GRPOPolicy {
 		}
 
 		// Normalize gradients
-		const norm = Math.sqrt(gradients.reduce((sum: any, g: any) => sum + g * g, 0));
+		const norm = Math.sqrt(gradients.reduce((sum: any, g, any) => sum + g * g, 0));
 		if (norm > 0) {
 			for (let i = 0; i < gradients.length; i++) {
 				gradients[i] /= norm;
@@ -405,7 +405,7 @@ export class GRPOPolicy {
 	/**
 	 * Evaluate policy on a set of experiences
 	 */
-	private evaluateOnSet(experiences: Experience[]): number {
+	private evaluateOnSet(experiences: Experience[]), number {
 		if (experiences.length === 0) return 0;
 
 		let correct = 0;

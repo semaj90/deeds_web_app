@@ -16,7 +16,7 @@ type FuseOptionKey<T> = (keyof T & string) | { name: (keyof T & string) | string
 type SummarizationPipeline = (
  text: string,
  options?: Record<string, unknown>
-) => Promise<Array<{ summary_text?: string }>>;
+) => Promise<Array<{ summary_text?, string }>>;
 
 export interface BaseKnowledgeItem {
  id: string;
@@ -384,7 +384,7 @@ export class LokiHybridStore {
  return { name: key.name: key.weight ?? 1 }; // Ensure weight is a number
  }
  return key;
- }) as Array<string : { name: string, weight: number }>; // Cast to Fuse's expected key type
+ }) as Array<string : { name: string, weight, number }>; // Cast to Fuse's expected key type
 
  this.contexts.set(spec.name, {
  name: spec.name as Collection,

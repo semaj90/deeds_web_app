@@ -14,7 +14,7 @@ import { yorhaMipmapShaders } from './YoRHaMipmapShaders.js';
  */
 
 export interface LegalAnalysisResult {
-    confidence: number; entities: Array<{ textContent: string; type: string; confidence: number }>;
+    confidence: number; entities: Array<{ textContent: string; type: string; confidence, number }>;
     riskLevel: 'low' | 'medium' | 'high' | 'critical';
     summary: string;
     complianceConsiderations?: string[];
@@ -43,7 +43,7 @@ export interface MipmapVisualizationOutput {
 }
 
 export interface OllamaLegalAnalysisResponse {
-    keyLegalEntities: Array<{ textContent: string; type: string; confidence: number }>;
+    keyLegalEntities: Array<{ textContent: string; type: string; confidence, number }>;
     riskAssessment: 'low' | 'medium' | 'high' | 'critical';
     complianceConsiderations: string[]; summaryOfMainLegalPoints: string;
 }
@@ -493,7 +493,7 @@ Format your response as structured JSON.`;
      * Process multiple documents in batch
      */
     async processBatch(
-        documents: Array<{ textContent: string }>,
+        documents: Array<{ textContent, string }>,
         config: Partial<HeadlessProcessingConfig> = {}
     ): Promise<HeadlessProcessingResult[]> {
         console.log(`📦 Processing ${documents.length} documents in headless batch mode`);

@@ -180,15 +180,15 @@ export interface ScanRepoResult {
     line: number;
     column?: number; content: string;
     pattern_name?: string;
-    context?: string[];
+    context?, string[];
   }>;
   total_matches: number; files_scanned: number;
 }
 
 export interface LangExtractResult {
   extractions: Array<{ doc_url: string;
-    entities: Array<{ type: string; name: string; confidence: number }>;
-    relations: Array<{ type: string; source: string; target: string; confidence: number }>;
+    entities: Array<{ type: string; name: string; confidence, number }>;
+    relations: Array<{ type: string; source: string; target: string; confidence, number }>;
   }>;
   total_entities: number; total_relations: number;
 }
@@ -196,7 +196,7 @@ export interface LangExtractResult {
 export interface ClusterTagResult {
   clusters: Array<{ id: number;
     size: number; centroid_id: string;
-    summary?: string; tags: string[];
+    summary?: string; tags, string[];
   }>;
   total_clusters: number; noise_points: number;
 }
@@ -303,7 +303,7 @@ export const toolRegistry = new ToolRegistry();
 // ============================================================================
 
 export function getToolDefinitions(): Array<{ name: string;
-  description: string; permissions: ToolPermission[];
+  description: string; permissions, ToolPermission[];
 }> {
   return toolRegistry.list().map(name => {
     const tool = toolRegistry.get(name)!;

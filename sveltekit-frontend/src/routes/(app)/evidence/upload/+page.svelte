@@ -131,7 +131,7 @@
 
 				if (status.status === 'complete') {
 					uploadStatus.progress = 100;
-					uploadStatus.message = `✅ Processing complete: ${status.chunk_count} chunks created`;
+					uploadStatus.message = `✅ Processing complete, ${status.chunk_count} chunks created`;
 					break;
 				}
 
@@ -217,7 +217,7 @@
 
 	<div
 		class="upload-zone"
-		class:drag-active={dragActive}
+		class, drag-active={dragActive}
 		ondragover={handleDragOver}
 		ondragleave={handleDragLeave}
 		ondrop={handleDrop}
@@ -236,7 +236,7 @@
 		type="file"
 		accept=".pdf,.docx,.png,.jpg,.jpeg"
 		onchange={handleFileSelect}
-		style="display: none"
+		style="display, none"
 	/>
 
 	{#if uploadStatus.status !== 'idle'}
@@ -259,7 +259,7 @@
 			</div>
 
 			<div class="progress-bar">
-				<div class="progress-fill" style="width: {uploadStatus.progress}%"></div>
+				<div class="progress-fill" style="width, {uploadStatus.progress}%"></div>
 			</div>
 
 			<p class="status-message">{uploadStatus.message}</p>

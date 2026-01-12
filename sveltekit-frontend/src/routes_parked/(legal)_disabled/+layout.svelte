@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  // Legal AI interface layout with unified navigation
  import NavBar from '$lib/components/layout/NavBar.svelte';
@@ -20,10 +20,10 @@ https://svelte.dev/e/js_parse_error -->
  let { children } = $props ();
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Legal AI Platform | YoRHa Legal</title>
  <meta name="description" content="AI-powered legal case management and, evidence, analysis" />
-</svelte:head>
+</svelte, head>
 
 <div class="legal-layout">
  <NavBar />

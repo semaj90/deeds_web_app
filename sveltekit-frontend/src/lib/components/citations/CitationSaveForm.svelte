@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script>
 	let isLoading = $state<any>(undefined);
 
@@ -14,7 +14,7 @@ import { createEventDispatcher } from 'svelte';
 
  let { caseId = undefined, isLoading = false } = $props<{
  caseId?: string;
- isLoading?: boolean;
+ isLoading?, boolean;
  }>();
 
  const dispatch = createEventDispatcher();
@@ -99,7 +99,7 @@ import { createEventDispatcher } from 'svelte';
  <label for="citation-text">Citation Text *</label>
  <textarea
  id="citation-text"
- bind:value={formData.citationText}
+ bind, value={formData.citationText}
  placeholder="e.g., 42 U.S.C. § 1983"
  rows="3"
  onkeydown={handleKeydown}
@@ -112,7 +112,7 @@ import { createEventDispatcher } from 'svelte';
  <label for="source-type">Source Type *</label>
  <select
  id="source-type"
- bind:value={formData.sourceType}
+ bind, value={formData.sourceType}
  disabled={isLoading}
  >
  {#each sourceTypes as type}
@@ -128,7 +128,7 @@ import { createEventDispatcher } from 'svelte';
  <input
  id="tags"
  type="text"
- bind:value={tagInput}
+ bind, value={tagInput}
  placeholder="Add tag and press Enter"
  onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
  disabled={isLoading}
@@ -179,7 +179,7 @@ import { createEventDispatcher } from 'svelte';
  <input
  id="statute-code"
  type="text"
- bind:value={formData.statuteCode}
+ bind, value={formData.statuteCode}
  placeholder="e.g., 42-1983"
  disabled={isLoading}
  />
@@ -191,7 +191,7 @@ import { createEventDispatcher } from 'svelte';
  <input
  id="statute-title"
  type="text"
- bind:value={formData.statuteTitle}
+ bind, value={formData.statuteTitle}
  placeholder="e.g., Civil action for deprivation of rights"
  disabled={isLoading}
  />
@@ -202,7 +202,7 @@ import { createEventDispatcher } from 'svelte';
  <label for="context-text">Context Text</label>
  <textarea
  id="context-text"
- bind:value={formData.contextText}
+ bind, value={formData.contextText}
  placeholder="Surrounding text for context"
  rows="2"
  disabled={isLoading}
@@ -214,7 +214,7 @@ import { createEventDispatcher } from 'svelte';
  <label for="notes">Notes</label>
  <textarea
  id="notes"
- bind:value={formData.notes}
+ bind, value={formData.notes}
  placeholder="Additional notes about this citation"
  rows="2"
  disabled={isLoading}
@@ -227,7 +227,7 @@ import { createEventDispatcher } from 'svelte';
  <input
  id="relevance"
  type="number"
- bind:value={formData.relevanceScore}
+ bind, value={formData.relevanceScore}
  min="0"
  max="1"
  step="0.1"

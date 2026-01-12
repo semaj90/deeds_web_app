@@ -8,7 +8,7 @@ import { ingestStatuteWithChunks } from './statute-ingestion-service.js';
 
 export interface ScraperSource {
  name: string; url: string;
- parser: (html: string) => Promise<Array<{ title: string; content: string; section?: string }>>;
+ parser: (html: string) => Promise<Array<{ title: string; content: string; section?, string }>>;
  jurisdiction: string;
  category?: string;
 }

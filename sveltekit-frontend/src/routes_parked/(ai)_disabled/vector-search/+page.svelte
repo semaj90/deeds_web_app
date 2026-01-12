@@ -107,7 +107,7 @@
  type="number"
  min="1"
  max="100"
- bind:value={limit}
+ bind, value={limit}
  onchange={(e) => (limit = +(e.target as HTMLInputElement).value)}
  />
  </div>
@@ -194,7 +194,7 @@
  >
  <div
  class="similarity-badge"
- style={`color:${getSimilarityColor(r.similarity)}`}
+ style={`color, ${getSimilarityColor(r.similarity)}`}
  >
  {(r.similarity * 100).toFixed(1)}%
  </div>

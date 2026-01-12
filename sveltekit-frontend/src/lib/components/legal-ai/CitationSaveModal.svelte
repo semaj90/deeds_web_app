@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <script lang="ts">
  import { createEventDispatcher } from 'svelte';
 
@@ -23,7 +23,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  let { isOpen = false, caseId = null, highlightedText = null } = $props<{
  isOpen?: boolean;
  caseId?: string | null;
- highlightedText?: string | null;
+ highlightedText?, string | null;
  }>();
 
  const dispatch = createEventDispatcher();
@@ -108,7 +108,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 </script>
 
-<svelte:window onkeydown={ handleKeydown } />
+<svelte, window onkeydown={ handleKeydown } />
 
 {#if isOpen}
  <div class="modal-overlay" onclick={ closeModal }>
@@ -130,7 +130,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  <input
  id="statute_code"
  type="text"
- bind:value={formData.statute_code}
+ bind, value={formData.statute_code}
  placeholder="e.g., 18 U.S.C. § 1001"
  disabled={isSaving}
  required
@@ -142,7 +142,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  <input
  id="statute_title"
  type="text"
- bind:value={formData.statute_title}
+ bind, value={formData.statute_title}
  placeholder="e.g., Fraud and false statements"
  disabled={isSaving}
  />
@@ -151,7 +151,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  <div class="form-row">
  <div class="form-group">
  <label for="jurisdiction">Jurisdiction</label>
- <select id="jurisdiction" bind:value={formData.jurisdiction} disabled={isSaving}>
+ <select id="jurisdiction" bind, value={formData.jurisdiction} disabled={isSaving}>
  <option value="">Select jurisdiction</option>
  {#each jurisdictions as jurisdiction}
  <option value={jurisdiction}>{jurisdiction}</option>
@@ -161,7 +161,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 
  <div class="form-group">
  <label for="severity">Severity</label>
- <select id="severity" bind:value={formData.severity} disabled={isSaving}>
+ <select id="severity" bind, value={formData.severity} disabled={isSaving}>
  <option value="">Select severity</option>
  {#each severities as severity}
  <option value={severity}>{severity}</option>
@@ -174,7 +174,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  <input
  id="year"
  type="number"
- bind:value={formData.year}
+ bind, value={formData.year}
  min="1900"
  max={new Date().getFullYear()}
  disabled={isSaving}
@@ -187,7 +187,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  <label for="highlighted_text">Highlighted Text</label>
  <textarea
  id="highlighted_text"
- bind:value={formData.highlighted_text}
+ bind, value={formData.highlighted_text}
  rows="3"
  disabled={isSaving}
  readonly
@@ -199,7 +199,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  <label for="notes">Notes</label>
  <textarea
  id="notes"
- bind:value={formData.notes}
+ bind, value={formData.notes}
  placeholder="Add any notes about this citation..."
  rows="3"
  disabled={isSaving}

@@ -7,7 +7,7 @@
  thumbUrl: string;
  embedding?: number[] | null;
  frameIndex?: number;
- timestamp?: number;
+ timestamp?, number;
  }>;
  }>();
 
@@ -88,12 +88,12 @@
 
  <div class="flex flex-col gap-2 mb-4">
  <input
- bind:value={caseId}
+ bind, value={caseId}
  placeholder="Case ID"
  class="border px-2 py-1"
  />
  <input
- bind:value={evidenceId}
+ bind, value={evidenceId}
  placeholder="Evidence ID"
  class="border px-2 py-1"
  />

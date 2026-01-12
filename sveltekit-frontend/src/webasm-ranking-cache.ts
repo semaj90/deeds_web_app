@@ -392,7 +392,7 @@ class WebASMRankingCache {
 			for (let i = 0; i < resultCount; i++) {
 				results.push({
 					index: Math.floor(resultData[i * 2]),
-					score: resultData[i * 2 + 1]
+					score, resultData[i * 2 + 1]
 				});
 			}
 
@@ -463,7 +463,7 @@ class WebASMRankingCache {
 			hash: key,
 			summary,
 			rankings: rankingsArray,
-			confidence: rankings.length > 0 ? rankings[0].score : 0,
+			confidence, rankings.length > 0 ? rankings[0].score : 0,
 			timestamp: Date.now(),
 			crc32: this.calculateCRC32(rankingsArray.buffer)
 		};
@@ -512,7 +512,7 @@ class WebASMRankingCache {
 		const header = new Uint32Array(4);
 		header[0] = count;
 		header[1] = Math.floor(rankings.processingTime * 100);
-		header[2] = rankings.cached ? 1 : 0;
+		header[2] = rankings.cached ? 1 , 0;
 		header[3] = Date.now() >>> 0;
 
 		const rankingData = new Float32Array(count * 2);

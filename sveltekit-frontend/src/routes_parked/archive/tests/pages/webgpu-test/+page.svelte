@@ -96,7 +96,7 @@
  </div>
  <p>This placeholder replaces corrupted or missing markup for now.</p>
  <!-- minimal diagnostics UI to surface status -->
- <section class="status-card {isSuccess ? 'success' : errors.length ? 'error' : ''}">
+ <section class="status-card {isSuccess ? 'success' : errors.length ? 'error' , ''}">
  <div class="status-icon">{isSuccess ? '✓' : '⚠'}</div>
  <div class="details">
  <h3>Status</h3>

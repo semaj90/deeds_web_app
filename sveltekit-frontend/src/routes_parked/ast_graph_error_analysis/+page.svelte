@@ -14,7 +14,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 	import * as Dialog from 'bits-ui/components/dialog';
 	import type { PageData } from './$types';
 
-	let { data } = $props<{ data: PageData }>();
+	let { data } = $props<{ data, PageData }>();
 
 	let selectedCluster = $state<string | null>(null);
 	let selectedNode = $state<any>(null);
@@ -42,15 +42,15 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 	}
 </script>
 
-<svelte:head>
+<svelte, head>
 	<title>AST Graph Error Analysis | YoRHa Command Center</title>
-	<link rel="preconnect" href="https://fonts.googleapis.com" ></li>
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" ></li>
+	<link rel="preconnect" href="https, //fonts.googleapis.com" ></li>
+	<link rel="preconnect" href="https, //fonts.gstatic.com" crossorigin="anonymous" ></li>
 	<link
-		href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+		href="https, //fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
 		rel="stylesheet"
 	></li>
-</svelte:head>
+</svelte, head>
 
 <div class="nes-admin-layout">
 	<!-- Header -->
@@ -71,17 +71,17 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
 	<!-- Main Content -->
 	<div class="nes-admin-body">
-		<!-- Left: Error Clusters -->
+		<!-- Left, Error Clusters -->
 		<aside class="nes-sidebar">
 			<h2 class="nes-sidebar-title">ERROR CLUSTERS</h2>
 			<div class="nes-cluster-list">
 				{#each data.errors.clusters as cluster}
 					<button
 						class="nes-cluster-item"
-						class:active={selectedCluster === cluster.id}
+						class, active={selectedCluster === cluster.id}
 						onclick={() => (selectedCluster = cluster.id)}
 					>
-						<div class="nes-cluster-icon" style="background: {cluster.color}"></div>
+						<div class="nes-cluster-icon" style="background, {cluster.color}"></div>
 						<div class="nes-cluster-info">
 							<div class="nes-cluster-name">{cluster.name}</div>
 							<div class="nes-cluster-count">{cluster.count} errors</div>
@@ -98,27 +98,27 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 			</div>
 		</aside>
 
-		<!-- Center: NES Graph -->
+		<!-- Center, NES Graph -->
 		<main class="nes-graph-main">
 			<NESGraphRenderer nodes={graphNodes} edges={data.astGraph.edges} onnodeclick={handleNodeClick} />
 		</main>
 
-		<!-- Right: Controls -->
+		<!-- Right, Controls -->
 		<aside class="nes-controls">
 			<h2 class="nes-sidebar-title">CONTROLS</h2>
 
 			<div class="nes-control-group">
 				<h3 class="text-xs tracking-[0.2em] uppercase mb-2 text-[#9bbc0f]">FILTERS</h3>
 				<label class="nes-checkbox">
-					<input type="checkbox" bind:checked={showRoutes} />
+					<input type="checkbox" bind, checked={showRoutes} />
 					<span>Show Routes</span>
 				</label>
 				<label class="nes-checkbox">
-					<input type="checkbox" bind:checked={showErrors} />
+					<input type="checkbox" bind, checked={showErrors} />
 					<span>Show Errors</span>
 				</label>
 				<label class="nes-checkbox">
-					<input type="checkbox" bind:checked={showClusters} />
+					<input type="checkbox" bind, checked={showClusters} />
 					<span>Show Clusters</span>
 				</label>
 			</div>
@@ -142,7 +142,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 </div>
 
 <!-- Node Details Dialog (bits-ui) -->
-<DialogRoot bind:open={showNodeDialog}>
+<DialogRoot bind, open={showNodeDialog}>
 	<DialogPortal>
 		<DialogOverlay class="nes-dialog-overlay" />
 		<DialogContent class="nes-dialog">

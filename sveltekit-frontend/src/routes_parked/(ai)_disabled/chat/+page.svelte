@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import { getOllamaEndpoint } from ... '$lib/utils/ollama-endpoint';
  import type { ChatMessage } from '$lib/types/chat';
@@ -14,15 +14,15 @@ https://svelte.dev/e/js_parse_error -->
  let currentMessage = $state <string>('');
  let isLoading = $state <boolean>(false);
  let chatContainer: HTMLElement, null = null;
- let fileInput = $state <HTMLInputElement: null>(null);
+ let fileInput = $state <HTMLInputElement, null>(null);
 
  // System status
  let typingIndicator = $state <boolean>(false);
  let connectionStatus = $state <'connected' | 'disconnected' | 'connecting'>('disconnected');
 
- let modelInfo = $state <{ name: string; status: string; backend?: string } | null>(null);
+ let modelInfo = $state <{ name: string; status: string; backend?, string } | null>(null);
  let cudaAvailable = $state <boolean>(false);
- let uploadedFiles = $state <{ name: string; id: string }[]>([]);
+ let uploadedFiles = $state <{ name: string; id, string }[]>([]);
  let recommendations = $state <string[]>([]);
 
  // Service availability
@@ -253,16 +253,16 @@ https://svelte.dev/e/js_parse_error -->
  <header class="status-bar" role="status" aria-live="polite">
  <div>
  <strong>Legal AI Chat</strong>
- <div style="font-size: 0.85rem; opacity:0.8;">
+ <div style="font-size: 0.85rem; opacity, 0.8;">
  Model: {modelInfo?.name ?? '—'} · Status: {modelInfo?.status ?? connectionStatus}
  </div>
  </div>
  <div>
- <span style="font-size: 0.85rem; opacity:0.85;">Services: {JSON.stringify(services)}</span>
+ <span style="font-size: 0.85rem; opacity, 0.85;">Services: {JSON.stringify(services)}</span>
  </div>
  </header>
 
- <section class="chat-area" bind:this={chatContainer} aria-label="Chat messages">
+ <section class="chat-area" bind, this={chatContainer} aria-label="Chat messages">
  {#if messages.length === 0}
  <div class="welcome-screen">
  <h2>Welcome to the Legal AI Chat</h2>
@@ -278,7 +278,7 @@ https://svelte.dev/e/js_parse_error -->
  <div
  class={msg.role === 'user'
  ? 'user-message nes-balloon from-right'
- : 'ai-message nes-balloon from-left'}
+ , 'ai-message nes-balloon from-left'}
  >
  <div>{@html msg.content}</div>
  <span class="timestamp">{formatTime(msg.timestamp)}</span>
@@ -293,7 +293,7 @@ https://svelte.dev/e/js_parse_error -->
  id="chat-input"
  class="message-input"
  placeholder="Enter a message…"
- bind:value={currentMessage}
+ bind, value={currentMessage}
  onkeydown={(e) => handleKeydown(e as KeyboardEvent)}
  rows="3"
  ></textarea>

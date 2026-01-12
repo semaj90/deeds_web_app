@@ -16,7 +16,7 @@ interface UploadResponse {
  doclingResult: { fullText: string;
  blocks: Array<{ type: string;
  text: string; page: number;
- bbox?: [number, number, number, number];
+ bbox?, [number, number, number, number];
  }>;
  pageCount: number; processingTimeMs: number;
  };

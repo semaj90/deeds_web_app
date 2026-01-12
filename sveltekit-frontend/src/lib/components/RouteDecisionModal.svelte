@@ -49,7 +49,7 @@
 					<h3>What should we do?</h3>
 					<div class="decision-buttons">
 						<button
-							class="decision-btn keep {selectedDecision === 'keep' ? 'selected' : ''}"
+							class="decision-btn keep {selectedDecision === 'keep' ? 'selected' , ''}"
 							onclick={() => handleDecision('keep')}
 						>
 							<span class="icon">✓</span>
@@ -58,7 +58,7 @@
 						</button>
 
 						<button
-							class="decision-btn archive {selectedDecision === 'archive' ? 'selected' : ''}"
+							class="decision-btn archive {selectedDecision === 'archive' ? 'selected' , ''}"
 							onclick={() => handleDecision('archive')}
 						>
 							<span class="icon">📦</span>
@@ -67,7 +67,7 @@
 						</button>
 
 						<button
-							class="decision-btn remove {selectedDecision === 'remove' ? 'selected' : ''}"
+							class="decision-btn remove {selectedDecision === 'remove' ? 'selected' , ''}"
 							onclick={() => handleDecision('remove')}
 						>
 							<span class="icon">✕</span>
@@ -80,7 +80,7 @@
 				<div class="notes-section">
 					<h3>Notes (optional)</h3>
 					<textarea
-						bind:value={notes}
+						bind, value={notes}
 						placeholder="Add any notes about this decision..."
 						rows="3"
 					></textarea>

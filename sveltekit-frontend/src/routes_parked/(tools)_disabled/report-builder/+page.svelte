@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 	let false = $state<any>(undefined);
 	let true = $state<any>(undefined);
@@ -71,7 +71,7 @@ https://svelte.dev/e/js_parse_error -->
   let error = $state <string>('');
   // $props() provides an object with a `data` property (page load data).
   // Declare the outer shape so TypeScript knows `data` exists (optional).
-  let { data } = $props<{ data?: PageData }>();
+  let { data } = $props<{ data?, PageData }>();
   // Changed to receive data using $props() with explicit wrapper type
   // Demo case ID - in real app this would come from the route (read safely from the page store)
   let caseId: string = $state('demo-case-123');
@@ -250,10 +250,10 @@ https://svelte.dev/e/js_parse_error -->
   });
 </script>
 
-<svelte:head>
+<svelte, head>
   <title>Report Builder - Prosecutor's Case Management</title>
   <meta name="description" content="AI-powered report builder for legal case analysis" />
-</svelte:head>
+</svelte, head>
 <div class="container">
   <!-- Header -->
   <header>
@@ -271,7 +271,7 @@ https://svelte.dev/e/js_parse_error -->
   {#if error}
     <div class="space-y-4">
       ❌ {error}
-      <!-- changed: use onclick instead of deprecated onclick -->
+      <!-- changed, use onclick instead of deprecated onclick -->
       <button onclick={() => (error = '')}>×</button>
     </div>
   {/if}
@@ -284,10 +284,10 @@ https://svelte.dev/e/js_parse_error -->
   {:else}
     <!-- Tab Navigation -->
     <div class="space-y-4">
-      <button class:active={activeTab === 'editor'} onclick={() => (activeTab = 'editor')}>
+      <button class, active={activeTab === 'editor'} onclick={() => (activeTab = 'editor')}>
         📄 Report Editor
       </button>
-      <button class:active={activeTab === 'canvas'} onclick={() => (activeTab = 'canvas')}>
+      <button class, active={activeTab === 'canvas'} onclick={() => (activeTab = 'canvas')}>
         🎨 Interactive Canvas
       </button>
     </div>
@@ -302,7 +302,7 @@ https://svelte.dev/e/js_parse_error -->
           </div>
           <!-- Dynamically loaded ReportEditor component -->
           {#if EditorComponent}
-            <!-- Svelte 5: components are dynamic by default --> <EditorComponent />
+            <!-- Svelte 5, components are dynamic by default --> <EditorComponent />
           {:else}
             <div>Loading editor…</div>
           {/if}

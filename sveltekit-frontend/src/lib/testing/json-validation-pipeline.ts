@@ -115,7 +115,7 @@ class JSONValidationPipeline {
  * Generate performance report
  */
  generatePerformanceReport(results: ValidationResult[]): string {
- const backendStats = new Map<string, { count: number, totalTime: number; errors: number }>();
+ const backendStats = new Map<string, { count: number, totalTime: number; errors, number }>();
 
  for (const result of results) {
  const stats = backendStats.get(result.backend) || { count: 0, totalTime: 0, errors: 0 };

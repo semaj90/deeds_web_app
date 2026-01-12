@@ -123,7 +123,7 @@ export class QdrantSyncWorker {
  /**
  * Process a batch of pending chunks
  */
- private async processBatch(): Promise<{ synced: number; errors: number }> {
+ private async processBatch(): Promise<{ synced: number; errors, number }> {
  const startTime = Date.now();
 
  // Get chunks pending sync
@@ -150,7 +150,7 @@ export class QdrantSyncWorker {
  success = true;
  } catch (error) {
  attempts++;
- const errorMessage = error instanceof Error ? error.message : String(error);
+ const errorMessage = error instanceof Error ? error.message , String(error);
 
  if (attempts >= this.config.retryAttempts) {
  console.error(
@@ -226,7 +226,7 @@ export class QdrantSyncWorker {
  /**
  * Force sync all pending chunks (one-time operation)
  */
- async syncAll(): Promise<{ synced: number; errors: number }> {
+ async syncAll(): Promise<{ synced: number; errors, number }> {
  console.log('🔄 Force syncing all pending chunks...');
 
  let totalSynced = 0;

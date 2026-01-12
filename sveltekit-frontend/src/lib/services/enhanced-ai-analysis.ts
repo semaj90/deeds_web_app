@@ -147,7 +147,7 @@ Return only the array:`;
   }
  }
 
- private async generateSummaryAndTopics(text: string): Promise<{ summary: string, topics: string[] }> {
+ private async generateSummaryAndTopics(text: string): Promise<{ summary: string, topics, string[] }> {
   const summaryPrompt = `
 Analyze this legal document and provide:
 1. A concise summary (2-3 sentences)

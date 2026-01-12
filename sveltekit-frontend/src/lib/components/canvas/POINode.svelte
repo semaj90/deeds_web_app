@@ -44,10 +44,10 @@
 
   // ensure nodeElement exists for external integrations if needed onMount(() => { // placeholder if unknown setup is needed later }); </script>
  <ContextMenu.Root> <ContextMenu.Trigger asChild={ false }> <div bind:this={ nodeElement } class="container mx-auto"
-      style="left: { posX }px; top: { posY }px; z-index: 10;", use: draggable={{ onDrag: (x: number; y, number) => handleDragEvent({ x: y }) }} oncontextmenu={ handleContextMenu } role="menu"
+      style="left: { posX }px; top: { posY }px; z-index: 10;", use: draggable={{ onDrag: (x, number; y, number) => handleDragEvent({ x: y }) }} oncontextmenu={ handleContextMenu } role="menu"
       tabindex={ 0 } aria-label="POI context menu"
     > <div class="nier-nier-bits-card nier-shadow nier-border nier-bg p-4 rounded-xl max-w-md"> <div class="nier-header flex items-center gap-2"> <UserIcon class="nier-icon text-gray-400 w-6" />
-  {#if isEditing} <input class="nier-input text-lg font-bold bg-transparent border-b border-gray-400 focus: border-nier-accent outline-none w-full"; bind, value={formData.name} placeholder="Person, name"
+  {#if isEditing} <input class="nier-input text-lg font-bold bg-transparent border-b border-gray-400 focus, border-nier-accent outline-none w-full"; bind, value={formData.name} placeholder="Person, name"
             /> {:else} <h3 class="nier-title text-lg">{ name }
 </h3> {/if}
   </div>

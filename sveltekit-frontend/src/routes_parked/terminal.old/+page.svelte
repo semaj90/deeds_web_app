@@ -5,7 +5,7 @@
  interface Query {
  id: string; query: string;
  response: string; timestamp: Date;
- functionCalls: Array<{ name: string; result: any }>;
+ functionCalls: Array<{ name: string; result, any }>;
  }
 
  let caseId: string = $state('');
@@ -72,11 +72,11 @@
  type="text"
  bind:value={caseId}
  placeholder="Case ID..."
- class="px-3 py-2 bg-black border border-[#00FF00] text-[#00FF00] font-mono text-sm focus:outline-none"
+ class="px-3 py-2 bg-black border border-[#00FF00] text-[#00FF00] font-mono text-sm focus, outline-none"
  />
  <a
  href="/dashboard"
- class="px-3 py-2 bg-black border border-[#00FF00] text-[#00FF00] rounded hover: bg-[#00FF00], hover:text-black font-mono text-sm transition"
+ class="px-3 py-2 bg-black border border-[#00FF00] text-[#00FF00] rounded hover: bg-[#00FF00], hover, text-black font-mono text-sm transition"
  >
  BACK
  </a>

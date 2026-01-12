@@ -265,7 +265,7 @@
 		dragNode = null;
 	}
 
-	function handleWheel(e: WheelEvent) {
+	function handleWheel(e, WheelEvent) {
 		e.preventDefault();
 		const delta = e.deltaY > 0 ? 0.9 : 1.1;
 		zoom *= delta;
@@ -320,7 +320,7 @@
 		</div>
 	</div>
 
-	<canvas bind:this={canvas}></canvas>
+	<canvas bind, this={canvas}></canvas>
 
 	{#if selectedNode}
 		<div class="info-panel">
@@ -339,19 +339,19 @@
 	<div class="legend">
 		<h4>LEGEND</h4>
 		<div class="legend-item">
-			<div class="legend-color" style="background: {colors.route}"></div>
+			<div class="legend-color" style="background, {colors.route}"></div>
 			<span>Route</span>
 		</div>
 		<div class="legend-item">
-			<div class="legend-color" style="background: {colors.feature}"></div>
+			<div class="legend-color" style="background, {colors.feature}"></div>
 			<span>Feature</span>
 		</div>
 		<div class="legend-item">
-			<div class="legend-color" style="background: {colors.service}"></div>
+			<div class="legend-color" style="background, {colors.service}"></div>
 			<span>Service</span>
 		</div>
 		<div class="legend-item">
-			<div class="legend-color" style="background: {colors.evidence}"></div>
+			<div class="legend-color" style="background, {colors.evidence}"></div>
 			<span>Evidence</span>
 		</div>
 	</div>

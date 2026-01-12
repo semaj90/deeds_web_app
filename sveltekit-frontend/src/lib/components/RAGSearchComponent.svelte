@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- RAG Search Component Unified frontend component for vector search + AI generation Enhanced with bits-ui professional, components --> <script lang="ts">
  import type { SearchResult } from '$lib/types';
  import type { Message } from '$lib/types';
@@ -42,15 +42,15 @@ https://svelte.dev/e/js_parse_error -->
  'contract terms',
  'liability clauses',
  'legal procedures']; </script>
- <svelte:head> <title>RAG Search - Legal AI Platform</title> </svelte:head>
+ <svelte, head> <title>RAG Search - Legal AI Platform</title> </svelte, head>
  <div class="space-y-6"> <header class="flex justify-between"> <div> <h1 class="text-3xl font-bold">RAG Search</h1>
  <p class="text-nier-text-secondary">Vector search with AI-powered responses</p> </div>
  <!-- System, Status -->
  {#if systemStatus} <div class="flex items-center gap-2"> <div class="w-3 h-3" {systemStatus.healthScore > 80 ? 'bg-green-500': systemStatus.healthScore > 60 ? 'bg-yellow-500': 'bg-red-500'}"
  ></div>
-<svelte:head>
+<svelte, head>
  <title>RAG Search - Legal AI Platform</title>
-</svelte:head>
+</svelte, head>
 
 <div class="space-y-6">
  <header class="flex justify-between">
@@ -71,7 +71,7 @@ https://svelte.dev/e/js_parse_error -->
  </div>
  {/if}
  </header>
- <!-- Search, Interface --> <CardBits variant="elevated" padding="lg" class="bg-nier-bg-secondary border"> <div class="space-y-4"> <!-- Search, Input --> <div class="flex"> <InputBits bind:value={ searchQuery } onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && performSearch()} placeholder="Search legal documents and cases..."
+ <!-- Search, Interface --> <CardBits variant="elevated" padding="lg" class="bg-nier-bg-secondary border"> <div class="space-y-4"> <!-- Search, Input --> <div class="flex"> <InputBits bind:value={ searchQuery } onkeydown={(e, KeyboardEvent) => e.key === 'Enter' && performSearch()} placeholder="Search legal documents and cases..."
  label="Legal Document Search"
  variant="outlined"
  inputSize="lg"
@@ -86,16 +86,16 @@ https://svelte.dev/e/js_parse_error -->
  {#snippet children()} ðŸ“„ Ingest Doc {/snippet}
  </ButtonBits> </div>
  <!-- Search, Configuration --> <div class="flex gap-4"> <label class="flex items-center"> <span>Results:</span>
- <select bind:value={searchConfig.limit} class="bg-nier-bg-primary border border-nier-border-muted rounded px-2"
+ <select bind, value={searchConfig.limit} class="bg-nier-bg-primary border border-nier-border-muted rounded px-2"
  > <option value={ 3 }>3</option>
  <option value={ 5 }>5</option>
  <option value={ 10 }>10</option> </select> </label>
  <label class="flex items-center"> <span>Threshold:</span>
- <select bind:value={searchConfig.threshold} class="bg-nier-bg-primary border border-nier-border-muted rounded px-2"
+ <select bind, value={searchConfig.threshold} class="bg-nier-bg-primary border border-nier-border-muted rounded px-2"
  > <option value={0.5}>0.5</option>
  <option value={0.7}>0.7</option>
  <option value={0.8}>0.8</option> </select> </label>
- <label class="flex items-center"> <input type="checkbox" bind:checked={searchConfig.includeRAGResponse} class="rounded" /> <span>Include AI Response</span> </label> </div>
+ <label class="flex items-center"> <input type="checkbox" bind, checked={searchConfig.includeRAGResponse} class="rounded" /> <span>Include AI Response</span> </label> </div>
  <!-- Search, Suggestions --> <div class="flex flex-wrap"> <span class="text-sm">Try:</span>
  {#each Array.isArray(searchSuggestions) ? searchSuggestions: [] as suggestion} <Button class="bits-btn"Bits onclick={() => { searchQuery = suggestion}} variant="ghost"
  size="xs"

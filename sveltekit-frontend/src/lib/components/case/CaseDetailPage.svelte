@@ -5,7 +5,7 @@
  import SummaryEditor from './SummaryEditor.svelte';
 
  let { caseId } = $props<{
- caseId: string;
+ caseId, string;
  }>();
 
  let summary: CaseSummary, null = null;

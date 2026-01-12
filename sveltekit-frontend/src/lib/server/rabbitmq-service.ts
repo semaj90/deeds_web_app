@@ -8,7 +8,7 @@ export interface DocumentProcessingJob {
  documentId: string, caseId: string, userId: string, s3Key: string, s3Bucket: string, originalName: string, mimeType: string, fileSize: number, processingType: string; // e.g., "ocr" | "nlp" | "classify"
  priority?: number
  createdAt?: string
- metadata?: Record<string: unknown>}
+ metadata?: Record<string, unknown>}
 
 export interface DLQMessage extends DocumentProcessingJob {
  error: string, retries: number, timestamp: string; // ISO

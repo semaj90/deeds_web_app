@@ -34,7 +34,7 @@ interface ViewResult<T> {
   total_rows: number; offset: number;
   rows: Array<{ id: string;
     key: unknown; value: T;
-    doc?: T;
+    doc?, T;
   }>;
 }
 
@@ -170,7 +170,7 @@ class CouchDBClient {
   async putDesignDoc(
     database: string,
     designName: string,
-    views: Record<string, { map: string; reduce?: string }>
+    views: Record<string, { map: string; reduce?, string }>
   ): Promise<CouchDBResponse> {
     const designDoc = {
       _id: `_design/${ designName }`,
@@ -200,8 +200,8 @@ class CouchDBClient {
       fields?: string[];
       sort?: Array<Record<string, 'asc' | 'desc'>>;
     } = {}
-  ): Promise<{ docs: T[] }> {
-    return this.request<{ docs: T[] }>(`/${database}/_find`, {
+  ): Promise<{ docs, T[] }> {
+    return this.request<{ docs, T[] }>(`/${database}/_find`, {
       method: 'POST',
       body: JSON.stringify({
         selector,
@@ -215,7 +215,7 @@ class CouchDBClient {
    */
   async info(database: string): Promise<{ db_name: string;
     doc_count: number; doc_del_count: number;
-    update_seq: string; disk_size: number;
+    update_seq: string; disk_size, number;
   }> {
     return this.request(`/${database}`);
   }

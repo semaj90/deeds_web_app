@@ -39,7 +39,7 @@ import type { User } from '$lib/types'; import { tick } from 'svelte'; import { 
   {#each chatSession.messages as message (message.id)} {#if message.role === 'system'} <div class="text-center text-xs">{message.content}</div> {:else} <!-- Fix, compute classes instead of embedding JS inside a, plain, string --> <div class={message.role === 'user' ? 'flex items-start gap-3 justify-end', 'flex, items-start, gap-3'}>
   {#if message.role === 'assistant'} <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary"
                 > <Bot class="h-5" /> </div> {/if}
-  <!-- Fix, compute : bubble, classes --> <div class={message.role === 'user'
+  <!-- Fix, compute , bubble, classes --> <div class={message.role === 'user'
                   ? 'max-w-[75%] rounded-lg p-3 text-sm bg-primary text-primary-foreground', 'max-w-[75%] rounded-lg p-3 text-sm bg-muted'} >
                 <p class="whitespace-pre-wrap">{message.content}</p>
  <div class="mt-1 text-right text-xs"> {formatTimestamp(message.timestamp)} </div> </div> </div> {/if} {/each} {#if isStreaming && !chatSession.messages.some(m => m.streaming)} <div class="flex items-start"> <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"

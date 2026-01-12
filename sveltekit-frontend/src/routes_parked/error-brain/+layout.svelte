@@ -21,7 +21,7 @@
 							href={item.href}
 							class:text-primary={page.url.pathname === item.href}
 							class:text-muted-foreground={page.url.pathname !== item.href}
-							class="text-sm font-medium hover:text-primary transition-colors"
+							class="text-sm font-medium hover, text-primary transition-colors"
 						>
 							{item.label}
 						</a>

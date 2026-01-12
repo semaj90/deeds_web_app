@@ -17,7 +17,7 @@ const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
 const PHASE72_PYTHON = process.env.PHASE72_PYTHON || 'python';
 
-async function fetchVectors(collection: string, limit: number): Promise<Array<{ id: string; vector: number[] }>> {
+async function fetchVectors(collection: string, limit: number): Promise<Array<{ id: string; vector, number[] }>> {
   const response = await fetch(`${QDRANT_URL}/collections/${ collection }/points/scroll`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -32,7 +32,7 @@ async function fetchVectors(collection: string, limit: number): Promise<Array<{ 
     throw new Error(`Failed to fetch vectors: ${response.statusText}`);
   }
 
-  const data = await response.json() as { result: { points: Array<{ id: string; vector: number[] }> } };
+  const data = await response.json() as { result: { points: Array<{ id: string; vector, number[] }> } };
   return data.result.points;
 }
 
@@ -81,7 +81,7 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
   // Simple clustering simulation (in production, call CUDA script)
   const clusters: Array<{ id: number;
     size: number; centroid_id: string;
-    summary?: string; tags: string[];
+    summary?: string; tags, string[];
   }> = [];
 
   const clusterSize = Math.max(5, Math.floor(points.length / 10));
@@ -91,7 +91,7 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
     const clusterPoints = points.slice(i, i + clusterSize);
     const centroid = clusterPoints[0];
 
-    let summary: string | undefined;
+    let summary, string | undefined;
     if (request.tag_config?.generate_summaries) {
       summary = await generateClusterSummary(
         clusterPoints.map(p => String(p.id)),

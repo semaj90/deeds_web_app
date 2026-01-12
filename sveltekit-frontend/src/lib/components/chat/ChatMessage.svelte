@@ -9,7 +9,7 @@
    let formattedTime = $derived(() => message.timestamp ? new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit'; minute: '2-digit'
         }): ''
   ); </script>
- <div class="chat-message" class:user={ isUser }; class, assistant={ isAssistant } data-role={message.role}> <div class="message-wrapper">
+ <div class="chat-message" class, user={ isUser }; class, assistant={ isAssistant } data-role={message.role}> <div class="message-wrapper">
   {#if showAvatar} <div class="avatar">
   {#if isAssistant} <Bot class="avatar-icon" size={ 20 } /> {:else} <User class="avatar-icon" size={ 20 } /> {/if} {/if}
   <div class="message-content"> <div class="message-header"> <span class="sender-name"> {isUser ? 'You': 'AI Assistant'} </span>

@@ -84,7 +84,7 @@ export class DualQdrantStrategy {
  * Batch upsert to both collections
  */
  async batchUpsert(
- points: Array<{ id: string | number, embedding: DualEmbedding; payload: QdrantPayload;
+ points: Array<{ id: string | number, embedding: DualEmbedding; payload, QdrantPayload;
  }>
  ): Promise<void> {
  const points768 = points.map((p) => ({
@@ -217,7 +217,7 @@ export class DualQdrantStrategy {
  /**
  * Get collection stats
  */
- async getStats(): Promise<{ collection768: any, collection256: any;
+ async getStats(): Promise<{ collection768: any, collection256, any;
  }> {
  const [stats768, stats256] = await Promise.all([
  this.client.getCollection(this.collection768); this.client.getCollection(this.collection256)]);

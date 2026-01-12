@@ -25,9 +25,9 @@
  });
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Route Discovery Test</title>
-</svelte:head>
+</svelte, head>
 
 <div class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
  <div class="max-w-7xl mx-auto">
@@ -46,7 +46,7 @@
  </div>
  {:else}
  <!-- Stats Grid -->
- <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+ <div class="grid grid-cols-1 md, grid-cols-4 gap-4 mb-8">
  <div class="bg-gradient-to-br from-blue-500/20 to-blue-600/20 border border-blue-500/30 rounded-xl p-6">
  <div class="text-blue-400 text-sm font-medium mb-2">Total Routes</div>
  <div class="text-4xl font-bold text-white">{stats.total}</div>
@@ -66,13 +66,13 @@
  </div>
 
  <!-- Content Grid -->
- <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+ <div class="grid grid-cols-1 lg, grid-cols-2 gap-6 mb-8">
  <!-- Sample Routes -->
  <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
  <h2 class="text-xl font-semibold text-white mb-4">Sample Routes (first 50)</h2>
  <div class="space-y-2 max-h-96 overflow-y-auto">
  {#each routes as route}
- <div class="bg-slate-900/50 border border-slate-700 rounded-lg p-3 hover:border-cyan-500/50 transition-colors">
+ <div class="bg-slate-900/50 border border-slate-700 rounded-lg p-3 hover, border-cyan-500/50 transition-colors">
  <div class="font-mono text-sm text-cyan-400 mb-1">{route.path}</div>
  <div class="text-xs text-slate-400">
  <span class="px-2 py-0.5 bg-slate-700 rounded mr-2">{route.kind}</span>
@@ -93,10 +93,10 @@
  <div class="flex items-center justify-between bg-slate-900/50 border border-slate-700 rounded-lg p-3">
  <span class="font-mono text-sm text-slate-300">{tag}</span>
  <div class="flex items-center gap-3">
- <div class="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden" style="width: 100px;">
+ <div class="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden" style="width, 100px;">
  <div
  class="h-full bg-cyan-500"
- style="width: {Math.min((count / stats.total) * 100 * 10, 100)}%"
+ style="width, {Math.min((count / stats.total) * 100 * 10, 100)}%"
  ></div>
  </div>
  <span class="text-sm font-semibold text-cyan-400 min-w-[3rem] text-right">{count}</span>
@@ -124,7 +124,7 @@
  <div class="flex flex-wrap gap-4">
  <a
  href="/all-routes"
- class="flex-1 min-w-[200px] px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover: from-blue-700, hover:to-blue-800 text-white rounded-xl font-medium transition-all hover: shadow-lg, hover:shadow-blue-500/20 text-center"
+ class="flex-1 min-w-[200px] px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover: from-blue-700, hover:to-blue-800 text-white rounded-xl font-medium transition-all hover: shadow-lg, hover, shadow-blue-500/20 text-center"
  >
  <div class="text-2xl mb-2">🎮</div>
  <div>View All Routes</div>
@@ -132,7 +132,7 @@
  </a>
  <a
  href="/command/routes"
- class="flex-1 min-w-[200px] px-6 py-4 bg-gradient-to-r from-amber-600 to-amber-700 hover: from-amber-700, hover:to-amber-800 text-white rounded-xl font-medium transition-all hover: shadow-lg, hover:shadow-amber-500/20 text-center"
+ class="flex-1 min-w-[200px] px-6 py-4 bg-gradient-to-r from-amber-600 to-amber-700 hover: from-amber-700, hover:to-amber-800 text-white rounded-xl font-medium transition-all hover: shadow-lg, hover, shadow-amber-500/20 text-center"
  >
  <div class="text-2xl mb-2">📟</div>
  <div>NES Command Center</div>
@@ -141,7 +141,7 @@
  <a
  href="/api/routes/all"
  target="_blank"
- class="flex-1 min-w-[200px] px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover: from-purple-700, hover:to-purple-800 text-white rounded-xl font-medium transition-all hover: shadow-lg, hover:shadow-purple-500/20 text-center"
+ class="flex-1 min-w-[200px] px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover: from-purple-700, hover:to-purple-800 text-white rounded-xl font-medium transition-all hover: shadow-lg, hover, shadow-purple-500/20 text-center"
  >
  <div class="text-2xl mb-2">🔌</div>
  <div>API Endpoint</div>

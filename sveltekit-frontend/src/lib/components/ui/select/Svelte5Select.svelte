@@ -124,7 +124,7 @@ function handleBlur() {
 		{required}
 		{ disabled }
 		class="sr-only"
-		bind:value
+		bind, value
 		aria-hidden="true"
 		tabindex="-1"
 	>
@@ -139,7 +139,7 @@ function handleBlur() {
 		type="button"
 		class="{baseClasses}"
 		class:ring-2={isOpen}
-		class:ring-blue-500={isOpen}
+		class, ring-blue-500={isOpen}
 		{ disabled }
 		aria-haspopup="listbox"
 		aria-expanded={isOpen}
@@ -147,13 +147,13 @@ function handleBlur() {
 		onkeydown={handleKeydown}
 		onblur={handleBlur}
 	>
-		<span class="block truncate" class:text-slate-400={!selectedOption}>
+		<span class="block truncate" class, text-slate-400={!selectedOption}>
 			{displayValue}
 		</span>
 		<span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
 			<svg
 				class="w-5 h-5 text-slate-400 transition-transform duration-200"
-				class:rotate-180={isOpen}
+				class, rotate-180={isOpen}
 				fill="none"
 				stroke="currentColor"
 				viewBox="0 0 24 24"
@@ -177,7 +177,7 @@ function handleBlur() {
 					class:bg-blue-600={focusedIndex === i}
 					class:bg-blue-700={value === opt.value}
 					class:opacity-50={opt.disabled}
-					class:cursor-not-allowed={opt.disabled}
+					class, cursor-not-allowed={opt.disabled}
 					role="option"
 					aria-selected={value === opt.value}
 					aria-disabled={opt.disabled}

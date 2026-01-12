@@ -46,7 +46,7 @@ import { onMount } from 'svelte';
  let droppedEvidenceIds = $state <string[]>([]);
 
  // Evidence positioning and layout
- let evidencePositions = $state <Map<string, { x: number; y: number; width: number; height: number }>>(new Map());
+ let evidencePositions = $state <Map<string, { x: number; y: number; width: number; height, number }>>(new Map());
 
  // Calculate icon based on file type
  function getFileIcon(mimeType: string) {
@@ -245,10 +245,10 @@ import { onMount } from 'svelte';
  ondrop={handleDrop}
  role="region"
  aria-label="Evidence detective canvas - drag evidence here for AI tagging"
- tabindex={readonly ? -1 : 0}
+ tabindex={readonly ? -1 , 0}
 >
  <!-- Drop zone indicator -->
- <div class="drop-zone-indicator" class:active={dropZoneActive}>
+ <div class="drop-zone-indicator" class, active={dropZoneActive}>
  <Target size={ 48 } />
  <p>Drop evidence here for AI detective mode</p>
  </div>
@@ -266,7 +266,7 @@ import { onMount } from 'svelte';
 
  <div
  class="canvas-content"
- style="transform: translate({panX}px, {panY}px) scale({zoom})"
+ style="transform, translate({panX}px, {panY}px) scale({zoom})"
  >
  {#each evidence as item (item.id)}
  {@const position = evidencePositions.get(item.id)}
@@ -275,7 +275,7 @@ import { onMount } from 'svelte';
  {#if position}
  <div
  class="evidence-wrapper"
- style="left: {position.x}px; top: {position.y}px"
+ style="left: {position.x}px; top, {position.y}px"
  >
  <EvidenceCard
  evidence={item}

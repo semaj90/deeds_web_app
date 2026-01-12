@@ -468,10 +468,10 @@ Build on previous responses:
  });
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Help & Support - Legal AI Platform</title>
  <meta name="description" content="Help documentation, tutorials, and support resources for the Legal AI Platform" />
-</svelte:head>
+</svelte, head>
 
 <main class="min-h-screen bg-gray-50">
  <!-- Header -->
@@ -492,12 +492,12 @@ Build on previous responses:
  <input
  type="text"
  placeholder="Search help articles..."
- class="w-full pl-12 pr-32 py-4 rounded-lg border-0 text-gray-900 text-lg focus: ring-2, focus: ring-white, focus: ring-opacity-50", bind:value={searchQuery}
+ class="w-full pl-12 pr-32 py-4 rounded-lg border-0 text-gray-900 text-lg focus: ring-2, focus: ring-white, focus: ring-opacity-50", bind, value={searchQuery}
  />
  <button
  onclick={ toggleSearchMode }
  class="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-white text-blue-600 rounded-md hover:bg-gray-50 transition flex items-center gap-2 font-medium"
- class:disabled={isSearching}
+ class, disabled={isSearching}
  disabled={isSearching}
  >
  {#if isSearching}
@@ -588,9 +588,9 @@ Build on previous responses:
  </div>
 
  {#if filteredArticles.length > 0}
- <div class="grid gap-6 md: grid-cols-2, lg:grid-cols-3">
+ <div class="grid gap-6 md: grid-cols-2, lg, grid-cols-3">
  {#each filteredArticles as article}
- <article class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
+ <article class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover, shadow-md transition">
  <div class="flex items-start gap-4 mb-4">
  <getTypeIcon(article.type) class="h-6 w-6 {getTypeColor(article.type)} flex-shrink-0 mt-1" ></type)>
  <div class="flex-1">
@@ -637,12 +637,12 @@ Build on previous responses:
  Frequently Asked Questions
  </h2>
 
- <div class="grid gap-4 md:grid-cols-2">
+ <div class="grid gap-4 md, grid-cols-2">
  {#each faqs as faq}
  <details class="bg-white rounded-lg shadow-sm border border-gray-200 group">
- <summary class="flex justify-between items-center w-full p-6 text-left font-medium text-gray-900 cursor-pointer hover:bg-gray-50">
+ <summary class="flex justify-between items-center w-full p-6 text-left font-medium text-gray-900 cursor-pointer hover, bg-gray-50">
  {faq.question}
- <ArrowRight class="h-5 w-5 text-gray-400 group-open:rotate-90 transition-transform" />
+ <ArrowRight class="h-5 w-5 text-gray-400 group-open, rotate-90 transition-transform" />
  </summary>
  <div class="px-6 pb-6">
  <p class="text-gray-700">{faq.answer}</p>
@@ -658,7 +658,7 @@ Build on previous responses:
  <ExternalLink class="h-5 w-5 mr-3" />
  Need More Help?
  </h3>
- <div class="grid gap-4 md:grid-cols-3">
+ <div class="grid gap-4 md, grid-cols-3">
  <ButtonRoot variant="outline" class="h-auto p-4 flex-col items-start bits-btn">
  <MessageSquare class="h-6 w-6 mb-2" />
  <div class="font-medium">Contact Support</div>

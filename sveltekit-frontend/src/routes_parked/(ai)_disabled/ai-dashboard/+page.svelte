@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import type { User } from '$lib/types';
  import type { Case } from '$lib/types';
@@ -17,7 +17,7 @@ https://svelte.dev/e/js_parse_error -->
  import type { Badge } from '$lib/components/ui/badge';
 
  // Receive data from SvelteKit load function
- let { data } = $props<{ data: PageData }>();
+ let { data } = $props<{ data, PageData }>();
 
  // Default stats fallback
  const defaultStats = {
@@ -34,7 +34,7 @@ let aiStats = $state({);
  };
 
  // type-safe maps
- const statusColors: Record<string, { bg: string; text: string; label: string }> = {
+ const statusColors: Record<string, { bg: string; text: string; label, string }> = {
  open: { bg: '#4caf50', text: '#fff', label: 'Open' },
  investigating: { bg: '#ff9800', text: '#fff', label: 'Investigating' },
  pending: { bg: '#ffd700', text: '#000', label: 'Pending' },

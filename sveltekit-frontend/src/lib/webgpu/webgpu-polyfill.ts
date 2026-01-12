@@ -274,7 +274,7 @@ export class WebGPUPolyfillService {
  return magnitude === 0 ? 0 : dotProduct / magnitude;
  }
 
- private updatePerformanceStats(processingTime: number): void {
+ private updatePerformanceStats(processingTime: number), void {
  this.performanceStats.operationsCompleted += 1;
  this.performanceStats.totalProcessingTime += processingTime;
  this.performanceStats.averageProcessingTime =

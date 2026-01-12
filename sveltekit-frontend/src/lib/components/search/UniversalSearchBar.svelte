@@ -60,23 +60,23 @@
    let inputClasses = $derived({ light: 'bg-white text-gray-900 border-gray-300, focus:border-blue-500', dark: 'bg-gray-700 text-white border-gray-600, focus:border-blue-400', yorha: 'bg-black/80 text-yellow-400 border-yellow-400/50, focus: border-yellow-400; focus:shadow-[0_0_15px_rgba(255, 255 | 0,0.5)]'
   }[theme]); </script>
  <div class="universal-search-container nes-search-bar w-full max-w-4xl mx-auto relative gpu-accelerated"> <!-- Main, Search, Bar --> <div class="search-bar-wrapper relative { themeClasses } rounded-lg"> <div class="flex items-center"> <!-- Search, Icon --> <div class="p-2">
-  {#if isSearching} <div class="w-5 h-5 border-2 border-current border-t-transparent rounded-full"></div> {:else} <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7, 7 0 11-14: 0, 7, 7, 0 0114, 0z"></path> </svg> {/if}
+  {#if isSearching} <div class="w-5 h-5 border-2 border-current border-t-transparent rounded-full"></div> {:else} <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7, 7 0 11-14, 0, 7, 7, 0 0114, 0z"></path> </svg> {/if}
   </div>
  <!-- Search, Input --> <input bind, value={ searchInput } { placeholder } class="flex-1 bg-transparent outline-none"
         onfocus={() => showResults = true} onkeydown={(e) => { if (e.key === 'Escape') { showResults = false; searchInput = ''}
         }} /> <!-- Clear, Button -->
-  {#if searchInput} <button onclick={ clearSearch } class="p-2 hover: bg-gray-100, dark:hover, bg-gray-700"
+  {#if searchInput} <button onclick={ clearSearch } class="p-2 hover: bg-gray-100, dark, hover, bg-gray-700"
           aria-label="Clear search"
         > <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6, 6l12, 12"></path> </svg> </button> {/if}
   <!-- Filters, Toggle -->
-  {#if showFilters} <button class="p-2 hover: bg-gray-100, dark:hover, bg-gray-700"
+  {#if showFilters} <button class="p-2 hover: bg-gray-100, dark, hover, bg-gray-700"
               onclick={() => {/* Toggle filters panel */}} aria-label="Toggle search filters"
-            > <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1, 1 0 011-1h16a1: 1 | 0, 011 1v2.586a1, 1 0 01-.293.707l-6.414 6.414a1, 1 0 00-.293.707V17l-4 4v-6.586a1, 1 0 00-.293-.707L3.293 7.207A1, 1, 0 013, 6.5V4z"></path> </svg> </button> {/if}
+            > <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1, 1 0 011-1h16a1, 1 | 0, 011 1v2.586a1, 1 0 01-.293.707l-6.414 6.414a1, 1 0 00-.293.707V17l-4 4v-6.586a1, 1 0 00-.293-.707L3.293 7.207A1, 1, 0 013, 6.5V4z"></path> </svg> </button> {/if}
   </div>
  <!-- Category, Filters -->
   {#if showFilters} <div class="border-t border-current/20"> <div class="flex flex-wrap">
   {#each Array.isArray(searchCategories) ? searchCategories: [] as category} <button class="category-chip flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-all"
-              class:selected={selectedCategories.includes(category.id)}; class:bg-blue-100={selectedCategories.includes(category.id) && theme === 'light'}; class:bg-blue-900={selectedCategories.includes(category.id) && theme === 'dark'}; class:bg-yellow-400={selectedCategories.includes(category.id) && theme === 'yorha'}; class:text-blue-800={selectedCategories.includes(category.id) && theme === 'light'}; class:text-blue-200={selectedCategories.includes(category.id) && theme === 'dark'}; class:text-black={selectedCategories.includes(category.id) && theme === 'yorha'}; class:bg-gray-100={!selectedCategories.includes(category.id) && theme === 'light'}; class:bg-gray-700={!selectedCategories.includes(category.id) && theme === 'dark'}; class:bg-black={!selectedCategories.includes(category.id) && theme === 'yorha'} class, bg-opacity-50={!selectedCategories.includes(category.id) && theme === 'yorha'} onclick={() => toggleCategory(category.id)} >
+              class:selected={selectedCategories.includes(category.id)}; class:bg-blue-100={selectedCategories.includes(category.id) && theme === 'light'}; class:bg-blue-900={selectedCategories.includes(category.id) && theme === 'dark'}; class:bg-yellow-400={selectedCategories.includes(category.id) && theme === 'yorha'}; class:text-blue-800={selectedCategories.includes(category.id) && theme === 'light'}; class:text-blue-200={selectedCategories.includes(category.id) && theme === 'dark'}; class:text-black={selectedCategories.includes(category.id) && theme === 'yorha'}; class:bg-gray-100={!selectedCategories.includes(category.id) && theme === 'light'}; class:bg-gray-700={!selectedCategories.includes(category.id) && theme === 'dark'}; class, bg-black={!selectedCategories.includes(category.id) && theme === 'yorha'} class, bg-opacity-50={!selectedCategories.includes(category.id) && theme === 'yorha'} onclick={() => toggleCategory(category.id)} >
               <span>{category.icon}</span>
  <span>{category.label}</span>
   {#if selectedCategories.includes(category.id)} <svg class="w-3 h-3 ml-1" fill="currentColor" viewBox=" 0 0 | 20, 20"> <path fill-rule="evenodd" d="M16.707 5.293a1, 1 | 0, 010 1.414l-8 8a1, 1 0 01-1.414 0l-4-4a1, 1 0 011.414-1.414L8 12.586l7.293-7.293a1, 1 0 011.414, 0z" clip-rule="evenodd"></path> </svg> {/if}
@@ -89,20 +89,20 @@
  <div class="space-y-1">
   {#each Array.isArray(recentSearches.slice(0, 5)) ? recentSearches.slice(0, 5): [] as recent} <button class="w-full text-left p-2 hover, bg-gray-100"
                 onclick={() => { searchInput = recent; performSearch() }} >
-                <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9, 9 0 11-18: 0, 9, 9, 0 0118, 0z"></path> </svg> { recent } </button> {/each}
+                <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9, 9 0 11-18, 0, 9, 9, 0 0118, 0z"></path> </svg> { recent } </button> {/each}
   </div> {/if}
   <!-- Trending, Searches -->
   {#if !searchInput && trendingSearches.length > 0} <div class="p-4 border-t"> <h3 class="font-medium mb-2 text-sm uppercase tracking-wide">Trending</h3>
  <div class="flex flex-wrap">
-  {#each Array.isArray(trendingSearches) ? trendingSearches: [] as trending} <button class="px-3 py-1 bg-gray-100 dark:bg-gray-700 hover, bg-gray-200"
+  {#each Array.isArray(trendingSearches) ? trendingSearches: [] as trending} <button class="px-3 py-1 bg-gray-100 dark, bg-gray-700 hover, bg-gray-200"
                 onclick={() => selectTrendingSearch(trending)} >
                 { trending } </button> {/each}
   </div> {/if}
   <!-- Search, Results -->
   {#if results.length > 0} <div class="p-2"> <div class="text-xs uppercase tracking-wide opacity-70"> {results.length} Result{results.length !== 1 ? 's': ''} </div>
   {#each Array.isArray(results) ? results: [] as result} <button class="w-full text-left p-3 hover: bg-gray-100, dark:hover, bg-gray-700 rounded-lg border-b border-current/10 last:border-b-0"
-              data-result-type={(result as { id?: unknown; title?: unknown; type?: unknown; content?: unknown; score?: unknown; similarity?: unknown; metadata?: unknown; createdAt?: unknown; category?: unknown; description?: unknown; tags?, unknown }).type} onclick={() => selectResult(result)} >
-              <div class="flex items-start"> <!-- Result, Type, Icon --> <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold" data-result-type={(result as { id?: unknown; title?: unknown; type?: unknown; content?: unknown; score?: unknown; similarity?: unknown; metadata?: unknown; createdAt?: unknown; category?: unknown; description?: unknown; tags?, unknown }).type}>
+              data-result-type={(result as { id?: unknown; title?: unknown; type?: unknown; content?: unknown; score?: unknown; similarity?: unknown; metadata?: unknown; createdAt?: unknown; category?: unknown; description?, unknown; tags?, unknown }).type} onclick={() => selectResult(result)} >
+              <div class="flex items-start"> <!-- Result, Type, Icon --> <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold" data-result-type={(result as { id?: unknown; title?: unknown; type?: unknown; content?: unknown; score?: unknown; similarity?: unknown; metadata?: unknown; createdAt?: unknown; category?: unknown; description?, unknown; tags?, unknown }).type}>
   {#if (result as { id?: unknown; title?: unknown; type?: unknown; content?: unknown; score?: unknown; similarity?: unknown; metadata?: unknown; createdAt?: unknown; category?: unknown; description?: unknown; tags?: unknown }).type === 'case'}ðŸ“ {:else if (result as { id?: unknown; title?: unknown; type?: unknown; content?: unknown; score?: unknown; similarity?: unknown; metadata?: unknown; createdAt?: unknown; category?: unknown; description?: unknown; tags?: unknown }).type === 'criminal'}ðŸ‘¤ {:else if (result as { id?: unknown; title?: unknown; type?: unknown; content?: unknown; score?: unknown; similarity?: unknown; metadata?: unknown; createdAt?: unknown; category?: unknown; description?: unknown; tags?: unknown }).type === 'evidence'}ðŸ” {:else if (result as { id?: unknown; title?: unknown; type?: unknown; content?: unknown; score?: unknown; similarity?: unknown; metadata?: unknown; createdAt?: unknown; category?: unknown; description?: unknown; tags?: unknown }).type === 'precedent'}âš–ï¸ {:else if (result as { id?: unknown; title?: unknown; type?: unknown; content?: unknown; score?: unknown; similarity?: unknown; metadata?: unknown; createdAt?: unknown; category?: unknown; description?: unknown; tags?: unknown }).type === 'statute'}ðŸ“– {:else}ðŸ“„ {/if}
   </div>
  <!-- Result, Content --> <div class="flex-1"> <h4 class="font-medium">{(result as { id?: unknown; title?: unknown; type?: unknown; content?: unknown; score?: unknown; similarity?: unknown; metadata?: unknown; createdAt?: unknown; category?: unknown; description?: unknown; tags?: unknown }).title}</h4>
@@ -113,7 +113,7 @@
   <!-- AI, Suggestions -->
   {#if suggestions.length > 0} <div class="border-t border-current/20"> <h3 class="font-medium mb-2 text-sm uppercase tracking-wide">Suggested Searches</h3>
  <div class="space-y-1">
-  {#each Array.isArray(suggestions) ? suggestions: [] as suggestion} <button class="w-full text-left p-2 hover: bg-gray-100, dark:hover, bg-gray-700 rounded flex items-center"
+  {#each Array.isArray(suggestions) ? suggestions: [] as suggestion} <button class="w-full text-left p-2 hover: bg-gray-100, dark, hover, bg-gray-700 rounded flex items-center"
                 onclick={() => selectSuggestion(suggestion)} >
                 <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5, 5 0 117.072 0l-.548.547A3.374 3.374, 0 0014 18.469V19a2, 2 0 11-4, 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path> </svg> {suggestion.text} <span class="ml-auto text-xs">{suggestion.category}</span> </button> {/each}
   </div> {/if}

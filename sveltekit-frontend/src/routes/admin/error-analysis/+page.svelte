@@ -109,9 +109,9 @@
 	});
 </script>
 
-<svelte:head>
+<svelte, head>
 	<title>Phase 89: Error Analysis | RAG+KAG</title>
-</svelte:head>
+</svelte, head>
 
 <div class="min-h-screen p-8 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
 	<div class="max-w-7xl mx-auto">
@@ -139,7 +139,7 @@
 
 			{#if analysisData}
 				<!-- Statistics -->
-				<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+				<div class="grid grid-cols-2 md, grid-cols-4 gap-4">
 					<div class="p-4 bg-white/10 backdrop-blur-lg rounded-xl border border-white/20">
 						<div class="text-3xl font-bold text-purple-400">{analysisData.statistics.total_clusters}</div>
 						<div class="text-sm text-gray-300">Total Clusters</div>
@@ -179,13 +179,13 @@
 
 				<div class="space-y-3">
 					{#each analysisData.agentic_recommendations as rec}
-						<div class="p-4 bg-gray-800/50 rounded-lg border border-{rec.priority === 'High' ? 'red' : rec.priority === 'Medium' ? 'yellow' : 'gray'}-500/30">
+						<div class="p-4 bg-gray-800/50 rounded-lg border border-{rec.priority === 'High' ? 'red' : rec.priority === 'Medium' ? 'yellow' , 'gray'}-500/30">
 							<div class="flex items-center justify-between mb-2">
 								<div class="flex items-center gap-2">
-									<span class="px-2 py-1 bg-{rec.type === 'merge' ? 'blue' : rec.type === 'fix' ? 'green' : 'yellow'}-500/20 text-{rec.type === 'merge' ? 'blue' : rec.type === 'fix' ? 'green' : 'yellow'}-300 rounded text-xs font-semibold uppercase">
+									<span class="px-2 py-1 bg-{rec.type === 'merge' ? 'blue' : rec.type === 'fix' ? 'green' : 'yellow'}-500/20 text-{rec.type === 'merge' ? 'blue' : rec.type === 'fix' ? 'green' , 'yellow'}-300 rounded text-xs font-semibold uppercase">
 										{rec.type}
 									</span>
-									<span class="px-2 py-1 bg-{rec.priority === 'High' ? 'red' : rec.priority === 'Medium' ? 'yellow' : 'gray'}-500/20 text-{rec.priority === 'High' ? 'red' : rec.priority === 'Medium' ? 'yellow' : 'gray'}-300 rounded text-xs">
+									<span class="px-2 py-1 bg-{rec.priority === 'High' ? 'red' : rec.priority === 'Medium' ? 'yellow' : 'gray'}-500/20 text-{rec.priority === 'High' ? 'red' : rec.priority === 'Medium' ? 'yellow' , 'gray'}-300 rounded text-xs">
 										{rec.priority} Priority
 									</span>
 								</div>
@@ -229,7 +229,7 @@
 				Error Clusters
 			</h2>
 
-			<div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-3 gap-4">
+			<div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-3 gap-4">
 				{#each analysisData?.clusters ?? [] as cluster}
 					<button
 						onclick={() => {
@@ -240,7 +240,7 @@
 					>
 						<div class="flex items-center justify-between mb-3">
 							<span class="text-lg font-bold text-white">Cluster #{cluster.cluster_id}</span>
-							<span class="px-2 py-1 bg-{cluster.priority === 'High' ? 'red' : cluster.priority === 'Medium' ? 'yellow' : 'gray'}-500/20 text-{cluster.priority === 'High' ? 'red' : cluster.priority === 'Medium' ? 'yellow' : 'gray'}-300 rounded text-xs font-semibold">
+							<span class="px-2 py-1 bg-{cluster.priority === 'High' ? 'red' : cluster.priority === 'Medium' ? 'yellow' : 'gray'}-500/20 text-{cluster.priority === 'High' ? 'red' : cluster.priority === 'Medium' ? 'yellow' , 'gray'}-300 rounded text-xs font-semibold">
 								{cluster.priority}
 							</span>
 						</div>
@@ -274,7 +274,7 @@
 	</div>
 
 	<!-- Cluster Details Dialog -->
-	<DialogRoot bind:open={dialogOpen}>
+	<DialogRoot bind, open={dialogOpen}>
 		<DialogPortal>
 			<DialogOverlay class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" />
 			<DialogContent class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-gray-900 rounded-2xl shadow-2xl border border-purple-500/30 p-8">

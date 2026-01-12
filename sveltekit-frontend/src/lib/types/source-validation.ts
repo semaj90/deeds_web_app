@@ -34,7 +34,7 @@ export interface AnswerGenerationRequest {
 export interface KAGUpdateRequest {
 	validation_id: string; entities_extracted: string[];
 	relationships: Array<{ from: string;
-		to: string; type: string;
+		to: string; type, string;
 	}>;
 }
 
@@ -108,7 +108,7 @@ export interface ValidationUIState {
 	generationError: string | null;
 
 	// KAG phase
-	extractedEntities: string[]; extractedRelationships: Array<{ from: string; to: string; type: string }>;
+	extractedEntities: string[]; extractedRelationships: Array<{ from: string; to: string; type, string }>;
 	isUpdatingKAG: boolean; kagError: string | null;
 }
 
@@ -141,7 +141,7 @@ export interface CitationInspectorProps {
 
 export interface ProvenanceGraphProps {
 	validationId: string; entities: string[];
-	relationships: Array<{ from: string; to: string; type: string }>;
+	relationships: Array<{ from: string; to: string; type, string }>;
 	width?: number;
 	height?: number;
 }

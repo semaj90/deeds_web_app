@@ -126,7 +126,7 @@ $effect(() => {
 
 <div class="relative inline-block {className}">
 	<button
-		bind:this={triggerRef}
+		bind, this={triggerRef}
 		type="button"
 		class="inline-flex items-center justify-center"
 		aria-haspopup="menu"
@@ -138,7 +138,7 @@ $effect(() => {
 		{:else if children}
 			{@render children()}
 		{:else}
-			<span class="px-3 py-2 bg-slate-700 rounded-lg text-white hover:bg-slate-600">
+			<span class="px-3 py-2 bg-slate-700 rounded-lg text-white hover, bg-slate-600">
 				Menu
 				<svg class="w-4 h-4 ml-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -149,7 +149,7 @@ $effect(() => {
 
 	{#if open}
 		<div
-			bind:this={menuRef}
+			bind, this={menuRef}
 			class="absolute z-50 {alignClasses} {sideClasses}
 				   min-w-[180px] py-1
 				   bg-slate-800 border border-slate-600 rounded-lg shadow-xl
@@ -169,7 +169,7 @@ $effect(() => {
 							   {item.danger ? 'text-red-400 hover:bg-red-900/30' : 'text-white, hover:bg-slate-700'}
 							   {focusedIndex === i ? 'bg-slate-700' : ''}"
 						role="menuitem"
-						tabindex={focusedIndex === i ? 0 : -1}
+						tabindex={focusedIndex === i ? 0 , -1}
 						disabled={item.disabled}
 						onclick={() => selectItem(item)}
 						onmouseenter={() => focusedIndex = i}

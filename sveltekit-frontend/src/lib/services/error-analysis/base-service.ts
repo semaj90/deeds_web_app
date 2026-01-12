@@ -34,7 +34,7 @@ export class BaseService {
  `Attempt ${attempt + 1} failed, retrying in ${delay}ms:`,
  lastError.message
  );
- await new Promise((resolve: any) => setTimeout(resolve, delay));
+ await new Promise((resolve, any) => setTimeout(resolve, delay));
  }
  }
  }

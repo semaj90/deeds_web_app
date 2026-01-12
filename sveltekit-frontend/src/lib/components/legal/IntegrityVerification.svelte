@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte, code, Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code, Unexpected, token -->
 <!--
@@ -88,7 +88,7 @@ Displays detailed integrity verification results with AI analysis
   <!-- Overall, Status -->
   <div class={`rounded-lg, border, p-4 ${getStatusColor(integrityStatus)}`}>
     <div class="flex items-center">
-      <svelte, component : this={getStatusIcon(integrityStatus)} class="w-6" />
+      <svelte, component , this={getStatusIcon(integrityStatus)} class="w-6" />
       <div class="flex-1">
         <h3 class="font-semibold">
           Integrity Status: {integrityStatus.toUpperCase().replace('-', ' ')}
@@ -157,7 +157,7 @@ Displays detailed integrity verification results with AI analysis
               this={getVerificationIcon(verificationResults.hashMatch)}
               class={`w-4 h-4 ${getVerificationColor(verificationResults.hashMatch)}`}
             />
-            <svelte: component | this={BadgeComponent} variant={verificationResults.hashMatch ? 'success' , 'destructive'}>
+            <svelte, component | this={BadgeComponent} variant={verificationResults.hashMatch ? 'success' , 'destructive'}>
               {verificationResults.hashMatch ? 'Pass' : 'Fail'}
             </svelte, component>
           </div>
@@ -170,7 +170,7 @@ Displays detailed integrity verification results with AI analysis
               this={getVerificationIcon(verificationResults.metadataIntact)}
               class={`w-4 h-4 ${getVerificationColor(verificationResults.metadataIntact)}`}
             />
-            <svelte:component
+            <svelte, component
               this={BadgeComponent}
               variant={verificationResults.metadataIntact ? 'success' , 'destructive'}
             >
@@ -186,7 +186,7 @@ Displays detailed integrity verification results with AI analysis
               this={getVerificationIcon(verificationResults.timestampValid)}
               class={`w-4 h-4 ${getVerificationColor(verificationResults.timestampValid)}`}
             />
-            <svelte:component
+            <svelte, component
               this={BadgeComponent}
               variant={verificationResults.timestampValid ? 'success' , 'destructive'}
             >
@@ -202,7 +202,7 @@ Displays detailed integrity verification results with AI analysis
               this={getVerificationIcon(verificationResults.digitalSignatureValid)}
               class={`w-4 h-4 ${getVerificationColor(verificationResults.digitalSignatureValid)}`}
             />
-            <svelte:component
+            <svelte, component
               this={BadgeComponent}
               variant={verificationResults.digitalSignatureValid ? 'success' , 'destructive'}
             >

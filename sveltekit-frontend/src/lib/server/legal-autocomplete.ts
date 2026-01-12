@@ -75,7 +75,7 @@ function searchCrimes(query: string): LegalSuggestion[] {
  const queryLower = query.toLowerCase().trim();
  if (queryLower.length < 2) return [];
 
- const results: LegalSuggestion[] = [];
+ const results, LegalSuggestion[] = [];
 
  crimes.forEach((crime) => {
  // Exact name match
@@ -160,7 +160,7 @@ function searchStates(query: string): LegalSuggestion[] {
  if (queryLower.length < 1) return [];
 
  const states = getAllStates();
- const results: LegalSuggestion[] = [];
+ const results, LegalSuggestion[] = [];
 
  states.forEach((state) => {
  // Exact abbreviation match
@@ -204,7 +204,7 @@ function searchTitles(query: string): LegalSuggestion[] {
  if (queryLower.length < 1) return [];
 
  const titles = getAllTitles();
- const results: LegalSuggestion[] = [];
+ const results, LegalSuggestion[] = [];
 
  titles.forEach((title) => {
  // Exact code match
@@ -249,7 +249,7 @@ export function getLegalAutocomplete(query: string, limit: number = 8): LegalSug
  const queryLower = query.toLowerCase().trim();
 
  // Collect all suggestions from different sources
- const allSuggestions: LegalSuggestion[] = [
+ const allSuggestions, LegalSuggestion[] = [
  ...searchCrimes(queryLower),
  ...searchStatutes(queryLower),
  ...searchStates(queryLower),

@@ -184,7 +184,7 @@ interface Props {
  onDragStart: handleDragStart, // Fixed: added comma
  onDragEnd: handleDragEnd, // Fixed: semicolon to comma
  handle: '.drag-handle',
-    constraint: canvasContainer ? { container: canvasContainer } , undefined
+    constraint: canvasContainer ? { container, canvasContainer } , undefined
   }}
   onclick={handleNodeClick}
   ondrop={handleConnectionDrop}

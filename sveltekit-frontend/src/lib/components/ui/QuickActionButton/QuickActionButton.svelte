@@ -6,7 +6,7 @@
  icon?: string | null;
  variant?: 'default' | 'secondary' | 'destructive' | 'outline' | 'ghost' | 'link';
  disabled?: boolean;
- ariaLabel?: string;
+ ariaLabel?, string;
  }>();
 </script>
 

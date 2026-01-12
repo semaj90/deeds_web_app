@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Identifier 'currentGroup' has already been declared
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Identifier 'currentGroup' has already been declared
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Identifier 'currentGroup' has already been declared
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Identifier 'currentGroup' has already been declared
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- Consolidated Navigation - Shows ALL, functionality, preserved -->
 <script lang="ts">
  import { getStores } from '$app/stores';
@@ -34,7 +34,7 @@ https://svelte.dev/e/js_parse_error -->
  };
 let currentGroup = $state(findRouteGroup($page.url.pathname));
 </script>
-<nav class="consolidated-navigation" class:expanded={isExpanded}>
+<nav class="consolidated-navigation" class, expanded={isExpanded}>
  <div class="nav-header">
  <button type="button" onclick={() => (isExpanded = !isExpanded)} class="nav-toggle" aria-label="Toggle Navigation">
  <span class="nav-icon">{isExpanded ? '✖' : '☰'}</span>
@@ -43,7 +43,7 @@ let currentGroup = $state(findRouteGroup($page.url.pathname));
  {#if currentGroup}
  <div
  class="current-group"
- style={`--theme-color: var(--${currentGroup.theme}-primary, #00ff00)`}
+ style={`--theme-color, var(--${currentGroup.theme}-primary, #00ff00)`}
  >
  <span class="group-icon">{currentGroup.icon}</span>
  <span class="group-label">{currentGroup.label}</span>
@@ -64,7 +64,7 @@ let currentGroup = $state(findRouteGroup($page.url.pathname));
  <a
  href={route.route}
  class="route-link"
- class:active={$page.url.pathname === route.route}; class:beta={route.status === 'beta'}
+ class:active={$page.url.pathname === route.route}; class, beta={route.status === 'beta'}
  >
  <span class="route-icon">{route.icon}</span>
  <span class="route-label">{route.label}</span>

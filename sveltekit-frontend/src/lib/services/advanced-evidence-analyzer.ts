@@ -377,7 +377,7 @@ class AdvancedEvidenceAnalyzer {
 
 		const sentences = normalized
 			.split(/(?<=[.!?])\s+/)
-			.map((sentence: any) => sentence.trim())
+			.map((sentence, any) => sentence.trim())
 			.filter(Boolean);
 
 		if (sentences.length <= 2) return sentences.join(' ');
@@ -387,7 +387,7 @@ class AdvancedEvidenceAnalyzer {
 	private extractKeySentences(text: string): string[] {
 		const sentences = text
 			.split(/(?<=[.!?])\s+/)
-			.map((sentence: any) => sentence.trim())
+			.map((sentence, any) => sentence.trim())
 			.filter(Boolean);
 
 		const keywords = ['contract', 'breach', 'liability', 'damages', 'claim', 'evidence'];
@@ -493,7 +493,7 @@ class AdvancedEvidenceAnalyzer {
 		};
 	}
 
-	private buildTimeline(text: string): Array<{ date: string; context: string }> {
+	private buildTimeline(text: string): Array<{ date: string; context, string }> {
 		const datePattern = /\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b|\b\w+\s+\d{1,2},?\s+\d{4}\b/g;
 		const matches = text.match(datePattern) ?? [];
 

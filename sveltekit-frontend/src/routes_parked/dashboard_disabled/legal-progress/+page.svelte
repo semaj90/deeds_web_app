@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Cannot use keyword 'await' outside an async function
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Cannot use keyword 'await' outside an async function
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Cannot use keyword 'await' outside an async function
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Cannot use keyword 'await' outside an async function
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import DocumentThumbnailTray from '$lib/components/dashboard/DocumentThumbnailTray.svelte';
  import FallbackAlert from '$lib/components/dashboard/FallbackAlert.svelte';
@@ -86,15 +86,15 @@ https://svelte.dev/e/js_parse_error -->
  });
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Legal Document Processing Dashboard</title>
  <link rel="stylesheet" href="/styles/courthouse-theme.css" ></li>
-</svelte:head>
+</svelte, head>
 
 <div class="courthouse-dashboard">
  <div class="dashboard-header">
  <h1 class="courthouse-heading courthouse-heading-1">📄 Legal Document Processing</h1>
- <div class="connection-status" class:connected={isConnectedValue}>
+ <div class="connection-status" class, connected={isConnectedValue}>
  <span class="status-indicator"></span>
  <span class="status-text">{connectionStatusText}</span>
  </div>

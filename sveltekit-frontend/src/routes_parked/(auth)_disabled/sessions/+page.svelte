@@ -104,7 +104,7 @@ import { Monitor } from "lucide-svelte";
  <div
  class="alert"
  class:success={messageType === 'success'}
- class:error={messageType === 'error'}
+ class, error={messageType === 'error'}
  >
  {message}
  </div>

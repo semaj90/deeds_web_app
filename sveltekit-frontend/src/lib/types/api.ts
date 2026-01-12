@@ -56,7 +56,7 @@ export interface HealthStatus {
 
 export interface ServiceHealth {
  service: string; status: HealthStatus;
- dependencies?: Record<string: HealthStatus>;
+ dependencies?: Record<string, HealthStatus>;
 }
 
 export interface SystemInfo {
@@ -734,7 +734,7 @@ export interface RecommendationResponse extends APIResponse {
 // System Health & Comprehensive Monitoring
 export interface SystemHealthResponse extends APIResponse {
  overall: 'healthy' | 'degraded' | 'unhealthy';
- healthScore: number; services: Record<string: HealthCheckResult>; summary: { total: number; healthy: number; unhealthy: number; experimental: number };
+ healthScore: number; services: Record<string, HealthCheckResult>; summary: { total: number; healthy: number; unhealthy: number; experimental: number };
  deployment: string; infrastructure: {
  platform: 'Windows Native';
  docker: false; gpu: string;

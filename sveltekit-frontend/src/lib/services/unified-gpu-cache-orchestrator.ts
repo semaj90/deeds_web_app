@@ -100,7 +100,7 @@ export class UnifiedGPUCacheOrchestrator {
     async semanticSearch(
         query: string,
         options: { topK?: number; useCache?: boolean; enableGPUAcceleration?: boolean; filters?: Record<string, unknown> } = {}
-    ): Promise<{ results: unknown[]; metrics: { totalTime: number; cacheHitRate: number; gpuAcceleration: boolean; compressionSavings: number } }> {
+    ): Promise<{ results: unknown[]; metrics: { totalTime: number; cacheHitRate: number; gpuAcceleration: boolean; compressionSavings, number } }> {
         const startTime = performance.now();
         try {
             const cacheKey = `search:${typeof window !== 'undefined' ? btoa(JSON.stringify({ query: options })) : Buffer.from(JSON.stringify({ query: options })).toString('base64')}`;
@@ -175,7 +175,7 @@ export class UnifiedGPUCacheOrchestrator {
         if (!queryEmbedding) return results;
 
         const recomputed = await Promise.all(
-            results.map(async (resul: anyt) => {
+            results.map(async (resul, anyt) => {
                 const embeddingRaw = result.embedding;
                 if (!embeddingRaw) return result;
 
@@ -272,7 +272,7 @@ export class UnifiedGPUCacheOrchestrator {
             suggestions.push({
                 category: 'cache',
                 priority: 'high',
-                issue: `Cache hit rate is ${(metrics.cache.hitRate * 100).toFixed(1)}% (target: >70%)`,
+                issue: `Cache hit rate is ${(metrics.cache.hitRate * 100).toFixed(1)}% (target,  >70%)`,
                 solution: 'Increase cache TTL or improve cache key strategies',
                 expectedImprovement: '15-25% faster response times',
                 autoApplicable: true
@@ -294,7 +294,7 @@ export class UnifiedGPUCacheOrchestrator {
             suggestions.push({
                 category: 'gpu',
                 priority: 'medium',
-                issue: `GPU utilization at ${(metrics.gpu.utilization * 100).toFixed(1)}% (target: >60%)`,
+                issue: `GPU utilization at ${(metrics.gpu.utilization * 100).toFixed(1)}% (target,  >60%)`,
                 solution: 'Enable more GPU-accelerated operations or increase batch sizes',
                 expectedImprovement: '30-50% better throughput',
                 autoApplicable: false
@@ -438,7 +438,7 @@ export class UnifiedGPUCacheOrchestrator {
 
     private tokenize(text: string): Float32Array {
         const tokens = text.toLowerCase().split(/\s+/).slice(0, 512);
-        co(: anyn)st tokenIds = tokens.map(t => (t.charCodeAt(0) || 0) % 1000);
+        co(, anyn)st tokenIds = tokens.map(t => (t.charCodeAt(0) || 0) % 1000);
         const padded = new Array(512).fill(0);
         for (let i = 0; i < Math.min(tokenIds.length, 512); i++) {
             padded[i] = tokenIds[i];

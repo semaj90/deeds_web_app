@@ -35,7 +35,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  let viewMode = $state<'pipeline' | 'errors' | 'routes'>('pipeline');
 
  // ACE Pipeline State
- let pipelineState = $state<Record<StageKey, { progress: number; status: StageStatus; results?: any }>>({
+ let pipelineState = $state<Record<StageKey, { progress: number; status: StageStatus; results?, any }>>({
  webCrawl: { progress: 0, status: 'idle' },
  vlmProcess: { progress: 0, status: 'idle' },
  graphBuild: { progress: 0, status: 'idle' },
@@ -44,7 +44,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  });
 
  let isProcessing = $state(false);
- let processingLogs = $state<Array<{ time: string; stage: string; message: string; level: 'info' | 'success' | 'error' | 'warn' }>>([]);
+ let processingLogs = $state<Array<{ time: string; stage: string; message: string; level, 'info' | 'success' | 'error' | 'warn' }>>([]);
 
  // Error Detection Results
  let detectedErrors = $state<Array<{
@@ -52,7 +52,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  type: 'syntax' | 'runtime' | 'ui' | 'accessibility' | 'performance';
  severity: 'critical' | 'high' | 'medium' | 'low';
  message: string; suggestion: string;
- autoFixable: boolean; fixed: boolean;
+ autoFixable: boolean; fixed, boolean;
  }>>([]);
 
  // Route Discovery
@@ -191,9 +191,9 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  });
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>ACE System - Agentic Error Fixing | Legal AI</title>
-</svelte:head>
+</svelte, head>
 
 <div class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white">
  <!-- Header -->
@@ -201,7 +201,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <div class="max-w-7xl mx-auto px-4 py-4">
  <div class="flex items-center justify-between">
  <div>
- <h1 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+ <h1 class="text-2xl md, text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
  ⚡ ACE System
  </h1>
  <p class="text-sm text-cyan-200/70">Agentic Context Engineering • Error Detection • Auto-Fix</p>
@@ -252,7 +252,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <button
  onclick={runCompletePipeline}
  disabled={isProcessing}
- class="px-6 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover: from-cyan-700, hover:to-blue-700 rounded-lg font-semibold disabled:opacity-50 flex items-center gap-2"
+ class="px-6 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover: from-cyan-700, hover:to-blue-700 rounded-lg font-semibold disabled, opacity-50 flex items-center gap-2"
  >
  {#if isProcessing}
  <span class="animate-spin">⏳</span> Processing...
@@ -263,20 +263,19 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  </div>
 
  <!-- Pipeline Stages -->
- <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+ <div class="grid grid-cols-1 md, grid-cols-5 gap-4">
  {#each ACE_STAGES as stage, i}
  {@const state = pipelineState[stage.key]}
  <div class="relative">
  <!-- Connector Arrow -->
  {#if i < ACE_STAGES.length - 1}
- <div class="hidden md:block absolute top-1/2 -right-2 transform -translate-y-1/2 text-cyan-500/50 z-10">→</div>
+ <div class="hidden md, block absolute top-1/2 -right-2 transform -translate-y-1/2 text-cyan-500/50 z-10">→</div>
  {/if}
 
  <div class="p-4 rounded-lg border-2 transition-all h-full {
  state.status === 'complete' ? 'bg-green-500/20 border-green-500/50' :
  state.status === 'running' ? 'bg-blue-500/20 border-blue-500/50 animate-pulse' :
- state.status === 'error' ? 'bg-red-500/20 border-red-500/50' :
- 'bg-gray-700/30 border-gray-600/30'
+ state.status === 'error' ? 'bg-red-500/20 border-red-500/50' , 'bg-gray-700/30 border-gray-600/30'
  }">
  <div class="flex items-center justify-between mb-2">
  <span class="text-2xl">{stage.icon}</span>
@@ -293,7 +292,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  {#if state.status === 'running'}
  <div class="mt-3 h-1.5 bg-gray-700 rounded-full overflow-hidden">
- <div class="h-full bg-blue-500 transition-all rounded-full" style="width: {state.progress}%"></div>
+ <div class="h-full bg-blue-500 transition-all rounded-full" style="width, {state.progress}%"></div>
  </div>
  <span class="text-xs text-blue-300 mt-1">{state.progress}%</span>
  {/if}
@@ -334,8 +333,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <span class="{
  log.level === 'error' ? 'text-red-400' :
  log.level === 'success' ? 'text-green-400' :
- log.level === 'warn' ? 'text-yellow-400' :
- 'text-gray-300'
+ log.level === 'warn' ? 'text-yellow-400' , 'text-gray-300'
  }">{log.message}</span>
  </div>
  {/each}
@@ -358,7 +356,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  {#if stats.autoFixable > 0}
  <button
  onclick={fixAllErrors}
- class="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover: from-green-700, hover:to-emerald-700 rounded-lg font-semibold flex items-center gap-2"
+ class="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover: from-green-700, hover, to-emerald-700 rounded-lg font-semibold flex items-center gap-2"
  >
  🔧 Fix All ({stats.autoFixable})
  </button>
@@ -381,8 +379,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  error.fixed ? 'bg-green-500/10 border-green-500/30' :
  error.severity === 'critical' ? 'bg-red-500/20 border-red-500/50' :
  error.severity === 'high' ? 'bg-orange-500/20 border-orange-500/50' :
- error.severity === 'medium' ? 'bg-yellow-500/20 border-yellow-500/50' :
- 'bg-gray-700/30 border-gray-600/30'
+ error.severity === 'medium' ? 'bg-yellow-500/20 border-yellow-500/50' , 'bg-gray-700/30 border-gray-600/30'
  }">
  <div class="flex items-start justify-between gap-4">
  <div class="flex-1">
@@ -390,8 +387,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <span class="px-2 py-0.5 text-xs rounded font-medium {
  error.severity === 'critical' ? 'bg-red-500/30 text-red-300' :
  error.severity === 'high' ? 'bg-orange-500/30 text-orange-300' :
- error.severity === 'medium' ? 'bg-yellow-500/30 text-yellow-300' :
- 'bg-gray-500/30 text-gray-300'
+ error.severity === 'medium' ? 'bg-yellow-500/30 text-yellow-300' , 'bg-gray-500/30 text-gray-300'
  }">{error.severity.toUpperCase()}</span>
  <span class="px-2 py-0.5 text-xs rounded bg-blue-500/30 text-blue-300">{error.type}</span>
  {#if error.fixed}
@@ -436,15 +432,15 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  type="text"
  bind:value={searchQuery}
  placeholder="Search routes..."
- class="px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-500 outline-none w-64"
+ class="px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus, border-purple-500 outline-none w-64"
  />
  </div>
 
- <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-3 gap-3 max-h-[60vh] overflow-y-auto">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-3 gap-3 max-h-[60vh] overflow-y-auto">
  {#each discoveredRoutes.filter(r => !searchQuery || r.route.toLowerCase().includes(searchQuery.toLowerCase())) as route}
  {@const hasError = detectedErrors.some(e => e.route === route.route && !e.fixed)}
  <div class="p-3 rounded-lg border transition-all hover:scale-[1.02] {
- hasError ? 'bg-red-500/10 border-red-500/30' : 'bg-gray-700/30 border-gray-600/30 hover:border-purple-500/50'
+ hasError ? 'bg-red-500/10 border-red-500/30' : 'bg-gray-700/30 border-gray-600/30 hover, border-purple-500/50'
  }">
  <div class="flex items-center justify-between">
  <code class="text-sm text-purple-300 font-mono truncate flex-1">{route.route}</code>
@@ -473,7 +469,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  {/if}
 
  <!-- Quick Stats Footer -->
- <footer class="grid grid-cols-2 md:grid-cols-5 gap-4">
+ <footer class="grid grid-cols-2 md, grid-cols-5 gap-4">
  {#each [
  { label: 'Total Routes', value: stats.totalRoutes, icon: '🗺️', color: 'purple' },
  { label: 'Errors Found', value: stats.totalErrors, icon: '🐛', color: 'red' },
@@ -492,7 +488,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 </div>
 
 <!-- Error Detail Dialog -->
-<dialog bind:this={errorDetailDialog} class="bg-gray-900 border border-cyan-500/50 rounded-xl p-6 max-w-lg w-full backdrop:bg-black/70">
+<dialog bind:this={errorDetailDialog} class="bg-gray-900 border border-cyan-500/50 rounded-xl p-6 max-w-lg w-full backdrop, bg-black/70">
  {#if selectedError}
  <h2 class="text-xl font-bold text-cyan-300 mb-4">Error Details</h2>
  <div class="space-y-3">

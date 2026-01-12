@@ -94,13 +94,13 @@
  <button
  onclick={onGenerateSummary}
  disabled={isGenerating}
- class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover: bg-blue-700, disabled:bg-gray-400 font-medium transition"
+ class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover: bg-blue-700, disabled, bg-gray-400 font-medium transition"
  >
  {isGenerating ? 'Generating...' : 'Generate Suggested Summary'}
  </button>
  <button
  onclick={ onReject }
- class="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 font-medium transition"
+ class="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover, bg-red-50 font-medium transition"
  >
  Reject
  </button>

@@ -262,9 +262,9 @@
 	});
 </script>
 
-<svelte:head>
+<svelte, head>
 	<title>Phase 89: ACE Admin | Vector Search & Analysis</title>
-</svelte:head>
+</svelte, head>
 
 <div class="container">
 	<header class="header">
@@ -274,16 +274,16 @@
 
 	<!-- Tab Navigation -->
 	<nav class="tabs">
-		<button class="tab" class:active={activeTab === 'search'} onclick={() => activeTab = 'search'}>
+		<button class="tab" class, active={activeTab === 'search'} onclick={() => activeTab = 'search'}>
 			🔍 Vector Search
 		</button>
-		<button class="tab" class:active={activeTab === 'clusters'} onclick={() => activeTab = 'clusters'}>
+		<button class="tab" class, active={activeTab === 'clusters'} onclick={() => activeTab = 'clusters'}>
 			📊 Clusters
 		</button>
-		<button class="tab" class:active={activeTab === 'graph'} onclick={() => activeTab = 'graph'}>
+		<button class="tab" class, active={activeTab === 'graph'} onclick={() => activeTab = 'graph'}>
 			🕸️ Graph Analysis
 		</button>
-		<button class="tab" class:active={activeTab === 'pipeline'} onclick={() => activeTab = 'pipeline'}>
+		<button class="tab" class, active={activeTab === 'pipeline'} onclick={() => activeTab = 'pipeline'}>
 			🚀 Pipeline
 		</button>
 	</nav>
@@ -296,7 +296,7 @@
 					<input
 						type="text"
 						placeholder="Search errors with embeddinggemma (768-dim cosine similarity)..."
-						bind:value={searchQuery}
+						bind, value={searchQuery}
 						onkeydown={(e) => e.key === 'Enter' && performSearch()}
 						class="search-input"
 					/>
@@ -307,7 +307,7 @@
 
 				<div class="results-grid">
 					{#each searchResults as result (result.id)}
-						<div class="result-card" style="--score: {result.score}">
+						<div class="result-card" style="--score, {result.score}">
 							<div class="result-header">
 								<span class="score">{(result.score * 100).toFixed(1)}%</span>
 								<span class="source">{result.source}</span>
@@ -334,7 +334,7 @@
 					{#each clusters as cluster (cluster.cluster_id)}
 						<button
 							class="cluster-card"
-							class:selected={selectedCluster?.cluster_id === cluster.cluster_id}
+							class, selected={selectedCluster?.cluster_id === cluster.cluster_id}
 							onclick={() => selectedCluster = cluster}
 						>
 							<div class="cluster-header">
@@ -436,7 +436,7 @@
 				</div>
 
 				<div class="progress-bar">
-					<div class="progress-fill" style="width: {pipelineProgress}%"></div>
+					<div class="progress-fill" style="width, {pipelineProgress}%"></div>
 					<span class="progress-text">{pipelineProgress}%</span>
 				</div>
 

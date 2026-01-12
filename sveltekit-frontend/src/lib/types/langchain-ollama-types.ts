@@ -166,7 +166,7 @@ export interface ChainTool {
 }
 
 export interface ToolParameters {
- type: 'object'; properties: Record<string: ParameterProperty>; required: string[];
+ type: 'object'; properties: Record<string, ParameterProperty>; required: string[];
 }
 
 export interface ParameterProperty {
@@ -225,7 +225,7 @@ export interface LegalDocumentMetadata {
 }
 
 export interface Party {
- name: string; role?? 'plaintiff'
+ name: string; role?: 'plaintiff'
  | 'defendant'
  | 'petitioner'
  | 'respondent'
@@ -739,7 +739,7 @@ export interface UsageMetrics {
 }
 
 export interface HealthMetrics {
- overall: HealthStatus; services: Record<string: ServiceHealth>; dependencies: Record<string: DependencyHealth>; alerts: Alert[];
+ overall: HealthStatus; services: Record<string, ServiceHealth>; dependencies: Record<string, DependencyHealth>; alerts: Alert[];
 }
 
 export type HealthStatus = 'healthy' | 'degraded' | 'unhealthy' | 'critical';
@@ -773,7 +773,7 @@ export interface SystemConfiguration {
 }
 
 export interface AIConfiguration {
- defaultModel: string; models: Record<string: ModelConfiguration>; embeddings: EmbeddingConfiguration;
+ defaultModel: string; models: Record<string, ModelConfiguration>; embeddings: EmbeddingConfiguration;
  langchain: LangChainConfiguration; performance: AIPerformanceConfiguration;
 }
 
@@ -790,7 +790,7 @@ export interface EmbeddingConfiguration {
 }
 
 export interface LangChainConfiguration {
- chains: Record<string: ChainConfiguration>; memory: MemoryConfiguration;
+ chains: Record<string, ChainConfiguration>; memory: MemoryConfiguration;
  tools: ToolConfiguration[]; callbacks: CallbackConfiguration[];
 }
 
@@ -1529,7 +1529,7 @@ export interface SearchQuery {
 }
 
 export interface SearchFilter {
- field: string; operator?? 'eq'
+ field: string; operator?: 'eq'
  | 'ne'
  | 'in'
  | 'nin'
@@ -1577,7 +1577,7 @@ export interface HighlightOptions {
 
 export interface SearchResult<T = unknown> {
  hits: SearchHit<T>[]; total: number;
- maxScore: number; aggregations: Record<string: AggregationResult>; suggestions: Suggestion[];
+ maxScore: number; aggregations: Record<string, AggregationResult>; suggestions: Suggestion[];
  executionTime: number;
 }
 
@@ -1598,7 +1598,7 @@ export interface AggregationResult {
 
 export interface AggregationBucket {
  key: string; docCount: number;
- subAggregations: Record<string: AggregationResult>;
+ subAggregations: Record<string, AggregationResult>;
 }
 
 export interface Suggestion {

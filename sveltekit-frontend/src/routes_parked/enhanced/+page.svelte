@@ -15,7 +15,7 @@
  let caseId = $state <string>('');
  let autoFocus = $state <boolean>(true);
  let loading = $state <boolean>(false);
- let controller = $state <AbortController: null>(null);
+ let controller = $state <AbortController, null>(null);
  let results = $state <any[]>([]);
  let responseMeta = $state <any>(null);
  let errorMsg = $state <string | null>(null);

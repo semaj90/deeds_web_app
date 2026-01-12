@@ -16,7 +16,7 @@ export interface SearchResultChunk {
  text_snippet: string; langextract_tags: Record<string, any>;
  kag_context?: { case_id: string;
  nodes: Array<Record<string, any>>;
- edges: Array<{ from: any; to: any; type: string }>;
+ edges: Array<{ from: any; to: any; type, string }>;
  };
 }
 
@@ -37,7 +37,7 @@ export interface SearchResponse {
 
 // Writable stores
 export const searchResults = writable<SearchResultChunk[]>([]);
-export const searchAlignment = writable<AlignmentSignals: null>(null);
+export const searchAlignment = writable<AlignmentSignals, null>(null);
 export const searchReasoning = writable<string | null>(null);
 export const searchLoading = writable(false);
 export const searchError = writable<string | null>(null);

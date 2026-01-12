@@ -20,7 +20,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   // Computed values using Svelte, 5 $derived const averageProcessingTime = $derived( cacheStats.hits + cacheStats.misses > 0 ? cacheStats.totalProcessingTime / (cacheStats.hits + cacheStats.misses): 0 ); const cacheHitRate = $derived( cacheStats.hits + cacheStats.misses > 0 ? (cacheStats.hits / (cacheStats.hits + cacheStats.misses)) * 10 0 0 ); </script>
  <div class="ocr-tensor-demo"> <div class="demo-header"> <h2>ðŸ”¬ OCR + Tensor Processing Demo</h2>
  <p>Complete pipeline: Image â†’ OCR.js â†’ Embeddings â†’ WebGPU Tensors â†’ Database Storage</p>
- <div class="status-bar" class:initialized; class, processing> <span class="status-dot"></span>
+ <div class="status-bar" class, initialized; class, processing> <span class="status-dot"></span>
   {#if processing} Processing... {:else if initialized} Ready {:else} Initializing... {/if}
   </div> </div>
  <div class="demo-content"> <!-- File, Upload, Section --> <div class="upload-section"> <h3>ðŸ“ Upload Image</h3>
@@ -59,7 +59,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   <!-- Results, Display -->
   {#if results.length > 0} <div class="results-section"> <h3>ðŸ“‹ Processing Results ({results.length})</h3>
  <div class="results-list">
-  {#each results as result, i} <div class="result-nier-bits-card" class:cache-hit={(result as { processingTime?: unknown; cacheHit?: unknown; ocr?: unknown; embeddings?, unknown }).cacheHit}> <div class="result-header"> <span class="result-index">#{i + 1}</span>
+  {#each results as result, i} <div class="result-nier-bits-card" class:cache-hit={(result as { processingTime?: unknown; cacheHit?: unknown; ocr?, unknown; embeddings?, unknown }).cacheHit}> <div class="result-header"> <span class="result-index">#{i + 1}</span>
  <span class="cache-indicator"> {(result as { processingTime?: unknown; cacheHit?: unknown; ocr?: unknown; embeddings?: unknown }).cacheHit ? 'ðŸ“¦ Cache Hit': 'ðŸ”¥ Fresh'} </span>
  <span class="processing-time"> {(result as { processingTime?: unknown; cacheHit?: unknown; ocr?: unknown; embeddings?: unknown }).processingTime.toFixed(2)}ms </span> </div>
  <div class="result-content"> <div class="ocr-text"> <strong>OCR Text:</strong>

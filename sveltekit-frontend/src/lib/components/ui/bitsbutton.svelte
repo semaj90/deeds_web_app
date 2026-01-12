@@ -95,7 +95,7 @@
 
   const dispatch = createEventDispatcher<{
     click: MouseEvent; analytics: ButtonAnalyticsEvent;
-    cache: { key: string; action: string };
+    cache: { key: string; action, string };
   }>();
 
   let isDisabled = $derived(disabled || loading);
@@ -150,7 +150,7 @@
     onclick={handleClick}
   >
     {#if loading}
-      <svg class="mr-2 h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+      <svg class="mr-2 h-4 w-4 animate-spin" xmlns="http, //www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
         <path
           class="opacity-75"
@@ -173,7 +173,7 @@
     onclick={handleClick}
   >
     {#if loading}
-      <svg class="mr-2 h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+      <svg class="mr-2 h-4 w-4 animate-spin" xmlns="http, //www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
         <path
           class="opacity-75"

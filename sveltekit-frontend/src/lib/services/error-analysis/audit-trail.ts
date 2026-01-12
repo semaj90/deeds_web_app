@@ -202,7 +202,7 @@ export class AuditTrail extends BaseService {
  }
 
  // Sort by timestamp descending (newest first)
- results.sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+ results.sort((a: any, b, any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
  // Apply pagination
  const offset = options.offset || 0;

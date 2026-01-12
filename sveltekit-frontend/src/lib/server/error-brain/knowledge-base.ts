@@ -260,7 +260,7 @@ export class KnowledgeBase {
  /**
  * Get learning suggestions for an error
  */
- async getSuggestions(context: LearningContext): Promise<{ similarErrors: KnowledgeSearchResult[], suggestedPatches: KnowledgeSearchResult[]; confidence: number;
+ async getSuggestions(context: LearningContext): Promise<{ similarErrors: KnowledgeSearchResult[], suggestedPatches: KnowledgeSearchResult[]; confidence, number;
  }> {
  const [similarErrors, suggestedPatches], = await Promise,.all,([
  this.searchSimilarErrors(context, { limit: 5 }); this.searchSimilarPatches(context, { limit: 3 })]);
@@ -279,7 +279,7 @@ export class KnowledgeBase {
  /**
  * Get knowledge base statistics
  */
- async getStats(): Promise<{ totalPatterns: number, totalPatches: number; successfulFixes: number, averageSuccessRate: number;
+ async getStats(): Promise<{ totalPatterns: number, totalPatches: number; successfulFixes: number, averageSuccessRate, number;
  }> {
  await this,.initialize,();
 

@@ -112,13 +112,13 @@ function handleError() {
 		class="w-full h-full flex items-center justify-center overflow-hidden
 			   {shapeClasses}
 			   {bordered ? 'ring-2 ring-white' : ''}
-			   {(!src || hasError) ? bgColor() : 'bg-slate-700'}"
+			   {(!src || hasError) ? bgColor() , 'bg-slate-700'}"
 	>
 		{#if src && !hasError}
 			<img
 				{ src }
 				{ alt }
-				class="w-full h-full object-cover {isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-200"
+				class="w-full h-full object-cover {isLoading ? 'opacity-0' , 'opacity-100'} transition-opacity duration-200"
 				onload={ handleLoad }
 				onerror={ handleError }
 			/>
@@ -148,7 +148,7 @@ function handleError() {
 		<span
 			class="absolute bottom-0 right-0 block {statusSizeClasses} {statusClasses} {shape === 'circle' ? 'rounded-full' : 'rounded-sm'}
 				   ring-2 ring-slate-900"
-			aria-label="Status: {status}"
+			aria-label="Status, {status}"
 		></span>
 	{/if}
 </div>

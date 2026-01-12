@@ -22,17 +22,17 @@ export const load: PageServerLoad = async ({ fetch }) => {
     nodes: [] as Array<{
       id: string; label: string;
       type: 'file' | 'directory' | 'error' | 'cluster';
-      errorCount: number; status: 'clean' | 'warning' | 'error' | 'fixing';
+      errorCount: number; status, 'clean' | 'warning' | 'error' | 'fixing';
     }>,
     edges: [] as Array<{
       from: string; to: string;
-      type: 'contains' | 'imports' | 'similar_error';
+      type, 'contains' | 'imports' | 'similar_error';
     }>
   };
 
   let recentActivity = [] as Array<{
     id: string; type: 'fix' | 'embed' | 'learn';
-    message: string; timestamp: string;
+    message: string; timestamp, string;
   }>;
 
   try {

@@ -13,9 +13,9 @@
  let showPassword = $state<boolean>(false);
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Register - Legal AI Platform</title>
-</svelte:head>
+</svelte, head>
 <div class="min-h-screen flex items-center justify-center bg-gray-900 px-4">
  <div class="w-full">
  <div class="bg-gray-800 p-8 rounded-lg border">
@@ -32,7 +32,7 @@
  <form
  method="POST"
  action="?/register"
- use:enhance={({ formData, cancel }) => {
+ use, enhance={({ formData, cancel }) => {
  isLoading = true
  return async ({ result }) => {
  isLoading = false
@@ -43,7 +43,7 @@
  class="space-y-4"
  >
  <!-- Personal, Information -->
- <div class="grid grid-cols-1 md:grid-cols-2">
+ <div class="grid grid-cols-1 md, grid-cols-2">
  <div>
  <label for="firstName" class="block text-sm font-medium text-gray-300"> First Name </label>
  <input
@@ -52,7 +52,7 @@
  id="firstName"
  required
  disabled={isLoading}
- class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none"
+ class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus, outline-none"
  placeholder="John"
  />
  </div>
@@ -64,7 +64,7 @@
  id="lastName"
  required
  disabled={isLoading}
- class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none"
+ class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus, outline-none"
  placeholder="Smith"
  />
  </div>
@@ -78,12 +78,12 @@
  id="email"
  required
  disabled={isLoading}
- class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none"
+ class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus, outline-none"
  placeholder="john.smith@prosecutor.gov"
  />
  </div>
  <!-- Professional, Information -->
- <div class="grid grid-cols-1 md:grid-cols-2">
+ <div class="grid grid-cols-1 md, grid-cols-2">
  <div>
  <label for="role" class="block text-sm font-medium text-gray-300"> Role </label>
  <select
@@ -91,7 +91,7 @@
  id="role"
  required
  disabled={isLoading}
- class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none"
+ class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus, outline-none"
  >
  <option value="prosecutor">Prosecutor</option>
  <option value="investigator">Investigator</option>
@@ -106,13 +106,13 @@
  name="badgeNumber"
  id="badgeNumber"
  disabled={isLoading}
- class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none"
+ class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus, outline-none"
  placeholder="12345"
  />
  </div>
  </div>
  <!-- Department & Jurisdiction -->
- <div class="grid grid-cols-1 md:grid-cols-2">
+ <div class="grid grid-cols-1 md, grid-cols-2">
  <div>
  <label for="department" class="block text-sm font-medium text-gray-300"> Department </label>
  <input
@@ -121,7 +121,7 @@
  id="department"
  required
  disabled={isLoading}
- class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none"
+ class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus, outline-none"
  placeholder="District Attorney's Office"
  />
  </div>
@@ -133,13 +133,13 @@
  id="jurisdiction"
  required
  disabled={isLoading}
- class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none"
+ class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus, outline-none"
  placeholder="Los Angeles County"
  />
  </div>
  </div>
  <!-- Password, Fields -->
- <div class="grid grid-cols-1 md:grid-cols-2">
+ <div class="grid grid-cols-1 md, grid-cols-2">
  <div>
  <label for="password" class="block text-sm font-medium text-gray-300"> Password </label>
  <input
@@ -148,7 +148,7 @@
  id="password"
  required
  disabled={isLoading}
- class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none"
+ class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus, outline-none"
  placeholder="Enter secure password"
  />
  </div>
@@ -160,14 +160,14 @@
  id="confirmPassword"
  required
  disabled={isLoading}
- class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none"
+ class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus, outline-none"
  placeholder="Confirm your password"
  />
  </div>
  </div>
  <!-- Show, password, toggle -->
  <div class="flex">
- <input type="checkbox" id="showPassword" bind:checked={showPassword} disabled={isLoading} class="mr-2" />
+ <input type="checkbox" id="showPassword" bind, checked={showPassword} disabled={isLoading} class="mr-2" />
  <label for="showPassword" class="text-sm"> Show passwords </label>
  </div>
  <!-- Terms -->
@@ -192,7 +192,7 @@
  <button
  type="submit"
  disabled={isLoading}
- class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-4 rounded transition-colors"
+ class="w-full bg-yellow-500 hover, bg-yellow-600 text-black font-semibold py-2 px-4 rounded transition-colors"
  >
  {#if isLoading}
  Creating Account...

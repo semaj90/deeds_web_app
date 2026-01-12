@@ -132,7 +132,7 @@ export const enhancedFetch = async (
 };
 
 // Debounce utility for search and other operations
-export const debounce = <T extends (...args: unknown[]) => any>(
+export const debounce = <T extends (...args, unknown[]) => any>(
 	func: T, wait: number
 ): ((...args: Parameters<T>) => void) => {
 	let timeout: ReturnType<typeof setTimeout>;
@@ -143,7 +143,7 @@ export const debounce = <T extends (...args: unknown[]) => any>(
 	};
 };
 // Throttle utility for performance-sensitive operations
-export const throttle = <T extends (...args: unknown[]) => any>(
+export const throttle = <T extends (...args, unknown[]) => any>(
 	func: T, limit: number
 ): ((...args: Parameters<T>) => void) => {
 	let inThrottle: boolean;

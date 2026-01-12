@@ -115,12 +115,12 @@
  <div>
  <div class="flex justify-between text-sm mb-1">
  <span class="text-slate-300">GPU Utilization</span>
- <span class="{getMetricColor(gpuMetrics.utilization, { low: 60, high: 85 85 })}">{gpuMetrics.utilization}%</span>
+ <span class="{getMetricColor(gpuMetrics.utilization, { low: 60, high, 85 85 })}">{gpuMetrics.utilization}%</span>
  </div>
  <div class="w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-cyan-400 transition-all duration-300"
- style="width: {gpuMetrics.utilization}%"
+ style="width, {gpuMetrics.utilization}%"
  ></div>
  </div>
  </div>
@@ -129,14 +129,14 @@
  <div>
  <div class="flex justify-between text-sm mb-1">
  <span class="text-slate-300">VRAM Usage</span>
- <span class="{getMetricColor((gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100, { low: 70, high: 90 90 })}">
+ <span class="{getMetricColor((gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100, { low: 70, high, 90 90 })}">
  {gpuMetrics.memoryUsed.toFixed(1)} / {gpuMetrics.memoryTotal} GB
  </span>
  </div>
  <div class="w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-green-400 transition-all duration-300"
- style="width: {(gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100}%"
+ style="width, {(gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100}%"
  ></div>
  </div>
  </div>
@@ -144,7 +144,7 @@
  <!-- Temperature -->
  <div class="grid grid-cols-3 gap-4 text-center">
  <div class="bg-slate-700/30 rounded-lg p-3">
- <div class="text-lg font-bold {getMetricColor(gpuMetrics.temperature, { low: 70, high: 85 85 })}">
+ <div class="text-lg font-bold {getMetricColor(gpuMetrics.temperature, { low: 70, high, 85 85 })}">
  {gpuMetrics.temperature}°C
  </div>
  <div class="text-xs text-slate-400">Temperature</div>
@@ -168,7 +168,7 @@
  {#each performanceHistory as point}
  <div
  class="bg-cyan-400/60 rounded-sm flex-1 transition-all duration-200"
- style="height: {point.utilization}%"
+ style="height, {point.utilization}%"
  ></div>
  {/each}
  </div>

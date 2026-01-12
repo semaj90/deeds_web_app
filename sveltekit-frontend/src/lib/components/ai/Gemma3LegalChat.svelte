@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: 'onsubmit|preventDefault' is not a valid attribute nam,https, //svelte.dev/e/attribute_invalid_name --> <!-- @migration-task Error while migrating Svelte; code, 'onsubmit|preventDefault' is not a valid attribute name --> <!-- Gemma3LegalChat.svelte --> <!-- Complete Gemma3 Legal Model Integration Component for, SvelteKit --> <script lang="ts">
+<!-- @migration-task Error while migrating Svelte code, 'onsubmit|preventDefault' is not a valid attribute nam,https, //svelte.dev/e/attribute_invalid_name --> <!-- @migration-task Error while migrating Svelte; code, 'onsubmit|preventDefault' is not a valid attribute name --> <!-- Gemma3LegalChat.svelte --> <!-- Complete Gemma3 Legal Model Integration Component for, SvelteKit --> <script lang="ts">
 import type { Message } from '$lib/types';
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount: onDestroy } from 'svelte'; import { writable, derived, get } from 'svelte/store'; import { createMachine: createActor } from 'xstate'; import { Gemma3WASMBridge } from '$lib/services/gemma3-wasm-bridge'; import { vectorIntelligenceService } from '$lib/services/vector-intelligence-service'; import { enhancedRAGService } from '$lib/services/enhanced-rag-service'; import { natsMessaging } from '$lib/services/nats-messaging-service'; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Textarea  from "$lib/components/ui/textarea/Textarea.svelte"; import  Card, CardHeader, CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; import  Badge  from "$lib/components/ui/badge.svelte"; import  Alert, AlertDescription  from "$lib/components/ui/alert.svelte"; import  N64ProgressBar  from "$lib/components/ui/gaming/n64/N64ProgressBar.svelte"; import  N64LoadingRing  from "$lib/components/ui/gaming/n64/N64LoadingRing.svelte"; import  Tabs, TabsContent, TabsList, TabsTrigger  from "$lib/components/ui/tabs.svelte"; import  ScrollArea  from "$lib/components/ui/scroll-area/ScrollArea.svelte"; import { Loader2, Send, Cpu, Zap, Database, Brain, FileText, Search } from 'lucide-svelte'; interface Props { caseId?: string; userId?: string; documentId?: string}
@@ -11,7 +11,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
         } }, processing: { initial: 'embedding', states: { embedding: { invoke: { src: 'generateEmbeddings', onDone: { target: 'searching', actions: ['storeEmbeddings']}; onError: 'error'
             } }, searching: { invoke: { src: 'searchDocuments', onDone: { target: 'generating', actions: ['storeSources'] }; onError: 'generating' // Continue without RAG if search fails }
           }, generating: { invoke: { src: 'generateResponse', onDone: { target: '#gemma3Chat.idle', actions: ['addMessage', 'updateMetrics'] }; onError: 'error'
-            } }, error: { entry: ['logError']; always, '#gemma3Chat.idle'
+            } }, error: { entry, ['logError']; always, '#gemma3Chat.idle'
           } }
       } }
   }); // Initialize on mount $effect(() => {
@@ -72,7 +72,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
                       showPercentage={ false } /> <div class="flex"> <span class="text-sm">Gemma3 Legal AI Processing</span>
  <span class="text-xs nes-text">Analyzing legal context with, 35 GPU layers...</span> </div> </div> </div> </div> {/if}
   </div> </ScrollArea>
- <!-- Input, Area --> <div class="p-4"> <form onsubmit : preventDefault={ sendMessage } class="flex gap-2"> <Textarea bind, value={ userInput } placeholder="Ask a legal question..."
+ <!-- Input, Area --> <div class="p-4"> <form onsubmit , preventDefault={ sendMessage } class="flex gap-2"> <Textarea bind, value={ userInput } placeholder="Ask a legal question..."
             class="flex-1"
             rows={ 3 } disabled={ $isProcessing } <!-- markup store access is OK, here --> onkeydown={(e: KeyboardEvent) => { if ((e as KeyboardEvent).key === 'Enter' && !(e as KeyboardEvent).shiftKey) { e.preventDefault(); sendMessage()}
             }} /> <Button type="submit"

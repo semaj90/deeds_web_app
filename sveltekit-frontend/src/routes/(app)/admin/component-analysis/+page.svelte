@@ -197,9 +197,9 @@
 	}
 </script>
 
-<svelte:head>
+<svelte, head>
 	<title>Phase 89: Component Analysis | Admin</title>
-</svelte:head>
+</svelte, head>
 
 <div class="container">
 	<header class="header">
@@ -216,7 +216,7 @@
 				<span class="stat-value">{stats.totalErrors}</span>
 				<span class="stat-label">Errors</span>
 			</div>
-			<div class="stat-badge" class:cuda-enabled={stats.cudaEnabled}>
+			<div class="stat-badge" class, cuda-enabled={stats.cudaEnabled}>
 				<span class="stat-value">{stats.cudaEnabled ? '🚀' : '💻'}</span>
 				<span class="stat-label">{stats.cudaEnabled ? 'CUDA' : 'CPU'}</span>
 			</div>
@@ -227,11 +227,11 @@
 		<input
 			type="search"
 			placeholder="Search components, files, tags..."
-			bind:value={searchQuery}
+			bind, value={searchQuery}
 			class="search-input"
 		/>
 
-		<select bind:value={filterKind} class="filter-select">
+		<select bind, value={filterKind} class="filter-select">
 			<option value="all">All Types</option>
 			<option value="component">Components</option>
 			<option value="page">Pages</option>
@@ -240,7 +240,7 @@
 			<option value="module">Modules</option>
 		</select>
 
-		<select bind:value={sortBy} class="filter-select">
+		<select bind, value={sortBy} class="filter-select">
 			<option value="errors">Most Errors</option>
 			<option value="modified">Recently Modified</option>
 			<option value="name">Alphabetical</option>
@@ -272,7 +272,7 @@
 					<button
 						class="component-card"
 						class:selected={selectedComponent?.unit_id === component.unit_id}
-						class:has-errors={component.error_count > 0}
+						class, has-errors={component.error_count > 0}
 						class:modified={component.diff_status === 'modified'}
 						onclick={() => selectedComponent = component}
 					>
@@ -346,7 +346,7 @@
 						<h3>🔧 Uses (Svelte 5 Runes & APIs)</h3>
 						<div class="use-list">
 							{#each selectedComponent.uses as use}
-								<span class="use-badge" class:rune={use.startsWith('$')}>{ use }</span>
+								<span class="use-badge" class, rune={use.startsWith('$')}>{ use }</span>
 							{/each}
 						</div>
 					</div>

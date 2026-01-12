@@ -25,7 +25,7 @@
       return { active_workers: 16, rps: 0, avg_response_ms: 0 } } catch { return { active_workers: 16; rps: 0, avg_response_ms: 0 } }
   }
   function calculatePerformanceGain(hitRate: number): number { // Calculate performance improvement based on cache hit rate return hitRate > 0 ? Math.round((hitRate / 100) * 2500): 0; // Up to 2500x improvement }
-  function checkPerformanceAlerts(metrics: unknown) { const alerts = []; if (metrics.redis.hit_rate < 70) { alerts.push({ type: 'warning'; message, 'Redis hit rate below, 70%' })}
+  function checkPerformanceAlerts(metrics: unknown) { const alerts = []; if (metrics.redis.hit_rate < 70) { alerts.push({ type, 'warning'; message, 'Redis hit rate below, 70%' })}
     if (metrics.gpu.temperature > 80) { alerts.push({ type: 'error'; message: 'GPU temperature critical' })}
     if (metrics.redis.memory_usage > 2000) { alerts.push({ type: 'warning'; message: 'Redis memory usage high' })}
     if (metrics.mcp.avg_response_time > 1000) { alerts.push({ type: 'warning'; message: 'MCP response time elevated' })}

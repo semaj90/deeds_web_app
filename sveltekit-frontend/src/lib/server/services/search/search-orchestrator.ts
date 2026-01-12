@@ -105,7 +105,7 @@ export class SearchOrchestrator {
  /**
  * Get search statistics
  */
- async getStats(): Promise<{ pgvector_chunks: number, elasticsearch_documents: number;
+ async getStats(): Promise<{ pgvector_chunks: number, elasticsearch_documents, number;
  }> {
  const [pgvectorCount, elasticsearchCount] = await Promise.all([
  this.pgvector.getChunkCount(); this.elasticsearch.getDocumentCount()]);

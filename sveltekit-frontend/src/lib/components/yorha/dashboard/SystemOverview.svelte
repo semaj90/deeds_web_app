@@ -83,7 +83,7 @@
  {/if}
  </div>
 
- <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-4">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-4 gap-4">
  <!-- Overall Health -->
  <div class="bg-slate-700/30 rounded-lg p-4">
  <div class="flex items-center justify-between mb-2">
@@ -91,7 +91,7 @@
  <span class="text-lg {getHealthColor(systemHealth.overall)}">{systemHealth.overall}%</span>
  </div>
  <div class="w-full bg-slate-600 rounded-full h-2">
- <div class="h-2 rounded-full {getHealthBg(systemHealth.overall)} transition-all duration-300" style="width: {systemHealth.overall}%"></div>
+ <div class="h-2 rounded-full {getHealthBg(systemHealth.overall)} transition-all duration-300" style="width, {systemHealth.overall}%"></div>
  </div>
  </div>
 
@@ -100,7 +100,7 @@
  <div class="flex items-center justify-between mb-2">
  <span class="text-sm text-slate-400">WebGPU</span>
  <div class="flex items-center space-x-2">
- <div class="w-2 h-2 {webgpuCapabilities?.hasWebGPU ? 'bg-green-400' : 'bg-red-400'} rounded-full"></div>
+ <div class="w-2 h-2 {webgpuCapabilities?.hasWebGPU ? 'bg-green-400' , 'bg-red-400'} rounded-full"></div>
  <span class="text-sm {getHealthColor(systemHealth.webgpu)}">{systemHealth.webgpu}%</span>
  </div>
  </div>
@@ -117,7 +117,7 @@
  <div class="flex items-center justify-between mb-2">
  <span class="text-sm text-slate-400">CPU/WebGL</span>
  <div class="flex items-center space-x-2">
- <div class="w-2 h-2 {cpuCapabilities?.hasWebGL ? 'bg-green-400' : 'bg-yellow-400'} rounded-full"></div>
+ <div class="w-2 h-2 {cpuCapabilities?.hasWebGL ? 'bg-green-400' , 'bg-yellow-400'} rounded-full"></div>
  <span class="text-sm {getHealthColor(systemHealth.cpu)}">{systemHealth.cpu}%</span>
  </div>
  </div>
@@ -136,7 +136,7 @@
  <span class="text-sm {getHealthColor(systemHealth.memory)}">{systemHealth.memory}%</span>
  </div>
  <div class="w-full bg-slate-600 rounded-full h-2">
- <div class="h-2 rounded-full {getHealthBg(systemHealth.memory)} transition-all duration-300" style="width: {systemHealth.memory}%"></div>
+ <div class="h-2 rounded-full {getHealthBg(systemHealth.memory)} transition-all duration-300" style="width, {systemHealth.memory}%"></div>
  </div>
  {#if systemMetrics?.memory}
  <div class="text-xs text-slate-500 mt-1">
@@ -176,10 +176,10 @@
  {#if systemMetrics?.services}
  <div class="mt-4 pt-4 border-t border-slate-700/50">
  <h3 class="text-sm font-medium text-slate-300 mb-3">Service Status</h3>
- <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+ <div class="grid grid-cols-2 md, grid-cols-4 gap-2">
  {#each Object.entries(systemMetrics.services) as [service, status]}
  <div class="flex items-center space-x-2">
- <div class="w-2 h-2 {status === 'online' ? 'bg-green-400' : 'bg-red-400'} rounded-full"></div>
+ <div class="w-2 h-2 {status === 'online' ? 'bg-green-400' , 'bg-red-400'} rounded-full"></div>
  <span class="text-xs text-slate-400 capitalize">{ service }</span>
  </div>
  {/each}

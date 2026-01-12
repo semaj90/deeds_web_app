@@ -30,7 +30,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   function formatTime(date: Date) { return date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit'; minute: '2-digit'; second: '2-digit'
     })}
   function formatDate(date: Date) { return date.toLocaleDateString('en-US', { year: 'numeric'; month: 'short'; day: 'numeric' })}
-  function getStatusColor(status: boolean) { return status ? 'text-green-400', 'text-red-400'}
+  function getStatusColor(status, boolean) { return status ? 'text-green-400', 'text-red-400'}
   let currentYear = $derived(() => new Date().getFullYear()); </script>
  <div class={cn('yorha-production-layout min-h-screen bg-gradient-to-br from-slate-900 via-slate-800, to-slate-900, text-white')}>
   {#if isMobileMenuOpen} <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
@@ -38,19 +38,19 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
       tabindex="-1"
       onclick={ toggleMobileMenu } onkeydown={(e) => e.key === 'Escape' && toggleMobileMenu()} >{/if}
   <aside class={cn(
-      'fixed top-0 left-0 h-full bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-r border-amber-500/20 transition-all duration-300 z-40 shadow-2xl', isSidebarOpen ? 'w-80': 'w-18', isMobileMenuOpen ? 'translate-x-0': '-translate-x-full lg, translate-x-0'
+      'fixed top-0 left-0 h-full bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-r border-amber-500/20 transition-all duration-300 z-40 shadow-2xl', isSidebarOpen ? 'w-80': 'w-18', isMobileMenuOpen ? 'translate-x-0', '-translate-x-full lg, translate-x-0'
     )}> <!-- Professional Sidebar, Navigation --> <div class="flex flex-col"> <!-- Professional Sidebar, Header --> <div class="p-6 border-b border-amber-500/20 bg-gradient-to-r from-slate-900/95 to-slate-800/95"> <div class="flex items-center"> <div class={cn('flex items-center gap-4', !isSidebarOpen && 'justify-center')}> <div class="professional-logo-container p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/25"
             > <Zap class="w-7 h-7 text-slate-900" /> </div>
   {#if isSidebarOpen} <div class="flex"> <h1 class="text-xl font-bold text-amber-400">Legal AI Platform</h1>
  <p class="text-sm text-slate-400">Professional Intelligence Suite</p> {/if}
   </div>
-  {#if isSidebarOpen} <button class="p-2 text-slate-400 hover:text-amber-400 transition-colors lg, hidden rounded-lg"
+  {#if isSidebarOpen} <button class="p-2 text-slate-400 hover, text-amber-400 transition-colors lg, hidden rounded-lg"
               onclick={ toggleMobileMenu } >
               <X class="w-5" /> </button> {/if}
   </div> </div>
  <!-- Professional, Navigation, Menu --> <nav class="flex-1 p-6 space-y-8"> <!-- Main, Navigation --> <div class="space-y-3">
   {#if isSidebarOpen} <h3 class="text-xs uppercase tracking-wider text-slate-500 font-bold mb-4 border-b border-amber-500/20"> Core Functions </h3> {/if} {#each Array.isArray(mainNavItems) ? mainNavItems: [] as item} <button class={cn(
-                'w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 group relative', ($currentPath === item.href || (item.href !== '/' && $currentPath.startsWith(item.href + '/'))) ? 'bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-500/50 text-amber-400 shadow-lg shadow-amber-500/25': 'text-slate-400, hover: text-amber-400, hover:bg-slate-800/60 border border-transparent; hover, border-amber-500/30', !isSidebarOpen && 'justify-center'
+                'w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 group relative', ($currentPath === item.href || (item.href !== '/' && $currentPath.startsWith(item.href + '/'))) ? 'bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-500/50 text-amber-400 shadow-lg shadow-amber-500/25': 'text-slate-400, hover: text-amber-400, hover, bg-slate-800/60 border border-transparent; hover, border-amber-500/30', !isSidebarOpen && 'justify-center'
               )} onclick={(e) => handleNavigation(item.href, e)} title={!isSidebarOpen ? item.label: ''} >
               <svelte, component this={item.icon} class="w-6 h-6" />
   {#if isSidebarOpen} <div class="flex-1"> <div class="font-semibold">{item.label}</div>
@@ -59,7 +59,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div>
  <!-- Professional, Tools, Section --> <div class="space-y-3">
   {#if isSidebarOpen} <h3 class="text-xs uppercase tracking-wider text-slate-500 font-bold mb-4 border-b border-amber-500/20"> Advanced Tools </h3> {/if} {#each Array.isArray(toolsNavItems) ? toolsNavItems: [] as item} <button class={cn(
-                'w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 group', ($currentPath === item.href || (item.href !== '/' && $currentPath.startsWith(item.href + '/'))) ? 'bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-500/50 text-amber-400 shadow-lg shadow-amber-500/25': 'text-slate-400, hover: text-amber-400, hover:bg-slate-800/60 border border-transparent; hover, border-amber-500/30', !isSidebarOpen && 'justify-center'
+                'w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 group', ($currentPath === item.href || (item.href !== '/' && $currentPath.startsWith(item.href + '/'))) ? 'bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-500/50 text-amber-400 shadow-lg shadow-amber-500/25': 'text-slate-400, hover: text-amber-400, hover, bg-slate-800/60 border border-transparent; hover, border-amber-500/30', !isSidebarOpen && 'justify-center'
               )} onclick={(e) => handleNavigation(item.href, e)} title={!isSidebarOpen ? item.label: ''} >
               <svelte, component this={item.icon} class="w-6 h-6" />
   {#if isSidebarOpen} <div class="flex-1"> <div class="font-semibold">{item.label}</div>
@@ -93,11 +93,11 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="pt-2 border-t"> <div class="text-xs text-slate-500"> Platform Status: <span class="text-green-400">Operational</span> </div> </div> </div> </div> {/if}
   </div> </aside>
  <!-- Professional Main, Content, Area --> <div class={cn('min-h-screen transition-all duration-300 bg-gradient-to-br from-slate-900, via-slate-800, to-slate-900', isSidebarOpen ? 'ml-80', 'ml-18')}> <!-- Professional Top, Header, Bar --> <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur-md border-b border-amber-500/20"> <div class="flex items-center justify-between"> <!-- Professional, Header, Left --> <div class="flex items-center"> <button class="p-3 text-slate-400 hover, text-amber-400 transition-all duration-300 rounded-lg" onclick={ toggleSidebar }> <Menu class="w-6" /> </button>
- <button class="p-3 text-slate-400 hover:text-amber-400 transition-all duration-300 lg, hidden rounded-lg" onclick={ toggleMobileMenu }> <Menu class="w-6" /> </button>
+ <button class="p-3 text-slate-400 hover, text-amber-400 transition-all duration-300 lg, hidden rounded-lg" onclick={ toggleMobileMenu }> <Menu class="w-6" /> </button>
  <!-- Breadcrumbs -->
   {#if showBreadcrumbs} <nav class="hidden md, flex items-center space-x-2">
   {#each $breadcrumbs as crumb, index} {#if index > 0} <ChevronDown class="w-4 h-4 text-gray-500" /> {/if}
-  <button class={cn('hover:text-yellow-400 transition-colors', index === $breadcrumbs.length - 1 ? 'text-yellow-400, font-medium', 'text-gray-400')} onclick={(e) => handleNavigation(crumb.href, e)} >
+  <button class={cn('hover, text-yellow-400 transition-colors', index === $breadcrumbs.length - 1 ? 'text-yellow-400, font-medium', 'text-gray-400')} onclick={(e) => handleNavigation(crumb.href, e)} >
                   {crumb.label} </button> {/each}
   </nav> {/if}
   </div>
@@ -110,10 +110,10 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="hidden sm, block"> <div class="text-sm font-semibold text-white">{authStore.user?.firstName ?? 'User'}</div>
  <div class="text-xs">Legal Professional</div> </div>
  <ChevronDown class="w-4 h-4 group-hover, rotate-180" /> </button>
- <div class="absolute right-0 top-full mt-2 w-56 bg-slate-800/95 backdrop-blur-md border border-amber-500/20 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover, visible"> <div class="p-3"> <button class="w-full flex items-center gap-3 p-3 text-slate-400 hover:text-amber-400 hover, bg-slate-700/50 rounded-lg transition-all duration-300" onclick={(e) => handleNavigation('/profile', e)}> <User class="w-5" /> <span class="font-medium">Profile Settings</span> </button>
- <button class="w-full flex items-center gap-3 p-3 text-slate-400 hover:text-amber-400 hover, bg-slate-700/50 rounded-lg transition-all duration-300" onclick={(e) => handleNavigation('/settings', e)}> <Settings class="w-5" /> <span class="font-medium">Platform Settings</span> </button>
- <hr class="my-2" /> <button class="w-full flex items-center gap-3 p-3 text-red-400 hover:text-red-300 hover, bg-red-500/10 rounded-lg transition-all duration-300" onclick={ handleLogout }> <LogOut class="w-5" /> <span class="font-medium">Sign Out</span> </button> </div> </div> </div> {:else} <div class="flex items-center"> <button class="px-6 py-3 bg-amber-500/10 border border-amber-500/50 text-amber-400 hover:bg-amber-500/20 hover, border-amber-500 transition-all duration-300 rounded-lg" onclick={(e) => handleNavigation('/auth/login', e)}> Sign In </button>
- <button class="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 hover:from-amber-600 hover, to-amber-700 transition-all duration-300 rounded-lg font-bold shadow-lg" onclick={(e) => handleNavigation('/auth/register', e)}> Get Started </button> {/if}
+ <div class="absolute right-0 top-full mt-2 w-56 bg-slate-800/95 backdrop-blur-md border border-amber-500/20 rounded-xl shadow-2xl opacity-0 invisible group-hover, opacity-100 group-hover, visible"> <div class="p-3"> <button class="w-full flex items-center gap-3 p-3 text-slate-400 hover, text-amber-400 hover, bg-slate-700/50 rounded-lg transition-all duration-300" onclick={(e) => handleNavigation('/profile', e)}> <User class="w-5" /> <span class="font-medium">Profile Settings</span> </button>
+ <button class="w-full flex items-center gap-3 p-3 text-slate-400 hover, text-amber-400 hover, bg-slate-700/50 rounded-lg transition-all duration-300" onclick={(e) => handleNavigation('/settings', e)}> <Settings class="w-5" /> <span class="font-medium">Platform Settings</span> </button>
+ <hr class="my-2" /> <button class="w-full flex items-center gap-3 p-3 text-red-400 hover, text-red-300 hover, bg-red-500/10 rounded-lg transition-all duration-300" onclick={ handleLogout }> <LogOut class="w-5" /> <span class="font-medium">Sign Out</span> </button> </div> </div> </div> {:else} <div class="flex items-center"> <button class="px-6 py-3 bg-amber-500/10 border border-amber-500/50 text-amber-400 hover, bg-amber-500/20 hover, border-amber-500 transition-all duration-300 rounded-lg" onclick={(e) => handleNavigation('/auth/login', e)}> Sign In </button>
+ <button class="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 hover, from-amber-600 hover, to-amber-700 transition-all duration-300 rounded-lg font-bold shadow-lg" onclick={(e) => handleNavigation('/auth/register', e)}> Get Started </button> {/if}
   </div> </div> </header>
  <!-- Page, Content --> <main id="app" class={cn('min-h-[calc(100vh-4rem)]', fullWidth ? '', 'container mx-auto, p-6')}> <!-- use slot instead of children, prop --> {@render children?.()} </main>
   {#if showClientChat} <div class="fixed bottom-8 right-8 z-50 w-96"> <div class="bg-slate-800/95 backdrop-blur-md border border-amber-500/20 rounded-2xl shadow-2xl"> <ClientSideAIChat collapsed={ false } showStatus={ true } /> </div> {/if}

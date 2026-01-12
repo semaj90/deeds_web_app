@@ -20,7 +20,7 @@
 		// Find all citations
 		const citations: Array<{ start: number;
 			end: number; type: string;
-			content: string; reference: string;
+			content: string; reference, string;
 		}> = [];
 
 		// Find statutes

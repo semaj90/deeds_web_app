@@ -3,7 +3,7 @@
 
  // Minimal props / state for the dashboard placeholder
  let { title = 'Case Scoring Dashboard' } = $props<{
- title?: string;
+ title?, string;
  }>();
 </script>
 
@@ -14,7 +14,7 @@
  </header>
 
  <section class="dashboard-body">
- <!-- Placeholder content: your real dashboard can replace this -->
+ <!-- Placeholder content, your real dashboard can replace this -->
  <div class="placeholder-card">
  <p>Components, charts and controls will be rendered here.</p>
  </div>

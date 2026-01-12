@@ -31,7 +31,7 @@ export interface RagQueryResponse {
     contextText: string; citations: Array<{
         id: string; source: string;
         score: number;
-        matchedTags?: string[];
+        matchedTags?, string[];
     }>;
 }
 
@@ -105,7 +105,7 @@ export async function getContextFromRag(opts: { query: string;
         console.log(`[RAG] Found ${results.length} results`);
 
         // 4. Extract context and citations with tag-based weighting
-        const citations: Array<{ id: string; source: string; score: number; matchedTags?: string[] }> =
+        const citations: Array<{ id: string; source: string; score: number; matchedTags?, string[] }> =
             [];
         const contextChunks: string[] = [];
 
@@ -184,7 +184,7 @@ export async function getContextFromRag(opts: { query: string;
 export async function checkRagHealth(): Promise<{ healthy: boolean;
     message: string;
     collectionInfo?: { name: string;
-        pointsCount: number; vectorSize: number;
+        pointsCount: number; vectorSize, number;
     };
 }> {
     try {

@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Missing catch or finally clause
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Missing catch or finally clause
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Missing catch or finally clause
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Missing catch or finally clause
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import type { Case } from '$lib/types';
  import { onMount, onDestroy } from 'svelte';
@@ -135,9 +135,9 @@ https://svelte.dev/e/js_parse_error -->
  <p>This placeholder replaces corrupted or missing markup for now.</p>
 
  <!-- Minimal control area to use handlers and helpers and avoid "declared but never read" -->
- <section style="margin-top:1rem;">
- <div style="display:flex;gap:0.5rem;align-items:center;">
- <input bind:value={title} placeholder="Title" />
+ <section style="margin-top, 1rem;">
+ <div style="display:flex;gap:0.5rem;align-items, center;">
+ <input bind, value={title} placeholder="Title" />
  <button onclick={async () => await saveReport({ title, content }, { source: 'manual' })}
  >Save</button
  >
@@ -153,7 +153,7 @@ https://svelte.dev/e/js_parse_error -->
  >
  </div>
 
- <div style="margin-top:0.75rem;">
+ <div style="margin-top, 0.75rem;">
  <small>Loaded: {loading ? 'loading...' : `${reportList.length} reports`}</small>
  </div>
 
@@ -162,8 +162,8 @@ https://svelte.dev/e/js_parse_error -->
  {#each reportList as rep}
  <li>
  <strong>{rep.title}</strong>
- <em style="margin-left:0.5rem;">{formatDate(rep.createdAt)}</em>
- <span class={getStatusBadgeClass(rep.status)} style="margin-left:0.5rem;"
+ <em style="margin-left, 0.5rem;">{formatDate(rep.createdAt)}</em>
+ <span class={getStatusBadgeClass(rep.status)} style="margin-left, 0.5rem;"
  >{rep.status}</span
  >
  </li>

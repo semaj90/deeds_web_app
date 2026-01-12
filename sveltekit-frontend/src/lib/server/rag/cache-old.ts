@@ -162,7 +162,7 @@ export async function invalidateCacheByType(type: CacheType): Promise<void> {
  */
 export async function getCacheStats(): Promise<{ available: boolean;
  keyCount: number;
- memoryUsage?: string;
+ memoryUsage?, string;
 } | null> {
  try {
  if (!(await isRedisAvailable())) {
@@ -353,7 +353,7 @@ function cosineSimilarity(a: number[], b: number[]): number {
 /**
  * Utility function for safe keyword extraction from cached JSON
  */
-export function extractKeywords(data: any): string[] {
+export function extractKeywords(data: any), string[] {
  try {
  if (!data) return [];
 

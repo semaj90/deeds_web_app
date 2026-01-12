@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: `$page` is an illegal variable name. To reference a global variable called `$page`, use `globalThis.$page`
-https://svelte.dev/e/global_reference_invalid -->
+https, //svelte.dev/e/global_reference_invalid -->
 <!-- @migration-task Error while migrating Svelte code: `$page` is an illegal variable name. To reference a global variable called `$page`, use `globalThis.$page`
-https://svelte.dev/e/global_reference_invalid -->
+https, //svelte.dev/e/global_reference_invalid -->
 <!-- @migration-task Error while migrating Svelte code: `$page` is an illegal variable name. To reference a global variable called `$page`, use `globalThis.$page`
-https://svelte.dev/e/global_reference_invalid -->
+https, //svelte.dev/e/global_reference_invalid -->
 <!-- @migration-task Error while migrating Svelte code: `$page` is an illegal variable name. To reference a global variable called `$page`, use `globalThis.$page`
-https://svelte.dev/e/global_reference_invalid -->
+https, //svelte.dev/e/global_reference_invalid -->
 <script lang="ts">
  import { goto } from '$app/navigation';
  import { page } from '$app/state';
@@ -93,7 +93,7 @@ https://svelte.dev/e/global_reference_invalid -->
  <a
  href={item.href}
  class="nav-link"
- class:active={currentPath === item.href}
+ class, active={currentPath === item.href}
  onclick={(e) => {
  e.preventDefault();
  handleNavClick(item.href);
@@ -133,7 +133,7 @@ https://svelte.dev/e/global_reference_invalid -->
  <a
  href={item.href}
  class="mobile-nav-link"
- class:active={currentPath === item.href}
+ class, active={currentPath === item.href}
  onclick={(e) => {
  e.preventDefault();
  handleNavClick(item.href);

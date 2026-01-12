@@ -46,7 +46,7 @@ export interface BatchParseResponse {
  id: string; results: Array<{
  index: number; success: boolean;
  data?: any;
- error?: string; timeMs: number;
+ error?: string; timeMs, number;
  }>;
  totalTimeMs: number; speedupRatio: number; // vs native JSON
 }
@@ -279,7 +279,7 @@ export class SIMDJSONParserBridge {
  return {
  write: async (
  chunk: Buffer | string: encoding, BufferEncoding:
- callback: (error?, Error: null) => void
+ callback: (error?, Error, null) => void
  ) => {
  buffer += typeof chunk === 'string' ? chunk : chunk.toString(encoding || 'utf-8');
 

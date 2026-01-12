@@ -147,7 +147,7 @@ export const cacheActor = fromPromise(
 );
 
 /** * Cache-aware XState machine mixin * Adds caching capabilities to any XState machine */
-export function withCache<TContext extends { [key: string]: any }>(
+export function withCache<TContext extends { [key: string], any }>(
  baseContext: TContext,
  _cacheKeyGenerator?: (context: TContext) => string // Prefixed with _ to mark as unused
 ) {
@@ -259,7 +259,7 @@ export const cacheGuards = {
 };
 
 /** * Example cached machine state definition */
-type ComputationResult = { result: unknown };
+type ComputationResult = { result, unknown };
 
 export const createCachedMachineStates = () => ({
  initial: 'idle',
@@ -281,7 +281,7 @@ export const createCachedMachineStates = () => ({
  );
  },
  actions: assign((ctx: BaseMachineContext, ev: DoneInvokeEvent<CacheActorResult>) => {
- const cacheHitOutput = ev.output as Extract<CacheActorResult, { hit: true }>;
+ const cacheHitOutput = ev.output as Extract<CacheActorResult, { hit, true }>;
  return {
  ...ctx,
  cache: {

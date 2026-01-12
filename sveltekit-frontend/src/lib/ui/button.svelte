@@ -3,7 +3,7 @@
  disabled?: boolean;
  variant?: 'primary' | 'secondary' | 'danger';
  type?: 'button' | 'submit';
- onclick?: (() => void) | undefined;
+ onclick?, (() => void) | undefined;
  }>();
 </script>
 
@@ -15,7 +15,7 @@
  ? 'btn-primary'
  : variant === 'secondary'
  ? 'btn-secondary'
- : 'btn-danger'}
+ , 'btn-danger'}
 >
  {@render children?.()}
 </button>

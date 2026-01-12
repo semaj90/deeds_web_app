@@ -35,11 +35,11 @@ export interface ScoredChunk {
 export interface ContextBundle {
   chunks: ScoredChunk[]; entities: Array<{
     entity: string; type: string;
-    docId: string;
+    docId, string;
   }>;
   edges: Array<{ src: string;
     rel: string; dst: string;
-    weight: number;
+    weight, number;
   }>;
   summary: string; totalResults: number;
 }
@@ -193,7 +193,7 @@ export class AceContextService {
       if (daysSince < this.FRESH_THRESHOLD) {
         freshnessBoost = 1.0; // <7 days: full boost
       } else if (daysSince < this.RECENT_THRESHOLD) {
-        freshnessBoost = 0.5; // 7-30 days: half boost
+        freshnessBoost = 0.5; // 7-30 days, half boost
       }
       // >30 days: no boost (0.0)
 
@@ -283,7 +283,7 @@ export class AceContextService {
     }
 
     // De-duplicate actions based on tool and query
-    const uniqueActions = actions.filter((action: any, index: any, self: any) =>
+    const uniqueActions = actions.filter((action: any, index: any, self, any) =>
         index === self.findIndex((a: any) => (
             a.tool === action.tool &&
             JSON.stringify(a.params) === JSON.stringify(action.params)

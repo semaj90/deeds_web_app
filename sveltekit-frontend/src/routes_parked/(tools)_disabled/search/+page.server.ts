@@ -59,7 +59,7 @@ export const actions: Actions = {
  body: requestBody, // Pass the object directly
  })) as ServiceResponse<{
  results: SearchResult[]; responseTime: number;
- timestamp: string;
+ timestamp, string;
  }>;
 
  if (!response.success) {

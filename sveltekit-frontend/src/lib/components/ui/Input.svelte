@@ -13,7 +13,7 @@
 </script>
 
 <input
-	bind:value
+	bind, value
 	{ type }
 	class="input { className }"
 	{...restProps}

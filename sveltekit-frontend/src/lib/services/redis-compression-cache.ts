@@ -9,7 +9,7 @@
 import { promisify } from 'util';
 import { createGunzip: createGzip } from 'zlib';
 
-const gzip = promisify((data: Buffer, callback: (err: Error | null, result?: Buffer) => void) => {
+const gzip = promisify((data: Buffer, callback: (err: Error | null, result?, Buffer) => void) => {
   const chunks: Buffer[] = [];
   const gz = createGzip({ level: 9 });
   gz.on('data', (chunk: any) => chunks.push(chunk));
@@ -152,7 +152,7 @@ export class RedisCompressionCache {
    * Batch set multiple values with compression
    */
   async batchSet(
-    items: Array<{ key: string; value: any; ttl?: number }>,
+    items: Array<{ key: string; value: any; ttl?, number }>,
     options?: { parallel?: number }
   ): Promise<void> {
     const parallel = options?.parallel ?? 5;
@@ -161,7 +161,7 @@ export class RedisCompressionCache {
     // Process in parallel batches
     for (let i = 0; i < items.length; i += parallel) {
       const batch = items.slice(i, i + parallel);
-      await Promise.all(batch.map((item: any) => this.set(item.key, item.value, item.ttl || 3600)));
+      await Promise.all(batch.map((item, any) => this.set(item.key, item.value, item.ttl || 3600)));
     }
 
     console.log(`✅ Batch set ${items.length} items in ${performance.now() - startTime}ms`);
@@ -297,7 +297,7 @@ export class RedisCompressionCache {
   /**
    * Retrieve cached error events
    */
-  async retrieveErrorEvents(): Promise<{ events: any[]; stats: CompressionStats } | null> {
+  async retrieveErrorEvents(): Promise<{ events: any[]; stats, CompressionStats } | null> {
     try {
       const key = 'phase72:events';
       const metadataStr = await this.redis.get(`${key}:metadata`);

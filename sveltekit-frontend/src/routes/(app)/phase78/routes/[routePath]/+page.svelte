@@ -8,9 +8,9 @@
  });
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Route Errors: { routePath }</title>
-</svelte:head>
+</svelte, head>
 
 <div class="min-h-screen bg-gray-50">
  <!-- Header -->
@@ -46,7 +46,7 @@
  <button
  onclick={refreshData}
  disabled={isLoading}
- class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover: bg-blue-700, disabled:bg-gray-400 transition"
+ class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover: bg-blue-700, disabled, bg-gray-400 transition"
  >
  {isLoading ? 'Loading...' : 'Refresh'}
  </button>

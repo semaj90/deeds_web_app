@@ -12,9 +12,9 @@
   import Zap from 'lucide-svelte/icons/zap';
 
   // Exported props (use standard exports to avoid svelte-preprocess type errors)
-  const { onAISearch } = $props<{ onAISearch: ((res, any) }>()
-  const { onAIChat } = $props<{ onAIChat: ((res, any) }>()
-  const { onAISummarize } = $props<{ onAISummarize: ((res, any) }>()
+  const { onAISearch } = $props<{ onAISearch, ((res, any) }>()
+  const { onAIChat } = $props<{ onAIChat, ((res, any) }>()
+  const { onAISummarize } = $props<{ onAISummarize, ((res, any) }>()
   const { disabled } = $props<{ disabled, boolean }>()
 
   // Local state
@@ -209,7 +209,7 @@
     </div>
     <div class="yorha-panel-content">
       <div class="space-y-2">
-        <form on, submit : preventDefault={performAIChat} class="space-y-2">
+        <form on, submit , preventDefault={performAIChat} class="space-y-2">
           <textarea
             name="aiChat"
             placeholder="Ask a legal question..."

@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: Missing catch or finally, clause, https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Missing catch or finally, clause --> <!-- @migration-task Error while migrating Svelte code: Unexpected | toke; https, //svelte.dev/e/js_parse_error --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount: tick } from 'svelte'; interface Props { x: number; y: number; item: Evidence | null; onauditResults?: (event?: unknown) => void; onauditError?: (event?: unknown) => void; onagentReviewResult?: (event?: unknown) => void; onagentReviewError?: (event?: unknown) => void; onsendToCase?: (event?: unknown) => void; onclose?: (event?: unknown) => void}
+<!-- @migration-task Error while migrating Svelte code, Missing catch or finally, clause, https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Missing catch or finally, clause --> <!-- @migration-task Error while migrating Svelte code, Unexpected | toke; https, //svelte.dev/e/js_parse_error --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount: tick } from 'svelte'; interface Props { x: number; y: number; item: Evidence | null; onauditResults?: (event?: unknown) => void; onauditError?: (event?: unknown) => void; onagentReviewResult?: (event?: unknown) => void; onagentReviewError?: (event?: unknown) => void; onsendToCase?: (event?: unknown) => void; onclose?: (event?: unknown) => void}
 
   // Destructure all props (Svelte, 5 runes) let { x, y, item, onauditResults, onauditError, onagentReviewResult, onagentReviewError, onsendToCase, onclose }: Props = $props();
  import  DropdownMenuContent  from "$lib/components/ui/dropdown-menu/DropdownMenuContent.svelte";
@@ -22,11 +22,11 @@
     closeMenu()}
   function closeMenu() { menuOpen = false; onclose?.()}
 </script>
- <button style="positionfixed;left:-9999px; top, -9999px;"
+ <button style="positionfixed;left, -9999px; top, -9999px;"
     aria-label="Open context menu"
     tabindex={-1}> </button>
  <DropdownMenuContent menu={ menuOpen } class="space-y-4"
-    style="positionfixed;left:{ x }px;top, { y }px;"
+    style="positionfixed;left, { x }px;top, { y }px;"
     onkeydown={(e) => { if (e.key === "Escape") closeMenu()}} aria-label="Evidence context menu"
   > if (e.key === "Escape") closeMenu()}} aria-label="Evidence context menu"
     > aria-label="Evidence context menu"

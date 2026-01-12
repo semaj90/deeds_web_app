@@ -643,7 +643,7 @@ let cacheHit = false;
                         jurisdiction: document.jurisdiction,
                         court: document.court,
                         citation: document.citation,
-                        dateDecided: document.dateDecided,
+                        dateDecided, document.dateDecided,
                     },
                 });
             }

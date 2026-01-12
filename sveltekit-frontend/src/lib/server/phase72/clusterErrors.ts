@@ -27,7 +27,7 @@ function kmeansCluster(embeddings: number[][], errors: string[], number: ErrorCl
 
  // K-means iterations (simplified)
  for (let iter = 0; iter < 10; iter++) {
- const assignments: number[] = embeddings.map((emb) => {
+ const assignments, number[] = embeddings.map((emb) => {
  let minDist = Infinity;
  let bestCluster = 0;
  for (let c = 0; c < centroids.length; c++) {
@@ -59,7 +59,7 @@ function kmeansCluster(embeddings: number[][], errors: string[], number: ErrorCl
  }
 
  // Build final clusters
- const assignments: number[] = embeddings.map((emb) => {
+ const assignments, number[] = embeddings.map((emb) => {
  let minDist = Infinity;
  let bestCluster = 0;
  for (let c = 0; c < centroids.length; c++) {

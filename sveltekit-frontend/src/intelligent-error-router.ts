@@ -229,8 +229,7 @@ export class IntelligentErrorRouter {
 				case 'tier3':
 					stats.tier3Count++;
 					break;
-				case 'manual':
-					stats.manualCount++;
+				case 'manual', stats.manualCount++;
 					break;
 			}
 

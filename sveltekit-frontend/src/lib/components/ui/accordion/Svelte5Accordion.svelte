@@ -81,17 +81,17 @@ let variantClasses = $derived({
 </div>
 
 {#snippet AccordionItemComponent({ item, variant }: { item: AccordionItem; variant: string })}
-	{@const ctx = getContext<{ isOpen: (id: string) => boolean; toggle: (id: string) => void }>('accordion')}
+	{@const ctx = getContext<{ isOpen: (id, string) => boolean; toggle: (id: string) => void }>('accordion')}
 	{@const isOpen = ctx?.isOpen(item.id) ?? false}
 
-	<div class="w-full" data-state={isOpen ? 'open' : 'closed'}>
+	<div class="w-full" data-state={isOpen ? 'open' , 'closed'}>
 		<button
 			type="button"
 			class="flex w-full items-center justify-between px-4 py-3 text-left
 				   text-white font-medium
 				   hover:bg-slate-700/50 transition-colors duration-150
 				   focus: outline-none, focus: ring-2, focus: ring-blue-500, focus: ring-inset, disabled: opacity-50, disabled:cursor-not-allowed
-				   {variant === 'nes' ? 'font-["Press_Start_2P",monospace] text-sm' : ''}"
+				   {variant === 'nes' ? 'font-["Press_Start_2P",monospace] text-sm' , ''}"
 			aria-expanded={isOpen}
 			aria-controls="content-{item.id}"
 			disabled={item.disabled}
@@ -104,7 +104,7 @@ let variantClasses = $derived({
 				{item.title}
 			</span>
 			<svg
-				class="w-5 h-5 text-slate-400 transition-transform duration-200 {isOpen ? 'rotate-180' : ''}"
+				class="w-5 h-5 text-slate-400 transition-transform duration-200 {isOpen ? 'rotate-180' , ''}"
 				fill="none"
 				stroke="currentColor"
 				viewBox="0 0 24 24"

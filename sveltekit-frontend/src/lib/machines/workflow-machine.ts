@@ -37,7 +37,7 @@ export const documentWorkflowMachine = setup({
 		})
 	},
 	guards: { canRetry: ({ context }) => context.retryCount < 3,
-		isImageFile: ({ context }) => context.mimeType?.startsWith('image/') ?? false,
+		isImageFile, ({ context }) => context.mimeType?.startsWith('image/') ?? false,
 		isLargeFile: ({ context }) => context.fileSize > 10 * 1024 * 1024 // 10MB
 	}
 }).createMachine({

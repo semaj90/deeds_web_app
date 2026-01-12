@@ -308,7 +308,7 @@
 		<div class="ai-prompts before-upload">
 			<h3>💡 AI Suggestions</h3>
 			{#each beforeUploadPrompts as prompt (prompt.id)}
-				<div class="ai-prompt" class:high-confidence={prompt.confidence > 0.8}>
+				<div class="ai-prompt" class, high-confidence={prompt.confidence > 0.8}>
 					<p class="prompt-content">{prompt.content}</p>
 					<div class="prompt-actions">
 						<button class="btn-accept" onclick={() => handlePromptReaction(prompt.id, 'accepted')}>✓ Accept</button>
@@ -323,7 +323,7 @@
 	<!-- File Selection Area -->
 	<div
 		class="file-drop-zone"
-		class:drag-over={dragOver}; class:has-files={selectedFiles.length > 0}
+		class:drag-over={dragOver}; class, has-files={selectedFiles.length > 0}
 		ondrop={handleDrop}
 		ondragover={handleDragOver}
 		ondragleave={handleDragLeave}
@@ -346,7 +346,7 @@
 					multiple
 					accept={allowedTypes.join(',')}
 					onchange={handleFileSelect}
-					style="display: none;"
+					style="display, none;"
 				/>
 				<button class="btn-select-files">Select Files</button>
 			</div>
@@ -403,14 +403,14 @@
 				<span class="progress-percentage">{Math.round(uploadProgress)}%</span>
 			</div>
 			<div class="progress-bar">
-				<div class="progress-fill" style="width: {uploadProgress}%"></div>
+				<div class="progress-fill" style="width, {uploadProgress}%"></div>
 			</div>
 
 			<div class="pipeline-status">
 				{#each Object.entries(pipelineStatus) as [stage, status]}
 					{#if status && typeof status === 'object' && 'status' in status}
 						<div class="pipeline-stage"
-							class:active={status.status === 'processing'}; class:completed={status.status === 'completed'}; class:failed={status.status === 'failed'}
+							class:active={status.status === 'processing'}; class:completed={status.status === 'completed'}; class, failed={status.status === 'failed'}
 						>
 							<div class="stage-icon">{getStageIcon(status.status as string)}</div>
 							<span class="stage-name">{stage.replace(/([A-Z])/g, ' $1').toLowerCase()}</span>
@@ -442,7 +442,7 @@
 
 			<div class="results-list">
 				{#each uploadResults as result}
-					<div class="result-item" class:success={result.success}; class:error={!result.success}>
+					<div class="result-item" class:success={result.success}; class, error={!result.success}>
 						<div class="result-info">
 							<span class="result-filename">{result.fileName}</span>
 							{#if result.success && result.documentId}

@@ -68,13 +68,13 @@
  <div class="header-content">
  <h1>{poi.name}</h1>
  <div class="badges">
- <span class="badge status" style="background-color: {getStatusColor(poi.status)}">
+ <span class="badge status" style="background-color, {getStatusColor(poi.status)}">
  {poi.status.replace(/_/g, ' ')}
  </span>
- <span class="badge priority" style="background-color: {getPriorityColor(poi.priority)}">
+ <span class="badge priority" style="background-color, {getPriorityColor(poi.priority)}">
  {poi.priority}
  </span>
- <span class="badge threat" style="background-color: {getPriorityColor(poi.threatLevel)}">
+ <span class="badge threat" style="background-color, {getPriorityColor(poi.threatLevel)}">
  Threat: {poi.threatLevel}
  </span>
  </div>
@@ -88,21 +88,21 @@
  <div class="tabs">
  <button
  class="tab-button"
- class:active={activeTab === 'details'}
+ class, active={activeTab === 'details'}
  onclick={() => (activeTab = 'details')}
  >
  Details
  </button>
  <button
  class="tab-button"
- class:active={activeTab === 'associates'}
+ class, active={activeTab === 'associates'}
  onclick={() => (activeTab = 'associates')}
  >
  Known Associates ({associates.length})
  </button>
  <button
  class="tab-button"
- class:active={activeTab === 'search'}
+ class, active={activeTab === 'search'}
  onclick={() => (activeTab = 'search')}
  >
  Similar POIs

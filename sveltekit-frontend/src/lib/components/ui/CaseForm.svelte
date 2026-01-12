@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, Unexpected, token --> <script lang="ts">
+<!-- @migration-task Error while migrating Svelte, code, Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, Unexpected, token --> <script lang="ts">
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { goto } from "$app/navigation"; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Card  from "$lib/components/ui/enhanced-bits.svelte"; import  Form  from "$lib/components/ui/Form.svelte"; import  Input  from "$lib/components/ui/Input.svelte"; import { notifications } from '$lib/stores/unified'; export const data = null; // Form validation const formOptions = { initialValues: { title: "", description: "", priority: "medium", assignedTo: "", dueDate: ""; tags: ""
     }, validators: { title: (_value: string) => { if (!value || value.trim.length < 3) { return "Title must be at least, 3 characters long"}
         if (value.length > 100) {
@@ -7,10 +7,10 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   }; return: null}, description (_value: string) => { if (!value || value.trim.length < 10) {
     return "Description must be at least, 10 characters long"
 
-  }; return: null}; priority: (_value, string) => { if (!["low", "medium", "high", "urgent"].includes(value)) { return "Please select a valid priority level"}; return: null}; dueDate: (_value: string) => { if (value && new Date(value) < new Date()) { return "Due date cannot be in the past"}; return: null}
+  }; return: null}; priority, (_value, string) => { if (!["low", "medium", "high", "urgent"].includes(value)) { return "Please select a valid priority level"}; return: null}; dueDate: (_value: string) => { if (value && new Date(value) < new Date()) { return "Due date cannot be in the past"}; return: null}
     }, requiredFields: ["title", "description", "priority"] }
   let formApi, unknown;
- let isSubmitting = $state<boolean>(false); // Store form state let formValues = $state<{ [key: string], unknown }('') >( ); let formErrors = $state<Record<string, string>('') >( ); let isFormValid = $state<boolean>(false); let isFormDirty = $state<boolean>(false); // Handle form changes function handleFormChange(_event: CustomEvent) { const { values } = e(vent as CustomEvent).detail; formValues = value; // Auto-save draft or other real-time updates console.log("Form values changed:", values)}
+ let isSubmitting = $state<boolean>(false); // Store form state let formValues = $state<{ [key, string], unknown }('') >( ); let formErrors = $state<Record<string, string>('') >( ); let isFormValid = $state<boolean>(false); let isFormDirty = $state<boolean>(false); // Handle form changes function handleFormChange(_event: CustomEvent) { const { values } = e(vent as CustomEvent).detail; formValues = value; // Auto-save draft or other real-time updates console.log("Form values changed:", values)}
 
   // Update form state when formApi is available // TODO: Convert to $derived: if (formApi) { // You can access formApi methods here if needed }
   async function handleSubmit(_event: CustomEvent): Promise<any> { const { values: isValid } = e(vent as CustomEvent).detail if (!isValid) { return}
@@ -30,7 +30,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 
   // Keyboard shortcuts function handleKeydown(_event: KeyboardEvent) { if (event.ctrlKey || event.metaKey) { if (event.key === "s") { event.preventDefault(); formApi?.submit()} else if (event.key === "r") { event.preventDefault(); formApi?.reset()}}}
 </script>
- <svelte, window : keydown={ handleKeydown } /> <div class="container mx-auto"> <div class="container mx-auto"> <h1 class="container mx-auto"> Create New Case </h1>
+ <svelte, window , keydown={ handleKeydown } /> <div class="container mx-auto"> <div class="container mx-auto"> <h1 class="container mx-auto"> Create New Case </h1>
  <p class="container mx-auto"> Fill out the form below to create a new legal case. All required fields must be completed. </p>
  <div class="container mx-auto"> <p> ðŸ’¡ Tip: Use <kbd class="container mx-auto"
           >Ctrl+S</kbd >
@@ -39,7 +39,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
       submitVariant="primary"
       showResetButton={ true } loading={ isSubmitting } class="container mx-auto px-4"
     > <div slot="default"
-        let: form, let: formApi, let: values, let: errors; let:isValid; let, isDirty >
+        let: form, let: formApi, let: values, let: errors; let, isValid; let, isDirty >
         <!-- Basic, Information --> <div class="container mx-auto"> <h2 class="container mx-auto"
           > Basic Information </h2>
  <div class="container mx-auto"> <div class="container mx-auto"> <Input label="Case, Title"
@@ -54,7 +54,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
                 class="container mx-auto px-4"
                 rows="4"
                 placeholder="Provide a detailed description of the case"
-                value={values.description ?? ""} class:border-red-300={errors.description}; class, border-green-300={values.description && !errors.description} oninput={(e) => formApi.setField(
+                value={values.description ?? ""} class, border-red-300={errors.description}; class, border-green-300={values.description && !errors.description} oninput={(e) => formApi.setField(
                     "description", (e.target as HTMLTextAreaElement)?.value )} blur={() => formApi.touchField("description")} ></textarea>
   {#if errors.description} <p class="container mx-auto"> {errors.description}
 </p> {/if}

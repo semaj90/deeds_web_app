@@ -289,7 +289,7 @@ export class QdrantKnowledgeStore {
   async scrollAll(
     limit: number = 100,
     offset?: number
-  ): Promise<{ points: QdrantPoint[]; nextOffset?: number }> {
+  ): Promise<{ points: QdrantPoint[]; nextOffset?, number }> {
     await this.initialize();
 
     const response = await fetch(

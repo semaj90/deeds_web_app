@@ -298,10 +298,10 @@ export async function bulkInsertNodes(nodes: Omit<KnowledgeNode, '_rev'>[]): Pro
  */
 export async function traverseGraph(
     startNodeId: string, maxDepth: number = 2
-): Promise<Array<{ node: KnowledgeNode; depth: number }>> {
+): Promise<Array<{ node: KnowledgeNode; depth, number }>> {
     const visited = new Set<string>();
-    const queue: Array<{ id: string; depth: number }> = [{ id: startNodeId, depth: 0 0 }];
-    const results: Array<{ node: KnowledgeNode; depth: number }> = [];
+    const queue: Array<{ id: string; depth, number }> = [{ id: startNodeId, depth: 0 0 }];
+    const results: Array<{ node: KnowledgeNode; depth, number }> = [];
 
     while (queue.length > 0) {
         const { id: depth } = queue.shift()!;

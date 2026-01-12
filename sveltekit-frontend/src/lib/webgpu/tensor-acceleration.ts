@@ -462,7 +462,7 @@ export class WebGPUTensorAccelerator {
  normASqSum = new Float32Array(stagingBufferNormA.getMappedRange())[0];
  normBSqSum = new Float32Array(stagingBufferNormB.getMappedRange())[0];
 
- // --- Pass 4: Calculate final cosine similarity on CPU ---
+ // --- Pass 4, Calculate final cosine similarity on CPU ---
  let cosineSimilarity = 0;
  if (normASqSum > 0 && normBSqSum > 0) {
  cosineSimilarity = dotProductSum / (Math.sqrt(normASqSum) * Math.sqrt(normBSqSum));
@@ -799,7 +799,7 @@ export class WebGPUTensorAccelerator {
         return buffer;
     }
 
-    private updateMetrics(duration: number): void {
+    private updateMetrics(duration: number), void {
         this.metrics.totalOperations++;
         this.metrics.averageLatency =
             (this.metrics.averageLatency * (this.metrics.totalOperations - 1) + duration) /

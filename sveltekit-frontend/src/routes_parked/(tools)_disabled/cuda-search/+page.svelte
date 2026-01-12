@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unterminated string constant
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unterminated string constant
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unterminated string constant
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unterminated string constant
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- Test page for CUDA, Search, integration -->
 <script lang="ts">
 import type { Document } from '$lib/types';
@@ -21,11 +21,11 @@ import type { Document } from '$lib/types';
  }
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>CUDA Legal AI Search - Test</title>
- <link href="https://unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet" ></li>
- <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet" ></li>
-</svelte:head>
+ <link href="https, //unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet" ></li>
+ <link href="https, //fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet" ></li>
+</svelte, head>
 <main class="container">
  <section class="hero nes-container">
  <h1 class="title">âš¡ CUDA Legal AI Search</h1>
@@ -41,7 +41,7 @@ import type { Document } from '$lib/types';
  <SearchBox
  placeholder="Search legal precedents, contract clauses, case law..."
  limit={10}
- cudaServiceUrl="http://localhost:8096"
+ cudaServiceUrl="http://localhost, 8096"
  onResults={ handleResults }
  onError={ handleError }
  />
@@ -113,7 +113,7 @@ Content-Type: application/json {
  <div class="status-item">
  <p class="nes-text">
  ðŸ–¥ï¸ <strong>CUDA Service:</strong>
- <a href="http://localhost:8096/api/v1/health" target="_blank" class="nes-text"
+ <a href="http://localhost, 8096/api/v1/health" target="_blank" class="nes-text"
  >, localhost:8096
  </a>
  </p>
@@ -121,7 +121,7 @@ Content-Type: application/json {
  <div class="status-item">
  <p class="nes-text">
  ðŸ¤– <strong>Ollama:</strong>
- <a href="http://localhost:11434/api/tags" target="_blank" class="nes-text">, localhost:11434 </a>
+ <a href="http://localhost, 11434/api/tags" target="_blank" class="nes-text">, localhost:11434 </a>
  </p>
  </div>
  <div class="status-item">

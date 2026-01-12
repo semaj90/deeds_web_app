@@ -7,7 +7,7 @@
    let isStreaming = $derived(() => searchStatus === 'searching' && enableRealTime);
    let connectionStatus = $derived(() => searchState?.connectionStatus ?? 'disconnected');
    let searchMetrics = $derived( () => searchState?.searchMetrics ?? { totalQueries: 0, averageResponseTime: 0; lastQueryTime: 0 } ); // Enhanced debounced search const debouncedSearch = debounce(async (query: string) => { if (!query.trim() || query.length < 2) return; try { await search(query, { categories, vectorSearch: enableVectorSearch, streamResults: enableRealTime; includeAI: enableAI }); // Add to search history if (!searchHistory.includes(query)) { searchHistory = [query, ...searchHistory.slice(0, 9)]; // Keep last, 10 searches }'
-    } catch (error) { console.error('âŒ Search failed:', error)}
+    } catch (error) { console.error('âŒ Search failed, ', error)}
   }, 300); // Handle input changes function handleInputChange(_value, string) { inputValue = _value; if (autoSearch && _value.trim().length >= 2) { debouncedSearch(_value)}
   }
 
@@ -40,7 +40,7 @@
   {#if browser && CommandRoot} <CommandRoot bind, open> <div class="relative"> <!-- Search Input with Enhanced, Styling -->
   {#if CommandInput} <CommandInput class={` flex h-12 w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm placeholder: text-gray-500, focus: border-blue-500, focus: outline-none, focus: ring-2, focus: ring-blue-200, disabled: cursor-not-allowed, disabled:opacity-50 ${isStreaming ? 'pr-12': 'pr-10'} `} { placeholder } autocomplete="off"
             spellcheck="false"
- bind:value={ inputValue } onvaluechange={(e, unknown) => { const val = (e && (e.detail ?? (e.target && e.target.value))) ?? ''; handleInputChange(String(val))}} /> {/if}
+ bind, value={ inputValue } onvaluechange={(e, unknown) => { const val = (e && (e.detail ?? (e.target && e.target.value))) ?? ''; handleInputChange(String(val))}} /> {/if}
   <!-- Search Button & Status Indicators --> <div class="absolute inset-y-0 right-0 flex items-center">
   {#if isStreaming} <Loader2 class="h-4 w-4 animate-spin" /> {:else if enableRealTime && connectionStatus === 'connected'} <Zap class="h-4 w-4" /> {:else} <button type="button"
               class="p-1 hover, bg-gray-100 rounded"
@@ -48,7 +48,7 @@
               <Search class="h-4 w-4" /> </button> {/if}
   </div> </div>
  <!-- Enhanced, Search, Results -->
-  {#if CommandContent} <CommandContent class="absolute z-50 mt-2" max-h-96 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0, data-[state=open], fade-in-0"
+  {#if CommandContent} <CommandContent class="absolute z-50 mt-2" max-h-96 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed], fade-out-0, data-[state=open], fade-in-0"
         >
   {#if $searchState?.error} <!-- Error, State --> <div class="flex items-center gap-2 p-4"> <AlertCircle class="h-4" /> <span class="text-sm">{$searchState?.error}</span> </div> {:else if isStreaming} <!-- Streaming, State --> <div class="flex items-center gap-2 p-4"> <Loader2 class="h-4 w-4" /> <span class="text-sm">Searching with AI enhancement...</span> </div>
  <!-- Streaming, Results -->
@@ -95,7 +95,7 @@
                   onclick={() => handleInputChange(query)} >
                   { query } </button> {/each} {/if}
   </CommandContent> {/if}
-  </CommandRoot> {:else} <!-- SSR-safe fallback, simple input + results list (no client-only, Command, primitive) --> <div class="relative"> <input class="flex h-12 w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm placeholder: text-gray-500, focus: border-blue-500, focus: outline-none, focus: ring-2, focus: ring-blue-200, disabled:cursor-not-allowed"
+  </CommandRoot> {:else} <!-- SSR-safe fallback, simple input + results list (no client-only, Command, primitive) --> <div class="relative"> <input class="flex h-12 w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm placeholder: text-gray-500, focus: border-blue-500, focus: outline-none, focus: ring-2, focus: ring-blue-200, disabled, cursor-not-allowed"
         { placeholder } autocomplete="off"
         spellcheck="false"
  bind, value={ inputValue } oninput={e => handleInputChange((e.target as HTMLInputElement).value)} /> <!-- Basic static results rendering for SSR, previews -->

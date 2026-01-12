@@ -8,14 +8,14 @@ export interface SearchEvidenceResult {
  results: Array<{ id: string;
  title: string; classification: string;
  status: string; relevance: number;
- snippet: string;
+ snippet, string;
  }>;
 }
 
 export interface ExtractHoldingsResult {
  evidenceId: string; holdings: Array<{
  text: string; confidence: number;
- citations: string[];
+ citations, string[];
  }>;
 }
 
@@ -23,7 +23,7 @@ export interface FindCitationsResult {
  evidenceId: string; citations: Array<{
  type: 'statute' | 'case' | 'regulation';
  reference: string; title: string;
- year?: number;
+ year?, number;
  }>;
 }
 
@@ -31,7 +31,7 @@ export interface AnalyzeRelationshipsResult {
  evidenceIds: string[]; relationships: Array<{
  source: string; target: string;
  type: 'mentions' | 'contradicts' | 'supports' | 'references' | 'timeline';
- confidence: number; reasoning: string;
+ confidence: number; reasoning, string;
  }>;
 }
 

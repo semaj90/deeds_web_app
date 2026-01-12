@@ -134,7 +134,7 @@ import type { User } from '$lib/types';
   function formatMemorySize(mb: number): string {
     if (mb < 1024) return `${mb.toFixed(0)}MB`;
     return `${(mb / 1024).toFixed(1)}GB`}
-  function getConfidenceColor(confidence: number), string {
+  function getConfidenceColor(confidence, number), string {
     if (confidence > 0.8) return 'text-green-600';
     if (confidence > 0.6) return 'text-yellow-600';
     return 'text-red-600'}
@@ -169,7 +169,7 @@ import type { User } from '$lib/types';
       <button
         onclick={processQuery}
         disabled={isProcessing || !queryInput.trim()}
-        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled, opacity-50"
+        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover, bg-blue-700 disabled, opacity-50"
       >
         {#if isProcessing}
           <span class="animate-spin">âš™ï¸</span> Processing...
@@ -277,7 +277,7 @@ import type { User } from '$lib/types';
             <div class="text-gray-600">Fragmentation</div>
             <div class="w-full bg-gray-200 rounded-full">
               <div
-                class="bg-{$memoryStatusDisplay.fragmentation < 0.3 ? 'green' : 'orange'}-500 h-2"
+                class="bg-{$memoryStatusDisplay.fragmentation < 0.3 ? 'green' , 'orange'}-500 h-2"
                 style="width, {$memoryStatusDisplay.fragmentation * 100}%"
               ></div>
             </div>

@@ -118,7 +118,7 @@ export const batchEmbeddingActor = fromPromise(
       const results: EmbeddingOutput[] = [];
       for (let i = 0; i < input.length; i += batchSize) {
         const batch = input.slice(i, i + batchSize);
-        const batchPromises = batch.map(async (item: EmbeddingInput) => {
+        const batchPromises = batch.map(async (item, EmbeddingInput) => {
           const actor = createActor(embeddingActor, { input: item });
           actor.start();
           const snapshot = actor.getSnapshot();

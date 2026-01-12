@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import CrossExaminationAssistant from './CrossExaminationAssistant.svelte';
  import DetectiveEvidenceMap from './DetectiveEvidenceMap.svelte';
@@ -35,14 +35,14 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  let { currentCase = null } = $props<{
- currentCase?: Case, null;
+ currentCase?, Case, null;
  }>();
 
  let activeModule = $state <'map' | 'police' | 'cross-exam' | 'judicial' | 'timeline'>('map');
  let caseEvidence = $state <Evidence[]>([]);
  let witnesses = $state <Witness[]>([]);
  let charges = $state <string[]>([]);
- let selectedWitness = $state <Witness: null>(null);
+ let selectedWitness = $state <Witness, null>(null);
 
  // Mock data for demonstration - in real app this would come from database
  $effect(() => {() => {
@@ -157,8 +157,7 @@ https://svelte.dev/e/js_parse_error -->
  <div class="flex items-center gap-2 mt-2">
  <span class="px-2 py-1 rounded text-xs font-medium
  {currentCase.status === 'active' ? 'bg-green-900/20 text-green-400' :
- currentCase.status === 'pending' ? 'bg-yellow-900/20 text-yellow-400' :
- 'bg-slate-700 text-slate-400'}">
+ currentCase.status === 'pending' ? 'bg-yellow-900/20 text-yellow-400' , 'bg-slate-700 text-slate-400'}">
  {currentCase.status.toUpperCase()}
  </span>
  </div>

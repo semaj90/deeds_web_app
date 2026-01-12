@@ -502,7 +502,7 @@ export class RAGKnowledgePipeline {
 	private calculateKeywordScore(query: string, doc: IndexedDocument): number {
 		const queryTokens = query.toLowerCase().split(/\s+/);
 		const docKeywords = [
-			...(doc.keywords || []).map((k: any) => k.toLowerCase()),
+			...(doc.keywords || []).map((k, any) => k.toLowerCase()),
 			...(doc.ripgrepKeywords || []).map((k: any) => k.toLowerCase())
 		];
 

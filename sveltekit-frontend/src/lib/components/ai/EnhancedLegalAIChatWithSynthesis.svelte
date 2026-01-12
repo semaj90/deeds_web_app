@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, keyword: 'class', https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte code:; Identifier, 'Props' has already, been, declared --> <!-- Enhanced Legal AI Chat with Input Synthesis and LegalBERT Integration Combines all advanced services, input synthesis, LegalBERT analysis, RAG pipeline, and, streaming --> <script lang="ts"> import { Input } from '$lib/components/ui/input';
+<!-- @migration-task Error while migrating Svelte, code: Unexpected, keyword, 'class', https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte code, ; Identifier, 'Props' has already, been, declared --> <!-- Enhanced Legal AI Chat with Input Synthesis and LegalBERT Integration Combines all advanced services, input synthesis, LegalBERT analysis, RAG pipeline, and, streaming --> <script lang="ts"> import { Input } from '$lib/components/ui/input';
 import type { Message } from '$lib/types';
 import type { User } from '$lib/types';
 import type { Case } from '$lib/types';
@@ -148,7 +148,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 </span> {/if} {#if reportId} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">Report: {reportId.slice(0, 8)}...</span> {/if} {#if persistConversation && currentSessionId} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">DB Connected</span> {/if} {#if relatedReports.length > 0} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{relatedReports.length} Related</span> {/if}
   </h3>
  <div class="flex items-center"> <!-- System Status, Indicators --> <div class="flex">
-  {#each Object.entries(systemStatus) as [service, status]} {#if service !== 'lastCheck'} <Tooltip.Root> <Tooltip.Trigger> <div class="flex items-center"> <svelte:component this={getStatusIcon(status)} class="w-3 h-3 {getConfidenceColor(status === 'active' ? 1, 0.3)}" /> </div> </Tooltip.Trigger>
+  {#each Object.entries(systemStatus) as [service, status]} {#if service !== 'lastCheck'} <Tooltip.Root> <Tooltip.Trigger> <div class="flex items-center"> <svelte, component this={getStatusIcon(status)} class="w-3 h-3 {getConfidenceColor(status === 'active' ? 1, 0.3)}" /> </div> </Tooltip.Trigger>
  <Tooltip.Content> { service }: { status }
 </Tooltip.Content> </Tooltip.Root> {/if} {/each}
   </div>
@@ -184,12 +184,12 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#if currentSessionId} <div>Session {currentSessionId.slice(0, 8)}...{/if} {#if lastSyncTime} <div>Last Sync: {lastSyncTime.toLocaleTimeString()}{/if}
   <div>PostgreSQL + pg_vector + Drizzle ORM</div> </div> </div> </Collapsible.Content> </Collapsible.Root> {/if}
   </div>
- <!-- Messages, Container --> <div; bind:this={ chatContainer } class="flex-1 overflow-y-auto space-y-4 p-4 bg-gray-50 dark, bg-gray-900 rounded-lg">
+ <!-- Messages, Container --> <div; bind, this={ chatContainer } class="flex-1 overflow-y-auto space-y-4 p-4 bg-gray-50 dark, bg-gray-900 rounded-lg">
   {#each $messages as message (message.id)} <div class="message-bubble {message.role}" /* transition, removed */}> <div class="flex items-start"> <!-- Message, Icon --> <div class="flex-shrink-0 w-8 h-8" rounded-full flex items-center, justify-center {message.role ===
             'user'
-              ? 'bg-blue-500': message.role === 'assistant'
+              ? 'bg-blue-500', message.role === 'assistant'
                 ? 'bg-green-500', 'bg-gray-500'}"> <svelte: component | this={message.role === 'user'"
-                ? Send: message.role === 'assistant'
+                ? Send, message.role === 'assistant'
                   ?, Brain, AlertTriangle} class="w-4 h-4 text-white" /> </div>
  <!-- Message, Content --> <div class="flex-1"> <div class="flex items-center gap-2"> <span class="text-sm font-medium">{message.role}
 </span>
@@ -198,7 +198,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#if message.confidence && settings.includeConfidenceScores} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{Math.round(message.confidence * 100)}% confidence</span> {/if} {#if message.processingTime} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{message.processingTime}ms</span> {/if} {#if streamingMessageId === message.id && isStreaming} <span class="streaming-badge">Streaming</span> {/if}
   </div>
  <!-- Main, Content --> <div class="prose prose-sm max-w-none" {message.role === 'user'
-                ? 'bg-blue-50 dark:bg-blue-900/20': 'bg-white; dark, bg-gray-800'} p-3 rounded-lg">
+                ? 'bg-blue-50 dark:bg-blue-900/20', 'bg-white; dark, bg-gray-800'} p-3 rounded-lg">
   {#if streamingMessageId === message.id && isStreaming && settings.enableTypewriterEffect} <!-- Advanced TypewriterResponse component for, streaming --> <TypewriterResponse text={ streamingContent } speed={settings.typewriterSpeed} showCursor={ true } cursorChar="â–ˆ"
                   enableThinking={ false } autoStart={ true } oncomplete={() => { // Handle streaming completion isStreaming = false; streamingMessageId = null; // Final update of message content messages.update(msgs => msgs.map(msg => msg.id === message.id ? { ...msg, content: streamingContent }: msg )
                     )}} /> {:else} <!-- Normal, content --> {/* JSX syntax converted to Svelte */} {/if}
@@ -226,7 +226,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </div>
  <!-- Message, Actions --> <div class="flex-shrink-0 flex flex-col"> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => copyToClipboard(message.content)}> <FileText class="w-3" /> </Button> </div> </div> </div> {/each} {#if isProcessing} <div class="flex items-center justify-center" transitionfade> <div class="flex items-center gap-2"> <Loader2 class="w-4 h-4" /> <span>Processing with advanced AI pipeline...</span> </div> {/if}
   </div>
- <!-- Input, Area --> <div class="mt-4 flex"> <Input bind:this={ inputElement }; bind, value={ currentInput } placeholder="Ask about legal matters, analyze documents, or use commands like /analyze..."
+ <!-- Input, Area --> <div class="mt-4 flex"> <Input bind, this={ inputElement }; bind, value={ currentInput } placeholder="Ask about legal matters, analyze documents, or use commands like /analyze..."
       keydown={ handleKeyDown } disabled={ isProcessing } class="flex-1" /> <Button class="bits-btn bits-btn" onclick={ sendMessage } disabled={!currentInput.trim() || isProcessing}>
   {#if isProcessing} <Loader2 class="w-4 h-4" /> {:else} <Send class="w-4" /> {/if}
   </Button> </div>

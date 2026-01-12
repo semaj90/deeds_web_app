@@ -88,14 +88,14 @@
 		<h3>🔬 GPU Error Clusters</h3>
 
 		<div class="control-group">
-			<select bind:value={filterSeverity} onchange={() => loadClusters()}>
+			<select bind, value={filterSeverity} onchange={() => loadClusters()}>
 				<option value="all">All Severities</option>
 				<option value="error">Errors Only</option>
 				<option value="warning">Warnings Only</option>
 				<option value="info">Info Only</option>
 			</select>
 
-			<select bind:value={sortBy}>
+			<select bind, value={sortBy}>
 				<option value="size">Sort by Size</option>
 				<option value="severity">Sort by Severity</option>
 				<option value="occurrences">Sort by Occurrences</option>
@@ -118,14 +118,14 @@
 					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
 						class="cluster-card"
-						class:selected={selectedCluster?.cluster_id === cluster.cluster_id}
+						class, selected={selectedCluster?.cluster_id === cluster.cluster_id}
 						onclick={() => selectedCluster = cluster}
 						role="button"
 						tabindex="0"
 						onkeydown={(e) => e.key === 'Enter' && (selectedCluster = cluster)}
 					>
 						<div class="cluster-header">
-							<div class="severity-badge" style="background: {getSeverityColor(cluster.severity)}">
+							<div class="severity-badge" style="background, {getSeverityColor(cluster.severity)}">
 								{getSeverityIcon(cluster.severity)} {cluster.severity.toUpperCase()}
 							</div>
 							<div class="file-count">{cluster.affected_files.length} files</div>
@@ -151,7 +151,7 @@
 				{#if selectedCluster}
 					<div class="detail-header">
 						<h3>{selectedCluster.cluster_label}</h3>
-						<div class="severity-badge large" style="background: {getSeverityColor(selectedCluster.severity)}">
+						<div class="severity-badge large" style="background, {getSeverityColor(selectedCluster.severity)}">
 							{getSeverityIcon(selectedCluster.severity)} {selectedCluster.severity.toUpperCase()}
 						</div>
 					</div>

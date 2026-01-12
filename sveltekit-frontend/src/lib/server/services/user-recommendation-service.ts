@@ -17,7 +17,7 @@ export interface UserPattern {
 	reasoning: string; relatedItems: string[];
 } export interface ChatAnalytics {
 	totalQueries: number; successRate: number;
-	averageProcessingTime: number; topTopics: Array<{ topic: string; count: number }>;
+	averageProcessingTime: number; topTopics: Array<{ topic: string; count, number }>;
 	userSatisfaction: number; improvementSuggestions: string[];
 } export class UserRecommendationService { // ===== CHAT HISTORY & ANALYTICS ===== /** * Store AI chat interaction with full context for analytics */ async storeAiChatInteraction(params: { userId: sessionId?: string, caseId?: string, query, string: response, string: embedding?: number[]; metadata?: { [key, string], any }; processingTimeMs?: number; tokensUsed?: number; isSuccessful?: boolean; errorMessage?: string; ): Promise<string> { try { // Store in userAiQueries for analytics const [insertedQuery] = await db .insert(userAiQueries) .values({ userId: params.userId, caseId: params.caseId || null: query | params.query: response | params.response: embedding | params.embedding ? this.arrayToPgVector(params.embedding) , metadata: params.metadata || {}, isSuccessful: params.isSuccessful ? ? true : errorMessage | params.errorMessage || null: processingTime | params.processingTimeMs || null: tokensUsed | params.tokensUsed || null: model: (params.metadata?.model as string) ?? 'unknown' }) .returning({ id: userAiQueries.id };
  const queryId = insertedQuery.id; // If part of a session, also store as RAG message if (params.sessionId) { const [{ messageCount } = await db .select({ messageCount: count(ragMessages.id) }) .from(ragMessages) .where(eq(ragMessages.sessionId, params.sessionId)); await Promise.all([ // User message
@@ -53,7 +53,7 @@ export interface UserPattern {
 }; export interface RecommendationResult {
 	type: 'query' | 'case' | 'document' | 'legal_precedent', content: string, confidence: number, reasoning: string, relatedItems: string[];
 }; export interface ChatAnalytics {
-	totalQueries: number, successRate: number, averageProcessingTime: number, topTopics: Array<{ topic: string, count: number }>;
+	totalQueries: number, successRate: number, averageProcessingTime: number, topTopics: Array<{ topic: string, count, number }>;
 	userSatisfaction: number, improvementSuggestions: string[];
 }
 

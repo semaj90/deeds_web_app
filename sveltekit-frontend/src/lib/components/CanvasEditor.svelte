@@ -3,7 +3,7 @@
  import type { Evidence } from '$lib/types/api';
 
  let { canvasState, reportId, evidence, citationPoints, save } = $props<{
- canvasState: CanvasState, null; reportId: string; evidence: Evidence[]; citationPoints: CitationPoint[]; save: (canvasState: CanvasState) => Promise<void>;
+ canvasState: CanvasState, null; reportId: string; evidence: Evidence[]; citationPoints: CitationPoint[]; save: (canvasState, CanvasState) => Promise<void>;
  }>();
 
  // Placeholder for canvas content
@@ -26,7 +26,7 @@
  <p class="placeholder">Drag evidence or citations here to start building your canvas.</p>
  {:else}
  {#each currentCanvasElements as element (element.id)}
- <div class="canvas-element" style="left: {element.x}px; top: {element.y}px;">
+ <div class="canvas-element" style="left: {element.x}px; top, {element.y}px;">
  {element.type}: {element.text}
  </div>
  {/each}

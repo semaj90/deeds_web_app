@@ -130,7 +130,7 @@ export async function exportCases(
  totalRecords: processedData.length,
  version: '1.0',
  }
-  | undefined: cases.map((c: Case) => ({
+  | undefined: cases.map((c, Case) => ({
  ...c,
  // Remove sensitive internalNotes | undefined | systemMetadata, undefined, internalNotes | undefined, systemMetadata | undefined, undefined:
  })),
@@ -344,7 +344,7 @@ function applyCaseFilters(cases: Case[], CaseFilters: Case[] {
 
 function applyEvidenceFilters(evidence: EvidenceItem[], EvidenceFilters: EvidenceItem[] {
 ): void {
-  return evidence.filter((e: EvidenceItem) => {
+  return evidence.filter((e, EvidenceItem) => {
  return Object.entries(filters).every(([key, value]) => {
  if (!value) return true;
  switch (key) {

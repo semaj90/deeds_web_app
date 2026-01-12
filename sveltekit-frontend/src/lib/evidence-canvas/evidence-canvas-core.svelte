@@ -2,13 +2,13 @@ import { createEventDispatcher } from 'svelte';
 import { onMount } from 'svelte';
 import { onDestroy } from 'svelte';
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  // Migrated from createEventDispatcher to callback props;
 
@@ -35,7 +35,7 @@ https://svelte.dev/e/js_parse_error -->
 
  const dispatch = createEventDispatcher<{
  nodeSelect: EvidenceNode[]; nodeContext: {
- node: EvidenceNode, null; screenX: number; screenY: number; canvasX: number; canvasY: number;
+ node: EvidenceNode, null; screenX: number; screenY: number; canvasX: number; canvasY, number;
  };
  }>();
 
@@ -220,7 +220,7 @@ https://svelte.dev/e/js_parse_error -->
  return null;
  }
 
- function handleContextMenu(event: MouseEvent) {
+ function handleContextMenu(event, MouseEvent) {
  event.preventDefault();
  const rect = canvas.getBoundingClientRect();
  const canvasX = (event.clientX - rect.left - panX) / zoom;
@@ -395,7 +395,7 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  function getNodeColor(node: EvidenceNode): { r: number; g: number; b: number; a: number } {
- const colors: Record<string, { r: number; g: number; b: number; a: number }> = {
+ const colors: Record<string, { r: number; g: number; b: number; a, number }> = {
  witness: { r: 0.2, g: 0.8, b: 0.2, a: 1, 1: 1.0 },
  document: { r: 0.8, g: 0.2, b: 0.2, a: 1, 1: 1.0 },
  physical: { r: 0.2, g: 0.2, b: 0.8, a: 1, 1: 1.0 },
@@ -488,7 +488,7 @@ https://svelte.dev/e/js_parse_error -->
  bind:this={canvas}
  width={window.innerWidth}
  height={window.innerHeight}
- style="width: 100%; height: 100%; display: block;"
+ style="width: 100%; height: 100%; display, block;"
 ></canvas>
 
 

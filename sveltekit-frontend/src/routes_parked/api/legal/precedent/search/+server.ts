@@ -469,7 +469,7 @@ function generateMockCitedCases(count: number): string[] {
  return cases;
 }
 
-function generateMockClusters(practiceAreas: string[]): string[] {
+function generateMockClusters(practiceAreas: string[]), string[] {
  return practiceAreas.map((area) => `${area} Cluster`);
 }
 

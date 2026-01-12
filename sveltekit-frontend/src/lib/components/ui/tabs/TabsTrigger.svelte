@@ -46,7 +46,7 @@
 	data-state={isActive ? 'active' : 'inactive'}
 	{ disabled }
 	onclick={ handleClick }
-	class="{defaultClass} {isActive ? 'bg-background text-foreground shadow-sm' : ''} {className}"
+	class="{defaultClass} {isActive ? 'bg-background text-foreground shadow-sm' , ''} {className}"
 >
 	{#if children}
 		{@render children()}

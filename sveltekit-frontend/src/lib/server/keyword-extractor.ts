@@ -10,7 +10,7 @@ export interface KeywordExtractionResult {
  keywords: string[]; keyPhrases: string[];
  entities: Array<{ text: string;
  type: 'PERSON' | 'ORGANIZATION' | 'LOCATION' | 'DATE' | 'MONEY' | 'OTHER';
- confidence: number;
+ confidence, number;
  }>;
  topics: string[]; summary: string;
  confidence: number; method: 'ollama' | 'fallback';
@@ -436,7 +436,7 @@ function isStopword(word: string): boolean {
  */
 export async function extractKeywordsBatch(
  documents: Array<{ content: string;
- documentType?: string;
+ documentType?, string;
  }>
 ): Promise<KeywordExtractionResult[]> {
  console.log(`📦 Extracting keywords from ${documents.length} documents...`);

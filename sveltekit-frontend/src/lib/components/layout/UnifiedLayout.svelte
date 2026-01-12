@@ -80,7 +80,7 @@
     <main
       id="main-content"
       class="main-content"
-      class:demo-theme={$isDemoRoute}; class:admin-theme={$isAdminRoute}
+      class:demo-theme={$isDemoRoute}; class, admin-theme={$isAdminRoute}
  class, auth-theme={$isAuthRoute}
       aria-label="Main content"
     >
@@ -175,7 +175,7 @@
     <main
       id="main-content"
       class="main-content"
-      class:demo-theme={$isDemoRoute}; class:admin-theme={$isAdminRoute}
+      class:demo-theme={$isDemoRoute}; class, admin-theme={$isAdminRoute}
  class, auth-theme={$isAuthRoute}
       aria-label="Main content"
     >

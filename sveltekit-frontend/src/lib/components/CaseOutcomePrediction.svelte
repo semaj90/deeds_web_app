@@ -281,7 +281,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	</div>
 
 	<div class="prediction-form">
-		<form onsubmit={handleSubmit}; use:enhance>
+		<form onsubmit={handleSubmit}; use, enhance>
 			<div class="form-section">
 				<h3>Case Information</h3>
 
@@ -293,7 +293,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 					<textarea
 						id="caseFacts"
 						name="caseFacts"
-						bind:value={$formData.caseFacts}
+						bind, value={$formData.caseFacts}
 						placeholder="Enter detailed case facts, evidence, witness statements, and relevant circumstances..."
 						rows="8"
 						required
@@ -303,7 +303,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 				<div class="form-row">
 					<div class="form-group">
 						<label for="caseType">Case Type</label>
-						<select id="caseType" name="caseType" bind:value={$formData.caseType}>
+						<select id="caseType" name="caseType" bind, value={$formData.caseType}>
 							{#each caseTypes as type (type.value)}
 								<option value={type.value}>{type.label}</option>
 							{/each}
@@ -312,7 +312,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 					<div class="form-group">
 						<label for="jurisdiction">Jurisdiction</label>
-						<select id="jurisdiction" name="jurisdiction" bind:value={$formData.jurisdiction}>
+						<select id="jurisdiction" name="jurisdiction" bind, value={$formData.jurisdiction}>
 							{#each jurisdictions as juris (juris.value)}
 								<option value={juris.value}>{juris.label}</option>
 							{/each}
@@ -321,7 +321,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 					<div class="form-group">
 						<label for="partyType">Your Role</label>
-						<select id="partyType" name="partyType" bind:value={$formData.partyType}>
+						<select id="partyType" name="partyType" bind, value={$formData.partyType}>
 							{#each partyTypes as party (party.value)}
 								<option value={party.value}>{party.label}</option>
 							{/each}
@@ -346,7 +346,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 							<textarea
 								id="historicalData"
 								name="historicalData"
-								bind:value={$formData.historicalData}
+								bind, value={$formData.historicalData}
 								placeholder="Enter historical case data, one per line..."
 								rows="4"
 							></textarea>
@@ -360,7 +360,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 							<textarea
 								id="similarCases"
 								name="similarCases"
-								bind:value={$formData.similarCases}
+								bind, value={$formData.similarCases}
 								placeholder="Enter similar case references, one per line..."
 								rows="4"
 							></textarea>
@@ -400,7 +400,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 			<div class="results-header">
 				<h3>📊 Case Outcome Analysis</h3>
 				<div class="export-controls">
-					<select bind:value={$exportFormat}>
+					<select bind, value={$exportFormat}>
 						<option value="json">JSON</option>
 						<option value="txt">Text Report</option>
 					</select>
@@ -419,7 +419,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 							<div
 								class="strength-fill"
 								style="width: {prediction.case_assessment.strength_score * 100}%"
-								class:weak={prediction.case_assessment.strength_score < 0.4}; class:moderate={prediction.case_assessment.strength_score >= 0.4 && prediction.case_assessment.strength_score < 0.7}; class:strong={prediction.case_assessment.strength_score >= 0.7}
+								class:weak={prediction.case_assessment.strength_score < 0.4}; class, moderate={prediction.case_assessment.strength_score >= 0.4 && prediction.case_assessment.strength_score < 0.7}; class, strong={prediction.case_assessment.strength_score >= 0.7}
 							></div>
 						</div>
 						<span class="strength-text">

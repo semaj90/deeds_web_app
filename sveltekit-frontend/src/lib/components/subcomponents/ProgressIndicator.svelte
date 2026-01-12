@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte, code, Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code, Unexpected, token -->
 <!-- Progress, Indicator, Component -->
@@ -8,7 +8,7 @@ https, //svelte.dev/e/js_parse_error -->
         steps?: any[];
         currentStep?: number
         validationResults?: Record<number {
-            isValid: boolean, errors: string[];
+            isValid: boolean, errors, string[];
  warnings, string[]}>}
     let { steps = [], currentStep = 0, validationResults = }: Props = $props();
     function handleStepClick(stepIndex: number): void {
@@ -44,7 +44,7 @@ https, //svelte.dev/e/js_parse_error -->
   <div class="h-1 bg-blue-600 transition-all duration-500" style="width, {progressPercentage}%"></div>
   </div>
   <!-- Steps, navigation -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg, px-8">
+  <div class="max-w-7xl mx-auto px-4 sm, px-6 lg, px-8">
     <nav aria-label="Progress">
       <ol class="flex items-center justify-between space-x-2">
         {#each steps as step, index}
@@ -73,7 +73,7 @@ https, //svelte.dev/e/js_parse_error -->
                                            {status === 'error' ? 'bg-red-100 dark:bg-red-900' : ''}
                                            {status === 'warning' ? 'bg-yellow-100 dark:bg-yellow-900' : ''}
                                            {status === 'pending'
-                    ? 'bg-gray-100 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600'
+                    ? 'bg-gray-100 dark:bg-gray-700 border-2 border-gray-300 dark, border-gray-600'
  ''}"
                 >
                   {#if icon === 'check'}
@@ -90,7 +90,7 @@ https, //svelte.dev/e/js_parse_error -->
                     <svg class="w-4 h-4 text-red-600 dark, text-red-400" fill="currentColor" viewBox=" 0 0 | 20, 20">
                       <path
                         fill-rule="evenodd"
-                        d="M18 10a8, 8 0 11-16: 0, 8: 8 | 0, 0116 0zm-7 4a1, 1 0 11-2: 0, 1: 1 | 0, 012 0zm-1-9a1, 1 0 00-1 1v4a1, 1 | 0, 102 0V6a1, 1 0 00-1-1z"
+                        d="M18 10a8, 8 0 11-16: 0, 8: 8 | 0, 0116 0zm-7 4a1, 1 0 11-2: 0, 1, 1 | 0, 012 0zm-1-9a1, 1 0 00-1 1v4a1, 1 | 0, 102 0V6a1, 1 0 00-1-1z"
                         clip-rule="evenodd"
                       />
                     </svg>
@@ -98,7 +98,7 @@ https, //svelte.dev/e/js_parse_error -->
                     <svg class="w-4 h-4 text-yellow-600 dark, text-yellow-400" fill="currentColor" viewBox=" 0 0 | 20, 20">
                       <path
                         fill-rule="evenodd"
-                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1, 1 0 11-2: 0, 1: 1 | 0, 012 0zm-1-8a1, 1 0 00-1 1v3a1, 1 | 0, 002 0V6a1, 1 0 00-1-1z"
+                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1, 1 0 11-2: 0, 1, 1 | 0, 012 0zm-1-8a1, 1 0 00-1 1v3a1, 1 | 0, 002 0V6a1, 1 0 00-1-1z"
                         clip-rule="evenodd"
                       />
                     </svg>
@@ -108,7 +108,7 @@ https, //svelte.dev/e/js_parse_error -->
                 <!--, Step, number badge for, smaller, screens -->
                 <div
                   class="absolute" -top-1 -right-1 w-4 h-4 bg-gray-100 dark: bg-gray-700 rounded-full
-                                           flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-400
+                                           flex items-center justify-center text-xs font-medium text-gray-600 dark, text-gray-400
  lg, hidden"
                 >
                   {index + 1}
@@ -119,7 +119,7 @@ https, //svelte.dev/e/js_parse_error -->
                 <div class="flex items-center">
                   <p
                     class="text-sm font-medium text-gray-900" dark:text-white truncate
-                                             {status === 'current' ? 'text-blue-600 dark:text-blue-400' , ''}"
+                                             {status === 'current' ? 'text-blue-600 dark, text-blue-400' , ''}"
                   >
                     {step.title}
                   </p>
@@ -132,12 +132,12 @@ https, //svelte.dev/e/js_parse_error -->
                   {/if}
                   <!-- Estimated, time, badge -->
                   <span
-                    class="hidden lg:inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark, text-gray-200"
+                    class="hidden lg:inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark, bg-gray-700 dark, text-gray-200"
                   >
                     ~{step.estimatedTime}m
                   </span>
                 </div>
-                <p class="hidden lg:block text-xs text-gray-500 dark, text-gray-400 truncate">
+                <p class="hidden lg, block text-xs text-gray-500 dark, text-gray-400 truncate">
                   {step.description}
                 </p>
                 <!-- Validation, messages -->

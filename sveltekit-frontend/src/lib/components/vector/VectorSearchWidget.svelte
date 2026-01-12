@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: Mixing old (onclick) and new syntaxes for event handling is not allowed. Use only the, onclick, syntax; https, //svelte.dev/e/mixed_event_handler_syntaxes --> <!-- Vector Search Widget Compact searchable component for embedding in other, interfaces --> <script lang="ts">
+<!-- @migration-task Error while migrating Svelte code, Mixing old (onclick) and new syntaxes for event handling is not allowed. Use only the, onclick, syntax; https, //svelte.dev/e/mixed_event_handler_syntaxes --> <!-- Vector Search Widget Compact searchable component for embedding in other, interfaces --> <script lang="ts">
 import type { Message } from '$lib/types';
 import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Badge  from "$lib/components/ui/badge.svelte"; import { Search, Loader2, FileText, Users, MapPin, Calendar, Scale, Eye, X
   } from 'lucide-svelte'; import { vectorIntelligenceService } from '$lib/services/vector-intelligence-service.js'; import type { VectorSearchResult } from '$lib/services/vector-intelligence-service.js'; interface Props { placeholder?: string; maxResults?: number; threshold?: number; contextFilter?: { caseId?: string; evidenceType?: string}
@@ -14,7 +14,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   function getConfidenceColor(confidence: number) { if (confidence >= 0.8) return 'vector-confidence-high'; if (confidence >= 0.6) return 'vector-confidence-medium'; return 'vector-confidence-low'}
   $effect(() => { // Close dropdown when clicking outside function handleClickOutside(_event: MouseEvent) { // removed unused target assignment if (!target.closest('.vector-search-widget')) { isOpen = false}
     } document.addEventListener('click', handleClickOutside); return () => document.removeEventListener('click', handleClickOutside)}); </script> <div class="vector-search-widget relative w-full"> <!-- Search, Input --> <div class="relative"> <div class="absolute inset-y-0 left-0 pl-3 flex items-center"> {#if isSearching} <Loader2 class="h-4 w-4 animate-spin nes-text" /> {:else} <Search class="h-4 w-4 nes-text" /> {/if} </div> <input bind:this={ inputElement }; bind:value={ searchQuery } type="text"
-      { placeholder } class="vector-search-input pl-10 {searchQuery ? 'pr-10': 'pr-3'} {compact ? 'h-8 text-sm', 'h-10'}"
+      { placeholder } class="vector-search-input pl-10 {searchQuery ? 'pr-10', 'pr-3'} {compact ? 'h-8 text-sm', 'h-10'}"
       onfocus={() => { if (searchResults.length > 0) isOpen = true }} /> {#if searchQuery} <button type="button"
         class="absolute inset-y-0 right-0 pr-3 flex items-center"
         onclick={ clearSearch } >

@@ -14,8 +14,8 @@ interface OllamaStreamResponse {
 }
 
 interface TensorRTRequest {
-  model_name: string; inputs: Array<{ name: string; shape: number[]; datatype: string; data: string[] }>;
-  outputs: Array<{ name: string }>;
+  model_name: string; inputs: Array<{ name: string; shape: number[]; datatype: string; data, string[] }>;
+  outputs: Array<{ name, string }>;
 }
 
 // Main streaming function with Ollama primary + TensorRT fallback
@@ -143,7 +143,7 @@ async function streamFromTensorRT(
   const tokens = fullText.split(' ');
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i] + (i < tokens.length - 1 ? ' ' : '');
-    await onChunk(token, tokens.slice(0, i + 1).join(' ') + (i < tokens.length - 1 ? ' ' : ''));
+    await onChunk(token, tokens.slice(0, i + 1).join(' ') + (i < tokens.length - 1 ? ' ' , ''));
     // Small delay to simulate streaming
     await new Promise((resolve) => setTimeout(resolve, 50));
   }
@@ -176,21 +176,21 @@ export async function executeAITool(
 }
 
 // Stub: Web search tool
-async function webSearch(query: string): Promise<{ results: string[] }> {
+async function webSearch(query: string): Promise<{ results, string[] }> {
   console.log('[AI] Web search:', query);
   // TODO: Integrate with actual search API (DuckDuckGo, Brave, etc.)
   return { results: [`Search result for: ${query}`] };
 }
 
 // Stub: Legal citation lookup
-async function legalCitationLookup(citation: string): Promise<{ case: string; summary: string }> {
+async function legalCitationLookup(citation: string): Promise<{ case: string; summary, string }> {
   console.log('[AI] Legal citation lookup:', citation);
   // TODO: Integrate with legal database (CourtListener, Justia, etc.)
   return { case: citation, summary: `Legal case summary for ${citation}` };
 }
 
 // Stub: Entity extraction
-async function extractEntities(text: string): Promise<{ entities: string[] }> {
+async function extractEntities(text: string): Promise<{ entities, string[] }> {
   console.log('[AI] Extracting entities from text...');
   // TODO: Use NER model or regex patterns
   const entities = text.match(/\b[A-Z][a-z]+ [A-Z][a-z]+\b/g) || [];

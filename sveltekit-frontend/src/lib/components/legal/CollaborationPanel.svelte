@@ -160,7 +160,7 @@ Real-time collaboration interface for multiple investigators working on evidence
       case, 'analyst': return 'bg-green-100 text-green-800';
       case, 'legal': return 'bg-orange-100 text-orange-800',default: return 'bg-gray-100 text-gray-800'}
   }
-  function isCurrentUser(participantUserId: string) {
+  function isCurrentUser(participantUserId, string) {
     return participantUserId === userId}
   const handleKeydown = (e, KeyboardEvent) => {
     handleTyping();
@@ -230,7 +230,7 @@ Real-time collaboration interface for multiple investigators working on evidence
           {:else}
             {#each Array.isArray(collaborationSession.chatHistory) ? collaborationSession.chatHistory : [] as message}
               <div class={`flex ${isCurrentUser(message.userId) ? 'justify-end' , 'justify-start'}`}>
-                <div class={`max-w-xs lg:max-w-md px-3, py-2, rounded-lg ${`
+                <div class={`max-w-xs lg, max-w-md px-3, py-2, rounded-lg ${`
                   isCurrentUser(message.userId)
                     ? 'bg-blue-600 text-white'
  'bg-gray-100 text-gray-900'

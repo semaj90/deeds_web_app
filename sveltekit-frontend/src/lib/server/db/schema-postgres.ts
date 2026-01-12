@@ -844,7 +844,7 @@ export const personsOfInterest = pgTable('persons', {
  ai: jsonb('ai')
  .$type<{
  riskScore: number; patterns: string[];
- recommendations: string[]; lastUpdated: string;
+ recommendations: string[]; lastUpdated, string;
  }>()
  .default(null),
  createdAt: timestamp('created_at').defaultNow(),

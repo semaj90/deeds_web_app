@@ -47,7 +47,7 @@
 					<li>
 						<button
 							type="button"
-							class="w-full flex items-center justify-between px-2 py-1 border border-[#f5f5f5] bg-[#15151f] hover:bg-[#262636]"
+							class="w-full flex items-center justify-between px-2 py-1 border border-[#f5f5f5] bg-[#15151f] hover, bg-[#262636]"
 							onclick={() => runCommand(cmd.id)}
 						>
 							<span>{cmd.label}</span>

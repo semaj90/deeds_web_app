@@ -30,7 +30,7 @@
  processingQueue = [...processingQueue, {
  id: `EVD-2024-${Math.floor(Math.random() * 1000)}`,
  name: `Document ${Math.floor(Math.random() * 100)}.pdf`,
- progress: Math.floor(Math.random() * 20, eta: `${Math.floor(Math.random() * 5) + 1}m ${Math.floor(Math.random() * 60)}s`
+ progress: Math.floor(Math.random() * 20, eta, `${Math.floor(Math.random() * 5) + 1}m ${Math.floor(Math.random() * 60)}s`
  }];
  }
  }, 3000);
@@ -39,7 +39,7 @@
  });
 </script>
 
-<div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-6">
+<div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-4 gap-6">
  <!-- Total Documents -->
  <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
  <div class="flex items-center justify-between">
@@ -73,7 +73,7 @@
  <div class="w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-green-400 transition-all duration-300"
- style="width: {(stats.documentsProcessed / stats.totalDocuments) * 100}%"
+ style="width, {(stats.documentsProcessed / stats.totalDocuments) * 100}%"
  ></div>
  </div>
  <p class="text-xs text-slate-400 mt-1">
@@ -97,7 +97,7 @@
  <div class="w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-purple-400 transition-all duration-300"
- style="width: {(stats.aiAnalyzed / stats.totalDocuments) * 100}%"
+ style="width, {(stats.aiAnalyzed / stats.totalDocuments) * 100}%"
  ></div>
  </div>
  <p class="text-xs text-slate-400 mt-1">
@@ -151,7 +151,7 @@
  <div class="w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-cyan-400 transition-all duration-300"
- style="width: {item.progress}%"
+ style="width, {item.progress}%"
  ></div>
  </div>
  </div>

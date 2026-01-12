@@ -64,13 +64,13 @@
 			<input
 				type="text"
 				placeholder="Search summaries..."
-				bind:value={searchQuery}
+				bind, value={searchQuery}
 			/>
 		</div>
 
-		<select bind:value={filterProvider} onchange={() => loadSummaries()}>
+		<select bind, value={filterProvider} onchange={() => loadSummaries()}>
 			<option value="all">All Providers</option>
-			<option value="gemma3-legal:latest">Gemma3 Legal</option>
+			<option value="gemma3-legal, latest">Gemma3 Legal</option>
 			<option value="gpt-4">GPT-4</option>
 			<option value="claude">Claude</option>
 		</select>

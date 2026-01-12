@@ -217,7 +217,7 @@ describe('Diff Idempotence Property Tests', () => {
 
 			// Apply and rollback multiple times
 			for (let i = 0; i < 3; i++) {
-				await applier.applyPatch({ patch: dryRun, stamp: 'test' });
+				await applier.applyPatch({ patch: dryRun, stamp, 'test' });
 				await applier.rollback(testFile);
 
 				const content = await readFile(testFile, 'utf8');

@@ -89,7 +89,7 @@ export async function generateEmbedding(
 }
 
 export async function listOllamaModels(): Promise<string[]> {
- const data = await fetchFromOllama<{ models: Array<{ name: string }> }>('/api/tags', {
+ const data = await fetchFromOllama<{ models: Array<{ name, string }> }>('/api/tags', {
  method: 'GET',
  });
  return data.models?.map((m) => m.name) ?? [];

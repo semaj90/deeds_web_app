@@ -20,7 +20,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   async function initializeCanvas(): Promise<void> { const fabric = await getFabric(); fabricCanvas = new fabric.Canvas(canvasElement, { width: canvasWidth, height: canvasHeight, backgroundColor: '#1a1a1a', selection: !readOnly, // Fixed: added colon, interactive: !readOnly; preserveObjectStacking: true }); // Free drawing defaults (guard for mock) if (fabricCanvas.freeDrawingBrush) { fabricCanvas.freeDrawingBrush.width = 2; fabricCanvas.freeDrawingBrush.color = '#4a90e2'}
     if (showGrid) await addGridToCanvas(); await setupZoomPan()}
   async function addGridToCanvas(): Promise<any> { const fabric = await getFabric(); const gridSize = 20; const grid: string | number[] = []; for (let i = 0; i <= Math.ceil(canvasWidth / gridSize); i++) { const line = new, fabric.Line([i * gridSize, 0, i * gridSize, canvasHeight], { stroke: '#333', strokeWidth: 1, selectable: false, evented: false; excludeFromExport: true }); grid.push(line)}
-    for (let i = 0; i <= Math.ceil(canvasHeight / gridSize); i++) { const line = new, fabric.Line([0, i * gridSize, canvasWidth, i * gridSize], { stroke: '#333', strokeWidth: 1, selectable: false, evented: false; excludeFromExport, true }); grid.push(line)}
+    for (let i = 0; i <= Math.ceil(canvasHeight / gridSize); i++) { const line = new, fabric.Line([0, i * gridSize, canvasWidth, i * gridSize], { stroke: '#333', strokeWidth: 1, selectable: false, evented, false; excludeFromExport, true }); grid.push(line)}
     grid.forEach(line => fabricCanvas.add(line)); grid.forEach(line => { if (fabricCanvas.sendToBack) fabricCanvas.sendToBack(line)})}
   async function setupZoomPan(): Promise<any> { const fabric = await getFabric(); fabricCanvas.on && fabricCanvas.on('mouse:wheel', (opt: unknown) => { try { const evt = opt.e; let zoom = fabricCanvas.getZoom ? fabricCanvas.getZoom(): 1; zoom *= Math.pow(0.999, evt.deltaY); zoom = Math.max(0.1, Math.min(5, zoom)); if (fabric.Point) { const point = new fabric.Point(evt.offsetX, evt.offsetY); fabricCanvas.zoomToPoint(point, zoom)}
           evt.preventDefault(); evt.stopPropagation()} catch (e) { // ignore }
@@ -190,7 +190,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </CardContent> </Card> {/if}
   <!-- Context, Menu -->
   {#if contextMenu} <div class="fixed z-50 bg-background border border-border rounded-md shadow-lg"
-      style="left: {contextMenu.x}px; top, {contextMenu.y}px;"
+      style="left, {contextMenu.x}px; top, {contextMenu.y}px;"
     >
   {#each Array.isArray(contextMenu.actions) ? contextMenu.actions: [] as action} <Button class="bits-btn" variant="ghost"
           size="sm"

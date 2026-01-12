@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: 'default' is a reserved word in JavaScript and cannot be, used, her, https, //svelte.dev/e/unexpected_reserved_word --> <!-- @migration-task Error while migrating Svelte, code, 'default' is a reserved word in JavaScript and cannot be, used, here -->
+<!-- @migration-task Error while migrating Svelte code, 'default' is a reserved word in JavaScript and cannot be, used, her, https, //svelte.dev/e/unexpected_reserved_word --> <!-- @migration-task Error while migrating Svelte, code, 'default' is a reserved word in JavaScript and cannot be, used, here -->
   {#snippet default} <script lang="ts"> // Svelte, 5 runes are auto-imported import { pipelineManager, type PipelineType, type PipelineResult } from '$lib/services/pipeline-manager';
  import { PipelineVisualizer } from '$lib/services/pipeline-visualizer';
  import { Button } from '$lib/components/ui/enhanced-bits';
@@ -42,7 +42,7 @@
 
   // Format memory display function formatMemory(mb: number): string { return `${mb.toFixed(0)}MB`}
 
-  // Get status color function getStatusColor(success: boolean): string { return success ? 'text-green-600', 'text-red-600'}
+  // Get status color function getStatusColor(success: boolean), string { return success ? 'text-green-600', 'text-red-600'}
 
   // Initialize on mount $effect(() => { checkSystemHealth()}); </script>
  <div class="space-y-6 p-6 max-w-7xl"> <!-- Header --> <div class="text-center"> <h1 class="text-3xl font-bold text-gray-900"> ðŸš€ Advanced Redis Pipeline Demo </h1>
@@ -88,7 +88,7 @@
 </div> </div> </div> </div> {/each}
   </div> {/if}
   </div> </div>
- <!-- Metrics, Dashboard --> <div class="grid grid-cols-1 md:grid-cols-2 lg, grid-cols-4"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{metrics.totalOperations}
+ <!-- Metrics, Dashboard --> <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-4"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{metrics.totalOperations}
 </div>
  <div class="text-sm">Total Operations</div> </div> </div> </div>
  <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{formatTime(metrics.averageTime)}
@@ -110,7 +110,7 @@
  <div class="yorha-panel-content"> <div class="space-y-3">
   {#each Array.isArray(results.slice(0, 5)) ? results.slice(0, 5): [] as result} <div class="p-3 border"> <div class="flex justify-between items-start"> <div class="flex items-center"> <span class="font-semibold">{(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).type}
 </span>
- <span class={getStatusColor((result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?, any }).success)}> {(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).success ? 'âœ…': 'âŒ'}
+ <span class={getStatusColor((result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?, any; error?, any }).success)}> {(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).success ? 'âœ…': 'âŒ'}
 </span> </div>
  <div class="text-sm"> {formatTime((result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.totalProcessingTime)}
 </div> </div>

@@ -450,7 +450,7 @@ export const commonContext7Phase8Queries = {
  */
  analyzePhase8Component: (component: string,
  xstateContext?: LegalFormContext,
- currentState?: StateValue
+ currentState?, StateValue
  ) => ({
  component,
  context: 'legal-ai' as const,

@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected | token,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Unexpected, token --> <!-- Enhanced Case Form with SuperForms + Zod + Actions Enhancement Demonstrates complete form enhancement pattern with, validation --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { enhance } from '$app/forms';
+<!-- @migration-task Error while migrating Svelte, code, Unexpected | token,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Unexpected, token --> <!-- Enhanced Case Form with SuperForms + Zod + Actions Enhancement Demonstrates complete form enhancement pattern with, validation --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { enhance } from '$app/forms';
  import { onDestroy } from 'svelte';
  import type { Writable } from 'svelte/store'; // NOTE: Removed Card* imports to avoid SvelteComponentTyped constructor/type mismatch. // Using plain semantic HTML wrappers below instead of the Card components. // Use native <label>, <textarea>, <input type="checkbox"> to avoid SvelteComponentTyped constructor/type mismatch // Removed broken select module import. Using native <select> instead. import { AlertCircle, Loader2, Save, CheckCircle, Upload, FileText, Calendar, Users, Scale } from 'lucide-svelte';
  import { caseFormSchema } from '$lib/schemas/forms';
@@ -96,7 +96,7 @@
             aria-invalid={$errors?.description ? 'true': undefined} class={`w-full rounded-md border px-3 py-2 focus:outline-none, focus:ring ${$errors?.description ? 'border-destructive': ''}`} ></textarea>
   {#if $errors?.description} <p class="text-sm">{$errors.description[0]}</p> {/if}
   <p class="text-sm nes-text"> {$form?.description?.length ?? 0}/1000 characters </p> </div>
- <!-- Advanced, Options --> <div class="border-t"> <!-- Use native button to avoid passing: unknown, 'type' prop to Button, component --> <button type="button"
+ <!-- Advanced, Options --> <div class="border-t"> <!-- Use native button to avoid passing, unknown, 'type' prop to Button, component --> <button type="button"
             onclick={() => (showAdvanced = !showAdvanced)} class="mb-4 inline-flex items-center px-3 py-2 rounded-md text-sm bg-transparent hover:bg-muted/5"
             aria-expanded={ showAdvanced } >
             {showAdvanced ? 'Hide': 'Show'} Advanced Options </button>

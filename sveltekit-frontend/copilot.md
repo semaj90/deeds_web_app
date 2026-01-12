@@ -5,6 +5,64 @@ Date: 2026-01-11
 Baseline: 77,002 TypeScript/CSS errors, 232 warnings, 2,471 files
 Goal: 40-45% error reduction through automated pattern fixing
 
+## XState v5 Migration Patterns (2026-01-11)
+
+### Pattern: fromPromise Inline Types
+**Error Codes:** TS2345, TS2322, TS2554
+**Frequency:** High (affects all fromPromise actors)
+
+**Problem:**
+XState v5 `fromPromise` no longer supports inline type annotations in the function signature. Types must be extracted to separate interfaces or provided as generics.
+
+**Broken Syntax (XState v4 style):**
+```typescript
+// ❌ Inline types in fromPromise
+const promiseLogic = fromPromise(async ({ input }: { input: { userId: string } }) => {
+  const user = await getUser(input.userId);
+  return user;
+});
+```
+
+**Correct Syntax (XState v5):**
+```typescript
+// ✅ Method 1: Extract interface
+interface PromiseInput {
+  userId: string;
+}
+
+const promiseLogic = fromPromise(async ({ input }: { input: PromiseInput }) => {
+  const user = await getUser(input.userId);
+  return user;
+});
+
+// ✅ Method 2: Use generic parameters
+const promiseLogic = fromPromise<User, { userId: string }>(
+  async ({ input, self }) => {
+    const user = await getUser(input.userId);
+    return user;
+  }
+);
+```
+
+**Migration Steps:**
+1. Extract all inline types from fromPromise function signatures
+2. Move types to interfaces or type aliases
+3. Apply types as generics: `fromPromise<TOutput, TInput>(...)`
+4. Update all actor logic creators (fromCallback, fromObservable, etc.)
+
+**Scan Results (2026-01-12):**
+- **39 files** with fromPromise inline types (122 total occurrences)
+- See detailed report: `reports/xstate-migration/latest.md`
+- High-priority files:
+  - `src/lib/stores/_archive/old-stores/enhanced-upload-machine.ts` (11 occurrences)
+  - `src/lib/state/evidenceCustodyMachine.ts` (6 occurrences)
+  - `src/lib/state/evidence-processing-machine.ts` (5 occurrences)
+
+**Related Errors:**
+- `Type '{ userId: string }' is not assignable to type 'never'`
+- `Cannot use inline type annotations in fromPromise`
+- `Property 'userId' does not exist on type 'unknown'`
+
 ## Identified CSS Corruption Patterns
 
 ### Pattern 1: Split Global Selectors
@@ -32,6 +90,89 @@ Goal: 40-45% error reduction through automated pattern fixing
 ```javascript
 content.replace(/:\s+global\(/g, ':global(')
 ```
+
+---
+
+## 🤖 Phase 96: XState v5 State Machine Architecture
+
+### Discovery: TypeScript LSP Limitation with `setup()`
+**Context:** XState v5.24.0 exports `setup()` but TypeScript can't resolve it due to declaration file indirection.
+
+**ACE Recommendation:**
+```typescript
+// 🔴 Avoid (TypeScript LSP fails)
+import { setup, fromPromise } from 'xstate';
+const machine = setup({ actors: { /* ... */ } }).createMachine({ /* ... */ });
+
+// 🟢 Prefer (guaranteed to work)
+import { createMachine, fromPromise, assign } from 'xstate';
+const machine = createMachine({
+    types: {
+        context: {} as AIAssistantContext,
+        events: {} as AIAssistantEvent
+    },
+    states: {
+        processing: {
+            invoke: {
+                // Inline actor logic
+                src: fromPromise<string>(async ({ input, signal }: {
+                    input: { prompt: string; model: string };
+                    signal: AbortSignal;
+                }) => {
+                    const response = await fetch('/api/ai/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(input),
+                        signal  // Connects to XState lifecycle for cancellation
+                    });
+                    if (!response.ok) throw new Error(`AI failed: ${response.statusText}`);
+                    return (await response.json()).response;
+                }),
+                input: ({ context }) => ({
+                    prompt: context.currentQuery,
+                    model: context.model
+                }),
+                onDone: {
+                    target: 'idle',
+                    actions: assign({
+                        response: ({ event }) => event.output,
+                        conversationHistory: ({ context, event }) => [
+                            ...context.conversationHistory,
+                            { id: crypto.randomUUID(), type: 'assistant', content: event.output, timestamp: new Date() }
+                        ]
+                    })
+                },
+                onError: {
+                    target: 'error',
+                    actions: assign({ error: ({ event }) => (event.error as Error).message })
+                }
+            },
+            on: {
+                CANCEL: { target: 'idle', actions: assign({ error: 'Request cancelled' }) }
+            }
+        }
+    }
+});
+```
+
+### Type Signature (Critical)
+```typescript
+// ❌ XState v5 rejects multiple generics
+fromPromise<TOutput, TInput>(async ({ input }) => { /* ... */ })
+
+// ✅ Single generic + explicit parameter typing
+fromPromise<TOutput>(async ({ input, signal }: { input: TInput; signal: AbortSignal }) => { /* ... */ })
+```
+
+### Phase 96 Deliverables
+- ✅ `aiAssistantMachine.ts`: Error-free, cancellation-ready
+- ✅ `AIAssistantMachineComponent.svelte`: Manual actor subscription (no `@xstate/svelte`)
+- ✅ `DocumentUploadMachineIntegration.svelte`: File ingestion UI restored
+- ✅ `/indexing` route: Integration demo grid with both components
+- ✅ Knowledge doc: `docs/xstate-v5-patterns.md` (canonical reference)
+
+### RAG/KAG Tags
+`#xstate-v5` `#frompromise` `#typescript-lsp` `#state-machines` `#actor-cancellation` `#phase96-complete`
 
 ---
 

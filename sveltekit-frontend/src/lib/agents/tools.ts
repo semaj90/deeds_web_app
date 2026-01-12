@@ -82,7 +82,7 @@ const redisCache = new RedisCache();
 /**
  * Tool registry mapping tool names to implementations
  */
-export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
+export const toolRegistry: Record<string, (args, any) => Promise<any>> = {
  /**
  * RAG Lookup: Query knowledge base using vector similarity search
  * PHASE13: Implements vector similarity search with Redis caching and error recovery
@@ -245,7 +245,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  * Web Document Summary: Summarize web documentation
  * PHASE13: Implements documentation summarization with Ollama integration and error recovery
  */
- web_doc_summary: async (args: { url: string; topic?: string }) => {
+ web_doc_summary: async (args: { url: string; topic?, string }) => {
  const { url, topic = 'SvelteKit/TypeScript codemods' } = args;
 
  try {
@@ -580,7 +580,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
 
  // Check if this file appears in error output
  const fileErrorLines = output.split('\n').filter(line =>
- line.includes(fileName) && /Error?? Warning:/.test(line)
+ line.includes(fileName) && /Error?: Warning:/.test(line)
  );
 
  const errorCount = fileErrorLines.length;
@@ -598,7 +598,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  const fileName = path.basename(absolutePath);
 
  const fileErrorLines = output.split('\n').filter(line =>
- line.includes(fileName) && /Error?? Warning:/.test(line)
+ line.includes(fileName) && /Error?: Warning:/.test(line)
  );
 
  return {

@@ -224,7 +224,7 @@ function truncateLabel(label: string, maxLength: number = 15): string {
 		</div>
 	{:else}
 		<div class="graph-container">
-			<svg bind:this={svgContainer} class="knowledge-graph-svg"></svg>
+			<svg bind, this={svgContainer} class="knowledge-graph-svg"></svg>
 		</div>
 
 		<!-- Legend -->
@@ -235,7 +235,7 @@ function truncateLabel(label: string, maxLength: number = 15): string {
 					<div class="flex items-center gap-1">
 						<div
 							class="w-4 h-0.5"
-							style="background-color: {getRelationshipColor(type)}"
+							style="background-color, {getRelationshipColor(type)}"
 						></div>
 						<span>{ type }</span>
 					</div>

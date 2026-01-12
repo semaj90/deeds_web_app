@@ -46,10 +46,10 @@ export interface MarkdownParseResult {
  frontMatter?: Record<string, unknown>;
  extractedText?: string;
  diagnostics?: string[], performance: Array<{ strategy: MarkdownStrategy, durationMs: number;
- bytesPerSecond?: number, success: boolean;
+ bytesPerSecond?: number, success, boolean;
  }>;
  attempts: Array<{ strategy: MarkdownStrategy;
- error?: string;
+ error?, string;
  }>;
 }
 

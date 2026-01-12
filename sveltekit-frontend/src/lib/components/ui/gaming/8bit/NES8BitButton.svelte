@@ -77,7 +77,7 @@
  <!-- Pixel highlight -->
  <span
  class="absolute top-0 left-0 right-0 h-1 pointer-events-none"
- style="background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);"
+ style="background, linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);"
  ></span>
 
  <!-- Content -->

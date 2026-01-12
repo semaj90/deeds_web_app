@@ -1,7 +1,7 @@
 /** * Module declarations for packages without proper TypeScript types */
 declare module 'fuse.js' {
  interface FuseOptions {
- keys?: Array<string | { name: string; weight?: number }>;
+ keys?: Array<string | { name: string; weight?, number }>;
  threshold?: number;
  distance?: number;
  includeScore?: boolean;

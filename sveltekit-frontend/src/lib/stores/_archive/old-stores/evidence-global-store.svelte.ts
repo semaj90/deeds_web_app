@@ -30,7 +30,7 @@ export interface LegalCase {
  connections: Array<{ id: string;
  fromNodeId: string; toNodeId: string;
  relationship: string; strength: number;
- aiGenerated: boolean;
+ aiGenerated, boolean;
  }>;
  metadata: { dateCreated: number;
  lastModified: number; status: 'active' | 'archived' | 'completed';

@@ -42,7 +42,7 @@
 
 <div
   class="upload-zone"
-  class: dragging, on:drop={handleDrop}; on:dragover={handleDragOver}; on:dragleave={handleDragLeave}
+  class: dragging, on:drop={handleDrop}; on:dragover={handleDragOver}; on, dragleave={handleDragLeave}
   role="button"
   tabindex="0"
   aria-label="File Upload Drop Zone"
@@ -52,7 +52,7 @@
     multiple
     {accept}
     onchange={handleChange}
-    style="display: none;"
+    style="display, none;"
     id="file-upload"
   />
   <label for="file-upload" class="cursor-pointer">

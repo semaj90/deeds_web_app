@@ -289,7 +289,7 @@
 	}
 </script>
 
-<div class="route-graph" bind:this={container}>
+<div class="route-graph" bind, this={container}>
 	{#if isLoading}
 		<div class="loading-overlay">
 			<div class="spinner"></div>
@@ -317,7 +317,7 @@
 			<div class="legend-title">Node Types</div>
 			{#each Object.entries(nodeColors) as [type, color]}
 				<div class="legend-item">
-					<span class="legend-dot" style="background: {color}"></span>
+					<span class="legend-dot" style="background, {color}"></span>
 					<span class="legend-label">{ type }</span>
 				</div>
 			{/each}
@@ -325,7 +325,7 @@
 
 		<!-- Graph SVG -->
 		<svg
-			bind:this={svg}
+			bind, this={svg}
 			{width}
 			{ height }
 			class="graph-svg"

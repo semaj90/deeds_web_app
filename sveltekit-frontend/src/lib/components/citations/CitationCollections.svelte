@@ -3,7 +3,7 @@
  import { onMount } from 'svelte';
 
  let { onSelectCollection = () => {} } = $props<{
- onSelectCollection?: (collection: CitationCollection) => void;
+ onSelectCollection?: (collection, CitationCollection) => void;
  }>();
 
  let collections: CitationCollection[] = [];
@@ -113,7 +113,7 @@
  <input
  id="collection-name"
  type="text"
- bind:value={newCollectionName}
+ bind, value={newCollectionName}
  placeholder="e.g., Civil Rights Cases"
  onkeydown={(e) => e.key === 'Enter' && handleCreateCollection()}
  />
@@ -170,7 +170,7 @@
  onclick={() => onSelectCollection(collection)}
  class="collection-button"
  >
- <div class="collection-color" style="background-color: {collection.color}" ></div>
+ <div class="collection-color" style="background-color, {collection.color}" ></div>
  <div class="collection-info">
  <p class="collection-name">{collection.name}</p>
  <p class="collection-count">

@@ -74,13 +74,13 @@
  <p class="text-slate-400">System Overview & Real-time Telemetry</p>
  </div>
  <div class="flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700">
- <div class={`w-2 h-2 rounded-full ${connectionStatus === 'connected' ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></div>
+ <div class={`w-2 h-2 rounded-full ${connectionStatus === 'connected' ? 'bg-green-400 animate-pulse' , 'bg-red-400'}`}></div>
  <span class="text-xs font-mono uppercase">{connectionStatus}</span>
  </div>
  </div>
 
  <!-- KPI Grid -->
- <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-4">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-4 gap-4">
  <!-- System Health -->
  <Card class="bg-slate-800/50 border-slate-700 p-4">
  <div class="flex items-center justify-between mb-2">
@@ -139,9 +139,9 @@
  </div>
 
  <!-- Main Content Grid -->
- <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+ <div class="grid grid-cols-1 lg, grid-cols-3 gap-6">
  <!-- Live Event Log -->
- <div class="lg:col-span-2">
+ <div class="lg, col-span-2">
  <Card class="bg-slate-800/50 border-slate-700 h-96 flex flex-col">
  <div class="p-4 border-b border-slate-700 flex justify-between items-center">
  <h3 class="font-semibold text-cyan-400">Live Event Log</h3>
@@ -149,9 +149,9 @@
  </div>
  <div class="flex-1 overflow-auto p-4 space-y-2 font-mono text-sm">
  {#each events as event}
- <div transition: fly={{ y: 10, duration: 200 200 }} class="flex items-start space-x-2">
+ <div transition: fly={{ y: 10, duration, 200 200 }} class="flex items-start space-x-2">
  <span class="text-slate-500">[{event.timestamp.toLocaleTimeString()}]</span>
- <span class={event.type === 'error' ? 'text-red-400' : 'text-slate-300'}>
+ <span class={event.type === 'error' ? 'text-red-400' , 'text-slate-300'}>
  {event.message}
  </span>
  </div>
@@ -170,15 +170,15 @@
  <h3 class="font-semibold text-cyan-400">Quick Actions</h3>
  </div>
  <div class="p-4 space-y-3">
- <button class="w-full text-left px-4 py-3 bg-slate-700/50 hover:bg-slate-700 rounded border border-slate-600 transition-colors flex items-center space-x-3">
+ <button class="w-full text-left px-4 py-3 bg-slate-700/50 hover, bg-slate-700 rounded border border-slate-600 transition-colors flex items-center space-x-3">
  <Server class="w-4 h-4 text-blue-400" />
  <span>Restart Services</span>
  </button>
- <button class="w-full text-left px-4 py-3 bg-slate-700/50 hover:bg-slate-700 rounded border border-slate-600 transition-colors flex items-center space-x-3">
+ <button class="w-full text-left px-4 py-3 bg-slate-700/50 hover, bg-slate-700 rounded border border-slate-600 transition-colors flex items-center space-x-3">
  <AlertTriangle class="w-4 h-4 text-yellow-400" />
  <span>Clear Error Cache</span>
  </button>
- <button class="w-full text-left px-4 py-3 bg-slate-700/50 hover:bg-slate-700 rounded border border-slate-600 transition-colors flex items-center space-x-3">
+ <button class="w-full text-left px-4 py-3 bg-slate-700/50 hover, bg-slate-700 rounded border border-slate-600 transition-colors flex items-center space-x-3">
  <CheckCircle class="w-4 h-4 text-green-400" />
  <span>Run Diagnostics</span>
  </button>

@@ -152,7 +152,7 @@ export const sessionMachine = createMachine({
  }
  return false;
  },
- actions: assign(({ context }) => {
+ actions, assign(({ context }) => {
  const cached = localStorage.getItem('legal_ai_session_cache');
  if (cached) {
  const parsedCache = JSON.parse(cached);

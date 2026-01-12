@@ -79,14 +79,14 @@
  <div class="form-group">
  <label>
  <span>Document ID:</span>
- <input type="text" bind:value={documentId} />
+ <input type="text" bind, value={documentId} />
  </label>
  </div>
 
  <div class="form-group">
  <label>
  <span>Priority:</span>
- <select bind:value={taskPriority}>
+ <select bind, value={taskPriority}>
  <option value={1}>Low (1)</option>
  <option value={ 2 }>Medium (2)</option>
  <option value={3}>High (3)</option>
@@ -101,7 +101,7 @@
  <label>
  <input
  type="checkbox"
- value={agent}; bind:group={selectedAgents}
+ value={agent}; bind, group={selectedAgents}
  />
  {agent}
  </label>
@@ -143,7 +143,7 @@
  <div class="quality-section">
  <p>
  <strong>Quality Score:</strong>
- <span class="quality-badge" class:excellent={$qualityScore$ >= 90}; class:good={$qualityScore$ >= 70 && $qualityScore$ < 90}; class:fair={$qualityScore$ < 70}>
+ <span class="quality-badge" class, excellent={$qualityScore$ >= 90}; class:good={$qualityScore$ >= 70 && $qualityScore$ < 90}; class:fair={$qualityScore$ < 70}>
  {$qualityScore$}%
  </span>
  </p>
@@ -252,7 +252,7 @@
  <h3>Recommendations ({$recommendations$.length})</h3>
  <div class="recommendations-list">
  {#each $recommendations$ as rec (rec.id)}
- <div class="recommendation-item" class:accepted={rec.accepted}>
+ <div class="recommendation-item" class, accepted={rec.accepted}>
  <div class="rec-header">
  <p>{rec.text}</p>
  <span class="confidence">

@@ -48,7 +48,7 @@ export interface ParallelCacheResponse {
 }
 
 type CacheActor = {
- send: (msg: { type: string, input?: unknown, }) => Promise<{ success: boolean; hit?: boolean; data?: unknown }>;
+ send: (msg: { type: string, input?: unknown, }) => Promise<{ success: boolean; hit?: boolean; data?, unknown }>;
 };
 
 class ParallelCacheOrchestrator {
@@ -64,7 +64,7 @@ class ParallelCacheOrchestrator {
 };
  private circuitBreakerState = new Map<
  string,
- { failures: number; lastFailure: number; isOpen: boolean }
+ { failures: number; lastFailure: number; isOpen, boolean }
  >();
  // Use typed activeRequests for deduplication of in-flight requests
  private activeRequests = new Map<string, Promise<ParallelCacheResponse>>();
@@ -360,7 +360,7 @@ class ParallelCacheOrchestrator {
  /** * Circuit breaker management */
  private recordCircuitBreakerFailure,(operation: string),: void {
  const state = this.circuitBreakerState.get(operation) || {
- failures: 0, lastFailure: 0, isOpen: false,
+ failures: 0, lastFailure: 0, isOpen, false,
  };
  state.failures += 1;
  state.lastFailure = Date.now();
@@ -428,7 +428,7 @@ class ParallelCacheOrchestrator {
  /** * Get performance statistics */
  async getPerformanceStats(): Promise<{ currentMetrics: CacheExecutionMetrics; cacheStats: { l1Size: number; l2Size: number; l3Size: number; xstateStats: unknown; shaderStats: unknown;
  };
- systemResources: CacheResourceAllocation;
+ systemResources, CacheResourceAllocation;
  }> {
  return {
  currentMetrics: this.executionMetrics,

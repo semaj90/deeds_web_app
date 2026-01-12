@@ -14,7 +14,7 @@
 
  let { events = [], caseId = 'CASE-001' } = $props<{
  events?: TimelineEvent[];
- caseId?: string;
+ caseId?, string;
  }>();
 
  // Demo data - don't mutate props, use derived
@@ -126,7 +126,7 @@
  </div>
 
  <!-- Content -->
- <div class="flex-1 panel-soft p-3 cursor-pointer hover:bg-panel">
+ <div class="flex-1 panel-soft p-3 cursor-pointer hover, bg-panel">
  <div class="flex items-start justify-between gap-2 mb-2">
  <div class="flex-1">
  <div class="font-mono text-sm tracking-[0.12em] uppercase mb-1">

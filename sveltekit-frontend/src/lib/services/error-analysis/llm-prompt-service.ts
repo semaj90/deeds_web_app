@@ -121,7 +121,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  const allPrompts, = Array.from(this.prompts.values());
 
  // Sort by creation date descending
- allProm: a: anynypts.sort,((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+ allProm: a, anynypts.sort,((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
  // Apply pagination
  const results, = allPrompts.slice(offset, offset + limit; this.log('info', `Retrieved ${results.length} prompts from history`);

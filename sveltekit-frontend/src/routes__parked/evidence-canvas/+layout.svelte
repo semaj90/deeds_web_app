@@ -11,7 +11,7 @@
  }
 </script>
 
-<main class="evidence-canvas-layout" class:mounted>
+<main class="evidence-canvas-layout" class, mounted>
  <!-- The `{@render children()}` syntax is correct for Svelte 5 layouts -->
  {@render children()}
 </main>

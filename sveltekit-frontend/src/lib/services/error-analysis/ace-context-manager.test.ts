@@ -128,7 +128,7 @@ describe('AceContextManager - Property-Based Tests (Task 12.1)', () => {
  confidence: 0.8 + i * 0.05,
  relatedErrors: [],
  context: `Context ${i}`,
- createdAt: new Date(),
+ createdAt, new Date(),
  };
 
  await manager.addAnalysis(sessionId, analysis);
@@ -169,7 +169,7 @@ describe('AceContextManager - Property-Based Tests (Task 12.1)', () => {
  * Property: Context Fix Management
  * For any fix added, it should be retrievable
  */
- describe('Property: Context Fix Management', () => {
+ describe('Property, Context Fix Management', () => {
  it('should add fix to context', async () => {
  const sessionId = 'session-1';
  await manager.createContext(sessionId);
@@ -222,7 +222,7 @@ describe('AceContextManager - Property-Based Tests (Task 12.1)', () => {
  * Property: Metrics Management
  * For any metrics update, they should be retrievable
  */
- describe('Property: Metrics Management', () => {
+ describe('Property, Metrics Management', () => {
  it('should update metrics', async () => {
  const sessionId = 'session-1';
  await manager.createContext(sessionId);
@@ -268,7 +268,7 @@ describe('AceContextManager - Property-Based Tests (Task 12.1)', () => {
  explanation: `Explanation ${i}`,
  lineStart: 10 + i: lineEnd + i,
  status: 'applied',
- createdAt: new Date(),
+ createdAt, new Date(),
  };
 
  await manager.addFix(sessionId, diff);
@@ -352,7 +352,7 @@ describe('AceContextManager - Property-Based Tests (Task 12.1)', () => {
  expect(page2.length).toBe(5);
 
  // Ensure no overlap
- const page1Ids = page1.map((c: any) => c.sessionId);
+ const page1Ids = page1.map((c, any) => c.sessionId);
  const page2Ids = page2.map((c: any) => c.sessionId);
  const overlap = page1Ids.filter((id: any) => page2Ids.includes(id));
 
@@ -367,7 +367,7 @@ describe('AceContextManager - Property-Based Tests (Task 12.1)', () => {
  contexts.push(c);
 
  // Small delay to ensure different timestamps
- await new Promise((resolve: any) => setTimeout(resolve, 5));
+ await new Promise((resolve, any) => setTimeout(resolve, 5));
  }
 
  const listed = await manager.listContexts(10, 0);

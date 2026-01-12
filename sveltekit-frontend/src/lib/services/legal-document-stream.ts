@@ -20,7 +20,7 @@ export interface SemanticAnalysis {
     embedding: number[]; legalEntities: LegalEntity[];
     keyTopics: string[]; complexity: number;
     sentiment: 'positive' | 'negative' | 'neutral';
-    similarDocuments: Array<{ id: string; similarity: number; title: string }>;
+    similarDocuments: Array<{ id: string; similarity: number; title, string }>;
 }
 
 export interface LegalReasoning {
@@ -29,7 +29,7 @@ export interface LegalReasoning {
         details: string;
     };
     legalPrinciples: string[]; precedentAnalysis: {
-        relevantCases: Array<{ id: string; title: string; relevance: number }>;
+        relevantCases: Array<{ id: string; title: string; relevance, number }>;
         summary: string;
     };
 }
@@ -130,7 +130,7 @@ export class LegalDocumentStreamService {
     private activeAnalyses: Map<string, Promise<any>> = new Map();
     private config: StreamConfig;
     private statistics: StreamStatistics;
-    private eventListeners: Map<string, Array<(event: StreamEvent) => void>> = new Map();
+    private eventListeners: Map<string, Array<(event, StreamEvent) => void>> = new Map();
 
     constructor(config?: Partial<StreamConfig>) {
         this.config = {
@@ -398,7 +398,7 @@ export class LegalDocumentStreamService {
             });
 
             if (parallelProcessing) {
-                const promises = batch.map((doc: any) => 
+                const promises = batch.map((doc, any) => 
                     this.streamDocument(connectionId, doc, { streamProgress: false })
                         .catch((err: any) => console.warn(`Batch item failed: ${doc.id}`, err))
                 );
@@ -468,7 +468,7 @@ export class LegalDocumentStreamService {
     private emitEvent(connectionId: string, event: StreamEvent): void {
         const listeners = this.eventListeners.get(connectionId);
         if (listeners) {
-            listeners.forEach((cb: any) => {
+            listeners.forEach((cb, any) => {
                 try { cb(event); } catch (e) { console.error('Listener error:', e); }
             });
         }

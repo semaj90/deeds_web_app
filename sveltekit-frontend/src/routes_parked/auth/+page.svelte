@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import { fade, slide } from 'svelte/transition'; import { cubicOut } from 'svelte/easing'; // Authentication mode state let authMode = $state <'login' | 'register'>('login'); let isLoading = $state <boolean>(false); let error = $state <string>(''); let success = $state <string>(''); // Form data let formData = $state ({ email: '', password: '', confirmPassword: '', firstName: '', lastName: '', role: 'prosecutor', department: '', jurisdiction: '', badgeNumber: '', agreeToTerms: false, agreeToPrivacy: false });
   

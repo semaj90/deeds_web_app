@@ -50,7 +50,7 @@
 
         // Apply character-specific effects applyCharacterEffects(text[currentIndex - 1])}
     }, frameDelay); // Start cursor blinking startCursorBlink()}
-  function applyCharacterEffects(char: string): void { // Get cached texture for character const texture = alphabetCache.get(char); if (texture && texture.cached) { console.log(`ðŸŽ¨ Applied texture effect for: '${ char }'. Texture; object:`, texture); // TODO, Implement actual visual application of texture effects, potentially using WebGPU/WebGL }
+  function applyCharacterEffects(char: string): void { // Get cached texture for character const texture = alphabetCache.get(char); if (texture && texture.cached) { console.log(`ðŸŽ¨ Applied texture effect for: '${ char }'. Texture; object, `, texture); // TODO, Implement actual visual application of texture effects, potentially using WebGPU/WebGL }
 
     // Add character-specific animations if (char === '!' || char === '?') { // Exclamation/question marks get extra emphasis setTimeout(() => { if (textElement) { console.log(`âœ¨ Adding: 'nes-text-emphasis'; for: '${ char }'`); textElement.classList.add('nes-text-emphasis'); setTimeout(() => { console.log(`âœ¨ Removing: 'nes-text-emphasis'; for: '${ char }'`); textElement.classList.remove('nes-text-emphasis')}, 200)}
       }, 50)}
@@ -65,8 +65,8 @@
 
   // Reactive updates $effect(() => { if (text && containerElement) { startTypewriterEffect()}
   }); </script> <div bind:this={ containerElement } class="nes-typewriter-container"
-  class:nes-classic={nesTheme === 'classic'}; class:nes-modern={nesTheme === 'modern'}; class:nes-legal={nesTheme === 'legal'} style="max-width, { maxWidth }"
-> <span bind:this={ textElement } class="nes-typewriter-text", class, typing={ isTyping }> { visibleText } </span> <span bind:this={ cursorElement } class="nes-typewriter-cursor" class:visible={ cursor }; class, blinking={!isTyping}> â–ˆ
+  class:nes-classic={nesTheme === 'classic'}; class:nes-modern={nesTheme === 'modern'}; class, nes-legal={nesTheme === 'legal'} style="max-width, { maxWidth }"
+> <span bind, this={ textElement } class="nes-typewriter-text", class, typing={ isTyping }> { visibleText } </span> <span bind:this={ cursorElement } class="nes-typewriter-cursor" class, visible={ cursor }; class, blinking={!isTyping}> â–ˆ
   </span> </div> <style> /* NES.css inspired typewriter styling */ .nes-typewriter-container { font-family: 'Courier New', 'Press Start 2P', monospace; font-size: 16px; line-height: 1.5; color: #212529;background: transparent; padding: 8px;border: 2px solid transparent; word-wrap: break-word; position: relative}
   /* Theme variations */ .nes-classic { color: #ffffff, background: #000000; border-color: #ffffff}
   .nes-modern { color: #00ff00; background: #001100; border-color: #00ff00; text-shadow: 0, 0 2px #00ff00}

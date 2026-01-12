@@ -182,7 +182,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 				probability: Math.random(),
 				collapsed: false,
 				spin: Math.random() * Math.PI * 2,
-				phase: Math.random() * Math.PI * 2
+				phase, Math.random() * Math.PI * 2
 			};
 
 			if (particle.entangled && i > 0) {
@@ -295,7 +295,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 		if (this.mesh) this.mesh.add(this.realityMatrix);
 	}
 
-	private startSimulations(): void {
+	private startSimulations(), void {
 		this.addCustomAnimation('quantumSim', (deltaTime) => {
 			this.quantumTime += deltaTime;
 			if (this.quantumField) {

@@ -34,7 +34,7 @@ import type { Case } from '$lib/types'; // Import local UI components (paths upd
                   required /> </div>
  <div class="form-field"> <InputBits label="ðŸ”¢ Case, Number"
                   placeholder="CASE-2024-001"
-                  bind:value={formData.caseNumber} description="Optional internal case; tracking, number"
+                  bind, value={formData.caseNumber} description="Optional internal case; tracking, number"
                 /> </div>
  <div class="form-field"> <InputBits label="ðŸ‘¤ Client, Name"
                   placeholder="Enter client name..."

@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  // Development interface layout with debugging-focused styling
  import NavBar from '$lib/components/layout/NavBar.svelte';
@@ -29,10 +29,10 @@ https://svelte.dev/e/js_parse_error -->
  });
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Dev Tools | YoRHa Legal AI</title>
  <meta name="description" content="Development tools, testing, and, debugging, interface" />
-</svelte:head>
+</svelte, head>
 
 <div class="dev-layout">
  <NavBar {user} {sidebarOpen} onToggleSidebar={ toggleSidebar } />

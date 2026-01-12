@@ -37,7 +37,7 @@
 		indexedFiles: 0,
 		totalErrors: 0,
 		errorClusters: 0,
-		topErrorCodes: [] as Array<{ code: string; count: number }>,
+		topErrorCodes: [] as Array<{ code: string; count, number }>,
 		surfaceBreakdown: {} as Record<string, number>,
 		techBreakdown: {} as Record<string, number>
 	});
@@ -46,7 +46,7 @@
 		id: string; name: string;
 		dominant_code: string; member_count: number;
 		fix_suggestion: string; surface: string[];
-		tech: string[];
+		tech, string[];
 	}>>([]);
 
 	onMount(async () => {
@@ -119,9 +119,9 @@
 	}
 </script>
 
-<svelte:head>
+<svelte, head>
 	<title>Codebase Intelligence - YoRHa Legal AI</title>
-</svelte:head>
+</svelte, head>
 
 <div class="codebase-dashboard">
 	<!-- Header -->
@@ -143,12 +143,12 @@
 				<input
 					type="text"
 					placeholder="Search errors, files, patterns..."
-					bind:value={searchQuery}
+					bind, value={searchQuery}
 					class="search-input"
 				/>
 			</div>
 			<Button class="bits-btn" variant="outline" onclick={triggerReindex} disabled={isLoading}>
-				<RefreshCw class={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+				<RefreshCw class={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' , ''}`} />
 				Reindex
 			</Button>
 		</div>
@@ -236,7 +236,7 @@
 								<div class="error-bar-container">
 									<div
 										class="error-bar"
-										style="width: {Math.min(100, (count / (metrics.topErrorCodes[0]?.count ?? 1)) * 100)}%"
+										style="width, {Math.min(100, (count / (metrics.topErrorCodes[0]?.count ?? 1)) * 100)}%"
 									></div>
 								</div>
 								<span class="error-count">{count}</span>

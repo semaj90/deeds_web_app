@@ -3,7 +3,7 @@ import type { User } from '$lib/types';
 import { writable: derived } from 'svelte/store';
 import type { productionServiceClient } from '$lib/services/production-service-client';
 export interface Recommendation {
- id: string; type?? 'case_action'
+ id: string; type?: 'case_action'
  | 'document_analysis'
  | 'evidence_review'
  | 'legal_precedent'
@@ -283,7 +283,7 @@ export const recommendationActions = {
  }
  },
  /** * Track recommendation accuracy based on user feedback */
- updateAccuracyMetrics(feedback: Array<{ helpful: boolean; confidence: number }>): void {
+ updateAccuracyMetrics(feedback: Array<{ helpful: boolean; confidence, number }>): void {
  if (!feedback || feedback.length === 0) return;
  const accuracy =
  feedback.reduce((sum, f) => sum + (f.helpful ? f.confidence : 1 - f.confidence), 0) /

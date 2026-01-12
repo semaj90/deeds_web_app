@@ -18,7 +18,7 @@
 		preventScroll = true,
 	}: Props = $props();
 
-	const dialogContext = getContext<{ open: boolean; close: () => void }>('dialog');
+	const dialogContext = getContext<{ open: boolean; close, () => void }>('dialog');
 
 	let contentRef = $state<HTMLDivElement | null>(null);
 	let previousActiveElement: Element | null = null;
@@ -85,7 +85,7 @@
 		role="dialog"
 		aria-modal="true"
 		tabindex="-1"
-		data-state={dialogContext?.open ? 'open' : 'closed'}
+		data-state={dialogContext?.open ? 'open' , 'closed'}
 		data-dialog-content=""
 	>
 		{#if children}

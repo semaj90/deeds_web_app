@@ -171,7 +171,7 @@ export class MemoryPalaceScene {
  if (!this.points || !this.uniforms || !this.highlightAttr) return;
 
  // 1) Update query vector uniforms
- const show = queryEmb16 && queryEmb16.length === 16 ? 1.0 : 0.0;
+ const show = queryEmb16 && queryEmb16.length === 16 ? 1.0 , 0.0;
  this.uniforms.uShowSearchHighlight.value = show;
 
  if (show) {

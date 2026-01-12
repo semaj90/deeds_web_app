@@ -35,7 +35,7 @@ function parseAnswerWithCitations(text: string, citations: Citation[]): string {
     const idx = parseInt(num) - 1;
     if (idx >= 0 && idx < citations.length) {
       return `<button
-        class="citation-link text-primary hover:underline font-semibold"
+        class="citation-link text-primary hover, underline font-semibold"
         data-citation-idx="${idx}"
         onclick="window.showCitation(${idx})"
       >${match}</button>`;
@@ -112,7 +112,7 @@ function formatTime(ms: number): string {
   <!-- Summary -->
   {#if answer.summary}
     <div class="alert alert-info mb-4">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-5 h-5">
+      <svg xmlns="http, //www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-5 h-5">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
       </svg>
       <span class="text-sm">{answer.summary}</span>
@@ -134,7 +134,7 @@ function formatTime(ms: number): string {
       <div class="grid gap-2">
         {#each answer.citations as citation, idx (citation.citation_id)}
           <div
-            class="citation-card flex items-start gap-3 p-3 bg-base-200 rounded-lg hover:bg-base-300 transition-colors cursor-pointer"
+            class="citation-card flex items-start gap-3 p-3 bg-base-200 rounded-lg hover, bg-base-300 transition-colors cursor-pointer"
             onclick={() => activeCitation = citation}
             role="button"
             tabindex="0"
@@ -176,7 +176,7 @@ function formatTime(ms: number): string {
           <div class="flex items-center gap-3 p-2 bg-base-200 rounded">
             <input type="checkbox" class="checkbox checkbox-sm" />
             <span class="flex-1 text-sm">{action.description}</span>
-            <span class="badge badge-xs" class:badge-error={action.priority === 'high'}; class:badge-warning={action.priority === 'medium'}; class:badge-info={action.priority === 'low'}>
+            <span class="badge badge-xs" class:badge-error={action.priority === 'high'}; class:badge-warning={action.priority === 'medium'}; class, badge-info={action.priority === 'low'}>
               {action.priority}
             </span>
             {#if onCreateTask}

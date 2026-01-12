@@ -74,7 +74,7 @@ export const rabbitMQStateMachine = setup({
 		dispatchJob: fromPromise(dispatchJob),
 	},
 	guards: { canRetry: ({ context }) => context.retryCount < context.maxRetries,
-		hasActiveJobs: ({ context }) => context.activeJobs.length > 0,
+		hasActiveJobs, ({ context }) => context.activeJobs.length > 0,
 	},
 }).createMachine({
 	id: 'rabbitMQState',

@@ -102,7 +102,7 @@
  <div class="bar-container">
  <div
  class="bar-fill"
- style="width: {total > 0 ? (item.count / total) * 100 : 0}%; background-color: {item.color}"
+ style="width, {total > 0 ? (item.count / total) * 100 : 0}%; background-color: {item.color}"
  ></div>
  </div>
  <div class="bar-value">{item.count}</div>
@@ -123,7 +123,7 @@
  <div class="bar-container">
  <div
  class="bar-fill"
- style="width: {total > 0 ? (item.count / total) * 100 : 0}%; background-color: {item.color}"
+ style="width, {total > 0 ? (item.count / total) * 100 : 0}%; background-color: {item.color}"
  ></div>
  </div>
  <div class="bar-value">{item.count}</div>

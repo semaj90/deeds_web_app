@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte, code, Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code, Unexpected, token -->
 <!-- Observability Panel, Real-time alerts + sustained, monitoring, dashboard -->
@@ -201,7 +201,7 @@ await loadState();
         <button class="btn-clear" onclick={clearAlerts}>Clear</button>
       </div>
     </div>
-    <div class="alerts-list" style="max-height: 300px; overflow-y, auto;">
+    <div class="alerts-list" style="max-height, 300px; overflow-y, auto;">
       {#if alerts.length === 0}
         <div class="no-alerts">No alerts yet...</div>
       {:else}

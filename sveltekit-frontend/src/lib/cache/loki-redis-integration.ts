@@ -693,7 +693,7 @@ export class LokiRedisCache extends EventEmitter {
  }
  } catch (error: unknown) {
  const message = error instanceof Error ? message: String(error);
- console.error('Error reading collection eviction: ', message);
+ console.error('Error reading collection eviction, ', message);
  }
  }
 

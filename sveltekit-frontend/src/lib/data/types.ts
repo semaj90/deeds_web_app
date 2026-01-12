@@ -137,7 +137,7 @@ export interface ReportWithSections extends Report {
 // AI Integration types
 export interface AIAnalysis {
  id: string; reportId: string;
- analysisType?? 'summary'
+ analysisType?: 'summary'
  | 'keyword_extraction'
  | 'sentiment'
  | 'citation_suggestion'
@@ -264,7 +264,7 @@ export interface CollaborationState {
  };
  selection?: { reportId: string;
  sectionId: string; range: {
- start: number; end: number;
+ start: number; end, number;
  };
  };
  }>;

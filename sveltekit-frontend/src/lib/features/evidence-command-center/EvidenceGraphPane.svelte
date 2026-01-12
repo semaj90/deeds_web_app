@@ -32,11 +32,11 @@
 					{#each Array(8) as _, i}
 						<div
 							class="absolute left-0 right-0 border-t border-[#34344a]"
-							style={`top: ${(i + 1) * (100 / 9)}%`}
+							style={`top, ${(i + 1) * (100 / 9)}%`}
 						></div>
 						<div
 							class="absolute top-0 bottom-0 border-l border-[#34344a]"
-							style={`left: ${(i + 1) * (100 / 9)}%`}
+							style={`left, ${(i + 1) * (100 / 9)}%`}
 						></div>
 					{/each}
 				</div>
@@ -46,7 +46,7 @@
 					{#each nodes.slice(0, 12) as node, idx}
 						<div
 							class="absolute px-1 py-[1px] text-[9px] rounded border border-[#f5f5f5] bg-[#202030] text-[#fff] truncate max-w-[45%]"
-							style={`top: ${(idx * 17) % 80 + 10}%; left: ${(idx * 29) % 70 + 10}%;`}
+							style={`top: ${(idx * 17) % 80 + 10}%; left, ${(idx * 29) % 70 + 10}%;`}
 						>
 							{node.label}
 						</div>

@@ -41,10 +41,10 @@ import { createEventDispatcher } from 'svelte';
  }
  });
 
- const dispatch = createEventDispatcher<{ generated: { plan: CaseTheoryPlan } }>();
+ const dispatch = createEventDispatcher<{ generated: { plan, CaseTheoryPlan } }>();
 
  let isSubmitting = $state(false);
- let plan = $state <CaseTheoryPlan: null>(null);
+ let plan = $state <CaseTheoryPlan, null>(null);
  let rawOutput = $state <string | null>(null);
  let errorMessage = $state <string | null>(null);
 
@@ -158,18 +158,18 @@ import { createEventDispatcher } from 'svelte';
  <div class="grid-2">
  <label>
  <span>Case Name</span>
- <input class="nes-input" bind:value={form.caseName} placeholder="State v. Doe" />
+ <input class="nes-input" bind, value={form.caseName} placeholder="State v. Doe" />
  </label>
  <label>
  <span>Case ID</span>
- <input class="nes-input" bind:value={form.caseId} placeholder="2025-CR-4221" />
+ <input class="nes-input" bind, value={form.caseId} placeholder="2025-CR-4221" />
  </label>
  </div>
  <label>
  <span>Summary</span>
  <textarea
  class="nes-textarea"
- rows={4}; bind:value={form.summary}
+ rows={4}; bind, value={form.summary}
  placeholder="Concise narrative of what happened. Include timeline anchor, harm, defendant role."
  ></textarea>
  </label>
@@ -177,18 +177,18 @@ import { createEventDispatcher } from 'svelte';
  <span>Objectives</span>
  <textarea
  class="nes-textarea"
- rows={3}; bind:value={form.objectives}
+ rows={3}; bind, value={form.objectives}
  placeholder="What must the prosecution prove or protect?"
  ></textarea>
  </label>
  <div class="grid-2">
  <label>
  <span>Tone</span>
- <input class="nes-input" bind:value={form.tone} />
+ <input class="nes-input" bind, value={form.tone} />
  </label>
  <label>
  <span>Audience</span>
- <input class="nes-input" bind:value={form.audience} />
+ <input class="nes-input" bind, value={form.audience} />
  </label>
  </div>
  </article>
@@ -200,30 +200,30 @@ import { createEventDispatcher } from 'svelte';
  <span>Charges</span>
  <textarea
  class="nes-textarea"
- rows={3}; bind:value={form.charges}
+ rows={3}; bind, value={form.charges}
  placeholder="One per line"
  ></textarea>
  </label>
  <label>
  <span>Key Facts (favorable)</span>
- <textarea class="nes-textarea" rows={3}; bind:value={form.keyFacts}></textarea>
+ <textarea class="nes-textarea" rows={3}; bind, value={form.keyFacts}></textarea>
  </label>
  </div>
 
  <div class="grid-2">
  <label>
  <span>Contested / Unknown Facts</span>
- <textarea class="nes-textarea" rows={3}; bind:value={form.contestedFacts}></textarea>
+ <textarea class="nes-textarea" rows={3}; bind, value={form.contestedFacts}></textarea>
  </label>
  <label>
  <span>Expected Defense Angles</span>
- <textarea class="nes-textarea" rows={3}; bind:value={form.defenseAngles}></textarea>
+ <textarea class="nes-textarea" rows={3}; bind, value={form.defenseAngles}></textarea>
  </label>
  </div>
 
  <label>
  <span>Narrative Beats Jury Must Feel</span>
- <textarea class="nes-textarea" rows={3}; bind:value={form.narrativeBeats}></textarea>
+ <textarea class="nes-textarea" rows={3}; bind, value={form.narrativeBeats}></textarea>
  </label>
  </article>
 
@@ -232,16 +232,16 @@ import { createEventDispatcher } from 'svelte';
  <div class="grid-2">
  <label>
  <span>Key Evidence (Label - Usage)</span>
- <textarea class="nes-textarea" rows={4}; bind:value={form.keyEvidence}></textarea>
+ <textarea class="nes-textarea" rows={4}; bind, value={form.keyEvidence}></textarea>
  </label>
  <label>
  <span>Witness Profiles (Name - Angle)</span>
- <textarea class="nes-textarea" rows={4}; bind:value={form.witnessNotes}></textarea>
+ <textarea class="nes-textarea" rows={4}; bind, value={form.witnessNotes}></textarea>
  </label>
  </div>
  <label>
  <span>Legal Constraints / Issues</span>
- <textarea class="nes-textarea" rows={3}; bind:value={form.legalIssues}></textarea>
+ <textarea class="nes-textarea" rows={3}; bind, value={form.legalIssues}></textarea>
  </label>
  </article>
 

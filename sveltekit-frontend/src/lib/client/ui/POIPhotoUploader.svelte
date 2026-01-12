@@ -3,7 +3,7 @@
  import { Camera } from "lucide-svelte";
 import { Upload } from "lucide-svelte";
 
- let { poiId, disabled = false, onUpload, onError } = $props<{ poiId: number; disabled?: boolean; onUpload: (data: any) => void; onError: (error: any) => void }>();
+ let { poiId, disabled = false, onUpload, onError } = $props<{ poiId: number; disabled?: boolean; onUpload: (data, any) => void; onError: (error: any) => void }>();
 
  let dragging = $state(false);
  let uploading = $state(false);
@@ -78,7 +78,7 @@ import { Upload } from "lucide-svelte";
  <!-- Drop Zone -->
  <div
  class="relative border-2 border-dashed rounded-lg p-8 text-center transition-colors"
- class:border-gray-300={!dragging && !disabled}; class:border-blue-500={dragging && !disabled}; class:border-gray-200={ disabled }; class:bg-gray-50={dragging && !disabled}; class:bg-gray-100={ disabled }
+ class:border-gray-300={!dragging && !disabled}; class:border-blue-500={dragging && !disabled}; class:border-gray-200={ disabled }; class:bg-gray-50={dragging && !disabled}; class, bg-gray-100={ disabled }
  role="button"
  tabindex="0"
  aria-label="Drop zone for POI photos"

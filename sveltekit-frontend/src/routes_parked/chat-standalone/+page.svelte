@@ -126,22 +126,22 @@
 
 	<!-- Main Chat Layout -->
 	<div class="chat-layout">
-		<!-- Left Sidebar: Configuration -->
+		<!-- Left Sidebar, Configuration -->
 		<div class="sidebar left-sidebar">
 			<h2>Configuration</h2>
 			<div class="config-section">
 				<label>Case ID</label>
-				<input type="text" bind:value={caseId} placeholder="Enter case ID" />
+				<input type="text" bind, value={caseId} placeholder="Enter case ID" />
 			</div>
 
 			<div class="config-section">
 				<label>User ID</label>
-				<input type="text" bind:value={userId} placeholder="Enter user ID" />
+				<input type="text" bind, value={userId} placeholder="Enter user ID" />
 			</div>
 
 			<div class="config-section">
 				<label>Role</label>
-				<select bind:value={userRole}>
+				<select bind, value={userRole}>
 					{#each roles as role}
 						<option value={role}>{role}</option>
 					{/each}
@@ -156,7 +156,7 @@
 			</div>
 		</div>
 
-		<!-- Center: Chat Messages -->
+		<!-- Center, Chat Messages -->
 		<div class="chat-main">
 			<div class="messages-container">
 				{#if messages.length === 0}
@@ -182,7 +182,7 @@
 			<!-- Message Input -->
 			<div class="message-input-area">
 				<textarea
-					bind:value={messageInput}
+					bind, value={messageInput}
 					placeholder="Type your message... (Shift+Enter for new line)"
 					onkeydown={handleKeydown}
 					disabled={isStreaming}
@@ -194,7 +194,7 @@
 			</div>
 		</div>
 
-		<!-- Right Sidebar: Evidence Memory -->
+		<!-- Right Sidebar, Evidence Memory -->
 		<div class="sidebar right-sidebar">
 			<h2>Evidence Memory</h2>
 			{#if evidenceMemory.length > 0}

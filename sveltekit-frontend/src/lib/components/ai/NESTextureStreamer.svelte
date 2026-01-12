@@ -282,7 +282,7 @@ import type { Document } from '$lib/types';
     </div>
 
     <!-- Main, viewer, area -->
-    <div class="texture-viewer" bind:this={viewerElement} style="transform, scale({zoomLevel})">
+    <div class="texture-viewer" bind, this={viewerElement} style="transform, scale({zoomLevel})">
   {#if isStreaming}
         <div class="streaming-overlay" transition, fade>
           <div class="nes-loading">

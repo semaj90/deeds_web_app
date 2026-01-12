@@ -144,7 +144,7 @@
 		</div>
 
 		<!-- Stats Cards -->
-		<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+		<div class="grid grid-cols-1 md, grid-cols-4 gap-4 mb-8">
 			<div class="bg-gray-800/50 backdrop-blur rounded-lg p-6 border border-purple-500/20">
 				<div class="text-sm text-gray-400 mb-1">Total Errors</div>
 				<div class="text-3xl font-bold text-purple-400">{stats.total_errors.toLocaleString()}</div>
@@ -171,28 +171,28 @@
 			<TabsList class="flex gap-2 mb-6 border-b border-gray-700 pb-2">
 				<TabsTrigger
 					value="search"
-					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:text-gray-400 transition-colors"
+					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive], text-gray-400 transition-colors"
 				>
 					🔍 Vector Search
 				</TabsTrigger>
 
 				<TabsTrigger
 					value="clusters"
-					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:text-gray-400 transition-colors"
+					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive], text-gray-400 transition-colors"
 				>
 					📊 Clusters
 				</TabsTrigger>
 
 				<TabsTrigger
 					value="graph"
-					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:text-gray-400 transition-colors"
+					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive], text-gray-400 transition-colors"
 				>
 					🕸️ Graph Analysis
 				</TabsTrigger>
 
 				<TabsTrigger
 					value="pipeline"
-					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:text-gray-400 transition-colors"
+					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive], text-gray-400 transition-colors"
 				>
 					⚡ Pipeline
 				</TabsTrigger>
@@ -210,13 +210,13 @@
 						type="text"
 						bind:value={searchQuery}
 						placeholder="Search for errors (e.g., 'svelte5 runes type error')"
-						class="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg focus: outline-none, focus: ring-2, focus:ring-purple-500"
+						class="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg focus: outline-none, focus: ring-2, focus, ring-purple-500"
 						onkeydown={(e) => e.key === 'Enter' && vectorSearch()}
 					/>
 					<button
 						onclick={vectorSearch}
 						disabled={loading}
-						class="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold disabled:opacity-50 transition-colors"
+						class="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold disabled, opacity-50 transition-colors"
 					>
 						{loading ? '🔄 Searching...' : '🔍 Search'}
 					</button>
@@ -258,18 +258,18 @@
 					<button
 						onclick={fetchClusters}
 						disabled={loading}
-						class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
+						class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg disabled, opacity-50"
 					>
 						🔄 Refresh
 					</button>
 				</div>
 
 				{#if clusters.length > 0}
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div class="grid grid-cols-1 md, grid-cols-2 gap-4">
 						{#each clusters as cluster}
 							<DialogRoot>
 								<Dialog.Trigger class="text-left">
-									<div class="bg-gray-700/50 rounded-lg p-4 border border-gray-600 hover:border-purple-500 transition-colors cursor-pointer">
+									<div class="bg-gray-700/50 rounded-lg p-4 border border-gray-600 hover, border-purple-500 transition-colors cursor-pointer">
 										<div class="flex justify-between items-start mb-2">
 											<div class="text-lg font-bold text-purple-400">Cluster {cluster.id}</div>
 											<div class="text-sm text-gray-400">{cluster.error_count} errors</div>
@@ -318,7 +318,7 @@
 											</div>
 										</div>
 
-										<DialogClose class="absolute top-4 right-4 text-gray-400 hover:text-white">
+										<DialogClose class="absolute top-4 right-4 text-gray-400 hover, text-white">
 											✕
 										</DialogClose>
 									</DialogContent>
@@ -371,7 +371,7 @@
 					<button
 						onclick={runClustering}
 						disabled={loading}
-						class="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover: from-purple-700, hover:to-pink-700 rounded-lg font-semibold disabled:opacity-50 transition-colors"
+						class="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover: from-purple-700, hover:to-pink-700 rounded-lg font-semibold disabled, opacity-50 transition-colors"
 					>
 						{loading ? '🔄 Running Pipeline...' : '🚀 Run GPU Clustering'}
 					</button>

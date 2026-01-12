@@ -19,7 +19,7 @@ export interface DynamicRouteConfig {
  pattern: string; template: string;
  component?: string;
  layout?: string;
- params?: Record<string, { optional?: boolean; type?: string }>;
+ params?: Record<string, { optional?: boolean; type?, string }>;
  preload?: boolean;
  ssr?: boolean;
  hydrate?: boolean;
@@ -29,7 +29,7 @@ export interface DynamicRouteConfig {
 export interface GeneratedRoute {
  id: string; path: string;
  component: string;
- layout?: string; params: Record<string, { optional?: boolean; type?: string }>;
+ layout?: string; params: Record<string, { optional?: boolean; type?, string }>;
  metadata: {
  category?: string;
  status?: string;
@@ -142,8 +142,8 @@ export class DynamicRouteGenerator {
  return `routes/${p}/+page.svelte`;
  }
 
- private extractParams(routePath: string): Record<string, { optional?: boolean; type?: string }> {
- const params: Record<string, { optional?: boolean; type?: string }> = {};
+ private extractParams(routePath: string): Record<string, { optional?: boolean; type?, string }> {
+ const params: Record<string, { optional?: boolean; type?, string }> = {};
  if (!routePath) return params;
 
  // handle Svelte-style segments: [id], [[id]] (optional), [...rest]
@@ -230,7 +230,7 @@ export class DynamicRouteGenerator {
  string,
  {
  id: string; component: string;
- layout?: string; params: Record<string, { optional?: boolean; type?: string }>;
+ layout?: string; params: Record<string, { optional?: boolean; type?, string }>;
  metadata: GeneratedRoute['metadata'];
  }
  > {
@@ -238,7 +238,7 @@ export class DynamicRouteGenerator {
  string,
  {
  id: string; component: string;
- layout?: string; params: Record<string, { optional?: boolean; type?: string }>;
+ layout?: string; params: Record<string, { optional?: boolean; type?, string }>;
  metadata: GeneratedRoute['metadata'];
  }
  > = {};

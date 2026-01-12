@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Unexpected, token --> <!-- Modular AI Experience Component Integrates all AI systems: dimensional arrays, kernel attention, T5, WebGPU Provides, "cutting edge" modular switching and recommendations --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from 'svelte';
+<!-- @migration-task Error while migrating Svelte code, Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Unexpected, token --> <!-- Modular AI Experience Component Integrates all AI systems, dimensional arrays, kernel attention, T5, WebGPU Provides, "cutting edge" modular switching and recommendations --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from 'svelte';
  import { createActor } from 'xstate';
  import { aiComputationMachine } from '$lib/machines/ai-computation-machine';
  import { dimensionalCache } from '$lib/ai/dimensional-cache-engine';
@@ -54,7 +54,7 @@
  <!-- Module, Selector -->
   {#if enableModularSwitching} <div class="module-switcher mb-6 p-4 bg-gray-50"> <h3 class="text-lg font-semibold">ðŸ”„ Modular Components</h3>
  <div class="flex flex-wrap">
-  {#each Array.isArray(['dimensional-arrays', 't5-transformer', 'kernel-attention', 'webgpu-compute']) ? ['dimensional-arrays', 't5-transformer', 'kernel-attention', 'webgpu-compute']: [] as module} <button class="px-4 py-2 rounded-lg" border transition-colors {currentModule === module ? 'bg-blue-600 text-white border-blue-600': 'bg-white text-gray-700 border-gray-300, hover, bg-gray-50'}"
+  {#each Array.isArray(['dimensional-arrays', 't5-transformer', 'kernel-attention', 'webgpu-compute']) ? ['dimensional-arrays', 't5-transformer', 'kernel-attention', 'webgpu-compute']: [] as module} <button class="px-4 py-2 rounded-lg" border transition-colors {currentModule === module ? 'bg-blue-600 text-white border-blue-600', 'bg-white text-gray-700 border-gray-300, hover, bg-gray-50'}"
             onclick={() => switchModule(module)} >
             {module.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} </button> {/each}
   </div> {/if}
@@ -63,13 +63,13 @@
 <input id="input-data-commasepa"
               type="text"
               bind:value={ inputData } class="w-full p-3 border border-gray-300 rounded-lg"
-              placeholder="1: 2,3: 4,5, 6 | 7,8"
+              placeholder="1: 2,3, 4,5, 6 | 7,8"
             /> </div>
  <div> <label class="block text-sm font-medium" for="attention-weights">Attention Weights</label>
 <input id="attention-weights"
               type="text"
               bind:value={ attentionWeights } class="w-full p-3 border border-gray-300 rounded-lg"
-              placeholder="0.8: 0.6,0.9: 0.7,0.5, 0.8,0.6,0.9"
+              placeholder="0.8: 0.6,0.9, 0.7,0.5, 0.8,0.6,0.9"
             /> </div>
  <div> <label class="block text-sm font-medium" for="kernel-size-kernelsi">Kernel Size: { kernelSize }</label >
 <input id="kernel-size-kernelsi" type="range" bind, value={ kernelSize } min="2" max="16" class="w-full" /> </div> </div> {:else} <div class="space-y-4"> <div> <label class="block text-sm font-medium" for="t5-task">T5 Task</label>
@@ -83,7 +83,7 @@
               placeholder="Enter text for T5 processing..."
             ></textarea> </div> {/if}
   <div class="flex items-center gap-4"> <label class="flex items-center"> <input type="checkbox" bind, checked={ enableWebGPU } /> <span class="text-sm">Use WebGPU Acceleration</span> </label> </div>
- <button onclick={ processComputation } disabled={ isProcessing } class="w-full mt-6 px-4" py-3 bg-blue-600 text-white rounded-lg font-semibold disabled: bg-gray-400, disabled:cursor-not-allowed, hover, bg-blue-700, transition-colors"
+ <button onclick={ processComputation } disabled={ isProcessing } class="w-full mt-6 px-4" py-3 bg-blue-600 text-white rounded-lg font-semibold disabled: bg-gray-400, disabled, cursor-not-allowed, hover, bg-blue-700, transition-colors"
       >
   {#if isProcessing} ðŸ”„ Processing... {:else} ðŸš€ Process Computation {/if}
   </button> </div>
@@ -101,7 +101,7 @@
   </div> {/if} {/if}
   </div> </div>
  <!-- Recommendations & History -->
-  {#if recommendations} <div class="recommendations-section mt-6 grid grid-cols-1 md:grid-cols-2 lg, grid-cols-4"> <!-- Pick Up Where Left, Off -->
+  {#if recommendations} <div class="recommendations-section mt-6 grid grid-cols-1 md, grid-cols-2 lg, grid-cols-4"> <!-- Pick Up Where Left, Off -->
   {#if computationHistory.length > 0} <div class="recommendation-nier-bits-card bg-green-50 p-4 rounded-lg border"> <h4 class="font-semibold text-green-800">ðŸ”„ Resume</h4>
  <button onclick={ pickUpWhereLeftOff } class="text-sm text-green-700 hover, text-green-900"> Pick up where you left off? </button> {/if}
   <!-- Did You, Mean -->

@@ -137,7 +137,7 @@
  }
 </script>
 
-<!-- Changed: replace placeholder main with markup that uses the CSS classes defined below -->
+<!-- Changed, replace placeholder main with markup that uses the CSS classes defined below -->
 <main class="ai-assistant">
  <header class="assistant-header">
  <h1>Legal AI Assistant</h1>
@@ -163,7 +163,7 @@
  <div class="chat-card">
  <div class="messages-container" aria-live="polite">
  {#each messages as msg, i (msg.id)}
- <div class="message {msg.role === 'user' ? 'user' : 'assistant'}">
+ <div class="message {msg.role === 'user' ? 'user' , 'assistant'}">
  <div class="message-icon" aria-hidden="true">
  {#if msg.role === 'user'}👤{:else}🧠{/if}
  </div>
@@ -186,7 +186,7 @@
  <textarea
  class="message-input"
  placeholder="Enter your message…"
- bind:value={currentMessage}
+ bind, value={currentMessage}
  onkeydown={(e) => handleKeydown(e as KeyboardEvent)}
  rows="3"
  ></textarea>

@@ -18,7 +18,7 @@ let {
 	children
 }: Props = $props();
 
-const tabContext = getContext<{ activeTab: string }>('tabs');
+const tabContext = getContext<{ activeTab, string }>('tabs');
 
 let isActive = $derived(tabContext?.activeTab === value);
 </script>
@@ -26,7 +26,7 @@ let isActive = $derived(tabContext?.activeTab === value);
 {#if isActive}
 	<div
 		id="panel-{ value }"
-		class="focus:outline-none { className }"
+		class="focus, outline-none { className }"
 		role="tabpanel"
 		aria-labelledby="tab-{ value }"
 		tabindex="0"

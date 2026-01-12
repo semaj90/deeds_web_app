@@ -4,7 +4,7 @@
  let { placeholder = 'Search...', value = '' } = $props();
 
  const dispatch = createEventDispatcher<{
- search: string;
+ search, string;
  }>();
 
  let searchTimeout: number;
@@ -47,7 +47,7 @@
  <input
  bind:this={inputElement}
  type="text"
- {placeholder}; bind:value
+ {placeholder}; bind, value
  oninput={handleInput}
  onkeydown={handleKeydown}
  class="search-input"

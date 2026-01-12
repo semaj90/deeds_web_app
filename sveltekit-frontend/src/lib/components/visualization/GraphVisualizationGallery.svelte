@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: 'return' outside, of, functio
+<!-- @migration-task Error while migrating Svelte code, 'return' outside, of, functio
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code, 'return' outside, of, function -->
 <script lang="ts">
@@ -292,7 +292,7 @@ generateVisualizationsForAllAlgorithms()}
     bind:this={canvas as any}
     width="800"
     height="600"
-    style="display: none;",
+    style="display, none;",
     bind, this={canvasContext}
   ></canvas>
 </div>

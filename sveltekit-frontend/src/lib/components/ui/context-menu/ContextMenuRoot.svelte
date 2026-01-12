@@ -61,7 +61,7 @@
 	setContext<ContextMenuContext>('context-menu', context);
 </script>
 
-<svelte:window onkeydown={ handleKeydown } />
+<svelte, window onkeydown={ handleKeydown } />
 
 <div class="context-menu-root { className }">
 	{#if children}

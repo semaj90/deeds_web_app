@@ -8,7 +8,7 @@ interface SuggestFixRequest {
  errors?: Array<{ code: string;
  message: string; severity: string;
  file_path?: string;
- line?: number;
+ line?, number;
  }>;
  context?: string;
 }

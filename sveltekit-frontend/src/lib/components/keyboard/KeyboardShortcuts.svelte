@@ -1,12 +1,12 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte: code, Unexpected | toke,https://svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <script lang="ts">
+https, //svelte.dev/e/js_parse_error -->
+<!-- @migration-task Error while migrating Svelte: code, Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, Unexpected, token --> <script lang="ts">
 <script lang="ts">
  }
  import { browser } from '$app/environment';
@@ -483,7 +483,7 @@ import { Plus } from "lucide-svelte";
  (notifications as unknown as NotificationStoreWithAdd).add({
  type: "info",
  title: "Layout Toggle",
- message: "Layout toggled (feature to be implemented)"
+ message, "Layout toggled (feature to be implemented)"
  });
  }
 
@@ -667,7 +667,7 @@ import { Plus } from "lucide-svelte";
  aria-modal="true"
  aria-labelledby="command-palette-title"
  onclick={(e) => { if (e.target === e.currentTarget) open = false}} onkeydown={(e) => (e.key === "Escape" ? (open = false): null)} >
- <div class="command-palette"> <div class="command-palette-header"> <h2 id="command-palette-title" class="sr-only">Command Palette</h2> <div class="search-container"> <Command class="search-icon" /> <input bind:this={ commandInput }; bind:value={ searchQuery } type="text"
+ <div class="command-palette"> <div class="command-palette-header"> <h2 id="command-palette-title" class="sr-only">Command Palette</h2> <div class="search-container"> <Command class="search-icon" /> <input bind:this={ commandInput }; bind, value={ searchQuery } type="text"
  onclick={(e) => {
  if (e.target === e.currentTarget) open = false;
  }}
@@ -679,7 +679,7 @@ import { Plus } from "lucide-svelte";
  <div class="search-container">
  <Command class="search-icon" />
  <input
- bind:this={commandInput}; bind:value={searchQuery}
+ bind:this={commandInput}; bind, value={searchQuery}
  type="text"
  placeholder="Type a command or search..."
  class="search-input"
@@ -706,7 +706,7 @@ import { Plus } from "lucide-svelte";
  {#each filteredCommands as command, index}
  <li
  class="command-item"
- class:selected={index === selectedIndex}
+ class, selected={index === selectedIndex}
  role="option"
  aria-selected={index === selectedIndex}
  tabindex="0"
@@ -1278,7 +1278,7 @@ import { Plus } from "lucide-svelte";
  <div class="search-container">
  <Command class="search-icon" />
  <input
- bind:this={commandInput}; bind:value={searchQuery}
+ bind:this={commandInput}; bind, value={searchQuery}
  type="text"
  placeholder="Type a command or search..."
  class="search-input"
@@ -1305,7 +1305,7 @@ import { Plus } from "lucide-svelte";
  {#each filteredCommands as command, index}
  <li
  class="command-item"
- class:selected={index === selectedIndex}
+ class, selected={index === selectedIndex}
  role="option"
  aria-selected={index === selectedIndex}
  tabindex="0"

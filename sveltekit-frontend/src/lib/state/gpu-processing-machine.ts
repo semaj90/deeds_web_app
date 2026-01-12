@@ -41,7 +41,7 @@ export interface ProcessingMetrics {
 
 // Machine Context interface
 interface GPUProcessingContext {
- processingQueue: DocumentInput[]; activeProcessing: Map<string: DocumentInput>; completedDocuments: ProcessingResult[];
+ processingQueue: DocumentInput[]; activeProcessing: Map<string, DocumentInput>; completedDocuments: ProcessingResult[];
  errorDocuments: ProcessingResult[]; serviceHealth: ServiceHealth;
  metrics: ProcessingMetrics; maxConcurrent: number;
  retryCount: Map<string, number>;
@@ -78,7 +78,7 @@ const canRetry = ({ context, event }: { context: GPUProcessingContext; event: an
 };
 
 // Actions
-const addToQueue = ({ context, event }: { context: GPUProcessingContext; event: any }) => {
+const addToQueue = ({ context, event }: { context: GPUProcessingContext; event, any }) => {
  if (event.type === 'PROCESS_DOCUMENT') {
  context.processingQueue.push({
  documentId: event.documentId,

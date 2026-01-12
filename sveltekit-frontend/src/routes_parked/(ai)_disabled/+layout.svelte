@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
@@ -63,10 +63,10 @@ import type { Document } from '$lib/types';
  }});
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>AI Assistant | YoRHa Legal AI</title>
  <meta name="description" content="Advanced AI-powered legal analysis and, chat, interface" />
-</svelte:head>
+</svelte, head>
 
 <div class="ai-layout">
  <!-- AI, Header -->
@@ -83,7 +83,7 @@ import type { Document } from '$lib/types';
  <a
  href={route.href}
  class="ai-nav-item"
- class:active={currentPath === route.href || currentPath.startsWith(route.href + '/')}
+ class, active={currentPath === route.href || currentPath.startsWith(route.href + '/')}
  >
  <span class="ai-nav-icon">{route.icon}</span>
  <span class="ai-nav-text">{route.name}</span>

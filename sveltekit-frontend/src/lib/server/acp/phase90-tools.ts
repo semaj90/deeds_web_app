@@ -22,7 +22,7 @@ interface QdrantClientExt extends QdrantClient {
     filter?: unknown;
     with_payload?: boolean;
   }): Promise<{ points: Array<{ id: string | number; payload?: Record<string, unknown> }> }>;
-  getCollection(collection_name: string): Promise<{ points_count?: number }>;
+  getCollection(collection_name: string): Promise<{ points_count?, number }>;
 }
 
 // Extended Redis client type for methods that may vary by version
@@ -267,7 +267,7 @@ export async function phase90_get_cluster(clusterId: number): Promise<ClusterInf
   };
 }
 
-export async function phase90_get_fix_order(): Promise<{ clusterId: number; errorCount: number; priority: number }[]> {
+export async function phase90_get_fix_order(): Promise<{ clusterId: number; errorCount: number; priority, number }[]> {
   const client = await getQdrant();
 
   // Get all clusters
@@ -332,7 +332,7 @@ export async function phase90_query_glyphs(
 }
 
 export async function phase90_get_stats(): Promise<{ qdrant: { embeddings: number; clusters: number; recommendations: number };
-  redis: { totalKeys: number; glyphKeys: number; embedKeys: number };
+  redis: { totalKeys: number; glyphKeys: number; embedKeys, number };
 }> {
   const qdrantClient = await getQdrant();
   const redisClient = await getRedis();
@@ -399,7 +399,7 @@ export async function phase90_get_file_errors(
 
 export async function phase90_get_fix_recommendation(clusterId: number): Promise<{ clusterId: number;
   recommendation: string; priority: string;
-  affectedFiles: string[];
+  affectedFiles, string[];
 } | null> {
   const client = await getQdrant();
 

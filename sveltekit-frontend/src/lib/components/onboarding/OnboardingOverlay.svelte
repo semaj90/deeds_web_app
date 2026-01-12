@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, Unexpected, token --> <script lang="ts"> // Svelte, 5 runes are auto-imported // @ts-nocheck import { onMount } from 'svelte';
+<!-- @migration-task Error while migrating Svelte, code, Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, Unexpected, token --> <script lang="ts"> // Svelte, 5 runes are auto-imported // @ts-nocheck import { onMount } from 'svelte';
  import { browser } from "$app/environment";
  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import { ArrowLeft, ArrowRight, Check, Lightbulb, MousePointer, Pause, Play, SkipForward, Target, X
@@ -59,7 +59,7 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
  <!-- Highlight box for, target, element -->
   {#if highlightBox} <div class="w-4"
         style="
-          top: {highlightBox.top}px; left: {highlightBox.left}px; width: {highlightBox.width}px; height, {highlightBox.height}px
+          top: {highlightBox.top}px; left: {highlightBox.left}px; width, {highlightBox.width}px; height, {highlightBox.height}px
         "
       >{/if}
   <!-- Tooltip/Content, card --> <div class="w-4"

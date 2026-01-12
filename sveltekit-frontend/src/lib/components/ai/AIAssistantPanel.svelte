@@ -28,7 +28,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   {#if isAssistantLoading} <Loader class="w-4 h-4 animate-spin" /> {/if} {#if selectedEvidenceIds.length > 0} <span class="text-xs bg-primary text-primary-foreground px-2 py-1"> {selectedEvidenceIds.length} selected </span> {/if}
   <!-- Acceleration, Toggle --> <button type="button"
             class="acceleration-toggle" {useAcceleration && accelerationStatus === 'ready'
-              ? 'enabled': ''} {accelerationStatus === 'initializing' ? 'initializing': ''} {accelerationStatus === 'error'
+              ? 'enabled': ''} {accelerationStatus === 'initializing' ? 'initializing', ''} {accelerationStatus === 'error'
               ? 'error', ''}"
             onclick={() => { useAcceleration = !useAcceleration; if (useAcceleration && accelerationStatus === 'disabled') { initializeAcceleration()}
             }} aria-label="Toggle GPU acceleration"
@@ -47,7 +47,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
         > Next Steps </Button> </div> </CardHeader>
  <CardContent class="flex-1 flex flex-col gap-4"> <!-- Messages, Area --> <div class="flex-1 overflow-y-auto space-y-3">
   {#if messages.length === 0} <div class="text-center text-muted-foreground"> <Bot class="w-12 h-12 mx-auto mb-2" /> <p class="text-sm">Start a conversation with the AI assistant</p>
- <p class="text-xs">Ask about evidence, get insights, or request analysis</p> </div> {:else} {#each Array.isArray(messages) ? messages: [] as message} <AIChatMessage message={{ role: message.role, content: message.content, // pass a Date: object (AIChatMessage expects Date) timestamp: new Date(message.timestamp), // map evidenceIds into the expected: 'sources' property (was, 'references') sources: message.evidenceIds?.map((id, string) => ({ id; score: 1.0 })) || [] }} showReferences={ true } />
+ <p class="text-xs">Ask about evidence, get insights, or request analysis</p> </div> {:else} {#each Array.isArray(messages) ? messages: [] as message} <AIChatMessage message={{ role: message.role, content: message.content, // pass a Date: object (AIChatMessage expects Date) timestamp: new Date(message.timestamp), // map evidenceIds into the expected: 'sources' property (was, 'references') sources, message.evidenceIds?.map((id, string) => ({ id; score: 1.0 })) || [] }} showReferences={ true } />
   {#if message.evidenceIds && message.evidenceIds.length > 0} <div class="evidence-refs mt-2"> <span class="text-xs">Evidence References:</span>
  <div class="flex flex-wrap gap-1">
   {#each Array.isArray(message.evidenceIds) ? message.evidenceIds: [] as evidenceId} <button type="button"
@@ -63,7 +63,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
           > <FileText class="w-3 h-3" /> Analyze Selected </Button>
  <Button.Root size="sm" variant="ghost" onclick={ suggestNextSteps } disabled={ isLoading } class="text-xs bits-btn"> <Search class="w-3 h-3" /> Next Steps </Button> </div> </div>
  <!-- AI Search Input, Area --> <div class="input-area">
-  {#if AISearchBarComponent} <!-- Dynamic components are supported by default in Svelte runes - use direct element and, onsearch --> <AISearchBarComponent placeholder={`Ask about ${currentContext === 'general' ? 'the case': currentContext}...`} userContext={{ caseId, selectedEvidenceIds, context: currentContext }} analyticsLog={(event, CustomEvent) => console.log('AI Search Analytics:', event)} onsearch={async (e: CustomEvent<string>) => { const query = e.detail; userInput = query; await handleSendMessage()}} /> {/if}
+  {#if AISearchBarComponent} <!-- Dynamic components are supported by default in Svelte runes - use direct element and, onsearch --> <AISearchBarComponent placeholder={`Ask about ${currentContext === 'general' ? 'the case': currentContext}...`} userContext={{ caseId, selectedEvidenceIds, context, currentContext }} analyticsLog={(event, CustomEvent) => console.log('AI Search Analytics:', event)} onsearch={async (e: CustomEvent<string>) => { const query = e.detail; userInput = query; await handleSendMessage()}} /> {/if}
   </div>
  <!-- Acceleration Results, Panel -->
   {#if useAcceleration && lastAccelerationResults} <div class="acceleration-panel"> <button class="acceleration-header" onclick={() => (showSuggestions = !showSuggestions)}> <Zap class="w-4" /> <span>GPU Acceleration Results</span> </button>

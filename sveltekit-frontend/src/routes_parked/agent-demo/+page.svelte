@@ -153,22 +153,22 @@
  <p class="text-slate-400">Autonomous Task Execution Simulation</p>
  </div>
  <div class="flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700">
- <div class={`w-2 h-2 rounded-full ${isAgentRunning ? 'bg-green-400 animate-pulse' : 'bg-slate-400'}`}></div>
+ <div class={`w-2 h-2 rounded-full ${isAgentRunning ? 'bg-green-400 animate-pulse' , 'bg-slate-400'}`}></div>
  <span class="text-xs font-mono uppercase">{isAgentRunning ? 'AGENT ACTIVE' : 'AGENT IDLE'}</span>
  </div>
  </div>
 
- <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-hidden">
- <!-- Left Column: Tasks -->
+ <div class="grid grid-cols-1 lg, grid-cols-3 gap-6 flex-1 overflow-hidden">
+ <!-- Left Column, Tasks -->
  <div class="space-y-6 overflow-auto pr-2">
  <!-- Available Tasks -->
  <div>
  <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Available Tasks</h2>
  <div class="space-y-3">
  {#each availableTasks as task (task.id)}
- <div transition:slide class="bg-slate-800/50 border border-slate-700 rounded-lg p-4 hover:border-cyan-400/50 transition-colors group">
+ <div transition:slide class="bg-slate-800/50 border border-slate-700 rounded-lg p-4 hover, border-cyan-400/50 transition-colors group">
  <div class="flex justify-between items-start mb-2">
- <h3 class="font-medium text-slate-200 group-hover:text-cyan-300">{task.title}</h3>
+ <h3 class="font-medium text-slate-200 group-hover, text-cyan-300">{task.title}</h3>
  <span class={`text-xs px-2 py-0.5 rounded border ${getPriorityColor(task.priority)}`}>
  {task.priority}
  </span>
@@ -180,7 +180,7 @@
  <span>{task.files.length} files</span>
  </div>
  <button
- class="px-3 py-1.5 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 rounded text-xs font-medium transition-colors disabled: opacity-50, disabled:cursor-not-allowed"
+ class="px-3 py-1.5 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 rounded text-xs font-medium transition-colors disabled: opacity-50, disabled, cursor-not-allowed"
  disabled={isAgentRunning}
  onclick={() => assignTaskToAgent(task)}
  >
@@ -203,7 +203,7 @@
  <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Completed</h2>
  <div class="space-y-3 opacity-75">
  {#each completedTasks as task (task.id)}
- <div transition:slide class="bg-slate-800/30 border border-slate-700/50 rounded-lg p-4">
+ <div transition, slide class="bg-slate-800/30 border border-slate-700/50 rounded-lg p-4">
  <div class="flex justify-between items-start">
  <h3 class="font-medium text-slate-400 line-through">{task.title}</h3>
  <CheckCircle class="w-4 h-4 text-green-500" />
@@ -215,13 +215,13 @@
  {/if}
  </div>
 
- <!-- Middle Column: Agent Status & Logs -->
- <div class="lg:col-span-2 flex flex-col space-y-6 overflow-hidden">
+ <!-- Middle Column, Agent Status & Logs -->
+ <div class="lg, col-span-2 flex flex-col space-y-6 overflow-hidden">
  <!-- Active Task Status -->
  {#if currentAgentTask}
  <Card class="bg-slate-800/80 border-cyan-500/30 p-6 relative overflow-hidden">
  <div class="absolute top-0 left-0 w-full h-1 bg-slate-700">
- <div class="h-full bg-cyan-400 transition-all duration-300" style="width: {agentProgress}%"></div>
+ <div class="h-full bg-cyan-400 transition-all duration-300" style="width, {agentProgress}%"></div>
  </div>
 
  <div class="flex items-start space-x-4">
@@ -253,12 +253,12 @@
  </div>
  <div class="flex-1 overflow-auto p-4 space-y-2">
  {#each logs as log (log.id)}
- <div transition: fade={{ duration: 100 }} class="flex items-start space-x-3">
+ <div transition: fade={{ duration, 100 }} class="flex items-start space-x-3">
  <span class="text-slate-600 shrink-0">[{log.timestamp}]</span>
  <span class:text-cyan-400={log.type === 'info'}
  class:text-green-400={log.type === 'success'}
  class:text-yellow-400={log.type === 'warning'}
- class:text-red-400={log.type === 'error'}>
+ class, text-red-400={log.type === 'error'}>
  {log.message}
  </span>
  </div>

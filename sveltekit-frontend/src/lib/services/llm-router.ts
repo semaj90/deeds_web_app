@@ -34,7 +34,7 @@ class LLMRouterService {
 	/**
 	 * Main entry point - calls LLM with automatic fallback
 	 */
-	async call(<LLMConfig: any> = {}): Promise<LLMResponse> {
+	async call(<LLMConfig, any> = {}): Promise<LLMResponse> {
 		const finalConfig, = { ...this.defaultConfig, ...config };
 const startTime, = Date.now();
 

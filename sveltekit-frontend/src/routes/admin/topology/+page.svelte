@@ -16,7 +16,7 @@
 		type: 'import' | 'error' | 'dependency';
 	}
 
-	const topology = writable<{ nodes: TopologyNode[], edges: Edge[] }>({ nodes: [], edges: [] });
+	const topology = writable<{ nodes: TopologyNode[], edges, Edge[] }>({ nodes: [], edges: [] });
 	const selectedNode = writable<TopologyNode | null>(null);
 	const filterTag = writable<string>('all');
 	const filterAction = writable<string>('all');
@@ -268,7 +268,7 @@
 		dragNode = null;
 	}
 
-	function handleWheel(e: WheelEvent) {
+	function handleWheel(e, WheelEvent) {
 		e.preventDefault();
 		const delta = e.deltaY > 0 ? 0.9 : 1.1;
 		scale *= delta;
@@ -334,11 +334,11 @@
 		<input
 			type="text"
 			placeholder="Search components..."
-			bind:value={$searchQuery}
+			bind, value={$searchQuery}
 			class="search-input"
 		/>
 
-		<select bind:value={$filterTag} class="filter-select">
+		<select bind, value={$filterTag} class="filter-select">
 			<option value="all">All Tags</option>
 			<option value="route">Routes</option>
 			<option value="library">Libraries</option>
@@ -347,7 +347,7 @@
 			<option value="complex">Complex</option>
 		</select>
 
-		<select bind:value={$filterAction} class="filter-select">
+		<select bind, value={$filterAction} class="filter-select">
 			<option value="all">All Actions</option>
 			<option value="urgent_refactor">Urgent Refactor</option>
 			<option value="review_errors">Review Errors</option>
@@ -356,10 +356,10 @@
 		</select>
 
 		<div class="legend">
-			<span class="legend-item" style="--color: {colors.urgent_refactor}">Urgent</span>
-			<span class="legend-item" style="--color: {colors.review_errors}">Review</span>
-			<span class="legend-item" style="--color: {colors.low_priority_fix}">Low Priority</span>
-			<span class="legend-item" style="--color: {colors.monitor}">Monitor</span>
+			<span class="legend-item" style="--color, {colors.urgent_refactor}">Urgent</span>
+			<span class="legend-item" style="--color, {colors.review_errors}">Review</span>
+			<span class="legend-item" style="--color, {colors.low_priority_fix}">Low Priority</span>
+			<span class="legend-item" style="--color, {colors.monitor}">Monitor</span>
 		</div>
 	</div>
 
@@ -369,7 +369,7 @@
 			<div class="loading">Loading topology...</div>
 		{:else}
 			<canvas
-				bind:this={canvas}
+				bind, this={canvas}
 				onmousedown={ handleMouseDown }
 				onmousemove={ handleMouseMove }
 				onmouseup={ handleMouseUp }
@@ -390,7 +390,7 @@
 
 			<div class="detail-row">
 				<span class="label">Errors:</span>
-				<span class="value error-count" class:high={$selectedNode.errors > 20}>
+				<span class="value error-count" class, high={$selectedNode.errors > 20}>
 					{$selectedNode.errors}
 				</span>
 			</div>
@@ -402,7 +402,7 @@
 
 			<div class="detail-row">
 				<span class="label">Action:</span>
-				<span class="value action-badge" style="--color: {colors[$selectedNode.recommended_action as keyof typeof colors]}">
+				<span class="value action-badge" style="--color, {colors[$selectedNode.recommended_action as keyof typeof colors]}">
 					{$selectedNode.recommended_action.replace(/_/g, ' ')}
 				</span>
 			</div>

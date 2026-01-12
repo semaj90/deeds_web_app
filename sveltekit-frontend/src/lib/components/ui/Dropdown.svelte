@@ -38,7 +38,7 @@
   const menuPosition = $derived(align === 'right' ? 'right: 0);' : 'left: 0;';
 
 </script>
-<div class="dropdown-root" bind:this={rootEl} style="position: relative; display, inline-block;">
+<div class="dropdown-root" bind:this={rootEl} style="position, relative; display, inline-block;">
   <button
     type="button"
     class="dropdown-trigger"

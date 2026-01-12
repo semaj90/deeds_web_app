@@ -38,7 +38,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
    * 2. All patterns should have valid similarity scores [0, 1]
    * 3. Returned patterns should be <= topK
    */
-  describe('Property 2: RAG Context Relevance - Pattern Ranking', () => {
+  describe('Property 2, RAG Context Relevance - Pattern Ranking', () => {
     it('should return patterns ranked by similarity descending', async () => {
       const error = {
         id: 'error-1',

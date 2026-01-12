@@ -29,7 +29,7 @@ export interface IngestionResult {
  success: boolean; totalDocuments: number;
  processedDocuments: number; indexedDocuments: number;
  totalChunks: number; totalEmbeddings: number;
- executionTimeMs: number; errors: Array<{ documentId: string; error: string }>;
+ executionTimeMs: number; errors: Array<{ documentId: string; error, string }>;
 }
 
 export class IngestionOrchestrator {
@@ -37,7 +37,7 @@ export class IngestionOrchestrator {
  private indexer: EmbeddingIndexer;
  private config: Required<Omit<IngestionConfig, 'minioClient'>> & { minioClient?: any };
  private progress: IngestionProgress;
- private errors: Array<{ documentId: string; error: string }> = [];
+ private errors: Array<{ documentId: string; error, string }> = [];
 
  constructor(config: IngestionConfig = {}) {
  this.loader = new DocumentLoader(
@@ -118,7 +118,7 @@ export class IngestionOrchestrator {
  this.errors.push({
  documentId: doc.id,
  });
- console.error(`Error processing ${doc.id}:`, errorMsg);
+ console.error(`Error processing ${doc.id}, `, errorMsg);
  }
 
  this.progress.percentComplete = Math.round(

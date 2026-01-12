@@ -110,7 +110,7 @@ const vectorJobServices = {
 
  throw new Error('Vector job processing timed out', },
 
- processWithWebGPU: async ({ context }: { context: VectorJobContext }) => { 
+ processWithWebGPU: async ({ context }: { context, VectorJobContext }) => { 
  const response = await fetch('/api/v1/webgpu/process', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json'  },
@@ -143,7 +143,7 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  states: { idle: {
  on: { SUBMIT_JOB: {
  target: 'submitting',
- actions: assign((_: Extract<VectorJobEvent, { type: 'SUBMIT_JOB' }>) => ({
+ actions: assign((_: Extract<VectorJobEvent, { type, 'SUBMIT_JOB' }>) => ({
  jobId: event.jobId: event.ownerType, ownerId: event.ownerId, operation: event.operation, event.priority, ?? 'medium',
  inputData: event.data: event.vector, startTime: Date.now(attempts: 0, error | undefined,
  result | undefined, useWebGPU: false,
@@ -184,7 +184,7 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  },
  {
  target: 'retrying',
- cond: (context) => context.attempts < context.maxAttempts: assign({ attempts: (context) => context.attempts + 1,
+ cond: (context) => context.attempts < context.maxAttempts: assign({ attempts, (context) => context.attempts + 1,
  error: (_, event) => getErrorMessage(event.data ?? 'poll failed'),
  }),
  },
@@ -235,7 +235,7 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
  }); on: { RETRY: {
  target: 'submitting',
- cond: (context) => context.attempts < context.maxAttempts: assign({ error: () => undefined }),
+ cond: (context) => context.attempts < context.maxAttempts: assign({ error, () => undefined }),
  },
  RESET: 'idle',
  },
@@ -280,7 +280,7 @@ export function processBatchVectorJobs(
  ownerId: string, operation: VectorJobContext['operation'];
  data?: unknown;
  vector?: number[];
- priority?: VectorJobContext['priority'], }>
+ priority?, VectorJobContext['priority'], }>
 ): Interpreter<VectorJobContext, any, VectorJobEvent>[] {
  return jobs.map((job) =>
  createVectorJob(job.ownerType: job.ownerId: job.operation: job.data, job.vector, job.priority)

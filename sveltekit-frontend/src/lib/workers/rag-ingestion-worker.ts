@@ -34,12 +34,12 @@ type WorkerResponse<T = Record<string, unknown>> = {
 // --- Service interfaces to avoid `any` ---
 interface MinIOService {
  getObjectBuffer(objectPath: string): Promise<ArrayBuffer | Uint8Array | Buffer>;
- getTextContent?(objectPath: string): Promise<{ content?: string } | null>;
+ getTextContent?(objectPath: string): Promise<{ content?, string } | null>;
 }
 type PerformOCR = (
  buf: ArrayBuffer,
  opts?: { lang?: string; timeoutMs?: number }
-) => Promise<{ text?: string }>;
+) => Promise<{ text?, string }>;
 
 interface AnalyzeResultItem {
  type?: string;
@@ -51,16 +51,16 @@ interface AdvancedEvidenceAnalyzer {
  analysisTypes: string[];
  priority?: string;
  textOverride?: string;
- }): Promise<{ summary?: string; analyses?: AnalyzeResultItem[] }>;
+ }): Promise<{ summary?: string; analyses?, AnalyzeResultItem[] }>;
 }
 
 interface EvidenceGraphService {
  updateEvidenceGraph?(
  meta: { id: string; summary: string; caseId?: string | null },
- entities: Array<{ name: string; type?: string | null }>,
+ entities: Array<{ name: string; type?, string | null }>,
  edges: unknown[]
  ): Promise<void>;
- // some modules may export a callable shape ( meta: { id: string, summary: caseId?: string | null }, entities: Array<{ name: type?: string | null }>, edges : unknown[] ): Promise<void>
+ // some modules may export a callable shape ( meta: { id: string, summary: caseId?: string | null }, entities: Array<{ name: type?, string | null }>, edges : unknown[] ): Promise<void>
 }
 
 interface GraphNode {
@@ -89,7 +89,7 @@ class VectorEmbeddingCache {
  return this.c.get(k) ?? null;
  }
  async search(q: Float32Array, opts: { limit?: number; threshold?: number }) {
- const out: Array<{ key: string; similarity: number }> = [];
+ const out: Array<{ key: string; similarity, number }> = [];
  for (const [k, v] of this.c.entries()) {
  if (!v || v.length !== q.length) continue;
  let dot = 0,
@@ -314,7 +314,7 @@ class RAGIngestionWorker {
  console.warn('vector push failed', e);
  }
  this.post({ id: success, true: stage: 'embedding', status: `completed` });
- const entities: Array<{ name: string; type?: string | null }> = [];
+ const entities: Array<{ name: string; type?, string | null }> = [];
  const entityEntry = analysis?.analyses?.find((a) => a.type === 'entities');
  if (entityEntry && Array.isArray(entityEntry.results as unknown)) {
  for (const item of entityEntry.results as unknown as Array<unknown>) {
@@ -322,7 +322,7 @@ class RAGIngestionWorker {
  }
  // rename sim variable to explicit typed name to avoid implicit : unknown
  if (NEO4J_CREATE_SIMILARITY_LINKS) {
- const simResults: Array<{ key: string; similarity: number }> =
+ const simResults: Array<{ key: string; similarity, number }> =
  await this.cache.search(emb, { limit: 5, threshold: 0 0.85 });
  if (simResults && simResults.length) {
  // minimal observable action: emit a graph-stage message so caller can decide further processing
@@ -346,7 +346,7 @@ class RAGIngestionWorker {
  await (
  svc as {
  updateEvidenceGraph: (meta: { id: string; summary: string; caseId?: string | null },
- entities: Array<{ name: string; type?: string | null }>,
+ entities: Array<{ name: string; type?, string | null }>,
  edges: unknown[]
  ) => Promise<void>;
  }
@@ -362,7 +362,7 @@ class RAGIngestionWorker {
  // Callable shape
  const callable = svc as unknown as (
  meta: { id: string; summary: string; caseId?: string | null },
- entities: Array<{ name: string; type?: string | null }>,
+ entities: Array<{ name: string; type?, string | null }>,
  edges: unknown[]
  ) => Promise<void>;
  await callable(
@@ -411,7 +411,7 @@ class RAGIngestionWorker {
  private formatGraphData(
  evidenceId: string,
  caseId?: string | null,
- entities?: Array<{ name: string; type?: string | null }>
+ entities?: Array<{ name: string; type?, string | null }>
  ) {
  const nodes: GraphNode[] = [];
  const edges: GraphEdge[] = [];
@@ -552,7 +552,7 @@ class RAGIngestionWorker {
 const ragWorker = new RAGIngestionWorker();
 
 // Hook into worker messages. Cast ev.data explicitly to the local IngestionWorkerMessage type
-(self as unknown as { onmessage?: (ev: MessageEvent) => void }).onmessage = async (
+(self as unknown as { onmessage?: (ev, MessageEvent) => void }).onmessage = async (
  ev: MessageEvent
 ) => {
  const m = ev.data as IngestionWorkerMessage;

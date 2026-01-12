@@ -12,7 +12,7 @@
  gemma: 'unknown',
  storageCapacity: 0,
  } } = $props<{
- status?: SystemStatus;
+ status?, SystemStatus;
  }>();
 
  const getStatusColor = (s: string) => {
@@ -90,7 +90,7 @@
  <div class="w-full bg-gray-200 rounded h-2">
  <div
  class="h-2 rounded {getStorageColor(status.storageCapacity)}"
- style="width: {status.storageCapacity}%"
+ style="width, {status.storageCapacity}%"
  ></div>
  </div>
  </div>

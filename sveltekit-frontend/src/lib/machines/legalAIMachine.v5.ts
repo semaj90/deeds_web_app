@@ -1,6 +1,5 @@
-import type { createMachine, assign, fromPromise, createActor } from 'xstate';
-import { writable } from 'svelte/store';
-import type { productionServiceClient } from '$lib/api/production-service-client';
+import { productionServiceClient } from '$lib/api/production-service-client';
+import { assign, createMachine, fromPromise } from 'xstate';
 
 // Define missing types
 interface LooseObject {
@@ -176,7 +175,7 @@ export const legalAIMachine = createMachine(
         invoke: {
           src: 'authenticateUser',
           input: ({ event }) => ({
-            credentials: (event as Extract<LegalAIEvent, { type: 'AUTH.LOGIN' }>).credentials,
+            credentials: (event as Extract<LegalAIEvent, { type, 'AUTH.LOGIN' }>).credentials,
           }),
           onDone: { target: 'authenticated', actions: ['setUser'] },
           onError: { target: 'idle', actions: ['clearUser'] },
@@ -198,7 +197,7 @@ export const legalAIMachine = createMachine(
         invoke: {
           src: 'loadCases',
           input: ({ event }) => ({
-            filters: (event as Extract<LegalAIEvent, { type: 'CASES.LOAD' }>).filters,
+            filters: (event as Extract<LegalAIEvent, { type, 'CASES.LOAD' }>).filters,
           }),
           onDone: { target: 'authenticated', actions: 'setCases' },
           onError: { target: 'authenticated' },
@@ -209,7 +208,7 @@ export const legalAIMachine = createMachine(
         invoke: {
           src: 'processAIQuery',
           input: ({ event }) => ({
-            prompt: (event as Extract<LegalAIEvent, { type: 'AI.QUERY' }>).prompt,
+            prompt: (event as Extract<LegalAIEvent, { type, 'AI.QUERY' }>).prompt,
           }),
           onDone: { target: 'authenticated', actions: 'setAIResponse' },
           onError: { target: 'authenticated', actions: 'setAIError' },
@@ -269,7 +268,7 @@ export const legalAIMachine = createMachine(
         return { cases: { ...context.cases, items: casesOutput, loading: false } };
       }),
       setCurrentCase: assign((context, event) => {
-        const selectEvent = event as Extract<LegalAIEvent, { type: 'CASES.SELECT' }>;
+        const selectEvent = event as Extract<LegalAIEvent, { type, 'CASES.SELECT' }>;
         return {
           cases: { ...context.cases, currentCase: selectEvent?.case ?? context.cases.currentCase },
         };
@@ -285,7 +284,7 @@ export const legalAIMachine = createMachine(
         return { ai: { ...context.ai, error: message, isProcessing: false } };
       }),
       startAIProcessing: assign((context, event) => {
-        const queryEvent = event as Extract<LegalAIEvent, { type: 'AI.QUERY' }>;
+        const queryEvent = event as Extract<LegalAIEvent, { type, 'AI.QUERY' }>;
         return {
           ai: {
             ...context.ai,

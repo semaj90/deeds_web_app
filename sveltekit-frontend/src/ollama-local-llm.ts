@@ -62,7 +62,7 @@ class OllamaLocalLLM {
 	private baseUrl: string;
 	private defaultModel: string = 'gemma3:latest';
 	private availableModels: Map<string, OllamaModel> = new Map();
-	private modelCache: Map<string, { loaded: boolean; lastUsed: number }> = new Map();
+	private modelCache: Map<string, { loaded: boolean; lastUsed, number }> = new Map();
 
 	constructor(baseUrl: string = 'http://localhost:11434') {
 		this.baseUrl = baseUrl;
@@ -329,7 +329,7 @@ PARAMETER num_ctx 4096`;
 	 * Chat completion with conversation history
 	 */
 	async chat(
-		messages: Array<{ role: 'user' | 'assistant'; content: string }>,
+		messages: Array<{ role: 'user' | 'assistant'; content, string }>,
 		model?: string
 	): Promise<string | null> {
 		try {

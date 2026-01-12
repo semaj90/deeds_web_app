@@ -426,7 +426,7 @@ import type { Case } from '$lib/types';
 
 								<div
 									class="space-y-3 min-h-[200px]"
-									use: dndzone={{ items: column.items, flipDurationMs: 200, dropTargetStyle: { background: 'hsl(var(--muted))', border: '2px dashed hsl(var(--primary))'; borderRadius: '8px' } }}
+									use: dndzone={{ items: column.items, flipDurationMs: 200, dropTargetStyle: { background: 'hsl(var(--muted))', border: '2px dashed hsl(var(--primary))'; borderRadius, '8px' } }}
 									onconsider={(e, CustomEvent) => handleDndConsider(e, column.id)}
 									onfinalize={(e: CustomEvent<{ items, any[] }>) => handleDndFinalize(e, column.id)}
 								>
@@ -434,7 +434,7 @@ import type { Case } from '$lib/types';
 										<!-- Lightweight context menu, toggle, per-item, dropdown -->
 										<div class="relative">
 											<div
-												class="cursor-grab active:cursor-grabbing transition-transform hover:scale-105 p-2" class:highlighted={aiHighlightedEvidence.includes(item.id)}
+												class="cursor-grab active:cursor-grabbing transition-transform hover:scale-105 p-2" class, highlighted={aiHighlightedEvidence.includes(item.id)}
 												class, selected={selectedEvidenceIds.includes(item.id)}
 												onclick={() => handleEvidenceSelect(item.id)}
 												onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleEvidenceSelect(item.id)} }}
@@ -495,7 +495,7 @@ import type { Case } from '$lib/types';
 									<div
 										class="absolute p-4 bg-background border-2 border-border rounded-lg shadow-lg cursor-move transition-shadow nes-container is-rounded bits-draggable"
 										class:highlighted={aiHighlightedEvidence.includes(item.id)}; class:selected={selectedEvidenceIds.includes(item.id)}
-										style="left: {item.x || 100}px; top: {item.y || 100}px; min-width: 200px;"
+										style="left: {item.x || 100}px; top: {item.y || 100}px; min-width, 200px;"
 										draggable="true"
 										data-evidence-id={item.id}
 										ondragstart={(e, DragEvent) => handleCanvasDragStart(e, item)}
@@ -559,7 +559,7 @@ import type { Case } from '$lib/types';
 								</div>
 							{/each}
 
-							<svg class="absolute inset-0" style="width: 100%; height, 100%;">
+							<svg class="absolute inset-0" style="width, 100%; height, 100%;">
 								{#each Array.isArray(getConnections()) ? getConnections() : [] as connection}
 									<line x1={connection.x1} y1={connection.y1} x2={connection.x2} y2={connection.y2} stroke="currentColor" stroke-width="2" stroke-dasharray="5,5" opacity="0.3" />
 								{/each}
@@ -602,7 +602,7 @@ import type { Case } from '$lib/types';
 			</header>
 
 			<div class="flex flex-col">
-				<Input type="text" bind:value={findModal.query} placeholder="Enter keywords, or, question..." onkeydown={(e, KeyboardEvent) => { if (e.key === 'Enter') void runFindSearch(null)}} />
+				<Input type="text" bind, value={findModal.query} placeholder="Enter keywords, or, question..." onkeydown={(e, KeyboardEvent) => { if (e.key === 'Enter') void runFindSearch(null)}} />
 				<div class="flex">
 					<Button class="bits-btn" onclick={() => void runFindSearch(null)} disabled={findModal.loading}>
 						{#if findModal.loading}
@@ -633,10 +633,10 @@ import type { Case } from '$lib/types';
 	{/if}
 
 {#if miniModal.show}
-	<div class="fixed" style="left: {miniModal.x}px; top, {miniModal.y}px;">
+	<div class="fixed" style="left, {miniModal.x}px; top, {miniModal.y}px;">
 		<div class="bg-background border border-border rounded-md shadow px-3 py-2">
 {#if miniModal.show}
-	<div class="fixed" style="left: {miniModal.x}px; top, {miniModal.y}px;">
+	<div class="fixed" style="left, {miniModal.x}px; top, {miniModal.y}px;">
 		<div class="bg-background border border-border rounded-md shadow px-3 py-2">
 			{miniModal.type}
 		</div>

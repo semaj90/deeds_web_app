@@ -154,7 +154,7 @@
 </script>
 
 <canvas
- bind:this={canvas}
+ bind, this={canvas}
  class="connections-canvas"
  width="100%"
  height="100%"

@@ -81,7 +81,7 @@ export interface ContradictionEngineInput {
  testimony?: MarkdownEvidenceInput[];
  uiSnapshots?: UISnapshotInput[];
  routeSpecs?: RouteSpecInput[];
- timeline?: Array<{ time: string; description?: string }>;
+ timeline?: Array<{ time: string; description?, string }>;
 }
 
 export interface TimelineFact {

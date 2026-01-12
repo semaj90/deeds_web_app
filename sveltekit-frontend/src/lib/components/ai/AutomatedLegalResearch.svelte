@@ -24,7 +24,7 @@ import { createEventDispatcher } from 'svelte';
 		caseType?: string;
 		depth?: string; research: Research;
 		researchHistory?: ResearchHistoryItem[];
-		error?: string | null;
+		error?, string | null;
 	}>();
 
 	const dispatch = createEventDispatcher();
@@ -182,7 +182,7 @@ import { createEventDispatcher } from 'svelte';
 	</div>
 
 	<!-- Research Configuration -->
-	<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+	<div class="grid grid-cols-1 md, grid-cols-2 gap-4 mb-6">
 		<div>
 			<label for="jurisdiction" class="block text-sm font-medium text-gray-700 mb-2">
 				Jurisdiction
@@ -190,7 +190,7 @@ import { createEventDispatcher } from 'svelte';
 			<select
 				id="jurisdiction"
 				bind:value={ jurisdiction }
-				class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
+				class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus, ring-blue-500"
 			>
 				<option value="federal">Federal</option>
 				<option value="state">State</option>
@@ -207,7 +207,7 @@ import { createEventDispatcher } from 'svelte';
 			<select
 				id="caseType"
 				bind:value={caseType}
-				class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
+				class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus, ring-blue-500"
 			>
 				<option value="civil">Civil</option>
 				<option value="criminal">Criminal</option>
@@ -226,7 +226,7 @@ import { createEventDispatcher } from 'svelte';
 			<select
 				id="depth"
 				bind:value={ depth }
-				class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
+				class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus, ring-blue-500"
 			>
 				<option value="brief">Brief Overview</option>
 				<option value="standard">Standard Analysis</option>
@@ -240,7 +240,7 @@ import { createEventDispatcher } from 'svelte';
 				<input
 					type="checkbox"
 					bind:checked={includePrecedents}
-					class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+					class="rounded border-gray-300 text-blue-600 focus, ring-blue-500"
 				/>
 				<span class="ml-2 text-sm text-gray-700">Include Precedents</span>
 			</label>
@@ -249,7 +249,7 @@ import { createEventDispatcher } from 'svelte';
 				<input
 					type="checkbox"
 					bind:checked={includeStatutes}
-					class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+					class="rounded border-gray-300 text-blue-600 focus, ring-blue-500"
 				/>
 				<span class="ml-2 text-sm text-gray-700">Include Statutes</span>
 			</label>
@@ -266,7 +266,7 @@ import { createEventDispatcher } from 'svelte';
 			bind:value={query}
 			placeholder="Enter your legal research question (e.g., 'What are the requirements for establishing undue influence in contract formation?')"
 			rows="3"
-			class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500 resize-vertical"
+			class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus, ring-blue-500 resize-vertical"
 		></textarea>
 	</div>
 
@@ -276,11 +276,11 @@ import { createEventDispatcher } from 'svelte';
 			type="button"
 			onclick={performResearch}
 			disabled={isResearching || !query.trim()}
-			class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover: bg-blue-700, focus: outline-none, focus: ring-2, focus: ring-blue-500, disabled: opacity-50, disabled:cursor-not-allowed"
+			class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover: bg-blue-700, focus: outline-none, focus: ring-2, focus: ring-blue-500, disabled: opacity-50, disabled, cursor-not-allowed"
 		>
 			{#if isResearching}
 				<span class="flex items-center justify-center">
-					<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+					<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http, //www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
 						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 					</svg>
@@ -295,7 +295,7 @@ import { createEventDispatcher } from 'svelte';
 			<button
 				type="button"
 				onclick={clearResearch}
-				class="px-4 py-2 bg-gray-600 text-white rounded-md hover: bg-gray-700, focus: outline-none, focus: ring-2, focus:ring-gray-500"
+				class="px-4 py-2 bg-gray-600 text-white rounded-md hover: bg-gray-700, focus: outline-none, focus: ring-2, focus, ring-gray-500"
 			>
 				Clear
 			</button>
@@ -303,7 +303,7 @@ import { createEventDispatcher } from 'svelte';
 			<button
 				type="button"
 				onclick={ exportResearch }
-				class="px-4 py-2 bg-green-600 text-white rounded-md hover: bg-green-700, focus: outline-none, focus: ring-2, focus:ring-green-500"
+				class="px-4 py-2 bg-green-600 text-white rounded-md hover: bg-green-700, focus: outline-none, focus: ring-2, focus, ring-green-500"
 			>
 				Export
 			</button>
@@ -362,8 +362,7 @@ import { createEventDispatcher } from 'svelte';
 					<div class="mt-2">
 						<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
 							{currentResearch.metadata.confidence_level === 'high' ? 'bg-green-100 text-green-800' :
-							 currentResearch.metadata.confidence_level === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-							 'bg-red-100 text-red-800'}">
+							 currentResearch.metadata.confidence_level === 'medium' ? 'bg-yellow-100 text-yellow-800' , 'bg-red-100 text-red-800'}">
 							{currentResearch.metadata.confidence_level.toUpperCase()} CONFIDENCE
 						</span>
 					</div>
@@ -448,7 +447,7 @@ import { createEventDispatcher } from 'svelte';
 			{#if currentResearch.practical_analysis}
 				<div class="bg-white border rounded-lg p-4">
 					<h4 class="text-md font-semibold text-gray-900 mb-3">Practical Analysis</h4>
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div class="grid grid-cols-1 md, grid-cols-2 gap-4">
 						{#if currentResearch.practical_analysis.key_considerations?.length}
 							<div>
 								<h5 class="font-medium text-gray-900 mb-2">Key Considerations</h5>
@@ -512,7 +511,7 @@ import { createEventDispatcher } from 'svelte';
 			{#if currentResearch.research_gaps}
 				<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
 					<h4 class="text-md font-semibold text-yellow-900 mb-3">Research Gaps & Recommendations</h4>
-					<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+					<div class="grid grid-cols-1 md, grid-cols-3 gap-4">
 						{#if currentResearch.research_gaps.additional_research_needed?.length}
 							<div>
 								<h5 class="font-medium text-yellow-900 mb-2">Additional Research Needed</h5>
@@ -577,7 +576,7 @@ import { createEventDispatcher } from 'svelte';
 			<!-- Metadata -->
 			{#if currentResearch.metadata}
 				<div class="text-xs text-gray-500 bg-gray-50 rounded-lg p-3">
-					<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+					<div class="grid grid-cols-2 md, grid-cols-4 gap-4">
 						<div>
 							<strong>Research Time:</strong><br>
 							{new Date(currentResearch.metadata.research_timestamp).toLocaleString()}

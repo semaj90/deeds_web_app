@@ -28,7 +28,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
 
  let searchResults = $state <VectorResult[]>([]); // Use VectorResult type
- let selectedDocument = $state <VectorResult: null>(null); // Use VectorResult type
+ let selectedDocument = $state <VectorResult, null>(null); // Use VectorResult type
  let isAnalyzing = $state <boolean>(false);
 
  const handleSearchResults = (results: VectorResult[]) => {
@@ -73,10 +73,10 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  });
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Legal AI Search - Deeds Platform</title>
  <meta name="description" content="Search legal documents using AI-powered, semantic, search" />
-</svelte:head>
+</svelte, head>
 <div class="search-page">
  <header class="search-header">
  <div class="nes-container is-rounded">

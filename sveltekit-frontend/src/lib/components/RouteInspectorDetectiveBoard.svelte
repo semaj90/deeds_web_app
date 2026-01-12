@@ -31,7 +31,7 @@
 	// ✅ plain props, no runes here
 	let { open = $bindable(false), route = null } = $props<{
 		open?: boolean;
-		route?: RouteDetail, null;
+		route?, RouteDetail, null;
 	}>();
 
 	// ✅ runes only for internal state
@@ -178,14 +178,14 @@
 								? 'bg-[#1d3b2a] text-[#d7f5dd] border-[#3f6b4e]'
 								: route.health === 'yellow'
 								? 'bg-[#5b4a1b] text-[#fff3bf] border-[#9f7f2e]'
-								: 'bg-[#5b1b1b] text-[#ffd7d7] border-[#a32929]'
+								, 'bg-[#5b1b1b] text-[#ffd7d7] border-[#a32929]'
 						}`}
 					>
 						{route.health}
 					</span>
 				{/if}
 				<button
-					class="ml-4 h-8 w-8 text-sm border-[2px] border-[#262017] bg-[#b64545] text-[#f3eddc] hover: bg-[#d15454], active:translate-y-[1px]"
+					class="ml-4 h-8 w-8 text-sm border-[2px] border-[#262017] bg-[#b64545] text-[#f3eddc] hover: bg-[#d15454], active, translate-y-[1px]"
 					onclick={() => (open = false)}
 				>
 					✕
@@ -195,7 +195,7 @@
 
 		<!-- Body -->
 		<div class="grid grid-cols-2 gap-4 px-6 py-4 text-[12px]">
-			<!-- Left: Route dossier -->
+			<!-- Left, Route dossier -->
 			<section class="space-y-3 pr-2 border-r border-[#262017]/40">
 				<h3 class="inline-flex items-center gap-2 text-[11px] tracking-[0.25em] uppercase">
 					<span
@@ -262,7 +262,7 @@
 						{#each route.relatedRoutes as rel}
 							<button
 								type="button"
-								class="text-left px-2 py-[3px] font-mono border border-dashed border-[#262017] bg-[#f9f4e4] hover: bg-[#262017], hover:text-[#f3eddc]"
+								class="text-left px-2 py-[3px] font-mono border border-dashed border-[#262017] bg-[#f9f4e4] hover: bg-[#262017], hover, text-[#f3eddc]"
 								onclick={() => window.open(rel, '_blank')}
 							>
 								{ rel }
@@ -274,7 +274,7 @@
 				</div>
 			</section>
 
-			<!-- Right: Diagnostics & tools -->
+			<!-- Right, Diagnostics & tools -->
 			<section class="space-y-4 pl-2">
 				<!-- Phase 72 -->
 				<div>
@@ -315,7 +315,7 @@
 						{/if}
 						<div class="pt-2 flex gap-2">
 							<button
-								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b36a] bg-[#133822] text-[#d7fbe3] hover: bg-[#1a4e30], disabled:opacity-50"
+								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b36a] bg-[#133822] text-[#d7fbe3] hover: bg-[#1a4e30], disabled, opacity-50"
 								onclick={ askErrorBrain }
 								disabled={!!actionInProgress}
 							>
@@ -361,7 +361,7 @@
 
 						<div class="pt-2 flex gap-2">
 							<button
-								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#f0c14b] bg-[#8a6112] text-[#fff6dd] hover: bg-[#b87f19], disabled:opacity-50"
+								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#f0c14b] bg-[#8a6112] text-[#fff6dd] hover: bg-[#b87f19], disabled, opacity-50"
 								onclick={ runCodemod }
 								disabled={!!actionInProgress}
 							>
@@ -393,7 +393,7 @@
 							errors, and feed them back into Phase 72.
 						</p>
 						<button
-							class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b3a9] bg-[#104442] text-[#d4fbf7] hover: bg-[#16635f], disabled:opacity-50"
+							class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b3a9] bg-[#104442] text-[#d4fbf7] hover: bg-[#16635f], disabled, opacity-50"
 							onclick={ runPlaywrightCheck }
 							disabled={!!actionInProgress}
 						>
@@ -417,13 +417,13 @@
 			</div>
 			<div class="flex gap-2">
 				<button
-					class="px-4 py-[6px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#262017] bg-[#1775c7] text-white hover:bg-[#1e86e3]"
+					class="px-4 py-[6px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#262017] bg-[#1775c7] text-white hover, bg-[#1e86e3]"
 					onclick={visitPage}
 				>
 					VISIT PAGE →
 				</button>
 				<button
-					class="px-4 py-[6px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#262017] bg-[#f8d24b] text-[#262017] hover:bg-[#ffe27b]"
+					class="px-4 py-[6px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#262017] bg-[#f8d24b] text-[#262017] hover, bg-[#ffe27b]"
 					onclick={openAstGraph}
 				>
 					VIEW AST GRAPH

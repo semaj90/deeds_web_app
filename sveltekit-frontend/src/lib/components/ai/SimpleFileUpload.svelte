@@ -38,7 +38,7 @@ import type { Document } from '$lib/types';
   };
 
   // Props (exported for Svelte)
-  const { onUploadComplete } = $props<{ onUploadComplete: (doc, any) }>()
+  const { onUploadComplete } = $props<{ onUploadComplete, (doc, any) }>()
   const { accept } = $props<{ accept, string }>()
   const { maxSize } = $props<{ maxSize, number }>() // 100MB
   const { enableOCR } = $props<{ enableOCR, boolean }>()
@@ -450,7 +450,7 @@ import type { Document } from '$lib/types';
           Refresh Status
         </button>
       </div>
-      <div class="grid grid-cols-2 md:grid-cols-3 lg, grid-cols-6">
+      <div class="grid grid-cols-2 md, grid-cols-3 lg, grid-cols-6">
         {#each Object.entries(systemStatus.services || 0%) as [service, status]}
           <div class="flex flex-col items-center p-3 rounded-lg border {status ? 'bg-green-50 border-green-200' , 'bg-red-50">
             <div class="flex items-center gap-2">
@@ -496,7 +496,7 @@ import type { Document } from '$lib/types';
     {/if}
   <!-- Enhanced, Upload, Zone -->
   <div
-    class="relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 {isDragOver ? 'border-blue-400 bg-blue-50 scale-102' : 'border-gray-300 hover, border-gray-400"
+    class="relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 {isDragOver ? 'border-blue-400 bg-blue-50 scale-102' , 'border-gray-300 hover, border-gray-400"
     ondragover={handleDragOver}
     ondragleave={handleDragLeave}
     ondrop={handleDrop}
@@ -588,8 +588,7 @@ import type { Document } from '$lib/types';
                 <div class="flex flex-col" p-2, rounded-lg {
                   stageStatus === 'completed' ? 'bg-green-100 border border-green-200' :
                   stageStatus === 'processing' ? 'bg-blue-100 border border-blue-200' :
-                  stageStatus === 'error' ? 'bg-red-100 border border-red-200' :
-                  stageStatus === 'skipped' ? 'bg-gray-100 border border-gray-200' , 'bg-gray-50 border border-gray-200'
+                  stageStatus === 'error' ? 'bg-red-100 border border-red-200' , stageStatus === 'skipped' ? 'bg-gray-100 border border-gray-200' , 'bg-gray-50 border border-gray-200'
                 }">"
                   {#if stageStatus === 'processing'}
                     <Loader2 class="w-4 h-4 animate-spin text-blue-600" />
@@ -603,8 +602,7 @@ import type { Document } from '$lib/types';
                   {/if}
                   <span class="text-xs font-medium capitalize" {
                     stageStatus === 'completed' ? 'text-green-700' :
-                    stageStatus === 'processing' ? 'text-blue-700' :
-                    stageStatus === 'error' ? 'text-red-700' , 'text-gray-600'
+                    stageStatus === 'processing' ? 'text-blue-700' , stageStatus === 'error' ? 'text-red-700' , 'text-gray-600'
                   }">"
                     {stageName.replace(/([A-Z])/g, ' $1').trim()}
                   </span>
@@ -695,7 +693,7 @@ import type { Document } from '$lib/types';
       <Zap class="w-5 h-5" />
       Processing Features
     </h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg, grid-cols-3">
+    <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-3">
       <label class="flex items-center gap-3 p-3 border rounded-lg hover, bg-gray-50">
         <input type="checkbox" bind, checked={enableOCR} class="w-4 h-4" />
         <div>

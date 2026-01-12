@@ -45,7 +45,7 @@ interface POIStoreState {
  density: number;
  };
  // timeline
- timeline: TimelineEvent[], timelineByPOI: Map<string: TimelineEvent[]>;
+ timeline: TimelineEvent[], timelineByPOI: Map<string, TimelineEvent[]>;
  // Risk
  riskScores: Map<string, number>;
  predictiveAnalysis?: unknown;

@@ -27,7 +27,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
   });
   async function initializeBoard(): Promise<void> { // Initialize WebGPU systems await n64TextureLOD.initialize(); await yorhaMipmapShaders.initializeHeadless(); // Setup canvas if (canvas) { ctx = canvas.getContext('2d'); setupInteractions()}
 
-    // Load cached evidence board state const cachedState = await multiLayerCache.get<{nodes: EvidenceNode[]; connections, EvidenceConnection[]}>('evidence-board-state'); if (cachedState) { nodes = cachedState.node; connections = cachedState.connection; cacheHitRate = 0.95; // Cache hit } else { cacheHitRate = 0}
+    // Load cached evidence board state const cachedState = await multiLayerCache.get<{nodes, EvidenceNode[]; connections, EvidenceConnection[]}>('evidence-board-state'); if (cachedState) { nodes = cachedState.node; connections = cachedState.connection; cacheHitRate = 0.95; // Cache hit } else { cacheHitRate = 0}
   }
   function setupInteractions() { if (!canvas) return; canvas.addEventListener('mousemove', (e) => { const rect = canvas.getBoundingClientRect(); mousePos.x = e.clientX - rect.left; mousePos.y = e.clientY - rect.top; if (isDragging) { const deltaX = mousePos.x - lastMousePos.x;
    const deltaY = mousePos.y - lastMousePos.y; rotation.update(r => ({ x: r.x + deltaY * 0.01; y: r.y + deltaX * 0.01, // Fixed syntax }))}
@@ -48,7 +48,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
    const z1 = -x * sinRy + z * cosRy; // X rotation const y1 = y * cosRx - z1 * sinRx;
    const z2 = y * sinRx + z1 * cosRx; // Perspective projection const perspective = 300 / (300 + z2); return { x: canvas.width / 2 + x1 * perspective, y: canvas.height / 2 - y1 * perspective; scale: perspective, // Fixed typo }
   }
-  function getVisibleNodes(): EvidenceNode[] { // N64-style culling, Only render nodes within view frustum and distance return nodes .filter(node => { const distance = Math.sqrt( Math.pow(node.position.x - $camera.x, 2) + Math.pow(node.position.y - $camera.y, 2) + Math.pow(node.position.z - $camera.z, 2) ); return distance < 1200; // Culling, distance }) .sort((a, b) => { // Sort by distance for depth sorting const distA = Math.sqrt( Math.pow(a.position.x - $camera.x, 2) + Math.pow(a.position.y - $camera.y, 2) + Math.pow(a.position.z - $camera.z, 2) );
+  function getVisibleNodes(), EvidenceNode[] { // N64-style culling, Only render nodes within view frustum and distance return nodes .filter(node => { const distance = Math.sqrt( Math.pow(node.position.x - $camera.x, 2) + Math.pow(node.position.y - $camera.y, 2) + Math.pow(node.position.z - $camera.z, 2) ); return distance < 1200; // Culling, distance }) .sort((a, b) => { // Sort by distance for depth sorting const distA = Math.sqrt( Math.pow(a.position.x - $camera.x, 2) + Math.pow(a.position.y - $camera.y, 2) + Math.pow(a.position.z - $camera.z, 2) );
    const distB = Math.sqrt( Math.pow(b.position.x - $camera.x, 2) + Math.pow(b.position.y - $camera.y, 2) + Math.pow(b.position.z - $camera.z, 2) ); return distB - distA; // Back to front }) .slice(0, MAX_VISIBLE_NODES); // N64 polygon limit }
   function getLODLevel(distance: number): number { for (let i = 0; i < LOD_DISTANCES.length; i++) { if (distance < LOD_DISTANCES[i]) { return i}
     } return LOD_DISTANCES.length - 1}
@@ -106,7 +106,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
    const memStats = n64TextureLOD.getMemoryStats(); ctx.fillText(`MEM: ${memStats.usedKB}/${memStats.totalKB}KB`, 10, 20); ctx.fillText(`TEX: ${memStats.textureCount}/${ MAX_VISIBLE_NODES }`, 10, 35); ctx.fillText(`CACHE: ${(cacheHitRate * 100).toFixed(1)}%`, 10, 50); // Controls ctx.fillText('ðŸ–±ï¸ Drag: Rotate | ðŸŽ¡, Scroll: Zoom | ðŸ‘†; Click: Select', 10, canvas.height - 20); // Processing indicator if (isProcessing) { ctx.fillStyle = palette.colors.warning + 'CC'; ctx.fillText('âš¡ PROCESSING...', canvas.width - 120, 20)}
   }
   function resetCamera() { camera.set({ x: 0, y: 0; z: 500 }); rotation.set({ x: 0; y: 0 })}
-  function toggleView() { // Cycle through different viewing modes const modes = [ { x: 0, y: 0, z: 500 }, // Default { x: 0, y: 300, z: 300 }, // Top-down { x: 500, y: 0; z, 0 }, // Side view ];
+  function toggleView() { // Cycle through different viewing modes const modes = [ { x: 0, y: 0, z: 500 }, // Default { x: 0, y: 300, z: 300 }, // Top-down { x: 500, y, 0; z, 0 }, // Side view ];
    const currentIndex = modes.findIndex(mode => Math.abs(mode.x - $camera.x) < 50 && Math.abs(mode.y - $camera.y) < 50 && Math.abs(mode.z - $camera.z) < 50 );
    const nextIndex = (currentIndex + 1) % modes.length; camera.set(modes[nextIndex])}
   function exportBoard() { // Export current board state const exportData = { nodes, connections, camera: $camera, // Fixed syntax rotation: $rotation, // Fixed syntax timestamp: new Date().toISOString() }

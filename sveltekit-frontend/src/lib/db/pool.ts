@@ -160,7 +160,7 @@ export async function withRetry<T>(queryFn: () => Promise<T>, maxRetries: number
         break;
       }
 
-      // Exponential backoff: 100ms, 200ms, 400ms
+      // Exponential backoff, 100ms, 200ms, 400ms
       const delay = 100 * Math.pow(2, attempt);
       console.warn(
         `Query failed (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${delay}ms...`
@@ -190,7 +190,7 @@ export async function withRetry<T>(queryFn: () => Promise<T>, maxRetries: number
  */
 export async function healthCheck(): Promise<{ healthy: boolean;
   responseTime: number;
-  error?: string;
+  error?, string;
 }> {
   const startTime = Date.now();
 

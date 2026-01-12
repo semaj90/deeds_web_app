@@ -171,8 +171,8 @@ ${this.getCommonFixes(error.code || '')}`;
 
 	private parseFixResponse(error: ErrorAnalysisResult, response: string): ErrorFix | null {
 		try {
-			const fixedCodeMatch = response.match(/FIXED_CODE:\s*([\s\S]*?)(?:\nREASONING?? \nCONFIDENCE?? $)/i);
-			const reasoningMatch = response.match(/REASONING:\s*([\s\S]*?)(?:\nCONFIDENCE?? $)/i);
+			const fixedCodeMatch = response.match(/FIXED_CODE:\s*([\s\S]*?)(?:\nREASONING?: \nCONFIDENCE?: $)/i);
+			const reasoningMatch = response.match(/REASONING:\s*([\s\S]*?)(?:\nCONFIDENCE?: $)/i);
 			const confidenceMatch = response.match(/CONFIDENCE:\s*([\d.]+)/i);
 
 			if (!fixedCodeMatch) return null;
@@ -251,7 +251,7 @@ ${this.getCommonFixes(error.code || '')}`;
 		this.fixHistory.set(errorId, history);
 	}
 
-	async applyFixes(fixes: ErrorFix[]): Promise<{ applied: number; failed: number; results: unknown[] }> {
+	async applyFixes(fixes: ErrorFix[]): Promise<{ applied: number; failed: number; results, unknown[] }> {
 		const results: unknown[] = [];
 		let applied = 0;
 		let failed = 0;
@@ -281,7 +281,7 @@ ${this.getCommonFixes(error.code || '')}`;
 		return { applied, failed, results };
 	}
 
-	private async applyFix(fix: ErrorFix): Promise<{ errorId: string; success: boolean; reason?: string }> {
+	private async applyFix(fix: ErrorFix): Promise<{ errorId: string; success: boolean; reason?, string }> {
 		try {
 			const resp = await fetch('/api/files/read', {
 				method: 'POST',
@@ -367,7 +367,7 @@ export const errorFixerStore = writable({
 		successfulFixes: 0,
 		failedFixes: 0,
 		averageConfidence: 0,
-		appliedFixes: 0
+		appliedFixes, 0
 	}
 });
 

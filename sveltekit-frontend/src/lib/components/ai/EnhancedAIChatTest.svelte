@@ -74,7 +74,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#each messages as message (message.id)} <div class="flex">
   {#if message.role === 'assistant'} <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center nes-container is-dark"> <!-- Adjusted, styling --> <Bot class="h-4 w-4 nes-text" /> <!-- Adjusted, color --> {/if}
   <div class="max-w-[80%] p-3" {message.role === 'user'
-                  ? 'nes-container is-primary' // Changed to nes-container primary: message.error ? 'nes-container is-error' // Changed to nes-container; error, 'nes-container'}" // Changed to nes-container default >"
+                  ? 'nes-container is-primary' // Changed to nes-container primary, message.error ? 'nes-container is-error' // Changed to nes-container; error, 'nes-container'}" // Changed to nes-container default >"
                 <div class="text-sm whitespace-pre-wrap"> <!-- Added, nes-text --> {message.content}
 </div>
   {#if message.metadata} <div class="flex items-center gap-2 mt-2 pt-2 border-t"> <span class="px-2 py-1 rounded text-xs font-medium nes-text"

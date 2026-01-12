@@ -18,15 +18,15 @@ declare module 'bits-ui' {
  [key: string]: any;
  }
  export class Card extends SvelteComponentTyped<CardProps> {}
- export class CardHeader extends SvelteComponentTyped<{ class?: string }> {}
- export class CardContent extends SvelteComponentTyped<{ class?: string }> {}
+ export class CardHeader extends SvelteComponentTyped<{ class?, string }> {}
+ export class CardContent extends SvelteComponentTyped<{ class?, string }> {}
  export class Modal extends SvelteComponentTyped<{
  open?: boolean;
- onClose?: () => void;
+ onClose?, () => void;
  class?: string;
  }> {}
- export class Tooltip extends SvelteComponentTyped<{ content?: string; placement?: string }> {}
- export class Icon extends SvelteComponentTyped<{ name?: string; size?: number | string }> {}
+ export class Tooltip extends SvelteComponentTyped<{ content?: string; placement?, string }> {}
+ export class Icon extends SvelteComponentTyped<{ name?: string; size?, number | string }> {}
  // Fallback for: unknown other named exports — prefer: unknown, over: unknown
  export const __any: unknown;
  // ...existing code...

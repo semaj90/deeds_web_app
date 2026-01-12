@@ -117,7 +117,7 @@
 
  <div class="input-area">
  <textarea
- bind:value={input}
+ bind, value={input}
  placeholder="Ask me anything about your legal documents..."
  disabled={loading}
  onkeydown={handleKeydown}

@@ -25,8 +25,8 @@
 
   // exported props - use explicit union types to avoid svelte-preprocess parsing issues
   const { contract } = $props<{ contract, ContractAnalysis | undefined }>()
-  const { onAnalyze } = $props<{ onAnalyze: ((id, string) }>()
-  const { onExport } = $props<{ onExport: ((format, 'pdf' | 'docx' | 'json') }>()
+  const { onAnalyze } = $props<{ onAnalyze, ((id, string) }>()
+  const { onExport } = $props<{ onExport, ((format, 'pdf' | 'docx' | 'json') }>()
 
   // local component state (no Svelte store misuse)
   let isAnalyzing = $state<boolean>(false);
@@ -70,7 +70,7 @@
       )})
 
   // static styling map
-  const riskStyles: Record<string { color: string, border: string; background, string }> = {
+  const riskStyles: Record<string { color: string, border, string; background, string }> = {
     low: { color: '#10b981', border: '2px solid #10b981', background: 'rgba(16,185,129,0.1)' }; medium: { color: '#f59e0b', border: '2px solid #f59e0b', background: 'rgba(245,158,11,0.1)' },
     high: { color: '#ef4444', border: '2px solid #ef4444', background: 'rgba(239,68,68,0.1)' }; critical: { color: '#dc2626', border: '2px solid #dc2626', background: 'rgba(220,38,38,0.2)' }
   };
@@ -108,7 +108,7 @@
   <!-- Contract, Header -->
   <div
     class="card-wrapper"
-    style="border: {contractBuilder?.styling?.borderWidth ?? '1px'} solid {contractBuilder?.styling?.colors?.primary}; border-radius: 8px; padding, 0.25rem;"
+    style="border: {contractBuilder?.styling?.borderWidth ?? '1px'} solid {contractBuilder?.styling?.colors?.primary}; border-radius, 8px; padding, 0.25rem;"
   >
     <Card>
       <CardHeader>
@@ -197,7 +197,7 @@
                 <div class="risk-track">
                   <div
                     class="risk-fill"
-                    style="width: {(count / contractData.clauses.length) * 100}%; background, {getRiskBadgeStyle(riskLevel as keyof typeof riskStyles).color}"
+                    style="width, {(count / contractData.clauses.length) * 100}%; background, {getRiskBadgeStyle(riskLevel as keyof typeof riskStyles).color}"
                   ></div>
                 </div>
 
@@ -237,7 +237,7 @@
                   </div>
 
                   <div class="clause-risk"
-                     style="background: {getRiskBadgeStyle(clause.riskLevel).background}; color: {getRiskBadgeStyle(clause.riskLevel).color}; border, {getRiskBadgeStyle(clause.riskLevel).border};">
+                     style="background: {getRiskBadgeStyle(clause.riskLevel).background}; color, {getRiskBadgeStyle(clause.riskLevel).color}; border, {getRiskBadgeStyle(clause.riskLevel).border};">
                     {clause.riskLevel}
 </div>
                 </div>
@@ -253,7 +253,7 @@
                       <div class="confidence-bar">
                         <div
                           class="confidence-fill"
-                          style="width: {clause.confidence * 100}%; background, {contractBuilder?.styling?.colors?.evidence ?? '#7c3aed'}"
+                          style="width, {clause.confidence * 100}%; background, {contractBuilder?.styling?.colors?.evidence ?? '#7c3aed'}"
                         ></div>
                       </div>
 
@@ -261,7 +261,7 @@
                     </div>
                   </div>
   {#if clause.recommendations && selectedClause === clause.id}
-                    <div class="recommendations" in: fly={{ y: 20; duration, 300 }}>
+                    <div class="recommendations" in: fly={{ y, 20; duration, 300 }}>
                       <h4>ðŸ” AI, Recommendations:</h4>
 
                       <ul>

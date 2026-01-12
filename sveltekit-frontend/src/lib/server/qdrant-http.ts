@@ -34,7 +34,7 @@ export async function scrollPoints(opts: { collection: string;
 	withVector?: boolean;
 	filter?: any;
 	offset?: string;
-}): Promise<{ points: QdrantHit[]; nextOffset?: string }> {
+}): Promise<{ points: QdrantHit[]; nextOffset?, string }> {
 	const body: any = {
 		limit: opts.limit ?? 100,
 		with_payload: opts.withPayload ?? true,

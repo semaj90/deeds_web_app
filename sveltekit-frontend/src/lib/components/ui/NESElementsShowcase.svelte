@@ -5,7 +5,7 @@
 </script>
 
 <!-- HTML5, Semantic, Elements -->
-<article class="nes-container" style="display: {visible ? 'block' , 'none'}">
+<article class="nes-container" style="display, {visible ? 'block' , 'none'}">
   <p class="title">NES.css Elements Showcase</p>
   <header>
     <h1>Main Title (H1)</h1>
@@ -91,7 +91,7 @@
       </figure>
       <figure>
         <img
-          src="data:image/svg+xml,%3Csvg xmlns='http, //www.w3.org/2000/svg' width='100' height='50'%3E%3Crect width='100' height='50' fill='%23666'/%3E%3Ctext, x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white'%3EIMG%3C/text%3E%3C/svg%3E"
+          src="data, image/svg+xml,%3Csvg xmlns='http, //www.w3.org/2000/svg' width='100' height='50'%3E%3Crect width='100' height='50' fill='%23666'/%3E%3Ctext, x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white'%3EIMG%3C/text%3E%3C/svg%3E"
           alt="Example image"
         />
         <figcaption>Image element example</figcaption>

@@ -81,7 +81,7 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
  }
 
  // Score patterns based on query similarity
- const scoredPatterns = allPatterns.map((pattern: any) => ({
+ const scoredPatterns = allPatterns.map((pattern, any) => ({
  pattern: score.scorePattern(pattern, query),
  }));
 

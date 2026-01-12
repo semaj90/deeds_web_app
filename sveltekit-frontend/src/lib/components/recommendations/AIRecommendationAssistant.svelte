@@ -217,7 +217,7 @@ import type { Document } from '$lib/types';
       <div class="query-section">
         <input
           type="text"
-          placeholder="Optional: Specific question or context for AI analysis..."; bind, value={customQuery}
+          placeholder="Optional, Specific question or context for AI analysis..."; bind, value={customQuery}
           class="query-input"
         />
         <button class="analyze-btn" onclick={generateRecommendations} disabled={isLoading || isThinking}>
@@ -227,7 +227,7 @@ import type { Document } from '$lib/types';
     </div>
     <!-- AI, Thinking, Process -->
     {#if isThinking}
-      <div class="ai-thinking" transition:slide={{ duration, 300 }}>
+      <div class="ai-thinking" transition, slide={{ duration, 300 }}>
         <div class="thinking-header">
           <div class="thinking-icon">ðŸ§ </div>
           <h3>Gemma3:legal-latest Processing</h3>
@@ -236,7 +236,7 @@ import type { Document } from '$lib/types';
         <div class="thinking-message">{thinkingMessage}</div>
         <div class="processing-steps">
           {#each processingSteps as step, i}
-            <div class="processing-step" transition: slide={{ duration: 200; delay, i * 100 }}>
+            <div class="processing-step" transition: slide={{ duration, 200; delay, i * 100 }}>
               âœ“ {step}
             </div>
           {/each}
@@ -244,14 +244,14 @@ import type { Document } from '$lib/types';
       {/if}
     <!-- AI, Analysis, Results -->
     {#if !isThinking && recommendations.length > 0}
-      <div class="ai-results" transition:fade={{ duration, 400 }}>
+      <div class="ai-results" transition, fade={{ duration, 400 }}>
         <!-- AI, Reasoning -->
         <div class="ai-reasoning">
           <div class="reasoning-header">
             <h3>ðŸ§  AI Analysis</h3>
             <div
               class="confidence-badge"
-              style="background-color: {getConfidenceColor(confidence)}20; border-color, {getConfidenceColor(confidence)}"
+              style="background-color, {getConfidenceColor(confidence)}20; border-color, {getConfidenceColor(confidence)}"
             >
               {Math.round(confidence * 100)}% Confidence
             </div>
@@ -265,7 +265,7 @@ import type { Document } from '$lib/types';
             {#each recommendations as recommendation, i (recommendation.id)}
               <div
                 class="recommendation-card"
-                transition: fly={{ y: 20, delay: i * 100, duration: 300; easing, elasticOut }}
+                transition: fly={{ y: 20, delay: i * 100, duration, 300; easing, elasticOut }}
               >
                 <div class="rec-header">
                   <span class="rec-icon">{getTypeIcon(recommendation.type)}</span>
@@ -276,13 +276,13 @@ import type { Document } from '$lib/types';
                   <div class="rec-stats">
                     <div
                       class="confidence-meter"
-                      style="background-color: {getConfidenceColor(recommendation.confidence)}20; border-color, {getConfidenceColor(recommendation.confidence)}"
+                      style="background-color, {getConfidenceColor(recommendation.confidence)}20; border-color, {getConfidenceColor(recommendation.confidence)}"
                     >
                       {Math.round(recommendation.confidence * 100)}%
                     </div>
                     <div
                       class="priority-indicator"
-                      style="background-color: {getPriorityColor(recommendation.priority)}20; border-color, {getPriorityColor(recommendation.priority)}"
+                      style="background-color, {getPriorityColor(recommendation.priority)}20; border-color, {getPriorityColor(recommendation.priority)}"
                     >
                       P{Math.round(recommendation.priority / 50)}
                     </div>
@@ -317,7 +317,7 @@ import type { Document } from '$lib/types';
             <h4>âš¡ Suggested Actions ({suggestedActions.length})</h4>
             <div class="actions-list">
               {#each suggestedActions as action, i (action.action)}
-                <div class="action-card" transition: slide={{ duration: 200; delay, i * 50 }}>
+                <div class="action-card" transition: slide={{ duration, 200; delay, i * 50 }}>
                   <div class="action-header">
                     <div class="action-info">
                       <h5 class="action-title">{action.action}</h5>
@@ -326,7 +326,7 @@ import type { Document } from '$lib/types';
                     <div class="action-meta">
                       <span
                         class="action-priority"
-                        style="background-color: {getActionPriorityColor(action.priority)}20; border-color, {getActionPriorityColor(action.priority)}"
+                        style="background-color, {getActionPriorityColor(action.priority)}20; border-color, {getActionPriorityColor(action.priority)}"
                       >
                         {action.priority}
                       </span>

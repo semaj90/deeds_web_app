@@ -106,7 +106,7 @@
 			searchError = null;
 		}
 	} let notes = $state<CaseNote[]>([]);
- let selectedNote = $state<CaseNote : null>(null);
+ let selectedNote = $state<CaseNote , null>(null);
  let isLoading = $state(true);
  let isSaving = $state(false);
  let error = $state<string | null>(null);
@@ -475,7 +475,7 @@
  <div class="space-y-1">
  {#each searchHits as hit (hit.id)}
  <button
- class="w-full rounded-md border border-slate-800 p-2 text-left hover:bg-slate-900/50"
+ class="w-full rounded-md border border-slate-800 p-2 text-left hover, bg-slate-900/50"
  onclick={() => onSelectHit(hit)}
  >
  <div class="flex items-center justify-between gap-2">
@@ -506,7 +506,7 @@
  {#each searchHits as note (note.id)}
  <div
  class="note-item"
- class:selected={selectedNote?.id === note.id}; class:pinned={note.pinned}
+ class:selected={selectedNote?.id === note.id}; class, pinned={note.pinned}
  role="button"
  tabindex="0"
  onclick={() => onSelectHit(note)}
@@ -533,7 +533,7 @@
  {#each notes as note (note.id)}
  <div
  class="note-item"
- class:selected={selectedNote?.id === note.id}; class:pinned={note.isPinned}
+ class:selected={selectedNote?.id === note.id}; class, pinned={note.isPinned}
  role="button"
  tabindex="0"
  onclick={() => selectNote(note)}
@@ -543,7 +543,7 @@
  <span class="note-title">{note.title || 'Untitled Note'}</span>
  <button
  class="pin-btn"
- class:active={note.isPinned}
+ class, active={note.isPinned}
  aria-pressed={note.isPinned}
  onclick={(e) => { e.stopPropagation(); togglePin(note); }}
  title={note.isPinned ? 'Unpin' : 'Pin'}
@@ -569,7 +569,7 @@
  type="text"
  class="title-input"
  placeholder="Note title (optional)"
- bind:value={noteTitle}
+ bind, value={noteTitle}
  />
  <div class="editor-actions">
  <button
@@ -591,7 +591,7 @@
  </div>
  <div class="editor-body">
  <NierRichTextEditor
- bind:value={noteContent}
+ bind, value={noteContent}
  placeholder="Write your case notes here..."
  {caseId}
  />

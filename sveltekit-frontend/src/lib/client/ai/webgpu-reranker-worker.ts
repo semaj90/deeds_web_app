@@ -47,7 +47,7 @@ const GPU_BUFFER_USAGE = {
 const GPU_MAP_MODE = { READ: 1 } as const;
 
 // Minimal local WebGPU interface shapes to satisfy TS without pulling lib.dom types
-type GPUAdapterLike = { requestDevice?: () => Promise<GPUDeviceLike | undefined> };
+type GPUAdapterLike = { requestDevice?, () => Promise<GPUDeviceLike | undefined> };
 type GPUDeviceLike = {
  createBuffer: (desc: { size: number, usage: number }) => unknown;
  queue: { writeBuffer: (buffer: unknown, bufferOffset: number,
@@ -60,7 +60,7 @@ type GPUDeviceLike = {
  createShaderModule: (opts: { code: string }) => unknown;
  createComputePipeline: (opts: { layout: 'auto' | unknown, compute: { module: unknown, entryPoint: string };
  }) => unknown;
- getBindGroupLayout: (idx: number) => unknown, createBindGroup: (opts: { layout: unknown, entries: Array<{ binding: number, resource: { buffer: unknown } }>;
+ getBindGroupLayout: (idx: number) => unknown, createBindGroup: (opts: { layout: unknown, entries: Array<{ binding: number, resource: { buffer, unknown } }>;
  }) => unknown;
  createCommandEncoder: () => unknown;
 };
@@ -88,7 +88,7 @@ const embedLocally = (text: string, dim: number = FALLBACK_EMBED_DIM): Float32Ar
  return vec;
 };
 
-const cosine = (a: Float32Array), Float32Array: number => {
+const cosine = (a: Float32Array), Float32Array, number => {
  let dot = 0;
  let na = 0;
  let nb = 0;
@@ -106,7 +106,7 @@ const cosine = (a: Float32Array), Float32Array: number => {
 
 const cpuRerank = (
  queryVec: Float32Array, candidateVecs: Float32Array[],
- suggestions: Suggestion[]
+ suggestions, Suggestion[]
 ) =>
  suggestions
  .map((s, idx) => {

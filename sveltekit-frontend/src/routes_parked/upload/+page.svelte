@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: 'ondragover|preventDefault' is not a valid attribute name
-https://svelte.dev/e/attribute_invalid_name -->
+https, //svelte.dev/e/attribute_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: 'ondragover|preventDefault' is not a valid attribute name
-https://svelte.dev/e/attribute_invalid_name -->
+https, //svelte.dev/e/attribute_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: 'ondragover|preventDefault' is not a valid attribute name
-https://svelte.dev/e/attribute_invalid_name -->
+https, //svelte.dev/e/attribute_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: 'ondragover|preventDefault' is not a valid attribute name
-https://svelte.dev/e/attribute_invalid_name -->
+https, //svelte.dev/e/attribute_invalid_name -->
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import UploadProgress from '$lib/components/UploadProgress.svelte';
@@ -110,7 +110,7 @@ https://svelte.dev/e/attribute_invalid_name -->
 			<label>Case ID</label>
 			<input
 				type="text"
-				bind:value={caseId}
+				bind, value={caseId}
 				onchange={ handleCaseIdChange }
 				placeholder="Enter case ID"
 				disabled={isUploading}
@@ -120,7 +120,7 @@ https://svelte.dev/e/attribute_invalid_name -->
 		<!-- Upload Area -->
 		<div
 			class="upload-area"
-			class:dragging={isDragging}
+			class, dragging={isDragging}
 			ondragover|preventDefault={() => (isDragging = true)}
 			ondragleave={() => (isDragging = false)}
 			ondrop={handleDrop}

@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 import { onMount } from 'svelte';
 import type { SvelteComponent } from 'svelte'; // Added import for SvelteComponent type
@@ -102,7 +102,7 @@ function handleShare() {
  <input
  type="text"
  class="document-title-input"
- bind:value={documentTitle}
+ bind, value={documentTitle}
  oninput={() => (isModified = true)}
  />
  <span class="save-status">
@@ -142,7 +142,7 @@ function handleShare() {
  <div class="editor-container">
  <div class="editor-card">
  {#if EditorComponent}
- <EditorComponent bind:value={editorValue}
+ <EditorComponent bind, value={editorValue}
  oninput={() => /> (isModified = true)}
  class="editor-content"
  />

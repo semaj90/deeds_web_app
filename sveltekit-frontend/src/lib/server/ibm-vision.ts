@@ -24,7 +24,7 @@ export interface IBMVisionResult {
  dates?: string[];
  };
  classifications?: Array<{ class: string;
- confidence: number;
+ confidence, number;
  }>;
  faces?: Array<{ bbox: number[];
  age?: { min: number; max: number };
@@ -90,7 +90,7 @@ export class IBMVisionService {
  private async extractText(imageBase64: string): Promise<{ text: string;
  confidence: number;
  language?: string;
- entities?: any;
+ entities?, any;
  }> {
  const params = {
  images_file: { value: Buffer.from(imageBase64, 'base64'),
@@ -121,7 +121,7 @@ export class IBMVisionService {
  */
  private async classifyImage(
  imageBase64: string
- ): Promise<Array<{ class: string; confidence: number }>> {
+ ): Promise<Array<{ class: string; confidence, number }>> {
  const params = {
  images_file: { value: Buffer.from(imageBase64, 'base64'),
  options: { filename: 'image.jpg',

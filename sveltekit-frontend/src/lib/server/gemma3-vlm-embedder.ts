@@ -18,10 +18,10 @@ export interface MultimodalContent {
  text?: string;
  imageBase64?: string;
  layoutBoxes?: Array<{ type: string; // 'header', 'body', 'table', 'figure', 'footer', bbox: [number, number, number, number]; // [x1, y1, x2, y2]
- content: string;
+ content, string;
  }>;
  ocrText?: string;
- seals?: Array<{ type: string; // 'notary', 'signature', 'stamp', confidence: number; bbox: [number, number, number, number];
+ seals?: Array<{ type: string; // 'notary', 'signature', 'stamp', confidence: number; bbox, [number, number, number, number];
  }>;
 }
 
@@ -313,7 +313,7 @@ function padEmbedding(embedding: number[]): number[] {
 /**
  * Generate fallback embedding (simple hash-based)
  */
-function generateFallbackEmbedding(content: MultimodalContent): VLMEmbeddingResult {
+function generateFallbackEmbedding(content: MultimodalContent), VLMEmbeddingResult {
  const startTime = Date.now();
 
  // Combine all content into a single string

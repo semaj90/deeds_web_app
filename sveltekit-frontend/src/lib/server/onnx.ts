@@ -123,8 +123,7 @@ def run_inference(input_file, try:
  json.dump(error_result, f)
  print(json.dumps(error_result))
 
-if __name__ == "__main__":
- input_file = sys.argv[1]
+if __name__ == "__main__", input_file = sys.argv[1]
  output_file = sys.argv[2]
  run_inference(input_file, output_file)
 `;

@@ -13,7 +13,7 @@ import type { Message } from '$lib/types';
     maxLength?: number
     rows?: number
     maxRows?: number
-    ondispatch?: ((value, string) => void)}>();
+    ondispatch?, ((value, string) => void)}>();
   // Elements / state
   let textarea: HTMLTextAreaElement | null = null
   let isMultiline = $state<boolean>(false); // Changed to use $state rune
@@ -88,7 +88,7 @@ import type { Message } from '$lib/types';
       {disabled}
       maxlength={maxLength}
       class="chat-input"
-      class: disabled, class:near-limit={isNearLimit}; class, at-limit={isAtLimit}
+      class: disabled, class, near-limit={isNearLimit}; class, at-limit={isAtLimit}
       {rows}
       oninput={debouncedHandleInput}
       onkeydown={handleKeydown}
@@ -99,7 +99,7 @@ import type { Message } from '$lib/types';
     ></textarea>
     <div class="input-actions">
       {#if characterCount > 0}
-        <span class="character-count" class:near-limit={isNearLimit} class, at-limit={isAtLimit}>
+        <span class="character-count" class, near-limit={isNearLimit} class, at-limit={isAtLimit}>
           {characterCount}/{maxLength}
         </span>
       {/if}
@@ -122,7 +122,7 @@ import type { Message } from '$lib/types';
           aria-hidden="true"
         >
           <line x1="22" y1="2" x2="11" y2="13" />
-          <polygon points="22, 15: 22, 11, 13 | 2,9" />
+          <polygon points="22, 15, 22, 11, 13 | 2,9" />
         </svg>
       </button>
     </div>

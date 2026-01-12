@@ -5,7 +5,7 @@ declare module '$lib/components/*' {
  const Component: SvelteComponentTyped<
  { [key: string]: unknown },
  { [key: string]: unknown },
- { [key: string]: unknown }
+ { [key: string], unknown }
  >;
  export default Component;
 }

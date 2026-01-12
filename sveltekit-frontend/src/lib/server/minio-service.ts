@@ -216,12 +216,12 @@ export class MinIOService {
  static async batchExtractText(
  minioUrls: string[],
  options?: { concurrency?: number; maxSize?: number }
- ): Promise<Array<{ url: string; result?: TextExtractionResult; error?: string }>> {
+ ): Promise<Array<{ url: string; result?: TextExtractionResult; error?, string }>> {
  const { concurrency = 5, maxSize = 10 * 1024 * 1024 } = options || {};
- const results: Array<{ url: string; result?: TextExtractionResult; error?: string }> = [];
+ const results: Array<{ url: string; result?: TextExtractionResult; error?, string }> = [];
  for (let i = 0; i < minioUrls.length; i += concurrency) {
  const batch = minioUrls.slice(i, i + concurrency);
- const promises = batch.map(async (url: string) => {
+ const promises = batch.map(async (url, string) => {
  try {
  const result = await this.getTextContent(url, { maxSize });
  return { url: result };

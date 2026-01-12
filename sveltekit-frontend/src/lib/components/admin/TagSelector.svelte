@@ -106,7 +106,7 @@
 	);
 </script>
 
-<div class="tag-selector" class:disabled>
+<div class="tag-selector" class, disabled>
 	<label class="selector-label">
 		🏷️ Citation Tags
 		<span class="tag-count">({selectedTags.length} selected)</span>
@@ -157,7 +157,7 @@
 						<input
 							type="text"
 							placeholder="Search tags..."
-							bind:value={searchQuery}
+							bind, value={searchQuery}
 							oninput={ loadTags }
 						/>
 					</div>
@@ -189,7 +189,7 @@
 						<input
 							type="text"
 							placeholder="Create new tag..."
-							bind:value={newTagName}
+							bind, value={newTagName}
 							onkeydown={(e) => e.key === 'Enter' && createTag()}
 						/>
 						<button

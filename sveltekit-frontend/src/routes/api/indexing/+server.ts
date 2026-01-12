@@ -420,7 +420,7 @@ Phase: Phase 66-79 Error Analysis
 
       return json({
         success: true,
-        results: results.map((r: any) => ({
+        results: results.map((r, any) => ({
           file: r.payload?.file_path,
           chunk: r.payload?.chunk_index,
           similarity: (r.score * 100).toFixed(1),

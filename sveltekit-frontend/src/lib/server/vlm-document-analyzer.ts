@@ -121,7 +121,7 @@ ${context ? `Context: ${context}` : ''}`,
 async function extractDocumentInfo(
  visionAnalysis: string, _documentType: string
 ): Promise<{ summary: string;
- entities: string[]; concepts: string[];
+ entities: string[]; concepts, string[];
 }> {
  const extractionPrompt = `Given this document analysis:
 
@@ -188,10 +188,10 @@ function computeConfidence(analysis: string): number {
  * Called from enhanced-rag endpoint
  */
 export async function enrichChatWithVLMAnalysis(chatContext: { query: string;
- ragResults: Array<{ text: string; evidence_id: string }>;
+ ragResults: Array<{ text: string; evidence_id, string }>;
  imageData?: string;
 }): Promise<{ enrichedContext: string;
- visionInsights: string[]; confidence: number;
+ visionInsights: string[]; confidence, number;
 }> {
  const { query, ragResults, imageData } = chatContext;
 

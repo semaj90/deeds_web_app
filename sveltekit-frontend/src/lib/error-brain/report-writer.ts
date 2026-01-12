@@ -53,9 +53,9 @@ export async function writeIncidentReport(
  incidentId: string,
  report: { title: string;
  timestamp: string; detectionQueries: string[];
- fixRules: Array<{ id: string; pattern: string; description: string }>;
- topOffenders: Array<{ file: string; count: number }>;
- filesChanged: Array<{ file: string; changes: number }>;
+ fixRules: Array<{ id: string; pattern: string; description, string }>;
+ topOffenders: Array<{ file: string; count, number }>;
+ filesChanged: Array<{ file: string; changes, number }>;
  unsafePatterns: string[];
  }
 ): Promise<void> {

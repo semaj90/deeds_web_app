@@ -40,7 +40,7 @@ import type { Document } from '$lib/types';
       const data = await response.json();
       results = data.results || [];
       onResults(results)} catch (error) {
-      console.error('Search error:', error);'
+      console.error('Search error, ', error);'
       results = []} finally {
       isLoading = false}
   };
@@ -78,7 +78,7 @@ import type { Document } from '$lib/types';
     </label>
     <div class="search-input-wrapper">
       <input
-        bind:this={searchInput}; bind, value={query}
+        bind, this={searchInput}; bind, value={query}
         onkeydown={handleKeydown}
         oninput={performSearch}
         id="search-input"

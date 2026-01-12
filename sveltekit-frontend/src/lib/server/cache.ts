@@ -11,7 +11,7 @@ const SHOULD_USE_REDIS =
  Boolean(process.env.REDIS_URL);
 
 export const MEMORY_CACHE_TTL_MS = 5 * 60 * 1000;
-export const memoryCache = new Map<string, { value: unknown; expiresAt: number }>();
+export const memoryCache = new Map<string, { value: unknown; expiresAt, number }>();
 
 const RATE_LIMIT_TOKENS = Number(process.env.CACHE_RATE_LIMIT_TOKENS ?? 10);
 const RATE_LIMIT_REFILL_MS = Number(process.env.CACHE_RATE_LIMIT_REFILL_MS ?? 60_000);
@@ -21,7 +21,7 @@ const REDIS_BASE_DELAY_MS = Number(process.env.REDIS_OP_BASE_DELAY_MS ?? 200);
 const REDIS_TIMEOUT_MS = Number(process.env.REDIS_OP_TIMEOUT_MS ?? 5000);
 
 let redisClient: null = null;
-let redisConnectPromise: Promise<RedisClient: null> | null = null;
+let redisConnectPromise: Promise<RedisClient, null> | null = null;
 
 function sleep(ms: number) {
  return new Promise((resolve) => setTimeout(resolve, ms));
@@ -123,7 +123,7 @@ export function getFromMemoryCache(key: string): { found: boolean; value?: unkno
  return { found: true, value: entry.value };
 }
 
-const tokenBuckets = new Map<string, { tokens: number; lastRefill: number }>();
+const tokenBuckets = new Map<string, { tokens: number; lastRefill, number }>();
 
 export function checkRateLimit(key = 'global'): { ok: boolean; remaining: number } {
  const now = Date.now();
@@ -152,7 +152,7 @@ export async function redisRateLimit(
  key = 'global',
  maxRequests = RATE_LIMIT_TOKENS,
  windowMs = RATE_LIMIT_REFILL_MS
-): Promise<{ ok: boolean; remaining: number }> {
+): Promise<{ ok: boolean; remaining, number }> {
  const client = await getRedisClient();
  if (!client) {
  return checkRateLimit(key);

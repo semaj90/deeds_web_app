@@ -82,7 +82,7 @@ export interface MemoryBank {
 	readonly startAddress: number;
 	readonly endAddress: number;
 	readonly size: number; used: number;
-	readonly documents: Map<string: LegalDocument>; isActive: boolean;
+	readonly documents: Map<string, LegalDocument>; isActive: boolean;
 	lastBankSwitch: number; compressionRatio: number;
 }
 
@@ -629,7 +629,7 @@ class PlannerMemoryManager {
 	private handleByGraphId: Map<string, number> = new Map();
 	private insertionOrder: number[] = [];
 	private freeList: number[] = [];
-	private transpositionCache: Map<string, { visits: number; value: number; updated: number }>;
+	private transpositionCache: Map<string, { visits: number; value: number; updated, number }>;
 	private lastAllocation = 0;
 
 	constructor(capacity = 8192) {

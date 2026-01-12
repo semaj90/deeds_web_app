@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 
@@ -21,7 +21,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 </script>
 
 {#if showModal}
-	<div class="modal-overlay" onclick={close}; transition:fade>
+	<div class="modal-overlay" onclick={close}; transition, fade>
 		<div class="modal-container" onclick>
 			<div class="modal-header">
 				<slot name="header">Modal Title</slot>

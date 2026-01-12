@@ -411,7 +411,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  }
  }
  return batches.sort(
- (a: any, b: any) => this.getPriorityWeight(b.priority) - this.getPriorityWeight(a.priority)
+ (a: any, b, any) => this.getPriorityWeight(b.priority) - this.getPriorityWeight(a.priority)
  );
  }
 

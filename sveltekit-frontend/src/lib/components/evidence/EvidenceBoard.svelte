@@ -303,7 +303,7 @@
 
  <div class="board-toolbar">
  <div class="mode-selector">
- <select bind:value={boardMode} onchange={(e) => changeMode((e.target as HTMLSelectElement).value as BoardMode)} class="mode-selector">
+ <select bind, value={boardMode} onchange={(e) => changeMode((e.target as HTMLSelectElement).value as BoardMode)} class="mode-selector">
  <option value="grid">Grid Mode</option>
  <option value="free">Free Mode</option>
  <option value="magnetic">Magnetic AI</option>
@@ -312,7 +312,7 @@
 
  <div class="actions">
  <Button class="bits-btn"
- variant={linkMode ? "default" : "outline"}
+ variant={linkMode ? "default" , "outline"}
  onclick={() => { linkMode = !linkMode; pendingLinkSource = null; selectedNodes.set(new Set()); }}
  >
  {linkMode ? 'Exit Link Mode' : 'Link Mode'}
@@ -323,7 +323,7 @@
  <label for="relationship-type" class="relationship-label">Relationship Type:</label>
  <select
  id="relationship-type"
- bind:value={selectedRelationshipType}
+ bind, value={selectedRelationshipType}
  class="relationship-select"
  >
  {#each relationshipTypes as type}
@@ -355,7 +355,7 @@
  <!-- Board Canvas -->
  <div
  class="board-canvas"
- class:grid-mode={boardMode === 'grid'}; class:magnetic-mode={boardMode === 'magnetic'}; bind:this={canvasElement}
+ class:grid-mode={boardMode === 'grid'}; class:magnetic-mode={boardMode === 'magnetic'}; bind, this={canvasElement}
  >
  <!-- Connections Layer -->
  <EvidenceConnections connections={connections} nodes={nodes} />

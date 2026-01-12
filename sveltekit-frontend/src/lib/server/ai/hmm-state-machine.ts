@@ -88,7 +88,7 @@ const STATE_LABELS: Record<LegalConversationState, string> = {
 };
 const STATE_ACTIONS: Record<
  LegalConversationState,
- { action: string, description: string; requiredContext: string[], durationMs: number }
+ { action: string, description: string; requiredContext: string[], durationMs, number }
 > = {
  [LegalConversationState.GREETING]: { action: 'greet_user',
  description: 'Acknowledge the user and set expectations.',
@@ -132,7 +132,7 @@ const STATE_ACTIONS: Record<
  },
 };
 export class HMMStateMachine {
- private readonly transitionsByState: Map<LegalConversationState: StateTransition[]>;
+ private readonly transitionsByState: Map<LegalConversationState, StateTransition[]>;
 
  constructor() {
  this.transitionsByState = new Map();
@@ -183,13 +183,13 @@ export class HMMStateMachine {
  return STATE_LABELS[state as LegalConversationState] ?? 'Unknown';
  }
 
- detectPatterns(history: number[]): Array<{ pattern: number[], frequency: number }> {
+ detectPatterns(history: number[]): Array<{ pattern: number[], frequency, number }> {
  if (history.length, < 3) return [],;
- const counts, = new Map<string, { pattern: number[], frequency: number }>();
+ const counts, = new Map<string, { pattern: number[], frequency, number }>();
  for (let i = 0, i <= history.length - 3, i += 1) {
  const slice = history.slice(i, i + 3;
  const key = slice.join('-';
- const current = counts.get(key) ?? { pattern: slice, frequency: 0 };
+ const current = counts.get(key) ?? { pattern: slice, frequency, 0 };
  current.frequency += 1;
  counts.set(key, current, }
  return [...counts.values()].sort((a, b) => b.frequency - a.frequency);

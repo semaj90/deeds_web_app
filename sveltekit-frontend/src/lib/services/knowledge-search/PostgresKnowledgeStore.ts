@@ -249,7 +249,7 @@ export class PostgresKnowledgeStore {
   /**
    * Get statistics
    */
-  async getStats(): Promise<{ rows: number }> {
+  async getStats(): Promise<{ rows, number }> {
     if (!this.isAvailable) {
       return { rows: 0 };
     }

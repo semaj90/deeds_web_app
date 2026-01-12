@@ -43,7 +43,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  * 3. Similar errors should be in same cluster
  * 4. Cluster count should be <= min(k, number of errors)
  */
- describe('Property 5: Error Clustering Consistency', () => {
+ describe('Property 5, Error Clustering Consistency', () => {
  it('should cluster all errors without loss', async () => {
  await fc.assert(
  fc.asyncProperty(

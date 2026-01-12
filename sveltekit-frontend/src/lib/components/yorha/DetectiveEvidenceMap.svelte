@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import * as d3 from 'd3';
  import { onDestroy, onMount } from 'svelte';
@@ -26,14 +26,14 @@ https://svelte.dev/e/js_parse_error -->
 
  interface DetectiveMapData {
  evidence: EvidenceNode[]; links: GraphLink[];
- contradictions: Array<{ sourceId: string; targetId: string; type: string }>;
- timeline: Array<{ evidenceId: string; timestamp: string; description: string }>;
+ contradictions: Array<{ sourceId: string; targetId: string; type, string }>;
+ timeline: Array<{ evidenceId: string; timestamp: string; description, string }>;
  }
 
  let { data = null, caseId = null, show = true } = $props<{
  data?: DetectiveMapData, null;
  caseId?: string | null;
- show?: boolean;
+ show?, boolean;
  }>();
 
  let container: HTMLElement;
@@ -43,7 +43,7 @@ https://svelte.dev/e/js_parse_error -->
  let height = $state(800);
  let zoom: d3.ZoomBehavior<Element, unknown>;
  let isLoading = $state(true);
- let selectedNode = $state <EvidenceNode: null>(null);
+ let selectedNode = $state <EvidenceNode, null>(null);
  let filterMode = $state <'all' | 'evidence' | 'contradictions' | 'timeline'>('all');
 
  // Phoenix Wright color scheme
@@ -133,17 +133,17 @@ https://svelte.dev/e/js_parse_error -->
  .attr('cy', '50%')
  .attr('r', '50%')
  .html(`
- <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.8"/>
- <stop offset="70%" style="stop-color:#ef4444;stop-opacity:0.4"/>
- <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0"/>
+ <stop offset="0%" style="stop-color:#ef4444;stop-opacity, 0.8"/>
+ <stop offset="70%" style="stop-color:#ef4444;stop-opacity, 0.4"/>
+ <stop offset="100%" style="stop-color:#ef4444;stop-opacity, 0"/>
  `);
 
  // Timeline connection gradient
  defs.append('linearGradient')
  .attr('id', 'timeline-gradient')
  .html(`
- <stop offset="0%" style="stop-color:#3b82f6"/>
- <stop offset="100%" style="stop-color:#1d4ed8"/>
+ <stop offset="0%" style="stop-color, #3b82f6"/>
+ <stop offset="100%" style="stop-color, #1d4ed8"/>
  `);
 
  // Prepare nodes and links
@@ -366,7 +366,7 @@ https://svelte.dev/e/js_parse_error -->
  );
  }
 
- function centerOnNode(nodeId: string) {
+ function centerOnNode(nodeId, string) {
  const node = data?.evidence.find(n => n.id === nodeId);
  if (node && svg) {
  // Implement centering logic
@@ -415,10 +415,10 @@ https://svelte.dev/e/js_parse_error -->
  </div>
 
  <div class="flex gap-2">
- <button onclick={resetZoom} class="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600">
+ <button onclick={resetZoom} class="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded hover, bg-slate-600">
  Reset Zoom
  </button>
- <button onclick={ loadData } class="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600">
+ <button onclick={ loadData } class="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded hover, bg-slate-600">
  Refresh
  </button>
  </div>
@@ -447,7 +447,7 @@ https://svelte.dev/e/js_parse_error -->
  <span>Contradiction</span>
  </div>
  <div class="flex items-center gap-2">
- <span class="text-blue-400" style="text-decoration: underline;">╌╌</span>
+ <span class="text-blue-400" style="text-decoration, underline;">╌╌</span>
  <span>Timeline</span>
  </div>
  </div>
@@ -463,7 +463,7 @@ https://svelte.dev/e/js_parse_error -->
  </div>
  {/if}
 
- <div bind:this={container} class="w-full h-96 bg-slate-950 rounded border border-slate-700"></div>
+ <div bind, this={container} class="w-full h-96 bg-slate-950 rounded border border-slate-700"></div>
  </div>
 
  <!-- Selected Node Details -->

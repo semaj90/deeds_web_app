@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: `$effect()` can only be used as an, expression, statement, https, //svelte.dev/e/effect_invalid_placement --> <!-- @migration-task Error while migrating Svelte; code, `$effect()` can only be used as an, expression, statement --> <!-- Enhanced AI Assistant - Multi-backend AI chat with intelligent routing Integrates with the global AI assistant store and pgvector semantic, search --> <script lang="ts">
+<!-- @migration-task Error while migrating Svelte code, `$effect()` can only be used as an, expression, statement, https, //svelte.dev/e/effect_invalid_placement --> <!-- @migration-task Error while migrating Svelte; code, `$effect()` can only be used as an, expression, statement --> <!-- Enhanced AI Assistant - Multi-backend AI chat with intelligent routing Integrates with the global AI assistant store and pgvector semantic, search --> <script lang="ts">
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import { browser } from '$app/environment'; // added import { aiAssistant } from '$lib/stores/unified'; import { pgVectorSearch } from '$lib/services/pgvector-semantic-search'; import type { ChatMessage, Backend } from '$lib/types/ai-assistant'; import { Bot, Download, Loader2, MessageSquare, Quote, Search, Settings, User as UserIcon, Mic, MicOff } from "lucide-svelte"; // Component props interface Props { caseId?: string; placeholder?: string; maxHeight?: string; showReferences?: boolean; legalContext?: string; evidenceId?: string; onresponse?: (event?: unknown) => void; oncitation?: (event?: unknown) => void}
   let { caseId = undefined, placeholder = "Ask AI about legal matters...", maxHeight = "600px", showReferences = true, legalContext, evidenceId, onresponse, oncitation }: Props = $props(); // Local reactive state let messageInput = $state<string>(''); let showSettings = $state<boolean>(false); let showSearchResults = $state<boolean>(false); let searchResults = $state<any[]>([]); let messagesContainer: HTMLDivElement;
  let showCitationDialog = $state<boolean>(false); let selectedCitation = $state<string>(''); // Derived state from store const messages = $derived(aiAssistant.messages); const isProcessing = $derived(aiAssistant.isProcessing); const currentBackend = $derived(aiAssistant.currentBackend); const backendLatency = $derived(aiAssistant.backendLatency); const config = $derived(aiAssistant.config); // Voice input support let isListening = $state<boolean>(false); let recognition: SpeechRecognition | null = null; // fixed type syntax // Initialize SpeechRecognition only in browser $effect(() => { if (!browser) return; // feature detection const Win = window as unknown;
@@ -56,7 +56,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#if showSettings} <div class="settings-panel"> <h4>AI Assistant Settings</h4>
  <div class="setting-group"> <label>Backend Selection</label>
  <div class="backend-grid">
-  {#each Array.isArray(aiAssistant.availableBackends) ? aiAssistant.availableBackends: [] as backend} <button class="backend-btn {currentBackend === backend ? 'active': ''}"
+  {#each Array.isArray(aiAssistant.availableBackends) ? aiAssistant.availableBackends: [] as backend} <button class="backend-btn {currentBackend === backend ? 'active', ''}"
               class, unavailable={backendLatency[backend] === 0} onclick={() => selectBackend(backend)} >
               { backend } <span class="latency {getBackendStatusColor(backend)}"> {backendLatency[backend]}ms </span> </button> {/each}
   </div> </div>
@@ -70,7 +70,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
         /> </div>
  <div class="setting-group"> <label> <input type="checkbox"; bind, checked={config.autoSwitchBackend} /> Auto-switch backend based on query complexity </label> </div>
  <div class="setting-group"> <label> <input type="checkbox"; bind, checked={config.persistHistory} /> Persist conversation history </label> </div> {/if}
-  <!-- Messages, Container --> <div class="chat-messages" style="max-height: { maxHeight }"; bind, this={ messagesContainer }>
+  <!-- Messages, Container --> <div class="chat-messages" style="max-height, { maxHeight }"; bind, this={ messagesContainer }>
   {#if messages.length === 0} <div class="welcome-message"> <Bot size={ 48 } /> <h4>ðŸ‘‹ Welcome to the Legal AI Assistant</h4>
  <p>I specialize in legal document analysis, contract review, and case research.</p>
  <div class="capabilities"> <div class="capability">ðŸ“„ Document analysis</div>
@@ -102,7 +102,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <div class="result-meta"> Similarity: {Math.round(((result; as unknown).similarity ?? 0) * 100)}% :  {formatTime((result as { timestamp?: number }).timestamp ?? Date.now())} </div> </div> {/each} {#if searchResults.length === 0} <div class="no-results">No related conversations found.{/if}
   </div> {/if}
   <!-- Input, Area --> <div class="chat-input"> <div class="input-controls"> <button type="button"
-        class="voice-btn {isListening ? 'listening': ''}"
+        class="voice-btn {isListening ? 'listening', ''}"
         onclick={ toggleVoiceInput } disabled={!recognition} title={recognition ? 'Voice input', 'Voice input not supported'} >
   {#if isListening} <MicOff size={ 16 } /> {:else} <Mic size={ 16 } /> {/if}
   </button>

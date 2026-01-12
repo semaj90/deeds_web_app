@@ -8,10 +8,10 @@
 	let description = $state<string>('Interactive evidence analysis and annotation canvas with AI-powered analysis capabilities');
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>{title}</title> <meta name="description" content={description} />
  <meta name="keywords" content="evidence, canvas, legal, AI, analysis, annotation" />
-</svelte:head>
+</svelte, head>
 <div class="evidence-canvas-page">
  <header class="page-header">
  <h1>Evidence Canvas</h1>

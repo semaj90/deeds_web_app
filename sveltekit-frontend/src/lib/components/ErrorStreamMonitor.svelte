@@ -88,7 +88,7 @@
 <div class="error-stream-container">
  <!-- Status Bar -->
  <div class="status-bar">
- <div class="status-indicator" class: connected, class:disconnected={!connected}>
+ <div class="status-indicator" class: connected, class, disconnected={!connected}>
  {connected ? '🟢 Connected' : '🔴 Disconnected'}
  </div>
  {#if error}
@@ -137,7 +137,7 @@
 
  <div class="severity-bar-container">
  <div class="severity-bar">
- <div class="bar-fill" style="width: {getSeverityBar(error.severity)}%"></div>
+ <div class="bar-fill" style="width, {getSeverityBar(error.severity)}%"></div>
  </div>
  <span class="severity-label">{error.severity}/100</span>
  </div>

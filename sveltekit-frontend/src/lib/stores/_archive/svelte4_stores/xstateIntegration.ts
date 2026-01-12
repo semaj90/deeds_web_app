@@ -90,7 +90,7 @@ export function machineContext<T>(
 
 /**
  * Action helper for cleanup on component destroy
- * Usage: <div, use:machineCleanup={cleanup}>
+ * Usage: <div, use, machineCleanup={cleanup}>
  */
 export function machineCleanup(node: HTMLElement, cleanup: () => void) {
  return {

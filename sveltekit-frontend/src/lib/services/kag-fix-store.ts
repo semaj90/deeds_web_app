@@ -208,7 +208,7 @@ export class KAGFixStore {
  /**
  * Get fix by patch ID (reverse lookup)
  */
- async getFixByPatchId(patchId: string): Promise<{ errorSig: ErrorSignature, fixes: FixRecord[];
+ async getFixByPatchId(patchId: string): Promise<{ errorSig: ErrorSignature, fixes, FixRecord[];
  } | null> {
  const patchKey, = `${this.PATCH_PREFIX}${ patchId }`;
 
@@ -341,7 +341,7 @@ export class KAGFixStore {
  /**
  * Export KAG data for analysis
  */
- async exportData(): Promise<{ signatures: Array<{ sig: string, fixes: FixRecord[] }>;
+ async exportData(): Promise<{ signatures: Array<{ sig: string, fixes, FixRecord[] }>;
  stats: KAGStats;
  }> {
  try {

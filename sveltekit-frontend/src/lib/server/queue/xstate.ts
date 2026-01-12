@@ -10,7 +10,7 @@ export interface QueueState {
 }
 
 export interface QueueContext {
- jobs: Map<string: QueueState>; activeJobs: Set<string>;
+ jobs: Map<string, QueueState>; activeJobs: Set<string>;
  maxConcurrency: number; retryDelay: number;
 }
 
@@ -82,7 +82,7 @@ const queueMachine = createMachine<QueueContext, QueueEvent>(
  context.activeJobs.add(event.jobId);
  }
  return context;
- }, completeJob: assign((context, event) => {
+ }, completeJob, assign((context, event) => {
  if (event.type !== 'COMPLETE_JOB') return context;
 
  const job = context.jobs.get(event.jobId);
@@ -114,7 +114,7 @@ const queueMachine = createMachine<QueueContext, QueueEvent>(
  job.error = undefined;
  }
  return context;
- }, cancelJob: assign((context, event) => {
+ }, cancelJob, assign((context, event) => {
  if (event.type !== 'CANCEL_JOB') return context;
 
  context.jobs.delete(event.jobId);
@@ -152,7 +152,7 @@ const queueMachine = createMachine<QueueContext, QueueEvent>(
 
 export class XStateQueueManager {
  private static instance: XStateQueueManager;
- private interpreter: Interpreter<QueueContext, any: QueueEvent>;
+ private interpreter: Interpreter<QueueContext, any, QueueEvent>;
 
  private constructor() {
  this.interpreter = interpret(queueMachine).start();

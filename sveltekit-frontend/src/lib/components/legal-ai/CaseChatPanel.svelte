@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Expected a valid CSS identifier
-https://svelte.dev/e/css_expected_identifier -->
+https, //svelte.dev/e/css_expected_identifier -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid CSS identifier
-https://svelte.dev/e/css_expected_identifier -->
+https, //svelte.dev/e/css_expected_identifier -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid CSS identifier
-https://svelte.dev/e/css_expected_identifier -->
+https, //svelte.dev/e/css_expected_identifier -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid CSS identifier
-https://svelte.dev/e/css_expected_identifier -->
+https, //svelte.dev/e/css_expected_identifier -->
 <script lang="ts">
  import { onMount } from 'svelte';
 
@@ -104,9 +104,9 @@ https://svelte.dev/e/css_expected_identifier -->
  </div>
 
  <!-- Messages -->
- <div class="messages-container" bind:this={messagesContainer}>
+ <div class="messages-container" bind, this={messagesContainer}>
  {#each messages as message (message.id)}
- <div class="message" class:system={message.role === 'system'}; class:prosecutor={message.role === 'prosecutor'}; class:ai={message.role === 'ai'}>
+ <div class="message" class:system={message.role === 'system'}; class:prosecutor={message.role === 'prosecutor'}; class, ai={message.role === 'ai'}>
  <div class="message-header">
  <span class="message-role">
  {#if message.role === 'prosecutor'}
@@ -144,7 +144,7 @@ https://svelte.dev/e/css_expected_identifier -->
  <!-- Input -->
  <div class="chat-input-area">
  <textarea
- bind:value={inputValue}
+ bind, value={inputValue}
  onkeydown={ handleKeydown }
  placeholder="Ask a legal question about this case..."
  class="chat-input"

@@ -23,9 +23,9 @@
 		lastRun?: string;
 	};
 
-	let { open = $bindable(false), route = $bindable<RouteInfo: null>(null), onClose } = $props<{
+	let { open = $bindable(false), route = $bindable<RouteInfo, null>(null), onClose } = $props<{
 		open: boolean; route: RouteInfo, null;
-		onClose?: () => void;
+		onClose?, () => void;
 	}>();
 
 	let loadingErrors = $state(false);

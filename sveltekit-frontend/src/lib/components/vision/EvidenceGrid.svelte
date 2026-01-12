@@ -4,7 +4,7 @@
  import { createEventDispatcher } from 'svelte';
 
  const dispatch = createEventDispatcher<{
- select: { src: string };
+ select: { src, string };
  }>();
 
  interface Props {
@@ -21,7 +21,7 @@
 <div class="grid grid-cols-3 gap-2 overflow-auto h-full p-2 border border-black">
  {#each selectedThumbs as thumb}
  <div
- class="cursor-pointer hover:scale-105 transition-transform border border-black bg-[#fff] aspect-square"
+ class="cursor-pointer hover, scale-105 transition-transform border border-black bg-[#fff] aspect-square"
  onclick={() => choose(thumb)}
  >
  <img

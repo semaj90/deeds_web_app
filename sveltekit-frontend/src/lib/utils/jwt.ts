@@ -77,7 +77,7 @@ export function getTimeUntilExpiration(token: string): number {
  * @param minutesBeforeExpiry - Minutes before expiry to trigger refresh (default: 5)
  * @returns true if should refresh
  */
-export function shouldRefreshToken(token: string, minutesBeforeExpiry = 5): boolean {
+export function shouldRefreshToken(token: string, minutesBeforeExpiry = 5), boolean {
  const timeLeft = getTimeUntilExpiration(token);
  const refreshThreshold = minutesBeforeExpiry * 60 * 1000;
  return timeLeft > 0 && timeLeft <= refreshThreshold;
@@ -108,7 +108,7 @@ export function isValidJWTFormat(token: string): boolean {
  if (!token || typeof token !== 'string') return false;
 
  const parts = token.split('.');
- return parts.length === 3 && parts.every((part: any) => part.length > 0);
+ return parts.length === 3 && parts.every((part, any) => part.length > 0);
 }
 
 /**

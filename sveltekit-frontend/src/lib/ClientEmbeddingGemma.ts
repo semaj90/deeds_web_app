@@ -67,7 +67,7 @@ export class ClientEmbeddingGemma {
  normalize?: boolean;
  maxLength?: number;
  } = {}
- ): Promise<{ embeddings: number[][]; model: string; dimension: number; count: number;
+ ): Promise<{ embeddings: number[][]; model: string; dimension: number; count, number;
  }> {
  if (!this.isInitialized || !this.session || !this.tokenizer) {
  await this.initialize();
@@ -171,7 +171,7 @@ export class ClientEmbeddingGemma {
  /**
  * L2 normalize embedding
  */
- private normalizeEmbedding(embedding: number[]): number[] {
+ private normalizeEmbedding(embedding: number[]), number[] {
  const norm = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
  if (norm > 0) {
  return embedding.map((val) => val / norm);
@@ -288,7 +288,7 @@ export function findSimilar(
  queryEmbedding: number[],
  embeddings: number[][],
  topK: number = 5
-): { index: number; similarity: number }[] {
+): { index: number; similarity, number }[] {
  const similarities = embeddings.map((emb, index) => ({
  index,
  similarity: cosineSimilarity(queryEmbedding, emb),

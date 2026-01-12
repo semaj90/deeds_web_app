@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, Unexpected, token --> <script lang="ts">
+<!-- @migration-task Error while migrating Svelte, code, Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, Unexpected, token --> <script lang="ts">
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import from 'svelte'; interface Props { class?: string; children?: import('svelte').Snippet}
   import  Card, CardHeader, CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; import  Badge  from "$lib/components/ui/badge.svelte"; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Separator  from "$lib/components/ui/separator/Separator.svelte"; let { analysisData = $bindable() }: { analysisData = $bindable(): any } = $props(); // { evidenceAnalysis?: any; personsData?: any; caseSynthesis?: any; caseId?: string; timestamp?: string}
 

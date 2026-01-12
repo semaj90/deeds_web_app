@@ -110,7 +110,7 @@ export async function getArchivedInteractions(
     offset?: number;
     startDate?: Date;
     endDate?: Date;
-    interactionType?: string;
+    interactionType?, string;
   } = {}
 ) {
   const db = getDb();

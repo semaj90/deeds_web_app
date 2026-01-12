@@ -3,9 +3,9 @@
  import YoRHaHarvardCard from '$lib/components/ui/enhanced-bits/YoRHaHarvardCard.svelte';
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Grey Balance Test - YoRHa Harvard Components</title>
-</svelte:head>
+</svelte, head>
 
 <main class="p-8 bg-enhanced-bg-primary">
  <div class="max-w-6xl mx-auto">
@@ -21,7 +21,7 @@
  <section class="space-y-6">
  <h2 class="text-2xl font-bold text-harvard-crimson">Button Variants</h2>
 
- <div class="grid grid-cols-1 md:grid-cols-3">
+ <div class="grid grid-cols-1 md, grid-cols-3">
  <!-- Original, Variants -->
  <div class="space-y-4">
  <h3 class="text-lg font-semibold">Original Colors</h3>
@@ -53,7 +53,7 @@
  <section class="space-y-6">
  <h2 class="text-2xl font-bold text-harvard-crimson">Card Variants</h2>
 
- <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-3">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-3">
  <!-- Original, Cards -->
  <YoRHaHarvardCard
  variant="default"
@@ -120,7 +120,7 @@
  <section class="space-y-6">
  <h2 class="text-2xl font-bold text-harvard-crimson">Color Palette Reference</h2>
 
- <div class="grid grid-cols-2 md:grid-cols-4">
+ <div class="grid grid-cols-2 md, grid-cols-4">
  <div class="bg-harvard-crimson p-4 rounded text-white">
  <div class="font-bold">Harvard Crimson</div>
  <div class="text-sm">#c41e3a</div>
@@ -149,7 +149,7 @@
  <section class="space-y-6">
  <h2 class="text-2xl font-bold text-harvard-crimson">Before vs After Comparison</h2>
 
- <div class="grid grid-cols-1 md:grid-cols-2">
+ <div class="grid grid-cols-1 md, grid-cols-2">
  <div class="space-y-4">
  <h3 class="text-lg font-semibold">Before: Crimson Heavy</h3>
  <div class="p-6 bg-gradient-to-br from-red-900/20 to-red-800/10 rounded-lg border">
@@ -192,7 +192,7 @@
  <section class="space-y-6">
  <h2 class="text-2xl font-bold text-harvard-crimson">Interactive Demo</h2>
 
- <div class="grid grid-cols-1 md:grid-cols-3">
+ <div class="grid grid-cols-1 md, grid-cols-3">
  <YoRHaHarvardCard
  variant="grey"
  title="Click Me"

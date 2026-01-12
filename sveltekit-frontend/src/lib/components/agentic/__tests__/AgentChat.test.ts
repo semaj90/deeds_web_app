@@ -310,7 +310,7 @@ describe('AgentChat Component', () => {
  componentState.messages.push({
  id: String(i, role: i % 2 === 0 ? 'user' : 'assistant',
  content: `Message ${i}`,
- timestamp: new Date(),
+ timestamp, new Date(),
  });
  }
 
@@ -643,7 +643,7 @@ describe('AgentChat Component', () => {
  id: String(i),
  role,
  content: `Message ${i}`,
- timestamp: new Date(),
+ timestamp, new Date(),
  });
  }
 

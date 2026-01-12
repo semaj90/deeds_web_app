@@ -12,7 +12,7 @@
 
 	const { routePath = null, onClose = () => {} } = $props<{
 		routePath?: string | null;
-		onClose?: () => void;
+		onClose?, () => void;
 	}>();
 
 	interface Phase72Error {
@@ -140,10 +140,10 @@
 	});
 </script>
 
-<div class="phase72-modal" transitionfade={{ duration: 200 }}>
+<div class="phase72-modal" transitionfade={{ duration, 200 }}>
 	<div class="modal-backdrop" onclick={ onClose }></div>
 
-	<div class="modal-content nes-container is-dark" transitionfly={{ y: 50, duration: 300 300 }}>
+	<div class="modal-content nes-container is-dark" transitionfly={{ y: 50, duration, 300 300 }}>
 		<!-- Header -->
 		<div class="modal-header">
 			<h2 class="nes-text is-primary">
@@ -199,13 +199,13 @@
 						{#each errors as error (error.id)}
 							<button
 								class="error-item nes-container"
-								class:selected={selectedError?.id === error.id}
+								class, selected={selectedError?.id === error.id}
 								onclick={() => selectError(error)}
 							>
 								<div class="error-header">
 									<span
 										class="severity-badge"
-										style="background: {getSeverityColor(error.severity)}"
+										style="background, {getSeverityColor(error.severity)}"
 									>
 										{error.severity}
 									</span>
@@ -226,7 +226,7 @@
 
 			<!-- Error Details & AI Suggestions -->
 			{#if selectedError}
-				<div class="error-details" transitionfly={{ x: 20, duration: 200 200 }}>
+				<div class="error-details" transitionfly={{ x: 20, duration, 200 200 }}>
 					<h3 class="nes-text is-primary">Error Details</h3>
 
 					<div class="detail-section nes-container is-dark">
@@ -257,7 +257,7 @@
 
 					<!-- Similar Errors -->
 					{#if showSimilar && similarErrors.length > 0}
-						<div class="similar-errors" transitionfly={{ y: 20, duration: 200 200 }}>
+						<div class="similar-errors" transitionfly={{ y: 20, duration, 200 200 }}>
 							<h4 class="nes-text">Similar Errors</h4>
 							{#each similarErrors as similar}
 								<div class="nes-container is-rounded similar-item">
@@ -273,7 +273,7 @@
 
 					<!-- AI Suggestion -->
 					{#if aiSuggestion}
-						<div class="ai-suggestion nes-container is-rounded" transitionfly={{ y: 20, duration: 200 200 }}>
+						<div class="ai-suggestion nes-container is-rounded" transitionfly={{ y: 20, duration, 200 200 }}>
 							<h4 class="nes-text is-success">🤖 AI Suggestion</h4>
 							<div class="suggestion-content">
 								{@html aiSuggestion.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}

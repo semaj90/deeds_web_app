@@ -19,7 +19,7 @@ interface CollectionSummary {
   summarized_at: string;
 }
 
-async function getCollectionInfo(name: string): Promise<{ points_count: number } | null> {
+async function getCollectionInfo(name: string): Promise<{ points_count, number } | null> {
   try {
     const response = await fetch(`${QDRANT_URL}/collections/${ name }`);
     if (!response.ok) return null;
@@ -68,7 +68,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     // Get all collections
     const listResponse = await fetch(`${QDRANT_URL}/collections`);
-    const listData = await listResponse.json() as { result: { collections: Array<{ name: string }> } };
+    const listData = await listResponse.json() as { result: { collections: Array<{ name, string }> } };
 
     let targetCollections = listData.result.collections.map(c => c.name);
     if (body.collections?.length) {
@@ -131,11 +131,11 @@ export const GET: RequestHandler = async () => {
     // Get existing summaries from CouchDB
     const { docs } = await couchdb.find<{
       source_id: string; summary_text: string;
-      tags: string[]; created_at: string;
+      tags: string[]; created_at, string;
     }>('llm_summaries', { type: 'llm_summary', source_type: 'cluster' }, { limit: 100 });
 
     const listResponse = await fetch(`${QDRANT_URL}/collections`);
-    const listData = await listResponse.json() as { result: { collections: Array<{ name: string }> } };
+    const listData = await listResponse.json() as { result: { collections: Array<{ name, string }> } };
 
     return json({
       collections: listData.result.collections.length,

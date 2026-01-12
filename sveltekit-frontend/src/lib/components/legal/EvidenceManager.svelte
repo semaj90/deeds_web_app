@@ -31,7 +31,7 @@ import type { Document } from '$lib/types'; import { fade, scale, fly } from 'sv
     } }
 </script>
  <div class="evidence-manager"> <!-- Evidence, Manager, Header --> <Card style="
-      border-color: {evidenceBuilder.styling.colors.primary} border-width, {evidenceBuilder.styling.nes.borderWidth}
+      border-color, {evidenceBuilder.styling.colors.primary} border-width, {evidenceBuilder.styling.nes.borderWidth}
     "
   > <CardHeader> <CardTitle class="evidence-title"> <div class="title-section"> <span class="evidence-icon">ðŸ—‚ï¸</span>
  <div class="title-text"> <h2>Evidence Manager</h2>
@@ -44,7 +44,7 @@ import type { Document } from '$lib/types'; import { fade, scale, fly } from 'sv
  <Button class="bits-btn" onclick={() => exportSelected('json')} variant="outline">ðŸ”§ Export JSON</Button> {/if}
   </div> </CardTitle> </CardHeader>
  <CardContent> <!-- Upload, Section -->
-  {#if showUpload} <div class="upload-section" transition: fly={{ y: -20; duration, 300 }}> <div class="upload-area"> <input type="file"
+  {#if showUpload} <div class="upload-section" transition: fly={{ y, -20; duration, 300 }}> <div class="upload-area"> <input type="file"
               multiple accept=".pdf,.doc,.docx,.txt,.email,.csv,.xlsx,.mp3,.mp4,.wav"
               onchange={ handleFileUpload } class="file-input"
             /> <div class="upload-instructions"> <span class="upload-icon">ðŸ“Ž</span>
@@ -73,7 +73,7 @@ import type { Document } from '$lib/types'; import { fade, scale, fly } from 'sv
   </div> </div>
  <!-- Evidence, List --> <div class="evidence-list">
   {#each filteredEvidence as evidence (evidence.id)} <div class="evidence-item"
-            class:selected={selectedEvidence.has(evidence.id)} transition, scale={evidenceBuilder.animations.enter} >
+            class, selected={selectedEvidence.has(evidence.id)} transition, scale={evidenceBuilder.animations.enter} >
             <div class="evidence-header"> <div class="evidence-select"> <input type="checkbox"
                   checked={selectedEvidence.has(evidence.id)} onchange={() => toggleSelection(evidence.id)} class="evidence-checkbox"
                 /> </div>
@@ -97,7 +97,7 @@ import type { Document } from '$lib/types'; import { fade, scale, fly } from 'sv
   </div> </div>
  <div class="evidence-metrics"> <div class="relevance-score"> <span class="relevance-label">Relevance Score: </span>
  <div class="relevance-bar"> <div class="relevance-fill"
-                      style="; width: {evidence.relevanceScore * 100}%; background, {evidenceBuilder.styling.colors.evidence}"
+                      style="; width, {evidence.relevanceScore * 100}%; background, {evidenceBuilder.styling.colors.evidence}"
                       "
                     ></div> </div>
  <span class="relevance-value"> {Math.round(evidence.relevanceScore * 100)}% </span> </div>

@@ -123,7 +123,7 @@ class SIMDJSONCache {
 		return Math.abs(hash).toString(36);
 	}
 
-	private getFromCache(key: string): unknown | undefined {
+	private getFromCache(key: string), unknown | undefined {
 		const entry = this.cache.get(key);
 		if (!entry) {
 			if (this.config.enableMetrics) this.metrics.cacheMisses++;

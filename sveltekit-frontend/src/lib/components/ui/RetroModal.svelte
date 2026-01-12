@@ -52,7 +52,7 @@
       role="dialog"
       aria-modal="true"
       aria-label={title}
-      style="min-width:400px, max-width, 600px;"
+      style="min-width, 400px, max-width, 600px;"
     >
       <div class="flex justify-between items-center mb-4">
         <div class="nes-text is-primary font-bold">{title}</div>

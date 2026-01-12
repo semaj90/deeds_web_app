@@ -13,7 +13,7 @@
  class?: string;
  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
  size?: 'default' | 'sm' | 'lg' | 'icon';
- [key: string]: any; // Allow arbitrary props
+ [key: string], any; // Allow arbitrary props
  }>();
 
  // Example of how you might derive classes based on variant/size

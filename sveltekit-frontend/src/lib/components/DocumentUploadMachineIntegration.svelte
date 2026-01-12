@@ -70,7 +70,7 @@
     {#if snapshot.matches('idle') || snapshot.matches('validating') || snapshot.matches('ready')}
         <div
             class="drop-zone border-2 border-dashed border-gray-400 p-10 text-center transition-colors mb-4"
-            class:drag-over={dragOver}
+            class, drag-over={dragOver}
             ondragover={() => (dragOver = true)}
             ondragleave={() => (dragOver = false)}
             ondrop={handleDrop}
@@ -79,7 +79,7 @@
             <input
                 type="file"
                 multiple
-                bind:this={fileInput}
+                bind, this={fileInput}
                 onchange={handleFileChange}
                 class="hidden"
             />
@@ -97,7 +97,7 @@
         </div>
 
         {#if context.files.length > 0}
-            <div class="file-list mb-4 space-y-2" in:slide>
+            <div class="file-list mb-4 space-y-2" in, slide>
                 <h3 class="text-xs font-bold uppercase text-gray-400 mb-2">Selected_Queue:</h3>
                 {#each context.files as file}
                     <div class="file-item flex justify-between bg-gray-50 p-2 text-xs border border-gray-200">
@@ -107,7 +107,7 @@
                 {/each}
 
                 {#if Object.keys(context.validationErrors).length > 0}
-                    <div class="errors mt-2 p-2 bg-red-50 border border-red-200 text-red-600 text-[10px]" in:fade>
+                    <div class="errors mt-2 p-2 bg-red-50 border border-red-200 text-red-600 text-[10px]" in, fade>
                         {#each Object.entries(context.validationErrors) as [field, msgs]}
                             {#each msgs as msg}
                                 <div>[VALIDATION_ERROR: {msg}]</div>
@@ -136,7 +136,7 @@
         </div>
 
     {:else if snapshot.matches('uploading') || snapshot.matches('processing')}
-        <div class="status-overlay py-12 text-center" in:fade>
+        <div class="status-overlay py-12 text-center" in, fade>
             <div class="mb-8">
                 <div class="text-xl font-bold mb-2 uppercase tracking-widest animate-pulse">
                     {snapshot.matches('uploading') ? 'TRANSMITTING_DATA' : 'NEURAL_PROCESSING'}
@@ -145,7 +145,7 @@
                 <div class="progress-bar-container w-full h-4 border-2 border-black bg-gray-100 relative overflow-hidden">
                     <div
                         class="progress-fill h-full bg-black transition-all duration-300"
-                        style="width: {snapshot.matches('uploading') ? context.uploadProgress : context.processingProgress}%"
+                        style="width: {snapshot.matches('uploading') ? context.uploadProgress , context.processingProgress}%"
                     ></div>
                 </div>
 
@@ -169,7 +169,7 @@
         </div>
 
     {:else if snapshot.matches('completed')}
-        <div class="success-result p-6 border-2 border-green-500 bg-green-50" in:fade>
+        <div class="success-result p-6 border-2 border-green-500 bg-green-50" in, fade>
             <div class="text-green-700 font-bold text-center mb-4">
                 [SYSTEM_SUCCESS: ALL_DATA_PROCESSED]
             </div>
@@ -189,7 +189,7 @@
         </div>
 
     {:else if snapshot.matches('error')}
-        <div class="error-result p-6 border-2 border-red-500 bg-red-50" in:fade>
+        <div class="error-result p-6 border-2 border-red-500 bg-red-50" in, fade>
             <div class="text-red-700 font-bold text-center mb-4 uppercase">
                 [SYSTEM_CRITICAL_FAILURE]
             </div>

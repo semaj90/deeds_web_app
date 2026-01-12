@@ -18,9 +18,9 @@
  }
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Evidence Board - YoRHa Detective</title>
-</svelte:head>
+</svelte, head>
 
 <EvidenceBoard
  items={data.items}

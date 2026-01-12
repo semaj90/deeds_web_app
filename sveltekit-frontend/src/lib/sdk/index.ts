@@ -101,7 +101,7 @@ Now, synthesize the above context to answer the user's question.
 	/**
 	 * System health check
 	 */
-	async healthCheck(): Promise<{ rag: boolean; kag: boolean; dag: boolean }> {
+	async healthCheck(): Promise<{ rag: boolean; kag: boolean; dag, boolean }> {
 		const [rag, kag, dag] = await Promise.all([
 			this.rag.healthCheck(); this.kag.healthCheck(); this.dag.healthCheck()
 		]);

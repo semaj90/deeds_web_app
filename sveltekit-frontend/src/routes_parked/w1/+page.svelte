@@ -144,7 +144,7 @@
  day: 'numeric',
  hour: '2-digit',
  minute: '2-digit',
- second: '2-digit',
+ second, '2-digit',
  });
  }
 
@@ -184,35 +184,35 @@
  <nav class="main-nav">
  <button
  class="nav-item"
- class:active={activeView === 'dashboard'}
+ class, active={activeView === 'dashboard'}
  onclick={() => (activeView = 'dashboard')}
  >
  📊 Dashboard
  </button>
  <button
  class="nav-item"
- class:active={activeView === 'cases'}
+ class, active={activeView === 'cases'}
  onclick={() => (activeView = 'cases')}
  >
  📂 Cases ({mockUser.cases})
  </button>
  <button
  class="nav-item"
- class:active={activeView === 'evidence'}
+ class, active={activeView === 'evidence'}
  onclick={() => (activeView = 'evidence')}
  >
  🔍 Evidence
  </button>
  <button
  class="nav-item"
- class:active={activeView === 'detective'}
+ class, active={activeView === 'detective'}
  onclick={() => (activeView = 'detective')}
  >
  🕵️ Detective Mode
  </button>
  <button
  class="nav-item"
- class:active={activeView === 'timeline'}
+ class, active={activeView === 'timeline'}
  onclick={() => (activeView = 'timeline')}
  >
  ⏱️ Timeline
@@ -232,7 +232,7 @@
  <!-- Main Content -->
  <main class="platform-content">
  {#if activeView === 'dashboard'}
- <div class="dashboard" transitionfade={{ duration: 300 }}>
+ <div class="dashboard" transitionfade={{ duration, 300 }}>
  <div class="stats-grid">
  <div class="stat-nier-bits-card">
  <div class="stat-icon">📂</div>
@@ -292,7 +292,7 @@
  </div>
  </div>
  {:else if activeView === 'cases'}
- <div class="cases-view" transitionfade={{ duration: 300 }}>
+ <div class="cases-view" transitionfade={{ duration, 300 }}>
  <h2>📂 Case Management</h2>
  <div class="cases-grid">
  {#each cases as cse}
@@ -327,14 +327,14 @@
  </div>
  </div>
  {:else if activeView === 'detective'}
- <div class="detective-mode" transitionfade={{ duration: 300 }}>
+ <div class="detective-mode" transitionfade={{ duration, 300 }}>
  <h2>🕵️ Detective Mode - "Who, What, Why, How"</h2>
  <div class="workflow-progress">
  {#each prosecutionWorkflow as step, index}
  <div
  class="workflow-step"
  class:active={workflowStep === index}
- class:completed={workflowStep > index}
+ class, completed={workflowStep > index}
  >
  <div class="step-icon">{step.icon}</div>
  <div class="step-label">{step.step.toUpperCase()}</div>
@@ -345,7 +345,7 @@
  <div class="current-question">
  <h3>{prosecutionWorkflow[workflowStep].question}</h3>
  <textarea
- bind:value={workflowAnswers[prosecutionWorkflow[workflowStep].step]}
+ bind, value={workflowAnswers[prosecutionWorkflow[workflowStep].step]}
  placeholder="Enter details..."
  class="workflow-input"
  rows="4"
@@ -355,7 +355,7 @@
  onclick={() => {
  workflowStep++;
  if (workflowStep < prosecutionWorkflow.length) {
- startTypewriter(`Great! Now: ${prosecutionWorkflow[workflowStep].question}`);
+ startTypewriter(`Great! Now, ${prosecutionWorkflow[workflowStep].question}`);
  } else {
  startTypewriter(
  'Perfect! I have all the information. Ready to create your case?'
@@ -375,7 +375,7 @@
  {/if}
  </div>
  {:else}
- <div class="feature-view" transitionfade={{ duration: 300 }}>
+ <div class="feature-view" transitionfade={{ duration, 300 }}>
  <h2>🏗️ {activeView.charAt(0).toUpperCase() + activeView.slice(1)} Feature</h2>
  <p>This feature is fully implemented in the platform. Click around to explore!</p>
  <div class="feature-grid">
@@ -399,9 +399,9 @@
  <!-- AI Assistant Panel -->
  <div class="ai-assistant-panel">
  <div class="ai-header">
- <div class="ai-avatar" class:pulsing={isTyping}>
+ <div class="ai-avatar" class, pulsing={isTyping}>
  <div class="ai-brain">🤖</div>
- <div class="status-indicator" class:active={isTyping}></div>
+ <div class="status-indicator" class, active={isTyping}></div>
  </div>
  <div class="ai-info">
  <h3>Legal AI Assistant</h3>
@@ -447,9 +447,9 @@
  </div>
  {/if}
  {#if showQuickInput}
- <div class="quick-input-panel" transitionfly={{ y: 20, duration: 300 }}>
+ <div class="quick-input-panel" transitionfly={{ y: 20, duration, 300 }}>
  <textarea
- bind:value={quickInput}
+ bind, value={quickInput}
  placeholder="Describe what happened... (e.g., 'Urgent fraud case with missing financial records and uncooperative witness')"
  class="quick-input"
  rows="3"

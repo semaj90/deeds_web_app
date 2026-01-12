@@ -199,9 +199,9 @@
  });
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>YoRHa Detective Interface</title>
-</svelte:head>
+</svelte, head>
 
 <div class="flex h-screen flex-col">
  <div class="flex-1 overflow-auto">
@@ -228,7 +228,7 @@
  {#each sections as section (section.id)}
  <button
  class="rounded-lg border border-slate-700 bg-black/60 p-4 transition-all hover:border-amber-400
- {selectedSection === section.id ? 'border-amber-400' : ''}"
+ {selectedSection === section.id ? 'border-amber-400' , ''}"
  onclick={() => setSelectedSection(section.id)}
  aria-pressed={selectedSection === section.id}
  >
@@ -284,7 +284,7 @@
  : 'Unknown date'}
  </p>
  <button
- class="mt-2 text-xs text-amber-300 hover:underline"
+ class="mt-2 text-xs text-amber-300 hover, underline"
  onclick={() => navigateToCase(caseItem.id)}
  >
  View case
@@ -340,7 +340,7 @@
  <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
  <div
  class="fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4
- border border-slate-700 bg-slate-900 p-6 shadow-lg duration-200 animate-in fade-in-0 zoom-in-95 sm: rounded-lg, md:w-full"
+ border border-slate-700 bg-slate-900 p-6 shadow-lg duration-200 animate-in fade-in-0 zoom-in-95 sm: rounded-lg, md, w-full"
  onclick={(e) => e.stopPropagation()}
  role="dialog"
  aria-modal="true"
@@ -366,7 +366,7 @@
  id="case-title"
  type="text"
  bind:value={newCaseData.title}
- class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400"
+ class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus, border-amber-400"
  required
  />
  </div>
@@ -376,7 +376,7 @@
  id="case-description"
  bind:value={newCaseData.description}
  rows="4"
- class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400"
+ class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus, border-amber-400"
  placeholder="Provide additional context, links, or known entities."
  ></textarea>
  </div>
@@ -385,7 +385,7 @@
  <select
  id="case-priority"
  bind:value={newCaseData.priority}
- class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400"
+ class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus, border-amber-400"
  >
  <option value="low">Low</option>
  <option value="medium">Medium</option>
@@ -396,7 +396,7 @@
  <div class="flex justify-end gap-3">
  <button
  type="button"
- class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:border-slate-400"
+ class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover, border-slate-400"
  onclick={ cancelNewCase }
  >
  Cancel
@@ -411,12 +411,12 @@
  </form>
  <button
  type="button"
- class="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover: opacity-100, focus: outline-none, focus: ring-2, focus: ring-slate-400, focus: ring-offset-2, focus:ring-offset-slate-900"
+ class="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover: opacity-100, focus: outline-none, focus: ring-2, focus: ring-slate-400, focus: ring-offset-2, focus, ring-offset-slate-900"
  onclick={ cancelNewCase }
  aria-label="Close"
  >
  <svg
- xmlns="http://www.w3.org/2000/svg"
+ xmlns="http, //www.w3.org/2000/svg"
  width="24"
  height="24"
  viewBox="0 0 24 24"

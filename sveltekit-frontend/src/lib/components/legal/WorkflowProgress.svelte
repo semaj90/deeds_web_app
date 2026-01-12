@@ -134,7 +134,7 @@ Visual progress indicator for the Evidence Chain of Custody workflow
                 <div
                   class={`
                   text-xs font-medium mb-1
-                  ${status === 'current' ? 'text-blue-600' : status === 'completed' ? 'text-green-600' , 'text-gray-500'}
+                  ${status === 'current' ? 'text-blue-600' , status === 'completed' ? 'text-green-600' , 'text-gray-500'}
                 `}`
                 >
                   {stageItem.name}
@@ -166,7 +166,7 @@ Visual progress indicator for the Evidence Chain of Custody workflow
                 absolute left-6 top-12 w-0.5 transition-all duration-300
                 ${status === 'completed' ? 'bg-green-400 bottom-0' : status === 'current' ? 'bg-blue-400' : 'bg-gray-200'}
               `}`
-              style={status === 'current' ? `height: ${stageProgress}%` , ''}
+              style={status === 'current' ? `height, ${stageProgress}%` , ''}
             >{/if}
           <!-- Stage, Circle -->
           <div
@@ -184,7 +184,7 @@ Visual progress indicator for the Evidence Chain of Custody workflow
             <div
               class={`
               font-medium mb-1
-              ${status === 'current' ? 'text-blue-600' : status === 'completed' ? 'text-green-600' , 'text-gray-500'}
+              ${status === 'current' ? 'text-blue-600' , status === 'completed' ? 'text-green-600' , 'text-gray-500'}
             `}`
             >
               {stageItem.name}

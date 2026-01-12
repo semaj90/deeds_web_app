@@ -94,9 +94,9 @@
 	});
 </script>
 
-<svelte:head>
+<svelte, head>
 	<title>Phase 78 AI Patches - Apply Fixes</title>
-</svelte:head>
+</svelte, head>
 
 <div class="min-h-screen bg-gray-50">
 	<!-- Header -->
@@ -110,14 +110,14 @@
 				<div class="flex gap-3">
 					<a
 						href="/phase78/monitor"
-						class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+						class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded hover, bg-gray-50 transition"
 					>
 						← Back to Monitor
 					</a>
 					<button
 						onclick={ loadData }
 						disabled={isLoading}
-						class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover: bg-blue-700, disabled:bg-gray-400 transition"
+						class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover: bg-blue-700, disabled, bg-gray-400 transition"
 					>
 						{isLoading ? 'Loading...' : 'Refresh'}
 					</button>
@@ -146,7 +146,7 @@
 			</div>
 		{:else if data}
 			<!-- Stats Cards -->
-			<div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+			<div class="grid grid-cols-1 md, grid-cols-5 gap-4 mb-8">
 				<div class="bg-white rounded-lg border p-4 text-center">
 					<div class="text-sm text-gray-600 font-semibold uppercase">Total</div>
 					<div class="text-3xl font-bold text-gray-900 mt-2">{data.stats.totalSuggestions}</div>
@@ -179,7 +179,7 @@
 			{:else}
 				<div class="space-y-6">
 					{#each data.suggestions as suggestion (suggestion.id)}
-						<div class="bg-white border rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+						<div class="bg-white border rounded-xl shadow-sm overflow-hidden hover, shadow-md transition-shadow">
 							<!-- Header -->
 							<div class="p-5 border-b bg-gray-50 flex justify-between items-center">
 								<div class="flex items-center gap-3">
@@ -215,14 +215,14 @@
 								</div>
 								<div class="flex gap-2">
 									<button
-										class="px-4 py-2 text-gray-600 text-sm hover:text-gray-900 font-medium transition"
+										class="px-4 py-2 text-gray-600 text-sm hover, text-gray-900 font-medium transition"
 										onclick={() => navigator.clipboard.writeText(suggestion.patch)}
 									>
 										📋 Copy Code
 									</button>
 									{#if !suggestion.applied}
 										<button
-											class="px-5 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 shadow-sm disabled:bg-gray-400 transition"
+											class="px-5 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 shadow-sm disabled, bg-gray-400 transition"
 											onclick={() => applyPatch(suggestion.id)}
 											disabled={applyingPatch === suggestion.id}
 										>

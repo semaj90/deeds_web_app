@@ -99,9 +99,9 @@
  }
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Phase 74: SvelteKit Frontend | YoRHa Legal AI</title>
-</svelte:head>
+</svelte, head>
 
 <div class="phase-74-layout">
  <!-- Header -->
@@ -127,35 +127,35 @@
  <h3>Features</h3>
  <button
  class="nav-btn"
- class:active={activeTab === 'editor'}
+ class, active={activeTab === 'editor'}
  onclick={() => activeTab = 'editor'}
  >
  📝 Code Editor
  </button>
  <button
  class="nav-btn"
- class:active={activeTab === 'upload'}
+ class, active={activeTab === 'upload'}
  onclick={() => activeTab = 'upload'}
  >
  📁 File Upload
  </button>
  <button
  class="nav-btn"
- class:active={activeTab === 'search'}
+ class, active={activeTab === 'search'}
  onclick={() => activeTab = 'search'}
  >
  🔍 Web Search
  </button>
  <button
  class="nav-btn"
- class:active={activeTab === 'diff'}
+ class, active={activeTab === 'diff'}
  onclick={() => activeTab = 'diff'}
  >
  📊 Diff Viewer
  </button>
  <button
  class="nav-btn"
- class:active={activeTab === 'form'}
+ class, active={activeTab === 'form'}
  onclick={() => activeTab = 'form'}
  >
  📋 Case Form
@@ -259,7 +259,7 @@
  console.log('Case loaded:', caseId);
  return data;
  } catch (error) {
- console.error('Failed to load case:', error);
+ console.error('Failed to load case, ', error);
  return null;
  }
 }`}

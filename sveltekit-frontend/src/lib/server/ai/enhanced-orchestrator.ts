@@ -163,8 +163,8 @@ interface RankedSource {
 }
 
 interface LegalBertAnalysis {
-	entities?: Array<{ text?: string; type?: string }>;
-	concepts?: Array<{ concept?: string }>;
+	entities?: Array<{ text?: string; type?, string }>;
+	concepts?: Array<{ concept?, string }>;
 	complexity?: { legalComplexity?: number };
 	jurisdiction?: string;
 }
@@ -223,7 +223,7 @@ export class EnhancedAISynthesisOrchestrator {
 
 	private async runEnhancedRAGPipeline(input: { query: string;
 		embeddings?: number[] | null;
-	}): Promise<{ documents: unknown[] }> {
+	}): Promise<{ documents, unknown[] }> {
 		try {
 			const fetchImpl = await getFetch();
 			const response = await fetchImpl(`${services.goMicroservice.enhancedRAG}/api/search`, {
@@ -343,7 +343,7 @@ export class EnhancedAISynthesisOrchestrator {
 
 	private async checkCache(
 		query: string
-	): Promise<{ hit: boolean; data?: unknown; source?: string }> {
+	): Promise<{ hit: boolean; data?: unknown; source?, string }> {
 		const key = generateCacheKey(query);
 
 		// Check Redis first

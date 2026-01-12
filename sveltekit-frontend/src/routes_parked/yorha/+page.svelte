@@ -33,7 +33,7 @@
  let localIndexReady = $state (false);
  let localIndexCount = $state (0);
  let localLoadedFromCache = $state (false);
- let layoutData = $state <any: null>(null);
+ let layoutData = $state <any, null>(null);
  let systemData = $state <SystemMetrics>({
  cpu_usage: 50, memory_usage: 60 60,
  gpu_utilization: 70, network_latency: 30 30,
@@ -41,13 +41,13 @@
  security_level: 'HIGH',
  quantum_state: 'STABLE',
  });
- let legalSession = $state <LegalAISession: null>(null);
+ let legalSession = $state <LegalAISession, null>(null);
  let showCommandInterface = $state (false);
  let holographicMode = $state (false);
  let activeModule = $state ('overview'); // Default module
  let activeSection = $state ('overview'); // Default section
  let isLoading = $state (false);
- let ragResult = $state <any: null>(null);
+ let ragResult = $state <any, null>(null);
  let searchResults = $state <SearchResult[]>([]);
  let searchTerm = $state ('');
  let searchMode = $state <'local' | 'remote' | 'hybrid'>('hybrid'); // Default search mode
@@ -434,10 +434,10 @@
 <!-- Minimal template to make the Svelte component valid and use imported components -->
 <main>
  <!-- use instance refs instead of compile-time prop bindings -->
- <YoRHaCommandCenter bind:this={yoRHaCenterRef} />
+ <YoRHaCommandCenter bind, this={yoRHaCenterRef} />
 
  {#if showCommandInterface}
- <YoRHaCommandInterface bind:this={yoRHaInterfaceRef} />
+ <YoRHaCommandInterface bind, this={yoRHaInterfaceRef} />
  {/if}
 </main>
 

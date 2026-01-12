@@ -145,7 +145,7 @@ export class MinIOService {
    */
   async storeChunks(
     docId: string,
-    chunks: Array<{ text: string; metadata: object }>
+    chunks: Array<{ text: string; metadata, object }>
   ): Promise<string> {
     this.validateInput(docId, 'docId');
     if (!Array.isArray(chunks) || chunks.length === 0) {
@@ -338,7 +338,7 @@ export class MinIOService {
           error
         );
         if (attempt < maxRetries - 1) {
-          await new Promise((resolve: any) => setTimeout(resolve, delayMs));
+          await new Promise((resolve, any) => setTimeout(resolve, delayMs));
         }
       }
     }
@@ -402,7 +402,7 @@ export class MinIOService {
     bucket: string,
     prefix: string,
     maxKeys: number = 1000
-  ): Promise<Array<{ key: string; size: number; lastModified: Date }>> {
+  ): Promise<Array<{ key: string; size: number; lastModified, Date }>> {
     this.validateInput(bucket, 'bucket');
 
     try {

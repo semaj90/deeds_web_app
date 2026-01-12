@@ -71,7 +71,7 @@ export class EmbeddingWorkerManager {
 	private pendingTasks = new Map<
 		string,
 		{
-			resolve: (value: unknown) => void;
+			resolve: (value, unknown) => void;
 			reject: (error: Error) => void;
 			onProgress?: (progress: number, data?: ProgressData) => void;
 		}

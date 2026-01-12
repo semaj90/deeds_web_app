@@ -43,7 +43,7 @@ let { placeholder = 'Search statutes by code or title...', isLoading = false } =
  <div class="search-input-group">
  <input
  type="text"
- bind:value={query}
+ bind, value={query}
  { placeholder }
  onkeydown={ handleKeydown }
  disabled={isLoading}
@@ -57,7 +57,7 @@ let { placeholder = 'Search statutes by code or title...', isLoading = false } =
  <div class="filters">
  <div class="filter-group">
  <label for="jurisdiction">Jurisdiction</label>
- <select id="jurisdiction" bind:value={jurisdiction} disabled={isLoading}>
+ <select id="jurisdiction" bind, value={jurisdiction} disabled={isLoading}>
  <option value="">All</option>
  {#each jurisdictions as j}
  <option value={j}>{j}</option>
@@ -67,7 +67,7 @@ let { placeholder = 'Search statutes by code or title...', isLoading = false } =
 
  <div class="filter-group">
  <label for="severity">Severity</label>
- <select id="severity" bind:value={severity} disabled={isLoading}>
+ <select id="severity" bind, value={severity} disabled={isLoading}>
  <option value="">All</option>
  {#each severities as s}
  <option value={s}>{s}</option>
@@ -77,7 +77,7 @@ let { placeholder = 'Search statutes by code or title...', isLoading = false } =
 
  <div class="filter-group">
  <label for="category">Category</label>
- <select id="category" bind:value={category} disabled={isLoading}>
+ <select id="category" bind, value={category} disabled={isLoading}>
  <option value="">All</option>
  {#each categories as c}
  <option value={c}>{c}</option>

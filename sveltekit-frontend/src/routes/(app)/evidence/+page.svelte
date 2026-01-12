@@ -3,7 +3,7 @@
 	import type { ActionData, PageData } from './$types';
 	import { onMount } from 'svelte';
 
-	let { data, form } = $props<{ data: PageData; form: ActionData }>();
+	let { data, form } = $props<{ data: PageData; form, ActionData }>();
 
 	let isDragging = $state(false);
 	let isUploading = $state(false);
@@ -85,7 +85,7 @@
 		<form
 			method="POST"
 			action="?/upload"
-			use:enhance={() => {
+			use, enhance={() => {
 				isUploading = true;
 				return async ({ result }) => {
 					isUploading = false;
@@ -103,7 +103,7 @@
 			<div
 				class="drop-zone"
 				class:dragging={isDragging}
-				class:disabled={isUploading}
+				class, disabled={isUploading}
 				ondragover={handleDragOver}
 				ondragleave={handleDragLeave}
 				ondrop={handleDrop}
@@ -128,7 +128,7 @@
 							onchange={handleFileSelect}
 							id="file-input"
 							class="hidden-input"
-							style="display: none;"
+							style="display, none;"
 						/>
 						<button type="button" onclick={() => document.getElementById('file-input')?.click()}>
 							Choose File

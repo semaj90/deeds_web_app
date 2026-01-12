@@ -17,7 +17,7 @@
  id: string; caseId: string;
  text: string; holding: string;
  citations: Array<{ code: string;
- title: string; jurisdiction: string;
+ title: string; jurisdiction, string;
  }>;
  version: number; createdAt: string;
  updatedAt: string;
@@ -147,7 +147,7 @@
  <h1>{caseDetail.caseNumber}</h1>
  <div class="case-meta">
  <span class="defendant">{caseDetail.defendant}</span>
- <span class="status" class:active={caseDetail.status === 'Active'}>
+ <span class="status" class, active={caseDetail.status === 'Active'}>
  {caseDetail.status}
  </span>
  </div>
@@ -174,21 +174,21 @@
  <div class="tabs">
  <button
  class="tab"
- class:active={activeTab === 'summary'}
+ class, active={activeTab === 'summary'}
  onclick={() => (activeTab = 'summary')}
  >
  Summary
  </button>
  <button
  class="tab"
- class:active={activeTab === 'similar'}
+ class, active={activeTab === 'similar'}
  onclick={() => (activeTab = 'similar')}
  >
  Similar Cases
  </button>
  <button
  class="tab"
- class:active={activeTab === 'details'}
+ class, active={activeTab === 'details'}
  onclick={() => (activeTab = 'details')}
  >
  Details

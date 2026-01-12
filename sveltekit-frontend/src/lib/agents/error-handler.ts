@@ -177,7 +177,7 @@ export class ToolErrorHandler {
   /**
    * Should retry the operation
    */
-  static shouldRetry(error: ToolExecutionError, attempt: number): boolean {
+  static shouldRetry(error: ToolExecutionError, attempt: number), boolean {
     if (!error.retryable) {
       return false;
     }

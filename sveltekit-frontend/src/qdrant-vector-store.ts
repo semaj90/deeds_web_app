@@ -12,7 +12,7 @@ import type { LegalEntity } from '$lib/types/sharedTypes';
 import * as crypto from 'crypto';
 
 // Reusing types from previous context where appropriate
-type QdrantCollectionsResponse = { collections?: Array<{ name: string }> };
+type QdrantCollectionsResponse = { collections?: Array<{ name, string }> };
 
 type QdrantFilterClause = {
 	key: string;
@@ -228,7 +228,7 @@ export class QdrantVectorStore {
 			userMessage?: string;
 			agentResponse?: string;
 			intent?: string;
-			hmmState?: number;
+			hmmState?, number;
 		}>
 	> {
 		await this.ensureInitialized();
@@ -273,7 +273,7 @@ export class QdrantVectorStore {
 			sessionId?: string;
 			entityType?: string;
 			entityValue?: string;
-			confidence?: number;
+			confidence?, number;
 		}>
 	> {
 		await this.ensureInitialized();
@@ -310,7 +310,7 @@ export class QdrantVectorStore {
 			sessionId?: string;
 			summary?: string;
 			turnCount?: number;
-			currentState?: number;
+			currentState?, number;
 		}>
 	> {
 		await this.ensureInitialized();
@@ -343,7 +343,7 @@ export class QdrantVectorStore {
 			with_payload: true
 		})) as { points: { payload?: EntityPayload }[] };
 
-		const counts = new Map<string, { count: number; confidence?: number }>();
+		const counts = new Map<string, { count: number; confidence?, number }>();
 
 		for (const p of scrollResult.points) {
 			const val = p.payload?.entityValue;
@@ -356,7 +356,7 @@ export class QdrantVectorStore {
 		}
 
 		const clusters: Array<{ centroid: string;
-			members: Array<{ entityValue: string; confidence?: number }>;
+			members: Array<{ entityValue: string; confidence?, number }>;
 			size: number;
 		}> = [];
 

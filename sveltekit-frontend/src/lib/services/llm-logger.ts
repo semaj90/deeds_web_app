@@ -239,7 +239,7 @@ class LLMLogger {
 
       if (!searchResponse.ok) return [];
 
-      const { result } = await searchResponse.json() as { result: Array<{ payload: { log_id: string } }> };
+      const { result } = await searchResponse.json() as { result: Array<{ payload: { log_id, string } }> };
 
       // Fetch full logs from CouchDB
       const logs: LLMLog[] = [];
@@ -314,7 +314,7 @@ class LLMLogger {
     notes?: string
   ): Promise<void> {
     try {
-      const log = await couchdb.get<LLMLog & { _rev: string }>('ace_llm_logs', logId);
+      const log = await couchdb.get<LLMLog & { _rev, string }>('ace_llm_logs', logId);
       if (!log) return;
 
       log.evaluation.human_feedback = feedback;

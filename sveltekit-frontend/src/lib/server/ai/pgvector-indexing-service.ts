@@ -251,7 +251,7 @@ WHERE 1=1
  }
  /** * Get document statistics */
  async getStats(): Promise<{ totalDocuments: number, totalChunks: number; totalEmbeddings: number, averageEmbeddingDimension: number;
- indexSize?: string;
+ indexSize?, string;
  }> {
  try {
  const stats = await this.db.execute(

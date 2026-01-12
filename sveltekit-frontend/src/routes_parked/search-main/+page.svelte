@@ -88,7 +88,7 @@
 			<input
 				type="text"
 				placeholder="Search evidence by meaning, statute, or case details..."
-				bind:value={query}
+				bind, value={query}
 				onkeydown={ handleKeydown }
 				disabled={loading}
 			/>
@@ -101,7 +101,7 @@
 		<div class="filters">
 			<div class="filter-group">
 				<label>Jurisdiction</label>
-				<select bind:value={filters.jurisdiction}>
+				<select bind, value={filters.jurisdiction}>
 					<option value="">All Jurisdictions</option>
 					{#each jurisdictions as j}
 						<option value={j}>{j}</option>
@@ -111,7 +111,7 @@
 
 			<div class="filter-group">
 				<label>Statute</label>
-				<select bind:value={filters.statute}>
+				<select bind, value={filters.statute}>
 					<option value="">All Statutes</option>
 					{#each statutes as s}
 						<option value={s}>{s}</option>
@@ -122,9 +122,9 @@
 			<div class="filter-group">
 				<label>Date Range</label>
 				<div class="date-range">
-					<input type="date" bind:value={filters.dateRange[0]} />
+					<input type="date" bind, value={filters.dateRange[0]} />
 					<span>to</span>
-					<input type="date" bind:value={filters.dateRange[1]} />
+					<input type="date" bind, value={filters.dateRange[1]} />
 				</div>
 			</div>
 

@@ -40,7 +40,7 @@ export interface Evidence {
  thumbnailUrl?: string; // From EvidenceItem
 
  // Processing status and metadata
- processingStatus?? 'pending'
+ processingStatus?: 'pending'
  | 'processing'
  | 'completed'
  | 'failed'
@@ -67,7 +67,7 @@ export type EvidenceAnalysisResult = {
 // ==================== AI Agent Types ====================
 export type AIAgentTool = {
  name: string; description: string;
- parameters: Record<string, { type: string; description: string; required?: boolean }>;
+ parameters: Record<string, { type: string; description: string; required?, boolean }>;
  execute: (params: Record<string, unknown>) => Promise<unknown>;
 };
 
@@ -131,13 +131,13 @@ export type CacheEntry<T> = { data: T; timestamp: number; ttl: number; userId?: 
 
 export type EmbeddingCache = CacheEntry<{
  fileId: string; embedding: VectorEmbedding;
- model: string;
+ model, string;
 }>;
 
 export type AnalysisCache = CacheEntry<{
  fileId: string; summary: string;
  tags: string[];
- legalNotes?: string;
+ legalNotes?, string;
 }>;
 
 // ==================== API Response Types ====================
@@ -149,12 +149,12 @@ export type APIResponse<T = unknown> = {
 
 export type UploadResponse = APIResponse<{
  fileId: string; path: string;
- processingStarted: boolean;
+ processingStarted, boolean;
 }>;
 
 export type SearchResponse = APIResponse<{
  results: VectorSearchResult[]; totalFound: number;
- queryTimeMs: number;
+ queryTimeMs, number;
 }>;
 
 // ==================== WebSocket Message Types ====================
@@ -193,7 +193,7 @@ export type EvidenceSnapshot =
  status: 'error'; error: unknown; // Required when status is 'error', output | undefined; // Must be undefined when status is 'error'
  });
 
-export type EvidenceActor = ActorRef<EvidenceSnapshot: WorkflowEvent>; // Swapped generics: snapshot first, event second
+export type EvidenceActor = ActorRef<EvidenceSnapshot, WorkflowEvent>; // Swapped generics: snapshot first, event second
 
 // For WebSocket updates
 export interface AnalysisUpdate {

@@ -14,7 +14,7 @@
 
  let { citation, showActions = true } = $props<{
  citation: Citation;
- showActions?: boolean;
+ showActions?, boolean;
  }>();
 
 
@@ -145,7 +145,7 @@
  <span class="meta-label">Severity:</span>
  <span
  class="meta-badge severity"
- style="background-color: {getSeverityColor(citation.severity)}"
+ style="background-color, {getSeverityColor(citation.severity)}"
  >
  {citation.severity}
  </span>
@@ -178,7 +178,7 @@
  {#if isEditing}
  <div class="notes-editor">
  <textarea
- bind:value={editedNotes}
+ bind, value={editedNotes}
  placeholder="Add notes about this citation..."
  rows="4"
  disabled={isSaving}

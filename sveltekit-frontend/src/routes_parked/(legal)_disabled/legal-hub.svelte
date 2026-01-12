@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; import Card from '$lib/components/ui/Card/Card.svelte'; import CardContent from '$lib/components/ui/Card/CardContent.svelte'; import CardHeader from '$lib/components/ui/Card/CardHeader.svelte'; import CardTitle from '$lib/components/ui/Card/CardTitle.svelte'; import Button from '$lib/components/ui/button/Button.svelte'; // Types interface LegalStats { activeCases: number, documentsAnalyzed: number, citationsFound: number; complianceScore: number}

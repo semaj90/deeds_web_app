@@ -17,10 +17,10 @@
  };
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Phase 4: Detective Mode - YoRHa Legal AI</title>
  <meta name="description" content="Professional investigative AI system with evidence mapping, automated reports, and judicial analysis" />
-</svelte:head>
+</svelte, head>
 
 <DetectiveModeDashboard {currentCase} />
 

@@ -14,7 +14,7 @@ class InMemoryQueue extends EventEmitter {
  private messages: Map<string, QueueMessage[]> = new Map();
  private processing: Set<string> = new Set();
  private deadLetter: Map<string, QueueMessage[]> = new Map();
- private stats: Map<string, { processed: number, failed: number }> = new Map();
+ private stats: Map<string, { processed: number, failed, number }> = new Map();
 
  constructor(private options: QueueOptions = {}) {
  super();

@@ -263,7 +263,7 @@ export async function indexLawSection(
  * Batch index case chunks
  */
 export async function batchIndexCaseChunks(
- documents: Array<{ id: string; document: CaseChunkDocument;
+ documents: Array<{ id: string; document, CaseChunkDocument;
  }>,
  batchSize: number = 100
 ): Promise<void> {
@@ -319,7 +319,7 @@ export async function batchIndexCaseChunks(
  * Batch index law sections
  */
 export async function batchIndexLawSections(
- documents: Array<{ id: string; document: LawSectionDocument;
+ documents: Array<{ id: string; document, LawSectionDocument;
  }>,
  batchSize: number = 100
 ): Promise<void> {
@@ -381,7 +381,7 @@ export async function searchCaseChunks(
 ): Promise<
  Array<{
  id: string; score: number;
- document: CaseChunkDocument;
+ document, CaseChunkDocument;
  }>
 > {
  try {
@@ -439,7 +439,7 @@ export async function searchCaseChunks(
  const result = (await response.json()) as {
  hits: { hits: Array<{
  _id: string; _score: number;
- _source: CaseChunkDocument;
+ _source, CaseChunkDocument;
  }>;
  };
  };
@@ -466,7 +466,7 @@ export async function searchLawSections(
 ): Promise<
  Array<{
  id: string; score: number;
- document: LawSectionDocument;
+ document, LawSectionDocument;
  }>
 > {
  try {
@@ -514,7 +514,7 @@ export async function searchLawSections(
  const result = (await response.json()) as {
  hits: { hits: Array<{
  _id: string; _score: number;
- _source: LawSectionDocument;
+ _source, LawSectionDocument;
  }>;
  };
  };

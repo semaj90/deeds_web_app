@@ -120,20 +120,20 @@
 
 	<!-- Main Layout -->
 	<div class="board-layout">
-		<!-- Left Sidebar: Evidence List -->
+		<!-- Left Sidebar, Evidence List -->
 		<div class="sidebar left-sidebar">
 			<h2>Evidence Library</h2>
 			<div class="evidence-list">
 				{#each evidence as item (item.id)}
 					<div
 						class="list-item"
-						class:selected={selectedEvidence?.id === item.id}
+						class, selected={selectedEvidence?.id === item.id}
 						onclick={() => (selectedEvidence = item)}
 						onkeydown={(e) => e.key === 'Enter' && (selectedEvidence = item)}
 						role="button"
 						tabindex="0"
 					>
-						<div class="status-indicator" style="background: {item.status_color}"></div>
+						<div class="status-indicator" style="background, {item.status_color}"></div>
 						<div class="list-item-content">
 							<div class="list-item-title">{item.title}</div>
 							<div class="list-item-meta">{item.doc_id}</div>
@@ -143,7 +143,7 @@
 			</div>
 		</div>
 
-		<!-- Center Canvas: Evidence Cards -->
+		<!-- Center Canvas, Evidence Cards -->
 		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 		<div
 			class="canvas"
@@ -154,7 +154,7 @@
 			role="application"
 			aria-label="Evidence board canvas"
 		>
-			<div class="canvas-content" style="transform: translate({panX}px, {panY}px) scale({zoom / 100})">
+			<div class="canvas-content" style="transform, translate({panX}px, {panY}px) scale({zoom / 100})">
 				<!-- Connection Lines -->
 				<EvidenceConnections {evidence} />
 
@@ -172,7 +172,7 @@
 			</div>
 		</div>
 
-		<!-- Right Rail: Metadata -->
+		<!-- Right Rail, Metadata -->
 		<div class="sidebar right-sidebar">
 			{#if selectedEvidence}
 				<div class="metadata-panel">
@@ -183,7 +183,7 @@
 					</div>
 					<div class="metadata-section">
 						<label>Status</label>
-						<span class="status-badge" style="background: {selectedEvidence.status_color}">
+						<span class="status-badge" style="background, {selectedEvidence.status_color}">
 							{selectedEvidence.status}
 						</span>
 					</div>

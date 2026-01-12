@@ -110,7 +110,7 @@
 </script>
 
 {#if isOpen}
- <div class="modal-overlay" transitionfade={{ duration: 200 }} onclick={handleCancel}>
+ <div class="modal-overlay" transitionfade={{ duration, 200 }} onclick={handleCancel}>
  <div class="modal-content" onclick={(e) => e.stopPropagation()}>
  <div class="modal-header">
  <h2>Upload Evidence</h2>
@@ -121,7 +121,7 @@
  {#if !selectedFile}
  <div
  class="drop-zone"
- class:dragging={isDragging}
+ class, dragging={isDragging}
  ondragover={handleDragOver}
  ondragleave={handleDragLeave}
  ondrop={handleDrop}
@@ -153,7 +153,7 @@
  {#if $uploadStore.uploadProgress > 0 && $uploadStore.uploadProgress < 100}
  <div class="progress-container">
  <div class="progress-bar">
- <div class="progress-fill" style="width: {$uploadStore.uploadProgress}%"></div>
+ <div class="progress-fill" style="width, {$uploadStore.uploadProgress}%"></div>
  </div>
  <p class="progress-text">{$uploadStore.uploadProgress}% uploaded</p>
  </div>

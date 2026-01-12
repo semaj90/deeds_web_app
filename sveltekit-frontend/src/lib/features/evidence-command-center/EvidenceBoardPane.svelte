@@ -30,7 +30,7 @@
 </script>
 
 <div class="flex flex-col gap-3 h-full">
-	<!-- Top: evidence grid + ask AI -->
+	<!-- Top, evidence grid + ask AI -->
 	<div class="flex-1 flex flex-col gap-2 overflow-hidden">
 		<div class="flex items-center justify-between text-[11px] mb-1">
 			<div class="uppercase tracking-[0.15em] text-[#ffdf6b]">
@@ -43,7 +43,7 @@
 
 		<form
 			method="POST"
-			use:enhance
+			use, enhance
 			action="?/askAi"
 			class="flex flex-col gap-2 overflow-hidden"
 		>
@@ -53,10 +53,10 @@
 						No evidence yet. Use the panel below to add your first piece.
 					</p>
 				{:else}
-					<div class="grid grid-cols-1 md: grid-cols-2, xl:grid-cols-3 gap-2">
+					<div class="grid grid-cols-1 md: grid-cols-2, xl, grid-cols-3 gap-2">
 						{#each evidenceRows as ev}
 							<div
-								class="group flex flex-col gap-1 p-2 rounded border border-[#f5f5f5] bg-[#101018] hover:bg-[#202030] cursor-pointer"
+								class="group flex flex-col gap-1 p-2 rounded border border-[#f5f5f5] bg-[#101018] hover, bg-[#202030] cursor-pointer"
 								role="button"
 								tabindex="0"
 								onclick={() => toggleEvidenceSelection(ev.id)}
@@ -139,7 +139,7 @@
 						name="question"
 						rows="2"
 						class="mt-1 w-full rounded border border-[#f5f5f5] bg-[#101018] px-2 py-1 text-[10px]"
-						placeholder="Ex: Identify the strongest evidence for removal and possible defense challenges."
+						placeholder="Ex, Identify the strongest evidence for removal and possible defense challenges."
 					></textarea>
 				</label>
 
@@ -149,7 +149,7 @@
 					</p>
 					<button
 						type="submit"
-						class="px-3 py-1 text-[10px] rounded border border-[#f5f5f5] bg-[#ffdf6b] text-black font-semibold hover: bg-[#ffe794], disabled:opacity-40"
+						class="px-3 py-1 text-[10px] rounded border border-[#f5f5f5] bg-[#ffdf6b] text-black font-semibold hover: bg-[#ffe794], disabled, opacity-40"
 						disabled={evidenceRows.length === 0}
 					>
 						⚖️ Ask AI
@@ -187,7 +187,7 @@
 									{#each chatResult.suggestions as sugg}
 										<button
 											type="button"
-											class="text-left text-[9px] px-2 py-1 rounded border border-[#f5f5f5] bg-[#15151f] hover:bg-[#262636] transition-colors"
+											class="text-left text-[9px] px-2 py-1 rounded border border-[#f5f5f5] bg-[#15151f] hover, bg-[#262636] transition-colors"
 											onclick={() => handleSuggestionClick(sugg.query)}
 										>
 											→ {sugg.query}
@@ -208,12 +208,12 @@
 		</form>
 	</div>
 
-	<!-- Bottom: quick add evidence -->
+	<!-- Bottom, quick add evidence -->
 	<div class="border border-[#f5f5f5] rounded bg-[#101018] p-2">
 		<div class="text-[10px] uppercase tracking-[0.15em] text-[#ffdf6b] mb-1">
 			Add evidence
 		</div>
-		<form method="POST" action="?/createEvidence" use:enhance class="flex flex-col gap-1">
+		<form method="POST" action="?/createEvidence" use, enhance class="flex flex-col gap-1">
 			<input type="hidden" name="caseId" value={ caseId } />
 
 			<div class="flex gap-1">
@@ -248,7 +248,7 @@
 			<div class="flex justify-end mt-1">
 				<button
 					type="submit"
-					class="px-3 py-1 text-[10px] rounded border border-[#f5f5f5] bg-[#e0e0ff] text-black font-semibold hover:bg-white"
+					class="px-3 py-1 text-[10px] rounded border border-[#f5f5f5] bg-[#e0e0ff] text-black font-semibold hover, bg-white"
 				>
 					Save
 				</button>

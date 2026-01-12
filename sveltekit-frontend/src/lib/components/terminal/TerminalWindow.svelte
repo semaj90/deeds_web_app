@@ -2,7 +2,7 @@
  interface Query {
  id: string; query: string;
  response: string; timestamp: Date;
- functionCalls: Array<{ name: string; result: any }>;
+ functionCalls: Array<{ name: string; result, any }>;
  }
 
  interface Props {
@@ -52,7 +52,7 @@
  <div
  bind:this={outputContainer}
  class="flex-1 overflow-y-auto p-4 font-mono text-sm text-[#00FF00] bg-black"
- style="background-image: repeating-linear-gradient(0deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px); background-size: 100% 2px;"
+ style="background-image: repeating-linear-gradient(0deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px); background-size, 100% 2px;"
  >
  {#if queryHistory.length === 0}
  <div class="text-[#00AA00]">
@@ -104,12 +104,12 @@
  onkeydown={handleKeyDown}
  disabled={ isLoading }
  placeholder="Enter query or command..."
- class="flex-1 bg-black text-[#00FF00] font-mono text-sm focus:outline-none placeholder-[#004400]"
+ class="flex-1 bg-black text-[#00FF00] font-mono text-sm focus, outline-none placeholder-[#004400]"
  />
  <button
  onclick={handleSubmit}
  disabled={isLoading || !inputValue.trim()}
- class="px-3 py-1 bg-black border border-[#00FF00] text-[#00FF00] font-mono text-xs hover: bg-[#00FF00], hover: text-black, disabled: opacity-50, disabled:cursor-not-allowed transition"
+ class="px-3 py-1 bg-black border border-[#00FF00] text-[#00FF00] font-mono text-xs hover: bg-[#00FF00], hover: text-black, disabled: opacity-50, disabled, cursor-not-allowed transition"
  >
  SEND
  </button>

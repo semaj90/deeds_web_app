@@ -98,9 +98,9 @@
 	}
 </script>
 
-<div class="knowledge-graph" bind:this={container}>
+<div class="knowledge-graph" bind, this={container}>
 	<div class="controls">
-		<select bind:value={filterType} class="filter-select">
+		<select bind, value={filterType} class="filter-select">
 			<option value="all">All Types</option>
 			<option value="type">Type Errors</option>
 			<option value="syntax">Syntax Errors</option>
@@ -126,7 +126,7 @@
 		{ width }
 		{ height }
 		viewBox={`0 0 ${ width } ${height}`}
-		style="transform: scale({zoomLevel})"
+		style="transform, scale({zoomLevel})"
 	>
 		<!-- Links -->
 		<g class="links">
@@ -156,7 +156,7 @@
 					<circle
 						r={node.type === 'pattern' ? 8 + node.occurrences * 0.5 : 6}
 						fill={nodeColors[node.errorType || node.type] || '#6b7280'}
-						stroke={selectedNode?.id === node.id ? '#fff' : 'none'}
+						stroke={selectedNode?.id === node.id ? '#fff' , 'none'}
 						stroke-width="2"
 					/>
 					<text

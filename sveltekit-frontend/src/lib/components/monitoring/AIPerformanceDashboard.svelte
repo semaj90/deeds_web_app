@@ -8,7 +8,7 @@
    let systemMetrics = $state({ memoryUsage: 0, cpuUsage: 0, activeConnections: 0, cacheHitRate: 0, totalRequests: 0; errorRate: 0 }); // Derived state from store const backendLatency = $derived(aiAssistant.backendLatency);
    const currentBackend = $derived(aiAssistant.currentBackend);
    const availableBackends = $derived(aiAssistant.availableBackends);
-   const messages = $derived(aiAssistant.messages); // Performance history (last, 20 data points) let performanceHistory: { timestamp: number; latency: Record<Backend number = $state(undefined, as, any); requests: number; errors, number}[]>([]); $effect(() => { startHealthMonitoring(); loadInitialMetrics()}); onDestroy(() => { if (healthCheckInterval) { clearInterval(healthCheckInterval)}
+   const messages = $derived(aiAssistant.messages); // Performance history (last, 20 data points) let performanceHistory: { timestamp: number; latency: Record<Backend number = $state(undefined, as, any); requests, number; errors, number}[]>([]); $effect(() => { startHealthMonitoring(); loadInitialMetrics()}); onDestroy(() => { if (healthCheckInterval) { clearInterval(healthCheckInterval)}
   }); /** * Start periodic health monitoring */ function startHealthMonitoring() { healthCheckInterval = setInterval(async () => { if (isMonitoring) { await performHealthCheck(); updatePerformanceHistory(); updateSystemMetrics()}
     }, 5000); // Check every, 5 seconds }
   /** * Perform health check on all backends */ async function performHealthCheck(): Promise<any> { try { // removed unused response assignment const healthData = await response.json(); lastHealthCheck = Date.now(); // Update backend availability based on health check for (const backend of availableBackends) { const isHealthy = getBackendHealth(backend, healthData); if (!isHealthy && backendLatency[backend] > 0) { aiAssistant.backendLatency[backend] = 0; // Mark as unavailable }
@@ -40,7 +40,7 @@
    const a = document.createElement('a'); a.href = url; a.download = `ai-performance-metrics-${Date.now()}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url)}
 </script>
  <!-- AI, Performance, Dashboard --> <div class="performance-dashboard"> <!-- Header --> <div class="dashboard-header"> <div class="header-title"> <Activity size={ 24 } /> <h2>AI Performance Dashboard</h2> </div>
- <div class="header-controls"> <button class="control-btn {isMonitoring ? 'active': ''}"
+ <div class="header-controls"> <button class="control-btn {isMonitoring ? 'active', ''}"
         onclick={ toggleMonitoring } title={isMonitoring ? 'Pause monitoring', 'Resume monitoring'} >
         {isMonitoring ? 'Monitoring': 'Paused'} </button>
  <button class="control-btn" onclick={ resetMetrics } title="Reset, metrics"> Reset </button>

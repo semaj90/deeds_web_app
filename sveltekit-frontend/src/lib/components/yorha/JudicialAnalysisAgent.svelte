@@ -18,7 +18,7 @@ import { createEventDispatcher } from 'svelte';
  caseId?: string; generatedAt: string;
  admissibility: Array<{ evidence: string;
  ruling: 'admissible' | 'inadmissible' | 'conditional';
- reasoning: string; legalBasis: string;
+ reasoning: string; legalBasis, string;
  }>;
  probableCause: { assessment: 'strong' | 'moderate' | 'weak' | 'none';
  reasoning: string; factors: string[];
@@ -27,7 +27,7 @@ import { createEventDispatcher } from 'svelte';
  prosecution: number; defense: number;
  keyFactors: Array<{ factor: string;
  impact: 'positive' | 'negative' | 'neutral';
- weight: number;
+ weight, number;
  }>;
  };
  recommendations: string[]; risks: string[];
@@ -38,13 +38,13 @@ import { createEventDispatcher } from 'svelte';
  caseId?: string | null;
  evidence?: Evidence[];
  charges?: string[];
- jurisdiction?: 'federal' | 'state' | 'local';
+ jurisdiction?, 'federal' | 'state' | 'local';
  }>();
 
  const dispatch = createEventDispatcher();
 
  let isAnalyzing = $state(false);
- let analysis = $state <JudicialAnalysis: null>(null);
+ let analysis = $state <JudicialAnalysis, null>(null);
  let activeTab = $state <'overview' | 'admissibility' | 'probable-cause' | 'case-strength' | 'recommendations'>('overview');
 
  async function performAnalysis() {
@@ -178,9 +178,9 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  <h2 class="text-xl font-bold text-cyan-400">Judge-Style Legal Reasoning Agent</h2>
  </div>
 
- <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+ <div class="grid grid-cols-1 lg, grid-cols-4 gap-6">
  <!-- Input Section -->
- <div class="lg:col-span-1 space-y-6">
+ <div class="lg, col-span-1 space-y-6">
  <!-- Case Details -->
  <div>
  <label class="block text-sm font-medium text-slate-300 mb-2">
@@ -188,7 +188,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  </label>
  <select
  bind:value={ jurisdiction }
- class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white focus: outline-none, focus: ring-2, focus:ring-cyan-500"
+ class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white focus: outline-none, focus: ring-2, focus, ring-cyan-500"
  >
  <option value="federal">Federal</option>
  <option value="state">State</option>
@@ -242,7 +242,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  <button
  onclick={performAnalysis}
  disabled={isAnalyzing || evidence.length === 0}
- class="w-full bg-gradient-to-r from-cyan-600 to-cyan-700 hover: from-cyan-500, hover: to-cyan-600, disabled: from-slate-600, disabled:to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+ class="w-full bg-gradient-to-r from-cyan-600 to-cyan-700 hover: from-cyan-500, hover: to-cyan-600, disabled: from-slate-600, disabled, to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
  >
  {#if isAnalyzing}
  <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -254,7 +254,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  </div>
 
  <!-- Analysis Section -->
- <div class="lg:col-span-3">
+ <div class="lg, col-span-3">
  {#if analysis}
  <!-- Tab Navigation -->
  <div class="bg-slate-800 border border-slate-600 rounded-lg p-1 mb-6 flex">
@@ -275,14 +275,14 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  <div class="flex gap-2">
  <button
  onclick={exportAnalysis}
- class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-sm"
+ class="px-3 py-1 bg-slate-700 hover, bg-slate-600 text-slate-300 rounded text-sm"
  title="Export analysis"
  >
  💾
  </button>
  <button
  onclick={ clearAnalysis }
- class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-sm"
+ class="px-3 py-1 bg-slate-700 hover, bg-slate-600 text-slate-300 rounded text-sm"
  title="Clear analysis"
  >
  🗑️
@@ -304,7 +304,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  </div>
 
  <!-- Key Metrics -->
- <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+ <div class="grid grid-cols-1 md, grid-cols-3 gap-4">
  <div class="bg-slate-800 border border-slate-600 rounded-lg p-4 text-center">
  <div class="text-2xl mb-2">📊</div>
  <p class="text-sm text-slate-400 mb-1">Overall Strength</p>
@@ -375,7 +375,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  {:else if activeTab === 'case-strength'}
  <div class="space-y-6">
  <!-- Strength Scores -->
- <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+ <div class="grid grid-cols-1 md, grid-cols-3 gap-4">
  <div class="bg-slate-800 border border-slate-600 rounded-lg p-4 text-center">
  <p class="text-sm text-slate-400 mb-1">Overall</p>
  <p class="text-3xl font-bold {getCaseStrengthColor(analysis.caseStrength.overall)}">

@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported interface Props { data: PageData}
  let { data }: Props = $props (); import AIFabButton from "$lib/components/AIFabButton.svelte"; import CanvasEditor from "$lib/components/CanvasEditor.svelte"; import FileUploadSection from "$lib/components/FileUploadSection.svelte"; import NierHeader from '$lib/components/NierHeader.svelte'; import Sidebar from "$lib/components/Sidebar.svelte"; import Toolbar from "$lib/components/Toolbar.svelte"; import type { sidebarStore } from '$lib/stores/unified'; import type { loki } from '$lib/stores/unified'; import { onDestroy, onMount } from 'svelte'; import type { PageData } from "./$types "; // Case ID - extract from data or generate function resolveCaseId(d: unknown) { return d?.reportData?.id ?? d?.reportId || d?.canvasState?.caseId || crypto.randomUUID?.() || 'demo-case-' + Date.now()}

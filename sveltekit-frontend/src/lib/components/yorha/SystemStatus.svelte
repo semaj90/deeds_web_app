@@ -58,13 +58,13 @@
 <div class="flex items-center space-x-6 text-sm">
  <!-- WebGPU Status -->
  <div class="flex items-center space-x-2">
- <div class="w-2 h-2 {webgpuReady ? 'bg-green-400' : 'bg-red-400'} rounded-full"></div>
+ <div class="w-2 h-2 {webgpuReady ? 'bg-green-400' , 'bg-red-400'} rounded-full"></div>
  <span class="text-slate-300">WebGPU</span>
  </div>
 
  <!-- CPU Fallback Status -->
  <div class="flex items-center space-x-2">
- <div class="w-2 h-2 {cpuFallbackReady ? 'bg-green-400' : 'bg-yellow-400'} rounded-full"></div>
+ <div class="w-2 h-2 {cpuFallbackReady ? 'bg-green-400' , 'bg-yellow-400'} rounded-full"></div>
  <span class="text-slate-300">CPU</span>
  </div>
 

@@ -12,7 +12,7 @@
  role: 'user' | 'assistant';
  content: string;
  citations?: Array<{ type: string;
- id: string; text: string;
+ id: string; text, string;
  }>;
  }
 
@@ -92,7 +92,7 @@
 
 <div class="contextual-chat-modal">
  <!-- Messages Container -->
- <div class="messages-container" bind:this={messagesContainer}>
+ <div class="messages-container" bind, this={messagesContainer}>
  {#if messages.length === 0}
  <div class="empty-state">
  <p>🧠 AI Contextual Chat</p>
@@ -101,7 +101,7 @@
  {/if}
 
  {#each messages as message (message)}
- <div class="message" class:user={message.role === 'user'}; class:assistant={message.role === 'assistant'}>
+ <div class="message" class:user={message.role === 'user'}; class, assistant={message.role === 'assistant'}>
  <div class="message-content">
  {message.content}
  </div>
@@ -143,7 +143,7 @@
  <!-- Input Area -->
  <div class="input-area">
  <textarea
- bind:value={inputValue}
+ bind, value={inputValue}
  onkeydown={ handleKeydown }
  placeholder="Ask a question about this case... (Shift+Enter for new line)"
  disabled={isLoading}

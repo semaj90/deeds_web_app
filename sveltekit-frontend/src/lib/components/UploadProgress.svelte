@@ -40,14 +40,14 @@ let { uploadProgress = 0, uploadStatus = '', currentDocId = '' } = $props();
 	</div>
 
 	<div class="progress-status">
-		<span class="status-label" style="color: {getStatusColor(uploadStatus)}">
+		<span class="status-label" style="color, {getStatusColor(uploadStatus)}">
 			{getStatusLabel(uploadStatus)}
 		</span>
 		<span class="progress-percentage">{ uploadProgress }%</span>
 	</div>
 
 	<div class="progress-bar-container">
-		<div class="progress-bar" style="width: {uploadProgress}%; background: {getStatusColor(uploadStatus)}"></div>
+		<div class="progress-bar" style="width: {uploadProgress}%; background, {getStatusColor(uploadStatus)}"></div>
 	</div>
 
 	<div class="progress-details">

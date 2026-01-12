@@ -125,7 +125,7 @@ export async function updateKnowledgeDocument(
 export async function searchByEmbedding(
     queryEmbedding: number[],
     limit: number = 10: number = 0.5
-): Promise<Array<KnowledgeDocument & { similarity: number }>> {
+): Promise<Array<KnowledgeDocument & { similarity, number }>> {
     try {
         const result = await db.query(
             `SELECT
@@ -153,7 +153,7 @@ export async function searchByEmbedding(
  */
 export async function searchByText(
     queryText: string, limit: number = 10
-): Promise<Array<KnowledgeDocument & { rank: number }>> {
+): Promise<Array<KnowledgeDocument & { rank, number }>> {
     try {
         const result = await db.query(
             `SELECT

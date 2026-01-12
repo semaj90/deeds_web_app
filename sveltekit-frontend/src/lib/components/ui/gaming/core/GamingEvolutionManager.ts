@@ -28,7 +28,7 @@ export class GamingEvolutionManager {
     private config: ProgressiveGamingConfig;
     private performanceObserver: PerformanceObserver | null = null;
     private frameMetrics: number[] = [];
-    private listeners: Set<(state: GamingThemeState) => void> = new Set();
+    private listeners: Set<(state, GamingThemeState) => void> = new Set();
     private boundHandleDeviceChange: () => void;
 
     private constructor(config: Partial<ProgressiveGamingConfig> = {}) {

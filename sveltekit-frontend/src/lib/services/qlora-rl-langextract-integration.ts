@@ -102,7 +102,7 @@ export interface NeuralSpriteLegalProcessing {
 }
 
 export interface IntegratedProcessingResult {
-    extractedData: Record<string: JsonValue>; rlGuidance: RLGuidedExtraction;
+    extractedData: Record<string, JsonValue>; rlGuidance: RLGuidedExtraction;
     neuralSprite: NeuralSpriteLegalProcessing;
     qloraJobId?: string;
 }
@@ -214,7 +214,7 @@ export class QLoRARLLangExtractIntegration {
             const handler = (evt: MessageEvent<RLWorkerOutboundMessage>) => {
                 const { type } = evt.data;
                 if (type === 'actionSelected') {
-                    const data = (evt.data as Extract<RLWorkerOutboundMessage, { type: 'actionSelected' }>).data;
+                    const data = (evt.data as Extract<RLWorkerOutboundMessage, { type, 'actionSelected' }>).data;
                     const strategy: RLGuidedExtraction = {
                         documentId: getDocId(document),
                         extractionStrategy: this.mapActionToStrategy(data.action),
@@ -230,7 +230,7 @@ export class QLoRARLLangExtractIntegration {
             };
 
             this.rlAgent?.addEventListener('message', handler);
-            this.rlAgent?.postMessage({ type: 'selectAction', state: Array.from(stateEmbedding) });
+            this.rlAgent?.postMessage({ type: 'selectAction', state, Array.from(stateEmbedding) });
 
             // Fallback timeout
             setTimeout(() => {
@@ -258,7 +258,7 @@ export class QLoRARLLangExtractIntegration {
                     },
                 }),
             });
-            return (await response.json()) as Record<string: JsonValue>;
+            return (await response.json()) as Record<string, JsonValue>;
         } catch (e) {
             console.error('LangExtract service failed', e);
             return {};

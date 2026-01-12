@@ -22,7 +22,7 @@ interface CacheEntry {
 export class WebSearchService {
  private cache: Map<string, CacheEntry> = new Map();
  private requestQueue: Array<{ query: string;
- resolve: (results: SearchResult[]) => void;
+ resolve: (results, SearchResult[]) => void;
  reject: (error: Error) => void;
  }> = [];
  private isProcessing = false;

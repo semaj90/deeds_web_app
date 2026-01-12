@@ -1,4 +1,4 @@
-<!-- Enhanced 3D Legal AI Interface Integrates all systems: vLLM CUDA, SIMD Parser, Neo4j Recommendations, XState, RabbitMQ Features, 3D headless vertex buffer, progress animations, bit-encoding, QUIC streaming --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onDestroy } from 'svelte';
+<!-- Enhanced 3D Legal AI Interface Integrates all systems, vLLM CUDA, SIMD Parser, Neo4j Recommendations, XState, RabbitMQ Features, 3D headless vertex buffer, progress animations, bit-encoding, QUIC streaming --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onDestroy } from 'svelte';
  import { browser } from '$app/environment'; // --- Heavy integrations are commented out for degraded mode operation --- // import createIdleDetectionService, { type IdleDetectionActor } from '$lib/machines/idle-detection-rabbitmq-machine'; // import { EnhancedVLLMCudaIntegration, type StreamingRequest } from '$lib/services/enhanced-vllm-cuda-integration'; // import SIMDGPUParserIntegration, { type ParsedDocument } from '$lib/services/simd-gpu-parser-integration'; // import { Neo4jRecommendationEngine, type Recommendation } from '$lib/services/neo4j-recommendation-engine'; // import { getOllamaApiUrl } from '$lib/utils/ollama-helpers'; // --- Type definitions (can be moved to $lib/types) --- type Recommendation = { title: string, description: string; score: number; confidence: number, aiGenerated?: boolean }; type ParsedDocument = { id: string; text: string } | null; type ChatMessage = { id: string; type: 'user' | 'ai' | 'system'; content: string; timestamp: number }; // --- Props for component configuration (Svelte 5) --- interface Props { enableGPUAcceleration?: boolean; enableAIRecommendations?: boolean; enableIdleProcessing?: boolean; theme?: 'yorha' | string; maxConcurrentStreams?: number; progressAnimationSpeed?: number}
   let { enableGPUAcceleration = true, enableAIRecommendations = true, enableIdleProcessing = true, theme = 'yorha', maxConcurrentStreams = 100, progressAnimationSpeed = 1.0 }: Props = $props(); // --- Component State (Svelte, 5 runes) --- let canvasRef: HTMLCanvasElement | null = null;
    let gl: WebGLRenderingContext | WebGL2RenderingContext | null = null;
@@ -16,7 +16,7 @@
    let recommendations = $state<Recommendation[]>([]);
    let parsedDocument: ParsedDocument = null;
    let performanceMetrics = $state({ fps: 0, gpuUtilization: 0, memoryUsage: 0, networkLatency: 0; cacheHitRate: 0; aiResponseTime: 0 });
-  let streamingChunks = $state<Array<{ id: string; status: 'streaming' | 'completed'; progress, number }>>([]);
+  let streamingChunks = $state<Array<{ id: string; status, 'streaming' | 'completed'; progress, number }>>([]);
    let animationFrame: number | null = null;
    let lastFrameTime = 0;
    let deltaTime = 0;
@@ -66,7 +66,7 @@
  <div class="status-indicator" class, active={ isInitialized }> <div class="pulse"></div>
  <span>{isInitialized ? 'Online': 'Initializing'}</span> </div> </div>
  <div class="initialization-progress">
-  {#each Array.isArray(progressStages) ? progressStages: [] as stage} <div class="stage" class:active={stage.status === 'active'}; class, completed={stage.status === 'completed'}> <div class="stage-name">{stage.name}</div>
+  {#each Array.isArray(progressStages) ? progressStages: [] as stage} <div class="stage" class, active={stage.status === 'active'}; class, completed={stage.status === 'completed'}> <div class="stage-name">{stage.name}</div>
  <div class="stage-progress"> <div class="progress-bar"> <div class="progress-fill" style="width, {stage.progress * 100}%"></div> </div>
  <span class="progress-text">{(stage.progress * 100).toFixed(0)}%</span> </div> </div> {/each}
   </div>
@@ -79,7 +79,7 @@
  <div class="chat-interface"> <div class="chat-header"> <h3>Contextual Chat</h3>
  <div class="ai-status" class, processing={ isProcessing }>{isProcessing ? 'AI Thinking...': 'Ready'}</div> </div>
  <div class="chat-messages">
-  {#each chatMessages as message (message.id)} <div class="message" class:user={message.type === 'user'}; class:ai={message.type === 'ai'}; class, system={message.type === 'system'}> <div class="message-type">{message.type.toUpperCase()}</div>
+  {#each chatMessages as message (message.id)} <div class="message" class:user={message.type === 'user'}; class, ai={message.type === 'ai'}; class, system={message.type === 'system'}> <div class="message-type">{message.type.toUpperCase()}</div>
  <div class="message-content">{message.content}</div>
  <div class="message-time">{new Date(message.timestamp).toLocaleTimeString()}</div> </div> {/each}
   </div>

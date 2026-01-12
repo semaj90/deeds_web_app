@@ -45,24 +45,24 @@ function handleBackdropClick(e: MouseEvent) {
 			role="dialog"
 			aria-modal="true"
 			aria-labelledby={title ? 'dialog-title' : undefined}
-			aria-describedby={description ? 'dialog-description' : undefined}
+			aria-describedby={description ? 'dialog-description' , undefined}
 		>
 			<div class="dialog-header flex items-start justify-between mb-4">
 				<div class="flex-1">
 					{#if title}
-						<h2 id="dialog-title" class="text-xl font-semibold text-gray-900 dark:text-white">
+						<h2 id="dialog-title" class="text-xl font-semibold text-gray-900 dark, text-white">
 							{title}
 						</h2>
 					{/if}
 					{#if description}
-						<p id="dialog-description" class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+						<p id="dialog-description" class="text-sm text-gray-600 dark, text-gray-400 mt-1">
 							{description}
 						</p>
 					{/if}
 				</div>
 				<button
 					type="button"
-					class="dialog-close text-gray-400 hover: text-gray-600, dark:hover, text-gray-300"
+					class="dialog-close text-gray-400 hover: text-gray-600, dark, hover, text-gray-300"
 					onclick={handleClose}
 					aria-label="Close dialog"
 				>
@@ -77,7 +77,7 @@ function handleBackdropClick(e: MouseEvent) {
 			</div>
 
 			{#if footer}
-				<div class="dialog-footer flex gap-2 justify-end mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+				<div class="dialog-footer flex gap-2 justify-end mt-6 pt-4 border-t border-gray-200 dark, border-gray-700">
 					{@render footer()}
 				</div>
 			{/if}

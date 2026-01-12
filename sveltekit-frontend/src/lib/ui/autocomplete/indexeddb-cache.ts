@@ -257,7 +257,7 @@ export async function clearCache(): Promise<void> {
  */
 export async function getCacheStats(): Promise<{ count: number;
  lastUpdated: number | null;
- isStale: boolean;
+ isStale, boolean;
 }> {
  if (!db) await initIndexedDB();
 

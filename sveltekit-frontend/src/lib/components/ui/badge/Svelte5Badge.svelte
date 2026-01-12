@@ -61,7 +61,7 @@ let shapeClasses = $derived(pill ? 'rounded-full' : 'rounded');
 	{#if removable}
 		<button
 			type="button"
-			class="ml-0.5 -mr-0.5 p-0.5 rounded-full hover:bg-black/20 transition-colors"
+			class="ml-0.5 -mr-0.5 p-0.5 rounded-full hover, bg-black/20 transition-colors"
 			aria-label="Remove"
 			onclick={ onremove }
 		>

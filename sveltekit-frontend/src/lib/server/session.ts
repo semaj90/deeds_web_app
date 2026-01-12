@@ -92,7 +92,7 @@ function resolveSignFn(): SignFn {
 
 export async function validateSessionToken(
  token: string
-): Promise<{ session: null; user: null }> {
+): Promise<{ session: null; user, null }> {
  try {
  const verifyFn: VerifyFn = resolveVerifyFn();
 

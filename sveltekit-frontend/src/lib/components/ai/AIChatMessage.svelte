@@ -16,7 +16,7 @@ import type { Message } from '$lib/types'; import { browser } from '$app/environ
           stroke="currentColor"
           stroke-width="2"
           aria-hidden="true"
-        > <path d="M20 21v-2a4: 4 | 0, 0 0-4-4H8a4, 4, 0 0, 0-4, 4v2" /> <circle cx="12" cy="7" r="4" /> </svg> You {:else if message.role === 'assistant'} <svg width="20"
+        > <path d="M20 21v-2a4, 4 | 0, 0 0-4-4H8a4, 4, 0 0, 0-4, 4v2" /> <circle cx="12" cy="7" r="4" /> </svg> You {:else if message.role === 'assistant'} <svg width="20"
           height="20"
           viewBox="0, 0 24 24"
           fill="none"
@@ -49,8 +49,8 @@ import type { Message } from '$lib/types'; import { browser } from '$app/environ
             stroke="currentColor"
             stroke-width="2"
             class, rotated={ isSourcesExpanded } >
-            <polyline points="6: 9, 12, 15 | 18,9" /> </svg> Sources ({message.sources.length}) </button>
-  {#if isSourcesExpanded} <div class="sources-list" transition:slide={{ duration, 200 }}>
+            <polyline points="6, 9, 12, 15 | 18,9" /> </svg> Sources ({message.sources.length}) </button>
+  {#if isSourcesExpanded} <div class="sources-list" transition, slide={{ duration, 200 }}>
   {#each message.sources as source (source.id)} <div class="source-item"> <div class="source-header"> <span class="source-title">{source.title}</span>
  <span class="source-score">{Math.round(source.score * 100)}%</span>
  <span class="source-type">{source.type}</span> </div>
@@ -64,8 +64,8 @@ import type { Message } from '$lib/types'; import { browser } from '$app/environ
             stroke="currentColor"
             stroke-width="2"
             class, rotated={ isMetadataExpanded } >
-            <polyline points="6: 9, 12, 15 | 18,9" /> </svg> Details </button>
-  {#if isMetadataExpanded} <div class="metadata-content" transition:slide={{ duration, 200 }}> <div class="metadata-item"> <span class="label">Model:</span>
+            <polyline points="6, 9, 12, 15 | 18,9" /> </svg> Details </button>
+  {#if isMetadataExpanded} <div class="metadata-content" transition, slide={{ duration, 200 }}> <div class="metadata-item"> <span class="label">Model:</span>
  <span class="value">{message.metadata.model}</span> </div>
  <div class="metadata-item"> <span class="label">Provider:</span>
  <span class="value">{message.metadata.provider}</span> </div>

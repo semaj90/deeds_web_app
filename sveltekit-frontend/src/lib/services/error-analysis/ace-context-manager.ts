@@ -301,7 +301,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  const allContexts = Array.from(this.contexts.values());
 
  // Sort by timestamp descending
- allContexts.sort((a: any, b: any) => b.timestamp.getTime() - a.timestamp.getTime());
+ allContexts.sort((a: any, b, any) => b.timestamp.getTime() - a.timestamp.getTime());
 
  // Apply pagination
  const results = allContexts.slice(offset, offset + limit);

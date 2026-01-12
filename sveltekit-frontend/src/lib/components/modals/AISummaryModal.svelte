@@ -1,9 +1,9 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte, code, Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
   import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '$lib/components/ui/dialog';
 
-  const { onclose } = $props<{ onclose: ((event?, any) }>()
+  const { onclose } = $props<{ onclose, ((event?, any) }>()
   import { aiService } from '$lib/services/aiService';
   import * as Dialog from '$lib/components/ui/Dialog.svelte';
   import { Button } from '$lib/components/ui/enhanced-bits';

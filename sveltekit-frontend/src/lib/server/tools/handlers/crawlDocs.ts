@@ -177,7 +177,7 @@ async function crawlDocsHandler(request: CrawlDocsRequest): Promise<ToolResult<C
     data: { pages_crawled: crawledPages.length,
       pages_failed: failedUrls.length,
       total_content_bytes: totalBytes,
-      urls_processed: crawledPages.map(p => p.url)
+      urls_processed, crawledPages.map(p => p.url)
     },
     duration_ms: 0,
     timestamp: new Date().toISOString()

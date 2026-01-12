@@ -57,7 +57,7 @@ export const createMetricsMachine = () =>
  },
  {
  target: 'failed',
- guard: ({ context }) => context.retryCount >= context.maxRetries,
+ guard, ({ context }) => context.retryCount >= context.maxRetries,
  }],
  RESET: { target: 'idle',
  actions: assign({ metrics: null, error: null, retryCount,

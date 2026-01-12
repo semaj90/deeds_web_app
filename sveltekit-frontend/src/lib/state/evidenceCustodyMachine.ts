@@ -35,14 +35,14 @@ export interface EvidenceCustodyContext {
   activeCollaborators: string[];
   collaborationSession?: { sessionId: string;
     participants: Array<{ userId: string;
-      role: string; joinedAt: string;
+      role: string; joinedAt, string;
     }>;
     chatHistory: Array<{ userId: string;
-      message: string; timestamp: string;
+      message: string; timestamp, string;
     }>;
     annotations: Array<{ userId: string;
       content: string; position: unknown;
-      timestamp: string;
+      timestamp, string;
     }>;
   };
   // Workflow progress
@@ -53,7 +53,7 @@ export interface EvidenceCustodyContext {
   custodyEvents: Array<{ id: string;
     eventType: string; timestamp: string;
     userId: string; details: unknown;
-    signature: string;
+    signature, string;
   }>;
   // Performance and timing
   startTime: number; stageStartTime: number;
@@ -88,7 +88,7 @@ async function generateEvidenceHash(evidence: Evidence): Promise<string> {
   return crypto.createHash('sha256').update(content).digest('hex');
 }
 
-async function generateEventSignature(event: Record<string: unknown>): Promise<string> {
+async function generateEventSignature(event: Record<string, unknown>): Promise<string> {
   const content = JSON.stringify(event);
   return crypto.createHash('sha256').update(content).digest('hex');
 }
@@ -187,7 +187,7 @@ const integrityVerificationService = fromPromise(
     return { verificationResults, integrityStatus, custodyEvent };
   }
 );
-const aiAnalysisService = fromPromise(async ({ input }: { input: EvidenceCustodyContext }) => {
+const aiAnalysisService = fromPromise(async ({ input }: { input, EvidenceCustodyContext }) => {
   console.log(`Performing AI analysis for evidence custody: ${input.evidenceId}`);
   // Multi-agent AI analysis using the existing pipeline
   const analysisResponse = await fetch('/api/multi-agent/analyze', {
@@ -453,7 +453,7 @@ export const evidenceCustodyMachine = createMachine({
     error: { on: {
         RETRY: { target: 'intake',
           guard: ({ context }) => context.retryCount < context.maxRetries,
-          actions: assign({ retryCount: ({ context }) => context.retryCount + 1,
+          actions: assign({ retryCount, ({ context }) => context.retryCount + 1,
             error: () => undefined }) },
         FORCE_COMPLETE: { target: 'completed',
           actions: assign({ warnings: ({ context }) => [...context.warnings, 'Forced completion with errors'] }) },

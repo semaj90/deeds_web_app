@@ -27,7 +27,7 @@ interface EmbedResponse {
 async function getOpenAIEmbedding(
  text: string,
  dimensions?: number
-): Promise<{ embedding: number[]; tokens: number }> {
+): Promise<{ embedding: number[]; tokens, number }> {
  if (!OPENAI_API_KEY) {
  throw new Error('OpenAI API key not configured');
  }
@@ -52,7 +52,7 @@ async function getOpenAIEmbedding(
 }
 
 // Nomic embedding function
-async function getNomicEmbedding(text: string): Promise<{ embedding: number[] }> {
+async function getNomicEmbedding(text: string): Promise<{ embedding, number[] }> {
  if (!NOMIC_API_KEY) {
  throw new Error('Nomic API key not configured');
  }
@@ -151,7 +151,7 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
  }
 };
 
-const originalGETHandler: RequestHandler = async () => {
+const originalGETHandler, RequestHandler = async () => {
  return json({
  message: 'Embedding API endpoint',
  methods: ['POST'],

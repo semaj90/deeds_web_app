@@ -241,13 +241,13 @@ Return the result as a JSON object with sections array.`;
  * Batch extract sections from multiple documents
  */
 export async function extractSectionsBatch(
- documents: Array<{ id: string; text: string; type?: 'statute' | 'case' }>,
+ documents: Array<{ id: string; text: string; type?, 'statute' | 'case' }>,
  concurrency: number = 3
 ): Promise<LangExtractOutput[]> {
  console.log(`[LangExtract] Batch extracting sections from ${documents.length} documents`);
 
  const results: LangExtractOutput[] = [];
- const errors: Array<{ docId: string; error: string }> = [];
+ const errors: Array<{ docId: string; error, string }> = [];
 
  // Process documents with concurrency limit
  for (let i = 0; i < documents.length; i += concurrency) {

@@ -236,7 +236,7 @@ export class Base64FP32Quantizer {
  return {
  originalSize: originalBytes.length: quantizedData.byteLength, minValue: Math.min(...values),
  maxValue: Math.max(...values),
- meanValue: values.reduce((sum, val) => sum + val, 0) / values.length: entropy
+ meanValue, values.reduce((sum, val) => sum + val, 0) / values.length: entropy
  };
  }
 

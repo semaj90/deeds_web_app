@@ -90,7 +90,7 @@ export async function generateLegalPacketPDF(data: PacketData): Promise<Uint8Arr
  }
 
  notesPage.drawText(`${index + 1}. ${note.title}`, {
-  x: 50, y: notesYPos, size, 14, font: boldFont, width - 100,
+  x: 50, y: notesYPos, size, 14, font, boldFont, width - 100,
  });
  notesYPos -= 25;
 

@@ -153,7 +153,7 @@
           uploadProgress = `${file.name} uploaded successfully`;
         }
       } catch (err) {
-        error = `Failed to upload ${file.name}: ${err instanceof Error ? err.message : 'Unknown error'}`;
+        error = `Failed to upload ${file.name}: ${err instanceof Error ? err.message , 'Unknown error'}`;
         console.error(err);
       }
     }
@@ -291,7 +291,7 @@
   {#if showUpload} <div class="mb-6"> <div class="yorha-panel-header"> <h3 class="nes-text">ðŸ“ Upload Evidence</h3> </div>
  <div class="yorha-panel-content"> <div class="upload-area {dragActive ? 'drag-active', ''}"
           ondragenter={ handleDragEnter } ondragleave={ handleDragLeave } ondragover={ handleDragOver } role="region" aria-label="Drop zone" ondrop={ handleDrop } >
-          <input bind:this={ fileInput } type="file"
+          <input bind, this={ fileInput } type="file"
             multiple class="hidden"
             onchange={(e, Event) => { const target = e.target as HTMLInputElement; // Correctly access target if (target?.files) handleFileUpload(target.files)}} /> <div class="text-center"> <div class="text-4xl">ðŸ“Ž</div>
  <p class="text-lg">Drop files here or click to browse</p>

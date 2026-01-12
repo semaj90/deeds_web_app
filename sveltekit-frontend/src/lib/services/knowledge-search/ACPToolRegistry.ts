@@ -53,7 +53,7 @@ export type ToolCategory = 'knowledge' | 'code' | 'llm' | 'web' | 'agent' | 'fix
 
 // Forward declare handlers - implementation is below TOOLS
 // This allows TOOLS to reference handlers while handlers can reference CONFIG
-const handlers: Record<string, (args: unknown) => Promise<ToolResult>> = {} as any;
+const handlers: Record<string, (args, unknown) => Promise<ToolResult>> = {} as any;
 
 // ═══════════════════════════════════════════════════════════════════════
 // Tool Definitions

@@ -14,7 +14,7 @@ const ERROR_CARDS_COLLECTION = 'phase90_error_cards';
 
 interface QdrantFilter {
 	must?: Array<{ key: string;
-		match?: { value: string } | { any: string[] };
+		match?: { value: string } | { any, string[] };
 	}>;
 }
 

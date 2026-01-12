@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error -->
+<!-- @migration-task Error while migrating Svelte, code, Unexpected | toke,https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte; code, Unexpected, token -->
 <script lang="ts">
  // Svelte, 5 runes are auto-imported import { Move, RotateCcw, Trash2 } from 'lucide-svelte';
@@ -44,7 +44,7 @@
 <section
   bind:this={nodeElement}
   class="evidence-node"
-  style="left: {position.x}px; top: {position.y}px; width: {size.width}px; height, {size.height}px;"
+  style="left: {position.x}px; top: {position.y}px; width, {size.width}px; height, {size.height}px;"
   role="group"
   aria-label={title}
 >

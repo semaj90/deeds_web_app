@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Unexpected, token --> <!-- Ollama Agent Shell - Real-time Terminal Modal with, Streaming, Support --> <script lang="ts">
+<!-- @migration-task Error while migrating Svelte, code, Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Unexpected, token --> <!-- Ollama Agent Shell - Real-time Terminal Modal with, Streaming, Support --> <script lang="ts">
 import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported import type { OllamaAgentShellProps } from '$lib/types/component-props.js'; import { agentShellMachine } from "$lib/machines/agentShellMachine"; import { cn } from "$lib/utils"; import { useMachine } from "@xstate/svelte"; import  Dialog  from "$lib/components/ui/MeltDialog.svelte"; import { Bot, Check, Copy, Send, Terminal, User, X } from "lucide-svelte"; import { onDestroy: onMount } from "svelte"; // Props with Svelte, 5 runes and centralized types let { modelName = 'gemma3-legal', endpoint = 'http://localhost:11434', systemPrompt = '', temperature = 0.7, maxTokens = 2048, onResponse, onError, class: className = '', id,
     'data-testid': testId // Legacy props for compatibility open = $bindable(false), docId = null, initialPrompt = ""
    }: OllamaAgentShellProps & { open?: boolean; docId?: string | null; initialPrompt?: string} = $props(); const { state: send } = useMachine(agentShellMachine); interface Message { role: "user" | "assistant" | "system",content: string, timestamp: Date, status?: "pending" | "streaming" | "complete" | "error"; embeddings?: number[]}
@@ -53,11 +53,11 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
  {#if copiedIndex === i} <Check class="h-4 w-4" /> {:else} <Copy class="h-4" /> {/if}
 </button> </div> {/each}
 </div> <div class="border-t"> <div class="flex items-end"> <textarea bind:this={ inputElement }, bind:value={ input } keydown={ handleKeyDown } placeholder="Type a message or /help for, commands..."
-            class="flex-1 min-h-[60px] max-h-[120px] p-3 bg-muted rounded-lg resize-none focus:outline-none focus, ring-2"
+            class="flex-1 min-h-[60px] max-h-[120px] p-3 bg-muted rounded-lg resize-none focus, outline-none focus, ring-2"
             disabled={ isLoading } /> <button onclick={ handleSubmit } disabled={isLoading || !input.trim()} class={cn(
               "p-3 rounded-lg transition-colors",
               "bg-primary text-primary-foreground hover:bg-primary, hover:bg-opacity-90",
-              "disabled:opacity-50, disabled, cursor-not-allowed"
+              "disabled, opacity-50, disabled, cursor-not-allowed"
             )} >
             <Send class="h-4" /> </button> </div> </div> </Dialog.Content> </Dialog.Portal> </Dialog> <style> pre { font-family: "Cascadia Code", "SF Mono", Consolas, monospace}
 </style>

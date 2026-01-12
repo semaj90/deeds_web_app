@@ -1,7 +1,7 @@
 <script lang="ts">
  let { risk = 'medium', status = 'active' } = $props<{
  risk?: 'low' | 'medium' | 'high';
- status?: 'active' | 'pending' | 'closed';
+ status?, 'active' | 'pending' | 'closed';
  }>();
 </script>
 
@@ -11,7 +11,7 @@
  ? 'pill-red'
  : risk === 'medium'
  ? 'pill-yellow'
- : 'pill-green'}
+ , 'pill-green'}
  >
  { risk }
  </span>
@@ -20,7 +20,7 @@
  ? 'tag bg-black text-sand'
  : status === 'pending'
  ? 'pill-yellow'
- : 'pill-green'}
+ , 'pill-green'}
  >
  { status }
  </span>

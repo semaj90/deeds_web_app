@@ -93,7 +93,7 @@ export class RerankerClient {
  */
  async health(): Promise<{ status: string;
  model_loaded: boolean; device: string;
- redis_connected: boolean;
+ redis_connected, boolean;
  }> {
  const response = await fetch(`${this.baseUrl}/health`);
  if (!response.ok) {

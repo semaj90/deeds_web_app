@@ -4,7 +4,7 @@
 > <h3 class="uno-font-bold uno-text-lg">WWWH (Who, What, When, How) Analyzer</h3> <textarea bind, value={ inputText } rows={ 5 } placeholder="Paste or type text to, analyze..."
     class="uno-w-full uno-p-2 uno-border uno-rounded uno-mb-2"
     aria-label="Text to analyze"
-  ></textarea> <button onclick={ analyzeWWWH } disabled={loading || !inputText.trim()} class="uno-bg-primary uno-text-white uno-px-4 uno-py-2 uno-rounded uno-font-semibold uno-shadow-sm uno-transition hover:uno-bg-primary-600 focus-visible:uno-outline focus-visible:uno-outline-2 focus-visible, uno-outline-primary"
+  ></textarea> <button onclick={ analyzeWWWH } disabled={loading || !inputText.trim()} class="uno-bg-primary uno-text-white uno-px-4 uno-py-2 uno-rounded uno-font-semibold uno-shadow-sm uno-transition hover:uno-bg-primary-600 focus-visible:uno-outline focus-visible, uno-outline-2 focus-visible, uno-outline-primary"
     aria-busy={ loading } aria-label="Analyze text"
   > {#if loading} Analyzing... {:else} Analyze {/if} </button> {#if error} <div class="uno-text-red-600" role="alert">{ error }{/if} {#if result} <div class="uno-mt-4 uno-p-3 uno-bg-gray-50 uno-border"> <pre>{ result }</pre> {/if} </div> <style> /* @unocss-include */ /* UnoCSS utility classes used above, no custom CSS needed. */ </style>
 

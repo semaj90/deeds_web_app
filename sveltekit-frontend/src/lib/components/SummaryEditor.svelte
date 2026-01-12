@@ -6,7 +6,7 @@
  caseId: string; text: string;
  holding: string; citations: Array<{
  code: string; title: string;
- jurisdiction: string;
+ jurisdiction, string;
  }>;
  version: number; createdAt: string;
  updatedAt: string;
@@ -157,7 +157,7 @@
  {#each versions as version}
  <button
  class="version-item"
- class:active={version.version === selectedVersion}
+ class, active={version.version === selectedVersion}
  onclick={() => loadVersion(version.version)}
  >
  <span class="version-number">v{version.version}</span>
@@ -175,7 +175,7 @@
  <h3>Summary</h3>
  {#if isEditing}
  <textarea
- bind:value={editedText}
+ bind, value={editedText}
  class="editor-textarea"
  placeholder="Enter case summary..."
  ></textarea>
@@ -190,7 +190,7 @@
  <h3>Holding</h3>
  {#if isEditing}
  <textarea
- bind:value={editedHolding}
+ bind, value={editedHolding}
  class="editor-textarea"
  placeholder="Enter holding statement..."
  ></textarea>

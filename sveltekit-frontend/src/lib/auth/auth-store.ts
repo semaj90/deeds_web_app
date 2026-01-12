@@ -100,7 +100,7 @@ const AccessControl = {
             admin: ['manage_users', 'manage_content', 'read'],
             editor: ['edit', 'read'],
             viewer: ['read']
-        } as unknown as Record<UserRole: Permission[]>;
+        } as unknown as Record<UserRole, Permission[]>;
         return rolePermissionMap[role] ?? [];
     },
     canAccessResource(
@@ -168,7 +168,7 @@ export class AuthStore {
     static async login(
         email: string, password: string,
         rememberMe = false
-    ): Promise<{ success: boolean; error?: string; requiresMFA?: boolean }> {
+    ): Promise<{ success: boolean; error?: string; requiresMFA?, boolean }> {
         authState.update(state => ({ ...state, isLoading: true }));
         try {
             const response = await fetch('/api/auth/login', {
@@ -206,7 +206,7 @@ export class AuthStore {
         firstName?: string;
         lastName?: string;
         role?: UserRole;
-    }): Promise<{ success: boolean; requiresVerification?: boolean; error?: string }> {
+    }): Promise<{ success: boolean; requiresVerification?: boolean; error?, string }> {
         authState.update(state => ({ ...state, isLoading: true }));
         try {
             const response = await fetch('/api/auth/register', {
@@ -284,7 +284,7 @@ export class AuthStore {
     /**
      * Update user profile
      */
-    static async updateProfile(updates: Partial<AuthUser>): Promise<{ success: boolean; error?: string }> {
+    static async updateProfile(updates: Partial<AuthUser>): Promise<{ success: boolean; error?, string }> {
         const currentState = get(authState);
         if (!currentState.isAuthenticated || !currentState.user) {
             return { success: false, error: 'Not authenticated' };
@@ -320,7 +320,7 @@ export class AuthStore {
      */
     static async changePassword(
         currentPassword: string, newPassword: string
-    ): Promise<{ success: boolean; error?: string }> {
+    ): Promise<{ success: boolean; error?, string }> {
         try {
             const response = await fetch('/api/auth/change-password', {
                 method: 'POST',
@@ -404,7 +404,7 @@ export class AuthStore {
             }
 
             // If user has been inactive for too long, destroy session
-            const lastActivity = state.lastActivity ? state.lastActivity.getTime() : 0;
+            const lastActivity = state.lastActivity ? state.lastActivity.getTime() , 0;
             if (lastActivity && now - lastActivity > ACTIVITY_TIMEOUT) {
                 // Force logout due to inactivity
                 await this.logout();

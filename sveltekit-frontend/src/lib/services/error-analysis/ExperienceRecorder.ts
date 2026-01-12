@@ -37,7 +37,7 @@ export class ExperienceRecorder {
 	private config: ExperienceRecorderConfig;
 	private experiences = new Map<string, Experience>();
 	private groups = new Map<string, ErrorGroup>();
-	private strategyStats = new Map<string, { successes: number; failures: number; totalConfidence: number }>();
+	private strategyStats = new Map<string, { successes: number; failures: number; totalConfidence, number }>();
 	private stats = {
 		totalRecorded: 0,
 		successfulFixes: 0,
@@ -243,7 +243,7 @@ export class ExperienceRecorder {
 		const strategyScores = new Map<string, {
 			successes: number; failures: number;
 			totalConfidence: number;
-			strategy?: FixStrategy;
+			strategy?, FixStrategy;
 		}>();
 
 		for (const { groupId } of similarGroups.slice(0, 5)) {

@@ -53,13 +53,13 @@
     addSuffix: true
   });
 </script>
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte, code, Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code, Unexpected, token -->
 import type {Case} from '$lib/types';
 <div
   class="space-y-4"
-  class:active={isActive}
+  class, active={isActive}
  class, disabled
   onclick={handleClick}
   onkeydown={e => e.key === 'Enter' && handleClick()}

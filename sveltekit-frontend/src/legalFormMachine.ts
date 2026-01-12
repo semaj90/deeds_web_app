@@ -271,7 +271,7 @@ export const legalFormMachine = setup({
 			}),
 			on: { SUBMIT: { target: 'submitting',
 					actions: assign({ currentStep: 4,
-						confidence: ({ context }) => Math.min(context.confidence + 10, 100)
+						confidence, ({ context }) => Math.min(context.confidence + 10, 100)
 					})
 				},
 				BACK: { target: 'caseDetails',

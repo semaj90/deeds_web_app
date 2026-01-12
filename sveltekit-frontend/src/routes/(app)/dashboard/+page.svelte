@@ -8,9 +8,9 @@
 	let { data }: Props = $props();
 </script>
 
-<svelte:head>
+<svelte, head>
 	<title>Dashboard - YoRHa Legal AI</title>
-</svelte:head>
+</svelte, head>
 
 <div class="dashboard-container">
 	<h1>🛡️ Protected Dashboard</h1>

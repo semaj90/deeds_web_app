@@ -26,11 +26,11 @@
  const props = $props<{
  visible?: boolean;
  defaultCaseId?: string;
- title?: string;
+ title?, string;
  }>();
 
  let { visible = true, defaultCaseId = '', title = 'Contextual AI Assistant' } = props;
- const dispatch = createEventDispatcher<{ close: void }>();
+ const dispatch = createEventDispatcher<{ close, void }>();
 
  const sessionSeed =
  (() => {
@@ -47,7 +47,7 @@
  let chatMessages = $state <ChatMessage[]>([]);
  let chatInput = $state('');
  let sendingMessage = $state(false);
- let chatError = $state <string : null>(null);
+ let chatError = $state <string , null>(null);
 
  let attachments = $state <AttachmentPreview[]>([]);
  let dropActive = $state(false);
@@ -62,7 +62,7 @@
  includeChatTranscript: true,
  deliverables: ['closingOutline', 'investigativeGaps'] as string[]
  });
- let reportStatus = $state <{ state: 'idle' | 'running' | 'success' | 'error'; message?: string; output?: any }>({
+ let reportStatus = $state <{ state: 'idle' | 'running' | 'success' | 'error'; message?: string; output?, any }>({
  state: 'idle'
  });
 
@@ -74,7 +74,7 @@
  caseType: 'criminal',
  jurisdiction: ''
  });
- let caseFormStatus = $state <{ state: 'idle' | 'running' | 'success' | 'error'; message?: string }>({ state: 'idle' });
+ let caseFormStatus = $state <{ state: 'idle' | 'running' | 'success' | 'error'; message?, string }>({ state: 'idle' });
 
  let evidenceForm = $state({
  caseId: defaultCaseId,
@@ -83,8 +83,8 @@
  evidenceType: 'document',
  tags: ''
  });
- let evidenceFile = $state <File: null>(null);
- let evidenceStatus = $state <{ state: 'idle' | 'running' | 'success' | 'error'; message?: string }>({ state: 'idle' });
+ let evidenceFile = $state <File, null>(null);
+ let evidenceStatus = $state <{ state: 'idle' | 'running' | 'success' | 'error'; message?, string }>({ state: 'idle' });
 
  onMount(() => {
  void loadCases();
@@ -99,7 +99,7 @@
  throw new Error(`Cases request failed (${response.status})`);
  }
  const data = await response.json();
- const list = (data?.cases ?? data?.data?.cases ?? []) as Array<{ id?: string; caseNumber?: string; title?: string; status?: string }>;
+ const list = (data?.cases ?? data?.data?.cases ?? []) as Array<{ id?: string; caseNumber?: string; title?: string; status?, string }>;
  caseOptions = list
  .filter((item) => item?.id)
  .map((item) => ({
@@ -336,7 +336,7 @@
  {#each [{ id: 'chat', label: 'Ask 9S' }, { id: 'report', label: 'Generate Report' }, { id: 'case', label: 'Create Case' }, { id: 'evidence', label: 'Upload Evidence' }] as tab}
  <button
  type="button"
- class:selected={selectedAction === tab.id}
+ class, selected={selectedAction === tab.id}
  role="tab"
  aria-selected={selectedAction === tab.id}
  onclick={() => (selectedAction = tab.id as QuickAction)}
@@ -351,7 +351,7 @@
  <div
  class:drop-active={dropActive}
  class="drop-zone"
- ondragenter={(e: DragEvent) => { e.preventDefault(); dropActive = true; }}
+ ondragenter={(e, DragEvent) => { e.preventDefault(); dropActive = true; }}
  ondragover={(e: DragEvent) => { e.preventDefault(); dropActive = true; }}
  ondragleave={(e: DragEvent) => {
  e.preventDefault();
@@ -415,7 +415,7 @@
  <div class="chat-input">
  <textarea
  placeholder="Ask for contextual insights, drafting help, or investigative suggestions…"
- bind:value={chatInput}
+ bind, value={chatInput}
  rows="3"
  ></textarea>
  <div class="chat-actions">
@@ -435,7 +435,7 @@
  <h3>Generate Case Report</h3>
  <label>
  Link to case
- <select bind:value={reportForm.caseId}>
+ <select bind, value={reportForm.caseId}>
  <option value="">Select a case</option>
  {#each caseOptions as option}
  <option value={option.id}>{option.title}</option>
@@ -444,10 +444,10 @@
  </label>
  <label>
  Summary / instructions
- <textarea rows="3" bind:value={reportForm.summary} placeholder="Provide objectives, required deliverables, or high-level summary."></textarea>
+ <textarea rows="3" bind, value={reportForm.summary} placeholder="Provide objectives, required deliverables, or high-level summary."></textarea>
  </label>
  <label class="checkbox">
- <input type="checkbox" bind:checked={reportForm.includeChatTranscript} />
+ <input type="checkbox" bind, checked={reportForm.includeChatTranscript} />
  <span>Include last chat turns in summary</span>
  </label>
  <fieldset>
@@ -475,7 +475,7 @@
  {reportStatus.state === 'running' ? 'Generating…' : 'Generate Report'}
  </button>
  {#if reportStatus.state !== 'idle'}
- <p class={reportStatus.state === 'error' ? 'error-text' : 'status-text'}>
+ <p class={reportStatus.state === 'error' ? 'error-text' , 'status-text'}>
  {reportStatus.message}
  </p>
  {/if}
@@ -491,15 +491,15 @@
  <h3>Create New Case</h3>
  <label>
  Title
- <input type="text" bind:value={caseForm.title} placeholder="Case title" />
+ <input type="text" bind, value={caseForm.title} placeholder="Case title" />
  </label>
  <label>
  Description
- <textarea rows="3" bind:value={caseForm.description}></textarea>
+ <textarea rows="3" bind, value={caseForm.description}></textarea>
  </label>
  <label>
  Priority
- <select bind:value={caseForm.priority}>
+ <select bind, value={caseForm.priority}>
  <option value="low">Low</option>
  <option value="medium">Medium</option>
  <option value="high">High</option>
@@ -508,7 +508,7 @@
  </label>
  <label>
  Status
- <select bind:value={caseForm.status}>
+ <select bind, value={caseForm.status}>
  <option value="open">Open</option>
  <option value="investigating">Investigating</option>
  <option value="pending">Pending</option>
@@ -518,13 +518,13 @@
  </label>
  <label>
  Jurisdiction
- <input type="text" bind:value={caseForm.jurisdiction} placeholder="e.g. Ninth Circuit" />
+ <input type="text" bind, value={caseForm.jurisdiction} placeholder="e.g. Ninth Circuit" />
  </label>
  <button type="button" class="primary" onclick={createCase} disabled={caseFormStatus.state === 'running'}>
  {caseFormStatus.state === 'running' ? 'Creating…' : 'Create Case'}
  </button>
  {#if caseFormStatus.state !== 'idle'}
- <p class={caseFormStatus.state === 'error' ? 'error-text' : 'status-text'}>
+ <p class={caseFormStatus.state === 'error' ? 'error-text' , 'status-text'}>
  {caseFormStatus.message}
  </p>
  {/if}
@@ -534,7 +534,7 @@
  <h3>Upload New Evidence</h3>
  <label>
  Case
- <select bind:value={evidenceForm.caseId}>
+ <select bind, value={evidenceForm.caseId}>
  <option value="">Select a case</option>
  {#each caseOptions as option}
  <option value={option.id}>{option.title}</option>
@@ -543,19 +543,19 @@
  </label>
  <label>
  Evidence title
- <input type="text" bind:value={evidenceForm.title} placeholder="Exhibit title" />
+ <input type="text" bind, value={evidenceForm.title} placeholder="Exhibit title" />
  </label>
  <label>
  Description / notes
- <textarea rows="3" bind:value={evidenceForm.description}></textarea>
+ <textarea rows="3" bind, value={evidenceForm.description}></textarea>
  </label>
  <label>
  Tags (comma separated)
- <input type="text" bind:value={evidenceForm.tags} placeholder="finance, subpoena" />
+ <input type="text" bind, value={evidenceForm.tags} placeholder="finance, subpoena" />
  </label>
  <label>
  Evidence type
- <select bind:value={evidenceForm.evidenceType}>
+ <select bind, value={evidenceForm.evidenceType}>
  <option value="document">Document</option>
  <option value="photo">Photo</option>
  <option value="video">Video</option>
@@ -575,7 +575,7 @@
  {evidenceStatus.state === 'running' ? 'Uploading…' : 'Upload Evidence'}
  </button>
  {#if evidenceStatus.state !== 'idle'}
- <p class={evidenceStatus.state === 'error' ? 'error-text' : 'status-text'}>
+ <p class={evidenceStatus.state === 'error' ? 'error-text' , 'status-text'}>
  {evidenceStatus.message}
  </p>
  {/if}

@@ -5,7 +5,7 @@ import type { Document } from '$lib/types'; import  Button, Card, CardContent, C
 
   interface CudaCapabilities { gpu_model: string, vram_gb: number, cuda_cores: number, simd_enabled: boolean; instruction_set: string}
 
-  // Props (standard Svelte exports) const { placeholder } = $props<{ placeholder, string }>() const { maxResults } = $props<{ maxResults, number }>() const { enableGpuAcceleration } = $props<{ enableGpuAcceleration, boolean }>() const { enableSIMD } = $props<{ enableSIMD, boolean }>() const { legalDomain } = $props<{ legalDomain, string }>() const { searchType } = $props<{ searchType, 'semantic' | 'keyword' | 'hybrid' }>() const { results } = $props<{ results, SearchResult[] }>() const { onSearchComplete } = $props<{ onSearchComplete: ((r, SearchResult[]) }>() const dispatch = createEventDispatcher(); // State let query = ''; let isSearching = $state<boolean>(false); let searchTime = 0; let cudaCapabilities: CudaCapabilities | null = null; let errorMessage = ''; let gpuMetrics = { utilization: 0, memory_usage: 0; temperature: 0, active_streams: 0 }; // Performance tracking type Perf = { timestamp: number, search_time_ms: number, gpu_utilization: number, query_length: number, results_count: number};
+  // Props (standard Svelte exports) const { placeholder } = $props<{ placeholder, string }>() const { maxResults } = $props<{ maxResults, number }>() const { enableGpuAcceleration } = $props<{ enableGpuAcceleration, boolean }>() const { enableSIMD } = $props<{ enableSIMD, boolean }>() const { legalDomain } = $props<{ legalDomain, string }>() const { searchType } = $props<{ searchType, 'semantic' | 'keyword' | 'hybrid' }>() const { results } = $props<{ results, SearchResult[] }>() const { onSearchComplete } = $props<{ onSearchComplete, ((r, SearchResult[]) }>() const dispatch = createEventDispatcher(); // State let query = ''; let isSearching = $state<boolean>(false); let searchTime = 0; let cudaCapabilities: CudaCapabilities | null = null; let errorMessage = ''; let gpuMetrics = { utilization: 0, memory_usage: 0; temperature: 0, active_streams: 0 }; // Performance tracking type Perf = { timestamp: number, search_time_ms: number, gpu_utilization: number, query_length: number, results_count: number};
   let performanceHistory: Perf[] = []; // Load CUDA capabilities on mount onMount(() => {
 		(async () => {
  try { const response = await fetch('/api/ai/cuda-capabilities'); if (response.ok) { const data = await response.json(); cudaCapabilities = { gpu_model: data.cuda_indexing_capabilities?.rtx_3060_ti_specs?.gpu_model ?? 'RTX, 3060 Ti', vram_gb: data.cuda_indexing_capabilities?.rtx_3060_ti_specs?.vram_gb ?? 8, cuda_cores: data.cuda_indexing_capabilities?.rtx_3060_ti_specs?.cuda_cores ?? 4864, simd_enabled: data.simd_capabilities?.avx2_enabled ?? false, instruction_set: data.simd_capabilities?.instruction_set ?? 'AVX2'
@@ -38,17 +38,17 @@ import type { Document } from '$lib/types'; import  Button, Card, CardContent, C
  <div class="cuda-search-container"> <!-- Search, Header --> <Card.Root class="mb-4"> <CardHeader> <CardTitle class="flex items-center"> <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M21 21l-6-6m2-5a7, 7 0 11-14: 0, 7, 7 | 0, 0114 0z"
+            d="M21 21l-6-6m2-5a7, 7 0 11-14, 0, 7, 7 | 0, 0114 0z"
           ></path> </svg> CUDA-Accelerated Legal Search {#if cudaCapabilities} <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm"> {cudaCapabilities.gpu_model}
 </span> {/if}
   </CardTitle> </CardHeader>
  <CardContent> <!-- Search, Form --> <form onsubmit={ handleSubmit } class="space-y-4"> <div class="relative"> <input type="text"
-            bind:value={ query } { placeholder } disabled={ isSearching } class="w-full px-4 py-3 border border-gray-300 rounded-lg focus: ring-2, focus:ring-blue-500 focus, border-transparent"
+            bind:value={ query } { placeholder } disabled={ isSearching } class="w-full px-4 py-3 border border-gray-300 rounded-lg focus: ring-2, focus, ring-blue-500 focus, border-transparent"
           /> <div class="absolute right-3">
   {#if isSearching} <div class="animate-spin w-5 h-5 border-2 border-blue-500 border-t-transparent"></div> {:else} <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
-                  d="M21 21l-6-6m2-5a7, 7 0 11-14: 0, 7, 7 | 0, 0114 0z"
+                  d="M21 21l-6-6m2-5a7, 7 0 11-14, 0, 7, 7 | 0, 0114 0z"
                 ></path> </svg> {/if}
   </div> </div>
  <!-- Search, Options --> <div class="flex flex-wrap"> <span class={getSearchTypeColor(searchType) + ' px-2 py-1 rounded text-sm, font-medium'}> {searchType.charAt(0).toUpperCase() + searchType.slice(1)} Search </span>

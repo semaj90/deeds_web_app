@@ -3,7 +3,7 @@
 import type { mat4, vec4 } from 'gl-matrix';
 
 export interface MatrixUINode {
- type?? 'button'
+ type?: 'button'
  | 'card'
  | 'input'
  | 'dialog'
@@ -77,7 +77,7 @@ export class MatrixUICompiler {
  async compileEnhanced(
  nodes: MatrixUINode[],
  _xstateContext?: unknown // Renamed to _xstateContext
- ): Promise<{ compiled: CompiledNode[], webgl: EnhancedWebGLBuffer; css: CSSOutput, events: EventMapping[]; optimizations: string[];
+ ): Promise<{ compiled: CompiledNode[], webgl: EnhancedWebGLBuffer; css: CSSOutput, events: EventMapping[]; optimizations, string[];
  }> {
  // Fixed return type syntax
  const optimizations: string[] = []; // Fixed syntax
@@ -123,7 +123,7 @@ export class MatrixUICompiler {
  };
  private generateEnhancedWebGLBuffers(
  nodes: MatrixUINode[], lodLevel: 'low' | 'mid' | 'high'
- ): EnhancedWebGLBuffer {
+ ), EnhancedWebGLBuffer {
  // Fixed parameter type syntax
  const vertexCount = nodes.length * 4; // 4 vertices per node
  const vertices = new Float32Array(vertexCount * 3, // x, y, z
@@ -406,7 +406,7 @@ export class MatrixUICompiler {
  /**
  * Calculate Level of Detail based on viewport and AI context
  */
- private calculateLOD(node: MatrixUINode): 'low' | 'mid' | 'high' {
+ private calculateLOD(node: MatrixUINode), 'low' | 'mid' | 'high' {
  // Fixed parameter type syntax
  // High LOD for AI-flagged important elements
  if (node.metadata?.aiGenerated && node.metadata?.confidence && node.metadata.confidence > 80) {

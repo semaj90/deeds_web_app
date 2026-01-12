@@ -192,7 +192,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  }
 
  this.log('info', `Listed ${diffs.length} diffs`, { filters });
- return diffs.map((d: any) => ({ ...d }));
+ return diffs.map((d, any) => ({ ...d }));
  });
  }
 

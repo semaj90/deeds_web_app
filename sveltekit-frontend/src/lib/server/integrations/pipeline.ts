@@ -332,7 +332,7 @@ export class LegalAIPipeline {
  temperature?: number;
  maxTokens?: number;
  }
- ): AsyncIterable<{ type: 'sources' | 'token' | 'done'; data: any }> {
+ ): AsyncIterable<{ type: 'sources' | 'token' | 'done'; data, any }> {
  const topK = options?.topK ?? 5;
 
  // 1. Search for sources
@@ -378,7 +378,7 @@ export class LegalAIPipeline {
  async batchIngest(
  documents: Array<{ content: string;
  metadata: DocumentMetadata;
- file?: Buffer;
+ file?, Buffer;
  }>,
  batchSize: number = 10
  ): Promise<ProcessedDocument[]> {
@@ -401,7 +401,7 @@ export class LegalAIPipeline {
  async healthCheck(): Promise<{ overall: 'healthy' | 'degraded' | 'unavailable';
  services: { ollama: any;
  redis: any; qdrant: any;
- minio: any;
+ minio, any;
  };
  }> {
  const [ollama, redis, qdrant, minio] = await Promise.all([

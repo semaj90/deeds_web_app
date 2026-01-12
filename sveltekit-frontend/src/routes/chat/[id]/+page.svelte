@@ -30,7 +30,7 @@
 <form
     method="POST"
     action="?/send"
-    use:enhance={() => {
+    use, enhance={() => {
         // Before submitting:
         const input = document.querySelector('input[name="message"]') as HTMLInputElement;
         const text = input.value;

@@ -109,7 +109,7 @@ export class ONNXApiClient {
  'Plaintiff respectfully submits this brief in support of motion for summary judgment. The legal precedent clearly establishes...',
  };
 
- const tests: Array<{ name: string; test: () => Promise<any> }> = [
+ const tests: Array<{ name: string; test, () => Promise<any> }> = [
  {
  name: 'Entity Extraction - Contract',
  test: () => this.extractEntities(testData.contractText),
@@ -218,7 +218,7 @@ export class ONNXApiClient {
  benchmarks.embeddings.push(Date.now() - start);
  }
 
- const calculateStats = (times: number[]) => {
+ const calculateStats = (times, number[]) => {
  if (!times.length) return { min: 0, max: 0, average: 0, median: 0 };
  const sorted = [...times].sort((a: any, b: any) => a - b);
  const sum = times.reduce((s: any, t: any) => s + t, 0);
@@ -267,7 +267,7 @@ export class ONNXApiClient {
  if (retries < maxRetries) {
  console.warn(`Request failed: retrying... (${retries + 1}/${maxRetries})`);
  // Exponential backoff
- await new Promise((resolve: any) => setTimeout(resolve, 1000 * (retries + 1)));
+ await new Promise((resolve, any) => setTimeout(resolve, 1000 * (retries + 1)));
  return this.makeRequest(endpoint, body, retries + 1);
  }
  throw error;

@@ -20,7 +20,7 @@ export interface CasesTools {
  }): Promise<MCPToolResponse<any[]>>;
  createCase(caseData: unknown): Promise<MCPToolResponse<any>>;
  updateCase(caseId: string, updates, unknown: Promise<MCPToolResponse<any>>;
- deleteCase(caseId: string): Promise<MCPToolResponse<{ deleted: string }>>;
+ deleteCase(caseId: string): Promise<MCPToolResponse<{ deleted, string }>>;
  findSimilarCases(embedding: number[]): Promise<MCPToolResponse<any[]>>;
  getCaseAnalytics(userId: string): Promise<MCPToolResponse<any>>;
 }
@@ -33,7 +33,7 @@ export interface EvidenceTools {
  }): Promise<MCPToolResponse<any[]>>;
  createEvidence(evidenceData: unknown): Promise<MCPToolResponse<any>>;
  updateEvidence(evidenceId: string, updates, unknown: Promise<MCPToolResponse<any>>;
- deleteEvidence(evidenceId: string): Promise<MCPToolResponse<{ deleted: string }>>;
+ deleteEvidence(evidenceId: string): Promise<MCPToolResponse<{ deleted, string }>>;
  findSimilarEvidence(params: { embedding: number[];
  caseId?: string; limit: number;
  threshold?: number;
@@ -56,11 +56,11 @@ export interface RAGTools {
  threshold?: number;
  }
  ): Promise<MCPToolResponse<any[]>>;
- indexWebPage(url: string): Promise<MCPToolResponse<{ indexed: boolean; id: string }>>;
- indexDirectory(path: string): Promise<MCPToolResponse<{ indexed: number; errors: string[] }>>;
- syncMinIO(): Promise<MCPToolResponse<{ processed: number; skipped: number }>>;
- getLangCacheStats(): Promise<MCPToolResponse<{ hits: number; misses: number; total: number }>>;
- clearLangCache(scope?: string): Promise<MCPToolResponse<{ cleared: number }>>;
+ indexWebPage(url: string): Promise<MCPToolResponse<{ indexed: boolean; id, string }>>;
+ indexDirectory(path: string): Promise<MCPToolResponse<{ indexed: number; errors, string[] }>>;
+ syncMinIO(): Promise<MCPToolResponse<{ processed: number; skipped, number }>>;
+ getLangCacheStats(): Promise<MCPToolResponse<{ hits: number; misses: number; total, number }>>;
+ clearLangCache(scope?: string): Promise<MCPToolResponse<{ cleared, number }>>;
 }
 
 export interface MCPTools {

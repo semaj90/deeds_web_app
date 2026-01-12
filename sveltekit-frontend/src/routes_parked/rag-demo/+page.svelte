@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: 'onsubmit|preventDefault' is not a valid attribute name
-https://svelte.dev/e/attribute_invalid_name -->
+https, //svelte.dev/e/attribute_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: 'onsubmit|preventDefault' is not a valid attribute name
-https://svelte.dev/e/attribute_invalid_name -->
+https, //svelte.dev/e/attribute_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: 'onsubmit|preventDefault' is not a valid attribute name
-https://svelte.dev/e/attribute_invalid_name -->
+https, //svelte.dev/e/attribute_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: 'onsubmit|preventDefault' is not a valid attribute name
-https://svelte.dev/e/attribute_invalid_name -->
+https, //svelte.dev/e/attribute_invalid_name -->
 <!-- src/routes/rag-demo/+page.svelte -->
 <script lang="ts">
  import { onMount } from 'svelte';
@@ -83,14 +83,14 @@ https://svelte.dev/e/attribute_invalid_name -->
  });
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>RAG Pipeline Demo</title>
-</svelte:head>
+</svelte, head>
 
 <div class="container mx-auto p-8">
  <h1 class="text-3xl font-bold mb-8">Legal AI RAG Pipeline Demo</h1>
 
- <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+ <div class="grid grid-cols-1 md, grid-cols-2 gap-8">
  <!-- Document Processing -->
  <div class="bg-white p-6 rounded-lg shadow-md">
  <h2 class="text-xl font-semibold mb-4">Process Document</h2>
@@ -106,14 +106,14 @@ https://svelte.dev/e/attribute_invalid_name -->
  bind:value={documentUrl}
  placeholder="https://example.com/document.pdf"
  required
- class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
+ class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus, ring-blue-500"
  />
  </div>
 
  <button
  type="submit"
  disabled={!documentUrl}
- class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover: bg-blue-700, disabled: bg-gray-400, disabled:cursor-not-allowed"
+ class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover: bg-blue-700, disabled: bg-gray-400, disabled, cursor-not-allowed"
  >
  Process Document
  </button>
@@ -139,8 +139,7 @@ https://svelte.dev/e/attribute_invalid_name -->
  <span>Status:</span>
  <span class="capitalize font-medium
  {status.status === 'completed' ? 'text-green-600' :
- status.status === 'failed' ? 'text-red-600' :
- 'text-blue-600'}">
+ status.status === 'failed' ? 'text-red-600' , 'text-blue-600'}">
  {status.status}
  </span>
  </div>
@@ -154,7 +153,7 @@ https://svelte.dev/e/attribute_invalid_name -->
  <div class="w-full bg-gray-200 rounded-full h-2">
  <div
  class="bg-blue-600 h-2 rounded-full transition-all duration-300"
- style="width: {status.totalShards ? ((status.completedShards ?? 0) / status.totalShards) * 100 : 0}%"
+ style="width: {status.totalShards ? ((status.completedShards ?? 0) / status.totalShards) * 100 , 0}%"
  ></div>
  </div>
  {/if}
@@ -184,7 +183,7 @@ https://svelte.dev/e/attribute_invalid_name -->
  <div class="mt-8 bg-gray-50 p-6 rounded-lg">
  <h2 class="text-xl font-semibold mb-4">Pipeline Architecture</h2>
 
- <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+ <div class="grid grid-cols-1 md, grid-cols-3 gap-4">
  <div class="bg-white p-4 rounded border-l-4 border-blue-500">
  <h3 class="font-medium">1. Document Sharding</h3>
  <p class="text-sm text-gray-600 mt-1">

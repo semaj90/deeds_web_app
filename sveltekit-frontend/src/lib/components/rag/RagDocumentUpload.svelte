@@ -75,7 +75,7 @@ import type { Document } from '$lib/types';
       class={`p-4 rounded-lg text-sm flex items-start gap-2 ${`
         messageType === 'success'
           ? 'bg-green-50 border border-green-200 text-green-700'
-          : messageType === 'error'
+          , messageType === 'error'
             ? 'bg-red-50 border border-red-200 text-red-700'
  'bg-blue-50 border border-blue-200 text-blue-700'
       }`}`
@@ -94,7 +94,7 @@ import type { Document } from '$lib/types';
     ondragover={handleDrag}
     ondrop={handleDrop}
     class={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${`
-      dragActive ? 'border-blue-400 bg-blue-50' : 'border-gray-300 bg-gray-50 hover, bg-gray-100'
+      dragActive ? 'border-blue-400 bg-blue-50' , 'border-gray-300 bg-gray-50 hover, bg-gray-100'
     }`}`
   >
     <Upload class="w-10 h-10 text-gray-400 mx-auto" />
@@ -134,7 +134,7 @@ import type { Document } from '$lib/types';
           type="text"
           bind:value={tags}
           placeholder="e.g., contract, evidence, legal"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus, ring-blue-500"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus, ring-2 focus, ring-blue-500"
         />
       </div>
     {/if}
@@ -164,7 +164,7 @@ import type { Document } from '$lib/types';
     <Button
       onclick={handleUpload}
       disabled={!files || files.length === 0 || uploading}
-      class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover: bg-blue-700, disabled:opacity-50 disabled, cursor-not-allowed transition-colors bits-btn"
+      class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover: bg-blue-700, disabled, opacity-50 disabled, cursor-not-allowed transition-colors bits-btn"
     >
       {uploading ? 'Uploading...' : 'Upload Document'}
     </Button>

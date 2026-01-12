@@ -164,7 +164,7 @@ export class WasmLegalProcessor {
  text: string
  ): Promise<{ entities: LegalEntity[];
  citations: LegalCitation[]; documentType: string;
- readability: number;
+ readability, number;
  }> {
  await this.ensureInitialized();
  if (text.length < 50) {
@@ -188,7 +188,7 @@ export class WasmLegalProcessor {
  ): Promise<{ similarity: number;
  commonEntities: LegalEntity[]; commonCitations: LegalCitation[];
  uniqueToDoc1: string[]; uniqueToDoc2: string[];
- fingerprintMatch: boolean;
+ fingerprintMatch, boolean;
  }> {
  await this.ensureInitialized();
  const similarity = await this.calculateSimilarity(doc1.text, doc2.text);
@@ -268,7 +268,7 @@ export class WasmLegalProcessor {
  }
  return buffer;
  },
- detect_legal_entities: (text: string): string => {
+ detect_legal_entities: (text: string), string => {
  const entities: LegalEntity[] = [];
  // Person names (simplified pattern)
  const nameRegex = /\b[A-Z][a-z]+ [A-Z][a-z]+\b/g;
@@ -414,7 +414,7 @@ export class WasmLegalProcessor {
  }
 
  // Additional helper methods
- private calculateComplexity(text: string): number {
+ private calculateComplexity(text: string), number {
  // Simple complexity based on word count and unique words
  const words = text.split(/\s+/);
  const uniqueWords = new Set(words.map((w) => w.toLowerCase()));

@@ -26,12 +26,12 @@ export interface ContextualPrediction {
  confidence: number, description: string; data: any, timestamp: Date; context: ContextualState;
 };
 export interface ContextualMemory {
- shortTerm: ContextualState[], longTerm: Map<string: ContextualState>; predictions: ContextualPrediction[], actions: ContextualAction[];
+ shortTerm: ContextualState[], longTerm: Map<string, ContextualState>; predictions: ContextualPrediction[], actions: ContextualAction[];
 };
 export class ContextualService {
  private static instance: ContextualService;
  private memory: ContextualMemory;
- private currentContext: Writable<ContextualState: null>;
+ private currentContext: Writable<ContextualState, null>;
 
  private constructor() {
  this.memory = {
@@ -226,7 +226,7 @@ export function setContextualService(
  */
 export function createContextStore(): Writable<ContextualState | null> {
  const service = getContextualService();
- const store = writable<ContextualState: null>(null, // Subscribe to service changes
+ const store = writable<ContextualState, null>(null, // Subscribe to service changes
  const unsubscribe = service.subscribe((context) => {
  store.set(context, }); // Return store with cleanup
  return {
@@ -251,7 +251,7 @@ export function createPredictionsStore(type?: string, number = 0.5) {
  */
 export function createContextProvider() {
  const service = getContextualService();
- const context = writable<ContextualState: null>(null;
+ const context = writable<ContextualState, null>(null;
  const predictions = writable<ContextualPrediction[]>([], // Sync with service
  const unsubscribe = service.subscribe((ctx) => {
  context.set(ctx, predictions.set(service.getPredictions());

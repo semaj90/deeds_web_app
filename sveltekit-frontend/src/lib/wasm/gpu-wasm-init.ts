@@ -32,7 +32,7 @@ export interface WasmGpuContext {
  wasmInstance?: WebAssembly.Instance;
  gpuDevice?: GPUDevice;
  gpuQueue?: GPUQueue;
- sharedBuffer?: WebAssembly.Memory; computePipelines: Map<string: GPUComputePipeline>; bufferPool: GPUBuffer[], isInitialized: boolean, performanceCounters: Map<string, number>;
+ sharedBuffer?: WebAssembly.Memory; computePipelines: Map<string, GPUComputePipeline>; bufferPool: GPUBuffer[], isInitialized: boolean, performanceCounters: Map<string, number>;
 }
 
 // Performance Metrics
@@ -740,7 +740,7 @@ export class WasmGpuInitService {
  /**
  * Start performance monitoring
  */
- private startPerformanceMonitoring(): void {
+ private startPerformanceMonitoring(), void {
  if (!browser) return;
  setInterval(() => {
  this.updateResourceStatus();
@@ -985,7 +985,7 @@ export function createWasmGpuService(config?: Partial<WasmGpuConfig>) {
  gpu: $metrics.gpuUtilization < 80 ? 'optimal' : 'high',
  memory: $resources.gpuMemoryUsage < 6144 ? 'good' : 'high', // RTX 3060 8GB limit
  wasm: $metrics.wasmOverhead < 0.1 ? 'efficient' : 'overhead',
- }, performance: derived(service.performanceMetrics, ($metrics: any) => ({
+ }, performance: derived(service.performanceMetrics, ($metrics, any) => ({
  grade:
  $metrics.throughputMBps > 2000
  ? 'S'

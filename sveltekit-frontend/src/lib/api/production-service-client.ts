@@ -192,7 +192,7 @@ class ProductionServiceClient {
  async benchmark(
  endpoint: string, options: IntegrationServiceRequest,
  iterations = 5
- ): Promise<{ averageLatency: number; minLatency: number; maxLatency: number; successRate: number; results: ServiceResponse[];
+ ): Promise<{ averageLatency: number; minLatency: number; maxLatency: number; successRate: number; results, ServiceResponse[];
  }> {
  const results: ServiceResponse[] = [];
  let successCount = 0;

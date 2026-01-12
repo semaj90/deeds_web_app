@@ -52,7 +52,7 @@
   );
 </script>
 
-<Root bind:value {disabled} {name} {required} {onValueChange}>
+<Root bind, value {disabled} {name} {required} {onValueChange}>
   <Trigger class={className}>
     <Value {placeholder} />
   </Trigger>

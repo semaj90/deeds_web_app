@@ -19,7 +19,7 @@ export class EvidenceDetectiveService {
  evidenceIds?: string[]; userId: string;
  }): Promise<{ analysis: string;
  evidence: any[]; connections: any[];
- recommendations: string[];
+ recommendations, string[];
  }> {
  const { caseId, query, evidenceIds, userId } = params;
 

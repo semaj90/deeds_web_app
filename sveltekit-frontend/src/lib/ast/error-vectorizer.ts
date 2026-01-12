@@ -11,7 +11,7 @@ export interface ErrorVector {
 }
 
 export interface WebGPUExport {
- vectors: Array<{ id: string, vector: number[]; metadata: { file: string, code: string; line: number, severity: string;
+ vectors: Array<{ id: string, vector: number[]; metadata: { file: string, code: string; line: number, severity, string;
  };
  }>;
  dimensions: number, count: number; codebook: Record<string, number>;

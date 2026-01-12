@@ -8,10 +8,10 @@
  let caseId = $derived(data?.caseId ?? null);
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Phoenix Wright Prosecutor Mode - Legal AI Platform</title>
  <meta name="description" content="Professional legal evidence analysis with real-time AI assistance" />
-</svelte:head>
+</svelte, head>
 
 <PhoenixProsecutorDashboard {caseId} />
 

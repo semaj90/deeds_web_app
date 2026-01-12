@@ -14,7 +14,7 @@ export interface PrefetchContext {
  sectionId: string; sectionText: string;
  relatedStatutes: Array<{ id: string;
  title: string; section: string;
- relevance: number;
+ relevance, number;
  }>;
  semanticKeywords: string[]; vectorContext: number[];
  timestamp: number; ttl: number; // Time to live in milliseconds

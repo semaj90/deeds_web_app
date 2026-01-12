@@ -61,7 +61,7 @@
 		role="option"
 		aria-selected={isSelected}
 		data-disabled={disabled || undefined}
-		tabindex={disabled ? -1 : 0}
+		tabindex={disabled ? -1 , 0}
 		onclick={ handleClick }
 		onkeydown={ handleKeydown }
 		class="{defaultClass} { className }"

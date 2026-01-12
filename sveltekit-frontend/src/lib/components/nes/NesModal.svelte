@@ -51,7 +51,7 @@
  >
  <div
  class="nes-modal {widthClass}"
- bind:this={modalElement}
+ bind, this={modalElement}
  role="dialog"
  aria-modal="true"
  aria-labelledby="nes-modal-title"

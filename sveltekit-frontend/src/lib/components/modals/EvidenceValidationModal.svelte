@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: Attributes need to, be, unique, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte, code, Attributes need to, be, unique --> <!-- @migration-task Error while migrating Svelte code: Identifier: 'aiEvent' has already, been, declared, https, //svelte.dev/e/js_parse_error --> <script lang="ts">
+<!-- @migration-task Error while migrating Svelte code, Attributes need to, be, unique, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte, code, Attributes need to, be, unique --> <!-- @migration-task Error while migrating Svelte code: Identifier, 'aiEvent' has already, been, declared, https, //svelte.dev/e/js_parse_error --> <script lang="ts">
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported interface Props { open?: boolean; evidence?: any; aiEvent?: any; onvalidated?: (event?: any) => void}
   let { open = false, evidence = null, aiEvent = null, onvalidated }: Props = $props(); import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Dialog  from "$lib/components/ui/MeltDialog.svelte"; import { AlertTriangle, CheckCircle, Edit3, Save, Tag, XCircle } from "lucide-svelte"; import type { Evidence } from '$lib/stores/unified'; let validationChoice = $state<"approve" | "reject" | null >(null); let feedback = $state<string >(""); let corrections = $state({ summary: "", tags: [] as string[], evidenceType: "", analysis: ""
   });
@@ -56,7 +56,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <!-- Feedback, Section -->
   {#if validationChoice} <div class="space-y-4"> <div> <label for="feedback" class="space-y-4"> Additional Feedback (Optional) </label>
  <textarea id="feedback"
-                  bind:value={ feedback } placeholder="Add, any additional comments or context..."
+                  bind, value={ feedback } placeholder="Add, any additional comments or context..."
                   class="space-y-4"
                   rows={ 4 } ></textarea> </div> {/if}
   <!-- Corrections, Section -->

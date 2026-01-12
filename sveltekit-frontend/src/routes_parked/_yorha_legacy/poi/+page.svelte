@@ -75,12 +75,12 @@
  let highRiskCount = $derived(persons.filter(p => p.riskLevel === 'high').length);
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Persons of Interest - YoRHa Detective</title>
-</svelte:head>
+</svelte, head>
 
 <div class="grid grid-cols-[1fr_300px] gap-4">
- <!-- Left: POI List -->
+ <!-- Left, POI List -->
  <div class="flex flex-col gap-4">
  <Panel>
  <div class="flex items-center justify-between mb-3">
@@ -94,7 +94,7 @@
  <!-- Filters -->
  <div class="flex gap-2 mb-3">
  <select
- bind:value={filterRole}
+ bind, value={filterRole}
  class="bg-sandDark text-black px-3 py-1.5 rounded border border-black/40 text-xs font-mono"
  >
  <option value="all">All Roles</option>
@@ -105,7 +105,7 @@
  </select>
 
  <select
- bind:value={filterRisk}
+ bind, value={filterRisk}
  class="bg-sandDark text-black px-3 py-1.5 rounded border border-black/40 text-xs font-mono"
  >
  <option value="all">All Risk Levels</option>
@@ -146,7 +146,7 @@
  </Panel>
  </div>
 
- <!-- Right: Stats & Actions -->
+ <!-- Right, Stats & Actions -->
  <div class="flex flex-col gap-4">
  <Panel>
  <div class="heading-sub mb-3">Overview</div>

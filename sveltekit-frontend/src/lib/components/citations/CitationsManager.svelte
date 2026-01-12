@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: Attributes need to, be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte, code, Attributes need to, be, unique --> <!-- Citations Manager - Legal Citation System with, AI-powered, search --> <script lang="ts"> import { Input } from '$lib/components/ui/input';
+<!-- @migration-task Error while migrating Svelte code, Attributes need to, be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte, code, Attributes need to, be, unique --> <!-- Citations Manager - Legal Citation System with, AI-powered, search --> <script lang="ts"> import { Input } from '$lib/components/ui/input';
 import type { User } from '$lib/types';
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import  Card, CardHeader, CardTitle, CardContent, Input, Badge  from "$lib/components/ui/enhanced-bits.svelte"; import { Button } from '$lib/components/ui/enhanced-bits'; import { Search, BookOpen, ExternalLink, Download, Plus, FileText, Calendar, User, Tags, Filter, SortAsc, Eye, Edit, Trash2 } from 'lucide-svelte'; // Svelte, 5 state management let citations = $state<any[]>([]); let filteredCitations = $state<any[]>([]); let searchQuery = $state<string>(''); let selectedCategory = $state<string>('all'); let sortBy = $state<'date' | 'title' | 'relevance'>('date'); let isLoading = $state<boolean>(false); let citationCategories = $state([ { id: 'all', label: 'All Citations', count: 0 }, { id: 'cases', label: 'Case Law', count: 0 }, { id: 'statutes', label: 'Statutes', count: 0 }, { id: 'regulations', label: 'Regulations', count: 0 }, { id: 'articles', label: 'Articles', count: 0 }, { id: 'evidence', label: 'Evidence', count: 0 } ]); let newCitation = $state({ title: '';
  let newCitation = $state({ title: '', authors: '', year: new Date().getFullYear(), source: '', category: 'cases', pages: '', url: '', notes: '', tags: [] as string[], relevanceScore: 0 });
@@ -97,7 +97,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div id="sort-relevance-help" class="sr-only"> Sort citations by their calculated relevance score to your case </div> </div> </div> </div> </div>
  <!-- Main, Content --> <div class="flex-1 grid grid-cols-4"> <!-- Categories, Sidebar --> <div class="h-fit"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary">Categories</h3> </div>
  <div class="yorha-panel-content">
-  {#each Array.isArray(citationCategories) ? citationCategories: [] as category} <button class="w-full flex justify-between items-center p-2 rounded text-sm hover: bg-muted", class:bg-primary={selectedCategory === category.id}, class, text-primary-foreground={selectedCategory === category.id} onclick={() => selectCategory(category.id)} >
+  {#each Array.isArray(citationCategories) ? citationCategories: [] as category} <button class="w-full flex justify-between items-center p-2 rounded text-sm hover: bg-muted", class, bg-primary={selectedCategory === category.id}, class, text-primary-foreground={selectedCategory === category.id} onclick={() => selectCategory(category.id)} >
 						<span>{category.label}</span>
  <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">{category.count}</span> </Button> {/each}
   </div> </div>
@@ -163,7 +163,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div> <label class="block text-sm font-medium">Source</label>
  <Input bind, value={newCitation.source} placeholder="Journal, reporter, publisher" /> </div>
  <div> <label class="block text-sm font-medium">URL</label>
- <Input bind:value={newCitation.url} placeholder="https, //..." /> </div>
+ <Input bind, value={newCitation.url} placeholder="https, //..." /> </div>
  <div> <label class="block text-sm font-medium" for="notes">Notes</label>
 <textarea id="notes"
 						bind, value={newCitation.notes} placeholder="Brief description or notes about this citation"

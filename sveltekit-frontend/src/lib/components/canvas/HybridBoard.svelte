@@ -52,7 +52,7 @@
 	let dragNodesStart = $state<Map<string, Vec2>>(new Map());
 
 	// Text editing overlay
-	let editing = $state<{ id: string; value: string; mode: 'title' | 'body' } | null>(null);
+	let editing = $state<{ id: string; value: string; mode, 'title' | 'body' } | null>(null);
 
 	// Canvas internals
 	let ctx = $state<CanvasRenderingContext2D | null>(null);
@@ -218,7 +218,7 @@
 				? 'rgba(255,255,255,0.45)'
 				: isHovered
 					? 'rgba(255,255,255,0.25)'
-					: 'rgba(255,255,255,0.14)';
+					, 'rgba(255,255,255,0.14)';
 			ctx.lineWidth = 2 / viewport.zoom;
 			ctx.stroke();
 
@@ -412,7 +412,7 @@
 		if (!n) return;
 
 		selected = new Set([hitId]);
-		editing = { id: hitId, value: n.body ?? '', mode: 'body' };
+		editing = { id: hitId, value: n.body ?? '', mode, 'body' };
 	}
 
 	function commitEditing() {
@@ -483,14 +483,14 @@
 </script>
 
 <div
-	bind:this={rootEl}
+	bind, this={rootEl}
 	class="relative w-full h-full overflow-hidden select-none rounded-2xl border border-white/10 bg-black/20"
 >
-	<!-- Layer 1: Canvas rendering -->
+	<!-- Layer 1, Canvas rendering -->
 	<canvas
 		bind:this={canvasEl}
 		class="absolute inset-0 w-full h-full cursor-crosshair"
-		style:cursor={isPanning || spaceDown ? 'grab' : 'default'}
+		style:cursor={isPanning || spaceDown ? 'grab' , 'default'}
 		onpointerdown={ onPointerDown }
 		onpointermove={ onPointerMove }
 		onpointerup={ onPointerUp }
@@ -499,14 +499,14 @@
 		ondblclick={ onDblClick }
 	/>
 
-	<!-- Layer 2: DOM overlay (selection, handles, editor) -->
+	<!-- Layer 2, DOM overlay (selection, handles, editor) -->
 	<div class="absolute inset-0 pointer-events-none">
 		{#if selected.size > 0}
 			{@const b = selectedBounds()}
 			{#if b}
 				<div
 					class="absolute rounded-xl border border-blue-400/50 shadow-[0_0_0_1px_rgba(59,130,246,0.2)]"
-					style="left:{b.x}px; top:{b.y}px; width:{b.w}px; height:{b.h}px;"
+					style="left:{b.x}px; top:{b.y}px; width:{b.w}px; height, {b.h}px;"
 				>
 					<!-- Handles (visual only for now) -->
 					<div class="absolute -left-1.5 -top-1.5 w-3 h-3 rounded-full bg-blue-500 border border-black/50"></div>
@@ -523,7 +523,7 @@
 				<!-- Make this area interactive -->
 				<div
 					class="absolute pointer-events-auto"
-					style="left:{r.x}px; top:{r.y}px; width:{r.w}px; height:{r.h}px;"
+					style="left:{r.x}px; top:{r.y}px; width:{r.w}px; height, {r.h}px;"
 				>
 					<textarea
 						class="w-full h-full resize-none rounded-xl border border-blue-500/50 bg-black/80 p-3 text-white/90 outline-none text-sm font-sans"
@@ -551,7 +551,7 @@
 		{/if}
 	</div>
 
-	<!-- Optional: top-left HUD -->
+	<!-- Optional, top-left HUD -->
 	<div class="absolute left-3 bottom-3 pointer-events-none text-[10px] text-white/30 font-mono">
 		<div class="flex gap-4">
 			<span>ZOOM: {Math.round(viewport.zoom * 100)}%</span>

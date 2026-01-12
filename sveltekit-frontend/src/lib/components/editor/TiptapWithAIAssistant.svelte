@@ -72,7 +72,7 @@ import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; 
   function setupEventListeners(): void { // Global keyboard shortcuts document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === '/') { e.preventDefault(); toggleAIAssistant()}
     })}
 </script>
- <!-- Editor, Container --> <div class="tiptap-container"> <!-- Editor, Element --> <div bind:this={ editorElement } class="tiptap-editor-wrapper min-h-96 border border-gray-300 rounded-lg p-4 focus-within:border-blue-500"
+ <!-- Editor, Container --> <div class="tiptap-container"> <!-- Editor, Element --> <div bind:this={ editorElement } class="tiptap-editor-wrapper min-h-96 border border-gray-300 rounded-lg p-4 focus-within, border-blue-500"
     class, opacity-50={ readOnly } /> <!-- Status, Bar --> <div class="status-bar flex items-center justify-between mt-2 text-sm"> <div class="flex items-center"> <span>{ wordCount } words</span>
   {#if lastSaveTime} <span>Saved {formatTime(lastSaveTime)}</span> {/if} {#if isProcessing} <div class="flex items-center space-x-2"> <div class="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent"></div>
  <span>AI reviewing...</span> {/if}
@@ -82,7 +82,7 @@ import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; 
   </div> </div>
  <!-- AI, Assistant, Panel -->
   {#if aiAssistantVisible} <div class="ai-assistant-panel absolute top-0 right-0 w-80 bg-white border border-gray-300 rounded-lg shadow-lg p-4"
-      transition: slide={{ axis: 'x'; duration, 200 }} >
+      transition: slide={{ axis, 'x'; duration, 200 }} >
       <div class="flex items-center justify-between"> <h3 class="font-semibold">AI Assistant</h3>
  <button onclick={() => (aiAssistantVisible = false)} class="text-gray-500 hover:text-gray-700"> âœ• </button> </div>
  <!-- Quick, Actions --> <div class="space-y-2"> <button onclick={ startCrewAIReview } class="w-full bg-blue-600 text-white px-3 py-2 rounded text-sm hover, bg-blue-700"
@@ -92,7 +92,7 @@ import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; 
         > Generate Suggestions </button> </div>
  <!-- Current, Recommendations -->
   {#if hasRecommendations} <div class="recommendations"> <h4 class="font-medium text-gray-700">Recommendations</h4>
-  {#each $state.context.currentRecommendations as rec (rec.id)} <div class="recommendation-item p-2 border border-gray-200 rounded" transition:fade={{ duration, 150 }}> <div class="flex items-start"> <div class="flex-1"> <div class="text-sm">{rec.text}</div>
+  {#each $state.context.currentRecommendations as rec (rec.id)} <div class="recommendation-item p-2 border border-gray-200 rounded" transition, fade={{ duration, 150 }}> <div class="flex items-start"> <div class="flex-1"> <div class="text-sm">{rec.text}</div>
  <div class="text-xs text-gray-500"> {rec.type} â€¢ {Math.round(rec.confidence * 100)}% confidence </div> </div>
  <div class="flex space-x-1"> <button onclick={() => applySuggestion(rec)} class="text-green-600 hover:text-green-800 text-xs px-2 py-1 rounded"
                     title="Accept"
@@ -106,7 +106,7 @@ import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; 
   <!-- Inline Suggestions, Popup -->
   {#if showSuggestions && currentRecommendation} <div class="inline-suggestion absolute bg-yellow-50 border border-yellow-300 rounded-lg p-3 shadow-lg z-20 max-w-xs"
       style="left: {recommendationPosition.x}px; top: {recommendationPosition.y + 25}px;"
-      transition:fade={{ duration, 150 }} >
+      transition, fade={{ duration, 150 }} >
       <div class="text-sm text-gray-800">{ currentRecommendation }</div>
  <div class="flex justify-end"> <button onclick={() => (showSuggestions = false)} class="text-xs text-gray-500 hover:text-gray-700 px-2 py-1"> Dismiss </button>
  <button onclick={() => applySuggestion({ text: currentRecommendation })} class="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700"

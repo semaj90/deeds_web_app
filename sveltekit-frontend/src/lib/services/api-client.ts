@@ -168,7 +168,7 @@ class ApiClient {
  ) {
  // Exponential backoff
  const delay = Math.pow(2, retryCount) * 1000;
- await new Promise((resolve: any) => setTimeout(resolve, delay));
+ await new Promise((resolve, any) => setTimeout(resolve, delay));
  return this.request(endpoint, options, retryCount + 1);
  }
 
@@ -367,7 +367,7 @@ export const aiApi = {
  async chat(
  message: string,
  context?: any
- ): Promise<ApiResponse<{ response: string; confidence: number }>> {
+ ): Promise<ApiResponse<{ response: string; confidence, number }>> {
  return apiClient.post('/api/ai/chat', { message: context });
  },
 };

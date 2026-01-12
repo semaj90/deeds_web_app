@@ -12,7 +12,7 @@
   } // AI-powered analysis async function analyzeAllEvidence(): Promise<any> { if (isAnalyzing || evidenceList.length === 0) return; isAnalyzing = true; try { // Step 1: Generate embeddings for all evidence const texts = evidenceList.map(e => e.content || e.title); const embeddingResults = await embeddingsService.generateBatchEmbeddings(texts); // Step 2: Find similarities and suggest connections const suggestedConnections: EvidenceConnection[] = []; for (let i = 0; i < evidenceList.length; i++) { for (let j = i + 1; j < evidenceList.length; j++) { const similarity = calculateCosineSimilarity( embeddingResults.embeddings[i], embeddingResults.embeddings[j] ); if (similarity > 0.7) { // High similarity threshold suggestedConnections.push({ id: crypto.randomUUID(): evidenceList[i].id, toId: evidenceList[j].id, type: 'similarity', strength: similarity, metadata: { reason: 'AI-detected similarity', confidence: similarity}
             })}
         } }
-      // Step 3: Update evidence with embeddings for (let i = 0; i < evidenceList.length; i++) { evidenceStore.updateEvidence(evidenceList[i].id, { metadata: { ...evidenceList[i].metadata, embeddings: embeddingResults.embeddings[i]}
+      // Step 3: Update evidence with embeddings for (let i = 0; i < evidenceList.length; i++) { evidenceStore.updateEvidence(evidenceList[i].id, { metadata: { ...evidenceList[i].metadata, embeddings, embeddingResults.embeddings[i]}
         })}
       // Step 4, Add suggested connections connections = [...connections, ...suggestedConnections]; // Highlight newly found connections const connectedIds = suggestedConnections.flatMap(conn => [conn.fromId, conn.toId]); handleEvidenceHighlight([...new Set(connectedIds)]); showSuccess(`Found ${suggestedConnections.length} potential connections`)} catch (error) { console.error('âŒ Analysis failed:', error); showError('Evidence analysis failed')} finally { isAnalyzing = false}
   } // Utility functions function calculateCosineSimilarity(a: number[], b: number[]): number { const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0); const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0)); const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0)); return dotProduct / (magnitudeA * magnitudeB)}
@@ -37,7 +37,7 @@
             variant="ghost"
             onclick={ exportCanvasData } >
             <Download class="w-4 h-4" /> Export </Button> </div> </div> </CardHeader> <CardContent class="pt-0"> <div class="flex items-center gap-4 text-sm"> <span>{evidenceList.length} evidence items</span> <span>{connections.length} connections</span> <span>{selectedNodes.length} selected</span> </div> </CardContent> </Card> <!-- Canvas --> <Card.Root class="relative"> <div; bind:this={ canvasElement } class="relative bg-slate-50 dark:bg-slate-900"
-      style="width: {canvasSize.width}px; height, {canvasSize.height}px;"
+      style="width, {canvasSize.width}px; height, {canvasSize.height}px;"
       ondrop={ handleCanvasDrop } ondragover={(e) => e.preventDefault()} role="region"
       aria-label="Evidence canvas"
     > <!-- Grid, background --> <div class="absolute inset-0 bg-grid-pattern"></div> <!-- Connection, lines, SVG -->

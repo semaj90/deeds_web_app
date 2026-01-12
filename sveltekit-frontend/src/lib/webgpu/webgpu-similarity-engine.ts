@@ -184,7 +184,7 @@ export class WebGPUSimilarityEngine {
  const similarityResults: SimilarityResult[] = [];
  for (let i = 0; i < numDocs; i++) {
  similarityResults.push({
- index: i, score: results[i],
+ index: i, score, results[i],
  });
  }
 

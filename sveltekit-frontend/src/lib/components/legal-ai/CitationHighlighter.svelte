@@ -8,7 +8,7 @@
 
  let { content = '', citations = [] } = $props<{
  content?: string;
- citations?: HighlightedCitation[];
+ citations?, HighlightedCitation[];
  }>();
 
  const dispatch = createEventDispatcher();

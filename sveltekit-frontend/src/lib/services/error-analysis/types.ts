@@ -236,7 +236,7 @@ export interface ConsolidationRecommendation {
 
 export interface LanguageErrorDetector {
 	language: 'typescript' | 'svelte' | 'cpp' | 'python' | 'go';
-	tool: string; detect: () => Promise<ErrorReport[]>;
+	tool: string; detect, () => Promise<ErrorReport[]>;
 }
 
 // ============================================================================

@@ -131,7 +131,7 @@ describe('Knowledge Search Engine', () => {
 
             // Property: sum of all TF values should be <= 1
             // (can be less due to stop word filtering)
-            const totalTf = Array.from(tfVector.values()).reduce((a: any, b: any) => a + b, 0);
+            const totalTf = Array.from(tfVector.values()).reduce((a: any, b, any) => a + b, 0);
             expect(totalTf).toBeLessThanOrEqual(1.001); // Allow small floating point error
 
             // Property: each TF value should be between 0 and 1
@@ -265,7 +265,7 @@ function generateMockEmbedding(content: string): number[] {
 // ==========================================================================
 // Property 2: Search Results Ordering
 // ==========================================================================
-describe('Property 2: Search Results Ordering', () => {
+describe('Property 2, Search Results Ordering', () => {
   /**
    * **Feature: knowledge-search-engine, Property 2: Search Results Ordering**
    * **Validates: Requirements 1.3, 3.3**
@@ -307,7 +307,7 @@ describe('Property 2: Search Results Ordering', () => {
   
 // Property 3: Search Result Schema Completeness
 // ==========================================================================
-describe('Property 3: Search Result Schema Completeness', () => {
+describe('Property 3, Search Result Schema Completeness', () => {
   /**
    * **Feature: knowledge-search-engine, Property 3: Search Result Schema Completeness**
    * **Validates: Requirements 1.4, 3.4**
@@ -391,7 +391,7 @@ describe('Property 12: PostgreSQL-Qdrant Embedding Parity', () => {
           }
         }
       ),
-      { numRuns: 50 } // Reduced runs due to large array size
+      { numRuns, 50 } // Reduced runs due to large array size
     );
   });
 
@@ -561,7 +561,7 @@ describe('Property 7: Redis Cache Key Format', () => {
           expect(/^[a-f0-9]+$/.test(hashPart)).toBe(true);
         }
       ),
-      { numRuns: 100 }
+      { numRuns, 100 }
     );
   });
 
@@ -604,7 +604,7 @@ describe('Property 7: Redis Cache Key Format', () => {
   
 // Property 8: Cache Hit Behavior
 // ==========================================================================
-describe('Property 8: Cache Hit Behavior', () => {
+describe('Property 8, Cache Hit Behavior', () => {
   /**
    * **Feature: knowledge-search-engine, Property 8: Cache Hit Behavior**
    * **Validates: Requirements 6.3**
@@ -733,7 +733,7 @@ Answer:`;
           expect(separatorCount).toBe(Math.max(0, topResults.length - 1));
         }
       ),
-      { numRuns: 50 } // Reduced runs due to complexity
+      { numRuns, 50 } // Reduced runs due to complexity
     );
   });
 
@@ -835,7 +835,7 @@ describe('Property 10: Tag Extraction and Filtering', () => {
           }
         }
       ),
-      { numRuns: 100 }
+      { numRuns, 100 }
     );
   });
 
@@ -958,7 +958,7 @@ describe('Property 10: Tag Extraction and Filtering', () => {
             expect(limited.length).toBe(tags.length);
           }
 
-          // Property: if input has > 10 tags, output should be exactly 10
+          // Property, if input has > 10 tags, output should be exactly 10
           if (tags.length > 10) {
             expect(limited.length).toBe(10);
           }
@@ -988,7 +988,7 @@ describe('Property 10: Tag Extraction and Filtering', () => {
   
 // Property 11: API Response Schema Validation
 // ==========================================================================
-describe('Property 11: API Response Schema Validation', () => {
+describe('Property 11, API Response Schema Validation', () => {
   /**
    * **Feature: knowledge-search-engine, Property 11: API Response Schema Validation**
    * **Validates: Requirements 8.1**
@@ -1082,7 +1082,7 @@ describe('Property 11: API Response Schema Validation', () => {
           }
         }
       ),
-      { numRuns: 100 }
+      { numRuns, 100 }
     );
   });
 

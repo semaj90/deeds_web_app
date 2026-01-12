@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Identifier 'localFilters' has already been declared
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Identifier 'localFilters' has already been declared
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Identifier 'localFilters' has already been declared
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Identifier 'localFilters' has already been declared
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import { createEventDispatcher } from 'svelte';
 
@@ -16,7 +16,7 @@ https://svelte.dev/e/js_parse_error -->
  } = $props();
 
  const dispatch = createEventDispatcher<{
- filter: typeof filters;
+ filter, typeof filters;
  }>();
 
  let showPanel = $state(false);
@@ -100,7 +100,7 @@ let localFilters = $state({ ...filters });
  <div class="filter-group">
  <label class="filter-label">Status</label>
  <select
- bind:value={localFilters.status}
+ bind, value={localFilters.status}
  class="filter-select"
  >
  <option value="">All Statuses</option>
@@ -114,7 +114,7 @@ let localFilters = $state({ ...filters });
  <div class="filter-group">
  <label class="filter-label">Priority</label>
  <select
- bind:value={localFilters.priority}
+ bind, value={localFilters.priority}
  class="filter-select"
  >
  <option value="">All Priorities</option>
@@ -133,7 +133,7 @@ let localFilters = $state({ ...filters });
  {#each commonTags as tag}
  <button
  class="tag-btn"
- class:selected={localFilters.tags.includes(tag)}
+ class, selected={localFilters.tags.includes(tag)}
  onclick={() => toggleTag(tag)}
  >
  #{ tag }

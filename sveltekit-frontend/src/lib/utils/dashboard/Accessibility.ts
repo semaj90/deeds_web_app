@@ -227,7 +227,7 @@ export class AccessibilityUtils {
  const issues: string[] = [];
 
  // Check for images without alt text
- const images = document.querySelectorAll('img:not([alt])');
+ const images = document.querySelectorAll('img, not([alt])');
  if (images.length > 0) {
  issues.push(`Found ${images.length} images without alt text`);
  }

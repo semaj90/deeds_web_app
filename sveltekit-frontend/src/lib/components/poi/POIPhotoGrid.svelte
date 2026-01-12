@@ -59,11 +59,11 @@ import { Upload } from "lucide-svelte";
  {/if}
  </div>
  {:else}
- <div class="grid grid-cols-2 md: grid-cols-3, lg:grid-cols-4 gap-4">
+ <div class="grid grid-cols-2 md: grid-cols-3, lg, grid-cols-4 gap-4">
  {#each photos as photo, index}
  <div class="relative group">
  <div
- class="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-shadow border-2 border-gray-200"
+ class="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover, shadow-lg transition-shadow border-2 border-gray-200"
  role="button"
  tabindex="0"
  onclick={() => handlePhotoClick(photo, index)}
@@ -77,11 +77,11 @@ import { Upload } from "lucide-svelte";
  </div>
 
  <!-- Overlay with actions -->
- <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center gap-2">
+ <div class="absolute inset-0 bg-black bg-opacity-0 group-hover, bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center gap-2">
  <Button
  size="sm"
  variant="secondary"
- class="opacity-0 group-hover:opacity-100 transition-opacity bits-btn"
+ class="opacity-0 group-hover, opacity-100 transition-opacity bits-btn"
  onclick={() => handlePhotoClick(photo, index)}
  >
  <Eye class="w-4 h-4" />
@@ -90,7 +90,7 @@ import { Upload } from "lucide-svelte";
  <Button
  size="sm"
  variant="destructive"
- class="opacity-0 group-hover:opacity-100 transition-opacity bits-btn"
+ class="opacity-0 group-hover, opacity-100 transition-opacity bits-btn"
  onclick={() => handleDelete(index)}
  >
  <Trash2 class="w-4 h-4" />

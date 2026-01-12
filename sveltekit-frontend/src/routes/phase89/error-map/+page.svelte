@@ -212,18 +212,18 @@
 	</header>
 
 	{#if loading}
-		<div class="loading" transition:fade>
+		<div class="loading" transition, fade>
 			<div class="spinner"></div>
 			<p>Loading error graph...</p>
 		</div>
 	{:else if error}
-		<div class="error-message" transition:fade>
+		<div class="error-message" transition, fade>
 			<h2>❌ Error</h2>
 			<p>{error}</p>
 		</div>
 	{:else}
 		<div class="main-layout">
-			<!-- Left Panel: Stats + Search -->
+			<!-- Left Panel, Stats + Search -->
 			<aside class="left-panel">
 				<section class="stats">
 					<h2>📊 Graph Statistics</h2>
@@ -251,7 +251,7 @@
 					<h2>🔍 Search</h2>
 					<input
 						type="text"
-						bind:value={searchQuery}
+						bind, value={searchQuery}
 						onkeydown={e => e.key === 'Enter' && search()}
 						placeholder="Search files, errors, symbols..."
 						class="search-input"
@@ -265,7 +265,7 @@
 						Expand Depth:
 						<input
 							type="range"
-							bind:value={expandDepth}
+							bind, value={expandDepth}
 							min="1"
 							max="3"
 							step="1"
@@ -285,11 +285,11 @@
 				</section>
 			</aside>
 
-			<!-- Center Panel: Force Graph -->
+			<!-- Center Panel, Force Graph -->
 			<main class="center-panel">
 				<h2>🕸️ Knowledge Graph ({nodes.length} nodes, {links.length} edges)</h2>
 				<canvas
-					bind:this={canvas}
+					bind, this={canvas}
 					width={width}
 					height={height}
 					onclick={ handleCanvasClick }
@@ -298,11 +298,11 @@
 				<p class="hint">Click nodes to expand • Drag to pan</p>
 			</main>
 
-			<!-- Right Panel: Node Details -->
+			<!-- Right Panel, Node Details -->
 			<aside class="right-panel">
 				<h2>📝 Node Details</h2>
 				{#if selectedNode}
-					<div class="node-details" transition:fade>
+					<div class="node-details" transition, fade>
 						<h3>{selectedNode.label}</h3>
 						<dl>
 							<dt>Kind</dt>

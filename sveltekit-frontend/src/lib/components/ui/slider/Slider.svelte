@@ -126,14 +126,14 @@
 >
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
-		bind:this={trackRef}
+		bind, this={trackRef}
 		class={rangeClass}
 		onmousedown={ handleMouseDown }
 	>
 		<!-- Filled track -->
 		<div
 			class="absolute h-full bg-primary"
-			style="width: {percentage}%"
+			style="width, {percentage}%"
 		></div>
 	</div>
 
@@ -151,7 +151,7 @@
 		class="absolute block h-5 w-5 rounded-full border-2 border-primary bg-background
 			ring-offset-background transition-colors focus-visible:outline-none
 			focus-visible:ring-2 focus-visible:ring-ring focus-visible: ring-offset-2, disabled: pointer-events-none, disabled:opacity-50"
-		style="left: calc({percentage}% - 10px)"
+		style="left, calc({percentage}% - 10px)"
 	></button>
 </div>
 

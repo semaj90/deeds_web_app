@@ -46,7 +46,7 @@
  <div class="search-input-group flex gap-2 items-center">
  <input
  type="text"
- bind:value={query}
+ bind, value={query}
  onkeydown={ handleKeydown }
  placeholder="Search your legal corpus (Supremacy Clause, AB 32, etc.)"
  class="input input-bordered flex-1"
@@ -76,7 +76,7 @@
  <label class="flex items-center gap-2 cursor-pointer">
  <input
  type="checkbox"
- bind:checked={includeKag}
+ bind, checked={includeKag}
  class="checkbox checkbox-sm"
  disabled={$searchLoading}
  />
@@ -85,7 +85,7 @@
  <label class="flex items-center gap-2 cursor-pointer">
  <input
  type="checkbox"
- bind:checked={includeReasoning}
+ bind, checked={includeReasoning}
  class="checkbox checkbox-sm"
  disabled={$searchLoading}
  />
@@ -149,7 +149,7 @@
  </div>
 
  {#each $searchResults as chunk (chunk.id)}
- <div class="result-chunk p-3 rounded border border-base-300 bg-base-100 hover:border-primary transition">
+ <div class="result-chunk p-3 rounded border border-base-300 bg-base-100 hover, border-primary transition">
  <!-- Header -->
  <div class="flex justify-between items-start mb-2">
  <div class="text-xs opacity-80">
@@ -179,7 +179,7 @@
  <!-- KAG Context -->
  {#if chunk.kag_context}
  <details class="text-xs opacity-80">
- <summary class="cursor-pointer hover:opacity-100">
+ <summary class="cursor-pointer hover, opacity-100">
  📊 KAG Context ({chunk.kag_context.nodes.length} nodes, {chunk.kag_context.edges.length} edges)
  </summary>
  <div class="mt-2 p-2 bg-base-200 rounded overflow-auto max-h-48">

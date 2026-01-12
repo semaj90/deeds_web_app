@@ -137,7 +137,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </div>
  <div class="flex items-center space-x-2">
  <div class="flex items-center">
- <div class="w-3 h-3 rounded-full {systemHealthy ? 'bg-green-500' : 'bg-red-500'}"></div>
+ <div class="w-3 h-3 rounded-full {systemHealthy ? 'bg-green-500' , 'bg-red-500'}"></div>
  <span class="text-sm ml-2">{systemHealthy ? 'System Healthy' : 'System Issues'}</span>
  </div>
 				{#if Object.entries(systemHealth).filter(([k, v]) => !v).length > 0}
@@ -148,9 +148,9 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </div>
  </div>
 
- <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+ <div class="grid grid-cols-1 lg, grid-cols-3 gap-6 mt-6">
  <!-- Workflow Selection -->
- <div class="lg:col-span-1">
+ <div class="lg, col-span-1">
  <Card>
  <CardHeader>
  <CardTitle>Select Workflow</CardTitle>
@@ -158,21 +158,21 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <CardContent>
  <div class="space-y-2">
  <label class="flex items-center">
- <input type="radio" bind:group={selectedWorkflow} value="legal-research" class="w-4 h-4 text-blue-600" />
+ <input type="radio" bind, group={selectedWorkflow} value="legal-research" class="w-4 h-4 text-blue-600" />
  <div class="ml-2">
  <div class="font-medium">Legal Research</div>
  <div class="text-sm text-gray-600">Comprehensive case law and precedent analysis</div>
  </div>
  </label>
  <label class="flex items-center">
- <input type="radio" bind:group={selectedWorkflow} value="document-processing" class="w-4 h-4 text-blue-600" />
+ <input type="radio" bind, group={selectedWorkflow} value="document-processing" class="w-4 h-4 text-blue-600" />
  <div class="ml-2">
  <div class="font-medium">Document Processing</div>
  <div class="text-sm text-gray-600">AI-powered document analysis and extraction</div>
  </div>
  </label>
  <label class="flex items-center">
- <input type="radio" bind:group={selectedWorkflow} value="case-creation" class="w-4 h-4 text-blue-600" />
+ <input type="radio" bind, group={selectedWorkflow} value="case-creation" class="w-4 h-4 text-blue-600" />
  <div class="ml-2">
  <div class="font-medium">Case Creation</div>
  <div class="text-sm text-gray-600">Automated case setup with AI assistance</div>
@@ -195,7 +195,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  {#each Object.entries(systemHealth) as [service, healthy]}
  <div class="flex items-center justify-between">
  <span class="capitalize">{service.replace(/[/_-]/g, ' ')}</span>
- <span class="{healthy ? 'text-green-600' : 'text-red-600'}">
+ <span class="{healthy ? 'text-green-600' , 'text-red-600'}">
  {healthy ? '✓' : '✗'}
  </span>
  </div>
@@ -206,7 +206,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </div>
 
  <!-- Workflow Form -->
- <div class="lg:col-span-2">
+ <div class="lg, col-span-2">
  <Card>
  <CardHeader>
  <CardTitle>{selectedWorkflow.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')} Workflow</CardTitle>
@@ -216,12 +216,12 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="space-y-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="research-query">Research Query</label>
- <textarea id="research-query" bind:value={legalResearchForm.query} placeholder="Enter your legal research question..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus:ring-blue-500" rows="3"></textarea>
+ <textarea id="research-query" bind:value={legalResearchForm.query} placeholder="Enter your legal research question..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus, ring-blue-500" rows="3"></textarea>
  </div>
  <div class="grid grid-cols-2 gap-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="jurisdiction">Jurisdiction</label>
- <select id="jurisdiction" bind:value={legalResearchForm.jurisdiction} class="w-full p-2 border border-gray-300 rounded">
+ <select id="jurisdiction" bind, value={legalResearchForm.jurisdiction} class="w-full p-2 border border-gray-300 rounded">
  <option value="federal">Federal</option>
  <option value="state">State</option>
  <option value="local">Local</option>
@@ -230,7 +230,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </div>
  <div>
  <label class="block text-sm font-medium text-gray-700" for="user-role">User Role</label>
- <select id="user-role" bind:value={legalResearchForm.userRole} class="w-full p-2 border border-gray-300 rounded">
+ <select id="user-role" bind, value={legalResearchForm.userRole} class="w-full p-2 border border-gray-300 rounded">
  <option value="attorney">Attorney</option>
  <option value="paralegal">Paralegal</option>
  <option value="judge">Judge</option>
@@ -245,11 +245,11 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="space-y-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="document-content">Document Content</label>
- <textarea id="document-content" bind:value={documentProcessingForm.content} placeholder="Paste your document content here..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus:ring-blue-500" rows="6"></textarea>
+ <textarea id="document-content" bind:value={documentProcessingForm.content} placeholder="Paste your document content here..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus, ring-blue-500" rows="6"></textarea>
  </div>
  <div>
  <label class="block text-sm font-medium text-gray-700" for="document-type">Document Type</label>
- <select id="document-type" bind:value={documentProcessingForm.documentType} class="w-full p-2 border border-gray-300 rounded">
+ <select id="document-type" bind, value={documentProcessingForm.documentType} class="w-full p-2 border border-gray-300 rounded">
  <option value="contract">Contract</option>
  <option value="brief">Legal Brief</option>
  <option value="evidence">Evidence</option>
@@ -264,16 +264,16 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="space-y-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="case-title">Case Title</label>
- <input id="case-title" type="text" bind:value={caseCreationForm.title} placeholder="Enter case title..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus:ring-blue-500" />
+ <input id="case-title" type="text" bind:value={caseCreationForm.title} placeholder="Enter case title..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus, ring-blue-500" />
  </div>
  <div>
  <label class="block text-sm font-medium text-gray-700" for="case-description">Case Description</label>
- <textarea id="case-description" bind:value={caseCreationForm.description} placeholder="Describe the case details..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus:ring-blue-500" rows="4"></textarea>
+ <textarea id="case-description" bind:value={caseCreationForm.description} placeholder="Describe the case details..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus, ring-blue-500" rows="4"></textarea>
  </div>
  <div class="grid grid-cols-2 gap-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="case-type">Case Type</label>
- <select id="case-type" bind:value={caseCreationForm.caseType} class="w-full p-2 border border-gray-300 rounded">
+ <select id="case-type" bind, value={caseCreationForm.caseType} class="w-full p-2 border border-gray-300 rounded">
  <option value="civil">Civil</option>
  <option value="criminal">Criminal</option>
  <option value="corporate">Corporate</option>
@@ -283,7 +283,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </div>
  <div>
  <label class="block text-sm font-medium text-gray-700" for="jurisdiction">Jurisdiction</label>
- <select id="jurisdiction" bind:value={caseCreationForm.jurisdiction} class="w-full p-2 border border-gray-300 rounded">
+ <select id="jurisdiction" bind, value={caseCreationForm.jurisdiction} class="w-full p-2 border border-gray-300 rounded">
  <option value="federal">Federal</option>
  <option value="state">State</option>
  <option value="local">Local</option>
@@ -295,7 +295,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
 
  <!-- Execute Button -->
  <div class="pt-4 border-t mt-4">
- <Button onclick={executeWorkflow} disabled={isProcessing || !systemHealthy} class="w-full {isProcessing ? 'opacity-50 cursor-not-allowed' : ''} bits-btn">
+ <Button onclick={executeWorkflow} disabled={isProcessing || !systemHealthy} class="w-full {isProcessing ? 'opacity-50 cursor-not-allowed' , ''} bits-btn">
  {#if isProcessing}
  <div class="flex items-center justify-center">
  <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
@@ -333,7 +333,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </div>
  <div class="mt-4">
  <div class="w-full bg-gray-200 rounded-full h-2">
- <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: {activeWorkflowStatus.progress}%"></div>
+ <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width, {activeWorkflowStatus.progress}%"></div>
  </div>
  </div>
  </CardContent>

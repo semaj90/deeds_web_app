@@ -4,7 +4,7 @@
  import type { SimilarCase } from '$lib/types/case-summary';
 
  let { cases = [] } = $props<{
- cases?: SimilarCase[];
+ cases?, SimilarCase[];
  }>();
 </script>
 

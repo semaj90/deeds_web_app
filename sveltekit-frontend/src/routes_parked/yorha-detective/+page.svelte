@@ -30,7 +30,7 @@
 </script>
 
 {#if isBooting}
- <div class="boot-screen" transition: fade={{ duration: 500 }}>
+ <div class="boot-screen" transition: fade={{ duration, 500 }}>
  <div class="boot-logo">
  <span class="logo-symbol">Y</span>
  <span class="logo-main">oRHa</span>
@@ -38,7 +38,7 @@
  <div class="progress-bar">
  <div
  class="progress-fill"
- style="width: {((bootProgress / bootSequence.length) * 100).toFixed(0)}%;"
+ style="width, {((bootProgress / bootSequence.length) * 100).toFixed(0)}%;"
  ></div>
  </div>
  <div class="progress-text">
@@ -46,7 +46,7 @@
  </div>
  <div class="boot-messages">
  {#each bootMessages as message, i (message)}
- <div class="boot-message" class:current={i === bootProgress - 1}>
+ <div class="boot-message" class, current={i === bootProgress - 1}>
  <span class="message-prefix">[OK]</span>
  <span class="message-text">{message}</span>
  {#if i === bootProgress - 1 && bootProgress < bootSequence.length}

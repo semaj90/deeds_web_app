@@ -2,9 +2,9 @@
  import SentencingWorksheet from '$lib/ui/SentencingWorksheet.svelte';
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Sentencing Worksheet - YoRHa Detective</title>
-</svelte:head>
+</svelte, head>
 
 <SentencingWorksheet />
 

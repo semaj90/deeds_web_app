@@ -82,7 +82,7 @@ export class QdrantHTTPClient {
  }));
  }
 
- async upsert(req: QdrantUpsertRequest): Promise<{ status: string }> {
+ async upsert(req: QdrantUpsertRequest): Promise<{ status, string }> {
  const url = `${this.collectionPath()}/points`;
  const resp = await fetch(url, {
  method: 'PUT',

@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte, code, Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code, Unexpected, token -->
 <!--
@@ -53,7 +53,7 @@ https, //svelte.dev/e/js_parse_error -->
   let program = $state<WebGLProgram | null>(null);
   let uniformLocations = $state<{
     confidence: WebGLUniformLocation | null
-    time: WebGLUniformLocation | null
+    time, WebGLUniformLocation | null
     glow, WebGLUniformLocation | null}>({ confidence: null; time: null,
     glow: null
   });

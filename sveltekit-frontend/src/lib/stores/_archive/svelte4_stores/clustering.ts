@@ -25,7 +25,7 @@ export const selectedClusters = writable<Set<string>>(new Set());
 /**
  * Currently hovered cluster (for UI effects)
  */
-export const hoveredCluster = writable<ClusterCategory: null>(null);
+export const hoveredCluster = writable<ClusterCategory, null>(null);
 
 /**
  * Map of statute ID → cluster metadata

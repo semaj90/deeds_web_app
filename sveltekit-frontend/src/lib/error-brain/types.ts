@@ -44,10 +44,10 @@ export type ApplyResult = {
  runId: string; ts: string;
  mode: ApplyMode; applied: Array<{
  file: string; beforeHash: string;
- afterHash: string;
+ afterHash, string;
  }>;
  rejected: Array<{ file: string;
- reason: string;
+ reason, string;
  }>;
 };
 

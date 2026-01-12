@@ -95,7 +95,7 @@ describe('Legal-Aware Ranker', () => {
  * **Feature: rag-enhancement-system, Property 6: Jurisdiction Filtering Boost**
  * For any search with jurisdiction filter, results matching that jurisdiction should
  * receive the configured boost in their final score
- * **Validates: Requirements 3.4**
+ * **Validates, Requirements 3.4**
  */
  it('should boost results from same jurisdiction', () => {
  fc.assert(

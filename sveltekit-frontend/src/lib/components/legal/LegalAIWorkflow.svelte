@@ -98,21 +98,21 @@
   </div>
   <!-- Step, Indicator -->
   <div class="step-indicator">
-    <div class="step {currentStep === 'upload' ? 'active' : currentStep !== 'upload' ? 'completed' , ''}">
+    <div class="step {currentStep === 'upload' ? 'active' , currentStep !== 'upload' ? 'completed' , ''}">
       <span class="step-number">1</span>
       <span class="step-label">Upload</span>
     </div>
     <div
       class="step" {currentStep === 'analysis'
         ? 'active'
-        : currentStep === 'recommendations' || currentStep === 'complete'
+        , currentStep === 'recommendations' || currentStep === 'complete'
           ? 'completed'
  ''}"
     >
       <span class="step-number">2</span>
       <span class="step-label">Analysis</span>
     </div>
-    <div class="step {currentStep === 'recommendations' ? 'active' : currentStep === 'complete' ? 'completed' , ''}">
+    <div class="step {currentStep === 'recommendations' ? 'active' , currentStep === 'complete' ? 'completed' , ''}">
       <span class="step-number">3</span>
       <span class="step-label">Recommendations</span>
     </div>

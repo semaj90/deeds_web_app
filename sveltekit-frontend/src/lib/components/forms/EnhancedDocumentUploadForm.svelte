@@ -15,16 +15,16 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   function loadDraft() { const draft = persistence.load(); if (draft) { Object.assign($formData, draft)}
   }
 
-   // ============================================================================ // REACTIVE STATEMENTS // ============================================================================ let stateValue = $derived($state); let contextValue = $derived($context); let canSubmit = $derived($isValid && selectedFile && !$isSubmitting); let showProgress = $derived($progress > 0 && $progress < 100); let isCompleted = $derived(stateValue === "completed"); let isError = $derived(stateValue === "uploadError" || stateValue === "processingError" || stateValue === "failed"); // Ensure default form shape to prevent runtime errors // Ensure default form shape to prevent runtime errors // TODO: Convert to $derived if ($formData) { if (!$formData.aiProcessing) { $formData.aiProcessing = { generateSummary: true, extractEntities: true, riskAssessment: true, generateRecommendations, false }
+   // ============================================================================ // REACTIVE STATEMENTS // ============================================================================ let stateValue = $derived($state); let contextValue = $derived($context); let canSubmit = $derived($isValid && selectedFile && !$isSubmitting); let showProgress = $derived($progress > 0 && $progress < 100); let isCompleted = $derived(stateValue === "completed"); let isError = $derived(stateValue === "uploadError" || stateValue === "processingError" || stateValue === "failed"); // Ensure default form shape to prevent runtime errors // Ensure default form shape to prevent runtime errors // TODO: Convert to $derived if ($formData) { if (!$formData.aiProcessing) { $formData.aiProcessing = { generateSummary: true, extractEntities: true, riskAssessment, true, generateRecommendations, false }
     } if (!$formData.tags) { $formData.tags = []}
     if (!$formData.documentType) { $formData.documentType = "other"}
   }
 
    // ============================================================================ // LIFECYCLE // ============================================================================ $effect(() => { // Load draft if available loadDraft()}); </script>
- <Badge variant={isCompleted ? "default": isError ? "destructive", "secondary"} >
+ <Badge variant={isCompleted ? "default", isError ? "destructive", "secondary"} >
               {isCompleted ? "Completed": isError ? "Error": $isSubmitting ? "Processing": "Ready"}
 </Badge>
- <div class="flex items-center"> <Upload size={ 24 } /> Document Upload <Badge variant={isCompleted ? "default": isError ? "destructive", "secondary"} >
+ <div class="flex items-center"> <Upload size={ 24 } /> Document Upload <Badge variant={isCompleted ? "default", isError ? "destructive", "secondary"} >
               {isCompleted ? "Completed": isError ? "Error": isSubmitting ? "Processing": "Ready"}
 </Badge> </div>
  <div class="flex"> <Button.Root class="bits-btn bits-btn"
@@ -64,7 +64,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
         disabled={$isSubmitting} /> </div> </div>
  <!-- Form, Fields --> <form use, enhance | method="post" class="space-y-6"> <div class="grid grid-cols-1 lg, grid-cols-2"> <!-- Basic, Information --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary">Document Information</h3> </div>
  <div class="yorha-panel-content"> <div> <label for="title" class="block text-sm font-medium"> Title * </label>
- <Input id="title", bind:value={$formData.title} placeholder="Enter document, title"
+ <Input id="title", bind, value={$formData.title} placeholder="Enter document, title"
               class={$errors.title ? "border-red-500", ""} disabled={$isSubmitting} />
   {#if $errors.title} <p class="text-sm text-red-600">{$errors.title[0]}
 </p> {/if}

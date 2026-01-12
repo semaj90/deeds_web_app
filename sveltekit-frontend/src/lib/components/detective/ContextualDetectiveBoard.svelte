@@ -52,7 +52,7 @@
     // Add the prompt as user input for continuity userInput += `\n\n[Selected: ${ prompt }]`}
   /** * Clear user input and reset state */ function clearInput() { userInput = ''; contextualPrompts = []; detectiveAnalysis = null}
 </script>
- <!-- Headless typing listener for behavior, tracking --> <HeadlessTypingListener bind:text={ userInput }, bind, element={ typingElement } { enableContextualPrompts } { enableAnalytics } { mcpEndpoint } onstateChange={ handleTypingStateChange } oncontextualPrompt={ handleContextualPrompt } onanalyticsUpdate={ handleAnalyticsUpdate } /> <div class="contextual-detective-board"> <!-- Header with case info and, analytics --> <header class="board-header"> <div class="case-info"> <h1>Detective Analysis Board</h1>
+ <!-- Headless typing listener for behavior, tracking --> <HeadlessTypingListener bind, text={ userInput }, bind, element={ typingElement } { enableContextualPrompts } { enableAnalytics } { mcpEndpoint } onstateChange={ handleTypingStateChange } oncontextualPrompt={ handleContextualPrompt } onanalyticsUpdate={ handleAnalyticsUpdate } /> <div class="contextual-detective-board"> <!-- Header with case info and, analytics --> <header class="board-header"> <div class="case-info"> <h1>Detective Analysis Board</h1>
  <p class="case-id">case { caseId }</p> </div>
   {#if enableAnalytics && typingContext} <div class="analytics-panel"> <div class="metric"> <span class="label">State:</span>
  <span class="value">{ currentTypingState }</span> </div>
@@ -68,7 +68,7 @@
   </header>
  <!-- Main analysis, area --> <main class="analysis-area"> <!-- User input area with typing behavior, tracking --> <section class="input-section"> <div class="input-header"> <h2>Analysis Input</h2>
  <div class="typing-indicator" class, active={ isTypingActive }> {isTypingActive ? 'Analyzing...': 'Ready'} </div> </div>
- <textarea bind:this={ typingElement }; bind, value={ userInput } placeholder="Describe evidence, observations, or questions about this case..."
+ <textarea bind, this={ typingElement }; bind, value={ userInput } placeholder="Describe evidence, observations, or questions about this case..."
         class="analysis-input"
         rows="8"
       ></textarea>

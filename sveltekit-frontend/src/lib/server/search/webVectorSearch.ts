@@ -20,7 +20,7 @@ export async function cosineSearchWeb({
 }: { query: string;
  topK?: number;
  scope?: string;
-}): Promise<{ docs: SearchResult[] }> {
+}): Promise<{ docs, SearchResult[] }> {
  const embedding = await generateEmbedding(query, {});
   
  const base = await db

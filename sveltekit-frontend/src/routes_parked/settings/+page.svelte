@@ -3,10 +3,10 @@
  export const prerender = true; // make this page explicitly prerenderable / SSR-friendly
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Settings - WardenNet Legal</title>
  <meta name="description" content="Application settings and, user, preferences" />
-</svelte:head>
+</svelte, head>
 <div class="min-h-screen bg-gray-900">
  <main class="container mx-auto">
  <h1 class="text-2xl font-bold">Settings</h1>

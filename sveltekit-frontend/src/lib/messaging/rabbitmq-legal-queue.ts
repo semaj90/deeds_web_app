@@ -75,7 +75,7 @@ export class RabbitMQLegalQueue {
     private reconnectTimeout: NodeJS.Timeout | null = null;
 
     // Queue management
-    private messageHandlers: Map<string, (message: LegalDocumentMessage) => Promise<void>> = new Map();
+    private messageHandlers: Map<string, (message, LegalDocumentMessage) => Promise<void>> = new Map();
     private pendingAcks: Map<string, () => void> = new Map();
     private processingQueue: Map<string, LegalDocumentMessage> = new Map();
 

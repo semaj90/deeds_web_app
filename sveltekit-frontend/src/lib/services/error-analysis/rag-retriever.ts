@@ -35,7 +35,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  throw new Error('topK must be at least 1');
  }
 
- this.log('info', `Querying patterns for error: ${error.message}`);
+ this.log('info', `Querying patterns for error, ${error.message}`);
 
  try {
  // Generate embedding for error message

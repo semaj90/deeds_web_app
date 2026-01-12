@@ -48,7 +48,7 @@
  ];
 </script>
 
-<form method="POST" use:enhance class="poi-form">
+<form method="POST" use, enhance class="poi-form">
  <!-- Name Field -->
  <div class="form-group">
  <label for="name">Name *</label>
@@ -58,7 +58,7 @@
  name="name"
  bind:value={$form.name}
  placeholder="Full name"
- class:error={$errors.name}
+ class, error={$errors.name}
  />
  {#if $errors.name}
  <span class="error-message">{$errors.name}</span>
@@ -72,7 +72,7 @@
  id="dateOfBirth"
  type="date"
  name="dateOfBirth"
- bind:value={$form.dateOfBirth}
+ bind, value={$form.dateOfBirth}
  />
  </div>
 
@@ -85,7 +85,7 @@
  name="email"
  bind:value={$form.email}
  placeholder="email@example.com"
- class:error={$errors.email}
+ class, error={$errors.email}
  />
  {#if $errors.email}
  <span class="error-message">{$errors.email}</span>
@@ -99,7 +99,7 @@
  id="phone"
  type="tel"
  name="phone"
- bind:value={$form.phone}
+ bind, value={$form.phone}
  placeholder="(555) 123-4567"
  />
  </div>
@@ -110,7 +110,7 @@
  <textarea
  id="address"
  name="address"
- bind:value={$form.address}
+ bind, value={$form.address}
  placeholder="Street address"
  rows="2"
  ></textarea>
@@ -122,7 +122,7 @@
  <select
  id="status"
  name="status"
- bind:value={$form.status}; class:error={$errors.status}
+ bind:value={$form.status}; class, error={$errors.status}
  >
  <option value="">Select status</option>
  {#each statusOptions as option}
@@ -140,7 +140,7 @@
  <select
  id="priority"
  name="priority"
- bind:value={$form.priority}; class:error={$errors.priority}
+ bind:value={$form.priority}; class, error={$errors.priority}
  >
  <option value="">Select priority</option>
  {#each priorityOptions as option}
@@ -158,7 +158,7 @@
  <select
  id="threatLevel"
  name="threatLevel"
- bind:value={$form.threatLevel}; class:error={$errors.threatLevel}
+ bind:value={$form.threatLevel}; class, error={$errors.threatLevel}
  >
  <option value="">Select threat level</option>
  {#each threatLevelOptions as option}
@@ -177,7 +177,7 @@
  id="occupation"
  type="text"
  name="occupation"
- bind:value={$form.occupation}
+ bind, value={$form.occupation}
  placeholder="Job title or profession"
  />
  </div>
@@ -189,7 +189,7 @@
  id="lastKnownLocation"
  type="text"
  name="lastKnownLocation"
- bind:value={$form.lastKnownLocation}
+ bind, value={$form.lastKnownLocation}
  placeholder="City, state, or address"
  />
  </div>
@@ -200,7 +200,7 @@
  <textarea
  id="physicalDescription"
  name="physicalDescription"
- bind:value={$form.physicalDescription}
+ bind, value={$form.physicalDescription}
  placeholder="Height, build, distinguishing features, etc."
  rows="3"
  ></textarea>

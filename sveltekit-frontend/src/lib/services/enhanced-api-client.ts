@@ -118,7 +118,7 @@ let lastError: Error | unknown;
  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
  try {
  const response = await fetch(url.toString(), requestInit);
- let parsed: unknown = null;
+ let parsed, unknown = null;
  const contentType = response.headers.get('content-type') || '';
 
  if (contentType.includes('application/json')) {
@@ -162,7 +162,7 @@ const ed = errorData as Record<string, unknown>;
  }
 
 const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
- await new Promise((resolve: any) => setTimeout(resolve, delay));
+ await new Promise((resolve, any) => setTimeout(resolve, delay));
  }
  }
  throw lastError;
@@ -290,7 +290,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Update evidence
  */
  async updateEvidence(
- id: string, evidenceData: Partial<{ title: string, evidenceType: string; description: string, fileUrl: string; fileName: string, fileSize: number; mimeType: string, hash: string; tags: string[], chainOfCustody: unknown[]; aiSummary: string, summary: string; isAdmissible: boolean, confidentialityLevel: string;
+ id: string, evidenceData: Partial<{ title: string, evidenceType: string; description: string, fileUrl: string; fileName: string, fileSize: number; mimeType: string, hash: string; tags: string[], chainOfCustody: unknown[]; aiSummary: string, summary: string; isAdmissible: boolean, confidentialityLevel, string;
  }>,
  signal?: AbortSignal
  ): Promise<ApiResponse<unknown>> {
@@ -453,7 +453,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  file: File,
  onProgress?: () => void,
  signal?: AbortSignal
- ): Promise<{ fileUrl: string, fileName: string; fileSize: number, mimeType: string; hash: string;
+ ): Promise<{ fileUrl: string, fileName: string; fileSize: number, mimeType: string; hash, string;
  }> {
  const formData = new FormData();
  formData.append('file', file);
@@ -498,7 +498,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  }
  reject(new ApiError(status, 'UPLOAD_FAILED', 'File upload failed', parsed));
  }
- } catch (err: unknown) {
+ } catch (err, unknown) {
  reject(err);
  }
  });

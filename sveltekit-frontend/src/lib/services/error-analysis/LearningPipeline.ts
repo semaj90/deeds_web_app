@@ -192,7 +192,7 @@ export class LearningPipeline {
 				version: policy.getState().version,
 				message: `Policy updated to v${policy.getState().version}`,
 				validationScore,
-				rollback: false
+				rollback, false
 			};
 
 		} catch (error) {

@@ -42,8 +42,8 @@ export type LegalJobData =
 
 export class LegalAIJobQueue {
     private static instance: LegalAIJobQueue;
-    private queues: Map<string: RabbitMQQueue>;
-    private workers: Map<string: RabbitMQWorker>;
+    private queues: Map<string, RabbitMQQueue>;
+    private workers: Map<string, RabbitMQWorker>;
     private redis: RedisClient;
 
     constructor() {

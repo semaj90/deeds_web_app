@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte, code, Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code, Unexpected, token -->
 <script lang="ts">
@@ -241,7 +241,7 @@ import type { Document } from '$lib/types';
                       onclick={toggleGPUAnalysis}
                       class="text-sm" {showGPUAnalysis
                         ? 'bg-purple-100 text-purple-700'
-                        : 'bg-gray-100'}, hover, bg-purple-200 px-3 py-1 rounded"
+                        , 'bg-gray-100'}, hover, bg-purple-200 px-3 py-1 rounded"
                     >
                       {showGPUAnalysis ? 'ðŸ§  GPU Active' : 'âš¡ GPU Analysis'}
                     </button>

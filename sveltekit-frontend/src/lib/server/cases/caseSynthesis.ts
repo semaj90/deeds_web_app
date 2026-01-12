@@ -17,17 +17,17 @@ export interface CaseSynthesis {
  notes: Array<{ id: string;
  title: string | null;
  content: string; is_pinned: boolean;
- is_ai: boolean; updated_at: string;
+ is_ai: boolean; updated_at, string;
  }>;
  evidence: Array<{ id: string;
  filename: string; file_type: string;
- processing_status: string; created_at: string;
+ processing_status: string; created_at, string;
  }>;
  summaries: Array<{ id: string;
- summary_text: string; created_at: string;
+ summary_text: string; created_at, string;
  }>;
  recentChat: Array<{ user_message: string;
- assistant_response: string; created_at: string;
+ assistant_response: string; created_at, string;
  }>;
 }
 

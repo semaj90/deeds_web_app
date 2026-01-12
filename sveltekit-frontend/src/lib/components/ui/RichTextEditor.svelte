@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, Unexpected, token --> <script lang="ts"> // Svelte, 5 runes are auto-imported interface Props { content?: unknown; placeholder?: unknown; editable?: unknown; showToolbar?: unknown; autoSave?: unknown; autoSaveDelay?: unknown}
+<!-- @migration-task Error while migrating Svelte, code, Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, Unexpected, token --> <script lang="ts"> // Svelte, 5 runes are auto-imported interface Props { content?: unknown; placeholder?: unknown; editable?: unknown; showToolbar?: unknown; autoSave?: unknown; autoSaveDelay?: unknown}
   let { content = "", placeholder = "Start writing your note...", editable = true, showToolbar = true, autoSave = false, autoSaveDelay = 2000 }: Props = $props();
  import { Editor } from "@tiptap/core";
  import Image from "@tiptap/extension-image";

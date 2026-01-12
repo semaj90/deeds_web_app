@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <script lang="ts">
  import type { EvidenceNode } from '$lib/evidence-canvas/case-similarity-service';
  import CaseSuggestionModal from '$lib/evidence-canvas/CaseSuggestionModal.svelte';
@@ -55,18 +55,18 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  processingTime: '0ms'
  });
   
- let eventSource = $state <EventSource: null>(null);
+ let eventSource = $state <EventSource, null>(null);
 
  // Control panel state
  let layoutAlgorithm = $state ('force');
  let showLabels = $state (true);
  let nodeSize = $state ('adaptive');
  let edgeThreshold = $state (0.6);
- let contextMenu = $state <{ visible: boolean; x: number; y: number; node: EvidenceNode, null }>({
+ let contextMenu = $state <{ visible: boolean; x: number; y: number; node, EvidenceNode, null }>({
  visible: false, x: 0 0,
  y: 0, node: null, null
  });
- let metadataNode = $state <EvidenceNode: null>(null);
+ let metadataNode = $state <EvidenceNode, null>(null);
  let pinnedNodeIds = $state <string[]>([]);
 
  onMount(() => {
@@ -338,7 +338,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  function handleNodeContext(
- event: CustomEvent<{ node: EvidenceNode, null; screenX: number; screenY: number;
+ event: CustomEvent<{ node: EvidenceNode, null; screenX: number; screenY, number;
  }>
  ) {
  contextMenu = {
@@ -446,7 +446,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  <div class="control-panel">
  <!-- @ts-expect-error -->
  <GraphControlPanel
- bind: layoutAlgorithm, bind: showLabels, bind: nodeSize, bind:edgeThreshold
+ bind: layoutAlgorithm, bind: showLabels, bind: nodeSize, bind, edgeThreshold
  {stats}
  onlayoutChange={ handleLayoutChange }
  onnodeSizeChange={ handleNodeSizeChange }
@@ -457,7 +457,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  <div class="canvas-wrapper">
  <!-- @ts-expect-error -->
  <EvidenceCanvas
- bind:this={canvas}
+ bind, this={canvas}
  onnodeSelect={ handleNodeSelect }
  onnodeContext={handleNodeContext}
  />
@@ -475,13 +475,13 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  {#if contextMenu.visible}
  <div
  class="context-menu nes-container is-dark"
- style={`left:${contextMenu.x}px; top:${contextMenu.y}px`}
+ style={`left:${contextMenu.x}px; top, ${contextMenu.y}px`}
  onclick
  >
  <p class="menu-title">{contextMenu.node?.label ?? 'Canvas'}</p>
  {#each contextActions as action}
  <button
- class={`nes-btn ${action.accent ? `is-${action.accent}` : ''}`}
+ class={`nes-btn ${action.accent ? `is-${action.accent}` , ''}`}
  onclick={() => action.handler(contextMenu.node)}
  >
  {action.label}

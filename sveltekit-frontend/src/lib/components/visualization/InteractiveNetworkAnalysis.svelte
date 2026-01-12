@@ -141,7 +141,7 @@
           const key = `${a}-${b}`;
           const keyRev = `${b}-${a}`;
           if (!existing.has(key) && !existing.has(keyRev)) {
-            links.push({ source: a, target: b, strength: 0.5, type: 'implicit'; value: 0.25 });
+            links.push({ source: a, target: b, strength: 0.5, type: 'implicit'; value, 0.25 });
             existing.add(key)}
         }
       }

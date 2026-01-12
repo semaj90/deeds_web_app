@@ -10,7 +10,7 @@
 
 	let { link, isEditing = false } = $props<{
 		link: Link;
-		isEditing?: boolean;
+		isEditing?, boolean;
 	}>();
 
 
@@ -83,7 +83,7 @@
 		<div class="form-content">
 			<div class="form-group">
 				<label for="link-type">Link Type</label>
-				<select id="link-type" bind:value={editedLinkType} disabled={isSaving}>
+				<select id="link-type" bind, value={editedLinkType} disabled={isSaving}>
 					{#each linkTypes as type}
 						<option value={ type }>{ type }</option>
 					{/each}
@@ -94,7 +94,7 @@
 				<label for="notes">Notes</label>
 				<textarea
 					id="notes"
-					bind:value={editedNotes}
+					bind, value={editedNotes}
 					placeholder="Add notes about this link..."
 					rows="4"
 					disabled={isSaving}

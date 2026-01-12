@@ -60,7 +60,7 @@ import type { Case } from '$lib/types';
           </span>
         </div>
 
-        <h3 class="text-lg font-semibold nier-heading line-clamp-1 group-hover: text-harvard-crimson, dark:group-hover, text-digital-green">
+        <h3 class="text-lg font-semibold nier-heading line-clamp-1 group-hover: text-harvard-crimson, dark, group-hover, text-digital-green">
           {caseData.title}
         </h3>
   {#if caseData.description}
@@ -209,7 +209,7 @@ import type { Case } from '$lib/types';
   {#if $open}
   <div
     class="nier-panel p-2 min-w-[200px] z-50"
-    transition: scale={{ duration: 200, start, 0.95 }}
+    transition: scale={{ duration, 200, start, 0.95 }}
   >
     <Button class="bits-btn"
       onclick={() => onView(caseData.id)}

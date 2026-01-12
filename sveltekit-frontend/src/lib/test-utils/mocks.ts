@@ -46,7 +46,7 @@ export interface MockMinIOObject {
 
 class MockQdrantClient {
 	private collections: Map<string, MockQdrantPoint[]> = new Map();
-	private collectionConfigs: Map<string, { vectorSize: number }> = new Map();
+	private collectionConfigs: Map<string, { vectorSize, number }> = new Map();
 
 	/**
 	 * Create or recreate a collection
@@ -155,7 +155,7 @@ class MockQdrantClient {
 	/**
 	 * Get collection info
 	 */
-	async getCollection(collectionName: string): Promise<{ pointsCount: number; vectorSize: number } | null> {
+	async getCollection(collectionName: string): Promise<{ pointsCount: number; vectorSize, number } | null> {
 		if (!this.collections.has(collectionName)) {
 			return null;
 		}
@@ -316,7 +316,7 @@ class MockOllamaClient {
 	/**
 	 * Generate embeddings
 	 */
-	async embeddings(options: { model: string; prompt: string }): Promise<{ embedding: number[] }> {
+	async embeddings(options: { model: string; prompt: string }): Promise<{ embedding, number[] }> {
 		// Generate deterministic fake embedding based on prompt
 		const seed = this.hashString(options.prompt);
 		const embedding = Array.from({ length: this.embeddingDimension }, (_, i) => {
@@ -332,7 +332,7 @@ class MockOllamaClient {
 	async generate(options: { model: string;
 		prompt: string;
 		stream?: boolean;
-	}): Promise<{ response: string }> {
+	}): Promise<{ response, string }> {
 		// Check if we have a pre-configured response
 		const response = this.responses.get(options.prompt) ||
 			`Mock response for: ${options.prompt.substring(0, 50)}...`;
@@ -378,7 +378,7 @@ class MockPostgreSQLClient {
 	/**
 	 * Execute SQL query
 	 */
-	async query(sql: string, params?: any[]): Promise<{ rows: any[]; rowCount: number }> {
+	async query(sql: string, params?: any[]): Promise<{ rows: any[]; rowCount, number }> {
 		// Simple mock - just return empty results
 		// In real tests, you'd parse SQL and return appropriate data
 		const rows: any[] = [];
@@ -449,7 +449,7 @@ class MockMinIOClient {
 	/**
 	 * Check if object exists
 	 */
- async statObject(bucket: string): Promise<{ size: number } | null> {
+ async statObject(bucket: string): Promise<{ size, number } | null> {
 		const objectKey = `${ bucket }/${ key }`;
 		const object = this.objects.get(objectKey);
 
@@ -465,8 +465,8 @@ class MockMinIOClient {
 	/**
 	 * List objects in bucket
 	 */
-	async listObjects(bucket: string, prefix?: string): Promise<Array<{ name: string; size: number }>> {
-		const results: Array<{ name: string; size: number }> = [];
+	async listObjects(bucket: string, prefix?: string): Promise<Array<{ name: string; size, number }>> {
+		const results: Array<{ name: string; size, number }> = [];
 
 		for (const [objectKey, object] of this.objects.entries()) {
 			if (object.bucket !== bucket) continue;

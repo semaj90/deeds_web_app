@@ -41,7 +41,7 @@ export function generateId(): string {
 }
 
 /** * Debounce function */
-export function debounce<T extends (...args: unknown[]) => unknown>( // Changed any to unknown
+export function debounce<T extends (...args, unknown[]) => unknown>( // Changed any to unknown
  func: T, delay: number
 ): (...args: Parameters<T>) => void {
  let timeoutId: NodeJS.Timeout;
@@ -52,7 +52,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>( // Changed 
 }
 
 /** * Throttle function */
-export function throttle<T extends (...args: unknown[]) => unknown>( // Changed any to unknown
+export function throttle<T extends (...args, unknown[]) => unknown>( // Changed any to unknown
  func: T, delay: number
 ): (...args: Parameters<T>) => void {
  let lastCall = 0;
@@ -172,7 +172,7 @@ export function formatProcessingTime(ms: number): string {
 }
 
 /** * Extract initials from name */
-export function getInitials(name: string): string {
+export function getInitials(name: string), string {
  return name
  .split(' ')
  .map((part) => part.charAt(0))

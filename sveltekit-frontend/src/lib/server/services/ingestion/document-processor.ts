@@ -78,7 +78,7 @@ export function splitSentences(text: string): string[] {
 /**
  * Tokenize text (simple word-based tokenization)
  */
-export function tokenize(text: string): string[] {
+export function tokenize(text: string), string[] {
  return text.split(/\s+/).filter((token) => token.length > 0);
 }
 
@@ -310,7 +310,7 @@ export async function processDocument(
  * Batch process documents
  */
 export async function batchProcessDocuments(
- documents: Array<{ id: string; title: string; text: string; source: string }>
+ documents: Array<{ id: string; title: string; text: string; source, string }>
 ): Promise<ProcessedDocument[]> {
  const processed: ProcessedDocument[] = [];
 

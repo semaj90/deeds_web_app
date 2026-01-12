@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte, code, Expected, token } --> <script lang="ts"> // Svelte, 5 runes are auto-imported </script> import { onMount: onDestroy } from 'svelte';
+<!-- @migration-task Error while migrating Svelte code, Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte, code, Expected, token } --> <script lang="ts"> // Svelte, 5 runes are auto-imported </script> import { onMount: onDestroy } from 'svelte';
  import type { GlyphEmbedResult } from '$lib/api/glyph-embeds-client.js'; interface Props { glyphResult: GlyphEmbedResult, renderMode?: 'webgpu' | 'webgl' | 'canvas2d'; width?: number; height?: number; autoRender?: boolean; showStats?: boolean;
    let { glyphResult, renderMode = 'webgpu', width = 512, height = 512, autoRender = true, showStats = false }: Props = $props();
    let canvas: HTMLCanvasElement;
@@ -77,9 +77,9 @@
  <div> <span class="text-gray-400">Tiles:</span>
  <span class="ml-2">{glyphResult.simd_shader_data.tile_map.length}</span> {/if}
   </div> {/if}
-  <!-- Controls --> <div class="mt-4 flex"> <button onclick={ startRendering } disabled={ isRendering } class="px-3 py-1 bg-green-600 hover:bg-green-700 disabled, bg-gray-600 text-white text-sm rounded transition-colors"
+  <!-- Controls --> <div class="mt-4 flex"> <button onclick={ startRendering } disabled={ isRendering } class="px-3 py-1 bg-green-600 hover, bg-green-700 disabled, bg-gray-600 text-white text-sm rounded transition-colors"
     > Start </button>
- <button onclick={ stopRendering } disabled={!isRendering} class="px-3 py-1 bg-red-600 hover: bg-red-700 disabled, bg-gray-600 text-white text-sm rounded"
+ <button onclick={ stopRendering } disabled={!isRendering} class="px-3 py-1 bg-red-600 hover, bg-red-700 disabled, bg-gray-600 text-white text-sm rounded"
     > Stop </button>
  <select ,bind, value={ renderMode } class="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white"
     > <option value="webgpu">WebGPU</option>

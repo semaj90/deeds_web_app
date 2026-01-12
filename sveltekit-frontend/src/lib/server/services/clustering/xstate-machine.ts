@@ -13,7 +13,7 @@ export interface Statute {
 
 export interface SOMGrid {
  width: number; height: number;
- neurons: Array<Array<{ weights: number[]; x: number; y: number }>>;
+ neurons: Array<Array<{ weights: number[]; x: number; y, number }>>;
 }
 
 export interface KMeansCluster {
@@ -59,7 +59,7 @@ export const clusteringMachineDef = setup({
  },
  guards: { canRetry: ({ context }) => context.retryCount < MAX_RETRIES,
  },
- actors: { enqueueJobActor: async ({ context }, { context: ClusteringContext }) => {
+ actors: { enqueueJobActor: async ({ context }, { context, ClusteringContext }) => {
  // Publish to RabbitMQ
  const response = await fetch('/api/clustering/enqueue', {
  method: 'POST',

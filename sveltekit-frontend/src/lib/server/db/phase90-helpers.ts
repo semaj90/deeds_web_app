@@ -60,7 +60,7 @@ export async function upsertChunkContent(
  documentId: string; chunkIndex: number;
  content: string;
  }
-): Promise<{ created: boolean; version: number }> {
+): Promise<{ created: boolean; version, number }> {
  const { id, documentId, chunkIndex, content } = params;
  const hash = calculateContentHash(content);
 
@@ -126,7 +126,7 @@ export async function upsertDocumentContent(
  filename?: string;
  mimeType?: string;
  }
-): Promise<{ created: boolean; version: number }> {
+): Promise<{ created: boolean; version, number }> {
  const { id, title, content, userId, caseId, filename, mimeType } = params;
  const hash = calculateContentHash(content);
 
@@ -270,7 +270,7 @@ export async function softDeleteEvidence(db: DB, string: Promise<void> {
 export async function softDeleteCase(
  db: DB, caseId: string,
  cascadeEvidence = false
-): Promise<{ caseDeleted: boolean; evidenceDeleted: number }> {
+): Promise<{ caseDeleted: boolean; evidenceDeleted, number }> {
  await db
  .update(schema.cases)
  .set({

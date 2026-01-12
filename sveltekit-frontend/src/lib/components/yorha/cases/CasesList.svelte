@@ -76,7 +76,7 @@
  }
  }));
 
- function toggleCaseSelection(caseId: string) {
+ function toggleCaseSelection(caseId, string) {
  if (selectedCases.has(caseId)) {
  selectedCases.delete(caseId);
  } else {
@@ -139,10 +139,10 @@
  <div class="flex items-center justify-between">
  {#if selectedCases.size > 0}
  <div class="flex space-x-2">
- <button class="px-3 py-1 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 text-sm rounded transition-colors">
+ <button class="px-3 py-1 bg-cyan-400/20 hover, bg-cyan-400/30 text-cyan-400 text-sm rounded transition-colors">
  Bulk Actions
  </button>
- <button class="px-3 py-1 bg-red-400/20 hover:bg-red-400/30 text-red-400 text-sm rounded transition-colors">
+ <button class="px-3 py-1 bg-red-400/20 hover, bg-red-400/30 text-red-400 text-sm rounded transition-colors">
  Delete
  </button>
  </div>
@@ -156,20 +156,20 @@
  <thead class="bg-slate-700/30">
  <tr class="text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
  <th class="px-4 py-3 w-12"></th>
- <th class="px-4 py-3 cursor-pointer hover:text-cyan-400" onclick={() => { sortBy = 'title'; sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; }}>
+ <th class="px-4 py-3 cursor-pointer hover, text-cyan-400" onclick={() => { sortBy = 'title'; sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; }}>
  Case {sortBy === 'title' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
  </th>
- <th class="px-4 py-3 cursor-pointer hover:text-cyan-400" onclick={() => { sortBy = 'status'; sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; }}>
+ <th class="px-4 py-3 cursor-pointer hover, text-cyan-400" onclick={() => { sortBy = 'status'; sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; }}>
  Status {sortBy === 'status' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
  </th>
- <th class="px-4 py-3 cursor-pointer hover:text-cyan-400" onclick={() => { sortBy = 'priority'; sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; }}>
+ <th class="px-4 py-3 cursor-pointer hover, text-cyan-400" onclick={() => { sortBy = 'priority'; sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; }}>
  Priority {sortBy === 'priority' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
  </th>
  <th class="px-4 py-3">Assignee</th>
- <th class="px-4 py-3 cursor-pointer hover:text-cyan-400" onclick={() => { sortBy = 'progress'; sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; }}>
+ <th class="px-4 py-3 cursor-pointer hover, text-cyan-400" onclick={() => { sortBy = 'progress'; sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; }}>
  Progress {sortBy === 'progress' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
  </th>
- <th class="px-4 py-3 cursor-pointer hover:text-cyan-400" onclick={() => { sortBy = 'updated'; sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; }}>
+ <th class="px-4 py-3 cursor-pointer hover, text-cyan-400" onclick={() => { sortBy = 'updated'; sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; }}>
  Updated {sortBy === 'updated' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
  </th>
  <th class="px-4 py-3">Actions</th>
@@ -178,11 +178,11 @@
 
  <tbody class="divide-y divide-slate-700/30">
  {#each sortedCases as caseItem}
- <tr class="hover:bg-slate-700/20 transition-colors">
+ <tr class="hover, bg-slate-700/20 transition-colors">
  <td class="px-4 py-4">
  <input
  type="checkbox"
- class="rounded border-slate-600 bg-slate-700 text-cyan-400 focus:ring-cyan-400"
+ class="rounded border-slate-600 bg-slate-700 text-cyan-400 focus, ring-cyan-400"
  checked={selectedCases.has(caseItem.id)}
  onchange={() => toggleCaseSelection(caseItem.id)}
  />
@@ -204,7 +204,7 @@
 
  <td class="px-4 py-4">
  <div class="flex items-center">
- <div class="w-3 h-3 rounded-full mr-2 {caseItem.priority === 'high' ? 'bg-red-400' : caseItem.priority === 'medium' ? 'bg-yellow-400' : 'bg-green-400'}"></div>
+ <div class="w-3 h-3 rounded-full mr-2 {caseItem.priority === 'high' ? 'bg-red-400' : caseItem.priority === 'medium' ? 'bg-yellow-400' , 'bg-green-400'}"></div>
  <span class="text-sm text-slate-300 capitalize">{caseItem.priority}</span>
  </div>
  </td>
@@ -218,7 +218,7 @@
  <div class="w-16 bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-cyan-400 transition-all duration-300"
- style="width: {caseItem.progress}%"
+ style="width, {caseItem.progress}%"
  ></div>
  </div>
  <span class="text-xs text-slate-400">{caseItem.progress}%</span>
@@ -231,13 +231,13 @@
 
  <td class="px-4 py-4">
  <div class="flex space-x-1">
- <button class="p-1 text-slate-400 hover:text-cyan-400 transition-colors" title="View Details">
+ <button class="p-1 text-slate-400 hover, text-cyan-400 transition-colors" title="View Details">
  👁️
  </button>
- <button class="p-1 text-slate-400 hover:text-yellow-400 transition-colors" title="Edit">
+ <button class="p-1 text-slate-400 hover, text-yellow-400 transition-colors" title="Edit">
  ✏️
  </button>
- <button class="p-1 text-slate-400 hover:text-red-400 transition-colors" title="Delete">
+ <button class="p-1 text-slate-400 hover, text-red-400 transition-colors" title="Delete">
  🗑️
  </button>
  </div>
@@ -255,13 +255,13 @@
  </div>
 
  <div class="flex space-x-2">
- <button class="px-3 py-1 bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 text-sm rounded transition-colors" disabled>
+ <button class="px-3 py-1 bg-slate-700/50 hover, bg-slate-600/50 text-slate-300 text-sm rounded transition-colors" disabled>
  Previous
  </button>
  <button class="px-3 py-1 bg-cyan-400/20 text-cyan-400 text-sm rounded">
  1
  </button>
- <button class="px-3 py-1 bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 text-sm rounded transition-colors" disabled>
+ <button class="px-3 py-1 bg-slate-700/50 hover, bg-slate-600/50 text-slate-300 text-sm rounded transition-colors" disabled>
  Next
  </button>
  </div>

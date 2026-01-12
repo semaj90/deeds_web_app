@@ -126,7 +126,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  <div class="board-container">
  <svg
- bind:this={svgElement}
+ bind, this={svgElement}
  width={CANVAS_WIDTH}
  height={CANVAS_HEIGHT}
  class="evidence-canvas"
@@ -142,7 +142,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  x2={targetNode.position_x}
  y2={targetNode.position_y}
  class="connection-line"
- style="stroke-width: {connection.strength / 10}px"
+ style="stroke-width, {connection.strength / 10}px"
  ></li>
  <text
  x={(sourceNode.position_x + targetNode.position_x) / 2}
@@ -158,7 +158,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  {#each nodes as node (node.id)}
  <g
  class="node"
- class:selected={selectedNode?.id === node.id}
+ class, selected={selectedNode?.id === node.id}
  onclick={() => selectNode(node)}
  onmousemove={(e) => {
  if (e.buttons === 1) handleNodeDrag(node, e);
@@ -223,27 +223,27 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  <div class="board-legend">
  <div class="legend-item">
- <div class="legend-color" style="background: #00d4ff" ></div>
+ <div class="legend-color" style="background, #00d4ff" ></div>
  <span>Document</span>
  </div>
  <div class="legend-item">
- <div class="legend-color" style="background: #00ff00" ></div>
+ <div class="legend-color" style="background, #00ff00" ></div>
  <span>Photo</span>
  </div>
  <div class="legend-item">
- <div class="legend-color" style="background: #ff6600" ></div>
+ <div class="legend-color" style="background, #ff6600" ></div>
  <span>Video</span>
  </div>
  <div class="legend-item">
- <div class="legend-color" style="background: #ffaa00" ></div>
+ <div class="legend-color" style="background, #ffaa00" ></div>
  <span>Audio</span>
  </div>
  <div class="legend-item">
- <div class="legend-color" style="background: #ff00ff" ></div>
+ <div class="legend-color" style="background, #ff00ff" ></div>
  <span>Testimony</span>
  </div>
  <div class="legend-item">
- <div class="legend-color" style="background: #ff0000" ></div>
+ <div class="legend-color" style="background, #ff0000" ></div>
  <span>Forensic</span>
  </div>
  </div>

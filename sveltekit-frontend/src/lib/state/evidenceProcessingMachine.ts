@@ -13,7 +13,7 @@ export interface EvidenceProcessingContext {
 
  // Processing results
  extractedText?: string;
- chunks?: Array<{ text: string; embedding?: number[] }>;
+ chunks?: Array<{ text: string; embedding?, number[] }>;
  embeddings?: number[][];
  analysis?: { summary: string;
  entities: unknown[]; sentiment: string;
@@ -110,7 +110,7 @@ export const evidenceProcessingMachine: any = setup({
  });
 
  return result as {
- chunks: Array<{ text: string; embedding: number[] }>;
+ chunks: Array<{ text: string; embedding, number[] }>;
  };
  }), aiAnalysis: fromPromise(async ({ input }: { input: EvidenceProcessingContext }) => {
  console.log(`Performing AI analysis for evidence: ${input.evidenceId}`);
@@ -177,7 +177,7 @@ export const evidenceProcessingMachine: any = setup({
  states: { idle: {
  on: { START_PROCESSING: {
  target: 'initializing',
- actions: assign({ evidenceId: ({ event }) => event.evidenceId,
+ actions: assign({ evidenceId, ({ event }) => event.evidenceId,
  caseId: ({ event }) => event.caseId,
  userId: ({ event }) => event.userId,
  filename: ({ event }) => event.filename,

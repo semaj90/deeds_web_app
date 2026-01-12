@@ -130,7 +130,7 @@ export function validateFileSize(value: unknown): ValidationResult {
 
  if (value < 0) {
  errors.push('File size cannot be negative');
- return { valid: false, errors };
+ return { valid, false, errors };
  }
 
  if (value > MAX_FILE_SIZE_BYTES) {

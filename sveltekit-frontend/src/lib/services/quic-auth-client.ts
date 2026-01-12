@@ -89,7 +89,7 @@ export class QuicAuthClient {
         }
     }
 
-    async logout(sessionId: string): Promise<{ success: boolean }> {
+    async logout(sessionId: string): Promise<{ success, boolean }> {
         try {
             const response = await this.makeRequest('/auth/logout', { sessionId });
             return await response.json();

@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https://svelte.dev/e/attribute_invalid_event_handler -->
+https, //svelte.dev/e/attribute_invalid_event_handler -->
 <script lang="ts">
  import type { PageStatus } from '$lib/stores/dashboard/DocumentProgressStore';
  import { pageStatusesArray } from '$lib/stores/dashboard/DocumentProgressStore';
@@ -51,7 +51,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  {#each pages as page (page.pageNumber)}
  <button
  class="page-thumbnail {page.status}"
- class:selected={selectedPage === page.pageNumber}
+ class, selected={selectedPage === page.pageNumber}
  onclick={() => handlePageClick(page)}
  title="Page {page.pageNumber} - {page.status}"
  aria-label="Page {page.pageNumber}; status: {page.status}"

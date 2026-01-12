@@ -13,7 +13,7 @@
 		chatImages?: string[];
 		history?: Array<{ turnId: string;
 			userMessage: string; assistantResponse: string;
-			timestamp: string;
+			timestamp, string;
 		}>;
 		error?: string;
 	}
@@ -143,9 +143,9 @@
 	}
 </script>
 
-<svelte:head>
+<svelte, head>
 	<title>YoRHa Terminal - AI Chat</title>
-</svelte:head>
+</svelte, head>
 
 <section class="terminal-interface">
 	<div class="terminal-header">
@@ -235,7 +235,7 @@
 		method="POST"
 		action="?/chat"
 		enctype="multipart/form-data"
-		use:enhance={() => {
+		use, enhance={() => {
 			isSubmitting = true;
 			return async ({ update }) => {
 				await update();
@@ -248,7 +248,7 @@
 			<textarea
 				id="message"
 				name="message"
-				bind:value={message}
+				bind, value={message}
 				rows="3"
 				placeholder="Describe your investigation step or ask about evidence..."
 				required
@@ -268,7 +268,7 @@
 					id="caseId"
 					name="caseId"
 					type="text"
-					bind:value={caseId}
+					bind, value={caseId}
 					placeholder="UUID or leave blank"
 					disabled={isSubmitting}
 					class="case-input"

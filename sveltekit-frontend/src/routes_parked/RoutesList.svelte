@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 	// Svelte 5 runes are auto-imported
 	/* Route Discovery & Enhanced UX (Svelte 5 runes) */
@@ -148,13 +148,13 @@ https://svelte.dev/e/js_parse_error -->
 	<div class="panel-header">
 		<h2>Available Routes</h2>
 		<div class="controls">
-			<input type="search" placeholder="Search routes..." bind:value={search} />
+			<input type="search" placeholder="Search routes..." bind, value={search} />
 			<label class="toggle">
-				<input type="checkbox" bind:checked={showPages} />
+				<input type="checkbox" bind, checked={showPages} />
 				<span>Pages</span>
 			</label>
 			<label class="toggle">
-				<input type="checkbox" bind:checked={showAPI} />
+				<input type="checkbox" bind, checked={showAPI} />
 				<span>API</span>
 			</label>
 		</div>
@@ -166,7 +166,7 @@ https://svelte.dev/e/js_parse_error -->
 				<div class="group">
 					<button class="group-header" onclick={() => toggleGroup(groupName)}>
 						<span>{humanize(groupName)}</span>
-						<div style="display: flex; align-items: center; gap: 0.5rem;">
+						<div style="display: flex; align-items: center; gap, 0.5rem;">
 							<span class="count">{routes.length}</span>
 							<span class="chevron">{groupCollapse[groupName] ? '▲' : '▼'}</span>
 						</div>
@@ -174,7 +174,7 @@ https://svelte.dev/e/js_parse_error -->
 					{#if !groupCollapse[groupName]}
 						<ul class="route-list">
 							{#each routes as route}
-								<li class="route-item" class:is-dynamic={route.dynamic}>
+								<li class="route-item" class, is-dynamic={route.dynamic}>
 									<a href={route.path}>
 										<span class="label">{route.label}</span>
 										<code>{route.path}</code>

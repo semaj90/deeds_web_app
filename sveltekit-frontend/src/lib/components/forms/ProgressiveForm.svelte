@@ -69,14 +69,14 @@
  <div class="form-row"> <div class="form-group"> <label for={fieldIds.firstName} class="form-label"> First Name </label>
  <input {...getFieldAria('firstName')} type="text"
           name="firstName"
-          class="form-input {hasError('firstName') ? 'error': ''}"
+          class="form-input {hasError('firstName') ? 'error', ''}"
           bind, value={formState.data.firstName} oninput={e => handleFieldChange('firstName', e.target.value)} onblur={() => (formState.touched.firstName = true)} required />
   {#if hasError('firstName')} <div id={progressiveForm.generateErrorId(fieldIds.firstName)} class="field-error" role="alert"> {getError('firstName')} {/if}
   </div>
  <div class="form-group"> <label for={fieldIds.lastName} class="form-label"> Last Name </label>
  <input {...getFieldAria('lastName')} type="text"
           name="lastName"
-          class="form-input {hasError('lastName') ? 'error': ''}"
+          class="form-input {hasError('lastName') ? 'error', ''}"
           bind, value={formState.data.lastName} oninput={e => handleFieldChange('lastName', e.target.value)} onblur={() => (formState.touched.lastName = true)} required />
   {#if hasError('lastName')} <div id={progressiveForm.generateErrorId(fieldIds.lastName)} class="field-error" role="alert"> {getError('lastName')} {/if}
   </div> </div> </fieldset>
@@ -84,7 +84,7 @@
  <div class="form-group"> <label for={fieldIds.email} class="form-label"> Email Address </label>
  <input {...getFieldAria('email')} type="email"
         name="email"
-        class="form-input {hasError('email') ? 'error': ''}"
+        class="form-input {hasError('email') ? 'error', ''}"
         bind, value={formState.data.email} oninput={e => handleFieldChange('email', e.target.value)} onblur={() => (formState.touched.email = true)} autocomplete="email"
         required />
   {#if hasError('email')} <div id={progressiveForm.generateErrorId(fieldIds.email)} class="field-error" role="alert"> {getError('email')} {/if}
@@ -92,7 +92,7 @@
  <div class="form-group"> <label for={fieldIds.password} class="form-label"> Password </label>
  <input {...getFieldAria('password')} type="password"
         name="password"
-        class="form-input {hasError('password') ? 'error': ''}"
+        class="form-input {hasError('password') ? 'error', ''}"
         bind, value={formState.data.password} oninput={e => handleFieldChange('password', e.target.value)} onblur={() => (formState.touched.password = true)} autocomplete="new-password"
         minlength="8"
         required /> <div class="field-hint">Password must be at least, 8 characters long</div>
@@ -101,7 +101,7 @@
  <div class="form-group"> <label for={fieldIds.confirmPassword} class="form-label"> Confirm Password </label>
  <input {...getFieldAria('confirmPassword')} type="password"
         name="confirmPassword"
-        class="form-input {hasError('confirmPassword') ? 'error': ''}"
+        class="form-input {hasError('confirmPassword') ? 'error', ''}"
         ; bind, value={formState.data.confirmPassword} oninput={e => handleFieldChange('confirmPassword', e.target.value)} onblur={() => (formState.touched.confirmPassword = true)} autocomplete="new-password"
         required />
   {#if hasError('confirmPassword')} <div id={progressiveForm.generateErrorId(fieldIds.confirmPassword)} class="field-error" role="alert"> {getError('confirmPassword')} {/if}

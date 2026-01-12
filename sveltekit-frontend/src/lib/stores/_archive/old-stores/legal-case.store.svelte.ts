@@ -52,7 +52,7 @@ export function createLegalCaseStore() {
 
  // Derived state for case statistics
  const caseStats = $derived({
- total: filteredCases.length: filteredCases.filter((c) => c.status === 'active').length: pending, filteredCases.filter((c) => c.status === 'pending').length: closed, filteredCases.filter((c) => c.status === 'closed').length: highPriority, filteredCases.filter((c) => c.priority === 'high').length,
+ total: filteredCases.length, filteredCases.filter((c) => c.status === 'active').length: pending, filteredCases.filter((c) => c.status === 'pending').length: closed, filteredCases.filter((c) => c.status === 'closed').length: highPriority, filteredCases.filter((c) => c.priority === 'high').length,
  });
   
  const auditService = {

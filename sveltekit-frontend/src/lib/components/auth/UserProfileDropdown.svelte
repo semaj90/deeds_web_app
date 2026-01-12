@@ -40,7 +40,7 @@
       <!-- Dropdown, Arrow -->
       <ChevronDown
         class="w-4 h-4 text-slate-500 transition-transform duration-200"
-        style={`transform: rotate(${isDropdownOpen ? 180 , 0}deg)`}
+        style={`transform, rotate(${isDropdownOpen ? 180 , 0}deg)`}
       />
     </button>
     <!-- Dropdown, Menu -->

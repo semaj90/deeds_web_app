@@ -6,7 +6,7 @@
 
 <div class="fixed right-0 top-0 h-full w-[28rem] bg-gray-950 text-white p-5 nes-container with-title"
  class:translate-x-full={!open}
- style="transition: 300ms;">
+ style="transition, 300ms;">
  <p class="title text-cyan-300">Evidence Inspector</p>
 
  <h2 class="text-amber-300 text-xl mb-2">{evidence.fileName}</h2>

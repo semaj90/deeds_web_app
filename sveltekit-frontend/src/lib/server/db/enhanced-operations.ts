@@ -18,7 +18,7 @@ import { create } from "domain";
  ...payload
  };
  },
- update: async (id: string, updates: Partial<{ title: string, description: string, priority: string, status: string, location: string, jurisdiction: string}>, userId: string) => {
+ update: async (id: string, updates: Partial<{ title: string, description: string, priority: string, status: string, location: string, jurisdiction, string}>, userId: string) => {
  // Stub: Return mock updated case
  return {
  id,

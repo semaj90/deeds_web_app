@@ -18,12 +18,12 @@ export interface ParameterSchema {
  minimum?: number;
  maximum?: number;
  items?: ParameterSchema;
- properties?: Record<string: ParameterSchema>;
+ properties?: Record<string, ParameterSchema>;
 }
 
 export interface FunctionSchema {
  name: string; description: string;
- parameters: Record<string: ParameterSchema>; requiredParameters: string[];
+ parameters: Record<string, ParameterSchema>; requiredParameters: string[];
  safetyLevel: 'public' | 'internal' | 'restricted';
  auditLog: boolean;
 }
@@ -205,7 +205,7 @@ function validateParameter(name: string, value: any): ValidationResult {
  // String validation
  if (schema.type === 'string' && typeof value === 'string') {
  if (schema.minLength && value.length < schema.minLength) {
- errors.push(`Parameter "${name}" is too short: minimum ${schema.minLength} characters`);
+ errors.push(`Parameter "${name}" is too short, minimum ${schema.minLength} characters`);
  }
  if (schema.maxLength && value.length > schema.maxLength) {
  errors.push(`Parameter "${name}" is too long: maximum ${schema.maxLength} characters`);
@@ -220,7 +220,7 @@ function validateParameter(name: string, value: any): ValidationResult {
  // Number validation
  if (schema.type === 'number' && typeof value === 'number') {
  if (schema.minimum !== undefined && value < schema.minimum) {
- errors.push(`Parameter "${name}" is too small: minimum ${schema.minimum}`);
+ errors.push(`Parameter "${name}" is too small, minimum ${schema.minimum}`);
  }
  if (schema.maximum !== undefined && value > schema.maximum) {
  errors.push(`Parameter "${name}" is too large: maximum ${schema.maximum}`);

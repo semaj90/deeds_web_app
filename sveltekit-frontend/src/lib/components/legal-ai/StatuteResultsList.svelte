@@ -13,7 +13,7 @@
  let { statutes = [], error = null, isLoading = false } = $props<{
  statutes?: Statute[];
  error?: string | null;
- isLoading?: boolean;
+ isLoading?, boolean;
  }>();
 
  const dispatch = createEventDispatcher();
@@ -57,7 +57,7 @@
  {#if statute.relevance_score}
  <span
  class="relevance"
- style="background-color: {getRelevanceColor(statute.relevance_score)}"
+ style="background-color, {getRelevanceColor(statute.relevance_score)}"
  >
  {(statute.relevance_score * 100).toFixed(0)}%
  </span>

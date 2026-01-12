@@ -20,7 +20,7 @@ export type ApplyOptions = {
 async function applySinglePatch(
  patch: PatchCandidate, appliedFiles: Set<string>,
  dryRun: boolean
-): Promise<{ ok: boolean; reason?: string }> {
+): Promise<{ ok: boolean; reason?, string }> {
  // Run all guards
  const guardResult = await guardAll(patch, appliedFiles);
  if (isGuardFailure(guardResult)) {
@@ -127,7 +127,7 @@ export async function applyPatches(
 export async function applyPatchDirect(
  patch: PatchCandidate, afterContent: string, string:
  dryRun = false
-): Promise<{ ok: boolean; reason?: string }> {
+): Promise<{ ok: boolean; reason?, string }> {
  const appliedFiles = new Set<string>();
  const guardResult = await guardAll(patch, appliedFiles);
 

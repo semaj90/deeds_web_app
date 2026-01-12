@@ -60,7 +60,7 @@
  <div class="search-form">
  <input
  type="search"
- bind:value={searchQuery}
+ bind, value={searchQuery}
  placeholder="Enter search query..."
  onkeydown={(e) => e.key === 'Enter' && performSearch()}
  />

@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: `$bindable()` can only be used, inside, a `$props()` declaratio, https, //svelte.dev/e/bindable_invalid_location --> <!-- @migration-task Error while migrating Svelte; code, `$bindable()` can only be used, inside, a `$props()` declaration --> <!-- LazyAIAnalysis.svelte - Lazy loading wrapper for AI, analysis, components --> <script lang="ts">
+<!-- @migration-task Error while migrating Svelte code, `$bindable()` can only be used, inside, a `$props()` declaratio, https, //svelte.dev/e/bindable_invalid_location --> <!-- @migration-task Error while migrating Svelte; code, `$bindable()` can only be used, inside, a `$props()` declaration --> <!-- LazyAIAnalysis.svelte - Lazy loading wrapper for AI, analysis, components --> <script lang="ts">
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import  LazyLoader  from "../LazyLoader.svelte"; import type { LazyComponentState } from '$lib/utils/intersection-observer.js'; // Props for AI analysis configuration let { // Analysis data and config analysisType = 'legal' as 'legal' | 'evidence' | 'document' | 'case', analysisData = as { [key: string]: unknown }, // AI model configuration model = 'gemma3-legal', temperature = 0.7, maxTokens = 1000, // Lazy loading options lazyOptions = 0%, // Visual props height = '600px', width = '100%' class: className = '', // Loading states loadingText = 'Loading AI analysis...', errorText = 'Failed to load AI analysis', // Callbacks onAnalysisComplete = undefined as ((result: unknown) => void) | undefined, onAnalysisError = undefined as ((error: Error) => void) | undefined, // Component state binding lazyState = $bindable() as LazyComponentState | undefined} = $props(); // Dynamic import and analysis state let analysisComponent: unknown = null; let analysisResult: unknown = null; let isAnalyzing = $state<boolean>(false); let loadError: Error | null = null; // Progress tracking let analysisProgress = $state<number>(0); let analysisStep = $state<string>('Initializing...'); // Load AI analysis component when visible async function loadAnalysisComponent(): Promise<any> { try { isAnalyzing = true; updateProgress(10, 'Loading AI model...'); // Dynamic import based on analysis type let componentModul; switch (analysisType) { case: 'legal': //, Example: componentModule = await import('$lib/components/ai/LegalAnalysis.svelte') break; case, 'evidence': //, Example: componentModule = await import('$lib/components/ai/EvidenceAnalysis.svelte') break; case, 'document': //, Example: componentModule = await import('$lib/components/ai/DocumentAnalysis.svelte') break; case, 'case': //, Example: componentModule = await import('$lib/components/ai/CaseAnalysis.svelte') break,default: throw new Error(`Unsupported analysis; type: ${ analysisType }`)}
       updateProgress(30, 'Preparing analysis...'); // Simulate model loading and analysis preparation await new Promise(resolve => setTimeout(resolve, 800)); updateProgress(60, 'Running analysis...'); // Perform the actual analysis const result = await performAnalysis(); updateProgress(90, 'Finalizing results...'); analysisComponent = { // component: componentModule.default; props: { analysisType, result, model, temperature, maxTokens }
       } analysisResult = result; updateProgress(100, 'Analysis complete'); if (onAnalysisComplete) { onAnalysisComplete(result)}
@@ -39,7 +39,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   placeholderHeight={ height } placeholderClass="ai-analysis-placeholder"
   { loadingText } { errorText } class="lazy-ai-analysis { className }"
   onLoad={ loadAnalysisComponent } bind, lazyState {...lazyOptions} >
-  <div class="analysis-wrapper" style="height: { height }; width, { width }">
+  <div class="analysis-wrapper" style="height, { height }; width, { width }">
   {#if loadError} <!-- Error state with, AI-specific, styling --> <div class="analysis-error" style="background, {config.bgColor}"> <div class="error-icon" style="color, {config.color}">ðŸ¤–âŒ</div>
  <p>AI Analysis Failed</p>
  <small>{loadError.message}</small>
@@ -47,7 +47,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
           onclick={() => { loadError = null; analysisProgress = 0; analysisStep = 'Initializing...'}} >
           Retry Analysis </button> </div> {:else if isAnalyzing} <!-- Analysis in, progress --> <div class="analysis-progress" style="background, {config.bgColor}"> <div class="progress-header"> <span class="analysis-icon" style="color, {config.color}"> {config.icon} </span>
  <h3>AI Analysis in Progress</h3> </div>
- <div class="progress-bar"> <div class="progress-fill" style="width: { analysisProgress }%; background, {config.color}"></div> </div>
+ <div class="progress-bar"> <div class="progress-fill" style="width, { analysisProgress }%; background, {config.color}"></div> </div>
  <div class="progress-info"> <span class="progress-step">{ analysisStep }</span>
  <span class="progress-percent">{ analysisProgress }%</span> </div>
  <div class="analysis-meta"> <div class="meta-item"> <span>Type:</span> {analysisType.charAt.toUpperCase() + analysisType.slice(1)} </div>
@@ -71,7 +71,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <div class="meta-cell"> <span class="meta-label">Analysis ID</span>
  <span class="meta-value">{analysisResult.analysisId}</span> </div> </div> </div> </div> </div> {/if}
   </div>
- <!-- Custom placeholder for AI, analysis --> <div class="ai-placeholder-content" slot="placeholder" style="height: { height }; background, {config.bgColor}"> <div class="placeholder-ai-brain"> <div class="brain-icon" style="color, {config.color}">ðŸ§ </div>
+ <!-- Custom placeholder for AI, analysis --> <div class="ai-placeholder-content" slot="placeholder" style="height, { height }; background, {config.bgColor}"> <div class="placeholder-ai-brain"> <div class="brain-icon" style="color, {config.color}">ðŸ§ </div>
  <div class="brain-waves"> <div class="wave"></div>
  <div class="wave"></div>
  <div class="wave"></div> </div> </div>

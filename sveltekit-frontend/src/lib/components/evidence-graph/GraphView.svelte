@@ -1,5 +1,5 @@
-<!-- @migration-task Error while migrating Svelte code: Expected token }; https://svelte.dev/e/expected_token -->
-<!-- @migration-task Error while migrating Svelte code: Expected token }; https://svelte.dev/e/expected_token -->
+<!-- @migration-task Error while migrating Svelte code: Expected token }; https, //svelte.dev/e/expected_token -->
+<!-- @migration-task Error while migrating Svelte code: Expected token }; https, //svelte.dev/e/expected_token -->
 patch
   16:  interface GraphLink {
   17: source, string | GraphNode;

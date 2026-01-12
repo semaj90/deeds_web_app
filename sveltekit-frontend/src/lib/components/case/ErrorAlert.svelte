@@ -3,7 +3,7 @@
 
  let { error = null, onDismiss = null, onRetry = null } = $props<{
  error?: string | null;
- onDismiss?: (() => void) | null;
+ onDismiss?, (() => void) | null;
  onRetry?: (() => void) | null;
  }>();
 

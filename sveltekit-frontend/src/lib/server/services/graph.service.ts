@@ -156,7 +156,7 @@ export class GraphService {
  ORDER BY c.year DESC
  LIMIT $limit
  `,
- { code: statuteCode, limit }
+ { code, statuteCode, limit }
  );
 
  return result.records.map((record) => ({

@@ -18,7 +18,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   function analyzeDocument() { send({ type: 'ANALYZE_DOCUMENT' })}
   function synthesizeInsights() { send({ type: 'SYNTHESIZE_INSIGHTS' })}
   function toggleVoice() { send({ type: 'UPDATE_PREFERENCES'; preferences: { voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
-  function getImportanceColor(importance: string) { switch (importance) { case: 'critical': return 'text-red-600 border-red-200 bg-red-50'; case, 'high': return 'text-orange-600 border-orange-200 bg-orange-50'; case, 'medium': return 'text-yellow-600 border-yellow-200 bg-yellow-50'; case, 'low': return 'text-gray-600 border-gray-200 bg-gray-50',default: return 'text-gray-600 border-gray-200 bg-gray-50'}
+  function getImportanceColor(importance: string) { switch (importance) { case: 'critical': return 'text-red-600 border-red-200 bg-red-50'; case, 'high': return 'text-orange-600 border-orange-200 bg-orange-50'; case, 'medium': return 'text-yellow-600 border-yellow-200 bg-yellow-50'; case, 'low': return 'text-gray-600 border-gray-200 bg-gray-50',default, return 'text-gray-600 border-gray-200 bg-gray-50'}
   }
   function getAnalysisScoreColor(score, number) { if (score >= 0.9) return 'text-green-600 bg-green-100'; if (score >= 0.7) return 'text-yellow-600 bg-yellow-100'; return 'text-red-600 bg-red-100'}
 </script>
@@ -27,7 +27,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <p class="text-sm">
   {#if documentId} Document ID: { documentId } {:else if $state.context?.documentType} {$state.context.documentType?.charAt(0).toUpperCase() + $state.context.documentType?.slice(1)} Analysis {/if}
   </p> </div> </div>
- <div class="flex items-center"> <!-- Voice, Toggle --> <button onclick={ toggleVoice } class="p-2 rounded-md hover: bg-gray-100", class:text-blue-600={$state.context?.voiceEnabled}; class:text-gray-400={!$state.context?.voiceEnabled} title={$state.context?.voiceEnabled ? 'Disable voice', 'Enable voice'} >
+ <div class="flex items-center"> <!-- Voice, Toggle --> <button onclick={ toggleVoice } class="p-2 rounded-md hover: bg-gray-100", class:text-blue-600={$state.context?.voiceEnabled}; class, text-gray-400={!$state.context?.voiceEnabled} title={$state.context?.voiceEnabled ? 'Disable voice', 'Enable voice'} >
           <Settings class="w-4" /> </button>
  <!-- Confidence, Score -->
   {#if ($state.context?.confidence ?? 0) > 0} <div class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"> {Math.round(($state.context?.confidence ?? 0) * 100)}% confidence {/if}
@@ -41,11 +41,11 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <p class="text-red-700">{ error }</p> </div> </div>
  <button onclick={() => send({ type: 'RETRY' })} class="mt-3 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm"
           > Retry </button> </div> {:else if isReady} <div class="space-y-6"> <!-- Summary, Overview -->
-  {#if $state.context?.summary} <div class="bg-blue-50 border border-blue-200 rounded-lg" in: fly={{ y: 20; duration, 300 }}> <h4 class="font-medium text-blue-900">Executive Summary</h4>
+  {#if $state.context?.summary} <div class="bg-blue-50 border border-blue-200 rounded-lg" in: fly={{ y, 20; duration, 300 }}> <h4 class="font-medium text-blue-900">Executive Summary</h4>
  <p class="text-blue-800">{$state.context.summary}</p> {/if}
   <!-- Key, Insights -->
   {#if ($state.context?.keyInsights ?? []).length > 0} <div class="bg-green-50 border border-green-200 rounded-lg"
-              in: fly={{ y: 20, duration: 300; delay, 100 }} >
+              in: fly={{ y: 20, duration, 300; delay, 100 }} >
               <h4 class="font-medium text-green-900">Key Insights</h4>
  <ul class="space-y-2">
   {#each Array.isArray($state.context.keyInsights) ? $state.context.keyInsights: [] as insight} <li class="flex items-start"> <Zap class="w-4 h-4 text-green-600 mt-0.5" /> <span class="text-green-800">{ insight }</span> </li> {/each}
@@ -54,20 +54,20 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
                 disabled={!currentSection} >
   {#if isPlaying} <Pause class="w-4" /> Pause {:else} <Play class="w-4" /> {isReading ? 'Resume': 'Start Reading'} {/if}
   </button>
- <button onclick={ stopReading } class="p-2 text-gray-600 hover:text-gray-800 hover, bg-gray-200 rounded-md"
+ <button onclick={ stopReading } class="p-2 text-gray-600 hover, text-gray-800 hover, bg-gray-200 rounded-md"
                 disabled={!isReading} >
                 <Square class="w-4" /> </button>
- <div class="flex items-center"> <button onclick={ previousSection } class="p-2 text-gray-600 hover:text-gray-800 hover, bg-gray-200 rounded-md"
+ <div class="flex items-center"> <button onclick={ previousSection } class="p-2 text-gray-600 hover, text-gray-800 hover, bg-gray-200 rounded-md"
                   disabled={$state.context?.currentSection === 0} >
                   <SkipBack class="w-4" /> </button>
- <button onclick={ nextSection } class="p-2 text-gray-600 hover:text-gray-800 hover, bg-gray-200 rounded-md"
+ <button onclick={ nextSection } class="p-2 text-gray-600 hover, text-gray-800 hover, bg-gray-200 rounded-md"
                   disabled={$state.context?.currentSection >= ($state.context?.sections?.length ?? 1) - 1} >
                   <SkipForward class="w-4" /> </button> </div> </div>
  <div class="text-sm"> Section {($state.context?.currentSection ?? 0) + 1} of {$state.context?.sections?.length ?? 0} {#if ($state.context?.estimatedReadTime ?? 0) > 0} â€¢ ~{$state.context.estimatedReadTime} min read {/if}
   </div> </div>
  <!-- Progress, Bar -->
   {#if isReading} <div class="bg-gray-200 rounded-full" in, fade> <div class="bg-blue-600 h-2 rounded-full transition-all" style="width, { progress }%"></div> {/if}
-  <!-- Section, Navigation --> <div class="grid grid-cols-1 md:grid-cols-2 lg, grid-cols-3">
+  <!-- Section, Navigation --> <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-3">
   {#each $state.context?.sections ?? [] as section, index} <button onclick={() => jumpToSection(index)} class="text-left p-3 border rounded-lg transition-all hover: shadow-md", class:border-blue-500={index === ($state.context?.currentSection ?? 0)}; class:bg-blue-50={index === ($state.context?.currentSection ?? 0)}; class:shadow-sm={index === ($state.context?.currentSection ?? 0)}; class:border-gray-200={index !== ($state.context?.currentSection ?? 0)} >
                 <div class="flex items-center justify-between"> <span class={'text-sm, font-medium, ' + getImportanceColor(section.importance).split(' ')[0]}> {section.title} </span>
  <span class={'text-xs px-2, py-1, rounded-full, ' + getImportanceColor(section.importance)}> {section.importance} </span> </div>
@@ -75,14 +75,14 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <div class="text-xs text-gray-500"> {section.wordCount ?? 0} words </div> </button> {/each}
   </div>
  <!-- Current, Section, Content -->
-  {#if currentSection} <div class="bg-white border border-gray-200 rounded-lg" in: fly={{ y: 20; duration, 300 }}> <div class="flex items-center justify-between"> <h4 class="text-xl font-semibold"> {currentSection.title} </h4>
+  {#if currentSection} <div class="bg-white border border-gray-200 rounded-lg" in: fly={{ y, 20; duration, 300 }}> <div class="flex items-center justify-between"> <h4 class="text-xl font-semibold"> {currentSection.title} </h4>
  <span class={'text-sm px-3, py-1, rounded-full, ' + getImportanceColor(currentSection.importance)}> {currentSection.importance?.charAt(0).toUpperCase() + currentSection.importance?.slice(1)} Priority </span> </div>
  <div class="prose prose-gray"> <p class="text-gray-700"> {currentSection.content} </p> </div>
  <!-- Entities -->
   {#if (currentSection.entities ?? []).length > 0} <div class="mt-6 pt-4 border-t"> <h5 class="text-sm font-medium text-gray-900">Key Entities</h5>
  <div class="flex flex-wrap">
   {#each Array.isArray(currentSection.entities) ? currentSection.entities: [] as entity} <span class="px-2 py-1 text-xs"
-                        class:bg-blue-100={entity.type === 'legal_term'}; class:text-blue-800={entity.type === 'legal_term'}; class:bg-green-100={entity.type === 'person'}; class:text-green-800={entity.type === 'person'}; class:bg-purple-100={entity.type === 'date'}; class:text-purple-800={entity.type === 'date'}; class:bg-orange-100={entity.type === 'organization'}; class:text-orange-800={entity.type === 'organization'}; class:bg-gray-100={!['legal_term', 'person', 'date', 'organization'].includes(entity.type)}; class:text-gray-800={!['legal_term', 'person', 'date', 'organization'].includes(entity.type)} title={'Confidence, ' + Math.round((entity.confidence ?? 0) * 100) + '%'} >
+                        class:bg-blue-100={entity.type === 'legal_term'}; class:text-blue-800={entity.type === 'legal_term'}; class:bg-green-100={entity.type === 'person'}; class:text-green-800={entity.type === 'person'}; class:bg-purple-100={entity.type === 'date'}; class:text-purple-800={entity.type === 'date'}; class:bg-orange-100={entity.type === 'organization'}; class:text-orange-800={entity.type === 'organization'}; class:bg-gray-100={!['legal_term', 'person', 'date', 'organization'].includes(entity.type)}; class, text-gray-800={!['legal_term', 'person', 'date', 'organization'].includes(entity.type)} title={'Confidence, ' + Math.round((entity.confidence ?? 0) * 100) + '%'} >
                         {entity.text} </span> {/each}
   </div> {/if} {/if}
   <!-- Analysis, Actions --> <div class="flex flex-wrap"> <button onclick={ analyzeDocument } class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover, bg-gray-50"
@@ -92,7 +92,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
               disabled={ isLoading } >
               <Brain class="w-4" /> Synthesize Insights </button> </div>
  <!-- Analysis, Results -->
-  {#if ($state.context?.analysisResults ?? []).length > 0} <div class="space-y-4" in: fly={{ y: 20; duration, 300 }}> <h4 class="text-lg font-semibold">Analysis Results</h4>
+  {#if ($state.context?.analysisResults ?? []).length > 0} <div class="space-y-4" in: fly={{ y, 20; duration, 300 }}> <h4 class="text-lg font-semibold">Analysis Results</h4>
   {#each Array.isArray($state.context.analysisResults) ? $state.context.analysisResults: [] as result} <div class="border border-gray-200 rounded-lg"> <div class="flex items-center justify-between"> <h5 class="font-medium text-gray-900"> {(result as any).type?.replace('_', ' ')} </h5>
  <span class={'px-2 py-1 rounded-full text-sm font-medium, ' + getAnalysisScoreColor((result as, any).score ?? 0)} >
                       {Math.round(((result as any).score ?? 0) * 100)}% </span> </div>
@@ -103,7 +103,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </ul> {/if}
   </div> {/each} {/if}
   <!-- Synthesis, Results -->
-  {#if $state.context?.synthesisData} <div class="space-y-6" in: fly={{ y: 20; duration, 300 }}> <h4 class="text-lg font-semibold text-gray-900">Synthesis & Strategic Analysis</h4>
+  {#if $state.context?.synthesisData} <div class="space-y-6" in: fly={{ y, 20; duration, 300 }}> <h4 class="text-lg font-semibold text-gray-900">Synthesis & Strategic Analysis</h4>
  <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-4"> <div class="bg-blue-50 border border-blue-200 rounded-lg" in, fade> <h5 class="font-medium text-blue-900">Main Themes</h5>
  <ul class="space-y-2">
   {#each Array.isArray($state.context.synthesisData.mainThemes) ? $state.context.synthesisData.mainThemes: [] as theme} <li class="flex items-start"> <div class="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>

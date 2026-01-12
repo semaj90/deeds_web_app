@@ -26,7 +26,7 @@
 </script>
 
 <div class="layout">
-	<!-- LEFT: Sidebar (Navigation) -->
+	<!-- LEFT, Sidebar (Navigation) -->
 	<aside class="sidebar">
 		<div class="logo">⚖️ Legal AI</div>
 		<nav>
@@ -49,7 +49,7 @@
 		</div>
 	</aside>
 
-	<!-- CENTER: Primary Workspace -->
+	<!-- CENTER, Primary Workspace -->
 	<main class="workspace">
 		<LawSearchPanel
 			onselect={ handleSelect }
@@ -59,7 +59,7 @@
 		/>
 	</main>
 
-	<!-- RIGHT: Stacked Sidebar (Citations + Chat) -->
+	<!-- RIGHT, Stacked Sidebar (Citations + Chat) -->
 	<aside class="right-rail">
 		<CitationSidebar {selectedLaw} {citations} />
 		<MiniChatLegal {selectedLaw} />

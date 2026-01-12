@@ -8,7 +8,7 @@ env.allowRemoteModels = false;
 env.useFS = false; // Use in-memory models for browser compatibility
 
 export interface TransformerConfig {
- model: string; task?? 'text-classification'
+ model: string; task?: 'text-classification'
  | 'token-classification'
  | 'question-answering'
  | 'text-generation'

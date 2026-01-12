@@ -11,7 +11,7 @@
  let isGenerating = $state(false);
 
  let embeddingText = $state('This is a sample legal document for testing embeddings.');
- let embeddingResult = $state <{embedding: number[], dimensions: number} | null>(null);
+ let embeddingResult = $state <{embedding: number[], dimensions, number} | null>(null);
  let isGeneratingEmbedding = $state(false);
 
  onMount(() => {
@@ -85,7 +85,7 @@
  <div class="inference-section">
  <h3>📝 Text Generation (Gemma3)</h3>
  <textarea
- bind:value={prompt}
+ bind, value={prompt}
  placeholder="Enter your prompt..."
  rows="3"
  class="prompt-input"
@@ -114,7 +114,7 @@
  <div class="inference-section">
  <h3>🔍 Text Embedding (EmbeddingGemma)</h3>
  <textarea
- bind:value={embeddingText}
+ bind, value={embeddingText}
  placeholder="Enter text to embed..."
  rows="2"
  class="embedding-input"

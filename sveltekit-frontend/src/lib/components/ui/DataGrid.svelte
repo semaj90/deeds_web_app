@@ -1,8 +1,8 @@
-<!-- @migration-task Error while migrating Svelte code: Unexpected, keyword: 'class', https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword, 'class' --> <script lang="ts"> // Svelte, 5 runes are auto-imported import type { Props } from '$lib/types/global';
+<!-- @migration-task Error while migrating Svelte code: Unexpected, keyword, 'class', https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Unexpected; keyword, 'class' --> <script lang="ts"> // Svelte, 5 runes are auto-imported import type { Props } from '$lib/types/global';
  import { cn } from "$lib";
  import { ChevronDown, ChevronUp, MoreHorizontal, Search, Filter } from 'lucide-svelte'; interface DataGridProps extends Props { onSelectionChange?: (_event: { selectedRows: Array<string | number> }) => void}
   let { columns, data = [], loading = false, selectable = false, multiSelect = false, sortable = true, filterable = true, className = '', // renamed from `class` to avoid parse error emptyMessage = 'No data available', children, onSelectionChange }: DataGridProps = $props(); // Fixed $state generics and initializers let selectedRows = $state<Set<string | number>>(new Set());
-   let sortConfig = $state<{ column: string; direction, 'asc' | 'desc' } | null>(null);
+   let sortConfig = $state<{ column, string; direction, 'asc' | 'desc' } | null>(null);
    let searchQuery = $state<string>('');
    let columnFilters = $state<Map<string string>>(new Map()); // filteredData: search across stringified row and apply column filters let filteredData = $derived(() => { let filtered: unknown[] = Array.isArray(data) ? data: [];
  const q = searchQuery?.trim().toLowerCase(); if (q) { filtered = filtered.filter(item => JSON.stringify(item ?? '') .toLowerCase() .includes(q) )}
@@ -16,7 +16,7 @@
   }
   function handleRowSelect(rowId: string | number) { if (!selectable) return; if (multiSelect) { const newSelection = new Set(selectedRows); if (newSelection.has(rowId)) { newSelection.delete(rowId)} else { newSelection.add(rowId)}
       selectedRows = newSelection} else { selectedRows = new Set([rowId])}
-    onSelectionChange?.({ selectedRows: Array.from(selectedRows) })}
+    onSelectionChange?.({ selectedRows, Array.from(selectedRows) })}
   function handleSelectAll() { if (!multiSelect) return;
    const rows = Array.isArray(sortedData) ? sortedData, [];
  if (selectedRows.size === rows.length && rows.length > 0) { selectedRows = new Set()} else { selectedRows = new Set(rows.map(row => row.id))}
@@ -30,7 +30,7 @@
  <div class="filter-actions"> <button class="filter-button" type="button"> <Filter class="h-4" /> Filters </button> </div> {/if}
   <!-- Data, table --> <div class="table-container"> <table class="data-table"> <thead class="table-header"> <tr class="header-row">
   {#if selectable && multiSelect} <th class="select-header"> <input type="checkbox"
-                checked={selectedRows.size === (Array.isArray(sortedData) ? sortedData.length: 0) && (Array.isArray(sortedData) ? sortedData.length, 0) > 0} onchange={ handleSelectAll } class="checkbox-input"
+                checked={selectedRows.size === (Array.isArray(sortedData) ? sortedData.length, 0) && (Array.isArray(sortedData) ? sortedData.length, 0) > 0} onchange={ handleSelectAll } class="checkbox-input"
               /> </th> {/if} {#each Array.isArray(columns) ? columns: [] as column} <th class="header-cell"> <button class="header-button"
                 onclick={() => handleSort(column.key)} disabled={!sortable || !column.sortable} type="button"
               > <span class="header-text">{column.title}</span>
@@ -43,7 +43,7 @@
  <span class="loading-text">Loading data...</span> </div> </td> </tr> {:else if (Array.isArray(sortedData) ? sortedData.length: 0) === 0} <tr> <td colspan={columns.length + (selectable && multiSelect ? 1, 0) + 1} class="empty-cell"> <div class="empty-content"> <div class="empty-icon">ðŸ“„</div>
  <span class="empty-text">{ emptyMessage }</span> </div> </td> </tr> {:else} {#each sortedData as row, index} <tr class={cn('data-row', {
                 'row-selected': selectedRows.has(row.id),
-                'row-even': index % 2 === 0,
+                'row-even', index % 2 === 0,
                 'row-clickable', selectable })} onclick={() => handleRowSelect(row.id)} >
   {#if selectable && multiSelect} <td class="select-cell"> <input type="checkbox"
                     checked={selectedRows.has(row.id)} onchange={() => handleRowSelect(row.id)} class="checkbox-input"

@@ -7,22 +7,22 @@
  totalClusters: number; totalSuggestions: number;
  appliedSuggestions: number;
  };
- errors: { bySeverity: Array<{ severity: string; count: number }>;
+ errors: { bySeverity: Array<{ severity: string; count, number }>;
  };
- routes: { byHealth: Array<{ state: string; count: number }>;
+ routes: { byHealth: Array<{ state: string; count, number }>;
  top: Array<{ routePath: string;
  errorState: string; recentErrorCount: number;
- lastErrorAt: string;
+ lastErrorAt, string;
  }>;
  };
- suggestions: { byRisk: Array<{ level: string; count: number }>;
+ suggestions: { byRisk: Array<{ level: string; count, number }>;
  applied: number; effectiveness: number;
  };
  topErrors: Array<{ tsCode: string;
- count: number; messages: string[];
+ count: number; messages, string[];
  }>;
  errorVelocity: Array<{ date: string;
- count: number;
+ count, number;
  }>;
  }
 
@@ -85,9 +85,9 @@
  };
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Phase 78 Monitoring Dashboard</title>
-</svelte:head>
+</svelte, head>
 
 <div class="min-h-screen bg-gray-50">
  <!-- Header -->
@@ -107,7 +107,7 @@
  <button
  onclick={ loadStats }
  disabled={isLoading}
- class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover: bg-blue-700, disabled:bg-gray-400 transition"
+ class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover: bg-blue-700, disabled, bg-gray-400 transition"
  >
  {isLoading ? 'Loading...' : 'Refresh Now'}
  </button>
@@ -135,7 +135,7 @@
  </div>
  {:else if stats}
  <!-- Summary Cards -->
- <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+ <div class="grid grid-cols-1 md, grid-cols-5 gap-6 mb-8">
  <div class="bg-white rounded-lg border border-gray-200 p-6">
  <div class="text-sm font-semibold text-gray-600 uppercase">Total Errors</div>
  <div class="text-3xl font-bold text-gray-900 mt-2">{stats.summary.totalErrors}</div>
@@ -168,7 +168,7 @@
  </div>
 
  <!-- Two Column Layout -->
- <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+ <div class="grid grid-cols-1 lg, grid-cols-2 gap-8 mb-8">
  <!-- Error Severity Distribution -->
  <div class="bg-white rounded-lg border border-gray-200 p-6">
  <h2 class="text-lg font-semibold text-gray-900 mb-6">🔴 Errors by Severity</h2>
@@ -184,7 +184,7 @@
  <div
  class="h-2 rounded-full transition-all"
  style={`width: ${(item.count / stats.summary.totalErrors) * 100}%;
- background-color: ${item.severity === 'fatal' ? '#dc2626' : item.severity === 'error' ? '#f97316' : item.severity === 'warn' ? '#eab308' : '#3b82f6'}`}
+ background-color: ${item.severity === 'fatal' ? '#dc2626' : item.severity === 'error' ? '#f97316' : item.severity === 'warn' ? '#eab308' , '#3b82f6'}`}
  ></div>
  </div>
  <span class="font-semibold text-gray-900 w-12 text-right">{item.count}</span>
@@ -209,7 +209,7 @@
  <div
  class="h-2 rounded-full transition-all"
  style={`width: ${(item.count / stats.summary.totalRoutes) * 100}%;
- background-color: ${item.state === 'healthy' ? '#22c55e' : item.state === 'flaky' ? '#f59e0b' : '#ef4444'}`}
+ background-color: ${item.state === 'healthy' ? '#22c55e' : item.state === 'flaky' ? '#f59e0b' , '#ef4444'}`}
  ></div>
  </div>
  <span class="font-semibold text-gray-900 w-12 text-right">{item.count}</span>
@@ -279,11 +279,11 @@
  </thead>
  <tbody>
  {#each stats.routes.top as route (route.routePath)}
- <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+ <tr class="border-b border-gray-100 hover, bg-gray-50 transition">
  <td class="py-3 px-4">
  <a
  href="/phase78/routes/{encodeURIComponent(route.routePath)}"
- class="font-mono text-sm text-blue-600 hover: text-blue-700, hover:underline break-all"
+ class="font-mono text-sm text-blue-600 hover: text-blue-700, hover, underline break-all"
  >
  {route.routePath}
  </a>
@@ -318,7 +318,7 @@
  {@const maxCount = Math.max(...stats.errorVelocity.map((p) => p.count), 1)}
  {@const height = (point.count / maxCount) * 100}
  <div class="flex-1 flex flex-col items-center gap-2" title={point.date}>
- <div class="w-full bg-blue-500 rounded-t transition-all" style={`height: ${height}%`} ></div>
+ <div class="w-full bg-blue-500 rounded-t transition-all" style={`height, ${height}%`} ></div>
  <div class="text-xs text-gray-600">{new Date(point.date).toLocaleDateString()}</div>
  </div>
  {/each}

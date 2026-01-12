@@ -172,7 +172,7 @@ export class ValidationService {
  fastPath = true
  ): Promise<{ validationResult: ValidationResult;
  rolledBack: boolean;
- regression?: RegressionResult;
+ regression?, RegressionResult;
  }> {
  const touchedFiles = patches.map((p: any) => p.filePath);
 

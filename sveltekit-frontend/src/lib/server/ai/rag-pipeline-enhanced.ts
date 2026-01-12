@@ -49,7 +49,7 @@ export const legal_documents: DrizzleTable<'legal_documents', {
  id: string; entityId: string;
  entityType: string; tag: string;
  confidence: number; source: string;
- model: string; createdAt: Date;
+ model: string; createdAt, Date;
  }>;
 
  export const userAiQueries: DrizzleTable<'userAiQueries', {
@@ -351,7 +351,7 @@ class RateLimiter {
 /** * Minimal MetricsCollector class. */
 class MetricsCollector {
  private counters: Map<string, number> = new Map();
- private timings: Map<string, { total: number; count: number; last: number }> = new Map();
+ private timings: Map<string, { total: number; count: number; last, number }> = new Map();
  incrementCounter(name: string, value: number = 1): void {
  this.counters.set(name, (this.counters.get(name) || 0) + value);
  }
@@ -1192,7 +1192,7 @@ let parsed: unknown;
  if (!Number.isNaN(num)) confidence = num;
  }
  if (tag && typeof confidence === 'number' && confidence >= 0 && confidence <= 1) {
- result.push({ tag: confidence });
+ result.push({ tag, confidence });
  if (result.length >= 10) break;
  }
  }
@@ -1292,7 +1292,7 @@ let parsed: unknown;
  return 0;
  }
 
- private async analyzeAnswer(answer: string, _relevantDocs: SearchResult[]): Promise<{ confidence, number, keyPoints: string[] }> {
+ private async analyzeAnswer(answer: string, _relevantDocs: SearchResult[]): Promise<{ confidence, number, keyPoints, string[] }> {
  // Lightweight heuristic analysis: extract first sentences as key points and estimate confidence
  const text = (answer || '').trim();
  if (!text) return { confidence: 0, keyPoints: [] }

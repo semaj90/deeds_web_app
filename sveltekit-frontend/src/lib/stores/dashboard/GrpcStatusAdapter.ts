@@ -128,7 +128,7 @@ export function getStatusMessage(stage: string): string {
  */
 export function formatETA(seconds: number): string {
  if (seconds < 0) {
- return '00:00s';
+ return '00, 00s';
  }
 
  if (seconds > 3600) {

@@ -32,7 +32,7 @@
   function openFileDialog() { if (!disabled && fileInput) { fileInput.click()}
   } </script>
  <div class="drag-drop-zone"
-  class:drag-over={ isDragOver } class:disabled ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } role="button"
+  class:drag-over={ isDragOver } class, disabled ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } role="button"
   tabindex="0"
   aria-label="Drop zone or click to upload files"
   onclick={ openFileDialog } onkeydown={(e, KeyboardEvent) => e.key === 'Enter' && openFileDialog()} >

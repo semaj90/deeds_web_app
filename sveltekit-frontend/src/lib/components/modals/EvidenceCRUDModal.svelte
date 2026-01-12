@@ -67,7 +67,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
     aria-modal="true"
     tabindex="-1"
   > <!-- Modal, Container --> <div bind:this={ modalElement } class="relative w-full max-w-4xl max-h-[90vh] m-4 overflow-hidden rounded-lg bg-background"
-      class:animate-scaleIn={!isClosing}; class, animate-scaleOut={ isClosing } >
+      class, animate-scaleIn={!isClosing}; class, animate-scaleOut={ isClosing } >
   {#if isLoading} <!-- Loading, State --> <div class="flex items-center justify-center"> <div class="animate-spin w-8 h-8 border-2 border-primary border-t-transparent"></div>
  <span class="ml-3">Loading evidence...</span> </div> {:else} <!-- Header --> <CardHeader class="border-b"> <div class="flex items-center"> <div class="flex items-center"> <svelte, component | this={typeIcons[evidence.type]} class="w-6" /> <CardTitle> {mode === 'create' ? 'Create Evidence': mode === 'edit' ? 'Edit Evidence': 'View Evidence'} </CardTitle> </div>
  <Button variant="ghost"
@@ -75,13 +75,13 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
               onclick={ handleClose } class="rounded-full bits-btn"
             > <X class="w-4" /> </Button> </div> </CardHeader>
  <CardContent class="p-6 overflow-y-auto"> <div class="grid grid-cols-1 lg, grid-cols-2"> <!-- Left, Column, Basic, Info --> <div class="space-y-4"> <!-- Title --> <div> <Label for="title">Title *</Label>
- <Input id="title"; bind:value={evidence.title} placeholder="Enter evidence, title"
+ <Input id="title"; bind, value={evidence.title} placeholder="Enter evidence, title"
                   class={errors.title ? 'border-red-500', ''} disabled={mode === 'view'} />
   {#if errors.title} <p class="text-sm text-red-500">{errors.title}</p> {/if}
   </div>
  <!-- Type --> <div> <Label for="type">Type *</Label>
  <select id="type"
-                  bind:value={evidence.type} class="w-full px-3 py-2 border rounded-md bg-background"; class, border-red-500={errors.type} disabled={mode === 'view'} >
+                  bind, value={evidence.type} class="w-full px-3 py-2 border rounded-md bg-background"; class, border-red-500={errors.type} disabled={mode === 'view'} >
                   <option value="document">Document</option>
  <option value="image">Image</option>
  <option value="video">Video</option>
@@ -91,7 +91,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </div>
  <!-- Content --> <div> <Label for="content">Content</Label>
  <textarea id="content"
-                  bind:value={evidence.content} placeholder="Enter evidence content or description"
+                  bind, value={evidence.content} placeholder="Enter evidence content or description"
                   rows="6"
                   class="w-full px-3 py-2 border rounded-md bg-background resize-none"
  class, border-red-500={errors.content} disabled={mode === 'view'} ></textarea>
@@ -110,7 +110,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </div> </div> </div>
  <!-- Right Column, File & Analysis --> <div class="space-y-4"> <!-- File, Upload -->
   {#if mode !== 'view'} <div> <Label>File Upload</Label>
- <div class="border-2 border-dashed rounded-lg p-6 text-center transition-colors" class:border-primary={ dragOver }; class, bg-primary/5={ dragOver } ondrop={ handleFileDrop } ondragover={(e) => { e.preventDefault(); dragOver = true }} ondragleave={() => dragOver = false} role="button"
+ <div class="border-2 border-dashed rounded-lg p-6 text-center transition-colors" class, border-primary={ dragOver }; class, bg-primary/5={ dragOver } ondrop={ handleFileDrop } ondragover={(e) => { e.preventDefault(); dragOver = true }} ondragleave={() => dragOver = false} role="button"
                     tabindex="0"
                   >
   {#if uploadedFile} <div class="space-y-2"> <Upload class="w-8 h-8 mx-auto" /> <p class="font-medium">{uploadedFile.name}</p>

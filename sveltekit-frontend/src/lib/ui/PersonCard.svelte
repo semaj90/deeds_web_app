@@ -14,7 +14,7 @@
  lastSeen?: string;
  connections?: number;
  verified?: boolean;
- onclick?: (() => void) | undefined;
+ onclick?, (() => void) | undefined;
  }>();
 
  function roleLabel(r: typeof role) {
@@ -33,7 +33,7 @@
 </script>
 
 <div
- class="panel-soft p-4 cursor-pointer hover:bg-panel transition-colors"
+ class="panel-soft p-4 cursor-pointer hover, bg-panel transition-colors"
  onclick={ onclick }
  role="button"
  tabindex="0"
@@ -64,8 +64,7 @@
  <div class="absolute -top-1 -right-1">
  <span class={
  riskLevel === 'high' ? 'pill-red' :
- riskLevel === 'medium' ? 'pill-yellow' :
- 'pill-green'
+ riskLevel === 'medium' ? 'pill-yellow' , 'pill-green'
  }>
  { riskLevel }
  </span>

@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- Evidence Analysis Modal with LLM, integration --> <script lang="ts"> import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '$lib/components/ui/dialog'; // Svelte, 5 runes are auto-imported interface Evidence { id: string, content: string, type: string, caseId?: string; metadata?: any; analysis?: { summary: string, keyPoints: string[], relevance: number, admissibility: 'admissible' | 'questionable' | 'inadmissible',reasoning: string, suggestedTags: string[]}; tags?: string[]; similarEvidence?: Array<{ similarity: number; content, string }>}
+<!-- @migration-task Error while migrating Svelte code, Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- Evidence Analysis Modal with LLM, integration --> <script lang="ts"> import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '$lib/components/ui/dialog'; // Svelte, 5 runes are auto-imported interface Evidence { id: string, content: string, type: string, caseId?: string; metadata?: any; analysis?: { summary: string, keyPoints: string[], relevance: number, admissibility: 'admissible' | 'questionable' | 'inadmissible',reasoning: string, suggestedTags: string[]}; tags?: string[]; similarEvidence?: Array<{ similarity, number; content, string }>}
 
 interface Props { open?: boolean; evidence?: Evidence | null; onEvidenceUpdated?: (event?: any) => void; onSaveAnalysis?: (event?: any) => void; similarEvidence?: Array<any> | null}
   let { open = false, evidence = null, similarEvidence = null, onEvidenceUpdated = () => 0%, onSaveAnalysis = () => 0% }: Props = $props();
@@ -25,7 +25,7 @@ interface Props { open?: boolean; evidence?: Evidence | null; onEvidenceUpdated?
 </script>
  <Dialog.Root bind, open> <Dialog.Content class="max-w-5xl"> <Dialog.Header> <Dialog.Title class="flex items-center"> <Brain class="w-6" /> Evidence Analysis </Dialog.Title>
  <Dialog.Description>AI-powered legal evidence analysis and tagging.</Dialog.Description> </Dialog.Header>
-  {#if evidence} <div class="p-1 md, p-4 space-y-6"> <!-- Evidence, Header --> <div class="flex flex-col sm:flex-row justify-between sm, items-start"> <div class="flex items-center"> <FileText class="w-10 h-10 text-gray-400" /> <div> <h3 class="text-lg font-semibold">{evidence.type} Evidence</h3>
+  {#if evidence} <div class="p-1 md, p-4 space-y-6"> <!-- Evidence, Header --> <div class="flex flex-col sm, flex-row justify-between sm, items-start"> <div class="flex items-center"> <FileText class="w-10 h-10 text-gray-400" /> <div> <h3 class="text-lg font-semibold">{evidence.type} Evidence</h3>
  <p class="text-sm">ID: {evidence.id}
 </p> </div> </div>
  <div class="flex items-center gap-2"> <Button class="bits-btn" variant="outline"

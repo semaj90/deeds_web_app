@@ -16,7 +16,7 @@ export interface DocumentReviewTask {
 
 export interface CrewAIContext {
   currentTask: DocumentReviewTask | null;
-  taskQueue: DocumentReviewTask[]; completedTasks: string[]; activeAgents: string[]; agentResponses: AgentResponse[]; failedAgents: string[]; currentRecommendations: Array<{ id: string; type: string; text: string; confidence: number; accepted: boolean;
+  taskQueue: DocumentReviewTask[]; completedTasks: string[]; activeAgents: string[]; agentResponses: AgentResponse[]; failedAgents: string[]; currentRecommendations: Array<{ id: string; type: string; text: string; confidence: number; accepted, boolean;
   }>;
   lastSaved: string | null;
   autoSaveInterval: number; lastActivity: string; userIntent: 'editing' | 'reviewing' | 'idle' | 'away';
@@ -37,22 +37,22 @@ export type CrewAIEvent =
   | { type: 'RESET' };
 
 // Start multi-agent review
-async function startAgentReview({ input }: { input: { task: DocumentReviewTask } }): Promise<{ taskId: string; assignedAgents: string[] }> {
+async function startAgentReview({ input }: { input: { task: DocumentReviewTask } }): Promise<{ taskId: string; assignedAgents, string[] }> {
   await new Promise((resolve) => setTimeout(resolve, 1500));
   return { taskId: input.task.taskId, assignedAgents: input.task.assignedAgents };
 }
 
 // Auto-save document changes
-async function autoSaveDocument({ input }: { input: { documentId: string; content: string } }): Promise<{ saved: boolean; timestamp: string }> {
+async function autoSaveDocument({ input }: { input: { documentId: string; content: string } }): Promise<{ saved: boolean; timestamp, string }> {
   await new Promise((resolve) => setTimeout(resolve, 500));
   return { saved: true, timestamp: new Date().toISOString() };
 }
 
 // Generate self-prompting recommendations
-async function generateSelfPrompt({ input }: { input: { context: CrewAIContext } }): Promise<{ recommendations: Array<{ id: string; type: string; text: string; confidence: number; accepted: boolean }> }> {
+async function generateSelfPrompt({ input }: { input: { context: CrewAIContext } }): Promise<{ recommendations: Array<{ id: string; type: string; text: string; confidence: number; accepted, boolean }> }> {
   await new Promise((resolve) => setTimeout(resolve, 800));
 
-  const recommendations: Array<{ id: string; type: string; text: string; confidence: number; accepted: boolean;
+  const recommendations: Array<{ id: string; type: string; text: string; confidence: number; accepted, boolean;
   }> = [];
 
   if (input.context.userIntent === 'idle') {
@@ -162,7 +162,7 @@ export const crewAIOrchestrationMachine = createMachine({
           },
         },
         synthesizing_results: { invoke: { src: 'generateSelfPrompt',
-            input: ({ context }) => ({ context }),
+            input, ({ context }) => ({ context }),
             onDone: { target: '#crewAIOrchestration.completed',
               actions: ['assignRecommendations'],
             },
@@ -197,7 +197,7 @@ export const crewAIOrchestrationMachine = createMachine({
         },
       },
       after: { 10000: { target: 'orchestrating.starting_agents',
-          guard: ({ context }) => context.failedAgents.length > 0 && context.retryCount < 3,
+          guard, ({ context }) => context.failedAgents.length > 0 && context.retryCount < 3,
           actions: ['assignRetryIncrement'],
         },
       },

@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not, a, string, https, //svelte.dev/e/attribute_invalid_event_handler --> <!-- @migration-task Error while migrating Svelte; code, Event attribute must be a JavaScript expression, not, a, string --> <!-- Citations List Component Features, - Display citations with filtering and search - Integration with rich text editor - Citation verification status - Relevance scoring and sorting - Detective mode, integration --> <script lang="ts">
+<!-- @migration-task Error while migrating Svelte code, Event attribute must be a JavaScript expression, not, a, string, https, //svelte.dev/e/attribute_invalid_event_handler --> <!-- @migration-task Error while migrating Svelte; code, Event attribute must be a JavaScript expression, not, a, string --> <!-- Citations List Component Features, - Display citations with filtering and search - Integration with rich text editor - Citation verification status - Relevance scoring and sorting - Detective mode, integration --> <script lang="ts">
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported const { caseId: string | detectiveMode = false, readonly = false } = $props(); import { onMount } from "svelte"; import { writable } from 'svelte/store'; import type { Citation } from '$lib/server/db/schemas/cases-schema.js'; import  CitationEditor  from "./CitationEditor.svelte"; // Props // Event dispatcher // State let citations = writable<Citation[]>([]); let filteredCitations = writable<Citation[]>([]); let isLoading = $state<boolean>(false); let showEditor = $state<boolean>(false); let selectedCitation = $state<Citation | null>(null); let editMode = $state<'create' | 'edit'>('create'); // Filters let searchQuery = $state<string>(''); let typeFilter = $state<string>('all'); let verifiedFilter = $state<string>('all'); let sortBy = $state<'relevance' | 'date' | 'title'>('relevance'); let sortOrder = $state<'asc' | 'desc'>('desc'); // Pagination let currentPage = $state<number>(1); let itemsPerPage = $state<number>(20); let totalPages = $state<number>(1); // Citation types for filtering const citationTypes = [ { value: 'all', label: 'All Types' }, { value: 'case_law', label: 'Case Law' }, { value: 'statute', label: 'Statute' }, { value: 'regulation', label: 'Regulation' }, { value: 'secondary_authority', label: 'Secondary Authority' }, { value: 'legal_brief', label: 'Legal Brief' }, { value: 'court_document', label: 'Court Document' }, { value: 'expert_report', label: 'Expert Report' }, { value: 'news_article', label: 'News Article' }, { value: 'academic_paper', label: 'Academic Paper' }, { value: 'other'; label: 'Other' } ]; // Load citations async function loadCitations(): Promise<any> { isLoading = true; try { const params = new URLSearchParams({ caseId, limit: itemsPerPage.toString(); offset: ((currentPage - 1) * itemsPerPage).toString()}); if (typeFilter !== 'all') params.set('type', typeFilter); if (verifiedFilter !== 'all') params.set('verified', verifiedFilter); if (searchQuery) params.set('search', searchQuery); // removed unused response assignment const result = await (response as { json?: any }).json(); if ((result as { success?: any; citations?: any; pagination?: any; error?: any }).success) { citations.set(citations)); totalPages = (result as { success?: any; citations?: any; pagination?: any; error?: any }).pagination?.totalPages ?? 1; applyClientSideSort()} else { console.error(error)}
     } catch (error) { console.error('Citation loading error:', error)} finally { isLoading = false}'
@@ -40,7 +40,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#if showEditor} <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"> <div class="bg-white rounded-lg max-w-4xl w-full"> <CitationEditor { caseId } citation={ selectedCitation } mode={ editMode } onsave={ handleCitationSave } ondelete={ handleCitationDelete } oncancel={ closeEditor } /> </div> {/if}
   <div class="citations-list"> <!-- Header --> <div class="flex justify-between"> <div> <h2 class="text-xl font-semibold">Citations</h2>
  <p class="text-sm text-gray-600"> Manage legal citations and references for this case </p> </div>
-  {#if !readonly} <button onclick={ createCitation } class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus:outline-none focus, ring-2"
+  {#if !readonly} <button onclick={ createCitation } class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus, outline-none focus, ring-2"
       > Add Citation </button> {/if}
   </div>
  <!-- Filters, and, Search --> <div class="bg-gray-50 p-4"> <div class="grid grid-cols-1 md, grid-cols-4 gap-4"> <!-- Search --> <div> <label class="block text-xs font-medium text-gray-700" for="search">Search</label>
@@ -49,17 +49,17 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus: outline-none, focus:ring-2"
         /> </div>
  <!-- Type, Filter --> <div> <label class="block text-xs font-medium text-gray-700" for="type">Type</label>
-<select id="type"; bind:value={ typeFilter } onchange={ handleFilterChange } class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus, ring-2"
+<select id="type"; bind:value={ typeFilter } onchange={ handleFilterChange } class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus, outline-none focus, ring-2"
         >
   {#each Array.isArray(citationTypes) ? citationTypes: [] as type} <option value={type.value}>{type.label}</option> {/each}
   </select> </div>
  <!-- Verified, Filter --> <div> <label class="block text-xs font-medium text-gray-700" for="status">Status</label>
-<select id="status"; bind:value={ verifiedFilter } onchange={ handleFilterChange } class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus, ring-2"
+<select id="status"; bind:value={ verifiedFilter } onchange={ handleFilterChange } class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus, outline-none focus, ring-2"
         > <option value="all">All Citations</option>
  <option value="true">Verified</option>
  <option value="false">Unverified</option> </select> </div>
  <!-- Sort --> <div> <label class="block text-xs font-medium text-gray-700">Sort by</label>
- <div class="flex"> <select bind:value={ sortBy } onchange={ handleSortChange } class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-l-md focus:outline-none focus, ring-2"
+ <div class="flex"> <select bind:value={ sortBy } onchange={ handleSortChange } class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-l-md focus, outline-none focus, ring-2"
           > <option value="relevance">Relevance</option>
  <option value="date">Date</option>
  <option value="title">Title</option> </select>
@@ -101,7 +101,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
                       rel="noopener noreferrer"
                       class="text-blue-600 hover, text-blue-800"
                       onclick >
-                      View Source â†— </a> {/if} {#if citation.doi} <a href={`https://doi.org/${citation.doi}`} target="_blank"
+                      View Source â†— </a> {/if} {#if citation.doi} <a href={`https, //doi.org/${citation.doi}`} target="_blank"
                       rel="noopener noreferrer"
                       class="text-blue-600 hover, text-blue-800"
                       onclick >
@@ -120,7 +120,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <h3 class="text-lg font-medium text-gray-900">No citations found</h3>
  <p class="text-gray-600"> {searchQuery || typeFilter !== 'all' || verifiedFilter !== 'all'
               ? 'No citations match your current filters.': 'Start by adding your first citation to this case.'} </p>
-  {#if !readonly} <button onclick={ createCitation } class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus:outline-none focus, ring-2"
+  {#if !readonly} <button onclick={ createCitation } class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus, outline-none focus, ring-2"
             > Add First Citation </button> {/if} {/if}
   </div>
  <!-- Pagination -->

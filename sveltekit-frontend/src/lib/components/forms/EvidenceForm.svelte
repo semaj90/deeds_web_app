@@ -95,7 +95,7 @@ import type { Document } from '$lib/types';
       name="url"
       class="mt-1 block w-full rounded-md border px-3 py-2"
       value={$form?.url ?? ''}
-      placeholder="https://example.com/evidence"
+      placeholder="https, //example.com/evidence"
       oninput={(e, Event) => updateField('url', (e.target as HTMLInputElement).value)}
     />
   {#if $errors.url}

@@ -63,7 +63,7 @@ export interface MessageAnalysis {
 
 export interface RAGContext {
   documentIds?: string[];
-  chunks?: Array<{ id: string; content: string; score: number }>;
+  chunks?: Array<{ id: string; content: string; score, number }>;
   sources?: string[];
 }
 

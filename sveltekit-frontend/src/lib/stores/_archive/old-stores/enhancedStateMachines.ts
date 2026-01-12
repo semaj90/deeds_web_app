@@ -23,11 +23,11 @@ import {  browser  } from '$app/environment';
 export interface EnhancedAIContext {
  // Core evidence processing
  selectedEvidence: Evidence | null;
- evidenceQueue: Evidence[]; processingResults: Map<string: ProcessingResult>;
+ evidenceQueue: Evidence[]; processingResults: Map<string, ProcessingResult>;
  // AI & ML Pipeline
  embeddings: Map<string, number[]>;
  vectorMatches: VectorMatch[]; aiTags: Map<string, string[]>;
- aiAnalysis: Map<string: AIAnalysis>;
+ aiAnalysis: Map<string, AIAnalysis>;
  // Graph & Relationships
  graphRelationships: GraphNode[]; connectionStrength: Map<string, number>;
  // Real-time & Streaming
@@ -238,7 +238,7 @@ export const evidenceProcessingMachine = setup({
  if (event.type !== 'RETRY_FAILED') return false;
  return context.retryAttempts < 3;
  },
- isSystemHealthy: ({ context }) => context.systemHealth === 'healthy',
+ isSystemHealthy, ({ context }) => context.systemHealth === 'healthy',
  needsCacheSync: ({ context }) => {
  if (!context.lastSync) return true;
  const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
@@ -269,7 +269,7 @@ export const evidenceProcessingMachine = setup({
  states: { idle: {
  on: { ADD_EVIDENCE: {
  target: 'queueing',
- actions: assign({ evidenceQueue: ({ context, event }) => [...context.evidenceQueue: event.evidence],
+ actions: assign({ evidenceQueue, ({ context, event }) => [...context.evidenceQueue: event.evidence],
  selectedEvidence: ({ event }) => event.evidence,
  }),
  },

@@ -59,7 +59,7 @@
 	<div class="search-bar">
 		<input
 			type="text"
-			bind:value={search.query}
+			bind, value={search.query}
 			onkeypress={ handleKeyPress }
 			placeholder="Ask a question about TypeScript, SvelteKit, or Svelte 5..."
 			class="search-input"
@@ -72,7 +72,7 @@
 	<!-- Options -->
 	<div class="options">
 		<label class="checkbox-label">
-			<input type="checkbox" bind:checked={search.synthesizeEnabled} />
+			<input type="checkbox" bind, checked={search.synthesizeEnabled} />
 			<span>AI Synthesis (generate answer)</span>
 		</label>
 
@@ -86,7 +86,7 @@
 
 			{#if search.isGemini}
 				<label class="checkbox-label web-search-toggle">
-					<input type="checkbox" bind:checked={search.useWebSearch} />
+					<input type="checkbox" bind, checked={search.useWebSearch} />
 					<span>🌐 Enable Google Search Grounding</span>
 				</label>
 			{:else}
@@ -117,7 +117,7 @@
 
 	<!-- Synthesized Answer -->
 	{#if search.synthesized}
-		<div class="synthesized-answer" class:web-grounded={search.searchUsed}>
+		<div class="synthesized-answer" class, web-grounded={search.searchUsed}>
 			<h2>
 				{#if search.searchUsed}
 					🌐 AI Answer (Web Grounded)

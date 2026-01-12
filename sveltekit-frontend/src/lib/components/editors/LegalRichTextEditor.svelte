@@ -135,12 +135,12 @@
  });
 </script>
 
-<div class="legal-rich-text-editor rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
+<div class="legal-rich-text-editor rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark, bg-gray-800 overflow-hidden">
  <!-- Toolbar -->
  {#if !readonly}
- <div class="toolbar flex flex-wrap items-center gap-1 p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+ <div class="toolbar flex flex-wrap items-center gap-1 p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark, bg-gray-900">
  <!-- Undo/Redo -->
- <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark:border-gray-600">
+ <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark, border-gray-600">
  <button type="button" onclick={ undo } class="toolbar-btn" title="Undo (Ctrl+Z)">
  <span class="i-lucide-undo-2"></span>
  </button>
@@ -150,7 +150,7 @@
  </div>
 
  <!-- Headings -->
- <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark:border-gray-600">
+ <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark, border-gray-600">
  <select
  class="toolbar-select"
  value={currentHeading}
@@ -165,30 +165,30 @@
  </div>
 
  <!-- Text Formatting -->
- <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark:border-gray-600">
- <button type="button" onclick={ toggleBold } class="toolbar-btn {isBold ? 'active' : ''}" title="Bold (Ctrl+B)">
+ <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark, border-gray-600">
+ <button type="button" onclick={ toggleBold } class="toolbar-btn {isBold ? 'active' , ''}" title="Bold (Ctrl+B)">
  <span class="i-lucide-bold"></span>
  </button>
- <button type="button" onclick={toggleItalic} class="toolbar-btn {isItalic ? 'active' : ''}" title="Italic (Ctrl+I)">
+ <button type="button" onclick={toggleItalic} class="toolbar-btn {isItalic ? 'active' , ''}" title="Italic (Ctrl+I)">
  <span class="i-lucide-italic"></span>
  </button>
- <button type="button" onclick={toggleUnderline} class="toolbar-btn {isUnderline ? 'active' : ''}" title="Underline (Ctrl+U)">
+ <button type="button" onclick={toggleUnderline} class="toolbar-btn {isUnderline ? 'active' , ''}" title="Underline (Ctrl+U)">
  <span class="i-lucide-underline"></span>
  </button>
- <button type="button" onclick={toggleStrike} class="toolbar-btn {isStrike ? 'active' : ''}" title="Strikethrough">
+ <button type="button" onclick={toggleStrike} class="toolbar-btn {isStrike ? 'active' , ''}" title="Strikethrough">
  <span class="i-lucide-strikethrough"></span>
  </button>
  </div>
 
  <!-- Lists -->
- <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark:border-gray-600">
- <button type="button" onclick={ toggleBulletList } class="toolbar-btn {isBulletList ? 'active' : ''}" title="Bullet List">
+ <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark, border-gray-600">
+ <button type="button" onclick={ toggleBulletList } class="toolbar-btn {isBulletList ? 'active' , ''}" title="Bullet List">
  <span class="i-lucide-list"></span>
  </button>
- <button type="button" onclick={ toggleOrderedList } class="toolbar-btn {isOrderedList ? 'active' : ''}" title="Numbered List">
+ <button type="button" onclick={ toggleOrderedList } class="toolbar-btn {isOrderedList ? 'active' , ''}" title="Numbered List">
  <span class="i-lucide-list-ordered"></span>
  </button>
- <button type="button" onclick={toggleBlockquote} class="toolbar-btn {isBlockquote ? 'active' : ''}" title="Quote">
+ <button type="button" onclick={toggleBlockquote} class="toolbar-btn {isBlockquote ? 'active' , ''}" title="Quote">
  <span class="i-lucide-quote"></span>
  </button>
  </div>
@@ -207,7 +207,7 @@
  <div
  bind:this={editorElement}
  class="editor-content prose prose-sm dark:prose-invert max-w-none p-4 overflow-y-auto"
- style="min-height: {minHeight};"
+ style="min-height, {minHeight};"
  >
  <!-- TipTap will render here, or fallback textarea -->
  {#if !editor}
@@ -217,7 +217,7 @@
  {placeholder}
  disabled={readonly}
  class="w-full h-full bg-transparent border-none outline-none resize-none"
- style="min-height: {minHeight};"
+ style="min-height, {minHeight};"
  ></textarea>
  {/if}
  </div>

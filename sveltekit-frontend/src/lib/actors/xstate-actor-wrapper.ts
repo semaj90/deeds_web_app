@@ -198,20 +198,20 @@ export function createRAGSearchActor(input: RAGSearchInput): ActorRefFrom<typeof
 
 // ===== WORKFLOW ORCHESTRATION ACTOR =====
 export interface WorkflowInput {
-  steps: Array<{ type: string; input: unknown }>;
+  steps: Array<{ type: string; input, unknown }>;
   parallel?: boolean;
 }
 
 export interface WorkflowOutput {
   results: { [key: string]: unknown };
-  totalTime: number; success: boolean; errors: Array<{ step: string; error: string }>;
+  totalTime: number; success: boolean; errors: Array<{ step: string; error, string }>;
 }
 
 export const workflowActor = fromPromise(
   async ({ input }: { input: WorkflowInput }): Promise<WorkflowOutput> => {
     const startTime = Date.now();
     const results: { [key: string]: unknown } = {};
-    const errors: Array<{ step: string; error: string }> = [];
+    const errors: Array<{ step: string; error, string }> = [];
     let success = true;
 
     try {

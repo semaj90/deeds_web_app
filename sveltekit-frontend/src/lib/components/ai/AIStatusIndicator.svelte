@@ -31,7 +31,7 @@
 
 <div
   class="ai-status-indicator"
-  class:error={isErrorState}; class:loading={isLoadingState}; class:ready={isReadyState}
+  class:error={isErrorState}; class:loading={isLoadingState}; class, ready={isReadyState}
   style="color, {statusColor}"
   role="status"
   aria-live="polite"

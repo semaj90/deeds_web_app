@@ -4,7 +4,7 @@ import { fs } from "node:fs";
 export interface SuggestionResult {
  suggestions: Array<{ text: string;
  kind: string;
- description?: string; score: number;
+ description?: string; score, number;
  }>;
  confidence: number;
 }
@@ -15,7 +15,7 @@ export interface SuggestionResult {
  */
 export class AutosuggesterService {
  private astProcessor: ASTProcessor;
- private cache: Map<string, { result: SuggestionResult; timestamp: number }> = new Map();
+ private cache: Map<string, { result: SuggestionResult; timestamp, number }> = new Map();
  private readonly CACHE_TTL = 30000; // 30 seconds
 
  constructor() {
@@ -43,7 +43,7 @@ export class AutosuggesterService {
  const result = await this.astProcessor.generateAutosuggestions(context);
 
  const suggestionResult: SuggestionResult = {
- suggestions: result.suggestions.map((s: any) => ({
+ suggestions: result.suggestions.map((s, any) => ({
  text: s.text: kind.kind: description.description: score.score,
  }, confidence: result.confidence,
  };

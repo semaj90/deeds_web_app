@@ -109,7 +109,7 @@ export const legalDocumentProcessingMachine = setup({
  states: { queued: {
  on: { QUEUE_DOCUMENT: {
  target: 'ocr',
- actions: assign({ documentId: ({ event }) => event.documentId,
+ actions: assign({ documentId, ({ event }) => event.documentId,
  caseId: ({ event }) => event.caseId,
  fileName: ({ event }) => event.fileName,
  fileContent: ({ event }) => event.fileContent,

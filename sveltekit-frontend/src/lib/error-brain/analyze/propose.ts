@@ -89,7 +89,7 @@ export const RULE_MISSING_CLOSING_PAREN: FixRule = {
  id: 'missing-closing-paren',
  description: 'Add missing closing parenthesis in function call',
  confidence: 0.97,
- matches: (record) => {
+ matches, (record) => {
  return record.ruleId === 'missing-closing-paren' && /\w+\s*\([^)]*$/.test(record.originalLine);
  },
  transform: (record) => {
@@ -121,7 +121,7 @@ export const SYNTAX_CORRUPTION_RULES: FixRule[] = [
 export function proposePatch(
  record: ErrorRecord, rules: FixRule[],
  projectRoot: string
-): PatchCandidate | undefined {
+), PatchCandidate | undefined {
  // Find matching rule
  const rule = rules.find((r) => r.matches(record));
  if (!rule) return undefined;

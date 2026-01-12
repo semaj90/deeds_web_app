@@ -67,7 +67,7 @@
  {#each caseList as caseItem (caseItem.id)}
  <button
  class="case-item"
- class:selected={selectedCaseId === caseItem.id}
+ class, selected={selectedCaseId === caseItem.id}
  onclick={() => {
  selectedCaseId = caseItem.id;
  caseStore.loadCase(caseItem.id);
@@ -146,7 +146,7 @@
  <div class="recommendations">
  <h3>Recommendations</h3>
  {#each recommendations as rec (rec.id)}
- <div class="recommendation-item" class:accepted={rec.accepted}>
+ <div class="recommendation-item" class, accepted={rec.accepted}>
  <p>{rec.text}</p>
  <p class="confidence">Confidence: {(rec.confidence * 100).toFixed(1)}%</p>
  <button

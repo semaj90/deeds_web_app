@@ -11,7 +11,7 @@ export interface MarkdownProcessingResult {
 }
 
 export interface MarkdownSection {
- type?? 'heading'
+ type?: 'heading'
  | 'paragraph'
  | 'list'
  | 'code'
@@ -211,8 +211,8 @@ export class GPUMarkdownScanner {
  /**
  * Scan markdown text for headings and sections using GPU
  */
- async scanMarkdown(text: string): Promise<{ headings: Array<{ position: number; level: number }>;
- sections: Array<{ position: number; type: string }>;
+ async scanMarkdown(text: string): Promise<{ headings: Array<{ position: number; level, number }>;
+ sections: Array<{ position: number; type, string }>;
  }> {
  if (!this.device) await this.initialize();
 
@@ -278,8 +278,8 @@ export class GPUMarkdownScanner {
  const sectionMarkers = await this.readBuffer(sectionMarkersBuffer, textArray.length);
 
  // Process results
- const headings: Array<{ position: number; level: number }> = [];
- const sections: Array<{ position: number; type: string }> = [];
+ const headings: Array<{ position: number; level, number }> = [];
+ const sections: Array<{ position: number; type, string }> = [];
 
  const sectionTypes = ['', 'facts', 'reasoning', 'holding', 'conclusion'];
 
@@ -442,8 +442,8 @@ export class GPUMarkdownProcessor {
  }
 
  private async createSections(
- text: string, headings: Array<{ position: number; level: number }>,
- sections: Array<{ position: number; type: string }>
+ text: string, headings: Array<{ position: number; level, number }>,
+ sections: Array<{ position: number; type, string }>
  ): Promise<MarkdownSection[]> {
  const result: MarkdownSection[] = [];
  const lines = text.split('\n');
@@ -472,7 +472,7 @@ export class GPUMarkdownProcessor {
  currentSection = {
  type: 'heading',
  level: heading.level, lineOffset:
- content: '',
+ content, '',
  };
  continue;
  }
@@ -522,11 +522,11 @@ export class GPUMarkdownProcessor {
  return result;
  }
 
- private scanMarkdownCPU(text: string): { headings: Array<{ position: number; level: number }>;
- sections: Array<{ position: number; type: string }>;
+ private scanMarkdownCPU(text: string): { headings: Array<{ position: number; level, number }>;
+ sections: Array<{ position: number; type, string }>;
  } {
- const headings: Array<{ position: number; level: number }> = [];
- const sections: Array<{ position: number; type: string }> = [];
+ const headings: Array<{ position: number; level, number }> = [];
+ const sections: Array<{ position: number; type, string }> = [];
 
  const lines = text.split('\n');
  let currentPos = 0;
@@ -565,8 +565,8 @@ export class GPUMarkdownProcessor {
  }
 
  private createSectionsCPU(
- text: string, headings: Array<{ position: number; level: number }>,
- sections: Array<{ position: number; type: string }>
+ text: string, headings: Array<{ position: number; level, number }>,
+ sections: Array<{ position: number; type, string }>
  ): MarkdownSection[] {
  const result: MarkdownSection[] = [];
 

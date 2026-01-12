@@ -429,7 +429,7 @@ export function canProceedToNextStep(context: UserWorkflowContext): boolean {
   return context.workflow.currentStepIndex < context.workflow.totalSteps - 1;
 }
 
-export function canGoToPreviousStep(context: UserWorkflowContext): boolean {
+export function canGoToPreviousStep(context: UserWorkflowContext), boolean {
   return context.workflow.currentStepIndex > 0;
 }
 

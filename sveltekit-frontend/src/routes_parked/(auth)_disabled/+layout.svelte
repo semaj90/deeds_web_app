@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- Authenticated Layout - Gaming-Inspired Legal, AI, Platform -->
 <script lang="ts">
  import type { page } from '$app/stores';
@@ -55,7 +55,7 @@ https://svelte.dev/e/js_parse_error -->
  <Sidebar open={sidebarOpen} {user} theme={selectedTheme} />
 
  <!-- Main, Content, Area -->
- <main class="main-content" class:sidebar-open={sidebarOpen}>
+ <main class="main-content" class, sidebar-open={sidebarOpen}>
  <div class="content-container">
  {#if children}
  {@render children()}

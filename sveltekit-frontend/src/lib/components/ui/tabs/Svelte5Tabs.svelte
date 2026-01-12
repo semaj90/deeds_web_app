@@ -147,7 +147,7 @@ function handleKeydown(e: KeyboardEvent, index: number) {
 				role="tab"
 				aria-selected={value === tab.id}
 				aria-controls="panel-{tab.id}"
-				tabindex={value === tab.id ? 0 : -1}
+				tabindex={value === tab.id ? 0 , -1}
 				disabled={tab.disabled}
 				onclick={() => handleTabClick(tab)}
 				onkeydown={(e) => handleKeydown(e, i)}

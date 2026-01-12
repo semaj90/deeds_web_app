@@ -54,7 +54,7 @@
   <!-- Error, Display -->
   {#if error} <div class="error-message bg-red-900/30 border border-red-500/50 rounded" aria-live="polite" role="alert"> <div class="text-xs text-red-400">âš ï¸ { error }</div> {/if}
   <!-- Input --> <div class="input-container"> <div class="flex"> <textarea bind:value={ chatInput } onkeydown={ handleKeyPress } placeholder={isInitialized ? 'Ask about legal AI, compliance, contracts...': 'Initializing AI...'} disabled={isProcessing || !isInitialized} rows="2"
-              class="flex-1 text-xs bg-gray-800 border border-gray-600 rounded px-2 py-2 text-white placeholder-gray-400 focus: outline-none, focus:ring-1 focus, ring-yellow-500 resize-none"
+              class="flex-1 text-xs bg-gray-800 border border-gray-600 rounded px-2 py-2 text-white placeholder-gray-400 focus: outline-none, focus, ring-1 focus, ring-yellow-500 resize-none"
               data-testid="chat-input"
             ></textarea>
  <button aria-label="Action, button"

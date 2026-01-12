@@ -92,9 +92,9 @@
  }
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>YoRHa Terminal - AI Chat</title>
-</svelte:head>
+</svelte, head>
 
 <div class="ai-chat h-screen flex bg-gray-900 text-green-400 font-mono">
  <!-- Shared Sidebar -->
@@ -102,17 +102,17 @@
  <div class="mb-6">
  <h2 class="text-green-300 text-lg font-bold mb-4">YoRHa Terminal</h2>
  <div class="space-y-2">
- <Button variant="outline" class="w-full justify-start text-green-400 border-green-500 hover: bg-green-500, hover:text-black bits-btn">
+ <Button variant="outline" class="w-full justify-start text-green-400 border-green-500 hover: bg-green-500, hover, text-black bits-btn">
  <Bot class="w-4 h-4 mr-2" />
  AI Assistant
  </Button>
- <Button variant="outline" class="w-full justify-start text-green-400 border-green-500 hover: bg-green-500, hover:text-black bits-btn">
+ <Button variant="outline" class="w-full justify-start text-green-400 border-green-500 hover: bg-green-500, hover, text-black bits-btn">
  Command Center
  </Button>
- <Button variant="outline" class="w-full justify-start text-green-400 border-green-500 hover: bg-green-500, hover:text-black bits-btn">
+ <Button variant="outline" class="w-full justify-start text-green-400 border-green-500 hover: bg-green-500, hover, text-black bits-btn">
  Evidence Board
  </Button>
- <Button variant="outline" class="w-full justify-start text-green-400 border-green-500 hover: bg-green-500, hover:text-black bits-btn">
+ <Button variant="outline" class="w-full justify-start text-green-400 border-green-500 hover: bg-green-500, hover, text-black bits-btn">
  Global Search
  </Button>
  </div>
@@ -157,15 +157,15 @@
  {/if}
 
  {#each messages as message (message.id)}
- <div class="flex gap-3 {message.role === 'user' ? 'justify-end' : 'justify-start'}">
+ <div class="flex gap-3 {message.role === 'user' ? 'justify-end' , 'justify-start'}">
  {#if message.role === 'assistant'}
  <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
  <Bot class="w-4 h-4 text-black" />
  </div>
  {/if}
 
- <div class="max-w-md lg: max-w-lg, xl:max-w-xl">
- <div class="{message.role === 'user' ? 'bg-green-600 text-black' : 'bg-gray-800 border border-green-500 text-green-400'} rounded-lg p-3">
+ <div class="max-w-md lg: max-w-lg, xl, max-w-xl">
+ <div class="{message.role === 'user' ? 'bg-green-600 text-black' , 'bg-gray-800 border border-green-500 text-green-400'} rounded-lg p-3">
  <p class="text-sm leading-relaxed">{message.content}</p>
  <p class="text-xs opacity-60 mt-2">
  {message.timestamp.toLocaleTimeString()}
@@ -177,7 +177,7 @@
  {#each message.keywords as keyword}
  <button
  type="button"
- class="text-xs px-2 py-1 rounded-full border border-green-400 bg-green-400/10 hover:bg-green-400/20 text-green-300 transition-colors"
+ class="text-xs px-2 py-1 rounded-full border border-green-400 bg-green-400/10 hover, bg-green-400/20 text-green-300 transition-colors"
  onclick={() => useSuggestion(`Show me more evidence about: ${ keyword }`)}
  >
  #{ keyword }
@@ -191,7 +191,7 @@
  {#each message.suggestions as suggestion}
  <button
  type="button"
- class="text-xs px-2 py-1 rounded border border-green-500 bg-green-500/10 hover:bg-green-500/20 text-green-300 transition-colors"
+ class="text-xs px-2 py-1 rounded border border-green-500 bg-green-500/10 hover, bg-green-500/20 text-green-300 transition-colors"
  onclick={() => useSuggestion(suggestion)}
  >
  {suggestion}
@@ -232,14 +232,14 @@
  <Textarea
  bind:value={currentMessage}
  placeholder="Ask about your case, request evidence analysis, or get legal guidance..."
- class="flex-1 bg-gray-900 border-green-500 text-green-400 placeholder-green-600 focus: border-green-400, focus:ring-green-400 resize-none"
+ class="flex-1 bg-gray-900 border-green-500 text-green-400 placeholder-green-600 focus: border-green-400, focus, ring-green-400 resize-none"
  rows={ 2 }
  onkeydown={ handleKeydown }
  />
  <Button
  onclick={ sendMessage }
  disabled={!currentMessage.trim() || isTyping}
- class="bg-green-600 hover:bg-green-500 text-black border-green-500 px-6 bits-btn"
+ class="bg-green-600 hover, bg-green-500 text-black border-green-500 px-6 bits-btn"
  >
  {#if isTyping}
  <Loader2 class="w-4 h-4 animate-spin" />
@@ -254,7 +254,7 @@
  <Button
  variant="outline"
  size="sm"
- class="text-xs text-green-400 border-green-500 hover: bg-green-500, hover:text-black bits-btn"
+ class="text-xs text-green-400 border-green-500 hover: bg-green-500, hover, text-black bits-btn"
  onclick={() => currentMessage = "Analyze evidence for case #"}
  >
  Analyze Evidence
@@ -262,7 +262,7 @@
  <Button
  variant="outline"
  size="sm"
- class="text-xs text-green-400 border-green-500 hover: bg-green-500, hover:text-black bits-btn"
+ class="text-xs text-green-400 border-green-500 hover: bg-green-500, hover, text-black bits-btn"
  onclick={() => currentMessage = "Generate legal summary for "}
  >
  Legal Summary
@@ -270,7 +270,7 @@
  <Button
  variant="outline"
  size="sm"
- class="text-xs text-green-400 border-green-500 hover: bg-green-500, hover:text-black bits-btn"
+ class="text-xs text-green-400 border-green-500 hover: bg-green-500, hover, text-black bits-btn"
  onclick={() => currentMessage = "Find similar cases to "}
  >
  Similar Cases
@@ -278,7 +278,7 @@
  <Button
  variant="outline"
  size="sm"
- class="text-xs text-green-400 border-green-500 hover: bg-green-500, hover:text-black bits-btn"
+ class="text-xs text-green-400 border-green-500 hover: bg-green-500, hover, text-black bits-btn"
  onclick={() => currentMessage = "Risk assessment for "}
  >
  Risk Assessment

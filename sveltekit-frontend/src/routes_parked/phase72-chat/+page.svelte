@@ -202,13 +202,13 @@
  <div class="flex-1 overflow-auto space-y-3 p-4">
  {#each messages as msg}
  <div
- class={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+ class={`flex ${msg.role === 'user' ? 'justify-end' , 'justify-start'}`}
  >
  <div
  class={`max-w-md px-4 py-2 rounded-lg ${
  msg.role === 'user'
  ? 'bg-primary text-primary-content'
- : 'bg-base-700 text-neutral-100'
+ , 'bg-base-700 text-neutral-100'
  }`}
  >
  <div class="text-sm whitespace-pre-wrap">{msg.content}</div>
@@ -238,7 +238,7 @@
  <div class="flex gap-2">
  <input
  class="flex-1 input input-bordered input-sm bg-base-700 text-neutral-100 placeholder-neutral-500"
- bind:value={input}
+ bind, value={input}
  placeholder="Ask the Phase 72 agent..."
  onkeydown={(e) => e.key === 'Enter' && !loading && sendMessage()}
  disabled={loading}

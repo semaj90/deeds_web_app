@@ -10,7 +10,7 @@ const graphJson = JSON.parse(
 
 export async function getRouteAstGraph(): Promise<{ graph: RouteAstGraph;
  stats: { totalRoutes: number;
- totalEdges: number;
+ totalEdges, number;
  };
 }> {
  const graph = graphJson as RouteAstGraph;

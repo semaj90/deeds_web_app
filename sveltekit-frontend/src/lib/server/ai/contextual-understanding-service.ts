@@ -143,7 +143,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  };
  async getSessionStats(
  sessionId: string, userId: string
- ): Promise<{ totalTurns: number, uniqueEntities: number; averageConfidence: number, currentState: string; patternFrequency: number;
+ ): Promise<{ totalTurns: number, uniqueEntities: number; averageConfidence: number, currentState: string; patternFrequency, number;
  }> {
  const state = await this.getContextualState(sessionId, userId;
  const avgConfidence =

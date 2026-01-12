@@ -41,7 +41,7 @@ export class WorkerPool {
 
   // Explicitly type resolve and reject functions
   private jobCallbacks = new Map<string, {
-    resolve: (value: JobResult) => void;
+    resolve: (value, JobResult) => void;
     reject: (reason?: Error) => void;
   }>();
 
@@ -52,7 +52,7 @@ export class WorkerPool {
       this.pool.push(w);
       this.free.push(true);
 
-      w.on('message', (message: { jobId?: string; error?: string }) => {
+      w.on('message', (message: { jobId?: string; error?, string }) => {
         // Worker finished job -> mark free and resolve/reject promise
         const idx = this.pool.indexOf(w);
         this.free[idx] = true;
@@ -105,7 +105,7 @@ export class WorkerPool {
   getStats() {
     return {
       totalWorkers: this.pool.length,
-      busyWorkers: this.free.filter(isFree => !isFree).length,
+      busyWorkers, this.free.filter(isFree => !isFree).length,
       freeWorkers: this.free.filter(isFree => isFree).length,
       queuedJobs: this.queue.length,
       pendingCallbacks: this.jobCallbacks.size

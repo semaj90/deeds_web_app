@@ -10,7 +10,7 @@ class RateLimiter { private limits = new Map<string, RateLimitEntry>(); private 
 }
 
 class ChatRateLimiter {
- private requests: Map<string, { count: number; resetTime: number }> = new Map();
+ private requests: Map<string, { count: number; resetTime, number }> = new Map();
  private limit = 10; // requests per window
  private windowMs = 60 * 1000; // 1 minute
 

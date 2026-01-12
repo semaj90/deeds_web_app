@@ -218,7 +218,7 @@ export class CacheService {
  async getStats(): Promise<{ summaries: number;
  similarCases: number; ragResults: number;
  citations: number; statutes: number;
- total: number;
+ total, number;
  }> {
  try {
  const stats = {

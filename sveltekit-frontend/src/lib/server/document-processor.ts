@@ -24,14 +24,14 @@ export interface DocumentProcessingResult {
  layout?: { regions: Array<{
  type: string; bbox: number[];
  confidence: number;
- text?: string;
+ text?, string;
  }>;
  };
  objects?: Array<{ class: string;
- bbox: number[]; confidence: number;
+ bbox: number[]; confidence, number;
  }>;
  classifications?: Array<{ class: string;
- confidence: number;
+ confidence, number;
  }>;
  faces?: Array<{ bbox: number[];
  age?: { min: number; max: number };
@@ -39,11 +39,11 @@ export interface DocumentProcessingResult {
  emotions?: Record<string, number>;
  }>;
  tables?: Array<{ content: string[][];
- bbox?: number[];
+ bbox?, number[];
  }>;
  images?: Array<{ content: Buffer;
  bbox?: number[];
- caption?: string;
+ caption?, string;
  }>;
  method: string; engines: string[];
 }
@@ -232,7 +232,7 @@ export class DocumentProcessor {
  // For speed priority, use fastest result
  if (priority === 'speed') {
  const fastest = results.reduce((prev, curr) =>
- (prev.metadata?.processingTime ?? 0) < (curr.metadata?.processingTime ?? 0) ? prev : curr
+ (prev.metadata?.processingTime ?? 0) < (curr.metadata?.processingTime ?? 0) ? prev , curr
  );
  return fastest as DocumentProcessingResult;
  }

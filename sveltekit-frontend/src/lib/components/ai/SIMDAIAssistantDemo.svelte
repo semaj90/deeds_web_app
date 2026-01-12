@@ -87,7 +87,7 @@
 </Button> </div> </div>
  <!-- Query, Input --> <div class="space-y-2"> <div class="flex"> <input type="text"
             bind:value={ queryInput } placeholder="Enter your legal AI query..."
-            class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus, ring-blue-500"
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus, ring-2 focus, ring-blue-500"
             disabled={ isProcessing } onkeydown={(e) => e.key === 'Enter' && submitQuery()} /> <Button onclick={ submitQuery } disabled={isProcessing || !queryInput.trim()} class={isProcessing ? 'processing', ''} >
             {isProcessing ? 'Processing...': 'Submit'}
 </Button> </div>
@@ -111,7 +111,7 @@
  <div class="text-sm">Total Time</div> </div> </div>
  <!-- Compressed Tiles, Visualization -->
   {#if (simdResults.compressed_tiles?.length ?? 0) > 0} <div class="space-y-2"> <h4 class="font-medium">Compressed Tiles (7-bit encoding):</h4>
- <div class="grid grid-cols-2 md:grid-cols-4 lg, grid-cols-6">
+ <div class="grid grid-cols-2 md, grid-cols-4 lg, grid-cols-6">
   {#each (simdResults.compressed_tiles ?? []).slice(0, 12) as tile, index} <div class="bg-gray-800 text-white p-2 rounded"> <div class="flex justify-between items-center"> <span>#{index + 1}
 </span>
  <span class="text-green-400">{(tile.compression_ratio ?? 0).toFixed(0)}:1</span> </div>

@@ -325,7 +325,7 @@ describe('ErrorHandler', () => {
  });
  });
 
- describe('Property: Input Validation Consistency', () => {
+ describe('Property, Input Validation Consistency', () => {
  it('validation should be consistent for same input', async () => {
  await fc.assert(
  fc.asyncProperty(

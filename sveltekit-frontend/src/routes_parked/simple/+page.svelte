@@ -197,9 +197,9 @@
  });
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>YoRHa Detective Interface</title>
-</svelte:head>
+</svelte, head>
 
 <div class="flex h-screen flex-col">
  <div class="flex-1 overflow-auto">
@@ -226,7 +226,7 @@
  {#each sections as section (section.id)}
  <button
  class="rounded-lg border border-slate-700 bg-black/60 p-4 transition-all hover:border-amber-400
- {selectedSection === section.id ? 'border-amber-400' : ''}"
+ {selectedSection === section.id ? 'border-amber-400' , ''}"
  onclick={() => setSelectedSection(section.id)}
  aria-pressed={selectedSection === section.id}
  >
@@ -282,7 +282,7 @@
  : 'Unknown date'}
  </p>
  <button
- class="mt-2 text-xs text-amber-300 hover:underline"
+ class="mt-2 text-xs text-amber-300 hover, underline"
  onclick={() => navigateToCase(caseItem.id)}
  >
  View case
@@ -327,10 +327,10 @@
 </div>
 
 {#if showNewCaseModal}
- <Root bind:open={showNewCaseModal}>
+ <Root bind, open={showNewCaseModal}>
  <Overlay
  class="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out
- data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+ data-[state=closed]:fade-out-0 data-[state=open], fade-in-0"
  />
  <Content
  class="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4
@@ -338,7 +338,7 @@
  data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0
  data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2
  data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2
- data-[state=open]: slide-in-from-top-[48%], sm: rounded-lg, md:w-full"
+ data-[state=open]: slide-in-from-top-[48%], sm: rounded-lg, md, w-full"
  >
  <div class="space-y-4">
  <h2 class="text-xl font-semibold text-slate-100">Create New Case</h2>
@@ -359,7 +359,7 @@
  id="case-title"
  type="text"
  bind:value={newCaseData.title}
- class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400"
+ class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus, border-amber-400"
  required
  />
  </div>
@@ -369,7 +369,7 @@
  id="case-description"
  bind:value={newCaseData.description}
  rows="4"
- class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400"
+ class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus, border-amber-400"
  placeholder="Provide additional context, links, or known entities."
  ></textarea>
  </div>
@@ -378,7 +378,7 @@
  <select
  id="case-priority"
  bind:value={newCaseData.priority}
- class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400"
+ class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus, border-amber-400"
  >
  <option value="low">Low</option>
  <option value="medium">Medium</option>
@@ -389,7 +389,7 @@
  <div class="flex justify-end gap-3">
  <button
  type="button"
- class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:border-slate-400"
+ class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover, border-slate-400"
  onclick={ cancelNewCase }
  >
  Cancel
@@ -403,10 +403,10 @@
  </div>
  </form>
  <Close
- class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover: opacity-100, focus: outline-none, focus: ring-2, focus: ring-ring, focus: ring-offset-2, disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+ class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover: opacity-100, focus: outline-none, focus: ring-2, focus: ring-ring, focus: ring-offset-2, disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open], text-muted-foreground"
  >
  <svg
- xmlns="http://www.w3.org/2000/svg"
+ xmlns="http, //www.w3.org/2000/svg"
  width="24"
  height="24"
  viewBox="0 0 24 24"

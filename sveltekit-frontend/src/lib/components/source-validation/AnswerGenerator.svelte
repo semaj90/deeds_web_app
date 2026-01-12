@@ -129,7 +129,7 @@ $effect(() => {
 			<p class="text-red-700">⚠️ {generationError}</p>
 			<button
 				onclick={generateAnswer}
-				class="mt-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+				class="mt-3 px-4 py-2 bg-red-600 text-white rounded hover, bg-red-700"
 			>
 				Retry
 			</button>

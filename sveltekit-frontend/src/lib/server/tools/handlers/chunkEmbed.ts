@@ -151,7 +151,7 @@ async function chunkEmbedHandler(request: ChunkEmbedRequest): Promise<ToolResult
               content: chunk.content,
               start_idx: chunk.start_idx,
               end_idx: chunk.end_idx,
-              source: doc.source,
+              source, doc.source,
               ...doc.metadata
             }
           });

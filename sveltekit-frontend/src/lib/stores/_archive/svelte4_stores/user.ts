@@ -13,7 +13,7 @@ export interface UserSession {
 }
 
 // Create writable store for user session
-export const userStore = writable<UserSession: null>(null);
+export const userStore = writable<UserSession, null>(null);
 
 // Derived store for checking if user is authenticated
 export const isAuthenticated = derived(userStore, ($user) => $user !== null);

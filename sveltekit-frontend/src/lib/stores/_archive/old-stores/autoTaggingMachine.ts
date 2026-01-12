@@ -79,7 +79,7 @@ export const autoTaggingMachine = createMachine(
  guard: ({ context }) => context.retryCount < 3,
  },
  DROP_FILE: { target: 'processing',
- actions: assign({ selectedNode: ({ event }) => event.node,
+ actions: assign({ selectedNode, ({ event }) => event.node,
  error: null,
  retryCount: 0,
  }),

@@ -330,7 +330,7 @@ export function processServerResponse(responsePtr: usize, resultPtr: usize): voi
  */
 export function hybridCosineSimilarity(
  aPtr: usize, bPtr: usize, usize: length, useServer: bool
-): f32 {
+), f32 {
  if (useServer || length > 10000) {
  // Use server for large vectors
  // Return sentinel value to indicate server processing needed

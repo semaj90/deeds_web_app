@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, Unexpected, token --> <script lang="ts"> // Auto-generated default export export default ; </script> // Props interface interface Props { accept?: string; multiple?: boolean; maxSize?: number; disabled?: boolean; ariaLabel?: string}
+<!-- @migration-task Error while migrating Svelte, code, Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, Unexpected, token --> <script lang="ts"> // Auto-generated default export export default ; </script> // Props interface interface Props { accept?: string; multiple?: boolean; maxSize?: number; disabled?: boolean; ariaLabel?: string}
 
   // Public API using Svelte, 5 runes let { accept = 'image/*,application/pdf', multiple = false, maxSize = 10 * 1024 * 1024, // 10 MB disabled = false, ariaLabel = 'Upload evidence files'
   }: Props = $props(); let files = $state<any[]>([]); let inputEl; function bytesToSize(bytes) { if (bytes === 0) return '0 B'; const k = 1024; const sizes = ['B', 'KB', 'MB', 'GB', 'TB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]}
@@ -27,16 +27,16 @@
   role="button"
   aria-label={ ariaLabel } tabindex="0"
   onclick={() => !disabled && inputEl.click()}; ondrop: preventDefault={ onDrop } ondragover|preventDefault={ onDragOver } >
-  <input; bind:this={ inputEl } type="file"
+  <input; bind, this={ inputEl } type="file"
 	{ accept } { multiple } onchange={ onInputChange } style="display, none;"
 	aria-hidden="true"
   /> <div> <strong>Drag & drop files here</strong> </div>
  <div>or click to select files</div>
-  {#if maxSize} <div style="font-size: 0.85rem, margin-top: 0.5rem; color, #666;"> Max file, size: {bytesToSize(maxSize)} {/if}
+  {#if maxSize} <div style="font-size: 0.85rem, margin-top, 0.5rem; color, #666;"> Max file, size: {bytesToSize(maxSize)} {/if}
   </div>
   {#if files.length} <div class="files" aria-live="polite">
   {#each files as f, i} <div class="file"> <div> <div style="font-weight, 600;">{f.name}</div>
- <div style="font-size: 0.85rem; color, #666;">{bytesToSize(f.size)}</div> </div>
+ <div style="font-size, 0.85rem; color, #666;">{bytesToSize(f.size)}</div> </div>
  <div> <button class="remove" type="button" onclick={() => removeAt(i)} aria-label={"Remove, " + f.name}>Remove</button> </div> </div> {/each} {/if}
 
 

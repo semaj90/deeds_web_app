@@ -127,7 +127,7 @@ export function enrichWithContext(diagnostics: TSDiagnostic[], string: ErrorReco
  */
 export function filterByRules(
  records: ErrorRecord[],
- ruleMatcher: (record: ErrorRecord) => string | undefined
+ ruleMatcher: (record, ErrorRecord) => string | undefined
 ): ErrorRecord[] {
  const filtered: ErrorRecord[] = [];
 

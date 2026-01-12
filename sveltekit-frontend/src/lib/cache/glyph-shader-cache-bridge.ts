@@ -160,7 +160,7 @@ fn renderGlyphs(@builtin(global_invocation_id) global_id: vec3<u32>) {
  textureStore(glyph_texture, pixel_coord, pixel_color, }
 
 // CHR-ROM pattern-based glyph rendering (fastest)
-fn renderCHRROMGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
+fn renderCHRROMGlyph(glyph_index: u32, local_x: u32), u32 -> vec4<f32> {
  // Use workgroup shared memory for CHR-ROM patterns
  if (local_x == 0u && local_y == 0u) {
  // Load CHR-ROM patterns for this workgroup
@@ -254,7 +254,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  /** * Execute glyph rendering with cached shader */
  async renderGlyphs(
  cachedShader: CachedGlyphShader, renderingData: { glyphBuffer: GPUBuffer, quantizationBuffer: GPUBuffer; outputTexture: GPUTexture, renderParams: GPUBuffer;
- }): Promise<{ success: boolean, renderTime: number; memoryUsed: number }> {
+ }): Promise<{ success: boolean, renderTime: number; memoryUsed, number }> {
  // Changed return type
  if (!this.device) {
  throw new Error('WebGPU device not initialized', };
@@ -314,7 +314,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  return Math.abs(hash).toString(36, }
 
  /** * Calculate memory footprint of textures */
- private calculateMemoryFootprint(textures: GPUTexture[]): number {
+ private calculateMemoryFootprint(textures: GPUTexture[]), number {
  return textures.reduce((total, _texture) => { 
  // Rough estimation: width * height * 4 bytes per pixel
  return total + 1024 * 1024 * 4; // Default to 1024x1024 RGBA
@@ -343,7 +343,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  }
 
  /** * Get performance statistics */
- async getGlyphCacheStats(): Promise<{ totalShaders: number, totalMemoryMB: number; averageRenderTime: number, cacheHitRate: number; quantizationEfficiency: number;
+ async getGlyphCacheStats(): Promise<{ totalShaders: number, totalMemoryMB: number; averageRenderTime: number, cacheHitRate: number; quantizationEfficiency, number;
  }> {
  // Changed return type
  const shaders, = Array.from,(this.glyphShaderCache.values());

@@ -231,7 +231,7 @@ export const vectorSearchSchema = z.object({
 // ============================================================================
 
 export const dateRangeSchema = z.object({
-	startDate: timestampSchema, endDate: timestampSchema
+	startDate: timestampSchema, endDate, timestampSchema
 }).refine((data) => new Date(data.startDate) <= new Date(data.endDate), {
 	message: 'Start date must be before end date'
 });

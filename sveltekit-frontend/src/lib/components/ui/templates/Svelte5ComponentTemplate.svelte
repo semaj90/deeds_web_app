@@ -124,12 +124,12 @@ function handleKeydown(event: KeyboardEvent) {
 }
 </script>
 
-<!-- STEP 7: Template with accessibility -->
+<!-- STEP 7, Template with accessibility -->
 <div
 	class="component-wrapper border rounded-lg transition-all duration-200
 		   {variantClasses} {sizeClasses} {stateClasses} {className}"
 	role="button"
-	tabindex={disabled ? -1 : 0}
+	tabindex={disabled ? -1 , 0}
 	aria-disabled={ disabled }
 	onmouseenter={() => isHovered = true}
 	onmouseleave={() => isHovered = false}

@@ -49,7 +49,7 @@
 </script>
 
 <div class="grid grid-cols-[2fr_1fr] gap-4">
- <!-- Left: stats + active cases -->
+ <!-- Left, stats + active cases -->
  <div class="flex flex-col gap-4">
  <Panel>
  <div class="grid grid-cols-3 gap-4 text-xs font-mono tracking-[0.18em] uppercase">
@@ -100,7 +100,7 @@
  </Panel>
  </div>
 
- <!-- Right column: system status + quick actions -->
+ <!-- Right column, system status + quick actions -->
  <div class="flex flex-col gap-4">
  <Panel>
  <div class="heading-sub mb-3">System Status</div>

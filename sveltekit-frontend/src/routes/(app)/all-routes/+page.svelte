@@ -210,7 +210,7 @@
 			<h2>Routes ({routes.length})</h2>
 			<ul>
 				{#each routes.slice(0, 10) as route}
-					<li class="route-item" class:has-errors={route.errorCount && route.errorCount > 0}>
+					<li class="route-item" class, has-errors={route.errorCount && route.errorCount > 0}>
 						<button
 							class="route-info-btn"
 							onclick={() => handleRouteView(route.id)}
@@ -234,17 +234,17 @@
 						</button>
 						<div class="route-actions">
 							{#if route.errorCount}
-								<span class="error-badge" title={`${route.errorCount} error${route.errorCount !== 1 ? 's' : ''}`}>
+								<span class="error-badge" title={`${route.errorCount} error${route.errorCount !== 1 ? 's' , ''}`}>
 									{route.errorCount} error{route.errorCount !== 1 ? 's' : ''}
 								</span>
 							{/if}
 							{#if route.warningCount}
-								<span class="warning-badge" title={`${route.warningCount} warning${route.warningCount !== 1 ? 's' : ''}`}>
+								<span class="warning-badge" title={`${route.warningCount} warning${route.warningCount !== 1 ? 's' , ''}`}>
 									{route.warningCount} warning{route.warningCount !== 1 ? 's' : ''}
 								</span>
 							{/if}
 							{#if route.errorState}
-								<span class="health-indicator" title={`Health: ${route.errorState}`}>
+								<span class="health-indicator" title={`Health, ${route.errorState}`}>
 									{route.errorState === 'healthy' ? '✅' : route.errorState === 'flaky' ? '🟡' : '❌'}
 								</span>
 							{/if}

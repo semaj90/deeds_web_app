@@ -62,7 +62,7 @@ declare global {
 }
 
 export interface OCRResult {
- text: string, confidence: number; boundingBoxes: Array<{ text: string, bbox: BBox; confidence: number }>;
+ text: string, confidence: number; boundingBoxes: Array<{ text: string, bbox: BBox; confidence, number }>;
 }
 
 export interface TensorData {
@@ -160,7 +160,7 @@ export class OCRTensorProcessor {
  console.log(`ðŸŽ® LOD Level set to: ${this.currentLODLevel}`);
  }
 
- private updateMemoryPressure(): void {
+ private updateMemoryPressure(), void {
  const memoryInfo = performance.memory;
  if (memoryInfo) {
  this.memoryPressure = memoryInfo.usedJSHeapSize / memoryInfo.totalJSHeapSize;
@@ -342,7 +342,7 @@ const recognize = tesseractInstance.recognize.bind(tesseractInstance);
  fallback?: string[];
  useCrewAI?: boolean;
  parallelism?: number;
- cacheSize?: number;
+ cacheSize?, number;
  }> {
  try {
  // Check Ollama GPU memory availability and status
@@ -362,7 +362,7 @@ const recognize = tesseractInstance.recognize.bind(tesseractInstance);
  fallback: ['nomic-embed-text', 'client-autogen'],
  useCrewAI: false,
  parallelism: 4,
- cacheSize: 128
+ cacheSize, 128
  };
  }
 
@@ -419,7 +419,7 @@ const recognize = tesseractInstance.recognize.bind(tesseractInstance);
 
  private async generateEmbeddings(
  text: string
- ): Promise<{ embeddings: Float32Array, fromCache: boolean; model: string }> {
+ ): Promise<{ embeddings: Float32Array, fromCache: boolean; model, string }> {
  try {
  // Intelligent model selection based on Ollama GPU memory and system state
  const modelConfig = await this.selectOptimalModel();
@@ -724,7 +724,7 @@ const cleanup = () => {
  return priority;
  }
 
- private calculateAdaptiveDelay(): number {
+ private calculateAdaptiveDelay(), number {
  // Calculate delay based on memory pressure and system load
  if (
  this.memoryPressure >

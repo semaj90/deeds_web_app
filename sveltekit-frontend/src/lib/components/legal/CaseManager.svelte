@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: 'return' outside of, functio, https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, 'return' outside of, function --> <!-- Legal Case Manager Component Bits UI v2 + Svelte, 5 implementation for comprehensive case management Features, CRUD operations, real-time updates, AI integration --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { writable } from 'svelte/store'; // import named UI components (avoid namespace import) import  Dialog  from "$lib/components/ui/Dialog.svelte";
+<!-- @migration-task Error while migrating Svelte code, 'return' outside of, functio, https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, 'return' outside of, function --> <!-- Legal Case Manager Component Bits UI v2 + Svelte, 5 implementation for comprehensive case management Features, CRUD operations, real-time updates, AI integration --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { writable } from 'svelte/store'; // import named UI components (avoid namespace import) import  Dialog  from "$lib/components/ui/Dialog.svelte";
  import  Button, Input, Textarea, Label, Separator  from "$lib/components/ui/enhanced-bits.svelte";
  import * as legalPlatformClient from '$lib/services/legal-platform-client';
  import type { CaseData, ApiResponse } from '$lib/services/legal-platform-client'; // Component state - use Svelte writable stores const cases = writable<CaseData[]>([]);
@@ -85,7 +85,7 @@
 </p> {/if}
   <!-- Loading, State -->
   {#if $loading} <div class="flex justify-center items-center"> <div class="animate-spin rounded-full h-8 w-8 border-b-2"></div> {/if}
-  <!-- Cases, Grid --> <div class="grid grid-cols-1 md:grid-cols-2 lg, grid-cols-3">
+  <!-- Cases, Grid --> <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-3">
   {#each $cases as caseData (caseData.id)} <div class="hover, shadow-lg transition-shadow"> <div class="yorha-panel-header"> <div class="flex justify-between"> <div class="flex-1"> <h3 class="nes-text is-primary text-lg">{caseData.title}
 </h3>
  <p class="text-sm text-gray-500">#{caseData.id?.slice(-8)}

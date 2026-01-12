@@ -155,7 +155,7 @@
 <div class="ace-controls">
 	<header>
 		<h3>🤖 ACE Agent</h3>
-		<div class="status-indicator" class:running={status.running}>
+		<div class="status-indicator" class, running={status.running}>
 			{status.running ? '● Running' : '○ Idle'}
 		</div>
 	</header>
@@ -170,7 +170,7 @@
 				<label for="task-input">Task Description</label>
 				<textarea
 					id="task-input"
-					bind:value={taskInput}
+					bind, value={taskInput}
 					placeholder="E.g., Fix TypeScript 5.6 compatibility issues"
 					rows="3"
 				></textarea>
@@ -179,7 +179,7 @@
 			<div class="form-row">
 				<div class="form-group">
 					<label for="provider-select">LLM Provider</label>
-					<select id="provider-select" bind:value={providerInput}>
+					<select id="provider-select" bind, value={providerInput}>
 						{#each providers as provider}
 							<option value={provider.value}>
 								{provider.label}
@@ -193,7 +193,7 @@
 					<input
 						id="iterations-input"
 						type="number"
-						bind:value={iterationsInput}
+						bind, value={iterationsInput}
 						min="1"
 						max="10"
 					/>
@@ -228,7 +228,7 @@
 			</div>
 
 			<div class="progress-bar">
-				<div class="progress-fill" style="width: {status.progress}%"></div>
+				<div class="progress-fill" style="width, {status.progress}%"></div>
 			</div>
 
 			<div class="action-buttons">

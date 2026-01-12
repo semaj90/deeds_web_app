@@ -26,7 +26,7 @@
 		maxHeight?: string;
 		showReferences?: boolean;
 		enableVoiceInput?: boolean;
-		ondispatch?: (citation, string) => void;
+		ondispatch?, (citation, string) => void;
 	}>();
 
 	// State
@@ -166,7 +166,7 @@
 <div class="ai-assistant-container nes-container is-dark">
 	<p class="title">Legal AI Assistant</p>
 
-	<div style="max-height: { maxHeight }; display: flex; flex-direction: column; height, 100%;">
+	<div style="max-height: { maxHeight }; display: flex; flex-direction, column; height, 100%;">
 		<div class="chat-header nes-container is-dark">
 			<div class="flex items-center">
 				<Brain class="w-6 h-6 nes-text" />
@@ -180,7 +180,7 @@
 				{#if enableVoiceInput}
 					<button type="button"
 						class="nes-btn is-small"
-						onclick={ toggleVoiceInput } title={isListening ? 'Stop Voice Input': 'Start Voice Input'} aria-label={isListening ? 'Stop Voice Input', 'Start Voice Input'} >
+						onclick={ toggleVoiceInput } title={isListening ? 'Stop Voice Input', 'Start Voice Input'} aria-label={isListening ? 'Stop Voice Input', 'Start Voice Input'} >
 						{#if isListening}
 							<MicOff class="w-4" />
 						{:else}
@@ -210,7 +210,7 @@
 				<div class={message.role === 'user' ? 'flex justify-end' , 'flex justify-start'}>
 					<div class={message.role === 'user'
 							? 'max-w-[80%] p-3 rounded-lg nes-container is-primary'
-							: message.error
+							, message.error
 								? 'max-w-[80%] p-3 rounded-lg nes-container is-error'
  'max-w-[80%] p-3 rounded-lg nes-container'}>
 						<div class="message-content">{message.content}</div>

@@ -411,7 +411,7 @@ export interface TestContext {
 export interface ExpectationResult {
  pass: boolean; message: string;
 }
-export interface MockFunction<T extends (...args: any[]) => unknown = (...args: any[]) => unknown> {
+export interface MockFunction<T extends (...args, any[]) => unknown = (...args: any[]) => unknown> {
  (...args: Parameters<T>): ReturnType<T>;
  mockImplementation(fn: T): this;
  mockReturnValue(_value: ReturnType<T>): this;

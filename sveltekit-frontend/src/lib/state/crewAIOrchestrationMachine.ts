@@ -16,7 +16,7 @@ export interface DocumentReviewTask {
 };
 export interface CrewAIContext {
  currentTask: DocumentReviewTask | null;
- taskQueue: DocumentReviewTask[], completedTasks: string[]; activeAgents: string[], agentResponses: AgentResponse[]; failedAgents: string[], currentRecommendations: Array<{ id: string, type: string; text: string, confidence: number; accepted: boolean;
+ taskQueue: DocumentReviewTask[], completedTasks: string[]; activeAgents: string[], agentResponses: AgentResponse[]; failedAgents: string[], currentRecommendations: Array<{ id: string, type: string; text: string, confidence: number; accepted, boolean;
  }>;
  lastSaved: string | null;
  autoSaveInterval: number, lastActivity: string; userIntent: 'editing' | 'reviewing' | 'idle' | 'away';
@@ -175,7 +175,7 @@ export const crewAIOrchestrationMachine = setup({
  : false,
  shouldRetryAgents: (args) =>
  args.context.failedAgents.length > 0 && args.context.retryCount < 3,
- needsAutoSave: (args) => { 
+ needsAutoSave, (args) => { 
  if (!args.context.lastSaved) return true;
  const now = Date.now();
  const lastSaved = new Date(args.context.lastSaved).getTime();
@@ -266,7 +266,7 @@ export const crewAIOrchestrationMachine = setup({
 
  synthesizing_results: { invoke: {
  src: 'generateSelfPrompt',
- input: ({ context }) => ({ context }, onDone: { target: '#crewAIOrchestration.completed',
+ input, ({ context }) => ({ context }, onDone: { target: '#crewAIOrchestration.completed',
  actions: ['assignRecommendations'],
  },
  onError: { target: '#crewAIOrchestration.completed',
@@ -304,7 +304,7 @@ export const crewAIOrchestrationMachine = setup({
  },
  after: { 10000: {
  target: 'orchestrating.starting_agents',
- guard: ({ context }) => context.failedAgents.length > 0 && context.retryCount < 3,
+ guard, ({ context }) => context.failedAgents.length > 0 && context.retryCount < 3,
  actions: ['assignRetryIncrement'],
  },
  },

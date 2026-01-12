@@ -38,7 +38,7 @@
 
 <div class="legal-ai-layout">
  <!-- Sidebar -->
- <aside class="sidebar" class:open={sidebarOpen}>
+ <aside class="sidebar" class, open={sidebarOpen}>
  <div class="sidebar-header">
  <div class="logo">
  <span class="logo-icon">⚖️</span>
@@ -58,7 +58,7 @@
  <a
  href={item.href}
  class="nav-item"
- class:active={$page.url.pathname.startsWith(item.href)}
+ class, active={$page.url.pathname.startsWith(item.href)}
  >
  <span class="nav-icon">{item.icon}</span>
  <span class="nav-label">{item.label}</span>
@@ -68,7 +68,7 @@
 
  <div class="sidebar-footer">
  <div class="system-strip">
- <div class="status-indicator" class:online={systemStatus.online}></div>
+ <div class="status-indicator" class, online={systemStatus.online}></div>
  <span class="status-text">
  {systemStatus.online ? 'Online' : 'Offline'}
  </span>
@@ -132,21 +132,21 @@
  <div class="status-item">
  <span class="status-label">Postgres</span>
  <div class="status-bar">
- <div class="bar-fill" style="width: 65%"></div>
+ <div class="bar-fill" style="width, 65%"></div>
  </div>
  <span class="status-value">6.5 GB</span>
  </div>
  <div class="status-item">
  <span class="status-label">Qdrant Vectors</span>
  <div class="status-bar">
- <div class="bar-fill" style="width: 42%"></div>
+ <div class="bar-fill" style="width, 42%"></div>
  </div>
  <span class="status-value">4.2 GB</span>
  </div>
  <div class="status-item">
  <span class="status-label">Neo4j Graph</span>
  <div class="status-bar">
- <div class="bar-fill" style="width: 28%"></div>
+ <div class="bar-fill" style="width, 28%"></div>
  </div>
  <span class="status-value">2.8 GB</span>
  </div>

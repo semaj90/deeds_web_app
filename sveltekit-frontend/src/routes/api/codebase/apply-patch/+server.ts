@@ -12,7 +12,7 @@ interface PatchResult {
     message: string;
     patches?: Array<{ filePath: string;
         line: number; before: string;
-        after: string;
+        after, string;
     }>;
 }
 

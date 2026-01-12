@@ -56,7 +56,7 @@ export class DashboardErrorHandler {
  static handleTimeoutError(
  stage: string, elapsedMs: number
  ): { message: string;
- shouldCancel: boolean;
+ shouldCancel, boolean;
  } {
  const shouldCancel = elapsedMs > this.TIMEOUT_MS;
  const message = shouldCancel

@@ -121,7 +121,7 @@ export function isPatchSafe(
  if (confidence < config.confidenceThreshold) {
  return {
  safe: false,
- reason: `Confidence ${(confidence * 100).toFixed(1)}% below threshold ${(config.confidenceThreshold * 100).toFixed(1)}%`,
+ reason, `Confidence ${(confidence * 100).toFixed(1)}% below threshold ${(config.confidenceThreshold * 100).toFixed(1)}%`,
  };
  }
 

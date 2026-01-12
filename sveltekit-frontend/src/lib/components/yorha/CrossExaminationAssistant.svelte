@@ -34,7 +34,7 @@ import { createEventDispatcher } from 'svelte';
  let { witness = null, evidence = [], caseContext = '' } = $props<{
  witness?: Witness | null;
  evidence?: Evidence[];
- caseContext?: string;
+ caseContext?, string;
  }>();
 
  const dispatch = createEventDispatcher();
@@ -149,9 +149,9 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  <h2 class="text-xl font-bold text-purple-400">AI-Guided Cross-Examination Assistant</h2>
  </div>
 
- <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+ <div class="grid grid-cols-1 lg, grid-cols-3 gap-6">
  <!-- Input Section -->
- <div class="lg:col-span-1 space-y-6">
+ <div class="lg, col-span-1 space-y-6">
  <!-- Witness Selection -->
  <div>
  <label class="block text-sm font-medium text-slate-300 mb-2">
@@ -195,7 +195,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  <textarea
  bind:value={ caseContext }
  placeholder="Additional context about the case, allegations, or specific areas to focus on..."
- class="w-full h-24 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus: outline-none, focus: ring-2, focus:ring-purple-500 resize-none text-sm"
+ class="w-full h-24 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus: outline-none, focus: ring-2, focus, ring-purple-500 resize-none text-sm"
  ></textarea>
  </div>
 
@@ -219,7 +219,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  <button
  onclick={generateQuestions}
  disabled={isGenerating || !witness}
- class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover: from-purple-500, hover: to-purple-600, disabled: from-slate-600, disabled:to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+ class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover: from-purple-500, hover: to-purple-600, disabled: from-slate-600, disabled, to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
  >
  {#if isGenerating}
  <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -231,7 +231,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  </div>
 
  <!-- Questions Section -->
- <div class="lg:col-span-2 space-y-4">
+ <div class="lg, col-span-2 space-y-4">
  {#if session}
  <!-- Session Header -->
  <div class="bg-slate-800 border border-slate-600 rounded-lg p-4">
@@ -242,14 +242,14 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  <div class="flex gap-2">
  <button
  onclick={exportQuestions}
- class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-sm"
+ class="px-3 py-1 bg-slate-700 hover, bg-slate-600 text-slate-300 rounded text-sm"
  title="Export questions"
  >
  💾
  </button>
  <button
  onclick={ clearSession }
- class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-sm"
+ class="px-3 py-1 bg-slate-700 hover, bg-slate-600 text-slate-300 rounded text-sm"
  title="Clear session"
  >
  🗑️
@@ -272,7 +272,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  <div>
  <label class="block text-xs text-slate-400 mb-1">Type</label>
  <select
- bind:value={selectedQuestionType}
+ bind, value={selectedQuestionType}
  class="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm"
  >
  <option value="all">All Types</option>
@@ -285,7 +285,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  <div>
  <label class="block text-xs text-slate-400 mb-1">Priority</label>
  <select
- bind:value={selectedPriority}
+ bind, value={selectedPriority}
  class="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm"
  >
  <option value="all">All Priorities</option>

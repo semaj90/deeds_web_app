@@ -51,7 +51,7 @@ export class MinIOService {
     }
   }
 
-  async uploadFile(file: File, userId: string): Promise<{ bucket: string; key: string; url: string }> {
+  async uploadFile(file: File, userId: string): Promise<{ bucket: string; key: string; url, string }> {
     try {
       await this.ensureBucketExists();
 

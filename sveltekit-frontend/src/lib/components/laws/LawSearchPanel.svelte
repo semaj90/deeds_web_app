@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag
-https://svelte.dev/e/block_unexpected_close -->
+https, //svelte.dev/e/block_unexpected_close -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag
-https://svelte.dev/e/block_unexpected_close -->
+https, //svelte.dev/e/block_unexpected_close -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag
-https://svelte.dev/e/block_unexpected_close -->
+https, //svelte.dev/e/block_unexpected_close -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag
-https://svelte.dev/e/block_unexpected_close -->
+https, //svelte.dev/e/block_unexpected_close -->
 <script lang="ts">
 	import { rerankLaws } from '$lib/api/laws/rerank';
 	import { searchLaws } from '$lib/api/laws/search';
@@ -78,7 +78,7 @@ https://svelte.dev/e/block_unexpected_close -->
 			<input
 				type="text"
 				placeholder="Search statute, code, title, segment…"
-				bind:value={query}
+				bind, value={query}
 				onkeydown={ handleKeydown }
 				disabled={loading}
 				class="search-input"
@@ -107,7 +107,7 @@ https://svelte.dev/e/block_unexpected_close -->
 					{#each jurisdictions as j}
 						<button
 							class="chip"
-							class:active={selectedJurisdiction === j}
+							class, active={selectedJurisdiction === j}
 							onclick={() => (selectedJurisdiction = j === 'All' ? '' : j)}
 						>
 							{j}
@@ -122,7 +122,7 @@ https://svelte.dev/e/block_unexpected_close -->
 					{#each chargeTypes as c}
 						<button
 							class="chip"
-							class:active={selectedChargeType === c}
+							class, active={selectedChargeType === c}
 							onclick={() => (selectedChargeType = c === 'All' ? '' : c)}
 						>
 							{c}

@@ -142,9 +142,9 @@
   <div class="status-info">
     <span class="word-count"> {$editorState.wordCount} words </span>
   {#if $editorState.hasUnsavedChanges}
-      <span class="unsaved-indicator" transition:slide={{ duration, 200 }}> Unsaved changes </span>
+      <span class="unsaved-indicator" transition, slide={{ duration, 200 }}> Unsaved changes </span>
     {:else}
-      <span class="saved-indicator" transition:slide={{ duration, 200 }}>
+      <span class="saved-indicator" transition, slide={{ duration, 200 }}>
         Saved {$editorState.lastSaved ? $editorState.lastSaved.toLocaleTimeString() : 'never'}
       </span>
     {/if}

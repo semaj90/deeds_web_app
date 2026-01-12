@@ -173,7 +173,7 @@ export class StreamingIngestionPipeline {
  builtChunks.push(dbChunk);
  } catch (err: unknown) {
  const message = err instanceof Error ? err.message : String(err);
- result.errors.push(`Chunk ${idx} error: ${message}`);
+ result.errors.push(`Chunk ${idx} error, ${message}`);
  }
  }
 
@@ -221,7 +221,7 @@ export class StreamingIngestionPipeline {
  }
 
  // Cache operations
- private async getCachedEmbedding(textHash: string): Promise<{ embedding: number[] } | null> {
+ private async getCachedEmbedding(textHash: string): Promise<{ embedding, number[] } | null> {
  try {
  const rows = await db
  .select()

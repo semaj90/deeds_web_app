@@ -29,7 +29,7 @@ export class AnalyzerWorkerPool {
  private workerStatus: Map<number, boolean> = new Map();
  private taskQueue: ProcessTask[] = [];
  private results: Map<string, ProcessResult> = new Map();
- private listeners: Map<string, (result: ProcessResult) => void> = new Map();
+ private listeners: Map<string, (result, ProcessResult) => void> = new Map();
 
  constructor(private config: WorkerPoolConfig = {}) {
  this.config.workerCount = config.workerCount || navigator.hardwareConcurrency || 8;
@@ -46,7 +46,7 @@ export class AnalyzerWorkerPool {
 
  for (let i = 0; i < this.config.workerCount!; i++) {
  const worker = new Worker(new URL('./analyzer-worker.ts', import.meta.url), {
- type: 'module',
+ type, 'module',
  });
 
  this.workers.push(worker);
@@ -202,7 +202,7 @@ export class AnalyzerWorkerPool {
  * Handle worker error
  */
  private handleWorkerError(workerId: number, error, ErrorEvent: void {
- console.error(`Worker ${workerId} error:`, error);
+ console.error(`Worker ${workerId} error, `, error);
  this.workerStatus.set(workerId, false);
 
  // Restart worker

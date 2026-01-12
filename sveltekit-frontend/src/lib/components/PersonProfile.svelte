@@ -25,10 +25,10 @@
 				<p class="text-sm opacity-60">{selectedPerson.alias}</p>
 
 				<div class="flex gap-4 mt-4">
-					<span class="nes-badge {selectedPerson.status.toLowerCase() === 'wanted' ? 'is-error' : selectedPerson.status.toLowerCase() === 'monitoring' ? 'is-warning' : 'is-success'}">
+					<span class="nes-badge {selectedPerson.status.toLowerCase() === 'wanted' ? 'is-error' : selectedPerson.status.toLowerCase() === 'monitoring' ? 'is-warning' , 'is-success'}">
 						{selectedPerson.status}
 					</span>
-					<span class="nes-badge {selectedPerson.priority.toLowerCase() === 'high' ? 'is-error' : selectedPerson.priority.toLowerCase() === 'medium' ? 'is-warning' : 'is-success'}">
+					<span class="nes-badge {selectedPerson.priority.toLowerCase() === 'high' ? 'is-error' : selectedPerson.priority.toLowerCase() === 'medium' ? 'is-warning' , 'is-success'}">
 						{selectedPerson.priority}
 					</span>
 				</div>

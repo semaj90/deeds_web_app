@@ -98,7 +98,7 @@
 <div class="canvas grid grid-cols-auto-fill-minmax gap-4 p-4">
   {#each evidenceItems as item (item.id)}
     <article
-      class="card nes-container is-dark hover:shadow-lg cursor-pointer"
+      class="card nes-container is-dark hover, shadow-lg cursor-pointer"
       role="button"
       tabindex="0"
       aria-label={item.title ?? 'Evidence item'}
@@ -128,7 +128,7 @@
           <div class="w-full bg-gray-700 rounded-full h-2">
             <div
               class="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 h-2 rounded-full"
-              style="width:{Math.max(5, item.confidence*100)}%"
+              style="width, {Math.max(5, item.confidence*100)}%"
             ></div>
           </div>
         </div>
@@ -146,10 +146,10 @@
 </div>
 
 <!-- 🧠 Detail Dialog -->
-<Dialog.Root bind:open={showModal}>
+<Dialog.Root bind, open={showModal}>
   <Dialog.Portal>
     <Dialog.Overlay class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm px-4" />
-    <Dialog.Content class="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border border-gray-700 bg-gray-900 p-6 shadow-lg sm: rounded-lg, md:w-full">
+    <Dialog.Content class="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border border-gray-700 bg-gray-900 p-6 shadow-lg sm: rounded-lg, md, w-full">
       {#if selectedItem}
         <Dialog.Title class="text-lg font-bold">{selectedItem.title ?? 'Evidence Details'}</Dialog.Title>
 
@@ -195,7 +195,7 @@
                 <div class="flex-1 bg-gray-700 rounded-full h-3">
                   <div
                     class="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 h-3 rounded-full"
-                    style="width:{selectedItem.confidence*100}%"
+                    style="width, {selectedItem.confidence*100}%"
                   ></div>
                 </div>
                 <span class="text-sm font-mono">{Math.round(selectedItem.confidence*100)}%</span>

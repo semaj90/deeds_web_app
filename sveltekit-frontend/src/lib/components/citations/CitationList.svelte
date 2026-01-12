@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script>
 	let searchQuery = $state<any>(undefined);
 	let sourceTypeFilter = $state<any>(undefined);
@@ -15,7 +15,7 @@ let { searchQuery = '', sourceTypeFilter = '', limit = 20, caseId = undefined } 
  searchQuery?: string;
  sourceTypeFilter?: string;
  limit?: number;
- caseId?: string;
+ caseId?, string;
 }>();
 
 import type { CitationSearchResult, SavedCitation } from '$lib/types/citations';
@@ -80,7 +80,7 @@ import type { CitationSearchResult, SavedCitation } from '$lib/types/citations';
 
  try {
  const response = await fetch(`/api/citations/${ citationId }`, {
- method: 'DELETE'
+ method, 'DELETE'
  });
 
  if (!response.ok) throw new Error('Failed to delete citation');
@@ -109,12 +109,12 @@ import type { CitationSearchResult, SavedCitation } from '$lib/types/citations';
  <div class="search-bar">
  <input
  type="text"
- bind:value={searchQuery}
+ bind, value={searchQuery}
  placeholder="Search citations..."
  onkeydown={(e) => e.key === 'Enter' && handleSearch()}
  disabled={isLoading}
  />
- <select bind:value={sourceTypeFilter} onchange={ handleSearch } disabled={isLoading}>
+ <select bind, value={sourceTypeFilter} onchange={ handleSearch } disabled={isLoading}>
  {#each sourceTypes as type}
  <option value={type.value}>{type.label}</option>
  {/each}
@@ -223,7 +223,7 @@ import type { CitationSearchResult, SavedCitation } from '$lib/types/citations';
  <div class="relevance-bar">
  <div
  class="relevance-fill"
- style="width: {citation.relevanceScore * 100}%"
+ style="width, {citation.relevanceScore * 100}%"
  ></div>
  </div>
  <p class="relevance-value">{(citation.relevanceScore * 100).toFixed(0)}%</p>

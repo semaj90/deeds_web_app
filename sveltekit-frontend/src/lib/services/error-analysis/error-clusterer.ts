@@ -53,7 +53,7 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
  // Group errors by cluster assignment
  const clusters: Cluster[] = [];
  for (let i = 0; i < k; i++) {
- const clusterErrors = errors.filter((_: any, idx: any) => clusterAssignments[idx] === i);
+ const clusterErrors = errors.filter((_: any, idx, any) => clusterAssignments[idx] === i);
 
  if (clusterErrors.length > 0) {
  const cluster: Cluster = {
@@ -114,7 +114,7 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
 
  while (!converged && iteration < maxIterations) {
  // Assign each point to nearest centroid
- const newAssignments = embeddings.map((embedding: any) => {
+ const newAssignments = embeddings.map((embedding, any) => {
  let minDistance = Infinity;
  let nearestCluster = 0;
 
@@ -135,7 +135,7 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
  // Update centroids
  const newCentroids: number[][] = [];
  for (let i = 0; i < k; i++) {
- const clusterPoints = embeddings.filter((_: any, idx: any) => assignments[idx] === i);
+ const clusterPoints = embeddings.filter((_: any, idx, any) => assignments[idx] === i);
 
  if (clusterPoints.length > 0) {
  const centroid = new Array(dimension).fill(0);

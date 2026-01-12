@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte, code, Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code, Unexpected, token -->
 <script lang="ts">
@@ -50,7 +50,7 @@ https, //svelte.dev/e/js_parse_error -->
   let { width = 800, height = 480 } = $props() as { width?: number; height?: number };
   // replace dispatcher type so `device` can be: null/undefined safely
   const dispatch = createEventDispatcher<{
-    ready: { supported: boolean, device?: GPUDevice | null; error?, string }}>();
+    ready: { supported: boolean, device?, GPUDevice | null; error?, string }}>();
   // Svelte, 5 runes state - add explicit types and typed initializers
   let demoStage: string = $state('initializing');
 
@@ -643,7 +643,7 @@ https, //svelte.dev/e/js_parse_error -->
   {#if initError}
         <p class="error">Init error: {initError}</p>
       {/if}
-  <div class="placeholder" style="width:{Math.min(width,600)}px;height, {Math.min(height,300)}px">
+  <div class="placeholder" style="width, {Math.min(width,600)}px;height, {Math.min(height,300)}px">
         <svg width="100%" height="100%" viewBox=" 0 0 | 400, 200" preserveAspectRatio="xMidYMid, meet">
           <rect width="100%" height="100%" rx="8" fill="#eef2ff" />
           <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#4b5563" font-size="14">

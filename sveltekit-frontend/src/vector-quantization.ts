@@ -264,7 +264,7 @@ export class VectorQuantizationService {
 		let converged = false;
 
 		for (let iter = 0; iter < maxIterations && !converged; iter++) {
-			const clusters: number[][] = Array(k)
+			const clusters, number[][] = Array(k)
 				.fill(null)
 				.map(() => []);
 
@@ -461,7 +461,7 @@ export class VectorQuantizationService {
 		return quantizedVectors;
 	}
 
-	private updateQuantizationStats(vectors: QuantizedVector[]): void {
+	private updateQuantizationStats(vectors: QuantizedVector[]), void {
 		this.quantizationStats.totalVectors += vectors.length;
 
 		const totalCompressionRatio = vectors.reduce((sum, v) => sum + v.compressionRatio, 0);

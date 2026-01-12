@@ -34,7 +34,7 @@
  {#each similarities as item}
  <div
  class="relative cursor-pointer hover:scale-105 transition-transform border border-black overflow-hidden {getHeatmapColor(item.score)}"
- class:selected={selectedId === item.id}
+ class, selected={selectedId === item.id}
  >
  <img
  src={item.thumbUrl}

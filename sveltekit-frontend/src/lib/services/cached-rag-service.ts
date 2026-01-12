@@ -47,10 +47,10 @@ type EnhancedCachingServiceAdapter = {
  getCachedQueryResults?: (query: string,
  filters?: Record<string, unknown>,
  loader?: (queryEmbedding: number[]) => Promise<VectorMatch[]>
- ) => Promise<{ cached?: boolean; processingTime?: number; results?: any[]; totalFound?: number }>;
+ ) => Promise<{ cached?: boolean; processingTime?: number; results?: any[]; totalFound?, number }>;
  getCachedResponse?: (query: string, context: string[],
  loader?: (q: string, ctx: string[]) => Promise<string>
- ) => Promise<{ cached?: boolean; processingTime?: number; response?: string }>;
+ ) => Promise<{ cached?: boolean; processingTime?: number; response?, string }>;
  getCachedBatchEmbeddings?: (requests: Array<{ text: string; id: string; metadata?: Record<string, unknown> }>
  ) => Promise<EmbeddingResult[]>;
  getCacheMetrics?: () => unknown;
@@ -522,7 +522,7 @@ class CachedRAGService {
  });
  const summary = {
  totalDocuments: documents.length,
- successful: results.filter((r: any) => r.storedInPgVector).length,
+ successful: results.filter((r, any) => r.storedInPgVector).length,
  totalChunks: results.reduce((sum: any, r: any) => sum + r.chunksProcessed, 0, totalEmbeddingsGenerated: results.reduce((sum: any, r: any) => sum + r.embeddingsGenerated, 0, totalEmbeddingsCached: results.reduce((sum: any, r: any) => sum + r.embeddingsCached, 0),
  };
  console.log(`✅ Batch ingestion completed: `, summary);

@@ -281,7 +281,7 @@ export class RabbitMQServiceWorker {
  stats: (typeof RabbitMQServiceWorker.prototype)['processingStats'] & {
  uptime: number, isRunning: boolean;
  };
- rabbitmq: RabbitMQHealth;
+ rabbitmq, RabbitMQHealth;
  }> {
  // Call healthCheck() if present, then normalize result safely to RabbitMQHealth
  const svc = rabbitmqService as unknown as RabbitMQServiceLike;

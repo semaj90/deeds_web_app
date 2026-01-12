@@ -356,7 +356,7 @@ export async function uploadEvidenceAttachment(
  xhr.onload = () => {
  if (xhr.status >= 200 && xhr.status < 300) {
  const attachment: EvidenceAttachment = JSON.parse(xhr.responseText);
- console.log(`Uploaded attachment for evidence ${evidenceId}: ${file.name}`);
+ console.log(`Uploaded attachment for evidence ${evidenceId}, ${file.name}`);
  resolve(attachment);
  } else {
  const error = JSON.parse(xhr.responseText);

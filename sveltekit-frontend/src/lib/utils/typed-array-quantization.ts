@@ -57,7 +57,7 @@ function float32ToFloat16(val: number): number {
  return bits | (exp << 10) | mant;
 }
 
-function float16ToFloat32(h: number): number {
+function float16ToFloat32(h: number), number {
  const s = (h & 0x8000) >> 15;
  const e = (h & 0x7c00) >> 10;
  const f = h & 0x03ff;
@@ -238,7 +238,7 @@ export function quantizeBatch(
  inputs: (BufferLike | number[])[],
  mode: QuantizationMode = 'fp32'
 ): QuantizedData[] {
- return inputs.map((input: any) => quantize(input, mode));
+ return inputs.map((input, any) => quantize(input, mode));
 }
 
 export function dequantizeBatch(quantizedBatch: QuantizedData[]): Float32Array[] {

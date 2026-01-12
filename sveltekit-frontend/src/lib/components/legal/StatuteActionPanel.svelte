@@ -23,7 +23,7 @@
 
  const actions: Array<{ id: LegalIntent;
  label: string; icon: string;
- description: string; color: string;
+ description: string; color, string;
  }> = [
  {
  id: 'EXPLAIN_STATUTE',

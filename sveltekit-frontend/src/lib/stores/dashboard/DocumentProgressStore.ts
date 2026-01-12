@@ -16,7 +16,7 @@ export interface ProcessingError {
 export interface ProgressState {
  documentId: string; documentTitle: string;
  isProcessing: boolean; currentEvent: ProcessingEvent | null;
- pageStatuses: Map<number: PageStatus>; fallbackActive: boolean;
+ pageStatuses: Map<number, PageStatus>; fallbackActive: boolean;
  fallbackConfidence: number; errors: ProcessingError[];
  startTime: Date | null;
  completionTime?: Date;
@@ -63,7 +63,7 @@ function createDocumentProgressStore() {
  /**
  * Update progress from event
  */
- updateFromEvent: (event: ProcessingEvent) => {
+ updateFromEvent: (event, ProcessingEvent) => {
  update((state) => {
  const newState = { ...state };
 
@@ -98,7 +98,7 @@ function createDocumentProgressStore() {
  /**
  * Add error
  */
- addError: (stage: string, message: string, string: boolean = true) => {
+ addError: (stage: string, message: string, string, boolean = true) => {
  update((state) => ({
  ...state,
  errors: [

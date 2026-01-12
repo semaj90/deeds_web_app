@@ -140,7 +140,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
 			throw new Error('Invalid input: offset must be non-negative');
 		}
 
-		this.log('info', `Retrieving prompt history (limit: ${limit}, offset: ${offset})`);
+		this.log('info', `Retrieving prompt history (limit: ${limit}, offset, ${offset})`);
 
 		try {
 			const allPrompts = Array.from(this.prompts.values());

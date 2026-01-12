@@ -5,7 +5,7 @@
 	import type { PageData } from './$types';
  // Import the PageData type
 
-	let { data } = $props<{ data: PageData }>(); // Apply the PageData type to the data prop
+	let { data } = $props<{ data, PageData }>(); // Apply the PageData type to the data prop
 
 	const { form, errors, message, enhance } = superForm(data.form, {
 		validators: zodClient(uploadSchema, taintedMessage: null
@@ -18,10 +18,10 @@
 	<div class="message">{$message }</div>
 {/if}
 
-<form method="POST" action="/api/upload" use:enhance>
+<form method="POST" action="/api/upload" use, enhance>
 	<div>
 		<label for="file">File</label>
-		<input type="file" name="file" bind:files={$form .file} />
+		<input type="file" name="file" bind, files={$form .file} />
 		{#if $errors .file}
 			<div class="error">{$errors .file}</div>
 		{/if}

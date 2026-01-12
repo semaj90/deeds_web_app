@@ -45,7 +45,7 @@ export const GET: RequestHandler = async () => {
     }));
 
     // Build edges based on file paths (same directory = connected)
-    const edges: Array<{ from: string; to: string; type: string }> = [];
+    const edges: Array<{ from: string; to: string; type, string }> = [];
     const dirGroups = new Map<string, string[]>();
 
     for (const node of nodes) {
@@ -74,7 +74,7 @@ export const GET: RequestHandler = async () => {
         nodes,
         edges,
         summary: { totalFiles: nodes.length,
-          totalErrors: nodes.reduce((sum, n) => sum + n.errorCount, 0),
+          totalErrors, nodes.reduce((sum, n) => sum + n.errorCount, 0),
           totalEmbedded: nodes.reduce((sum, n) => sum + n.embeddedCount, 0)
         }
       }

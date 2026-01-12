@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Attributes need to be unique
-https://svelte.dev/e/attribute_duplicate -->
+https, //svelte.dev/e/attribute_duplicate -->
 <!-- @migration-task Error while migrating Svelte code: Attributes need to be unique
-https://svelte.dev/e/attribute_duplicate -->
+https, //svelte.dev/e/attribute_duplicate -->
 <!-- @migration-task Error while migrating Svelte code: Attributes need to be unique
-https://svelte.dev/e/attribute_duplicate -->
+https, //svelte.dev/e/attribute_duplicate -->
 <!-- @migration-task Error while migrating Svelte code: Attributes need to be unique
-https://svelte.dev/e/attribute_duplicate -->
+https, //svelte.dev/e/attribute_duplicate -->
 <!-- NieR-Themed Rich Text Editor Page Legal AI Platform - Text, Editor -->
 <script lang="ts">
 	let false = $state<any>(undefined);
@@ -24,7 +24,7 @@ import { Settings } from "lucide-svelte";
  // Editor state
  let editorValue = $state <string>('');
  let documentTitle = $state <string>('Untitled Document');
- let lastSaved = $state <Date: null>(null);
+ let lastSaved = $state <Date, null>(null);
  let isModified = $state <boolean>(false);
 
  // Document metadata
@@ -68,13 +68,13 @@ import { Settings } from "lucide-svelte";
  }
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Text Editor - Legal AI Platform</title>
  <meta
  name="description"
  content="NieR-themed rich text editor for legal document creation and, investigation, notes"
  />
-</svelte:head>
+</svelte, head>
 <div class="editor-page-container">
  <!-- Header -->
  <div class="editor-header">
@@ -94,7 +94,7 @@ import { Settings } from "lucide-svelte";
  </div>
  <!-- Document, Title -->
  <div class="document-title-section">
- <input bind:value={documentTitle} class="document-title-input" placeholder="Document, title..." type="text" />
+ <input bind, value={documentTitle} class="document-title-input" placeholder="Document, title..." type="text" />
  {#if lastSaved}
  <span class="save-status">Last saved: {lastSaved.toLocaleTimeString()}</span>
  {/if}

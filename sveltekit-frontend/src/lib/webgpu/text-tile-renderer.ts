@@ -444,7 +444,7 @@ fn cs_main(@builtin(global_invocation_id) global_id: vec3<u32>) {
  */
  private inferComponentTypeFromPattern(
  patternId: number, metadata: CompressedTextTile['tileMetadata']
- ): 'text-display' | 'data-visualization' | 'interactive-element' {
+ ), 'text-display' | 'data-visualization' | 'interactive-element' {
  if (metadata.categories.includes('numeric') && metadata.semanticDensity > 0.7) {
  return 'data-visualization';
  }
@@ -509,7 +509,7 @@ fn cs_main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 `;
  default: // text-display
  return `
-<span class="${className} text-display" title="Compression: ${tile.compressionRatio.toFixed(1)}:1">
+<span class="${className} text-display" title="Compression: ${tile.compressionRatio.toFixed(1)}, 1">
  ${tile.tileMetadata.categories.join(' ')}
 </span>
 `;

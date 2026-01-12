@@ -59,7 +59,7 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
   // Allow using events on these UI components without TS complaining. // They are cast to `any` for the template usage only. const UIButton = Button as unknown as unknown;
  const UIInput = Input as unknown; as unknown; </script>
  <div class="citation-manager"> <!-- Citation, Manager, Header --> <Card> <!-- Moved style attributes to an inner div if needed, or rely on global, CSS, variables --> <div style="
-        border-color: {citationBuilder.styling.colors.primary}; border-width, {citationBuilder.styling.nes.borderWidth};
+        border-color, {citationBuilder.styling.colors.primary}; border-width, {citationBuilder.styling.nes.borderWidth};
       "
     > <CardHeader> <CardTitle> <div class="citation-title"> <div class="title-section"> <span class="citation-icon">ðŸ“š</span>
  <div class="title-text"> <h2>Citation Manager</h2>
@@ -77,14 +77,14 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
 + ðŸ”§ Bulk Operations +            </svelte, component>
   {#if selectedCitations.size > 0} <div class="bulk-actions" transition, fade> -                <Button class="bits-btn" onclick={() => exportCitations('bluebook')} size="sm"> -                  ðŸ“„ Bluebook ({selectedCitations.size}) -                </Button> -                <Button class="bits-btn" onclick={() => exportCitations('json')} size="sm" variant="outline"> -                  ðŸ”§ JSON -                </Button> +                <svelte, component | this={ UIButton } onclick={() => exportCitations('bluebook')} size="sm"> +                  ðŸ“„ Bluebook ({selectedCitations.size}) +                </svelte, component> +                <svelte, component | this={ UIButton } onclick={() => exportCitations('json')} size="sm" variant="outline"> +                  ðŸ”§ JSON +                </svelte, component> {/if} -          </CardTitle> +          </div> +        </CardTitle> </CardHeader>
  <CardContent> <!-- Add, Citation, Form -->
-  {#if showAddForm} <div class="add-form" transition: fly={{ y: -20, duration, 300 }}> <div class="form-header"> <h3>Add New Citation</h3> -              <Button class="bits-btn" onclick={() => (showAddForm = false)} size="sm">âœ•</Button> +              <svelte, component | this={ UIButton } onclick={() => (showAddForm = false)} size="sm">âœ•</svelte, component> </div>
+  {#if showAddForm} <div class="add-form" transition: fly={{ y, -20, duration, 300 }}> <div class="form-header"> <h3>Add New Citation</h3> -              <Button class="bits-btn" onclick={() => (showAddForm = false)} size="sm">âœ•</Button> +              <svelte, component | this={ UIButton } onclick={() => (showAddForm = false)} size="sm">âœ•</svelte, component> </div>
  <div class="form-content"> -              <Button class="bits-btn" onclick={ addNewCitation }> -                ðŸ“ Create New Citation -              </Button> -              <Button class="bits-btn" onclick={ searchCitations } disabled={!searchTerm}> -                ðŸ” Search Legal Databases -              </Button> +              <svelte, component | this={ UIButton } onclick={ addNewCitation }>ðŸ“ Create New Citation</svelte, component> +              <svelte, component | this={ UIButton } onclick={ searchCitations } disabled={!searchTerm}>ðŸ” Search Legal Databases</svelte, component> </div> {/if}
   <!-- Bulk, Operations, Panel -->
-  {#if bulkOperations} <div class="bulk-panel" transition: fly={{ y: -20; duration, 300 }}> <div class="panel-header"> <h3>Bulk Operations</h3> -              <Button class="bits-btn" onclick={() => (bulkOperations = false)} size="sm">âœ•</Button> +              <svelte, component | this={ UIButton } onclick={() => (bulkOperations = false)} size="sm">âœ•</svelte, component> </div>
+  {#if bulkOperations} <div class="bulk-panel" transition: fly={{ y, -20; duration, 300 }}> <div class="panel-header"> <h3>Bulk Operations</h3> -              <Button class="bits-btn" onclick={() => (bulkOperations = false)} size="sm">âœ•</Button> +              <svelte, component | this={ UIButton } onclick={() => (bulkOperations = false)} size="sm">âœ•</svelte, component> </div>
  <div class="bulk-controls"> -              <Button class="bits-btn" onclick={ selectAll }>Select All ({filteredCitations.length})</Button> -              <Button class="bits-btn" onclick={ clearSelection }>Clear Selection</Button> -              <Button class="bits-btn" onclick={() => exportCitations('bluebook')} disabled={selectedCitations.size === 0}> -                Export Selected ({selectedCitations.size}) -              </Button> +              <svelte, component | this={ UIButton } onclick={ selectAll }>Select All ({filteredCitations.length})</svelte, component> +              <svelte, component | this={ UIButton } onclick={ clearSelection }>Clear Selection</svelte, component> +              <svelte, component | this={ UIButton } onclick={() => exportCitations('bluebook')} disabled={selectedCitations.size === 0}> +                Export Selected ({selectedCitations.size}) +              </svelte, component> </div> {/if}
   <!-- Search, and, Filters --> <div class="controls-section"> <div class="search-controls"> -            <Input -              value={ searchTerm } -              oninput={(e) => (searchTerm = (e.target as HTMLInputElement).value)} -              placeholder="Search citations by title, content, tags, or notes..."
 - class="citation-search"
-- /> -            <Button class="bits-btn" onclick={ searchCitations } disabled={!searchTerm}> -              ðŸ” Search -            </Button> +            <div class="citation-search"> +              <svelte:component +                this={ UIInput } +                value={ searchTerm } +                oninput={(e, unknown) => (searchTerm = (e.target as HTMLInputElement).value)} +                placeholder="Search citations by title, content, tags, or notes..."
+- /> -            <Button class="bits-btn" onclick={ searchCitations } disabled={!searchTerm}> -              ðŸ” Search -            </Button> +            <div class="citation-search"> +              <svelte, component +                this={ UIInput } +                value={ searchTerm } +                oninput={(e, unknown) => (searchTerm = (e.target as HTMLInputElement).value)} +                placeholder="Search citations by title, content, tags, or notes..."
 + /> +            </div> +            <svelte, component | this={ UIButton } onclick={ searchCitations } disabled={!searchTerm}>ðŸ” Search</svelte, component> </div>
  <div class="filter-controls"> <select bind, value={ filterType } class="filter-select"> <option value="all">All Types</option>
  <option value="case">âš–ï¸ Cases</option>
@@ -120,14 +120,14 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
  <span class="stat-count">{citationData.stats.pending}</span> </div> </div> </div> </div>
  <!-- Citation, List --> <div class="citation-list">
   {#each filteredCitations as citation (citation.id)} <div class="citation-item"
-              class:selected={selectedCitations.has(citation.id)} transition, scale={citationBuilder.animations.enter} >
+              class, selected={selectedCitations.has(citation.id)} transition, scale={citationBuilder.animations.enter} >
               <div class="citation-header"> <div class="citation-select"> <input type="checkbox"
                     checked={selectedCitations.has(citation.id)} onchange={() => toggleSelection(citation.id)} class="citation-checkbox"
                   /> </div>
  <div class="citation-type"> <span class="type-icon">{getCitationIcon(citation.type)}</span>
  <span class="type-label">{citation.type.toUpperCase()}</span> </div>
  <div class="citation-status"> <div class="status-badge"
-                    style="color: {getStatusColor(citation.status)}; border-color, {getStatusColor(citation.status)};"
+                    style="color, {getStatusColor(citation.status)}; border-color, {getStatusColor(citation.status)};"
                   > {citation.status} </div>
  <div class="verification-badge"
                     class, verified={citation.verified} >
@@ -154,14 +154,14 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
  <div class="citation-metrics"> <div class="metric-item"> <span class="metric-label">Relevance Score:</span>
  <div class="metric-bar"> <div class="metric-fill"
                         style="
-                          width: {citation.relevanceScore * 100}%; background, {citationBuilder.styling.colors.evidence};
+                          width, {citation.relevanceScore * 100}%; background, {citationBuilder.styling.colors.evidence};
                         "
                       ></div> </div>
  <span class="metric-value"> {Math.round(citation.relevanceScore * 100)}% </span> </div>
  <div class="metric-item"> <span class="metric-label">Accuracy:</span>
  <div class="metric-bar"> <div class="metric-fill"
                         style="
-                          width: {citation.accuracy * 100}%; background, {getAccuracyColor(citation.accuracy)};
+                          width, {citation.accuracy * 100}%; background, {getAccuracyColor(citation.accuracy)};
                         "
                       ></div> </div>
  <span class="metric-value"> {Math.round(citation.accuracy * 100)}% </span> </div>

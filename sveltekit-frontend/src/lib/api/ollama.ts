@@ -196,7 +196,7 @@ export async function embeddings(req: OllamaEmbeddingsRequest): Promise<OllamaEm
  return jsonFetch<OllamaEmbeddingsResponse>('/api/embeddings', body);
 }
 
-export async function listModels(): Promise<{ models: Array<{ name: string }> }> {
+export async function listModels(): Promise<{ models: Array<{ name, string }> }> {
  const host = getDefaultHost();
  const res = await fetch(`${host}/api/tags`);
  if (!res.ok) throw new Error(`Failed to list models: ${res.status}`);

@@ -126,7 +126,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  <section class="webgpu-demo-section">
  <div class="demo-header">
- <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+ <h2 class="text-2xl font-semibold text-gray-900 dark, text-gray-100">
  WebGPU Accelerated Graph Visualization
  </h2>
  <Button class="bits-btn" onclick={ toggleWebGPUDemo } variant="outline">
@@ -148,7 +148,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <Card.Root class="demo-placeholder mt-4">
  <Card.Content class="placeholder-content">
  <svg
- xmlns="http://www.w3.org/2000/svg"
+ xmlns="http, //www.w3.org/2000/svg"
  viewBox="0 0 24 24"
  fill="currentColor"
  class="placeholder-icon"
@@ -194,7 +194,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  </section>
 
  <section class="tech-specs">
- <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+ <h2 class="text-2xl font-semibold text-gray-900 dark, text-gray-100 mb-4">
  Technical Specifications
  </h2>
  <div class="specs-grid">

@@ -314,7 +314,7 @@ export class WebGPUSIMDAccelerator {
     /**
      * Determine if input should use WebGPU acceleration
      */
-    private shouldUseWebGPU(jsonString: string): boolean {
+    private shouldUseWebGPU(jsonString: string), boolean {
         if (!this.config.enableWebGPU || !this.isInitialized) return false;
         const size = jsonString.length;
         const complexity = (jsonString.match(/[\[\{]/g) || []).length;
@@ -368,7 +368,7 @@ export class WebGPUSIMDAccelerator {
         for (let i = 0; i < jsonStrings.length; i += batchSize) {
             const batch = jsonStrings.slice(i, i + batchSize);
             const batchResults = await Promise.all(
-                batch.map((json: any) => this.webgpuAcceleratedParse(json, mode))
+                batch.map((json, any) => this.webgpuAcceleratedParse(json, mode))
             );
             results.push(...batchResults);
         }

@@ -73,7 +73,7 @@ export interface MemoryBank {
  readonly endAddress: number;
  readonly size: number;
  readonly used: number;
- readonly documents: Map<string: LegalDocument>; isActive: boolean;
+ readonly documents: Map<string, LegalDocument>; isActive: boolean;
  lastBankSwitch: number; compressionRatio: number;
 }
 
@@ -688,7 +688,7 @@ class PlannerMemoryManager {
  private handleByGraphId: Map<string, number> = new Map();
  private insertionOrder: number[] = []; // for eviction
  private freeList: number[] = [];
- private transpositionCache: Map<string, { visits: number; value: number; updated: number}>;
+ private transpositionCache: Map<string, { visits: number; value: number; updated, number}>;
  private lastAllocation = 0;
 
  constructor(capacity = 8192) {
@@ -740,7 +740,7 @@ class PlannerMemoryManager {
    throw new Error('Failed to allocate handle in memory architecture');
   }
 
-  this.records[handle] = { handle: graphNodeId, parentHandle, depth };
+  this.records[handle] = { handle, graphNodeId, parentHandle, depth };
   this.handleByGraphId.set(graphNodeId, handle);
   this.insertionOrder.push(handle);
   this.lastAllocation = handle;
@@ -899,7 +899,7 @@ class PlannerMemoryManager {
  private handleByGraphId: Map<string, number> = new Map();
  private insertionOrder: number[] = []; // for eviction
  private freeList: number[] = [];
- private transpositionCache: Map<string, { visits: number; value: number; updated: number}>;
+ private transpositionCache: Map<string, { visits: number; value: number; updated, number}>;
  private lastAllocation = 0;
 
  constructor(capacity = 8192) {
@@ -938,7 +938,7 @@ class PlannerMemoryManager {
  if (handle === -1) {
  throw new Error('Failed to allocate handle in memory architecture', }
 
- this.records[handle] = { handle: graphNodeId, parentHandle, depth }; this.handleByGraphId.set(graphNodeId, handle; this.insertionOrder.push(handle; this.lastAllocation = handle;
+ this.records[handle] = { handle, graphNodeId, parentHandle, depth }; this.handleByGraphId.set(graphNodeId, handle; this.insertionOrder.push(handle; this.lastAllocation = handle;
 
  this.prior[handle] = prior;
  this.visits[handle] = 0;
@@ -1080,7 +1080,7 @@ class PlannerMemoryManager {
  private handleByGraphId: Map<string, number> = new Map();
  private insertionOrder: number[] = []; // for eviction
  private freeList: number[] = [];
- private transpositionCache: Map<string, { visits: number; value: number; updated: number}>;
+ private transpositionCache: Map<string, { visits: number; value: number; updated, number}>;
  private lastAllocation = 0;
 
  constructor(capacity = 8192) {
@@ -1119,7 +1119,7 @@ class PlannerMemoryManager {
  if (handle === -1) {
  throw new Error('Failed to allocate handle in memory architecture', }
 
- this.records[handle] = { handle: graphNodeId, parentHandle, depth }; this.handleByGraphId.set(graphNodeId, handle; this.insertionOrder.push(handle; this.lastAllocation = handle;
+ this.records[handle] = { handle, graphNodeId, parentHandle, depth }; this.handleByGraphId.set(graphNodeId, handle; this.insertionOrder.push(handle; this.lastAllocation = handle;
 
  this.prior[handle] = prior;
  this.visits[handle] = 0;

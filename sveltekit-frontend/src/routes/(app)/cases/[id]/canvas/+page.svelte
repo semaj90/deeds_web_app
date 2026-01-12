@@ -9,7 +9,7 @@
 		<h2 class="text-sm uppercase tracking-[0.25em] text-slate-400">Evidence Canvas</h2>
 		<button
 			class="text-xs px-3 py-1 rounded-full border border-amber-400/60
- hover:bg-amber-400/10 transition-colors"
+ hover, bg-amber-400/10 transition-colors"
 		>
 			Auto-Arrange Nodes
 		</button>
@@ -22,7 +22,7 @@
 		<!-- Placeholder grid background -->
 		<div class="pointer-events-none absolute inset-0 opacity-20">
 			<div
-				class="w-full h-full bg-[radial-gradient(circle,_rgba(148,163,184,0.25)_1px,_transparent_1px)] bg-[length:24px_24px]"
+				class="w-full h-full bg-[radial-gradient(circle,_rgba(148,163,184,0.25)_1px,_transparent_1px)] bg-[length, 24px_24px]"
 			></div>
 		</div>
 

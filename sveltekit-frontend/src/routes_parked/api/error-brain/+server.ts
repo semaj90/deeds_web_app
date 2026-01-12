@@ -48,7 +48,7 @@ interface PatchResult {
  id: string; analysisId: string;
  patch: { filePath: string;
  changes: Array<{ type: 'add' | 'remove' | 'modify';
- line: number; content: string;
+ line: number; content, string;
  }>;
  };
  timestamp: string;

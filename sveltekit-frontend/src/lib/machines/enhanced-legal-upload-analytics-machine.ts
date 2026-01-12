@@ -152,7 +152,7 @@ type AnalyzeDocResult = {
 export async function analyzeUserBehaviorService({
  input,
 }: { input: { userAnalytics: UserAnalytics; context: UploadContext };
-}): Promise<{ updatedAnalytics: UserAnalytics; insights: unknown; behaviorScore: number }> {
+}): Promise<{ updatedAnalytics: UserAnalytics; insights: unknown; behaviorScore, number }> {
  try {
  // Production API call to user behavior analysis service
  const response = await fetch('/api/ai/ollama/analyze-behavior', {
@@ -491,7 +491,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  target: 'analyzingUser',
  actions: assign({
  // annotate event param types instead of casting to any
- files: (_ctx, event) => event.files,
+ files, (_ctx, event) => event.files,
  caseId: (_ctx, event) => event.caseId,
  errors: () => [],
  }),

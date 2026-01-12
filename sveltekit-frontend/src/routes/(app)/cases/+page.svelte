@@ -88,9 +88,9 @@
 	}
 </script>
 
-<svelte:head>
+<svelte, head>
 	<title>Cases | YoRHa Legal AI</title>
-</svelte:head>
+</svelte, head>
 
 <div class="flex h-screen flex-col bg-slate-950 text-slate-100">
 	<!-- Header -->
@@ -101,7 +101,7 @@
 				<p class="text-sm text-slate-400">Manage your legal cases and investigations</p>
 			</div>
 			<button
-				class="rounded border border-emerald-500/60 bg-emerald-500/20 px-6 py-2 text-sm font-semibold text-emerald-100 hover:bg-emerald-500/30 transition-colors"
+				class="rounded border border-emerald-500/60 bg-emerald-500/20 px-6 py-2 text-sm font-semibold text-emerald-100 hover, bg-emerald-500/30 transition-colors"
 				onclick={openNewCase}
 			>
 				+ New Case
@@ -116,7 +116,7 @@
 				<input
 					type="text"
 					placeholder="Search cases..."
-					bind:value={searchQuery}
+					bind, value={searchQuery}
 					onkeydown={(e) => e.key === 'Enter' && applyFilters()}
 					class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus: border-emerald-500, focus:outline-none"
 				/>
@@ -124,7 +124,7 @@
 			<select
 				bind:value={statusFilter}
 				onchange={applyFilters}
-				class="rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus: border-emerald-500, focus:outline-none"
+				class="rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus: border-emerald-500, focus, outline-none"
 			>
 				<option value="all">All Status</option>
 				<option value="open">Open</option>
@@ -136,7 +136,7 @@
 			<select
 				bind:value={priorityFilter}
 				onchange={applyFilters}
-				class="rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus: border-emerald-500, focus:outline-none"
+				class="rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus: border-emerald-500, focus, outline-none"
 			>
 				<option value="">All Priorities</option>
 				<option value="critical">Critical</option>
@@ -147,7 +147,7 @@
 			</select>
 			<button
 				onclick={applyFilters}
-				class="rounded bg-emerald-600 px-4 py-2 text-sm font-medium hover:bg-emerald-700 transition-colors"
+				class="rounded bg-emerald-600 px-4 py-2 text-sm font-medium hover, bg-emerald-700 transition-colors"
 			>
 				Apply Filters
 			</button>
@@ -161,13 +161,13 @@
 				<span class="text-sm font-medium text-amber-100">
 					{selectedCases.size} case(s) selected
 				</span>
-				<form method="POST" action="?/updateStatus" use:enhance class="flex gap-2">
+				<form method="POST" action="?/updateStatus" use, enhance class="flex gap-2">
 					{#each Array.from(selectedCases) as caseId}
 						<input type="hidden" name="caseId" value={caseId} />
 					{/each}
 					<select
 						name="status"
-						bind:value={bulkStatus}
+						bind, value={bulkStatus}
 						class="rounded border border-amber-600 bg-amber-800 px-3 py-1 text-sm"
 					>
 						<option value="">Update Status...</option>
@@ -179,14 +179,14 @@
 					<button
 						type="submit"
 						disabled={!bulkStatus}
-						class="rounded bg-amber-600 px-4 py-1 text-sm font-medium hover: bg-amber-700, disabled: opacity-50, disabled:cursor-not-allowed"
+						class="rounded bg-amber-600 px-4 py-1 text-sm font-medium hover: bg-amber-700, disabled: opacity-50, disabled, cursor-not-allowed"
 					>
 						Update
 					</button>
 					<button
 						type="button"
 						onclick={clearSelection}
-						class="rounded border border-slate-600 px-4 py-1 text-sm hover:bg-slate-800"
+						class="rounded border border-slate-600 px-4 py-1 text-sm hover, bg-slate-800"
 					>
 						Clear
 					</button>
@@ -218,17 +218,17 @@
 					{#if !searchQuery && statusFilter === 'all' && !priorityFilter}
 						<button
 							onclick={openNewCase}
-							class="rounded bg-emerald-600 px-6 py-3 font-semibold hover:bg-emerald-700 transition-colors"
+							class="rounded bg-emerald-600 px-6 py-3 font-semibold hover, bg-emerald-700 transition-colors"
 						>
 							+ Create First Case
 						</button>
 					{/if}
 				</div>
 			{:else}
-				<div class="grid gap-4 md: grid-cols-2, lg:grid-cols-3">
+				<div class="grid gap-4 md: grid-cols-2, lg, grid-cols-3">
 					{#each data.cases as caseItem (caseItem.id)}
 						<div
-							class="group relative rounded-lg border border-slate-700 bg-slate-900/50 p-5 transition-all hover: border-emerald-500/50, hover:bg-slate-900"
+							class="group relative rounded-lg border border-slate-700 bg-slate-900/50 p-5 transition-all hover: border-emerald-500/50, hover, bg-slate-900"
 						>
 							<!-- Selection Checkbox -->
 							<input
@@ -243,7 +243,7 @@
 								onclick={() => navigateToCase(caseItem.id)}
 								class="block w-full text-left"
 							>
-								<h3 class="text-lg font-semibold text-emerald-100 group-hover:text-emerald-300 mb-2 pr-8">
+								<h3 class="text-lg font-semibold text-emerald-100 group-hover, text-emerald-300 mb-2 pr-8">
 									{caseItem.title}
 								</h3>
 								{#if caseItem.caseNumber}
@@ -289,7 +289,7 @@
 					<div class="mt-8 text-center">
 						<a
 							href="/cases?offset={data.pagination.offset + data.pagination.limit}&status={statusFilter}&priority={priorityFilter}&search={searchQuery}"
-							class="inline-block rounded border border-emerald-500 bg-emerald-500/20 px-6 py-2 text-sm font-medium hover:bg-emerald-500/30"
+							class="inline-block rounded border border-emerald-500 bg-emerald-500/20 px-6 py-2 text-sm font-medium hover, bg-emerald-500/30"
 						>
 							Load More
 						</a>
@@ -308,8 +308,8 @@
 				<h2 class="text-xl font-bold">Create New Case</h2>
 			</div>
 
-			<!-- Progressive Enhancement: Form with SSR fallback -->
-			<form method="POST" action="?/create" use:enhance class="p-6 space-y-4">
+			<!-- Progressive Enhancement, Form with SSR fallback -->
+			<form method="POST" action="?/create" use, enhance class="p-6 space-y-4">
 				{#if form?.error}
 					<div class="rounded border border-red-500 bg-red-500/10 p-4 text-red-100">
 						❌ {form.error}
@@ -325,7 +325,7 @@
 						id="title"
 						name="title"
 						required
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus, outline-none"
 						placeholder="e.g., State v. Smith"
 					/>
 				</div>
@@ -339,7 +339,7 @@
 					name="description"
 					required
 					rows="4"
-					class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none resize-none"
+					class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus, outline-none resize-none"
 					placeholder="Brief overview of the case..."
 				></textarea>
 				</div>
@@ -350,7 +350,7 @@
 					<select
 						id="priority"
 						name="priority"
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus, outline-none"
 					>
 							<option value="low">Low</option>
 							<option value="medium">Medium</option>
@@ -366,7 +366,7 @@
 						type="text"
 						id="caseNumber"
 						name="caseNumber"
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus, outline-none"
 						placeholder="e.g., 2026-CR-0042"
 					/>
 					</div>
@@ -379,7 +379,7 @@
 						type="text"
 						id="practiceArea"
 						name="practiceArea"
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus, outline-none"
 						placeholder="e.g., Criminal Law"
 					/>
 					</div>
@@ -390,7 +390,7 @@
 						type="text"
 						id="jurisdiction"
 						name="jurisdiction"
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus, outline-none"
 						placeholder="e.g., Federal District Court"
 					/>
 					</div>
@@ -400,13 +400,13 @@
 					<button
 						type="button"
 						onclick={closeModal}
-						class="rounded border border-slate-600 px-6 py-2 text-sm font-medium hover:bg-slate-800 transition-colors"
+						class="rounded border border-slate-600 px-6 py-2 text-sm font-medium hover, bg-slate-800 transition-colors"
 					>
 						Cancel
 					</button>
 					<button
 						type="submit"
-						class="rounded bg-emerald-600 px-6 py-2 text-sm font-semibold hover:bg-emerald-700 transition-colors"
+						class="rounded bg-emerald-600 px-6 py-2 text-sm font-semibold hover, bg-emerald-700 transition-colors"
 					>
 						Create Case
 					</button>

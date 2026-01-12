@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Unexpected, token --> <!-- LLM Provider Selector with Melt UI and, Real-time, Status --> <script lang="ts"> // Svelte, 5 runes are auto-imported import type { LLMProviderSelectorProps, LLMProvider, LLMModel, LLMStatus, PerformanceMetrics } from '$lib/types/component-props.js';
+<!-- @migration-task Error while migrating Svelte, code, Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Unexpected, token --> <!-- LLM Provider Selector with Melt UI and, Real-time, Status --> <script lang="ts"> // Svelte, 5 runes are auto-imported import type { LLMProviderSelectorProps, LLMProvider, LLMModel, LLMStatus, PerformanceMetrics } from '$lib/types/component-props.js';
  import * as Select from 'bits-ui'; // Updated to use bits-ui components // TODO: Replace with bits-ui equivalents when available // import { Badge } from 'bits-ui'
   	import { writable, derived, type Writable } from 'svelte/store';
  import { onMount } from "svelte";
@@ -12,7 +12,7 @@
   			id: 'crewai-team', name: 'CrewAI Teams', type: 'crewai', endpoint: 'http://localhost:8002', status: 'offline', capabilities: ['role-based', 'collaborative', 'workflow'], models: [] }
   	]); // Real-time status checking let statusCheckInterval = $state<number | null>(null);
    const checkProviderStatus = async (provider: LLMProvider): Promise<LLMStatus> => { try { const response = await fetch(`${provider.endpoint}/health`, { method: 'GET', timeout: 5000 }); return response.ok ? 'online': 'offline'} catch { return 'offline'}
-  	} const updateProviderStatuses = async () => { const currentProviders = $provider; for (let i = 0; i < currentProviders.length; i++) { const newStatus = await, checkProviderStatus(currentProviders[i]); if (currentProviders[i].status !== newStatus) { currentProviders[i].status = newStatus; ondispatch?.({ provider: currentProviders[i], status, newStatus })}
+  	} const updateProviderStatuses = async () => { const currentProviders = $provider; for (let i = 0; i < currentProviders.length; i++) { const newStatus = await, checkProviderStatus(currentProviders[i]); if (currentProviders[i].status !== newStatus) { currentProviders[i].status = newStatus; ondispatch?.({ provider, currentProviders[i], status, newStatus })}
   		} providers.set(currentProviders)}
   	$effect(() => { // Initial status check updateProviderStatuses(); // Periodic status updates every, 10 seconds statusCheckInterval = setInterval(updateProviderStatuses, 10000); return () => { clearInterval(statusCheckInterval)}
   	}); // Melt UI Select setup const { elements: { trigger, menu, option, group, groupLabel, label }, states: { selectedLabel, open, selected }, helpers: { isSelected } } = createSelect<LLMProvider>({ forceVisible: true, positioning: { placement: 'bottom', fitViewport: true }
@@ -22,7 +22,7 @@
   	} </script>
  <div class="llm-provider-selector"> <!-- Label --> <label class="block text-sm font-medium text-yorha-text-primary"
 	> LLM Provider </label>
- <!-- Select, Trigger --> <button class="flex h-10 w-full items-center justify-between rounded-md border border-yorha-border bg-yorha-bg-secondary px-3 py-2 text-sm placeholder: text-yorha-text-tertiary, focus: outline-none, focus: ring-2, focus: ring-yorha-primary, focus: ring-offset-2, disabled: cursor-not-allowed, disabled:opacity-50 transition-all duration-200"; class, opacity-50={ disabled } { disabled } aria-label="Select LLM, Provider"
+ <!-- Select, Trigger --> <button class="flex h-10 w-full items-center justify-between rounded-md border border-yorha-border bg-yorha-bg-secondary px-3 py-2 text-sm placeholder: text-yorha-text-tertiary, focus: outline-none, focus: ring-2, focus: ring-yorha-primary, focus: ring-offset-2, disabled: cursor-not-allowed, disabled, opacity-50 transition-all duration-200"; class, opacity-50={ disabled } { disabled } aria-label="Select LLM, Provider"
 	> <span class="truncate">
   {#if selectedProvider} <span class="flex items-center"> <span class="text-lg" role="img">{getTypeIcon(selectedProvider.type)}</span>
  <span>{selectedProvider.name}</span>
@@ -38,7 +38,7 @@
   {#if $open} <div class="z-50 min-w-[320px] rounded-md border border-yorha-border bg-yorha-bg-primary p-1 shadow-lg"
 			/*, transition, removed */} >
   {#each $providers as provider (provider.id)} <div class="relative cursor-default select-none rounded-sm px-2 py-2 text-sm outline-none transition-colors"
-				 class:bg-yorha-bg-secondary={$isSelected(provider)}; class:text-yorha-text-primary={$isSelected(provider)}; class:hover, bg-yorha-bg-tertiary={!$isSelected(provider)} >
+				 class:bg-yorha-bg-secondary={$isSelected(provider)}; class:text-yorha-text-primary={$isSelected(provider)}; class, hover, bg-yorha-bg-tertiary={!$isSelected(provider)} >
 					<div class="border-none bg-transparent"> <div class="yorha-panel-content"> <!-- Provider, Header --> <div class="flex items-center justify-between"> <div class="flex items-center"> <span class="text-lg" role="img">{getTypeIcon(provider.type)}</span>
  <div> <div class="font-medium">{provider.name}</div>
  <div class="text-xs">{provider.endpoint}</div> </div> </div>

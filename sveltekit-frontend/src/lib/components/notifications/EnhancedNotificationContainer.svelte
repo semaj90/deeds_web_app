@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, Unexpected, token --> mcp<script lang="ts"> // Svelte, 5 runes are auto-imported import  Button  from "$lib/components/ui/enhanced-bits.svelte";
+<!-- @migration-task Error while migrating Svelte code, Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, Unexpected, token --> mcp<script lang="ts"> // Svelte, 5 runes are auto-imported import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import { notifications, type Notification } from '$lib/stores/unified";
  import { FocusManager } from "$lib/utils/accessibility";
  import { AlertCircle, AlertTriangle, Check, Info, X } from "lucide-svelte";
@@ -56,17 +56,17 @@
   {#each visibleNotifications as notification ((notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).id)} <div class="container mx-auto"
         use:setNotificationelement={(notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).id} role="alert"
         aria-labelledby="notification-title-{(notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).id}"
-        aria-describedby="notification-message-{(notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?, any }).id}"
+        aria-describedby="notification-message-{(notification as { type?: any; title?: any; message?: any; id?: any; duration?, any; actions?, any }).id}"
         onmouseenter={() => pauseTimer(notification)} onmouseleave={ focusin } focusout={() => resumeTimer(notification)} >
         <div class="container mx-auto"
-        > <div class="container mx-auto"> <!-- Icon --> <div class="container mx-auto"> <svelte:component this={getNotificationIcon((notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?, any }).type)} class="container mx-auto"
+        > <div class="container mx-auto"> <!-- Icon --> <div class="container mx-auto"> <svelte:component this={getNotificationIcon((notification as { type?: any; title?: any; message?: any; id?: any; duration?, any; actions?, any }).type)} class="container mx-auto"
                 aria-hidden="true"
               /> </div>
- <!-- Content --> <div class="container mx-auto"> <div class="container mx-auto"> <div class="container mx-auto"> <p id="notification-title-{(notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?, any }).id}"
+ <!-- Content --> <div class="container mx-auto"> <div class="container mx-auto"> <div class="container mx-auto"> <p id="notification-title-{(notification as { type?: any; title?: any; message?: any; id?: any; duration?, any; actions?, any }).id}"
                     class="container mx-auto px-4"
                   > {(notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).title}
 </p>
-  {#if (notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).message} <p id="notification-message-{(notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?, any }).id}"
+  {#if (notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).message} <p id="notification-message-{(notification as { type?: any; title?: any; message?: any; id?: any; duration?, any; actions?, any }).id}"
                       class="container mx-auto px-4"
                     > {(notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).message}
 </p> {/if}

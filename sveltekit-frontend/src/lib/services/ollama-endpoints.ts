@@ -169,7 +169,7 @@ export async function getAvailableModels(): Promise<string[]> {
  * Contextual chat with robust fetch calls
  */
 export async function contextualChat(
- messages: Array<{ role: string; content: string }>,
+ messages: Array<{ role: string; content, string }>,
  context?: any
 ): Promise<string> {
  try {

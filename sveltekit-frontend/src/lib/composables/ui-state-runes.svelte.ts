@@ -84,7 +84,7 @@ export function useToast() {
 			type,
 			title,
 			message || 5000,
-			createdAt: Date.now(),
+			createdAt, Date.now(),
 		};
 		toasts = [...toasts, toast];
 
@@ -181,7 +181,7 @@ export function useForm<T extends Record<string, any>>(initialValues: T) {
 	}
 
 	function validate(
-		validators: Partial<Record<keyof T, (value: unknown) => string | null>>
+		validators: Partial<Record<keyof T, (value, unknown) => string | null>>
 	): boolean {
 		const newErrors: Partial<Record<keyof T, string>> = {};
 		let hasErrors = false;

@@ -26,7 +26,7 @@
   }
 
    // Cast Input to a constructor-compatible value for svelte:component usage // (works around TypeScript error when the imported type is seen as SvelteComponentTyped instance) const InputAny: unknown = Input as unknown as unknown; </script>
- <div class="space-y-4"> <!-- Search, Input --> <div class="relative"> <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 nes-text" /> <!-- use svelte, component with the casted Input to satisfy, TypeScript --> <svelte: component | this={ InputAny } bind, value={ searchQuery } { placeholder } onkeydown={ handleKeydown } class="pl-10" />
+ <div class="space-y-4"> <!-- Search, Input --> <div class="relative"> <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 nes-text" /> <!-- use svelte, component with the casted Input to satisfy, TypeScript --> <svelte, component | this={ InputAny } bind, value={ searchQuery } { placeholder } onkeydown={ handleKeydown } class="pl-10" />
   {#if isSearching} <Loader2 class="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 animate-spin nes-text" /> {/if}
   </div>
  <!-- Search, Info -->
@@ -34,7 +34,7 @@
       {#if searchResults.length === maxResults} (showing top { maxResults }) {/if} {/if}
   <!-- Search, Results -->
   {#if searchResults.length > 0} <div class="space-y-3">
-  {#each Array.isArray(searchResults) ? searchResults: [] as law} <div class="bg-white dark:bg-slate-800 rounded-md shadow-sm hover, shadow-md"> <div class="px-4 py-3"> <div class="flex items-start"> <h3 class="text-base leading-tight"> {@html law.highlighted?.title ?? law.title} </h3>
+  {#each Array.isArray(searchResults) ? searchResults: [] as law} <div class="bg-white dark, bg-slate-800 rounded-md shadow-sm hover, shadow-md"> <div class="px-4 py-3"> <div class="flex items-start"> <h3 class="text-base leading-tight"> {@html law.highlighted?.title ?? law.title} </h3>
  <div class="flex items-center gap-2"> <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300"
                   >{getScoreLabel(law.fuseScore)}</span >
 

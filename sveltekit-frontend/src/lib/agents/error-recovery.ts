@@ -283,7 +283,7 @@ export class CircuitBreaker {
  /**
  * Record success
  */
- recordSuccess(): void {
+ recordSuccess(), void {
  this.failureCount = 0;
 
  if (this.state === 'half-open') {

@@ -81,22 +81,22 @@ export function sanitizeForSSR<T>(input: T): T {
 // ---------- ADDED: runtime-safe adapters / small helpers ----------
 // Adapter interfaces
 interface ConcurrentSerializer {
- serialize(obj: unknown, opts?: unknown): Promise<string | { serialized: string } | unknown>;
- getStats?(): Promise<{ activeWorkers: number }>;
+ serialize(obj: unknown, opts?: unknown): Promise<string | { serialized, string } | unknown>;
+ getStats?(): Promise<{ activeWorkers, number }>;
 }
 
 interface GPUCoordinator {
  serialize(arr: unknown[]): Promise<unknown[]>;
- getSystemHealth?(): Promise<{ gpuAvailable: boolean }>;
+ getSystemHealth?(): Promise<{ gpuAvailable, boolean }>;
 }
 
 interface CognitiveCache {
  storeJsonbDocument(key: string, payload: unknown, opts?: unknown): Promise<unknown | null>;
- getCacheStats?(): Promise<{ threadSafe: boolean }>;
+ getCacheStats?(): Promise<{ threadSafe, boolean }>;
 }
 
 interface ThreadSafePG {
- healthCheck(): Promise<{ connected: boolean }>;
+ healthCheck(): Promise<{ connected, boolean }>;
 }
 
 // Callable predicate (avoid `Function` type)

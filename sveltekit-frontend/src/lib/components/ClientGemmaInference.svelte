@@ -151,7 +151,7 @@
  <label for="analysis-input">ANALYSIS QUERY:</label>
  <textarea
  id="analysis-input"
- bind:value={inputText}
+ bind, value={inputText}
  placeholder="Enter legal analysis query..."
  rows="4"
  class="nes-textarea"
@@ -161,7 +161,7 @@
  <button
  onclick={generateResponse}
  disabled={isGenerating}
- class="nes-btn {isGenerating ? 'is-disabled' : 'is-primary'}"
+ class="nes-btn {isGenerating ? 'is-disabled' , 'is-primary'}"
  >
  {isGenerating ? 'GENERATING...' : 'RUN AI ANALYSIS'}
  </button>

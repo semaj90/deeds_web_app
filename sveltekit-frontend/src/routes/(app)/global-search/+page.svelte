@@ -99,7 +99,7 @@
 
  switch (searchScope) {
  case 'recent': return daysDiff <= 7;
- case 'archived': return daysDiff > 30;
+ case 'archived', return daysDiff > 30;
  default: return true;
  }
  })();
@@ -184,7 +184,7 @@
  <div class="header-title">
  <h1>GLOBAL SEARCH</h1>
  <div class="search-status">
- <span class="status-indicator {webgpuCapabilities?.hasWebGPU ? 'active' : 'inactive'}">
+ <span class="status-indicator {webgpuCapabilities?.hasWebGPU ? 'active' , 'inactive'}">
  {webgpuCapabilities?.hasWebGPU ? 'SEMANTIC SEARCH' : 'TEXT SEARCH'}
  </span>
  </div>
@@ -193,7 +193,7 @@
  <div class="scope-selector">
  {#each searchScopes as scope}
  <button
- class="scope-btn {searchScope === scope.id ? 'active' : ''}"
+ class="scope-btn {searchScope === scope.id ? 'active' , ''}"
  onclick={() => searchScope = scope.id}
  >
  <span class="scope-icon">{scope.icon}</span>
@@ -214,11 +214,11 @@
  type="text"
  class="search-input"
  placeholder="Enter search query (e.g., 'fraud investigation', 'wire transfer', 'John Doe')..."
- bind:value={searchQuery}
+ bind, value={searchQuery}
  onkeydown={(e) => e.key === 'Enter' && performSearch()}
  />
  <button
- class="search-btn {isSearching ? 'searching' : ''}"
+ class="search-btn {isSearching ? 'searching' , ''}"
  onclick={ performSearch }
  disabled={isSearching || !searchQuery.trim()}
  >
@@ -237,23 +237,23 @@
  <h3>SEARCH FILTERS</h3>
  <div class="filter-grid">
  <label class="filter-item">
- <input type="checkbox" bind:checked={searchFilters.cases} />
+ <input type="checkbox" bind, checked={searchFilters.cases} />
  <span class="filter-label">Cases</span>
  </label>
  <label class="filter-item">
- <input type="checkbox" bind:checked={searchFilters.evidence} />
+ <input type="checkbox" bind, checked={searchFilters.evidence} />
  <span class="filter-label">Evidence</span>
  </label>
  <label class="filter-item">
- <input type="checkbox" bind:checked={searchFilters.persons} />
+ <input type="checkbox" bind, checked={searchFilters.persons} />
  <span class="filter-label">Persons</span>
  </label>
  <label class="filter-item">
- <input type="checkbox" bind:checked={searchFilters.documents} />
+ <input type="checkbox" bind, checked={searchFilters.documents} />
  <span class="filter-label">Documents</span>
  </label>
  <label class="filter-item">
- <input type="checkbox" bind:checked={searchFilters.communications} />
+ <input type="checkbox" bind, checked={searchFilters.communications} />
  <span class="filter-label">Communications</span>
  </label>
  </div>
@@ -270,7 +270,7 @@
  <div class="results-list">
  {#each searchResults as result}
  <div
- class="result-item {selectedResult?.id === result.id ? 'selected' : ''}"
+ class="result-item {selectedResult?.id === result.id ? 'selected' , ''}"
  onclick={() => selectedResult = result}
  >
  <div class="result-icon">
@@ -284,7 +284,7 @@
  <span class="result-relevance">RELEVANCE: {(result.relevance * 100).toFixed(1)}%</span>
  <span
  class="result-status"
- style="background-color: {getStatusColor(result.status)}"
+ style="background-color, {getStatusColor(result.status)}"
  >
  {result.status.toUpperCase()}
  </span>
@@ -335,7 +335,7 @@
  </div>
  <div class="detail-row">
  <span class="detail-label">STATUS:</span>
- <span class="detail-value status" style="color: {getStatusColor(selectedResult.status)}">
+ <span class="detail-value status" style="color, {getStatusColor(selectedResult.status)}">
  {selectedResult.status.toUpperCase()}
  </span>
  </div>

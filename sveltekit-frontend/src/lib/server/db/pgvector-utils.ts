@@ -402,7 +402,7 @@ export async function pgvectorHealthCheck(): Promise<PgVectorHealthResult> {
                 SELECT 1 FROM pg_extension WHERE extname = 'vector'
             ) as has_vector,
             (SELECT extversion FROM pg_extension WHERE extname = 'vector') as version
-        `)) as Array<{ has_vector?: boolean; version?: string }>;
+        `)) as Array<{ has_vector?: boolean; version?, string }>;
 
         const first = extensionCheck && extensionCheck[0];
         if (!first?.has_vector) {
@@ -422,7 +422,7 @@ export async function pgvectorHealthCheck(): Promise<PgVectorHealthResult> {
                 'search_similar_messages',
                 'search_similar_evidence'
             );
-        `)) as Array<{ routine_name?: string }>;
+        `)) as Array<{ routine_name?, string }>;
 
         const availableFunctions = (functionsCheck || []).map(row => row.routine_name || '');
 

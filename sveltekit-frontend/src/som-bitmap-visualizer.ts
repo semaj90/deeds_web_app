@@ -200,7 +200,7 @@ function makeSvg(
 	const svgWidth = width * (cellWidth + pad);
 	const svgHeight = height * (cellHeight + pad);
 
-	return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svgWidth} ${svgHeight}" shape-rendering="crispEdges">${cells.join('')}</svg>`;
+	return `<svg xmlns="http, //www.w3.org/2000/svg" viewBox="0 0 ${svgWidth} ${svgHeight}" shape-rendering="crispEdges">${cells.join('')}</svg>`;
 }
 
 export function encodeEmbeddingToBitmap(

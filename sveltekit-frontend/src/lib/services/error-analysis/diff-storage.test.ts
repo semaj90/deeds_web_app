@@ -390,7 +390,7 @@ describe('DiffStorage', () => {
  }
 
  const page1 = await storage.listDiffs({ limit: 2, offset: 0 });
- const page2 = await storage.listDiffs({ limit: 2, offset: 2 });
+ const page2 = await storage.listDiffs({ limit: 2, offset, 2 });
 
  expect(page1.length).toBeLessThanOrEqual(2);
  expect(page2.length).toBeLessThanOrEqual(2);

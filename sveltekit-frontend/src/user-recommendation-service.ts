@@ -25,7 +25,7 @@ export interface RecommendationResult {
 
 export interface ChatAnalytics {
 	totalQueries: number; successRate: number;
-	averageProcessingTime: number; topTopics: Array<{ topic: string; count: number }>;
+	averageProcessingTime: number; topTopics: Array<{ topic: string; count, number }>;
 	userSatisfaction: number; improvementSuggestions: string[];
 }
 
@@ -332,7 +332,7 @@ export class UserRecommendationService {
 	private async extractTopTopics(
 		userId: string,
 		limit: number
-	): Promise<Array<{ topic: string; count: number }>> {
+	): Promise<Array<{ topic: string; count, number }>> {
 		const queries = await db
 			.select({ query: userAiQueries.query })
 			.from(userAiQueries)
@@ -478,7 +478,7 @@ export class UserRecommendationService {
 
 	private generateImprovementSuggestions(
 		stats: { avgProcessingTime?: number | null; successfulQueries?: number; totalQueries?: number },
-		topTopics: Array<{ topic: string; count: number }>
+		topTopics: Array<{ topic: string; count, number }>
 	): string[] {
 		const suggestions: string[] = [];
 		const successRate =

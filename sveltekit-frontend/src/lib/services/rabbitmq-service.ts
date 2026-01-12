@@ -34,7 +34,7 @@ export interface RabbitMQConfig {
 export interface IRabbitMQService {
     initialize(retries?: number, delay?: number): Promise<void>;
     publishDocumentProcessingJob(job: DocumentProcessingJob): Promise<boolean>;
-    publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{ success: number; failed: number }>;
+    publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{ success: number; failed, number }>;
     purgeQueue(queueType: keyof RabbitMQConfig['queues']): Promise<boolean>;
     close(): Promise<void>;
     healthCheck(): Promise<any>;
@@ -113,7 +113,7 @@ class RabbitMQService implements IRabbitMQService {
                 console.log(`Connecting to RabbitMQ (Attempt ${attempt}/${maxRetries})...`);
                 this.connection = await amqp.connect(this.config.url);
 
-                this.connection.on('error', (err: any) => {
+                this.connection.on('error', (err, any) => {
                     console.error('RabbitMQ Connection Error:', err);
                     this.isConnected = false;
                 });
@@ -178,7 +178,7 @@ class RabbitMQService implements IRabbitMQService {
         }
     }
 
-    async publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{ success: number; failed: number }> {
+    async publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{ success: number; failed, number }> {
         let success = 0;
         let failed = 0;
 

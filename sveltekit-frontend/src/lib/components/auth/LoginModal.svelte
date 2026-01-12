@@ -8,7 +8,7 @@
  {#if $message} <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700"> {$message} {/if} <form class="space-y-4" method="POST" action="/api/auth/login" use, enhance> <div> <label for="email" class="block text-sm font-medium text-slate-700">Email</label> <input id="email"
             type="email"
             name="email"
-            bind:value={$form.email} class="w-full px-3 py-2 border {$errors.email ? 'border-red-500': 'border-slate-300'} rounded-md focus:outline-none focus, ring-2"
+            bind:value={$form.email} class="w-full px-3 py-2 border {$errors.email ? 'border-red-500': 'border-slate-300'} rounded-md focus, outline-none focus, ring-2"
             placeholder="you@example.com"
           />
 
@@ -17,7 +17,7 @@
 </div> <div> <label for="password" class="block text-sm font-medium text-slate-700">Password</label> <input id="password"
             type="password"
             name="password"
-            bind:value={$form.password} class="w-full px-3 py-2 border {$errors.password ? 'border-red-500': 'border-slate-300'} rounded-md focus:outline-none focus, ring-2"
+            bind:value={$form.password} class="w-full px-3 py-2 border {$errors.password ? 'border-red-500': 'border-slate-300'} rounded-md focus, outline-none focus, ring-2"
             placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
           />
 
@@ -25,7 +25,7 @@
 </p> {/if}
 </div> <div class="flex items-center"> <label class="flex items-center"> <input type="checkbox"
               name="rememberMe"
-              bind:checked={$form.rememberMe} class="w-4 h-4 border-slate-300 rounded focus, ring-2"
+              bind, checked={$form.rememberMe} class="w-4 h-4 border-slate-300 rounded focus, ring-2"
             /> <span class="text-sm">Remember me</span> </label> <a href="/forgot-password" class="text-sm text-blue-600">Forgot password?</a> </div> <div class="flex gap-3 justify-end"> <Button type="button"
             onclick={ closeModal } variant="secondary"
             class="px-4 py-2 bg-slate-200 text-slate-900 rounded hover, bg-slate-300 bits-btn"

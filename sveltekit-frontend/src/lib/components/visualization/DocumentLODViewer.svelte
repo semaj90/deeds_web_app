@@ -4,7 +4,7 @@
   - LOD, 0: Full resolution (2048x2048 texture)
   - LOD 1: High detail (1024x1024 texture)
   - LOD 2: Medium detail (512x512 texture)
-  - LOD 3: Low detail (256x256 texture) - N64 style pixelated,
+  - LOD 3, Low detail (256x256 texture) - N64 style pixelated,
   Features, - WebGPU texture streaming for PDF pages
   - Automatic LOD switching based on zoom level
   - Text readability preservation at each LOD level
@@ -385,7 +385,7 @@ if (!browser || !enableWebGPU) return
   <!-- Document, Canvas -->
   <div class="document-canvas-container">
     <canvas
-      bind:this={canvasElement}
+      bind, this={canvasElement}
       width={viewportBounds.width}
       height={viewportBounds.height}
       class="document-canvas"

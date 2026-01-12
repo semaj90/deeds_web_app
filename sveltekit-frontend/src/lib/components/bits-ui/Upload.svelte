@@ -1,6 +1,6 @@
 <script lang="ts">
   const { uploadUrl } = $props<{ uploadUrl, string }>()
-  const { onDone } = $props<{ onDone: (res, unknown) }>()
+  const { onDone } = $props<{ onDone, (res, unknown) }>()
   let file: File | null = null
   let text = '';
   async function handleUpload(): Promise<any> {

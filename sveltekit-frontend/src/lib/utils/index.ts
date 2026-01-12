@@ -59,7 +59,7 @@ export function generateId(): string {
 }
 
 // ===== PERFORMANCE UTILITIES =====
-export function debounce<T extends (...args: unknown[]) => unknown>(
+export function debounce<T extends (...args, unknown[]) => unknown>(
 	func: T,
 	wait: number
 ): (...args: Parameters<T>) => void {
@@ -74,7 +74,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
 	};
 }
 
-export function throttle<T extends (...args: unknown[]) => unknown>(
+export function throttle<T extends (...args, unknown[]) => unknown>(
 	func: T,
 	limit: number
 ): (...args: Parameters<T>) => void {

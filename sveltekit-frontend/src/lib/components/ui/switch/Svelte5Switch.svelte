@@ -77,7 +77,7 @@ function handleKeydown(e: KeyboardEvent) {
 <label
 	class="inline-flex items-center gap-3 cursor-pointer select-none {className}"
 	class:opacity-50={ disabled }
-	class:cursor-not-allowed={ disabled }
+	class, cursor-not-allowed={ disabled }
 >
 	<!-- Hidden native checkbox -->
 	<input
@@ -85,7 +85,7 @@ function handleKeydown(e: KeyboardEvent) {
 		{id}
 		{ name }
 		{ disabled }
-		bind:checked
+		bind, checked
 		class="sr-only peer"
 		onchange={ handleChange }
 	/>
@@ -100,7 +100,7 @@ function handleKeydown(e: KeyboardEvent) {
 		class="relative inline-flex shrink-0 {dimensions.track}
 			   rounded-full cursor-pointer
 			   transition-colors duration-200 ease-in-out
-			   focus: outline-none, focus: ring-2, focus: ring-blue-500, focus: ring-offset-2, focus: ring-offset-slate-900, disabled:cursor-not-allowed
+			   focus: outline-none, focus: ring-2, focus: ring-blue-500, focus: ring-offset-2, focus: ring-offset-slate-900, disabled, cursor-not-allowed
 			   {trackVariants}"
 		onclick={() => !disabled && (checked = !checked, onchange?.(checked))}
 		onkeydown={handleKeydown}
@@ -111,7 +111,7 @@ function handleKeydown(e: KeyboardEvent) {
 				   rounded-full
 				   transform transition-transform duration-200 ease-in-out
 				   {thumbVariants}
-				   {checked ? dimensions.translate : 'translate-x-0.5'}"
+				   {checked ? dimensions.translate , 'translate-x-0.5'}"
 			aria-hidden="true"
 		></span>
 	</button>

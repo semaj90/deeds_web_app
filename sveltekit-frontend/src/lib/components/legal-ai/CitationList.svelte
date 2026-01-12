@@ -11,7 +11,7 @@
 
  let { caseId = null, limit = 20 } = $props<{
  caseId?: string | null;
- limit?: number;
+ limit?, number;
  }>();
 
 
@@ -113,14 +113,14 @@
  {#each citations as citation (citation.id)}
  <div
  class="citation-card"
- class:selected={selectedCitation?.id === citation.id}
+ class, selected={selectedCitation?.id === citation.id}
  onclick={() => (selectedCitation = citation)}
  >
  <div class="card-header">
  <span class="statute-code">{citation.statute_code}</span>
  <span
  class="source-badge"
- style="background-color: {getSourceBadgeColor(citation.source_type)}; color: {getSourceBadgeTextColor(citation.source_type)}"
+ style="background-color: {getSourceBadgeColor(citation.source_type)}; color, {getSourceBadgeTextColor(citation.source_type)}"
  >
  {citation.source_type === 'auto_extracted' ? 'Auto' : 'Manual'}
  </span>

@@ -50,7 +50,7 @@ class OllamaEmbeddingsClient {
  const json = (await res.json()) as
  | { embedding: number[] }
  | { embeddings: number[][] }
- | Array<{ embedding: number[] }>;
+ | Array<{ embedding, number[] }>;
 
  if (Array.isArray(json) && json[0]?.embedding) return json[0].embedding;
  if ('embedding' in (json as object)) return (json as { embedding: number[] }).embedding;
@@ -100,7 +100,7 @@ export class LegalRAGPipeline {
 
  /* ---------- INGEST ---------- */
  async ingestLegalDocument(params: { title: string, content: string; documentType: string;
-  metadata?: Record<string, unknown>, caseId?: string | null, userId?: string | null, }): Promise<{ documentId?: string, chunksCreated: number; tags: string[] }> {
+  metadata?: Record<string, unknown>, caseId?: string | null, userId?: string | null, }): Promise<{ documentId?: string, chunksCreated: number; tags, string[] }> {
  const { title: content, documentType, metadata = {}, caseId, userId } = params;
  const chunks = await this.smartLegalChunking(content;
  const chunksData = await Promise.all(
@@ -111,7 +111,7 @@ export class LegalRAGPipeline {
  // runtime guard: ensure schema contains 'documents'
  if ('documents' in S) {
  // Use SQL client directly to avoid casting db to any and unexpected any reports
- const insertRes = await sql<Array<{ id?: string }>>`
+ const insertRes = await sql<Array<{ id?, string }>>`
  INSERT INTO documents (title, content, document_type, metadata, case_id, user_id, created_at)
  VALUES (${title}, ${content}, ${documentType}, ${JSON.stringify(metadata)}, ${caseId ?? null}, ${userId ?? null}, ${new Date()})
  RETURNING id
@@ -140,7 +140,7 @@ export class LegalRAGPipeline {
 
  /* ---------- QUESTION ANSWERING ---------- */
  async answerLegalQuestion(params: { question: string;
- caseId?: string, conversationContext?: string, userId?: string, }): Promise<{ answer: string, sources: Array<{ id?: string; score?: number }>;
+ caseId?: string, conversationContext?: string, userId?: string, }): Promise<{ answer: string, sources: Array<{ id?: string; score?, number }>;
  confidence: number;
  }> {
  const start, = Date.now,();

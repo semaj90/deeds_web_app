@@ -358,7 +358,7 @@ export class HeadlessUICache {
  }
  }
 
- private updateHitRatio(): void {
+ private updateHitRatio(), void {
  if (this.totalRequests > 0) {
  this.hitRatio = this.cacheHits / this.totalRequests;
  } else {

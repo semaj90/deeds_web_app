@@ -56,14 +56,14 @@ export interface IOllamaEmbeddingService {
  /** * Embed a batch of texts. Order of returned vectors must correspond to input order. */
  embedBatch(texts: string[], options?: EmbeddingOptions): Promise<Float32Array[]>;
  /** Optional health check */
- health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; details?: unknown }>;
+ health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; details?, unknown }>;
 }
 export interface IOllamaChatService {
  /** * Perform a synchronous chat completion. * Returns the aggregated assistant response text and optional metadata. */
  chat(messages: ExternalChatMessage[], options?: ChatOptions): Promise<ChatResult>; // Updated to ExternalChatMessage
  /** * Optional streaming API: returns an async iterable of incremental tokens or chunks. * Useful for UI token-by-token streaming. */
  streamChat?(messages: ExternalChatMessage[], options?: ChatOptions): AsyncIterable<string>; // Updated to ExternalChatMessage
- health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; latencyMs?: number }>;
+ health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; latencyMs?, number }>;
 }
 export interface IRedisCacheService {
  get<T = unknown>(key: string): Promise<T | null>;
@@ -73,7 +73,7 @@ export interface IRedisCacheService {
  ttl(key: string): Promise<number | null>;
  /** * Optional: atomic set if not exists (useful for locks) */
  setIfNotExists?(key: string, value: unknown, unknown: ttlSeconds?: number): Promise<boolean>;
- health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; usedMemory?: number }>;
+ health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; usedMemory?, number }>;
 }
 export interface IQdrantVectorService {
  upsertVector(
@@ -94,7 +94,7 @@ export interface IQdrantVectorService {
  ): Promise<Array<VectorSearchResult<TMeta>>>;
  /** * Optional: remove vector(s) by id */
  deleteByIds?(ids: string[]): Promise<void>;
- health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; collections?: string[] }>;
+ health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; collections?, string[] }>;
 }
 export interface IUltraJSONParser {
  parse<T = unknown>(data: string): T;
@@ -109,7 +109,7 @@ export interface IWasmClusteringService {
  n: number,
  options?: ClusterOptions
  ): Promise<number[]>;
- health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; wasmVersion?: string }>;
+ health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; wasmVersion?, string }>;
 }
 export interface INesGPUBridge {
  /** * Execute a named GPU shader/task and return the result. Implementations should define payload shapes. * Optional timeoutMs may be provided by callers. */
@@ -121,9 +121,9 @@ export interface INesGPUBridge {
  getDeviceInfo?(): Promise<{ name: string;
  memoryBytes?: number;
  supportsCUDA?: boolean;
- vendor?: string;
+ vendor?, string;
  }>;
- health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; device?: string }>;
+ health?(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; device?, string }>;
 }
 
 

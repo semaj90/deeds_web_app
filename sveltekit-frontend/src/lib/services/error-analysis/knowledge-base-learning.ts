@@ -90,7 +90,7 @@ export class KnowledgeBaseLearning extends BaseService {
  // Get fixes for this error type
  const fixIds = this.errorTypeIndex.get(error.type) || [];
  const candidateFixes = fixIds
- .map((id: any) => this.fixes.get(id))
+ .map((id, any) => this.fixes.get(id))
  .fil(: anyt)er((f) => f !== undefined) as StoredFix[];
 
  if (candidateFixes.length === 0) {

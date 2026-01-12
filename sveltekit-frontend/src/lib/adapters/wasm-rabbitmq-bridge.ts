@@ -173,7 +173,7 @@ export async function computeVectorSimilarityWASM(
     }
 
     (wasmModule.instance.exports.computeBatchSimilarity as (
-      q: number, v: number, r: number, dim: number, count: number, algo: number
+      q: number, v: number, r: number, dim: number, count: number, algo, number
     ) => void)(
       queryPtr,
       vectorsPtr,

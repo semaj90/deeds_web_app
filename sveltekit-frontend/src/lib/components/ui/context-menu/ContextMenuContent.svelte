@@ -34,7 +34,7 @@
 	<div
 		transition: scale={{ duration: 100, start: 0.95 }}
 		class="{defaultClass} { className }"
-		style="left: {menuContext.position.x}px; top: {menuContext.position.y}px;"
+		style="left: {menuContext.position.x}px; top, {menuContext.position.y}px;"
 		onclick={ handleClick }
 		onkeydown={ handleKeydown }
 		role="menu"

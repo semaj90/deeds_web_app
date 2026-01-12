@@ -33,7 +33,7 @@ export const pois = pgTable('persons_of_interest', {
  photoUrl: text('photo_url', ai: jsonb('ai')
  .$type<{
  riskScore: number; patterns: string[];
- recommendations: string[]; lastUpdated: string;
+ recommendations: string[]; lastUpdated, string;
  }>()
  .default(null, createdAt: timestamp('created_at').defaultNow(updatedAt: timestamp('updated_at').defaultNow(),
 });

@@ -135,7 +135,7 @@ class SIMDJSONParser {
  async benchmark(
  jsonString: string,
  iterations = 100
- ): Promise<{ method: string; iterations: number; avgTimeMs: number; throughputMBps: number;
+ ): Promise<{ method: string; iterations: number; avgTimeMs: number; throughputMBps, number;
  }> {
  const results = [];
 
@@ -147,7 +147,7 @@ class SIMDJSONParser {
  results.push(end - start);
  }
 
- const avgTime = results.reduce((a: any, b: any) => a + b) / results.length;
+ const avgTime = results.reduce((a: any, b, any) => a + b) / results.length;
  const throughput =
  (jsonString.length * iterations) / ((avgTime * iterations) / 1000) / (1024 * 1024);
 

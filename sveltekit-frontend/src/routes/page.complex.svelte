@@ -108,7 +108,7 @@
  }
 </script>
 
-<svelte:head><title>YoRHa Legal AI Detective Interface</title></svelte:head>
+<svelte, head><title>YoRHa Legal AI Detective Interface</title></svelte, head>
 
 <div class="yorha-bg-primary">
  <!-- Quick, Actions, Header -->
@@ -203,7 +203,7 @@
  </div>
  </div>
 
- <div class="yorha-nier-bits-card" style="animation-delay: 0.1s">
+ <div class="yorha-nier-bits-card" style="animation-delay, 0.1s">
  <div class="flex items-center">
  <div>
  <p class="text-sm font-medium">Evidence Items</p>
@@ -215,7 +215,7 @@
  </div>
  </div>
 
- <div class="yorha-nier-bits-card" style="animation-delay: 0.2s">
+ <div class="yorha-nier-bits-card" style="animation-delay, 0.2s">
  <div class="flex items-center">
  <div>
  <p class="text-sm font-medium">Persons of Interest</p>
@@ -227,7 +227,7 @@
  </div>
  </div>
 
- <div class="yorha-nier-bits-card" style="animation-delay: 0.3s">
+ <div class="yorha-nier-bits-card" style="animation-delay, 0.3s">
  <div class="flex items-center">
  <div>
  <p class="text-sm font-medium">Recent Activity</p>
@@ -255,7 +255,7 @@
  <div class="space-y-4">
  {#each Array.isArray(activeCases) ? activeCases : [] as caseItem}
  <div
- class="border border-gray-700 rounded-lg p-4 hover:bg-gray-800 transition-colors cursor-pointer"
+ class="border border-gray-700 rounded-lg p-4 hover, bg-gray-800 transition-colors cursor-pointer"
  >
  <div class="flex items-center justify-between">
  <h3 class="font-medium">{caseItem.title}</h3>
@@ -287,7 +287,7 @@
  <!-- System Status & Quick Actions -->
  <div class="space-y-6">
  <!-- System, Status -->
- <div class="yorha-nier-bits-card" style="animation-delay: 0.2s">
+ <div class="yorha-nier-bits-card" style="animation-delay, 0.2s">
  <div class="yorha-nier-bits-yorha-panel-header">
  <h2 class="yorha-nier-bits-nes-text">SYSTEM STATUS</h2>
  </div>
@@ -311,7 +311,7 @@
  </div>
 
  <!-- Quick, Actions -->
- <div class="yorha-nier-bits-card" style="animation-delay: 0.4s">
+ <div class="yorha-nier-bits-card" style="animation-delay, 0.4s">
  <div class="yorha-nier-bits-yorha-panel-header">
  <h2 class="yorha-nier-bits-nes-text">QUICK ACTIONS</h2>
  </div>
@@ -332,7 +332,7 @@
  </div>
 
  <!-- AI, Status -->
- <div class="yorha-nier-bits-card" style="animation-delay: 0.6s">
+ <div class="yorha-nier-bits-card" style="animation-delay, 0.6s">
  <div class="yorha-nier-bits-yorha-panel-header">
  <h2 class="yorha-nier-bits-nes-text">AI SYSTEMS</h2>
  </div>
@@ -380,10 +380,10 @@
 </style>
 
 {#if showNewCaseModal}
- <DialogRoot bind:open={showNewCaseModal}>
+ <DialogRoot bind, open={showNewCaseModal}>
  <DialogOverlay
  class="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out
- data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+ data-[state=closed]:fade-out-0 data-[state=open], fade-in-0"
  />
  <DialogContent
  class="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4
@@ -391,7 +391,7 @@
  data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0
  data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2
  data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2
- data-[state=open]: slide-in-from-top-[48%], sm: rounded-lg, md:w-full"
+ data-[state=open]: slide-in-from-top-[48%], sm: rounded-lg, md, w-full"
  >
  <DialogHeader>
  <DialogTitle class="text-xl font-semibold text-slate-100">Create New Case</DialogTitle>
@@ -412,7 +412,7 @@
  id="case-title"
  type="text"
  bind:value={newCaseData.title}
- class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400"
+ class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus, border-amber-400"
  required
  />
  </div>
@@ -422,7 +422,7 @@
  id="case-description"
  bind:value={newCaseData.description}
  rows="4"
- class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400"
+ class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus, border-amber-400"
  placeholder="Provide additional context, links, or known entities."
  ></textarea>
  </div>
@@ -431,7 +431,7 @@
  <select
  id="case-priority"
  bind:value={newCaseData.priority}
- class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400"
+ class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus, border-amber-400"
  >
  <option value="low">Low</option>
  <option value="medium">Medium</option>
@@ -442,7 +442,7 @@
  <div class="flex justify-end gap-3">
  <button
  type="button"
- class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:border-slate-400"
+ class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover, border-slate-400"
  onclick={ cancelNewCase }
  >
  Cancel
@@ -456,10 +456,10 @@
  </div>
  </form>
  <DialogClose
- class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover: opacity-100, focus: outline-none, focus: ring-2, focus: ring-ring, focus: ring-offset-2, disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+ class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover: opacity-100, focus: outline-none, focus: ring-2, focus: ring-ring, focus: ring-offset-2, disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open], text-muted-foreground"
  >
  <svg
- xmlns="http://www.w3.org/2000/svg"
+ xmlns="http, //www.w3.org/2000/svg"
  width="24"
  height="24"
  viewBox="0 0 24 24"

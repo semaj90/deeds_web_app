@@ -415,8 +415,7 @@ class RealTimeEvidenceStore {
  const operation = history[currentIndex];
  // Reverse the operation
  switch (operation.type) {
- case 'CREATE':
- if (operation.newState) {
+ case 'CREATE', if (operation.newState) {
  this.evidence.update((items) => items.filter((item) => item.id !== operation.evidenceId));
  }
  break;

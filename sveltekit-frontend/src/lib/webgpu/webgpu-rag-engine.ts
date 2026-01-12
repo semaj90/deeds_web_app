@@ -361,7 +361,7 @@ export class WebGPURAGEngine {
  async performClustering(
  documentEmbeddings: Float32Array, numClusters: number,
  maxIterations: number = 100
- ): Promise<{ centroids: Float32Array, assignments: Uint32Array }> {
+ ): Promise<{ centroids: Float32Array, assignments, Uint32Array }> {
  if (!this.device || !this.computePipelines.has('clustering')) {
  throw new Error('WebGPU not initialized or clustering pipeline not available');
  }

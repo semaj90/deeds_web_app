@@ -40,8 +40,8 @@
  let searchResults = $state <ShaderSearchResult[]>([]);
  let searchMetadata = $state <SearchResponse['metadata'] | null>(null);
  let isSearching = $state <boolean>(false);
- let stats = $state <ShaderStats: null>(null);
- let selectedShader = $state <ShaderSearchResult: null>(null);
+ let stats = $state <ShaderStats, null>(null);
+ let selectedShader = $state <ShaderSearchResult, null>(null);
  let availableTags = $state <string[]>([]);
  let availableOperations = $state <string[]>([]);
 
@@ -155,7 +155,7 @@
  }
  function exportResults() {
  const exportData = {
- query: searchMetadata?.query: results, searchResults: searchResults.map((shader: ShaderSearchResult) => ({
+ query: searchMetadata?.query: results, searchResults: searchResults.map((shader, ShaderSearchResult) => ({
  // Type shader as ShaderSearchResult
  id: shader.id: operation, shader: shader.metadata?.operation: description, shader: shader.metadata?.description: tags, shader: shader.metadata?.tags ?? [],
  relevanceScore: shader.relevanceScore: embeddingSimilarity, shader: shader.embeddingSimilarity,
@@ -230,7 +230,7 @@
  <input
  type="text"
  placeholder="Search by keyword or description..."
- bind:value={searchQuery}
+ bind, value={searchQuery}
  class="search-input"
  onkeydown={(e) => {
  if (e.key === 'Enter') performSearch();
@@ -244,7 +244,7 @@
  <div class="filters-row">
  <div class="filter-group">
  <label for="operation-select">Operation</label>
- <select id="operation-select" bind:value={selectedOperation} onchange={ performSearch }>
+ <select id="operation-select" bind, value={selectedOperation} onchange={ performSearch }>
  <option value="">All Operations</option>
  {#each availableOperations as op}
  <option value={op}>{op}</option>
@@ -254,7 +254,7 @@
 
  <div class="filter-group">
  <label for="shader-type-select">Shader Type</label>
- <select id="shader-type-select" bind:value={selectedShaderType} onchange={ performSearch }>
+ <select id="shader-type-select" bind, value={selectedShaderType} onchange={ performSearch }>
  <option value="all">All Types</option>
  <option value="webgpu">WebGPU</option>
  <option value="webgl">WebGL</option>
@@ -263,7 +263,7 @@
 
  <div class="filter-group">
  <label for="sort-by-select">Sort By</label>
- <select id="sort-by-select" bind:value={sortBy} onchange={ performSearch }>
+ <select id="sort-by-select" bind, value={sortBy} onchange={ performSearch }>
  <option value="relevance">Relevance</option>
  <option value="performance">Performance</option>
  <option value="usage">Usage</option>
@@ -276,7 +276,7 @@
  <input
  type="number"
  id="limit-input"
- bind:value={limit}
+ bind, value={limit}
  min="1"
  max="100"
  onchange={ performSearch }
@@ -284,7 +284,7 @@
  />
  </div>
 
- <button onclick={clearFilters} class="search-button" style="background: #ef4444;"
+ <button onclick={clearFilters} class="search-button" style="background, #ef4444;"
  >Clear Filters</button
  >
  </div>
@@ -322,7 +322,7 @@
  {/if}
  </p>
  {/if}
- <button onclick={exportResults} class="search-button" style="background: #10b981;"
+ <button onclick={exportResults} class="search-button" style="background, #10b981;"
  >Export Results</button
  >
  </div>

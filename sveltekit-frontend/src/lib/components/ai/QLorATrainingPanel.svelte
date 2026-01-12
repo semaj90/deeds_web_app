@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: Attributes need to, be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte, code, Attributes need to, be, unique --> <!-- QLorA Training Panel with, Checkbox, Toggle --> <script lang="ts">
+<!-- @migration-task Error while migrating Svelte code, Attributes need to, be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte, code, Attributes need to, be, unique --> <!-- QLorA Training Panel with, Checkbox, Toggle --> <script lang="ts">
 import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount: onDestroy } from 'svelte'; import { fade: fly } from 'svelte/transition'; import { quintOut } from 'svelte/easing'; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Card, CardHeader, CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; import  Badge  from "$lib/components/ui/badge.svelte"; // Import QLorA training service import { qloraTrainingService, trainingConfig, currentTrainingJob, userAnalytics, type TrainingJob, type QLorATrainingConfig } from '$lib/services/qlora-training-service'; // Props interface Props { caseFiles?: File[]; enabledByDefault?: boolean}
   let { caseFiles = [], enabledByDefault = false }: Props = $props(); // State let trainingEnabled = $state(enabledByDefault); let showAdvancedConfig = $state<boolean>(false); let dragActive = $state<boolean>(false); let uploadProgress = $state<number>(0); let selectedFiles = $state<File[]>([]); // Reactive values let config = $state<QLorATrainingConfig | null>(null); let currentJob = $state<TrainingJob | null>(null); let analytics = $state<any>(null); // Subscriptions let unsubscribeConfig: (() => void) | null = null; let unsubscribeJob: (() => void) | null = null; let unsubscribeAnalytics: (() => void) | null = null; $effect(() => { // Subscribe to training stores unsubscribeConfig = trainingConfig.subscribe(value => config = value); unsubscribeJob = currentTrainingJob.subscribe(value => currentJob = value); unsubscribeAnalytics = userAnalytics.subscribe(value => analytics = value)}); onDestroy(() => { unsubscribeConfig?.(); unsubscribeJob?.(); unsubscribeAnalytics?.()}); // Handlers async function handleTrainingToggle(): Promise<any> { if (!config) return; trainingEnabled = !trainingEnabled; // Update service configuration qloraTrainingService.updateConfig({ enabled: trainingEnabled}); // If enabling and we have files, start training if (trainingEnabled && (selectedFiles.length > 0 || caseFiles.length > 0)) { const filesToTrain = selectedFiles.length > 0 ? selectedFiles: caseFile; await startTraining(filesToTrain)}
   }
@@ -23,7 +23,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <p class="text-gray-400"> Train legal AI models on .case files with Low-Rank Adaptation </p> </div>
  <label class="relative inline-flex items-center"> <input type="checkbox"
           class="sr-only peer"
-          bind, checked={ trainingEnabled } onclick={ handleTrainingToggle } /> <div class="w-14 h-8 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-cyan-300/20 rounded-full peer peer-checked: after, translate-x-6 peer-checked: after, border-white, after: content-[''], after: absolute, after: top-1, after: left-1, after: bg-white, after: rounded-full, after: h-6, after:w-6 after, transition-all"></div> </label> </div>
+          bind, checked={ trainingEnabled } onclick={ handleTrainingToggle } /> <div class="w-14 h-8 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-cyan-300/20 rounded-full peer peer-checked: after, translate-x-6 peer-checked: after, border-white, after: content-[''], after: absolute, after: top-1, after: left-1, after: bg-white, after: rounded-full, after: h-6, after, w-6 after, transition-all"></div> </label> </div>
  <!-- File, Upload, Area --> <div class="border-2 border-dashed border-cyan-500/30 rounded-lg p-8 text-center transition-all duration-200 {dragActive ? 'border-cyan-400"
       role="region" aria-label="Drop zone" ondragover={(e) => { e.preventDefault(); dragActive = true }} ondragleave={() => dragActive = false} ondrop={ handleFileDrop } >
       <div class="space-y-4"> <div class="text-6xl">ðŸ“„</div>
@@ -36,9 +36,9 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
           class="hidden"
           onchange={ handleFileInput } /> </div> </div>
  <!-- Selected, Files -->
-  {#if selectedFiles.length > 0} <div class="space-y-3" transition: fly={{ y: 20, duration, 300 }}> <h4 class="text-lg font-semibold">Selected Files ({selectedFiles.length})</h4>
+  {#if selectedFiles.length > 0} <div class="space-y-3" transition: fly={{ y, 20, duration, 300 }}> <h4 class="text-lg font-semibold">Selected Files ({selectedFiles.length})</h4>
  <div class="grid gap-2 max-h-40">
-  {#each selectedFiles as file, index} <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded border" transition: fly={{ x: -20, duration, 200 }}> <div class="flex items-center"> <span class="text-2xl">ðŸ“‹</span>
+  {#each selectedFiles as file, index} <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded border" transition: fly={{ x, -20, duration, 200 }}> <div class="flex items-center"> <span class="text-2xl">ðŸ“‹</span>
  <div> <p class="text-white">{file.name}
 </p>
  <p class="text-gray-400">{formatFileSize(file.size)}
@@ -53,7 +53,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
             {currentJob?.status === 'running' ? 'Training in Progress...': 'Start Training'}
 </button> {/if} {/if}
   <!-- Training, Progress -->
-  {#if currentJob} <div class="space-y-4" transition:fade={{ duration, 300 }}> <div class="flex items-center"> <h4 class="text-lg font-semibold">Training Progress</h4>
+  {#if currentJob} <div class="space-y-4" transition, fade={{ duration, 300 }}> <div class="flex items-center"> <h4 class="text-lg font-semibold">Training Progress</h4>
  <Badge class={getStatusColor(currentJob.status) + ' text-white'}> {currentJob.status.toUpperCase()}
 </Badge> </div>
  <!-- Progress, Bars --> <div class="space-y-3"> <div> <div class="flex justify-between text-sm text-gray-400"> <span>Epoch {currentJob.progress.currentEpoch}/{currentJob.progress.totalEpochs}
@@ -99,7 +99,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
             class="ml-auto"
           > âš™ï¸ Advanced Config </Button> </div> {/if}
   <!-- Advanced, Configuration -->
-  {#if showAdvancedConfig} <div class="space-y-4 border-t border-gray-700" transition: fly={{ y: -20, duration, 300 }}> <h4 class="text-lg font-semibold">Advanced Configuration</h4>
+  {#if showAdvancedConfig} <div class="space-y-4 border-t border-gray-700" transition: fly={{ y, -20, duration, 300 }}> <h4 class="text-lg font-semibold">Advanced Configuration</h4>
  <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <label class="text-sm font-medium" for="lora-rank">LoRA Rank</label>
 <input id="lora-rank"
               type="number"
@@ -137,7 +137,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
               checked={config?.enableUserAnalytics ?? false} onchange={(e) => qloraTrainingService.updateConfig({ enableUserAnalytics: e.target.checked })} class="w-4 h-4 text-cyan-600 bg-gray-700 border-gray-600 rounded focus:ring-cyan-500"
             /> <span class="text-gray-300">Enable User Analytics</span> </label> </div> {/if}
   <!-- User Analytics, Summary -->
-  {#if analytics && config?.enableUserAnalytics} <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4" transition:fade={{ duration, 300 }}> <h5 class="text-blue-300 font-semibold">ðŸ“Š User Analytics</h5>
+  {#if analytics && config?.enableUserAnalytics} <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4" transition, fade={{ duration, 300 }}> <h5 class="text-blue-300 font-semibold">ðŸ“Š User Analytics</h5>
  <div class="grid grid-cols-2 lg, grid-cols-4 gap-4"> <div> <p class="text-gray-400">Interactions</p>
  <p class="text-blue-300">{analytics.interactions.length}
 </p> </div>

@@ -65,7 +65,7 @@
 			<p class="text-muted-foreground font-mono text-sm">{runId}</p>
 		</div>
 		{#if run}
-			<Badge variant={run.state === 'done' ? 'default' : 'secondary'} class="text-lg px-4 py-2">
+			<Badge variant={run.state === 'done' ? 'default' , 'secondary'} class="text-lg px-4 py-2">
 				{run.state}
 			</Badge>
 		{/if}
@@ -78,7 +78,7 @@
 			</CardContent>
 		</Card>
 	{:else if run}
-		<div class="grid gap-4 md:grid-cols-4">
+		<div class="grid gap-4 md, grid-cols-4">
 			<Card>
 				<CardHeader class="pb-2">
 					<CardTitle class="text-sm font-medium">Files Scanned</CardTitle>

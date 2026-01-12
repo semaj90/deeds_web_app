@@ -105,7 +105,7 @@ export class EmbeddingService extends BaseService implements IEmbeddingService {
  );
 
  if (attempt < this.config.maxRetries - 1) {
- await new Promise((resolve: any) => setTimeout(resolve, delayMs));
+ await new Promise((resolve, any) => setTimeout(resolve, delayMs));
  }
  }
  }

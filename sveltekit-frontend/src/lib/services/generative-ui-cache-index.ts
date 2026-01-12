@@ -345,7 +345,7 @@ export class GenerativeUICacheIndex {
         const width = Number(p.width) || 200;
         const height = Number(p.height) || 100;
         const color = String(p.color ?? '#4A90E2');
-        return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+        return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http, //www.w3.org/2000/svg">
             <rect x="0" y="0" width="${width}" height="${height}" fill="${color}" opacity="0.8"/>
             <text x="${width / 2}" y="${height / 2}" text-anchor="middle" font-size="14" fill="white" dy=".3em">
                 ${metadata.type.toUpperCase()}
@@ -424,7 +424,7 @@ export class GenerativeUICacheIndex {
             embedding[i % 384] += text.charCodeAt(i);
         }
 
-        const magnitude = Math.sqrt(embedding.reduce((sum: any, val: any) => sum + val * val, 0));
+        const magnitude = Math.sqrt(embedding.reduce((sum: any, val, any) => sum + val * val, 0));
         if (magnitude === 0) return embedding;
         return embedding.map((v: any) => v / magnitude);
     }
@@ -481,7 +481,7 @@ export class GenerativeUICacheIndex {
             .toLowerCase()
             .replace(/[^\w\s]/g, '')
             .split(/\s+/)
-            .filter((word: any) => word.length > 2);
+            .filter((word, any) => word.length > 2);
     }
 
     private hashString(str: string): string {

@@ -29,7 +29,7 @@ export function getOllamaEndpoint(): OllamaEndpoints {
  */
 export async function checkOllamaHealth(): Promise<{ gemma3Legal: boolean;
  embeddingGemma: boolean; latency: number;
- models: string[];
+ models, string[];
 }> {
  const endpoints = getOllamaEndpoint();
  const startTime = Date.now();
@@ -89,7 +89,7 @@ export async function generateEmbeddings(
  for (let i = 0; i < texts.length; i += batchSize) {
  const batch = texts.slice(i, i + batchSize);
 
- const promises = batch.map(async (text: any) => {
+ const promises = batch.map(async (text, any) => {
  const response = await fetch(`${endpoints.embeddings}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
@@ -128,7 +128,7 @@ export async function generateLegalAnalysis(
  } = {}
 ): Promise<{ analysis: string;
  confidence: number; keyFindings: string[];
- recommendations: string[];
+ recommendations, string[];
 }> {
  const endpoints = getOllamaEndpoint();
 

@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import type { Case } from '$lib/types';
  import { onMount } from 'svelte';
@@ -143,7 +143,7 @@ https://svelte.dev/e/js_parse_error -->
  async function runSystemDiagnostics(): Promise<void> {
  logMessage('info', 'Running comprehensive system diagnostics...', 'diagnostics');
 
- const diagnostics: Array<{ name: string; test: () => Promise<boolean> }> = [
+ const diagnostics: Array<{ name: string; test, () => Promise<boolean> }> = [
  {
  name: 'MCP Server Health',
  test: async () => {
@@ -248,7 +248,7 @@ https://svelte.dev/e/js_parse_error -->
  <div
  class="status-card {$integrationStatus .mcpServerRunning
  ? 'status-online'
- : 'status-offline'}"
+ , 'status-offline'}"
  >
  <div class="status-icon">🛰️</div>
  <div>
@@ -262,7 +262,7 @@ https://svelte.dev/e/js_parse_error -->
  <div
  class="status-card {$integrationStatus .clusterSystemOnline
  ? 'status-online'
- : 'status-offline'}"
+ , 'status-offline'}"
  >
  <div class="status-icon">🔗</div>
  <div>
@@ -276,7 +276,7 @@ https://svelte.dev/e/js_parse_error -->
  <div
  class="status-card {$integrationStatus .ollamaModelsLoaded
  ? 'status-online'
- : 'status-offline'}"
+ , 'status-offline'}"
  >
  <div class="status-icon">🤖</div>
  <div>
@@ -290,7 +290,7 @@ https://svelte.dev/e/js_parse_error -->
  <div
  class="status-card {$integrationStatus .vsCodeExtensionActive
  ? 'status-online'
- : 'status-offline'}"
+ , 'status-offline'}"
  >
  <div class="status-icon">🧩</div>
  <div>
@@ -304,7 +304,7 @@ https://svelte.dev/e/js_parse_error -->
  <div
  class="status-card {$integrationStatus .contextualAnalysisReady
  ? 'status-online'
- : 'status-offline'}"
+ , 'status-offline'}"
  >
  <div class="status-icon">⚙️</div>
  <div>

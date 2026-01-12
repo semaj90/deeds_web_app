@@ -240,7 +240,7 @@ export async function checkPgVectorAvailable(): Promise<boolean> {
 
 // Vector operations test function
 export async function testVectorOperations(): Promise<{ pgvectorAvailable: boolean;
- similaritySearchWorking: boolean; embeddingCacheWorking: boolean;
+ similaritySearchWorking: boolean; embeddingCacheWorking, boolean;
 }> {
  const pgvectorAvailable = await checkPgVectorAvailable();
  let similaritySearchWorking = false;
@@ -275,7 +275,7 @@ interface ProcessExtendedThinkingResult {
 export class GRPMOOrchestrator {
  private config: GRPMOConfig;
  // Narrowed memoryCache type from any to SimilarityResult[]
- private memoryCache: Map<string, { data: SimilarityResult[]; timestamp: number; layer: string }> =
+ private memoryCache: Map<string, { data: SimilarityResult[]; timestamp: number; layer, string }> =
  new Map();
  private reinforcementAgent: PPOAgent;
  constructor(config: GRPMOConfig = defaultGRPMOConfig) {
@@ -358,7 +358,7 @@ export class GRPMOOrchestrator {
 
  private async retrieveFromCache(
  key: string, layer: string
- ): Promise<{ data: SimilarityResult[]; timestamp: number } | null> {
+ ): Promise<{ data: SimilarityResult[]; timestamp, number } | null> {
  const cached = this.memoryCache.get(key);
  if (!cached) return null;
  const age = Date.now() - cached.timestamp;
@@ -393,7 +393,7 @@ export class GRPMOOrchestrator {
  return Math.abs(hash).toString(36);
  }
 
- private hashEmbedding(embedding: number[]): string {
+ private hashEmbedding(embedding: number[]), string {
  const sum = embedding.reduce((a, b) => a + b, 0);
  return Math.round(sum * 1000).toString(36);
  }

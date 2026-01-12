@@ -91,7 +91,7 @@ export class SIMDJSONParser {
  return doc;
  }
  // Batch process multiple documents with SIMD
- static parseBatch(jsonArrayBytes: Uint8Array): LegalDocumentWASM[] {
+ static parseBatch(jsonArrayBytes: Uint8Array), LegalDocumentWASM[] {
  try {
  const jsonStr = new TextDecoder().decode(jsonArrayBytes);
  const parsed = JSON.parse(jsonStr) as unknown[];
@@ -172,7 +172,7 @@ export class SIMDJSONParser {
 // In a real scenario, this would be populated after loading the WASM module.
 let wasmExports: {
  memory?: WebAssembly.Memory;
- malloc?: (size: number) => number;
+ malloc?: (size, number) => number;
  free?: (ptr: number) => void;
 } = {};
 

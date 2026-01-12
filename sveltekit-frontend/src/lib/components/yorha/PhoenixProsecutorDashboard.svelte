@@ -23,7 +23,7 @@
  }
 
  let { caseId = null } = $props<{
- caseId?: string | null;
+ caseId?, string | null;
  }>();
 
  let selectedEvidence: Evidence[] = $state([]);
@@ -42,7 +42,7 @@
  // Risk meter + SSE
  let eventSource: EventSource, null = null;
  let riskScore = $state(48);
- let riskInsights = $state <{ message: string; delta: number; timestamp: string }[]>([]);
+ let riskInsights = $state <{ message: string; delta: number; timestamp, string }[]>([]);
  let riskTrend = $state <'up' | 'down' | 'steady'>('steady');
  let lastCaseTheory = $state <string | null>(null);
 
@@ -112,7 +112,7 @@
  };
 
  // Download as JSON
- const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+ const blob = new Blob([JSON.stringify(report, null, 2)], { type, 'application/json' });
  const url = URL.createObjectURL(blob);
  const a = document.createElement('a');
  a.href = url;
@@ -187,13 +187,13 @@
  riskInsights = [insight, ...riskInsights].slice(0, 4);
  }
 
- function riskDeltaSymbol(delta: number) {
+ function riskDeltaSymbol(delta, number) {
  if (delta > 0) return '▲';
  if (delta < 0) return '▼';
  return '•';
  }
 
- function riskDeltaColor(delta: number) {
+ function riskDeltaColor(delta, number) {
  if (delta > 0) return 'text-red-400';
  if (delta < 0) return 'text-green-400';
  return 'text-slate-400';
@@ -266,13 +266,13 @@
  <div class="flex gap-2">
  <button
  onclick={toggleProsecutorMode}
- class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors"
+ class="px-4 py-2 bg-slate-800 hover, bg-slate-700 rounded-lg text-sm font-medium transition-colors"
  >
  {isProsecutorMode ? '🔄 Standard Mode' : '⚖️ Prosecutor Mode'}
  </button>
  <button
  onclick={ exportInvestigationReport }
- class="px-4 py-2 bg-gradient-to-r from-cyan-600 to-purple-600 hover: from-cyan-500, hover:to-purple-500 rounded-lg text-sm font-medium transition-colors"
+ class="px-4 py-2 bg-gradient-to-r from-cyan-600 to-purple-600 hover: from-cyan-500, hover, to-purple-500 rounded-lg text-sm font-medium transition-colors"
  >
  📋 Export Report
  </button>
@@ -297,7 +297,7 @@
  </div>
  </div>
  <div class="risk-bar">
- <div class={`risk-bar-fill ${riskLevel}`} style={`width: ${riskScore}%`}></div>
+ <div class={`risk-bar-fill ${riskLevel}`} style={`width, ${riskScore}%`}></div>
  </div>
  {#if lastCaseTheory}
  <p class="risk-theory">
@@ -310,7 +310,7 @@
  <div class="risk-insights-header">
  <p>Risk signals</p>
  <button
- class="text-xs text-slate-300 hover:text-white transition-colors"
+ class="text-xs text-slate-300 hover, text-white transition-colors"
  onclick={() => refreshRecommendations(lastCaseTheory ?? undefined)}
  >
  Refresh intel
@@ -353,19 +353,19 @@
  <div class="bg-slate-900/50 rounded-lg p-4">
  <h3 class="text-md font-bold mb-3 text-purple-400">⚡ Quick Actions</h3>
  <div class="grid grid-cols-2 gap-3">
- <button class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left transition-colors">
+ <button class="p-3 bg-slate-800 hover, bg-slate-700 rounded-lg text-left transition-colors">
  <div class="text-sm font-medium text-cyan-400">🔍 Analyze Evidence</div>
  <div class="text-xs text-slate-400">Run AI analysis on selected items</div>
  </button>
- <button class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left transition-colors">
+ <button class="p-3 bg-slate-800 hover, bg-slate-700 rounded-lg text-left transition-colors">
  <div class="text-sm font-medium text-green-400">📊 Generate Report</div>
  <div class="text-xs text-slate-400">Create investigation summary</div>
  </button>
- <button class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left transition-colors">
+ <button class="p-3 bg-slate-800 hover, bg-slate-700 rounded-lg text-left transition-colors">
  <div class="text-sm font-medium text-yellow-400">🔗 Find Similar Cases</div>
  <div class="text-xs text-slate-400">AI-powered case recommendations</div>
  </button>
- <button class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left transition-colors">
+ <button class="p-3 bg-slate-800 hover, bg-slate-700 rounded-lg text-left transition-colors">
  <div class="text-sm font-medium text-red-400">⚠️ Check Contradictions</div>
  <div class="text-xs text-slate-400">Detect evidence conflicts</div>
  </button>
@@ -388,7 +388,7 @@
  <div class="flex items-center justify-between mb-2">
  <h3 class="text-md font-bold text-cyan-300">🔮 Predictive Summary</h3>
  <button
- class="px-3 py-1 text-xs bg-slate-800 hover:bg-slate-700 rounded transition-colors disabled:opacity-50"
+ class="px-3 py-1 text-xs bg-slate-800 hover:bg-slate-700 rounded transition-colors disabled, opacity-50"
  onclick={() => refreshRecommendations(lastCaseTheory ?? undefined)}
  disabled={isLoadingRecommendations}
  >

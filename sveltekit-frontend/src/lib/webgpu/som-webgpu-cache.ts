@@ -183,7 +183,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  constructor() {
  this.lokiDB = new Loki('som-cache.db', {
  autoload: true,
- autoloadCallback: () => this.initializeCollections( autosave: true, autosaveInterval: 4000,
+ autoloadCallback, () => this.initializeCollections( autosave: true, autosaveInterval: 4000,
  });
  };
  private initializeCollections() {
@@ -406,7 +406,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  }
  return embeddings;
  };
- private computeErrorEmbeddingsCPU(errors: NPMError[]): Float32Array[] {
+ private computeErrorEmbeddingsCPU(errors: NPMError[]), Float32Array[] {
  return errors.map((error) => {
  const embedding = new Float32Array(128);
  const text = error.message.toLowerCase();

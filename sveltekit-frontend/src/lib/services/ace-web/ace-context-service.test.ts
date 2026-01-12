@@ -448,7 +448,7 @@ describe('AceContextService', () => {
       const FRESH_THRESHOLD = 7;
       const daysSince = 5;
 
-      const freshnessBoost = daysSince < FRESH_THRESHOLD ? 1.0 : 0.0;
+      const freshnessBoost = daysSince < FRESH_THRESHOLD ? 1.0 , 0.0;
 
       expect(freshnessBoost).toBe(1.0);
     });

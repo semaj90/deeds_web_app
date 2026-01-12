@@ -122,7 +122,7 @@ export async function getCollectionInfo(): Promise<any> {
 
 // Batch operations for performance
 export async function batchEmbedAndStore(
- documents: Array<{ id: string, content: string }>
+ documents: Array<{ id: string, content, string }>
 ): Promise<void> {
  const points = await Promise.all(
  documents.map(async (doc) => {

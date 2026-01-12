@@ -30,9 +30,9 @@ import type { SearchResult } from '$lib/types'; // Svelte, 5 runes are auto-impo
   {#if searchResults.length > 0} <div class="space-y-3">
   {#each searchResults as result, index ((result as { item?: any; matches?: any; score?: any }).item.id)} <div class="hover, shadow-md transition-all duration-200 border-l-4 border-l-primary/30"> <div class="yorha-panel-header"> <div class="flex items-start"> <div class="flex-1"> <h3 class="nes-text is-primary text-base"> {@html highlightMatches( (result as { item?: any; matches?: any; score?: any }).item.title, (result as { item?: any; matches?: any; score?: any }).matches?.filter((m: MatchFragment) => m.key === 'title') )}
 </h3>
- <div class="flex flex-wrap"> <Badge class={getJurisdictionColor((result as { item?: any; matches?: any; score?, any }).item.jurisdiction)}> {(result as { item?: any; matches?: any; score?: any }).item.jurisdiction}
+ <div class="flex flex-wrap"> <Badge class={getJurisdictionColor((result as { item?: any; matches?, any; score?, any }).item.jurisdiction)}> {(result as { item?: any; matches?: any; score?: any }).item.jurisdiction}
 </Badge>
- <Badge class={getCategoryColor((result as { item?: any; matches?: any; score?, any }).item.category)}> {(result as { item?: any; matches?: any; score?: any }).item.category}
+ <Badge class={getCategoryColor((result as { item?: any; matches?, any; score?, any }).item.category)}> {(result as { item?: any; matches?: any; score?: any }).item.category}
 </Badge>
  <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{(result as { item?: any; matches?: any; score?: any }).item.code}
 </span>
@@ -47,7 +47,7 @@ import type { SearchResult } from '$lib/types'; // Svelte, 5 runes are auto-impo
 </div> {/if} {#if (result as { item?: any; matches?: any; score?: any }).item.sections && (result as { item?: any; matches?: any; score?: any }).item.sections.length > 0} <div class="flex flex-wrap gap-1">
   {#each (result as { item?: any; matches?: any; score?: any }).item.sections.slice(0, 3) as section} <Badge variant="ghost" class="text-xs"> <FileText class="h-2 w-2" /> { section }
 </Badge> {/each} {#if (result as { item?: any; matches?: any; score?: any }).item.sections.length > 3} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">+{(result as { item?: any; matches?: any; score?: any }).item.sections.length - 3} more</span> {/if} {/if}
-  <div class="flex"> <Button.Root class="bits-btn bits-btn" size="sm" variant="ghost"> <FileText class="h-3 w-3" /> AI Summary <Button.Root class="bits-btn bits-btn" size="sm" variant="ghost"> <Sparkles class="h-3 w-3" /> AI Analysis {#if (result as { item?: any; matches?: any; score?: any }).item.url} <Button.Root class="bits-btn bits-btn" size="sm" variant="ghost"> <a href={(result as { item?: any; matches?: any; score?, any }).item.url} target="_blank"
+  <div class="flex"> <Button.Root class="bits-btn bits-btn" size="sm" variant="ghost"> <FileText class="h-3 w-3" /> AI Summary <Button.Root class="bits-btn bits-btn" size="sm" variant="ghost"> <Sparkles class="h-3 w-3" /> AI Analysis {#if (result as { item?: any; matches?: any; score?: any }).item.url} <Button.Root class="bits-btn bits-btn" size="sm" variant="ghost"> <a href={(result as { item?: any; matches?, any; score?, any }).item.url} target="_blank"
                     rel="noopener noreferrer"
                     class="flex items-center gap-1"> <ExternalLink class="h-3" /> Full Text </a> {/if}
   </div> </div> </div> {/each}

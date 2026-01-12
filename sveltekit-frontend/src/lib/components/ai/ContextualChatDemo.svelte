@@ -36,7 +36,7 @@ import type { Document } from '$lib/types';
   let isLoading = $state<boolean>(false);
   let error = $state<string | null>(null);
   let stats = $state<{
-    totalTurns: number, avgConfidence: number, stateTransitions: number; mostCommonState, string} | null>(null);
+    totalTurns: number, avgConfidence: number, stateTransitions, number; mostCommonState, string} | null>(null);
   // Derived state names
   const stateNames = {
     0: 'Greeting',

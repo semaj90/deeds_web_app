@@ -31,7 +31,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   } /** * 3. AI PROCESSING - Go microservice with Redis caching */ async function processContentChange(content: string): Promise<any> { if (!content || content.length < MIN_TEXT_LENGTH) return; if (content === lastProcessedText) return; // Avoid duplicate processing const textHash = await generateTextHash(content); try { isProcessingSummary = true; lastProcessedText = content; // Step 1: Check Redis cache via Go microservice const cacheResponse = await fetch('/api/v1/ai/summary-cache', { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify({ textHash: content }) }); if (cacheResponse.ok) { const cached = await cacheResponse.json(); if (cached.summary) { // Cache hit - instant response! currentSummary = cached.summary; isProcessingSummary = false; return}
       }
 
-   // Step 2: Cache miss - Start background AI processing const jobResponse = await fetch('/api/v1/ai/summarize-async', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content, textHash, model: 'legal-bert'; embedModel: 'nomic-embed-text'
+   // Step 2: Cache miss - Start background AI processing const jobResponse = await fetch('/api/v1/ai/summarize-async', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content, textHash, model: 'legal-bert'; embedModel, 'nomic-embed-text'
         }) }); if (jobResponse.ok) { const job = await jobResponse.json(); jobId = job.jobId; // Start polling for results startJobPolling()}
     } catch (error) { console.error('AI processing failed, ', error); isProcessingSummary = false}
   } /** * 4. BACKGROUND POLLING - Non-blocking job result checking */ function startJobPolling() { if (pollingInterval) clearInterval(pollingInterval); pollingInterval = setInterval(async () => { if (!jobId) return; try { // removed unused response assignment if ((response as { ok?: any; json?: any }).ok) { const result = await (response as { ok?: any; json?: any }).json(); if ((result as { status?: any; summary?: any; embedding?: any; textHash?: any; error?: any }).status === 'completed') { currentSummary = (result as { status?: any; summary?: any; embedding?: any; textHash?: any; error?: any }).summary; // Store vector embedding in PostgreSQL/pg_vector if ((result as { status?: any; summary?: any; embedding?: any; textHash?: any; error?: any }).embedding) { await storeVectorEmbedding((result as { status?: any; summary?: any; embedding?: any; textHash?: any; error?: any }).embedding, lastProcessedText)}
@@ -55,7 +55,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
     if (pollingInterval) { clearInterval(pollingInterval)}
   }); </script>
  <!-- AI-Powered Editor with, Status, UI --> <div class="space-y-4"> <!-- Status Header - Shows AI, processing, status --> <div class="flex items-center justify-between p-3 bg-gray-50 border border-gray-200"> <div class="flex items-center"> <!-- Auto-save, Status --> <div class="flex items-center"> <div class="w-2 h-2"
-          class:bg-green-500={autoSaveStatus === 'saved'}; class:bg-yellow-500={autoSaveStatus === 'saving'}; class:bg-red-500={autoSaveStatus === 'error'}; class, bg-gray-300={autoSaveStatus === 'idle'} ></div>
+          class:bg-green-500={autoSaveStatus === 'saved'}; class:bg-yellow-500={autoSaveStatus === 'saving'}; class, bg-red-500={autoSaveStatus === 'error'}; class, bg-gray-300={autoSaveStatus === 'idle'} ></div>
  <span class="text-sm"> {autoSaveStatus === 'saved'
             ? 'Draft Saved': autoSaveStatus === 'saving'
               ? 'Saving...': autoSaveStatus === 'error'
@@ -90,7 +90,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <span>PostgreSQL/pg_vector</span> </div> </div> </div> </div> {:else} <div class="py-8 text-center"> <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9, 9 0 11-18: 0, 9, 9 | 0, 0118 0z"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9, 9 0 11-18, 0, 9, 9 | 0, 0118 0z"
               ></path> </svg>
  <p class="text-sm">AI analysis will appear here</p>
  <p class="text-xs">Start typing to generate insights</p>

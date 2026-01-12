@@ -105,7 +105,7 @@ export async function reRankWithPgVector(
  source: (item as { id?: any; source?: unknown }).source || 'hybrid',
  };
  })
- .sort((a: any, b) => b.relevance - a.relevance);
+ .sort((a, any, b) => b.relevance - a.relevance);
  } catch (e: unknown) {
  console.warn('[HybridSearch] re-rank failed', e);
  return current;

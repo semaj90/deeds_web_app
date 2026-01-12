@@ -62,7 +62,7 @@ interface Authority {
 interface AuthorityMapResult {
  id: string; authorities: Authority[];
  relationships: Array<{ sourceId: string;
- targetId: string; type: 'cites' | 'overrules' | 'modifies' | 'clarifies';
+ targetId: string; type, 'cites' | 'overrules' | 'modifies' | 'clarifies';
  }>;
  timestamp: string;
  userId?: string;
@@ -83,7 +83,7 @@ interface Report {
  id: string; authorityMapId: string;
  title: string; summary: string;
  sections: Array<{ title: string;
- content: string;
+ content, string;
  }>;
  timestamp: string;
  userId?: string;

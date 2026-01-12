@@ -228,7 +228,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
 
  private analyzeEvidenceGaps(nodes: EvidenceNode[]): Array<{ type: string;
  description: string; riskLevel: 'low' | 'medium' | 'high';
- confidence: number; mitigationSteps: string[];
+ confidence: number; mitigationSteps, string[];
  }> {
  const gaps = [];
 
@@ -278,7 +278,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  private parseStrategyResponse(response: string): Array<{ title: string;
  description: string; confidence: number;
  priority: 'low' | 'medium' | 'high' | 'critical';
- actions: string[];
+ actions, string[];
  }> {
  // Simple parsing - in production, use more sophisticated NLP
  const strategies = [];

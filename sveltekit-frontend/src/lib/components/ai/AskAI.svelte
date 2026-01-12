@@ -27,7 +27,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
         }, body: JSON.stringify(requestBody));
  if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`)}
   } catch (error) { console.error('API call failed:', error); throw error}, signal: controller.signal }); if (!response.ok) { const errorData = await response.json.catch(() => ( )); throw new Error(errorData.error || "Failed to get AI response")}
-      if (selectedModel === "ollama" && response.body) { // Streaming response (Ollama/Gemma3) const reader = response.body.getReader(); let decoder = new TextDecoder(); let done = $state<boolean>(false); let buffer = $state<string>(""); // In the streaming loop: let meta = $state<{ [key: string], unknown }('') >( ); while (!done) { const { value, done: doneReading } = await reader.read(); done = doneReading; if (value) { buffer += decoder.decode(value, { stream: true }); // Try to parse JSON lines (newline-delimited) let lines = buffer.split("\n"); buffer = lines.pop() ?? ""; for (const line of lines) { if (!line.trim()) continu; try { const chunk = JSON.parse(line); if (chunk.answer !== undefined) { aiMessage.content += chunk.answer}
+      if (selectedModel === "ollama" && response.body) { // Streaming response (Ollama/Gemma3) const reader = response.body.getReader(); let decoder = new TextDecoder(); let done = $state<boolean>(false); let buffer = $state<string>(""); // In the streaming loop: let meta = $state<{ [key, string], unknown }('') >( ); while (!done) { const { value, done: doneReading } = await reader.read(); done = doneReading; if (value) { buffer += decoder.decode(value, { stream: true }); // Try to parse JSON lines (newline-delimited) let lines = buffer.split("\n"); buffer = lines.pop() ?? ""; for (const line of lines) { if (!line.trim()) continu; try { const chunk = JSON.parse(line); if (chunk.answer !== undefined) { aiMessage.content += chunk.answer}
                 if (chunk.confidence !== undefined) aiMessage.confidence = chunk.confidenc; if (chunk.references !== undefined) aiMessage.references = chunk.reference; if (chunk.model !== undefined) meta.model = chunk.model; if (chunk.processingTime !== undefined) meta.processingTime = chunk.processingTim; if (chunk.searchResults !== undefined) meta.searchResults = chunk.searchResult; aiMessage.metadata = meta; // Update conversation in-place conversation = conversation.map((m) => m.id === aiMessageId ? { ...aiMessage }: m); setTimeout(() => scrollToBottom(), 50)} catch (e) { // Ignore parse errors for incomplete lines }
             } }
         }
@@ -105,7 +105,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
               step="0.1"; bind, value={ temperature } id="field-4"
             /> <span>{ temperature }</span> </div> </div> {/if}
   </div>
- <!-- Conversation --> <div; bind:this={ messagesContainer } style="max-height, { maxHeight }"
+ <!-- Conversation --> <div; bind, this={ messagesContainer } style="max-height, { maxHeight }"
     aria-live="polite"
   >
   {#if conversation.length === 0} <div> <MessageCircle /> <p>Start a conversation with the AI assistant</p>
@@ -138,10 +138,10 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div>
  <!-- Input, Area --> <div>
   {#if error} <div> <div> <AlertCircle /> <span>{ error }</span> </div> {/if}
-  <div> <div> <textarea bind:this={ textareaRef }; bind:value={ query } onkeypress={ handleKeyPress } oninput={(_event, Event) => debounce(autoResize, 300} { placeholder } disabled={ isLoading } rows={ 1 } aria-label="Ask AI input"
+  <div> <div> <textarea bind:this={ textareaRef }; bind, value={ query } onkeypress={ handleKeyPress } oninput={(_event, Event) => debounce(autoResize, 300} { placeholder } disabled={ isLoading } rows={ 1 } aria-label="Ask AI input"
         ></textarea>
   {#if enableVoiceInput} <button type="button"
-            class:text-red-500={ isListening } aria-label={isListening ? "Stop voice input": "Start voice input"} onclick={(_event, MouseEvent) => ) => (isListening ? stopVoiceInput(): startVoiceInput()} disabled={ isLoading } >
+            class:text-red-500={ isListening } aria-label={isListening ? "Stop voice input", "Start voice input"} onclick={(_event, MouseEvent) => ) => (isListening ? stopVoiceInput(): startVoiceInput()} disabled={ isLoading } >
             ðŸŽ¤ </button> {/if}
   </div>
  <button aria-label="Action, button"
@@ -152,7 +152,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </button> </div>
  <div> <button type="button"
             class="container mx-auto px-4 {isListening ? 'text-red-500': ''}"
-            aria-label={isListening ? "Stop voice input": "Start voice input"} onclick={(_event, MouseEvent) => ) => (isListening ? stopVoiceInput(): startVoiceInput()} disabled={ isLoading } >
+            aria-label={isListening ? "Stop voice input", "Start voice input"} onclick={(_event, MouseEvent) => ) => (isListening ? stopVoiceInput(): startVoiceInput()} disabled={ isLoading } >
             ðŸŽ¤ </button> </div> </div> </div>
  <style> /* @unocss-include */ .ai-chat-component { font-family: system-ui, -apple-system, sans-serif}
   .message { animation: slideInFromBottom: 0.3s ease-in-out; transform: translateY(0)}

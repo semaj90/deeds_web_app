@@ -378,7 +378,7 @@ export class FeedbackLoopService {
 
         const queryLower = query.toLowerCase();
 
-        if (advancedIndicators.some((indicator: any) => queryLower.includes(indicator))) {
+        if (advancedIndicators.some((indicator, any) => queryLower.includes(indicator))) {
             return 'expert';
         } else if (complexityIndicators.some((indicator: any) => queryLower.includes(indicator))) {
             return 'intermediate';
@@ -500,7 +500,7 @@ export class FeedbackLoopService {
             // Calculate rating distribution
             const ratingDistribution: { [score: number]: number } = {};
             for (let i = 1; i <= 5; i++) {
-                ratingDistribution[i] = recentRatings.filter((r: any) => Math.floor(r.score) === i).length;
+                ratingDistribution[i] = recentRatings.filter((r, any) => Math.floor(r.score) === i).length;
             }
 
             // Calculate improvement trends by feature area

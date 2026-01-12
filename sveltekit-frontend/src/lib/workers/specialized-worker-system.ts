@@ -72,7 +72,7 @@ export type JobPayload =
 	| Record<string, unknown>;
 
 export interface SpecializedJob {
-  id: string; type?? 'SUMMARIZE_DOCUMENT'
+  id: string; type?: 'SUMMARIZE_DOCUMENT'
     | 'GET_CASE_LAW'
     | 'GENERATE_EMBEDDING'
     | 'ANALYZE_EVIDENCE'
@@ -606,7 +606,7 @@ export class EmbeddingWorker extends SpecializedWorker {
     }
     const seed = Math.abs(hash) || 1;
 
-    const seededRandom = (n: number) => {
+    const seededRandom = (n, number) => {
       const x = Math.sin(seed + n) * 10000;
       return x - Math.floor(x);
     };
@@ -622,7 +622,7 @@ export class EmbeddingWorker extends SpecializedWorker {
 // Factory function for creating the orchestrator with common workers
 export async function createSpecializedWorkerSystem(
 	rabbitmqUrl: string = 'amqp://localhost'
-): Promise<{ orchestrator: JobOrchestrator, workers: SpecializedWorker[] }> {
+): Promise<{ orchestrator: JobOrchestrator, workers, SpecializedWorker[] }> {
 	const orchestrator = new JobOrchestrator(rabbitmqUrl);
 	await orchestrator.initialize();
 

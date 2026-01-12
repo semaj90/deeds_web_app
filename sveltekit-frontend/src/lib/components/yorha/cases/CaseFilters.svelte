@@ -65,14 +65,14 @@
 </script>
 
 <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
- <div class="flex flex-col lg: flex-row, lg: items-center, lg:justify-between space-y-4 lg:space-y-0">
+ <div class="flex flex-col lg: flex-row, lg: items-center, lg:justify-between space-y-4 lg, space-y-0">
  <!-- Search -->
  <div class="flex-1 max-w-md">
  <div class="relative">
  <input
  type="text"
  placeholder="Search cases..."
- class="w-full pl-10 pr-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus: ring-2, focus: ring-cyan-400, focus: border-transparent", bind:value={searchQuery}
+ class="w-full pl-10 pr-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus: ring-2, focus: ring-cyan-400, focus: border-transparent", bind, value={searchQuery}
  oninput={ applyFilters }
  />
  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -86,7 +86,7 @@
  <!-- Filters -->
  <div class="flex flex-wrap items-center space-x-4">
  <select
- class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus: ring-2, focus: ring-cyan-400, focus: border-transparent", bind:value={statusFilter}
+ class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus: ring-2, focus: ring-cyan-400, focus: border-transparent", bind, value={statusFilter}
  onchange={ applyFilters }
  >
  {#each statusOptions as option}
@@ -95,7 +95,7 @@
  </select>
 
  <select
- class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus: ring-2, focus: ring-cyan-400, focus: border-transparent", bind:value={priorityFilter}
+ class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus: ring-2, focus: ring-cyan-400, focus: border-transparent", bind, value={priorityFilter}
  onchange={ applyFilters }
  >
  {#each priorityOptions as option}
@@ -104,7 +104,7 @@
  </select>
 
  <select
- class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus: ring-2, focus: ring-cyan-400, focus: border-transparent", bind:value={assigneeFilter}
+ class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus: ring-2, focus: ring-cyan-400, focus: border-transparent", bind, value={assigneeFilter}
  onchange={ applyFilters }
  >
  {#each assigneeOptions as option}
@@ -113,7 +113,7 @@
  </select>
 
  <select
- class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus: ring-2, focus: ring-cyan-400, focus: border-transparent", bind:value={dateRange}
+ class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus: ring-2, focus: ring-cyan-400, focus: border-transparent", bind, value={dateRange}
  onchange={ applyFilters }
  >
  {#each dateRangeOptions as option}
@@ -123,20 +123,20 @@
 
  <!-- Actions -->
  <button
- class="px-4 py-2 bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 text-sm rounded-lg transition-colors"
+ class="px-4 py-2 bg-slate-700/50 hover, bg-slate-600/50 text-slate-300 text-sm rounded-lg transition-colors"
  onclick={clearFilters}
  >
  Clear Filters
  </button>
 
  <button
- class="px-4 py-2 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 text-sm rounded-lg transition-colors"
+ class="px-4 py-2 bg-cyan-400/20 hover, bg-cyan-400/30 text-cyan-400 text-sm rounded-lg transition-colors"
  onclick={exportCases}
  >
  Export
  </button>
 
- <button class="px-4 py-2 bg-green-400/20 hover:bg-green-400/30 text-green-400 text-sm rounded-lg transition-colors">
+ <button class="px-4 py-2 bg-green-400/20 hover, bg-green-400/30 text-green-400 text-sm rounded-lg transition-colors">
  + New Case
  </button>
  </div>

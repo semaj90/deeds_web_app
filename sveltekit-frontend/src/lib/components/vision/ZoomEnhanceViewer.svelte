@@ -25,7 +25,7 @@
  class="max-h-full max-w-full transition-all duration-300 object-contain"
  style="
  filter: {enhanced ? 'contrast(1.4) saturate(1.2) brightness(1.1)' : 'none'};
- image-rendering: {enhanced ? 'auto' : 'auto'};
+ image-rendering: {enhanced ? 'auto' , 'auto'};
  "
  />
 
@@ -39,7 +39,7 @@
  <div class="mt-3 flex gap-3">
  <button
  onclick={toggleEnhance}
- class="px-3 py-1 border border-black bg-yellow-200 hover:bg-yellow-300 transition-colors"
+ class="px-3 py-1 border border-black bg-yellow-200 hover, bg-yellow-300 transition-colors"
  >
  {enhanced ? 'Remove Enhance' : 'Enhance'}
  </button>

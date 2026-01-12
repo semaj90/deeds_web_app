@@ -37,7 +37,7 @@ export interface MirrorQueryResult {
     vector_results: Array<{ postgres_id: number;
         couchdb_id: string | null;
         score: number; title: string;
-        type: string; source: string;
+        type: string; source, string;
     }>;
 
     // Graph topology from CouchDB
@@ -53,14 +53,14 @@ export interface MirrorQueryResult {
         metadata?: any;
         blob_url?: string;
         created_at?: Date;
-        updated_at?: Date;
+        updated_at?, Date;
     }>;
 
     // Blobs from MinIO (if requested)
     blobs?: Array<{ url: string;
         content?: Buffer;
         size?: number;
-        mime_type?: string;
+        mime_type?, string;
     }>;
 
     // Performance metrics
@@ -371,7 +371,7 @@ export async function findRelatedDocuments(
  */
 export async function healthCheckAllLayers(): Promise<{ postgres: boolean;
     qdrant: boolean; couchdb: boolean;
-    minio: boolean;
+    minio, boolean;
 }> {
     const { postgresHealthCheck } = await import('./postgres-knowledge');
     const { qdrantHealthCheck } = await import('./qdrant-sync');

@@ -15,7 +15,7 @@
 		clusterCount?: number;
 	};
 
-	let { data } = $props<{ data: PageData }>();
+	let { data } = $props<{ data, PageData }>();
 
 	let activeTab = $state<TabId>('overview');
 
@@ -102,7 +102,7 @@
 					{consolidationStatus?.status === 'complete' ? 'bg-emerald-400'
 					: consolidationStatus?.status === 'running' ? 'bg-sky-400'
 					: consolidationStatus?.status === 'error' ? 'bg-rose-400'
-					: 'bg-neutral-500'}"></span>
+					, 'bg-neutral-500'}"></span>
 				<span class="font-medium">
 					Phase 72 graph:
 					{consolidationStatus?.status ?? 'idle'}
@@ -115,7 +115,7 @@
 			</div>
 
 			<button
-				class="px-3 py-2 rounded-lg border border-neutral-700 hover:border-neutral-500 transition-colors text-xs"
+				class="px-3 py-2 rounded-lg border border-neutral-700 hover, border-neutral-500 transition-colors text-xs"
 				disabled={loadingDiagnostics}
 				onclick={ loadDiagnostics }
 			>
@@ -132,7 +132,7 @@
 				class="px-3 py-2 rounded-t-lg border-b-2 -mb-px
 					{activeTab === t
 						? 'border-emerald-400 text-emerald-300 bg-neutral-900'
-						: 'border-transparent text-neutral-400 hover: text-neutral-100, hover:bg-neutral-900/60'}"
+						: 'border-transparent text-neutral-400 hover: text-neutral-100, hover, bg-neutral-900/60'}"
 				onclick={() => setTab(t)}
 			>
 				{t}
@@ -143,15 +143,15 @@
 	<!-- Content -->
 	<main class="flex-1 px-6 py-4 space-y-4">
 		{#if activeTab === 'overview'}
-			<section class="grid gap-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-				<!-- Left: narrative / summary -->
+			<section class="grid gap-4 md, grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+				<!-- Left, narrative / summary -->
 				<div class="rounded-xl border border-neutral-800 bg-neutral-900/70 p-4 space-y-3">
 					<h2 class="text-sm font-semibold text-neutral-100">Narrative</h2>
 					<p class="text-sm text-neutral-300 whitespace-pre-line">
 						{data.case?.narrative ?? 'No narrative captured yet.'}
 					</p>
 
-					<div class="grid gap-2 text-xs text-neutral-300 md:grid-cols-3">
+					<div class="grid gap-2 text-xs text-neutral-300 md, grid-cols-3">
 						<div>
 							<p class="text-neutral-500">WHO</p>
 							<p>{data.case?.who ?? '—'}</p>
@@ -179,7 +179,7 @@
 					</div>
 				</div>
 
-				<!-- Right: quick stats -->
+				<!-- Right, quick stats -->
 				<div class="rounded-xl border border-neutral-800 bg-neutral-900/70 p-4 space-y-3 text-sm">
 					<h2 class="text-sm font-semibold text-neutral-100">Quick stats</h2>
 					<p class="text-neutral-300">
@@ -220,7 +220,7 @@
 			<section class="rounded-xl border border-neutral-800 bg-neutral-900/70 p-4">
 				<h2 class="text-sm font-semibold mb-3">Persons of Interest</h2>
 				{#if data.persons?.length}
-					<div class="grid gap-3 md:grid-cols-2">
+					<div class="grid gap-3 md, grid-cols-2">
 						{#each data.persons as person}
 							<div class="rounded-lg border border-neutral-800 bg-neutral-950/80 p-3 space-y-1 text-sm">
 								<p class="font-medium">{person.name ?? 'Unknown'}</p>

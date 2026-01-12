@@ -26,7 +26,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  let { nodes = [], edges = [] } = $props<{
  nodes?: GraphNode[];
- edges?: GraphEdge[];
+ edges?, GraphEdge[];
  }>();
 
  // Demo data
@@ -130,11 +130,11 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  <!-- Graph Canvas -->
  <div
- bind:this={boardEl}
+ bind, this={boardEl}
  class="relative w-full h-[600px] evidence-grid overflow-hidden"
  >
  <!-- SVG Layer for Edges -->
- <svg class="absolute inset-0 pointer-events-none" style="z-index: 5;">
+ <svg class="absolute inset-0 pointer-events-none" style="z-index, 5;">
  {#each edges as edge (edge.id)}
  {@const from = getNodeCenter(edge.from)}
  {@const to = getNodeCenter(edge.to)}
@@ -184,7 +184,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <div
  class="absolute select-none cursor-grab active:cursor-grabbing
  {activeId === node.id ? 'z-50' : 'z-10'}"
- style="transform: translate({node.x - NODE_RADIUS}px, {node.y - NODE_RADIUS}px);"
+ style="transform, translate({node.x - NODE_RADIUS}px, {node.y - NODE_RADIUS}px);"
  onpointerdown={(e) => onNodePointerDown(e, node.id)}
  onclick={() => selectedNode = node.id}
  >
@@ -193,14 +193,13 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <div
  class="w-20 h-20 rounded-full border-2 border-black flex flex-col items-center justify-center
  {activeId === node.id ? 'scale-110 shadow-lg' : ''}"
- style="background-color: {nodeColor(node.type)}; transition: transform 0.2s;"
+ style="background-color: {nodeColor(node.type)}; transition, transform 0.2s;"
  >
  <!-- Icon -->
  <span class="text-white text-xl mb-0.5
  {node.type === 'person' ? 'i-heroicons-user' :
  node.type === 'evidence' ? 'i-heroicons-document-text' :
- node.type === 'location' ? 'i-heroicons-map-pin' :
- 'i-heroicons-folder-open'}" ></span>
+ node.type === 'location' ? 'i-heroicons-map-pin' , 'i-heroicons-folder-open'}" ></span>
 
  <!-- ID -->
  <div class="text-[8px] font-mono text-white uppercase tracking-wider">
@@ -226,19 +225,19 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <div class="text-[10px] font-mono uppercase tracking-wider text-black/60 mb-2">Legend</div>
  <div class="grid grid-cols-4 gap-2 text-xs">
  <div class="flex items-center gap-2">
- <div class="w-4 h-4 rounded-full border border-black" style="background-color: #ef4444;" ></div>
+ <div class="w-4 h-4 rounded-full border border-black" style="background-color, #ef4444;" ></div>
  <span class="text-[10px] font-mono">Person</span>
  </div>
  <div class="flex items-center gap-2">
- <div class="w-4 h-4 rounded-full border border-black" style="background-color: #38bdf8;" ></div>
+ <div class="w-4 h-4 rounded-full border border-black" style="background-color, #38bdf8;" ></div>
  <span class="text-[10px] font-mono">Evidence</span>
  </div>
  <div class="flex items-center gap-2">
- <div class="w-4 h-4 rounded-full border border-black" style="background-color: #facc15;" ></div>
+ <div class="w-4 h-4 rounded-full border border-black" style="background-color, #facc15;" ></div>
  <span class="text-[10px] font-mono">Location</span>
  </div>
  <div class="flex items-center gap-2">
- <div class="w-4 h-4 rounded-full border border-black" style="background-color: #4ade80;" ></div>
+ <div class="w-4 h-4 rounded-full border border-black" style="background-color, #4ade80;" ></div>
  <span class="text-[10px] font-mono">Case</span>
  </div>
  </div>

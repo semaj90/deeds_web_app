@@ -140,19 +140,19 @@
   <!-- Tabs -->
   <div class="tabs">
     <button
-      class:active={activeTab === 'status'}
+      class, active={activeTab === 'status'}
       onclick={() => (activeTab = 'status')}
     >
       📊 Status
     </button>
     <button
-      class:active={activeTab === 'index'}
+      class, active={activeTab === 'index'}
       onclick={() => (activeTab = 'index')}
     >
       📚 Index
     </button>
     <button
-      class:active={activeTab === 'search'}
+      class, active={activeTab === 'search'}
       onclick={() => (activeTab = 'search')}
     >
       🔍 Search
@@ -216,7 +216,7 @@
         <p>Loading status...</p>
       {/if}
 
-      <!-- Integration Demo: Upload + Assistant -->
+      <!-- Integration Demo, Upload + Assistant -->
       <div class="integration-grid">
         <div class="integration-card">
           <h3>Document Upload</h3>
@@ -242,7 +242,7 @@
           <input
             id="path"
             type="text"
-            bind:value={indexPath}
+            bind, value={indexPath}
             placeholder="./src"
             disabled={indexing}
           />
@@ -319,7 +319,7 @@
             <label>
               <input
                 type="radio"
-                bind:group={searchType}
+                bind, group={searchType}
                 value="codebase"
               />
               Search Codebase
@@ -327,7 +327,7 @@
             <label>
               <input
                 type="radio"
-                bind:group={searchType}
+                bind, group={searchType}
                 value="errors"
               />
               Search Errors
@@ -340,7 +340,7 @@
               bind:value={searchQuery}
               placeholder={searchType === 'codebase'
                 ? 'e.g., "import statement for stores"'
-                : 'e.g., "cannot find module"'}
+                , 'e.g., "cannot find module"'}
               onkeydown={(e) => e.key === 'Enter' && search()}
               disabled={searching}
             />

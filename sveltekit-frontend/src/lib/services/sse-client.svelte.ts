@@ -39,7 +39,7 @@ export class SSEClient {
   private config: Required<SSEConfig>;
 
   // Event handlers
-  private messageHandlers = new Map<string, (data: unknown) => void>();
+  private messageHandlers = new Map<string, (data, unknown) => void>();
 
   constructor(config: SSEConfig) {
     this.config = {

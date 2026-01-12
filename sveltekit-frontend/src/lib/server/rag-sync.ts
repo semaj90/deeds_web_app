@@ -583,7 +583,7 @@ export async function regenerateEvidenceEmbeddings(
  * Health check: Verify RAG sync service is operational
  */
 export async function checkRagSyncHealth(): Promise<{ healthy: boolean, message: string;
- details?: { qdrantConnected: boolean, databaseConnected: boolean; collectionExists: boolean;
+ details?: { qdrantConnected: boolean, databaseConnected: boolean; collectionExists, boolean;
  };
 }> {
  try {

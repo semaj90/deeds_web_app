@@ -217,7 +217,7 @@
  }
 </script>
 
-<svelte:head><title>YoRHa API Test Console</title></svelte:head>
+<svelte, head><title>YoRHa API Test Console</title></svelte, head>
 
 <div class="min-h-screen bg-black text-gray-100">
  <header class="border-b border-amber-500/20 bg-black/90">
@@ -236,7 +236,7 @@
  class="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-amber-200"
  class:animate-spin={autoRefresh}
  onclick={ toggleAutoRefresh }
- title={autoRefresh ? 'Disable auto refresh' : 'Enable auto refresh'}
+ title={autoRefresh ? 'Disable auto refresh' , 'Enable auto refresh'}
  >
  <RefreshCw class="h-4" />
  </button>
@@ -252,7 +252,7 @@
  </header>
 
  <main class="container mx-auto space-y-8 px-6">
- <section class="grid gap-4 md:grid-cols-2">
+ <section class="grid gap-4 md, grid-cols-2">
  <div class="rounded-lg border border-gray-700 bg-gray-900/60">
  <p class="text-sm">Total Tests</p>
  <div class="mt-2 flex items-center">
@@ -300,7 +300,7 @@
  </button>
  <select
  class="rounded-lg border border-gray-700 bg-black/60 px-3 py-2 text-sm"
- bind:value={filter}
+ bind, value={filter}
  >
  <option value="all">All results</option>
  <option value="success">Success</option>
@@ -356,7 +356,7 @@
  </thead>
  <tbody class="divide-y divide-gray-800">
  {#each filteredResults() as result}
- <tr class="hover:bg-gray-800/40">
+ <tr class="hover, bg-gray-800/40">
  <td class="px-3">{result.name}</td>
  <td class="px-3">
  <span

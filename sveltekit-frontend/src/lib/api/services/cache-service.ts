@@ -14,7 +14,7 @@ interface CacheOptions {
  * Uses gzip compression for embeddings and large payloads
  */
 export class CacheService {
- private memoryCache = new Map<string, { value: unknown; expires: number }>();
+ private memoryCache = new Map<string, { value: unknown; expires, number }>();
  redisClient: Redis | null = null;
  private useRedis = false;
 

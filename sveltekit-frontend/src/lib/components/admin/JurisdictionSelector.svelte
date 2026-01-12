@@ -48,7 +48,7 @@
 		onchange={handleChange}
 		{disabled}
 		class="jurisdiction-select"
-		class:empty={!value}
+		class, empty={!value}
 	>
 		<option value="">
 			{required ? 'Select Jurisdiction (Required)' : 'Select Jurisdiction'}

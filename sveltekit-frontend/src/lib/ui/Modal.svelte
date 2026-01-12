@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
-https://svelte.dev/e/tag_invalid_name -->
+https, //svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
-https://svelte.dev/e/tag_invalid_name -->
+https, //svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
-https://svelte.dev/e/tag_invalid_name -->
+https, //svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
-https://svelte.dev/e/tag_invalid_name -->
+https, //svelte.dev/e/tag_invalid_name -->
 <script lang="ts">
 	let title = $state<any>(undefined);
 	let description = $state<any>(undefined);
@@ -131,7 +131,7 @@ import { X } from "lucide-svelte";
  role="dialog"
  aria-modal="true"
  aria-labelledby={title ? 'modal-title' : undefined}
- aria-describedby={description ? 'modal-description' : undefined}
+ aria-describedby={description ? 'modal-description' , undefined}
  tabindex="-1"
  >
  <div class="modal-content" role="document">
@@ -184,7 +184,7 @@ import { X } from "lucide-svelte";
 
  <button
  class="btn confirm-btn"
- class:loading
+ class, loading
  onclick={handleConfirm}
  disabled={loading}
  type="button"

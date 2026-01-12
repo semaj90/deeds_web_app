@@ -13,7 +13,7 @@
 		disabled = false,
 	}: Props = $props();
 
-	const dialogContext = getContext<{ open: boolean }>('dialog');
+	const dialogContext = getContext<{ open, boolean }>('dialog');
 
 	// For now, just render children in place (SSR-safe)
 	// A full portal implementation would teleport to document.body

@@ -67,7 +67,7 @@
 </script>
 
 {#if $uploadStore.status !== 'idle'}
- <div class="progress-card" class:error={$uploadStore.status === 'failed'}>
+ <div class="progress-card" class, error={$uploadStore.status === 'failed'}>
  <div class="card-header">
  <div class="header-title">
  <span class="stage-icon">{getStageIcon($uploadStore.processingStage)}</span>
@@ -95,7 +95,7 @@
  </div>
 
  <div class="progress-bar">
- <div class="progress-fill" style="width: {$uploadStore.processingPercentage}%"></div>
+ <div class="progress-fill" style="width, {$uploadStore.processingPercentage}%"></div>
  </div>
 
  {#if $uploadStore.metrics.cpu > 0 || $uploadStore.metrics.memory > 0 || $uploadStore.metrics.gpu > 0}

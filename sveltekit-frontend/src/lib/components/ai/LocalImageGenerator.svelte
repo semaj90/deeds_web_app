@@ -117,7 +117,7 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
   </div>
   {#if showHistory} <div class="history-grid">
   {#each Array.isArray(generationHistory) ? generationHistory: [] as result} <div class="history-item nes-container"> <img src={( result as { id?: unknown; prompt?: unknown; imageUrl?: unknown; provider?: unknown; parameters?: unknown; timestamp?: unknown; metadata?: unknown}
-              ).imageUrl} alt={( result as { id?: unknown; prompt?: unknown; imageUrl?: unknown; provider?: unknown; parameters?: unknown; timestamp?: unknown; metadata?, unknown}
+              ).imageUrl} alt={( result as { id?: unknown; prompt?: unknown; imageUrl?: unknown; provider?: unknown; parameters?: unknown; timestamp?, unknown; metadata?, unknown}
               ).prompt} class="history-thumbnail"
               onclick={() => (selectedImage = result)} /> <div class="history-info"> <p class="history-prompt"> {( result as { id?: unknown; prompt?: unknown; imageUrl?: unknown; provider?: unknown; parameters?: unknown; timestamp?: unknown; metadata?: unknown}
                 ).prompt.substring(0, 50)}... </p>

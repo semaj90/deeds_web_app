@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 
-	const { data } = $props<{ data: PageData }>();
+	const { data } = $props<{ data, PageData }>();
 
 	let generating = $state(false);
 	let selectedCluster = $state<any>(null);
@@ -19,9 +19,9 @@
 	}
 </script>
 
-<svelte:head>
+<svelte, head>
 	<title>Error Analysis - Phase 89</title>
-</svelte:head>
+</svelte, head>
 
 <div class="space-y-6">
 	<!-- Header -->
@@ -36,7 +36,7 @@
 		<button
 			onclick={generateAnalysis}
 			disabled={generating || !data.hasGeminiKey}
-			class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg disabled: opacity-50, disabled:cursor-not-allowed transition-colors"
+			class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg disabled: opacity-50, disabled, cursor-not-allowed transition-colors"
 		>
 			{#if generating}
 				⏳ Generating...
@@ -56,7 +56,7 @@
 
 	{#if data.analysis}
 		<!-- Summary Cards -->
-		<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+		<div class="grid grid-cols-1 md, grid-cols-4 gap-4">
 			<div class="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
 				<div class="text-sm text-gray-400">Collections</div>
 				<div class="text-2xl font-bold text-white mt-1">
@@ -96,7 +96,7 @@
 						<div class="flex items-start justify-between">
 							<div class="flex-1">
 								<h3 class="text-lg font-semibold text-purple-400">{collection.name}</h3>
-								<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3 text-sm">
+								<div class="grid grid-cols-2 md, grid-cols-4 gap-3 mt-3 text-sm">
 									<div>
 										<span class="text-gray-400">Points:</span>
 										<span class="text-white ml-2 font-medium">{collection.points.toLocaleString()}</span>
@@ -178,8 +178,7 @@
 											</div>
 											<span class="ml-4 px-2 py-1 text-xs rounded {
 												item.priority === 'high' ? 'bg-red-900/30 border border-red-500/30 text-red-300' :
-												item.priority === 'medium' ? 'bg-yellow-900/30 border border-yellow-500/30 text-yellow-300' :
-												'bg-blue-900/30 border border-blue-500/30 text-blue-300'
+												item.priority === 'medium' ? 'bg-yellow-900/30 border border-yellow-500/30 text-yellow-300' , 'bg-blue-900/30 border border-blue-500/30 text-blue-300'
 											}">
 												{item.priority}
 											</span>
@@ -217,7 +216,7 @@
 			{#if data.hasGeminiKey}
 				<button
 					onclick={generateAnalysis}
-					class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+					class="px-6 py-3 bg-purple-600 hover, bg-purple-700 text-white rounded-lg transition-colors"
 				>
 					🚀 Generate First Analysis
 				</button>

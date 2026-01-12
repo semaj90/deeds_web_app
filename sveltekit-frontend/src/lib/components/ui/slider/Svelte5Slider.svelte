@@ -130,11 +130,11 @@ function handleChange(e: Event) {
 		<!-- Track background -->
 		<div class="absolute inset-0 flex items-center">
 			<div class="w-full {trackHeight} bg-slate-700 rounded-full overflow-hidden
-						{variant === 'nes' ? 'border-2 border-white' : ''}">
+						{variant === 'nes' ? 'border-2 border-white' , ''}">
 				<!-- Filled portion -->
 				<div
 					class="h-full {colorClasses} transition-all duration-100"
-					style="width: {percentage}%"
+					style="width, {percentage}%"
 				></div>
 			</div>
 		</div>
@@ -167,7 +167,7 @@ function handleChange(e: Event) {
 				   [&::-moz-range-thumb]:border-2
 				   [&::-moz-range-thumb]:shadow-md
 				   [&: :-moz-range-thumb]:cursor-pointer, focus:outline-none"
-			style="height: {size === 'sm' ? '12px' : size === 'lg' ? '20px' : '16px'}"
+			style="height: {size === 'sm' ? '12px' : size === 'lg' ? '20px' , '16px'}"
 			oninput={ handleInput }
 			onchange={ handleChange }
 			aria-valuemin={min}

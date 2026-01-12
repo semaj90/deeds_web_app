@@ -186,7 +186,7 @@ class CitationExtractionWorker {
  * Get extraction statistics
  */
  async getExtractionStats(): Promise<{ totalJobs: number;
- completedJobs: number; failedJobs: number;
+ completedJobs: number; failedJobs, number;
  }> {
  try {
  const waiting = await this.worker.getWaiting();

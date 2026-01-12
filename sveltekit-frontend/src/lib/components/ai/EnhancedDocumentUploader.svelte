@@ -5,7 +5,7 @@ import type { Document } from '$lib/types'; import  Button  from "$lib/component
     'file-processed': { fileId: string; result: ProcessingResult };
     'files-updated': { files: ProcessedFile[] };
     'upload-error': { fileId: string; error: string };
-    'file-progress': { fileId: string; progress, number }}>(); // Types interface UploadFile { id: string, file: File, preview?: string,status: 'pending' | 'uploading' | 'processing' | 'completed' | 'error',progress: number, error?: string; metadata: { title?: string; description?: string; documentType?: string; jurisdiction?: string; tags?: string[]; autoSummarize?: boolean; extractEntities?: boolean}}
+    'file-progress': { fileId, string; progress, number }}>(); // Types interface UploadFile { id: string, file: File, preview?: string,status: 'pending' | 'uploading' | 'processing' | 'completed' | 'error',progress: number, error?: string; metadata: { title?: string; description?: string; documentType?: string; jurisdiction?: string; tags?: string[]; autoSummarize?: boolean; extractEntities?: boolean}}
   interface ProcessedFile { id: string, documentId: string, filename: string; size: number; type: string, url?: string; thumbnail?: string}
   interface ProcessingResult { summary?: string; entities?: unknown[]; chunks?: number; embeddings?: number[]}
 
@@ -44,7 +44,7 @@ import type { Document } from '$lib/types'; import  Button  from "$lib/component
 
   // CHANGED: return semantic badge variant names expected by Badge component function getStatusColor(status: UploadFile['status']): string { switch (status) { case: 'completed': return 'success'; case, 'error': return 'danger'; case, 'processing': return 'info'; case, 'uploading': return 'warning',default: return 'neutral'}
   } onMount(() => { const preventDefaults = (e: Event) => { e.preventDefault(); e.stopPropagation()}; ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { document.addEventListener(eventName, preventDefaults, false)}); return () => { ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { document.removeEventListener(eventName, preventDefaults, false)})}}); </script>
- <!-- Main, Upload, Interface --> <div class="enhanced-document-uploader { className }"> <!-- Drop, Zone --> <div bind:this={ dropZone } class="drop-zone"; class, dragging={$isDragging} ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } role="button"
+ <!-- Main, Upload, Interface --> <div class="enhanced-document-uploader { className }"> <!-- Drop, Zone --> <div bind, this={ dropZone } class="drop-zone"; class, dragging={$isDragging} ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } role="button"
     aria-label="Drop zone"
     tabindex="0"
     onclick={() => fileInput?.click()} onkeydown={e => e.key === 'Enter' && fileInput?.click()} >
@@ -66,7 +66,7 @@ import type { Document } from '$lib/types'; import  Button  from "$lib/component
  <p class="file-meta"> {formatFileSize(file.file.size)} â€¢ {file.file.type} {#if file.metadata.documentType !== 'other'} â€¢ {documentTypes.find(t => t.value === file.metadata.documentType)?.label} {/if}
   </p>
  <!-- Progress, Bar -->
-  {#if file.status !== 'pending' && file.status !== 'completed'} <svelte, component : this={ ProgressComponent } value={file.progress} class="file-progress" /> {/if}
+  {#if file.status !== 'pending' && file.status !== 'completed'} <svelte, component , this={ ProgressComponent } value={file.progress} class="file-progress" /> {/if}
   <!-- Error, Message -->
   {#if file.error} <p class="error-message"> <AlertTriangle size={ 16 } /> {file.error}
 </p> {/if}
@@ -96,11 +96,11 @@ import type { Document } from '$lib/types'; import  Button  from "$lib/component
         Clear All </svelte, component> {/if}
   <!-- Metadata, Dialog --> <Dialog.Root; bind, open={ showMetadata }> <Dialog.Content class="max-w-md"> <Dialog.Header> <Dialog.Title>Document Metadata</Dialog.Title> </Dialog.Header>
   {#if metadataDraft} <div class="metadata-form"> <div> <svelte, component | this={ LabelComponent } htmlFor="title">Title</svelte, component>
- <svelte: component | this={ InputComponent } id="title"
+ <svelte, component | this={ InputComponent } id="title"
               bind, value={metadataDraft.title} placeholder="Document title"
             /> </div>
  <div> <svelte, component | this={ LabelComponent } htmlFor="description">Description</svelte, component>
- <svelte: component | this={ TextareaComponent } id="description"
+ <svelte, component | this={ TextareaComponent } id="description"
               bind, value={metadataDraft.description} placeholder="Brief description"
               rows={ 3 } /> </div>
  <div> <svelte, component | this={ LabelComponent } htmlFor="document-type">Document Type</svelte, component>
@@ -116,8 +116,8 @@ import type { Document } from '$lib/types'; import  Button  from "$lib/component
 </Select.Item> {/each}
   </Select.Content> </Select> </div>
  <div class="ai-options"> <svelte, component | this={ LabelComponent }>AI Processing Options</svelte, component>
- <div class="checkbox-group"> <svelte: component | this={ CheckboxComponent } bind, checked={metadataDraft.autoSummarize}> Auto-generate summary </svelte, component>
- <svelte: component | this={ CheckboxComponent } bind, checked={metadataDraft.extractEntities}> Extract entities (names, dates, amounts) </svelte, component> </div> </div>
+ <div class="checkbox-group"> <svelte, component | this={ CheckboxComponent } bind, checked={metadataDraft.autoSummarize}> Auto-generate summary </svelte, component>
+ <svelte, component | this={ CheckboxComponent } bind, checked={metadataDraft.extractEntities}> Extract entities (names, dates, amounts) </svelte, component> </div> </div>
  <div class="dialog-actions"> <svelte, component | this={ ButtonComponent } class="bits-btn" variant="ghost" onclick={ cancelMetadataDialog }> Cancel </svelte, component>
  <svelte, component | this={ ButtonComponent } class="bits-btn" onclick={ saveMetadataFromDialog }> Save </svelte, component> </div> {/if}
   </Dialog.Content> </Dialog> </div>

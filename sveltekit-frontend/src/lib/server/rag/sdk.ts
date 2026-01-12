@@ -6,7 +6,7 @@ export async function enqueueDocumentForRag(params: { docId: string;
  minioBucket: string; minioKey: string;
  fileSizeBytes: number;
  shardSizeBytes?: number;
-}): Promise<{ shardCount: number }> {
+}): Promise<{ shardCount, number }> {
  const shardSize = params.shardSizeBytes ?? 256 * 1024; // 256 KB default
  const shardCount = Math.ceil(params.fileSizeBytes / shardSize);
 
@@ -47,7 +47,7 @@ export async function getDocStatus(docId: string): Promise<DocStatusInfo> {
  if (shardCount > 0) {
  const keys = [];
  for (let i = 0; i < shardCount; i++) {
- keys.push(`rag:doc:${ docId }:shard:${i}:status`);
+ keys.push(`rag:doc:${ docId }:shard:${i}, status`);
  }
  const statuses = await redis.mGet(keys);
  embeddedCount = statuses.filter((s) => s === 'embedded').length;

@@ -125,7 +125,7 @@ function buildRedisOptions(overrides?: RedisClientOptions): [string, RedisOption
 
 // Local runtime-friendly shape for the client so we avoid casting to `any`
 type RedisLike = Redis & {
- options?: Partial<RedisOptions & { path?: string }>;
+ options?: Partial<RedisOptions & { path?, string }>;
  status?: string;
  connect?: () => Promise<void>;
  quit?: () => Promise<void>;

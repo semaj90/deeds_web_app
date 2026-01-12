@@ -91,7 +91,7 @@
 
 <div class="{containerClass} {className}">
 	<div
-		bind:this={viewportElement}
+		bind, this={viewportElement}
 		onscroll={ handleScroll }
 		class={viewportClass()}
 	>
@@ -104,7 +104,7 @@
 		<div class="{scrollbarVerticalClass} {scrollbarClass}">
 			<div
 				class={thumbClass}
-				style="height: {verticalThumbHeight}px; transform: translateY({verticalThumbTop}px);"
+				style="height: {verticalThumbHeight}px; transform, translateY({verticalThumbTop}px);"
 			></div>
 		</div>
 	{/if}
@@ -113,7 +113,7 @@
 		<div class="{scrollbarHorizontalClass} {scrollbarClass}">
 			<div
 				class={thumbClass}
-				style="width: {horizontalThumbWidth}px; transform: translateX({horizontalThumbLeft}px);"
+				style="width: {horizontalThumbWidth}px; transform, translateX({horizontalThumbLeft}px);"
 			></div>
 		</div>
 	{/if}

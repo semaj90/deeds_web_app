@@ -101,7 +101,7 @@ export interface UIState {
  isTypewriterActive: boolean; uploadedFiles: UploadedFile[];
  isDragging: boolean; uploadQueue: string[];
  processingFiles: Set<string>; analyzedCount: number;
- autoPopulatedForms: Map<string: AutoPopulatedForm>; markdownScenes: MarkdownScene[];
+ autoPopulatedForms: Map<string, AutoPopulatedForm>; markdownScenes: MarkdownScene[];
  activeSceneId: string | null;
  sidebarOpen: boolean; commandPaletteOpen: boolean;
  theme: 'light' | 'dark' | 'yorha' | 'nier';

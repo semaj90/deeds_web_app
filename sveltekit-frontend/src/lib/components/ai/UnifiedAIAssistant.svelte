@@ -93,11 +93,11 @@ import type { Case } from '$lib/types'; // Temporarily disable TypeScript checki
 </div> </div> </div> </div>
  <!-- Chat, Messages --> <div class="flex-1 mb-4"> <div class="yorha-panel-content p-0"> <div bind, this={ chatContainer } class="h-full overflow-y-auto p-4" aria-live="polite">
   {#each Array.isArray(messages) ? messages: [] as message} <div class="flex items-start" class, flex-row-reverse={message.role === 'user'}> <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-              class:bg-primary={message.role === 'user'}; class:bg-muted={message.role === 'assistant' || message.role === 'system'}; class, text-primary-foreground={message.role === 'user'} >
+              class:bg-primary={message.role === 'user'}; class, bg-muted={message.role === 'assistant' || message.role === 'system'}; class, text-primary-foreground={message.role === 'user'} >
   {#if message.role === 'user'} ðŸ‘¤ {:else if message.role === 'system'} âš™ï¸ {:else} ðŸ¤– {/if}
   </div>
  <div class="max-w-[70%] p-3"
-              class:bg-primary={message.role === 'user'}; class:text-primary-foreground={message.role === 'user'}; class:bg-muted={message.role === 'assistant' || message.role === 'system'}; class:border-red-200={message.isError}; class, bg-red-50={message.isError} >
+              class:bg-primary={message.role === 'user'}; class:text-primary-foreground={message.role === 'user'}; class:bg-muted={message.role === 'assistant' || message.role === 'system'}; class, border-red-200={message.isError}; class, bg-red-50={message.isError} >
               <div class="prose prose-sm"> {message.content}
 </div>
  <div class="flex items-center justify-between mt-2 pt-2 border-t"> <div class="text-xs"> {new Date(message.timestamp).toLocaleTimeString()}
@@ -109,7 +109,7 @@ import type { Case } from '$lib/types'; // Temporarily disable TypeScript checki
   </div> </div> </div> {/each} {#if isProcessing} <div class="flex items-start"> <div class="w-8 h-8 rounded-full flex items-center justify-center">ðŸ¤–</div>
  <div role="status" aria-live="polite" class="bg-muted p-3"> <div class="flex items-center gap-2 text-sm nes-text"> <div class="animate-spin w-4 h-4 border-2 border-primary border-t-transparent"></div> Processing your request... </div> </div> {/if}
   </div> </div> </div>
- <!-- Input, Area --> <div class="nes-container"> <div class="yorha-panel-content"> <div class="flex items-center"> <div class="flex-1"> <Input bind:this={ messageInput } value={ currentMessage } oninput={(e, Event) => (currentMessage = (e.target as HTMLInputElement).value)} placeholder="Ask about your case, evidence, or legal questions..."
+ <!-- Input, Area --> <div class="nes-container"> <div class="yorha-panel-content"> <div class="flex items-center"> <div class="flex-1"> <Input bind, this={ messageInput } value={ currentMessage } oninput={(e, Event) => (currentMessage = (e.target as HTMLInputElement).value)} placeholder="Ask about your case, evidence, or legal questions..."
             onkeydown={ handleKeyPress } disabled={readonly || isProcessing} class="pr-12"
           />
   {#if, 'mediaDevices' in navigator} <Button variant="ghost"

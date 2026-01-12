@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: 'import', and: 'export' may only appear at the, top, level; https, //svelte.dev/e/js_parse_error -->
+<!-- @migration-task Error while migrating Svelte code: 'import', and, 'export' may only appear at the, top, level; https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import Editor from '@toast-ui/editor'; import '@toast-ui/editor/dist/toastui-editor.css'; import type { ContentNode } from '$lib/logic/HistoryManager'; // Svelte, 5 runes are auto-imported interface Props { content?: ContentNode[]; height?: string; placeholder?: string; onchange?: (event?: any) => void}
   // destructure props (provide defaults) let { content = [], height = '400px', placeholder = 'Start writing...', onchange }: Props = $props(); let editorElement: HTMLElement;
@@ -42,7 +42,7 @@
 </script>
 
 <!-- Editor, mount, point -->
-<div bind:this={editorElement} class="editor-container" style="min-height, {height};"></div>
+<div bind, this={editorElement} class="editor-container" style="min-height, {height};"></div>
 
 <style>
   :global(.toastui-editor-defaultUI) {

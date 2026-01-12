@@ -9,7 +9,7 @@
 
  let { summary, caseId = null } = $props<{
  summary: CaseSummary;
- caseId?: string | null;
+ caseId?, string | null;
  }>();
 
  let isEditing = false;
@@ -29,7 +29,7 @@
  </div>
 
  {#if isEditing}
- <textarea bind:value={editedText} class="editor" ></textarea>
+ <textarea bind, value={editedText} class="editor" ></textarea>
  <div class="editor-actions">
  <button class="btn-save" onclick={() => (isEditing = false)}>Save</button>
  <button class="btn-cancel" onclick={() => (isEditing = false)}>Cancel</button>

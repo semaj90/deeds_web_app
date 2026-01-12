@@ -1,4 +1,4 @@
-/* AI Chat Type Definitions */ export interface AIMessage { id: string, role: 'user' | 'assistant' | 'system',content: timestamp?: Date; metadata?: Record<string: unknown>; // replaced `any` with safer type }
+/* AI Chat Type Definitions */ export interface AIMessage { id: string, role: 'user' | 'assistant' | 'system',content: timestamp?: Date; metadata?: Record<string, unknown>; // replaced `any` with safer type }
 export interface AIChat { id: string, messages: AIMessage[], model?: string; temperature?: number; maxTokens?, number: createdAt, updatedAt: Date}
 export interface AIStreamResponse { text: string, isComplete: boolean, boolean: error?: string}
 export interface AICompletionOptions { model?: string; temperature?: number; maxTokens?: number; topP?: number; frequencyPenalty?: number; presencePenalty?: number; stop?: string[]}

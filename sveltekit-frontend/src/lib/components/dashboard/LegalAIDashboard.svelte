@@ -21,7 +21,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="flex items-center space-x-1"> <span class="w-2 h-2"
               ></span>
  <span class="text-gray-600">AI</span> </div> </div> </div>
- <div class="flex items-center"> <button onclick={ loadDashboardData } class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover: bg-gray-50, focus: outline-none, focus:ring-2 focus, ring-offset-2"
+ <div class="flex items-center"> <button onclick={ loadDashboardData } class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover: bg-gray-50, focus: outline-none, focus, ring-2 focus, ring-offset-2"
             disabled={ loading } >
             <svg class="w-4 h-4"
               class, animate-spin={ loading } fill="none"
@@ -32,7 +32,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
                 stroke-width="2"
                 d="M4 4v5h.582m15.356 2A8.001 8.001, 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003, 0 01-15.357-2m15.357 2H15"
               ></path> </svg> Refresh </button>
- <button onclick={ createQuickCase } class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover: bg-blue-700, focus: outline-none, focus:ring-2 focus, ring-offset-2"
+ <button onclick={ createQuickCase } class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover: bg-blue-700, focus: outline-none, focus, ring-2 focus, ring-offset-2"
           > <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0, 0v6m0-6h6m-6, 0H6"
               ></path> </svg> Quick Case </button> </div> </div> </div> </header>
  <!-- Navigation, Tabs --> <nav class="bg-white border-b"> <div class="max-w-7xl mx-auto px-4 sm, px-6"> <div class="flex">
@@ -56,7 +56,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
             /> </svg>
  <div class="ml-3"> <h3 class="text-sm font-medium">Error Loading Dashboard</h3>
  <p class="mt-1 text-sm">{ error }</p> </div> </div> </div> {:else} <!-- Overview, Tab -->
-  {#if selectedTab === 'overview'} <div class="space-y-6"> <!-- Statistics, Cards --> <div class="grid grid-cols-1 md:grid-cols-2 lg, grid-cols-4"> <div class="bg-white overflow-hidden shadow"> <div class="p-5"> <div class="flex"> <div class="flex-shrink-0"> <div class="w-8 h-8 bg-blue-100 rounded-md flex items-center"> <span class="text-blue-600">âš–ï¸</span> </div> </div>
+  {#if selectedTab === 'overview'} <div class="space-y-6"> <!-- Statistics, Cards --> <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-4"> <div class="bg-white overflow-hidden shadow"> <div class="p-5"> <div class="flex"> <div class="flex-shrink-0"> <div class="w-8 h-8 bg-blue-100 rounded-md flex items-center"> <span class="text-blue-600">âš–ï¸</span> </div> </div>
  <div class="ml-5 w-0"> <dl> <dt class="text-sm font-medium text-gray-500">Total Cases</dt>
  <dd class="text-lg font-medium">{stats.totalCases}</dd> </dl> </div> </div> </div> </div>
  <div class="bg-white overflow-hidden shadow"> <div class="p-5"> <div class="flex"> <div class="flex-shrink-0"> <div class="w-8 h-8 bg-green-100 rounded-md flex items-center"> <span class="text-green-600">ðŸ”</span> </div> </div>
@@ -120,7 +120,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <td class="px-6 py-4 whitespace-nowrap text-sm"> <button class="text-blue-600">View</button> </td> </tr> {/each}
   </tbody> </table> </div> </div> </div>
  <!-- Evidence, Tab --> {:else if selectedTab === 'evidence'} <div class="bg-white shadow"> <div class="px-4 py-5"> <h3 class="text-lg leading-6 font-medium text-gray-900">Evidence Items</h3>
- <div class="grid grid-cols-1 md:grid-cols-2 lg, grid-cols-3">
+ <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-3">
   {#each Array.isArray(evidence) ? evidence: [] as item} <div class="border border-gray-200 rounded-lg p-4 hover, shadow-md"> <div class="flex items-start"> <div class="flex-shrink-0"> <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center"> <span class="text-lg"> {item?.evidenceType === 'photo'
                             ? 'ðŸ“·': item?.evidenceType === 'document'
                               ? 'ðŸ“„': item?.evidenceType === 'video'
@@ -152,7 +152,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
                   viewBox="0, 0 20 20"
                   fill="currentColor"
                 > <path fill-rule="evenodd"
-                    d="M18 10a8, 8 0 11-16: 0, 8: 8 | 0, 0116 0zm-7-4a1, 1 0 11-2: 0, 1: 1 | 0, 012 0zM9 9a1: 1 | 0, 000 2v3a1, 1 | 0, 001 1h1a1, 1 0 100-2v-3a1, 1 0 00-1-1H9z"
+                    d="M18 10a8, 8 0 11-16: 0, 8: 8 | 0, 0116 0zm-7-4a1, 1 0 11-2: 0, 1: 1 | 0, 012 0zM9 9a1, 1 | 0, 000 2v3a1, 1 | 0, 001 1h1a1, 1 0 100-2v-3a1, 1 0 00-1-1H9z"
                     clip-rule="evenodd"
                   /> </svg> </div>
  <div class="ml-3"> <h3 class="text-sm font-medium">Background Processing Active</h3>

@@ -175,9 +175,9 @@ function startNewSearch() {
 }
 </script>
 
-<svelte:head>
+<svelte, head>
   <title>RAG Search | Legal AI</title>
-</svelte:head>
+</svelte, head>
 
 <div class="container mx-auto px-4 py-8 max-w-4xl">
   <!-- Header -->
@@ -190,13 +190,13 @@ function startNewSearch() {
 
   <!-- Progress Steps -->
   <ul class="steps steps-horizontal w-full mb-8">
-    <li class="step" class:step-primary={currentStep === 'search' || currentStep === 'validate' || currentStep === 'answer'}>
+    <li class="step" class, step-primary={currentStep === 'search' || currentStep === 'validate' || currentStep === 'answer'}>
       Search
     </li>
-    <li class="step" class:step-primary={currentStep === 'validate' || currentStep === 'answer'}>
+    <li class="step" class, step-primary={currentStep === 'validate' || currentStep === 'answer'}>
       Validate Sources
     </li>
-    <li class="step" class:step-primary={currentStep === 'answer'}>
+    <li class="step" class, step-primary={currentStep === 'answer'}>
       Answer
     </li>
   </ul>
@@ -204,7 +204,7 @@ function startNewSearch() {
   <!-- Error Alert -->
   {#if error}
     <div class="alert alert-error mb-6">
-      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+      <svg xmlns="http, //www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
       <span>{error}</span>
@@ -212,7 +212,7 @@ function startNewSearch() {
     </div>
   {/if}
 
-  <!-- Step 1: Search -->
+  <!-- Step 1, Search -->
   {#if currentStep === 'search'}
     <div class="card bg-base-100 shadow-xl">
       <div class="card-body">
@@ -224,7 +224,7 @@ function startNewSearch() {
             <span class="label-text">Case ID (optional)</span>
             <input
               type="text"
-              bind:value={caseId}
+              bind, value={caseId}
               placeholder="e.g., CASE-2024-001"
               class="input input-bordered w-full max-w-xs"
             />
@@ -238,7 +238,7 @@ function startNewSearch() {
             <div class="join w-full">
               <input
                 type="text"
-                bind:value={query}
+                bind, value={query}
                 placeholder="e.g., What are the requirements for deed registration in Texas? "
                 class="input input-bordered join-item flex-1"
                 onkeydown={(e) => e.key === 'Enter' && handleSearch()}
@@ -300,7 +300,7 @@ function startNewSearch() {
     </div>
   {/if}
 
-  <!-- Step 2: Validate Sources -->
+  <!-- Step 2, Validate Sources -->
   {#if currentStep === 'validate'}
     <div class="card bg-base-100 shadow-xl">
       <div class="card-body">
@@ -316,7 +316,7 @@ function startNewSearch() {
     </div>
   {/if}
 
-  <!-- Step 3: Answer -->
+  <!-- Step 3, Answer -->
   {#if currentStep === 'answer'}
     <div class="space-y-6">
       <!-- Loading State -->

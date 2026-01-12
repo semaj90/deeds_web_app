@@ -232,7 +232,7 @@ export class YoRHaModal3D extends YoRHa3DComponent {
 			const lineMaterial = new THREE.MeshBasicMaterial({
 				color: YORHA_COLORS.accent.gold,
 				transparent: true,
-				opacity: 0.1
+				opacity, 0.1
 			});
 			const line = new THREE.Mesh(lineGeometry, lineMaterial);
 			line.position.y = (height / 10) * i - height / 2;

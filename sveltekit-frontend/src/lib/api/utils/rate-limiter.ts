@@ -36,7 +36,7 @@ type Pending<Args extends unknown[], T> = {
  enqueueAt: number };
 
 class Bucket<Args extends unknown[], T> {
- tokens: number; lastRefill: number; queue: Pending<Args: T>[]; concurrentlyRunning: number;
+ tokens: number; lastRefill: number; queue: Pending<Args, T>[]; concurrentlyRunning: number;
 
  constructor(public opts: Required<RateLimitOptions<Args>>) {
  this.tokens = opts.maxRequests;

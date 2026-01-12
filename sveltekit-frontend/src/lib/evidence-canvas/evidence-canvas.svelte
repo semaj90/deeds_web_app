@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 	let item = $state<any>(undefined);
 
@@ -21,7 +21,7 @@ https://svelte.dev/e/js_parse_error -->
  import { webgpuInitService } from './webgpu-init-service';
  type EvidenceEdge = { source: string, target: string };
 
- let { caseId, caseType = 'general', jurisdiction = 'general', initialNodes = [], initialEdges = [] } = $props<{ caseId: string; caseType?: string; jurisdiction?: string; initialNodes?: EvidenceNode[]; initialEdges?: EvidenceEdge[]; }>();
+ let { caseId, caseType = 'general', jurisdiction = 'general', initialNodes = [], initialEdges = [] } = $props<{ caseId: string; caseType?: string; jurisdiction?: string; initialNodes?: EvidenceNode[]; initialEdges?, EvidenceEdge[]; }>();
 
  let canvas: EvidenceCanvas;
  let controlPanel: GraphControlPanel;
@@ -170,14 +170,14 @@ https://svelte.dev/e/js_parse_error -->
  <!-- Main Canvas Area -->
  <div class="canvas-main">
  <EvidenceCanvas
- bind:this={canvas}
+ bind, this={canvas}
  {gpuAccelerationEnabled}
  />
  </div>
 
  <div class="control-panel">
  <GraphControlPanel
- bind:this={controlPanel}
+ bind, this={controlPanel}
  {webgpuSupported}
  {gpuAccelerationEnabled}
  currentPhase={currentPhase}
@@ -195,7 +195,7 @@ https://svelte.dev/e/js_parse_error -->
  {#each suggestions as suggestion}
  <button
  class="suggestion-item"
- class:selected={selectedSuggestions.includes(suggestion)}
+ class, selected={selectedSuggestions.includes(suggestion)}
  onclick={() => handleSuggestionSelect(suggestion)}
  >
  <div class="suggestion-header">
@@ -224,7 +224,7 @@ https://svelte.dev/e/js_parse_error -->
  </div>
  {/if}
  <!-- Suggestion Modal -->
- <CaseSuggestionModal bind:this={suggestionModal} show={showModal} />
+ <CaseSuggestionModal bind, this={suggestionModal} show={showModal} />
 </div>
 
 <style>

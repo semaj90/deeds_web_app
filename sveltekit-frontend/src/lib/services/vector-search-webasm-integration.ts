@@ -52,7 +52,7 @@ export interface PipelineMetrics {
  */
 export class VectorSearchWebASMPipeline {
     private config: VectorSearchPipelineConfig;
-    private cache = new Map<string, { results: SearchResult[]; timestamp: number }>();
+    private cache = new Map<string, { results: SearchResult[]; timestamp, number }>();
     private performanceMetrics: PipelineMetrics = {
         totalTime: 0, embeddingTime: 0, searchTime: 0, cacheHitRate: 0, throughput: 0, wasmMemoryUsage: 0, gpuUtilization: 0
     };
@@ -73,7 +73,7 @@ export class VectorSearchWebASMPipeline {
     /**
      * Perform vector search with WebASM acceleration
      */
-    async search(request: SearchRequest): Promise<{ results: SearchResult[]; metrics: PipelineMetrics }> {
+    async search(request: SearchRequest): Promise<{ results: SearchResult[]; metrics, PipelineMetrics }> {
         const startTime = performance.now();
         const cacheKey = this.generateCacheKey(request);
 

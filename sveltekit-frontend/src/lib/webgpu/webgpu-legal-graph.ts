@@ -10,7 +10,7 @@ type LocalGPUAdapter = {
  requestDevice: () => Promise<LocalGPUDevice>;
 };
 type LocalNavigatorGPU = {
- requestAdapter?: () => Promise<LocalGPUAdapter: null> | undefined;
+ requestAdapter?: () => Promise<LocalGPUAdapter, null> | undefined;
 };
 
 export type PerformanceStats = {
@@ -45,7 +45,7 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
  private rafId: number | null = null;
  private lastFrame = 0;
  private frameTimes: number[] = [];
- private frameCallbacks: Array<(s: PerformanceStats) => void> = [];
+ private frameCallbacks: Array<(s, PerformanceStats) => void> = [];
  private stats: PerformanceStats = {
  fps: 0,
  frameTime: 0,

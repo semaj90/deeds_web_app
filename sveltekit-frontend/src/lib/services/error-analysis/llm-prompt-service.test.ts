@@ -279,7 +279,7 @@ describe('LLMPromptService - Unit Tests (Task 11.1)', () => {
  text: `Response ${i}`,
  tokens: 50 + i,
  model: 'gemma3-legal',
- timestamp: new Date(),
+ timestamp, new Date(),
  });
  }
 
@@ -294,7 +294,7 @@ describe('LLMPromptService - Unit Tests (Task 11.1)', () => {
  text: `Response ${i}`,
  tokens: 50,
  model: 'gemma3-legal',
- timestamp: new Date(),
+ timestamp, new Date(),
  });
  }
 
@@ -320,7 +320,7 @@ describe('LLMPromptService - Unit Tests (Task 11.1)', () => {
  expect(page2.length).toBe(5);
 
  // Ensure no overlap
- const page1Ids = page1.map((p: any) => p.id);
+ const page1Ids = page1.map((p, any) => p.id);
  const page2Ids = page2.map((p: any) => p.id);
  const overlap = page1Ids.filter((id: any) => page2Ids.includes(id));
 
@@ -340,7 +340,7 @@ describe('LLMPromptService - Unit Tests (Task 11.1)', () => {
  prompts.push(p);
 
  // Small delay to ensure different timestamps
- await new Promise((resolve: any) => setTimeout(resolve, 5));
+ await new Promise((resolve, any) => setTimeout(resolve, 5));
  }
 
  const history = await service.retrievePromptHistory(10, 0);

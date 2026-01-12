@@ -18,7 +18,7 @@ import { onMount } from 'svelte';
  let wsReconnecting = $state<boolean>(false);
 
  // File upload state
- let selectedFile = $state <File: null>(null);
+ let selectedFile = $state <File, null>(null);
  let isDragging = $state <boolean>(false);
  let uploadProgress = $state <number>(0);
  let currentFileId = $state <string | null>(null);
@@ -34,7 +34,7 @@ import { onMount } from 'svelte';
  });
   
  let backendStatus = $state <{
- typescript: boolean, pythonAI: boolean, advancedAI: boolean, capabilities: string[]
+ typescript: boolean, pythonAI: boolean, advancedAI: boolean, capabilities, string[]
  }>({ typescript: true, pythonAI: false, false,
  advancedAI: false,
  capabilities: []
@@ -61,7 +61,7 @@ import { onMount } from 'svelte';
  // File metadata
  let fileMetadata = $state <{
  filename: string, size: number, uploadTime: string
- analysis?: string
+ analysis?, string
  } | null>(null);
 
  // ======================
@@ -513,21 +513,21 @@ import { onMount } from 'svelte';
  <h2 class="text-xl font-semibold mb-2">Backend Status</h2>
  <div class="flex items-center space-x-4">
  <div class="flex items-center">
- <span class="w-3 h-3 rounded-full {backendStatus.typescript ? 'bg-green-500' : 'bg-red-500'}"></span>
+ <span class="w-3 h-3 rounded-full {backendStatus.typescript ? 'bg-green-500' , 'bg-red-500'}"></span>
  <span class="ml-2">TypeScript Backend: {backendStatus.typescript ? 'Healthy' : 'Unhealthy'}</span>
  </div>
  <div class="flex items-center">
- <span class="w-3 h-3 rounded-full {backendStatus.pythonAI ? 'bg-green-500' : 'bg-red-500'}"></span>
+ <span class="w-3 h-3 rounded-full {backendStatus.pythonAI ? 'bg-green-500' , 'bg-red-500'}"></span>
  <span class="ml-2">Python AI Backend: {backendStatus.pythonAI ? 'Healthy' : 'Unhealthy'}</span>
  </div>
  {#if backendStatus.pythonAI}
  <div class="flex items-center">
- <span class="w-3 h-3 rounded-full {wsConnected ? 'bg-green-500' : 'bg-yellow-500'}"></span>
+ <span class="w-3 h-3 rounded-full {wsConnected ? 'bg-green-500' , 'bg-yellow-500'}"></span>
  <span class="ml-2">WebSocket: {wsConnected ? 'Connected' : wsReconnecting ? 'Reconnecting...' : 'Disconnected'}</span>
  </div>
  {/if}
  <div class="flex items-center">
- <span class="w-3 h-3 rounded-full {backendStatus.advancedAI ? 'bg-purple-500' : 'bg-gray-500'}"></span>
+ <span class="w-3 h-3 rounded-full {backendStatus.advancedAI ? 'bg-purple-500' , 'bg-gray-500'}"></span>
  <span class="ml-2">Advanced AI Backend: {backendStatus.advancedAI ? 'Healthy' : 'Unavailable'}</span>
  </div>
  </section>
@@ -540,7 +540,7 @@ import { onMount } from 'svelte';
  <label class="flex items-center">
  <input
  type="checkbox"
- bind:checked={advancedAIMode}
+ bind, checked={advancedAIMode}
  class="mr-2"
  />
  Enable Advanced AI Orchestration
@@ -550,7 +550,7 @@ import { onMount } from 'svelte';
  {/if}
  </div>
  {#if aiSystemStatus}
- <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+ <div class="mt-4 grid grid-cols-2 md, grid-cols-4 gap-4 text-sm">
  <div class="bg-purple-50 p-3 rounded">
  <div class="font-medium">NAS Engine</div>
  <div class="text-purple-600">{aiSystemStatus.component_status?.nas_engine ? 'Active' : 'Inactive'}</div>
@@ -576,7 +576,7 @@ import { onMount } from 'svelte';
  <section class="bg-white rounded-lg shadow p-4">
  <h2 class="text-xl font-semibold mb-4">Upload Evidence Document</h2>
  <div
- class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}"
+ class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragging ? 'border-blue-500 bg-blue-50' , 'border-gray-300'}"
  ondragover={ handleDragOver }
  ondragleave={ handleDragLeave }
  ondrop={ handleDrop }
@@ -622,7 +622,7 @@ import { onMount } from 'svelte';
  <span>{workflowStatus.progress}%</span>
  </div>
  <div class="w-full bg-gray-200 rounded-full h-2">
- <div class="h-2 rounded-full transition-all duration-300 {getProgressColor(workflowStatus.progress)}" style="width: {workflowStatus.progress}%"></div>
+ <div class="h-2 rounded-full transition-all duration-300 {getProgressColor(workflowStatus.progress)}" style="width, {workflowStatus.progress}%"></div>
  </div>
  {#if workflowStatus.message}
  <p class="text-sm text-gray-600 mt-1">{workflowStatus.message}</p>
@@ -635,7 +635,7 @@ import { onMount } from 'svelte';
  {#if fileMetadata}
  <section class="bg-white rounded-lg shadow p-4">
  <h2 class="text-xl font-semibold mb-4">Document Analysis</h2>
- <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+ <div class="grid grid-cols-1 md, grid-cols-2 gap-4 mb-4">
  <div>
  <span class="font-medium">Filename:</span> {fileMetadata.filename}
  </div>
@@ -685,7 +685,7 @@ import { onMount } from 'svelte';
  type="text"
  bind:value={searchQuery}
  placeholder="Search for evidence, keywords, or ask questions..."
- class="w-full p-3 border border-gray-300 rounded-lg focus: ring-2, focus: ring-blue-500, focus:border-transparent"
+ class="w-full p-3 border border-gray-300 rounded-lg focus: ring-2, focus: ring-blue-500, focus, border-transparent"
  />
  {#if isSearching}
  <div class="absolute right-3 top-3">

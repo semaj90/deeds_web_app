@@ -182,7 +182,7 @@ export class OllamaAdapter implements OllamaClient {
   }
 
   async chat(
-    messages: Array<{ role: string; content: string }>,
+    messages: Array<{ role: string; content, string }>,
     opts?: { model?: string; stream?: boolean }
   ): Promise<string | AsyncIterable<string>> {
     const model = opts?.model ?? this.config.chatModel || 'gemma3:legal-latest';
@@ -417,7 +417,7 @@ export class PgVectorAdapter implements PgVectorClient {
     });
   }
 
-  async query(sql: string, params?: unknown[]): Promise<{ rows: any[] }> {
+  async query(sql: string, params?: unknown[]): Promise<{ rows, any[] }> {
     await this.ensurePool();
     return this.pool.query(sql, params);
   }
@@ -515,7 +515,7 @@ export class MinIOAdapter implements MinIOClient {
     key: string,
     data: Buffer | ReadableStream,
     metadata?: Record<string, string>
-  ): Promise<{ etag: string }> {
+  ): Promise<{ etag, string }> {
     await this.ensureClient();
     const result = await this.client.putObject(bucket, key, data, undefined, metadata);
     return { etag: result.etag };
@@ -534,10 +534,10 @@ export class MinIOAdapter implements MinIOClient {
   async listObjects(
     bucket: string,
     prefix?: string
-  ): Promise<Array<{ name: string; size: number; etag: string }>> {
+  ): Promise<Array<{ name: string; size: number; etag, string }>> {
     await this.ensureClient();
     const stream = this.client.listObjects(bucket, prefix, true);
-    const objects: Array<{ name: string; size: number; etag: string }> = [];
+    const objects: Array<{ name: string; size: number; etag, string }> = [];
     return new Promise((resolve, reject) => {
       stream.on('data', (obj: any) => {
         objects.push({ name: obj.name, size: obj.size, etag: obj.etag });
@@ -547,7 +547,7 @@ export class MinIOAdapter implements MinIOClient {
     });
   }
 
-  async listBuckets(): Promise<Array<{ name: string }>> {
+  async listBuckets(): Promise<Array<{ name, string }>> {
     await this.ensureClient();
     return this.client.listBuckets();
   }
@@ -573,7 +573,7 @@ export class Neo4jAdapter implements Neo4jClient {
   async run(
     cypher: string,
     params?: Record<string, unknown>
-  ): Promise<{ records: Array<{ toObject(): any }> }> {
+  ): Promise<{ records: Array<{ toObject(), any }> }> {
     await this.ensureDriver();
     return this.session.run(cypher, params);
   }

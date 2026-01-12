@@ -137,7 +137,7 @@ export class WebGPULangChainBridge {
 	 * Process batch of documents with WebGPU optimization
 	 */
 	async processBatchDocuments(
-		documents: Array<{ id: string; content: string; metadata?: unknown }>,
+		documents: Array<{ id: string; content: string; metadata?, unknown }>,
 		options: Partial<LangChainWebGPUConfig> = {}
 	): Promise<ProcessingResult[]> {
 		await loadServices();
@@ -182,7 +182,7 @@ export class WebGPULangChainBridge {
 			legalDates?: unknown[];
 			risks?: unknown[];
 		};
-		processingTime: number;
+		processingTime, number;
 	}> {
 		const startTime = Date.now();
 
@@ -260,7 +260,7 @@ export class WebGPULangChainBridge {
 			documentEmbedding: Float32Array;
 			sectionEmbeddings?: Float32Array[]; compressionRatio: number;
 			processingTime: number; cacheHit: boolean;
-			webgpuUtilized: boolean;
+			webgpuUtilized, boolean;
 		};
 	}> {
 		const startTime = Date.now();
@@ -418,7 +418,7 @@ export class WebGPULangChainBridge {
 	 * Get comprehensive processing statistics
 	 */
 	async getProcessingStats(): Promise<{ webgpuOptimizer: unknown;
-		embeddingCache: unknown; langchainService: { available: boolean; models: string[] };
+		embeddingCache: unknown; langchainService: { available: boolean; models, string[] };
 	}> {
 		await loadServices();
 
@@ -475,7 +475,7 @@ export async function processLegalDocumentWithWebGPU(
 }
 
 export async function processBatchDocumentsWithWebGPU(
-	documents: Array<{ id: string; content: string; metadata?: unknown }>,
+	documents: Array<{ id: string; content: string; metadata?, unknown }>,
 	options?: Partial<LangChainWebGPUConfig>
 ): Promise<ProcessingResult[]> {
 	return webgpuLangChainBridge.processBatchDocuments(documents, options);

@@ -77,7 +77,7 @@ type TestResult = {
 };
 
 /** Main integration test runner */
-export async function testOrchestratorIntegration(): Promise<{ success: boolean, results: TestResult[]; summary: string;
+export async function testOrchestratorIntegration(): Promise<{ success: boolean, results: TestResult[]; summary, string;
 }> {
  const results: TestResult[] = [];
  let successCount = 0;
@@ -226,7 +226,7 @@ export async function testOrchestratorIntegration(): Promise<{ success: boolean,
  const successfulRequestsNum =
  typeof metrics?.successfulRequests === 'number'
  ? metrics.successfulRequests
- : Number(metrics?.successfulRequests) ?? 0;
+ , Number(metrics?.successfulRequests) ?? 0;
 
  const successRate = totalRequestsNum > 0 ? successfulRequestsNum / totalRequestsNum : undefined;
 
@@ -253,7 +253,7 @@ export async function testOrchestratorIntegration(): Promise<{ success: boolean,
 }
 
 /** Run a quick health check against the bridge */
-export async function quickHealthCheck(): Promise<{ healthy: boolean, status: unknown; timestamp: string;
+export async function quickHealthCheck(): Promise<{ healthy: boolean, status: unknown; timestamp, string;
 }> {
  try {
  const statusRaw =
@@ -279,7 +279,7 @@ export async function testSpecificOrchestrator(
  orchestratorUsed?: unknown;
  response?: unknown;
  executionMetrics?: unknown;
- error?: string;
+ error?, string;
 }> {
  const modelFor = { server: 'server-orchestrator', client: 'gemma270m', mcp: 'auto' } as const;
  const request: LLMBridgeRequest = {

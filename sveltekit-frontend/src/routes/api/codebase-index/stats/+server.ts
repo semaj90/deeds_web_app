@@ -49,7 +49,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		);
 
 		let totalErrors = 0;
-		let topErrorCodes: Array<{ code: string; count: number }> = [];
+		let topErrorCodes: Array<{ code: string; count, number }> = [];
 		let surfaceBreakdown: Record<string, number> = {};
 		let techBreakdown: Record<string, number> = {};
 		let lastIndexed: string | null = null;

@@ -126,10 +126,10 @@
 	}
 </script>
 
-<svelte:head>
+<svelte, head>
 	<title>ACP Tool Dashboard | Phase 76</title>
 	<meta name="description" content="Agent Communication Protocol Tool Dashboard" />
-</svelte:head>
+</svelte, head>
 
 <div class="dashboard">
 	<!-- Header -->
@@ -150,7 +150,7 @@
 			<h2>System Health</h2>
 			<div class="health-grid">
 				{#each Object.entries(systemHealth) as [service, status]}
-					<div class="health-item" class:healthy={status === 'healthy'} class:offline={status === 'offline'}>
+					<div class="health-item" class:healthy={status === 'healthy'} class, offline={status === 'offline'}>
 						<span class="health-icon">{getStatusIcon(status as string)}</span>
 						<span class="health-name">{service}</span>
 						<span class="health-status">{status}</span>
@@ -166,7 +166,7 @@
 		<aside class="tool-browser">
 			<div class="category-filter">
 				<label for="category">Category:</label>
-				<select id="category" bind:value={selectedCategory}>
+				<select id="category" bind, value={selectedCategory}>
 					<option value="all">All Categories</option>
 					{#each categories as cat}
 						<option value={cat}>{getCategoryIcon(cat)} {cat.toUpperCase()}</option>
@@ -178,7 +178,7 @@
 				{#each filteredTools as tool}
 					<button
 						class="tool-item"
-						class:selected={selectedTool === tool.name}
+						class, selected={selectedTool === tool.name}
 						onclick={() => selectTool(tool.name)}
 					>
 						<span class="tool-icon">{getCategoryIcon(tool.category)}</span>
@@ -206,7 +206,7 @@
 							id="args"
 							bind:value={toolArgs}
 							rows="6"
-							placeholder={'{"query": "example"}'}
+							placeholder={'{"query", "example"}'}
 						></textarea>
 					</div>
 
@@ -228,7 +228,7 @@
 						<div class="result-box">
 							<h3>Result</h3>
 							<div class="result-meta">
-								<span class:success={result.success} class:failure={!result.success}>
+								<span class:success={result.success} class, failure={!result.success}>
 									{result.success ? '✅ Success' : '❌ Failed'}
 								</span>
 								{#if result.metadata?.duration}

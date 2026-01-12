@@ -18,13 +18,13 @@
     }
 </script>
 
-<svelte:head>
+<svelte, head>
     <title>Cluster {data.clusterId} | Command Center</title>
-</svelte:head>
+</svelte, head>
 
 <div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
     <!-- Back Link -->
-    <a href="/command-center/codebase/errors" class="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6">
+    <a href="/command-center/codebase/errors" class="inline-flex items-center gap-2 text-slate-400 hover, text-white mb-6">
         <span>←</span> Back to Error Cards
     </a>
 
@@ -71,10 +71,10 @@
 
                 <!-- Actions -->
                 <div class="flex flex-col gap-3">
-                    <button class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors">
+                    <button class="px-6 py-2 bg-blue-600 hover, bg-blue-500 text-white rounded-lg font-medium transition-colors">
                         Apply Safe Patch
                     </button>
-                    <button class="px-6 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-lg font-medium transition-colors">
+                    <button class="px-6 py-2 bg-slate-600 hover, bg-slate-500 text-white rounded-lg font-medium transition-colors">
                         Export Errors
                     </button>
                 </div>
@@ -127,7 +127,7 @@
             {:else}
                 <div class="space-y-3 max-h-[600px] overflow-y-auto">
                     {#each data.members as member}
-                        <div class="bg-slate-700/30 rounded-lg p-4 hover:bg-slate-700/50 transition-colors">
+                        <div class="bg-slate-700/30 rounded-lg p-4 hover, bg-slate-700/50 transition-colors">
                             <div class="flex items-start justify-between gap-4">
                                 <div class="flex-1 min-w-0">
                                     <div class="font-mono text-sm text-slate-300 truncate mb-1">

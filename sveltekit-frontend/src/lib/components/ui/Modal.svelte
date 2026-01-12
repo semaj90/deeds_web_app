@@ -10,7 +10,7 @@
   {#if open} <div bind:this={ modalElement } class="modal-backdrop"
     onclick={ handleOutsideClick } role="presentation"
     aria-hidden="true"
-    transition:fade={{ duration, 200 }} >
+    transition, fade={{ duration, 200 }} >
     <div class={['modal-content', sizeClasses].filter(Boolean).join(' ')} role="dialog"
       aria-modal="true"
       aria-labelledby={title ? 'modal-title', undefined} >

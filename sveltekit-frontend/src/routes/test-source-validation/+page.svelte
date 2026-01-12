@@ -28,7 +28,7 @@ let citations = $state<CitationMetadata[]>([]);
 
 // Step 3: Knowledge Graph
 let entities = $state<string[]>([]);
-let relationships = $state<Array<{ from: string; to: string; type: string }>>([]);
+let relationships = $state<Array<{ from: string; to: string; type, string }>>([]);
 let kagUpdateStatus = $state<string | null>(null);
 
 // ============================================================================
@@ -124,8 +124,8 @@ function extractEntities(text: string): string[] {
 
 function extractRelationships(
 	text: string
-): Array<{ from: string; to: string; type: string }> {
-	const relationships: Array<{ from: string; to: string; type: string }> = [];
+): Array<{ from: string; to: string; type, string }> {
+	const relationships: Array<{ from: string; to: string; type, string }> = [];
 
 	const patterns = [
 		{ regex: /(\w+)\s+uses?\s+(\w+)/gi, type: 'USES' },
@@ -150,9 +150,9 @@ function extractRelationships(
 }
 </script>
 
-<svelte:head>
+<svelte, head>
 	<title>Source Validation RAG - Integration Test</title>
-</svelte:head>
+</svelte, head>
 
 <div class="test-page">
 	<!-- Header -->
@@ -167,7 +167,7 @@ function extractRelationships(
 				</div>
 				<button
 					onclick={ resetWorkflow }
-					class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+					class="px-4 py-2 bg-gray-600 text-white rounded-lg hover, bg-gray-700"
 				>
 					🔄 Reset Workflow
 				</button>
@@ -178,21 +178,21 @@ function extractRelationships(
 	<!-- Progress Stepper -->
 	<div class="progress-stepper max-w-7xl mx-auto px-4 py-8">
 		<div class="flex items-center justify-center gap-4">
-			<div class="step" class:active={currentStep === 'search'} class:completed={currentStep !== 'search'}>
+			<div class="step" class:active={currentStep === 'search'} class, completed={currentStep !== 'search'}>
 				<div class="step-number">1</div>
 				<div class="step-label">Search & Validate</div>
 			</div>
 
 			<div class="step-arrow">→</div>
 
-			<div class="step" class:active={currentStep === 'answer'} class:completed={currentStep === 'graph'}>
+			<div class="step" class:active={currentStep === 'answer'} class, completed={currentStep === 'graph'}>
 				<div class="step-number">2</div>
 				<div class="step-label">Generate Answer</div>
 			</div>
 
 			<div class="step-arrow">→</div>
 
-			<div class="step" class:active={currentStep === 'graph'}>
+			<div class="step" class, active={currentStep === 'graph'}>
 				<div class="step-number">3</div>
 				<div class="step-label">Knowledge Graph</div>
 			</div>
@@ -202,7 +202,7 @@ function extractRelationships(
 	<!-- Main Content -->
 	<main class="main-content max-w-7xl mx-auto px-4 pb-12">
 		{#if currentStep === 'search'}
-			<!-- Step 1: Search & Validate -->
+			<!-- Step 1, Search & Validate -->
 			<div class="step-content">
 				<SourceValidator
 					{caseId}
@@ -211,7 +211,7 @@ function extractRelationships(
 				/>
 			</div>
 		{:else if currentStep === 'answer' && validationId}
-			<!-- Step 2: Generate Answer -->
+			<!-- Step 2, Generate Answer -->
 			<div class="step-content">
 				<AnswerGenerator
 					{validationId}
@@ -228,7 +228,7 @@ function extractRelationships(
 				{/if}
 			</div>
 		{:else if currentStep === 'graph' && validationId}
-			<!-- Step 3: Knowledge Graph -->
+			<!-- Step 3, Knowledge Graph -->
 			<div class="step-content">
 				<ProvenanceGraph
 					{validationId}
@@ -281,7 +281,7 @@ function extractRelationships(
 								</button>
 								<button
 									onclick={ resetWorkflow }
-									class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+									class="w-full px-4 py-2 bg-blue-600 text-white rounded hover, bg-blue-700 text-sm"
 								>
 									🔄 Start New Workflow
 								</button>

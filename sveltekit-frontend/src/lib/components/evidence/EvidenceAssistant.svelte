@@ -15,7 +15,7 @@ import { createEventDispatcher } from 'svelte';
 
  let { node, open = $bindable(false) } = $props<{
  node: EvidenceNode;
- open?: boolean;
+ open?, boolean;
  }>();
 
  let analysis = '';
@@ -78,7 +78,7 @@ import { createEventDispatcher } from 'svelte';
  }
 </script>
 
-<Dialog bind:open>
+<Dialog bind, open>
  <DialogContent class="evidence-dialog">
  <DialogHeader>
  <DialogTitle class="flex items-center gap-2">
@@ -139,7 +139,7 @@ import { createEventDispatcher } from 'svelte';
  {#if analysis}
  <div class="analysis-content">
  <textarea
- bind:value={analysis}
+ bind, value={analysis}
  placeholder="AI analysis will appear here..."
  rows={ 6 }
  readonly
@@ -173,13 +173,13 @@ import { createEventDispatcher } from 'svelte';
  Title:
  <input
  type="text"
- bind:value={node.title}
+ bind, value={node.title}
  onchange={(e) => updateNode({ title: e.currentTarget.value })}
  />
  </label>
 
  <label>
- Description: <Textarea, bind:value={node.description}
+ Description: <Textarea, bind, value={node.description}
  onchange={(e) => updateNode({ description: e.currentTarget.value })}
  rows={ 3 }
  />
@@ -192,7 +192,7 @@ import { createEventDispatcher } from 'svelte';
  min="0"
  max="1"
  step="0.1"
- bind:value={node.confidence}
+ bind, value={node.confidence}
  onchange={(e) => updateNode({ confidence: parseFloat(e.currentTarget.value) })}
  />
  </label>

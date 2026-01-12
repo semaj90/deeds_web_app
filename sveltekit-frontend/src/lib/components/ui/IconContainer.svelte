@@ -46,7 +46,7 @@
 </script>
 
 <div
- bind:this={containerRef}
+ bind, this={containerRef}
  class="icon-container icon-container-{size} {sizeClasses[size]} { className }"
 >
  <Icon class="h-full w-full" />

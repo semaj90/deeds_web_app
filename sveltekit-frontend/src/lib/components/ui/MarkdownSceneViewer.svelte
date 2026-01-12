@@ -53,7 +53,7 @@
  }
 </script>
 
-<div class="scene-viewer {className}" class:validated={scene.validated}>
+<div class="scene-viewer {className}" class, validated={scene.validated}>
  <!-- Header -->
  <div class="scene-header">
  <div class="scene-title-row">
@@ -83,7 +83,7 @@
  {#if isEditing}
  <textarea
  class="edit-textarea"
- bind:value={editedMarkdown}
+ bind, value={editedMarkdown}
  rows="10"
  ></textarea>
  {:else}

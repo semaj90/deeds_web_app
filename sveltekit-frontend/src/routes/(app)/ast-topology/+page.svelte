@@ -80,7 +80,7 @@
         let currentPath = '';
         for (let i = 0; i < parts.length - 1; i++) {
           const parent = currentPath || 'root';
-          currentPath = currentPath ? `${currentPath}/${parts[i]}` : parts[i];
+          currentPath = currentPath ? `${currentPath}/${parts[i]}` , parts[i];
           if (!fileTree.has(parent)) {
             fileTree.set(parent, new Set());
           }
@@ -227,16 +227,16 @@
   }
 </script>
 
-<svelte:head>
+<svelte, head>
   <title>AST Topology Explorer | Phase 89</title>
-</svelte:head>
+</svelte, head>
 
 <div class="topology-explorer">
   <!-- Header -->
   <header class="explorer-header">
     <div class="header-left">
       <h1>🕸️ AST Topology Explorer</h1>
-      <span class="connection-status" class:connected={isConnected}>
+      <span class="connection-status" class, connected={isConnected}>
         {isConnected ? '🟢 Live' : '🔴 Disconnected'}
       </span>
     </div>
@@ -245,11 +245,11 @@
       <input
         type="search"
         placeholder="Search files..."
-        bind:value={searchQuery}
+        bind, value={searchQuery}
         class="search-input"
       />
 
-      <select bind:value={filterSource} class="filter-select">
+      <select bind, value={filterSource} class="filter-select">
         <option value="all">All Sources</option>
         <option value="src/lib">src/lib</option>
         <option value="src/routes">src/routes</option>
@@ -258,15 +258,15 @@
 
       <div class="view-toggle">
         <button
-          class:active={viewMode === 'tree'}
+          class, active={viewMode === 'tree'}
           onclick={() => viewMode = 'tree'}
         >🌳 Tree</button>
         <button
-          class:active={viewMode === 'graph'}
+          class, active={viewMode === 'graph'}
           onclick={() => viewMode = 'graph'}
         >🕸️ Graph</button>
         <button
-          class:active={viewMode === 'list'}
+          class, active={viewMode === 'list'}
           onclick={() => viewMode = 'list'}
         >📋 List</button>
       </div>
@@ -303,7 +303,7 @@
             <button
               class="tree-node"
               class:selected={selectedNode === node.id}
-              class:has-errors={node.errorCount > 0}
+              class, has-errors={node.errorCount > 0}
               onclick={() => selectedNode = node.id}
             >
               <span class="node-icon">
@@ -311,21 +311,21 @@
               </span>
               <span class="node-label">{node.label || node.id.split('/').pop()}</span>
               {#if node.errorCount > 0}
-                <span class="error-badge" style="background: {getStatusColor(node.status)}">
+                <span class="error-badge" style="background, {getStatusColor(node.status)}">
                   {node.errorCount}
                 </span>
               {/if}
-              <span class="node-status" style="background: {getStatusColor(node.status)}"></span>
+              <span class="node-status" style="background, {getStatusColor(node.status)}"></span>
             </button>
           {/each}
         </div>
       {:else if viewMode === 'list'}
         <div class="error-list">
           {#each filteredNodes.filter(n => n.errorCount > 0).sort((a, b) => b.errorCount - a.errorCount) as node (node.id)}
-            <div class="error-item" class:selected={selectedNode === node.id}>
+            <div class="error-item" class, selected={selectedNode === node.id}>
               <div class="error-header" onclick={() => selectedNode = node.id}>
                 <span class="file-path">{node.id}</span>
-                <span class="error-count" style="color: {getStatusColor(node.status)}">
+                <span class="error-count" style="color, {getStatusColor(node.status)}">
                   {node.errorCount} errors
                 </span>
               </div>

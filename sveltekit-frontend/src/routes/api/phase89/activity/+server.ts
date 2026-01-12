@@ -35,7 +35,7 @@ export const GET: RequestHandler = async () => {
     const activity: Array<{ id: string;
       type: 'fix' | 'embed' | 'learn';
       message: string; timestamp: string;
-      data?: any;
+      data?, any;
     }> = [];
 
     // Also get recent fix suggestions

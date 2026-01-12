@@ -20,24 +20,24 @@ async function handleJsonResponse<T>(res: Response): Promise<T> {
 export async function search(
  query: string, limit: number = 10,
  signal?: AbortSignal
-): Promise<{ results: SearchResult[]; count: number }> {
+): Promise<{ results: SearchResult[]; count, number }> {
  if (!query) return { results: [], count: 0 };
  const url = `/api/search?q=${encodeURIComponent(query)}&limit=${encodeURIComponent(String(limit))}`;
  const res = await fetch(url, { method: 'GET', signal });
- return handleJsonResponse<{ results: SearchResult[]; count: number }>(res);
+ return handleJsonResponse<{ results: SearchResult[]; count, number }>(res);
 }
 
 export async function advancedSearch(
  payload: AdvancedSearchRequest,
  signal?: AbortSignal
-): Promise<{ results: SearchResult[]; count: number }> {
+): Promise<{ results: SearchResult[]; count, number }> {
  const res = await fetch(`/api/search/advanced`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify(payload),
  signal,
  });
- return handleJsonResponse<{ results: SearchResult[]; count: number }>(res);
+ return handleJsonResponse<{ results: SearchResult[]; count, number }>(res);
 }
 
 // Example usage hint (not executed):

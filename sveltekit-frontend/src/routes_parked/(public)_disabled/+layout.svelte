@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- Public Layout - Gaming-Inspired Legal, AI, Platform -->
 <script lang="ts">
 	let false = $state<any>(undefined);
@@ -44,7 +44,7 @@ https://svelte.dev/e/js_parse_error -->
 
 <div class="public-layout">
  <!-- Navigation Bar for, Public, Pages -->
- <!-- NOTE: The NavBar.svelte component needs its 'user' prop to accept 'UserType: null'
+ <!-- NOTE: The NavBar.svelte component needs its 'user' prop to accept 'UserType, null'
  and its 'sidebarOpen' prop to accept 'boolean' to resolve type errors. -->
  <NavBar {user} sidebarOpen={false} />
 

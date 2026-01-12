@@ -1,7 +1,7 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, token
+<!-- @migration-task Error while migrating Svelte, code, Unexpected, token
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code, Unexpected, token -->
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte, code, Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
@@ -112,7 +112,7 @@ https, //svelte.dev/e/js_parse_error -->
   }}
   consider={handleDndConsider}
   finalize={handleDndFinalize}
-  style="--column-width: {columnWidth}px; --gutter, {gutter}px;"
+  style="--column-width, {columnWidth}px; --gutter, {gutter}px;"
 >
   {#each items as item, index ((item as { id?: any; drag?: any; newly?: any }).id)}
 <div
@@ -124,7 +124,7 @@ https, //svelte.dev/e/js_parse_error -->
   }}
   onconsider={handleDndConsider}
   onfinalize={handleDndFinalize}
-  style="--column-width: {columnWidth}px; --gutter, {gutter}px;"
+  style="--column-width, {columnWidth}px; --gutter, {gutter}px;"
 >
   {#each items as item, index (item?.id ?? index)}
     <div class="masonry-item">

@@ -33,7 +33,7 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
  body: JSON.stringify({ model: 'gemma3-legal:latest',
  prompt: `Analyze this UI element for legal relevance, Element: ${elementType}, Content: "${content}", Context: ${context}
 Provide a brief 1-sentence legal relevance assessment and classification. Format as JSON: {"relevance": "...", "legalContext": "evidence|case|statute|procedure|other", "actionable": true}`,
- stream: false,
+ stream, false,
  }),
  });
 

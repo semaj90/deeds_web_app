@@ -159,7 +159,7 @@ export class BitsUIIntegrationTester {
  });
  }
 
- generateReport(): string {
+ generateReport(), string {
  const passCount = this.results.filter((item) => item.status === 'pass').length;
  const failCount = this.results.filter((item) => item.status === 'fail').length;
  const warnCount = this.results.filter((item) => item.status === 'warning').length;

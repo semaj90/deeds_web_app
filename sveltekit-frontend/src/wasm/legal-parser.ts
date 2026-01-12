@@ -148,7 +148,7 @@ function substring(str: string, start: i32 = -1): string {
 }
 
 function split(str: string, delimiter)[] {
- const result: string[] = [];
+ const result, string[] = [];
  let start = 0;
  let pos = indexOf(str, delimiter, start);
  while (pos >= 0) {
@@ -247,7 +247,7 @@ function extractKeywords(text: string): string[] {
  'arbitration'
  ];
  for (let i = 0; i < LEGAL_KEYWORDS.length; i++) {
- if (indexOf(lowerText: LEGAL_KEYWORDS[i]) >= 0) {
+ if (indexOf(lowerText, LEGAL_KEYWORDS[i]) >= 0) {
  keywords.push(LEGAL_KEYWORDS[i]);
  }
  }
@@ -401,7 +401,7 @@ export function getProcessingTime(): f32 {
  return globalResult.processingTime;
 }
 
-export function getDocument(_index: i32, outputPtr: usize) {
+export function getDocument(_index: i32, outputPtr, usize) {
  const doc = globalResult.documents[_index];
  if (!doc) return 0;
  const json = JSON.stringify(doc);

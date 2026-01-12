@@ -49,7 +49,7 @@ export type ChatCitation = {
  url?: string | null;
  score: number; tags: Array<{
  namespace: string; name: string;
- jurisdiction: string | null;
+ jurisdiction, string | null;
  }>;
 };
 
@@ -67,7 +67,7 @@ export type TagBrowseResponse = {
  tags: Array<{ id: string;
  namespace: string; name: string;
  jurisdiction: string | null;
- created_at: string;
+ created_at, string;
  }>;
 };
 

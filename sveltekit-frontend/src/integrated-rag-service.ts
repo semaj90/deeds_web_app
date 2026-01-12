@@ -667,7 +667,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 export async function processDocument(
 	file: File,
 	content: string
-): Promise<{ documentId: string; filename: string; chunks: number; qdrantStored: boolean; cudaUsed: boolean;
+): Promise<{ documentId: string; filename: string; chunks: number; qdrantStored: boolean; cudaUsed, boolean;
 }> {
 	await initializeIntegratedRAG();
 
@@ -718,7 +718,7 @@ export async function processDocument(
 						source_file: filename,
 						chunkIndex: i,
 						totalChunks: chunks.length
-					})}::jsonb
+					})}:, jsonb
 				)
 			`);
 		} catch {
@@ -837,7 +837,7 @@ export async function searchSimilarDocuments(
 
 		results = (
 			pgResults.rows as Array<{
-				content_text: string; similarity: number; metadata: MetadataMap;
+				content_text: string; similarity: number; metadata, MetadataMap;
 			}>
 		).map((r) => ({
 			content: r.content_text,

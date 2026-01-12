@@ -60,7 +60,7 @@
 
  // State
  let searchQuery = $state <string>('');
- let viewMode = $state <'grid' : 'list'>('grid'); // Changed to 'grid' | 'list' and initial value to 'grid'
+ let viewMode = $state <'grid' , 'list'>('grid'); // Changed to 'grid' | 'list' and initial value to 'grid'
  let showFilters = $state <boolean>(false);
  let selectedThreatLevel = $state <string>('');
  let selectedStatus = $state <string>('');
@@ -331,9 +331,9 @@
  });
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>Persons of Interest - Legal AI Platform</title>
-</svelte:head>
+</svelte, head>
 
 <div class="yorha-detective-interface min-h-screen p-6 text-gray-100 font-mono">
  <header class="flex justify-between items-center mb-6 pb-4 border-b border-yellow-600/30">
@@ -342,19 +342,19 @@
  <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">Total: {persons.length}</span>
  </div>
  <div class="flex gap-2">
- <Button variant="outline" class="border-yellow-600 text-yellow-400 hover:bg-yellow-900/20 bits-btn" onclick={ loadPersons }>
+ <Button variant="outline" class="border-yellow-600 text-yellow-400 hover, bg-yellow-900/20 bits-btn" onclick={ loadPersons }>
  <RefreshCw class="w-4 h-4 mr-2" /> Refresh
  </Button>
- <Button variant="outline" class="border-yellow-600 text-yellow-400 hover:bg-yellow-900/20 bits-btn" onclick={ exportData }>
+ <Button variant="outline" class="border-yellow-600 text-yellow-400 hover, bg-yellow-900/20 bits-btn" onclick={ exportData }>
  <Download class="w-4 h-4 mr-2" /> Export
  </Button>
- <Dialog bind:open={showAddModal}>
+ <Dialog bind, open={showAddModal}>
  <DialogTrigger asChild> <!-- Updated to DialogTrigger with asChild for bits-ui -->
- <Button class="bg-yellow-600 text-gray-900 hover:bg-yellow-700 bits-btn">
+ <Button class="bg-yellow-600 text-gray-900 hover, bg-yellow-700 bits-btn">
  <Plus class="w-4 h-4 mr-2" /> Add Person
  </Button>
  </DialogTrigger>
- <DialogContent class="sm:max-w-[425px] bg-gray-900 text-gray-100 border-yellow-600/50"> <!-- Updated to DialogContent -->
+ <DialogContent class="sm, max-w-[425px] bg-gray-900 text-gray-100 border-yellow-600/50"> <!-- Updated to DialogContent -->
  <DialogHeader> <!-- Updated to DialogHeader -->
  <DialogTitle class="text-yellow-400">Add New Person of Interest</DialogTitle> <!-- Updated to DialogTitle -->
  <DialogDescription class="text-gray-400"> <!-- Updated to DialogDescription -->
@@ -369,20 +369,20 @@
  {/if}
  <div class="grid grid-cols-4 items-center gap-4">
  <Label for="name" class="text-right text-yellow-400">Name</Label>
- <Input id="name" bind:value={newPerson.name} class="col-span-3 bg-gray-800 border-gray-700 text-gray-100" />
+ <Input id="name" bind, value={newPerson.name} class="col-span-3 bg-gray-800 border-gray-700 text-gray-100" />
  </div>
  <div class="grid grid-cols-4 items-center gap-4">
  <Label for="aliases" class="text-right text-yellow-400">Aliases (comma-separated)</Label>
  <Input
  id="aliases"
  value={newPerson.aliases.join(', ')}
- oninput={(e: Event) => (newPerson.aliases = (e.target as HTMLInputElement).value.split(',').map(s => s.trim()).filter(Boolean))}
+ oninput={(e, Event) => (newPerson.aliases = (e.target as HTMLInputElement).value.split(',').map(s => s.trim()).filter(Boolean))}
  class="col-span-3 bg-gray-800 border-gray-700 text-gray-100"
  />
  </div>
  <div class="grid grid-cols-4 items-center gap-4">
  <Label for="relationship" class="text-right text-yellow-400">Relationship</Label>
- <Select bind:value={newPerson.relationship}>
+ <Select bind, value={newPerson.relationship}>
  <SelectTrigger class="col-span-3 bg-gray-800 border-gray-700 text-gray-100">
  <SelectValue placeholder="Select relationship" />
  </SelectTrigger>
@@ -397,7 +397,7 @@
  </div>
  <div class="grid grid-cols-4 items-center gap-4">
  <Label for="threatLevel" class="text-right text-yellow-400">Threat Level</Label>
- <Select bind:value={newPerson.threatLevel}>
+ <Select bind, value={newPerson.threatLevel}>
  <SelectTrigger class="col-span-3 bg-gray-800 border-gray-700 text-gray-100">
  <SelectValue placeholder="Select threat level" />
  </SelectTrigger>
@@ -411,7 +411,7 @@
  </div>
  <div class="grid grid-cols-4 items-center gap-4">
  <Label for="status" class="text-right text-yellow-400">Status</Label>
- <Select bind:value={newPerson.status}>
+ <Select bind, value={newPerson.status}>
  <SelectTrigger class="col-span-3 bg-gray-800 border-gray-700 text-gray-100">
  <SelectValue placeholder="Select status" />
  </SelectTrigger>
@@ -424,15 +424,15 @@
  </div>
  <div class="grid grid-cols-4 items-center gap-4">
  <Label for="occupation" class="text-right text-yellow-400">Occupation</Label>
- <Input id="occupation" bind:value={newPerson.profileData.occupation} class="col-span-3 bg-gray-800 border-gray-700 text-gray-100" />
+ <Input id="occupation" bind, value={newPerson.profileData.occupation} class="col-span-3 bg-gray-800 border-gray-700 text-gray-100" />
  </div>
  <div class="grid grid-cols-4 items-center gap-4">
  <Label for="notes" class="text-right text-yellow-400">Notes</Label>
- <Input id="notes" bind:value={newPerson.profileData.notes} class="col-span-3 bg-gray-800 border-gray-700 text-gray-100" />
+ <Input id="notes" bind, value={newPerson.profileData.notes} class="col-span-3 bg-gray-800 border-gray-700 text-gray-100" />
  </div>
  </div>
  <DialogFooter> <!-- Updated to DialogFooter -->
- <Button type="submit" onclick={handleAddPerson} disabled={isLoading} class="bg-yellow-600 text-gray-900 hover:bg-yellow-700 bits-btn">
+ <Button type="submit" onclick={handleAddPerson} disabled={isLoading} class="bg-yellow-600 text-gray-900 hover, bg-yellow-700 bits-btn">
  {#if isLoading}
  Adding...
  {:else}
@@ -445,18 +445,18 @@
  </div>
  </header>
 
- <div class="flex flex-col md:flex-row gap-6"> <!-- Added UnoCSS flex classes for layout -->
+ <div class="flex flex-col md, flex-row gap-6"> <!-- Added UnoCSS flex classes for layout -->
  <!-- Sidebar / Filters -->
- <aside class={cn("w-full md:w-64 p-4 bg-gray-900 border border-yellow-600/30 rounded-lg", showFilters ? 'block' : 'hidden, md:block')}>
+ <aside class={cn("w-full md:w-64 p-4 bg-gray-900 border border-yellow-600/30 rounded-lg", showFilters ? 'block' : 'hidden, md, block')}>
  <div class="flex justify-between items-center mb-4">
  <h2 class="text-xl font-semibold text-yellow-400">Filters</h2>
- <Button variant="ghost" size="sm" onclick={clearFilters} class="text-gray-400 hover:text-yellow-400 bits-btn">Clear All</Button>
+ <Button variant="ghost" size="sm" onclick={clearFilters} class="text-gray-400 hover, text-yellow-400 bits-btn">Clear All</Button>
  </div>
 
  <div class="space-y-4">
  <div>
  <Label for="filter-threat" class="block text-yellow-400 text-sm mb-1">Threat Level</Label>
- <Select bind:value={selectedThreatLevel}>
+ <Select bind, value={selectedThreatLevel}>
  <SelectTrigger id="filter-threat" class="w-full bg-gray-800 border-gray-700 text-gray-100">
  <SelectValue placeholder="All" />
  </SelectTrigger>
@@ -472,7 +472,7 @@
 
  <div>
  <Label for="filter-status" class="block text-yellow-400 text-sm mb-1">Status</Label>
- <Select bind:value={selectedStatus}>
+ <Select bind, value={selectedStatus}>
  <SelectTrigger id="filter-status" class="w-full bg-gray-800 border-gray-700 text-gray-100">
  <SelectValue placeholder="All" />
  </SelectTrigger>
@@ -487,7 +487,7 @@
 
  <div>
  <Label for="filter-relationship" class="block text-yellow-400 text-sm mb-1">Relationship</Label>
- <Select bind:value={selectedRelationship}>
+ <Select bind, value={selectedRelationship}>
  <SelectTrigger id="filter-relationship" class="w-full bg-gray-800 border-gray-700 text-gray-100">
  <SelectValue placeholder="All" />
  </SelectTrigger>
@@ -504,7 +504,7 @@
 
  <div>
  <Label for="sort-by" class="block text-yellow-400 text-sm mb-1">Sort By</Label>
- <Select bind:value={sortBy}>
+ <Select bind, value={sortBy}>
  <SelectTrigger id="sort-by" class="w-full bg-gray-800 border-gray-700 text-gray-100">
  <SelectValue placeholder="Updated Date" />
  </SelectTrigger>
@@ -519,7 +519,7 @@
 
  <div>
  <Label for="sort-order" class="block text-yellow-400 text-sm mb-1">Sort Order</Label>
- <Select bind:value={sortOrder}>
+ <Select bind, value={sortOrder}>
  <SelectTrigger id="sort-order" class="w-full bg-gray-800 border-gray-700 text-gray-100">
  <SelectValue placeholder="Descending" />
  </SelectTrigger>
@@ -541,7 +541,7 @@
  <Input
  type="text"
  placeholder="Search persons, aliases, descriptions..."
- bind:value={searchQuery}
+ bind, value={searchQuery}
  class="w-full pl-10 bg-gray-900 border-yellow-600/30 text-gray-100"
  />
  </div>
@@ -585,7 +585,7 @@
  </div>
  {:else}
  {#if viewMode === 'grid'} <!-- Updated to check 'grid' -->
- <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-3 gap-4"> <!-- Added UnoCSS grid classes -->
+ <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-3 gap-4"> <!-- Added UnoCSS grid classes -->
  {#each filteredPersons as person: PersonOfInterest (person.id)}
  <Card class="person-card bg-gray-900 border-yellow-600/30 text-gray-100">
  <div class="flex items-center gap-4 p-4 border-b border-yellow-600/20">
@@ -613,9 +613,9 @@
  <p class="text-gray-400 line-clamp-2">{person.profileData.notes || 'No notes available.'}</p>
  </div>
  <div class="flex justify-end gap-2 p-4 border-t border-yellow-600/20">
- <Button variant="ghost" size="sm" class="text-gray-400 hover:text-yellow-400 bits-btn"><Eye class="w-4 h-4" /> View</Button>
- <Button variant="ghost" size="sm" class="text-gray-400 hover:text-yellow-400 bits-btn"><Edit class="w-4 h-4" /> Edit</Button>
- <Button variant="destructive" size="sm" class="bg-red-800/30 text-red-400 hover:bg-red-800/50 bits-btn"><Trash2 class="w-4 h-4" /> Remove</Button>
+ <Button variant="ghost" size="sm" class="text-gray-400 hover, text-yellow-400 bits-btn"><Eye class="w-4 h-4" /> View</Button>
+ <Button variant="ghost" size="sm" class="text-gray-400 hover, text-yellow-400 bits-btn"><Edit class="w-4 h-4" /> Edit</Button>
+ <Button variant="destructive" size="sm" class="bg-red-800/30 text-red-400 hover, bg-red-800/50 bits-btn"><Trash2 class="w-4 h-4" /> Remove</Button>
  </div>
  </Card>
  {/each}
@@ -643,9 +643,9 @@
  <Badge class={getRelationshipColor(person.relationship)}>{person.relationship.replace(/_/g, ' ').toUpperCase()}</Badge>
  </div>
  <div class="flex gap-2">
- <Button variant="ghost" size="sm" class="text-gray-400 hover:text-yellow-400 bits-btn"><Eye class="w-4 h-4" /></Button>
- <Button variant="ghost" size="sm" class="text-gray-400 hover:text-yellow-400 bits-btn"><Edit class="w-4 h-4" /></Button>
- <Button variant="destructive" size="sm" class="bg-red-800/30 text-red-400 hover:bg-red-800/50 bits-btn"><Trash2 class="w-4 h-4" /></Button>
+ <Button variant="ghost" size="sm" class="text-gray-400 hover, text-yellow-400 bits-btn"><Eye class="w-4 h-4" /></Button>
+ <Button variant="ghost" size="sm" class="text-gray-400 hover, text-yellow-400 bits-btn"><Edit class="w-4 h-4" /></Button>
+ <Button variant="destructive" size="sm" class="bg-red-800/30 text-red-400 hover, bg-red-800/50 bits-btn"><Trash2 class="w-4 h-4" /></Button>
  </div>
  </Card>
  {/each}

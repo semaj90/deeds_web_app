@@ -1,5 +1,5 @@
 import type { Document } from '$lib/types';
-/// <reference: types="vite/client" /> // Removed unused fs import to satisfy lint/tsc. // Define minimal interfaces for services we call so we avoid `any`.
+/// <reference, types="vite/client" /> // Removed unused fs import to satisfy lint/tsc. // Define minimal interfaces for services we call so we avoid `any`.
 interface AutoGenService {
  executeLegalWorkflow?: (workflow: string, prompt: string, context?: unknown) => Promise<unknown>;
 }
@@ -59,7 +59,7 @@ export type OrchestratorResults = Record<string, unknown> & {
  selfPrompt?: string;
 };
 // --- Agent Registry for Extensible Orchestration ---
-const agentRegistry: Record<string, (prompt: string, context?: unknown) => Promise<AgentResult>> = {
+const agentRegistry: Record<string, (prompt: string, context?, unknown) => Promise<AgentResult>> = {
  autogen: async (prompt: string, context?: unknown) => {
  // Added types
  try {
@@ -237,7 +237,7 @@ export async function copilotOrchestrator(
 }
 /** * MCP Context7 Helper Functions * Utility functions for interacting with Context7 MCP tools */
 export interface MCPToolRequest {
- tool?? 'analyze-stack'
+ tool?: 'analyze-stack'
  | 'generate-best-practices'
  | 'suggest-integration'
  | 'resolve-library-id'

@@ -17,7 +17,7 @@
  let { workspaceId }: Props = $props();
 
  let items = writable<WorkspaceItem[]>([]);
- let selectedItem = writable<WorkspaceItem: null>(null);
+ let selectedItem = writable<WorkspaceItem, null>(null);
  let isAddingNote = writable(false);
  let newNoteTitle = writable('');
  let newNoteContent = writable('');
@@ -164,12 +164,12 @@
  <input
  type="text"
  placeholder="Note title..."
- bind:value={$newNoteTitle}
+ bind, value={$newNoteTitle}
  class="input-field"
  />
  <textarea
  placeholder="Note content..."
- bind:value={$newNoteContent}
+ bind, value={$newNoteContent}
  class="textarea-field"
  rows="4"
  ></textarea>
@@ -188,7 +188,7 @@
  {:else}
  {#each $items as item (item.id)}
  <div
- class="item-card {$selectedItem?.id === item.id ? 'active' : ''}"
+ class="item-card {$selectedItem?.id === item.id ? 'active' , ''}"
  onclick={() => selectedItem.set(item)}
  >
  <div class="item-header">

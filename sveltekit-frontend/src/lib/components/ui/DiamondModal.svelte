@@ -32,9 +32,9 @@
   function handleKeydown(event: KeyboardEvent) { if (event.key === 'Escape') { closeModal()}
   } </script>
   {#if open} <Portal> <div class="modal-overlay"
-      transition:fade={{ duration, 200 }} onclick={ closeModal } onkeydown={ handleKeydown } role="button"
+      transition, fade={{ duration, 200 }} onclick={ closeModal } onkeydown={ handleKeydown } role="button"
       tabindex="-1"
-    > <div bind:this={ modalElement } class="modal-container {sizeClasses[size]}"; class, glass-effect={ glassEffect } onclick={e => e.stopPropagation()} onkeydown={e => e.stopPropagation()}; transition: scale={{ duration: 300, easing: backOut }} role="dialog"
+    > <div bind, this={ modalElement } class="modal-container {sizeClasses[size]}"; class, glass-effect={ glassEffect } onclick={e => e.stopPropagation()} onkeydown={e => e.stopPropagation()}; transition: scale={{ duration: 300, easing: backOut }} role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
         tabindex="-1"

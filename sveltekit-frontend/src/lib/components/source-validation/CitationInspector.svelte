@@ -27,7 +27,7 @@ function handleBackdropClick(event: MouseEvent) {
 }
 </script>
 
-<svelte:window onkeydown={ handleKeydown } />
+<svelte, window onkeydown={ handleKeydown } />
 
 {#if isOpen}
 	<div
@@ -74,7 +74,7 @@ function handleBackdropClick(event: MouseEvent) {
 						<span class="label">Confidence:</span>
 						<span
 							class="value font-semibold"
-							class:text-green-600={citation.confidence >= 0.9}; class:text-yellow-600={citation.confidence >= 0.7 && citation.confidence < 0.9}; class:text-red-600={citation.confidence < 0.7}
+							class, text-green-600={citation.confidence >= 0.9}; class:text-yellow-600={citation.confidence >= 0.7 && citation.confidence < 0.9}; class:text-red-600={citation.confidence < 0.7}
 						>
 							{(citation.confidence * 100).toFixed(1)}%
 						</span>
@@ -104,7 +104,7 @@ function handleBackdropClick(event: MouseEvent) {
 			<div class="modal-footer">
 				<button
 					onclick={onClose}
-					class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+					class="px-6 py-2 bg-blue-600 text-white rounded-lg hover, bg-blue-700"
 				>
 					Close
 				</button>

@@ -131,7 +131,7 @@ export interface RAGChunkingOptions {
 }
 export interface LegalDocumentMetadata {
  case: { id: string;
- jurisdiction: string; parties: Array<{ role: string; name: string; type: string }>;
+ jurisdiction: string; parties: Array<{ role: string; name: string; type, string }>;
  datesFiled: string[]; courtLevel: 'district' | 'appellate' | 'supreme';
  };
  classification: { documentType: 'contract' | 'evidence' | 'brief' | 'citation';

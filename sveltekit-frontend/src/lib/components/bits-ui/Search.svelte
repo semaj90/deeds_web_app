@@ -2,7 +2,7 @@
   import  VectorCard  from "./VectorCard.svelte";
   
   const { searchUrl } = $props<{ searchUrl, string }>()
-  const { onSelect } = $props<{ onSelect: (item, any) }>()
+  const { onSelect } = $props<{ onSelect, (item, any) }>()
   let query = '';
   
   let results: any[] = [];

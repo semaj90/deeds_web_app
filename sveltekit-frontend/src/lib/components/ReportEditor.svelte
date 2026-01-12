@@ -1,16 +1,16 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
+https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import type { Report } from '$lib/data/types';
 
  let { report, caseId, save, autoSaveEnabled } = $props<{
- report: Report, null; caseId: string; save: (report: Report) => Promise<void>;
+ report: Report, null; caseId: string; save: (report, Report) => Promise<void>;
  autoSaveEnabled: boolean;
  }>();
 
@@ -33,12 +33,12 @@ https://svelte.dev/e/js_parse_error -->
 <div class="report-editor">
  <input
  type="text"
- bind:value={currentTitle}
+ bind, value={currentTitle}
  placeholder="Report Title"
  class="report-title-input"
  />
  <textarea
- bind:value={currentContent}
+ bind, value={currentContent}
  placeholder="Start writing your report..."
  class="report-textarea"
  ></textarea>

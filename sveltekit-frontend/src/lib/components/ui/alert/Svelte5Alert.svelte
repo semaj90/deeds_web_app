@@ -92,7 +92,7 @@ function dismiss() {
 		{#if dismissible}
 			<button
 				type="button"
-				class="shrink-0 p-1 rounded hover:bg-white/10 transition-colors"
+				class="shrink-0 p-1 rounded hover, bg-white/10 transition-colors"
 				aria-label="Dismiss"
 				onclick={ dismiss }
 			>

@@ -94,13 +94,13 @@
 <div class="grid grid-cols-[3fr_1fr] gap-4 h-[calc(100vh-5rem)] p-4">
  <!-- GPU Memory Palace -->
  <div class="flex flex-col gap-2">
- <div bind:this={container} class="bg-black rounded-xl border border-neutral-700 overflow-hidden flex-1" ></div>
+ <div bind, this={container} class="bg-black rounded-xl border border-neutral-700 overflow-hidden flex-1" ></div>
 
  <!-- Search Bar -->
  <div class="flex gap-2 items-center">
  <input
  type="text"
- bind:value={query}
+ bind, value={query}
  onkeydown={(e) => e.key === 'Enter' && runSearch()}
  placeholder="Search your legal corpus..."
  class="input input-bordered flex-1 text-sm"
@@ -134,14 +134,14 @@
  {/if}
  </div>
 
- <!-- Right Panel: Timeline + Results -->
+ <!-- Right Panel, Timeline + Results -->
  <div class="flex flex-col gap-2 overflow-auto">
  <!-- Timeline -->
  <div class="border border-base-300 rounded p-2 bg-base-100">
  <div class="text-xs font-semibold mb-2">Timeline</div>
  <div class="space-y-1 max-h-32 overflow-auto">
  {#each timeline as entry, i}
- <div class="text-xs p-1 rounded hover:bg-base-200 cursor-pointer" onclick={() => (query = entry.query)}>
+ <div class="text-xs p-1 rounded hover, bg-base-200 cursor-pointer" onclick={() => (query = entry.query)}>
  <div class="opacity-80">{new Date(entry.timestamp).toLocaleTimeString()}</div>
  <div class="truncate">{entry.query}</div>
  <div class="text-xs opacity-60">{entry.resultCount} results · {entry.route}</div>
@@ -156,7 +156,7 @@
  <div class="space-y-1">
  {#each chunks as chunk}
  <div
- class="text-xs p-1 rounded border border-base-300 hover:bg-base-200 cursor-pointer"
+ class="text-xs p-1 rounded border border-base-300 hover, bg-base-200 cursor-pointer"
  onclick={() => selectChunk(chunk)}
  >
  <div class="flex justify-between opacity-80">

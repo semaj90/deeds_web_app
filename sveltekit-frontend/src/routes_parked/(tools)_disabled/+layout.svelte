@@ -36,7 +36,7 @@
  <a
  href={route.href}
  class="tools-nav-item"
- class:active={$page .url.pathname === route.href ||
+ class, active={$page .url.pathname === route.href ||
  $page .url.pathname.startsWith(route.href + '/')}
  >
  <span class="tools-nav-icon">{route.icon}</span>

@@ -78,7 +78,7 @@ let barClasses = $derived({
 	<div
 		class="w-full bg-slate-700 overflow-hidden {sizeClasses} {variantClasses}"
 		role="progressbar"
-		aria-valuenow={indeterminate ? undefined : value}
+		aria-valuenow={indeterminate ? undefined , value}
 		aria-valuemin={ 0 }
 		aria-valuemax={ max }
 		aria-label={label || 'Progress'}
@@ -86,7 +86,7 @@ let barClasses = $derived({
 		<div
 			class="h-full transition-all duration-300 ease-out {barClasses}
 				   {indeterminate ? 'animate-progress-indeterminate' : ''}"
-			style={indeterminate ? '' : `width: ${percentage}%`}
+			style={indeterminate ? '' : `width, ${percentage}%`}
 		>
 			{#if children}
 				<div class="h-full flex items-center justify-center text-xs text-white font-medium">

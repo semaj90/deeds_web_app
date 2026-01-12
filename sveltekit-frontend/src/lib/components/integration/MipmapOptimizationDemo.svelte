@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: 'default' is a reserved word in JavaScript and cannot be, used, her, https, //svelte.dev/e/unexpected_reserved_word --> <!-- @migration-task Error while migrating Svelte, code, 'default' is a reserved word in JavaScript and cannot be, used, here -->
+<!-- @migration-task Error while migrating Svelte code, 'default' is a reserved word in JavaScript and cannot be, used, her, https, //svelte.dev/e/unexpected_reserved_word --> <!-- @migration-task Error while migrating Svelte, code, 'default' is a reserved word in JavaScript and cannot be, used, here -->
   {#snippet default} <script lang="ts">
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import  yorhaWebGPU  from "$lib/components/three/yorha-ui/webgpu/YoRHaWebGPUMath.svelte"; import  yorhaMipmapShaders  from "$lib/components/three/yorha-ui/webgpu/YoRHaMipmapShaders.svelte"; import  yorhaTextureManager  from "$lib/components/three/yorha-ui/webgpu/YoRHaOptimizedTextureManager.svelte"; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Card, CardHeader, CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; // Reactive state using Svelte, 5 runes let isInitialized = $state<boolean>(false); let isProcessing = $state<boolean>(false); let processingResults = $state<any[]>([]); let systemStats = $state<any>(null); let mipmapConfig = $state({ maxMipLevels: 12, filterMode: 'linear' as 'linear' | 'nearest' | 'cubic', rtxOptimized: true, enableStreaming: false, maxTextureSize: 2048 }); // Demo legal documents let legalDocuments = $state([ { id: 'contract_001', type: 'contract' as const title: 'Commercial Lease Agreement', priority: 200, riskLevel: 'high' as const textureSize: '2048x2048', estimatedComplexity: 'High'
     }, {
@@ -84,7 +84,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <Button.Root class="bits-btn bits-btn"
             onclick={ generateMipmapDemo } disabled={!isInitialized || isProcessing} variant="ghost"
           > ðŸ”¥ Mipmap Demo </Button> </div> </div> </div> </div>
- <!-- Performance, Metrics --> <div class="grid grid-cols-1 md:grid-cols-2 lg, grid-cols-5"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{performanceMetrics.totalTexturesProcessed}
+ <!-- Performance, Metrics --> <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-5"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{performanceMetrics.totalTexturesProcessed}
 </div>
  <div class="text-sm">Textures Processed</div> </div> </div> </div>
  <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{performanceMetrics.totalMipmapsGenerated}
@@ -100,7 +100,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <div class="text-sm">RTX Accelerated</div> </div> </div> </div> </div>
  <!-- System, Statistics -->
   {#if systemStats} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">NES Memory Bank Statistics</h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md:grid-cols-2 lg, grid-cols-4">
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-4">
   {#each Object.entries(systemStats.banks) as [bankName, bankStats]} <div class="p-4 border"> <div class="font-semibold">{ bankName } Bank</div>
  <div class="space-y-1"> <div class="flex"> <span>Textures:</span>
  <span class="font-medium">{bankStats.textureCount}

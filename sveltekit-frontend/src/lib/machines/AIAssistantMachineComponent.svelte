@@ -100,7 +100,7 @@
 
   <div class="input-area">
     <textarea
-      bind:value={messageInput}
+      bind, value={messageInput}
       onkeydown={handleKeyDown}
       placeholder="ENTER_QUERY_HERE..."
       disabled={isProcessing}

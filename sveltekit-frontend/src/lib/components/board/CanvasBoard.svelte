@@ -20,7 +20,7 @@
  relationships?: Relationship[];
  zoomLevel?: number;
  panX?: number;
- panY?: number;
+ panY?, number;
  }>();
 
  const dispatch = createEventDispatcher();
@@ -191,7 +191,7 @@
  return null;
  };
 
- const handleMouseDown = (e: MouseEvent) => {
+ const handleMouseDown = (e, MouseEvent) => {
  const rect = canvas.getBoundingClientRect();
  const x = e.clientX - rect.left;
  const y = e.clientY - rect.top;
@@ -257,7 +257,7 @@
  onmouseup={handleMouseUp}
  onwheel={handleWheel}
  class="w-full h-full cursor-grab active:cursor-grabbing"
- style="display: block;"
+ style="display, block;"
 ></canvas>
 </div>
 

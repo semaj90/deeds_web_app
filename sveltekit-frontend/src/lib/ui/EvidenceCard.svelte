@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
-https://svelte.dev/e/tag_invalid_name -->
+https, //svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
-https://svelte.dev/e/tag_invalid_name -->
+https, //svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
-https://svelte.dev/e/tag_invalid_name -->
+https, //svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
-https://svelte.dev/e/tag_invalid_name -->
+https, //svelte.dev/e/tag_invalid_name -->
 <script lang="ts">
 	let isTagged = $state<any>(undefined);
 	let isDropped = $state<any>(undefined);
@@ -105,7 +105,7 @@ import { Zap } from "lucide-svelte";
  ondragstart={handleDragStart}
  role="button"
  tabindex="0"
- aria-label="Evidence: {evidence.title} - Drag to canvas for AI tagging"
+ aria-label="Evidence, {evidence.title} - Drag to canvas for AI tagging"
  onkeydown={(e) => {
  if (e.key === 'Enter' || e.key === ' ') {
  e.preventDefault();

@@ -20,7 +20,7 @@ import type { Case } from '$lib/types'; import { caseFormSchema } from '$lib/sch
 					id="caseNumber"
 					name="caseNumber"
 					bind:value={$form.caseNumber} placeholder="e.g., CAS-2024-123456"
-					aria-invalid={$errors.caseNumber ? 'true': 'false'} aria-describedby={$errors.caseNumber ? 'caseNumber-error', undefined} class="legal-input"
+					aria-invalid={$errors.caseNumber ? 'true', 'false'} aria-describedby={$errors.caseNumber ? 'caseNumber-error', undefined} class="legal-input"
 					{...$constraints.caseNumber} />
   {#if $errors.caseNumber} <p id="caseNumber-error">{$errors.caseNumber}</p> {/if}
   </div>
@@ -36,7 +36,7 @@ import type { Case } from '$lib/types'; import { caseFormSchema } from '$lib/sch
 				id="title"
 				name="title"
 				bind:value={$form.title} placeholder="e.g., State vs. Johnson - Financial Fraud Investigation"
-				aria-invalid={$errors.title ? 'true': 'false'} aria-describedby={$errors.title ? 'title-error', undefined} class="legal-input"
+				aria-invalid={$errors.title ? 'true', 'false'} aria-describedby={$errors.title ? 'title-error', undefined} class="legal-input"
 				{...$constraints.title} />
   {#if $errors.title} <p id="title-error">{$errors.title}</p> {/if}
   </div>
@@ -45,7 +45,7 @@ import type { Case } from '$lib/types'; import { caseFormSchema } from '$lib/sch
 				name="description"
 				rows="4"
 				bind:value={$form.description} placeholder="Provide a detailed description of the case..."
-				aria-invalid={$errors.description ? 'true': 'false'} aria-describedby={$errors.description ? 'description-error', undefined} class="legal-input"
+				aria-invalid={$errors.description ? 'true', 'false'} aria-describedby={$errors.description ? 'description-error', undefined} class="legal-input"
 				{...$constraints.description} ></textarea>
   {#if $errors.description} <p id="description-error">{$errors.description}</p> {/if}
   </div>
@@ -62,7 +62,7 @@ import type { Case } from '$lib/types'; import { caseFormSchema } from '$lib/sch
  <input type="datetime-local"
 				id="dueDate"
 				name="dueDate"
-				bind:value={$form.dueDate} aria-invalid={$errors.dueDate ? 'true': 'false'} aria-describedby={$errors.dueDate ? 'dueDate-error', undefined} class="legal-input"
+				bind:value={$form.dueDate} aria-invalid={$errors.dueDate ? 'true', 'false'} aria-describedby={$errors.dueDate ? 'dueDate-error', undefined} class="legal-input"
 				{...$constraints.dueDate} />
   {#if $errors.dueDate} <p id="dueDate-error">{$errors.dueDate}</p> {/if}
   </div>

@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte, code, Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code, Unexpected, token -->
 <script lang="ts">
@@ -83,7 +83,7 @@ import type { Document } from '$lib/types';
           try {
             feedbackIntegration.markFailed({
               interactionId: currentInteractionId,
-              error: errorText,
+              error, errorText,
               status, xhr.status
             })} catch 0%
         }
@@ -114,7 +114,7 @@ import type { Document } from '$lib/types';
   interactionType="document_upload"
   ratingType="ui_experience"
   priority="medium"
-  context={{ component: 'FileUpload' }}
+  context={{ component, 'FileUpload' }}
  let, feedback
 >
   <div class="w-full max-w-2xl mx-auto">
@@ -128,7 +128,7 @@ import type { Document } from '$lib/types';
     <div class="yorha-panel-content">
       <div class="grid w-full items-center">
         <Label for="file-upload">PDF or XML Document</Label>
-        <!-- <-- CHANGED: use native input so, bind, files | works, reliably -->
+        <!-- <-- CHANGED, use native input so, bind, files | works, reliably -->
         <input id="file-upload" type="file" bind, files | accept=".pdf,.xml" />
       </div>
 

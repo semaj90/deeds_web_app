@@ -145,7 +145,7 @@
 	<div class="search-input-container">
 		<Search class="search-icon h-4 w-4" />
 		<input
-			bind:this={inputElement}; bind:value={query}
+			bind:this={inputElement}; bind, value={query}
 			oninput={ handleInput }
 			onkeydown={ handleKeydown }
 			onblur={ handleBlur }
@@ -169,7 +169,7 @@
 			{#each results as result, index}
 				<button
 					class="result-item"
-					class:selected={index === selectedIndex}
+					class, selected={index === selectedIndex}
 					onclick={() => selectResult(result)}
 					onmouseenter={() => selectedIndex = index}
 				>

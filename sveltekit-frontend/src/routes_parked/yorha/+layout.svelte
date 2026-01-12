@@ -95,7 +95,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  { path: '/yorha/chat', label: 'AI Chat', icon: Bot, description: 'Enhanced AI conversation' }];
 
  // runtime-safe fetch helper (try dynamic JS module first, then fetch API)
- async function fetchYoRhaStatus(): Promise<any: null> {
+ async function fetchYoRhaStatus(): Promise<any, null> {
  try {
  // Cast to any so TypeScript doesn't enforce a specific shape on the imported module.
  const mod = (await import('$lib/components/three/yorha-ui/api/YoRHaAPIClient').catch(
@@ -192,7 +192,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <div class="yorha-layout">
  <header class="yorha-header">
  <div class="yorha-header-content">
- <!-- changed: use onclick (runes) instead of, deprecated; onclick -->
+ <!-- changed, use onclick (runes) instead of, deprecated; onclick -->
  <button
  class="yorha-menu-toggle"
  aria-label="Open sidebar"
@@ -208,7 +208,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  </div>
  <div class="yorha-status-bar">
  <div class="yorha-status-item">
- <span class="dot" class:connected={systemStatus.connected} aria-hidden="true"></span>
+ <span class="dot" class, connected={systemStatus.connected} aria-hidden="true"></span>
  {systemStatus.connected ? 'Connected' : 'Disconnected'}
  </div>
  <div class="yorha-status-item">
@@ -241,7 +241,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  class="yorha-sidebar"
  role="dialog"
  aria-label="YoRHa Sidebar"
- class:yorha-sidebar-open={sidebarOpen}
+ class, yorha-sidebar-open={sidebarOpen}
  >
  <nav class="yorha-nav" aria-label="Main navigation">
  <div class="yorha-nav-header">
@@ -267,7 +267,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  aria-current={isActivePath(item.path) ? 'page' : undefined}
  >
  {#if item.icon}
- <!-- render icon with svelte:component for dynamic components -->
+ <!-- render icon with svelte, component for dynamic components -->
  <item.icon size={16} ></icon>
  {/if}
  <div class="yorha-nav-content">

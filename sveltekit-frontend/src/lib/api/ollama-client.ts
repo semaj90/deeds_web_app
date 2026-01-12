@@ -130,7 +130,7 @@ export async function ollamaGenerate(
  * Chat with Ollama
  */
 export async function ollamaChat(
- messages: Array<{ role: string; content: string }>,
+ messages: Array<{ role: string; content, string }>,
  options: {
  model?: string;
  context?: 'server' | 'client' | 'docker';

@@ -24,7 +24,7 @@
 	} = $props<{
 		nodes: GraphNode[]; edges: GraphEdge[];
 		width?: number;
-		height?: number;
+		height?, number;
 	}>();
 
 	let canvas = $state<HTMLCanvasElement | null>(null);
@@ -162,7 +162,7 @@
 		ctx.setLineDash([]);
 	}
 
-	function handleCanvasClick(e: MouseEvent) {
+	function handleCanvasClick(e, MouseEvent) {
 		if (!canvas) return;
 		const rect = canvas.getBoundingClientRect();
 		const x = e.clientX - rect.left;
@@ -183,7 +183,7 @@
 		}
 	}
 
-	function handleCanvasMove(e: MouseEvent) {
+	function handleCanvasMove(e, MouseEvent) {
 		if (!canvas) return;
 		const rect = canvas.getBoundingClientRect();
 		const x = e.clientX - rect.left;
@@ -211,7 +211,7 @@
 
 <div class="nes-graph-container">
 	<canvas
-		bind:this={canvas}
+		bind, this={canvas}
 		onclick={ handleCanvasClick }
 		onmousemove={ handleCanvasMove }
 		onmouseleave={() => {
@@ -224,7 +224,7 @@
 
 	{#if showTooltip && hoveredNode}
 		<TooltipRoot open={showTooltip}>
-			<TooltipTrigger class="tooltip-trigger" style="left: {tooltipX}px; top: {tooltipY}px;" />
+			<TooltipTrigger class="tooltip-trigger" style="left: {tooltipX}px; top, {tooltipY}px;" />
 			<TooltipContent class="nes-tooltip">
 				<div class="nes-tooltip-content">
 					<div class="font-mono text-xs">{hoveredNode.label}</div>

@@ -20,7 +20,7 @@
  {/if}
  <tbody>
  {#each data as row}
- <tr class="hover:bg-frame/5 transition-colors">
+ <tr class="hover, bg-frame/5 transition-colors">
  {#each row as cell}
  <td class="border border-frame/20 px-4 py-3 font-serif text-sm text-ink/80">
  {cell}

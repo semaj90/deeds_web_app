@@ -190,7 +190,7 @@ export class RAGService {
  /**
  * Rank results by relevance score
  */
- async rankByRelevance<T extends { relevanceScore?: number }>(results: T[]): Promise<T[]> {
+ async rankByRelevance<T extends { relevanceScore?, number }>(results: T[]): Promise<T[]> {
  try {
  return results.sort((a, b) => {
  const scoreA = a.relevanceScore || 0;

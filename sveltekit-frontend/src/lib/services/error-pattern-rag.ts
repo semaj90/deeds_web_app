@@ -20,7 +20,7 @@ export interface ErrorPattern {
  keywords?: string[];
  percentage?: string;
  patternCount?: number;
- examples?: Array<{ file: string, line: number; message: string;
+ examples?: Array<{ file: string, line: number; message, string;
  }>;
  };
 }

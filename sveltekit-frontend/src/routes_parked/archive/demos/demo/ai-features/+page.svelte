@@ -118,9 +118,9 @@ The security footage from **Camera 3** (Main Entrance) shows the following seque
  }
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>AI Features Demo | YoRHa Legal AI</title>
-</svelte:head>
+</svelte, head>
 
 <div class="demo-page">
  <header class="demo-header">

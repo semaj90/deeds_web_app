@@ -132,7 +132,7 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 			<textarea
 				class="prompt-input"
 				placeholder="Enter your prompt for legal document analysis..."
-				bind:value={prompt}
+				bind, value={prompt}
 				rows="6"
 			></textarea>
 

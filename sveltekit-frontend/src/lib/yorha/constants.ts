@@ -16,7 +16,7 @@ export interface YoRHaFormFieldBase {
 
 export type YoRHaFormField =
  | (YoRHaFormFieldBase & { type: 'text' | 'textarea' | 'date' })
- | (YoRHaFormFieldBase & { type: 'select', options: Array<{ value: string, label: string }> });
+ | (YoRHaFormFieldBase & { type: 'select', options: Array<{ value: string, label, string }> });
   
 export const documentsColumns: YoRHaColumn[] = [
  { key: 'yorha_id', title: 'YORHA ID', sortable: true, width: 140 },
@@ -134,7 +134,7 @@ export function withAbort<T>(fn: (signal?: AbortSignal) => Promise<T>): { promis
 /**
  * debounce - Simple debounce helper that returns a debounced version of the provided function.
  */
-export function debounce<T extends (...args: unknown[]) => void>(fn: T, wait = 300): T {
+export function debounce<T extends (...args, unknown[]) => void>(fn: T, wait = 300): T {
  let t: ReturnType<typeof setTimeout> | undefined;
  return ((...a: unknown[]) => {
  if (t) clearTimeout(t);

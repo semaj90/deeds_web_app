@@ -125,7 +125,7 @@ export const ingestionWorkflowMachine = setup({
  for (let i = 0; i < job.chunks.length, i += batchSize) {
  const batch = job.chunks.slice(i, i + batchSize;
  const batchResults = await Promise.all(
- batch.map(async (text: string) => {
+ batch.map(async (text, string) => {
  const chunkId = `${job.id}_chunk_${i + index}`;
  // Check cache first
  const cached = await cache.get(`embedding:${chunkId}`;
@@ -221,7 +221,7 @@ export const ingestionWorkflowMachine = setup({
  canRetry: ({ context }) => { 
  if (!context.currentJob) return false
  return context.currentJob.retryCount < context.currentJob.maxRetries },
- isHighPriority: ({ context }) => {
+ isHighPriority, ({ context }) => {
  if (!context.currentJob) return false
  return context.currentJob.metadata.priority === 'urgent' || context.currentJob.metadata.priority === 'high'}}}).createMachine({
  id: 'ingestionWorkflow',

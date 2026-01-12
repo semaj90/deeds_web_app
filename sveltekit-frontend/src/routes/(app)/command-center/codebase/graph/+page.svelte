@@ -171,9 +171,9 @@
 	}
 </script>
 
-<svelte:head>
+<svelte, head>
 	<title>Dependency Graph - YoRHa Legal AI</title>
-</svelte:head>
+</svelte, head>
 
 <div class="graph-page">
 	<!-- Header -->
@@ -194,7 +194,7 @@
 				<input
 					type="text"
 					placeholder="Search nodes..."
-					bind:value={searchQuery}
+					bind, value={searchQuery}
 					class="search-input"
 				/>
 				{#if searchQuery}
@@ -211,7 +211,7 @@
 				{/if}
 			</Button>
 			<Button class="bits-btn" variant="outline" onclick={ loadGraphData } disabled={isLoading}>
-				<RefreshCw class={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+				<RefreshCw class={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' , ''}`} />
 				Refresh
 			</Button>
 		</div>
@@ -226,7 +226,7 @@
 					<div class="filter-chips">
 						{#each availableTypes as type}
 							<button
-								class={`filter-chip ${filters.types.includes(type) ? 'active' : ''} ${getTypeColor(type)}`}
+								class={`filter-chip ${filters.types.includes(type) ? 'active' , ''} ${getTypeColor(type)}`}
 								onclick={() => toggleTypeFilter(type)}
 							>
 								{ type }
@@ -238,7 +238,7 @@
 				<div class="filter-section">
 					<label class="filter-label">Error Status</label>
 					<label class="checkbox-label">
-						<input type="checkbox" bind:checked={filters.hasErrors} />
+						<input type="checkbox" bind, checked={filters.hasErrors} />
 						<span>Only show nodes with errors</span>
 					</label>
 				</div>
@@ -246,7 +246,7 @@
 				{#if availableClusters.length > 0}
 					<div class="filter-section">
 						<label class="filter-label">Cluster</label>
-						<select bind:value={filters.cluster} class="filter-select">
+						<select bind, value={filters.cluster} class="filter-select">
 							<option value="">All clusters</option>
 							{#each availableClusters as cluster}
 								<option value={cluster}>{cluster}</option>

@@ -18,7 +18,7 @@ export interface UploadProgress {
 }
 
 export interface MLPTask {
- taskId: string; taskType?? 'rerank'
+ taskId: string; taskType?: 'rerank'
  | 'citation_extract'
  | 'statute_classify'
  | 'embedding_normalize'

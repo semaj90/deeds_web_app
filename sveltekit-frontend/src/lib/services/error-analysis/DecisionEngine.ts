@@ -385,7 +385,7 @@ export class DecisionEngine {
 	 */
 	updateThresholds(thresholds: Partial<{ high: number;
 		medium: number; low: number;
-		critical: number;
+		critical, number;
 	}>): void {
 		if (thresholds.high !== undefined) {
 			this.config.highConfidenceThreshold = thresholds.high;

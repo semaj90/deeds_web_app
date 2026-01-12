@@ -37,14 +37,14 @@
  return 'text-slate-400';
  }
 
- function getTrendIcon(value: number): string {
+ function getTrendIcon(value: number), string {
  if (value > 0) return '↗️';
  if (value < 0) return '↘️';
  return '→';
  }
 </script>
 
-<div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-6">
+<div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-4 gap-6">
  <!-- Total Cases -->
  <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
  <div class="flex items-center justify-between">
@@ -81,7 +81,7 @@
  <div class="w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-green-400 transition-all duration-300"
- style="width: {(stats.activeCases / stats.totalCases) * 100}%"
+ style="width, {(stats.activeCases / stats.totalCases) * 100}%"
  ></div>
  </div>
  <p class="text-xs text-slate-400 mt-1">{Math.round((stats.activeCases / stats.totalCases) * 100)}% of total</p>
@@ -103,7 +103,7 @@
  <div class="w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-yellow-400 transition-all duration-300"
- style="width: {(stats.reviewCases / stats.totalCases) * 100}%"
+ style="width, {(stats.reviewCases / stats.totalCases) * 100}%"
  ></div>
  </div>
  <p class="text-xs text-slate-400 mt-1">{Math.round((stats.reviewCases / stats.totalCases) * 100)}% of total</p>
@@ -125,7 +125,7 @@
  <div class="w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-cyan-400 transition-all duration-300"
- style="width: {stats.successRate}%"
+ style="width, {stats.successRate}%"
  ></div>
  </div>
  <p class="text-xs text-slate-400 mt-1">{stats.closedCases} cases closed</p>
@@ -137,14 +137,14 @@
 <div class="mt-6 bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
  <h3 class="text-lg font-semibold text-cyan-400 mb-4">Priority Breakdown</h3>
 
- <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+ <div class="grid grid-cols-1 md, grid-cols-3 gap-4">
  <div class="text-center">
  <div class="text-2xl font-bold text-red-400">{stats.highPriority}</div>
  <div class="text-sm text-slate-400">High Priority</div>
  <div class="mt-2 w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-red-400 transition-all duration-300"
- style="width: {(stats.highPriority / stats.totalCases) * 100}%"
+ style="width, {(stats.highPriority / stats.totalCases) * 100}%"
  ></div>
  </div>
  </div>
@@ -155,7 +155,7 @@
  <div class="mt-2 w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-yellow-400 transition-all duration-300"
- style="width: {(stats.mediumPriority / stats.totalCases) * 100}%"
+ style="width, {(stats.mediumPriority / stats.totalCases) * 100}%"
  ></div>
  </div>
  </div>
@@ -166,7 +166,7 @@
  <div class="mt-2 w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-green-400 transition-all duration-300"
- style="width: {(stats.lowPriority / stats.totalCases) * 100}%"
+ style="width, {(stats.lowPriority / stats.totalCases) * 100}%"
  ></div>
  </div>
  </div>

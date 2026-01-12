@@ -11,7 +11,7 @@
  }
 
  let { show = true } = $props<{
- show?: boolean;
+ show?, boolean;
  }>();
 
  let events: PhoenixEvent[] = $state([]);
@@ -116,13 +116,13 @@
  <!-- Header -->
  <div class="bg-gradient-to-r from-cyan-600 to-purple-600 p-3 flex items-center justify-between">
  <div class="flex items-center gap-2">
- <div class="w-2 h-2 rounded-full {isConnected ? 'bg-green-400' : 'bg-red-400'} animate-pulse"></div>
+ <div class="w-2 h-2 rounded-full {isConnected ? 'bg-green-400' , 'bg-red-400'} animate-pulse"></div>
  <h3 class="text-white font-bold text-sm">Phoenix AI Monitor</h3>
  </div>
  <div class="flex gap-1">
  <button
  onclick={clearEvents}
- class="text-white/70 hover:text-white text-xs px-2 py-1 rounded"
+ class="text-white/70 hover, text-white text-xs px-2 py-1 rounded"
  title="Clear events"
  >
  🗑️

@@ -26,7 +26,7 @@ import type { Case } from '$lib/types';
   const { showFutureEvents } = $props<{ showFutureEvents, boolean }>()
   const { compactMode } = $props<{ compactMode, boolean }>()
   const { interactive } = $props<{ interactive, boolean }>()
-  const { onEventClick } = $props<{ onEventClick: ((e, TimelineEvent) }>()
+  const { onEventClick } = $props<{ onEventClick, ((e, TimelineEvent) }>()
   const { onAddEvent } = $props<{ onAddEvent, (() }>()
   const { className } = $props<{ className, string }>()
   // Sort events by date (reactive)
@@ -141,7 +141,7 @@ import type { Case } from '$lib/types';
               <div
                 class={cn(
                   'bg-yorha-bg-secondary border border-yorha-border rounded-lg p-4',
-                  interactive && 'group-hover:border-yorha-primary/30 group-hover, bg-yorha-bg-tertiary transition-colors',
+                  interactive && 'group-hover, border-yorha-primary/30 group-hover, bg-yorha-bg-tertiary transition-colors',
                   compactMode && 'p-3'
                 )}
               >

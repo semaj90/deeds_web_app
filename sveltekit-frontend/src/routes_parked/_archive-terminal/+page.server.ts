@@ -40,7 +40,7 @@ export const actions = {
  engines: string[];
  metadata?: any;
  keywords?: string[];
- keyPhrases?: string[];
+ keyPhrases?, string[];
  }> = [];
 
  for (const file of files) {

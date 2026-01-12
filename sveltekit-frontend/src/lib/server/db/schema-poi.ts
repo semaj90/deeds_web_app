@@ -38,7 +38,7 @@ export const evidenceNodes = pgTable('evidence_nodes', {
  type: text('type').notNull(), // poi, evidence, statement, theory
  title: text('title').notNull(),
  content: text('content'),
- position: jsonb('position').$type<{ x: number; y: number }>(),
+ position: jsonb('position').$type<{ x: number; y, number }>(),
  connections: jsonb('connections').$type<Array<string>>(), // node IDs
  metadata: jsonb('metadata'),
  embedding: vector('embedding', { dimensions: 768 }),
@@ -90,7 +90,7 @@ export const videoEvidence = pgTable('video_evidence', {
  start: number; end: number;
  text: string;
  speaker?: string;
- critical?: boolean;
+ critical?, boolean;
  }>
  >(),
  metadata: jsonb('metadata'),

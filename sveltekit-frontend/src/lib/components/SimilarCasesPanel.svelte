@@ -4,7 +4,7 @@
  import { onMount } from 'svelte';
 
  let { caseId } = $props<{
- caseId: string;
+ caseId, string;
  }>();
 
  interface SimilarCase {
@@ -89,7 +89,7 @@
  <div class="controls">
  <div class="control-group">
  <label for="limit">Limit:</label>
- <select id="limit" bind:value={limit} onchange={ loadSimilarCases }>
+ <select id="limit" bind, value={limit} onchange={ loadSimilarCases }>
  <option value={ 3 }>3</option>
  <option value={ 5 }>5</option>
  <option value={ 10 }>10</option>
@@ -105,7 +105,7 @@
  min="0"
  max="1"
  step="0.1"
- bind:value={minRelevance}
+ bind, value={minRelevance}
  onchange={ loadSimilarCases }
  />
  <span class="relevance-value">{(minRelevance * 100).toFixed(0)}%</span>
@@ -113,7 +113,7 @@
 
  <div class="control-group">
  <label for="sortBy">Sort by:</label>
- <select id="sortBy" bind:value={sortBy}>
+ <select id="sortBy" bind, value={sortBy}>
  <option value="relevance">Relevance</option>
  <option value="rank">Rank</option>
  </select>
@@ -146,7 +146,7 @@
  >
  {caseItem.caseNumber}
  </button>
- <div class="relevance-badge" style="background-color: {getRelevanceColor(caseItem.relevanceScore)}">
+ <div class="relevance-badge" style="background-color, {getRelevanceColor(caseItem.relevanceScore)}">
  {(caseItem.relevanceScore * 100).toFixed(0)}%
  </div>
  </div>
@@ -161,7 +161,7 @@
  <label for="$1">$1</label>
  <span
  class="outcome-badge"
- style="background-color: {getOutcomeColor(caseItem.outcome)}"
+ style="background-color, {getOutcomeColor(caseItem.outcome)}"
  >
  {caseItem.outcome}
  </span>

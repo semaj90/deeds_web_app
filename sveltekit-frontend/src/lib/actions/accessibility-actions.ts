@@ -29,7 +29,7 @@ export interface ARIAStateParams {
 }
 
 export interface KeyboardNavigationParams {
- keys: Record<string, (_event: KeyboardEvent) => void>;
+ keys: Record<string, (_event, KeyboardEvent) => void>;
  capture?: boolean;
  preventDefault?: boolean;
 }

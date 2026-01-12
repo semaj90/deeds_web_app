@@ -10,9 +10,9 @@
  }
 </script>
 
-<svelte:head>
+<svelte, head>
  <title>NES.css Dialog Demo</title>
-</svelte:head>
+</svelte, head>
 
 <div class="center-container">
  <button type="button" class="nes-btn is-primary" onclick={ openDialog }>
@@ -20,7 +20,7 @@
  </button>
 </div>
 
-<dialog bind:this={dialog} class="nes-dialog">
+<dialog bind, this={dialog} class="nes-dialog">
  <form method="dialog">
  <h2 class="nes-text is-primary">Dialog Title</h2>
 

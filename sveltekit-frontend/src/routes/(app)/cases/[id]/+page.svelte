@@ -206,7 +206,7 @@
  <header class="bg-white shadow">
  <div class="max-w-7xl mx-auto px-4 py-6">
  <div class="flex items-center justify-between mb-2">
- <a href="/dashboard" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+ <a href="/dashboard" class="text-blue-600 hover, text-blue-700 text-sm font-medium">
  ← Back to Cases
  </a>
  <div class="flex gap-2">
@@ -227,7 +227,7 @@
  <button
  onclick={handleExportPacket}
  disabled={isExportingPacket}
- class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 disabled:opacity-50"
+ class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 disabled, opacity-50"
  title="Export case packet as PDF"
  >
  📄 {isExportingPacket ? 'Exporting...' : 'Export Packet'}
@@ -275,15 +275,15 @@
  </div>
  {/if}
 
- <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
- <!-- Left: Upload & Evidence List -->
- <div class="lg:col-span-2 space-y-6">
+ <div class="grid grid-cols-1 lg, grid-cols-3 gap-8">
+ <!-- Left, Upload & Evidence List -->
+ <div class="lg, col-span-2 space-y-6">
  <!-- Upload Section -->
  <div class="bg-white rounded-lg shadow p-6">
  <h2 class="text-lg font-semibold text-gray-900 mb-4">Upload Evidence</h2>
 
  <label class="block">
- <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 transition">
+ <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover, border-blue-500 transition">
  <p class="text-gray-600 mb-2">📄 Click to upload or drag and drop</p>
  <p class="text-sm text-gray-500">PDF, images, documents</p>
  <input
@@ -333,7 +333,7 @@
  ? 'bg-yellow-100 text-yellow-800'
  : item.status === 'approved'
  ? 'bg-green-100 text-green-800'
- : 'bg-red-100 text-red-800'
+ , 'bg-red-100 text-red-800'
  }`}
  >
  {item.status}
@@ -346,7 +346,7 @@
  </div>
  </div>
 
- <!-- Right: Preview & Summary -->
+ <!-- Right, Preview & Summary -->
  <div class="space-y-6">
  {#if selectedEvidence}
  {#if !suggestedSummary}

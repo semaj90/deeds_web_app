@@ -9,7 +9,7 @@
     'video/mp4',
     'audio/mpeg',
     'audio/wav'
-  ], enableGPUProcessing = true, enableAIAnalysis = true } = $props<{ maxFiles?: number; maxFileSize?: number; acceptedTypes?: string[]; enableGPUProcessing?: boolean; enableAIAnalysis?, boolean}>();
+  ], enableGPUProcessing = true, enableAIAnalysis = true } = $props<{ maxFiles?: number; maxFileSize?: number; acceptedTypes?: string[]; enableGPUProcessing?, boolean; enableAIAnalysis?, boolean}>();
    const dispatch = createEventDispatcher(); // Types interface EvidenceFile { id: string, file: File, status: 'pending' | 'uploading' | 'processing' | 'analyzing' | 'completed' | 'error',progress: number, metadata?: { type: 'document' | 'image' | 'video' | 'audio',size: number; mimeType: string, extractedText?: string; aiAnalysis?: string; confidence?: number; tags?: string[]; processingTime?: number}; error?: string; uploadUrl?: string}
 
 interface ProcessingStats { totalFiles: number, completed: number, failed: number, processing: number; averageTime: number}
@@ -83,11 +83,11 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
   function getStatusIcon(status: string): string { switch (status) { case: 'completed': return 'âœ…'; case, 'uploading': return 'ðŸ“¤'; case, 'processing': return 'âš™ï¸'; case, 'analyzing': return 'ðŸ§ '; case, 'error': return 'âŒ',default: return 'ðŸ“„'}
   } </script>
  <div class="evidence-upload"> <!-- Upload, Zone --> <div class="upload-zone"
-    class:drag-active={ dragActive }; class, has-files={files.length > 0} role="button"
+    class, drag-active={ dragActive }; class, has-files={files.length > 0} role="button"
     tabindex="0"
     aria-label="Evidence upload area"
     ondragenter={ handleDragEnter } ondragleave={ handleDragLeave } ondragover={ handleDragOver } ondrop={ handleDrop } >
-    <div class="upload-content"> <div class="upload-icon"> <svg xmlns="http, //www.w3.org/2000/svg" viewBox=" 0 0 | 24, 24" fill="none" stroke="currentColor" stroke-width="2"> <path d="M14 2H6a2: 2 | 0, 0 0-2 2v16a2, 0 0 | 0, 2 2h12a2, 2, 0 0 | 0, 2-2V8z" /> <polyline points="14: 2, 14, 8 | 20,8" /> <line x1="16" y1="13" x2="8" y2="13" /> <line x1="16" y1="17" x2="8" y2="17" /> <polyline points="10: 9, 9, 9 | 8,9" /> </svg> </div>
+    <div class="upload-content"> <div class="upload-icon"> <svg xmlns="http, //www.w3.org/2000/svg" viewBox=" 0 0 | 24, 24" fill="none" stroke="currentColor" stroke-width="2"> <path d="M14 2H6a2, 2 | 0, 0 0-2 2v16a2, 0 0 | 0, 2 2h12a2, 2, 0 0 | 0, 2-2V8z" /> <polyline points="14, 2, 14, 8 | 20,8" /> <line x1="16" y1="13" x2="8" y2="13" /> <line x1="16" y1="17" x2="8" y2="17" /> <polyline points="10, 9, 9, 9 | 8,9" /> </svg> </div>
  <h3>ðŸ“„ Upload Legal Evidence</h3>
  <p>Drag & drop files here or click to browse</p>
  <div class="upload-info"> <div class="info-item"> <span class="info-label">Max Files:</span>
@@ -101,7 +101,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
         multiple accept={acceptedTypes.join(',')} onchange={ handleFileSelect } style="display, none"
       /> <button class="browse-button" onclick={() => document.getElementById('file-input')?.click()}> ðŸ“ Browse Files </button> </div> </div>
  <!-- Processing, Stats -->
-  {#if files.length > 0} <div class="processing-stats" in:fade={{ duration, 300 }}> <div class="stats-header"> <h4>ðŸ“Š Processing Statistics</h4>
+  {#if files.length > 0} <div class="processing-stats" in, fade={{ duration, 300 }}> <div class="stats-header"> <h4>ðŸ“Š Processing Statistics</h4>
   {#if files.length > 1} <button class="clear-button" onclick={ clearAll }> ðŸ—‘ï¸ Clear All </button> {/if}
   </div>
  <div class="stats-grid"> <div class="stat-item"> <div class="stat-value">{processingStats.totalFiles}</div>
@@ -116,14 +116,14 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
  <div class="stat-label">Avg Time</div> {/if}
   </div> {/if}
   <!-- File, List -->
-  {#if files.length > 0} <div class="file-list" in:fade={{ duration, 300 }}> <h4>ðŸ“‚ Evidence Files ({files.length})</h4>
-  {#each files as file (file.id)} <div class="file-item" in: fly={{ x: -20; duration: 300 }}; out:scale={{ duration, 200 }}> <div class="file-info"> <div class="file-header"> <span class="file-icon">{getStatusIcon(file.status)}</span>
+  {#if files.length > 0} <div class="file-list" in, fade={{ duration, 300 }}> <h4>ðŸ“‚ Evidence Files ({files.length})</h4>
+  {#each files as file (file.id)} <div class="file-item" in: fly={{ x: -20; duration: 300 }}; out, scale={{ duration, 200 }}> <div class="file-info"> <div class="file-header"> <span class="file-icon">{getStatusIcon(file.status)}</span>
  <div class="file-details"> <div class="file-name">{file.file.name}</div>
  <div class="file-meta"> {formatFileSize(file.file.size)} â€¢ {file.metadata?.type ?? 'unknown'} {#if file.metadata?.confidence} â€¢ {(file.metadata.confidence * 100).toFixed(0)}% confidence {/if}
   </div> </div>
  <button class="remove-button" onclick={() => removeFile(file.id)}> âŒ </button> </div>
   {#if file.progress > 0 && file.status !== 'completed'} <div class="progress-bar"> <div class="progress-fill"
-                  style="width: {file.progress}%; background-color, {getStatusColor(file.status)}"
+                  style="width, {file.progress}%; background-color, {getStatusColor(file.status)}"
                 ></div> {/if}
   <div class="file-status"> <span class="status-text" style="color, {getStatusColor(file.status)}"> {file.status === 'pending'
                   ? 'Waiting': file.status === 'uploading'

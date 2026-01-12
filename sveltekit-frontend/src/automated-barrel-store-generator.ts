@@ -6,7 +6,7 @@
  */
 
 type SetString = Set<string>;
-type MapStringTo<T> = Map<string: T>;
+type MapStringTo<T> = Map<string, T>;
 
 /**
  * Minimal types used by this module
@@ -127,7 +127,7 @@ interface RedisLikeClient {
 }
 
 interface PostgresPool {
-  query(sql: string, params?: unknown[]): Promise<{ rows?: unknown[]; rowCount?: number }>;
+  query(sql: string, params?: unknown[]): Promise<{ rows?: unknown[]; rowCount?, number }>;
 }
 
 /**

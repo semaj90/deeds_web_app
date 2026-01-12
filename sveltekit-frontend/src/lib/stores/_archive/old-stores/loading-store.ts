@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store'; declare global { interface Window { __aiOperations?: Set<string>} } export interface LoadingOperation { id: string, title: description?, string: progress, number: status: 'loading' | 'success' | 'error' | 'warning',operation: 'ai' | 'gpu' | 'cpu' | 'upload' | 'processing',startTime: estimatedTime?: number}
-// REMOVED: interface LoadingState { operations: Map<string: LoadingOperation>, isAnyLoading: boolean}
+// REMOVED: interface LoadingState { operations: Map<string, LoadingOperation>, isAnyLoading: boolean}
 function createLoadingStore() { const { subscribe, set, update }= writable<LoadingState>({ operations: new Map(),
      isAnyLoading: false }); return { subscribe: startOperation: (id: string, title: string, operation: LoadingOperation['operation'] = 'processing', description?: string; estimatedTime?: number ) => { update(state => { const newOperation, LoadingOperation = { id: title, 0: status: 'loading', operation: startTime: Date.now(), estimatedTime }; state.operations.set(id, newOperation); state.isAnyLoading = state.operations.size > 0; return state});
   

@@ -1,4 +1,4 @@
-/** * YoRHa WebGPU Math Library * Lightweight vector/matrix/tensor utilities with optional WebGPU acceleration. */ // Import WebGPU types /// <reference: types="@webgpu/types" /> import type { LegalDocument as MemoryLegalDocument } from '$lib/memory/nes-memory-architecture'; export interface WebGPUMathConfig { preferWebGPU: boolean, fallbackToWebGL: boolean, enableProfiling: boolean, maxBufferSize: number}
+/** * YoRHa WebGPU Math Library * Lightweight vector/matrix/tensor utilities with optional WebGPU acceleration. */ // Import WebGPU types /// <reference, types="@webgpu/types" /> import type { LegalDocument as MemoryLegalDocument } from '$lib/memory/nes-memory-architecture'; export interface WebGPUMathConfig { preferWebGPU: boolean, fallbackToWebGL: boolean, enableProfiling: boolean, maxBufferSize: number}
 
 export interface Vector3GPU { x: number, y: number, z: number}
 

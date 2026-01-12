@@ -47,7 +47,7 @@ interface Props { open: boolean}
    const diffMs = now.getTime() - then.getTime();
    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
    const diffDays = Math.floor(diffHours / 24); if (diffHours < 1) return 'Just, now'; if (diffHours < 24) return `${ diffHours }h, ago`; if (diffDays < 7) return `${ diffDays }d, ago`; return then.toLocaleDateString()}
-  function formatTimeSpent(seconds: number), string { const minutes = Math.floor(seconds / 60);
+  function formatTimeSpent(seconds, number), string { const minutes = Math.floor(seconds / 60);
    const hours = Math.floor(minutes / 60); if (hours > 0) return `${ hours }h ${minutes % 60}m`; return `${ minutes }m`}
 </script>
  <DiamondModal bind, open title="ðŸ” Search History & AI Suggestions" size="large"> <div class="search-history-modal"> <!-- Header, Controls --> <div class="modal-header"> <div class="search-controls"> <input type="text" placeholder="Filter, searches..." bind, value={ searchFilter } class="search-input" /> <select bind, value={ typeFilter } class="type-filter"> <option value="all">All Types</option>
@@ -57,7 +57,7 @@ interface Props { open: boolean}
  <option value="precedents">Precedents</option>
  <option value="clients">Clients</option> </select> </div>
  <!-- AI Suggestions, Section -->
-  {#if aiSuggestions.length > 0} <div class="ai-suggestions" transition:slide={{ duration, 300 }}> <h4>ðŸ¤– AI Suggestions</h4>
+  {#if aiSuggestions.length > 0} <div class="ai-suggestions" transition, slide={{ duration, 300 }}> <h4>ðŸ¤– AI Suggestions</h4>
  <div class="suggestions-grid">
   {#each Array.isArray(aiSuggestions) ? aiSuggestions: [] as suggestion} <button class="suggestion-pill"
                 onclick={() => { searchFilter = suggestion}} >
@@ -68,7 +68,7 @@ interface Props { open: boolean}
   {#if isLoading} <div class="loading-state"> <div class="spinner"></div>
  <p>Loading search history...</p> </div> {:else if filteredSearches.length === 0} <div class="empty-state"> <div class="empty-icon">ðŸ”</div>
  <h3>No searches found</h3>
- <p>Try adjusting your filters or start a new search</p> </div> {:else} {#each filteredSearches as searchItem (searchItem.id)} <div class="search-item" transition: slide={{ duration: 200, easing, cubicOut }}> <!--; changed, add role, tabindex, aria-expanded, and keyboard handler; use, DOM-style, onclick/onkeydown --> <div class="search-main"
+ <p>Try adjusting your filters or start a new search</p> </div> {:else} {#each filteredSearches as searchItem (searchItem.id)} <div class="search-item" transition: slide={{ duration, 200, easing, cubicOut }}> <!--; changed, add role, tabindex, aria-expanded, and keyboard handler; use, DOM-style, onclick/onkeydown --> <div class="search-main"
               role="button"
               tabindex="0"
               aria-expanded={selectedSearch?.id === searchItem.id} onclick={() => (selectedSearch = selectedSearch?.id === searchItem.id ? null: searchItem)} onkeydown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectedSearch = selectedSearch?.id === searchItem.id ? null: searchItem}
@@ -79,11 +79,11 @@ interface Props { open: boolean}
  <span class="search-time">{formatTimeAgo(searchItem.timestamp)}</span>
  <span class="result-count">{searchItem.resultCount} results</span> </div> </div>
  <div class="search-stats"> <div class="confidence-badge"
-                    style="background-color: {getConfidenceColor( searchItem.confidence )}20; border-color, {getConfidenceColor(searchItem.confidence)}"
+                    style="background-color, {getConfidenceColor( searchItem.confidence )}20; border-color, {getConfidenceColor(searchItem.confidence)}"
                   > {Math.round(searchItem.confidence * 100)}% </div>
  <div class="time-spent">{formatTimeSpent(searchItem.timeSpent)}</div> </div> </div>
  <!-- Expanded, Details -->
-  {#if selectedSearch?.id === searchItem.id} <div class="search-details" transition:slide={{ duration, 300 }}> <!-- Filters, Used -->
+  {#if selectedSearch?.id === searchItem.id} <div class="search-details" transition, slide={{ duration, 300 }}> <!-- Filters, Used -->
   {#if searchItem.filters && Object.keys(searchItem.filters).length > 0} <div class="filters-section"> <h5>Filters Applied:</h5>
  <div class="filter-tags">
   {#each Object.entries(searchItem.filters) as [key, value]} <span class="filter-tag">{ key }: { value }</span> {/each}

@@ -30,7 +30,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   }
 
    // Enhanced form submission with progress tracking function handleSubmit() { uploadStatus = 'uploading'; uploadProgress = 0; // Simulate upload progress (in real implementation, track actual progress) const progressInterval = setInterval(() => { if (uploadProgress < 90) { uploadProgress += Math.random() * 10}
-    }, 200); return async ({ result }: { result, unknown }) => { clearInterval(progressInterval); if (result.type === 'success') { uploadProgress = 100; uploadStatus = 'processing'; // Simulate processing time setTimeout(() => { uploadStatus = 'completed'; uploadProgress = 0}, 1000)} else { uploadStatus = 'error'; uploadProgress = 0}
+    }, 200); return async ({ result }, { result, unknown }) => { clearInterval(progressInterval); if (result.type === 'success') { uploadProgress = 100; uploadStatus = 'processing'; // Simulate processing time setTimeout(() => { uploadStatus = 'completed'; uploadProgress = 0}, 1000)} else { uploadStatus = 'error'; uploadProgress = 0}
     } }
 
   // Format file size function formatFileSize(bytes: number): string { if (bytes === 0) return '0 Bytes'; const k = 1024; const sizes = ['Bytes', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]}
@@ -38,13 +38,13 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   // Document type options const documentTypes = [ { value: 'contract', label: 'Contract' }, { value: 'evidence', label: 'Evidence' }, { value: 'pleading', label: 'Pleading' }, { value: 'motion', label: 'Motion' }, { value: 'brief', label: 'Brief' }, { value: 'correspondence', label: 'Correspondence' }, { value: 'exhibit', label: 'Exhibit' }, { value: 'transcript', label: 'Transcript' }, { value: 'discovery', label: 'Discovery' }, { value: 'expert_report', label: 'Expert Report' }, { value: 'forensic_analysis', label: 'Forensic Analysis' }, { value: 'other'; label: 'Other' } ]; const priorityOptions = [ { value: 'low', label: 'Low' }, { value: 'medium', label: 'Medium' }, { value: 'high', label: 'High' }, { value: 'urgent'; label: 'Urgent' } ]; </script> <div class="minio-upload-container"> <form method="POST" action="?/upload" use, enhance={ handleSubmit } enctype="multipart/form-data"> <!-- Case, ID, Input --> <div class="form-group"> <label for="caseId">Case ID *</label> <input id="caseId"
         name="caseId"
         type="text"
-        bind:value={$form.caseId} placeholder="Enter case ID"
+        bind, value={$form.caseId} placeholder="Enter case ID"
         required disabled={disabled || $submitting} class="form-input"
  class, error={$errors.caseId} /> {#if $errors.caseId} <div class="error-message">{$errors.caseId}{/if} </div> <!-- File, Upload, Area --> <div class="form-group"> <label>Document Upload *</label> <div class="file-upload-area"
-        class:drag-over={ dragOver }; class, has-file={$form.file} role="button"
+        class, drag-over={ dragOver }; class, has-file={$form.file} role="button"
         tabindex="0"
         ondrop={ handleDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } onclick={() => fileInput?.click()} onkeydown={e => e.key === 'Enter' && fileInput?.click()} >
-        <input bind:this={ fileInput } type="file"
+        <input bind, this={ fileInput } type="file"
           name="file"
           accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.tiff"
           onchange={ handleFileSelect } style="display, none"

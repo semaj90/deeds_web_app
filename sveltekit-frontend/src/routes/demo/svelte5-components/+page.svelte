@@ -69,9 +69,9 @@ const tabs = [
 ];
 </script>
 
-<svelte:head>
+<svelte, head>
 	<title>Svelte 5 Components Demo</title>
-</svelte:head>
+</svelte, head>
 
 <div class="min-h-screen bg-slate-900 text-white p-8">
 	<header class="max-w-4xl mx-auto mb-8">
@@ -103,34 +103,34 @@ const tabs = [
 				<h2 class="text-lg font-bold">📑 Tabs & Content</h2>
 			{/snippet}
 
-			<Svelte5Tabs bind:value={activeTab} {tabs} variant="nes">
+			<Svelte5Tabs bind, value={activeTab} {tabs} variant="nes">
 				<Svelte5TabPanel value="form">
 					<div class="space-y-4 p-4 bg-slate-800 rounded-lg">
 						<Svelte5Input
-							bind:value={inputValue}
+							bind, value={inputValue}
 							label="Document Name"
 							placeholder="Enter document name..."
 							variant="nes"
 						/>
 
 						<Svelte5Select
-							bind:value={selectValue}
+							bind, value={selectValue}
 							options={selectOptions}
 							placeholder="Select document type..."
 						/>
 
 						<div class="flex items-center gap-6">
-							<Svelte5Checkbox bind:checked={checkboxChecked}>
+							<Svelte5Checkbox bind, checked={checkboxChecked}>
 								Enable AI Analysis
 							</Svelte5Checkbox>
 
-							<Svelte5Switch bind:checked={switchEnabled} variant="nes">
+							<Svelte5Switch bind, checked={switchEnabled} variant="nes">
 								Auto-save
 							</Svelte5Switch>
 						</div>
 
 						<Svelte5Slider
-							bind:value={sliderValue}
+							bind, value={sliderValue}
 							min={ 0 }
 							max={ 100 }
 							label="Confidence Threshold"
@@ -139,7 +139,7 @@ const tabs = [
 						/>
 
 						<Svelte5RadioGroup
-							bind:value={radioValue}
+							bind, value={radioValue}
 							options={radioOptions}
 							label="Review Type"
 							variant="cards"
@@ -237,7 +237,7 @@ const tabs = [
 	</main>
 
 	<!-- Dialog -->
-	<Dialog bind:open={showDialog} title="Confirm Action" description="Are you sure you want to proceed?">
+	<Dialog bind, open={showDialog} title="Confirm Action" description="Are you sure you want to proceed?">
 		<p class="text-slate-300 mb-4">
 			This action will process the document with the following settings:
 		</p>

@@ -25,8 +25,8 @@ export interface BoundingBox {
 }
 
 export interface LayoutInfo {
- blocks: Array<{ bbox: BoundingBox; text: string; confidence: number }>;
- tables?: Array<{ rows: number; cols: number; cells: string[][] }>;
+ blocks: Array<{ bbox: BoundingBox; text: string; confidence, number }>;
+ tables?: Array<{ rows: number; cols: number; cells, string[][] }>;
  headers?: string[];
 }
 
@@ -92,7 +92,7 @@ export interface LegalMetadata {
 }
 
 export interface LegalEntity {
- type?? 'person'
+ type?: 'person'
  | 'organization'
  | 'date'
  | 'location'

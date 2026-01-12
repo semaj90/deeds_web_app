@@ -21,7 +21,7 @@
  photos?: Array<{ url: string;
  thumbnailUrl: string;
  metadata?: any;
- ai?: any;
+ ai?, any;
  }>;
  }
 
@@ -76,7 +76,7 @@
  }
 </script>
 
-<Dialog bind:open={ open }>
+<Dialog bind, open={ open }>
  <DialogContent>
  <div class="max-w-4xl max-h-[80vh] overflow-y-auto">
  <DialogHeader>
@@ -100,7 +100,7 @@
  {#each matches as match (match.poi.id)}
  <Card>
  <CardContent class="p-4">
- <div class="flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow" onclick={() => handleSelectPOI(match.poi)}>
+ <div class="flex items-center gap-4 cursor-pointer hover, shadow-md transition-shadow" onclick={() => handleSelectPOI(match.poi)}>
  <!-- POI Photo -->
  <div class="flex-shrink-0">
  {#if match.poi.photos && match.poi.photos.length > 0}
@@ -149,7 +149,7 @@
  </div>
 
  <div class="flex justify-end pt-4 border-t">
- <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible: ring-offset-2, disabled: pointer-events-none, disabled:opacity-50 border border-input bg-background hover: bg-accent, hover:text-accent-foreground h-10 px-4 py-2" onclick={handleClose}>
+ <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible: ring-offset-2, disabled: pointer-events-none, disabled:opacity-50 border border-input bg-background hover: bg-accent, hover, text-accent-foreground h-10 px-4 py-2" onclick={handleClose}>
  <X class="w-4 h-4 mr-2" />
  Close
  </button>

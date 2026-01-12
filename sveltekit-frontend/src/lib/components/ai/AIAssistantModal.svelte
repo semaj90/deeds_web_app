@@ -6,7 +6,7 @@ interface CaseData { id: string, title: string, status: string, evidence?: Evide
 
 interface UserData { id: string; name: string, email?: string; role?: string}
 
-interface AIStoreContext { loading?: boolean; error?: string; summary?: string; stream?: string; sources?: Array<{ id?: string; title?: string; [k: string], unknown }>}
+interface AIStoreContext { loading?: boolean; error?: string; summary?: string; stream?: string; sources?: Array<{ id?: string; title?: string; [k, string], unknown }>}
 
 interface AIStore { context: AIStoreContext}
 

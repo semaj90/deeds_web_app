@@ -30,13 +30,13 @@ export type RouteDefinition = {
 
 // --- Compatibility layer types to avoid repetitive `any` casts ---
 type RouteRegistryShape = Partial<{
- routeRegistry: unknown, RouteRegistry: unknown; routes: unknown, dynamicRoutes: unknown; allRegisteredRoutes: unknown, currentRoute: unknown; favoriteRoutes: unknown, recentRoutes: unknown; routeStatistics: unknown, getRoute: (id: string) => unknown, registerRoute: (id: string): => unknown, registerDynamicRoute: (id: string, path: string, cfg?: Partial<DynamicRouteConfig>) => unknown;
+ routeRegistry: unknown, RouteRegistry: unknown; routes: unknown, dynamicRoutes: unknown; allRegisteredRoutes: unknown, currentRoute: unknown; favoriteRoutes: unknown, recentRoutes: unknown; routeStatistics: unknown, getRoute: (id, string) => unknown, registerRoute: (id: string): => unknown, registerDynamicRoute: (id: string, path: string, cfg?: Partial<DynamicRouteConfig>) => unknown;
  unregisterRoute: (id: string) => unknown, searchRoutes: (q: string) => unknown, addToFavorites: (id: string) => unknown, removeFromFavorites: (id: string) => unknown, isFavorite: (id: string) => boolean;
  getAll?: () => unknown[];
 }>;
 
 type RouteGuardsShape = Partial<{
- RouteGuards: unknown, routeGuards: unknown; createGuardedLoader: unknown, withGuards: unknown; createRouteGuardMiddleware: unknown, configureRouteGuards: unknown; getRouteGuardConfig: unknown, checkRoutePermission: unknown; checkMultipleRoutePermissions: unknown;
+ RouteGuards: unknown, routeGuards: unknown; createGuardedLoader: unknown, withGuards: unknown; createRouteGuardMiddleware: unknown, configureRouteGuards: unknown; getRouteGuardConfig: unknown, checkRoutePermission: unknown; checkMultipleRoutePermissions, unknown;
 }>;
 
 // Cast the imported modules to the shapes above (no `any` sprinkled everywhere)
@@ -147,7 +147,7 @@ export async function initializeRouting(
 // Allow either a simple map or a descriptor map matching some router libs.
 type LocalDynamicConfig = Partial<DynamicRouteConfig> & {
  // allow either a plain record of values or a record of typed param descriptors
- params?: Record<string, unknown> | Record<string, { optional?: boolean; type?: string }>;
+ params?: Record<string, unknown> | Record<string, { optional?: boolean; type?, string }>;
 };
 
 export class RouteBuilder {
@@ -185,7 +185,7 @@ export class RouteBuilder {
  }
 
  params(
- params: Record<string, unknown> | Record<string, { optional?: boolean; type?: string }>
+ params: Record<string, unknown> | Record<string, { optional?: boolean; type?, string }>
  ): RouteBuilder {
  // If every value looks like a descriptor (object with optional/type) keep as-is,
  // otherwise convert the plain record into a descriptor map with inferred types.
@@ -202,10 +202,10 @@ export class RouteBuilder {
  )
  ) {
  // Already descriptor-shaped
- this.config.params = params as Record<string, { optional?: boolean; type?: string }>;
+ this.config.params = params as Record<string, { optional?: boolean; type?, string }>;
  } else {
  // Normalize unknown map -> descriptor map
- const converted: Record<string, { optional?: boolean; type?: string }> = {};
+ const converted: Record<string, { optional?: boolean; type?, string }> = {};
  for (const [k, v] of Object.entries(params as Record<string, unknown>)) {
  converted[k] = {
  // Use typeof to provide a useful hint; default to "unknown" for null/undefined, type: v === null || v === undefined ? 'unknown' : (typeof v as string),
@@ -343,7 +343,7 @@ export function validateRoute(route: GeneratedRoute | RouteDefinition): { valid:
 /** * Route debugging utility */
 export function debugRoutes(): { totalRoutes: number, staticRoutes: number; dynamicRoutes: number, routeList: Array<{ id: string, path: string; type: 'static' | 'dynamic';
  category?: string;
- status?: string;
+ status?, string;
  }>;
 } {
  const dynamicRoutes = getAllDynamicRoutes();

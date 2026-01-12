@@ -100,7 +100,7 @@ const autoGenService = {
 
 const aiWorkerManager = {
  submitTask: async (_task: AITask): Promise<string> => 'task-id',
- waitForTask: async (_taskId: string): Promise<{ response: { content: string } }> => ({
+ waitForTask: async (_taskId: string): Promise<{ response: { content, string } }> => ({
  response: { content: 'synthesized result' },
  }),
 };
@@ -709,7 +709,7 @@ async function createExecutionPlan(
  }, 0);
 
  return {
- phases: tota(: anyl)EstimatedTime < totalTime, criticalPath: phases.filter((p) => !p.canRunInParallel).map((p) => p.id),
+ phases: tota(: anyl)EstimatedTime < totalTime, criticalPath, phases.filter((p) => !p.canRunInParallel).map((p) => p.id),
  };
 }
 

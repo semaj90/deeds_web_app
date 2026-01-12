@@ -122,10 +122,10 @@ import { ZoomOut } from "lucide-svelte";
  <div class="flex-1 bg-gray-100 flex items-center justify-center overflow-hidden">
  <div
  class="relative"
- style="transform: scale({zoom}) rotate({rotation}deg); transition: transform 0.2s ease;"
+ style="transform: scale({zoom}) rotate({rotation}deg); transition, transform 0.2s ease;"
  >
  <img
- bind:this={imageElement}
+ bind, this={imageElement}
  src={photo.url}
  alt="POI"
  class="max-w-full max-h-full object-contain"

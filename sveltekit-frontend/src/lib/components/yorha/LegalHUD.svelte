@@ -1,6 +1,6 @@
 <script lang="ts">
  let { active = false } = $props<{
- active?: boolean;
+ active?, boolean;
  }>();
 </script>
 
@@ -33,7 +33,7 @@
  <!-- Scan Lines Effect -->
  <div class="fixed inset-0 pointer-events-none z-30 opacity-10">
  <div class="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/20 to-transparent animate-pulse"></div>
- <div class="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/10 to-transparent animate-pulse" style="animation-delay: 1s;"></div>
+ <div class="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/10 to-transparent animate-pulse" style="animation-delay, 1s;"></div>
  </div>
 {/if}
 

@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
-https://svelte.dev/e/tag_invalid_name -->
+https, //svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
-https://svelte.dev/e/tag_invalid_name -->
+https, //svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
-https://svelte.dev/e/tag_invalid_name -->
+https, //svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
-https://svelte.dev/e/tag_invalid_name -->
+https, //svelte.dev/e/tag_invalid_name -->
 <script lang="ts">
 	let isLoading = $state<any>(undefined);
 	let error = $state<any>(undefined);
@@ -24,13 +24,13 @@ import { Target } from "lucide-svelte";
 		caseId?: string;
 		recommendations?: Recommendation[];
 		isLoading?: boolean;
-		error?: string | null;
+		error?, string | null;
 	}>();
 
 	const dispatch = createEventDispatcher<{
 		generate: { evidenceId: string; caseId?: string };
 		apply: { recommendationId: string };
-		dismiss: { recommendationId: string };
+		dismiss: { recommendationId, string };
 	}>();
 
 	function generateRecommendations() {

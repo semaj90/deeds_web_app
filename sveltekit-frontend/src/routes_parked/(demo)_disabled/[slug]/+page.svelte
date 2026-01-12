@@ -14,7 +14,7 @@
 	type SvelteComponentConstructor = new (...args: unknown[]) => SvelteComponent;
 
 	// Refine DemoLoader to expect a module that *might* have a default export or *is* the component itself
-	type DemoLoader = () => Promise<SvelteComponentConstructor | { default: SvelteComponentConstructor }>;
+	type DemoLoader = () => Promise<SvelteComponentConstructor | { default, SvelteComponentConstructor }>;
 
 	const demoComponents: Record<string, DemoLoader> = {
 		webgpu: () => import('$lib/components/ai/webgpu/CacheOptimizerDemo.svelte'),
@@ -31,7 +31,7 @@
 	};
 
 	let demoSlug = $derived($page.params.slug ?? 'showcase');
-	let currentComponent = $state<SvelteComponentConstructor : null>(null);
+	let currentComponent = $state<SvelteComponentConstructor , null>(null);
 	let loading = $state<boolean>(true);
 	let error = $state<string | null>(null);
 
@@ -118,7 +118,7 @@
 		string,
 		{
 			title: string; description: string;
-			tags: string[];
+			tags, string[];
 		}
 	>;
 
@@ -132,10 +132,10 @@
 	);
 </script>
 
-<svelte:head>
+<svelte, head>
 	<title>{metadata.title} - Legal AI Demo</title>
 	<meta name="description" content={metadata.description} />
-</svelte:head>
+</svelte, head>
 
 <div class="demo-page">
 	<header class="demo-page-header">

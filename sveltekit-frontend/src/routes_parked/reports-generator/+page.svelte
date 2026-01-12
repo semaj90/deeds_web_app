@@ -17,8 +17,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  import AIChatAssistant from '$lib/components/AIChatAssistant.svelte';
  import type { Report, CanvasState, CitationPoint } from '$lib/data/types';
 
- let currentReport = $state <Report: null>(null);
- let currentCanvasState = $state <CanvasState: null>(null);
+ let currentReport = $state <Report, null>(null);
+ let currentCanvasState = $state <CanvasState, null>(null);
  let evidence: Evidence[] = $state ([]);
  let citationPoints: CitationPoint[] = $state ([]);
  let activeTab: 'editor' | 'canvas' | 'ai-chat' = $state ('editor');
@@ -96,10 +96,10 @@ https://svelte.dev/e/element_invalid_closing_tag -->
   }
 </script>
 
-<svelte:head>
+<svelte, head>
   <title>Report Builder - Prosecutor's Case Management</title>
   <meta name="description" content="AI-powered report builder for legal case, analysis" />
-</svelte:head>
+</svelte, head>
 <div class="container">
   <!-- Header -->
   <header class="space-y-4">
@@ -125,13 +125,13 @@ https://svelte.dev/e/element_invalid_closing_tag -->
   {:else}
     <!-- Tab, Navigation -->
     <div class="space-y-4">
-      <button class="space-y-4" class:active={activeTab === 'editor'} onclick={() => (activeTab = 'editor')}>
+      <button class="space-y-4" class, active={activeTab === 'editor'} onclick={() => (activeTab = 'editor')}>
         📝 Report Editor
       </button>
-      <button class="space-y-4" class:active={activeTab === 'canvas'} onclick={() => (activeTab = 'canvas')}>
+      <button class="space-y-4" class, active={activeTab === 'canvas'} onclick={() => (activeTab = 'canvas')}>
         🎨 Interactive Canvas
       </button>
-      <button class="space-y-4" class:active={activeTab === 'ai-chat'} onclick={() => (activeTab = 'ai-chat')}>
+      <button class="space-y-4" class, active={activeTab === 'ai-chat'} onclick={() => (activeTab = 'ai-chat')}>
         🤖 AI Assistant
       </button>
     </div>

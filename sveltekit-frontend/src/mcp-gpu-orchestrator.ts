@@ -7,7 +7,7 @@
 import { productionServiceClient, type ServiceResponse } from './production-service-client.js';
 
 export interface GPUTask {
-	id: string; type?? 'legal_analysis'
+	id: string; type?: 'legal_analysis'
 		| 'document_processing'
 		| 'vector_embedding'
 		| 'som_clustering'
@@ -653,7 +653,7 @@ Provide a complete, working fix with explanation.`;
 	 */
 	async getClusterStatus(): Promise<{ metrics: ClusterMetrics | null;
 		autosolveContext: AutosolveContext | null;
-		activeGPUTasks: number; queueSize: number;
+		activeGPUTasks: number; queueSize, number;
 	}> {
 		return {
 			metrics: this.clusterMetrics,

@@ -12,7 +12,7 @@ type JsonValue = JsonPrimitive | JsonArray | JsonObject;
 export type TensorOperation = {
 	type: string; input: Float32Array | number[];
 	shape?: number[];
-	metadata?: Record<string: JsonValue>;
+	metadata?: Record<string, JsonValue>;
 };
 
 export type StreamingResponse = {
@@ -69,7 +69,7 @@ export interface SimdHealthResponse {
 export interface SimdBatchResponse {
 	results: Array<{ index: number;
 		result?: any;
-		error?: string; success: boolean;
+		error?: string; success, boolean;
 	}>;
 	total_processed: number; successful: number;
 	latency_ms: number; method: string;
@@ -246,7 +246,7 @@ class QUICClient {
 
 	async parseJsonBatch(requests: Array<{ text: string;
 		type?: string;
-		field?: string;
+		field?, string;
 	}>): Promise<SimdBatchResponse> {
 		try {
 			const response = await this.fetch('/parse/batch', {

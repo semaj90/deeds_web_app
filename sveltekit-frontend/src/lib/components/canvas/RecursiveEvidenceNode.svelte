@@ -27,7 +27,7 @@ interface Props { evidence: EvidenceNod, depth?: number; maxDepth?: number; visi
   function toggleRelationshipDetails() { showRelationshipDetails = !showRelationshipDetail}
 </script>
  <!-- Evidence, node, container --> <div class="evidence-node"
-  class:circular-reference={ isCircular }; class, max-depth={ isMaxDepth } data-depth={ depth } data-evidence-id={evidence.evidenceId} role="treeitem"
+  class, circular-reference={ isCircular }; class, max-depth={ isMaxDepth } data-depth={ depth } data-evidence-id={evidence.evidenceId} role="treeitem"
   aria-expanded={ isExpanded } >
   {#if isCircular} <!-- Circular, reference, warning --> <div class="circular-warning"> <span class="warning-icon">ðŸ”„</span>
  <div class="warning-content"> <h5>Circular Reference Detected</h5>

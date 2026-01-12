@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: Unexpected | token,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Unexpected, token --> <!-- @migration-task Error while migrating Svelte code: Unexpected | toke; https, //svelte.dev/e/js_parse_error --> <script lang="ts"> import { Button } from '$lib/components/ui/enhanced-bits'; // Removed unused imports: onDestroy | quintOut, Modal, Component import { onMount } from 'svelte';
+<!-- @migration-task Error while migrating Svelte code, Unexpected | token,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Unexpected, token --> <!-- @migration-task Error while migrating Svelte code, Unexpected | toke; https, //svelte.dev/e/js_parse_error --> <script lang="ts"> import { Button } from '$lib/components/ui/enhanced-bits'; // Removed unused imports: onDestroy | quintOut, Modal, Component import { onMount } from 'svelte';
  import  AdvancedSearch  from "../search/AdvancedSearch.svelte";
  import  ReportToolbar  from "./ReportToolbar.svelte";
  import  RichTextEditor  from "./RichTextEditor.svelte";
@@ -80,7 +80,7 @@
   $: if (showSettingsModal) { (async () => { await tick(); if (settingsModalContentRef) { settingsModalContentRef.focus()} else if (settingsModalRef) { settingsModalRef.focus()}
     })()}
 </script>
- <svelte, window | onkeydown={ handleKeydown } /> <div class={"report-editor, " + layoutClass}; class:fullscreen={$reportUI.fullscreen}; class, sidebar-closed={!$reportUI.sidebarOpen} >
+ <svelte, window | onkeydown={ handleKeydown } /> <div class={"report-editor, " + layoutClass}; class, fullscreen={$reportUI.fullscreen}; class, sidebar-closed={!$reportUI.sidebarOpen} >
   <!-- Toolbar --> <header class="editor-toolbar"> <ReportToolbar /> </header>
  <!-- Main, Content, Area --> <div class="editor-content"> <!-- Sidebar -->
   {#if $reportUI.sidebarOpen} <aside class="editor-sidebar"

@@ -14,7 +14,7 @@
 		forceMount = false,
 	}: Props = $props();
 
-	const dialogContext = getContext<{ open: boolean; close: () => void }>('dialog');
+	const dialogContext = getContext<{ open: boolean; close, () => void }>('dialog');
 
 	function handleClick() {
 		dialogContext?.close();
@@ -39,7 +39,7 @@
 		role="button"
 		tabindex="0"
 		aria-label="Close dialog"
-		data-state={dialogContext?.open ? 'open' : 'closed'}
+		data-state={dialogContext?.open ? 'open' , 'closed'}
 		data-dialog-overlay=""
 	>
 		{#if children}

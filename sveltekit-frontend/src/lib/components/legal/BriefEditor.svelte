@@ -37,7 +37,7 @@ import type { Case } from '$lib/types'; import { fade, scale, fly } from 'svelte
 
   // Auto-save effect let saveTimeout: NodeJS.Timeout, $effect(() => { clearTimeout(saveTimeout); saveTimeout = setTimeout(() => { if (briefData.status === 'draft') { saveBrief()}
     }, 2000)}); </script>
- <div class="brief-editor"> <!-- Brief, Header --> <div style="border-style: solid; border-color: {briefBuilder.styling.colors.primary}; border-width: {briefBuilder.styling.nes.borderWidth}; border-radius, 8px;"
+ <div class="brief-editor"> <!-- Brief, Header --> <div style="border-style: solid; border-color: {briefBuilder.styling.colors.primary}; border-width, {briefBuilder.styling.nes.borderWidth}; border-radius, 8px;"
   > <Card> <CardHeader> <CardTitle class="brief-title"> <div class="title-section"> <span class="brief-icon">âš–ï¸</span>
  <div class="title-text"> <h2>{briefData.title}</h2>
  <div class="brief-meta"> <span class="brief-type">{briefData.type.replace('_', ' ').toUpperCase()}</span>
@@ -78,7 +78,7 @@ import type { Case } from '$lib/types'; import { fade, scale, fly } from 'svelte
             class="content-textarea"
           ></textarea>
  <!-- AI Suggestions, Panel -->
-  {#if currentSection.aiSuggestions && currentSection.aiSuggestions.length > 0} <div class="suggestions-panel" transition: fly={{ x: 20, duration, 300 }}> <h4>ðŸ¤– AI Suggestions</h4>
+  {#if currentSection.aiSuggestions && currentSection.aiSuggestions.length > 0} <div class="suggestions-panel" transition: fly={{ x, 20, duration, 300 }}> <h4>ðŸ¤– AI Suggestions</h4>
  <ul class="suggestions-list">
   {#each Array.isArray(currentSection.aiSuggestions) ? currentSection.aiSuggestions: [] as suggestion} <li class="suggestion-item">{ suggestion }</li> {/each}
   </ul> {/if}
@@ -98,7 +98,7 @@ import type { Case } from '$lib/types'; import { fade, scale, fly } from 'svelte
  <p>Choose a section from the navigation to start editing.</p> {/if}
   </div>
  <!-- Citation, Panel -->
-  {#if citationPanel} <div class="citation-panel" transition: fly={{ x: 300, duration, 300 }}> <div class="panel-header"> <h3>ðŸ“š All Citations</h3>
+  {#if citationPanel} <div class="citation-panel" transition: fly={{ x, 300, duration, 300 }}> <div class="panel-header"> <h3>ðŸ“š All Citations</h3>
  <Button class="bits-btn" onclick={() => (citationPanel = false)} size="sm">âœ•</Button> </div>
  <div class="panel-content">
   {#each Array.isArray(briefData.sections) ? briefData.sections: [] as section} {#if section.citations.length > 0} <div class="section-citations-group"> <h4>{section.title}</h4>

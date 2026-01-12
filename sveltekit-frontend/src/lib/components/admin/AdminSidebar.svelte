@@ -29,7 +29,7 @@
 			<a
 				href={section.path}
 				class="nav-item"
-				class:active={isActive(section.path)}
+				class, active={isActive(section.path)}
 				title={section.label}
 			>
 				<span class="icon">{section.icon}</span>

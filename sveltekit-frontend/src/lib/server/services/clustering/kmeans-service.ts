@@ -105,7 +105,7 @@ function assignToClusters(
  * Update centroids
  */
 function updateCentroids(data: number[][], assignments: number[]): number[][] {
- const newCentroids: number[][] = Array.from({ length: k }, () => []);
+ const newCentroids: number[][] = Array.from({ length, k }, () => []);
  const counts: number[] = Array(k).fill(0);
 
  // Sum points in each cluster
@@ -214,7 +214,7 @@ export async function runKMeans(
  * Assign statutes to clusters with confidence
  */
 export async function assignStatutesToClusters(
- statutes: Array<{ id: string; embedding?: number[] }>,
+ statutes: Array<{ id: string; embedding?, number[] }>,
  clusters: KMeansCluster[],
  confidenceThreshold: number = 0.7
 ): Promise<ClusterAssignment[]> {
@@ -256,7 +256,7 @@ export async function assignStatutesToClusters(
  */
 export async function generateClusterLabels(
  clusters: KMeansCluster[],
- statutes: Array<{ id: string; heading?: string; text?: string }>
+ statutes: Array<{ id: string; heading?: string; text?, string }>
 ): Promise<Map<number, string>> {
  const labels = new Map<number, string>();
 
@@ -283,7 +283,7 @@ export async function generateClusterLabels(
  * Calculate cluster quality metrics
  */
 export function calculateClusterQuality(
- statutes: Array<{ id: string; embedding?: number[] }>,
+ statutes: Array<{ id: string; embedding?, number[] }>,
  assignments: ClusterAssignment[],
  clusters: KMeansCluster[]
 ): { silhouetteScore: number;

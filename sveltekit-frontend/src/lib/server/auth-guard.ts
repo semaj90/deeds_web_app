@@ -33,7 +33,7 @@ return false;
 }
 
 export class StorageRateLimit {
-private static requests = new Map<string, { count: number; resetTime: number }>();
+private static requests = new Map<string, { count: number; resetTime, number }>();
 static check(userId: string, maxRequests = 100, windowMs = 60000): boolean {
 const now = Date.now();
 const userRequests = this.requests.get(userId);

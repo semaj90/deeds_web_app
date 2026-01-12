@@ -55,7 +55,7 @@
 	class="nes-panel {variantClasses} {className}"
 	class:cursor-pointer={ onclick }
 	onclick={ onclick }
-	role={onclick ? 'button' : undefined}
+	role={onclick ? 'button' , undefined}
 	onkeydown={onclick ? (e) => e.key === 'Enter' && onclick() : undefined}
 >
 	{#if header}
