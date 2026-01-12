@@ -505,9 +505,9 @@ export const legalCaseMachine = setup({
  search: fromPromise(searchService),
  generateEmbedding: fromPromise(generateEmbeddingService),
  searchRelatedEvidence: fromPromise(searchRelatedEvidenceService),
- uploadEvidence: fromPromise(async (
- { context: _context, input }, { context: LegalCaseContext, input: LegalCaseActors['uploadEvidence']['input'] }
- ): Promise<UploadEvidenceServiceResult> => {
+ uploadEvidence: fromPromise<UploadEvidenceServiceResult, LegalCaseActors['uploadEvidence']['input']>(async (
+ { input }
+ ) => {
  const formData = new FormData();
  (input.files || []).forEach((file: File) => formData.append('files', file));
  formData.append('caseId', input.caseId ?? '');
@@ -516,16 +516,16 @@ export const legalCaseMachine = setup({
  if (!response.ok) throw new Error('Upload failed');
  return await response.json();
  }),
- aiSummarizeCase: fromPromise(async (
- { context: _context, input }: { context: LegalCaseContext, input: LegalCaseActors['aiSummarizeCase']['input'] }
- ): Promise<CaseSummaryServiceResult> => {
+ aiSummarizeCase: fromPromise<CaseSummaryServiceResult, LegalCaseActors['aiSummarizeCase']['input']>(async (
+ { input }
+ ) => {
  if (!input.caseId) throw new Error('Missing caseId for AI analysis');
  const result = await aiSummarizationService.summarizeCase(input.caseId);
  return result as CaseSummaryServiceResult;
  }),
- updateCase: fromPromise(async (
- { input }: { input: LegalCaseActors['updateCase']['input'] }
- ): Promise<Case> => {
+ updateCase: fromPromise<Case, LegalCaseActors['updateCase']['input']>(async (
+ { input }
+ ) => {
  const caseId = input.caseId;
  if (!caseId) throw new Error('Missing caseId for update');
  const response = await fetch(`/api/cases/${caseId}`, {
@@ -536,9 +536,9 @@ export const legalCaseMachine = setup({
  if (!response.ok) throw new Error('Update failed');
  return await response.json();
  }),
- deleteCase: fromPromise(async (
- { input }: { input: LegalCaseActors['deleteCase']['input'] }
- ): Promise<boolean> => {
+ deleteCase: fromPromise<boolean, LegalCaseActors['deleteCase']['input']>(async (
+ { input }
+ ) => {
  if (!input.caseId) throw new Error('Missing caseId for delete');
  const response = await fetch(`/api/cases/${input.caseId}`, { method: 'DELETE' });
  if (!response.ok) throw new Error('Delete failed');

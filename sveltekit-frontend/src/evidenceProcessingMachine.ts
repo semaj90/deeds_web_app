@@ -69,7 +69,10 @@ export const evidenceProcessingMachine = setup({
   types: { context: {} as EvidenceProcessingContext,
     events: {} as EvidenceProcessingEvent,
   },
-  actors: { documentProcessing: fromPromise(async ({ input }: { input: EvidenceProcessingContext }) => {
+  actors: { documentProcessing: fromPromise<{
+        jobId: string;
+        extractedText?: string; processingTime: number;
+      }, { input: EvidenceProcessingContext }>(async ({ input }) => {
       console.log(`Starting document processing for evidence: ${input.evidenceId}`);
 
       const result = await callProcessingAPI('document', {
@@ -91,7 +94,9 @@ export const evidenceProcessingMachine = setup({
         extractedText?: string; processingTime: number;
       };
     }),
-    embeddingGeneration: fromPromise(async ({ input }: { input: EvidenceProcessingContext }) => {
+    embeddingGeneration: fromPromise<{
+        chunks: Array<{ text: string; embedding, number[] }>;
+      }, { input: EvidenceProcessingContext }>(async ({ input }) => {
       console.log(`Generating embeddings for evidence: ${input.evidenceId}`);
 
       const result = await callProcessingAPI('embeddings', {
@@ -107,7 +112,11 @@ export const evidenceProcessingMachine = setup({
         chunks: Array<{ text: string; embedding, number[] }>;
       };
     }),
-    aiAnalysis: fromPromise(async ({ input }: { input: EvidenceProcessingContext }) => {
+    aiAnalysis: fromPromise<{
+        summary: string; entities: unknown[]; sentiment: string; classification: string;
+        riskAssessment?: string;
+        recommendations?: string[];
+      }, { input: EvidenceProcessingContext }>(async ({ input }) => {
       console.log(`Performing AI analysis for evidence: ${input.evidenceId}`);
 
       const result = await callProcessingAPI('analysis', {
@@ -122,7 +131,7 @@ export const evidenceProcessingMachine = setup({
         recommendations?: string[];
       };
     }),
-    cacheResults: fromPromise(async ({ input }: { input: EvidenceProcessingContext }) => {
+    cacheResults: fromPromise<void, { input: EvidenceProcessingContext }>(async ({ input }) => {
       console.log(`Caching final results for evidence: ${input.evidenceId}`);
 
       const finalResult = {

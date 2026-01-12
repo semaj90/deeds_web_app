@@ -18,7 +18,7 @@ export interface EmbeddingActorOutput {
   tokenCount?: number;
 }
 
-export const embeddingActor = fromPromise(async ({ input }: { input: EmbeddingActorInput }) => {
+export const embeddingActor = fromPromise<unknown, { input: EmbeddingActorInput }>(async ({ input })) => {
   const startTime = Date.now();
   try {
     const response = await fetchWithTimeout('/api/ai/embed', {
@@ -64,8 +64,8 @@ export interface DocumentProcessingOutput {
   processingTime: number; success: boolean;
 }
 
-export const documentProcessingActor = fromPromise(
-  async ({ input }: { input: DocumentProcessingInput }) => {
+export const documentProcessingActor = fromPromise<unknown, { input: DocumentProcessingInput }>(
+  async ({ input })) => {
     const startTime = Date.now();
     try {
       const response = await fetchWithTimeout('/api/ai/process-document', {
@@ -106,7 +106,7 @@ export interface LegalAnalysisOutput {
   riskScore: number; riskFactors: string[]; recommendations: string[]; precedents: Array<unknown>; confidence: number; processingTime: number;
 }
 
-export const legalAnalysisActor = fromPromise(async ({ input }: { input: LegalAnalysisInput }) => {
+export const legalAnalysisActor = fromPromise<unknown, { input: LegalAnalysisInput }>(async ({ input })) => {
   const startTime = Date.now();
   try {
     const response = await fetchWithTimeout('/api/ai/legal-analysis', {
@@ -148,7 +148,7 @@ export interface RAGSearchOutput {
   results: Array<unknown>; totalResults: number; processingTime: number; model: string;
 }
 
-export const ragSearchActor = fromPromise(async ({ input }: { input: RAGSearchInput }) => {
+export const ragSearchActor = fromPromise<unknown, { input: RAGSearchInput }>(async ({ input })) => {
   const startTime = Date.now();
   try {
     const response = await fetchWithTimeout('/api/ai/rag-search', {
@@ -207,8 +207,8 @@ export interface WorkflowOutput {
   totalTime: number; success: boolean; errors: Array<{ step: string; error, string }>;
 }
 
-export const workflowActor = fromPromise(
-  async ({ input }: { input: WorkflowInput }): Promise<WorkflowOutput> => {
+export const workflowActor = fromPromise<unknown, { input: WorkflowInput }>(
+  async ({ input })): Promise<WorkflowOutput> => {
     const startTime = Date.now();
     const results: { [key: string]: unknown } = {};
     const errors: Array<{ step: string; error, string }> = [];

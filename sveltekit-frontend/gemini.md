@@ -108,6 +108,13 @@ const promiseLogic = fromPromise<User, { userId: string }>(
 - **Estimated error reduction:** 1,200-1,800 errors after migration
 - **Detailed report:** `reports/xstate-migration/latest.md`
 
+**Fixes Applied (2026-01-12):**
+- ✅ `src/evidenceProcessingMachine.ts`: 4 fromPromise actors migrated to XState v5
+  - documentProcessing, embeddingGeneration, aiAnalysis, cacheResults
+  - Applied explicit type parameters: `fromPromise<OutputType, { input: InputType }>`
+- 📊 **Progress:** 1/39 high-priority files completed (2.6%)
+- 🎯 **Next:** Apply automated fixer to remaining 38 files
+
 ---
 
 ## 🎯 Phase 96: XState v5 Migration (2026-01-11)

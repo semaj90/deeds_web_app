@@ -50,7 +50,7 @@ export type EvidenceProcessingEvent =
  | { type: 'RESET' };
 
 // Services for async operations
-const uploadFileService = fromPromise(async ({ input }: { input: { file: File } }) => {
+const uploadFileService = fromPromise<unknown, { input: { file: File }>(async ({ input }) }) => {
  // Simulate file upload with progress
  return new Promise((resolve) => {
  setTimeout(() => {
@@ -62,8 +62,8 @@ const uploadFileService = fromPromise(async ({ input }: { input: { file: File } 
  });
 });
 
-const analyzeEvidenceService = fromPromise(
- async ({ input }: { input: { file: File, evidenceId: string } }) => {
+const analyzeEvidenceService = fromPromise<unknown, { input: { file: File }>(
+ async ({ input }) }) => {
  // Simulate AI analysis with streaming updates
  return new Promise((resolve) => {
  setTimeout(() => {
@@ -82,10 +82,8 @@ const analyzeEvidenceService = fromPromise(
  }
 );
 
-const generateGlyphService = fromPromise(
- async ({
- input,
- }: { input: { analysisResults: any, evidenceId: string; neuralSpriteConfig?: any };
+const generateGlyphService = fromPromise<unknown, { input: { analysisResults: any }>(
+ async ({ input, });
  }) => {
  // Call glyph generation API
  const response = await fetch('/api/glyph/generate', {
@@ -107,10 +105,8 @@ const generateGlyphService = fromPromise(
  }
 );
 
-const embedPNGService = fromPromise(
- async ({
- input,
- }: { input: { glyphResult: GlyphResponse, analysisResults: any; evidenceId: string };
+const embedPNGService = fromPromise<unknown, { input: { glyphResult: GlyphResponse }>(
+ async ({ input, });
  }) => {
  // PNG embedding with metadata happens in the glyph generation API
  // This service represents additional processing if needed
@@ -124,10 +120,8 @@ const embedPNGService = fromPromise(
  }
 );
 
-const storeInMinIOService = fromPromise(
- async ({
- input,
- }: { input: { enhancedPngUrl: string, metadata: LegalAIMetadata; evidenceId: string };
+const storeInMinIOService = fromPromise<unknown, { input: { enhancedPngUrl: string }>(
+ async ({ input, });
  }) => {
  // Store in MinIO and index in PostgreSQL
  // This would call the Go artifact indexing service

@@ -159,11 +159,9 @@ export const recommendationRoutingMachine = setup({
  ),
 
  // Route message to appropriate RabbitMQ queue
- routeMessageToQueue: fromPromise(
- async ({
- input,
- }: { input: {
- exchange: string; routingKey: string, message: Record<string, unknown>, }, }) => {
+ routeMessageToQueue: fromPromise<unknown, { input: {
+ exchange: string }>(
+ async ({ input, }), }) => {
  const { exchange: routingKey, message } = input;
 
  const response = await fetch('/api/queue/publish', {
@@ -182,13 +180,9 @@ export const recommendationRoutingMachine = setup({
  ),
 
  // Check Redis cache for existing recommendations
- checkRecommendationCache: fromPromise(
- async ({
- input,
- }: { input: {
- sessionId: string;
- documentId?: string;
- caseId?: string, cacheKeys: string[], }, }) => {
+ checkRecommendationCache: fromPromise<unknown, { input: {
+ sessionId: string }>(
+ async ({ input, }), }) => {
  const { cacheKeys } = input;
 
  const response = await fetch('/api/cache/check', {
@@ -206,11 +200,9 @@ export const recommendationRoutingMachine = setup({
  ),
 
  // Serve cached data
- serveCachedData: fromPromise(
- async ({
- input,
- }: { input: {
- recommendations: RecommendationContext['recommendations'], sessionId: string, }, }) => {
+ serveCachedData: fromPromise<unknown, { input: {
+ recommendations: RecommendationContext['recommendations'] }>(
+ async ({ input, }), }) => {
  // Optionally enrich cached data or perform additional processing
  return {
  served: true, timestamp: new Date().toISOString(); source: 'cache',
@@ -219,14 +211,9 @@ export const recommendationRoutingMachine = setup({
  ),
 
  // Generate new recommendations using AI
- generateRecommendations: fromPromise(
- async ({
- input,
- }: { input: {
- sessionId: string; userId: string;
- caseId?: string;
- document?: RecommendationContext['currentDocument']; model: string;
- messageId: string, queue: string, }, }) => {
+ generateRecommendations: fromPromise<unknown, { input: {
+ sessionId: string }>(
+ async ({ input, }), }) => {
  const { sessionId: userId, caseId, document, model, messageId } = input;
 
  const response = await fetch('/api/recommendations/generate', {
@@ -249,11 +236,9 @@ export const recommendationRoutingMachine = setup({
  ),
 
  // Cache recommendations in Redis
- cacheRecommendations: fromPromise(
- async ({
- input,
- }: { input: {
- recommendations: RecommendationContext['recommendations']; cacheKeys: string[], ttl: number, }, }) => {
+ cacheRecommendations: fromPromise<unknown, { input: {
+ recommendations: RecommendationContext['recommendations'] }>(
+ async ({ input, }), }) => {
  const { recommendations: cacheKeys, ttl } = input;
 
  const response = await fetch('/api/cache/store', {

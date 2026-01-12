@@ -30,17 +30,17 @@ function extractInlineType(code, matchStart) {
   let inString = false;
   let stringChar = null;
   let i = matchStart;
-  
+
   // Start from 'fromPromise('
   const fromPromiseMatch = code.slice(matchStart).match(/^fromPromise\s*\(/);
   if (!fromPromiseMatch) return null;
-  
+
   i = matchStart + fromPromiseMatch[0].length - 1; // Position at opening paren
-  
+
   for (; i < code.length; i++) {
     const char = code[i];
     const prevChar = i > 0 ? code[i - 1] : '';
-    
+
     // Handle string literals
     if ((char === '"' || char === "'" || char === '`') && prevChar !== '\\') {
       if (!inString) {
@@ -51,7 +51,7 @@ function extractInlineType(code, matchStart) {
         stringChar = null;
       }
     }
-    
+
     if (!inString) {
       if (char === '(') depth++;
       if (char === ')') {
@@ -60,45 +60,45 @@ function extractInlineType(code, matchStart) {
       }
     }
   }
-  
+
   const fullCall = code.slice(matchStart, i + 1);
-  
+
   // More robust pattern matching for inline types
   // Pattern: async ({ input, ...rest }: { input: TypeDef, ...other })
   const asyncMatch = fullCall.match(/async\s*\(\s*\{([^}]+)\}\s*:\s*\{([^}]+)\}/s);
-  
+
   if (!asyncMatch) {
     return null;
   }
-  
+
   const destructuredParams = asyncMatch[1];
   const typeAnnotation = asyncMatch[2];
-  
+
   // Extract just the input type
   const inputMatch = typeAnnotation.match(/input:\s*([^,;}]+)/);
   if (!inputMatch) {
     return null;
   }
-  
+
   let inputType = inputMatch[1].trim();
-  
+
   // Clean up type - remove trailing semicolons, comments
   inputType = inputType.replace(/[;,].*$/, '').trim();
-  
+
   // Try to infer output type from return statement or type context
   let outputType = 'unknown';
-  
+
   // Look for explicit return type
   const returnMatch = fullCall.match(/return\s+([^;]+)/);
   if (returnMatch) {
     const returnValue = returnMatch[1].trim();
-    
+
     // Infer from common patterns
     if (returnValue.includes('fetch(')) outputType = 'Response';
     else if (returnValue.match(/await\s+\w+\./)) outputType = 'unknown';
     else outputType = 'unknown';
   }
-  
+
   return {
     fullCall,
     inputType,
@@ -110,17 +110,20 @@ function extractInlineType(code, matchStart) {
  * Generate fixed code with generic parameters
  */
 function generateFix(typeInfo) {
-  const { fullCall, inputType, outputType } = typeInfo;
+  const { fullCall, inputType, outputType, destructuredParams } = typeInfo;
 
-  // Replace inline type with generic parameters
+  // Build the generic parameters
+  const generics = `<${outputType}, { input: ${inputType} }>`;
+
+  // Replace the inline type annotation with just the destructuring
   const fixed = fullCall
     .replace(
       /fromPromise\s*\(/,
-      `fromPromise<${outputType}, { ${inputType} }>(`
+      `fromPromise${generics}(`
     )
     .replace(
-      /\{\s*([^}]+)\}\s*:\s*\{\s*input:\s*[^}]+\}/,
-      '{ $1 }'
+      /async\s*\(\s*\{[^}]+\}\s*:\s*\{[^}]+\}/,
+      `async ({ ${destructuredParams} })`
     );
 
   return fixed;
