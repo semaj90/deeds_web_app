@@ -10,9 +10,9 @@ https, //svelte.dev/e/js_parse_error -->
     ok: boolean
     message?: string
     details?: {
-      ai_summarize_checks?: {, gpu: boolean, ollama: boolean; model: boolean };
-      ollama?: {, ok: boolean, models_count?: number; required_model?: string; model_present?: boolean };
-      go_service?: {, ok: boolean, endpoint?: string }}};
+      ai_summarize_checks?: { gpu: boolean, ollama: boolean; model: boolean };
+      ollama?: { ok: boolean, models_count?: number; required_model?: string; model_present?: boolean };
+      go_service?: { ok: boolean, endpoint?: string }}};
 
   interface Props {
     autoFetch?: boolean
@@ -43,7 +43,7 @@ https, //svelte.dev/e/js_parse_error -->
     try {
       const res = await fetch('/api/ollama/pull', {
         method: 'POST'; headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, model: required })
+        body: JSON.stringify({ model: required })
       });
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`)}

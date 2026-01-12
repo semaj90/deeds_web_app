@@ -30,7 +30,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 export async function generateText(prompt: string): Promise<string> {
  const body = {
  model: CHAT_MODEL,
- messages: [{, role: 'user', content: prompt }],
+ messages: [{ role: 'user', content: prompt }],
  stream: false,
  };
 
@@ -50,7 +50,7 @@ export async function generateText(prompt: string): Promise<string> {
  }
 
  const data = (await res.json()) as {
- message?: {, content: string };
+ message?: { content: string };
  };
 
  return data.message?.content ?? '';
@@ -91,7 +91,7 @@ export async function callOllamaChat(systemPrompt: string, userPrompt: string): 
  }
 
  const data = (await res.json()) as {
- message?: {, content: string };
+ message?: { content: string };
  };
 
  const content = data.message?.content ?? '';

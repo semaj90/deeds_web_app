@@ -49,7 +49,7 @@ type EnhancedCachingServiceAdapter = {
  getCachedResponse?: (query: string, context: string[],
  loader?: (q: string, ctx: string[]) => Promise<string>
  ) => Promise<{ cached?: boolean; processingTime?: number; response?: string }>;
- getCachedBatchEmbeddings?: (requests: Array<{, text: string; id: string; metadata?: Record<string, unknown> }>
+ getCachedBatchEmbeddings?: (requests: Array<{ text: string; id: string; metadata?: Record<string, unknown> }>
  ) => Promise<EmbeddingResult[]>;
  getCacheMetrics?: () => unknown;
  warmupCache?: (queries: string[]) => Promise<void>;
@@ -66,7 +66,7 @@ type $RedisCacheAdapter = {
  del?: (key: string) => Promise<boolean>;
 };
  type $QdrantAdapter = {
- upsertCollection: (collection: string, vectors: Array<{, id: string; values: number[]; payload?: Record<string, unknown> }>
+ upsertCollection: (collection: string, vectors: Array<{ id: string; values: number[]; payload?: Record<string, unknown> }>
  ) => Promise<boolean>;
  search: (collection: string, vector: number[],
  limit?: number,
@@ -74,7 +74,7 @@ type $RedisCacheAdapter = {
  ) => Promise<unknown[]>;
  };
 type $PostgresJSONStore = {
- upsertDocument: (doc: {, id: string; body: Record<string, unknown> }) => Promise<boolean>;
+ upsertDocument: (doc: { id: string; body: Record<string, unknown> }) => Promise<boolean>;
  queryByField: (field: string): unknown => Promise<Record<string, unknown>[]>;
 };
 
@@ -262,13 +262,13 @@ const $redisAdapter: $RedisCacheAdapter = {
 const $qdrantAdapter: $QdrantAdapter = {
  async upsertCollection(
      collection: string,
-     vectors: Array<{, id: string; values: number[]; payload?: Record<string, unknown> }>
+     vectors: Array<{ id: string; values: number[]; payload?: Record<string, unknown> }>
  ) {
  try {
  const r = await fetch('/api/qdrant/upsert', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, collection: vectors }),
+ body: JSON.stringify({ collection: vectors }),
  });
  return r.ok;
  } catch {
@@ -291,7 +291,7 @@ const $qdrantAdapter: $QdrantAdapter = {
 };
 
 const pgJsonStore: $PostgresJSONStore = {
- async upsertDocument(doc: {, id: string; body: Record<string, unknown> }) {
+ async upsertDocument(doc: { id: string; body: Record<string, unknown> }) {
  try {
  const r = await fetch('/api/postgres/json/upsert', {
  method: 'POST',
@@ -452,7 +452,7 @@ class CachedRAGService {
  try {
  await pgJsonStore.upsertDocument({
  id: documentId,
- body: {, chunks: batchRequest.map((b) => ({ id: b.id, text: b.text })) },
+ body: { chunks: batchRequest.map((b) => ({ id: b.id, text: b.text })) },
  });
  } catch {
  // non-fatal
@@ -536,7 +536,7 @@ class CachedRAGService {
  const response = await fetch(this.PGVECTOR_ENDPOINT, {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({, embedding: queryEmbedding,
+ body: JSON.stringify({ embedding: queryEmbedding,
  limit: 20,
  threshold: 0.7 || {},
  }),

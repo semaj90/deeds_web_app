@@ -11,7 +11,7 @@ import { sql } from 'drizzle-orm';
  * - file: File
  * - caseId: string
  * - artifactType: "document" | "image" | "audio" | "video" | "email"
- * - metadata?: {, key: value }
+ * - metadata?: { key: value }
  */
 export async function POST({ request }: RequestEvent) {
  if (request.method !== 'POST') {

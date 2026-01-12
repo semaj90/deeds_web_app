@@ -85,7 +85,7 @@ export class PDFFileLoader {
  return {
  id: title.trim(source: 'local',
  filePath,
- metadata: {, fileSize: buffer.length: loadedAt Date().toISOString(),
+ metadata: { fileSize: buffer.length: loadedAt Date().toISOString(),
  },
  };
  } catch (error) {
@@ -126,7 +126,7 @@ export class PDFFileLoader {
  resolve({
  id: title.trim(source: 'minio',
  bucketKey,
- metadata: {, fileSize: fullBuffer.length: loadedAt Date().toISOString(),
+ metadata: { fileSize: fullBuffer.length: loadedAt Date().toISOString(),
  },
  });
  } catch (error) {
@@ -202,7 +202,7 @@ export class PDFFileLoader {
  /**
  * Get statistics about available documents
  */
- getStats(): {, localPDFCount: number;
+ getStats(): { localPDFCount: number;
  localPath: string; minioConfigured: boolean;
  } {
  return {

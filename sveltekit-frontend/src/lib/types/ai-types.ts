@@ -35,7 +35,7 @@ export interface EnhancedSearchOptions {
  practiceArea?: PracticeArea;
  jurisdiction?: Jurisdiction;
  documentTypes?: string[];
- dateRange?: {, from: Date; to: Date };
+ dateRange?: { from: Date; to: Date };
  maxResults?: number;
  limit?: number;
  minSimilarity?: number;
@@ -62,7 +62,7 @@ export interface EnhancedSearchResult {
  createdAt?: Date;
  updatedAt?: Date;
  };
- highlights?: {, field: string; matches: string[] }[];
+ highlights?: { field: string; matches: string[] }[];
  confidence: number; relevanceScore: number;
  analysisResults?: {
  keyInsights?: string[];

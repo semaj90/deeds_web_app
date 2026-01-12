@@ -12,7 +12,7 @@ export type RagSearchRequest = {
 export type RagSearchResult = {
  id: string; score: number;
  finalScore?: number;
- explain?: {, cosine: number;
+ explain?: { cosine: number;
  sharedTags: number; sameJurisdiction: number;
  finalScore: number;
  };
@@ -64,7 +64,7 @@ export type TagBrowseRequest = {
 };
 
 export type TagBrowseResponse = {
- tags: Array<{, id: string;
+ tags: Array<{ id: string;
  namespace: string; name: string;
  jurisdiction: string | null;
  created_at: string;

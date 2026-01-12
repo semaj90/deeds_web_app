@@ -410,7 +410,7 @@ export interface YoRHaReactiveState<T> {
  * Enhanced-Bits compatible theme configuration
  */
 export interface YoRHaEnhancedTheme extends UITheme {
- enhancedBits: {, cardStyles: Record<string, string>;
+ enhancedBits: { cardStyles: Record<string, string>;
  buttonVariants: Record<string, string>;
  inputStyles: Record<string, string>;
  };

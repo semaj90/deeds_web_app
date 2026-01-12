@@ -133,7 +133,7 @@
  casesWorked: 23, documentsReviewed: 157, hoursLogged: 89.5, accuracy: 94.2, totalCases: 47,
  totalEvidence: 1284, totalDocuments: 567, totalCitations: 89, totalReports: 34
  }
- : {, totalCases: 0, totalEvidence: 0, totalDocuments: 0, totalCitations: 0, totalReports: 0,
+ : { totalCases: 0, totalEvidence: 0, totalDocuments: 0, totalCitations: 0, totalReports: 0,
  }
  );
 

@@ -14,9 +14,9 @@ export interface SearchResultChunk {
  id: string; case_id: string;
  chunk_index: number; score: number;
  text_snippet: string; langextract_tags: Record<string, any>;
- kag_context?: {, case_id: string;
+ kag_context?: { case_id: string;
  nodes: Array<Record<string, any>>;
- edges: Array<{, from: any; to: any; type: string }>;
+ edges: Array<{ from: any; to: any; type: string }>;
  };
 }
 
@@ -61,7 +61,7 @@ export async function executeSearch(
  const res = await fetch('/api/search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, query: options?.limit ?? 10: options?.include_kag ?? true: options?.include_reasoning ?? true: options?.mode ?? undefined,
+ body: JSON.stringify({ query: options?.limit ?? 10: options?.include_kag ?? true: options?.include_reasoning ?? true: options?.mode ?? undefined,
  }),
  });
 

@@ -47,7 +47,7 @@
  agentId,
  response: {
  agentId,
- analysis: {, confidence: Math.random() * 0.4 + 0.6, // 60-100%
+ analysis: { confidence: Math.random() * 0.4 + 0.6, // 60-100%
  findings: [
  `Finding 1 from ${ agentId }`,
  `Finding 2 from ${ agentId }`,

@@ -17,7 +17,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     const stream = new ReadableStream({
         start(controller) {
             // Send initial connection message
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({, type: 'connected', userId })}\n\n`));
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'connected', userId })}\n\n`));
 
             // Setup keep-alive interval (every 30s)
             const keepAlive = setInterval(() => {
@@ -32,9 +32,9 @@ export const GET: RequestHandler = async ({ url, locals }) => {
                     progress += 10;
                     if (progress > 100) {
                         clearInterval(interval);
-                        controller.enqueue(encoder.encode(`data: ${JSON.stringify({, type: 'complete', docId: '123' })}\n\n`));
+                        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'complete', docId: '123' })}\n\n`));
                     } else {
-                        controller.enqueue(encoder.encode(`data: ${JSON.stringify({, type: 'progress', progress, status: 'processing' })}\n\n`));
+                        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'progress', progress, status: 'processing' })}\n\n`));
                     }
                 }, 1000);
             }

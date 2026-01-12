@@ -49,7 +49,7 @@ export interface SearchOptions {
 export interface SearchFilters {
   tags?: string[];
   source?: string;
-  dateRange?: {, start: Date; end: Date };
+  dateRange?: { start: Date; end: Date };
   urlPattern?: string;
 }
 
@@ -68,9 +68,9 @@ export interface SearchResult {
 
 export interface CollectionStats {
   totalDocuments: number; indexedVectors: number;
-  collections: {, qdrant: { points: number; status: string };
-    postgres: {, rows: number };
-    minio: {, objects: number; size: string };
+  collections: { qdrant: { points: number; status: string };
+    postgres: { rows: number };
+    minio: { objects: number; size: string };
   };
   lastIndexed: string;
 }
@@ -86,7 +86,7 @@ export interface ReindexStats {
 
 export interface MCPToolResult {
   success: boolean; results: SearchResult[];
-  metadata: {, queryTime: number;
+  metadata: { queryTime: number;
     cacheHit: boolean; totalDocs: number;
   };
 }
@@ -155,7 +155,7 @@ export interface ACPTool {
   inputSchema: Record<string, unknown>;
   outputSchema: Record<string, unknown>;
   examples: ToolExample[]; handler: ToolHandler;
-  rateLimit?: {, requests: number; window: number };
+  rateLimit?: { requests: number; window: number };
 }
 
 export interface ToolExample {
@@ -486,9 +486,9 @@ export interface DocumentResponse {
 
 export interface StatsResponse {
   totalDocuments: number; indexedVectors: number;
-  collections: {, qdrant: { points: number; status: string };
-    postgres: {, rows: number };
-    minio: {, objects: number; size: string };
+  collections: { qdrant: { points: number; status: string };
+    postgres: { rows: number };
+    minio: { objects: number; size: string };
   };
   lastIndexed: string;
 }

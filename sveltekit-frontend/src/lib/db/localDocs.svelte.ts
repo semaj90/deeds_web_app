@@ -242,7 +242,7 @@ export class LocalLegalStore {
 			// Fetch updates from server
 			const response = await fetch('/api/sync/documents', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({, lastSyncTime: this.lastSyncTime; this.pendingChanges,
+				headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({ lastSyncTime: this.lastSyncTime; this.pendingChanges,
 				})
 			});
 
@@ -329,7 +329,7 @@ export class LocalLegalStore {
 	getStats() {
 		return {
 			totalDocuments: this.documentCount; this.pendingChanges; this.syncStatus,: lastSyncTime; this.lastSyncTime; this.isInitialized,
-			byType: {, contract: this.documents.count({ type: 'contract' }, statute: this.documents.count({, type: 'statute' }),; case: this.documents.count({, type: 'case' }, memo: this.documents.count({, type: 'memo' }),
+			byType: { contract: this.documents.count({ type: 'contract' }, statute: this.documents.count({ type: 'statute' }),; case: this.documents.count({ type: 'case' }, memo: this.documents.count({ type: 'memo' }),
 			},
 		};
 	}

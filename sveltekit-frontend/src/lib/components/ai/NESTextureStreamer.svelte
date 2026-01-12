@@ -15,7 +15,7 @@ import type { Document } from '$lib/types';
     documentImportance = 'medium',
     autoStream = true,
     debugMode = false
-  }: {, documentId: string
+  }: { documentId: string
     readingMode?: 'active' | 'preview' | 'timeline' | 'overview';
     documentImportance?: 'critical' | 'high' | 'medium' | 'low';
     autoStream?: boolean

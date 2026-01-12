@@ -127,7 +127,7 @@ export interface Context7McpConfig {
 }
 export interface Context7McpResponse {
  library: string; content: string;
- metadata: {, tokenCount: number; version?: string; topics: string[]; confidence: number };
+ metadata: { tokenCount: number; version?: string; topics: string[]; confidence: number };
  snippets?: CodeSnippet[];
 }
 export interface CodeSnippet {

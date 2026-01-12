@@ -70,7 +70,7 @@ export interface FactContradiction {
 
 export interface UIContradiction {
  route: string; type: string;
- details: {, expected: UISpec;
+ details: { expected: UISpec;
  actual: UISemanticSnapshot;
  message?: string;
  };
@@ -81,7 +81,7 @@ export interface ContradictionEngineInput {
  testimony?: MarkdownEvidenceInput[];
  uiSnapshots?: UISnapshotInput[];
  routeSpecs?: RouteSpecInput[];
- timeline?: Array<{, time: string; description?: string }>;
+ timeline?: Array<{ time: string; description?: string }>;
 }
 
 export interface TimelineFact {
@@ -114,7 +114,7 @@ export interface ContradictionEngineResult {
  factContradictions: FactContradiction[]; uiContradictions: UIContradiction[];
  timelineContradictions?: TimelineContradiction[];
  timelineDescriptions?: string[]; reasoning: string;
- objection: {, triggered: boolean;
+ objection: { triggered: boolean;
  message: string; level: 'critical' | 'warning' | 'none';
  };
  ragSuggestions?: Record<string, unknown>;

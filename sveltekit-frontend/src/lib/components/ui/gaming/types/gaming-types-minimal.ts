@@ -13,9 +13,9 @@ export interface ProgressiveGamingConfig {
  performanceThreshold: number; autoDetectPerformance: boolean;
  fallbackToLowQuality: boolean; adaptiveFrameRate: boolean;
  thermalThrottling: boolean; batteryOptimization: boolean;
- nesSettings: {, strictPalette: boolean; enableScanlines: boolean; pixelScale: number };
- snesSettings: {, enableGradients: boolean; enableModeViitColors: boolean; layerCount: number };
- n64Settings: {, enableAntiAliasing: boolean;
+ nesSettings: { strictPalette: boolean; enableScanlines: boolean; pixelScale: number };
+ snesSettings: { enableGradients: boolean; enableModeViitColors: boolean; layerCount: number };
+ n64Settings: { enableAntiAliasing: boolean;
  enableTextureFiltering: boolean; enableMipMapping: boolean;
  polygonCount: string; enableFog: boolean;
  fogColor: string; fogDensity: number;

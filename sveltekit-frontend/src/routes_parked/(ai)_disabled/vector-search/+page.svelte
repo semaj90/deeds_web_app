@@ -27,7 +27,7 @@
  const response = await fetch('/api/ai/vector-search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, query: query.trim( type: searchType,
+ body: JSON.stringify({ query: query.trim( type: searchType,
  threshold,
  limit,
  }),

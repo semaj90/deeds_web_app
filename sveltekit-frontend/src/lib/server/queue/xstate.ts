@@ -28,40 +28,40 @@ const queueMachine = createMachine<QueueContext, QueueEvent>(
  {
  id: 'queue',
  initial: 'idle',
- context: {, jobs: new Map(),
+ context: { jobs: new Map(),
      activeJobs: new Set(),
      maxConcurrency: 3, retryDelay: 1000
  },
- states: {, idle: {
- on: {, ADD_JOB: {
+ states: { idle: {
+ on: { ADD_JOB: {
  actions: 'addJob',
  target: 'processing',
  },
  PROCESS_QUEUE: 'processing',
  },
  },
- processing: {, entry: 'processQueue',
- on: {, ADD_JOB: {
+ processing: { entry: 'processQueue',
+ on: { ADD_JOB: {
  actions: 'addJob',
  },
- START_JOB: {, actions: 'startJob',
+ START_JOB: { actions: 'startJob',
  },
- COMPLETE_JOB: {, actions: 'completeJob',
+ COMPLETE_JOB: { actions: 'completeJob',
  },
- FAIL_JOB: {, actions: 'failJob',
+ FAIL_JOB: { actions: 'failJob',
  },
- RETRY_JOB: {, actions: 'retryJob',
+ RETRY_JOB: { actions: 'retryJob',
  },
- CANCEL_JOB: {, actions: 'cancelJob',
+ CANCEL_JOB: { actions: 'cancelJob',
  },
- SET_CONCURRENCY: {, actions: 'setConcurrency',
+ SET_CONCURRENCY: { actions: 'setConcurrency',
  },
  },
  },
  },
  },
  {
- actions: {, addJob: assign((context, event) => {
+ actions: { addJob: assign((context, event) => {
  if (event.type !== 'ADD_JOB') return context;
 
  const job: QueueState = {
@@ -216,11 +216,11 @@ export class XStateQueueManager {
 
 // Legal-specific queue configurations
 export const LEGAL_QUEUE_CONFIGS = {
- documentProcessing: {, maxConcurrency: 2, retryDelay: 2000, maxRetries: 3,
+ documentProcessing: { maxConcurrency: 2, retryDelay: 2000, maxRetries: 3,
  },
- aiAnalysis: {, maxConcurrency: 1, retryDelay: 5000, maxRetries: 2,
+ aiAnalysis: { maxConcurrency: 1, retryDelay: 5000, maxRetries: 2,
  },
- evidenceIngestion: {, maxConcurrency: 3, retryDelay: 1000, maxRetries: 5,
+ evidenceIngestion: { maxConcurrency: 3, retryDelay: 1000, maxRetries: 5,
  },
 } as const;
 

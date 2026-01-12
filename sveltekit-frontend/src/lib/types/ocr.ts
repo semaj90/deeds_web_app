@@ -16,7 +16,7 @@ export interface OCRResult {
 export interface OCRWord {
  text: string;
  confidence?: number;
- boundingBox?: {, x: number;
+ boundingBox?: { x: number;
  y: number; width: number;
  height: number;
  };

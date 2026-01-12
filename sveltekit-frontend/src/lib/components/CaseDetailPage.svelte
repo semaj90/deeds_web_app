@@ -16,7 +16,7 @@
  interface Summary {
  id: string; caseId: string;
  text: string; holding: string;
- citations: Array<{, code: string;
+ citations: Array<{ code: string;
  title: string; jurisdiction: string;
  }>;
  version: number; createdAt: string;
@@ -75,7 +75,7 @@
  const response = await fetch('/api/cases/summary', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, caseId: includeEvidence, true,
+ body: JSON.stringify({ caseId: includeEvidence, true,
  includeTimeline: true,
  analysisDepth: 'comprehensive',
  }),

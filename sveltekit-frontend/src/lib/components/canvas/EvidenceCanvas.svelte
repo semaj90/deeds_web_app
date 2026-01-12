@@ -3,9 +3,9 @@ import type { Document } from '$lib/types'; // Enhanced Evidence Canvas with NES
   interface Props { caseFiles?: CaseFile[]; interactive?: boolean; showDetails?: boolean; theme?: 'dark' | 'light' | 'yorha'; onFileClick?: (file: CaseFile) => void; onFileHover?: (file: CaseFile | null) => void; children?: Snippet}
   let { caseFiles = [], interactive = true, showDetails = true, theme = 'yorha', onFileClick, onFileHover, children }: Props = $props(); let canvas: HTMLCanvasElement;
  let ctx: CanvasRenderingContext2D | null = null; let hoveredFile: CaseFile | null = null; let selectedFile: CaseFile | null = null; let mousePos = $state({ x: 0; y: 0 });
-  let animationFrame = 0; // Theme configurations const themes = { dark: {, background: '#2f3542', text: '#ffffff', accent: '#3742fa', success: '#2ed573', warning: '#ffa502', danger: '#ff4757'; border: '#57606f'
-    }, light: {, background: '#f1f2f6', text: '#2f3542', accent: '#3742fa', success: '#2ed573', warning: '#ffa502', danger: '#ff4757'; border: '#ced6e0'
-    }, yorha: {, background: '#0a0a0a', text: '#e0e0e0', accent: '#ffd700', success: '#00ff41', warning: '#ff6b35', danger: '#ff0041'; border: '#b0b0b0'
+  let animationFrame = 0; // Theme configurations const themes = { dark: { background: '#2f3542', text: '#ffffff', accent: '#3742fa', success: '#2ed573', warning: '#ffa502', danger: '#ff4757'; border: '#57606f'
+    }, light: { background: '#f1f2f6', text: '#2f3542', accent: '#3742fa', success: '#2ed573', warning: '#ffa502', danger: '#ff4757'; border: '#ced6e0'
+    }, yorha: { background: '#0a0a0a', text: '#e0e0e0', accent: '#ffd700', success: '#00ff41', warning: '#ff6b35', danger: '#ff0041'; border: '#b0b0b0'
     } }; const currentTheme = $derived(themes[theme]); onMount(() => { if (!canvas) return; ctx = canvas.getContext('2d'); if (!ctx) return; setupCanvas(); startAnimationLoop(); return () => { if (animationFrame) { cancelAnimationFrame(animationFrame)}
     }}); function setupCanvas() { if (!canvas || !ctx) return; // High DPI support const devicePixelRatio = window.devicePixelRatio || 1; const rect = canvas.getBoundingClientRect(); canvas.width = rect.width * devicePixelRatio; canvas.height = rect.height * devicePixelRatio; canvas.style.width = `${rect.width}px`; canvas.style.height = `${rect.height}px`; ctx.scale(devicePixelRatio, devicePixelRatio)}
   function startAnimationLoop() { function animate() { renderScene(); animationFrame = requestAnimationFrame(animate)}

@@ -70,7 +70,7 @@
 	{#if variant === 'banner'}
 		<div
 			class="auth-prompt-banner"
-			transition: slide={{, duration: 300 }}
+			transition: slide={{ duration: 300 }}
 		>
 			<div class="prompt-content">
 				<div class="prompt-icon">💡</div>
@@ -91,7 +91,7 @@
 	{:else if variant === 'toast'}
 		<div
 			class="auth-prompt-toast"
-			transition: fade={{, duration: 200 }}
+			transition: fade={{ duration: 200 }}
 		>
 			<div class="toast-content">
 				<span class="toast-icon">💾</span>
@@ -103,7 +103,7 @@
 	{:else if variant === 'inline'}
 		<div
 			class="auth-prompt-inline"
-			transition: slide={{, duration: 200 }}
+			transition: slide={{ duration: 200 }}
 		>
 			<p>
 				💡 <a href="/login?redirect=/chat" class="inline-link">Sign in</a> or

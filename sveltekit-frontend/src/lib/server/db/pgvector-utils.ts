@@ -279,7 +279,7 @@ export async function searchSimilarEvidence(
 /**
  * Insert chat message with vector embedding
  */
-export async function insertChatMessageWithEmbedding(messageData: {, id: string;
+export async function insertChatMessageWithEmbedding(messageData: { id: string;
     sessionId: string; role: string;
     content: string; embedding: number[];
     metadata?: Record<string, unknown>;

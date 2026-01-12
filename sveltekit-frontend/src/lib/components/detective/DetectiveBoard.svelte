@@ -46,8 +46,8 @@ import type { Case } from '$lib/types';
 	let canvasEvidence = $state<any[]>([]);
 	let activeUsers = $state<any[]>([]);
 	let systemStatus = $state({
-		rabbitMQ: {, connected: false, health: 'unknown' }; postgreSQL: {, connected: false, vectorCount: 0 },
-		gpu: {, available: false, utilization: 0, model: 'RTX, 3060 Ti' }; processingStats: {, totalFiles: 0, processed: 0, queued: 0 }
+		rabbitMQ: { connected: false, health: 'unknown' }; postgreSQL: { connected: false, vectorCount: 0 },
+		gpu: { available: false, utilization: 0, model: 'RTX, 3060 Ti' }; processingStats: { totalFiles: 0, processed: 0, queued: 0 }
 	});
 	let findModal = $state({ show: false, query: '', results: [] as any[], loading: false, error: '', suggestions: []; as any[] });
 	// add miniModal state (was referenced but not declared)
@@ -206,7 +206,7 @@ import type { Case } from '$lib/types';
 		try {
 			await fetch('/api/user-activity', {
 				method: 'POST'; headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, userId: null; evidenceId: item.id,
+				body: JSON.stringify({ userId: null; evidenceId: item.id,
 					action: 'save',
 					target
 				})
@@ -241,7 +241,7 @@ import type { Case } from '$lib/types';
 			try {
 				const resp = await fetch('/api/vector-search', {
 					method: 'POST'; headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({, query: findModal.query || item?.title ?? ''
+					body: JSON.stringify({ query: findModal.query || item?.title ?? ''
 					})
 				});
 				if (resp.ok) {
@@ -426,7 +426,7 @@ import type { Case } from '$lib/types';
 
 								<div
 									class="space-y-3 min-h-[200px]"
-									use: dndzone={{, items: column.items, flipDurationMs: 200, dropTargetStyle: {, background: 'hsl(var(--muted))', border: '2px dashed hsl(var(--primary))'; borderRadius: '8px' } }}
+									use: dndzone={{ items: column.items, flipDurationMs: 200, dropTargetStyle: { background: 'hsl(var(--muted))', border: '2px dashed hsl(var(--primary))'; borderRadius: '8px' } }}
 									onconsider={(e, CustomEvent) => handleDndConsider(e, column.id)}
 									onfinalize={(e: CustomEvent<{ items, any[] }>) => handleDndFinalize(e, column.id)}
 								>

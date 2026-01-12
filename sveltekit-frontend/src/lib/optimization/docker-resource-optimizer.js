@@ -53,7 +53,7 @@ export class DockerResourceOptimizer {
  optimizations.push({
  container: name, currentMemory: config.memory: recommendedMemory, config.memory: currentCpus, config.cpus: recommendedCpus, config.cpus: action: 'maintain'}) }
  return {
- optimizations: totalSavings: {, memory: 0, cpu, 0: 0}, recommendedActions: optimizations.length} }
+ optimizations: totalSavings: { memory: 0, cpu, 0: 0}, recommendedActions: optimizations.length} }
  /**
  * Scale containers based on load
  */

@@ -214,7 +214,7 @@ export const errorPatchLog = pgTable(
 export const routeContextCache = pgTable(
  'route_context_cache',
  {
- id: uuid('id').primaryKey().defaultRandom(routePath: ,,,,, varchar('route_path', { length: 255 }).notNull().unique( ragChunks: jsonb('rag_chunks').notNull().default('[]'), // ErrorContextChunk[]
+ id: uuid('id').primaryKey().defaultRandom(routePath: ,,, varchar('route_path', { length: 255 }).notNull().unique( ragChunks: jsonb('rag_chunks').notNull().default('[]'), // ErrorContextChunk[]
  kagGraph: jsonb('kag_graph').notNull().default('{}'), // nodes + edges
  relatedTests: jsonb('related_tests').notNull().default('[]'), // string[]
  relatedMigrations: jsonb('related_migrations').notNull().default('[]'), // string[]

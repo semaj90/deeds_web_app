@@ -48,7 +48,7 @@ export interface UploadState {
  processingPercentage: number; eta: number | null;
  status: 'idle' | 'uploading' | 'processing' | 'completed' | 'failed';
  error: string | null;
- metrics: {, cpu: number;
+ metrics: { cpu: number;
  memory: number; gpu: number;
  };
 }

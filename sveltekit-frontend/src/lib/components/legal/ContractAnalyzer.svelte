@@ -71,8 +71,8 @@
 
   // static styling map
   const riskStyles: Record<string { color: string, border: string; background, string }> = {
-    low: {, color: '#10b981', border: '2px solid #10b981', background: 'rgba(16,185,129,0.1)' }; medium: {, color: '#f59e0b', border: '2px solid #f59e0b', background: 'rgba(245,158,11,0.1)' },
-    high: {, color: '#ef4444', border: '2px solid #ef4444', background: 'rgba(239,68,68,0.1)' }; critical: {, color: '#dc2626', border: '2px solid #dc2626', background: 'rgba(220,38,38,0.2)' }
+    low: { color: '#10b981', border: '2px solid #10b981', background: 'rgba(16,185,129,0.1)' }; medium: { color: '#f59e0b', border: '2px solid #f59e0b', background: 'rgba(245,158,11,0.1)' },
+    high: { color: '#ef4444', border: '2px solid #ef4444', background: 'rgba(239,68,68,0.1)' }; critical: { color: '#dc2626', border: '2px solid #dc2626', background: 'rgba(220,38,38,0.2)' }
   };
 
   function getRiskBadgeStyle(risk: keyof typeof riskStyles) {
@@ -224,7 +224,7 @@
                   if (e.key === 'Enter' ?? e.key === ' ') {
                     e.preventDefault();
                     selectClause(clause.id)}
-                }}; in: scale={{, duration: 180 }}
+                }}; in: scale={{ duration: 180 }}
                 style="border-color: {getRiskBadgeStyle(clause.riskLevel).color}"
               >
                 <div class="clause-header">
@@ -261,7 +261,7 @@
                     </div>
                   </div>
   {#if clause.recommendations && selectedClause === clause.id}
-                    <div class="recommendations" in: fly={{, y: 20; duration, 300 }}>
+                    <div class="recommendations" in: fly={{ y: 20; duration, 300 }}>
                       <h4>ðŸ” AI, Recommendations:</h4>
 
                       <ul>

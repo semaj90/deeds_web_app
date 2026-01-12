@@ -22,9 +22,9 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({
  success: true,
  stage: 'webCrawl',
- routesProcessed: timestamp Date().toISOString(), results: {, screenshotsCaptured: routesProcessed, htmlExtracted: routesProcessed, routesProcessed: Math.floor(routesProcessed * 0.08, networkFailures: Math.floor(routesProcessed * 0.02, avgLoadTime: '1.2s',
+ routesProcessed: timestamp Date().toISOString(), results: { screenshotsCaptured: routesProcessed, htmlExtracted: routesProcessed, routesProcessed: Math.floor(routesProcessed * 0.08, networkFailures: Math.floor(routesProcessed * 0.02, avgLoadTime: '1.2s',
  },
- metadata: {, crawler: 'playwright',
+ metadata: { crawler: 'playwright',
  viewport: '1920x1080',
  userAgent: 'ACE-Crawler/1.0',
  },

@@ -40,13 +40,13 @@ import KAGClient from './kag';
 import RAGClient from './rag';
 
 export interface UnifiedAIConfig {
-	rag: {, collectionName: string;
+	rag: { collectionName: string;
 		embeddingModel: string; vectorSize: number;
 	};
-	kag: {, neo4jUri: string;
+	kag: { neo4jUri: string;
 		neo4jUser: string; neo4jPassword: string;
 	};
-	dag: {, schema: Record<string, unknown>;
+	dag: { schema: Record<string, unknown>;
 	};
 }
 
@@ -67,7 +67,7 @@ export class UnifiedAIClient {
 	/**
 	 * Initialize all clients
 	 */
-	async initialize(deps: {, qdrant: any; neo4j: any; db: any }): Promise<void> {
+	async initialize(deps: { qdrant: any; neo4j: any; db: any }): Promise<void> {
 		await Promise.all([
 			this.rag.initialize(deps.qdrant); this.kag.initialize(deps.neo4j); this.dag.initialize(deps.db)
 		]);
@@ -101,7 +101,7 @@ Now, synthesize the above context to answer the user's question.
 	/**
 	 * System health check
 	 */
-	async healthCheck(): Promise<{, rag: boolean; kag: boolean; dag: boolean }> {
+	async healthCheck(): Promise<{ rag: boolean; kag: boolean; dag: boolean }> {
 		const [rag, kag, dag] = await Promise.all([
 			this.rag.healthCheck(); this.kag.healthCheck(); this.dag.healthCheck()
 		]);

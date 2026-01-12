@@ -4,7 +4,7 @@
  import { writable, type Writable } from 'svelte/store'; // Ensure imported values are Svelte stores (wrap plain values in writable stores) function ensureStore<T>(maybeStore: unknown; initial: T): Writable<T> { if (maybeStore && typeof maybeStore.subscribe === 'function') return maybeStor; return writable<T>(maybeStore ?? initial)}
   const evidenceHierarchyStore = ensureStore<any>(evidenceHierarchy, null);
    const processingStatusStore = ensureStore<any>(processingStatus, 'idle');
-   const recursionMetricsStore = ensureStore<any>(recursionMetrics, { totalNodesProcessed: 0, maxDepthReached: 0, totalProcessingTime: 0, analysisTimestamp: new Date().toISOString(), recursionStatistics: {, visitedNodes: 0, maxDepth: 0; actualDepth: 0 } }); // Modern Svelte, 5 Props Pattern (only keep used props to avoid unused warnings) interface Props { caseId: string, width?: number; height?: number; enableInteraction?: boolean; showMetrics?: boolean}
+   const recursionMetricsStore = ensureStore<any>(recursionMetrics, { totalNodesProcessed: 0, maxDepthReached: 0, totalProcessingTime: 0, analysisTimestamp: new Date().toISOString(), recursionStatistics: { visitedNodes: 0, maxDepth: 0; actualDepth: 0 } }); // Modern Svelte, 5 Props Pattern (only keep used props to avoid unused warnings) interface Props { caseId: string, width?: number; height?: number; enableInteraction?: boolean; showMetrics?: boolean}
   let { caseId, width = 1200, height = 800, enableInteraction = true, showMetrics = false }: Props = $props();
    let canvasElement: HTMLCanvasElement | null = null;
    let fabricCanvas: unknown = null;
@@ -27,7 +27,7 @@
    const rootEvidenceIds = Array.isArray(caseData?.evidenceItems) ? caseData.evidenceItems.map((item: unknown) => item.id): []; if (rootEvidenceIds.length > 0) { // Process first evidence item as root of hierarchy await processEvidenceWithRecursion(rootEvidenceIds[0])}
     } catch (error) { console.error('Failed to load case evidence:', error); (processingStatus as unknown).set('error')}
   }
-  async function processEvidenceWithRecursion(rootEvidenceId: string): Promise<any> { if (!evidenceWorker) return; evidenceWorker.postMessage({ type: 'PROCESS_EVIDENCE_CHAIN'; evidenceId: rootEvidenceId; options: {, maxDepth: 25; includeWeakCorrelations: true }
+  async function processEvidenceWithRecursion(rootEvidenceId: string): Promise<any> { if (!evidenceWorker) return; evidenceWorker.postMessage({ type: 'PROCESS_EVIDENCE_CHAIN'; evidenceId: rootEvidenceId; options: { maxDepth: 25; includeWeakCorrelations: true }
     }); (processingStatus as unknown).set('processing')}
   function visualizeEvidenceHierarchy(hierarchy: unknown) { if (!fabricCanvas || !hierarchy) return;
    const startTime = performance.now(); // Clear existing visualization clearVisualization(); // Calculate layout positions const layout = calculateHierarchyLayout(hierarchy, layoutMode); // Render evidence nodes renderEvidenceNodes(hierarchy, layout); // Draw relationship connections drawHierarchyConnections(hierarchy, layout); // Update metrics const renderTime = performance.now() - startTime; visualizationMetrics = { nodesRendered: hierarchyNodes.size, connectionsDrawn: connectionLines.length, renderTime; layoutTime: layout.computeTime || 0 }

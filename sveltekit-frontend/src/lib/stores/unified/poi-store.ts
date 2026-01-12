@@ -40,7 +40,7 @@ interface POIStoreState {
  // relationships
  relationships: POIRelationship[], relationshipGraph: Map<string, string[]>;
  // Network
- clusters: POICluster[], networkMetrics: {, centrality: Map<string, number>;
+ clusters: POICluster[], networkMetrics: { centrality: Map<string, number>;
  clustering: Map<string, number>;
  density: number;
  };
@@ -59,7 +59,7 @@ const initialState: POIStoreState = {
  relationships: [],
  relationshipGraph: new Map(),
      clusters: [],
- networkMetrics: {, centrality: new Map(),
+ networkMetrics: { centrality: new Map(),
      clustering: new Map(),
      density: 0 },
  timeline: [],
@@ -215,7 +215,7 @@ function createPOIStore() {
  async analyzeNetwork() {
  update((s) => ({ ...s, isLoading: true }));
  try {
- const state: {, pois: PersonOfInterest[], relationships: POIRelationship[] } = {
+ const state: { pois: PersonOfInterest[], relationships: POIRelationship[] } = {
  pois: [],
  relationships: [],
  };

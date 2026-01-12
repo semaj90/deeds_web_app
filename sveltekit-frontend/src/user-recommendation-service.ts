@@ -12,7 +12,7 @@ export interface UserPattern {
 	frequentCases: string[]; preferredTopics: string[];
 	queryComplexity: 'simple' | 'moderate' | 'complex';
 	usageFrequency: 'low' | 'medium' | 'high';
-	timePatterns: {, mostActiveHours: number[];
+	timePatterns: { mostActiveHours: number[];
 		averageSessionLength: number; queriesPerSession: number;
 	};
 }
@@ -149,7 +149,7 @@ export class UserRecommendationService {
 				preferredTopics: topicAnalysis.topics,
 				queryComplexity: queryStats.complexity,
 				usageFrequency: sessionStats.frequency as 'high' | 'low' | 'medium',
-				timePatterns: {, mostActiveHours: sessionStats.activeHours,
+				timePatterns: { mostActiveHours: sessionStats.activeHours,
 					averageSessionLength: sessionStats.avgSessionLength,
 					queriesPerSession: sessionStats.avgQueriesPerSession
 				}
@@ -332,7 +332,7 @@ export class UserRecommendationService {
 	private async extractTopTopics(
 		userId: string,
 		limit: number
-	): Promise<Array<{, topic: string; count: number }>> {
+	): Promise<Array<{ topic: string; count: number }>> {
 		const queries = await db
 			.select({ query: userAiQueries.query })
 			.from(userAiQueries)
@@ -392,7 +392,7 @@ export class UserRecommendationService {
 		return 'complex';
 	}
 
-	private extractActiveHours(sessions: {, startedAt: Date | string | null }[]): number[] {
+	private extractActiveHours(sessions: { startedAt: Date | string | null }[]): number[] {
 		const hourCounts = new Map<number, number>();
 
 		sessions.forEach((session) => {
@@ -478,7 +478,7 @@ export class UserRecommendationService {
 
 	private generateImprovementSuggestions(
 		stats: { avgProcessingTime?: number | null; successfulQueries?: number; totalQueries?: number },
-		topTopics: Array<{, topic: string; count: number }>
+		topTopics: Array<{ topic: string; count: number }>
 	): string[] {
 		const suggestions: string[] = [];
 		const successRate =

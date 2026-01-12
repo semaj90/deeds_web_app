@@ -215,21 +215,21 @@ export class LokiSearchService {
 }
 
 export const LEGAL_LOKI_CONFIGS = {
-    cases: {, collection: 'cases',
+    cases: { collection: 'cases',
         indices: ['caseNumber', 'title', 'status', 'createdAt'],
         unique: ['caseNumber'],
     },
-    evidence: {, collection: 'evidence',
+    evidence: { collection: 'evidence',
         indices: ['caseId', 'title', 'evidenceType', 'createdAt', 'tags'],
     },
-    documents: {, collection: 'documents',
+    documents: { collection: 'documents',
         indices: ['caseId', 'title', 'documentType', 'createdAt', 'author'],
     },
-    persons: {, collection: 'persons',
+    persons: { collection: 'persons',
         indices: ['name', 'aliases', 'caseIds', 'createdAt'],
         unique: ['name'],
     },
-    annotations: {, collection: 'annotations',
+    annotations: { collection: 'annotations',
         indices: ['evidenceId', 'userId', 'createdAt', 'type'],
     },
 } as const;

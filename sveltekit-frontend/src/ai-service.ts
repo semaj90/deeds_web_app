@@ -64,7 +64,7 @@ export class AIService {
     userId: string,
     caseId?: string,
     options: AIQueryOptions = {}
-  ): Promise<{, response: string; confidence: number; contextUsed: string[];
+  ): Promise<{ response: string; confidence: number; contextUsed: string[];
     queryId?: string;
   }> {
     const startTime = Date.now();
@@ -267,7 +267,7 @@ Format your response as JSON with the structure:
     queryEmbedding: number[],
     userId?: string,
     limit = 5
-  ): Promise<Array<{, query: string; response: string; similarity: number }>> {
+  ): Promise<Array<{ query: string; response: string; similarity: number }>> {
     try {
       if (userId) {
         const rows = (await db.execute(
@@ -347,7 +347,7 @@ Format your response as JSON with the structure:
   /**
    * Log AI query to database
    */
-  private async logQuery(data: {, userId: string;
+  private async logQuery(data: { userId: string;
     caseId?: string; query: string; response: string; model: string; confidence: number; processingTime: number; contextUsed: string[];
     embedding?: number[];
     isSuccessful?: boolean;

@@ -160,7 +160,7 @@ export async function invalidateCacheByType(type: CacheType): Promise<void> {
 /**
  * Get cache statistics
  */
-export async function getCacheStats(): Promise<{, available: boolean;
+export async function getCacheStats(): Promise<{ available: boolean;
  keyCount: number;
  memoryUsage?: string;
 } | null> {

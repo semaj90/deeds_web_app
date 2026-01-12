@@ -62,7 +62,7 @@ export class RAGClient {
 			await this.qdrant.getCollection(this.config.collectionName);
 		} catch {
 			await this.qdrant.createCollection(this.config.collectionName, {
-				vectors: {, size: this.config.vectorSize,
+				vectors: { size: this.config.vectorSize,
 					distance: 'Cosine'
 				}
 			});
@@ -84,7 +84,7 @@ export class RAGClient {
 				{
 					id: doc.id,
 					vector: doc.embedding,
-					payload: {, content: doc.content,
+					payload: { content: doc.content,
 						...doc.metadata
 					}
 				}

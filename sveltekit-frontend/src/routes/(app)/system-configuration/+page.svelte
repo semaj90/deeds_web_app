@@ -5,33 +5,33 @@
 
  // Configuration settings
  let config = $state({
- general: {, theme: 'yorha',
+ general: { theme: 'yorha',
  language: 'en',
  timezone: 'UTC',
  autoSave: true,
  notifications: true
  },
- ai: {, model: 'gemma3-legal',
+ ai: { model: 'gemma3-legal',
  temperature: 0.7,
  maxTokens: 2048,
  ollamaEndpoint: 'http://localhost:11434',
  embeddingModel: 'embeddinggemma',
  enableFallback: true
  },
- database: {, type: 'postgresql',
+ database: { type: 'postgresql',
  host: 'localhost',
  port: 5432,
  database: 'legal_ai_db',
  ssl: false,
  connectionPool: 10
  },
- gpu: {, enableWebGPU: true,
+ gpu: { enableWebGPU: true,
  enableCUDA: true,
  memoryLimit: 80,
  batchSize: 32,
  precision: 'fp16'
  },
- security: {, encryption: 'AES256',
+ security: { encryption: 'AES256',
  sessionTimeout: 3600,
  twoFactor: false,
  auditLogging: true,
@@ -42,9 +42,9 @@
  let systemInfo = $state({
  version: '2.0.0',
  uptime: '0d 0h 0m',
-	memory: {, used: 0, total: 0, percentage: 0 },
-	disk: {, used: 0, total: 0, percentage: 0 },
-	cpu: {, usage: 0, cores: 0 }
+	memory: { used: 0, total: 0, percentage: 0 },
+	disk: { used: 0, total: 0, percentage: 0 },
+	cpu: { usage: 0, cores: 0 }
  });
 
  let webgpuCapabilities = $state({ hasWebGPU: false });
@@ -73,33 +73,33 @@
  function resetToDefaults() {
  // Reset to default values
  config = {
- general: {, theme: 'yorha',
+ general: { theme: 'yorha',
  language: 'en',
  timezone: 'UTC',
  autoSave: true,
  notifications: true
  },
- ai: {, model: 'gemma3-legal',
+ ai: { model: 'gemma3-legal',
  temperature: 0.7,
  maxTokens: 2048,
  ollamaEndpoint: 'http://localhost:11434',
  embeddingModel: 'embeddinggemma',
  enableFallback: true
  },
- database: {, type: 'postgresql',
+ database: { type: 'postgresql',
  host: 'localhost',
  port: 5432,
  database: 'legal_ai_db',
  ssl: false,
  connectionPool: 10
  },
- gpu: {, enableWebGPU: true,
+ gpu: { enableWebGPU: true,
  enableCUDA: true,
  memoryLimit: 80,
  batchSize: 32,
  precision: 'fp16'
  },
- security: {, encryption: 'AES256',
+ security: { encryption: 'AES256',
  sessionTimeout: 3600,
  twoFactor: false,
  auditLogging: true,
@@ -140,9 +140,9 @@
  systemInfo = {
  version: '2.0.0',
  uptime: '2d 14h 32m',
-	memory: {, used: 8192, total: 16384, percentage: 50 },
-	disk: {, used: 256, total: 512, percentage: 50 },
-	cpu: {, usage: 45, cores: 8 }
+	memory: { used: 8192, total: 16384, percentage: 50 },
+	disk: { used: 256, total: 512, percentage: 50 },
+	cpu: { usage: 45, cores: 8 }
  };
 
  performanceMetrics = {

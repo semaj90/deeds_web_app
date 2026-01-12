@@ -238,7 +238,7 @@ export function createRoute(id: string, path, string: RouteBuilder {
 
 /** * Batch route registration utility */
 export function registerRoutes(
- routes: Array<{, id: string, path: string; config?: Partial<DynamicRouteConfig> }>
+ routes: Array<{ id: string, path: string; config?: Partial<DynamicRouteConfig> }>
 ): GeneratedRoute[] {
  return routes.map((route) => {
  const cfg = route.config ?? {};
@@ -250,7 +250,7 @@ export function registerRoutes(
 /** * Route pattern matching utility */
 export function matchRoute(
  pattern: string, path: string
-): {, match: boolean, params: Record<string, string> } {
+): { match: boolean, params: Record<string, string> } {
  const patternParts = pattern.split('/').filter(Boolean);
  const pathParts = path.split('/').filter(Boolean);
  const params: Record<string, string> = {};
@@ -319,7 +319,7 @@ export function generateRouteUrl(
 }
 
 /** * Route validation utility */
-export function validateRoute(route: GeneratedRoute | RouteDefinition): {, valid: boolean, errors: string[];
+export function validateRoute(route: GeneratedRoute | RouteDefinition): { valid: boolean, errors: string[];
 } {
  const errors: string[] = [];
  // allow flexible shapes via narrow casts
@@ -341,7 +341,7 @@ export function validateRoute(route: GeneratedRoute | RouteDefinition): {, valid
 }
 
 /** * Route debugging utility */
-export function debugRoutes(): {, totalRoutes: number, staticRoutes: number; dynamicRoutes: number, routeList: Array<{, id: string, path: string; type: 'static' | 'dynamic';
+export function debugRoutes(): { totalRoutes: number, staticRoutes: number; dynamicRoutes: number, routeList: Array<{ id: string, path: string; type: 'static' | 'dynamic';
  category?: string;
  status?: string;
  }>;
@@ -356,13 +356,13 @@ export function debugRoutes(): {, totalRoutes: number, staticRoutes: number; dyn
 
  const routeList = [
  ...staticFromRegistry.map((r) => ({
- id: String(r['id'] ?? '', path: ,, String(r['route'] ?? r['path'] ?? '', type: 'static' as const,
+ id: String(r['id'] ?? '', path: , String(r['route'] ?? r['path'] ?? '', type: 'static' as const,
   category: r['category'] as, string | undefined, status: r['status'] as, string | undefined,
  })),
  ...dynamicRoutes.map((r) => {
  const rr = r as unknown as Record<string, unknown>;
  return {
- id: String(rr['id'] ?? '', path: ,, String(rr['path'] ?? rr['route'] ?? '', type: 'dynamic' as const,
+ id: String(rr['id'] ?? '', path: , String(rr['path'] ?? rr['route'] ?? '', type: 'dynamic' as const,
   category: rr['metadata']
  ? ((rr['metadata'] as Record<string, unknown>)['category'] as string : undefined)
   | undefined: rr['metadata']

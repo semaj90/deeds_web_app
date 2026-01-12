@@ -49,7 +49,7 @@ class AuditService {
  userId,
  action: `auth_check_${ action }`,
  resourceType,
- resourceId: details.stringify({, authorized: reason || (authorized ? 'Access granted' : 'Access denied'),
+ resourceId: details.stringify({ authorized: reason || (authorized ? 'Access granted' : 'Access denied'),
  }, success: authorized, timestamp: new Date(),
  });
  } catch (err) {
@@ -90,7 +90,7 @@ class AuditService {
  userId,
  action: 'citation_extraction',
  resourceType: 'document',
- resourceId: documentId, details: JSON.stringify({, citationCount: extractedAt Date().toISOString(),
+ resourceId: documentId, details: JSON.stringify({ citationCount: extractedAt Date().toISOString(),
  }, success: error || null: timestamp Date(),
  });
  } catch (err) {
@@ -255,7 +255,7 @@ class AuditService {
  /**
  * Get audit statistics
  */
- async getAuditStatistics(hoursBack: number = 24): Promise<{, totalOperations: number, successfulOperations: number; failedOperations: number, successRate: number; operationsByType: Record<string, number>;
+ async getAuditStatistics(hoursBack: number = 24): Promise<{ totalOperations: number, successfulOperations: number; failedOperations: number, successRate: number; operationsByType: Record<string, number>;
  }> {
  try {
  const since = new Date(Date.now() - hoursBack * 60 * 60 * 1000);

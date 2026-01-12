@@ -2,7 +2,7 @@
  import { createEventDispatcher } from 'svelte';
 
  let { summary } = $props<{
- summary: {, id: string;
+ summary: { id: string;
  caseId: string; text: string;
  holding: string; citations: Array<{
  code: string; title: string;
@@ -29,7 +29,7 @@
  const response = await fetch(`/api/cases/${summary.caseId}/summary`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, text: editedText, holding: editedHolding,
+ body: JSON.stringify({ text: editedText, holding: editedHolding,
  }),
  });
 

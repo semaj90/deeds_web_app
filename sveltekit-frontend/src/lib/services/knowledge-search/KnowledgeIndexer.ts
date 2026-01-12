@@ -208,7 +208,7 @@ export class KnowledgeIndexer {
       const response = await fetch(`${this.config.ollamaUrl}/api/embeddings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, model: this.config.embeddingModel,
+        body: JSON.stringify({ model: this.config.embeddingModel,
           prompt: content.slice(0, 8000) // Limit to 8k chars
         })
       });
@@ -251,10 +251,10 @@ Summary:`;
       const response = await fetch(`${this.config.ollamaUrl}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, model: this.config.summaryModel,
+        body: JSON.stringify({ model: this.config.summaryModel,
           prompt,
           stream: false,
-          options: {, temperature: 0.3, num_predict: 200 },
+          options: { temperature: 0.3, num_predict: 200 },
         })
       });
 
@@ -368,7 +368,7 @@ Summary:`;
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({, points: [
+          body: JSON.stringify({ points: [
               {
                 id: qdrantId,
                 vector: embedding,

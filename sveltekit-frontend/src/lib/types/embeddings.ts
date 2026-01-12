@@ -30,7 +30,7 @@ export interface BatchEmbeddingRequest {
 }
 export interface TextPreprocessingResult {
  cleanText: string; tokens: string[];
- metadata: {, originalLength: number;
+ metadata: { originalLength: number;
  cleanedLength: number; tokenCount: number;
  hasSpecialChars: boolean;
  };
@@ -44,7 +44,7 @@ export interface WASMEmbeddingConfig {
 }
 export interface BatchEmbeddingResponse {
  success: boolean; results: EmbeddingResponse[];
- summary: {, total: number; successful: number; failed: number; processingTime: string };
+ summary: { total: number; successful: number; failed: number; processingTime: string };
 }
 export interface VectorDocument {
  id: string; content: string;

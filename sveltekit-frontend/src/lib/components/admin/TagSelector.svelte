@@ -60,7 +60,7 @@
 			const res = await fetch('/api/tags', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, name: newTagName.trim().toLowerCase().replace(/\s+/g, '-'),
+				body: JSON.stringify({ name: newTagName.trim().toLowerCase().replace(/\s+/g, '-'),
 					jurisdiction
 				})
 			});

@@ -52,7 +52,7 @@ async function connectRedis(): Promise<RedisClient | null> {
  try {
  const options: any = {
  url: DEFAULT_REDIS_URL,
- socket: {, reconnectStrategy: () => 1000,
+ socket: { reconnectStrategy: () => 1000,
  },
  };
 
@@ -111,7 +111,7 @@ export async function setCache(
  }
 }
 
-export function getFromMemoryCache(key: string): {, found: boolean; value?: unknown } {
+export function getFromMemoryCache(key: string): { found: boolean; value?: unknown } {
  const entry = memoryCache.get(key);
  if (!entry) return { found: false };
 
@@ -125,7 +125,7 @@ export function getFromMemoryCache(key: string): {, found: boolean; value?: unkn
 
 const tokenBuckets = new Map<string, { tokens: number; lastRefill: number }>();
 
-export function checkRateLimit(key = 'global'): {, ok: boolean; remaining: number } {
+export function checkRateLimit(key = 'global'): { ok: boolean; remaining: number } {
  const now = Date.now();
  const bucket = tokenBuckets.get(key) ?? { tokens: RATE_LIMIT_TOKENS, lastRefill: now };
  const elapsed = now - bucket.lastRefill;
@@ -152,7 +152,7 @@ export async function redisRateLimit(
  key = 'global',
  maxRequests = RATE_LIMIT_TOKENS,
  windowMs = RATE_LIMIT_REFILL_MS
-): Promise<{, ok: boolean; remaining: number }> {
+): Promise<{ ok: boolean; remaining: number }> {
  const client = await getRedisClient();
  if (!client) {
  return checkRateLimit(key);

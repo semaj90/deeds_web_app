@@ -97,7 +97,7 @@ export interface TensorMetadata {
  jurisdiction: string; embeddingModel: string;
  processingType: 'chunk' | 'sentence' | 'paragraph' | 'document';
  legalEntities: string[]; context: Record<string, unknown>;
- quality: {, completeness: number; accuracy: number; relevance: number };
+ quality: { completeness: number; accuracy: number; relevance: number };
 }
 export interface TileConfiguration {
  tileSize: [number, number, number, number];
@@ -119,7 +119,7 @@ export interface TricubicInterpolation {
  tensorId: string; coordinates: [number, number];
  result: Float32Array; confidence: number;
  interpolationMethod: 'tricubic' | 'trilinear' | 'nearest';
- parameters: {, smoothness: number;
+ parameters: { smoothness: number;
  boundaryCondition: 'zero' | 'periodic' | 'mirror';
  accuracy: 'low' | 'medium' | 'high';
  };
@@ -129,11 +129,11 @@ export interface WebGPUContext {
  device: GPUDevice | null; // GPUDevice when WebGPU is available
  adapter: GPUAdapter | null; // GPUAdapter when WebGPU is available
  isSupported: boolean; isInitialized: boolean;
- capabilities: {, maxComputeWorkgroupStorageSize: number;
+ capabilities: { maxComputeWorkgroupStorageSize: number;
  maxComputeWorkgroupsPerDimension: number; maxComputeInvocationsPerWorkgroup: number;
  maxBufferSize: number;
  };
- memoryUsage: {, allocated: number; available: number; peak: number };
+ memoryUsage: { allocated: number; available: number; peak: number };
 }
 export interface GPUBufferInfo {
  id: string; buffer: GPUBuffer; // GPUBuffer when WebGPU is available
@@ -151,8 +151,8 @@ export interface LegalDocumentAnalysis {
  keyFindings: string[]; legalEntities: LegalEntity[];
  riskFactors: RiskFactor[]; recommendations: string[];
  confidence: number; citedCases: CitedCase[];
- practiceAreaClassification: {, primary: string; secondary: string[]; confidence: number };
- jurisdictionAnalysis: {, primary: string; applicable: string[]; conflicts?: string[] };
+ practiceAreaClassification: { primary: string; secondary: string[]; confidence: number };
+ jurisdictionAnalysis: { primary: string; applicable: string[]; conflicts?: string[] };
  processingTime: number; metadata: Record<string, unknown>;
 }
 export interface LegalEntity {
@@ -168,7 +168,7 @@ export interface RiskFactor {
  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
  description: string;
  mitigation?: string; confidence: number;
- impact: {, financial: number; operational: number; reputational: number };
+ impact: { financial: number; operational: number; reputational: number };
  probability: number; timeframe: 'IMMEDIATE' | 'SHORT_TERM' | 'MEDIUM_TERM' | 'LONG_TERM';
 }
 export interface CitedCase {
@@ -205,7 +205,7 @@ export interface VectorSearchResponse {
  results: SearchResult[]; totalResults: number;
  queryTime: number; searchMode: string;
  usedCache: boolean; modelUsed: string;
- aggregations?: {, practiceAreas: Record<string, number>;
+ aggregations?: { practiceAreas: Record<string, number>;
  documentTypes: Record<string, number>;
  jurisdictions: Record<string, number>;
  };
@@ -226,14 +226,14 @@ export interface WebSocketEvent {
 }
 export interface SystemMetrics {
  timestamp: number; cpu: { usage: number; cores: number; frequency: number };
- memory: {, used: number; available: number; total: number; swap: number };
- gpu?: {, usage: number;
- memory: {, used: number; total: number };
+ memory: { used: number; available: number; total: number; swap: number };
+ gpu?: { usage: number;
+ memory: { used: number; total: number };
  temperature: number; power: number;
  };
- network: {, latency: number; throughput: number; packetLoss: number };
- storage: {, read: number; write: number; usage: number };
- services: {, redis: 'healthy' | 'degraded' | 'down';
+ network: { latency: number; throughput: number; packetLoss: number };
+ storage: { read: number; write: number; usage: number };
+ services: { redis: 'healthy' | 'degraded' | 'down';
  postgres: 'healthy' | 'degraded' | 'down';
  quic: 'healthy' | 'degraded' | 'down';
  webgpu: 'available' | 'unavailable';
@@ -245,7 +245,7 @@ export interface QUICConfig {
  connectionTimeout: number; retryAttempts: number;
  retryDelay: number; enableMetrics: boolean;
  compressionLevel: number; priorityMode: 'none' | 'static' | 'dynamic';
- flowControl: {, initialWindow: number; maxWindow: number; autoTuning: boolean };
+ flowControl: { initialWindow: number; maxWindow: number; autoTuning: boolean };
 }
 export interface WebGPUConfig {
  enableWebGPU: boolean; preferredAdapter: 'integrated' | 'discrete' | 'cpu';

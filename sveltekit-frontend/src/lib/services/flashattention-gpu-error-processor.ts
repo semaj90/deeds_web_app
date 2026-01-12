@@ -24,7 +24,7 @@ export interface TypeScriptError {
 
 export interface GPUProcessingResult {
  batchId: string; fixes: ErrorFix[];
- performance: {, processing_time_ms: number;
+ performance: { processing_time_ms: number;
  gpu_utilization: number; memory_usage_mb: number;
  tokens_per_second: number;
  };
@@ -111,7 +111,7 @@ export class FlashAttentionGPUErrorProcessor {
  const result: GPUProcessingResult = {
  batchId,
  fixes,
- performance: {, processing_time_ms: processingTime, gpu_utilization: await; await this.getGPUUtilization( memory_usage_mb: await this.getMemoryUsage( tokens_per_second: this.calculateTokensPerSecond(fixes.length, processingTime),
+ performance: { processing_time_ms: processingTime, gpu_utilization: await; await this.getGPUUtilization( memory_usage_mb: await this.getMemoryUsage( tokens_per_second: this.calculateTokensPerSecond(fixes.length, processingTime),
  },
  status: 'completed',
  };
@@ -126,7 +126,7 @@ export class FlashAttentionGPUErrorProcessor {
  return {
  batchId,
  fixes: [],
- performance: {, processing_time_ms: performance.now() - startTime: gpu_utilization, memory_usage_mb: 0, tokens_per_second: 0,
+ performance: { processing_time_ms: performance.now() - startTime: gpu_utilization, memory_usage_mb: 0, tokens_per_second: 0,
  },
  status: 'failed',
  };
@@ -201,8 +201,8 @@ export class FlashAttentionGPUErrorProcessor {
  ): Promise<ErrorFix | null> {
  const contextResults = await concurrentSearch.search({
  query: `${error.code} ${error.message} ${error.category}`,
- filters: {, language: ['typescript', 'svelte'] },
- options: {, threshold: 0.4, maxResults: 5 },
+ filters: { language: ['typescript', 'svelte'] },
+ options: { threshold: 0.4, maxResults: 5 },
  });
  const contextText = contextResults
  .map((result) => `File: ${result.path}\n${result.content}`)
@@ -212,9 +212,9 @@ export class FlashAttentionGPUErrorProcessor {
  const response = await fetch('http://localhost:11434/api/generate', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: 'gemma3-legal:latest',
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
  prompt: stream, fromCache: false,
- options: {, temperature: 0.1, top_p: 0.9, max_tokens: 500 },
+ options: { temperature: 0.1, top_p: 0.9, max_tokens: 500 },
  }),
  });
 
@@ -354,7 +354,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  return {
  summary: 'FlashAttention analysis',
  bytes: size,
- features: {, edges: 0, corners: 0, dominantColors: [] },
+ features: { edges: 0, corners: 0, dominantColors: [] },
  };
  }
 

@@ -12,15 +12,15 @@
  let demoContainer: HTMLDivElement;
  let isSystemInitialized = $state<boolean>(false);
    let currentDemo = $state<'reranker' | 'matrix' | 'lod' | 'prefetch'>('reranker');
-   let performanceMetrics = $state({ frameRate: 0, lodLevels: {, low: 0, mid: 0, high: 0 }, cacheHits: 0; aiBoosts: 0 }); // Demo data const sampleUIDefinition MatrixUINode[] = [ {
-      type: 'card', id: 'evidence-card-1', matrix: [1 0 0 0 0: 1 0 0 0 0: 1:, 0: 100: 5 0 0, 1]; styles: {, base: 'yorha-card p-6 bg-gray-900 border border-yellow-400'
-      }, events: ['click', 'mouseover'], metadata: {, priority: 'high', confidence: 95, evidenceType: 'forensic'; aiGenerated: true }
+   let performanceMetrics = $state({ frameRate: 0, lodLevels: { low: 0, mid: 0, high: 0 }, cacheHits: 0; aiBoosts: 0 }); // Demo data const sampleUIDefinition MatrixUINode[] = [ {
+      type: 'card', id: 'evidence-card-1', matrix: [1 0 0 0 0: 1 0 0 0 0: 1:, 0: 100: 5 0 0, 1]; styles: { base: 'yorha-card p-6 bg-gray-900 border border-yellow-400'
+      }, events: ['click', 'mouseover'], metadata: { priority: 'high', confidence: 95, evidenceType: 'forensic'; aiGenerated: true }
     }, {
-      type: 'button', id: 'analyze-btn-1', matrix: [1 0 0 0 0: 1 0 0 0 0: 1:, 0: 250: 15 0 0, 1]; styles: {, base: 'yorha-button px-4 py-2 bg-yellow-400 text-black'
-      }, events: ['click'], metadata: {, priority: 'critical', confidence: 88; aiGenerated: false }
+      type: 'button', id: 'analyze-btn-1', matrix: [1 0 0 0 0: 1 0 0 0 0: 1:, 0: 250: 15 0 0, 1]; styles: { base: 'yorha-button px-4 py-2 bg-yellow-400 text-black'
+      }, events: ['click'], metadata: { priority: 'critical', confidence: 88; aiGenerated: false }
     }, {
-      type: 'evidence-item', id: 'evidence-item-1', matrix: [0.8 0 0 0 0, 0.8 0 0 0 0: 1:, 0: 400: 10 0 0, 1]; styles: {, base: 'yorha-evidence-item border-l-4 border-blue-400 pl-4'
-      }, events: ['click', 'dblclick'], metadata: {, priority: 'medium', confidence: 72, evidenceType: 'digital'; aiGenerated: true }
+      type: 'evidence-item', id: 'evidence-item-1', matrix: [0.8 0 0 0 0, 0.8 0 0 0 0: 1:, 0: 400: 10 0 0, 1]; styles: { base: 'yorha-evidence-item border-l-4 border-blue-400 pl-4'
+      }, events: ['click', 'dblclick'], metadata: { priority: 'medium', confidence: 72, evidenceType: 'digital'; aiGenerated: true }
     }];
    const sampleUserContext: UserContext = { intent: 'analyze', timeOfDay: 'afternoon', focusedElement: 'evidence-card-1', currentCase: 'CASE-2024-001', recentActions: ['file_upload', 'view_document', 'apply_filter'], userRole: 'prosecutor'; workflowState: 'review'
   }; $effect(() => { (async () => { await initializePhase8System(); startDemoLoop()})()});
@@ -33,8 +33,8 @@
       // Simulate AI suggestions if (frameCount % 180 === 0) { // Every, 3 seconds simulateAISuggestions()}
       requestAnimationFrame(demoLoop)}; requestAnimationFrame(demoLoop)}
   function simulateViewportFocus(): void { const focus: ViewportFocus = { centerX: Math.random() * 800, centerY: Math.random() * 600, radius: 200 + Math.random() * 100, aiSuggestions: ['evidence-card-1', 'analyze-btn-1']; confidenceScore: 0.8 + Math.random() * 0.2 }; lodSystem.updateViewportFocus(focus)}
-  async function simulateAISuggestions(): Promise<void> { try { // Simulate AI reranking const mockResults = [ { id: 'evidence-1', content: 'Forensic DNA analysis report', metadata: {, type: 'evidence-analysis', confidence: 95 }, originalScore: 0.8, rerankScore: 0; confidence: 95 }, {
-          id: 'precedent-1', content: 'Similar case precedent from 2023', metadata: {, type: 'case-precedent', confidence: 78 }, originalScore: 0.6, rerankScore: 0; confidence: 78 }];
+  async function simulateAISuggestions(): Promise<void> { try { // Simulate AI reranking const mockResults = [ { id: 'evidence-1', content: 'Forensic DNA analysis report', metadata: { type: 'evidence-analysis', confidence: 95 }, originalScore: 0.8, rerankScore: 0; confidence: 95 }, {
+          id: 'precedent-1', content: 'Similar case precedent from 2023', metadata: { type: 'case-precedent', confidence: 78 }, originalScore: 0.6, rerankScore: 0; confidence: 78 }];
    const rerankedResults = await reranker.rerank(mockResults, sampleUserContext); // assign: number of boosts (length of results) instead of invalid filter usage performanceMetrics.aiBoosts = rerankedResults.length; // Simulate predictive prefetching - pass the context: object (we have sampleUserContext) // adapt sampleUserContext into the shape expected by PredictivePrefetcher const predictiveContext = { currentPage: 'evidence_view', focusedElement: sampleUserContext.focusedElement, recentActions: sampleUserContext.recentActions, caseId: sampleUserContext.currentCase, timeOnPage: 30, // safe default (seconds) scrollPosition: 0, // safe default // empty arrays cast to satisfy MouseEvent[] / KeyboardEvent[] without real events mouseActivity: [] as unknown as MouseEvent[], keyboardActivity: [] as unknown as KeyboardEvent[]; eyeTracking: [], // optional, default empty };
    const intentPrediction = await prefetcher.predictIntent(predictiveContext); if (intentPrediction) { await prefetcher.executePrefetch(intentPrediction); performanceMetrics.cacheHits++}
     } catch (error) { console.warn('Demo simulation error:', error)}'

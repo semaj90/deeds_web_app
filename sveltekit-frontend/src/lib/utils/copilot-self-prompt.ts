@@ -30,14 +30,14 @@ export interface AgentResult {
 }
 
 export interface EngineeringAnalysis {
- solutions: {, steps: {
+ solutions: { steps: {
  action: string; description: string;
  commands: string[]; targetFiles: string[];
  dependencies?: string[];
  }[];
  approach: string; estimatedTime: number;
  }[];
- recommendations: {, type: Recommendation['category'];
+ recommendations: { type: Recommendation['category'];
  title: string; description: string;
  impact: Recommendation['impact']; effort: Recommendation['effort'];
  priority: number;
@@ -55,7 +55,7 @@ function getFastApiUrl(): string {
 }
 
 // Service implementation for CrewAI-based legal case analysis
-const analyzeLegalCaseWithCrew = async (caseData: {, prompt: string;
+const analyzeLegalCaseWithCrew = async (caseData: { prompt: string;
  documents: unknown[]; jurisdiction: string;
 }): Promise<Record<string, unknown>> => {
  const controller = new AbortController();
@@ -100,8 +100,8 @@ const autoGenService = {
 
 const aiWorkerManager = {
  submitTask: async (_task: AITask): Promise<string> => 'task-id',
- waitForTask: async (_taskId: string): Promise<{, response: { content: string } }> => ({
- response: {, content: 'synthesized result' },
+ waitForTask: async (_taskId: string): Promise<{ response: { content: string } }> => ({
+ response: { content: 'synthesized result' },
  }),
 };
 
@@ -322,7 +322,7 @@ export async function copilotSelfPrompt(
  recommendations,
  selfPrompt,
  executionPlan,
- metadata: {, processingTime: calculateConfidence(contextResults, agentResults, engineeringAnalysis),
+ metadata: { processingTime: calculateConfidence(contextResults, agentResults, engineeringAnalysis),
  sources: extractSources(contextResults, memoryResults, agentResults),
  tokensUsed,
  },

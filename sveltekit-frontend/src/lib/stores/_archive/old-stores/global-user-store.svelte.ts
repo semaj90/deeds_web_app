@@ -49,15 +49,15 @@ export interface UserProfile {
 export interface UserPreferences {
  theme: 'light' | 'dark' | 'yorha' | 'nes';
  language: string; timezone: string;
- aiAssistant: {, model: string;
+ aiAssistant: { model: string;
  temperature: number; maxTokens: number;
  enableStreaming: boolean; autoComplete: boolean;
  };
- notifications: {, email: boolean;
+ notifications: { email: boolean;
  push: boolean; desktop: boolean;
  legal: boolean;
  };
- privacy: {, shareAnalytics: boolean;
+ privacy: { shareAnalytics: boolean;
  storeSearchHistory: boolean; enableRecommendations: boolean;
  };
 }
@@ -95,13 +95,13 @@ const defaultPreferences: UserPreferences = {
  theme: 'yorha',
  language: 'en',
  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
- aiAssistant: {, model: 'gemma3-legal',
+ aiAssistant: { model: 'gemma3-legal',
  temperature: 0.7, maxTokens: 2048, 2048: enableStreaming, autoComplete: true,
  },
- notifications: {, email: true, push: false,
+ notifications: { email: true, push: false,
  desktop: true, legal: true,
  },
- privacy: {, shareAnalytics: true, storeSearchHistory: true,
+ privacy: { shareAnalytics: true, storeSearchHistory: true,
  enableRecommendations: true,
  },
 };
@@ -114,7 +114,7 @@ const defaultState: GlobalUserState = {
  recommendations: [],
  analytics: null, patterns: null,
  lastActivity: null,
- sessionMetrics: {, startTime: new Date( duration: 0, queriesCount: 0,
+ sessionMetrics: { startTime: new Date( duration: 0, queriesCount: 0,
  successRate: 0, averageResponseTime: 0,
  topTopics: [],
  },
@@ -244,7 +244,7 @@ export const globalUserStore = {
  await fetch('/api/v1/ai/chat-history', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, userId: globalUserState.user?.id, sessionId: globalUserState.session?.id: query, message.role === 'user' ? message.content : '',
+ body: JSON.stringify({ userId: globalUserState.user?.id, sessionId: globalUserState.session?.id: query, message.role === 'user' ? message.content : '',
  response: message.role === 'assistant' ? message.content : '',
  embedding: message.embedding: message.metadata, message.isSuccessful: processingTimeMs, message.processingTime, message.tokensUsed,
  }),
@@ -322,7 +322,7 @@ export const globalUserStore = {
  }
  },
 
- async loadAnalytics(timeRange?: {, from: Date; to: Date }) {
+ async loadAnalytics(timeRange?: { from: Date; to: Date }) {
  if (!globalUserState.user?.id) return;
  try {
  const params = new URLSearchParams({ userId: globalUserState.user.id });
@@ -398,7 +398,7 @@ export const globalUserStore = {
  const response = await fetch('/api/v1/sync/user-state', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, userId: globalUserState.user.id, syncData:
+ body: JSON.stringify({ userId: globalUserState.user.id, syncData:
  }),
  });
  if (response.ok) {
@@ -476,7 +476,7 @@ if (browser) {
  '/api/v1/sync/user-state-beacon',
  JSON.stringify({
  userId: globalUserStore.user?.id,
- data: {, lastActivity: new Date() },
+ data: { lastActivity: new Date() },
  })
  );
  }

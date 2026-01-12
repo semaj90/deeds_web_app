@@ -42,7 +42,7 @@ interface RedisClient {
 interface NESMemory {
  allocateDocument(
  document: CachedDocument, data: ArrayBuffer,
- options: {, compress: boolean; preferredBank: string}
+ options: { compress: boolean; preferredBank: string}
  ): Promise<boolean>;
  getDocument(
  documentId: string
@@ -68,23 +68,23 @@ export interface LegalDocument {
 // Cache configuration optimized for legal AI workloads
 const CACHE_CONFIG = {
  // Loki.js
- loki: {, autosave: true, autosaveInterval: 5000, // 5 seconds
+ loki: { autosave: true, autosaveInterval: 5000, // 5 seconds
  autoload: true, throttledSaves: true,
  serializationMethod: 'pretty',
  },
  // Redis
- redis: {, host: 'localhost',
+ redis: { host: 'localhost',
  port: 6379,
  db: 0,
  keyPrefix: 'legal_ai:',
- ttl: {, documents: 3600, // 1 hour
+ ttl: { documents: 3600, // 1 hour
  searches: 1800, // 30 minutes
  searchAnalyses: 7200, // 2 hours
  aiEmbeddings: 86400, // 24 hours for vector embeddings
  },
  },
  // Memory
- memory: {, maxLokiSize: 50 * 1024 * 1024, // 50MB in-memory
+ memory: { maxLokiSize: 50 * 1024 * 1024, // 50MB in-memory
  evictionThreshold: 0.85, // Evict when 85% full
  compressionThreshold: 1024, // Compress documents > 1KB
  nesIntegration: true, // Use NES memory for overflow
@@ -97,13 +97,13 @@ export interface CachedDocument extends LegalDocument {
 }
 
 export interface CacheStats {
- loki: {, collections: number; documents: number; memoryUsage: number; queries: number; hits: number; misses: number;
+ loki: { collections: number; documents: number; memoryUsage: number; queries: number; hits: number; misses: number;
  };
- redis: {, connected: boolean; keys: number; memoryUsage: number; operations: number; hits: number; misses: number;
+ redis: { connected: boolean; keys: number; memoryUsage: number; operations: number; hits: number; misses: number;
  };
- nes: {, documentsStored: number; memoryUsage: number; bankSwitches: number;
+ nes: { documentsStored: number; memoryUsage: number; bankSwitches: number;
  };
- overall: {, hitRatio: number; avgResponseTime: number; totalDocuments: number; syncConflicts: number;
+ overall: { hitRatio: number; avgResponseTime: number; totalDocuments: number; syncConflicts: number;
  };
 }
 
@@ -118,10 +118,10 @@ export class LokiRedisCache extends EventEmitter {
 
  // Performance tracking
  private stats = {
- loki: {, collections: 0, documents: 0, memoryUsage: 0, queries: 0, hits: 0, misses: 0 },
- redis: {, connected: false, keys: 0, memoryUsage: 0, operations: 0, hits: 0, misses: 0 },
- nes: {, documentsStored: 0, memoryUsage: 0, bankSwitches: 0 },
- overall: {, hitRatio: 0, avgResponseTime: 0, totalDocuments: 0, syncConflicts: 0 },
+ loki: { collections: 0, documents: 0, memoryUsage: 0, queries: 0, hits: 0, misses: 0 },
+ redis: { connected: false, keys: 0, memoryUsage: 0, operations: 0, hits: 0, misses: 0 },
+ nes: { documentsStored: 0, memoryUsage: 0, bankSwitches: 0 },
+ overall: { hitRatio: 0, avgResponseTime: 0, totalDocuments: 0, syncConflicts: 0 },
  };
  private responseTimeTracker: number[] = [];
  private isInitialized = false;
@@ -284,7 +284,7 @@ export class LokiRedisCache extends EventEmitter {
 
  private async handleRedisMessage(message: string): Promise<void> {
  try {
- const data: {, operation: string; documentId: string; document?: CachedDocument } =
+ const data: { operation: string; documentId: string; document?: CachedDocument } =
  JSON.parse(message);
  if (!data || !data.operation || !data.documentId) return;
  const { documentId, operation, document } = data;
@@ -681,7 +681,7 @@ export class LokiRedisCache extends EventEmitter {
 
  private async evictLokiDocuments(): Promise<void> {
  // Find least recently used documents across all collections
- const candidates: {, collection: Collection<CachedDocument>; document: CachedDocument}[] = [];
+ const candidates: { collection: Collection<CachedDocument>; document: CachedDocument}[] = [];
  for (const collection of this.collections.values()) {
  if (!collection) continue;
  try {
@@ -882,22 +882,22 @@ export class LokiRedisCache extends EventEmitter {
 
  // Reset stats
  this.stats = {
- loki: {, collections: this.collections.size,
+ loki: { collections: this.collections.size,
  documents: 0,
  memoryUsage: 0,
  queries: 0,
  hits: 0,
  misses: 0,
  },
- redis: {, connected: this.stats.redis.connected,
+ redis: { connected: this.stats.redis.connected,
  keys: 0,
  memoryUsage: 0,
  operations: 0,
  hits: 0,
  misses: 0,
  },
- nes: {, documentsStored: 0, memoryUsage: 0, bankSwitches: 0 },
- overall: {, hitRatio: 0, avgResponseTime: 0, totalDocuments: 0, syncConflicts: 0 },
+ nes: { documentsStored: 0, memoryUsage: 0, bankSwitches: 0 },
+ overall: { hitRatio: 0, avgResponseTime: 0, totalDocuments: 0, syncConflicts: 0 },
  };
  console.log('✅ Cache cleared successfully');
  } catch (error: unknown) {

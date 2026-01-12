@@ -120,7 +120,7 @@ function createCitationStore() {
  const response = await fetch(`/api/citations/${ citationId }/similar`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, threshold: threshold || 0.7 }),
+ body: JSON.stringify({ threshold: threshold || 0.7 }),
  credentials: 'include',
  });
  if (response.ok) {
@@ -206,7 +206,7 @@ function createCitationStore() {
  const response = await fetch('/api/citations/cluster', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, citations: this._getCurrentCitations() }),
+ body: JSON.stringify({ citations: this._getCurrentCitations() }),
  credentials: 'include',
  });
  if (response.ok) {

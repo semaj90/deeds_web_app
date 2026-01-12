@@ -28,11 +28,11 @@ export type RunStep =
 
 export type RunProgress = {
  runId: string; createdAt: number;
- step: RunStep; pct: number; // 0..100, counters: {, filesScanned: number;
+ step: RunStep; pct: number; // 0..100, counters: { filesScanned: number;
  errorsFound: number; patchesProposed: number;
  patchesApplied: number; patchesRejected: number;
  };
- lastError?: {, code: string;
+ lastError?: { code: string;
  message: string;
  cause?: string;
  file?: string;
@@ -46,7 +46,7 @@ export type ApplyResult = {
  file: string; beforeHash: string;
  afterHash: string;
  }>;
- rejected: Array<{, file: string;
+ rejected: Array<{ file: string;
  reason: string;
  }>;
 };
@@ -60,7 +60,7 @@ export type ErrorBrainEvent =
  confidence: number; ts: number;
  }
  | { type: 'run.patch.applied'; runId: string; file: string; ts: number }
- | { type: 'run.failed'; runId: string; error: {, code: string; message: string }; ts: number }
+ | { type: 'run.failed'; runId: string; error: { code: string; message: string }; ts: number }
  | { type: 'run.completed'; runId: string; summary: unknown; ts: number };
 
 

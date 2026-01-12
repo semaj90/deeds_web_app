@@ -72,7 +72,7 @@ tags: formData.getAll('tags'),
 
  if (!validation.success) {
  const form = {
- valid: false, errors: validation.error.flatten(data: {, type: formData.get('type'), 
+ valid: false, errors: validation.error.flatten(data: { type: formData.get('type'), 
 title: formData.get('title'), 
 isPrivate: formData.get('isPrivate') === 'true',
  aiAnalysis: formData.get('aiAnalysis') !== 'false',
@@ -156,7 +156,7 @@ tags: formData.getAll('tags'),
  });
  }
 
- return { form, uploadResult: {, message: 'Document uploaded successfully!' } };
+ return { form, uploadResult: { message: 'Document uploaded successfully!' } };
  } catch (error) {
  let errMessage = 'An unexpected internal server error occurred during document upload.';
  if (error instanceof Error) {

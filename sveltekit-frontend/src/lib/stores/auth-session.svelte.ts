@@ -164,7 +164,7 @@ class AuthSessionStore {
 	 * Initialize session from server data
 	 * Called in +layout.svelte with data from +layout.server.ts
 	 */
-	initialize(data: {, user: User | null; session: Session | null }) {
+	initialize(data: { user: User | null; session: Session | null }) {
 		this.user = data.user;
 		this.session = data.session;
 		this.isLoading = false;
@@ -183,7 +183,7 @@ class AuthSessionStore {
 			const response = await fetch('/api/auth/login', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, email: password }, credentials: 'include' // Important: include cookies
+				body: JSON.stringify({ email: password }, credentials: 'include' // Important: include cookies
 			});
 
 			if (!response.ok) {

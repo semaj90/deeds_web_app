@@ -67,10 +67,10 @@ export const load: PageServerLoad = async () => {
 		`);
 
 		return {
-			qdrant: {, collections: collectionStats,
+			qdrant: { collections: collectionStats,
 				totalPoints: collectionStats.reduce((sum, col) => sum + col.pointsCount, 0)
 			},
-			postgres: {, embeddings: pgEmbeddings.rows,
+			postgres: { embeddings: pgEmbeddings.rows,
 				timeline: timeline.rows,
 				stats: embeddingStats.rows[0]
 			}
@@ -78,8 +78,8 @@ export const load: PageServerLoad = async () => {
 	} catch (error) {
 		console.error('Error loading codebase data:', error);
 		return {
-			qdrant: {, collections: [], totalPoints: 0 },
-			postgres: {, embeddings: [], timeline: [], stats: {} },
+			qdrant: { collections: [], totalPoints: 0 },
+			postgres: { embeddings: [], timeline: [], stats: {} },
 			error: String(error)
 		};
 	}

@@ -72,7 +72,7 @@ export class UltraJSONParser {
  /**
  * Get parser capabilities
  */
- static getCapabilities(): {, wasm: boolean;
+ static getCapabilities(): { wasm: boolean;
  native: boolean; initialized: boolean;
  } {
  return {

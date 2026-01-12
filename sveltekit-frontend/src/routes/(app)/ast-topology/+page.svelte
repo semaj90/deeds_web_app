@@ -210,7 +210,7 @@
       const res = await fetch('/api/phase89/fix', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, file: nodeId })
+        body: JSON.stringify({ file: nodeId })
       });
 
       if (res.ok) {

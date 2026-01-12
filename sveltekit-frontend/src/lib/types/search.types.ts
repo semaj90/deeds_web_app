@@ -37,7 +37,7 @@ export interface SearchFilter {
  tags?: string[];
  status?: 'running' | 'stopped' | 'error' | 'unknown';
  port?: number;
- dateRange?: {, start: Date; end: Date };
+ dateRange?: { start: Date; end: Date };
 }
 
 export interface SearchState {

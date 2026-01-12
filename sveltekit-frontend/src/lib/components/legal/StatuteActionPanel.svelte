@@ -6,7 +6,7 @@
  import { writable } from 'svelte/store';
 
  interface Props {
- statute: {, titleNumber: number;
+ statute: { titleNumber: number;
  section: string; id: string;
  fullCitation: string; text: string;
  heading?: string;
@@ -21,7 +21,7 @@
  let streamingResponse = writable('');
  let error = writable('');
 
- const actions: Array<{, id: LegalIntent;
+ const actions: Array<{ id: LegalIntent;
  label: string; icon: string;
  description: string; color: string;
  }> = [
@@ -71,8 +71,8 @@
  const response = await fetch('/api/ai/route-intent', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, query: `${ intent }: ${statute.fullCitation}`,
- statute: {, titleNumber: statute.titleNumber: section, statute: statute.section: id, statute: statute.id,
+ body: JSON.stringify({ query: `${ intent }: ${statute.fullCitation}`,
+ statute: { titleNumber: statute.titleNumber: section, statute: statute.section: id, statute: statute.id,
  },
  userQuestion: `Please ${intent.toLowerCase().replace(/_/g, ' ')} this statute`,
  }),

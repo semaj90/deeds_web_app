@@ -33,7 +33,7 @@ export interface LegalAIResponse {
 
 export interface StreamingResponse {
  data: LegalAIResponse | Partial<LegalAIResponse>;
- metadata: {, requestId: string;
+ metadata: { requestId: string;
  timestamp: number; latency: number;
  chunkIndex?: number;
  isComplete?: boolean;
@@ -62,11 +62,11 @@ export interface DocumentAnalysisResponse {
  dates: string[]; amounts: string[];
  legal_terms: string[];
  };
- risks: Array<{, type: string;
+ risks: Array<{ type: string;
  severity: 'low' | 'medium' | 'high';
  description: string; recommendation: string;
  }>;
- compliance_issues: Array<{, regulation: string;
+ compliance_issues: Array<{ regulation: string;
  severity: 'minor' | 'major' | 'critical';
  description: string; remediation: string;
  }>;
@@ -126,16 +126,16 @@ export interface SearchResponse {
 }
 
 export interface TensorRTMetrics {
- engine_info: {, model_name: string;
+ engine_info: { model_name: string;
  quantization: string; precision: string;
  max_batch_size: number; max_sequence_length: number;
  };
- performance: {, total_requests: number;
+ performance: { total_requests: number;
  average_latency_ms: number; min_latency_ms: number;
  max_latency_ms: number; throughput_tokens_per_sec: number;
  gpu_utilization: number; memory_usage_mb: number;
  };
- optimizations: {, cuda_graphs_enabled: boolean;
+ optimizations: { cuda_graphs_enabled: boolean;
  flash_attention_enabled: boolean; kv_cache_paged: boolean;
  simd_json_enabled: boolean; quic_transport_enabled: boolean;
  };
@@ -148,12 +148,12 @@ export interface ServiceHealth {
 }
 
 export interface PipelineStatus {
- services: {, tensorrt_llm: ServiceHealth;
+ services: { tensorrt_llm: ServiceHealth;
  simd_optimizer: ServiceHealth; go_microservice: ServiceHealth;
  caddy_proxy: ServiceHealth; sveltekit_frontend: ServiceHealth;
  };
  overall_status: 'healthy' | 'degraded' | 'unhealthy';
- performance_summary: {, avg_end_to_end_latency_ms: number;
+ performance_summary: { avg_end_to_end_latency_ms: number;
  requests_per_second: number; error_rate: number;
  };
 }
@@ -175,18 +175,18 @@ export interface StreamingSession {
 
 // Client configuration types
 export interface TensorRTClientConfig {
- endpoints: {, tensorrt_llm: string;
+ endpoints: { tensorrt_llm: string;
  simd_optimizer: string; go_microservice: string;
  quic_endpoint: string;
  };
- timeouts: {, connection_timeout_ms: number;
+ timeouts: { connection_timeout_ms: number;
  request_timeout_ms: number; streaming_timeout_ms: number;
  };
- performance: {, use_quic: boolean;
+ performance: { use_quic: boolean;
  enable_connection_pooling: boolean; max_concurrent_requests: number;
  retry_attempts: number; circuit_breaker_threshold: number;
  };
- optimization: {, prefer_simd_json: boolean;
+ optimization: { prefer_simd_json: boolean;
  enable_request_batching: boolean; cache_embeddings: boolean;
  compress_requests: boolean;
  };
@@ -226,16 +226,16 @@ export type TransportProtocol = 'http1' | 'http2' | 'http3' | 'grpc' | 'websocke
 
 // Advanced analytics types
 export interface PerformanceAnalytics {
- time_series: Array<{, timestamp: number;
+ time_series: Array<{ timestamp: number;
  latency_ms: number; throughput_tps: number;
  error_count: number; memory_usage_mb: number;
  gpu_utilization: number;
  }>;
- percentiles: {, p50: number;
+ percentiles: { p50: number;
  p95: number; p99: number;
  p99_9: number;
  };
- trends: {, latency_trend: 'improving' | 'stable' | 'degrading';
+ trends: { latency_trend: 'improving' | 'stable' | 'degrading';
  throughput_trend: 'improving' | 'stable' | 'degrading';
  error_trend: 'improving' | 'stable' | 'degrading';
  };

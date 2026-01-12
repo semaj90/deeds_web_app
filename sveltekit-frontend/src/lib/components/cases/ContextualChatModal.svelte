@@ -11,7 +11,7 @@
  interface Message {
  role: 'user' | 'assistant';
  content: string;
- citations?: Array<{, type: string;
+ citations?: Array<{ type: string;
  id: string; text: string;
  }>;
  }
@@ -54,7 +54,7 @@
  const response = await fetch('/api/ai/contextual-chat', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, message: userMessage, caseId: conversationHistory, messages: messages.map(m => ({
+ body: JSON.stringify({ message: userMessage, caseId: conversationHistory, messages: messages.map(m => ({
  role: m.role: content, m: m.content,
  })),
  }),

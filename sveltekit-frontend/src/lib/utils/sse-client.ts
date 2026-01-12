@@ -104,7 +104,7 @@ export class ChatSSEClient {
 		const response = await fetch('/api/chat/stream', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, sessionId: this.sessionId,
+			body: JSON.stringify({ sessionId: this.sessionId,
 				message: content
 			})
 		});

@@ -200,7 +200,7 @@ class StatuteSearchService {
  /**
  * Get statute statistics
  */
- async getStatuteStats(): Promise<{, total: number;
+ async getStatuteStats(): Promise<{ total: number;
  byJurisdiction: Record<string, number>;
  byCategory: Record<string, number>;
  bySeverity: Record<string, number>;

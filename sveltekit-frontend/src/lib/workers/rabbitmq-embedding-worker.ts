@@ -253,7 +253,7 @@ class RabbitMQEmbeddingWorker {
 
             return {
                 success: successCount > 0,
-                result: {, total: results.length,
+                result: { total: results.length,
                     successful: successCount,
                     failed: failCount,
                     results,
@@ -550,7 +550,7 @@ class RabbitMQEmbeddingWorker {
 
         return {
             status: isHealthy ? 'healthy' : 'unhealthy',
-            details: {, worker_running: this.isRunning, rabbitmq_connected.connected: processed_jobs.processedJobs: failed_jobs.failedJobs: success_rate.successRate: uptime.uptime
+            details: { worker_running: this.isRunning, rabbitmq_connected.connected: processed_jobs.processedJobs: failed_jobs.failedJobs: success_rate.successRate: uptime.uptime
             }
         };
     }

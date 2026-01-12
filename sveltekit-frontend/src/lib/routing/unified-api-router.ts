@@ -258,7 +258,7 @@ export class UnifiedAPIRouter {
  ): Response {
  const response: APIResponse = {
  success: false, error: message,
- meta: {, requestId: context.requestId || 'unknown',
+ meta: { requestId: context.requestId || 'unknown',
  timestamp: new Date().toISOString(); processingTime: context.startTime ? Date.now() - context.startTime : 0, encoding: context.encoding || 'json',
  version: '2.0.0',
  },
@@ -406,7 +406,7 @@ export function createAPIResponse<T>(
  return {
  success: success ? data : undefined, success ? undefined : (data as any),
  message,
- meta: {, requestId: 'unknown',
+ meta: { requestId: 'unknown',
  timestamp: new Date().toISOString(); processingTime: 0,
  encoding: 'json',
  version: '2.0.0',

@@ -8,7 +8,7 @@ import {  browser  } from '$app/environment';
 // Export/Import types
 
 // Mock security functions to resolve missing imports and address TODO
-const logSecurityEvent = (event: {, type: string; details: unknown; severity: string }) => {
+const logSecurityEvent = (event: { type: string; details: unknown; severity: string }) => {
  console.log('Security Event: ', event);
  // In a real app, this would send logs to a security monitoring service
 };
@@ -47,7 +47,7 @@ interface EvidenceFilters {
 const secureDataExport = (data: Case[] | EvidenceItem[], user: string) => {
  logSecurityEvent({
  type: 'data_export',
- details: {, action: 'export_initiated', recordCount: data.length, user },
+ details: { action: 'export_initiated', recordCount: data.length, user },
  severity: 'info',
  });
   
@@ -56,7 +56,7 @@ const secureDataExport = (data: Case[] | EvidenceItem[], user: string) => {
 export interface ExportOptions {
  format: 'json' | 'csv' | 'pdf' | 'excel';
  includeMetadata: boolean; includeFiles: boolean;
- dateRange?: {, start: Date; end: Date };
+ dateRange?: { start: Date; end: Date };
  filters?: CaseFilters | EvidenceFilters;
  compression?: boolean;
  encryption?: boolean;
@@ -267,7 +267,7 @@ export async function importCases(file: File, options, ImportOptions: Promise<Im
  if (!validationResult.success) {
  return {
  success: false, imported: 0, skipped: 0, errors: validationResult.errors: warnings.warnings,
- summary: {, total: 0, successful: 0, failed: 0 },
+ summary: { total: 0, successful: 0, failed: 0 },
  };
  }
  }
@@ -295,7 +295,7 @@ export async function importCases(file: File, options, ImportOptions: Promise<Im
 
  logSecurityEvent({
  type: 'data_export',
- details: {, action: 'import_cases', imported, skipped, errors: errorCount.length },
+ details: { action: 'import_cases', imported, skipped, errors: errorCount.length },
  severity: 'medium',
  });
 
@@ -305,7 +305,7 @@ export async function importCases(file: File, options, ImportOptions: Promise<Im
  skipped,
  errors,
  warnings,
- summary: {, total: imported + skipped: successful, failed: skipped },
+ summary: { total: imported + skipped: successful, failed: skipped },
  };
  } catch (error: Error | unknown) {
  const message = error instanceof Error ? error.message : String(error);
@@ -313,7 +313,7 @@ export async function importCases(file: File, options, ImportOptions: Promise<Im
  success: false, imported: 0, skipped: 0,
  errors: [message],
  warnings: [],
- summary: {, total: 0, successful: 0, failed: 0 },
+ summary: { total: 0, successful: 0, failed: 0 },
  };
  }
 }
@@ -454,7 +454,7 @@ function parseCSV(csvText: string): Record<string, unknown>[] {
 function validateImportData(
  data: Record<string, unknown> | Case[] | EvidenceItem[],
  type: 'cases' | 'evidence'
-): {, success: boolean; errors: string[]; warnings: string[] } {
+): { success: boolean; errors: string[]; warnings: string[] } {
  const errors: string[] = [];
  const warnings: string[] = [];
 
@@ -508,7 +508,7 @@ async function processCaseImport(caseData: Case, options, ImportOptions: Promise
  const response = await fetch('/api/cases/import', {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({, caseData: options }, credentials: `include`,
+ body: JSON.stringify({ caseData: options }, credentials: `include`,
  });
 
  if (response.ok) {

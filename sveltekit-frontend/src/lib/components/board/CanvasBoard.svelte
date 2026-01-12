@@ -6,7 +6,7 @@
  classification: 'public' | 'confidential' | 'sealed';
  status: 'pending' | 'approved' | 'locked' | 'rejected';
  type: 'document' | 'image' | 'audio' | 'video';
- boardPosition: {, x: number; y: number };
+ boardPosition: { x: number; y: number };
  }
 
  interface Relationship {

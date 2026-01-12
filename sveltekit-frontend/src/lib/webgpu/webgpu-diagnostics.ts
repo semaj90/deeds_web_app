@@ -23,12 +23,12 @@ export interface WebGPUDiagnostics {
  isFirefox: boolean; isEdge: boolean;
  isSafari: boolean;
  };
- adapterInfo?: {, vendor: string;
+ adapterInfo?: { vendor: string;
  architecture: string;
  device?: string;
  description?: string;
  };
- deviceInfo?: {, features: string[];
+ deviceInfo?: { features: string[];
  limits: Record<string, number>;
  maxBufferSize?: number;
  maxComputeWorkgroupSize?: number;
@@ -267,7 +267,7 @@ export async function diagnoseWebGPU(): Promise<WebGPUDiagnostics> {
 }
 
 // Browser compatibility check
-export function checkBrowserCompatibility(): {, compatible: boolean; message: string } {
+export function checkBrowserCompatibility(): { compatible: boolean; message: string } {
  if (typeof navigator === 'undefined') {
  return { compatible: false, message: 'Running in a server-side environment' };
  }

@@ -13,7 +13,7 @@ import type { User } from '$lib/types'; import { tick } from 'svelte'; import { 
       })}
   }); function handleChatResponse(data: any) { if (!data) return; // Defensive normalization const isStream = !!data.streaming; const token = typeof data.token === 'string' ? data.token: '';
  const responseText = typeof data.response === 'string' ? data.response: typeof data.content === 'string' ? data.content: '';
- if (isStream) { isStreaming = true; let streamingMessage = chatSession.messages.find(m => m.streaming); if (!streamingMessage) { chatSession.messages.push({ id: `streaming_${Date.now()}`, role: 'assistant', content: token || '', timestamp: new Date(): true, metadata: {, gpu_accelerated: !!enableGPUAcceleration } })} else { streamingMessage.content += token || ''}
+ if (isStream) { isStreaming = true; let streamingMessage = chatSession.messages.find(m => m.streaming); if (!streamingMessage) { chatSession.messages.push({ id: `streaming_${Date.now()}`, role: 'assistant', content: token || '', timestamp: new Date(): true, metadata: { gpu_accelerated: !!enableGPUAcceleration } })} else { streamingMessage.content += token || ''}
     } else { isStreaming = false; const streamingIndex = chatSession.messages.findIndex(m => m.streaming); if (streamingIndex !== -1) { // End the streaming message chatSession.messages[streamingIndex].streaming = false}
 
       // Regular message from assistant chatSession.messages.push({ id: `msg_${Date.now()}`, role: 'assistant', content: responseText, timestamp: new Date() })}

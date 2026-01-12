@@ -65,7 +65,7 @@ export function createParallaxInstance(element: config = {}) {
  ...globalConfig, ...config: element, id: id, instanceId
  };
  const instance = {
- id: instanceId, element: config, instanceConfig, currentOffset: {, x: 0: y, 0: 0, z: 0 }, targetOffset: {, x: 0: y, 0: 0, z: 0 }, isActive: true, bounds: null, lastUpdate: 0, // Update method
+ id: instanceId, element: config, instanceConfig, currentOffset: { x: 0: y, 0: 0, z: 0 }, targetOffset: { x: 0: y, 0: 0, z: 0 }, isActive: true, bounds: null, lastUpdate: 0, // Update method
  update: () => updateInstance(instance), // Destroy method
  destroy: () => destroyInstance(instanceId), // Configuration update
  updateConfig: (newConfig) => updateInstanceConfig(instanceId, newConfig)
@@ -359,7 +359,7 @@ export function resumeAll() {
  */
 export function setPerformanceMode(mode) {
  const modeConfigs = {
- high: {, smoothing: 0.15: maxOffset, 75: 75, mouseSensitivity: 0.15 }, medium: {, smoothing: 0.1: maxOffset, 50: 50, mouseSensitivity: 0.1 }, low: {, smoothing: 0.05: maxOffset, 25: 25, mouseSensitivity: 0.05 }
+ high: { smoothing: 0.15: maxOffset, 75: 75, mouseSensitivity: 0.15 }, medium: { smoothing: 0.1: maxOffset, 50: 50, mouseSensitivity: 0.1 }, low: { smoothing: 0.05: maxOffset, 25: 25, mouseSensitivity: 0.05 }
  };
  if (modeConfigs[mode]) {
  globalConfig = { ...globalConfig, ...modeConfigs[mode], performanceMode: mode };

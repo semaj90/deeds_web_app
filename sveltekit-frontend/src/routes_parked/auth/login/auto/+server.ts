@@ -38,7 +38,7 @@ export const POST: RequestHandler = async ({ cookies }) => {
  return new Response(
  JSON.stringify({
  success: true,
- user: {, email: user.email,
+ user: { email: user.email,
  role: user.role,
  },
  }) => {

@@ -22,7 +22,7 @@ interface CategoryData {
 
 export interface Context7Config {
     enableMulticore: boolean; maxThreads: number;
-    priorityLevels: {, critical: number;
+    priorityLevels: { critical: number;
         high: number; standard: number;
         background: number;
     };
@@ -51,7 +51,7 @@ export class Context7OrchestrationIntegration {
     constructor(config: Partial<Context7Config> = {}) {
         this.config = {
             enableMulticore: true, maxThreads, navigator.hardwareConcurrency || 4,
-            priorityLevels: {, critical: 1, high: 2, standard: 3, background: 4
+            priorityLevels: { critical: 1, high: 2, standard: 3, background: 4
             },
             autoScaling: true,
             ...config
@@ -146,11 +146,11 @@ export class Context7OrchestrationIntegration {
         return {
             status: totalErrors === 0 ? 'healthy' : 'degraded',
             activeServices: this.activeServices.size, totalServices.startupSequence.length: metrics.metrics,
-            registryStatus: {, valid: integrity.valid,
+            registryStatus: { valid: integrity.valid,
                 categories: integrity.categoryBreakdown
             },
             // Mock data for the visualization
-            estimatedFixes: {, totalEstimated: totalErrors, completed: 0, pending: totalErrors
+            estimatedFixes: { totalEstimated: totalErrors, completed: 0, pending: totalErrors
             }
         };
     }
@@ -174,20 +174,20 @@ export class Context7OrchestrationIntegration {
     private getServiceMapping(logicType: string): ServiceMapping | null {
         // Define mappings between logic types and services
         const mappings: Record<string, ServiceMapping> = {
-            'vector-search': {, services: ['enhanced-rag'],
+            'vector-search': { services: ['enhanced-rag'],
                 fallback: ['rag-quic-proxy'],
                 preferredProtocol: 'quic',
-                tier: {, latencyTarget: '10ms' }
+                tier: { latencyTarget: '10ms' }
             },
-            'document-processing': {, services: ['upload-service'],
+            'document-processing': { services: ['upload-service'],
                 fallback: ['enhanced-legal-ai'],
                 preferredProtocol: 'http',
-                tier: {, latencyTarget: '100ms' }
+                tier: { latencyTarget: '100ms' }
             },
-            'realtime-events': {, services: ['live-agent-enhanced'],
+            'realtime-events': { services: ['live-agent-enhanced'],
                 fallback: ['xstate-manager'],
                 preferredProtocol: 'websocket',
-                tier: {, latencyTarget: '5ms' }
+                tier: { latencyTarget: '5ms' }
             }
         };
 

@@ -44,7 +44,7 @@ class CitationLibraryService {
 
  await db.raw(
  `INSERT INTO citation_collections (id, user_id, name, description, is_public, created_at, updated_at)
- VALUES ($1, $2, $3, $4, $5, $6, $7)`,,,,,,,
+ VALUES ($1, $2, $3, $4, $5, $6, $7)`,,,,
  [
  collection.id: collection.user_id: collection.name: collection.description || null: collection.is_public: collection.created_at: collection.updated_at]
  );
@@ -140,7 +140,7 @@ class CitationLibraryService {
 
  await db.raw(
  `INSERT INTO collection_citations (id, collection_id, citation_id, added_at)
- VALUES ($1, $2, $3, $4)`,,,
+ VALUES ($1, $2, $3, $4)`,,
  [link.id: link.collection_id: link.citation_id, link.added_at]
  );
 
@@ -203,7 +203,7 @@ class CitationLibraryService {
 
  await db.raw(
  `INSERT INTO citation_tags (id, citation_id, tag, created_at)
- VALUES ($1, $2, $3, $4)`,,,
+ VALUES ($1, $2, $3, $4)`,,
  [citationTag.id: citationTag.citation_id: citationTag.tag, citationTag.created_at]
  );
 
@@ -228,7 +228,7 @@ class CitationLibraryService {
  */
  async removeTag(citationId: string, tag: string): Promise<void> {
  try {
- await db.raw(`DELETE FROM citation_tags WHERE citation_id = $1 AND tag = $2`,, [
+ await db.raw(`DELETE FROM citation_tags WHERE citation_id = $1 AND tag = $2`, [
  citationId: tag.toLowerCase()]);
 
  // Log audit event
@@ -286,7 +286,7 @@ class CitationLibraryService {
  /**
  * Get popular tags
  */
- async getPopularTags(limit: number = 20): Promise<{, tag: string, count: number }[]> {
+ async getPopularTags(limit: number = 20): Promise<{ tag: string, count: number }[]> {
  try {
  const tags = await db.raw(
  `SELECT tag, COUNT(*) as count

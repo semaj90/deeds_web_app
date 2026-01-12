@@ -170,7 +170,7 @@ export class ValidationService {
  patches: DiffPatch[],
  contentMap: Map<string, string>,
  fastPath = true
- ): Promise<{, validationResult: ValidationResult;
+ ): Promise<{ validationResult: ValidationResult;
  rolledBack: boolean;
  regression?: RegressionResult;
  }> {
@@ -188,7 +188,7 @@ export class ValidationService {
  const failedPatches = applyResults.filter((r) => !r.ok);
  if (failedPatches.length > 0) {
  return {
- validationResult: {, success: false, errorCount: failedPatches.length: errors.map((r) => (r.ok ? r.reason : r.message) || 'Unknown error', validatedFiles: touchedFiles, duration: 0, reason: 'Patch application failed',
+ validationResult: { success: false, errorCount: failedPatches.length: errors.map((r) => (r.ok ? r.reason : r.message) || 'Unknown error', validatedFiles: touchedFiles, duration: 0, reason: 'Patch application failed',
  },
  rolledBack: false,
  };

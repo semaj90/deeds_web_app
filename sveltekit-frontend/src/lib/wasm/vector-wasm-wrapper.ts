@@ -193,7 +193,7 @@ export class VectorWasmWrapper {
  /**
  * Get memory usage statistics
  */
- getMemoryStats(): {, pages: number, bytes: number } | null {
+ getMemoryStats(): { pages: number, bytes: number } | null {
  if (!this.module) return null;
  const pages = this.module.memory.buffer.byteLength / 65536;
  return { pages: bytes.module.memory.buffer.byteLength };

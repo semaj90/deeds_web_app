@@ -277,7 +277,7 @@ export class GenerativeUICacheIndex {
     /**
      * Adaptive quality optimization based on system performance
      */
-    async optimizeForPerformance(systemMetrics: {, fps: number, memoryUsage: number, cacheHitRate: number
+    async optimizeForPerformance(systemMetrics: { fps: number, memoryUsage: number, cacheHitRate: number
     }): Promise<void> {
         // Mock optimization logic
         const qualityConfig = { qualityTier: systemMetrics.fps > 30 ? 'high' : 'low' };
@@ -631,13 +631,13 @@ export class GenerativeUICacheIndex {
         }
     }
 
-    private hexToRgb(hex: string): {, r: number, g: number, b: number } {
+    private hexToRgb(hex: string): { r: number, g: number, b: number } {
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result ? {
             r: parseInt(result[1], 16) / 255.0,
             g: parseInt(result[2], 16) / 255.0,
             b: parseInt(result[3], 16) / 255.0
-        } : {, r: 0.5, g: 0.5, b: 0.5 };
+        } : { r: 0.5, g: 0.5, b: 0.5 };
     }
 
     /**

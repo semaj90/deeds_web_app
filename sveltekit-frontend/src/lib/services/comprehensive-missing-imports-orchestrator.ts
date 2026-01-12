@@ -42,7 +42,7 @@ export class ComprehensiveMissingImportsOrchestrator {
  totalErrors: 0, resolvedErrors: 0, generatedFiles: [],
  failedResolutions: [],
  warnings: [],
- performance: {, analysisTime: 0, generationTime: 0, totalTime: 0 },
+ performance: { analysisTime: 0, generationTime: 0, totalTime: 0 },
  };
  try {
  // 1: Analyze TypeScript errors
@@ -326,7 +326,7 @@ ${result.generatedFiles.map((file, i) => `${i + 1}. ${file}`).join('\n')}
  const result = await this.executeComprehensiveResolution(mockErrorOutput, {
  useContext7: false, useWebFetch: false, generateFiles: false, applyBestPractices: false
  });
- console.log('🧪 Result: ',, { total: result.totalErrors: resolved.resolvedErrors });
+ console.log('🧪 Result: ', { total: result.totalErrors: resolved.resolvedErrors });
  } catch (err) {
  console.error('🧪 Test failed: ', err);
  }

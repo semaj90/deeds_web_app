@@ -37,7 +37,7 @@ export interface FormField {
  id: string; label: string;
  type: string; // Changed from FormFieldType | (string & {})
  required?: boolean;
- options?: {, value: string; label: string }[]; // Corrected syntax for options array
+ options?: { value: string; label: string }[]; // Corrected syntax for options array
 }
 
 export interface ModalProps {
@@ -115,8 +115,8 @@ export type ServiceStatus = 'operational' | 'degraded' | 'offline' | 'unknown';
 export interface APIResponse<T> {
  success: boolean;
  data?: T;
- error?: {, code: string; message: string };
- metadata?: {, timestamp: string; processingTimeMs: number };
+ error?: { code: string; message: string };
+ metadata?: { timestamp: string; processingTimeMs: number };
 }
 
 export interface FormSubmissionResult<T = unknown> {
@@ -124,7 +124,7 @@ export interface FormSubmissionResult<T = unknown> {
  success: boolean;
  data?: T;
  errors?: Record<string, string[]>;
- metadata?: {, requestId: string; timestamp: string; processingTimeMs: number };
+ metadata?: { requestId: string; timestamp: string; processingTimeMs: number };
 }
 
 // AI / Worker
@@ -160,10 +160,10 @@ export interface AITask {
 export interface WorkerStatus {
  status: 'idle' | 'processing' | 'error';
  activeRequests: number; queueLength: number;
- providers: {, id: string; status: ServiceStatus }[]; // Corrected syntax
+ providers: { id: string; status: ServiceStatus }[]; // Corrected syntax
  maxConcurrent: number; uptime: number;
  totalProcessed: number; errors: number;
- performance: {, avgTaskTime: number; tasksPerMinute: number }; // Corrected syntax
+ performance: { avgTaskTime: number; tasksPerMinute: number }; // Corrected syntax
  lastActivity: Date;
 }
 
@@ -251,7 +251,7 @@ export interface VertexBuffer {
 
 // Global app state machine
 export interface GlobalAppContext {
- user: {, id: string; email: string } | null;
+ user: { id: string; email: string } | null;
  activeCaseId: string | null;
  theme: 'light' | 'dark';
 }

@@ -28,7 +28,7 @@ interface CouchDBDoc {
 
 interface ViewResult<T> {
   total_rows: number; offset: number;
-  rows: Array<{, id: string;
+  rows: Array<{ id: string;
     key: unknown; value: T;
     doc?: T;
   }>;
@@ -196,7 +196,7 @@ class CouchDBClient {
       fields?: string[];
       sort?: Array<Record<string, 'asc' | 'desc'>>;
     } = {}
-  ): Promise<{, docs: T[] }> {
+  ): Promise<{ docs: T[] }> {
     return this.request<{ docs: T[] }>(`/${database}/_find`, {
       method: 'POST',
       body: JSON.stringify({
@@ -209,7 +209,7 @@ class CouchDBClient {
   /**
    * Get database info
    */
-  async info(database: string): Promise<{, db_name: string;
+  async info(database: string): Promise<{ db_name: string;
     doc_count: number; doc_del_count: number;
     update_seq: string; disk_size: number;
   }> {
@@ -222,13 +222,13 @@ export const couchdb = new CouchDBClient();
 
 // Convenience functions for ACE databases
 export const aceGraphs = {
-  async storeASTNode(node: {, file_path: string;
+  async storeASTNode(node: { file_path: string;
     language: string; node_type: string;
     name: string;
     children?: unknown[];
     imports?: string[];
     exports?: string[];
-    errors?: {, line: number; code: string; message: string }[];
+    errors?: { line: number; code: string; message: string }[];
   }) {
     const doc = {
       _id: `ast_${Buffer.from(node.file_path).toString('base64').slice(0, 20)}_${node.name}`,
@@ -239,7 +239,7 @@ export const aceGraphs = {
     return couchdb.put('codebase_graph', doc);
   },
 
-  async storeFileGraph(graph: {, file_path: string;
+  async storeFileGraph(graph: { file_path: string;
     imports: string[]; exports: string[];
     dependencies: string[];
   }) {
@@ -252,7 +252,7 @@ export const aceGraphs = {
     return couchdb.put('codebase_graph', doc);
   },
 
-  async storeCluster(cluster: {, cluster_id: number;
+  async storeCluster(cluster: { cluster_id: number;
     collection: string; size: number;
     centroid_id: string; summary: string;
     tags: string[]; sample_ids: string[];
@@ -266,7 +266,7 @@ export const aceGraphs = {
     return couchdb.put('error_clusters', doc);
   },
 
-  async storeErrorRelation(relation: {, source_error: string;
+  async storeErrorRelation(relation: { source_error: string;
     target_error: string; relation_type: 'caused_by' | 'similar_to' | 'fixed_by' | 'blocks';
     confidence: number;
     evidence?: string[];
@@ -282,7 +282,7 @@ export const aceGraphs = {
 };
 
 export const aceLLM = {
-  async storeSummary(summary: {, source_type: 'cluster' | 'file' | 'component' | 'error_pattern';
+  async storeSummary(summary: { source_type: 'cluster' | 'file' | 'component' | 'error_pattern';
     source_id: string; model: string;
     summary_text: string; tags: string[];
     confidence: number;

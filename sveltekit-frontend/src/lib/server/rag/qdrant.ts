@@ -11,7 +11,7 @@ export type QdrantHit = {
 /**
  * Search vectors in Qdrant collection
  */
-export async function qdrantSearch(opts: {, vector: number[];
+export async function qdrantSearch(opts: { vector: number[];
  limit: number;
  scoreThreshold?: number;
  filter?: any;
@@ -42,7 +42,7 @@ export async function qdrantSearch(opts: {, vector: number[];
 /**
  * Upsert points to Qdrant collection
  */
-export async function qdrantUpsert(opts: {, points: Array<{ id: string; vector: number[]; payload?: Record<string, any> }>;
+export async function qdrantUpsert(opts: { points: Array<{ id: string; vector: number[]; payload?: Record<string, any> }>;
  wait?: boolean;
 }): Promise<any> {
  const r = await fetch(
@@ -50,7 +50,7 @@ export async function qdrantUpsert(opts: {, points: Array<{ id: string; vector: 
  {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, points: opts.points }),
+ body: JSON.stringify({ points: opts.points }),
  }
  );
 

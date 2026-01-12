@@ -2,7 +2,7 @@ import Fuse from '$lib/utils/fuse-import';
 
 export interface SearchableDocument {
  id: string, content: string; path: string, type: 'error' | 'component' | 'api' | 'config';
- metadata: {, language: string, lastModified: number; size: number;
+ metadata: { language: string, lastModified: number; size: number;
  embedding?: number[];
  };
 }
@@ -185,16 +185,16 @@ export class ConcurrentIndexedDBSearch {
  },
  });
  } catch (err) {
- self.postMessage({ workerId, type: 'error', data: {, error: String(err) } });
+ self.postMessage({ workerId, type: 'error', data: { error: String(err) } });
  }
  } else if (type === 'index') {
  self.postMessage({
  workerId,
  type: 'indexUpdated',
- data: {, success: true, documentsIndexed: (data || []).length },
+ data: { success: true, documentsIndexed: (data || []).length },
  });
  } else if (type === 'clear') {
- self.postMessage({ workerId, type: 'cacheCleared', data: {, success: true } });
+ self.postMessage({ workerId, type: 'cacheCleared', data: { success: true } });
  }
  };
  };
@@ -419,7 +419,7 @@ export class ConcurrentIndexedDBSearch {
  const response = await fetch('http://localhost:11434/api/embeddings', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: 'nomic-embed-text:latest', prompt: text }),
+ body: JSON.stringify({ model: 'nomic-embed-text:latest', prompt: text }),
  });
  if (!response.ok) {
  throw new Error(`Ollama error: ${response.status}`);
@@ -481,14 +481,14 @@ export class ConcurrentIndexedDBSearch {
  }
 
  async indexTypeScriptErrors(
- errors: {, code: string, message: string; file: string, line: number }[]
+ errors: { code: string, message: string; file: string, line: number }[]
  ): Promise<void> {
  const documents: SearchableDocument[] = errors.map((error, index) => ({
  id: `error-${ index }-${Date.now()}`,
  content: `${error.code}: ${error.message}`,
  path: error.file,
  type: 'error',
- metadata: {, language: 'typescript',
+ metadata: { language: 'typescript',
  lastModified: Date.now(),
      size: error.message.length, undefined:
  },
@@ -506,8 +506,8 @@ export class ConcurrentIndexedDBSearch {
  async searchErrors(query: string): Promise<SearchableDocument[]> {
  return this.search({
  query,
- filters: {, type: ['error'] },
- options: {, threshold: 0.2, maxResults: 100 },
+ filters: { type: ['error'] },
+ options: { threshold: 0.2, maxResults: 100 },
  });
  }
 

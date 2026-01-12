@@ -36,7 +36,7 @@ export interface WorkerTriggerResponse {
   success: boolean; data: { streamId: string; correlationId: string; triggerType: string; action: string;
     caseId?: string;
   };
-  metadata: {, timestamp: string; worker: string; version: string;
+  metadata: { timestamp: string; worker: string; version: string;
   };
 }
 
@@ -51,7 +51,7 @@ export class EnhancedCaseAPI {
       // Step 1: Create the case via REST API
       const caseResponse = await restClient.post<CaseResponse>('/cases', {
         ...data,
-        metadata: {, createdVia: 'yorha-command-center',
+        metadata: { createdVia: 'yorha-command-center',
           formVersion: '2.0',
           workflowStep: 'case-creation',
           timestamp: new Date().toISOString(),
@@ -103,7 +103,7 @@ export class EnhancedCaseAPI {
           type: 'case_created',
           caseId,
           action: 'process',
-          metadata: {, priority: formData.priority,
+          metadata: { priority: formData.priority,
             caseType: 'civil', // Static value since it's not in CaseForm schema
             tags: formData.tags || [],
             trigger: 'yorha-case-form',
@@ -179,7 +179,7 @@ export class EnhancedCaseAPI {
   ): Promise<APIResponse<CaseResponse>> {
     return restClient.post<CaseResponse>(`/cases/${caseId}`, {
       ...updates,
-      metadata: {, updatedVia: 'yorha-command-center',
+      metadata: { updatedVia: 'yorha-command-center',
         workflowStep: 'case-update',
         timestamp: new Date().toISOString(),
         ...updates.metadata,
@@ -200,12 +200,12 @@ export class EnhancedCaseAPI {
    */
   async getCaseAnalytics(
     params: {
-      dateRange?: {, start: string; end: string };
+      dateRange?: { start: string; end: string };
       caseType?: string[];
       priority?: string[];
       includeClusterData?: boolean;
     } = {}
-  ): Promise<APIResponse<{, daily: Array<unknown>; weekly: Array<unknown> }>> {
+  ): Promise<APIResponse<{ daily: Array<unknown>; weekly: Array<unknown> }>> {
     const searchParams = new URLSearchParams();
     if (params.dateRange) {
       searchParams.append('dateStart', params.dateRange.start);
@@ -231,7 +231,7 @@ export class EnhancedCaseAPI {
     algorithm?: 'kmeans' | 'som' | 'hierarchical';
     k?: number;
     includeEmbeddings?: boolean;
-  }): Promise<APIResponse<{, clusters: Array<unknown>; silhouetteScore: number; totalCases: number }>> {
+  }): Promise<APIResponse<{ clusters: Array<unknown>; silhouetteScore: number; totalCases: number }>> {
     return restClient.post('/cases/cluster', {
       ...params,
       algorithm: params.algorithm || 'kmeans',

@@ -55,7 +55,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
     const response = await fetch(`${OLLAMA_URL_VAR}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({, model: EMBEDDING_MODEL,
+      body: JSON.stringify({ model: EMBEDDING_MODEL,
         prompt: text.substring(0, 8000)
       })
     });
@@ -76,7 +76,7 @@ async function ensureQdrantCollection() {
     await (qdrant as any).getCollection('knowledge_base');
   } catch {
     await qdrant.createCollection('knowledge_base', {
-      vectors: {, size: 768,
+      vectors: { size: 768,
         distance: 'Cosine'
       }
     });
@@ -291,7 +291,7 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({, contents: [{ parts: [{, text: augmentedPrompt }] }]
+          body: JSON.stringify({ contents: [{ parts: [{ text: augmentedPrompt }] }]
           })
         }
       );
@@ -303,7 +303,7 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
       const ollamaRes = await fetch(`${OLLAMA_URL_VAR}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, model: LOCAL_LLM,
+        body: JSON.stringify({ model: LOCAL_LLM,
           prompt: augmentedPrompt,
           stream: false
         })
@@ -317,7 +317,7 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
       success: true,
       response,
       llm_used: llmUsed,
-      rag_context: {, matches: (searchResults as any[]).length,
+      rag_context: { matches: (searchResults as any[]).length,
         avg_similarity: avgSimilarity.toFixed(2),
         documents: (searchResults as any[]).map(r => r.payload?.document_name)
       }

@@ -6,7 +6,7 @@
     required?: boolean
     placeholder?: string
     rows?: number
-    options?: {, value: string; label: string }[];
+    options?: { value: string; label: string }[];
     defaultValue?: string}
   interface Props {
     fields: FormField[]; onSubmit: (data: Record<string, unknown>) => Promise<void>;

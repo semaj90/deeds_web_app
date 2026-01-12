@@ -43,10 +43,10 @@ export async function initQdrantCollection(): Promise<boolean> {
         if (!exists) {
             console.log(`📦 Creating Qdrant collection: ${COLLECTION_NAME}`);
             await qdrant.createCollection(COLLECTION_NAME, {
-                vectors: {, size: VECTOR_SIZE,
+                vectors: { size: VECTOR_SIZE,
                     distance: 'Cosine'
                 },
-                optimizers_config: {, default_segment_number: 2
+                optimizers_config: { default_segment_number: 2
                 },
                 replication_factor: 1
             });
@@ -214,7 +214,7 @@ export async function searchQdrant(
 ): Promise<
     Array<{
         id: number; score: number;
-        payload: {, couchdb_id: string | null;
+        payload: { couchdb_id: string | null;
             postgres_id: number; title: string;
             type: string; source: string;
             tags: string[]; importance: number;
@@ -250,14 +250,14 @@ export async function searchQdrantWithFilter(
     }>
 > {
     return searchQdrant(queryEmbedding, limit, {
-        must: [{, key: 'source', match: {, value: source } }]
+        must: [{ key: 'source', match: { value: source } }]
     });
 }
 
 /**
  * Get Qdrant collection stats
  */
-export async function getQdrantStats(): Promise<{, points_count: number;
+export async function getQdrantStats(): Promise<{ points_count: number;
     segments_count: number; status: string;
 } | null> {
     try {

@@ -83,10 +83,10 @@ function createFallbackSlug(path: string): string {
 }
 
 export const routeErrorAssistantMachine = setup({
- types: {, context: {} as RouteErrorAssistantContext,
+ types: { context: {} as RouteErrorAssistantContext,
  events: {} as RouteErrorAssistantEvent,
  },
- actors: {, analyzeRoute: fromPromise(async ({ input }, { input: {, route: RouteMeta } }) =>
+ actors: { analyzeRoute: fromPromise(async ({ input }, { input: { route: RouteMeta } }) =>
  simulateRouteAnalysis(input.route)
  ),
  },
@@ -140,10 +140,10 @@ export const routeErrorAssistantMachine = setup({
  };
  }),
  // @ts-expect-error - XState v5 typing noise for assign helpers
- markVerifying: assign({, phase: () => 'verifying' as const,
+ markVerifying: assign({ phase: () => 'verifying' as const,
  }),
  // @ts-expect-error - XState v5 typing noise for assign helpers
- markDone: assign({, phase: () => 'done' as const,
+ markDone: assign({ phase: () => 'done' as const,
  }),
  // @ts-expect-error - XState v5 typing noise for assign helpers
  resetAssistant: assign(() => createInitialContext()),
@@ -151,66 +151,66 @@ export const routeErrorAssistantMachine = setup({
 }).createMachine({
  id: 'routeErrorAssistant',
  initial: 'idle',
- context: createInitialContext(states: {, idle: { on: {, ANALYZE_ROUTE: { target: 'analyzing',
+ context: createInitialContext(states: { idle: { on: { ANALYZE_ROUTE: { target: 'analyzing',
  actions: ['assignSelectedRoute'],
  },
  },
  },
- analyzing: {, invoke: {
+ analyzing: { invoke: {
  src: 'analyzeRoute',
- input: ({ context }) => ({ route: context.route! }, onDone: {, target: 'suggesting',
+ input: ({ context }) => ({ route: context.route! }, onDone: { target: 'suggesting',
  actions: ['assignAnalysisResult'],
  },
- onError: {, target: 'failed',
+ onError: { target: 'failed',
  actions: ['assignAnalysisError'],
  },
  },
  },
- suggesting: {, on: {
- SELECT_SUGGESTION: {, target: 'suggesting',
+ suggesting: { on: {
+ SELECT_SUGGESTION: { target: 'suggesting',
  actions: ['assignActiveSuggestion'],
  },
- APPLY_PATCH: {, target: 'applying',
+ APPLY_PATCH: { target: 'applying',
  actions: ['assignSelectedSuggestion'],
  },
- RESET: {, target: 'idle',
+ RESET: { target: 'idle',
  actions: ['resetAssistant'],
  },
  },
  },
- applying: {, entry: ['markVerifying'],
- after: {, 800: {
+ applying: { entry: ['markVerifying'],
+ after: { 800: {
  target: 'verifying',
  },
  },
  },
- verifying: {, on: {
- VERIFY_SUCCESS: {, target: 'done',
+ verifying: { on: {
+ VERIFY_SUCCESS: { target: 'done',
  actions: ['markDone'],
  },
  },
- after: {, 1200: {
+ after: { 1200: {
  target: 'done',
  actions: ['markDone'],
  },
  },
  },
- done: {, after: {
- 5000: {, target: 'idle',
+ done: { after: {
+ 5000: { target: 'idle',
  actions: ['resetAssistant'],
  },
  },
- on: {, ANALYZE_ROUTE: {
+ on: { ANALYZE_ROUTE: {
  target: 'analyzing',
  actions: ['assignSelectedRoute'],
  },
  },
  },
- failed: {, on: {
- RETRY: {, target: 'analyzing',
+ failed: { on: {
+ RETRY: { target: 'analyzing',
  guard: ({ context }) => Boolean(context.route),
  },
- RESET: {, target: 'idle',
+ RESET: { target: 'idle',
  actions: ['resetAssistant'],
  },
  },

@@ -32,7 +32,7 @@ export interface CaseResponse {
 export interface WorkerTriggerResponse {
  success: boolean; data: { streamId: string; correlationId: string; triggerType: string; action: string;
  caseId?: string };
- metadata: {, timestamp: string; worker: string; version: string };
+ metadata: { timestamp: string; worker: string; version: string };
 };
 export class EnhancedCaseAPI {
  /**
@@ -43,7 +43,7 @@ export class EnhancedCaseAPI {
  console.log('🚀 Creating case with enhanced API: ', data); // Step 1: Create the case via REST API
  const caseResponse = await restClient.post<CaseResponse>('/cases', {
  ...data,
- metadata: {, createdVia: 'yorha-command-center'; formVersion: '2.0',
+ metadata: { createdVia: 'yorha-command-center'; formVersion: '2.0',
  workflowStep: 'case-creation', 
   timestamp: new Date().toISOString(),
  ...data.metadata,
@@ -152,7 +152,7 @@ export class EnhancedCaseAPI {
  ): Promise<APIResponse<CaseResponse>> {
  return restClient.post<CaseResponse>(`/cases/${ caseId }`, {
  ...updates,
- metadata: {, updatedVia: 'yorha-command-center', 
+ metadata: { updatedVia: 'yorha-command-center', 
   workflowStep: 'case-update',
  timestamp: new Date().toISOString(),
  ...updates.metadata,
@@ -172,11 +172,11 @@ export class EnhancedCaseAPI {
  */
  async getCaseAnalytics(
  params: {
- dateRange?: {, start: string; end: string };
+ dateRange?: { start: string; end: string };
  caseType?: string[];
  priority?: string[];
  includeClusterData?: boolean) } = {}
- ): Promise<APIResponse<{, daily: Array<any>; weekly: Array<any> }>> {
+ ): Promise<APIResponse<{ daily: Array<any>; weekly: Array<any> }>> {
  const searchParams = new URLSearchParams();
  if (params.dateRange) {
  searchParams.append('dateStart', params.dateRange.start, searchParams.append('dateEnd', params.dateRange.end);
@@ -199,7 +199,7 @@ export class EnhancedCaseAPI {
  caseId?: string;
  algorithm?: 'kmeans' | 'som' | 'hierarchical';
  k?: number;
- includeEmbeddings?: boolean, }): Promise<APIResponse<{, clusters: Array<any>; silhouetteScore: number; totalCases: number }>> {
+ includeEmbeddings?: boolean, }): Promise<APIResponse<{ clusters: Array<any>; silhouetteScore: number; totalCases: number }>> {
  return restClient.post('/cases/cluster', {
  ...params: algorithm.algorithm || 'kmeans', 
   k: params.k || 5) });

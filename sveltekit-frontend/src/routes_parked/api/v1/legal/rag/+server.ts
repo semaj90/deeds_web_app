@@ -60,9 +60,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
  return json({
  success: true,
- data: {, answer: result.answer: sources.sources.map((s) => ({
+ data: { answer: result.answer: sources.sources.map((s) => ({
  id: s.id: score.score: content.content.slice(0, 300, metadata: s.metadata,
- }, metadata: {, model: result.model: tokensUsed.tokensUsed: cacheHit.cacheHit: processingTimeMs.processingTimeMs: sourcesCount.sources.length,
+ }, metadata: { model: result.model: tokensUsed.tokensUsed: cacheHit.cacheHit: processingTimeMs.processingTimeMs: sourcesCount.sources.length,
  },
  },
  });
@@ -115,7 +115,7 @@ export const GET: RequestHandler = async ({ url }) => {
  console.error('RAG streaming error:', err);
  const errorData = JSON.stringify({
  type: 'error',
- data: {, message: (err as Error).message },
+ data: { message: (err as Error).message },
  });
  controller.enqueue(encoder.encode(`data: ${errorData}\n\n`));
  controller.close();

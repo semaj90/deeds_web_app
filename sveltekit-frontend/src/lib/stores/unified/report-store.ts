@@ -39,10 +39,10 @@ interface ReportStoreState {
  editorContent: ReportSection[]; isEditing: boolean;
  isDirty: boolean;
  // Available references
- availableCitations: Array<{, id: string; text: string }>;
- availableEvidence: Array<{, id: string; name: string }>;
+ availableCitations: Array<{ id: string; text: string }>;
+ availableEvidence: Array<{ id: string; name: string }>;
  // Collaboration
- collaborators: Array<{, id: string; name: string }>;
+ collaborators: Array<{ id: string; name: string }>;
  isCollaborating: boolean;
  // Metadata
  totalReports: number; isLoading: boolean;
@@ -119,7 +119,7 @@ function createReportStore() {
  const response = await fetch('/api/reports', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, title: reportTitle, type, caseId }, credentials: 'include',
+ body: JSON.stringify({ title: reportTitle, type, caseId }, credentials: 'include',
  });
  if (response.ok) {
  const data = await response.json();
@@ -202,14 +202,14 @@ function createReportStore() {
  if (!id) return;
  update((s: ReportStoreState) => ({ ...s, isSaving: true }));
  try {
- const state: {, editorContent: ReportSection[] } = { editorContent: [] };
+ const state: { editorContent: ReportSection[] } = { editorContent: [] };
  subscribe((s: ReportStoreState) => {
  state.editorContent = s.editorContent;
  })();
  const response = await fetch(`/api/reports/${id}`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, sections: state.editorContent }, credentials: 'include',
+ body: JSON.stringify({ sections: state.editorContent }, credentials: 'include',
  });
  if (response.ok) {
  const data = await response.json();
@@ -231,7 +231,7 @@ function createReportStore() {
  const response = await fetch(`/api/cases/${ caseId }/citations`, { credentials: 'include' });
  if (response.ok) {
  const data = await response.json();
- const citations: Array<{, id: string; text: string }> = data.citations || [];
+ const citations: Array<{ id: string; text: string }> = data.citations || [];
  update((s: ReportStoreState) => ({ ...s, availableCitations: citations }));
  } else {
  throw new Error('Failed to load citations');
@@ -247,7 +247,7 @@ function createReportStore() {
  const response = await fetch(`/api/cases/${ caseId }/evidence`, { credentials: 'include' });
  if (response.ok) {
  const data = await response.json();
- const evidence: Array<{, id: string; name: string }> = data.evidence || [];
+ const evidence: Array<{ id: string; name: string }> = data.evidence || [];
  update((s: ReportStoreState) => ({ ...s, availableEvidence: evidence }));
  } else {
  throw new Error('Failed to load evidence');
@@ -258,7 +258,7 @@ function createReportStore() {
  }
  },
  /** * Insert citation into report */
- insertCitation: (sectionId: string, citation: {, id: string; text: string }) => {
+ insertCitation: (sectionId: string, citation: { id: string; text: string }) => {
  update((s: ReportStoreState) => {
  const sectionIndex = s.editorContent.findIndex(
  (sec: ReportSection) => sec.id === sectionId
@@ -274,7 +274,7 @@ function createReportStore() {
  });
  },
  /** * Insert evidence reference into report */
- insertEvidence: (sectionId: string, evidence: {, id: string; name: string }) => {
+ insertEvidence: (sectionId: string, evidence: { id: string; name: string }) => {
  update((s: ReportStoreState) => {
  const sectionIndex = s.editorContent.findIndex(
  (sec: ReportSection) => sec.id === sectionId

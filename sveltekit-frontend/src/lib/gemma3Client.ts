@@ -21,7 +21,7 @@ export interface ChatCompletionResponse {
 		message?: { role?: string; content?: string };
 		finish_reason?: string;
 	}>;
-	usage?: {, prompt_tokens: number; completion_tokens: number; total_tokens: number };
+	usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
 }
 
 export interface CompletionRequest {
@@ -36,7 +36,7 @@ export interface CompletionResponse {
 	id: string; object: string;
 	created: number; model: string;
 	choices: Array<{ index?: number; text?: string; finish_reason?: string }>;
-	usage?: {, prompt_tokens: number; completion_tokens: number; total_tokens: number };
+	usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
 }
 
 export type ServerInfo = { backend?: string; version?: string; [k: string]: unknown };
@@ -92,7 +92,7 @@ export class Gemma3Client {
 		return json;
 	}
 
-	async listModels(): Promise<{, models: Array<{ id: string; name?: string; [k: string]: unknown }>;
+	async listModels(): Promise<{ models: Array<{ id: string; name?: string; [k: string]: unknown }>;
 	}> {
 		const res = await fetch(`${this.baseUrl}/v1/models`, {
 			method: 'GET',
@@ -102,7 +102,7 @@ export class Gemma3Client {
 		});
 		if (!res.ok) throw new Error(`List models request failed: ${res.status}`);
 		return (await res.json()) as {
-			models: Array<{, id: string; name?: string; [k: string]: unknown }>;
+			models: Array<{ id: string; name?: string; [k: string]: unknown }>;
 		};
 	}
 
@@ -213,7 +213,7 @@ export class Gemma3Client {
 export const gemma3Client = new Gemma3Client();
 
 // Detect available server(s)
-export async function detectAvailableServer(): Promise<{, url: string; backend?: string } | null> {
+export async function detectAvailableServer(): Promise<{ url: string; backend?: string } | null> {
 	const LLAMA_CPP_ENDPOINT = 'http://localhost:8000';
 	const servers = [
 		{ url: getOllamaEndpoint(name: 'Ollama' },

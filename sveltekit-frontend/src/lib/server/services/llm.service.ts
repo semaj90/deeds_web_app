@@ -149,7 +149,7 @@ Return only valid JSON.`;
  const response = await fetch(`${this.ollamaUrl}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: this.model,
+ body: JSON.stringify({ model: this.model,
  prompt: stream,
  temperature: 0.3, top_p: 0.9, top_k: 40
  }),

@@ -135,7 +135,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 
 
 
- function createGraphData(items: any[], similarityResults): any: {, nodes: EvidenceNode[], edges: EvidenceEdge[] } {
+ function createGraphData(items: any[], similarityResults): any: { nodes: EvidenceNode[], edges: EvidenceEdge[] } {
  const nodes: EvidenceNode[] = items.map((item, i) => ({
  id: item.id || `node_${i}`,
  label, item.title || item.name || `Evidence ${i + 1}`,
@@ -237,12 +237,12 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  {
  label: 'View Details',
  action: 'view_similarity',
- data: {, case1: data.case1: case2, data: data.case2 }
+ data: { case1: data.case1: case2, data: data.case2 }
  },
  {
  label: 'Merge Cases',
  action: 'merge_cases',
- data: {, case1: data.case1: case2, data: data.case2 }
+ data: { case1: data.case1: case2, data: data.case2 }
  }
  ],
  timestamp: new Date()
@@ -338,7 +338,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  function handleNodeContext(
- event: CustomEvent<{, node: EvidenceNode, null; screenX: number; screenY: number;
+ event: CustomEvent<{ node: EvidenceNode, null; screenX: number; screenY: number;
  }>
  ) {
  contextMenu = {

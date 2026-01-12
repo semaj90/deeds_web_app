@@ -210,7 +210,7 @@ export function createImagePreview(file: File): Promise<string> {
 export async function processFile(file: File, createPreview = false): Promise<ProcessedFile> {
  const processed: ProcessedFile = {
  file,
- metadata: {, name: file.name,
+ metadata: { name: file.name,
  size: file.size,
  type: file.type,
  lastModified: file.lastModified,

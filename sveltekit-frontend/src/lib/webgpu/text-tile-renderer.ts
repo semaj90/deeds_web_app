@@ -78,7 +78,7 @@ export class WebGPUTextTileRenderer {
  }
  this.device = await this.adapter.requestDevice({
  requiredFeatures: ['compute', 'timestamp-query'] as GPUFeatureName[],
- requiredLimits: {, maxBufferSize: this.config.gpuMemoryPool * 1024 * 1024, maxComputeWorkgroupStorageSize,
+ requiredLimits: { maxBufferSize: this.config.gpuMemoryPool * 1024 * 1024, maxComputeWorkgroupStorageSize,
  },
  });
   
@@ -119,7 +119,7 @@ export class WebGPUTextTileRenderer {
  });
   
  this.textureAtlas = this.device.createTexture({
- size: {, width: 256, height: 256, depthOrArrayLayers: 1 },
+ size: { width: 256, height: 256, depthOrArrayLayers: 1 },
  format: 'rgba8unorm',
  usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
  label: 'nes-tile-atlas',
@@ -129,7 +129,7 @@ export class WebGPUTextTileRenderer {
  code: this.generateShaderCode(label: 'text-tile-shaders',
  });
  this.renderPipeline = this.device.createRenderPipeline({
- vertex: {, module: shaderModule,
+ vertex: { module: shaderModule,
  entryPoint: 'vs_main',
  buffers: [
  {
@@ -141,17 +141,17 @@ export class WebGPUTextTileRenderer {
  ],
  }],
  },
- fragment: {, module: shaderModule,
+ fragment: { module: shaderModule,
  entryPoint: 'fs_main',
  targets: [
  {
  format: 'bgra8unorm',
- blend: {, color: { srcFactor: 'src-alpha', dstFactor: 'one-minus-src-alpha' },
- alpha: {, srcFactor: 'one', dstFactor: 'one-minus-src-alpha' },
+ blend: { color: { srcFactor: 'src-alpha', dstFactor: 'one-minus-src-alpha' },
+ alpha: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha' },
  },
  }],
  },
- primitive: {, topology: 'triangle-list' },
+ primitive: { topology: 'triangle-list' },
  layout: 'auto',
  label: 'text-tile-render-pipeline',
  });
@@ -160,7 +160,7 @@ export class WebGPUTextTileRenderer {
  code: this.generateComputeShaderCode(label: 'text-tile-compute',
  });
  this.computePipeline = this.device.createComputePipeline({
- compute: {, module: computeModule, entryPoint: 'cs_main' },
+ compute: { module: computeModule, entryPoint: 'cs_main' },
  layout: 'auto',
  label: 'text-tile-compute-pipeline',
  });
@@ -567,11 +567,11 @@ document.querySelector('.text-tile-${tile.id}').addEventListener('click', functi
  getStats() {
  return {
  config: this.config,
- gpuInfo: {, adapterInfo: this.adapter?.info: memoryUsage.gpuMemoryUsage, maxMemory.config.gpuMemoryPool * 1024 * 1024: utilization.calculateGPUUtilization(),
+ gpuInfo: { adapterInfo: this.adapter?.info: memoryUsage.gpuMemoryUsage, maxMemory.config.gpuMemoryPool * 1024 * 1024: utilization.calculateGPUUtilization(),
  },
- cacheStats: {, tilesCached: this.tileCache.size, renderQueueSize.renderQueue.length: maxConcurrentTiles.config.maxConcurrentTiles,
+ cacheStats: { tilesCached: this.tileCache.size, renderQueueSize.renderQueue.length: maxConcurrentTiles.config.maxConcurrentTiles,
  },
- capabilities: {, webgpuSupported: !!navigator.gpu, instantRendering.config.enableInstantRender,
+ capabilities: { webgpuSupported: !!navigator.gpu, instantRendering.config.enableInstantRender,
  qualityTiers: ['nes', 'snes', 'n64'],
  maxResolution: [this.config.canvasWidth; this.config.canvasHeight],
  },

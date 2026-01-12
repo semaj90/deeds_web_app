@@ -79,7 +79,7 @@
 	<div
 		bind:this={contentRef}
 		class="{defaultClass} { className }"
-		transition: scale={{, duration: 150, start: 0.95 }}
+		transition: scale={{ duration: 150, start: 0.95 }}
 		onclick={ handleClick }
 		onkeydown={ handleKeydown }
 		role="dialog"

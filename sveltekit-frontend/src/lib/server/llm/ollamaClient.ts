@@ -24,7 +24,7 @@ export async function ollamaChat({
  const response = await fetch(`${base}/api/chat`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: stream,
+ body: JSON.stringify({ model: stream,
  options: { temperature },
  messages: [
  { role: 'system', content: system },

@@ -16,7 +16,7 @@
 
 	type Phase72Status = {
 		errorCount: number;
-		lastError?: {, code: string;
+		lastError?: { code: string;
 			message: string; count: number;
 			lastSeen: string;
 		};
@@ -83,7 +83,7 @@
 			await fetch('/api/phase72/suggest-fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, route: route.path })
+				body: JSON.stringify({ route: route.path })
 			});
 		} finally {
 			actionInProgress = null;
@@ -97,7 +97,7 @@
 			const res = await fetch('/api/phase82/upgrade-route', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, route: route.path })
+				body: JSON.stringify({ route: route.path })
 			});
 			if (res.ok) {
 				const data = await res.json();
@@ -128,7 +128,7 @@
 			await fetch('/api/phase78/playwright-check', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, route: route.path })
+				body: JSON.stringify({ route: route.path })
 			});
 		} finally {
 			actionInProgress = null;

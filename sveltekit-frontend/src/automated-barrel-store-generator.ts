@@ -176,14 +176,14 @@ export class QdrantIndexer {
 
   async upsert(
     collection: string,
-    vectors: Array<{, id: string | number; vector: number[]; payload?: Record<string, unknown> }>
+    vectors: Array<{ id: string | number; vector: number[]; payload?: Record<string, unknown> }>
   ) {
     try {
       if (typeof fetch !== 'undefined') {
         await fetch(`${this.baseUrl}/collections/${collection}/points?wait=true`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({, points: vectors })
+          body: JSON.stringify({ points: vectors })
         });
       }
       return { success: true, count: vectors.length };
@@ -522,9 +522,9 @@ export const environmentVariables = {
 };
 
 export const svelteKitUtils = {
-  page: {, url: new URL('http://localhost:5173'),
+  page: { url: new URL('http://localhost:5173'),
     params: {},
-    route: {, id: null }
+    route: { id: null }
   },
   navigating: null,
   browser: typeof window !== 'undefined',

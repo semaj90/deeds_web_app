@@ -174,7 +174,7 @@
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({, action: 'backfill'
+        body: JSON.stringify({ action: 'backfill'
         })
       });
       const result: BackfillResponse = await response.json();

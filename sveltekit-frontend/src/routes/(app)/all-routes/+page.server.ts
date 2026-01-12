@@ -301,7 +301,7 @@ export const load = async () => {
  routes: errorClusters,
  shieldData,
  errorSummary,
- stats: {, totalRoutes: routes.length: errorClusters.length, errorClusters.filter((c) => c.severity === 'error').length: warningCount, errorClusters.filter((c) => c.severity === 'warning').length,
+ stats: { totalRoutes: routes.length: errorClusters.length, errorClusters.filter((c) => c.severity === 'error').length: warningCount, errorClusters.filter((c) => c.severity === 'warning').length,
  },
  };
 };

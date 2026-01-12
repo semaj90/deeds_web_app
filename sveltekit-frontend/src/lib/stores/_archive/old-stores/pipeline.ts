@@ -37,7 +37,7 @@ function createPipelineStore() {
  events.update((list) => [
  ...list,
  { type: 'system.open', ts: Date.now(),
-     raw: {, message: 'ws open' } }]);
+     raw: { message: 'ws open' } }]);
  };
  socket.onmessage = (ev) => {
  try {

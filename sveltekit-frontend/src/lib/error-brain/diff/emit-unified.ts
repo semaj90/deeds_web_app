@@ -126,7 +126,7 @@ export function computeLineDelta(before: string, after, string: number {
 export function createPatchCandidate(
  file: string, before: string, string: after, reason: string, string: confidence,
  ruleId?: string
-): {, beforeHash: string;
+): { beforeHash: string;
  afterHash: string; unifiedDiff: string;
  lineDelta: number; file: string;
  reason: string; confidence: number;

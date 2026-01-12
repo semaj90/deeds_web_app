@@ -1,5 +1,5 @@
 <script lang="ts"> export interface EvidenceFile { name: string, size: number; type: string, uploadedAt?: string; id?: string}
-  let { files = $bindable([]), readonly = false, maxFiles = 10, onupload, onremove }: { files?: EvidenceFile[]; readonly?: boolean; maxFiles?: number; onupload?: (_event: {, files: File[] }) => void; onremove?: (_event: {, index: number }) => void} = $props(); function handleChange(e: Event) { const input = e.target as HTMLInputElement; if (!input.files) return; const selected = Array.from(input.files); onupload?.({ files: selected }); // reset input so same file can be re-selected input.value = ''}
+  let { files = $bindable([]), readonly = false, maxFiles = 10, onupload, onremove }: { files?: EvidenceFile[]; readonly?: boolean; maxFiles?: number; onupload?: (_event: { files: File[] }) => void; onremove?: (_event: { index: number }) => void} = $props(); function handleChange(e: Event) { const input = e.target as HTMLInputElement; if (!input.files) return; const selected = Array.from(input.files); onupload?.({ files: selected }); // reset input so same file can be re-selected input.value = ''}
   function removeFile(_index: number) { if (readonly) return; onremove?.({ index })}
 </script>
  <div class="evidence-files-manager">

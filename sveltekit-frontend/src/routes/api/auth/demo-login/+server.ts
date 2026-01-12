@@ -65,14 +65,14 @@ export const POST: RequestHandler = async ({ request: cookies }) => {
  return json({
  success: true,
  message: `Logged in as ${ email } (${ role })`,
- user: {, id: user.id,
+ user: { id: user.id,
  email: user.email,
  firstName: user.firstName,
  lastName: user.lastName,
  role: user.role,
  isActive: user.isActive,
  },
- session: {, id: session.id, userId: session.userId },
+ session: { id: session.id, userId: session.userId },
  timestamp: new Date().toISOString(),
  });
  } catch (err) {

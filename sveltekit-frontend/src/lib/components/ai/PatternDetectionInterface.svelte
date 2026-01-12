@@ -5,7 +5,7 @@
    let analysisResults = $state<AnalysisResult | null>(null); // Filters and controls let patternTypeFilter = $state<'all' | 'temporal' | 'behavioral' | 'financial' | 'communication'>('all');
    let confidenceThreshold = $state<number>(70);
    let timeRange = $state<'1d' | '7d' | '30d' | '90d' | 'all'>('30d');
-   let selectedDataSources = $state<string[]>(['evidence', 'communications', 'financial']); interface DetectedPattern { id: string, type: 'temporal' | 'behavioral' | 'financial' | 'communication' | 'location',title: string, description: string, confidence: number, significance: number, frequency: number, timeframe: {, start: string, end: string; duration: string}; entities: PatternEntity[], evidence: string[], correlations: PatternCorrelation[], riskLevel: 'low' | 'medium' | 'high' | 'critical'; recommendations: string[]}
+   let selectedDataSources = $state<string[]>(['evidence', 'communications', 'financial']); interface DetectedPattern { id: string, type: 'temporal' | 'behavioral' | 'financial' | 'communication' | 'location',title: string, description: string, confidence: number, significance: number, frequency: number, timeframe: { start: string, end: string; duration: string}; entities: PatternEntity[], evidence: string[], correlations: PatternCorrelation[], riskLevel: 'low' | 'medium' | 'high' | 'critical'; recommendations: string[]}
 
 interface PatternEntity { id: string, type: 'person' | 'organization' | 'location' | 'event' | 'document',name: string, role: string; involvement: number}
 

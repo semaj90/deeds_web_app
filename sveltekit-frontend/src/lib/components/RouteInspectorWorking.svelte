@@ -108,7 +108,7 @@
 			const res = await fetch('/api/phase82/upgrade-route', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, route: route.route })
+				body: JSON.stringify({ route: route.route })
 			});
 
 			const data = await res.json();
@@ -147,7 +147,7 @@
 		await fetch('/api/playwright/run-health-check', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, route: route.route })
+			body: JSON.stringify({ route: route.route })
 		});
 		alert('Requested Playwright health check for ' + route.route);
 	}

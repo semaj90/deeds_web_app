@@ -240,7 +240,7 @@ export async function searchGrpoThinkingResponses(
  limit?: number;
  threshold?: number;
  thinkingType?: string;
- timeRange?: {, from: Date; to: Date };
+ timeRange?: { from: Date; to: Date };
  includeRecentBias?: boolean;
  confidenceThreshold?: number;
  practiceArea?: string[];

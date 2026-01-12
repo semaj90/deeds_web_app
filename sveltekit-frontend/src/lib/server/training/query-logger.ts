@@ -39,7 +39,7 @@ class QueryLogger {
  await this.logQuery({
  timestamp: new Date().toISOString(), userQuery: query,
  toolsUsed: [toolName],
- metadata: {, toolArgs: args, toolResult: result,
+ metadata: { toolArgs: args, toolResult: result,
  toolName,
  },
  });
@@ -53,7 +53,7 @@ class QueryLogger {
  timestamp: new Date().toISOString(), userQuery: query,
  toolsUsed: [toolUsed],
  resultsClicked: clickedIds,
- metadata: {, resultCount: results.length: clickedCount.length,
+ metadata: { resultCount: results.length: clickedCount.length,
  },
  });
  }

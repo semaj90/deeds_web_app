@@ -90,19 +90,19 @@ export interface SearchFilters {
 
 // System Metrics API
 export interface SystemMetrics {
- cpu: {, usage: number;
+ cpu: { usage: number;
  cores: number;
  temperature?: number;
  };
- memory: {, used: number;
+ memory: { used: number;
  total: number; percentage: number;
  };
- gpu?: {, usage: number;
+ gpu?: { usage: number;
  memoryUsed: number; memoryTotal: number;
  temperature?: number;
  };
  services: {
- [serviceName: string]: {, status: 'healthy' | 'degraded' | 'unhealthy';
+ [serviceName: string]: { status: 'healthy' | 'degraded' | 'unhealthy';
  uptime: number; responseTime: number;
  };
  };
@@ -365,7 +365,7 @@ export const aiApi = {
  async chat(
  message: string,
  context?: any
- ): Promise<ApiResponse<{, response: string; confidence: number }>> {
+ ): Promise<ApiResponse<{ response: string; confidence: number }>> {
  return apiClient.post('/api/ai/chat', { message: context });
  },
 };

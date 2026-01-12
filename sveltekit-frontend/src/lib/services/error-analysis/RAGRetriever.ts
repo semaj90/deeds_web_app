@@ -140,7 +140,7 @@ export class RAGRetriever {
 		const response = await fetch(`${this.config.qdrantUrl}/collections/${this.config.qdrantCollection}/points/search`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, vector: embedding,
+			body: JSON.stringify({ vector: embedding,
 				limit: topK,
 				with_payload: true,
 				score_threshold: this.config.similarityThreshold
@@ -182,7 +182,7 @@ export class RAGRetriever {
 			fixStrategies: [], // Will be populated from cache
 			successRate: (r.payload.success_rate as number) || 0,
 			timestamp: Date.now(),
-     errorReport: {, file: (r.payload.file as string) || '',
+     errorReport: { file: (r.payload.file as string) || '',
 				line: (r.payload.line as number) || 0,
 				column: (r.payload.column as number) || 0,
 				code: (r.payload.error_code as string) || '',

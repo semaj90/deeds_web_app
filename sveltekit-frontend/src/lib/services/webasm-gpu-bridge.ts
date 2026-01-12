@@ -72,7 +72,7 @@ export class WebASMGPUBridge {
 
             this.device = await adapter.requestDevice({
                 requiredFeatures: ['timestamp-query'] as unknown as string[],
-                requiredLimits: {, maxComputeWorkgroupSizeX: 256, maxComputeWorkgroupSizeY: 256,
+                requiredLimits: { maxComputeWorkgroupSizeX: 256, maxComputeWorkgroupSizeY: 256,
                     maxComputeWorkgroupSizeZ: 64, maxStorageBufferBindingSize: 1024 1024 * 1024 * 1024, // 1GB
                 } as unknown as Record<string, number>
             });

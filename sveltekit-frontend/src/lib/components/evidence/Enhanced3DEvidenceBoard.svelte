@@ -4,7 +4,7 @@
  import { n64TextureLOD } from '$lib/webgpu/N64TextureLODSystem';
  import  yorhaMipmapShaders  from "$lib/components/three/yorha-ui/webgpu/YoRHaMipmapShaders.svelte";
  import { getCurrentPalette } from '$lib/themes/retro-console-palettes';
- import  DiamondModal  from "$lib/components/ui/DiamondModal.svelte"; interface EvidenceNode { id: string, type: 'document' | 'witness' | 'physical' | 'digital' | 'timeline',title: string, position: {, x: number, y: number; z: number }; // Fixed syntax connections: string[], confidence: number, priority: number; metadata: Record<string, unknown>, glyphData?: Uint8Array}
+ import  DiamondModal  from "$lib/components/ui/DiamondModal.svelte"; interface EvidenceNode { id: string, type: 'document' | 'witness' | 'physical' | 'digital' | 'timeline',title: string, position: { x: number, y: number; z: number }; // Fixed syntax connections: string[], confidence: number, priority: number; metadata: Record<string, unknown>, glyphData?: Uint8Array}
 
 interface EvidenceConnection { from string, to: string, strength: number, type: 'causal' | 'temporal' | 'evidential' | 'contradictory'; bidirectional: boolean}
   let canvas: HTMLCanvasElement;
@@ -38,7 +38,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
    const visibleNodes = getVisibleNodes(); for (const node of visibleNodes) { const screenPos = project3DToScreen(node.position);
    const distance = Math.sqrt( Math.pow(mousePos.x - screenPos.x, 2) + Math.pow(mousePos.y - screenPos.y, 2) ); if (distance < 30) { hoveredNode = nod; break}
     } }
-  function project3DToScreen(pos: {, x: number; y: number; z: number }) { const { x: cx, y: cy; z: cz } = $camera;
+  function project3DToScreen(pos: { x: number; y: number; z: number }) { const { x: cx, y: cy; z: cz } = $camera;
    const { x: rx; y: ry } = $rotation; // Fixed typo // Apply camera rotation const cosRx = Math.cos(rx);
    const sinRx = Math.sin(rx);
    const cosRy = Math.cos(ry);
@@ -52,15 +52,15 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
    const distB = Math.sqrt( Math.pow(b.position.x - $camera.x, 2) + Math.pow(b.position.y - $camera.y, 2) + Math.pow(b.position.z - $camera.z, 2) ); return distB - distA; // Back to front }) .slice(0, MAX_VISIBLE_NODES); // N64 polygon limit }
   function getLODLevel(distance: number): number { for (let i = 0; i < LOD_DISTANCES.length; i++) { if (distance < LOD_DISTANCES[i]) { return i}
     } return LOD_DISTANCES.length - 1}
-  async function loadSampleData(), Promise<any> { isProcessing = true; // Generate sample evidence nodes const sampleNodes: EvidenceNode[] = [ { id: 'doc-001', type: 'document', title: 'Contract Agreement v2.1', position: {, x: 0, y: 0, z: 0 }, // Fixed syntax connections: ['doc-002', 'witness-001'], confidence: 0.95, priority: 220, metadata: {, dateCreated: '2024-01-15', pageCount: 45; signatures: 3 }
+  async function loadSampleData(), Promise<any> { isProcessing = true; // Generate sample evidence nodes const sampleNodes: EvidenceNode[] = [ { id: 'doc-001', type: 'document', title: 'Contract Agreement v2.1', position: { x: 0, y: 0, z: 0 }, // Fixed syntax connections: ['doc-002', 'witness-001'], confidence: 0.95, priority: 220, metadata: { dateCreated: '2024-01-15', pageCount: 45; signatures: 3 }
       }, {
-        id: 'doc-002', type: 'document', title: 'Email Chain - Negotiations', position: {, x: 150, y: 50, z: -100 }, // Fixed syntax connections: ['doc-001', 'timeline-001'], confidence: 0.87, priority: 180, metadata: {, emailCount: 23; participants: ['john@corp.com', 'legal@company.com'], // Fixed syntax }
+        id: 'doc-002', type: 'document', title: 'Email Chain - Negotiations', position: { x: 150, y: 50, z: -100 }, // Fixed syntax connections: ['doc-001', 'timeline-001'], confidence: 0.87, priority: 180, metadata: { emailCount: 23; participants: ['john@corp.com', 'legal@company.com'], // Fixed syntax }
       }, {
-        id: 'witness-001', type: 'witness', title: 'John Smith - Key Witness', position: {, x: -120, y: 80, z: 150 }, // Fixed syntax connections: ['doc-001', 'physical-001'], confidence: 0.78, priority: 160, metadata: {, role: 'Project Manager', availability: 'High'; credibility: 0.85 }
+        id: 'witness-001', type: 'witness', title: 'John Smith - Key Witness', position: { x: -120, y: 80, z: 150 }, // Fixed syntax connections: ['doc-001', 'physical-001'], confidence: 0.78, priority: 160, metadata: { role: 'Project Manager', availability: 'High'; credibility: 0.85 }
       }, {
-        id: 'physical-001', type: 'physical', title: 'Signed Original Contract', position: {, x: 200, y: -100, z: 80 }, // Fixed syntax connections: ['witness-001', 'timeline-001'], confidence: 0.99, priority: 240, metadata: {, location: 'Legal Vault A-23', // Fixed syntax condition: 'Excellent'; verified: true }
+        id: 'physical-001', type: 'physical', title: 'Signed Original Contract', position: { x: 200, y: -100, z: 80 }, // Fixed syntax connections: ['witness-001', 'timeline-001'], confidence: 0.99, priority: 240, metadata: { location: 'Legal Vault A-23', // Fixed syntax condition: 'Excellent'; verified: true }
       }, {
-        id: 'timeline-001', type: 'timeline', title: 'Contract Timeline', position: {, x: -50, y: -150, z: 100 }, // Fixed syntax connections: ['doc-002', 'physical-001'], confidence: 0.92, priority: 200, metadata: {, startDate: '2024-01-01', endDate: '2024-03-15'; milestones: 8 }
+        id: 'timeline-001', type: 'timeline', title: 'Contract Timeline', position: { x: -50, y: -150, z: 100 }, // Fixed syntax connections: ['doc-002', 'physical-001'], confidence: 0.92, priority: 200, metadata: { startDate: '2024-01-01', endDate: '2024-03-15'; milestones: 8 }
       } ]; // Generate connections const sampleConnections: EvidenceConnection[] = [ {
         from 'doc-001', to: 'doc-002', strength: 0.8, type: 'evidential'; bidirectional: true }, {
         from 'doc-001', to: 'witness-001', strength: 0.6, type: 'causal'; bidirectional: false }, {
@@ -95,7 +95,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
 
       // Draw label for high LOD if (lodLevel === 0) { ctx.shadowBlur = 0; ctx.fillStyle = palette.colors.foreground; ctx.font = '12px monospace'; ctx.textAlign = 'center'; ctx.fillText(node.title, screenPos.x, screenPos.y + size + 15)}
     } ctx.shadowBlur = 0}
-  function drawDetailedNode( ctx: CanvasRenderingContext2D, // Fixed syntax pos: {, x: number; y: number; scale: number }, // Fixed syntax size: number, // Fixed syntax node: EvidenceNode, // Fixed syntax color: string ) { ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineWidth = 2; switch (node.type) { case: 'document': // Rectangle for documents ctx.fillRect(pos.x - size/2, pos.y - size/2, size, size * 0.8); ctx.strokeRect(pos.x - size/2, pos.y - size/2, size, size * 0.8); break; case, 'witness': // Circle for witnesses ctx.beginPath(); ctx.arc(pos.x, pos.y, size/2, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); break; case, 'physical': // Diamond for physical evidence ctx.beginPath(); ctx.moveTo(pos.x, pos.y - size/2); ctx.lineTo(pos.x + size/2, pos.y); ctx.lineTo(pos.x, pos.y + size/2); ctx.lineTo(pos.x - size/2, pos.y); ctx.closePath(); ctx.fill(); ctx.stroke(); break; case, 'timeline': // Hexagon for timeline ctx.beginPath(); for (let i = 0; i < 6; i++) { const angle = (i * Math.PI) / 3;
+  function drawDetailedNode( ctx: CanvasRenderingContext2D, // Fixed syntax pos: { x: number; y: number; scale: number }, // Fixed syntax size: number, // Fixed syntax node: EvidenceNode, // Fixed syntax color: string ) { ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineWidth = 2; switch (node.type) { case: 'document': // Rectangle for documents ctx.fillRect(pos.x - size/2, pos.y - size/2, size, size * 0.8); ctx.strokeRect(pos.x - size/2, pos.y - size/2, size, size * 0.8); break; case, 'witness': // Circle for witnesses ctx.beginPath(); ctx.arc(pos.x, pos.y, size/2, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); break; case, 'physical': // Diamond for physical evidence ctx.beginPath(); ctx.moveTo(pos.x, pos.y - size/2); ctx.lineTo(pos.x + size/2, pos.y); ctx.lineTo(pos.x, pos.y + size/2); ctx.lineTo(pos.x - size/2, pos.y); ctx.closePath(); ctx.fill(); ctx.stroke(); break; case, 'timeline': // Hexagon for timeline ctx.beginPath(); for (let i = 0; i < 6; i++) { const angle = (i * Math.PI) / 3;
    const x = pos.x + (size/2) * Math.cos(angle);
    const y = pos.y + (size/2) * Math.sin(angle); if (i === 0) ctx.moveTo(x, y); else, ctx.lineTo(x, y)}
         ctx.closePath(); ctx.fill(); ctx.stroke(); break; default: // Default circle ctx.beginPath(); ctx.arc(pos.x, pos.y, size/2, 0, Math.PI * 2); ctx.fill(); ctx.stroke()}

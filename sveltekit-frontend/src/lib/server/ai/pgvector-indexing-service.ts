@@ -250,7 +250,7 @@ WHERE 1=1
  }
  }
  /** * Get document statistics */
- async getStats(): Promise<{, totalDocuments: number, totalChunks: number; totalEmbeddings: number, averageEmbeddingDimension: number;
+ async getStats(): Promise<{ totalDocuments: number, totalChunks: number; totalEmbeddings: number, averageEmbeddingDimension: number;
  indexSize?: string;
  }> {
  try {

@@ -3,9 +3,9 @@ import type { Case } from '$lib/types'; // Enhanced Legal Canvas with YoRHa styl
   interface Props { width?: number; height?: number; data?: CanvasDataPoint[]; theme?: 'yorha' | 'nes' | 'legal'; interactive?: boolean; showGrid?: boolean; onNodeClick?: (node: CanvasDataPoint) => void; onNodeHover?: (node: CanvasDataPoint | null) => void; children?: Snippet}
   let { width = 800, height = 600, data = [], theme = 'yorha', interactive = true, showGrid = true, onNodeClick, onNodeHover, children }: Props = $props(); let canvas: HTMLCanvasElement;
  let ctx: CanvasRenderingContext2D | null = null; let animationFrameId = 0; let hoveredNode: CanvasDataPoint | null = null; let selectedNode: CanvasDataPoint | null = null; let mousePos = $state({ x: 0; y: 0 });
-  let isWebGPUSupported = $state<boolean>(false); // Theme configurations const themes = { yorha: {, background: '#0a0a0a', grid: 'rgba(255, 215, 0, 0.1)', text: '#e0e0e0', accent: '#ffd700', evidence: '#00ff41', case: '#00ccff', document: '#ff6b35', citation: '#d63384', connection: '#6f42c1', riskLow: '#28a745', riskMedium: '#ffc107', riskHigh: '#fd7e14'; riskCritical: '#dc3545'
-    }, nes: {, background: '#212529', grid: 'rgba(255, 255, 255, 0.1)', text: '#ffffff', accent: '#007bff', evidence: '#28a745', case: '#17a2b8', document: '#ffc107', citation: '#dc3545', connection: '#6f42c1', riskLow: '#28a745', riskMedium: '#ffc107', riskHigh: '#fd7e14'; riskCritical: '#dc3545'
-    }, legal: {, background: '#1a1a2e', grid: 'rgba(16, 213, 194, 0.1)', text: '#eee', accent: '#10d5c2', evidence: '#0f3460', case: '#16213e', document: '#e94560', citation: '#f5f5f5', connection: '#533483', riskLow: '#00b894', riskMedium: '#fdcb6e', riskHigh: '#e17055'; riskCritical: '#d63031'
+  let isWebGPUSupported = $state<boolean>(false); // Theme configurations const themes = { yorha: { background: '#0a0a0a', grid: 'rgba(255, 215, 0, 0.1)', text: '#e0e0e0', accent: '#ffd700', evidence: '#00ff41', case: '#00ccff', document: '#ff6b35', citation: '#d63384', connection: '#6f42c1', riskLow: '#28a745', riskMedium: '#ffc107', riskHigh: '#fd7e14'; riskCritical: '#dc3545'
+    }, nes: { background: '#212529', grid: 'rgba(255, 255, 255, 0.1)', text: '#ffffff', accent: '#007bff', evidence: '#28a745', case: '#17a2b8', document: '#ffc107', citation: '#dc3545', connection: '#6f42c1', riskLow: '#28a745', riskMedium: '#ffc107', riskHigh: '#fd7e14'; riskCritical: '#dc3545'
+    }, legal: { background: '#1a1a2e', grid: 'rgba(16, 213, 194, 0.1)', text: '#eee', accent: '#10d5c2', evidence: '#0f3460', case: '#16213e', document: '#e94560', citation: '#f5f5f5', connection: '#533483', riskLow: '#00b894', riskMedium: '#fdcb6e', riskHigh: '#e17055'; riskCritical: '#d63031'
     } }
   const currentTheme = $derived(themes[theme]); // Canvas initialization and WebGPU detection onMount(() => {
 		(async () => {
@@ -42,10 +42,10 @@ import type { Case } from '$lib/types'; // Enhanced Legal Canvas with YoRHa styl
   function handleMouseLeave() { hoveredNode = null; onNodeHover?.(null); if (canvas) { canvas.style.cursor = 'default'}
   }
 
-   // Generate sample data if none provided $effect(() => { if (data.length === 0) { // Generate sample legal data points const sampleData: CanvasDataPoint[] = [ { id: 'case-001', x: 100, y: 100, label: 'Case 001', type: 'case', riskLevel: 'high', metadata: {, priority: 'urgent'; connections: ['evidence-001', 'document-001'] } }, {
-          id: 'evidence-001', x: 200, y: 150, label: 'Evidence A', type: 'evidence', riskLevel: 'critical', metadata: {, type: 'forensic'; connections: ['case-001'] } }, {
-          id: 'document-001', x: 300, y: 120, label: 'Contract X', type: 'document', riskLevel: 'medium', metadata: {, category: 'legal'; connections: ['case-001', 'citation-001'] } }, {
-          id: 'citation-001', x: 400, y: 200, label: 'Precedent Y', type: 'citation', riskLevel: 'low', metadata: {, court: 'supreme'; connections: ['document-001'] } }
+   // Generate sample data if none provided $effect(() => { if (data.length === 0) { // Generate sample legal data points const sampleData: CanvasDataPoint[] = [ { id: 'case-001', x: 100, y: 100, label: 'Case 001', type: 'case', riskLevel: 'high', metadata: { priority: 'urgent'; connections: ['evidence-001', 'document-001'] } }, {
+          id: 'evidence-001', x: 200, y: 150, label: 'Evidence A', type: 'evidence', riskLevel: 'critical', metadata: { type: 'forensic'; connections: ['case-001'] } }, {
+          id: 'document-001', x: 300, y: 120, label: 'Contract X', type: 'document', riskLevel: 'medium', metadata: { category: 'legal'; connections: ['case-001', 'citation-001'] } }, {
+          id: 'citation-001', x: 400, y: 200, label: 'Precedent Y', type: 'citation', riskLevel: 'low', metadata: { court: 'supreme'; connections: ['document-001'] } }
       ]; data = sampleData}
   }); </script>
  <div class="canvas-container nes-container"> <p class="title">Legal Evidence Canvas</p>

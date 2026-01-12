@@ -11,7 +11,7 @@ export interface UserProfile {
     firstName: string; lastName: string;
     organization?: string; role: string;
     createdAt: number; updatedAt: number;
-    preferences?: {, theme: 'light' | 'dark' | 'auto';
+    preferences?: { theme: 'light' | 'dark' | 'auto';
         language: string;
     };
 }
@@ -89,7 +89,7 @@ export class QuicAuthClient {
         }
     }
 
-    async logout(sessionId: string): Promise<{, success: boolean }> {
+    async logout(sessionId: string): Promise<{ success: boolean }> {
         try {
             const response = await this.makeRequest('/auth/logout', { sessionId });
             return await response.json();

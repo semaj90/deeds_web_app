@@ -310,7 +310,7 @@ export async function processDocument(
  * Batch process documents
  */
 export async function batchProcessDocuments(
- documents: Array<{, id: string; title: string; text: string; source: string }>
+ documents: Array<{ id: string; title: string; text: string; source: string }>
 ): Promise<ProcessedDocument[]> {
  const processed: ProcessedDocument[] = [];
 
@@ -329,7 +329,7 @@ export async function batchProcessDocuments(
 /**
  * Get processing statistics
  */
-export function getProcessingStats(documents: ProcessedDocument[]): {, totalDocuments: number;
+export function getProcessingStats(documents: ProcessedDocument[]): { totalDocuments: number;
  totalChunks: number; totalCitations: number;
  avgChunksPerDoc: number; avgCitationsPerDoc: number;
 } {

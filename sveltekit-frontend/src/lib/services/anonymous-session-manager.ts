@@ -156,7 +156,7 @@ export class AnonymousSessionManager {
 	/**
 	 * Get session info for migration
 	 */
-	getSessionInfo(): {, sessionId: string; messageCount: number; chatCount: number } | null {
+	getSessionInfo(): { sessionId: string; messageCount: number; chatCount: number } | null {
 		if (!this.session) return null;
 
 		let messageCount = 0;
@@ -172,7 +172,7 @@ export class AnonymousSessionManager {
 	/**
 	 * Export all chats for migration to legal_ai_db
 	 */
-	exportForMigration(): {, sessionId: string; chats: Record<string, ChatMessage[]> } | null {
+	exportForMigration(): { sessionId: string; chats: Record<string, ChatMessage[]> } | null {
 		if (!this.session) return null;
 
 		return {

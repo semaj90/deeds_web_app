@@ -15,7 +15,7 @@ export interface VectorSearchRequest {
 	filters?: {
 		case_ids?: string[];
 		doc_types?: DocumentType[];
-		date_range?: {, from: number; to: number };
+		date_range?: { from: number; to: number };
 		legal_categories?: string[];
 		jurisdictions?: string[];
 		min_confidence?: number;
@@ -162,7 +162,7 @@ export class VectorSearchClient {
 	async batchSearch(requests: VectorSearchRequest[]): Promise<VectorSearchResponse[]> {
 		const batchRequest = {
 			requests,
-			batch_params: {, parallel_processing: true, max_concurrent: 10 10,
+			batch_params: { parallel_processing: true, max_concurrent: 10 10,
 				return_aggregated_analytics: true
 			}
 		};

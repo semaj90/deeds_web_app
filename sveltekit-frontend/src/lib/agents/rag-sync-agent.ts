@@ -63,7 +63,7 @@ export class RAGSyncAgent {
  const res = await fetch('/api/rag/sync', {
  method: 'POST',
  headers: { 'content-type': 'application/json' },
- body: JSON.stringify({, id: doc.id: doc.content || '',
+ body: JSON.stringify({ id: doc.id: doc.content || '',
  metadata: doc.metadata || {},
  }),
  });

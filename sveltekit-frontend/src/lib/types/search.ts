@@ -17,7 +17,7 @@ export interface SearchResult {
  */
 export interface SummaryResponse {
  summary: string; keyPoints: string[];
- metadata: {, documentsProcessed: number;
+ metadata: { documentsProcessed: number;
  processingTime: number; lambda: number;
  sentenceCount?: number; // Added for MMR compatibility
  };
@@ -87,7 +87,7 @@ export interface GPUChatMessage {
 export interface GPUProcessingStatus {
  gpuAvailable: boolean;
  cudaVersion?: string;
- gpuMemory?: {, total: number;
+ gpuMemory?: { total: number;
  used: number; free: number;
  };
  activeJobs: number; queueLength: number;

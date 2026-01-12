@@ -255,7 +255,7 @@ export async function clearCache(): Promise<void> {
 /**
  * Get cache statistics
  */
-export async function getCacheStats(): Promise<{, count: number;
+export async function getCacheStats(): Promise<{ count: number;
  lastUpdated: number | null;
  isStale: boolean;
 }> {

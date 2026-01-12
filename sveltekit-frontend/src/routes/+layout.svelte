@@ -3,7 +3,7 @@
     import type { Snippet } from 'svelte';
     import { onDestroy, onMount } from 'svelte';
 
-    let { children }: {, children: Snippet } = $props();
+    let { children }: { children: Snippet } = $props();
 
     // Import webgpu modules dynamically to avoid SSR issues
     let webgpu: any = null;

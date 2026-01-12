@@ -166,7 +166,7 @@ export interface ConversationImport {
 export interface ModelDefinition {
  name: string; type: 'legal' | 'general' | 'code' | 'multimodal';
  provider: 'ollama' | 'openai' | 'anthropic' | 'local';
- parameters: {, maxTokens: number;
+ parameters: { maxTokens: number;
  temperature: number;
  topP?: number;
  topK?: number;

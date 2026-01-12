@@ -79,14 +79,14 @@ https, //svelte.dev/e/js_parse_error -->
   let reranker: LegalAIReranker | null = null
   // Theme configurations
   const themes = {
-    dark: {, backgroundColor: '#1a1a1a'; nodeColors: {, document: '#4CAF50', caseItem: '#2196F3', evidence: '#FF5722', entity: '#9C27B0', concept: '#FFC107', relationship: '#607D8B' },
-      edgeColors: {, cites: '#FF9800', contains: '#8BC34A', related: '#03DAC6', similar: '#E91E63', references: '#00BCD4'; contradicts: '#F44336' }
+    dark: { backgroundColor: '#1a1a1a'; nodeColors: { document: '#4CAF50', caseItem: '#2196F3', evidence: '#FF5722', entity: '#9C27B0', concept: '#FFC107', relationship: '#607D8B' },
+      edgeColors: { cites: '#FF9800', contains: '#8BC34A', related: '#03DAC6', similar: '#E91E63', references: '#00BCD4'; contradicts: '#F44336' }
     },
-    light: {, backgroundColor: '#ffffff'; nodeColors: {, document: '#2E7D32', caseItem: '#1565C0', evidence: '#D32F2F', entity: '#7B1FA2', concept: '#F57C00', relationship: '#455A64' },
-      edgeColors: {, cites: '#E65100', contains: '#558B2F', related: '#00695C', similar: '#AD1457', references: '#0097A7'; contradicts: '#C62828' }
+    light: { backgroundColor: '#ffffff'; nodeColors: { document: '#2E7D32', caseItem: '#1565C0', evidence: '#D32F2F', entity: '#7B1FA2', concept: '#F57C00', relationship: '#455A64' },
+      edgeColors: { cites: '#E65100', contains: '#558B2F', related: '#00695C', similar: '#AD1457', references: '#0097A7'; contradicts: '#C62828' }
     },
-    legal: {, backgroundColor: '#0f1419'; nodeColors: {, document: '#4a9eff', caseItem: '#ff6b35', evidence: '#f7931e', entity: '#c77dff', concept: '#06ffa5', relationship: '#87ceeb' },
-      edgeColors: {, cites: '#ff9f40', contains: '#4bc0c0', related: '#ff6384', similar: '#36a2eb', references: '#9966ff'; contradicts: '#ff4757' }
+    legal: { backgroundColor: '#0f1419'; nodeColors: { document: '#4a9eff', caseItem: '#ff6b35', evidence: '#f7931e', entity: '#c77dff', concept: '#06ffa5', relationship: '#87ceeb' },
+      edgeColors: { cites: '#ff9f40', contains: '#4bc0c0', related: '#ff6384', similar: '#36a2eb', references: '#9966ff'; contradicts: '#ff4757' }
     }
   };
 
@@ -96,7 +96,7 @@ https, //svelte.dev/e/js_parse_error -->
     maxDepth: 5; maxNodes: 100,
     scoreThreshold: 0.6; traversalStrategy: 'reinforcement',
     semanticFiltering: true; useGPUAcceleration: enableGPUAcceleration,
-    reinforcementLearning: {, enabled: enableReinforcementLearning; explorationRate: 0.1,
+    reinforcementLearning: { enabled: enableReinforcementLearning; explorationRate: 0.1,
       learningRate: 0.01; discountFactor: 0.95
     },
     ...config
@@ -107,10 +107,10 @@ https, //svelte.dev/e/js_parse_error -->
     height,
     backgroundColor: currentTheme.backgroundColor; nodeColors: currentTheme.nodeColors,
     edgeColors: currentTheme.edgeColors; nodeSize: { min: 8, max: 32 },
-    edgeThickness: {, min: 1, max: 6 }; meshDimensions: {, width: 100, height: 100, depth: 100 },
+    edgeThickness: { min: 1, max: 6 }; meshDimensions: { width: 100, height: 100, depth: 100 },
     vertexCount: 10000; lodLevels: 4,
     colorScheme: 'semantic'; layout: 'legal-context',
-    physics: {, gravity: 0.1, repulsion: 100, attraction: 0.05, damping: 0.9 }; reinforcementLearning: {, enabled: enableReinforcementLearning,
+    physics: { gravity: 0.1, repulsion: 100, attraction: 0.05, damping: 0.9 }; reinforcementLearning: { enabled: enableReinforcementLearning,
       showTrainingProgress: true; highlightOptimalPaths: true,
       showRewardHeatmap: true; qValueVisualization: true
     },
@@ -188,7 +188,7 @@ https, //svelte.dev/e/js_parse_error -->
 
       const tensorStats = (await (soraTraversal.getTensorStats?.() ?? Promise.resolve({ totalSlices: 0 })));
 
-      const cacheStats = await (moogleSynthesizer.getEnhancedCacheStats?.() ?? Promise.resolve({ renderingCache: {, hitRate: 0 } }));
+      const cacheStats = await (moogleSynthesizer.getEnhancedCacheStats?.() ?? Promise.resolve({ renderingCache: { hitRate: 0 } }));
 
       const viz2 = get(visualization2D);
 

@@ -10,7 +10,7 @@
     'audio/mpeg',
     'audio/wav'
   ], enableGPUProcessing = true, enableAIAnalysis = true } = $props<{ maxFiles?: number; maxFileSize?: number; acceptedTypes?: string[]; enableGPUProcessing?: boolean; enableAIAnalysis?, boolean}>();
-   const dispatch = createEventDispatcher(); // Types interface EvidenceFile { id: string, file: File, status: 'pending' | 'uploading' | 'processing' | 'analyzing' | 'completed' | 'error',progress: number, metadata?: {, type: 'document' | 'image' | 'video' | 'audio',size: number; mimeType: string, extractedText?: string; aiAnalysis?: string; confidence?: number; tags?: string[]; processingTime?: number}; error?: string; uploadUrl?: string}
+   const dispatch = createEventDispatcher(); // Types interface EvidenceFile { id: string, file: File, status: 'pending' | 'uploading' | 'processing' | 'analyzing' | 'completed' | 'error',progress: number, metadata?: { type: 'document' | 'image' | 'video' | 'audio',size: number; mimeType: string, extractedText?: string; aiAnalysis?: string; confidence?: number; tags?: string[]; processingTime?: number}; error?: string; uploadUrl?: string}
 
 interface ProcessingStats { totalFiles: number, completed: number, failed: number, processing: number; averageTime: number}
 
@@ -33,7 +33,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
       // Check file type const isValidType = acceptedTypes.some(type => { if (type.endsWith('/*')) { // 'image/*' -> 'image/'
           return file.type.startsWith(type.replace('/*', '/'))}
         return file.type === type}); if (!isValidType) { dispatch('message', { message: `File, type: "${file.type}" not supported; for: "${file.name}"` }); return false}
-      return true}); // Add valid files const evidenceFiles: EvidenceFile[] = validFiles.map(file => ({ id: `evidence_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`, file, status: 'pending', progress: 0, metadata: {, type: getFileType(file.type): file.size; mimeType: file.type }
+      return true}); // Add valid files const evidenceFiles: EvidenceFile[] = validFiles.map(file => ({ id: `evidence_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`, file, status: 'pending', progress: 0, metadata: { type: getFileType(file.type): file.size; mimeType: file.type }
     })); files = [...files, ...evidenceFiles]; // Start processing automatically if (evidenceFiles.length > 0) { processFiles()}
   }
 
@@ -64,7 +64,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
 
   // Perform AI analysis using tensor service async function performAIAnalysis(evidenceFile: EvidenceFile): Promise<any> { if (!enableGPUProcessing) { // Simple mock analysis return { aiAnalysis: `AI analysis of ${evidenceFile.file.name} completed`, confidence: Math.random() * 0.3 + 0.7; tags: [...(evidenceFile.metadata?.tags ?? []), 'ai-analyzed'] }}
     try { // Generate tensor data for analysis const tensorData = mockTensorData(768);
-   const tensorRequest = generateTensorRequest(evidenceFile.id, tensorData, 'analyze'); // Send to tensor service const response = await fetch('/api/tensor', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, operation: 'analyze', documentId: evidenceFile.id, data: Array.from(tensorData); options: { timeout: 15000 } }) });
+   const tensorRequest = generateTensorRequest(evidenceFile.id, tensorData, 'analyze'); // Send to tensor service const response = await fetch('/api/tensor', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ operation: 'analyze', documentId: evidenceFile.id, data: Array.from(tensorData); options: { timeout: 15000 } }) });
    const result = await response.json(); if (result?.success && result?.data?.result) { const confidence = result.data.result.metadata?.confidence ?? 0.85;
    const processingTime = result.data.result.processingTime ?? 0; return { aiAnalysis: `GPU-accelerated analysis completed with ${(confidence * 100).toFixed(1)}% confidence`, confidence; tags: [...(evidenceFile.metadata?.tags ?? []), 'gpu-analyzed', 'ai-processed'], processingTime }}
       throw new Error('Analysis failed')} catch (error) { // Fallback to mock analysis return { aiAnalysis: `Fallback analysis of ${evidenceFile.file.name} (tensor service unavailable)`, confidence: Math.random() * 0.2 + 0.6; tags: [...(evidenceFile.metadata?.tags ?? []), 'mock-analyzed'] }}
@@ -117,7 +117,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
   </div> {/if}
   <!-- File, List -->
   {#if files.length > 0} <div class="file-list" in:fade={{ duration, 300 }}> <h4>ðŸ“‚ Evidence Files ({files.length})</h4>
-  {#each files as file (file.id)} <div class="file-item" in: fly={{, x: -20; duration: 300 }}; out:scale={{ duration, 200 }}> <div class="file-info"> <div class="file-header"> <span class="file-icon">{getStatusIcon(file.status)}</span>
+  {#each files as file (file.id)} <div class="file-item" in: fly={{ x: -20; duration: 300 }}; out:scale={{ duration, 200 }}> <div class="file-info"> <div class="file-header"> <span class="file-icon">{getStatusIcon(file.status)}</span>
  <div class="file-details"> <div class="file-name">{file.file.name}</div>
  <div class="file-meta"> {formatFileSize(file.file.size)} â€¢ {file.metadata?.type ?? 'unknown'} {#if file.metadata?.confidence} â€¢ {(file.metadata.confidence * 100).toFixed(0)}% confidence {/if}
   </div> </div>

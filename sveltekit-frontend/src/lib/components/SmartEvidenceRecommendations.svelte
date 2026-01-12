@@ -28,9 +28,9 @@ import { Target } from "lucide-svelte";
 	}>();
 
 	const dispatch = createEventDispatcher<{
-		generate: {, evidenceId: string; caseId?: string };
-		apply: {, recommendationId: string };
-		dismiss: {, recommendationId: string };
+		generate: { evidenceId: string; caseId?: string };
+		apply: { recommendationId: string };
+		dismiss: { recommendationId: string };
 	}>();
 
 	function generateRecommendations() {

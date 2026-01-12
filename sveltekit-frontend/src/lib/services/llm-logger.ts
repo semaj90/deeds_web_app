@@ -19,16 +19,16 @@ const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
 export interface LLMLog {
   log_id: string; timestamp: string;
   model: string; task_type: 'error_fix' | 'code_gen' | 'summary' | 'extraction' | 'chat' | 'analysis';
-  input: {, prompt: string;
+  input: { prompt: string;
     context_chunks?: string[];
     system_prompt?: string;
     metadata?: Record<string, unknown>;
   };
-  output: {, response: string;
+  output: { response: string;
     tokens_in: number; tokens_out: number;
     latency_ms: number;
   };
-  evaluation: {, success: boolean;
+  evaluation: { success: boolean;
     errors_fixed?: number;
     human_feedback?: 'positive' | 'negative' | null;
     ace_score?: number;
@@ -40,7 +40,7 @@ export interface LLMLog {
 export interface InstructionSample {
   instruction: string; input: string;
   output: string;
-  metadata?: {, source: string;
+  metadata?: { source: string;
     task_type: string; ace_score: number;
     model: string;
   };
@@ -140,7 +140,7 @@ class LLMLogger {
       const embedResponse = await fetch(`${OLLAMA_URL}/api/embeddings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, model: 'embeddinggemma:latest',
+        body: JSON.stringify({ model: 'embeddinggemma:latest',
           prompt: textToEmbed
         })
       });
@@ -153,10 +153,10 @@ class LLMLogger {
       await fetch(`${QDRANT_URL}/collections/ace_llm_logs/points`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, points: [{
+        body: JSON.stringify({ points: [{
             id: log.log_id,
             vector: embedding,
-            payload: {, log_id: log.log_id,
+            payload: { log_id: log.log_id,
               model: log.model,
               task_type: log.task_type,
               ace_score: log.evaluation.ace_score,
@@ -216,7 +216,7 @@ class LLMLogger {
       const embedResponse = await fetch(`${OLLAMA_URL}/api/embeddings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, model: 'embeddinggemma:latest',
+        body: JSON.stringify({ model: 'embeddinggemma:latest',
           prompt: prompt.slice(0, 2000)
         })
       });
@@ -229,17 +229,17 @@ class LLMLogger {
       const searchResponse = await fetch(`${QDRANT_URL}/collections/ace_llm_logs/points/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, vector: embedding,
+        body: JSON.stringify({ vector: embedding,
           limit,
           with_payload: true,
-          filter: {, must: [{ key: 'success', match: {, value: true } }]
+          filter: { must: [{ key: 'success', match: { value: true } }]
           }
         })
       });
 
       if (!searchResponse.ok) return [];
 
-      const { result } = await searchResponse.json() as { result: Array<{, payload: { log_id: string } }> };
+      const { result } = await searchResponse.json() as { result: Array<{ payload: { log_id: string } }> };
 
       // Fetch full logs from CouchDB
       const logs: LLMLog[] = [];
@@ -276,7 +276,7 @@ class LLMLogger {
       return docs.map(log => ({
         instruction: this.generateInstruction(log, input: log.input.prompt,
         output: log.output.response,
-        metadata: {, source: log.log_id,
+        metadata: { source: log.log_id,
           task_type: log.task_type,
           ace_score, log.evaluation.ace_score || 0,
           model: log.model
@@ -345,10 +345,10 @@ export async function logLLMCall(
   taskType: LLMLog['task_type'],
   prompt: string,
   response: string,
-  metrics: {, tokensIn: number;
+  metrics: { tokensIn: number;
     tokensOut: number; latencyMs: number;
   },
-  evaluation: {, success: boolean;
+  evaluation: { success: boolean;
     errorsFixed?: number;
     aceScore?: number;
   },
@@ -367,7 +367,7 @@ export async function logLLMCall(
       tokens_out: metrics.tokensOut,
       latency_ms: metrics.latencyMs
     },
-    evaluation: {, success: evaluation.success,
+    evaluation: { success: evaluation.success,
       errors_fixed: evaluation.errorsFixed,
       ace_score: evaluation.aceScore
     }

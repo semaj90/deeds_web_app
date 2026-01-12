@@ -18,7 +18,7 @@ export async function getRAGSessions(user: UserType, request: Request, any): any
  return a placeholder
  return json({
  success: true,
- data: [{, id: 'rag-session-1', name: 'My First RAG Session', userId: user.id }],
+ data: [{ id: 'rag-session-1', name: 'My First RAG Session', userId: user.id }],
  });
  } catch (error) {
  console.error('Error fetching RAG sessions:', error);

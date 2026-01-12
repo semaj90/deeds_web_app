@@ -33,7 +33,7 @@ export interface WebGPUSOMCache {
   // Methods
   findSimilar(vector: Float32Array, k?: number): Array<unknown>;
   updateWithWeight(id: string, vector: Float32Array, weight: number, size: number): void;
-  getStats(): {, nodeCount: number; avgSimilarity: number; lastUpdate: number };
+  getStats(): { nodeCount: number; avgSimilarity: number; lastUpdate: number };
   storeVector(id: string, vector: Float32Array): void;
 }
 
@@ -58,7 +58,7 @@ export interface LocalLLMConnector {
 
 // Hidden Markov Model for AssemblyScript compatibility
 export class HiddenMarkovModel {
-  constructor(config: {, stateCount: number;
+  constructor(config: { stateCount: number;
     observationCount: number; transitionSmoothness: number;
     emissionSmoothness: number;
   });

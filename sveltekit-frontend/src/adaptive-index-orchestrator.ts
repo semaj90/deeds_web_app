@@ -63,7 +63,7 @@ export class AdaptiveIndexOrchestrator {
 	/**
 	 * Decide routing based on context
 	 */
-	async decideRouting(context: {, caseId: string; fileSize: number; textLength: number;
+	async decideRouting(context: { caseId: string; fileSize: number; textLength: number;
 	}): Promise<RoutingDecision> {
 		// Simple heuristic-based routing
 		if (context.fileSize > 1024 * 256) return 'gpu';
@@ -118,9 +118,9 @@ Predict optimal routing probabilities as JSON:
 			const res = await fetch(url, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, model: 'gemma3',
+				body: JSON.stringify({ model: 'gemma3',
 					prompt,
-					options: {, temperature: 0.1,
+					options: { temperature: 0.1,
 						num_ctx: 4096
 					},
 					stream: false
@@ -163,11 +163,11 @@ Predict optimal routing probabilities as JSON:
 			const response = await fetch(qdrantUpsertUrl, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, points: [
+				body: JSON.stringify({ points: [
 						{
 							id: item.id,
 							vector: embedding,
-							payload: {, caseId: item.caseId,
+							payload: { caseId: item.caseId,
 								type: item.type,
 								title: item.title ?? '',
 								content_preview: item.text.substring(0, 500),
@@ -226,7 +226,7 @@ Predict optimal routing probabilities as JSON:
 			const res = await fetch(url, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, model: 'embeddinggemma:latest',
+				body: JSON.stringify({ model: 'embeddinggemma:latest',
 					prompt: item.text
 				})
 			});

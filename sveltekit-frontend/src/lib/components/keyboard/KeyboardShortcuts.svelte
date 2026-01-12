@@ -59,7 +59,7 @@ import { Plus } from "lucide-svelte";
 
  }
  interface NotificationStoreWithAdd {
- add: (notification: {, type: string; title: string; message: string }) => void;
+ add: (notification: { type: string; title: string; message: string }) => void;
  }
 
  let open = $state<boolean>(false);
@@ -885,7 +885,7 @@ import { Plus } from "lucide-svelte";
  }
 
  interface NotificationStoreWithAdd {
- add: (notification: {, type: string; title: string; message: string }) => void;
+ add: (notification: { type: string; title: string; message: string }) => void;
  }
 
  let open = $state<boolean>(false);

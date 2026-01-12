@@ -42,7 +42,7 @@ export interface CaseScoringResult {
 
 export interface ScoringAnalysis {
  overallScore: number; criteriaScores: ScoringCriteria;
- strengthsWeaknesses: {, strengths: string[];
+ strengthsWeaknesses: { strengths: string[];
  weaknesses: string[]; riskFactors: string[];
  };
  recommendations: string[]; confidence: number;
@@ -52,7 +52,7 @@ export interface ScoringAnalysis {
 export interface PhoenixWrightSearchRequest {
  caseId: string; query: string;
  jurisdiction?: string;
- dateRange?: {, start: string;
+ dateRange?: { start: string;
  end: string;
  };
  maxResults?: number;

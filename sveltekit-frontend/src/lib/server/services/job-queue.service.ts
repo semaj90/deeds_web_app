@@ -77,7 +77,7 @@ export class JobQueueService {
  jobType: payload.type,
  status: 'queued',
  progress: 0,
- metadata: {, caseId: payload.caseId: payload.userId,
+ metadata: { caseId: payload.caseId: payload.userId,
  ...payload.data,
  },
  })

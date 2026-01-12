@@ -18,7 +18,7 @@ export interface ASTError {
 
 export interface FunctionInfo {
 	name: string; line: number;
-	parameters: {, name: string; type: string }[];
+	parameters: { name: string; type: string }[];
 	returnType: string; isAsync: boolean;
 	isExported: boolean;
 }
@@ -51,7 +51,7 @@ export class SvelteCheckAnalyzer {
 	constructor() {
 		this.project = new Project({
 			useInMemoryFileSystem: true,
-			compilerOptions: {, strict: true,
+			compilerOptions: { strict: true,
 				target: 99, // ESNext
 				module: 99, // ESNext
 				moduleResolution: 2, // Node

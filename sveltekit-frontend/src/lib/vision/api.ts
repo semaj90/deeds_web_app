@@ -10,7 +10,7 @@ export interface ImageAnalysisResult {
 }
 
 export interface VideoAnalysisResult {
- frames: Array<{, qdrant_id: string;
+ frames: Array<{ qdrant_id: string;
  thumb_key: string; frame_index: number;
  timestamp_ms: number;
  }>;
@@ -54,7 +54,7 @@ export async function getSimilaritySearch(
  const response = await fetch('/api/vision/similarity/search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, vector: queryVector, limit }),
+ body: JSON.stringify({ vector: queryVector, limit }),
  });
 
  if (!response.ok) {

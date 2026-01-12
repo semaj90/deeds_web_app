@@ -22,12 +22,12 @@
  onSelect,
  onMove,
  onLink
- }: {, node: EvidenceNodeType;
+ }: { node: EvidenceNodeType;
  isSelected?: boolean;
  isPendingLinkSource?: boolean;
- linkMode?: boolean; onSelect: (data: {, nodeId: string; multiSelect: boolean }) => void;
- onMove: (data: {, nodeId: string; x: number; y: number }) => void;
- onLink?: (data: {, nodeId: string }) => void;
+ linkMode?: boolean; onSelect: (data: { nodeId: string; multiSelect: boolean }) => void;
+ onMove: (data: { nodeId: string; x: number; y: number }) => void;
+ onLink?: (data: { nodeId: string }) => void;
  } = $props();
 
  let isDragging = $state(false);

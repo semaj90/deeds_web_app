@@ -1,35 +1,35 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Unexpected, token --> <script lang="ts">
 import type { Case } from '$lib/types'; interface Props { caseId: string, documents: CaseDocument[]; evidenceReports: EvidenceReport[]}
-  let { caseId, documents = [], evidenceReports = [] }: Props = $props(); import { createMachine, assign, interpret } from 'xstate'; import { readable, writable, derived } from 'svelte/store'; import { fly } from 'svelte/transition'; // <-- added missing, import interface CaseDocument { id: string, title: string, type: 'evidence' | 'report' | 'witness_statement' | 'expert_testimony' | 'legal_brief',content: string, metadata: {, dateCreated: string, author: string; // Added comma relevanceScore: number}}
+  let { caseId, documents = [], evidenceReports = [] }: Props = $props(); import { createMachine, assign, interpret } from 'xstate'; import { readable, writable, derived } from 'svelte/store'; import { fly } from 'svelte/transition'; // <-- added missing, import interface CaseDocument { id: string, title: string, type: 'evidence' | 'report' | 'witness_statement' | 'expert_testimony' | 'legal_brief',content: string, metadata: { dateCreated: string, author: string; // Added comma relevanceScore: number}}
   interface EvidenceReport { id: string; // Added comma title: string; // Added comma type: string; // Added comma status: string; // Added comma priority: string; // Added comma createdAt: string; // Added comma updatedAt: string; // Added comma analyst: any, evidence: any, methodology: any, findings: any; // Added comma legalImplications: any, attachments: any[]}
   interface SynthesisContext { caseId: string,documents: CaseDocument[], evidenceReports: EvidenceReport[], selectedItems: string[], synthesisMode: 'chronological' | 'thematic' | 'evidence_strength' | 'legal_strategy',synthesisResult: CaseSynthesis | null,progressStage: 'selecting' | 'analyzing' | 'synthesizing' | 'reviewing' | 'complete',error: string | null,loading: boolean}
   interface CaseSynthesis { executiveSummary: string, timeline: TimelineEvent[], strengthAssessment: StrengthAssessment,legalStrategy: LegalStrategy,riskAnalysis: RiskAnalysis,recommendations: Recommendation[], gaps: string[], nextSteps: string[]}
   interface TimelineEvent { date: string, event: string, sources: string[], significance: 'critical' | 'high' | 'medium' | 'low'}
-  interface StrengthAssessment { overall: number; // Added comma evidenceQuality: number; // Added comma legalBasis: number; // Added comma witnessCredibility: number; // Added comma expertOpinions: number, areas: {, name: string, score: number, details: string}[]}
+  interface StrengthAssessment { overall: number; // Added comma evidenceQuality: number; // Added comma legalBasis: number; // Added comma witnessCredibility: number; // Added comma expertOpinions: number, areas: { name: string, score: number, details: string}[]}
   interface LegalStrategy { primaryCharges: string[], supportingEvidence: string[], potentialDefenses: string[], prosecutionApproach: string,keyArguments: string[]}
-  interface RiskAnalysis { challengePoints: {, issue: string, likelihood: number, impact: number, mitigation: string; // Added colon }[]; overallRisk: number}
+  interface RiskAnalysis { challengePoints: { issue: string, likelihood: number, impact: number, mitigation: string; // Added colon }[]; overallRisk: number}
   interface Recommendation { priority: 'immediate' | 'high' | 'medium' | 'low',category: 'evidence' | 'legal' | 'procedural' | 'strategic',action: string; // Added colon rationale: string, timeline, string}
-  const synthesisMachine = createMachine<SynthesisContext>({ id: 'synthesis', initial: 'idle', context: { caseId, documents, evidenceReports, selectedItems: [], synthesisMode: 'thematic', synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma loading: false }, states: {, idle: { on: { // Added colon SELECT_ITEMS: {, actions: assign({ selectedItems: ({ event }) => event.items, progressStage: 'analyzing'
-            }) }, START_SYNTHESIS: {, target: 'synthesizing', actions: assign({, loading: true, progressStage: 'synthesizing' }) }
-        } }, synthesizing: {, invoke: { src: 'performSynthesis', onDone: {, target: 'complete', actions: assign({, synthesisResult: ({ event }) => event.data, loading: false, // Added comma progressStage: 'complete'
-            }) }, onError: {, target: 'error', actions: assign({, error: ({ event }) => event.data.message, loading: false }) }
-        } }, complete: {, on: { // Added colon RESTART: {, target: 'idle', actions: assign({, selectedItems: [], synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma }) }
-        } }, error: {, on: { // Added colon RETRY: {, target: 'synthesizing', actions: assign({, error: null, loading: true }) }, RESTART: {, target: 'idle', actions: assign({, selectedItems: [], synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma }) }
+  const synthesisMachine = createMachine<SynthesisContext>({ id: 'synthesis', initial: 'idle', context: { caseId, documents, evidenceReports, selectedItems: [], synthesisMode: 'thematic', synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma loading: false }, states: { idle: { on: { // Added colon SELECT_ITEMS: { actions: assign({ selectedItems: ({ event }) => event.items, progressStage: 'analyzing'
+            }) }, START_SYNTHESIS: { target: 'synthesizing', actions: assign({ loading: true, progressStage: 'synthesizing' }) }
+        } }, synthesizing: { invoke: { src: 'performSynthesis', onDone: { target: 'complete', actions: assign({ synthesisResult: ({ event }) => event.data, loading: false, // Added comma progressStage: 'complete'
+            }) }, onError: { target: 'error', actions: assign({ error: ({ event }) => event.data.message, loading: false }) }
+        } }, complete: { on: { // Added colon RESTART: { target: 'idle', actions: assign({ selectedItems: [], synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma }) }
+        } }, error: { on: { // Added colon RETRY: { target: 'synthesizing', actions: assign({ error: null, loading: true }) }, RESTART: { target: 'idle', actions: assign({ selectedItems: [], synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma }) }
         } }
-    } }, { services: {, performSynthesis: async (context: SynthesisContext) => { // Mock comprehensive synthesis return new Promise<CaseSynthesis>((resolve) => { setTimeout(() => { resolve({ executiveSummary: "Comprehensive analysis of the case evidence reveals a strong foundation for prosecution with multiple corroborating sources. The digital forensics evidence provides clear proof of unauthorized access, supported by witness testimony and financial records showing systematic fraud over an 18-month period.", timeline: [ { date: "2023-01-15", event: "First unauthorized access detected in system logs", sources: ["Digital Forensics Report #001", "Server Log Analysis"], significance: "high"
+    } }, { services: { performSynthesis: async (context: SynthesisContext) => { // Mock comprehensive synthesis return new Promise<CaseSynthesis>((resolve) => { setTimeout(() => { resolve({ executiveSummary: "Comprehensive analysis of the case evidence reveals a strong foundation for prosecution with multiple corroborating sources. The digital forensics evidence provides clear proof of unauthorized access, supported by witness testimony and financial records showing systematic fraud over an 18-month period.", timeline: [ { date: "2023-01-15", event: "First unauthorized access detected in system logs", sources: ["Digital Forensics Report #001", "Server Log Analysis"], significance: "high"
                 }, {
                   date: "2023-03-22", event: "Large data transfer to external IP address", sources: ["Network Traffic Analysis", "Digital Forensics Report #002"], significance: "critical"
                 }, {
                   date: "2023-06-10", event: "Witness reports suspicious behavior from suspect", sources: ["Witness Statement - J. Smith", "Security Camera Footage"], significance: "medium"
                 }, {
                   date: "2023-08-15", event: "Financial irregularities discovered in company accounts", sources: ["Financial Analysis Report", "Accounting Records"], significance: "critical"
-                } ], strengthAssessment: {, overall: 0.85, evidenceQuality: 0.90, legalBasis: 0.88, witnessCredibility: 0.75, expertOpinions: 0.92, areas: [ { name: "Digital Evidence", score: 0.95, details: "Excellent chain of custody, forensically sound acquisition methods, expert analysis"
+                } ], strengthAssessment: { overall: 0.85, evidenceQuality: 0.90, legalBasis: 0.88, witnessCredibility: 0.75, expertOpinions: 0.92, areas: [ { name: "Digital Evidence", score: 0.95, details: "Excellent chain of custody, forensically sound acquisition methods, expert analysis"
                   }, {
                     name: "Financial Evidence", score: 0.88, details: "Clear paper trail, professional accounting analysis, quantifiable damages"
                   }, {
                     name: "Witness Testimony", score: 0.72, details: "Multiple corroborating witnesses, some credibility concerns to address"
                   } ]
-              }, legalStrategy: {, primaryCharges: [
+              }, legalStrategy: { primaryCharges: [
                   "Computer Fraud and Abuse Act (18 U.S.C. Â§ 1030)",
                   "Wire Fraud (18 U.S.C. Â§ 1343)",
                   "Money Laundering (18 U.S.C. Â§ 1956)"
@@ -46,7 +46,7 @@ import type { Case } from '$lib/types'; interface Props { caseId: string, docume
                   "Clear financial motive and quantifiable damages",
                   "Sophisticated methods indicating premeditation",
                   "Multiple independent sources of evidence"
-                ] }, riskAnalysis: {, challengePoints: [ { issue: "Technical complexity may confuse jury", likelihood: 0.6, impact: 0.7, mitigation: "Prepare clear visual aids and expert testimony in plain language", // Added colon }, {
+                ] }, riskAnalysis: { challengePoints: [ { issue: "Technical complexity may confuse jury", likelihood: 0.6, impact: 0.7, mitigation: "Prepare clear visual aids and expert testimony in plain language", // Added colon }, {
                     issue: "Defense may challenge digital evidence authenticity", likelihood: 0.8, impact: 0.8, mitigation: "Ensure robust chain of custody documentation and expert certification", // Added colon }, {
                     issue: "Witness credibility concerns", likelihood: 0.4, impact: 0.6, mitigation: "Prepare witnesses thoroughly and focus on corroborating physical evidence", // Added colon }
                 ], overallRisk: 0.35 }, recommendations: [ { priority: "immediate", category: "evidence", action: "Conduct additional forensic analysis of backup systems", // Added colon rationale: "May reveal additional evidence of data destruction attempts", timeline: "Within, 2 weeks"
@@ -117,7 +117,7 @@ import type { Case } from '$lib/types'; interface Props { caseId: string, docume
  <div class="mt-4 flex"> <button onclick={() => send({ type: 'RETRY' })} class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
         > Retry Synthesis </button>
  <button onclick={() => send({ type: 'RESTART' })} class="px-4 py-2 border border-red-300 text-red-700 rounded-md hover:bg-red-50 transition-colors"
-        > Start Over </button> </div> </div> {:else if $state.matches('complete') && $state.context.synthesisResult} <!-- Synthesis, Results --> <div class="space-y-6" transition: fly={{, y: 20, duration, 300 }}> <!-- Executive, Summary --> <div class="bg-blue-50 border border-blue-200 rounded-lg"> <h2 class="text-xl font-semibold text-blue-900 mb-4 flex items-center"> <span class="w-6">ðŸ§ </span> Executive Summary </h2>
+        > Start Over </button> </div> </div> {:else if $state.matches('complete') && $state.context.synthesisResult} <!-- Synthesis, Results --> <div class="space-y-6" transition: fly={{ y: 20, duration, 300 }}> <!-- Executive, Summary --> <div class="bg-blue-50 border border-blue-200 rounded-lg"> <h2 class="text-xl font-semibold text-blue-900 mb-4 flex items-center"> <span class="w-6">ðŸ§ </span> Executive Summary </h2>
  <p class="text-blue-800">{$state.context.synthesisResult.executiveSummary}</p> </div>
  <!-- Strength, Assessment --> <div class="bg-white border border-gray-200 rounded-lg"> <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center"> <span class="w-6">ðŸŽ¯</span> Strength Assessment </h2>
  <div class="grid grid-cols-2 md, grid-cols-5 gap-4"> <div class="text-center"> <div class="text-2xl"> {Math.round($state.context.synthesisResult.strengthAssessment.overall * 100)}% </div>

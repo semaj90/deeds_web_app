@@ -32,12 +32,12 @@ export const GET: RequestHandler = async ({ cookies }) => {
 
 		return json({
 			authenticated: true,
-			session: {, id: session.id,
+			session: { id: session.id,
 				userId: session.userId,
 				expiresAt: session.expiresAt,
 				fresh: session.fresh
 			},
-			user: {, id: user.id,
+			user: { id: user.id,
 				email: user.email,
 				firstName: user.firstName,
 				lastName: user.lastName,

@@ -38,7 +38,7 @@ export interface RAGQuery {
  filters?: {
  documentType?: string;
  jurisdiction?: string;
- dateRange?: {, start: Date; end: Date };
+ dateRange?: { start: Date; end: Date };
  };
  limit?: number;
  threshold?: number;
@@ -154,8 +154,8 @@ export interface Permission {
 export interface UserPreferences {
  theme: 'light' | 'dark' | 'auto';
  language: string; timezone: string;
- notifications: {, email: boolean; push: boolean; sms: boolean };
- ui: {, density: 'compact' | 'comfortable' | 'spacious'; sidebarCollapsed: boolean };
+ notifications: { email: boolean; push: boolean; sms: boolean };
+ ui: { density: 'compact' | 'comfortable' | 'spacious'; sidebarCollapsed: boolean };
 }
 export interface AuthSession {
  id: string; userId: string;
@@ -194,8 +194,8 @@ export interface ApiError {
 export interface SearchOptions {
  query?: string;
  filters?: { [key: string]: unknown };
- sort?: {, field: string; direction: 'asc' | 'desc' };
- pagination?: {, page: number; limit: number };
+ sort?: { field: string; direction: 'asc' | 'desc' };
+ pagination?: { page: number; limit: number };
 }
 export interface SearchResult<T = unknown> {
  item: T;
@@ -213,7 +213,7 @@ export interface SearchResponse<T = unknown> {
 // ===== CACHING & PERFORMANCE TYPES =====
 export interface CacheEntry<T = unknown> {
  key: string; value: T;
- metadata: {, createdAt: Date;
+ metadata: { createdAt: Date;
  expiresAt?: Date; accessCount: number;
  lastAccessed: Date; size: number;
  tags?: string[];
@@ -237,7 +237,7 @@ export interface AIAnalysisResponse {
  tokensUsed?: number;
  metadata?: {
  entities?: LegalEntity[];
- sentiment?: {, score: number; label: 'positive' | 'negative' | 'neutral' };
+ sentiment?: { score: number; label: 'positive' | 'negative' | 'neutral' };
  riskScore?: number;
  tags?: string[];
  embeddingDimension?: number; // Added for clarity on embedding dimension in AI analysis response
@@ -265,7 +265,7 @@ export interface MCPResponse<T = unknown> {
  success: boolean;
  result?: T;
  error?: string;
- metadata?: {, processingTime: number; model?: string; tokens?: number };
+ metadata?: { processingTime: number; model?: string; tokens?: number };
 }
 export interface Context7Integration {
  stackAnalysis: boolean; bestPractices: boolean;
@@ -285,7 +285,7 @@ export interface FormField {
  minLength?: number;
  maxLength?: number;
  };
- options?: {, value: string; label: string };
+ options?: { value: string; label: string };
 }
 export interface FormSchema {
  fields: FormField[];

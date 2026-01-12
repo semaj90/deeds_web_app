@@ -52,7 +52,7 @@
 			const res = await fetch(`/api/phase72/check-route`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, route: route.path })
+				body: JSON.stringify({ route: route.path })
 			});
 
 			if (res.ok) {

@@ -257,7 +257,7 @@
  }
 
  // Extracted reusable function for updating the user profile via API
- async function updateUserProfileApi(body: {, firstName: string | null;
+ async function updateUserProfileApi(body: { firstName: string | null;
  lastName: string | null;
  email: string;
  }) {

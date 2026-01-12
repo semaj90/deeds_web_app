@@ -87,7 +87,7 @@ function handleValidate() {
 }
 
 // Confidence badge styling
-function getConfidenceBadge(confidence: ConfidenceLevel): {, class: string; label: string } {
+function getConfidenceBadge(confidence: ConfidenceLevel): { class: string; label: string } {
   switch (confidence) {
     case 'high':
       return { class: 'badge-success', label: 'High' };

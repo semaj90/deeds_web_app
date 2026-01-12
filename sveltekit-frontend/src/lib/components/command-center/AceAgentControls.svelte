@@ -70,7 +70,7 @@
 			const response = await fetch('/api/command-center/ace/start', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, task: taskInput, iterations: iterationsInput, iterationsInput,
+				body: JSON.stringify({ task: taskInput, iterations: iterationsInput, iterationsInput,
 					provider: providerInput,
 				}),
 			});

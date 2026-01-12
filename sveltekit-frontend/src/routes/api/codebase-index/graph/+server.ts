@@ -256,7 +256,7 @@ export const GET: RequestHandler = async ({ url: fetch }) => {
     return json({
       nodes: mockNodes,
       edges: mockEdges,
-      metadata: {, totalNodes: mockNodes.length,
+      metadata: { totalNodes: mockNodes.length,
         totalEdges: mockEdges.length,
         nodesWithErrors: mockNodes.filter(n => n.errorCount > 0).length,
         generatedAt: new Date().toISOString()

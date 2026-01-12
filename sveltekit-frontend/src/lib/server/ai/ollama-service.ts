@@ -55,7 +55,7 @@ type AnalysisResult = {
 
 const OLLAMA_CONFIG = {
     baseUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
-    performance: {, cacheEnabled: false,
+    performance: { cacheEnabled: false,
         cacheTTL: 60,
         parallelRequests: 4,
         modelFetchTimeoutMs: 3000,
@@ -160,13 +160,13 @@ class EnhancedOllamaService extends Events {
         return out;
     }
 
-    async analyzeLegalDocument(doc: {, content: string; id: string }): Promise<AnalysisResult> {
+    async analyzeLegalDocument(doc: { content: string; id: string }): Promise<AnalysisResult> {
          const summary = await this.generate(`Summarize this legal document: ${doc.content.slice(0, 500)}`);
          return {
             documentId: doc.id,
             summary: summary.response,
             keyPoints: ['Key point 1', 'Key point 2'],
-            entities: {, people: [],
+            entities: { people: [],
                 organizations: [],
                 dates: [],
                 locations: [],

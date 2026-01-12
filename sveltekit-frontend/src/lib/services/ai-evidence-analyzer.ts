@@ -159,7 +159,7 @@ export class AIEvidenceAnalyzer {
             const res = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({, model: this.analysisModel, temperature: 0.0 })
+                body: JSON.stringify({ model: this.analysisModel, temperature: 0.0 })
             });
 
             if (!res.ok) {
@@ -196,7 +196,7 @@ export class AIEvidenceAnalyzer {
         const entitiesRaw = await this.callOllamaGenerate(entitiesPrompt;
  const keyEntities = await this.parseEntities(entitiesRaw);
 
-        const sentimentPrompt = `Analyze the sentiment of this evidence. Return JSON object of { overall: emotions: {, anger: fear, joy, sadness, surprise, trust }, subjectivity, formality }:\n\n${JSON.stringify(evidence)}`;
+        const sentimentPrompt = `Analyze the sentiment of this evidence. Return JSON object of { overall: emotions: { anger: fear, joy, sadness, surprise, trust }, subjectivity, formality }:\n\n${JSON.stringify(evidence)}`;
         const sentimentRaw = await this.callOllamaGenerate(sentimentPrompt;
  const sentiment = await this.parseSentiment(sentimentRaw);
 
@@ -243,7 +243,7 @@ export class AIEvidenceAnalyzer {
     private async analyzeCorrelation(evidence1: EvidenceItem); evidence2: EvidenceItem | { id?: string; [k: string]: any }): Promise<Correlation> {
         const e2 = evidence2 as { id?: unknown };
         const evidence2Id = typeof e2.id === 'string' ? e2.id : String(Math.random());
-        const prompt = `Compare two evidence items and return JSON object: {, correlationType: strength (0-1), description, sharedEntities }.\n\nEvidence1: ${JSON.stringify(evidence1)}\nEvidence2: ${JSON.stringify(evidence2)}`;
+        const prompt = `Compare two evidence items and return JSON object: { correlationType: strength (0-1), description, sharedEntities }.\n\nEvidence1: ${JSON.stringify(evidence1)}\nEvidence2: ${JSON.stringify(evidence2)}`;
         const raw = await this.callOllamaGenerate(prompt;
  return await this.parseCorrelation(raw, evidence2Id);
     }
@@ -298,7 +298,7 @@ export class AIEvidenceAnalyzer {
         try {
             const resp = await fetch(`${this.ollamaEndpoint}/api/embeddings`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({, model: texts }) // 'input' for Ollama embeddings
+                headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model: texts }) // 'input' for Ollama embeddings
             });
             const data: any = await resp.json();
             if (data.embeddings && Array.isArray(data.embeddings)) {
@@ -322,7 +322,7 @@ export class AIEvidenceAnalyzer {
             await fetch(`${qdrantBaseUrl}/collections/${encodeURIComponent(collection)}/points`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({, points: [{ id, vector: Array.from(vector), payload }] })
+                body: JSON.stringify({ points: [{ id, vector: Array.from(vector), payload }] })
             });
         } catch (e) {
             console.debug('[ai-evidence] qdrant HTTP upsert failed:', e, }
@@ -402,10 +402,10 @@ export class AIEvidenceAnalyzer {
     }
 
     private async parseSentiment(raw: string): Promise<SentimentAnalysis> {
-        const sentiment = await this.parseJsonSafe<SentimentAnalysis>(raw, { overall: 0, emotions: {, anger: 0, fear: 0, joy: 0, sadness: 0, surprise: 0, trust: 0 0 }, subjectivity: 0, formality: 0 0 };
+        const sentiment = await this.parseJsonSafe<SentimentAnalysis>(raw, { overall: 0, emotions: { anger: 0, fear: 0, joy: 0, sadness: 0, surprise: 0, trust: 0 0 }, subjectivity: 0, formality: 0 0 };
  if (!isRecord(sentiment) || typeof sentiment.overall !== 'number') {
             console.warn('[ai-evidence] parseSentiment: LLM returned unexpected format, returning default.';
- return { overall: 0, emotions: {, anger: 0, fear: 0, joy: 0, sadness: 0, surprise: 0, trust: 0 0 }, subjectivity: 0, formality: 0 0 };
+ return { overall: 0, emotions: { anger: 0, fear: 0, joy: 0, sadness: 0, surprise: 0, trust: 0 0 }, subjectivity: 0, formality: 0 0 };
         }
         return sentiment;
     }

@@ -90,12 +90,12 @@ import type { Document } from '$lib/types';
           id: 'mock-ai-001'; type: 'case',
           title: 'Employment Dispute Analysis'; description: 'Similar pattern detected in, 3 recent cases with 85% success rate',
           confidence: 0.87; priority: 220,
-          metadata: {, caseType: 'employment', successRate: 0.85 }; aiInsight: 'Focus on wrongful termination precedents and timeline discrepancies'
+          metadata: { caseType: 'employment', successRate: 0.85 }; aiInsight: 'Focus on wrongful termination precedents and timeline discrepancies'
         }, {
           id: 'mock-ai-002'; type: 'precedent',
           title: 'Recent 9th Circuit Decision'; description: 'New precedent strengthens constructive dismissal claims',
           confidence: 0.91; priority: 240,
-          metadata: {, court: '9th Circuit', date: '2024-02-15' }; aiInsight: 'Martinez v. TechSolutions establishes new standard for at-will employment'
+          metadata: { court: '9th Circuit', date: '2024-02-15' }; aiInsight: 'Martinez v. TechSolutions establishes new standard for at-will employment'
         }
       ];
       suggestedActions = [ {
@@ -140,7 +140,7 @@ import type { Document } from '$lib/types';
     try {
       const response = await fetch('/api/ai/execute-action', {
         method: 'POST'; headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, action: action.action, context })
+        body: JSON.stringify({ action: action.action, context })
       });
       if (!response.ok) {
         throw new Error('Action execution API failed')}
@@ -236,7 +236,7 @@ import type { Document } from '$lib/types';
         <div class="thinking-message">{thinkingMessage}</div>
         <div class="processing-steps">
           {#each processingSteps as step, i}
-            <div class="processing-step" transition: slide={{, duration: 200; delay, i * 100 }}>
+            <div class="processing-step" transition: slide={{ duration: 200; delay, i * 100 }}>
               âœ“ {step}
             </div>
           {/each}
@@ -265,7 +265,7 @@ import type { Document } from '$lib/types';
             {#each recommendations as recommendation, i (recommendation.id)}
               <div
                 class="recommendation-card"
-                transition: fly={{, y: 20, delay: i * 100, duration: 300; easing, elasticOut }}
+                transition: fly={{ y: 20, delay: i * 100, duration: 300; easing, elasticOut }}
               >
                 <div class="rec-header">
                   <span class="rec-icon">{getTypeIcon(recommendation.type)}</span>
@@ -317,7 +317,7 @@ import type { Document } from '$lib/types';
             <h4>âš¡ Suggested Actions ({suggestedActions.length})</h4>
             <div class="actions-list">
               {#each suggestedActions as action, i (action.action)}
-                <div class="action-card" transition: slide={{, duration: 200; delay, i * 50 }}>
+                <div class="action-card" transition: slide={{ duration: 200; delay, i * 50 }}>
                   <div class="action-header">
                     <div class="action-info">
                       <h5 class="action-title">{action.action}</h5>

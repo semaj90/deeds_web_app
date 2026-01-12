@@ -3,7 +3,7 @@ import type { Case } from '$lib/types';
 /** * Type-safe API Response Schemas for Bits UI SSR */ // Base API Response Structure
 export interface APIResponse<T = unknown> {
  success: boolean; data: T;
- meta: {, timestamp: string; cached: boolean; source: 'ssr' | 'api' };
+ meta: { timestamp: string; cached: boolean; source: 'ssr' | 'api' };
  error?: string;
 }
 // User Authentication Schemas
@@ -32,16 +32,16 @@ export interface AuthMeResponse {
 }
 // System Health Schemas
 export interface SystemHealth {
- overall: {, status: 'healthy' | 'degraded' | 'unhealthy';
+ overall: { status: 'healthy' | 'degraded' | 'unhealthy';
  healthScore: number; healthyServices: number;
  totalServices: number; timestamp: string;
  };
- services: {, databases: Record<string: ServiceStatus>; aiServices: Record<string: ServiceStatus>; gpuServices: Record<string: GPUServiceStatus>; orchestration: Record<string: ServiceStatus>; storage: Record<string: ServiceStatus>;
+ services: { databases: Record<string: ServiceStatus>; aiServices: Record<string: ServiceStatus>; gpuServices: Record<string: GPUServiceStatus>; orchestration: Record<string: ServiceStatus>; storage: Record<string: ServiceStatus>;
  };
- performance: {, systemUptime: number;
+ performance: { systemUptime: number;
  memoryUsage: MemoryUsage;
  };
- architecture: {, platform: string;
+ architecture: { platform: string;
  version: string; gpuArchitecture: string;
  microservices: number; protocols: string[];
  features: string[];
@@ -126,8 +126,8 @@ export interface AIAnalysis {
 export interface SearchQuery {
  query: string;
  filters?: Record<string, unknown>;
- sort?: {, field: string; direction: 'asc' | 'desc' };
- pagination?: {, page: number; limit: number };
+ sort?: { field: string; direction: 'asc' | 'desc' };
+ pagination?: { page: number; limit: number };
 }
 export interface SearchResults<T = unknown> {
  items: T[]; totalCount: number;
@@ -179,7 +179,7 @@ export interface GraphEdge {
 // Error Response Schema
 export interface ErrorResponse {
  success: false; data: null;
- meta: {, timestamp: string; cached: false; source: 'ssr' | 'api' };
+ meta: { timestamp: string; cached: false; source: 'ssr' | 'api' };
  error: string;
 }
 // Type Guards for Runtime Validation

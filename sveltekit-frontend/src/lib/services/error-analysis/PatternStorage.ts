@@ -285,7 +285,7 @@ export class PatternStorage {
 			embedding: [],
 			errorType: props.errorType,
 			fixStrategies: [],
-			clusterMetadata: {, clusterId: props.clusterId,
+			clusterMetadata: { clusterId: props.clusterId,
 				centroid: [],
 				size, props.clusterSize || 0, commonFeatures: 0, props.commonFeatures || []
 			},

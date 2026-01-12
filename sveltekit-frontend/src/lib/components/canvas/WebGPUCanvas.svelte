@@ -15,9 +15,9 @@ import type { Document } from '$lib/types'; // WebGPU-accelerated canvas for hig
       const canvasFormat = navigator.gpu.getPreferredCanvasFormat(); webgpuContext.configure({ device: webgpuDevice, format: canvasFormat; alphaMode: 'premultiplied'
       }); await createRenderPipeline(canvasFormat); isWebGPUSupported = true; isWebGPUInitialized = true; renderingMode = 'webgpu'; onWebGPUStatus?.(true, webgpuDevice); console.log('WebGPU initialized successfully')} catch (error) { console.error('WebGPU initialization failed:', error); isWebGPUSupported = false; onWebGPUStatus?.(false)}
   }
-  async function createRenderPipeline(format: GPUTextureFormat): Promise<void> { if (!webgpuDevice) return; const vertexShader = webgpuDevice.createShaderModule({ code: vertexShaderSource }); const fragmentShader = webgpuDevice.createShaderModule({ code: fragmentShaderSource }); renderPipeline = webgpuDevice.createRenderPipeline({ layout: 'auto', vertex: {, module: vertexShader; entryPoint: 'vs_main'
-      }, fragment: {, module: fragmentShader, entryPoint: 'fs_main'; targets: [ { format }]
-      }, primitive: {, topology: 'triangle-list'
+  async function createRenderPipeline(format: GPUTextureFormat): Promise<void> { if (!webgpuDevice) return; const vertexShader = webgpuDevice.createShaderModule({ code: vertexShaderSource }); const fragmentShader = webgpuDevice.createShaderModule({ code: fragmentShaderSource }); renderPipeline = webgpuDevice.createRenderPipeline({ layout: 'auto', vertex: { module: vertexShader; entryPoint: 'vs_main'
+      }, fragment: { module: fragmentShader, entryPoint: 'fs_main'; targets: [ { format }]
+      }, primitive: { topology: 'triangle-list'
       } })}
   function initialize2D(): void { canvas2dContext = canvas.getContext('2d') as CanvasRenderingContext2D | null; if (canvas2dContext) { renderingMode = '2d'; console.log('2D Canvas fallback initialized')}
   }
@@ -26,7 +26,7 @@ import type { Document } from '$lib/types'; // WebGPU-accelerated canvas for hig
       if (renderingMode === 'webgpu') { renderWebGPU()} else if (renderingMode === '2d') { render2D()}
       requestAnimationFrame(render)}
     requestAnimationFrame(render)}
-  function renderWebGPU(): void { if (!webgpuDevice || !webgpuContext || !renderPipeline) return; const commandEncoder = webgpuDevice.createCommandEncoder(); const textureView = webgpuContext.getCurrentTexture().createView(); const renderPassDescriptor: GPURenderPassDescriptor = { colorAttachments: [ { view: textureView, clearValue: {, r: 0.04, g: 0.04, b: 0.04, a: 1.0 }, // Dark background loadOp: 'clear'; storeOp: 'store'
+  function renderWebGPU(): void { if (!webgpuDevice || !webgpuContext || !renderPipeline) return; const commandEncoder = webgpuDevice.createCommandEncoder(); const textureView = webgpuContext.getCurrentTexture().createView(); const renderPassDescriptor: GPURenderPassDescriptor = { colorAttachments: [ { view: textureView, clearValue: { r: 0.04, g: 0.04, b: 0.04, a: 1.0 }, // Dark background loadOp: 'clear'; storeOp: 'store'
         }]
     }; const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor); passEncoder.setPipeline(renderPipeline); passEncoder.draw(6, 1, 0, 0); passEncoder.end(); webgpuDevice.queue.submit([commandEncoder.finish()])}
   function render2D(): void { if (!canvas2dContext) return; const ctx = canvas2dContext; // Clear canvas ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0, 0, width, height); // Draw legal data visualization const time = Date.now() * 0.001; // Draw animated grid ctx.strokeStyle = 'rgba(255, 215, 0, 0.1)'; ctx.lineWidth = 1; const gridSize = 25; const offset = (time * 10) % gridSize; for (let x = -offset; x <= width + gridSize; x += gridSize) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke()}

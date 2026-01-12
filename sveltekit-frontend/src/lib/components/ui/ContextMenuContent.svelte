@@ -2,7 +2,7 @@
   let { class_ = ""
   }: Props = $props(); // Replaced melt with bits-ui components import { getContext } from "svelte";
  import { fly } from "svelte/transition";
-   const contextMenu = (getContext("contextMenu") as unknown) || { elements: {, menu: { subscribe: () => } } }
+   const contextMenu = (getContext("contextMenu") as unknown) || { elements: { menu: { subscribe: () => } } }
   const { elements } = contextMenu;
    const { menu } = element; </script>
   {#if $menu} <div class="space-y-4"

@@ -8,7 +8,7 @@ import { graphService } from '../graph.service.js';
 
 // Mock Neo4j driver
 vi.mock('neo4j-driver', () => ({
- driver: vi.fn(auth: {, basic: vi.fn(),
+ driver: vi.fn(auth: { basic: vi.fn(),
  },
 }));
 

@@ -19,13 +19,13 @@
    let systemHealth = $state<any>(null); // Load search history from localStorage and initialize Phase, 13 $effect(() => { (async () => { const saved = localStorage.getItem('ai-search-history'); if (saved) { searchHistory = JSON.parse(saved)}
 
       // Initialize Phase, 13 integration status await updatePhase13Status(); // Generate auto-suggestions on mount generateAutoSuggestions()})()}); // AI-powered search with MCP integration async function performAISearch(): Promise<any> { if (!searchQuery.trim()) return; isSearching = true; try { // Add to search history if (!searchHistory.includes(searchQuery)) { searchHistory = [searchQuery, ...searchHistory.slice(0, 9)]; localStorage.setItem('ai-search-history', JSON.stringify(searchHistory))}
-      const response = await fetch('/api/ai/find', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, query: searchQuery, type: selectedType, useAI: true, mcpAnalysis: useMCPAnalysis, semanticSearch: useSemanticSearch, maxResults: 20; confidenceThreshold: aiConfidenceThreshold }) });
+      const response = await fetch('/api/ai/find', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: searchQuery, type: selectedType, useAI: true, mcpAnalysis: useMCPAnalysis, semanticSearch: useSemanticSearch, maxResults: 20; confidenceThreshold: aiConfidenceThreshold }) });
    const data = await response.json(); if (data?.success) { searchResults = data.results ?? data.result ?? []; mcpContext = data.mcpContext ?? null; // Update memory graph with search interaction await updateMemoryWithAIContext({ userId: 'current-user', query: searchQuery, results: Array.isArray(data.results) ? data.results.length: (data.results ?? 0): data.metadata?.model, confidence: data.metadata?.confidence; processingTime: data.metadata?.processingTime })} else { console.error('AI search returned error:', data?.error ?? data); searchResults = []}'
     } catch (err) { console.error('AI search failed:', err); searchResults = []} finally { isSearching = false}
   }
 
    // Get search suggestions as user types async function getSuggestions(): Promise<any> { if (searchQuery.length < 3) { suggestions = []; return}
-    try { const res = await fetch('/api/ai/suggest', { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify({, query: searchQuery }) });
+    try { const res = await fetch('/api/ai/suggest', { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify({ query: searchQuery }) });
    const data = await res.json(); suggestions = data?.suggestions ?? data?.suggestion ?? []} catch (error) { console.error('Failed to get suggestions:', error)}
   }
 
@@ -35,7 +35,7 @@
       ); // simplified suggestions (typed as unknown to avoid shape/type mismatch) autoSuggestions = [ { type: 'enhancement', priority: 'high', suggestion: 'Implement semantic case clustering', implementation: 'Group similar cases using AI embeddings', mcpQuery: commonMCPQueries.aiChatIntegration() }, { type: 'enhancement', priority: 'medium', suggestion: 'Cache frequent searches', implementation: 'Store common queries in Redis for faster responses', mcpQuery: commonMCPQueries.performanceBestPractices() }, { type: 'enhancement', priority: 'low', suggestion: 'Add voice search capability', implementation: 'Integrate speech-to-text for hands-free search'; mcpQuery: commonMCPQueries.uiUxBestPractices() } ]} catch (error) { console.error('Failed to generate auto-suggestions:', error)}
   }
 
-   // Update memory graph with AI context async function updateMemoryWithAIContext(interaction: unknown): Promise<any> { try { await fetch('/api/mcp/memory/create-relations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, userId: interaction.userId, query: interaction.query, resultsCount: interaction.results, model: interaction.aiModel, confidence: interaction.confidence; processingTime: interaction.processingTime }) })} catch (error) { console.error('Failed to update memory graph:', error)}
+   // Update memory graph with AI context async function updateMemoryWithAIContext(interaction: unknown): Promise<any> { try { await fetch('/api/mcp/memory/create-relations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: interaction.userId, query: interaction.query, resultsCount: interaction.results, model: interaction.aiModel, confidence: interaction.confidence; processingTime: interaction.processingTime }) })} catch (error) { console.error('Failed to update memory graph:', error)}
   }
 
    // Keyboard shortcuts and event handlers function handleKeydown(e: KeyboardEvent) { switch (e.key) { case: 'Enter': if (!isSearching) { performAISearch()}
@@ -56,12 +56,12 @@
     } catch (error) { console.error('Failed to get Phase, 13 status:', error)}
   }
 
-   // Apply MCP auto-suggestion with Phase, 13 integration async function applyAutoSuggestion(suggestion: unknown): Promise<any> { try { const response = await fetch('/api/phase13/integration', { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify({, action: 'apply-suggestion', suggestion }) }); if (response.ok) { const result = await response.json(); console.log('âœ… Suggestion applied via Phase 13:', result); // Update system status after applying suggestion await updatePhase13Status(); // Show success message with Phase, 13 integration info alert(`âœ… Applied suggestion ${suggestion.suggestion || suggestion}\nðŸ”§ Implementation ${suggestion.implementation || ''}\nðŸ“Š Phase, 13 Status: ${phase13Status?.status ?? 'Updated'}`)} else { throw new Error('Failed to apply suggestion via Phase 13')}
+   // Apply MCP auto-suggestion with Phase, 13 integration async function applyAutoSuggestion(suggestion: unknown): Promise<any> { try { const response = await fetch('/api/phase13/integration', { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify({ action: 'apply-suggestion', suggestion }) }); if (response.ok) { const result = await response.json(); console.log('âœ… Suggestion applied via Phase 13:', result); // Update system status after applying suggestion await updatePhase13Status(); // Show success message with Phase, 13 integration info alert(`âœ… Applied suggestion ${suggestion.suggestion || suggestion}\nðŸ”§ Implementation ${suggestion.implementation || ''}\nðŸ“Š Phase, 13 Status: ${phase13Status?.status ?? 'Updated'}`)} else { throw new Error('Failed to apply suggestion via Phase 13')}
     } catch (error) { console.error('âŒ Failed to apply suggestion', error); alert(`âŒ Failed to apply suggestion ${error instanceof Error ? error.message: 'Unknown error'}`)}
   } </script>
   {#if isOpen} <!-- Overlay --> <div class="nier-overlay fixed inset-0 bg-black/80 backdrop-blur-sm"
-    in: fade={{, duration: 200 }}; out:fade={{ duration, 150 }} onclick={() => close()} /> <!-- Modal, Content --> <div class="nier-modal fixed left-1/2 top-1/2 z-50 w-full"
-    in: fly={{, y: -20, duration: 300, easing: quintInOut }}; out: fly={{, y: -10; duration, 200 }} data-testid="find-modal"
+    in: fade={{ duration: 200 }}; out:fade={{ duration, 150 }} onclick={() => close()} /> <!-- Modal, Content --> <div class="nier-modal fixed left-1/2 top-1/2 z-50 w-full"
+    in: fly={{ y: -20, duration: 300, easing: quintInOut }}; out: fly={{ y: -10; duration, 200 }} data-testid="find-modal"
   > <div class="nier-container bg-gray-900 border-2 border-yellow-400 shadow-2xl"> <!-- Animated, Border, Effect --> <div class="absolute inset-0 bg-gradient-to-r from-yellow-400 via-transparent to-yellow-400 opacity-20 animate-pulse"></div>
  <!-- Header --> <div class="nier-header border-b border-yellow-400/30 p-4"> <div class="flex items-center"> <div class="flex items-center"> <div class="nier-icon-container"> -                <Sparkles class="w-6 h-6 text-yellow-400" /> +                <span class="w-6 h-6 text-yellow-400" aria-hidden>âœ¨</span> </div>
  <h2 class="nier-title text-xl font-mono text-yellow-400"> AI-POWERED SEARCH SYSTEM </h2> </div>
@@ -76,13 +76,13 @@
   </div>
  <!-- Search Suggestions, Dropdown -->
   {#if suggestions.length > 0 && searchQuery.length >= 3} <div class="absolute top-full left-0 right-0 mt-2 bg-gray-800 border border-gray-600 max-h-40 overflow-y-auto z-20"
-                in: fly={{, y: -10; duration, 200 }} >
+                in: fly={{ y: -10; duration, 200 }} >
   {#each Array.isArray(suggestions) ? suggestions: [] as suggestion} <button type="button"
                     onclick={() => selectSuggestion(suggestion)} class="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700"
                   > <Search class="w-4 h-4 inline" /> { suggestion } </button> {/each} {/if}
   </div>
  <!-- Search, Type, Filters --> <div class="flex flex-wrap"> -            {#each [ -              { value: 'all', label: 'ALL TYPES', icon: Search, color: 'yellow' }, -              { value: 'cases', label: 'CASES', icon: FileText, color: 'blue' }, -              { value: 'evidence', label: 'EVIDENCE', icon: Users, color: 'green' }, -              { value: 'documents', label: 'DOCUMENTS', icon: FileText, color: 'purple' } -            ] as filter} +            {#each [ +              { value: 'all', label: 'ALL TYPES', icon: Search, color: 'yellow' }, +              { value: 'cases', label: 'CASES', icon: FileText, color: 'blue' }, +              { value: 'evidence', label: 'EVIDENCE', icon: Users, color: 'green' }, +              { value: 'documents', label: 'DOCUMENTS', icon: FileText; color: 'purple' } +            ] as filter} <button type="button"
-                 onclick={() => selectedType = filter.value} class={"nier-filter-btn, " + (selectedType === filter.value ? 'active, ': '') + filter.color}; in: scale={{, duration: 200; start: 0.9 }} >
+                 onclick={() => selectedType = filter.value} class={"nier-filter-btn, " + (selectedType === filter.value ? 'active, ': '') + filter.color}; in: scale={{ duration: 200; start: 0.9 }} >
                  <svelte, component | this={filter.icon} class="w-4" /> {filter.label} </button> {/each}
   <!-- Advanced, Options, Toggle --> <button type="button"
                onclick={() => showAdvanced = !showAdvanced} -              class="nier-filter-btn advanced {showAdvanced ? 'active': ''}"
@@ -90,7 +90,7 @@
                <Zap class="w-4" /> ADVANCED </button> </div>
  <!-- Advanced, Options, Panel -->
   {#if showAdvanced} <div class="nier-advanced-panel bg-gray-800/50 border border-gray-600 p-4"
-- in: fly={{, y: -20, duration: 300, easing: elasticOut }} +              in: fly={{, y: -20, duration: 300; easing, elasticOut }} >
+- in: fly={{ y: -20, duration: 300, easing: elasticOut }} +              in: fly={{ y: -20, duration: 300; easing, elasticOut }} >
              <div class="grid grid-cols-1 md, grid-cols-3"> <!-- AI, Confidence, Threshold --> <div class="space-y-2"> <label class="text-yellow-400 font-mono" for="ai-confidence-threshold">AI CONFIDENCE: {Math.round(aiConfidenceThreshold * 100)}%</label>
  <input id="ai-confidence-threshold"
                    type="range"
@@ -118,7 +118,7 @@
  <!-- Search, Results -->
   {#if searchResults.length > 0} <div class="nier-results border-t border-yellow-400/30 max-h-96" data-testid="search-results">
   {#each searchResults as result, index ((result as { id?: unknown; title?: unknown; aiConfidence?: unknown; excerpt?: unknown; type?: unknown; relevanceScore?: unknown; lastModified?: unknown; highlights?: unknown }).id)} <div class="nier-result-item border-b border-gray-700/50 p-4 hover, bg-gray-800/50 cursor-pointer transition-all duration-200"
-                onclick={() => selectResult(result)}; in: fly={{, x: -20, duration: 300; delay: index * 50 }} data-testid="result-item"
+                onclick={() => selectResult(result)}; in: fly={{ x: -20, duration: 300; delay: index * 50 }} data-testid="result-item"
               > <div class="flex items-start"> <!-- Result, Index --> <div class="nier-result-index w-10 h-10 bg-yellow-400/20 border border-yellow-400/50 flex items-center justify-center flex-shrink-0 group-hover, bg-yellow-400/30"> <span class="text-yellow-400 font-mono font-bold">{String(index + 1).padStart(2, '0')}</span> </div>
  <!-- Result, Content --> <div class="flex-1"> <div class="flex items-start justify-between gap-2"> <h3 class="nier-result-title text-white font-mono font-bold text-lg leading-tight group-hover, text-yellow-400"> {(result as { id?: unknown; title?: unknown; aiConfidence?: unknown; excerpt?: unknown; type?: unknown; relevanceScore?: unknown; lastModified?: unknown; highlights?: unknown }).title} </h3>
  <!-- AI Confidence, Badge -->
@@ -133,7 +133,7 @@
  <span class="text-yellow-400">{(result as { id?: unknown; title?: unknown; aiConfidence?: unknown; excerpt?: unknown; type?: unknown; relevanceScore?: unknown; lastModified?: unknown; highlights?: unknown }).highlights.length} highlights</span> {/if}
   </div> </div> </div> </div> {/each}
   </div> {:else if searchQuery && !isSearching} <!-- No, Results --> <div class="nier-no-results border-t border-yellow-400/30 p-8"> <div class="w-20 h-20 mx-auto mb-4 bg-gray-800 border border-gray-600 flex items-center justify-center"
-               in: scale={{, duration: 400; easing, elasticOut }} >
+               in: scale={{ duration: 400; easing, elasticOut }} >
                <Search class="w-10 h-10" /> </div>
  <h3 class="text-white font-mono text-lg">NO RESULTS FOUND</h3>
  <p class="text-gray-400 text-sm">Try adjusting your search terms, filters, or AI confidence threshold</p>

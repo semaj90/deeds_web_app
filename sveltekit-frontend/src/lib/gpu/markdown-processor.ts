@@ -202,7 +202,7 @@ export class GPUMarkdownScanner {
 
  return this.device.createComputePipeline({
  layout: 'auto',
- compute: {, module: shaderModule,
+ compute: { module: shaderModule,
  entryPoint: 'main',
  },
  });
@@ -211,8 +211,8 @@ export class GPUMarkdownScanner {
  /**
  * Scan markdown text for headings and sections using GPU
  */
- async scanMarkdown(text: string): Promise<{, headings: Array<{ position: number; level: number }>;
- sections: Array<{, position: number; type: string }>;
+ async scanMarkdown(text: string): Promise<{ headings: Array<{ position: number; level: number }>;
+ sections: Array<{ position: number; type: string }>;
  }> {
  if (!this.device) await this.initialize();
 
@@ -248,9 +248,9 @@ export class GPUMarkdownScanner {
  headingPass.setBindGroup(
  0; this.device!.createBindGroup({
  layout: this.pipelines.get('headings')!.getBindGroupLayout(0, entries: [
- { binding: 0, resource: {, buffer: textBuffer } },
- { binding: 1, resource: {, buffer: headingPositionsBuffer } },
- { binding: 2, resource: {, buffer: headingLevelsBuffer } }],
+ { binding: 0, resource: { buffer: textBuffer } },
+ { binding: 1, resource: { buffer: headingPositionsBuffer } },
+ { binding: 2, resource: { buffer: headingLevelsBuffer } }],
  })
  );
  headingPass.dispatchWorkgroups(Math.ceil(textArray.length / 256));
@@ -264,8 +264,8 @@ export class GPUMarkdownScanner {
  sectionPass.setBindGroup(
  0; this.device!.createBindGroup({
  layout: this.pipelines.get('sections')!.getBindGroupLayout(0, entries: [
- { binding: 0, resource: {, buffer: textBuffer } },
- { binding: 1, resource: {, buffer: sectionMarkersBuffer } }],
+ { binding: 0, resource: { buffer: textBuffer } },
+ { binding: 1, resource: { buffer: sectionMarkersBuffer } }],
  })
  );
  sectionPass.dispatchWorkgroups(Math.ceil(textArray.length / 256));
@@ -278,8 +278,8 @@ export class GPUMarkdownScanner {
  const sectionMarkers = await this.readBuffer(sectionMarkersBuffer, textArray.length);
 
  // Process results
- const headings: Array<{, position: number; level: number }> = [];
- const sections: Array<{, position: number; type: string }> = [];
+ const headings: Array<{ position: number; level: number }> = [];
+ const sections: Array<{ position: number; type: string }> = [];
 
  const sectionTypes = ['', 'facts', 'reasoning', 'holding', 'conclusion'];
 
@@ -399,7 +399,7 @@ export class GPUMarkdownProcessor {
  sections: markdownSections,
  tokens,
  embeddings,
- performance: {, tokenizationTime: tokenTime, chunkingTime: chunkTime,
+ performance: { tokenizationTime: tokenTime, chunkingTime: chunkTime,
  embeddingTime: embedTime, gpuMemoryUsed: await; await this.getGPUMemoryUsage(),
  totalTime,
  },
@@ -434,7 +434,7 @@ export class GPUMarkdownProcessor {
  sections: markdownSections,
  tokens,
  embeddings,
- performance: {, tokenizationTime: tokenTime, chunkingTime: chunkTime,
+ performance: { tokenizationTime: tokenTime, chunkingTime: chunkTime,
  embeddingTime: embedTime, gpuMemoryUsed: 0 0,
  totalTime,
  },
@@ -442,8 +442,8 @@ export class GPUMarkdownProcessor {
  }
 
  private async createSections(
- text: string, headings: Array<{, position: number; level: number }>,
- sections: Array<{, position: number; type: string }>
+ text: string, headings: Array<{ position: number; level: number }>,
+ sections: Array<{ position: number; type: string }>
  ): Promise<MarkdownSection[]> {
  const result: MarkdownSection[] = [];
  const lines = text.split('\n');
@@ -522,11 +522,11 @@ export class GPUMarkdownProcessor {
  return result;
  }
 
- private scanMarkdownCPU(text: string): {, headings: Array<{ position: number; level: number }>;
- sections: Array<{, position: number; type: string }>;
+ private scanMarkdownCPU(text: string): { headings: Array<{ position: number; level: number }>;
+ sections: Array<{ position: number; type: string }>;
  } {
- const headings: Array<{, position: number; level: number }> = [];
- const sections: Array<{, position: number; type: string }> = [];
+ const headings: Array<{ position: number; level: number }> = [];
+ const sections: Array<{ position: number; type: string }> = [];
 
  const lines = text.split('\n');
  let currentPos = 0;
@@ -565,8 +565,8 @@ export class GPUMarkdownProcessor {
  }
 
  private createSectionsCPU(
- text: string, headings: Array<{, position: number; level: number }>,
- sections: Array<{, position: number; type: string }>
+ text: string, headings: Array<{ position: number; level: number }>,
+ sections: Array<{ position: number; type: string }>
  ): MarkdownSection[] {
  const result: MarkdownSection[] = [];
 

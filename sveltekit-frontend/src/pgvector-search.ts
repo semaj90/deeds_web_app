@@ -64,7 +64,7 @@ export class PGVectorSearch {
 	async insertChunks(
 		documentId: string,
 		title: string,
-		chunks: Array<{, text: string;
+		chunks: Array<{ text: string;
 			embedding: number[];
 			metadata?: Record<string, unknown>;
 		}>

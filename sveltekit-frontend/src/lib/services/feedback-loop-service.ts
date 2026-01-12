@@ -244,7 +244,7 @@ export class FeedbackLoopService {
                     preferredFeatures: [],
                     responseTimeThreshold: 2000, // Default 2 seconds
                     qualityExpectations: this.adaptiveThresholds.get(userRole) || 3.5,
-                    learningProgress: {, initialAccuracy: rating.score,
+                    learningProgress: { initialAccuracy: rating.score,
                         currentAccuracy: rating.score,
                         improvementRate: 0,
                         strongAreas: [],
@@ -476,7 +476,7 @@ export class FeedbackLoopService {
         }
 
         return {
-            suggestedFeatures: pattern.preferredFeatures.slice(0, 5, qualityImprovements: pattern.learningProgress.weakAreas.map(area => `Consider using improved ${area} features`, personalizedSettings: {, responseTimeThreshold: pattern.responseTimeThreshold,
+            suggestedFeatures: pattern.preferredFeatures.slice(0, 5, qualityImprovements: pattern.learningProgress.weakAreas.map(area => `Consider using improved ${area} features`, personalizedSettings: { responseTimeThreshold: pattern.responseTimeThreshold,
                 qualityExpectations: pattern.qualityExpectations,
                 difficultyPreference: pattern.commonQueries.length > 5 ? 'intermediate' : 'beginner'
             }

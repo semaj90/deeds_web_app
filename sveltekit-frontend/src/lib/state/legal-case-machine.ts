@@ -55,21 +55,21 @@ export interface LegalCaseContext {
  searchQuery: string, searchResults: unknown[]; relatedEvidence: unknown[], lastEmbedding: number[] | null;
  filters: {
  evidenceType?: string;
- dateRange?: {, start: Date, end: Date };
+ dateRange?: { start: Date, end: Date };
  tags?: string[];
  isAdmissible?: boolean;
  };
  // UI state
  activeTab: 'overview' | 'evidence' | 'analysis' | 'search', isLoading: boolean; error: string | null;
  // Form data
- formData: {, caseForm: Partial<NewCase>, evidenceForm: Partial<NewEvidence>;
+ formData: { caseForm: Partial<NewCase>, evidenceForm: Partial<NewEvidence>;
  };
  // Workflow state
  workflowStage: 'investigation' | 'analysis' | 'preparation' | 'review' | 'closed', nextActions: string[];
  // Collaboration
  collaborators: Array<any>, notifications: Array<any>;
  // Performance tracking
- stats: {, totalEvidence: number, processedEvidence: number; averageConfidence: number, processingTime: number;
+ stats: { totalEvidence: number, processedEvidence: number; averageConfidence: number, processingTime: number;
  };
 }
 // Event types
@@ -113,39 +113,39 @@ export type LegalCaseEvents =
 
 // Define actor types for services
 export type LegalCaseActors = {
- loadCase: {, input: { caseId: string };
+ loadCase: { input: { caseId: string };
  output: Case;
  };
- createCase: {, input: NewCase, output: Case;
+ createCase: { input: NewCase, output: Case;
  };
- loadEvidence: {, input: { caseId?: string };
+ loadEvidence: { input: { caseId?: string };
  output: Evidence[];
  };
- uploadEvidence: {, input: { files: File[], caseId: string; documentType: string };
+ uploadEvidence: { input: { files: File[], caseId: string; documentType: string };
  output: UploadEvidenceServiceResult;
  };
- processEvidence: {, input: { evidenceId: string };
+ processEvidence: { input: { evidenceId: string };
  output: ProcessEvidenceServiceResult;
  };
- aiSummarizeCase: {, input: { caseId: string };
+ aiSummarizeCase: { input: { caseId: string };
  output: CaseSummaryServiceResult;
  };
- findSimilarCases: {, input: { caseId?: string };
+ findSimilarCases: { input: { caseId?: string };
  output: any[];
  };
- updateCase: {, input: { caseId: string, updates: Partial<Case> };
+ updateCase: { input: { caseId: string, updates: Partial<Case> };
  output: Case;
  };
- deleteCase: {, input: { caseId: string };
+ deleteCase: { input: { caseId: string };
  output: boolean;
  };
- generateEmbedding: {, input: { text: string };
+ generateEmbedding: { input: { text: string };
  output: EmbeddingServiceResult;
  };
- searchRelatedEvidence: {, input: { text?: string; caseId?: string };
+ searchRelatedEvidence: { input: { text?: string; caseId?: string };
  output: RelatedEvidenceServiceResult['results'];
  };
- search: {, input: { query: string, filters: LegalCaseContext['filters'] };
+ search: { input: { query: string, filters: LegalCaseContext['filters'] };
  output: SearchServiceResult;
  };
 };
@@ -153,7 +153,7 @@ export type LegalCaseActors = {
 // === Services (async operations) ===
 // XState expects functions of the form (context, event) => Promise<any>
 // below we expose functions that return promises; when invoked by the machine we pass them directly
-const loadCaseService = async ({ input }: {, input: LegalCaseActors['loadCase']['input'] }): Promise<Case> => {
+const loadCaseService = async ({ input }: { input: LegalCaseActors['loadCase']['input'] }): Promise<Case> => {
  const caseId = input.caseId;
  if (!caseId) throw new Error('Missing caseId');
  const response = await fetch(`/api/cases/${caseId}`);
@@ -161,7 +161,7 @@ const loadCaseService = async ({ input }: {, input: LegalCaseActors['loadCase'][
  return await response.json();
 };
 
-const createCaseService = async ({ input }: {, input: LegalCaseActors['createCase']['input'] }): Promise<Case> => {
+const createCaseService = async ({ input }: { input: LegalCaseActors['createCase']['input'] }): Promise<Case> => {
  const response = await fetch('/api/cases', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
@@ -171,7 +171,7 @@ const createCaseService = async ({ input }: {, input: LegalCaseActors['createCas
  return await response.json();
 };
 
-const loadEvidenceService = async ({ input }: {, input: LegalCaseActors['loadEvidence']['input'] }): Promise<Evidence[]> => {
+const loadEvidenceService = async ({ input }: { input: LegalCaseActors['loadEvidence']['input'] }): Promise<Evidence[]> => {
  const caseId = input?.caseId;
  if (!caseId) throw new Error('Missing caseId for evidence load');
  const response = await fetch(`/api/cases/${caseId}/evidence`);
@@ -179,30 +179,30 @@ const loadEvidenceService = async ({ input }: {, input: LegalCaseActors['loadEvi
  return await response.json();
 };
 
-const processEvidenceService = async ({ input }: {, input: LegalCaseActors['processEvidence']['input'] }): Promise<ProcessEvidenceServiceResult> => {
+const processEvidenceService = async ({ input }: { input: LegalCaseActors['processEvidence']['input'] }): Promise<ProcessEvidenceServiceResult> => {
  const evidenceId = input.evidenceId;
  if (!evidenceId) throw new Error('Missing evidenceId for processing');
  const result = await aiSummarizationService.summarizeEvidence(evidenceId);
  return result as ProcessEvidenceServiceResult;
 };
 
-const findSimilarCasesService = async ({ input }: {, input: LegalCaseActors['findSimilarCases']['input'] }): Promise<any[]> => {
+const findSimilarCasesService = async ({ input }: { input: LegalCaseActors['findSimilarCases']['input'] }): Promise<any[]> => {
  const caseId = input?.caseId;
  if (!caseId) throw new Error('Missing caseId for similarity search');
- const similarDocs = await vectorSearchService.findSimilarDocuments(caseId,, { limit: 5, threshold: 0 0.7 });
+ const similarDocs = await vectorSearchService.findSimilarDocuments(caseId, { limit: 5, threshold: 0 0.7 });
  return similarDocs;
 };
 
-const searchService = async ({ input }: {, input: LegalCaseActors['search']['input'] }): Promise<SearchServiceResult> => {
+const searchService = async ({ input }: { input: LegalCaseActors['search']['input'] }): Promise<SearchServiceResult> => {
  const query = input.query ?? '';
  const results = await vectorSearchService.search({
  query: filters, input.filters,
- options: {, limit: 20 }
+ options: { limit: 20 }
  });
  return { ...results, query } as SearchServiceResult; // Include query in the result
 };
 
-const generateEmbeddingService = async ({ input }: {, input: LegalCaseActors['generateEmbedding']['input'] }): Promise<EmbeddingServiceResult> => {
+const generateEmbeddingService = async ({ input }: { input: LegalCaseActors['generateEmbedding']['input'] }): Promise<EmbeddingServiceResult> => {
  const text = input.text;
  if (!text) throw new Error('Missing text for embedding generation');
  // Use the real embedder (local Gemma3 or Nomic fallback)
@@ -213,12 +213,12 @@ const generateEmbeddingService = async ({ input }: {, input: LegalCaseActors['ge
  };
 };
 
-const searchRelatedEvidenceService = async ({ input }: {, input: LegalCaseActors['searchRelatedEvidence']['input'] }): Promise<RelatedEvidenceServiceResult['results']> => {
+const searchRelatedEvidenceService = async ({ input }: { input: LegalCaseActors['searchRelatedEvidence']['input'] }): Promise<RelatedEvidenceServiceResult['results']> => {
  const text = input?.text ?? 'Related evidence search';
  const response = await fetch('/api/unified/search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, query: text,
+ body: JSON.stringify({ query: text,
  type: 'evidence',
  limit: 5, caseId: input.caseId, useRecommendations: true
  })
@@ -230,16 +230,16 @@ const searchRelatedEvidenceService = async ({ input }: {, input: LegalCaseActors
  return data.results || [];
 };
 // === Guards ===
-const isValidCaseData = ({ context: _context }: {, context: LegalCaseContext }) => {
+const isValidCaseData = ({ context: _context }: { context: LegalCaseContext }) => {
  const { caseForm } = _context.formData;
  return !!(caseForm && (caseForm as any).title && (caseForm as any).description && (caseForm as any).caseNumber);
 };
 
-const hasEvidence = ({ context: _context }: {, context: LegalCaseContext }) => {
+const hasEvidence = ({ context: _context }: { context: LegalCaseContext }) => {
  return Array.isArray(_context.evidence) && _context.evidence.length > 0;
 };
 
-const hasAIAnalysis = ({ context: _context }: {, context: LegalCaseContext }) => {
+const hasAIAnalysis = ({ context: _context }: { context: LegalCaseContext }) => {
  return !!_context.aiSummary;
 };
 // === Actions (assign helpers) ===
@@ -342,7 +342,7 @@ export const legalCaseMachine = setup({
  context: LegalCaseContext, events: LegalCaseEvents;
  },
  guards: { isValidCaseData, hasEvidence, hasAIAnalysis },
- actions: {, assignCaseData: ({ context, event }) => {
+ actions: { assignCaseData: ({ context, event }) => {
  const output = (event as DoneActorEvent<Case>).output;
  context.case = output ?? null;
  context.caseId = output?.id ?? null;
@@ -436,14 +436,14 @@ export const legalCaseMachine = setup({
  filters: {},
  activeTab: 'overview',
  isLoading: false, error: null,
- formData: {, caseForm: {},
+ formData: { caseForm: {},
  evidenceForm: {}
  },
  workflowStage: 'investigation',
  nextActions: ['Collect evidence', 'Interview witnesses', 'Review documents'],
  collaborators: [],
  notifications: [],
- stats: {, totalEvidence: 0, processedEvidence: 0 0, averageConfidence: 0, processingTime: 0 0 }
+ stats: { totalEvidence: 0, processedEvidence: 0 0, averageConfidence: 0, processingTime: 0 0 }
  });
  },
  assignCaseFormReset: ({ context }) => {
@@ -517,14 +517,14 @@ export const legalCaseMachine = setup({
  return await response.json();
  }),
  aiSummarizeCase: fromPromise(async (
- { context: _context, input }: {, context: LegalCaseContext, input: LegalCaseActors['aiSummarizeCase']['input'] }
+ { context: _context, input }: { context: LegalCaseContext, input: LegalCaseActors['aiSummarizeCase']['input'] }
  ): Promise<CaseSummaryServiceResult> => {
  if (!input.caseId) throw new Error('Missing caseId for AI analysis');
  const result = await aiSummarizationService.summarizeCase(input.caseId);
  return result as CaseSummaryServiceResult;
  }),
  updateCase: fromPromise(async (
- { input }: {, input: LegalCaseActors['updateCase']['input'] }
+ { input }: { input: LegalCaseActors['updateCase']['input'] }
  ): Promise<Case> => {
  const caseId = input.caseId;
  if (!caseId) throw new Error('Missing caseId for update');
@@ -537,7 +537,7 @@ export const legalCaseMachine = setup({
  return await response.json();
  }),
  deleteCase: fromPromise(async (
- { input }: {, input: LegalCaseActors['deleteCase']['input'] }
+ { input }: { input: LegalCaseActors['deleteCase']['input'] }
  ): Promise<boolean> => {
  if (!input.caseId) throw new Error('Missing caseId for delete');
  const response = await fetch(`/api/cases/${input.caseId}`, { method: 'DELETE' });
@@ -547,7 +547,7 @@ export const legalCaseMachine = setup({
  }
 }).createMachine({
  id: 'legalCase',
- context: {, case: null, caseId: null,
+ context: { case: null, caseId: null,
  evidence: [],
  selectedEvidence: null,
  uploadQueue: [],
@@ -560,190 +560,190 @@ export const legalCaseMachine = setup({
  filters: {},
  activeTab: 'overview',
  isLoading: false, error: null,
- formData: {, caseForm: {},
+ formData: { caseForm: {},
  evidenceForm: {}
  },
  workflowStage: 'investigation',
  nextActions: ['Collect evidence', 'Interview witnesses', 'Review documents'],
  collaborators: [],
  notifications: [],
- stats: {, totalEvidence: 0, processedEvidence: 0 0, averageConfidence: 0, processingTime: 0 0 }
+ stats: { totalEvidence: 0, processedEvidence: 0 0, averageConfidence: 0, processingTime: 0 0 }
  },
  initial: 'idle',
- states: {, idle: {
- on: {, LOAD_CASE: { target: 'loadingCase', actions: [{, type: 'setLoading' }] },
- CREATE_CASE: {, target: 'creatingCase', cond: 'isValidCaseData', actions: [{, type: 'setLoading' }] },
- SEARCH: {, target: 'searching', actions: [{, type: 'setLoading' }] },
- SWITCH_TAB: {, actions: [{ type: 'switchTab' }] }
+ states: { idle: {
+ on: { LOAD_CASE: { target: 'loadingCase', actions: [{ type: 'setLoading' }] },
+ CREATE_CASE: { target: 'creatingCase', cond: 'isValidCaseData', actions: [{ type: 'setLoading' }] },
+ SEARCH: { target: 'searching', actions: [{ type: 'setLoading' }] },
+ SWITCH_TAB: { actions: [{ type: 'switchTab' }] }
  }
  },
- loadingCase: {, invoke: [{
+ loadingCase: { invoke: [{
  id: 'loadCase',
  src: 'loadCase', // Reference actor by string ID
  input: ({ event }) => ({ caseId: (event as Extract<LegalCaseEvents, { type: 'LOAD_CASE' }>).caseId }),
- onDone: {, target: 'caseLoaded', actions: [{, type: 'assignCaseData' }] },
- onError: {, target: 'error', actions: [{, type: 'assignError' }] }
+ onDone: { target: 'caseLoaded', actions: [{ type: 'assignCaseData' }] },
+ onError: { target: 'error', actions: [{ type: 'assignError' }] }
  }]
  },
- creatingCase: {, invoke: [{
+ creatingCase: { invoke: [{
  id: 'createCase',
  src: 'createCase', // Reference actor by string ID
  input: ({ context }) => context.formData.caseForm,
- onDone: {, target: 'caseLoaded',
+ onDone: { target: 'caseLoaded',
  actions: [
  { type: 'assignCaseData' },
  { type: 'assignCaseFormReset' }
  ]
  },
- onError: {, target: 'error', actions: [{, type: 'assignError' }] }
+ onError: { target: 'error', actions: [{ type: 'assignError' }] }
  }]
  },
- caseLoaded: {, initial: 'loadingEvidence',
- states: {, loadingEvidence: {
- entry: [{, type: 'setLoading' }],
- invoke: [{, id: 'loadEvidence',
+ caseLoaded: { initial: 'loadingEvidence',
+ states: { loadingEvidence: {
+ entry: [{ type: 'setLoading' }],
+ invoke: [{ id: 'loadEvidence',
  src: 'loadEvidence', // Reference actor by string ID
  input: ({ context }) => ({ caseId: context.caseId ?? undefined }), // Rely on context.caseId
- onDone: {, target: 'ready', actions: [{, type: 'assignEvidence' }, { type: 'setLoadingFalse' }] },
- onError: {, target: 'ready', actions: [{, type: 'assignError' }, { type: 'setLoadingFalse' }] }
+ onDone: { target: 'ready', actions: [{ type: 'assignEvidence' }, { type: 'setLoadingFalse' }] },
+ onError: { target: 'ready', actions: [{ type: 'assignError' }, { type: 'setLoadingFalse' }] }
  }]
  },
- ready: {, on: {
- ADD_EVIDENCE: {, target: 'uploadingEvidence',
+ ready: { on: {
+ ADD_EVIDENCE: { target: 'uploadingEvidence',
  actions: [
  { type: 'setLoading' },
- assign(({ event }: {, event: Extract<LegalCaseEvents, { type: 'ADD_EVIDENCE' }> }) => ({ uploadQueue: event.files ?? [] }))
+ assign(({ event }: { event: Extract<LegalCaseEvents, { type: 'ADD_EVIDENCE' }> }) => ({ uploadQueue: event.files ?? [] }))
  ]
  },
- PROCESS_EVIDENCE: {, target: 'processingEvidence', actions: [{, type: 'setLoading' }] },
- START_AI_ANALYSIS: {, target: 'aiAnalysis', actions: [{, type: 'setLoading' }], cond: 'hasEvidence' },
- FIND_SIMILAR_CASES: {, target: 'findingSimilarCases', actions: [{, type: 'setLoading' }] },
- GENERATE_EMBEDDING: {, target: 'generatingEmbedding', actions: [{, type: 'setLoading' }] },
- SEARCH_RELATED_EVIDENCE: {, target: 'searchingRelatedEvidence', actions: [{, type: 'setLoading' }] },
- UPDATE_CASE: {, target: 'updatingCase', actions: [{, type: 'setLoading' }] },
- DELETE_CASE: {, target: 'deletingCase', actions: [{, type: 'setLoading' }] }
+ PROCESS_EVIDENCE: { target: 'processingEvidence', actions: [{ type: 'setLoading' }] },
+ START_AI_ANALYSIS: { target: 'aiAnalysis', actions: [{ type: 'setLoading' }], cond: 'hasEvidence' },
+ FIND_SIMILAR_CASES: { target: 'findingSimilarCases', actions: [{ type: 'setLoading' }] },
+ GENERATE_EMBEDDING: { target: 'generatingEmbedding', actions: [{ type: 'setLoading' }] },
+ SEARCH_RELATED_EVIDENCE: { target: 'searchingRelatedEvidence', actions: [{ type: 'setLoading' }] },
+ UPDATE_CASE: { target: 'updatingCase', actions: [{ type: 'setLoading' }] },
+ DELETE_CASE: { target: 'deletingCase', actions: [{ type: 'setLoading' }] }
  }
  },
- uploadingEvidence: {, invoke: [{
+ uploadingEvidence: { invoke: [{
  id: 'uploadEvidence',
  src: 'uploadEvidence', // Reference actor by string ID
  input: ({ context }) => ({
  files: context.uploadQueue, context.caseId ?? '',
  documentType: 'evidence'
  }),
- onDone: {, target: 'loadingEvidence',
+ onDone: { target: 'loadingEvidence',
  actions: [
  assign({ uploadQueue: [] }) => { type: 'assignUploadNotifications' }
  ]
  },
- onError: {, target: 'ready', actions: [{, type: 'assignError' }] }
+ onError: { target: 'ready', actions: [{ type: 'assignError' }] }
  }]
  },
- processingEvidence: {, invoke: [{
+ processingEvidence: { invoke: [{
  id: 'processEvidence',
  src: 'processEvidence', // Reference actor by string ID
  input: ({ context, event }) => ({ evidenceId: (event as Extract<LegalCaseEvents, { type: 'PROCESS_EVIDENCE' }>).evidenceId ?? context.selectedEvidence?.id ?? '' }),
- onDone: {, target: 'ready',
+ onDone: { target: 'ready',
  actions: [
  { type: 'setLoadingFalse' },
  { type: 'assignProcessingEvidenceUpdate' }
  ]
  },
- onError: {, target: 'ready', actions: [{, type: 'assignError' }] }
+ onError: { target: 'ready', actions: [{ type: 'assignError' }] }
  }]
  },
- aiAnalysis: {, initial: 'analyzing',
- states: {, analyzing: {
- invoke: [{, id: 'aiSummarizeCase',
+ aiAnalysis: { initial: 'analyzing',
+ states: { analyzing: {
+ invoke: [{ id: 'aiSummarizeCase',
  src: 'aiSummarizeCase', // Reference actor by string ID
  input: ({ context }) => ({ caseId: context.caseId ?? '' }),
- onDone: {, target: 'complete', actions: [{, type: 'assignAISummary' }] },
- onError: {, target: '#legalCase.caseLoaded.ready', actions: [{, type: 'assignError' }] }
+ onDone: { target: 'complete', actions: [{ type: 'assignAISummary' }] },
+ onError: { target: '#legalCase.caseLoaded.ready', actions: [{ type: 'assignError' }] }
  }],
- on: {, AI_ANALYSIS_PROGRESS: { actions: [{, type: 'assignAIProgress' }] } }
+ on: { AI_ANALYSIS_PROGRESS: { actions: [{ type: 'assignAIProgress' }] } }
  },
- complete: {, entry: [
+ complete: { entry: [
  { type: 'setLoadingFalse' },
  { type: 'assignAIAnalysisCompleteNotification' }
  ],
- after: {, 1000: { target: '#legalCase.caseLoaded.ready' } }
+ after: { 1000: { target: '#legalCase.caseLoaded.ready' } }
  }
  }
  },
- findingSimilarCases: {, invoke: [{
+ findingSimilarCases: { invoke: [{
  id: 'findSimilarCases',
  src: 'findSimilarCases', // Reference actor by string ID
  input: ({ context }) => ({ caseId: context.caseId ?? '' }),
- onDone: {, target: 'ready', actions: [{, type: 'setLoadingFalse' }, { type: 'assignSimilarCases' }] },
- onError: {, target: 'ready', actions: [{, type: 'assignError' }] }
+ onDone: { target: 'ready', actions: [{ type: 'setLoadingFalse' }, { type: 'assignSimilarCases' }] },
+ onError: { target: 'ready', actions: [{ type: 'assignError' }] }
  }]
  },
- updatingCase: {, invoke: [{
+ updatingCase: { invoke: [{
  id: 'updateCase',
  src: 'updateCase', // Reference actor by string ID
  input: ({ context, event }) => ({ caseId: context.caseId ?? '', updates: (event as Extract<LegalCaseEvents, { type: 'UPDATE_CASE' }>).updates }),
- onDone: {, target: 'ready', actions: [{, type: 'setLoadingFalse' }, { type: 'assignCaseData' }] },
- onError: {, target: 'ready', actions: [{, type: 'assignError' }] }
+ onDone: { target: 'ready', actions: [{ type: 'setLoadingFalse' }, { type: 'assignCaseData' }] },
+ onError: { target: 'ready', actions: [{ type: 'assignError' }] }
  }]
  },
- deletingCase: {, invoke: [{
+ deletingCase: { invoke: [{
  id: 'deleteCase',
  src: 'deleteCase', // Reference actor by string ID
  input: ({ context }) => ({ caseId: context.caseId ?? '' }),
- onDone: {, target: '#legalCase.idle',
- actions: [{, type: 'resetContext' }]
+ onDone: { target: '#legalCase.idle',
+ actions: [{ type: 'resetContext' }]
  },
- onError: {, target: 'ready', actions: [{, type: 'assignError' }] }
+ onError: { target: 'ready', actions: [{ type: 'assignError' }] }
  }]
  },
- generatingEmbedding: {, invoke: [{
+ generatingEmbedding: { invoke: [{
  id: 'generateEmbedding',
  src: 'generateEmbedding', // Reference actor by string ID
  input: ({ event }) => ({ text: (event as Extract<LegalCaseEvents, { type: 'GENERATE_EMBEDDING' }>).text }),
- onDone: [{, target: 'searchingRelatedEvidence', actions: [{, type: 'assignEmbedding' }] }],
- onError: {, target: 'ready', actions: [{, type: 'assignError' }] }
+ onDone: [{ target: 'searchingRelatedEvidence', actions: [{ type: 'assignEmbedding' }] }],
+ onError: { target: 'ready', actions: [{ type: 'assignError' }] }
  }]
  },
- searchingRelatedEvidence: {, invoke: [{
+ searchingRelatedEvidence: { invoke: [{
  id: 'searchRelatedEvidence',
  src: 'searchRelatedEvidence', // Reference actor by string ID
  input: ({ context, event }) => ({
  text: (event as Extract<LegalCaseEvents, { type: 'SEARCH_RELATED_EVIDENCE' }>).embedding ? undefined : context.case?.description ?? 'Related evidence search',
  caseId: context.caseId ?? undefined
  }),
- onDone: {, target: 'ready',
+ onDone: { target: 'ready',
  actions: [
  { type: 'assignRelatedEvidence' },
  { type: 'assignRelatedEvidenceNotification' }
  ]
  },
- onError: {, target: 'ready', actions: [{, type: 'assignError' }] }
+ onError: { target: 'ready', actions: [{ type: 'assignError' }] }
  }]
  }
  },
- on: {, SWITCH_TAB: { actions: [{, type: 'switchTab' }] },
- SET_WORKFLOW_STAGE: {, actions: [{ type: 'updateWorkflowStage' }] },
- UPDATE_CASE_FORM: {, actions: [{ type: 'updateFormData' }] },
- SELECT_EVIDENCE: {, actions: [{ type: 'assignSelectedEvidence' }] },
- APPLY_FILTERS: {, actions: [{ type: 'assignFilters' }] },
- REFRESH: {, target: '.loadingEvidence' }
+ on: { SWITCH_TAB: { actions: [{ type: 'switchTab' }] },
+ SET_WORKFLOW_STAGE: { actions: [{ type: 'updateWorkflowStage' }] },
+ UPDATE_CASE_FORM: { actions: [{ type: 'updateFormData' }] },
+ SELECT_EVIDENCE: { actions: [{ type: 'assignSelectedEvidence' }] },
+ APPLY_FILTERS: { actions: [{ type: 'assignFilters' }] },
+ REFRESH: { target: '.loadingEvidence' }
  }
  },
- searching: {, invoke: [{
+ searching: { invoke: [{
  id: 'search',
  src: 'search', // Reference actor by string ID
  input: ({ context, event }) => ({ query: (event as Extract<LegalCaseEvents, { type: 'SEARCH' }>).query: filters, context.filters }),
- onDone: {, target: 'idle', actions: [{, type: 'setLoadingFalse' }, { type: 'assignSearchResults' }] },
- onError: {, target: 'error', actions: [{, type: 'assignError' }] }
+ onDone: { target: 'idle', actions: [{ type: 'setLoadingFalse' }, { type: 'assignSearchResults' }] },
+ onError: { target: 'error', actions: [{ type: 'assignError' }] }
  }]
  },
- error: {, entry: [{ type: 'setLoadingFalse' }],
- on: {, RETRY: { target: 'idle', actions: [{, type: 'clearError' }] }, DISMISS_ERROR: {, actions: [{ type: 'clearError' }] } }
+ error: { entry: [{ type: 'setLoadingFalse' }],
+ on: { RETRY: { target: 'idle', actions: [{ type: 'clearError' }] }, DISMISS_ERROR: { actions: [{ type: 'clearError' }] } }
  }
  },
- on: {, RESET: {
+ on: { RESET: {
  target: 'idle',
- actions: [{, type: 'resetContext' }]
+ actions: [{ type: 'resetContext' }]
  }
  }
 };

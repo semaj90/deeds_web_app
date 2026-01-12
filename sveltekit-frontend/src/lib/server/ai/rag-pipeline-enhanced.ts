@@ -21,7 +21,7 @@ import { join } from "path";
 declare module '$lib/server/db/schema-postgres' {
  // Example Drizzle table type (simplified)
  interface DrizzleTable<TName extends string, TColumns extends Record<string, any>> {
- _?: {, name: TName; columns: TColumns; dialect: 'pg'; schema | undefined;
+ _?: { name: TName; columns: TColumns; dialect: 'pg'; schema | undefined;
  };
  }
 
@@ -104,11 +104,11 @@ export interface RAGSettings {
 
 /** * Security Settings */
 export interface SecuritySettings {
- rateLimit: {, perMinute: number; windowMs: number;
+ rateLimit: { perMinute: number; windowMs: number;
  };
- validation: {, maxInputLength: number; maxDocumentSize: number; allowedDocumentTypes: string[];
+ validation: { maxInputLength: number; maxDocumentSize: number; allowedDocumentTypes: string[];
  };
- sanitization: {, removeHtmlTags: boolean; removeSqlChars: boolean; maxLineLength: number;
+ sanitization: { removeHtmlTags: boolean; removeSqlChars: boolean; maxLineLength: number;
  };
 }
 
@@ -139,7 +139,7 @@ const createDefaultConfig = (): RAGConfig => ({
  // Prioritize process.env.OLLAMA_URL for Docker compatibility
  baseUrl: process.env.OLLAMA_URL || OLLAMA_CONFIG.baseUrl, embeddingModel: OLLAMA_CONFIG.embeddingModel, llmModel: OLLAMA_CONFIG.llmModel, embeddingDimensions: OLLAMA_CONFIG.embeddingDimensions, timeout: OLLAMA_CONFIG.timeout, temperature: OLLAMA_CONFIG.temperature, numCtx: OLLAMA_CONFIG.numCtx, numPredict: OLLAMA_CONFIG.numPredict,
  },
- rag: {, chunkSize: parseInt(process.env.RAG_CHUNK_SIZE || '1500'),
+ rag: { chunkSize: parseInt(process.env.RAG_CHUNK_SIZE || '1500'),
  chunkOverlap: parseInt(process.env.RAG_CHUNK_OVERLAP || '300'),
  maxSources: parseInt(process.env.RAG_MAX_SOURCES || '10'),
  similarityThreshold: parseFloat(process.env.RAG_SIMILARITY_THRESHOLD || '0.5'),
@@ -149,15 +149,15 @@ const createDefaultConfig = (): RAGConfig => ({
  enableCaching: process.env.RAG_ENABLE_CACHING !== 'false',
  batchSize: parseInt(process.env.RAG_BATCH_SIZE || '10'),
  },
- security: {, rateLimit: {
+ security: { rateLimit: {
  perMinute: parseInt(process.env.RAG_RATE_LIMIT_PER_MINUTE || '60'),
  windowMs: parseInt(process.env.RAG_RATE_LIMIT_WINDOW_MS || '60000'),
  },
- validation: {, maxInputLength: parseInt(process.env.RAG_MAX_INPUT_LENGTH || '10000'),
+ validation: { maxInputLength: parseInt(process.env.RAG_MAX_INPUT_LENGTH || '10000'),
  maxDocumentSize: parseInt(process.env.RAG_MAX_DOCUMENT_SIZE || '10485760'),
  allowedDocumentTypes: (process.env.RAG_ALLOWED_DOC_TYPES || 'contract,statute,case_law,brief,memo').split(','),
  },
- sanitization: {, removeHtmlTags: process.env.RAG_REMOVE_HTML_TAGS !== 'false',
+ sanitization: { removeHtmlTags: process.env.RAG_REMOVE_HTML_TAGS !== 'false',
  removeSqlChars: process.env.RAG_REMOVE_SQL_CHARS !== 'false',
  maxLineLength: parseInt(process.env.RAG_MAX_LINE_LENGTH || '2000'),
  },
@@ -214,7 +214,7 @@ export interface AnswerResult {
  processingTime: number;
  citations?: string[];
  legalPrecedents?: string[];
- riskAssessment?: {, level: 'low' | 'medium' | 'high', factors: string[] };
+ riskAssessment?: { level: 'low' | 'medium' | 'high', factors: string[] };
 }
 
 /** * Contract Analysis Result */
@@ -443,7 +443,7 @@ class OllamaHTTPEmbeddings implements EmbeddingsProvider {
  const response = await fetch(`${this.baseUrl}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({, model: this.model, prompt: input }),
+ body: JSON.stringify({ model: this.model, prompt: input }),
  });
  if (!response.ok) {
  const errorText = await response.text();
@@ -478,9 +478,9 @@ class OllamaHTTPLLM {
  const response = await fetch(`${this.baseUrl}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({, model: this.model,
+ body: JSON.stringify({ model: this.model,
  prompt,
- options: {, temperature: this.temperature, num_ctx: this.numCtx, num_predict: this.numPredict },
+ options: { temperature: this.temperature, num_ctx: this.numCtx, num_predict: this.numPredict },
  stream: false, // Request non-streaming response for invoke
  }),
  });
@@ -512,7 +512,7 @@ export class EnhancedLegalRAGPipeline {
  private db?: ReturnType<typeof drizzle>;
  private redis?: InstanceType<typeof Redis>;
  private embeddings?: EmbeddingsProvider;
- private llm?: {, invoke: (input: RunnableInvokeInput) => Promise<RunnableInvokeOutput> }; // treat as Runnable-like adapter
+ private llm?: { invoke: (input: RunnableInvokeInput) => Promise<RunnableInvokeOutput> }; // treat as Runnable-like adapter
  private validator: InputValidator;
  private rateLimiter: RateLimiter;
  private metrics: MetricsCollector;
@@ -1027,7 +1027,7 @@ Answer: `);
   confidence: analysis.confidence.toString(),
   processingTime: Date.now() - startTime, contextUsed: relevantDocs.map((d) => d.documentId),
   embedding: JSON.stringify(queryEmbedding),
-  metadata: {, sourcesCount: relevantDocs.length, analysis.keyPoints, confidentialityLevel: citations.length, legalPrecedents.length, riskLevel: riskAssessment.level,
+  metadata: { sourcesCount: relevantDocs.length, analysis.keyPoints, confidentialityLevel: citations.length, legalPrecedents.length, riskLevel: riskAssessment.level,
   },
   });
  } catch (error) {
@@ -1245,9 +1245,9 @@ let parsed: unknown;
  getMetrics(): Record<string, unknown> {
  return {
  ...this.metrics.getMetrics(),
- config: {, chunkSize: this.config.rag.chunkSize; this.config.rag.maxSources, enableCaching: this.config.rag.enableCaching, enableAutoTagging: this.config.rag.enableAutoTagging,
+ config: { chunkSize: this.config.rag.chunkSize; this.config.rag.maxSources, enableCaching: this.config.rag.enableCaching, enableAutoTagging: this.config.rag.enableAutoTagging,
  },
- rateLimiting: {, perMinute: this.config.security.rateLimit.perMinute; this.config.security.rateLimit.windowMs,
+ rateLimiting: { perMinute: this.config.security.rateLimit.perMinute; this.config.security.rateLimit.windowMs,
  },
  };
  }
@@ -1327,7 +1327,7 @@ const sentences = text.split(/(?<=[.? !])\s+/).filter(Boolean);
  return Array.from(precedents);
  }
 
- private assessLegalRisks(text: string): {, level: 'low' | 'medium' | 'high', factors: string[] } {
+ private assessLegalRisks(text: string): { level: 'low' | 'medium' | 'high', factors: string[] } {
  const lowerText = (text || '').toLowerCase();
  const highRiskTerms = ['breach', 'penalty', 'fines', 'criminal', 'termination for cause', 'liability unlimited'];
  const mediumRiskTerms = ['indemnify', 'warranty', 'material breach', 'liquidated damages', 'exclusive'];

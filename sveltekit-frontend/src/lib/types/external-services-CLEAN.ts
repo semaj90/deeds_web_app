@@ -5,7 +5,7 @@ export interface OllamaClient {
   embed(text: string, opts?: { model?: string }): Promise<number[]>;
   generateText?(prompt: string, opts?: { model?: string; maxTokens?: number }): Promise<string>;
   chat?(
-    messages: Array<{, role: string; content: string }>,
+    messages: Array<{ role: string; content: string }>,
     opts?: { model?: string; stream?: boolean }
   ): Promise<string | AsyncIterable<string>>;
 }
@@ -84,15 +84,15 @@ export interface PostgresConfig {
 }
 
 export interface PgVectorClient {
-  query<T = unknown>(sql: string, params?: unknown[]): Promise<{, rows: T[] }>;
+  query<T = unknown>(sql: string, params?: unknown[]): Promise<{ rows: T[] }>;
   search(
     collection: string,
     vector: number[],
     limit?: number
-  ): Promise<Array<{, id: string; similarity: number; metadata: Record<string, unknown> }>>;
+  ): Promise<Array<{ id: string; similarity: number; metadata: Record<string, unknown> }>>;
   insert(
     collection: string,
-    vectors: Array<{, id: string; vector: number[]; metadata?: Record<string, unknown> }>
+    vectors: Array<{ id: string; vector: number[]; metadata?: Record<string, unknown> }>
   ): Promise<void>;
   createExtension?(): Promise<void>;
   disconnect(): Promise<void>;
@@ -112,10 +112,10 @@ export interface MinIOClient {
     key: string,
     data: Buffer | ReadableStream,
     metadata?: Record<string, string>
-  ): Promise<{, etag: string }>;
+  ): Promise<{ etag: string }>;
   getObject(bucket: string, key: string): Promise<ReadableStream>;
   removeObject(bucket: string, key: string): Promise<void>;
-  listObjects(bucket: string, prefix?: string): Promise<Array<{, name: string; size: number; etag: string }>>;
+  listObjects(bucket: string, prefix?: string): Promise<Array<{ name: string; size: number; etag: string }>>;
   makeBucket?(bucket: string, region?: string): Promise<void>;
   bucketExists?(bucket: string): Promise<boolean>;
 }
@@ -129,7 +129,7 @@ export interface Neo4jConfig {
 }
 
 export interface Neo4jClient {
-  run<T = unknown>(cypher: string, params?: Record<string, unknown>): Promise<{, records: Array<{ toObject(): T }> }>;
+  run<T = unknown>(cypher: string, params?: Record<string, unknown>): Promise<{ records: Array<{ toObject(): T }> }>;
   close(): Promise<void>;
   verifyConnectivity?(): Promise<void>;
 }

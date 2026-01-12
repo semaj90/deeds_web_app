@@ -181,7 +181,7 @@ export async function generateCaseSummaryPDF(
  title: 'Case Summary',
  content: summary,
  type: 'summary',
- metadata: {, createdAt: new Date().toISOString(), author: generatedBy,
+ metadata: { createdAt: new Date().toISOString(), author: generatedBy,
  },
  }],
  generatedAt: new Date().toISOString(),
@@ -195,12 +195,12 @@ export async function generateCaseSummaryPDF(
  * Generate evidence packet PDF
  */
 export async function generateEvidencePacketPDF(
- caseId: string, caseTitle: string, string: Array<{, title: string, content: string; type: string, collectedAt: string }>
+ caseId: string, caseTitle: string, string: Array<{ title: string, content: string; type: string, collectedAt: string }>
 ): Promise<Uint8Array> {
  const sections: LegalPacketSection[] = evidence.map((item) => ({
  title: item.title, content.content,
  type: 'evidence',
- metadata: {, createdAt: item.collectedAt,
+ metadata: { createdAt: item.collectedAt,
  tags: [item.type],
  },
  }));

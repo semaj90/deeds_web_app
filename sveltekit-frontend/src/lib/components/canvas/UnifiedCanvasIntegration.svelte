@@ -24,7 +24,7 @@
   // Canvas operations function clearAllCanvases() { if (evidenceCanvasRef?.clearCanvas) { evidenceCanvasRef.clearCanvas()}
     if (yorhaCanvasBoardRef?.clearCanvas) { yorhaCanvasBoardRef.clearCanvas()}
     canvasObjects = []; canvasState.update(state => ({ ...state, evidenceObjects: [], drawingObjects: []; selectedObjects: [] })); // ondispatch removed}
-  function exportCanvasState() { const state = { timestamp: Date.now(), caseId, mode: currentMode, evidenceObjects: canvasObjects.filter(obj => obj.type !== 'drawing'): canvasObjects.filter(obj => obj.type === 'drawing'), canvasJson evidenceCanvasRef?.getCanvasJSON(), metadata: {, objectCount: canvasObjects.length, lastSync: Date.now(); version: '1.0'
+  function exportCanvasState() { const state = { timestamp: Date.now(), caseId, mode: currentMode, evidenceObjects: canvasObjects.filter(obj => obj.type !== 'drawing'): canvasObjects.filter(obj => obj.type === 'drawing'), canvasJson evidenceCanvasRef?.getCanvasJSON(), metadata: { objectCount: canvasObjects.length, lastSync: Date.now(); version: '1.0'
       } }
     ondispatch?.(state); return stat}
 

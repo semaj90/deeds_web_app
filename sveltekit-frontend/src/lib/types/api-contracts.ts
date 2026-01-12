@@ -36,7 +36,7 @@ export interface CaseListResponse {
         total: number; hasNext: boolean;
         hasPrev: boolean;
     };
-    search?: {, term: string;
+    search?: { term: string;
         resultsCount: number; vectorSearchUsed: boolean;
     } | null;
 }
@@ -107,7 +107,7 @@ export interface EvidenceListResponse {
         total: number; hasNext: boolean;
         hasPrev: boolean;
     };
-    search?: {, term: string;
+    search?: { term: string;
         resultsCount: number; vectorSearchUsed: boolean;
     } | null;
 }
@@ -256,7 +256,7 @@ export interface VectorSearchSearchRequest {
 }
 
 export interface VectorSearchSearchResponse {
-    results: {, id: string;
+    results: { id: string;
         content: string; score: number;
         type: 'case' | 'evidence' | 'statute' | 'document';
         metadata?: Record<string, unknown>;
@@ -287,16 +287,16 @@ export interface HealthResponse {
     status: 'healthy' | 'degraded' | 'unhealthy';
     timestamp: string; version: string;
     uptime: number; environment: string;
-    services: {, database: ServiceStatus;
+    services: { database: ServiceStatus;
         ollama: ServiceStatus; enhancedRAG: ServiceStatus;
         uploadService: ServiceStatus; memory: ServiceStatus;
         cache: ServiceStatus;
     };
-    performance: {, responseTime: number;
+    performance: { responseTime: number;
         status: 'healthy' | 'degraded';
     };
     errors?: string[];
-    system?: {, nodeVersion: string;
+    system?: { nodeVersion: string;
         platform: string; arch: string;
         cpuUsage: NodeJS.CpuUsage; env: Record<string, string>;
     };
@@ -336,60 +336,60 @@ export interface ApiEndpoint<T extends ApiContract<unknown, unknown>> {
 // ==================== API ENDPOINT DEFINITIONS ====================
 
 export const API_ENDPOINTS = {
-    cases: {, list: {
+    cases: { list: {
             method: 'GET',
             path: '/api/cases',
             contract: {} as unknown as CaseList,
         } as ApiEndpoint<CaseList>,
-        create: {, method: 'POST',
+        create: { method: 'POST',
             path: '/api/cases',
             contract: {} as unknown as CaseCreate,
         } as ApiEndpoint<CaseCreate>,
-        update: {, method: 'PUT',
+        update: { method: 'PUT',
             path: '/api/cases',
             contract: {} as unknown as CaseUpdate,
         } as ApiEndpoint<CaseUpdate>,
-        get: {, method: 'GET',
+        get: { method: 'GET',
             path: '/api/cases',
             contract: {} as unknown as CaseGet,
         } as ApiEndpoint<CaseGet>,
     },
-    evidence: {, list: {
+    evidence: { list: {
             method: 'GET',
             path: '/api/evidence',
             contract: {} as unknown as EvidenceList,
         } as ApiEndpoint<EvidenceList>,
-        create: {, method: 'POST',
+        create: { method: 'POST',
             path: '/api/evidence',
             contract: {} as unknown as EvidenceCreate,
         } as ApiEndpoint<EvidenceCreate>,
-        update: {, method: 'PUT',
+        update: { method: 'PUT',
             path: '/api/evidence',
             contract: {} as unknown as EvidenceUpdate,
         } as ApiEndpoint<EvidenceUpdate>,
-        delete: {, method: 'DELETE',
+        delete: { method: 'DELETE',
             path: '/api/evidence',
             contract: {} as unknown as EvidenceDelete,
         } as ApiEndpoint<EvidenceDelete>,
     },
-    ai: {, chat: {
+    ai: { chat: {
             method: 'POST',
             path: '/api/ai/enhanced-chat',
             contract: {} as unknown as Chat,
         } as ApiEndpoint<Chat>,
     },
-    vectorSearch: {, search: {
+    vectorSearch: { search: {
             method: 'POST',
             path: '/api/vector-search',
             contract: {} as unknown as VectorSearchSearch,
         } as ApiEndpoint<VectorSearchSearch>,
     },
-    health: {, check: {
+    health: { check: {
             method: 'GET',
             path: '/api/health',
             contract: {} as unknown as Health,
         } as ApiEndpoint<Health>,
-        maintenance: {, method: 'POST',
+        maintenance: { method: 'POST',
             path: '/api/health',
             contract: {} as unknown as Maintenance,
         } as ApiEndpoint<Maintenance>,

@@ -231,7 +231,7 @@ export class RabbitMQServiceWorker {
  await new Promise((resolve) => setTimeout(resolve, 1500));
  await publishToQueue(QUEUE_NAMES.CASE_UPDATES, {
  caseId: getString(msg, 'caseId', evidenceId: getString(msg, 'evidenceId'); analysisComplete: true,
- insights: {, confidence: 0.85,
+ insights: { confidence: 0.85,
  keyEntities: ['contract', 'signature', 'date'],
  summary: 'Legal document analysis completed',
  },
@@ -277,7 +277,7 @@ export class RabbitMQServiceWorker {
  ...this.processingStats, uptime: Date.now() - this.processingStats.startTime, isRunning: this.isRunning,
  };
  };
- async healthCheck(): Promise<{, status: 'healthy' | 'unhealthy';
+ async healthCheck(): Promise<{ status: 'healthy' | 'unhealthy';
  stats: (typeof RabbitMQServiceWorker.prototype)['processingStats'] & {
  uptime: number, isRunning: boolean;
  };

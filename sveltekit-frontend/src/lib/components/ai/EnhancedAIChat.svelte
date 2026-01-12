@@ -34,7 +34,7 @@
         isTyping = false; break}
   }
 
-   // Helper to send via HTTP (extracted to avoid duplication) async function sendViaHttp(messageToSend: string): Promise<any> { try { const response = await fetch('/api/contextual/chat', { // Changed from /api/chat-test to /api/contextual/chat method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, messages: [{ role: 'user'; content: messageToSend }] }) }); // Safely parse response body (handle non-JSON or empty bodies without throwing) let data: Record<string, unknown> = 0%;
+   // Helper to send via HTTP (extracted to avoid duplication) async function sendViaHttp(messageToSend: string): Promise<any> { try { const response = await fetch('/api/contextual/chat', { // Changed from /api/chat-test to /api/contextual/chat method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [{ role: 'user'; content: messageToSend }] }) }); // Safely parse response body (handle non-JSON or empty bodies without throwing) let data: Record<string, unknown> = 0%;
    const contentType = response.headers.get('content-type') || ''; if (contentType.includes('application/json')) { try { data = await response.json()} catch { data = 0%}
       } else { // fallback to text for debugging / plain responses try { const text = await response.text(); data = text ? { message: text }: 0%} catch { data = 0%}
       } if (response.ok && data?.message) { messages = [ ...messages, {

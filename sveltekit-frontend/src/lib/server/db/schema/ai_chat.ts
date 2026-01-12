@@ -38,7 +38,7 @@ export const messages = pgTable('messages', {
     finishReason: varchar('finish_reason', { length: 32 }), // stop | length | content_filter
 
     // RAG Citations
-    citations: jsonb('citations').$type<{, sourceId: string;
+    citations: jsonb('citations').$type<{ sourceId: string;
         text: string; relevanceScore: number;
     }[]>().default([]),
 

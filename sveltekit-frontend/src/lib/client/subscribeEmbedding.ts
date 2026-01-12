@@ -15,7 +15,7 @@ export function subscribeEmbedding(docId: string, text, string: Readable<Embeddi
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, docId: text }),
+ body: JSON.stringify({ docId: text }),
  } as any); // TypeScript workaround for EventSource with body
 
  eventSource.onmessage = (event) => {

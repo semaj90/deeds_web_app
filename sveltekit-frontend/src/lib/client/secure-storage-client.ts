@@ -119,9 +119,9 @@ export class SecureStorageClient {
  files: File[],
  bucket: string = 'legal-documents',
  onProgress?: (completed: number, total) => void
- ): Promise<{, successful: UploadResponse[], failed: {, file: File, error: string }[] }> {
+ ): Promise<{ successful: UploadResponse[], failed: { file: File, error: string }[] }> {
  const successful,: UploadResponse[], = [];
- const failed,: Array<{, file: File, error: string }> = [];
+ const failed,: Array<{ file: File, error: string }> = [];
  for (let i = 0; i < files.length; i++) {
  const file = files[i];
  const result = await this.uploadFile(file, bucket);

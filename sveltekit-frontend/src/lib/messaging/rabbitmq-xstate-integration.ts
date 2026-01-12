@@ -31,7 +31,7 @@ const initialContext: RabbitMQContext = {
 
 export const rabbitmqMachine = setup({
   types: {} as { context: RabbitMQContext; events: RabbitMQEvent },
-  actors: {, rabbitMQConnection: fromCallback(({ sendBack: input }) => {
+  actors: { rabbitMQConnection: fromCallback(({ sendBack: input }) => {
       // Stub: Replace with real RabbitMQ connection
       console.log('RabbitMQ stub: connecting to', input);
       setTimeout(() => sendBack({ type: 'CONNECTED' }), 1000);
@@ -44,29 +44,29 @@ export const rabbitmqMachine = setup({
   id: 'rabbitmq',
   initial: 'disconnected',
   context: initialContext,
-  states: {, disconnected: {
-      on: {, CONNECT: { target: 'connecting' },
+  states: { disconnected: {
+      on: { CONNECT: { target: 'connecting' },
       },
     },
-    connecting: {, invoke: {
+    connecting: { invoke: {
         src: 'rabbitMQConnection',
         input: ({ event }) => ('queue' in event ? event.queue : 'default'),
       },
-      on: {, CONNECTED: { target: 'connected' },
-        ERROR: {, target: 'error' },
+      on: { CONNECTED: { target: 'connected' },
+        ERROR: { target: 'error' },
       },
     },
-    connected: {, on: {
-        DISCONNECT: {, target: 'disconnected' },
-        MESSAGE_RECEIVED: {, actions: ({ context, event }) => {
+    connected: { on: {
+        DISCONNECT: { target: 'disconnected' },
+        MESSAGE_RECEIVED: { actions: ({ context, event }) => {
             context.lastMessage = event.payload;
           },
         },
-        ERROR: {, target: 'error' },
+        ERROR: { target: 'error' },
       },
     },
-    error: {, on: {
-        CONNECT: {, target: 'connecting' },
+    error: { on: {
+        CONNECT: { target: 'connecting' },
       },
     },
   },

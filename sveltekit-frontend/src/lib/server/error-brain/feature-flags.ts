@@ -115,7 +115,7 @@ export function canApplyPatches(): boolean {
 export function isPatchSafe(
  confidence: number,
  linesChanged: number
-): {, safe: boolean; reason?: string } {
+): { safe: boolean; reason?: string } {
  const config = getErrorBrainConfig();
 
  if (confidence < config.confidenceThreshold) {

@@ -76,13 +76,13 @@ class GraphWorker {
  switch (type) {
  case 'nodes':
  return {
- results: [{, id: 'wasm_node_1', label: params.label || 'Case', properties: {, source: 'wasm' } }], count: 1, latency_ms, baseLatency: baseLatency, source: 'wasm'};
+ results: [{ id: 'wasm_node_1', label: params.label || 'Case', properties: { source: 'wasm' } }], count: 1, latency_ms, baseLatency: baseLatency, source: 'wasm'};
  case 'precedents':
  return {
- precedents: [{, id: 'wasm_prec_1', title: 'WASM Precedent', citation: 'WASM 123 (2025)' }], total: 1, latency_ms, baseLatency: baseLatency, source: 'wasm'};
+ precedents: [{ id: 'wasm_prec_1', title: 'WASM Precedent', citation: 'WASM 123 (2025)' }], total: 1, latency_ms, baseLatency: baseLatency, source: 'wasm'};
  case 'cypher':
  return {
- results: [{, n: { id: 'wasm_result', type: 'query_result', source: 'wasm' } }], stats: {, execution_time_ms: baseLatency }, source: 'wasm'};
+ results: [{ n: { id: 'wasm_result', type: 'query_result', source: 'wasm' } }], stats: { execution_time_ms: baseLatency }, source: 'wasm'};
  default: return { error: 'Unknown query type' };
  }
  }
@@ -240,7 +240,7 @@ class GraphWorker {
  async queryNeo4j(query, params) {
  try {
  const response = await fetch('http://localhost:7474/db/data/transaction/commit', {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, statements: [ {
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ statements: [ {
  statement: query, parameters: params}]})});
  if (response.ok) {
  const data = await response.json();
@@ -253,7 +253,7 @@ class GraphWorker {
  async queryGraphService(query, params) {
  try {
  const response = await fetch('http://localhost:7474/api/graph/query', {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, query: parameters, params })
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: parameters, params })
  });
  if (response.ok) {
  const data = await response.json();
@@ -305,7 +305,7 @@ if (typeof self !== 'undefined') {
  case 'query':
  await graphWorker.executeQuery(data.query, data.params);
  break
- case 'telemetry': self.postMessage({, type: 'telemetry_result', data: graphWorker.getTelemetry()});
+ case 'telemetry': self.postMessage({ type: 'telemetry_result', data: graphWorker.getTelemetry()});
  break
  case 'cache_clear': // Clear IndexedDB cache
  try {

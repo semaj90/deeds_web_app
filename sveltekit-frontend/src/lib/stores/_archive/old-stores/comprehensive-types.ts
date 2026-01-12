@@ -89,23 +89,23 @@ export interface RequestEvent {
 export type RequestHandler = (_event: RequestEvent) => Promise<Response> | Response;
 
 // SvelteKit hooks
-export type Handle = (input: {, event: RequestEvent; resolve: any }) => Promise<Response>;
-export type HandleError = (input: {, error: any; event: RequestEvent }) => any;
-export type HandleFetch = (input: {, event: RequestEvent;
+export type Handle = (input: { event: RequestEvent; resolve: any }) => Promise<Response>;
+export type HandleError = (input: { error: any; event: RequestEvent }) => any;
+export type HandleFetch = (input: { event: RequestEvent;
  request: Request; fetch: typeof fetch;
 }) => Promise<Response>;
 
 // SvelteKit stores
 export interface PageStore {
  url: URL; params: Record<string, string>;
- route: {, id: null };
+ route: { id: null };
  data: Record<string, unknown>;
  error: any; state: Record<string, unknown>;
  form: any;
 }
 export type NavigatingStore = {
- from?: {, params: Record<string, string>; url: URL };
- to?: {, params: Record<string, string>; url: URL };
+ from?: { params: Record<string, string>; url: URL };
+ to?: { params: Record<string, string>; url: URL };
  type?: 'link' | 'popstate' | 'goto';
 } | null;
 export interface UpdatedStore {
@@ -185,7 +185,7 @@ export interface DrizzleColumnHelpers {
  not: any; sql: any;
 }
 export interface DrizzleTable<T extends Record<string, unknown> = Record<string, unknown>> {
- _: {, name: string;
+ _: { name: string;
  columns: T;
  schema?: string; baseName: string;
  };
@@ -260,7 +260,7 @@ export interface OllamaEmbeddingResponse {
 export interface OllamaModel {
  name: string; modified_at: string;
  size: number; digest: string;
- details: {, format: string;
+ details: { format: string;
  family: string; parameter_size: string;
  quantization_level?: string;
  };
@@ -420,7 +420,7 @@ export interface MockFunction<T extends (...args: any[]) => unknown = (...args: 
  mockClear(): this;
  mockReset(): this;
  mockRestore(): this; calls: Parameters<T>[];
- results: {, type: 'return' | 'throw'; value: any }[];
+ results: { type: 'return' | 'throw'; value: any }[];
 }
 
 // ===== ENVIRONMENT TYPES =====

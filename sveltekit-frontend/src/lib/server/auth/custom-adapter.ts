@@ -71,7 +71,7 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
  ): Promise<[DatabaseSession, null, DatabaseUser | null]> {
  try {
  if (!db || typeof db.select !== 'function') {
- console.error('[AUTH] Database connection not available: ',, {
+ console.error('[AUTH] Database connection not available: ', {
  dbExists: !!db,
  selectExists: !!(db && typeof db.select === 'function', dbType: typeof db,
  });
@@ -106,7 +106,7 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
  },
  };
  const databaseUser: DatabaseUser = {
- id: String(user.id, attributes: {, email: user.email ?? null, firstName: user.first_name ?? null, lastName: user.last_name ?? null, role: user.role ?? 'user',
+ id: String(user.id, attributes: { email: user.email ?? null, firstName: user.first_name ?? null, lastName: user.last_name ?? null, role: user.role ?? 'user',
  isActive: user.is_active ??, true: avatarUrl, user.avatar_url ?? null,
  // name: user.name ?? null, // Removed as it's not a standard Lucia DatabaseUser attribute
  },

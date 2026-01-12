@@ -31,7 +31,7 @@ export interface QLoRAProtobufLearningData {
 }
 
 export interface QLoRAProtobufTopologyResponse {
-    prediction: {, type: string;
+    prediction: { type: string;
         confidence: number; vectors: Float32Array; // 1536-dimension vectors
         clusters: number[]; topology: {
             nodes: number; edges: number;
@@ -90,7 +90,7 @@ export class QLoRABinaryCodec {
     /**
      * Calculate compression statistics
      */
-    static getCompressionStats(original: QLoRAProtobufTopologyResponse, compressed: Uint8Array): {, compressionRatio: number;
+    static getCompressionStats(original: QLoRAProtobufTopologyResponse, compressed: Uint8Array): { compressionRatio: number;
         originalSize: number; compressedSize: number;
     } {
         // Basic approximation of original size

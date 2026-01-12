@@ -5,7 +5,7 @@ export interface APIResponse<T = unknown> {
  success: boolean;
  data?: T;
  error?: string;
- metadata?: {, timestamp: string, version: string; processing_time: number;
+ metadata?: { timestamp: string, version: string; processing_time: number;
  };
 }
 
@@ -66,7 +66,7 @@ export class SelfOrganizingMap {
 }
 
 export interface ClusterResultDetails {
- clusters: DocumentCluster[], metrics: {, silhouetteScore: number, inertia: number; converged: boolean;
+ clusters: DocumentCluster[], metrics: { silhouetteScore: number, inertia: number; converged: boolean;
  };
 }
 

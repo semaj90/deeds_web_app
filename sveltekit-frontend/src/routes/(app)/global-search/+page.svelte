@@ -116,7 +116,7 @@
 					const response = await fetch(`${endpoint}/api/embeddings`, {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({, model: 'embeddinggemma:latest',
+						body: JSON.stringify({ model: 'embeddinggemma:latest',
 							prompt: `${searchQuery} ${record.content}`
 						})
 					});

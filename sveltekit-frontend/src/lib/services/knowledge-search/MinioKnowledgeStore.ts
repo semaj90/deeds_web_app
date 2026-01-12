@@ -248,7 +248,7 @@ export class MinioKnowledgeStore {
   /**
    * Get storage statistics
    */
-  async getStats(): Promise<{, objects: number; size: string }> {
+  async getStats(): Promise<{ objects: number; size: string }> {
     await this.initialize();
 
     try {

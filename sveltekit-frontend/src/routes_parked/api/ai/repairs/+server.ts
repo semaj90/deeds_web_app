@@ -33,14 +33,14 @@ export const GET: RequestHandler = async ({ url }) => {
  // Query Qdrant for repair suggestions
  const searchResult = await qdrant.scroll(COLLECTION_NAME, {
  limit,
- filter: {, must: [
+ filter: { must: [
  {
  key: 'status',
- match: {, value: status },
+ match: { value: status },
  },
  {
  key: 'confidence',
- range: {, gte: minConfidence },
+ range: { gte: minConfidence },
  }],
  },
  with_payload: true, with_vector: false, fromCache: false,
@@ -73,7 +73,7 @@ export const POST: RequestHandler = async ({ request }) => {
   
  await qdrant.setPayload(COLLECTION_NAME, {
  points: [id],
- payload: {, status: updated_at Date().toISOString(),
+ payload: { status: updated_at Date().toISOString(),
  ...(applied_diff && { applied_diff }),
  },
  });

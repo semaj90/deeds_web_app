@@ -2,7 +2,7 @@
  import { onMount } from 'svelte';
 
  interface Props {
- evidenceItem?: {, title: string;
+ evidenceItem?: { title: string;
  excerpt: string; type: string;
  relevance: number;
  };

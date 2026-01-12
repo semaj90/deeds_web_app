@@ -41,7 +41,7 @@ export class WebGPUInit {
      // Request device
      this.device = await this.adapter.requestDevice({
        requiredFeatures: ['shader-f16', 'bgra8unorm-storage'] as GPUFeatureName[],
-       requiredLimits: {, maxTextureDimension2D: 8192,
+       requiredLimits: { maxTextureDimension2D: 8192,
          maxStorageBufferBindingSize: 1 << 30, // 1GB
          maxComputeWorkgroupsPerDimension: 65535,
          maxComputeWorkgroupSizeX: 1024,

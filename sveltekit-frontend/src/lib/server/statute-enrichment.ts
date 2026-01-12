@@ -22,7 +22,7 @@ interface Precedent {
 
 // Statute database with enrichment data
 const statuteDatabase: Record<string, StatuteEnrichment> = {
- '273a': {, citation: '273a PC',
+ '273a': { citation: '273a PC',
  title: 'Child Endangerment',
  severity: 'wobbler',
  severityColor: 'crimson',
@@ -72,7 +72,7 @@ const statuteDatabase: Record<string, StatuteEnrichment> = {
  relevance: 0.88,
  }],
  },
- '211': {, citation: '211 PC',
+ '211': { citation: '211 PC',
  title: 'Robbery',
  severity: 'felony',
  severityColor: 'crimson',
@@ -115,7 +115,7 @@ const statuteDatabase: Record<string, StatuteEnrichment> = {
  relevance: 0.96,
  }],
  },
- '23153': {, citation: '23153 VC',
+ '23153': { citation: '23153 VC',
  title: 'DUI Causing Injury',
  severity: 'wobbler',
  severityColor: 'orange',
@@ -157,7 +157,7 @@ const statuteDatabase: Record<string, StatuteEnrichment> = {
  relevance: 0.94,
  }],
  },
- '148': {, citation: '148 PC',
+ '148': { citation: '148 PC',
  title: 'Resisting Arrest',
  severity: 'misdemeanor',
  severityColor: 'yellow',

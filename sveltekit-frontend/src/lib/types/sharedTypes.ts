@@ -25,8 +25,8 @@ export interface BoundingBox {
 }
 
 export interface LayoutInfo {
- blocks: Array<{, bbox: BoundingBox; text: string; confidence: number }>;
- tables?: Array<{, rows: number; cols: number; cells: string[][] }>;
+ blocks: Array<{ bbox: BoundingBox; text: string; confidence: number }>;
+ tables?: Array<{ rows: number; cols: number; cells: string[][] }>;
  headers?: string[];
 }
 
@@ -77,15 +77,15 @@ export interface Party {
 }
 
 export interface LegalMetadata {
- case: {, id: string;
+ case: { id: string;
  jurisdiction: string; parties: Party[];
  datesFiled: string[]; courtLevel: 'district' | 'appellate' | 'supreme';
  };
- classification: {, documentType: 'contract' | 'evidence' | 'brief' | 'citation';
+ classification: { documentType: 'contract' | 'evidence' | 'brief' | 'citation';
  practiceArea: string[]; confidenceLevel: number;
  riskLevel: 'low' | 'medium' | 'high' | 'critical';
  };
- processing: {, extractedEntities: string[];
+ processing: { extractedEntities: string[];
  keyTerms: string[]; sentiment: number;
  complexity: number;
  };
@@ -101,7 +101,7 @@ export interface LegalEntity {
  | 'clause'
  | 'amount';
  value: string; confidence: number;
- span: {, start: number; end: number };
+ span: { start: number; end: number };
  startPos?: number;
  endPos?: number;
 }

@@ -8,7 +8,7 @@ export const POST: RequestHandler = async ({ request }) => {
  caseId,
  result,
  format,
- }: {, caseId: string;
+ }: { caseId: string;
  result: PhoenixWrightSearchResult; format: 'pdf' | 'json';
  } = await request.json();
 
@@ -38,7 +38,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const pdfBuffer = await page.pdf({
  format: 'A4',
  printBackground: true,
- margin: {, top: '1in',
+ margin: { top: '1in',
  right: '1in',
  bottom: '1in',
  left: '1in',

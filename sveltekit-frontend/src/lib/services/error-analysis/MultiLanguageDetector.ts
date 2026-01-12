@@ -39,7 +39,7 @@ export class MultiLanguageDetector {
 	private config: MultiLanguageConfig;
 	private stats = {
 		totalDetections: 0,
-		byLanguage: {, typescript: 0, svelte: 0, cpp: 0, python: 0, go: 0
+		byLanguage: { typescript: 0, svelte: 0, cpp: 0, python: 0, go: 0
 		}
 	};
 
@@ -359,7 +359,7 @@ export class MultiLanguageDetector {
 	resetStats(): void {
 		this.stats = {
 			totalDetections: 0,
-			byLanguage: {, typescript: 0, svelte: 0, cpp: 0, python: 0, go: 0
+			byLanguage: { typescript: 0, svelte: 0, cpp: 0, python: 0, go: 0
 			}
 		};
 	}

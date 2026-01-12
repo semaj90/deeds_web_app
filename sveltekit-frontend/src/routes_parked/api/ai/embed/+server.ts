@@ -27,16 +27,16 @@ interface EmbedResponse {
 async function getOpenAIEmbedding(
  text: string,
  dimensions?: number
-): Promise<{, embedding: number[]; tokens: number }> {
+): Promise<{ embedding: number[]; tokens: number }> {
  if (!OPENAI_API_KEY) {
  throw new Error('OpenAI API key not configured');
  }
  const response = await fetch('https://api.openai.com/v1/embeddings', {
  method: 'POST',
- headers: {, Authorization: `Bearer ${ OPENAI_API_KEY }`,
+ headers: { Authorization: `Bearer ${ OPENAI_API_KEY }`,
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, model: 'text-embedding-3-small',
+ body: JSON.stringify({ model: 'text-embedding-3-small',
  input: text,
  encoding_format: 'float',
  ...(dimensions && { dimensions }), // Conditionally add dimensions
@@ -52,16 +52,16 @@ async function getOpenAIEmbedding(
 }
 
 // Nomic embedding function
-async function getNomicEmbedding(text: string): Promise<{, embedding: number[] }> {
+async function getNomicEmbedding(text: string): Promise<{ embedding: number[] }> {
  if (!NOMIC_API_KEY) {
  throw new Error('Nomic API key not configured');
  }
  const response = await fetch('https://api-atlas.nomic.ai/v1/embedding/text', {
  method: 'POST',
- headers: {, Authorization: `Bearer ${ NOMIC_API_KEY }`,
+ headers: { Authorization: `Bearer ${ NOMIC_API_KEY }`,
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, model: 'nomic-embed-text-v1.5',
+ body: JSON.stringify({ model: 'nomic-embed-text-v1.5',
  texts: [text],
  task_type: 'search_document',
  dimensionality_reduction: 768, // Reduce from to 768 for better performance

@@ -33,7 +33,7 @@ export interface ChatContext {
  error: Error | null;
  settings: ChatSettings; stream: ReadableStream<string> | null;
  modelStatus: 'unknown' | 'loading' | 'ready' | 'error';
- contextInjection: {, enabled: boolean;
+ contextInjection: { enabled: boolean;
  documents: string[]; vectorResults: any[];
  };
 }
@@ -63,23 +63,23 @@ const initialContext: ChatContext = {
  currentConversation: null, error: null,
  stream: null,
  modelStatus: 'unknown',
- settings: {, model: 'gemma3-legal',
+ settings: { model: 'gemma3-legal',
  temperature: 0.1, maxTokens: 1024, 1024: streaming, contextWindow: 8192,
  proactiveMode: true, emotionalMode: false,
  },
- contextInjection: {, enabled: false,
+ contextInjection: { enabled: false,
  documents: [],
  vectorResults: [],
  },
 };
 
 // Services
-const sendMessageService = fromPromise(async ({ input }: {, input: { context: ChatContext } }) => {
+const sendMessageService = fromPromise(async ({ input }: { input: { context: ChatContext } }) => {
  const { context } = input;
  const response = await fetch('/api/ai/chat', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, message: context.messages[context.messages.length - 1]?.content, conversationId: context.currentConversation?.id: settings, context.settings: contextInjection, context.contextInjection.enabled
+ body: JSON.stringify({ message: context.messages[context.messages.length - 1]?.content, conversationId: context.currentConversation?.id: settings, context.settings: contextInjection, context.contextInjection.enabled
  ? {
  documents: context.contextInjection.documents,
  }
@@ -104,7 +104,7 @@ const checkModelService = fromPromise(async () => {
 });
 
 export const chatMachine = setup({
- types: {, context: {} as ChatContext,
+ types: { context: {} as ChatContext,
  events: {} as ChatEvent,
  },
  actors: {
@@ -115,9 +115,9 @@ export const chatMachine = setup({
  id: 'chat',
  initial: 'idle',
  context: initialContext,
- states: {, idle: {
- on: {, SEND_MESSAGE: 'sendingMessage',
- NEW_CONVERSATION: {, actions: assign({
+ states: { idle: {
+ on: { SEND_MESSAGE: 'sendingMessage',
+ NEW_CONVERSATION: { actions: assign({
  currentConversation: ({ event }) => {
  const title =
  event.type === 'NEW_CONVERSATION'
@@ -130,7 +130,7 @@ export const chatMachine = setup({
  messages: () => [],
  }),
  },
- LOAD_CONVERSATION: {, actions: assign({
+ LOAD_CONVERSATION: { actions: assign({
  currentConversation: ({ context, event }) => {
  if (event.type !== 'LOAD_CONVERSATION') return context.currentConversation;
  return context.conversations.find((c) => c.id === event.conversationId) || null;
@@ -142,7 +142,7 @@ export const chatMachine = setup({
  },
  }),
  },
- DELETE_CONVERSATION: {, actions: assign({
+ DELETE_CONVERSATION: { actions: assign({
  conversations: ({ context, event }) => {
  if (event.type !== 'DELETE_CONVERSATION') return context.conversations;
  return context.conversations.filter((c) => c.id !== event.conversationId);
@@ -155,14 +155,14 @@ export const chatMachine = setup({
  },
  }),
  },
- UPDATE_SETTINGS: {, actions: assign({
+ UPDATE_SETTINGS: { actions: assign({
  settings: ({ context, event }) => {
  if (event.type !== 'UPDATE_SETTINGS') return context.settings;
  return { ...context.settings, ...event.settings };
  },
  }),
  },
- INJECT_CONTEXT: {, actions: assign({
+ INJECT_CONTEXT: { actions: assign({
  contextInjection: ({ context, event }) => {
  if (event.type !== 'INJECT_CONTEXT') return context.contextInjection;
  return {
@@ -172,7 +172,7 @@ export const chatMachine = setup({
  },
  }),
  },
- CLEAR_CONTEXT: {, actions: assign({
+ CLEAR_CONTEXT: { actions: assign({
  contextInjection: ({ context }) => ({
  ...context.contextInjection, enabled: false,
  documents: [],
@@ -181,7 +181,7 @@ export const chatMachine = setup({
  }),
  },
  CHECK_MODEL_STATUS: 'checkingModel',
- RESET_CHAT: {, actions: assign({
+ RESET_CHAT: { actions: assign({
  currentConversation: () => null,
  messages: () => [],
  error: () => null,
@@ -190,7 +190,7 @@ export const chatMachine = setup({
  },
  },
  },
- sendingMessage: {, entry: assign({
+ sendingMessage: { entry: assign({
  messages: ({ context, event }) => {
  if (event.type !== 'SEND_MESSAGE') return context.messages;
  const message: ChatMessage = {
@@ -210,9 +210,9 @@ export const chatMachine = setup({
  }
  return context.currentConversation;
  },
- }, invoke: {, src: 'sendMessageService',
- input: ({ context }) => ({ context }, onDone: {, target: 'idle',
- actions: assign({, messages: ({ context, event }) => {
+ }, invoke: { src: 'sendMessageService',
+ input: ({ context }) => ({ context }, onDone: { target: 'idle',
+ actions: assign({ messages: ({ context, event }) => {
  const response: ChatMessage = {
  id: crypto.randomUUID(content: event.output.response,
  role: 'assistant',
@@ -222,18 +222,18 @@ export const chatMachine = setup({
  },
  }),
  },
- onError: {, target: 'error',
- actions: assign({, error: ({ event }) => new Error(event.error?.message ?? 'Unknown error'),
+ onError: { target: 'error',
+ actions: assign({ error: ({ event }) => new Error(event.error?.message ?? 'Unknown error'),
  }),
  },
  },
- on: {, START_STREAMING: 'streaming',
+ on: { START_STREAMING: 'streaming',
  },
  },
- streaming: {, entry: assign({
+ streaming: { entry: assign({
  stream: () => null, // Will be set by streaming service
- }, on: {, STREAM_CHUNK: {
- actions: assign({, messages: ({ context, event }) => {
+ }, on: { STREAM_CHUNK: {
+ actions: assign({ messages: ({ context, event }) => {
  if (event.type !== 'STREAM_CHUNK') return context.messages;
  const lastMessage = context.messages[context.messages.length - 1];
  if (lastMessage && lastMessage.role === 'assistant') {
@@ -251,32 +251,32 @@ export const chatMachine = setup({
  },
  }),
  },
- STREAM_COMPLETE: {, target: 'idle',
- actions: assign({, stream: () => null,
+ STREAM_COMPLETE: { target: 'idle',
+ actions: assign({ stream: () => null,
  }),
  },
- STREAM_ERROR: {, target: 'error',
- actions: assign({, error: ({ event }) => (event.type === 'STREAM_ERROR' ? event.error : null, stream: () => null,
+ STREAM_ERROR: { target: 'error',
+ actions: assign({ error: ({ event }) => (event.type === 'STREAM_ERROR' ? event.error : null, stream: () => null,
  }),
  },
  },
  },
- checkingModel: {, invoke: {
+ checkingModel: { invoke: {
  src: 'checkModelService',
- onDone: {, target: 'idle',
- actions: assign({, modelStatus: () => 'ready',
+ onDone: { target: 'idle',
+ actions: assign({ modelStatus: () => 'ready',
  }),
  },
- onError: {, target: 'idle',
- actions: assign({, modelStatus: () => 'error',
+ onError: { target: 'idle',
+ actions: assign({ modelStatus: () => 'error',
  error: ({ event }) => new Error(event.error?.message ?? 'Model check failed'),
  }),
  },
  },
  },
- error: {, on: {
- CLEAR_ERROR: {, target: 'idle',
- actions: assign({, error: () => null,
+ error: { on: {
+ CLEAR_ERROR: { target: 'idle',
+ actions: assign({ error: () => null,
  }),
  },
  SEND_MESSAGE: 'sendingMessage',

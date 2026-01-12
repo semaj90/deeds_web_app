@@ -170,7 +170,7 @@ export class FeatureFlags extends BaseService implements IFeatureFlags {
  /**
  * Get feature flag status as JSON
  */
- getStatus(): {, enabled: string[];
+ getStatus(): { enabled: string[];
  disabled: string[]; total: number;
  } {
  const enabled: string[] = [];

@@ -23,10 +23,10 @@ import { User } from "lucide-svelte";
  onEdit,
  onDelete
  } = $props<{
- poi: {, id: string;
+ poi: { id: string;
  name: string;
  alias?: string; threatLevel: string;
- photos?: Array<{, url: string;
+ photos?: Array<{ url: string;
  thumbnailUrl: string;
  metadata?: any;
  ai?: any;

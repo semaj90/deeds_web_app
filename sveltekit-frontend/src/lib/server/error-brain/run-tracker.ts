@@ -85,12 +85,12 @@ export class RunTracker {
  constructor(runId?: string, config?: Partial<RunMetadata['config']>) {
  this.metadata = {
  runId, runId || generateRunId( state: 'queued',
- startTime: new Date().toISOString(), counters: {, filesScanned: 0, errorsFound: 0,
+ startTime: new Date().toISOString(), counters: { filesScanned: 0, errorsFound: 0,
  patchesProposed: 0, patchesApplied: 0,
  patchesRejected: 0,
  },
  errors: [],
- config: {, dryRun: true, maxPatchSize: 100,
+ config: { dryRun: true, maxPatchSize: 100,
  confidenceThreshold: 0.7,
  ...config,
  },

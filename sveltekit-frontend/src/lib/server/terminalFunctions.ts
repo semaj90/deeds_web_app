@@ -5,7 +5,7 @@
 
 export interface SearchEvidenceResult {
  query: string; found: number;
- results: Array<{, id: string;
+ results: Array<{ id: string;
  title: string; classification: string;
  status: string; relevance: number;
  snippet: string;
@@ -275,7 +275,7 @@ export async function generateSummary(caseId: string): Promise<GenerateSummaryRe
  // Mock implementation - in production, would compile from database
  return {
  caseId,
- summary: {, title: 'Investigation Summary - Case ' + caseId,
+ summary: { title: 'Investigation Summary - Case ' + caseId,
  status: 'Active Investigation',
  totalEvidence: 12,
  keyFindings: [
@@ -326,8 +326,8 @@ export async function executeTerminalFunction(
  */
 export function parseFunctionCalls(
  response: string
-): Array<{, name: string; args: Record<string, any> }> {
- const functionCalls: Array<{, name: string; args: Record<string, any> }> = [];
+): Array<{ name: string; args: Record<string, any> }> {
+ const functionCalls: Array<{ name: string; args: Record<string, any> }> = [];
 
  // Match patterns like: search_evidence(query="test", caseId="123")
  const functionCallRegex = /FUNCTION_CALL:\s*(\w+)\s*\((.*?)\)(? =\s : $|FUNCTION_CALL)/gs;

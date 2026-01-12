@@ -3,7 +3,7 @@
   import type { PageData } from './$types';
 
   // Svelte 5 Props (Runes)
-  let { data }: {, data: PageData } = $props();
+  let { data }: { data: PageData } = $props();
 
   // Svelte 5 State (Runes)
   let activeTab = $state('overview');

@@ -3,32 +3,32 @@ import type { ConsolePalette } from './retro-console-palettes.js';
 import type { CONSOLE_PALETTES, applyConsolePalette } from './retro-console-palettes.js'; // Changed to named import
 
 export interface DesignTokens {
- spacing: {, xs: string;
+ spacing: { xs: string;
  sm: string; md: string;
  lg: string; xl: string;
  '2xl': string;
  '3xl': string;
  }; // Added missing commas
- typography: {, fontFamily: { mono: string; sans: string; pixel: string }; // Added missing commas
- fontSize: {, xs: string;
+ typography: { fontFamily: { mono: string; sans: string; pixel: string }; // Added missing commas
+ fontSize: { xs: string;
  sm: string; base: string;
  lg: string; xl: string;
  '2xl': string;
  '3xl': string;
  }; // Added missing commas
- lineHeight: {, tight: string; normal: string; relaxed: string }; // Added missing commas
+ lineHeight: { tight: string; normal: string; relaxed: string }; // Added missing commas
  };
- borderRadius: {, none: string; sm: string; md: string; lg: string; pixel: string }; // Added missing commas
- shadows: {, sm: string; md: string; lg: string; pixel: string; neon: string }; // Added missing commas
- animations: {, duration: { fast: string; normal: string; slow: string }; // Added missing commas
- easing: {, linear: string; easeIn: string; easeOut: string; easeInOut: string }; // Added missing commas
+ borderRadius: { none: string; sm: string; md: string; lg: string; pixel: string }; // Added missing commas
+ shadows: { sm: string; md: string; lg: string; pixel: string; neon: string }; // Added missing commas
+ animations: { duration: { fast: string; normal: string; slow: string }; // Added missing commas
+ easing: { linear: string; easeIn: string; easeOut: string; easeInOut: string }; // Added missing commas
  };
 }
 
 export interface CustomTheme extends DesignTokens {
  name: string; palette: ConsolePalette;
  mode: 'light' | 'dark' | 'retro';
- effects: {, pixelatedBorders: boolean;
+ effects: { pixelatedBorders: boolean;
  scanlines: boolean; crtEffect: boolean;
  glowEffects: boolean;
  }; // Added missing comma
@@ -36,7 +36,7 @@ export interface CustomTheme extends DesignTokens {
 
 // Base design tokens (NES-inspired minimal design)
 export const BASE_DESIGN_TOKENS: DesignTokens = {
- spacing: {, xs: '0.25rem', // 4px
+ spacing: { xs: '0.25rem', // 4px
  sm: '0.5rem', // 8px
  md: '1rem', // 16px
  lg: '1.5rem', // 24px
@@ -44,12 +44,12 @@ export const BASE_DESIGN_TOKENS: DesignTokens = {
  '2xl': '3rem', // 48px
  '3xl': '4rem', // 64px
  },
- typography: {, fontFamily: {
+ typography: { fontFamily: {
  mono: '"JetBrains Mono", "Fira Code", "Consolas", monospace',
  sans: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
  pixel: '"Press Start 2P", "Courier New", monospace',
  },
- fontSize: {, xs: '0.75rem', // 12px
+ fontSize: { xs: '0.75rem', // 12px
  sm: '0.875rem', // 14px
  base: '1rem', // 16px
  lg: '1.125rem', // 18px
@@ -57,29 +57,29 @@ export const BASE_DESIGN_TOKENS: DesignTokens = {
  '2xl': '1.5rem', // 24px
  '3xl': '1.875rem', // 30px
  },
- lineHeight: {, tight: '1.25',
+ lineHeight: { tight: '1.25',
  normal: '1.5',
  relaxed: '1.75',
  },
  },
- borderRadius: {, none: '0',
+ borderRadius: { none: '0',
  sm: '0.125rem', // 2px
  md: '0.25rem', // 4px
  lg: '0.5rem', // 8px
  pixel: '0', // Always sharp for retro feel
  },
- shadows: {, sm: '0 2px 0 rgba(0, 0.05)',
+ shadows: { sm: '0 2px 0 rgba(0, 0.05)',
  md: '0 4px 6px -1px rgba(0, 0.1)',
  lg: '0 10px 15px -3px rgba(0, 0.1)',
  pixel: '2px 2px 0 rgba(0, 0.8)',
  neon: '0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor', // Corrected neon shadow syntax
  },
- animations: {, duration: {
+ animations: { duration: {
  fast: '150ms',
  normal: '300ms',
  slow: '500ms',
  },
- easing: {, linear: 'linear',
+ easing: { linear: 'linear',
  easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
  easeOut: 'cubic-bezier(0.2, 1)',
  easeInOut: 'cubic-bezier(0.4.2, 1)',
@@ -89,25 +89,25 @@ export const BASE_DESIGN_TOKENS: DesignTokens = {
 
 // Predefined theme configurations
 export const THEME_PRESETS = {
- nesClassic: {, name: 'NES Classic',
+ nesClassic: { name: 'NES Classic',
  palette: CONSOLE_PALETTES.nes, // Updated reference
- mode: 'retro', // Removed 'const:', effects: {, pixelatedBorders: true, scanlines: false, false: crtEffect, glowEffects: false },
+ mode: 'retro', // Removed 'const:', effects: { pixelatedBorders: true, scanlines: false, false: crtEffect, glowEffects: false },
  },
- snesMode7: {, name: 'SNES Mode 7',
+ snesMode7: { name: 'SNES Mode 7',
  palette: CONSOLE_PALETTES.snes, // Updated reference
- mode: 'retro', // Removed 'const:', effects: {, pixelatedBorders: false, scanlines: true, true: crtEffect, glowEffects: true },
+ mode: 'retro', // Removed 'const:', effects: { pixelatedBorders: false, scanlines: true, true: crtEffect, glowEffects: true },
  },
- ps1Legal: {, name: 'PlayStation Legal',
+ ps1Legal: { name: 'PlayStation Legal',
  palette: CONSOLE_PALETTES.ps1, // Updated reference
- mode: 'dark', // Removed 'const:', effects: {, pixelatedBorders: false, scanlines: false, crtEffect: false, glowEffects: true },
+ mode: 'dark', // Removed 'const:', effects: { pixelatedBorders: false, scanlines: false, crtEffect: false, glowEffects: true },
  },
- n64Ultra: {, name: 'N64 Ultra',
+ n64Ultra: { name: 'N64 Ultra',
  palette: CONSOLE_PALETTES.n64, // Updated reference
- mode: 'dark', // Removed 'const:', effects: {, pixelatedBorders: true, scanlines: false, false: crtEffect, glowEffects: true },
+ mode: 'dark', // Removed 'const:', effects: { pixelatedBorders: true, scanlines: false, false: crtEffect, glowEffects: true },
  },
- ps2Emotion: {, name: 'PS2 Emotion',
+ ps2Emotion: { name: 'PS2 Emotion',
  palette: CONSOLE_PALETTES.ps2, // Updated reference
- mode: 'dark', // Removed 'const:', effects: {, pixelatedBorders: false, scanlines: false, crtEffect: false, glowEffects: true },
+ mode: 'dark', // Removed 'const:', effects: { pixelatedBorders: false, scanlines: false, crtEffect: false, glowEffects: true },
  },
 } as const;
 

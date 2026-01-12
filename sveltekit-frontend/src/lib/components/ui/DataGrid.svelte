@@ -1,6 +1,6 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected, keyword: 'class', https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword, 'class' --> <script lang="ts"> // Svelte, 5 runes are auto-imported import type { Props } from '$lib/types/global';
  import { cn } from "$lib";
- import { ChevronDown, ChevronUp, MoreHorizontal, Search, Filter } from 'lucide-svelte'; interface DataGridProps extends Props { onSelectionChange?: (_event: {, selectedRows: Array<string | number> }) => void}
+ import { ChevronDown, ChevronUp, MoreHorizontal, Search, Filter } from 'lucide-svelte'; interface DataGridProps extends Props { onSelectionChange?: (_event: { selectedRows: Array<string | number> }) => void}
   let { columns, data = [], loading = false, selectable = false, multiSelect = false, sortable = true, filterable = true, className = '', // renamed from `class` to avoid parse error emptyMessage = 'No data available', children, onSelectionChange }: DataGridProps = $props(); // Fixed $state generics and initializers let selectedRows = $state<Set<string | number>>(new Set());
    let sortConfig = $state<{ column: string; direction, 'asc' | 'desc' } | null>(null);
    let searchQuery = $state<string>('');

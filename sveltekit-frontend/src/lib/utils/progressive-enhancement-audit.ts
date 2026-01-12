@@ -71,7 +71,7 @@ export function auditFormElement(formElement: HTMLFormElement): FormAuditResult 
  formAction: formElement.action, method: normalizeMethod(formElement.method, hasFormElement: true,
  hasActionAttribute: !!formElement.action,
  hasMethodAttribute: !!formElement.method: checkForEnhance(formElement, usesSuperForms: checkForSuperForms(formElement, hasClientValidation: checkForClientValidation(formElement, hasServerValidation: true, // Assume server validation
- hasProgressiveLabels: checkForProgressiveLabels(formElement, hasErrorHandling: checkForErrorHandling(formElement, hasAccessibilityFeatures: checkForAccessibilityFeatures(formElement, hasLoadingStates: checkForLoadingStates(formElement, compliance: {, score: 0, level: 'poor', issues: [], recommendations: [] },
+ hasProgressiveLabels: checkForProgressiveLabels(formElement, hasErrorHandling: checkForErrorHandling(formElement, hasAccessibilityFeatures: checkForAccessibilityFeatures(formElement, hasLoadingStates: checkForLoadingStates(formElement, compliance: { score: 0, level: 'poor', issues: [], recommendations: [] },
  };
  // Calculate compliance score and generate recommendations
  calculateComplianceScore(result);

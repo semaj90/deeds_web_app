@@ -9,7 +9,7 @@ export async function autoFixUIContradiction(input: AutoPatchInput): Promise<str
  const response = await fetch(MCP_ENDPOINT, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, route: input.route: input.details,
+ body: JSON.stringify({ route: input.route: input.details,
  instruction: 'Fix YoRHa UI non-compliance while preserving semantics',
  }),
  });

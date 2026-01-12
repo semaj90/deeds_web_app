@@ -62,7 +62,7 @@ export interface RAGSearchResult {
  explanation?: string;
  relevantChunks?: TextChunk[];
  highlights?: string[];
- legalRelevance?: {, overall: number;
+ legalRelevance?: { overall: number;
  factual: number; procedural: number;
  precedential: number; jurisdictional: number;
  confidence: number;

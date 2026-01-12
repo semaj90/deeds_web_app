@@ -14,10 +14,10 @@ export class EvidenceDetectiveService {
  this.ollamaService = new OllamaService();
  }
 
- async analyzeEvidence(params: {, caseId: string;
+ async analyzeEvidence(params: { caseId: string;
  query: string;
  evidenceIds?: string[]; userId: string;
- }): Promise<{, analysis: string;
+ }): Promise<{ analysis: string;
  evidence: any[]; connections: any[];
  recommendations: string[];
  }> {

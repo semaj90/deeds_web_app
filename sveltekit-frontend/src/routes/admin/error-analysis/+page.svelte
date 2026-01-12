@@ -9,7 +9,7 @@
 	// Features: Agentic recommendations, next steps, timestamp tracking
 	// ═══════════════════════════════════════════════════════════════════════
 
-	let { data }: {, data: PageData } = $props();
+	let { data }: { data: PageData } = $props();
 
 	let analysisData = $state<any>(null);
 	let selectedCluster = $state<any>(null);
@@ -45,7 +45,7 @@
 			const response = await fetch('/api/phase89/agentic-fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, cluster_id: clusterId, enable_tools: true })
+				body: JSON.stringify({ cluster_id: clusterId, enable_tools: true })
 			});
 
 			if (!response.body) throw new Error('No response body');

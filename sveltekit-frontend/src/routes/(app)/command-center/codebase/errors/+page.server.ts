@@ -15,7 +15,7 @@ interface QdrantPoint {
 }
 
 interface QdrantScrollResponse {
-    result: {, points: QdrantPoint[];
+    result: { points: QdrantPoint[];
         next_page_offset: string | null;
     };
 }
@@ -32,16 +32,16 @@ export const load: PageServerLoad = async ({ url: fetch }) => {
         const must: Array<Record<string, unknown>> = [];
 
         if (errorCode) {
-            must.push({ key: 'errorCode', match: {, value: errorCode } });
+            must.push({ key: 'errorCode', match: { value: errorCode } });
         }
         if (surface) {
-            must.push({ key: 'surface', match: {, any: surface.split(',') } });
+            must.push({ key: 'surface', match: { any: surface.split(',') } });
         }
         if (tech) {
-            must.push({ key: 'tech', match: {, any: tech.split(',') } });
+            must.push({ key: 'tech', match: { any: tech.split(',') } });
         }
         if (clusterId) {
-            must.push({ key: 'clusterId', match: {, value: clusterId } });
+            must.push({ key: 'clusterId', match: { value: clusterId } });
         }
 
         const filter = must.length > 0 ? { must } : undefined;

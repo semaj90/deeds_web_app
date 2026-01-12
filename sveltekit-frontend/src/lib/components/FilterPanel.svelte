@@ -9,7 +9,7 @@ https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import { createEventDispatcher } from 'svelte';
 
- let { filters }: {, filters: {
+ let { filters }: { filters: {
  status: string; priority: string;
  tags: string[];
  };

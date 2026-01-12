@@ -79,7 +79,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  const response = await fetch(endpoint, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, statute_code: statuteCode, citation_id: citationId, citationId,
+ body: JSON.stringify({ statute_code: statuteCode, citation_id: citationId, citationId,
  link_type: linkType, notes, notes, notes || undefined,
  }),
  });

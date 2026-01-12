@@ -26,7 +26,7 @@ export class QdrantPostgreSQLService {
 
             if (!exists) {
                 await this.qdrant.createCollection(collectionName, {
-                    vectors: {, size: vectorSize,
+                    vectors: { size: vectorSize,
                         distance: 'Cosine'
                     }
                 });
@@ -54,7 +54,7 @@ export class QdrantPostgreSQLService {
     async syncDocument(docId: string, vector: number[], payload: Record<string, any>) {
         try {
             await this.qdrant.upsert('legal_knowledge', {
-                points: [{, id: docId,
+                points: [{ id: docId,
                     vector,
                     payload
                 }]

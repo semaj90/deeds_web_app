@@ -8,7 +8,7 @@ import { json } from '@sveltejs/kit';
 export async function GET() {
 	const env = {
 		timestamp: new Date().toISOString(),
-		has: {, REDIS_URL: !!process.env.REDIS_URL,
+		has: { REDIS_URL: !!process.env.REDIS_URL,
 			DATABASE_URL: !!process.env.DATABASE_URL,
 			QDRANT_URL: !!process.env.QDRANT_URL,
 			OLLAMA_URL: !!process.env.OLLAMA_URL,

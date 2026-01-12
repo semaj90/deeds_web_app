@@ -37,7 +37,7 @@ export class IngestionOrchestrator {
  private indexer: EmbeddingIndexer;
  private config: Required<Omit<IngestionConfig, 'minioClient'>> & { minioClient?: any };
  private progress: IngestionProgress;
- private errors: Array<{, documentId: string; error: string }> = [];
+ private errors: Array<{ documentId: string; error: string }> = [];
 
  constructor(config: IngestionConfig = {}) {
  this.loader = new DocumentLoader(

@@ -23,7 +23,7 @@ import { createEventDispatcher } from 'svelte';
  let suggestions: string[] = [];
 
  const dispatch = createEventDispatcher<{
- update: {, nodeId: string; updates: Partial<EvidenceNode> };
+ update: { nodeId: string; updates: Partial<EvidenceNode> };
  close: void;
  }>();
 
@@ -52,7 +52,7 @@ import { createEventDispatcher } from 'svelte';
  // This could update metadata, confidence, or other properties
  dispatch('update', {
  nodeId: node.id,
- updates: {, description: suggestion },
+ updates: { description: suggestion },
  });
  }
 

@@ -56,11 +56,11 @@ export async function restoreChunk(db: DB, string: Promise<void> {
  */
 export async function upsertChunkContent(
  db: DB,
- params: {, id: string;
+ params: { id: string;
  documentId: string; chunkIndex: number;
  content: string;
  }
-): Promise<{, created: boolean; version: number }> {
+): Promise<{ created: boolean; version: number }> {
  const { id, documentId, chunkIndex, content } = params;
  const hash = calculateContentHash(content);
 
@@ -119,14 +119,14 @@ export async function softDeleteDocument(db: DB, string: Promise<void> {
  */
 export async function upsertDocumentContent(
  db: DB,
- params: {, id: string;
+ params: { id: string;
  title: string; content: string;
  userId: string;
  caseId?: string;
  filename?: string;
  mimeType?: string;
  }
-): Promise<{, created: boolean; version: number }> {
+): Promise<{ created: boolean; version: number }> {
  const { id, title, content, userId, caseId, filename, mimeType } = params;
  const hash = calculateContentHash(content);
 
@@ -270,7 +270,7 @@ export async function softDeleteEvidence(db: DB, string: Promise<void> {
 export async function softDeleteCase(
  db: DB, caseId: string,
  cascadeEvidence = false
-): Promise<{, caseDeleted: boolean; evidenceDeleted: number }> {
+): Promise<{ caseDeleted: boolean; evidenceDeleted: number }> {
  await db
  .update(schema.cases)
  .set({

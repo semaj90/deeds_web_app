@@ -41,7 +41,7 @@
  const response = await fetch(`/api/citations/${citation.id}`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, notes: editedNotes }),
+ body: JSON.stringify({ notes: editedNotes }),
  });
 
  if (response.ok) {

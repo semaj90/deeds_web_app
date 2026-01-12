@@ -20,7 +20,7 @@ export interface CacheConfig {
 
 export interface CacheObject {
     key: string, data: Uint8Array | string | ArrayBuffer;
-    metadata: {, contentType: string, size: number; compressed: boolean;
+    metadata: { contentType: string, size: number; compressed: boolean;
         compressionRatio?: number; timestamp: number;
         ttl?: number;
         tags?: string[];
@@ -133,7 +133,7 @@ export class MinIOGPUCacheService {
             }
 
             const cacheObject: CacheObject = { key: keyType, data: finalData,
-                metadata: {, contentType: options.contentType || 'application/octet-stream',
+                metadata: { contentType: options.contentType || 'application/octet-stream',
                     size: dataBytes.length,
                     compressionRatio: compressed ? compressionRatio : undefined,
                     timestamp: Date.now(),
@@ -238,7 +238,7 @@ const operationTime = performance.now() - startTime;
         return {
             ...this.stats, cacheSize: this.cache.size,
             memoryUsage,
-            compressionStats: {, totalSavings: this.stats.compressionSavings, averageRatio.length
+            compressionStats: { totalSavings: this.stats.compressionSavings, averageRatio.length
             }
         };
     }

@@ -28,7 +28,7 @@ https://svelte.dev/e/js_parse_error -->
 
  type Props = {
  open: boolean; caseId: string;
- onSave: (data: {, statement: Statement }) => void;
+ onSave: (data: { statement: Statement }) => void;
  onCancel: () => void;
  };
 
@@ -61,7 +61,7 @@ https://svelte.dev/e/js_parse_error -->
  let aiSuggestions = $state('');
  let isGeneratingSuggestions = $state(false);
 
- const steps: {, id: WizardStep; title: string; description: string }[] = [
+ const steps: { id: WizardStep; title: string; description: string }[] = [
  { id: 'basic-info', title: 'Basic Information', description: 'Victim details and contact information' },
  { id: 'incident-details', title: 'Incident Details', description: 'What happened, when, and where' },
  { id: 'impact-assessment', title: 'Impact Assessment', description: 'Effects on the victim' },

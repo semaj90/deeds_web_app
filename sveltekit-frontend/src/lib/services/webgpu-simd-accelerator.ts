@@ -69,7 +69,7 @@ export class WebGPUSIMDAccelerator {
             // Request device with limits (note: not all limits are honored by implementations)
             this.device = await adapter.requestDevice({
                 requiredFeatures: [],
-                requiredLimits: {, maxStorageBufferBindingSize: this.config.gpuMemoryLimit * 1024 * 1024,
+                requiredLimits: { maxStorageBufferBindingSize: this.config.gpuMemoryLimit * 1024 * 1024,
                     maxComputeWorkgroupSizeX: this.config.workgroupSize,
                 },
             });
@@ -208,7 +208,7 @@ export class WebGPUSIMDAccelerator {
             const computeShader = this.device.createShaderModule({ code: shaderCode });
             const computePipeline = this.device.createComputePipeline({
                 layout: 'auto',
-                compute: {, module: computeShader, entryPoint: 'main' },
+                compute: { module: computeShader, entryPoint: 'main' },
             });
 
             // Bind group is illustrative, real binding layout depends on shader
@@ -216,8 +216,8 @@ export class WebGPUSIMDAccelerator {
             const bindGroup = this.device.createBindGroup({
                 layout: bindGroupLayout,
                 entries: [
-                    { binding: 0, resource: {, buffer: inputBuffer } },
-                    { binding: 1, resource: {, buffer: outputBuffer } }],
+                    { binding: 0, resource: { buffer: inputBuffer } },
+                    { binding: 1, resource: { buffer: outputBuffer } }],
             });
 
             const commandEncoder = this.device.createCommandEncoder();
@@ -333,7 +333,7 @@ export class WebGPUSIMDAccelerator {
     /**
      * Categorize batch inputs by optimal processing method
      */
-    private categorizeBatches(jsonStrings: string[]): {, webgpu: string[];
+    private categorizeBatches(jsonStrings: string[]): { webgpu: string[];
         simd: string[]; standard: string[];
     } {
         const batches = {

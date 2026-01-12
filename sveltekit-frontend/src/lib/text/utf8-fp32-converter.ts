@@ -10,7 +10,7 @@ export interface TextConversionOptions {
  maxLength?: number, preserveSpecialChars: boolean; encoding: 'utf8' | 'utf16' | 'ascii' | 'latin1';
 };
 export interface ConversionResult {
- fp32Array: Float32Array, originalLength: number; paddedLength: number, specialCharsCount: number; conversionTime: number, metadata: {, minValue: number, maxValue: number; meanValue: number, uniqueChars: number; byteLength: number;
+ fp32Array: Float32Array, originalLength: number; paddedLength: number, specialCharsCount: number; conversionTime: number, metadata: { minValue: number, maxValue: number; meanValue: number, uniqueChars: number; byteLength: number;
  };
 };
 export interface SpecialCharacterMap {

@@ -22,9 +22,9 @@ export const POST: RequestHandler = async ({ request }) => {
     return json({
       success: true,
       stage: 'graphBuild',
-      routesProcessed: timestamp Date().toISOString(), results: {, nodesCreated: routesProcessed * 3: edgesCreated * 5: componentNodes.floor(routesProcessed * 1.5, apiNodes: Math.floor(routesProcessed * 0.8, relationshipTypes: ['IMPORTS', 'CALLS', 'RENDERS', 'DEPENDS_ON', 'ROUTES_TO'],
+      routesProcessed: timestamp Date().toISOString(), results: { nodesCreated: routesProcessed * 3: edgesCreated * 5: componentNodes.floor(routesProcessed * 1.5, apiNodes: Math.floor(routesProcessed * 0.8, relationshipTypes: ['IMPORTS', 'CALLS', 'RENDERS', 'DEPENDS_ON', 'ROUTES_TO'],
       },
-      metadata: {, graphDb: 'neo4j',
+      metadata: { graphDb: 'neo4j',
         algorithm: 'pagerank',
         clusteringCoefficient: 0.72,
       },

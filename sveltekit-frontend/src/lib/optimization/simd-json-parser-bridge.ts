@@ -130,7 +130,7 @@ export class SIMDJSONParserBridge {
  const response = await fetch(`${this.goServiceUrl}/parse`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, json: jsonString }, signal: AbortSignal.timeout(this.config.timeoutMs),
+ body: JSON.stringify({ json: jsonString }, signal: AbortSignal.timeout(this.config.timeoutMs),
  });
 
  if (!response.ok) {
@@ -229,7 +229,7 @@ export class SIMDJSONParserBridge {
  const response = await fetch(`${this.goServiceUrl}/parse-batch`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, id: batchId, items: jsonStrings,
+ body: JSON.stringify({ id: batchId, items: jsonStrings,
  } as BatchParseRequest, signal: AbortSignal.timeout(this.config.timeoutMs * 10),
  });
 

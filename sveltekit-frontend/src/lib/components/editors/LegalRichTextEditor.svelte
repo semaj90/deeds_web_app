@@ -55,7 +55,7 @@
  element: editorElement,
  extensions: [
  StarterKit.configure({
- heading: {, levels: [1, 2, 3, 4],
+ heading: { levels: [1, 2, 3, 4],
  },
  }),
  Placeholder.configure({

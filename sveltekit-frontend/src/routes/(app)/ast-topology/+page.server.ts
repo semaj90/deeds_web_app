@@ -59,7 +59,7 @@ export const load: PageServerLoad = async ({ fetch }) => {
     errorStats,
     topologyData,
     recentActivity,
-    config: {, qdrantUrl: process.env.QDRANT_URL || 'http://localhost:6333',
+    config: { qdrantUrl: process.env.QDRANT_URL || 'http://localhost:6333',
       ollamaModels: ['embeddinggemma:latest', 'gemma3-legal:latest']
     }
   };

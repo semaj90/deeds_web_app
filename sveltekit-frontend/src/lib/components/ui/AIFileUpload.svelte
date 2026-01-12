@@ -179,7 +179,7 @@
  if (file.type === 'image') {
  return {
  ...baseMetadata,
- scenes: [{, description: 'Indoor scene with multiple subjects',
+ scenes: [{ description: 'Indoor scene with multiple subjects',
  objects: ['desk', 'computer', 'documents'],
  actions: ['sitting', 'reading'],
  confidence: 0.87

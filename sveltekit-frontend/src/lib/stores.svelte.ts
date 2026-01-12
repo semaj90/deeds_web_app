@@ -11,12 +11,12 @@
 // Types
 // ========================================
 export interface UserSession {
-	user: {, id: string;
+	user: { id: string;
 		email: string; firstName: string | null;
 		lastName: string | null;
 		role: string; avatarUrl: string | null;
 	};
-	session: {, id: string;
+	session: { id: string;
 		expiresAt: string;
 	};
 }
@@ -316,7 +316,7 @@ export const chatStore = (() => {
 			const response = await fetch('/api/chats', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, title: caseId })
+				body: JSON.stringify({ title: caseId })
 			});
 
 			if (response.ok) {

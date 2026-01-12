@@ -37,22 +37,22 @@ export type CrewAIEvent =
   | { type: 'RESET' };
 
 // Start multi-agent review
-async function startAgentReview({ input }: {, input: { task: DocumentReviewTask } }): Promise<{, taskId: string; assignedAgents: string[] }> {
+async function startAgentReview({ input }: { input: { task: DocumentReviewTask } }): Promise<{ taskId: string; assignedAgents: string[] }> {
   await new Promise((resolve) => setTimeout(resolve, 1500));
   return { taskId: input.task.taskId, assignedAgents: input.task.assignedAgents };
 }
 
 // Auto-save document changes
-async function autoSaveDocument({ input }: {, input: { documentId: string; content: string } }): Promise<{, saved: boolean; timestamp: string }> {
+async function autoSaveDocument({ input }: { input: { documentId: string; content: string } }): Promise<{ saved: boolean; timestamp: string }> {
   await new Promise((resolve) => setTimeout(resolve, 500));
   return { saved: true, timestamp: new Date().toISOString() };
 }
 
 // Generate self-prompting recommendations
-async function generateSelfPrompt({ input }: {, input: { context: CrewAIContext } }): Promise<{, recommendations: Array<{ id: string; type: string; text: string; confidence: number; accepted: boolean }> }> {
+async function generateSelfPrompt({ input }: { input: { context: CrewAIContext } }): Promise<{ recommendations: Array<{ id: string; type: string; text: string; confidence: number; accepted: boolean }> }> {
   await new Promise((resolve) => setTimeout(resolve, 800));
 
-  const recommendations: Array<{, id: string; type: string; text: string; confidence: number; accepted: boolean;
+  const recommendations: Array<{ id: string; type: string; text: string; confidence: number; accepted: boolean;
   }> = [];
 
   if (input.context.userIntent === 'idle') {
@@ -85,10 +85,10 @@ export const crewAIOrchestrationMachine = null as any;
 export const crewAIOrchestrationMachine = createMachine({
   id: 'crewAIOrchestration',
   initial: 'idle',
-  types: {, context: {} as CrewAIContext,
+  types: { context: {} as CrewAIContext,
     events: {} as CrewAIEvent,
   },
-  context: {, currentTask: null,
+  context: { currentTask: null,
     taskQueue: [],
     completedTasks: [],
     activeAgents: [],
@@ -105,42 +105,42 @@ export const crewAIOrchestrationMachine = createMachine({
     processingTime: 0,
     qualityScore: 0,
   },
-  states: {, idle: { on: {, START_REVIEW: { target: 'orchestrating',
+  states: { idle: { on: { START_REVIEW: { target: 'orchestrating',
           actions: ['assignStartReview'],
         },
-        USER_ACTIVITY: {, actions: ['assignLastActivity'],
+        USER_ACTIVITY: { actions: ['assignLastActivity'],
         },
       },
     },
-    orchestrating: {, initial: 'starting_agents',
-      on: {, USER_ACTIVITY: { actions: ['assignUserIntent'],
+    orchestrating: { initial: 'starting_agents',
+      on: { USER_ACTIVITY: { actions: ['assignUserIntent'],
         },
-        USER_IDLE: {, actions: ['assignUserIdle'],
+        USER_IDLE: { actions: ['assignUserIdle'],
         },
-        ACCEPT_RECOMMENDATION: {, actions: ['assignAcceptRecommendation'],
+        ACCEPT_RECOMMENDATION: { actions: ['assignAcceptRecommendation'],
         },
-        CANCEL: {, target: 'idle',
+        CANCEL: { target: 'idle',
           actions: ['assignCancelTask'],
         },
       },
-      states: {, starting_agents: { invoke: {, src: 'startAgentReview',
+      states: { starting_agents: { invoke: { src: 'startAgentReview',
             input: ({ context }) => ({ task: context.currentTask! }),
-            onDone: {, target: 'agents_running',
+            onDone: { target: 'agents_running',
             },
-            onError: {, target: '#crewAIOrchestration.failed',
+            onError: { target: '#crewAIOrchestration.failed',
               actions: ['assignStartError'],
             },
           },
         },
-        agents_running: {, on: { AGENT_COMPLETED: {, actions: ['assignAgentCompleted'],
+        agents_running: { on: { AGENT_COMPLETED: { actions: ['assignAgentCompleted'],
               target: 'checking_completion',
             },
-            AGENT_FAILED: {, actions: ['assignAgentFailed'],
+            AGENT_FAILED: { actions: ['assignAgentFailed'],
               target: 'checking_completion',
             },
           },
         },
-        checking_completion: {, always: [
+        checking_completion: { always: [
             {
               target: 'synthesizing_results',
               guard: ({ context }) =>
@@ -156,47 +156,47 @@ export const crewAIOrchestrationMachine = createMachine({
               target: 'agents_running',
             }],
         },
-        retrying_failed: {, entry: ['assignRetryIncrement'],
-          after: {, 2000: { target: 'agents_running',
+        retrying_failed: { entry: ['assignRetryIncrement'],
+          after: { 2000: { target: 'agents_running',
             },
           },
         },
-        synthesizing_results: {, invoke: { src: 'generateSelfPrompt',
+        synthesizing_results: { invoke: { src: 'generateSelfPrompt',
             input: ({ context }) => ({ context }),
-            onDone: {, target: '#crewAIOrchestration.completed',
+            onDone: { target: '#crewAIOrchestration.completed',
               actions: ['assignRecommendations'],
             },
-            onError: {, target: '#crewAIOrchestration.completed',
+            onError: { target: '#crewAIOrchestration.completed',
             },
           },
         },
       },
     },
-    completed: {, entry: ['assignCompletedTasks'],
-      invoke: {, src: 'autoSaveDocument',
+    completed: { entry: ['assignCompletedTasks'],
+      invoke: { src: 'autoSaveDocument',
         input: ({ context }) => ({
           documentId: context.currentTask?.documentId ?? '',
           content: 'updated_content',
         }),
-        onDone: {, actions: ['assignLastSaved'],
+        onDone: { actions: ['assignLastSaved'],
         },
       },
-      after: {, 5000: { target: 'idle',
+      after: { 5000: { target: 'idle',
           actions: ['assignResetAfterComplete'],
         },
       },
     },
-    failed: {, on: { RETRY: [
+    failed: { on: { RETRY: [
           {
             target: 'orchestrating.starting_agents',
             guard: ({ context }) => context.failedAgents.length > 0 && context.retryCount < 3,
             actions: ['assignRetryWithIncrement'],
           }],
-        RESET: {, target: 'idle',
+        RESET: { target: 'idle',
           actions: ['assignResetAll'],
         },
       },
-      after: {, 10000: { target: 'orchestrating.starting_agents',
+      after: { 10000: { target: 'orchestrating.starting_agents',
           guard: ({ context }) => context.failedAgents.length > 0 && context.retryCount < 3,
           actions: ['assignRetryIncrement'],
         },

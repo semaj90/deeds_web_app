@@ -131,7 +131,7 @@ export async function createStatuteChunks(
 export async function ingestStatuteWithChunks(
  source: StatuteSource,
  chunkingOptions?: ChunkingOptions
-): Promise<{, statuteId: string; chunksCreated: number }> {
+): Promise<{ statuteId: string; chunksCreated: number }> {
  // Ingest statute
  const statuteId = await ingestStatute(source);
 
@@ -147,7 +147,7 @@ export async function ingestStatuteWithChunks(
 export async function batchIngestStatutes(
  sources: StatuteSource[],
  chunkingOptions?: ChunkingOptions
-): Promise<Array<{, statuteId: string; chunksCreated: number; error?: string }>> {
+): Promise<Array<{ statuteId: string; chunksCreated: number; error?: string }>> {
  const results = [];
 
  for (const source of sources) {
@@ -236,7 +236,7 @@ export async function getStatuteWithChunks(statuteId: string) {
 /**
  * Get ingestion statistics
  */
-export async function getIngestionStats(): Promise<{, totalStatutes: number;
+export async function getIngestionStats(): Promise<{ totalStatutes: number;
  totalChunks: number; chunksWithEmbeddings: number;
  jurisdictions: string[]; categories: string[];
 }> {

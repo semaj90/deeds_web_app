@@ -10,7 +10,7 @@ export interface VectorSearchResult {
  id: string; content: string;
  score: number;
  metadata?: Record<string, unknown>;
- source?: {, type: string; name: string; url: string };
+ source?: { type: string; name: string; url: string };
  highlights?: string[];
  confidence?: number;
 }

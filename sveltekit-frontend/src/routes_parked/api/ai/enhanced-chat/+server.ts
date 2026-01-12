@@ -59,7 +59,7 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
 
  const response: EnhancedChatResponse = {
  response: aiResponse, confidence: 0.8, processingTime: Date.now() - startTime,
- metadata: {, model: settings?.model ?? 'gemma3-legal:latest',
+ metadata: { model: settings?.model ?? 'gemma3-legal:latest',
  tokensUsed: Math.ceil(aiResponse.length / 4, enabledFeatures: ['basic-generation'],
  },
  recommendations: ['Verify legal advice with qualified counsel'],
@@ -82,10 +82,10 @@ async function generateAIResponse(query: string, _context, unknown: Promise<stri
  const response = await fetch('http://localhost:11434/api/generate', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: 'gemma3-legal:latest',
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
  prompt: `Legal AI Assistant: ${ query }`,
  stream: false,
- options: {, temperature: 0.3, top_p: 0.9, num_ctx: 4096
+ options: { temperature: 0.3, top_p: 0.9, num_ctx: 4096
  },
  }),
  });

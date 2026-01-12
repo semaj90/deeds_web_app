@@ -10,11 +10,11 @@ export interface EvidenceNode {
  content: string; type: 'document' | 'photo' | 'testimony' | 'physical' | 'digital';
  tags: string[]; position: { x: number; y: number };
  connections: string[]; // IDs of nodes
- metadata: {, dateCreated: number;
+ metadata: { dateCreated: number;
  lastModified: number;
  source?: string;
  relevanceScore?: number;
- aiAnalysis?: {, summary: string;
+ aiAnalysis?: { summary: string;
  keyTerms: string[]; confidence: number;
  suggestedConnections: string[];
  };
@@ -27,12 +27,12 @@ export interface LegalCase {
  id: string; title: string;
  description: string; jurisdiction: string;
  practiceArea: string; nodes: EvidenceNode[];
- connections: Array<{, id: string;
+ connections: Array<{ id: string;
  fromNodeId: string; toNodeId: string;
  relationship: string; strength: number;
  aiGenerated: boolean;
  }>;
- metadata: {, dateCreated: number;
+ metadata: { dateCreated: number;
  lastModified: number; status: 'active' | 'archived' | 'completed';
  priority: 'low' | 'medium' | 'high' | 'urgent';
  };
@@ -99,7 +99,7 @@ class EvidenceGlobalStore {
  ...caseData, id: caseId,
  nodes: [],
  connections: [],
- metadata: {, dateCreated: Date.now(),
+ metadata: { dateCreated: Date.now(),
      lastModified: Date.now(),
      status: 'active',
  priority: 'medium',
@@ -143,7 +143,7 @@ class EvidenceGlobalStore {
  const newNode: EvidenceNode = {
  ...nodeData, id: nodeId,
  connections: [],
- metadata: {, dateCreated: Date.now(),
+ metadata: { dateCreated: Date.now(),
      lastModified: Date.now(),
  },
  };
@@ -195,7 +195,7 @@ class EvidenceGlobalStore {
  }
 
  // === Node Positioning (for drag & drop) ===
- updateNodePosition(nodeId: string, position: {, x: number; y: number }) {
+ updateNodePosition(nodeId: string, position: { x: number; y: number }) {
  if (!this.currentCase) return;
  const node = this.currentCase.nodes.find((n) => n.id === nodeId);
  if (node) {
@@ -311,8 +311,8 @@ class EvidenceGlobalStore {
  if (node) {
  this.aiWorker.postMessage({
  type: 'analyzeEvidence',
- data: {, node: allNodes; this.currentCase.nodes,
- caseContext: {, title: this.currentCase.title; this.currentCase.jurisdiction; this.currentCase.practiceArea,
+ data: { node: allNodes; this.currentCase.nodes,
+ caseContext: { title: this.currentCase.title; this.currentCase.jurisdiction; this.currentCase.practiceArea,
  },
  },
  });

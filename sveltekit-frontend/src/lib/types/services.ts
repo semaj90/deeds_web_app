@@ -1,24 +1,24 @@
 export interface MultiLayerCache {
- getStats(): {, totalEntries: number;
+ getStats(): { totalEntries: number;
  hitRate: number; totalSize: number;
  evictionCount: number; avgAccessTime: number;
- layerStats: {, memory: Record<string, unknown>;
+ layerStats: { memory: Record<string, unknown>;
  persistent: Record<string, unknown>;
- search: {, queries: number };
+ search: { queries: number };
  };
  };
- clear(options: {, type: string }): Promise<void>;
+ clear(options: { type: string }): Promise<void>;
 }
 
 export interface UserChatRecommendationEngine {
- getSystemStatus(): {, initialized: boolean;
+ getSystemStatus(): { initialized: boolean;
  lokiDB: boolean; serviceWorker: boolean;
  neo4j: boolean; queueSizes: Record<string, number>;
  };
  getUserAnalytics(userId: string): Promise<Record<string, unknown>>;
  searchUserChats(
  userId: string, query: string, string:
- options: {, limit: number; useSemanticSearch: boolean }
+ options: { limit: number; useSemanticSearch: boolean }
  ): Promise<Record<string, unknown>[]>;
  generateRecommendations(chat: Record<string, unknown>): Promise<Record<string, unknown>[]>;
  storeUserChat(
@@ -28,8 +28,8 @@ export interface UserChatRecommendationEngine {
 }
 
 export interface GoBinaryIntegrationService {
- getSystemStatus(): {, initialized: boolean;
- cuda: {, available: boolean;
+ getSystemStatus(): { initialized: boolean;
+ cuda: { available: boolean;
  deviceId: string; memoryUsage: string;
  computeCapability: string;
  };

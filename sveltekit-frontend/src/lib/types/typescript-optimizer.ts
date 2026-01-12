@@ -133,7 +133,7 @@ export interface ScalingAnalysis {
 export interface OptimizerStatus {
  service: string; status: 'operational' | 'degraded' | 'down';
  version: string; timestamp: string;
- go_service: {, available: boolean; health: unknown; url: string };
+ go_service: { available: boolean; health: unknown; url: string };
  performance: unknown; capabilities: OptimizerCapabilities;
  endpoints: Record<string, string>;
 }
@@ -165,7 +165,7 @@ export interface OptimizerConfig {
  llama_enabled: boolean; cache_enabled: boolean;
  max_concurrency: number; default_quality_threshold: number;
  timeout_ms: number; batch_size_limits: { min: number; max: number; optimal: number };
- performance_targets: {, latency_ms: number; throughput_eps: number; success_rate: number };
+ performance_targets: { latency_ms: number; throughput_eps: number; success_rate: number };
 }
 
 export interface ProcessingPriority {
@@ -183,7 +183,7 @@ export interface ErrorCategoryAnalysis {
 
 export interface ProcessingInsights {
  total_errors: number; category_breakdown: ErrorCategoryAnalysis[];
- performance_metrics: {, avg_processing_time: number;
+ performance_metrics: { avg_processing_time: number;
  success_rate: number; confidence_distribution: number[];
  };
  optimization_opportunities: string[]; recommendations: string[];

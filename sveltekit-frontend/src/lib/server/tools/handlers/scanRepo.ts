@@ -27,7 +27,7 @@ interface RipgrepMatch {
 async function runRipgrep(
   pattern: string,
   paths: string[],
-  options: {, caseSensitive: boolean;
+  options: { caseSensitive: boolean;
     maxResults: number; includeLineNumbers: boolean;
     includeContext: number; excludes: string[];
     isRegex: boolean;
@@ -131,7 +131,7 @@ async function scanRepoHandler(request: ScanRepoRequest): Promise<ToolResult<Sca
     success: true,
     run_id, request.run_id,
     tool: 'scan_repo',
-    data: {, matches: allMatches,
+    data: { matches: allMatches,
       total_matches: allMatches.length,
       files_scanned: filesScanned.size
     },

@@ -34,11 +34,11 @@ async function generateEmbedding(text: string, model: string = 'embeddinggemma:l
 async function searchQdrant(
   collection: string,
   embedding: number[],
-  options: {, limit: number;
+  options: { limit: number;
     threshold: number;
     filters?: Record<string, unknown>;
   }
-): Promise<Array<{, id: string; score: number; payload: Record<string, unknown> }>> {
+): Promise<Array<{ id: string; score: number; payload: Record<string, unknown> }>> {
   const body: Record<string, unknown> = {
     vector: embedding,
     limit: options.limit,
@@ -68,7 +68,7 @@ async function searchQdrant(
     throw new Error(`Qdrant search failed: ${response.statusText}`);
   }
 
-  const data = await response.json() as { result: Array<{, id: string; score: number; payload: Record<string, unknown> }> };
+  const data = await response.json() as { result: Array<{ id: string; score: number; payload: Record<string, unknown> }> };
   return data.result;
 }
 
@@ -94,7 +94,7 @@ async function kbSearchHandler(request: KBSearchRequest): Promise<ToolResult<KBS
   }
 
   // Search all collections
-  const allResults: Array<{, id: string; score: number; content: string; metadata?: Record<string, unknown> }> = [];
+  const allResults: Array<{ id: string; score: number; content: string; metadata?: Record<string, unknown> }> = [];
 
   for (const collection of request.collections) {
     try {
@@ -119,7 +119,7 @@ async function kbSearchHandler(request: KBSearchRequest): Promise<ToolResult<KBS
     success: true,
     run_id, request.run_id,
     tool: 'kb_search',
-    data: {, results: limitedResults,
+    data: { results: limitedResults,
       total_results: limitedResults.length
     },
     duration_ms: 0,

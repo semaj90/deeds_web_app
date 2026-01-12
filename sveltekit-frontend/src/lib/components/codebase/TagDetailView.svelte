@@ -25,7 +25,7 @@
 		id: string; name: string;
 		filePath: string; type: string;
 		category: string; errorCount: number;
-		cluster?: {, id: string;
+		cluster?: { id: string;
 			name: string; memberCount: number;
 		};
 		embedding?: number[];

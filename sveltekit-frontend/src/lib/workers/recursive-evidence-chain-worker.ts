@@ -87,7 +87,7 @@ export class RecursiveEvidenceChainProcessor {
 				relationships: [],
 				legalImplications: ['max_depth_reached_or_circular_reference'],
 				confidence: 0.1,
-				metadata: {, processingTime: performance.now() - startTime,
+				metadata: { processingTime: performance.now() - startTime,
 					recursionPath: [...recursionPath, rootEvidenceId],
 					analysisTimestamp: new Date().toISOString()
 				}
@@ -157,7 +157,7 @@ export class RecursiveEvidenceChainProcessor {
 				relationships: [],
 				legalImplications: [`error_processing: ${msg}`],
 				confidence: 0.0,
-				metadata: {, processingTime: performance.now() - startTime,
+				metadata: { processingTime: performance.now() - startTime,
 					recursionPath: [...recursionPath, rootEvidenceId],
 					analysisTimestamp: new Date().toISOString()
 				}
@@ -208,7 +208,7 @@ export class RecursiveEvidenceChainProcessor {
 			const response = await fetch(`${this.apiBaseUrl}/evidence/correlate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, evidenceIds: [evidenceId],
+				body: JSON.stringify({ evidenceIds: [evidenceId],
 					analysisType: 'comprehensive',
 					includeWeakCorrelations: true
 				})

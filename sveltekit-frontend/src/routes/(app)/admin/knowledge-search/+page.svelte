@@ -4,7 +4,7 @@
 	import { enhance } from '$app/forms';
 	import type { PageData, ActionData } from './$types';
 
-	let { data, form }: {, data: PageData, form: ActionData } = $props();
+	let { data, form }: { data: PageData, form: ActionData } = $props();
 
 	// Search State
 	let searchQuery = $state('');
@@ -37,7 +37,7 @@
 
 	// Actions
 	function handleEnhance() {
-		return async ({ update }: {, update: () => Promise<void> }) => {
+		return async ({ update }: { update: () => Promise<void> }) => {
 			isSearching = true;
 			await update();
 			isSearching = false;

@@ -71,7 +71,7 @@ export async function deleteVectors(collection: string, ids: string[]): Promise<
  const response = await fetch('/api/vector/delete', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify({, collection: ids }),
+ body: JSON.stringify({ collection: ids }),
  });
 
  if (!response.ok) {
@@ -94,7 +94,7 @@ export async function createCollection(
  const response = await fetch('/api/vector/collections', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify({, name: collection, vectorSize, distance }),
+ body: JSON.stringify({ name: collection, vectorSize, distance }),
  });
 
  if (!response.ok) {

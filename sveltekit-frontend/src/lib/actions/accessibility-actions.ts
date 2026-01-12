@@ -54,7 +54,7 @@ export interface DropdownOptions {
 /** * Accessible Click Action * Handles mouse, keyboard, and touch interactions with full accessibility */
 export function accessibleClick(
  element: HTMLElement, params: AccessibleClickParams
-): {, update: (params: AccessibleClickParams) => void; destroy: () => void } {
+): { update: (params: AccessibleClickParams) => void; destroy: () => void } {
  let currentParams = params;
 
  function setupAccessibility() {
@@ -119,7 +119,7 @@ export function accessibleClick(
 /** * Focus Management Action * Handles focus trapping, restoration, and skip links */
 export function focusManagement(
  element: HTMLElement, params: FocusManagementParams = {}
-): {, update: (params: FocusManagementParams) => void; destroy: () => void } {
+): { update: (params: FocusManagementParams) => void; destroy: () => void } {
  let currentParams = params;
  let previouslyFocused: null = null;
  let focusableElements: HTMLElement[] = [];
@@ -236,7 +236,7 @@ export function focusManagement(
 /** * ARIA State Management Action * Dynamically manages ARIA attributes based on component state */
 export function ariaState(
  element: HTMLElement, params: ARIAStateParams
-): {, update: (params: ARIAStateParams) => void; destroy: () => void } {
+): { update: (params: ARIAStateParams) => void; destroy: () => void } {
  let currentParams = params;
 
  function updateARIA() {
@@ -293,7 +293,7 @@ export function ariaState(
 /** * Keyboard Navigation Action * Handles complex keyboard interactions with customizable key mappings */
 export function keyboardNavigation(
  element: HTMLElement, params: KeyboardNavigationParams
-): {, update: (params: KeyboardNavigationParams) => void; destroy: () => void } {
+): { update: (params: KeyboardNavigationParams) => void; destroy: () => void } {
  let currentParams = params;
 
  function handleKeydown(event: KeyboardEvent) {
@@ -326,7 +326,7 @@ export function keyboardNavigation(
 /** * Live Region Action * Manages ARIA live regions for dynamic content announcements */
 export function liveRegion(
  element: HTMLElement, params: LiveRegionParams = {}
-): {, update: (params: LiveRegionParams) => void;
+): { update: (params: LiveRegionParams) => void;
  announce: (message: string) => void;
  destroy: () => void;
 } {
@@ -457,7 +457,7 @@ export const compositeActions = {
    describedby: options.description ? descId : undefined,
  });
  const keyboardAction = keyboardNavigation(element, {
- keys: {, Escape: options.onClose },
+ keys: { Escape: options.onClose },
  preventDefault: true,
  });
 
@@ -478,7 +478,7 @@ export const compositeActions = {
 			controls: listboxId,
 		});
 		const keyboardAction = keyboardNavigation(element, {
-			keys: {, Enter: () => {
+			keys: { Enter: () => {
 					options.onToggle();
 				},
 				' ': () => {

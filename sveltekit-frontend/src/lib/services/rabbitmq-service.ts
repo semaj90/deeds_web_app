@@ -26,7 +26,7 @@ export interface RabbitMQConfig {
         embeddingProcessing: string; summarization: string;
         deadLetter: string;
     };
-    exchanges: {, documents: string;
+    exchanges: { documents: string;
         deadLetter: string;
     };
 }
@@ -34,7 +34,7 @@ export interface RabbitMQConfig {
 export interface IRabbitMQService {
     initialize(retries?: number, delay?: number): Promise<void>;
     publishDocumentProcessingJob(job: DocumentProcessingJob): Promise<boolean>;
-    publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{, success: number; failed: number }>;
+    publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{ success: number; failed: number }>;
     purgeQueue(queueType: keyof RabbitMQConfig['queues']): Promise<boolean>;
     close(): Promise<void>;
     healthCheck(): Promise<any>;
@@ -85,13 +85,13 @@ class RabbitMQService implements IRabbitMQService {
         const rabbitUrl = env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672';
         this.config = {
             url: rabbitUrl,
-            queues: {, documentProcessing: 'doc_processing_queue',
+            queues: { documentProcessing: 'doc_processing_queue',
                 ocrProcessing: 'ocr_processing_queue',
                 embeddingProcessing: 'embedding_processing_queue',
                 summarization: 'summarization_queue',
                 deadLetter: 'dead_letter_queue'
             },
-            exchanges: {, documents: 'documents_exchange',
+            exchanges: { documents: 'documents_exchange',
                 deadLetter: 'dead_letter_exchange'
             }
         };
@@ -178,7 +178,7 @@ class RabbitMQService implements IRabbitMQService {
         }
     }
 
-    async publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{, success: number; failed: number }> {
+    async publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{ success: number; failed: number }> {
         let success = 0;
         let failed = 0;
 

@@ -156,7 +156,7 @@ export class QueryBuilder {
  static async executeQuery<T>(
  baseQuery: QueryLike, filters: QueryFilters,
  table: TableLike
- ): Promise<{, data: T, total: number; pagination: PaginationParams }> {
+ ): Promise<{ data: T, total: number; pagination: PaginationParams }> {
  // Build filter conditions
  const conditions = this.buildFilters(table, filters;
  const whereClause = this.applyFilters(conditions);

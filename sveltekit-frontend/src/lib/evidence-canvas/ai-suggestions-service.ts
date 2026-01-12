@@ -135,9 +135,9 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, model: 'gemma3-legal:latest',
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
  prompt: stream,
- options: {, temperature: 0.3, num_predict: 200
+ options: { temperature: 0.3, num_predict: 200
  },
  }),
  });
@@ -226,7 +226,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  return examples[type] || 'supporting documentation';
  }
 
- private analyzeEvidenceGaps(nodes: EvidenceNode[]): Array<{, type: string;
+ private analyzeEvidenceGaps(nodes: EvidenceNode[]): Array<{ type: string;
  description: string; riskLevel: 'low' | 'medium' | 'high';
  confidence: number; mitigationSteps: string[];
  }> {
@@ -275,7 +275,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  return gaps;
  }
 
- private parseStrategyResponse(response: string): Array<{, title: string;
+ private parseStrategyResponse(response: string): Array<{ title: string;
  description: string; confidence: number;
  priority: 'low' | 'medium' | 'high' | 'critical';
  actions: string[];

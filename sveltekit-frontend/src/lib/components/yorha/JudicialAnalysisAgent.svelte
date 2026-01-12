@@ -16,16 +16,16 @@ import { createEventDispatcher } from 'svelte';
  interface JudicialAnalysis {
  id: string;
  caseId?: string; generatedAt: string;
- admissibility: Array<{, evidence: string;
+ admissibility: Array<{ evidence: string;
  ruling: 'admissible' | 'inadmissible' | 'conditional';
  reasoning: string; legalBasis: string;
  }>;
- probableCause: {, assessment: 'strong' | 'moderate' | 'weak' | 'none';
+ probableCause: { assessment: 'strong' | 'moderate' | 'weak' | 'none';
  reasoning: string; factors: string[];
  };
- caseStrength: {, overall: number; // 0-100
+ caseStrength: { overall: number; // 0-100
  prosecution: number; defense: number;
- keyFactors: Array<{, factor: string;
+ keyFactors: Array<{ factor: string;
  impact: 'positive' | 'negative' | 'neutral';
  weight: number;
  }>;

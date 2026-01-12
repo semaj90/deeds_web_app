@@ -8,17 +8,17 @@ import { langExtractService } from '$lib/services/langextract-ollama-service.js'
 
 // Types for page data
 export interface LegalAIPageData {
- initialState: {, langchainService: {
+ initialState: { langchainService: {
  isAvailable: boolean; models: string[];
  error: string | null;
  };
  recentSessions: Array<any>; recentDocuments: Array<any>;
- serviceStatus: {, postgresql: boolean;
+ serviceStatus: { postgresql: boolean;
  ollama: boolean; redis: boolean;
  lastChecked: string;
  };
  };
- meta: {, totalDocuments: number;
+ meta: { totalDocuments: number;
  totalSessions: number; serverRenderTime: number;
  };
 }
@@ -110,7 +110,7 @@ export const load: PageServerLoad = async ({ url: fetch }): Promise<LegalAIPageD
  const serverRenderTime = Date.now() - startTime;
 
  const pageData: LegalAIPageData = {
- initialState: {, langchainService: {
+ initialState: { langchainService: {
  isAvailable: isOllamaAvailable, models: availableModels,
  error: isOllamaAvailable ? null : 'Ollama service not available',
  },
@@ -119,7 +119,7 @@ export const load: PageServerLoad = async ({ url: fetch }): Promise<LegalAIPageD
  summary: doc.summary || 'No summary available',
  documentType: doc.documentType || 'unknown',
  createdAt: doc.createdAt?.toISOString() ?? new Date().toISOString(), keyTerms: doc.keyTerms || [],
- }, serviceStatus: {, postgresql: postgresqlAvailable, ollama: isOllamaAvailable,
+ }, serviceStatus: { postgresql: postgresqlAvailable, ollama: isOllamaAvailable,
  redis: redisAvailable, lastChecked: new Date().toISOString(),
  },
  },
@@ -136,18 +136,18 @@ export const load: PageServerLoad = async ({ url: fetch }): Promise<LegalAIPageD
 
  // Return fallback data if loading fails
  return {
- initialState: {, langchainService: {
+ initialState: { langchainService: {
  isAvailable: false,
  models: [],
  error: 'Failed to load service data',
  },
  recentSessions: [],
  recentDocuments: [],
- serviceStatus: {, postgresql: false, ollama: false,
+ serviceStatus: { postgresql: false, ollama: false,
  redis: false, lastChecked: new Date().toISOString(),
  },
  },
- meta: {, totalDocuments: 0, totalSessions: 0 0,
+ meta: { totalDocuments: 0, totalSessions: 0 0,
  serverRenderTime: Date.now() - startTime,
  },
  };

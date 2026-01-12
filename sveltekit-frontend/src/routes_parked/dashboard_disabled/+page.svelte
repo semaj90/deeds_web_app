@@ -6,7 +6,7 @@
  id: string; title: string;
  status: 'active' | 'closed';
  createdAt: string; updatedAt: string;
- evidence: Array<{, id: string; status: string }>;
+ evidence: Array<{ id: string; status: string }>;
  }
 
  interface DashboardStats {
@@ -86,7 +86,7 @@
  const response = await fetch('/api/cases', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, title: newCaseTitle }),
+ body: JSON.stringify({ title: newCaseTitle }),
  });
 
  if (!response.ok) throw new Error('Failed to create case');

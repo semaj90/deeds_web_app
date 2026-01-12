@@ -13,7 +13,7 @@ export interface VectorSimilarityRequest {
 export interface VectorSimilarityResponse {
  success: boolean;
  result?: number | number[];
- metadata: {, operation: string;
+ metadata: { operation: string;
  vectorDimensions: number; vectorCount: number;
  usedCUDA: boolean;
  gpuTime?: number; parallelWorkers: number;
@@ -65,7 +65,7 @@ export interface MatrixBatchOperation {
 export interface MatrixResponse {
  success: boolean;
  result?: number[][] | number[][][] | number[];
- metadata: {, operation: string;
+ metadata: { operation: string;
  inputShape: number[]; outputShape: number[];
  processingTime: number; usedCUDA: boolean;
  parallelWorkers: number; memoryUsed: number;
@@ -103,7 +103,7 @@ export interface VectorSearchResponse {
  cudaTime?: number;
  rerankTime?: number;
  };
- query: {, original: string;
+ query: { original: string;
  embedding?: number[]; filters: unknown;
  };
 }
@@ -116,7 +116,7 @@ export interface ChunkingRequest {
 }
 export interface ChunkingResponse {
  success: boolean; chunks: string[];
- metadata?: {, originalLength: number;
+ metadata?: { originalLength: number;
  chunkCount: number; averageChunkSize: number;
  chunkingMethod: string; chunkSize: number;
  chunkOverlap: number;
@@ -130,15 +130,15 @@ export interface RAGChunkingOptions {
  maxChunkSize?: number;
 }
 export interface LegalDocumentMetadata {
- case: {, id: string;
+ case: { id: string;
  jurisdiction: string; parties: Array<{ role: string; name: string; type: string }>;
  datesFiled: string[]; courtLevel: 'district' | 'appellate' | 'supreme';
  };
- classification: {, documentType: 'contract' | 'evidence' | 'brief' | 'citation';
+ classification: { documentType: 'contract' | 'evidence' | 'brief' | 'citation';
  practiceArea: string[]; confidenceLevel: number;
  riskLevel: 'low' | 'medium' | 'high' | 'critical';
  };
- processing: {, extractedEntities: string[];
+ processing: { extractedEntities: string[];
  keyTerms: string[]; sentiment: number;
  complexity: number;
  };
@@ -149,7 +149,7 @@ export interface CUDAConfig {
  submit: string; workers: string;
  metrics: string;
  };
- gpu: {, model: string;
+ gpu: { model: string;
  cudaCores: number; tensorCores: number;
  memoryGB: number; computeCapability: string;
  };

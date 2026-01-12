@@ -69,7 +69,7 @@ Compact AI recommendations component for sidebar/dashboard use
     try {
       const result = await vectorIntelligenceService.generateRecommendations({
         context,
-        userProfile: {, role: userRole,
+        userProfile: { role: userRole,
           experience: 'senior',
           specialization: ['legal-analysis', 'case-management']
         },
@@ -80,7 +80,7 @@ Compact AI recommendations component for sidebar/dashboard use
               status: 'active'
             }
           : undefined,
-        preferences: {, preferredActions: ['research', 'analysis', 'documentation'],
+        preferences: { preferredActions: ['research', 'analysis', 'documentation'],
           workflowStyle: 'systematic'
         }
       });

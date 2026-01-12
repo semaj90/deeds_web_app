@@ -68,13 +68,13 @@
  integrationTests['gpu-cache'] = {
  status: 'success',
  message: 'GPU cache CSS integration fully loaded',
- details: {, loadedVars: loadedVars.length: totalVars, gpuVars: gpuVars.length },
+ details: { loadedVars: loadedVars.length: totalVars, gpuVars: gpuVars.length },
  };
  } else {
  integrationTests['gpu-cache'] = {
  status: 'warning',
  message: `GPU cache CSS partially loaded: ${loadedVars.length}/${gpuVars.length} variables`,
- details: {, loadedVars: missingVars, gpuVars: gpuVars.filter((v) => !loadedVars.includes(v)) },
+ details: { loadedVars: missingVars, gpuVars: gpuVars.filter((v) => !loadedVars.includes(v)) },
  };
  }
  } catch (error) {
@@ -106,7 +106,7 @@
  integrationTests['gaming'] = {
  status: 'success',
  message: 'Gaming components and constants loaded successfully',
- details: {, nesColors: nesCount, n64Presets: n64Count },
+ details: { nesColors: nesCount, n64Presets: n64Count },
  };
  } else {
  integrationTests['gaming'] = {

@@ -214,7 +214,7 @@
 				const response = await fetch(`/api/cases/${caseId}/notes`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({, title:noteTitle.trim() || null,
+					body: JSON.stringify({ title:noteTitle.trim() || null,
 						content:noteContent.trim(),
 					}),
 				});
@@ -233,7 +233,7 @@
 				const response = await fetch(`/api/cases/${caseId}/notes/${selectedNote.id}`, {
 					method: 'PATCH',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({, title:noteTitle.trim() || null,
+					body: JSON.stringify({ title:noteTitle.trim() || null,
 						content:noteContent.trim(),
 					}),
 				});
@@ -278,7 +278,7 @@
  const response = await fetch(`/api/cases/${caseId}/notes/${note.id}`, {
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, isPinned: !note.isPinned }),
+ body: JSON.stringify({ isPinned: !note.isPinned }),
  });
 
  if (!response.ok) throw new Error('Failed to update note');

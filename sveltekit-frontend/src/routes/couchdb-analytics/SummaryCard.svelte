@@ -11,7 +11,7 @@
 		file_path: string; summary: string;
 		key_entities: string[]; llm_provider: string;
 		generated_at: string;
-		metadata?: {, error_count: number;
+		metadata?: { error_count: number;
 			classes: string[]; functions: string[];
 			language: string; lines_of_code: number;
 		};

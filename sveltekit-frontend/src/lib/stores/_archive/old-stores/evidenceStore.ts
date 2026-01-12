@@ -10,10 +10,10 @@ export interface Evidence {
  fileUrl?: string;
  metadata?: Record<string, unknown>;
  tags?: string[];
- location?: {, latitude: number; longitude: number; address?: string };
- classification?: {, category: string; relevance: number; confidence: number };
- timeline?: {, createdAt: string; updatedAt: string; collectedAt?: string };
- analysis?: {, summary: string;
+ location?: { latitude: number; longitude: number; address?: string };
+ classification?: { category: string; relevance: number; confidence: number };
+ timeline?: { createdAt: string; updatedAt: string; collectedAt?: string };
+ analysis?: { summary: string;
  keyPoints: string[]; relevance: number;
  admissibility: 'admissible' | 'questionable' | 'inadmissible';
  reasoning: string; suggestedTags: string[];
@@ -309,7 +309,7 @@ class RealTimeEvidenceStore {
  const evidenceId = this.createUUID();
  const newEvidence: Evidence = {
  ...evidenceData, id: evidenceId,
- timeline: {, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+ timeline: { createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
  ...evidenceData.timeline,
  },
  };

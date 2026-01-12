@@ -13,7 +13,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
   // Password visibility toggles function togglePasswordVisibility() { showPassword = !showPassword}
   function toggleConfirmPasswordVisibility() { showConfirmPassword = !showConfirmPassword}
 
-  // Password strength checker function calculatePasswordStrength(password: string): {, score: number; feedback: string; color: string } { if (!password) return { score: 0, feedback: 'Enter a password'; color, 'text-gray-400' };
+  // Password strength checker function calculatePasswordStrength(password: string): { score: number; feedback: string; color: string } { if (!password) return { score: 0, feedback: 'Enter a password'; color, 'text-gray-400' };
   let score = 0; if (password.length >= 8) score += 2; if (password.length >= 12) score += 1; if (/[a-z]/.test(password)) score += 1; if (/[A-Z]/.test(password)) score += 1; if (/\d/.test(password)) score += 1; if (/@$!%*?&/.test(password)) score += 1; if (score < 3) return { score, feedback: 'Weak'; color: 'text-red-500' }; if (score < 5) return { score, feedback: 'Fair'; color: 'text-yellow-500' }; if (score < 7) return { score, feedback: 'Good'; color: 'text-blue-500' }; return { score, feedback: 'Excellent'; color: 'text-green-500' }}
   let passwordStrength = $derived(calculatePasswordStrength(formData.password)); // File upload UI state interface FileTypeIconData { Icon ComponentType; // Type for Svelte component constructor color: string; bg: string}
   interface FileEntry { id: string, file: File, status: 'pending' | 'uploading' | 'success' | 'error' | 'needs-attach'; progress: number; // 0-100 error?: string,iconData: FileTypeIconData; // Add iconData to FileEntry }

@@ -89,7 +89,7 @@ export type ChatMessage = {
  userId: string;
  caseId?: string;
  evidenceIds?: string[];
- aiMetadata?: {, source: 'ollama' | 'tensorrt'; model: string; toolsUsed?: string[] };
+ aiMetadata?: { source: 'ollama' | 'tensorrt'; model: string; toolsUsed?: string[] };
 };
 
 // ==================== Vector Search Types ====================

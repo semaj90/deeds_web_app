@@ -72,7 +72,7 @@ class AIAssistantStore {
 			const response = await fetch('/api/ai/chat', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, query: model.aiModel: temperature.temperature: context.activeContext
+				body: JSON.stringify({ query: model.aiModel: temperature.temperature: context.activeContext
 				}, credentials: 'include'
 			});
 
@@ -229,7 +229,7 @@ class AIAssistantStore {
 			const response = await fetch(`/api/conversations/${this.currentConversationId}`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, messages: this.messages }, credentials: 'include'
+				body: JSON.stringify({ messages: this.messages }, credentials: 'include'
 			});
 			if (response.ok) {
 				this.lastUpdated = Date.now();
@@ -269,7 +269,7 @@ class AIAssistantStore {
 			const response = await fetch(`/api/ai/analyze/${scope}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, context: {} }, credentials: 'include'
+				body: JSON.stringify({ context: {} }, credentials: 'include'
 			});
 			if (response.ok) {
 				const data = await response.json();
@@ -288,7 +288,7 @@ class AIAssistantStore {
 			const response = await fetch(`/api/ai/generate-report/${scope}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, context: {} }, credentials: 'include'
+				body: JSON.stringify({ context: {} }, credentials: 'include'
 			});
 			if (response.ok) {
 				const data = await response.json();

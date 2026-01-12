@@ -100,7 +100,7 @@ export class DocumentLoader {
  /**
  * Get processing statistics
  */
- getStats(): {, totalDocuments: number;
+ getStats(): { totalDocuments: number;
  source: string; minioConfigured: boolean;
  } {
  const stats = this.pdfLoader.getStats();

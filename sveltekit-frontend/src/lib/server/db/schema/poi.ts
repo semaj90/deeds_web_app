@@ -16,10 +16,10 @@ export const pois = pgTable('persons_of_interest', {
  filename: string; uploadedAt: string;
  metadata: {
  exif?: Record<string, any>;
- gps?: {, lat: number; lng: number };
+ gps?: { lat: number; lng: number };
  timestamp?: string;
  deviceModel?: string;
- resolution?: {, width: number; height: number };
+ resolution?: { width: number; height: number };
  };
  ai: {
  faceEmbedding?: number[]; // Face recognition vector

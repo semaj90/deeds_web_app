@@ -37,7 +37,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const response = await fetch(`${process.env.OLLAMA_URL}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: LLM_MODEL,
+ body: JSON.stringify({ model: LLM_MODEL,
  prompt: `${systemPrompt}\n\n${userPrompt}`,
  stream: false,
  }),
@@ -54,7 +54,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  return json({
  clause: chunkId.statute?.id ?? 'unknown',
- pdf: {, page: null, // TODO: compute from statute metadata
+ pdf: { page: null, // TODO: compute from statute metadata
  bbox: null,
  },
  });

@@ -227,7 +227,7 @@ export class ExperienceRecorder {
 		limit: number = 10
 	): Promise<StrategyRanking[]> {
 		// Find similar groups
-		const similarGroups: {, groupId: string; similarity: number }[] = [];
+		const similarGroups: { groupId: string; similarity: number }[] = [];
 
 		for (const [groupId, group] of this.groups) {
 			const similarity = this.cosineSimilarity(errorEmbedding, group.centroid);
@@ -286,7 +286,7 @@ export class ExperienceRecorder {
 			if (total === 0) continue;
 
 			rankings.push({
-				strategy: {, id: strategyId,
+				strategy: { id: strategyId,
 					description: '',
 					code: '',
 					applicablePatterns: [],

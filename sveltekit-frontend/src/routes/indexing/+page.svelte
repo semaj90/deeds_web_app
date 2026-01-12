@@ -1,4 +1,6 @@
 <script lang="ts">
+  import DocumentUploadMachineIntegration from '$lib/components/DocumentUploadMachineIntegration.svelte';
+  import AIAssistantMachineComponent from '$lib/machines/AIAssistantMachineComponent.svelte';
   import { onMount } from 'svelte';
 
   interface IndexingStatus {
@@ -213,6 +215,18 @@
       {:else}
         <p>Loading status...</p>
       {/if}
+
+      <!-- Integration Demo: Upload + Assistant -->
+      <div class="integration-grid">
+        <div class="integration-card">
+          <h3>Document Upload</h3>
+          <DocumentUploadMachineIntegration />
+        </div>
+        <div class="integration-card">
+          <h3>AI Assistant</h3>
+          <AIAssistantMachineComponent />
+        </div>
+      </div>
     </div>
   {/if}
 
@@ -772,6 +786,27 @@
     font-size: 12px;
     margin-top: 8px !important;
     color: #ccc;
+  }
+
+  /* Integration Grid */
+  .integration-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .integration-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .integration-card h3 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    color: #333;
   }
 </style>
 

@@ -116,7 +116,7 @@ export async function logout(): Promise<void> {
  // Notify server of logout
  await fetch('/api/auth/logout', {
  method: 'POST',
- headers: {, Authorization: `Bearer ${token}` },
+ headers: { Authorization: `Bearer ${token}` },
  });
  }
 

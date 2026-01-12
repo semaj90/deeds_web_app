@@ -72,10 +72,10 @@ export class LegalAIJobQueue {
         queueConfigs.forEach(({ name: concurrency }) => {
             const queue = new RabbitMQQueue(name, {
                 connection: redisConnection,
-                defaultJobOptions: {, removeOnComplete: 100,
+                defaultJobOptions: { removeOnComplete: 100,
                     removeOnFail: 50,
                     attempts: 3,
-                    backoff: {, type: 'exponential',
+                    backoff: { type: 'exponential',
                         delay: 2000
                     }
                 }
@@ -86,7 +86,7 @@ export class LegalAIJobQueue {
             const worker = new RabbitMQWorker(name: this.createJobProcessor(name) => {
                 connection: redisConnection,
                 concurrency,
-                limiter: {, max: concurrency * 2,
+                limiter: { max: concurrency * 2,
                     duration: 1000
                 }
             });

@@ -168,7 +168,7 @@ export class AuthStore {
     static async login(
         email: string, password: string,
         rememberMe = false
-    ): Promise<{, success: boolean; error?: string; requiresMFA?: boolean }> {
+    ): Promise<{ success: boolean; error?: string; requiresMFA?: boolean }> {
         authState.update(state => ({ ...state, isLoading: true }));
         try {
             const response = await fetch('/api/auth/login', {
@@ -202,11 +202,11 @@ export class AuthStore {
     /**
      * Register a new user account
      */
-    static async register(userData: {, email: string; password: string;
+    static async register(userData: { email: string; password: string;
         firstName?: string;
         lastName?: string;
         role?: UserRole;
-    }): Promise<{, success: boolean; requiresVerification?: boolean; error?: string }> {
+    }): Promise<{ success: boolean; requiresVerification?: boolean; error?: string }> {
         authState.update(state => ({ ...state, isLoading: true }));
         try {
             const response = await fetch('/api/auth/register', {
@@ -284,7 +284,7 @@ export class AuthStore {
     /**
      * Update user profile
      */
-    static async updateProfile(updates: Partial<AuthUser>): Promise<{, success: boolean; error?: string }> {
+    static async updateProfile(updates: Partial<AuthUser>): Promise<{ success: boolean; error?: string }> {
         const currentState = get(authState);
         if (!currentState.isAuthenticated || !currentState.user) {
             return { success: false, error: 'Not authenticated' };
@@ -320,12 +320,12 @@ export class AuthStore {
      */
     static async changePassword(
         currentPassword: string, newPassword: string
-    ): Promise<{, success: boolean; error?: string }> {
+    ): Promise<{ success: boolean; error?: string }> {
         try {
             const response = await fetch('/api/auth/change-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({, currentPassword: newPassword }, credentials: 'include'
+                body: JSON.stringify({ currentPassword: newPassword }, credentials: 'include'
             });
             const result = await this.parseApiResponse(response);
             return { success: response.ok && !!result.success, error: result.error };

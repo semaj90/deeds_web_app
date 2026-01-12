@@ -36,11 +36,11 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  // ACE Pipeline State
  let pipelineState = $state<Record<StageKey, { progress: number; status: StageStatus; results?: any }>>({
- webCrawl: {, progress: 0, status: 'idle' },
- vlmProcess: {, progress: 0, status: 'idle' },
- graphBuild: {, progress: 0, status: 'idle' },
- vectorIndex: {, progress: 0, status: 'idle' },
- llmAnalyze: {, progress: 0, status: 'idle' }
+ webCrawl: { progress: 0, status: 'idle' },
+ vlmProcess: { progress: 0, status: 'idle' },
+ graphBuild: { progress: 0, status: 'idle' },
+ vectorIndex: { progress: 0, status: 'idle' },
+ llmAnalyze: { progress: 0, status: 'idle' }
  });
 
  let isProcessing = $state(false);
@@ -92,7 +92,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  const response = await fetch(stage.endpoint, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, routes: discoveredRoutes.map(r => r.route) })
+ body: JSON.stringify({ routes: discoveredRoutes.map(r => r.route) })
  });
 
  const result = await response.json();

@@ -98,7 +98,7 @@ Provide your analysis in this JSON structure:
 					{ role: 'user', content: prompt }
 				],
 				stream: false,
-				options: {, temperature: 0.3 }
+				options: { temperature: 0.3 }
 			})
 		});
 

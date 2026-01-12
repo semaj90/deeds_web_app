@@ -5,7 +5,7 @@
  id: string; title: string;
  status: 'active' | 'closed';
  createdAt: string; updatedAt: string;
- evidence: Array<{, id: string; status: string }>;
+ evidence: Array<{ id: string; status: string }>;
  }
 
  let { isLoading = false, cases = [] } = $props<{

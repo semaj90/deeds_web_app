@@ -3,7 +3,7 @@
  import { createEventDispatcher } from 'svelte';
 
  const dispatch = createEventDispatcher<{
- updated: Array<{, embeddingId: string;
+ updated: Array<{ embeddingId: string;
  thumbUrl: string;
  embedding?: number[] | null;
  frameIndex?: number;

@@ -79,7 +79,7 @@ export class PostgresKnowledgeStore {
    *
    * @param doc - Document data including embedding
    */
-  async upsertDocument(doc: {, qdrantId: number;
+  async upsertDocument(doc: { qdrantId: number;
     url: string; urlHash: string;
     title: string; summary: string;
     entities: string[]; tags: string[];
@@ -249,7 +249,7 @@ export class PostgresKnowledgeStore {
   /**
    * Get statistics
    */
-  async getStats(): Promise<{, rows: number }> {
+  async getStats(): Promise<{ rows: number }> {
     if (!this.isAvailable) {
       return { rows: 0 };
     }

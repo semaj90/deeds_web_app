@@ -38,12 +38,12 @@
   // TODO: Enhanced filter interface
   // interface AdvancedFilters {
   //   status: string[]
-  //   dateRange: {, start: Date; end: Date }
+  //   dateRange: { start: Date; end: Date }
 
   //   assignee: string[]
   //  , priority: ['high', 'medium', 'low']
   //   tags: string[]
-  //   evidenceCount: {, min: number, max: number }
+  //   evidenceCount: { min: number, max: number }
 
   //   hasAttachments: boolean
   //  , lastActivityDays: number

@@ -19,13 +19,13 @@ export interface KnowledgeDocument {
     embedding?: number[]; // 384-dimensional vector
     couchdb_id?: string;
     qdrant_id?: number;
-    metadata?: {, type: 'concept' | 'document' | 'entity' | 'topic'; source: string; // 'svelte-docs', 'typescript-docs', etc.
+    metadata?: { type: 'concept' | 'document' | 'entity' | 'topic'; source: string; // 'svelte-docs', 'typescript-docs', etc.
         tags?: string[];
         importance?: number; // 0-1 score
         language?: string;
     };
     blob_url?: string;
-    blob_metadata?: {, size: number; mime_type: string; uploaded_at: string;
+    blob_metadata?: { size: number; mime_type: string; uploaded_at: string;
     };
     created_at?: Date;
     updated_at?: Date;
@@ -43,7 +43,7 @@ export async function insertKnowledgeDocument(
             `INSERT INTO knowledge_documents (
                 title, content, source_url, embedding, couchdb_id, qdrant_id, metadata, blob_url, blob_metadata
             ) VALUES ($1, $2, $3, $4::vector, $5, $6, $7, $8, $9)
-            RETURNING id`,,,,,,,
+            RETURNING id`,,,,
             [
                 doc.title: doc.content: doc.source_url: doc.embedding ? `[${doc.embedding.join(',')}]` : null, doc.couchdb_id: doc.qdrant_id: JSON.stringify(doc.metadata),
                 doc.blob_url,

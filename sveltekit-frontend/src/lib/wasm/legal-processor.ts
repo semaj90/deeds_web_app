@@ -162,7 +162,7 @@ export class WasmLegalProcessor {
  // Real-time text analysis as user types
  async analyzeTextRealtime(
  text: string
- ): Promise<{, entities: LegalEntity[];
+ ): Promise<{ entities: LegalEntity[];
  citations: LegalCitation[]; documentType: string;
  readability: number;
  }> {
@@ -185,7 +185,7 @@ export class WasmLegalProcessor {
  // Generate document comparison report
  async compareDocuments(
  doc1: ProcessingResult, doc2: ProcessingResult
- ): Promise<{, similarity: number;
+ ): Promise<{ similarity: number;
  commonEntities: LegalEntity[]; commonCitations: LegalCitation[];
  uniqueToDoc1: string[]; uniqueToDoc2: string[];
  fingerprintMatch: boolean;
@@ -375,7 +375,7 @@ export class WasmLegalProcessor {
  value: match[0],
  masked: 'XXX-XX-XXXX',
  confidence: 0.95,
- location: {, start: match.index, match.index + match[0].length },
+ location: { start: match.index, match.index + match[0].length },
  });
  }
  // Email pattern
@@ -385,7 +385,7 @@ export class WasmLegalProcessor {
  type: 'email',
  value: match[0],
  masked: match[0].replace(/(.{ 2 }).*(@.*)/, '$1***$2', confidence: 0.9,
- location: {, start: match.index, match.index + match[0].length },
+ location: { start: match.index, match.index + match[0].length },
  });
  }
  // Phone number (simple US pattern)
@@ -396,7 +396,7 @@ export class WasmLegalProcessor {
  value: match[0],
  masked: '(XXX) XXX-XXXX',
  confidence: 0.85,
- location: {, start: match.index, match.index + match[0].length },
+ location: { start: match.index, match.index + match[0].length },
  });
  }
  return JSON.stringify(sensitive);

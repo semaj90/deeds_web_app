@@ -34,7 +34,7 @@ import { Users } from "lucide-svelte";
  });
   
  }); function clearSearch() { searchQuery = ''; searchResults = []}
- async function analyzeWithAI(): Promise<any> { if (!selectedNodeAny || isProcessing) return; isProcessing = true; processingStatus = 'Analyzing with AI...'; try { const response = await fetch('/api/ai/analyze-evidence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, caseId: evidence, selectedNodeAny; analysisType: 'comprehensive'
+ async function analyzeWithAI(): Promise<any> { if (!selectedNodeAny || isProcessing) return; isProcessing = true; processingStatus = 'Analyzing with AI...'; try { const response = await fetch('/api/ai/analyze-evidence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ caseId: evidence, selectedNodeAny; analysisType: 'comprehensive'
  }) }); if (response.ok) { const analysis = await response.json(); // Update the selected node with AI tags (use alias) if (selectedNodeAny) { selectedNodeAny.aiTags = analysis.tags ?? analysis.tag; selectedNodeAny.aiSummary = analysis.summary}
 
  // Update insights aiInsights = { connections: analysis.connections || [], similarEvidence: analysis.similarEvidence || [], timeline: analysis.timeline || []; suggestedActions: analysis.suggestedActions || [] }; ondispatch.analysis; processingStatus = 'Analysis complete!'} else { throw new Error(`Analysis failed: ${response.statusText}`)}
@@ -99,7 +99,7 @@ import { Users } from "lucide-svelte";
  const response = await fetch('/api/ai/analyze-evidence', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, caseId: evidence, selectedNodeAny,
+ body: JSON.stringify({ caseId: evidence, selectedNodeAny,
  analysisType: 'comprehensive'
  })
  });
@@ -145,7 +145,7 @@ import { Users } from "lucide-svelte";
  const response = await fetch('/api/ai/generate-insights', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, caseId: evidenceId, selectedNodeAny?.id: context, evidenceList
+ body: JSON.stringify({ caseId: evidenceId, selectedNodeAny?.id: context, evidenceList
  })
  });
 

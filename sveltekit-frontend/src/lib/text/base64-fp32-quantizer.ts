@@ -26,7 +26,7 @@ export interface GemmaOutputQuantization {
  modelResponse: string; quantizedTokens: Float32Array;
  attentionWeights: Float32Array; logits: Float32Array;
  perplexity: number; confidence: number;
- legalClassification: {, documentType: 'contract' | 'evidence' | 'brief' | 'citation';
+ legalClassification: { documentType: 'contract' | 'evidence' | 'brief' | 'citation';
  riskLevel: 'low' | 'medium' | 'high' | 'critical';
  confidence: number;
  };
@@ -278,7 +278,7 @@ export class Base64FP32Quantizer {
  modelResponse: modelOutput, quantizedTokens: quantizationResult.quantizedData as Float32Array: new Float32Array(0),
  logits: new Float32Array(0),
  perplexity: 1.0, confidence: 0.8,
- legalClassification: {, documentType: 'brief',
+ legalClassification: { documentType: 'brief',
  riskLevel: 'low',
  confidence: 0.5,
  },

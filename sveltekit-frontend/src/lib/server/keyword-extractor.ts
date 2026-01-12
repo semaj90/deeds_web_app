@@ -8,7 +8,7 @@ import { generateText } from './ollama-service.js';
 
 export interface KeywordExtractionResult {
  keywords: string[]; keyPhrases: string[];
- entities: Array<{, text: string;
+ entities: Array<{ text: string;
  type: 'PERSON' | 'ORGANIZATION' | 'LOCATION' | 'DATE' | 'MONEY' | 'OTHER';
  confidence: number;
  }>;
@@ -435,7 +435,7 @@ function isStopword(word: string): boolean {
  * Batch extract keywords from multiple documents
  */
 export async function extractKeywordsBatch(
- documents: Array<{, content: string;
+ documents: Array<{ content: string;
  documentType?: string;
  }>
 ): Promise<KeywordExtractionResult[]> {

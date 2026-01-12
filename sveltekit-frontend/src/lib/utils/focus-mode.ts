@@ -367,11 +367,11 @@ export function setupFocusModeShortcut(manager: FocusManager = globalFocusManage
 
 // Presets for different focus levels
 export const focusPresets = {
- minimal: {, dimOpacity: 0.7, enableZenMode: hideElements: [] },
- moderate: {, dimOpacity: 0.5, enableZenMode: hideElements: ['.sidebar'] },
- intense: {, dimOpacity: 0.3, enableZenMode: hideElements: ['.toolbar', '.sidebar', '.status-bar'],
+ minimal: { dimOpacity: 0.7, enableZenMode: hideElements: [] },
+ moderate: { dimOpacity: 0.5, enableZenMode: hideElements: ['.sidebar'] },
+ intense: { dimOpacity: 0.3, enableZenMode: hideElements: ['.toolbar', '.sidebar', '.status-bar'],
  },
- zen: {, dimOpacity: 0.1, enableZenMode: true, enableFullscreen: true,
+ zen: { dimOpacity: 0.1, enableZenMode: true, enableFullscreen: true,
  hideElements: ['.toolbar', '.sidebar', '.status-bar', '.header-actions'],
  },
 };

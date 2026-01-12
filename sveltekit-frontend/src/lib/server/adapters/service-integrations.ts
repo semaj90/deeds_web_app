@@ -45,7 +45,7 @@ export function loadServiceEnvironment(): ServiceEnvironment {
   return {
     // Database
     databaseUrl,
-    postgresConfig: {, host: dbUrl.hostname || 'localhost',
+    postgresConfig: { host: dbUrl.hostname || 'localhost',
       port: parseInt(dbUrl.port || '5432', 10),
       database: dbUrl.pathname.slice(1) || 'legal_ai_db',
       user: dbUrl.username || process.env.POSTGRES_USER || 'legal_admin',
@@ -58,7 +58,7 @@ export function loadServiceEnvironment(): ServiceEnvironment {
       fallbackPassword: process.env.POSTGRES_SUPERUSER_PASSWORD || 'postgres'
     },
     // Redis
-    redisConfig: {, url: process.env.REDIS_URL || 'redis://localhost:6379/0',
+    redisConfig: { url: process.env.REDIS_URL || 'redis://localhost:6379/0',
       password: process.env.REDIS_PASSWORD || undefined,
       host: process.env.REDIS_HOST || 'localhost',
       port: parseInt(process.env.REDIS_PORT || '6379', 10),
@@ -67,20 +67,20 @@ export function loadServiceEnvironment(): ServiceEnvironment {
       enableReadyCheck: true
     },
     // Qdrant
-    qdrantConfig: {, host: process.env.QDRANT_HOST || 'localhost',
+    qdrantConfig: { host: process.env.QDRANT_HOST || 'localhost',
       port: parseInt(process.env.QDRANT_PORT || '6333', 10),
       apiKey: process.env.QDRANT_API_KEY,
       timeout: 30000
     },
     // Ollama
-    ollamaConfig: {, baseUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
+    ollamaConfig: { baseUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
       embeddingModel: process.env.EMBEDDING_MODEL || 'embeddinggemma:latest',
       chatModel: process.env.CHAT_MODEL || 'gemma3:legal-latest',
       gpuLayers: parseInt(process.env.OLLAMA_GPU_LAYERS || '30', 10),
       timeout: 60000
     },
     // MinIO
-    minioConfig: {, endPoint: (process.env.MINIO_ENDPOINT || 'localhost:9000').split(':')[0],
+    minioConfig: { endPoint: (process.env.MINIO_ENDPOINT || 'localhost:9000').split(':')[0],
       port: parseInt(
         (process.env.MINIO_ENDPOINT || 'localhost:9000').split(':')[1] ||
           process.env.MINIO_PORT ||
@@ -93,7 +93,7 @@ export function loadServiceEnvironment(): ServiceEnvironment {
       region: 'us-east-1'
     },
     // Neo4j
-    neo4jConfig: {, uri: process.env.NEO4J_URI || 'bolt://localhost:7687',
+    neo4jConfig: { uri: process.env.NEO4J_URI || 'bolt://localhost:7687',
       user: process.env.NEO4J_USER || 'neo4j',
       password: process.env.NEO4J_PASSWORD || 'password',
       database: process.env.NEO4J_DATABASE || 'neo4j',
@@ -168,7 +168,7 @@ export class OllamaAdapter implements OllamaClient {
       body: JSON.stringify({
         model,
         prompt,
-        options: {, num_predict: opts?.maxTokens ?? 512 }
+        options: { num_predict: opts?.maxTokens ?? 512 }
       }),
       signal: AbortSignal.timeout(this.config.timeout || 60000)
     });
@@ -182,7 +182,7 @@ export class OllamaAdapter implements OllamaClient {
   }
 
   async chat(
-    messages: Array<{, role: string; content: string }>,
+    messages: Array<{ role: string; content: string }>,
     opts?: { model?: string; stream?: boolean }
   ): Promise<string | AsyncIterable<string>> {
     const model = opts?.model ?? this.config.chatModel || 'gemma3:legal-latest';
@@ -238,7 +238,7 @@ export class OllamaAdapter implements OllamaClient {
       throw new Error(`Ollama listModels failed: ${response.statusText}`);
     }
     const data = await response.json();
-    return data.models?.map((m: {, name: string }) => m.name) || [];
+    return data.models?.map((m: { name: string }) => m.name) || [];
   }
 }
 
@@ -264,7 +264,7 @@ export class RedisAdapter implements RedisCacheService {
     this.connected = true;
   }
 
-  private parseRedisUrl(url: string): {, host: string; port: number; password?: string } {
+  private parseRedisUrl(url: string): { host: string; port: number; password?: string } {
     try {
       const parsed = new URL(url);
       return {
@@ -345,7 +345,7 @@ export class QdrantAdapter implements QdrantClient {
   async createCollection(name: string, vectorSize: number): Promise<void> {
     await this.ensureClient();
     await this.client.createCollection(name, {
-      vectors: {, size: vectorSize, distance: 'Cosine' }
+      vectors: { size: vectorSize, distance: 'Cosine' }
     });
   }
 
@@ -392,7 +392,7 @@ export class QdrantAdapter implements QdrantClient {
   async getCollections(): Promise<string[]> {
     await this.ensureClient();
     const result = await this.client.getCollections();
-    return result.collections?.map((c: {, name: string }) => c.name) || [];
+    return result.collections?.map((c: { name: string }) => c.name) || [];
   }
 }
 
@@ -417,7 +417,7 @@ export class PgVectorAdapter implements PgVectorClient {
     });
   }
 
-  async query(sql: string, params?: unknown[]): Promise<{, rows: any[] }> {
+  async query(sql: string, params?: unknown[]): Promise<{ rows: any[] }> {
     await this.ensurePool();
     return this.pool.query(sql, params);
   }
@@ -430,7 +430,7 @@ export class PgVectorAdapter implements PgVectorClient {
     collection: string,
     vector: number[],
     limit?: number
-  ): Promise<Array<{, id: string; similarity: number; metadata: Record<string, unknown> }>> {
+  ): Promise<Array<{ id: string; similarity: number; metadata: Record<string, unknown> }>> {
     const vectorStr = `[${vector.join(',')}]`;
     const sql = `
       SELECT id, 1 - (embedding <=> $1::vector) as similarity, metadata
@@ -444,7 +444,7 @@ export class PgVectorAdapter implements PgVectorClient {
 
   async insert(
     collection: string,
-    vectors: Array<{, id: string; vector: number[]; metadata?: Record<string, unknown> }>
+    vectors: Array<{ id: string; vector: number[]; metadata?: Record<string, unknown> }>
   ): Promise<void> {
     const values = vectors
       .map((_, i) => `($${i * 3 + 1}, $${i * 3 + 2}::vector, $${i * 3 + 3}::jsonb)`)
@@ -515,7 +515,7 @@ export class MinIOAdapter implements MinIOClient {
     key: string,
     data: Buffer | ReadableStream,
     metadata?: Record<string, string>
-  ): Promise<{, etag: string }> {
+  ): Promise<{ etag: string }> {
     await this.ensureClient();
     const result = await this.client.putObject(bucket, key, data, undefined, metadata);
     return { etag: result.etag };
@@ -534,10 +534,10 @@ export class MinIOAdapter implements MinIOClient {
   async listObjects(
     bucket: string,
     prefix?: string
-  ): Promise<Array<{, name: string; size: number; etag: string }>> {
+  ): Promise<Array<{ name: string; size: number; etag: string }>> {
     await this.ensureClient();
     const stream = this.client.listObjects(bucket, prefix, true);
-    const objects: Array<{, name: string; size: number; etag: string }> = [];
+    const objects: Array<{ name: string; size: number; etag: string }> = [];
     return new Promise((resolve, reject) => {
       stream.on('data', (obj: any) => {
         objects.push({ name: obj.name, size: obj.size, etag: obj.etag });
@@ -547,7 +547,7 @@ export class MinIOAdapter implements MinIOClient {
     });
   }
 
-  async listBuckets(): Promise<Array<{, name: string }>> {
+  async listBuckets(): Promise<Array<{ name: string }>> {
     await this.ensureClient();
     return this.client.listBuckets();
   }
@@ -573,7 +573,7 @@ export class Neo4jAdapter implements Neo4jClient {
   async run(
     cypher: string,
     params?: Record<string, unknown>
-  ): Promise<{, records: Array<{ toObject(): any }> }> {
+  ): Promise<{ records: Array<{ toObject(): any }> }> {
     await this.ensureDriver();
     return this.session.run(cypher, params);
   }

@@ -2,7 +2,7 @@
   import { enhance } from '$app/forms';
   import type { PageData } from './$types';
 
- let { data }: {, data: PageData } = $props();
+ let { data }: { data: PageData } = $props();
 
  let analysisQuery = $state('');
  let analysisResults: any[] = $state([]);

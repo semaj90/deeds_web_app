@@ -67,7 +67,7 @@ export interface SimdHealthResponse {
 }
 
 export interface SimdBatchResponse {
-	results: Array<{, index: number;
+	results: Array<{ index: number;
 		result?: any;
 		error?: string; success: boolean;
 	}>;
@@ -146,7 +146,7 @@ class QUICClient {
 		try {
 			const response = await this.fetch('/health', {
 				method: 'GET',
-				headers: {, Accept: 'application/json' }
+				headers: { Accept: 'application/json' }
 			});
 
 			if (response.ok) {
@@ -210,7 +210,7 @@ class QUICClient {
 			const response = await this.fetch('/parse', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, text: jsonText, type: options?.type ?? 'general',
+				body: JSON.stringify({ text: jsonText, type: options?.type ?? 'general',
 					field: options?.field
 				})
 			});
@@ -244,7 +244,7 @@ class QUICClient {
 		}
 	}
 
-	async parseJsonBatch(requests: Array<{, text: string;
+	async parseJsonBatch(requests: Array<{ text: string;
 		type?: string;
 		field?: string;
 	}>): Promise<SimdBatchResponse> {
@@ -274,7 +274,7 @@ class QUICClient {
 			const response = await this.fetch('/analyze', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, text: jsonText, type: options?.type ?? 'structure_analysis'
+				body: JSON.stringify({ text: jsonText, type: options?.type ?? 'structure_analysis'
 				})
 			});
 
@@ -319,7 +319,7 @@ class QUICClient {
 					'Content-Type': 'application/json',
 					'X-Stream-ID': streamId, Accept: 'text/plain'
 				},
-				body: JSON.stringify({, operation: operation.type: Array.isArray(operation.input) ? operation.input : Array.from(operation.input),
+				body: JSON.stringify({ operation: operation.type: Array.isArray(operation.input) ? operation.input : Array.from(operation.input),
 					shape: operation.shape, operation.metadata
 				})
 			});
@@ -349,7 +349,7 @@ class QUICClient {
 					'Content-Type': 'application/json',
 					'X-Stream-ID': streamId, Accept: 'text/plain'
 				},
-				body: JSON.stringify({, content: documentContent,
+				body: JSON.stringify({ content: documentContent,
 					document_type: 'legal',
 					practice_area: 'general',
 					jurisdiction: 'US'
@@ -647,7 +647,7 @@ class QUICClient {
 	}
 
 	// Get stream statistics
-	getStreamStats(): {, total: number;
+	getStreamStats(): { total: number;
 		active: number; completed: number;
 		errors: number; byTypes: Record<string, number>;
 	} {

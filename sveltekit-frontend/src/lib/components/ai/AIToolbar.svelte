@@ -42,7 +42,7 @@
         category: 'all',
         maxResults: 10,
         useAI: true,
-        advancedOptions: {, useVector: true,
+        advancedOptions: { useVector: true,
           similarityThreshold: 0.7
         }
       };
@@ -120,7 +120,7 @@
     summaryResult = '';
     errorMessage = '';
     try {
-      const payload = { text: summarizeText, type: 'legal', options: {, max_tokens: 500 } };
+      const payload = { text: summarizeText, type: 'legal', options: { max_tokens: 500 } };
       const response = await fetch('/api/ai/summarize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

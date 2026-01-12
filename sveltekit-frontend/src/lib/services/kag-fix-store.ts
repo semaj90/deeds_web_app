@@ -70,10 +70,10 @@ export class KAGFixStore {
  * - 123 → N for all numbers
  * - Lowercase + trim
  *
- * Input: {, message: file, code, tool, position }
- * Output: {, sig: message, file, code, tool, fileExt }
+ * Input: { message: file, code, tool, position }
+ * Output: { sig: message, file, code, tool, fileExt }
  */
- computeSignature(error: {, message: string;
+ computeSignature(error: { message: string;
  file?: string;
  code?: string, tool?: string, position?: number, }): ErrorSignature {
  // Normalize error message (remove file paths, line numbers)
@@ -208,7 +208,7 @@ export class KAGFixStore {
  /**
  * Get fix by patch ID (reverse lookup)
  */
- async getFixByPatchId(patchId: string): Promise<{, errorSig: ErrorSignature, fixes: FixRecord[];
+ async getFixByPatchId(patchId: string): Promise<{ errorSig: ErrorSignature, fixes: FixRecord[];
  } | null> {
  const patchKey, = `${this.PATCH_PREFIX}${ patchId }`;
 
@@ -341,7 +341,7 @@ export class KAGFixStore {
  /**
  * Export KAG data for analysis
  */
- async exportData(): Promise<{, signatures: Array<{ sig: string, fixes: FixRecord[] }>;
+ async exportData(): Promise<{ signatures: Array<{ sig: string, fixes: FixRecord[] }>;
  stats: KAGStats;
  }> {
  try {
@@ -358,7 +358,7 @@ export class KAGFixStore {
  console.error('KAG Export Error:', error;
  return {
  signatures: [],
- stats: {, totalSignatures: 0, totalFixes: 0,
+ stats: { totalSignatures: 0, totalFixes: 0,
  avgConfidence: 0,
  topFixes: [],
  recentFixes: [],

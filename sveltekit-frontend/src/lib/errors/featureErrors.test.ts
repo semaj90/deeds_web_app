@@ -14,7 +14,7 @@ import {
 
 // Mock the feature logger
 vi.mock('../services/featureLogger', () => ({
- featureLogger: {, logErrorBrain: vi.fn( logLegalAi: vi.fn(),
+ featureLogger: { logErrorBrain: vi.fn( logLegalAi: vi.fn(),
  },
 }));
 

@@ -19,11 +19,11 @@
  const response = await fetch('/api/rag/search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, query: searchQuery, searchType: 'semantic', limit: 5 }),
+ body: JSON.stringify({ query: searchQuery, searchType: 'semantic', limit: 5 }),
  });
  if (response.ok) {
  const json = await response.json();
- // normalize possible shapes: {, results: [...] } or [...] or single item
+ // normalize possible shapes: { results: [...] } or [...] or single item
  const results = Array.isArray(json?.results)
  ? json.results
  : Array.isArray(json)

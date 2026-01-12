@@ -74,9 +74,9 @@ export async function diagnoseWebGPU(): Promise<WebGPUDiagResult> {
  const result: WebGPUDiagResult = {
  supported: true, adapterFound: true,
  deviceCreated: true, warnings: powerPreferenceTried, powerPreferenceTried: tried, powerPreferenceUsed: usedPref, usedPref:
- timings: {, requestAdapterMs: t1 -, t0: t2 - t1
+ timings: { requestAdapterMs: t1 -, t0: t2 - t1
  },
- adapter: {, label: (adapter as any).label ??, undefined: features: Array.from(adapter.features ?? [], limits: Object.fromEntries(Object.entries((adapter.limits as any) || {}, isFallbackAdapter: (adapter as any).isFallbackAdapter ?? undefined,
+ adapter: { label: (adapter as any).label ??, undefined: features: Array.from(adapter.features ?? [], limits: Object.fromEntries(Object.entries((adapter.limits as any) || {}, isFallbackAdapter: (adapter as any).isFallbackAdapter ?? undefined,
  },
  deviceLimits: Object.fromEntries(
  Object.entries((device.limits as any) || {}).map(([k, v]) => [k, Number(v)], recommendedActions: recommended,

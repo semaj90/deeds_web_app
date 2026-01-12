@@ -48,7 +48,7 @@ export interface PhoenixWrightSearchRequest {
  caseId: string; query: string;
  searchType: 'precedents' | 'contradictions' | 'evidence' | 'comprehensive';
  jurisdiction?: string;
- dateRange?: {, start: string; end: string };
+ dateRange?: { start: string; end: string };
  maxResults?: number;
  includeTestimony?: boolean;
  detectContradictions?: boolean;
@@ -838,7 +838,7 @@ Provide 2-3 specific strategic recommendations for the prosecution team.`;
  */
  private determineRiskLevel(
  score: number,
- thresholds: {, low: number; medium: number; high: number }
+ thresholds: { low: number; medium: number; high: number }
  ): 'low' | 'medium' | 'high' | 'critical' | 'urgent' {
  if (score >= thresholds.high) return 'high';
  if (score >= thresholds.medium) return 'medium';

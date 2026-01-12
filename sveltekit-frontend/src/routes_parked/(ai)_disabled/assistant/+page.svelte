@@ -29,7 +29,7 @@
  const response = await fetch('/api/ai/chat', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, message: messageToSend,
+ body: JSON.stringify({ message: messageToSend,
  model: 'gemma3-legal:latest',
  useRAG: true,
  }),

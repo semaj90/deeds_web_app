@@ -18,7 +18,7 @@
   }
 
    // Batch processing demo async function batchProcess(): Promise<any> { if (isProcessing) return; isProcessing = true; try { console.log('ðŸ“¦ Starting batch processing');
-   const batchRequests = [ { cacheKey: 'contracts_batch', config: {, type: 'optimized' as PipelineType } }, { cacheKey: 'evidence_batch', config: {, type: 'advanced' as PipelineType } }, { cacheKey: 'cases_batch', config: {, type: 'end-to-end' as PipelineType } } ];
+   const batchRequests = [ { cacheKey: 'contracts_batch', config: { type: 'optimized' as PipelineType } }, { cacheKey: 'evidence_batch', config: { type: 'advanced' as PipelineType } }, { cacheKey: 'cases_batch', config: { type: 'end-to-end' as PipelineType } } ];
    const batchResults = await pipelineManager.batchProcess(batchRequests); results = [...batchResults, ...results.slice(0, 7)]; updateMetrics()} catch (error) { console.error('Batch processing failed:', error)} finally { isProcessing = false}
   }
 

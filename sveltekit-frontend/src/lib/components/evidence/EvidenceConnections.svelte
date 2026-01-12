@@ -26,7 +26,7 @@
  updatedAt: string;
  };
 
- let { nodes, connections }: {, nodes: Writable<EvidenceNodeType[]>;
+ let { nodes, connections }: { nodes: Writable<EvidenceNodeType[]>;
  connections: Writable<EvidenceConnection[]>;
  } = $props();
 

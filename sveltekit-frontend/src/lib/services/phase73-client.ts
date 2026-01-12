@@ -103,7 +103,7 @@ export class Phase73Client {
  /**
  * Get backend health status
  */
- async getHealth(): Promise<{, status: 'healthy' | 'degraded' | 'unhealthy';
+ async getHealth(): Promise<{ status: 'healthy' | 'degraded' | 'unhealthy';
  version: string; uptime: number;
  services: Record<string, boolean>;
  }> {

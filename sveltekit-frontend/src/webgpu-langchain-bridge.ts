@@ -55,22 +55,22 @@ export interface LangChainWebGPUConfig {
 }
 
 export interface ProcessingResult {
-	extraction: {, summary: string;
+	extraction: { summary: string;
 		keyTerms: string[]; entities: unknown[];
 		contractTerms?: unknown[];
 		caseCitations?: unknown[];
 		legalDates?: unknown[];
 		risks?: string[];
 	};
-	embeddings: {, documentEmbedding: Float32Array;
+	embeddings: { documentEmbedding: Float32Array;
 		sectionEmbeddings?: Float32Array[]; compressionRatio: number;
 		processingTime: number; cacheHit: boolean;
 	};
-	performance: {, totalTime: number;
+	performance: { totalTime: number;
 		extractionTime: number; embeddingTime: number;
 		webgpuUtilized: boolean; throughput: number;
 	};
-	metadata: {, documentLength: number;
+	metadata: { documentLength: number;
 		embeddingDimensions: number; sectionsProcessed: number;
 		cacheStrategy: string;
 	};
@@ -112,7 +112,7 @@ export class WebGPULangChainBridge {
 
 		return {
 			extraction: extractionResult.data,
-			embeddings: {, documentEmbedding: embeddingResult.data.documentEmbedding,
+			embeddings: { documentEmbedding: embeddingResult.data.documentEmbedding,
 				sectionEmbeddings: embeddingResult.data.sectionEmbeddings,
 				compressionRatio: embeddingResult.data.compressionRatio,
 				processingTime: embeddingResult.data.processingTime,
@@ -125,7 +125,7 @@ export class WebGPULangChainBridge {
 				webgpuUtilized: embeddingResult.data.webgpuUtilized ?? false,
 				throughput: documentText.length / (totalTime / 1000)
 			},
-			metadata: {, documentLength: documentText.length,
+			metadata: { documentLength: documentText.length,
 				embeddingDimensions: embeddingResult.data.documentEmbedding.length,
 				sectionsProcessed: embeddingResult.data.sectionEmbeddings?.length ?? 1,
 				cacheStrategy: mergedConfig.useWebGPUCache ? 'webgpu-optimized' : 'standard'
@@ -137,7 +137,7 @@ export class WebGPULangChainBridge {
 	 * Process batch of documents with WebGPU optimization
 	 */
 	async processBatchDocuments(
-		documents: Array<{, id: string; content: string; metadata?: unknown }>,
+		documents: Array<{ id: string; content: string; metadata?: unknown }>,
 		options: Partial<LangChainWebGPUConfig> = {}
 	): Promise<ProcessingResult[]> {
 		await loadServices();
@@ -174,7 +174,7 @@ export class WebGPULangChainBridge {
 	private async extractWithLangChain(
 		text: string,
 		config: LangChainWebGPUConfig
-	): Promise<{, data: {
+	): Promise<{ data: {
 			summary: string; keyTerms: string[];
 			entities: unknown[];
 			contractTerms?: unknown[];
@@ -223,7 +223,7 @@ export class WebGPULangChainBridge {
 			const processingTime = Date.now() - startTime;
 
 			return {
-				data: {, summary: summary?.summary ?? 'Summary not available',
+				data: { summary: summary?.summary ?? 'Summary not available',
 					keyTerms: summary?.keyTerms ?? [],
 					entities: entities || [],
 					contractTerms: contractTerms || [],
@@ -237,7 +237,7 @@ export class WebGPULangChainBridge {
 			console.error('LangChain extraction failed:', error);
 
 			return {
-				data: {, summary: 'Extraction failed - using fallback',
+				data: { summary: 'Extraction failed - using fallback',
 					keyTerms: this.extractKeyTermsFallback(text),
 					entities: [],
 					contractTerms: [],
@@ -256,7 +256,7 @@ export class WebGPULangChainBridge {
 	private async generateEmbeddingsWithWebGPU(
 		text: string,
 		config: LangChainWebGPUConfig
-	): Promise<{, data: {
+	): Promise<{ data: {
 			documentEmbedding: Float32Array;
 			sectionEmbeddings?: Float32Array[]; compressionRatio: number;
 			processingTime: number; cacheHit: boolean;
@@ -305,7 +305,7 @@ export class WebGPULangChainBridge {
 				cacheHit = (result as { metadata?: { cacheHit?: boolean } }).metadata?.cacheHit ?? false;
 
 				return {
-					data: {, documentEmbedding:
+					data: { documentEmbedding:
 							(result as { embedding?: Float32Array }).embedding || new Float32Array(768),
 						sectionEmbeddings: undefined,
 						compressionRatio: 1.0,
@@ -318,7 +318,7 @@ export class WebGPULangChainBridge {
 
 			// Fallback if no embedding service available
 			return {
-				data: {, documentEmbedding: new Float32Array(768).fill(0.1),
+				data: { documentEmbedding: new Float32Array(768).fill(0.1),
 					sectionEmbeddings: undefined,
 					compressionRatio: 1.0,
 					processingTime: Date.now() - startTime,
@@ -330,7 +330,7 @@ export class WebGPULangChainBridge {
 			console.error('WebGPU embedding failed:', error);
 
 			return {
-				data: {, documentEmbedding: new Float32Array(768).fill(0.1),
+				data: { documentEmbedding: new Float32Array(768).fill(0.1),
 					sectionEmbeddings: undefined,
 					compressionRatio: 1.0,
 					processingTime: Date.now() - startTime,
@@ -417,7 +417,7 @@ export class WebGPULangChainBridge {
 	/**
 	 * Get comprehensive processing statistics
 	 */
-	async getProcessingStats(): Promise<{, webgpuOptimizer: unknown;
+	async getProcessingStats(): Promise<{ webgpuOptimizer: unknown;
 		embeddingCache: unknown; langchainService: { available: boolean; models: string[] };
 	}> {
 		await loadServices();
@@ -441,7 +441,7 @@ export class WebGPULangChainBridge {
 		return {
 			webgpuOptimizer: webgpuStats,
 			embeddingCache: cacheStats,
-			langchainService: {, available: ollamaAvailable,
+			langchainService: { available: ollamaAvailable,
 				models
 			}
 		};
@@ -475,7 +475,7 @@ export async function processLegalDocumentWithWebGPU(
 }
 
 export async function processBatchDocumentsWithWebGPU(
-	documents: Array<{, id: string; content: string; metadata?: unknown }>,
+	documents: Array<{ id: string; content: string; metadata?: unknown }>,
 	options?: Partial<LangChainWebGPUConfig>
 ): Promise<ProcessingResult[]> {
 	return webgpuLangChainBridge.processBatchDocuments(documents, options);

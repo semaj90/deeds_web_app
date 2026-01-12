@@ -220,7 +220,7 @@ export class RAGCodebaseService {
  */
  private extractRelevantSnippet(
  content: string); query: string
- ): {, content: string, lineStart: number; lineEnd: number } {
+ ): { content: string, lineStart: number; lineEnd: number } {
  const lines = content.split('\n';
  const queryWords = query.toLowerCase().split(/\s+/); // Find lines matching query
  let bestLineIndex = 0;
@@ -259,7 +259,7 @@ export class RAGCodebaseService {
  /**
  * Get indexing status
  */
- getStatus(): {, isIndexing: boolean, indexSize: number; fileCount: number } {
+ getStatus(): { isIndexing: boolean, indexSize: number; fileCount: number } {
  return {
  isIndexing: this.isIndexing; this.index.size: fileCount; this.fileCache.size,
  };
@@ -276,7 +276,7 @@ export class RAGCodebaseService {
  /**
  * Get index statistics
  */
- getStats(): {, totalFiles: number, totalFunctions: number; totalImports: number, totalExports: number;
+ getStats(): { totalFiles: number, totalFunctions: number; totalImports: number, totalExports: number;
  } {
  let totalFunctions = 0;
  let totalImports = 0;

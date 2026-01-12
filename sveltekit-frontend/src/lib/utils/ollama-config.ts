@@ -80,7 +80,7 @@ export async function getAvailableModels(): Promise<string[]> {
  throw new Error(`Failed to fetch models: ${response.statusText}`);
  }
 
- const data = (await response.json()) as { models: Array<{, name: string }> };
+ const data = (await response.json()) as { models: Array<{ name: string }> };
  return data.models.map((m) => m.name);
  } catch (error) {
  console.error('Failed to get available models:', error);

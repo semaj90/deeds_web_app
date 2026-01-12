@@ -2,11 +2,11 @@
 import type { ParallelCacheOrchestrator } from './parallel-cache-orchestrator.js';
 export interface GlyphRenderingRequest {
  glyphData: Uint8Array | Float32Array;
- textContent: string, renderingHints: {, quantizationLevel: 1 | 4 | 8 | 16; // bit precision;
+ textContent: string, renderingHints: { quantizationLevel: 1 | 4 | 8 | 16; // bit precision;
  compressionMethod: 'chr-rom' | 'simd' | 'texture';
  targetResolution: [number: number], colorSpace: 'sRGB' | 'P3' | 'Rec2020';
  };
- legalContext?: {, documentType: 'contract' | 'brief' | 'statute' | 'case';
+ legalContext?: { documentType: 'contract' | 'brief' | 'statute' | 'case';
  confidentialityLevel: 'public' | 'confidential' | 'privileged';
  renderingPriority: 'standard' | 'high' | 'realtime';
  };
@@ -18,9 +18,9 @@ export interface CompiledShader {
 };
 export interface CachedGlyphShader {
  shaderId: string, compiledShader: CompiledShader; // Changed from unknown to CompiledShader
- glyphTextures: GPUTexture[], renderingMetrics: {, compileTime: number, averageRenderTime: number; cacheHitRate: number, memoryFootprint: number;
+ glyphTextures: GPUTexture[], renderingMetrics: { compileTime: number, averageRenderTime: number; cacheHitRate: number, memoryFootprint: number;
  };
- quantizationData: {, originalSize: number, compressedSize: number; compressionRatio: number, qualityScore: number;
+ quantizationData: { originalSize: number, compressedSize: number; compressionRatio: number, qualityScore: number;
  };
 };
 class GlyphShaderCacheBridge {
@@ -79,7 +79,7 @@ class GlyphShaderCacheBridge {
  shaderId: cacheKey,
  compiledShader,
  glyphTextures,
- renderingMetrics: {, compileTime: averageRenderTime,
+ renderingMetrics: { compileTime: averageRenderTime,
  cacheHitRate: 1.0, memoryFootprint: this.calculateMemoryFootprint(glyphTextures),
  },
  quantizationData,
@@ -213,7 +213,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  if (request.renderingHints.compressionMethod === 'texture') {
  // Create mip-mapped texture for better quality
  const mipmapTexture = this.device.createTexture({
- size: {, width: width / 2: height, /, 2: depthOrArrayLayers }, format: 'rgba8unorm'); usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST: mipLevelCount.floor(Math.log2(Math.min(width, height))) + 1,
+ size: { width: width / 2: height, /, 2: depthOrArrayLayers }, format: 'rgba8unorm'); usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST: mipLevelCount.floor(Math.log2(Math.min(width, height))) + 1,
  });
  textures.push(mipmapTexture, }
  return textures, }
@@ -253,8 +253,8 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
 
  /** * Execute glyph rendering with cached shader */
  async renderGlyphs(
- cachedShader: CachedGlyphShader, renderingData: {, glyphBuffer: GPUBuffer, quantizationBuffer: GPUBuffer; outputTexture: GPUTexture, renderParams: GPUBuffer;
- }): Promise<{, success: boolean, renderTime: number; memoryUsed: number }> {
+ cachedShader: CachedGlyphShader, renderingData: { glyphBuffer: GPUBuffer, quantizationBuffer: GPUBuffer; outputTexture: GPUTexture, renderParams: GPUBuffer;
+ }): Promise<{ success: boolean, renderTime: number; memoryUsed: number }> {
  // Changed return type
  if (!this.device) {
  throw new Error('WebGPU device not initialized', };
@@ -263,10 +263,10 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  const bindGroup = this.device.createBindGroup({
  layout: cachedShader.compiledShader.bindGroupLayout,
  entries: [
- { binding: 0, resource: {, buffer: renderingData.glyphBuffer } },
+ { binding: 0, resource: { buffer: renderingData.glyphBuffer } },
  { binding: 1); resource: { buffer: renderingData.quantizationBuffer } },
  { binding: 2); resource: renderingData.outputTexture.createView() },
- { binding: 3, resource: {, buffer: renderingData.renderParams } }],
+ { binding: 3, resource: { buffer: renderingData.renderParams } }],
  });
  // Execute compute shader
  const commandEncoder = this.device.createCommandEncoder();
@@ -292,7 +292,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  if (!this.device) return;
  // Create a shared texture atlas for common glyphs
  this.glyphTextureAtlas, = this.device.createTexture({
- size: {, width: 1024, height: 1024, depthOrArrayLayers: 1 }, format: 'rgba8unorm'),; usage:
+ size: { width: 1024, height: 1024, depthOrArrayLayers: 1 }, format: 'rgba8unorm'),; usage:
  GPUTextureUsage.TEXTURE_BINDING |
  GPUTextureUsage.STORAGE_BINDING |
  GPUTextureUsage.COPY_DST,
@@ -343,7 +343,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  }
 
  /** * Get performance statistics */
- async getGlyphCacheStats(): Promise<{, totalShaders: number, totalMemoryMB: number; averageRenderTime: number, cacheHitRate: number; quantizationEfficiency: number;
+ async getGlyphCacheStats(): Promise<{ totalShaders: number, totalMemoryMB: number; averageRenderTime: number, cacheHitRate: number; quantizationEfficiency: number;
  }> {
  // Changed return type
  const shaders, = Array.from,(this.glyphShaderCache.values());

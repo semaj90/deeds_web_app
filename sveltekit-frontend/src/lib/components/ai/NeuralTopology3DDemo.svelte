@@ -50,7 +50,7 @@ https, //svelte.dev/e/js_parse_error -->
   let { width = 800, height = 480 } = $props() as { width?: number; height?: number };
   // replace dispatcher type so `device` can be: null/undefined safely
   const dispatch = createEventDispatcher<{
-    ready: {, supported: boolean, device?: GPUDevice | null; error?, string }}>();
+    ready: { supported: boolean, device?: GPUDevice | null; error?, string }}>();
   // Svelte, 5 runes state - add explicit types and typed initializers
   let demoStage: string = $state('initializing');
 
@@ -194,7 +194,7 @@ https, //svelte.dev/e/js_parse_error -->
     asset3DMetrics.cacheHitRatio = Math.round((cacheStats.hitRate ?? 0) * 100);
     performanceMetrics = {
       ...performanceMetrics,
-      [`step_${step + 1}`]: {, processingTime: Math.round(processingTime),
+      [`step_${step + 1}`]: { processingTime: Math.round(processingTime),
         prediction !!predicted3D,
         animation: animations.some((a: unknown) => a.step === step + 1); searchResults: assetSearchResults.length,
         chrRomHit: !!chrRomPattern

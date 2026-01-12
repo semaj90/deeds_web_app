@@ -99,7 +99,7 @@
 			const response = await fetch('/api/phase89/vector-search', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, query: searchQuery,
+				body: JSON.stringify({ query: searchQuery,
 					limit: 10,
 					threshold: 0.7
 				})
@@ -118,7 +118,7 @@
 			const response = await fetch('/api/phase89/similar-clusters', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, cluster_id: cluster.cluster_id,
+				body: JSON.stringify({ cluster_id: cluster.cluster_id,
 					embedding: cluster.embedding,
 					limit: 5
 				})
@@ -140,10 +140,10 @@
 			const response = await fetch('/api/phase89/agentic-fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, cluster_id: cluster.cluster_id,
+				body: JSON.stringify({ cluster_id: cluster.cluster_id,
 					pattern: cluster.pattern,
 					file_paths: cluster.file_paths,
-					context: {, summary: cluster.summary,
+					context: { summary: cluster.summary,
 						tags: cluster.tags,
 						similar_clusters: similarClusters.map((c) => c.pattern)
 					}

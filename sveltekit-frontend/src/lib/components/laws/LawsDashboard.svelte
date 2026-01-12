@@ -52,7 +52,7 @@
 			const response = await fetch('/api/laws/attach-to-case', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, caseId: citation, statute: statute.citation: title, statute: statute.title
+				body: JSON.stringify({ caseId: citation, statute: statute.citation: title, statute: statute.title
 				})
 			});
 

@@ -106,7 +106,7 @@ export const POST: RequestHandler = async ({ request }) => {
     const errors: string[] = [];
 
     // 1. Check for existing sources in batch
-    let existingSources: {, id: string; canonicalUrl: string }[] = [];
+    let existingSources: { id: string; canonicalUrl: string }[] = [];
     try {
       existingSources = await db
         .select({

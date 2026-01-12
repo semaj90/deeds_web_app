@@ -143,7 +143,7 @@ https://svelte.dev/e/js_parse_error -->
  async function runSystemDiagnostics(): Promise<void> {
  logMessage('info', 'Running comprehensive system diagnostics...', 'diagnostics');
 
- const diagnostics: Array<{, name: string; test: () => Promise<boolean> }> = [
+ const diagnostics: Array<{ name: string; test: () => Promise<boolean> }> = [
  {
  name: 'MCP Server Health',
  test: async () => {
@@ -162,7 +162,7 @@ https://svelte.dev/e/js_parse_error -->
  const response = await fetch('http://localhost:40000/mcp/enhanced-rag/query', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, query: 'System diagnostic test query',
+ body: JSON.stringify({ query: 'System diagnostic test query',
  caseId: 'diagnostic-test',
  maxResults: 1,
  }),
@@ -195,7 +195,7 @@ https://svelte.dev/e/js_parse_error -->
  const response = await fetch('http://localhost:40000/mcp/context7/resolve-library-id', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, libraryName: 'sveltekit' }),
+ body: JSON.stringify({ libraryName: 'sveltekit' }),
  });
  return response.ok;
  } catch {

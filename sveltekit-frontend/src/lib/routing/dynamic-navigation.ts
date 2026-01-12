@@ -227,7 +227,7 @@ export class DynamicNavigation {
  /** Internal: check all guards for a transition */
  private async checkNavigationGuards(
  to: string, from: string
- ): Promise<{, allowed: boolean; redirectTo?: string }> {
+ ): Promise<{ allowed: boolean; redirectTo?: string }> {
  for (const guard of this.guards.values()) {
  try {
  const allowed = await Promise.resolve(guard.condition(to, from));

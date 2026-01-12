@@ -10,7 +10,7 @@
  updatedAt: string;
  };
 
- let { caseId, selectedEvidenceId = null }: {, caseId: string; selectedEvidenceId?: string | null } = $props();
+ let { caseId, selectedEvidenceId = null }: { caseId: string; selectedEvidenceId?: string | null } = $props();
 
  let relationships = $state<EvidenceRelationship[]>([]);
  let loading = $state(false);

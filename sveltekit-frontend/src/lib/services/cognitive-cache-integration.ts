@@ -36,7 +36,7 @@ interface ThreadSafeCache {
 
 interface JsonbDocument {
  id: string; content: unknown;
- metadata: {, lastModified: number;
+ metadata: { lastModified: number;
  accessCount: number; gpuProcessed: boolean;
  threadId?: string;
  [key: string]: unknown;
@@ -142,7 +142,7 @@ export class CognitiveCacheService {
  const jsonbDoc: JsonbDocument = {
  id,
  content: document,
- metadata: {, lastModified: Date.now(),
+ metadata: { lastModified: Date.now(),
  accessCount: 0,
  gpuProcessed: false,
  threadId: this.getCurrentThreadId(),
@@ -303,7 +303,7 @@ export class CognitiveCacheService {
  return `browser-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
  }
  // eslint-disable-next-line @typescript-eslint/no-var-requires
- const proc = (typeof process !== 'undefined') ? process : {, pid: 0 };
+ const proc = (typeof process !== 'undefined') ? process : { pid: 0 };
  return `server-${proc.pid}-${Date.now()}`;
  }
  /** * Clear cache with thread synchronization */
@@ -322,7 +322,7 @@ export class CognitiveCacheService {
  }
  }
  /** * Get cache statistics */
- getCacheStats(): {, totalEntries: number;
+ getCacheStats(): { totalEntries: number;
  gpuProcessedCount: number; averageAccessCount: number;
  threadSafe: boolean;
  } {
@@ -358,7 +358,7 @@ export async function queryJsonb(
 }
 // Legal AI specific utilities
 export interface LegalDocument {
- caseId: string, title: string; content: string, metadata: {, court: string, date: string, parties: unknown[], classification: string[]; riskLevel: 'low' | 'medium' | 'high' | 'critical';
+ caseId: string, title: string; content: string, metadata: { court: string, date: string, parties: unknown[], classification: string[]; riskLevel: 'low' | 'medium' | 'high' | 'critical';
  };
  embedding?: Float32Array;
 }
@@ -462,14 +462,14 @@ class CognitiveCacheManager {
  }
 
  async get<T>(key: string, metadataType?: CacheEntryMetadata['type']): Promise<T | null> {
- let entry: {, data: unknown; metadata: CacheEntryMetadata; options: CacheOptions; timestamp: number } | undefined;
+ let entry: { data: unknown; metadata: CacheEntryMetadata; options: CacheOptions; timestamp: number } | undefined;
 
  if (!browser && redisClient && redisClient.isReady) {
  try {
  const redisKey = await this.getRedisKey({
  key: key,
  type: metadataType || 'legal-data',
- context: {, action: 'get', priority: 'medium' },
+ context: { action: 'get', priority: 'medium' },
  });
  const cachedData = await redisClient.get(redisKey);
  if (cachedData) {
@@ -498,7 +498,7 @@ class CognitiveCacheManager {
  const redisKey = await this.getRedisKey({
  key: key,
  type: metadataType || 'legal-data',
- context: {, action: 'get', priority: 'medium' },
+ context: { action: 'get', priority: 'medium' },
  });
  await redisClient.del(redisKey);
  } catch (error) {
@@ -516,7 +516,7 @@ class CognitiveCacheManager {
  const redisKey = await this.getRedisKey({
  key,
  type: metadataType || 'legal-data',
- context: {, action: 'invalidate', priority: 'medium' },
+ context: { action: 'invalidate', priority: 'medium' },
  });
  await redisClient.del(redisKey);
  console.log(`[CognitiveCache] Invalidated Redis cache entry for key: ${redisKey}`);

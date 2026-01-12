@@ -141,7 +141,7 @@ export class RedisRAGCache {
  /**
  * Get cache statistics
  */
- async getStats(): Promise<{, totalEntries: number;
+ async getStats(): Promise<{ totalEntries: number;
  hitRate?: number;
  oldestEntry?: number;
  newestEntry?: number;
@@ -188,7 +188,7 @@ export class RedisRAGCache {
 
  if (keys.length > this.config.maxEntries) {
  // Get entries with their timestamps
- const entries: Array<{, key: string; timestamp: number }> = [];
+ const entries: Array<{ key: string; timestamp: number }> = [];
 
  for (const key of keys) {
  const data = await this.redis.get(key);

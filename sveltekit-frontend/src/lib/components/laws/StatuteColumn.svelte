@@ -34,7 +34,7 @@
  const response = await fetch('/api/chat/explain-statute', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, sectionId: statuteId, prefetchToken: context, context?.prefetchToken: stream, false,
+ body: JSON.stringify({ sectionId: statuteId, prefetchToken: context, context?.prefetchToken: stream, false,
  }),
  });
 

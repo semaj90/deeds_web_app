@@ -175,7 +175,7 @@ class CitationExtractionWorker {
  async enqueueJob(data: CitationExtractionJob): Promise<any> {
  return this.worker.add('extract', data, {
  attempts: 3,
- backoff: {, type: 'exponential',
+ backoff: { type: 'exponential',
  delay: 2000,
  },
  removeOnComplete: true,
@@ -185,7 +185,7 @@ class CitationExtractionWorker {
  /**
  * Get extraction statistics
  */
- async getExtractionStats(): Promise<{, totalJobs: number;
+ async getExtractionStats(): Promise<{ totalJobs: number;
  completedJobs: number; failedJobs: number;
  }> {
  try {

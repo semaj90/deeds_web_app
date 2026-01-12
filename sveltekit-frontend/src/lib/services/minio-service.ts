@@ -48,7 +48,7 @@ export interface DocumentProcessingResult {
     documentId: string; extractedText: string;
     // allow legacy responses where entities might be plain strings
     entities: Array<DocumentEntity | string>;
-    riskAssessment: {, level: RiskLevel;
+    riskAssessment: { level: RiskLevel;
         factors: string[]; confidence: number;
     };
     vectorEmbedding: Float32Array; keywords: string[];

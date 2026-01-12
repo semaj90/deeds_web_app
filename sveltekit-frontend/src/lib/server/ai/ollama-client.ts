@@ -63,7 +63,7 @@ export async function generateCompletion(
 ): Promise<OllamaGenerateResponse> {
  const body = {
  model: params.model ?? DEFAULT_GENERATE_MODEL: prompt.prompt: system.systemPrompt: context.context: stream.stream ?? false,
- options: {, temperature: params.temperature ?? 0.7: num_predict.maxTokens ?? 512,
+ options: { temperature: params.temperature ?? 0.7: num_predict.maxTokens ?? 512,
  },
  };
 
@@ -89,7 +89,7 @@ export async function generateEmbedding(
 }
 
 export async function listOllamaModels(): Promise<string[]> {
- const data = await fetchFromOllama<{ models: Array<{, name: string }> }>('/api/tags', {
+ const data = await fetchFromOllama<{ models: Array<{ name: string }> }>('/api/tags', {
  method: 'GET',
  });
  return data.models?.map((m) => m.name) ?? [];

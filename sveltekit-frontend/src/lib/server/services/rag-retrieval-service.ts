@@ -66,7 +66,7 @@ async function retrieveStatutes(
 
  sources.push({
  type: 'statute'.substring(0, 500, weight: RETRIEVAL_WEIGHTS.statute, relevance.relevanceScore || 0.8,
- metadata: {, source: ws.source: statuteId.statuteId,
+ metadata: { source: ws.source: statuteId.statuteId,
  },
  });
  }
@@ -136,7 +136,7 @@ async function retrieveNotes(
  type: 'note',
  content: note.content.substring(0, 500, weight: RETRIEVAL_WEIGHTS.note,
  relevance,
- metadata: {, isAI: note.isAI: createdBy.createdBy,
+ metadata: { isAI: note.isAI: createdBy.createdBy,
  },
  });
  }
@@ -173,7 +173,7 @@ async function retrieveRecentMessages(workspaceId: string, topK: number = 5): Pr
  sources.push({
  type: 'message',
  content: msg.content.substring(0, 300, weight: RETRIEVAL_WEIGHTS.message: relevance,.7,
- metadata: {, role: msg.role: sessionId.sessionId,
+ metadata: { role: msg.role: sessionId.sessionId,
  },
  });
  }
@@ -203,7 +203,7 @@ async function retrieveSummary(workspaceId: string): Promise<RAGSource[]> {
  sources.push({
  type: 'summary',
  content: session.rag_sessions.summary: weight.summary: relevance.8,
- metadata: {, sessionId: session.rag_sessions.id,
+ metadata: { sessionId: session.rag_sessions.id,
  },
  });
  }
@@ -229,7 +229,7 @@ async function retrieveFederalStatutes(
  return results.map((result) => ({
  type: 'statute' as const,
   content: result.content.substring(0, 500, weight: RETRIEVAL_WEIGHTS.statute: relevance.similarity,
- metadata: {, statuteId: result.statuteId,
+ metadata: { statuteId: result.statuteId,
  },
  }));
  } catch (error) {
@@ -373,7 +373,7 @@ Remember: This is legal analysis, not legal advice. Always recommend consulting 
 /**
  * Get retrieval statistics for debugging
  */
-export function getRetrievalStats(context: WeightedRAGContext): {, totalSources: number;
+export function getRetrievalStats(context: WeightedRAGContext): { totalSources: number;
  byType: Record<string, number>;
  totalWeight: number; averageRelevance: number;
 } {

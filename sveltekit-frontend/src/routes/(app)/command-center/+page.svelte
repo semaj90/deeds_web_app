@@ -32,7 +32,7 @@
 		gpuStatus: 'active',
 		ragIndexSize: 0,
 		ocrAccuracy: 0,
-		trends: {, totalCases: 5.2,
+		trends: { totalCases: 5.2,
 			activeCases: -2.1,
 			evidenceProcessed: 12.8,
 			aiQueries: 8.5
@@ -141,7 +141,7 @@
 			activeCases: Math.round(baseMetrics.activeCases * (1 + variation)),
 			evidenceProcessed: Math.round(baseMetrics.evidenceProcessed * (1 + variation)),
 			aiQueries: Math.round(baseMetrics.aiQueries * (1 + variation)),
-			trends: {, totalCases: (Math.random() - 0.5) * 20, // Random trend between -10% and +10%
+			trends: { totalCases: (Math.random() - 0.5) * 20, // Random trend between -10% and +10%
 					activeCases: (Math.random() - 0.5) * 20,
 					evidenceProcessed: (Math.random() - 0.5) * 20,
 					aiQueries: (Math.random() - 0.5) * 20

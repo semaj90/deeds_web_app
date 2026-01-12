@@ -69,7 +69,7 @@
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({, query: `Analyze this evidence: ${evidence.file_name}`,
+				body: JSON.stringify({ query: `Analyze this evidence: ${evidence.file_name}`,
 					caseId: evidence.case_id
 				})
 			});

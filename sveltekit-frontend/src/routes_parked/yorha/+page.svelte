@@ -212,9 +212,9 @@
  const resp = await fetch('/api/v1/legal/session/create', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, user_id: 'yorha-user-001',
+ body: JSON.stringify({ user_id: 'yorha-user-001',
  case_id: `case-${Date.now()}`,
- context: {, jurisdiction: 'Global',
+ context: { jurisdiction: 'Global',
  practice_area: ['AI Law', 'Tech Ethics', 'Data Privacy'],
  case_type: 'Investigation',
  priority_level: 8,

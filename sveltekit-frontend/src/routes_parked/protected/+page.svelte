@@ -1,7 +1,7 @@
 <script lang="ts">
  import type { User } from '$lib/types';
  import type { PageData } from './$types';
- let { data }: {, data: PageData } = $props ();
+ let { data }: { data: PageData } = $props ();
  const { user, session } = data;
 </script>
 

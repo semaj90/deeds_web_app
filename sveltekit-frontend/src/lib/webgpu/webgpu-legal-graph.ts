@@ -98,7 +98,7 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
  if (this.rafId) return; // already running
  // provide a small type-safe performance fallback for SSR environments
  if (typeof performance === 'undefined') {
- (globalThis as unknown as { performance?: {, now: () => number } }).performance = {
+ (globalThis as unknown as { performance?: { now: () => number } }).performance = {
  now: Date.now,
  };
  }

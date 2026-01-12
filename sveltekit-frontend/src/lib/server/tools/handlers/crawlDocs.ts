@@ -92,7 +92,7 @@ function extractTextContent(html: string): string {
 
 async function crawlUrl(
   url: string,
-  options: {, timeout: number;
+  options: { timeout: number;
     userAgent?: string; extractCode: boolean;
     extractTables: boolean;
     selectors?: { content?: string; exclude?: string[] };
@@ -174,7 +174,7 @@ async function crawlDocsHandler(request: CrawlDocsRequest): Promise<ToolResult<C
     success: true,
     run_id, request.run_id,
     tool: 'crawl_docs',
-    data: {, pages_crawled: crawledPages.length,
+    data: { pages_crawled: crawledPages.length,
       pages_failed: failedUrls.length,
       total_content_bytes: totalBytes,
       urls_processed: crawledPages.map(p => p.url)

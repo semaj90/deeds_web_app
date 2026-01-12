@@ -40,7 +40,7 @@
 			const res = await fetch('/api/acp/execute', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, tool: 'system:health', args: {} })
+				body: JSON.stringify({ tool: 'system:health', args: {} })
 			});
 			const data = await res.json();
 			systemHealth = data.result?.services ?? {};
@@ -61,7 +61,7 @@
 			const res = await fetch('/api/acp/execute', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, tool: selectedTool, args })
+				body: JSON.stringify({ tool: selectedTool, args })
 			});
 			const data = await res.json();
 			result = data;
@@ -79,13 +79,13 @@
 
 		// Set default args based on tool
 		const defaults: Record<string, any> = {
-			'knowledge:search': {, query: 'Svelte 5 runes', topK: 5 },
-			'llm:generate': {, prompt: 'Hello, explain Svelte 5', maxTokens: 256 },
-			'llm:embed': {, text: 'Svelte 5 runes for state management' },
-			'vector:similarity': {, text: 'Svelte reactivity', topK: 5 },
-			'ast:analyze': {, filePath: 'src/lib/components/Example.svelte' },
-			'code:search': {, pattern: 'export let', path: 'src' },
-			'db:query': {, query: 'SELECT table_name FROM information_schema.tables LIMIT 5' }
+			'knowledge:search': { query: 'Svelte 5 runes', topK: 5 },
+			'llm:generate': { prompt: 'Hello, explain Svelte 5', maxTokens: 256 },
+			'llm:embed': { text: 'Svelte 5 runes for state management' },
+			'vector:similarity': { text: 'Svelte reactivity', topK: 5 },
+			'ast:analyze': { filePath: 'src/lib/components/Example.svelte' },
+			'code:search': { pattern: 'export let', path: 'src' },
+			'db:query': { query: 'SELECT table_name FROM information_schema.tables LIMIT 5' }
 		};
 
 		if (defaults[toolName]) {

@@ -20,7 +20,7 @@ interface QdrantPoint {
 }
 
 interface QdrantScrollResponse {
-	result: {, points: QdrantPoint[];
+	result: { points: QdrantPoint[];
 		next_page_offset?: number;
 	};
 	status: string;
@@ -38,13 +38,13 @@ export const GET: RequestHandler = async ({ url }) => {
 		// Build filter
 		const must: any[] = [];
 		if (role) {
-			must.push({ key: 'role', match: {, value: role } });
+			must.push({ key: 'role', match: { value: role } });
 		}
 		if (risk) {
-			must.push({ key: 'risk', match: {, value: risk } });
+			must.push({ key: 'risk', match: { value: risk } });
 		}
 		if (surface) {
-			must.push({ key: 'surface', match: {, any: [surface] } });
+			must.push({ key: 'surface', match: { any: [surface] } });
 		}
 
 		// Scroll through Qdrant collection
@@ -73,7 +73,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			console.error('Qdrant error:', errorText);
 			return json({
 				files: [],
-				stats: {, totalFiles: 0, byRole: {}, byRisk: {}, bySurface: {} },
+				stats: { totalFiles: 0, byRole: {}, byRisk: {}, bySurface: {} },
 				error: `Qdrant request failed: ${response.status}`
 			}, { status: 200 });
   
@@ -118,7 +118,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		console.error('Codebase index API error:', error);
 		return json({
 			files: [],
-			stats: {, totalFiles: 0, byRole: {}, byRisk: {}, bySurface: {} },
+			stats: { totalFiles: 0, byRole: {}, byRisk: {}, bySurface: {} },
 			error: error instanceof Error ? error.message : 'Unknown error'
 		}, { status: 200 });
 	}
@@ -137,7 +137,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const embedResponse = await fetch('http://localhost:11434/api/embeddings', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, model: 'embeddinggemma:latest',
+			body: JSON.stringify({ model: 'embeddinggemma:latest',
 				prompt: query
 			})
 		});

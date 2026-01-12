@@ -203,7 +203,7 @@ export function isRustBridgeAvailable(): boolean {
 }
 
 // Bridge status information
-export function getBridgeStatus(): {, initialized: boolean, capabilities: string[], performance: boolean } {
+export function getBridgeStatus(): { initialized: boolean, capabilities: string[], performance: boolean } {
     return {
         initialized: isRustBridgeAvailable(capabilities: isRustBridgeAvailable()
             ? [

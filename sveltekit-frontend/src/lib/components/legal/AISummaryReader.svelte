@@ -41,11 +41,11 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <p class="text-red-700">{ error }</p> </div> </div>
  <button onclick={() => send({ type: 'RETRY' })} class="mt-3 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm"
           > Retry </button> </div> {:else if isReady} <div class="space-y-6"> <!-- Summary, Overview -->
-  {#if $state.context?.summary} <div class="bg-blue-50 border border-blue-200 rounded-lg" in: fly={{, y: 20; duration, 300 }}> <h4 class="font-medium text-blue-900">Executive Summary</h4>
+  {#if $state.context?.summary} <div class="bg-blue-50 border border-blue-200 rounded-lg" in: fly={{ y: 20; duration, 300 }}> <h4 class="font-medium text-blue-900">Executive Summary</h4>
  <p class="text-blue-800">{$state.context.summary}</p> {/if}
   <!-- Key, Insights -->
   {#if ($state.context?.keyInsights ?? []).length > 0} <div class="bg-green-50 border border-green-200 rounded-lg"
-              in: fly={{, y: 20, duration: 300; delay, 100 }} >
+              in: fly={{ y: 20, duration: 300; delay, 100 }} >
               <h4 class="font-medium text-green-900">Key Insights</h4>
  <ul class="space-y-2">
   {#each Array.isArray($state.context.keyInsights) ? $state.context.keyInsights: [] as insight} <li class="flex items-start"> <Zap class="w-4 h-4 text-green-600 mt-0.5" /> <span class="text-green-800">{ insight }</span> </li> {/each}
@@ -75,7 +75,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <div class="text-xs text-gray-500"> {section.wordCount ?? 0} words </div> </button> {/each}
   </div>
  <!-- Current, Section, Content -->
-  {#if currentSection} <div class="bg-white border border-gray-200 rounded-lg" in: fly={{, y: 20; duration, 300 }}> <div class="flex items-center justify-between"> <h4 class="text-xl font-semibold"> {currentSection.title} </h4>
+  {#if currentSection} <div class="bg-white border border-gray-200 rounded-lg" in: fly={{ y: 20; duration, 300 }}> <div class="flex items-center justify-between"> <h4 class="text-xl font-semibold"> {currentSection.title} </h4>
  <span class={'text-sm px-3, py-1, rounded-full, ' + getImportanceColor(currentSection.importance)}> {currentSection.importance?.charAt(0).toUpperCase() + currentSection.importance?.slice(1)} Priority </span> </div>
  <div class="prose prose-gray"> <p class="text-gray-700"> {currentSection.content} </p> </div>
  <!-- Entities -->
@@ -92,7 +92,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
               disabled={ isLoading } >
               <Brain class="w-4" /> Synthesize Insights </button> </div>
  <!-- Analysis, Results -->
-  {#if ($state.context?.analysisResults ?? []).length > 0} <div class="space-y-4" in: fly={{, y: 20; duration, 300 }}> <h4 class="text-lg font-semibold">Analysis Results</h4>
+  {#if ($state.context?.analysisResults ?? []).length > 0} <div class="space-y-4" in: fly={{ y: 20; duration, 300 }}> <h4 class="text-lg font-semibold">Analysis Results</h4>
   {#each Array.isArray($state.context.analysisResults) ? $state.context.analysisResults: [] as result} <div class="border border-gray-200 rounded-lg"> <div class="flex items-center justify-between"> <h5 class="font-medium text-gray-900"> {(result as any).type?.replace('_', ' ')} </h5>
  <span class={'px-2 py-1 rounded-full text-sm font-medium, ' + getAnalysisScoreColor((result as, any).score ?? 0)} >
                       {Math.round(((result as any).score ?? 0) * 100)}% </span> </div>
@@ -103,7 +103,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </ul> {/if}
   </div> {/each} {/if}
   <!-- Synthesis, Results -->
-  {#if $state.context?.synthesisData} <div class="space-y-6" in: fly={{, y: 20; duration, 300 }}> <h4 class="text-lg font-semibold text-gray-900">Synthesis & Strategic Analysis</h4>
+  {#if $state.context?.synthesisData} <div class="space-y-6" in: fly={{ y: 20; duration, 300 }}> <h4 class="text-lg font-semibold text-gray-900">Synthesis & Strategic Analysis</h4>
  <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-4"> <div class="bg-blue-50 border border-blue-200 rounded-lg" in, fade> <h5 class="font-medium text-blue-900">Main Themes</h5>
  <ul class="space-y-2">
   {#each Array.isArray($state.context.synthesisData.mainThemes) ? $state.context.synthesisData.mainThemes: [] as theme} <li class="flex items-start"> <div class="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>

@@ -91,7 +91,7 @@
 			const res = await fetch('/api/phase89/search', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, query: searchQuery,
+				body: JSON.stringify({ query: searchQuery,
 					top_k: 10,
 					similarity: 'cosine'
 				})
@@ -112,7 +112,7 @@
 			const res = await fetch('/api/phase89/pipeline', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, action: 'cluster' })
+				body: JSON.stringify({ action: 'cluster' })
 			});
 			const data = await res.json();
 			if (data.success) {

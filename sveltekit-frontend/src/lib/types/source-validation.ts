@@ -33,7 +33,7 @@ export interface AnswerGenerationRequest {
 
 export interface KAGUpdateRequest {
 	validation_id: string; entities_extracted: string[];
-	relationships: Array<{, from: string;
+	relationships: Array<{ from: string;
 		to: string; type: string;
 	}>;
 }
@@ -81,7 +81,7 @@ export interface KAGUpdateResponse {
 
 export interface HealthCheckResponse {
 	status: 'healthy' | 'unhealthy';
-	qdrant?: {, collection: string;
+	qdrant?: { collection: string;
 		vectors: number;
 	};
 	couchdb?: Record<string, any>;
@@ -141,7 +141,7 @@ export interface CitationInspectorProps {
 
 export interface ProvenanceGraphProps {
 	validationId: string; entities: string[];
-	relationships: Array<{, from: string; to: string; type: string }>;
+	relationships: Array<{ from: string; to: string; type: string }>;
 	width?: number;
 	height?: number;
 }
@@ -158,22 +158,22 @@ export interface SourceTypeMetadata {
 }
 
 export const SOURCE_TYPE_CONFIG: Record<SourceType, SourceTypeMetadata> = {
-	documentation: {, label: 'Documentation',
+	documentation: { label: 'Documentation',
 		color: 'blue',
 		icon: '📖',
 		description: 'Official documentation and guides'
 	},
-	code: {, label: 'Code',
+	code: { label: 'Code',
 		color: 'green',
 		icon: '💻',
 		description: 'Source code files from codebase'
 	},
-	error_fix: {, label: 'Error Fix',
+	error_fix: { label: 'Error Fix',
 		color: 'yellow',
 		icon: '🔧',
 		description: 'Previously resolved error fixes'
 	},
-	community: {, label: 'Community',
+	community: { label: 'Community',
 		color: 'purple',
 		icon: '👥',
 		description: 'Community discussions and Q&A'

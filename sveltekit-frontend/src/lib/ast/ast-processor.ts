@@ -384,11 +384,11 @@ Response:`;
  const response = await fetch(`${endpoints.primary}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: 'gemma3-legal:latest',
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
  prompt,
  format: 'json',
- options: {, temperature: 0.3, num_predict: 100 },
- options: {, temperature: 0.3, num_predict: 100 },
+ options: { temperature: 0.3, num_predict: 100 },
+ options: { temperature: 0.3, num_predict: 100 },
  }),
  });
 
@@ -425,7 +425,7 @@ Response:`;
  /**
  * Get completion statistics for monitoring
  */
- getStats(): {, filesProcessed: number; suggestionsGenerated: number;
+ getStats(): { filesProcessed: number; suggestionsGenerated: number;
  return {
  filesProcessed: this.project.getSourceFiles().length,
  suggestionsGenerated: 0, // Would track this in a real implementation

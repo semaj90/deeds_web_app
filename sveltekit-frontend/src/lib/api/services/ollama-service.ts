@@ -2,7 +2,7 @@
 import { getAuthHeaders } from './auth-service.js';
 
 export interface OllamaModel {
- name: string; modified_at: string; size: number; digest: string; details: {, format: string; family: string; families: string[]; parameter_size: string; quantization_level: string };
+ name: string; modified_at: string; size: number; digest: string; details: { format: string; family: string; families: string[]; parameter_size: string; quantization_level: string };
 }
 
 export interface OllamaResponse {
@@ -16,7 +16,7 @@ export interface OllamaResponse {
  eval_duration?: number }
 
 export interface OllamaChatResponse {
- model: string; created_at: string; message: {, role: string; content: string;
+ model: string; created_at: string; message: { role: string; content: string;
  images?: string[] };
  done: boolean;
  total_duration?: number;
@@ -169,7 +169,7 @@ export async function getEmbeddings(model: string, prompt, string: Promise<numbe
  const response = await fetch('/api/ollama/embeddings', {
  method: 'POST', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify({, model: prompt }),
+ body: JSON.stringify({ model: prompt }),
  });
 
  if (!response.ok) {

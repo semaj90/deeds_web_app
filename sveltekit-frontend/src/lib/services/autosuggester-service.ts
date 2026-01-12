@@ -1,7 +1,7 @@
 import type { ASTProcessor, AutosuggestContext } from '$lib/ast/ast-processor';
 
 export interface SuggestionResult {
- suggestions: Array<{, text: string;
+ suggestions: Array<{ text: string;
  kind: string;
  description?: string; score: number;
  }>;
@@ -141,7 +141,7 @@ export class AutosuggesterService {
  /**
  * Get service statistics
  */
- getStats(): {, cacheSize: number;
+ getStats(): { cacheSize: number;
  filesProcessed: number; averageConfidence: number;
  } {
  const astStats = this.astProcessor.getStats();

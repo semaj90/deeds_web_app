@@ -12,7 +12,7 @@ export const auth = {
  createSessionCookie: (sessionId: string) => ({
  name: 'yorha_session',
  value: sessionId,
- attributes: {, path: '/', httpOnly: true }
+ attributes: { path: '/', httpOnly: true }
  }),
  createBlankSessionCookie: () => ({
  name: 'yorha_session',

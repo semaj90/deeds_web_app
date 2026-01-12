@@ -117,7 +117,7 @@ export async function storeEmbedding(
  // cast to: unknown to bypass strict typings; use collectionName as the client expects
  await (qdrantClient as any).upsert({
  collectionName: (_CFG as any)?.QDRANT_COLLECTION ?? 'legal_embeddings',
- points: [{, id: recordId, vector: embedding, payload: metadata as Record<string, unknown> }],
+ points: [{ id: recordId, vector: embedding, payload: metadata as Record<string, unknown> }],
  } as unknown);
  }
  } catch (err) {

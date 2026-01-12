@@ -98,7 +98,7 @@ class JSONValidationPipeline {
  const response = await fetch(this.mcpEndpoint, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, action: 'validate-json-parsing',
+ body: JSON.stringify({ action: 'validate-json-parsing',
  results: timestamp Date().toISOString(), phase: 'Phase52',
  }),
  });
@@ -150,10 +150,10 @@ const testJSONSamples = [
  '{"metadata": {"created": "2025-01-01", "tags": ["legal", "contract", "binding"]}}',
  // Large JSON for performance testing
  JSON.stringify({
- documents: Array.from({, length: 100 }, (_, i) => ({
+ documents: Array.from({ length: 100 }, (_, i) => ({
  id: `DOC-${ i }`,
  title: `Legal Document ${ i }`,
- content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(10, metadata: {, size: Math.random() * 1000, type: 'contract' },
+ content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(10, metadata: { size: Math.random() * 1000, type: 'contract' },
  })),
  })];
 

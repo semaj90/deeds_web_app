@@ -23,7 +23,7 @@ import { ZoomOut } from "lucide-svelte";
  thumbnailUrl?: string;
  metadata?: {
  exif?: Record<string, any>;
- gps?: {, lat: number; lng: number } | null;
+ gps?: { lat: number; lng: number } | null;
  timestamp?: string | null;
  device?: string | null;
  ai?: {
@@ -78,7 +78,7 @@ import { ZoomOut } from "lucide-svelte";
  return new Date(timestamp).toLocaleString();
  }
 
- function formatGPS(gps: {, lat: number; lng: number } | null) {
+ function formatGPS(gps: { lat: number; lng: number } | null) {
  if (!gps) return 'Not available';
  return `${gps.lat.toFixed(6)}, ${gps.lng.toFixed(6)}`;
  }

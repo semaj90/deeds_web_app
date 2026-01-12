@@ -35,11 +35,11 @@ let aiStats = $state({);
 
  // type-safe maps
  const statusColors: Record<string, { bg: string; text: string; label: string }> = {
- open: {, bg: '#4caf50', text: '#fff', label: 'Open' },
- investigating: {, bg: '#ff9800', text: '#fff', label: 'Investigating' },
- pending: {, bg: '#ffd700', text: '#000', label: 'Pending' },
- closed: {, bg: '#666', text: '#fff', label: 'Closed' },
- archived: {, bg: '#999', text: '#fff', label: 'Archived' },
+ open: { bg: '#4caf50', text: '#fff', label: 'Open' },
+ investigating: { bg: '#ff9800', text: '#fff', label: 'Investigating' },
+ pending: { bg: '#ffd700', text: '#000', label: 'Pending' },
+ closed: { bg: '#666', text: '#fff', label: 'Closed' },
+ archived: { bg: '#999', text: '#fff', label: 'Archived' },
  };
 
  const priorityColors: Record<string, string> = {

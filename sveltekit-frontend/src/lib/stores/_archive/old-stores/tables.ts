@@ -262,11 +262,11 @@ export function createTableStats(tableId: string) {
 // Export types and utilities // TableState and TableNotification are already exported as interfaces above
 // Legal AI specific table configurations
 export const legalAITableConfigs = {
- cases: {, pageSize: 25, sortColumn: 'created_at', sortDirection: 'desc' as const },
- evidence: {, pageSize: 50, sortColumn: 'date_collected', sortDirection: 'desc' as const },
- documents: {, pageSize: 20, sortColumn: 'upload_date', sortDirection: 'desc' as const },
- users: {, pageSize: 30, sortColumn: 'last_login', sortDirection: 'desc' as const },
- auditLog: {, pageSize: 100, sortColumn: 'timestamp', sortDirection: 'desc' as const },
+ cases: { pageSize: 25, sortColumn: 'created_at', sortDirection: 'desc' as const },
+ evidence: { pageSize: 50, sortColumn: 'date_collected', sortDirection: 'desc' as const },
+ documents: { pageSize: 20, sortColumn: 'upload_date', sortDirection: 'desc' as const },
+ users: { pageSize: 30, sortColumn: 'last_login', sortDirection: 'desc' as const },
+ auditLog: { pageSize: 100, sortColumn: 'timestamp', sortDirection: 'desc' as const },
 };
 
 // Utility functions

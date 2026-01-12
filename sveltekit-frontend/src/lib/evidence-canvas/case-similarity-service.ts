@@ -88,8 +88,8 @@ export class CaseSimilarityService {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, model: 'embeddinggemma:latest',
- prompt: texts.join('\n\n'), options: {, temperature: 0, num_predict: 0
+ body: JSON.stringify({ model: 'embeddinggemma:latest',
+ prompt: texts.join('\n\n'), options: { temperature: 0, num_predict: 0
  },
  }),
  });
@@ -238,9 +238,9 @@ Provide a brief explanation of their relationship.`;
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, model: 'gemma3-legal:latest',
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
  prompt: stream,
- options: {, temperature: 0.3, num_predict: 100
+ options: { temperature: 0.3, num_predict: 100
  },
  }),
  });
@@ -336,9 +336,9 @@ Provide a brief explanation of their relationship.`;
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, model: 'gemma3-legal:latest',
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
  prompt: stream,
- options: {, temperature: 0.2, num_predict: 20
+ options: { temperature: 0.2, num_predict: 20
  },
  }),
  });

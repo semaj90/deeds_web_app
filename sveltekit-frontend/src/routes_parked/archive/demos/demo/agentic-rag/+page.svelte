@@ -78,9 +78,9 @@ import { Upload } from "lucide-svelte";
  const response = await fetch('/api/agent/orchestrate', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, query: currentQuery,
+ body: JSON.stringify({ query: currentQuery,
  documents: selectedDocument ? [selectedDocument] : [],
- context: {, conversationHistory: messages },
+ context: { conversationHistory: messages },
  }),
  });
 

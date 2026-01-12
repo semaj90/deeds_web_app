@@ -117,7 +117,7 @@ export class ChatStore {
             const response = await fetch('/api/chat/session', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({, user_id: userId, case_id: caseId })
+                body: JSON.stringify({ user_id: userId, case_id: caseId })
             });
             if (!response.ok) { throw new Error('Failed to create session'); }
             const session: ChatSession = await response.json();

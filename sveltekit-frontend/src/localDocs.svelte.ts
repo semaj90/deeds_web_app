@@ -278,7 +278,7 @@ export class LocalLegalStore {
 			const response = await fetch('/api/sync/documents', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, lastSyncTime: this.lastSyncTime,
+				body: JSON.stringify({ lastSyncTime: this.lastSyncTime,
 					pendingChanges: this.pendingChanges
 				})
 			});
@@ -378,10 +378,10 @@ export class LocalLegalStore {
 			syncStatus: this.syncStatus,
 			lastSyncTime: this.lastSyncTime,
 			isInitialized: this.isInitialized,
-			byType: {, contract: this.documents.count({ type: 'contract' }),
-				statute: this.documents.count({, type: 'statute' }),
-				case: this.documents.count({, type: 'case' }),
-				memo: this.documents.count({, type: 'memo' })
+			byType: { contract: this.documents.count({ type: 'contract' }),
+				statute: this.documents.count({ type: 'statute' }),
+				case: this.documents.count({ type: 'case' }),
+				memo: this.documents.count({ type: 'memo' })
 			}
 		};
 	}

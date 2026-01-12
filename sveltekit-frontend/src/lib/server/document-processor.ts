@@ -21,27 +21,27 @@ export interface DocumentProcessingResult {
  dates?: string[];
  legalCitations?: string[];
  };
- layout?: {, regions: Array<{
+ layout?: { regions: Array<{
  type: string; bbox: number[];
  confidence: number;
  text?: string;
  }>;
  };
- objects?: Array<{, class: string;
+ objects?: Array<{ class: string;
  bbox: number[]; confidence: number;
  }>;
- classifications?: Array<{, class: string;
+ classifications?: Array<{ class: string;
  confidence: number;
  }>;
- faces?: Array<{, bbox: number[];
- age?: {, min: number; max: number };
+ faces?: Array<{ bbox: number[];
+ age?: { min: number; max: number };
  gender?: string;
  emotions?: Record<string, number>;
  }>;
- tables?: Array<{, content: string[][];
+ tables?: Array<{ content: string[][];
  bbox?: number[];
  }>;
- images?: Array<{, content: Buffer;
+ images?: Array<{ content: Buffer;
  bbox?: number[];
  caption?: string;
  }>;
@@ -109,7 +109,7 @@ export class DocumentProcessor {
  const ocrResult = await extractTextHybrid(fileBuffer, filename);
  results.push({
  text: ocrResult.text,
- metadata: {, confidence: ocrResult.confidence,
+ metadata: { confidence: ocrResult.confidence,
  processingTime: ocrResult.processingTime,
  },
  method: ocrResult.method,
@@ -146,7 +146,7 @@ export class DocumentProcessor {
  const visionResult = await this.ibmVision.analyzeImage(fileBuffer, filename);
  results.push({
  text: visionResult.text,
- metadata: {, confidence: visionResult.confidence,
+ metadata: { confidence: visionResult.confidence,
  language: visionResult.language,
  processingTime: visionResult.processingTime,
  },
@@ -169,7 +169,7 @@ export class DocumentProcessor {
  text: yoloResult.text,
  layout: yoloResult.layout,
  objects: yoloResult.objects,
- metadata: {, processingTime: yoloResult.processingTime,
+ metadata: { processingTime: yoloResult.processingTime,
  },
  method: yoloResult.method,
  });
@@ -223,7 +223,7 @@ export class DocumentProcessor {
  if (results.length === 0) {
  return {
  text: '',
- metadata: {, processingTime: 0 },
+ metadata: { processingTime: 0 },
  method: 'none',
  engines: [],
  };
@@ -248,7 +248,7 @@ export class DocumentProcessor {
  // For comprehensive, merge all results
  const merged: DocumentProcessingResult = {
  text: '',
- metadata: {, processingTime: 0 },
+ metadata: { processingTime: 0 },
  method: 'comprehensive',
  engines: [],
  };

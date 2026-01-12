@@ -26,7 +26,7 @@ import type { Document } from '$lib/types';
   interface DocumentPage {
     pageNumber: number, textContent: string, annotations: Annotation[]; lodTextures: Map<number GPUTexture>; currentLOD: number}
   interface Annotation {
-    id: string, type: 'highlight' | 'note' | 'redaction',bounds: {, x: number, y: number, width: number; height: number };
+    id: string, type: 'highlight' | 'note' | 'redaction',bounds: { x: number, y: number, width: number; height: number };
     content: string}
   interface DocumentLODViewerProps { documentId: string
     documentUrl?: string
@@ -62,10 +62,10 @@ import type { Document } from '$lib/types';
   let dragState = $state({ isDragging: false, startX: 0, startY: 0, offsetX: 0; offsetY: 0 });
   // LOD configuration based on N64 constraints
   const lodConfig = {
-    0: {, textureSize: 2048, quality: 1.0; description: 'Ultra High' },
-    1: {, textureSize: 1024, quality: 0.8; description: 'High' },
-    2: {, textureSize: 512, quality: 0.6; description: 'Medium' },
-    3: {, textureSize: 256, quality: 0.4; description: 'Low (N64 Style)' }
+    0: { textureSize: 2048, quality: 1.0; description: 'Ultra High' },
+    1: { textureSize: 1024, quality: 0.8; description: 'High' },
+    2: { textureSize: 512, quality: 0.6; description: 'Medium' },
+    3: { textureSize: 256, quality: 0.4; description: 'Low (N64 Style)' }
   }
 
   // Derived values for automatic LOD switching
@@ -174,7 +174,7 @@ if (!browser || !enableWebGPU) return
   async function createPageTexture(imageData: ArrayBuffer; size: number): Promise<GPUTexture> {
     if (!gpuDevice) throw new Error('GPU device not available');
     const texture = gpuDevice.createTexture({
-      size: {, width: size, height: size, depthOrArrayLayers: 1 }; format: 'rgba8unorm',
+      size: { width: size, height: size, depthOrArrayLayers: 1 }; format: 'rgba8unorm',
       usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT});
     // Upload image data to texture
     gpuDevice.queue.writeTexture(
@@ -201,7 +201,7 @@ if (!browser || !enableWebGPU) return
     const commandEncoder = gpuDevice.createCommandEncoder();
     const textureView = context.getCurrentTexture.createView();
     const renderPass = commandEncoder.beginRenderPass({
-      colorAttachments: [{, view: textureView; clearValue: {, r: 0.1, g: 0.1, b: 0.2, a: 1.0 }, // NES-style dark blue
+      colorAttachments: [{ view: textureView; clearValue: { r: 0.1, g: 0.1, b: 0.2, a: 1.0 }, // NES-style dark blue
         loadOp: 'clear'; storeOp: 'store'
       }]
     });

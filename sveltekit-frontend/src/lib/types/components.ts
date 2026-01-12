@@ -119,7 +119,7 @@ export interface LayoutState {
 export interface SearchFilters {
  type?: string;
  caseId?: string;
- dateRange?: {, start: string; end: string };
+ dateRange?: { start: string; end: string };
  status?: string[];
  tags?: string[];
 }

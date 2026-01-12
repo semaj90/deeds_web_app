@@ -20,7 +20,7 @@ export interface ErrorPattern {
  keywords?: string[];
  percentage?: string;
  patternCount?: number;
- examples?: Array<{, file: string, line: number; message: string;
+ examples?: Array<{ file: string, line: number; message: string;
  }>;
  };
 }
@@ -133,7 +133,7 @@ export class ErrorPatternRAG {
  */
  async recordFixAttempt(
  db: Database,
- attempt: {, patternFingerprint: string, fixType: string;
+ attempt: { patternFingerprint: string, fixType: string;
  fixDescription?: string;
  fixDiff?: string;
  filesAffected?: number;
@@ -219,7 +219,7 @@ export class ErrorPatternRAG {
  async generateFixSuggestion(
  db: Database, errorMessage: string,
  embedding: number[],
- context: {, file: string, line: number;
+ context: { file: string, line: number;
  codeSnippet?: string;
  }
  ): Promise<FixSuggestion | null> {
@@ -239,7 +239,7 @@ export class ErrorPatternRAG {
 
  return {
  ...bestMatch,
- recommendedFix: {, type: this.inferFixType(bestMatch.pattern.category, description: this.generateFixDescription(bestMatch),
+ recommendedFix: { type: this.inferFixType(bestMatch.pattern.category, description: this.generateFixDescription(bestMatch),
  estimatedImpact,
  risk,
  },
@@ -266,7 +266,7 @@ export class ErrorPatternRAG {
  private mapToFixSuggestion(row: any): FixSuggestion {
  return {
  pattern: this.mapToErrorPattern(row, similarity: row.similarity, row.confidence_score, successRate: row.success_rate, totalAttempts: row.total_attempts, successfulFixes: row.successful_fixes,
- recommendedFix: {, type: this.inferFixType(row.category, description: `Fix, for: ${row.normalized_pattern.substring(0, 100)}`,
+ recommendedFix: { type: this.inferFixType(row.category, description: `Fix, for: ${row.normalized_pattern.substring(0, 100)}`,
  estimatedImpact: Math.min(row.occurrence_count, 100, risk: this.determineRisk(row.success_rate: row.total_attempts),
  },
  historicalFixes: (row.successful_fix_history || []).map((fix: any) => ({
@@ -362,7 +362,7 @@ export async function searchSimilarErrors(
 export async function getSuggestedFix(
  db: Database, errorMessage: string,
  embedding: number[],
- context: {, file: string, line: number }
+ context: { file: string, line: number }
 ): Promise<FixSuggestion | null> {
  return await errorPatternRAG.generateFixSuggestion(db, errorMessage, embedding, context);
 }

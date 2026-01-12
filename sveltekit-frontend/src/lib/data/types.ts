@@ -107,7 +107,7 @@ export interface Book {
  id: string; title: string;
  description?: string; caseId: string;
  reports: Report[]; citationPoints: CitationPoint[];
- metadata: {, tags: string[];
+ metadata: { tags: string[];
  category: string; priority: 'low' | 'medium' | 'high' | 'critical';
  confidentialityLevel: 'public' | 'restricted' | 'confidential' | 'top-secret';
  jurisdiction: string; createdDate: string;
@@ -123,7 +123,7 @@ export interface ReportSection {
  id: string; title: string;
  content: string; // HTML content from contenteditable
  order: number; type: 'text' | 'evidence' | 'citation' | 'canvas';
- metadata?: {, citations: string[]; // CitationPoint IDs
+ metadata?: { citations: string[]; // CitationPoint IDs
  evidenceRefs: string[]; // Evidence IDs
  canvasStateId?: string; // CanvasState ID if type is 'canvas'
  };
@@ -142,7 +142,7 @@ export interface AIAnalysis {
  | 'sentiment'
  | 'citation_suggestion'
  | 'legal_precedent';
- result: {, content: string;
+ result: { content: string;
  confidence: number; metadata: Record<string, any>;
  };
  timestamp: Date;
@@ -170,7 +170,7 @@ export interface CanvasStateData {
  background?: string; dimensions: {
  width: number; height: number;
  };
- viewport: {, zoom: number;
+ viewport: { zoom: number;
  panX: number; panY: number;
  };
  metadata: {
@@ -185,7 +185,7 @@ export interface SearchFilters {
  query?: string;
  caseId?: string;
  reportType?: string;
- dateRange?: {, start: Date;
+ dateRange?: { start: Date;
  end: Date;
  };
  tags?: string[];
@@ -207,7 +207,7 @@ export interface ExportOptions {
  includeCanvases: boolean; includeCitations: boolean;
  includeMetadata: boolean;
  watermark?: string;
- headerFooter?: {, header: string;
+ headerFooter?: { header: string;
  footer: string;
  };
 }
@@ -238,7 +238,7 @@ export interface LegacyCitationPoint {
 export interface EditorState {
  activeReportId?: string;
  activeCanvasId?: string; selectedCitations: string[];
- clipboardContent?: {, type: 'text' | 'citation' | 'canvas-object';
+ clipboardContent?: { type: 'text' | 'citation' | 'canvas-object';
  data: any;
  };
  autoSaveEnabled: boolean;
@@ -257,18 +257,18 @@ export interface SidebarState {
 
 // Real-time collaboration types (future feature)
 export interface CollaborationState {
- activeUsers: Array<{, userId: string;
+ activeUsers: Array<{ userId: string;
  userName: string;
- cursor?: {, x: number;
+ cursor?: { x: number;
  y: number;
  };
- selection?: {, reportId: string;
+ selection?: { reportId: string;
  sectionId: string; range: {
  start: number; end: number;
  };
  };
  }>;
- changes: Array<{, id: string;
+ changes: Array<{ id: string;
  userId: string; type: 'text' | 'canvas' | 'citation';
  timestamp: Date; data: Record<string, unknown>;
  }>;

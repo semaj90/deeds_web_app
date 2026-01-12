@@ -23,7 +23,7 @@ export type ContextChatResponse = {
  turnId: string; answer: string;
  keywords: string[]; keyPhrases: string[];
  suggestions: Suggestion[]; latencyMs: number;
- citations?: Array<{, id: string; source: string; score: number }>;
+ citations?: Array<{ id: string; source: string; score: number }>;
 };
 
 export async function contextualChat(params: ContextChatRequest): Promise<ContextChatResponse> {

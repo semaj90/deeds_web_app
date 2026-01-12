@@ -159,7 +159,7 @@ export async function completeValidationWorkflow(
 	rejectedChunkIds: string[] = [],
 	validationNotes?: string,
 	llmProvider: string = 'gemma3-legal'
-): Promise<{, validationId: string;
+): Promise<{ validationId: string;
 	answer: string; citations: AnswerGenerationResponse['citations'];
 	kagUpdate: KAGUpdateResponse;
 }> {
@@ -241,8 +241,8 @@ function extractEntities(text: string): string[] {
 
 function extractRelationships(
 	text: string
-): Array<{, from: string; to: string; type: string }> {
-	const relationships: Array<{, from: string; to: string; type: string }> = [];
+): Array<{ from: string; to: string; type: string }> {
+	const relationships: Array<{ from: string; to: string; type: string }> = [];
 
 	// Pattern: "X uses Y", "X depends on Y", "X references Y"
 	const patterns = [

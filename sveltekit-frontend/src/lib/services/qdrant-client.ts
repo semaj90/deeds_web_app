@@ -82,12 +82,12 @@ export class QdrantHTTPClient {
  }));
  }
 
- async upsert(req: QdrantUpsertRequest): Promise<{, status: string }> {
+ async upsert(req: QdrantUpsertRequest): Promise<{ status: string }> {
  const url = `${this.collectionPath()}/points`;
  const resp = await fetch(url, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, points: req.points }),
+ body: JSON.stringify({ points: req.points }),
  });
  if (!resp.ok) throw new Error(`Qdrant HTTP upsert failed: ${resp.status}`);
  const data = await resp.json();
@@ -100,8 +100,8 @@ export class QdrantHTTPClient {
  if (check.ok) return;
 
  const body = {
- vectors: {, size: VECTOR_DIMENSIONS, distance: 'Cosine' },
- optimizers_config: {, default_segment_number: 4 },
+ vectors: { size: VECTOR_DIMENSIONS, distance: 'Cosine' },
+ optimizers_config: { default_segment_number: 4 },
  };
  const create = await fetch(url, {
  method: 'PUT',

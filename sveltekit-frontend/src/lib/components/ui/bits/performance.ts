@@ -149,7 +149,7 @@ export class VirtualScrollManager {
  this.totalItems = count;
  }
 
- getVisibleRange(): {, start: number; end: number; offset: number } {
+ getVisibleRange(): { start: number; end: number; offset: number } {
  const { itemHeight, bufferSize, overscan } = this.options;
  const startIndex = Math.floor(this.scrollTop / itemHeight);
  const endIndex = Math.min(

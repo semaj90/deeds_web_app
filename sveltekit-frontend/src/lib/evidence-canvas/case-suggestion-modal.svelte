@@ -11,7 +11,7 @@ https://svelte.dev/e/js_parse_error -->
 
  import type { type AISuggestion } from './ai-suggestions-service';
 
- let { show = $bindable(false) }: {, show: boolean } = $props();
+ let { show = $bindable(false) }: { show: boolean } = $props();
  let currentSuggestion = $state <AISuggestion | null>(null);
 
  export function showModal(suggestion: AISuggestion) {

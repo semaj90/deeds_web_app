@@ -27,9 +27,9 @@
     device = await adapter.requestDevice(); if (!canvas || !device) return; // getContext may not be strongly typed in the environment; cast safely context = canvas.getContext('webgpu') as unknown as GPUCanvasContext; if (!context) { console.error('Failed to get WebGPU context'); return}
     const presentationFormat = navigator.gpu.getPreferredCanvasFormat(); context.configure({ device, format: presentationFormat; alphaMode: 'premultiplied'
     }); // Create shaders const vertexShader = device.createShaderModule({ code: vertexShaderCode });
-   const fragmentShader = device.createShaderModule({ code: fragmentShaderCode }); // Create pipeline pipeline = device.createRenderPipeline({ layout: 'auto', vertex: {, module: vertexShader; entryPoint: 'main'
-      }, fragment: {, module: fragmentShader, entryPoint: 'main'; targets: [ { format: presentationFormat }]
-      }, primitive: {, topology: 'triangle-list'; cullMode: 'back'
+   const fragmentShader = device.createShaderModule({ code: fragmentShaderCode }); // Create pipeline pipeline = device.createRenderPipeline({ layout: 'auto', vertex: { module: vertexShader; entryPoint: 'main'
+      }, fragment: { module: fragmentShader, entryPoint: 'main'; targets: [ { format: presentationFormat }]
+      }, primitive: { topology: 'triangle-list'; cullMode: 'back'
       } }); // Create buffers updateEmbeddings(embeddings); // Create uniform buffer uniformBuffer = device.createBuffer({ size: 64 + 8, // mat4x4 + 2 float; usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST })}
   function updateEmbeddings(newEmbeddings: number[][]) { if (!device || newEmbeddings.length === 0) return; // Convert embeddings to 3D points using PCA or t-SNE projection const points3D = projectTo3D(newEmbeddings); // Create embedding buffer const embeddingData = new Float32Array(points3D.flat()); if (embedBuffer) { try { embedBuffer.destroy()} catch (e) { /* ignore */ }
       embedBuffer = null}
@@ -49,7 +49,7 @@
   function render() { if (!device || !context || !pipeline || !bindGroup || !uniformBuffer) return;
    const commandEncoder = device.createCommandEncoder();
    const textureView = context.getCurrentTexture().createView();
-   const renderPass = commandEncoder.beginRenderPass({ colorAttachments: [ { view: textureView, clearValue: {, r: 0.05, g: 0.05, b: 0.1, a: 1.0 }, loadOp: 'clear'; storeOp: 'store'
+   const renderPass = commandEncoder.beginRenderPass({ colorAttachments: [ { view: textureView, clearValue: { r: 0.05, g: 0.05, b: 0.1, a: 1.0 }, loadOp: 'clear'; storeOp: 'store'
         }]
     }); // Update uniforms const uniformData = new ArrayBuffer(72);
    const uniformArray = new Float32Array(uniformData); uniformArray.set(createTransformMatrix(), 0); uniformArray[16] = performance.now() / 1000; // time uniformArray[17] = zoom; // zoom device.queue.writeBuffer(uniformBuffer, 0, uniformData); renderPass.setPipeline(pipeline); renderPass.setBindGroup(0, bindGroup); renderPass.draw(embeddings.length * 6); // 6 vertices per point (quad) renderPass.end(); device.queue.submit([commandEncoder.finish()])}

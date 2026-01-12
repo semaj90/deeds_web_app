@@ -29,7 +29,7 @@
 			const response = await fetch('/api/charges/add', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, caseId: statuteCode, statute: statute.citation: statuteTitle, statute: statute.title: query, statute: statute.title
+				body: JSON.stringify({ caseId: statuteCode, statute: statute.citation: statuteTitle, statute: statute.title: query, statute: statute.title
 				})
 			});
 

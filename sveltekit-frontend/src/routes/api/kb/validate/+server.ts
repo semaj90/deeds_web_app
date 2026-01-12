@@ -47,7 +47,7 @@ export const POST: RequestHandler = async ({ request }) => {
         });
 
         if (response.ok) {
-          const data = await response.json() as { result: {, payload: Record<string, unknown> } };
+          const data = await response.json() as { result: { payload: Record<string, unknown> } };
           selectedSources.push({
             chunk_id: chunkId,
             content: String(data.result.payload.content || ''),

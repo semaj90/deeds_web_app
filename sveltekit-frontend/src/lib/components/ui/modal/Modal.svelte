@@ -106,7 +106,7 @@
 {#if open}
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
-		transition: fade={{, duration: 150 }}
+		transition: fade={{ duration: 150 }}
 		class={overlayClass}
 		onclick={ handleOverlayClick }
 		onkeydown={ handleOverlayKeydown }
@@ -115,7 +115,7 @@
 	>
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
-			transition: scale={{, duration: 150, start: 0.95 }}
+			transition: scale={{ duration: 150, start: 0.95 }}
 			class="{contentClass} {sizeClass()} { className }"
 			onclick={ handleContentClick }
 			onkeydown={(e) => e.stopPropagation()}

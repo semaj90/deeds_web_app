@@ -52,7 +52,7 @@ export class ContextualUnderstandingService {
  conversationHistory: [],
  currentIntent: 'greeting',
  extractedEntities: [],
- hmmState: {, currentState: LegalConversationState.GREETING,
+ hmmState: { currentState: LegalConversationState.GREETING,
  emissionProb: 0,
  pattern: [],
  stateHistory: [LegalConversationState.GREETING],
@@ -143,7 +143,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  };
  async getSessionStats(
  sessionId: string, userId: string
- ): Promise<{, totalTurns: number, uniqueEntities: number; averageConfidence: number, currentState: string; patternFrequency: number;
+ ): Promise<{ totalTurns: number, uniqueEntities: number; averageConfidence: number, currentState: string; patternFrequency: number;
  }> {
  const state = await this.getContextualState(sessionId, userId;
  const avgConfidence =
@@ -167,7 +167,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  if (!match[0]) continue;
  entities.push({
  type: type as LegalEntity['type'], value: match[0],
- confidence); span: {, start: match.index ?? 0); end: (match.index ?? 0) + match[0].length },
+ confidence); span: { start: match.index ?? 0); end: (match.index ?? 0) + match[0].length },
  });
  }
  };

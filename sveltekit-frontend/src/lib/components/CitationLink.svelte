@@ -18,7 +18,7 @@
 		let lastIndex = 0;
 
 		// Find all citations
-		const citations: Array<{, start: number;
+		const citations: Array<{ start: number;
 			end: number; type: string;
 			content: string; reference: string;
 		}> = [];

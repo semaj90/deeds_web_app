@@ -239,7 +239,7 @@ class RouteRegistry {
         return metaCat ?? CATEGORY_UNKNOWN;
     }
 
-    private getRouteSearchMeta(route: RouteDefinition | GeneratedRoute): {, title: string, description: string, tags: string[], id: string } {
+    private getRouteSearchMeta(route: RouteDefinition | GeneratedRoute): { title: string, description: string, tags: string[], id: string } {
         const r = route as unknown as Record<string, unknown>;
         const title = this.asString(r['title']) ?? '';
         const description = this.asString(r['description']) ?? '';

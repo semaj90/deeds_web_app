@@ -79,7 +79,7 @@ export async function embedTextsBatch(
 /**
  * Check Ollama health and model availability
  */
-export async function checkOllamaHealth(): Promise<{, healthy: boolean;
+export async function checkOllamaHealth(): Promise<{ healthy: boolean;
  models: string[];
  error?: string;
 }> {

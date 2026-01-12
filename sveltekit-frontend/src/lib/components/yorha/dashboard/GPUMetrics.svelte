@@ -89,7 +89,7 @@
  })();
  });
 
- function getMetricColor(value: number, thresholds: {, low: number; high: number }): string {
+ function getMetricColor(value: number, thresholds: { low: number; high: number }): string {
  if (value >= thresholds.high) return 'text-red-400';
  if (value >= thresholds.low) return 'text-yellow-400';
  return 'text-green-400';

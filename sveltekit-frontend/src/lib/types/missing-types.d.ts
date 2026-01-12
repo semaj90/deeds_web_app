@@ -29,7 +29,7 @@ declare interface RAGDocument {
  metadata?: Record<string, unknown>;
 }
 // Store types
-declare const enhancedRAGStore: {, search: (query: string) => Promise<RAGSearchResult[]>;
+declare const enhancedRAGStore: { search: (query: string) => Promise<RAGSearchResult[]>;
  add: (doc: RAGDocument) => Promise<void>;
 };
 declare const documentVectors: unknown;

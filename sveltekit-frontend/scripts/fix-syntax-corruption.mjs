@@ -63,6 +63,22 @@ function fixSyntaxCorruption(content) {
         fixes.push('Removed double semicolons');
     }
 
+    // Pattern 4: Phantom start comma in object/type "{, "
+    const startCommaRegex = /{\s*,/g;
+    if (startCommaRegex.test(newContent)) {
+        newContent = newContent.replace(startCommaRegex, '{');
+        modified = true;
+        fixes.push('Removed phantom start comma in object');
+    }
+
+    // Pattern 5: Double commas ",,"
+    const doubleCommaRegex = /,,/g;
+    if (doubleCommaRegex.test(newContent)) {
+        newContent = newContent.replace(doubleCommaRegex, ',');
+        modified = true;
+        fixes.push('Removed double commas');
+    }
+
     return { modified, newContent, fixes };
 }
 

@@ -53,7 +53,7 @@ https://svelte.dev/e/js_parse_error -->
     aiTags: string[]; aiSummary: string | null;
     summary: string | null;
     isAdmissible: boolean; confidentialityLevel: string;
-    canvasPosition: {, x: number; y: number } | null;
+    canvasPosition: { x: number; y: number } | null;
     uploadedBy: string; uploadedAt: Date;
     updatedAt: Date;
     [key: string]: unknown;
@@ -194,7 +194,7 @@ https://svelte.dev/e/js_parse_error -->
       error = 'Failed to save report';
     }
   }
-  async function handleCanvasSave(data: {, objects: unknown[] }): Promise<void> {
+  async function handleCanvasSave(data: { objects: unknown[] }): Promise<void> {
     try {
       const now = new Date().toISOString();
       let stateToSave: CanvasState;

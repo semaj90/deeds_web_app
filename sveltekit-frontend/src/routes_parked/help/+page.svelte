@@ -433,7 +433,7 @@ Build on previous responses:
  const response = await fetch('/api/help/search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, query: searchQuery, category:activeCategory
+ body: JSON.stringify({ query: searchQuery, category:activeCategory
  })
  });
 

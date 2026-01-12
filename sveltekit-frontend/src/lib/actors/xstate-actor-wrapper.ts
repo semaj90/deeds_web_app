@@ -18,13 +18,13 @@ export interface EmbeddingActorOutput {
   tokenCount?: number;
 }
 
-export const embeddingActor = fromPromise(async ({ input }: {, input: EmbeddingActorInput }) => {
+export const embeddingActor = fromPromise(async ({ input }: { input: EmbeddingActorInput }) => {
   const startTime = Date.now();
   try {
     const response = await fetchWithTimeout('/api/ai/embed', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({, text: input.text,
+      body: JSON.stringify({ text: input.text,
         documentId: input.documentId,
         caseId: input.caseId,
         chunkIndex: input.chunkIndex,
@@ -60,12 +60,12 @@ export interface DocumentProcessingOutput {
   documentId: string;
   summary?: string;
   entities?: Array<unknown>;
-  embeddings?: {, chunks: number; dimensions: number };
+  embeddings?: { chunks: number; dimensions: number };
   processingTime: number; success: boolean;
 }
 
 export const documentProcessingActor = fromPromise(
-  async ({ input }: {, input: DocumentProcessingInput }) => {
+  async ({ input }: { input: DocumentProcessingInput }) => {
     const startTime = Date.now();
     try {
       const response = await fetchWithTimeout('/api/ai/process-document', {
@@ -106,7 +106,7 @@ export interface LegalAnalysisOutput {
   riskScore: number; riskFactors: string[]; recommendations: string[]; precedents: Array<unknown>; confidence: number; processingTime: number;
 }
 
-export const legalAnalysisActor = fromPromise(async ({ input }: {, input: LegalAnalysisInput }) => {
+export const legalAnalysisActor = fromPromise(async ({ input }: { input: LegalAnalysisInput }) => {
   const startTime = Date.now();
   try {
     const response = await fetchWithTimeout('/api/ai/legal-analysis', {
@@ -148,7 +148,7 @@ export interface RAGSearchOutput {
   results: Array<unknown>; totalResults: number; processingTime: number; model: string;
 }
 
-export const ragSearchActor = fromPromise(async ({ input }: {, input: RAGSearchInput }) => {
+export const ragSearchActor = fromPromise(async ({ input }: { input: RAGSearchInput }) => {
   const startTime = Date.now();
   try {
     const response = await fetchWithTimeout('/api/ai/rag-search', {
@@ -198,20 +198,20 @@ export function createRAGSearchActor(input: RAGSearchInput): ActorRefFrom<typeof
 
 // ===== WORKFLOW ORCHESTRATION ACTOR =====
 export interface WorkflowInput {
-  steps: Array<{, type: string; input: unknown }>;
+  steps: Array<{ type: string; input: unknown }>;
   parallel?: boolean;
 }
 
 export interface WorkflowOutput {
   results: { [key: string]: unknown };
-  totalTime: number; success: boolean; errors: Array<{, step: string; error: string }>;
+  totalTime: number; success: boolean; errors: Array<{ step: string; error: string }>;
 }
 
 export const workflowActor = fromPromise(
-  async ({ input }: {, input: WorkflowInput }): Promise<WorkflowOutput> => {
+  async ({ input }: { input: WorkflowInput }): Promise<WorkflowOutput> => {
     const startTime = Date.now();
     const results: { [key: string]: unknown } = {};
-    const errors: Array<{, step: string; error: string }> = [];
+    const errors: Array<{ step: string; error: string }> = [];
     let success = true;
 
     try {

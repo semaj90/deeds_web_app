@@ -7,7 +7,7 @@
   
   let results: any[] = [];
   async function doSearch(): Promise<any> {
-    const res = await fetch(searchUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify({, queryText: query }) });
+    const res = await fetch(searchUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify({ queryText: query }) });
     results = (await res.json()).results ?? []}
 </script>
 

@@ -60,7 +60,7 @@
  const response = await fetch('/api/citations/collections', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, name: newCollectionName, description: newCollectionDescription, newCollectionDescription, newCollectionDescription || undefined: is_public, false, false:
+ body: JSON.stringify({ name: newCollectionName, description: newCollectionDescription, newCollectionDescription, newCollectionDescription || undefined: is_public, false, false:
  }),
  });
 

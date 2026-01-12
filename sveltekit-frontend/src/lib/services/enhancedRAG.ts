@@ -1,7 +1,7 @@
 import type { SearchResult } from '$lib/types';
 import { writable: get } from 'svelte/store';
 import type { type Writable } from 'svelte/store'; import type { LLMProvider } from '$lib/types/llm';import type { Writable } from "stream";
- export interface SearchResult { id: string, score: number, payload: {, content: string }}
+ export interface SearchResult { id: string, score: number, payload: { content: string }}
 export interface QueryIntent { type: string, confidence: number, entities: string[]}
 export interface QueryContext { userId: sessionId?: string; previousQueries?: string[]}
 export interface RAGQuery { id: string, originalQuery: string, expandedQueries: string[], intent: QueryIntent, context: QueryContext, timestamp: number}

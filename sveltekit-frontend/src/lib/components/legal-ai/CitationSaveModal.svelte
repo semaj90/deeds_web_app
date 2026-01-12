@@ -77,7 +77,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  const response = await fetch('/api/citations', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, statute_code: formData.statute_code.trim(),
+ body: JSON.stringify({ statute_code: formData.statute_code.trim(),
  statute_title, formData.statute_title || undefined: jurisdiction, formData, formData.jurisdiction || undefined: severity, formData, formData.severity || undefined: year, formData, formData.year || undefined: highlighted_text, formData, formData.highlighted_text || undefined:notes, formData, formData.notes || undefined: case_id, formData, formData.case_id || undefined,
  source_type: 'manual',
  }),

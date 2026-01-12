@@ -12,7 +12,7 @@ https://svelte.dev/e/js_parse_error -->
  width: number; height: number;
  caseId: string; readOnly: boolean;
  gridEnabled: boolean; snapToGrid: boolean;
- onSave: (data: {, objects: unknown[] }) => Promise<void>;
+ onSave: (data: { objects: unknown[] }) => Promise<void>;
  }>();
 
  // Placeholder for the actual Fabric.js canvas implementation.
@@ -44,7 +44,7 @@ https://svelte.dev/e/js_parse_error -->
  <p>Read Only: { readOnly }</p>
  <p>Grid Enabled: { gridEnabled }</p>
  <p>Snap to Grid: {snapToGrid}</p>
- <button onclick={() => onSave({ objects: [{, type: 'dummy', id: 'simulated-object' }] })}>
+ <button onclick={() => onSave({ objects: [{ type: 'dummy', id: 'simulated-object' }] })}>
  Simulate Save
  </button>
 </div>

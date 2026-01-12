@@ -109,7 +109,7 @@ export class FeatureLogger {
  /**
  * Get log statistics
  */
- getStats(): {, errorBrain: number; legalAi: number } {
+ getStats(): { errorBrain: number; legalAi: number } {
  return {
  errorBrain: this.errorBrainLogs.length,
  legalAi: this.legalAiLogs.length,

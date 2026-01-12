@@ -6,7 +6,7 @@
 	// ─────────────────────────────────────
 	// Props & Data
 	// ─────────────────────────────────────
-	const { data }: {, data: PageData } = $props();
+	const { data }: { data: PageData } = $props();
 
 	// Make routes reactive so SSE updates trigger re-renders
 	// Initialize from server data
@@ -141,7 +141,7 @@
 			const response = await fetch(`/api/routes/${encodeURIComponent(routeId)}/interactions`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, interaction_type: interactionType,
+				body: JSON.stringify({ interaction_type: interactionType,
 					metadata: metadata || {}
 				})
 			});

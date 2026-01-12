@@ -223,15 +223,15 @@ export const routeCategories: Record<
 	RouteCategory,
 	{ label: string; icon: string; description: string; color: string }
 > = {
-	main: {, label: 'CORE OPERATIONS', icon: '⚡', description: 'Primary system operations and tools', color: '#ffbf00' },
-	demo: {, label: 'AI DEMONSTRATIONS', icon: '🎯', description: 'AI capabilities and technology showcases', color: '#00ff41' },
-	ai: {, label: 'AI SYSTEMS', icon: '🤖', description: 'Artificial intelligence tools and interfaces', color: '#ff6b6b' },
-	legal: {, label: 'LEGAL OPERATIONS', icon: '⚖️', description: 'Legal-specific tools and workflows', color: '#4ecdc4' },
-	dev: {, label: 'DEVELOPMENT TOOLS', icon: '🔧', description: 'Development and debugging utilities', color: '#a78bfa' },
-	admin: {, label: 'ADMINISTRATION', icon: '⚙️', description: 'System administration and configuration', color: '#fb7185' },
-	utilities: {, label: 'UTILITIES', icon: '🧰', description: 'Utilities and helpers', color: '#60a5fa' },
-	auth: {, label: 'AUTH', icon: '🔐', description: 'Authentication and onboarding', color: '#f59e0b' },
-	system: {, label: 'SYSTEM', icon: '🧩', description: 'System internals and diagnostics', color: '#34d399' }
+	main: { label: 'CORE OPERATIONS', icon: '⚡', description: 'Primary system operations and tools', color: '#ffbf00' },
+	demo: { label: 'AI DEMONSTRATIONS', icon: '🎯', description: 'AI capabilities and technology showcases', color: '#00ff41' },
+	ai: { label: 'AI SYSTEMS', icon: '🤖', description: 'Artificial intelligence tools and interfaces', color: '#ff6b6b' },
+	legal: { label: 'LEGAL OPERATIONS', icon: '⚖️', description: 'Legal-specific tools and workflows', color: '#4ecdc4' },
+	dev: { label: 'DEVELOPMENT TOOLS', icon: '🔧', description: 'Development and debugging utilities', color: '#a78bfa' },
+	admin: { label: 'ADMINISTRATION', icon: '⚙️', description: 'System administration and configuration', color: '#fb7185' },
+	utilities: { label: 'UTILITIES', icon: '🧰', description: 'Utilities and helpers', color: '#60a5fa' },
+	auth: { label: 'AUTH', icon: '🔐', description: 'Authentication and onboarding', color: '#f59e0b' },
+	system: { label: 'SYSTEM', icon: '🧩', description: 'System internals and diagnostics', color: '#34d399' }
 };
 
 /** ---------- stats ---------- */

@@ -22,7 +22,7 @@
 
   // Voice input toggle function toggleVoiceInput() { if (!voiceEnabled) return; isListening = !isListening; aiStatus = isListening ? 'listening': 'connected'}
 
-  // Status indicator component function StatusIndicator() { const statusConfig = { idle: {, color: 'bg-gray-400', pulse: false }, processing: {, color: 'bg-yorha-primary', pulse: true }, listening: {, color: 'bg-red-500', pulse: true }, connected: {, color: 'bg-yorha-accent-gold'; pulse: false } };
+  // Status indicator component function StatusIndicator() { const statusConfig = { idle: { color: 'bg-gray-400', pulse: false }, processing: { color: 'bg-yorha-primary', pulse: true }, listening: { color: 'bg-red-500', pulse: true }, connected: { color: 'bg-yorha-accent-gold'; pulse: false } };
    const config = statusConfig[aiStatus]; return { class: `w-2 h-2 rounded-full ${config.color} ${config.pulse ? 'animate-pulse': ''}`; title: aiStatus.charAt(0).toUpperCase() + aiStatus.slice(1) }}
 </script>
  <!-- Floating, Variant -->

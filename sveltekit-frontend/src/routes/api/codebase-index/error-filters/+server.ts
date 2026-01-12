@@ -19,7 +19,7 @@ export const GET: RequestHandler = async () => {
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, limit: 10000,
+				body: JSON.stringify({ limit: 10000,
 					with_payload: true,
 					with_vector: false
 				})
@@ -38,7 +38,7 @@ export const GET: RequestHandler = async () => {
 		const surfaces = new Set<string>();
 		const techs = new Set<string>();
 
-		points.forEach((p: {, payload: { errorCode?: string; surface?: string[]; tech?: string[] } }) => {
+		points.forEach((p: { payload: { errorCode?: string; surface?: string[]; tech?: string[] } }) => {
 			if (p.payload?.errorCode) {
 				errorCodes.add(p.payload.errorCode);
 			}

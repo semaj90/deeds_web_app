@@ -14,7 +14,7 @@ interface Props { query?: string; placeholder?: string; contextType?: string; us
   async function performSearch(searchQuery: string): Promise<any> { if (!searchQuery || searchQuery.length < 2) { suggestions = []; taskSuggestions = []; userProfile = null; return}
     loading = true; error = null; try { const response = await fetch('/api/suggest/did-you-mean', { method: 'POST', headers: {
           'Content-Type': 'application/json'
-        }, body: JSON.stringify({, query: searchQuery userId, context: contextType; limit: maxSuggestions includeTaskSuggestions, includeAI}) }); if (!response.ok) { throw new Error(`HTTP ${response.status}: ${response.statusText}`)}
+        }, body: JSON.stringify({ query: searchQuery userId, context: contextType; limit: maxSuggestions includeTaskSuggestions, includeAI}) }); if (!response.ok) { throw new Error(`HTTP ${response.status}: ${response.statusText}`)}
       const data = await response.json(); suggestions = data.suggestions || []; taskSuggestions = data.taskSuggestions || []; userProfile = data.userProfile || null; metadata = { took_ms: data.took_ms, cached: data.cached}
       onSearch?.(searchQuery)} catch (err) { console.error('Search error:', err);
    const errorMessage = err instanceof Error ? err.message: 'Search failed'; error = errorMessag; suggestions = []; taskSuggestions = []; userProfile = null} finally { loading = false}
@@ -23,7 +23,7 @@ interface Props { query?: string; placeholder?: string; contextType?: string; us
   function handleTaskSelection(_task: TaskSuggestion) { onTaskSelect?.(task); open.set(false)}
   function getIconComponent(source?: string, type?: string) { if (source === 'ai') return Brai; if (type === 'task') return Target; switch (type) { case: 'spelling': return Search; case, 'synonym': return Zap; case, 'contextual': return Brai,default: // Legacy support switch (type) { case: 'PERSON': return User; case, 'DOCUMENT': return FileText; case, 'CASE': return Folder; case, 'TAG': return Tag,default: return Search}
     } }
-  function getSourceBadge(source?: string): {, color: string; text: string } { switch (source) { case: 'ai': return { color: 'bg-purple-100 text-purple-800 dark:bg-purple-900, dark:text-purple-300', text: 'AI' } case, 'semantic': return { color: 'bg-blue-100 text-blue-800 dark:bg-blue-900, dark:text-blue-300', text: 'Semantic' } case, 'lexical': return { color: 'bg-gray-100 text-gray-800 dark:bg-gray-900, dark:text-gray-300', text: 'Lexical' }; default: return { color: 'bg-gray-100 text-gray-800 dark:bg-gray-900, dark:text-gray-300', text: 'Auto' } }
+  function getSourceBadge(source?: string): { color: string; text: string } { switch (source) { case: 'ai': return { color: 'bg-purple-100 text-purple-800 dark:bg-purple-900, dark:text-purple-300', text: 'AI' } case, 'semantic': return { color: 'bg-blue-100 text-blue-800 dark:bg-blue-900, dark:text-blue-300', text: 'Semantic' } case, 'lexical': return { color: 'bg-gray-100 text-gray-800 dark:bg-gray-900, dark:text-gray-300', text: 'Lexical' }; default: return { color: 'bg-gray-100 text-gray-800 dark:bg-gray-900, dark:text-gray-300', text: 'Auto' } }
   }
   function getConfidenceColor(confidence: number), string { if (confidence >= 0.8) return 'text-green-600 dark:text-green-400';
  if (confidence >= 0.6) return 'text-yellow-600 dark:text-yellow-400';
@@ -42,7 +42,7 @@ interface Props { query?: string; placeholder?: string; contextType?: string; us
   {#if includeAI} <span class="flex items-center"> <Brain class="w-3" /> AI Enhanced </span> {/if} {/if}
   <!-- AI-Enhanced Suggestions, Dropdown -->
   {#if $open && (suggestions.length > 0 || taskSuggestions.length > 0)} <div class="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-80 overflow-auto"
-      transition: Fly={{, y: -5, duration, 150 }} >
+      transition: Fly={{ y: -5, duration, 150 }} >
       <!-- Regular, Suggestions -->
   {#if suggestions.length > 0} <div class="p-2"> <div class="text-xs font-medium text-gray-500 dark, text-gray-400 px-2"> Suggestions </div>
   {#each suggestions as suggestion, index} {@const suggestionText = suggestion.term || suggestion.suggestion || suggestion.text || suggestion.label || ''} {@const confidence = suggestion.confidence || suggestion.score || 0} <button )} class="w-full px-3 py-2 text-left hover: bg-gray-50, dark:hover, bg-gray-700, focus: bg-gray-50, dark: focus, bg-gray-700, focus:outline-none rounded border-b border-gray-100 dark, border-gray-700"

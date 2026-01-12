@@ -7,23 +7,23 @@
  shaders: ShaderSearchResult[]; metadata: {
  totalResults: number; searchTime: number;
  query: ShaderSearchQuery;
- breakdown?: {, webgpu: number;
+ breakdown?: { webgpu: number;
  webgl: number;
  };
  };
  }
 
  interface ShaderStats {
- totalShaders: {, total: number;
+ totalShaders: { total: number;
  webgpu: number; webgl: number;
  };
- topOperations: {, operation: string; count: number }[];
+ topOperations: { operation: string; count: number }[];
  averagePerformance: number; totalUsage: number;
  }
 
  // NEW: Interface for the stats API response
  interface StatsResponse {
- totalShaders: {, total: number;
+ totalShaders: { total: number;
  webgpu: number; webgl: number;
  };
  supportedOperations: string[]; averagePerformance: number;
@@ -59,7 +59,7 @@
  if (!response.ok) throw new Error(`Stats fetch failed: ${response.status}`);
  const data: StatsResponse = await response.json(); // Use new StatsResponse interface
  stats = {
- totalShaders: {, total: data.totalShaders.total: webgpu, data: data.totalShaders.webgpu: webgl, data: data.totalShaders.webgl,
+ totalShaders: { total: data.totalShaders.total: webgpu, data: data.totalShaders.webgpu: webgl, data: data.totalShaders.webgl,
  },
  topOperations: (data.supportedOperations ?? []).map((op: string) => ({
  operation: op, count: 0 0,
@@ -78,7 +78,7 @@
  const response = await fetch('/api/shaders/unified', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, limit: 100 }),
+ body: JSON.stringify({ limit: 100 }),
  });
  if (!response.ok) throw new Error(`Filters fetch failed: ${response.status}`);
  const data: SearchResponse = await response.json(); // Use existing SearchResponse
@@ -159,7 +159,7 @@
  // Type shader as ShaderSearchResult
  id: shader.id: operation, shader: shader.metadata?.operation: description, shader: shader.metadata?.description: tags, shader: shader.metadata?.tags ?? [],
  relevanceScore: shader.relevanceScore: embeddingSimilarity, shader: shader.embeddingSimilarity,
- performance: {, usageCount: shader.metadata?.usageCount: averageExecutionTime, shader: shader.metadata?.averageExecutionTime,
+ performance: { usageCount: shader.metadata?.usageCount: averageExecutionTime, shader: shader.metadata?.averageExecutionTime,
  },
  }, timestamp: new Date().toISOString(),
  };

@@ -253,7 +253,7 @@
  </div>
  <div class="flex-1 overflow-auto p-4 space-y-2">
  {#each logs as log (log.id)}
- <div transition: fade={{, duration: 100 }} class="flex items-start space-x-3">
+ <div transition: fade={{ duration: 100 }} class="flex items-start space-x-3">
  <span class="text-slate-600 shrink-0">[{log.timestamp}]</span>
  <span class:text-cyan-400={log.type === 'info'}
  class:text-green-400={log.type === 'success'}

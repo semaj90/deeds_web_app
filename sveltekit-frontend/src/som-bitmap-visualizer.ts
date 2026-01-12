@@ -35,7 +35,7 @@ export interface SOMBitmapResult {
 }
 
 const paletteMap: Record<SOMBitmapPalette, [number, number, number][]> = {
-	grayscale: Array.from({, length: 256 }, (_, i) => [i, i, i] as [number, number, number]),
+	grayscale: Array.from({ length: 256 }, (_, i) => [i, i, i] as [number, number, number]),
 	blueprint: Array.from(
 		{ length: 256 },
 		(_, i) =>

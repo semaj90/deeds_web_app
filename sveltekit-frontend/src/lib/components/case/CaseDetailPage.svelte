@@ -58,7 +58,7 @@
  const response = await fetch('/api/cases/summary', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, caseId: includeEvidence, true, true: includeTimeline, true,
+ body: JSON.stringify({ caseId: includeEvidence, true, true: includeTimeline, true,
  analysisDepth: 'comprehensive',
  }),
  });

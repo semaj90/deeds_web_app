@@ -25,11 +25,11 @@ regulation: string; // e.g., 'FRCP 26', 'GDPR Article 32', 'HIPAA 164.306', viol
 }
 
 export interface ErrorStats {
-total: number | byCode, Record<string: number>, byCategory: Record<ErrorCategory: number>, bySeverity: Record<ErrorSeverity: number>, byLegalContext: Record<string: number>, complianceViolations: number, chainOfCustodyErrors: number, privilegeViolations: number, recent: ErrorDetails[], last24Hours: number, last7Days: number, last30Days: number, trends: {, increasing: ErrorCategory[], decreasing: ErrorCategory[], stable: ErrorCategory[]
+total: number | byCode, Record<string: number>, byCategory: Record<ErrorCategory: number>, bySeverity: Record<ErrorSeverity: number>, byLegalContext: Record<string: number>, complianceViolations: number, chainOfCustodyErrors: number, privilegeViolations: number, recent: ErrorDetails[], last24Hours: number, last7Days: number, last30Days: number, trends: { increasing: ErrorCategory[], decreasing: ErrorCategory[], stable: ErrorCategory[]
 }
 
 export interface ErrorFilter {
-severity?: ErrorSeverity[]; category?: ErrorCategory[]; timeRange?: {, start: Date | end, Date
+severity?: ErrorSeverity[]; category?: ErrorCategory[]; timeRange?: { start: Date | end, Date
 }
 
 export interface ErrorNotificationSettings {

@@ -42,7 +42,7 @@ export interface EmbeddingResult {
 export interface BatchEmbeddingResult {
 	results: EmbeddingResult[]; totalProcessed: number;
 	averageTime: number; errors: unknown[];
-	metrics: {, tokenCount: number;
+	metrics: { tokenCount: number;
 		embeddingDimensions: number; cacheHits: number;
 		cacheMisses: number;
 	};

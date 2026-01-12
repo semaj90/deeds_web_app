@@ -32,7 +32,7 @@ export interface EmbeddingError {
 /**
  * XState v5 actor for generating embeddings with legal context
  */
-export const embeddingActor = fromPromise(async ({ input }: {, input: EmbeddingInput }): Promise<EmbeddingOutput> => {
+export const embeddingActor = fromPromise(async ({ input }: { input: EmbeddingInput }): Promise<EmbeddingOutput> => {
   const startTime = Date.now();
   try {
     // Validate input
@@ -64,7 +64,7 @@ export const embeddingActor = fromPromise(async ({ input }: {, input: EmbeddingI
 			embedding,
 			dimension: embedding.length,
 			model: 'nomic-embed-text',
-			metadata: {, textLength: input.text.length,
+			metadata: { textLength: input.text.length,
 				processingTime,
 				caseId: input.context?.caseId,
 				evidenceId: input.context?.evidenceId,
@@ -111,7 +111,7 @@ export const embeddingActor = fromPromise(async ({ input }: {, input: EmbeddingI
  * Batch embedding actor for multiple texts
  */
 export const batchEmbeddingActor = fromPromise(
-  async ({ input }: {, input: EmbeddingInput[] }): Promise<EmbeddingOutput[]> => {
+  async ({ input }: { input: EmbeddingInput[] }): Promise<EmbeddingOutput[]> => {
     try {
       // Process embeddings in parallel with concurrency limit
       const batchSize = 5; // Prevent overwhelming Ollama

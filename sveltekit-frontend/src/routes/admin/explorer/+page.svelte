@@ -97,7 +97,7 @@
 			const response = await fetch('/api/admin/agent/fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, file_path: route.path,
+				body: JSON.stringify({ file_path: route.path,
 					error_count: route.errors
 				})
 			});

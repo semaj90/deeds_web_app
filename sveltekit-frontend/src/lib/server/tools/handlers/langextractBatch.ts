@@ -32,7 +32,7 @@ async function extractFromDocument(
   relationTypes: string[],
   model: string,
   timeout: number
-): Promise<{, entities: ExtractedEntity[]; relations: ExtractedRelation[] }> {
+): Promise<{ entities: ExtractedEntity[]; relations: ExtractedRelation[] }> {
   // Try LangExtract first
   try {
     const controller = new AbortController();
@@ -74,7 +74,7 @@ JSON:`;
         model,
         prompt,
         stream: false,
-        options: {, temperature: 0.1 }
+        options: { temperature: 0.1 }
       })
     });
 
@@ -115,7 +115,7 @@ async function langextractBatchHandler(request: LangExtractBatchRequest): Promis
   const model = options.model || 'gemma3-legal:latest';
   const timeout = options.timeout_ms || 30000;
 
-  const extractions: Array<{, doc_url: string;
+  const extractions: Array<{ doc_url: string;
     entities: ExtractedEntity[]; relations: ExtractedRelation[];
   }> = [];
 

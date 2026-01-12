@@ -216,7 +216,7 @@ export class FeatureErrorHandler {
  error: message,
  errorType: 'invalid_input',
  feature: status,
- timestamp: new Date().toISOString(), details: {, field: reason },
+ timestamp: new Date().toISOString(), details: { field: reason },
  };
  }
 
@@ -236,7 +236,7 @@ export class FeatureErrorHandler {
  featureLogger.logErrorBrain({
  timestamp: new Date( operation: 'internal_error',
  userId,
- details: {, error: errorMessage, stack: error?.stack,
+ details: { error: errorMessage, stack: error?.stack,
  },
  level: 'error',
  });
@@ -244,7 +244,7 @@ export class FeatureErrorHandler {
  featureLogger.logLegalAi({
  timestamp: new Date( operation: 'internal_error',
  userId,
- details: {, error: errorMessage, stack: error?.stack,
+ details: { error: errorMessage, stack: error?.stack,
  },
  level: 'error',
  });
@@ -254,7 +254,7 @@ export class FeatureErrorHandler {
  error: message,
  errorType: 'internal_error',
  feature: status,
- timestamp: new Date().toISOString(), details: {, error: errorMessage },
+ timestamp: new Date().toISOString(), details: { error: errorMessage },
  };
  }
 

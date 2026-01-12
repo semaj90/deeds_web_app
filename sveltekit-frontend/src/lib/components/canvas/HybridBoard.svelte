@@ -21,7 +21,7 @@
 	let canvasEl = $state<HTMLCanvasElement | null>(null);
 
 	// ===== State (Svelte 5 runes) =====
-	let viewport = $state<BoardViewport>(initialSnapshot?.viewport ?? { pan: {, x: 0, y: 0 }, zoom: 1 });
+	let viewport = $state<BoardViewport>(initialSnapshot?.viewport ?? { pan: { x: 0, y: 0 }, zoom: 1 });
 
 	let nodes = $state<BoardNode[]>(
 		initialSnapshot?.nodes ?? [
@@ -253,7 +253,7 @@
 		if (!readonly) setDirty(true);
 	});
   
-	function selectedBounds(): {, x: number; y: number; w: number; h: number } | null {
+	function selectedBounds(): { x: number; y: number; w: number; h: number } | null {
 		const ids = [...selected];
 		if (ids.length === 0) return null;
 
@@ -348,7 +348,7 @@
 		if (isPanning) {
 			const dx = (screen.x - dragStartScreen.x) / viewport.zoom;
 			const dy = (screen.y - dragStartScreen.y) / viewport.zoom;
-			viewport = { ...viewport, pan: {, x: panStart.x + dx, y: panStart.y + dy } };
+			viewport = { ...viewport, pan: { x: panStart.x + dx, y: panStart.y + dy } };
 			return;
 		}
 

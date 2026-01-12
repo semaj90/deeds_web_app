@@ -42,7 +42,7 @@ export interface ChatSession {
  id: string;
  title?: string; messages: ChatMessage[];
  createdAt: number; updatedAt: number;
- metadata?: {, totalMessages: number;
+ metadata?: { totalMessages: number;
  primaryBackend: Backend;
  legalDomain?: string; averageResponseTime: number;
  };
@@ -112,7 +112,7 @@ export interface VectorSearchResult {
 // Loki.js specific types
 export interface LokiMessage extends ChatMessage {
  $loki?: number;
- meta?: {, created: number;
+ meta?: { created: number;
  revision: number; version: number;
  };
 }
@@ -140,7 +140,7 @@ export interface BackendCapabilities {
  codeGeneration?: boolean;
  legalAnalysis?: boolean;
  };
- pricing?: {, inputTokens: number;
+ pricing?: { inputTokens: number;
  outputTokens: number; currency: string;
  };
 }
@@ -156,11 +156,11 @@ export interface LegalContext {
 
 export interface LegalAnalysisResult {
  summary: string; keyPoints: string[];
- risks: {, level: 'low' | 'medium' | 'high' | 'critical';
+ risks: { level: 'low' | 'medium' | 'high' | 'critical';
  description: string;
  recommendation?: string;
  }[];
- citations: {, type: 'statute' | 'case_law' | 'regulation' | 'contract';
+ citations: { type: 'statute' | 'case_law' | 'regulation' | 'contract';
  citation: string; relevance: number;
  }[];
  confidence: number;
@@ -172,7 +172,7 @@ export interface GPUAcceleration {
  device?: 'webgpu' | 'cuda' | 'opencl';
  memoryUsage?: number;
  computeUnits?: number;
- performance?: {, tokensPerSecond: number;
+ performance?: { tokensPerSecond: number;
  latencyMs: number; throughput: number;
  };
 }
@@ -189,7 +189,7 @@ export interface GoMicroRequest {
  payload: unknown;
  priority?: 'low' | 'medium' | 'high' | 'urgent';
  timeout?: number;
- retryPolicy?: {, maxRetries: number;
+ retryPolicy?: { maxRetries: number;
  backoffMs: number;
  };
 }
@@ -198,7 +198,7 @@ export interface GoMicroResponse {
  success: boolean;
  data?: any;
  error?: string;
- metadata?: {, processingNodes: string[];
+ metadata?: { processingNodes: string[];
  totalProcessingTime: number; queueTime: number;
  retryCount?: number;
  };
@@ -235,7 +235,7 @@ export interface ExportOptions {
 export interface RealtimeConfig {
  enableVoiceInput: boolean; enableVoiceOutput: boolean;
  enableTypingIndicators: boolean; enableReadReceipts: boolean;
- voiceSettings?: {, language: string;
+ voiceSettings?: { language: string;
  voice: string; rate: number;
  pitch: number;
  };
@@ -253,7 +253,7 @@ export interface LegalPlatformIntegration {
  documentId?: string;
  citationId?: string;
  analysisType?: 'evidence' | 'contract' | 'citation' | 'general';
- permissions?: {, read: boolean;
+ permissions?: { read: boolean;
  write: boolean; share: boolean;
  };
 }

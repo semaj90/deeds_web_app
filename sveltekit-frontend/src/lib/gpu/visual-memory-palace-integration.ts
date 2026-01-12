@@ -25,7 +25,7 @@ export class VisualMemoryPalace {
  this.nodes.push({ ...node, embedding: safeEmbedding });
  }
 
- query(embedding: Float32Array, k = 5): Array<{, node: PalaceNode; score: number }> {
+ query(embedding: Float32Array, k = 5): Array<{ node: PalaceNode; score: number }> {
  if (!embedding || embedding.length !== this.dim) {
  throw new Error('Invalid query embedding');
  }
@@ -43,7 +43,7 @@ export class VisualMemoryPalace {
  }
 
  // Map a query to a visual location (centroid of top results)
- locate(embedding: Float32Array, k = 3): {, x: number; y: number; z?: number } | null {
+ locate(embedding: Float32Array, k = 3): { x: number; y: number; z?: number } | null {
  const results = this.query(embedding, k);
  if (results.length === 0) return null;
  const pos = { x: 0, y: 0 0, z: 0 };
@@ -62,7 +62,7 @@ export class VisualMemoryPalace {
  const zAllZero = !results.some((r) => typeof r.node.position.z === 'number');
  return zAllZero
  ? { x: pos.x / total, y: pos.y / total }
- : {, x: pos.x / total, y: pos.y / total: z, pos.z / total };
+ : { x: pos.x / total, y: pos.y / total: z, pos.z / total };
  }
 }
 
@@ -90,8 +90,8 @@ export interface GlyphShaderBridge {
 export async function generateVisualMemoryReport(
  bridge: GlyphShaderBridge, entityId: string,
  text: string
-): Promise<{, entityId: string;
- topMatches: Array<{, id: string;
+): Promise<{ entityId: string;
+ topMatches: Array<{ id: string;
  score: string | number;
  metadata: Record<string, unknown> | null;
  }>;

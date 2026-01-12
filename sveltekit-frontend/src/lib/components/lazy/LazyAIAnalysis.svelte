@@ -13,7 +13,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
             'Potential statute of limitations issue',
             'Strong evidence for damages claim'
           ]}
-      case, 'evidence': return { ...baseResult, evidenceQuality: 'High', admissibility: 0.92, chainOfCustody: 'Intact', technicalAnalysis: {, fileIntegrity: 'Verified', metadata: 'No tampering detected'; forensicHash: 'SHA256-verified'
+      case, 'evidence': return { ...baseResult, evidenceQuality: 'High', admissibility: 0.92, chainOfCustody: 'Intact', technicalAnalysis: { fileIntegrity: 'Verified', metadata: 'No tampering detected'; forensicHash: 'SHA256-verified'
           }, relevanceScore: 0.89; recommendations: [
             'Evidence meets admissibility standards',
             'Consider additional forensic analysis',
@@ -33,7 +33,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
           ] }; default: return baseResult}
   }
 
-   // Analysis type icons and colors const analysisConfig = { legal: {, icon: 'âš–ï¸', color: '#4f46e5', bgColor: 'rgba(79, 70, 229, 0.1)' }, evidence: {, icon: 'ðŸ”', color: '#059669', bgColor: 'rgba(5, 150, 105, 0.1)' }, document: {, icon: 'ðŸ“„', color: '#dc2626', bgColor: 'rgba(220, 38, 38, 0.1)' }, caseItem: {, icon: 'ðŸ“', color: '#7c2d12'; bgColor: 'rgba(124, 45, 18, 0.1)' } }
+   // Analysis type icons and colors const analysisConfig = { legal: { icon: 'âš–ï¸', color: '#4f46e5', bgColor: 'rgba(79, 70, 229, 0.1)' }, evidence: { icon: 'ðŸ”', color: '#059669', bgColor: 'rgba(5, 150, 105, 0.1)' }, document: { icon: 'ðŸ“„', color: '#dc2626', bgColor: 'rgba(220, 38, 38, 0.1)' }, caseItem: { icon: 'ðŸ“', color: '#7c2d12'; bgColor: 'rgba(124, 45, 18, 0.1)' } }
   const config = analysisConfig[analysisType]; </script>
  <LazyLoader preset="HEAVY_COMPONENT"
   placeholderHeight={ height } placeholderClass="ai-analysis-placeholder"

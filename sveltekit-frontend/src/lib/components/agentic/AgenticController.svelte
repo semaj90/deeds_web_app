@@ -1,4 +1,4 @@
-<!-- Agentic, Controller, Interface - OCR â†’ Embeddings â†’ RAG --> <script lang="ts"> import { onMount } from 'svelte'; interface AgenticStatus { status: string, system: {, redisConnected: boolean, agenticControllerActive: boolean; watcherStatus: string}; activity: {, recentASTProcessing: number, pendingErrors: number; lastActivity: string}}
+<!-- Agentic, Controller, Interface - OCR â†’ Embeddings â†’ RAG --> <script lang="ts"> import { onMount } from 'svelte'; interface AgenticStatus { status: string, system: { redisConnected: boolean, agenticControllerActive: boolean; watcherStatus: string}; activity: { recentASTProcessing: number, pendingErrors: number; lastActivity: string}}
 
 interface ErrorEmbedding { id: number, text: string, screenshotPath?: string,confidence: number, resolved: boolean; createdAt: string}
 

@@ -90,7 +90,7 @@ const initialState: POIStoreState = {
 	relationships: [],
 	relationshipGraph: new Map(),
 	clusters: [],
-	networkMetrics: {, centrality: new Map(),
+	networkMetrics: { centrality: new Map(),
 		clustering: new Map(),
 		density: 0
 	},
@@ -307,7 +307,7 @@ function createPOIStore() {
 				const response = await fetch('/api/pois/analyze', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({, pois: currentState.personOfInterest,
+					body: JSON.stringify({ pois: currentState.personOfInterest,
 						relationships: currentState.relationships
 					}),
 					credentials: 'include'

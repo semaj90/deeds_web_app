@@ -77,7 +77,7 @@
  const response = await fetch('/api/ai/memo-skeleton', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, facts: $items.filter((i) => i.type === 'note').map((i) => i.content).join('\n\n'), statutes: $items.filter((i) => i.type === 'statute').map((i) => i.title).join(', '), notes: $items.filter((i) => i.type === 'note').map((i) => i.title),
+ body: JSON.stringify({ facts: $items.filter((i) => i.type === 'note').map((i) => i.content).join('\n\n'), statutes: $items.filter((i) => i.type === 'statute').map((i) => i.title).join(', '), notes: $items.filter((i) => i.type === 'note').map((i) => i.title),
  }),
  });
 

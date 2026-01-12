@@ -54,8 +54,8 @@ export interface CaseTheoryRequestPayload {
  contestedFacts?: string[];
  defenseAngles?: string[];
  narrativeBeats?: string[];
- keyEvidence?: Array<{, label: string; purpose?: string }>;
- witnessProfiles?: Array<{, name: string; angle?: string }>;
+ keyEvidence?: Array<{ label: string; purpose?: string }>;
+ witnessProfiles?: Array<{ name: string; angle?: string }>;
  legalIssues?: string[];
  deliverables?: string[];
  tone?: string;

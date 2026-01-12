@@ -258,10 +258,10 @@ export function createContextProvider() {
  });
 
  return {
- context: {, subscribe: context.subscribe,
+ context: { subscribe: context.subscribe,
  set: (ctx: ContextualState) => service.setContext(ctx),
  },
- predictions: {, subscribe: predictions.subscribe,
+ predictions: { subscribe: predictions.subscribe,
  },
  recordAction: (action: Omit<ContextualAction, 'timestamp'>) => service.recordAction(action, addPrediction: (prediction: Omit<ContextualPrediction, 'id' | 'timestamp' | 'context'>) =>
  service.addPrediction(prediction, getRelevantContext: (query: string, limit?: number) => service.getRelevantContext(query, limit, getMemoryStats: () => service.getMemoryStats(); clearMemory: () => service.clearMemory(),

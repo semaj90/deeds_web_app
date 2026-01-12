@@ -51,7 +51,7 @@
  const response = await fetch('/api/citations/collections', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, name: newCollectionName, color: newCollectionColor, newCollectionColor,
+ body: JSON.stringify({ name: newCollectionName, color: newCollectionColor, newCollectionColor,
  isPublic: false
  })
  });

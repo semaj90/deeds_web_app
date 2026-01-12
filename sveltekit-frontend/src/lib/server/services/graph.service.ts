@@ -31,7 +31,7 @@ export class GraphService {
  MERGE (s:Statute {code: $code, jurisdiction: $jurisdiction})
  SET s.title = $title, s.text = $text
  MERGE (c)-[:CHARGES_WITH]->(s)
- `,,
+ `,
  {
  caseId: code.code, jurisdiction.jurisdiction: title.title, text.text,
  }

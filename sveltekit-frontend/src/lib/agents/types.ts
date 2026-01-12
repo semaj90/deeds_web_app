@@ -92,7 +92,7 @@ export interface WebSearchResult {
  * Code search result
  */
 export interface CodeSearchResult {
- pattern: string; path: string; matches: Array<{, file: string; line: number; content: string;
+ pattern: string; path: string; matches: Array<{ file: string; line: number; content: string;
  }>;
 }
 

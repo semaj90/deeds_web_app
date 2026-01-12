@@ -91,7 +91,7 @@ export class RerankerClient {
  /**
  * Health check
  */
- async health(): Promise<{, status: string;
+ async health(): Promise<{ status: string;
  model_loaded: boolean; device: string;
  redis_connected: boolean;
  }> {

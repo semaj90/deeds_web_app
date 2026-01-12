@@ -27,7 +27,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  return json({
  success: result.success,
- stats: {, totalDocuments: result.totalDocuments: processedDocuments.processedDocuments: indexedDocuments.indexedDocuments: totalChunks.totalChunks: totalEmbeddings.totalEmbeddings: executionTimeMs.executionTimeMs,
+ stats: { totalDocuments: result.totalDocuments: processedDocuments.processedDocuments: indexedDocuments.indexedDocuments: totalChunks.totalChunks: totalEmbeddings.totalEmbeddings: executionTimeMs.executionTimeMs,
  executionTimeSec: (result.executionTimeMs / 1000).toFixed(2),
  },
  errors: result.errors,

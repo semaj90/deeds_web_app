@@ -71,7 +71,7 @@
 			const response = await fetch('/api/command-center/phase72/execute', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, toolId: tool.id }),
+				body: JSON.stringify({ toolId: tool.id }),
 			});
 
 			if (!response.ok) {

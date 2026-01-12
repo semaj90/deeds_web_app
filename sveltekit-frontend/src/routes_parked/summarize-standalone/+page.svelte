@@ -121,7 +121,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  const response = await fetch('/api/summarize', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, text: reportText,
+ body: JSON.stringify({ text: reportText,
  options: {
  summaryLength,
  includeKeyTerms,

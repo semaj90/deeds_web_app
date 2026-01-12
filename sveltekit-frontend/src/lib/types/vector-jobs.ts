@@ -93,7 +93,7 @@ export interface WASMLLMConfig {
 export interface WASMLLMResponse {
  text: string; tokens: number;
  processingTimeMs: number; confidence: number;
- metadata: {, model: string;
+ metadata: { model: string;
  promptTokens: number; completionTokens: number;
  totalTokens: number;
  };
@@ -118,29 +118,29 @@ export interface LegalSimilarityResult {
 }
 // Monitoring and metrics types
 export interface VectorServiceMetrics {
- queueDepth: {, embeddings: number; similarities: number; indexing: number; clustering: number };
- processingStats: {, totalProcessed: number;
+ queueDepth: { embeddings: number; similarities: number; indexing: number; clustering: number };
+ processingStats: { totalProcessed: number;
  averageProcessingTimeMs: number; successRate: number;
  errorRate: number;
  };
- resourceUsage: {, cudaUtilization: number;
+ resourceUsage: { cudaUtilization: number;
  webgpuUtilization: number; memoryUsage: number;
  redisConnections: number;
  };
- performance: {, cudaOpsPerSecond: number;
+ performance: { cudaOpsPerSecond: number;
  webgpuOpsPerSecond: number; vectorsPerSecond: number;
  throughputMBps: number;
  };
 }
 export interface VectorHealthStatus {
  overall: 'healthy' | 'degraded' | 'unhealthy';
- services: {, redis: 'connected' | 'disconnected' | 'error';
+ services: { redis: 'connected' | 'disconnected' | 'error';
  postgres: 'connected' | 'disconnected' | 'error';
  rabbitmq: 'connected' | 'disconnected' | 'error';
  cuda: 'available' | 'unavailable' | 'error';
  webgpu: 'available' | 'unavailable' | 'not_supported';
  };
- queues: { [queueName: string]: {, depth: number; consumers: number; processingRate: number } };
+ queues: { [queueName: string]: { depth: number; consumers: number; processingRate: number } };
  lastHealthCheck: Date;
 }
 // Error types for vector processing

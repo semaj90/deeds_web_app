@@ -21,7 +21,7 @@ interface CacheEntry {
 
 export class WebSearchService {
  private cache: Map<string, CacheEntry> = new Map();
- private requestQueue: Array<{, query: string;
+ private requestQueue: Array<{ query: string;
  resolve: (results: SearchResult[]) => void;
  reject: (error: Error) => void;
  }> = [];
@@ -260,7 +260,7 @@ export class WebSearchService {
  /**
  * Get cache statistics
  */
- getCacheStats(): {, size: number; entries: number } {
+ getCacheStats(): { size: number; entries: number } {
  return {
  size: this.cache.size, Array.from(this.cache.values()).reduce(
  (sum, entry) => sum + entry.results.length,

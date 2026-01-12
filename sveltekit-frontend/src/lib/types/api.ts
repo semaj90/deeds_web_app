@@ -198,11 +198,11 @@ export interface SearchRequest {
  type?: 'cases' | 'evidence' | 'statutes' | 'all';
  filters?: {
  caseId?: string;
- dateRange?: {, start: Date; end: Date };
+ dateRange?: { start: Date; end: Date };
  tags?: string[];
  status?: string[];
  };
- pagination?: {, page: number; limit: number };
+ pagination?: { page: number; limit: number };
 }
 
 export interface SearchResponse<T = unknown> {
@@ -596,16 +596,16 @@ export interface HealthCheckResult {
 export interface ClusterMetrics {
  spawned: Record<string, number>;
  deferredActive: number; deferredTotal: number;
- lastAllocation?: {, type: string; port: number; timestamp: string };
+ lastAllocation?: { type: string; port: number; timestamp: string };
  events: unknown[]; workers: unknown[];
  deferredQueue: unknown[];
 }
 
 // Performance Metrics Interface
 export interface PerformanceMetrics {
- protocols: {, QUIC: string; gRPC: string; HTTP: string; WebSocket: string };
- resources: {, cpu: string; memory: string; gpu?: string; storage: string };
- performance: {, averageResponseTime: string; uptime: string; throughput: string };
+ protocols: { QUIC: string; gRPC: string; HTTP: string; WebSocket: string };
+ resources: { cpu: string; memory: string; gpu?: string; storage: string };
+ performance: { averageResponseTime: string; uptime: string; throughput: string };
  timestamp: string;
 }
 
@@ -647,8 +647,8 @@ export interface EnhancedUploadResponse extends APIResponse {
  size: number; contentType: string;
  uploadTime: string; processingStatus: 'pending' | 'processing' | 'completed' | 'failed';
  extractedText?: string;
- ocrResults?: {, text: string; confidence: number; language: string };
- embeddings?: {, model: string; dimensions: number; generated: boolean };
+ ocrResults?: { text: string; confidence: number; language: string };
+ embeddings?: { model: string; dimensions: number; generated: boolean };
  analysis?: EvidenceAIAnalysis; metadata: Record<string, unknown>;
 }
 
@@ -667,14 +667,14 @@ export interface DimensionalCacheResponse extends APIResponse {
  embeddings?: number[][];
  attention?: number[][];
  metadata?: Record<string, unknown>;
- cacheStats?: {, hitRate: number; size: number; capacity: number; evictions: number };
+ cacheStats?: { hitRate: number; size: number; capacity: number; evictions: number };
 }
 
 // XState Idle Detection & Queue Management
 export interface XStateRequest {
  action: 'transition' | 'queue' | 'status' | 'health';
  state?: 'idle' | 'active' | 'computing' | 'offline' | 'error';
- jobData?: {, id: string;
+ jobData?: { id: string;
  type: 'computation' | 'analysis' | 'processing' | 'rag' | 'upload';
  priority: 'low' | 'medium' | 'high' | 'critical';
  payload: Record<string, unknown>;
@@ -685,13 +685,13 @@ export interface XStateRequest {
 
 export interface XStateResponse extends APIResponse {
  currentState: string;
- queueStatus?: {, pending: number;
+ queueStatus?: { pending: number;
  processing: number; completed: number;
  failed: number; total: number;
  };
  idleTime?: number;
  lastActivity?: string;
- machineConfig?: {, states: string[]; transitions: Record<string, string[]> };
+ machineConfig?: { states: string[]; transitions: Record<string, string[]> };
 }
 
 // Modular Hot-Swappable Experience System
@@ -726,7 +726,7 @@ export interface RecommendationResponse extends APIResponse {
  lastActivity?: string;
  corrected?: string;
  relatedSearches?: string[];
- userPattern?: {, mostUsedFeatures: string[];
+ userPattern?: { mostUsedFeatures: string[];
  preferredSearchTerms: string[]; averageSessionTime: number;
  };
 }
@@ -746,8 +746,8 @@ export interface SystemHealthResponse extends APIResponse {
 export interface ServiceDiscoveryResponse extends APIResponse {
  services: unknown[]; total: number;
  active: number; experimental: number;
- protocolSupport: {, HTTP: number; gRPC: number; QUIC: number; WebSocket: number };
- deployment: {, type: 'Windows Native'; docker: false; processes: number };
+ protocolSupport: { HTTP: number; gRPC: number; QUIC: number; WebSocket: number };
+ deployment: { type: 'Windows Native'; docker: false; processes: number };
 }
 
 // NATS Messaging Integration Types
@@ -844,7 +844,7 @@ export interface CommandSearchRequest {
 }
 
 export interface CommandSearchResponse {
- results: {, cases: unknown[]; evidence: unknown[]; documents: unknown[]; people: unknown[] };
+ results: { cases: unknown[]; evidence: unknown[]; documents: unknown[]; people: unknown[] };
  success?: boolean;
  meta?: Record<string, unknown>;
 }

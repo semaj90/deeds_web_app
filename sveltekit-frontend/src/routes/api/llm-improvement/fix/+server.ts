@@ -33,7 +33,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return json({
 			success: result.success,
-			result: {, action: result.action, confidence: result.confidence, fixApplied: result.fixApplied, experienceId: result.experienceId, error: result.error
+			result: { action: result.action, confidence: result.confidence, fixApplied: result.fixApplied, experienceId: result.experienceId, error: result.error
 			},
 			stats: decisionEngine.getStats()
 		});
@@ -57,7 +57,7 @@ export const GET: RequestHandler = async () => {
 
 		return json({
 			success: true,
-			stats: {, decision: decisionEngine.getStats(),
+			stats: { decision: decisionEngine.getStats(),
 				thresholds: decisionEngine.getThresholds()
 			}
 		});

@@ -89,7 +89,7 @@
 			const embedRes = await fetch('http://localhost:11434/api/embed', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, model: 'embeddinggemma:latest', input: searchQuery })
+				body: JSON.stringify({ model: 'embeddinggemma:latest', input: searchQuery })
 			});
 
 			if (!embedRes.ok) throw new Error('Embedding failed');
@@ -132,7 +132,7 @@
 			const res = await fetch('http://localhost:6333/collections/phase89_error_clusters/points/scroll', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, limit: 50, with_payload: true })
+				body: JSON.stringify({ limit: 50, with_payload: true })
 			});
 
 			if (!res.ok) return;
@@ -178,7 +178,7 @@
 			const res = await fetch('/api/phase89/pipeline', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, action: 'cluster', chunkSize: 500 })
+				body: JSON.stringify({ action: 'cluster', chunkSize: 500 })
 			});
 
 			if (res.ok) {
@@ -212,7 +212,7 @@
 			const res = await fetch('/api/phase89/fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, cluster_id: cluster.cluster_id,
+				body: JSON.stringify({ cluster_id: cluster.cluster_id,
 					strategy: cluster.fix_strategy,
 					ace_context: true
 				})

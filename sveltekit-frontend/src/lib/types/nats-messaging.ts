@@ -131,15 +131,15 @@ export interface MessageMetrics {
  error_count: number;
 }
 export interface PerformanceMetrics {
- throughput: {, messages_per_second: number;
+ throughput: { messages_per_second: number;
  bytes_per_second: number; peak_messages_per_second: number;
  peak_bytes_per_second: number;
  };
- latency: {, avg_publish_latency_ms: number;
+ latency: { avg_publish_latency_ms: number;
  avg_delivery_latency_ms: number; p95_publish_latency_ms: number;
  p95_delivery_latency_ms: number;
  };
- reliability: {, success_rate: number;
+ reliability: { success_rate: number;
  retry_rate: number; duplicate_rate: number;
  loss_rate: number;
  };
@@ -282,7 +282,7 @@ export interface SearchEventData {
 export interface SearchFilters {
  case_ids?: string[];
  document_types?: string[];
- date_range?: {, from: string; to?: string };
+ date_range?: { from: string; to?: string };
  priority?: string[];
  status?: string[];
  assigned_to?: string[];

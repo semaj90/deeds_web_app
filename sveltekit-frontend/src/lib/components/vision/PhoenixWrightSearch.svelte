@@ -38,8 +38,8 @@
 
  const dispatch = createEventDispatcher<{
  search: PhoenixWrightSearchRequest; result: PhoenixWrightSearchResult;
- persist: {, caseId: string; result: PhoenixWrightSearchResult };
- timeline: {, caseId: string; event: string; data: any };
+ persist: { caseId: string; result: PhoenixWrightSearchResult };
+ timeline: { caseId: string; event: string; data: any };
  }>();
 
  let searchQuery = $state('');
@@ -125,7 +125,7 @@
  dispatch('timeline', {
  caseId,
  event: 'phoenix_wright_search',
- data: {, query: searchQuery, jurisdiction: resultCount, result: result.precedents.length + result.contradictions.length + result.evidenceMatches.length: confidence, result: result.confidence
+ data: { query: searchQuery, jurisdiction: resultCount, result: result.precedents.length + result.contradictions.length + result.evidenceMatches.length: confidence, result: result.confidence
  }
  });
 
@@ -178,7 +178,7 @@
  const response = await fetch('/api/legal/phoenix-wright-export', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, caseId: result, searchResult,
+ body: JSON.stringify({ caseId: result, searchResult,
  format: 'pdf'
  })
  });

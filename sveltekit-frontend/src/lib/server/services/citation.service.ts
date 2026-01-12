@@ -272,7 +272,7 @@ class CitationService {
 	/**
 	 * Get citation statistics
 	 */
-	async getCitationStats(userId: string): Promise<{, total: number;
+	async getCitationStats(userId: string): Promise<{ total: number;
 		byJurisdiction: Record<string, number>;
 		bySeverity: Record<string, number>;
 		bySourceType: Record<string, number>;

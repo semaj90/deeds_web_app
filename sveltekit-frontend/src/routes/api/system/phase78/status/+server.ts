@@ -92,14 +92,14 @@ export const GET: RequestHandler = async ({ locals }) => {
 		return json({
 			timestamp: new Date().toISOString(),
 			status: 'active',
-			routes: {, stats: routeStats[0],
+			routes: { stats: routeStats[0],
 				critical: criticalRoutes
 			},
-			suggestions: {, stats: suggestionStats[0],
+			suggestions: { stats: suggestionStats[0],
 				recent: suggestions
 			},
 			clusters: clusterStats[0],
-			systemHealth: {, database: 'connected',
+			systemHealth: { database: 'connected',
 				qdrant: 'unknown',
 				ollama: 'unknown'
 			}

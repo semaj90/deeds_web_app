@@ -195,7 +195,7 @@ class CaseLinkService {
  /**
  * Get link statistics
  */
- async getLinkStats(caseId: string): Promise<{, total: number, byLinkType: Record<string, number>;
+ async getLinkStats(caseId: string): Promise<{ total: number, byLinkType: Record<string, number>;
  }> {
  try {
  const total = await this.getLinkCount(caseId;

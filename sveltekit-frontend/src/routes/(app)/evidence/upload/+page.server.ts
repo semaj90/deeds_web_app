@@ -69,7 +69,7 @@ interface FinalEvidenceMetadata {
 	legalConcepts?: string[];
 	citations?: string[];
 	ocrConfidence?: number;
-	resolution?: {, width: number; height: number };
+	resolution?: { width: number; height: number };
 	format?: string;
 	hasAlphaChannel?: boolean;
 	durationSeconds?: number;
@@ -142,13 +142,13 @@ export const actions: Actions = {
 			// Accept generic form entry (server may provide a non-DOM File)
 			const rawFile = formData.get('file');
 			if (!rawFile) {
-				return fail(400, { form: {, errors: { file: ['No file provided'] } } });
+				return fail(400, { form: { errors: { file: ['No file provided'] } } });
 			}
 
 			// Ensure the provided entry supports arrayBuffer (basic duck-typing)
 			if (typeof (rawFile as any).arrayBuffer !== 'function') {
 				return fail(400, {
-					form: {, errors: { file: ['Uploaded file is not readable on server'] } }
+					form: { errors: { file: ['Uploaded file is not readable on server'] } }
 				});
 			}
 
@@ -177,7 +177,7 @@ export const actions: Actions = {
 			if (caseId) {
 				const caseRecord = await db.select().from(cases).where(eq(cases.id, caseId)).limit(1);
 				if (!caseRecord || caseRecord.length === 0) {
-					return fail(400, { form: {, errors: { case_id: ['Selected case not found'] } } });
+					return fail(400, { form: { errors: { case_id: ['Selected case not found'] } } });
 				}
 			}
 
@@ -267,7 +267,7 @@ export const actions: Actions = {
 					tempMetadata = {
 						...tempMetadata,
 						kind: 'IMAGE',
-						resolution: {, width: 0, height: 0 },
+						resolution: { width: 0, height: 0 },
 						format: fileType.split('/')[1] || 'unknown',
 						hasAlphaChannel: fileType === 'image/png',
 						extractedText: ocrResult?.text ?? undefined,
@@ -341,7 +341,7 @@ export const actions: Actions = {
 		} catch (error: unknown) {
 			console.error('Evidence upload failed:', error);
 			return fail(500, {
-				form: {, errors: { _global: ['Server error while uploading evidence'] } }
+				form: { errors: { _global: ['Server error while uploading evidence'] } }
 			});
 		}
 	}

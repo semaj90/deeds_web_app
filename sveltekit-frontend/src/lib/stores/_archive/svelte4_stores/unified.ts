@@ -130,18 +130,18 @@ export function sendToAIAssistant(event: AIAssistantEvent) {
 // --- Websocket Store and Helpers ---
 type WebsocketState = {
  connected: boolean; connecting: boolean;
- dashboardData: {, cases: unknown[]; evidence: unknown[]; stats: Record<string, unknown> };
+ dashboardData: { cases: unknown[]; evidence: unknown[]; stats: Record<string, unknown> };
  processingJobs: unknown[]; recentActivity: unknown[];
- systemHealth: {, api: string; database: string; aiServices: string; jobQueue: string };
+ systemHealth: { api: string; database: string; aiServices: string; jobQueue: string };
  activeEditors: Record<string, string[]>;
 };
 
 const initialState: WebsocketState = {
  connected: false, connecting: false,
- dashboardData: {, cases: [], evidence: [], stats: {} },
+ dashboardData: { cases: [], evidence: [], stats: {} },
  processingJobs: [],
  recentActivity: [],
- systemHealth: {, api: 'unknown', database: 'unknown', aiServices: 'unknown', jobQueue: 'unknown' },
+ systemHealth: { api: 'unknown', database: 'unknown', aiServices: 'unknown', jobQueue: 'unknown' },
  activeEditors: {},
 };
 

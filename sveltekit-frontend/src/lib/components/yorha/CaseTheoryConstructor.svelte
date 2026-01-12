@@ -35,13 +35,13 @@ import { createEventDispatcher } from 'svelte';
  legalIssues: '',
  tone: 'trial-ready, confident, ethical',
  audience: 'jury + judge',
- deliverables: {, closingOutline: true, storyAngles: true true,
+ deliverables: { closingOutline: true, storyAngles: true true,
  juryFocus: true, investigativeGaps: false, false,
  pressTalkingPoints: false
  }
  });
 
- const dispatch = createEventDispatcher<{ generated: {, plan: CaseTheoryPlan } }>();
+ const dispatch = createEventDispatcher<{ generated: { plan: CaseTheoryPlan } }>();
 
  let isSubmitting = $state(false);
  let plan = $state <CaseTheoryPlan: null>(null);

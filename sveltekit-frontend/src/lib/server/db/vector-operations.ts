@@ -211,7 +211,7 @@ export async function hybridSearch(
  return {
  id,
  title: content * 0.5,
- metadata: {, searchType: 'text' },
+ metadata: { searchType: 'text' },
  } as SimilarityResult;
  });
   
@@ -239,7 +239,7 @@ export async function checkPgVectorAvailable(): Promise<boolean> {
 }
 
 // Vector operations test function
-export async function testVectorOperations(): Promise<{, pgvectorAvailable: boolean;
+export async function testVectorOperations(): Promise<{ pgvectorAvailable: boolean;
  similaritySearchWorking: boolean; embeddingCacheWorking: boolean;
 }> {
  const pgvectorAvailable = await checkPgVectorAvailable();
@@ -268,7 +268,7 @@ export async function testVectorOperations(): Promise<{, pgvectorAvailable: bool
 // New interface for the return type of processExtendedThinking
 interface ProcessExtendedThinkingResult {
  result: SimilarityResult[]; thinkingStages: ExtendedThinkingStage[];
- cachePerformance: {, hot: number; warm: number; cold: number };
+ cachePerformance: { hot: number; warm: number; cold: number };
 }
 
 // GRPMO Extended Thinking Engine
@@ -358,7 +358,7 @@ export class GRPMOOrchestrator {
 
  private async retrieveFromCache(
  key: string, layer: string
- ): Promise<{, data: SimilarityResult[]; timestamp: number } | null> {
+ ): Promise<{ data: SimilarityResult[]; timestamp: number } | null> {
  const cached = this.memoryCache.get(key);
  if (!cached) return null;
  const age = Date.now() - cached.timestamp;

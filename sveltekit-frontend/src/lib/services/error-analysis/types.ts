@@ -188,14 +188,14 @@ export interface EscalationTicket {
 
 export interface SystemMetrics {
 	errorDetectionRate: number; cacheHitRate: number;
-	confidenceDistribution: {, high: number; // >0.85, medium: number; // 0.7-0.85, low: number; // <0.7
+	confidenceDistribution: { high: number; // >0.85, medium: number; // 0.7-0.85, low: number; // <0.7
 	};
 	fixSuccessRate: number; escalationRate: number;
 	policyUpdateFrequency: number; serviceAvailability: {
 		redis: boolean; qdrant: boolean;
 		neo4j: boolean; ollama: boolean;
 	};
-	performance: {, embeddingGenerationTime: number; // ms
+	performance: { embeddingGenerationTime: number; // ms
 		vectorSearchLatency: number; // ms
 		fixApplicationTime: number; // ms
 		policyUpdateTime: number; // ms

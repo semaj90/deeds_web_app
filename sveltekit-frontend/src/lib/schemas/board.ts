@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const boardViewportSchema = z.object({
-    pan: z.object({, x: z.number( y: z.number() }, zoom: z.number()
+    pan: z.object({ x: z.number( y: z.number() }, zoom: z.number()
 });
 
 export const boardNodeSchema = z.object({

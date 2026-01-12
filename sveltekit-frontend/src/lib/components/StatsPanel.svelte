@@ -2,16 +2,16 @@
  type StatsType = {
  total: number; active: number;
  highRisk: number; aiGenerated: number;
- byPriority: {, low: number;
+ byPriority: { low: number;
  medium: number; high: number;
  critical: number;
  };
- byStatus: {, active: number;
+ byStatus: { active: number;
  inactive: number; archived: number;
  };
  };
 
- let { stats }: {, stats: StatsType } = $props();
+ let { stats }: { stats: StatsType } = $props();
 
  let showDetails = $state(false);
 

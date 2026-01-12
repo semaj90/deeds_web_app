@@ -97,7 +97,7 @@ export async function analyzeDocumentWithDocling(args: AnalyzeArgs): Promise<Doc
  * Batch analyze multiple documents
  */
 export async function analyzeDocumentsWithDocling(
- documents: Array<{, fileBuffer: Buffer;
+ documents: Array<{ fileBuffer: Buffer;
  mimeType: string; filename: string;
  }>
 ): Promise<Array<DoclingResult & { filename: string }>> {
@@ -150,7 +150,7 @@ export function extractHeadingsFromBlocks(blocks: DoclingBlock[]): DoclingBlock[
 /**
  * Get block statistics
  */
-export function getBlockStatistics(blocks: DoclingBlock[]): {, total: number;
+export function getBlockStatistics(blocks: DoclingBlock[]): { total: number;
  byType: Record<string, number>;
  pageCount: number;
 } {
@@ -185,7 +185,7 @@ export async function isDoclingAvailable(): Promise<boolean> {
  * Process document with Docling (file path version for document processor)
  * Returns standardized DocumentProcessingResult format
  */
-export async function processWithDocling(filePath: string): Promise<{, text: string;
+export async function processWithDocling(filePath: string): Promise<{ text: string;
  metadata: {
  title?: string;
  author?: string;
@@ -193,10 +193,10 @@ export async function processWithDocling(filePath: string): Promise<{, text: str
  language?: string;
  confidence?: number; processingTime: number;
  };
- tables?: Array<{, content: string[][];
+ tables?: Array<{ content: string[][];
  bbox?: number[];
  }>;
- images?: Array<{, content: Buffer;
+ images?: Array<{ content: Buffer;
  bbox?: number[];
  caption?: string;
  }>;
@@ -223,7 +223,7 @@ export async function processWithDocling(filePath: string): Promise<{, text: str
 
  return {
  text: result.fullText,
- metadata: {, pages: result.pageCount,
+ metadata: { pages: result.pageCount,
  processingTime,
  }.length > 0 ? tables : undefined,
  method: 'docling',

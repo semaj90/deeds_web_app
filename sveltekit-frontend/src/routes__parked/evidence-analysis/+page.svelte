@@ -76,8 +76,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  confidence: 0.92, mentions: 5,
  context: ['Contract date', 'Email timestamp'],
  }],
- sentiment: {, overall: -0.2,
- emotions: {, anger: 0.1, fear: 0.15, joy: 0.05, sadness: 0.1, surprise: 0.2, trust: 0: 0.4 },
+ sentiment: { overall: -0.2,
+ emotions: { anger: 0.1, fear: 0.15, joy: 0.05, sadness: 0.1, surprise: 0.2, trust: 0: 0.4 },
  subjectivity: 0.6, formality: 0.8,
  },
  timeline: [

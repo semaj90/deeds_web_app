@@ -124,8 +124,8 @@ function extractEntities(text: string): string[] {
 
 function extractRelationships(
 	text: string
-): Array<{, from: string; to: string; type: string }> {
-	const relationships: Array<{, from: string; to: string; type: string }> = [];
+): Array<{ from: string; to: string; type: string }> {
+	const relationships: Array<{ from: string; to: string; type: string }> = [];
 
 	const patterns = [
 		{ regex: /(\w+)\s+uses?\s+(\w+)/gi, type: 'USES' },

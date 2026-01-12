@@ -13,11 +13,11 @@ export async function uploadAndAnalyze(file: File): Promise<any> {
  // Return a mock analysis result
  return {
  documentId: `doc-${Date.now()}`,
- parsed: {, document_type: 'Contract',
+ parsed: { document_type: 'Contract',
  risk_level: 'Medium',
  summary: `Mock summary for ${file.name}. This document involves legal clauses related to commercial agreements.`,
  },
- analysis: {, recommendations: [
+ analysis: { recommendations: [
  { action: 'Review Clause 3.1 for ambiguity', confidence: 0.85 },
  { action: 'Verify signatory authority', confidence: 0.92 }],
  synthesis: `The document appears to be a standard commercial contract. Mock analysis suggests focusing on key clauses related to liability and termination.`,

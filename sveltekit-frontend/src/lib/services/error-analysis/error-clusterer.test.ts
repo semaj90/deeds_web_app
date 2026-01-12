@@ -49,7 +49,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  fc.asyncProperty(
  fc.array(
  fc.record({
- id: fc.string({, minLength: 1, maxLength: 50 }, file: fc.string({, minLength: 1, maxLength: 100 }, line: fc.integer({, min: 1, max: 1000 }, column: fc.integer({, min: 1, max: 100 }, message: fc.string({, minLength: 1, maxLength: 200 }, type: fc.constantFrom('typescript' as const, 'svelte' as const, severity: fc.constantFrom('error' as const, 'warning' as const, status: fc.constantFrom('new' as const),
+ id: fc.string({ minLength: 1, maxLength: 50 }, file: fc.string({ minLength: 1, maxLength: 100 }, line: fc.integer({ min: 1, max: 1000 }, column: fc.integer({ min: 1, max: 100 }, message: fc.string({ minLength: 1, maxLength: 200 }, type: fc.constantFrom('typescript' as const, 'svelte' as const, severity: fc.constantFrom('error' as const, 'warning' as const, status: fc.constantFrom('new' as const),
  }),
  { minLength: 1, maxLength: 20 }
  ),
@@ -178,7 +178,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  fc.asyncProperty(
  fc.array(
  fc.record({
- id: fc.string({, minLength: 1, maxLength: 50 }, file: fc.string({, minLength: 1, maxLength: 100 }, line: fc.integer({, min: 1, max: 1000 }, column: fc.integer({, min: 1, max: 100 }, message: fc.string({, minLength: 1, maxLength: 200 }, type: fc.constantFrom('typescript' as const, 'svelte' as const, severity: fc.constantFrom('error' as const, 'warning' as const, status: fc.constantFrom('new' as const),
+ id: fc.string({ minLength: 1, maxLength: 50 }, file: fc.string({ minLength: 1, maxLength: 100 }, line: fc.integer({ min: 1, max: 1000 }, column: fc.integer({ min: 1, max: 100 }, message: fc.string({ minLength: 1, maxLength: 200 }, type: fc.constantFrom('typescript' as const, 'svelte' as const, severity: fc.constantFrom('error' as const, 'warning' as const, status: fc.constantFrom('new' as const),
  }),
  { minLength: 1, maxLength: 10 }
  ),

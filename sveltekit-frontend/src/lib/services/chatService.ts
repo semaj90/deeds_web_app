@@ -53,7 +53,7 @@ class ChatService {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, case_id: caseId,
+ body: JSON.stringify({ case_id: caseId,
  user_id: userId.trim(),
  role,
  }, signal: this.abortController.signal,

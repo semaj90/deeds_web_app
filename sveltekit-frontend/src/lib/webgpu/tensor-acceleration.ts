@@ -87,7 +87,7 @@ export class WebGPUTensorAccelerator {
 
             this.device = await this.adapter.requestDevice({
                 requiredFeatures,
-                requiredLimits: {, maxBufferSize: this.config.maxBufferSize,
+                requiredLimits: { maxBufferSize: this.config.maxBufferSize,
                     maxStorageBufferBindingSize: this.config.maxBufferSize,
                     maxComputeWorkgroupStorageSize: 32768,
                 },
@@ -337,7 +337,7 @@ export class WebGPUTensorAccelerator {
  const elementWiseShader = this.shaderCache.get('elementWiseProducts')!;
  const elementWisePipeline = this.device.createComputePipeline({
  layout: 'auto',
- compute: {, module: elementWiseShader,
+ compute: { module: elementWiseShader,
  entryPoint: 'main',
  },
  });
@@ -345,12 +345,12 @@ export class WebGPUTensorAccelerator {
  const elementWiseBindGroup = this.device.createBindGroup({
  layout: elementWisePipeline.getBindGroupLayout(0),
  entries: [
- { binding: 0, resource: {, buffer: bufferA } },
- { binding: 1, resource: {, buffer: bufferB } },
- { binding: 2, resource: {, buffer: dotProductsElemBuffer } },
- { binding: 3, resource: {, buffer: normASqElemBuffer } },
- { binding: 4, resource: {, buffer: normBSqElemBuffer } },
- { binding: 5, resource: {, buffer: paramsBufferElem } }],
+ { binding: 0, resource: { buffer: bufferA } },
+ { binding: 1, resource: { buffer: bufferB } },
+ { binding: 2, resource: { buffer: dotProductsElemBuffer } },
+ { binding: 3, resource: { buffer: normASqElemBuffer } },
+ { binding: 4, resource: { buffer: normBSqElemBuffer } },
+ { binding: 5, resource: { buffer: paramsBufferElem } }],
  });
 
  const commandEncoder1 = this.device.createCommandEncoder();
@@ -365,7 +365,7 @@ export class WebGPUTensorAccelerator {
  const reduceSumShader = this.shaderCache.get('reduceSum')!;
  const reduceSumPipeline = this.device.createComputePipeline({
  layout: 'auto',
- compute: {, module: reduceSumShader,
+ compute: { module: reduceSumShader,
  entryPoint: 'main',
  },
  });
@@ -396,9 +396,9 @@ export class WebGPUTensorAccelerator {
  const reduceDotProductsBindGroup = this.device.createBindGroup({
  layout: reduceSumPipeline.getBindGroupLayout(0),
  entries: [
- { binding: 0, resource: {, buffer: dotProductsElemBuffer } },
- { binding: 1, resource: {, buffer: dotProductSumBuffer } },
- { binding: 2, resource: {, buffer: paramsBufferReduce } }],
+ { binding: 0, resource: { buffer: dotProductsElemBuffer } },
+ { binding: 1, resource: { buffer: dotProductSumBuffer } },
+ { binding: 2, resource: { buffer: paramsBufferReduce } }],
  });
  const computePass2_1 = commandEncoder2.beginComputePass();
  computePass2_1.setPipeline(reduceSumPipeline);
@@ -410,9 +410,9 @@ export class WebGPUTensorAccelerator {
  const reduceNormASqBindGroup = this.device.createBindGroup({
  layout: reduceSumPipeline.getBindGroupLayout(0),
  entries: [
- { binding: 0, resource: {, buffer: normASqElemBuffer } },
- { binding: 1, resource: {, buffer: normASqSumBuffer } },
- { binding: 2, resource: {, buffer: paramsBufferReduce } }],
+ { binding: 0, resource: { buffer: normASqElemBuffer } },
+ { binding: 1, resource: { buffer: normASqSumBuffer } },
+ { binding: 2, resource: { buffer: paramsBufferReduce } }],
  });
  const computePass2_2 = commandEncoder2.beginComputePass();
  computePass2_2.setPipeline(reduceSumPipeline);
@@ -424,9 +424,9 @@ export class WebGPUTensorAccelerator {
  const reduceNormBSqBindGroup = this.device.createBindGroup({
  layout: reduceSumPipeline.getBindGroupLayout(0),
  entries: [
- { binding: 0, resource: {, buffer: normBSqElemBuffer } },
- { binding: 1, resource: {, buffer: normBSqSumBuffer } },
- { binding: 2, resource: {, buffer: paramsBufferReduce } }],
+ { binding: 0, resource: { buffer: normBSqElemBuffer } },
+ { binding: 1, resource: { buffer: normBSqSumBuffer } },
+ { binding: 2, resource: { buffer: paramsBufferReduce } }],
  });
  const computePass2_3 = commandEncoder2.beginComputePass();
  computePass2_3.setPipeline(reduceSumPipeline);
@@ -730,7 +730,7 @@ export class WebGPUTensorAccelerator {
  const shader = this.shaderCache.get('embedding')!;
  const computePipeline = this.device.createComputePipeline({
  layout: 'auto',
- compute: {, module: shader,
+ compute: { module: shader,
  entryPoint: 'main',
  },
  });
@@ -738,10 +738,10 @@ export class WebGPUTensorAccelerator {
  const bindGroup = this.device.createBindGroup({
  layout: computePipeline.getBindGroupLayout(0),
  entries: [
- { binding: 0, resource: {, buffer: tokensBuffer } },
- { binding: 1, resource: {, buffer: weightsBuffer } },
- { binding: 2, resource: {, buffer: outputBuffer } },
- { binding: 3, resource: {, buffer: paramsBuffer } }],
+ { binding: 0, resource: { buffer: tokensBuffer } },
+ { binding: 1, resource: { buffer: weightsBuffer } },
+ { binding: 2, resource: { buffer: outputBuffer } },
+ { binding: 3, resource: { buffer: paramsBuffer } }],
  });
 
  const commandEncoder = this.device.createCommandEncoder();

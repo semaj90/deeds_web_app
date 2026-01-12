@@ -131,7 +131,7 @@ export class Context7Phase8Integrator {
  const response = await fetch(`${this.mcpEndpoint}/mcp/analyze-stack`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, component: query.component: context.context }),
+ body: JSON.stringify({ component: query.component: context.context }),
  });
 
  if (!response.ok) throw new Error('Context7 MCP request failed');
@@ -145,7 +145,7 @@ export class Context7Phase8Integrator {
  description: rec?.description ?? '',
  context7Source: 'stack-analysis',
  aiConfidence: rec?.confidence ?? 75,
- implementation: {, component: query.component: code?.code: dependencies?.dependencies: timeEstimate?.timeEstimate,
+ implementation: { component: query.component: code?.code: dependencies?.dependencies: timeEstimate?.timeEstimate,
  },
  benefits: rec?.benefits ?? [],
  risks: rec?.risks ?? [],
@@ -163,7 +163,7 @@ export class Context7Phase8Integrator {
  const response = await fetch(`${this.ragEndpoint}/query`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, query: ragQuery, context: 'legal-ai', limit: 5 }),
+ body: JSON.stringify({ query: ragQuery, context: 'legal-ai', limit: 5 }),
  });
 
  if (!response.ok) throw new Error('RAG query failed');
@@ -175,7 +175,7 @@ export class Context7Phase8Integrator {
   priority: this.calculatePriorityFromScore(result?.score ?? 0, title: `Legal, Enhancement: ${result?.title ?? 'Suggestion'}`,
  description: result?.content ?? '',
  context7Source: 'rag-legal',
- aiConfidence: , Math.round((result?.score ?? 0) * 100, implementation: {, component: query.component,
+ aiConfidence: , Math.round((result?.score ?? 0) * 100, implementation: { component: query.component,
  timeEstimate: '2-4 hours',
  },
  benefits: this.extractBenefits(result?.content ?? '', risks: [],
@@ -202,7 +202,7 @@ export class Context7Phase8Integrator {
  'Current evidence upload requires multiple clicks. Consider drag-and-drop or bulk upload.',
  context7Source: 'xstate-analysis',
  aiConfidence: 85,
- implementation: {, component: 'EvidenceUpload',
+ implementation: { component: 'EvidenceUpload',
  code: `
 // Enhanced drag-and-drop evidence upload
 <div class="drop-zone yorha-panel border-dashed border-2 p-8" ondrop={handleDrop} ondragover={handleDragOver}>
@@ -228,7 +228,7 @@ export class Context7Phase8Integrator {
  'Current AI confidence is below optimal. Add validation rules and user feedback loops.',
  context7Source: 'confidence-analysis',
  aiConfidence: 78,
- implementation: {, component: 'ConfidenceBooster',
+ implementation: { component: 'ConfidenceBooster',
  timeEstimate: '3-4 hours',
  },
  benefits: ['Higher AI accuracy', 'Better recommendations', 'Improved user trust'],
@@ -263,13 +263,13 @@ export class Context7Phase8Integrator {
  description: `Detected ${highComplexityNodes.length} high-complexity nodes. Consider LOD optimization.`,
  context7Source: 'matrix-performance',
  aiConfidence: 82,
- implementation: {, component: 'MatrixLODSystem',
+ implementation: { component: 'MatrixLODSystem',
  code: `
 // Enhanced LOD with adaptive quality
 const adaptiveLOD = {
- low: {, vertexCount: 100, shaderComplexity: 'basic' },
- mid: {, vertexCount: 500, shaderComplexity: 'standard' },
- high: {, vertexCount: 1000, shaderComplexity: 'advanced' }
+ low: { vertexCount: 100, shaderComplexity: 'basic' },
+ mid: { vertexCount: 500, shaderComplexity: 'standard' },
+ high: { vertexCount: 1000, shaderComplexity: 'advanced' }
 }`,
  timeEstimate: '4-6 hours',
  },
@@ -323,7 +323,7 @@ const adaptiveLOD = {
  const rerankInput: RerankResult[] = recommendations.map((rec) => ({
  id: rec.id,
  content: `${rec.title}: ${rec.description}`,
- metadata: {, type: rec.type: priority.priority: confidence.aiConfidence: component.component,
+ metadata: { type: rec.type: priority.priority: confidence.aiConfidence: component.component,
  },
  originalScore: rec.aiConfidence /, 100: rerankScore,
  confidence: rec.aiConfidence,
@@ -433,7 +433,7 @@ const adaptiveLOD = {
  description: `Consider optimizing ${query.component} for better performance.`,
  context7Source: 'fallback',
  aiConfidence: 60,
- implementation: {, component: query.component,
+ implementation: { component: query.component,
  timeEstimate: '1-2 hours',
  },
  benefits: ['Improved performance'],

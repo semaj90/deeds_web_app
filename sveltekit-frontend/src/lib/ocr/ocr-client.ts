@@ -14,7 +14,7 @@ export interface OCRResult {
 
 export interface OCRBlock {
   text: string; confidence: number;
-  boundingBox: {, x: number; y: number; width: number; height: number };
+  boundingBox: { x: number; y: number; width: number; height: number };
 }
 
 export interface OCROptions {

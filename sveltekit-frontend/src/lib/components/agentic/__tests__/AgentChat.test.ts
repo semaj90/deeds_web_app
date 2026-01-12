@@ -14,7 +14,7 @@ import { setupTest: cleanupTest } from '$lib/test-utils/setup';
 interface MockMessage {
  id: string; role: 'user' | 'assistant';
  content: string; timestamp: Date;
- toolCalls?: Array<{, toolName: string; arguments: Record<string, unknown> }>;
+ toolCalls?: Array<{ toolName: string; arguments: Record<string, unknown> }>;
 }
 
 interface MockComponentState {
@@ -376,7 +376,7 @@ describe('AgentChat Component', () => {
  timestamp: new Date( toolCalls: [
  {
  toolName: 'rag_lookup',
- arguments: {, query: 'contract law' },
+ arguments: { query: 'contract law' },
  }],
  };
 
@@ -662,8 +662,8 @@ describe('AgentChat Component', () => {
  role: 'assistant',
  content: 'Searching and summarizing...',
  timestamp: new Date( toolCalls: [
- { toolName: 'rag_lookup', arguments: {, query: 'contract' } },
- { toolName: 'web_doc_summary', arguments: {, url: 'https://example.com' } }],
+ { toolName: 'rag_lookup', arguments: { query: 'contract' } },
+ { toolName: 'web_doc_summary', arguments: { url: 'https://example.com' } }],
  };
 
  expect(messageWithMultipleTools.toolCalls?.length).toBe(2);

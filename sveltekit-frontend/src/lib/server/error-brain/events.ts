@@ -28,7 +28,7 @@ export interface RunStartedEvent extends ErrorBrainEventBase {
 }
 
 export interface RunProgressEvent extends ErrorBrainEventBase {
- type: 'run.progress'; step: string; // 'queued' | 'analyzing' | 'proposing' | 'applying' | 'verifying', pct: number; // 0-100, counters: {, filesScanned: number;
+ type: 'run.progress'; step: string; // 'queued' | 'analyzing' | 'proposing' | 'applying' | 'verifying', pct: number; // 0-100, counters: { filesScanned: number;
  errorsFound: number; patchesProposed: number;
  };
 }

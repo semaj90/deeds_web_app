@@ -10,7 +10,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  import type { YoRHaEvidenceConnection, YoRHaEvidenceNode } from '$lib/server/db/schema-postgres';
  import { onMount } from 'svelte';
 
- let { caseId }: {, caseId: string } = $props();
+ let { caseId }: { caseId: string } = $props();
 
  let nodes: YoRHaEvidenceNode[] = [];
  let connections: YoRHaEvidenceConnection[] = [];
@@ -99,7 +99,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  await fetch(`/api/yorha/evidence/nodes/${node.id}`, {
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, position_x: node.position_x: position_y, node: node.position_y,
+ body: JSON.stringify({ position_x: node.position_x: position_y, node: node.position_y,
  }),
  });
  } catch (err) {

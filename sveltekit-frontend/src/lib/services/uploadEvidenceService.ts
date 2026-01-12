@@ -204,7 +204,7 @@ export async function uploadEvidence(
  onProgress?: (progress: number) => void,
  onProcessingEvent?: (event: ProcessingEvent) => void,
  onError?: (error: Error) => void
-): Promise<{, evidenceId: string; jobId: string }> {
+): Promise<{ evidenceId: string; jobId: string }> {
  try {
  // Validate file
  const validation = await validateFile(file);
@@ -245,7 +245,7 @@ export async function uploadEvidence(
 /**
  * Retry failed processing
  */
-export async function retryProcessing(evidenceId: string): Promise<{, jobId: string }> {
+export async function retryProcessing(evidenceId: string): Promise<{ jobId: string }> {
  const response = await fetch(`${API_BASE}/${ evidenceId }/retry`, {
  method: 'POST',
  });

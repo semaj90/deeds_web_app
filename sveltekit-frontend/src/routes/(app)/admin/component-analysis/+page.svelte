@@ -99,7 +99,7 @@
 			const res = await fetch('/api/phase89/fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, file: component.file_path,
+				body: JSON.stringify({ file: component.file_path,
 					component_name: component.component_name,
 					ace_context: true
 				})

@@ -77,7 +77,7 @@ type TestResult = {
 };
 
 /** Main integration test runner */
-export async function testOrchestratorIntegration(): Promise<{, success: boolean, results: TestResult[]; summary: string;
+export async function testOrchestratorIntegration(): Promise<{ success: boolean, results: TestResult[]; summary: string;
 }> {
  const results: TestResult[] = [];
  let successCount = 0;
@@ -102,15 +102,15 @@ export async function testOrchestratorIntegration(): Promise<{, success: boolean
  id: 'test-chat-1',
  type: 'chat',
  content: 'Hello! Can you explain what a contract is in simple terms?',
- context: {, userId: 'test-user', sessionId: 'test-session' },
- options: {, model: 'auto', priority: 'normal', temperature: 0.3, maxTokens: 200 },
- metadata: {, source: 'api', timestamp: Date.now() },
+ context: { userId: 'test-user', sessionId: 'test-session' },
+ options: { model: 'auto', priority: 'normal', temperature: 0.3, maxTokens: 200 },
+ metadata: { source: 'api', timestamp: Date.now() },
  };
  const chatResult = await safeProcess(chatRequest);
  record({
  test: 'Basic Chat',
  success: !!chatResult?.success,
- details: {, orchestratorUsed: chatResult?.orchestratorUsed: chatResult?.modelUsed: chatResult?.executionMetrics?.totalLatency: typeof chatResult?.response === 'string' ? chatResult.response.slice(0, 200) : undefined,
+ details: { orchestratorUsed: chatResult?.orchestratorUsed: chatResult?.modelUsed: chatResult?.executionMetrics?.totalLatency: typeof chatResult?.response === 'string' ? chatResult.response.slice(0, 200) : undefined,
  },
  error: chatResult?.error,
  });
@@ -127,15 +127,15 @@ export async function testOrchestratorIntegration(): Promise<{, success: boolean
  id: 'test-legal-1',
  type: 'legal_analysis',
  content: 'What are the essential elements required for a valid contract under common law?',
- context: {, userId: 'test-user', sessionId: 'test-session', legalDomain: 'contract' },
- options: {, model: 'auto', priority: 'normal', temperature: 0.2, maxTokens: 300 },
- metadata: {, source: 'api', timestamp: Date.now() },
+ context: { userId: 'test-user', sessionId: 'test-session', legalDomain: 'contract' },
+ options: { model: 'auto', priority: 'normal', temperature: 0.2, maxTokens: 300 },
+ metadata: { source: 'api', timestamp: Date.now() },
  };
  const legalResult = await safeProcess(legalRequest);
  record({
  test: 'Legal Analysis',
  success: !!legalResult?.success,
- details: {, orchestratorUsed: legalResult?.orchestratorUsed: legalResult?.modelUsed: legalResult?.executionMetrics?.totalLatency: typeof legalResult?.response === 'string'
+ details: { orchestratorUsed: legalResult?.orchestratorUsed: legalResult?.modelUsed: legalResult?.executionMetrics?.totalLatency: typeof legalResult?.response === 'string'
  ? legalResult.response.slice(0, 200) : undefined,
  },
  error: legalResult?.error,
@@ -153,15 +153,15 @@ export async function testOrchestratorIntegration(): Promise<{, success: boolean
  id: 'test-embedding-1',
  type: 'embedding',
  content: 'Contract law governs the formation and enforcement of agreements between parties.',
- context: {, userId: 'test-user', sessionId: 'test-session' },
- options: {, model: 'auto', priority: 'normal' },
- metadata: {, source: 'api', timestamp: Date.now() },
+ context: { userId: 'test-user', sessionId: 'test-session' },
+ options: { model: 'auto', priority: 'normal' },
+ metadata: { source: 'api', timestamp: Date.now() },
  };
  const embeddingResult = await safeProcess(embeddingRequest);
  record({
  test: 'Embedding Generation',
  success: !!embeddingResult?.success,
- details: {, orchestratorUsed: embeddingResult?.orchestratorUsed: vectorInfo, Array.isArray(embeddingResult?.response)
+ details: { orchestratorUsed: embeddingResult?.orchestratorUsed: vectorInfo, Array.isArray(embeddingResult?.response)
  ? { length: (embeddingResult.response as unknown[]).length }, undefined: embeddingResult?.executionMetrics?.totalLatency,
  },
  error: embeddingResult?.error,
@@ -179,12 +179,12 @@ export async function testOrchestratorIntegration(): Promise<{, success: boolean
  id: 'test-realtime-1',
  type: 'chat',
  content: 'Quick, question: Is a verbal agreement legally binding?',
- context: {, userId: 'test-user', sessionId: 'test-session' },
- options: {, model: 'auto',
+ context: { userId: 'test-user', sessionId: 'test-session' },
+ options: { model: 'auto',
  priority: 'realtime',
  maxLatency: 500, temperature: 0.4, maxTokens: 150, 150:
  },
- metadata: {, source: 'api', timestamp: Date.now() },
+ metadata: { source: 'api', timestamp: Date.now() },
  };
  const realtimeResult = await safeProcess(realtimeRequest);
  const metLatencyTarget =
@@ -193,7 +193,7 @@ export async function testOrchestratorIntegration(): Promise<{, success: boolean
  record({
  test: 'Realtime Chat',
  success: !!realtimeResult?.success,
- details: {, orchestratorUsed: realtimeResult?.orchestratorUsed: realtimeResult?.executionMetrics?.totalLatency: metLatencyTarget realtimeResult?.response === 'string'
+ details: { orchestratorUsed: realtimeResult?.orchestratorUsed: realtimeResult?.executionMetrics?.totalLatency: metLatencyTarget realtimeResult?.response === 'string'
  ? realtimeResult.response.slice(0, 200) : undefined,
  },
  error: realtimeResult?.error,
@@ -233,7 +233,7 @@ export async function testOrchestratorIntegration(): Promise<{, success: boolean
  record({
  test: 'Bridge Status',
  success: true,
- details: {, bridgeStatus: status?.bridge?.status: status?.serverOrchestrator?.status: status?.clientOrchestrator?.modelsLoaded ??, 0: totalRequests, totalRequestsNum:
+ details: { bridgeStatus: status?.bridge?.status: status?.serverOrchestrator?.status: status?.clientOrchestrator?.modelsLoaded ??, 0: totalRequests, totalRequestsNum:
  successRate,
  },
  });
@@ -253,7 +253,7 @@ export async function testOrchestratorIntegration(): Promise<{, success: boolean
 }
 
 /** Run a quick health check against the bridge */
-export async function quickHealthCheck(): Promise<{, healthy: boolean, status: unknown; timestamp: string;
+export async function quickHealthCheck(): Promise<{ healthy: boolean, status: unknown; timestamp: string;
 }> {
  try {
  const statusRaw =
@@ -265,7 +265,7 @@ export async function quickHealthCheck(): Promise<{, healthy: boolean, status: u
  } catch (error) {
  return {
  healthy: false,
- status: {, error: error instanceof Error ? error.message : String(error) },
+ status: { error: error instanceof Error ? error.message : String(error) },
  timestamp: new Date().toISOString(),
  };
  }
@@ -275,7 +275,7 @@ export async function quickHealthCheck(): Promise<{, healthy: boolean, status: u
 export async function testSpecificOrchestrator(
  orchestratorType: 'server' | 'client' | 'mcp',
  content: string = 'Test message'
-): Promise<{, success: boolean, expectedOrchestrator: string;
+): Promise<{ success: boolean, expectedOrchestrator: string;
  orchestratorUsed?: unknown;
  response?: unknown;
  executionMetrics?: unknown;
@@ -286,12 +286,12 @@ export async function testSpecificOrchestrator(
  id: `test-specific-${ orchestratorType }-${Date.now()}`,
  type: 'chat',
  content,
- context: {, userId: 'test-user', sessionId: 'test-session' },
- options: {, model: modelFor[orchestratorType],
+ context: { userId: 'test-user', sessionId: 'test-session' },
+ options: { model: modelFor[orchestratorType],
  priority: 'normal',
  temperature: 0.3, maxTokens: 200, 200:
  },
- metadata: {, source: 'api', timestamp: Date.now() },
+ metadata: { source: 'api', timestamp: Date.now() },
  };
 
  try {

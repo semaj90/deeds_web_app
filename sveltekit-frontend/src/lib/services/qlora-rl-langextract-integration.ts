@@ -62,7 +62,7 @@ type RLWorkerOutboundMessage =
 
 // Trainer worker message types
 interface TrainingProgress {
-    progress: {, currentEpoch: number;
+    progress: { currentEpoch: number;
         totalEpochs: number; loss: number;
         accuracy: number;
     };
@@ -144,7 +144,7 @@ export class QLoRARLLangExtractIntegration {
     async processLegalDocument(
         document: LegalDocument,
         extractionSchema: Record<string, unknown>,
-        userFeedback?: {, correct: boolean; comments?: string }
+        userFeedback?: { correct: boolean; comments?: string }
     ): Promise<IntegratedProcessingResult> {
         console.log(`⚡ Processing legal document ${getDocId(document)} with RL+QLoRA integration`);
 
@@ -249,9 +249,9 @@ export class QLoRARLLangExtractIntegration {
             const response = await fetch(`${this.langextractServiceUrl}/extract`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({, text: `Legal Document: ${getDocId(document)}\nType: ${getDocType(document)}\nContent: [Document content would be here]`,
+                body: JSON.stringify({ text: `Legal Document: ${getDocId(document)}\nType: ${getDocType(document)}\nContent: [Document content would be here]`,
                     schema,
-                    options: {, model: 'gpt-4o-mini',
+                    options: { model: 'gpt-4o-mini',
                         temperature: rlGuidance.temperature,
                         maxTokens: rlGuidance.maxTokens,
                         fromCache: true,
@@ -332,7 +332,7 @@ export class QLoRARLLangExtractIntegration {
         }
     }
 
-    private calculateReward(extractedData: Record<string, JsonValue>, userFeedback?: {, correct: boolean }): number {
+    private calculateReward(extractedData: Record<string, JsonValue>, userFeedback?: { correct: boolean }): number {
         let reward = 0;
         const keyCount = Object.keys(extractedData).length;
         // Base reward for extraction density
@@ -370,7 +370,7 @@ export class QLoRARLLangExtractIntegration {
         this.qloraTrainer?.postMessage({
             type: 'startTraining',
             jobId,
-            config: {, model: 'gemma-2-2b-it',
+            config: { model: 'gemma-2-2b-it',
                 lora_alpha: 16,
                 lora_dropout: 0.1,
                 target_modules: ['q_proj', 'v_proj'],

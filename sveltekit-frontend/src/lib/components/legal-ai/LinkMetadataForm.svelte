@@ -47,7 +47,7 @@
 				{
 					method: 'PUT',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({, link_type: editedLinkType, notes: editedNotes, editedNotes, editedNotes || undefined,
+					body: JSON.stringify({ link_type: editedLinkType, notes: editedNotes, editedNotes, editedNotes || undefined,
 					}),
 				}
 			);

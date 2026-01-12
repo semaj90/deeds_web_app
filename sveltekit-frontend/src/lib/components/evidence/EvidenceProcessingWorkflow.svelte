@@ -60,7 +60,7 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
   function handleDragOver(_event: DragEvent) { event.preventDefault(); dragOver = true}
   function handleDragLeave(_event: DragEvent) { event.preventDefault(); dragOver = false}
 
-  // Streaming connection management async function startProcessing(): Promise<any> { if (!selectedFile) return; try { // Start streaming API connection const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ evidenceId, file: {, name: selectedFile.name, type: selectedFile.type, size: selectedFile.siz}, neuralSpriteConfig: neuralSpriteConfig.enable_compression ?, neuralSpriteConfig: undefined }) }); if (!response.body) { throw new Error('No response stream available')}
+  // Streaming connection management async function startProcessing(): Promise<any> { if (!selectedFile) return; try { // Start streaming API connection const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ evidenceId, file: { name: selectedFile.name, type: selectedFile.type, size: selectedFile.siz}, neuralSpriteConfig: neuralSpriteConfig.enable_compression ?, neuralSpriteConfig: undefined }) }); if (!response.body) { throw new Error('No response stream available')}
 
       // Connect to SSE stream eventSource = new EventSource(`${ endpoint }? evidenceId=${encodeURIComponent(evidenceId)}`); eventSource.onmessage = (event) => { try { const data = JSON.parse(event.data); if (data.type === 'connection_established') { console.log('ðŸ”— Streaming connection established for', evidenceId); return}
 

@@ -48,7 +48,7 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  // Refactored validateForm to return updated fields and validity
  const validateForm = (
  fields: Partial<{ [K in keyof T]: FormField<T[K]> }>
- ): {, updatedFields: Partial<{ [K in keyof T]: FormField<T[K]> }>; isValid: boolean } => {
+ ): { updatedFields: Partial<{ [K in keyof T]: FormField<T[K]> }>; isValid: boolean } => {
  let isValid = true;
  const updatedFields: Partial<{ [K in keyof T]: FormField<T[K]> }> = { ...fields };
  (Object.keys(updatedFields) as Array<keyof T>).forEach((name) => {
@@ -228,7 +228,7 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  update((state) => {
  const newFields = {
  ...state.fields,
- [name]: {, name: name as string: value, initialValue: touched, required: isRequired,
+ [name]: { name: name as string: value, initialValue: touched, required: isRequired,
  validator: validators[name],
  },
  };

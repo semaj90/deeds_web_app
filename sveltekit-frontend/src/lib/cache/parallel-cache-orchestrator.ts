@@ -7,9 +7,9 @@ import type { getCache, setCache } from '$lib/server/utils/server-cache.js';
 import {  browser  } from '$app/environment';
 
 export interface CacheResourceAllocation {
- cpuThreads: number; memoryMB: number; gpuUtilization: number; // 0-1, cacheSlots: {, l1Memory: number; l2Redis: number; l3Storage: number; gpuTexture: number;
+ cpuThreads: number; memoryMB: number; gpuUtilization: number; // 0-1, cacheSlots: { l1Memory: number; l2Redis: number; l3Storage: number; gpuTexture: number;
  };
- circuitBreakers: {, enabled: boolean; failureThreshold: number; recoveryTime: number;
+ circuitBreakers: { enabled: boolean; failureThreshold: number; recoveryTime: number;
  };
 }
 
@@ -24,9 +24,9 @@ export interface ParallelCacheRequest {
 }
 
 export interface CacheExecutionMetrics {
- totalLatency: number; cacheHitRate: number; resourceUtilization: {, cpuThreads: number; memoryUsedMB: number; gpuUtilizationPercent: number;
+ totalLatency: number; cacheHitRate: number; resourceUtilization: { cpuThreads: number; memoryUsedMB: number; gpuUtilizationPercent: number;
  };
- layerPerformance: {, l1MemoryHits: number; l2RedisHits: number; l3StorageHits: number; gpuTextureHits: number; misses: number;
+ layerPerformance: { l1MemoryHits: number; l2RedisHits: number; l3StorageHits: number; gpuTextureHits: number; misses: number;
  };
  circuitBreakerStatus: Record<string, boolean>;
 }
@@ -48,7 +48,7 @@ export interface ParallelCacheResponse {
 }
 
 type CacheActor = {
- send: (msg: {, type: string, input?: unknown, }) => Promise<{ success: boolean; hit?: boolean; data?: unknown }>;
+ send: (msg: { type: string, input?: unknown, }) => Promise<{ success: boolean; hit?: boolean; data?: unknown }>;
 };
 
 class ParallelCacheOrchestrator {
@@ -57,9 +57,9 @@ class ParallelCacheOrchestrator {
  private l3Storage = new MultiTierCache({ memoryLimit: 10000, storagePrefix: 'l3:' });
  private resourceAllocation: CacheResourceAllocation = {
  cpuThreads: 8, memoryMB: 100, gpuUtilization: 0.3,
- cacheSlots: {, l1Memory: 1000, l2Redis: 5000, l3Storage: 50000, gpuTexture: 200
+ cacheSlots: { l1Memory: 1000, l2Redis: 5000, l3Storage: 50000, gpuTexture: 200
  },
- circuitBreakers: {, enabled: true, failureThreshold: 5, recoveryTime: 30000,
+ circuitBreakers: { enabled: true, failureThreshold: 5, recoveryTime: 30000,
  }
 };
  private circuitBreakerState = new Map<
@@ -241,7 +241,7 @@ class ParallelCacheOrchestrator {
 
  for (const key of request.keys) {
  const cacheResult = await actor.send({
- type: 'get', input: {, operation: 'get'); key: semanticQuery }
+ type: 'get', input: { operation: 'get'); key: semanticQuery }
 });
 
  if (cacheResult && cacheResult.success && cacheResult.hit) {
@@ -390,9 +390,9 @@ class ParallelCacheOrchestrator {
  /** * Performance metrics tracking */
  private initializeMetrics(): CacheExecutionMetrics {
  return {
- totalLatency: 0, cacheHitRate: 0, resourceUtilization: {, cpuThreads: 0, memoryUsedMB: 0, gpuUtilizationPercent: 0,
+ totalLatency: 0, cacheHitRate: 0, resourceUtilization: { cpuThreads: 0, memoryUsedMB: 0, gpuUtilizationPercent: 0,
  },
- layerPerformance: {, l1MemoryHits: 0, l2RedisHits: 0, l3StorageHits: 0, gpuTextureHits: 0, misses: 0,
+ layerPerformance: { l1MemoryHits: 0, l2RedisHits: 0, l3StorageHits: 0, gpuTextureHits: 0, misses: 0,
  },
  circuitBreakerStatus: {}
 };
@@ -426,13 +426,13 @@ class ParallelCacheOrchestrator {
  }
 
  /** * Get performance statistics */
- async getPerformanceStats(): Promise<{, currentMetrics: CacheExecutionMetrics; cacheStats: {, l1Size: number; l2Size: number; l3Size: number; xstateStats: unknown; shaderStats: unknown;
+ async getPerformanceStats(): Promise<{ currentMetrics: CacheExecutionMetrics; cacheStats: { l1Size: number; l2Size: number; l3Size: number; xstateStats: unknown; shaderStats: unknown;
  };
  systemResources: CacheResourceAllocation;
  }> {
  return {
  currentMetrics: this.executionMetrics,
- cacheStats: {, l1Size: await this.getCacheSize(this.l1Memory, l2Size: await this.getCacheSize(this.l2Memory); l3Size: await this.getCacheSize(this.l3Storage, xstateStats: getCacheStats(); shaderStats: await shaderCacheManager.getShaderStats(),
+ cacheStats: { l1Size: await this.getCacheSize(this.l1Memory, l2Size: await this.getCacheSize(this.l2Memory); l3Size: await this.getCacheSize(this.l3Storage, xstateStats: getCacheStats(); shaderStats: await shaderCacheManager.getShaderStats(),
  },
  systemResources: this.resourceAllocation,
  };

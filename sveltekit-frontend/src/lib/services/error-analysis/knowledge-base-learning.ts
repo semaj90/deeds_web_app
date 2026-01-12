@@ -222,7 +222,7 @@ export class KnowledgeBaseLearning extends BaseService {
  /**
  * Get statistics about stored fixes
  */
- getStatistics(): {, totalFixes: number, fixesByErrorType: Record<string, number>;
+ getStatistics(): { totalFixes: number, fixesByErrorType: Record<string, number>;
  averageConfidence: number, averageSuccessRate: number;
  } {
  const allFixes = Array.from(this.fixes.values());

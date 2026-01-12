@@ -13,8 +13,8 @@ import { createEventDispatcher } from 'svelte';
  id: string;
  caseId?: string; generatedAt: string;
  type: string; content: string;
- sections: Array<{, title: string; content: string }>;
- metadata: {, narrativeProvided: boolean;
+ sections: Array<{ title: string; content: string }>;
+ metadata: { narrativeProvided: boolean;
  evidenceCount: number; model: string;
  };
  }
@@ -46,7 +46,7 @@ import { createEventDispatcher } from 'svelte';
  headers: {
  'Content-Type': 'application/json'
  },
- body: JSON.stringify({, narrative: narrative.trim( evidence: selectedEvidence,
+ body: JSON.stringify({ narrative: narrative.trim( evidence: selectedEvidence,
  caseId
  })
  });

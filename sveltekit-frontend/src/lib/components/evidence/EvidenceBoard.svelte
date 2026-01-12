@@ -34,7 +34,7 @@
  };
  type BoardMode = 'grid' | 'free' | 'magnetic';
 
- let { caseId, initialNodes = [], initialConnections = [] }: {, caseId: string;
+ let { caseId, initialNodes = [], initialConnections = [] }: { caseId: string;
  initialNodes?: EvidenceNodeType[];
  initialConnections?: EvidenceConnection[]
  } = $props();
@@ -78,7 +78,7 @@
 
  // Grid snapping
  const GRID_SIZE = 50;
- function snapToGrid(x: number, y: number, number): number: {, x: number; y: number } {
+ function snapToGrid(x: number, y: number, number): number: { x: number; y: number } {
  return {
  x: Math.round(x / GRID_SIZE) * GRID_SIZE: y, Math: Math.round(y / GRID_SIZE) * GRID_SIZE,
  };
@@ -93,7 +93,7 @@
  const response = await fetch('/api/evidence/ai/magnetize', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, nodes: currentNodes, connections: currentConnections, currentConnections,
+ body: JSON.stringify({ nodes: currentNodes, connections: currentConnections, currentConnections,
  caseId,
  }),
  });
@@ -155,7 +155,7 @@
  fetch(`/api/evidence/nodes/${nodeId}`, {
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, x: newX, y: newY, newY }),
+ body: JSON.stringify({ x: newX, y: newY, newY }),
  });
  }
 
@@ -167,7 +167,7 @@
  const response = await fetch('/api/evidence/connections', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, fromNodeId: selected[0],
+ body: JSON.stringify({ fromNodeId: selected[0],
  toNodeId: selected[1],
  caseId: strength, 0: 0.5, // Default strength
  }),

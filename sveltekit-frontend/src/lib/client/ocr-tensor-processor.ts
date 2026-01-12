@@ -6,19 +6,19 @@ import { Record } from "neo4j-driver";
 // Placeholder definitions to resolve compilation errors if gaming-constants.js is missing or incorrect
 // These should ideally be imported from a proper constants file.
 const ENHANCED_MEMORY_CACHING = {
- performance: {, adaptiveTuning: { thresholds: {, criticalMemory: 0.8, lowMemory: 0.6,
+ performance: { adaptiveTuning: { thresholds: { criticalMemory: 0.8, lowMemory: 0.6,
  },
  },
  },
 }
 
 const GAMING_ERA_SPECS = {
- n64: {, memoryMB: 4, // Placeholder value, adjust as needed
- dnnLodSystem: {, enabled: true },
+ n64: { memoryMB: 4, // Placeholder value, adjust as needed
+ dnnLodSystem: { enabled: true },
  },
- '8bit': {, memoryArchitecture: { autoEncoderCache: true },
+ '8bit': { memoryArchitecture: { autoEncoderCache: true },
  },
- '16bit': {, memoryArchitecture: { lodScalingBuffer: true },
+ '16bit': { memoryArchitecture: { lodScalingBuffer: true },
  },
 };
 
@@ -34,7 +34,7 @@ type RecognizeInput =
 type BBox = { x0: number, y0: number; x1: number, y1: number } | number[];
 type Word = { text: string, bbox: BBox; confidence: number }
 
-type RecognizeResult = { data: {, text: string, confidence: number; words: Word[] } }
+type RecognizeResult = { data: { text: string, confidence: number; words: Word[] } }
 
 type LoggerMessage = Record<string, unknown>;
 
@@ -419,14 +419,14 @@ const recognize = tesseractInstance.recognize.bind(tesseractInstance);
 
  private async generateEmbeddings(
  text: string
- ): Promise<{, embeddings: Float32Array, fromCache: boolean; model: string }> {
+ ): Promise<{ embeddings: Float32Array, fromCache: boolean; model: string }> {
  try {
  // Intelligent model selection based on Ollama GPU memory and system state
  const modelConfig = await this.selectOptimalModel();
  const response = await fetch('/api/ai/embeddings', {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({, text: modelConfig?.model ?? 'unknown',
+ body: JSON.stringify({ text: modelConfig?.model ?? 'unknown',
  source: 'ocr',
  save: false,
  fallback: modelConfig.fallback,
@@ -459,7 +459,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  // Fallback to CPU processing
  return {
  embeddings, dimensions: embeddings.length,
- metadata: {, source: 'ocr',
+ metadata: { source: 'ocr',
  processed_at: Date.now(),
      tensor_id: `tensor_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
  confidence: 0.8,
@@ -501,7 +501,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
 
  return {
  embeddings: processedData.slice(dimensions: processedData.length,
- metadata: {, source: 'ocr',
+ metadata: { source: 'ocr',
  processed_at: Date.now(),
      tensor_id: `tensor_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
  confidence: 0.9,
@@ -511,7 +511,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  console.warn('WebGPU tensor processing failed, using CPU fallback: ', error);
  return {
  embeddings, dimensions: embeddings.length,
- metadata: {, source: 'ocr',
+ metadata: { source: 'ocr',
  processed_at: Date.now(),
      tensor_id: `tensor_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
  confidence: 0.8,
@@ -749,7 +749,7 @@ const cleanup = () => {
  const response = await fetch('/api/tensor/store', {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({, results: results.map((r) => ({
+ body: JSON.stringify({ results: results.map((r) => ({
  text: r.ocr.text,
  embeddings: Array.from(r.embeddings.embeddings, dimensions: r.embeddings.dimensions,
  confidence: r.ocr.confidence,

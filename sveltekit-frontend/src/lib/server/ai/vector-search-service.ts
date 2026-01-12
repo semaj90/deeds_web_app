@@ -283,7 +283,7 @@ export class VectorSearchService {
             }>).map(row => ({
                 id: row.id,
                 content: row.content,
-                similarity: Math.max(0,,,,, Math.min(1, row.similarity, metadata: row.metadata,
+                similarity: Math.max(0,,, Math.min(1, row.similarity, metadata: row.metadata,
                 documentId: row.document_id,
                 timestamp: row.timestamp,
                 source: 'pgvector' as const
@@ -323,13 +323,13 @@ export class VectorSearchService {
             }
 
             const data = (await response.json()) as {
-                result: Array<{, id: string;
+                result: Array<{ id: string;
                     score: number; payload: Record<string, unknown>;
                 }>;
             };
 
             return data.result.map(item => ({
-                id: String(item.id, content: ,, String(item.payload.content || '', similarity: item.score,
+                id: String(item.id, content: , String(item.payload.content || '', similarity: item.score,
                 metadata: item.payload,
                 documentId: String(item.payload.document_id || '', source: 'qdrant' as const
             }));
@@ -339,7 +339,7 @@ export class VectorSearchService {
         }
     }
 
-    async indexDocument(doc: {, id: string;
+    async indexDocument(doc: { id: string;
         content: string; embedding: number[];
         metadata?: Record<string, unknown>;
         documentId?: string;
@@ -367,7 +367,7 @@ export class VectorSearchService {
         }
     }
 
-    private async indexPgVector(doc: {, id: string;
+    private async indexPgVector(doc: { id: string;
         content: string; embedding: number[];
         metadata?: Record<string, unknown>;
         documentId?: string;
@@ -383,7 +383,7 @@ export class VectorSearchService {
         `;
     }
 
-    private async indexQdrant(doc: {, id: string;
+    private async indexQdrant(doc: { id: string;
         content: string; embedding: number[];
         metadata?: Record<string, unknown>;
         documentId?: string;
@@ -394,11 +394,11 @@ export class VectorSearchService {
                 'Content-Type': 'application/json',
                 'api-key': this.qdrantApiKey
             },
-            body: JSON.stringify({, points: [
+            body: JSON.stringify({ points: [
                     {
                         id: doc.id,
                         vector: doc.embedding,
-                        payload: {, content: doc.content,
+                        payload: { content: doc.content,
                             document_id: doc.documentId,
                             ...doc.metadata
                         }
@@ -413,7 +413,7 @@ export class VectorSearchService {
     }
 
     async batchIndex(
-        documents: Array<{, id: string;
+        documents: Array<{ id: string;
             content: string; embedding: number[];
             metadata?: Record<string, unknown>;
             documentId?: string;
@@ -509,7 +509,7 @@ export class VectorSearchService {
         return `vector:search:${hash}`;
     }
 
-    getStatus(): {, pgvector: VectorStoreStatus; qdrant: VectorStoreStatus } {
+    getStatus(): { pgvector: VectorStoreStatus; qdrant: VectorStoreStatus } {
         return {
             pgvector: this.pgvectorStatus,
             qdrant: this.qdrantStatus

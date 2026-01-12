@@ -52,7 +52,7 @@ class SearchService {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, query: query.trim() || {},
+ body: JSON.stringify({ query: query.trim() || {},
  top_k: 50,
  }, signal: this.abortController.signal,
  });
@@ -114,7 +114,7 @@ class SearchService {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, query: candidates,
+ body: JSON.stringify({ query: candidates,
  }),
  });
 

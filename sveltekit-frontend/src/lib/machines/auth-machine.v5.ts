@@ -32,15 +32,15 @@ const initialContext: AuthContext = {
 
 export const authMachine = setup({
   types: {} as { context: AuthContext; events: AuthEvent },
-  actions: {, setLoading: assign({ isLoading: () => true }, clearLoading: assign({, isLoading: () => false }, setError: assign({, error: ({ event }) => ('error' in event ? event.error : 'Unknown error', isLoading: () => false
-    }, setUser: assign({, user: ({ event }) => ('user' in event ? event.user as AuthContext['user'] : null, session: ({ event }) => ('session' in event ? event.session as AuthContext['session'] : null, isLoading: () => false,
+  actions: { setLoading: assign({ isLoading: () => true }, clearLoading: assign({ isLoading: () => false }, setError: assign({ error: ({ event }) => ('error' in event ? event.error : 'Unknown error', isLoading: () => false
+    }, setUser: assign({ user: ({ event }) => ('user' in event ? event.user as AuthContext['user'] : null, session: ({ event }) => ('session' in event ? event.session as AuthContext['session'] : null, isLoading: () => false,
       error: () => undefined,
-    }, clearUser: assign({, user: () => null, session: () => null }),
+    }, clearUser: assign({ user: () => null, session: () => null }),
   },
-  actors: {, authenticate: fromPromise(async ({ input }, { input: {, email: string; password: string } }) => {
+  actors: { authenticate: fromPromise(async ({ input }, { input: { email: string; password: string } }) => {
       // Stub: Replace with real auth logic
       console.log('Auth stub called with:', input.email);
-      return { user: {, id: '1', email: input.email }, session: {, id: 'sess_1' } };
+      return { user: { id: '1', email: input.email }, session: { id: 'sess_1' } };
     }, logout: fromPromise(async () => {
       return { success: true };
     }),
@@ -49,31 +49,31 @@ export const authMachine = setup({
   id: 'auth',
   initial: 'idle',
   context: initialContext,
-  states: {, idle: {
-      on: {, START_LOGIN: { target: 'authenticating' },
+  states: { idle: {
+      on: { START_LOGIN: { target: 'authenticating' },
       },
     },
-    authenticating: {, entry: 'setLoading',
-      invoke: {, src: 'authenticate',
-        input: ({ event }) => ('data' in event ? event.data : {, email: '', password: '' }, onDone: {, target: 'authenticated',
+    authenticating: { entry: 'setLoading',
+      invoke: { src: 'authenticate',
+        input: ({ event }) => ('data' in event ? event.data : { email: '', password: '' }, onDone: { target: 'authenticated',
           actions: 'setUser',
         },
-        onError: {, target: 'idle',
+        onError: { target: 'idle',
           actions: 'setError',
         },
       },
     },
-    authenticated: {, entry: 'clearLoading',
-      on: {, LOGOUT: 'loggingOut',
+    authenticated: { entry: 'clearLoading',
+      on: { LOGOUT: 'loggingOut',
         SESSION_EXPIRED: 'idle',
       },
     },
-    loggingOut: {, entry: 'setLoading',
-      invoke: {, src: 'logout',
-        onDone: {, target: 'idle',
+    loggingOut: { entry: 'setLoading',
+      invoke: { src: 'logout',
+        onDone: { target: 'idle',
           actions: ['clearUser', 'clearLoading'],
         },
-        onError: {, target: 'idle',
+        onError: { target: 'idle',
           actions: ['clearUser', 'setError'],
         },
       },
