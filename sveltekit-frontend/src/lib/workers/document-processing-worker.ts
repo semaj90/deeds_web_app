@@ -47,7 +47,7 @@ export interface EmbeddingResult {
 export type DocumentProcessingRecord = typeof schema.documentProcessing.$inferSelect ;
 
 class DocumentProcessingWorker {
- private isRunning = $state (false);
+ private isRunning = false;
  private processedCount = 0;
  private failedCount = 0;
  private intervalHandle: ReturnType<typeof setInterval> | null = null;

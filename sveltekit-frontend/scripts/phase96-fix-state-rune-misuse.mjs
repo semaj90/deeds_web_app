@@ -41,6 +41,14 @@ function fixStateInFile(filePath) {
     content = content.replace(/(this\.\w+)(\s*)=(\s*)\$state\s*\(\s*(.+?)\s*\)/g,
       '$1$2=$3$4');
 
+    // Pattern 4: Fix corrupted syntax like "private: boolean = $state (false)"
+    content = content.replace(/(\s+)(private|public):\s*(\w+)\s*=\s*\$state\s*\(\s*(.+?)\s*\)/g,
+      '$1$2 $3 = $4');
+
+    // Pattern 5: Fix syntax like "private running = $state (false)" with extra space
+    content = content.replace(/(\s+)(private|public)(\s+)(\w+)(\s*)=(\s*)\$state\s+\(\s*(.+?)\s*\)/g,
+      '$1$2$3$4$5=$6$7');
+
     if (content !== original) {
       fs.writeFileSync(filePath, content, 'utf-8');
       console.log(`✅ Fixed: ${path.relative(srcDir, filePath)}`);

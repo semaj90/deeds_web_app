@@ -1,10 +1,347 @@
 # Claude Tactical Error Fixing Guide - Phase 96
 
-## Current Situation (2026-01-15 15:30 PST)
+## Current Situation (2026-01-11 21:00 PST)
 
-**Status:** Phase 96 AI Component Restoration - COMPLETE ✅
-**XState v5 Migration:** All machine files verified error-free
-**Knowledge Base:** Enhanced with v5 patterns and production best practices
+**Status:** RabbitMQ Integration + RAG/KAG/DAG Knowledge Base Updates
+**XState v5 Migration:** Case machines rebuilt, idle-detection needs cleanup
+**Focus:** Streaming/Chunking response optimization
+
+---
+
+## 🐰 RabbitMQ Background Job Architecture
+
+### Why We Need It
+JavaScript is single-threaded → Can't handle heavy tasks (AI analysis, OCR, case clustering) during HTTP requests → Queue jobs via RabbitMQ → Workers process asynchronously
+
+### Integration Pattern
+
+**Producer (Frontend → RabbitMQ):**
+```typescript
+// idle-detection-rabbitmq-machine.ts
+const response = await fetch('/api/rabbitmq/publish', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    exchange: 'legal.background',
+    routingKey: job.type, // 'case_creation', 'document_analysis', etc.
+    message: {
+      jobId: job.id,
+      type: job.type,
+      priority: job.priority,
+      payload: job.payload,
+      sessionId: context.sessionId,
+      userId: context.userId,
+      timestamp: Date.now()
+    },
+    headers: {
+      messageType: 'background_job',
+      priority: job.priority,
+      retryCount: job.retryCount.toString()
+    }
+  })
+});
+```
+
+**Consumer (Backend Workers):**
+```typescript
+// amqplib pattern
+channel.assertQueue('task_queue', { durable: true });
+channel.prefetch(1); // Fair dispatch
+
+channel.consume('task_queue', async (msg) => {
+  const job = JSON.parse(msg.content.toString());
+
+  try {
+    // Process job (case creation, AI analysis, etc.)
+    const result = await processJob(job);
+
+    // Store results in Neo4j/MinIO/PostgreSQL
+    await storeResults(result);
+
+    // Acknowledge job completion
+    channel.ack(msg);
+  } catch (error) {
+    // Retry logic or dead-letter queue
+    if (job.retryCount < 3) {
+      channel.nack(msg, false, true); // Requeue
+    } else {
+      channel.nack(msg, false, false); // Send to DLQ
+    }
+  }
+}, { noAck: false });
+```
+
+### Rebuilt State Machines
+
+**1. case-creation-machine.ts**
+- Purpose: Validate and create legal cases asynchronously
+- XState v5: `fromPromise<unknown, { input: CaseCreationContext }>`
+- Features: Auto-save, retry logic (3 attempts), validation errors
+- API: `POST /api/cases` with jobId + sessionId
+
+**2. enhanced-legal-case-machine.ts**
+- Purpose: Full case lifecycle (load/create/evidence/AI)
+- Actors:
+  - `initializeSystem`: System health check
+  - `loadCase`: Fetch case + evidence
+  - `createCase`: Submit new case
+  - `addEvidence`: Upload attachments
+  - `startAIAnalysis`: Queue AI analysis job
+- Integration: All results flow through RabbitMQ
+
+### Message Durability
+
+**Queue Declaration:**
+```javascript
+channel.assertQueue('task_queue', {
+  durable: true  // Queue survives RabbitMQ restart
+});
+```
+
+**Message Persistence:**
+```javascript
+channel.sendToQueue(queue, Buffer.from(msg), {
+  persistent: true  // Messages written to disk
+});
+```
+
+**Fair Dispatch:**
+```javascript
+channel.prefetch(1);  // Don't send new job until current one is acked
+```
+
+---
+
+## 🧠 RAG + KAG + DAG Knowledge Base Patterns
+
+### RAG (Retrieval-Augmented Generation)
+**Pattern:** Query → Vector Search → Inject Context → LLM Response
+
+```typescript
+// Example: Knowledge Search with Qdrant
+async function ragQuery(query: string) {
+  // 1. Embed query
+  const embedding = await ollama.embeddings({
+    model: 'embeddinggemma:latest',
+    prompt: query
+  });
+
+  // 2. Vector search
+  const results = await qdrant.search({
+    collection: 'knowledge_base',
+    vector: embedding.embedding,
+    limit: 5
+  });
+
+  // 3. Inject context into prompt
+  const context = results.map(r => r.payload.text).join('\n\n');
+  const prompt = `Context:\n${context}\n\nQuestion: ${query}`;
+
+  // 4. Generate response
+  const response = await ollama.generate({
+    model: 'gemma3-legal:latest',
+    prompt,
+    stream: true  // Streaming for UX
+  });
+
+  return response;
+}
+```
+
+### KAG (Knowledge-Augmented Generation)
+**Pattern:** Structured knowledge (Neo4j graph) + LLM reasoning
+
+```typescript
+// Example: Case relationship analysis
+async function kagAnalysis(caseId: string) {
+  // 1. Query Neo4j for case relationships
+  const cypher = `
+    MATCH (c:Case {id: $caseId})-[:RELATED_TO]->(related:Case)
+    MATCH (c)-[:HAS_EVIDENCE]->(e:Evidence)
+    RETURN c, related, collect(e) as evidence
+  `;
+  const graph = await neo4j.run(cypher, { caseId });
+
+  // 2. Convert graph to text
+  const knowledge = formatGraphAsContext(graph);
+
+  // 3. LLM analysis
+  const analysis = await ollama.generate({
+    model: 'gemma3-legal:latest',
+    prompt: `Analyze this case structure:\n${knowledge}`
+  });
+
+  return analysis;
+}
+```
+
+### DAG (Directed Acyclic Graph) Processing
+**Pattern:** Job dependency resolution for RabbitMQ tasks
+
+```typescript
+// Example: Complex workflow
+const jobDAG = {
+  'extract_text': { dependencies: [] },
+  'legal_analysis': { dependencies: ['extract_text'] },
+  'case_creation': { dependencies: ['legal_analysis'] },
+  'send_notification': { dependencies: ['case_creation'] }
+};
+
+async function processDAG(dag: JobDAG) {
+  const completed = new Set<string>();
+
+  while (completed.size < Object.keys(dag).length) {
+    for (const [jobId, config] of Object.entries(dag)) {
+      if (!completed.has(jobId)) {
+        const canRun = config.dependencies.every(dep => completed.has(dep));
+
+        if (canRun) {
+          await queueRabbitMQJob(jobId, config);
+          completed.add(jobId);
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## 🌊 Streaming + Chunking Response Optimization
+
+### Problem
+Large LLM responses block UI → Poor UX → Need incremental delivery
+
+### Solution: SSE (Server-Sent Events) + Chunked Transfer
+
+**Backend (SvelteKit endpoint):**
+```typescript
+// src/routes/api/stream/+server.ts
+export async function GET({ url }) {
+  const query = url.searchParams.get('q');
+
+  return new Response(
+    new ReadableStream({
+      async start(controller) {
+        const response = await ollama.generate({
+          model: 'gemma3-legal:latest',
+          prompt: query,
+          stream: true
+        });
+
+        for await (const chunk of response) {
+          const data = `data: ${JSON.stringify(chunk)}\n\n`;
+          controller.enqueue(new TextEncoder().encode(data));
+        }
+
+        controller.close();
+      }
+    }),
+    {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive'
+      }
+    }
+  );
+}
+```
+
+**Frontend (Svelte component):**
+```svelte
+<script>
+let response = $state('');
+
+async function streamQuery(query) {
+  const eventSource = new EventSource(`/api/stream?q=${encodeURIComponent(query)}`);
+
+  eventSource.onmessage = (event) => {
+    const chunk = JSON.parse(event.data);
+    response += chunk.response; // Append incrementally
+  };
+
+  eventSource.onerror = () => {
+    eventSource.close();
+  };
+}
+</script>
+
+<button onclick={() => streamQuery('Analyze case...')}>
+  Stream Analysis
+</button>
+
+<div>{response}</div>
+```
+
+### Chunking Strategies
+
+**1. Token-based chunking:**
+```typescript
+function chunkByTokens(text: string, maxTokens: number = 512) {
+  const tokens = text.split(/\s+/);
+  const chunks: string[] = [];
+
+  for (let i = 0; i < tokens.length; i += maxTokens) {
+    chunks.push(tokens.slice(i, i + maxTokens).join(' '));
+  }
+
+  return chunks;
+}
+```
+
+**2. Semantic chunking (preserve context):**
+```typescript
+function chunkBySentences(text: string, chunkSize: number = 3) {
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+  const chunks: string[] = [];
+
+  for (let i = 0; i < sentences.length; i += chunkSize) {
+    chunks.push(sentences.slice(i, i + chunkSize).join(' '));
+  }
+
+  return chunks;
+}
+```
+
+**3. Embedding-aware chunking:**
+```typescript
+async function chunkWithEmbeddings(document: string) {
+  const paragraphs = document.split('\n\n');
+  const chunks: { text: string; embedding: number[] }[] = [];
+
+  for (const para of paragraphs) {
+    const { embedding } = await ollama.embeddings({
+      model: 'embeddinggemma:latest',
+      prompt: para
+    });
+
+    chunks.push({ text: para, embedding });
+  }
+
+  // Group similar chunks
+  return clusterChunks(chunks);
+}
+```
+
+---
+
+## ✅ Completed Actions
+
+### 1. XState v5 Case Machine Rebuild
+- **case-creation-machine.ts**: Clean fromPromise generics, validation, retry
+- **enhanced-legal-case-machine.ts**: Full CRUD + AI analysis
+- **Integration**: Both ready to queue via idle-detection machine
+
+### 2. RabbitMQ Documentation Integration
+- **Fetched**: rabbitmq.com tutorials (Hello World + Work Queues)
+- **Patterns**: Message acknowledgment, durability, fair dispatch
+- **Library**: amqplib (npm install amqplib)
+
+### 3. Knowledge Base Enhancement
+- **gemini.md**: RabbitMQ patterns added
+- **claude.md**: RAG/KAG/DAG + streaming/chunking patterns
+- **Focus**: Production-ready async job processing
 
 ---
 

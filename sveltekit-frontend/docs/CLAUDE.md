@@ -979,3 +979,337 @@ node scripts/phase90-detect-cascade-errors.mjs --file=src/lib/services/cognitive
 # Expected: 0 errors, 0 density
 ```
 
+
+---
+
+## 🐰 RabbitMQ Streams & Chunking Architecture (January 11, 2026)
+
+### RabbitMQ Streams Core Concepts
+
+**What is a Stream?**
+- Append-only immutable log (non-destructive reads)
+- Always persistent and replicated (quorum-based)
+- Supports time-travel (replay from any offset/timestamp)
+- Designed for high throughput and large backlogs
+
+**Key Differences from Classic Queues:**
+1. **Non-destructive consumption** - Messages never deleted on consumption
+2. **Offset-based tracking** - Consumers track position, not RabbitMQ
+3. **Segment-based storage** - Fixed-size disk segments (500MB default)
+4. **Replica reads** - Consumers can read from replicas for load distribution
+
+### Stream Declaration (AMQP 0.9.1)
+
+```typescript
+// TypeScript/Node.js pattern
+import amqp from 'amqplib';
+
+const connection = await amqp.connect('amqp://localhost');
+const channel = await connection.createChannel();
+
+// Declare stream with retention policies
+await channel.assertQueue('my-stream', {
+  durable: true,
+  arguments: {
+    'x-queue-type': 'stream',
+    'x-max-length-bytes': 20_000_000_000, // 20GB max size
+    'x-max-age': '7D',                      // 7 days retention
+    'x-stream-max-segment-size-bytes': 100_000_000, // 100MB segments
+    'x-stream-filter-size-bytes': 32        // Bloom filter size
+  }
+});
+```
+
+### Chunking & Streaming Patterns
+
+**1. Publisher Confirms (Data Safety)**
+```typescript
+// Enable publisher confirms
+await channel.confirmSelect();
+
+// Publish with confirmation
+await channel.publish('', 'my-stream', Buffer.from('message'), {
+  persistent: true,
+  messageId: generateUniqueId()
+});
+
+// Wait for confirmation
+await new Promise((resolve, reject) => {
+  channel.waitForConfirms()
+    .then(resolve)
+    .catch(reject);
+});
+```
+
+**2. Consumer Offset Management**
+```typescript
+// Start from specific offset
+await channel.consume('my-stream', (msg) => {
+  if (msg) {
+    // Process message
+    console.log(msg.content.toString());
+    
+    // Manual ack (advances offset)
+    channel.ack(msg);
+  }
+}, {
+  noAck: false, // Manual acks required
+  arguments: {
+    'x-stream-offset': 'first' // 'first' | 'last' | 'next' | <number> | <timestamp> | <interval>
+  }
+});
+
+// Offset options:
+// - 'first': Start from beginning
+// - 'last': Start from latest chunk
+// - 5000: Start at offset 5000
+// - new Date('2026-01-01'): Start at timestamp
+// - '1h': Start 1 hour ago
+```
+
+**3. QoS Prefetch (Chunking Control)**
+```typescript
+// Set prefetch to control chunk size
+await channel.prefetch(100); // 100 messages max in-flight
+
+// Consumer with bounded prefetch
+await channel.consume('my-stream', async (msg) => {
+  if (msg) {
+    // Process in chunks of 100
+    await processMessage(msg);
+    channel.ack(msg);
+  }
+}, { noAck: false });
+```
+
+**4. Deduplication (Exactly-Once Semantics)**
+```typescript
+// Named producer with deduplication
+let publishingId = 0;
+
+async function publishWithDedup(message: string) {
+  await channel.publish('', 'my-stream', Buffer.from(message), {
+    headers: {
+      'x-deduplication-header': 'my-producer-name',
+      'x-stream-publishing-id': publishingId++
+    }
+  });
+}
+
+// On restart, query last publishing ID
+const lastId = await queryLastPublishingId('my-producer-name');
+publishingId = lastId + 1;
+```
+
+### Super Streams (Partitioned Streams)
+
+```bash
+# Create partitioned stream for horizontal scaling
+rabbitmq-streams add_super_stream invoices --partitions 3
+```
+
+```typescript
+// Client automatically routes to partitions
+// Based on routing key or custom partitioning
+await channel.publish('invoices-exchange', 'invoice-123', buffer);
+```
+
+### Retention Policies
+
+**Size-based:**
+- x-max-length-bytes: Total stream size limit
+- Deletes oldest segments when exceeded
+
+**Time-based:**
+- x-max-age: Message age limit (e.g., '7D', '24h')
+- Deletes segments older than threshold
+
+**Segment-based:**
+- Always keeps at least 1 segment
+- Segments contain both messages and offset-tracking metadata
+
+### Performance Characteristics
+
+**Throughput:**
+- Optimized for sequential writes (append-only)
+- Replica reads distribute load across cluster
+- Prefetch 100-300 balances throughput/memory
+
+**Latency:**
+- Disk I/O heavy (use fast SSDs)
+- Ack latency ~200ms for persistent messages
+- Batched fsync() for efficiency
+
+**Replication:**
+- Quorum-based (needs majority replicas)
+- Cluster size tolerance:
+  - 3 nodes: 1 failure
+  - 5 nodes: 2 failures
+  - 7 nodes: 3 failures
+
+### Common Patterns for Legal AI
+
+**1. Document Chunking Pipeline**
+```typescript
+// Producer: Chunk large documents
+async function publishDocumentChunks(docId: string, content: string) {
+  const chunks = chunkDocument(content, 1000); // 1KB chunks
+  
+  for (let i = 0; i < chunks.length; i++) {
+    await channel.publish('', 'doc-stream', Buffer.from(JSON.stringify({
+      docId,
+      chunkIndex: i,
+      totalChunks: chunks.length,
+      content: chunks[i]
+    })), {
+      headers: {
+        'x-deduplication-header': doc-,
+        'x-stream-publishing-id': i
+      }
+    });
+  }
+}
+
+// Consumer: Process chunks with offset tracking
+await channel.consume('doc-stream', async (msg) => {
+  if (msg) {
+    const { docId, chunkIndex, content } = JSON.parse(msg.content.toString());
+    await processChunk(docId, chunkIndex, content);
+    channel.ack(msg);
+  }
+}, {
+  arguments: { 'x-stream-offset': 'last' } // Resume from last position
+});
+```
+
+**2. Time-Travel Replay for Debugging**
+```typescript
+// Replay from 1 hour ago
+const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+
+await channel.consume('error-stream', (msg) => {
+  if (msg) {
+    console.log('Historical error:', msg.content.toString());
+    channel.ack(msg);
+  }
+}, {
+  arguments: { 'x-stream-offset': oneHourAgo }
+});
+```
+
+**3. Single Active Consumer (SAC)**
+```typescript
+// Only one consumer active at a time (for ordering)
+await channel.consume('legal-analysis-stream', processLegalDoc, {
+  arguments: {
+    'x-stream-offset': 'first',
+    'x-single-active-consumer': true, // Enable SAC
+    'x-consumer-name': 'legal-analyzer-1' // Unique consumer name
+  }
+});
+```
+
+### Integration with Phase 96 XState Machines
+
+```typescript
+// Example: RabbitMQ stream as XState event source
+import { fromCallback } from 'xstate';
+
+const streamMachine = setup({
+  actors: {
+    rabbitMQStream: fromCallback(({ sendBack }) => {
+      const channel = await createChannel();
+      
+      channel.consume('case-stream', (msg) => {
+        if (msg) {
+          sendBack({ type: 'CASE_RECEIVED', data: JSON.parse(msg.content.toString()) });
+          channel.ack(msg);
+        }
+      }, {
+        arguments: { 'x-stream-offset': 'last' }
+      });
+      
+      return () => channel.close();
+    })
+  }
+}).createMachine({
+  initial: 'listening',
+  states: {
+    listening: {
+      invoke: {
+        src: 'rabbitMQStream'
+      },
+      on: {
+        CASE_RECEIVED: {
+          actions: 'processCase'
+        }
+      }
+    }
+  }
+});
+```
+
+### Error Handling & Resilience
+
+**1. Negative Acks with Requeue**
+```typescript
+try {
+  await processMessage(msg);
+  channel.ack(msg);
+} catch (error) {
+  if (isTransientError(error)) {
+    channel.nack(msg, false, true); // Requeue
+  } else {
+    channel.nack(msg, false, false); // Dead-letter or discard
+  }
+}
+```
+
+**2. Dead Letter Exchange (DLX)**
+```typescript
+await channel.assertQueue('doc-stream-dlq', {
+  durable: true,
+  arguments: {
+    'x-queue-type': 'classic' // DLQ doesn't need to be stream
+  }
+});
+
+await channel.assertQueue('doc-stream', {
+  durable: true,
+  arguments: {
+    'x-queue-type': 'stream',
+    'x-dead-letter-exchange': 'dlx-exchange'
+  }
+});
+```
+
+**3. Consumer Acknowledgement Timeout**
+- Quorum queues enforce 30-min timeout
+- Streams do not auto-nack on timeout
+- Design: Track message age in consumer state
+
+### Best Practices (2026)
+
+1. **Use prefetch 100-300** - Optimal throughput without memory issues
+2. **Enable publisher confirms** - Data safety guarantee
+3. **Implement deduplication for critical flows** - Exactly-once semantics
+4. **Set retention policies** - Prevent unbounded disk growth
+5. **Use super streams for >100k msg/sec** - Horizontal partitioning
+6. **Read from replicas** - Distribute consumer load
+7. **Monitor segment count** - High count = retention too long or throughput too high
+8. **Use streams for event sourcing** - Immutable audit trail
+
+### Common Pitfalls
+
+❌ **Global QoS** - Streams don't support channel-wide prefetch (use per-consumer)
+❌ **Auto-ack mode** - Defeats stream's replay capability
+❌ **Unbounded prefetch** - Causes memory exhaustion
+❌ **Misusing deduplication** - Publishing ID must be strictly increasing
+❌ **Concurrent producers with same name** - Breaks deduplication
+
+### Resources
+
+- [RabbitMQ Streams Docs](https://www.rabbitmq.com/docs/streams)
+- [Publisher Confirms](https://www.rabbitmq.com/docs/confirms)
+- [Stream Protocol](https://github.com/rabbitmq/rabbitmq-server/blob/main/deps/rabbitmq_stream/docs/PROTOCOL.adoc)
+

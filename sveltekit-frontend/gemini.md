@@ -1,29 +1,99 @@
-# Phase 66 Progress Summary - Gemini Knowledge Base
+# Phase 89-96 Progress Summary - Gemini Knowledge Base
 
 ## 🎯 Mission Status (2026-01-11)
 
-**Objective:** Reduce TypeScript/CSS errors from 77,002 to ~42,000 (45% reduction)
+**Current Focus:** RabbitMQ Background Job Integration + Chunking/Streaming Fixes
 
-### Current State
+### Latest Updates
 ```
-✅ Baseline Measurement Complete
-   └─ svelte-check found 77,002 errors in 2,471 files
+✅ XState v5 Case Machines Rebuilt
+   ├─ case-creation-machine.ts: RabbitMQ job handler for async case creation
+   ├─ enhanced-legal-case-machine.ts: Full case management (load/create/evidence/AI)
+   └─ Both machines: Clean fromPromise<Output, Input> generics
 
-✅ Structural Fixes Applied (Phase 1)
-   ├─ Type import corruption: 346 files fixed
-   ├─ FormData argument corruption: 3 files fixed
-   └─ Knowledge search SSR migration: Complete
+✅ RabbitMQ Integration Documentation
+   ├─ Work Queues pattern: Round-robin task distribution
+   ├─ Message acknowledgment: Manual ack with {noAck: false}
+   ├─ Message durability: {durable: true} + {persistent: true}
+   └─ Fair dispatch: channel.prefetch(1) for load balancing
 
-🔄 CSS Pattern Analysis (Phase 2 - Current)
-   ├─ fix-css-selectors.mjs: Created & validated
-   ├─ Dry-run: No false positives detected
-   └─ Ready for targeted application
+🔄 Knowledge Base Enhancement (Current)
+   ├─ RAG: Retrieval-Augmented Generation patterns
+   ├─ KAG: Knowledge-Augmented Generation workflows
+   ├─ DAG: Directed Acyclic Graph processing
+   └─ Streaming/Chunking: Response optimization
 
-⏳ Phase 66 Agent Ready
-   ├─ Python environment: Requires `pip install --upgrade openai langchain-openai`
-   ├─ LLM: Ollama gemma3-legal:latest (native, no OpenAI)
-   └─ Tools: 5 specialized fixers registered
+⏳ Idle Detection Machine
+   └─ Needs corruption cleanup (pervasive syntax errors)
 ```
+
+---
+
+## 🐰 RabbitMQ Integration Patterns
+
+### Core Concepts (from rabbitmq.com tutorials)
+
+**Work Queue Pattern:**
+```javascript
+// Producer (new_task.js)
+const queue = 'task_queue';
+const msg = process.argv.slice(2).join(' ') || "Hello World!";
+
+channel.assertQueue(queue, { durable: true });
+channel.sendToQueue(queue, Buffer.from(msg), { persistent: true });
+```
+
+**Consumer (worker.js):**
+```javascript
+channel.assertQueue(queue, { durable: true });
+channel.prefetch(1); // Fair dispatch - don't give worker more than 1 job
+
+channel.consume(queue, function(msg) {
+  const secs = msg.content.toString().split('.').length - 1;
+  console.log(" [x] Received %s", msg.content.toString());
+
+  setTimeout(function() {
+    console.log(" [x] Done");
+    channel.ack(msg); // Manual acknowledgment
+  }, secs * 1000);
+}, {
+  noAck: false // Require manual ack
+});
+```
+
+### Our Implementation
+
+**Job Types (idle-detection-rabbitmq-machine.ts):**
+```typescript
+type:
+  | 'document_analysis'
+  | 'case_clustering'
+  | 'legal_research'
+  | 'citation_validation'
+  | 'self_prompting'
+  | 'case_creation'        // NEW: Queue case creation
+  | 'case_management'      // NEW: Load/evidence/AI analysis
+  | 'recommendation_generation'  // NEW: Smart suggestions
+```
+
+**Queue Strategy:**
+```
+User Active → User Idle (5min) → Generate Prompts → Queue Jobs
+                                        ↓
+                                  RabbitMQ (AMQP 5672)
+                                        ↓
+                    Round-robin dispatch to workers
+                                        ↓
+            [Worker 1] [Worker 2] [Worker 3]
+                        ↓
+            Results → Neo4j + MinIO + PostgreSQL
+```
+
+### Key Benefits
+- **Async Processing:** JavaScript stays single-threaded, workers handle heavy lifting
+- **Fault Tolerance:** Message acknowledgment prevents job loss
+- **Scalability:** Add workers dynamically during high load
+- **Durability:** Messages survive RabbitMQ restarts ({durable: true})
 
 ---
 

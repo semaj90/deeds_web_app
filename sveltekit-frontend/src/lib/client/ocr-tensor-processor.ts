@@ -117,7 +117,7 @@ export class OCRTensorProcessor {
  // worker may be a Dedicated Worker or a ServiceWorker (registration.active)
  private worker?: Worker | ServiceWorker;
  private serviceWorkerRegistration?: ServiceWorkerRegistration;
- private ocrInitialized = $state(false);
+ private ocrInitialized = false;
  private webgpuDevice?: GPUDevice;
  private shaderCacheManager: IShaderCacheManager; // Use the new interface type
  private currentLODLevel: 'high' | 'medium' | 'low' = 'medium';

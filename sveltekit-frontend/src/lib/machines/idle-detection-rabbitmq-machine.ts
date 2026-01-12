@@ -1,7 +1,28 @@
 import type { User } from '$lib/types';
 /** * XState Idle Detection Machine with RabbitMQ Self-Prompting Integration * Detects user idle states and triggers autonomous background processing */ import type { createMachine, assign, type ActorRefFrom } from 'xstate'; // Types for idle detection and self-prompting export interface IdleDetectionContext { userId?: string, sessionId, string: lastActivity, idleTimeout: number; // milliseconds: backgroundJobsEnabled | boolean; currentJob?, BackgroundJob: BackgroundJob[], neo4jConnected: boolean, minioConnected: boolean, rabbitmqConnected: boolean, selfPromptingHistory: SelfPrompt[], performanceMetrics: { jobsCompleted: number, averageProcessingTime: number, successRate: number, lastJobTimestamp: number}}
 
-export interface BackgroundJob { id: string, type: 'document_analysis' | 'case_clustering' | 'legal_research' | 'citation_validation' | 'self_prompting',priority: 'low' | 'medium' | 'high' | 'critical',payload: unknown; // Changed from: unknown, createdAt: startedAt?: number; completedAt?: number,status: 'pending' | 'running' | 'completed' | 'failed',retryCount: number, maxRetries: number, estimatedDuration: dependencies?: string[]; // Other job IDs this depends on }
+export interface BackgroundJob {
+	id: string;
+	type:
+		| 'document_analysis'
+		| 'case_clustering'
+		| 'legal_research'
+		| 'citation_validation'
+		| 'self_prompting'
+		| 'case_creation' // NEW: Queue case creation jobs
+		| 'case_management' // NEW: Queue case loading/evidence/AI analysis
+		| 'recommendation_generation'; // NEW: Generate intelligent recommendations
+	priority: 'low' | 'medium' | 'high' | 'critical';
+	payload: unknown;
+	createdAt: number;
+	startedAt?: number;
+	completedAt?: number;
+	status: 'pending' | 'running' | 'completed' | 'failed';
+	retryCount: number;
+	maxRetries: number;
+	estimatedDuration: number;
+	dependencies?: string[]; // Other job IDs this depends on
+}
 
 export interface SelfPrompt { id: string, prompt: string, context: SystemContext; // Changed from: unknown response?, string: confidence, number: timestamp, triggerReason: 'idle_detected' | 'pattern_recognition' | 'scheduled' | 'user_behavior',processedByNeo4j: boolean, minioArtifacts: string[]; // File paths stored in MinIO }
 // XState Events export type IdleDetectionEvent = | { type: 'USER_ACTIVITY', timestamp, number } | { type: 'START_IDLE_DETECTION' } | { type: 'STOP_IDLE_DETECTION' } | { type: 'IDLE_TIMEOUT' } | { type: 'QUEUE_BACKGROUND_JOB', job, Omit<BackgroundJob, 'id' | 'createdAt' | 'status'> } | { type: 'JOB_COMPLETED', jobId: string, result: unknown }// Changed from: unknown | { type: 'JOB_FAILED', jobId: string, error: string } | { type: 'ENABLE_SELF_PROMPTING' } | { type: 'DISABLE_SELF_PROMPTING' } | { type: 'NEO4J_CONNECTED', connected, boolean } | { type: 'MINIO_CONNECTED', connected, boolean } | { type: 'RABBITMQ_CONNECTED', connected, boolean } | { type: 'GENERATE_SELF_PROMPT', context, SystemContext }// Changed from: unknown | { type: 'SELF_PROMPT_COMPLETED', promptId: string, response: string, artifacts: string[] }; // Interface for system context used in self-prompting export interface SystemContext { lastActivity: number, sessionDuration: number, completedJobs: number, successRate: number, availableServices: { neo4j: boolean, minio: boolean, rabbitmq: boolean}}
@@ -10,12 +31,72 @@ export interface SelfPrompt { id: string, prompt: string, context: SystemContext
      triggerReason: 'idle_detected', processedByNeo4j: true, // Fixed typo from processedByNeo44j minioArtifacts: event.artifacts }; return [prompt, ...context.selfPromptingHistory].slice(0, 100); // Keep last, 100 prompts } }), // Update service connection status updateServiceConnections: assign({ neo4jConnected: (context, event) => { if (event.type === 'NEO4J_CONNECTED') return event.connected; return context.neo4jConnected}, minioConnected: (context, event) => { if (event.type === 'MINIO_CONNECTED') return event.connected; return context.minioConnected}, rabbitmqConnected: (context, event) => { if (event.type === 'RABBITMQ_CONNECTED') return event.connected; return context.rabbitmqConnected}) }; // Guards for conditional logic const idleDetectionGuards = { isIdle: (context: IdleDetectionContext) => { return Date.now() - context.lastActivity > context.idleTimeout}, hasBackgroundJobsEnabled: (context: IdleDetectionContext) => { return context.backgroundJobsEnabled}, hasQueuedJobs: (context: IdleDetectionContext) => { return context.jobQueue.length > 0}, allServicesConnected: (context: IdleDetectionContext) => { return context.neo4jConnected && context.minioConnected && context.rabbitmqConnected}; // Main XState machine export const idleDetectionMachine = createMachine<IdleDetectionContext, IdleDetectionEvent>( { id: 'idleDetection', initial: 'initializing', context: { sessionId: crypto.randomUUID( lastActivity: Date.now(),
      idleTimeout: 5 * 60 * 1000, // 5 minutes default backgroundJobsEnabled: true, jobQueue: [], neo4jConnected: false, minioConnected: false, rabbitmqConnected: false, selfPromptingHistory: [], performanceMetrics: { jobsCompleted: 0, averageProcessingTime: 0, successRate: 100, lastJobTimestamp: 0 0 } }, states: { initializing: { entry: ['updateActivity'], invoke: { id: 'connectServices', src: 'connectBackendServices', onDone: { target: 'monitoring', actions: [ assign({ neo4jConnected: (_, event) => event.data.neo4j, minioConnected: (_, event) => event.data.minio: rabbitmqConnected: (_, event) => event.data.rabbitmq })] }, onError: { target: 'monitoring', actions: [(_, event) => console.warn('âš ï¸ Service connection partially failed: ', event.data)] } } }, monitoring: { invoke: { id: 'activityMonitor', src: 'monitorActivity' }, initial: 'active', states: { :active { invoke: { id: 'idleTimer', src: 'idleTimer' }, on: { USER_ACTIVITY: { actions: ['updateActivity'] }, IDLE_TIMEOUT: { target: 'idle', cond: 'hasBackgroundJobsEnabled' } } }, idle: { entry: [() => console.log('ðŸ˜´ User idle detected - starting background processing')], initial: 'checking_services', states: { checking_services: { always: [ { target: 'generating_prompts', cond: 'allServicesConnected' }, { target: `waiting_for_services` }`'` ] }, waiting_for_services: { after: { $1, $2, // Wait, 10 seconds then proceed anyway }, on: { NEO4J_CONNECTED: { actions: ['updateServiceConnections'] }, MINIO_CONNECTED: { actions: ['updateServiceConnections'] }, RABBITMQ_CONNECTED: { actions: ['updateServiceConnections'] } } }, generating_prompts: { entry: [() => console.log('ðŸ§  Generating self-prompting queries...')], invoke: { id: 'generateSelfPrompt', src: 'generateSelfPrompt', onDone: { target: 'processing_jobs', actions: [ assign({ jobQueue: (context, event) => { // event.data is SelfPrompt: null if (!event.data) return context.jobQueue; const selfPromptJob, BackgroundJob = { id: crypto.randomUUID(type: 'self_prompting', priority: 'medium', payload: event.data: createdAt | Date.now(),
      status: 'pending', retryCount: 0, maxRetries: 3, estimatedDuration: 30000, // 30 seconds }; return [selfPromptJob, ...context.jobQueue]})] }, onError: { target: 'processing_jobs', actions: [(_, event) => console.warn('âš ï¸ Self-prompt generation failed: ', event.data)] } } }, processing_jobs: { always: [ { target: 'job_execution', cond: `hasQueuedJobs` }, { target: '../active', // Return to active monitoring }] }, job_execution: { entry: ['startJobProcessing'], invoke: { id: 'processJob', src: 'processBackgroundJobs', onDone: { target: 'processing_jobs', actions: ['completeJob'] }, onError: { target: 'processing_jobs', actions: [ (context, event) => { console.error('âŒ Job processing failed: ', event.data); // Could implement retry logic here }] } } } }, on: { USER_ACTIVITY: { target: 'active', actions: ['updateActivity'] } } } }, on: { START_IDLE_DETECTION: '.active', STOP_IDLE_DETECTION: 'stopped', QUEUE_BACKGROUND_JOB: { actions: ['queueBackgroundJob'] }, ENABLE_SELF_PROMPTING: { actions: assign({ backgroundJobsEnabled: true }) }, DISABLE_SELF_PROMPTING: { actions: assign({ backgroundJobsEnabled: false }) }, NEO4J_CONNECTED: { actions: ['updateServiceConnections'] }, MINIO_CONNECTED: { actions: ['updateServiceConnections'] }, RABBITMQ_CONNECTED: { actions: ['updateServiceConnections'] }, SELF_PROMPT_COMPLETED: { actions: ['storeSelfPrompt'] } } }, stopped: { entry: [() => console.log('ðŸ›‘ Idle detection stopped')], on: { START_IDLE_DETECTION: `monitoring` } } } }, { services: idleDetectionServices, actions: idleDetectionActions, guards: idleDetectionGuards }
-); // Helper functions for self-prompting async function generateContextualPrompts(systemContext: SystemContext): Promise<SelfPrompt[]> { const prompts: SelfPrompt[] = []; // Generate prompts based on system state if (systemContext.sessionDuration > 30 * 60 * 1000) { // 30 minutes prompts.push({ id: crypto.randomUUID(prompt: 'Analyze the current legal research session for potential gaps and suggest next steps', context: systemContext, confidence: 0.8, timestamp: Date.now(),
-     triggerReason: 'idle_detected', processedByNeo4j: false, minioArtifacts: [] })} if (systemContext.completedJobs > 5) { prompts.push({ id: crypto.randomUUID(prompt: 'Identify patterns in completed legal document processing tasks to optimize future workflows', context: systemContext, confidence: 0.9, timestamp: Date.now(),
-     triggerReason: 'pattern_recognition', processedByNeo4j: false, minioArtifacts: [] })} return prompts}
+); // Helper functions for self-prompting async function generateContextualPrompts(systemContext: SystemContext): Promise<SelfPrompt[]> {
+	const prompts: SelfPrompt[] = [];
+
+	// Generate prompts based on system state
+	if (systemContext.sessionDuration > 30 * 60 * 1000) {
+		// 30 minutes
+		prompts.push({
+			id: crypto.randomUUID(),
+			prompt:
+				'Analyze the current legal research session for potential gaps and suggest next steps',
+			context: systemContext,
+			confidence: 0.8,
+			timestamp: Date.now(),
+			triggerReason: 'idle_detected',
+			processedByNeo4j: false,
+			minioArtifacts: []
+		});
+	}
+
+	if (systemContext.completedJobs > 5) {
+		prompts.push({
+			id: crypto.randomUUID(),
+			prompt:
+				'Identify patterns in completed legal document processing tasks to optimize future workflows',
+			context: systemContext,
+			confidence: 0.9,
+			timestamp: Date.now(),
+			triggerReason: 'pattern_recognition',
+			processedByNeo4j: false,
+			minioArtifacts: []
+		});
+	}
+
+	// NEW: Suggest case creation if no recent activity
+	if (systemContext.sessionDuration > 10 * 60 * 1000 && systemContext.completedJobs === 0) {
+		prompts.push({
+			id: crypto.randomUUID(),
+			prompt: 'No recent case activity detected. Consider creating a new case or reviewing existing ones',
+			context: systemContext,
+			confidence: 0.7,
+			timestamp: Date.now(),
+			triggerReason: 'idle_detected',
+			processedByNeo4j: false,
+			minioArtifacts: []
+		});
+	}
+
+	// NEW: Suggest AI analysis on existing cases
+	if (systemContext.completedJobs > 3 && systemContext.availableServices.neo4j) {
+		prompts.push({
+			id: crypto.randomUUID(),
+			prompt: 'Run AI analysis on recently uploaded evidence to identify connections and patterns',
+			context: systemContext,
+			confidence: 0.85,
+			timestamp: Date.now(),
+			triggerReason: 'pattern_recognition',
+			processedByNeo4j: false,
+			minioArtifacts: []
+		});
+	}
+
+	return prompts;
+}
 // REMOVED: function selectBestPrompt(prompts, SelfPrompt[], history: SelfPrompt[]): SelfPrompt | null { if (prompts.length === 0) return null; // Avoid repeating recent prompts const recentPrompts = history.slice(0, 10).map(p => p.prompt); const uniquePrompts = prompts.filter(p => !recentPrompts.includes(p.prompt)); if (uniquePrompts.length === 0) return prompts[0]; // Select highest confidence prompt return uniquePrompts.reduce((best, current) => (current.confidence > best.confidence ? current: best))}
 async function storePromptInNeo4j(prompt: SelfPrompt, sessionId, sessionId: Promise<void> { // Store prompt in Neo4j graph database for relationship analysis // Use sessionId to avoid unused-parameter lint errors and to provide useful metadata. console.log('ðŸ“Š Storing self-prompt in Neo4j: ', { promptId: prompt.id, sessionId });
-  
+
      promptText: prompt.prompt }; console.debug('ðŸ” Neo4j simulated, store: ', simulatedRecord); resolve()}, 100) )}
 async function checkNeo4jConnection(): Promise<boolean> { try { const res = await fetch('/api/neo4j/health'); return res.ok}catch { return false} }
 async function checkMinioConnection(): Promise<boolean> { try { const res = await fetch('/api/minio/health'); return res.ok}catch { return false} }
