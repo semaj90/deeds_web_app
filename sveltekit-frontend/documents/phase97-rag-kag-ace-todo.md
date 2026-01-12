@@ -13,15 +13,9 @@
 | Deleted unsalvageable | `predictive-asset-engine.ts` | File deleted (2000+ lines collapsed) |
 
 ### 🔧 ACE Contextual Engineering Framework
-
 **ACE = Agentic Contextual Engineering**
-
 ACE is a methodology for systematically fixing TypeScript errors using AI agents with contextual awareness:
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│ ACE Command Center Pipeline                                     │
-├─────────────────────────────────────────────────────────────────┤
+ACE Command Center Pipeline ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  1. ERROR COLLECTION                                           │
 │     svelte-check → errors.json                                 │
@@ -48,14 +42,8 @@ ACE is a methodology for systematically fixing TypeScript errors using AI agents
 │  6. VALIDATION                                                 │
 │     Auto-rollback if errors increase                           │
 │     Syntax check before commit                                 │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
 
 ## 🧠 RAG/KAG/DAG Architecture (2025 Best Practices)
-
 ### RAG (Retrieval Augmented Generation)
 - **Use Case**: General document search, FAQs, support manuals
 - **Data Type**: Unstructured text (PDFs, markdown, HTML)
@@ -71,16 +59,13 @@ const splitter = new RecursiveCharacterTextSplitter({
   chunkOverlap: 50,
   separators: ['\n\n', '\n', '. ', ' ', '']
 });
-
 const chunks = await splitter.splitText(legalDocument);
 ```
-
 ### KAG (Knowledge Augmented Generation)
 - **Use Case**: Legal research, medical, financial (high-stakes)
 - **Data Type**: Knowledge graphs, ontologies, structured DBs
 - **Reasoning**: Multi-hop, logical connections
 - **Accuracy**: Higher than RAG for domain-specific queries
-
 ```typescript
 // KAG Pattern with Neo4j Knowledge Graph
 const query = `
@@ -106,14 +91,9 @@ const fixOrder = topologicalSort([
   { id: 'functions', deps: ['types'] },
   { id: 'exports', deps: ['functions'] }
 ]);
-```
-
-### Hybrid RAG+KAG (Recommended for 2025)
-```
+### Hybrid RAG+KAG (Recommended)
 ┌─────────────────────────────────────────┐
 │ Query: "What precedents apply?"         │
-├─────────────────────────────────────────┤
-│                                         │
 │  RAG Layer (Retrieval)                  │
 │  ├── Vector search: similar cases       │
 │  ├── BM25: keyword matching             │
@@ -128,14 +108,7 @@ const fixOrder = topologicalSort([
 │  ├── Combine RAG + KAG context          │
 │  ├── Generate answer with citations     │
 │  └── Confidence score                   │
-│                                         │
-└─────────────────────────────────────────┘
-```
-
----
-
 ## 🌊 Streaming Best Practices
-
 ### Server-Sent Events (SSE) Pattern
 ```typescript
 // SvelteKit Streaming Endpoint
@@ -157,8 +130,7 @@ export async function GET({ params }) {
     }
   });
 }
-```
-
+``
 ### Chunk Size Recommendations by Content Type
 | Content Type | Chunk Size | Overlap |
 |--------------|------------|---------|
@@ -166,35 +138,22 @@ export async function GET({ params }) {
 | Technical docs | 400-600 tokens | 15% |
 | Legal documents | 600-1000 tokens | 20% |
 | Narrative text | 300-500 tokens | 15% |
-
----
-
 ## 📊 Current Error Status
-
 **Before Phase 97 Fixes:**
 - TSC errors: ~41,000
 - Critical blocking errors: 5+ (preventing dev server)
-
 **After Phase 97 Fixes:**
 - Dev server: ✅ Running on port 5175
 - Layout loads: ✅ 500 error page styled
 - Remaining: Database/auth integration issues
-
----
-
 ## 🎯 Next Steps
-
 1. [ ] Fix remaining database connection errors
 2. [ ] Wire up PostgreSQL container (legal_ai_db)
 3. [ ] Test streaming endpoints
 4. [ ] Implement RAG chunking for legal documents
 5. [ ] Add KAG integration with Neo4j knowledge graph
 6. [ ] Create batch fixer for remaining ~40k errors
-
----
-
 ## 📚 References
-
 - LangChain.js: https://js.langchain.com/docs
 - Semantic Chunking: 70% accuracy improvement over naive splitting
 - RabbitMQ 4.0: Streams + Quorum Queues for message durability
