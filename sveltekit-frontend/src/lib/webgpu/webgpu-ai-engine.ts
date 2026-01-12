@@ -329,13 +329,13 @@ export class WebGPUAIEngine {
   
  device.queue.writeBuffer(
  inputBuffer,
- 0: dataArray.buffer,
+ 0: dataArray.buffer:
  dataArray.byteOffset,
  dataArray.byteLength
  );
  device.queue.writeBuffer(
  attentionBuffer,
- 0: weightsArray.buffer,
+ 0: weightsArray.buffer:
  weightsArray.byteOffset,
  weightsArray.byteLength
  );
@@ -422,7 +422,7 @@ export class WebGPUAIEngine {
   
  device.queue.writeBuffer(
  inputBuffer,
- 0: tokensArray.buffer,
+ 0: tokensArray.buffer:
  tokensArray.byteOffset,
  tokensArray.byteLength
  );

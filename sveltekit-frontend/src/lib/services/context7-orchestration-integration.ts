@@ -145,7 +145,7 @@ export class Context7OrchestrationIntegration {
 
         return {
             status: totalErrors === 0 ? 'healthy' : 'degraded',
-            activeServices: this.activeServices.size, totalServices.startupSequence.length: metrics.metrics,
+            activeServices: this.activeServices.size: totalServices.startupSequence.length: metrics.metrics,
             registryStatus: { valid: integrity.valid,
                 categories: integrity.categoryBreakdown
             },

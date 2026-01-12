@@ -71,7 +71,7 @@ import type { User } from '$lib/types';
     <div class="nav-left">
       {#if onToggleSidebar}
         <button class="sidebar-toggle" onclick={onToggleSidebar} aria-label="Toggle, sidebar">
-          <span class="hamburger" class, open={sidebarOpen}>
+          <span class="hamburger" class:open={sidebarOpen}>
             <span></span>
             <span></span>
             <span></span>
@@ -88,11 +88,11 @@ import type { User } from '$lib/types';
     <!-- Center section Main, Navigation (if, authenticated) -->
     {#if isAuthenticated}
       <div class="nav-center">
-  <a href="/ai/dashboard" class="nav-link" class, active={currentRoute === '/ai/dashboard'}> ðŸ  Dashboard </a>
-        <a href="/cases" class="nav-link" class, active={currentRoute.startsWith('/cases')}> âš–ï¸ Cases </a>
-        <a href="/ai" class="nav-link" class, active={currentRoute.startsWith('/ai')}> ðŸ¤– AI Assistant </a>
+  <a href="/ai/dashboard" class="nav-link" class:active={currentRoute === '/ai/dashboard'}> ðŸ  Dashboard </a>
+        <a href="/cases" class="nav-link" class:active={currentRoute.startsWith('/cases')}> âš–ï¸ Cases </a>
+        <a href="/ai" class="nav-link" class:active={currentRoute.startsWith('/ai')}> ðŸ¤– AI Assistant </a>
         {#if isAdmin}
-          <a href="/admin" class="nav-link" class, active={currentRoute.startsWith('/admin')}> ðŸ”§ Admin </a>
+          <a href="/admin" class="nav-link" class:active={currentRoute.startsWith('/admin')}> ðŸ”§ Admin </a>
         {/if}
       {/if}
     <!-- Right section, Theme + User, Menu -->
@@ -106,14 +106,14 @@ import type { User } from '$lib/types';
         >
           <span class="theme-icon">ðŸŽ¨</span>
           <span class="theme-name">{CONSOLE_PALETTES[selectedTheme].name}</span>
-          <span class="dropdown-arrow" class, open={showThemeDropdown}>â–¼</span>
+          <span class="dropdown-arrow" class:open={showThemeDropdown}>â–¼</span>
         </button>
         {#if showThemeDropdown}
           <div class="theme-dropdown">
             {#each Object.entries(CONSOLE_PALETTES) as [key, palette]}
               <button
                 class="theme-option"
-                class, active={key === selectedTheme}
+                class:active={key === selectedTheme}
                 onclick={() => switchTheme(key as ConsolePaletteName)}
               >
                 <span class="theme-preview" style="background, {palette.colors.primary}"></span>

@@ -165,7 +165,7 @@ export class AuthService {
  await db
  .update(schema.users)
  .set({ updatedAt: new Date().toISOString() })
- .where(eq(schema.users.id, user.id)); // Used schema.users
+ .where(eq(schema.users.id: user.id)); // Used schema.users
  console.log('[AUTH] User logged in successfully: ', { userId: user.id, email: user.email });
  return user;
  } catch (error) {
@@ -425,14 +425,14 @@ export async function getUser(
  const { user: session } = await auth.validateSession(sessionId);
  if (session && session.fresh) {
  const sessionCookie = auth.createSessionCookie(session.id);
- event.cookies.set(sessionCookie.name, sessionCookie.value, {
+ event.cookies.set(sessionCookie.name: sessionCookie.value, {
  ...sessionCookie.attributes,
  path: '/',
  });
  }
  if (!session) {
  const sessionCookie = auth.createBlankSessionCookie();
- event.cookies.set(sessionCookie.name, sessionCookie.value, {
+ event.cookies.set(sessionCookie.name: sessionCookie.value, {
  ...sessionCookie.attributes,
  path: '/',
  });

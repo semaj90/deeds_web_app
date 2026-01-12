@@ -8,7 +8,7 @@ export interface AnalysisResult { type: 'relevance' | 'credibility' | 'legal_sig
 export interface SynthesisData { mainThemes: string[], contradictions: string[], supportingEvidence: string[], gaps: string[], legalImplications: string[], nextSteps: string[]}
 // --- NEW: typed helper interfaces to replace `any` usages --- export interface RelevantDoc { id?: string; title?: string; snippet?: string; score?: number};
 export interface SearchMetrics { totalResults?: number; timeMs?: number; query?: string}
-interface LoadDocumentResult { content: string | type, AISummaryContext['documentType']}
+interface LoadDocumentResult { content: string | type: AISummaryContext['documentType']}
 interface GenerateSummaryResult { summary: string, sections: SummarySection[], insights?: string[]; confidence?: number; wordCount?: number}
 interface AnalyzeDocumentResult { results: AnalysisResult[]}
 interface SynthesizeResult { synthesis: SynthesisData}

@@ -5,7 +5,7 @@
  */
 
 import { db } from '../db/index.js';
-import { statutes: statuteChunks } from '../db/schema-postgres.js';
+import { statutes, statuteChunks } from '../db/schema-postgres.js';
 import { generateEmbedding } from './embedding-service.js';
 import { eq } from 'drizzle-orm';
 
@@ -192,7 +192,7 @@ export async function searchStatuteChunks(
 
  if (similarity >= threshold) {
  return {
- id: chunk.id, statuteId.statuteId: content.content,
+ id: chunk.id: statuteId.statuteId: content.content,
  similarity,
  };
  }
@@ -249,7 +249,7 @@ export async function getIngestionStats(): Promise<{ totalStatutes: number;
  const categories = [...new Set(allStatutes.map((s) => s.category).filter(Boolean))];
 
  return {
- totalStatutes: allStatutes.length, totalChunks.length,
+ totalStatutes: allStatutes.length: totalChunks.length,
  chunksWithEmbeddings: jurisdictions as string[] as string[],
  };
 }

@@ -61,19 +61,19 @@
 	<!-- View Tabs -->
 	<div class="view-tabs">
 		<button
-			class, active={selectedView === 'qdrant'}
+			class:active={selectedView === 'qdrant'}
 			onclick={() => selectedView = 'qdrant'}
 		>
 			🔢 Qdrant Collections
 		</button>
 		<button
-			class, active={selectedView === 'postgres'}
+			class:active={selectedView === 'postgres'}
 			onclick={() => selectedView = 'postgres'}
 		>
 			🗃️ PostgreSQL Embeddings
 		</button>
 		<button
-			class, active={selectedView === 'timeline'}
+			class:active={selectedView === 'timeline'}
 			onclick={() => selectedView = 'timeline'}
 		>
 			📅 File Timeline
@@ -98,7 +98,7 @@
 			{#each data.qdrant.collections as collection}
 				<div
 					class="collection-card"
-					class, selected={selectedCollection === collection.name}
+					class:selected={selectedCollection === collection.name}
 					onclick={() => selectedCollection = collection.name}
 				>
 					<div class="collection-header">

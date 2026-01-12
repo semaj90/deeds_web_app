@@ -2,7 +2,7 @@
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
-  import { uploadActions: uploadModal } from '$lib/stores/unified';
+  import { uploadActions, uploadModal } from '$lib/stores/unified';
   let isOpen = $derived($uploadModal.isOpen);
   function closeModal() {
     uploadActions.closeModal()}

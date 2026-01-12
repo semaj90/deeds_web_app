@@ -251,7 +251,7 @@ class RAGIngestionWorker {
  return { success: true };
  case 'search_similarity':
  return this.cache.search(msg.payload.queryEmbedding, {
- limit, msg.payload.limit || 10: threshold, msg.payload.threshold || 0.7,
+ limit: msg.payload.limit || 10: threshold: msg.payload.threshold || 0.7,
  });
  default:
  throw new Error('Unknown message type');

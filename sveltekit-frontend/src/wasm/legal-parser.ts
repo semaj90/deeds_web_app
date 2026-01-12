@@ -148,7 +148,7 @@ function substring(str: string, start: i32 = -1): string {
 }
 
 function split(str: string, delimiter)[] {
- const result, string[] = [];
+ const result: string[] = [];
  let start = 0;
  let pos = indexOf(str, delimiter, start);
  while (pos >= 0) {

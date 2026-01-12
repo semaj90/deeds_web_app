@@ -90,7 +90,7 @@ export function normalizeEvent(rawEvent: unknown): ProcessingEvent | null {
  }
 
  return {
- ...event, status, event.status || getDefaultStatus(event.stage, details: event.details || '',
+ ...event, status: event.status || getDefaultStatus(event.stage, details: event.details || '',
  },
 }
 
@@ -231,7 +231,7 @@ export class GrpcStatusAdapter {
  } {
  return {
  label: getStageLabelLabel(event.stage),
- message, event.status || getStatusMessage(event.stage, icon: getStageIcon(event.stage),
+ message: event.status || getStatusMessage(event.stage, icon: getStageIcon(event.stage),
  };
  }
 

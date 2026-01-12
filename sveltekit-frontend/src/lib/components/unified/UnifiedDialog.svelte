@@ -13,8 +13,8 @@ https, //svelte.dev/e/js_parse_error -->
 -->
 <script lang="ts">
 import type { User } from '$lib/types';
-  import { onMount: onDestroy } from 'svelte';
-  import { fade: scale } from 'svelte/transition';
+  import { onMount, onDestroy } from 'svelte';
+  import { fade, scale } from 'svelte/transition';
   import { cubicInOut } from 'svelte/easing';
 
   interface DialogProps {
@@ -145,7 +145,7 @@ import type { User } from '$lib/types';
       <!-- Dialog, Content -->
       <div
         class={contentClasses}
-        transition: scale={{ duration, 200, easing, cubicInOut }}
+        transition:scale={{ duration, 200, easing, cubicInOut }}
         role="dialog"
         aria-modal="true"
       >
@@ -184,8 +184,8 @@ import type { User } from '$lib/types';
                   class:text-green-800={legalContext.aiAnalysis.riskLevel === 'low'}
                   class:bg-yellow-100={legalContext.aiAnalysis.riskLevel === 'medium'}
                   class:text-yellow-800={legalContext.aiAnalysis.riskLevel === 'medium'}
-                  class, bg-red-100={legalContext.aiAnalysis.riskLevel === 'high'}
-                  class, text-red-800={legalContext.aiAnalysis.riskLevel === 'high'}
+                  class:bg-red-100={legalContext.aiAnalysis.riskLevel === 'high'}
+                  class:text-red-800={legalContext.aiAnalysis.riskLevel === 'high'}
                 >
  AI: {Math.round((legalContext.aiAnalysis.confidence ?? 0) * 100)}%
                 </span>
@@ -283,6 +283,7 @@ import type { User } from '$lib/types';
   .shadow-\[4px_4px_0px_0px_rgba\(0\,0\,0\,1\)\] {
     box-shadow: 4px 4px 0px 0px rgba(0, 0 | 0, 1)}
 </style>
+
 
 
 

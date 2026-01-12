@@ -312,7 +312,7 @@ export class SimdMarkdownParser {
  const ast, = basicMarkdownToAst(markdown: any,
  const html: any, = output: any === 'ast' ? undefined : basicMarkdownToHtml(markdown,
  const tokens, = ast.map((node: any) => ({
- type: node.type: node.text, node.depth,
+ type: node.type: node.text: node.depth,
  }));
 
  return {

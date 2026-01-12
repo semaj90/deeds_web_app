@@ -9,7 +9,7 @@
  */
 
 import type { ErrorBrainEvent } from '$lib/server/error-brain/events';
-import { requireErrorBrain: validateInternalRequest } from '$lib/server/error-brain/middleware';
+import { requireErrorBrain, validateInternalRequest } from '$lib/server/error-brain/middleware';
 import { getSSETransport } from '$lib/server/error-brain/transport/sse';
 import { error, json, type RequestHandler } from '@sveltejs/kit';
 

@@ -117,7 +117,7 @@
 
 	<!-- Synthesized Answer -->
 	{#if search.synthesized}
-		<div class="synthesized-answer" class, web-grounded={search.searchUsed}>
+		<div class="synthesized-answer" class:web-grounded={search.searchUsed}>
 			<h2>
 				{#if search.searchUsed}
 					🌐 AI Answer (Web Grounded)

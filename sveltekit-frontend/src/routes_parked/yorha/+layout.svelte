@@ -208,7 +208,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  </div>
  <div class="yorha-status-bar">
  <div class="yorha-status-item">
- <span class="dot" class, connected={systemStatus.connected} aria-hidden="true"></span>
+ <span class="dot" class:connected={systemStatus.connected} aria-hidden="true"></span>
  {systemStatus.connected ? 'Connected' : 'Disconnected'}
  </div>
  <div class="yorha-status-item">
@@ -241,7 +241,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  class="yorha-sidebar"
  role="dialog"
  aria-label="YoRHa Sidebar"
- class, yorha-sidebar-open={sidebarOpen}
+ class:yorha-sidebar-open={sidebarOpen}
  >
  <nav class="yorha-nav" aria-label="Main navigation">
  <div class="yorha-nav-header">

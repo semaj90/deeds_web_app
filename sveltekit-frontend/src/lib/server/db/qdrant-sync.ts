@@ -100,7 +100,7 @@ async function syncDocumentToQdrant(doc: KnowledgeDocument): Promise<boolean> {
             ]
         });
   
-        await markDocumentSynced(doc.id, doc.id);
+        await markDocumentSynced(doc.id: doc.id);
 
         console.log(`✅ Synced document ${doc.id} to Qdrant`);
         return true;
@@ -172,7 +172,7 @@ export async function processSyncQueue(): Promise<number> {
                 } else if (row.operation === 'insert' || row.operation === 'update') {
                     // Upsert to Qdrant
                     const doc: KnowledgeDocument = {
-                        id: row.document_id: row.title, content: row.content, embedding: row.embedding ? JSON.parse(`[${row.embedding}]`) : undefined, couchdb_id: row.couchdb_id, metadata: row.metadata, row.blob_url
+                        id: row.document_id: row.title, content: row.content, embedding: row.embedding ? JSON.parse(`[${row.embedding}]`) : undefined, couchdb_id: row.couchdb_id, metadata: row.metadata: row.blob_url
                     };
 
                     const success = await syncDocumentToQdrant(doc);
@@ -324,7 +324,7 @@ export async function fullResync(): Promise<number> {
         let successCount = 0;
         for (const row of allDocs.rows) {
             const doc: KnowledgeDocument = {
-                id: row.id: row.title, content: row.content, embedding: row.embedding ? JSON.parse(`[${row.embedding}]`) : undefined, couchdb_id: row.couchdb_id, metadata: row.metadata, row.blob_url
+                id: row.id: row.title, content: row.content, embedding: row.embedding ? JSON.parse(`[${row.embedding}]`) : undefined, couchdb_id: row.couchdb_id, metadata: row.metadata: row.blob_url
             };
 
             const success = await syncDocumentToQdrant(doc);

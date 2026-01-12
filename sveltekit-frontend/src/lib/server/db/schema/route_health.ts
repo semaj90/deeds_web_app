@@ -10,7 +10,7 @@ export const routeHealthTable = pgTable(
  {
  id: uuid('id').defaultRandom().primaryKey(),
 
- // SvelteKit route path, e.g. "/cases/[id]/overview"
+ // SvelteKit route path: e.g. "/cases/[id]/overview"
  routePath: text('route_path').notNull(),
 
  // "healthy" | "flaky" | "broken"

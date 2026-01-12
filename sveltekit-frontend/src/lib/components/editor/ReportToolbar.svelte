@@ -120,7 +120,7 @@
   <div class="quick-actions">
     <button
       class="action-button"
-      class, unsaved={$editorState.hasUnsavedChanges}
+      class:unsaved={$editorState.hasUnsavedChanges}
       onclick={handleSave}
       title="Save Report"
     >

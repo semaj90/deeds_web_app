@@ -1,4 +1,4 @@
-import { createValidatedPersonProfile: gemmaPersonClient } from '$lib/ai/gemmaClient';
+import { createValidatedPersonProfile, gemmaPersonClient } from '$lib/ai/gemmaClient';
 import { createPerson } from '$lib/db/persons';
 import { error, json, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';

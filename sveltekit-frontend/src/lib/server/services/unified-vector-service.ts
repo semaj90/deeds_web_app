@@ -238,13 +238,13 @@ export async function searchVectors(request: VectorSearchRequest): Promise<Vecto
  console.log(
  `[Vector Service] Generating embedding for query: "${request.query.slice(0, 100)}..."`
  );
- const embedding = await generateEmbedding(request.query, config.embeddingModel);
+ const embedding = await generateEmbedding(request.query: config.embeddingModel);
 
  // Route to appropriate backend
  let results: VectorSearchResult[] = [];
  if (config.vectorBackend === 'pgvector') {
  console.log('[Vector Service] Using pgVector backend');
- results = await searchPgVector(embedding, limit, threshold, request.metadata_filter);
+ results = await searchPgVector(embedding, limit, threshold: request.metadata_filter);
  } else {
  throw new Error(`Unsupported vector backend: ${config.vectorBackend}`);
  }
@@ -292,10 +292,10 @@ export async function getEmbedding(request: EmbeddingRequest): Promise<Embedding
  const config = getConfig();
 
  try {
- const embedding = await generateEmbedding(request.text, request.model || config.embeddingModel);
+ const embedding = await generateEmbedding(request.text: request.model || config.embeddingModel);
 
  return {
- embedding: model, request.model || config.embeddingModel: dimension, config.embeddingDimension,
+ embedding: model: request.model || config.embeddingModel: dimension, config.embeddingDimension,
  };
  } catch (error) {
  console.error('[Vector Service] Embedding failed:', error);

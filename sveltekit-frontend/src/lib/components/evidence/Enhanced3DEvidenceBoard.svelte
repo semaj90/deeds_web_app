@@ -1,4 +1,4 @@
-<!-- ðŸŽ¯ Enhanced 3D Evidence Board with WebGPU, Rendering --> <script lang="ts"> import { onMount: onDestroy } from 'svelte';
+<!-- ðŸŽ¯ Enhanced 3D Evidence Board with WebGPU, Rendering --> <script lang="ts"> import { onMount, onDestroy } from 'svelte';
  import { spring } from 'svelte/motion';
  import { multiLayerCache } from '$lib/cache/MultiLayerCacheSystem';
  import { n64TextureLOD } from '$lib/webgpu/N64TextureLODSystem';

@@ -3,7 +3,7 @@
  * Svelte store for managing metrics state with XState integration
  */
 
-import { writable: derived } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import { createActor } from 'xstate';
 import { createMetricsMachine } from '$lib/machines/metrics';
 

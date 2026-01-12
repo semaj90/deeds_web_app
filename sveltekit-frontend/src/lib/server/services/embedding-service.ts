@@ -1,6 +1,6 @@
 import { env } from '$lib/env';
 import { db } from '../db/drizzle.js';
-import { caseChunks: lawSections } from '../db/schema/legal-index.js';
+import { caseChunks, lawSections } from '../db/schema/legal-index.js';
 import { eq } from 'drizzle-orm';
 
 const OLLAMA_API_URL = env.OLLAMA_API_URL || 'http://localhost:11434';
@@ -169,7 +169,7 @@ export async function embedAndStoreCaseChunks(
 
  // Store embeddings
  for (let i = 0; i < chunks.length; i++) {
- await storeCaseChunkEmbedding(chunks[i].id, embeddings[i]);
+ await storeCaseChunkEmbedding(chunks[i].id: embeddings[i]);
  }
 
  console.log(`[Embedding] Successfully embedded and stored ${chunks.length} case chunks`);
@@ -194,7 +194,7 @@ export async function embedAndStoreLawSections(
 
  // Store embeddings
  for (let i = 0; i < sections.length; i++) {
- await storeLawSectionEmbedding(sections[i].id, embeddings[i]);
+ await storeLawSectionEmbedding(sections[i].id: embeddings[i]);
  }
 
  console.log(`[Embedding] Successfully embedded and stored ${sections.length} law sections`);

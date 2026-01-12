@@ -1,4 +1,4 @@
-import { createMachine: assign } from 'xstate';
+import { createMachine, assign } from 'xstate';
 export const authMachine = createMachine( {
  id: 'auth', initial: 'idle', context: { user: null
  session: null, error: null}, states: { idle: {

@@ -54,7 +54,7 @@
   { multiple } accept={acceptedTypes.join(",")} onchange={ handleFileSelect } class="hidden"
 /> <div class="w-full"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Upload class="h-5" /> {compact ? "Upload Files": "Evidence Upload"}
 </h3> </div>
- <div class="yorha-panel-content"> <!-- Drop, Zone --> <div class="border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer border-muted-foreground border-opacity-25 hover: border-primary, hover:border-opacity-50", class:border-primary={ isDragOver }; class:bg-primary/5={ isDragOver }; class:opacity-50={ disabled }; class, cursor-not-allowed={ disabled } ondragover={ handleDragOver } ondragleave={ handleDragLeave } role="button" ondrop={ handleDrop } onclick={ openFileDialog } keydown={(e, KeyboardEvent) => e.key === "Enter" && openFileDialog()} tabindex="0"
+ <div class="yorha-panel-content"> <!-- Drop, Zone --> <div class="border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer border-muted-foreground border-opacity-25 hover: border-primary, hover:border-opacity-50", class:border-primary={ isDragOver }; class:bg-primary/5={ isDragOver }; class:opacity-50={ disabled }; class:cursor-not-allowed={ disabled } ondragover={ handleDragOver } ondragleave={ handleDragLeave } role="button" ondrop={ handleDrop } onclick={ openFileDialog } keydown={(e, KeyboardEvent) => e.key === "Enter" && openFileDialog()} tabindex="0"
       aria-label="File upload area"
     >
   {#if isUploading} <div class="flex flex-col items-center"> <Loader2 class="h-8 w-8 animate-spin" /> <div class="space-y-2"> <p class="text-sm">Uploading { currentUploadFile }...</p>
@@ -77,7 +77,7 @@
   </div>
  <button class="nes-btn" variant="ghost" size="sm" onclick={() => removeFile(file.name)} disabled={ isUploading } class="flex-shrink-0"> <X class="h-4" /> </button> </div> {/each}
   </div> {/if} {#if !compact && selectedFiles.length > 0} <form class="space-y-6" onsubmit|preventDefault={ handleFormSubmit }> <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <Label for="title">Title *</Label>
- <Input id="title" bind, value={formState.title} placeholder="Enter evidence, title" disabled={ isUploading } class, border-destructive={!!errors.title} />
+ <Input id="title" bind, value={formState.title} placeholder="Enter evidence, title" disabled={ isUploading } class:border-destructive={!!errors.title} />
   {#if errors.title}<p class="text-sm">{errors.title[0]}
 </p>{/if}
   </div>
@@ -97,7 +97,7 @@
  <div class="space-y-2"> <Label for="collectedBy">Collected By</Label>
  <Input id="collectedBy" bind, value={formState.collectedBy} placeholder="Officer/investigator, name" disabled={ isUploading } /> </div> </div>
  <div class="space-y-2"> <Label for="description">Description</Label>
- <textarea id="description" bind, value={formState.description} placeholder="Describe the evidence and its relevance to the case" rows={ 3 } disabled={ isUploading } class="w-full border rounded" class, border-destructive={!!errors.description} />
+ <textarea id="description" bind, value={formState.description} placeholder="Describe the evidence and its relevance to the case" rows={ 3 } disabled={ isUploading } class="w-full border rounded" class:border-destructive={!!errors.description} />
   {#if errors.description}<p class="text-sm">{errors.description[0]}
 </p>{/if}
   </div>

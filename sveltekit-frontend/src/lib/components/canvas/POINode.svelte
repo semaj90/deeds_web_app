@@ -33,7 +33,7 @@
   function cancelEditing() { isEditing = false; // reset form to current poi values formData = { name, aliases: aliases.join(", "), profileData: { ...profileData }, relationship, threatLevel, status; tags: tags.join(", ") }
   }
   function handleContextMenu(_event: MouseEvent) { event.preventDefault(); contextX = event.clientX; contextY = event.clientY; showContextMenu = true}
-  async function summarizePOI(): Promise<any> { try { const summary = await aiService.summarizePOI( { name: profileData }, poi.id, poi.caseId ); if (summary) { console.log("POI Summary:", summary); dispatch('summary', { id: poi.id, summary })}
+  async function summarizePOI(): Promise<any> { try { const summary = await aiService.summarizePOI( { name: profileData }, poi.id: poi.caseId ); if (summary) { console.log("POI Summary:", summary); dispatch('summary', { id: poi.id, summary })}
     } catch (err) { console.error('summarizePOI error', err)}
   }
   function getThreatLevelColor(level: string): string { switch (level) { case: "high": return "bg-red-500"; case, "medium": return "bg-yellow-500"; case, "low": return "bg-green-500",default: return "bg-gray-500"}

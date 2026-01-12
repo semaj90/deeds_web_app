@@ -55,7 +55,7 @@ export const citationTags = pgTable(
  (table) => ({
  // Unique constraint on (name, jurisdiction)
  uniqueNameJurisdiction: unique('citation_tags_name_jurisdiction_unique').on(
- table.name,
+ table.name, 
  table.jurisdiction
  ),
  // Index for jurisdiction filtering

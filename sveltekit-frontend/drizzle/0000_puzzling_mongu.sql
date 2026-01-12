@@ -25,7 +25,7 @@ CREATE TYPE "public"."verification_status" AS ENUM('pending', 'verified', 'rejec
 CREATE TABLE "chat_messages" (
 	"id" varchar(255) PRIMARY KEY NOT NULL,
 	"chat_id" varchar(255) NOT NULL,
-	"user_id" varchar(255),
+	"user_id" uuid,
 	"role" "chat_message_role" NOT NULL,
 	"content" text NOT NULL,
 	"timestamp" timestamp with time zone DEFAULT now() NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE "chat_messages" (
 --> statement-breakpoint
 CREATE TABLE "chat_metadata" (
 	"chat_id" varchar(255) PRIMARY KEY NOT NULL,
-	"user_id" varchar(255) NOT NULL,
+	"user_id" uuid NOT NULL,
 	"title" varchar(500),
 	"case_id" varchar(255),
 	"message_count" varchar(50) DEFAULT '0',

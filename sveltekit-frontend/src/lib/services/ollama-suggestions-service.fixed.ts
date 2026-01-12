@@ -87,7 +87,7 @@ export class OllamaSuggestionsService {
 			});
 
 			return this.parseSuggestionsResponse(
-				response,
+				response:
 				request.reportType,
 				request.maxSuggestions ?? 5
 			);

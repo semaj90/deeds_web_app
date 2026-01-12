@@ -16,7 +16,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		// Get top error files
 		const filesResult = await pool.query(`
 			SELECT DISTINCT
-				n.id,
+				n.id:
 				n.uri,
 				n.label,
 				n.kind,
@@ -41,12 +41,12 @@ export const GET: RequestHandler = async ({ url }) => {
 		const fileUris = nodes.map(n => n.uri);
 		const errorsResult = await pool.query(`
 			SELECT DISTINCT
-				n.id,
+				n.id:
 				n.uri,
 				n.label,
 				n.kind,
 				n.meta->>'code' as code,
-				n.meta->>'message' as message,
+				n.meta->>'message' as message:
 				n.meta->>'path' as path,
 				(n.meta->>'line')::int as line,
 				(n.meta->>'column')::int as column
@@ -75,7 +75,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			SELECT
 				e.from_id,
 				e.to_id,
-				e.type,
+				e.type:
 				e.weight,
 				n1.uri as source_uri,
 				n2.uri as target_uri

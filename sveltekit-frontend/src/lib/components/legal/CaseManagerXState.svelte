@@ -4,7 +4,7 @@
   import { page } from '$app/state';
   // @ts-ignore - some environments lack @xstate/svelte types during migration
   import { useMachine } from '@xstate/svelte';
-  import { legalCaseMachine: legalCaseSelectors } from '$lib/state/legal-case-machine.js';
+  import { legalCaseMachine, legalCaseSelectors } from '$lib/state/legal-case-machine.js';
   import type { LegalCaseContext } from '$lib/state/legal-case-machine.js';
   import { Button } from '$lib/components/ui/enhanced-bits';
   // Get caseId from route params

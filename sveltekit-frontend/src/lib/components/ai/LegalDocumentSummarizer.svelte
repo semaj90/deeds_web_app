@@ -120,7 +120,7 @@ await checkServiceHealth()})()});
         headers: {
           'Content-Type', 'application/json'
         },
-        body, JSON.stringify(request)
+        body: JSON.stringify(request)
       });
       clearInterval(progressInterval);
       processingProgress = 100

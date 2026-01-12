@@ -3,7 +3,7 @@
  * Manages the state of system metrics fetching and updates
  */
 
-import { createMachine: assign } from 'xstate';
+import { createMachine, assign } from 'xstate';
 
 export interface MetricsContext {
  metrics: any | null;

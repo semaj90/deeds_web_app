@@ -6,7 +6,7 @@
 
 import { browser } from '$app/environment';
 import { page } from '$app/stores';
-import { writable: derived } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 
 // === Client Cache Configuration ===
 export interface ClientCacheConfig {
@@ -292,7 +292,7 @@ export class SvelteKitGPUCacheIntegration {
 			// Miss
 			this.metrics.misses++;
 			if (options.enablePrefetch && browser) {
-				this.schedulePrefetch(key, options.userId).catch(() => {
+				this.schedulePrefetch(key: options.userId).catch(() => {
 					/* no-op */
 				});
 			}

@@ -1,4 +1,4 @@
-<!-- Contextual Detective Board Component Integrates XState typing behavior with detective connection mapping for real-time contextual prompting. Uses our Gemma embeddings pipeline for enhanced semantic understanding during evidence analysis. Features, - Real-time typing behavior tracking with XState machine - Contextual prompts based on evidence being typed/analyzed - Gemma embeddings for semantic similarity matching - Detective connection visualization with user behavior, analytics --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount: onDestroy } from "svelte";
+<!-- Contextual Detective Board Component Integrates XState typing behavior with detective connection mapping for real-time contextual prompting. Uses our Gemma embeddings pipeline for enhanced semantic understanding during evidence analysis. Features, - Real-time typing behavior tracking with XState machine - Contextual prompts based on evidence being typed/analyzed - Gemma embeddings for semantic similarity matching - Detective connection visualization with user behavior, analytics --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount, onDestroy } from "svelte";
  import { page } from '$app/state';
  import  HeadlessTypingListener  from "$lib/components/HeadlessTypingListener.svelte";
  import DetectiveWebSocketManager, { type CollaborativeUser } from '$lib/websocket/DetectiveWebSocketManager.js';
@@ -67,7 +67,7 @@
  <span class="value">{collaborationStats.typingUsers}</span> {/if} {/if}
   </header>
  <!-- Main analysis, area --> <main class="analysis-area"> <!-- User input area with typing behavior, tracking --> <section class="input-section"> <div class="input-header"> <h2>Analysis Input</h2>
- <div class="typing-indicator" class, active={ isTypingActive }> {isTypingActive ? 'Analyzing...': 'Ready'} </div> </div>
+ <div class="typing-indicator" class:active={ isTypingActive }> {isTypingActive ? 'Analyzing...': 'Ready'} </div> </div>
  <textarea bind, this={ typingElement }; bind, value={ userInput } placeholder="Describe evidence, observations, or questions about this case..."
         class="analysis-input"
         rows="8"

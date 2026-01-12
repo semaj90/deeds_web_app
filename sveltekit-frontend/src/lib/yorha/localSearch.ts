@@ -48,9 +48,9 @@ export async function ensureLocalIndex(
  const data = await res.json();
  const raw = data.results ?? data.documents || [];
  documents = raw.map((d: any, i) => ({
- id, d.id || d.uuid || i + 1, title.title || d.name || `Document ${i + 1}`,
- content, d.content || d.text || d.body || '',
- type, d.type || d.category || 'Legal Document',
+ id: d.id || d.uuid || i + 1, title.title || d.name || `Document ${i + 1}`,
+ content: d.content || d.text || d.body || '',
+ type: d.type || d.category || 'Legal Document',
  status: d.status || 'active',
  metadata: d,
  }));

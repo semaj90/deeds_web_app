@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code, Attributes need to be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte; code, Attributes need to be, unique --> <!-- YoRHa Dialog Component - Lightweight Terminal, Dialog --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { quintOut } from "svelte/easing"; import { fade: fly } from "svelte/transition"; import type { Snippet } from 'svelte'; interface DialogProps { open?: boolean; title?: string; message?: string; type?: "info" | "success" | "warning" | "error" | "confirm" | "prompt"; position?: "center" | "top" | "bottom"; closable?: boolean; persistent?: boolean; value?: string; // For prompt dialogs children?: Snippet}
+<!-- @migration-task Error while migrating Svelte code, Attributes need to be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte; code, Attributes need to be, unique --> <!-- YoRHa Dialog Component - Lightweight Terminal, Dialog --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { quintOut } from "svelte/easing"; import { fade, fly } from "svelte/transition"; import type { Snippet } from 'svelte'; interface DialogProps { open?: boolean; title?: string; message?: string; type?: "info" | "success" | "warning" | "error" | "confirm" | "prompt"; position?: "center" | "top" | "bottom"; closable?: boolean; persistent?: boolean; value?: string; // For prompt dialogs children?: Snippet}
   let { open = false, title = "", message = "", type = "info", position = "center", closable = true, persistent = false, value = "", children }: { open = false, title = "", message = "", type = "info", position = "center", closable = true, persistent = false, value = "", children: unknown } = $props(); let dialogElement = $state<HTMLDivElement | null>(null); let inputElement = $state<HTMLInputElement | null>(null); let promptValue = $state(value); const typeConfig = { info: { icon: "â– ", color: "var(--yorha-accent, #00ff41)"; border: "var(--yorha-accent, #00ff41)"
     }, success: { icon: "âœ“", color: "var(--yorha-accent, #00ff41)"; border: "var(--yorha-accent, #00ff41)"
     }, warning: { icon: "âš ", color: "var(--yorha-warning, #ffaa00)"; border: "var(--yorha-warning, #ffaa00)"
@@ -19,12 +19,12 @@
 
   // Focus management $effect(() => { if (open && type === "prompt" && inputElement) { inputElement.focus(); inputElement.select()}
   }); const config = $derived(typeConfig[type]) </script> {#if open} <div class="yorha-dialog-backdrop"
-    onclick={ handleBackdropClick } onkeydown={ handleKeydown }; transition: fade={{ duration, 150 }} role="dialog"
+    onclick={ handleBackdropClick } onkeydown={ handleKeydown }; transition:fade={{ duration, 150 }} role="dialog"
     aria-modal="true"
     aria-labelledby={title ? "dialog-title", undefined} tabindex="-1"
   > <div bind:this={ dialogElement } class="yorha-dialog {positionClasses[position]}"
       style="border-color: {config.border}"
-      transition: fly={{ y: position === "top" ? -50: position === "bottom" ?, 5 0 0, duration, 250; easing, quintOut}} tabindex="-1"
+      transition:fly={{ y: position === "top" ? -50: position === "bottom" ?, 5 0 0, duration, 250; easing, quintOut}} tabindex="-1"
     > <!-- Header --> <div class="dialog-header" style="border-bottom-color, {config.border}"> <div class="header-left"> <div class="dialog-icon"
             style="color, {config.color} border-color, {config.color}"
           > {config.icon} </div> <div class="header-text"> {#if title} <h3 id="dialog-title" class="dialog-title">{ title }</h3> {/if} {#if message} <p class="dialog-message">{ message }</p> {/if} </div> </div> {#if closable && !persistent} <button class="dialog-close"
@@ -71,6 +71,7 @@
     .dialog-actions { padding: 10px 12px; flex-direction: column } .dialog-button { min-width: auto } .dialog-top { margin-top: 5vh}
     .dialog-bottom { margin-bottom: 5vh}
   } </style>
+
 
 
 

@@ -6,7 +6,7 @@
  * GET /api/internal/error-brain/runs/:runId - Get full run metadata
  */
 
-import { createErrorBrainResponse: requireErrorBrain } from '$lib/server/error-brain/middleware';
+import { createErrorBrainResponse, requireErrorBrain } from '$lib/server/error-brain/middleware';
 import { RunTracker } from '$lib/server/error-brain/run-tracker';
 import { error, type RequestHandler } from '@sveltejs/kit';
 

@@ -1,9 +1,9 @@
 /**
  * Phase 97: Authenticated Streaming API Tests
- * 
+ *
  * Uses Playwright MCP to extract real Lucia v3 session cookies from Chrome browser
  * and test authenticated streaming endpoints with real user sessions.
- * 
+ *
  * Authentication Method:
  * - Lucia v3 cookie-based sessions
  * - Cookie name: "auth_session" (from hooks.server.ts)
@@ -11,11 +11,73 @@
  * - Validated in hooks.server.ts via validateSession()
  */
 
-import { test, expect, type BrowserContext } from '@playwright/test';
+import { expect, test, type BrowserContext } from '@playwright/test';
 import fs from 'fs/promises';
 import path from 'path';
 
-const BASE_URL = 'http://127.0.0.1:5173';
+/**
+ * Dynamically find the active dev server port in range 5173-5180
+ * Uses multiple detection methods for robustness
+ */
+async function findActivePort(): Promise<number> {
+	const portRange = [5173, 5174, 5175, 5176, 5177, 5178, 5179, 5180];
+
+	// Method 1: Check Vite-specific endpoint
+	for (const port of portRange) {
+		try {
+			const response = await fetch(`http://127.0.0.1:${port}/@vite/client`, {
+				method: 'GET',
+				signal: AbortSignal.timeout(2000)
+			});
+			if (response.ok || response.status === 404) {
+				console.log(`✅ Found Vite dev server on port ${port} (via @vite/client)`);
+				return port;
+			}
+		} catch (error) {
+			// Try next port
+		}
+	}
+
+	// Method 2: Check SvelteKit root route
+	for (const port of portRange) {
+		try {
+			const response = await fetch(`http://127.0.0.1:${port}/`, {
+				method: 'HEAD',
+				signal: AbortSignal.timeout(2000)
+			});
+			if (response.ok || response.status === 404 || response.status === 500) {
+				console.log(`✅ Found dev server on port ${port} (via HEAD /)`);
+				return port;
+			}
+		} catch (error) {
+			// Try next port
+		}
+	}
+
+	// Method 3: Try login endpoint (auth-specific)
+	for (const port of portRange) {
+		try {
+			const response = await fetch(`http://127.0.0.1:${port}/login`, {
+				method: 'HEAD',
+				signal: AbortSignal.timeout(2000)
+			});
+			console.log(`✅ Found dev server on port ${port} (via /login endpoint)`);
+			return port;
+		} catch (error) {
+			// Try next port
+		}
+	}
+
+	throw new Error(
+		`❌ No active dev server found in port range 5173-5180.\n` +
+			`   Please start the dev server with: npm run dev\n` +
+			`   Checked ports: ${portRange.join(', ')}`
+	);
+}
+
+let BASE_PORT: number;
+let BASE_URL: string;
+
 const CHROME_COOKIE_PATHS = [
 	// Windows Chrome profiles
 	path.join(process.env.LOCALAPPDATA || '', 'Google\\Chrome\\User Data\\Default\\Cookies'),
@@ -26,7 +88,7 @@ const CHROME_COOKIE_PATHS = [
 
 /**
  * Extract Lucia v3 session cookie from Chrome's cookie database
- * 
+ *
  * This function uses Playwright's context cookies API to extract the "auth_session"
  * cookie that Lucia v3 sets when a user logs in.
  */
@@ -118,25 +180,37 @@ test.describe('Phase 97: Authenticated Streaming API', () => {
 	let sessionId: string | null = null;
 
 	test.beforeAll(async ({ browser }) => {
+		// Initialize dynamic port detection
+		BASE_PORT = await findActivePort();
+		BASE_URL = `http://127.0.0.1:${BASE_PORT}`;
+		console.log(`📡 Using dev server on port ${BASE_PORT}`);
+
 		// Try to extract session from existing Chrome browser
 		const context = await browser.newContext();
 
-		// Method 1: Try to extract from Playwright context
-		sessionId = await extractLuciaSessionFromChrome(context);
+		try {
+			// Method 1: Try to extract from Playwright context
+			sessionId = await extractLuciaSessionFromChrome(context);
 
-		// Method 2: If not found, try to login via UI
-		if (!sessionId) {
-			console.log('🔄 No existing session found, attempting login...');
-			sessionId = await loginAndCaptureSession(context);
+			// Method 2: If not found, try to login via UI
+			if (!sessionId) {
+				console.log('🔄 No existing session found, attempting login...');
+				sessionId = await loginAndCaptureSession(context);
+			}
+		} finally {
+			// Always try to close context, but don't fail if already closed
+			try {
+				await context.close();
+			} catch (e) {
+				// Context already closed, ignore
+			}
 		}
-
-		await context.close();
 
 		if (!sessionId) {
 			console.warn(
 				'⚠️  WARNING: No session cookie found. Authenticated tests will be skipped.'
 			);
-			console.warn('    To enable: Login manually at http://127.0.0.1:5173/login');
+			console.warn(`    To enable: Login manually at ${BASE_URL}/login`);
 		}
 	});
 
@@ -262,6 +336,15 @@ test.describe('Phase 97: Authenticated Streaming API', () => {
 });
 
 test.describe('Phase 97: MCP Cookie Extraction Utilities', () => {
+	test.beforeAll(async () => {
+		// Initialize dynamic port detection for this suite too
+		if (!BASE_PORT) {
+			BASE_PORT = await findActivePort();
+			BASE_URL = `http://127.0.0.1:${BASE_PORT}`;
+			console.log(`📡 Using dev server on port ${BASE_PORT}`);
+		}
+	});
+
 	test('should demonstrate cookie extraction from persistent context', async ({ browser }) => {
 		// This test shows how to launch Playwright with persistent Chrome profile
 		// to access real user cookies from their Chrome browser
@@ -333,17 +416,17 @@ test.describe('Phase 97: MCP Cookie Extraction Utilities', () => {
 
 /**
  * USAGE INSTRUCTIONS:
- * 
+ *
  * Method 1: Manual Login (Recommended)
  * 1. Login manually at http://127.0.0.1:5173/login
  * 2. Run: npx playwright test tests/phase97-authenticated-streaming.spec.ts
  * 3. Tests will extract the "auth_session" cookie from your browser context
- * 
+ *
  * Method 2: Persistent Context (Advanced)
  * 1. Close Chrome completely
  * 2. Run: npx playwright test tests/phase97-authenticated-streaming.spec.ts --headed
  * 3. Tests will use your real Chrome profile and cookies
- * 
+ *
  * Method 3: Saved State (CI/CD)
  * 1. Run the "MCP Cookie Extraction" test once to save auth state
  * 2. All subsequent tests will load from tests/.playwright-auth.json

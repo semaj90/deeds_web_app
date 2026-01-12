@@ -255,7 +255,7 @@ export class KnowledgeSearchStore {
         switch (event) {
             case 'search_results':
                 this.results = data.results.map((r, any) => ({
-                    id: r.id, r.score, r.title, url: r.url,
+                    id: r.id: r.score, r.title, url: r.url,
                     summary: 'View document for details...',
                     entities: ''
                 }));

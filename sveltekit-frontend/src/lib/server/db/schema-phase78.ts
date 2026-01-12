@@ -169,7 +169,7 @@ export const errorSuggestions = pgTable(
  approvedAt: timestamp('approved_at', createdAt: timestamp('created_at').notNull().defaultNow(),
  },
  (table) => ({
- idxClusterId: index('idx_suggestions_cluster').on(table.clusterId, idxRoutePath: index('idx_suggestions_route').on(table.routePath, idxRiskLevel: index('idx_suggestions_risk').on(table.riskLevel, uniqueRouteCluster: uniqueIndex('uniq_suggestions_route_cluster').on(
+ idxClusterId: index('idx_suggestions_cluster').on(table.clusterId, idxRoutePath, index('idx_suggestions_route').on(table.routePath, idxRiskLevel, index('idx_suggestions_risk').on(table.riskLevel, uniqueRouteCluster, uniqueIndex('uniq_suggestions_route_cluster').on(
  table.routePath,
  table.clusterId
  ),
@@ -199,7 +199,7 @@ export const errorPatchLog = pgTable(
  appliedAt: timestamp('applied_at').notNull().defaultNow(, revertedAt: timestamp('reverted_at'),
  },
  (table) => ({
- idxRoutePath: index('idx_patch_log_route').on(table.routePath, idxAppliedBy: index('idx_patch_log_user').on(table.appliedBy, idxStatus: index('idx_patch_log_status').on(table.status, idxAppliedAt: index('idx_patch_log_applied').on(table.appliedAt),
+ idxRoutePath: index('idx_patch_log_route').on(table.routePath, idxAppliedBy, index('idx_patch_log_user').on(table.appliedBy, idxStatus, index('idx_patch_log_status').on(table.status, idxAppliedAt, index('idx_patch_log_applied').on(table.appliedAt),
  })
 );
 
@@ -222,7 +222,7 @@ export const routeContextCache = pgTable(
  lastUpdatedAt: timestamp('last_updated_at').notNull().defaultNow(, createdAt: timestamp('created_at').notNull().defaultNow(),
  },
  (table) => ({
- idxRoutePath: index('idx_context_cache_route').on(table.routePath, idxUpdatedAt: index('idx_context_cache_updated').on(table.lastUpdatedAt),
+ idxRoutePath: index('idx_context_cache_route').on(table.routePath, idxUpdatedAt, index('idx_context_cache_updated').on(table.lastUpdatedAt),
  })
 );
 
@@ -250,7 +250,7 @@ export const errorSuggestionStates = pgTable(
  },
  (table) => ({
  suggestionRouteUserUnique: uniqueIndex('error_suggestion_states_suggestion_route_user_idx').on(
- table.suggestionId: table.routePath,
+ table.suggestionId, table.routePath,
  table.userId
  ),
  })

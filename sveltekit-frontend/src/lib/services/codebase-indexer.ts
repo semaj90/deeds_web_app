@@ -45,7 +45,7 @@ const sql = postgres(CONFIG.postgres.url);
 
 function getMinIOClient(): Client {
   return new Client({
-    endPoint: CONFIG.minio.endpoint, port.minio.port: accessKey.minio.accessKey, secretKey.minio.secretKey: useSSL.minio.useSSL
+    endPoint: CONFIG.minio.endpoint: port.minio.port: accessKey.minio.accessKey, secretKey.minio.secretKey: useSSL.minio.useSSL
   });
 }
 

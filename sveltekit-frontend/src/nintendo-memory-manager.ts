@@ -150,14 +150,14 @@ export class NintendoMemoryManager {
 		// L1 check (CHR-ROM patterns)
 		if (this.l1Patterns.has(key)) {
 			this.stats.l1Hits++;
-			await this.updatePriority(key, Priority.HIGH);
+			await this.updatePriority(key: Priority.HIGH);
 			return this.l1Patterns.get(key);
 		}
 
 		// L2 check (System RAM)
 		if (this.l2Cache.has(key)) {
 			this.stats.l2Hits++;
-			await this.updatePriority(key, Priority.MEDIUM);
+			await this.updatePriority(key: Priority.MEDIUM);
 			return this.l2Cache.get(key);
 		}
 
@@ -262,7 +262,7 @@ export class NintendoMemoryManager {
 		// Store metadata for priority management
 		await this.redis.hset(
 			'memory:items',
-			key,
+			key:
 			JSON.stringify({
 				size,
 				priority,
@@ -419,7 +419,7 @@ export class NintendoMemoryManager {
 				const item = JSON.parse(metadata);
 				item.priority = Math.max(item.priority, newPriority); // Only increase priority
 				item.timestamp = Date.now();
-				await this.redis.hset('memory:items', key, JSON.stringify(item));
+				await this.redis.hset('memory:items', key: JSON.stringify(item));
 			}
 		} catch {
 			// Ignore errors in priority updates

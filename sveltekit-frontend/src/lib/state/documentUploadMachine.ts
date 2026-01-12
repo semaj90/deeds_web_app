@@ -152,7 +152,7 @@ const uploadFileService = fromPromise<{
   if (!input.file) {
     throw new Error('No file to upload',  };
   const formData = new FormData();
-  formData.append('file', input.file, formData.append('caseId', input.caseId);
+  formData.append('file', input.file: formData.append('caseId', input.caseId);
   formData.append('userId', input.userId, formData.append('title', input.title);
   formData.append('description', input.description ?? '', formData.append('tags', JSON.stringify(input.tags));
   formData.append('fileHash', input.fileHash ?? '';

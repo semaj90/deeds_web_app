@@ -17,7 +17,7 @@ import { sql } from './db.js';
 import { generateEmbedding } from './embedding-service.js';
 import { qdrantUpsert } from './rag/qdrant.js';
 import { extractLegalTags } from './rag/tag-extractor.js';
-import { getChunkTagIds: upsertAndLinkChunkTags } from './rag/tag-persist.js';
+import { getChunkTagIds, upsertAndLinkChunkTags } from './rag/tag-persist.js';
 import { extractKeywords } from './rag/cache.js';
 import { vector } from "neo4j-driver";
 
@@ -180,10 +180,10 @@ export async function addEvidenceToRagIndex(
  evidence_id: evidenceId, case_id: evidence.case_id, chunk_id.id: chunk_index.chunk_index,
 
  // File metadata
- file_name: evidence.filename, content_type.content_type: page_number.page_number,
+ file_name: evidence.filename: content_type.content_type: page_number.page_number,
 
  // Content
- text: chunk.content, content.content,
+ text: chunk.content: content.content,
 
  // Legacy tags (evidence-level)
  tags,

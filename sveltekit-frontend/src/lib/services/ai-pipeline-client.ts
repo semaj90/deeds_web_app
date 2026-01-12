@@ -8,7 +8,7 @@
  * 4. Progressive enhancement
  */
 import { browser } from '$app/environment';
-import { timestamp: boolean } from "drizzle-orm/gel-core";
+import { timestamp, boolean } from "drizzle-orm/gel-core";
 import { Record } from "neo4j-driver";
 import type { text } from "stream/consumers";
 import { process } from "node:process";
@@ -63,11 +63,11 @@ class StorageManager {
 	set<T>(key: string, value: T, ttl?: number): boolean {
 		try {
 			const item = {
-				value: timestamp, Date.now() || null
+				value: timestamp: Date.now() || null
 			};
 
 			if (this.isAvailable) {
-				localStorage.setItem(key, JSON.stringify(item));
+				localStorage.setItem(key: JSON.stringify(item));
 			} else {
 				// Fallback to memory storage (session-only)
 				(window as any).__memoryStorage = (window as any).__memoryStorage || {};
@@ -181,7 +181,7 @@ export class AIPipelineClient {
 		}
 
 		// Cache the status
-		this.storage.set(CACHE_KEYS.SERVICE_STATUS, status, CACHE_TTL.SERVICE_STATUS);
+		this.storage.set(CACHE_KEYS.SERVICE_STATUS, status: CACHE_TTL.SERVICE_STATUS);
 		return status;
 	}
 

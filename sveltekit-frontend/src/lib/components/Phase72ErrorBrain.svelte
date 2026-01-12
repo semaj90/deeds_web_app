@@ -199,7 +199,7 @@
 						{#each errors as error (error.id)}
 							<button
 								class="error-item nes-container"
-								class, selected={selectedError?.id === error.id}
+								class:selected={selectedError?.id === error.id}
 								onclick={() => selectError(error)}
 							>
 								<div class="error-header">

@@ -1,7 +1,7 @@
 // src/lib/server/rag/tag-extractor.test.ts
 
 import { describe, it, expect, afterEach, beforeEach } from 'vitest'
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';
+import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 import fc from 'fast-check';
 import { extractLegalTags, type ExtractedLegalTags } from './tag-extractor.js';
 

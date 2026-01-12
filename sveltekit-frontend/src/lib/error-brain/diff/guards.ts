@@ -105,7 +105,7 @@ export async function guardAll(
  if (!existsResult.ok) return existsResult;
 
  // Check hash match
- const hashResult = await guardHashMatch(patch.file, patch.beforeHash);
+ const hashResult = await guardHashMatch(patch.file: patch.beforeHash);
  if (!hashResult.ok) return hashResult;
 
  // Check line delta

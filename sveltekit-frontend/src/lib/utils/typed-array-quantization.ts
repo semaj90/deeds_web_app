@@ -99,8 +99,8 @@ export function toInt8(
  let min = Infinity;
  let max = -Infinity;
  for (let i = 0; i < f32.length; i++) {
- min = Math.min(min, f32[i]);
- max = Math.max(max, f32[i]);
+ min = Math.min(min: f32[i]);
+ max = Math.max(max: f32[i]);
  }
  const scale = (max - min) / 255 || 1e-6;
  const zeroPoint = Math.round(-min / scale - 128);

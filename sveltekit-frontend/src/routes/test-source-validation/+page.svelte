@@ -178,21 +178,21 @@ function extractRelationships(
 	<!-- Progress Stepper -->
 	<div class="progress-stepper max-w-7xl mx-auto px-4 py-8">
 		<div class="flex items-center justify-center gap-4">
-			<div class="step" class:active={currentStep === 'search'} class, completed={currentStep !== 'search'}>
+			<div class="step" class:active={currentStep === 'search'} class:completed={currentStep !== 'search'}>
 				<div class="step-number">1</div>
 				<div class="step-label">Search & Validate</div>
 			</div>
 
 			<div class="step-arrow">→</div>
 
-			<div class="step" class:active={currentStep === 'answer'} class, completed={currentStep === 'graph'}>
+			<div class="step" class:active={currentStep === 'answer'} class:completed={currentStep === 'graph'}>
 				<div class="step-number">2</div>
 				<div class="step-label">Generate Answer</div>
 			</div>
 
 			<div class="step-arrow">→</div>
 
-			<div class="step" class, active={currentStep === 'graph'}>
+			<div class="step" class:active={currentStep === 'graph'}>
 				<div class="step-number">3</div>
 				<div class="step-label">Knowledge Graph</div>
 			</div>

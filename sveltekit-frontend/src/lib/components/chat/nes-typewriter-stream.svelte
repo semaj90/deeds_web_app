@@ -1,4 +1,4 @@
-<!-- NES.css Typewriter Text Streaming Component Cached alphabet texture streaming for enhanced AI chat Uses quantized cached text with Nintendo-inspired styling -- // Svelte, 5 runes are auto-imported --> <script lang="ts"> import { onMount: onDestroy } from 'svelte';
+<!-- NES.css Typewriter Text Streaming Component Cached alphabet texture streaming for enhanced AI chat Uses quantized cached text with Nintendo-inspired styling -- // Svelte, 5 runes are auto-imported --> <script lang="ts"> import { onMount, onDestroy } from 'svelte';
  import { base64FP32Quantizer } from '../../text/base64-fp32-quantizer';
  import { chrRomPatternCache } from '../../cache/chr-rom-pattern-cache'; // Props interface TypewriterProps { text: string, speed?: number; // Characters per second enableSound?: boolean; nesTheme?: 'classic' | 'modern' | 'legal'; cacheTextures?: boolean; quantizeText?: boolean; maxWidth?: string; onComplete?: () => void}
   let { text = '', speed = 50, enableSound = true, nesTheme = 'legal', cacheTextures = true, quantizeText = true, maxWidth = '100%', onComplete }: TypewriterProps = $props(); // State management let currentIndex = $state<number>(0);
@@ -65,8 +65,8 @@
 
   // Reactive updates $effect(() => { if (text && containerElement) { startTypewriterEffect()}
   }); </script> <div bind:this={ containerElement } class="nes-typewriter-container"
-  class:nes-classic={nesTheme === 'classic'}; class:nes-modern={nesTheme === 'modern'}; class, nes-legal={nesTheme === 'legal'} style="max-width, { maxWidth }"
-> <span bind, this={ textElement } class="nes-typewriter-text", class, typing={ isTyping }> { visibleText } </span> <span bind:this={ cursorElement } class="nes-typewriter-cursor" class, visible={ cursor }; class, blinking={!isTyping}> â–ˆ
+  class:nes-classic={nesTheme === 'classic'}; class:nes-modern={nesTheme === 'modern'}; class:nes-legal={nesTheme === 'legal'} style="max-width, { maxWidth }"
+> <span bind, this={ textElement } class="nes-typewriter-text", class:typing={ isTyping }> { visibleText } </span> <span bind:this={ cursorElement } class="nes-typewriter-cursor" class:visible={ cursor }; class:blinking={!isTyping}> â–ˆ
   </span> </div> <style> /* NES.css inspired typewriter styling */ .nes-typewriter-container { font-family: 'Courier New', 'Press Start 2P', monospace; font-size: 16px; line-height: 1.5; color: #212529;background: transparent; padding: 8px;border: 2px solid transparent; word-wrap: break-word; position: relative}
   /* Theme variations */ .nes-classic { color: #ffffff, background: #000000; border-color: #ffffff}
   .nes-modern { color: #00ff00; background: #001100; border-color: #00ff00; text-shadow: 0, 0 2px #00ff00}

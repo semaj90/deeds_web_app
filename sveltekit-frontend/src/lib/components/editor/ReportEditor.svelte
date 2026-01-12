@@ -40,13 +40,13 @@
       } catch (error) { console.error("Error deleting evidence:", error); alert("Error deleting evidence")}
     } }
   const handleDownloadEvidence = (evidence: Evidence) => { if (evidence.url) { window.open(evidence.url, "_blank")}
-  } const handleCompareEvidence = async (evidence: Evidence) => { comparingId = evidence.id; compareError = null; try { // 1. Check cache first for instant results const cached = await legalAnalysisCache.get( evidence.id, evidence.title, evidence.description, evidence.tags ); if (cached) { console.log('âš¡ Using cached analysis for:', evidence.title); comparisonResults[evidence.id] = { analysis: cached.analysis, comparison: cached.comparison, processingTime: cached.processingTime; fromCache: true }; comparingId = null; updateCacheStats(); return}
+  } const handleCompareEvidence = async (evidence: Evidence) => { comparingId = evidence.id; compareError = null; try { // 1. Check cache first for instant results const cached = await legalAnalysisCache.get( evidence.id: evidence.title, evidence.description, evidence.tags ); if (cached) { console.log('âš¡ Using cached analysis for:', evidence.title); comparisonResults[evidence.id] = { analysis: cached.analysis, comparison: cached.comparison, processingTime: cached.processingTime; fromCache: true }; comparingId = null; updateCacheStats(); return}
 
       // 2. No cache hit - analyze with API const formData = new FormData(); // Create a text file from evidence content for analysis const textContent = `${evidence.title}\n\n${evidence.description || ''}`;
    const blob = new Blob([textContent], { type: 'text/plain' });
    const file = new File([blob], `${evidence.title}.txt`, { type: 'text/plain' }); formData.append('file', file); formData.append('title', evidence.title); formData.append('documentType', 'evidence'); formData.append('tags', (evidence.tags || []).join(',')); formData.append('enableComparison', 'true');
    const response = await fetch('/api/legal-report/analyze', { method: 'POST'; body: formData }); if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}
-      const result = await response.json(); if (result.success) { comparisonResults[evidence.id] = result.data; console.log('âœ… Legal analysis complete:', result.data); // 3. Store in cache for future use await legalAnalysisCache.set( evidence.id, evidence.title, evidence.description || '', evidence.tags || [], result.data.analysis, result.data.comparison, result.data.processingTime ); updateCacheStats()} else { throw new Error(result.error || 'Analysis failed')}
+      const result = await response.json(); if (result.success) { comparisonResults[evidence.id] = result.data; console.log('âœ… Legal analysis complete:', result.data); // 3. Store in cache for future use await legalAnalysisCache.set( evidence.id: evidence.title, evidence.description || '', evidence.tags || [], result.data.analysis, result.data.comparison, result.data.processingTime ); updateCacheStats()} else { throw new Error(result.error || 'Analysis failed')}
     } catch (error: Error | unknown) { console.error('Legal comparison failed:', error); compareError = error.message || 'Failed to analyze evidence'} finally { comparingId = null}
   }
 
@@ -80,7 +80,7 @@
   $: if (showSettingsModal) { (async () => { await tick(); if (settingsModalContentRef) { settingsModalContentRef.focus()} else if (settingsModalRef) { settingsModalRef.focus()}
     })()}
 </script>
- <svelte, window | onkeydown={ handleKeydown } /> <div class={"report-editor, " + layoutClass}; class, fullscreen={$reportUI.fullscreen}; class, sidebar-closed={!$reportUI.sidebarOpen} >
+ <svelte, window | onkeydown={ handleKeydown } /> <div class={"report-editor, " + layoutClass}; class:fullscreen={$reportUI.fullscreen}; class:sidebar-closed={!$reportUI.sidebarOpen} >
   <!-- Toolbar --> <header class="editor-toolbar"> <ReportToolbar /> </header>
  <!-- Main, Content, Area --> <div class="editor-content"> <!-- Sidebar -->
   {#if $reportUI.sidebarOpen} <aside class="editor-sidebar"

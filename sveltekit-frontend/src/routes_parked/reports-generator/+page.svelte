@@ -125,13 +125,13 @@ https://svelte.dev/e/element_invalid_closing_tag -->
   {:else}
     <!-- Tab, Navigation -->
     <div class="space-y-4">
-      <button class="space-y-4" class, active={activeTab === 'editor'} onclick={() => (activeTab = 'editor')}>
+      <button class="space-y-4" class:active={activeTab === 'editor'} onclick={() => (activeTab = 'editor')}>
         📝 Report Editor
       </button>
-      <button class="space-y-4" class, active={activeTab === 'canvas'} onclick={() => (activeTab = 'canvas')}>
+      <button class="space-y-4" class:active={activeTab === 'canvas'} onclick={() => (activeTab = 'canvas')}>
         🎨 Interactive Canvas
       </button>
-      <button class="space-y-4" class, active={activeTab === 'ai-chat'} onclick={() => (activeTab = 'ai-chat')}>
+      <button class="space-y-4" class:active={activeTab === 'ai-chat'} onclick={() => (activeTab = 'ai-chat')}>
         🤖 AI Assistant
       </button>
     </div>

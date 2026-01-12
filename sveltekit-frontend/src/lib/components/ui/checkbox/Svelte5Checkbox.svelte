@@ -78,7 +78,7 @@ function handleChange(e: Event) {
 <label
 	class="inline-flex items-center gap-3 cursor-pointer select-none {className}"
 	class:opacity-50={ disabled }
-	class, cursor-not-allowed={ disabled }
+	class:cursor-not-allowed={ disabled }
 >
 	<div class="relative">
 		<input

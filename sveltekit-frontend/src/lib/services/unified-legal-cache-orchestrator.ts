@@ -1,6 +1,6 @@
 /** * Unified Legal Cache Orchestrator * Implements intelligent caching for both retrieval results and embeddings * Integrates with Nintendo-style memory management and existing infrastructure */ import type { Redis } from 'ioredis'; import type { Pool } from 'pg'; import type { createHash } from 'crypto'; import type { NintendoMemoryManager, Priority } from './nintendo-memory-manager.js'; import type { LegalDocument, APIResponse } from '$lib/types'; // REMOVE: import type { getEmbeddingFromOllama } from '$lib/server/services/ollama-api'; // ADD: Imports for server-side integration helpers and their types import type { ollamaEmbed } from './cached-rag-service.js'; // Local type matching the shape returned by cached-rag-service's ollamaEmbed'
 import { legal_documents } from "$lib/db/index.js";
-import { object: string } from "fast-check";
+import { object, string } from "fast-check";
 import { title } from "process";
 import { metadata } from "./enhanced-rag-pagerank.js";
 import { sha256 } from "./error-analysis/diffs/unifiedDiff.js";

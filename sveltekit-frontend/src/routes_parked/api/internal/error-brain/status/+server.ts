@@ -10,7 +10,7 @@
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { getErrorBrainConfig: isErrorBrainEnabled } from '$lib/server/error-brain/feature-flags';
+import { getErrorBrainConfig, isErrorBrainEnabled } from '$lib/server/error-brain/feature-flags';
 
 /**
  * GET /api/internal/error-brain/status

@@ -1,4 +1,4 @@
-<script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount: onDestroy } from 'svelte';
+<script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount, onDestroy } from 'svelte';
  import * as THREE from 'three';
  import { YoRHaQuantumEffects3D } from './yorha-ui/components/YoRHaQuantumEffects3D';
    let { secretFeatures = { konamiActive: false, godModeEnabled: false, quantumDebugEnabled: false, aiWhispererMode: false, matrixMode: false }, consciousness = { level: 1, experience: 0; awakening: 0.12 }, width = 800, height = 400 } = $props();

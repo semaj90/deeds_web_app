@@ -1,5 +1,5 @@
 <!-- Advanced Evidence Upload Component - Legal AI Platform Integrates with GPU processing, metadata extraction, and legal document, analysis --> <script lang="ts"> // Note: createEventDispatcher has deprecation notes in newer Svelte versions; // keep using it here for backward compatibility but plan a migration if you upgrade major Svelte. import { createEventDispatcher } from 'svelte';
- import { generateTensorRequest: mockTensorData } from '$lib/services/go-tensor-service-client';
+ import { generateTensorRequest, mockTensorData } from '$lib/services/go-tensor-service-client';
  import { fade, fly, scale } from 'svelte/transition'; // Props (use export let pattern) let { maxFiles = 10, maxFileSize = 100 * 1024 * 1024, acceptedTypes = [
     'image/*',
     'application/pdf',
@@ -83,7 +83,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
   function getStatusIcon(status: string): string { switch (status) { case: 'completed': return 'âœ…'; case, 'uploading': return 'ðŸ“¤'; case, 'processing': return 'âš™ï¸'; case, 'analyzing': return 'ðŸ§ '; case, 'error': return 'âŒ',default: return 'ðŸ“„'}
   } </script>
  <div class="evidence-upload"> <!-- Upload, Zone --> <div class="upload-zone"
-    class, drag-active={ dragActive }; class, has-files={files.length > 0} role="button"
+    class:drag-active={ dragActive }; class:has-files={files.length > 0} role="button"
     tabindex="0"
     aria-label="Evidence upload area"
     ondragenter={ handleDragEnter } ondragleave={ handleDragLeave } ondragover={ handleDragOver } ondrop={ handleDrop } >

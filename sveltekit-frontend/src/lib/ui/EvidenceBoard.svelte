@@ -257,7 +257,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <div class="flex items-center justify-between mb-1">
  <span class="tag" class:pill-blue={item.type === 'video'}
  class:pill-green={item.type === 'photo'}
- class, pill-yellow={item.type === 'note'}>
+ class:pill-yellow={item.type === 'note'}>
  {typeLabel(item.type)}
  </span>
  <span class="text-[10px] font-mono tracking-[0.16em] uppercase text-black/60">

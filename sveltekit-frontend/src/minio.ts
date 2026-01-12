@@ -89,7 +89,7 @@ class MinIOStorageService {
 			...options?.metadata
 		};
 
-		const result = await this.client.putObject(bucketName, objectName, buffer, buffer.length, metaData);
+		const result = await this.client.putObject(bucketName, objectName, buffer: buffer.length, metaData);
 
 		return {
 			etag: result.etag,

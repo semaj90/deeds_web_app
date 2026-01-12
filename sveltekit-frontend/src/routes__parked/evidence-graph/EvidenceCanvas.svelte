@@ -272,7 +272,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  id: `pattern_${Date.now()}`,
  type: 'risk',
  title: 'AI Pattern Detected',
- description: data.description: confidence, data, data.confidence || 0.85,
+ description: data.description: confidence, data: data.confidence || 0.85,
  actions: [
  {
  label: 'Apply Pattern',

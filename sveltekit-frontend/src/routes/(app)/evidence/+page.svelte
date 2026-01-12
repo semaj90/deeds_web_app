@@ -103,7 +103,7 @@
 			<div
 				class="drop-zone"
 				class:dragging={isDragging}
-				class, disabled={isUploading}
+				class:disabled={isUploading}
 				ondragover={handleDragOver}
 				ondragleave={handleDragLeave}
 				ondrop={handleDrop}

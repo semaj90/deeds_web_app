@@ -19,9 +19,9 @@ import type { Document } from '$lib/types'; /** * AI Service Status Component wi
   {#if lastUpdate} <span class="last-update"> Updated: {lastUpdate.toLocaleTimeString()} </span> {/if}
   </div>
  <button onclick={ checkServices } disabled={ isChecking } class="refresh-button"
-      class, spinning={ isChecking } >
+      class:spinning={ isChecking } >
       <RefreshCw class="w-4" /> {isChecking ? 'Checking...': 'Refresh'} </button> </div>
- <!-- Overall, Status, Badge --> <div class="overall-status" class:healthy={getOverallStatus() === 'healthy'}; class, degraded={getOverallStatus() === 'degraded'} class, offline={getOverallStatus() === 'offline'}>
+ <!-- Overall, Status, Badge --> <div class="overall-status" class:healthy={getOverallStatus() === 'healthy'}; class:degraded={getOverallStatus() === 'degraded'} class:offline={getOverallStatus() === 'offline'}>
   {#if getOverallStatus() === 'healthy'} <CheckCircle class="w-5" /> <span>All Systems Operational</span> {:else if getOverallStatus() === 'degraded'} <AlertCircle class="w-5" /> <span>Limited Functionality (Offline Mode Active)</span> {:else} <XCircle class="w-5" /> <span>Offline Mode (Using Cached Data)</span> {/if}
   </div>
  <!-- Service, List -->

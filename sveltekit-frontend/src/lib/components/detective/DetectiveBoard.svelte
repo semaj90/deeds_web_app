@@ -22,7 +22,7 @@ import type { Case } from '$lib/types';
 	import  AIAssistantPanel  from "../ai/AIAssistantPanel.svelte";
 	import  EvidenceCard  from "./EvidenceCard.svelte";
 	import  UploadZone  from "./UploadZone.svelte";
-	import { analyzeEvidence: findEvidenceConnections } from '$lib/ai/ai-service';
+	import { analyzeEvidence, findEvidenceConnections } from '$lib/ai/ai-service';
 	import { rabbitMQService } from '$lib/services/rabbitmq-service';
 	import { VectorService } from '$lib/services/vector-service';
 	import { gpuAccelerationService as gpuService } from '$lib/services/gpu-acceleration-service';
@@ -434,8 +434,8 @@ import type { Case } from '$lib/types';
 										<!-- Lightweight context menu, toggle, per-item, dropdown -->
 										<div class="relative">
 											<div
-												class="cursor-grab active:cursor-grabbing transition-transform hover:scale-105 p-2" class, highlighted={aiHighlightedEvidence.includes(item.id)}
-												class, selected={selectedEvidenceIds.includes(item.id)}
+												class="cursor-grab active:cursor-grabbing transition-transform hover:scale-105 p-2" class:highlighted={aiHighlightedEvidence.includes(item.id)}
+												class:selected={selectedEvidenceIds.includes(item.id)}
 												onclick={() => handleEvidenceSelect(item.id)}
 												onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleEvidenceSelect(item.id)} }}
 												role="button"

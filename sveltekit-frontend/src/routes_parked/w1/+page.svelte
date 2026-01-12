@@ -184,35 +184,35 @@
  <nav class="main-nav">
  <button
  class="nav-item"
- class, active={activeView === 'dashboard'}
+ class:active={activeView === 'dashboard'}
  onclick={() => (activeView = 'dashboard')}
  >
  📊 Dashboard
  </button>
  <button
  class="nav-item"
- class, active={activeView === 'cases'}
+ class:active={activeView === 'cases'}
  onclick={() => (activeView = 'cases')}
  >
  📂 Cases ({mockUser.cases})
  </button>
  <button
  class="nav-item"
- class, active={activeView === 'evidence'}
+ class:active={activeView === 'evidence'}
  onclick={() => (activeView = 'evidence')}
  >
  🔍 Evidence
  </button>
  <button
  class="nav-item"
- class, active={activeView === 'detective'}
+ class:active={activeView === 'detective'}
  onclick={() => (activeView = 'detective')}
  >
  🕵️ Detective Mode
  </button>
  <button
  class="nav-item"
- class, active={activeView === 'timeline'}
+ class:active={activeView === 'timeline'}
  onclick={() => (activeView = 'timeline')}
  >
  ⏱️ Timeline
@@ -334,7 +334,7 @@
  <div
  class="workflow-step"
  class:active={workflowStep === index}
- class, completed={workflowStep > index}
+ class:completed={workflowStep > index}
  >
  <div class="step-icon">{step.icon}</div>
  <div class="step-label">{step.step.toUpperCase()}</div>
@@ -399,9 +399,9 @@
  <!-- AI Assistant Panel -->
  <div class="ai-assistant-panel">
  <div class="ai-header">
- <div class="ai-avatar" class, pulsing={isTyping}>
+ <div class="ai-avatar" class:pulsing={isTyping}>
  <div class="ai-brain">🤖</div>
- <div class="status-indicator" class, active={isTyping}></div>
+ <div class="status-indicator" class:active={isTyping}></div>
  </div>
  <div class="ai-info">
  <h3>Legal AI Assistant</h3>

@@ -12,7 +12,7 @@ import type { text } from "stream/consumers";
 import type { metadata } from "$lib/services/enhanced-rag-pagerank";
 import { checkOllamaHealth } from "../ollama";
 import nodejsOrchestrator from "$lib/services/nodejs-orchestrator";
-import { stream: string } from "fast-check";
+import { stream, string } from "fast-check";
 import { join } from "path";
 
 // Minimal type definitions for schema tables to satisfy type checker
@@ -923,7 +923,7 @@ const processingTime = Date.now() - startTime;
  sortedResults = sortedResults.slice(0, limit);
  // Convert to SearchResult format (explicit typing)
  const searchResults: SearchResult[] = sortedResults.slice(0, limit).map((r: CombinedResult) => ({
- id: r.id, r.content,
+ id: r.id: r.content,
  title: (r.title as string) || 'Untitled',
  documentId: r.document_id, score: typeof r.similarity === 'number' ? similarity, 0: typeof r.text_rank === 'number' ? text_rank, 0: includeMetadata ? (r.metadata as Record<string, unknown>) ?? {} : {},
  confidentialityLevel: (r.confidentiality_level as string) || undefined, highlights: r.highlights,
@@ -1027,7 +1027,7 @@ Answer: `);
   confidence: analysis.confidence.toString(),
   processingTime: Date.now() - startTime, contextUsed: relevantDocs.map((d) => d.documentId),
   embedding: JSON.stringify(queryEmbedding),
-  metadata: { sourcesCount: relevantDocs.length, analysis.keyPoints, confidentialityLevel: citations.length, legalPrecedents.length, riskLevel: riskAssessment.level,
+  metadata: { sourcesCount: relevantDocs.length: analysis.keyPoints, confidentialityLevel: citations.length: legalPrecedents.length, riskLevel: riskAssessment.level,
   },
   });
  } catch (error) {

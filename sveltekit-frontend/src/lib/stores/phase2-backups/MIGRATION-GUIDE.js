@@ -91,9 +91,9 @@ const importGuide = {
       'âœ… Works - Available in ai-unified.ts',
   }, // Recommended new imports
   modern: {
-    "import { aiStore: parseAICommand } from './stores/ai-unified.js'": 'âœ… Recommended',
-    "import { evidenceStore: evidenceById } from './stores/evidence-unified.js'": 'âœ… Recommended',
-    "import { aiStore: evidenceStore } from './stores.js'": 'âœ… Barrel exports',
+    "import { aiStore, parseAICommand } from './stores/ai-unified.js'": 'âœ… Recommended',
+    "import { evidenceStore, evidenceById } from './stores/evidence-unified.js'": 'âœ… Recommended',
+    "import { aiStore, evidenceStore } from './stores.js'": 'âœ… Barrel exports',
   },
 };
 // TESTING CHECKLIST

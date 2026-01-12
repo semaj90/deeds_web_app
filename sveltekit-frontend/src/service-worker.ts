@@ -254,7 +254,7 @@ async function cacheResponse(
 
  // 1. Browser cache
  const cache = await caches.open('legal-ai-v1');
- cachePromises.push(cache.put(request, response.clone()));
+ cachePromises.push(cache.put(request: response.clone()));
 
  // 2. Redis distributed cache
  if (isRedisConnected && cacheStrategy.useRedis) {
@@ -508,7 +508,7 @@ async function processWarmingTask(task: CacheWarmingTask): Promise<void> {
  await (somWebGPUCache as any).precomputeEmbeddings(task.payload);
  } else {
  // use safeSomStore fallback
- await safeSomStore(task.id, task.payload);
+ await safeSomStore(task.id: task.payload);
  }
  }
  break;

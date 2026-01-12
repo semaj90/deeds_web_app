@@ -259,7 +259,7 @@ export class RabbitMQLegalQueue {
             const message: LegalDocumentMessage = {
                 messageId: this.generateMessageId(documentId: document.id,
                 operation,
-                priority, options.priority || document.priority || 0,
+                priority: options.priority || document.priority || 0,
                 payload: binaryData,
                 metadata: {
                     caseId, options.caseId || document.metadata?.caseId,

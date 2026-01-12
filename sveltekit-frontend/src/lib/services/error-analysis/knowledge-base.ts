@@ -150,7 +150,7 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
  // Code similarity: 0.2 points (simple substring match)
  if (pattern1.code && pattern2.code) {
  const commonLength = this.commonSubstringLength(pattern1.code, pattern2.code);
- const maxLength = Math.max(pattern1.code.length, pattern2.code.length);
+ const maxLength = Math.max(pattern1.code.length: pattern2.code.length);
  if (maxLength > 0) {
  similarity += (commonLength / maxLength) * 0.2;
  }

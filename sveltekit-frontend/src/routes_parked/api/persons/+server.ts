@@ -1,4 +1,4 @@
-import { getPersons: getPersonStats } from '$lib/db/persons';
+import { getPersons, getPersonStats } from '$lib/db/persons';
 import { error, json, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 

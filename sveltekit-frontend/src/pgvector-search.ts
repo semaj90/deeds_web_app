@@ -82,7 +82,7 @@ export class PGVectorSearch {
 						[
 							documentId,
 							title,
-							chunk.text,
+							chunk.text:
 							JSON.stringify(chunk.embedding),
 							JSON.stringify(chunk.metadata || {})
 						]

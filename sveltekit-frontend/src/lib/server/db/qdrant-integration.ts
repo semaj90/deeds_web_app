@@ -1,7 +1,7 @@
 
 import { QdrantClient } from '@qdrant/js-client-rest';
-import { db } from './index.js';
-import * as schema from './schema.js';
+import { db } from './index.ts';
+import * as schema from './schema.ts';
 import { eq, sql } from 'drizzle-orm';
 
 export interface QdrantConfig {

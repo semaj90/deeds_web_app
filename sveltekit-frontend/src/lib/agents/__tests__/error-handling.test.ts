@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';
+import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 import {
  classifyError,
  determineRecoveryStrategy,

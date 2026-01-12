@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fc from 'fast-check';
 import { EmbeddingService } from './embedding-service.js';
 import type { ServiceConfig } from './types.js';
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';
+import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 import type { max } from "drizzle-orm";
 
 describe('EmbeddingService - Property-Based Tests (Task 3.1)', () => {

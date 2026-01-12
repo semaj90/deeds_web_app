@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { caseSummaryService } from '../case-summary.service.js';
 import { ragService } from '../rag.service.js';
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';
+import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 
 // Mock cacheService module
 vi.mock('../cache.service', () => ({
@@ -147,7 +147,7 @@ describe('Performance Tests', () => {
 
  const startTime = Date.now();
 
- await Promise.all(queries.map((q) => ragService.retrieveRAGContext(q.query, q.jurisdiction)));
+ await Promise.all(queries.map((q) => ragService.retrieveRAGContext(q.query: q.jurisdiction)));
 
  const elapsed = Date.now() - startTime;
 

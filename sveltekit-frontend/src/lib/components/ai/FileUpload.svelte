@@ -84,7 +84,7 @@ import type { Document } from '$lib/types';
             feedbackIntegration.markFailed({
               interactionId: currentInteractionId,
               error, errorText,
-              status, xhr.status
+              status: xhr.status
             })} catch 0%
         }
       }

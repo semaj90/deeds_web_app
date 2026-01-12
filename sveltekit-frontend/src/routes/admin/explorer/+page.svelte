@@ -162,7 +162,7 @@
 	<!-- Header -->
 	<div class="header">
 		<h1>🗺️ Route Explorer & Agent Control</h1>
-		<div class="agent-status" class, active={$agentStatus.active}>
+		<div class="agent-status" class:active={$agentStatus.active}>
 			{#if $agentStatus.active}
 				<span class="pulse">🤖</span>
 				<span>Fixing: {$agentStatus.current_file}</span>
@@ -193,13 +193,13 @@
 
 		<div class="view-modes">
 			<button
-				class, active={$viewMode === 'tree'}
+				class:active={$viewMode === 'tree'}
 				onclick={() => viewMode.set('tree')}
 			>
 				📁 Tree
 			</button>
 			<button
-				class, active={$viewMode === 'list'}
+				class:active={$viewMode === 'list'}
 				onclick={() => viewMode.set('list')}
 			>
 				📋 List
@@ -231,7 +231,7 @@
 						<div
 							class="route-item"
 							class:selected={$selectedRoute?.id === route.id}
-							class, has-errors={route.errors > 0}
+							class:has-errors={route.errors > 0}
 							onclick={() => selectRoute(route)}
 						>
 							<div class="route-icon">{route.type === 'page' ? '📄' : route.type === 'api' ? '🔌' : '⚙️'}</div>
@@ -271,7 +271,7 @@
 					</div>
 					<div class="metric">
 						<span class="metric-label">Errors</span>
-						<span class="metric-value error" class, high={$selectedRoute.errors > 10}>
+						<span class="metric-value error" class:high={$selectedRoute.errors > 10}>
 							{$selectedRoute.errors}
 						</span>
 					</div>
@@ -374,7 +374,7 @@
 					<div
 						class="tree-route"
 						class:selected={selectedPath === route.path}
-						class, has-errors={route.errors > 0}
+						class:has-errors={route.errors > 0}
 						onclick={() => selectRoute(route)}
 					>
 						<span class="route-icon">{route.type === 'page' ? '📄' : '⚙️'}</span>

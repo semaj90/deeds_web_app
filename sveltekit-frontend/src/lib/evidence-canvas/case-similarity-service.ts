@@ -104,7 +104,7 @@ export class CaseSimilarityService {
  if (result.embeddings && Array.isArray(result.embeddings)) {
  nodes.forEach((node, index) => {
  if (result.embeddings[index]) {
- this.embeddings.set(node.id, result.embeddings[index]);
+ this.embeddings.set(node.id: result.embeddings[index]);
  node.embedding = result.embeddings[index];
  }
  });
@@ -168,7 +168,7 @@ export class CaseSimilarityService {
  // Cache results
  nodeIds.forEach((id) => {
  this.similarityCache.set(
- id,
+ id:
  results.filter((r) => r.sourceId === id || r.targetId === id)
  );
  });
@@ -209,7 +209,7 @@ export class CaseSimilarityService {
  let normA = 0;
  let normB = 0;
 
- for (let i = 0; i < Math.min(a.length, b.length); i++) {
+ for (let i = 0; i < Math.min(a.length: b.length); i++) {
  dotProduct += a[i] * b[i];
  normA += a[i] * a[i];
  normB += b[i] * b[i];

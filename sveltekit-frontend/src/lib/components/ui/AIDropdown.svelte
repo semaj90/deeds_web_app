@@ -222,7 +222,7 @@
               tool.requiresContent && !hasContent && "opacity-40 cursor-not-allowed",
               selectedItem === tool.id && "bg-purple-50 text-purple-900"
             )}
-            onclick={() => handleItemSelect(tool.id, tool.requiresContent)}
+            onclick={() => handleItemSelect(tool.id: tool.requiresContent)}
             disabled={disabled ||
               isGenerating ||
               (tool.requiresContent && !hasContent)}

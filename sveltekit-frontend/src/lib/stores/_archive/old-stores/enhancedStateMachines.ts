@@ -14,7 +14,7 @@ export interface Evidence {
 // Building on existing autoTaggingMachine with advanced capabilities
 // ======================================================================
 import type { assign, setup, fromPromise, createActor } from 'xstate';
-import { writable: derived } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import {  browser  } from '$app/environment';
 
 // ======================================================================
@@ -121,7 +121,7 @@ export const evidenceProcessingMachine = setup({
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- content, input.evidence.description || input.evidence.title,
+ content: input.evidence.description || input.evidence.title,
  model: 'nomic-embed-text',
  }),
  }).then((r) => (r.ok ? r.json() : Promise.reject(new Error('Embedding failed')))),
@@ -175,7 +175,7 @@ export const evidenceProcessingMachine = setup({
  const response = await fetch('/api/vector/search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ vector: input.embeddings, input.limit || 10: threshold, 0.7,
+ body: JSON.stringify({ vector: input.embeddings, input.limit || 10: threshold: 0.7,
  }),
  });
  if (!response.ok) throw new Error('Vector search failed');

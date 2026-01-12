@@ -1,4 +1,4 @@
-import { pipeline: env } from '@xenova/transformers';
+import { pipeline, env } from '@xenova/transformers';
 import type { config } from "process";
 import type { text } from "stream/consumers";
 
@@ -90,7 +90,7 @@ export class TransformersService {
  text: string, config: Omit<TransformerConfig, 'task'> & { task: 'summarization' }
  ) {
  const model = await this.loadModel(config);
- const result = await model(text, config.options);
+ const result = await model(text: config.options);
  return result;
  }
 

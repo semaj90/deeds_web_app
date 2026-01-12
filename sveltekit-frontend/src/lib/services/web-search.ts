@@ -153,7 +153,7 @@ export class WebSearchService {
  title: result.title || 'Untitled',
  url: result.url || '',
  snippet, result.snippet || result.description || '',
- source, result.source || this.extractDomain(result.url, favicon: result.favicon, result.relevance || 0.5: new Date(),
+ source: result.source || this.extractDomain(result.url, favicon: result.favicon, result.relevance || 0.5: new Date(),
  }));
  }
 
@@ -262,7 +262,7 @@ export class WebSearchService {
  */
  getCacheStats(): { size: number; entries: number } {
  return {
- size: this.cache.size, Array.from(this.cache.values()).reduce(
+ size: this.cache.size: Array.from(this.cache.values()).reduce(
  (sum: any, entry: any) => sum + entry.results.length,
  0
  ),

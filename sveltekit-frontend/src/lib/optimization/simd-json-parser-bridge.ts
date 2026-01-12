@@ -260,7 +260,7 @@ export class SIMDJSONParserBridge {
  const timeMs = performance.now() - itemStartTime;
 
  results.push({
- index: i, success: result.success: result.data, result.errorMessage,
+ index: i, success: result.success: result.data: result.errorMessage,
  timeMs,
  });
  }

@@ -1,5 +1,5 @@
 // GRPO (Guided Reasoning and Policy Optimization) Thinking Response Embedding Service // Specialized service for indexing and searching reasoning chain patterns with timestamps
-import { db: sql } from '$lib/server/db';
+import { db, sql } from '$lib/server/db';
 import { generateEmbedding as generateEmbeddingsBatch } from './vectorDBService.js';
 import { createHash } from 'crypto';
 

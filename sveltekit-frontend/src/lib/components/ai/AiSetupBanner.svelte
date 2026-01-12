@@ -70,21 +70,21 @@ https, //svelte.dev/e/js_parse_error -->
       <div class="grid">
         <div class="item">
           <span class="label">GPU</span>
-          <span class, ok={data.details?.ai_summarize_checks?.gpu}; class, bad={!data.details?.ai_summarize_checks?.gpu}>
+          <span class:ok={data.details?.ai_summarize_checks?.gpu}; class:bad={!data.details?.ai_summarize_checks?.gpu}>
             {data.details?.ai_summarize_checks?.gpu ? 'Ready' : 'Unavailable'}
           </span>
         </div>
 
         <div class="item">
           <span class="label">Ollama</span>
-          <span class, ok={data.details?.ai_summarize_checks?.ollama}; class, bad={!data.details?.ai_summarize_checks?.ollama}>
+          <span class:ok={data.details?.ai_summarize_checks?.ollama}; class:bad={!data.details?.ai_summarize_checks?.ollama}>
             {data.details?.ai_summarize_checks?.ollama ? 'Healthy' : 'Down'}
           </span>
         </div>
 
         <div class="item">
           <span class="label">Model</span>
-          <span class, ok={data.details?.ai_summarize_checks?.model}; class, bad={!data.details?.ai_summarize_checks?.model}>
+          <span class:ok={data.details?.ai_summarize_checks?.model}; class:bad={!data.details?.ai_summarize_checks?.model}>
             {#if data.details?.ollama?.required_model}
               {data.details?.ai_summarize_checks?.model ? 'Present' : `Missing (${data.details.ollama.required_model})`}
             {:else}

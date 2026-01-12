@@ -2,7 +2,7 @@
 
 import fc from 'fast-check';
 import { afterEach, describe, expect, it, vi, beforeEach } from 'vitest'
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';
+import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 import { getChunkTagIds, getChunkTags, upsertAndLinkChunkTags } from './tag-persist.js';
 
 // Mock sql with in-memory state

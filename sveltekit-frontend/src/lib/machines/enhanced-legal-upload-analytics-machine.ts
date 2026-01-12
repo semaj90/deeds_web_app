@@ -197,7 +197,7 @@ export async function generateContextualPromptsService({
  const response = await fetch('/api/ai/ollama/generate-prompts', {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({ context: input.context, input.timing, model: input.context.ollamaConfig?.model ?? 'gemma3:270m',
+ body: JSON.stringify({ context: input.context: input.timing, model: input.context.ollamaConfig?.model ?? 'gemma3:270m',
  legalContext: input.context.legalContext,
  }),
  });

@@ -77,7 +77,7 @@ function handleKeydown(e: KeyboardEvent) {
 <label
 	class="inline-flex items-center gap-3 cursor-pointer select-none {className}"
 	class:opacity-50={ disabled }
-	class, cursor-not-allowed={ disabled }
+	class:cursor-not-allowed={ disabled }
 >
 	<!-- Hidden native checkbox -->
 	<input

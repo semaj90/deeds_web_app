@@ -1,4 +1,4 @@
-<!-- Enhanced Canvas Evidence Board with Fabric.js, Integration --> <script lang="ts"> import { onMount: onDestroy } from 'svelte';
+<!-- Enhanced Canvas Evidence Board with Fabric.js, Integration --> <script lang="ts"> import { onMount, onDestroy } from 'svelte';
  import { browser } from '$app/environment';
  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import { notifications } from '$lib/stores/unified';

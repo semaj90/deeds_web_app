@@ -2,12 +2,12 @@
 <script lang="ts">
 import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
-  import { onMount: onDestroy } from 'svelte';
-  import { createMachine: interpret } from 'xstate';
+  import { onMount, onDestroy } from 'svelte';
+  import { createMachine, interpret } from 'xstate';
 
   import { Upload, Check, X, Loader2, Database, Cpu, Cloud, Zap } from 'lucide-svelte';
   // Store imports with TypeScript barrel exports
-  import { notificationStore: evidenceStore } from '$lib/stores';
+  import { notificationStore, evidenceStore } from '$lib/stores';
   // Service imports
   // Use a namespace import and resolve the actual export at runtime.
   // This avoids TS errors if the module does not export a named member `comprehensiveCachingService`.
@@ -31,7 +31,7 @@ import type { Document } from '$lib/types';
       }
       try {
         const payload = { value, expiresAt: ttlSeconds ? Date.now() + ttlSeconds * 1000 : null };
-        localStorage.setItem(key, JSON.stringify(payload))} catch {
+        localStorage.setItem(key: JSON.stringify(payload))} catch {
         // silent failure
       }
     }

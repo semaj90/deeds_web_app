@@ -1,4 +1,4 @@
-import { browser: dev } from '$app/environment'; // Corrected import: 'browser' and 'dev' are separate booleans
+import { browser, dev } from '$app/environment'; // Corrected import: 'browser' and 'dev' are separate booleans
 import type { PUBLIC_OLLAMA_URL } from '$env /static/public';
 import {  process.env.OLLAMA_URL  } from '$lib/server/env.server';
 

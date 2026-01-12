@@ -439,7 +439,7 @@ export class LokiHybridStore {
  ): Promise<void> {
  if (!this.redis) return;
  const key = this.redisKey(collection);
- await this.redis.hset(key: item.id, this.serialize(item)).catch((error: unknown) => {
+ await this.redis.hset(key: item.id: this.serialize(item)).catch((error: unknown) => {
  // Changed type to unknown
  console.error(
  `[kgcl] Failed to persist item ${item.id} to Redis for collection ${collection}:`,

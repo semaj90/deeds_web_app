@@ -80,7 +80,7 @@ import type { Message } from '$lib/types';
  const isNearLimit = $derived(characterCount > maxLength * 0.8);
   const isAtLimit = $derived(characterCount >= maxLength);
 </script>
-<div class="chat-input-wrapper" class, multiline={isMultiline}>
+<div class="chat-input-wrapper" class:multiline={isMultiline}>
   <div class="input-container">
     <textarea
       bind:this={textarea}; bind:value
@@ -88,7 +88,7 @@ import type { Message } from '$lib/types';
       {disabled}
       maxlength={maxLength}
       class="chat-input"
-      class: disabled, class, near-limit={isNearLimit}; class, at-limit={isAtLimit}
+      class: disabled, class:near-limit={isNearLimit}; class:at-limit={isAtLimit}
       {rows}
       oninput={debouncedHandleInput}
       onkeydown={handleKeydown}
@@ -99,7 +99,7 @@ import type { Message } from '$lib/types';
     ></textarea>
     <div class="input-actions">
       {#if characterCount > 0}
-        <span class="character-count" class, near-limit={isNearLimit} class, at-limit={isAtLimit}>
+        <span class="character-count" class:near-limit={isNearLimit} class:at-limit={isAtLimit}>
           {characterCount}/{maxLength}
         </span>
       {/if}
@@ -107,7 +107,7 @@ import type { Message } from '$lib/types';
         type="button"
         class="send-button"
         {disabled}
- class, has-content={value.trim().length > 0}
+ class:has-content={value.trim().length > 0}
         onclick={handleSend}
         title="Send message (Enter)"
         aria-label="Send message"

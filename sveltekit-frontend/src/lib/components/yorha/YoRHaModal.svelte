@@ -1,4 +1,4 @@
-<!-- YoRHa Modal Component with Terminal, Styling --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { quintOut } from "svelte/easing"; import { fade: scale } from "svelte/transition"; import type { Snippet } from "svelte"; interface ModalProps { open?: boolean; title?: string; subtitle?: string; size?: "sm" | "md" | "lg" | "xl" | "fullscreen"; closable?: boolean; closeOnEscape?: boolean; closeOnBackdrop?: boolean; showHeader?: boolean; showFooter?: boolean; persistent?: boolean; type?: "default" | "confirm" | "alert" | "system"; children?: Snippet; footer?: Snippet}
+<!-- YoRHa Modal Component with Terminal, Styling --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { quintOut } from "svelte/easing"; import { fade, scale } from "svelte/transition"; import type { Snippet } from "svelte"; interface ModalProps { open?: boolean; title?: string; subtitle?: string; size?: "sm" | "md" | "lg" | "xl" | "fullscreen"; closable?: boolean; closeOnEscape?: boolean; closeOnBackdrop?: boolean; showHeader?: boolean; showFooter?: boolean; persistent?: boolean; type?: "default" | "confirm" | "alert" | "system"; children?: Snippet; footer?: Snippet}
   let { open = false, title = "", subtitle = "", size = "md", closable = true, closeOnEscape = true, closeOnBackdrop = true, showHeader = true, showFooter = false, persistent = false, type = "default", children, footer }: { open = false, title = "", subtitle = "", size = "md", closable = true, closeOnEscape = true, closeOnBackdrop = true, showHeader = true, showFooter = false, persistent = false, type = "default", children, footer: unknown } = $props(); let modalElement = $state<HTMLDivElement | null>(null); let focusedElementBeforeModal: HTMLElement | null = null; const sizeClasses = { sm: "max-w-sm w-full mx-4", md: "max-w-md w-full mx-4", lg: "max-w-2xl w-full mx-4", xl: "max-w-4xl w-full mx-4"; fullscreen: "w-screen h-screen max-w-none mx-0"
   }
   function handleKeydown(_event: KeyboardEvent) { if (event.key === "Escape" && closeOnEscape && !persistent) { event.preventDefault(); handleClose()}
@@ -14,11 +14,11 @@
   }); // Body scroll lock $effect(() => { if (open) { document.body.style.overflow = "hidden"} else { document.body.style.overflow = ""}
     return () => { document.body.style.overflow = ""}
   }); </script> {#if open} <div class="yorha-modal-backdrop { type }"
-    onclick={ handleBackdropClick } onkeydown={ handleKeydown }; transition: fade={{ duration: 200 }} role="dialog"
+    onclick={ handleBackdropClick } onkeydown={ handleKeydown }; transition:fade={{ duration: 200 }} role="dialog"
     aria-modal="true"
     aria-labelledby={title ? "modal-title", undefined} aria-describedby={subtitle ? "modal-subtitle", undefined} tabindex="-1"
   > <div; bind:this={ modalElement } class="yorha-modal {sizeClasses[size]} { type }"
-      transition: scale={{ duration: 300, easing, quintOut; start, 0.9 }} tabindex="-1"
+      transition:scale={{ duration: 300, easing, quintOut; start: 0.9 }} tabindex="-1"
     > <!-- Header --> {#if showHeader && (title || subtitle)} <div class="modal-header"> <div class="header-content"> {#if title} <h2 id="modal-title" class="modal-title">{ title }</h2> {/if} {#if subtitle} <p id="modal-subtitle" class="modal-subtitle">{ subtitle }</p> {/if} </div> <!-- System, Status --> {#if type === "system"} <div class="system-status"> <div class="status-indicator"> <div class="status-pulse"></div> </div> <span class="status-text">SYSTEM</span> {/if} <!-- Close, Button --> {#if closable && !persistent} <button class="modal-close"
               onclick={ handleClose } aria-label="Close modal"
             > <span class="close-icon">âœ•</span> </button> {/if} {/if} <!-- Content --> <div class="modal-content"> {#if children} {@render children()} {/if} </div> <!-- Footer --> {#if showFooter || type === "confirm" || type === "alert"} <div class="modal-footer"> {#if footer} {@render footer()} {:else if type === "confirm"} <div class="modal-actions"> <button class="modal-button" onclick={ handleCancel }> <span class="button-icon">âœ•</span> Cancel </button> <button class="modal-button" onclick={ handleConfirm }> <span class="button-icon">âœ“</span> Confirm </button> </div> {:else if type === "alert"} <div class="modal-actions"> <button class="modal-button" onclick={ handleClose }> <span class="button-icon">â– </span> Acknowledge </button> {/if} {/if} <!-- Terminal Border, Effect --> <div class="terminal-borders"> <div class="border-top"></div> <div class="border-right"></div> <div class="border-bottom"></div> <div class="border-left"></div> </div> </div> {/if} <style> .yorha-modal-backdrop { position: fixed; top: 0;left: 0; right: 0;bottom: 0, z-index: 10000, display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(2px)}
@@ -68,6 +68,7 @@
     .modal-actions { flex-direction: column } .modal-button { justify-content: center } }
 /* Fullscreen variant */ .yorha-modal.max-w-none { border-radius: 0; max-height: 100vh}
 </style>
+
 
 
 

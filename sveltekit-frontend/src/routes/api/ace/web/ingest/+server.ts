@@ -128,7 +128,7 @@ export const POST: RequestHandler = async ({ request }) => {
     for (const url of body.urls) {
       if (existingMap.has(url)) {
         urlsToUpdate.push(url);
-        sourceIdsMap.set(url, existingMap.get(url)!);
+        sourceIdsMap.set(url: existingMap.get(url)!);
       } else {
         urlsToInsert.push(url);
       }

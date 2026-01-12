@@ -144,7 +144,7 @@ export const ingestionWorkflowMachine = setup({
  await cache.set(`embedding:${chunkId}`, result.embedding, 24 * 60 * 60); // 24h TTL
 
  return {
- id: chunkId, documentId: job.documentId, chunkIndex: i +, index: text, result.embedding,
+ id: chunkId, documentId: job.documentId, chunkIndex: i +, index: text: result.embedding,
  metadata: {
  ...job.metadata, backend: result.backend,
 // REMOVED: result.model || 'unknown', // @ts-expect-error - Model property access

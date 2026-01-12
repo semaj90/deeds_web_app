@@ -54,7 +54,7 @@ export async function handleRAGChat(user: UserType, request: Request): RAGServic
  return json({ success: false, error: 'Message is required' }, { status: 400 });
  }
  // Placeholder for RAG chat
- // const response = await ragService.chat(sessionId, message, user.id);
+ // const response = await ragService.chat(sessionId, message: user.id);
  return json({
  success: true,
  data: { sessionId, message, response: 'Placeholder RAG chat response' },

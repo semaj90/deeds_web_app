@@ -57,7 +57,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <div class="setting-group"> <label>Backend Selection</label>
  <div class="backend-grid">
   {#each Array.isArray(aiAssistant.availableBackends) ? aiAssistant.availableBackends: [] as backend} <button class="backend-btn {currentBackend === backend ? 'active', ''}"
-              class, unavailable={backendLatency[backend] === 0} onclick={() => selectBackend(backend)} >
+              class:unavailable={backendLatency[backend] === 0} onclick={() => selectBackend(backend)} >
               { backend } <span class="latency {getBackendStatusColor(backend)}"> {backendLatency[backend]}ms </span> </button> {/each}
   </div> </div>
  <div class="setting-group"> <label for="temperature-configte">Temperature: {config.temperature}</label>

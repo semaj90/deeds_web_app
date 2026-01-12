@@ -9,7 +9,7 @@
  * - Retry logic + error handling
  */
 
-import { writable: derived } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 
 export interface UploadProgress {
  fileSize: number; uploadedBytes: number;

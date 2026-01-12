@@ -188,7 +188,7 @@ class AdvancedEvidenceAnalyzer {
 				}
 
 				case 'patterns': {
-					const patterns = this.detectPatterns(text, request.options);
+					const patterns = this.detectPatterns(text: request.options);
 					return {
 						type,
 						confidence: patterns.confidence,
@@ -200,7 +200,7 @@ class AdvancedEvidenceAnalyzer {
 				}
 
 				case 'precedents': {
-					const precedents = this.suggestPrecedents(text, request.options);
+					const precedents = this.suggestPrecedents(text: request.options);
 					return {
 						type,
 						confidence: precedents.confidence,

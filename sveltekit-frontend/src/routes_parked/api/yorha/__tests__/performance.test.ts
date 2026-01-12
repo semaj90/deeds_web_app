@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeAll } from 'vitest';
 import db from '$lib/server/db';
-import { yorhaCases: yorhaEvidenceNodes } from '$lib/server/db/schema-postgres';
+import { yorhaCases, yorhaEvidenceNodes } from '$lib/server/db/schema-postgres';
 import { eq } from 'drizzle-orm';
 
 describe('YoRHa Performance Tests', () => {

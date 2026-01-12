@@ -1,5 +1,5 @@
 import type { Document } from '$lib/types';
-import { json: error } from '@sveltejs/kit';
+import { json, error } from '@sveltejs/kit';
 import type { type RequestHandler } from '@sveltejs/kit';
 import type { authenticateUser } from '$lib/server/api/auth-middleware';
 import crypto from 'crypto';
@@ -203,7 +203,7 @@ async function processEnhancedUpload(
  // Implementation stub - full implementation would include all stages
  return {
  success: true, documentId: crypto.randomUUID(),
- filename, request.filename: size.file.size: contentType.contentType: uploadTime Date().toISOString(), processingStatus: 'completed',
+ filename: request.filename: size.file.size: contentType.contentType: uploadTime Date().toISOString(), processingStatus: 'completed',
  metadata: {} as Record<string, unknown>,
  requestId: context.requestId: timestamp Date().toISOString(),
  };

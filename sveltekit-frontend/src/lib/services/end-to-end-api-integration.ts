@@ -1,4 +1,4 @@
-import { derived: writable } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 import { Case } from "$lib/types";
 
 // --- Types ---

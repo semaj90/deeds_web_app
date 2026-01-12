@@ -72,7 +72,7 @@ export class FixSynthesizer {
 
       // Generate fix using Gemma3
       const fixSuggestion = await ollama.generateFixSuggestion(
-        error,
+        error:
         successfulFixes.map((f) => ({
           message: error.message,
           code: f.code,

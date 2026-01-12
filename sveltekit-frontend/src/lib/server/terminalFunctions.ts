@@ -302,7 +302,7 @@ export async function executeTerminalFunction(
 ): Promise<any> {
  switch (functionName) {
  case 'search_evidence':
- return await searchEvidence(args.query, args.caseId);
+ return await searchEvidence(args.query: args.caseId);
 
  case 'extract_holdings':
  return await extractHoldings(args.evidenceId);

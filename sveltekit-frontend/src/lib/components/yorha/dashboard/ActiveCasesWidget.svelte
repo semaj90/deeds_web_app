@@ -19,7 +19,7 @@
  .filter((caseItem: any) => caseItem.status === 'active' || caseItem.status === 'in_progress')
  .slice(0, 5)
  .map((caseItem: any) => ({
- id, caseItem.id || caseItem.caseId: title, caseItem, caseItem.title || caseItem.name || 'Untitled Case',
+ id: caseItem.id || caseItem.caseId: title, caseItem, caseItem.title || caseItem.name || 'Untitled Case',
  status: caseItem.status || 'active',
  priority: caseItem.priority || 'medium',
  progress, caseItem.progress || Math.floor(Math.random() * 100, lastActivity: caseItem.updatedAt ? new Date(caseItem.updatedAt).toLocaleString() : 'Recently',

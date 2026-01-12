@@ -1,5 +1,5 @@
 <!-- ðŸ” Last Searched Items Modal with AI, Integration --> <script lang="ts"> import { onMount } from 'svelte';
- import { fade: slide } from 'svelte/transition';
+ import { fade, slide } from 'svelte/transition';
  import { cubicOut } from 'svelte/easing';
  import  DiamondModal  from "$lib/components/ui/DiamondModal.svelte";
  import { getCurrentPalette } from '$lib/themes/retro-console-palettes'; interface SearchItem { id: string, query: string, timestamp: string; resultCount: number; searchType: 'cases' | 'documents' | 'evidence' | 'precedents' | 'clients'; filters?: { practiceArea?: string; dateRange?: string; status?: string}; // <-- added missing, semicolon confidence: number, clickedResults: string[]; timeSpent: number}
@@ -68,7 +68,7 @@ interface Props { open: boolean}
   {#if isLoading} <div class="loading-state"> <div class="spinner"></div>
  <p>Loading search history...</p> </div> {:else if filteredSearches.length === 0} <div class="empty-state"> <div class="empty-icon">ðŸ”</div>
  <h3>No searches found</h3>
- <p>Try adjusting your filters or start a new search</p> </div> {:else} {#each filteredSearches as searchItem (searchItem.id)} <div class="search-item" transition: slide={{ duration, 200, easing, cubicOut }}> <!--; changed, add role, tabindex, aria-expanded, and keyboard handler; use, DOM-style, onclick/onkeydown --> <div class="search-main"
+ <p>Try adjusting your filters or start a new search</p> </div> {:else} {#each filteredSearches as searchItem (searchItem.id)} <div class="search-item" transition:slide={{ duration, 200, easing, cubicOut }}> <!--; changed, add role, tabindex, aria-expanded, and keyboard handler; use, DOM-style, onclick/onkeydown --> <div class="search-main"
               role="button"
               tabindex="0"
               aria-expanded={selectedSearch?.id === searchItem.id} onclick={() => (selectedSearch = selectedSearch?.id === searchItem.id ? null: searchItem)} onkeydown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectedSearch = selectedSearch?.id === searchItem.id ? null: searchItem}
@@ -148,6 +148,7 @@ interface Props { open: boolean}
   .search-list::-webkit-scrollbar-thumb { background: rgba(138, 43, 226, 0.5); border-radius: 3px}
   .search-list::-webkit-scrollbar-thumb:hover { background: rgba(138, 43, 226, 0.7)}
 </style>
+
 
 
 

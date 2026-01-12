@@ -1,4 +1,4 @@
-import { error: redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types.js';
 import db from '$lib/server/db';
 import { yorhaCases } from '$lib/server/db/schema-postgres';

@@ -38,7 +38,7 @@
 
 <div class="legal-ai-layout">
  <!-- Sidebar -->
- <aside class="sidebar" class, open={sidebarOpen}>
+ <aside class="sidebar" class:open={sidebarOpen}>
  <div class="sidebar-header">
  <div class="logo">
  <span class="logo-icon">⚖️</span>
@@ -58,7 +58,7 @@
  <a
  href={item.href}
  class="nav-item"
- class, active={$page.url.pathname.startsWith(item.href)}
+ class:active={$page.url.pathname.startsWith(item.href)}
  >
  <span class="nav-icon">{item.icon}</span>
  <span class="nav-label">{item.label}</span>
@@ -68,7 +68,7 @@
 
  <div class="sidebar-footer">
  <div class="system-strip">
- <div class="status-indicator" class, online={systemStatus.online}></div>
+ <div class="status-indicator" class:online={systemStatus.online}></div>
  <span class="status-text">
  {systemStatus.online ? 'Online' : 'Offline'}
  </span>

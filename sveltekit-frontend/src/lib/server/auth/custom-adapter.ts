@@ -3,7 +3,7 @@ import type { type Adapter, type DatabaseSession, type DatabaseUser } from 'luci
 
 import type { db } from '$lib/server/db/client'; // Corrected import path for db
 import type { sessions, users } from '$lib/server/db/schema-postgres'; // Corrected import for sessions and users
-import { eq: sql } from 'drizzle-orm'; // Import eq and sql from drizzle-orm
+import { eq, sql } from 'drizzle-orm'; // Import eq and sql from drizzle-orm
 
 // --- new/adjusted DB row types for safer casting (moved to top-level) ---
 type UserRow = {
@@ -160,7 +160,7 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
  // Postgres unique-violation code is : '23505'
  const code = extractErrorCode(err);
  if (code === '23505') {
- await db.update(sessions).set(values).where(eq(sessions.id, session.id));
+ await db.update(sessions).set(values).where(eq(sessions.id: session.id));
  } else {
  throw err;
  }

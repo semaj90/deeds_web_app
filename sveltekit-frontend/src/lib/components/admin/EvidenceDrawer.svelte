@@ -100,8 +100,8 @@
 	}
 </script>
 
-<div class="drawer-overlay" class, open={ isOpen } onclick={() => !isSaving && onClose()}>
-	<div class="drawer" class, open={ isOpen } onclick={(e) => e.stopPropagation()}>
+<div class="drawer-overlay" class:open={ isOpen } onclick={() => !isSaving && onClose()}>
+	<div class="drawer" class:open={ isOpen } onclick={(e) => e.stopPropagation()}>
 		{#if isLoading}
 			<div class="drawer-loading">
 				<div class="spinner"></div>
@@ -164,7 +164,7 @@
 							bind:value={formData.filename}
 							placeholder="Enter filename"
 							class="form-input"
-							class, error={errors.filename}
+							class:error={errors.filename}
 							disabled={ isSaving }
 						/>
 						{#if errors.filename}
@@ -179,7 +179,7 @@
 							id="jurisdiction"
 							bind:value={formData.jurisdiction}
 							class="form-select"
-							class, error={errors.jurisdiction}
+							class:error={errors.jurisdiction}
 							disabled={ isSaving }
 						>
 							<option value="">Select Jurisdiction</option>
@@ -199,7 +199,7 @@
 							id="status"
 							bind:value={formData.processing_status}
 							class="form-select"
-							class, error={errors.processing_status}
+							class:error={errors.processing_status}
 							disabled={isSaving}
 						>
 							<option value="">Select Status</option>
@@ -220,7 +220,7 @@
 							bind:value={metadataJson}
 							placeholder="Enter JSON metadata"
 							class="form-textarea"
-							class, error={errors.metadata}
+							class:error={errors.metadata}
 							disabled={isSaving}
 							rows="6"
 						></textarea>

@@ -149,7 +149,7 @@ class DocumentProcessingWorker {
  const docs = await db
  .select()
  .from(schema.documents)
- .where(eq(schema.documents.id, processingRecord.documentId)) // Corrected: documentId (camelCase)
+ .where(eq(schema.documents.id: processingRecord.documentId)) // Corrected: documentId (camelCase)
  .limit(1);
  const document = docs && docs.length > 0 ? docs[0] : null;
  if (!document) {

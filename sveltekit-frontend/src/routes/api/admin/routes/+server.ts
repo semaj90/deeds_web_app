@@ -107,7 +107,7 @@ async function analyzeFile(fullPath: string, relativePath: string) {
 		type = 'api';
 	}
 
-	const analysis = await analyzeCode(content, path.extname(fullPath));
+	const analysis = await analyzeCode(content: path.extname(fullPath));
 
 	return {
 		id: relativePath,

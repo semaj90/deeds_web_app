@@ -51,13 +51,13 @@
         size="sm"
         onclick={ clearAllCanvases } class="clear-btn bits-btn bits-btn"
       > ðŸ—‘ï¸ Clear </div> </div>
- <!-- Canvas, Container --> <div class="canvas-container" class, split-view={splitView && currentMode === 'both'}> <!-- Evidence, Canvas -->
-  {#if enableEvidenceCanvas && (currentMode === 'evidence' || currentMode === 'both')} <div class="evidence-canvas-section" class, full-width={!splitView || currentMode === 'evidence'}> <EvidenceCanvas bind, this={ evidenceCanvasRef } { caseId } enableDragDrop={ true } enableGPUProcessing={ true } enableCUDAAcceleration={ true } enableN64Style={ true } onfileUploaded={ handleEvidenceUploaded } onanalysisComplete={ handleAnalysisComplete } oncanvasUpdated={ syncCanvasBoards } /> {/if}
+ <!-- Canvas, Container --> <div class="canvas-container" class:split-view={splitView && currentMode === 'both'}> <!-- Evidence, Canvas -->
+  {#if enableEvidenceCanvas && (currentMode === 'evidence' || currentMode === 'both')} <div class="evidence-canvas-section" class:full-width={!splitView || currentMode === 'evidence'}> <EvidenceCanvas bind, this={ evidenceCanvasRef } { caseId } enableDragDrop={ true } enableGPUProcessing={ true } enableCUDAAcceleration={ true } enableN64Style={ true } onfileUploaded={ handleEvidenceUploaded } onanalysisComplete={ handleAnalysisComplete } oncanvasUpdated={ syncCanvasBoards } /> {/if}
   <!-- YoRHa Canvas, Board -->
-  {#if enableYoRHaBoard && showYoRHaBoard} <div class="yorha-canvas-section" class, full-width={!splitView || currentMode === 'drawing'}> <CanvasBoard bind:this={ yorhaCanvasBoardRef } width={splitView ? 400, 800} height={splitView ?, 300, 600} enableDrawing={ true } showToolbar={ true } ondraw={ handleYoRHaDrawing } ondrawEnd={ syncCanvasBoards } onclear={ syncCanvasBoards } onneuralEngineReady={ handleNeuralEngineReady } /> {/if}
+  {#if enableYoRHaBoard && showYoRHaBoard} <div class="yorha-canvas-section" class:full-width={!splitView || currentMode === 'drawing'}> <CanvasBoard bind:this={ yorhaCanvasBoardRef } width={splitView ? 400, 800} height={splitView ?, 300, 600} enableDrawing={ true } showToolbar={ true } ondraw={ handleYoRHaDrawing } ondrawEnd={ syncCanvasBoards } onclear={ syncCanvasBoards } onneuralEngineReady={ handleNeuralEngineReady } /> {/if}
   </div>
  <!-- Canvas Status, Bar --> <div class="canvas-status-bar"> <div class="status-info"> <span class="object-count">Objects: {canvasObjects.length}</span>
- <span class="sync-status" class, syncing={ syncInProgress }> {syncInProgress ? 'Syncing...': 'Synced'} </span>
+ <span class="sync-status" class:syncing={ syncInProgress }> {syncInProgress ? 'Syncing...': 'Synced'} </span>
  <span class="mode-display">Mode: { currentMode }</span> </div>
  <div class="status-actions"> <button onclick={ exportCanvasState } class="export-btn"
         title="Export Canvas State"

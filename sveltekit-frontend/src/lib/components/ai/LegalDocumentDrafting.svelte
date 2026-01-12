@@ -72,7 +72,7 @@ import type { Document } from '$lib/types'; // Note: removed unused onMount and 
  <div class="drafting-layout"> <!-- Sidebar --> <aside class="drafting-sidebar">
   {#if !currentDocument} <!-- Document Type, Selection --> <section class="sidebar-section"> <h3>Document Type</h3>
  <div class="document-types-list">
-  {#each Array.isArray(documentTypes) ? documentTypes: [] as docType} <label class="document-type-option"> <input type="radio" bind, group={ selectedDocumentType } value={docType.id} class="sr-only" /> <!-- Fixed class name to match, CSS (.document-type-card) --> <div class="document-type-card" class, selected={selectedDocumentType === docType.id}> <div class="type-header"> <span class="type-icon">{getDocumentTypeIcon(docType.category)}</span>
+  {#each Array.isArray(documentTypes) ? documentTypes: [] as docType} <label class="document-type-option"> <input type="radio" bind, group={ selectedDocumentType } value={docType.id} class="sr-only" /> <!-- Fixed class name to match, CSS (.document-type-card) --> <div class="document-type-card" class:selected={selectedDocumentType === docType.id}> <div class="type-header"> <span class="type-icon">{getDocumentTypeIcon(docType.category)}</span>
  <div> <h4>{docType.name}</h4>
  <!-- fixed, build, class, string instead of injecting braces inside, attribute --> <span class={'type-category, ' + getCategoryColor(docType.category)}> {docType.category} </span> </div> </div>
  <p class="type-description">{docType.description}</p>

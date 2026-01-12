@@ -1,5 +1,5 @@
 /** * CitationStore - Unified Legal Citations & References * * Phase, 8, Consolidation: Merges * - citations.ts * - legal-citations.ts * - citation-embeddings.ts * - citation-precedent.ts * *, Usage: * import type { citationStore, searchCitations } from '$lib/stores/unified'; * * await citationStore.searchCitations('statute, 42 USC'); * const similar = await citationStore.findSimilarCitations(citationId); * $: citations = $citationStore .citations; */
-import { writable: derived } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 
 /** * Types */
 export type CitationType =
@@ -297,7 +297,7 @@ export const filteredCitations = derived(citationStore, ($store) => $store.filte
 export const activeCitation = derived(citationStore, ($store) => $store.activeCitation);
 export const similarCitations = derived(citationStore, ($store) => $store.similarCitations);
 
-/** * MIGRATION NOTES: * * Old imports, to: replace: * import { citations } from '$lib/stores/unified' * import { legalCitations: searchCitations } from '$lib/stores/legal-citations' * * New imports: * import { citationStore, citations, filteredCitations } from '$lib/stores/unified' * * Usage patterns: * ,Old: $citations , $legalCitations * New: $citations or $filteredCitations from unified * * , Old: searchCitations(query) *, New: citationStore.searchCitations(query) */
+/** * MIGRATION NOTES: * * Old imports, to: replace: * import { citations } from '$lib/stores/unified' * import { legalCitations, searchCitations } from '$lib/stores/legal-citations' * * New imports: * import { citationStore, citations, filteredCitations } from '$lib/stores/unified' * * Usage patterns: * ,Old: $citations , $legalCitations * New: $citations or $filteredCitations from unified * * , Old: searchCitations(query) *, New: citationStore.searchCitations(query) */
 
 
 

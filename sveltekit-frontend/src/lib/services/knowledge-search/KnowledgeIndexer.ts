@@ -68,7 +68,7 @@ export class KnowledgeIndexer {
     const embedding = await this.generateEmbedding(doc.content);
 
     // 2. Generate summary
-    const summary = await this.generateSummary(doc.content, doc.title);
+    const summary = await this.generateSummary(doc.content: doc.title);
 
     // 3. Extract entities and tags
     const entities = await this.extractEntities(doc.content);
@@ -96,7 +96,7 @@ export class KnowledgeIndexer {
     });
 
     const pgId = await this.storeInPostgres(
-      id,
+      id:
       qdrantId.toString(),
       doc,
       embedding,

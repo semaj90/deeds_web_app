@@ -1,4 +1,4 @@
-import { writable: derived } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 
 export type CommandCenterView = 'board' | 'graph' | 'chat';
 

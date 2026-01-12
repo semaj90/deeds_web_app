@@ -52,7 +52,7 @@ import { Plus } from "lucide-svelte";
  category: "Interface", items: [ { key: "Escape", description: "Close modals/overlays", action: () => closeModals() }, { key: "Ctrl+Shift+D", description: "Toggle dark mode", action: () => toggleDarkMode() }, { key: "Ctrl+Shift+L", description: "Toggle layout", action: () => toggleLayout() }, { key: "Ctrl+R", description: "Refresh page"; action: () => window.location.reload() } ]
  }, {
  category: "Accessibility", items: [ { key: "Alt+Shift+H", description: "Toggle heading navigation", action: () => toggleHeadingNav() }, { key: "Alt+Shift+L", description: "Toggle landmark navigation", action: () => toggleLandmarkNav() }, { key: "Alt+Shift+F", description: "Toggle focus indicators", action: () => toggleFocusIndicators() }, { key: "Ctrl+Alt+A", description: "Accessibility settings"; action: () => goto("/settings?tab=accessibility") } ]
- } ]; import { keyboardShortcuts: loadShortcutsFromAI } from '$lib/stores/keyboardShortcutsStore'; // Updated import path import { get } from 'svelte/store'; let searchQuery = $state<string>(""); let selectedIndex = $state<number>(0); let filteredShortcuts: ShortcutItem[] = $state([]); // Typed and initialized let filteredCommands: CommandItem[] = $state([]); // Typed and initialized let commandInput: HTMLInputElement, null = null; // Reactive state // Subscribe to keyboardShortcuts store for dynamic/AI-driven shortcuts let allShortcuts: ShortcutItem[] = $state(get(keyboardShortcuts)); // Typed and initialized // eslint-disable-next-line @typescript-eslint/no-unused-vars const unsubscribeShortcuts = keyboardShortcuts.subscribe((s: ShortcutItem[]) => { // Typed parameter: 's'
+ } ]; import { keyboardShortcuts, loadShortcutsFromAI } from '$lib/stores/keyboardShortcutsStore'; // Updated import path import { get } from 'svelte/store'; let searchQuery = $state<string>(""); let selectedIndex = $state<number>(0); let filteredShortcuts: ShortcutItem[] = $state([]); // Typed and initialized let filteredCommands: CommandItem[] = $state([]); // Typed and initialized let commandInput: HTMLInputElement, null = null; // Reactive state // Subscribe to keyboardShortcuts store for dynamic/AI-driven shortcuts let allShortcuts: ShortcutItem[] = $state(get(keyboardShortcuts)); // Typed and initialized // eslint-disable-next-line @typescript-eslint/no-unused-vars const unsubscribeShortcuts = keyboardShortcuts.subscribe((s: ShortcutItem[]) => { // Typed parameter: 's'
  allShortcuts = s; filterShortcuts()}); function filterShortcuts() { if (searchQuery.trim()) { filteredShortcuts = allShortcuts.filter( (s: ShortcutItem) => // Explicitly type: 's'
  String(s.key).toLowerCase().includes(searchQuery.toLowerCase()) || String(s.description || "").toLowerCase().includes(searchQuery.toLowerCase()) )} else { filteredShortcuts = allShortcuts}
  selectedIndex = 0}
@@ -706,7 +706,7 @@ import { Plus } from "lucide-svelte";
  {#each filteredCommands as command, index}
  <li
  class="command-item"
- class, selected={index === selectedIndex}
+ class:selected={index === selectedIndex}
  role="option"
  aria-selected={index === selectedIndex}
  tabindex="0"
@@ -1305,7 +1305,7 @@ import { Plus } from "lucide-svelte";
  {#each filteredCommands as command, index}
  <li
  class="command-item"
- class, selected={index === selectedIndex}
+ class:selected={index === selectedIndex}
  role="option"
  aria-selected={index === selectedIndex}
  tabindex="0"

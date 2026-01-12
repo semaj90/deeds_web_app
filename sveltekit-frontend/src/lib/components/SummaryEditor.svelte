@@ -157,7 +157,7 @@
  {#each versions as version}
  <button
  class="version-item"
- class, active={version.version === selectedVersion}
+ class:active={version.version === selectedVersion}
  onclick={() => loadVersion(version.version)}
  >
  <span class="version-number">v{version.version}</span>

@@ -284,10 +284,10 @@ https, //svelte.dev/e/js_parse_error -->
   {:else}
     <!-- Tab Navigation -->
     <div class="space-y-4">
-      <button class, active={activeTab === 'editor'} onclick={() => (activeTab = 'editor')}>
+      <button class:active={activeTab === 'editor'} onclick={() => (activeTab = 'editor')}>
         📄 Report Editor
       </button>
-      <button class, active={activeTab === 'canvas'} onclick={() => (activeTab = 'canvas')}>
+      <button class:active={activeTab === 'canvas'} onclick={() => (activeTab = 'canvas')}>
         🎨 Interactive Canvas
       </button>
     </div>

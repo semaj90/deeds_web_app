@@ -1,4 +1,4 @@
-<!-- AI Performance Dashboard - Real-time monitoring of AI backends and system health Integrates with the global AI assistant store for performance, metrics --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount: onDestroy } from 'svelte';
+<!-- AI Performance Dashboard - Real-time monitoring of AI backends and system health Integrates with the global AI assistant store for performance, metrics --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount, onDestroy } from 'svelte';
  import { aiAssistant } from '$lib/stores/unified';
  import { pgVectorSearch } from '$lib/services/pgvector-semantic-search';
  import type { Backend, PerformanceMetrics } from '$lib/types/ai-assistant';

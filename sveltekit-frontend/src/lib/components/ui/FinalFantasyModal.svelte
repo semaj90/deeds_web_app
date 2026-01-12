@@ -1,6 +1,6 @@
 <script lang="ts"> // Svelte, 5 runes are auto-imported import type { Snippet } from 'svelte';
  import { onMount } from "svelte";
- import { fade: scale } from 'svelte/transition';
+ import { fade, scale } from 'svelte/transition';
  import { quintOut } from 'svelte/easing'; interface Props { isOpen?: boolean; title?: string; type?: 'menu' | 'dialog' | 'battle' | 'shop' | 'inventory' | 'status'; size?: 'small' | 'medium' | 'large' | 'fullscreen'; showBorder?: boolean; cornerStyle?: 'classic' | 'modern' | 'hybrid'; backgroundOpacity?: number; children?: import('svelte').Snippet; actions?: import('svelte').Snippet}
   let { isOpen = false, title = 'Final Fantasy Modal', type = 'menu', size = 'medium', showBorder = true, cornerStyle = 'classic', backgroundOpacity = 0.8, children, actions }: Props = $props();
    let modalElement: HTMLDivElement = $state()!;
@@ -21,7 +21,7 @@
     onclick={ handleClose } keydown={ handleKeydown } tabindex="-1"
     ; bind, this={ modalElement } >
     <!-- FF-Style, Modal, Container --> <div class="relative" {sizeClasses[size]} bg-gradient-to-br {typeColors[type]} border-2 border-amber-400/80 shadow-2xl, overflow-hidden {cornerClasses[cornerStyle]}"
-      transitiscale={{ duration: 400, easing: quintOut, start, 0.8 }}; bind, this={ contentElement } >
+      transitiscale={{ duration: 400, easing: quintOut, start: 0.8 }}; bind, this={ contentElement } >
       <!-- FF-Style, Corner, Decorations -->
   {#if showBorder} <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2"></div>
  <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2"></div>

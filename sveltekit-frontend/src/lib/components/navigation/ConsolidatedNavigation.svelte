@@ -34,7 +34,7 @@ https, //svelte.dev/e/js_parse_error -->
  };
 let currentGroup = $state(findRouteGroup($page.url.pathname));
 </script>
-<nav class="consolidated-navigation" class, expanded={isExpanded}>
+<nav class="consolidated-navigation" class:expanded={isExpanded}>
  <div class="nav-header">
  <button type="button" onclick={() => (isExpanded = !isExpanded)} class="nav-toggle" aria-label="Toggle Navigation">
  <span class="nav-icon">{isExpanded ? '✖' : '☰'}</span>
@@ -64,7 +64,7 @@ let currentGroup = $state(findRouteGroup($page.url.pathname));
  <a
  href={route.route}
  class="route-link"
- class:active={$page.url.pathname === route.route}; class, beta={route.status === 'beta'}
+ class:active={$page.url.pathname === route.route}; class:beta={route.status === 'beta'}
  >
  <span class="route-icon">{route.icon}</span>
  <span class="route-label">{route.label}</span>

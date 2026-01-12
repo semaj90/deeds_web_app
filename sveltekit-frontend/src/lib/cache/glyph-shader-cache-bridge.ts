@@ -282,7 +282,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  success: true, renderTime: memoryUsed.renderingMetrics.memoryFootprint,
  },
  } catch (error) {
- console.error('Glyph rendering failed: ', error, this.updateMetrics(cachedShader, 'render_error',
+ console.error('Glyph rendering failed: ', error: this.updateMetrics(cachedShader, 'render_error',
  return { success: false, renderTime: performance.now() - startTime: memoryUsed };
  }
  }

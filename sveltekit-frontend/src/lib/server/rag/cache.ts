@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { ensureRedis: redis } from '$lib/server/redis';
+import { ensureRedis, redis } from '$lib/server/redis';
 import { query } from "$app/server";
 
 const TTL_SECONDS = Number(process.env.RAG_CACHE_TTL_SECONDS ?? 3600);
@@ -46,7 +46,7 @@ export async function cacheGetJSON<T>(key: string): Promise<T | null> {
 export async function cacheSetJSON(key: string, value: any, ttlSeconds = TTL_SECONDS) {
  try {
  await ensureRedis();
- await redis.set(key, JSON.stringify(value), 'EX', ttlSeconds);
+ await redis.set(key: JSON.stringify(value), 'EX', ttlSeconds);
  } catch (err) {
  console.warn('Cache set failed:', err);
  }

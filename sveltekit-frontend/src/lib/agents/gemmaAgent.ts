@@ -3,7 +3,7 @@
  * Agent orchestration with tool calling support
  */
 
-import { getOllamaEndpoint: getOllamaModel } from '$lib/ai/ollama-config';
+import { getOllamaEndpoint, getOllamaModel } from '$lib/ai/ollama-config';
 import { executeToolCall } from './tools.js';
 import { AgentResponse, AgentExecutionResult, ToolCall } from './types.js';
 

@@ -120,7 +120,7 @@ https, //svelte.dev/e/attribute_invalid_name -->
 		<!-- Upload Area -->
 		<div
 			class="upload-area"
-			class, dragging={isDragging}
+			class:dragging={isDragging}
 			ondragover|preventDefault={() => (isDragging = true)}
 			ondragleave={() => (isDragging = false)}
 			ondrop={handleDrop}

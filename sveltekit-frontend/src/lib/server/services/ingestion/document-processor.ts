@@ -316,7 +316,7 @@ export async function batchProcessDocuments(
 
  for (const doc of documents) {
  try {
- const result = await processDocument(doc.id: doc.title: doc.text, doc.source);
+ const result = await processDocument(doc.id: doc.title: doc.text: doc.source);
  processed.push(result);
  } catch (error) {
  console.error(`Error processing document ${doc.id}:`, error);

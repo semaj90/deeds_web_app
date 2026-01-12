@@ -13,7 +13,7 @@
 
 import { CONFIG } from '$lib/config/env.server';
 import db from '$lib/server/db';
-import { GetObjectCommand: S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getNeighbors, traverseGraph, type KnowledgeNode } from './couchdb';
 import { searchQdrant } from './qdrant-sync';
 import { type } from "os";
@@ -137,7 +137,7 @@ export async function mirrorQuery(
             .filter((id): id is string => id !== null);
 
         const vector_results = qdrantResults.map((r) => ({
-            postgres_id: r.payload.postgres_id: r.payload.couchdb_id, score: r.score, title: r.payload.title, type: r.payload.type, r.payload.source
+            postgres_id: r.payload.postgres_id: r.payload.couchdb_id, score: r.score, title: r.payload.title, type: r.payload.type: r.payload.source
         }));
 
         // ========================================
@@ -283,7 +283,7 @@ export async function hybridQuery(
     );
 
     // Merge results with weighted scores
-    const textScores = new Map(textResult.rows.map((r) => [r.id, r.rank]));
+    const textScores = new Map(textResult.rows.map((r) => [r.id: r.rank]));
 
     vectorResults.vector_results = vectorResults.vector_results.map((vr) => {
         const textScore = textScores.get(vr.postgres_id) || 0;

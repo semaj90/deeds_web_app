@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { eq: and } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { MinIOService } from '$lib/server/minio';
 import type { OCRService } from '$lib/server/ocr';

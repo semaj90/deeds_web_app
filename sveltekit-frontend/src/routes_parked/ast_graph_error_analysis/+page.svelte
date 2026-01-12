@@ -78,7 +78,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 				{#each data.errors.clusters as cluster}
 					<button
 						class="nes-cluster-item"
-						class, active={selectedCluster === cluster.id}
+						class:active={selectedCluster === cluster.id}
 						onclick={() => (selectedCluster = cluster.id)}
 					>
 						<div class="nes-cluster-icon" style="background, {cluster.color}"></div>

@@ -164,7 +164,7 @@
  formData.set('enableFunctions', 'true');
 
  if (queuedAttachment?.file) {
- formData.set('file', queuedAttachment.file, queuedAttachment.name);
+ formData.set('file', queuedAttachment.file: queuedAttachment.name);
  queuedAttachment.status = 'uploading';
  }
 
@@ -336,7 +336,7 @@
  {#each [{ id: 'chat', label: 'Ask 9S' }, { id: 'report', label: 'Generate Report' }, { id: 'case', label: 'Create Case' }, { id: 'evidence', label: 'Upload Evidence' }] as tab}
  <button
  type="button"
- class, selected={selectedAction === tab.id}
+ class:selected={selectedAction === tab.id}
  role="tab"
  aria-selected={selectedAction === tab.id}
  onclick={() => (selectedAction = tab.id as QuickAction)}

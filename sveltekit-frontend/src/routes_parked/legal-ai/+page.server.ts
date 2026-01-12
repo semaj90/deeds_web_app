@@ -2,7 +2,7 @@
 
 import type { PageServerLoad } from './$types.js';
 import db from '$lib/server/db/index.js';
-import { legalDocuments: ragSessions } from '$lib/server/db/schema-postgres.js';
+import { legalDocuments, ragSessions } from '$lib/server/db/schema-postgres.js';
 import { desc, eq, sql } from 'drizzle-orm';
 import { langExtractService } from '$lib/services/langextract-ollama-service.js';
 

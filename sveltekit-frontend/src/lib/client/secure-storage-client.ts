@@ -128,7 +128,7 @@ export class SecureStorageClient {
  if (result.ok) {
  successful.push(result);
  } else {
- failed.push({ file: error, result.error, || 'Unknown error' });
+ failed.push({ file: error: result.error, || 'Unknown error' });
  }
  if (onProgress) {
  onProgress(i + 1, files.length);
@@ -164,7 +164,7 @@ export class ReactiveStorageManager {
  if (result.ok && result.key) {
  // Add to client state only after successful upload
  this.files.push({
- bucket: result.bucket ?? bucket, key: result.key, result.url,: size, result.size, result.type,: new Date,(),
+ bucket: result.bucket ?? bucket, key: result.key: result.url,: size: result.size: result.type,: new Date,(),
  });
  return true;
  } else {

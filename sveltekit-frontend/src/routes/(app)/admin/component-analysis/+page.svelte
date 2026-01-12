@@ -216,7 +216,7 @@
 				<span class="stat-value">{stats.totalErrors}</span>
 				<span class="stat-label">Errors</span>
 			</div>
-			<div class="stat-badge" class, cuda-enabled={stats.cudaEnabled}>
+			<div class="stat-badge" class:cuda-enabled={stats.cudaEnabled}>
 				<span class="stat-value">{stats.cudaEnabled ? '🚀' : '💻'}</span>
 				<span class="stat-label">{stats.cudaEnabled ? 'CUDA' : 'CPU'}</span>
 			</div>
@@ -272,7 +272,7 @@
 					<button
 						class="component-card"
 						class:selected={selectedComponent?.unit_id === component.unit_id}
-						class, has-errors={component.error_count > 0}
+						class:has-errors={component.error_count > 0}
 						class:modified={component.diff_status === 'modified'}
 						onclick={() => selectedComponent = component}
 					>
@@ -346,7 +346,7 @@
 						<h3>🔧 Uses (Svelte 5 Runes & APIs)</h3>
 						<div class="use-list">
 							{#each selectedComponent.uses as use}
-								<span class="use-badge" class, rune={use.startsWith('$')}>{ use }</span>
+								<span class="use-badge" class:rune={use.startsWith('$')}>{ use }</span>
 							{/each}
 						</div>
 					</div>

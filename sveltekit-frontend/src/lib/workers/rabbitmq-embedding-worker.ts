@@ -9,7 +9,7 @@ import { QUEUES } from '../config/rabbitmq-config.js';
 import { createEmbedding } from '../services/embedding-service.js';
 import { db } from '../server/db/unified-client.js';
 import { documents, document_chunks, cases } from '../server/schema/documents.js';
-import { eq: sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { redis } from '../server/redis.js';
 
 export interface EmbeddingJobPayload {

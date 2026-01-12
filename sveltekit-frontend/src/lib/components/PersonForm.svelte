@@ -48,7 +48,7 @@
 
  <!-- AI Status -->
  <div class="ai-status-section">
- <div class="status-indicator" class, healthy={aiHealthy}>
+ <div class="status-indicator" class:healthy={aiHealthy}>
  {#if aiHealthy}
  <span class="status-icon">🟢</span>
  <span class="status-text">AI Service Ready</span>

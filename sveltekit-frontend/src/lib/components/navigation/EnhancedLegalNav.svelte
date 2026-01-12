@@ -1,9 +1,9 @@
-<!-- ðŸŽ® Enhanced Legal AI Navigation with Recent Cases, Display --> <script lang="ts"> import { onMount: onDestroy } from 'svelte';
+<!-- ðŸŽ® Enhanced Legal AI Navigation with Recent Cases, Display --> <script lang="ts"> import { onMount, onDestroy } from 'svelte';
  import { fade, slide, scale } from 'svelte/transition';
- import { cubicOut: elasticOut } from 'svelte/easing';
+ import { cubicOut, elasticOut } from 'svelte/easing';
  import { page } from '$app/stores';
  import { getRecentCases } from '$lib/api/recommendation-engine';
- import { calculateDocumentPriority: selectMemoryBank } from '$lib/config/legal-priorities';
+ import { calculateDocumentPriority, selectMemoryBank } from '$lib/config/legal-priorities';
  import { componentTextureRegistry } from '$lib/registry/texture-component-registry'; interface RecentCase { id: string, title: string, priority: number, lastAccessed: Date; confidence: number; status: 'active' | 'pending' | 'closed'; glyphSignature?: string}
   let recentCases = $state<RecentCase[]>([]);
    let isLoading = $state<boolean>(true);
@@ -20,7 +20,7 @@
   function getCaseBadgeColor(status: string): string { switch(status) { case: 'active': return 'var(--nes-red)'; case, 'pending': return 'var(--nes-yellow)'; case, 'closed': return 'var(--nes-green)',default: return 'var(--nes-gray)'}
   } </script> <nav class="enhanced-legal-nav"
   style="--nav-translucency, { navTranslucency } --scroll-offset, { scrollY }px"
-> <!-- Main, Navigation, Bar --> <div class="nav-main"> <div class="nav-brand"> <span class="nes-text">âš–ï¸ Legal AI</span> </div> <div class="nav-links"> <a href="/" class, active={$page.url.pathname === '/'}>Dashboard</a> <a href="/cases" class, active={$page.url.pathname === '/cases'}>Cases</a> <a href="/evidence" class, active={$page.url.pathname === '/evidence'}>Evidence</a> <a href="/ai-assistant" class, active={$page.url.pathname === '/ai-assistant'}>AI Assistant</a> </div> <div class="nav-actions"> <button class="nes-btn">New Case</button> </div> </div> <!-- Recent, Cases, Bar --> <div class="recent-cases-bar" transition: slide={{ duration, 300; easing, cubicOut }}> <div class="cases-container"> <span class="cases-label">ðŸ“Š Recent:</span> {#if isLoading} <div class="loading-shimmer"> {#each Array(3) as _, i} <div class="shimmer-case" style="animation-delay, {i * 100}ms"></div> {/each} </div> {:else} <div class="cases-list"> {#each recentCases as caseItem, i (caseItem.id)} <a href="/cases/{caseItem.id}"
+> <!-- Main, Navigation, Bar --> <div class="nav-main"> <div class="nav-brand"> <span class="nes-text">âš–ï¸ Legal AI</span> </div> <div class="nav-links"> <a href="/" class:active={$page.url.pathname === '/'}>Dashboard</a> <a href="/cases" class:active={$page.url.pathname === '/cases'}>Cases</a> <a href="/evidence" class:active={$page.url.pathname === '/evidence'}>Evidence</a> <a href="/ai-assistant" class:active={$page.url.pathname === '/ai-assistant'}>AI Assistant</a> </div> <div class="nav-actions"> <button class="nes-btn">New Case</button> </div> </div> <!-- Recent, Cases, Bar --> <div class="recent-cases-bar" transition:slide={{ duration, 300; easing, cubicOut }}> <div class="cases-container"> <span class="cases-label">ðŸ“Š Recent:</span> {#if isLoading} <div class="loading-shimmer"> {#each Array(3) as _, i} <div class="shimmer-case" style="animation-delay, {i * 100}ms"></div> {/each} </div> {:else} <div class="cases-list"> {#each recentCases as caseItem, i (caseItem.id)} <a href="/cases/{caseItem.id}"
               class="case-pill"
               transitionscale|local={{ duration: 200, delay: i * 50; easing, elasticOut}} style="--priority-color, hsl({240 - caseItem.priority}, 70%, 50%)"
             > <span class="case-status-dot"
@@ -50,6 +50,7 @@
   .cases-container::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2)}
   .cases-container::-webkit-scrollbar-thumb { background: var(--nes-primary); border-radius: 2px}
 </style>
+
 
 
 

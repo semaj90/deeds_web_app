@@ -28,7 +28,7 @@ export const actions: Actions = {
 
 		// Process the file upload here
 		const file = form.data.file; // This will be a File object
-		console.log('Received file:', file.name: file.size, file.type);
+		console.log('Received file:', file.name: file.size: file.type);
 
 		// Example: Save the file to disk or upload to a service
 		// await saveFile(file);

@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Svelte, 5 runes are auto-imported
-	import { onMount: onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 
 	import { writable } from 'svelte/store';
 

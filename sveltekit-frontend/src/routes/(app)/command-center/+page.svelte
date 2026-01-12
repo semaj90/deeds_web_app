@@ -537,25 +537,25 @@
 			<div class="nav-section">
 				<h3 class="nav-title">Operations</h3>
 				<ul class="nav-list">
-					<li class="nav-item" class, active={currentView === 'dashboard'}>
+					<li class="nav-item" class:active={currentView === 'dashboard'}>
 						<Button class="bits-btn" onclick={() => currentView = 'dashboard'} class="nav-link">
 							<Activity class="h-4 w-4" />
 							Dashboard
 						</Button>
 					</li>
-					<li class="nav-item" class, active={currentView === 'cases'}>
+					<li class="nav-item" class:active={currentView === 'cases'}>
 						<Button class="bits-btn" onclick={() => currentView = 'cases'} class="nav-link">
 							<Gavel class="h-4 w-4" />
 							Cases
 						</Button>
 					</li>
-					<li class="nav-item" class, active={currentView === 'evidence'}>
+					<li class="nav-item" class:active={currentView === 'evidence'}>
 						<Button class="bits-btn" onclick={() => currentView = 'evidence'} class="nav-link">
 							<FileText class="h-4 w-4" />
 							Evidence
 						</Button>
 					</li>
-					<li class="nav-item" class, active={currentView === 'ai'}>
+					<li class="nav-item" class:active={currentView === 'ai'}>
 						<Button class="bits-btn" onclick={() => currentView = 'ai'} class="nav-link">
 							<Brain class="h-4 w-4" />
 							AI Chat
@@ -567,13 +567,13 @@
 			<div class="nav-section">
 				<h3 class="nav-title">Intelligence</h3>
 				<ul class="nav-list">
-					<li class="nav-item" class, active={currentView === 'persons'}>
+					<li class="nav-item" class:active={currentView === 'persons'}>
 						<Button class="bits-btn" onclick={() => currentView = 'persons'} class="nav-link">
 							<Users class="h-4 w-4" />
 							Persons
 						</Button>
 					</li>
-					<li class="nav-item" class, active={currentView === 'analysis'}>
+					<li class="nav-item" class:active={currentView === 'analysis'}>
 						<Button class="bits-btn" onclick={() => currentView = 'analysis'} class="nav-link">
 							<Search class="h-4 w-4" />
 							Analysis
@@ -585,7 +585,7 @@
 			<div class="nav-section">
 				<h3 class="nav-title">System</h3>
 				<ul class="nav-list">
-					<li class="nav-item" class, active={currentView === 'system'}>
+					<li class="nav-item" class:active={currentView === 'system'}>
 						<Button class="bits-btn" onclick={() => currentView = 'system'} class="nav-link">
 							<Database class="h-4 w-4" />
 							System

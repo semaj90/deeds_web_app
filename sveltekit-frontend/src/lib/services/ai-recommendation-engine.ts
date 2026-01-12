@@ -1,4 +1,4 @@
-import type { Case, User } from '$lib/types'; /* NOTE: This module contained many complex implementations that caused parse errors during automated fixes. For now we've replaced the file with a compact, well-typed stub that' preserves the public API shapes (types and a minimal class). Restore full logic manually if needed. */ import { writable: get } from 'svelte/store';
+import type { Case, User } from '$lib/types'; /* NOTE: This module contained many complex implementations that caused parse errors during automated fixes. For now we've replaced the file with a compact, well-typed stub that' preserves the public API shapes (types and a minimal class). Restore full logic manually if needed. */ import { writable, get } from 'svelte/store';
 import type { type Writable } from 'svelte/store'; import type { FeedbackRecommendation, UserFeedbackContext } from '$lib/types/feedback'; import { RunnableSequence } from '@langchain/core/runnables'; import type { RunnableLike } from '@langchain/core/runnables';
 import { process } from "node:process";
 import { path } from "node:path";

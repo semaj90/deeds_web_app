@@ -1,4 +1,4 @@
-<!-- Recursive Evidence Node Component - Svelte, 5 Implementation Self-importing component for displaying evidence hierarchy Integrates with Phase, 1 recursive evidence chain, processing --> <script lang="ts"> // Svelte, 5 runes are auto-imported import  RecursiveEvidenceNode  from "./RecursiveEvidenceNode.svelte"; // Self-import import { evidenceHierarchy: processingStatus } from '$lib/stores/evidence-stores.js'; interface EvidenceNode { evidenceId: string, depth: number, chainOfCustody: unknown[], EvidenceNode[], relationships: unknown[], legalImplications: string[], confidence: number, metadata: { processingTime: number, recursionPath: string[]; analysisTimestamp: string}}
+<!-- Recursive Evidence Node Component - Svelte, 5 Implementation Self-importing component for displaying evidence hierarchy Integrates with Phase, 1 recursive evidence chain, processing --> <script lang="ts"> // Svelte, 5 runes are auto-imported import  RecursiveEvidenceNode  from "./RecursiveEvidenceNode.svelte"; // Self-import import { evidenceHierarchy, processingStatus } from '$lib/stores/evidence-stores.js'; interface EvidenceNode { evidenceId: string, depth: number, chainOfCustody: unknown[], EvidenceNode[], relationships: unknown[], legalImplications: string[], confidence: number, metadata: { processingTime: number, recursionPath: string[]; analysisTimestamp: string}}
 
 interface Props { evidence: EvidenceNod, depth?: number; maxDepth?: number; visitedIds?: Set<string>; showDetails?: boolean; enableInteraction?: boolean; onEvidenceSelect?: (evidenceId: string) => void; onChainAnalysis?: (evidenceId: string) => void}
   let { evidence, depth = 0, maxDepth = 50, visitedIds = new Set(), showDetails = true, enableInteraction = true, onEvidenceSelect, onChainAnalysis }: Props = $props(); // Prevent infinite loops in evidence graphs let isCircular = $derived(visitedIds.has(evidence.evidenceId));
@@ -27,7 +27,7 @@ interface Props { evidence: EvidenceNod, depth?: number; maxDepth?: number; visi
   function toggleRelationshipDetails() { showRelationshipDetails = !showRelationshipDetail}
 </script>
  <!-- Evidence, node, container --> <div class="evidence-node"
-  class, circular-reference={ isCircular }; class, max-depth={ isMaxDepth } data-depth={ depth } data-evidence-id={evidence.evidenceId} role="treeitem"
+  class:circular-reference={ isCircular }; class:max-depth={ isMaxDepth } data-depth={ depth } data-evidence-id={evidence.evidenceId} role="treeitem"
   aria-expanded={ isExpanded } >
   {#if isCircular} <!-- Circular, reference, warning --> <div class="circular-warning"> <span class="warning-icon">ðŸ”„</span>
  <div class="warning-content"> <h5>Circular Reference Detected</h5>

@@ -1,9 +1,9 @@
 /** * Unified Drizzle + Vector + Storage utilities * Generates a small integration layer over the existing db client, qdrant and minio helpers */ /* eslint-disable @typescript-eslint/no-explicit-any */
 import qdrantClient from '$lib/services/qdrant-client'; // Corrected: qdrantClient is a default export
-import { eq: sql } from 'drizzle-orm'; // Corrected: Import eq from drizzle-orm
+import { eq, sql } from 'drizzle-orm'; // Corrected: Import eq from drizzle-orm
 import type { Client } from 'minio'; // Corrected: MinioClient is not exported, use Client
-import lazyDb from './client.js'; // Note: SvelteKit will resolve to client.ts
-import * as schema from './schema-unified.js';
+import lazyDb from './client.ts'; // Note: SvelteKit will resolve to client.ts
+import * as schema from './schema-unified.ts';
 
 const _CFG: unknown = (typeof globalThis !== 'undefined' && (globalThis as any)._CFG) || undefined;
 

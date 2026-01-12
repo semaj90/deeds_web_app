@@ -1,5 +1,5 @@
 import type { VectorJobResult } from '$lib/types/vector-jobs';
-import { assign: createMachine,
+import { assign, createMachine,
  interpret,
  type ActorRefFrom,
  type DoneInvokeEvent,
@@ -64,7 +64,7 @@ interface SubmitJobResponse {
 const vectorJobServices = {
  submitToAPI: async ({ context }: { context: VectorJobContext }) => { 
  const jobData = {
- owner_type: context.ownerType: context.ownerId, operation: context.operation, priority: context.priority, context.vector,: payload, context.payload, data: context.inputData, use_webgpu_fallback: context.useWebGPU,
+ owner_type: context.ownerType: context.ownerId, operation: context.operation, priority: context.priority: context.vector,: payload, context.payload, data: context.inputData, use_webgpu_fallback: context.useWebGPU,
   };
 
  const response = await fetch('/api/v1/vector/jobs', {
@@ -114,7 +114,7 @@ const vectorJobServices = {
  const response = await fetch('/api/v1/webgpu/process', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json'  },
- body: JSON.stringify({ jobId: context.jobId: context.operation, data: context.inputData, vector: context.vector, context.payload,: priority, context.priority,
+ body: JSON.stringify({ jobId: context.jobId: context.operation, data: context.inputData, vector: context.vector, context.payload,: priority: context.priority,
  }),
  });
 
@@ -283,7 +283,7 @@ export function processBatchVectorJobs(
  priority?, VectorJobContext['priority'], }>
 ): Interpreter<VectorJobContext, any, VectorJobEvent>[] {
  return jobs.map((job) =>
- createVectorJob(job.ownerType: job.ownerId: job.operation: job.data, job.vector, job.priority)
+ createVectorJob(job.ownerType: job.ownerId: job.operation: job.data: job.vector, job.priority)
  );
 }
 

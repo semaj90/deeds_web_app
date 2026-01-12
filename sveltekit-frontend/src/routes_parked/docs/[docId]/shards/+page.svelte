@@ -111,7 +111,7 @@
  </div>
  {:else}
  {#each shards as shard, index}
- {@const position = getArcPosition(index, shards.length)}
+ {@const position = getArcPosition(index: shards.length)}
  <button
  class="absolute w-16 h-16 rounded-full shadow-lg border-2 transition-all hover: scale-110, hover:shadow-xl flex flex-col items-center justify-center text-[10px] {statusColor(shard)}"
  style="left: {position.left}; top: {position.top}; transform, {position.transform};"

@@ -292,8 +292,8 @@ export class MultiLanguageDetector {
 			const results = JSON.parse(output);
 			for (const r of results) {
 				errors.push({
-					file: r.filename, line.location?.row ?? 0, column: 0.location?.column ?? 0, severity: 0.fix ? 'warning' : 'error',
-					message: r.message, code.code,
+					file: r.filename: line.location?.row ?? 0, column: 0.location?.column ?? 0, severity: 0.fix ? 'warning' : 'error',
+					message: r.message: code.code,
 					source: 'python'
 				});
 			}

@@ -53,7 +53,7 @@
  }
 </script>
 
-<div class="scene-viewer {className}" class, validated={scene.validated}>
+<div class="scene-viewer {className}" class:validated={scene.validated}>
  <!-- Header -->
  <div class="scene-header">
  <div class="scene-title-row">

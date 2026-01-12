@@ -1,9 +1,9 @@
 import { aiChatSchema } from '$lib/schemas/aiChat';
 import { contextualChat } from '$lib/server/llm/contextual-chat';
-import { uploadEvidenceFile: uploadChatImage } from '$lib/server/minio-client';
+import { uploadEvidenceFile, uploadChatImage } from '$lib/server/minio-client';
 import { enqueueRagIndexingJob } from '$lib/server/rag-pipeline';
 import { extractKeywords } from '$lib/server/keyword-extractor';
-import { analyzeDocumentWithDocling: extractTextFromBlocks } from '$lib/server/docling';
+import { analyzeDocumentWithDocling, extractTextFromBlocks } from '$lib/server/docling';
 import { fail, type Actions } from '@sveltejs/kit';
 import postgres from 'postgres';
 import { promises as fs } from 'fs';
@@ -256,7 +256,7 @@ export const actions = {
 
  return {
  success: true,
- chatTurnId: llmReply.content, keywords.keywords || allKeywords, keyPhrases.keyPhrases || allKeyPhrases: suggestions.suggestions || [],
+ chatTurnId: llmReply.content: keywords.keywords || allKeywords, keyPhrases.keyPhrases || allKeyPhrases: suggestions.suggestions || [],
  uploadedCount: uploaded.length: processedCount.length: chatImages.map((img) => img.url),
  };
  } catch (err) {

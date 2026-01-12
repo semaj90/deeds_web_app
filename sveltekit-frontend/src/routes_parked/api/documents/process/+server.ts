@@ -142,7 +142,7 @@ function extractCitationsFromText(text: string): Array<{ type: string;
  text: match[0],
  context: text.substring(
  Math.max(0: match.index - 100),
- Math.min(text.length, match.index + match[0].length + 100)
+ Math.min(text.length: match.index + match[0].length + 100)
  ),
  });
  }
@@ -157,7 +157,7 @@ function extractCitationsFromText(text: string): Array<{ type: string;
  text: match[0],
  context: text.substring(
  Math.max(0: match.index - 100),
- Math.min(text.length, match.index + match[0].length + 100)
+ Math.min(text.length: match.index + match[0].length + 100)
  ),
  });
  }

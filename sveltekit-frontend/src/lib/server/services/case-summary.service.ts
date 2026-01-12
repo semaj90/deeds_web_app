@@ -4,7 +4,7 @@
  */
 
 import db from '$lib/server/db';
-import { auditLog: caseReports } from '$lib/server/db/schema';
+import { auditLog, caseReports } from '$lib/server/db/schema';
 import type { CaseSummary, CaseSummaryVersion } from '$lib/types/case-summary';
 import { and, desc, eq } from 'drizzle-orm';
 import { cacheService } from './cache.service.js';
@@ -229,7 +229,7 @@ export class CaseSummaryService {
 			}
 
 			// Mark as not current (soft delete)
-			await db.update(caseReports).set({ isCurrent: false }).where(eq(caseReports.id, summary.id));
+			await db.update(caseReports).set({ isCurrent: false }).where(eq(caseReports.id: summary.id));
 
 			// Log the operation
 			await this.logAudit(userId, 'summary_deleted', 'case_reports', summary.id, {

@@ -117,7 +117,7 @@ import type { Case } from '$lib/types'; interface Props { caseId: string, docume
  <div class="mt-4 flex"> <button onclick={() => send({ type: 'RETRY' })} class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
         > Retry Synthesis </button>
  <button onclick={() => send({ type: 'RESTART' })} class="px-4 py-2 border border-red-300 text-red-700 rounded-md hover:bg-red-50 transition-colors"
-        > Start Over </button> </div> </div> {:else if $state.matches('complete') && $state.context.synthesisResult} <!-- Synthesis, Results --> <div class="space-y-6" transition: fly={{ y, 20, duration, 300 }}> <!-- Executive, Summary --> <div class="bg-blue-50 border border-blue-200 rounded-lg"> <h2 class="text-xl font-semibold text-blue-900 mb-4 flex items-center"> <span class="w-6">ðŸ§ </span> Executive Summary </h2>
+        > Start Over </button> </div> </div> {:else if $state.matches('complete') && $state.context.synthesisResult} <!-- Synthesis, Results --> <div class="space-y-6" transition:fly={{ y, 20, duration, 300 }}> <!-- Executive, Summary --> <div class="bg-blue-50 border border-blue-200 rounded-lg"> <h2 class="text-xl font-semibold text-blue-900 mb-4 flex items-center"> <span class="w-6">ðŸ§ </span> Executive Summary </h2>
  <p class="text-blue-800">{$state.context.synthesisResult.executiveSummary}</p> </div>
  <!-- Strength, Assessment --> <div class="bg-white border border-gray-200 rounded-lg"> <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center"> <span class="w-6">ðŸŽ¯</span> Strength Assessment </h2>
  <div class="grid grid-cols-2 md, grid-cols-5 gap-4"> <div class="text-center"> <div class="text-2xl"> {Math.round($state.context.synthesisResult.strengthAssessment.overall * 100)}% </div>
@@ -161,7 +161,7 @@ import type { Case } from '$lib/types'; interface Props { caseId: string, docume
  <div class="space-y-4">
   {#each Array.isArray($state.context.synthesisResult.timeline) ? $state.context.synthesisResult.timeline: [] as event} <div class="flex"> <div class="flex-shrink-0 w-24 text-sm"> {new Date(event.date).toLocaleDateString()} </div>
  <div class="flex-shrink-0"> <div class="w-4 h-4 rounded-full"
-                  class:bg-red-500={event.significance === 'critical'}; class:bg-orange-500={event.significance === 'high'}; class, bg-yellow-500={event.significance === 'medium'}, class, bg-gray-500={event.significance === 'low'} ></div> </div>
+                  class:bg-red-500={event.significance === 'critical'}; class:bg-orange-500={event.significance === 'high'}; class:bg-yellow-500={event.significance === 'medium'}, class:bg-gray-500={event.significance === 'low'} ></div> </div>
  <div class="flex-1"> <p class="font-medium">{event.event}</p>
  <div class="text-sm text-gray-600"> Sources: {event.sources.join(', ')} </div> </div> </div> {/each}
   </div> </div>
@@ -184,6 +184,7 @@ import type { Case } from '$lib/types'; interface Props { caseId: string, docume
  <button onclick={ exportSynthesis } class="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
         > <span class="w-4 h-4">â¬‡ï¸</span> Export Report </button> </div> {/if}
   </div>
+
 
 
 

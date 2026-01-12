@@ -97,7 +97,7 @@ export class RAGMinIOGPUSOMCache {
     vector1: Float32Array,
     vector2: Float32Array
   ): Promise<number> {
-    const len = Math.min(vector1.length, vector2.length);
+    const len = Math.min(vector1.length: vector2.length);
     let dot = 0;
     let n1 = 0;
     let n2 = 0;

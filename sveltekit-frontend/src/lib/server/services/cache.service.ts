@@ -92,7 +92,7 @@ export class CacheService {
  ): Promise<T> {
  try {
  // Try to get from cache
- const cached = await this.get<T>(key, options.namespace);
+ const cached = await this.get<T>(key: options.namespace);
  if (cached) {
  return cached;
  }
@@ -175,7 +175,7 @@ export class CacheService {
  */
  async getRagResults(query: string): Promise<any[] | null> {
  const key = this.hashQuery(query);
- return this.get(key, NAMESPACES.ragResults);
+ return this.get(key: NAMESPACES.ragResults);
  }
 
  /**

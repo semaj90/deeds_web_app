@@ -72,7 +72,7 @@
  ...messages,
  {
  role: 'assistant',
- content, data.answer || data.response || 'No response',
+ content: data.answer || data.response || 'No response',
  citations: data.citations || [],
  }];
  } catch (err) {
@@ -101,7 +101,7 @@
  {/if}
 
  {#each messages as message (message)}
- <div class="message" class:user={message.role === 'user'}; class, assistant={message.role === 'assistant'}>
+ <div class="message" class:user={message.role === 'user'}; class:assistant={message.role === 'assistant'}>
  <div class="message-content">
  {message.content}
  </div>

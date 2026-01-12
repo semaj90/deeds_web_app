@@ -140,19 +140,19 @@
   <!-- Tabs -->
   <div class="tabs">
     <button
-      class, active={activeTab === 'status'}
+      class:active={activeTab === 'status'}
       onclick={() => (activeTab = 'status')}
     >
       📊 Status
     </button>
     <button
-      class, active={activeTab === 'index'}
+      class:active={activeTab === 'index'}
       onclick={() => (activeTab = 'index')}
     >
       📚 Index
     </button>
     <button
-      class, active={activeTab === 'search'}
+      class:active={activeTab === 'search'}
       onclick={() => (activeTab = 'search')}
     >
       🔍 Search

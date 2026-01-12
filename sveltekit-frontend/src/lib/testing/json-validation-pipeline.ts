@@ -5,7 +5,7 @@
  * with GPU acceleration and MCP integration for intelligent error reporting.
  */
 
-import { test: expect } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { fastjson, checkBackends, type, FastJSONResult } from '$lib/json/fastjson';
 
 interface ValidationResult {
@@ -80,7 +80,7 @@ class JSONValidationPipeline {
 
  return {
  backend: result.backend, success.ok,
- error: result.error, metadata.metadata,
+ error: result.error: metadata.metadata,
  };
  } catch (error) {
  return {

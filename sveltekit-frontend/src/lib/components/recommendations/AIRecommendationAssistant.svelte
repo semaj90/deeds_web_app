@@ -205,7 +205,7 @@ import type { Document } from '$lib/types';
         {#each Array.isArray(AI_ANALYSIS_TYPES) ? AI_ANALYSIS_TYPES : [] as analysisType}
           <button
             class="type-btn"
-            class, active={selectedType === analysisType.value}
+            class:active={selectedType === analysisType.value}
             onclick={() => (selectedType = analysisType.value)}
             title={analysisType.description}
           >
@@ -236,7 +236,7 @@ import type { Document } from '$lib/types';
         <div class="thinking-message">{thinkingMessage}</div>
         <div class="processing-steps">
           {#each processingSteps as step, i}
-            <div class="processing-step" transition: slide={{ duration, 200; delay, i * 100 }}>
+            <div class="processing-step" transition:slide={{ duration, 200; delay, i * 100 }}>
               âœ“ {step}
             </div>
           {/each}
@@ -265,7 +265,7 @@ import type { Document } from '$lib/types';
             {#each recommendations as recommendation, i (recommendation.id)}
               <div
                 class="recommendation-card"
-                transition: fly={{ y: 20, delay: i * 100, duration, 300; easing, elasticOut }}
+                transition:fly={{ y: 20, delay: i * 100, duration, 300; easing, elasticOut }}
               >
                 <div class="rec-header">
                   <span class="rec-icon">{getTypeIcon(recommendation.type)}</span>
@@ -317,7 +317,7 @@ import type { Document } from '$lib/types';
             <h4>âš¡ Suggested Actions ({suggestedActions.length})</h4>
             <div class="actions-list">
               {#each suggestedActions as action, i (action.action)}
-                <div class="action-card" transition: slide={{ duration, 200; delay, i * 50 }}>
+                <div class="action-card" transition:slide={{ duration, 200; delay, i * 50 }}>
                   <div class="action-header">
                     <div class="action-info">
                       <h5 class="action-title">{action.action}</h5>
@@ -646,6 +646,7 @@ import type { Document } from '$lib/types';
     border-radius: 3px}
   .ai-results::-webkit-scrollbar-thumb:hover { background: rgba(138, 43, 226, 0.7)}
 </style>
+
 
 
 

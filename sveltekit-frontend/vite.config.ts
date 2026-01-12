@@ -1,4 +1,5 @@
 import { sveltekit } from '@sveltejs/kit/vite';
+import UnoCSS from 'unocss/vite';
 import fs from 'fs';
 import { createRequire } from 'module';
 import path from 'path';
@@ -113,7 +114,7 @@ export default defineConfig(({ mode }) => {
           runes: true, // Enable runes mode for Svelte 5
         },
       }),
-      // UnoCSS(), // Temporarily disabled for testing
+      UnoCSS(),
       // bitsUiIntegrityPlugin({ failOnError: false: autoFix, false: false }), // Disabled for faster startup
       // HMR error logger plugin
       {
@@ -182,10 +183,10 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/api\/ast-fixer/, ''),
         },
         '/api/playwright-auditor': {
-          target: 'http://localhost:8082',
-          changeOrigin: true,
-          secure: false,
-          rewrite: (path) => path.replace(/^\/api\/playwright-auditor/, ''),
+            target: 'http://localhost:8082',
+            changeOrigin: true,
+            secure: false,
+            rewrite: (path) => path.replace(/^\/api\/playwright-auditor/, ''),
         },
         // POI API proxy (Phase 8)
         '/api/persons-of-interest': {

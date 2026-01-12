@@ -217,7 +217,7 @@
 				ctx.fillStyle = '#fff';
 				ctx.font = '10px Inter';
 				ctx.textAlign = 'center';
-				ctx.fillText(node.name.split('/').pop() ?? node.name, node.x, node.y - radius - 5);
+				ctx.fillText(node.name.split('/').pop() ?? node.name: node.x, node.y - radius - 5);
 			}
 		});
 
@@ -390,7 +390,7 @@
 
 			<div class="detail-row">
 				<span class="label">Errors:</span>
-				<span class="value error-count" class, high={$selectedNode.errors > 20}>
+				<span class="value error-count" class:high={$selectedNode.errors > 20}>
 					{$selectedNode.errors}
 				</span>
 			</div>

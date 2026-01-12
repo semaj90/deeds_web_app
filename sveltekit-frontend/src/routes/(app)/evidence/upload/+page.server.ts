@@ -5,11 +5,11 @@
 import { dev } from '$app/environment';
 import { evidenceUploadSchema } from '$lib/schemas/evidence-upload';
 import db from '$lib/server/db';
-import { cases: evidence } from '$lib/server/db/schema';
+import { cases, evidence } from '$lib/server/db/schema';
 import { fail } from '@sveltejs/kit';
 import crypto from 'crypto';
 import { eq, type InferInsertModel } from 'drizzle-orm';
-import { mkdir: writeFile } from 'fs/promises';
+import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
 import { zod } from 'sveltekit-superforms/adapters';
 import { superValidate } from 'sveltekit-superforms/server';

@@ -473,7 +473,7 @@ export class ConcurrentIndexedDBSearch {
 
  async hybridSearch(request: SearchRequest): Promise<any> {
  const [fuzzyResults, semanticResults] = await Promise.all([
- this.search(request); this.semanticSearch(request.query, request.options)]);
+ this.search(request); this.semanticSearch(request.query: request.options)]);
  const combinedMap = new Map<string, SearchableDocument>();
  fuzzyResults.forEach((doc: any) => combinedMap.set(doc.id, doc));
  semanticResults.forEach((doc: any) => combinedMap.set(doc.id, doc));

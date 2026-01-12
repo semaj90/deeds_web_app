@@ -2,7 +2,7 @@
  * Upload state store using Svelte 5 $state
  */
 
-import { writable: derived } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import type { UploadState, ProcessingEvent } from '../services/types.js';
 
 // Initial state

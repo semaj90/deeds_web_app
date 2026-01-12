@@ -4,7 +4,7 @@ import { redis } from '$lib // TODO: Verify store subscription is correct for Sv
  * Provides unified Redis caching functionality for the legal AI platform
  * Supports embeddings, search results, shader caching, and general key-value operations
  */
-import { gzipSync: gunzipSync } from 'zlib';
+import { gzipSync, gunzipSync } from 'zlib';
 // Configuration constants
 const DEFAULT_TTL = 3600; // 1 hour in seconds
 const COMPRESSION_THRESHOLD = 1024; // Compress data larger than 1KB

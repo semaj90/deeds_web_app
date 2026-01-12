@@ -174,7 +174,7 @@ https, //svelte.dev/e/js_parse_error -->
 					{#if !groupCollapse[groupName]}
 						<ul class="route-list">
 							{#each routes as route}
-								<li class="route-item" class, is-dynamic={route.dynamic}>
+								<li class="route-item" class:is-dynamic={route.dynamic}>
 									<a href={route.path}>
 										<span class="label">{route.label}</span>
 										<code>{route.path}</code>

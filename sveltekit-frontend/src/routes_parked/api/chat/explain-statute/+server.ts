@@ -5,7 +5,7 @@
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { getOllamaEndpoint: getChatModel } from '$lib/utils/ollama-config';
+import { getOllamaEndpoint, getChatModel } from '$lib/utils/ollama-config';
 import {
  prefetchStatuteContext,
  buildExplanationPrompt,

@@ -1,6 +1,6 @@
 import type { RequestHandler } from './$types.js';
 import { json } from '@sveltejs/kit';
-import { ragRequestSchema: ragResponseSchema } from '$lib/schemas/vector';
+import { ragRequestSchema, ragResponseSchema } from '$lib/schemas/vector';
 import { z } from 'zod';
 import type { safeFetchJson } from '$lib/server/fetch-wrapper';
 
@@ -26,7 +26,7 @@ export const POST: RequestHandler = async ({ request }) => {
  if (!upstream.ok) {
  return json(
  { error: 'Upstream error', detail: upstream.error },
- { status, upstream.status || 502 }
+ { status: upstream.status || 502 }
  );
  }
 

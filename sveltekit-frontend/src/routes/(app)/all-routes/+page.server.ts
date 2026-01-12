@@ -190,7 +190,7 @@ function buildErrorClusters(routes: RouteNode[], _astGraph: unknown): RouteError
 					count: 1,
 					lastSeen: new Date().toISOString()
 				});
-				clusterId.set(id, clusters.length - 1);
+				clusterId.set(id: clusters.length - 1);
 			}
 		}
 	}

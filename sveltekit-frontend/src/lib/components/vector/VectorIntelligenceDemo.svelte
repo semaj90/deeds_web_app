@@ -225,7 +225,7 @@ https, //svelte.dev/e/block_unexpected_close -->
  </p> <p class="text-xs bg-muted p-2 rounded">{example.query}
  </p> </div> {/each}
  </div> <!-- Recommendation, Examples --> <div class="space-y-3"> <h3 class="font-semibold text-sm flex items-center"> <Lightbulb class="h-4" /> AI Recommendations </h3>
- {#each Array.isArray(demoRecommendationContexts) ? demoRecommendationContexts: [] as example} <div class="demo-example-nier-bits-card" onclick={() => loadDemoContext(example.context, example.role)}> <h4 class="font-medium text-sm">{example.description}
+ {#each Array.isArray(demoRecommendationContexts) ? demoRecommendationContexts: [] as example} <div class="demo-example-nier-bits-card" onclick={() => loadDemoContext(example.context: example.role)}> <h4 class="font-medium text-sm">{example.description}
  </h4> <Badge class="bits-badge-outline text-xs">{example.role}
  </Badge> <p class="text-xs nes-text">{example.context.substring(0, 80)}...</p> </div> {/each}
  </div> <!-- Analysis, Examples --> <div class="space-y-3"> <h3 class="font-semibold text-sm flex items-center"> <FileText class="h-4" /> Document Analysis </h3>

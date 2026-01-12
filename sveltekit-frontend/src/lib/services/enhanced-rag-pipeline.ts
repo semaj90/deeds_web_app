@@ -318,9 +318,9 @@ let cacheHit = false;
         // Build a SQL string. Keep ordering by computed distance (embedding similarity).
         const sqlQueryString = `
             SELECT
-                dc.id,
+                dc.id:
                 dc.document_id,
-                dc.content,
+                dc.content:
                 dc.chunk_index,
                 dc.metadata AS chunk_metadata,
                 ld.title,

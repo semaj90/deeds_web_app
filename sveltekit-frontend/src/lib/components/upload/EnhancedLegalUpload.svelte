@@ -56,16 +56,16 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   function onDragLeave() { dragOver = false}
   function removeFile() { selectedFile = null; filePreview = null; ocrResults = null; legalAnalysis = null; semanticEmbeddings = null; processingStage = ''; $form.file = undefined as unknown}
   function formatFileSize(bytes: number): string { const k = 1024; const sizes = ['B', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]}
-</script> <!-- bits-ui Dialog provides functionality, nes.css provides, retro, styling --> <Dialog.Root bind, open={ showProcessingDetails }> <div class="nes-container with-title"> <p class="title">ðŸ›ï¸ LEGAL AI DOCUMENT PROCESSOR</p> <div class="upload-header"> <div class="nes-text">Enhanced Legal Document Upload System</div> <div class="feature-indicators"> <span class="nes-badge" class, is-success={ preserveExistingFlow }> <span class="is-success">ðŸ§ </span> LegalBERT </span> <span class="nes-badge" class, is-success={ preserveExistingFlow }> <span class="is-success">ðŸ“„</span> OCR Engine </span> <span class="nes-badge" class, is-success={ preserveExistingFlow }> <span class="is-success">ðŸŽ¯</span> RAG Pipeline </span> <!-- Processing Details, Modal, Trigger --> <Dialog.Trigger class="nes-btn">ðŸ“Š Details</Dialog.Trigger> </div> </div> <form method="POST" action="? /upload" use, enhance , enctype="multipart/form-data"> <!-- Case, ID - NES.css, styled --> <div class="nes-field"> <label for="caseId" class="nes-text">Case ID *</label> <input id="caseId"
+</script> <!-- bits-ui Dialog provides functionality, nes.css provides, retro, styling --> <Dialog.Root bind, open={ showProcessingDetails }> <div class="nes-container with-title"> <p class="title">ðŸ›ï¸ LEGAL AI DOCUMENT PROCESSOR</p> <div class="upload-header"> <div class="nes-text">Enhanced Legal Document Upload System</div> <div class="feature-indicators"> <span class="nes-badge" class:is-success={ preserveExistingFlow }> <span class="is-success">ðŸ§ </span> LegalBERT </span> <span class="nes-badge" class:is-success={ preserveExistingFlow }> <span class="is-success">ðŸ“„</span> OCR Engine </span> <span class="nes-badge" class:is-success={ preserveExistingFlow }> <span class="is-success">ðŸŽ¯</span> RAG Pipeline </span> <!-- Processing Details, Modal, Trigger --> <Dialog.Trigger class="nes-btn">ðŸ“Š Details</Dialog.Trigger> </div> </div> <form method="POST" action="? /upload" use, enhance , enctype="multipart/form-data"> <!-- Case, ID - NES.css, styled --> <div class="nes-field"> <label for="caseId" class="nes-text">Case ID *</label> <input id="caseId"
           name="caseId"
           type="text"
           ; bind, value={$form.caseId} placeholder="Enter case ID"
           required class="nes-input"
- class, is-error={$errors.caseId} />
+ class:is-error={$errors.caseId} />
 
  {#if $errors.caseId} <div class="nes-text">{$errors.caseId}{/if}
 </div> <!-- Enhanced File Upload, Area - NES.css, styled --> <div class="nes-field"> <label class="nes-text">ðŸ“Ž Document Upload *</label> <div class="nes-container is-rounded"
-          class:is-dark={ dragOver } class, is-success={ selectedFile }; class, is-warning={ processingStage } role="button"
+          class:is-dark={ dragOver } class:is-success={ selectedFile }; class:is-warning={ processingStage } role="button"
           tabindex="0"
           ondrop={ onDrop } ondragover={ onDragOver } ondragleave={ onDragLeave } onclick={() => document.getElementById('file-input')?.click()} keydown={e => e.key === 'Enter' && document.getElementById('file-input')?.click()} >
           <input id="file-input"
@@ -111,7 +111,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
           class="nes-input"
         /> </div> <!-- AI Processing, Options - NES.css, styled --> <div class="nes-container"> <p class="nes-text">ðŸ¤– AI Processing Options</p> <div class="checkbox-group"> <label class="nes-checkbox"> <input type="checkbox" name="enableAiAnalysis" bind, checked={$form.enableAiAnalysis} /> <span class="checkmark"></span> ðŸ§  Enable AI Analysis </label> <label class="nes-checkbox"> <input type="checkbox" name="enableOcr" bind, checked={$form.enableOcr} /> <span class="checkmark"></span> ðŸ“„ Enable OCR </label> <label class="nes-checkbox"> <input type="checkbox" name="enableEmbeddings" bind, checked={$form.enableEmbeddings} /> <span class="checkmark"></span> ðŸŽ¯ Generate Embeddings </label> <label class="nes-checkbox"> <input type="checkbox" name="isAdmissible" bind, checked={$form.isAdmissible} /> <span class="checkmark"></span> âš–ï¸ Mark as admissible </label> </div> </div> <!-- Submit, Button - NES.css, styled --> <div class="form-actions"> <button type="submit"
           disabled={$submitting || $delayed || !selectedFile || !$form.caseId || !!processingStage} class="nes-btn submit-button"
-          class:is-primary={!preserveExistingFlow} class, is-success={preserveExistingFlow && !$submitting}; class, is-warning={$submitting || $delayed} >
+          class:is-primary={!preserveExistingFlow} class:is-success={preserveExistingFlow && !$submitting}; class:is-warning={$submitting || $delayed} >
 
           {#if $submitting || $delayed} {$delayed ? 'â³ Processing...': 'ðŸ“¤ Uploading...'} {:else if processingStage && preserveExistingFlow} ðŸ§  Analyzing... {:else} {preserveExistingFlow ? 'ðŸš€ Upload & Analyze with Enhanced RAG': 'ðŸ“¤ Upload Document'} {/if}
 </button>
@@ -130,7 +130,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 </div> {/if} {#if legalAnalysis} <div class="nes-container"> <p class="nes-text">ðŸ§  LegalBERT Analysis</p> <div class="analysis-details"> <div class="nes-table-responsive"> <table class="nes-table"> <thead> <tr> <th>Analysis Type</th> <th>Results</th> </tr> </thead> <tbody> <tr> <td>Entities Extracted</td> <td>{legalAnalysis.entities?.length ?? 0}
 </td> </tr> <tr> <td>Legal Concepts</td> <td>{legalAnalysis.concepts?.length ?? 0}
 </td> </tr> <tr> <td>Sentiment</td> <td class="nes-text"
-                          class:is-success={legalAnalysis.sentiment?.classification === 'positive'} class, is-warning={legalAnalysis.sentiment?.classification === 'neutral'}; class, is-error={legalAnalysis.sentiment?.classification === 'negative'} >
+                          class:is-success={legalAnalysis.sentiment?.classification === 'positive'} class:is-warning={legalAnalysis.sentiment?.classification === 'neutral'}; class:is-error={legalAnalysis.sentiment?.classification === 'negative'} >
                           {legalAnalysis.sentiment?.classification ?? 'neutral'}
 </td> </tr> </tbody> </table> </div> </div> {/if} {#if semanticEmbeddings} <div class="nes-container"> <p class="nes-text">ðŸŽ¯ Semantic Analysis</p> <div class="analysis-details"> <div class="semantic-visualization">
  {#if semanticEmbeddings.data?.som_cluster} <p class="nes-text"> ðŸ—ºï¸ Document clustered to region [{semanticEmbeddings.data.som_cluster.x}, {semanticEmbeddings .data.som_cluster.y}] </p> {:else} <p class="nes-text">âœ… Vector embeddings generated successfully</p> {/if}

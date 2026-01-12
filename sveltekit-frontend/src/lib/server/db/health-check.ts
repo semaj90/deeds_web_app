@@ -1,5 +1,5 @@
 /** * Database Health Check Utility * Validates actual PostgreSQL database connectivity */
-import type { pool } from './drizzle.js';
+import type { pool } from './drizzle.ts';
 
 export async function validateDatabaseOnStartup(): Promise<boolean> {
  let client;

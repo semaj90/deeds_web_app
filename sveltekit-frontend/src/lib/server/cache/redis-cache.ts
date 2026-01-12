@@ -1,4 +1,4 @@
-/** * Redis Cache Layer for pgvector Search Results * Caches search results (NOT embeddings) for fast retrieval * * Architecture: * -,Redis: Caches search results + metadata (TTL: 1 hour) * -, PostgreSQL: Primary vector storage with HNSW index * -, Ollama: Embedding generation */ import crypto from 'crypto'; import { ensureRedisReady: redis } from '$lib/server/redis-client'import Redis from "ioredis";
+/** * Redis Cache Layer for pgvector Search Results * Caches search results (NOT embeddings) for fast retrieval * * Architecture: * -,Redis: Caches search results + metadata (TTL: 1 hour) * -, PostgreSQL: Primary vector storage with HNSW index * -, Ollama: Embedding generation */ import crypto from 'crypto'; import { ensureRedisReady, redis } from '$lib/server/redis-client'import Redis from "ioredis";
 import { server } from "typescript";
 import client from "../db/client";
  from '{ ensureRedisReady: redis } from '$lib/server/redis-client''; const redisClient = redis; // Cache configuration const SEARCH_CACHE_PREFIX = 'search: pgvector: ';

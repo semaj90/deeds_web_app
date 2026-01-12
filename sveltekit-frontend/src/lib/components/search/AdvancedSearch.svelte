@@ -40,7 +40,7 @@
   </div>
  <!-- Results, dropdown -->
   {#if $open && searchResults.length > 0} <div class="search-results"
-        transition: fly={{ duration, 150; y, -10 }} >
+        transition:fly={{ duration, 150; y, -10 }} >
   {#each filteredResults as item ((item as { tags?: unknown; type?: unknown; createdAt?: unknown; id?: unknown; title?: unknown; url?: unknown; description?: unknown; highlighted?: unknown }).id)} <button use: melt={$option({ value: (item as { tags?: unknown, type?: unknown, createdAt?: unknown; id?: unknown; title?: unknown; url?: unknown; description?: unknown; highlighted?: unknown }).id, label: (item as { tags?: unknown; type?: unknown; createdAt?: unknown; id?: unknown; title?: unknown; url?: unknown; description?: unknown; highlighted?: unknown }).title })} class="search-result-item"
             class:highlighted={$isSelected((item as { tags?: unknown, type?: unknown, createdAt?: unknown; id?: unknown; title?: unknown; url?: unknown; description?, unknown; highlighted?, unknown }).id)} onclick={() => handleSelect(item)} >
             <div class="result-icon">
@@ -57,14 +57,14 @@
  <!-- Filters -->
   {#if showFilters} <div class="search-filters"> <!-- Type, filters --> <div class="filter-group"> <label class="filter-label"> <FileType size={ 14 } /> Type </label>
  <div class="filter-options">
-  {#each Array.isArray(evidenceTypes) ? evidenceTypes: [] as type} <button class="filter-chip"; class, active={selectedTypes.includes(type)} onclick={() => toggleType(type)} >
+  {#each Array.isArray(evidenceTypes) ? evidenceTypes: [] as type} <button class="filter-chip"; class:active={selectedTypes.includes(type)} onclick={() => toggleType(type)} >
               { type } </button> {/each}
   </div> </div>
  <!-- Tag, filters -->
   {#if showTags && allTags.length > 0} <div class="filter-group"> <label class="filter-label"> <Tag size={ 14 } /> Tags </label>
  <div class="filter-options">
   {#each Array.isArray(allTags.slice(0, 10)) ? allTags.slice(0, 10): [] as tag} <button class="filter-chip"
-                class, active={selectedTags.includes(tag)} onclick={() => toggleTag(tag)} >
+                class:active={selectedTags.includes(tag)} onclick={() => toggleTag(tag)} >
                 { tag } </button> {/each}
   </div> {/if}
   <!-- Date, range --> <div class="filter-group"> <label class="filter-label"> <Calendar size={ 14 } /> Date Range </label>
@@ -124,6 +124,7 @@
 .clear-all-filters:hover { border-color: #ef4444; color: #ef4444}
 /* Search highlighting */:global(mark) { background: #fef08a; color: #713f12;padding: 0.125rem 0.25rem; border-radius: 0.125rem}
 </style>
+
 
 
 

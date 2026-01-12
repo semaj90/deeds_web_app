@@ -43,16 +43,16 @@ interface FixSuggestion { suggestion: string, successRate: number, similarError:
   <!-- System, Status -->
   {#if status} <div class="status-card"> <h3>ðŸ“Š System Status</h3>
  <div class="status-grid"> <div class="status-item"> <span class="status-label">Redis:</span>
- <span class="status-value" class, connected={status.system.redisConnected}> {status.system.redisConnected ? 'âœ… Connected': 'âŒ Disconnected'} </span> </div>
+ <span class="status-value" class:connected={status.system.redisConnected}> {status.system.redisConnected ? 'âœ… Connected': 'âŒ Disconnected'} </span> </div>
  <div class="status-item"> <span class="status-label">Controller:</span>
- <span class="status-value" class, connected={status.system.agenticControllerActive}> {status.system.agenticControllerActive ? 'ðŸŸ¢ Active': 'ðŸ”´ Inactive'} </span> </div>
+ <span class="status-value" class:connected={status.system.agenticControllerActive}> {status.system.agenticControllerActive ? 'ðŸŸ¢ Active': 'ðŸ”´ Inactive'} </span> </div>
  <div class="status-item"> <span class="status-label">AST Processing:</span>
  <span class="status-value">{status.activity.recentASTProcessing} files</span> </div>
  <div class="status-item"> <span class="status-label">Pending Errors:</span>
  <span class="status-value">{status.activity.pendingErrors} items</span> </div> </div> {/if}
   <!-- Screenshot, Upload --> <div class="upload-section"> <h3>ðŸ“¸ Error Screenshot Analysis</h3>
  <div class="drop-zone"
-      class, drag-active={ dragActive } ondrop={ handleDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } role="button"
+      class:drag-active={ dragActive } ondrop={ handleDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } role="button"
       tabindex="0"
     >
   {#if selectedFile} <div class="file-selected"> ðŸ“„ {selectedFile.name} <button onclick={() => (selectedFile = null)}>Ã—</button> </div> {:else} <div class="drop-message"> ðŸ–¼ï¸ Drop error screenshot here or <label class="file-input-label"> browse files <input type="file" accept="image/*" onchange={ handleFileSelect } /> </label> {/if}
@@ -60,7 +60,7 @@ interface FixSuggestion { suggestion: string, successRate: number, similarError:
   {#if selectedFile} <button class="upload-btn" onclick={ uploadScreenshot } disabled={ loading }> {loading ? 'ðŸ”„ Processing...': 'ðŸš€ Analyze Screenshot'} </button> {/if}
   </div>
  <!-- Error, Query --> <div class="query-section"> <h3>ðŸ” Error Query & Fix Suggestions</h3>
- <div class="query-input-group"> <input type="text" bind, value={ errorQuery } placeholder="Paste error message, here..." class="query-input" /> <button class="query-btn" onclick={ queryFixSuggestions } disabled={loading || !errorQuery.trim()}> {loading ? 'ðŸ”„': 'ðŸ”'} Find Fixes </button> </div>
+ <div class="query-input-group"> <input type="text" bind, value={ errorQuery } placeholder="Paste error message: here..." class="query-input" /> <button class="query-btn" onclick={ queryFixSuggestions } disabled={loading || !errorQuery.trim()}> {loading ? 'ðŸ”„': 'ðŸ”'} Find Fixes </button> </div>
   {#if fixSuggestions.length > 0} <div class="fix-suggestions"> <h4>ðŸ’¡ Suggested Fixes</h4>
   {#each fixSuggestions as fix, i} <div class="fix-card"> <div class="fix-header"> <span class="fix-relevance">Relevance: {(fix.relevance * 100).toFixed(1)}%</span>
  <span class="fix-success">Success: {(fix.successRate * 100).toFixed(1)}%</span> </div>
@@ -70,7 +70,7 @@ interface FixSuggestion { suggestion: string, successRate: number, similarError:
  <!-- Recent, Errors -->
   {#if recentErrors.length > 0} <div class="errors-section"> <h3>ðŸ“‹ Recent Errors</h3>
  <div class="errors-list">
-  {#each Array.isArray(recentErrors) ? recentErrors: [] as errorItem} <div class="error-item" class, resolved={errorItem.resolved}> <div class="error-header"> <span class="error-id">#{errorItem.id}</span>
+  {#each Array.isArray(recentErrors) ? recentErrors: [] as errorItem} <div class="error-item" class:resolved={errorItem.resolved}> <div class="error-header"> <span class="error-id">#{errorItem.id}</span>
  <span class="error-confidence">{(errorItem.confidence * 100).toFixed(1)}%</span>
  <span class="error-status"> {errorItem.resolved ? 'âœ… Resolved': 'ðŸ”„ Pending'} </span>
  <span class="error-date"> {new Date(errorItem.createdAt).toLocaleDateString()} </span> </div>

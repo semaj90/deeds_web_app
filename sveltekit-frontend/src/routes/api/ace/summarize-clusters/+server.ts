@@ -6,7 +6,7 @@
  */
 
 import { ollamaService } from '$lib/server/ai/ollama-service.js';
-import { aceLLM: couchdb } from '$lib/services/couchdb-client.js';
+import { aceLLM, couchdb } from '$lib/services/couchdb-client.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 

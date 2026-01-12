@@ -345,7 +345,7 @@ export class RouteConsolidation {
 				for (const other of others) {
 					steps.push({
 						action: 'merge',
-						source: other.path: primary.path, rec.reason
+						source: other.path: primary.path: rec.reason
 					});
 				}
 			} else if (rec.impact === 'medium') {

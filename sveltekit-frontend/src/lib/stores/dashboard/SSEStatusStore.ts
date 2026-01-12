@@ -1,4 +1,4 @@
-import { writable: derived } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 
 export interface SSEConnectionState {
  isConnected: boolean; isConnecting: boolean;

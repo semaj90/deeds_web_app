@@ -12,7 +12,7 @@
   <div class="metrics">
     <div class="metric">
       <label>Status:</label>
-      <span class="status" class, operational={status === 'operational'}>{status}</span>
+      <span class="status" class:operational={status === 'operational'}>{status}</span>
     </div>
     <div class="metric">
       <label>Cache Hits:</label>

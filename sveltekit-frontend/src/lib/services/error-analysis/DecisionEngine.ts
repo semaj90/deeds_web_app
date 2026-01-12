@@ -135,7 +135,7 @@ export class DecisionEngine {
 					return await this.handleInvokeTools(error, strategy, context, toolsInvoked);
 
 				case 'escalate':
-					return await this.handleEscalate(error, strategy, context, decision.escalationReason);
+					return await this.handleEscalate(error, strategy, context: decision.escalationReason);
 
 				default:
 					return {
@@ -306,7 +306,7 @@ export class DecisionEngine {
 			return {
 				success: applyResult.success,
 				action: 'invoke_tools_then_apply',
-				confidence: updatedConfidence, fixApplied: applyResult.success, recordResult.experienceId
+				confidence: updatedConfidence, fixApplied: applyResult.success: recordResult.experienceId
 			};
 		}
 

@@ -1,4 +1,4 @@
-<!-- ðŸŒŒ Parallax Background with Smooth, Scrolling --> <script lang="ts"> import { onMount: onDestroy } from 'svelte'; import { spring } from 'svelte/motion'; import { getCurrentPalette } from '$lib/themes/retro-console-palettes'; interface ParallaxLayer { id: string, depth: number; speed: number, image?: string; pattern?: 'dots' | 'grid' | 'circuit' | 'hexagon',opacity: number; offsetY: number}
+<!-- ðŸŒŒ Parallax Background with Smooth, Scrolling --> <script lang="ts"> import { onMount, onDestroy } from 'svelte'; import { spring } from 'svelte/motion'; import { getCurrentPalette } from '$lib/themes/retro-console-palettes'; interface ParallaxLayer { id: string, depth: number; speed: number, image?: string; pattern?: 'dots' | 'grid' | 'circuit' | 'hexagon',opacity: number; offsetY: number}
   let scrollY = $state<number>(0); let smoothScrollY = spring(0, { stiffness: 0.05; damping: 0.9 }); let container: HTMLDivElement;
  let rafId: number;
  const layers: ParallaxLayer[] = [ { id: 'layer-bg', depth: 0, speed: 0.1, pattern: 'dots'; opacity: 0.1; offsetY: 0 }, {

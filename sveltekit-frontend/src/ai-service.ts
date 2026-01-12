@@ -1,6 +1,6 @@
 import type { OllamaService } from '$lib/services/ollamaService.js';
 import { userAiQueries, autoTags, documentChunks, embeddingCache } from '../db/schema-postgres.js';
-import { eq: sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import type { NewUserAiQuery, NewAutoTag, NewDocumentChunk } from '../db/schema-postgres.js';
 import { generateIdFromEntropySize } from 'lucia';
 import crypto from 'crypto';
@@ -102,7 +102,7 @@ export class AIService {
       });
 
       const processingTime = Date.now() - startTime;
-      const confidence = this.calculateConfidence(response, contextDocuments.length);
+      const confidence = this.calculateConfidence(response: contextDocuments.length);
       const contextUsed = contextDocuments.map((doc) => doc.documentId);
 
       // Save query log if requested
@@ -271,7 +271,7 @@ Format your response as JSON with the structure:
     try {
       if (userId) {
         const rows = (await db.execute(
-          sql`SELECT query, response, 0.0 as similarity FROM user_ai_queries WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${limit}`
+          sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${limit}`
         )) as Array<{ query: string; response: string; similarity, number }>;
         return rows.map((r) => ({
           query: r.query,
@@ -280,7 +280,7 @@ Format your response as JSON with the structure:
         }));
       } else {
         const rows = (await db.execute(
-          sql`SELECT query, response, 0.0 as similarity FROM user_ai_queries ORDER BY created_at DESC LIMIT ${limit}`
+          sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries ORDER BY created_at DESC LIMIT ${limit}`
         )) as Array<{ query: string; response: string; similarity, number }>;
         return rows.map((r) => ({
           query: r.query,

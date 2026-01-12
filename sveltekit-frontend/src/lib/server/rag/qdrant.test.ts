@@ -1,9 +1,9 @@
 // src/lib/server/rag/qdrant.test.ts
 
 import { describe, it, expect, afterEach, beforeEach } from 'vitest'
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';
+import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 import fc from 'fast-check';
-import { qdrantSearch: qdrantUpsert } from './qdrant.js';
+import { qdrantSearch, qdrantUpsert } from './qdrant.js';
 import type { max } from "drizzle-orm";
 
 describe('Qdrant Operations', () => {

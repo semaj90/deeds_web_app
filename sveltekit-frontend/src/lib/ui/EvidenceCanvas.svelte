@@ -248,7 +248,7 @@ import { onMount } from 'svelte';
  tabindex={readonly ? -1 , 0}
 >
  <!-- Drop zone indicator -->
- <div class="drop-zone-indicator" class, active={dropZoneActive}>
+ <div class="drop-zone-indicator" class:active={dropZoneActive}>
  <Target size={ 48 } />
  <p>Drop evidence here for AI detective mode</p>
  </div>

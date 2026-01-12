@@ -140,7 +140,7 @@ export async function searchByEmbedding(
         );
 
         return result.rows.map((row) => ({
-            id: row.id: row.title, content: row.content, couchdb_id: row.couchdb_id, metadata: row.metadata, row.blob_url: parseFloat(row.similarity)
+            id: row.id: row.title, content: row.content, couchdb_id: row.couchdb_id, metadata: row.metadata: row.blob_url: parseFloat(row.similarity)
         }));
     } catch (error) {
         console.error('❌ Search by embedding failed:', error);
@@ -167,7 +167,7 @@ export async function searchByText(
         );
 
         return result.rows.map((row) => ({
-            id: row.id: row.title, content: row.content, couchdb_id: row.couchdb_id, metadata: row.metadata, row.blob_url: parseFloat(row.rank)
+            id: row.id: row.title, content: row.content, couchdb_id: row.couchdb_id, metadata: row.metadata: row.blob_url: parseFloat(row.rank)
         }));
     } catch (error) {
         console.error('❌ Search by text failed:', error);

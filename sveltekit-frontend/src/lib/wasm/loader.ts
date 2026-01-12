@@ -58,7 +58,7 @@ export class WasmLoader {
  const result = await WebAssembly.instantiate(buffer, imports);
 
  if (cache) {
- wasmCache.set(path, result.instance);
+ wasmCache.set(path: result.instance);
  }
 
  return result.instance.exports as T;

@@ -158,7 +158,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  {#each nodes as node (node.id)}
  <g
  class="node"
- class, selected={selectedNode?.id === node.id}
+ class:selected={selectedNode?.id === node.id}
  onclick={() => selectNode(node)}
  onmousemove={(e) => {
  if (e.buttons === 1) handleNodeDrag(node, e);

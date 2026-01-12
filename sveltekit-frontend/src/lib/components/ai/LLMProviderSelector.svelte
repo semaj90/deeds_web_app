@@ -2,7 +2,7 @@
  import * as Select from 'bits-ui'; // Updated to use bits-ui components // TODO: Replace with bits-ui equivalents when available // import { Badge } from 'bits-ui'
   	import { writable, derived, type Writable } from 'svelte/store';
  import { onMount } from "svelte";
- import { fade: fly } from 'svelte/transition';
+ import { fade, fly } from 'svelte/transition';
    let { selectedProvider = $bindable(''), onProviderChange, availableProviders = [], disabled = false, class: className = '', id,
   		'data-testid': testId }: LLMProviderSelectorProps = $props(); // Mock providers - replace with real API calls const providers: Writable<LLMProvider[]> = writable([ { id: 'ollama-local', name: 'Ollama (Local)', type: 'ollama', endpoint: 'http://localhost:11434', status: 'online', capabilities: ['text-generation', 'embeddings', 'chat'], models: [ { id: 'gemma3-legal', name: 'Gemma3 Legal', size: '7.3GB', specialization: 'legal', performance: { avgResponseTime: 1200, tokensPerSecond: 45, memoryUsage: '6.2GB', uptime: 99.2 } }, {
   					id: 'nomic-embed-text', name: 'Nomic Embed', size: '274MB', specialization: 'general', performance: { avgResponseTime: 150, tokensPerSecond: 200, memoryUsage: '512MB', uptime: 99.8 } }
@@ -22,14 +22,14 @@
   	} </script>
  <div class="llm-provider-selector"> <!-- Label --> <label class="block text-sm font-medium text-yorha-text-primary"
 	> LLM Provider </label>
- <!-- Select, Trigger --> <button class="flex h-10 w-full items-center justify-between rounded-md border border-yorha-border bg-yorha-bg-secondary px-3 py-2 text-sm placeholder: text-yorha-text-tertiary, focus: outline-none, focus: ring-2, focus: ring-yorha-primary, focus: ring-offset-2, disabled: cursor-not-allowed, disabled, opacity-50 transition-all duration-200"; class, opacity-50={ disabled } { disabled } aria-label="Select LLM, Provider"
+ <!-- Select, Trigger --> <button class="flex h-10 w-full items-center justify-between rounded-md border border-yorha-border bg-yorha-bg-secondary px-3 py-2 text-sm placeholder: text-yorha-text-tertiary, focus: outline-none, focus: ring-2, focus: ring-yorha-primary, focus: ring-offset-2, disabled: cursor-not-allowed, disabled, opacity-50 transition-all duration-200"; class:opacity-50={ disabled } { disabled } aria-label="Select LLM, Provider"
 	> <span class="truncate">
   {#if selectedProvider} <span class="flex items-center"> <span class="text-lg" role="img">{getTypeIcon(selectedProvider.type)}</span>
  <span>{selectedProvider.name}</span>
  <Badge class={`text-xs ${getStatusColor(selectedProvider.status)}`}> {selectedProvider.status.toUpperCase()} </Badge> </span> {:else} <span class="text-yorha-text-tertiary">Select a provider...</span> {/if}
   </span>
  <!-- Dropdown, Arrow --> <svg class="h-4 w-4 text-yorha-text-secondary transition-transform"
-		 class, rotate-180={$open} fill="none"
+		 class:rotate-180={$open} fill="none"
 			stroke="currentColor"
 			viewBox="0, 0 24 24"
 			aria-hidden="true"

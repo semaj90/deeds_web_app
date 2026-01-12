@@ -195,7 +195,7 @@ https, //svelte.dev/e/js_parse_error -->
  {#each suggestions as suggestion}
  <button
  class="suggestion-item"
- class, selected={selectedSuggestions.includes(suggestion)}
+ class:selected={selectedSuggestions.includes(suggestion)}
  onclick={() => handleSuggestionSelect(suggestion)}
  >
  <div class="suggestion-header">

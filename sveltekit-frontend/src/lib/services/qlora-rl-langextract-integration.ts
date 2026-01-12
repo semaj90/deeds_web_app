@@ -230,7 +230,7 @@ export class QLoRARLLangExtractIntegration {
             };
 
             this.rlAgent?.addEventListener('message', handler);
-            this.rlAgent?.postMessage({ type: 'selectAction', state, Array.from(stateEmbedding) });
+            this.rlAgent?.postMessage({ type: 'selectAction', state: Array.from(stateEmbedding) });
 
             // Fallback timeout
             setTimeout(() => {

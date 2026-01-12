@@ -103,7 +103,7 @@ export class MinIOService {
  if (!res.Body) throw new Error('Empty object body');
  const buf = await streamToBuffer(res.Body as Readable);
  if (buf.length > maxSize) throw new Error(`Object too large: ${buf.length}`);
- const fileType = detectFileType(key, res.ContentType ?? null);
+ const fileType = detectFileType(key: res.ContentType ?? null);
  let content = buf.toString('utf-8');
  if (fileType === 'json') {
  try {
@@ -171,7 +171,7 @@ export class MinIOService {
  const res = await this.client.send(cmd);
  return (res.Contents || []).map((item) => ({
  key: item.Key!,
- size, item.Size || 0, lastModified: 0, item.LastModified || new Date(),
+ size: item.Size || 0, lastModified: 0, item.LastModified || new Date(),
  contentType | undefined, // Not available in listObjects response
  bucket,
  }));
@@ -200,7 +200,7 @@ export class MinIOService {
  const cmd = new HeadObjectCommand({ Bucket: bucket, Key: key });
  const res = await this.client.send(cmd);
  return {
- key, size, res.ContentLength || 0, lastModified: 0, res.LastModified || new Date(),
+ key, size: res.ContentLength || 0, lastModified: 0, res.LastModified || new Date(),
  contentType, res.ContentType || undefined,
  bucket,
  };

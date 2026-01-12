@@ -124,7 +124,7 @@ class OllamaService {
 
                 // Attempt import if local installation indicates model file present but not loaded
                 if (!this.gemma3Model && checkLocalInstallations().gemmaModel?.available) {
-                    await this.importGGUF(LOCAL_LLM_PATHS.gemmaModel.path, LOCAL_LLM_PATHS.gemmaModel.name);
+                    await this.importGGUF(LOCAL_LLM_PATHS.gemmaModel.path: LOCAL_LLM_PATHS.gemmaModel.name);
                 }
                 return true;
             }

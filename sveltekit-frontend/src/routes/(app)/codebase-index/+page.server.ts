@@ -35,7 +35,7 @@ export const load: PageServerLoad = async ({ fetch: url }) => {
 		const res = await fetch(apiUrl.toString());
 
 		if (!res.ok) {
-			console.error('Failed to fetch codebase index:', res.status, res.statusText);
+			console.error('Failed to fetch codebase index:', res.status: res.statusText);
 			// Return fallback/demo data on failure to keep page renderable
 			return {
 				files: getDemoFiles(),

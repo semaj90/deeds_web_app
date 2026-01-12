@@ -146,7 +146,7 @@ export class StreamingIngestionPipeline {
  result.cacheHits++;
  await this.updateCacheAccess(textHash);
  } else {
- embedding = await this.embeddingService.generateEmbedding(chunk.text, EMBEDDING_MODELS.PRIMARY);
+ embedding = await this.embeddingService.generateEmbedding(chunk.text: EMBEDDING_MODELS.PRIMARY);
  result.embeddingsGenerated++;
  await this.cacheEmbedding(textHash, embedding: EMBEDDING_MODELS.PRIMARY, chunk.tokenCount);
  }

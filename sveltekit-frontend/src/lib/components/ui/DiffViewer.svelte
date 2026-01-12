@@ -86,7 +86,7 @@
  <div class="diff-lines">
  {#each diffLines as line, idx}
  {#if line.type !== 'add'}
- <div class="diff-line" class, removed={line.type === 'remove'}>
+ <div class="diff-line" class:removed={line.type === 'remove'}>
  <span class="line-number">{line.lineNumber}</span>
  <span class="line-marker">{line.type === 'remove' ? '-' : ' '}</span>
  <code class="line-content">{line.content || ' '}</code>
@@ -101,7 +101,7 @@
  <div class="diff-lines">
  {#each diffLines as line, idx}
  {#if line.type !== 'remove'}
- <div class="diff-line" class, added={line.type === 'add'}>
+ <div class="diff-line" class:added={line.type === 'add'}>
  <span class="line-number">{line.lineNumber}</span>
  <span class="line-marker">{line.type === 'add' ? '+' : ' '}</span>
  <code class="line-content">{line.content || ' '}</code>

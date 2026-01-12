@@ -18,26 +18,44 @@ export const handle: Handle = async ({ event, resolve }) => {
   // Add timing information
   const startTime = Date.now();
 
-  // === LUCIA V3 SESSION VALIDATION ===
-  const sessionId = event.cookies.get('auth_session');
 
-  if (!sessionId) {
-    event.locals.user = null;
-    event.locals.session = null;
+  // === DEV BYPASS AUTH ===
+  if (process.env.DEV_BYPASS_AUTH === 'true') {
+    event.locals.user = {
+      id: 'dev-admin-id',
+      email: 'admin@yorha.dev',
+      username: '2B',
+      role: 'admin'
+    };
+    event.locals.session = {
+      id: 'dev-session-id',
+      userId: 'dev-admin-id',
+      expiresAt: new Date(Date.now() + 86400000),
+      fresh: true
+    } as any;
   } else {
-    const { session, user } = await validateSession(sessionId);
+    // === LUCIA V3 SESSION VALIDATION ===
+    const sessionId = event.cookies.get('auth_session');
 
-    if (session && session.fresh) {
-      setSessionCookie(event.cookies, session.id);
+    if (!sessionId) {
+      event.locals.user = null;
+      event.locals.session = null;
+    } else {
+      const { session, user } = await validateSession(sessionId);
+
+      if (session && session.fresh) {
+        setSessionCookie(event.cookies, session.id);
+      }
+
+      if (!session) {
+        deleteSessionCookie(event.cookies);
+      }
+
+      event.locals.user = user;
+      event.locals.session = session;
     }
-
-    if (!session) {
-      deleteSessionCookie(event.cookies);
-    }
-
-    event.locals.user = user;
-    event.locals.session = session;
   }
+
 
   // Resolve the request
   const response = await resolve(event);

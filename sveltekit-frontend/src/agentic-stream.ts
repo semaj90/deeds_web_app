@@ -14,7 +14,7 @@ interface OllamaStreamResponse {
 }
 
 interface TensorRTRequest {
-  model_name: string; inputs: Array<{ name: string; shape: number[]; datatype: string; data, string[] }>;
+  model_name: string; inputs: Array<{ name: string; shape: number[]; datatype: string; data: string[] }>;
   outputs: Array<{ name, string }>;
 }
 

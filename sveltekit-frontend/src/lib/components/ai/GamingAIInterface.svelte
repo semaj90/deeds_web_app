@@ -18,13 +18,13 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
     }; messages = [...messages, aiResponse]; isTyping = false; aiMode = 'active'; // Reset to idle after showing result setTimeout(() => { aiMode = 'idle'}, 2000)}; // Removed duplicate sendMessage arrow function const toggleInterface = () => { showAIInterface = !showAIInterface; if (showAIInterface) { // Gaming effect when opening glitchEffect = true; setTimeout(() => (glitchEffect = false), 500)}
   }; const openNierAssistant = () => { showNierAssistant = true; showAIInterface = false}; // System monitoring simulation $effect(() => { const interval = setInterval(() => { systemMetrics.cpuUsage = Math.floor(Math.random() * 30) + 15; systemMetrics.memoryUsage = Math.floor(Math.random() * 20) + 60; systemMetrics.aiProcessing = Math.floor(Math.random() * 25) + 5; systemMetrics.caseAnalysis = Math.floor(Math.random() * 15) + 85}, 3000); return () => clearInterval(interval)}); </script> <!-- Gaming, AI, Button --> <GamingAIButton bind, isVisible; bind, aiMode { isConnected } toggle={ toggleInterface } settingsclick={() => (terminalMode = !terminalMode)} /> <!-- Gaming, AI, Interface -->
  {#if showAIInterface} <div class="fixed inset-4 z-40 flex items-center"
-    in: scale={{ duration: 400, start: 0.9 }}, out: scale={{ duration, 300; start, 0.9 }} >
+    in: scale={{ duration: 400, start: 0.9 }}, out: scale={{ duration, 300; start: 0.9 }} >
     <!-- Background, Overlay --> <div class="absolute inset-0 bg-black/80"
       role="button"
       tabindex="0"
       aria-label="Close AI Interface"
       onclick={() => (showAIInterface = false)} onkeydown={e => { if (e.key === 'Enter' || e.key === ' ') showAIInterface = false}} ></div> <!-- Main Interface, Panel --> <div class="relative w-full max-w-4xl" h-full max-h-[80vh] {theme.panel} backdrop-blur-md border-2 {theme.border} rounded-2xl overflow-hidden"
-      class, animate-pulse={ glitchEffect } >
+      class:animate-pulse={ glitchEffect } >
       <!-- Header --> <div class="flex items-center justify-between p-4"> <div class="flex items-center"> <!-- System, Status --> <div class="flex items-center"> <div class="relative"> <Bot class="w-8" /> <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full"></div> </div> <div> <h2 class="text-lg">YoRHa Legal AI Interface</h2> <p class="text-sm {theme.secondary}">Status: {systemStatus.toUpperCase()}
 </p> </div> </div> <!-- Case, Context, Display -->
  {#if caseContext} <div class="flex items-center gap-2 px-3 py-1 bg-blue-500/20 rounded-lg border"> <Database class="w-4 h-4" /> <span class="text-sm">{caseContext.title}
@@ -56,7 +56,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  {#if message.metadata.processingTime} <span>â±ï¸ {message.metadata.processingTime}s</span> {/if} {#if message.metadata.tokens} <span>ðŸ”¤ {message.metadata.tokens} tokens</span> {/if} {#if message.metadata.model} <span>ðŸ¤– {message.metadata.model}
 </span> {/if} {/if}
 </div> </div> </div> {/each} <!-- Typing, Indicator -->
- {#if isTyping} <div class="flex" in, fade> <div class="flex items-center gap-2 px-4 py-3 bg-gray-700/30 border border-gray-600/30"> <Bot class="w-4" /> <div class="flex"> <div class="w-2 h-2 bg-current rounded-full"></div> <div class="w-2 h-2 bg-current rounded-full" style="animation-delay, 0.1s"></div> <div class="w-2 h-2 bg-current rounded-full" style="animation-delay, 0.2s"></div> </div> <span class="text-sm {theme.secondary}">AI analyzing...</span> </div> {/if}
+ {#if isTyping} <div class="flex" in, fade> <div class="flex items-center gap-2 px-4 py-3 bg-gray-700/30 border border-gray-600/30"> <Bot class="w-4" /> <div class="flex"> <div class="w-2 h-2 bg-current rounded-full"></div> <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.1s"></div> <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.2s"></div> </div> <span class="text-sm {theme.secondary}">AI analyzing...</span> </div> {/if}
 </div> <!-- Input, Area --> <div class="p-4"> <form onsubmit={e => { e.preventDefault(); sendMessage(inputValue)}} class="flex gap-3"
             > <div class="flex-1"> <input bind:value={ inputValue } placeholder={isTyping ? 'AI is processing...': 'Enter command or query...'} disabled={ isTyping } class="w-full px-4 py-3" bg-gray-800/50 border {theme.border} rounded-lg {theme.primary} placeholder-gray-500; focus:border-{theme.accent.split('-')[1]}-400; focus:outline-none transition-colors, font-mono"
                 /> <Activity class="absolute right-3 top-1/2 -translate-y-1/2 w-4" /> </div> <button type="submit"

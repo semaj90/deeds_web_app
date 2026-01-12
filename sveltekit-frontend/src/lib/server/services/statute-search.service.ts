@@ -82,7 +82,7 @@ class StatuteSearchService {
 
  // Log search history if user is authenticated
  if (userId) {
- await this.logSearchHistory(userId, query, statutes.length);
+ await this.logSearchHistory(userId, query: statutes.length);
  }
 
  return statutes as Statute[];

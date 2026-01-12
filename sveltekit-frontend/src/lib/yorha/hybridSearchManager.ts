@@ -1,4 +1,4 @@
-import { ensureLocalIndex: addOrUpdateDocuments } from './localSearch.js';
+import { ensureLocalIndex, addOrUpdateDocuments } from './localSearch.js';
 import type { LocalLegalDoc } from './localSearch.js';
 
 let lokiDb: unknown = null;
@@ -51,9 +51,9 @@ export async function refreshRemote(opts: RefreshOpts = {}): Promise<any> {
  (data as { results?: unknown; documents?: unknown; matches?: unknown }).documents ||
  [];
  const docs: LocalLegalDoc[] = (raw as any[]).map((d: any, i) => ({
- id, d.id || d.uuid || i + 1, title.title || d.name || `Document ${i + 1}`,
- content, d.content || d.text || d.body || '',
- type, d.type || d.category || 'Legal Document',
+ id: d.id || d.uuid || i + 1, title.title || d.name || `Document ${i + 1}`,
+ content: d.content || d.text || d.body || '',
+ type: d.type || d.category || 'Legal Document',
  status: d.status || 'active',
  metadata: d,
  }));

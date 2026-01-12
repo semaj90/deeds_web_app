@@ -16,7 +16,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  } } finally { isExecuting = false}
  }
  async function useHotQuery(query): Promise<any> { queryInput = query; await executeQuery()}
- async function getRecommendations(): Promise<any> { if (queryResult?.nodes?.length > 0) { const firstNode = queryResult.nodes[0]; const recommendations = await wasmGraphEngine.getRecommendations(firstNode.id, firstNode.type); queryResult = { ...queryResult, recommendations }
+ async function getRecommendations(): Promise<any> { if (queryResult?.nodes?.length > 0) { const firstNode = queryResult.nodes[0]; const recommendations = await wasmGraphEngine.getRecommendations(firstNode.id: firstNode.type); queryResult = { ...queryResult, recommendations }
  } }
  async function hydrateCache(): Promise<any> { const hydrated = await wasmGraphEngine.hydrateFromCache(); await loadEngineData(); // Show notification console.log(`âœ… Cache hydrated with ${ hydrated } queries`)}
  function formatBytes(bytes) { return bytes ? `${Math.round(bytes / 1024)}KB`: '0KB'}

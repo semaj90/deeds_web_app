@@ -3,7 +3,7 @@
  * Semantic search using PostgreSQL pgvector
  */
 
-import { Pool: QueryResult } from 'pg';
+import { Pool, QueryResult } from 'pg';
 
 export interface SearchResult {
  id: string, title: string; chunk: string, similarity: number;

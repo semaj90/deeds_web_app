@@ -299,7 +299,7 @@ export class WebSearchService {
 
       await this.minioService.storeObject(
         'ace-web-raw',
-        key,
+        key:
         JSON.stringify(snapshot, null, 2),
         'application/json'
       );

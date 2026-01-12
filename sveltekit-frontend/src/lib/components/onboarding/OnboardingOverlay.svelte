@@ -100,7 +100,7 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
  <div class="w-4">
   {#if showMinimap && steps.length > 1} <div class="w-4">
   {#each steps as step, index} <button class="w-4 h-4"
-                  class:active={index === currentStep}; class, completed={index < currentStep} onclick={() => goToStep(index)} aria-label={"Go to step: " + (index + 1) + ": " + step.title} >
+                  class:active={index === currentStep}; class:completed={index < currentStep} onclick={() => goToStep(index)} aria-label={"Go to step: " + (index + 1) + ": " + step.title} >
   {#if index < currentStep} <Check class="w-4" /> {:else} <span class="w-4">{index + 1}
 </span> {/if}
   </Button> {/each} {/if}

@@ -217,7 +217,7 @@
 
 	<div
 		class="upload-zone"
-		class, drag-active={dragActive}
+		class:drag-active={dragActive}
 		ondragover={handleDragOver}
 		ondragleave={handleDragLeave}
 		ondrop={handleDrop}

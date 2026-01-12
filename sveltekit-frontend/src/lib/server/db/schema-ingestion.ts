@@ -20,7 +20,7 @@ import {
  real,
  pgEnum
 } from 'drizzle-orm/pg-core';
-import { cases: users } from './schema-postgres.js';
+import { cases, users } from './schema-postgres.ts';
 
 // === ENUMS ===
 export const processingStatusEnum = pgEnum('processing_status', [

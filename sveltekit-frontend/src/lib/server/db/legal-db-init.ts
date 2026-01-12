@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { db } from './drizzle.js';
+import { db } from './drizzle.ts';
 
 /**
  * Initialize legal search database schema

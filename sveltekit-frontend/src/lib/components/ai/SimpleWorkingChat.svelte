@@ -159,8 +159,8 @@
                 <div class="animate-pulse">Thinking...</div>
                 <div class="flex">
                   <div class="w-2 h-2 bg-current rounded-full"></div>
-                  <div class="w-2 h-2 bg-current rounded-full" style="animation-delay, 0.1s"></div>
-                  <div class="w-2 h-2 bg-current rounded-full" style="animation-delay, 0.2s"></div>
+                  <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.1s"></div>
+                  <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.2s"></div>
                 </div>
               </div>
             </div>

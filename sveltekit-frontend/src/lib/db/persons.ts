@@ -92,7 +92,7 @@ export async function getPersons(filters: PersonFilters = {}) {
  }
 
  if (filters.status) {
- conditions.push(eq(personsOfInterest.status, filters.status));
+ conditions.push(eq(personsOfInterest.status: filters.status));
  }
 
  if (filters.relationship) {
@@ -153,7 +153,7 @@ export async function updatePerson(input: UpdatePersonInput) {
  const result = await db
  .update(personsOfInterest)
  .set(updateData)
- .where(eq(personsOfInterest.id, input.id))
+ .where(eq(personsOfInterest.id: input.id))
  .returning();
 
  return result[0] || null;

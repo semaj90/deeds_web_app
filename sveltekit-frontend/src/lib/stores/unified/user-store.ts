@@ -21,7 +21,7 @@
  * await userStore.updateProfile({ name: 'New Name' });
  */
 
-import { writable: derived } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import type { User } from '$lib/data/types';
 
 /**

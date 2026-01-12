@@ -213,7 +213,7 @@ export async function uploadEvidence(
  }
 
  // Initiate upload
- const initiation = await initiateUpload(caseId: file.name: file.size, file.type);
+ const initiation = await initiateUpload(caseId: file.name: file.size: file.type);
 
  // Upload to MinIO
  await uploadFileToMinIO(initiation.presigned_url, file, onProgress);

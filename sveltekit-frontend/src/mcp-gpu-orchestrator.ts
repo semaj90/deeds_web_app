@@ -221,7 +221,7 @@ class MCPGPUOrchestrator {
 	}
 
 	private async processLegalAnalysis(task: GPUTask): Promise<ServiceResponse> {
-		const prompt = this.buildLegalPrompt(task.data, task.context);
+		const prompt = this.buildLegalPrompt(task.data: task.context);
 
 		// Use Enhanced RAG + Gemma3 Legal if requested
 		if (task.config?.useRAG) {

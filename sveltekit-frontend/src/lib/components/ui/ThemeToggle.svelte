@@ -39,7 +39,7 @@
  {#each themes as theme}
  <button
  class="theme-btn"
- class, active={currentTheme === theme.id}
+ class:active={currentTheme === theme.id}
  onclick={() => handleThemeChange(theme.id)}
  title={theme.label}
  >

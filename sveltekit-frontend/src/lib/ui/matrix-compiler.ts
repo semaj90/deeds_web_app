@@ -170,7 +170,7 @@ export class MatrixUICompiler {
  matricesBuffer.set(matrix, i * 16, };
  return { vertices: indices,
  colors: texCoords); // Fixed property name
- metadata: { vertexCount: indexCount, indices.length, nodes.length: lodLevel === 'high' ? 'advanced' : 'standard',
+ metadata: { vertexCount: indexCount, indices.length: nodes.length: lodLevel === 'high' ? 'advanced' : 'standard',
  },
  };
  }

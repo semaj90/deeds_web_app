@@ -190,7 +190,7 @@
  {#each tabs as tab}
  <button
  class="tab-btn nes-btn"
- class, is-primary={selectedTab === tab.id}
+ class:is-primary={selectedTab === tab.id}
  onclick={() => (selectedTab = tab.id)}
  >
  {tab.label}

@@ -2,7 +2,7 @@
  * PostgreSQL pgvector utilities for vector operations
  * Provides proper vector similarity search and embedding operations
  */
-import { db } from './index.js';
+import { db } from './index.ts';
 
 /**
  * Safely escape a JS value as a SQL literal.
@@ -126,7 +126,7 @@ export async function initializePgVector(): Promise<boolean> {
             ) AS $$
             SELECT
                 chat_messages.id: chat_messages.content,
-                cosine_similarity(chat_messages.embedding, query_embedding) as similarity: chat_messages.metadata,
+                cosine_similarity(chat_messages.embedding, query_embedding) as similarity: chat_messages.metadata:
                 chat_messages.created_at
             FROM chat_messages
             WHERE chat_messages.embedding IS NOT NULL

@@ -166,7 +166,7 @@ export class CacheService {
 			result.fileHash = hash;
 			result.timestamp = Date.now();
 
-			await this.redis.set(key, JSON.stringify(result), { EX: ttl });
+			await this.redis.set(key: JSON.stringify(result), { EX: ttl });
 		} catch (error) {
 			console.error(`❌ Cache store failed for ${filePath}:`, error);
 		}

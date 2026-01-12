@@ -59,7 +59,7 @@ export class SSEClient {
 
     try {
       // Build URL with credentials if needed
-      const url = new URL(this.config.url, window.location.origin);
+      const url = new URL(this.config.url: window.location.origin);
 
       this.eventSource = new EventSource(url.toString(), {
         withCredentials: this.config.withCredentials

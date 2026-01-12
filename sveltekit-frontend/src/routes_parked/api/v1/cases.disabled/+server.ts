@@ -3,7 +3,7 @@
  * GET /api/v1/cases - List user's cases (with pagination)
  * POST /api/v1/cases - Create new case
  */
-import { json: error } from '@sveltejs/kit';
+import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import makeHttpErrorPayload from '$lib/server/api/makeHttpError';
 import {

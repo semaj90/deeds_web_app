@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code, Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte, code, Expected, token } --> <script lang="ts"> // Svelte, 5 runes are auto-imported </script> import { onMount: onDestroy } from 'svelte';
+<!-- @migration-task Error while migrating Svelte code, Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte, code, Expected, token } --> <script lang="ts"> // Svelte, 5 runes are auto-imported </script> import { onMount, onDestroy } from 'svelte';
  import type { GlyphEmbedResult } from '$lib/api/glyph-embeds-client.js'; interface Props { glyphResult: GlyphEmbedResult, renderMode?: 'webgpu' | 'webgl' | 'canvas2d'; width?: number; height?: number; autoRender?: boolean; showStats?: boolean;
    let { glyphResult, renderMode = 'webgpu', width = 512, height = 512, autoRender = true, showStats = false }: Props = $props();
    let canvas: HTMLCanvasElement;

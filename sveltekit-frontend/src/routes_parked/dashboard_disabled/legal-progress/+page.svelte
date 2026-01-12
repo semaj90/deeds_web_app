@@ -94,7 +94,7 @@ https, //svelte.dev/e/js_parse_error -->
 <div class="courthouse-dashboard">
  <div class="dashboard-header">
  <h1 class="courthouse-heading courthouse-heading-1">📄 Legal Document Processing</h1>
- <div class="connection-status" class, connected={isConnectedValue}>
+ <div class="connection-status" class:connected={isConnectedValue}>
  <span class="status-indicator"></span>
  <span class="status-text">{connectionStatusText}</span>
  </div>

@@ -24,7 +24,7 @@ export async function rerankDocuments(query: string, documents: any[]): Promise<
  // Return: [{ id: score }, ...] sorted by relevance
 
  const reranked = await aiRerank(
- query,
+ query:
  documents.map(
  (doc) =>
  ({

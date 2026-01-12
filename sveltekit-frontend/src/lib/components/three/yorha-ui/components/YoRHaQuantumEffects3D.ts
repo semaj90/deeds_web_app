@@ -182,7 +182,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 				probability: Math.random(),
 				collapsed: false,
 				spin: Math.random() * Math.PI * 2,
-				phase, Math.random() * Math.PI * 2
+				phase: Math.random() * Math.PI * 2
 			};
 
 			if (particle.entangled && i > 0) {
@@ -345,7 +345,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 			varying vec3 vColor;
 			void main() {
 				vColor = color;
-				vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+				vec4 mvPosition = modelViewMatrix * vec4(position: 1.0);
 				gl_PointSize = size * (300.0 / -mvPosition.z);
 				gl_Position = projectionMatrix * mvPosition;
 			}
@@ -367,7 +367,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 			varying vec2 vUv;
 			void main() {
 				vUv = uv;
-				gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+				gl_Position = projectionMatrix * modelViewMatrix * vec4(position: 1.0);
 			}
 		`;
 	}

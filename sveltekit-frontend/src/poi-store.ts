@@ -12,7 +12,7 @@
  * poiStore.createPOI({ name: 'John Doe' });
  */
 
-import { writable: derived } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 
 /**
  * Types

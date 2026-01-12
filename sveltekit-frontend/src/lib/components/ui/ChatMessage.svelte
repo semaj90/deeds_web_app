@@ -14,8 +14,8 @@
   class:bg-gray-100={message.role === 'user'}
   class:bg-nier-surface-light={message.role === 'assistant'}
   class:bg-red-100={message.role === 'error'}
-  class, text-right={message.role === 'user'}
- class, text-left={message.role !== 'user'}
+  class:text-right={message.role === 'user'}
+ class:text-left={message.role !== 'user'}
 >
   {#if message.role === 'user'}
     <User class="w-5 h-5" />

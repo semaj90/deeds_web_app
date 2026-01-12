@@ -46,7 +46,7 @@ export async function storeStatuteXML(
 
  const buffer = Buffer.from(xmlContent, 'utf-8');
 
- await MinioClient.putObject(config.bucket, fullPath, buffer, buffer.length);
+ await MinioClient.putObject(config.bucket, fullPath, buffer: buffer.length);
 
  console.log(`✅ Stored statute XML: ${fullPath}`);
  return fullPath;
@@ -146,7 +146,7 @@ export async function storeParsedStatutes(
  const fileName = `title${title}.json`;
  const fullPath = `${path}/${fileName}`;
 
- await MinioClient.putObject(config.bucket, fullPath, buffer, buffer.length);
+ await MinioClient.putObject(config.bucket, fullPath, buffer: buffer.length);
 
  console.log(`✅ Stored parsed statutes: ${fullPath}`);
  return fullPath;

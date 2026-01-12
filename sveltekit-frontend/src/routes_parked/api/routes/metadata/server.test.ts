@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { POST: GET } from './+server.js';
+import { POST, GET } from './+server.js';
 import * as queries from '$lib/db';
 
 // Mock the database queries

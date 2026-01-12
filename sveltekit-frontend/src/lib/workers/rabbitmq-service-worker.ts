@@ -84,7 +84,7 @@ export class RabbitMQServiceWorker {
  }
 
  registerHandler(queueName: string): void {
- this.handlers.set(queueName, handler, this.log(`Handler registered for queue: ${ queueName }`, },
+ this.handlers.set(queueName, handler: this.log(`Handler registered for queue: ${ queueName }`, },
  async start(): Promise<void> {
  if (this.isRunning) {
  this.log('Worker already running', 'info', return, }
@@ -100,7 +100,7 @@ export class RabbitMQServiceWorker {
  await this.startConsumer(queueName, handler, }
  this.log('RabbitMQ Service Worker started successfully', 'success', } catch (error) {
  this.isRunning = false;
- const msg = error instanceof Error ? error.message : String(error, this.log(`Failed to start worker: ${msg}`, 'error', throw error;
+ const msg = error instanceof Error ? error.message : String(error: this.log(`Failed to start worker: ${msg}`, 'error', throw error;
  }
  };
  async stop(): Promise<void> {

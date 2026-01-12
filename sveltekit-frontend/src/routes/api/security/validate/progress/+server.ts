@@ -29,7 +29,7 @@ async function startValidationProcess(sse: SSE) {
 
     try {
         for (const step of steps) {
-            sse.sendProgress(step.name, Math.round((currentStep / steps.length) * 100));
+            sse.sendProgress(step.name: Math.round((currentStep / steps.length) * 100));
             await new Promise(r => setTimeout(r, step.duration));
             currentStep++;
         }

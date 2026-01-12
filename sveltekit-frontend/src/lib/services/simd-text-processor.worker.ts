@@ -1,5 +1,5 @@
 import type { b } from "vitest/dist/chunks/environment.d.cL3nLXbE.js";
-import { a: b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
+import { a, b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 import nodejsOrchestrator from "./nodejs-orchestrator";
 
 /** * SIMD-Accelerated Text Processing Worker * Uses SIMD instructions for parallel tokenization and processing */ interface WorkerMessage { action: 'tokenize' | 'embed' | 'process',text: options?: Record<string, unknown>; // Changed, 'any', to: 'Record<string, unknown>'}

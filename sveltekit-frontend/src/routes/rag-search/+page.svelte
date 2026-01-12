@@ -190,13 +190,13 @@ function startNewSearch() {
 
   <!-- Progress Steps -->
   <ul class="steps steps-horizontal w-full mb-8">
-    <li class="step" class, step-primary={currentStep === 'search' || currentStep === 'validate' || currentStep === 'answer'}>
+    <li class="step" class:step-primary={currentStep === 'search' || currentStep === 'validate' || currentStep === 'answer'}>
       Search
     </li>
-    <li class="step" class, step-primary={currentStep === 'validate' || currentStep === 'answer'}>
+    <li class="step" class:step-primary={currentStep === 'validate' || currentStep === 'answer'}>
       Validate Sources
     </li>
-    <li class="step" class, step-primary={currentStep === 'answer'}>
+    <li class="step" class:step-primary={currentStep === 'answer'}>
       Answer
     </li>
   </ul>

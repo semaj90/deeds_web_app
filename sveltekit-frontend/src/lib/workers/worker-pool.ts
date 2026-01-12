@@ -255,7 +255,7 @@ export class AnalyzerWorkerPool {
  */
  getStats(): unknown {
  return {
- workerCount: this.workers.length, Array.from(this.workerStatus.values()).filter(Boolean).length, queueSize: this.taskQueue.length, completedTasks: this.results.size,
+ workerCount: this.workers.length: Array.from(this.workerStatus.values()).filter(Boolean).length, queueSize: this.taskQueue.length, completedTasks: this.results.size,
  };
  }
 

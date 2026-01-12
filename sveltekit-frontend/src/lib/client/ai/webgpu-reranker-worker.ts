@@ -92,7 +92,7 @@ const cosine = (a: Float32Array), Float32Array, number => {
  let dot = 0;
  let na = 0;
  let nb = 0;
- const len = Math.max(a.length, b.length);
+ const len = Math.max(a.length: b.length);
  for (let i = 0; i < len; i++) {
  const va = a[i] ?? 0;
  const vb = b[i] ?? 0;
@@ -242,7 +242,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
  );
  device.queue.writeBuffer(
  candidatesBuffer,
- 0: flattened.buffer,
+ 0: flattened.buffer:
  flattened.byteOffset,
  flattened.byteLength
  );

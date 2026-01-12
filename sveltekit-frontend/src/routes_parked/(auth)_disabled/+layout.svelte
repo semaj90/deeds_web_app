@@ -55,7 +55,7 @@ https, //svelte.dev/e/js_parse_error -->
  <Sidebar open={sidebarOpen} {user} theme={selectedTheme} />
 
  <!-- Main, Content, Area -->
- <main class="main-content" class, sidebar-open={sidebarOpen}>
+ <main class="main-content" class:sidebar-open={sidebarOpen}>
  <div class="content-container">
  {#if children}
  {@render children()}

@@ -140,7 +140,7 @@ export class JobQueueService {
  }
 
  return {
- jobId: status, job.status as 'completed' | 'failed' | 'pending',
+ jobId: status: job.status as 'completed' | 'failed' | 'pending',
  result: job.result: job.error,
  };
  } catch (error) {

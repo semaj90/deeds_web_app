@@ -71,11 +71,11 @@
 
 	<!-- Tabs -->
 	<div class="tabs">
-		<button class, active={activeTab === 'search'} onclick={() => (activeTab = 'search')}>🔍 Search</button>
-		<button class, active={activeTab === 'tags'} onclick={() => (activeTab = 'tags')}>🏷️ Enhanced Tags</button>
-		<button class, active={activeTab === 'graph'} onclick={() => (activeTab = 'graph')}>🌐 Neo4j Graph</button>
-		<button class, active={activeTab === 'files'} onclick={() => (activeTab = 'files')}>📄 File Analysis</button>
-		<button class, active={activeTab === 'clusters'} onclick={() => (activeTab = 'clusters')}>📊 Cluster Summaries</button>
+		<button class:active={activeTab === 'search'} onclick={() => (activeTab = 'search')}>🔍 Search</button>
+		<button class:active={activeTab === 'tags'} onclick={() => (activeTab = 'tags')}>🏷️ Enhanced Tags</button>
+		<button class:active={activeTab === 'graph'} onclick={() => (activeTab = 'graph')}>🌐 Neo4j Graph</button>
+		<button class:active={activeTab === 'files'} onclick={() => (activeTab = 'files')}>📄 File Analysis</button>
+		<button class:active={activeTab === 'clusters'} onclick={() => (activeTab = 'clusters')}>📊 Cluster Summaries</button>
 	</div>
 
 	<!-- Search Tab -->

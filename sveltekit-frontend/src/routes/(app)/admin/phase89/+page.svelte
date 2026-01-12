@@ -274,16 +274,16 @@
 
 	<!-- Tab Navigation -->
 	<nav class="tabs">
-		<button class="tab" class, active={activeTab === 'search'} onclick={() => activeTab = 'search'}>
+		<button class="tab" class:active={activeTab === 'search'} onclick={() => activeTab = 'search'}>
 			🔍 Vector Search
 		</button>
-		<button class="tab" class, active={activeTab === 'clusters'} onclick={() => activeTab = 'clusters'}>
+		<button class="tab" class:active={activeTab === 'clusters'} onclick={() => activeTab = 'clusters'}>
 			📊 Clusters
 		</button>
-		<button class="tab" class, active={activeTab === 'graph'} onclick={() => activeTab = 'graph'}>
+		<button class="tab" class:active={activeTab === 'graph'} onclick={() => activeTab = 'graph'}>
 			🕸️ Graph Analysis
 		</button>
-		<button class="tab" class, active={activeTab === 'pipeline'} onclick={() => activeTab = 'pipeline'}>
+		<button class="tab" class:active={activeTab === 'pipeline'} onclick={() => activeTab = 'pipeline'}>
 			🚀 Pipeline
 		</button>
 	</nav>
@@ -334,7 +334,7 @@
 					{#each clusters as cluster (cluster.cluster_id)}
 						<button
 							class="cluster-card"
-							class, selected={selectedCluster?.cluster_id === cluster.cluster_id}
+							class:selected={selectedCluster?.cluster_id === cluster.cluster_id}
 							onclick={() => selectedCluster = cluster}
 						>
 							<div class="cluster-header">

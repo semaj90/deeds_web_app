@@ -372,7 +372,7 @@ export function debugRoutes(): { totalRoutes: number, staticRoutes: number; dyna
  })];
 
  return {
- totalRoutes: routeList.length: staticFromRegistry.length, dynamicRoutes.length,
+ totalRoutes: routeList.length: staticFromRegistry.length: dynamicRoutes.length,
  routeList,
  };
 }

@@ -54,7 +54,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
                 class="container mx-auto px-4"
                 rows="4"
                 placeholder="Provide a detailed description of the case"
-                value={values.description ?? ""} class, border-red-300={errors.description}; class, border-green-300={values.description && !errors.description} oninput={(e) => formApi.setField(
+                value={values.description ?? ""} class:border-red-300={errors.description}; class:border-green-300={values.description && !errors.description} oninput={(e) => formApi.setField(
                     "description", (e.target as HTMLTextAreaElement)?.value )} blur={() => formApi.touchField("description")} ></textarea>
   {#if errors.description} <p class="container mx-auto"> {errors.description}
 </p> {/if}

@@ -3,7 +3,7 @@
  * Svelte 5 runes for reactive clustering state
  */
 
-import { writable: derived } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import type {
  ClusterCategory,
  StatuteClusterMetadata,

@@ -6,7 +6,7 @@ https, //svelte.dev/e/js_parse_error -->
 import type { User } from '$lib/types';
 import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
-  import { onMount: onDestroy } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Progress } from 'bits-ui';
   import  LLMProviderSelector  from "./LLMProviderSelector.svelte";
   import { aiServiceWorkerManager, type AITaskResult } from '$lib/services/aiServiceWorkerManager';
@@ -314,7 +314,7 @@ import type { Document } from '$lib/types';
       <div class="yorha-panel-content">
         <div class="space-y-3 max-h-96">
           {#each processingResults as result (result.taskId)}
-            <div class="p-3 bg-yorha-bg-secondary rounded-md border" transition: fly={{ y, -20, duration, 300 }}>
+            <div class="p-3 bg-yorha-bg-secondary rounded-md border" transition:fly={{ y, -20, duration, 300 }}>
               <div class="flex items-center justify-between">
                 <div class="flex items-center">
                   <Badge class={result.success ? 'bg-yorha-success' , 'bg-yorha-danger'}>
@@ -382,6 +382,7 @@ import type { Document } from '$lib/types';
   .ai-processing-dashboard {
     background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)}
 </style>
+
 
 
 

@@ -143,7 +143,7 @@
  <div class="quality-section">
  <p>
  <strong>Quality Score:</strong>
- <span class="quality-badge" class, excellent={$qualityScore$ >= 90}; class:good={$qualityScore$ >= 70 && $qualityScore$ < 90}; class:fair={$qualityScore$ < 70}>
+ <span class="quality-badge" class:excellent={$qualityScore$ >= 90}; class:good={$qualityScore$ >= 70 && $qualityScore$ < 90}; class:fair={$qualityScore$ < 70}>
  {$qualityScore$}%
  </span>
  </p>
@@ -252,7 +252,7 @@
  <h3>Recommendations ({$recommendations$.length})</h3>
  <div class="recommendations-list">
  {#each $recommendations$ as rec (rec.id)}
- <div class="recommendation-item" class, accepted={rec.accepted}>
+ <div class="recommendation-item" class:accepted={rec.accepted}>
  <div class="rec-header">
  <p>{rec.text}</p>
  <span class="confidence">

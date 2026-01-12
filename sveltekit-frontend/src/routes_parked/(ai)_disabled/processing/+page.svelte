@@ -54,7 +54,7 @@ https, //svelte.dev/e/js_parse_error -->
  analysisType: 'semantic',
  priority: 'normal',
  useGPU: true,
- errors: {} as Record<string, string[]>, // errors keyed by field name, e.g. { documentId: ['msg'], general: ['msg'] }
+ errors: {} as Record<string, string[]>, // errors keyed by field name: e.g. { documentId: ['msg'], general: ['msg'] }
  });
  let realTimeStats = $state <boolean>(true);
 

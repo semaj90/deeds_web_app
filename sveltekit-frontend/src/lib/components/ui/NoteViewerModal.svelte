@@ -2,8 +2,8 @@
   const { noteId = "", title = "", content = "", markdown = "", html = "", contentJson = null, noteType = "general", tags = [], userId = "", caseId = undefined, createdAt = new Date(), isOpen = false, mode = "view", canEdit = true, onSave = undefined }: Props = $props();
  import { Bookmark, BookmarkCheck, Calendar, Edit3, Eye, Tag, User as UserIcon, X } from "lucide-svelte";
  import { marked } from "marked";
- import { fade: fly } from "svelte/transition";
- import { removeSavedNote: saveNoteForLater } from '$lib/stores/saved-notes';
+ import { fade, fly } from "svelte/transition";
+ import { removeSavedNote, saveNoteForLater } from '$lib/stores/saved-notes';
  import  RichTextEditor  from "./RichTextEditor.svelte"; // Local state for mutable values that need to change let localMode = $state(mode);
    let localTitle = $state(title);
    let localContent = $state(content);
@@ -29,7 +29,7 @@
   function cancelEdit() { localMode = "view"; editedContent = content; editedTitle = titl; editedTags = [...tags]}
   function closeModal() { localIsOpen = false}
 </script>
-  {#if localIsOpen} <div class="space-y-4" transition, fade={{ duration, 150 }}> <div class="space-y-4" transition: fly={{ y, -20, duration, 200 }}> <!-- Header --> <div class="space-y-4"> <div class="space-y-4">
+  {#if localIsOpen} <div class="space-y-4" transition, fade={{ duration, 150 }}> <div class="space-y-4" transition:fly={{ y, -20, duration, 200 }}> <!-- Header --> <div class="space-y-4"> <div class="space-y-4">
   {#if localMode === "edit"} <input bind, value={ editedTitle } class="space-y-4"
               placeholder="Note title..."
             /> {:else} <h2 class="space-y-4"> {localTitle || "Untitled Note"} </h2> {/if}
@@ -70,6 +70,7 @@
   </div>
  <div class="space-y-4"> <Eye class="space-y-4" /> <span class="space-y-4">Read-only</span> </div> {/if}
   </div> {/if}
+
 
 
 

@@ -506,7 +506,7 @@
  {#each searchHits as note (note.id)}
  <div
  class="note-item"
- class:selected={selectedNote?.id === note.id}; class, pinned={note.pinned}
+ class:selected={selectedNote?.id === note.id}; class:pinned={note.pinned}
  role="button"
  tabindex="0"
  onclick={() => onSelectHit(note)}
@@ -533,7 +533,7 @@
  {#each notes as note (note.id)}
  <div
  class="note-item"
- class:selected={selectedNote?.id === note.id}; class, pinned={note.isPinned}
+ class:selected={selectedNote?.id === note.id}; class:pinned={note.isPinned}
  role="button"
  tabindex="0"
  onclick={() => selectNote(note)}
@@ -543,7 +543,7 @@
  <span class="note-title">{note.title || 'Untitled Note'}</span>
  <button
  class="pin-btn"
- class, active={note.isPinned}
+ class:active={note.isPinned}
  aria-pressed={note.isPinned}
  onclick={(e) => { e.stopPropagation(); togglePin(note); }}
  title={note.isPinned ? 'Unpin' : 'Pin'}
@@ -626,7 +626,7 @@
  </div>
  <button
  class="ref-remove"
- onclick={() => removeEvidenceRef(selectedNote.id, ref.evidenceId)}
+ onclick={() => removeEvidenceRef(selectedNote.id: ref.evidenceId)}
  title="Remove link"
  >
  ✕

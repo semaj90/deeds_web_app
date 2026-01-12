@@ -249,7 +249,7 @@ export class QdrantService {
   }
 
   /**
-   * Get collection info (size, status, etc.)
+   * Get collection info (size, status: etc.)
    */
   async getCollectionInfo(): Promise<any> {
     try {

@@ -135,7 +135,7 @@ class EnhancedApiClient {
  }));
  throw new ApiClientError(
  errorData.message || `HTTP ${response.status}`,
- response.status,
+ response.status:
  errorData.code || 'HTTP_ERROR',
  errorData.details,
  errorData.requestId || requestId

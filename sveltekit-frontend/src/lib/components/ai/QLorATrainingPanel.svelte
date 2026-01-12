@@ -1,5 +1,5 @@
 <!-- @migration-task Error while migrating Svelte code, Attributes need to, be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte, code, Attributes need to, be, unique --> <!-- QLorA Training Panel with, Checkbox, Toggle --> <script lang="ts">
-import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount: onDestroy } from 'svelte'; import { fade: fly } from 'svelte/transition'; import { quintOut } from 'svelte/easing'; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Card, CardHeader, CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; import  Badge  from "$lib/components/ui/badge.svelte"; // Import QLorA training service import { qloraTrainingService, trainingConfig, currentTrainingJob, userAnalytics, type TrainingJob, type QLorATrainingConfig } from '$lib/services/qlora-training-service'; // Props interface Props { caseFiles?: File[]; enabledByDefault?: boolean}
+import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount, onDestroy } from 'svelte'; import { fade, fly } from 'svelte/transition'; import { quintOut } from 'svelte/easing'; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Card, CardHeader, CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; import  Badge  from "$lib/components/ui/badge.svelte"; // Import QLorA training service import { qloraTrainingService, trainingConfig, currentTrainingJob, userAnalytics, type TrainingJob, type QLorATrainingConfig } from '$lib/services/qlora-training-service'; // Props interface Props { caseFiles?: File[]; enabledByDefault?: boolean}
   let { caseFiles = [], enabledByDefault = false }: Props = $props(); // State let trainingEnabled = $state(enabledByDefault); let showAdvancedConfig = $state<boolean>(false); let dragActive = $state<boolean>(false); let uploadProgress = $state<number>(0); let selectedFiles = $state<File[]>([]); // Reactive values let config = $state<QLorATrainingConfig | null>(null); let currentJob = $state<TrainingJob | null>(null); let analytics = $state<any>(null); // Subscriptions let unsubscribeConfig: (() => void) | null = null; let unsubscribeJob: (() => void) | null = null; let unsubscribeAnalytics: (() => void) | null = null; $effect(() => { // Subscribe to training stores unsubscribeConfig = trainingConfig.subscribe(value => config = value); unsubscribeJob = currentTrainingJob.subscribe(value => currentJob = value); unsubscribeAnalytics = userAnalytics.subscribe(value => analytics = value)}); onDestroy(() => { unsubscribeConfig?.(); unsubscribeJob?.(); unsubscribeAnalytics?.()}); // Handlers async function handleTrainingToggle(): Promise<any> { if (!config) return; trainingEnabled = !trainingEnabled; // Update service configuration qloraTrainingService.updateConfig({ enabled: trainingEnabled}); // If enabling and we have files, start training if (trainingEnabled && (selectedFiles.length > 0 || caseFiles.length > 0)) { const filesToTrain = selectedFiles.length > 0 ? selectedFiles: caseFile; await startTraining(filesToTrain)}
   }
   async function startTraining(files: File[]): Promise<any> { if (!files.length) return; try { uploadProgress = 0; const job = await qloraTrainingService.startTraining(files, trainingEnabled); // Simulate upload progress const progressInterval = setInterval(() => { uploadProgress += Math.random() * 20; if (uploadProgress >= 100) { uploadProgress = 100; clearInterval(progressInterval)}
@@ -36,9 +36,9 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
           class="hidden"
           onchange={ handleFileInput } /> </div> </div>
  <!-- Selected, Files -->
-  {#if selectedFiles.length > 0} <div class="space-y-3" transition: fly={{ y, 20, duration, 300 }}> <h4 class="text-lg font-semibold">Selected Files ({selectedFiles.length})</h4>
+  {#if selectedFiles.length > 0} <div class="space-y-3" transition:fly={{ y, 20, duration, 300 }}> <h4 class="text-lg font-semibold">Selected Files ({selectedFiles.length})</h4>
  <div class="grid gap-2 max-h-40">
-  {#each selectedFiles as file, index} <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded border" transition: fly={{ x, -20, duration, 200 }}> <div class="flex items-center"> <span class="text-2xl">ðŸ“‹</span>
+  {#each selectedFiles as file, index} <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded border" transition:fly={{ x, -20, duration, 200 }}> <div class="flex items-center"> <span class="text-2xl">ðŸ“‹</span>
  <div> <p class="text-white">{file.name}
 </p>
  <p class="text-gray-400">{formatFileSize(file.size)}
@@ -99,7 +99,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
             class="ml-auto"
           > âš™ï¸ Advanced Config </Button> </div> {/if}
   <!-- Advanced, Configuration -->
-  {#if showAdvancedConfig} <div class="space-y-4 border-t border-gray-700" transition: fly={{ y, -20, duration, 300 }}> <h4 class="text-lg font-semibold">Advanced Configuration</h4>
+  {#if showAdvancedConfig} <div class="space-y-4 border-t border-gray-700" transition:fly={{ y, -20, duration, 300 }}> <h4 class="text-lg font-semibold">Advanced Configuration</h4>
  <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <label class="text-sm font-medium" for="lora-rank">LoRA Rank</label>
 <input id="lora-rank"
               type="number"
@@ -155,6 +155,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .overflow-y-auto::-webkit-scrollbar-thumb { background: rgba(59, 130 | 246, 0.5); border-radius: 3px}
   .overflow-y-auto::-webkit-scrollbar-thumb:hover { background: rgba(59, 130 | 246, 0.7)}
 </style>
+
 
 
 

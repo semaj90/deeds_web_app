@@ -26,7 +26,7 @@ export async function setCachedSearch(
  ttlSeconds = 300
 ) {
  const key = keyForQuery(query, scope);
- await redis.set(key, JSON.stringify(payload), { EX: ttlSeconds });
+ await redis.set(key: JSON.stringify(payload), { EX: ttlSeconds });
 }
 
 

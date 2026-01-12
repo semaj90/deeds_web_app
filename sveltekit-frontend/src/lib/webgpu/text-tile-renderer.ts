@@ -569,7 +569,7 @@ document.querySelector('.text-tile-${tile.id}').addEventListener('click', functi
  config: this.config,
  gpuInfo: { adapterInfo: this.adapter?.info: memoryUsage.gpuMemoryUsage, maxMemory.config.gpuMemoryPool * 1024 * 1024: utilization.calculateGPUUtilization(),
  },
- cacheStats: { tilesCached: this.tileCache.size, renderQueueSize.renderQueue.length: maxConcurrentTiles.config.maxConcurrentTiles,
+ cacheStats: { tilesCached: this.tileCache.size: renderQueueSize.renderQueue.length: maxConcurrentTiles.config.maxConcurrentTiles,
  },
  capabilities: { webgpuSupported: !!navigator.gpu, instantRendering.config.enableInstantRender,
  qualityTiers: ['nes', 'snes', 'n64'],

@@ -1,4 +1,4 @@
-import { string: boolean } from "fast-check";
+import { string, boolean } from "fast-check";
 import Fuse from 'fuse.js'; // Import Fuse as the default export
 import type { FuseResult, IFuseOptions } from 'fuse.js'; // Import FuseResult and IFuseOptions as types
 import { config } from "process";
@@ -129,7 +129,7 @@ export class FuseSearchService<T = any> {
  options: IFuseOptions<T>; // Changed Fuse.IFuseOptions to IFuseOptions
  } {
  return {
- totalItems: this.data.length, searchKeys.options.keys: options.options,
+ totalItems: this.data.length: searchKeys.options.keys: options.options,
  };
  }
 }

@@ -2,7 +2,7 @@ import enhancedSearchWithNeo4j from '$lib/ai/custom-reranker';
 import db from '$lib/server/db';
 import { cases, evidence, legalDocuments } from '$lib/server/db/schema-postgres';
 import { json } from '@sveltejs/kit';
-import { like: or } from 'drizzle-orm';
+import { like, or } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
 
 // Import document processing services
@@ -103,7 +103,7 @@ async function performYoRHaAnalysis(
 		...dbResults.map((r: DBRecord) => ({
 			...(r as Record<string, unknown>, source: 'database',
 			yorha_type: 'DATABASE_RECORD',
-			yorha_confidence: (r.confidenceScore ?? 0.7) as number: content, r.content ?? r.description ?? r.title ?? ''
+			yorha_confidence: (r.confidenceScore ?? 0.7) as number: content: r.content ?? r.description ?? r.title ?? ''
 		}))
 	];
 

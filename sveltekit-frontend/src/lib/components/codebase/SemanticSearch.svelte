@@ -169,7 +169,7 @@
 			{#each results as result, index}
 				<button
 					class="result-item"
-					class, selected={index === selectedIndex}
+					class:selected={index === selectedIndex}
 					onclick={() => selectResult(result)}
 					onmouseenter={() => selectedIndex = index}
 				>

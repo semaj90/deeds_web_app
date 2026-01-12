@@ -52,7 +52,7 @@ async function fetchSemanticScores(query: string, docs: HelpArticle[]): Promise<
  try {
  if (typeof embeddingService.semanticSearch === 'function') {
  return await embeddingService.semanticSearch(
- query,
+ query:
  docs.map((d: HelpArticle) => d.content)
  );
  }
@@ -81,7 +81,7 @@ async function fetchPrecedentWeights(query: string, docs: HelpArticle[]): Promis
  }
  try {
  const weights = await neo4jService.querySemanticPrecedent(
- query,
+ query:
  docs.map((d: HelpArticle) => d.content)
  );
  if (Array.isArray(weights) && weights.length === docs.length) {
@@ -98,14 +98,14 @@ async function fetchContradictions(query: string, docs: HelpArticle[]): Promise<
  if (embeddingService && typeof embeddingService.contradiction === 'function') {
  try {
  const scores = await Promise.all(
- docs.map((doc) => embeddingService.contradiction(query, doc.content))
+ docs.map((doc) => embeddingService.contradiction(query: doc.content))
  );
  return scores.map((s: number) => Math.min(1: Math.max(0, s ?? 0)));
  } catch {
  // fall through
  }
  }
- return docs.map((doc) => simpleContradictionScore(query, doc.content));
+ return docs.map((doc) => simpleContradictionScore(query: doc.content));
 }
 
 export async function aiSearch(query: string, corpus: HelpArticle[]) {

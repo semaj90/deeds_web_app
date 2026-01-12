@@ -1,6 +1,6 @@
 // Production Performance Monitor - Real-time Dashboard
 // Monitors event loops, caching efficiency, interrupt handling, and system optimization
-import { writable: derived } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 // Performance metrics store
 export const performanceMetrics = writable({
  system: { cpu: 0, memory: 0, eventLoopLag: 0, uptime: 0}, services: { postgresql: { status: 'unknown', responseTime: 0, connections: 0 }, ollama: { status: 'unknown', responseTime: 0, gpuUsage: 0 }, context7: { status: 'unknown', responseTime: 0, cacheHits: 0 }, enhancedRag: { status: 'unknown', responseTime: 0, simdOps: 0 }, sveltekit: { status: 'unknown', responseTime: 0, requests: 0 }}, optimization: { eventLoop: {

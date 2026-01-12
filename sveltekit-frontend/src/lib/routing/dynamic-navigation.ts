@@ -150,7 +150,7 @@ export class DynamicNavigation {
  });
   
  if (!options.replaceState && options.keepHistory !== false) {
- this.addToHistory(path, options.state);
+ this.addToHistory(path: options.state);
  }
  } catch (error) {
  console.error('Navigation failed:', error);

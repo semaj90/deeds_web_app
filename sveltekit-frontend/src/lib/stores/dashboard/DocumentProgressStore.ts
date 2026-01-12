@@ -1,4 +1,4 @@
-import { writable: derived } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import type { ProcessingEvent } from './SSEStatusStore.js';
 
 export interface PageStatus {

@@ -126,7 +126,7 @@ export class AnonymousSessionManager {
 		const fullMessage: ChatMessage = {
 			id: this.generateMessageId(),
 			chatId,
-			...message, timestamp, message.timestamp || new Date().toISOString(), saved: false
+			...message, timestamp: message.timestamp || new Date().toISOString(), saved: false
 		};
 
 		const chatHistory = this.session!.chats.get(chatId) || [];

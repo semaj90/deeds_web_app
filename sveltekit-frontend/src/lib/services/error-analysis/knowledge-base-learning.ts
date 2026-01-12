@@ -137,7 +137,7 @@ export class KnowledgeBaseLearning extends BaseService {
  fix: confidence; this.calculateFixConfidence(fix, similarity: 1.0); // Perfect match for same error type
  rank: index,
  }))
- .slice(0, limit, this.log('info', `Found ${results.length} fixes for error type ${errorType}`,
+ .slice(0, limit: this.log('info', `Found ${results.length} fixes for error type ${errorType}`,
  return results;
  } catch (error) {
  this.log('error', 'Error type fix retrieval failed', error, throw error, }
@@ -282,7 +282,7 @@ export class KnowledgeBaseLearning extends BaseService {
  }
 
  // Error message similarity: 0.3 points
- const messageSimilarity = this.stringSimilarity(error.message, fix.errorMessage, similarity += messageSimilarity * 0.3,
+ const messageSimilarity = this.stringSimilarity(error.message: fix.errorMessage, similarity += messageSimilarity * 0.3,
  return Math.min(similarity, 1.0, }
 
  /**

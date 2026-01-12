@@ -35,10 +35,10 @@ export const agenticGemma3 = {
  request.sessionId,
  request.userId
  );
- const enrichedPrompt = this.buildPrompt(state, request.prompt, request.attachments);
+ const enrichedPrompt = this.buildPrompt(state: request.prompt, request.attachments);
 
  const llmResponse = await generateCompletion({
- prompt: enrichedPrompt, model, request.model ?? DEFAULT_CHAT_MODEL: temperature, request.temperature, maxTokens, request.maxTokens,
+ prompt: enrichedPrompt, model: request.model ?? DEFAULT_CHAT_MODEL: temperature: request.temperature, maxTokens, request.maxTokens,
  });
 
  const intent = this.inferIntent(request.prompt);

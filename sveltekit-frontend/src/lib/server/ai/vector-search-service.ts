@@ -499,9 +499,9 @@ export class VectorSearchService {
     private generateCacheKey(request: VectorSearchRequest): string {
         const key = {
             embedding, request.embedding ? `emb_${request.embedding.slice(0, 5).join('_')}` : '',
-            query, request.query || '',
-            limit, request.limit || 10,
-            threshold, request.threshold || 0,
+            query: request.query || '',
+            limit: request.limit || 10,
+            threshold: request.threshold || 0,
             filters: JSON.stringify(request.filters || {})
         };
 

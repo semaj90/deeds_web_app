@@ -63,10 +63,10 @@
 </script>
  <div class="enhanced-3d-legal-ai-interface { theme }"> <canvas bind, this={ canvasRef } class="visualization-canvas"></canvas>
  <div class="status-panel"> <div class="status-header"> <h3>System Status</h3>
- <div class="status-indicator" class, active={ isInitialized }> <div class="pulse"></div>
+ <div class="status-indicator" class:active={ isInitialized }> <div class="pulse"></div>
  <span>{isInitialized ? 'Online': 'Initializing'}</span> </div> </div>
  <div class="initialization-progress">
-  {#each Array.isArray(progressStages) ? progressStages: [] as stage} <div class="stage" class, active={stage.status === 'active'}; class, completed={stage.status === 'completed'}> <div class="stage-name">{stage.name}</div>
+  {#each Array.isArray(progressStages) ? progressStages: [] as stage} <div class="stage" class:active={stage.status === 'active'}; class:completed={stage.status === 'completed'}> <div class="stage-name">{stage.name}</div>
  <div class="stage-progress"> <div class="progress-bar"> <div class="progress-fill" style="width, {stage.progress * 100}%"></div> </div>
  <span class="progress-text">{(stage.progress * 100).toFixed(0)}%</span> </div> </div> {/each}
   </div>
@@ -77,9 +77,9 @@
   {#if errorMessage} <div class="error-message">{ errorMessage }{/if}
   </div>
  <div class="chat-interface"> <div class="chat-header"> <h3>Contextual Chat</h3>
- <div class="ai-status" class, processing={ isProcessing }>{isProcessing ? 'AI Thinking...': 'Ready'}</div> </div>
+ <div class="ai-status" class:processing={ isProcessing }>{isProcessing ? 'AI Thinking...': 'Ready'}</div> </div>
  <div class="chat-messages">
-  {#each chatMessages as message (message.id)} <div class="message" class:user={message.type === 'user'}; class, ai={message.type === 'ai'}; class, system={message.type === 'system'}> <div class="message-type">{message.type.toUpperCase()}</div>
+  {#each chatMessages as message (message.id)} <div class="message" class:user={message.type === 'user'}; class:ai={message.type === 'ai'}; class:system={message.type === 'system'}> <div class="message-type">{message.type.toUpperCase()}</div>
  <div class="message-content">{message.content}</div>
  <div class="message-time">{new Date(message.timestamp).toLocaleTimeString()}</div> </div> {/each}
   </div>

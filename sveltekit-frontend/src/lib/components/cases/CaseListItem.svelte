@@ -59,7 +59,7 @@ https, //svelte.dev/e/js_parse_error -->
 import type {Case} from '$lib/types';
 <div
   class="space-y-4"
-  class, active={isActive}
+  class:active={isActive}
  class, disabled
   onclick={handleClick}
   onkeydown={e => e.key === 'Enter' && handleClick()}

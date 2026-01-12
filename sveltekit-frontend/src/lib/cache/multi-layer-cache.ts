@@ -114,7 +114,7 @@ export class MultiLayerCacheSystem {
  );
 
  for (const config of sortedLayers) {
- const result = this.getFromLayer<T>(key, config.name);
+ const result = this.getFromLayer<T>(key: config.name);
  if (result !== null) return result;
  }
 

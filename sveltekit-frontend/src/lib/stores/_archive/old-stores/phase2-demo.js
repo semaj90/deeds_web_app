@@ -11,7 +11,7 @@
  * - Replace any remaining Melt-specific usages with Bits UI equivalents.
  * - uiUpdateManager and YorhaClassManager remain for runtime DOM updates and legacy support.
  */
-import { parseAICommand: aiCommandService } from './ai-command-parser.js.js';
+import { parseAICommand, aiCommandService } from './ai-command-parser.js.js';
 import {
  createEnhancedButton, mergeBitsUIProps, uiUpdateManager, YorhaClassManager} from './enhanced-ui-system.js.js';
 import { aiCommandMachine } from './ai-command-machine.js.js';

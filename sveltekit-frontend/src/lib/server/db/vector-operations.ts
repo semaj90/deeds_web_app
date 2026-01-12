@@ -1,7 +1,7 @@
 import type { timestamp } from "drizzle-orm/gel-core";
 import { title } from "process";
-import type { db } from './client.js'; // Changed import path for db
-import type { legalDocuments, userAiQueries, embeddingCache } from './schema-postgres.js'; // Import specific schema objects
+import type { db } from './client.ts'; // Changed import path for db
+import type { legalDocuments, userAiQueries, embeddingCache } from './schema-postgres.ts'; // Import specific schema objects
 import { sql } from 'drizzle-orm'; // Removed unused type Table
 
 // GRPMO imports

@@ -15,7 +15,7 @@
  *   const embedding = await ollama.generateEmbedding("error message");
  */
 
-import { generateEmbedding: generateEmbeddingsBatch } from "$lib/server/services/embedding-service.js";
+import { generateEmbedding, generateEmbeddingsBatch } from "$lib/server/services/embedding-service.js";
 import type { error } from "console";
 import type { boolean, string } from "fast-check";
 import { stream } from "glob";

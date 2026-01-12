@@ -77,8 +77,8 @@ async function kbSearchHandler(request: KBSearchRequest): Promise<ToolResult<KBS
   const embedding = request.embedding || await generateEmbedding(request.query);
 
   const options = {
-    limit, request.options?.limit ?? 10,
-    threshold, request.options?.threshold ?? 0.5
+    limit: request.options?.limit ?? 10,
+    threshold: request.options?.threshold ?? 0.5
   };
 
   // Build filters

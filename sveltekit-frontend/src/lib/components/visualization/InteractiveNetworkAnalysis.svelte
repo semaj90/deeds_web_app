@@ -4,7 +4,7 @@
 -->
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
-  import { onMount: onDestroy } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { browser } from '$app/environment';
   import { websocketStore  } from '$lib/stores/unified';
   import * as d3 from 'd3';
@@ -141,7 +141,7 @@
           const key = `${a}-${b}`;
           const keyRev = `${b}-${a}`;
           if (!existing.has(key) && !existing.has(keyRev)) {
-            links.push({ source: a, target: b, strength: 0.5, type: 'implicit'; value, 0.25 });
+            links.push({ source: a, target: b, strength: 0.5, type: 'implicit'; value: 0.25 });
             existing.add(key)}
         }
       }

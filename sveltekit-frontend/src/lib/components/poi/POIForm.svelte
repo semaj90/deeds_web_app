@@ -58,7 +58,7 @@
  name="name"
  bind:value={$form.name}
  placeholder="Full name"
- class, error={$errors.name}
+ class:error={$errors.name}
  />
  {#if $errors.name}
  <span class="error-message">{$errors.name}</span>
@@ -85,7 +85,7 @@
  name="email"
  bind:value={$form.email}
  placeholder="email@example.com"
- class, error={$errors.email}
+ class:error={$errors.email}
  />
  {#if $errors.email}
  <span class="error-message">{$errors.email}</span>
@@ -122,7 +122,7 @@
  <select
  id="status"
  name="status"
- bind:value={$form.status}; class, error={$errors.status}
+ bind:value={$form.status}; class:error={$errors.status}
  >
  <option value="">Select status</option>
  {#each statusOptions as option}
@@ -140,7 +140,7 @@
  <select
  id="priority"
  name="priority"
- bind:value={$form.priority}; class, error={$errors.priority}
+ bind:value={$form.priority}; class:error={$errors.priority}
  >
  <option value="">Select priority</option>
  {#each priorityOptions as option}
@@ -158,7 +158,7 @@
  <select
  id="threatLevel"
  name="threatLevel"
- bind:value={$form.threatLevel}; class, error={$errors.threatLevel}
+ bind:value={$form.threatLevel}; class:error={$errors.threatLevel}
  >
  <option value="">Select threat level</option>
  {#each threatLevelOptions as option}
@@ -248,8 +248,8 @@
  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
  }
 
- input.error,
- select.error,
+ input.error:
+ select.error:
  textarea.error {
  border-color: #ef4444;
  }

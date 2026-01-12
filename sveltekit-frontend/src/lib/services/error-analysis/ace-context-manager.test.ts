@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';
+import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 import { AceContextManager } from './ace-context-manager.js';
 import type { ServiceConfig, Analysis, Diff } from './types.js';
 

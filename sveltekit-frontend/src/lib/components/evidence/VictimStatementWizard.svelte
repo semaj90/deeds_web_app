@@ -162,7 +162,7 @@ https, //svelte.dev/e/js_parse_error -->
  {#each steps as step, index}
  <div
  class="step-indicator"
- class:active={step.id === currentStep}; class, completed={getCurrentStepIndex() > index}
+ class:active={step.id === currentStep}; class:completed={getCurrentStepIndex() > index}
  >
  <span class="step-number">{index + 1}</span>
  <span class="step-title">{step.title}</span>

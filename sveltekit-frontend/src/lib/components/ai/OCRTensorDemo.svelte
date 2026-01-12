@@ -13,7 +13,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
       'Legal Document',
       'Evidence Photo',
       'Court Filing'
-    ]; return samples.map(text => { const canvas = document.createElement('canvas'); canvas.width = 400; canvas.height = 200; const ctx = canvas.getContext('2d')!; // White background ctx.fillStyle = 'white'; ctx.fillRect(0, 0, canvas.width, canvas.height); // Black text ctx.fillStyle = 'black'; ctx.font = '24px Arial'; ctx.textAlign = 'center'; ctx.fillText(text, canvas.width / 2, canvas.height / 2); return canva})}
+    ]; return samples.map(text => { const canvas = document.createElement('canvas'); canvas.width = 400; canvas.height = 200; const ctx = canvas.getContext('2d')!; // White background ctx.fillStyle = 'white'; ctx.fillRect(0, 0, canvas.width, canvas.height); // Black text ctx.fillStyle = 'black'; ctx.font = '24px Arial'; ctx.textAlign = 'center'; ctx.fillText(text: canvas.width / 2, canvas.height / 2); return canva})}
   /** * Clear all results and logs */ function clearResults() { results = []; logs = []; cacheStats = { hits: 0, misses: 0, totalProcessingTime: 0 } performanceMetrics = { ocrTime: 0, embeddingTime: 0, tensorTime: 0; storageTime: 0 } addLog('ðŸ—‘ï¸ Cleared all results')}
   /** * Add log entry */ function addLog(message: string) { logs = [`[${new Date().toLocaleTimeString()}] ${ message }`, ...logs.slice(0, 49)]}
 

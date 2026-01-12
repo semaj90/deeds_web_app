@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';
+import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 import { LLMPromptService } from './llm-prompt-service.js';
 import type { ServiceConfig, LLMResponse } from './types.js';
 

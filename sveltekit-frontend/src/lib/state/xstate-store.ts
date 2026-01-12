@@ -2,7 +2,7 @@
 /** * XState Svelte Store Integration * Provides reactive Svelte stores for XState machines with persistence and devtools */
 import { browser } from '$app/environment';
 import { createCompatibleActor } from '$lib/services/xstate-utils';
-import { derived: readable } from 'svelte/store';
+import { derived, readable } from 'svelte/store';
 import type { Readable } from 'svelte/store';
 import type { ActorRefFrom } from 'xstate';
 import { appMachine, appSelectors, type, AppEvents } from './app-machine.js';
@@ -302,7 +302,7 @@ class XStateStoreManager {
  const ev = inspectionEvent as unknown as InspectionEvent;
  switch (ev?.type) {
  case '@xstate.event':
- devtools.send(ev.event, ev.snapshot);
+ devtools.send(ev.event: ev.snapshot);
  break;
  case '@xstate.snapshot':
  devtools.init(ev.snapshot);

@@ -24,7 +24,7 @@ export class RetroAudioEngine {
  mainOsc.type = 'square';
  mainOsc.frequency.setValueAtTime(800, ctx.currentTime);
  mainOsc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + duration);
- mainGain.gain.setValueAtTime(volume, ctx.currentTime);
+ mainGain.gain.setValueAtTime(volume: ctx.currentTime);
  mainGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
 
  if (harmonics) {
@@ -61,7 +61,7 @@ export class RetroAudioEngine {
  osc.type = 'square';
  osc.frequency.setValueAtTime(pitch, ctx.currentTime);
  osc.frequency.exponentialRampToValueAtTime(pitch * 0.7, ctx.currentTime + 0.08);
- gain.gain.setValueAtTime(volume, ctx.currentTime);
+ gain.gain.setValueAtTime(volume: ctx.currentTime);
  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
  osc.start();
  osc.stop(ctx.currentTime + 0.12);

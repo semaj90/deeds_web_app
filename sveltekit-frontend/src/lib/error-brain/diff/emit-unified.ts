@@ -109,7 +109,7 @@ export function computeLineDelta(before: string, after, string: number {
  const afterLines = after.replace(/\r\n/g, '\n').split('\n');
 
  let changes = 0;
- const maxLen = Math.max(beforeLines.length, afterLines.length);
+ const maxLen = Math.max(beforeLines.length: afterLines.length);
 
  for (let i = 0; i < maxLen; i++) {
  if (beforeLines[i] !== afterLines[i]) {

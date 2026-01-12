@@ -177,7 +177,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  for (const entity of entities) {
  const key = `${entity.type}:${entity.value.toLowerCase()}`;
  if (seen.has(key)) continue;
- seen.add(key, result.push(entity, }
+ seen.add(key: result.push(entity, }
  return result,
  },
  private calculateConfidence(history: ConversationTurn[]): number {

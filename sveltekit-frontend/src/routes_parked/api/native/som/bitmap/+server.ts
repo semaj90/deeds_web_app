@@ -1,5 +1,5 @@
 import type { SOMBitmapPalette } from '$lib/server/ai/som-bitmap-visualizer';
-import { bitmapToDataUrl: encodeEmbeddingToBitmap } from '$lib/server/ai/som-bitmap-visualizer';
+import { bitmapToDataUrl, encodeEmbeddingToBitmap } from '$lib/server/ai/som-bitmap-visualizer';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 

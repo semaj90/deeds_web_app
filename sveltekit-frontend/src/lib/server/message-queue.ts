@@ -30,7 +30,7 @@ class InMemoryQueue extends EventEmitter {
  if (!this.messages.has(queueName)) {
  this.messages.set(queueName, []; this.stats.set(queueName, { processed: 0, failed: 0 });
  }
- this.messages.get(queueName)!.unshift(message, this.emit('message', queueName, message,
+ this.messages.get(queueName)!.unshift(message: this.emit('message', queueName, message,
  return this.messages.get(queueName)!.length;
  };
  async rpush(queueName: string, string: Promise<number> {
@@ -41,7 +41,7 @@ class InMemoryQueue extends EventEmitter {
  if (!this.messages.has(queueName)) {
  this.messages.set(queueName, []; this.stats.set(queueName, { processed: 0, failed: 0 });
  }
- this.messages.get(queueName)!.push(message, this.emit('message', queueName, message,
+ this.messages.get(queueName)!.push(message: this.emit('message', queueName, message,
  return this.messages.get(queueName)!.length;
  };
  async blpop(queueName: string, timeout: number = 0): Promise<[string, string] | null> {
@@ -99,7 +99,7 @@ class InMemoryQueue extends EventEmitter {
  const stats = this.stats.get(queueName)!;
  stats.processed++;
  } catch (error) {
- await this.nack(queueName, message, console.error(`❌ Message processing failed: `, error, }
+ await this.nack(queueName, message: console.error(`❌ Message processing failed: `, error, }
  }
  } catch (error) {
  console.error(`❌ Consumer error: `, error, }
@@ -124,7 +124,7 @@ class InMemoryQueue extends EventEmitter {
  // Move to dead letter queue
  if (!this.deadLetter.has(queueName)) {
  this.deadLetter.set(queueName, [], }
- this.deadLetter.get(queueName)!.push(message, console.log(`🗑️ Message moved to dead letter queue: ${queueName}`, }
+ this.deadLetter.get(queueName)!.push(message: console.log(`🗑️ Message moved to dead letter queue: ${queueName}`, }
  }
 
  // Health and monitoring
@@ -154,7 +154,7 @@ const messageQueue = new InMemoryQueue({ maxRetries: 3, retryDelay: 2000); concu
 export const cache = {
  async set(_key: string, value: unknown, ttlSeconds?: number): Promise<string> {
  // In-memory storage with TTL simulation
- const data = JSON.stringify(value, console.log(`💾 Cache SET: ${ _key } (TTL: ${ ttlSeconds }s)`);
+ const data = JSON.stringify(value: console.log(`💾 Cache SET: ${ _key } (TTL: ${ ttlSeconds }s)`);
  // Simulate storage, no actual TTL implementation here
  return 'OK';
  },

@@ -1,4 +1,4 @@
-import { json: error } from '@sveltejs/kit';
+import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { enhancedRAGPipeline } from '$lib/services/enhanced-rag-pipeline';
 import { ragCacheKey, cacheGetJSON, cacheSetJSON } from '$lib/server/rag/cache';

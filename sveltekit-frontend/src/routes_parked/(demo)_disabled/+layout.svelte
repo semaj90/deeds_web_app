@@ -49,7 +49,7 @@ https, //svelte.dev/e/js_parse_error -->
  <a
  href={`/demo/${route.slug}`}
  class="demo-nav-item"
- class, active={currentDemo === route.slug}
+ class:active={currentDemo === route.slug}
  >
  <span class="demo-nav-icon">{route.icon}</span>
  <span class="demo-nav-text">{route.name}</span>

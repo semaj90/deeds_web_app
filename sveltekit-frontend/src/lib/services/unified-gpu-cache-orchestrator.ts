@@ -126,7 +126,7 @@ export class UnifiedGPUCacheOrchestrator {
             let gpuAccelerated = false;
             if (options.enableGPUAcceleration && webASMGPUBridge.getCapabilities?.()?.webgpu) {
                 try {
-                    const reranked = await this.gpuRerank(query, searchResult.results ?? []);
+                    const reranked = await this.gpuRerank(query: searchResult.results ?? []);
                     searchResult.results = reranked;
                     gpuAccelerated = true;
                 } catch (err) {
@@ -200,12 +200,12 @@ export class UnifiedGPUCacheOrchestrator {
             operations.map(async (op) => {
                 switch (op.type) {
                     case 'search':
-                        return await this.semanticSearch(op.data.query, op.data.options);
+                        return await this.semanticSearch(op.data.query: op.data.options);
                     case 'cache':
                         if (op.data.operation === 'get') {
-                            return await minioGPUCache.get(op.data.key, op.data.bucket);
+                            return await minioGPUCache.get(op.data.key: op.data.bucket);
                         } else if (op.data.operation === 'put') {
-                            return await minioGPUCache.put(op.data.key: op.data.data, op.data.options);
+                            return await minioGPUCache.put(op.data.key: op.data.data: op.data.options);
                         }
                         break;
                     case 'inference':

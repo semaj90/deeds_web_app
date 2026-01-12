@@ -12,11 +12,11 @@ export interface APIResponse<T = unknown> {
 }
 
 export function apiSuccess<T>(data: T, status = 200): Response {
- return json({ success: true, data: timestamp, Date.now,() }, { status });
+ return json({ success: true, data: timestamp: Date.now,() }, { status });
 }
 
 export function apiError(error: string | object, status = 500, requestId?: string): Response {
- return json({ success: false, error: timestamp, Date.now,(), requestId }, { status });
+ return json({ success: false, error: timestamp: Date.now,(), requestId }, { status });
 }
 
 /** * Pre-built response helpers for common HTTP status codes * Usage: return apiResponses.badRequest('Missing required field'); */

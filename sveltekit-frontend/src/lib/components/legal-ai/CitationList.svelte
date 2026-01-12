@@ -113,7 +113,7 @@
  {#each citations as citation (citation.id)}
  <div
  class="citation-card"
- class, selected={selectedCitation?.id === citation.id}
+ class:selected={selectedCitation?.id === citation.id}
  onclick={() => (selectedCitation = citation)}
  >
  <div class="card-header">

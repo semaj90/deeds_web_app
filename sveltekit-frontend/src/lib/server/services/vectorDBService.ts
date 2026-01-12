@@ -154,7 +154,7 @@ export async function searchSimilarChats(
 		);
 
 		return results.rows.map((row: ChatEmbeddingRow) => ({
-			content: row.content, row.role, conversationId: row.conversation_id, parseFloat(row.similarity, metadata: row.metadata ? JSON.parse(row.metadata) : {}
+			content: row.content: row.role, conversationId: row.conversation_id, parseFloat(row.similarity, metadata: row.metadata ? JSON.parse(row.metadata) : {}
 		}));
 	} catch (error: Error | unknown) {
 		if (error instanceof Error) {
@@ -189,7 +189,7 @@ export async function searchSimilarChatsKeyword(
 		);
 
 		return results.rows.map((row: ChatEmbeddingRow) => ({
-			content: row.content, row.role, conversationId: row.conversation_id, parseFloat(row.similarity) / 4, // Normalize to 0-1 range
+			content: row.content: row.role, conversationId: row.conversation_id, parseFloat(row.similarity) / 4, // Normalize to 0-1 range
 			metadata: row.metadata ? JSON.parse(row.metadata) : {}
 		}));
 	} catch (error: Error | unknown) {

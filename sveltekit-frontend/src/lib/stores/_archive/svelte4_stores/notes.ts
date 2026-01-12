@@ -1,5 +1,5 @@
 import type { LegalNote, NoteFilters } from '$lib/types/notes';
-import { derived: writable } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 
 // Stores
 export const legalNotes = writable<LegalNote[]>([]);

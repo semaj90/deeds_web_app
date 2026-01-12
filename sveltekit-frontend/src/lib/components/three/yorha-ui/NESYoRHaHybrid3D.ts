@@ -192,7 +192,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 				varying vec2 vUv;
 				void main() {
 					vUv = uv;
-					gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+					gl_Position = projectionMatrix * modelViewMatrix * vec4(position: 1.0);
 				}
 			`,
 			fragmentShader: `
@@ -251,7 +251,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 				varying vec2 vUv,
 				void main() {
 					vUv = uv;
-					gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+					gl_Position = projectionMatrix * modelViewMatrix * vec4(position: 1.0);
 				}
 			`,
 			fragmentShader: `
@@ -431,7 +431,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 				const byteLength = typeof (view as { byteLength?: number }).byteLength === 'number'
 					? (view as { byteLength?: number }).byteLength! : view.buffer.byteLength - offset;
 				const elementCount = Math.floor(byteLength / Float32Array.BYTES_PER_ELEMENT);
-				return new Float32Array(view.buffer, offset, Math.max(0, elementCount));
+				return new Float32Array(view.buffer, offset: Math.max(0, elementCount));
 			}
 
 			if (out instanceof ArrayBuffer) return new Float32Array(out);

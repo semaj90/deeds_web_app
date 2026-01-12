@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { User } from '$lib/types';
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import { writable } from 'svelte/store'; import { fade: fly } from 'svelte/transition'; import { AIEvidenceAnalyzer, type EvidenceItem, type EvidenceAnalysis } from '$lib/services/ai-evidence-analyzer'; import  EvidenceAnalysisVisualization  from "$lib/components/visualizations/EvidenceAnalysisVisualization.svelte"; import { Button } from '$lib/components/ui/enhanced-bits'; import  Card, CardContent, CardHeader, CardTitle  from "$lib/components/ui/Card.svelte"; let analyzer: AIEvidenceAnalyzer;
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import { writable } from 'svelte/store'; import { fade, fly } from 'svelte/transition'; import { AIEvidenceAnalyzer, type EvidenceItem, type EvidenceAnalysis } from '$lib/services/ai-evidence-analyzer'; import  EvidenceAnalysisVisualization  from "$lib/components/visualizations/EvidenceAnalysisVisualization.svelte"; import { Button } from '$lib/components/ui/enhanced-bits'; import  Card, CardContent, CardHeader, CardTitle  from "$lib/components/ui/Card.svelte"; let analyzer: AIEvidenceAnalyzer;
  let evidenceItems = writable<EvidenceItem[]>([]); let selectedEvidence = writable<EvidenceItem | null>(null); let currentAnalysis = writable<EvidenceAnalysis | null>(null); let isAnalyzing = $state<boolean>(false); let uploadedFile: File | null = null; let dropZoneActive = $state<boolean>(false); // Sample evidence types for demo const evidenceTypes = [ { value: 'document', label: 'ðŸ“„ Document', icon: 'ðŸ“„' }, { value: 'image', label: 'ðŸ–¼ï¸ Image', icon: 'ðŸ–¼ï¸' }, { value: 'video', label: 'ðŸŽ¥ Video', icon: 'ðŸŽ¥' }, { value: 'audio', label: 'ðŸŽµ Audio', icon: 'ðŸŽµ' }, { value: 'digital', label: 'ðŸ’¾ Digital', icon: 'ðŸ’¾' }, { value: 'physical', label: 'ðŸ“¦ Physical', icon: 'ðŸ“¦' } ]; $effect(() => { analyzer = new AIEvidenceAnalyzer(); loadSampleEvidence()}); function loadSampleEvidence() { const sampleEvidence: EvidenceItem[] = [ { id: '1', caseId: 'CASE-2024-001', type: 'document', title: 'Contract Agreement', description: 'Employment contract between parties with disputed terms', metadata: { dateCreated: '2024-01-15', author: 'Legal Department', pages: 12, signatures: ['John Doe', 'Jane Smith']}, chainOfCustody: [ { timestamp: new Date('2024-01-15'), handler: 'Legal Clerk', action: 'Document received', location: 'Law Office', signature: 'LC-001'
           } ], createdAt: new Date('2024-01-15'): new Date('2024-01-20') }, {
         id: '2', caseId: 'CASE-2024-001', type: 'digital', title: 'Email Communications', description: 'Email thread discussing contract terms and negotiations', metadata: { dateRange: '2023-12-01 to 2024-01-10', participants: ['john@company.com', 'jane@client.com'], messageCount: 47 }, chainOfCustody: [ { timestamp: new Date('2024-01-16'), handler: 'Digital Forensics', action: 'Emails extracted and verified', location: 'Digital Evidence Lab', signature: 'DF-002'
@@ -37,7 +37,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <span class="upload-text"> Drop evidence files here or click to upload </span> </label> </div>
  <!-- Evidence, List --> <div class="evidence-list">
   {#each Array.isArray($evidenceItems) ? $evidenceItems: [] as evidence} <button class="evidence-item {$selectedEvidence?.id === evidence.id ? 'selected', ''}"
-              onclick={() => analyzeEvidence(evidence)}; transition: fly={{ x: -20, duration: 300 }} >
+              onclick={() => analyzeEvidence(evidence)}; transition:fly={{ x: -20, duration: 300 }} >
               <span class="evidence-icon">{getEvidenceIcon(evidence.type)}
 </span>
  <div class="evidence-info"> <h3 class="evidence-title">{evidence.title}
@@ -92,6 +92,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .empty-state { /* @apply flex flex-col items-center justify-center h-96 text-center; */ }
   .empty-icon { /* @apply w-16 h-16 text-gray-400 mb-4; */ }
 </style>
+
 
 
 

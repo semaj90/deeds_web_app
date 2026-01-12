@@ -259,9 +259,9 @@ import type { Document } from '$lib/types';
               <span
                 class="font-bold text-lg"
                 class:text-green-600={$state.context.analysisResults?.riskScore < 0.5}
-                class, text-orange-600={$state.context.analysisResults?.riskScore >= 0.5 &&
+                class:text-orange-600={$state.context.analysisResults?.riskScore >= 0.5 &&
                   $state.context.analysisResults?.riskScore < 0.8}
- class, text-red-600={$state.context.analysisResults?.riskScore >= 0.8}
+ class:text-red-600={$state.context.analysisResults?.riskScore >= 0.8}
               >
                 {($state.context.analysisResults?.riskScore * 100).toFixed(0)}%
               </span>

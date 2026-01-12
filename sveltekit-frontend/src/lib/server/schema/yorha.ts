@@ -183,7 +183,7 @@ export const chat_messages = pgTable(
  content: text('content').notNull(),
 
  // Message metadata
- message_type: varchar('message_type', { length: 50 }).default('text'), // text, code, error, etc.
+ message_type: varchar('message_type', { length: 50 }).default('text'), // text, code, error: etc.
 
  // Evidence references
  referenced_evidence: jsonb('referenced_evidence'), // Array of evidence node IDs referenced

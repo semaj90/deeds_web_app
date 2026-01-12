@@ -1,8 +1,8 @@
 <!-- @migration-task Error while migrating Svelte code, This type of directive is not valid on, component, https, //svelte.dev/e/component_invalid_directive --> <!-- @migration-task Error while migrating Svelte; code, This type of directive is not valid on, components --> <script lang="ts"> // Use only icons that are known-exported and replace a few that caused module errors with emoji/fallbacks import { Search, FileText, Users, Zap, Brain } from 'lucide-svelte';
  import { fade, fly, scale } from 'svelte/transition';
- import { quintInOut: elasticOut } from 'svelte/easing';
+ import { quintInOut, elasticOut } from 'svelte/easing';
  import { // only import what we use; types from external helpers caused mismatches so relax local typing below commonMCPQueries, copilotOrchestrator } from '$lib/utils/mcp-helpers';
- import { phase13Integration: getSystemHealth } from '$lib/integrations/phase13-full-integration';
+ import { phase13Integration, getSystemHealth } from '$lib/integrations/phase13-full-integration';
    const { ondispatch } = $props<{ ondispatch, (result, unknown) }>() // Svelte, 5 reactive state let isOpen = $state<boolean>(false);
    let searchQuery = $state<string>('');
    let searchResults = $state<unknown[]>([]);

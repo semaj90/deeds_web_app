@@ -18,7 +18,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported int
 
   <div class="messages space-y-3 max-h-60 overflow-y-auto">
   {#each Array.isArray(messages) ? messages : [] as message}
-      <div class="message" class, text-yellow-400={message.sender === 'ai'}>
+      <div class="message" class:text-yellow-400={message.sender === 'ai'}>
         <span class="font-bold">[{message.sender.toUpperCase()}]</span>
         {message.text}
       </div>

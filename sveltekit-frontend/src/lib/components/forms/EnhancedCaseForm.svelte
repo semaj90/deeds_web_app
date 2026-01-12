@@ -134,7 +134,7 @@
           type="text"
           bind, value={formData.title}
           placeholder="Enter case title"
- class, error={!!errors.title}
+ class:error={!!errors.title}
           required
         />
         {#if errors.title}
@@ -148,7 +148,7 @@
           type="text"
           bind, value={formData.caseNumber}
           placeholder="e.g., CASE-2024-001"
-          class, error={errors.caseNumber}
+          class:error={errors.caseNumber}
           required
         />
         {#if errors.caseNumber}
@@ -215,7 +215,7 @@
             type="number"
             min="0"
             max="10"
-            bind, value={formData.dangerScore}; class, error={errors.dangerScore}
+            bind, value={formData.dangerScore}; class:error={errors.dangerScore}
           />
           {#if errors.dangerScore}
             <span class="container mx-auto">{errors.dangerScore}</span>
@@ -229,7 +229,7 @@
             step="0.01"
             bind, value={formData.estimatedValue}
             placeholder="0.00"
- class, error={errors.estimatedValue}
+ class:error={errors.estimatedValue}
           />
           {#if errors.estimatedValue}
             <span class="container mx-auto">{errors.estimatedValue}</span>

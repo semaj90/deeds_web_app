@@ -58,7 +58,7 @@ export class MinIOService {
       const key = `${userId}/${Date.now()}-${file.name}`;
       const buffer = Buffer.from(await file.arrayBuffer());
 
-      await this.client.putObject(this.bucket, key, buffer, file.size, {
+      await this.client.putObject(this.bucket, key, buffer: file.size, {
         'Content-Type': file.type,
       });
 
@@ -97,7 +97,7 @@ export class MinIOService {
   static async getTextContentFromUrl(url: string): Promise<{ content: string; metadata: Record<string, unknown> } | null> {
     try {
       const service = new MinIOService();
-      const key = MinIOService.extractKeyFromUrl(url, service.bucket);
+      const key = MinIOService.extractKeyFromUrl(url: service.bucket);
       return await service.getTextContent(key);
     } catch (e) {
       console.error('MinIOService.getTextContent failed', e);
@@ -107,7 +107,7 @@ export class MinIOService {
 
   static async getObjectBufferFromUrl(url: string): Promise<Buffer> {
     const service = new MinIOService();
-    const key = MinIOService.extractKeyFromUrl(url, service.bucket);
+    const key = MinIOService.extractKeyFromUrl(url: service.bucket);
     return await service.getObjectBuffer(key);
   }
 

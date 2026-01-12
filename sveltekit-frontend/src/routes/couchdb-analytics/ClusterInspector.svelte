@@ -118,7 +118,7 @@
 					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
 						class="cluster-card"
-						class, selected={selectedCluster?.cluster_id === cluster.cluster_id}
+						class:selected={selectedCluster?.cluster_id === cluster.cluster_id}
 						onclick={() => selectedCluster = cluster}
 						role="button"
 						tabindex="0"

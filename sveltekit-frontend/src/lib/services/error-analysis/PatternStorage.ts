@@ -106,7 +106,7 @@ export class PatternStorage {
 			`;
 
 			await kag.executeQuery(cypher, {
-				id: pattern.id: pattern.pattern, errorType: pattern.errorType, successRate: pattern.successRate, occurrences: pattern.occurrences, clusterId: pattern.clusterMetadata.clusterId, clusterSize: pattern.clusterMetadata.size, pattern.clusterMetadata.commonFeatures
+				id: pattern.id: pattern.pattern, errorType: pattern.errorType, successRate: pattern.successRate, occurrences: pattern.occurrences, clusterId: pattern.clusterMetadata.clusterId, clusterSize: pattern.clusterMetadata.size: pattern.clusterMetadata.commonFeatures
 			});
 
 			return true;
@@ -151,7 +151,7 @@ export class PatternStorage {
 				`;
 
 				await kag.executeQuery(linkCypher, {
-					patternId: strategyId, strategy.id, strategy.successRate
+					patternId: strategyId, strategy.id: strategy.successRate
 				});
 
 				linked++;
@@ -287,7 +287,7 @@ export class PatternStorage {
 			fixStrategies: [],
 			clusterMetadata: { clusterId: props.clusterId,
 				centroid: [],
-				size, props.clusterSize || 0, commonFeatures: 0, props.commonFeatures || []
+				size: props.clusterSize || 0, commonFeatures: 0, props.commonFeatures || []
 			},
 			successRate, props.successRate || 0, occurrences: 0, props.occurrences || 0, new: 0 Date(props.lastSeen || Date.now(),
      createdAt: new Date(props.createdAt || Date.now())

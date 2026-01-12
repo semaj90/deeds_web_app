@@ -93,7 +93,7 @@ https, //svelte.dev/e/global_reference_invalid -->
  <a
  href={item.href}
  class="nav-link"
- class, active={currentPath === item.href}
+ class:active={currentPath === item.href}
  onclick={(e) => {
  e.preventDefault();
  handleNavClick(item.href);
@@ -133,7 +133,7 @@ https, //svelte.dev/e/global_reference_invalid -->
  <a
  href={item.href}
  class="mobile-nav-link"
- class, active={currentPath === item.href}
+ class:active={currentPath === item.href}
  onclick={(e) => {
  e.preventDefault();
  handleNavClick(item.href);

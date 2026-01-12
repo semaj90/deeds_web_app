@@ -23,7 +23,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   function setContext(context: typeof currentContext) { currentContext = context}
 
   // provide a runtime-safe reference to the imported component to avoid constructor-type errors const AISearchBarComponent: unknown = AISearchBar as unknown; as unknown; </script>
- <div class="ai-assistant-panel" class, hidden={!isVisible}> <Card class="h-full flex"> <CardHeader class="pb-3"> <div class="flex items-center"> <CardTitle class="flex items-center gap-2"> <Bot class="w-5 h-5" /> Legal AI Assistant </CardTitle>
+ <div class="ai-assistant-panel" class:hidden={!isVisible}> <Card class="h-full flex"> <CardHeader class="pb-3"> <div class="flex items-center"> <CardTitle class="flex items-center gap-2"> <Bot class="w-5 h-5" /> Legal AI Assistant </CardTitle>
  <div class="flex items-center">
   {#if isAssistantLoading} <Loader class="w-4 h-4 animate-spin" /> {/if} {#if selectedEvidenceIds.length > 0} <span class="text-xs bg-primary text-primary-foreground px-2 py-1"> {selectedEvidenceIds.length} selected </span> {/if}
   <!-- Acceleration, Toggle --> <button type="button"

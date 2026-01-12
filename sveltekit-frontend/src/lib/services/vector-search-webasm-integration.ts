@@ -168,7 +168,7 @@ export class VectorSearchWebASMPipeline {
      */
     private generateCacheKey(request: SearchRequest): string {
         const key = {
-            query, request.query: filters.filters || {},
+            query: request.query: filters.filters || {},
             topK, request.topK || 10
         };
         return typeof window !== 'undefined' ? btoa(JSON.stringify(key)) : JSON.stringify(key);

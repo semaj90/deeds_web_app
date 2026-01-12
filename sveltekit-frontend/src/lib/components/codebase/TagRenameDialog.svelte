@@ -129,7 +129,7 @@
 						bind:value={newName}
 						onkeydown={ handleKeydown }
 						class="name-input"
-						class:invalid={newName && !isValid}; class, valid={isValid}
+						class:invalid={newName && !isValid}; class:valid={isValid}
 						placeholder="Enter new name..."
 						disabled={isRenaming || success}
 					/>

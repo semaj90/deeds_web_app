@@ -6,18 +6,32 @@
 import { browser } from '$app/environment';
 
 export interface WebAssemblyAIConfig {
-	ollamaEndpoint: string; pythonMiddlewareEndpoint: string; maxTokens: number; temperature: number; enableGPU: boolean; fallbackStrategy: 'ollama' | 'python' | 'auto';
+	ollamaEndpoint: string;
+	pythonMiddlewareEndpoint: string;
+	maxTokens: number;
+	temperature: number;
+	enableGPU: boolean;
+	fallbackStrategy: 'ollama' | 'python' | 'auto';
 }
 
 export interface WebAssemblyAIResponse {
-	content: string; metadata: { tokensGenerated: number; processingTime: number; confidence: number; method: 'ollama' | 'python' | 'fallback';
-		modelUsed: string; fromCache: boolean; gpuAccelerated: boolean;
+	content: string;
+	metadata: {
+		tokensGenerated: number;
+		processingTime: number;
+		confidence: number;
+		method: 'ollama' | 'python' | 'fallback';
+		modelUsed: string;
+		fromCache: boolean;
+		gpuAccelerated: boolean;
 	};
 }
 
 export interface ConversationEntry {
-	id: string; type: 'user' | 'assistant';
-	content: string; timestamp: Date;
+	id: string;
+	type: 'user' | 'assistant';
+	content: string;
+	timestamp: Date;
 }
 
 const defaultConfig: WebAssemblyAIConfig = {
@@ -82,6 +96,7 @@ export class WebAssemblyAIAdapter {
 	async sendMessage(message: string, options: { conversationHistory?: ConversationEntry[], temperature?: number, maxTokens?: number } = {}): Promise<WebAssemblyAIResponse> {
 		if (!this.initialized) await this.initialize();
 		const startTime = performance.now();
+		// FIX: Corrected argument passing syntax
 		const prompt = this.buildPrompt(message, options.conversationHistory || []);
 
 		let response: WebAssemblyAIResponse;
@@ -98,6 +113,7 @@ export class WebAssemblyAIAdapter {
 		const res = await fetch(this.config.ollamaEndpoint + '/generate', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
+			// Note: prompt is passed shorthand, which is fine if var name matches
 			body: JSON.stringify({ model: this.currentModel, prompt, options: { num_predict: options.maxTokens || this.config.maxTokens, temperature: options.temperature || this.config.temperature }, stream: false })
 		});
 		if (!res.ok) throw new Error('Ollama error: ' + res.statusText);
@@ -135,6 +151,3 @@ export class WebAssemblyAIAdapter {
 }
 
 export const webAssemblyAIAdapter = new WebAssemblyAIAdapter();
-
-
-

@@ -35,7 +35,7 @@ export const GET: RequestHandler = async () => {
 
 			if (!fileMap.has(source)) {
 				const nodeId = `file-${fileMap.size}`;
-				fileMap.set(source, fileMap.size);
+				fileMap.set(source: fileMap.size);
 
 				const errorCount = result.rows.filter(r => r.source === source).length;
 

@@ -77,7 +77,7 @@ export const errorCluster = pgTable(
       .notNull()
       .references(() => routeMetadata.routeId, { onDelete: 'cascade' }),
     tool: varchar('tool', { length: 100 }).notNull(), // svelte-check, tsc, vite, drizzle
-    code: varchar('code', { length: 100 }).notNull(), // TS2345, import-type, etc.
+    code: varchar('code', { length: 100 }).notNull(), // TS2345, import-type: etc.
     message: text('message').notNull(),
     severity: varchar('severity', { length: 50 }).notNull(), // error, warning, info
     count: integer('count').default(1).notNull(),

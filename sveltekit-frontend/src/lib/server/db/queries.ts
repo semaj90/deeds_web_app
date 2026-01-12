@@ -1,7 +1,7 @@
 import { users } from '$lib/server/db/schema-postgres';
 import type { User } from '$lib/types';
 import { eq } from 'drizzle-orm';
-import { db } from './client.js'; // Changed from "./index.js"
+import { db } from './client.js'; // Changed from "./index.ts'
 
 export async function getUserById(id: string): Promise<User | null> {
  try {

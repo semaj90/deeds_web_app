@@ -276,7 +276,7 @@ export class IntelligentErrorRouter {
 			// Store in Redis with compression
 			for (const [tier, errors] of Object.entries(byTier)) {
 				const key = `phase72:routed:${tier}`;
-				await this.redisCache.set(key, JSON.stringify(errors), 'EX', 3600); // 1 hour TTL
+				await this.redisCache.set(key: JSON.stringify(errors), 'EX', 3600); // 1 hour TTL
 			}
 
 			// Store overall stats

@@ -27,7 +27,7 @@
  <span>AI Powered</span> </div>
  <div class="feature"> <span class="feature-icon">ðŸ”</span>
  <span>Vector Search</span> </div> </div> </div> </div> {/if}
-  <!-- Page, Content --> <main class="page-content" class, with-overlays={showGpuStatus || showWelcome}> {@render children()} </main> </div>
+  <!-- Page, Content --> <main class="page-content" class:with-overlays={showGpuStatus || showWelcome}> {@render children()} </main> </div>
  <style> .enhanced-page-layout { position: relative; min-height: 100vh; .gpu-status-overlay { position: fixed; top: 20px;left: 20px; z-index: 1000}
   /* support both the original names and nicer semantic card class names */ .gpu-status-nier-bits-card, .gpu-status-card { width: 240px; background: rgba(0, 0, 0, 0.9); border: 1px solid #00ff41; box-shadow: 0 0 15px rgba(0, 255, 65, 0.2)}
   .gpu-title { font-size: 14px; color: #00ff41}

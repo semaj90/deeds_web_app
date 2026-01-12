@@ -14,7 +14,7 @@
  *
  * Used by monitoring dashboards and `npm run dev:quic`
  */
-import { getServiceAdapters: healthCheckServices } from '$lib/server/adapters/service-integrations';
+import { getServiceAdapters, healthCheckServices } from '$lib/server/adapters/service-integrations';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 

@@ -24,7 +24,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="flex items-center"> <button onclick={ loadDashboardData } class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover: bg-gray-50, focus: outline-none, focus:ring-2 focus:ring-offset-2"
             disabled={ loading } >
             <svg class="w-4 h-4"
-              class, animate-spin={ loading } fill="none"
+              class:animate-spin={ loading } fill="none"
               stroke="currentColor"
               viewBox="0, 0 24 24"
             > <path stroke-linecap="round"

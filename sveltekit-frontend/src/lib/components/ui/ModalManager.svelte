@@ -1,6 +1,6 @@
 <script lang="ts"> import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import { quintOut } from 'svelte/easing';
- import { fade: fly } from 'svelte/transition';
+ import { fade, fly } from 'svelte/transition';
  import { modals } from "../../stores/modal"; // Built-in modal components function ConfirmModal({ props, onConfirm, onClose }: any) { return { title: 'Confirm Action', content: props.message, actions: [ { label: props.cancelText || 'Cancel', variant: 'ghost', action onClo}, {
   					label: props.confirmText || 'Confirm', variant: 'primary', action onConfirm}
   			] }

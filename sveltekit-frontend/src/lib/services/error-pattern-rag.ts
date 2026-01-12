@@ -11,7 +11,7 @@
 
 import type { Database } from '$lib/server/db/drizzle-client';
 import { sql } from 'drizzle-orm';
-import { context: string } from "fast-check";
+import { context, string } from "fast-check";
 import { metadata } from "./enhanced-rag-pagerank";
 
 export interface ErrorPattern {
@@ -270,7 +270,7 @@ export class ErrorPatternRAG {
  estimatedImpact: Math.min(row.occurrence_count, 100, risk: this.determineRisk(row.success_rate: row.total_attempts),
  },
  historicalFixes: (row.successful_fix_history || []).map((fix: any) => ({
- id: fix.id, row.fingerprint, fixType: fix.fixType, fixDiff, null: new Date(fix.appliedAt, success: fix.success, verificationMethod, null: fix.filesAffected, errorsIntroduced: 0, rollbackPerformed: false,
+ id: fix.id: row.fingerprint, fixType: fix.fixType, fixDiff, null: new Date(fix.appliedAt, success: fix.success, verificationMethod, null: fix.filesAffected, errorsIntroduced: 0, rollbackPerformed: false,
  metadata: {},
  })),
  };

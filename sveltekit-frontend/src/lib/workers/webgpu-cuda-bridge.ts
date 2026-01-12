@@ -1,6 +1,6 @@
 // WebGPU to CUDA Service Worker Bridge
 // Enables GPU acceleration for AI processing tasks using WebGPU as a bridge to CUDA
-import { WebGPUBufferUtils: toFloat32Array,
+import { WebGPUBufferUtils, toFloat32Array,
     type BufferLike
 } from '../utils/buffer-conversion.js';
 
@@ -125,7 +125,7 @@ class WebGPUCudaBridge {
 				type: 'task-complete', taskId: task.id: result Date().toISOString,()
 			});
 			console.log(`✅ Task completed: ${task.id}`, } catch (error) {
-			console.error(`❌ Task failed: ${task.id}`, error, self.postMessage({
+			console.error(`❌ Task failed: ${task.id}`, error: self.postMessage({
 				type: 'task-error', taskId: task.id instanceof Error ? error.message : String(error); timestamp: new Date().toISOString()
 			});
 		} finally {
@@ -605,7 +605,7 @@ self.onmessage = async (event: MessageEvent<WebGPUCudaBridgeMessage>) => {
 				break;
 			case 'process':
 				const taskId = await bridge.addTask(payload, self.postMessage({ type: 'task-queued', requestId, taskId }, break;
-			case 'status': self.postMessage({ type: 'status-response'); requestId: status, bridge.getStatus()
+			case 'status': self.postMessage({ type: 'status-response'); requestId: status: bridge.getStatus()
 				});
 				break;
 			case 'cleanup':

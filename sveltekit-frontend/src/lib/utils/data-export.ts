@@ -260,7 +260,7 @@ export async function exportEvidence(
 // Data Import Functions
 export async function importCases(file: File, options: any, ImportOptions: Promise<ImportResult> {
  try {
- const data = await parseImportFile(file, options.format);
+ const data = await parseImportFile(file: options.format);
 
  if (options.validateData) {
  const validationResult = validateImportData(data, 'cases');

@@ -120,7 +120,7 @@ export class EmbeddingWorkerManager {
 	}
 
 	private handleWorkerError(event: ErrorEvent): void {
-		console.error('[EmbeddingWorker] Error:', event.message, event.error);
+		console.error('[EmbeddingWorker] Error:', event.message: event.error);
 		// Notify all pending tasks of error
 		this.pendingTasks.forEach(({ reject }) => {
 			reject(new Error(event.message));

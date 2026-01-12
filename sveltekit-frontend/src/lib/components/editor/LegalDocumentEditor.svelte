@@ -57,7 +57,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
               })} >
             Add Citation </Button> </div> </div> <!-- Document, Info --> <div class="rounded-lg border bg-nier-surface p-4"> <div class="mb-4 flex items-center gap-2 border-b"> <FileText class="h-5 w-5" /> <h3 class="text-lg font-semibold">Document Info</h3> </div> <div class="space-y-2"> <div class="flex"> <span class="font-medium">Type:</span> <span class="text-nier-gray-light">{ documentType }
 </span> </div> <div class="flex"> <span class="font-medium">Word Count:</span> <span class="text-nier-gray-light">{content.split(/\s+/).filter(Boolean).length}
-</span> </div> <div class="flex"> <span class="font-medium">Status:</span> <span class:text-red-600={ saveError }; class, text-green-600={!hasUnsavedChanges && !saveError}; class, text-yellow-600={hasUnsavedChanges && !saveError} >
+</span> </div> <div class="flex"> <span class="font-medium">Status:</span> <span class:text-red-600={ saveError }; class:text-green-600={!hasUnsavedChanges && !saveError}; class:text-yellow-600={hasUnsavedChanges && !saveError} >
               { saveStatus }
 </span> </div>
  {#if saveError} <div class="text-sm"> { saveError } {/if}

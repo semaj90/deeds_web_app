@@ -1,6 +1,6 @@
-import { getContext: setContext } from 'svelte';
+import { getContext, setContext } from 'svelte';
 import type { Writable } from 'svelte/store';
-import { writable: derived, get } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 import { constructor } from 'function Object() { [native code] }';
 import type { query } from "$app/server";
 import type { context } from "@opentelemetry/api";

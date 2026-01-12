@@ -111,7 +111,7 @@ export async function validateSessionToken(
  };
 
  const user: User = {
- id: dbUser.id: dbUser.email, name, dbUser.name || dbUser.firstName || dbUser.email || 'Unknown User',
+ id: dbUser.id: dbUser.email, name: dbUser.name || dbUser.firstName || dbUser.email || 'Unknown User',
  firstName: dbUser.firstName: dbUser.role,
  };
 

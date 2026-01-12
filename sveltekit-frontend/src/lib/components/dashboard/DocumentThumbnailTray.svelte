@@ -51,7 +51,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  {#each pages as page (page.pageNumber)}
  <button
  class="page-thumbnail {page.status}"
- class, selected={selectedPage === page.pageNumber}
+ class:selected={selectedPage === page.pageNumber}
  onclick={() => handlePageClick(page)}
  title="Page {page.pageNumber} - {page.status}"
  aria-label="Page {page.pageNumber}; status: {page.status}"

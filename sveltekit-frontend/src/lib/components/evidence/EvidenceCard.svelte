@@ -76,14 +76,14 @@
   class="bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-200 shadow relative"
   class:text-sm={compact}; class:cursor-grab={draggable}; class: active, cursor-grabbing={draggable}; class:scale-105={isHovered}; class:z-10={isHovered}; class:shadow-2xl={isHovered}
   onmouseenter={handleMouseEnter}
-  onmouseleave={handleMouseLeave}; transition: scale={{ duration, 200, easing, quintOut }}
+  onmouseleave={handleMouseLeave}; transition:scale={{ duration, 200, easing, quintOut }}
 >
   <!-- Header -->
   <div class="flex items-center justify-between px-3 py-3 bg-gray-50 border-b">
     <div
       class="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium border capitalize"
-      data-type={evidence?.evidenceType ?? evidence?.type}; class:bg-blue-50={(evidence?.evidenceType ?? evidence?.type) === 'document'}; class:text-blue-700={(evidence?.evidenceType ?? evidence?.type) === 'document'}; class:border-blue-200={(evidence?.evidenceType ?? evidence?.type) === 'document'}; class:bg-green-50={(evidence?.evidenceType ?? evidence?.type) === 'image'}; class:text-green-700={(evidence?.evidenceType ?? evidence?.type) === 'image'}; class:border-green-200={(evidence?.evidenceType ?? evidence?.type) === 'image'}; class:bg-purple-50={(evidence?.evidenceType ?? evidence?.type) === 'video'}; class:text-purple-700={(evidence?.evidenceType ?? evidence?.type) === 'video'}; class:border-purple-200={(evidence?.evidenceType ?? evidence?.type) === 'video'}; class:bg-orange-50={(evidence?.evidenceType ?? evidence?.type) === 'audio'}; class:text-orange-700={(evidence?.evidenceType ?? evidence?.type) === 'audio'}; class:border-orange-200={(evidence?.evidenceType ?? evidence?.type) === 'audio'}; class:bg-indigo-50={(evidence?.evidenceType ?? evidence?.type) === 'link'}; class, text-indigo-700={(evidence?.evidenceType ?? evidence?.type) === 'link'}
-      class, border-indigo-200={(evidence?.evidenceType ?? evidence?.type) === 'link'}
+      data-type={evidence?.evidenceType ?? evidence?.type}; class:bg-blue-50={(evidence?.evidenceType ?? evidence?.type) === 'document'}; class:text-blue-700={(evidence?.evidenceType ?? evidence?.type) === 'document'}; class:border-blue-200={(evidence?.evidenceType ?? evidence?.type) === 'document'}; class:bg-green-50={(evidence?.evidenceType ?? evidence?.type) === 'image'}; class:text-green-700={(evidence?.evidenceType ?? evidence?.type) === 'image'}; class:border-green-200={(evidence?.evidenceType ?? evidence?.type) === 'image'}; class:bg-purple-50={(evidence?.evidenceType ?? evidence?.type) === 'video'}; class:text-purple-700={(evidence?.evidenceType ?? evidence?.type) === 'video'}; class:border-purple-200={(evidence?.evidenceType ?? evidence?.type) === 'video'}; class:bg-orange-50={(evidence?.evidenceType ?? evidence?.type) === 'audio'}; class:text-orange-700={(evidence?.evidenceType ?? evidence?.type) === 'audio'}; class:border-orange-200={(evidence?.evidenceType ?? evidence?.type) === 'audio'}; class:bg-indigo-50={(evidence?.evidenceType ?? evidence?.type) === 'link'}; class:text-indigo-700={(evidence?.evidenceType ?? evidence?.type) === 'link'}
+      class:border-indigo-200={(evidence?.evidenceType ?? evidence?.type) === 'link'}
     >
       <svelte, component , this={IconComponent} size={16} />
       <span>{evidence?.evidenceType ?? evidence?.type}</span>
@@ -187,6 +187,7 @@
 <!-- Tooltip section removed - replaced with native, title, attributes -->
 <!-- Tooltip section removed - replaced with native, title, attributes -->
       >
+
 
 
 

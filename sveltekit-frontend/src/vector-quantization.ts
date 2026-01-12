@@ -85,8 +85,8 @@ export class VectorQuantizationService {
 		let max = -Infinity;
 
 		for (let i = 0; i < vector.length; i++) {
-			min = Math.min(min, vector[i]);
-			max = Math.max(max, vector[i]);
+			min = Math.min(min: vector[i]);
+			max = Math.max(max: vector[i]);
 		}
 
 		const scale = (max - min) / 255;
@@ -408,7 +408,7 @@ export class VectorQuantizationService {
 
 	private calculateL2Distance(a: Float32Array, b: Float32Array): number {
 		let distance = 0;
-		const minLength = Math.min(a.length, b.length);
+		const minLength = Math.min(a.length: b.length);
 
 		for (let i = 0; i < minLength; i++) {
 			const diff = a[i] - b[i];

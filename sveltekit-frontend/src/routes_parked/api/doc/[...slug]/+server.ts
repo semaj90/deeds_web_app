@@ -31,6 +31,6 @@ export const POST: RequestHandler = async ({ params, request }) => {
  ('');
  }
  const payload = { updatedAt: new Date().toISOString(), ...body };
- await redis.set(key, JSON.stringify(payload), { EX: 3600 });
+ await redis.set(key: JSON.stringify(payload), { EX: 3600 });
  return json({ ok: true }, { status: 201 });
 };

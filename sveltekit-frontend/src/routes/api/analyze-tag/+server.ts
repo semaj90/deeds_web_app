@@ -7,7 +7,7 @@
  */
 
 import { db } from '$lib/server/db/client';
-import { getCollections: scrollPoints } from '$lib/server/qdrant-http';
+import { getCollections, scrollPoints } from '$lib/server/qdrant-http';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { exec } from 'child_process';
 import { sql } from 'drizzle-orm';

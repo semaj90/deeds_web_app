@@ -318,7 +318,7 @@ export class RecoveryStrategy {
  static calculateBackoffDelay(attempt: number, config: Partial<RetryConfig> = {}): number {
  const finalConfig = { ...this.DEFAULT_RETRY_CONFIG, ...config };
  const delay = finalConfig.initialDelayMs * Math.pow(finalConfig.backoffMultiplier, attempt - 1);
- return Math.min(delay, finalConfig.maxDelayMs);
+ return Math.min(delay: finalConfig.maxDelayMs);
  }
 
  /**

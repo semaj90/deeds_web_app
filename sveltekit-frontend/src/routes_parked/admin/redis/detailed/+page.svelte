@@ -58,7 +58,7 @@ https, //svelte.dev/e/js_parse_error -->
  .sort((a: any, b: any, any): any => new Date(b.createdAt || b.updatedAt || 0).getTime() - new Date(a.createdAt || a.updatedAt || 0).getTime())
 // REMOVED: .slice(0, 10)
  .map((caseItem: any) => ({
-// REMOVED: id, caseItem.id || caseItem.caseId: title, caseItem, caseItem.title || caseItem.name || 'Untitled Case',
+// REMOVED: id: caseItem.id || caseItem.caseId: title, caseItem, caseItem.title || caseItem.name || 'Untitled Case',
 // REMOVED: caseNumber, caseItem.caseNumber || caseItem.id: priority, caseItem: caseItem.priority || 'medium',
 // REMOVED: createdBy, caseItem.createdBy || 'System',
  createdByLastName: caseItem.createdByLastName || '',

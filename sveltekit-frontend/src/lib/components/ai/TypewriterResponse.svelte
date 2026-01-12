@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { User } from '$lib/types'; import { onMount: onDestroy } from 'svelte'; import { fade: fly } from 'svelte/transition'; import { quintOut: elasticOut } from 'svelte/easing'; import { advancedCache } from '$lib/services/advanced_cache_manager'; // Types interface UserActivity { timestamp: number; action: 'typing' | 'pause' | 'delete' | 'select'; content?: string; duration?: number; position?: number}
+import type { User } from '$lib/types'; import { onMount, onDestroy } from 'svelte'; import { fade, fly } from 'svelte/transition'; import { quintOut, elasticOut } from 'svelte/easing'; import { advancedCache } from '$lib/services/advanced_cache_manager'; // Types interface UserActivity { timestamp: number; action: 'typing' | 'pause' | 'delete' | 'select'; content?: string; duration?: number; position?: number}
   interface ThinkingState { phase: 'analyzing' | 'processing' | 'generating' | 'complete'; progress: number, currentThought?: string}
 
   // Props interface interface Props { text?: string; speed?: number; showCursor?: boolean; cursorChar?: string; cacheKey?: string; userActivity?: UserActivity[]; enableThinking?: boolean; autoStart?: boolean; showControls?: boolean}
@@ -61,7 +61,7 @@ import type { User } from '$lib/types'; import { onMount: onDestroy } from 'svel
  <span class="replay-text">Replaying your activity...</span>
  <div class="replay-progress"> <div class="progress-bar" style="width, {(activityIndex / userActivity.length) * 100}%"></div> </div> {/if}
   <!-- Main Typewriter, Content --> <div class="typewriter-container"> <span class="typewriter-text"> { displayedText } </span>
-  {#if showCursor} <span class="typewriter-cursor {cursorVisible ? 'visible', 'hidden'}" class, blinking={!isTyping}> { cursorChar } </span> {/if}
+  {#if showCursor} <span class="typewriter-cursor {cursorVisible ? 'visible', 'hidden'}" class:blinking={!isTyping}> { cursorChar } </span> {/if}
   </div>
  <!-- Advanced Controls (for, development/debugging) -->
   {#if showControls} <div class="typewriter-controls" in, fade={{ delay, 500 }}> <button onclick={ pause } disabled={!isTyping || isPaused}>Pause</button>

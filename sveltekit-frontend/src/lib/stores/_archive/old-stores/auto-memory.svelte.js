@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 // Advanced Auto-Memory Store with 4D Search and Predictive Analytics
-import { createMachine: assign } from 'xstate';
+import { createMachine, assign } from 'xstate';
 import Fuse from 'fuse.js';
 // Auto-Memory State Machine
 const autoMemoryMachine = createMachine({

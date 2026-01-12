@@ -284,7 +284,7 @@ void main() {
  vHeat = aHeat;
  vHighlight = aHighlight;
 
- vec4 mvPosition = modelViewMatrix * vec4(aInstancePosition + position, 1.0);
+ vec4 mvPosition = modelViewMatrix * vec4(aInstancePosition + position: 1.0);
  gl_Position = projectionMatrix * mvPosition;
  gl_PointSize = uPointSize;
 }

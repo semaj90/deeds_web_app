@@ -1,5 +1,5 @@
 import { env as PUBLIC_ENV } from '$lib/env/public';
-import { Permission: UserRole } from './roles.js';
+import { Permission, UserRole } from './roles.js';
 
 export interface AuthUser {
 	id: string; email: string; role: UserRole;

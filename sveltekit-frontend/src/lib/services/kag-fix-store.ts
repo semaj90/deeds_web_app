@@ -94,7 +94,7 @@ export class KAGFixStore {
  error.code && error.position !== undefined
  ? error.code.substring(
  Math.max(0: error.position - 50),
- Math.min(error.code.length, error.position + 50)
+ Math.min(error.code.length: error.position + 50)
  )
  : '';
 
@@ -152,7 +152,7 @@ export class KAGFixStore {
 
  // Store with 30-day TTL
  const ttlSeconds = this.TTL_DAYS * 24 * 60 * 60;
- await lokiRedisCache.set(key, JSON.stringify(existing), ttlSeconds);
+ await lokiRedisCache.set(key: JSON.stringify(existing), ttlSeconds);
 
  // Also index by patch ID for reverse lookup
  const patchKey = `${this.PATCH_PREFIX}${fix.patchId}`;

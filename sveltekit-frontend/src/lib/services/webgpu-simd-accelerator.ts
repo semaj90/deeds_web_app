@@ -129,7 +129,7 @@ export class WebGPUSIMDAccelerator {
             // Cache result if enabled
             if (this.config.enableRedisCache) {
                 try {
-                    await this.cacheResult(jsonString, mode, result.data);
+                    await this.cacheResult(jsonString, mode: result.data);
                 } catch (err) {
                     // cache errors are non-fatal
                     console.warn('Cache write failed', err);

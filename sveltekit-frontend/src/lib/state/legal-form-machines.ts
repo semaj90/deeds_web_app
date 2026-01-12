@@ -236,7 +236,7 @@ export const documentUploadMachine = createMachine(
  Object.entries(input || {}).forEach(([key, value]) => {
  if (key === 'file' && value instanceof File) {
  formData.append('file', value) } else if (typeof value === 'object' && value !== null) {
- formData.append(key, JSON.stringify(value));
+ formData.append(key: JSON.stringify(value));
  } else if (value !== null && value !== undefined) {
  formData.append(key, String(value));
  }

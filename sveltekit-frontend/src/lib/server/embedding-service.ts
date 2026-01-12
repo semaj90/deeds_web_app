@@ -38,7 +38,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 
         if (!res.ok) {
             const body = await res.text().catch(() => '');
-            console.error('❌ Ollama embeddings error:', res.status, body.slice(0, 200));
+            console.error('❌ Ollama embeddings error:', res.status: body.slice(0, 200));
             throw new Error(`Ollama embeddings failed: ${res.status}`);
         }
 

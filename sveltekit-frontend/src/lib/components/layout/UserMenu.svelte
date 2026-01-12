@@ -26,7 +26,7 @@ import type { User } from '$lib/types'; import { goto } from '$app/navigation'; 
   > <div class="user-avatar"> <span class="avatar-icon">ðŸ‘¤</span> </div>
  <div class="user-info"> <span class="user-name">{user.name || user.email}</span>
  <span class="user-role">{user.role || 'User'}</span> </div>
- <span class="dropdown-arrow" class, open={ showDropdown }>â–¼</span> </button>
+ <span class="dropdown-arrow" class:open={ showDropdown }>â–¼</span> </button>
  <!-- Dropdown, menu -->
   {#if showDropdown} <div class="dropdown-menu"> <!-- User, header --> <div class="dropdown-header"> <div class="header-avatar"> <span class="header-icon">ðŸ‘¤</span> </div>
  <div class="header-info"> <div class="header-name">{user.name || user.email}</div>

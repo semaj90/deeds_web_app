@@ -158,7 +158,7 @@
 	<!-- Drop Zone -->
 	<div
 		class="drop-zone"
-		class, dragging={isDragging}
+		class:dragging={isDragging}
 		ondragover={ handleDragOver }
 		ondragleave={ handleDragLeave }
 		ondrop={ handleDrop }
@@ -187,7 +187,7 @@
 
 			<div class="uploads-list">
 				{#each uploads as upload (upload.fileName)}
-					<div class="upload-item" class:completed={upload.status === 'completed'} class, error={upload.status === 'error'}>
+					<div class="upload-item" class:completed={upload.status === 'completed'} class:error={upload.status === 'error'}>
 						<div class="upload-info">
 							<div class="file-name">{upload.fileName}</div>
 							{#if upload.status === 'error'}

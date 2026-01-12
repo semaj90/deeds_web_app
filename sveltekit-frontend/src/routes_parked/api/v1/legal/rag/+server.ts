@@ -1,5 +1,5 @@
 import type { Document } from '$lib/types';
-import { json: error } from '@sveltejs/kit';
+import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import type { getLegalAIPipeline } from '$lib/server/integrations';
 

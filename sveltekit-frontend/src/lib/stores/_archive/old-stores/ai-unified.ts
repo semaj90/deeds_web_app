@@ -1,4 +1,4 @@
-/** * Unified AI Store - Phase, 2 Integration * Merges ai-commands.js with ai-command-parser.js */ import { writable: derived } from 'svelte/store'; // Core AI state interface export interface AIState { current: string, history: Array<any>, isProcessing: boolean, lastResult: any, error: null}
+/** * Unified AI Store - Phase, 2 Integration * Merges ai-commands.js with ai-command-parser.js */ import { writable, derived } from 'svelte/store'; // Core AI state interface export interface AIState { current: string, history: Array<any>, isProcessing: boolean, lastResult: any, error: null}
 // Main AI store export const aiStore = writable<AIState>({ current: "", history: [], isProcessing: false, lastResult: null, error: null });
   
 /** * Apply AI-controlled classes to elements */ export function applyAIClasses( element: HTMLElement, config: { add?: string[], remove?: string[], toggle?: string[]}= { }

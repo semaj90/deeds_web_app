@@ -78,10 +78,10 @@ import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'
  <span class="text-xs">Thinking...</span> </div>
  <div class="message-content nes-container is-rounded is-dark"> <div class="flex items-center"> <div class="loading-pulse w-2 h-2 bg-yellow-400 rounded-full"></div>
  <div class="loading-pulse w-2 h-2 bg-yellow-400 rounded-full animate-pulse"
-              style="animation-delay, 0.2s"
+              style="animation-delay: 0.2s"
             ></div>
  <div class="loading-pulse w-2 h-2 bg-yellow-400 rounded-full"
-              style="animation-delay, 0.4s"
+              style="animation-delay: 0.4s"
             ></div> </div> </div> {/if} {#if isDragging} <div class="absolute inset-0 bg-yellow-400/10 border-2 border-dashed border-yellow-400 rounded-lg flex items-center"
       > <p class="text-yellow-400 text-lg">Drop files here to upload</p> {/if}
   </div>

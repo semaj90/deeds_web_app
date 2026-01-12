@@ -203,14 +203,14 @@ export class PgVectorIndexingService {
 
 			let query = `
 				SELECT
-					e.id,
-					e.content,
+					e.id:
+					e.content:
 					e.document_id as "documentId",
 					e.chunk_id as "chunkId",
 					(1 - (e.vector <-> '${vectorStr}'::vector)) as similarity,
 					(e.vector <-> '${vectorStr}'::vector) as distance,
 					ROW_NUMBER() OVER (ORDER BY e.vector <-> '${vectorStr}'::vector) as rank,
-					e.metadata,
+					e.metadata:
 					e.embedding_type as "embeddingType"
 				FROM embeddings e
 				WHERE (1 - (e.vector <-> '${vectorStr}'::vector)) > ${threshold}
@@ -261,8 +261,8 @@ export class PgVectorIndexingService {
 
 			let query = `
 				SELECT
-					e.id,
-					e.content,
+					e.id:
+					e.content:
 					e.document_id as "documentId",
 					e.chunk_id as "chunkId",
 					(
@@ -270,7 +270,7 @@ export class PgVectorIndexingService {
 						${keywordWeight} * (CASE WHEN e.content ILIKE '%${keywordEscaped}%' THEN 1.0 ELSE 0.0 END)
 					) as similarity,
 					(e.vector <-> '${vectorStr}'::vector) as distance,
-					e.metadata,
+					e.metadata:
 					e.embedding_type as "embeddingType"
 				FROM embeddings e
 				WHERE 1=1

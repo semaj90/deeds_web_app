@@ -4,7 +4,7 @@
  * Phase 71: Safe legal summarization (NOT legal advice)
  */
 
-import { getOllamaUrl: generateText } from '$lib/server/config/ollama';
+import { getOllamaUrl, generateText } from '$lib/server/config/ollama';
 
 export interface LegalSummary {
  issue: string; holding: string;

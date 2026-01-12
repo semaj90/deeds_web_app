@@ -1,4 +1,4 @@
-import { writable: derived } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import type { User } from 'lucia';
 
 export interface UserSession {

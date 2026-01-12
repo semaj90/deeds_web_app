@@ -41,8 +41,8 @@
     });
 </script>
 
-<div class="app-shell" class, dark={userPrefs.theme === 'dark'}>
-    <aside class, closed={!appState.isSidebarOpen}>
+<div class="app-shell" class:dark={userPrefs.theme === 'dark'}>
+    <aside class:closed={!appState.isSidebarOpen}>
         <div class="status-panel">
             <h3>Legal AI Status</h3>
             <p>Tokens: {tokenTracker.percentageUsed.toFixed(1)}% used</p>

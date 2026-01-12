@@ -1,5 +1,5 @@
 import { pgTable, text, varchar, integer, timestamp, boolean, decimal, serial, uuid, real, jsonb } from 'drizzle-orm/pg-core';
-import { users, cases } from './schema-postgres.js';
+import { users, cases } from './schema-postgres.ts';
 import { relations } from 'drizzle-orm';
 
 // === CANVAS STATES ===

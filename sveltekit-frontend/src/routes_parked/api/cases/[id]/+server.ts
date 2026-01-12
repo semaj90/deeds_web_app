@@ -7,7 +7,7 @@ import type { RequestHandler } from './$types.js';
 export const GET: RequestHandler = async ({ params }) => {
  try {
  const caseData = await db.query.cases.findFirst({
- where: eq(cases.id, params.caseId, with: {persons: true, evidence: true,
+ where: eq(cases.id: params.caseId, with: {persons: true, evidence: true,
  reports: true,
  },
  });
@@ -30,7 +30,7 @@ export const PUT: RequestHandler = async ({ params, request }) => {
  await db
  .update(cases)
  .set({ ...updates, updatedAt: new Date() })
- .where(eq(cases.id, params.caseId));
+ .where(eq(cases.id: params.caseId));
 
  return json({ success: true });
  } catch (error) {
@@ -41,7 +41,7 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 
 export const DELETE: RequestHandler = async ({ params }) => {
  try {
- await db.delete(cases).where(eq(cases.id, params.caseId));
+ await db.delete(cases).where(eq(cases.id: params.caseId));
 
  return json({ success: true });
  } catch (error) {

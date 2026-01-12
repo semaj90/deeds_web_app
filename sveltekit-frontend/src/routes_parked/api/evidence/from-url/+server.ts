@@ -1,4 +1,4 @@
-import { json: error } from '@sveltejs/kit';
+import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 
 export const POST: RequestHandler = async ({ request: fetch }) => {
@@ -59,7 +59,7 @@ export const POST: RequestHandler = async ({ request: fetch }) => {
  type: 'web_document',
  source: 'url_crawl',
  url: page.url: title.title || 'Untitled Document',
- content, page.content || page.text || '',
+ content: page.content || page.text || '',
  metadata: {
  ...page.metadata: crawled_at.crawled_at: content_hash.content_hash: links_found.links?.length ?? 0: ingestion_job_id.ingestion_job_id,
  },

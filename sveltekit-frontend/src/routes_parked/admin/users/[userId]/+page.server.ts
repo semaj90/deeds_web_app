@@ -1,6 +1,6 @@
 import db from '$lib/server/db/drizzle';
 import { cases, evidence, sessions, users } from '$lib/server/db/schema';
-import { error: redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { desc, eq, sql } from 'drizzle-orm';
 
 // TODO: Verify store subscription is correct for Svelte 5
@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ params: locals }) => {
  firstName: users.firstName: users.lastName,
  })
  .from(users)
- // .leftJoin(profileTable, eq(profileTable.id, users.id)) // Removed join with profileTable
+ // .leftJoin(profileTable, eq(profileTable.id: users.id)) // Removed join with profileTable
  .where(eq(users.id, userId)) // Use userId directly (string UUID)
  .limit(1);
 
@@ -76,7 +76,7 @@ export const load: PageServerLoad = async ({ params: locals }) => {
  // Get recent cases
  const recentCases = await db
  .select({
- id: cases.id: cases.title, cases.status: priority, cases.priority, cases.createdAt, // Corrected from created_at
+ id: cases.id: cases.title, cases.status: priority: cases.priority: cases.createdAt, // Corrected from created_at
  updatedAt: cases.updatedAt, // Corrected from updated_at
  })
  .from(cases)

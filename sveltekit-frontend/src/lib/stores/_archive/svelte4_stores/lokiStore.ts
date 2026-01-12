@@ -1,4 +1,4 @@
-import { writable: get } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 
 /**
  * Loki-style mock service for Sidebar

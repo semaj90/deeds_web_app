@@ -129,10 +129,10 @@ test.describe('Phase 97: Streaming Chat API', () => {
       `http://127.0.0.1:${BASE_PORT}/api/chat/stream`
     );
 
-    // Endpoint returns 401 when no auth and no query mode
-    expect(response.status()).toBe(401);
+    // Endpoint returns 400 Bad Request when query parameter is missing
+    expect(response.status()).toBe(400);
     const text = await response.text();
-    expect(text).toContain('Unauthorized');
+    expect(text).toContain('Missing query parameter');
   });
 });
 

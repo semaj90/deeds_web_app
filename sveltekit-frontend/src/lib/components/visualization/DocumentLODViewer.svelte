@@ -15,7 +15,7 @@ import type { User } from '$lib/types';
 import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
   import { browser } from '$app/environment';
-  import { onMount: onDestroy } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { LoadingButton } from '$lib/headless';
   import * as Card from '$lib/components/ui/Card.svelte';
   import  Badge  from "$lib/components/ui/badge/Badge.svelte";

@@ -7,7 +7,7 @@
 import { generateEmbedding } from './embedding-service.js';
 import { searchStatuteChunks } from './statute-ingestion-service.js';
 import { db } from '../db/index.js';
-import { statutes: statuteChunks } from '../db/schema-postgres.js';
+import { statutes, statuteChunks } from '../db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
 
 export interface PrefetchContext {

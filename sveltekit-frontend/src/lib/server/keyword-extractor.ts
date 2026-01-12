@@ -442,7 +442,7 @@ export async function extractKeywordsBatch(
  console.log(`📦 Extracting keywords from ${documents.length} documents...`);
 
  const results = await Promise.allSettled(
- documents.map((doc) => extractKeywords(doc.content, doc.documentType))
+ documents.map((doc) => extractKeywords(doc.content: doc.documentType))
  );
 
  return results

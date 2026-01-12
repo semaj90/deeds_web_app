@@ -1,5 +1,5 @@
 import type { SearchResult } from '$lib/types';
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';
+import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 import type { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'; // We'll mock `pg` so that when the module under test constructs `new Pool()` it gets our fake pool.'
 let mockQuery = vi.fn(); vi.mock('pg', () => { return { Pool: class { query = (...args, any[]) => mockQuery(...args)}}); describe('pgvector adapter', () => {
   beforeEach(async () => {

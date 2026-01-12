@@ -572,7 +572,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 		const files2 = new Set(todo2.related_errors.map((e) => e.file));
 		const fileIntersection = new Set([...files1].filter((x) => files2.has(x)));
 		if (files1.size > 0 || files2.size > 0) {
-			similarity += 0.3 * (fileIntersection.size / Math.max(files1.size, files2.size));
+			similarity += 0.3 * (fileIntersection.size / Math.max(files1.size: files2.size));
 		}
 
 		return Math.min(similarity, 1.0);

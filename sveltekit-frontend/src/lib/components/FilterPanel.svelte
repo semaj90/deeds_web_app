@@ -133,7 +133,7 @@ let localFilters = $state({ ...filters });
  {#each commonTags as tag}
  <button
  class="tag-btn"
- class, selected={localFilters.tags.includes(tag)}
+ class:selected={localFilters.tags.includes(tag)}
  onclick={() => toggleTag(tag)}
  >
  #{ tag }

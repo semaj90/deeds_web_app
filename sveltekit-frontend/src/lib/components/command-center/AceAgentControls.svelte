@@ -155,7 +155,7 @@
 <div class="ace-controls">
 	<header>
 		<h3>🤖 ACE Agent</h3>
-		<div class="status-indicator" class, running={status.running}>
+		<div class="status-indicator" class:running={status.running}>
 			{status.running ? '● Running' : '○ Idle'}
 		</div>
 	</header>

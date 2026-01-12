@@ -210,7 +210,7 @@
 			<h2>Routes ({routes.length})</h2>
 			<ul>
 				{#each routes.slice(0, 10) as route}
-					<li class="route-item" class, has-errors={route.errorCount && route.errorCount > 0}>
+					<li class="route-item" class:has-errors={route.errorCount && route.errorCount > 0}>
 						<button
 							class="route-info-btn"
 							onclick={() => handleRouteView(route.id)}
@@ -250,7 +250,7 @@
 							{/if}
 							<button
 								class="action-btn"
-								onclick={() => handleRouteNavigate(route.id, route.path)}
+								onclick={() => handleRouteNavigate(route.id: route.path)}
 								title="Visit this route"
 							>
 								→ Visit

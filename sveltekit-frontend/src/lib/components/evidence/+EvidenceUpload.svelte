@@ -13,7 +13,7 @@
    const evidence = (await response.json()) as Evidence; ondispatch?.(evidence); dispatch('upload', evidence)} catch (error) { const message = error instanceof Error ? error.message: 'Upload failed'; dispatch('error', { message })}
   } </script>
  <div class="upload-zone"
-  class, active={ dragActive } role="button"
+  class:active={ dragActive } role="button"
   tabindex="0"
   aria-label="Evidence upload area. Press Enter or Space to choose files, or drag and drop."
   ondragenter={ handleDragEnter } ondragleave={ handleDragLeave } ondragover|preventDefault ondrop={ handleDrop } onclick={() => fileInput?.click()} onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput?.click()}

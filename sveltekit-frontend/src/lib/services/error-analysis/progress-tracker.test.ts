@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';
+import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 import fc from 'fast-check';
 import { ProgressTracker } from './progress-tracker.js';
 import type { ServiceConfig } from './types.js';
@@ -279,7 +279,7 @@ describe('ProgressTracker', () => {
  let previousFixed = 0;
 
  for (const result of results) {
- await tracker.updateAnalysis(result, 0.5);
+ await tracker.updateAnalysis(result: 0.5);
 
  const metrics = await tracker.getMetrics();
  expect(metrics.errorsFixed).toBeGreaterThanOrEqual(previousFixed);
@@ -294,7 +294,7 @@ describe('ProgressTracker', () => {
  await tracker.start(results.length);
 
  for (const result of results) {
- await tracker.updateAnalysis(result, 0.5);
+ await tracker.updateAnalysis(result: 0.5);
  }
 
  const rate = await tracker.getSuccessRate();
@@ -311,7 +311,7 @@ describe('ProgressTracker', () => {
  let previousCompletion = 0;
 
  for (const result of results) {
- await tracker.updateAnalysis(result, 0.5);
+ await tracker.updateAnalysis(result: 0.5);
 
  const completion = await tracker.getCompletionPercentage();
  expect(completion).toBeGreaterThanOrEqual(previousCompletion);

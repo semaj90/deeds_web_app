@@ -103,7 +103,7 @@ import { Send } from "lucide-svelte";
  <!-- Message List -->
  <div class="flex-1 overflow-y-auto p-3 space-y-4 text-sm font-mono">
  {#each messages as m}
- <article class="border-1 p-2" class:ai={m.role==='ai'}; class:user={m.role==='user'}; class, system={m.role==='system'}>
+ <article class="border-1 p-2" class:ai={m.role==='ai'}; class:user={m.role==='user'}; class:system={m.role==='system'}>
  <header class="text-2xs uppercase opacity-70">{m.role}</header>
  <p class="mt-1 font-mono text-xs">{m.text}</p>
  </article>

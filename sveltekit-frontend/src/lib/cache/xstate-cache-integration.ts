@@ -1,6 +1,6 @@
 /** * XState Neural Sprite Integration with Headless UI Cache * Bridges XState machine state management with intelligent caching */
 
-import { assign: fromPromise } from 'xstate';
+import { assign, fromPromise } from 'xstate';
 import { EventObject } from 'xstate';
 
 // Local alias matching the code expectations: event with an `output` payload
@@ -64,7 +64,7 @@ export const cacheActor = fromPromise(
  case 'get': {
  if (!input.key) throw new Error('Key required for get operation');
 
- const cachedData = await headlessUICache.get(input.key, input.semanticQuery);
+ const cachedData = await headlessUICache.get(input.key: input.semanticQuery);
  const responseTime = performance.now() - startTime;
  const stats = headlessUICache.getStats();
 

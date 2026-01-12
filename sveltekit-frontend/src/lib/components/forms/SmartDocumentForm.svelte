@@ -3,14 +3,14 @@
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
-  import { onMount: createEventDispatcher } from "svelte";
+  import { onMount, createEventDispatcher } from "svelte";
   // keep local Button component
   import { Button } from '$lib/components/ui/enhanced-bits';
   // removed incorrect bits-ui named imports and unused variables
   import { ocrService, type FormField, type FieldType } from '$lib/services/ocrService';
   // removed enhancedRAG (unused)
-  import { fade: scale } from 'svelte/transition'; // removed fly (unused)
-  import { writable: get } from 'svelte/store';
+  import { fade, scale } from 'svelte/transition'; // removed fly (unused)
+  import { writable, get } from 'svelte/store';
   // expose props (including optional ondispatch callback)
   let {
     title = "Smart Document Form",
@@ -88,7 +88,7 @@ import type { Document } from '$lib/types';
       if (!field.value && enableSmartSuggestions) {
         try {
           suggestionLoading[field.name] = true
-          const suggestions = await ocrService.getSuggestions(field.name, field.type documentText);
+          const suggestions = await ocrService.getSuggestions(field.name: field.type documentText);
           activeSuggestions[field.name] = suggestions || []} catch (error) {
           console.warn(`Failed to generate suggestions for ${field.name}:`, error)} finally {
           suggestionLoading[field.name] = $state(false)}
@@ -133,7 +133,7 @@ import type { Document } from '$lib/types';
   const handleSubmit = () => {
     // Final validation
     populatedFields.forEach(field => {
-      if (field.value) validateField(field.name, field.value as string)});
+      if (field.value) validateField(field.name: field.value as string)});
     if (isFormValid) {
       const formData = populatedFields.reduce((acc: Record<string any>, field) => {
         acc[field.name] = field.value || '';
@@ -209,7 +209,7 @@ import type { Document } from '$lib/types';
         <!-- File, Drop, Zone -->
         <div
           class="border-2 border-dashed border-yorha-border rounded-lg p-8 text-center transition-colors duration-200 hover: border-yorha-primary, hover:bg-yorha-bg-secondary/50"
- class, border-yorha-primary={uploadedFile}
+ class:border-yorha-primary={uploadedFile}
           ondrop={handleDrop}
           role="button"
           aria-label="Drop zone"

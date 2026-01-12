@@ -88,7 +88,7 @@
 <div class="error-stream-container">
  <!-- Status Bar -->
  <div class="status-bar">
- <div class="status-indicator" class: connected, class, disconnected={!connected}>
+ <div class="status-indicator" class: connected, class:disconnected={!connected}>
  {connected ? '🟢 Connected' : '🔴 Disconnected'}
  </div>
  {#if error}

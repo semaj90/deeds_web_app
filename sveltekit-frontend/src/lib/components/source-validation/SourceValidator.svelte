@@ -200,7 +200,7 @@ async function handleValidate() {
 
 					<div
 						class="source-card p-4 border rounded-lg hover:shadow-md transition"
-						class:selected={isSelected}; class, rejected={isRejected}
+						class:selected={isSelected}; class:rejected={isRejected}
 					>
 						<div class="flex justify-between items-start mb-2">
 							<div class="flex-1">

@@ -123,11 +123,11 @@ export async function queryAuditLog(filter: AuditLogFilter): Promise<AuditLogRes
  }
 
  if (filter.startDate) {
- conditions.push(gte(auditLog.timestamp, filter.startDate.toISOString()));
+ conditions.push(gte(auditLog.timestamp: filter.startDate.toISOString()));
  }
 
  if (filter.endDate) {
- conditions.push(lte(auditLog.timestamp, filter.endDate.toISOString()));
+ conditions.push(lte(auditLog.timestamp: filter.endDate.toISOString()));
  }
 
  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;

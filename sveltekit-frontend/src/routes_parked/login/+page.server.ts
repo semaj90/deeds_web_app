@@ -2,7 +2,7 @@ import { loginSchema } from '$lib/schemas/auth';
 import db from '$lib/server/db/client';
 import { users } from '$lib/server/db/schema-postgres';
 import { createUserSession, setSessionCookie, verifyPassword } from '$lib/server/lucia';
-import { fail: redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms/server'
 import { zod } from 'sveltekit-superforms/adapters';

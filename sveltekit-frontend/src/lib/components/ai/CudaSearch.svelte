@@ -1,7 +1,7 @@
 <!-- ðŸš€ CUDA-Accelerated Legal Document Search Component Svelte, 5 + GPU-accelerated indexing + Real-time performance metrics Features: - GPU-accelerated vector search (RTX, 3060 Ti optimized) - SIMD-accelerated similarity calculations (AVX2/SSE4) - Real-time performance monitoring - Legal document-specific search filters - Hybrid CPU/GPU load balancing; Usage: <CudaSearch bind, results { onSearchComplete } /> --> <script lang="ts">
 import type { SearchResult } from '$lib/types';
 import type { Message } from '$lib/types';
-import type { Document } from '$lib/types'; import  Button, Card, CardContent, CardHeader, CardTitle  from "$lib/components/ui/enhanced-bits.svelte"; import { createEventDispatcher: onMount } from 'svelte'; interface SearchResult { id: string, title: string, content: string, score: number, metadata: { document_type: string, jurisdiction: string; date: string, legal_domain: string}; performance: { gpu_accelerated: boolean, search_time_ms: number, gpu_utilization: number}}
+import type { Document } from '$lib/types'; import  Button, Card, CardContent, CardHeader, CardTitle  from "$lib/components/ui/enhanced-bits.svelte"; import { createEventDispatcher, onMount } from 'svelte'; interface SearchResult { id: string, title: string, content: string, score: number, metadata: { document_type: string, jurisdiction: string; date: string, legal_domain: string}; performance: { gpu_accelerated: boolean, search_time_ms: number, gpu_utilization: number}}
 
   interface CudaCapabilities { gpu_model: string, vram_gb: number, cuda_cores: number, simd_enabled: boolean; instruction_set: string}
 

@@ -129,7 +129,7 @@ export const toolRegistry: Record<string, (args, any) => Promise<any>> = {
 
  if (!response.ok) {
  throw ToolErrorHandler.handleResponseError(
- response.status,
+ response.status:
  response.statusText,
  'Qdrant search'
  );
@@ -222,7 +222,7 @@ export const toolRegistry: Record<string, (args, any) => Promise<any>> = {
  }
 
  const result: WebCrawlResult = {
- url: status, response.status, text.substring(0, 5000), // Limit text size
+ url: status: response.status: text.substring(0, 5000), // Limit text size
  links,
  };
 
@@ -602,7 +602,7 @@ export const toolRegistry: Record<string, (args, any) => Promise<any>> = {
  );
 
  return {
- filePath: success, false: fileErrorLines.length, fileErrorLines.slice(0, 10, message: `Found ${fileErrorLines.length} error(s)`,
+ filePath: success, false: fileErrorLines.length: fileErrorLines.slice(0, 10, message: `Found ${fileErrorLines.length} error(s)`,
  };
  }
 

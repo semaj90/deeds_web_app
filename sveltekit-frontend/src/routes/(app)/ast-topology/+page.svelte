@@ -136,7 +136,7 @@
 
       eventSource.onerror = () => {
         isConnected = false;
-        console.warn('SSE connection error, reconnecting...');
+        console.warn('SSE connection error: reconnecting...');
         eventSource?.close();
         setTimeout(connectSSE, 5000);
       };
@@ -236,7 +236,7 @@
   <header class="explorer-header">
     <div class="header-left">
       <h1>🕸️ AST Topology Explorer</h1>
-      <span class="connection-status" class, connected={isConnected}>
+      <span class="connection-status" class:connected={isConnected}>
         {isConnected ? '🟢 Live' : '🔴 Disconnected'}
       </span>
     </div>
@@ -258,15 +258,15 @@
 
       <div class="view-toggle">
         <button
-          class, active={viewMode === 'tree'}
+          class:active={viewMode === 'tree'}
           onclick={() => viewMode = 'tree'}
         >🌳 Tree</button>
         <button
-          class, active={viewMode === 'graph'}
+          class:active={viewMode === 'graph'}
           onclick={() => viewMode = 'graph'}
         >🕸️ Graph</button>
         <button
-          class, active={viewMode === 'list'}
+          class:active={viewMode === 'list'}
           onclick={() => viewMode = 'list'}
         >📋 List</button>
       </div>
@@ -303,7 +303,7 @@
             <button
               class="tree-node"
               class:selected={selectedNode === node.id}
-              class, has-errors={node.errorCount > 0}
+              class:has-errors={node.errorCount > 0}
               onclick={() => selectedNode = node.id}
             >
               <span class="node-icon">
@@ -322,7 +322,7 @@
       {:else if viewMode === 'list'}
         <div class="error-list">
           {#each filteredNodes.filter(n => n.errorCount > 0).sort((a, b) => b.errorCount - a.errorCount) as node (node.id)}
-            <div class="error-item" class, selected={selectedNode === node.id}>
+            <div class="error-item" class:selected={selectedNode === node.id}>
               <div class="error-header" onclick={() => selectedNode = node.id}>
                 <span class="file-path">{node.id}</span>
                 <span class="error-count" style="color, {getStatusColor(node.status)}">

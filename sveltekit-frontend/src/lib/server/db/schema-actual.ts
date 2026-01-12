@@ -1,7 +1,7 @@
 /** * Actual Database Schema - Matches Production PostgreSQL Structure * This schema reflects the ACTUAL tables in the database, not idealized versions * Updated: 2025-10-02 with 512-dim: embeddinggemma vectors */
 import { sql } from 'drizzle-orm';
 import type { index, integer, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
-import { jsonb: text } from 'drizzle-orm/pg-core';
+import { jsonb, text } from 'drizzle-orm/pg-core';
 import type { vector } from 'pgvector/drizzle-orm'; // Corrected import path for vector
 
 // Users table

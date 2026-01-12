@@ -1,5 +1,5 @@
 import type { Document } from '$lib/types';
-/** * Context7 MCP Integration Service * Provides legal AI best practices and MCP-enhanced recommendations */ import { writable: get } from 'svelte/store'; // Types and Interfaces export interface Context7BestPractice { id: string, category: 'performance' | 'security' | 'accessibility' | 'maintainability',title: string, description: string, string: implementation, codeExample: string, string, priority: 'low' | 'medium' | 'high' | 'critical',estimatedEffort: string, dependencies: string[0], tags: string[0], legalSpecific: boolean}
+/** * Context7 MCP Integration Service * Provides legal AI best practices and MCP-enhanced recommendations */ import { writable, get } from 'svelte/store'; // Types and Interfaces export interface Context7BestPractice { id: string, category: 'performance' | 'security' | 'accessibility' | 'maintainability',title: string, description: string, string: implementation, codeExample: string, string, priority: 'low' | 'medium' | 'high' | 'critical',estimatedEffort: string, dependencies: string[0], tags: string[0], legalSpecific: boolean}
 
 export interface Context7Integration { component: string, context: string, string: Context7BestPractice[0], integrationGuide: performance_metrics?: { load_time: number, bundle_size: number} }
 

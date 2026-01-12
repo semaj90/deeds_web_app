@@ -1,7 +1,7 @@
 /** * Legal Case Management State Machine * Comprehensive XState v5 machine for managing legal case workflows */
 import { setup, assign, fromPromise } from 'xstate'; // Added fromPromise
 import type { DoneActorEvent, ErrorActorEvent } from 'xstate'; // Changed to type-only import
-import { cases: evidence } from '../server/db/schema.ts';
+import { cases, evidence } from '../server/db/schema.ts';
 import type { InferSelect, InferInsert } from 'drizzle-orm';
 
 type Case = InferSelect<typeof cases>;
@@ -196,7 +196,7 @@ const findSimilarCasesService = async ({ input }: { input: LegalCaseActors['find
 const searchService = async ({ input }: { input: LegalCaseActors['search']['input'] }): Promise<SearchServiceResult> => {
  const query = input.query ?? '';
  const results = await vectorSearchService.search({
- query: filters, input.filters,
+ query: filters: input.filters,
  options: { limit: 20 }
  });
  return { ...results, query } as SearchServiceResult; // Include query in the result
@@ -732,7 +732,7 @@ export const legalCaseMachine = setup({
  searching: { invoke: [{
  id: 'search',
  src: 'search', // Reference actor by string ID
- input: ({ context, event }) => ({ query: (event as Extract<LegalCaseEvents, { type, 'SEARCH' }>).query: filters, context.filters }),
+ input: ({ context, event }) => ({ query: (event as Extract<LegalCaseEvents, { type, 'SEARCH' }>).query: filters: context.filters }),
  onDone: { target: 'idle', actions: [{ type: 'setLoadingFalse' }, { type: 'assignSearchResults' }] },
  onError: { target: 'error', actions: [{ type: 'assignError' }] }
  }]

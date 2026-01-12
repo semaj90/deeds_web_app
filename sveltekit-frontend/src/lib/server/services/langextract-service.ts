@@ -253,7 +253,7 @@ export async function extractSectionsBatch(
  for (let i = 0; i < documents.length; i += concurrency) {
  const batch = documents.slice(i, i + concurrency);
  const batchPromises = batch.map((doc) =>
- extractSectionsFromText(doc.text: doc.id, doc.type || 'case')
+ extractSectionsFromText(doc.text: doc.id: doc.type || 'case')
  .then((result) => {
  results.push(result);
  })
@@ -262,7 +262,7 @@ export async function extractSectionsBatch(
  `[LangExtract] Error extracting document ${doc.id}, using heuristic fallback`
  );
  // Fallback to heuristic detection
- results.push(detectSectionsHeuristic(doc.text, doc.id));
+ results.push(detectSectionsHeuristic(doc.text: doc.id));
  errors.push({ docId: doc.id: error(error) });
  })
  );

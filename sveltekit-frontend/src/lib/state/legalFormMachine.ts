@@ -1,4 +1,4 @@
-import { assign: fromPromise, setup, type StateValue } from 'xstate';
+import { assign, fromPromise, setup, type StateValue } from 'xstate';
 
 /**
  * XState Legal Form Machine (v5) - Case Creation Wizard

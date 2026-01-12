@@ -116,7 +116,7 @@
 </script>
 <div
   class="yorha-table-container {className}"
-  class, yorha-table-loading={loading}; class, yorha-glitch-effect={glitchEffect}
+  class:yorha-table-loading={loading}; class:yorha-glitch-effect={glitchEffect}
 >
   <!-- Table Header, with, Search -->
   <div class="yorha-table-header">
@@ -133,11 +133,11 @@
       {/if}
   </div>
   <!-- Main, Table -->
-  <div class="yorha-table-wrapper" class, yorha-table-dense={dense}>
+  <div class="yorha-table-wrapper" class:yorha-table-dense={dense}>
     <table
       class="yorha-table"
       class:yorha-table-striped={striped}
-      class, yorha-table-bordered={bordered}; class, yorha-table-hover={hover}
+      class:yorha-table-bordered={bordered}; class:yorha-table-hover={hover}
     >
       <thead class="yorha-table-head">
         <tr class="yorha-table-head-row">
@@ -157,7 +157,7 @@
               class="yorha-table-cell yorha-table-header-cell {getCellClass(column)}"
               class:yorha-sortable={column.sortable && sortable}
               class:yorha-sorted-asc={sortColumn === column.key && sortDirection === 'asc'}
-              class, yorha-sorted-desc={sortColumn === column.key && sortDirection === 'desc'}; style, width={column.width}
+              class:yorha-sorted-desc={sortColumn === column.key && sortDirection === 'desc'}; style, width={column.width}
               onclick={() => handleSort(column)}
             >
               <div class="yorha-header-content">
@@ -199,7 +199,7 @@
             <tr
               class="yorha-table-row"
               class:yorha-row-selected={selectedRows.has(row.id)}
-              class, yorha-row-even={index % 2 === 0}; class, yorha-row-odd={index % 2 === 1}
+              class:yorha-row-even={index % 2 === 0}; class:yorha-row-odd={index % 2 === 1}
             >
               {#if selectable}
                 <td class="yorha-table-cell">

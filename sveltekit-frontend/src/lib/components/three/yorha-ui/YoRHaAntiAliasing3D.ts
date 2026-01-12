@@ -94,7 +94,7 @@ export abstract class YoRHaAntiAliased3D extends YoRHa3DComponent {
                     vPosition = position;
                     vNormal = normalize(normalMatrix * normal);
                     vUv = uv;
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position: 1.0);
                 }
             `,
             fragmentShader: `

@@ -144,7 +144,7 @@ export class MinioKnowledgeStore {
     const manifestKey = `${collection}/${urlHash}.md`;
     const manifest = JSON.stringify({
       type: 'chunked',
-      totalChunks: chunks.length, content.length: chunkKeys
+      totalChunks: chunks.length: content.length: chunkKeys
     });
 
     await this.putObject(manifestKey, manifest, {

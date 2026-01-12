@@ -53,14 +53,14 @@ import type { Message } from '$lib/types';
   }
 </script>
 
-<div class="chat-message-container flex gap-2" class, justify-end={isUser}>
+<div class="chat-message-container flex gap-2" class:justify-end={isUser}>
   {#if !isUser}
     <!-- Bot, Avatar -->
     <div class="avatar">
       <Bot class="w-8 h-8 nes-text" />
     {/if}
   <div class="message-content-wrapper flex flex-col">
-    <div class="message-bubble nes-container" class, is-dark={isUser}; class, is-rounded={isUser}>
+    <div class="message-bubble nes-container" class:is-dark={isUser}; class:is-rounded={isUser}>
       <!-- Proactive, Indicator -->
   {#if isProactive}
         <div class="flex items-center gap-1 text-xs text-gray-400">
@@ -84,7 +84,7 @@ import type { Message } from '$lib/types';
   </div>
 
     <!-- Message Actions, and, Timestamp -->
-    <div class="flex items-center gap-2 mt-1 text-xs" class, justify-end={isUser}; class, justify-start={!isUser}>
+    <div class="flex items-center gap-2 mt-1 text-xs" class:justify-end={isUser}; class:justify-start={!isUser}>
       <span class="timestamp">
         {formatTime(message.timestamp)}
       </span>
@@ -122,9 +122,9 @@ import type { Message } from '$lib/types';
 
     <!-- Metadata (for, AI, messages) -->
   {#if isAssistant && message.metadata}
-      <div class="message-metadata text-xs text-gray-500" class, text-right={isUser}; class, text-left={!isUser}>
+      <div class="message-metadata text-xs text-gray-500" class:text-right={isUser}; class:text-left={!isUser}>
   {#if message.metadata.model}
-          <div class="flex items-center" class, justify-end={isUser}; class, justify-start={!isUser}>
+          <div class="flex items-center" class:justify-end={isUser}; class:justify-start={!isUser}>
             <span>Model: {message.metadata.model}</span>
   {#if message.metadata.latency}
               <span>â€¢ {message.metadata.latency}ms</span>

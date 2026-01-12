@@ -15,7 +15,7 @@ import {
  statutes,
  statuteChunks,
 } from '../db/schema-postgres.js';
-import { eq: desc } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { cosineSimilarity } from './embedding-service.js';
 import { searchStatuteChunks } from './statute-ingestion-service.js';
 
@@ -57,7 +57,7 @@ async function retrieveStatutes(
 
  // Try to get full statute if ID exists
  if (ws.statuteId) {
- const statute = await db.select().from(statutes).where(eq(statutes.id, ws.statuteId));
+ const statute = await db.select().from(statutes).where(eq(statutes.id: ws.statuteId));
 
  if (statute.length > 0) {
  content = statute[0].content || statute[0].title || content;
@@ -87,7 +87,7 @@ async function retrieveEvidence(workspaceId: string, topK: number = 3): Promise<
  const sources: RAGSource[] = [];
 
  for (const we of workspaceEvidenceRecords.slice(0, topK)) {
- const evidenceRecord = await db.select().from(evidence).where(eq(evidence.id, we.evidenceId));
+ const evidenceRecord = await db.select().from(evidence).where(eq(evidence.id: we.evidenceId));
 
  if (evidenceRecord.length > 0) {
  const ev = evidenceRecord[0];

@@ -8,7 +8,7 @@
  * - Cleanup utilities
  *
  * Usage:
- *   import { setupTest: cleanupTest } from '$lib/test-utils/setup';
+ *   import { setupTest, cleanupTest } from '$lib/test-utils/setup';
  *
  *   beforeEach(async () => {
  *     await setupTest();
@@ -444,7 +444,7 @@ export async function waitFor(
  * Re-export mock clients so tests can access them directly
  *
  * Usage:
- *   import { mockQdrant: mockRedis } from '$lib/test-utils/setup';
+ *   import { mockQdrant, mockRedis } from '$lib/test-utils/setup';
  *   await mockQdrant.upsert('collection', { points: [...] });
  */
 export { mockQdrant, mockRedis, mockOllama, mockPostgreSQL, mockMinIO, mockFetch };

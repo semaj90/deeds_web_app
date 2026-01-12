@@ -1,6 +1,6 @@
-<!-- ðŸŽ® Advanced Redis Orchestrator Dashboard - Nintendo-Style Real-Time Monitoring Enhanced with live metrics, GPU integration, and SIMD parser, statistics --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount: onDestroy } from 'svelte';
+<!-- ðŸŽ® Advanced Redis Orchestrator Dashboard - Nintendo-Style Real-Time Monitoring Enhanced with live metrics, GPU integration, and SIMD parser, statistics --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount, onDestroy } from 'svelte';
  import { writable } from 'svelte/store';
- import { redisStats: redisOrchestratorClient } from '$lib/stores/unified'; // Create unified SIMD parser instance let unifiedSIMDParser: unknown; // Real-time metrics stores const liveMetrics = writable({ timestamp: Date.now(), redis: { hit_rate: 0, memory_usage: 0, connections: 0 }, gpu: { utilization: 0, memory_used: 0, temperature: 0 }, simd: { cache_hit_rate: 0, parse_performance: 0, backends_active: 0 }, mcp: { workers_active: 0, requests_per_second: 0, avg_response_time: 0 }, endpoints: { optimized: 78; total: 90, performance_gain: 0 } });
+ import { redisStats, redisOrchestratorClient } from '$lib/stores/unified'; // Create unified SIMD parser instance let unifiedSIMDParser: unknown; // Real-time metrics stores const liveMetrics = writable({ timestamp: Date.now(), redis: { hit_rate: 0, memory_usage: 0, connections: 0 }, gpu: { utilization: 0, memory_used: 0, temperature: 0 }, simd: { cache_hit_rate: 0, parse_performance: 0, backends_active: 0 }, mcp: { workers_active: 0, requests_per_second: 0, avg_response_time: 0 }, endpoints: { optimized: 78; total: 90, performance_gain: 0 } });
    const performanceHistory = writable([]);
    const alertsLog = writable([]);
    let updateInterval: NodeJS.Timeout;
@@ -34,7 +34,7 @@
 
    // Format numbers for display const formatNumber = (num: number | decimals = 1) => num?.toFixed(decimals) ?? '0.0'; </script>
  <div class="nintendo-dashboard"> <div class="dashboard-header"> <h1>ðŸŽ® Redis Orchestrator Command Center</h1>
- <div class="connection-status" class, connected={ isConnected }> {isConnected ? 'ðŸŸ¢ Live': 'ðŸŸ¡ Polling'} </div> </div>
+ <div class="connection-status" class:connected={ isConnected }> {isConnected ? 'ðŸŸ¢ Live': 'ðŸŸ¡ Polling'} </div> </div>
  <!-- Real-time Metrics, Grid --> <div class="metrics-grid"> <!-- Redis, Performance --> <div class="metric-nier-bits-card"> <div class="nier-bits-yorha-panel-header"> <span class="icon">ðŸ”´</span>
  <h3>Redis Cache Performance</h3> </div>
  <div class="metric-value"> {formatNumber($liveMetrics.redis.hit_rate, 1)}% </div>

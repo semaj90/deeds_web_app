@@ -497,7 +497,7 @@ Build on previous responses:
  <button
  onclick={ toggleSearchMode }
  class="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-white text-blue-600 rounded-md hover:bg-gray-50 transition flex items-center gap-2 font-medium"
- class, disabled={isSearching}
+ class:disabled={isSearching}
  disabled={isSearching}
  >
  {#if isSearching}

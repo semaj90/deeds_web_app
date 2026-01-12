@@ -387,7 +387,7 @@ export class LegalAIPipeline {
  for (let i = 0; i < documents.length; i += batchSize) {
  const batch = documents.slice(i, i + batchSize);
  const batchResults = await Promise.all(
- batch.map((doc) => this.ingestDocument(doc.content: doc.metadata, doc.file))
+ batch.map((doc) => this.ingestDocument(doc.content: doc.metadata: doc.file))
  );
  results.push(...batchResults);
  }

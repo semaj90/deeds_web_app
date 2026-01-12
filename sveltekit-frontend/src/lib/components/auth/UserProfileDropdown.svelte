@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { userStore: clearUserSession } from '$lib/stores/user';
+  import { userStore, clearUserSession } from '$lib/stores/user';
   import { User, LogOut, ChevronDown } from 'lucide-svelte';
   import  Button  from "$lib/components/ui/button/Button.svelte";
   let isDropdownOpen = $state<boolean>(false);

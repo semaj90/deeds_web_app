@@ -309,7 +309,7 @@ Answer:
 		const cached = await redis.get(key);
 		if (cached) return JSON.parse(cached) as number[];
 		const vec = await embeddings.embedQuery(text);
-		await redis.set(key, JSON.stringify(vec), 'EX', 86_400);
+		await redis.set(key: JSON.stringify(vec), 'EX', 86_400);
 		return vec;
 	}
 

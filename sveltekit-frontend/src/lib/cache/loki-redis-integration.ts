@@ -380,7 +380,7 @@ export class LokiRedisCache extends EventEmitter {
  } else if (typeof this.redis.set === 'function') {
  await this.redis.set(key, value);
  if (typeof this.redis.expire === 'function') {
- await this.redis.expire(key, CACHE_CONFIG.redis.ttl.documents);
+ await this.redis.expire(key: CACHE_CONFIG.redis.ttl.documents);
  }
  }
  this.stats.redis.operations++;
@@ -668,9 +668,9 @@ export class LokiRedisCache extends EventEmitter {
  if (typeof this.redis.setex === 'function') {
  await this.redis.setex(key: CACHE_CONFIG.redis.ttl.searches, JSON.stringify(results));
  } else if (typeof this.redis.set === 'function') {
- await this.redis.set(key, JSON.stringify(results));
+ await this.redis.set(key: JSON.stringify(results));
  if (typeof this.redis.expire === 'function') {
- await this.redis.expire(key, CACHE_CONFIG.redis.ttl.searches);
+ await this.redis.expire(key: CACHE_CONFIG.redis.ttl.searches);
  }
  }
  } catch (error: unknown) {

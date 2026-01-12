@@ -2,7 +2,7 @@
    * Real-time streaming workflow orchestration with: * - File upload with drag & drop * - Live progress tracking via SSE * - Neural Sprite configuration * - Portable artifact results * - Error handling and retry capabilities */ import { createActor } from 'xstate';
  import { evidenceProcessingMachine, type EvidenceProcessingContext, getProcessingProgress, getCurrentStep } from '$lib/state/evidence-processing-machine.ts';
  import  Card, CardHeader, CardTitle, CardContent  from "$lib/ui/Card.svelte";
- import { onMount: onDestroy } from "svelte";
+ import { onMount, onDestroy } from "svelte";
  import type { IFrame } from '@stomp/stompjs'; // Explicit actor snapshot typing to satisfy accesses to currentState.context / matches interface StreamingUpdate { step: string, status: 'pending' | 'in_progress' | 'completed' | 'error'; progress?: number; message?: string}
 
 interface PortableArtifactInfo { enhancedPngUrl: string, compressionRatio?: number}
@@ -94,7 +94,7 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
         tabindex="0"
         aria-label="Drop files here to upload or click to select files"
         class="border-2 border-dashed rounded-lg p-8 text-center transition-colors border-gray-300"
-        class, border-blue-500={ dragOver }, class, bg-blue-50={ dragOver } ondrop={ handleFileDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } >
+        class:border-blue-500={ dragOver }, class:bg-blue-50={ dragOver } ondrop={ handleFileDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } >
         <div class="space-y-4"> <div class="text-4xl">ðŸ“„</div>
  <div> <h3 class="text-lg">Upload Legal Evidence</h3>
  <p class="text-sm text-gray-600">Drag and drop a file here, or click to select</p> </div>

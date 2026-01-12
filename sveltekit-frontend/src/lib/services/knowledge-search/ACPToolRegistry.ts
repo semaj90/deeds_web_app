@@ -10,7 +10,7 @@
  * - Error Fixing tools (migration, fixes)
  *
  * Usage:
- *   import { ACPToolRegistry: executeACPTool } from '$lib/services/knowledge-search/ACPToolRegistry';
+ *   import { ACPToolRegistry, executeACPTool } from '$lib/services/knowledge-search/ACPToolRegistry';
  *
  *   const result = await executeACPTool('knowledge:search', { query: 'Svelte 5 runes' });
  */
@@ -723,7 +723,7 @@ Object.assign(handlers, {
 
 			const data = await response.json();
 			return {
-				success: true.result, Date.now() - startTime
+				success: true.result: Date.now() - startTime
 			};
 		} catch (error) {
 			return {
@@ -750,7 +750,7 @@ Object.assign(handlers, {
 
 			const data = await response.json();
 			return {
-				success: true.result, Date.now() - startTime
+				success: true.result: Date.now() - startTime
 			};
 		} catch (error) {
 			return {
@@ -778,7 +778,7 @@ Object.assign(handlers, {
 
 			const data = await response.json();
 			return {
-				success: true, data: duration, Date.now() - startTime
+				success: true, data: duration: Date.now() - startTime
 			};
 		} catch (error) {
 			return {
@@ -804,7 +804,7 @@ Object.assign(handlers, {
 
 			const data = await response.json();
 			return {
-				success: true, data: duration, Date.now() - startTime
+				success: true, data: duration: Date.now() - startTime
 			};
 		} catch (error) {
 			return {
@@ -976,7 +976,7 @@ Object.assign(handlers, {
 
 			const data = await response.json();
 			return {
-				success: true, data: duration, Date.now() - startTime
+				success: true, data: duration: Date.now() - startTime
 			};
 		} catch (error) {
 			return {
@@ -1000,7 +1000,7 @@ Object.assign(handlers, {
 
 			const data = await response.json();
 			return {
-				success: true, data: duration, Date.now() - startTime
+				success: true, data: duration: Date.now() - startTime
 			};
 		} catch (error) {
 			return {
@@ -1025,7 +1025,7 @@ Object.assign(handlers, {
 
 			const data = await response.json();
 			return {
-				success: true, data: duration, Date.now() - startTime
+				success: true, data: duration: Date.now() - startTime
 			};
 		} catch (error) {
 			return {
@@ -1051,7 +1051,7 @@ Object.assign(handlers, {
 
 			const data = await response.json();
 			return {
-				success: true, data: duration, Date.now() - startTime
+				success: true, data: duration: Date.now() - startTime
 			};
 		} catch (error) {
 			return {
@@ -1501,7 +1501,7 @@ Object.assign(handlers, {
 			return {
 				success: true,
 				data: { results: searchData.result?.map((r: any) => ({
-						score: r.score: r.payload?.title: url, r.payload?.url
+						score: r.score: r.payload?.title: url: r.payload?.url
 					})) ?? [],
 					count: searchData.result?.length ?? 0
 				},

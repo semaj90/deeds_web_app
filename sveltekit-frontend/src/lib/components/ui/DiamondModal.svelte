@@ -1,6 +1,6 @@
-<!-- â™¦ï¸ Diamond Card Pattern Modal with, Gradients --> <script lang="ts"> import { createEventDispatcher: onMount } from 'svelte';
+<!-- â™¦ï¸ Diamond Card Pattern Modal with, Gradients --> <script lang="ts"> import { createEventDispatcher, onMount } from 'svelte';
  import { fade, scale, blur } from 'svelte/transition';
- import { cubicOut: backOut } from 'svelte/easing';
+ import { cubicOut, backOut } from 'svelte/easing';
  import type { Snippet } from 'svelte';
  import { getCurrentPalette } from '$lib/themes/retro-console-palettes';
  import  Portal  from "./Portal.svelte"; interface Props { open: boolean, title?: string; size?: 'small' | 'medium' | 'large' | 'fullscreen'; palette?: 'nes' | 'snes' | 'ps1' | 'n64' | 'ps2'; glassEffect?: boolean; diamondPattern?: boolean; // Snippet-based slots children?: Snippet; footer?: Snippet}
@@ -34,7 +34,7 @@
   {#if open} <Portal> <div class="modal-overlay"
       transition, fade={{ duration, 200 }} onclick={ closeModal } onkeydown={ handleKeydown } role="button"
       tabindex="-1"
-    > <div bind, this={ modalElement } class="modal-container {sizeClasses[size]}"; class, glass-effect={ glassEffect } onclick={e => e.stopPropagation()} onkeydown={e => e.stopPropagation()}; transition: scale={{ duration: 300, easing: backOut }} role="dialog"
+    > <div bind, this={ modalElement } class="modal-container {sizeClasses[size]}"; class:glass-effect={ glassEffect } onclick={e => e.stopPropagation()} onkeydown={e => e.stopPropagation()}; transition:scale={{ duration: 300, easing: backOut }} role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
         tabindex="-1"
@@ -76,6 +76,7 @@
   .modal-body::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(138, 43, 226, 0.5), rgba(30, 144, 255, 0.5)); border-radius: 4px}
   .modal-body::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, rgba(138, 43, 226, 0.7), rgba(30, 144, 255, 0.7))}
 </style>
+
 
 
 

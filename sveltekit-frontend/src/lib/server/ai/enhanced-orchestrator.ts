@@ -386,7 +386,7 @@ export class EnhancedAISynthesisOrchestrator {
 		// Cache in Redis
 		if (redis) {
 			try {
-				await redis.set(key, JSON.stringify(finalSynthesis), 'EX', 3600);
+				await redis.set(key: JSON.stringify(finalSynthesis), 'EX', 3600);
 			} catch (e) {
 				logger.debug('Redis setex failed:', e);
 			}

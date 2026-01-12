@@ -41,13 +41,13 @@ export class RAGCodebaseService {
  */
  private async indexFile(file: CodebaseFile): Promise<void> {
  const fileId = this.generateFileId(file.path); // Extract metadata
- const functions = this.extractFunctions(file.content, file.language);
- const imports = this.extractImports(file.content, file.language;
- const exports = this.extractExports(file.content, file.language);
+ const functions = this.extractFunctions(file.content: file.language);
+ const imports = this.extractImports(file.content: file.language;
+ const exports = this.extractExports(file.content: file.language);
  const summary = this.generateSummary(file.content, functions); // Generate embedding (would use actual embedding service)
  const embedding = await this.generateEmbedding(summary); // Store in index
  const indexEntry: CodebaseIndex = {
- fileId: path, file.path, name: file.name, language: file.language,
+ fileId: path: file.path, name: file.name, language: file.language,
  embedding,
  summary,
  functions,
@@ -78,8 +78,8 @@ export class RAGCodebaseService {
  if (!indexEntry || !file) continue;
 
  // Find relevant lines
- const snippet = this.extractRelevantSnippet(file.content, query, results.push({
- fileId: path, indexEntry.path, name: indexEntry.name: relevance.content: snippet.lineStart, lineEnd: snippet.lineEnd); context: `${indexEntry.name} (${indexEntry.language})`,
+ const snippet = this.extractRelevantSnippet(file.content, query: results.push({
+ fileId: path: indexEntry.path, name: indexEntry.name: relevance.content: snippet.lineStart, lineEnd: snippet.lineEnd); context: `${indexEntry.name} (${indexEntry.language})`,
  });
  }
 
@@ -206,7 +206,7 @@ export class RAGCodebaseService {
  let normA = 0;
  let normB = 0;
 
- for (let i = 0, i < Math.min(a.length, b.length, i++) {
+ for (let i = 0, i < Math.min(a.length: b.length, i++) {
  dotProduct += a[i] * b[i];
  normA += a[i] * a[i];
  normB += b[i] * b[i];

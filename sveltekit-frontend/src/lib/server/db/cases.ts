@@ -3,8 +3,8 @@
  * Auto-create cases for prosecutors
  */
 
-import { db } from './index.js';
-import { wardenCases } from './warden-schema.js';
+import { db } from './index.ts';
+import { wardenCases } from './warden-schema.ts';
 import { eq } from 'drizzle-orm';
 
 /**

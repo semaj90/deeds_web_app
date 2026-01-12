@@ -11,7 +11,7 @@
  */
 
 import { writable, derived, get } from 'svelte/store';
-import { getContext: setContext } from 'svelte';
+import { getContext, setContext } from 'svelte';
 
 // ============================================
 // Types

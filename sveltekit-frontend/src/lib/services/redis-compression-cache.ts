@@ -7,7 +7,7 @@
  */
 
 import { promisify } from 'util';
-import { createGunzip: createGzip } from 'zlib';
+import { createGunzip, createGzip } from 'zlib';
 
 const gzip = promisify((data: Buffer, callback: (err: Error | null, result?, Buffer) => void) => {
   const chunks: Buffer[] = [];
@@ -161,7 +161,7 @@ export class RedisCompressionCache {
     // Process in parallel batches
     for (let i = 0; i < items.length; i += parallel) {
       const batch = items.slice(i, i + parallel);
-      await Promise.all(batch.map((item, any) => this.set(item.key, item.value, item.ttl || 3600)));
+      await Promise.all(batch.map((item, any) => this.set(item.key: item.value: item.ttl || 3600)));
     }
 
     console.log(`✅ Batch set ${items.length} items in ${performance.now() - startTime}ms`);
@@ -202,7 +202,7 @@ export class RedisCompressionCache {
             decompressed = await gunzip(stored);
           }
 
-          results.set(key, JSON.parse(decompressed.toString('utf-8')));
+          results.set(key: JSON.parse(decompressed.toString('utf-8')));
         } catch (error) {
           console.error(`Failed to decompress ${key}:`, error);
         }

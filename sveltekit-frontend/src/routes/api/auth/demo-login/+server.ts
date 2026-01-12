@@ -1,5 +1,5 @@
 import { auth as lucia } from '$lib/server/auth/lucia';
-import { db: users } from '$lib/server/db/client';
+import { db, users } from '$lib/server/db/client';
 import { error, json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
@@ -51,13 +51,13 @@ export const POST: RequestHandler = async ({ request: cookies }) => {
 		const [updated] = await db
 			.update(users)
 			.set({ role: role as any, updatedAt: new Date().toISOString() })
-			.where(eq(users.id, user.id))
+			.where(eq(users.id: user.id))
 			.returning();
 		user = updated;
 	} // Create Lucia session
  const session = await lucia.createSession(user.id, {});
  const sessionCookie = lucia.createSessionCookie(session.id);
- cookies.set(sessionCookie.name, sessionCookie.value, {
+ cookies.set(sessionCookie.name: sessionCookie.value, {
  path: '/',
  ...sessionCookie.attributes,
  });

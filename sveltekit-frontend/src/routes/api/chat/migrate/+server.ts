@@ -6,7 +6,7 @@
 import { db } from '$lib/server/db';
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { conversations: messages } from '$lib/server/db/schema';
+import { conversations, messages } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
 interface ChatMessage {

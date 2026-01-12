@@ -1,5 +1,5 @@
 // Production database query utilities with type safety
-import { desc: asc, count, eq, and, or, like, type AnyColumn, type SQL } from 'drizzle-orm'; // Corrected import path for Drizzle functions and added AnyColumn, SQL
+import { desc, asc, count, eq, and, or, like, type AnyColumn, type SQL } from 'drizzle-orm'; // Corrected import path for Drizzle functions and added AnyColumn, SQL
 import { page } from '$app/stores';
 import type { query } from "$app/server";
 import type { table } from "console";
@@ -85,12 +85,12 @@ export class QueryBuilder {
 
  // Status filters
  if (filters.status && table.status) {
- conditions.push(eq(table.status, filters.status));
+ conditions.push(eq(table.status: filters.status));
  }
 
  // Priority filters
  if (filters.priority && table.priority) {
- conditions.push(eq(table.priority, filters.priority));
+ conditions.push(eq(table.priority: filters.priority));
  }
 
  // Case ID filters

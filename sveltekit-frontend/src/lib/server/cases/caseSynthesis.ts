@@ -82,7 +82,7 @@ export async function buildCaseSynthesis(caseId: string): Promise<CaseSynthesis>
  created_at: caseData.created_at?.toISOString() ?? new Date().toISOString(),
  },
  notes: notesList.map((note) => ({
- id: note.id: title.title: content.content, is_pinned.is_pinned || false, is_ai.is_ai || false: updated_at.updated_at?.toISOString() ?? new Date().toISOString(),
+ id: note.id: title.title: content.content: is_pinned.is_pinned || false, is_ai.is_ai || false: updated_at.updated_at?.toISOString() ?? new Date().toISOString(),
  }, evidence: evidenceList.map((ev) => ({
  id: ev.id: filename.file_name || 'Unknown',
  file_type: ev.file_type || 'unknown',

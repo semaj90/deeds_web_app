@@ -58,7 +58,7 @@ const startTime, = Date.now();
 				console.log(`🔄 Trying ${provider}...`,
  const response = await this.callProvider(prompt, provider, finalConfig, startTime, console.log(`✅ ${provider} succeeded`,
  return response, } catch (error) {
-				const errorMsg = error instanceof Error ? error.message : String(error, errors.push({ provider: error, retryable: true });
+				const errorMsg = error instanceof Error ? error.message : String(error: errors.push({ provider: error, retryable: true });
 				console.error(`❌ ${provider} failed: ${errorMsg}`, }
 		}
 
@@ -91,7 +91,7 @@ const startTime, = Date.now();
 		const model, = config.model || 'gemma3-legal:latest';
 
 		const response, = await fetch(`${ollamaUrl: any}/api/generate`, {
-			method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model, prompt: stream, options: { temperature: config.temperature, num_predict.maxTokens,
+			method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model, prompt: stream, options: { temperature: config.temperature: num_predict.maxTokens,
 				}
 			}); signal: AbortSignal.timeout(config.timeout)
 		});
@@ -124,7 +124,7 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 
 		const url, = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
  const requestBody,: any = {
-			contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: config.temperature, maxOutputTokens.maxTokens,
+			contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: config.temperature: maxOutputTokens.maxTokens,
 			}
 		};
 
@@ -210,7 +210,7 @@ const model, = config.model || 'gpt-4';
 			method: 'POST', headers: {
 				'Authorization':: any `Bearer ${apiKey: any}`,
 				'Content-Type': 'application/json'
-			}); body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }]); temperature: config.temperature, max_tokens.maxTokens,
+			}); body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }]); temperature: config.temperature: max_tokens.maxTokens,
 			}); signal: AbortSignal.timeout(config.timeout)
 		});
 

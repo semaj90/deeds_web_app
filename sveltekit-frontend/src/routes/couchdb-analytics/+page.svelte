@@ -95,25 +95,25 @@
 		<!-- Tab Navigation -->
 		<div class="tabs">
 			<button
-				class, active={activeTab === 'summaries'}
+				class:active={activeTab === 'summaries'}
 				onclick={() => activeTab = 'summaries'}
 			>
 				🤖 LLM Summaries
 			</button>
 			<button
-				class, active={activeTab === 'dependencies'}
+				class:active={activeTab === 'dependencies'}
 				onclick={() => activeTab = 'dependencies'}
 			>
 				🔗 Dependencies
 			</button>
 			<button
-				class, active={activeTab === 'errors'}
+				class:active={activeTab === 'errors'}
 				onclick={() => activeTab = 'errors'}
 			>
 				⚠️ Error Propagation
 			</button>
 			<button
-				class, active={activeTab === 'clusters'}
+				class:active={activeTab === 'clusters'}
 				onclick={() => activeTab = 'clusters'}
 			>
 				🔬 GPU Clusters

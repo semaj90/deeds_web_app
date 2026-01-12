@@ -1,6 +1,6 @@
 // Complete JavaScript tracking system for Legal AI production
 // Integrates all tracking utilities with MCP memory system
-import { productionEntities: phaseRelations } from './production-entities.js';
+import { productionEntities, phaseRelations } from './production-entities.js';
 import tracker from './progress-tracker.js';
 import Context7Helper from './context7-utils.js';
 // Main tracking controller

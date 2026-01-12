@@ -86,7 +86,7 @@ export class DocumentLoader {
  continue;
  }
 
- const result = await processDocument(doc.id: doc.title: doc.text, doc.source);
+ const result = await processDocument(doc.id: doc.title: doc.text: doc.source);
 
  processed.push(result);
  } catch (error) {

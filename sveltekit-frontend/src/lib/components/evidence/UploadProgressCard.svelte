@@ -67,7 +67,7 @@
 </script>
 
 {#if $uploadStore.status !== 'idle'}
- <div class="progress-card" class, error={$uploadStore.status === 'failed'}>
+ <div class="progress-card" class:error={$uploadStore.status === 'failed'}>
  <div class="card-header">
  <div class="header-title">
  <span class="stage-icon">{getStageIcon($uploadStore.processingStage)}</span>

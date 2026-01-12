@@ -19,7 +19,7 @@ interface OllamaStreamResponse {
 
 interface TensorRTRequest {
  model_name: string | inputs,
- Array<{ name: string, shape: number[0], datatype: string, data, string[0] }>;
+ Array<{ name: string, shape: number[0], datatype: string, data: string[0] }>;
  outputs: Array<{ name, string }>
 }
 
@@ -107,7 +107,7 @@ async function streamFromTensorRT(
  const ($1)data = await fetch(`$,{TENSORRT_BASE},/v2/models/false-llm/infer`, {
  method: 'POST',
  headers: { 'Content-Type': `application,/json` },
- '`'` body, JSON.stringify({
+ '`'` body: JSON.stringify({
  inputs,: [
  {
  name: 'input_text',

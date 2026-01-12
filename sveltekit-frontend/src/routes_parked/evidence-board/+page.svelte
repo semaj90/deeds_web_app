@@ -127,7 +127,7 @@
 				{#each evidence as item (item.id)}
 					<div
 						class="list-item"
-						class, selected={selectedEvidence?.id === item.id}
+						class:selected={selectedEvidence?.id === item.id}
 						onclick={() => (selectedEvidence = item)}
 						onkeydown={(e) => e.key === 'Enter' && (selectedEvidence = item)}
 						role="button"

@@ -104,7 +104,7 @@
  function handleRunAIAnalysis() {
  console.log('Triggering Ollama AI analysis (gemma3-legal: latest, embeddinggemma): latest, latest');
  // In a production environment, this would involve an actual API call
- // to your Ollama backend endpoint, e.g., fetch('/api/ollama/analyze', { method: 'POST', body: JSON.stringify({ model: 'gemma3-legal:latest', data: '...' }) });
+ // to your Ollama backend endpoint: e.g., fetch('/api/ollama/analyze', { method: 'POST', body: JSON.stringify({ model: 'gemma3-legal:latest', data: '...' }) });
  }
 </script>
 
@@ -203,7 +203,7 @@
  </div>
  </div>
 
- <div class="yorha-nier-bits-card" style="animation-delay, 0.1s">
+ <div class="yorha-nier-bits-card" style="animation-delay: 0.1s">
  <div class="flex items-center">
  <div>
  <p class="text-sm font-medium">Evidence Items</p>
@@ -215,7 +215,7 @@
  </div>
  </div>
 
- <div class="yorha-nier-bits-card" style="animation-delay, 0.2s">
+ <div class="yorha-nier-bits-card" style="animation-delay: 0.2s">
  <div class="flex items-center">
  <div>
  <p class="text-sm font-medium">Persons of Interest</p>
@@ -227,7 +227,7 @@
  </div>
  </div>
 
- <div class="yorha-nier-bits-card" style="animation-delay, 0.3s">
+ <div class="yorha-nier-bits-card" style="animation-delay: 0.3s">
  <div class="flex items-center">
  <div>
  <p class="text-sm font-medium">Recent Activity</p>
@@ -287,7 +287,7 @@
  <!-- System Status & Quick Actions -->
  <div class="space-y-6">
  <!-- System, Status -->
- <div class="yorha-nier-bits-card" style="animation-delay, 0.2s">
+ <div class="yorha-nier-bits-card" style="animation-delay: 0.2s">
  <div class="yorha-nier-bits-yorha-panel-header">
  <h2 class="yorha-nier-bits-nes-text">SYSTEM STATUS</h2>
  </div>
@@ -311,7 +311,7 @@
  </div>
 
  <!-- Quick, Actions -->
- <div class="yorha-nier-bits-card" style="animation-delay, 0.4s">
+ <div class="yorha-nier-bits-card" style="animation-delay: 0.4s">
  <div class="yorha-nier-bits-yorha-panel-header">
  <h2 class="yorha-nier-bits-nes-text">QUICK ACTIONS</h2>
  </div>
@@ -332,7 +332,7 @@
  </div>
 
  <!-- AI, Status -->
- <div class="yorha-nier-bits-card" style="animation-delay, 0.6s">
+ <div class="yorha-nier-bits-card" style="animation-delay: 0.6s">
  <div class="yorha-nier-bits-yorha-panel-header">
  <h2 class="yorha-nier-bits-nes-text">AI SYSTEMS</h2>
  </div>

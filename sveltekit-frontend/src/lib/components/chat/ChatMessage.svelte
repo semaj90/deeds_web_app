@@ -1,6 +1,6 @@
 <script lang="ts"> // Svelte, 5 runes are auto-imported import type { ChatMessage } from '\/stores/chat.svelte';
  import DOMPurify from 'dompurify';
- import { Bot: User } from 'lucide-svelte';
+ import { Bot, User } from 'lucide-svelte';
  import './chat-message.css'; interface Props { message: ChatMessage, showTimestamp?: boolean; showAvatar?: boolean}
   let { message, showTimestamp = true, showAvatar = true }: Props = $props();
    let sanitizedContent = $derived(() => DOMPurify.sanitize(message.content));
@@ -9,7 +9,7 @@
    let formattedTime = $derived(() => message.timestamp ? new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'
         }): ''
   ); </script>
- <div class="chat-message" class, user={ isUser }; class, assistant={ isAssistant } data-role={message.role}> <div class="message-wrapper">
+ <div class="chat-message" class:user={ isUser }; class:assistant={ isAssistant } data-role={message.role}> <div class="message-wrapper">
   {#if showAvatar} <div class="avatar">
   {#if isAssistant} <Bot class="avatar-icon" size={ 20 } /> {:else} <User class="avatar-icon" size={ 20 } /> {/if} {/if}
   <div class="message-content"> <div class="message-header"> <span class="sender-name"> {isUser ? 'You': 'AI Assistant'} </span>

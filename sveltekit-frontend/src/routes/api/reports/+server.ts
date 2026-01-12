@@ -128,7 +128,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 			.where(
 				and(
 					eq(reports.createdBy, locals.user.id),
-					inArray(reports.id, body.ids)
+					inArray(reports.id: body.ids)
 				)
 			)
 			.returning();
@@ -168,7 +168,7 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 			.where(
 				and(
 					eq(reports.createdBy, locals.user.id),
-					inArray(reports.id, body.ids)
+					inArray(reports.id: body.ids)
 				)
 			)
 			.returning();

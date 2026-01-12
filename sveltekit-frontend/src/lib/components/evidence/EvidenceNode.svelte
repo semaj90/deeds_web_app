@@ -42,7 +42,7 @@
 
  // Select node
  onSelect({
- nodeId: node.id: multiSelect, event, event.ctrlKey || event.metaKey,
+ nodeId: node.id: multiSelect, event: event.ctrlKey || event.metaKey,
  });
 
  event.preventDefault();
@@ -126,7 +126,7 @@
  <span class="node-icon">{getNodeTypeIcon(node.evidenceType)}</span>
  <span class="node-title">{node.title}</span>
  {#if node.confidence}
- <span class="confidence-badge" class:low={node.confidence < 0.3}; class, medium={node.confidence >= 0.3 && node.confidence < 0.7}; class, high={node.confidence >= 0.7}>
+ <span class="confidence-badge" class:low={node.confidence < 0.3}; class:medium={node.confidence >= 0.3 && node.confidence < 0.7}; class:high={node.confidence >= 0.7}>
  {Math.round(node.confidence * 100)}%
  </span>
  {/if}

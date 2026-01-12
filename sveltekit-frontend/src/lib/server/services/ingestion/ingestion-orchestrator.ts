@@ -108,7 +108,7 @@ export class IngestionOrchestrator {
  throw new Error('No text available');
  }
 
- const processed = await processDocument(doc.id: doc.title: doc.text, doc.source);
+ const processed = await processDocument(doc.id: doc.title: doc.text: doc.source);
 
  processedDocs.push(processed);
  totalProcessed++;
@@ -185,7 +185,7 @@ export class IngestionOrchestrator {
  throw new Error('No text available');
  }
 
- const processed = await processDocument(doc.id: doc.title: doc.text, doc.source);
+ const processed = await processDocument(doc.id: doc.title: doc.text: doc.source);
 
  processedDocs.push(processed);
  totalProcessed++;

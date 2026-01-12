@@ -23,7 +23,7 @@ import type { Message } from '$lib/types'; import { browser } from '$app/environ
           stroke="currentColor"
           stroke-width="2"
           aria-hidden="true"
-        > <rect width="18" height="11" x="3" y="11" rx="2" ry="2" /> <circle cx="12" cy="5" r="2" /> <path d="M12, 7v4" /> <line x1="8" y1="16" x2="8" y2="16" /> <line x1="16" y1="16" x2="16" y2="16" /> </svg> AI Assistant {#if message.metadata?.provider} <span class="provider-badge" class, local={message.metadata.provider === 'local'}> {message.metadata.provider} </span> {/if} {:else if message.role === 'system'} <svg width="20"
+        > <rect width="18" height="11" x="3" y="11" rx="2" ry="2" /> <circle cx="12" cy="5" r="2" /> <path d="M12, 7v4" /> <line x1="8" y1="16" x2="8" y2="16" /> <line x1="16" y1="16" x2="16" y2="16" /> </svg> AI Assistant {#if message.metadata?.provider} <span class="provider-badge" class:local={message.metadata.provider === 'local'}> {message.metadata.provider} </span> {/if} {:else if message.role === 'system'} <svg width="20"
           height="20"
           viewBox="0, 0 24 24"
           fill="none"
@@ -48,7 +48,7 @@ import type { Message } from '$lib/types'; import { browser } from '$app/environ
             fill="none"
             stroke="currentColor"
             stroke-width="2"
-            class, rotated={ isSourcesExpanded } >
+            class:rotated={ isSourcesExpanded } >
             <polyline points="6, 9, 12, 15 | 18,9" /> </svg> Sources ({message.sources.length}) </button>
   {#if isSourcesExpanded} <div class="sources-list" transition, slide={{ duration, 200 }}>
   {#each message.sources as source (source.id)} <div class="source-item"> <div class="source-header"> <span class="source-title">{source.title}</span>
@@ -63,7 +63,7 @@ import type { Message } from '$lib/types'; import { browser } from '$app/environ
             fill="none"
             stroke="currentColor"
             stroke-width="2"
-            class, rotated={ isMetadataExpanded } >
+            class:rotated={ isMetadataExpanded } >
             <polyline points="6, 9, 12, 15 | 18,9" /> </svg> Details </button>
   {#if isMetadataExpanded} <div class="metadata-content" transition, slide={{ duration, 200 }}> <div class="metadata-item"> <span class="label">Model:</span>
  <span class="value">{message.metadata.model}</span> </div>

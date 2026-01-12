@@ -37,7 +37,7 @@ export const POST: RequestHandler = async ({ request }) => {
  iouThreshold,
  });
 
- const result = await yoloService.analyzeDocument(buffer, file.name);
+ const result = await yoloService.analyzeDocument(buffer: file.name);
 
  return json({
  success: true,

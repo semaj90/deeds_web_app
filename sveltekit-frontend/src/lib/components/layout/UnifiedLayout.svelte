@@ -64,7 +64,7 @@
   <a href="#main-content" class="skip-nav">Skip to main content</a>
 
   <!-- Main, Content, Area -->
-  <div class="content-wrapper" class, no-nav={hideNav}>
+  <div class="content-wrapper" class:no-nav={hideNav}>
     <!-- Sidebar Overlay, for, Mobile -->
   {#if sidebarOpen && browser}
       <!-- svelte-ignore, a11y_click_events_have_key_events -->
@@ -80,8 +80,8 @@
     <main
       id="main-content"
       class="main-content"
-      class:demo-theme={$isDemoRoute}; class, admin-theme={$isAdminRoute}
- class, auth-theme={$isAuthRoute}
+      class:demo-theme={$isDemoRoute}; class:admin-theme={$isAdminRoute}
+ class:auth-theme={$isAuthRoute}
       aria-label="Main content"
     >
   {#if title}
@@ -159,7 +159,7 @@
   <a href="#main-content" class="skip-nav">Skip to main content</a>
 
   <!-- Main, Content, Area -->
-  <div class="content-wrapper" class, no-nav={hideNav}>
+  <div class="content-wrapper" class:no-nav={hideNav}>
     <!-- Sidebar Overlay, for, Mobile -->
   {#if sidebarOpen && browser}
       <!-- svelte-ignore, a11y_click_events_have_key_events -->
@@ -175,8 +175,8 @@
     <main
       id="main-content"
       class="main-content"
-      class:demo-theme={$isDemoRoute}; class, admin-theme={$isAdminRoute}
- class, auth-theme={$isAuthRoute}
+      class:demo-theme={$isDemoRoute}; class:admin-theme={$isAdminRoute}
+ class:auth-theme={$isAuthRoute}
       aria-label="Main content"
     >
   {#if title}

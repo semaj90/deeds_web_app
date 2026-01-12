@@ -1,4 +1,4 @@
-import { error: redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types.js';
 import type { db } from '$lib/db/index.js';
 import type { users, profileTable } from '$lib/db/schema.js';

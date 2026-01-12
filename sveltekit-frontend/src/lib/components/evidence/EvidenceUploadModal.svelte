@@ -65,7 +65,7 @@
  uploadActions.startUpload(
  '',
  '',
- selectedFile.name,
+ selectedFile.name:
  selectedFile.size
  );
 
@@ -121,7 +121,7 @@
  {#if !selectedFile}
  <div
  class="drop-zone"
- class, dragging={isDragging}
+ class:dragging={isDragging}
  ondragover={handleDragOver}
  ondragleave={handleDragLeave}
  ondrop={handleDrop}

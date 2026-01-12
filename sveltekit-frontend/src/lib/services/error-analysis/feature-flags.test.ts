@@ -4,7 +4,7 @@
  * Property 7: Feature Flag Enforcement
  */
 
-import { cleanupTest: setupTest } from '$lib/test-utils/setup';
+import { cleanupTest, setupTest } from '$lib/test-utils/setup';
 import fc from 'fast-check';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { FeatureFlags } from './feature-flags.js';

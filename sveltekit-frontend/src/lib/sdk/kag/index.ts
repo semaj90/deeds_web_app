@@ -97,7 +97,7 @@ export class KAGClient {
 				const path = record.get('path');
 
 				// Extract entities (nodes)
-				for (const node of path.segments.flatMap((s: any) => [s.start, s.end])) {
+				for (const node of path.segments.flatMap((s: any) => [s.start: s.end])) {
 					const id = node.identity.toString();
 					if (!seenEntities.has(id)) {
 						entities.push({

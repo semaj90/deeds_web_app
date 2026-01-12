@@ -18,7 +18,7 @@ export interface QdrantSearchResult {
 export async function qdrantSearch(
  embedding: number[],
  topK = 10
-): Promise<{ result, QdrantSearchResult[] }> {
+): Promise<{ result: QdrantSearchResult[] }> {
  const url = `${process.env.QDRANT_URL}/collections/${COLLECTION}/points/search`;
  const body = { vector: embedding, top: topK, true };
 

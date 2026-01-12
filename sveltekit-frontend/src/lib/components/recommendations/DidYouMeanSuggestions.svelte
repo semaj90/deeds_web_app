@@ -1,5 +1,5 @@
 <!-- @migration-task Error while migrating Svelte code, ')}' is not a valid attribute, name https, //svelte.dev/e/attribute_invalid_name --> <!-- @migration-task Error while migrating Svelte, code, ')}' is not a valid attribute, name --> <!-- AI-Enhanced, "Did You Mean?" Suggestions Component with Intent, Prediction --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Replaced melt with bits-ui components import { Check, ChevronDown, Search, FileText, User, Folder, Tag, Brain, Zap, Target } from 'lucide-svelte';
- import { fly: fade } from 'svelte/transition'; interface Suggestion { term?: string; suggestion?: string; text?: string; score?: number; confidence?: number; source?: 'lexical' | 'semantic' | 'ai'; enhanced?: boolean; intent?: string; type?: 'spelling' | 'synonym' | 'contextual' | 'task'; // Legacy support for existing format label?: string; entityId?: string; description?: string; icon?: string; tags?: string[]; interface TaskSuggestion { task: string, confidence: number, estimatedSteps: number, priority: 'low' | 'medium' | 'high',category: string, interface UserProfile { confidenceLevel: number, learningPhase: 'exploration' | 'learning' | 'proficient' | 'expert'; preferredIntents: string[]}
+ import { fly, fade } from 'svelte/transition'; interface Suggestion { term?: string; suggestion?: string; text?: string; score?: number; confidence?: number; source?: 'lexical' | 'semantic' | 'ai'; enhanced?: boolean; intent?: string; type?: 'spelling' | 'synonym' | 'contextual' | 'task'; // Legacy support for existing format label?: string; entityId?: string; description?: string; icon?: string; tags?: string[]; interface TaskSuggestion { task: string, confidence: number, estimatedSteps: number, priority: 'low' | 'medium' | 'high',category: string, interface UserProfile { confidenceLevel: number, learningPhase: 'exploration' | 'learning' | 'proficient' | 'expert'; preferredIntents: string[]}
 
 interface Props { query?: string; placeholder?: string; contextType?: string; userId?: string; includeTaskSuggestions?: boolean; includeAI?: boolean; maxSuggestions?: number; showUserProfile?: boolean; onSelect?: (suggestion Suggestion) => void; onTaskSelect?: (_task: TaskSuggestion) => void; onSearch?: (query: string) => void}
   let { query = $bindable(''), placeholder = 'Ask anything... AI will suggest and learn', contextType = 'GENERAL', userId = 'anonymous', includeTaskSuggestions = true, includeAI = true, maxSuggestions = 8, showUserProfile = false, onSelect, onTaskSelect, onSearch }: Props = $props(); // Svelte, 5 reactive state let suggestions = $state<Suggestion[]>([]);
@@ -42,12 +42,12 @@ interface Props { query?: string; placeholder?: string; contextType?: string; us
   {#if includeAI} <span class="flex items-center"> <Brain class="w-3" /> AI Enhanced </span> {/if} {/if}
   <!-- AI-Enhanced Suggestions, Dropdown -->
   {#if $open && (suggestions.length > 0 || taskSuggestions.length > 0)} <div class="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-80 overflow-auto"
-      transition: Fly={{ y, -5, duration, 150 }} >
+      transition:Fly={{ y, -5, duration, 150 }} >
       <!-- Regular, Suggestions -->
   {#if suggestions.length > 0} <div class="p-2"> <div class="text-xs font-medium text-gray-500 dark, text-gray-400 px-2"> Suggestions </div>
   {#each suggestions as suggestion, index} {@const suggestionText = suggestion.term || suggestion.suggestion || suggestion.text || suggestion.label || ''} {@const confidence = suggestion.confidence || suggestion.score || 0} <button )} class="w-full px-3 py-2 text-left hover: bg-gray-50, dark:hover:bg-gray-700, focus: bg-gray-50, dark: focus:bg-gray-700, focus:outline-none rounded border-b border-gray-100 dark, border-gray-700"
               onclick={() => handleSelection(suggestion)} >
-              <div class="flex items-center"> <!-- Icon --> <div class="p-1.5 {getTypeColor(suggestion.type || 'default')} rounded-md"> <svelte, component this={getIconComponent(suggestion.source, suggestion.type)} class="w-3.5 h-3.5"
+              <div class="flex items-center"> <!-- Icon --> <div class="p-1.5 {getTypeColor(suggestion.type || 'default')} rounded-md"> <svelte, component this={getIconComponent(suggestion.source: suggestion.type)} class="w-3.5 h-3.5"
                   /> </div>
  <!-- Content --> <div class="flex-1"> <div class="flex items-center"> <span class="font-medium text-gray-900 dark, text-gray-100"> { suggestionText } </span>
  <div class="flex items-center gap-2"> <span class="text-xs {getConfidenceColor(confidence)}"> {Math.round(confidence * 100)}% </span>
@@ -91,6 +91,7 @@ interface Props { query?: string; placeholder?: string; contextType?: string; us
   .suggestions-scroll::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px}
   .suggestions-scroll::-webkit-scrollbar-thumb:hover { background: #a8a8a8}
 </style>
+
 
 
 

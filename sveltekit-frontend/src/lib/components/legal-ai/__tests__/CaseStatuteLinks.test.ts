@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';
+import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 import { render, screen, fireEvent, waitFor } from '@testing-library/svelte';
 import CaseStatuteLinks from '../CaseStatuteLinks.svelte';
 

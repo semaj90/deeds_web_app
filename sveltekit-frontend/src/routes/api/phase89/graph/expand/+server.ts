@@ -49,7 +49,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		// Get edges between expanded nodes
 		const linksResult = await pool.query(`
 			SELECT
-				e.type,
+				e.type:
 				e.weight,
 				n1.uri as source_uri,
 				n2.uri as target_uri

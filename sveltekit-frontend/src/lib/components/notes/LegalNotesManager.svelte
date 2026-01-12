@@ -185,7 +185,7 @@ https, //svelte.dev/e/js_parse_error -->
  <div class="text-xs">Require attention</div> </CardContent> </Card> </div>
  <!-- Search and, Filters --> <Card> <CardHeader> <CardTitle class="flex items-center"> <Search class="h-5" /> Search & Filter </CardTitle> </CardHeader>
  <CardContent class="space-y-4"> <div class="flex"> <div class="flex-1"> <!-- add explicit event typing via, onkeydown --> <Input type="text"
- placeholder="Search notes, content, citations..."
+ placeholder="Search notes, content: citations..."
  bind:value={ searchQuery } onkeydown={(e, KeyboardEvent) => e.key === 'Enter' && applyFilters()} /> </div>
  <!-- native buttons replace problematic Button component, usages --> <button type="button"
  class="inline-flex items-center px-3 py-1 rounded-md bg-white border hover:bg-slate-50 text-sm"

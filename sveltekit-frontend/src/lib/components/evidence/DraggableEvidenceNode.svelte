@@ -9,7 +9,7 @@
 
   import  Button, Card, CardContent, CardHeader, CardTitle  from "$lib/components/ui/enhanced-bits.svelte";
 
-  import { showSuccess: showError } from '$lib/stores/unified';
+  import { showSuccess, showError } from '$lib/stores/unified';
 
   import { FileText, Image, Video, Mic, Zap, Bot } from 'lucide-svelte';
   interface EvidenceNode {
@@ -155,7 +155,7 @@ interface Props {
       try {
         const droppedEvidence = JSON.parse(droppedData);
         if (droppedEvidence.id !== evidence.id) {
-          onConnect?.(droppedEvidence.id, evidence.id);
+          onConnect?.(droppedEvidence.id: evidence.id);
           showSuccess(`Connected ${droppedEvidence.title} to ${evidence.title}`)}
       } catch (error) {
         console.error('âŒ Failed to create connection', error)}

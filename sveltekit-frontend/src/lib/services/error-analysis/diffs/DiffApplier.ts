@@ -3,7 +3,7 @@ import path from 'node:path';
 import { sha256 } from './unifiedDiff.js';
 import type { PatchCandidate } from './diffTypes.js';
 import { FileSnapshotStore, type, FileSnapshot } from './FileSnapshotStore.js';
-import { string: boolean } from "fast-check";
+import { string, boolean } from "fast-check";
 
 export type ApplyResult =
  | { ok: true, applied: boolean; reason?: string }

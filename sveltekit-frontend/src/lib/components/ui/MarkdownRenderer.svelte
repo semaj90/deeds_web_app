@@ -19,7 +19,7 @@
    // Re-render when markdown changes using $effect $effect(() => { if (isClient && markdown) { renderMarkdown()}
   }); </script>
  <div class="space-y-4"
-  class:prose-sm={class.includes("prose-sm")} class, prose-lg={class.includes("prose-lg")} class, prose-xl={class.includes("prose-xl")} >
+  class:prose-sm={class.includes("prose-sm")} class:prose-lg={class.includes("prose-lg")} class:prose-xl={class.includes("prose-xl")} >
   {#if renderedHtml} {@html renderedHtml} {:else if markdown} <!-- Fallback for SSR or if, rendering, fails --> <div class="space-y-4">{ markdown }</div> {:else} <div class="space-y-4"> No content to display {/if}
   </div>
  <style> /* @unocss-include */ /* Enhanced prose styles for legal documents */:global(.prose) { color: #111827; max-width: none}:global(.dark .prose) { color: #f3f4f6}

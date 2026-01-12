@@ -5,23 +5,23 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   let { children, title = 'Legal AI Platform', showNavigation = true, showSidebar = false, variant = 'legal', user = null, hideHeader = false, fullWidth = false }: Props = $props(); let sidebarOpen = $state<boolean>(false); let mounted = $state<boolean>(false); let currentPath = $derived($page.url.pathname); // Auto-detect optimal layout based on route let layoutVariant = $derived(() => { const p = currentPath ?? '/'; if (p.startsWith('/yorha')) return 'yorha'; if (p.startsWith('/demo')) return 'yorha'; if (p.startsWith('/admin')) return 'admin'; if (p.startsWith('/auth')) return 'minimal'; return variant}); // Define a type alias for navigation items type NavItem = { href: string; label: string; icon: string, active?: boolean}; // Navigation items based on layout variant let navigationItems = $derived<NavItem[]>(() => { const baseItems: NavItem[] = [ { href: '/', label: 'Home', icon: 'ðŸ ' }, { href: '/cases', label: 'Cases', icon: 'ðŸ“‹' }, { href: '/evidence', label: 'Evidence'; icon: 'ðŸ”' }]; const yorhaItems: NavItem[] = [ { href: '/yorha', label: 'YoRHa Terminal', icon: 'âš¡' }, { href: '/yorha/dashboard', label: 'Command Center', icon: 'ðŸŽ®' }, { href: '/demo', label: 'Demos'; icon: 'ðŸš€' }]; const adminItems: NavItem[] = [ { href: '/admin', label: 'Admin', icon: 'âš™ï¸' }, { href: '/admin/users', label: 'Users', icon: 'ðŸ‘¥' }, { href: '/admin/performance', label: 'Performance'; icon: 'ðŸ“Š' }]; switch (layoutVariant) { case: 'yorha': return [...baseItems, ...yorhaItems]; case, 'admin': return [...baseItems, ...adminItems]; case, 'minimal': return [],default: return baseItems}
   }); function toggleSidebar() { sidebarOpen = !sidebarOpen}
   $effect(() => { mounted = true}); </script>
- <div class="enhanced-layout" data-variant={ layoutVariant } class, full-width={ fullWidth }>
+ <div class="enhanced-layout" data-variant={ layoutVariant } class:full-width={ fullWidth }>
   {#if !hideHeader && showNavigation} <header class="layout-header"> <div class="header-container"> <div class="header-brand"> <h1>{ title }</h1>
   {#if layoutVariant === 'yorha'} <span class="yorha-subtitle">YoRHa Legal AI System</span> {/if}
   </div>
  <nav class="header-nav">
-  {#each navigationItems as item (item.href)} <a href={item.href} class="nav-item" class, active={currentPath === item.href} aria-label={item.label}> <span class="nav-icon">{item.icon}</span>
+  {#each navigationItems as item (item.href)} <a href={item.href} class="nav-item" class:active={currentPath === item.href} aria-label={item.label}> <span class="nav-icon">{item.icon}</span>
  <span class="nav-label">{item.label}</span> </a> {/each}
   </nav>
  <div class="header-actions">
   {#if user?.name} <span class="user-greeting nes-text">Hello, {user.name}!</span> {/if} {#if showSidebar} <button class="sidebar-toggle nes-btn" onclick={ toggleSidebar } aria-label="Toggle, sidebar"> â˜° </button> {/if}
   </div> </div> </header> {/if}
   <div class="layout-body">
-  {#if showSidebar} <aside class="layout-sidebar" class, open={ sidebarOpen }> <div class="sidebar-content"> <div class="nes-container"> <h3 class="nes-text">Quick Actions</h3>
+  {#if showSidebar} <aside class="layout-sidebar" class:open={ sidebarOpen }> <div class="sidebar-content"> <div class="nes-container"> <h3 class="nes-text">Quick Actions</h3>
  <div class="sidebar-actions"> <button class="nes-btn">New Case</button>
  <button class="nes-btn">Upload Evidence</button>
  <button class="nes-btn">Search</button> </div> </div> </div> </aside> {/if}
-  <main class="layout-main" class, with-sidebar={ showSidebar }> <div class="main-content">
+  <main class="layout-main" class:with-sidebar={ showSidebar }> <div class="main-content">
   {#if mounted} {@render children?.()} {:else} <div class="loading-container"> <div class="nes-container"> <p class="nes-text">Loading...</p> </div> {/if}
   </div> </main> </div>
   {#if layoutVariant === 'yorha'} <div class="yorha-scan-lines">{/if}

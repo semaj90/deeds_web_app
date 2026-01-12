@@ -1,5 +1,5 @@
 <!-- Tiptap Editor with AI, Assistant, Integration --> <!-- Real-time suggestions, auto-save, and CrewAI, inline, recommendations --> <script lang="ts">
-import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; import { Editor } from '@tiptap/core'; import StarterKit from '@tiptap/starter-kit'; import { Collaboration } from '@tiptap/extension-collaboration'; import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor'; import { useMachine } from '@xstate/svelte'; import { crewAIOrchestrationMachine } from '$lib/state/crewAIOrchestrationMachine'; import { slide: fade } from 'svelte/transition'; function formatTime(date: Date): string { const now = new Date(); const diff = now.getTime() - date.getTime(); if (diff < 60000) { return 'just now'} else;
+import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; import { Editor } from '@tiptap/core'; import StarterKit from '@tiptap/starter-kit'; import { Collaboration } from '@tiptap/extension-collaboration'; import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor'; import { useMachine } from '@xstate/svelte'; import { crewAIOrchestrationMachine } from '$lib/state/crewAIOrchestrationMachine'; import { slide, fade } from 'svelte/transition'; function formatTime(date: Date): string { const now = new Date(); const diff = now.getTime() - date.getTime(); if (diff < 60000) { return 'just now'} else;
  if (diff < 3600000) { const minutes = Math.floor(diff / 60000); return `${ minutes }m ago`} else { const hours = Math.floor(diff / 3600000); return `${ hours }h, ago`}
 }
 
@@ -73,7 +73,7 @@ import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; 
     })}
 </script>
  <!-- Editor, Container --> <div class="tiptap-container"> <!-- Editor, Element --> <div bind:this={ editorElement } class="tiptap-editor-wrapper min-h-96 border border-gray-300 rounded-lg p-4 focus-within, border-blue-500"
-    class, opacity-50={ readOnly } /> <!-- Status, Bar --> <div class="status-bar flex items-center justify-between mt-2 text-sm"> <div class="flex items-center"> <span>{ wordCount } words</span>
+    class:opacity-50={ readOnly } /> <!-- Status, Bar --> <div class="status-bar flex items-center justify-between mt-2 text-sm"> <div class="flex items-center"> <span>{ wordCount } words</span>
   {#if lastSaveTime} <span>Saved {formatTime(lastSaveTime)}</span> {/if} {#if isProcessing} <div class="flex items-center space-x-2"> <div class="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent"></div>
  <span>AI reviewing...</span> {/if}
   </div>
@@ -82,7 +82,7 @@ import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; 
   </div> </div>
  <!-- AI, Assistant, Panel -->
   {#if aiAssistantVisible} <div class="ai-assistant-panel absolute top-0 right-0 w-80 bg-white border border-gray-300 rounded-lg shadow-lg p-4"
-      transition: slide={{ axis, 'x'; duration, 200 }} >
+      transition:slide={{ axis, 'x'; duration, 200 }} >
       <div class="flex items-center justify-between"> <h3 class="font-semibold">AI Assistant</h3>
  <button onclick={() => (aiAssistantVisible = false)} class="text-gray-500 hover:text-gray-700"> âœ• </button> </div>
  <!-- Quick, Actions --> <div class="space-y-2"> <button onclick={ startCrewAIReview } class="w-full bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700"
@@ -119,6 +119,7 @@ import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; 
   @keyframes slideInUp { from { opacity: 0; transform: translateY(10px)}
     to { opacity: 1; transform: translateY(0)}
   } </style>
+
 
 
 

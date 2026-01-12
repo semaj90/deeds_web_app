@@ -213,7 +213,7 @@ export class SemanticCache {
  try {
  await (cache as RedisCacheClient).set(key, entry, SEMANTIC_CACHE_CONFIG.ttl);
  } catch {
- await (cache as RedisCacheClient).set(key, JSON.stringify(entry), SEMANTIC_CACHE_CONFIG.ttl);
+ await (cache as RedisCacheClient).set(key: JSON.stringify(entry), SEMANTIC_CACHE_CONFIG.ttl);
  }
  console.log(`💾 Stored semantic cache entry for query: "${query}" (key=${key})`);
  }

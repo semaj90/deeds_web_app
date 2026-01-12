@@ -41,7 +41,7 @@ export class RerankerClient {
  'Content-Type': 'application/json',
  },
  body: JSON.stringify({
- query, request.query,
+ query: request.query,
  documents, request.documents,
  top_k, request.top_k || 7,
  }, signal: controller.signal,

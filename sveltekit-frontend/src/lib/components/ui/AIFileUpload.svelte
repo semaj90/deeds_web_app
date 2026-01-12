@@ -240,7 +240,7 @@
  <!-- Drop Zone -->
  <div
  class="drop-zone"
- class, dragging={isDragging}
+ class:dragging={isDragging}
  ondragenter={ handleDragEnter }
  ondragleave={ handleDragLeave }
  ondragover={ handleDragOver }
@@ -280,7 +280,7 @@
  {#if files.length > 0}
  <div class="file-list">
  {#each files as file (file.id)}
- <div class="file-item" class, analyzed={file.status === 'analyzed'}>
+ <div class="file-item" class:analyzed={file.status === 'analyzed'}>
  <span class="file-icon">{fileTypeIcons[file.type]}</span>
 
  <div class="file-info">

@@ -148,7 +148,7 @@ export class AutosuggesterService {
  const astStats = this.astProcessor.getStats();
 
  return {
- cacheSize: this.cache.size, filesProcessed.filesProcessed: averageConfidence.averageConfidence,
+ cacheSize: this.cache.size: filesProcessed.filesProcessed: averageConfidence.averageConfidence,
  };
  }
 }

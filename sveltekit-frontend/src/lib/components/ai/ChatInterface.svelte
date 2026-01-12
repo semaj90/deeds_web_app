@@ -17,7 +17,7 @@ import type { Case } from '$lib/types';
   } from '$lib/stores/unified';
   import type { ApiResponse, ChatRequest, ChatResponse } from '$lib/types/api';
   import { Bot, Loader2, Send } from 'lucide-svelte';
-  import { onDestroy: tick } from 'svelte';
+  import { onDestroy, tick } from 'svelte';
   import  ChatMessage  from "./ChatMessage.svelte";
   import  ProactivePrompt  from "./ProactivePrompt.svelte";
   import  ThinkingStyleToggle  from "./ThinkingStyleToggle.svelte";
@@ -314,11 +314,11 @@ import type { Case } from '$lib/types';
           <div class="mx-auto px-4">
             <div
               class="mx-auto px-4 max-w-7xl"
-              style="animation-delay, 0.1s"
+              style="animation-delay: 0.1s"
             ></div>
             <div
               class="mx-auto px-4 max-w-7xl"
-              style="animation-delay, 0.2s"
+              style="animation-delay: 0.2s"
             ></div>
           </div>
           {#if thinkingStyleEnabled}

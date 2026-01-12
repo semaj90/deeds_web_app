@@ -47,11 +47,11 @@
  }
 </script>
 
-<div class="typewriter-prompt {className}" class, typing={isTyping}>
+<div class="typewriter-prompt {className}" class:typing={isTyping}>
  <span class="prompt-icon">💬</span>
  <span class="prompt-text">
  {displayedText}
- <span class="cursor" class, visible={cursorVisible && isTyping}>|</span>
+ <span class="cursor" class:visible={cursorVisible && isTyping}>|</span>
  </span>
  {#if prompt?.caseId}
  <span class="case-badge">Case #{prompt.caseId}</span>

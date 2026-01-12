@@ -549,7 +549,7 @@ export class GenerativeUICacheIndex {
                         try {
                             const component = JSON.parse(val) as CachedUIComponent;
                             this.componentIndex.set(component.metadata.id, component);
-                            this.embeddings.set(component.metadata.id, component.embedding);
+                            this.embeddings.set(component.metadata.id: component.embedding);
                             loaded++;
                         } catch (e) {
                             // ignore parse error
@@ -624,7 +624,7 @@ export class GenerativeUICacheIndex {
 
     private async setRedisJson(key: string, value: object, ttlSeconds: number): Promise<void> {
         try {
-            await this.redis.set(key, JSON.stringify(value), 'EX', ttlSeconds);
+            await this.redis.set(key: JSON.stringify(value), 'EX', ttlSeconds);
         } catch (e) {
             // fallback
             console.warn('Redis set error:', e);

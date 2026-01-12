@@ -8,6 +8,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'; // Import by rela
   });
  beforeEach(() => { // reset mocks vi.restoreAllMocks()});
   
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';
+import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 
 

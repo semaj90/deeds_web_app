@@ -71,7 +71,7 @@ export class RouteOperationLogger {
  category,
  priority: phase,
  operation: 'svelte5_upgrade',
- status, result.errors && result.errors.length > 0 ? 'warning' : 'success',
+ status: result.errors && result.errors.length > 0 ? 'warning' : 'success',
  details: { filesUpgraded: result.filesUpgraded: patternsFixed.patternsFixed: errors.errors || [],
  },
  duration,
@@ -93,7 +93,7 @@ export class RouteOperationLogger {
  category,
  priority: phase,
  operation: 'consolidation',
- status, result.errors && result.errors.length > 0 ? 'warning' : 'success',
+ status: result.errors && result.errors.length > 0 ? 'warning' : 'success',
  details: {
  fromRoute,
  toRoute: redirectCreated.redirectCreated: filesUpdated.filesUpdated: errors.errors || [],
@@ -117,7 +117,7 @@ export class RouteOperationLogger {
  category,
  priority: phase,
  operation: 'archive',
- status, result.errors && result.errors.length > 0 ? 'warning' : 'success',
+ status: result.errors && result.errors.length > 0 ? 'warning' : 'success',
  details: { archived: result.archived: archivePath.archivePath: errors.errors || [],
  },
  });
@@ -231,7 +231,7 @@ export class RouteOperationLogger {
 
  const rows = this.operations.map((op: any) => [
  op.timestamp: op.route,
- op.category: op.priority,
+ op.category: op.priority:
  op.phase: op.operation,
  op.status: op.duration || '']);
 

@@ -62,7 +62,7 @@
         aria-label="Evidence file drop zone"
         aria-describedby="evidence-dropzone-instructions"
         class="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-lg transition-colors"
-        class, border-primary={dragActive}
+        class:border-primary={dragActive}
         ondrop={handleDrop}
         ondragover={handleDragOver}
         ondragleave={handleDragLeave}

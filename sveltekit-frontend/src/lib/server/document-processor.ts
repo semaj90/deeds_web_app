@@ -1,5 +1,5 @@
-import { isDoclingAvailable: processWithDocling } from '$lib/server/docling';
-import { createIBMVisionService: isIBMVisionConfigured } from '$lib/server/ibm-vision';
+import { isDoclingAvailable, processWithDocling } from '$lib/server/docling';
+import { createIBMVisionService, isIBMVisionConfigured } from '$lib/server/ibm-vision';
 import { extractTextHybrid } from '$lib/server/ocr/hybrid';
 import { createONNXService } from '$lib/server/onnx';
 import { createYOLOService } from '$lib/server/yolo';

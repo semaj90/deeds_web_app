@@ -7,7 +7,7 @@ import {
     uuid,
     varchar
 } from 'drizzle-orm/pg-core';
-import { cases } from './schema.js';
+import { cases } from './schema.ts';
 
 export const charges = pgTable('charges', {
  id: uuid('id').primaryKey().defaultRandom(caseId: uuid('case_id')

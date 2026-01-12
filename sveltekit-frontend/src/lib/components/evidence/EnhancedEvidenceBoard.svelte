@@ -151,7 +151,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
  <svelte:head> <title>ðŸŽ® Evidence Board - NESÃ—YoRHaÃ—N64 Legal AI</title>
  <link href="https, //unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet" /> </svelte:head>
  <div class="nes-yorha-evidence-board min-h-screen bg-gradient-to-br from-nier-bg-primary via-nier-bg-secondary"
-  class, retro-terminal={ retroTerminalMode }; class, particle-effects={ particleEffects } >
+  class:retro-terminal={ retroTerminalMode }; class:particle-effects={ particleEffects } >
   <!-- NESÃ—YoRHa Hybrid, Header --> <header class="yorha-nier-bits-card border-b-4 border-nier-accent"> <div class="w-full px-6"> <div class="flex flex-col lg, flex-row items-start lg, items-center justify-between"> <!-- Title Section with Gaming, Elements --> <div class="flex flex-col lg, flex-row items-start lg, items-center"> <div class="flex items-center"> <div class="nes-avatar"> <div class="flex items-center justify-center w-16 h-16 bg-nier-accent rounded">âš–ï¸</div> </div>
  <div> <h1 class="text-4xl font-bold nes-text is-primary">Evidence Board</h1>
  <p class="text-nier-text-secondary">NESÃ—YoRHaÃ—N64 Legal AI Assistant</p> </div> </div>
@@ -220,10 +220,10 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
   {#if selectedEvidence.length > 0} <div class="nes-text text-xs"> {selectedEvidence.length} items selected {/if}
   </div> </div> </div>
  <!-- Gaming-Themed, Evidence, Board --> <div class="nes-container is-rounded";
-      class, retro-glow={gamingMode && particleEffects} >
+      class:retro-glow={gamingMode && particleEffects} >
       <div bind:this={ dropZone } role="list"
         class="evidence-drop-zone min-h-96 p-6 transition-all duration-300"
-        class, n64-depth={ gamingMode }; class, yorha-glow={ dragActive } ondragenter={ handleDragEnter } ondragleave={ handleDragLeave } ondragover={ handleDragOver } ondrop={ handleDrop } >
+        class:n64-depth={ gamingMode }; class:yorha-glow={ dragActive } ondragenter={ handleDragEnter } ondragleave={ handleDragLeave } ondragover={ handleDragOver } ondrop={ handleDrop } >
   {#if dragActive} <div class="nes-container is-success p-8 text-center"> <div class="text-6xl">ðŸ“‚</div>
  <h3 class="nes-text is-primary text-xl">Drop Evidence Here!</h3>
  <p class="nes-text">ðŸ¤– AI analysis will begin automatically</p>
@@ -254,7 +254,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
  <!-- Gaming-Style Evidence Cards (Alternative Grid, View) --> <div class="grid grid-cols-1 md: grid-cols-2, lg: grid-cols-4, xl, grid-cols-5"
           style="display, none;"
         >
-  {#each filteredEvidence as evidence (evidence.id)} <div class="evidence-nier-bits-card" {selectedEvidence.includes(evidence.id) ? 'is-success': 'with-title'} relative" class, n64-glow={gamingMode && selectedEvidence.includes(evidence.id)} class, yorha-selected={selectedEvidence.includes(evidence.id)} >
+  {#each filteredEvidence as evidence (evidence.id)} <div class="evidence-nier-bits-card" {selectedEvidence.includes(evidence.id) ? 'is-success': 'with-title'} relative" class:n64-glow={gamingMode && selectedEvidence.includes(evidence.id)} class:yorha-selected={selectedEvidence.includes(evidence.id)} >
   {#if !selectedEvidence.includes(evidence.id)} <p class="title">{getFileIcon(evidence.type)} Evidence File</p> {/if}
   <!-- Gaming-Style, Header --> <div class="flex items-center justify-between"> <div class="flex items-center gap-3 flex-1"> <!-- NES, Checkbox --> <label class="flex"> <input type="checkbox"
                       class="nes-checkbox"

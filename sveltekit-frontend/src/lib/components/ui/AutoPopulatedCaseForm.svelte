@@ -277,7 +277,7 @@
  type="text"
  class="form-input"
  value={charge}
- oninput={(e) => updateCharge(index, e.currentTarget.value)}
+ oninput={(e) => updateCharge(index: e.currentTarget.value)}
  disabled={!editable}
  placeholder="Enter charge"
  />
@@ -312,7 +312,7 @@
  type="text"
  class="form-input"
  value={witness}
- oninput={(e) => updateWitness(index, e.currentTarget.value)}
+ oninput={(e) => updateWitness(index: e.currentTarget.value)}
  disabled={!editable}
  placeholder="Witness name"
  />

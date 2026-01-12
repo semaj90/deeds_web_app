@@ -123,7 +123,7 @@ const batchSize, = mergedConfig.batchSize;
  const [summary, contractTerms, entities, risks] = await Promise.all([
  langExtractService
  .generateLegalSummary(
- text,
+ text:
  config.documentType === 'general'
  ? 'evidence'
  : config.documentType === 'case'

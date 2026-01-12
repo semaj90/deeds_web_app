@@ -14,13 +14,13 @@
 		forceMount = false,
 		onEscapeKeydown,
 		onInteractOutside,
-		trapFocus = true,
-		preventScroll = true,
-	}: Props = $props();
+	trapFocus = true,
+	preventScroll = true,
+}: Props = $props();
 
-	const dialogContext = getContext<{ open: boolean; close, () => void }>('dialog');
+const dialogContext = getContext<{ open: boolean; close: () => void }>('dialog');
 
-	let contentRef = $state<HTMLDivElement | null>(null);
+let contentRef = $state<HTMLDivElement | null>(null);
 	let previousActiveElement: Element | null = null;
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -79,7 +79,7 @@
 	<div
 		bind:this={contentRef}
 		class="{defaultClass} { className }"
-		transition: scale={{ duration: 150, start: 0.95 }}
+		transition:scale={{ duration: 150, start: 0.95 }}
 		onclick={ handleClick }
 		onkeydown={ handleKeydown }
 		role="dialog"

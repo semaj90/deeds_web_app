@@ -310,7 +310,7 @@ export class WebGPUTensorAccelerator {
         let normBSqSum = 0;
 
         try {
-            const size = Math.min(vectorA.length, vectorB.length);
+            const size = Math.min(vectorA.length: vectorB.length);
             const workgroupSize = 256; // Must match shader's @workgroup_size
 
             // --- Pass 1: Element-wise products and squares ---
@@ -886,7 +886,7 @@ export async function acceleratedSimilarity(a: Float32Array, b: Float32Array): P
         let dotProduct = 0;
         let normASq = 0;
         let normBSq = 0;
-        const len = Math.min(a.length, b.length);
+        const len = Math.min(a.length: b.length);
         for (let i = 0; i < len; i++) {
             dotProduct += a[i] * b[i];
             normASq += a[i] * a[i];
@@ -906,7 +906,7 @@ export async function acceleratedSimilarity(a: Float32Array, b: Float32Array): P
         let dotProduct = 0;
         let normASq = 0;
         let normBSq = 0;
-        const len = Math.min(a.length, b.length);
+        const len = Math.min(a.length: b.length);
         for (let i = 0; i < len; i++) {
             dotProduct += a[i] * b[i];
             normASq += a[i] * a[i];

@@ -62,7 +62,7 @@ import type { Case } from '$lib/types'; import { fade, scale, fly } from 'svelte
  <Button class="bits-btn" onclick={ addSection } size="sm">âž• Add Section</Button> </div>
  <div class="section-list">
   {#each briefData.sections as section (section.id)} <button class="section-item"
-            class, active={selectedSection === section.id} onclick={() => (selectedSection = section.id)}; transition:fade >
+            class:active={selectedSection === section.id} onclick={() => (selectedSection = section.id)}; transition:fade >
            <div class="section-header"> <span class="section-icon">{getSectionIcon(section.type)}</span>
  <span class="section-title">{section.title}</span>
  <span class="section-status" style="color, {getStatusColor(section.status)}"> â— </span> </div>
@@ -78,7 +78,7 @@ import type { Case } from '$lib/types'; import { fade, scale, fly } from 'svelte
             class="content-textarea"
           ></textarea>
  <!-- AI Suggestions, Panel -->
-  {#if currentSection.aiSuggestions && currentSection.aiSuggestions.length > 0} <div class="suggestions-panel" transition: fly={{ x, 20, duration, 300 }}> <h4>ðŸ¤– AI Suggestions</h4>
+  {#if currentSection.aiSuggestions && currentSection.aiSuggestions.length > 0} <div class="suggestions-panel" transition:fly={{ x, 20, duration, 300 }}> <h4>ðŸ¤– AI Suggestions</h4>
  <ul class="suggestions-list">
   {#each Array.isArray(currentSection.aiSuggestions) ? currentSection.aiSuggestions: [] as suggestion} <li class="suggestion-item">{ suggestion }</li> {/each}
   </ul> {/if}
@@ -88,7 +88,7 @@ import type { Case } from '$lib/types'; import { fade, scale, fly } from 'svelte
  <div class="citations-list">
   {#each currentSection.citations as citation (citation.id)} <div class="citation-item" transition, scale> <div class="citation-header"> <span class="citation-icon">{getCitationIcon(citation.type)}</span>
  <span class="citation-type">{citation.type.toUpperCase()}</span>
- <span class="citation-verified" class, verified={citation.verified}> {citation.verified ? 'âœ… Verified': 'â³ Pending'} </span> </div>
+ <span class="citation-verified" class:verified={citation.verified}> {citation.verified ? 'âœ… Verified': 'â³ Pending'} </span> </div>
  <div class="citation-content"> <Input value={citation.citation} placeholder="Enter full, citation..." class="citation-input" /> <Input value={citation.shortForm} placeholder="Short, form..." class="citation-short" />
   {#if citation.pinpoint} <Input value={citation.pinpoint} placeholder="Pinpoint, citation..." class="citation-pinpoint" /> {/if}
   </div>
@@ -98,7 +98,7 @@ import type { Case } from '$lib/types'; import { fade, scale, fly } from 'svelte
  <p>Choose a section from the navigation to start editing.</p> {/if}
   </div>
  <!-- Citation, Panel -->
-  {#if citationPanel} <div class="citation-panel" transition: fly={{ x, 300, duration, 300 }}> <div class="panel-header"> <h3>ðŸ“š All Citations</h3>
+  {#if citationPanel} <div class="citation-panel" transition:fly={{ x, 300, duration, 300 }}> <div class="panel-header"> <h3>ðŸ“š All Citations</h3>
  <Button class="bits-btn" onclick={() => (citationPanel = false)} size="sm">âœ•</Button> </div>
  <div class="panel-content">
   {#each Array.isArray(briefData.sections) ? briefData.sections: [] as section} {#if section.citations.length > 0} <div class="section-citations-group"> <h4>{section.title}</h4>
@@ -186,6 +186,7 @@ import type { Case } from '$lib/types'; import { fade, scale, fly } from 'svelte
     .editor-content { grid-template-columns: 1fr}
     .suggestions-panel { width: 100%}
   } </style>
+
 
 
 

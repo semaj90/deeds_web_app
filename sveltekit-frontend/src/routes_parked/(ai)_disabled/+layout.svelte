@@ -83,7 +83,7 @@ import type { Document } from '$lib/types';
  <a
  href={route.href}
  class="ai-nav-item"
- class, active={currentPath === route.href || currentPath.startsWith(route.href + '/')}
+ class:active={currentPath === route.href || currentPath.startsWith(route.href + '/')}
  >
  <span class="ai-nav-icon">{route.icon}</span>
  <span class="ai-nav-text">{route.name}</span>

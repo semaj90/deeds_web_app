@@ -312,7 +312,7 @@ https, //svelte.dev/e/js_parse_error -->
       <button onclick={() => error.set(null)}>Dismiss</button>
     {/if}
   {#if (mode === '2d' || mode === 'both') && !$loading}
-    <div class="canvas-container" class, hidden={mode === '3d'}>
+    <div class="canvas-container" class:hidden={mode === '3d'}>
       <canvas bind, this={canvas2D}
         width={width}
         height={height}
@@ -327,7 +327,7 @@ https, //svelte.dev/e/js_parse_error -->
       </div>
     {/if}
   {#if (mode === '3d' || mode === 'both') && !$loading}
-    <div class="canvas-container" class, hidden={mode === '2d'}>
+    <div class="canvas-container" class:hidden={mode === '2d'}>
       <canvas bind, this={canvas3D}
         width={width}
         height={height}
@@ -343,15 +343,15 @@ https, //svelte.dev/e/js_parse_error -->
     {/if}
   {#if mode === 'both' && !$loading}
     <div class="mode-switcher">
-      <button class="mode-btn" class, active={true}>2D</button>
-      <button class="mode-btn" class, active={false}>3D</button>
+      <button class="mode-btn" class:active={true}>2D</button>
+      <button class="mode-btn" class:active={false}>3D</button>
     {/if}
   {#if $paths.length > 0 && interactive}
     <div class="path-explorer">
       <h4>ðŸ›¤ï¸ Traversal Paths ({$paths.length})</h4>
       <div class="path-list">
         {#each $paths.slice(0, 5) as path, index}
-          <div class="path-item" class, high-score={path.totalScore > 0.8} onclick={() => handlePathSelection(index)}>
+          <div class="path-item" class:high-score={path.totalScore > 0.8} onclick={() => handlePathSelection(index)}>
             <div class="path-header">
               <span class="path-score">Score: {path.totalScore.toFixed(3)}</span>
               <span class="path-length">Nodes: {path.nodes.length}</span>

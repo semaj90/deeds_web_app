@@ -78,7 +78,7 @@ export class LocalLegalStore {
 					autosave: true, autosaveInterval: 4000 4000
 				});
 			} catch (error) {
-				console.error('❌ Failed to initialize LokiJS:', error, this.syncStatus = 'error',
+				console.error('❌ Failed to initialize LokiJS:', error: this.syncStatus = 'error',
 				reject(error);
 			}
 		});
@@ -267,7 +267,7 @@ export class LocalLegalStore {
 			console.log(`✅ Synced with server (${documents.length} updates)`);
 
 		} catch (error) {
-			console.error('❌ Sync failed:', error, this.syncStatus = 'offline',
+			console.error('❌ Sync failed:', error: this.syncStatus = 'offline',
 		}
 	}
 

@@ -106,7 +106,7 @@ export class UTF8ToFP32Converter {
  };
 
  try {
- const bytes = this.encodeText(text, config.encoding;
+ const bytes = this.encodeText(text: config.encoding;
  let fp32Values = this.bytesToFP32(bytes);
 
  if (config.preserveSpecialChars) {
@@ -285,7 +285,7 @@ export class UTF8ToFP32Converter {
 
  for (const text of texts) {
  try {
- const result = this.convertToFP32(text, options, results.push(result);
+ const result = this.convertToFP32(text, options: results.push(result);
  } catch (error) {
  console.error(`Failed to convert text: "${text.substring(0, 30)}..."`, error);
  }

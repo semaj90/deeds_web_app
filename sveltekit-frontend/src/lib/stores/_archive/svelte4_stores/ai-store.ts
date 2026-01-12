@@ -3,7 +3,7 @@
  * Manages streaming responses, intent classification, and AI interactions
  */
 
-import { writable: derived } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import type { LegalIntent } from '$lib/ai/intents';
 
 export interface AIMessage {

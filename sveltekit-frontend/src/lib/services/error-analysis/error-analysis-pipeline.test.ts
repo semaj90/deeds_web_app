@@ -8,7 +8,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { ErrorAnalysisPipeline } from './error-analysis-pipeline.js';
 import type { ServiceConfig, Error } from './types.js';
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';
+import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 
 describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
   let pipeline: ErrorAnalysisPipeline;

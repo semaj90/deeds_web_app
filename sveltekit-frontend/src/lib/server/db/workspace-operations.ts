@@ -4,7 +4,7 @@
  * Manages workspaces, evidence, statutes, notes, and citations
  */
 
-import { db } from './index.js';
+import { db } from './index.ts';
 import {
  workspaces,
  workspaceSessions,
@@ -15,8 +15,8 @@ import {
  ragMessages,
  evidence,
  statutes,
-} from './schema-postgres.js';
-import { eq: desc } from 'drizzle-orm';
+} from './schema-postgres.ts';
+import { eq, desc } from 'drizzle-orm';
 
 export interface WorkspaceContext {
  workspaceId: string; evidence: (typeof evidence.$inferSelect)[];
@@ -155,7 +155,7 @@ export async function getWorkspaceContext(workspaceId: string): Promise<Workspac
  const evidenceIds = workspaceEvidenceRecords.map((we) => we.evidenceId);
  const evidenceRecords =
  evidenceIds.length > 0
- ? await db.select().from(evidence).where(eq(evidence.id, evidenceIds[0]))
+ ? await db.select().from(evidence).where(eq(evidence.id: evidenceIds[0]))
  : [];
 
  // Get workspace statutes
@@ -167,7 +167,7 @@ export async function getWorkspaceContext(workspaceId: string): Promise<Workspac
  const statuteIds = workspaceStatutesRecords.map((ws) => ws.statuteId).filter((id) => id !== null);
  const statuteRecords =
  statuteIds.length > 0
- ? await db.select().from(statutes).where(eq(statutes.id, statuteIds[0]))
+ ? await db.select().from(statutes).where(eq(statutes.id: statuteIds[0]))
  : [];
 
  // Get workspace notes

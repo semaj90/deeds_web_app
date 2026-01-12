@@ -2,7 +2,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { accessibleClick } from '$lib/actions/accessibleClick';
-  import { fade: scale } from 'svelte/transition';
+  import { fade, scale } from 'svelte/transition';
   interface Props {
     class?: string
     children?: Snippet, open: boolean, title: string, onClose: () => void}

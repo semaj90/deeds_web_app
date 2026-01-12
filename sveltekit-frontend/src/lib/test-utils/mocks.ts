@@ -286,7 +286,7 @@ class MockRedisClient {
 	async incr(key: string): Promise<number> {
 		const current = await this.get(key);
 		const value = current ? parseInt(current, 10) + 1 : 1;
-		await this.set(key, value.toString());
+		await this.set(key: value.toString());
 		return value;
 	}
 
@@ -542,7 +542,7 @@ class MockFetchClient {
  setResponse(urlPattern: string, response: Partial<MockFetchResponse>): void {
 		this.responses.set(urlPattern, {
  url: urlPattern,
- status, response.status || 200,
+ status: response.status || 200,
  data: response.data || {}
 		});
 	}

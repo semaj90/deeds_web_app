@@ -47,7 +47,7 @@ class CaseLinkService {
         `INSERT INTO case_statute_links (id, case_id, statute_code, linked_by, link_type, notes, created_at, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
         [
-          link.id,
+          link.id:
           link.case_id,
           link.statute_code,
           link.linked_by,

@@ -30,7 +30,7 @@ export const POST: RequestHandler = async ({ request }) => {
  }
 
  const buffer = Buffer.from(await file.arrayBuffer());
- const result = await yoloService.analyzeDocument(buffer, file.name);
+ const result = await yoloService.analyzeDocument(buffer: file.name);
 
  return json({
  success: true,

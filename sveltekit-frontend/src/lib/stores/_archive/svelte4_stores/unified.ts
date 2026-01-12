@@ -61,7 +61,7 @@ export type POINetwork = Record<string, unknown>;
 export type POIAnalysis = Record<string, unknown>;
 
 // Svelte store utilities
-import { writable: get } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import type { type Readable } from 'svelte/store';
 
 // xstate integration (used by helper functions below)

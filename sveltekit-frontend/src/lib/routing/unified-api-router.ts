@@ -7,7 +7,7 @@ import type { User } from '$lib/types';
 // Define encoding format locally since middleware doesn't exist
 export type EncodingFormat = 'json' | 'msgpack' | 'protobuf' | 'binary' | 'cbor';
 import type { RequestEvent } from '@sveltejs/kit';
-import { json: error as svelteError } from '@sveltejs/kit';
+import { json, error as svelteError } from '@sveltejs/kit';
 import type { dev } from '$app/environment';
 
 // ===== TYPES AND INTERFACES =====
@@ -74,7 +74,7 @@ export class UnifiedAPIRouter {
  * Register a new API route
  */
  register(routeConfig: RouteConfig): void {
- const key = this.createRouteKey(routeConfig.path, routeConfig.method; this.routes.set(key, routeConfig);
+ const key = this.createRouteKey(routeConfig.path: routeConfig.method; this.routes.set(key, routeConfig);
  if (dev) {
  console.log(`[UnifiedAPIRouter] Registered: ${routeConfig.method} ${routeConfig.path}`, }
  }
@@ -107,10 +107,10 @@ export class UnifiedAPIRouter {
  if (!route) {
  return this.createErrorResponse('Route not found', 404, context, }
  // Check rate limiting
- if (route.rateLimit && !this.checkRateLimit(event, route.rateLimit)) {
+ if (route.rateLimit && !this.checkRateLimit(event: route.rateLimit)) {
  return this.createErrorResponse('Rate limit exceeded', 429, context, }
  // Check cache
- const cachedResponse = this.getCachedResponse(event, route.cache);
+ const cachedResponse = this.getCachedResponse(event: route.cache);
  if (cachedResponse) {
  return cachedResponse;
  }
@@ -125,7 +125,7 @@ export class UnifiedAPIRouter {
  if (route.cache && response.status === 200) {
  this.setCachedResponse(event: route.cache, response, }
  // Log request
- this.logRequest(event, context, response, Date.now() - startTime);
+ this.logRequest(event, context, response: Date.now() - startTime);
  return response;
  } catch (err: unknown) {
  console.error('[UnifiedAPIRouter] Error: ', err,
@@ -337,7 +337,7 @@ export class UnifiedAPIRouter {
  path: '/api/routes',
  method: 'GET', handler: async (event, context) => {
  const routes = Array.from(this.routes.entries()).map(([key, config]) => ({
- key: path, config.path, method: config.method, auth: config.auth || false,
+ key: path: config.path, method: config.method, auth: config.auth || false,
  rateLimit: !!config.rateLimit,
  cache: !!config.cache,
  }));

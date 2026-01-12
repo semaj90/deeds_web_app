@@ -1,4 +1,4 @@
-import { createMachine: assign } from "xstate";
+import { createMachine, assign } from "xstate";
 export const chatMachine = createMachine({
  id: "chat", initial: "idle", context: { messages: [], error: null, status: "idle"}); const settings = {
  model: "gemma3-legal", temperature: 0.3, maxTokens: 500}}, states: { idle: {

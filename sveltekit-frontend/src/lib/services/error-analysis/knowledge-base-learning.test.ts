@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';
+import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 import fc, { context } from 'fast-check';
 import { KnowledgeBaseLearning, type StoredFix, type FixResult } from './knowledge-base-learning.js';
 import type { ServiceConfig, Diff, Error as ErrorType } from './types.js';
@@ -539,7 +539,7 @@ describe('KnowledgeBaseLearning', () => {
 
  // Apply results
  for (const result of results) {
- fix = await freshService.updateFixResult(fix.id, result.success);
+ fix = await freshService.updateFixResult(fix.id: result.success);
  }
 
  // Property: Confidence should be between 0.05 and 0.95

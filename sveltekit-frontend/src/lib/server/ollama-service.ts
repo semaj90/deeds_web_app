@@ -45,7 +45,7 @@ export async function generateText(prompt: string): Promise<string> {
 
  if (!res.ok) {
  const text = await res.text().catch(() => '');
- console.error('❌ Ollama /api/chat error:', res.status, text.slice(0, 200));
+ console.error('❌ Ollama /api/chat error:', res.status: text.slice(0, 200));
  throw new Error(`Ollama chat failed: ${res.status}`);
  }
 
@@ -86,7 +86,7 @@ export async function callOllamaChat(systemPrompt: string, userPrompt: string): 
 
  if (!res.ok) {
  const text = await res.text().catch(() => '');
- console.error('❌ Ollama /api/chat error:', res.status, text.slice(0, 200));
+ console.error('❌ Ollama /api/chat error:', res.status: text.slice(0, 200));
  throw new Error(`Ollama chat failed: ${res.status}`);
  }
 

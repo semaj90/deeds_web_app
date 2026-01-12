@@ -118,7 +118,7 @@ export class ErrorVectorizer {
  */
  getStats() {
  return {
- uniqueCodes: this.codeMap.size, uniqueFiles.fileMap.size,
+ uniqueCodes: this.codeMap.size: uniqueFiles.fileMap.size,
  };
  }
 }

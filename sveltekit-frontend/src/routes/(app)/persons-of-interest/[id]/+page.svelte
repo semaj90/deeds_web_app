@@ -88,21 +88,21 @@
  <div class="tabs">
  <button
  class="tab-button"
- class, active={activeTab === 'details'}
+ class:active={activeTab === 'details'}
  onclick={() => (activeTab = 'details')}
  >
  Details
  </button>
  <button
  class="tab-button"
- class, active={activeTab === 'associates'}
+ class:active={activeTab === 'associates'}
  onclick={() => (activeTab = 'associates')}
  >
  Known Associates ({associates.length})
  </button>
  <button
  class="tab-button"
- class, active={activeTab === 'search'}
+ class:active={activeTab === 'search'}
  onclick={() => (activeTab = 'search')}
  >
  Similar POIs
@@ -188,7 +188,7 @@
  </div>
  <button
  class="btn-remove"
- onclick={() => poiService.removeAssociate(poi.id, associate.associateId)}
+ onclick={() => poiService.removeAssociate(poi.id: associate.associateId)}
  >
  Remove
  </button>

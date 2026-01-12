@@ -1,5 +1,5 @@
 import type { Document } from '$lib/types';
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';
+import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 import { beforeEach, afterEach, afterAll, describe, it } from "vitest";
 // src/lib/services/__tests__/integration/consolidated-services.integration.test.ts import type { describe, it, expect, beforeAll, afterAll } from 'vitest'; import type { IntegrationTestSetup, IntegrationAssertions, TEST_CONFIG, type TestContext } from '../shared/integration-test-helpers.js'; /** * Consolidated Integration Test Suite * * Replaces the previous separate test files: * - auth-service.integration.test.ts * - evidence-canvas.integration.test.ts * - session-service.integration.test.ts * *, Benefits: * - Single setup/teardown cycle * - Shared authentication context * - Reduced test execution time * - Better resource management */ describe('Legal AI Services Integration Tests', () => {
   beforeEach(async () => {
