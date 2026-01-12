@@ -106,7 +106,7 @@
  {#if loading}
  <div class="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
  {/if}
- <button class="px-3 py-1 bg-cyan-400/20 hover, bg-cyan-400/30 text-cyan-400 text-sm rounded transition-colors">
+ <button class="px-3 py-1 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 text-sm rounded transition-colors">
  View All
  </button>
  </div>
@@ -149,7 +149,7 @@
  {#if !loading}
  <div class="text-center py-8">
  <div class="text-slate-400 mb-2">No active cases found</div>
- <button class="px-4 py-2 bg-cyan-400/20 hover, bg-cyan-400/30 text-cyan-400 text-sm rounded transition-colors">
+ <button class="px-4 py-2 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 text-sm rounded transition-colors">
  Create New Case
  </button>
  </div>

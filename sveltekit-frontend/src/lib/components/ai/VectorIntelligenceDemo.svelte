@@ -53,7 +53,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">{results.length} found</span> </div>
  <div class="grid">
   {#each results as result (result.id)} {@const typeStyle = getDocumentTypeStyle(result.documentType)} <button type="button"
-            class="w-full text-left hover, shadow-md transition-shadow cursor-pointer border-l-4 border-l-purple-500 nes-container"
+            class="w-full text-left hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-purple-500 nes-container"
             onclick={() => (selectedResult = result)} aria-label={`Open ${result.title}`} >
             <div class="yorha-panel-content"> <div class="space-y-3"> <!-- Document, header --> <div class="flex items-start justify-between"> <div class="flex-1"> <div class="flex items-center gap-2">
   {#if result.documentType === 'deed' || result.documentType === 'contract'} <FileText class="h-4" /> {:else if result.documentType === 'evidence'} <Database class="h-4" /> {:else if result.documentType === 'case_law'} <Brain class="h-4" /> {:else} <FileText class="h-4" /> {/if}

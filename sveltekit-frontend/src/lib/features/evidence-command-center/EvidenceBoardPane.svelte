@@ -56,7 +56,7 @@
 					<div class="grid grid-cols-1 md: grid-cols-2, xl, grid-cols-3 gap-2">
 						{#each evidenceRows as ev}
 							<div
-								class="group flex flex-col gap-1 p-2 rounded border border-[#f5f5f5] bg-[#101018] hover, bg-[#202030] cursor-pointer"
+								class="group flex flex-col gap-1 p-2 rounded border border-[#f5f5f5] bg-[#101018] hover:bg-[#202030] cursor-pointer"
 								role="button"
 								tabindex="0"
 								onclick={() => toggleEvidenceSelection(ev.id)}
@@ -187,7 +187,7 @@
 									{#each chatResult.suggestions as sugg}
 										<button
 											type="button"
-											class="text-left text-[9px] px-2 py-1 rounded border border-[#f5f5f5] bg-[#15151f] hover, bg-[#262636] transition-colors"
+											class="text-left text-[9px] px-2 py-1 rounded border border-[#f5f5f5] bg-[#15151f] hover:bg-[#262636] transition-colors"
 											onclick={() => handleSuggestionClick(sugg.query)}
 										>
 											→ {sugg.query}
@@ -248,7 +248,7 @@
 			<div class="flex justify-end mt-1">
 				<button
 					type="submit"
-					class="px-3 py-1 text-[10px] rounded border border-[#f5f5f5] bg-[#e0e0ff] text-black font-semibold hover, bg-white"
+					class="px-3 py-1 text-[10px] rounded border border-[#f5f5f5] bg-[#e0e0ff] text-black font-semibold hover:bg-white"
 				>
 					Save
 				</button>

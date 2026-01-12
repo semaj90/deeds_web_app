@@ -43,7 +43,7 @@
 
     <p class="text-red-600 dark, text-red-400 text-sm">{errorFallback}</p>
 
-    <button onclick={retry} class="px-3 py-1 bg-red-600 text-white rounded text-sm hover, bg-red-700"> Retry </button>
+    <button onclick={retry} class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"> Retry </button>
   </div>
 {:else if Component}
   <Component {...componentProps} />

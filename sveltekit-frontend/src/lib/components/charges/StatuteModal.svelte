@@ -82,7 +82,7 @@
 					</div>
 					<button
 						onclick={onClose}
-						class="text-gray-400 hover, text-white text-3xl leading-none"
+						class="text-gray-400 hover:text-white text-3xl leading-none"
 					>
 						✕
 					</button>
@@ -125,7 +125,7 @@
 						<h3 class="text-lg font-semibold text-white mb-3">🚔 Suggested Companion Charges</h3>
 						<div class="space-y-3">
 							{#each statute.bundledCharges as bundle}
-								<div class="p-4 bg-red-950 border-2 border-red-700 rounded-lg hover, bg-red-900 transition">
+								<div class="p-4 bg-red-950 border-2 border-red-700 rounded-lg hover:bg-red-900 transition">
 									<div class="flex justify-between items-start">
 										<div class="flex-1">
 											<p class="font-bold text-red-100">{bundle.title}</p>
@@ -164,7 +164,7 @@
 			<div class="bg-gray-800 border-t-2 border-red-700 p-4 flex gap-3 justify-end">
 				<button
 					onclick={onClose}
-					class="px-4 py-2 text-gray-300 bg-gray-700 hover, bg-gray-600 rounded-lg transition border border-gray-600"
+					class="px-4 py-2 text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-lg transition border border-gray-600"
 				>
 					Close
 				</button>

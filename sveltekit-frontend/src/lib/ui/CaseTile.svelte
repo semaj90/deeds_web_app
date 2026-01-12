@@ -5,7 +5,7 @@
  let { title = "", summary = "", link = "", status = "open" } = $props();
 </script>
 
-<a href={link} class="card block hover, shadow-lg transition-shadow bg-white border border-frame/20 rounded-lg p-4">
+<a href={link} class="card block hover:shadow-lg transition-shadow bg-white border border-frame/20 rounded-lg p-4">
  <div class="flex justify-between items-start mb-2">
  <h3 class="font-serif text-xl text-ink">{title}</h3>
  <span class="px-2 py-1 rounded text-xs font-mono

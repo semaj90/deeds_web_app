@@ -98,7 +98,7 @@
 <div class="canvas grid grid-cols-auto-fill-minmax gap-4 p-4">
   {#each evidenceItems as item (item.id)}
     <article
-      class="card nes-container is-dark hover, shadow-lg cursor-pointer"
+      class="card nes-container is-dark hover:shadow-lg cursor-pointer"
       role="button"
       tabindex="0"
       aria-label={item.title ?? 'Evidence item'}

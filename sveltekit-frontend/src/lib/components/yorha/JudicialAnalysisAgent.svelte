@@ -188,7 +188,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  </label>
  <select
  bind:value={ jurisdiction }
- class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white focus: outline-none, focus: ring-2, focus, ring-cyan-500"
+ class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white focus: outline-none, focus: ring-2, focus:ring-cyan-500"
  >
  <option value="federal">Federal</option>
  <option value="state">State</option>
@@ -275,14 +275,14 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  <div class="flex gap-2">
  <button
  onclick={exportAnalysis}
- class="px-3 py-1 bg-slate-700 hover, bg-slate-600 text-slate-300 rounded text-sm"
+ class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-sm"
  title="Export analysis"
  >
  💾
  </button>
  <button
  onclick={ clearAnalysis }
- class="px-3 py-1 bg-slate-700 hover, bg-slate-600 text-slate-300 rounded text-sm"
+ class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-sm"
  title="Clear analysis"
  >
  🗑️

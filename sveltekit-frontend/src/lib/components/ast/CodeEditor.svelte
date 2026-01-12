@@ -98,7 +98,7 @@
  {#each lineNumbers as line}
  <button
  type="button"
- class="block w-12 px-2 leading-6 transition-colors hover, bg-gray-700 {getLineClass(line)}"
+ class="block w-12 px-2 leading-6 transition-colors hover:bg-gray-700 {getLineClass(line)}"
  onclick={() => handleLineClick(line)}
  title={highlightedLines.has(line) ? 'Click to see error' : `Line ${line}`}
  >

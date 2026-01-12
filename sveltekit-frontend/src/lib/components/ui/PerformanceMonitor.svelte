@@ -169,7 +169,7 @@
 
         <button
           onclick={toggleVisibility}
-          class="text-gray-400 hover, text-white transition-colors"
+          class="text-gray-400 hover:text-white transition-colors"
           aria-label="Close performance monitor"
         >
           Ã—

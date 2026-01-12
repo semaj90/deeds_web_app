@@ -9,7 +9,7 @@
  class="px-4 py-2 text-sm transition-colors border-b-2
  {activeTab === index
  ? 'border-accent text-accent bg-accent/5'
- : 'border-transparent text-ink/70 hover: text-ink, hover, border-frame/50'}"
+ : 'border-transparent text-ink/70 hover: text-ink, hover:border-frame/50'}"
  onclick={() => activeTab = index}
  >
  {tab.label}

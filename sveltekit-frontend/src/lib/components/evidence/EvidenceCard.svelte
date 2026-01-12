@@ -88,12 +88,12 @@
       <svelte, component , this={IconComponent} size={16} />
       <span>{evidence?.evidenceType ?? evidence?.type}</span>
     </div>
-    <div class="flex items-center gap-1 opacity-0 group-hover, opacity-100">
+    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100">
       <!-- Prefer a named slot for custom actions; fallback to built-in, compare, button -->
       <slot name="actions" {evidence}>
         {#if showCompare}
           <button
-            class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100"
+            class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:bg-gray-100"
             onclick={handleCompareClick}
             title={comparing ? 'Analyzingâ€¦' , 'Analyze & compare'}
             aria-busy={comparing}
@@ -177,7 +177,7 @@
         href={evidence.url}
         target="_blank"
         rel="noopener noreferrer"
-        class="flex items-center gap-1 text-indigo-600 hover, text-indigo-800 text-sm font-medium"
+        class="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 text-sm font-medium"
       >
         <Link size={14} />
         Open Link

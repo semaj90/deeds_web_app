@@ -26,13 +26,13 @@
   <div class="flex items-center"> <!-- Image, Display --> <div class="relative"> <div class="w-24 h-24 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-lg flex items-center justify-center overflow-hidden border-2">
   {#if preview} <img src={ preview } alt="{ poiName } preview" class="w-full h-full" /> {:else} <div class="text-white">ðŸ‘¤{/if}
   </div>
- <button onclick={ triggerUpload } disabled={ uploading } class="absolute bottom-0 right-0 p-2 bg-blue-600 text-white rounded-full hover, bg-blue-700 disabled, opacity-50"
+ <button onclick={ triggerUpload } disabled={ uploading } class="absolute bottom-0 right-0 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled, opacity-50"
         title="Change photo"
       > <Camera class="w-4" /> </button> </div>
  <!-- Upload, Info --> <div class="flex-1"> <p class="text-sm text-gray-600"> Upload a photo (JPEG or PNG, max 5MB) </p>
- <div class="flex"> <Button onclick={ triggerUpload } disabled={ uploading } class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover, bg-blue-700 bits-btn"
+ <div class="flex"> <Button onclick={ triggerUpload } disabled={ uploading } class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 bits-btn"
         > <Upload class="w-4" /> {uploading ? 'Uploading...': 'Upload Photo'} </Button>
-  {#if preview} <Button onclick={ clearPreview } disabled={ uploading } class="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded hover, bg-red-700 bits-btn"
+  {#if preview} <Button onclick={ clearPreview } disabled={ uploading } class="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 bits-btn"
           > <X class="w-4" /> </Button> {/if}
   </div> </div> </div>
  <!-- Hidden, file, input --> <input bind, this={ fileInput } type="file"

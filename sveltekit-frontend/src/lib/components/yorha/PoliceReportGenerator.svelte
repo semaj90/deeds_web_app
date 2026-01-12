@@ -152,7 +152,7 @@ import { createEventDispatcher } from 'svelte';
  <textarea
  bind:value={narrative}
  placeholder="Describe what happened... (e.g., 'I was walking home when I noticed someone following me...')"
- class="w-full h-32 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus: outline-none, focus: ring-2, focus, ring-blue-500 resize-none"
+ class="w-full h-32 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus: outline-none, focus: ring-2, focus:ring-blue-500 resize-none"
  ></textarea>
  </div>
 
@@ -203,7 +203,7 @@ import { createEventDispatcher } from 'svelte';
  </button>
  <button
  onclick={ clearAll }
- class="px-4 py-3 bg-slate-700 hover, bg-slate-600 text-slate-300 rounded-lg transition-colors"
+ class="px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors"
  >
  Clear
  </button>
@@ -220,14 +220,14 @@ import { createEventDispatcher } from 'svelte';
  <div class="flex gap-2">
  <button
  onclick={exportReport}
- class="px-3 py-1 bg-slate-700 hover, bg-slate-600 text-slate-300 rounded text-sm"
+ class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-sm"
  title="Download as text file"
  >
  💾
  </button>
  <button
  onclick={printReport}
- class="px-3 py-1 bg-slate-700 hover, bg-slate-600 text-slate-300 rounded text-sm"
+ class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-sm"
  title="Print report"
  >
  🖨️

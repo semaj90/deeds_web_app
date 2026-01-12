@@ -89,7 +89,7 @@
  {#if loading}
  <div class="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
  {/if}
- <button class="px-3 py-1 bg-cyan-400/20 hover, bg-cyan-400/30 text-cyan-400 text-sm rounded transition-colors">
+ <button class="px-3 py-1 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 text-sm rounded transition-colors">
  View All
  </button>
  </div>
@@ -103,7 +103,7 @@
 
  <div class="space-y-3">
  {#each activities as activity}
- <div class="flex items-start space-x-3 p-3 bg-slate-700/20 rounded-lg hover, bg-slate-700/30 transition-colors">
+ <div class="flex items-start space-x-3 p-3 bg-slate-700/20 rounded-lg hover:bg-slate-700/30 transition-colors">
  <div class="text-lg {activity.color} mt-0.5">
  {activity.icon}
  </div>

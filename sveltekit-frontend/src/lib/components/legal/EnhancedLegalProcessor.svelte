@@ -140,7 +140,7 @@ import type { Document } from '$lib/types';
     <h2 class="text-2xl font-bold">Enhanced Legal Processor</h2>
     {#if !$state.matches('idle')}
       <button
-        class="text-sm text-gray-500 hover, text-gray-800"
+        class="text-sm text-gray-500 hover:text-gray-800"
         onclick={() => send({ type: 'RESET' })}
       >
         Reset
@@ -153,7 +153,7 @@ import type { Document } from '$lib/types';
       role="button"
       tabindex="0"
       aria-label="Upload document"
-      class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover, border-blue-500 transition-colors"
+      class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 transition-colors"
       onclick={() => fileInput.click()}
       onkeydown={(e: KeyboardEvent) => {
         // Activate on Enter or Space for accessibility
@@ -181,13 +181,13 @@ import type { Document } from '$lib/types';
       <p class="font-medium">File selected: {$state.context.file?.name}</p>
       <div class="mt-4">
         <button
-          class="bg-blue-600 text-white px-6 py-2 rounded-lg hover, bg-blue-700"
+          class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
           onclick={() => send({ type: 'UPLOAD' })}
         >
           Start Processing
         </button>
         <button
-          class="text-gray-600 hover, text-gray-900"
+          class="text-gray-600 hover:text-gray-900"
           onclick={() => send({ type: 'CANCEL' })}
         >
           Cancel
@@ -216,7 +216,7 @@ import type { Document } from '$lib/types';
       <h3 class="font-bold">Processing Failed</h3>
       <p>{$state.context.errorMessage}</p>
       <button
-        class="mt-4 bg-red-600 text-white px-4 py-1 rounded hover, bg-red-700"
+        class="mt-4 bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700"
         onclick={() => send({ type: 'RESET' })}
       >
         Try Again

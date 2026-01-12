@@ -167,7 +167,7 @@ function extractRelationships(
 				</div>
 				<button
 					onclick={ resetWorkflow }
-					class="px-4 py-2 bg-gray-600 text-white rounded-lg hover, bg-gray-700"
+					class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
 				>
 					🔄 Reset Workflow
 				</button>
@@ -281,7 +281,7 @@ function extractRelationships(
 								</button>
 								<button
 									onclick={ resetWorkflow }
-									class="w-full px-4 py-2 bg-blue-600 text-white rounded hover, bg-blue-700 text-sm"
+									class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
 								>
 									🔄 Start New Workflow
 								</button>

@@ -105,7 +105,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   {#if isLoading} <div class="nes-container"> <div class="yorha-panel-content py-8"> <div class="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
  <p class="text-sm nes-text">Loading citations...</p> </div> </div> {:else if filteredCitations.length === 0} <div class="nes-container"> <div class="yorha-panel-content py-8"> <BookOpen class="w-12 h-12 nes-text is-disabled mx-auto" /> <p class="text-sm nes-text is-disabled">No citations found</p>
   {#if searchQuery} <p class="text-xs nes-text">Try adjusting your search terms</p> {/if}
-  </div> </div> {:else} {#each Array.isArray(filteredCitations) ? filteredCitations: [] as citation} <div class="hover, shadow-md transition-shadow"> <div class="yorha-panel-content"> <div class="flex justify-between"> <div class="flex-1"> <div class="flex items-center gap-2"> <h3 class="font-semibold">{citation.title}</h3>
+  </div> </div> {:else} {#each Array.isArray(filteredCitations) ? filteredCitations: [] as citation} <div class="hover:shadow-md transition-shadow"> <div class="yorha-panel-content"> <div class="flex justify-between"> <div class="flex-1"> <div class="flex items-center gap-2"> <h3 class="font-semibold">{citation.title}</h3>
  <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{citation.category}</span>
   {#if citation.relevanceScore > 80} <span class="px-2 py-1 rounded text-xs font-medium bg-blue-500">High Relevance</span> {/if}
   </div>

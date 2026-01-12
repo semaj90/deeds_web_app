@@ -92,39 +92,39 @@
  <!-- Evidence, Grid --> <section class="evidence-section">
   {#if $report.settings.layout === 'masonry'} <section class="space-y-4"> <MasonryGridComponent items={ evidenceSearchResults } columnWidth={ 250 } gutter={ 12 } let, item >
                 <EvidenceCard evidence={ item } compact={ true } >
-                  <!-- actions slot, content, using `item` --> <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
+                  <!-- actions slot, content, using `item` --> <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:bg-gray-100 bits-btn"
                     onclick={() => handleViewEvidence(item)} title="View evidence"
                   > <Eye size={ 14 } /> </Button>
- <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
+ <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:bg-gray-100 bits-btn"
                     onclick={() => handleCompareEvidence(item)} title="Analyze & Compare with Legal Documents"
                     disabled={comparingId === item.id} >
   {#if comparingId === item.id} <Loader2 size={ 14 } class="animate-spin" /> {:else} <Search size={ 14 } /> {/if}
   </Button>
-  {#if item.url || item.file} <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
+  {#if item.url || item.file} <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:bg-gray-100 bits-btn"
                       onclick={() => handleDownloadEvidence(item)} title="Download"
                     > <Download size={ 14 } /> </Button> {/if}
-  <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
+  <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:bg-gray-100 bits-btn"
                     onclick={() => handleEditEvidence(item)} title="Edit evidence"
                   > <PenLine size={ 14 } /> </Button>
- <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
+ <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:bg-gray-100 bits-btn"
                     onclick={() => handleDeleteEvidence(item)} title="Delete evidence"
                   > <Trash2 size={ 14 } /> </Button> </EvidenceCard> </MasonryGridComponent> </section> {:else} <div>
   {#each evidenceSearchResults as evidence (evidence.id)} <EvidenceCard { evidence } compact={ true } >
-                  <!-- actions slot, content, using `evidence` --> <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
+                  <!-- actions slot, content, using `evidence` --> <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:bg-gray-100 bits-btn"
                     onclick={() => handleViewEvidence(evidence)} title="View evidence"
                   > <Eye size={ 14 } /> </Button>
- <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
+ <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:bg-gray-100 bits-btn"
                     onclick={() => handleCompareEvidence(evidence)} title="Analyze & Compare with Legal Documents"
                     disabled={comparingId === evidence.id} >
   {#if comparingId === evidence.id} <Loader2 size={ 14 } class="animate-spin" /> {:else} <Search size={ 14 } /> {/if}
   </Button>
-  {#if evidence.url || evidence.file} <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
+  {#if evidence.url || evidence.file} <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:bg-gray-100 bits-btn"
                       onclick={() => handleDownloadEvidence(evidence)} title="Download"
                     > <Download size={ 14 } /> </Button> {/if}
-  <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
+  <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:bg-gray-100 bits-btn"
                     onclick={() => handleEditEvidence(evidence)} title="Edit evidence"
                   > <PenLine size={ 14 } /> </Button>
- <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
+ <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:bg-gray-100 bits-btn"
                     onclick={() => handleDeleteEvidence(evidence)} title="Delete evidence"
                   > <Trash2 size={ 14 } /> </Button> </EvidenceCard> {/each} {/if} {#if evidenceSearchResults.length === 0} <div> <p>No evidence found</p>
  <small>Add evidence to enhance your report</small> {/if}
@@ -202,16 +202,16 @@
  <Button.Root class="add-evidence-btn bits-btn" onclick={() => handleAddNewEvidence()}> <!-- Changed Button.Root, to, Button --> <Plus size={ 16 } /> </Button> </div>
  <div class="evidence-grid-panel"> <!-- Use the, new, alias, MasonryGridComponent --> <MasonryGridComponent items={$report.attachedEvidence} columnWidth={ 200 } gutter={ 8 } let, item >
             <EvidenceCard evidence={ item } compact={ true } >
-              <!-- actions slot, content, using `item` --> <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
+              <!-- actions slot, content, using `item` --> <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:bg-gray-100 bits-btn"
                 onclick={() => handleViewEvidence(item)} title="View evidence"
               > <Eye size={ 14 } /> </Button>
-  {#if item.url || item.file} <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
+  {#if item.url || item.file} <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:bg-gray-100 bits-btn"
                   onclick={() => handleDownloadEvidence(item)} title="Download"
                 > <Download size={ 14 } /> </Button> {/if}
-  <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
+  <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:bg-gray-100 bits-btn"
                 onclick={() => handleEditEvidence(item)} title="Edit evidence"
               > <PenLine size={ 14 } /> </Button>
- <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover, bg-gray-100 bits-btn"
+ <Button class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:bg-gray-100 bits-btn"
                 onclick={() => handleDeleteEvidence(item)} title="Delete evidence"
               > <Trash2 size={ 14 } /> </Button> </EvidenceCard> </MasonryGridComponent> </div> </aside> {/if}
   </div> </div>

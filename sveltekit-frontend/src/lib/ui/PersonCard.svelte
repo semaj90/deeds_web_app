@@ -33,7 +33,7 @@
 </script>
 
 <div
- class="panel-soft p-4 cursor-pointer hover, bg-panel transition-colors"
+ class="panel-soft p-4 cursor-pointer hover:bg-panel transition-colors"
  onclick={ onclick }
  role="button"
  tabindex="0"

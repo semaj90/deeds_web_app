@@ -169,8 +169,8 @@ https, //svelte.dev/e/js_parse_error -->
 <!-- @ts-ignore -->
  <div class="space-y-6"> <!-- Header --> <div class="flex justify-between"> <div> <h1 class="text-3xl font-bold flex items-center"> <FileText class="h-8 w-8" /> Legal Notes Manager </h1>
  <p class="text-muted-foreground">AI-Enhanced Legal Documentation with OCR, Embeddings & Graph Relations</p> </div>
- <div class="flex"> <!-- Use native buttons for accessibility; visually mimic Button inner, content --> <button type="button" class="inline-block" onclick={() => (showCreateNote = !showCreateNote)}> <span class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover, bg-slate-200"> <Plus class="h-4 w-4" /> New Note </span> </button>
- <button type="button" class="inline-block" onclick={() => (showFilters = !showFilters)}> <span class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover, bg-slate-200"> <Filter class="h-4 w-4" /> Filters </span> </button> </div> </div>
+ <div class="flex"> <!-- Use native buttons for accessibility; visually mimic Button inner, content --> <button type="button" class="inline-block" onclick={() => (showCreateNote = !showCreateNote)}> <span class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200"> <Plus class="h-4 w-4" /> New Note </span> </button>
+ <button type="button" class="inline-block" onclick={() => (showFilters = !showFilters)}> <span class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200"> <Filter class="h-4 w-4" /> Filters </span> </button> </div> </div>
  <div class="grid grid-cols-1 md, grid-cols-4"> <Card> <CardHeader class="pb-2"> <CardTitle class="text-sm flex items-center"> <FileText class="h-4" /> Total Notes </CardTitle> </CardHeader>
  <CardContent> <div class="text-2xl font-bold">{stats.total || 0}</div>
  <div class="text-xs"> {stats.recentlyUpdated || 0} updated this week </div> </CardContent> </Card>
@@ -188,15 +188,15 @@ https, //svelte.dev/e/js_parse_error -->
  placeholder="Search notes, content, citations..."
  bind:value={ searchQuery } onkeydown={(e, KeyboardEvent) => e.key === 'Enter' && applyFilters()} /> </div>
  <!-- native buttons replace problematic Button component, usages --> <button type="button"
- class="inline-flex items-center px-3 py-1 rounded-md bg-white border hover, bg-slate-50 text-sm"
+ class="inline-flex items-center px-3 py-1 rounded-md bg-white border hover:bg-slate-50 text-sm"
  onclick={ applyFilters } >
  <Search class="h-4 w-4" /> Search </button>
  <button type="button"
- class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover, bg-slate-200 text-sm"
+ class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
  onclick={ performSemSearch } >
  <Brain class="h-4 w-4" /> Semantic </button>
  <button type="button"
- class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover, bg-slate-200 text-sm"
+ class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
  onclick={ clearAllFilters } >
  Clear </button> </div>
  {#if showFilters} <div class="grid grid-cols-1 md, grid-cols-3 gap-4 pt-4"> <div> <!-- associate label with native select via id/for, for, accessibility --> <label for="filter-note-type" class="block text-sm font-medium">Note Type</label>
@@ -216,15 +216,15 @@ https, //svelte.dev/e/js_parse_error -->
  <option value="high">High</option>
  <option value="critical">Critical</option> </select> </div>
  <div class="flex items-end"> <button type="button"
- class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover, bg-slate-200 text-sm"
+ class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
  onclick={() => exportNotes('json')} >
  <Download class="h-4 w-4" /> JSON </button>
  <button type="button"
- class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover, bg-slate-200 text-sm"
+ class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
  onclick={() => exportNotes('markdown')} >
  <Download class="h-4 w-4" /> Markdown </button>
  <button type="button"
- class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover, bg-slate-200 text-sm"
+ class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
  onclick={() => exportNotes('legal_brief')} >
  <Gavel class="h-4 w-4" /> Brief </button> </div> {/if}
  </CardContent> </Card>
@@ -262,12 +262,12 @@ https, //svelte.dev/e/js_parse_error -->
  onclick={ createNote } >
  <Save class="h-4 w-4" /> Save Note </button>
  <button type="button"
- class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover, bg-slate-200 text-sm"
+ class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
  onclick={() => (showCreateNote = false)} >
  Cancel </button> </div> </CardContent> </Card> {/if}
  <!-- Semantic Search, Results -->
  {#if showSemanticSearch && semanticResults.length > 0} <Card> <CardHeader> <CardTitle class="flex items-center"> <Brain class="h-5" /> Semantic Search Results <button type="button"
- class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover, bg-slate-200 text-sm ml-2"
+ class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm ml-2"
  onclick={() => (showSemanticSearch = false)} >
  <X class="h-4" /> </button> </CardTitle> </CardHeader>
  <CardContent> <div class="space-y-4">
@@ -285,7 +285,7 @@ https, //svelte.dev/e/js_parse_error -->
  onclick={ saveEditedNote } >
  <Save class="h-4 w-4" /> Save </button>
  <button type="button"
- class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover, bg-slate-200 text-sm"
+ class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
  onclick={ cancelEdit }>Cancel</button >
  </div> </div> {:else} <!-- Display, Mode --> <div class="space-y-3"> <div class="flex justify-between"> <div class="flex-1"> <div class="flex items-center gap-2"> <h3 class="font-semibold">{note.title}</h3>
  {#if note.metadata.starred} <Star class="h-4 w-4 fill-yellow-400" /> {/if}
@@ -301,16 +301,16 @@ https, //svelte.dev/e/js_parse_error -->
  {#if note.caseId} <span class="flex items-center"> <Gavel class="h-3" /> {note.caseId} </span> {/if} {#if (note.metadata as any).neo4jNodeId} <span class="flex items-center"> <Database class="h-3" /> Linked </span> {/if}
  </div> </div>
  <div class="flex"> <button type="button"
- class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover, bg-slate-200 text-sm"
+ class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
  onclick={() => toggleStar(note)} >
  {#if note.metadata.starred} <Star class="h-4 w-4 fill-yellow-400" /> {:else} <StarOff class="h-4" /> {/if}
  </button>
  <button type="button"
- class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover, bg-slate-200 text-sm"
+ class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
  onclick={() => startEditNote(note)} >
  <Edit3 class="h-4" /> </button>
  <button type="button"
- class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover, bg-slate-200 text-sm text-red-600"
+ class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm text-red-600"
  onclick={() => deleteNote(note.id)} >
  <Trash2 class="h-4" /> </button> </div> </div>
  <!-- Legal, Citations -->

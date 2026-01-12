@@ -87,7 +87,7 @@
                     type="text"
                     bind:value={searchQuery}
                     placeholder="Search by file, message, or code..."
-                    class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus: outline-none, focus: ring-2, focus, ring-blue-500"
+                    class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus: outline-none, focus: ring-2, focus:ring-blue-500"
                 />
             </div>
 
@@ -96,7 +96,7 @@
                 <label class="block text-sm text-slate-400 mb-2">Error Code</label>
                 <select
                     bind:value={selectedErrorCode}
-                    class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white focus: outline-none, focus: ring-2, focus, ring-blue-500"
+                    class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white focus: outline-none, focus: ring-2, focus:ring-blue-500"
                 >
                     <option value="">All Codes</option>
                     {#each Object.entries(data.errorCodeCounts).sort((a, b) => b[1] - a[1]) as [code, count]}
@@ -110,7 +110,7 @@
                 <label class="block text-sm text-slate-400 mb-2">Surface</label>
                 <select
                     bind:value={selectedSurface}
-                    class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white focus: outline-none, focus: ring-2, focus, ring-blue-500"
+                    class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white focus: outline-none, focus: ring-2, focus:ring-blue-500"
                 >
                     <option value="">All Surfaces</option>
                     {#each Object.entries(data.surfaceCounts).sort((a, b) => b[1] - a[1]) as [s, count]}
@@ -124,7 +124,7 @@
                 <label class="block text-sm text-slate-400 mb-2">Tech</label>
                 <select
                     bind:value={selectedTech}
-                    class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white focus: outline-none, focus: ring-2, focus, ring-blue-500"
+                    class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white focus: outline-none, focus: ring-2, focus:ring-blue-500"
                 >
                     <option value="">All Tech</option>
                     {#each Object.entries(data.techCounts).sort((a, b) => b[1] - a[1]) as [t, count]}
@@ -136,13 +136,13 @@
             <!-- Buttons -->
             <button
                 onclick={applyFilters}
-                class="px-6 py-2 bg-blue-600 hover, bg-blue-500 text-white rounded-lg font-medium transition-colors"
+                class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
             >
                 Apply
             </button>
             <button
                 onclick={clearFilters}
-                class="px-6 py-2 bg-slate-600 hover, bg-slate-500 text-white rounded-lg font-medium transition-colors"
+                class="px-6 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-lg font-medium transition-colors"
             >
                 Clear
             </button>
@@ -162,7 +162,7 @@
     {:else}
         <div class="space-y-3">
             {#each filteredErrors() as error}
-                <div class="bg-slate-800/60 backdrop-blur-sm rounded-xl p-4 border border-slate-700/50 hover, border-blue-500/30 transition-colors">
+                <div class="bg-slate-800/60 backdrop-blur-sm rounded-xl p-4 border border-slate-700/50 hover:border-blue-500/30 transition-colors">
                     <div class="flex items-start justify-between gap-4">
                         <div class="flex-1 min-w-0">
                             <!-- Error Code & Message -->
@@ -176,7 +176,7 @@
                                 {#if error.clusterId}
                                     <a
                                         href="/command-center/codebase/clusters/{error.clusterId}"
-                                        class="px-2 py-0.5 text-xs bg-purple-500/20 text-purple-300 rounded-full hover, bg-purple-500/30"
+                                        class="px-2 py-0.5 text-xs bg-purple-500/20 text-purple-300 rounded-full hover:bg-purple-500/30"
                                     >
                                         {error.clusterId}
                                     </a>
@@ -214,7 +214,7 @@
 
         {#if data.hasNextPage}
             <div class="mt-6 text-center">
-                <button class="px-6 py-2 bg-slate-700 hover, bg-slate-600 text-white rounded-lg">
+                <button class="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg">
                     Load More
                 </button>
             </div>

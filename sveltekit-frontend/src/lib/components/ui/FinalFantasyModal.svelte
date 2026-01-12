@@ -32,7 +32,7 @@
         > <h2 id="modal-title"
             class="text-lg font-bold text-white" tracking-wider uppercase text-shadow-lg shadow-black/50"
           > { title } </h2>
- <button class="absolute top-2 right-2" w-6 h-6 text-white hover, text-red-300 transition-colors duration-200 font-bold text-xl, leading-none"
+ <button class="absolute top-2 right-2" w-6 h-6 text-white hover:text-red-300 transition-colors duration-200 font-bold text-xl, leading-none"
             onclick={ handleClose } aria-label="Close modal"
           > Ã—
           </button> {/if}

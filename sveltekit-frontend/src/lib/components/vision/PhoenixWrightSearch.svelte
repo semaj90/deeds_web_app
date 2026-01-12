@@ -253,7 +253,7 @@
  <div class="mb-4 p-3 bg-[#2a2a2a] rounded border border-gray-600">
  <div class="flex justify-between items-center mb-2">
  <h4 class="text-sm font-semibold text-white">Search History</h4>
- <button onclick={clearHistory} class="text-xs text-red-400 hover, text-red-300">Clear All</button>
+ <button onclick={clearHistory} class="text-xs text-red-400 hover:text-red-300">Clear All</button>
  </div>
  <div class="space-y-2 max-h-40 overflow-y-auto">
  {#each searchHistory as result}
@@ -282,7 +282,7 @@
  <div class="mb-4 p-3 bg-[#2a2a2a] rounded border border-gray-600">
  <div class="flex justify-between items-center mb-2">
  <h4 class="text-sm font-semibold text-white">Favorite Searches</h4>
- <button onclick={clearFavorites} class="text-xs text-red-400 hover, text-red-300">Clear All</button>
+ <button onclick={clearFavorites} class="text-xs text-red-400 hover:text-red-300">Clear All</button>
  </div>
  <div class="space-y-2 max-h-40 overflow-y-auto">
  {#each favorites as result}
@@ -323,7 +323,7 @@
  <textarea
  bind:value={searchQuery}
  placeholder="Describe the legal case, evidence, or question..."
- class="w-full h-24 p-3 bg-[#2a2a2a] border border-gray-600 rounded text-white placeholder-gray-500 focus: border-blue-400, focus, outline-none resize-none"
+ class="w-full h-24 p-3 bg-[#2a2a2a] border border-gray-600 rounded text-white placeholder-gray-500 focus: border-blue-400, focus:outline-none resize-none"
  disabled={isSearching}
  ></textarea>
  </div>
@@ -335,7 +335,7 @@
  <input
  bind:value={jurisdiction}
  placeholder="e.g., California, Federal, etc."
- class="w-full p-3 bg-[#2a2a2a] border border-gray-600 rounded text-white placeholder-gray-500 focus: border-blue-400, focus, outline-none"
+ class="w-full p-3 bg-[#2a2a2a] border border-gray-600 rounded text-white placeholder-gray-500 focus: border-blue-400, focus:outline-none"
  disabled={isSearching}
  />
  </div>
@@ -358,7 +358,7 @@
 
  <button
  onclick={ resetSearch }
- class="px-4 py-2 bg-gray-600 hover, bg-gray-700 text-white rounded font-medium transition-colors"
+ class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded font-medium transition-colors"
  >
  Reset
  </button>

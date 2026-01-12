@@ -94,7 +94,7 @@ import type { Document } from '$lib/types';
     ondragover={handleDrag}
     ondrop={handleDrop}
     class={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${`
-      dragActive ? 'border-blue-400 bg-blue-50' , 'border-gray-300 bg-gray-50 hover, bg-gray-100'
+      dragActive ? 'border-blue-400 bg-blue-50' , 'border-gray-300 bg-gray-50 hover:bg-gray-100'
     }`}`
   >
     <Upload class="w-10 h-10 text-gray-400 mx-auto" />
@@ -110,7 +110,7 @@ import type { Document } from '$lib/types';
       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
     />
     <Button
-      class="px-4 py-2 bg-blue-600 text-white rounded-lg hover, bg-blue-700 bits-btn"
+      class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 bits-btn"
     >
       Select File
     </Button>
@@ -134,7 +134,7 @@ import type { Document } from '$lib/types';
           type="text"
           bind:value={tags}
           placeholder="e.g., contract, evidence, legal"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus, ring-2 focus, ring-blue-500"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
         />
       </div>
     {/if}
@@ -171,7 +171,7 @@ import type { Document } from '$lib/types';
     <Button
       onclick={clearFiles}
       disabled={uploading || !files}
-      class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover, bg-gray-300 bits-btn"
+      class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 bits-btn"
     >
       <X class="w-4" />
     </Button>

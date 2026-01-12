@@ -170,7 +170,7 @@
  </h2>
  <button
  type="button"
- class="text-slate-300 hover, text-white text-sm"
+ class="text-slate-300 hover:text-white text-sm"
  onclick={ onClose }
  >
  ✕ Close
@@ -234,7 +234,7 @@
  class={`w-full text-left border rounded px-2 py-1 text-xs ${
  s.id === selectedSuggestionId
  ? 'border-emerald-400 bg-emerald-500/10'
- : 'border-slate-700, hover, border-slate-500'
+ : 'border-slate-700, hover:border-slate-500'
  }`}
  onclick={() => (selectedSuggestionId = s.id)}
  >

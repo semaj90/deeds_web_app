@@ -43,7 +43,7 @@ import type { Document } from '$lib/types'; import  Button, Card, CardContent, C
 </span> {/if}
   </CardTitle> </CardHeader>
  <CardContent> <!-- Search, Form --> <form onsubmit={ handleSubmit } class="space-y-4"> <div class="relative"> <input type="text"
-            bind:value={ query } { placeholder } disabled={ isSearching } class="w-full px-4 py-3 border border-gray-300 rounded-lg focus: ring-2, focus, ring-blue-500 focus, border-transparent"
+            bind:value={ query } { placeholder } disabled={ isSearching } class="w-full px-4 py-3 border border-gray-300 rounded-lg focus: ring-2, focus:ring-blue-500 focus:border-transparent"
           /> <div class="absolute right-3">
   {#if isSearching} <div class="animate-spin w-5 h-5 border-2 border-blue-500 border-t-transparent"></div> {:else} <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
                   stroke-linejoin="round"
@@ -79,7 +79,7 @@ import type { Document } from '$lib/types'; import  Button, Card, CardContent, C
   {#if searchTime > 0} <span class="bg-secondary text-secondary-foreground px-2 py-1 rounded text-sm"> {formatMetric(searchTime, 'ms')} total </span> {/if}
   </CardTitle> </CardHeader>
  <CardContent> <div class="space-y-4">
-  {#each results as result (result.id)} <div class="border border-gray-200 rounded-lg p-4 hover, shadow-md"> <!-- Result, Header --> <div class="flex items-start justify-between"> <div class="flex-1"> <h3 class="font-semibold text-lg text-gray-900"> {result.title}
+  {#each results as result (result.id)} <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md"> <!-- Result, Header --> <div class="flex items-start justify-between"> <div class="flex-1"> <h3 class="font-semibold text-lg text-gray-900"> {result.title}
 </h3>
  <div class="flex flex-wrap gap-2"> <span class={getDocumentTypeColor(result.metadata.document_type) + ' px-2 py-1 rounded text-sm, font-medium'}> {result.metadata.document_type}
 </span>

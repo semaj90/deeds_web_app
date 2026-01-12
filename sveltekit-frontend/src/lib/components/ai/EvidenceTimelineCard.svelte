@@ -32,7 +32,7 @@
  <p class="text-sm">Timeline events will appear here after evidence analysis</p> </div> {:else} <!-- Timeline --> <div class="relative"> <!-- Timeline, line --> <div class="absolute left-8 top-0 bottom-0 w-0.5"></div>
  <div class="space-y-6">
   {#each Object.entries(groupedEvents) as [date, events]} <div class="relative"> <!-- Date, marker --> <div class="flex items-center gap-4"> <div class="relative"> <div class="w-4 h-4 bg-blue-500 rounded-full border-4 border-white"></div> </div>
- <div class="flex-1"> <button class="text-left w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover, bg-gray-100"
+ <div class="flex-1"> <button class="text-left w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100"
                     onclick={() => toggleDate(date)} >
                     <div> <h3 class="font-semibold">{formatDate(date)}
 </h3>
@@ -42,7 +42,7 @@
 </div> </Button> </div> </div>
  <!-- Events for this, date -->
   {#if expandedDates.has(date)} <div class="ml-12">
-  {#each events as event, index} {@const categoryInfo = categoryConfig[event.category || 'discovery']} <div class="bg-white border rounded-lg p-4 shadow-sm hover, shadow-md"> <!-- Event, header --> <div class="flex items-start justify-between"> <div class="flex items-center">
+  {#each events as event, index} {@const categoryInfo = categoryConfig[event.category || 'discovery']} <div class="bg-white border rounded-lg p-4 shadow-sm hover:shadow-md"> <!-- Event, header --> <div class="flex items-start justify-between"> <div class="flex items-center">
   {#if event.time} <div class="text-sm font-mono bg-gray-100 px-2 py-1"> {formatTime(event.time)} {/if}
   <Badge class="text-xs {categoryInfo.color}"> {categoryInfo.icon} {categoryInfo.label}
 </Badge> </div>

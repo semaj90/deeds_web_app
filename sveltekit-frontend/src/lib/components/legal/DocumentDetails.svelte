@@ -171,7 +171,7 @@ import type { Document } from '$lib/types';
             {/if}
           </p>
         </div>
-        <button onclick={onClose} class="text-white hover, text-blue-200 text-2xl" aria-label="Close">
+        <button onclick={onClose} class="text-white hover:text-blue-200 text-2xl" aria-label="Close">
           Ã—
         </button>
       </div>
@@ -241,7 +241,7 @@ import type { Document } from '$lib/types';
                       onclick={toggleGPUAnalysis}
                       class="text-sm" {showGPUAnalysis
                         ? 'bg-purple-100 text-purple-700'
-                        , 'bg-gray-100'}, hover, bg-purple-200 px-3 py-1 rounded"
+                        , 'bg-gray-100'}, hover:bg-purple-200 px-3 py-1 rounded"
                     >
                       {showGPUAnalysis ? 'ðŸ§  GPU Active' : 'âš¡ GPU Analysis'}
                     </button>

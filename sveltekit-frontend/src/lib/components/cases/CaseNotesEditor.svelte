@@ -475,7 +475,7 @@
  <div class="space-y-1">
  {#each searchHits as hit (hit.id)}
  <button
- class="w-full rounded-md border border-slate-800 p-2 text-left hover, bg-slate-900/50"
+ class="w-full rounded-md border border-slate-800 p-2 text-left hover:bg-slate-900/50"
  onclick={() => onSelectHit(hit)}
  >
  <div class="flex items-center justify-between gap-2">

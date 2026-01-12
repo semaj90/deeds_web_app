@@ -194,7 +194,7 @@ interface Props {
   role="button"
   tabindex="0"
 >
-  <Card class="w-64 shadow-lg hover, shadow-xl transition-all">
+  <Card class="w-64 shadow-lg hover:shadow-xl transition-all">
     <!-- Header with, drag, handle -->
     <CardHeader class="pb-2">
       <div class="flex items-center">

@@ -99,7 +99,7 @@ import type { Case } from '$lib/types';
 <div
   class={cn(
     'legal-precedent-card bg-yorha-bg-secondary border border-yorha-border rounded-lg overflow-hidden',
-    interactive && 'hover, border-yorha-primary/30 transition-colors',
+    interactive && 'hover:border-yorha-primary/30 transition-colors',
     precedent.overruled && 'opacity-75',
     className
   )}
@@ -292,7 +292,7 @@ import type { Case } from '$lib/types';
             href={precedent.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center gap-1 px-2 py-1 text-xs font-mono text-yorha-text-secondary hover, text-yorha-primary transition-colors"
+            class="inline-flex items-center gap-1 px-2 py-1 text-xs font-mono text-yorha-text-secondary hover:text-yorha-primary transition-colors"
           >
             <ExternalLink class="w-3" />
             Source
@@ -303,7 +303,7 @@ import type { Case } from '$lib/types';
             href={precedent.pdfUrl}
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center gap-1 px-2 py-1 text-xs font-mono text-yorha-text-secondary hover, text-yorha-primary transition-colors"
+            class="inline-flex items-center gap-1 px-2 py-1 text-xs font-mono text-yorha-text-secondary hover:text-yorha-primary transition-colors"
           >
             <BookOpen class="w-3" />
             PDF

@@ -342,15 +342,15 @@
  <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">Total: {persons.length}</span>
  </div>
  <div class="flex gap-2">
- <Button variant="outline" class="border-yellow-600 text-yellow-400 hover, bg-yellow-900/20 bits-btn" onclick={ loadPersons }>
+ <Button variant="outline" class="border-yellow-600 text-yellow-400 hover:bg-yellow-900/20 bits-btn" onclick={ loadPersons }>
  <RefreshCw class="w-4 h-4 mr-2" /> Refresh
  </Button>
- <Button variant="outline" class="border-yellow-600 text-yellow-400 hover, bg-yellow-900/20 bits-btn" onclick={ exportData }>
+ <Button variant="outline" class="border-yellow-600 text-yellow-400 hover:bg-yellow-900/20 bits-btn" onclick={ exportData }>
  <Download class="w-4 h-4 mr-2" /> Export
  </Button>
  <Dialog bind, open={showAddModal}>
  <DialogTrigger asChild> <!-- Updated to DialogTrigger with asChild for bits-ui -->
- <Button class="bg-yellow-600 text-gray-900 hover, bg-yellow-700 bits-btn">
+ <Button class="bg-yellow-600 text-gray-900 hover:bg-yellow-700 bits-btn">
  <Plus class="w-4 h-4 mr-2" /> Add Person
  </Button>
  </DialogTrigger>
@@ -432,7 +432,7 @@
  </div>
  </div>
  <DialogFooter> <!-- Updated to DialogFooter -->
- <Button type="submit" onclick={handleAddPerson} disabled={isLoading} class="bg-yellow-600 text-gray-900 hover, bg-yellow-700 bits-btn">
+ <Button type="submit" onclick={handleAddPerson} disabled={isLoading} class="bg-yellow-600 text-gray-900 hover:bg-yellow-700 bits-btn">
  {#if isLoading}
  Adding...
  {:else}
@@ -450,7 +450,7 @@
  <aside class={cn("w-full md:w-64 p-4 bg-gray-900 border border-yellow-600/30 rounded-lg", showFilters ? 'block' : 'hidden, md, block')}>
  <div class="flex justify-between items-center mb-4">
  <h2 class="text-xl font-semibold text-yellow-400">Filters</h2>
- <Button variant="ghost" size="sm" onclick={clearFilters} class="text-gray-400 hover, text-yellow-400 bits-btn">Clear All</Button>
+ <Button variant="ghost" size="sm" onclick={clearFilters} class="text-gray-400 hover:text-yellow-400 bits-btn">Clear All</Button>
  </div>
 
  <div class="space-y-4">
@@ -613,9 +613,9 @@
  <p class="text-gray-400 line-clamp-2">{person.profileData.notes || 'No notes available.'}</p>
  </div>
  <div class="flex justify-end gap-2 p-4 border-t border-yellow-600/20">
- <Button variant="ghost" size="sm" class="text-gray-400 hover, text-yellow-400 bits-btn"><Eye class="w-4 h-4" /> View</Button>
- <Button variant="ghost" size="sm" class="text-gray-400 hover, text-yellow-400 bits-btn"><Edit class="w-4 h-4" /> Edit</Button>
- <Button variant="destructive" size="sm" class="bg-red-800/30 text-red-400 hover, bg-red-800/50 bits-btn"><Trash2 class="w-4 h-4" /> Remove</Button>
+ <Button variant="ghost" size="sm" class="text-gray-400 hover:text-yellow-400 bits-btn"><Eye class="w-4 h-4" /> View</Button>
+ <Button variant="ghost" size="sm" class="text-gray-400 hover:text-yellow-400 bits-btn"><Edit class="w-4 h-4" /> Edit</Button>
+ <Button variant="destructive" size="sm" class="bg-red-800/30 text-red-400 hover:bg-red-800/50 bits-btn"><Trash2 class="w-4 h-4" /> Remove</Button>
  </div>
  </Card>
  {/each}
@@ -643,9 +643,9 @@
  <Badge class={getRelationshipColor(person.relationship)}>{person.relationship.replace(/_/g, ' ').toUpperCase()}</Badge>
  </div>
  <div class="flex gap-2">
- <Button variant="ghost" size="sm" class="text-gray-400 hover, text-yellow-400 bits-btn"><Eye class="w-4 h-4" /></Button>
- <Button variant="ghost" size="sm" class="text-gray-400 hover, text-yellow-400 bits-btn"><Edit class="w-4 h-4" /></Button>
- <Button variant="destructive" size="sm" class="bg-red-800/30 text-red-400 hover, bg-red-800/50 bits-btn"><Trash2 class="w-4 h-4" /></Button>
+ <Button variant="ghost" size="sm" class="text-gray-400 hover:text-yellow-400 bits-btn"><Eye class="w-4 h-4" /></Button>
+ <Button variant="ghost" size="sm" class="text-gray-400 hover:text-yellow-400 bits-btn"><Edit class="w-4 h-4" /></Button>
+ <Button variant="destructive" size="sm" class="bg-red-800/30 text-red-400 hover:bg-red-800/50 bits-btn"><Trash2 class="w-4 h-4" /></Button>
  </div>
  </Card>
  {/each}

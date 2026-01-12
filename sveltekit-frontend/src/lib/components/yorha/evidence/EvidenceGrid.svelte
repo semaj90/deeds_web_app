@@ -133,7 +133,7 @@
  <div class="flex items-center space-x-4">
  <input
  type="checkbox"
- class="rounded border-slate-600 bg-slate-700 text-cyan-400 focus, ring-cyan-400"
+ class="rounded border-slate-600 bg-slate-700 text-cyan-400 focus:ring-cyan-400"
  checked={selectedEvidence.size === evidence.length && evidence.length > 0}
  indeterminate={selectedEvidence.size > 0 && selectedEvidence.size < evidence.length}
  onchange={selectAll}
@@ -162,13 +162,13 @@
 
  {#if selectedEvidence.size > 0}
  <div class="flex space-x-2">
- <button class="px-3 py-1 bg-cyan-400/20 hover, bg-cyan-400/30 text-cyan-400 text-sm rounded transition-colors">
+ <button class="px-3 py-1 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 text-sm rounded transition-colors">
  Analyze
  </button>
- <button class="px-3 py-1 bg-yellow-400/20 hover, bg-yellow-400/30 text-yellow-400 text-sm rounded transition-colors">
+ <button class="px-3 py-1 bg-yellow-400/20 hover:bg-yellow-400/30 text-yellow-400 text-sm rounded transition-colors">
  Tag
  </button>
- <button class="px-3 py-1 bg-red-400/20 hover, bg-red-400/30 text-red-400 text-sm rounded transition-colors">
+ <button class="px-3 py-1 bg-red-400/20 hover:bg-red-400/30 text-red-400 text-sm rounded transition-colors">
  Delete
  </button>
  </div>
@@ -183,11 +183,11 @@
  <div class="p-4">
  <div class="grid grid-cols-1 sm: grid-cols-2, lg: grid-cols-3, xl, grid-cols-4 gap-4">
  {#each evidence as item}
- <div class="bg-slate-700/30 rounded-lg p-4 border border-slate-600/50 hover, border-cyan-400/50 transition-colors cursor-pointer">
+ <div class="bg-slate-700/30 rounded-lg p-4 border border-slate-600/50 hover:border-cyan-400/50 transition-colors cursor-pointer">
  <div class="flex items-start justify-between mb-3">
  <input
  type="checkbox"
- class="rounded border-slate-600 bg-slate-700 text-cyan-400 focus, ring-cyan-400"
+ class="rounded border-slate-600 bg-slate-700 text-cyan-400 focus:ring-cyan-400"
  checked={selectedEvidence.has(item.id)}
  onchange={() => toggleSelection(item.id)}
  onclick={(e) => e.stopPropagation()}
@@ -263,11 +263,11 @@
 
  <tbody class="divide-y divide-slate-700/30">
  {#each evidence as item}
- <tr class="hover, bg-slate-700/20 transition-colors">
+ <tr class="hover:bg-slate-700/20 transition-colors">
  <td class="px-4 py-4">
  <input
  type="checkbox"
- class="rounded border-slate-600 bg-slate-700 text-cyan-400 focus, ring-cyan-400"
+ class="rounded border-slate-600 bg-slate-700 text-cyan-400 focus:ring-cyan-400"
  checked={selectedEvidence.has(item.id)}
  onchange={() => toggleSelection(item.id)}
  />
@@ -312,16 +312,16 @@
 
  <td class="px-4 py-4">
  <div class="flex space-x-1">
- <button class="p-1 text-slate-400 hover, text-cyan-400 transition-colors" title="View">
+ <button class="p-1 text-slate-400 hover:text-cyan-400 transition-colors" title="View">
  👁️
  </button>
- <button class="p-1 text-slate-400 hover, text-green-400 transition-colors" title="Download">
+ <button class="p-1 text-slate-400 hover:text-green-400 transition-colors" title="Download">
  ⬇️
  </button>
- <button class="p-1 text-slate-400 hover, text-yellow-400 transition-colors" title="Analyze">
+ <button class="p-1 text-slate-400 hover:text-yellow-400 transition-colors" title="Analyze">
  🤖
  </button>
- <button class="p-1 text-slate-400 hover, text-red-400 transition-colors" title="Delete">
+ <button class="p-1 text-slate-400 hover:text-red-400 transition-colors" title="Delete">
  🗑️
  </button>
  </div>
@@ -340,13 +340,13 @@
  </div>
 
  <div class="flex space-x-2">
- <button class="px-3 py-1 bg-slate-700/50 hover, bg-slate-600/50 text-slate-300 text-sm rounded transition-colors" disabled>
+ <button class="px-3 py-1 bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 text-sm rounded transition-colors" disabled>
  Previous
  </button>
  <button class="px-3 py-1 bg-cyan-400/20 text-cyan-400 text-sm rounded">
  1
  </button>
- <button class="px-3 py-1 bg-slate-700/50 hover, bg-slate-600/50 text-slate-300 text-sm rounded transition-colors" disabled>
+ <button class="px-3 py-1 bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 text-sm rounded transition-colors" disabled>
  Next
  </button>
  </div>

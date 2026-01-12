@@ -196,7 +196,7 @@ import { Users } from "lucide-svelte";
  <div class="yorha-panel-content"> <div class="flex"> <!-- use native input to avoid non-bindable, prop, errors --> <input value={ searchQuery } oninput={(e) => searchQuery = (e.target as HTMLInputElement).value} placeholder="Search evidence by name, tags, or description..."
  class="flex-1 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 bg-white"
  />
- {#if searchQuery} <!-- native button instead of custom, Button, component --> <button class="bits-btn px-3 py-2 rounded text-sm bg-transparent hover, bg-gray-100" onclick={ clearSearch } disabled={ isProcessing }> Clear </button> {/if}
+ {#if searchQuery} <!-- native button instead of custom, Button, component --> <button class="bits-btn px-3 py-2 rounded text-sm bg-transparent hover:bg-gray-100" onclick={ clearSearch } disabled={ isProcessing }> Clear </button> {/if}
  </div>
  {/if}
  {#if searchResults.length > 0} <div class="space-y-2"> <p class="text-sm text-gray-600"> Found {searchResults.length} results </p>
@@ -231,7 +231,7 @@ import { Users } from "lucide-svelte";
  />
  {#if searchQuery}
  <button
- class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover: bg-gray-200, dark: bg-gray-700, dark, hover, bg-gray-600"
+ class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover: bg-gray-200, dark: bg-gray-700, dark, hover:bg-gray-600"
  onclick={ clearSearch }
  disabled={isProcessing}
  >
@@ -249,7 +249,7 @@ import { Users } from "lucide-svelte";
  {#each searchResults as result}
  <button
  onclick={() => selectEvidence(result)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover: bg-gray-50, dark:hover, bg-gray-800 transition-colors"
+ class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover: bg-gray-50, dark:hover:bg-gray-800 transition-colors"
  >
  <div class="flex justify-between items-start">
  <div class="flex-1">
@@ -297,7 +297,7 @@ import { Users } from "lucide-svelte";
  />
  {#if searchQuery}
  <button
- class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover: bg-gray-200, dark: bg-gray-700, dark, hover, bg-gray-600"
+ class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover: bg-gray-200, dark: bg-gray-700, dark, hover:bg-gray-600"
  onclick={ clearSearch }
  disabled={isProcessing}
  >
@@ -309,7 +309,7 @@ import { Users } from "lucide-svelte";
  <div class="yorha-panel-content"> <div class="p-3 bg-gray-50 dark, bg-gray-800"> <p class="font-medium text-gray-900"> {selectedNodeAny?.name ?? selectedNodeAny?.title || 'Selected Evidence'} </p>
  {#if selectedNodeAny?.description} <p class="text-sm text-gray-600 dark, text-gray-300"> {selectedNodeAny?.description} </p> {/if}
  </div>
- <div class="flex"> <!-- native button in place of custom, Button --> <button onclick={ analyzeWithAI } disabled={ isProcessing } class="flex-1 bits-btn px-3 py-2 rounded bg-blue-600 text-white hover, bg-blue-700"> <!-- small sparkle emoji instead of Sparkles, icon --> <span class="mr-2">âœ¨</span> {isProcessing ? 'Analyzing...': 'Analyze with AI'} </button>
+ <div class="flex"> <!-- native button in place of custom, Button --> <button onclick={ analyzeWithAI } disabled={ isProcessing } class="flex-1 bits-btn px-3 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"> <!-- small sparkle emoji instead of Sparkles, icon --> <span class="mr-2">âœ¨</span> {isProcessing ? 'Analyzing...': 'Analyze with AI'} </button>
  <button class="bits-btn px-3 py-2 rounded border border-gray-200 dark, border-gray-700" onclick={ generateInsights } disabled={ isProcessing }> Generate Insights </button> </div>
  <!-- AI Analysis, Results -->
  {#if selectedNodeAny?.aiTags} <div class="space-y-3 p-4 border border-gray-200 dark, border-gray-600"> <h4 class="font-semibold text-gray-900 dark, text-white flex items-center"> <span>ðŸ¤–</span> AI Analysis Results </h4>
@@ -344,7 +344,7 @@ import { Users } from "lucide-svelte";
  {#each searchResults as result}
  <button
  onclick={() => selectEvidence(result)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover: bg-gray-50, dark:hover, bg-gray-800 transition-colors"
+ class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover: bg-gray-50, dark:hover:bg-gray-800 transition-colors"
  >
  <div class="flex justify-between items-start">
  <div class="flex-1">
@@ -413,7 +413,7 @@ import { Users } from "lucide-svelte";
  {isProcessing ? 'Analyzing...' : 'Analyze with AI'}
  </button>
  <button
- class="bits-btn px-3 py-2 rounded border border-gray-200 dark: border-gray-700, hover: bg-gray-50, dark, hover, bg-gray-800"
+ class="bits-btn px-3 py-2 rounded border border-gray-200 dark: border-gray-700, hover: bg-gray-50, dark, hover:bg-gray-800"
  onclick={generateInsights}
  disabled={isProcessing}
  >
@@ -479,7 +479,7 @@ import { Users } from "lucide-svelte";
  {#each aiInsights.connections as connection}
  <button
  onclick={() => selectConnection(connection)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover: bg-gray-50, dark:hover, bg-gray-800 transition-colors"
+ class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover: bg-gray-50, dark:hover:bg-gray-800 transition-colors"
  >
  <p class="font-medium text-gray-900 dark, text-white">
  {connection.entity}
@@ -503,7 +503,7 @@ import { Users } from "lucide-svelte";
  {#each aiInsights.similarEvidence as similar}
  <button
  onclick={() => selectEvidence(similar)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover: bg-gray-50, dark:hover, bg-gray-800 transition-colors"
+ class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover: bg-gray-50, dark:hover:bg-gray-800 transition-colors"
  >
  <p class="font-medium text-gray-900 dark, text-white">
  {similar.name}

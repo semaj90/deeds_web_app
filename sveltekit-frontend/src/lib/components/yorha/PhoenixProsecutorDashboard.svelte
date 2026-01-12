@@ -266,7 +266,7 @@
  <div class="flex gap-2">
  <button
  onclick={toggleProsecutorMode}
- class="px-4 py-2 bg-slate-800 hover, bg-slate-700 rounded-lg text-sm font-medium transition-colors"
+ class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors"
  >
  {isProsecutorMode ? '🔄 Standard Mode' : '⚖️ Prosecutor Mode'}
  </button>
@@ -310,7 +310,7 @@
  <div class="risk-insights-header">
  <p>Risk signals</p>
  <button
- class="text-xs text-slate-300 hover, text-white transition-colors"
+ class="text-xs text-slate-300 hover:text-white transition-colors"
  onclick={() => refreshRecommendations(lastCaseTheory ?? undefined)}
  >
  Refresh intel
@@ -353,19 +353,19 @@
  <div class="bg-slate-900/50 rounded-lg p-4">
  <h3 class="text-md font-bold mb-3 text-purple-400">⚡ Quick Actions</h3>
  <div class="grid grid-cols-2 gap-3">
- <button class="p-3 bg-slate-800 hover, bg-slate-700 rounded-lg text-left transition-colors">
+ <button class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left transition-colors">
  <div class="text-sm font-medium text-cyan-400">🔍 Analyze Evidence</div>
  <div class="text-xs text-slate-400">Run AI analysis on selected items</div>
  </button>
- <button class="p-3 bg-slate-800 hover, bg-slate-700 rounded-lg text-left transition-colors">
+ <button class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left transition-colors">
  <div class="text-sm font-medium text-green-400">📊 Generate Report</div>
  <div class="text-xs text-slate-400">Create investigation summary</div>
  </button>
- <button class="p-3 bg-slate-800 hover, bg-slate-700 rounded-lg text-left transition-colors">
+ <button class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left transition-colors">
  <div class="text-sm font-medium text-yellow-400">🔗 Find Similar Cases</div>
  <div class="text-xs text-slate-400">AI-powered case recommendations</div>
  </button>
- <button class="p-3 bg-slate-800 hover, bg-slate-700 rounded-lg text-left transition-colors">
+ <button class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left transition-colors">
  <div class="text-sm font-medium text-red-400">⚠️ Check Contradictions</div>
  <div class="text-xs text-slate-400">Detect evidence conflicts</div>
  </button>

@@ -210,7 +210,7 @@
 						type="text"
 						bind:value={searchQuery}
 						placeholder="Search for errors (e.g., 'svelte5 runes type error')"
-						class="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg focus: outline-none, focus: ring-2, focus, ring-purple-500"
+						class="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg focus: outline-none, focus: ring-2, focus:ring-purple-500"
 						onkeydown={(e) => e.key === 'Enter' && vectorSearch()}
 					/>
 					<button
@@ -269,7 +269,7 @@
 						{#each clusters as cluster}
 							<DialogRoot>
 								<Dialog.Trigger class="text-left">
-									<div class="bg-gray-700/50 rounded-lg p-4 border border-gray-600 hover, border-purple-500 transition-colors cursor-pointer">
+									<div class="bg-gray-700/50 rounded-lg p-4 border border-gray-600 hover:border-purple-500 transition-colors cursor-pointer">
 										<div class="flex justify-between items-start mb-2">
 											<div class="text-lg font-bold text-purple-400">Cluster {cluster.id}</div>
 											<div class="text-sm text-gray-400">{cluster.error_count} errors</div>
@@ -318,7 +318,7 @@
 											</div>
 										</div>
 
-										<DialogClose class="absolute top-4 right-4 text-gray-400 hover, text-white">
+										<DialogClose class="absolute top-4 right-4 text-gray-400 hover:text-white">
 											✕
 										</DialogClose>
 									</DialogContent>

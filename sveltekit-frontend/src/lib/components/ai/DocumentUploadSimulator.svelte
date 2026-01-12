@@ -74,7 +74,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; in
  <h2 class="text-2xl font-semibold text-white mb-2">Drag & Drop Files Here</h2>
  <p class="text-gray-400 text-sm">or</p>
  <button type="button"
-        class="px-4 py-2 bg-blue-600 hover, bg-blue-700 rounded text-sm transition-colors"
+        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm transition-colors"
         onclick={() => fileInput?.click()} >
         Select Files </button>
  <p class="text-sm text-gray-400">Supports: PDF (OCR), TXT, JSON â€¢ Files under 10MB cached locally</p> </div> </div>
@@ -83,7 +83,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; in
  <div> <h3 class="font-semibold">{upload.filename}</h3>
  <p class="text-sm"> {(upload.size / 1024).toFixed(1)} KB â€¢ {upload.size < MAX_LOCAL_STORAGE_SIZE ? 'Local, Storage', 'PostgreSQL, Only'} </p> </div> </div>
  <button type="button"
-          class="text-gray-400 hover, text-red-400 transition-colors"
+          class="text-gray-400 hover:text-red-400 transition-colors"
           onclick={() => removeUpload(upload.id)} aria-label="Remove upload"
         > âœ•
         </button> </div>
@@ -104,7 +104,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; in
   {#if upload.embeddings} <div class="bg-gray-900 rounded"> <h4 class="text-sm font-semibold text-purple-400">ðŸ§  Vector Embeddings</h4>
  <div class="text-xs"> Generated {upload.embeddings.length}D vector using Nomic-Embed-Text <br /> First, 5 dimensions: [{upload.embeddings .slice(0, 5) .map(n => n.toFixed(3)) .join(', ')}...] </div> {/if}
   <!-- Actions --> <div class="flex"> <button type="button"
-              class="px-4 py-2 bg-blue-600 hover, bg-blue-700 rounded text-sm transition-colors"
+              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm transition-colors"
               onclick={() => downloadProcessedData(upload)} aria-label="Download processed JSON"
             > ðŸ“¥ Download JSON </button>
   {#if upload.localStorageKey} <span class="px-4 py-2 bg-green-600/20 text-green-400 rounded"> ðŸ’¾ Cached Locally </span> {/if}

@@ -40,7 +40,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#if showEditor} <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"> <div class="bg-white rounded-lg max-w-4xl w-full"> <CitationEditor { caseId } citation={ selectedCitation } mode={ editMode } onsave={ handleCitationSave } ondelete={ handleCitationDelete } oncancel={ closeEditor } /> </div> {/if}
   <div class="citations-list"> <!-- Header --> <div class="flex justify-between"> <div> <h2 class="text-xl font-semibold">Citations</h2>
  <p class="text-sm text-gray-600"> Manage legal citations and references for this case </p> </div>
-  {#if !readonly} <button onclick={ createCitation } class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus, outline-none focus, ring-2"
+  {#if !readonly} <button onclick={ createCitation } class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus:outline-none focus:ring-2"
       > Add Citation </button> {/if}
   </div>
  <!-- Filters, and, Search --> <div class="bg-gray-50 p-4"> <div class="grid grid-cols-1 md, grid-cols-4 gap-4"> <!-- Search --> <div> <label class="block text-xs font-medium text-gray-700" for="search">Search</label>
@@ -49,17 +49,17 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus: outline-none, focus:ring-2"
         /> </div>
  <!-- Type, Filter --> <div> <label class="block text-xs font-medium text-gray-700" for="type">Type</label>
-<select id="type"; bind:value={ typeFilter } onchange={ handleFilterChange } class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus, outline-none focus, ring-2"
+<select id="type"; bind:value={ typeFilter } onchange={ handleFilterChange } class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2"
         >
   {#each Array.isArray(citationTypes) ? citationTypes: [] as type} <option value={type.value}>{type.label}</option> {/each}
   </select> </div>
  <!-- Verified, Filter --> <div> <label class="block text-xs font-medium text-gray-700" for="status">Status</label>
-<select id="status"; bind:value={ verifiedFilter } onchange={ handleFilterChange } class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus, outline-none focus, ring-2"
+<select id="status"; bind:value={ verifiedFilter } onchange={ handleFilterChange } class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2"
         > <option value="all">All Citations</option>
  <option value="true">Verified</option>
  <option value="false">Unverified</option> </select> </div>
  <!-- Sort --> <div> <label class="block text-xs font-medium text-gray-700">Sort by</label>
- <div class="flex"> <select bind:value={ sortBy } onchange={ handleSortChange } class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-l-md focus, outline-none focus, ring-2"
+ <div class="flex"> <select bind:value={ sortBy } onchange={ handleSortChange } class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-l-md focus:outline-none focus:ring-2"
           > <option value="relevance">Relevance</option>
  <option value="date">Date</option>
  <option value="title">Title</option> </select>
@@ -73,7 +73,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <!-- Loading, State -->
   {#if isLoading} <div class="text-center"> <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2"></div>
  <p class="text-gray-600">Loading citations...</p> </div> {:else} <!-- Citations, List --> <div class="space-y-4">
-  {#each Array.isArray($filteredCitations) ? $filteredCitations: [] as citation} <div class="bg-white border rounded-lg p-4 hover, shadow-md transition-shadow"
+  {#each Array.isArray($filteredCitations) ? $filteredCitations: [] as citation} <div class="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow"
           role="button" tabindex="0"
                 onclick={() => selectCitation(citation)} >
           <div class="flex justify-between"> <div class="flex-1"> <!-- Citation, Header --> <div class="flex items-center space-x-3"> <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100"> {getCitationTypeLabel(citation.citationType)} </span>
@@ -99,11 +99,11 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#if citation.url || citation.doi} <div class="flex space-x-4">
   {#if citation.url} <a href={citation.url} target="_blank"
                       rel="noopener noreferrer"
-                      class="text-blue-600 hover, text-blue-800"
+                      class="text-blue-600 hover:text-blue-800"
                       onclick >
                       View Source â†— </a> {/if} {#if citation.doi} <a href={`https, //doi.org/${citation.doi}`} target="_blank"
                       rel="noopener noreferrer"
-                      class="text-blue-600 hover, text-blue-800"
+                      class="text-blue-600 hover:text-blue-800"
                       onclick >
  DOI: {citation.doi} â†— </a> {/if} {/if}
   </div>
@@ -120,12 +120,12 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <h3 class="text-lg font-medium text-gray-900">No citations found</h3>
  <p class="text-gray-600"> {searchQuery || typeFilter !== 'all' || verifiedFilter !== 'all'
               ? 'No citations match your current filters.': 'Start by adding your first citation to this case.'} </p>
-  {#if !readonly} <button onclick={ createCitation } class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus, outline-none focus, ring-2"
+  {#if !readonly} <button onclick={ createCitation } class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus:outline-none focus:ring-2"
             > Add First Citation </button> {/if} {/if}
   </div>
  <!-- Pagination -->
   {#if totalPages > 1} <div class="flex justify-between items-center"> <div class="text-sm"> Page { currentPage } of { totalPages } </div>
- <div class="flex"> <button onclick={() => changePage(currentPage - 1)} disabled={currentPage <= 1} class="px-3 py-2 text-sm font-medium text-gray-500 hover, text-gray-700"
+ <div class="flex"> <button onclick={() => changePage(currentPage - 1)} disabled={currentPage <= 1} class="px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-700"
           > Previous </button>
   {#each Array(Math.min(5, totalPages)).fill(0) as _, i} {@const pageNum = Math.max(1, currentPage - 2) + i} {#if pageNum <= totalPages} <button onclick={() => changePage(pageNum)} class={`px-3 py-2 text-sm font-medium rounded ${ pageNum === currentPage ? 'text-white bg-blue-600': 'text-gray-500, hover:text-gray-700'}`} >
                 { pageNum } </button> {/if} {/each}

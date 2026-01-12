@@ -115,7 +115,7 @@
 			</div>
 
 			<button
-				class="px-3 py-2 rounded-lg border border-neutral-700 hover, border-neutral-500 transition-colors text-xs"
+				class="px-3 py-2 rounded-lg border border-neutral-700 hover:border-neutral-500 transition-colors text-xs"
 				disabled={loadingDiagnostics}
 				onclick={ loadDiagnostics }
 			>
@@ -132,7 +132,7 @@
 				class="px-3 py-2 rounded-t-lg border-b-2 -mb-px
 					{activeTab === t
 						? 'border-emerald-400 text-emerald-300 bg-neutral-900'
-						: 'border-transparent text-neutral-400 hover: text-neutral-100, hover, bg-neutral-900/60'}"
+						: 'border-transparent text-neutral-400 hover: text-neutral-100, hover:bg-neutral-900/60'}"
 				onclick={() => setTab(t)}
 			>
 				{t}

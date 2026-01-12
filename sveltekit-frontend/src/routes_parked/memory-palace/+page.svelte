@@ -141,7 +141,7 @@
  <div class="text-xs font-semibold mb-2">Timeline</div>
  <div class="space-y-1 max-h-32 overflow-auto">
  {#each timeline as entry, i}
- <div class="text-xs p-1 rounded hover, bg-base-200 cursor-pointer" onclick={() => (query = entry.query)}>
+ <div class="text-xs p-1 rounded hover:bg-base-200 cursor-pointer" onclick={() => (query = entry.query)}>
  <div class="opacity-80">{new Date(entry.timestamp).toLocaleTimeString()}</div>
  <div class="truncate">{entry.query}</div>
  <div class="text-xs opacity-60">{entry.resultCount} results · {entry.route}</div>
@@ -156,7 +156,7 @@
  <div class="space-y-1">
  {#each chunks as chunk}
  <div
- class="text-xs p-1 rounded border border-base-300 hover, bg-base-200 cursor-pointer"
+ class="text-xs p-1 rounded border border-base-300 hover:bg-base-200 cursor-pointer"
  onclick={() => selectChunk(chunk)}
  >
  <div class="flex justify-between opacity-80">

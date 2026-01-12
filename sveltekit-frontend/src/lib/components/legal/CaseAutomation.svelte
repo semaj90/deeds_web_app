@@ -42,7 +42,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
               type="number"
               bind, value={ batchSize } min="1"
               max="100"
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus, border-blue-500"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500"
             /> </div>
  <div> <label for="confidence" class="block text-sm font-medium"> Confidence Threshold </label>
  <input id="confidence"
@@ -50,7 +50,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
               bind, value={ confidenceThreshold } min="0.1"
               max="1"
               step="0.05"
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus, border-blue-500"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500"
             /> </div> </div> </div> </div>
  <!-- Status, Panel --> <div class="space-y-6">
   {#if processing} <div class="p-4 bg-blue-50 rounded-lg border"> <h4 class="font-medium text-blue-800">Processing Status</h4>
@@ -74,7 +74,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <div class="text-sm"> <p>Processing Time: {processingStats.processingTime}ms</p>
  <p>Documents: {processingStats.documentsProcessed} processed successfully</p> </div> {/if}
   </div> </div>
- <!-- Action, Button --> <div class="mt-8 pt-6 border-t"> <button class="w-full bg-blue-600 hover, bg-blue-700 disabled, bg-gray-400"
+ <!-- Action, Button --> <div class="mt-8 pt-6 border-t"> <button class="w-full bg-blue-600 hover:bg-blue-700 disabled, bg-gray-400"
       onclick={ handleSubmit } disabled={processing || !selectedAutomationType || !selectedSource} >
   {#if processing} <div class="animate-spin rounded-full h-4 w-4 border-b-2"></div> Processing Automation... {:else} <span>ðŸš€</span> Configure Legal Automation {/if}
   </button> </div> </div>

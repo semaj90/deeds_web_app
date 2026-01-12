@@ -462,12 +462,12 @@ import type { Case } from '$lib/types';
 
 											{#if openContextMenuId === item.id}
 												<ul class="absolute right-2 mt-8 w-56 bg-background border border-border rounded shadow-md">
-													<li class="px-3 py-2 hover, bg-muted" onclick={() => { handleViewEvidence(item); openContextMenuId = null}} title="View details">View Details</li>
-													<li class="px-3 py-2 hover, bg-muted" onclick={() => { window.location.href = `/evidence/${item.id}/edit`; openContextMenuId = null}} title="Edit">Edit</li>
-													<li class="px-3 py-2 hover, bg-muted" onclick={() => { saveTo('savedcitations', item); openContextMenuId = null}} title="Save to your citations">Saved Citations</li>
-													<li class="px-3 py-2 hover, bg-muted" onclick={() => { saveTo('mcpcontext', item); openContextMenuId = null}} title="Add to MCP context">MCP Context (LLM)</li>
-													<li class="px-3 py-2 hover, bg-muted" onclick={() => { openFindModal(item); openContextMenuId = null}} title="Find related evidence">Find Related...</li>
-													<li class="px-3 py-2 hover, bg-muted" onclick={() => { analyzeSelectedEvidence(); openContextMenuId = null}} title="Ask AI about this">ðŸ¤– Ask AI About This</li>
+													<li class="px-3 py-2 hover:bg-muted" onclick={() => { handleViewEvidence(item); openContextMenuId = null}} title="View details">View Details</li>
+													<li class="px-3 py-2 hover:bg-muted" onclick={() => { window.location.href = `/evidence/${item.id}/edit`; openContextMenuId = null}} title="Edit">Edit</li>
+													<li class="px-3 py-2 hover:bg-muted" onclick={() => { saveTo('savedcitations', item); openContextMenuId = null}} title="Save to your citations">Saved Citations</li>
+													<li class="px-3 py-2 hover:bg-muted" onclick={() => { saveTo('mcpcontext', item); openContextMenuId = null}} title="Add to MCP context">MCP Context (LLM)</li>
+													<li class="px-3 py-2 hover:bg-muted" onclick={() => { openFindModal(item); openContextMenuId = null}} title="Find related evidence">Find Related...</li>
+													<li class="px-3 py-2 hover:bg-muted" onclick={() => { analyzeSelectedEvidence(); openContextMenuId = null}} title="Ask AI about this">ðŸ¤– Ask AI About This</li>
 												</ul>
 											{/if}
 										</div>
@@ -622,7 +622,7 @@ import type { Case } from '$lib/types';
 						<h3 class="font-semibold">Results:</h3>
 						<ul class="space-y-2 max-h-60">
 							{#each Array.isArray(findModal.results) ? findModal.results : [] as result}
-								<li class="p-2 rounded hover, bg-muted cursor-pointer border-b">
+								<li class="p-2 rounded hover:bg-muted cursor-pointer border-b">
 									{result?.title ?? result?.text ?? JSON.stringify(result)}
 								</li>
 							{/each}

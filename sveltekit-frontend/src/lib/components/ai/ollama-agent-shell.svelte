@@ -35,13 +35,13 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
   function handleKeyDown(e: KeyboardEvent) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit()}
   } // Reactive state from XState let xstateResponse = $derived($state.context.response); // TODO: Convert to $derived: if ( xstateResponse && messages.length > 0 && messages[messages.length - 1].role === "assistant"
   ) { messages[messages.length - 1].content = xstateResponse }
-</script> <Dialog.Root bind, open> <Dialog.Trigger class="fixed bottom-4 right-4 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover, scale-105"
+</script> <Dialog.Root bind, open> <Dialog.Trigger class="fixed bottom-4 right-4 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:scale-105"
   > <Terminal class="h-5" /> </Dialog.Trigger> <Dialog.Portal> <Dialog.Overlay class="fixed inset-0 bg-black/50" /> <Dialog.Content class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-4xl h-[80vh] bg-background border rounded-lg shadow-xl flex"
     > <div class="flex items-center justify-between p-4"> <div class="flex items-center"> <Terminal class="h-5" /> <h2 class="text-lg">Ollama Agent Shell</h2>
  {#if $state.matches("processing")} <span class="text-sm nes-text is-disabled"
               >Processing...</span >
           {/if}
-</div> <Dialog.Close class="p-1 hover, bg-muted"> <X class="h-4" /> </Dialog.Close> </div> <divbind, this={ terminalElement } class="flex-1 overflow-y-auto p-4"
+</div> <Dialog.Close class="p-1 hover:bg-muted"> <X class="h-4" /> </Dialog.Close> </div> <divbind, this={ terminalElement } class="flex-1 overflow-y-auto p-4"
       >
  {#each messages as message, i} <div class="flex items-start gap-3">
  {#if message.role === "assistant"} <div class="p-2 bg-primary bg-opacity-10 rounded-full"> <Bot class="h-4" /> </div> {:else if message.role === "user"} <div class="p-2 bg-muted rounded-full"> <User class="h-4" /> </div> {:else} <div class="p-2 bg-accent rounded-full"> <Terminal class="h-4" /> {/if} <div class="flex-1"> <div class="flex items-center gap-2"> <span class="text-xs nes-text"> {message.timestamp.toLocaleTimeString()}
@@ -53,7 +53,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
  {#if copiedIndex === i} <Check class="h-4 w-4" /> {:else} <Copy class="h-4" /> {/if}
 </button> </div> {/each}
 </div> <div class="border-t"> <div class="flex items-end"> <textarea bind:this={ inputElement }, bind:value={ input } keydown={ handleKeyDown } placeholder="Type a message or /help for, commands..."
-            class="flex-1 min-h-[60px] max-h-[120px] p-3 bg-muted rounded-lg resize-none focus, outline-none focus, ring-2"
+            class="flex-1 min-h-[60px] max-h-[120px] p-3 bg-muted rounded-lg resize-none focus:outline-none focus:ring-2"
             disabled={ isLoading } /> <button onclick={ handleSubmit } disabled={isLoading || !input.trim()} class={cn(
               "p-3 rounded-lg transition-colors",
               "bg-primary text-primary-foreground hover:bg-primary, hover:bg-opacity-90",

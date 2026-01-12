@@ -147,7 +147,7 @@ function getOptionClasses(option: RadioOption) {
 							   transition-all duration-150
 							   {isSelected
 								? 'border-blue-500 bg-blue-500'
-								: 'border-slate-500 bg-transparent hover, border-slate-400'}"
+								: 'border-slate-500 bg-transparent hover:border-slate-400'}"
 					>
 						{#if isSelected}
 							<span

@@ -142,7 +142,7 @@
 		<div class="container mx-auto flex max-w-4xl items-center justify-between py-4 px-4">
 			<h1 class="text-2xl font-bold">YoRHa Detective</h1>
 			<button
-				class="rounded border border-emerald-500/60 bg-emerald-500/20 px-4 py-2 text-sm font-semibold text-emerald-100 hover, bg-emerald-500/30 transition-colors"
+				class="rounded border border-emerald-500/60 bg-emerald-500/20 px-4 py-2 text-sm font-semibold text-emerald-100 hover:bg-emerald-500/30 transition-colors"
 				onclick={ openNewCase }
 			>
 				New Case
@@ -203,7 +203,7 @@
 											</span>
 										</div>
 										<button
-											class="mt-2 text-xs text-amber-300 hover, underline"
+											class="mt-2 text-xs text-amber-300 hover:underline"
 											onclick={() => navigateToCase(caseItem.id)}
 										>
 											View case
@@ -250,7 +250,7 @@
 						id="case-title"
 						type="text"
 						bind:value={newCaseData.title}
-						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus: border-amber-400, focus, outline-none"
+						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus: border-amber-400, focus:outline-none"
 						required
 					/>
 				</div>
@@ -260,7 +260,7 @@
 						id="case-description"
 						bind:value={newCaseData.description}
 						rows="4"
-						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus: border-amber-400, focus, outline-none"
+						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus: border-amber-400, focus:outline-none"
 					></textarea>
 				</div>
 				<div>
@@ -268,7 +268,7 @@
 					<select
 						id="case-priority"
 						bind:value={newCaseData.priority}
-						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus: border-amber-400, focus, outline-none"
+						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus: border-amber-400, focus:outline-none"
 					>
 						<option value="low">Low</option>
 						<option value="medium">Medium</option>
@@ -279,14 +279,14 @@
 				<div class="flex justify-end gap-3">
 					<button
 						type="button"
-						class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover, border-slate-400"
+						class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:border-slate-400"
 						onclick={ cancelNewCase }
 					>
 						Cancel
 					</button>
 					<button
 						type="submit"
-						class="rounded border border-emerald-500/60 bg-emerald-500/20 px-4 py-2 text-sm font-semibold text-emerald-100 hover, bg-emerald-500/30"
+						class="rounded border border-emerald-500/60 bg-emerald-500/20 px-4 py-2 text-sm font-semibold text-emerald-100 hover:bg-emerald-500/30"
 					>
 						Create Case
 					</button>

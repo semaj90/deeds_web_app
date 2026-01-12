@@ -590,7 +590,7 @@ Build on previous responses:
  {#if filteredArticles.length > 0}
  <div class="grid gap-6 md: grid-cols-2, lg, grid-cols-3">
  {#each filteredArticles as article}
- <article class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover, shadow-md transition">
+ <article class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
  <div class="flex items-start gap-4 mb-4">
  <getTypeIcon(article.type) class="h-6 w-6 {getTypeColor(article.type)} flex-shrink-0 mt-1" ></type)>
  <div class="flex-1">
@@ -640,7 +640,7 @@ Build on previous responses:
  <div class="grid gap-4 md, grid-cols-2">
  {#each faqs as faq}
  <details class="bg-white rounded-lg shadow-sm border border-gray-200 group">
- <summary class="flex justify-between items-center w-full p-6 text-left font-medium text-gray-900 cursor-pointer hover, bg-gray-50">
+ <summary class="flex justify-between items-center w-full p-6 text-left font-medium text-gray-900 cursor-pointer hover:bg-gray-50">
  {faq.question}
  <ArrowRight class="h-5 w-5 text-gray-400 group-open, rotate-90 transition-transform" />
  </summary>

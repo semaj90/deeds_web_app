@@ -262,7 +262,7 @@
 						{#each route.relatedRoutes as rel}
 							<button
 								type="button"
-								class="text-left px-2 py-[3px] font-mono border border-dashed border-[#262017] bg-[#f9f4e4] hover: bg-[#262017], hover, text-[#f3eddc]"
+								class="text-left px-2 py-[3px] font-mono border border-dashed border-[#262017] bg-[#f9f4e4] hover: bg-[#262017], hover:text-[#f3eddc]"
 								onclick={() => window.open(rel, '_blank')}
 							>
 								{ rel }
@@ -417,13 +417,13 @@
 			</div>
 			<div class="flex gap-2">
 				<button
-					class="px-4 py-[6px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#262017] bg-[#1775c7] text-white hover, bg-[#1e86e3]"
+					class="px-4 py-[6px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#262017] bg-[#1775c7] text-white hover:bg-[#1e86e3]"
 					onclick={visitPage}
 				>
 					VISIT PAGE →
 				</button>
 				<button
-					class="px-4 py-[6px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#262017] bg-[#f8d24b] text-[#262017] hover, bg-[#ffe27b]"
+					class="px-4 py-[6px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#262017] bg-[#f8d24b] text-[#262017] hover:bg-[#ffe27b]"
 					onclick={openAstGraph}
 				>
 					VIEW AST GRAPH

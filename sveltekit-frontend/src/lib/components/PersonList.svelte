@@ -46,7 +46,7 @@
 		<div class="person-entries max-h-96 overflow-y-auto">
 			{#each filteredPersons as person (person.id)}
 				<ButtonRoot
-					class="person-entry {selectedPerson?.id === person.id ? 'selected' : ''} w-full p-3 bg-gray-800 hover, bg-gray-700 transition rounded flex items-center gap-3 cursor-pointer border border-gray-600 bits-btn"
+					class="person-entry {selectedPerson?.id === person.id ? 'selected' : ''} w-full p-3 bg-gray-800 hover:bg-gray-700 transition rounded flex items-center gap-3 cursor-pointer border border-gray-600 bits-btn"
 					onclick={() => onSelect(person)}
 				>
 					<img src={person.photo || '/placeholder-person.jpg'} alt="" class="w-14 h-14 rounded shadow" />

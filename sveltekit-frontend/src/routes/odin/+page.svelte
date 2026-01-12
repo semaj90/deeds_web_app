@@ -168,7 +168,7 @@
 
           <div class="p-8 flex flex-col gap-8 h-full">
             <!-- Upload Zone -->
-            <div class="border-4 border-dashed border-nes-muted rounded-lg p-12 flex flex-col items-center justify-center gap-4 hover, border-nes-accent transition-colors bg-black/20">
+            <div class="border-4 border-dashed border-nes-muted rounded-lg p-12 flex flex-col items-center justify-center gap-4 hover:border-nes-accent transition-colors bg-black/20">
               <span class="text-6xl">📂</span>
               <div class="text-center">
                 <h3 class="text-xl text-nes-text mb-2">DROP CLASSIFIED MATERIALS HERE</h3>
@@ -197,21 +197,21 @@
                 <h4 class="text-nes-accent border-b-2 border-nes-accent pb-2">PIPELINE CONFIGURATION</h4>
 
                 <label class="flex items-center gap-3 cursor-pointer group">
-                  <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover, border-nes-accent">
+                  <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover:border-nes-accent">
                     <div class="w-3 h-3 bg-nes-accent"></div>
                   </div>
                   <span class="text-nes-text">ENABLE DOCLING-258M (OCR/VLM)</span>
                 </label>
 
                 <label class="flex items-center gap-3 cursor-pointer group">
-                  <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover, border-nes-accent">
+                  <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover:border-nes-accent">
                     <div class="w-3 h-3 bg-nes-accent"></div>
                   </div>
                   <span class="text-nes-text">LANGEXTRACT + TRANSLATION</span>
                 </label>
 
                 <label class="flex items-center gap-3 cursor-pointer group">
-                  <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover, border-nes-accent">
+                  <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover:border-nes-accent">
                     <div class="w-3 h-3 bg-nes-accent"></div>
                   </div>
                   <span class="text-nes-text">WHISPER AUDIO TRANSCRIPTION</span>
@@ -222,21 +222,21 @@
                 <h4 class="text-nes-accent border-b-2 border-nes-accent pb-2">INDEXING STRATEGY</h4>
 
                 <label class="flex items-center gap-3 cursor-pointer group">
-                  <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover, border-nes-accent">
+                  <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover:border-nes-accent">
                     <div class="w-3 h-3 bg-nes-accent"></div>
                   </div>
                   <span class="text-nes-text">COSINE RANKING + DEDUPLICATION</span>
                 </label>
 
                 <label class="flex items-center gap-3 cursor-pointer group">
-                  <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover, border-nes-accent">
+                  <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover:border-nes-accent">
                     <div class="w-3 h-3 bg-nes-accent"></div>
                   </div>
                   <span class="text-nes-text">TOPOLOGICAL TOPIC MAPPING</span>
                 </label>
 
                 <label class="flex items-center gap-3 cursor-pointer group">
-                  <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover, border-nes-accent">
+                  <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover:border-nes-accent">
                     <div class="w-3 h-3 bg-nes-accent"></div>
                   </div>
                   <span class="text-nes-text">ACE CONTEXTUAL RETRIEVAL</span>
@@ -269,9 +269,9 @@
               <div class="p-8 text-center text-nes-muted">NO ANOMALIES DETECTED. SYSTEM STABLE.</div>
             {:else}
               {#each data.stats as stat}
-                <div class="nes-row group cursor-pointer hover, bg-white/5">
+                <div class="nes-row group cursor-pointer hover:bg-white/5">
                   <span class="font-mono text-nes-muted">2025-12-24 04:20</span>
-                  <span class="text-nes-text group-hover, text-nes-accent truncate pr-2">{stat.error_code}: {stat.message?.substring(0, 40)}...</span>
+                  <span class="text-nes-text group-hover:text-nes-accent truncate pr-2">{stat.error_code}: {stat.message?.substring(0, 40)}...</span>
                   <div class="w-24">
                     <div class="nes-progress h-2">
                       <div class="nes-progress-bar w-[85%] bg-nes-warning"></div>

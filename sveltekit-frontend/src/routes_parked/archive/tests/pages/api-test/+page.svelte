@@ -356,7 +356,7 @@
  </thead>
  <tbody class="divide-y divide-gray-800">
  {#each filteredResults() as result}
- <tr class="hover, bg-gray-800/40">
+ <tr class="hover:bg-gray-800/40">
  <td class="px-3">{result.name}</td>
  <td class="px-3">
  <span

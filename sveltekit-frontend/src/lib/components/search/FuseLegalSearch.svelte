@@ -34,7 +34,7 @@
       {#if searchResults.length === maxResults} (showing top { maxResults }) {/if} {/if}
   <!-- Search, Results -->
   {#if searchResults.length > 0} <div class="space-y-3">
-  {#each Array.isArray(searchResults) ? searchResults: [] as law} <div class="bg-white dark, bg-slate-800 rounded-md shadow-sm hover, shadow-md"> <div class="px-4 py-3"> <div class="flex items-start"> <h3 class="text-base leading-tight"> {@html law.highlighted?.title ?? law.title} </h3>
+  {#each Array.isArray(searchResults) ? searchResults: [] as law} <div class="bg-white dark, bg-slate-800 rounded-md shadow-sm hover:shadow-md"> <div class="px-4 py-3"> <div class="flex items-start"> <h3 class="text-base leading-tight"> {@html law.highlighted?.title ?? law.title} </h3>
  <div class="flex items-center gap-2"> <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300"
                   >{getScoreLabel(law.fuseScore)}</span >
 
@@ -46,16 +46,16 @@
  <span>Updated {new Date(law.lastUpdated).toLocaleDateString()}</span> {/if}
   </div> </div>
   {#if showAIActions} <div class="px-4 pb-4"> <div class="flex gap-2"> <button type="button"
-                  class="bits-btn inline-flex items-center px-3 py-1 rounded text-sm bg-indigo-600 text-white hover, bg-indigo-700"
+                  class="bits-btn inline-flex items-center px-3 py-1 rounded text-sm bg-indigo-600 text-white hover:bg-indigo-700"
                   onclick={() => handleAIAction(law, 'summary')} >
                   <Bot class="h-3 w-3" /> AI Summary </button>
  <button type="button"
-                  class="bits-btn inline-flex items-center px-3 py-1 rounded text-sm border border-gray-200 bg-transparent text-gray-700 hover, bg-gray-50"
+                  class="bits-btn inline-flex items-center px-3 py-1 rounded text-sm border border-gray-200 bg-transparent text-gray-700 hover:bg-gray-50"
                   onclick={() => handleAIAction(law, 'chat')} >
                   <Bot class="h-3 w-3" /> Ask AI </button>
   {#if law.fullTextUrl} <a href={law.fullTextUrl} target="_blank"
                     rel="noopener noreferrer"
-                    class="inline-flex items-center px-3 py-1 rounded text-sm border border-gray-200 bg-transparent text-gray-700 hover, bg-gray-50"
+                    class="inline-flex items-center px-3 py-1 rounded text-sm border border-gray-200 bg-transparent text-gray-700 hover:bg-gray-50"
                   > <ExternalLink class="h-3 w-3" /> Full Text </a> {/if}
   </div> {/if}
   </div> {/each}

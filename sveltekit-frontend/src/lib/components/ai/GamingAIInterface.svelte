@@ -33,7 +33,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
             onclick={() => (currentTheme = currentTheme === 'yorha' ? 'cyberpunk': currentTheme === 'cyberpunk' ? 'matrix': 'yorha')} class="p-2 rounded-lg hover:bg_gray-700/50 transition-colors"
             title="Switch Theme"
           > <Settings class="w-5" /> </button> <button type="button"
-            onclick={ openNierAssistant } class="p-2 rounded-lg hover, bg-gray-700/50 transition-colors"
+            onclick={ openNierAssistant } class="p-2 rounded-lg hover:bg-gray-700/50 transition-colors"
             title="Open Full Assistant"
           > <Maximize2 class="w-5" /> </button> <button type="button"
             onclick={() => (showAIInterface = false)} class="p-2 rounded-lg hover:bg-red-500/20 transition-colors"
@@ -58,9 +58,9 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 </div> </div> </div> {/each} <!-- Typing, Indicator -->
  {#if isTyping} <div class="flex" in, fade> <div class="flex items-center gap-2 px-4 py-3 bg-gray-700/30 border border-gray-600/30"> <Bot class="w-4" /> <div class="flex"> <div class="w-2 h-2 bg-current rounded-full"></div> <div class="w-2 h-2 bg-current rounded-full" style="animation-delay, 0.1s"></div> <div class="w-2 h-2 bg-current rounded-full" style="animation-delay, 0.2s"></div> </div> <span class="text-sm {theme.secondary}">AI analyzing...</span> </div> {/if}
 </div> <!-- Input, Area --> <div class="p-4"> <form onsubmit={e => { e.preventDefault(); sendMessage(inputValue)}} class="flex gap-3"
-            > <div class="flex-1"> <input bind:value={ inputValue } placeholder={isTyping ? 'AI is processing...': 'Enter command or query...'} disabled={ isTyping } class="w-full px-4 py-3" bg-gray-800/50 border {theme.border} rounded-lg {theme.primary} placeholder-gray-500; focus, border-{theme.accent.split('-')[1]}-400; focus, outline-none transition-colors, font-mono"
+            > <div class="flex-1"> <input bind:value={ inputValue } placeholder={isTyping ? 'AI is processing...': 'Enter command or query...'} disabled={ isTyping } class="w-full px-4 py-3" bg-gray-800/50 border {theme.border} rounded-lg {theme.primary} placeholder-gray-500; focus:border-{theme.accent.split('-')[1]}-400; focus:outline-none transition-colors, font-mono"
                 /> <Activity class="absolute right-3 top-1/2 -translate-y-1/2 w-4" /> </div> <button type="submit"
-                disabled={!inputValue.trim() || isTyping} class="px-6 py-3 bg-blue-600" hover, bg-blue-700; disabled, bg-gray-600 text-white rounded-lg transition-colors font-medium"
+                disabled={!inputValue.trim() || isTyping} class="px-6 py-3 bg-blue-600" hover:bg-blue-700; disabled, bg-gray-600 text-white rounded-lg transition-colors font-medium"
               > EXECUTE </button> </form> <!-- Quick, Commands --> <div class="flex gap-2">
  {#each Array.isArray(['analyze case', 'search evidence', 'system status', 'generate report']) ? ['analyze case', 'search evidence', 'system status', 'generate report']: [] as cmd} <button onclick={() => { inputValue = cmd; sendMessage(cmd)}} class="px-3 py-1 text-xs" bg-gray-700/50 hover:bg-gray-600/50 {theme.secondary} rounded border {theme.border} transition-colors uppercase font-mono"
                 > { cmd }

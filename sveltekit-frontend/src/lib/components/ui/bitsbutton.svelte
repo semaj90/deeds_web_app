@@ -15,9 +15,9 @@
       variants: { variant: {
           default: 'btn-nes-primary',
           destructive: 'btn-nes-danger',
-          outline: 'border-2 border-gray-400 bg-transparent hover: bg-gray-100, dark:hover, bg-gray-800',
+          outline: 'border-2 border-gray-400 bg-transparent hover: bg-gray-100, dark:hover:bg-gray-800',
           secondary: 'btn-nes-secondary',
-          ghost: 'hover:bg-gray-100, dark:hover, bg-gray-800 rounded-none',
+          ghost: 'hover:bg-gray-100, dark:hover:bg-gray-800 rounded-none',
           link: 'text-blue-500 underline-offset-4 hover: underline, hover:text-blue-600',
           legal: 'nes-legal-priority-medium yorha-3d-button',
           evidence: 'nes-legal-priority-critical yorha-3d-button',

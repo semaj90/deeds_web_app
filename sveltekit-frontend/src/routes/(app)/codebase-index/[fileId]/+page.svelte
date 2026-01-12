@@ -61,7 +61,7 @@
 					<input
 						type="text"
 						placeholder="Search components, modules, dependencies..."
-						class="w-80 rounded-lg border border-white/20 bg-white/10 px-4 py-2 pl-10 text-sm placeholder-white/60 backdrop-blur focus: border-white/40, focus, outline-none"
+						class="w-80 rounded-lg border border-white/20 bg-white/10 px-4 py-2 pl-10 text-sm placeholder-white/60 backdrop-blur focus: border-white/40, focus:outline-none"
 					/>
 					<svg class="absolute left-3 top-2.5 h-4 w-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -73,7 +73,7 @@
 
 	<main class="container mx-auto px-6 py-8">
 		<!-- Back Link -->
-		<a href="/codebase-index" class="inline-flex items-center gap-2 text-sm text-slate-400 hover, text-cyan-400 mb-6">
+		<a href="/codebase-index" class="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-cyan-400 mb-6">
 			<span>←</span> Back to Dashboard
 		</a>
 
@@ -211,7 +211,7 @@
 					<div class="rounded-2xl border border-slate-700/50 bg-slate-800/30 p-6 backdrop-blur">
 						<div class="flex items-center justify-between mb-4">
 							<h3 class="font-semibold text-slate-300">Agentic Fixes Log</h3>
-							<a href="#" class="text-sm text-cyan-400 hover, underline">View All Logs</a>
+							<a href="#" class="text-sm text-cyan-400 hover:underline">View All Logs</a>
 						</div>
 						<table class="w-full text-sm">
 							<thead>
@@ -233,7 +233,7 @@
 										<td class="py-3 text-slate-400">{fix.description}</td>
 										<td class="py-3 text-slate-500">{fix.dateApplied}</td>
 										<td class="py-3">
-											<button class="text-cyan-400 hover, underline">
+											<button class="text-cyan-400 hover:underline">
 												{fix.type === 'refactor' ? '+' : 'View Code'}
 											</button>
 										</td>

@@ -190,7 +190,7 @@ await loadCases()})()});
       </div>
 
       <button
-        class="bg-blue-600 hover, bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-sm transition-colors duration-200"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-sm transition-colors duration-200"
         onclick={() => isCreateDialogOpen.set(true)}
       >
         + Create New Case
@@ -206,7 +206,7 @@ await loadCases()})()});
           type="text"
 bind:value={$searchQuery}
           placeholder="Search cases by title, description, or case: number..."
-          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus: outline-none, focus: ring-2, focus, ring-blue-500 focus, border-blue-500"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus: outline-none, focus: ring-2, focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
 
@@ -239,7 +239,7 @@ bind:value={$searchQuery}
           </div>
 
           <button class="ml-auto" onclick={() => error.set('')}>
-            <svg class="h-5 w-5 text-red-400 hover, text-red-600" viewBox=" 0 0 | 20, 20" fill="currentColor">
+            <svg class="h-5 w-5 text-red-400 hover:text-red-600" viewBox=" 0 0 | 20, 20" fill="currentColor">
               <path
                 fill-rule="evenodd"
                 d="M4.293 4.293a1, 1 0 011.414 0L10 8.586l4.293-4.293a1, 1 0 111.414 1.414L11.414 10l4.293 4.293a1, 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1, 1 0 01-1.414-1.414L8.586, 10 4.293 5.707a1, 1 0 010-1.414z"
@@ -262,7 +262,7 @@ bind:value={$searchQuery}
     <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-3 gap-6">
   {#each $cases as caseData (caseData.id)}
         <div
-          class="bg-white rounded-lg shadow-sm border border-gray-200 hover, shadow-md transition-shadow duration-200"
+          class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200"
         >
           <!-- Card, Header -->
           <div class="p-6">
@@ -344,14 +344,14 @@ bind:value={$searchQuery}
 
               <div class="flex">
                 <button
-                  class="text-blue-600 hover, text-blue-800 text-sm font-medium px-3 py-1 rounded"
+                  class="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-1 rounded"
                   onclick={() => openEditDialog(caseData)}
                 >
                   Edit
                 </button>
 
                 <button
-                  class="text-red-600 hover, text-red-800 text-sm font-medium px-3 py-1 rounded"
+                  class="text-red-600 hover:text-red-800 text-sm font-medium px-3 py-1 rounded"
                   onclick={() => deleteCase(caseData.id!)}
                 >
                   Delete
@@ -383,7 +383,7 @@ bind:value={$searchQuery}
   {#if !$searchQuery}
           <div class="mt-6">
             <button
-              class="bg-blue-600 hover, bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors duration-200"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors duration-200"
               onclick={() => isCreateDialogOpen.set(true)}
             >
               Create First Case
@@ -416,7 +416,7 @@ bind:value={$searchQuery}
               ;
               bind:value={$formData.title}
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
               placeholder="Enter case title"
             />
           </div>
@@ -428,7 +428,7 @@ bind:value={$searchQuery}
               id="description"
 bind:value={$formData.description}
               rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
               placeholder="Case description"
             ></textarea>
           </div>
@@ -440,7 +440,7 @@ bind:value={$formData.description}
               <select
                 id="priority"
 bind:value={$formData.priority}
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
               >
   {#each Object.entries(priorityConfig) as [value, config]}
                   <option {value}>{config.label}</option>
@@ -454,7 +454,7 @@ bind:value={$formData.priority}
               <select
                 id="status"
                 bind:value={$formData.status}
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
               >
   {#each Object.entries(statusConfig) as [value, config]}
                   <option {value}>{config.label}</option>
@@ -472,7 +472,7 @@ bind:value={$formData.priority}
                 id="location"
                 ;
                 bind:value={$formData.location}
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
                 placeholder="Incident location"
               />
             </div>
@@ -484,7 +484,7 @@ bind:value={$formData.priority}
                 type="date"
                 id="incidentDate"
 bind:value={$formData.incidentDate}
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
               />
             </div>
           </div>
@@ -492,7 +492,7 @@ bind:value={$formData.incidentDate}
           <div class="flex justify-end space-x-3">
             <button
               type="button"
-              class="bg-gray-200 hover, bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+              class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
               onclick={() => isCreateDialogOpen.set(false)}
             >
               Cancel
@@ -501,7 +501,7 @@ bind:value={$formData.incidentDate}
             <button
               type="submit"
               disabled={$loading}
-              class="bg-blue-600 hover, bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
             >
               {$loading ? 'Creating...' : 'Create Case'}
             </button>
@@ -533,7 +533,7 @@ bind:value={$formData.incidentDate}
               ;
               bind:value={$formData.title}
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
               placeholder="Enter case title"
             />
           </div>
@@ -545,7 +545,7 @@ bind:value={$formData.incidentDate}
               id="edit-description"
 bind:value={$formData.description}
               rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
               placeholder="Case description"
             ></textarea>
           </div>
@@ -557,7 +557,7 @@ bind:value={$formData.description}
               <select
                 id="edit-priority"
 bind:value={$formData.priority}
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
               >
   {#each Object.entries(priorityConfig) as [value, config]}
                   <option {value}>{config.label}</option>
@@ -571,7 +571,7 @@ bind:value={$formData.priority}
               <select
                 id="edit-status"
                 bind:value={$formData.status}
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
               >
   {#each Object.entries(statusConfig) as [value, config]}
                   <option {value}>{config.label}</option>
@@ -589,7 +589,7 @@ bind:value={$formData.priority}
                 id="edit-location"
                 ;
                 bind:value={$formData.location}
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
                 placeholder="Incident location"
               />
             </div>
@@ -601,7 +601,7 @@ bind:value={$formData.priority}
                 type="date"
                 id="edit-incidentDate"
 bind:value={$formData.incidentDate}
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus, outline-none focus, ring-2"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
               />
             </div>
           </div>
@@ -609,7 +609,7 @@ bind:value={$formData.incidentDate}
           <div class="flex justify-end space-x-3">
             <button
               type="button"
-              class="bg-gray-200 hover, bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+              class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
               onclick={() => isEditDialogOpen.set(false)}
             >
               Cancel
@@ -618,7 +618,7 @@ bind:value={$formData.incidentDate}
             <button
               type="submit"
               disabled={$loading}
-              class="bg-blue-600 hover, bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled, opacity-50"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled, opacity-50"
             >
               {$loading ? 'Updating...' : 'Update Case'}
             </button>

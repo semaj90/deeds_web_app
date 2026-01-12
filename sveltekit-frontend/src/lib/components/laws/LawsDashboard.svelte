@@ -209,7 +209,7 @@
 					</div>
 				{:else}
 					{#each timelineEvents as event (event.id)}
-						<div class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover, border-gray-600 transition">
+						<div class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition">
 							<div class="flex items-start justify-between">
 								<div class="flex-1">
 									<p class="text-gray-300 font-mono text-sm">{event.formatted}</p>

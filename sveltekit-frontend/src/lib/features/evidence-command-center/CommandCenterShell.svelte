@@ -43,7 +43,7 @@
 			</div>
 			<button
 				type="button"
-				class="px-2 py-0.5 border border-[#f5f5f5] bg-[#262636] hover, bg-[#34344a]"
+				class="px-2 py-0.5 border border-[#f5f5f5] bg-[#262636] hover:bg-[#34344a]"
 				onclick={() => evidenceCommandCenter.openCommandPalette()}
 			>
 				<span class="text-[9px] font-bold">COMMAND</span>

@@ -279,11 +279,11 @@
  </thead>
  <tbody>
  {#each stats.routes.top as route (route.routePath)}
- <tr class="border-b border-gray-100 hover, bg-gray-50 transition">
+ <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
  <td class="py-3 px-4">
  <a
  href="/phase78/routes/{encodeURIComponent(route.routePath)}"
- class="font-mono text-sm text-blue-600 hover: text-blue-700, hover, underline break-all"
+ class="font-mono text-sm text-blue-600 hover: text-blue-700, hover:underline break-all"
  >
  {route.routePath}
  </a>

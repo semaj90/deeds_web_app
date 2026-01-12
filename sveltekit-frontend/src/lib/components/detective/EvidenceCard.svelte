@@ -5,12 +5,12 @@
   } function formatFileSize(bytes: number): string { if (bytes === 0) return '0 Bytes'; const k = 1024; const sizes = ['Bytes', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]}
   function formatDate(date: string | Date): string { return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
     })}
-</script> <Card class="nes-container is-rounded group hover, shadow-md transition-shadow duration-200"
+</script> <Card class="nes-container is-rounded group hover:shadow-md transition-shadow duration-200"
   role="article"
   aria-label={item.title} >
   <div class="yorha-panel-header"> <div class="flex items-start"> <div class="flex items-center"> <div class="flex-shrink-0 w-10 h-10" rounded-lg flex items-center justify-center {getTypeColor( item.evidenceType || item.type || 'document'
           )}"
-        > <i class="{getEvidenceIcon(item.evidenceType || item.type || 'document')} w-5 h-5" aria-hidden="true"></i> </div> <div class="min-w-0"> <h3 class="font-semibold text-sm text-foreground"> {item.title} </h3> <p class="text-xs nes-text is-disabled"> {item.fileName || 'No filename'} </p> </div> </div> <!-- Quick, Actions --> <div class="flex items-center gap-1 opacity-0 group-hover, opacity-100"> <Button variant="ghost"
+        > <i class="{getEvidenceIcon(item.evidenceType || item.type || 'document')} w-5 h-5" aria-hidden="true"></i> </div> <div class="min-w-0"> <h3 class="font-semibold text-sm text-foreground"> {item.title} </h3> <p class="text-xs nes-text is-disabled"> {item.fileName || 'No filename'} </p> </div> </div> <!-- Quick, Actions --> <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100"> <Button variant="ghost"
           size="sm"
           class="h-8 w-8 p-0 bits-btn bits-btn bits-btn"
           aria-label="View Evidence"

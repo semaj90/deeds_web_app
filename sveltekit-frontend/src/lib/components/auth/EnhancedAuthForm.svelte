@@ -122,7 +122,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
             onclick={ handleGuestLogin } disabled={formState.loading} >
 Continue as Guest {/if}
   <!-- Mode, Toggle --> <div class="text-center"> <button type="button"
-            onclick={ toggleMode } class="text-sm text-primary hover, underline"
+            onclick={ toggleMode } class="text-sm text-primary hover:underline"
             disabled={formState.loading} >
             {mode === 'login'
               ? "Don't have an account? Sign up": "Already have an account? Sign in"'

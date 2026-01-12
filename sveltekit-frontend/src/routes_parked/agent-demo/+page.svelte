@@ -166,9 +166,9 @@
  <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Available Tasks</h2>
  <div class="space-y-3">
  {#each availableTasks as task (task.id)}
- <div transition:slide class="bg-slate-800/50 border border-slate-700 rounded-lg p-4 hover, border-cyan-400/50 transition-colors group">
+ <div transition:slide class="bg-slate-800/50 border border-slate-700 rounded-lg p-4 hover:border-cyan-400/50 transition-colors group">
  <div class="flex justify-between items-start mb-2">
- <h3 class="font-medium text-slate-200 group-hover, text-cyan-300">{task.title}</h3>
+ <h3 class="font-medium text-slate-200 group-hover:text-cyan-300">{task.title}</h3>
  <span class={`text-xs px-2 py-0.5 rounded border ${getPriorityColor(task.priority)}`}>
  {task.priority}
  </span>

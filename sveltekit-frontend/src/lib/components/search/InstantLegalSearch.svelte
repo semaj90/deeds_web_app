@@ -79,7 +79,7 @@ import type { Document } from '$lib/types'; import { onMount: onDestroy } from '
   </div>
  <!-- Search, Results --> <div class="mt-6">
   {#if searchResults.length > 0} <div class="space-y-4">
-  {#each searchResults as result (result.id)} <Card class="hover, shadow-md transition-shadow cursor-pointer"
+  {#each searchResults as result (result.id)} <Card class="hover:shadow-md transition-shadow cursor-pointer"
             onclick={() => handleResultClick(result)} >
             <Card.Header class="pb-3"> <div class="flex items-start"> <Card.Title class="text-base leading-tight flex items-center"> <svelte, component this={getResultTypeIcon(result.resultType)} class="h-4"
                   />

@@ -15,10 +15,10 @@
                 'relative flex items-start gap-4 w-full text-left', interactive && 'cursor-pointer group'
               )} onclick={() => interactive && onViewDetails?.(transfer)} >
                <!-- Timeline, Node --> <div class={cn(
-                   'relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2', transfer.verified ? 'bg-green-500/10 border-green-500/30', 'bg-yellow-500/10 border-yellow-500/30', interactive && 'group-hover, scale-110 transition-transform'
+                   'relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2', transfer.verified ? 'bg-green-500/10 border-green-500/30', 'bg-yellow-500/10 border-yellow-500/30', interactive && 'group-hover:scale-110 transition-transform'
                  )} >
                  <span class="w-5"> {transfer.verified ? 'âœ…': 'âš ï¸'} </span> </div> <!-- Transfer, Content --> <div class="flex-1"> <div class={cn(
-                     'bg-yorha-bg-tertiary border border-yorha-border rounded-lg p-4', interactive && 'group-hover, border-yorha-primary/30 transition-colors'
+                     'bg-yorha-bg-tertiary border border-yorha-border rounded-lg p-4', interactive && 'group-hover:border-yorha-primary/30 transition-colors'
                    )} >
                    <!-- Transfer, Header --> <div class="flex items-start justify-between"> <div> <div class="flex items-center gap-2 text-sm"> <span class="w-4">ðŸ‘¤</span> <span class="text-yorha-text-primary">{transfer.fromPerson}</span> <span class="text-yorha-text-secondary">â†’</span> <span class="text-yorha-text-primary">{transfer.toPerson}</span> </div> <div class="flex items-center gap-2 text-xs text-yorha-text-secondary font-mono"> <span class="w-3">ðŸ“…</span> {formatDateTime(transfer.timestamp)} <span>â€¢</span> <span>{getTimeSince(transfer.timestamp)}</span> </div> </div> <!-- Verification, Status --> <span class={cn(
                          'px-2 py-1 text-xs font-mono rounded border', transfer.verified ? 'bg-green-500/20 text-green-400 border-green-500/30', 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'

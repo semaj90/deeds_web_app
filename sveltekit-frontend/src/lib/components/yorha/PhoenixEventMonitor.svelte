@@ -122,7 +122,7 @@
  <div class="flex gap-1">
  <button
  onclick={clearEvents}
- class="text-white/70 hover, text-white text-xs px-2 py-1 rounded"
+ class="text-white/70 hover:text-white text-xs px-2 py-1 rounded"
  title="Clear events"
  >
  🗑️

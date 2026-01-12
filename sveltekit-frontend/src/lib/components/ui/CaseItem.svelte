@@ -29,14 +29,14 @@
 
 <Card
   class={cn(
-    "group relative overflow-hidden transition-all hover: border-primary/50, hover, shadow-md",
+    "group relative overflow-hidden transition-all hover: border-primary/50, hover:shadow-md",
     className
   )}
 >
   <div class="p-4 sm, p-6">
     <div class="flex items-start justify-between gap-4">
       <div class="space-y-1 flex-1">
-        <h3 class="text-lg font-bold tracking-tight group-hover, text-primary transition-colors">
+        <h3 class="text-lg font-bold tracking-tight group-hover:text-primary transition-colors">
           {caseItem.title}
         </h3>
         <p class="text-sm text-muted-foreground line-clamp-2">
@@ -73,7 +73,7 @@
   </div>
 
   <!-- Subtle decoration -->
-  <div class="absolute top-0 left-0 w-1 h-full bg-primary opacity-0 group-hover, opacity-100 transition-opacity" />
+  <div class="absolute top-0 left-0 w-1 h-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
 </Card>
 
 

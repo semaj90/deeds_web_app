@@ -76,7 +76,7 @@ import type { Case } from '$lib/types'; interface Props { caseId: string, docume
  <p class="text-gray-600">Case ID: { caseId } â€¢ Comprehensive analysis and strategic planning</p> </div>
  <div class="flex items-center"> <div class="text-right text-sm"> <div>{allItems.length} items available</div>
  <div>{$selectedCount} items selected</div> </div>
-  {#if $state.context.synthesisResult} <button onclick={ exportSynthesis } class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover, bg-blue-700"
+  {#if $state.context.synthesisResult} <button onclick={ exportSynthesis } class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           > <span class="w-4 h-4">â¬‡ï¸</span> Export </button> {/if}
   </div> </div>
  <!-- Progress, Bar --> <div class="mt-6"> <div class="flex items-center justify-between text-sm text-gray-600"> <span>Progress</span>
@@ -181,7 +181,7 @@ import type { Case } from '$lib/types'; interface Props { caseId: string, docume
   </div> </div>
  <!-- Action, Buttons --> <div class="flex"> <button onclick={() => send({ type: 'RESTART' })} class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
         > New Synthesis </button>
- <button onclick={ exportSynthesis } class="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-md hover, bg-blue-700"
+ <button onclick={ exportSynthesis } class="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
         > <span class="w-4 h-4">â¬‡ï¸</span> Export Report </button> </div> {/if}
   </div>
 

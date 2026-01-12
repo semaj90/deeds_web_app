@@ -61,7 +61,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#if enableEmbedding && systemStatus?.search} <div class="search-section"> <h3 class="text-lg font-semibold">Semantic Document Search</h3>
  <div class="flex"> <input type="text"
           bind:value={ searchQuery } placeholder="Search uploaded documents with AI..."
-          class="flex-1 px-4 py-2 border rounded-lg focus, outline-none focus, ring-2"
+          class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
         /> <button onclick={ handleSearch } disabled={isSearching || !searchQuery.trim()} class="px-6 py-2 bg-blue-500 text-white rounded-lg disabled, opacity-50"
         >
   {#if isSearching} <span class="inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent" aria-hidden></span> {:else} <Search class="w-4" /> {/if} Search </button> </div>
@@ -74,7 +74,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <span>Type: {(result as unknown).searchType}</span>
   {#if (result as unknown).matchedBy} <span>Matched by: {(result as unknown).matchedBy.join(', ')}</span> {/if}
   </div> </div>
- <button class="text-sm text-blue-500 hover, text-blue-700"> View Details </button> </div> </div> {/each}
+ <button class="text-sm text-blue-500 hover:text-blue-700"> View Details </button> </div> </div> {/each}
   </div> {/if} {/if}
   </div>
  <style> .enhanced-file-upload { padding: 1.5rem; background: #fff; border-radius: 0.5rem; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05)}

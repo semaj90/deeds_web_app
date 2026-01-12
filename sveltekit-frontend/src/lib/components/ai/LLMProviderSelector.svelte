@@ -38,7 +38,7 @@
   {#if $open} <div class="z-50 min-w-[320px] rounded-md border border-yorha-border bg-yorha-bg-primary p-1 shadow-lg"
 			/*, transition, removed */} >
   {#each $providers as provider (provider.id)} <div class="relative cursor-default select-none rounded-sm px-2 py-2 text-sm outline-none transition-colors"
-				 class:bg-yorha-bg-secondary={$isSelected(provider)}; class:text-yorha-text-primary={$isSelected(provider)}; class, hover, bg-yorha-bg-tertiary={!$isSelected(provider)} >
+				 class:bg-yorha-bg-secondary={$isSelected(provider)}; class:text-yorha-text-primary={$isSelected(provider)}; class, hover:bg-yorha-bg-tertiary={!$isSelected(provider)} >
 					<div class="border-none bg-transparent"> <div class="yorha-panel-content"> <!-- Provider, Header --> <div class="flex items-center justify-between"> <div class="flex items-center"> <span class="text-lg" role="img">{getTypeIcon(provider.type)}</span>
  <div> <div class="font-medium">{provider.name}</div>
  <div class="text-xs">{provider.endpoint}</div> </div> </div>

@@ -85,7 +85,7 @@ import type { Case } from '$lib/types';
     {#if onAddEvent && interactive}
       <button
         onclick={onAddEvent}
-        class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium font-mono bg-yorha-primary/10 text-yorha-primary border border-yorha-primary/20 rounded-md hover, bg-yorha-primary/20 transition-colors"
+        class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium font-mono bg-yorha-primary/10 text-yorha-primary border border-yorha-primary/20 rounded-md hover:bg-yorha-primary/20 transition-colors"
       >
         <Calendar class="w-4" />
         Add Event
@@ -99,7 +99,7 @@ import type { Case } from '$lib/types';
         <Calendar class="w-12 h-12 mx-auto mb-4" />
         <p>No timeline events recorded</p>
         {#if onAddEvent}
-          <button onclick={onAddEvent} class="mt-2 text-yorha-primary hover, text-yorha-accent">
+          <button onclick={onAddEvent} class="mt-2 text-yorha-primary hover:text-yorha-accent">
             Add the first event
           </button>
         {/if}
@@ -131,7 +131,7 @@ import type { Case } from '$lib/types';
                 'relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2',
                 config.bg,
                 config.border,
-                interactive && 'group-hover, scale-110 transition-transform'
+                interactive && 'group-hover:scale-110 transition-transform'
               )}
             >
               <IconComponent class={cn('w-5, h-5', config.color)} />
@@ -141,7 +141,7 @@ import type { Case } from '$lib/types';
               <div
                 class={cn(
                   'bg-yorha-bg-secondary border border-yorha-border rounded-lg p-4',
-                  interactive && 'group-hover, border-yorha-primary/30 group-hover, bg-yorha-bg-tertiary transition-colors',
+                  interactive && 'group-hover:border-yorha-primary/30 group-hover:bg-yorha-bg-tertiary transition-colors',
                   compactMode && 'p-3'
                 )}
               >
@@ -206,7 +206,7 @@ import type { Case } from '$lib/types';
                         <span class="text-yorha-text-secondary">Documents:</span>
                         <div class="mt-1">
                           {#each Array.isArray(event.documents) ? event.documents : [] as document}
-                            <div class="text-yorha-primary hover, text-yorha-accent">
+                            <div class="text-yorha-primary hover:text-yorha-accent">
                               {document}
                             </div>
                           {/each}

@@ -110,7 +110,7 @@
 				<div class="flex gap-3">
 					<a
 						href="/phase78/monitor"
-						class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded hover, bg-gray-50 transition"
+						class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
 					>
 						← Back to Monitor
 					</a>
@@ -179,7 +179,7 @@
 			{:else}
 				<div class="space-y-6">
 					{#each data.suggestions as suggestion (suggestion.id)}
-						<div class="bg-white border rounded-xl shadow-sm overflow-hidden hover, shadow-md transition-shadow">
+						<div class="bg-white border rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
 							<!-- Header -->
 							<div class="p-5 border-b bg-gray-50 flex justify-between items-center">
 								<div class="flex items-center gap-3">
@@ -215,7 +215,7 @@
 								</div>
 								<div class="flex gap-2">
 									<button
-										class="px-4 py-2 text-gray-600 text-sm hover, text-gray-900 font-medium transition"
+										class="px-4 py-2 text-gray-600 text-sm hover:text-gray-900 font-medium transition"
 										onclick={() => navigator.clipboard.writeText(suggestion.patch)}
 									>
 										📋 Copy Code

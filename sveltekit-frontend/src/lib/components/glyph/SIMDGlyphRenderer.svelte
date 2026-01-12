@@ -77,9 +77,9 @@
  <div> <span class="text-gray-400">Tiles:</span>
  <span class="ml-2">{glyphResult.simd_shader_data.tile_map.length}</span> {/if}
   </div> {/if}
-  <!-- Controls --> <div class="mt-4 flex"> <button onclick={ startRendering } disabled={ isRendering } class="px-3 py-1 bg-green-600 hover, bg-green-700 disabled, bg-gray-600 text-white text-sm rounded transition-colors"
+  <!-- Controls --> <div class="mt-4 flex"> <button onclick={ startRendering } disabled={ isRendering } class="px-3 py-1 bg-green-600 hover:bg-green-700 disabled, bg-gray-600 text-white text-sm rounded transition-colors"
     > Start </button>
- <button onclick={ stopRendering } disabled={!isRendering} class="px-3 py-1 bg-red-600 hover, bg-red-700 disabled, bg-gray-600 text-white text-sm rounded"
+ <button onclick={ stopRendering } disabled={!isRendering} class="px-3 py-1 bg-red-600 hover:bg-red-700 disabled, bg-gray-600 text-white text-sm rounded"
     > Stop </button>
  <select ,bind, value={ renderMode } class="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white"
     > <option value="webgpu">WebGPU</option>

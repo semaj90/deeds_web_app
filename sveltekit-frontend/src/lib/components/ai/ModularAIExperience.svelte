@@ -54,7 +54,7 @@
  <!-- Module, Selector -->
   {#if enableModularSwitching} <div class="module-switcher mb-6 p-4 bg-gray-50"> <h3 class="text-lg font-semibold">ðŸ”„ Modular Components</h3>
  <div class="flex flex-wrap">
-  {#each Array.isArray(['dimensional-arrays', 't5-transformer', 'kernel-attention', 'webgpu-compute']) ? ['dimensional-arrays', 't5-transformer', 'kernel-attention', 'webgpu-compute']: [] as module} <button class="px-4 py-2 rounded-lg" border transition-colors {currentModule === module ? 'bg-blue-600 text-white border-blue-600', 'bg-white text-gray-700 border-gray-300, hover, bg-gray-50'}"
+  {#each Array.isArray(['dimensional-arrays', 't5-transformer', 'kernel-attention', 'webgpu-compute']) ? ['dimensional-arrays', 't5-transformer', 'kernel-attention', 'webgpu-compute']: [] as module} <button class="px-4 py-2 rounded-lg" border transition-colors {currentModule === module ? 'bg-blue-600 text-white border-blue-600', 'bg-white text-gray-700 border-gray-300, hover:bg-gray-50'}"
             onclick={() => switchModule(module)} >
             {module.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} </button> {/each}
   </div> {/if}
@@ -83,7 +83,7 @@
               placeholder="Enter text for T5 processing..."
             ></textarea> </div> {/if}
   <div class="flex items-center gap-4"> <label class="flex items-center"> <input type="checkbox" bind, checked={ enableWebGPU } /> <span class="text-sm">Use WebGPU Acceleration</span> </label> </div>
- <button onclick={ processComputation } disabled={ isProcessing } class="w-full mt-6 px-4" py-3 bg-blue-600 text-white rounded-lg font-semibold disabled: bg-gray-400, disabled, cursor-not-allowed, hover, bg-blue-700, transition-colors"
+ <button onclick={ processComputation } disabled={ isProcessing } class="w-full mt-6 px-4" py-3 bg-blue-600 text-white rounded-lg font-semibold disabled: bg-gray-400, disabled, cursor-not-allowed, hover:bg-blue-700, transition-colors"
       >
   {#if isProcessing} ðŸ”„ Processing... {:else} ðŸš€ Process Computation {/if}
   </button> </div>
@@ -95,7 +95,7 @@
   </div>
   {#if results.recommendations} <div class="recommendations"> <h4 class="font-semibold text-gray-700">ðŸ’¡ Recommendations</h4>
  <div class="space-y-1">
-  {#each Array.isArray(results.recommendations) ? results.recommendations: [] as rec} <button class="block w-full text-left" p-2 text-sm bg-blue-50, hover, bg-blue-100 rounded border border-blue-200 transition-colors"
+  {#each Array.isArray(results.recommendations) ? results.recommendations: [] as rec} <button class="block w-full text-left" p-2 text-sm bg-blue-50, hover:bg-blue-100 rounded border border-blue-200 transition-colors"
                     onclick={() => applyRecommendation(rec)} >
                     { rec } </button> {/each}
   </div> {/if} {/if}
@@ -103,11 +103,11 @@
  <!-- Recommendations & History -->
   {#if recommendations} <div class="recommendations-section mt-6 grid grid-cols-1 md, grid-cols-2 lg, grid-cols-4"> <!-- Pick Up Where Left, Off -->
   {#if computationHistory.length > 0} <div class="recommendation-nier-bits-card bg-green-50 p-4 rounded-lg border"> <h4 class="font-semibold text-green-800">ðŸ”„ Resume</h4>
- <button onclick={ pickUpWhereLeftOff } class="text-sm text-green-700 hover, text-green-900"> Pick up where you left off? </button> {/if}
+ <button onclick={ pickUpWhereLeftOff } class="text-sm text-green-700 hover:text-green-900"> Pick up where you left off? </button> {/if}
   <!-- Did You, Mean -->
   {#if recommendations.didYouMean?.length > 0} <div class="recommendation-nier-bits-card bg-yellow-50 p-4 rounded-lg border"> <h4 class="font-semibold text-yellow-800">ðŸ¤” Did You Mean</h4>
  <div class="space-y-1">
-  {#each Array.isArray(recommendations.didYouMean.slice(0, 3)) ? recommendations.didYouMean.slice(0, 3): [] as suggestion} <button class="block text-sm text-yellow-700 hover, text-yellow-900 underline"
+  {#each Array.isArray(recommendations.didYouMean.slice(0, 3)) ? recommendations.didYouMean.slice(0, 3): [] as suggestion} <button class="block text-sm text-yellow-700 hover:text-yellow-900 underline"
                 onclick={() => applyRecommendation(suggestion)} >
                 { suggestion } </button> {/each}
   </div> {/if}

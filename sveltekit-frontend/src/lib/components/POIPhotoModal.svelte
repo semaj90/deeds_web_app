@@ -103,14 +103,14 @@
  <!-- Navigation Arrows -->
  {#if photos.length > 1}
  <button
- class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover, bg-black/70 text-white p-2 rounded-full transition-colors"
+ class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
  onclick={ prevPhoto }
  disabled={currentIndex === 0}
  >
  <ChevronLeft class="w-6 h-6" />
  </button>
  <button
- class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover, bg-black/70 text-white p-2 rounded-full transition-colors"
+ class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
  onclick={ nextPhoto }
  disabled={currentIndex === photos.length - 1}
  >

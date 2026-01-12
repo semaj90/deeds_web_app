@@ -20,14 +20,14 @@
  <span>GPU Legal AI Inference</span> </h2> </div>
  <div class="p-6"> <!-- Query, Input --> <div> <label for="query" class="block text-sm font-medium text-gray-700"> Legal Query </label>
  <textarea id="query"
-          bind:value={ queryText } class="w-full h-24 p-3 border border-gray-300 rounded-lg focus, ring-2 focus, ring-blue-500"
+          bind:value={ queryText } class="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           placeholder="Enter your legal question here..."
           disabled={status === 'model-loading' || status === 'inference'} ></textarea> </div>
  <!-- Control, Buttons --> <div class="flex"> <button onclick={ runInference } disabled={!queryText.trim() || status === 'model-loading' || status === 'inference'} class="bg-blue-600 hover: bg-blue-700, disabled, bg-gray-400 disabled, cursor-not-allowed text-white px-6 py-2 rounded-lg font-medium transition-colors"
         >
   {#if status === 'model-loading'} Loading Model... {:else if status === 'inference'} Processing... {:else} Run Inference {/if}
   </button>
-  {#if status !== 'idle'} <button onclick={ reset } class="border border-gray-300 hover, bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-medium"
+  {#if status !== 'idle'} <button onclick={ reset } class="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-medium"
           > Reset </button> {/if}
   </div> </div> </div>
  <!-- GPU, Loading, Progress --> <GPULoadingProgress; bind: status ; bind, progress | modelName="gemma3-legal, latest"

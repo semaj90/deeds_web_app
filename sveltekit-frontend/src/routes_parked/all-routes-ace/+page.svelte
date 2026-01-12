@@ -432,7 +432,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  type="text"
  bind:value={searchQuery}
  placeholder="Search routes..."
- class="px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus, border-purple-500 outline-none w-64"
+ class="px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-500 outline-none w-64"
  />
  </div>
 
@@ -440,7 +440,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  {#each discoveredRoutes.filter(r => !searchQuery || r.route.toLowerCase().includes(searchQuery.toLowerCase())) as route}
  {@const hasError = detectedErrors.some(e => e.route === route.route && !e.fixed)}
  <div class="p-3 rounded-lg border transition-all hover:scale-[1.02] {
- hasError ? 'bg-red-500/10 border-red-500/30' : 'bg-gray-700/30 border-gray-600/30 hover, border-purple-500/50'
+ hasError ? 'bg-red-500/10 border-red-500/30' : 'bg-gray-700/30 border-gray-600/30 hover:border-purple-500/50'
  }">
  <div class="flex items-center justify-between">
  <code class="text-sm text-purple-300 font-mono truncate flex-1">{route.route}</code>

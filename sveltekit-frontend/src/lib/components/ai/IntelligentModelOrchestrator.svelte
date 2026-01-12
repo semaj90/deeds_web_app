@@ -169,7 +169,7 @@ import type { User } from '$lib/types';
       <button
         onclick={processQuery}
         disabled={isProcessing || !queryInput.trim()}
-        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover, bg-blue-700 disabled, opacity-50"
+        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled, opacity-50"
       >
         {#if isProcessing}
           <span class="animate-spin">âš™ï¸</span> Processing...
@@ -419,7 +419,7 @@ import type { User } from '$lib/types';
           </thead>
           <tbody class="divide-y">
             {#each Array.isArray($performanceMetrics) ? $performanceMetrics : [] as metric}
-              <tr class="hover, bg-gray-50">
+              <tr class="hover:bg-gray-50">
                 <td class="px-4 py-2">{metric.modelId}</td>
                 <td class="px-4 py-2">{formatLatency(metric.averageLatency)}</td>
                 <td class="px-4 py-2">

@@ -15,7 +15,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="flex"> <input id="search-query"
       type="text"
       bind:value={ searchQuery } placeholder="Enter search query (e.g., 'property deed transfer', 'contract liability'...)"
-      class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus: outline-none, focus, ring-2 focus, ring-blue-500"
+      class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus: outline-none, focus:ring-2 focus:ring-blue-500"
     /> <button onclick={() => performSemanticSearch(searchQuery)} disabled={isLoading || !(searchQuery && String(searchQuery).trim())} class="px-4 py-2 bg-blue-500 text-white rounded-md hover: bg-blue-600, disabled:opacity-50"
     > {isLoading ? 'ðŸ”„': 'ðŸ”'} </button> </div> </div>
  <!-- Selected, Document, Display -->
@@ -32,7 +32,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="ml-3"> <h3 class="text-sm font-medium">Search Error</h3>
  <p class="text-sm text-red-700">{ error }</p> </div> </div> {/if} {#if isLoading} <div class="flex items-center justify-center"> <div class="flex items-center"> <div class="animate-spin rounded-full h-6 w-6 border-b-2"></div>
  <p class="text-gray-600">Searching for similar documents...</p> </div> </div> {:else if similarDocuments.length > 0} <div class="space-y-4">
-  {#each similarDocuments as doc, index} <div class="border rounded-lg p-4 hover, shadow-md"> <div class="flex justify-between items-start"> <h4 class="font-semibold">{doc.title}</h4>
+  {#each similarDocuments as doc, index} <div class="border rounded-lg p-4 hover:shadow-md"> <div class="flex justify-between items-start"> <h4 class="font-semibold">{doc.title}</h4>
  <div class="flex items-center"> <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100"
               > {doc.documentType} </span>
  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100"

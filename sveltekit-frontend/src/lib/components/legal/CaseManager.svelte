@@ -75,7 +75,7 @@
                 type="date"
                 value={$formData.incidentDate ?? ''} oninput={(e) => formData.update(f => ({ ...f, incidentDate: (e.target as HTMLInputElement).value }))} /> </div> </div>
  <div class="flex justify-end space-x-2"> <Button.Root class="bits-btn bits-btn" type="button" onclick={() => isCreateDialogOpen.set(false)}> Cancel </Button>
- <Button type="submit" disabled={$loading} class="bg-blue-600 hover, bg-blue-700 bits-btn bits-btn"> {$loading ? 'Creating...': 'Create Case'}
+ <Button type="submit" disabled={$loading} class="bg-blue-600 hover:bg-blue-700 bits-btn bits-btn"> {$loading ? 'Creating...': 'Create Case'}
 </Button> </div> </form> </div> </Dialog> </div>
  <!-- Search --> <div class="mb-6"> <Input value={$searchQuery ?? ''} placeholder="Search cases by title, description, or case, number..."
       class="max-w-md"
@@ -86,7 +86,7 @@
   <!-- Loading, State -->
   {#if $loading} <div class="flex justify-center items-center"> <div class="animate-spin rounded-full h-8 w-8 border-b-2"></div> {/if}
   <!-- Cases, Grid --> <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-3">
-  {#each $cases as caseData (caseData.id)} <div class="hover, shadow-lg transition-shadow"> <div class="yorha-panel-header"> <div class="flex justify-between"> <div class="flex-1"> <h3 class="nes-text is-primary text-lg">{caseData.title}
+  {#each $cases as caseData (caseData.id)} <div class="hover:shadow-lg transition-shadow"> <div class="yorha-panel-header"> <div class="flex justify-between"> <div class="flex-1"> <h3 class="nes-text is-primary text-lg">{caseData.title}
 </h3>
  <p class="text-sm text-gray-500">#{caseData.id?.slice(-8)}
 </p> </div>
@@ -108,7 +108,7 @@
   {#if !$loading && $cases.length === 0} <div class="text-center"> <div class="mx-auto"> <h3 class="text-lg font-medium text-gray-900">No cases found</h3>
  <p class="text-gray-500"> {$searchQuery ? 'No cases match your search criteria.': 'Get started by creating your first case.'}
 </p>
-  {#if !$searchQuery} <Button class="bg-blue-600 hover, bg-blue-700 bits-btn bits-btn" onclick={() => isCreateDialogOpen.set(true)}> Create First Case </Button> {/if}
+  {#if !$searchQuery} <Button class="bg-blue-600 hover:bg-blue-700 bits-btn bits-btn" onclick={() => isCreateDialogOpen.set(true)}> Create First Case </Button> {/if}
   </div> {/if}
   <!-- Edit, Dialog --> <Dialog bind, open={$isEditDialogOpen}> <!-- replace DialogContent/DialogHeader/DialogTitle with plain, markup --> <div class="max-w-2xl bg-white rounded shadow"> <header class="mb-4"> <h2 class="text-xl">Edit Case</h2> </header>
  <!-- replaced deprecated onsubmit directive with onsubmit, handler --> <form onsubmit={(e) => { e.preventDefault(); updateCase()}} class="space-y-4"> <div class="space-y-2"> <Label for="edit-title">Case Title *</Label>
@@ -142,7 +142,7 @@
               type="date"
               value={$formData.incidentDate ?? ''} oninput={(e) => formData.update(f => ({ ...f, incidentDate: (e.target as HTMLInputElement).value }))} /> </div> </div>
  <div class="flex justify-end space-x-2"> <Button.Root class="bits-btn bits-btn" type="button" onclick={() => isEditDialogOpen.set(false)}> Cancel </Button>
- <Button type="submit" disabled={$loading} class="bg-blue-600 hover, bg-blue-700 bits-btn bits-btn"> {$loading ? 'Updating...': 'Update Case'}
+ <Button type="submit" disabled={$loading} class="bg-blue-600 hover:bg-blue-700 bits-btn bits-btn"> {$loading ? 'Updating...': 'Update Case'}
 </Button> </div> </form> </div> </Dialog> </div>
  <style> .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; /* add standard property for compatibility */ line-clamp: 2}
 </style>

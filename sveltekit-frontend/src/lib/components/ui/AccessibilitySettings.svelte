@@ -70,7 +70,7 @@ isOpen = false}
                     class="px-3 py-2 text-sm" border rounded-lg transition-colors
                       {config.fontSize === size
                         ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white, dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark, border-gray-600; hover, border-blue-500'}"
+                        : 'bg-white, dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark, border-gray-600; hover:border-blue-500'}"
                     onclick={() => updateFontSize(size)}
                     aria-pressed={config.fontSize === size}
                   >

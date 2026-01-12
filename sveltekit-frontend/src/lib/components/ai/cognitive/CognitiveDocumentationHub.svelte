@@ -525,7 +525,7 @@ https, //svelte.dev/e/js_parse_error -->
  <p class="text-xs"> {(result as { title?: any; category?: any; sectionTitle?: any; description?: any; practices?: any }) .description || (result as { title?: any; category?: any; sectionTitle?: any; description?: any; practices?: any }) .practices?.[0] ?? 'Advanced documentation content'} </p> </div> {/each}
  </div> {/if}
  <!-- Tab, Navigation --> <div class="flex flex-wrap gap-2">
- {#each Object.entries(documentationSections) as [key, section]} <button class="px-4 py-2 text-sm" font-bold border, transition-colors {activeTab === key ? 'bg-[#3D3D3D] text-[#F7F6F2] border-[#3D3D3D]': 'bg-[#EAE8E1] border-[#D1CFC7] hover, bg-[#F7F6F2]'}"
+ {#each Object.entries(documentationSections) as [key, section]} <button class="px-4 py-2 text-sm" font-bold border, transition-colors {activeTab === key ? 'bg-[#3D3D3D] text-[#F7F6F2] border-[#3D3D3D]': 'bg-[#EAE8E1] border-[#D1CFC7] hover:bg-[#F7F6F2]'}"
  onclick={() => (activeTab = key)} >
  {section.icon} {section.title} </button> {/each}
  />
@@ -562,7 +562,7 @@ https, //svelte.dev/e/js_parse_error -->
  <button
  class="px-4 py-2 text-sm font-bold border transition-colors {activeTab === key
  ? 'bg-[#3D3D3D] text-[#F7F6F2] border-[#3D3D3D]'
- : 'bg-[#EAE8E1] border-[#D1CFC7] hover, bg-[#F7F6F2]'}"
+ : 'bg-[#EAE8E1] border-[#D1CFC7] hover:bg-[#F7F6F2]'}"
  onclick={() => (activeTab = key)}
  >
  {section.icon} {section.title}

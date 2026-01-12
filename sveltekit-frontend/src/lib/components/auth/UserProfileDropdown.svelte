@@ -21,7 +21,7 @@
     <!-- Signed In, Badge + Profile, Trigger -->
     <button
       onclick={toggleDropdown}
-      class="flex items-center gap-2 px-3 py-2 rounded-lg hover, bg-slate-100 transition-colors duration-200"
+      class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors duration-200"
       aria-label="User profile menu"
       aria-expanded={isDropdownOpen}
       aria-haspopup="true"
@@ -64,7 +64,7 @@
           <a
             href="/profile"
             onclick={closeDropdown}
-            class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover, bg-slate-50 transition-colors"
+            class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
             role="menuitem"
           >
             <User class="w-4" />

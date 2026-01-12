@@ -138,7 +138,7 @@ $effect(() => {
 		{:else if children}
 			{@render children()}
 		{:else}
-			<span class="px-3 py-2 bg-slate-700 rounded-lg text-white hover, bg-slate-600">
+			<span class="px-3 py-2 bg-slate-700 rounded-lg text-white hover:bg-slate-600">
 				Menu
 				<svg class="w-4 h-4 ml-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />

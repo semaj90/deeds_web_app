@@ -155,7 +155,7 @@ function truncate(text: string, maxLength: number = 200): string {
       {@const badge = getConfidenceBadge(chunk.confidence)}
 
       <div
-        class="chunk-card p-3 rounded-lg border transition-all cursor-pointer {isSelected ? 'border-primary bg-primary-5' : 'border-base-300, hover, border-primary-50'}"
+        class="chunk-card p-3 rounded-lg border transition-all cursor-pointer {isSelected ? 'border-primary bg-primary-5' : 'border-base-300, hover:border-primary-50'}"
         onclick={() => toggleChunk(chunk.chunk_id)}
         role="button"
         tabindex="0"
@@ -223,7 +223,7 @@ function truncate(text: string, maxLength: number = 200): string {
                 href={chunk.source_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-xs text-primary hover, underline mt-1 inline-block"
+                class="text-xs text-primary hover:underline mt-1 inline-block"
                 onclick={(e) => e.stopPropagation()}
               >
                 View source →

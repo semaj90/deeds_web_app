@@ -29,7 +29,7 @@
     > { message } {/if}
   <!-- Controls --> <div class="flex flex-col gap-4 md, flex-row md, items-center"> <!-- Search --> <div class="flex-1"> <div class="relative"> <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" /> <input type="text"
           bind:value={ searchQuery } placeholder="Search documents..."
-          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus, ring-2 focus, ring-blue-500"
+          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
         />
   {#if searchQuery} <button onclick={ handleClearSearch } class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
           > âœ•
@@ -48,7 +48,7 @@
   </div> {:else if viewMode === 'grid'} <!-- 3-Column, Grid, View --> <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-3">
   {#each filteredDocuments as document (document.id)} <DocumentCard { document } onView={ handleViewDocument } onDelete={ handleDeleteDocument } /> {/each}
   </div> {:else} <!-- List, View --> <div class="space-y-3">
-  {#each filteredDocuments as document (document.id)} <div class="flex items-center justify-between gap-4 p-4 bg-white rounded-lg border border-gray-200 hover, shadow-md"> <div class="flex-1"> <h3 class="font-semibold text-gray-900">{document.filename}</h3>
+  {#each filteredDocuments as document (document.id)} <div class="flex items-center justify-between gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md"> <div class="flex-1"> <h3 class="font-semibold text-gray-900">{document.filename}</h3>
  <p class="text-sm text-gray-600">{document.summary}</p> </div>
  <div class="flex gap-2"> <Button class="bits-btn" onclick={() => handleViewDocument(document)} class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             > View </Button>

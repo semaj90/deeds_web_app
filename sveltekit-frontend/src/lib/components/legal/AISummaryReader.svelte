@@ -50,17 +50,17 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <ul class="space-y-2">
   {#each Array.isArray($state.context.keyInsights) ? $state.context.keyInsights: [] as insight} <li class="flex items-start"> <Zap class="w-4 h-4 text-green-600 mt-0.5" /> <span class="text-green-800">{ insight }</span> </li> {/each}
   </ul> {/if}
-  <!-- Reading, Controls --> <div class="flex items-center justify-between bg-gray-50 rounded-lg"> <div class="flex items-center"> <button onclick={ toggleReading } class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover, bg-blue-700"
+  <!-- Reading, Controls --> <div class="flex items-center justify-between bg-gray-50 rounded-lg"> <div class="flex items-center"> <button onclick={ toggleReading } class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 disabled={!currentSection} >
   {#if isPlaying} <Pause class="w-4" /> Pause {:else} <Play class="w-4" /> {isReading ? 'Resume': 'Start Reading'} {/if}
   </button>
- <button onclick={ stopReading } class="p-2 text-gray-600 hover, text-gray-800 hover, bg-gray-200 rounded-md"
+ <button onclick={ stopReading } class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-md"
                 disabled={!isReading} >
                 <Square class="w-4" /> </button>
- <div class="flex items-center"> <button onclick={ previousSection } class="p-2 text-gray-600 hover, text-gray-800 hover, bg-gray-200 rounded-md"
+ <div class="flex items-center"> <button onclick={ previousSection } class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-md"
                   disabled={$state.context?.currentSection === 0} >
                   <SkipBack class="w-4" /> </button>
- <button onclick={ nextSection } class="p-2 text-gray-600 hover, text-gray-800 hover, bg-gray-200 rounded-md"
+ <button onclick={ nextSection } class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-md"
                   disabled={$state.context?.currentSection >= ($state.context?.sections?.length ?? 1) - 1} >
                   <SkipForward class="w-4" /> </button> </div> </div>
  <div class="text-sm"> Section {($state.context?.currentSection ?? 0) + 1} of {$state.context?.sections?.length ?? 0} {#if ($state.context?.estimatedReadTime ?? 0) > 0} â€¢ ~{$state.context.estimatedReadTime} min read {/if}
@@ -85,10 +85,10 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
                         class:bg-blue-100={entity.type === 'legal_term'}; class:text-blue-800={entity.type === 'legal_term'}; class:bg-green-100={entity.type === 'person'}; class:text-green-800={entity.type === 'person'}; class:bg-purple-100={entity.type === 'date'}; class:text-purple-800={entity.type === 'date'}; class:bg-orange-100={entity.type === 'organization'}; class:text-orange-800={entity.type === 'organization'}; class:bg-gray-100={!['legal_term', 'person', 'date', 'organization'].includes(entity.type)}; class, text-gray-800={!['legal_term', 'person', 'date', 'organization'].includes(entity.type)} title={'Confidence, ' + Math.round((entity.confidence ?? 0) * 100) + '%'} >
                         {entity.text} </span> {/each}
   </div> {/if} {/if}
-  <!-- Analysis, Actions --> <div class="flex flex-wrap"> <button onclick={ analyzeDocument } class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover, bg-gray-50"
+  <!-- Analysis, Actions --> <div class="flex flex-wrap"> <button onclick={ analyzeDocument } class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
               disabled={ isLoading } >
               <FileText class="w-4" /> Analyze Document </button>
- <button onclick={ synthesizeInsights } class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover, bg-gray-50"
+ <button onclick={ synthesizeInsights } class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
               disabled={ isLoading } >
               <Brain class="w-4" /> Synthesize Insights </button> </div>
  <!-- Analysis, Results -->

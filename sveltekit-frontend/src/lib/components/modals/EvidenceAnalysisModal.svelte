@@ -59,7 +59,7 @@ interface Props { open?: boolean; evidence?: Evidence | null; onEvidenceUpdated?
   {#each Array.isArray(evidence.tags || []) ? evidence.tags ?? []: [] as tag} <span class="px-2 py-1 rounded text-xs font-medium bg-blue-100"
                     >{ tag }
 </span >
-                {/each} {#each Array.isArray(evidence.analysis?.suggestedTags ?? []) ? evidence.analysis?.suggestedTags ?? []: [] as tag} <button class="px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700 hover, bg-gray-200"
+                {/each} {#each Array.isArray(evidence.analysis?.suggestedTags ?? []) ? evidence.analysis?.suggestedTags ?? []: [] as tag} <button class="px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200"
                   > { tag } <span class="text-xs">(suggested)</span> </button> {/each}
   </div>
  <div class="flex items-center"> <Input bind, value={ newTags } placeholder="Add, tags (comma-separated)"
@@ -74,7 +74,7 @@ interface Props { open?: boolean; evidence?: Evidence | null; onEvidenceUpdated?
   </div>
  <!-- Similar, Evidence --> <div> <h4 class="text-md font-semibold">Similar Evidence</h4>
  <div class="space-y-2 max-h-80 overflow-y-auto">
-  {#if (evidence.similarEvidence ?? []).length > 0} {#each Array.isArray(evidence.similarEvidence) ? evidence.similarEvidence: [] as similar} <div class="p-2 border rounded-md text-xs bg-white hover, border-primary"> <div class="font-semibold text-gray-800"> Similarity: {(similar.similarity * 100).toFixed(0)}% </div>
+  {#if (evidence.similarEvidence ?? []).length > 0} {#each Array.isArray(evidence.similarEvidence) ? evidence.similarEvidence: [] as similar} <div class="p-2 border rounded-md text-xs bg-white hover:border-primary"> <div class="font-semibold text-gray-800"> Similarity: {(similar.similarity * 100).toFixed(0)}% </div>
  <p class="text-gray-600">{similar.content}
 </p> </div> {/each} {:else} <div class="text-center py-4 border-2 border-dashed rounded-lg text-sm text-gray-500"
                   > No similar evidence found. {/if}

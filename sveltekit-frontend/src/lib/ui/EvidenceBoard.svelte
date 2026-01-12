@@ -277,7 +277,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <span class="text-black/60">
  connections: {connections.filter(c => c.from === item.id || c.to === item.id).length}
  </span>
- <span class="text-accentSoft cursor-pointer hover, text-accent">open ▸</span>
+ <span class="text-accentSoft cursor-pointer hover:text-accent">open ▸</span>
  </div>
  </div>
  </div>

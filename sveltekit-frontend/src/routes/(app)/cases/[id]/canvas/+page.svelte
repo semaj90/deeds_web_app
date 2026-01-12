@@ -9,7 +9,7 @@
 		<h2 class="text-sm uppercase tracking-[0.25em] text-slate-400">Evidence Canvas</h2>
 		<button
 			class="text-xs px-3 py-1 rounded-full border border-amber-400/60
- hover, bg-amber-400/10 transition-colors"
+ hover:bg-amber-400/10 transition-colors"
 		>
 			Auto-Arrange Nodes
 		</button>

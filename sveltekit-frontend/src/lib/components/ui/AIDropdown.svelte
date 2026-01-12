@@ -142,7 +142,7 @@
     class={cn(
       "inline-flex items-center gap-2 px-4 py-2 rounded-md transition-all font-medium border",
       "bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-700 border-purple-100",
-      "hover: from-purple-100, hover: to-indigo-100, hover, border-purple-200",
+      "hover: from-purple-100, hover: to-indigo-100, hover:border-purple-200",
       (disabled || isGenerating) && "opacity-50 cursor-not-allowed grayscale",
       open && " ring-2 ring-purple-500 ring-offset-2"
     )}
@@ -181,7 +181,7 @@
           <DropdownMenuItem
             class={cn(
               "flex items-center justify-between px-3 py-2.5 rounded-md cursor-pointer outline-none transition-colors",
-              "hover: bg-accent, focus, bg-accent",
+              "hover: bg-accent, focus:bg-accent",
               selectedItem === report.id && "bg-purple-50 text-purple-900"
             )}
             onclick={() => handleItemSelect(report.id)}
@@ -218,7 +218,7 @@
           <DropdownMenuItem
             class={cn(
               "flex items-center justify-between px-3 py-2.5 rounded-md cursor-pointer outline-none transition-colors",
-              "hover: bg-accent, focus, bg-accent",
+              "hover: bg-accent, focus:bg-accent",
               tool.requiresContent && !hasContent && "opacity-40 cursor-not-allowed",
               selectedItem === tool.id && "bg-purple-50 text-purple-900"
             )}

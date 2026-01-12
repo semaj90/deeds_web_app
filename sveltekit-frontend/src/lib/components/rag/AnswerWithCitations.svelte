@@ -35,7 +35,7 @@ function parseAnswerWithCitations(text: string, citations: Citation[]): string {
     const idx = parseInt(num) - 1;
     if (idx >= 0 && idx < citations.length) {
       return `<button
-        class="citation-link text-primary hover, underline font-semibold"
+        class="citation-link text-primary hover:underline font-semibold"
         data-citation-idx="${idx}"
         onclick="window.showCitation(${idx})"
       >${match}</button>`;
@@ -134,7 +134,7 @@ function formatTime(ms: number): string {
       <div class="grid gap-2">
         {#each answer.citations as citation, idx (citation.citation_id)}
           <div
-            class="citation-card flex items-start gap-3 p-3 bg-base-200 rounded-lg hover, bg-base-300 transition-colors cursor-pointer"
+            class="citation-card flex items-start gap-3 p-3 bg-base-200 rounded-lg hover:bg-base-300 transition-colors cursor-pointer"
             onclick={() => activeCitation = citation}
             role="button"
             tabindex="0"

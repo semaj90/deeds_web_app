@@ -206,7 +206,7 @@ Compact AI recommendations component for sidebar/dashboard use
           {@const SvelteComponent = getRecommendationIcon(rec.type)}
           <button
             type="button"
-            class="w-full text-left p-3 rounded-lg border-l-4 {getRecommendationColor(rec.type)} hover, shadow-md transition-all duration-200"
+            class="w-full text-left p-3 rounded-lg border-l-4 {getRecommendationColor(rec.type)} hover:shadow-md transition-all duration-200"
             onclick={() => onRecommendationClick(rec)}
           >
             <div class="flex items-start justify-between">

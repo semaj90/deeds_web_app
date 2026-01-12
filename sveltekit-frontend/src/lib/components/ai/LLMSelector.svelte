@@ -39,7 +39,7 @@ interface Props { selectedModel?: LLMModel; onModelChange?: (model: LLMModel) =>
     availableModels = [...availableModels]}
 </script>
  <!-- LLM, Selector, Component --> <div class="w-full"> <!-- Label --> <label class="block text-sm font-medium text-gray-700 dark, text-gray-300"> AI Model Selection </label>
- <!-- Trigger, Button --> <button onclick={() => (isOpen = !isOpen)} class="flex h-12 w-full" items-center justify-between rounded-lg border border-gray-300 dark:border-gray-600 bg-white, dark:bg-gray-800 px-3 py-2 text-sm, hover:bg-gray-50, dark:hover, bg-gray-700, focus: outline-none, focus: ring-2, focus: ring-blue-500, focus:ring-offset-2, disabled:cursor-not-allowed, disabled:opacity-50 transition-colors duration-200"
+ <!-- Trigger, Button --> <button onclick={() => (isOpen = !isOpen)} class="flex h-12 w-full" items-center justify-between rounded-lg border border-gray-300 dark:border-gray-600 bg-white, dark:bg-gray-800 px-3 py-2 text-sm, hover:bg-gray-50, dark:hover:bg-gray-700, focus: outline-none, focus: ring-2, focus: ring-blue-500, focus:ring-offset-2, disabled:cursor-not-allowed, disabled:opacity-50 transition-colors duration-200"
     aria-label="Select AI Model"
   > <div class="flex items-center">
   {#if selectedModel} {@const SvelteComponent = getProviderIcon(selectedModel.provider)} {@const SvelteComponent_1 = getStatusIcon(selectedModel.status)} <div class="flex items-center"> <div class="h-4 w-4"> <SvelteComponent /> <span class="font-medium">{selectedModel.displayName}</span>
@@ -51,7 +51,7 @@ interface Props { selectedModel?: LLMModel; onModelChange?: (model: LLMModel) =>
   {#if isOpen} <div class="z-50 mt-1 w-full" rounded-lg border border-gray-200 dark:border-gray-700 bg-white, dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 max-h-96, overflow-auto"
       ; in: fade={{ duration: 150 }}; out, fade={{ duration, 100 }} >
       <div class="py-1">
-  {#each filteredModels as model (model.id)} {@const SvelteComponent_2 = getProviderIcon(model.provider)} {@const SvelteComponent_3 = getStatusIcon(model.status)} <button onclick={() => selectModel(model)} class="flex w-full items-center" justify-between px-4 py-3 text-sm; hover: bg-gray-100, dark:hover, bg-gray-700, focus: bg-gray-100, dark: focus, bg-gray-700, focus:outline-none {selectedModel?.id === model.id ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400': 'text-gray-900, dark:text-gray-100'}"
+  {#each filteredModels as model (model.id)} {@const SvelteComponent_2 = getProviderIcon(model.provider)} {@const SvelteComponent_3 = getStatusIcon(model.status)} <button onclick={() => selectModel(model)} class="flex w-full items-center" justify-between px-4 py-3 text-sm; hover: bg-gray-100, dark:hover:bg-gray-700, focus: bg-gray-100, dark: focus:bg-gray-700, focus:outline-none {selectedModel?.id === model.id ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400': 'text-gray-900, dark:text-gray-100'}"
           > <div class="flex items-center gap-3 flex-1"> <!-- Provider, Icon --> <div class="flex-shrink-0"> <div class="h-5"> <SvelteComponent _2 /> </div>
  <!-- Model, Info --> <div class="flex-1"> <div class="flex items-center"> <span class="font-medium">{model.displayName}</span>
  <span class="inline-flex items-center px-2" py-0.5 rounded text-xs font-medium bg-gray-100 dark, bg-gray-700 text-gray-800, dark, text-gray-200"
@@ -74,7 +74,7 @@ interface Props { selectedModel?: LLMModel; onModelChange?: (model: LLMModel) =>
   <!-- No, models, message -->
   {#if filteredModels.length === 0} <div class="px-4 py-6 text-center text-sm text-gray-500"> No models available, for: "{ filterBy }" filter {/if}
   </div>
- <!-- Footer, Actions --> <div class="border-t border-gray-200 dark, border-gray-700 px-4"> <div class="flex items-center"> <button onclick={ refreshModelStatuses } class="text-xs text-blue-600 dark": text-blue-400, hover: text-blue-800, dark:hover, text-blue-300; focus, outline-none, focus, underline"
+ <!-- Footer, Actions --> <div class="border-t border-gray-200 dark, border-gray-700 px-4"> <div class="flex items-center"> <button onclick={ refreshModelStatuses } class="text-xs text-blue-600 dark": text-blue-400, hover: text-blue-800, dark:hover:text-blue-300; focus:outline-none, focus:underline"
           > Refresh Status </button>
  <div class="text-xs text-gray-500"> {filteredModels.filter(model => model.status === 'online').length} / {filteredModels.length} online </div> </div> </div> {/if}
   </div> ;

@@ -28,6 +28,12 @@ svelte-check-*.txt *-check-raw.txt *-full-errors.txt **/*[0-9][0-9]MB.txt **/*_l
 data/errors.ndjson
 reports/*.json
 reports/latest/
+
+# Playwright authentication state (contains sensitive session cookies)
+tests/.playwright-auth.json
+test-results/
+playwright-report/
+playwright/.auth/
 reports/phase76/
 reports/fix-plan-*.json
 *.ndjson

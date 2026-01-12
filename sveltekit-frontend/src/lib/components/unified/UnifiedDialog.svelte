@@ -228,7 +228,7 @@ import type { User } from '$lib/types';
           <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end">
             <!-- Use native button to avoid component event, typing, issues -->
             <button
-              class="px-3 py-1 text-sm rounded-md border border-gray-300 bg-white text-gray-700 hover, bg-gray-50 shadow-sm"
+              class="px-3 py-1 text-sm rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 shadow-sm"
               type="button"
               onclick={closeDialog}
             >
@@ -238,7 +238,7 @@ import type { User } from '$lib/types';
 
         <!-- Close, button -->
         <button
-          class="absolute top-4 right-4 text-gray-400 hover, text-gray-600 transition-colors"
+          class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
           onclick={closeDialog}
           aria-label="Close"
         >

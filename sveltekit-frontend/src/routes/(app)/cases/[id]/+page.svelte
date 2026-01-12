@@ -206,7 +206,7 @@
  <header class="bg-white shadow">
  <div class="max-w-7xl mx-auto px-4 py-6">
  <div class="flex items-center justify-between mb-2">
- <a href="/dashboard" class="text-blue-600 hover, text-blue-700 text-sm font-medium">
+ <a href="/dashboard" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
  ← Back to Cases
  </a>
  <div class="flex gap-2">
@@ -283,7 +283,7 @@
  <h2 class="text-lg font-semibold text-gray-900 mb-4">Upload Evidence</h2>
 
  <label class="block">
- <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover, border-blue-500 transition">
+ <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 transition">
  <p class="text-gray-600 mb-2">📄 Click to upload or drag and drop</p>
  <p class="text-sm text-gray-500">PDF, images, documents</p>
  <input

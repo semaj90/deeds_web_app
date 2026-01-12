@@ -68,7 +68,7 @@ import { User } from "lucide-svelte";
  }
 </script>
 
-<Card class="hover, shadow-lg transition-shadow cursor-pointer border-2" onclick={() => onView.poi}>
+<Card class="hover:shadow-lg transition-shadow cursor-pointer border-2" onclick={() => onView.poi}>
  <CardHeader class="pb-3">
  <div class="flex items-center justify-between">
  <div class="flex items-center gap-3">

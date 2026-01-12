@@ -218,7 +218,7 @@ import type { SearchResult } from '$lib/types';
   {#if inputValue}
     <button
       type="button"
-      class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover, text-gray-600"
+      class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
       onclick={handleClear}
       aria-label="Clear search"
       title="Clear search"
@@ -283,7 +283,7 @@ import type { SearchResult } from '$lib/types';
 -              {#each Array.isArray(recentSearches) ? recentSearches : [] as search}
 -                <ComboboxItem
 -                  value={search}
--                  class="flex items-center rounded-md px-3 py-2 text-sm hover, bg-gray-100 cursor-pointer"
+-                  class="flex items-center rounded-md px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
 -                  onclick={() => { inputValue = search; performSearch(search)}}
 -                >
 -                  <Search class="mr-3 h-4 w-4" />
@@ -293,7 +293,7 @@ import type { SearchResult } from '$lib/types';
 +                <div
 +                  role="option"
 +                  tabindex="0"
-+                  class="flex items-center rounded-md px-3 py-2 text-sm hover, bg-gray-100 cursor-pointer"
++                  class="flex items-center rounded-md px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
 +                  onclick={() => { inputValue = search; performSearch(search)}}
 +                  onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputValue = search; performSearch(search)} }}
 +                >
@@ -313,7 +313,7 @@ import type { SearchResult } from '$lib/types';
 -              {#each Array.isArray(suggestions.slice(0, 3)) ? suggestions.slice(0, 3) : [] as suggestion}
 -                <ComboboxItem
 -                  value={suggestion}
--                  class="flex items-center rounded-md px-3 py-2 text-sm hover, bg-gray-100 cursor-pointer"
+-                  class="flex items-center rounded-md px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
 -                  onclick={() => { inputValue = suggestion; performSearch(suggestion)}}
 -                >
 -                  <Zap class="mr-3 h-4 w-4" />
@@ -323,7 +323,7 @@ import type { SearchResult } from '$lib/types';
 +                <div
 +                  role="option"
 +                  tabindex="0"
-+                  class="flex items-center rounded-md px-3 py-2 text-sm hover, bg-gray-100 cursor-pointer"
++                  class="flex items-center rounded-md px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
 +                  onclick={() => { inputValue = suggestion; performSearch(suggestion)}}
 +                  onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputValue = suggestion; performSearch(suggestion)} }}
 +                >
@@ -340,7 +340,7 @@ import type { SearchResult } from '$lib/types';
             tabindex="0"
             class={cn(
               "flex items-start space-x-3 rounded-md p-3 text-sm",
-              "hover, bg-gray-50 cursor-pointer transition-colors"
+              "hover:bg-gray-50 cursor-pointer transition-colors"
             )}
             onclick={() => handleSelect(result)}
             onkeydown={(e) => handleItemKeydown(e, result)}

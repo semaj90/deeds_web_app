@@ -48,7 +48,7 @@
  PINNED CONTEXT ({$chatContext .length})
  </h3>
  <button
- class="text-[10px] text-red-400 hover, text-red-300"
+ class="text-[10px] text-red-400 hover:text-red-300"
  onclick={ clearAll }
  >
  CLEAR ALL
@@ -73,7 +73,7 @@
  </div>
  </div>
  <button
- class="ml-2 text-red-400 hover, text-red-300 text-xs"
+ class="ml-2 text-red-400 hover:text-red-300 text-xs"
  onclick={() => removeContext(item.id)}
  >
  ×

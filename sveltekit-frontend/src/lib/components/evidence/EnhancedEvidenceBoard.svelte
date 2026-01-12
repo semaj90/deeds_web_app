@@ -158,13 +158,13 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
  <!-- System Status with NES, Badges --> <div class="flex flex-wrap"> <span class="nes-badge {ollamaConnected ? 'is-success', 'is-error'}"> ðŸ¤– {ollamaConnected ? 'AI Online': 'AI Offline'} </span>
  <span class="nes-badge {minioConnected ? 'is-success', 'is-error'}"> ðŸ“¦ {minioConnected ? 'MinIO Ready': 'Storage Offline'} </span>
  <span class="nes-badge {cudaConnected ? 'is-success', 'is-warning'}"> âš¡ {cudaConnected ? 'CUDA Active': 'CPU Mode'} </span> </div> </div>
- <!-- Gaming Controls & Stats --> <div class="flex flex-col lg, flex-row items-start lg, items-center"> <!-- Evidence Stats with N64, Style --> <div class="flex"> <div class="n64-stat-nier-bits-card bg-gradient-to-br from-blue-500 to-blue-700 text-white px-4 py-2 rounded-lg shadow-lg transform hover, scale-105 transition-all"
+ <!-- Gaming Controls & Stats --> <div class="flex flex-col lg, flex-row items-start lg, items-center"> <!-- Evidence Stats with N64, Style --> <div class="flex"> <div class="n64-stat-nier-bits-card bg-gradient-to-br from-blue-500 to-blue-700 text-white px-4 py-2 rounded-lg shadow-lg transform hover:scale-105 transition-all"
             > <div class="text-xs">Total</div>
  <div class="text-xl">{ totalEvidence }</div> </div>
- <div class="n64-stat-nier-bits-card bg-gradient-to-br from-yellow-500 to-orange-600 text-white px-4 py-2 rounded-lg shadow-lg transform hover, scale-105"
+ <div class="n64-stat-nier-bits-card bg-gradient-to-br from-yellow-500 to-orange-600 text-white px-4 py-2 rounded-lg shadow-lg transform hover:scale-105"
             > <div class="text-xs">Processing</div>
  <div class="text-xl">{ processingCount }</div> </div>
- <div class="n64-stat-nier-bits-card bg-gradient-to-br from-green-500 to-emerald-600 text-white px-4 py-2 rounded-lg shadow-lg transform hover, scale-105"
+ <div class="n64-stat-nier-bits-card bg-gradient-to-br from-green-500 to-emerald-600 text-white px-4 py-2 rounded-lg shadow-lg transform hover:scale-105"
             > <div class="text-xs">Ready</div>
  <div class="text-xl">{ readyCount }</div> </div> </div>
  <!-- Gaming, Mode, Toggle --> <div class="flex items-center"> <button type="button"
@@ -185,7 +185,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
  <!-- AI Suggestions, Dropdown -->
   {#if showSuggestions && searchSuggestions.length > 0} <div class="nes-container is-dark mt-2 max-h-48">
   {#each Array.isArray(searchSuggestions) ? searchSuggestions: [] as suggestion} <button type="button"
-                  class="w-full text-left p-2 hover, bg-nier-accent"
+                  class="w-full text-left p-2 hover:bg-nier-accent"
                   onclick={() => applySuggestion(suggestion)} >
                   <div class="flex justify-between"> <span class="font-medium">{suggestion.text}</span>
  <span class="nes-badge is-success"> {(suggestion.confidence * 100).toFixed(0)}% </span> </div>

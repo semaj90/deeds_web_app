@@ -281,7 +281,7 @@
  : 'Unknown date'}
  </p>
  <button
- class="mt-2 text-xs text-amber-300 hover, underline"
+ class="mt-2 text-xs text-amber-300 hover:underline"
  onclick={() => navigateToCase(caseItem.id)}
  >
  View case
@@ -358,7 +358,7 @@
  id="case-title"
  type="text"
  bind:value={newCaseData.title}
- class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus, border-amber-400"
+ class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400"
  required
  />
  </div>
@@ -368,7 +368,7 @@
  id="case-description"
  bind:value={newCaseData.description}
  rows="4"
- class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus, border-amber-400"
+ class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400"
  placeholder="Provide additional context, links, or known entities."
  ></textarea>
  </div>
@@ -377,7 +377,7 @@
  <select
  id="case-priority"
  bind:value={newCaseData.priority}
- class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus, border-amber-400"
+ class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400"
  >
  <option value="low">Low</option>
  <option value="medium">Medium</option>
@@ -388,7 +388,7 @@
  <div class="flex justify-end gap-3">
  <button
  type="button"
- class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover, border-slate-400"
+ class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:border-slate-400"
  onclick={ cancelNewCase }
  >
  Cancel

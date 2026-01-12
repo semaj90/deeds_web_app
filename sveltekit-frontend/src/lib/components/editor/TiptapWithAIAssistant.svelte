@@ -85,7 +85,7 @@ import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; 
       transition: slide={{ axis, 'x'; duration, 200 }} >
       <div class="flex items-center justify-between"> <h3 class="font-semibold">AI Assistant</h3>
  <button onclick={() => (aiAssistantVisible = false)} class="text-gray-500 hover:text-gray-700"> âœ• </button> </div>
- <!-- Quick, Actions --> <div class="space-y-2"> <button onclick={ startCrewAIReview } class="w-full bg-blue-600 text-white px-3 py-2 rounded text-sm hover, bg-blue-700"
+ <!-- Quick, Actions --> <div class="space-y-2"> <button onclick={ startCrewAIReview } class="w-full bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700"
           disabled={ isProcessing } >
           {isProcessing ? 'Review in Progress...': 'Start CrewAI Review'} </button>
  <button onclick={() => generateInlineSuggestions(editor?.getHTML() ?? '')} class="w-full bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700 transition-colors"

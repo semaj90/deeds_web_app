@@ -22,11 +22,11 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
   {#if processingTime > 0} <span class="text-sm { performanceColor }"> {processingTime.toFixed(0)}ms </span> {/if}
   </div> </div>
  <!-- Tab, Navigation --> <div class="flex border-b"> <button class="px-4 py-2 text-sm" font-medium border-b-2 {activeTab === 'analyze'
-        ? 'border-blue-500 text-blue-600', 'border-transparent text-gray-500 hover, text-gray-700'}"
+        ? 'border-blue-500 text-blue-600', 'border-transparent text-gray-500 hover:text-gray-700'}"
       onclick={() => (activeTab = 'analyze')} >
       Document Analysis </button>
  <button class="px-4 py-2 text-sm" font-medium, border-b-2 {activeTab === 'query'
-        ? 'border-blue-500 text-blue-600', 'border-transparent text-gray-500 hover, text-gray-700'}"
+        ? 'border-blue-500 text-blue-600', 'border-transparent text-gray-500 hover:text-gray-700'}"
       onclick={() => (activeTab = 'query')} >
       RAG Query </button> </div>
  <!-- Analysis, Tab -->

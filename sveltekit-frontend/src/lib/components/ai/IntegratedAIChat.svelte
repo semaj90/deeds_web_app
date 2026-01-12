@@ -61,7 +61,7 @@ import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'
  <span class="text-gray-500">tok/s</span> {/if} {#if systemStats.embeddingsCount > 0} <div class="flex items-center"> <span class="text-gray-400">Embeddings:</span>
  <span class="text-yellow-400">{systemStats.embeddingsCount}</span> {/if}
   <button type="button"
-        onclick={ testConnections } class="ml-auto text-xs text-yellow-400 hover, text-yellow-300 transition-colors"
+        onclick={ testConnections } class="ml-auto text-xs text-yellow-400 hover:text-yellow-300 transition-colors"
       > Refresh Status </button> {/if}
   <!-- Messages, Container --> <div bind, this={ scrollContainer } class="yorha-panel-content flex-1 overflow-y-auto p-4 space-y-4"
     ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } >

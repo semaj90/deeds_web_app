@@ -317,7 +317,7 @@
                 class="bits-btn text-sm"
               > Clear Results </Button> </div>
   {#if searchResults.length === 0} <p class="text-gray-600">No similar evidence found.</p> {:else} <div class="space-y-3">
-  {#each Array.isArray(searchResults) ? searchResults: [] as result} <div class="search-result-item p-4 border rounded-lg bg-gray-50 hover, bg-gray-100"> <div class="flex justify-between"> <div class="flex-1"> <h5 class="font-medium">{result.title}
+  {#each Array.isArray(searchResults) ? searchResults: [] as result} <div class="search-result-item p-4 border rounded-lg bg-gray-50 hover:bg-gray-100"> <div class="flex justify-between"> <div class="flex-1"> <h5 class="font-medium">{result.title}
 </h5>
   {#if result.description} <p class="text-sm text-gray-600">{result.description}
 </p> {/if}
@@ -343,7 +343,7 @@
  <p class="text-gray-600">No evidence files uploaded yet.</p>
   {#if showUpload} <p class="text-sm text-gray-500">Use the upload section above to add files.</p> {/if}
   </div> {:else} <div class="space-y-3">
-  {#each Array.isArray(evidenceFiles) ? evidenceFiles: [] as file} <div class="evidence-file-item p-4 border rounded-lg hover, bg-gray-50"> <div class="flex justify-between"> <div class="flex-1"> <h5 class="font-medium">{file.title}
+  {#each Array.isArray(evidenceFiles) ? evidenceFiles: [] as file} <div class="evidence-file-item p-4 border rounded-lg hover:bg-gray-50"> <div class="flex justify-between"> <div class="flex-1"> <h5 class="font-medium">{file.title}
 </h5>
   {#if file.description} <p class="text-sm text-gray-600">{file.description}
 </p> {/if}

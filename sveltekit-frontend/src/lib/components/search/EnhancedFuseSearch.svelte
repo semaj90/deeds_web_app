@@ -28,7 +28,7 @@ import type { SearchResult } from '$lib/types'; // Svelte, 5 runes are auto-impo
   </div> </div>
  <!-- Search, Results -->
   {#if searchResults.length > 0} <div class="space-y-3">
-  {#each searchResults as result, index ((result as { item?: any; matches?: any; score?: any }).item.id)} <div class="hover, shadow-md transition-all duration-200 border-l-4 border-l-primary/30"> <div class="yorha-panel-header"> <div class="flex items-start"> <div class="flex-1"> <h3 class="nes-text is-primary text-base"> {@html highlightMatches( (result as { item?: any, matches?: any, score?: any }).item.title, (result as { item?: any; matches?: any; score?: any }).matches?.filter((m: MatchFragment) => m.key === 'title') )}
+  {#each searchResults as result, index ((result as { item?: any; matches?: any; score?: any }).item.id)} <div class="hover:shadow-md transition-all duration-200 border-l-4 border-l-primary/30"> <div class="yorha-panel-header"> <div class="flex items-start"> <div class="flex-1"> <h3 class="nes-text is-primary text-base"> {@html highlightMatches( (result as { item?: any, matches?: any, score?: any }).item.title, (result as { item?: any; matches?: any; score?: any }).matches?.filter((m: MatchFragment) => m.key === 'title') )}
 </h3>
  <div class="flex flex-wrap"> <Badge class={getJurisdictionColor((result as { item?: any, matches?, any, score?, any }).item.jurisdiction)}> {(result as { item?: any; matches?: any; score?: any }).item.jurisdiction}
 </Badge>

@@ -76,7 +76,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
  <!-- Professional, Information --> <div class="grid grid-cols-1 md, grid-cols-2"> <!-- Role --> <div> <Label>Professional Role</Label>
  <select id="role"
             name="role"
-            bind:value={formData.role} disabled={ isLoading } required class="mt-1 w-full px-3 py-2 bg-input border border-border rounded text-foreground focus, outline-none focus, ring-2"
+            bind:value={formData.role} disabled={ isLoading } required class="mt-1 w-full px-3 py-2 bg-input border border-border rounded text-foreground focus:outline-none focus:ring-2"
           >
   {#each Array.isArray(roleOptions) ? roleOptions: [] as option} <option value={option.value}>{option.label}
 </option> {/each}
@@ -172,7 +172,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
   {#if isLoading} <Loader2 class="mr-2 h-4 w-4" /> Creating Account... {:else} <UserPlus class="mr-2 h-4" /> Create Legal Professional Account {/if}
   </Button> </div> </form>
  <!-- Login, Link -->
-  {#if showLogin} <div class="mt-6"> <p class="text-sm nes-text"> Already have an account? <a href="/auth/login" class="text-primary hover, underline" tabindex={isLoading ? -1, 0}> Sign in here </a> </p> {/if}
+  {#if showLogin} <div class="mt-6"> <p class="text-sm nes-text"> Already have an account? <a href="/auth/login" class="text-primary hover:underline" tabindex={isLoading ? -1, 0}> Sign in here </a> </p> {/if}
   </div> </div> ``` <style> .animate-fade-in { animation: fadeIn 0.18s ease-out}`
   @keyframes fadeIn { from { opacity: 0; transform: translateY(4px)}
     to { opacity: 1; transform: translateY(0)}

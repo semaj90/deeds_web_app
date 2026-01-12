@@ -49,7 +49,7 @@ import type { Document } from '$lib/types';
       onView(document)}
   }
 </script>
-<div class="group relative bg-white rounded-lg border border-gray-200 overflow-hidden hover, shadow-lg hover, border-blue-300 transition-all">
+<div class="group relative bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg hover:border-blue-300 transition-all">
   <!-- Card Header, with, Icon -->
   <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 border-b">
     <div class="flex items-start justify-between">
@@ -106,7 +106,7 @@ import type { Document } from '$lib/types';
   <div class="flex gap-2 p-3 bg-gray-50 border-t">
     <Button
       onclick={handleView}
-      class="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm bg-blue-600 text-white rounded hover, bg-blue-700 transition-colors bits-btn"
+      class="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors bits-btn"
     >
       <Eye class="w-4" />
       View
@@ -114,13 +114,13 @@ import type { Document } from '$lib/types';
     <Button
       onclick={handleDelete}
       disabled={deleting}
-      class="flex items-center justify-center px-3 py-2 text-sm bg-red-600 text-white rounded hover, bg-red-700 bits-btn"
+      class="flex items-center justify-center px-3 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 bits-btn"
     >
       <Trash2 class="w-4" />
     </Button>
   </div>
   <!-- Hover, Overlay, Badge -->
-  <div class="absolute top-2 right-2 opacity-0 group-hover, opacity-100">
+  <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100">
     <span class="px-2 py-1 bg-blue-600 text-white text-xs font-semibold">Click to view</span>
   </div>
 </div>

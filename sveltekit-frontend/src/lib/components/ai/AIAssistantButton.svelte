@@ -43,7 +43,7 @@
             ? 'Ready to help': aiStatus === 'processing'
               ? 'Processing...': aiStatus === 'listening'
                 ? 'Listening...': 'Offline'} </span> </div>
-  {#if voiceEnabled} <span class="ml-auto p-1 hover, bg-yorha-bg-hover rounded inline-flex items-center justify-center"
+  {#if voiceEnabled} <span class="ml-auto p-1 hover:bg-yorha-bg-hover rounded inline-flex items-center justify-center"
           role="button"
           tabindex="0"
           onclick={e => { e.stopPropagation(); toggleVoiceInput()}} onkeydown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggleVoiceInput()}
@@ -70,7 +70,7 @@
   {#if aiStatus === 'connected'} <span class="text-xs px-2 py-1 bg-green-500/10 text-green-400"> Online </span> {/if}
   </div> </div> </div>
  <div class="flex items-center">
-  {#if voiceEnabled} <span class="p-2 hover, bg-yorha-bg-hover rounded-lg inline-flex items-center justify-center"
+  {#if voiceEnabled} <span class="p-2 hover:bg-yorha-bg-hover rounded-lg inline-flex items-center justify-center"
             role="button"
             tabindex="0"
             onclick={e => { e.stopPropagation(); toggleVoiceInput()}} onkeydown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggleVoiceInput()}

@@ -43,7 +43,7 @@
  bind, value={ inputValue } onvaluechange={(e, unknown) => { const val = (e && (e.detail ?? (e.target && e.target.value))) ?? ''; handleInputChange(String(val))}} /> {/if}
   <!-- Search Button & Status Indicators --> <div class="absolute inset-y-0 right-0 flex items-center">
   {#if isStreaming} <Loader2 class="h-4 w-4 animate-spin" /> {:else if enableRealTime && connectionStatus === 'connected'} <Zap class="h-4 w-4" /> {:else} <button type="button"
-              class="p-1 hover, bg-gray-100 rounded"
+              class="p-1 hover:bg-gray-100 rounded"
               onclick={ handleSearch } disabled={!inputValue.trim()} >
               <Search class="h-4 w-4" /> </button> {/if}
   </div> </div>
@@ -52,7 +52,7 @@
         >
   {#if $searchState?.error} <!-- Error, State --> <div class="flex items-center gap-2 p-4"> <AlertCircle class="h-4" /> <span class="text-sm">{$searchState?.error}</span> </div> {:else if isStreaming} <!-- Streaming, State --> <div class="flex items-center gap-2 p-4"> <Loader2 class="h-4 w-4" /> <span class="text-sm">Searching with AI enhancement...</span> </div>
  <!-- Streaming, Results -->
-  {#each filteredResults as result ((result as { title?: unknown; id?: unknown }).id)} {#if CommandItem} <CommandItem value={(result as unknown).id} class="relative flex cursor-default select-none items-start gap-3 rounded-sm px-3 py-2 text-sm outline-none hover, bg-gray-50"
+  {#each filteredResults as result ((result as { title?: unknown; id?: unknown }).id)} {#if CommandItem} <CommandItem value={(result as unknown).id} class="relative flex cursor-default select-none items-start gap-3 rounded-sm px-3 py-2 text-sm outline-none hover:bg-gray-50"
                   onselect={() => handleSelect(result)} >
                   <!-- Result, Type, Icon --> <div class="mt-1"> {getResultTypeIcon((result as unknown).type)} </div>
  <!-- Result, Content --> <div class="flex-1"> <div class="flex items-start justify-between"> <div class="font-medium text-gray-900">{(result as unknown).title}</div>
@@ -63,7 +63,7 @@
  <div class="flex items-center gap-2 mt-2 text-xs"> <span class="capitalize bg-gray-100 px-2 py-1">{(result as unknown).type}</span>
   {#if (result as unknown).metadata?.jurisdiction} <span>{(result as unknown).metadata.jurisdiction}</span> {/if} {#if (result as unknown).metadata?.status} <span class="capitalize">{(result as unknown).metadata.status}</span> {/if} {#if (result as unknown).realTime} <span class="text-blue-500">Live</span> {/if}
   </div> </div> </CommandItem> {:else} <!-- Fallback plain interactive element when CommandItem primitive, isn't, available --> <button type="button"'
-                  class="relative flex cursor-default select-none items-start gap-3 rounded-sm px-3 py-2 text-sm outline-none hover, bg-gray-50"
+                  class="relative flex cursor-default select-none items-start gap-3 rounded-sm px-3 py-2 text-sm outline-none hover:bg-gray-50"
                   onclick={() => handleSelect(result)} >
                   <div class="mt-1">{getResultTypeIcon((result as unknown).type)}</div>
  <div class="flex-1"> <div class="flex items-start justify-between"> <div class="font-medium text-gray-900">{(result as unknown).title}</div>
@@ -82,7 +82,7 @@
   </div>
   {#if (result as unknown).highlights && (result as unknown).highlights.length > 0} <div class="mt-2 text-xs"> <span class="font-medium">Highlights:</span> {(result; as unknown).highlights[0]?.substring(0, 80)}... {/if}
   </div> </CommandItem> {:else} <button type="button"
-                  class="relative flex cursor-default select-none items-start gap-3 rounded-sm px-3 py-2 text-sm outline-none hover, bg-gray-50"
+                  class="relative flex cursor-default select-none items-start gap-3 rounded-sm px-3 py-2 text-sm outline-none hover:bg-gray-50"
                   onclick={() => handleSelect(result)} >
                   <div class="mt-1">{getResultTypeIcon((result as unknown).type)}</div>
  <div class="flex-1"> <div class="flex items-start justify-between"> <div class="font-medium text-gray-900">{(result as unknown).title}</div>
@@ -91,7 +91,7 @@
   <!-- Search, Statistics --> <div class="border-t border-gray-200 px-3 py-2 text-xs"> {filteredResults.length} results â€¢ {searchMetrics.lastQueryTime}ms â€¢ {enableVectorSearch ? 'Vector': 'Text'} + {enableAI ? 'AI': 'Standard'} search </div> {:else if inputValue.trim().length >= 2} <!-- No, Results --> <div class="p-4 text-center text-sm"> <Search class="h-8 w-8 mx-auto mb-2" /> <p>No results found for: "{ inputValue }"</p>
  <p class="text-xs">Try adjusting your search terms or categories</p> </div> {:else if searchHistory.length > 0} <!-- Search, History --> <div class="p-3"> <div class="text-xs font-medium text-gray-700">Recent Searches</div>
   {#each Array.isArray(searchHistory.slice(0, 5)) ? searchHistory.slice(0, 5): [] as query} <button type="button"
-                  class="block w-full text-left text-xs text-gray-600 hover, text-gray-900 py-1"
+                  class="block w-full text-left text-xs text-gray-600 hover:text-gray-900 py-1"
                   onclick={() => handleInputChange(query)} >
                   { query } </button> {/each} {/if}
   </CommandContent> {/if}

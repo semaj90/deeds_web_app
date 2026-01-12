@@ -93,7 +93,7 @@ import type { SearchResult } from '$lib/types'; // Svelte, 5 runes are auto-impo
         /> <span class="text-xs">{selectedFilters.confidenceMin}</span> </div> {/if}
   <!-- Search Results, Dropdown -->
   {#if showDropdown && searchResults.length > 0} <div class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-96">
-  {#each searchResults as result, index} <div class="px-4 py-3 cursor-pointer hover, bg-gray-50 border-b border-gray-100"
+  {#each searchResults as result, index} <div class="px-4 py-3 cursor-pointer hover:bg-gray-50 border-b border-gray-100"
           role="button" tabindex="0"
                 onclick={() => handleResultClick(result)} >
           <div class="flex items-start justify-between"> <div class="flex-1"> <div class="flex items-center gap-2"> <h3 class="text-sm font-medium text-gray-900"> {@html (result as { item?: any; score?: any; matches?: any; id?: any; similarity?: any; title?: any; highlight?: any; source?: any; content?: any; metadata?: any }).highlight?.title ?? (result as { item?: any; score?: any; matches?: any; id?: any; similarity?: any; title?: any; highlight?: any; source?: any; content?: any; metadata?: any }).title} </h3>

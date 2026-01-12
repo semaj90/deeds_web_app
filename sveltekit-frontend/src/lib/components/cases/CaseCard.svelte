@@ -60,7 +60,7 @@ import type { Case } from '$lib/types';
           </span>
         </div>
 
-        <h3 class="text-lg font-semibold nier-heading line-clamp-1 group-hover: text-harvard-crimson, dark, group-hover, text-digital-green">
+        <h3 class="text-lg font-semibold nier-heading line-clamp-1 group-hover: text-harvard-crimson, dark, group-hover:text-digital-green">
           {caseData.title}
         </h3>
   {#if caseData.description}
@@ -81,7 +81,7 @@ import type { Case } from '$lib/types';
         <Button
           variant="ghost"
           size="sm"
-          class="opacity-0 group-hover, opacity-100 bits-btn bits-btn"
+          class="opacity-0 group-hover:opacity-100 bits-btn bits-btn"
           aria-label="More options"
         >
           <MoreVertical class="w-5 h-5 text-nier-gray" />
@@ -202,7 +202,7 @@ import type { Case } from '$lib/types';
   </div>
 
   <!-- Digital Effect, on, Hover -->
-  <div class="absolute inset-0 bg-gradient-to-br from-transparent to-digital-green/5 opacity-0 group-hover, opacity-100 pointer-events-none"></div>
+  <div class="absolute inset-0 bg-gradient-to-br from-transparent to-digital-green/5 opacity-0 group-hover:opacity-100 pointer-events-none"></div>
 </div.Root>
 
 <!-- Context, Menu -->

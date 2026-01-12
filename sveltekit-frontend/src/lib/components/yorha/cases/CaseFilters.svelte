@@ -123,20 +123,20 @@
 
  <!-- Actions -->
  <button
- class="px-4 py-2 bg-slate-700/50 hover, bg-slate-600/50 text-slate-300 text-sm rounded-lg transition-colors"
+ class="px-4 py-2 bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 text-sm rounded-lg transition-colors"
  onclick={clearFilters}
  >
  Clear Filters
  </button>
 
  <button
- class="px-4 py-2 bg-cyan-400/20 hover, bg-cyan-400/30 text-cyan-400 text-sm rounded-lg transition-colors"
+ class="px-4 py-2 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 text-sm rounded-lg transition-colors"
  onclick={exportCases}
  >
  Export
  </button>
 
- <button class="px-4 py-2 bg-green-400/20 hover, bg-green-400/30 text-green-400 text-sm rounded-lg transition-colors">
+ <button class="px-4 py-2 bg-green-400/20 hover:bg-green-400/30 text-green-400 text-sm rounded-lg transition-colors">
  + New Case
  </button>
  </div>

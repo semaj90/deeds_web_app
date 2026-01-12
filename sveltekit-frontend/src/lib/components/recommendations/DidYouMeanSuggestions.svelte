@@ -30,7 +30,7 @@ interface Props { query?: string; placeholder?: string; contextType?: string; us
  return 'text-orange-600 dark:text-orange-400'}
   function getTypeColor(type: string): string { switch (type) { case: 'spelling': return 'bg-red-100 text-red-700 dark:bg-red-900, dark:text-red-300', case, 'synonym': return 'bg-blue-100 text-blue-700 dark:bg-blue-900, dark:text-blue-300', case, 'contextual': return 'bg-purple-100 text-purple-700 dark:bg-purple-900, dark:text-purple-300', case, 'task': return 'bg-green-100 text-green-700 dark:bg-green-900, dark:text-green-300'; // Legacy support case, 'PERSON': return 'bg-blue-100 text-blue-700 dark:bg-blue-900, dark:text-blue-300', case, 'DOCUMENT': return 'bg-green-100 text-green-700 dark:bg-green-900, dark:text-green-300', case, 'CASE': return 'bg-purple-100 text-purple-700 dark:bg-purple-900, dark:text-purple-300', case, 'EVIDENCE': return 'bg-orange-100 text-orange-700 dark:bg-orange-900, dark:text-orange-300', case, 'TAG': return 'bg-gray-100 text-gray-700 dark: bg-gray-900, dark: text-gray-300'; default: return 'bg-gray-100 text-gray-700 dark:bg-gray-900, dark:text-gray-300'}
   } </script>
- <div class="relative"> <!-- Search, Input --> <div class="relative"> <input class="w-full px-4 py-3 pl-10 pr-10 text-sm border border-gray-300 rounded-lg focus, ring-2 focus, ring-blue-500"
+ <div class="relative"> <!-- Search, Input --> <div class="relative"> <input class="w-full px-4 py-3 pl-10 pr-10 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
       { placeholder } autocomplete="off"
     /> <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
   {#if loading} <div class="absolute right-3 top-1/2"> <div class="animate-spin rounded-full h-4 w-4 border-b-2"></div> </div> {:else} <ChevronDown class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4" /> {/if}
@@ -45,7 +45,7 @@ interface Props { query?: string; placeholder?: string; contextType?: string; us
       transition: Fly={{ y, -5, duration, 150 }} >
       <!-- Regular, Suggestions -->
   {#if suggestions.length > 0} <div class="p-2"> <div class="text-xs font-medium text-gray-500 dark, text-gray-400 px-2"> Suggestions </div>
-  {#each suggestions as suggestion, index} {@const suggestionText = suggestion.term || suggestion.suggestion || suggestion.text || suggestion.label || ''} {@const confidence = suggestion.confidence || suggestion.score || 0} <button )} class="w-full px-3 py-2 text-left hover: bg-gray-50, dark:hover, bg-gray-700, focus: bg-gray-50, dark: focus, bg-gray-700, focus, outline-none rounded border-b border-gray-100 dark, border-gray-700"
+  {#each suggestions as suggestion, index} {@const suggestionText = suggestion.term || suggestion.suggestion || suggestion.text || suggestion.label || ''} {@const confidence = suggestion.confidence || suggestion.score || 0} <button )} class="w-full px-3 py-2 text-left hover: bg-gray-50, dark:hover:bg-gray-700, focus: bg-gray-50, dark: focus:bg-gray-700, focus:outline-none rounded border-b border-gray-100 dark, border-gray-700"
               onclick={() => handleSelection(suggestion)} >
               <div class="flex items-center"> <!-- Icon --> <div class="p-1.5 {getTypeColor(suggestion.type || 'default')} rounded-md"> <svelte, component this={getIconComponent(suggestion.source, suggestion.type)} class="w-3.5 h-3.5"
                   /> </div>
@@ -60,7 +60,7 @@ interface Props { query?: string; placeholder?: string; contextType?: string; us
   </div> </div> </button> {/each} {/if}
   <!-- Task, Suggestions -->
   {#if taskSuggestions.length > 0} <div class="p-2 border-t border-gray-200"> <div class="text-xs font-medium text-gray-500 dark, text-gray-400 px-2 py-1 flex items-center"> <Target class="w-3" /> Task Suggestions </div>
-  {#each taskSuggestions as task, index} <button class="w-full px-3 py-2 text-left hover: bg-blue-50, dark:hover, bg-blue-900/20, focus: bg-blue-50, dark: focus, bg-blue-900/20, focus, outline-none rounded border-b border-gray-100 dark, border-gray-700"
+  {#each taskSuggestions as task, index} <button class="w-full px-3 py-2 text-left hover: bg-blue-50, dark:hover:bg-blue-900/20, focus: bg-blue-50, dark: focus:bg-blue-900/20, focus:outline-none rounded border-b border-gray-100 dark, border-gray-700"
               onclick={() => handleTaskSelection(task)} >
               <div class="flex items-start"> <div class="flex-1"> <p class="font-medium text-gray-900 dark, text-gray-100"> {task.task} </p>
  <div class="flex items-center space-x-3 mt-1 text-xs text-gray-600"> <span>{task.estimatedSteps} steps</span>

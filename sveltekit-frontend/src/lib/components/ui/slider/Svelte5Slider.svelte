@@ -159,7 +159,7 @@ function handleChange(e: Event) {
 				   [&::-webkit-slider-thumb]:shadow-md
 				   [&::-webkit-slider-thumb]:cursor-pointer
 				   [&::-webkit-slider-thumb]:transition-transform
-				   [&::-webkit-slider-thumb]:hover, scale-110
+				   [&::-webkit-slider-thumb]:hover:scale-110
 				   [&::-moz-range-thumb]:appearance-none
 				   [&::-moz-range-thumb]:{thumbSize}
 				   [&::-moz-range-thumb]:rounded-full

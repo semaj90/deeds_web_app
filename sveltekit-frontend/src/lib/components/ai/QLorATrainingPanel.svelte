@@ -29,7 +29,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
       <div class="space-y-4"> <div class="text-6xl">ðŸ“„</div>
  <div class="space-y-2"> <h3 class="text-xl font-semibold">Drop .case files here</h3>
  <p class="text-gray-400">or click to select files for training</p> </div>
- <label for="file-input" class="inline-block"> <Button class="bg-cyan-600 hover, bg-cyan-700 bits-btn bits-btn"> Select Files </Button> </label>
+ <label for="file-input" class="inline-block"> <Button class="bg-cyan-600 hover:bg-cyan-700 bits-btn bits-btn"> Select Files </Button> </label>
  <input id="file-input"
           type="file"
           multiple accept=".case,.json"
@@ -105,7 +105,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
               type="number"
               value={config?.rank ?? 16} min="1"
               max="128"
-              class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus, border-cyan-500"
+              class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus:border-cyan-500"
               onchange={(e) => qloraTrainingService.updateConfig({ rank: parseInt(e.target.value) })} /> </div>
  <div class="space-y-2"> <label class="text-sm font-medium" for="learning-rate">Learning Rate</label>
 <input id="learning-rate"
@@ -113,11 +113,11 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
               value={config?.trainingParams.learningRate ?? 2e-4} step="0.0001"
               min="0.0001"
               max="0.01"
-              class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus, border-cyan-500"
+              class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus:border-cyan-500"
               onchange={(e) => qloraTrainingService.updateConfig({ trainingParams: { ...config?.trainingParams!, learningRate: parseFloat(e.target.value) } })} /> </div>
  <div class="space-y-2"> <label class="text-sm font-medium" for="batch-size">Batch Size</label>
 <select id="batch-size"
-              value={config?.trainingParams.batchSize ?? 4} class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus, border-cyan-500"
+              value={config?.trainingParams.batchSize ?? 4} class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus:border-cyan-500"
               onchange={(e) => qloraTrainingService.updateConfig({ trainingParams: { ...config?.trainingParams!, batchSize: parseInt(e.target.value) } })} >
               <option value={ 1 }>1</option>
  <option value={ 2 }>2</option>
@@ -128,7 +128,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
               type="number"
               value={config?.trainingParams.epochs ?? 3} min="1"
               max="20"
-              class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus, border-cyan-500"
+              class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus:border-cyan-500"
               onchange={(e) => qloraTrainingService.updateConfig({ trainingParams: { ...config?.trainingParams!, epochs: parseInt(e.target.value) } })} /> </div> </div>
  <!-- Feature, Toggles --> <div class="space-y-3"> <label class="flex items-center"> <input type="checkbox"
               checked={config?.useReinforcementLearning ?? false} onchange={(e) => qloraTrainingService.updateConfig({ useReinforcementLearning: e.target.checked })} class="w-4 h-4 text-cyan-600 bg-gray-700 border-gray-600 rounded focus:ring-cyan-500"

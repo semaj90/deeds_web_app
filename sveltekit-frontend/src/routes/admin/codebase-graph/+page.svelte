@@ -212,11 +212,11 @@
 					bind:value={searchQuery}
 					placeholder="Search errors, patterns, or tags..."
 					class="flex-1 px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white
-					       placeholder-gray-500 focus: border-purple-500, focus, outline-none"
+					       placeholder-gray-500 focus: border-purple-500, focus:outline-none"
 					onkeydown={(e) => e.key === 'Enter' && performVectorSearch()}
 				/>
 				<Button
-					class="px-6 py-3 bg-purple-600 hover, bg-purple-700 text-white rounded-lg
+					class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
 					       font-medium transition-colors bits-btn"
 					onclick={ performVectorSearch }
 				>
@@ -231,7 +231,7 @@
 					</div>
 					{#each searchResults as result}
 						<button
-							class="w-full p-4 bg-gray-900/50 hover, bg-gray-900 rounded-lg border border-gray-700
+							class="w-full p-4 bg-gray-900/50 hover:bg-gray-900 rounded-lg border border-gray-700
 							       text-left transition-colors"
 							onclick={() => selectCluster(result)}
 						>
@@ -277,7 +277,7 @@
 					{#each clusters as cluster}
 						<button
 							class="p-6 bg-gray-800/50 hover:bg-gray-800 rounded-xl border border-gray-700
-							       text-left transition-all hover, border-purple-500"
+							       text-left transition-all hover:border-purple-500"
 							onclick={() => selectCluster(cluster)}
 						>
 							<div class="flex items-start justify-between mb-3">
@@ -383,7 +383,7 @@
 									<div class="space-y-2">
 										{#each similarClusters as similar}
 											<button
-												class="w-full p-3 bg-gray-900 hover, bg-gray-700 rounded-lg text-left
+												class="w-full p-3 bg-gray-900 hover:bg-gray-700 rounded-lg text-left
 												       transition-colors"
 												onclick={() => selectCluster(similar)}
 											>
@@ -402,7 +402,7 @@
 							<!-- Actions -->
 							<div class="flex gap-3 pt-4 border-t border-gray-700">
 								<Button
-									class="flex-1 px-4 py-3 bg-purple-600 hover, bg-purple-700 text-white rounded-lg
+									class="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
 									       font-medium transition-colors flex items-center justify-center gap-2 bits-btn"
 									onclick={() => initiateAgenticFix(selectedCluster)}
 								>
@@ -410,7 +410,7 @@
 									Agentic Fix
 								</Button>
 								<Button
-									class="px-4 py-3 bg-gray-700 hover, bg-gray-600 text-white rounded-lg
+									class="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
 									       transition-colors bits-btn"
 									onclick={() => (detailsOpen = false)}
 								>
@@ -421,7 +421,7 @@
 					{/if}
 
 					<DialogClose
-						class="absolute top-4 right-4 p-2 hover, bg-gray-700 rounded-lg transition-colors"
+						class="absolute top-4 right-4 p-2 hover:bg-gray-700 rounded-lg transition-colors"
 					>
 						<div class="i-carbon-close text-xl text-gray-400"></div>
 					</DialogClose>
@@ -449,7 +449,7 @@
 					</div>
 
 					<Button
-						class="w-full px-4 py-3 bg-gray-700 hover, bg-gray-600 text-white rounded-lg
+						class="w-full px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
 						       transition-colors bits-btn"
 						onclick={() => (fixDialogOpen = false)}
 					>

@@ -216,7 +216,7 @@
 			{#if data.hasGeminiKey}
 				<button
 					onclick={generateAnalysis}
-					class="px-6 py-3 bg-purple-600 hover, bg-purple-700 text-white rounded-lg transition-colors"
+					class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
 				>
 					🚀 Generate First Analysis
 				</button>

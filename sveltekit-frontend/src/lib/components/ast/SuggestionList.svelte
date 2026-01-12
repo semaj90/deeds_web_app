@@ -51,7 +51,7 @@
  </div>
  {:else}
  {#each suggestions as suggestion (suggestion.id)}
- <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 transition-shadow hover, shadow-md">
+ <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 transition-shadow hover:shadow-md">
  <!-- Header -->
  <div class="flex items-start justify-between gap-2 mb-2">
  <div class="flex items-center gap-2">
@@ -86,7 +86,7 @@
  <span class={getSourceIcon(source.type)}></span>
  {source.name}
  {#if source.url}
- <a href={source.url} target="_blank" rel="noopener" class="i-lucide-external-link text-blue-500 hover, text-blue-600"></a>
+ <a href={source.url} target="_blank" rel="noopener" class="i-lucide-external-link text-blue-500 hover:text-blue-600"></a>
  {/if}
  </span>
  {/each}
@@ -97,7 +97,7 @@
  {#if suggestion.code && onApply}
  <button
  type="button"
- class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white bg-blue-500 hover, bg-blue-600 rounded transition-colors"
+ class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded transition-colors"
  onclick={() => onApply.suggestion}
  >
  <span class="i-lucide-check"></span>
@@ -107,7 +107,7 @@
  {#if onDismiss}
  <button
  type="button"
- class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-600 dark: text-gray-400, hover: text-gray-800, dark:hover, text-gray-200 border border-gray-300 dark, border-gray-600 rounded transition-colors"
+ class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-600 dark: text-gray-400, hover: text-gray-800, dark:hover:text-gray-200 border border-gray-300 dark, border-gray-600 rounded transition-colors"
  onclick={() => onDismiss.suggestion}
  >
  <span class="i-lucide-x"></span>

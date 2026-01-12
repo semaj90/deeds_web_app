@@ -157,7 +157,7 @@ async function handleValidate() {
 				type="text"
 				bind:value={searchQuery}
 				placeholder="Enter your question (e.g., How do I use Svelte 5 runes?)"
-				class="flex-1 px-4 py-2 border rounded-lg focus: ring-2, focus, ring-blue-500"
+				class="flex-1 px-4 py-2 border rounded-lg focus: ring-2, focus:ring-blue-500"
 				disabled={isSearching}
 			/>
 			<button
@@ -182,10 +182,10 @@ async function handleValidate() {
 			<div class="flex justify-between items-center mb-4">
 				<h3 class="text-xl font-semibold">Found {searchResults.length} sources</h3>
 				<div class="flex gap-2">
-					<button onclick={approveAll} class="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover, bg-green-200">
+					<button onclick={approveAll} class="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200">
 						✅ Approve High-Confidence
 					</button>
-					<button onclick={ clearSelection } class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover, bg-gray-200">
+					<button onclick={ clearSelection } class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
 						🗑️ Clear
 					</button>
 				</div>

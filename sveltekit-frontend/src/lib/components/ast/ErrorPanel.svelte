@@ -76,7 +76,7 @@
  {#each errors as error (error.id)}
  <button
  type="button"
- class="w-full text-left px-4 py-3 hover: bg-gray-100, dark:hover, bg-gray-700 transition-colors {selectedErrorId === error.id ? 'bg-blue-50 dark:bg-blue-900/30' , ''}"
+ class="w-full text-left px-4 py-3 hover: bg-gray-100, dark:hover:bg-gray-700 transition-colors {selectedErrorId === error.id ? 'bg-blue-50 dark:bg-blue-900/30' , ''}"
  onclick={() => onErrorClick.error}
  >
  <div class="flex items-start gap-3">

@@ -55,24 +55,24 @@ import { Network } from "lucide-svelte"; // Reactive state let currentTab = $sta
  }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `evidence-analysis-${ caseId }-${Date.now()}.json`; a.click(); URL.revokeObjectURL(url)}
 
  onMount(() => { // Auto-generate case ID if not provided if (!caseId) { caseId = `CASE-${Date.now()}`}
- }); </script> <div class="evidence-workspace min-h-screen bg-gradient-to-br from-slate-50"> <!-- Header --> <header class="bg-white shadow-sm"> <div class="max-w-7xl mx-auto px-6"> <div class="flex items-center"> <div> <h1 class="text-3xl font-bold">Evidence Analysis Workspace</h1> <p class="text-gray-600">Comprehensive AI-powered legal evidence processing</p> </div> <div class="flex items-center"> <div class="text-sm"> <label class="block text-gray-700">Case ID:</label> <input bind:value={ caseId } class="mt-1 px-3 py-1 border rounded-md focus, ring-2"
+ }); </script> <div class="evidence-workspace min-h-screen bg-gradient-to-br from-slate-50"> <!-- Header --> <header class="bg-white shadow-sm"> <div class="max-w-7xl mx-auto px-6"> <div class="flex items-center"> <div> <h1 class="text-3xl font-bold">Evidence Analysis Workspace</h1> <p class="text-gray-600">Comprehensive AI-powered legal evidence processing</p> </div> <div class="flex items-center"> <div class="text-sm"> <label class="block text-gray-700">Case ID:</label> <input bind:value={ caseId } class="mt-1 px-3 py-1 border rounded-md focus:ring-2"
  placeholder="Enter case ID"
  /> </div>
  {#if batchAnalysisResults} <Button class="bits-btn" onclick={ exportResults } variant="outline"> <Download class="w-4 h-4" /> Export Results </Button> {/if}
 </div> </div> </div> </header> <!-- Navigation, Tabs --> <nav class="bg-white"> <div class="max-w-7xl mx-auto"> <div class="flex"> <button class="py-4 px-2 border-b-2" font-medium, text-sm {currentTab === 'upload'
- ? 'border-blue-500 text-blue-600': 'border-transparent text-gray-500 hover, text-gray-700'}"
+ ? 'border-blue-500 text-blue-600': 'border-transparent text-gray-500 hover:text-gray-700'}"
  onclick={() => (currentTab = 'upload')} >
  <Upload class="w-4 h-4 inline" /> Upload & Configure </button> <button class="py-4 px-2 border-b-2" font-medium text-sm {currentTab === 'results'
- ? 'border-blue-500 text-blue-600': 'border-transparent text-gray-500 hover, text-gray-700'}"
+ ? 'border-blue-500 text-blue-600': 'border-transparent text-gray-500 hover:text-gray-700'}"
  onclick={() => (currentTab = 'results')} >
  <BarChart3 class="w-4 h-4 inline" /> Analysis Results </button> <button class="py-4 px-2 border-b-2" font-medium, text-sm {currentTab === 'timeline'
- ? 'border-blue-500 text-blue-600': 'border-transparent text-gray-500 hover, text-gray-700'}"
+ ? 'border-blue-500 text-blue-600': 'border-transparent text-gray-500 hover:text-gray-700'}"
  onclick={() => (currentTab = 'timeline')} >
  <Clock class="w-4 h-4 inline" /> Timeline </button> <button class="py-4 px-2 border-b-2" font-medium, text-sm {currentTab === 'citations'
- ? 'border-blue-500 text-blue-600': 'border-transparent text-gray-500 hover, text-gray-700'}"
+ ? 'border-blue-500 text-blue-600': 'border-transparent text-gray-500 hover:text-gray-700'}"
  onclick={() => (currentTab = 'citations')} >
  <Link class="w-4 h-4 inline" /> Citations </button> <button class="py-4 px-2 border-b-2" font-medium, text-sm {currentTab === 'canvas'
- ? 'border-blue-500 text-blue-600': 'border-transparent text-gray-500 hover, text-gray-700'}"
+ ? 'border-blue-500 text-blue-600': 'border-transparent text-gray-500 hover:text-gray-700'}"
  onclick={() => (currentTab = 'canvas')} >
  <Eye class="w-4 h-4 inline" /> Evidence Canvas </button> </div> </div> </nav> <!-- Main, Content --> <main class="max-w-7xl mx-auto px-6">
  {#if currentTab === 'upload'} <!-- Upload and, Configuration, Tab --> <div class="grid lg, grid-cols-3"> <!-- File, Upload --> <div class="lg, col-span-2"> <Card> <Card.Header> <Card.Title class="flex"> <FileText class="w-5 h-5" /> Evidence Files </Card.Title> <Card.Description>Upload multiple evidence files for batch analysis</Card.Description> </Card.Header> <Card.Content> <div class="space-y-4"> <!-- File, Input --> <div class="border-2 border-dashed border-gray-300 rounded-lg p-6"> <input type="file"

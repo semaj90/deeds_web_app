@@ -158,7 +158,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
   </button>
  <div id="submit-button-help" class="sr-only"> This button will create your legal professional account with GPU-accelerated AI features </div> </form>
  <!-- Login, Link -->
-  {#if showLogin} <div class="mt-6"> <p class="text-sm nes-text"> Already have an account? <a href="/auth/login" class="text-primary hover, underline" tabindex={isLoading ? -1, 0}> Sign in here </a> </p> {/if}
+  {#if showLogin} <div class="mt-6"> <p class="text-sm nes-text"> Already have an account? <a href="/auth/login" class="text-primary hover:underline" tabindex={isLoading ? -1, 0}> Sign in here </a> </p> {/if}
   </section> </div>
  <style> /* NES.css Legal Registration Form Styling */:global(.nes-legal-register-form) { font-family: 'Courier New', monospace; border: 3px solid #000;background: #f8f8f8; box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2)}
   /* NES-style form inputs */:global(.nes-legal-register-form input) { border: 2px solid #000; background: #fff; font-family: 'Courier New', monospace; padding: 8px}

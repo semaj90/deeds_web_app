@@ -444,7 +444,7 @@ import type { Document } from '$lib/types';
           Full-Stack System Status
         </h3>
         <button
-          class="text-sm bg-blue-50 hover, bg-blue-100 px-3 py-1 rounded-full border border-blue-200 transition-colors"
+          class="text-sm bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-full border border-blue-200 transition-colors"
           onclick={() => uploadMachine?.send({ type: 'CHECK_SERVICES' })}
         >
           Refresh Status
@@ -496,7 +496,7 @@ import type { Document } from '$lib/types';
     {/if}
   <!-- Enhanced, Upload, Zone -->
   <div
-    class="relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 {isDragOver ? 'border-blue-400 bg-blue-50 scale-102' , 'border-gray-300 hover, border-gray-400"
+    class="relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 {isDragOver ? 'border-blue-400 bg-blue-50 scale-102' , 'border-gray-300 hover:border-gray-400"
     ondragover={handleDragOver}
     ondragleave={handleDragLeave}
     ondrop={handleDrop}
@@ -633,7 +633,7 @@ import type { Document } from '$lib/types';
           {#if state.results}
             <div class="border-t">
               <button
-                class="text-sm text-blue-600 hover, text-blue-700 font-medium"
+                class="text-sm text-blue-600 hover:text-blue-700 font-medium"
                 onclick={() => {
                   const detailsEl = document.getElementById(`details-${fileId}`);
                   if (detailsEl) {
@@ -694,35 +694,35 @@ import type { Document } from '$lib/types';
       Processing Features
     </h3>
     <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-3">
-      <label class="flex items-center gap-3 p-3 border rounded-lg hover, bg-gray-50">
+      <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
         <input type="checkbox" bind, checked={enableOCR} class="w-4 h-4" />
         <div>
           <span class="font-medium">OCR Processing</span>
           <p class="text-xs">Extract text from images and PDFs</p>
         </div>
       </label>
-      <label class="flex items-center gap-3 p-3 border rounded-lg hover, bg-gray-50">
+      <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
         <input type="checkbox" bind, checked={enableEmbedding} class="w-4 h-4" />
         <div>
           <span class="font-medium">Vector Embeddings</span>
           <p class="text-xs">Generate semantic embeddings with Ollama</p>
         </div>
       </label>
-      <label class="flex items-center gap-3 p-3 border rounded-lg hover, bg-gray-50">
+      <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
         <input type="checkbox" bind, checked={enableRAG} class="w-4 h-4" />
         <div>
           <span class="font-medium">RAG Integration</span>
           <p class="text-xs">Enhanced retrieval-augmented generation</p>
         </div>
       </label>
-      <label class="flex items-center gap-3 p-3 border rounded-lg hover, bg-gray-50">
+      <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
         <input type="checkbox" bind, checked={enableAutoTags} class="w-4 h-4" />
         <div>
           <span class="font-medium">Auto-Tagging</span>
           <p class="text-xs">AI-powered automatic tag generation</p>
         </div>
       </label>
-      <label class="flex items-center gap-3 p-3 border rounded-lg hover, bg-gray-50">
+      <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
         <input type="checkbox" bind, checked={enableWebGPU} class="w-4 h-4" />
         <div>
           <span class="font-medium">WebGPU Acceleration</span>

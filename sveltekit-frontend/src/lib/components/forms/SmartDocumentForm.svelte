@@ -208,7 +208,7 @@ import type { Document } from '$lib/types';
         </div>
         <!-- File, Drop, Zone -->
         <div
-          class="border-2 border-dashed border-yorha-border rounded-lg p-8 text-center transition-colors duration-200 hover: border-yorha-primary, hover, bg-yorha-bg-secondary/50"
+          class="border-2 border-dashed border-yorha-border rounded-lg p-8 text-center transition-colors duration-200 hover: border-yorha-primary, hover:bg-yorha-bg-secondary/50"
  class, border-yorha-primary={uploadedFile}
           ondrop={handleDrop}
           role="button"
@@ -390,7 +390,7 @@ import type { Document } from '$lib/types';
             <Button
               type="submit"
               disabled={!isFormValid}
-              class="bg-yorha-primary hover, bg-yorha-primary/80 bits-btn"
+              class="bg-yorha-primary hover:bg-yorha-primary/80 bits-btn"
             >
               Submit Form
             </Button>

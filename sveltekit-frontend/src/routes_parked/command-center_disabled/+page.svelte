@@ -170,15 +170,15 @@
  <h3 class="font-semibold text-cyan-400">Quick Actions</h3>
  </div>
  <div class="p-4 space-y-3">
- <button class="w-full text-left px-4 py-3 bg-slate-700/50 hover, bg-slate-700 rounded border border-slate-600 transition-colors flex items-center space-x-3">
+ <button class="w-full text-left px-4 py-3 bg-slate-700/50 hover:bg-slate-700 rounded border border-slate-600 transition-colors flex items-center space-x-3">
  <Server class="w-4 h-4 text-blue-400" />
  <span>Restart Services</span>
  </button>
- <button class="w-full text-left px-4 py-3 bg-slate-700/50 hover, bg-slate-700 rounded border border-slate-600 transition-colors flex items-center space-x-3">
+ <button class="w-full text-left px-4 py-3 bg-slate-700/50 hover:bg-slate-700 rounded border border-slate-600 transition-colors flex items-center space-x-3">
  <AlertTriangle class="w-4 h-4 text-yellow-400" />
  <span>Clear Error Cache</span>
  </button>
- <button class="w-full text-left px-4 py-3 bg-slate-700/50 hover, bg-slate-700 rounded border border-slate-600 transition-colors flex items-center space-x-3">
+ <button class="w-full text-left px-4 py-3 bg-slate-700/50 hover:bg-slate-700 rounded border border-slate-600 transition-colors flex items-center space-x-3">
  <CheckCircle class="w-4 h-4 text-green-400" />
  <span>Run Diagnostics</span>
  </button>

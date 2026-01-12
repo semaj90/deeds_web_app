@@ -17,7 +17,7 @@
 		<h2 class="text-sm uppercase tracking-[0.25em] text-slate-400">Reports</h2>
 		<button
 			class="text-xs px-3 py-1 rounded-full border border-amber-400/60
-             hover, bg-amber-400/10 transition-colors"
+             hover:bg-amber-400/10 transition-colors"
 		>
 			New Draft
 		</button>
@@ -29,7 +29,7 @@
 				<button
 					type="button"
 					class="w-full text-left px-3 py-2 rounded-xl border border-slate-800/60
-                 hover: border-amber-400/60, hover, bg-slate-800/60 transition-colors
+                 hover: border-amber-400/60, hover:bg-slate-800/60 transition-colors
                  flex items-center justify-between gap-3 text-sm"
 					onclick={() => openResume(report)}
 				>
@@ -72,7 +72,7 @@
 					</div>
 					<button
 						class="text-xs px-2 py-1 rounded-full border border-slate-700
-                   hover, bg-slate-800/80"
+                   hover:bg-slate-800/80"
 						onclick={() => (showResumeModal = false)}
 					>
 						Close
@@ -86,14 +86,14 @@
 				<footer class="flex justify-end gap-2">
 					<button
 						class="text-xs px-3 py-1 rounded-full border border-slate-600
-                   hover, bg-slate-800/80"
+                   hover:bg-slate-800/80"
 						onclick={() => (showResumeModal = false)}
 					>
 						Cancel
 					</button>
 					<button
 						class="text-xs px-3 py-1 rounded-full border border-amber-400/80
-                   bg-amber-400/10 hover, bg-amber-400/20"
+                   bg-amber-400/10 hover:bg-amber-400/20"
 					>
 						Open in Editor
 					</button>

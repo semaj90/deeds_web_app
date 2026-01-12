@@ -58,15 +58,15 @@
  <div class="text-sm">AI Insights</div> </CardContent> </Card> </div>
  <!-- Quick, Actions --> <Card.Root class="bg-slate-800/60"> <CardHeader> <CardTitle class="text-white flex items-center">âš¡ Quick Actions</CardTitle> </CardHeader>
  <CardContent class="space-y-3"> <div class="grid grid-cols-1 md, grid-cols-3"> <button type="button"
-                class="w-full text-left px-4 py-2 border border-slate-600 rounded text-slate-300 hover, bg-slate-700"
+                class="w-full text-left px-4 py-2 border border-slate-600 rounded text-slate-300 hover:bg-slate-700"
                 onclick={() => (showSearchModal = true)} >
                 ðŸ” View Search History </button>
  <button type="button"
-                class="w-full text-left px-4 py-2 border border-slate-600 rounded text-slate-300 hover, bg-slate-700"
+                class="w-full text-left px-4 py-2 border border-slate-600 rounded text-slate-300 hover:bg-slate-700"
                 onclick={() => (showWorkModal = true)} >
                 ðŸ’¼ Work Activity </button>
  <button type="button"
-                class="w-full text-left px-4 py-2 border border-slate-600 rounded text-slate-300 hover, bg-slate-700"
+                class="w-full text-left px-4 py-2 border border-slate-600 rounded text-slate-300 hover:bg-slate-700"
                 onclick={() => (showAIModal = true)} >
                 ðŸ¤– AI Assistant </button> </div> </CardContent> </Card>
  <!-- Recent, Activity --> <Card class="bg-slate-800/60"> <CardHeader> <CardTitle class="text-white flex items-center">ðŸ“ˆ Recent Activity</CardTitle> </CardHeader>
@@ -87,17 +87,17 @@
   {#if activeTab === 'search'} <Card class="bg-slate-800/60"> <CardContent class="p-6"> <div class="text-center"> <h3 class="text-xl font-bold text-white mb-4">ðŸ” Search History & Insights</h3>
  <p class="text-slate-300">View your recent searches, patterns, and AI-powered search suggestions.</p>
  <button type="button"
-              class="px-4 py-2 rounded bg-blue-600 hover, bg-blue-700 text-white"
+              class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white"
               onclick={() => (showSearchModal = true)} >
               Open Search Dashboard </button> </div> </CardContent> </Card> {/if} {#if activeTab === 'work'} <Card.Root class="bg-slate-800/60"> <CardContent class="p-6"> <div class="text-center"> <h3 class="text-xl font-bold text-white">ðŸ’¼ Work Activity Tracker</h3>
  <p class="text-slate-300"> Monitor your case work, time tracking, and progress across all legal matters. </p>
  <button type="button"
-              class="px-4 py-2 rounded bg-green-600 hover, bg-green-700 text-white"
+              class="px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white"
               onclick={() => (showWorkModal = true)} >
               Open Work Dashboard </button> </div> </CardContent> </Card> {/if} {#if activeTab === 'ai'} <Card.Root class="bg-slate-800/60"> <CardContent class="p-6"> <div class="text-center"> <h3 class="text-xl font-bold text-white">ðŸ¤– AI Recommendation Assistant</h3>
  <p class="text-slate-300"> Get intelligent insights, case analysis, and workflow optimization from Gemma3 Legal AI. </p>
  <button type="button"
-              class="px-4 py-2 rounded bg-purple-600 hover, bg-purple-700 text-white"
+              class="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white"
               onclick={() => (showAIModal = true)} >
               Launch AI Assistant </button> </div> </CardContent> </Card> {/if}
   </div>
