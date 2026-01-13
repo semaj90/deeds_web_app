@@ -1,4 +1,156 @@
-# Phase 66 CSS Error Fixing - ACE Knowledge Base
+# YoRHa Legal AI - Copilot Context (Updated 2026-01-13)
+
+## 🎯 Project Status Overview
+
+### TypeScript & Svelte 5 Migration
+- **Files:** 17,940 source files (3,078 TS, 1,476 Svelte)
+- **Svelte 5 Migration:** 99.9% complete (1,174/1,176 files)
+- **Remaining:** EvidenceCanvas.svelte (corrupted, needs rebuild)
+- **TypeScript Version:** 5.6+ (using TS 5.7 features)
+- **Framework:** SvelteKit 2.49.2 + Svelte 5.46.0
+
+### File Cleanup Potential
+- **Total source files:** 17,940
+- **Removable backups:** ~7,717 files (41.9%)
+  - Orphaned: 6,996 (.bak, .mojibake-backup variants)
+  - Archived: 541 (Svelte 4 migration artifacts)
+  - Gaming/Demos: 163 (experimental features)
+  - Safe to clean: YES (backup created)
+
+### Core API Routes (105 Endpoints)
+```typescript
+// Main API Structure
+/api/persons      - Person/entity management (GET, POST, PATCH, DELETE)
+/api/cases        - Case management
+/api/evidence     - Evidence handling
+/api/chat         - AI chat integration
+/api/health/*     - Service health checks (ollama, redis, ocr, search)
+/api/phase89/*    - Code indexing & AI analysis (24 endpoints)
+/api/tools/*      - Tool execution
+/api/system/*     - System operations
+/api/topology/*   - Code topology visualization
+```
+
+### AI/LLM Infrastructure (153 Files)
+- **Qdrant Vector DB:** 38 integration files
+- **Knowledge Base:** 16 service files
+- **ACE Contextual:** 18 context management files
+- **RAG Pipelines:** 81 retrieval-augmented generation files
+- **Phase 89 Indexer:** ✅ READY (code-unit-indexer.mjs)
+
+## Phase 98: Drizzle + Zod + Superforms (January 2026)
+
+### drizzle-kit Best Practices
+- **Development:** `drizzle-kit push` (quick iteration)
+- **Production:** `drizzle-kit generate` → `drizzle-kit migrate` (versioned SQL)
+
+### Schema Status
+- 79 tables defined in `schema-postgres.ts`
+- Key tables: `cases` (20 cols), `evidence` (14 cols), `users` (10 cols)
+
+### 🚨 If migrations fail on existing types:
+```bash
+# Create tables directly
+docker exec phase66-postgres psql -U legal_admin -d legal_ai_db -f /tmp/create-core-tables.sql
+```
+
+### drizzle-zod + Superforms Pattern
+```typescript
+// Generate Zod from Drizzle
+import { createInsertSchema } from 'drizzle-zod';
+import { zod } from 'sveltekit-superforms/adapters';
+
+// +page.server.ts
+const form = await superValidate(zod(insertCaseSchema));
+```
+
+### 🚫 Barrel Exports: NOT Recommended
+- **Hurts tree-shaking** → larger bundles
+- **Use direct imports instead:**
+```typescript
+// ✅ GOOD: Direct import
+import { caseService } from '$lib/server/services/case-service';
+
+// ❌ BAD: Barrel import
+import { caseService } from '$lib/server/services';
+```
+
+### RAG (Retrieval-Augmented Generation) Implementation
+**Architecture:** Combines LLM with vector search for contextually relevant responses
+```typescript
+// RAG Pipeline Components (81 files active)
+1. Vector Embeddings
+   - text-embedding-ada-002 (1,536 dimensions)
+   - Semantic meaning captured in numerical form
+   - Cosine similarity for relevance matching
+
+2. Vector Database (Qdrant)
+   - Collection: phase89_code_units
+   - 4,030 indexed code units
+   - KNN (k-nearest neighbors) search
+
+3. Retrieval Process
+   - User query → embedding
+   - Vector search → find similar chunks
+   - Top-k results + prompt → LLM
+   - Grounded, accurate response
+
+4. Benefits
+   ✅ Contextually relevant answers
+   ✅ Overcome token limits
+   ✅ Reduce fine-tuning costs
+   ✅ Real-time data integration
+```
+
+**RAG Workflow:**
+```typescript
+// src/lib/server/ai/rag-pipeline-enhanced.ts
+async function ragQuery(query: string) {
+  // 1. Chunk user query
+  const queryEmbedding = await createEmbedding(query);
+
+  // 2. Vector search in Qdrant
+  const results = await qdrant.search({
+    collection: 'phase89_code_units',
+    vector: queryEmbedding,
+    limit: 5,
+    filter: { feature_tags: 'evidence' }
+  });
+
+  // 3. Assemble context + prompt
+  const context = results.map(r => r.payload.signature_text).join('\n');
+  const prompt = `Context:\n${context}\n\nQuestion: ${query}`;
+
+  // 4. LLM generates grounded response
+  return await llm.complete(prompt);
+}
+```
+
+### Knowledge Graph & DAG (Directed Acyclic Graph)
+```typescript
+// ACE Contextual Engineering - 18 files
+- ace-context-manager.ts     // Context retrieval
+- ace-adapter.ts              // Tool integration
+- knowledge-base.ts           // Graph storage
+- error-pattern-rag.ts        // Pattern matching
+
+// DAG for dependency tracking
+Node → Edges → Relationships
+ ├─ Components depend on utilities
+ ├─ Routes depend on components
+ └─ Services depend on schemas
+
+// Query knowledge graph
+await aceContext.query({
+  nodeType: 'component',
+  relationships: ['imports', 'depends_on'],
+  depth: 3
+});
+```
+
+---
+
+## Phase 66 CSS Error Fixing - ACE Knowledge Base
 
 ## Context
 Date: 2026-01-11
@@ -6,6 +158,7 @@ Baseline: 77,002 TypeScript/CSS errors, 232 warnings, 2,471 files
 Goal: 40-45% error reduction through automated pattern fixing
 
 ## XState v5 Migration Patterns (2026-01-11)
+
 
 ### Pattern: fromPromise Inline Types
 **Error Codes:** TS2345, TS2322, TS2554
