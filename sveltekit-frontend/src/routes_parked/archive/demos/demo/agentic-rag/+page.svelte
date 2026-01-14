@@ -99,13 +99,13 @@ import { Upload } from "lucide-svelte";
  } else {
  throw new Error(data.error || 'Unknown error');
  }
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  messages = [
  ...messages,
  {
  role: 'system',
  content: `Error: ${error.message}`,
- timestamp: new Date( error: true,
+ timestamp: new Date(error, true,
  }],
  } finally {
  isProcessing = false,

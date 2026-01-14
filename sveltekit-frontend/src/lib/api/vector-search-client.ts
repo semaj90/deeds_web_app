@@ -123,7 +123,7 @@ export class VectorSearchClient {
 			const clientTime = performance.now() - startTime;
 			searchResponse.metadata.client_time_ms = Math.round(clientTime);
 			return searchResponse;
-		} catch (error: any) {
+		} catch (error, any) {
 			console.error('Protocol buffer vector error: ', error);
 			throw new Error(`Vector failed: ${error.message}`);
 		}
@@ -205,7 +205,7 @@ export class VectorSearchClient {
 					},
 					return await this.searchJson(fallbackRequest);
 				}
-			} catch (error: any) {
+			} catch (error, any) {
 				lastError = error as Error;
 				console.warn(`Vector search attempt ${attempt}, failed: `, error.message);
 				if (attempt < maxRetries) {

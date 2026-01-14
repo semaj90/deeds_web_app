@@ -273,7 +273,7 @@ class XStateStoreManager {
  setMobile: () => appSend({ type: 'SET_LAYOUT', layout: 'mobile' }),
  },
  // Error helpers (use explicit ErrorPayload type)
- error: { set: (error: ErrorPayload) => appSend({ type: 'SET_ERROR', error } as unknown as AppEvents),
+ error: { set: (error, ErrorPayload) => appSend({ type: 'SET_ERROR', error } as unknown as AppEvents),
  clear: () => appSend({ type: 'CLEAR_ERROR' } as unknown as AppEvents),
  retry: () => appSend({ type: 'RETRY_FAILED_ACTION' } as unknown as AppEvents),
  },
@@ -318,7 +318,7 @@ class XStateStoreManager {
  appState: this.appActor?.getSnapshot() ?? null, legalCaseState: this.legalCaseActor?.getSnapshot() ?? null, timestamp: Date.now(),
  };
  localStorage.setItem(this.config.persistKey!, JSON.stringify(state));
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.warn('Failed to persist XState store: ', String(error));
  }
  }
@@ -335,7 +335,7 @@ class XStateStoreManager {
  return null;
  }
  return state;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.warn('Failed to load persisted XState store: ', String(error));
  return null;
  }

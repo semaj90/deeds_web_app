@@ -305,8 +305,7 @@ ${sampleMessages}`;
 	/**
 	 * Classify a new error into an existing cluster
 	 */
-	async classifyError(
-		error: ErrorReport,
+	async classifyError(error, ErrorReport,
 		embedding: number[],
 		clusters: ClusterResult[]
 	): Promise<ClassificationResult> {

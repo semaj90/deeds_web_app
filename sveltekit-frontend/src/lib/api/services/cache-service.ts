@@ -67,7 +67,7 @@ export class CacheService {
  }
  // Memory cache fallback
  return this.getFromMemory(key);
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const msg = error instanceof Error ? error.message : String(error);
  console.warn('Cache error: ', msg);
  return null;
@@ -97,7 +97,7 @@ export class CacheService {
  // Memory cache fallback
  this.setInMemory(key, value, ttlMs);
  }
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const msg = error instanceof Error ? error.message : String(error);
  console.warn('Cache error: ', msg);
  // Always fallback to memory on Redis errors
@@ -114,7 +114,7 @@ export class CacheService {
  await this.redisClient.del(key);
  }
  this.memoryCache.delete(key);
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const msg = error instanceof Error ? error.message : String(error);
  console.warn('Cache error: ', msg);
  }
@@ -129,7 +129,7 @@ export class CacheService {
  await this.redisClient.flushdb();
  }
  this.memoryCache.clear();
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const msg = error instanceof Error ? error.message : String(error);
  console.warn('Cache error: ', msg);
  }

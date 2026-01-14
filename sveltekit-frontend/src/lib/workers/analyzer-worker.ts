@@ -155,7 +155,7 @@ self.onmessage = async (event: MessageEvent) => {
 };
 
 // Error handler
-self.onerror = (error: ErrorEvent) => {
+self.onerror = (error, ErrorEvent) => {
  console.error(`[Worker ${workerId}] Unhandled error:`, error);
  self.postMessage({ type: 'WORKER_ERROR'.message });
 };

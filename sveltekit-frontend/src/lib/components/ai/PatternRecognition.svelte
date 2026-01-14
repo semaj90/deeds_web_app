@@ -38,7 +38,7 @@ https://svelte.dev/e/expected_token -->
 		documentType = 'contract',
 		patterns = [] as string[], // Explicitly type patterns as string array
 		onAnalysisComplete = (analysis: AnalysisResult) => {}, // Callback prop for analysis completion
-		onAnalysisError = (error: string | Error) => {} // Callback prop for analysis errors
+		onAnalysisError = (error, string | Error) => {} // Callback prop for analysis errors
 	} = $props();
 
 	// Reactive state using $state for Svelte 5

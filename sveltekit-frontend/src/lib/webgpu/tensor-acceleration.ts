@@ -111,7 +111,7 @@ export class WebGPUTensorAccelerator {
             // Start metrics collection
             this.startMetricsCollection();
             return true;
-        } catch (error: Error | unknown) {
+        } catch (error, Error | unknown) {
             const msg = error instanceof Error ? error.message : String(error);
             console.error('🔥 WebGPU failed: ', msg);
             this.metrics.errorCount++;
@@ -491,7 +491,7 @@ export class WebGPUTensorAccelerator {
  const duration = performance.now() - start;
  this.updateMetrics(duration);
  return cosineSimilarity;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const msg = error instanceof Error ? error.message : String(error);
  this.metrics.errorCount++;
  this.metrics.lastError = msg;
@@ -654,7 +654,7 @@ export class WebGPUTensorAccelerator {
                     throughput: (vectorA.byteLength + vectorB.byteLength) / 1024 / 1024 / (totalTime / 1000), // MB/s
                 },
             } as Record<string, unknown>;
-        } catch (error: Error | unknown) {
+        } catch (error, Error | unknown) {
             const msg = error instanceof Error ? error.message : String(error);
             this.metrics.errorCount++;
             this.metrics.lastError = msg;

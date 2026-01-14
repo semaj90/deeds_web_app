@@ -59,7 +59,7 @@ export interface FormOptions {
   resetOnSuccess?: boolean;
   onSubmit?: (formData: any) => Promise<any> | void;
   onSuccess?: (data: any) => void;
-  onError?: (error: any) => void;
+  onError?: (error, any) => void;
 }
 
 export interface FormMachineIntegration<TActor extends AnyActorRef> {

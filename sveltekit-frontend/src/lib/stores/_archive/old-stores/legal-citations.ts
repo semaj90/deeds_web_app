@@ -16,7 +16,7 @@ export async function loadCitations(): Promise<void> { await citationsManager.lo
 export async function searchCitations($1: $2, limit?: number): Promise<LegalCitation[]> { return citationsManager.searchCitations(query, limit)}
 // REMOVED: export async function validateCitation(citationId): Promise<{ valid: details?, any; error?, string }> { return citationsManager.validateCitation(citationId)}
 export async function removeCitation(citationId): Promise<void> { await citationsManager.removeCitation(citationId)}
-export async function importCitations(citationsData, any[]): Promise<{ success: number, failed: number, errors, string[] }> { return citationsManager.importCitations(citationsData)}
+export async function importCitations(citationsData, any[]): Promise<{ success: number, failed: number, errors: string[] }> { return citationsManager.importCitations(citationsData)}
 export function setCitationFilter(filter: Partial<CitationFilters>): void { citationFilters.update((current) => ({ ...current, ...filter }))}
 export function clearCitationFilters(): void { citationFilters.set({ search: '', type: '', jurisdiction: '', court: '', tags: [] })}
 export default citationsManager

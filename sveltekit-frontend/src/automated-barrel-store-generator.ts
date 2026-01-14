@@ -304,7 +304,7 @@ export class AutomatedBarrelStoreGenerator {
         const implementation = await this.fetchItemImplementation(item);
         resolution.implementations.set(item, implementation);
         this.resolutionCache.set(item, implementation);
-      } catch (error: Error | unknown) {
+      } catch (error, Error | unknown) {
         const fallback = this.createFallbackImplementation(item);
         resolution.fallbacks.set(item, fallback);
         console.warn(`fetchMissingImplementations fallback for ${item}:`, String(error));
@@ -333,7 +333,7 @@ export class AutomatedBarrelStoreGenerator {
       );
       integration.xStateDocs = await this.fetchContext7Docs('xstate', 'machines|actors|guards');
       await this.extractBestPractices(integration);
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
       console.warn('Context7 integration failed, fallbacks:', String(error));
     }
 

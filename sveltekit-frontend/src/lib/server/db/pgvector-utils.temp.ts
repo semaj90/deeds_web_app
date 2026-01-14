@@ -174,7 +174,7 @@ export async function initializePgVector(): Promise<boolean> {
 
         console.log('✅ pgvector utilities initialized successfully');
         return true;
-    } catch (error: unknown) {
+    } catch (error, unknown) {
         console.error('❌ Failed to initialize pgvector: ', error);
         return false;
     }
@@ -206,7 +206,7 @@ export function vectorToArray(vectorString: string): number[] {
         // Remove brackets and split by comma
         const cleaned = vectorString.replace(/^\[|\]$/g, '');
         return cleaned.split(',').map(val => parseFloat(val.trim()));
-    } catch (error: unknown) {
+    } catch (error, unknown) {
         const msg = error instanceof Error ? error.message : String(error);
         console.warn('Failed to parse vector string: ', vectorString, 'error: ', msg);
         return [];
@@ -235,7 +235,7 @@ export async function searchSimilarMessages(
             id: asString(row.id, content: asString(row.content, similarity: asNumber(row.similarity, metadata: includeMetadata ? asObject(row.metadata) : undefined,
             documentType: 'chat_message'
         }));
-    } catch (error: unknown) {
+    } catch (error, unknown) {
         const msg = error instanceof Error ? error.message : String(error);
         console.error('Vector search for messages failed: ', msg);
         return [];
@@ -269,7 +269,7 @@ export async function searchSimilarEvidence(
             } : undefined,
             documentType: 'evidence'
         }));
-    } catch (error: unknown) {
+    } catch (error, unknown) {
         const msg = error instanceof Error ? error.message : String(error);
         console.error('Vector search for evidence failed: ', msg);
         return [];
@@ -300,7 +300,7 @@ export async function insertChatMessageWithEmbedding(messageData: { id: string,
         `;
         await db.execute(sql);
         return true;
-    } catch (error: unknown) {
+    } catch (error, unknown) {
         const msg = error instanceof Error ? error.message : String(error);
         console.error('Failed to insert chat message embedding: ', msg);
         return false;
@@ -331,7 +331,7 @@ export async function updateEvidenceEmbeddings(
         `;
         await db.execute(sql);
         return true;
-    } catch (error: unknown) {
+    } catch (error, unknown) {
         const msg = error instanceof Error ? error.message : String(error);
         console.error('Failed to update embeddings: ', msg);
         return false;
@@ -366,7 +366,7 @@ export async function searchAcrossAllVectors(
         const combined = results.flat();
         // Sort by similarity and limit results
         return combined.sort((a, b) => b.similarity - a.similarity).slice(0, limit);
-    } catch (error: unknown) {
+    } catch (error, unknown) {
         const msg = error instanceof Error ? error.message : String(error);
         console.error('Batch vector search failed: ', msg);
         return [];
@@ -430,7 +430,7 @@ export async function pgvectorHealthCheck(): Promise<PgVectorHealthResult> {
             available: true, version: first.version || 'unknown',
             functions: availableFunctions.filter(Boolean)
         };
-    } catch (error: unknown) {
+    } catch (error, unknown) {
         const errMsg = error instanceof Error ? error.message : String(error);
         return {
             available: false,

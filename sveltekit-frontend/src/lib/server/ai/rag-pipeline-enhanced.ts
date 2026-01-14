@@ -732,7 +732,7 @@ const embedding = await this.embeddings.embedQuery(text);
  ...metadata,
  },
  };
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const errorMsg = `Failed to process chunk ${i + idx}: ${error}`;
  errors.push(errorMsg);
  console.error(errorMsg);
@@ -755,7 +755,7 @@ const isDocumentChunkInsert = (): r is DocumentChunkInsert =>
  console.debug(
  `[RAG] Processed batch ${Math.floor(i / this.config.rag.batchSize) + 1}/${Math.ceil(
  chunks.length / this.config.rag.batchSize)}`);
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const errorMsg = `Failed to process batch ${Math.floor(i / this.config.rag.batchSize) + 1}: ${error}`;
  errors.push(errorMsg);
  console.error(errorMsg);

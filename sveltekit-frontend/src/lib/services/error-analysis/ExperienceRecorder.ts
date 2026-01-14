@@ -57,8 +57,7 @@ export class ExperienceRecorder {
 	/**
 	 * Record a fix experience
 	 */
-	async recordExperience(
-		error: ErrorReport,
+	async recordExperience(error, ErrorReport,
 		strategy: FixStrategy,
 		outcome: 'success' | 'failure',
 		context: ErrorContext,

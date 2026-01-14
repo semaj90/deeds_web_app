@@ -91,7 +91,7 @@ export class OllamaSuggestionsService {
 				request.reportType,
 				request.maxSuggestions ?? 5
 			);
-		} catch (error: unknown) {
+		} catch (error, unknown) {
 			const err = error instanceof Error ? error : new Error(String(error));
 			console.error('Ollama suggestion failed:', err);
 			throw new Error(`Failed to generate suggestions: ${err.message}`);
@@ -123,7 +123,7 @@ export class OllamaSuggestionsService {
 					yield suggestion;
 				}
 			}
-		} catch (error: unknown) {
+		} catch (error, unknown) {
 			const err = error instanceof Error ? error : new Error(String(error));
 			console.error('Ollama streaming failed:', err);
 			throw err;
@@ -219,7 +219,7 @@ export class OllamaSuggestionsService {
 
 			const json = (await response.json()) as OllamaResponse;
 			return json;
-		} catch (error: unknown) {
+		} catch (error, unknown) {
 			clearTimeout(timeoutId);
 			if (error instanceof DOMException && error.name === 'AbortError') {
 				throw new Error('Ollama request timed out');
@@ -304,7 +304,7 @@ export class OllamaSuggestionsService {
 			} finally {
 				reader.releaseLock();
 			}
-		} catch (error: unknown) {
+		} catch (error, unknown) {
 			clearTimeout(timeoutId);
 			if (error instanceof DOMException && error.name === 'AbortError') {
 				throw new Error('Ollama streaming request timed out');
@@ -385,7 +385,7 @@ export class OllamaSuggestionsService {
 						}
 					} as OllamaSuggestion;
 				});
-		} catch (error: unknown) {
+		} catch (error, unknown) {
 			const err = error instanceof Error ? error : new Error(String(error));
 			console.warn('Failed to parse structured suggestions, falling back to text parsing:', err.message);
 			return this.fallbackTextParsing(response.response ?? '', reportType, maxSuggestions);
@@ -471,7 +471,7 @@ export class OllamaSuggestionsService {
 				signal: AbortSignal.timeout(5000)
 			});
 			return response.ok;
-		} catch (error: unknown) {
+		} catch (error, unknown) {
 			const err = error instanceof Error ? error : new Error(String(error));
 			console.error('Ollama health check failed:', err);
 			return false;
@@ -502,7 +502,7 @@ export class OllamaSuggestionsService {
 						: ''
 				)
 				.filter((n: string) => !!n);
-		} catch (error: unknown) {
+		} catch (error, unknown) {
 			const err = error instanceof Error ? error : new Error(String(error));
 			console.error('Failed to get models:', err);
 			return [];
@@ -579,7 +579,7 @@ export async function testOllamaIntegration(): Promise<{
 			availableModels,
 			testSuggestions
 		};
-	} catch (error: unknown) {
+	} catch (error, unknown) {
 		const err = error instanceof Error ? error : new Error(String(error));
 		return {
 			success: false,

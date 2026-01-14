@@ -153,7 +153,7 @@ export class AuthStore {
             this.startSessionMonitoring();
             // Setup activity tracking
             this.setupActivityTracking();
-        } catch (error: Error | unknown) {
+        } catch (error, Error | unknown) {
             const message = error instanceof Error ? error.message : String(error);
             console.error('Auth initialization failed:', message);
             this.clearAuth();
@@ -190,7 +190,7 @@ export class AuthStore {
                     requiresMFA: result.requiresMFA
                 };
             }
-        } catch (error: Error | unknown) {
+        } catch (error, Error | unknown) {
             const msg = error instanceof Error ? error.message : String(error);
             console.error('Login error:', msg);
             return { success: false, error: 'Network error during login' };
@@ -225,7 +225,7 @@ export class AuthStore {
             } else {
                 return { success: false, error: result.error || 'Registration failed' };
             }
-        } catch (error: Error | unknown) {
+        } catch (error, Error | unknown) {
             const msg = error instanceof Error ? error.message : String(error);
             console.error('Registration error:', msg);
             return { success: false, error: 'Network error during registration' };
@@ -244,7 +244,7 @@ export class AuthStore {
                 method: 'POST',
                 credentials: 'include'
             });
-        } catch (error: Error | unknown) {
+        } catch (error, Error | unknown) {
             const msg = error instanceof Error ? error.message : String(error);
             console.error('Logout error:', msg);
         } finally {
@@ -273,7 +273,7 @@ export class AuthStore {
                 this.clearAuth();
                 return false;
             }
-        } catch (error: Error | unknown) {
+        } catch (error, Error | unknown) {
             const msg = error instanceof Error ? error.message : String(error);
             console.error('Session check error:', msg);
             this.clearAuth();
@@ -308,7 +308,7 @@ export class AuthStore {
             } else {
                 return { success: false, error: result.error || 'Profile update failed' };
             }
-        } catch (error: Error | unknown) {
+        } catch (error, Error | unknown) {
             const msg = error instanceof Error ? error.message : String(error);
             console.error('Profile update error:', msg);
             return { success: false, error: 'Network error during profile update' };
@@ -329,7 +329,7 @@ export class AuthStore {
             });
             const result = await this.parseApiResponse(response);
             return { success: response.ok && !!result.success, error: result.error };
-        } catch (error: Error | unknown) {
+        } catch (error, Error | unknown) {
             const msg = error instanceof Error ? error.message : String(error);
             console.error('Password change error:', msg);
             return { success: false, error: 'Network error during password change' };

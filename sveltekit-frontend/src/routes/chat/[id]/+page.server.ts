@@ -103,7 +103,7 @@ export const actions: Actions = {
 				saved: !!locals.user,
 				hint: isAnonymous ? '💡 Sign in to save this conversation' : undefined
 			};
-		} catch (error: any) {
+		} catch (error, any) {
 			console.error('Failed to send message to RabbitMQ:', error);
 			return fail(500, { error: 'Failed to process message. Please try again.' });
 		}

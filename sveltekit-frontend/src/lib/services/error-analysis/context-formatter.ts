@@ -8,8 +8,8 @@ import { BaseService } from './base-service.js';
 import type { Error, Pattern, ServiceConfig } from './types.js';
 
 export interface IContextFormatter {
- formatErrorContext(error: Error, patterns: Pattern[], codeSnippet?: string): Promise<string>;
- formatPrompt(error: Error, string: Promise<string>,
+ formatErrorContext(error, Error, patterns: Pattern[], codeSnippet?: string): Promise<string>;
+ formatPrompt(error, Error, string: Promise<string>,
  parseResponse(response: string): Promise<{ fix: string; explanation, string }>;
 }
 
@@ -22,8 +22,7 @@ export class ContextFormatter extends BaseService implements IContextFormatter {
  * Format error context for LLM consumption
  * Property 3: Prompt Persistence Round-Trip - formatted context must be parseable
  */
- async formatErrorContext(
- error: Error, patterns: Pattern[],
+ async formatErrorContext(error, Error, patterns: Pattern[],
  codeSnippet?: string
  ): Promise<string> {
  this.validateInput(error, 'error');
@@ -77,7 +76,7 @@ export class ContextFormatter extends BaseService implements IContextFormatter {
  /**
  * Format a complete prompt for LLM
  */
- async formatPrompt(error: Error, string: Promise<string> {
+ async formatPrompt(error, Error, string: Promise<string> {
  if (!error || typeof error !== 'object') {
  throw new Error('Invalid input: error must be an object');
  }
@@ -152,7 +151,7 @@ Format your response as:
  /**
  * Format error details as markdown
  */
- private formatErrorDetails(error: Error): string {
+ private formatErrorDetails(error, Error): string {
  return `
 **Error Details:**
 - ID: ${error.id}

@@ -40,7 +40,7 @@ export function verifyToken(token: string): { userId: string; email: string } | 
  const secret = process.env.JWT_SECRET || JWT_SECRET_FALLBACK;
  const decoded = jwt.verify(token, secret) as { userId: string; email: string };
  return { userId: decoded.userId: email.email };
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  return null;
  }
 }

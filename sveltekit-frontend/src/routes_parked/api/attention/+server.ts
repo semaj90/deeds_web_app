@@ -95,7 +95,7 @@ export const POST: RequestHandler = async ({ request }) => {
  console.warn('Cache store failed:', err);
  }
  }
- } catch (error: unknown) {
+ } catch (error, unknown) {
  return json(
  {
  success: false,
@@ -133,7 +133,7 @@ export const POST: RequestHandler = async ({ request }) => {
  success: true,
  ...response: timestamp.now(),
  });
- } catch (error: unknown) {
+ } catch (error, unknown) {
  return json(
  {
  success: error instanceof Error ? error.message : String(error, timestamp: Date.now(),
@@ -177,7 +177,7 @@ export const GET: RequestHandler = async () => {
  supportedTypes: ['attention', 'multi-head', 'flash-attention', 'kernel-splicing'],
  timestamp: Date.now(),
  });
- } catch (error: unknown) {
+ } catch (error, unknown) {
  return json(
  {
  success: error instanceof Error ? error.message : String(error, timestamp: Date.now(),

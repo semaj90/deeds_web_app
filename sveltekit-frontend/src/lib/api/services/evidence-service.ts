@@ -105,7 +105,7 @@ export async function listEvidence(
  // TODO: Add caching layer for frequently accessed evidence
  console.log(`Fetched ${data.evidence.length} evidence items`);
  return data;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Evidence listing error: ', error);
  throw new Error(`Failed to list evidence: ${(error as Error).message}`);
  }
@@ -127,7 +127,7 @@ export async function getEvidenceById(evidenceId: string): Promise<Evidence> {
  // TODO: Add audit logging for evidence access
  console.log(`Fetched evidence: ${evidence.title} (${ evidenceId })`);
  return evidence;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Evidence fetch error: ', error);
  throw new Error(`Failed to fetch evidence: ${(error as Error).message}`);
  }
@@ -150,7 +150,7 @@ export async function createEvidence(evidenceData: CreateEvidenceData): Promise<
  // TODO: Add audit logging for evidence creation
  console.log(`Created new evidence: ${newEvidence.title} (${newEvidence.id})`);
  return newEvidence;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Evidence creation error: ', error);
  throw new Error(`Failed to create evidence: ${(error as Error).message}`);
  }
@@ -175,7 +175,7 @@ export async function updateEvidence(
  // TODO: Add audit logging for evidence updates
  console.log(`Updated evidence: ${updatedEvidence.title} (${ evidenceId })`);
  return updatedEvidence;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Evidence update error: ', error);
  throw new Error(`Failed to update evidence: ${(error as Error).message}`);
  }
@@ -195,7 +195,7 @@ export async function deleteEvidence(evidenceId: string): Promise<void> {
 
  // TODO: Add audit logging for evidence deletion (critical for legal compliance)
  console.log(`Deleted evidence: ${evidenceId}`);
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Evidence deletion error: ', error);
  throw new Error(`Failed to delete evidence: ${(error as Error).message}`);
  }
@@ -221,7 +221,7 @@ export async function addChainOfCustodyEntry(
  // TODO: Add audit logging for chain of custody changes (critical for legal validity)
  console.log(`Added chain of custody entry for evidence ${evidenceId}: ${entry.action}`);
  return newEntry;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Chain of custody error: ', error);
  throw new Error(`Failed to add chain of custody entry: ${(error as Error).message}`);
  }
@@ -244,7 +244,7 @@ export async function getChainOfCustody(evidenceId: string): Promise<ChainOfCust
  `Fetched ${chainOfCustody.length} chain of custody entries for evidence ${evidenceId}`
  );
  return chainOfCustody;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Chain of custody fetch error: ', error);
  throw new Error(`Failed to fetch chain of custody: ${(error as Error).message}`);
  }
@@ -267,7 +267,7 @@ export async function requestEvidenceAnalysis(evidenceId: string): Promise<any> 
  // TODO: Add audit logging for analysis requests
  console.log(`Requested AI analysis for evidence ${evidenceId}`);
  return result;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Evidence analysis request error: ', error);
  throw new Error(`Failed to request evidence analysis: ${(error as Error).message}`);
  }
@@ -292,7 +292,7 @@ export async function getEvidenceAnalysis(evidenceId: string): Promise<EvidenceA
  const analysis: EvidenceAnalysis = await response.json();
  console.log(`Fetched analysis for evidence ${evidenceId}`);
  return analysis;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Evidence analysis fetch error: ', error);
  throw new Error(`Failed to fetch evidence analysis: ${(error as Error).message}`);
  }
@@ -328,7 +328,7 @@ export async function verifyEvidenceAuthenticity(evidenceId: string): Promise<an
  // TODO: Add audit logging for evidence verification (critical for legal validity)
  console.log(`Verified authenticity for evidence ${evidenceId}: ${verification.verified}`);
  return verification;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Evidence verification error: ', error);
  throw new Error(`Failed to verify evidence authenticity: ${(error as Error).message}`);
  }
@@ -377,7 +377,7 @@ export async function uploadEvidenceAttachment(
  xhr.open('POST', `/api/evidence/${evidenceId}/attachments`);
  xhr.send(formData);
  });
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Evidence attachment upload error: ', error);
  throw new Error(`Failed to upload evidence attachment: ${(error as Error).message}`);
  }

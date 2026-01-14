@@ -25,7 +25,7 @@
    const response = await fetch('/api/ai/ollama-simd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!response.ok) { throw new Error(`API request failed: ${response.statusText}`)}
       const result = await response.json(); // Send response into state machine send({ type: 'RESPONSE_RECEIVED', response: result?.response ?? '', metadata: { model: result?.model, tokensPerSecond: result?.performance_metrics?.tokens_per_second, totalDuration: result?.total_duration; simdResults: result?.simd_results }
       }); // handle SIMD visualization if (result?.simd_results?.enabled) { simdResults = result.simd_results; await generateLiveComponents(result.simd_results); addLog(`âœ… SIMD compression ${simdResults.total_compression_ratio.toFixed(1)}:1 ratio`); addLog(`ðŸŽ¨ Generated ${simdResults.instant_ui_components?.length ?? 0} UI components`)}
-      addLog(`âš¡ Response generated: ${Number(result?.performance_metrics?.tokens_per_second ?? 0).toFixed(1)} tokens/sec`); queryInput = ''} catch (error: any) { console.error('Query processing failed:', error); addLog(`âŒ Error: ${error?.message ?? 'Unknown error'}`); send({ type: 'ERROR', error: error?.message ?? 'Unknown error'
+      addLog(`âš¡ Response generated: ${Number(result?.performance_metrics?.tokens_per_second ?? 0).toFixed(1)} tokens/sec`); queryInput = ''} catch (error, any) { console.error('Query processing failed:', error); addLog(`âŒ Error: ${error?.message ?? 'Unknown error'}`); send({ type: 'ERROR', error: error?.message ?? 'Unknown error'
       })}
   }
   async function generateLiveComponents(simdData: any): Promise<any> { if (!simdData?.instant_ui_components) return;

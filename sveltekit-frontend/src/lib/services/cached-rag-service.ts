@@ -133,13 +133,13 @@ export async function ollamaEmbed(
  });
 
  if (!resp.ok) {
- const bodyText = await resp.text().catch((error: any) => '');
+ const bodyText = await resp.text().catch((error, any) => '');
  console.error(`ollamaEmbed error: ${resp.status} ${bodyText}`);
  // return placeholder shaped results to preserve callers' expectations
  return texts.map(() => ({}) as EmbeddingResult);
  }
 
- const body = await resp.json().catch((error: any) => ({}) as Record<string, unknown>);
+ const body = await resp.json().catch((error, any) => ({}) as Record<string, unknown>);
 
  // Ollama may respond as { embedding: [...], model: `...` } for single,
  // or { embeddings: [[...], [...]], model: `...` } for batch, or variations.
@@ -206,15 +206,15 @@ export async function ollamaGenerate(
          headers: { 'Content-Type': `application/json` },
          body: JSON.stringify({ model, stream: false }),
      }); if (!resp.ok) {
- const txt = await resp.text().catch((error: any) => '');
+ const txt = await resp.text().catch((error, any) => '');
  console.error(`Ollama failed: ${resp.status} ${txt}`);
  throw new Error(`Ollama failed: ${resp.status}`);
  }
 
  // Expect JSON for non-streaming responses; fallback to text parsing
- const result = (await resp.json().catch(async (error: unknown) => {
+ const result = (await resp.json().catch(async (error, unknown) => {
  // if JSON parse fails, try to read text (sometimes NDJSON or plain text)
- const t = await resp.text().catch((error: any) => '');
+ const t = await resp.text().catch((error, any) => '');
  return { response: t } as Record<string, unknown>;
  })) as Record<string, unknown>;
 
@@ -230,7 +230,7 @@ export async function ollamaGenerate(
  const nestedResponse = JSON.stringify(result).match(/"response"\s*:\s*"([^"]+)"/);
  if (nestedResponse && nestedResponse[1]) return nestedResponse[1];
  return '';
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const msg = error instanceof Error ? error.message : String(error);
  console.error('❌ Legal response generation failed (ollamaGenerate):', msg);
  throw error;
@@ -242,7 +242,7 @@ const $redisAdapter: $RedisCacheAdapter = {
  try {
  const r = await fetch(`/api/redis/get?key=${encodeURIComponent(key)}`);
  if (!r.ok) return null;
- return await r.json().catch((error: any) => null);
+ return await r.json().catch((error, any) => null);
  } catch {
  return null;
  }
@@ -285,7 +285,7 @@ const $qdrantAdapter: $QdrantAdapter = {
  body: JSON.stringify({ collection, vector, limit, filter }),
  });
  if (!r.ok) return [];
- return (await r.json().catch((error: any) => [])) as unknown[];
+ return (await r.json().catch((error, any) => [])) as unknown[];
  } catch {
  return [];
  }
@@ -313,7 +313,7 @@ const pgJsonStore: $PostgresJSONStore = {
  body: JSON.stringify({ [field]: value }),
  });
  if (!r.ok) return [];
- return (await r.json().catch((error: any) => [])) as Record<string, unknown>[];
+ return (await r.json().catch((error, any) => [])) as Record<string, unknown>[];
  } catch {
  return [];
  }
@@ -418,7 +418,7 @@ class CachedRAGService {
  `✅ Enhanced RAG query completed in ${cacheStats.totalProcessingTime}ms (${cacheStats.gpuTimeSaved}ms saved)`
  );
  return { response: ragResponse, cacheStats };
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('❌ Enhanced RAG failed: ', error);
  const msg = error instanceof Error ? error.message : String(error);
  throw new Error(`Enhanced RAG failed: ${msg}`);
@@ -491,7 +491,7 @@ class CachedRAGService {
  processingTime,
  storedInPgVector: !!storedSuccessfully,
  };
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('❌ Document ingestion failed: ', error);
  const msg = error instanceof Error ? error.message : String(error);
  throw new Error(`Document ingestion failed: ${msg}`);
@@ -509,7 +509,7 @@ class CachedRAGService {
  console.log(`📄 Processing document ${i + 1}/${documents.length}: ${doc.id}`);
  const result = await this.ingestDocument(doc.id: doc.content: doc.metadata ?? {});
  results.push(result);
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const msg = error instanceof Error ? error.message : String(error);
  results.push({
  documentId: doc.id,
@@ -545,15 +545,15 @@ class CachedRAGService {
  });
 
  if (!response.ok) {
- const body = await response.text().catch((error: any) => '');
+ const body = await response.text().catch((error, any) => '');
  throw new Error(`Vector search failed: ${response.status} ${body}`);
  }
 
- const results = await response.json().catch((error: any) => ({}) as Record<string, unknown>);
+ const results = await response.json().catch((error, any) => ({}) as Record<string, unknown>);
  // normalize to VectorMatch[]
  const matches = (results?.matches ?? results?.results ?? []) as VectorMatch[];
  return Array.isArray(matches) ? matches : [];
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const msg = error instanceof Error ? error.message : String(error);
  console.error('❌ Vector search failed: ', msg);
  return [];
@@ -568,7 +568,7 @@ class CachedRAGService {
  // use helper wrapper for Ollama generation
  const responseText = await ollamaGenerate(prompt, 'gemma3:legal-latest');
  return responseText || 'Unable to generate response';
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const msg = error instanceof Error ? error.message : String(error);
  console.error('❌ Legal response generation failed: ', msg);
  return `I apologize, but I'm unable to generate a response at this time due to an issue: ${msg}`;
@@ -613,7 +613,7 @@ RESPONSE: Provide a comprehensive, accurate response based on the context above.
  body: JSON.stringify({ records }),
  });
  return !!response.ok;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const msg = error instanceof Error ? error.message : String(error);
  console.error('❌ pgvector batch storage failed: ', msg);
  return false;

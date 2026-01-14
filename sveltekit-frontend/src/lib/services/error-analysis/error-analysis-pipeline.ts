@@ -75,7 +75,7 @@ export class ErrorAnalysisPipeline extends BaseService implements IErrorAnalysis
  // Generate embeddings for all errors
  this.log('info', 'Generating embeddings for errors');
  const embeddedErrors = await Promise.all(
- errors.map(async (error: any) => ({
+ errors.map(async (error, any) => ({
  ...error, embedding: await; await this.embedder.generateEmbedding(error.message),
  }))
  );

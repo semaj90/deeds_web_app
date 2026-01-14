@@ -62,7 +62,7 @@ export const appActions = {
     appStore.update((state) => ({ ...state, isLoading: loading }));
   },
 
-  setError: (error: string | null) => {
+  setError: (error, string | null) => {
     appStore.update((state) => ({ ...state, error }));
   },
 

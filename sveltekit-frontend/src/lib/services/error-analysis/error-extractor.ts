@@ -73,7 +73,7 @@ export class ErrorExtractor extends BaseService implements IErrorExtractor {
  });
 
  return this.parseSvelteCheckOutput(output);
- } catch (error: any) {
+ } catch (error, any) {
  // svelte-check returns non-zero exit code when errors are found
  const output = error.stdout || error.message || '';
  return this.parseSvelteCheckOutput(output);
@@ -120,7 +120,7 @@ export class ErrorExtractor extends BaseService implements IErrorExtractor {
  });
 
  return this.parseTscOutput(output);
- } catch (error: any) {
+ } catch (error, any) {
  // tsc returns non-zero exit code when errors are found
  const output = error.stdout || error.message || '';
  return this.parseTscOutput(output);

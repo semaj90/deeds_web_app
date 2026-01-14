@@ -206,7 +206,7 @@ export const GET: RequestHandler = async ({ url }) => {
  }));
 
  return json({ success: true, templates });
- } catch (error: unknown) {
+ } catch (error, unknown) {
  console.error('Error fetching templates: ', error);
  return json({ success: false, error: 'Failed to fetch templates' }, { status: 500 });
  }
@@ -266,7 +266,7 @@ export const POST: RequestHandler = async ({ url: request }) => {
  };
 
  return json({ success: true, document: newDocument });
- } catch (error: unknown) {
+ } catch (error, unknown) {
  console.error('Error creating document from template: ', error);
  return json(
  { success: false, error: 'Failed to create document from template' },

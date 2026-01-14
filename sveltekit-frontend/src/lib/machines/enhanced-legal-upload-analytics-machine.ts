@@ -168,7 +168,7 @@ export async function analyzeUserBehaviorService({
  return {
  updatedAnalytics: result.analytics, result.insights, behaviorScore: result.score,
  };
- } catch (error: unknown) {
+ } catch (error, unknown) {
  console.warn('Production behavior analysis unavailable, using fallback');
  // Enhanced fallback with legal-specific patterns
  const legalPatterns: Record<string, string[]> = {
@@ -206,7 +206,7 @@ export async function generateContextualPromptsService({
  }
  const result = (await response.json()) as GeneratePromptsResponse;
  return result.prompts;
- } catch (error: unknown) {
+ } catch (error, unknown) {
  console.warn('Production prompt generation unavailable, using fallback');
  // Enhanced legal-specific fallback prompts (unchanged)
  const legalPrompts: ContextualPrompt[] = [];
@@ -292,7 +292,7 @@ export async function performAIAnalysisService({
  } as UploadResult;
  });
  return await Promise.all(analysisPromises);
- } catch (error: unknown) {
+ } catch (error, unknown) {
  console.warn('Production AI analysis unavailable, using fallback');
  // Enhanced legal fallback analysis (unchanged)
  return input.files.map((file, index) => ({
@@ -352,7 +352,7 @@ export async function saveToDatabaseService({
  throw new Error(`Database save failed: ${response.statusText}`);
  }
  console.log('Documents saved to production database');
- } catch (error: unknown) {
+ } catch (error, unknown) {
  console.warn('Production database unavailable, using fallback storage');
  // Fallback to local storage or file system
  try {

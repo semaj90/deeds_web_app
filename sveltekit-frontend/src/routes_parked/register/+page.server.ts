@@ -140,7 +140,7 @@ export const actions: Actions = {
  }
 
  throw redirect(302, '/login?registered=true');
- } catch (error: any) {
+ } catch (error, any) {
  console.error('[Register] Error:', error);
  if (error instanceof Response) throw error;
  return message(form, 'Registration failed. Please try again.', { status: 500 });

@@ -338,7 +338,7 @@ export const actions: Actions = {
 
 			// 11) Success response for the action
 			return { success: true, evidence: inserted?.[0] ?? null };
-		} catch (error: unknown) {
+		} catch (error, unknown) {
 			console.error('Evidence upload failed:', error);
 			return fail(500, {
 				form: { errors: { _global: ['Server error while uploading evidence'] } }

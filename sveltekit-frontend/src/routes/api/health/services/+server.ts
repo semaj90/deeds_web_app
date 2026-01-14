@@ -59,7 +59,7 @@ export const GET: RequestHandler = async () => {
         },
       }
     );
-  } catch (error: unknown) {
+  } catch (error, unknown) {
     console.error('Health check failed: ', error);
     const msg = error instanceof Error ? error.message : String(error);
     return json(

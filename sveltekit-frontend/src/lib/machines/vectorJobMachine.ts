@@ -14,7 +14,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const hasWebGPU = () => typeof navigator !== 'undefined' && 'gpu' in navigator;
 
-const getErrorMessage = (error: unknown) => {
+const getErrorMessage = (error, unknown) => {
  if (error instanceof Error) {
  return error.message;
  }

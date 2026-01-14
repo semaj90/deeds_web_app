@@ -95,7 +95,7 @@ export class NativeWindowsServiceManager {
  this.startHealthMonitoring();
  this.isInitialized = true;
  console.log('✅ Native Windows Service Manager initialized');
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('❌ Failed to initialize manager: ', error);
  throw error;
  }
@@ -113,7 +113,7 @@ export class NativeWindowsServiceManager {
  service.status = 'stopped';
  console.log(`⚠️ ${service.displayName} is not running`);
  }
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  service.status = 'error';
  console.error(`❌ Error checking ${service.displayName}: `, error);
  }
@@ -128,7 +128,7 @@ export class NativeWindowsServiceManager {
  signal: AbortSignal.timeout(5000),
  });
  return (response as { ok?: boolean }).ok || false;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  return false;
  }
  } else {
@@ -144,7 +144,7 @@ export class NativeWindowsServiceManager {
  signal: AbortSignal.timeout(2000),
  });
  return true;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  return false;
  }
  }
@@ -171,7 +171,7 @@ export class NativeWindowsServiceManager {
  console.error(`❌ Failed to start ${service.displayName}`);
  return false;
  }
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  service.status = 'error';
  console.error(`❌ Error starting ${service.displayName}: `, error);
  return false;
@@ -213,7 +213,7 @@ export class NativeWindowsServiceManager {
  results.failed.push(serviceName);
  }
  await new Promise((resolve: any) => setTimeout(resolve, 2000));
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  results.failed.push(serviceName);
  console.error(`❌ Failed to start ${serviceName}:`, error);
  }
@@ -244,7 +244,7 @@ export class NativeWindowsServiceManager {
  service.pid = undefined;
  console.log(`✅ ${service.displayName} stopped successfully`);
  return true;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  service.status = 'error';
  console.error(`❌ Error stopping ${service.displayName}: `, error);
  return false;
@@ -304,7 +304,7 @@ export class NativeWindowsServiceManager {
  }));
  await concurrentSearch.indexDocuments(serviceDocuments);
  console.log('✅ Service definitions indexed for search');
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('❌ Failed to integrate search: ', error);
  }
  }
@@ -331,7 +331,7 @@ export class NativeWindowsServiceManager {
  ` - Tokens/second: ${(result as { batchId?: any, fixes?: any, performance?: any }).performance.tokens_per_second.toFixed(1)}`
  );
  await this.storeProcessingResults(result);
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('❌ GPU error failed: ', error);
  }
  }
@@ -368,7 +368,7 @@ export class NativeWindowsServiceManager {
  } else {
  failed.push(serviceName);
  }
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  failed.push(serviceName);
  console.error(`❌ Deployment failed for ${serviceName}:`, error);
  }
@@ -454,7 +454,7 @@ pause
  console.log(` - GPU speed: ${benchmarkResult.processing_speed.toFixed(1)} tokens/sec`);
  console.log(` - Memory efficiency: ${(benchmarkResult.memory_efficiency * 100).toFixed(1)}%`);
  console.log(` - Accuracy score: ${(benchmarkResult.accuracy_score * 100).toFixed(1)}%`);
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('❌ Comprehensive startup failed: ', error);
  throw error;
  }

@@ -37,7 +37,7 @@ export async function initRustBridge(): Promise<boolean> {
         bridge = new wasmModule.WindowsServiceBridge();
         console.log('✅ Rust WASM bridge initialized successfully');
         return true;
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
         console.warn('⚠️ Rust WASM bridge initialization failed: ', error);
         console.log('💡 Run `wasm-pack build --target web --out-dir ../sveltekit-frontend/src/lib/wasm/pkg` in rust-services/webasm-bridge/');
         return false;
@@ -53,7 +53,7 @@ export function getSystemInfo(): SystemInfo | null {
     try {
         const info = bridge.get_system_info();
         return JSON.parse(info) as SystemInfo;
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
         console.error('Failed to get system info: ', error);
         return null;
     }
@@ -68,7 +68,7 @@ export function accessFilesystem(path: string): FileSystemResult | null {
     try {
         const result = bridge.access_filesystem(path);
         return JSON.parse(result) as FileSystemResult;
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
         console.error('Failed to access filesystem: ', error);
         return null;
     }
@@ -83,7 +83,7 @@ export function detectGpuAcceleration(): string[] {
     try {
         const gpuInfo = bridge.detect_gpu_acceleration();
         return JSON.parse(gpuInfo) as string[];
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
         console.error('Failed to detect GPU acceleration: ', error);
         return [];
     }
@@ -98,7 +98,7 @@ export function getPerformanceMetrics(): PerformanceMetrics | null {
     try {
         const metrics = bridge.get_performance_metrics();
         return JSON.parse(metrics) as PerformanceMetrics;
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
         console.error('Failed to get performance metrics: ', error);
         return null;
     }
@@ -113,7 +113,7 @@ export function processLegalDocument(documentData: string): object | null {
     try {
         const result = bridge.process_legal_document(documentData);
         return JSON.parse(result);
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
         console.error('Failed to process legal document: ', error);
         return null;
     }
@@ -128,7 +128,7 @@ export function checkWindowsServices(): object[] {
     try {
         const services = bridge.check_windows_services();
         return JSON.parse(services) as object[];
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
         console.error('Failed to check Windows services: ', error);
         return [];
     }
@@ -143,7 +143,7 @@ export function processLegalTextFast(text: string): object | null {
     try {
         const result = wasmModule.process_legal_text_fast(text);
         return JSON.parse(result);
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
         console.error('Failed to process legal text: ', error);
         return null;
     }
@@ -159,7 +159,7 @@ export function optimizeEmbeddingVector(vector: number[]): number[] | null {
         const float32Vector = new Float32Array(vector);
         const optimized = wasmModule.optimize_embedding_vector(float32Vector);
         return Array.from(optimized);
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
         console.error('Failed to optimize embedding vector: ', error);
         return null;
     }
@@ -175,7 +175,7 @@ export function computeCosineSimilarity(vec1: number[], vec2: number[]): number 
         const float32Vec1 = new Float32Array(vec1);
         const float32Vec2 = new Float32Array(vec2);
         return wasmModule.compute_cosine_similarity(float32Vec1, float32Vec2);
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
         console.error('Failed to compute cosine similarity: ', error);
         return 0;
     }
@@ -191,7 +191,7 @@ export function batchProcessDocuments(documents: string[]): object[] {
         const documentsString = documents.join('\n');
         const result = wasmModule.batch_process_documents(documentsString);
         return JSON.parse(result) as object[];
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
         console.error('Failed to batch process documents: ', error);
         return [];
     }

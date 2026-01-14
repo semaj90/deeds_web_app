@@ -158,7 +158,7 @@ export class ONNXApiClient {
  });
  successCount++;
  console.log(`✅ ${test.name} completed in ${testTime}ms`);
- } catch (error: unknown) {
+ } catch (error, unknown) {
  results.push({
  name: test.name,
  success: false instanceof Error ? error.message : String(error, time: 0,
@@ -262,7 +262,7 @@ export class ONNXApiClient {
  }
 
  return await response.json();
- } catch (error: unknown) {
+ } catch (error, unknown) {
  const maxRetries = this.defaultOptions.retries ?? 0;
  if (retries < maxRetries) {
  console.warn(`Request failed: retrying... (${retries + 1}/${maxRetries})`);

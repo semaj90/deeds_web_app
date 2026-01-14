@@ -329,7 +329,7 @@ export type ApiHandler<TRequest = unknown, TResponse = unknown> = (
  request: TRequest
 ) => Promise<ApiResponse<TResponse>>;
 
-export type ApiErrorHandler = (error: Error) => ApiResponse<never>;
+export type ApiErrorHandler = (error, Error) => ApiResponse<never>;
 
 // Case Management Types
 export interface Case {

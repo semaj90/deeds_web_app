@@ -70,7 +70,7 @@ export class LokiEvidenceService {
 					autosave: true,
 					autosaveInterval: 4000
 				});
-			} catch (error: unknown) {
+			} catch (error, unknown) {
 				console.error('❌ Loki database failed: ', error);
 				reject(error);
 			}
@@ -129,7 +129,7 @@ export class LokiEvidenceService {
 			if (navigator.onLine) {
 				this.processSyncQueue();
 			}
-		} catch (error: unknown) {
+		} catch (error, unknown) {
 			console.error('Failed to create locally: ', error);
 			throw error;
 		}
@@ -171,7 +171,7 @@ export class LokiEvidenceService {
 			if (navigator.onLine) {
 				this.processSyncQueue();
 			}
-		} catch (error: unknown) {
+		} catch (error, unknown) {
 			console.error('Failed to update locally: ', error);
 			throw error;
 		}
@@ -203,7 +203,7 @@ export class LokiEvidenceService {
 			if (navigator.onLine) {
 				this.processSyncQueue();
 			}
-		} catch (error: unknown) {
+		} catch (error, unknown) {
 			console.error('Failed to delete locally: ', error);
 			throw error;
 		}
@@ -303,7 +303,7 @@ export class LokiEvidenceService {
 					// Mark as synced
 					operation.synced = true;
 					this.syncQueue.update(operation);
-				} catch (error: unknown) {
+				} catch (error, unknown) {
 					console.error(`Sync failed for operation ${operation.id}:`, error);
 					// Increment retry count
 					operation.retryCount++;

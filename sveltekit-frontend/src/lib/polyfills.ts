@@ -120,7 +120,7 @@ export const enhancedFetch = async (
 		}
 
 		return response;
-	} catch (error: Error | unknown) {
+	} catch (error, Error | unknown) {
 		clearTimeout(timeoutId);
 
 		if (error instanceof DOMException && error.name === 'AbortError') {
@@ -163,7 +163,7 @@ export const storage = {
 			if (typeof window === 'undefined') return defaultValue || null;
 			const item = localStorage.getItem(_key);
 			return item ? JSON.parse(item) : defaultValue || null;
-		} catch (error: Error | unknown) {
+		} catch (error, Error | unknown) {
 			console.warn(`Failed to get localStorage item: "${ _key }":`, error);
 			return defaultValue || null;
 		}
@@ -174,7 +174,7 @@ export const storage = {
 			if (typeof window === 'undefined') return false;
 			localStorage.setItem(_key, JSON.stringify(value));
 			return true;
-		} catch (error: Error | unknown) {
+		} catch (error, Error | unknown) {
 			console.warn(`Failed to set localStorage item: "${ _key }":`, error);
 			return false;
 		}
@@ -185,7 +185,7 @@ export const storage = {
 			if (typeof window === 'undefined') return false;
 			localStorage.removeItem(_key);
 			return true;
-		} catch (error: Error | unknown) {
+		} catch (error, Error | unknown) {
 			console.warn(`Failed to remove localStorage item: "${ _key }":`, error);
 			return false;
 		}
@@ -196,7 +196,7 @@ export const storage = {
 			if (typeof window === 'undefined') return false;
 			localStorage.clear();
 			return true;
-		} catch (error: Error | unknown) {
+		} catch (error, Error | unknown) {
 			console.warn('Failed to clear localStorage:', error);
 			return false;
 		}

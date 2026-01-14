@@ -39,7 +39,7 @@ declare module 'xstate' {
   export type AnyActorRef = any;
   export type Observer<T> = {
     next?: (value: T) => void;
-    error?: (error: Error | unknown) => void;
+    error?: (error, Error | unknown) => void;
     complete?: () => void;
   };
   export type Subscription = {
@@ -77,7 +77,7 @@ export interface ActorWrapper<T = unknown> {
 // Observer pattern for XState v5
 export interface StateObserver<T = unknown> {
   next?: (_value: T) => void;
-  error?: (error: Error | unknown) => void;
+  error?: (error, Error | unknown) => void;
   complete?: () => void;
 }
 

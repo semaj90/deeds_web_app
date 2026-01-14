@@ -170,8 +170,7 @@ export async function withDeadlockRetry<T>(
 /**
  * Constraint violation handler
  */
-export async function handleConstraintViolation(
- error: any,
+export async function handleConstraintViolation(error, any,
  context: {
  userId?: string,
  operationName?: string,

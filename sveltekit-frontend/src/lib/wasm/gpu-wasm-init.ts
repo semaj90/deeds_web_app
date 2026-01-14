@@ -140,7 +140,7 @@ export class WasmGpuInitService {
  console.log(
  `✅ WebAssembly GPU initialization complete (${Math.round(this.metrics.initializationTime)}ms)`
  );
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('❌ WebAssembly GPU initialization failed: ', error);
  this.initStatus.set({
  phase: 'error',
@@ -831,7 +831,7 @@ export class WasmGpuInitService {
  const bufferId = this.context.bufferPool.length;
  this.context.bufferPool.push(buffer);
  return bufferId;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Failed to allocate GPU buffer: ', error);
  return -1;
  }

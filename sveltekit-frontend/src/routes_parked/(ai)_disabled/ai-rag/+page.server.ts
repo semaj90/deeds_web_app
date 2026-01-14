@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ locals }) => {
  stats: { totalDocuments: 0, totalQueries: 0, avgResponseTime: 0,
  },
  };
- } catch (error: unknown) {
+ } catch (error, unknown) {
  const message = error instanceof Error ? error.message : String(error);
  console.error('Failed to load RAG data:', message);
  return fallback;

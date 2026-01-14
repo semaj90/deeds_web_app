@@ -416,7 +416,7 @@ export interface MockFunction<T extends (...args, any[]) => unknown = (...args: 
  mockImplementation(fn: T): this;
  mockReturnValue(_value: ReturnType<T>): this;
  mockResolvedValue(_value: Awaited<ReturnType<T>>): this;
- mockRejectedValue(error: any): this;
+ mockRejectedValue(error, any): this;
  mockClear(): this;
  mockReset(): this;
  mockRestore(): this; calls: Parameters<T>[];

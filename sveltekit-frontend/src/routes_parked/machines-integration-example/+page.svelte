@@ -46,7 +46,7 @@
  }
 
  // Handle upload errors
- function handleUploadError(error: string) {
+ function handleUploadError(error, string) {
  console.error('Upload failed:', error);
  }
 </script>

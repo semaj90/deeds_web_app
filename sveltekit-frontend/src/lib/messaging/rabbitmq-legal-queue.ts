@@ -166,7 +166,7 @@ export class RabbitMQLegalQueue {
 
             this.connection.onopen = () => { this.handleConnectionOpen(); };
             this.connection.onmessage = (event: MessageEvent) => { this.handleMessage(event); };
-            this.connection.onerror = (error: Event) => {
+            this.connection.onerror = (error, Event) => {
                 console.error('❌ RabbitMQ connection error: ', error);
                 this.handleConnectionError();
             };
@@ -174,7 +174,7 @@ export class RabbitMQLegalQueue {
                 console.warn('⚠️ RabbitMQ connection closed');
                 this.handleConnectionClose();
             };
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             console.error('❌ Failed to initialize RabbitMQ connection: ', error);
             this.scheduleReconnect();
         }
@@ -213,7 +213,7 @@ export class RabbitMQLegalQueue {
             // Start consuming from queues
             await this.startConsumers();
             console.log('🚀 RabbitMQ queues and consumers initialized');
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             console.error('❌ Failed to setup queues and consumers: ', error);
         }
     }
@@ -280,7 +280,7 @@ export class RabbitMQLegalQueue {
             await this.publishToQueue(queueName, message);
             this.metrics.messagesPublished++;
             console.log(`📤 Published ${operation} message for document ${document.id} to queue ${queueName}`);
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             console.error(`❌ Failed to publish document message: `, error);
             throw error;
         }
@@ -350,7 +350,7 @@ export class RabbitMQLegalQueue {
             });
   
             await this.acknowledgeMessage(message.messageId);
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             console.error(`❌ Document processing failed for ${message.documentId}: `, error);
             await this.sendProcessingResult({
                 success: false,
@@ -392,7 +392,7 @@ export class RabbitMQLegalQueue {
             });
 
             await this.acknowledgeMessage(message.messageId);
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             console.error(`❌ GPU compute failed: `, error);
             await this.handleProcessingError(message, error);
         }
@@ -420,7 +420,7 @@ export class RabbitMQLegalQueue {
             });
 
             await this.acknowledgeMessage(message.messageId);
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             console.error(`❌ Ranking computation failed: `, error);
             await this.handleProcessingError(message, error);
         }
@@ -441,7 +441,7 @@ export class RabbitMQLegalQueue {
             await this.broadcastMemoryStatus(memStats);
 
             await this.acknowledgeMessage(message.messageId);
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             console.error(`❌ Memory allocation handling failed: `, error);
         }
     }
@@ -610,7 +610,7 @@ export class RabbitMQLegalQueue {
                     }
                 }
             }
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             console.error('❌ Failed to handle message: ', error);
         }
     }

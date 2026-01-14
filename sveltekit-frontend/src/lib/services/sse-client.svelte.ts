@@ -89,7 +89,7 @@ export class SSEClient {
       };
 
       // Connection error
-      this.eventSource.onerror = (error: any) => {
+      this.eventSource.onerror = (error, any) => {
         this.isConnected = false;
         this.connectionError = 'Connection lost';
         console.error('[SSE] Connection error:', error);

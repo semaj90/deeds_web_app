@@ -168,7 +168,7 @@ export const GET: RequestHandler = async ({ url }) => {
                 });
                 controller.close();
 
-            } catch (error: any) {
+            } catch (error, any) {
                 console.error('[SSE] QLoRA streaming error:', error);
                 sendEvent('error', { message: error.message || 'Unknown error' });
                 controller.close();

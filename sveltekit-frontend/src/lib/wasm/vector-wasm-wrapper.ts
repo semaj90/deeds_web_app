@@ -39,7 +39,7 @@ export class VectorWasmWrapper {
  this.initialized = true;
  console.log('[VectorWASM] Module initialized successfully');
  return true;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('[VectorWASM] Failed to initialize: ', error);
  return false;
  }

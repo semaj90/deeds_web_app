@@ -136,7 +136,7 @@ export class VectorSearchWebASMPipeline {
 
             return { results: metrics.performanceMetrics };
 
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             console.error('❌ Vector search failed: ', error);
             throw new Error(`Vector search failed: ${error instanceof Error ? error.message : String(error)}`);
         }

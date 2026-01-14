@@ -180,7 +180,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  addLog('Auto-Fix', '🎉 All auto-fixable errors resolved!', 'success');
  }
 
- function showErrorDetail(error: typeof detectedErrors[0]) {
+ function showErrorDetail(error, typeof detectedErrors[0]) {
  selectedError = error;
  errorDetailDialog?.showModal();
  }

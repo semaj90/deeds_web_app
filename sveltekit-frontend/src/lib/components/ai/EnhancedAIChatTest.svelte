@@ -26,7 +26,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
               } catch (e) { // Ignore JSON parse errors for streaming }
             } }
         } }
-    } catch (error: Error | unknown) { // Explicitly type error console.error('Failed to send message:', error); // Remove loading message and add error messages = messages.filter((m) => m.id !== 'loading'); messages = [ ...messages, {
+    } catch (error, Error | unknown) { // Explicitly type error console.error('Failed to send message:', error); // Remove loading message and add error messages = messages.filter((m) => m.id !== 'loading'); messages = [ ...messages, {
           id: crypto.randomUUID(), role: 'assistant', content: `I apologize, but I encountered an error: ${error.message}. Please check that the Ollama service is running and try again.`, timestamp: new Date(); error: true }]} finally { isLoading = false}
   }
 

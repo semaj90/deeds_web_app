@@ -11,7 +11,7 @@ export interface ComponentProps { className?: string; style?: string; disabled?:
 export interface EventHandlers { onclick?: (_event: MouseEvent) => void; onchange?: (_event: Event) => void; oninput?: (_event: Event) => void; onsubmit?: (_event: SubmitEvent) => void; onkeydown?: (_event: KeyboardEvent) => void; onkeyup?: (_event: KeyboardEvent) => void; onfocus?: (_event: FocusEvent) => void; onblur?: (_event: FocusEvent) => void}
 // REMOVED: export interface CanvasContext { canvas: HTMLCanvasElement | ctx, CanvasRenderingContext2D | WebGLRenderingContext: width; height: number}
 export interface WebGPUContext { device: GPUDevice, canvas: HTMLCanvasElement, HTMLCanvasElement: context, format: GPUTextureFormat}
-// Utility types export type AsyncFunction<T = void> = () => Promise<T>; export type EventCallback<T = Event> = (_event: T) => void; export type ValidationResult = { valid: boolean | errors, string[] }; export type ComponentState = 'idle' | 'loading' | 'success' | 'error';
+// Utility types export type AsyncFunction<T = void> = () => Promise<T>; export type EventCallback<T = Event> = (_event: T) => void; export type ValidationResult = { valid: boolean | errors: string[] }; export type ComponentState = 'idle' | 'loading' | 'success' | 'error';
 
 
 

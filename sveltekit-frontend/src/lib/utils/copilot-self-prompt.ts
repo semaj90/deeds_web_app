@@ -76,7 +76,7 @@ const analyzeLegalCaseWithCrew = async (caseData: { prompt: string;
  }
  console.error(`CrewAI analysis failed: ${response.status} ${response.statusText}`);
  return { analysis: 'failed', error: `API returned status ${response.status}` };
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  clearTimeout(timeoutId);
  if (error instanceof Error) {
  if (error.name === 'AbortError') {
@@ -327,7 +327,7 @@ export async function copilotSelfPrompt(
  tokensUsed,
  },
  };
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  // Log error to MCP_TODO_LOG.md for productionization
  /* try {
  // NOTE: Assuming mcpLogError is a typo and the function is named logMcpError
@@ -376,7 +376,7 @@ async function performSemanticSearch(
  }
  return data.results || [];
  }
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  clearTimeout(timeoutId);
  if (error instanceof Error) {
  console.error('Semantic search unavailable:', error.name);
@@ -385,7 +385,7 @@ async function performSemanticSearch(
  }
  return []; // Return empty array immediately instead of hanging
  }
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Semantic search failed:', error);
  return []; // Fast fallback for unknown other errors
  }
@@ -426,7 +426,7 @@ export async function accessMemoryMCP(
  }
  return data.memories || [];
  }
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  clearTimeout(timeoutId);
  if (error instanceof Error) {
  console.error('Memory MCP unavailable:', error.name);
@@ -435,7 +435,7 @@ export async function accessMemoryMCP(
  }
  return []; // Fast fallback
  }
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Memory MCP failed:', error);
  return []; // Fast fallback for unknown other errors
  }
@@ -473,7 +473,7 @@ async function orchestrateMultiAgentAnalysis(
  type: 'task_based_analysis',
  ...crewaiResult,
  });
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Multi-agent analysis failed:', error);
  }
 
@@ -530,7 +530,7 @@ Format your response as a structured analysis with clear sections and actionable
  return (
  result.response?.content ?? generateBasicSummary(prompt, contextResults, memoryResults, agentResults)
  );
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Synthesis failed, using fallback:', error);
  return generateBasicSummary(prompt, contextResults, memoryResults, agentResults);
  }
@@ -879,7 +879,7 @@ export class RLRankingDatastore {
  private async initializeRedis() {
  try {
  this.redisClient = await getRedisClient();
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Failed to initialize Redis for ranking:', error);
  }
  }
@@ -903,7 +903,7 @@ export class RLRankingDatastore {
  // Keep top 10 summaries
  await this.redisClient.zremrangebyrank(this.summariesKey, 0, -11);
  console.log(`✅ Stored RL summary effectiveness: ${summary.effectiveness}`);
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Failed to store summary:', error);
  }
  }
@@ -913,7 +913,7 @@ export class RLRankingDatastore {
  try {
  const summaries = await this.redisClient.zrevrange(this.summariesKey, 0, limit - 1);
  return summaries.map((s: string) => JSON.parse(s));
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Failed to get summaries:', error);
  return [];
  }
@@ -946,7 +946,7 @@ export class RLRankingDatastore {
  break;
  }
  }
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Failed to update feedback:', error);
  }
  }

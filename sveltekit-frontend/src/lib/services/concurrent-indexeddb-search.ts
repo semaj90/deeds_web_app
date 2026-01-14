@@ -67,7 +67,7 @@ export class ConcurrentIndexedDBSearch {
  this.isInitialized = true;
  console.log('✅ Concurrent IndexedDB Search initialized');
  }
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error(
  '❌ Failed to initialize search: ',
  error instanceof Error ? error : String(error)
@@ -267,7 +267,7 @@ export class ConcurrentIndexedDBSearch {
  console.log(`🎯 Search completed in ${(endTime - startTime).toFixed(2)}ms`);
  console.log(`📊 Found ${finalResults.length} results for query: "${request.query}"`);
  return finalResults;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('❌ Search error: ', error instanceof Error ? error : String(error));
  return [];
  }
@@ -427,7 +427,7 @@ export class ConcurrentIndexedDBSearch {
  }
  const result = await response.json();
  return (result?.embedding as number[]) ?? [];
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('❌ Embedding failed: ', error instanceof Error ? error : String(error));
  return [];
  }
@@ -484,7 +484,7 @@ export class ConcurrentIndexedDBSearch {
  async indexTypeScriptErrors(
  errors: { code: string, message: string, file: string, line: number }[]
  ): Promise<void> {
- const documents: SearchableDocument[] = errors.map((error: any, index: any) => ({
+ const documents: SearchableDocument[] = errors.map((error, any, index: any) => ({
  id: `error-${ index }-${Date.now()}`,
  content: `${error.code}: ${error.message}`,
  path: error.file,

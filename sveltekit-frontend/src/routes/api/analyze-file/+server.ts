@@ -85,7 +85,7 @@ export async function POST({ request }: RequestEvent) {
 			qdrantTag,
 			patterns
 		});
-	} catch (error: any) {
+	} catch (error, any) {
 		console.error('File analysis failed:', error);
 		return json({ success: false, error: error.message }, { status: 500 });
 	}

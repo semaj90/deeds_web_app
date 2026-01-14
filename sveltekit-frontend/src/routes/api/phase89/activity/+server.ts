@@ -67,7 +67,7 @@ export const GET: RequestHandler = async () => {
     return json({
       activity: activity.slice(0, 50)
     });
-  } catch (error: any) {
+  } catch (error, any) {
     console.error('Activity error:', error);
     return json({
       activity: [],

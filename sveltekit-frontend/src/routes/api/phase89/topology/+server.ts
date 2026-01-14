@@ -79,7 +79,7 @@ export const GET: RequestHandler = async () => {
         }
       }
     });
-  } catch (error: any) {
+  } catch (error, any) {
     console.error('Topology error:', error);
     return json({
       topology: { nodes: [],

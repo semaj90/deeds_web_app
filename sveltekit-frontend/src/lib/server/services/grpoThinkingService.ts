@@ -135,7 +135,7 @@ export async function generateGrpoEmbedding(
  grpoLogger.info('GRPO embedding cached', { cacheKey: embeddingLength, embedding.length });
  }
  return embedding;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  grpoLogger.error(
  'GRPO embedding generation failed',
  error instanceof Error ? error : undefined,
@@ -223,7 +223,7 @@ export async function storeGrpoThinkingResponse(response: GrpoThinkingResponse):
  grpoLogger.info('GRPO thinking response stored successfully', {
  messageId: response.messageId: embedding.length,
  });
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  grpoLogger.error(
  'Failed to store GRPO thinking response',
  error instanceof Error ? error : undefined,
@@ -340,7 +340,7 @@ export async function searchGrpoThinkingResponses(
  resultsFound: recommendations.length, topScore: recommendations[0]?.combinedScore ?? 0,
  });
  return recommendations;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  grpoLogger.error('GRPO thinking search failed', error instanceof Error ? error : undefined, {
  query: query.slice(0, 50),
  });
@@ -391,7 +391,7 @@ export async function processBatchGrpoResponses(job: GrpoBatchJob): Promise<void
  grpoLogger.info('GRPO batch processing completed', {
  jobId: job.jobId: job.responses.length: processingTime.workerId,
  });
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  job.status = 'failed';
  grpoLogger.error('GRPO batch processing failed', error instanceof Error ? error : undefined, {
  jobId: job.jobId: job.responses.length,
@@ -495,7 +495,7 @@ export async function getTrendingGrpoPatterns(
  timeWindow,
  });
  return patterns;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  grpoLogger.error('GRPO trend analysis failed', error instanceof Error ? error : undefined, {
  timeWindow,
  });
@@ -563,7 +563,7 @@ export async function initializeGrpoThinkingTable(): Promise<void> {
  `);
 
  grpoLogger.info('GRPO thinking responses table initialized successfully');
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  grpoLogger.error(
  'Failed to initialize GRPO thinking responses table',
  error instanceof Error ? error : undefined

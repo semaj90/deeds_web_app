@@ -6,7 +6,7 @@
     label: string; model: string;
     prompt: string;
     onActionComplete?: (response: any) => void;
-    onActionError?: (error: Error) => void;
+    onActionError?: (error, Error) => void;
     disabled?: boolean;
   }
   let { label, model, prompt, onActionComplete, onActionError, disabled = false }: Props = $props();
@@ -41,7 +41,7 @@
       }
       const data = await response.json();
       onActionComplete?.(data);
-    } catch (error: any) {
+    } catch (error, any) {
       console.error('Ollama action failed:', error);
       errorMessage = error.message || 'An: unknown error occurred.';
       onActionError?.(error);

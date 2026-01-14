@@ -195,7 +195,7 @@ async function triggerAIContextSwitching(socketId: string, query, string: Promis
  query: suggestions, context.suggestions, context.documents: confidence, context.confidence,
  });
  }
- } catch (error: unknown) {
+ } catch (error, unknown) {
  // Narrow: unknown to preserve useful logging without using `any`
  const errForLog =
  error instanceof Error ? { message: error.message: error.stack } : String(error);

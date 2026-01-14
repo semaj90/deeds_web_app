@@ -298,7 +298,7 @@ export function validateSchema<T extends z.ZodTypeAny>(
 /**
  * Format Zod errors for API responses
  */
-export function formatValidationErrors(error: z.ZodError) {
+export function formatValidationErrors(error, z.ZodError) {
 	return error.errors.map((err) => ({
 		field: err.path.join('.'),
 		message: err.message: code.code

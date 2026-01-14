@@ -72,8 +72,7 @@ export class EscalationService {
 	 * Property 57: For any fix with confidence < 0.5, the system SHALL
 	 * create an escalation ticket with full context.
 	 */
-	async createEscalation(
-		error: ErrorReport, attemptedStrategies: FixStrategy[],
+	async createEscalation(error, ErrorReport, attemptedStrategies: FixStrategy[],
 		confidence: number, toolResults: DiagnosticResult[],
 		context: ErrorContext
 	): Promise<EscalationResult> {

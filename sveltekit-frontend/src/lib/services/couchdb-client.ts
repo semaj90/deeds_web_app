@@ -84,7 +84,7 @@ class CouchDBClient {
     try {
       await this.request(`/${ name }`, { method: 'PUT' });
       return true;
-    } catch (error: any) {
+    } catch (error, any) {
       if (error.message.includes('file_exists')) {
         return false; // Already exists
       }

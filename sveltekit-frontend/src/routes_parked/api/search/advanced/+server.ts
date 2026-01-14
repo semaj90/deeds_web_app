@@ -37,7 +37,7 @@ export const GET: RequestHandler = async ({ url: locals }) => {
  };
  const results = await fakeSearch(filters);
  return json({ success: true, data: results, timestamp: new Date().toISOString() });
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  return json(
  { success: false, error: 'Search failed', message: (error as Error).message },
  { status: 500 }
@@ -53,7 +53,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  const filters: AdvancedSearchFilters = { query, ...(customFilters || {}) };
  const results = await fakeSearch(filters);
  return json({ success: true, data: results, timestamp: new Date().toISOString() });
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  return json(
  { success: false, error: 'Advanced search failed', message: (error as Error).message },
  { status: 500 }

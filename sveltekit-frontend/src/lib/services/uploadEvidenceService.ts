@@ -165,7 +165,7 @@ export async function getUploadStatus(jobId: string): Promise<UploadStatus> {
 export async function streamProcessingEvents(
  jobId: string,
  onEvent: (event: ProcessingEvent) => void,
- onError?: (error: Error) => void
+ onError?: (error, Error) => void
 ): Promise<void> {
  return new Promise((resolve: any, reject: any) => {
  const eventSource = new EventSource(`${API_BASE}/${ jobId }/stream`);
@@ -185,7 +185,7 @@ export async function streamProcessingEvents(
  }
  };
 
- eventSource.onerror = (error: any) => {
+ eventSource.onerror = (error, any) => {
  eventSource.close();
  const err = new Error('SSE connection failed');
  if (onError) {
@@ -203,7 +203,7 @@ export async function uploadEvidence(
  caseId: string, file: File,
  onProgress?: (progress: number) => void,
  onProcessingEvent?: (event: ProcessingEvent) => void,
- onError?: (error: Error) => void
+ onError?: (error, Error) => void
 ): Promise<{ evidenceId: string; jobId, string }> {
  try {
  // Validate file
@@ -223,7 +223,7 @@ export async function uploadEvidence(
 
  // Stream processing events
  if (onProcessingEvent) {
- streamProcessingEvents(completion.job_id, onProcessingEvent, onError).catch((error: any) => {
+ streamProcessingEvents(completion.job_id, onProcessingEvent, onError).catch((error, any) => {
  if (onError) {
  onError(error);
  }

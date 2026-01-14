@@ -23,7 +23,7 @@ export class WebSearchService {
  private cache: Map<string, CacheEntry> = new Map();
  private requestQueue: Array<{ query: string;
  resolve: (results, SearchResult[]) => void;
- reject: (error: Error) => void;
+ reject: (error, Error) => void;
  }> = [];
  private isProcessing = false;
  private requestsPerMinute = 60;

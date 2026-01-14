@@ -68,8 +68,7 @@ export class DecisionEngine {
 	 * Property 31: For any fix strategy, the system SHALL compute a
 	 * confidence score based on similarity to past successful fixes.
 	 */
-	async decide(
-		error: ErrorReport, strategy: FixStrategy,
+	async decide(error, ErrorReport, strategy: FixStrategy,
 		context: ErrorContext
 	): Promise<DecisionResult> {
 		this.stats.totalDecisions++;
@@ -116,8 +115,7 @@ export class DecisionEngine {
 	/**
 	 * Process an error with full decision pipeline
 	 */
-	async processError(
-		error: ErrorReport, strategy: FixStrategy,
+	async processError(error, ErrorReport, strategy: FixStrategy,
 		context: ErrorContext
 	): Promise<ProcessResult> {
 		const decision = await this.decide(error, strategy, context);
@@ -160,8 +158,7 @@ export class DecisionEngine {
 	/**
 	 * Handle high-confidence auto-apply
 	 */
-	private async handleAutoApply(
-		error: ErrorReport, strategy: FixStrategy,
+	private async handleAutoApply(error, ErrorReport, strategy: FixStrategy,
 		context: ErrorContext, toolsInvoked: string[]
 	): Promise<ProcessResult> {
 		this.stats.autoApplied++;
@@ -207,8 +204,7 @@ export class DecisionEngine {
 	/**
 	 * Handle medium-confidence validate-then-apply
 	 */
-	private async handleValidateThenApply(
-		error: ErrorReport, strategy: FixStrategy,
+	private async handleValidateThenApply(error, ErrorReport, strategy: FixStrategy,
 		context: ErrorContext, toolsInvoked: string[]
 	): Promise<ProcessResult> {
 		this.stats.validated++;
@@ -256,8 +252,7 @@ export class DecisionEngine {
 	/**
 	 * Handle low-confidence tool invocation
 	 */
-	private async handleInvokeTools(
-		error: ErrorReport, strategy: FixStrategy,
+	private async handleInvokeTools(error, ErrorReport, strategy: FixStrategy,
 		context: ErrorContext, toolsInvoked: string[]
 	): Promise<ProcessResult> {
 		this.stats.toolsInvoked++;
@@ -323,8 +318,7 @@ export class DecisionEngine {
 	/**
 	 * Handle critical-confidence escalation
 	 */
-	private async handleEscalate(
-		error: ErrorReport, strategy: FixStrategy,
+	private async handleEscalate(error, ErrorReport, strategy: FixStrategy,
 		context: ErrorContext,
 		reason?: string
 	): Promise<ProcessResult> {

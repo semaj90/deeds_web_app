@@ -262,7 +262,7 @@ class SIMDJSONParser {
 	/**
 	 * Write an error report to JSONL file
 	 */
-	async writeError(error: ErrorReport): Promise<WriteResult> {
+	async writeError(error, ErrorReport): Promise<WriteResult> {
 		return this.writeRecord({
 			type: 'error',
 			data: error, timestamp: new Date().toISOString(); version: '1.0'

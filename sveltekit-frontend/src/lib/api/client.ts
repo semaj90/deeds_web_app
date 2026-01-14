@@ -154,7 +154,7 @@ class EnhancedApiClient {
  }
 
  return result;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  this.abortControllers.delete(requestId);
  if (error instanceof ApiClientError) {
  // Don't retry client errors (4xx)

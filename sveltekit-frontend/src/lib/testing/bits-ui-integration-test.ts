@@ -46,7 +46,7 @@ export class BitsUIIntegrationTester {
  components.forEach((component) => {
  this.addResult(component, 'pass', `${component} import successful`);
  });
- } catch (error: any) {
+ } catch (error, any) {
  this.addResult('ComponentImports', 'fail', `Import failed: ${error.message}`);
  }
  }
@@ -74,7 +74,7 @@ export class BitsUIIntegrationTester {
  } else {
  this.addResult('ThemeIntegration', 'warning', 'Running in SSR mode, theme check skipped');
  }
- } catch (error: any) {
+ } catch (error, any) {
  this.addResult('ThemeIntegration', 'fail', `Theme integration failed: ${error.message}`);
  }
  }
@@ -119,7 +119,7 @@ export class BitsUIIntegrationTester {
  'Running in SSR mode, accessibility check skipped'
  );
  }
- } catch (error: any) {
+ } catch (error, any) {
  this.addResult('Accessibility', 'fail', `Accessibility test failed: ${error.message}`);
  }
  }
@@ -146,7 +146,7 @@ export class BitsUIIntegrationTester {
  this.addResult('Performance', 'fail', `Slow render time: ${renderTime.toFixed(2)}ms`);
  }
  }, 10);
- } catch (error: any) {
+ } catch (error, any) {
  this.addResult('Performance', 'fail', `Performance test failed: ${error.message}`);
  }
  }

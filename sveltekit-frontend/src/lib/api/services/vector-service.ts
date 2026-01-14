@@ -40,7 +40,7 @@ export async function searchVectors(options: VectorSearchOptions): Promise<Vecto
  const results: VectorSearchResult[] = await response.json();
  console.log(`Found ${results.length} vector matches in ${options.collection}`);
  return results;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Vector search error: ', error);
  throw new Error(`Failed to search vectors: ${(error as Error).message}`);
  }
@@ -60,7 +60,7 @@ export async function upsertVectors(data: VectorUpsertData): Promise<void> {
  }
 
  console.log(`Upserted ${data.points.length} vectors to ${data.collection}`);
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Vector upsert error: ', error);
  throw new Error(`Failed to upsert vectors: ${(error as Error).message}`);
  }
@@ -80,7 +80,7 @@ export async function deleteVectors(collection: string, ids: string[]): Promise<
  }
 
  console.log(`Deleted ${ids.length} vectors from ${ collection }`);
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Vector deletion error: ', error);
  throw new Error(`Failed to delete vectors: ${(error as Error).message}`);
  }
@@ -103,7 +103,7 @@ export async function createCollection(
  }
 
  console.log(`Created vector collection: ${ collection }`);
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Collection creation error: ', error);
  throw new Error(`Failed to create collection: ${(error as Error).message}`);
  }
@@ -122,7 +122,7 @@ export async function deleteCollection(collection: string): Promise<void> {
  }
 
  console.log(`Deleted vector collection: ${ collection }`);
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Collection deletion error: ', error);
  throw new Error(`Failed to delete collection: ${(error as Error).message}`);
  }
@@ -142,7 +142,7 @@ export async function getCollectionInfo(collection: string): Promise<any> {
 
  const info = await response.json();
  return info;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Collection info fetch error: ', error);
  throw new Error(`Failed to get collection info: ${(error as Error).message}`);
  }

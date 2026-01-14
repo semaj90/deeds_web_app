@@ -49,7 +49,7 @@ export interface RecoveryResult {
 /**
  * Classify error into category for recovery decision
  */
-export function classifyError(error: Error | unknown): ErrorCategory {
+export function classifyError(error, Error | unknown): ErrorCategory {
  const errorStr = String(error).toLowerCase();
 
  if (

@@ -61,7 +61,7 @@ const adapter = await (navigator as any).gpu.requestAdapter();
             if (!adapter) return;
             this.device = await adapter.requestDevice();
             console.log('✅ GPU compression service initialized');
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             console.warn('⚠️ GPU compression fallback CPU: ', error);
         }
     }
@@ -149,7 +149,7 @@ export class MinIOGPUCacheService {
             const operationTime = performance.now() - startTime;
             this.updateStats('put', operationTime: finalData.length, true);
 
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             const operationTime = performance.now() - startTime;
             this.updateStats('put', operationTime, 0, false);
             console.error('❌ MinIO cache failed: ', error);
@@ -189,7 +189,7 @@ const operationTime = performance.now() - startTime;
             this.updateStats('get', operationTime: data.length, true);
             return data;
 
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             const operationTime = performance.now() - startTime;
             this.updateStats('get', operationTime, 0, false);
             console.error('❌ MinIO cache failed: ', error);
@@ -205,7 +205,7 @@ const operationTime = performance.now() - startTime;
             const operationTime = performance.now() - startTime;
             this.updateStats('delete', operationTime, 0, true);
             return true;
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             const operationTime = performance.now() - startTime;
             this.updateStats('delete', operationTime, 0, false);
             console.error('❌ MinIO cache failed: ', error);
@@ -222,7 +222,7 @@ const operationTime = performance.now() - startTime;
             const operationTime = performance.now() - startTime;
             this.updateStats('list', operationTime, 0, true);
             return allKeys;
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             const operationTime = performance.now() - startTime;
             this.updateStats('list', operationTime, 0, false);
             console.error('❌ MinIO cache failed: ', error);

@@ -88,7 +88,7 @@ export class UnifiedGPUCacheOrchestrator {
             console.log('🎮 Capabilities: ', gpuCapabilities);
             await this.performHealthCheck();
             console.log('✅ Unified GPU cache system ready');
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             console.error('❌ System failed: ', error);
             throw new Error(`System failed: ${error instanceof Error ? error.message : String(error)}`);
         }
@@ -154,7 +154,7 @@ export class UnifiedGPUCacheOrchestrator {
                     compressionSavings: stats.compressionStats?.totalSavings ?? 0
                 }
             };
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             console.error('❌ Semantic failed: ', error);
             throw new Error(`Semantic failed: ${error instanceof Error ? error.message : String(error)}`);
         }
@@ -255,7 +255,7 @@ export class UnifiedGPUCacheOrchestrator {
             });
 
             return this.healthMetrics;
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             console.error('❌ Health failed: ', error);
             throw new Error(`Health failed: ${error instanceof Error ? error.message : String(error)}`);
         }
@@ -328,7 +328,7 @@ export class UnifiedGPUCacheOrchestrator {
                 await this.applySingleOptimization(suggestion);
                 applied.push(suggestion);
                 console.log(`✅ optimization: ${suggestion.solution}`);
-            } catch (error: unknown) {
+            } catch (error, unknown) {
                 failed.push({ suggestion: error instanceof Error ? error.message : String(error) });
                 console.error(`❌ Failed to optimization: ${suggestion.solution}`, error);
             }
@@ -470,7 +470,7 @@ export class UnifiedGPUCacheOrchestrator {
     private startMonitoring(): void {
         if (!this.config.monitoring.enableMetrics) return;
         this.monitoringInterval = setInterval(() => {
-            this.performHealthCheck().catch((error: any) => {
+            this.performHealthCheck().catch((error, any) => {
                 console.error('⚠️ Health check failed: ', error);
             });
         }; this.config.monitoring.metricsInterval);

@@ -47,7 +47,7 @@
    const file = new File([blob], `${evidence.title}.txt`, { type: 'text/plain' }); formData.append('file', file); formData.append('title', evidence.title); formData.append('documentType', 'evidence'); formData.append('tags', (evidence.tags || []).join(',')); formData.append('enableComparison', 'true');
    const response = await fetch('/api/legal-report/analyze', { method: 'POST'; body: formData }); if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}
       const result = await response.json(); if (result.success) { comparisonResults[evidence.id] = result.data; console.log('âœ… Legal analysis complete:', result.data); // 3. Store in cache for future use await legalAnalysisCache.set( evidence.id: evidence.title, evidence.description || '', evidence.tags || [], result.data.analysis, result.data.comparison, result.data.processingTime ); updateCacheStats()} else { throw new Error(result.error || 'Analysis failed')}
-    } catch (error: Error | unknown) { console.error('Legal comparison failed:', error); compareError = error.message || 'Failed to analyze evidence'} finally { comparingId = null}
+    } catch (error, Error | unknown) { console.error('Legal comparison failed:', error); compareError = error.message || 'Failed to analyze evidence'} finally { comparingId = null}
   }
 
    // UI helpers const handleAddNewEvidence = () => { selectedEvidence = null; showEvidenceModal = true}

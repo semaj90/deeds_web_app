@@ -324,7 +324,7 @@ export class RecoveryStrategy {
  /**
  * Get recovery recommendation
  */
- static getRecoveryRecommendation(error: Error, feature: 'errorBrain' | 'legalAi'): string {
+ static getRecoveryRecommendation(error, Error, feature: 'errorBrain' | 'legalAi'): string {
  const errorMessage = error.message.toLowerCase();
 
  if (errorMessage.includes('timeout')) {

@@ -476,7 +476,7 @@ class MCPGPUOrchestrator {
 		return `${basePrompt}\n\nAnalyze the following:\n\n${content}`;
 	}
 
-	private buildRemediationPrompt(error: string, context7Docs: string): string {
+	private buildRemediationPrompt(error, string, context7Docs: string): string {
 		return `You are a TypeScript/SvelteKit expert. Fix this error using best practices.
 
 Error: ${error}

@@ -655,7 +655,7 @@ let cacheHit = false;
 
             console.log(`✅ Indexed ${chunks.length} chunks for document ${document.id}`);
             return { success: true, chunksCreated: chunks.length };
-        } catch (error: any) {
+        } catch (error, any) {
             console.error(`Failed to index document ${document.id}:`, error);
             return { success: false, chunksCreated: 0, error: error.message };
         }

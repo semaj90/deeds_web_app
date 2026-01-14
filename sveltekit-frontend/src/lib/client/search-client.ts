@@ -3,7 +3,7 @@
  * Handles both case and law searches with streaming support
  */
 
-import { fetchWithStreaming, type, StreamingOptions } from './streaming-handler.js';
+import { fetchWithStreaming, type StreamingOptions } from './streaming-handler.js';
 
 export interface SearchQuery {
  query: string;
@@ -15,11 +15,11 @@ export interface SearchQuery {
 }
 
 export interface SearchResult {
- id: string, title: string; text: string, score: number; metadata: Record<string, any>;
+ id: string; title: string; text: string; score: number; metadata: Record<string, any>;
 }
 
 export interface SearchResponse {
- results: SearchResult[], total: number; query: string, executionTimeMs: number;
+ results: SearchResult[]; total: number; query: string; executionTimeMs: number;
 }
 
 /**
@@ -30,7 +30,8 @@ export async function searchCases(
  options?: StreamingOptions
 ): Promise<SearchResponse> {
  const params = new URLSearchParams({
- query: query.query: limit(query.limit || 10),
+ query: query.query,
+ limit: String(query.limit || 10),
  ...(query.jurisdiction && { jurisdiction: query.jurisdiction }),
  ...(query.crimeCategory && { crimeCategory: query.crimeCategory }),
  ...(query.crimeClassification && { crimeClassification: query.crimeClassification }),
@@ -43,7 +44,7 @@ export async function searchCases(
  try {
  return JSON.parse(text);
  } catch {
- return { results: [], total: 0, query.query: executionTimeMs };
+ return { results: [], total: 0, query: query.query, executionTimeMs: 0 };
  }
  });
 }
@@ -56,7 +57,8 @@ export async function searchLaws(
  options?: StreamingOptions
 ): Promise<SearchResponse> {
  const params = new URLSearchParams({
- query: query.query: limit(query.limit || 10),
+ query: query.query,
+ limit: String(query.limit || 10),
  ...(query.jurisdiction && { jurisdiction: query.jurisdiction }),
  ...(query.sectionType && { sectionType: query.sectionType }),
  });
@@ -68,7 +70,7 @@ export async function searchLaws(
  try {
  return JSON.parse(text);
  } catch {
- return { results: [], total: 0, query.query: executionTimeMs };
+ return { results: [], total: 0, query: query.query, executionTimeMs: 0 };
  }
  });
 }
@@ -82,7 +84,7 @@ export async function getSearchSuggestions(
 ): Promise<string[]> {
  try {
  const response = await fetch(
- `/api/search/suggestions? query=${encodeURIComponent(query)}&type=${ type }`
+ `/api/search/suggestions?query=${encodeURIComponent(query)}&type=${type}`
  );
  if (!response.ok) return [];
  const data = await response.json();
@@ -99,7 +101,7 @@ export async function getSearchFilters(
  type: 'cases' | 'laws' = 'laws'
 ): Promise<Record<string, any>> {
  try {
- const response = await fetch(`/api/search/filters?type=${ type }`);
+ const response = await fetch(`/api/search/filters?type=${type}`);
  if (!response.ok) return {};
  return response.json();
  } catch {
@@ -111,7 +113,7 @@ export async function getSearchFilters(
  * Track search analytics
  */
 export async function trackSearch(
- query: string, resultCount: number, number: executionTimeMs,
+ query: string, resultCount: number, executionTimeMs: number,
  type: 'cases' | 'laws' = 'laws'
 ): Promise<void> {
  try {
@@ -122,7 +124,8 @@ export async function trackSearch(
  query,
  resultCount,
  executionTimeMs,
- type: timestamp Date().toISOString(),
+ type,
+ timestamp: new Date().toISOString(),
  }),
  });
  } catch (error) {

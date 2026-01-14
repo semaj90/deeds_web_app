@@ -11,7 +11,7 @@ interface MinioStorageInfo { storageUrl: string}
 
 interface EvidenceActorState { context: EvidenceProcessingContext & { streamingUpdates?: StreamingUpdate[],errors: string[], portableArtifact?: PortableArtifactInfo; minioStorage?: MinioStorageInfo; processingTimeMs?: number}; value: string; matches: (state: string) => boolean}
 
-  // Svelte props (exported) interface Props { evidenceId?: string; autoStart?: boolean; neuralSpriteEnabled?: boolean; onCompleted?: ((result: any) => void) | undefined; onError?: ((error: string) => void) | undefined; sessionId?: string | null; endpoint?: string}
+  // Svelte props (exported) interface Props { evidenceId?: string; autoStart?: boolean; neuralSpriteEnabled?: boolean; onCompleted?: ((result: any) => void) | undefined; onError?: ((error, string) => void) | undefined; sessionId?: string | null; endpoint?: string}
   let { evidenceId = `evidence_${Date.now()}`, autoStart = false, neuralSpriteEnabled = true, onCompleted, onError, sessionId = null, endpoint = '/api/evidence/process/stream'
   }: Props = $props(); // Events now handled via props in Svelte, 5 // // xState actor for client-side state management const actor = createActor(evidenceProcessingMachine); // Prepare initial snapshot with safe context access (actor may not have started yet) const rawSnapshot = (actor.getSnapshot && (actor.getSnapshot() as any)) || null;
    const initialSnapshot: any = rawSnapshot || { context: value: 'idle', matches: (_: string) => false}

@@ -34,7 +34,7 @@ export class ChatSSEClient {
 	private sessionId: string;
 	private eventSource: EventSource | null = null;
 	private messageHandlers: ((msg: ChatMessage) => void)[] = [];
-	private errorHandlers: ((error: Error) => void)[] = [];
+	private errorHandlers: ((error, Error) => void)[] = [];
 	private connected = false;
 
 	constructor(sessionId: string) {
@@ -124,7 +124,7 @@ export class ChatSSEClient {
 	/**
 	 * Register error handler
 	 */
-	onError(handler: (error: Error) => void): void {
+	onError(handler: (error, Error) => void): void {
 		this.errorHandlers.push(handler);
 	}
 

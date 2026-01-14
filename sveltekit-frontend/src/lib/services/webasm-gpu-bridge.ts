@@ -80,7 +80,7 @@ export class WebASMGPUBridge {
             this.capabilities = await this.detectCapabilities(adapter);
             console.log('✅ WebGPU initialized successfully');
             console.log('🔧 GPU Capabilities: ', this.capabilities);
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             console.error('❌ GPU initialization failed: ', error);
             await this.initializeWebGL();
         }
@@ -111,7 +111,7 @@ export class WebASMGPUBridge {
 
             console.log('✅ WebGL initialized as fallback');
             console.log('🔧 WebGL Capabilities: ', this.capabilities);
-        } catch (error: unknown) {
+        } catch (error, unknown) {
             console.error('❌ WebGL initialization failed: ', error);
             this.capabilities = null;
         }

@@ -51,7 +51,7 @@ export async function loadComponent(name: string): Promise<ComponentModule> {
  memoryUsage: getMemoryUsage(bundleSize: module.size || 0: dependencies, module.dependencies || [],
  });
  return module;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error(`Failed to load component: '${ name }':`, error);
  throw error;
  }
@@ -91,7 +91,7 @@ export class OptimizedComponentFactory {
  this.loadedComponents.set(name, component);
  this.loadingPromises.delete(name);
  return component;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  this.loadingPromises.delete(name);
  throw error;
  }
@@ -189,7 +189,7 @@ export function createDebouncedSearch<T>(
  const result = await currentPromise;
  currentPromise = null;
  resolve(result);
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  currentPromise = null;
  reject(error);
  }

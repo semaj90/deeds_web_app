@@ -418,7 +418,7 @@ export class WebGPUCUDABridge {
  /**
  * Compute error magnitude for clustering
  */
- private computeErrorMagnitude(error: GPUErrorPattern): number {
+ private computeErrorMagnitude(error, GPUErrorPattern): number {
  const typeWeight = {
  syntax: 0.9, semantic: 0.7, type: 0.6, import: 0.5, unknown: 0.3,
  };
@@ -429,7 +429,7 @@ export class WebGPUCUDABridge {
  /**
  * Compute context similarity with other errors
  */
- private computeContextSimilarity(error: GPUErrorPattern, allErrors: GPUErrorPattern[]): number {
+ private computeContextSimilarity(error, GPUErrorPattern, allErrors: GPUErrorPattern[]): number {
  let similarity = 0;
  let count = 0;
 

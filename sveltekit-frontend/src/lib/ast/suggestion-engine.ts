@@ -51,8 +51,7 @@ export class SuggestionEngine {
  /**
  * Get suggestions for an error
  */
-  async getSuggestions(
-  error: ASTError,
+  async getSuggestions(error, ASTError,
   codeContext: string,
   codebaseContext?: CodebaseContext
   ): Promise<Suggestion[]> {
@@ -82,7 +81,7 @@ export class SuggestionEngine {
  /**
  * Get local pattern-based suggestions
  */
-  private getLocalSuggestions(error: ASTError, codeContext: string): Suggestion[] {
+  private getLocalSuggestions(error, ASTError, codeContext: string): Suggestion[] {
  const suggestions: Suggestion[] = [];
  const cluster = this.classifyError(error);
 
@@ -175,8 +174,7 @@ export class SuggestionEngine {
  /**
  * Get RAG-based suggestions from codebase context
  */
- private async getRAGSuggestions(
- error: ASTError, context: CodebaseContext
+ private async getRAGSuggestions(error, ASTError, context: CodebaseContext
  ): Promise<Suggestion[]> {
  const suggestions: Suggestion[] = [];
  const cacheKey = `${error.code}-${error.message.slice(0, 50)}`;
@@ -236,7 +234,7 @@ export class SuggestionEngine {
  /**
  * Get web search suggestions
  */
- private async getWebSearchSuggestions(error: ASTError): Promise<Suggestion[]> {
+ private async getWebSearchSuggestions(error, ASTError): Promise<Suggestion[]> {
  const suggestions: Suggestion[] = [];
  const query = `${error.code} ${error.message.slice(0, 100)} fix`;
  const cacheKey = query;
@@ -265,7 +263,7 @@ export class SuggestionEngine {
  /**
  * Mock web search results (replace with actual API in production)
  */
- private getMockWebResults(error: ASTError): WebSearchResult[] {
+ private getMockWebResults(error, ASTError): WebSearchResult[] {
  const results: WebSearchResult[] = [];
 
  if (error.code.startsWith('TS2304')) {
@@ -314,7 +312,7 @@ export class SuggestionEngine {
  /**
  * Get AI-powered suggestions
  */
-  private async getAISuggestions(error: ASTError, codeContext: string): Promise<Suggestion[]> {
+  private async getAISuggestions(error, ASTError, codeContext: string): Promise<Suggestion[]> {
  const suggestions: Suggestion[] = [];
 
  try {
@@ -360,7 +358,7 @@ Provide a JSON response with fix:
  /**
  * Classify error into cluster type
  */
- private classifyError(error: ASTError): ClusterInfo {
+ private classifyError(error, ASTError): ClusterInfo {
  if (error.code.startsWith('TS1')) return CLUSTER_TYPES.syntax;
  if (error.code.startsWith('TS2304') || error.code.startsWith('TS2307'))
  return CLUSTER_TYPES.import;

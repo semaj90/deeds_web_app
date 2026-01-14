@@ -174,7 +174,7 @@ export class ErrorHandlerService {
  /**
  * Check if error is transient (retryable)
  */
- isTransientError(error: Error): boolean {
+ isTransientError(error, Error): boolean {
  const transientPatterns = [
  'ECONNREFUSED',
  'ECONNRESET',
@@ -191,7 +191,7 @@ export class ErrorHandlerService {
  /**
  * Check if error is permanent (non-retryable)
  */
- isPermanentError(error: Error): boolean {
+ isPermanentError(error, Error): boolean {
  const permanentPatterns = [
  'unauthorized',
  'forbidden',

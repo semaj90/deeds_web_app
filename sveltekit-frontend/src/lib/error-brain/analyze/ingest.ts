@@ -48,7 +48,7 @@ export function runTypeScriptCheck(tsconfigPath: string, filterCodes?: number[])
   
  // If we reach here, no errors (but could be warnings)
  return [];
- } catch (error: unknown) {
+ } catch (error, unknown) {
  // Parse stderr for error messages
  const stderr = (error as { stderr?: string }).stderr || '';
  const diagnostics = parseTSCOutput(stderr);

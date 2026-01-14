@@ -7,7 +7,7 @@
 
  interface Props {
  errors: ASTError[];
- onErrorClick?: (error: ASTError) => void;
+ onErrorClick?: (error, ASTError) => void;
  selectedErrorId?: string;
  maxHeight?: string;
  }

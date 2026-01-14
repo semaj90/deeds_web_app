@@ -91,7 +91,7 @@ export async function generateEmbedding(
  }
 
  return embedding;
- } catch (error: unknown) {
+ } catch (error, unknown) {
  console.error('Embedding generation failed: ', error);
  return null;
  }
@@ -158,7 +158,7 @@ async function generateLocalEmbedding(
  // }
 
  return rawEmbedding;
- } catch (error: unknown) {
+ } catch (error, unknown) {
  console.error('Ollama embedding generation failed: ', error);
  // Fallback to mock embedding for development
  return generateMockEmbedding(768); // Use 768D for web embeddings schema
@@ -242,7 +242,7 @@ export async function updateCaseEmbeddings(caseId: string): Promise<void> {
  // .where(eq(cases.id, caseId));
 
  console.log(`Updated embeddings for case ${ caseId }`);
- } catch (error: unknown) {
+ } catch (error, unknown) {
  console.error(`Failed to update embeddings for case ${ caseId }: `, error);
  throw error;
  }
@@ -284,7 +284,7 @@ export async function updateEvidenceEmbeddings(evidenceId: string): Promise<void
  // .where(eq(evidence.id, evidenceId));
 
  console.log(`Updated embeddings for evidence ${ evidenceId }`);
- } catch (error: unknown) {
+ } catch (error, unknown) {
  console.error(`Failed to update embeddings for evidence ${evidenceId}:`, error);
  throw error;
  }

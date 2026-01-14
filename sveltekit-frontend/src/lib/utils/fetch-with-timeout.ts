@@ -40,7 +40,7 @@ export interface FetchNetworkError extends Error {
  clearTimeout(timeoutId);
  }
  return response;
- } catch (error: unknown) {
+ } catch (error, unknown) {
  // Changed type to unknown
  // Clear timeout on error
  if (timeoutId) {
@@ -167,8 +167,7 @@ export interface FetchNetworkError extends Error {
 /** * Sleep utility for retry delays */ function sleep(ms: number): Promise<void> {
  return new Promise((resolve: any) => setTimeout(resolve, ms));
 }
-/** * Check if error is a timeout error */ export function isTimeoutError(
- error: unknown
+/** * Check if error is a timeout error */ export function isTimeoutError(error, unknown
 ): error is FetchTimeoutError {
  return (
  error instanceof Error &&
@@ -177,8 +176,7 @@ export interface FetchNetworkError extends Error {
  (error as FetchTimeoutError).code === 'FETCH_TIMEOUT'
  );
 }
-/** * Check if error is an abort error */ export function isAbortError(
- error: unknown
+/** * Check if error is an abort error */ export function isAbortError(error, unknown
 ): error is FetchAbortError {
  return (
  error instanceof Error &&
@@ -187,8 +185,7 @@ export interface FetchNetworkError extends Error {
  (error as FetchAbortError).code === 'FETCH_ABORTED'
  );
 }
-/** * Check if error is a network error */ export function isNetworkError(
- error: unknown
+/** * Check if error is a network error */ export function isNetworkError(error, unknown
 ): error is FetchNetworkError {
  return (
  error instanceof Error &&

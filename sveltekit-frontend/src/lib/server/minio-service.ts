@@ -186,7 +186,7 @@ export class MinIOService {
  const cmd = new HeadObjectCommand({ Bucket: bucket, Key: key });
  await this.client.send(cmd);
  return true;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  // Explicitly type error as 'any' or a more specific type if known
  if (error instanceof Error && error.name === 'NotFound') {
  return false;
@@ -204,7 +204,7 @@ export class MinIOService {
  contentType, res.ContentType || undefined,
  bucket,
  };
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  // Explicitly type error as 'any' or a more specific type if known
  if (error instanceof Error && error.name === 'NotFound') {
  return null;

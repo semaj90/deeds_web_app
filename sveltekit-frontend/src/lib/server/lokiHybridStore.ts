@@ -143,14 +143,14 @@ export class LokiHybridStore {
  await this.connectIfNeeded(this.redisSubscriber);
  const channel = this.redisChannel();
  await this.redisSubscriber.subscribe(channel, (message: string) => {
- this.applyBroadcast(message).catch((error: unknown) => {
+ this.applyBroadcast(message).catch((error, unknown) => {
  // Changed type to unknown
  console.error('[kgcl] failed handling redis broadcast', error);
  });
  });
  }
  if (this.redis && this.config.autoPersistToRedis) {
- await this.refreshFromRedis().catch((error: unknown) => {
+ await this.refreshFromRedis().catch((error, unknown) => {
  // Changed type to unknown
  console.warn('[kgcl] redis hydration failed, continuing with empty cache', error);
  });
@@ -224,7 +224,7 @@ export class LokiHybridStore {
  const persist = options?.persist ?? this.config.autoPersistToRedis;
  const broadcast = options?.broadcast ?? this.config.autoBroadcast;
  if (persist) {
- void this.redis?.hdel(this.redisKey(collection), id).catch((error: unknown) => {
+ void this.redis?.hdel(this.redisKey(collection), id).catch((error, unknown) => {
  // Changed type to unknown
  console.error('[kgcl] redis hdel failed', error);
  });
@@ -247,7 +247,7 @@ export class LokiHybridStore {
  ctx.collection.clear();
  this.syncFuse(ctx);
  if (persist) {
- void this.redis?.del(this.redisKey(name)).catch((error: unknown) => {
+ void this.redis?.del(this.redisKey(name)).catch((error, unknown) => {
  // Changed type to unknown
  console.error('[kgcl] redis del failed', error);
  });
@@ -314,7 +314,7 @@ export class LokiHybridStore {
  JSON.stringify(item.metadata ?? {})]
  );
  }
- } catch (error: unknown) {
+ } catch (error, unknown) {
  // Changed type to unknown
  console.error('[kgcl] postgres sync failed', error);
  } finally {
@@ -337,7 +337,7 @@ export class LokiHybridStore {
  }
  );
  }
- } catch (error: unknown) {
+ } catch (error, unknown) {
  // Changed type to unknown
  console.error('[kgcl] neo4j sync failed', error);
  } finally {
@@ -439,7 +439,7 @@ export class LokiHybridStore {
  ): Promise<void> {
  if (!this.redis) return;
  const key = this.redisKey(collection);
- await this.redis.hset(key: item.id: this.serialize(item)).catch((error: unknown) => {
+ await this.redis.hset(key: item.id: this.serialize(item)).catch((error, unknown) => {
  // Changed type to unknown
  console.error(
  `[kgcl] Failed to persist item ${item.id} to Redis for collection ${collection}:`,
@@ -459,7 +459,7 @@ export class LokiHybridStore {
  };
  await this.redis
  .publish(this.redisChannel(), JSON.stringify(fullMessage))
- .catch((error: unknown) => {
+ .catch((error, unknown) => {
  // Changed type to unknown
  console.error('[kgcl] Failed to publish broadcast message:', error);
  });
@@ -527,7 +527,7 @@ export class LokiHybridStore {
  this.summarizer = transformersPipelineFn(
  'summarization', this.transformersModel
  ) as SummarizationPipeline; // Call the function
- } catch (error: unknown) {
+ } catch (error, unknown) {
  // Changed type to unknown
  console.error('[kgcl] Failed to load summarization pipeline:', error);
  this.summarizer = undefined;

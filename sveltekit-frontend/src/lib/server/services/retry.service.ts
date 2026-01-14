@@ -8,13 +8,13 @@ export interface RetryOptions {
  initialDelayMs?: number;
  maxDelayMs?: number;
  backoffMultiplier?: number;
- shouldRetry?: (error: any) => boolean;
+ shouldRetry?: (error, any) => boolean;
 }
 
 const DEFAULT_OPTIONS: Required<RetryOptions> = {
  maxRetries: 3, initialDelayMs: 1000,
  maxDelayMs: 30000, backoffMultiplier: 2,
- shouldRetry: (error: any) => {
+ shouldRetry: (error, any) => {
  // Retry on network errors, timeouts, and 5xx errors
  if (error instanceof TypeError) return true; // Network error
  if (error.code === 'ECONNREFUSED') return true;

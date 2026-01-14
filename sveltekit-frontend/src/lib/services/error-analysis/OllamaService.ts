@@ -278,7 +278,7 @@ export class OllamaService {
 	/**
 	 * Generate fix suggestion for an error using ACE prompting
 	 */
-	async generateFixSuggestion(error: ErrorReport, similarErrors: { message: string, fix?: string }[] = []): Promise<string | null> {
+	async generateFixSuggestion(error, ErrorReport, similarErrors: { message: string, fix?: string }[] = []): Promise<string | null> {
 		const fewShotExamples = similarErrors
 			.filter((e: any) => e.fix)
 			.slice(0, 3)

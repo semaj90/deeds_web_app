@@ -137,7 +137,7 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
  }
 
  return json(result);
- } catch (error: unknown) {
+ } catch (error, unknown) {
  console.error('Embedding error: ', error);
  if (error instanceof Error) {
  if (error.message.includes('API key')) {

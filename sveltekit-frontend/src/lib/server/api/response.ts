@@ -10,7 +10,7 @@ export async function withApiHandler(
  const request = event.request;
  const result = await handler({ url, locals, request });
  return json(result);
- } catch (error: any) {
+ } catch (error, any) {
  return json({ error: error.message || 'Internal server error' }, { status: 500 });
  }
 }

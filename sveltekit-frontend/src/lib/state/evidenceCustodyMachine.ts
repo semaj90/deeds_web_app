@@ -156,7 +156,7 @@ const integrityVerificationService = fromPromise<unknown, { input: EvidenceCusto
         verificationResults.aiAnalysisScore = aiResult.integrityScore || 0;
         verificationResults.riskAssessment = aiResult.riskLevel || 'medium';
       }
-    } catch (error: unknown) {
+    } catch (error, unknown) {
       console.warn('AI verification failed, using manual verification only:', error);
       verificationResults.riskAssessment = 'requires-manual-review';
     }

@@ -192,7 +192,7 @@ export async function copyToClipboard(text: string): Promise<boolean> {
  try {
  await navigator.clipboard.writeText(text);
  return true;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Failed to copy clipboard: ', error);
  return false;
  }
@@ -232,7 +232,7 @@ export const storage = {
  if (!isBrowser()) return;
  try {
  localStorage.setItem(_key, JSON.stringify(value));
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Failed to save localStorage: ', error);
  }
  },

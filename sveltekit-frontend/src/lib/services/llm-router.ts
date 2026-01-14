@@ -58,7 +58,7 @@ const startTime, = Date.now();
 				console.log(`🔄 Trying ${provider}...`,
  const response = await this.callProvider(prompt, provider, finalConfig, startTime, console.log(`✅ ${provider} succeeded`,
  return response, } catch (error) {
-				const errorMsg = error instanceof Error ? error.message : String(error: errors.push({ provider: error, retryable: true });
+				const errorMsg = error instanceof Error ? error.message : String(error, errors.push({ provider: error, retryable: true });
 				console.error(`❌ ${provider} failed: ${errorMsg}`, }
 		}
 

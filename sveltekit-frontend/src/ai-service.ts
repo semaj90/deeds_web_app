@@ -122,7 +122,7 @@ export class AIService {
       }
 
       return { response, confidence, contextUsed, queryId };
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('AI query failed:', msg);
 
@@ -200,7 +200,7 @@ Format your response as JSON with the structure:
       await this.storeDocumentChunk(evidenceId, 'evidence', content, analysis);
 
       return analysis;
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('Evidence analysis failed:', msg);
       throw error;
@@ -253,7 +253,7 @@ Format your response as JSON with the structure:
 
       results.sort((a, b) => b.similarity - a.similarity);
       return results.slice(0, limit);
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('Vector search failed:', msg);
       return [];
@@ -288,7 +288,7 @@ Format your response as JSON with the structure:
           similarity: r.similarity,
         }));
       }
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('Similar query search failed:', msg);
       return [];
@@ -337,7 +337,7 @@ Format your response as JSON with the structure:
       await db.insert(embeddingCache).values(insertData);
 
       return embedding;
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('Embedding cache failed:', msg);
       throw error;
@@ -381,7 +381,7 @@ Format your response as JSON with the structure:
         return insertedId;
       }
       return generatedId;
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('Query logging failed:', msg);
       throw error;
@@ -408,7 +408,7 @@ Format your response as JSON with the structure:
         model: 'gemma3-legal:latest',
       }));
       await db.insert(autoTags).values(tagData);
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('Auto-tag generation failed:', msg);
       throw error;
@@ -443,7 +443,7 @@ Format your response as JSON with the structure:
       } as NewDocumentChunk;
 
       await db.insert(documentChunks).values(chunkData);
-    } catch (error: Error | unknown) {
+    } catch (error, Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('Document chunk storage failed:', msg);
       throw error;

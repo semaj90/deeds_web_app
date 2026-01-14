@@ -73,7 +73,7 @@ export class KAGFixStore {
  * Input: { message: file, code, tool, position }
  * Output: { sig: message, file, code, tool, fileExt }
  */
- computeSignature(error: { message: string,
+ computeSignature(error, { message: string,
  file?: string,
  code?: string, tool?: string, position?: number, }): ErrorSignature {
  // Normalize error message (remove file paths, line numbers)

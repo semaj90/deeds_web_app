@@ -105,7 +105,7 @@ export class StreamingIngestionPipeline {
  );
 
  return result;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const message = error instanceof Error ? error.message : String(error);
  result.errors.push(`Pipeline error: ${message}`);
  result.processingTimeMs = Date.now() - startTime;

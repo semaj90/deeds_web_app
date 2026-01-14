@@ -78,7 +78,7 @@ class SearchService {
  debounceSearch(
  query: string, filters: SearchFilters,
  callback: (results: SearchResponse) => void,
- onError: (error: Error) => void
+ onError: (error, Error) => void
  ): void {
  if (this.debounceTimer) {
  clearTimeout(this.debounceTimer);

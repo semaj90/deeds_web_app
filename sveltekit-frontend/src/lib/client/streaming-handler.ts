@@ -6,7 +6,7 @@
 export interface StreamingOptions {
  onChunk?: (chunk: string) => void;
  onComplete?: (fullText: string) => void;
- onError?: (error: Error) => void;
+ onError?: (error, Error) => void;
  signal?: AbortSignal;
 }
 

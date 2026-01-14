@@ -535,7 +535,7 @@ class QUICClient {
 		const duration = (stream.endTime || performance.now()) - stream.startTime;
 		console.log(
 			`📊 ${stream.type} stream ${streamId} closed after ${duration.toFixed(2)}ms${
-				errorMessage ? ` (error: ${errorMessage})` : ''
+				errorMessage ? ` (error, ${errorMessage})` : ''
 			}`
 		);
 	}

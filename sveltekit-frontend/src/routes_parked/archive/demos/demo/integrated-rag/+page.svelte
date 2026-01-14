@@ -8,7 +8,7 @@ https, //svelte.dev/e/js_parse_error -->
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 /** * Integrated RAG Demo Page * Complete workflow: Upload â†’ embeddinggemma â†’ pgvector â†’ Qdrant â†’ MinIO â†’ Search â†’ Recommendations */ import IntegratedRAGUpload from '$lib/components/upload/IntegratedRAGUpload.svelte'; import { onMount, onDestroy } from 'svelte'; import type { createWSClient, type WSConnectionStatus } from '$lib/utils/websocket-client'; let uploadCount = $state <number>(0); let lastUpload = $state <any>(null); let wsError = $state <string | null>(null); let connectionAttempts = $state <number>(0); let wsClient: ReturnType<typeof createWSClient> | null = null; let connectionStatus = $state <WSConnectionStatus>('disconnected'); let messages = $state <any[]>([]); let searchQuery = $state <string>(''); function handleSuccess(result: unknown) { uploadCount++; lastUpload = result}
- function handleError(error: string) { console.error('Upload failed:', error)}
+ function handleError(error, string) { console.error('Upload failed:', error)}
 
  onMount(() => { try { // Uses UUID-based endpoint from registry wsClient = createWSClient('rag', { onMessage: data => { messages = [...messages, data]}; onStatusChange: status => { connectionStatus = status}
  }); wsClient.connect()} catch (err) { console.error('Failed to create WebSocket client:', err); connectionStatus = 'error'}

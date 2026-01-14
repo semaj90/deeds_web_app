@@ -123,7 +123,7 @@ export function createLegalCaseStore() {
  userId: currentUser?.id ?? 'unknown',
  details: { count: cases.length },
  });
- } catch (error: any) {
+ } catch (error, any) {
  console.error('Failed to load cases: ', error);
  // Still provide mock data even on error
  const mockCases: LegalCase[] = [
@@ -180,7 +180,7 @@ export function createLegalCaseStore() {
  details: { insightCount: insights.findings?.length ?? 0, riskScore: insights.riskAssessment?.score,
  },
  });
- } catch (error: any) {
+ } catch (error, any) {
  console.error('Case analysis failed: ', error);
  await auditService.logAction({
  type: 'CASE_ANALYSIS_FAILED',
@@ -218,7 +218,7 @@ export function createLegalCaseStore() {
  details: { complianceScore: insights.complianceChecks?.length ?? 0, riskLevel: insights.riskAssessment?.score, // Changed from 'level' to 'score'
  },
  });
- } catch (error: any) {
+ } catch (error, any) {
  console.error('Document analysis failed: ', error);
  await auditService.logAction({
  type: 'DOCUMENT_ANALYSIS_FAILED',
@@ -252,7 +252,7 @@ export function createLegalCaseStore() {
  entityId: caseId, userId: currentUser?.id ?? 'unknown',
  details: { oldStatus },
  });
- } catch (error: any) {
+ } catch (error, any) {
  // Rollback on failure
  cases[caseIndex].status = oldStatus;
  throw error;

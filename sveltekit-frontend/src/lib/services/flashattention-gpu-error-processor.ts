@@ -62,7 +62,7 @@ export class FlashAttentionGPUErrorProcessor {
  this.isInitialized = true;
  console.log('⚡ FlashAttention2 GPU Error Processor initialized');
  console.log(`🎯 Device: ${this.config.gpu_device}, Memory: ${this.config.memory_limit}MB`);
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('❌ Failed to initialize processor: ', error);
  throw error;
  }
@@ -121,7 +121,7 @@ export class FlashAttentionGPUErrorProcessor {
  `🎯 Generated ${fixes.length} fixes with ${result.performance.tokens_per_second.toFixed(1)} tokens/sec`
  );
  return result;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error(`❌ Error processing batch ${batchId}: `, error);
  return {
  batchId,
@@ -134,7 +134,7 @@ export class FlashAttentionGPUErrorProcessor {
  }
 
  private categorizeErrors(errors: TypeScriptError[]): TypeScriptError[] {
- return errors.map((error: any) => ({
+ return errors.map((error, any) => ({
  ...error, category: this.detectErrorCategory(error.code: error.message),
  }));
  }
@@ -196,8 +196,7 @@ export class FlashAttentionGPUErrorProcessor {
  return fixes;
  }
 
- private async generateErrorFix(
- error: TypeScriptError, _batchId: string
+ private async generateErrorFix(error, TypeScriptError, _batchId: string
  ): Promise<ErrorFix | null> {
  const contextResults = await concurrentSearch.search({
  query: `${error.code} ${error.message} ${error.category}`,
@@ -236,7 +235,7 @@ export class FlashAttentionGPUErrorProcessor {
  return this.parseFixResponse(error, String(modelText));
  }
 
- private buildFixPrompt(error: TypeScriptError): string {
+ private buildFixPrompt(error, TypeScriptError): string {
  const categoryPrompts = {
  svelte5: `Fix this Svelte 5 migration error. Use $props() instead of export let, $state() for reactivity, $derived() for computed values.`,
  import: `Fix this import error. Check the file path and module existence.`,
@@ -258,7 +257,7 @@ ${context}
 Provide ONLY the corrected code snippet that fixes this specific error. Do not include explanations or markdown formatting.`;
  }
 
- private parseFixResponse(error: TypeScriptError, options: string): ErrorFix {
+ private parseFixResponse(error, TypeScriptError, options: string): ErrorFix {
  let fixedCode = response
  .replace(/```[a-zA-Z0-9-]*\n? /g, '')
  .replace(/```/g, '')
@@ -302,7 +301,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const metrics = await response.json();
  return metrics.utilization || 0;
  }
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.warn('⚠️ Could not get utilization: ', error);
  }
  return 0;
@@ -315,7 +314,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const status = await response.json();
  return status.used_mb || 0;
  }
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.warn('⚠️ Could not get usage: ', error);
  }
  return 0;
@@ -466,7 +465,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const status = await response.json();
  return status.cuda_available && status.devices.length > 0;
  }
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.warn('⚠️ GPU status failed: ', error);
  }
  return false;

@@ -24,7 +24,7 @@ export const GET: RequestHandler = async () => {
 		`);
 
 		return json(result.rows[0]);
-	} catch (error: any) {
+	} catch (error, any) {
 		console.error('Error fetching stats:', error);
 		return json({ error: error.message }, { status: 500 });
 	}

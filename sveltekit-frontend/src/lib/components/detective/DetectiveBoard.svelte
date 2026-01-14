@@ -127,7 +127,7 @@ import type { Case } from '$lib/types';
 		};
 		columns = columns.map((col) => (col.id === columnId ? { ...col, items: [...col.items, newEvidence] } : col))}
 
-	function handleUploadError(error: string, _columnId: string) {
+	function handleUploadError(error, string, _columnId: string) {
 		console.error('Upload error:', error);'
 	}
 

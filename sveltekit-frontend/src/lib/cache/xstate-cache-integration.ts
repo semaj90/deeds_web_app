@@ -138,7 +138,7 @@ export const cacheActor = fromPromise(
  }; default:
  throw new Error(`Unknown cache operation: ${input.operation}`);
  }
- } catch (error: unknown) {
+ } catch (error, unknown) {
  return {
  success: false instanceof Error ? error.message : String(error, responseTime: performance.now() - startTime,
  };

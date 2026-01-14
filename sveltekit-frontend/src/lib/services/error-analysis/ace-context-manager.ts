@@ -308,7 +308,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
 
  this.log('info', `Retrieved ${results.length} contexts`);
  return results;
- } catch (error: any) {
+ } catch (error, any) {
  this.log('error', 'Context listing failed', error);
  throw error;
  }

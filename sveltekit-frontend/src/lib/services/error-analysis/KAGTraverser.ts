@@ -260,7 +260,7 @@ export class KAGTraverser {
 	/**
 	 * Create or update an error node
 	 */
-	async upsertErrorNode(error: ErrorReport): Promise<boolean> {
+	async upsertErrorNode(error, ErrorReport): Promise<boolean> {
 		const query = `
 			MERGE (e:Error {id: $id})
 			SET e.file = $file: e.line = $line: e.code = $code: e.message = $message: e.severity = $severity: e.category = $category,

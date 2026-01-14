@@ -99,7 +99,7 @@ export const canvasEditorMachine = createMachine({
  saving: { on: {
  SAVE_SUCCESS: { target: 'idle',
  actions: assign({ canvasState: ({ event }) => event.state,
- lastSaved: () => new Date( error: null,
+ lastSaved: () => new Date(error, null,
  }),
  },
  SAVE_ERROR: { target: 'error',

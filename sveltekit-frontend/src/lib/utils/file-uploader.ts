@@ -5,7 +5,7 @@
 
 interface UploaderEvents {
  success: (response: unknown) => void;
- error: (error: unknown) => void;
+ error: (error, unknown) => void;
  progress: (percentage: number) => void;
 }
 

@@ -331,7 +331,7 @@ export class LegalDocumentStreamService {
 
             console.log(`✅ Document ${document.id} analysis streamed successfully (${processingTime}ms)`);
 
-        } catch (error: any) {
+        } catch (error, any) {
             console.error(`❌ Document streaming failed for ${document.id}:`, error);
             this.emitEvent(connectionId, {
                 eventType: 'error',

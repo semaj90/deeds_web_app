@@ -503,7 +503,7 @@ class UnifiedDocumentProcessor extends EventEmitter {
 				processingTime: Date.now() - startTime,
 				totalMatches: 0
 			};
-		} catch (error: unknown) {
+		} catch (error, unknown) {
 			const msg = error instanceof Error ? error.message : String(error);
 			console.error('Semantic search failed:', msg);
 			throw error;

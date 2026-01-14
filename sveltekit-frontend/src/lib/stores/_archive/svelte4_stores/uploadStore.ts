@@ -86,7 +86,7 @@ export const uploadActions = {
  /**
  * Handle error
  */
- setError(error: string) {
+ setError(error, string) {
  uploadStore.update((state) => ({
  ...state,
  status: 'failed',

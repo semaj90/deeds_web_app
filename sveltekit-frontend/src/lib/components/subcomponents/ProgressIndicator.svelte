@@ -8,7 +8,7 @@ https, //svelte.dev/e/js_parse_error -->
         steps?: any[];
         currentStep?: number
         validationResults?: Record<number {
-            isValid: boolean, errors, string[];
+            isValid: boolean, errors: string[];
  warnings, string[]}>}
     let { steps = [], currentStep = 0, validationResults = }: Props = $props();
     function handleStepClick(stepIndex: number): void {

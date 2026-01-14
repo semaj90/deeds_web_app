@@ -359,7 +359,7 @@ export class SvelteCheckAnalyzer {
 	/**
 	 * Get quick fixes for an error
 	 */
-	getQuickFixes(error: ASTError, _code: string): string[] {
+	getQuickFixes(error, ASTError, _code: string): string[] {
 		const fixes: string[] = [];
 
 		if (error.code.startsWith('TS2304')) {

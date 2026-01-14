@@ -72,7 +72,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  expect(errors).toEqual(mockErrors);
 
  // Property: Each error should have required fields
- errors.forEach((error: any) => {
+ errors.forEach((error, any) => {
  expect(error.id).toBeDefined();
  expect(error.file).toBeDefined();
  expect(error.line).toBeGreaterThan(0);

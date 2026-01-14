@@ -51,7 +51,7 @@ export async function logStructuredError(payload: { source: string,
  else console.info('[logger]', record);
  }
 }
-export async function captureAndFormat(error: any): Promise<any> {
+export async function captureAndFormat(error, any): Promise<any> {
  try {
  return formatErrorResponse(error);
  } catch {

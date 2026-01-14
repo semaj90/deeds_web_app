@@ -54,7 +54,7 @@ export async function POST() {
 				timestamp: new Date().toISOString()
 			}
 		});
-	} catch (error: any) {
+	} catch (error, any) {
 		console.error('Cluster summary generation failed:', error);
 		return json({ success: false, error: error.message }, { status: 500 });
 	} finally {

@@ -117,14 +117,14 @@ export class MicroserviceError extends AuthError {
 /**
  * Helper function to determine if an error is an AuthError
  */
-export function isAuthError(error: any): error is AuthError {
+export function isAuthError(error, any): error is AuthError {
  return error instanceof AuthError;
 }
 
 /**
  * Helper function to format errors for API responses
  */
-export function formatErrorResponse(error: any) {
+export function formatErrorResponse(error, any) {
  if (isAuthError(error)) {
  return {
  success: false,

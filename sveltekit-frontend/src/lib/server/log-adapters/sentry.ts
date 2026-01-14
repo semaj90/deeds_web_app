@@ -2,7 +2,7 @@
 // Example:
 // import * as Sentry from '@sentry/sveltekit';
 
-export function captureException(error: unknown, options?: Record<string, unknown>): void {
+export function captureException(error, unknown, options?: Record<string, unknown>): void {
  // Implement Sentry.captureException here
  console.error('Sentry captureException (placeholder):', error, options);
 }

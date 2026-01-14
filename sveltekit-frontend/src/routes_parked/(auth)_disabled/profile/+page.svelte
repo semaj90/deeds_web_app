@@ -336,7 +336,7 @@
  'success'
  );
  }
- function handleRagUploadError(error: string) {
+ function handleRagUploadError(error, string) {
  setFeedback(`RAG upload failed: ${error}`, 'error');
  }
 

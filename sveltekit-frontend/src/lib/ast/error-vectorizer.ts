@@ -27,7 +27,7 @@ export class ErrorVectorizer {
  /**
  * Vectorize a single error
  */
- vectorize(error: ASTError): ErrorVector {
+ vectorize(error, ASTError): ErrorVector {
  // Get or create numeric IDs for categorical features
  const codeId = this.getCodeId(error.code);
  const fileId = this.getFileId(error.file);

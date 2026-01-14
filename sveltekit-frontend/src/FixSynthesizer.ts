@@ -51,7 +51,7 @@ export class FixSynthesizer {
    * Property 28: For any error pattern, the system SHALL generate fixes
    * from similar examples using Gemma3.
    */
-  async synthesizeFix(error: ErrorReport, similarErrors: SimilarError[]): Promise<FixResult> {
+  async synthesizeFix(error, ErrorReport, similarErrors: SimilarError[]): Promise<FixResult> {
     try {
       const ollama = getOllamaService();
       await ollama.waitForInit();
@@ -71,9 +71,7 @@ export class FixSynthesizer {
         .slice(0, 3);
 
       // Generate fix using Gemma3
-      const fixSuggestion = await ollama.generateFixSuggestion(
-        error:
-        successfulFixes.map((f) => ({
+      const fixSuggestion = await ollama.generateFixSuggestion(error, successfulFixes.map((f) => ({
           message: error.message,
           code: f.code,
         }))
@@ -133,7 +131,7 @@ export class FixSynthesizer {
   /**
    * Generate validation rules based on error type
    */
-  private generateValidationRules(error: ErrorReport): ValidationRule[] {
+  private generateValidationRules(error, ErrorReport): ValidationRule[] {
     const rules: ValidationRule[] = [];
 
     // Always check syntax
@@ -172,7 +170,7 @@ export class FixSynthesizer {
   async validateFix(
     strategy: FixStrategy,
     error: ErrorReport
-  ): Promise<{ valid: boolean; errors, string[] }> {
+  ): Promise<{ valid: boolean; errors: string[] }> {
     const errors: string[] = [];
 
     for (const rule of strategy.validationRules) {

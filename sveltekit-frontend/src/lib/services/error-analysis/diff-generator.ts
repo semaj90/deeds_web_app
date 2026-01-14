@@ -9,7 +9,7 @@ import { BaseService } from './base-service.js';
 import type { Diff, Error, ServiceConfig } from './types.js';
 
 export interface IDiffGenerator {
- generateDiff(error: Error, fix: string): Promise<Diff>;
+ generateDiff(error, Error, fix: string): Promise<Diff>;
  addContext(diff: Diff, contextLines?: number): Promise<Diff>;
  formatDiff(diff: Diff): Promise<string>;
  splitLargeDiff(diff: Diff, maxLines?: number): Promise<Diff[]>;
@@ -24,7 +24,7 @@ export class DiffGenerator extends BaseService implements IDiffGenerator {
  * Generate a diff from error and fix
  * Property 4: Diff Context Preservation - diffs include surrounding context
  */
- async generateDiff(error: Error, fix: string): Promise<Diff> {
+ async generateDiff(error, Error, fix: string): Promise<Diff> {
  this.validateInput(error, 'error');
  this.validateInput(fix, 'fix');
  this.validateInput(originalCode, 'originalCode');

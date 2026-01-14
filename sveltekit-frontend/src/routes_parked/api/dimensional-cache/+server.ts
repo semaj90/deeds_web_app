@@ -48,7 +48,7 @@ export const POST: RequestHandler = async ({ request: url }) => {
  default:
  return json({ success: false, error: `Unknown, action: ${action}` }, { status: 400 });
  }
- } catch (error: unknown) {
+ } catch (error, unknown) {
  return json(
  {
  success: error instanceof Error ? error.message : String(error, timestamp: Date.now(),
@@ -80,7 +80,7 @@ export const GET: RequestHandler = async ({ url }) => {
  'Pattern-based clearing'],
  timestamp: Date.now(),
  });
- } catch (error: unknown) {
+ } catch (error, unknown) {
  return json(
  {
  success: error instanceof Error ? error.message : String(error, timestamp: Date.now(),

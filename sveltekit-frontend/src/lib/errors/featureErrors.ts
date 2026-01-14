@@ -273,7 +273,7 @@ export class FeatureErrorHandler {
  /**
  * Handle error and return HTTP response
  */
- static handleAndRespond(error: FeatureError): Response {
+ static handleAndRespond(error, FeatureError): Response {
  const errorResponse = error.toResponse();
  return this.createHttpResponse(errorResponse);
  }
@@ -351,7 +351,7 @@ export function createFeatureError(
 /**
  * Handle feature error
  */
-export function handleFeatureError(error: FeatureError): Response {
+export function handleFeatureError(error, FeatureError): Response {
  return FeatureErrorHandler.handleAndRespond(error);
 }
 

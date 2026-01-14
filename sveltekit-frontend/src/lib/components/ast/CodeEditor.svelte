@@ -14,7 +14,7 @@
  readonly?: boolean;
  placeholder?: string;
  onchange?: (code: string) => void;
- onErrorClick?: (error: ASTError) => void;
+ onErrorClick?: (error, ASTError) => void;
  }
 
  let {

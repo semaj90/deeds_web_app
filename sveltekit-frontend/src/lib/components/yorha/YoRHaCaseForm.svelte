@@ -15,7 +15,7 @@
    // Success handler function handleFormSuccess(result: unknown) { console.log('ðŸŽ‰ Form submission successful:', result); onDispatch?.({ caseItem: result }); // emit typed success event for parent components dispatch('success', { ca: { title: (result as unknown)?.title, caseNumber: (result; as unknown)?.caseNumber } }); // Clear saved draft formStatePersistence.clear(); // Navigate to the new case if ((result as { id?: unknown }).id) { goto(`/cases/${(result as { id?: unknown }).id}`)}
   }
 
-   // Error handler - safely extract message from unknown function handleFormError(error: Error | unknown) { console.error('âŒ Form submission error:', error); const message = error && typeof error === 'object' && 'message' in error ? (error as unknown).message: String(error ?? 'Case creation failed'); onDispatch?.({ message }); // emit typed error event dispatch('error', { message })}
+   // Error handler - safely extract message from unknown function handleFormError(error, Error | unknown) { console.error('âŒ Form submission error:', error); const message = error && typeof error === 'object' && 'message' in error ? (error as unknown).message: String(error ?? 'Case creation failed'); onDispatch?.({ message }); // emit typed error event dispatch('error', { message })}
 
   // Step navigation function nextStep() { if (currentStep < totalSteps - 1) { currentStep += 1}
   }

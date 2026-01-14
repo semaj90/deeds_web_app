@@ -42,7 +42,7 @@ export const embeddingActor = fromPromise<unknown, { input: EmbeddingActorInput 
       processingTime: Date.now() - startTime,
       tokenCount: data.tokenCount,
     } as EmbeddingActorOutput;
-  } catch (error: unknown) {
+  } catch (error, unknown) {
     throw new Error(`Embedding failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 });
@@ -86,7 +86,7 @@ export const documentProcessingActor = fromPromise<unknown, { input: DocumentPro
         processingTime: Date.now() - startTime,
         success: data.success || true,
       } as DocumentProcessingOutput;
-    } catch (error: unknown) {
+    } catch (error, unknown) {
       throw new Error(
         `Document processing failed: ${error instanceof Error ? error.message : String(error)}`
       );
@@ -127,7 +127,7 @@ export const legalAnalysisActor = fromPromise<unknown, { input: LegalAnalysisInp
       confidence: data.confidence || 0,
       processingTime: Date.now() - startTime,
     } as LegalAnalysisOutput;
-  } catch (error: unknown) {
+  } catch (error, unknown) {
     throw new Error(
       `Legal analysis failed: ${error instanceof Error ? error.message : String(error)}`
     );
@@ -167,7 +167,7 @@ export const ragSearchActor = fromPromise<unknown, { input: RAGSearchInput }>(as
       processingTime: Date.now() - startTime,
       model: data?.model ?? 'unknown',
     } as RAGSearchOutput;
-  } catch (error: unknown) {
+  } catch (error, unknown) {
     throw new Error(`RAG search failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 });
@@ -249,7 +249,7 @@ export const workflowActor = fromPromise<unknown, { input: WorkflowInput }>(
               });
             });
             results[stepId] = result;
-          } catch (error: unknown) {
+          } catch (error, unknown) {
             success = false;
             errors.push({
               step: stepId,
@@ -293,7 +293,7 @@ export const workflowActor = fromPromise<unknown, { input: WorkflowInput }>(
               });
             });
             results[stepId] = result;
-          } catch (error: unknown) {
+          } catch (error, unknown) {
             success = false;
             errors.push({
               step: stepId,
@@ -309,7 +309,7 @@ export const workflowActor = fromPromise<unknown, { input: WorkflowInput }>(
         success: success && errors.length === 0,
         errors,
       };
-    } catch (error: unknown) {
+    } catch (error, unknown) {
       throw new Error(
         `Workflow orchestration failed: ${error instanceof Error ? error.message : String(error)}`
       );

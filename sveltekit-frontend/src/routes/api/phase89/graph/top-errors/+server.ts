@@ -94,7 +94,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		}));
 
 		return json({ nodes: links });
-	} catch (error: any) {
+	} catch (error, any) {
 		console.error('Error fetching graph:', error);
 		return json({ error: error.message }, { status: 500 });
 	}

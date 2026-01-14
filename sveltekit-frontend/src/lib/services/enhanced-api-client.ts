@@ -146,7 +146,7 @@ const ed = errorData as Record<string, unknown>;
  throw new ApiError(response.status, errCode, errMessage, errDetails);
  }
  return (parsed as T) ?? ({} as T);
- } catch (error: unknown) {
+ } catch (error, unknown) {
  lastError = error;
  // Don't retry on client errors (4xx) except 429 (rate limit)
  if (

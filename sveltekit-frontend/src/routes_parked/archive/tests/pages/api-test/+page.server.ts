@@ -167,7 +167,7 @@ export const load: PageServerLoad = async ({ url: _url, fetch: _fetch }) => {
  initialLoad: true,
  timestamp: new Date().toISOString(),
  };
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Error loading API test data: ', error);
  return {
  endpoints: [],

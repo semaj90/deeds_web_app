@@ -26,7 +26,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			success: true,
 			message: `Started enhanced pipeline with ${ iterations } iterations (CUDA-accelerated)`
 		});
-	} catch (error: any) {
+	} catch (error, any) {
 		console.error('Failed to start pipeline:', error);
 		return json({ error: error.message }, { status: 500 });
 	}

@@ -59,7 +59,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  processed_at: new Date().toISOString(), userId: isTestMode ? 'test-user' : getUserId(locals as App.Locals),
  },
  });
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Similar evidence search failed: ', error);
  if (error instanceof z.ZodError) {
  return json(

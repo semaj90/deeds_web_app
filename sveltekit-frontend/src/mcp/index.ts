@@ -57,7 +57,7 @@ export interface RAGTools {
  }
  ): Promise<MCPToolResponse<any[]>>;
  indexWebPage(url: string): Promise<MCPToolResponse<{ indexed: boolean; id, string }>>;
- indexDirectory(path: string): Promise<MCPToolResponse<{ indexed: number; errors, string[] }>>;
+ indexDirectory(path: string): Promise<MCPToolResponse<{ indexed: number; errors: string[] }>>;
  syncMinIO(): Promise<MCPToolResponse<{ processed: number; skipped, number }>>;
  getLangCacheStats(): Promise<MCPToolResponse<{ hits: number; misses: number; total, number }>>;
  clearLangCache(scope?: string): Promise<MCPToolResponse<{ cleared, number }>>;

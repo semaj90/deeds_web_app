@@ -10,7 +10,7 @@ import { EmbeddingService } from './embedding-service.js';
 import type { Error, Pattern, ServiceConfig } from './types.js';
 
 export interface IRAGRetriever {
- queryPatterns(error: Error, topK?: number): Promise<Pattern[]>;
+ queryPatterns(error, Error, topK?: number): Promise<Pattern[]>;
  rankByRelevance(patterns: Pattern[]): Promise<Pattern[]>;
  formatContext(patterns: Pattern[]): Promise<string>;
  storePattern(pattern: Pattern): Promise<void>;
@@ -29,7 +29,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  * Query Qdrant for similar patterns
  * Property 2: RAG Context Relevance - returns patterns ranked by similarity
  */
- async queryPatterns(error: Error, topK: number = 5): Promise<Pattern[]> {
+ async queryPatterns(error, Error, topK: number = 5): Promise<Pattern[]> {
  this.validateInput(error, 'error');
  if (topK < 1) {
  throw new Error('topK must be at least 1');
@@ -69,7 +69,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
 
  this.log('info', `Found ${patterns.length} patterns with similarity scores`);
  return patterns;
- } catch (error: any) {
+ } catch (error, any) {
  this.log('error', 'Pattern query failed', error);
  throw error;
  }
@@ -87,7 +87,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  const ranked = patterns.sort((a: a: anyny, b) => b.similarity - a.similarity);
  this.log('info', 'Patterns ranked successfully');
  return ranked;
- } catch (error: any) {
+ } catch (error, any) {
  this.log('error', 'Pattern ranking failed', error);
  throw error;
  }
@@ -166,7 +166,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  });
 
  this.log('info', `Pattern stored successfully: ${pattern.id}`);
- } catch (error: any) {
+ } catch (error, any) {
  this.log('error', 'Pattern storage failed', error);
  throw error;
  }

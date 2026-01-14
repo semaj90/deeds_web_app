@@ -79,7 +79,7 @@ class ChatService {
  async streamResponse(
  streamUrl: string,
  onToken: (token: string) => void,
- onError?: (error: Error) => void
+ onError?: (error, Error) => void
  ): Promise<void> {
  return new Promise((resolve: any, reject: any) => {
  try {

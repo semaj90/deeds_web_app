@@ -185,7 +185,7 @@ export class WebGPUAIEngine {
  if (typeof window !== 'undefined') {
  window.dispatchEvent(new CustomEvent('webgpu:ready', { detail: this.capabilities }));
  }
- } catch (error: unknown) {
+ } catch (error, unknown) {
  // Changed error: unknown
  console.error('WebGPU initialization failed: ', error);
  this.capabilities = { isSupported: false, features: [], limits: {} as GPUSupportedLimits }; // Cast limits

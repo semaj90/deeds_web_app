@@ -232,7 +232,7 @@ export async function checkPgVectorAvailable(): Promise<boolean> {
  try {
  await db.execute(sql`SELECT 1::vector`);
  return true;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.log('pgvector not available: ', stringifyError(error));
  return false;
  }
@@ -250,7 +250,7 @@ export async function testVectorOperations(): Promise<{ pgvectorAvailable: boole
  const testEmbedding = generateSampleEmbedding();
  await searchSimilarDocuments(testEmbedding, 1, 0.0);
  similaritySearchWorking = true;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.log('Similarity search test failed: ', stringifyError(error));
  }
  try {
@@ -258,7 +258,7 @@ export async function testVectorOperations(): Promise<{ pgvectorAvailable: boole
  await cacheEmbedding('test-hash', testEmbedding);
  const retrieved = await getCachedEmbedding('test-hash');
  embeddingCacheWorking = retrieved !== null;
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.log('Embedding cache test failed: ', stringifyError(error));
  }
  }

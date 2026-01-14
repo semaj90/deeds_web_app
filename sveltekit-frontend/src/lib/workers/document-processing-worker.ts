@@ -67,7 +67,7 @@ class DocumentProcessingWorker {
  await rabbitMQService.connect();
  // Start consuming jobs from the document processing queue (polling)
  this.startConsuming();
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const message = error instanceof Error ? error.message : String(error); // Corrected syntax
  console.error("Failed to start document processing worker: ", message);
  this.isRunning = false; // Corrected: $state rune is for declaration, not assignment
@@ -131,7 +131,7 @@ class DocumentProcessingWorker {
  for (const record of queuedRecords) {
  await this.processDocumentFromDB(record);
  }
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const message = error instanceof Error ? error.message : String(error); // Corrected syntax
  console.error("Error checking for jobs: ", message);
  }
@@ -203,7 +203,7 @@ class DocumentProcessingWorker {
  );
  this.processedCount++;
  console.log(`âœ… Successfully processed document: ${job.documentId}`);
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const message = error instanceof Error ? error.message : String(error); // Corrected syntax
  console.error(`â Œ Error processing document ${job.documentId}: ${message}`);
  await this.updateProcessingStatus(job.documentId, "failed", `Processing failed: ${message}`);

@@ -44,7 +44,7 @@ export const GET: RequestHandler = async () => {
  host: 'localhost', // Consider getting from env
  timestamp,
  });
- } catch (error: unknown) {
+ } catch (error, unknown) {
  const msg = extractMessage(error);
  console.warn('[Redis Health] Redis unavailable: ', msg);
 

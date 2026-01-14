@@ -38,7 +38,7 @@ export class ToolErrorHandler {
   /**
    * Handle fetch errors
    */
-  static handleFetchError(error: unknown, context: string): ToolExecutionError {
+  static handleFetchError(error, unknown, context: string): ToolExecutionError {
     if (error instanceof TypeError) {
       if (error.message.includes('fetch')) {
         return new ToolExecutionError(
@@ -128,7 +128,7 @@ export class ToolErrorHandler {
   /**
    * Handle execution errors
    */
-  static handleExecutionError(error: unknown, context: string): ToolExecutionError {
+  static handleExecutionError(error, unknown, context: string): ToolExecutionError {
     if (error instanceof ToolExecutionError) {
       return error;
     }
@@ -153,7 +153,7 @@ export class ToolErrorHandler {
   /**
    * Format error message for user display
    */
-  static formatErrorMessage(error: ToolExecutionError): string {
+  static formatErrorMessage(error, ToolExecutionError): string {
     switch (error.type) {
       case ErrorType.NETWORK_ERROR:
         return `Network error: ${error.message}. Please check your connection and try again.`;
@@ -177,7 +177,7 @@ export class ToolErrorHandler {
   /**
    * Should retry the operation
    */
-  static shouldRetry(error: ToolExecutionError, attempt: number): boolean {
+  static shouldRetry(error, ToolExecutionError, attempt: number): boolean {
     if (!error.retryable) {
       return false;
     }
@@ -311,7 +311,7 @@ export function validatePositive(value: number, fieldName: string): void {
 /**
  * Log error for debugging
  */
-export function logError(error: ToolExecutionError, context: string): void {
+export function logError(error, ToolExecutionError, context: string): void {
   console.error(`[${context}] ${error.type}: ${error.message}`, {
     type: error.type,
     message: error.message,

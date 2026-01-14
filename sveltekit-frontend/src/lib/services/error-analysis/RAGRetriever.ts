@@ -246,7 +246,7 @@ export class RAGRetriever {
 		const dayMs = 24 * 60 * 60 * 1000;
 
 		return errors
-			.map((error: any) => {
+			.map((error, any) => {
 				// Recency factor: errors from last 7 days get boost
 				const ageInDays = (now - error.timestamp) / dayMs;
 				const recencyBoost = ageInDays < 7 ? 0.1 * (1 - ageInDays / 7) : 0;
@@ -274,7 +274,7 @@ export class RAGRetriever {
 
 		// Fetch fix strategies for each
 		const withStrategies = await Promise.all(
-			ranked.map(async (error: any) => {
+			ranked.map(async (error, any) => {
 				const strategies = await this.getFixStrategies(error.id);
 				return { ...error, fixStrategies: strategies };
 			})

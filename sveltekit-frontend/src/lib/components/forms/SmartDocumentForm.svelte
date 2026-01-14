@@ -122,7 +122,7 @@ import type { Document } from '$lib/types';
       errors[fieldName] = 'This field is required'} else if ((field as any).validation) {
       try {
         (field as any).validation.parse(value),
-        delete errors[fieldName]} catch (error: any) {
+        delete errors[fieldName]} catch (error, any) {
         errors[fieldName] = error?.errors?.[0]?.message ?? 'Invalid value'}
     } else {
       delete errors[fieldName]}

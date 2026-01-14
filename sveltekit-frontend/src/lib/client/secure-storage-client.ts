@@ -116,7 +116,7 @@ export class SecureStorageClient {
  }
  /** * Batch upload multiple files */
  async uploadFiles(
- files, File[],
+ files: File[],
  bucket: string = 'legal-documents',
  onProgress?: (completed: number, total) => void
  ): Promise<{ successful: UploadResponse[], failed: { file: File, error, string }[] }> {

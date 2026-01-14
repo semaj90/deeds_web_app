@@ -139,7 +139,7 @@ export class RunTracker {
  /**
  * Add error
  */
- addError(error: Omit<ErrorBrainError, 'timestamp'>): void {
+ addError(error, Omit<ErrorBrainError, 'timestamp'>): void {
  this.metadata.errors.push({
  ...error, timestamp: new Date().toISOString(),
  });

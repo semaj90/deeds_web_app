@@ -49,7 +49,7 @@ export const GET: RequestHandler = async () => {
 				{ status: 503 }
 			);
 		}
-	} catch (error: unknown) {
+	} catch (error, unknown) {
 		// This catches errors from the service itself (e.g., non-200 responses) or other unexpected errors.
 		const message = error instanceof Error ? error.message : 'Health check failed';
 		return json(

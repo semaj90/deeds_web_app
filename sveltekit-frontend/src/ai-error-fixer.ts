@@ -90,7 +90,7 @@ export class AIErrorFixer {
 		return fixes;
 	}
 
-	private async generateFix(error: ErrorAnalysisResult): Promise<ErrorFix | null> {
+	private async generateFix(error, ErrorAnalysisResult): Promise<ErrorFix | null> {
 		const cached = await this.getCachedFix(error.id);
 		if (cached) return cached;
 
@@ -102,7 +102,7 @@ export class AIErrorFixer {
 		return fix;
 	}
 
-	private async generateAIFix(error: ErrorAnalysisResult): Promise<ErrorFix | null> {
+	private async generateAIFix(error, ErrorAnalysisResult): Promise<ErrorFix | null> {
 		const prompt = this.createFixPrompt(error);
 
 		try {
@@ -131,7 +131,7 @@ export class AIErrorFixer {
 		}
 	}
 
-	private createFixPrompt(error: ErrorAnalysisResult): string {
+	private createFixPrompt(error, ErrorAnalysisResult): string {
 		const line = error.line || 0;
 		const original = error.originalCode ?? '// Code not available';
 
@@ -169,7 +169,7 @@ ${this.getCommonFixes(error.code || '')}`;
 		return fixes[code] || '- Manual review required\n- Check TypeScript documentation';
 	}
 
-	private parseFixResponse(error: ErrorAnalysisResult, response: string): ErrorFix | null {
+	private parseFixResponse(error, ErrorAnalysisResult, response: string): ErrorFix | null {
 		try {
 			const fixedCodeMatch = response.match(/FIXED_CODE:\s*([\s\S]*?)(?:\nREASONING?: \nCONFIDENCE?: $)/i);
 			const reasoningMatch = response.match(/REASONING:\s*([\s\S]*?)(?:\nCONFIDENCE?: $)/i);

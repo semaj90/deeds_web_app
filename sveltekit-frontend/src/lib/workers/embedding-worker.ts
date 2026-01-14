@@ -72,7 +72,7 @@ export class EmbeddingWorkerManager {
 		string,
 		{
 			resolve: (value, unknown) => void;
-			reject: (error: Error) => void;
+			reject: (error, Error) => void;
 			onProgress?: (progress: number, data?: ProgressData) => void;
 		}
 	>();

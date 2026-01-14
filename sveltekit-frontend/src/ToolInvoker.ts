@@ -107,7 +107,7 @@ export class ToolInvoker {
 				duration: Date.now() - startTime,
 				output: stdout
 			};
-		} catch (error: unknown) {
+		} catch (error, unknown) {
 			// svelte-check exits with non-zero when errors found
 			const execError = error as { stdout?: string; stderr?: string };
 			const output = (execError.stdout || '') + (execError.stderr || '');
@@ -190,7 +190,7 @@ export class ToolInvoker {
 				duration: Date.now() - startTime,
 				output: stdout + stderr
 			};
-		} catch (error: unknown) {
+		} catch (error, unknown) {
 			const execError = error as { stdout?: string; stderr?: string };
 			const output = (execError.stdout || '') + (execError.stderr || '');
 			const errors = this.parseTscOutput(output);

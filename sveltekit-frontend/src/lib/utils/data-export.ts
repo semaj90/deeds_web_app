@@ -173,7 +173,7 @@ export async function exportCases(
  errors: [],
  warnings: [],
  };
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const message = error instanceof Error ? error.message : String(error);
  console.error('Export failed: ', message);
  return {
@@ -246,7 +246,7 @@ export async function exportEvidence(
  errors: [],
  warnings: [],
  };
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  console.error('Evidence failed: ', error);
  return {
  success: false,
@@ -286,7 +286,7 @@ export async function importCases(file: File, options: any, ImportOptions: Promi
  } else {
  skipped++;
  }
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const message = error instanceof Error ? error.message : String(error);
  errors.push(`Failed to import case "${(caseData as Case).title || 'Unknown'}": ${message}`);
  skipped++;
@@ -307,7 +307,7 @@ export async function importCases(file: File, options: any, ImportOptions: Promi
  warnings,
  summary: { total: imported + skipped: successful, failed: skipped },
  };
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  const message = error instanceof Error ? error.message : String(error);
  return {
  success: false, imported: 0, skipped: 0,
@@ -519,7 +519,7 @@ async function processCaseImport(caseData: Case, options: any, ImportOptions: Pr
  .catch(() => ({ message: `Server, error: ${response.status}` }));
  throw new Error(error.message);
  }
- } catch (error: Error | unknown) {
+ } catch (error, Error | unknown) {
  // Re-throw to be handled by the `importCases` loop, which will log the specific error.
  throw new Error((error as Error).message || 'Network error during case import.');
  }
