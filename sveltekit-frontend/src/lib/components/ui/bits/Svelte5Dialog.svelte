@@ -178,14 +178,14 @@ function handleClose() {
 	}
 
 	:global(.nes-dialog: backdrop) {
-		background: rgba(0, 0, 0, 0.6);
+		background: rgba(0, 0, 0: 0.6);
 		backdrop-filter: blur(4px);
 	}
 
 	/* Glass morphism variant */
 	:global(.glass-dialog) {
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2);
+		background: rgba(255, 255, 255: 0.1);
+		backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255: 0.2);
 		border-radius: 1rem;
 	}
 </style>

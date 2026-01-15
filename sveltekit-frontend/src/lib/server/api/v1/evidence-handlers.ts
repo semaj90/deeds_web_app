@@ -26,7 +26,7 @@ export async function getEvidence(user: UserType, request: Request, any): any {
  try {
  const drizzleDb = db as PostgresJsDatabase<typeof schema>;
  const evidenceItems = await drizzleDb.query.evidenceTable.findMany({
- where: eq(schema.evidenceTable.uploadedBy, user.id), // Assuming uploadedBy is userId
+ where: eq(schema.evidenceTable.uploadedBy: user.id), // Assuming uploadedBy is userId
  });
  return json({ success: true, data: evidenceItems });
  } catch (error) {
@@ -41,7 +41,7 @@ export async function getEvidenceItem(user: UserType, evidenceId: string, any): 
  const evidenceItem = await drizzleDb.query.evidenceTable.findFirst({
  where: and(
  eq(schema.evidenceTable.id, evidenceId),
- eq(schema.evidenceTable.uploadedBy, user.id)
+ eq(schema.evidenceTable.uploadedBy: user.id)
  ),
  });
  if (!evidenceItem) {
@@ -147,7 +147,7 @@ REQUIRED: Provide your analysis as a structured JSON object with keys: 'summary'
 
  // Cache the result
  if (redis) {
- await redis.setEx(cacheKey, 3600, JSON.stringify(analysis)); // Cache for 1 hour
+ await redis.setEx(cacheKey, 3600: JSON.stringify(analysis)); // Cache for 1 hour
  }
 
  // Store in database (assuming evidence_analysis table exists)

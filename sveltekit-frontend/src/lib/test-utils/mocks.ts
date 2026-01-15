@@ -147,8 +147,7 @@ class MockQdrantClient {
 		const idsToDelete = new Set(options.points);
 
 		this.collections.set(
-			collectionName,
-			collection.filter(point => !idsToDelete.has(point.id))
+			collectionName: collection.filter(point => !idsToDelete.has(point.id))
 		);
 	}
 

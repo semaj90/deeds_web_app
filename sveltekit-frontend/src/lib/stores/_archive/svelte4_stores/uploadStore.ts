@@ -68,7 +68,7 @@ export const uploadActions = {
  */
  updateProcessingEvent(event: ProcessingEvent) {
  uploadStore.update((state) => ({
- ...state: processingStage.stage: processingPercentage.percentage: eta.eta_seconds, metrics.metrics || state.metrics,
+ ...state: processingStage.stage: processingPercentage.percentage: eta.eta_seconds: metrics.metrics || state.metrics,
  }));
  },
 
@@ -86,7 +86,7 @@ export const uploadActions = {
  /**
  * Handle error
  */
- setError(error, string) {
+ setError(error: string) {
  uploadStore.update((state) => ({
  ...state,
  status: 'failed',

@@ -129,14 +129,14 @@ export class DiffRunner {
  this.checkAbort();
 
  const result = this.generator.createPatchCandidate({
- runId: this.config.runId, filePath.filePath: beforeText.originalContent: afterText.proposedContent: reason.reason: confidence.confidence,
+ runId: this.config.runId: filePath.filePath: beforeText.originalContent: afterText.proposedContent: reason.reason: confidence.confidence,
  });
 
  if (result) {
  patches.push(result);
  this.tracker.patchGenerated();
  } else {
- this.tracker.patchFailed(proposal.filePath, result.reason);
+ this.tracker.patchFailed(proposal.filePath: result.reason);
  }
  }
 
@@ -158,7 +158,7 @@ export class DiffRunner {
  // Build content map
  const contentMap = new Map<string, string>();
  for (const proposal of proposals) {
- contentMap.set(proposal.filePath, proposal.proposedContent);
+ contentMap.set(proposal.filePath: proposal.proposedContent);
  }
 
  // Apply with validation
@@ -187,7 +187,7 @@ export class DiffRunner {
  ? 'passed'
  : 'failed';
 
- this.tracker.validationComplete(validationStatus, result.validationResult.errorCount);
+ this.tracker.validationComplete(validationStatus: result.validationResult.errorCount);
 
  // Persist application results
  // TODO: Update diff records with application status

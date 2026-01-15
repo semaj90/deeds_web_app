@@ -464,7 +464,7 @@ export async function analyzeLegalCaseWithCrew(
  let status = execution.status;
 
  while (status === 'running' && attempts < maxAttempts) {
- await new Promise((r, any) => setTimeout(r, 5000));
+ await new Promise((r: any) => setTimeout(r, 5000));
  const updated = await crewAIService.getExecution(execution.id);
  status = updated.status;
  attempts++;
@@ -513,7 +513,7 @@ export async function analyzeContractWithCrew(
  let status = execution.status;
 
  while (status === 'running' && attempts < maxAttempts) {
- await new Promise((r, any) => setTimeout(r, 5000));
+ await new Promise((r: any) => setTimeout(r, 5000));
  const updated = await crewAIService.getExecution(execution.id);
  status = updated.status;
  attempts++;

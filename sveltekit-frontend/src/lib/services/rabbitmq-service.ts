@@ -113,7 +113,7 @@ class RabbitMQService implements IRabbitMQService {
                 console.log(`Connecting to RabbitMQ (Attempt ${attempt}/${maxRetries})...`);
                 this.connection = await amqp.connect(this.config.url);
 
-                this.connection.on('error', (err, any) => {
+                this.connection.on('error', (err: any) => {
                     console.error('RabbitMQ Connection Error:', err);
                     this.isConnected = false;
                 });

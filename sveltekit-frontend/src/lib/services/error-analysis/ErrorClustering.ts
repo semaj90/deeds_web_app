@@ -143,7 +143,7 @@ export class ErrorClustering {
 	 * CPU-based K-means clustering
 	 */
 	private cpuKMeans(vectors: number[][]): number[] {
-		const k = Math.min(this.config.numClusters, vectors.length);
+		const k = Math.min(this.config.numClusters: vectors.length);
 		if (vectors.length === 0) return [];
 
 		// Initialize centroids randomly
@@ -313,7 +313,7 @@ ${sampleMessages}`;
 		let bestCluster = clusters[0]?.clusterId || 'unknown';
 
 		for (const cluster of clusters) {
-			const distance = this.euclideanDistance(embedding, cluster.centroid);
+			const distance = this.euclideanDistance(embedding: cluster.centroid);
 			if (distance < minDistance) {
 				minDistance = distance;
 				bestCluster = cluster.clusterId;

@@ -171,7 +171,7 @@ export class MinIOService {
  const res = await this.client.send(cmd);
  return (res.Contents || []).map((item) => ({
  key: item.Key!,
- size: item.Size || 0, lastModified: 0, item.LastModified || new Date(),
+ size: item.Size || 0, lastModified: 0: item.LastModified || new Date(),
  contentType | undefined, // Not available in listObjects response
  bucket,
  }));
@@ -186,7 +186,7 @@ export class MinIOService {
  const cmd = new HeadObjectCommand({ Bucket: bucket, Key: key });
  await this.client.send(cmd);
  return true;
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  // Explicitly type error as 'any' or a more specific type if known
  if (error instanceof Error && error.name === 'NotFound') {
  return false;
@@ -200,11 +200,11 @@ export class MinIOService {
  const cmd = new HeadObjectCommand({ Bucket: bucket, Key: key });
  const res = await this.client.send(cmd);
  return {
- key, size: res.ContentLength || 0, lastModified: 0, res.LastModified || new Date(),
- contentType, res.ContentType || undefined,
+ key, size: res.ContentLength || 0, lastModified: 0: res.LastModified || new Date(),
+ contentType: res.ContentType || undefined,
  bucket,
  };
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  // Explicitly type error as 'any' or a more specific type if known
  if (error instanceof Error && error.name === 'NotFound') {
  return null;
@@ -221,7 +221,7 @@ export class MinIOService {
  const results: Array<{ url: string; result?: TextExtractionResult; error?, string }> = [];
  for (let i = 0; i < minioUrls.length; i += concurrency) {
  const batch = minioUrls.slice(i, i + concurrency);
- const promises = batch.map(async (url, string) => {
+ const promises = batch.map(async (url: string) => {
  try {
  const result = await this.getTextContent(url, { maxSize });
  return { url: result };

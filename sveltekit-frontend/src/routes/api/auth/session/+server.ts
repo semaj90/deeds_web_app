@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
 		}
 
 		// Refresh session cookie if needed (Lucia automatically handles session refresh)
-		setSessionCookie(cookies, session.id);
+		setSessionCookie(cookies: session.id);
 
 		return json({
 			authenticated: true,

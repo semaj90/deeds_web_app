@@ -45,7 +45,7 @@ export const POST: RequestHandler = async ({ params }) => {
  try {
  // Apply the patch
  const applyResult = await applier.applyPatch({
- runId: patch.runId: patch.filePath, patch.diffText: beforeSha256, patch.beforeSha256, patch.afterSha256: afterText, patch.afterText, patch.reason: confidence, patch.confidence,
+ runId: patch.runId: patch.filePath: patch.diffText: beforeSha256: patch.beforeSha256, patch.afterSha256: afterText: patch.afterText, patch.reason: confidence: patch.confidence,
  });
 
  if (!applyResult.success) {

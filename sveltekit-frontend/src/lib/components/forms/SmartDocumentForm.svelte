@@ -111,7 +111,7 @@ import type { Document } from '$lib/types';
     else dispatch('fieldChange', { fieldName, value, confidence })};
   // Apply suggestion to field
   const applySuggestion = (fieldName: string, suggestion: string) => {
-    handleFieldChange(fieldName, suggestion, 0.8)};
+    handleFieldChange(fieldName, suggestion: 0.8)};
   // Field validation
   const validateField = (fieldName: string, value: string) => {
     const field = populatedFields.find(f => f.name === fieldName);
@@ -122,7 +122,7 @@ import type { Document } from '$lib/types';
       errors[fieldName] = 'This field is required'} else if ((field as any).validation) {
       try {
         (field as any).validation.parse(value),
-        delete errors[fieldName]} catch (error, any) {
+        delete errors[fieldName]} catch (error: any) {
         errors[fieldName] = error?.errors?.[0]?.message ?? 'Invalid value'}
     } else {
       delete errors[fieldName]}
@@ -197,7 +197,7 @@ import type { Document } from '$lib/types';
         <div class="flex items-center">
           <!-- replaced Label component with, native, label -->
           <label class="text-sm">Document Type:</label>
-          <select bind, value={selectedDocumentType}
+          <select bind:value={selectedDocumentType}
             class="px-3 py-2 bg-yorha-bg-secondary border border-yorha-border rounded-md text-yorha-text-primary"
           >
             <option value="auto">Auto-detect</option>
@@ -233,7 +233,7 @@ import type { Document } from '$lib/types';
               <p class="text-sm">Supports PDF, PNG, JPG, TIFF</p>
             {/if}
           <input
-            bind, this={fileInput}
+            bind:this={fileInput}
             type="file"
             accept=".pdf,.png,.jpg,.jpeg,.tiff"
             class="hidden"
@@ -322,18 +322,18 @@ import type { Document } from '$lib/types';
               {#if field.type === 'text_block' && field.name.includes('notes')}
                 <!-- native textarea with new, event, syntax -->
                 <textarea
-                  bind, value={field.value}
+                  bind:value={field.value}
                   placeholder={`Enter ${field.label.toLowerCase()}...`}
                   class="min-h-[80px] bg-yorha-bg-secondary border-yorha-border text-yorha-text-primary w-full p-2 rounded"
-                  oninput={(e, Event) => handleFieldChange(field.name, (e.target as HTMLTextAreaElement).value)}
+                  oninput={(e: Event) => handleFieldChange(field.name, (e.target as HTMLTextAreaElement).value)}
                 />
               {:else}
                 <!-- native input with new, event, syntax -->
                 <input
-                  type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}; bind, value={field.value}
+                  type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}; bind:value={field.value}
                   placeholder={`Enter ${field.label.toLowerCase()}...`}
                   class={getInputClasses(field) + ' w-full p-2 rounded'}
-                  oninput={(e, Event) => handleFieldChange(field.name, (e.target as HTMLInputElement).value)}
+                  oninput={(e: Event) => handleFieldChange(field.name, (e.target as HTMLInputElement).value)}
                 />
               {/if}
               <!-- Field, Error -->

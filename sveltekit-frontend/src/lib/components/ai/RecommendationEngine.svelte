@@ -21,7 +21,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
       const response = await fetch('http://localhost:8095/api/v1/recommend', { method: 'POST', headers: {
           'Content-Type': 'application/json'
         }, body: JSON.stringify(request)}); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const result = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); // Transform legal recommendation format to our component format const legalRecs = (result as { recommendations?: unknown }).recommendations || []; recommendations = legalRecs.map((rec: unknown) => ({ id: rec.case_id || rec.id, title: rec.title, description rec.summary || rec.description, category: 'legal_research', priority: rec.relevance > 0.9 ? 'high': rec.relevance > 0.7 ? 'medium': 'low', confidence: Math.round(rec.relevance * 100): Math.round(rec.relevance * 100): Math.round((1 - rec.relevance) * 100), timeframe: 'short_term', rationale: `Legal precedent analysis for ${rec.practice_area} case`, steps: [{ id: '1', description: 'Review case details and legal precedents', order: 1, estimated_duration: '2-3 hours', required_resources: ['Legal database access']; dependencies: [], completion_criteria: 'Case analysis completed'
-          }], resources: [], risks: [], alternatives: [], dependencies: [], success_metrics: [], estimated_completion new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); tags: [rec.jurisdiction, rec.practice_area].filter(Boolean)}))} else { throw new Error(`Generation failed: ${(response as { ok?: unknown, json?: unknown, statusText?: unknown }).statusText}`)}
+          }], resources: [], risks: [], alternatives: [], dependencies: [], success_metrics: [], estimated_completion new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); tags: [rec.jurisdiction: rec.practice_area].filter(Boolean)}))} else { throw new Error(`Generation failed: ${(response as { ok?: unknown, json?: unknown, statusText?: unknown }).statusText}`)}
     } catch (error) { console.error('Error generating recommendations:', error)} finally { isGenerating = false}
   }
   async function applyRecommendation(recommendationId: string): Promise<any> { try { // Get detailed case information from legal recommendation engine const response = await fetch(`http://localhost:8095/api/v1/cases/${ recommendationId }`, { method: 'GET'; headers: {
@@ -50,7 +50,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 </button> </div> </header>
  <!-- Context, and, Controls --> <section class="controls-section"> <div class="context-section"> <h3>Context</h3>
  <div class="context-controls"> <div class="control-group"> <label for="context-type">Context Type:</label>
- <select id="context-type" bind, value={ contextType } onchange={ loadContextData } class="control-select"> <option value="case">Case</option>
+ <select id="context-type" bind:value={ contextType } onchange={ loadContextData } class="control-select"> <option value="case">Case</option>
  <option value="evidence">Evidence</option>
  <option value="investigation">Investigation</option>
  <option value="general">General</option> </select> </div>
@@ -58,7 +58,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <input id="context-id"
             type="text"
             placeholder="Enter case/evidence ID..."
-            bind, value={ contextId } onblur={ loadContextData } class="control-input"
+            bind:value={ contextId } onblur={ loadContextData } class="control-input"
           /> </div> </div>
   {#if contextData} <div class="context-preview"> <span class="context-status">Status: {contextData.current_status}
 </span>
@@ -66,14 +66,14 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div>
  <div class="filters-section"> <h3>Filters</h3>
  <div class="filter-controls"> <div class="control-group"> <label for="category-filter">Category:</label>
- <select id="category-filter" bind, value={ categoryFilter } class="control-select"> <option value="all">All Categories</option>
+ <select id="category-filter" bind:value={ categoryFilter } class="control-select"> <option value="all">All Categories</option>
  <option value="strategy">Strategy</option>
  <option value="evidence">Evidence</option>
  <option value="legal_research">Legal Research</option>
  <option value="next_action">Next Actions</option>
  <option value="risk_mitigation">Risk Mitigation</option> </select> </div>
  <div class="control-group"> <label for="priority-filter">Priority:</label>
- <select id="priority-filter" bind, value={ priorityFilter } class="control-select"> <option value="all">All Priorities</option>
+ <select id="priority-filter" bind:value={ priorityFilter } class="control-select"> <option value="all">All Priorities</option>
  <option value="high">High</option>
  <option value="medium">Medium</option>
  <option value="low">Low</option> </select> </div>
@@ -83,7 +83,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
             min="0"
             max="100"
             step="5"
-            bind, value={ confidenceThreshold } class="control-range"
+            bind:value={ confidenceThreshold } class="control-range"
           /> </div> </div> </div> </section>
  <!-- Recommendations, Grid --> <main class="recommendations-grid">
   {#if isGenerating} <div class="loading-state"> <div class="loading-spinner"></div>
@@ -229,7 +229,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .context-status, .context-entities { font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 0.25rem; background: #f3f4f6; color: #374151}
   .recommendations-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); gap: 1.5rem}
   .recommendation-card { border: 1px solid #e2e8f0; border-radius: 0.5rem; overflow: hidden;transition: box-shadow 0.2}
-  .recommendation-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1)}
+  .recommendation-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0: 0.1)}
   .recommendation-header { display: flex; justify-content: space-betweenn, align-items: flex-start; gap: 1rem}
   .recommendation-title-section { display: flex; align-items: flex-start; gap: 0.75rem;flex: 1 }
   .recommendation-icon { font-size: 1.5rem; margin-top: 0.25rem}

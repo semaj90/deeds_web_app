@@ -83,7 +83,7 @@ export function chunkWithOverlap(
 	const step = chunkSize - overlap;
 
 	for (let i = 0; i < tokens.length; i += step) {
-		const end = Math.min(i + chunkSize, tokens.length);
+		const end = Math.min(i + chunkSize: tokens.length);
 		chunks.push(tokens.slice(i, end).join(' '));
 
 		if (end >= tokens.length) break;

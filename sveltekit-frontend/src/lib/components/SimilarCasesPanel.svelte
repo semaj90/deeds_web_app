@@ -89,7 +89,7 @@
  <div class="controls">
  <div class="control-group">
  <label for="limit">Limit:</label>
- <select id="limit" bind, value={limit} onchange={ loadSimilarCases }>
+ <select id="limit" bind:value={limit} onchange={ loadSimilarCases }>
  <option value={ 3 }>3</option>
  <option value={ 5 }>5</option>
  <option value={ 10 }>10</option>
@@ -105,7 +105,7 @@
  min="0"
  max="1"
  step="0.1"
- bind, value={minRelevance}
+ bind:value={minRelevance}
  onchange={ loadSimilarCases }
  />
  <span class="relevance-value">{(minRelevance * 100).toFixed(0)}%</span>
@@ -113,7 +113,7 @@
 
  <div class="control-group">
  <label for="sortBy">Sort by:</label>
- <select id="sortBy" bind, value={sortBy}>
+ <select id="sortBy" bind:value={sortBy}>
  <option value="relevance">Relevance</option>
  <option value="rank">Rank</option>
  </select>
@@ -253,7 +253,7 @@
  .control-group input:focus {
  outline: none;
  border-color: #2563eb;
- box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+ box-shadow: 0 0 0 3px rgba(37, 99, 235: 0.1);
  }
 
  .relevance-value {
@@ -319,7 +319,7 @@
 
  .case-card:hover {
  border-color: #2563eb;
- box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+ box-shadow: 0 4px 12px rgba(37, 99, 235: 0.1);
  }
 
  .card-header {

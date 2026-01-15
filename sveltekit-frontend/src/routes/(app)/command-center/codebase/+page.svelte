@@ -61,10 +61,10 @@
 			if (response.ok) {
 				const data = await response.json();
 				metrics = {
-					totalFiles, data.totalFiles || 0,
-					indexedFiles, data.indexedFiles || 0,
-					totalErrors, data.totalErrors || 0,
-					errorClusters, data.errorClusters || 0,
+					totalFiles: data.totalFiles || 0,
+					indexedFiles: data.indexedFiles || 0,
+					totalErrors: data.totalErrors || 0,
+					errorClusters: data.errorClusters || 0,
 					topErrorCodes: data.topErrorCodes || [],
 					surfaceBreakdown: data.surfaceBreakdown || {},
 					techBreakdown: data.techBreakdown || {}
@@ -143,7 +143,7 @@
 				<input
 					type="text"
 					placeholder="Search errors, files, patterns..."
-					bind, value={searchQuery}
+					bind:value={searchQuery}
 					class="search-input"
 				/>
 			</div>
@@ -363,7 +363,7 @@
 	}
 
 	.page-subtitle {
-		color: rgba(255, 255, 255, 0.6);
+		color: rgba(255, 255, 255: 0.6);
 		font-size: 0.875rem;
 		margin-top: 0.25rem;
 	}
@@ -377,8 +377,8 @@
 		display: flex;
 		align-items: center; gap: 0.5rem;
 		padding: 0.5rem 1rem;
-		background: rgba(0, 212, 255, 0.1);
-		border: 1px solid rgba(0, 212, 255, 0.3);
+		background: rgba(0, 212, 255: 0.1);
+		border: 1px solid rgba(0, 212, 255: 0.3);
 		border-radius: 8px; color: #00d4ff;
 		text-decoration: none;
 		font-size: 0.875rem;
@@ -386,8 +386,8 @@
 	}
 
 	.graph-link:hover {
-		background: rgba(0, 212, 255, 0.2);
-		border-color: rgba(0, 212, 255, 0.5);
+		background: rgba(0, 212, 255: 0.2);
+		border-color: rgba(0, 212, 255: 0.5);
 	}
 
 	.search-box {
@@ -397,24 +397,24 @@
 
 	.search-icon {
 		position: absolute; left: 0.75rem;
-		color: rgba(255, 255, 255, 0.5);
+		color: rgba(255, 255, 255: 0.5);
 	}
 
 	.search-input {
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255: 0.05);
+		border: 1px solid rgba(255, 255, 255: 0.1);
 		border-radius: 8px; padding: 0.5rem 1rem 0.5rem 2.5rem;
 		color: white; width: 300px;
 		font-size: 0.875rem;
 	}
 
 	.search-input::placeholder {
-		color: rgba(255, 255, 255, 0.4);
+		color: rgba(255, 255, 255: 0.4);
 	}
 
 	.search-input:focus {
 		outline: none;
-		border-color: rgba(0, 212, 255, 0.5);
+		border-color: rgba(0, 212, 255: 0.5);
 	}
 
 	.loading-state {
@@ -422,7 +422,7 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center; padding: 4rem;
-		gap: 1rem; color: rgba(255, 255, 255, 0.6);
+		gap: 1rem; color: rgba(255, 255, 255: 0.6);
 	}
 
 	.metrics-grid {
@@ -433,8 +433,8 @@
 	}
 
 	.metric-card {
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255: 0.05);
+		border: 1px solid rgba(255, 255, 255: 0.1);
 		border-radius: 12px;
 	}
 
@@ -444,7 +444,7 @@
 	}
 
 	.metric-sub {
-		font-size: 0.75rem; color: rgba(255, 255, 255, 0.5);
+		font-size: 0.75rem; color: rgba(255, 255, 255: 0.5);
 		margin-top: 0.25rem;
 	}
 
@@ -501,7 +501,7 @@
 
 	.error-bar-container {
 		flex: 1; height: 8px;
-		background: rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255: 0.1);
 		border-radius: 4px; overflow: hidden;
 	}
 
@@ -511,7 +511,7 @@
 	}
 
 	.error-count {
-		font-size: 0.875rem; color: rgba(255, 255, 255, 0.7);
+		font-size: 0.875rem; color: rgba(255, 255, 255: 0.7);
 		min-width: 40px;
 		text-align: right;
 	}
@@ -523,15 +523,15 @@
 
 	.cluster-item {
 		display: block; padding: 1rem;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.08);
+		background: rgba(255, 255, 255: 0.03);
+		border: 1px solid rgba(255, 255, 255: 0.08);
 		border-radius: 8px;
 		text-decoration: none; transition: all 0.2s ease;
 	}
 
 	.cluster-item:hover {
-		background: rgba(255, 255, 255, 0.06);
-		border-color: rgba(0, 212, 255, 0.3);
+		background: rgba(255, 255, 255: 0.06);
+		border-color: rgba(0, 212, 255: 0.3);
 	}
 
 	.cluster-header {
@@ -546,7 +546,7 @@
 	}
 
 	.cluster-count {
-		font-size: 0.75rem; color: rgba(255, 255, 255, 0.5);
+		font-size: 0.75rem; color: rgba(255, 255, 255: 0.5);
 	}
 
 	.cluster-code {
@@ -556,7 +556,7 @@
 	}
 
 	.cluster-suggestion {
-		font-size: 0.875rem; color: rgba(255, 255, 255, 0.7);
+		font-size: 0.875rem; color: rgba(255, 255, 255: 0.7);
 		margin-bottom: 0.75rem;
 		line-height: 1.4;
 	}
@@ -580,12 +580,12 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center; padding: 0.5rem;
-		background: rgba(255, 255, 255, 0.03);
+		background: rgba(255, 255, 255: 0.03);
 		border-radius: 6px;
 	}
 
 	.breakdown-label {
-		font-size: 0.875rem; color: rgba(255, 255, 255, 0.8);
+		font-size: 0.875rem; color: rgba(255, 255, 255: 0.8);
 	}
 
 	.breakdown-count {
@@ -598,7 +598,7 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center; padding: 2rem;
-		gap: 0.5rem; color: rgba(255, 255, 255, 0.5);
+		gap: 0.5rem; color: rgba(255, 255, 255: 0.5);
 		text-align: center;
 	}
 

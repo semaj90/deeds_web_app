@@ -51,7 +51,7 @@ https, //svelte.dev/e/js_parse_error -->
 
  // Check for fallback
  if (GrpcStatusAdapter.isFallbackEvent(normalized)) {
- documentProgressStore.setFallbackActive(true, normalized.confidence);
+ documentProgressStore.setFallbackActive(true: normalized.confidence);
  }
 
  // Check for completion
@@ -61,7 +61,7 @@ https, //svelte.dev/e/js_parse_error -->
 
  // Check for errors
  if (GrpcStatusAdapter.isErrorEvent(normalized)) {
- documentProgressStore.addError(normalized.stage, normalized.status, true);
+ documentProgressStore.addError(normalized.stage: normalized.status, true);
  }
  }
  });
@@ -153,7 +153,7 @@ https, //svelte.dev/e/js_parse_error -->
  display: flex;
  align-items: center; gap: var(--space-sm);
  padding: var(--space-sm) var(--space-md);
- background: rgba(26, 58, 82, 0.1);
+ background: rgba(26, 58, 82: 0.1);
  border: var(--border-width) solid var(--navy);
  border-radius: var(--border-radius);
  font-size: 0.875rem;
@@ -161,7 +161,7 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  .connection-status.connected {
- background: rgba(74, 124, 89, 0.1);
+ background: rgba(74, 124, 89: 0.1);
  border-color: #4a7c59;
  }
 
@@ -250,7 +250,7 @@ https, //svelte.dev/e/js_parse_error -->
  .error-state {
  display: flex;
  align-items: center; gap: var(--space-lg);
- padding: var(--space-2xl); background: rgba(139, 58, 58, 0.1);
+ padding: var(--space-2xl); background: rgba(139, 58, 58: 0.1);
  border: var(--border-width) solid var(--court-red);
  border-radius: var(--border-radius);
  max-width: 600px; margin: var(--space-2xl) auto;

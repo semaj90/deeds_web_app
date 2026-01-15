@@ -114,7 +114,7 @@ import type { Document } from '$lib/types';
         const notice = document.createElement('div');
         notice.innerHTML = 'âš ï¸ failure default to mock';
         notice.style.cssText =
-          'position: fixed, top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;',
+          'position: fixed, top: 20px; right: 20px; background: rgba(220, 53, 69: 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;',
         document.body.appendChild(notice);
         setTimeout(() => notice.remove(), 3000)}
     }
@@ -154,7 +154,7 @@ import type { Document } from '$lib/types';
       const notice = document.createElement('div');
       notice.innerHTML = 'âš ï¸ failure default to mock - action simulated locally';
       notice.style.cssText =
-        'position: fixed, top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;',
+        'position: fixed, top: 20px; right: 20px; background: rgba(220, 53, 69: 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;',
       document.body.appendChild(notice);
       setTimeout(() => notice.remove(), 3000);
       // Mock success - simulate action execution
@@ -217,7 +217,7 @@ import type { Document } from '$lib/types';
       <div class="query-section">
         <input
           type="text"
-          placeholder="Optional, Specific question or context for AI analysis..."; bind, value={customQuery}
+          placeholder="Optional, Specific question or context for AI analysis..."; bind:value={customQuery}
           class="query-input"
         />
         <button class="analyze-btn" onclick={generateRecommendations} disabled={isLoading || isThinking}>
@@ -378,43 +378,43 @@ import type { Document } from '$lib/types';
   .modal-header {
     margin-bottom: 1.5rem
     padding-bottom: 1rem
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1)}
+    border-bottom: 1px solid rgba(255, 255, 255: 0.1)}
   .analysis-types {
     display: grid
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem
     margin-bottom: 1rem}
   .type-btn {
     padding: 0.75rem
-   ;background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2);
+   ;background: rgba(255, 255, 255: 0.05); border: 1px solid rgba(255, 255, 255: 0.2);
     border-radius: 8px
-   ;color: rgba(255, 255, 255, 0.8);
+   ;color: rgba(255, 255, 255: 0.8);
     font-size: 0.85rem, cursor: pointer, transition: all 0.2s
     text-align: left}
-  .type-btn:hover { background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(138, 43, 226, 0.5)}
+  .type-btn:hover { background: rgba(255, 255, 255: 0.1);
+    border-color: rgba(138, 43, 226: 0.5)}
   .type-btn.active {
-    background: rgba(138, 43, 226, 0.2);
-    border-color: rgba(138, 43, 226, 0.6); color: #fff}
+    background: rgba(138, 43, 226: 0.2);
+    border-color: rgba(138, 43, 226: 0.6); color: #fff}
   .query-section {
     display: flex, gap: 1rem}
   .query-input {
     flex: 1, padding: 0.75rem
-   ;background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2);
+   ;background: rgba(255, 255, 255: 0.05); border: 1px solid rgba(255, 255, 255: 0.2);
     border-radius: 8px, color: #fff
     font-size: 0.9rem}
-  .query-input: placeholder { color: rgba(255, 255, 255, 0.5)}
+  .query-input: placeholder { color: rgba(255, 255, 255: 0.5)}
   .analyze-btn {
     padding: 0.75rem 1.5rem
-   ;background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(138, 43, 226, 0.5)); border: 1px solid rgba(138, 43, 226, 0.6);
+   ;background: linear-gradient(135deg, rgba(138, 43, 226: 0.3), rgba(138, 43, 226: 0.5)); border: 1px solid rgba(138, 43, 226: 0.6);
     border-radius: 8px, color: #fff
     font-weight: 500, cursor: pointer
    ;transition: all 0.2s
     white-space: nowrap}
   .analyze-btn:hover, not(disabled) {
-    background: linear-gradient(135deg, rgba(138, 43, 226, 0.4), rgba(138, 43, 226, 0.6)); transform: translateY(-1px)}
+    background: linear-gradient(135deg, rgba(138, 43, 226: 0.4), rgba(138, 43, 226: 0.6)); transform: translateY(-1px)}
   .analyze-btn:disabled {
     opacity: 0.6, cursor:not-allowed}
-  .ai-thinking { background: rgba(138, 43, 226, 0.1); border: 1px solid rgba(138, 43, 226, 0.3);
+  .ai-thinking { background: rgba(138, 43, 226: 0.1); border: 1px solid rgba(138, 43, 226: 0.3);
     border-radius: 12px, padding: 1.5rem
     margin-bottom: 1.5rem}
   .thinking-header {
@@ -425,15 +425,15 @@ import type { Document } from '$lib/types';
     font-size: 2rem, animation: pulse 2s infinite}
   .thinking-header h3 {
     margin: 0, flex: 1
-   ;color: rgba(255, 255, 255, 0.9)}
+   ;color: rgba(255, 255, 255: 0.9)}
   .thinking-spinner {
     width: 24px, height: 24px
-   ;border: 2px solid rgba(255, 255, 255, 0.2);
-    border-top: 2px solid rgba(138, 43, 226, 0.8);
+   ;border: 2px solid rgba(255, 255, 255: 0.2);
+    border-top: 2px solid rgba(138, 43, 226: 0.8);
     border-radius: 50%; animation: spin 1s linear infinite}
   .thinking-message {
     font-size: 1rem
-   ;color: rgba(255, 255, 255, 0.8);
+   ;color: rgba(255, 255, 255: 0.8);
     margin-bottom: 1rem
     font-style: italic}
   .processing-steps {
@@ -441,11 +441,11 @@ import type { Document } from '$lib/types';
     flex-direction: column, gap: 0.5rem}
   .processing-step {
     font-size: 0.85rem
-   ;color: rgba(255, 255, 255, 0.7); padding: 0.25rem 0}
+   ;color: rgba(255, 255, 255: 0.7); padding: 0.25rem 0}
   .ai-results {
     flex: 1
     overflow-y: auto}
-  .ai-reasoning { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+  .ai-reasoning { background: rgba(255, 255, 255: 0.05); border: 1px solid rgba(255, 255, 255: 0.1);
     border-radius: 8px, padding: 1rem
     margin-bottom: 1.5rem}
   .reasoning-header {
@@ -455,7 +455,7 @@ import type { Document } from '$lib/types';
     margin-bottom: 0.75rem}
   .reasoning-header h3 {
     margin: 0
-   ;color: rgba(255, 255, 255, 0.9);
+   ;color: rgba(255, 255, 255: 0.9);
     font-size: 1.1rem}
   .confidence-badge {
     padding: 0.25rem 0.75rem
@@ -465,7 +465,7 @@ import type { Document } from '$lib/types';
     font-weight: bold}
   .reasoning-text {
     margin: 0
-   ;color: rgba(255, 255, 255, 0.8);
+   ;color: rgba(255, 255, 255: 0.8);
     line-height: 1.5}
   .recommendations-section,
   .actions-section,
@@ -475,15 +475,15 @@ import type { Document } from '$lib/types';
   .actions-section h4,
   .topics-section h4 {
     margin: 0, 0 1rem 0
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255: 0.9);
     font-size: 1.1rem}
   .recommendations-grid {
     display: flex
     flex-direction: column, gap: 1rem}
-  .recommendation-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
+  .recommendation-card { background: rgba(255, 255, 255: 0.03); border: 1px solid rgba(255, 255, 255: 0.1);
     border-radius: 8px, padding: 1rem, transition: all 0.2s}
-  .recommendation-card:hover { background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.2)}
+  .recommendation-card:hover { background: rgba(255, 255, 255: 0.05);
+    border-color: rgba(255, 255, 255: 0.2)}
   .rec-header {
     display: flex, gap: 1rem
     margin-bottom: 0.75rem}
@@ -493,12 +493,12 @@ import type { Document } from '$lib/types';
   .rec-info {
     flex: 1}
   .rec-title { margin: 0, 0 0.5rem 0
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255: 0.9);
     font-size: 1rem
     font-weight: 500}
   .rec-description {
     margin: 0
-   ;color: rgba(255, 255, 255, 0.7);
+   ;color: rgba(255, 255, 255: 0.7);
     font-size: 0.9rem
     line-height: 1.4}
   .rec-stats {
@@ -513,17 +513,17 @@ import type { Document } from '$lib/types';
     font-size: 0.75rem
     font-weight: bold
     text-align: center}
-  .ai-insight { background: rgba(138, 43, 226, 0.1); border: 1px solid rgba(138, 43, 226, 0.2);
+  .ai-insight { background: rgba(138, 43, 226: 0.1); border: 1px solid rgba(138, 43, 226: 0.2);
     border-radius: 6px, padding: 0.75rem
     margin-bottom: 0.75rem}
   .insight-label {
     font-size: 0.8rem
-   ;color: rgba(138, 43, 226, 0.9);
+   ;color: rgba(138, 43, 226: 0.9);
     font-weight: 500
     margin-bottom: 0.25rem}
   .insight-text {
     font-size: 0.85rem
-   ;color: rgba(255, 255, 255, 0.8);
+   ;color: rgba(255, 255, 255: 0.8);
     line-height: 1.4
     font-style: italic}
   .metadata-details {
@@ -531,23 +531,23 @@ import type { Document } from '$lib/types';
   .metadata-details summary {
     cursor: pointer
     font-size: 0.8rem
-   ;color: rgba(255, 255, 255, 0.6);
+   ;color: rgba(255, 255, 255: 0.6);
     margin-bottom: 0.5rem}
-  .metadata-content { background: rgba(0, 0, 0, 0.2);
+  .metadata-content { background: rgba(0, 0, 0: 0.2);
     border-radius: 4px, padding: 0.5rem
     margin-top: 0.5rem}
   .metadata-item {
     display: flex, gap: 0.5rem
     margin-bottom: 0.25rem
     font-size: 0.75rem}
-  .metadata-key { color: rgba(255, 255, 255, 0.6);
+  .metadata-key { color: rgba(255, 255, 255: 0.6);
     min-width: 80px}
-  .metadata-value { color: rgba(255, 255, 255, 0.8);
+  .metadata-value { color: rgba(255, 255, 255: 0.8);
     word-break: break-word}
   .actions-list {
     display: flex
     flex-direction: column, gap: 1rem}
-  .action-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
+  .action-card { background: rgba(255, 255, 255: 0.03); border: 1px solid rgba(255, 255, 255: 0.1);
     border-radius: 8px, padding: 1rem}
   .action-header {
     display: flex
@@ -557,12 +557,12 @@ import type { Document } from '$lib/types';
     flex: 1
     margin-right: 1rem}
   .action-title { margin: 0, 0 0.5rem 0
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255: 0.9);
     font-size: 1rem
     font-weight: 500}
   .action-description {
     margin: 0
-   ;color: rgba(255, 255, 255, 0.7);
+   ;color: rgba(255, 255, 255: 0.7);
     font-size: 0.9rem
     line-height: 1.4}
   .action-meta {
@@ -578,7 +578,7 @@ import type { Document } from '$lib/types';
     text-transform: uppercase}
   .action-time {
     font-size: 0.8rem
-   ;color: rgba(255, 255, 255, 0.6)}
+   ;color: rgba(255, 255, 255: 0.6)}
   .action-tools {
     display: flex
     flex-wrap: wrap, gap: 0.5rem
@@ -586,21 +586,21 @@ import type { Document } from '$lib/types';
     margin-bottom: 0.75rem}
   .tools-label {
     font-size: 0.8rem
-   ;color: rgba(255, 255, 255, 0.6)}
+   ;color: rgba(255, 255, 255: 0.6)}
   .tool-chip {
     padding: 0.25rem 0.5rem
-   ;background: rgba(255, 255, 255, 0.1);
+   ;background: rgba(255, 255, 255: 0.1);
     border-radius: 4px
     font-size: 0.75rem
-   ;color: rgba(255, 255, 255, 0.8)}
+   ;color: rgba(255, 255, 255: 0.8)}
   .execute-btn {
     padding: 0.5rem 1rem
-   ;background: rgba(76, 175, 80, 0.2); border: 1px solid rgba(76, 175, 80, 0.4);
+   ;background: rgba(76, 175, 80: 0.2); border: 1px solid rgba(76, 175, 80: 0.4);
     border-radius: 6px, color: #fff
     font-size: 0.85rem, cursor: pointer
    ;transition: all 0.2s}
   .execute-btn:hover, not(disabled) {
-    background: rgba(76, 175, 80, 0.3); transform: translateY(-1px)}
+    background: rgba(76, 175, 80: 0.3); transform: translateY(-1px)}
   .execute-btn:disabled {
     opacity: 0.6, cursor:not-allowed}
   .topics-tags {
@@ -608,24 +608,24 @@ import type { Document } from '$lib/types';
     flex-wrap: wrap, gap: 0.5rem}
   .topic-tag {
     padding: 0.5rem 1rem
-   ;background: rgba(138, 43, 226, 0.1); border: 1px solid rgba(138, 43, 226, 0.3);
+   ;background: rgba(138, 43, 226: 0.1); border: 1px solid rgba(138, 43, 226: 0.3);
     border-radius: 16px
-   ;color: rgba(255, 255, 255, 0.8);
+   ;color: rgba(255, 255, 255: 0.8);
     font-size: 0.8rem, cursor: pointer, transition: all 0.2s}
-  .topic-tag:hover { background: rgba(138, 43, 226, 0.2);
-    border-color: rgba(138, 43, 226, 0.5)}
+  .topic-tag:hover { background: rgba(138, 43, 226: 0.2);
+    border-color: rgba(138, 43, 226: 0.5)}
   .empty-state {
     display: flex
     flex-direction: column
     align-items: center
     justify-content: center, padding: 3rem
     text-align: center
-   ;color: rgba(255, 255, 255, 0.7)}
+   ;color: rgba(255, 255, 255: 0.7)}
   .empty-icon {
     font-size: 4rem
     margin-bottom: 1rem, opacity: 0.5}
   .empty-state h3 { margin: 0, 0 0.5rem 0
-    color: rgba(255, 255, 255, 0.9)}
+    color: rgba(255, 255, 255: 0.9)}
   .empty-state p {
     margin: 0
     max-width: 400px
@@ -641,10 +641,10 @@ import type { Document } from '$lib/types';
   /* Scrollbar styling */
   .ai-results::-webkit-scrollbar {
     width: 6px}
-  .ai-results::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2)}
-  .ai-results::-webkit-scrollbar-thumb { background: rgba(138, 43, 226, 0.5);
+  .ai-results::-webkit-scrollbar-track { background: rgba(0, 0, 0: 0.2)}
+  .ai-results::-webkit-scrollbar-thumb { background: rgba(138, 43, 226: 0.5);
     border-radius: 3px}
-  .ai-results::-webkit-scrollbar-thumb:hover { background: rgba(138, 43, 226, 0.7)}
+  .ai-results::-webkit-scrollbar-thumb:hover { background: rgba(138, 43, 226: 0.7)}
 </style>
 
 

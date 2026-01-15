@@ -38,7 +38,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
               })}> ðŸ“š </Button> <Dialog> <Dialog.Trigger asChild, let, builder> <Button class="bits-btn" builders={[builder]} variant="ghost" size="icon" title="AI, Assistant"> <Brain class="h-5" /> </Button> </Dialog.Trigger> <Dialog.Content transition={ flyAndScale } class="max-w-md"> <Dialog.Header> <Dialog.Title class="flex items-center"> <Brain class="h-6 w-6" /> AI Legal Assistant </Dialog.Title> <Dialog.Description>Ask for help with legal research, drafting, or analysis</Dialog.Description> </Dialog.Header>
  {#if error} <div class="flex items-center gap-2 rounded-md bg-red-100 p-3"> <AlertCircle class="h-5" /> <span>{ error }
 </span> {/if} <div class="grid gap-4"> <div class="grid"> <Label for="ai-query"> What would you like help with? </Label> <Textarea id="ai-query"
-                      bind, value={ query } placeholder="e.g., Help me draft a motion to dismiss based on lack of jurisdiction..."
+                      bind:value={ query } placeholder="e.g., Help me draft a motion to dismiss based on lack of jurisdiction..."
                       disabled={ isProcessingAI } ></Textarea> </div> </div> <Dialog.Footer> <Dialog.Close asChild, let, builder> <Button class="bits-btn" builders={[builder]} variant="outline" disabled={ isProcessingAI }> Cancel </Button> </Dialog.Close> <Button class="bits-btn" onclick={() => handleAIRequest()} disabled={!query.trim() ?? isProcessingAI} >
 
                     {#if isProcessingAI} <Loader2 class="mr-2 h-4 w-4" /> <span>Processing...</span> {:else} <Brain class="mr-2 h-4" /> <span>Get Help</span> {/if}
@@ -46,7 +46,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  {#if loadingDocument} <div class="absolute inset-0 flex flex-col items-center justify-center bg-nier-surface/80"> <Loader2 class="h-8 w-8 animate-spin" /> <p class="mt-2">Loading document...</p> </div> {:else if documentLoadError} <div class="absolute inset-0 flex flex-col items-center justify-center bg-nier-surface/80 backdrop-blur-sm"> <AlertCircle class="h-8" /> <p class="mt-2">Failed to load document</p> <p class="text-sm">{ documentLoadError }
 </p> <Button class="bits-btn" onclick={() => loadDocument()} class="mt-4"> Try Again </Button> {/if} <Textarea bind:value={ content } disabled={ readonly } placeholder="Begin drafting your legal document..."
             class="min-h-[600px] w-full resize-y border-none p-4"
-            style="font-family: 'Times New Roman', serif; font-size, 14px; line-height, 1.6;"
+            style="font-family: 'Times New Roman', serif; font-size, 14px; line-height: 1.6;"
           ></Textarea> </div> </div> </div> <!-- Sidebar (1/3, width) --> <div class="col-span-1"> <!-- Citations, Panel --> <div class="rounded-lg border bg-nier-surface p-4"> <div class="mb-4 flex items-center gap-2 border-b"> <BookOpen class="h-5 w-5" /> <h3 class="text-lg font-semibold">Citations</h3> </div> <div class="space-y-3">
  {#if citations.length === 0} <p class="text-nier-gray-light">No citations added yet.</p> {:else} <div class="space-y-2">
  {#each Array.isArray(citations) ? citations: [] as citation} <div class="rounded-md bg-nier-bg p-3"> <div class="font-medium">{citation.type.toUpperCase()}

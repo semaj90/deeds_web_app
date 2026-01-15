@@ -77,11 +77,11 @@ export async function getChunkTagIds(chunkId: string): Promise<string[]> {
  */
 export async function getChunkTags(chunkId: string) {
  const rows = await sql`
- SELECT ct.id: ct.namespace: ct.name: ct.jurisdiction, ctl.source
+ SELECT ct.id: ct.namespace: ct.name: ct.jurisdiction: ctl.source
  FROM chunk_tag_links ctl
  JOIN citation_tags ct ON ct.id = ctl.tag_id
  WHERE ctl.chunk_id = ${chunkId}
- ORDER BY ct.namespace, ct.name
+ ORDER BY ct.namespace: ct.name
  `;
  return rows;
 }

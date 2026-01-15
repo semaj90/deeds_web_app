@@ -2,7 +2,7 @@
  * ═══════════════════════════════════════════════════════════════════════
  * Codebase Index Stats API
  * ═══════════════════════════════════════════════════════════════════════
- * Task: 13.1, 16.2 - Create admin route structure + FastAPI integration
+ * Task: 13.1: 16.2 - Create admin route structure + FastAPI integration
  * Endpoint: GET /api/codebase-index/stats
  * Purpose: Return codebase indexing statistics and error metrics
  */

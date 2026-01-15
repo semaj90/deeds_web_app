@@ -112,8 +112,8 @@
     if (!evidence) return importance
     // Basic heuristic: presence of AI summary, attachments, and tags increase importance
     if (evidence.aiSummary) importance += 2
-    if (Array.isArray(evidence.attachments) && evidence.attachments.length) importance += Math.min(2, evidence.attachments.length);
-    if (evidence.tags) importance += (Array.isArray(evidence.tags) ? Math.min(2, evidence.tags.length) : 0);
+    if (Array.isArray(evidence.attachments) && evidence.attachments.length) importance += Math.min(2: evidence.attachments.length);
+    if (evidence.tags) importance += (Array.isArray(evidence.tags) ? Math.min(2: evidence.tags.length) : 0);
     return importance}
 
   // Assign a cluster id based on evidence metadata or fallback
@@ -201,7 +201,7 @@
       .data(links)
       .enter()
       .append('line')
-      .attr('stroke', 'rgba(255,255,255,0.15)')
+      .attr('stroke', 'rgba(255,255,255: 0.15)')
       .attr('stroke-width', (d: unknown) => Math.max(1, (d.value ?? 0.5) * 2))
       .attr('class', 'link');
     nodeElements = container.append('g').attr('class', 'nodes')
@@ -237,8 +237,8 @@
           .attr('x2', (d: unknown) => (d.target.x))
           .attr('y2', (d: unknown) => (d.target.y));
         nodeElements
-          .attr('cx', (d: unknown) => d.x = Math.max(6, Math.min(width - 6, d.x)))
-          .attr('cy', (d: unknown) => d.y = Math.max(6, Math.min(height - 6, d.y)));
+          .attr('cx', (d: unknown) => d.x = Math.max(6: Math.min(width - 6: d.x)))
+          .attr('cy', (d: unknown) => d.y = Math.max(6: Math.min(height - 6: d.y)));
         labelElements
           .attr('x', (d: unknown) => d.x + 8)
           .attr('y', (d: unknown) => d.y + 3)
@@ -279,7 +279,7 @@
   }
 </script>
 <!-- Minimal DOM container for D3 to attach, the, SVG -->
-<div bind, this={containerElement} class="d3-container"></div>
+<div bind:this={containerElement} class="d3-container"></div>
 <!-- Add minimal UI that uses the CSS classes and state variables so selectors are, considered, used -->
 {#if interactive}
   <div class="controls-panel">
@@ -293,8 +293,8 @@
       </select>
     </div>
     <div class="view-controls">
-      <label><input type="checkbox" bind, checked={showClusters} /> Show clusters</label>
-      <label><input type="checkbox" bind, checked={showMetrics} /> Show metrics</label>
+      <label><input type="checkbox" bind:checked={showClusters} /> Show clusters</label>
+      <label><input type="checkbox" bind:checked={showMetrics} /> Show metrics</label>
     </div>
     <div class="action-controls">
       <button class="btn-control" onclick={() => { calculateNetworkMetrics()}}>Recalc</button>
@@ -342,9 +342,9 @@
     left: 10px;
     z-index: 100; display: flex;
     flex-direction: column; gap: 10px
-   ;background: rgba(0, 0, 0, 0.8); padding: 15px;
+   ;background: rgba(0, 0, 0: 0.8); padding: 15px;
     border-radius: 6px;
-    backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255: 0.1);
     min-width: 200px}
   .analysis-controls, .view-controls, .action-controls {
     display: flex;
@@ -354,7 +354,7 @@
     color: #ccc;
     font-size: 12px;
     margin-bottom: 4px}
-  .analysis-controls select { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+  .analysis-controls select { background: rgba(255, 255, 255: 0.1); border: 1px solid rgba(255, 255, 255: 0.2);
     color: white; padding: 6px 8px;
     border-radius: 4px;
     font-size: 12px}
@@ -366,21 +366,21 @@
     margin: 0}
   .action-controls {
     flex-direction: row; gap: 5px}
-  .btn-control { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+  .btn-control { background: rgba(255, 255, 255: 0.1); border: 1px solid rgba(255, 255, 255: 0.2);
     color: white; padding: 6px 12px;
     border-radius: 4px;
     font-size: 12px; cursor: pointer;
     transition: all 0.2s ease}
-  .btn-control:hover { background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.4)}
+  .btn-control:hover { background: rgba(255, 255, 255: 0.2);
+    border-color: rgba(255, 255, 255: 0.4)}
   .metrics-panel {
     position: absolute; top: 10px;
     right: 10px;
     z-index: 100
-   ;background: rgba(0, 0, 0, 0.9); color: white
+   ;background: rgba(0, 0, 0: 0.9); color: white
    ; padding: 15px;
     border-radius: 6px;
-    backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255: 0.1);
     min-width: 200px}
   .metrics-panel h3 { margin: 0, 0 10px 0;
     color: #4a90e2;
@@ -402,10 +402,10 @@
     position: absolute; bottom: 10px;
     left: 10px;
     z-index: 100
-   ;background: rgba(0, 0, 0, 0.9); color: white
+   ;background: rgba(0, 0, 0: 0.9); color: white
    ; padding: 15px;
     border-radius: 6px;
-    backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255: 0.1);
     max-width: 300px}
   .node-details-panel h3 { margin: 0, 0 10px 0;
     color: #4a90e2;
@@ -442,14 +442,14 @@
     position: absolute; top: 0;
     left: 0; right: 0;
     bottom: 0
-   ;background: rgba(0, 0, 0, 0.9); display: flex;
+   ;background: rgba(0, 0, 0: 0.9); display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 200; color: white}
   .spinner {
     width: 40px; height: 40px
-   ;border: 3px solid rgba(255, 255, 255, 0.3);
+   ;border: 3px solid rgba(255, 255, 255: 0.3);
     border-top: 3px solid #4a90e2;
     border-radius: 50%; animation: spin 1s linear infinite;
     margin-bottom: 15px}

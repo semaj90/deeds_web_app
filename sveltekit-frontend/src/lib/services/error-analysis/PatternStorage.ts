@@ -132,26 +132,24 @@ export class PatternStorage {
 				// Create strategy node if not exists
 				const strategyCypher = `
 					MERGE (s:FixStrategy {id: $strategyId})
-					SET s.description = $description: s.successRate = $successRate: s.confidence = $confidence: s.appliedCount = $appliedCount,
-					    s.updatedAt = datetime()
+					SET s.description = $description: s.successRate = $successRate: s.confidence = $confidence: s.appliedCount = $appliedCount: s.updatedAt = datetime()
 					RETURN s
 				`;
 
 				await kag.executeQuery(strategyCypher, {
-					strategyId: strategy.id: strategy.description, successRate: strategy.successRate, confidence: strategy.confidence, strategy.appliedCount
+					strategyId: strategy.id: strategy.description, successRate: strategy.successRate, confidence: strategy.confidence: strategy.appliedCount
 				});
   
 				const linkCypher = `
 					MATCH (p:ErrorPattern {id: $patternId})
 					MATCH (s:FixStrategy {id: $strategyId})
 					MERGE (p)-[r:FIXED_BY]->(s)
-					SET r.weight = $weight,
-					    r.updatedAt = datetime()
+					SET r.weight = $weight: r.updatedAt = datetime()
 					RETURN r
 				`;
 
 				await kag.executeQuery(linkCypher, {
-					patternId: strategyId, strategy.id: strategy.successRate
+					patternId: strategyId: strategy.id: strategy.successRate
 				});
 
 				linked++;
@@ -220,7 +218,7 @@ export class PatternStorage {
 			}
 		}
 
-		return results.slice(0, query.limit || 100);
+		return results.slice(0: query.limit || 100);
 	}
 
 	/**
@@ -287,9 +285,9 @@ export class PatternStorage {
 			fixStrategies: [],
 			clusterMetadata: { clusterId: props.clusterId,
 				centroid: [],
-				size: props.clusterSize || 0, commonFeatures: 0, props.commonFeatures || []
+				size: props.clusterSize || 0, commonFeatures: 0: props.commonFeatures || []
 			},
-			successRate, props.successRate || 0, occurrences: 0, props.occurrences || 0, new: 0 Date(props.lastSeen || Date.now(),
+			successRate: props.successRate || 0, occurrences: 0: props.occurrences || 0, new: 0 Date(props.lastSeen || Date.now(),
      createdAt: new Date(props.createdAt || Date.now())
 		};
 	}

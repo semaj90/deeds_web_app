@@ -157,12 +157,12 @@ import type { Message } from '$lib/types';
   :global(.message-content li) {
     margin-bottom: 0.25rem}
   :global(.message-content code) {
-    background: rgba(0, 0, 0, 0.1); padding: 0.125rem 0.25rem
+    background: rgba(0, 0, 0: 0.1); padding: 0.125rem 0.25rem
     border-radius: 0.25rem
     font-family: 'Courier New', monospace
     font-size: 0.875em}
   :global(.message-content blockquote) {
-    border-left: 3px solid rgba(0, 0, 0, 0.2);
+    border-left: 3px solid rgba(0, 0, 0: 0.2);
     padding-left: 1rem
    ;margin: 0.5rem 0
     font-style: italic}

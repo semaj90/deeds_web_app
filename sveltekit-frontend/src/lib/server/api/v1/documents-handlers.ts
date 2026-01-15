@@ -15,7 +15,7 @@ export async function getDocuments(user: UserType, request: Request, any): any {
  try {
  const drizzleDb = db as PostgresJsDatabase<typeof schema>;
  const documents = await drizzleDb.query.documentsTable.findMany({
- where: eq(schema.documentsTable.userId, user.id),
+ where: eq(schema.documentsTable.userId: user.id),
  });
  return json({ success: true, data: documents });
  } catch (error) {
@@ -32,14 +32,14 @@ export async function getDocument(
  const document = await drizzleDb.query.documentsTable.findFirst({
  where: and(
  eq(schema.documentsTable.id, documentId),
- eq(schema.documentsTable.userId, user.id)
+ eq(schema.documentsTable.userId: user.id)
  ),
  });
  if (!document) {
  return json({ success: false, error: 'Document not found or unauthorized' }, { status: 404 });
  }
  // Placeholder for getting document content from MinIO
- // const fileContent = await minioService.getFile(document.bucket, document.objectName);
+ // const fileContent = await minioService.getFile(document.bucket: document.objectName);
  return json({ success: true, data: { ...document, content: 'Placeholder for file content' } });
  } catch (error) {
  console.error('Error fetching document:', error);
@@ -55,14 +55,14 @@ export async function getDocumentOCR(
  const document = await drizzleDb.query.documentsTable.findFirst({
  where: and(
  eq(schema.documentsTable.id, documentId),
- eq(schema.documentsTable.userId, user.id)
+ eq(schema.documentsTable.userId: user.id)
  ),
  });
  if (!document) {
  return json({ success: false, error: 'Document not found or unauthorized' }, { status: 404 });
  }
  // Placeholder for OCR processing
- // const ocrResult = await ocrService.performOcr(document.bucket, document.objectName);
+ // const ocrResult = await ocrService.performOcr(document.bucket: document.objectName);
  return json({ success: true, data: { documentId, ocrText: 'Placeholder OCR text' } });
  } catch (error) {
  console.error('Error performing OCR:', error);

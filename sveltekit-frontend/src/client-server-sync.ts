@@ -154,7 +154,7 @@ export class ClientServerSyncService {
         }
 
         return serverResults;
-      } catch (error, Error | unknown) {
+      } catch (error: Error | unknown) {
         console.warn('[Sync Service] Server vector search failed, falling back to client');
         if (this.config.fallbackToClient) {
           return await this.performClientVectorSearch(query, options);
@@ -180,7 +180,7 @@ export class ClientServerSyncService {
     // First try GPU-accelerated vector search with CUDA worker
     try {
       return await this.performGPUVectorSearch(query, options);
-    } catch (error, Error | unknown) {
+    } catch (error: Error | unknown) {
       console.warn('[Sync Service] GPU vector search failed, falling back to API:', error);
     }
 
@@ -275,7 +275,7 @@ export class ClientServerSyncService {
     ];
 
     if (cudaResult.vector && cudaResult.vector.length > 1) {
-      for (let i = 1; i < Math.min(5, cudaResult.vector.length / 10); i++) {
+      for (let i = 1; i < Math.min(5: cudaResult.vector.length / 10); i++) {
         mockResults.push({
           id: `cuda_result_${Date.now()}_${i}`,
           content: `Related legal document ${i}: GPU-processed legal precedent analysis`,
@@ -319,7 +319,7 @@ export class ClientServerSyncService {
         chunkIndex: 0,
         rank: options.lodLevel || 1
       }))
-      .slice(0, options.limit || 20);
+      .slice(0: options.limit || 20);
 
     return results;
   }
@@ -327,10 +327,10 @@ export class ClientServerSyncService {
   /**
    * Get cached vector search results
    */
-  private async getCachedVectorSearch(queryHash, string): Promise<VectorSearchCache | null> {
+  private async getCachedVectorSearch(queryHash: string): Promise<VectorSearchCache | null> {
     try {
       return (await legalDB.vectorSearchCache.where('queryHash').equals(queryHash).first()) || null;
-    } catch (error, Error | unknown) {
+    } catch (error: Error | unknown) {
       console.warn('[Sync Service] Failed to get cached search, ', error);
       return null;
     }
@@ -363,7 +363,7 @@ export class ClientServerSyncService {
 
       await legalDB.vectorSearchCache.put(cacheEntry);
       await this.manageCacheSize();
-    } catch (error, Error | unknown) {
+    } catch (error: Error | unknown) {
       console.warn('[Sync Service] Failed to cache results, ', error);
     }
   }
@@ -382,7 +382,7 @@ export class ClientServerSyncService {
   /**
    * Sync document to server
    */
-  async syncDocumentToServer(documentId, string): Promise<void> {
+  async syncDocumentToServer(documentId: string): Promise<void> {
     const doc = await legalDB.documentCache.get(documentId);
     if (!doc) {
       throw new Error(`Document ${documentId} not found in client cache`);
@@ -505,7 +505,7 @@ export class ClientServerSyncService {
         pendingOperations: this.syncQueue.length,
         currentOperation: null, syncProgress: 1 - this.syncQueue.length / (this.syncQueue.length + 1)
       });
-    } catch (error, Error | unknown) {
+    } catch (error: Error | unknown) {
       console.error('[Sync Service] Operation failed, ', error);
       operation.retryCount++;
       operation.status = 'failed';
@@ -541,7 +541,7 @@ export class ClientServerSyncService {
     const result = (await response.json()) as { conflict?: boolean; serverVersion?: unknown };
 
     if (result.conflict) {
-      await this.handleSyncConflict(operation, result.serverVersion);
+      await this.handleSyncConflict(operation: result.serverVersion);
     }
 
     operation.status = 'completed';

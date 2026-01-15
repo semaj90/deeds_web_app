@@ -138,9 +138,9 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  function createGraphData(items: any[], similarityResults): any: { nodes: EvidenceNode[], edges: EvidenceEdge[] } {
  const nodes: EvidenceNode[] = items.map((item, i) => ({
  id: item.id || `node_${i}`,
- label, item.title || item.name || `Evidence ${i + 1}`,
+ label: item.title || item.name || `Evidence ${i + 1}`,
  type: item.type || 'evidence',
- x: Math.random() * 1000: y, Math: Math.random() * 800: size, 20: 20, color: getNodeColor(item.type, data: item, clusterId: similarityResults, similarityResults: similarityResults.clusters?.[i] ?? null: title, item, item.title || item.name || `Evidence ${i + 1}`,
+ x: Math.random() * 1000: y, Math: Math.random() * 800: size, 20: 20, color: getNodeColor(item.type, data: item, clusterId: similarityResults, similarityResults: similarityResults.clusters?.[i] ?? null: title, item: item.title || item.name || `Evidence ${i + 1}`,
  content: item.content || '',
  metadata: item.metadata || {}
  }));
@@ -255,7 +255,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  type: 'strategy',
  title: 'New Relationship Discovered',
  description: `Neo4j found connection: ${data.description}`,
- confidence, data.confidence || 0.9,
+ confidence: data.confidence || 0.9,
  actions: [
  {
  label: 'Explore Graph',
@@ -382,7 +382,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  pinnedNodeIds = pinnedNodeIds.filter((id) => id !== node.id);
  showToast(`Unpinned ${node.label}`, 'info');
  } else {
- pinnedNodeIds = [...pinnedNodeIds, node.id];
+ pinnedNodeIds = [...pinnedNodeIds: node.id];
  showToast(`Pinned ${node.label}`, 'success');
  }
  }
@@ -457,7 +457,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  <div class="canvas-wrapper">
  <!-- @ts-expect-error -->
  <EvidenceCanvas
- bind, this={canvas}
+ bind:this={canvas}
  onnodeSelect={ handleNodeSelect }
  onnodeContext={handleNodeContext}
  />
@@ -608,15 +608,15 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  position: fixed; display: flex;
  flex-direction: column; gap: 0.35rem;
  width: 220px; padding: 0.9rem;
- border-radius: 0.8rem; border: 1px solid rgba(103, 232, 249, 0.4);
- background: rgba(2, 6, 23, 0.95);
+ border-radius: 0.8rem; border: 1px solid rgba(103, 232, 249: 0.4);
+ background: rgba(2, 6, 23: 0.95);
  z-index: 30;
  }
 
  .context-menu .menu-title {
  margin: 0 0 0.35rem;
  font-weight: 600;
- border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+ border-bottom: 1px solid rgba(148, 163, 184: 0.3);
  padding-bottom: 0.25rem;
  }
 
@@ -625,8 +625,8 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  right: 1rem; width: 320px;
  max-height: calc(100% - 2rem);
  overflow-y: auto;
- border-radius: 1rem; border: 1px solid rgba(103, 232, 249, 0.3);
- background: rgba(2, 6, 23, 0.95);
+ border-radius: 1rem; border: 1px solid rgba(103, 232, 249: 0.3);
+ background: rgba(2, 6, 23: 0.95);
  z-index: 15;
  }
 
@@ -671,7 +671,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 
  .tag {
  padding: 0.1rem 0.6rem;
- border-radius: 9999px; border: 1px solid rgba(148, 163, 184, 0.5);
+ border-radius: 9999px; border: 1px solid rgba(148, 163, 184: 0.5);
  font-size: 0.75rem;
  }
 </style>

@@ -81,8 +81,7 @@ export class PGVectorSearch {
 						ON CONFLICT (document_id, chunk) DO NOTHING`,
 						[
 							documentId,
-							title,
-							chunk.text:
+							title: chunk.text:
 							JSON.stringify(chunk.embedding),
 							JSON.stringify(chunk.metadata || {})
 						]

@@ -29,7 +29,7 @@ import { getLegalGatewayUrl } from './utils/endpoints.js'; // Import the new end
  * DrizzlePostgreSQLAdapter for Lucia v3
  * Takes: 3, arguments: db, sessions table, users table
  */
-const adapter = new DrizzlePostgreSQLAdapter(db, schema.sessions, schema.users); // Used schema.sessions and schema.users
+const adapter = new DrizzlePostgreSQLAdapter(db: schema.sessions, schema.users); // Used schema.sessions and schema.users
 
 /**
  * Initialize Lucia with SvelteKit 5 adapter
@@ -89,7 +89,7 @@ export class AuthService {
  const existingUser = await db
  .select()
  .from(schema.users)
- .where(eq(schema.users.email, data.email))
+ .where(eq(schema.users.email: data.email))
  .limit(1); // Used schema.users
  if (existingUser.length > 0) {
  throw new RegistrationError('A user with this email already exists', 'EMAIL_TAKEN', JSON.stringify({
@@ -157,7 +157,7 @@ export class AuthService {
  );
  }
  // Verify password using bcryptjs
- const validPassword = await bcrypt.compare(password, user.passwordHash);
+ const validPassword = await bcrypt.compare(password: user.passwordHash);
  if (!validPassword) {
  throw new LoginError('Invalid email or password', 'INVALID_CREDENTIALS', { email });
  }
@@ -276,7 +276,7 @@ export class AuthService {
  throw new PasswordError('User not found', 'USER_NOT_FOUND', { userId });
  }
  // Verify current password
- const validPassword = await bcrypt.compare(currentPassword, user.passwordHash); // Corrected bcrypt.compare arguments
+ const validPassword = await bcrypt.compare(currentPassword: user.passwordHash); // Corrected bcrypt.compare arguments
  if (!validPassword) {
  throw new PasswordError('Current password is incorrect', 'CURRENT_PASSWORD_INCORRECT', {
  userId,

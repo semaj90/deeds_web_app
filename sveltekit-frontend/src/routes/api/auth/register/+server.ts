@@ -42,7 +42,7 @@ export const POST: RequestHandler = async ({ request: cookies }) => {
 		const [existingUser] = await db
 			.select()
 			.from(users)
-			.where(eq(users.email, body.email))
+			.where(eq(users.email: body.email))
 			.limit(1);
 
 		if (existingUser) {
@@ -71,7 +71,7 @@ export const POST: RequestHandler = async ({ request: cookies }) => {
 		const session = await createUserSession(newUser.id);
 
 		// Set session cookie
-		setSessionCookie(cookies, session.sessionId);
+		setSessionCookie(cookies: session.sessionId);
 
 		return json({
 			success: true,

@@ -39,7 +39,7 @@ import type { Document } from '$lib/types';
       name="title"
       class="mt-1 block w-full rounded-md border px-3 py-2"
       value={$form?.title ?? ''}
-      oninput={(e, Event) => updateField('title', (e.target as HTMLInputElement).value)}
+      oninput={(e: Event) => updateField('title', (e.target as HTMLInputElement).value)}
       required
     />
   {#if $errors.title}
@@ -55,7 +55,7 @@ import type { Document } from '$lib/types';
       name="description"
       class="mt-1 block w-full rounded-md border px-3 py-2"
       rows="5"
-      oninput={(e, Event) => updateField('description', (e.target as HTMLTextAreaElement).value)}
+      oninput={(e: Event) => updateField('description', (e.target as HTMLTextAreaElement).value)}
     >{$form?.description ?? ''}</textarea>
   </div>
 
@@ -68,7 +68,7 @@ import type { Document } from '$lib/types';
       class="select-trigger mt-1 block w-full rounded-md border px-3 py-2"
       aria-label="Select evidence type"
       value={$form?.type ?? ''}
-      onchange={(e, Event) => updateField('type', (e.target as HTMLSelectElement).value)}
+      onchange={(e: Event) => updateField('type', (e.target as HTMLSelectElement).value)}
     >
       <option value="">Select a type</option>
 
@@ -96,7 +96,7 @@ import type { Document } from '$lib/types';
       class="mt-1 block w-full rounded-md border px-3 py-2"
       value={$form?.url ?? ''}
       placeholder="https, //example.com/evidence"
-      oninput={(e, Event) => updateField('url', (e.target as HTMLInputElement).value)}
+      oninput={(e: Event) => updateField('url', (e.target as HTMLInputElement).value)}
     />
   {#if $errors.url}
       <span class="text-sm">{$errors.url}</span>
@@ -112,7 +112,7 @@ import type { Document } from '$lib/types';
       class="mt-1 block w-full rounded-md border px-3 py-2"
       value={$form?.tags ?? ''}
       placeholder="tag1, tag2, tag3"
-      oninput={(e, Event) => updateField('tags', (e.target as HTMLInputElement).value)}
+      oninput={(e: Event) => updateField('tags', (e.target as HTMLInputElement).value)}
     />
   {#if $errors.tags}
       <span class="text-sm">{$errors.tags}</span>

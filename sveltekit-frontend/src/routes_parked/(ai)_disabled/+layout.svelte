@@ -134,7 +134,7 @@ import type { Document } from '$lib/types';
  background: var(--surface-secondary, #111111);
  border-bottom: 2px solid var(--border-primary, #00ccff);
  padding: 1rem;
- box-shadow: 0 2px 8px rgba(0, 204, 255, 0.3);
+ box-shadow: 0 2px 8px rgba(0, 204, 255: 0.3);
  }
 
  .ai-brand {
@@ -151,7 +151,7 @@ import type { Document } from '$lib/types';
  font-size: 1.5rem;
  font-weight: bold; color: #00ccff;
  margin: 0;
- text-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+ text-shadow: 0 0 10px rgba(0, 204, 255: 0.5);
  }
 
  .ai-badge {
@@ -160,7 +160,7 @@ import type { Document } from '$lib/types';
  border-radius: 1rem;
  font-size: 0.8rem;
  font-weight: bold;
- box-shadow: 0 0 8px rgba(0, 204, 255, 0.4);
+ box-shadow: 0 0 8px rgba(0, 204, 255: 0.4);
  }
 
  /* Navigation */
@@ -185,7 +185,7 @@ import type { Document } from '$lib/types';
  content: ''; position: absolute;
  top: 0; left: -100%;
  width: 100%; height: 100%;
- background: linear-gradient(90deg, transparent, rgba(0, 204, 255, 0.2), transparent);
+ background: linear-gradient(90deg, transparent, rgba(0, 204, 255: 0.2), transparent);
  transition: left 0.5s ease;
  }
 
@@ -196,16 +196,16 @@ import type { Document } from '$lib/types';
  .ai-nav-item:hover {
  border-color: #00ffcc; color: #00ffcc;
  background: var(--surface-tertiary, #1a1a1a);
- box-shadow: 0 0 12px rgba(0, 255, 204, 0.3);
- text-shadow: 0 0 8px rgba(0, 255, 204, 0.5);
+ box-shadow: 0 0 12px rgba(0, 255, 204: 0.3);
+ text-shadow: 0 0 8px rgba(0, 255, 204: 0.5);
  }
 
  .ai-nav-item.active {
  border-color: #ff6600; color: #ff6600;
  background: var(--surface-tertiary, #1a1a1a);
  font-weight: bold;
- box-shadow: 0 0 16px rgba(255, 102, 0, 0.4);
- text-shadow: 0 0 8px rgba(255, 102, 0, 0.6);
+ box-shadow: 0 0 16px rgba(255, 102, 0: 0.4);
+ text-shadow: 0 0 8px rgba(255, 102, 0: 0.6);
  }
 
  .ai-nav-icon {
@@ -229,8 +229,8 @@ import type { Document } from '$lib/types';
  top: 0; left: 0;
  right: 0; bottom: 0;
  background-image:
- linear-gradient(45deg, transparent 49%, rgba(0, 204, 255, 0.03) 50%, transparent 51%),
- linear-gradient(-45deg, transparent 49%, rgba(0, 204, 255, 0.03) 50%, transparent 51%);
+ linear-gradient(45deg, transparent 49%, rgba(0, 204, 255: 0.03) 50%, transparent 51%),
+ linear-gradient(-45deg, transparent 49%, rgba(0, 204, 255: 0.03) 50%, transparent 51%);
  background-size: 40px 40px;
  pointer-events: none; opacity: 0.5;
  }
@@ -247,13 +247,13 @@ import type { Document } from '$lib/types';
  background: var(--surface-secondary, #111111);
  border: 2px dashed #00ccff;
  border-radius: 1rem;
- box-shadow: 0 0 20px rgba(0, 204, 255, 0.2);
+ box-shadow: 0 0 20px rgba(0, 204, 255: 0.2);
  }
 
  .ai-placeholder h2 {
  color: #00ccff;
  margin-bottom: 1rem;
- text-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+ text-shadow: 0 0 10px rgba(0, 204, 255: 0.5);
  }
 
  /* Footer */
@@ -261,7 +261,7 @@ import type { Document } from '$lib/types';
  border-top: 2px solid var(--border-primary, #00ccff);
  background: var(--surface-secondary, #111111);
  padding: 1rem;
- box-shadow: 0 -2px 8px rgba(0, 204, 255, 0.2);
+ box-shadow: 0 -2px 8px rgba(0, 204, 255: 0.2);
  }
 
  .ai-footer-content {
@@ -280,7 +280,7 @@ import type { Document } from '$lib/types';
  .ai-current strong {
  color: #00ffcc;
  text-transform: uppercase;
- text-shadow: 0 0 6px rgba(0, 255, 204, 0.5);
+ text-shadow: 0 0 6px rgba(0, 255, 204: 0.5);
  }
 
  .ai-controls {
@@ -299,8 +299,8 @@ import type { Document } from '$lib/types';
 
  .ai-main-btn:hover {
  border-color: #00ffcc; color: #00ffcc;
- box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
- text-shadow: 0 0 6px rgba(0, 255, 204, 0.5);
+ box-shadow: 0 0 10px rgba(0, 255, 204: 0.3);
+ text-shadow: 0 0 6px rgba(0, 255, 204: 0.5);
  }
 
  /* Responsive */
@@ -332,12 +332,12 @@ import type { Document } from '$lib/types';
  .ai-content::-webkit-scrollbar-thumb {
  background: linear-gradient(180deg, #00ccff, #0099cc);
  border-radius: 6px;
- box-shadow: 0 0 8px rgba(0, 204, 255, 0.5);
+ box-shadow: 0 0 8px rgba(0, 204, 255: 0.5);
  }
 
  .ai-content::-webkit-scrollbar-thumb:hover {
  background: linear-gradient(180deg, #00ffcc, #00ccaa);
- box-shadow: 0 0 12px rgba(0, 255, 204, 0.7);
+ box-shadow: 0 0 12px rgba(0, 255, 204: 0.7);
  }
 </style>
 

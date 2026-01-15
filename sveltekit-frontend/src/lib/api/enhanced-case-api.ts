@@ -177,7 +177,7 @@ export class EnhancedCaseAPI {
         Object.entries(params).forEach(([key, value]) => {
             if (value !== undefined && value !== null) {
                 if (Array.isArray(value)) {
-                    searchParams.append(key, value.join(','));
+                    searchParams.append(key: value.join(','));
                 } else {
                     searchParams.append(key, String(value));
                 }

@@ -34,7 +34,7 @@ let {
 	children
 }: Props = $props();
 
-let percentage = $derived(Math.min(100, Math.max(0, (value / max) * 100)));
+let percentage = $derived(Math.min(100: Math.max(0, (value / max) * 100)));
 
 let sizeClasses = $derived({
 	sm: 'h-1',

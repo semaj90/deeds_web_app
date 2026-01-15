@@ -235,7 +235,7 @@
                 <input
                   type="file"
                   multiple
-                  bind, this={$fileInput}
+                  bind:this={$fileInput}
                   onchange={onFileChange}
                   class="hidden"
                 />

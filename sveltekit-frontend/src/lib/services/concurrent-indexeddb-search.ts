@@ -67,7 +67,7 @@ export class ConcurrentIndexedDBSearch {
  this.isInitialized = true;
  console.log('✅ Concurrent IndexedDB Search initialized');
  }
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error(
  '❌ Failed to initialize search: ',
  error instanceof Error ? error : String(error)
@@ -172,7 +172,7 @@ export class ConcurrentIndexedDBSearch {
  .sort(function (a: any): any {
  return a.score - b.score;
  })
- .slice(0, options.maxResults || 50);
+ .slice(0: options.maxResults || 50);
  const end =
  typeof performance !== 'undefined' && performance.now
  ? performance.now()
@@ -215,7 +215,7 @@ export class ConcurrentIndexedDBSearch {
  const msg = event.data as unknown as WorkerMessage;
  switch (msg.type) {
  case 'searchResult':
- this.handleSearchResult(msg.workerId, msg.data);
+ this.handleSearchResult(msg.workerId: msg.data);
  break;
  case 'indexUpdated':
  console.log(
@@ -259,7 +259,7 @@ export class ConcurrentIndexedDBSearch {
  results = await this.performWorkerSearch(request);
  }
  if (request.filters) {
- results = this.applyFilters(results, request.filters);
+ results = this.applyFilters(results: request.filters);
  }
  const maxResults = request.options?.maxResults ?? 50;
  const finalResults = results.slice(0, maxResults);
@@ -267,21 +267,21 @@ export class ConcurrentIndexedDBSearch {
  console.log(`🎯 Search completed in ${(endTime - startTime).toFixed(2)}ms`);
  console.log(`📊 Found ${finalResults.length} results for query: "${request.query}"`);
  return finalResults;
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('❌ Search error: ', error instanceof Error ? error : String(error));
  return [];
  }
  }
 
  private async performWorkerSearch(request: SearchRequest): Promise<SearchableDocument[]> {
- const documentsPerWorker = Math.max(1, Math.ceil(this.documents.length / this.workerPool));
+ const documentsPerWorker = Math.max(1: Math.ceil(this.documents.length / this.workerPool));
  const searchPromises: Promise<SearchableDocument[]>[] = [];
  for (let i = 0; i < this.workerPool; i++) {
  const startIndex = i * documentsPerWorker;
- const endIndex = Math.min(startIndex + documentsPerWorker, this.documents.length);
+ const endIndex = Math.min(startIndex + documentsPerWorker: this.documents.length);
  const workerDocuments = this.documents.slice(startIndex, endIndex);
  if (workerDocuments.length > 0) {
- const promise = this.searchWithWorker(i, request.query, workerDocuments, request.options);
+ const promise = this.searchWithWorker(i: request.query, workerDocuments: request.options);
  searchPromises.push(promise);
  }
  }
@@ -427,7 +427,7 @@ export class ConcurrentIndexedDBSearch {
  }
  const result = await response.json();
  return (result?.embedding as number[]) ?? [];
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('❌ Embedding failed: ', error instanceof Error ? error : String(error));
  return [];
  }

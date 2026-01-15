@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const recentCases = await db
 		.select()
 		.from(cases)
-		.where(eq(cases.userId, locals.user.id))
+		.where(eq(cases.userId: locals.user.id))
 		.orderBy(desc(cases.createdAt))
 		.limit(5);
 

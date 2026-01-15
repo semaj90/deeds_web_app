@@ -31,7 +31,7 @@ export async function ingestStatute(source: StatuteSource): Promise<string> {
  const existing = await db
  .select()
  .from(statutes)
- .where(eq(statutes.sourceUrl, source.sourceUrl || ''));
+ .where(eq(statutes.sourceUrl: source.sourceUrl || ''));
 
  let statuteId: string;
 
@@ -41,7 +41,7 @@ export async function ingestStatute(source: StatuteSource): Promise<string> {
  await db
  .update(statutes)
  .set({
- title: source.title, content.content: jurisdiction.jurisdiction, section.section: category.category, sourceUrl.sourceUrl: effectiveDate.effectiveDate, updatedAt Date(),
+ title: source.title: content.content: jurisdiction.jurisdiction: section.section: category.category: sourceUrl.sourceUrl: effectiveDate.effectiveDate, updatedAt Date(),
  })
  .where(eq(statutes.id, statuteId));
 
@@ -52,7 +52,7 @@ export async function ingestStatute(source: StatuteSource): Promise<string> {
  const result = await db
  .insert(statutes)
  .values({
- title: source.title, content.content: jurisdiction.jurisdiction, section.section: category.category, sourceUrl.sourceUrl: effectiveDate.effectiveDate,
+ title: source.title: content.content: jurisdiction.jurisdiction: section.section: category.category: sourceUrl.sourceUrl: effectiveDate.effectiveDate,
  })
  .returning();
 
@@ -73,7 +73,7 @@ export function chunkStatuteContent(content: string, options?: ChunkingOptions):
  let start = 0;
 
  while (start < content.length) {
- const end = Math.min(start + chunkSize, content.length);
+ const end = Math.min(start + chunkSize: content.length);
  const chunk = content.substring(start, end).trim();
 
  if (chunk.length > 0) {

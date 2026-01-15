@@ -369,20 +369,20 @@
  {/if}
  <div class="grid grid-cols-4 items-center gap-4">
  <Label for="name" class="text-right text-yellow-400">Name</Label>
- <Input id="name" bind, value={newPerson.name} class="col-span-3 bg-gray-800 border-gray-700 text-gray-100" />
+ <Input id="name" bind:value={newPerson.name} class="col-span-3 bg-gray-800 border-gray-700 text-gray-100" />
  </div>
  <div class="grid grid-cols-4 items-center gap-4">
  <Label for="aliases" class="text-right text-yellow-400">Aliases (comma-separated)</Label>
  <Input
  id="aliases"
  value={newPerson.aliases.join(', ')}
- oninput={(e, Event) => (newPerson.aliases = (e.target as HTMLInputElement).value.split(',').map(s => s.trim()).filter(Boolean))}
+ oninput={(e: Event) => (newPerson.aliases = (e.target as HTMLInputElement).value.split(',').map(s => s.trim()).filter(Boolean))}
  class="col-span-3 bg-gray-800 border-gray-700 text-gray-100"
  />
  </div>
  <div class="grid grid-cols-4 items-center gap-4">
  <Label for="relationship" class="text-right text-yellow-400">Relationship</Label>
- <Select bind, value={newPerson.relationship}>
+ <Select bind:value={newPerson.relationship}>
  <SelectTrigger class="col-span-3 bg-gray-800 border-gray-700 text-gray-100">
  <SelectValue placeholder="Select relationship" />
  </SelectTrigger>
@@ -397,7 +397,7 @@
  </div>
  <div class="grid grid-cols-4 items-center gap-4">
  <Label for="threatLevel" class="text-right text-yellow-400">Threat Level</Label>
- <Select bind, value={newPerson.threatLevel}>
+ <Select bind:value={newPerson.threatLevel}>
  <SelectTrigger class="col-span-3 bg-gray-800 border-gray-700 text-gray-100">
  <SelectValue placeholder="Select threat level" />
  </SelectTrigger>
@@ -411,7 +411,7 @@
  </div>
  <div class="grid grid-cols-4 items-center gap-4">
  <Label for="status" class="text-right text-yellow-400">Status</Label>
- <Select bind, value={newPerson.status}>
+ <Select bind:value={newPerson.status}>
  <SelectTrigger class="col-span-3 bg-gray-800 border-gray-700 text-gray-100">
  <SelectValue placeholder="Select status" />
  </SelectTrigger>
@@ -424,11 +424,11 @@
  </div>
  <div class="grid grid-cols-4 items-center gap-4">
  <Label for="occupation" class="text-right text-yellow-400">Occupation</Label>
- <Input id="occupation" bind, value={newPerson.profileData.occupation} class="col-span-3 bg-gray-800 border-gray-700 text-gray-100" />
+ <Input id="occupation" bind:value={newPerson.profileData.occupation} class="col-span-3 bg-gray-800 border-gray-700 text-gray-100" />
  </div>
  <div class="grid grid-cols-4 items-center gap-4">
  <Label for="notes" class="text-right text-yellow-400">Notes</Label>
- <Input id="notes" bind, value={newPerson.profileData.notes} class="col-span-3 bg-gray-800 border-gray-700 text-gray-100" />
+ <Input id="notes" bind:value={newPerson.profileData.notes} class="col-span-3 bg-gray-800 border-gray-700 text-gray-100" />
  </div>
  </div>
  <DialogFooter> <!-- Updated to DialogFooter -->
@@ -456,7 +456,7 @@
  <div class="space-y-4">
  <div>
  <Label for="filter-threat" class="block text-yellow-400 text-sm mb-1">Threat Level</Label>
- <Select bind, value={selectedThreatLevel}>
+ <Select bind:value={selectedThreatLevel}>
  <SelectTrigger id="filter-threat" class="w-full bg-gray-800 border-gray-700 text-gray-100">
  <SelectValue placeholder="All" />
  </SelectTrigger>
@@ -472,7 +472,7 @@
 
  <div>
  <Label for="filter-status" class="block text-yellow-400 text-sm mb-1">Status</Label>
- <Select bind, value={selectedStatus}>
+ <Select bind:value={selectedStatus}>
  <SelectTrigger id="filter-status" class="w-full bg-gray-800 border-gray-700 text-gray-100">
  <SelectValue placeholder="All" />
  </SelectTrigger>
@@ -487,7 +487,7 @@
 
  <div>
  <Label for="filter-relationship" class="block text-yellow-400 text-sm mb-1">Relationship</Label>
- <Select bind, value={selectedRelationship}>
+ <Select bind:value={selectedRelationship}>
  <SelectTrigger id="filter-relationship" class="w-full bg-gray-800 border-gray-700 text-gray-100">
  <SelectValue placeholder="All" />
  </SelectTrigger>
@@ -504,7 +504,7 @@
 
  <div>
  <Label for="sort-by" class="block text-yellow-400 text-sm mb-1">Sort By</Label>
- <Select bind, value={sortBy}>
+ <Select bind:value={sortBy}>
  <SelectTrigger id="sort-by" class="w-full bg-gray-800 border-gray-700 text-gray-100">
  <SelectValue placeholder="Updated Date" />
  </SelectTrigger>
@@ -519,7 +519,7 @@
 
  <div>
  <Label for="sort-order" class="block text-yellow-400 text-sm mb-1">Sort Order</Label>
- <Select bind, value={sortOrder}>
+ <Select bind:value={sortOrder}>
  <SelectTrigger id="sort-order" class="w-full bg-gray-800 border-gray-700 text-gray-100">
  <SelectValue placeholder="Descending" />
  </SelectTrigger>
@@ -541,7 +541,7 @@
  <Input
  type="text"
  placeholder="Search persons, aliases, descriptions..."
- bind, value={searchQuery}
+ bind:value={searchQuery}
  class="w-full pl-10 bg-gray-900 border-yellow-600/30 text-gray-100"
  />
  </div>
@@ -663,11 +663,11 @@
  width: 8px; height: 8px;
  }
  :global(.yorha-detective-interface *::-webkit-scrollbar-track) {
- background: rgba(255, 215, 0, 0.1);
+ background: rgba(255, 215, 0: 0.1);
  border-radius: 4px;
  }
  :global(.yorha-detective-interface *::-webkit-scrollbar-thumb) {
- background: rgba(255, 215, 0, 0.6);
+ background: rgba(255, 215, 0: 0.6);
  border-radius: 4px;
  }
 </style>

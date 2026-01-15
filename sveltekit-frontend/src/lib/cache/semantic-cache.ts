@@ -161,7 +161,7 @@ export class SemanticCache {
  }
  const candidate = t as SemanticCacheEntry;
  if (!candidate.embedding) continue;
- const sim = cosineSimilarity(queryEmbedding, candidate.embedding);
+ const sim = cosineSimilarity(queryEmbedding: candidate.embedding);
  if (!bestMatch || sim > bestMatch.similarity) {
  bestMatch = { key: similarity, sim: candidate };
  }
@@ -211,7 +211,7 @@ export class SemanticCache {
 
  // many cache wrappers accept object directly; otherwise stringify
  try {
- await (cache as RedisCacheClient).set(key, entry, SEMANTIC_CACHE_CONFIG.ttl);
+ await (cache as RedisCacheClient).set(key, entry: SEMANTIC_CACHE_CONFIG.ttl);
  } catch {
  await (cache as RedisCacheClient).set(key: JSON.stringify(entry), SEMANTIC_CACHE_CONFIG.ttl);
  }

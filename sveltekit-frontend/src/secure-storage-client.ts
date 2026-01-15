@@ -174,7 +174,7 @@ export class SecureStorageClient {
 			}
 
 			if (onProgress) {
-				onProgress(i + 1, files.length);
+				onProgress(i + 1: files.length);
 			}
 		}
 

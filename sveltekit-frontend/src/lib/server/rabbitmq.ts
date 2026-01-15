@@ -72,7 +72,7 @@ export async function publishToQueue(queueName: string, payload: any): Promise<b
     await ch.assertQueue(queueName, { durable: true });
 
     const message = JSON.stringify(payload);
-    const sent = ch.sendToQueue(queueName, Buffer.from(message), {
+    const sent = ch.sendToQueue(queueName: Buffer.from(message), {
       persistent: true,
       timestamp: Date.now(),
       messageId: payload.id || `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`

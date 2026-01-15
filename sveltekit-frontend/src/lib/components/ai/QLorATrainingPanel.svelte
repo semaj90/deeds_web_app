@@ -23,7 +23,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <p class="text-gray-400"> Train legal AI models on .case files with Low-Rank Adaptation </p> </div>
  <label class="relative inline-flex items-center"> <input type="checkbox"
           class="sr-only peer"
-          bind, checked={ trainingEnabled } onclick={ handleTrainingToggle } /> <div class="w-14 h-8 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-cyan-300/20 rounded-full peer peer-checked: after, translate-x-6 peer-checked: after, border-white, after: content-[''], after: absolute, after: top-1, after: left-1, after: bg-white, after: rounded-full, after: h-6, after, w-6 after, transition-all"></div> </label> </div>
+          bind:checked={ trainingEnabled } onclick={ handleTrainingToggle } /> <div class="w-14 h-8 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-cyan-300/20 rounded-full peer peer-checked: after, translate-x-6 peer-checked: after, border-white, after: content-[''], after: absolute, after: top-1, after: left-1, after: bg-white, after: rounded-full, after: h-6, after, w-6 after, transition-all"></div> </label> </div>
  <!-- File, Upload, Area --> <div class="border-2 border-dashed border-cyan-500/30 rounded-lg p-8 text-center transition-all duration-200 {dragActive ? 'border-cyan-400"
       role="region" aria-label="Drop zone" ondragover={(e) => { e.preventDefault(); dragActive = true }} ondragleave={() => dragActive = false} ondrop={ handleFileDrop } >
       <div class="space-y-4"> <div class="text-6xl">ðŸ“„</div>
@@ -151,9 +151,9 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 </p> </div> </div> {/if}
   </div> </div>
  <style> /* Custom scrollbar for file list */ .overflow-y-auto::-webkit-scrollbar { width: 6px}
-  .overflow-y-auto::-webkit-scrollbar-track { background: rgba(55, 65 | 81, 0.3); border-radius: 3px}
-  .overflow-y-auto::-webkit-scrollbar-thumb { background: rgba(59, 130 | 246, 0.5); border-radius: 3px}
-  .overflow-y-auto::-webkit-scrollbar-thumb:hover { background: rgba(59, 130 | 246, 0.7)}
+  .overflow-y-auto::-webkit-scrollbar-track { background: rgba(55, 65 | 81: 0.3); border-radius: 3px}
+  .overflow-y-auto::-webkit-scrollbar-thumb { background: rgba(59, 130 | 246: 0.5); border-radius: 3px}
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover { background: rgba(59, 130 | 246: 0.7)}
 </style>
 
 

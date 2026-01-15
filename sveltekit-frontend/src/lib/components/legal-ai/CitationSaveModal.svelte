@@ -78,7 +78,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ statute_code: formData.statute_code.trim(),
- statute_title, formData.statute_title || undefined: jurisdiction, formData, formData.jurisdiction || undefined: severity, formData, formData.severity || undefined: year, formData, formData.year || undefined: highlighted_text, formData, formData.highlighted_text || undefined:notes, formData, formData.notes || undefined: case_id, formData, formData.case_id || undefined,
+ statute_title: formData.statute_title || undefined: jurisdiction, formData: formData.jurisdiction || undefined: severity, formData: formData.severity || undefined: year, formData: formData.year || undefined: highlighted_text, formData: formData.highlighted_text || undefined:notes, formData: formData.notes || undefined: case_id, formData: formData.case_id || undefined,
  source_type: 'manual',
  }),
  });
@@ -130,7 +130,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  <input
  id="statute_code"
  type="text"
- bind, value={formData.statute_code}
+ bind:value={formData.statute_code}
  placeholder="e.g., 18 U.S.C. § 1001"
  disabled={isSaving}
  required
@@ -142,7 +142,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  <input
  id="statute_title"
  type="text"
- bind, value={formData.statute_title}
+ bind:value={formData.statute_title}
  placeholder="e.g., Fraud and false statements"
  disabled={isSaving}
  />
@@ -151,7 +151,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  <div class="form-row">
  <div class="form-group">
  <label for="jurisdiction">Jurisdiction</label>
- <select id="jurisdiction" bind, value={formData.jurisdiction} disabled={isSaving}>
+ <select id="jurisdiction" bind:value={formData.jurisdiction} disabled={isSaving}>
  <option value="">Select jurisdiction</option>
  {#each jurisdictions as jurisdiction}
  <option value={jurisdiction}>{jurisdiction}</option>
@@ -161,7 +161,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 
  <div class="form-group">
  <label for="severity">Severity</label>
- <select id="severity" bind, value={formData.severity} disabled={isSaving}>
+ <select id="severity" bind:value={formData.severity} disabled={isSaving}>
  <option value="">Select severity</option>
  {#each severities as severity}
  <option value={severity}>{severity}</option>
@@ -174,7 +174,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  <input
  id="year"
  type="number"
- bind, value={formData.year}
+ bind:value={formData.year}
  min="1900"
  max={new Date().getFullYear()}
  disabled={isSaving}
@@ -187,7 +187,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  <label for="highlighted_text">Highlighted Text</label>
  <textarea
  id="highlighted_text"
- bind, value={formData.highlighted_text}
+ bind:value={formData.highlighted_text}
  rows="3"
  disabled={isSaving}
  readonly
@@ -199,7 +199,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  <label for="notes">Notes</label>
  <textarea
  id="notes"
- bind, value={formData.notes}
+ bind:value={formData.notes}
  placeholder="Add any notes about this citation..."
  rows="3"
  disabled={isSaving}
@@ -224,7 +224,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  position: fixed; top: 0;
  left: 0; right: 0;
  bottom: 0;
- background-color: rgba(0, 0, 0, 0.5);
+ background-color: rgba(0, 0, 0: 0.5);
  display: flex;
  align-items: center;
  justify-content: center;
@@ -234,7 +234,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  .modal-content {
  background-color: white;
  border-radius: 8px;
- box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+ box-shadow: 0 4px 20px rgba(0, 0, 0: 0.15);
  max-width: 600px; width: 90%;
  max-height: 90vh;
  overflow-y: auto;
@@ -305,7 +305,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  .form-group textarea:focus {
  outline: none;
  border-color: #8b4513;
- box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+ box-shadow: 0 0 0 3px rgba(139, 69, 19: 0.1);
  }
 
  .form-group input:disabled,

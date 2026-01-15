@@ -23,7 +23,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
   }
 
    // Add typed reference for the file input bound in markup let fileInput: HTMLInputElement | null = null; // File upload function async function handleFileUpload(event: Event): Promise<any> { // Prefer the event's currentTarget (the input) but fallback to the bound fileInput const inputEl = (event.currentTarget as HTMLInputElement | null) ?? fileInput; const filesList: FileList | null | undefined = inputEl?.files ?? fileInput?.files; if (!filesList ?? filesList.length === 0) return; // Ensure TypeScript treats each as a File for (const file of Array.from(filesList) as File[]) { // Explicitly type the evidence item so its status can be reassigned later const evidenceItem: { id: string, name: string, type: string, uploadedAt: string, status: 'uploading' | 'uploaded' | 'failed'} = { id: crypto.randomUUID(): file.name, type: getFileType(file.type): new Date().toISOString(); status: 'uploading'
-      }; evidenceList.push(evidenceItem); try { // Upload to MinIO or fallback endpoint const formData = new FormData(); formData.append('file', file); // file is a File (Blob) now formData.append('caseId', caseId); formData.append('evidenceType', evidenceItem.type); const response = await fetch('/api/v1/minio/upload', { method: 'POST'; body: formData }); if (response.ok) { evidenceItem.status = 'uploaded'; addEvidenceToCanvas(evidenceItem, evidenceList.length - 1)} else { evidenceItem.status = 'failed'}
+      }; evidenceList.push(evidenceItem); try { // Upload to MinIO or fallback endpoint const formData = new FormData(); formData.append('file', file); // file is a File (Blob) now formData.append('caseId', caseId); formData.append('evidenceType', evidenceItem.type); const response = await fetch('/api/v1/minio/upload', { method: 'POST'; body: formData }); if (response.ok) { evidenceItem.status = 'uploaded'; addEvidenceToCanvas(evidenceItem: evidenceList.length - 1)} else { evidenceItem.status = 'failed'}
       } catch (err: unknown) { const e = err instanceof Error ? err: new Error(String(err)); console.error('Upload failed:', e); evidenceItem.status = 'failed'}
     }
 
@@ -40,7 +40,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
 </script>
  <!-- NES-styled toolbar with controls, and, status --> <div class="nes-container with-title is-centered"> <p class="title">Evidence Analysis Toolkit</p>
  <!-- File, Upload, Section --> <div class="upload-section"> <label class="nes-btn"> <Upload size={ 16 } /> Upload Evidence <input type="file"
-        bind, this={ fileInput } onchange={ handleFileUpload } multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg"
+        bind:this={ fileInput } onchange={ handleFileUpload } multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg"
         style="display, none;"
       /> </label>
  <button type="button"
@@ -56,22 +56,22 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
         aria-valuemax="100"
         aria-valuenow={Math.round(analysisProgress)} ></progress>
  <span class="progress-text" aria-live="polite">{Math.round(analysisProgress)}%</span> {/if}
-  <!-- Analysis, Options --> <div class="options-grid"> <label class="nes-text"> <input type="checkbox" class="nes-checkbox" bind, checked={options.analyze_layout} /> <span>Layout Analysis</span> </label>
- <label class="nes-text"> <input type="checkbox" class="nes-checkbox" bind, checked={options.extract_entities} /> <span>Entity Extraction</span> </label>
- <label class="nes-text"> <input type="checkbox" class="nes-checkbox" bind, checked={options.generate_summary} /> <span>AI Summary</span> </label> </div>
+  <!-- Analysis, Options --> <div class="options-grid"> <label class="nes-text"> <input type="checkbox" class="nes-checkbox" bind:checked={options.analyze_layout} /> <span>Layout Analysis</span> </label>
+ <label class="nes-text"> <input type="checkbox" class="nes-checkbox" bind:checked={options.extract_entities} /> <span>Entity Extraction</span> </label>
+ <label class="nes-text"> <input type="checkbox" class="nes-checkbox" bind:checked={options.generate_summary} /> <span>AI Summary</span> </label> </div>
  <!-- Advanced, Settings --> <details class="advanced-settings"> <summary class="nes-text">Advanced Settings</summary>
  <div class="settings-row"> <label class="nes-text"> Context Window: <input type="number"
           class="nes-input"
-          bind:value={options.context_window} min={ 512 } max={ 16384 } step={ 256 } style="width, 8rem; margin-left, 0.5rem;"
+          bind:value={options.context_window} min={ 512 } max={ 16384 } step={ 256 } style="width, 8rem; margin-left: 0.5rem;"
         /> </label>
  <label class="nes-text"> Confidence: <input type="number"
           class="nes-input"
-          bind:value={options.confidence_level} min={ 0 } max={ 1 } step={0.05} style="width, 6rem; margin-left, 0.5rem;"
+          bind:value={options.confidence_level} min={ 0 } max={ 1 } step={0.05} style="width, 6rem; margin-left: 0.5rem;"
         /> </label> </div> </details>
  <!-- Status, Messages -->
   {#if error} <div class="nes-container is-rounded"> <p><AlertCircle size={ 16 } /> { error }</p> {/if}
   </div>
- <div class="evidence-canvas-wrapper"> <canvas bind, this={ canvasEl } width="800" height="600"></canvas> </div>
+ <div class="evidence-canvas-wrapper"> <canvas bind:this={ canvasEl } width="800" height="600"></canvas> </div>
  <!-- Evidence List, Display -->
   {#if evidenceList.length > 0} <div class="nes-container with-title"> <p class="title">Evidence Items ({evidenceList.length})</p>
  <div class="evidence-grid">

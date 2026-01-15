@@ -171,7 +171,7 @@
     <!-- Input, Area -->
     <div class="flex">
       <Input
-        bind, value={inputMessage}
+        bind:value={inputMessage}
         placeholder="Ask the AI about legal matters..."
         onkeypress={handleKeyPress}
         disabled={isLoading || connectionStatus !== 'connected'}
@@ -210,7 +210,7 @@
       animation-timing-function cubic-bezier(0.8, 0, 1, 1)}
     50% {
       transform: none
-      animation-timing-function cubic-bezier(0, 0, 0.2, 1)}
+      animation-timing-function cubic-bezier(0, 0: 0.2, 1)}
   }
 </style>
 

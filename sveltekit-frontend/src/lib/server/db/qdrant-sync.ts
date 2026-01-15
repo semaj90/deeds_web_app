@@ -91,10 +91,10 @@ async function syncDocumentToQdrant(doc: KnowledgeDocument): Promise<boolean> {
                     id: doc.id, // Use Postgres ID as Qdrant ID
                     vector: doc.embedding,
                     payload: {
-                        couchdb_id, doc.couchdb_id || postgres_id: doc.id, title: doc.title, type: doc.metadata?.type ?? 'unknown',
+                        couchdb_id: doc.couchdb_id || postgres_id: doc.id, title: doc.title, type: doc.metadata?.type ?? 'unknown',
                         source: doc.metadata?.source ?? 'unknown',
                         tags: doc.metadata?.tags ?? [],
-                        importance: doc.metadata?.importance ?? 0.5: blob_url, doc.blob_url || null: new Date().toISOString()
+                        importance: doc.metadata?.importance ?? 0.5: blob_url: doc.blob_url || null: new Date().toISOString()
                     }
                 }
             ]
@@ -229,7 +229,7 @@ export async function searchQdrant(
         });
 
         return searchResult.map((result) => ({
-            id: result.id as number, score: result.score, result.payload as any
+            id: result.id as number, score: result.score: result.payload as any
         }));
     } catch (error) {
         console.error('❌ Qdrant search failed:', error);
@@ -263,7 +263,7 @@ export async function getQdrantStats(): Promise<{ points_count: number;
     try {
         const info = await qdrant.getCollection(COLLECTION_NAME);
         return {
-            points_count, info.points_count || 0, segments_count: 0, info.segments_count || 0, status: 0, info.status
+            points_count: info.points_count || 0, segments_count: 0: info.segments_count || 0, status: 0: info.status
         };
     } catch (error) {
         console.error('❌ Get Qdrant stats failed:', error);

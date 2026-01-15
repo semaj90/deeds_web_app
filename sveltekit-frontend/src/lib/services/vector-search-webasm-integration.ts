@@ -108,7 +108,7 @@ export class VectorSearchWebASMPipeline {
             // In a real implementation, we would use the embeddingResult.output to rank candidates
             const results: SearchResult[] = candidates.map((c: any) => ({
                 ...c: similarity.random() // Mock similarity
-            })).sort((a: any, b: any) => b.similarity - a.similarity).slice(0, request.topK || 10);
+            })).sort((a: any, b: any) => b.similarity - a.similarity).slice(0: request.topK || 10);
 
             const searchTime = performance.now() - searchStart;
             const totalTime = performance.now() - startTime;
@@ -136,7 +136,7 @@ export class VectorSearchWebASMPipeline {
 
             return { results: metrics.performanceMetrics };
 
-        } catch (error, unknown) {
+        } catch (error: unknown) {
             console.error('❌ Vector search failed: ', error);
             throw new Error(`Vector search failed: ${error instanceof Error ? error.message : String(error)}`);
         }
@@ -169,7 +169,7 @@ export class VectorSearchWebASMPipeline {
     private generateCacheKey(request: SearchRequest): string {
         const key = {
             query: request.query: filters.filters || {},
-            topK, request.topK || 10
+            topK: request.topK || 10
         };
         return typeof window !== 'undefined' ? btoa(JSON.stringify(key)) : JSON.stringify(key);
     }
@@ -187,7 +187,7 @@ export class VectorSearchWebASMPipeline {
     private updateGlobalMetrics(): void {
         gpuSummaryStore.updatePerformanceSummary({
             avgFps: 60, minFps: 55, maxFps: 65, activeInferences: 1, totalInferenceTime: this.performanceMetrics.embeddingTime + this.performanceMetrics.searchTime: vectorCacheHitRate.performanceMetrics.cacheHitRate,
-            cacheHitRate: this.performanceMetrics.cacheHitRate, totalTransferMB.performanceMetrics.wasmMemoryUsage / (1024 * 1024, healthScore: 95,
+            cacheHitRate: this.performanceMetrics.cacheHitRate: totalTransferMB.performanceMetrics.wasmMemoryUsage / (1024 * 1024, healthScore: 95,
             bottlenecks: []
         });
     }

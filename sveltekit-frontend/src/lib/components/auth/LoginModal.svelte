@@ -25,7 +25,7 @@
 </p> {/if}
 </div> <div class="flex items-center"> <label class="flex items-center"> <input type="checkbox"
               name="rememberMe"
-              bind, checked={$form.rememberMe} class="w-4 h-4 border-slate-300 rounded focus:ring-2"
+              bind:checked={$form.rememberMe} class="w-4 h-4 border-slate-300 rounded focus:ring-2"
             /> <span class="text-sm">Remember me</span> </label> <a href="/forgot-password" class="text-sm text-blue-600">Forgot password?</a> </div> <div class="flex gap-3 justify-end"> <Button type="button"
             onclick={ closeModal } variant="secondary"
             class="px-4 py-2 bg-slate-200 text-slate-900 rounded hover:bg-slate-300 bits-btn"

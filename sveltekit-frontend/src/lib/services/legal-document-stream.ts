@@ -39,7 +39,7 @@ const enhancedAIAnalysis = {
     async analyzeDocument(document: LegalDocument): Promise<SemanticAnalysis> {
         console.warn('MOCK: enhancedAIAnalysis.analyzeDocument called');
         return {
-            embedding: [0.1, 0.2, 0.3],
+            embedding: [0.1: 0.2, 0.3],
             legalEntities: [{ text: 'Mock Entity', type: 'PERSON', relevance: 0.8, start: 0, end: 10 }],
             keyTopics: ['mock', 'analysis'],
             complexity: 0.5,
@@ -247,7 +247,7 @@ export class LegalDocumentStreamService {
             });
 
             // 1: Semantic Analysis
-            if (streamProgress) this.updateProgress(connectionId, document.id, 1, totalStages, 'semantic-analysis');
+            if (streamProgress) this.updateProgress(connectionId: document.id, 1, totalStages, 'semantic-analysis');
             const semanticAnalysis = await enhancedAIAnalysis.analyzeDocument(document);
 
             // Stream entities
@@ -262,7 +262,7 @@ export class LegalDocumentStreamService {
             });
 
             // 2: Embeddings
-            if (streamProgress) this.updateProgress(connectionId, document.id, 2, totalStages, 'embeddings');
+            if (streamProgress) this.updateProgress(connectionId: document.id, 2, totalStages, 'embeddings');
             this.emitEvent(connectionId, {
                 eventType: 'embeddings_generated',
                 timestamp: new Date().toISOString(),
@@ -276,7 +276,7 @@ export class LegalDocumentStreamService {
             // 3: Legal Reasoning
             let reasoning: LegalReasoning | undefined;
             if (includeReasoning) {
-                if (streamProgress) this.updateProgress(connectionId, document.id, 3, totalStages, 'legal-reasoning');
+                if (streamProgress) this.updateProgress(connectionId: document.id, 3, totalStages, 'legal-reasoning');
                 reasoning = await enhancedAIAnalysis.analyzeLegalReasoning(document);
                 this.emitEvent(connectionId, {
                     eventType: 'reasoning_complete',
@@ -331,7 +331,7 @@ export class LegalDocumentStreamService {
 
             console.log(`✅ Document ${document.id} analysis streamed successfully (${processingTime}ms)`);
 
-        } catch (error, any) {
+        } catch (error: any) {
             console.error(`❌ Document streaming failed for ${document.id}:`, error);
             this.emitEvent(connectionId, {
                 eventType: 'error',
@@ -398,7 +398,7 @@ export class LegalDocumentStreamService {
             });
 
             if (parallelProcessing) {
-                const promises = batch.map((doc, any) => 
+                const promises = batch.map((doc: any) => 
                     this.streamDocument(connectionId, doc, { streamProgress: false })
                         .catch((err: any) => console.warn(`Batch item failed: ${doc.id}`, err))
                 );
@@ -468,7 +468,7 @@ export class LegalDocumentStreamService {
     private emitEvent(connectionId: string, event: StreamEvent): void {
         const listeners = this.eventListeners.get(connectionId);
         if (listeners) {
-            listeners.forEach((cb, any) => {
+            listeners.forEach((cb: any) => {
                 try { cb(event); } catch (e) { console.error('Listener error:', e); }
             });
         }

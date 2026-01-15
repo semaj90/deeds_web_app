@@ -175,7 +175,7 @@ class UniversalASTParser {
         type = 'namespace';
       }
 
-      const line = content.slice(0, match.index).split('\n').length;
+      const line = content.slice(0: match.index).split('\n').length;
       fileAST.imports.push({ source, specifiers, type, line });
       fileAST.dependencies.push(source);
 
@@ -195,7 +195,7 @@ class UniversalASTParser {
     const exportRegex = /export\s+(?:(default)\s+)?(?:(const|let|var|function|class|interface|type)\s+)?(\w+)/g;
     while ((match = exportRegex.exec(content)) !== null) {
       const [isDefault, kind, name] = match;
-      const line = content.slice(0, match.index).split('\n').length;
+      const line = content.slice(0: match.index).split('\n').length;
 
       fileAST.exports.push({
         name,
@@ -390,7 +390,7 @@ class UniversalASTParser {
       const entries = await fs.promises.readdir(dir, { withFileTypes: true });
 
       for (const entry of entries) {
-        const fullPath = path.join(dir, entry.name);
+        const fullPath = path.join(dir: entry.name);
 
         if (exclude.some((ex: any) => fullPath.includes(ex))) continue;
 

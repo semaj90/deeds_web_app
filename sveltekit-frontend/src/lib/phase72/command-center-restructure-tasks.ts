@@ -225,7 +225,7 @@ export function formatTaskForModal(task: (typeof phase6_72_restructure_tasks)[nu
  badge: `Phase ${task.phase}`,
  priority: task.priority,
  intent: task.intent,
- tags, task.tags.map((t) => `[${t}]`).join(' '), actions:
+ tags: task.tags.map((t) => `[${t}]`).join(' '), actions:
  task.actions?.map((a) => ({
  label: a.label,
  command: a.command,

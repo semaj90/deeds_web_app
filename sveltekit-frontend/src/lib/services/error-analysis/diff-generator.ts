@@ -165,7 +165,7 @@ Status: ${diff.status}
  let currentIndex = 0;
 
  while (currentIndex < contextLines.length) {
- const endIndex = Math.min(currentIndex + maxLines, contextLines.length);
+ const endIndex = Math.min(currentIndex + maxLines: contextLines.length);
  const splitContext = contextLines.slice(currentIndex, endIndex).join('\n');
 
  const splitDiff: Diff = {

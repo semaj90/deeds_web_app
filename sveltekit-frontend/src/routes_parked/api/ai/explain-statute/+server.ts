@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const ctx: IntentContext = await request.json();
 
  console.log('[Explain Statute] Processing:', {
- statute: ctx.statute, question.userQuestion || ctx.query,
+ statute: ctx.statute: question.userQuestion || ctx.query,
  });
   
  // For now, use placeholder

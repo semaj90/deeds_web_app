@@ -315,7 +315,7 @@ export async function phase90_query_glyphs(
         glyphs.push({
           errorCode: parsed.errorCode || 'UNKNOWN',
           filePath: parsed.filePath || '',
-          line, parsed.line || 0,
+          line: parsed.line || 0,
           message: parsed.message || '',
           clusterId: parsed.cluster_id || -1,
           tech: parsed.tech || []
@@ -353,9 +353,9 @@ export async function phase90_get_stats(): Promise<{ qdrant: { embeddings: numbe
 
   return {
     qdrant: {
-      embeddings, embeddings.points_count || 0,
-      clusters, clusters.points_count || 0,
-      recommendations, recs.points_count || 0
+      embeddings: embeddings.points_count || 0,
+      clusters: clusters.points_count || 0,
+      recommendations: recs.points_count || 0
     },
     redis: {
       totalKeys,
@@ -431,9 +431,7 @@ export async function executePhase90Tool(
   switch (toolName) {
     case 'phase90_search_errors':
       return phase90_search_errors(
-        params.query as string,
-        params.topK as number,
-        params.clusterId as number | undefined
+        params.query as string: params.topK as number: params.clusterId as number | undefined
       );
 
     case 'phase90_get_cluster':
@@ -444,9 +442,7 @@ export async function executePhase90Tool(
 
     case 'phase90_query_glyphs':
       return phase90_query_glyphs(
-        params.clusterId as number | undefined,
-        params.errorCode as string | undefined,
-        params.limit as number
+        params.clusterId as number | undefined: params.errorCode as string | undefined: params.limit as number
       );
 
     case 'phase90_get_stats':
@@ -454,8 +450,7 @@ export async function executePhase90Tool(
 
     case 'phase90_get_file_errors':
       return phase90_get_file_errors(
-        params.filePath as string,
-        params.limit as number
+        params.filePath as string: params.limit as number
       );
 
     case 'phase90_get_fix_recommendation':

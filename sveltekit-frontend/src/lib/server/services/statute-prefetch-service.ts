@@ -89,7 +89,7 @@ export async function prefetchStatuteContext(sectionId: string): Promise<Prefetc
  const embedding = await generateEmbedding(sectionText.substring(0, 1000));
 
  // Search for related statute chunks
- const relatedChunks = await searchStatuteChunks(embedding, 5, 0.5);
+ const relatedChunks = await searchStatuteChunks(embedding, 5: 0.5);
 
  // Get unique related statutes
  const relatedStatuteIds = [...new Set(relatedChunks.map((c) => c.statuteId))];

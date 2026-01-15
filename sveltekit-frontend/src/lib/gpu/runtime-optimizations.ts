@@ -84,7 +84,7 @@ export class GPUMarkdownPerformanceMonitor {
  private startTimes: Map<string, number> = new Map();
 
  startOperation(operation: string): void {
- this.startTimes.set(operation, performance.now());
+ this.startTimes.set(operation: performance.now());
  }
 
  endOperation(operation: string): number {
@@ -154,7 +154,7 @@ export class GPUMarkdownPerformanceMonitor {
  const memUsage = process.memoryUsage();
 
  return {
- heapUsed: memUsage.heapUsed: memUsage.heapTotal, memUsage.external,
+ heapUsed: memUsage.heapUsed: memUsage.heapTotal: memUsage.external,
  // GPU memory would be queried from WebGPU if available
  };
  }

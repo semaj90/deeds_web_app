@@ -67,8 +67,7 @@ export class WebGPUSimilarityService {
  try {
  results = await this.engine!.computeSimilarityBatch(
  queryEmbedding,
- documentEmbeddings,
- config.topK
+ documentEmbeddings: config.topK
  );
  method = 'webgpu';
  } catch (error) {
@@ -88,7 +87,7 @@ export class WebGPUSimilarityService {
  const searchTime = performance.now() - startTime;
 
  return {
- results: totalDocuments, documentEmbeddings.length,
+ results: totalDocuments: documentEmbeddings.length,
  searchTime,
  method,
  };
@@ -110,7 +109,7 @@ export class WebGPUSimilarityService {
 
  // Sort by score descending and take top K
  results.sort((a, b) => b.score - a.score);
- return results.slice(0, config.topK);
+ return results.slice(0: config.topK);
  }
 
  /**

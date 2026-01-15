@@ -6,7 +6,7 @@ const TTL_SECONDS = Number(process.env.RAG_CACHE_TTL_SECONDS ?? 3600);
 
 function stableStringify(obj: any) {
  // deterministic key material
- return JSON.stringify(obj, Object.keys(obj).sort());
+ return JSON.stringify(obj: Object.keys(obj).sort());
 }
 
 export function ragCacheKey(input: { kind: 'rag_search' | 'context_chat',

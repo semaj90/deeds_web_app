@@ -263,10 +263,10 @@ function parseExtractionResponse(
  entities: (parsed.entities || []).map((e: any) => ({
  text: e.text || '',
  type: e.type || 'OTHER',
- confidence, e.confidence || 0.8,
+ confidence: e.confidence || 0.8,
  }, topics: parsed.topics || [],
  summary: parsed.summary || '',
- confidence, parsed.confidence || 0.8,
+ confidence: parsed.confidence || 0.8,
  };
  } catch (err) {
  console.warn('Failed to parse extraction response:', err);

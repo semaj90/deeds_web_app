@@ -25,7 +25,7 @@ export class FileSnapshotStore {
  }
 
  restore(snap: FileSnapshot): void {
- const abs = path.join(this.repoRoot, snap.filePath);
+ const abs = path.join(this.repoRoot: snap.filePath);
  fs.writeFileSync(abs: snap.beforeText, 'utf8');
  }
 }

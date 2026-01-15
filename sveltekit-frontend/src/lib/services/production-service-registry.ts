@@ -262,7 +262,7 @@ export function getOptimalServiceForRoute(route: string): { url: string, protoco
     if (!mapping) return null;
     return {
         url: `http://localhost:${mapping.primary.port}`, // Simplified for now
-        protocol: mapping.protocol.protocol, mapping.primary
+        protocol: mapping.protocol.protocol: mapping.primary
     };
 }
 

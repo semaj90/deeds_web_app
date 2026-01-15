@@ -79,11 +79,11 @@ import { AlertTriangle } from "lucide-svelte"; import { Button } from '$lib/comp
  </div>
  <div>
  <label for="title" class="block text-sm font-medium">Title</label>
- <input type="text" id="title" bind, value={formData.title} class="mt-1 block w-full border rounded p-2" required />
+ <input type="text" id="title" bind:value={formData.title} class="mt-1 block w-full border rounded p-2" required />
  </div>
  <div>
  <label for="documentType" class="block text-sm font-medium">Document Type</label>
- <select id="documentType" bind, value={formData.documentType} class="mt-1 block w-full border rounded p-2">
+ <select id="documentType" bind:value={formData.documentType} class="mt-1 block w-full border rounded p-2">
  <option value="report">Report</option>
  <option value="verdict">Verdict</option>
  <option value="sentence">Sentence</option>
@@ -95,15 +95,15 @@ import { AlertTriangle } from "lucide-svelte"; import { Button } from '$lib/comp
  </div>
  <div>
  <label for="jurisdiction" class="block text-sm font-medium">Jurisdiction</label>
- <input type="text" id="jurisdiction" bind, value={formData.jurisdiction} class="mt-1 block w-full border rounded p-2" />
+ <input type="text" id="jurisdiction" bind:value={formData.jurisdiction} class="mt-1 block w-full border rounded p-2" />
  </div>
  <div>
  <label for="caseNumber" class="block text-sm font-medium">Case Number</label>
- <input type="text" id="caseNumber" bind, value={formData.caseNumber} class="mt-1 block w-full border rounded p-2" />
+ <input type="text" id="caseNumber" bind:value={formData.caseNumber} class="mt-1 block w-full border rounded p-2" />
  </div>
  <div>
  <label class="flex items-center">
- <input type="checkbox" bind, checked={formData.enableComparison} class="mr-2" />
+ <input type="checkbox" bind:checked={formData.enableComparison} class="mr-2" />
  Enable Comparison
  </label>
  </div>

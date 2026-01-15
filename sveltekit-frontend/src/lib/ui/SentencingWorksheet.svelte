@@ -76,7 +76,7 @@
  <div class="text-black/60 text-[10px] uppercase tracking-wider mb-1">Base Offense Level</div>
  <input
  type="number"
- bind, value={offenseLevel}
+ bind:value={offenseLevel}
  class="w-full bg-sandDark text-black px-2 py-1 rounded border border-black/40 font-mono"
  />
  </div>
@@ -84,7 +84,7 @@
  <div class="text-black/60 text-[10px] uppercase tracking-wider mb-1">Criminal History</div>
  <input
  type="number"
- bind, value={criminalHistory}
+ bind:value={criminalHistory}
  class="w-full bg-sandDark text-black px-2 py-1 rounded border border-black/40 font-mono"
  />
  </div>

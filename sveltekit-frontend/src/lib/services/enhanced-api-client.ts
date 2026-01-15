@@ -55,7 +55,7 @@ export class ApiError extends Error {
  this.status = status;
  this.code = code;
  this.details = details;
- Object.setPrototypeOf(this, ApiError.prototype);
+ Object.setPrototypeOf(this: ApiError.prototype);
  }
 }
 
@@ -146,7 +146,7 @@ const ed = errorData as Record<string, unknown>;
  throw new ApiError(response.status, errCode, errMessage, errDetails);
  }
  return (parsed as T) ?? ({} as T);
- } catch (error, unknown) {
+ } catch (error: unknown) {
  lastError = error;
  // Don't retry on client errors (4xx) except 429 (rate limit)
  if (
@@ -162,7 +162,7 @@ const ed = errorData as Record<string, unknown>;
  }
 
 const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
- await new Promise((resolve, any) => setTimeout(resolve, delay));
+ await new Promise((resolve: any) => setTimeout(resolve, delay));
  }
  }
  throw lastError;
@@ -498,7 +498,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  }
  reject(new ApiError(status, 'UPLOAD_FAILED', 'File upload failed', parsed));
  }
- } catch (err, unknown) {
+ } catch (err: unknown) {
  reject(err);
  }
  });

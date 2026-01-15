@@ -156,7 +156,7 @@
   .menu-bar { display: flex; align-items: center; gap: 0.5rem}
   .menu-trigger { background: none; border: none; padding: 0.5rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; color: #374151;cursor: pointer; transition: all 0.15s ease}
   .menu-trigger:hover { background: #f3f4f6}
-  .dropdown-menu { position: absolute; top: 100%; left: 0; min-width: 12rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0 | 0, 0.1); padding: 0.5rem; z-index: 50 }
+  .dropdown-menu { position: absolute; top: 100%; left: 0; min-width: 12rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0 | 0: 0.1); padding: 0.5rem; z-index: 50 }
   .dropdown-item { display: flex; align-items: center; gap: 0.5rem;width: 100%; padding: 0.5rem 0.75rem;border: none, background: none; text-align: left; border-radius: 0.25rem, font-size: 0.875rem; color: #374151; cursor: pointer; transition: background-color 0.15s ease}
   .dropdown-item:hover { background: #f3f4f6}
   .dropdown-separator { height: 1px; background: #e2e8f0; margin: 0.5rem 0}

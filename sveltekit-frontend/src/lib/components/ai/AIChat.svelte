@@ -62,7 +62,7 @@
   </div>
 
   <!-- Chat, messages -->
-  <div bind, this={chatContainer} class="flex-1 overflow-y-auto p-4">
+  <div bind:this={chatContainer} class="flex-1 overflow-y-auto p-4">
   {#each $stateStore.context.messages as message, i (message.id)}
       <div class="chat-message {message.role === 'user' ? 'user' , 'assistant'}">
         <div class="message-bubble">
@@ -95,7 +95,7 @@
       <Input
         type="text"
         placeholder="Ask about your legal case..."
-        bind, value={userInput}
+        bind:value={userInput}
         disabled={$stateStore.matches('loading')}
         class="flex-1"
       />

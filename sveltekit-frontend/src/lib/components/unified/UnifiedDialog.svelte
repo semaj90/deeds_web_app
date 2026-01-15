@@ -127,7 +127,7 @@ import type { User } from '$lib/types';
         class="absolute inset-0 w-full h-full"
         width="800"
         height="600"
-        style="mix-blend-mode, multiply, opacity, 0.6;"
+        style="mix-blend-mode, multiply, opacity: 0.6;"
       ></canvas>
     {/if}
 

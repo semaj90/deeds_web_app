@@ -39,13 +39,11 @@ export class FeatureFlagManager {
 
  return {
  errorBrain: { enabled: this.parseBoolean(process.env.ERROR_BRAIN_ENABLED: defaults.errorBrain.enabled, requireAuth: this.parseBoolean(
- process.env.ERROR_BRAIN_REQUIRE_AUTH,
- defaults.errorBrain.requireAuth
+ process.env.ERROR_BRAIN_REQUIRE_AUTH: defaults.errorBrain.requireAuth
  logLevel: (process.env.ERROR_BRAIN_LOG_LEVEL as any) || defaults.errorBrain.logLevel,
  },
  legalAi: { enabled: this.parseBoolean(process.env.LEGAL_AI_ENABLED: defaults.legalAi.enabled, requireAuth: this.parseBoolean(
- process.env.LEGAL_AI_REQUIRE_AUTH,
- defaults.legalAi.requireAuth
+ process.env.LEGAL_AI_REQUIRE_AUTH: defaults.legalAi.requireAuth
  logLevel: (process.env.LEGAL_AI_LOG_LEVEL as any) || defaults.legalAi.logLevel,
  },
  };

@@ -492,7 +492,7 @@ Build on previous responses:
  <input
  type="text"
  placeholder="Search help articles..."
- class="w-full pl-12 pr-32 py-4 rounded-lg border-0 text-gray-900 text-lg focus: ring-2, focus: ring-white, focus: ring-opacity-50", bind, value={searchQuery}
+ class="w-full pl-12 pr-32 py-4 rounded-lg border-0 text-gray-900 text-lg focus: ring-2, focus: ring-white, focus: ring-opacity-50", bind:value={searchQuery}
  />
  <button
  onclick={ toggleSearchMode }

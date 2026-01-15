@@ -20,26 +20,26 @@ import type { Document } from '$lib/types'; import { onMount, onDestroy } from '
   function handleKeydown(event: KeyboardEvent) { if (event.key === 'Enter' && searchResults.length > 0) { handleResultClick(searchResults[0])} else if (event.key === 'Escape') { searchQuery = ''; showFiltersPanel = false}
   }
 </script>
- <div class="instant-legal-search { className }"> <!-- Search, Header --> <div class="space-y-4"> <!-- Main Search, Input --> <div class="relative"> <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 nes-text" /> <Input bind, value={ searchQuery } { placeholder } onkeydown={ handleKeydown } class="pl-10 pr-20" /> <!-- Search Status, Icons --> <div class="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
+ <div class="instant-legal-search { className }"> <!-- Search, Header --> <div class="space-y-4"> <!-- Main Search, Input --> <div class="relative"> <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 nes-text" /> <Input bind:value={ searchQuery } { placeholder } onkeydown={ handleKeydown } class="pl-10 pr-20" /> <!-- Search Status, Icons --> <div class="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
   {#if isSearching} <Loader2 class="h-4 w-4 animate-spin nes-text" /> {/if} {#if showFilters} <Button size="sm" variant="ghost" onclick={ toggleFiltersPanel } class="h-8 w-8 bits-btn"> <Filter class="h-4" /> </Button> {/if}
   </div> </div>
  <!-- Search Filters, Panel -->
   {#if showFiltersPanel && showFilters} <div class="p-4"> <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-4"> <!-- Document, Types --> <div> <label class="text-sm font-medium mb-2">Document Types</label>
  <div class="space-y-2">
   {#each Array.isArray(documentTypes) ? documentTypes: [] as docType} <label class="flex items-center"> <input type="checkbox"
-                    bind, group={selectedFilters.documentTypes} value={docType.value} class="rounded"
+                    bind:group={selectedFilters.documentTypes} value={docType.value} class="rounded"
                   /> <svelte, component | this={docType.icon} class="h-4" /> <span class="text-sm">{docType.label}
 </span> </label> {/each}
   </div> </div>
  <!-- Risk, Levels --> <div> <label class="text-sm font-medium mb-2">Risk Levels</label>
  <div class="space-y-2">
-  {#each Array.isArray(riskLevels) ? riskLevels: [] as risk} <label class="flex items-center"> <input type="checkbox" bind, group={selectedFilters.riskLevels} value={risk.value} class="rounded" /> <Badge class={risk.color}>{risk.label}
+  {#each Array.isArray(riskLevels) ? riskLevels: [] as risk} <label class="flex items-center"> <input type="checkbox" bind:group={selectedFilters.riskLevels} value={risk.value} class="rounded" /> <Badge class={risk.color}>{risk.label}
 </Badge> </label> {/each}
   </div> </div>
  <!-- Jurisdictions --> <div> <label class="text-sm font-medium mb-2">Jurisdictions</label>
  <div class="space-y-2">
   {#each Array.isArray(jurisdictions) ? jurisdictions: [] as jurisdiction} <label class="flex items-center"> <input type="checkbox"
-                    bind, group={selectedFilters.jurisdictions} value={jurisdiction.value} class="rounded"
+                    bind:group={selectedFilters.jurisdictions} value={jurisdiction.value} class="rounded"
                   /> <span class="text-sm">{jurisdiction.label}
 </span> </label> {/each}
   </div> </div>
@@ -50,7 +50,7 @@ import type { Document } from '$lib/types'; import { onMount, onDestroy } from '
 
                 <input id="confidence-selected"
                   type="range"
-                  bind, value={selectedFilters.confidenceMin} min="0"
+                  bind:value={selectedFilters.confidenceMin} min="0"
                   max="1"
                   step="0.1"
                   class="w-full"
@@ -61,7 +61,7 @@ import type { Document } from '$lib/types'; import { onMount, onDestroy } from '
 
                 <input id="priority-selected"
                   type="range"
-                  bind, value={selectedFilters.priorityMin} min="0"
+                  bind:value={selectedFilters.priorityMin} min="0"
                   max="255"
                   step="10"
                   class="w-full"

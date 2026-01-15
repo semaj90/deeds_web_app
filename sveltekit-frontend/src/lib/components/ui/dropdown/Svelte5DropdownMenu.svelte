@@ -126,7 +126,7 @@ $effect(() => {
 
 <div class="relative inline-block {className}">
 	<button
-		bind, this={triggerRef}
+		bind:this={triggerRef}
 		type="button"
 		class="inline-flex items-center justify-center"
 		aria-haspopup="menu"
@@ -149,7 +149,7 @@ $effect(() => {
 
 	{#if open}
 		<div
-			bind, this={menuRef}
+			bind:this={menuRef}
 			class="absolute z-50 {alignClasses} {sideClasses}
 				   min-w-[180px] py-1
 				   bg-slate-800 border border-slate-600 rounded-lg shadow-xl

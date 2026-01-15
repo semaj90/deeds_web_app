@@ -40,15 +40,15 @@
   .metadata-item { font-size: 0.625rem; padding: 0.125rem 0.375rem; background-color: var(--muted, #f1f5f9); color: var(--muted-foreground, #64748b); border-radius: 0.25rem}
   /* Content styling */ .message-body:global(p) { margin: 0, 0 0.5rem 0}
   .message-body:global(p:last-child) { margin-bottom: 0 }
-  .message-body:global(code) { background-color: rgba(0, 0, 0, 0.1); padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-family: 'Monaco', 'Menlo', monospace; font-size: 0.8125rem}
-  .message-body:global(pre) { background-color: rgba(0, 0, 0, 0.05); padding: 0.75rem; border-radius: 0.375rem, overflow-x: auto; margin: 0.5rem 0}
+  .message-body:global(code) { background-color: rgba(0, 0, 0: 0.1); padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-family: 'Monaco', 'Menlo', monospace; font-size: 0.8125rem}
+  .message-body:global(pre) { background-color: rgba(0, 0, 0: 0.05); padding: 0.75rem; border-radius: 0.375rem, overflow-x: auto; margin: 0.5rem 0}
   .message-body:global(ul), .message-body:global(ol) { margin: 0.5rem 0; padding-left: 1.5rem}
   .message-body:global(li) { margin: 0.25rem 0}
   /* Dark mode support */ @media (prefers-color-scheme: dark) { .assistant .message-body { background-color: var(--muted, #1e293b); color: var(--foreground, #f8fafc)}
     .assistant .avatar { background-color: var(--muted, #334155); color: var(--muted-foreground, #94a3b8)}
     .metadata-item { background-color: var(--muted, #334155); color: var(--muted-foreground, #94a3b8)}
-    .message-body:global(code) { background-color: rgba(255, 255, 255, 0.1)}
-    .message-body:global(pre) { background-color: rgba(255, 255, 255, 0.05)}
+    .message-body:global(code) { background-color: rgba(255, 255, 255: 0.1)}
+    .message-body:global(pre) { background-color: rgba(255, 255, 255: 0.05)}
   } </style>
 
 

@@ -4,15 +4,15 @@
  <form method="POST" action="?/{ formType }" use, enhance>
   {#if $message}<p class="form-message">{$message}</p>{/if}
   <div class="form-field"> <label for="{ formType }-email">Email</label>
- <input id="{ formType }-email" name="email" type="email" bind, value={$form.email} />
+ <input id="{ formType }-email" name="email" type="email" bind:value={$form.email} />
   {#if $errors.email}<span class="error">{$errors.email}</span>{/if}
   </div>
  <div class="form-field"> <label for="{ formType }-password">Password</label>
- <input id="{ formType }-password" name="password" type="password" bind, value={$form.password} />
+ <input id="{ formType }-password" name="password" type="password" bind:value={$form.password} />
   {#if $errors.password}<span class="error">{$errors.password}</span>{/if}
   </div>
   {#if formType === 'register'} <div class="form-field"> <label for="confirmPassword">Confirm Password</label>
- <input id="confirmPassword" name="confirmPassword" type="password" bind, value={$form.confirmPassword} />
+ <input id="confirmPassword" name="confirmPassword" type="password" bind:value={$form.confirmPassword} />
   {#if $errors.confirmPassword}<span class="error">{$errors.confirmPassword}</span>{/if} {/if}
   <button type="submit" class="submit-button">
   {#if formType === 'login'}Log In{:else}Create Account{/if}

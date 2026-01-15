@@ -54,7 +54,7 @@ export class IntelligentErrorRouter {
 		const routedErrors: RoutedError[] = [];
 
 		for (const pattern of analysisResult.patterns) {
-			const routed = await this.routeError(pattern, analysisResult.clusters);
+			const routed = await this.routeError(pattern: analysisResult.clusters);
 			routedErrors.push(routed);
 		}
 

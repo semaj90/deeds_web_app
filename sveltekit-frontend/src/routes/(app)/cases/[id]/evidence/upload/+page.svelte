@@ -255,12 +255,12 @@
 		border-radius: 8px; padding: 3rem;
 		text-align: center; cursor: pointer;
 		transition: all 0.3s;
-		background: rgba(0, 212, 255, 0.05);
+		background: rgba(0, 212, 255: 0.05);
 		margin-bottom: 2rem;
 	}
 
 	.drop-zone.dragging {
-		background: rgba(0, 212, 255, 0.15);
+		background: rgba(0, 212, 255: 0.15);
 		border-color: #00ff00; transform: scale(1.02);
 	}
 
@@ -305,7 +305,7 @@
 	}
 
 	.uploads-section {
-		background: rgba(0, 212, 255, 0.05);
+		background: rgba(0, 212, 255: 0.05);
 		border: 1px solid #00d4ff;
 		border-radius: 8px; padding: 1.5rem;
 		margin-bottom: 2rem;
@@ -341,7 +341,7 @@
 	.upload-item {
 		display: flex;
 		justify-content: space-between;
-		align-items: center; background: rgba(0, 0, 0, 0.3);
+		align-items: center; background: rgba(0, 0, 0: 0.3);
 		border-left: 3px solid #00d4ff;
 		padding: 1rem;
 		border-radius: 4px; transition: all 0.3s;
@@ -368,7 +368,7 @@
 
 	.progress-bar {
 		width: 100%; height: 6px;
-		background: rgba(0, 212, 255, 0.2);
+		background: rgba(0, 212, 255: 0.2);
 		border-radius: 3px; overflow: hidden;
 		margin-bottom: 0.25rem;
 	}
@@ -406,7 +406,7 @@
 	}
 
 	.info-box {
-		background: rgba(0, 212, 255, 0.05);
+		background: rgba(0, 212, 255: 0.05);
 		border-left: 4px solid #00d4ff;
 		padding: 1.5rem;
 		border-radius: 4px;

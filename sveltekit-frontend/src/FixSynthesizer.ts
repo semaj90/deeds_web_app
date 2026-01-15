@@ -71,7 +71,7 @@ export class FixSynthesizer {
         .slice(0, 3);
 
       // Generate fix using Gemma3
-      const fixSuggestion = await ollama.generateFixSuggestion(error, successfulFixes.map((f) => ({
+      const fixSuggestion = await ollama.generateFixSuggestion(error: successfulFixes.map((f) => ({
           message: error.message,
           code: f.code,
         }))
@@ -204,11 +204,11 @@ export class FixSynthesizer {
   ): Promise<boolean> {
     switch (rule.type) {
       case 'syntax':
-        return this.validateSyntax(strategy.code, error.file);
+        return this.validateSyntax(strategy.code: error.file);
       case 'type':
-        return this.validateTypes(strategy.code, error.file);
+        return this.validateTypes(strategy.code: error.file);
       case 'ast':
-        return this.validateAST(strategy.code, error.file);
+        return this.validateAST(strategy.code: error.file);
       default:
         return true;
     }

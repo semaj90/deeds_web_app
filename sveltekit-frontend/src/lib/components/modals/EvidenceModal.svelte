@@ -97,10 +97,10 @@ Edit
       </div>
     {:else}
       <form class="flex flex-col gap-2" onsubmit|preventDefault={handleSave}>
-        <input name="jsonData.title" bind, value={title} placeholder="Title" class="input" />
-        <input name="jsonData.description" bind, value={description} placeholder="Description" class="input" />
-        <input name="jsonData.tags" bind, value={tagsString} placeholder="Tags (comma, separated)" class="input" />
-        <input name="jsonData.type" bind, value={type} placeholder="Type" class="input" />
+        <input name="jsonData.title" bind:value={title} placeholder="Title" class="input" />
+        <input name="jsonData.description" bind:value={description} placeholder="Description" class="input" />
+        <input name="jsonData.tags" bind:value={tagsString} placeholder="Tags (comma, separated)" class="input" />
+        <input name="jsonData.type" bind:value={type} placeholder="Type" class="input" />
         <div class="flex gap-2">
           <Button type="submit" class="uno-bg-green-600 uno-text-white uno-px-3 uno-py-1 uno-rounded bits-btn bits-btn">
 Save
@@ -119,7 +119,7 @@ Cancel
 <style>
   /* @unocss-include */
   .uno-shadow {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08)}
+    box-shadow: 0 2px 8px rgba(0,0,0: 0.08)}
   .input.input-bordered {
     border: 1px solid #d1d5db
     border-radius: 0.375rem

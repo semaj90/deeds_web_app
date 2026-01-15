@@ -293,7 +293,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 					<textarea
 						id="caseFacts"
 						name="caseFacts"
-						bind, value={$formData.caseFacts}
+						bind:value={$formData.caseFacts}
 						placeholder="Enter detailed case facts, evidence, witness statements, and relevant circumstances..."
 						rows="8"
 						required
@@ -303,7 +303,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 				<div class="form-row">
 					<div class="form-group">
 						<label for="caseType">Case Type</label>
-						<select id="caseType" name="caseType" bind, value={$formData.caseType}>
+						<select id="caseType" name="caseType" bind:value={$formData.caseType}>
 							{#each caseTypes as type (type.value)}
 								<option value={type.value}>{type.label}</option>
 							{/each}
@@ -312,7 +312,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 					<div class="form-group">
 						<label for="jurisdiction">Jurisdiction</label>
-						<select id="jurisdiction" name="jurisdiction" bind, value={$formData.jurisdiction}>
+						<select id="jurisdiction" name="jurisdiction" bind:value={$formData.jurisdiction}>
 							{#each jurisdictions as juris (juris.value)}
 								<option value={juris.value}>{juris.label}</option>
 							{/each}
@@ -321,7 +321,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 					<div class="form-group">
 						<label for="partyType">Your Role</label>
-						<select id="partyType" name="partyType" bind, value={$formData.partyType}>
+						<select id="partyType" name="partyType" bind:value={$formData.partyType}>
 							{#each partyTypes as party (party.value)}
 								<option value={party.value}>{party.label}</option>
 							{/each}
@@ -346,7 +346,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 							<textarea
 								id="historicalData"
 								name="historicalData"
-								bind, value={$formData.historicalData}
+								bind:value={$formData.historicalData}
 								placeholder="Enter historical case data, one per line..."
 								rows="4"
 							></textarea>
@@ -360,7 +360,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 							<textarea
 								id="similarCases"
 								name="similarCases"
-								bind, value={$formData.similarCases}
+								bind:value={$formData.similarCases}
 								placeholder="Enter similar case references, one per line..."
 								rows="4"
 							></textarea>
@@ -400,7 +400,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 			<div class="results-header">
 				<h3>📊 Case Outcome Analysis</h3>
 				<div class="export-controls">
-					<select bind, value={$exportFormat}>
+					<select bind:value={$exportFormat}>
 						<option value="json">JSON</option>
 						<option value="txt">Text Report</option>
 					</select>
@@ -659,7 +659,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	.prediction-form {
 		background: white;
 		border-radius: 12px; padding: 2rem;
-		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 4px 6px rgba(0, 0, 0: 0.1);
 		margin-bottom: 2rem;
 	}
 
@@ -718,7 +718,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	}; textarea:focus, select:focus, focus:focus {
 		outline: none;
 		border-color: #3498db;
-		box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+		box-shadow: 0 0 0 3px rgba(52, 152, 219: 0.1);
 	}
 
 	textarea {
@@ -750,7 +750,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 	.primary-button:hover, not(disabled) {
 		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+		box-shadow: 0 4px 12px rgba(52, 152, 219: 0.3);
 	}
 
 	.primary-button:disabled {
@@ -788,7 +788,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	.prediction-results {
 		background: white;
 		border-radius: 12px; padding: 2rem;
-		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 4px 6px rgba(0, 0, 0: 0.1);
 	}
 
 	.results-header {
@@ -1012,7 +1012,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	.analysis-history {
 		background: white;
 		border-radius: 12px; padding: 2rem;
-		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 4px 6px rgba(0, 0, 0: 0.1);
 		margin-top: 2rem;
 	}
 
@@ -1036,7 +1036,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	.history-item:hover {
 		background: #e9ecef;
 		border-color: #3498db; transform: translateY(-1px);
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 2px 4px rgba(0, 0, 0: 0.1);
 	}
 
 	.history-header {

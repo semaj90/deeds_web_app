@@ -8,7 +8,7 @@ import type { Document } from '$lib/types'; /** * GPU-Accelerated RAG Search Com
   {#if gpuAccelerated && searchTime} <div class="gpu-badge"> <Zap class="w-3" /> <span class="text-xs">GPU: { searchTime }</span> {/if}
   </div>
  <div class="search-input-wrapper"> <Search class="search-icon" /> <input type="text"
-        bind, value={ query } onkeydown={ handleKeydown } placeholder="Search legal documents with AI embeddings..."
+        bind:value={ query } onkeydown={ handleKeydown } placeholder="Search legal documents with AI embeddings..."
         class="search-input"
         disabled={ isLoading } /> <!-- Replaced custom Button with a native button to avoid component typing, issues --> <button onclick={ performSearch } disabled={isLoading || !query.trim()} class="search-button inline-flex items-center gap-2 px-3 py-1 rounded text-sm bg-transparent"
         aria-label="Search"
@@ -27,29 +27,29 @@ import type { Document } from '$lib/types'; /** * GPU-Accelerated RAG Search Com
   </div> </div> {/each}
   </div> {/if}
   </div>
- <style> .gpu-rag-search { display: flex; flex-direction: column; gap: 1.5rem;padding: 1rem; background: rgba(15, 23, 36, 0.6); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 0.5rem}
+ <style> .gpu-rag-search { display: flex; flex-direction: column; gap: 1.5rem;padding: 1rem; background: rgba(15, 23, 36: 0.6); border: 1px solid rgba(6, 182, 212: 0.2); border-radius: 0.5rem}
   .search-container { display: flex; flex-direction: column; gap: 1rem}
   .search-header { display: flex; justify-content: space-between; align-items: center}
-  .gpu-badge { display: flex; align-items: center; gap: 0.25rem;padding: 0.25rem 0.5rem; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 0.25rem; color: #06b6d4}
-  .search-input-wrapper { display: flex; align-items: center; gap: 0.5rem;padding: 0.75rem; background: rgba(15, 23, 36, 0.8); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 0.375rem; transition: border-color 0.2s}
-  .search-input-wrapper:focus-within { border-color: rgba(6, 182, 212, 0.6)}
-  .search-icon { width: 1.25rem; height: 1.25rem;color: rgba(6, 182, 212, 0.6); flex-shrink: 0}
+  .gpu-badge { display: flex; align-items: center; gap: 0.25rem;padding: 0.25rem 0.5rem; background: rgba(6, 182, 212: 0.1); border: 1px solid rgba(6, 182, 212: 0.3); border-radius: 0.25rem; color: #06b6d4}
+  .search-input-wrapper { display: flex; align-items: center; gap: 0.5rem;padding: 0.75rem; background: rgba(15, 23, 36: 0.8); border: 1px solid rgba(6, 182, 212: 0.3); border-radius: 0.375rem; transition: border-color 0.2s}
+  .search-input-wrapper:focus-within { border-color: rgba(6, 182, 212: 0.6)}
+  .search-icon { width: 1.25rem; height: 1.25rem;color: rgba(6, 182, 212: 0.6); flex-shrink: 0}
   .search-input { flex: 1; background: transparent; border: none; outline: none;color: #e6eef8; font-size: 0.875rem; font-family: 'Courier New', monospace}
-  .search-input: placeholder { color: rgba(230, 238, 248, 0.4)}
+  .search-input: placeholder { color: rgba(230, 238, 248: 0.4)}
   .search-input:disabled { opacity: 0.5; cursor:not-allowed}
   .search-button { flex-shrink: 0; /* keep existing spacing/styling for the native button */ }
-  .error-message { padding: 0.75rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 0.375rem}
+  .error-message { padding: 0.75rem; background: rgba(239, 68, 68: 0.1); border: 1px solid rgba(239, 68, 68: 0.3); border-radius: 0.375rem}
   .results-container { display: flex; flex-direction: column; gap: 1rem}
-  .results-header { font-size: 0.875rem; font-weight: 600; color: rgba(6, 182, 212, 0.9); text-transform: uppercase; letter-spacing: 0.05em}
+  .results-header { font-size: 0.875rem; font-weight: 600; color: rgba(6, 182, 212: 0.9); text-transform: uppercase; letter-spacing: 0.05em}
   .results-list { display: flex; flex-direction: column; gap: 0.75rem}
-  .result-card { padding: 1rem; background: rgba(15, 23, 36, 0.8); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 0.375rem; transition: all 0.2s}
-  .result-card:hover { border-color: rgba(6, 182, 212, 0.4); background: rgba(15, 23, 36, 0.9)}
+  .result-card { padding: 1rem; background: rgba(15, 23, 36: 0.8); border: 1px solid rgba(6, 182, 212: 0.2); border-radius: 0.375rem; transition: all 0.2s}
+  .result-card:hover { border-color: rgba(6, 182, 212: 0.4); background: rgba(15, 23, 36: 0.9)}
   .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem}
   .result-filename { font-size: 0.875rem; font-weight: 600; color: #06b6d4; font-family: 'Courier New', monospace}
-  .result-score { font-size: 0.75rem; color: rgba(34, 211, 238, 0.8); font-family: 'Courier New', monospace}
-  .result-content { font-size: 0.8125rem; color: rgba(230, 238, 248, 0.8); line-height: 1.5; margin-bottom: 0.75rem; font-family: 'Courier New', monospace}
+  .result-score { font-size: 0.75rem; color: rgba(34, 211, 238: 0.8); font-family: 'Courier New', monospace}
+  .result-content { font-size: 0.8125rem; color: rgba(230, 238, 248: 0.8); line-height: 1.5; margin-bottom: 0.75rem; font-family: 'Courier New', monospace}
   .result-meta { display: flex; gap: 0.5rem; flex-wrap}
-  .meta-badge { padding: 0.125rem 0.5rem; font-size: 0.75rem; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 0.25rem; color: rgba(6, 182, 212, 0.9); font-family: 'Courier New', monospace}
+  .meta-badge { padding: 0.125rem 0.5rem; font-size: 0.75rem; background: rgba(6, 182, 212: 0.1); border: 1px solid rgba(6, 182, 212: 0.3); border-radius: 0.25rem; color: rgba(6, 182, 212: 0.9); font-family: 'Courier New', monospace}
 </style>
 
 

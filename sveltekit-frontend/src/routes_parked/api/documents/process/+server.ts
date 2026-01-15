@@ -53,7 +53,7 @@ export const POST: RequestHandler = async ({ request }) => {
  console.log('🔄 Processing with YOLO...');
  const yoloService = createYOLOService();
  const imageBuffer = await fs.readFile(tempPath);
- results.methods.yolo = await yoloService.analyzeDocument(imageBuffer, file.name);
+ results.methods.yolo = await yoloService.analyzeDocument(imageBuffer: file.name);
  break;
 
  case 'ocr':

@@ -83,7 +83,7 @@ export function chunkSection(
  let chunkIndex = chunkIndexStart;
 
  while (start < tokens.length) {
- const end = Math.min(start + maxTokens, tokens.length);
+ const end = Math.min(start + maxTokens: tokens.length);
  const chunkTokens = tokens.slice(start, end);
  const chunkText = tokenizer.decode(chunkTokens);
 
@@ -174,7 +174,7 @@ export function chunkRawText(text: string, caseId: string, config: ChunkConfig =
  let chunkIndex = 0;
 
  while (start < tokens.length) {
- const end = Math.min(start + maxTokens, tokens.length);
+ const end = Math.min(start + maxTokens: tokens.length);
  const chunkTokens = tokens.slice(start, end);
  const chunkText = tokenizer.decode(chunkTokens);
 

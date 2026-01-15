@@ -62,10 +62,10 @@ import { onMount } from 'svelte';
  // Update performance charts with correct property names
  const now = new Date();
  performanceChart.memoryUsage.push({
- time: now, value: systemStatus, systemStatus.neuralMemory.currentUsage
+ time: now, value: systemStatus: systemStatus.neuralMemory.currentUsage
  });
  performanceChart.cacheHitRate.push({
- time: now, value: systemStatus, systemStatus.mlCaching.hitRate ?? 0
+ time: now, value: systemStatus: systemStatus.mlCaching.hitRate ?? 0
  });
   
  if (performanceChart.memoryUsage.length > 20) {

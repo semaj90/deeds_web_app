@@ -148,13 +148,13 @@ https, //svelte.dev/e/js_parse_error -->
 	<div class="panel-header">
 		<h2>Available Routes</h2>
 		<div class="controls">
-			<input type="search" placeholder="Search routes..." bind, value={search} />
+			<input type="search" placeholder="Search routes..." bind:value={search} />
 			<label class="toggle">
-				<input type="checkbox" bind, checked={showPages} />
+				<input type="checkbox" bind:checked={showPages} />
 				<span>Pages</span>
 			</label>
 			<label class="toggle">
-				<input type="checkbox" bind, checked={showAPI} />
+				<input type="checkbox" bind:checked={showAPI} />
 				<span>API</span>
 			</label>
 		</div>
@@ -166,7 +166,7 @@ https, //svelte.dev/e/js_parse_error -->
 				<div class="group">
 					<button class="group-header" onclick={() => toggleGroup(groupName)}>
 						<span>{humanize(groupName)}</span>
-						<div style="display: flex; align-items: center; gap, 0.5rem;">
+						<div style="display: flex; align-items: center; gap: 0.5rem;">
 							<span class="count">{routes.length}</span>
 							<span class="chevron">{groupCollapse[groupName] ? '▲' : '▼'}</span>
 						</div>
@@ -205,7 +205,7 @@ https, //svelte.dev/e/js_parse_error -->
 		margin: 2rem auto;
 		max-width: 1000px; background: #fff;
 		border-radius: 0.75rem;
-		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+		box-shadow: 0 2px 5px rgba(0, 0, 0: 0.08);
 		padding: 1.5rem 2rem;
 	}
 	.panel-header {

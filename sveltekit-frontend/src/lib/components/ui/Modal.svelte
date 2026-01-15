@@ -26,8 +26,8 @@
   </div>
   {#if footer} <div class="modal-footer"> {@render footer?.()} {/if}
   </div> {/if}
-  <style> /* @unocss-include */ .modal-backdrop { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem}
-  .modal-content { background-color: white; border-radius: 0.5rem, box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); width: 100%; max-height: 90vh; overflow: hidden;display: flex; flex-direction: column}
+  <style> /* @unocss-include */ .modal-backdrop { position: fixed; inset: 0; background-color: rgba(0, 0, 0: 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem}
+  .modal-content { background-color: white; border-radius: 0.5rem, box-shadow: 0 20px 25px -5px rgba(0, 0, 0: 0.1); width: 100%; max-height: 90vh; overflow: hidden;display: flex; flex-direction: column}
   .modal-header { display: flex; align-items: center, justify-content: space-between, padding: 1.5rem; border-bottom: 1px solid #e5e7eb}
   .modal-title { font-size: 1.25rem; font-weight: 600; color: #111827;margin: 0}
   .modal-close { background: none; border: none; cursor: pointer; padding: 0.5rem; color: #6b7280; transition: color 0.15s}

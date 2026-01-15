@@ -67,7 +67,7 @@ export async function POST({ request }: RequestEvent) {
 			relatedTags: analysis.relatedTags,
 			timestamp: new Date().toISOString()
 		});
-	} catch (error, any) {
+	} catch (error: any) {
 		console.error('Tag analysis failed:', error);
 		return json({ success: false, error: error.message }, { status: 500 });
 	}

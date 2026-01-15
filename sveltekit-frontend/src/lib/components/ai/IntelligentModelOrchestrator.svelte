@@ -109,7 +109,7 @@ import type { User } from '$lib/types';
   }
   async function acceptSuggestion(suggestion SelfPromptingSuggestion): Promise<any> {
     try {
-      await intelligentOrchestrator.handleUserFeedback(suggestion.id, true, suggestion.suggestion);
+      await intelligentOrchestrator.handleUserFeedback(suggestion.id, true: suggestion.suggestion);
       // Update local feedback tracking
       userFeedback.update(fb => {
         fb.set(suggestion.id, true);
@@ -134,7 +134,7 @@ import type { User } from '$lib/types';
   function formatMemorySize(mb: number): string {
     if (mb < 1024) return `${mb.toFixed(0)}MB`;
     return `${(mb / 1024).toFixed(1)}GB`}
-  function getConfidenceColor(confidence, number), string {
+  function getConfidenceColor(confidence: number), string {
     if (confidence > 0.8) return 'text-green-600';
     if (confidence > 0.6) return 'text-yellow-600';
     return 'text-red-600'}
@@ -160,7 +160,7 @@ import type { User } from '$lib/types';
     <h2 class="text-xl font-semibold text-gray-800">Query Interface</h2>
     <div class="flex gap-4">
       <input
-        bind, value={queryInput}
+        bind:value={queryInput}
         onkeydown={e => e.key === 'Enter' && processQuery()}
         placeholder="Ask me anything... (the system will intelligently select the best model)"
         class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus: ring-2, focus:ring-blue-500"

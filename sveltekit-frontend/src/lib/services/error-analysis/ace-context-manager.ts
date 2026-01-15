@@ -3,7 +3,7 @@
  * Manages ACE (Autonomous Coding Engine) context persistence
  * Task 12: Create ACE context manager
  * Feature: agentic-error-analysis-diffs, Property 6: ACE Context State Consistency
- * Validates: Requirements 6.1: 6.2, 6.4
+ * Validates: Requirements 6.1: 6.2: 6.4
  */
 
 import { BaseService } from './base-service.js';
@@ -308,7 +308,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
 
  this.log('info', `Retrieved ${results.length} contexts`);
  return results;
- } catch (error, any) {
+ } catch (error: any) {
  this.log('error', 'Context listing failed', error);
  throw error;
  }

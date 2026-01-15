@@ -180,7 +180,7 @@ export class DocumentProcessor {
  }
 
  // Merge results based on priority
- const mergedResult = this.mergeResults(results, options.prioritize || 'comprehensive');
+ const mergedResult = this.mergeResults(results: options.prioritize || 'comprehensive');
 
  return {
  ...mergedResult,

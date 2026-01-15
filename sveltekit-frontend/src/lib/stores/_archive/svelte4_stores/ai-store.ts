@@ -93,7 +93,7 @@ function createAIStore() {
  /**
  * Set error
  */
- setError(error, string) {
+ setError(error: string) {
  update((state) => ({
  ...state, error, currentMessage: state.currentMessage
  ? {

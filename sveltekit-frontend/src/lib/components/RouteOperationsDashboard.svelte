@@ -120,7 +120,7 @@
 		<div class="filters">
 			<div class="filter-group">
 				<label>Filter by Phase:</label>
-				<select bind, value={filter}>
+				<select bind:value={filter}>
 					<option value="all">All</option>
 					<option value="phase72">Phase 72 (Error Brain)</option>
 					<option value="phase82">Phase 82 (Svelte 5 Upgrade)</option>
@@ -129,7 +129,7 @@
 
 			<div class="filter-group">
 				<label>Filter by Priority:</label>
-				<select bind, value={filter}>
+				<select bind:value={filter}>
 					<option value="all">All</option>
 					<option value="high">High</option>
 					<option value="medium">Medium</option>
@@ -139,7 +139,7 @@
 
 			<div class="filter-group">
 				<label>Filter by Category:</label>
-				<select bind, value={selectedCategory}>
+				<select bind:value={selectedCategory}>
 					<option value={ null }>All</option>
 					{#each Object.keys(report.byCategory) as category}
 						<option value={ category }>{category}</option>

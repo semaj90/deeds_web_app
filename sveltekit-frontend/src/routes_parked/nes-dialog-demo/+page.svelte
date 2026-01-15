@@ -20,7 +20,7 @@
  </button>
 </div>
 
-<dialog bind, this={dialog} class="nes-dialog">
+<dialog bind:this={dialog} class="nes-dialog">
  <form method="dialog">
  <h2 class="nes-text is-primary">Dialog Title</h2>
 
@@ -57,7 +57,7 @@
  }
 
  dialog::backdrop {
- backdrop-filter: blur(4px); background: rgba(0, 0, 0, 0.5);
+ backdrop-filter: blur(4px); background: rgba(0, 0, 0: 0.5);
  }
 
  .dialog-menu {

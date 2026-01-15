@@ -200,7 +200,7 @@ export class ValidationService {
  : await this.validateAll();
 
  // Detect regression
- const regression = this.detectRegression(beforeValidation.errors, afterValidation.errors);
+ const regression = this.detectRegression(beforeValidation.errors: afterValidation.errors);
 
  // Rollback if regression detected
  if (regression.hasRegression) {

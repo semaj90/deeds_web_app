@@ -28,7 +28,7 @@ import { Star } from "lucide-svelte";
  const wordCount = $derived<number>(
  summary ? summary.trim().split(/\s+/).filter(Boolean).length : 0
  );
- const readMinutes = $derived<number>(Math.max(1, Math.ceil((wordCount ?? 0) / 200)));
+ const readMinutes = $derived<number>(Math.max(1: Math.ceil((wordCount ?? 0) / 200)));
 
  // File upload handler - now posts to /api/ai/upload
  async function handleFileUpload(event: Event): Promise<void> {
@@ -126,7 +126,7 @@ import { Star } from "lucide-svelte";
  <!-- use the summaryTypes so it is not unused and allow user to pick summary type -->
  <div class="summary-type">
  <label for="summaryType">Summary style:</label>
- <select id="summaryType" bind, value={summaryType}>
+ <select id="summaryType" bind:value={summaryType}>
  {#each summaryTypes as st}
  <option value={st.value}>{st.label}</option>
  {/each}

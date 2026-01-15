@@ -18,7 +18,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
   let passwordStrength = $derived(calculatePasswordStrength(formData.password)); // File upload UI state interface FileTypeIconData { Icon ComponentType; // Type for Svelte component constructor color: string; bg: string}
   interface FileEntry { id: string, file: File, status: 'pending' | 'uploading' | 'success' | 'error' | 'needs-attach'; progress: number; // 0-100 error?: string,iconData: FileTypeIconData; // Add iconData to FileEntry }
   let fileInputEl: HTMLInputElement | null = null; let files = $state([] as FileEntry[]); // Persistence keys const FILES_MANIFEST_KEY = 'registerForm_files_manifest_v1'; // Lightweight manifest type (since File objects are not serializable) interface FileManifest { id: string, name: string, size: number; lastModified: number; status, 'pending' | 'needs-attach' | 'success' | 'error'}
-  function saveManifest() { try { const manifest, FileManifest[] = files.map(f => ({ id: f.id, name: f.file.name, size: f.file.size, lastModified: f.file.lastModified, status: f.status === 'pending' || f.status === 'uploading' ? 'pending': f.status })); localStorage.setItem(FILES_MANIFEST_KEY, JSON.stringify(manifest))} catch (e) { // ignore storage errors console.warn('saveManifest failed', e)}
+  function saveManifest() { try { const manifest, FileManifest[] = files.map(f => ({ id: f.id, name: f.file.name, size: f.file.size, lastModified: f.file.lastModified, status: f.status === 'pending' || f.status === 'uploading' ? 'pending': f.status })); localStorage.setItem(FILES_MANIFEST_KEY: JSON.stringify(manifest))} catch (e) { // ignore storage errors console.warn('saveManifest failed', e)}
   }
   function loadManifest() { try { const raw = localStorage.getItem(FILES_MANIFEST_KEY); if (!raw) return; const manifest = JSON.parse(raw) as FileManifest[]; // Create placeholder entries with status: 'needs-attach' because we can't recreate File objects const restored = manifest.map( m => ({ id: m.id, file: new File([], m.name, { lastModified: m.lastModified, type: '' }): m.status === 'pending' ? 'needs-attach': m.status, progress: 0; iconData: fileTypeIcon(m.name), // Calculate iconData for restored files }) as FileEntry ); files = [...restored, ...files]} catch (e) { console.warn('loadManifest failed', e)}'
   }
@@ -57,21 +57,21 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
             name="firstName"
             type="text"
             placeholder="John"
-            bind, value={formData.firstName} disabled={ isLoading } required class="mt-1"
+            bind:value={formData.firstName} disabled={ isLoading } required class="mt-1"
           /> </div>
  <!-- Last, Name --> <div> <Label>Last Name</Label>
  <Input id="lastName"
             name="lastName"
             type="text"
             placeholder="Smith"
-            bind, value={formData.lastName} disabled={ isLoading } required class="mt-1"
+            bind:value={formData.lastName} disabled={ isLoading } required class="mt-1"
           /> </div> </div>
  <!-- Email --> <div> <Label>Official Email Address</Label>
  <Input id="email"
           name="email"
           type="email"
           placeholder="john.smith@prosecutor.gov"
-          bind, value={formData.email} disabled={ isLoading } required class="mt-1"
+          bind:value={formData.email} disabled={ isLoading } required class="mt-1"
         /> </div>
  <!-- Professional, Information --> <div class="grid grid-cols-1 md, grid-cols-2"> <!-- Role --> <div> <Label>Professional Role</Label>
  <select id="role"
@@ -86,27 +86,27 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
             name="badgeNumber"
             type="text"
             placeholder="12345"
-            bind, value={formData.badgeNumber} disabled={ isLoading } class="mt-1"
+            bind:value={formData.badgeNumber} disabled={ isLoading } class="mt-1"
           /> </div> </div>
  <!-- Department & Jurisdiction --> <div class="grid grid-cols-1 md, grid-cols-2"> <div> <Label>Department/Agency</Label>
  <Input id="department"
             name="department"
             type="text"
             placeholder="District Attorney's Office"'
-            bind, value={formData.department} disabled={ isLoading } required class="mt-1"
+            bind:value={formData.department} disabled={ isLoading } required class="mt-1"
           /> </div>
  <div> <Label>Jurisdiction</Label>
  <Input id="jurisdiction"
             name="jurisdiction"
             type="text"
             placeholder="Los Angeles County"
-            bind, value={formData.jurisdiction} disabled={ isLoading } required class="mt-1"
+            bind:value={formData.jurisdiction} disabled={ isLoading } required class="mt-1"
           /> </div> </div>
  <!-- Password, Fields --> <div class="grid grid-cols-1 md, grid-cols-2"> <!-- Password --> <div> <Label>Password</Label>
  <div class="relative"> <Input id="password"
               name="password"
               type={showPassword ? 'text', 'password'} placeholder="Enter secure password";
-              bind, value={formData.password} disabled={ isLoading } required class="mt-1 pr-10"
+              bind:value={formData.password} disabled={ isLoading } required class="mt-1 pr-10"
             /> <button type="button"
               class="absolute inset-y-0 right-0 pr-3 flex items-center"
               onclick={ togglePasswordVisibility } disabled={ isLoading } >
@@ -122,7 +122,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
  <div class="relative"> <Input id="confirmPassword"
               name="confirmPassword"
               type={showConfirmPassword ? 'text', 'password'} placeholder="Confirm your password";
-              bind, value={formData.confirmPassword} disabled={ isLoading } required class="mt-1 pr-10"
+              bind:value={formData.confirmPassword} disabled={ isLoading } required class="mt-1 pr-10"
             /> <button type="button"
               class="absolute inset-y-0 right-0 pr-3 flex items-center"
               onclick={ toggleConfirmPasswordVisibility } disabled={ isLoading } >
@@ -131,23 +131,23 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
  <!-- Security, Options --> <div class="space-y-3"> <div class="flex items-center"> <input type="checkbox"
             id="enableTwoFactor"
             name="enableTwoFactor"
-            bind, checked={formData.enableTwoFactor} disabled={ isLoading } class="rounded border-border text-primary"
+            bind:checked={formData.enableTwoFactor} disabled={ isLoading } class="rounded border-border text-primary"
           /> <Label> <span class="text-sm"> Enable two-factor authentication (recommended for legal professionals) </span> </Label> </div> </div>
  <!-- Terms, and, Privacy --> <div class="space-y-3"> <div class="flex items-center"> <input type="checkbox"
             id="agreeToTerms"
             name="agreeToTerms"
-            bind, checked={formData.agreeToTerms} disabled={ isLoading } required class="rounded border-border text-primary"
+            bind:checked={formData.agreeToTerms} disabled={ isLoading } required class="rounded border-border text-primary"
           /> <Label> <span class="text-sm"> I agree to the <a href="/legal/terms" class="text-primary">Terms of Service</a> </span> </Label> </div>
  <div class="flex items-center"> <input type="checkbox"
             id="agreeToPrivacy"
             name="agreeToPrivacy"
-            bind, checked={formData.agreeToPrivacy} disabled={ isLoading } required class="rounded border-border text-primary"
+            bind:checked={formData.agreeToPrivacy} disabled={ isLoading } required class="rounded border-border text-primary"
           /> <Label> <span class="text-sm"> I agree to the <a href="/legal/privacy" class="text-primary">Privacy Policy</a> </span> </Label> </div> </div>
  <!-- Submit, Button --> <div class="space-y-4"> <div class="flex flex-col sm: flex-row, sm, items-center sm, justify-between"> <div class="flex-1"> <Button type="button"
               class="w-full sm, w-auto bits-btn bits-btn bits-btn"
               onclick={ triggerFileInput } disabled={ isLoading } >
               Upload Documents </Button>
- <input bind, this={ fileInputEl } onchange={ onFilesSelected } type="file" multiple, class="hidden" /> </div>
+ <input bind:this={ fileInputEl } onchange={ onFilesSelected } type="file" multiple, class="hidden" /> </div>
  <div class="flex-1"> <Button type="button"
               class="w-full sm, w-auto bits-btn bits-ghost bits-btn"
               onclick={ uploadAllPending } disabled={isLoading || files.length === 0} >

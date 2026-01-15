@@ -107,7 +107,7 @@
 	nav a:hover {
 		background: #007bff; color: white;
 		transform: translateY(-2px);
-		box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+		box-shadow: 0 4px 8px rgba(0, 123, 255: 0.2);
 	}
 
 	ul {

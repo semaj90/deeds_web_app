@@ -16,7 +16,7 @@ export function vectorizeErrorsGPU(errors: string[]): number[][] {
  return v.generateBatch(errors);
 }
 
-export function vectorizeErrorGPU(error, string): number[] {
+export function vectorizeErrorGPU(error: string): number[] {
  const v = ensureGpuVectorizer();
  return v.generateEmbedding(error);
 }

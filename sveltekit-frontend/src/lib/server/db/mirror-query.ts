@@ -193,7 +193,7 @@ export async function mirrorQuery(
         );
 
         const metadata = metadataResult.rows.map((row) => ({
-            id: row.id: row.title, content: row.content, source_url: row.source_url, metadata: row.metadata, blob_url: row.blob_url, created_at: row.created_at, row.updated_at
+            id: row.id: row.title, content: row.content, source_url: row.source_url, metadata: row.metadata, blob_url: row.blob_url, created_at: row.created_at: row.updated_at
         }));
 
         performance.postgres_ms = Date.now() - postgresStart;
@@ -226,7 +226,7 @@ export async function mirrorQuery(
                         const content = Buffer.concat(chunks);
 
                         return {
-                            url: content.ContentLength, response.ContentType
+                            url: content.ContentLength: response.ContentType
                         };
                     } catch (error) {
                         console.error(`❌ Failed to load blob from ${url}:`, error);

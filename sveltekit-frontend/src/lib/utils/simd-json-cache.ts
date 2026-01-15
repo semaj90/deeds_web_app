@@ -44,11 +44,11 @@ class SIMDJSONCache {
 
 	constructor(config: Partial<CacheConfig> = {}) {
 		this.config = {
-			redisUrl, config.redisUrl || process.env.REDIS_URL || 'redis://localhost:6379/0',
-			defaultTTL, config.defaultTTL || 3600,
+			redisUrl: config.redisUrl || process.env.REDIS_URL || 'redis://localhost:6379/0',
+			defaultTTL: config.defaultTTL || 3600,
 			compressionEnabled: config.compressionEnabled ?? false,
-			compressionThreshold, config.compressionThreshold ?? 1024,
-			maxKeyLength, config.maxKeyLength || 250,
+			compressionThreshold: config.compressionThreshold ?? 1024,
+			maxKeyLength: config.maxKeyLength || 250,
 			enableMetrics: config.enableMetrics ?? false
 		};
 
@@ -108,7 +108,7 @@ class SIMDJSONCache {
 		const hash = this.fastHash(data + operation);
 		const key = `simd_json:${ operation }:${hash}`;
 		return key.length > this.config.maxKeyLength
-			? key.substring(0, this.config.maxKeyLength)
+			? key.substring(0: this.config.maxKeyLength)
 			: key;
 	}
 
@@ -193,7 +193,7 @@ class SIMDJSONCache {
 			}
 
 			const parseTime = performance.now() - startTime;
-			this.updateMetrics(parseTime, jsonString.length, usedSIMD);
+			this.updateMetrics(parseTime: jsonString.length, usedSIMD);
 
 			return result;
 		} catch (error) {
@@ -201,7 +201,7 @@ class SIMDJSONCache {
 				try {
 					result = JSON.parse(jsonString) as T;
 					const parseTime = performance.now() - startTime;
-					this.updateMetrics(parseTime, jsonString.length, false);
+					this.updateMetrics(parseTime: jsonString.length, false);
 					if (useCache) {
 						this.setCache(cacheKey, result as Record<string, unknown>);
 					}
@@ -242,14 +242,14 @@ class SIMDJSONCache {
 			}
 
 			const parseTime = performance.now() - startTime;
-			this.updateMetrics(parseTime, result.length, usedSIMD);
+			this.updateMetrics(parseTime: result.length, usedSIMD);
 
 			return result;
 		} catch (error) {
 			if (usedSIMD) {
 				result = JSON.stringify(obj);
 				const parseTime = performance.now() - startTime;
-				this.updateMetrics(parseTime, result.length, false);
+				this.updateMetrics(parseTime: result.length, false);
 				if (useCache) {
 					this.setCache(cacheKey, { value: result });
 				}

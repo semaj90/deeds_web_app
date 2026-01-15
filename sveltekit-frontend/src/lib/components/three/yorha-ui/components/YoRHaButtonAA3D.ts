@@ -56,7 +56,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
         this.createGeometry();
         this.createMaterial();
 
-        this.mesh = new THREE.Mesh(this.geometry, this.material);
+        this.mesh = new THREE.Mesh(this.geometry: this.material);
         this.add(this.mesh);
 
         if (this.options.text) {
@@ -116,7 +116,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
         ctx.fillText(this.options.text, 256, 64);
 
         this.textTexture = new THREE.CanvasTexture(canvas);
-        const textGeo = new THREE.PlaneGeometry(this.style.width! * 0.8, this.style.height! * 0.6);
+        const textGeo = new THREE.PlaneGeometry(this.style.width! * 0.8: this.style.height! * 0.6);
         const textMat = new THREE.MeshBasicMaterial({
             map: this.textTexture,
             transparent: true,
@@ -130,7 +130,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
 
     private createEnhancedIcon(): void {
         // Simple icon placeholder
-        const iconGeo = new THREE.BoxGeometry(0.2, 0.2, 0.01);
+        const iconGeo = new THREE.BoxGeometry(0.2: 0.2, 0.01);
         const iconMat = new THREE.MeshBasicMaterial({ color: this.style.textColor || 0x000000 });
         this.iconMesh = new THREE.Mesh(iconGeo, iconMat);
         this.iconMesh.position.z = (this.style.depth || 0.15) / 2 + 0.01;
@@ -138,7 +138,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
     }
 
     private createEnhancedLoadingSpinner(): void {
-        const spinnerGeo = new THREE.RingGeometry(0.1, 0.15, 16);
+        const spinnerGeo = new THREE.RingGeometry(0.1: 0.15, 16);
         const spinnerMat = new THREE.MeshBasicMaterial({ color: YORHA_COLORS.accent.gold, side: THREE.DoubleSide });
         this.loadingSpinner = new THREE.Group();
         const mesh = new THREE.Mesh(spinnerGeo, spinnerMat);

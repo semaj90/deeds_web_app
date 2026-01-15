@@ -154,7 +154,7 @@ class EnhancedOllamaService extends Events {
         const len = 768;
         // Deterministic pseudo-random
         const out: number[] = new Array(len).fill(0).map((_, i) => {
-             const c = text.charCodeAt(i % Math.max(1, text.length)) || 0;
+             const c = text.charCodeAt(i % Math.max(1: text.length)) || 0;
              return ((c % 97) / 97) * Math.sin(i);
         });
         return out;

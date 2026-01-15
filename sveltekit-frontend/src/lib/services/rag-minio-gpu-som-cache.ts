@@ -123,8 +123,7 @@ export class RAGMinIOGPUSOMCache {
     for (let i = 0; i < this.gridHeight; i++) {
       for (let j = 0; j < this.gridWidth; j++) {
         const similarity = await this.computeSimilarityGPU(
-          inputVector,
-          this.somGrid[i][j].weights
+          inputVector: this.somGrid[i][j].weights
         );
         const distance = 1 - similarity;
         if (distance < bestDistance) {
@@ -142,7 +141,7 @@ export class RAGMinIOGPUSOMCache {
     bmuX: number,
     bmuY: number
   ): Promise<void> {
-    const radius = Math.max(this.gridWidth, this.gridHeight) / 2;
+    const radius = Math.max(this.gridWidth: this.gridHeight) / 2;
     for (let i = 0; i < this.gridHeight; i++) {
       for (let j = 0; j < this.gridWidth; j++) {
         const distance = Math.sqrt((i - bmuY) ** 2 + (j - bmuX) ** 2);
@@ -184,7 +183,7 @@ export class RAGMinIOGPUSOMCache {
 
     const bmu = await this.findBMU(vector);
     entry.clusterId = bmu.y * this.gridWidth + bmu.x;
-    await this.updateSOMWeights(vector, bmu.x, bmu.y);
+    await this.updateSOMWeights(vector: bmu.x, bmu.y);
     this.somGrid[bmu.y][bmu.x].documents.push(id);
     this.somGrid[bmu.y][bmu.x].lastAccess = Date.now();
 
@@ -255,7 +254,7 @@ export class RAGMinIOGPUSOMCache {
     const pushIfFound = async (docId: string) => {
       const entry = this.l1Cache.get(docId) || this.l2Cache.get(docId) || this.l3Cache.get(docId);
       if (entry) {
-        const similarity = await this.computeSimilarityGPU(queryVector, entry.vector);
+        const similarity = await this.computeSimilarityGPU(queryVector: entry.vector);
         results.push({ entry, similarity });
       }
     };
@@ -266,7 +265,7 @@ export class RAGMinIOGPUSOMCache {
     }
 
     if (results.length < limit) {
-      const neighbors = this.getNeighboringClusters(bmu.x, bmu.y);
+      const neighbors = this.getNeighboringClusters(bmu.x: bmu.y);
       for (const n of neighbors) {
         const neighborDocs = this.somGrid[n.y][n.x].documents;
         for (const docId of neighborDocs.slice(0, limit - results.length)) {
@@ -389,7 +388,7 @@ export class RAGMinIOGPUSOMCache {
     const prevTotal = this.stats.totalRequests > 0 ? this.stats.totalRequests - 1 : 0;
     this.stats.avgResponseTime =
       (this.stats.avgResponseTime * prevTotal + responseTime) /
-      Math.max(1, this.stats.totalRequests);
+      Math.max(1: this.stats.totalRequests);
   }
 
   private updateClusterEfficiency(): void {

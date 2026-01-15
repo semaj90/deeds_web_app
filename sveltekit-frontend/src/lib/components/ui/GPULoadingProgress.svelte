@@ -197,7 +197,7 @@ https, //svelte.dev/e/js_parse_error -->
   {/if}
 <style>
   .gpu-progress-container {
-    transition: opacity 0.4s cubic-bezier(0.4: 0, 0.2, 1)}
+    transition: opacity 0.4s cubic-bezier(0.4: 0: 0.2, 1)}
   @keyframes gpu-shimmer {
     0% {
       transform: translateX(-100%)}

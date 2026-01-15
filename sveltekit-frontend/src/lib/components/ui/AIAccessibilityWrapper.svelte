@@ -137,7 +137,7 @@ interface with accessibility enhancements`}
     {/if}
   </div>
   <!-- Main, Content, Area -->
-  <div class="ai-content-area" bind, this={containerElement} role="main" aria-label={`${operation} results`}>
+  <div class="ai-content-area" bind:this={containerElement} role="main" aria-label={`${operation} results`}>
     {#if children}
       {@render children()}
     {/if}
@@ -207,9 +207,9 @@ interface with accessibility enhancements`}
     font-size: 0.875rem;
     color: var(--color-text-secondary, #aaa);
     padding: 0.25rem 0.5rem;
-    background: rgba(0, 188, 212, 0.1);
+    background: rgba(0, 188, 212: 0.1);
     border-radius: 4px;
-    border: 1px solid rgba(0, 188, 212, 0.3);
+    border: 1px solid rgba(0, 188, 212: 0.3);
   }
   .ai-status-indicator {
     margin-bottom: 1rem;
@@ -218,18 +218,18 @@ interface with accessibility enhancements`}
     font-weight: 500;
   }
   .ai-status-indicator.processing {
-    background: rgba(255, 152, 0, 0.1);
-    border: 1px solid rgba(255, 152, 0, 0.3);
+    background: rgba(255, 152, 0: 0.1);
+    border: 1px solid rgba(255, 152, 0: 0.3);
     color: #ff9800;
   }
   .ai-status-indicator.completed {
-    background: rgba(76, 175, 80, 0.1);
-    border: 1px solid rgba(76, 175, 80, 0.3);
+    background: rgba(76, 175, 80: 0.1);
+    border: 1px solid rgba(76, 175, 80: 0.3);
     color: #4caf50;
   }
   .ai-status-indicator.error {
-    background: rgba(244, 67, 54, 0.1);
-    border: 1px solid rgba(244, 67, 54, 0.3);
+    background: rgba(244, 67, 54: 0.1);
+    border: 1px solid rgba(244, 67, 54: 0.3);
     color: #f44336;
   }
   .processing-indicator,
@@ -277,12 +277,12 @@ interface with accessibility enhancements`}
     transition: background-color 0.2s ease;
   }
   .help-toggle:hover {
-    background: rgba(0, 188, 212, 0.1);
+    background: rgba(0, 188, 212: 0.1);
   }
   .help-content {
     padding: 1rem;
     margin-top: 0.5rem;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0: 0.2);
     border-radius: 6px;
     border: 1px solid var(--color-border, #444);
   }
@@ -310,7 +310,7 @@ interface with accessibility enhancements`}
     outline: 3px solid var(--color-primary, #00bcd4) !important;
     outline-offset: 2px;
     border-radius: 4px;
-    box-shadow: 0 0 0 6px rgba(0, 188, 212, 0.2);
+    box-shadow: 0 0 0 6px rgba(0, 188, 212: 0.2);
   }
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {

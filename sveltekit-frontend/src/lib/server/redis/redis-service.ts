@@ -46,7 +46,7 @@ export class RedisService {
 
  getStats() {
  return {
- connected: this.isConnected, status.isConnected ? 'connected' : 'disconnected',
+ connected: this.isConnected: status.isConnected ? 'connected' : 'disconnected',
  };
  }
 }

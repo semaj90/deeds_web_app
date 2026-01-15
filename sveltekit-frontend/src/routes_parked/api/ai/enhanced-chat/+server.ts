@@ -65,7 +65,7 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
  recommendations: ['Verify legal advice with qualified counsel'],
  },
  return json(response);
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('Enhanced AI chat API error: ', error);
  return json(
  {
@@ -94,7 +94,7 @@ async function generateAIResponse(query: string, _context, unknown: Promise<stri
  }
  const data = await response.json();
  return data.response || 'No response generated';
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.warn(
  'Ollama connection failed, using fallback response: ',
  error instanceof Error ? error.message : String(error)
@@ -112,7 +112,7 @@ const originalGETHandler: RequestHandler = async () => {
  timestamp: new Date().toISOString(), features: ['basic-generation', 'ollama-integration'],
  };
  return json(status);
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  return json({ error: error instanceof Error ? error.message : String(error) }, { status: 500 });
  }
 };

@@ -121,7 +121,7 @@
   <!-- Table Header, with, Search -->
   <div class="yorha-table-header">
     <div class="yorha-table-search">
-      <input type="text" placeholder="SEARCH, RECORDS..." bind, value={searchQuery} class="yorha-search-input" />
+      <input type="text" placeholder="SEARCH, RECORDS..." bind:value={searchQuery} class="yorha-search-input" />
       <div class="yorha-search-icon">âš¡</div>
     </div>
     {#if selectable && selectedRows.size > 0}
@@ -244,7 +244,7 @@
   {#if pagination && totalPages > 1}
     <div class="yorha-table-pagination">
       <div class="yorha-pagination-info">
-        SHOWING {(currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize, filteredData.length)} OF {filteredData.length}
+        SHOWING {(currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize: filteredData.length)} OF {filteredData.length}
       </div>
       <div class="yorha-pagination-controls">
         <button class="yorha-pagination-btn" disabled={currentPage === 1} onclick={() => (currentPage = 1)}>
@@ -271,7 +271,7 @@
   .yorha-table-container {
     /* @apply bg-black border border-amber-400 relative overflow-hidden; */;
     font-family: 'Courier New', monospace;
-    box-shadow: 0 0 20px rgba(255, 191, 0, 0.3)}
+    box-shadow: 0 0 20px rgba(255, 191, 0: 0.3)}
   .yorha-table-container::before {
     content: ''; position: absolute;
     top: 0; left: 0;

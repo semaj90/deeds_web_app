@@ -131,7 +131,7 @@ export const userWorkflowMachine = createMachine({
             ADD_COLLABORATOR: { actions: assign({
                 collaborators: ({ context, event }) => {
                   const exists = context.collaborators.some((c: any) => c.id === event.collaborator.id);
-                  return exists ? context.collaborators : [...context.collaborators, event.collaborator];
+                  return exists ? context.collaborators : [...context.collaborators: event.collaborator];
                 }
               })
             },
@@ -152,7 +152,7 @@ export const userWorkflowMachine = createMachine({
                   })
                 },
                 ERROR: { target: 'stepError',
-                  actions: assign({ errors: ({ context, event }) => [...context.errors, event.error]
+                  actions: assign({ errors: ({ context, event }) => [...context.errors: event.error]
                   })
                 }
               }
@@ -192,11 +192,11 @@ export const userWorkflowMachine = createMachine({
                 NEXT_STEP: { target: 'executingStep',
                   actions: assign({ workflow: ({ context }) => ({
                       ...context.workflow,
-                      currentStepIndex: Math.min(context.workflow.currentStepIndex + 1, context.workflow.totalSteps - 1)
+                      currentStepIndex: Math.min(context.workflow.currentStepIndex + 1: context.workflow.totalSteps - 1)
                     }),
                     errors: [],
                     currentStep: ({ context }) => {
-                      const nextIndex = Math.min(context.workflow.currentStepIndex + 1, context.workflow.totalSteps - 1);
+                      const nextIndex = Math.min(context.workflow.currentStepIndex + 1: context.workflow.totalSteps - 1);
                       return context.workflow.steps[nextIndex] || 'unknown';
                     }
                   })

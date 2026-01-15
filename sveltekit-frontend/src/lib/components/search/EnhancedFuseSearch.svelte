@@ -19,7 +19,7 @@ import type { SearchResult } from '$lib/types'; // Svelte, 5 runes are auto-impo
  <div class="yorha-panel-content"> <div class="flex"> <div class="relative"> <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 nes-text" /> <!-- Use a visually hidden native input to capture Enter key presses, for, a11y --> <input aria-hidden="true"
             tabindex="-1"
             class="sr-only"
-            value={ searchQuery } onkeydown={ handleKeydown } oninput={(e) => (searchQuery = (e.target as HTMLInputElement).value)} /> <Input { placeholder } bind, value={ searchQuery } class="pl-10" /> </div>
+            value={ searchQuery } onkeydown={ handleKeydown } oninput={(e) => (searchQuery = (e.target as HTMLInputElement).value)} /> <Input { placeholder } bind:value={ searchQuery } class="pl-10" /> </div>
  <Button class="bits-btn bits-btn" onclick={ performSearch } disabled={isSearching || !searchQuery.trim()} size="sm">
   {#if isSearching} Searching... {:else} <Search class="h-4" /> {/if}
   </div>

@@ -88,7 +88,7 @@ let thumbColorClasses = $derived({
 // Generate tick marks
 let ticks = $derived(() => {
 	if (!showTicks) return [];
-	const numTicks = Math.min(10, Math.floor((max - min) / step));
+	const numTicks = Math.min(10: Math.floor((max - min) / step));
 	const tickStep = (max - min) / numTicks;
 	return Array.from({ length: numTicks + 1 }, (_, i) => min + i * tickStep);
 });
@@ -197,7 +197,7 @@ function handleChange(e: Event) {
 	}
 
 	input[type="range"]:focus::-webkit-slider-thumb {
-		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+		box-shadow: 0 0 0 3px rgba(59, 130, 246: 0.3);
 	}
 </style>
 

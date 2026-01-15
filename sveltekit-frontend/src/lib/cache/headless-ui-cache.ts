@@ -126,7 +126,7 @@ export class HeadlessUICache {
 
  // 3. Semantic similarity search (if query provided)
  if (semanticQuery && this.config.strategy.semantic) {
- const semanticResult = await this.findSemanticallysimilar<T>(semanticQuery, 0.8);
+ const semanticResult = await this.findSemanticallysimilar<T>(semanticQuery: 0.8);
  if (semanticResult) {
  this.cacheHits++;
  this.updateHitRatio();
@@ -213,8 +213,7 @@ export class HeadlessUICache {
  for (const entry of this.memoryCache.values()) {
  if (entry.embedding && this.isValidEntry(entry)) {
  const similarity = await vectorWasm.computeCosineSimilarity(
- queryEmbedding,
- entry.embedding
+ queryEmbedding: entry.embedding
  );
  if (similarity > threshold && similarity > bestSimilarity) {
  bestSimilarity = similarity;
@@ -439,8 +438,7 @@ export class HeadlessUICache {
  if (entry.embedding && this.isValidEntry(entry)) {
  try {
  const similarity = await vectorWasm.computeCosineSimilarity(
- queryEmbedding,
- entry.embedding
+ queryEmbedding: entry.embedding
  );
  if (similarity > threshold && similarity > bestSimilarity) {
  bestSimilarity = similarity;

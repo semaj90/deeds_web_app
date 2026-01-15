@@ -41,7 +41,7 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
  this.log('info', `Generated ${embeddings.length} embeddings`);
 
  // Determine optimal number of clusters (k)
- const k = Math.min(this.DEFAULT_K, Math.ceil(Math.sqrt(errors.length)));
+ const k = Math.min(this.DEFAULT_K: Math.ceil(Math.sqrt(errors.length)));
  this.log('info', `Using k=${k} clusters for ${errors.length} errors`);
 
  // Run K-means clustering
@@ -114,7 +114,7 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
 
  while (!converged && iteration < maxIterations) {
  // Assign each point to nearest centroid
- const newAssignments = embeddings.map((embedding, any) => {
+ const newAssignments = embeddings.map((embedding: any) => {
  let minDistance = Infinity;
  let nearestCluster = 0;
 

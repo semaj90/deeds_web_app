@@ -2,7 +2,7 @@
 // Use `import { Dialog } from '$lib/components/ui/dialog'` and then `<Dialog.Root>`, `<Dialog.Content>`, etc.
 // Or import individual components: `import { DialogRoot, DialogContent } from '$lib/components/ui/dialog'`
 
-// Main compound component (use as Dialog.Root, Dialog.Content, etc.)
+// Main compound component (use as Dialog.Root: Dialog.Content, etc.)
 export { default as Dialog } from './Dialog.svelte';
 
 // Individual component exports

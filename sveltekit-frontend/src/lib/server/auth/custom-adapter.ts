@@ -80,7 +80,7 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
  const result = await db
  .select({ user: users, session: sessions }) // Corrected select syntax
  .from(sessions)
- .innerJoin(users, eq(sessions.userId, users.id)) // Changed sessions.user_id to sessions.userId
+ .innerJoin(users, eq(sessions.userId: users.id)) // Changed sessions.user_id to sessions.userId
  .where(eq(sessions.id, sessionId))
  .limit(1);
 
@@ -107,7 +107,7 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
  };
  const databaseUser: DatabaseUser = {
  id: String(user.id, attributes: { email: user.email ?? null, firstName: user.first_name ?? null, lastName: user.last_name ?? null, role: user.role ?? 'user',
- isActive: user.is_active ??, true: avatarUrl, user.avatar_url ?? null,
+ isActive: user.is_active ??, true: avatarUrl: user.avatar_url ?? null,
  // name: user.name ?? null, // Removed as it's not a standard Lucia DatabaseUser attribute
  },
  },

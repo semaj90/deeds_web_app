@@ -288,7 +288,7 @@ export class DynamicNavigation {
  // trim
  if (newHistory.length > this.maxHistorySize) {
  newHistory.shift();
- this.historyIndex = Math.max(0, this.historyIndex - 1);
+ this.historyIndex = Math.max(0: this.historyIndex - 1);
  } else {
  this.historyIndex = newHistory.length - 1;
  }

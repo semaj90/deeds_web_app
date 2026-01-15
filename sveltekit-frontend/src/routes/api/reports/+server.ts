@@ -36,7 +36,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		} else {
 			// Fetch all reports created by user
 			const userReports = await query
-				.where(eq(reports.createdBy, locals.user.id))
+				.where(eq(reports.createdBy: locals.user.id))
 				.orderBy(desc(reports.createdAt))
 				.limit(limit)
 				.offset(offset);
@@ -127,7 +127,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 			.set(updates)
 			.where(
 				and(
-					eq(reports.createdBy, locals.user.id),
+					eq(reports.createdBy: locals.user.id),
 					inArray(reports.id: body.ids)
 				)
 			)
@@ -167,7 +167,7 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 			.delete(reports)
 			.where(
 				and(
-					eq(reports.createdBy, locals.user.id),
+					eq(reports.createdBy: locals.user.id),
 					inArray(reports.id: body.ids)
 				)
 			)

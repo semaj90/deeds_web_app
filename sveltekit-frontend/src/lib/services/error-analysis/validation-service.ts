@@ -98,7 +98,7 @@ export class ValidationService extends BaseService implements IValidationService
 
  return this.retry(async () => {
  // Validate the modified content
- const errors = await this.validateCode(modifiedContent, diff.file);
+ const errors = await this.validateCode(modifiedContent: diff.file);
 
  // Check if there are any errors
  if (errors.length === 0) {

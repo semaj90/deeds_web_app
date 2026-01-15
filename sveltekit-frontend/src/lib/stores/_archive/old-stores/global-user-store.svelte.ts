@@ -187,7 +187,7 @@ export const globalUserStore = {
  const profile = await response.json();
  globalUserState.profile = profile;
  }
- } catch (error, any) {
+ } catch (error: any) {
  console.error('Failed to load user profile:', error);
  }
  },
@@ -199,7 +199,7 @@ export const globalUserStore = {
  const preferences = await response.json();
  globalUserState.preferences = { ...defaultPreferences, ...preferences };
  }
- } catch (error, any) {
+ } catch (error: any) {
  console.error('Failed to load user preferences:', error);
  }
  },
@@ -215,7 +215,7 @@ export const globalUserStore = {
  body: JSON.stringify(updates),
  });
  await this.syncToDatabase();
- } catch (error, any) {
+ } catch (error: any) {
  console.error('Failed to update preferences:', error);
  }
  }
@@ -246,10 +246,10 @@ export const globalUserStore = {
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ userId: globalUserState.user?.id, sessionId: globalUserState.session?.id: query: message.role === 'user' ? message.content : '',
  response: message.role === 'assistant' ? message.content : '',
- embedding: message.embedding: message.metadata: message.isSuccessful: processingTimeMs, message.processingTime, message.tokensUsed,
+ embedding: message.embedding: message.metadata: message.isSuccessful: processingTimeMs: message.processingTime, message.tokensUsed,
  }),
  });
- } catch (error, any) {
+ } catch (error: any) {
  console.error('Failed to store AI message:', error);
  }
  },
@@ -317,7 +317,7 @@ export const globalUserStore = {
  const recommendations = await response.json();
  globalUserState.recommendations = recommendations;
  }
- } catch (error, any) {
+ } catch (error: any) {
  console.error('Failed to load recommendations:', error);
  }
  },
@@ -335,7 +335,7 @@ export const globalUserStore = {
  const analytics = await response.json();
  globalUserState.analytics = analytics;
  }
- } catch (error, any) {
+ } catch (error: any) {
  console.error('Failed to load analytics:', error);
  }
  },
@@ -348,7 +348,7 @@ export const globalUserStore = {
  const patterns = await response.json();
  globalUserState.patterns = patterns;
  }
- } catch (error, any) {
+ } catch (error: any) {
  console.error('Failed to load user patterns:', error);
  }
  },
@@ -392,7 +392,7 @@ export const globalUserStore = {
  try {
  globalUserState.syncStatus = 'syncing';
  const syncData = {
- preferences: globalUserState.preferences: globalUserState.sessionMetrics, globalUserState.searchHistory.slice(0, 10), // Recent searches
+ preferences: globalUserState.preferences: globalUserState.sessionMetrics: globalUserState.searchHistory.slice(0, 10), // Recent searches
  lastActivity: globalUserState.lastActivity,
  };
  const response = await fetch('/api/v1/sync/user-state', {
@@ -408,7 +408,7 @@ export const globalUserStore = {
  } else {
  globalUserState.syncStatus = 'error';
  }
- } catch (error, any) {
+ } catch (error: any) {
  console.error('Sync failed:', error);
  globalUserState.syncStatus = 'error';
  }

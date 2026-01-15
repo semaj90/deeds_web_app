@@ -5,7 +5,7 @@
  * Provides vector storage and semantic search using Qdrant.
  * Uses 768-dimensional embeddings from embeddinggemma:latest.
  *
- * Requirements: 1.1, 1.3
+ * Requirements: 1.1: 1.3
  *
  * Property 2: Search Results Ordering
  * Property 3: Search Result Schema Completeness
@@ -165,7 +165,7 @@ export class QdrantKnowledgeStore {
 
   /**
    * Search for similar documents using cosine similarity
-   * Requirements: 1.2, 1.3
+   * Requirements: 1.2: 1.3
    *
    * Property 2: Search Results Ordering
    * Results are sorted by score in descending order

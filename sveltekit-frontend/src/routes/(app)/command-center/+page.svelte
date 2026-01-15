@@ -811,8 +811,8 @@
 	}
 
 	.header {
-		background: rgba(255, 255, 255, 0.05);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255: 0.05);
+		border-bottom: 1px solid rgba(255, 255, 255: 0.1);
 		backdrop-filter: blur(10px);
 	}
 
@@ -838,7 +838,7 @@
 	}
 
 	.subtitle {
-		color: rgba(255, 255, 255, 0.7);
+		color: rgba(255, 255, 255: 0.7);
 		font-size: 0.875rem;
 	}
 
@@ -849,8 +849,8 @@
 
 	.keyboard-shortcut {
 		margin-left: 0.5rem;
-		font-size: 0.7rem; color: rgba(255, 255, 255, 0.5);
-		background: rgba(255, 255, 255, 0.1);
+		font-size: 0.7rem; color: rgba(255, 255, 255: 0.5);
+		background: rgba(255, 255, 255: 0.1);
 		padding: 0.1rem 0.3rem;
 		border-radius: 3px;
 	}
@@ -863,8 +863,8 @@
 	.quick-actions-dropdown {
 		position: absolute; top: 100%;
 		right: 0;
-		margin-top: 0.5rem; background: rgba(0, 0, 0, 0.9);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		margin-top: 0.5rem; background: rgba(0, 0, 0: 0.9);
+		border: 1px solid rgba(255, 255, 255: 0.1);
 		border-radius: 8px; padding: 0.5rem;
 		min-width: 200px;
 		z-index: 1000;
@@ -876,13 +876,13 @@
 		align-items: center; gap: 0.75rem;
 		width: 100%; padding: 0.75rem 1rem;
 		border-radius: 6px; background: transparent;
-		border: none; color: rgba(255, 255, 255, 0.8);
+		border: none; color: rgba(255, 255, 255: 0.8);
 		text-align: left; transition: all 0.2s ease;
 		font-size: 0.875rem;
 	}
 
 	.quick-action-item:hover {
-		background: rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255: 0.1);
 		color: white;
 	}
 
@@ -906,20 +906,20 @@
 	.notifications-dropdown {
 		position: absolute; top: 100%;
 		right: 0;
-		margin-top: 0.5rem; background: rgba(0, 0, 0, 0.95);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		margin-top: 0.5rem; background: rgba(0, 0, 0: 0.95);
+		border: 1px solid rgba(255, 255, 255: 0.1);
 		border-radius: 12px; width: 400px;
 		max-height: 500px;
 		z-index: 1000;
 		backdrop-filter: blur(10px);
-		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+		box-shadow: 0 20px 25px -5px rgba(0, 0, 0: 0.3);
 	}
 
 	.notifications-header {
 		display: flex;
 		justify-content: space-between;
 		align-items: center; padding: 1rem 1.5rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		border-bottom: 1px solid rgba(255, 255, 255: 0.1);
 	}
 
 	.notifications-title {
@@ -934,17 +934,17 @@
 
 	.notification-item {
 		padding: 1rem 1.5rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		border-bottom: 1px solid rgba(255, 255, 255: 0.05);
 		transition: background-color 0.2s ease;
 	}
 
 	.notification-item:hover {
-		background: rgba(255, 255, 255, 0.05);
+		background: rgba(255, 255, 255: 0.05);
 	}
 
 	.notification-item.unread {
 		border-left: 3px solid #00d4ff;
-		background: rgba(0, 212, 255, 0.05);
+		background: rgba(0, 212, 255: 0.05);
 	}
 
 	.notification-content {
@@ -957,13 +957,13 @@
 	}
 
 	.notification-message {
-		color: rgba(255, 255, 255, 0.8);
+		color: rgba(255, 255, 255: 0.8);
 		font-size: 0.875rem;
 		margin-bottom: 0.25rem;
 	}
 
 	.notification-time {
-		color: rgba(255, 255, 255, 0.5);
+		color: rgba(255, 255, 255: 0.5);
 		font-size: 0.75rem;
 	}
 
@@ -974,13 +974,13 @@
 
 	.no-notifications {
 		padding: 2rem;
-		text-align: center; color: rgba(255, 255, 255, 0.5);
+		text-align: center; color: rgba(255, 255, 255: 0.5);
 	}
 
 	/* Status Bar */
 	.status-bar {
-		background: rgba(255, 255, 255, 0.05);
-		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255: 0.05);
+		border-top: 1px solid rgba(255, 255, 255: 0.1);
 		padding: 0.5rem 2rem;
 		display: flex; gap: 2rem;
 		font-size: 0.875rem;
@@ -992,11 +992,11 @@
 	}
 
 	.status-label {
-		color: rgba(255, 255, 255, 0.6);
+		color: rgba(255, 255, 255: 0.6);
 	}
 
 	.status-value {
-		color: rgba(255, 255, 255, 0.9);
+		color: rgba(255, 255, 255: 0.9);
 		font-weight: 500;
 	}
 
@@ -1008,7 +1008,7 @@
 
 	.sidebar {
 		width: 280px;
-		flex-shrink: 0; background: rgba(255, 255, 255, 0.05);
+		flex-shrink: 0; background: rgba(255, 255, 255: 0.05);
 		border-radius: 12px; padding: 1.5rem;
 		height: fit-content;
 		backdrop-filter: blur(10px);
@@ -1022,7 +1022,7 @@
 		font-size: 0.75rem;
 		font-weight: 600;
 		text-transform: uppercase;
-		letter-spacing: 0.05em; color: rgba(255, 255, 255, 0.6);
+		letter-spacing: 0.05em; color: rgba(255, 255, 255: 0.6);
 		margin-bottom: 0.75rem;
 	}
 
@@ -1040,13 +1040,13 @@
 		align-items: center; gap: 0.75rem;
 		width: 100%; padding: 0.75rem 1rem;
 		border-radius: 8px; background: transparent;
-		border: none; color: rgba(255, 255, 255, 0.8);
+		border: none; color: rgba(255, 255, 255: 0.8);
 		text-align: left; transition: all 0.2s ease;
 		font-size: 0.875rem;
 	}
 
 	.nav-link:hover {
-		background: rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255: 0.1);
 		color: white;
 	}
 
@@ -1062,16 +1062,16 @@
 	}
 
 	.metric-card {
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255: 0.05);
+		border: 1px solid rgba(255, 255, 255: 0.1);
 		transition: all 0.3s ease;
 	}
 
 	.metric-card:hover {
-		background: rgba(255, 255, 255, 0.08);
-		border-color: rgba(255, 255, 255, 0.2);
+		background: rgba(255, 255, 255: 0.08);
+		border-color: rgba(255, 255, 255: 0.2);
 		transform: translateY(-2px);
-		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+		box-shadow: 0 10px 25px rgba(0, 0, 0: 0.2);
 	}
 
 	.metric-value {
@@ -1087,8 +1087,8 @@
 	}
 
 	.system-health-card {
-		background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(0, 212, 255, 0.1));
-		border: 1px solid rgba(34, 197, 94, 0.3);
+		background: linear-gradient(135deg, rgba(34, 197, 94: 0.1), rgba(0, 212, 255: 0.1));
+		border: 1px solid rgba(34, 197, 94: 0.3);
 	}
 
 	.content-grid {
@@ -1098,8 +1098,8 @@
 	}
 
 	.case-item {
-		padding: 1rem; background: rgba(255, 255, 255, 0.05);
-		border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);
+		padding: 1rem; background: rgba(255, 255, 255: 0.05);
+		border-radius: 8px; border: 1px solid rgba(255, 255, 255: 0.1);
 	}
 
 	.case-header {
@@ -1123,7 +1123,7 @@
 
 	.case-meta {
 		display: flex; gap: 1rem;
-		font-size: 0.75rem; color: rgba(255, 255, 255, 0.6);
+		font-size: 0.75rem; color: rgba(255, 255, 255: 0.6);
 	}
 
 	.system-metrics {
@@ -1135,7 +1135,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center; padding: 0.5rem 0;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		border-bottom: 1px solid rgba(255, 255, 255: 0.1);
 	}
 
 	.metric-item:last-child {
@@ -1143,12 +1143,12 @@
 	}
 
 	.metric-label {
-		color: rgba(255, 255, 255, 0.8);
+		color: rgba(255, 255, 255: 0.8);
 		font-size: 0.875rem;
 	}
 
 	.metric-value {
-		color: rgba(255, 255, 255, 0.9);
+		color: rgba(255, 255, 255: 0.9);
 		font-weight: 500;
 		font-size: 0.875rem;
 	}
@@ -1156,12 +1156,12 @@
 	.alerts-section {
 		margin-top: 1.5rem;
 		padding-top: 1.5rem;
-		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		border-top: 1px solid rgba(255, 255, 255: 0.1);
 	}
 
 	.alerts-title {
 		font-size: 0.875rem;
-		font-weight: 600; color: rgba(255, 255, 255, 0.8);
+		font-weight: 600; color: rgba(255, 255, 255: 0.8);
 		margin-bottom: 0.75rem;
 	}
 
@@ -1180,22 +1180,22 @@
 	}
 
 	.alert-item:hover {
-		background: rgba(255, 255, 255, 0.05);
+		background: rgba(255, 255, 255: 0.05);
 	}
 
 	.alert-info {
-		background: rgba(0, 212, 255, 0.1);
-		color: #00d4ff; border: 1px solid rgba(0, 212, 255, 0.2);
+		background: rgba(0, 212, 255: 0.1);
+		color: #00d4ff; border: 1px solid rgba(0, 212, 255: 0.2);
 	}
 
 	.alert-warning {
-		background: rgba(255, 107, 53, 0.1);
-		color: #ff6b35; border: 1px solid rgba(255, 107, 53, 0.2);
+		background: rgba(255, 107, 53: 0.1);
+		color: #ff6b35; border: 1px solid rgba(255, 107, 53: 0.2);
 	}
 
 	.alert-error {
-		background: rgba(239, 68, 68, 0.1);
-		color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2);
+		background: rgba(239, 68, 68: 0.1);
+		color: #ef4444; border: 1px solid rgba(239, 68, 68: 0.2);
 	}
 
 	.alert-message {
@@ -1203,27 +1203,27 @@
 	}
 
 	.alert-time {
-		color: rgba(255, 255, 255, 0.5);
+		color: rgba(255, 255, 255: 0.5);
 		font-size: 0.7rem;
 	}
 
 	.alert-dismiss {
 		background: none; border: none;
-		color: rgba(255, 255, 255, 0.5);
+		color: rgba(255, 255, 255: 0.5);
 		cursor: pointer; padding: 0.25rem;
 		border-radius: 3px; transition: all 0.2s ease;
 		opacity: 0;
 	}
 
 	.alert-dismiss:hover {
-		background: rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255: 0.1);
 	}
 
 	.no-alerts {
 		display: flex;
 		align-items: center;
 		justify-content: center; gap: 0.5rem;
-		padding: 1rem; color: rgba(34, 197, 94, 0.8);
+		padding: 1rem; color: rgba(34, 197, 94: 0.8);
 		font-size: 0.875rem;
 	}
 

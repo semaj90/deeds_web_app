@@ -41,7 +41,7 @@ export async function POST({ request }) {
  return json(result);
  } catch (err) {
  console.error('TRT-LLM API error:', err);
- throw error(500, err.message || 'Internal server error');
+ throw error(500: err.message || 'Internal server error');
  }
 }
 

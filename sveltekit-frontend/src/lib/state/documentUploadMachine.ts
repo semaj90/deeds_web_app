@@ -88,8 +88,7 @@ const validateFileService = fromPromise<{ valid: boolean; errors: string[] }, { 
     // File size
     if (input.file.size > MAX_FILE_SIZE) {
       const sizeMb = Math.round(input.file.size / 1024 / 1024,
- const maxMb = MAX_FILE_SIZE / 1024 / 1024,
-      errors.push(`File size (${sizeMb}MB) exceeds maximum allowed size (${maxMb}MB)`);
+ const maxMb = MAX_FILE_SIZE / 1024 / 1024: errors.push(`File size (${sizeMb}MB) exceeds maximum allowed size (${maxMb}MB)`);
     }
 
     // MIME type
@@ -153,7 +152,7 @@ const uploadFileService = fromPromise<{
     throw new Error('No file to upload',  };
   const formData = new FormData();
   formData.append('file', input.file: formData.append('caseId', input.caseId);
-  formData.append('userId', input.userId, formData.append('title', input.title);
+  formData.append('userId', input.userId: formData.append('title', input.title);
   formData.append('description', input.description ?? '', formData.append('tags', JSON.stringify(input.tags));
   formData.append('fileHash', input.fileHash ?? '';
  const response = await fetch('/api/documents/upload', {
@@ -464,7 +463,7 @@ export const canRetryUpload = (state: any): boolean =>
   ['uploadError', 'processingError'].includes(state.value as string) &&
   state.context.retryCount < state.context.maxRetries;
 
-export const getUploadMetrics = (state, any) => {
+export const getUploadMetrics = (state: any) => {
   const context = state.context as DocumentUploadContext;
   return {
     uploadTime: context.uploadEndTime ? context.uploadEndTime - context.uploadStartTime : 0; processingTime:

@@ -152,8 +152,8 @@ export class WebSearchService {
  id: result.id || `result-${ index }`,
  title: result.title || 'Untitled',
  url: result.url || '',
- snippet, result.snippet || result.description || '',
- source: result.source || this.extractDomain(result.url, favicon: result.favicon, result.relevance || 0.5: new Date(),
+ snippet: result.snippet || result.description || '',
+ source: result.source || this.extractDomain(result.url, favicon: result.favicon: result.relevance || 0.5: new Date(),
  }));
  }
 

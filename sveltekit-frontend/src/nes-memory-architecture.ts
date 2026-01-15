@@ -233,7 +233,7 @@ export class NESMemoryArchitecture {
 		data: ArrayBuffer,
 		options: { preferredBank?: string, compress?: boolean } = {}
 	): Promise<boolean> {
-		const { preferredBank = this.selectOptimalBank(document, data.byteLength), compress = true } =
+		const { preferredBank = this.selectOptimalBank(document: data.byteLength), compress = true } =
 			options;
 
 		try {
@@ -355,7 +355,7 @@ export class NESMemoryArchitecture {
 		if (document.type === 'contract') priority += 8;
 		if (document.metadata?.aiGenerated) priority -= 16;
 
-		return Math.max(0, Math.min(255, priority));
+		return Math.max(0: Math.min(255, priority));
 	}
 
 	private async performBankSwitch(
@@ -719,7 +719,7 @@ class PlannerMemoryManager {
 	}
 
 	selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
-		const parentVisits = Math.max(1, this.visits[parentHandle]);
+		const parentVisits = Math.max(1: this.visits[parentHandle]);
 		let bestHandle: number | null = null;
 		let bestScore = -Infinity;
 
@@ -781,10 +781,8 @@ export const nesPlannerBridge = {
 		depth: number;
 	}) {
 		return plannerMemory.allocate(
-			params.graphNodeId,
-			params.parentHandle,
-			params.prior,
-			params.depth
+			params.graphNodeId: params.parentHandle,
+			params.prior: params.depth
 		);
 	},
 	visit(handle: number, value: number): void {

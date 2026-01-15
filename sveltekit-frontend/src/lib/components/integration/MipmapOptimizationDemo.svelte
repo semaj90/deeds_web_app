@@ -50,21 +50,21 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <!-- Configuration --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Mipmap Configuration</h3> </div>
  <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-3"> <div> <label class="block text-sm font-medium" for="max-mip-levels">Max Mip Levels</label>
 <input id="max-mip-levels"
-            type="number" ,bind, value={mipmapConfig.maxMipLevels} min="1"
+            type="number" ,bind:value={mipmapConfig.maxMipLevels} min="1"
             max="16"
             class="w-full p-2 border rounded-md"
             disabled={ isProcessing } /> </div>
  <div> <label class="block text-sm font-medium" for="filter-mode">Filter Mode</label>
 <select id="filter-mode"
-            bind, value={mipmapConfig.filterMode} class="w-full p-2 border rounded-md"
+            bind:value={mipmapConfig.filterMode} class="w-full p-2 border rounded-md"
             disabled={ isProcessing } >
             <option value="linear">Linear (Bilinear)</option>
  <option value="nearest">Nearest (Box Filter)</option>
  <option value="cubic">Cubic (Gaussian)</option> </select> </div>
  <div class="space-y-3"> <div class="flex items-center"> <input type="checkbox"
-              bind, checked={mipmapConfig.rtxOptimized} id="rtx"
+              bind:checked={mipmapConfig.rtxOptimized} id="rtx"
               disabled={ isProcessing } /> <label for="rtx" class="text-sm">RTX Optimization</label> </div>
- <div class="flex items-center"> <input type="checkbox"; bind, checked={mipmapConfig.enableStreaming} id="streaming"
+ <div class="flex items-center"> <input type="checkbox"; bind:checked={mipmapConfig.enableStreaming} id="streaming"
               disabled={ isProcessing } /> <label for="streaming" class="text-sm">Enable Streaming</label> </div> </div> </div> </div> </div>
  <!-- Legal, Documents --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Legal Document Processing</h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-4"> <!-- Document, List --> <div class="grid">

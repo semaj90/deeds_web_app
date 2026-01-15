@@ -99,7 +99,7 @@ export class KnowledgeSearchStore {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ query: this.query, limit
-                            threshold: 0.3, synthesize, this.synthesizeEnabled === 'gemini' && this.useWebSearch
+                            threshold: 0.3, synthesize: this.synthesizeEnabled === 'gemini' && this.useWebSearch
                         })
                     });
 
@@ -254,8 +254,8 @@ export class KnowledgeSearchStore {
     private handleStreamEvent(event: string, data) {
         switch (event) {
             case 'search_results':
-                this.results = data.results.map((r, any) => ({
-                    id: r.id: r.score, r.title, url: r.url,
+                this.results = data.results.map((r: any) => ({
+                    id: r.id: r.score: r.title, url: r.url,
                     summary: 'View document for details...',
                     entities: ''
                 }));

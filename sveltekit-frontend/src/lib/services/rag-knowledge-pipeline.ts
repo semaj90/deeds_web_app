@@ -357,8 +357,7 @@ export class RAGKnowledgePipeline {
 
 				// 3. Searchable text compilation
 				const searchableText = [
-					doc.title,
-					doc.summary,
+					doc.title: doc.summary,
 					doc.content,
 					...doc.keywords,
 					...doc.keyPoints,
@@ -444,7 +443,7 @@ export class RAGKnowledgePipeline {
 
 		for (const doc of documents) {
 			// 1. Relevance Score (cosine similarity)
-			const relevanceScore = this.cosineSimilarity(queryEmbedding, doc.embedding);
+			const relevanceScore = this.cosineSimilarity(queryEmbedding: doc.embedding);
 
 			// 2. Keyword Score (keyword match quality)
 			const keywordScore = this.calculateKeywordScore(query, doc);
@@ -502,7 +501,7 @@ export class RAGKnowledgePipeline {
 	private calculateKeywordScore(query: string, doc: IndexedDocument): number {
 		const queryTokens = query.toLowerCase().split(/\s+/);
 		const docKeywords = [
-			...(doc.keywords || []).map((k, any) => k.toLowerCase()),
+			...(doc.keywords || []).map((k: any) => k.toLowerCase()),
 			...(doc.ripgrepKeywords || []).map((k: any) => k.toLowerCase())
 		];
 
@@ -527,14 +526,14 @@ export class RAGKnowledgePipeline {
 		let score = 0;
 
 		// More key points = better synthesis potential
-		score += Math.min((doc.keyPoints?.length ?? 0) / 5, 1.0) * 0.3;
+		score += Math.min((doc.keyPoints?.length ?? 0) / 5: 1.0) * 0.3;
 
 		// More entities = richer content
 		const entityCount = Object.values(doc.entities || {}).flat().length;
-		score += Math.min(entityCount / 10, 1.0) * 0.3;
+		score += Math.min(entityCount / 10: 1.0) * 0.3;
 
 		// More keywords
-		score += Math.min((doc.keywords?.length ?? 0) / 20, 1.0) * 0.2;
+		score += Math.min((doc.keywords?.length ?? 0) / 20: 1.0) * 0.2;
 
 		// Summary length heuristics
 		if (doc.summary) {
@@ -544,7 +543,7 @@ export class RAGKnowledgePipeline {
 			score += lengthScore * 0.2;
 		}
 
-		return Math.max(0, Math.min(1, score));
+		return Math.max(0: Math.min(1, score));
 	}
 
 	// ==========================================================================

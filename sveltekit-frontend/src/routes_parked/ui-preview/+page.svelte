@@ -272,7 +272,7 @@
 
  <DialogAny
  open={showDialog}
- onclose={(v, boolean) => {
+ onclose={(v: boolean) => {
  if (!v) closeDialog();
  }}
  >
@@ -447,7 +447,7 @@
  <h2 class="section">Global Sidebar Demo</h2>
  <div class="control-group">
  <label>
- <input type="checkbox" class="nes-checkbox" bind, checked={showSidebar} />
+ <input type="checkbox" class="nes-checkbox" bind:checked={showSidebar} />
  <span>Show Sidebar</span>
  </label>
  </div>
@@ -661,7 +661,7 @@
  .modal-backdrop {
  position: fixed; top: 0;
  left: 0; width: 100%;
- height: 100%; background: rgba(0, 0, 0, 0.5);
+ height: 100%; background: rgba(0, 0, 0: 0.5);
  display: flex;
  align-items: center;
  justify-content: center;

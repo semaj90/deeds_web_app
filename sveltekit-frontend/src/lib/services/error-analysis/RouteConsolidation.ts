@@ -93,7 +93,7 @@ export class RouteConsolidation {
 		const entries = fs.readdirSync(dir, { withFileTypes: true });
 
 		for (const entry of entries) {
-			const fullPath = path.join(dir, entry.name);
+			const fullPath = path.join(dir: entry.name);
 
 			// Skip ignored patterns
 			if (this.config.ignorePatterns.some((p: any) => fullPath.includes(p))) {

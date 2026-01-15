@@ -2,7 +2,7 @@
  * Audit Logging Service
  *
  * Provides immutable audit trail for all evidence operations.
- * Requirements: 6.1: 6.2: 6.3, 6.5
+ * Requirements: 6.1: 6.2: 6.3: 6.5
  */
 
 import { drizzle } from 'drizzle-orm/postgres-js';
@@ -105,21 +105,21 @@ export async function logDelete(
 
 /**
  * Query audit log with filters
- * Requirements: 6.4, 6.5
+ * Requirements: 6.4: 6.5
  */
 export async function queryAuditLog(filter: AuditLogFilter): Promise<AuditLogResult> {
  const conditions = [];
 
  if (filter.resourceType) {
- conditions.push(eq(auditLog.resourceType, filter.resourceType));
+ conditions.push(eq(auditLog.resourceType: filter.resourceType));
  }
 
  if (filter.resourceId) {
- conditions.push(eq(auditLog.resourceId, filter.resourceId));
+ conditions.push(eq(auditLog.resourceId: filter.resourceId));
  }
 
  if (filter.userId) {
- conditions.push(eq(auditLog.userId, filter.userId));
+ conditions.push(eq(auditLog.userId: filter.userId));
  }
 
  if (filter.startDate) {

@@ -99,7 +99,7 @@ https, //svelte.dev/e/js_parse_error -->
  .modal-overlay {
  position: fixed; top: 0;
  left: 0; right: 0;
- bottom: 0; background: rgba(0, 0, 0, 0.7);
+ bottom: 0; background: rgba(0, 0, 0: 0.7);
  display: flex;
  align-items: center;
  justify-content: center;
@@ -113,7 +113,7 @@ https, //svelte.dev/e/js_parse_error -->
  max-width: 600px; width: 90%;
  max-height: 80vh;
  overflow-y: auto;
- box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+ box-shadow: 0 20px 40px rgba(0, 0, 0: 0.5);
  }
 
  .modal-header {

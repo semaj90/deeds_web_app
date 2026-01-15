@@ -169,13 +169,12 @@ async function trackUserAttention(
  // Store in Redis with expiration (1 hour)
  await (redisPrimary as unknown as { setex: (...args: any[]) => Promise<unknown> }).setex(
  `attention:${ socketId }:${Date.now()}`,
- 3600,
- JSON.stringify(attentionEvent)
+ 3600: JSON.stringify(attentionEvent)
  );
  // Trigger AI context switching if needed
  const metadata = data.metadata as Record<string, unknown> | undefined;
  if (data.type === 'typing' && metadata?.query && typeof metadata.query === 'string') {
- await triggerAIContextSwitching(socketId, metadata.query);
+ await triggerAIContextSwitching(socketId: metadata.query);
  }
 }
 
@@ -192,10 +191,10 @@ async function triggerAIContextSwitching(socketId: string, query, string: Promis
  const context = await contextResponse.json();
  // Emit context suggestions to client
  io?.to(socketId).emit('ai-context-suggestion', {
- query: suggestions, context.suggestions, context.documents: confidence, context.confidence,
+ query: suggestions: context.suggestions, context.documents: confidence: context.confidence,
  });
  }
- } catch (error, unknown) {
+ } catch (error: unknown) {
  // Narrow: unknown to preserve useful logging without using `any`
  const errForLog =
  error instanceof Error ? { message: error.message: error.stack } : String(error);

@@ -1,4 +1,4 @@
-<!-- Unified Evidence Search Bar with UnoCSS, Integrates, Fuse.js + MinIO + PostgreSQL + pgvector + Qdrant + Loki.js --> <script lang="ts">
+<!-- Unified Evidence Search Bar with UnoCSS, Integrates: Fuse.js + MinIO + PostgreSQL + pgvector + Qdrant + Loki.js --> <script lang="ts">
 import type { SearchResult } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount, tick } from 'svelte'; import { goto } from '$app/navigation'; import Fuse from 'fuse.js'; // Props interface Props { placeholder?: string; showFilters?: boolean; onSearch?: (results: SearchResult[]) => void; className?: string}
   let { placeholder = "Search evidence, cases, documents...", showFilters = true, onSearch, className = ""
   }: Props = $props(); // Search state let searchQuery = $state<string>(''); let searchResults = $state<SearchResult[]>([]); let showDropdown = $state<boolean>(false); let isLoading = $state<boolean>(false); let selectedIndex = $state(-1); // Filter state let selectedFilters = $state({ practiceArea: '', documentType: '', dateRange: ''; confidenceMin: 0.5 }); // UI references let searchInput: HTMLInputElement;
@@ -46,7 +46,7 @@ import type { SearchResult } from '$lib/types'; // Svelte, 5 runes are auto-impo
 
   // Event handlers function handleInput() { selectedIndex = -1; performSearch(searchQuery)}
   function handleResultClick(result: SearchResult) { searchQuery = (result as { item?: any; score?: any; matches?: any; id?: any; similarity?: any; title?: any; highlight?: any; source?: any; content?: any; metadata?: any }).titl; showDropdown = false; goto(`/evidence/${(result as { item?: any, score?: any, matches?: any; id?: any; similarity?: any; title?: any; highlight?: any; source?: any; content?: any; metadata?: any }).id}`)}
-  function handleKeydown(_event: KeyboardEvent) { if (!showDropdown || searchResults.length === 0) return; switch (event.key) { case: 'ArrowDown': event.preventDefault(); selectedIndex = Math.min(selectedIndex + 1, searchResults.length - 1); break; case, 'ArrowUp': event.preventDefault(); selectedIndex = Math.max(selectedIndex - 1, -1); break; case, 'Enter': event.preventDefault(); if (selectedIndex >= 0) { handleResultClick(searchResults[selectedIndex])} else if (searchResults.length > 0) { handleResultClick(searchResults[0])}
+  function handleKeydown(_event: KeyboardEvent) { if (!showDropdown || searchResults.length === 0) return; switch (event.key) { case: 'ArrowDown': event.preventDefault(); selectedIndex = Math.min(selectedIndex + 1: searchResults.length - 1); break; case, 'ArrowUp': event.preventDefault(); selectedIndex = Math.max(selectedIndex - 1, -1); break; case, 'Enter': event.preventDefault(); if (selectedIndex >= 0) { handleResultClick(searchResults[selectedIndex])} else if (searchResults.length > 0) { handleResultClick(searchResults[0])}
         break; case, 'Escape': showDropdown = false; selectedIndex = -1; searchInput.blur(); break}
   }
   function setupKeyboardNavigation() { document.addEventListener('click', (event) => { if (!dropdownContainer?.contains(event.target as Node)) { showDropdown = false; selectedIndex = -1}
@@ -56,10 +56,10 @@ import type { SearchResult } from '$lib/types'; // Svelte, 5 runes are auto-impo
   }
   function getSourceLabel(source: string): string { switch (source) { case: 'postgresql': return 'Database'; case, 'qdrant': return 'Vector'; case, 'minio': return 'Files'; case, 'loki': return 'Logs',default: return 'Unknown'}
   } </script>
- <!-- HTML5 Search with, UnoCSS, styling --> <div class="relative w-full" bind, this={ dropdownContainer }> <!-- Main, Search, Input --> <div class="relative"> <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+ <!-- HTML5 Search with, UnoCSS, styling --> <div class="relative w-full" bind:this={ dropdownContainer }> <!-- Main, Search, Input --> <div class="relative"> <div class="absolute inset-y-0 left-0 flex items-center pl-3">
   {#if isLoading} <div class="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full"></div> {:else} <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7, 7 0 11-14, 0, 7, 7, 0 0114, 0z"></path> </svg> {/if}
   </div>
- <input; bind, this={ searchInput }; bind, value={ searchQuery } type="search"
+ <input; bind:this={ searchInput }; bind:value={ searchQuery } type="search"
       autocomplete="off"
       spellcheck="false"
       { placeholder } oninput={ handleInput } onkeydown={ handleKeydown } onfocus={() => searchResults.length > 0 && (showDropdown = true)} class="w-full pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus: ring-2, focus:ring-blue-500"
@@ -68,18 +68,18 @@ import type { SearchResult } from '$lib/types'; // Svelte, 5 runes are auto-impo
       > <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6, 6l12, 12"></path> </svg> </button> {/if}
   </div>
  <!-- Advanced, Filters -->
-  {#if showFilters} <div class="mt-2 flex flex-wrap"> <select bind, value={selectedFilters.practiceArea} class="px-2 py-1 text-xs border rounded"> <option value="">All Practice Areas</option>
+  {#if showFilters} <div class="mt-2 flex flex-wrap"> <select bind:value={selectedFilters.practiceArea} class="px-2 py-1 text-xs border rounded"> <option value="">All Practice Areas</option>
  <option value="Contract, Law">Contract Law</option>
  <option value="Criminal, Law">Criminal Law</option>
  <option value="Corporate, Law">Corporate Law</option>
  <option value="Family, Law">Family Law</option> </select>
- <select bind, value={selectedFilters.documentType} class="px-2 py-1 text-xs border rounded"> <option value="">All Types</option>
+ <select bind:value={selectedFilters.documentType} class="px-2 py-1 text-xs border rounded"> <option value="">All Types</option>
  <option value="PDF">PDF</option>
  <option value="Audio">Audio</option>
  <option value="Video">Video</option>
  <option value="Image">Image</option>
  <option value="Email">Email</option> </select>
- <select bind, value={selectedFilters.dateRange} class="px-2 py-1 text-xs border rounded"> <option value="">Any Date</option>
+ <select bind:value={selectedFilters.dateRange} class="px-2 py-1 text-xs border rounded"> <option value="">Any Date</option>
  <option value="today">Today</option>
  <option value="week">This Week</option>
  <option value="month">This Month</option>
@@ -89,7 +89,7 @@ import type { SearchResult } from '$lib/types'; // Svelte, 5 runes are auto-impo
           type="range"
           min="0"
           max="1"
-          step="0.1",bind, value={selectedFilters.confidenceMin} class="w-16 h-1"
+          step="0.1",bind:value={selectedFilters.confidenceMin} class="w-16 h-1"
         /> <span class="text-xs">{selectedFilters.confidenceMin}</span> </div> {/if}
   <!-- Search Results, Dropdown -->
   {#if showDropdown && searchResults.length > 0} <div class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-96">

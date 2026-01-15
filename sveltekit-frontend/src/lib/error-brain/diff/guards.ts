@@ -113,7 +113,7 @@ export async function guardAll(
  if (!lineDeltaResult.ok) return lineDeltaResult;
 
  // Check no duplicates
- const noDuplicatesResult = guardNoDuplicates(appliedFiles, patch.file);
+ const noDuplicatesResult = guardNoDuplicates(appliedFiles: patch.file);
  if (!noDuplicatesResult.ok) return noDuplicatesResult;
 
  return { ok: true };

@@ -135,6 +135,7 @@ export const users = pgTable('users', {
  id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
  email: varchar('email', { length: 255 }).unique().notNull(),
  passwordHash: varchar('hashed_password', { length: 255 }).notNull(),
+ name: varchar('name', { length: 255 }), // Legacy field - use firstName/lastName instead
  firstName: varchar('first_name', { length: 255 }),
  lastName: varchar('last_name', { length: 255 }),
  role: userRoleEnum('role').notNull().default('prosecutor'),
@@ -299,52 +300,35 @@ export const criminals = pgTable(
 );
 
 // === EVIDENCE MANAGEMENT ===
-export const evidence = pgTable(
- 'evidence',
- {
+export const evidence = pgTable('evidence', {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
  .primaryKey()
  .notNull(),
  caseId: uuid('case_id'), // Foreign key to cases.id
- criminalId: uuid('criminal_id'), // Foreign key to criminals.id
  title: varchar('title', { length: 255 }).notNull(),
  description: text('description'),
- evidenceType: evidenceTypeEnum('evidence_type').notNull(),
- fileType: varchar('file_type', { length: 50 }),
+ // OLD COLUMNS (preserve existing data)
+ filePath: varchar('file_path', { length: 500 }),
+ fileType: varchar('file_type', { length: 100 }),
+ fileSize: integer('file_size'),
+ hash: varchar('hash', { length: 255 }),
+ source: varchar('source', { length: 255 }),
+ dateObtained: timestamp('date_obtained', { withTimezone: true }),
+ chainOfCustody: jsonb('chain_of_custody'),
+ metadata: jsonb('metadata'),
+ createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+ updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+ // NEW COLUMNS (for enhanced functionality - graceful fallback if null)
+ criminalId: uuid('criminal_id'), // Foreign key to criminals.id
+ evidenceType: evidenceTypeEnum('evidence_type'), // Optional enum
  subType: varchar('sub_type', { length: 50 }),
- fileUrl: text('file_url'),
+ fileUrl: text('file_url'), // S3/MinIO URL
  fileName: varchar('file_name', { length: 255 }),
- canvasPosition: jsonb('canvas_position').default({}).notNull(),
+ canvasPosition: jsonb('canvas_position').default({}),
  uploadedBy: uuid('uploaded_by'), // Foreign key to users.id
- uploadedAt: timestamp('uploaded_at', { mode: 'string' }).defaultNow().notNull(),
- updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
- },
- (table) => ({
- indexes: [
- index('evidence_case_id_idx').on(table.caseId),
- index('evidence_criminal_id_idx').on(table.criminalId),
- index('evidence_type_idx').on(table.evidenceType),
- index('evidence_uploaded_by_idx').on(table.uploadedBy),
- index('evidence_uploaded_at_idx').on(table.uploadedAt)],
- foreignKeys: [
- foreignKey({
- columns: [table.caseId],
- foreignColumns: [cases.id],
- name: 'evidence_case_id_cases_id_fk',
- }).onDelete('cascade'),
- foreignKey({
- columns: [table.criminalId],
- foreignColumns: [criminals.id],
- name: 'evidence_criminal_id_criminals_id_fk',
- }).onDelete('set null'),
- foreignKey({
- columns: [table.uploadedBy],
- foreignColumns: [users.id],
- name: 'evidence_uploaded_by_users_id_fk',
- }).onDelete('set null')],
- })
-);
+ uploadedAt: timestamp('uploaded_at', { mode: 'string' }),
+});
 
 // === EVIDENCE RELATIONSHIPS ===
 export const evidenceRelationships = pgTable(
@@ -392,18 +376,26 @@ export const documents = pgTable('documents', {
  .default(sql`gen_random_uuid()`)
  .primaryKey()
  .notNull(),
- title: text('title').notNull(),
+ caseId: uuid('case_id'),
+ title: varchar('title', { length: 255 }).notNull(),
+ // OLD COLUMNS (preserve existing data)
+ description: text('description'),
+ filePath: varchar('file_path', { length: 500 }),
+ fileType: varchar('file_type', { length: 100 }),
+ fileSize: integer('file_size'),
  content: text('content'),
- s3Key: text('s3_key').notNull(), // Added
- s3Bucket: text('s3_bucket').notNull().default('legal-documents'), // Added
- originalName: text('original_name').notNull(), // Added
- mimeType: text('mime_type').notNull(), // Added
- fileSize: bigint('file_size', { mode: 'number' }).notNull().default(0), // Added
- caseId: uuid('case_id'), // Added, assuming foreign key to cases table
- userId: uuid('user_id'), // Added, assuming foreign key to users table
- status: documentStatusEnum('status').notNull().default('queued'),
- createdAt: timestamp('created_at').defaultNow().notNull(),
- updatedAt: timestamp('updated_at').defaultNow().notNull(),
+ summary: text('summary'),
+ embeddingId: varchar('embedding_id', { length: 255 }),
+ metadata: jsonb('metadata'),
+ createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+ updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+ status: varchar('status', { length: 50 }).default('pending'),
+ // NEW COLUMNS (for S3/MinIO integration - graceful fallback if null)
+ s3Key: text('s3_key'),
+ s3Bucket: text('s3_bucket').default('legal-documents'),
+ originalName: text('original_name'),
+ mimeType: text('mime_type'),
+ userId: uuid('user_id'),
 });
 
 // Define legalDocuments table (based on documents, with additional fields for Qdrant integration)
@@ -2173,12 +2165,10 @@ export const errorSuggestionStates = pgTable(
  },
  (table) => ({
  idxSuggestionRoute: index('idx_error_suggestion_states_suggestion_route').on(
- table.suggestionId,
- table.routePath
+ table.suggestionId, table.routePath
  ),
  uniqueSuggestionRouteUser: unique('uq_error_suggestion_states_suggestion_route_user').on(
- table.suggestionId,
- table.routePath,
+ table.suggestionId, table.routePath,
  table.userId
  ),
  })

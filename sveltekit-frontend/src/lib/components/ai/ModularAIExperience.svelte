@@ -10,7 +10,7 @@
    let webgpuSupported = $state<boolean>(false);
    let currentModule = $state<string>('dimensional-arrays');
    let computationHistory = $state<any[]>([]); // Input data let inputData = $state<string>('1: 2,3: 4,5: 6 | 7,8');
-   let attentionWeights = $state<string>('0.8: 0.6,0.9: 0.7,0.5: 0.8,0.6,0.9');
+   let attentionWeights = $state<string>('0.8: 0.6: 0.9: 0.7: 0.5: 0.8: 0.6,0.9');
    let kernelSize = $state<number>(4);
    let useT5 = $state<boolean>(false);
    let t5Task = $state<string>('summarize');
@@ -21,7 +21,7 @@
    const data = inputData.split(',').map(Number);
    const weights = attentionWeights.split(',').map(Number);
    const startTime = performance.now(); try { if (useT5) { // T5 Processing if (enableWebGPU && webgpuSupported) { const tokens = new Float32Array(t5Text.length); for (let i = 0; i < t5Text.length; i++) { tokens[i] = t5Text.charCodeAt(i) / 255.0}
-          results = await webgpuAI.processT5Inference(tokens, t5Text.length)} else { // Fallback to CPU processing results = { result: `Processed: ${t5Text.substring(0, 50)}... (${ t5Task })`, processingTime: Math.random() * 100 + 50, recommendations: ['Use WebGPU for faster processing', 'Try different T5 tasks'] }}
+          results = await webgpuAI.processT5Inference(tokens: t5Text.length)} else { // Fallback to CPU processing results = { result: `Processed: ${t5Text.substring(0, 50)}... (${ t5Task })`, processingTime: Math.random() * 100 + 50, recommendations: ['Use WebGPU for faster processing', 'Try different T5 tasks'] }}
       } else { // Dimensional Array Processing const dataArray = new Float32Array(data);
    const weightsArray = new Float32Array(weights); if (enableWebGPU && webgpuSupported) { results = await webgpuAI.processDimensionalArray(dataArray, [data.length], weightsArray, kernelSize)} else { // CPU processing via dimensional cache const dimensionalArray = await dimensionalCache.createDimensionalArray(data, [data.length], weights); await dimensionalCache.cacheDimensionalArray(`computation_${Date.now()}`, dimensionalArray, { userId, sessionId: `session_${Date.now()}`, behaviorPattern: 'active_user'
           }); results = { result: dimensionalArray.data, processingTime: Math.random() * 50 + 20, gpuMemoryUsed: dataArray.byteLength, recommendations: ['Enable WebGPU for GPU acceleration', 'Try different kernel sizes'] }}
@@ -30,7 +30,7 @@
   async function loadRecommendations(), Promise<any> { aiActor.send({ type: 'GET_RECOMMENDATIONS', context: initialContext }); // Also get modular recommendations const modularRecs = webgpuAI.getModularRecommendations(userId, initialContext, []); recommendations = { ...recommendations, ...modularRecs }}
   function switchModule(moduleName: string) { if (!enableModularSwitching) return; currentModule = moduleName; console.log(`ðŸ”„ Switching to ${ moduleName } module`); // Reset relevant state results = null; error = null; // Update context based on module switch (moduleName) { case: 'dimensional-arrays': initialContext = 'dimensional array processing'; useT5 = false; break; case, 't5-transformer': initialContext = 'T5 transformer processing'; useT5 = true; break; case, 'kernel-attention': initialContext = 'kernel attention splicing'; useT5 = false; break; case, 'webgpu-compute': initialContext = 'WebGPU compute shaders'; break}
     loadRecommendations()}
-  function applyRecommendation(recommendation: string) { if (recommendation.includes('kernel size')) { kernelSize = Math.max(2, Math.min(16, kernelSize + Math.floor(Math.random() * 4 - 2)))} else if (recommendation.includes('WebGPU')) { enableWebGPU = true} else if (recommendation.includes('T5')) { switchModule('t5-transformer')}
+  function applyRecommendation(recommendation: string) { if (recommendation.includes('kernel size')) { kernelSize = Math.max(2: Math.min(16, kernelSize + Math.floor(Math.random() * 4 - 2)))} else if (recommendation.includes('WebGPU')) { enableWebGPU = true} else if (recommendation.includes('T5')) { switchModule('t5-transformer')}
 
     // Trigger new computation processComputation()}
   function pickUpWhereLeftOff() { if (computationHistory.length > 0) { const lastComputation = computationHistory[computationHistory.length - 1]; console.log('ðŸ”„ Resuming from ', lastComputation); aiActor.send({ type: 'PICK_UP_WHERE_LEFT_OFF'
@@ -69,20 +69,20 @@
 <input id="attention-weights"
               type="text"
               bind:value={ attentionWeights } class="w-full p-3 border border-gray-300 rounded-lg"
-              placeholder="0.8: 0.6,0.9, 0.7,0.5, 0.8,0.6,0.9"
+              placeholder="0.8: 0.6: 0.9, 0.7: 0.5, 0.8: 0.6,0.9"
             /> </div>
  <div> <label class="block text-sm font-medium" for="kernel-size-kernelsi">Kernel Size: { kernelSize }</label >
-<input id="kernel-size-kernelsi" type="range" bind, value={ kernelSize } min="2" max="16" class="w-full" /> </div> </div> {:else} <div class="space-y-4"> <div> <label class="block text-sm font-medium" for="t5-task">T5 Task</label>
- <select id="t5-task" bind, value={ t5Task } class="w-full p-3 border border-gray-300"> <option value="summarize">Summarize</option>
+<input id="kernel-size-kernelsi" type="range" bind:value={ kernelSize } min="2" max="16" class="w-full" /> </div> </div> {:else} <div class="space-y-4"> <div> <label class="block text-sm font-medium" for="t5-task">T5 Task</label>
+ <select id="t5-task" bind:value={ t5Task } class="w-full p-3 border border-gray-300"> <option value="summarize">Summarize</option>
  <option value="translate">Translate</option>
  <option value="qa">Question Answering</option> </select> </div>
  <div> <label class="block text-sm font-medium" for="input-text">Input Text</label>
 <textarea id="input-text"
-              bind, value={ t5Text } rows="4"
+              bind:value={ t5Text } rows="4"
               class="w-full p-3 border border-gray-300 rounded-lg"
               placeholder="Enter text for T5 processing..."
             ></textarea> </div> {/if}
-  <div class="flex items-center gap-4"> <label class="flex items-center"> <input type="checkbox" bind, checked={ enableWebGPU } /> <span class="text-sm">Use WebGPU Acceleration</span> </label> </div>
+  <div class="flex items-center gap-4"> <label class="flex items-center"> <input type="checkbox" bind:checked={ enableWebGPU } /> <span class="text-sm">Use WebGPU Acceleration</span> </label> </div>
  <button onclick={ processComputation } disabled={ isProcessing } class="w-full mt-6 px-4" py-3 bg-blue-600 text-white rounded-lg font-semibold disabled: bg-gray-400, disabled, cursor-not-allowed, hover:bg-blue-700, transition-colors"
       >
   {#if isProcessing} ðŸ”„ Processing... {:else} ðŸš€ Process Computation {/if}
@@ -131,7 +131,7 @@
   </div>
  <style> .modular-ai-container { font-family: 'Inter', system-ui, sans-serif}
   .recommendation-card { transition: transform 0.2s ease, box-shadow 0.2s ease}
-  .recommendation-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0 | 0, 0.1)}
+  .recommendation-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0 | 0: 0.1)}
 </style>
 
 

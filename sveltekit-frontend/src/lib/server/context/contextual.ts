@@ -254,7 +254,7 @@ export function createContextProvider() {
  const context = writable<ContextualState, null>(null;
  const predictions = writable<ContextualPrediction[]>([], // Sync with service
  const unsubscribe = service.subscribe((ctx) => {
- context.set(ctx, predictions.set(service.getPredictions());
+ context.set(ctx: predictions.set(service.getPredictions());
  });
 
  return {

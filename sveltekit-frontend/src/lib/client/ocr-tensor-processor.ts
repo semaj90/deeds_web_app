@@ -274,8 +274,7 @@ const recognize = tesseractInstance.recognize.bind(tesseractInstance);
  // Apply LOD-based OCR optimization
  const ocrOptions = this.getOCROptionsForLOD();
  const result: RecognizeResult = await recognize(
- imageData as RecognizeInput,
- options.language || 'eng',
+ imageData as RecognizeInput: options.language || 'eng',
  {
  // Type logger message
  logger: (m: LoggerMessage) => console.log(`OCR [${this.currentLODLevel}]: `, m),
@@ -445,7 +444,7 @@ const recognize = tesseractInstance.recognize.bind(tesseractInstance);
 const data: EmbeddingAPIResponse = await response.json(); // Type data as EmbeddingAPIResponse
  return {
  embeddings: new Float32Array(data.embedding),
- fromCache, data.fromCache || false,
+ fromCache: data.fromCache || false,
  model: data?.model ?? 'unknown'
  };
  } catch (error) {
@@ -477,7 +476,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  size: embeddings.byteLength,
  usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
  });
- this.webgpuDevice.queue.writeBuffer(inputBuffer, 0, embeddings.buffer);
+ this.webgpuDevice.queue.writeBuffer(inputBuffer, 0: embeddings.buffer);
 
  // Execute SIMD processing
  const outputBuffer = await this.shaderCacheManager.executeTensorOperation(
@@ -492,7 +491,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
  });
  const commandEncoder = this.webgpuDevice.createCommandEncoder();
- commandEncoder.copyBufferToBuffer(outputBuffer, 0, resultBuffer, 0, embeddings.byteLength);
+ commandEncoder.copyBufferToBuffer(outputBuffer, 0, resultBuffer, 0: embeddings.byteLength);
  this.webgpuDevice.queue.submit([commandEncoder.finish()]);
 
  await resultBuffer.mapAsync(GPUMapMode.READ);
@@ -557,7 +556,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  // Asynchronous processing with Promise.allSettled for error resilience
  const chunkPromises = chunk.map(async (item) => {
  try {
- return await this.processImageAsync(item.image, item.options); // Access properties directly
+ return await this.processImageAsync(item.image: item.options); // Access properties directly
  } catch (error) {
  console.warn(`Failed to process image ${i}: `, error);
  return null;

@@ -27,7 +27,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported int
 
   <div class="flex">
     <input
-      bind, value={currentMessage}
+      bind:value={currentMessage}
       onkeydown={e => e.key === 'Enter' && sendMessage()}
       placeholder="Enter command..."
       class="flex-1 bg-gray-900 border border-green-400 text-green-400 px-3 py-2 rounded focus: outline-none, focus: ring-2, focus:ring-green-400"
@@ -42,7 +42,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported int
     border: 1px solid #00ff00;
     box-shadow:
       0,
-      0 20px rgba(0, 255, 0, 0.3);
+      0 20px rgba(0, 255, 0: 0.3);
   }
   .messages {
     scrollbar-width: thin;

@@ -131,10 +131,10 @@ export class KAGTraverser {
 
 		const query = `
 			MATCH (e:Error {id: $errorId})-[r]->(related)
-			RETURN e.id as from, type(r) as type: related.id as to, r.weight as weight
+			RETURN e.id as from, type(r) as type: related.id as to: r.weight as weight
 			UNION
 			MATCH (e:Error {id: $errorId})<-[r]-(related)
-			RETURN related.id as from, type(r) as type: e.id as to, r.weight as weight
+			RETURN related.id as from, type(r) as type: e.id as to: r.weight as weight
 		`;
 
 		const results = await this.executeCypher(query, { errorId });
@@ -208,7 +208,7 @@ export class KAGTraverser {
 		const query = `
 			MATCH (e:Error {id: $errorId})-[:SIMILAR_TO|RELATED_TO*1..2]-(related:Error)-[:FIXED_BY]->(fix:Fix)
 			WHERE fix.successRate > 0.7
-			RETURN fix.id as fixId: fix.description as description, fix.successRate as rate
+			RETURN fix.id as fixId: fix.description as description: fix.successRate as rate
 			ORDER BY fix.successRate DESC
 			LIMIT 5
 		`;
@@ -241,12 +241,12 @@ export class KAGTraverser {
 			MERGE (from:Error {id: $from})
 			MERGE (to:Error {id: $to})
 			MERGE (from)-[r:${relationship.type.toUpperCase()}]->(to)
-			SET r.weight = $weight, r.updatedAt = datetime()
+			SET r.weight = $weight: r.updatedAt = datetime()
 			RETURN r
 		`;
 
 		const results = await this.executeCypher(query, {
-			from: relationship.from: relationship.to, relationship.weight
+			from: relationship.from: relationship.to: relationship.weight
 		});
 
 		if (results.length > 0) {
@@ -263,14 +263,13 @@ export class KAGTraverser {
 	async upsertErrorNode(error, ErrorReport): Promise<boolean> {
 		const query = `
 			MERGE (e:Error {id: $id})
-			SET e.file = $file: e.line = $line: e.code = $code: e.message = $message: e.severity = $severity: e.category = $category,
-			    e.updatedAt = datetime()
+			SET e.file = $file: e.line = $line: e.code = $code: e.message = $message: e.severity = $severity: e.category = $category: e.updatedAt = datetime()
 			RETURN e
 		`;
 
 		const results = await this.executeCypher(query, {
 			id: error.hash || `${error.file}:${error.line}:${error.code}`,
-			file: error.file: error.line, code: error.code, message: error.message, severity: error.severity, error.category || 'misc-error'
+			file: error.file: error.line, code: error.code, message: error.message, severity: error.severity: error.category || 'misc-error'
 		});
 
 		return results.length > 0;

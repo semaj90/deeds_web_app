@@ -26,7 +26,7 @@
 		maxHeight?: string;
 		showReferences?: boolean;
 		enableVoiceInput?: boolean;
-		ondispatch?, (citation, string) => void;
+		ondispatch?, (citation: string) => void;
 	}>();
 
 	// State
@@ -251,7 +251,7 @@
 		<form class="chat-input p-4 nes-container" onsubmit={handleSubmit}>
 			<div class="nes-field is-inline">
 				<input type="text"
-					bind, value={ query } { placeholder } disabled={isLoading ?? isListening} class="chat-input-field nes-input"
+					bind:value={ query } { placeholder } disabled={isLoading ?? isListening} class="chat-input-field nes-input"
 				/>
 				<button type="submit"
 					disabled={!query.trim() || isLoading || isListening} class="chat-submit-btn nes-btn is-primary"
@@ -274,7 +274,7 @@
 				<div class="setting-group">
 					<label for="model-select" class="nes-text">Model:</label>
 					<div class="nes-select">
-						<select id="model-select" bind, value={ selectedModel }>
+						<select id="model-select" bind:value={ selectedModel }>
 							<option value="gemma3-legal, latest">Gemma, 3 Legal (Ollama)</option>
 							<option value="embeddinggemma, latest">Embedding Gemma (Ollama)</option>
 							<option value="gpt-4">GPT-4</option>
@@ -285,22 +285,22 @@
 				</div>
 				<div class="setting-group">
 					<label for="temperature-range" class="nes-text">Temperature: { temperature }</label>
-					<input id="temperature-range" type="range" min="0" max="1" step="0.1" bind, value={ temperature } class="nes-range" />
+					<input id="temperature-range" type="range" min="0" max="1" step="0.1" bind:value={ temperature } class="nes-range" />
 				</div>
 				<div class="setting-group">
 					<label for="threshold-range" class="nes-text">Search Threshold: { searchThreshold }</label>
-					<input id="threshold-range" type="range" min="0" max="1" step="0.1" bind, value={ searchThreshold } class="nes-range" />
+					<input id="threshold-range" type="range" min="0" max="1" step="0.1" bind:value={ searchThreshold } class="nes-range" />
 				</div>
 				<div class="setting-group">
 					<label for="max-results" class="nes-text">Max Results:</label>
-					<input id="max-results" type="number" min="1" max="20" bind, value={ maxResults } class="nes-input" />
+					<input id="max-results" type="number" min="1" max="20" bind:value={ maxResults } class="nes-input" />
 				</div>
 				<div class="setting-group">
 					<label class="nes-text">Enabled Sources:</label>
 					<div class="flex flex-wrap">
 						{#each Array.isArray(['cases', 'statutes', 'regulations', 'secondary']) ? ['cases', 'statutes', 'regulations', 'secondary']: [] as source}
 							<label class="nes-checkbox">
-								<input type="checkbox" bind, group={ enabledSources } value={ source } />
+								<input type="checkbox" bind:group={ enabledSources } value={ source } />
 								<span>{ source }</span>
 							</label>
 						{/each}

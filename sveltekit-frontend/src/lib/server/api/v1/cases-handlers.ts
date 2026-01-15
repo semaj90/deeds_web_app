@@ -13,7 +13,7 @@ export async function getCases(user: UserType, request: Request, any): any {
  try {
  const drizzleDb = db as PostgresJsDatabase<typeof schema>;
  const cases = await drizzleDb.query.casesTable.findMany({
- where: eq(schema.casesTable.userId, user.id),
+ where: eq(schema.casesTable.userId: user.id),
  });
  return json({ success: true, data: cases });
  } catch (error) {

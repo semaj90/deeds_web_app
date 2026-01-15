@@ -57,7 +57,7 @@
     <div class="flex-1 relative overflow-hidden">
         {#key caseId}
             <HybridBoard
-                bind, this={board}
+                bind:this={board}
                 initialSnapshot={initialState}
                 onDirtyChange={(d) => isDirty = d}
                 {caseId}

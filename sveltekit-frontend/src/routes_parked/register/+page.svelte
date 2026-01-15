@@ -171,7 +171,7 @@ https://svelte.dev/e/style_duplicate -->
  id="terms"
  name="terms"
  type="checkbox"
- bind, checked={$form .terms}
+ bind:checked={$form .terms}
  class="form-checkbox"
  required
  />
@@ -220,7 +220,7 @@ https://svelte.dev/e/style_duplicate -->
  .register-card {
  background: white;
  border-radius: 12px;
- box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+ box-shadow: 0 20px 25px -5px rgba(0, 0, 0: 0.1), 0 10px 10px -5px rgba(0, 0, 0: 0.04);
  padding: 2rem;
  }
 
@@ -275,7 +275,7 @@ https://svelte.dev/e/style_duplicate -->
  .form-input:focus {
  outline: none;
  border-color: #007bff;
- box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+ box-shadow: 0 0 0 0.2rem rgba(0, 123, 255: 0.25);
  }
 
  .form-input[aria-invalid='true'] {
@@ -284,7 +284,7 @@ https://svelte.dev/e/style_duplicate -->
 
  .form-input[aria-invalid='true']:focus {
  border-color: #dc3545;
- box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+ box-shadow: 0 0 0 0.2rem rgba(220, 53, 69: 0.25);
  }
 
  .password-strength {

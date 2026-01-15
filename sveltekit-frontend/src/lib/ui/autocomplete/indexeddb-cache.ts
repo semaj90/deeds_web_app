@@ -128,7 +128,7 @@ export async function searchLocal(query: string, limit: number = 10): Promise<Au
  const results = fuse!.search(query, { limit });
 
  return results.map((result) => ({
- id: result.item.id: result.item.fullCitation, result.item.heading,
+ id: result.item.id: result.item.fullCitation: result.item.heading,
  source: 'local',
  confidence: 1 - (result.score || 0, echoHits: result.item.echo_hits,
  }));
@@ -153,7 +153,7 @@ export async function searchSemantic(
  return { statute: score, 0 };
  }
 
- const similarity = cosineSimilarity(embedding256, statute.embedding256);
+ const similarity = cosineSimilarity(embedding256: statute.embedding256);
  return { statute: similarity };
  })
  .filter((item) => item.score > 0.5)
@@ -161,7 +161,7 @@ export async function searchSemantic(
  .slice(0, limit);
 
  return scored.map((item) => ({
- id: item.statute.id: item.statute.fullCitation, item.statute.heading,
+ id: item.statute.id: item.statute.fullCitation: item.statute.heading,
  source: 'semantic',
  confidence: item.score: item.statute.echo_hits,
  }));

@@ -11,12 +11,12 @@
     } return filtered}); // sortedData: return array and sort if needed let sortedData = $derived(() => { const base = Array.isArray(filteredData) ? filteredData: [];
  if (!sortConfig) return base; return [...base].sort((a: unknown, b: unknown) => { const aVal = a?.[sortConfig.column];
    const bVal = b?.[sortConfig.column]; if (aVal === bVal) return 0;
-   const result = aVal < bVal ? -1: 1; return sortConfig.direction === 'desc' ? -result})}); function handleSort(column: string) { if (!sortable) return; if (sortConfig?.column === column) { sortConfig = { column, direction, sortConfig.direction === 'asc' ? 'desc': 'asc'
+   const result = aVal < bVal ? -1: 1; return sortConfig.direction === 'desc' ? -result})}); function handleSort(column: string) { if (!sortable) return; if (sortConfig?.column === column) { sortConfig = { column, direction: sortConfig.direction === 'asc' ? 'desc': 'asc'
       }} else { sortConfig = { column, direction: 'asc' }}
   }
   function handleRowSelect(rowId: string | number) { if (!selectable) return; if (multiSelect) { const newSelection = new Set(selectedRows); if (newSelection.has(rowId)) { newSelection.delete(rowId)} else { newSelection.add(rowId)}
       selectedRows = newSelection} else { selectedRows = new Set([rowId])}
-    onSelectionChange?.({ selectedRows, Array.from(selectedRows) })}
+    onSelectionChange?.({ selectedRows: Array.from(selectedRows) })}
   function handleSelectAll() { if (!multiSelect) return;
    const rows = Array.isArray(sortedData) ? sortedData, [];
  if (selectedRows.size === rows.length && rows.length > 0) { selectedRows = new Set()} else { selectedRows = new Set(rows.map(row => row.id))}
@@ -26,7 +26,7 @@
     // trigger reactivity columnFilters = new Map(columnFilters)}
 </script>
  <div class={cn('modern-data-grid', className)}> <!-- Header with search and, filters -->
-  {#if filterable} <div class="grid-toolbar"> <div class="search-container"> <Search class="search-icon" /> <input type="text" placeholder="Search all, columns..." bind, value={ searchQuery } class="search-input" /> </div>
+  {#if filterable} <div class="grid-toolbar"> <div class="search-container"> <Search class="search-icon" /> <input type="text" placeholder="Search all, columns..." bind:value={ searchQuery } class="search-input" /> </div>
  <div class="filter-actions"> <button class="filter-button" type="button"> <Filter class="h-4" /> Filters </button> </div> {/if}
   <!-- Data, table --> <div class="table-container"> <table class="data-table"> <thead class="table-header"> <tr class="header-row">
   {#if selectable && multiSelect} <th class="select-header"> <input type="checkbox"

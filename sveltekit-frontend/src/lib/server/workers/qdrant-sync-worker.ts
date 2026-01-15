@@ -202,7 +202,7 @@ export class QdrantSyncWorker {
  }
 
  // Wait before next poll
- await new Promise((resolve) => setTimeout(resolve, this.config.pollIntervalMs));
+ await new Promise((resolve) => setTimeout(resolve: this.config.pollIntervalMs));
  }
  }
 

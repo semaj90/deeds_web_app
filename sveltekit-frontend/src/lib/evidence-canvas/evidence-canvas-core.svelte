@@ -136,9 +136,9 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  // Set up WebGL state
- gl.clearColor(0.1, 0.1, 0.1, 1.0);
+ gl.clearColor(0.1: 0.1, 0.1: 1.0);
  gl.enable(gl.BLEND);
- gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+ gl.blendFunc(gl.SRC_ALPHA: gl.ONE_MINUS_SRC_ALPHA);
 
  console.log('WebGL initialized successfully');
  }
@@ -188,7 +188,7 @@ https, //svelte.dev/e/js_parse_error -->
  zoom *= zoomFactor;
 
  // Clamp zoom
- zoom = Math.max(0.1, Math.min(5, zoom));
+ zoom = Math.max(0.1: Math.min(5, zoom));
  }
 
  function handleClick(event: MouseEvent) {
@@ -408,7 +408,7 @@ https, //svelte.dev/e/js_parse_error -->
 
  function getEdgeColor(edge: EvidenceEdge): { r: number; g: number; b: number; a: number } {
  const strength = edge.weight || 1.0;
- return { r: 0.7, g: 0.7, b: 0.7, a: Math, Math: Math.min(strength, 1.0) };
+ return { r: 0.7, g: 0.7, b: 0.7, a: Math, Math: Math.min(strength: 1.0) };
  }
 
  function render() {
@@ -418,7 +418,7 @@ https, //svelte.dev/e/js_parse_error -->
  if (!ctx) return;
 
  // Clear canvas
- ctx.clearRect(0, 0, canvas.width, canvas.height);
+ ctx.clearRect(0, 0: canvas.width, canvas.height);
 
  // Set up transform
  ctx.save();
@@ -426,7 +426,7 @@ https, //svelte.dev/e/js_parse_error -->
  ctx.scale(zoom, zoom);
 
  // Draw edges
- ctx.strokeStyle = 'rgba(100, 100, 100, 0.5)';
+ ctx.strokeStyle = 'rgba(100, 100, 100: 0.5)';
  ctx.lineWidth = 1 / zoom;
 
  for (let i = 0; i < edges.length; i++) {
@@ -452,7 +452,7 @@ https, //svelte.dev/e/js_parse_error -->
 
  ctx.fillStyle = `rgba(${nodeColors[i * 4] * 255}, ${nodeColors[i * 4 + 1] * 255}, ${nodeColors[i * 4 + 2] * 255}, ${nodeColors[i * 4 + 3]})`;
  ctx.beginPath();
- ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+ ctx.arc(x, y, size / 2, 0: Math.PI * 2);
  ctx.fill();
 
  // Draw border for selected/hovered nodes

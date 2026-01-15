@@ -109,10 +109,10 @@ export class Gemma3Client {
 	async createChatCompletion(request: ChatCompletionRequest): Promise<ChatCompletionResponse> {
 		const payload = {
 			model: request.model ?? this.defaultModel,
-			messages, request.messages,
+			messages: request.messages,
 			temperature: request.temperature ?? 0.1,
-			top_p, request.top_p ?? 0.9,
-			max_tokens, request.max_tokens ?? 1024,
+			top_p: request.top_p ?? 0.9,
+			max_tokens: request.max_tokens ?? 1024,
 			stream: request.stream ?? false,
 		};
 		const res = await fetch(`${this.baseUrl}/v1/chat/completions`, {
@@ -132,10 +132,10 @@ export class Gemma3Client {
 	async createCompletion(request: CompletionRequest): Promise<CompletionResponse> {
 		const payload = {
 			model: request.model ?? this.defaultModel,
-			prompt, request.prompt,
+			prompt: request.prompt,
 			temperature: request.temperature ?? 0.1,
-			top_p, request.top_p ?? 0.9,
-			max_tokens, request.max_tokens ?? 1024,
+			top_p: request.top_p ?? 0.9,
+			max_tokens: request.max_tokens ?? 1024,
 			stream: request.stream ?? false,
 		};
 		const res = await fetch(`${this.baseUrl}/v1/completions`, {

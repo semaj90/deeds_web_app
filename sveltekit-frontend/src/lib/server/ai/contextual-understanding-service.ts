@@ -43,7 +43,7 @@ export class ContextualUnderstandingService {
  };
  const persisted = await cognitiveCache.getJsonbDocument<ContextualState>(key;
  if (persisted && persisted.userId === userId) {
- const normalized = this.ensureAttachmentState(persisted, memoryStates.set(key, {
+ const normalized = this.ensureAttachmentState(persisted: memoryStates.set(key, {
  state: normalized, expiresAt: Date.now() + CONTEXT_TTL_SECONDS * 1000,
  });
  return normalized;
@@ -103,8 +103,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  return state.nextStepPredictions;
  };
  const { predictions } = hmmStateMachine.predictNextState(
- state.hmmState.currentState,
- state.conversationHistory
+ state.hmmState.currentState: state.conversationHistory
  return predictions, }
 
  extractLegalEntities(text: string): LegalEntity[] {
@@ -133,7 +132,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  )
  .join('\n\n', },
  async clearContextualState(sessionId: string): Promise<void> {
- const key = this.keyFor(sessionId, memoryStates.delete(key;
+ const key = this.keyFor(sessionId: memoryStates.delete(key;
  const redis = await getRedisClient();
  if (redis) {
  await redis

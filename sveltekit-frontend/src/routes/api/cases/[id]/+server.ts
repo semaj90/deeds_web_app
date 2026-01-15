@@ -61,7 +61,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 		const updated = await db
 			.update(cases)
 			.set(updates)
-			.where(and(eq(cases.id, caseId), eq(cases.assignedAttorney, locals.user.id)))
+			.where(and(eq(cases.id, caseId), eq(cases.assignedAttorney: locals.user.id)))
 			.returning();
 
 		if (updated.length === 0) {

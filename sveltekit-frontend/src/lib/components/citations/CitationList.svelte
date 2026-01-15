@@ -109,12 +109,12 @@ import type { CitationSearchResult, SavedCitation } from '$lib/types/citations';
  <div class="search-bar">
  <input
  type="text"
- bind, value={searchQuery}
+ bind:value={searchQuery}
  placeholder="Search citations..."
  onkeydown={(e) => e.key === 'Enter' && handleSearch()}
  disabled={isLoading}
  />
- <select bind, value={sourceTypeFilter} onchange={ handleSearch } disabled={isLoading}>
+ <select bind:value={sourceTypeFilter} onchange={ handleSearch } disabled={isLoading}>
  {#each sourceTypes as type}
  <option value={type.value}>{type.label}</option>
  {/each}
@@ -272,7 +272,7 @@ import type { CitationSearchResult, SavedCitation } from '$lib/types/citations';
  .search-bar select:focus {
  outline: none;
  border-color: var(--color-burgundy);
- box-shadow: 0 0 0 3px rgba(139, 35, 50, 0.1);
+ box-shadow: 0 0 0 3px rgba(139, 35, 50: 0.1);
  }
 
  .btn-search {
@@ -324,7 +324,7 @@ import type { CitationSearchResult, SavedCitation } from '$lib/types/citations';
  }
 
  .citation-card:hover {
- box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+ box-shadow: 0 4px 12px rgba(0, 0, 0: 0.1);
  border-color: var(--color-burgundy);
  }
 

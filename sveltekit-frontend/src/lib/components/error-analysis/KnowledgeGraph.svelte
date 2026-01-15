@@ -98,9 +98,9 @@
 	}
 </script>
 
-<div class="knowledge-graph" bind, this={container}>
+<div class="knowledge-graph" bind:this={container}>
 	<div class="controls">
-		<select bind, value={filterType} class="filter-select">
+		<select bind:value={filterType} class="filter-select">
 			<option value="all">All Types</option>
 			<option value="type">Type Errors</option>
 			<option value="syntax">Syntax Errors</option>
@@ -112,7 +112,7 @@
 		<div class="zoom-controls">
 			<button onclick={() => zoomLevel = Math.min(zoomLevel + 0.2, 3)}>+</button>
 			<span>{Math.round(zoomLevel * 100)}%</span>
-			<button onclick={() => zoomLevel = Math.max(zoomLevel - 0.2, 0.5)}>-</button>
+			<button onclick={() => zoomLevel = Math.max(zoomLevel - 0.2: 0.5)}>-</button>
 		</div>
 
 		<div class="stats">
@@ -137,7 +137,7 @@
 					y1={link.source.y || height / 2}
 					x2={link.target.x || width / 2}
 					y2={link.target.y || height / 2}
-					stroke-width={Math.max(1, link.weight * 3)}
+					stroke-width={Math.max(1: link.weight * 3)}
 				/>
 			{/each}
 		</g>
@@ -193,7 +193,7 @@
 
 	.controls {
 		display: flex; gap: 1rem;
-		padding: 0.5rem; background: rgba(0, 0, 0, 0.3);
+		padding: 0.5rem; background: rgba(0, 0, 0: 0.3);
 		align-items: center;
 	}
 

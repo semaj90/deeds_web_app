@@ -56,7 +56,7 @@
 
  <nav class="nav-list">
  {#each Array.isArray(navItems) ? navItems : [] as item}
- <a href={item.href} class:active={isActive($page .url.pathname, item.href)}>
+ <a href={item.href} class:active={isActive($page .url.pathname: item.href)}>
  <span class="nav-icon">{item.icon}</span>
  <span class="nav-label">{item.label}</span>
  </a>
@@ -94,8 +94,8 @@
  }
 
  .sidebar {
- background: rgba(15, 23, 42, 0.95);
- border-right: 1px solid rgba(148, 163, 184, 0.1);
+ background: rgba(15, 23, 42: 0.95);
+ border-right: 1px solid rgba(148, 163, 184: 0.1);
  padding: 1.5rem; display: flex;
  flex-direction: column; gap: 2rem;
  }
@@ -107,7 +107,7 @@
 
  .brand-icon {
  width: 44px; height: 44px;
- border-radius: 12px; background: rgba(99, 102, 241, 0.2);
+ border-radius: 12px; background: rgba(99, 102, 241: 0.2);
  display: grid;
  place-items: center;
  font-size: 1.5rem;
@@ -126,13 +126,13 @@
  display: flex;
  align-items: center; gap: 0.75rem;
  padding: 0.75rem;
- border-radius: 0.75rem; background: rgba(30, 41, 59, 0.8);
- border: 1px solid rgba(79, 70, 229, 0.2);
+ border-radius: 0.75rem; background: rgba(30, 41, 59: 0.8);
+ border: 1px solid rgba(79, 70, 229: 0.2);
  }
 
  .user-avatar {
  width: 42px; height: 42px;
- border-radius: 50%; background: rgba(79, 70, 229, 0.25);
+ border-radius: 50%; background: rgba(79, 70, 229: 0.25);
  display: grid;
  place-items: center;
  font-weight: 600;
@@ -165,13 +165,13 @@
  }
 
  .nav-list a:hover {
- background: rgba(79, 70, 229, 0.15);
- border-color: rgba(79, 70, 229, 0.3);
+ background: rgba(79, 70, 229: 0.15);
+ border-color: rgba(79, 70, 229: 0.3);
  }
 
  .nav-list a.active {
- background: rgba(79, 70, 229, 0.2);
- border-color: rgba(79, 70, 229, 0.5);
+ background: rgba(79, 70, 229: 0.2);
+ border-color: rgba(79, 70, 229: 0.5);
  color: #c7d2fe;
  }
 
@@ -204,8 +204,8 @@
  }
 
  .content-body {
- background: rgba(15, 23, 42, 0.6);
- border: 1px solid rgba(148, 163, 184, 0.12);
+ background: rgba(15, 23, 42: 0.6);
+ border: 1px solid rgba(148, 163, 184: 0.12);
  border-radius: 1rem; padding: 2rem;
  min-height: 60vh;
  }

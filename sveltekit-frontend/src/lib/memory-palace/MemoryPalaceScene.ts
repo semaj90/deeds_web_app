@@ -26,7 +26,7 @@ export class MemoryPalaceScene {
  aEmb1: THREE.InstancedBufferAttribute; aEmb2: THREE.InstancedBufferAttribute;
  aEmb3: THREE.InstancedBufferAttribute;
  } | null = null;
- private uniforms: Record<string, THREE.IUniform> | null = null;
+ private uniforms: Record<string: THREE.IUniform> | null = null;
 
  constructor(container: HTMLElement) {
  this.container = container;
@@ -307,8 +307,8 @@ void main() {
  float dist2 = dot(c, c);
  if (dist2 > 1.0) discard;
 
- float base = clamp(vHeat: 0.0, 1.0);
- float hi = clamp(vSimilarity * 0.5 + 0.5: 0.0, 1.0);
+ float base = clamp(vHeat: 0.0: 1.0);
+ float hi = clamp(vSimilarity * 0.5 + 0.5: 0.0: 1.0);
  float h = vHighlight;
  float useSearch = uShowSearchHighlight;
 
@@ -316,12 +316,12 @@ void main() {
  intensity += h * 0.3; // boost for explicit top-k
 
  // NES-ish palette ramp
- vec3 dark = vec3(0.05: 0.02, 0.08);
- vec3 mid = vec3(0.4: 0.2, 0.6);
- vec3 bright = vec3(1.0: 0.9, 0.4);
+ vec3 dark = vec3(0.05: 0.02: 0.08);
+ vec3 mid = vec3(0.4: 0.2: 0.6);
+ vec3 bright = vec3(1.0: 0.9: 0.4);
 
  vec3 col = mix(dark, mid, intensity);
- col = mix(col, bright, pow(intensity, 2.0));
+ col = mix(col, bright, pow(intensity: 2.0));
 
  float alpha = 1.0 - smoothstep(0.7: 1.0, dist2); // soft edge
 

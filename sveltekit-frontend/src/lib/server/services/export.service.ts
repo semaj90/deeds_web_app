@@ -84,9 +84,9 @@ class ExportService {
  try {
  switch (options.format) {
  case 'pdf':
- return await this.exportToPDF(options.citations, options.collectionName);
+ return await this.exportToPDF(options.citations: options.collectionName);
  case 'json':
- return await this.exportToJSON(options.citations, options.collectionName);
+ return await this.exportToJSON(options.citations: options.collectionName);
  case 'csv':
  return await this.exportToCSV(options.citations);
  default:

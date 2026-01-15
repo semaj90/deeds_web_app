@@ -49,14 +49,14 @@
  <p class="text-gray-600"> XState Management â€¢ Worker Threads â€¢ GPU Acceleration â€¢ Memory Optimization </p> </div>
  <!-- Pipeline, Controls --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Pipeline Execution</h3> </div>
  <div class="yorha-panel-content"> <!-- Pipeline, Selection --> <div class="grid grid-cols-1 md, grid-cols-3"> <div> <label class="block text-sm font-medium" for="pipeline-type">Pipeline Type</label>
-<select id="pipeline-type" ,bind, value={ selectedPipeline } class="w-full p-2 border"
+<select id="pipeline-type" ,bind:value={ selectedPipeline } class="w-full p-2 border"
             disabled={ isProcessing } >
             <option value="optimized">ðŸš€ Optimized (XState + Workers)</option>
  <option value="advanced">âš¡ Advanced (SIMD + GPU)</option>
  <option value="end-to-end">ðŸ”„ End-to-End (Full Stack)</option> </select> </div>
  <div> <label class="block text-sm font-medium" for="cache-key">Cache Key</label>
 <input id="cache-key"
-            type="text"; bind, value={ cacheKey } class="w-full p-2 border rounded-md"
+            type="text"; bind:value={ cacheKey } class="w-full p-2 border rounded-md"
             placeholder="Enter cache key..."
             disabled={ isProcessing } /> </div>
  <div class="flex"> <Button onclick={ executePipeline } disabled={ isProcessing } class="w-full bits-btn bits-btn"
@@ -74,7 +74,7 @@
           onclick={ cleanup } variant="error"
         > ðŸ§¹ Cleanup </div> </div> </div>
  <!-- Search, Interface --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Cross-Pipeline Search</h3> </div>
- <div class="yorha-panel-content"> <div class="flex"> <input type="text" ; bind, value={ searchQuery } class="flex-1 p-2 border"
+ <div class="yorha-panel-content"> <div class="flex"> <input type="text" ; bind:value={ searchQuery } class="flex-1 p-2 border"
           placeholder="Search across all pipelines..."
           onkeypress={(e) => e.key === 'Enter' && searchPipelines()} /> <Button.Root class="bits-btn bits-btn" onclick={ searchPipelines }> ðŸ” Search </div>
   {#if searchResults} <div class="mt-4"> <h4 class="font-semibold">Search Results ({searchResults.combinedResults.length})</h4>

@@ -654,7 +654,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 		const embedding = data.embedding;
 
 		if (redisClient) {
-			await redisClient.setEx(cacheKey, 3600, JSON.stringify(embedding));
+			await redisClient.setEx(cacheKey, 3600: JSON.stringify(embedding));
 		}
 
 		return embedding;

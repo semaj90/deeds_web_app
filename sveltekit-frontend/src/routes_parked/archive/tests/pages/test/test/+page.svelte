@@ -51,12 +51,12 @@
  .slice(0, 10)
  .map((caseItem: any) => ({
  id: caseItem.id || caseItem.caseId,
- title, caseItem.title || caseItem.name || 'Untitled Case',
- caseNumber, caseItem.caseNumber || caseItem.id,
+ title: caseItem.title || caseItem.name || 'Untitled Case',
+ caseNumber: caseItem.caseNumber || caseItem.id,
  priority: caseItem.priority || 'medium',
  createdBy: caseItem.createdBy || 'System',
  createdByLastName: caseItem.createdByLastName || '',
- createdAt, caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(), status: caseItem.status || 'active'
+ createdAt: caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(), status: caseItem.status || 'active'
  }));
 
  } catch (err) {
@@ -102,8 +102,8 @@
  .slice(0, 5)
  .map((item: any, index): number => ({
  id: `insight-${item.id || index}`,
- label, item.filename || item.title || `Evidence Analysis ${index + 1}`,
- summary, item.analysis || item.summary || 'AI analysis completed'
+ label: item.filename || item.title || `Evidence Analysis ${index + 1}`,
+ summary: item.analysis || item.summary || 'AI analysis completed'
  }));
 
  // Add some generated insights if we don't have enough

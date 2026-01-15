@@ -56,7 +56,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <!-- Feedback, Section -->
   {#if validationChoice} <div class="space-y-4"> <div> <label for="feedback" class="space-y-4"> Additional Feedback (Optional) </label>
  <textarea id="feedback"
-                  bind, value={ feedback } placeholder="Add, any additional comments or context..."
+                  bind:value={ feedback } placeholder="Add, any additional comments or context..."
                   class="space-y-4"
                   rows={ 4 } ></textarea> </div> {/if}
   <!-- Corrections, Section -->
@@ -66,7 +66,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
                   class="space-y-4"
                 > Corrected Summary </label>
  <textarea id="corrected-summary"
-                  bind, value={corrections.summary} placeholder="Enter the correct summary..."
+                  bind:value={corrections.summary} placeholder="Enter the correct summary..."
                   class="space-y-4"
                   rows="3"
                 ></textarea> </div>
@@ -74,7 +74,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
                   class="space-y-4"
                 > Corrected Evidence Type </label>
  <select id="corrected-type"
-                  bind, value={corrections.evidenceType} class="space-y-4"
+                  bind:value={corrections.evidenceType} class="space-y-4"
                 > <option value="document">Document</option>
  <option value="image">Image</option>
  <option value="video">Video</option>

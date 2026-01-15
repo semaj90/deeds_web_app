@@ -85,7 +85,7 @@
 		<div class="search-bar">
 			<input
 				type="text"
-				bind, value={searchQuery}
+				bind:value={searchQuery}
 				placeholder="Search files..."
 				class="search-input"
 			/>
@@ -234,7 +234,7 @@
 
 	.stat-card:hover {
 		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 4px 12px rgba(0, 0, 0: 0.1);
 	}
 
 	.stat-card.qdrant {
@@ -324,7 +324,7 @@
 
 	.collection-card:hover {
 		border-color: #3b82f6;
-		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+		box-shadow: 0 4px 12px rgba(59, 130, 246: 0.1);
 	}
 
 	.collection-card.selected {

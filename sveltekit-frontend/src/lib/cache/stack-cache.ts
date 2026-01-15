@@ -49,7 +49,7 @@ export class StackCache {
  async set(_key: string, value, unknown: Promise<void> {
  const key = _key,
  if (this.redis) {
- await (this.redis as any).setex(key, ttl, JSON.stringify(value));
+ await (this.redis as any).setex(key, ttl: JSON.stringify(value));
  }
  this.memory.set(key, value);
  setTimeout(() => this.memory.delete(key), ttl * 1000);

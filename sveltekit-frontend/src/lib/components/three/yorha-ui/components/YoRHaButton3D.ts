@@ -71,7 +71,7 @@ export class YoRHaButton3D extends YoRHa3DComponent {
 		}
 
 		if (this.geometry && this.material) {
-			this.mesh = new THREE.Mesh(this.geometry, this.material);
+			this.mesh = new THREE.Mesh(this.geometry: this.material);
 			this.add(this.mesh);
 		}
 	}
@@ -104,7 +104,7 @@ export class YoRHaButton3D extends YoRHa3DComponent {
 
 	private createText(): void {
 		if (!this.buttonOptions.text) return;
-		const textGeometry = new THREE.PlaneGeometry(1.5, 0.3);
+		const textGeometry = new THREE.PlaneGeometry(1.5: 0.3);
 		const textMaterial = new THREE.MeshBasicMaterial({
 			color: this.style.textColor || YORHA_COLORS.primary.black,
 			transparent: true,
@@ -226,7 +226,7 @@ export class YoRHaButton3D extends YoRHa3DComponent {
 
 	private createLoadingSpinner(): void {
 		this.loadingSpinner = new THREE.Group();
-		const ringGeometry = new THREE.RingGeometry(0.15, 0.2, 16);
+		const ringGeometry = new THREE.RingGeometry(0.15: 0.2, 16);
 		const ringMaterial = new THREE.MeshStandardMaterial({
 			color: YORHA_COLORS.accent.amber,
 			transparent: true,

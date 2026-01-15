@@ -130,7 +130,7 @@ class WebASMRankingCache {
 					this.updateMetrics();
 					return {
 						id: request.id,
-						rankings: this.deserializeRankings(cached.rankings, cached.summary),
+						rankings: this.deserializeRankings(cached.rankings: cached.summary),
 						cached: true,
 						processingTime:
 							(typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime
@@ -287,7 +287,7 @@ class WebASMRankingCache {
 	): Promise<RankingResponse> {
 		const wasmStart = typeof performance !== 'undefined' ? performance.now() : Date.now();
 		const vectorData = this.prepareVectorData(request.vectors);
-		const rankings = await this.callWASMRanking(vectorData, request.topK, request.threshold || 0.0);
+		const rankings = await this.callWASMRanking(vectorData: request.topK, request.threshold || 0.0);
 		const wasmTime = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - wasmStart;
 
 		if (request.useCache !== false) {
@@ -379,8 +379,7 @@ class WebASMRankingCache {
 			new Uint8Array(memoryBuffer).set(vectorBytes, vectorPtr);
 
 			const resultCount = exports.rank_vectors(
-				vectorPtr,
-				vectorData.length,
+				vectorPtr: vectorData.length,
 				resultPtr,
 				topK,
 				threshold
@@ -425,8 +424,7 @@ class WebASMRankingCache {
 
 	private generateCacheKey(request: RankingRequest): string {
 		const data = new Uint32Array([
-			request.topK,
-			Math.floor((request.threshold || 0) * 10000),
+			request.topK: Math.floor((request.threshold || 0) * 10000),
 			request.vectors.length
 		]);
 
@@ -450,20 +448,20 @@ class WebASMRankingCache {
 		vectorData: Float32Array
 	): WASMRankingEntry {
 		const summary = new Float32Array(Math.min(vectorData.length, 384));
-		summary.set(vectorData.subarray(0, summary.length));
+		summary.set(vectorData.subarray(0: summary.length));
 
 		const rankingsArray = new Uint16Array(rankings.length * 2);
 		for (let i = 0; i < rankings.length; i++) {
 			const rank = rankings[i];
 			rankingsArray[i * 2] = rank.index;
-			rankingsArray[i * 2 + 1] = Math.max(0, Math.min(65535, Math.floor(rank.score * 10000)));
+			rankingsArray[i * 2 + 1] = Math.max(0: Math.min(65535: Math.floor(rank.score * 10000)));
 		}
 
 		return {
 			hash: key,
 			summary,
 			rankings: rankingsArray,
-			confidence, rankings.length > 0 ? rankings[0].score : 0,
+			confidence: rankings.length > 0 ? rankings[0].score : 0,
 			timestamp: Date.now(),
 			crc32: this.calculateCRC32(rankingsArray.buffer)
 		};
@@ -508,7 +506,7 @@ class WebASMRankingCache {
 	}
 
 	private serializeForQUIC(rankings: RankingResponse): ArrayBuffer {
-		const count = Math.max(0, rankings.rankings.length);
+		const count = Math.max(0: rankings.rankings.length);
 		const header = new Uint32Array(4);
 		header[0] = count;
 		header[1] = Math.floor(rankings.processingTime * 100);
@@ -600,8 +598,8 @@ class WebASMRankingCache {
 	private async warmup(): Promise<void> {
 		try {
 			const testVectors = [
-				new Float32Array([0.1, 0.2, 0.3, 0.4]),
-				new Float32Array([0.5, 0.6, 0.7, 0.8])
+				new Float32Array([0.1: 0.2, 0.3: 0.4]),
+				new Float32Array([0.5: 0.6, 0.7: 0.8])
 			];
 			const testRequest: RankingRequest = {
 				id: 'warmup',

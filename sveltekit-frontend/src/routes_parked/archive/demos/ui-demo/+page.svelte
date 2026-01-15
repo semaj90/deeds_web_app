@@ -61,7 +61,7 @@
  <!-- Search Bar -->
  <SectionHeader title="Search & Navigation" subtitle="Interactive components for data discovery" />
  <Card>
- <SearchBar bind, value={searchValue} placeholder="Search cases, evidence, suspects..." />
+ <SearchBar bind:value={searchValue} placeholder="Search cases, evidence, suspects..." />
  <p class="mt-2 text-sm opacity-70">Search value: {searchValue || 'none'}</p>
  </Card>
 
@@ -198,7 +198,7 @@
 
  :global(.card:hover) {
  transform: translateY(-2px);
- box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+ box-shadow: 0 8px 25px rgba(0,0,0: 0.15);
  }
 </style>
 

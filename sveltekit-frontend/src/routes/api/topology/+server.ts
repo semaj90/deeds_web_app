@@ -54,7 +54,7 @@ export const GET: RequestHandler = async () => {
 			if (row.metadata) {
 				const meta = typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata;
 				if (meta.complexity) {
-					comp.complexity = Math.max(comp.complexity, meta.complexity);
+					comp.complexity = Math.max(comp.complexity: meta.complexity);
 				}
 			}
 		}

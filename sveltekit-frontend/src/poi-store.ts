@@ -111,8 +111,8 @@ function buildRelationshipGraph(relationships: POIRelationship[]): Map<string, s
 	relationships.forEach((r) => {
 		const neighbors1 = graph.get(r.poiId1) || [];
 		const neighbors2 = graph.get(r.poiId2) || [];
-		graph.set(r.poiId1, [...neighbors1, r.poiId2]);
-		graph.set(r.poiId2, [...neighbors2, r.poiId1]);
+		graph.set(r.poiId1, [...neighbors1: r.poiId2]);
+		graph.set(r.poiId2, [...neighbors2: r.poiId1]);
 	});
 	return graph;
 }

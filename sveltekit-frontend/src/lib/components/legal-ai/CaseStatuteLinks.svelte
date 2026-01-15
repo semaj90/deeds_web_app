@@ -111,7 +111,7 @@
  <div class="filters">
  <div class="filter-group">
  <label for="link-type-filter">Link Type:</label>
- <select id="link-type-filter" bind, value={selectedLinkType} onchange={ loadLinks }>
+ <select id="link-type-filter" bind:value={selectedLinkType} onchange={ loadLinks }>
  <option value="">All</option>
  {#each Object.keys(stats.byLinkType) as linkType}
  <option value={linkType}>
@@ -307,7 +307,7 @@
 
  .link-card:hover {
  border-color: #d4a574;
- box-shadow: 0 2px 8px rgba(139, 69, 19, 0.1);
+ box-shadow: 0 2px 8px rgba(139, 69, 19: 0.1);
  }
 
  .card-header {

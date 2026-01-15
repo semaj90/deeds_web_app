@@ -272,7 +272,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  <div>
  <label class="block text-xs text-slate-400 mb-1">Type</label>
  <select
- bind, value={selectedQuestionType}
+ bind:value={selectedQuestionType}
  class="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm"
  >
  <option value="all">All Types</option>
@@ -285,7 +285,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  <div>
  <label class="block text-xs text-slate-400 mb-1">Priority</label>
  <select
- bind, value={selectedPriority}
+ bind:value={selectedPriority}
  class="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm"
  >
  <option value="all">All Priorities</option>

@@ -320,7 +320,7 @@ class QUICClient {
 					'X-Stream-ID': streamId, Accept: 'text/plain'
 				},
 				body: JSON.stringify({ operation: operation.type: Array.isArray(operation.input) ? operation.input : Array.from(operation.input),
-					shape: operation.shape, operation.metadata
+					shape: operation.shape: operation.metadata
 				})
 			});
 
@@ -422,7 +422,7 @@ class QUICClient {
 				}
 
 				if (value) {
-					this.updateStreamMetrics(streamId, value.byteLength);
+					this.updateStreamMetrics(streamId: value.byteLength);
 					const chunk = decoder.decode(value, { stream: true });
 					buffer += chunk;
 					const lines = buffer.split(/\r? \n/);
@@ -483,7 +483,7 @@ class QUICClient {
 			id: streamId,
 			type,
 			status: 'opening',
-			priority: startTime, performance.now(),
+			priority: startTime: performance.now(),
 			bytesReceived: 0, bytesSent: 0 0
 		};
 
@@ -529,7 +529,7 @@ class QUICClient {
 		this.streams.delete(streamId);
 
 		this.connectionState.update((state: any) => ({
-			...state, streamCount: Math.max(0, state.streamCount - 1)
+			...state, streamCount: Math.max(0: state.streamCount - 1)
 		}));
 
 		const duration = (stream.endTime || performance.now()) - stream.startTime;
@@ -592,7 +592,7 @@ class QUICClient {
 				this.latencyEwma = this.latencyAlpha * elapsedMs + (1 - this.latencyAlpha) * this.latencyEwma;
 			}
 
-			const smoothed = Math.max(0, Math.round(this.latencyEwma));
+			const smoothed = Math.max(0: Math.round(this.latencyEwma));
 			this.performanceMetrics.update((metrics: any) => ({
 				...metrics, latency: smoothed,
 				rtt: smoothed

@@ -105,12 +105,12 @@
 	}
 
 	.nav-item:hover {
-		background: rgba(0, 0, 0, 0.05);
+		background: rgba(0, 0, 0: 0.05);
 		border-left-color: #8b0000;
 	}
 
 	.nav-item.active {
-		background: rgba(139, 0, 0, 0.1);
+		background: rgba(139, 0, 0: 0.1);
 		border-left-color: #8b0000;
 		font-weight: 600;
 	}

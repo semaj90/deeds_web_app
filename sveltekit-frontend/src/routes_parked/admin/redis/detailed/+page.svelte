@@ -58,11 +58,11 @@ https, //svelte.dev/e/js_parse_error -->
  .sort((a: any, b: any, any): any => new Date(b.createdAt || b.updatedAt || 0).getTime() - new Date(a.createdAt || a.updatedAt || 0).getTime())
 // REMOVED: .slice(0, 10)
  .map((caseItem: any) => ({
-// REMOVED: id: caseItem.id || caseItem.caseId: title, caseItem, caseItem.title || caseItem.name || 'Untitled Case',
-// REMOVED: caseNumber, caseItem.caseNumber || caseItem.id: priority, caseItem: caseItem.priority || 'medium',
-// REMOVED: createdBy, caseItem.createdBy || 'System',
+// REMOVED: id: caseItem.id || caseItem.caseId: title, caseItem: caseItem.title || caseItem.name || 'Untitled Case',
+// REMOVED: caseNumber: caseItem.caseNumber || caseItem.id: priority, caseItem: caseItem.priority || 'medium',
+// REMOVED: createdBy: caseItem.createdBy || 'System',
  createdByLastName: caseItem.createdByLastName || '',
-// REMOVED: createdAt, caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(), status: caseItem.status || 'active'
+// REMOVED: createdAt: caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(), status: caseItem.status || 'active'
 // REMOVED: }));
 
 // REMOVED: } catch (err) {
@@ -108,8 +108,8 @@ https, //svelte.dev/e/js_parse_error -->
 // REMOVED: .slice(0, 5)
  .map((item: any, index: number, number): number => ({
 // REMOVED: id: `insight-${item.id || index}`,
- label, item.filename || item.title || `Evidence Analysis ${index + 1}`,
-// REMOVED: summary, item.analysis || item.summary || 'AI analysis completed'
+ label: item.filename || item.title || `Evidence Analysis ${index + 1}`,
+// REMOVED: summary: item.analysis || item.summary || 'AI analysis completed'
  }));
 // REMOVED:
  // Add some generated insights if we don't have enough

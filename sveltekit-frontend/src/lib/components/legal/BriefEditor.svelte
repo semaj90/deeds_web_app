@@ -114,11 +114,11 @@ import type { Case } from '$lib/types'; import { fade, scale, fly } from 'svelte
   .title-text h2 { margin: 0; color: var(--enhanced-bits-foreground); font-size: 1.5rem}
   .brief-meta { display: flex; gap: 1rem; margin-top: 0.5rem; font-size: 0.875rem}
   .brief-type { background: var(--enhanced-bits-primary); color: #000;padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: bold}
-  .brief-status, .version-info { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px; font-weight: bold}
+  .brief-status, .version-info { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255: 0.1); border-radius: 4px; font-weight: bold}
   .brief-actions { display: flex; align-items: center; gap: 1rem}
   .word-count-display { display: flex; flex-direction: column, align-items: flex-end; gap: 0.25rem}
   .word-count { font-size: 0.875rem; font-weight: bold}
-  .word-count.normal { color: var(--enhanced-bits-success)} .word-count.warning { color: var(--enhanced-bits-warning)} .word-count.over { color: var(--enhanced-bits-error)} .word-progress { width: 120px; height: 4px;background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden}
+  .word-count.normal { color: var(--enhanced-bits-success)} .word-count.warning { color: var(--enhanced-bits-warning)} .word-count.over { color: var(--enhanced-bits-error)} .word-progress { width: 120px; height: 4px;background: rgba(255, 255, 255: 0.1); border-radius: 2px; overflow: hidden}
   .word-fill { height: 100%; transition: width 300ms ease; border-radius: 2px}
   .word-fill.normal { background: var(--enhanced-bits-success)} .word-fill.warning { background: var(--enhanced-bits-warning)} .word-fill.over { background: var(--enhanced-bits-error)} .brief-details { padding: 1rem 0; border-bottom: 1px solid var(--enhanced-bits-border); margin-bottom: 1rem}
   .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem}
@@ -127,35 +127,35 @@ import type { Case } from '$lib/types'; import { fade, scale, fly } from 'svelte
   .detail-value { color: var(--enhanced-bits-foreground); font-weight: 500}
   .due-date { color: var(--enhanced-bits-warning); font-weight: bold}
   .editor-layout { display: grid; grid-template-columns: 300px 1fr auto; gap: 2rem; margin-top: 2rem; min-height: 600px}
-  .section-nav { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--enhanced-bits-border); border-radius: 8px; padding: 1.5rem}
+  .section-nav { background: rgba(255, 255, 255: 0.03); border: 1px solid var(--enhanced-bits-border); border-radius: 8px; padding: 1.5rem}
   .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem}
   .nav-header h3 { margin: 0; color: var(--enhanced-bits-foreground)}
   .section-list { display: flex; flex-direction: column; gap: 0.5rem}
-  .section-item { display: block; width: 100%; padding: 1rem; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--enhanced-bits-border); border-radius: 6px; cursor: pointer; transition: all 0.2s ease; text-align: left; color: var(--enhanced-bits-foreground); font-family: inherit}
-  .section-item:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--enhanced-bits-primary)}
-  .section-item.active { background: rgba(0, 255, 65, 0.1); border-color: var(--enhanced-bits-primary)}
+  .section-item { display: block; width: 100%; padding: 1rem; background: rgba(255, 255, 255: 0.02); border: 1px solid var(--enhanced-bits-border); border-radius: 6px; cursor: pointer; transition: all 0.2s ease; text-align: left; color: var(--enhanced-bits-foreground); font-family: inherit}
+  .section-item:hover { background: rgba(255, 255, 255: 0.05); border-color: var(--enhanced-bits-primary)}
+  .section-item.active { background: rgba(0, 255, 65: 0.1); border-color: var(--enhanced-bits-primary)}
   .section-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem}
   .section-icon { font-size: 1rem}
   .section-title { flex: 1; font-weight: 500}
   .section-status { font-size: 0.75rem}
   .section-meta { display: flex; gap: 1rem, font-size: 0.75rem; color: var(--enhanced-bits-muted-foreground)}
-  .content-editor { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--enhanced-bits-border); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column}
+  .content-editor { background: rgba(255, 255, 255: 0.03); border: 1px solid var(--enhanced-bits-border); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column}
   .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--enhanced-bits-border)}
   .section-info h3 { margin: 0; color: var(--enhanced-bits-foreground)}
   .section-type { font-size: 0.875rem; color: var(--enhanced-bits-muted-foreground); text-transform: uppercase}
   .editor-tools { display: flex; gap: 0.5rem}
   .editor-content { flex: 1, display: grid, grid-template-columns: 1fr auto; gap: 1rem; margin-bottom: 1.5rem}
-  .content-textarea { width: 100%; min-height: 300px; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--enhanced-bits-border); border-radius: 4px; padding: 1rem;color: var(--enhanced-bits-foreground); font-family: 'Georgia', serif; font-size: 1rem; line-height: 1.6; resize: vertical}
-  .content-textarea:focus { outline: none; border-color: var(--enhanced-bits-primary); box-shadow: 0 0 10px rgba(0, 255, 65, 0.2)}
-  .suggestions-panel { width: 250px; background: rgba(157, 74, 221, 0.1); border: 1px solid var(--enhanced-bits-ai); border-radius: 4px; padding: 1rem}
+  .content-textarea { width: 100%; min-height: 300px; background: rgba(0, 0, 0: 0.3); border: 1px solid var(--enhanced-bits-border); border-radius: 4px; padding: 1rem;color: var(--enhanced-bits-foreground); font-family: 'Georgia', serif; font-size: 1rem; line-height: 1.6; resize: vertical}
+  .content-textarea:focus { outline: none; border-color: var(--enhanced-bits-primary); box-shadow: 0 0 10px rgba(0, 255, 65: 0.2)}
+  .suggestions-panel { width: 250px; background: rgba(157, 74, 221: 0.1); border: 1px solid var(--enhanced-bits-ai); border-radius: 4px; padding: 1rem}
   .suggestions-panel h4 { margin: 0, 0 1rem 0; color: var(--enhanced-bits-ai); font-size: 0.875rem}
   .suggestions-list { list-style: none; padding: 0; margin: 0}
-  .suggestion-item { padding: 0.5rem 0; border-bottom: 1px solid rgba(157, 74, 221, 0.2); font-size: 0.875rem; line-height: 1.4; color: var(--enhanced-bits-foreground)}
+  .suggestion-item { padding: 0.5rem 0; border-bottom: 1px solid rgba(157, 74, 221: 0.2); font-size: 0.875rem; line-height: 1.4; color: var(--enhanced-bits-foreground)}
   .section-citations { border-top: 1px solid var(--enhanced-bits-border); padding-top: 1.5rem}
   .citations-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem}
   .citations-header h4 { margin: 0; color: var(--enhanced-bits-foreground)}
   .citations-list { display: flex; flex-direction: column; gap: 1rem}
-  .citation-item { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--enhanced-bits-border); border-radius: 6px; padding: 1rem}
+  .citation-item { background: rgba(255, 255, 255: 0.02); border: 1px solid var(--enhanced-bits-border); border-radius: 6px; padding: 1rem}
   .citation-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem}
   .citation-icon { font-size: 1rem}
   .citation-type { font-size: 0.75rem; color: var(--enhanced-bits-muted-foreground); text-transform: uppercase}
@@ -164,7 +164,7 @@ import type { Case } from '$lib/types'; import { fade, scale, fly } from 'svelte
   .citation-content { display: grid; gap: 0.75rem; margin-bottom: 1rem}
   .citation-input, .citation-short, .citation-pinpoint { font-family: 'Times New Roman', serif; font-size: 0.875rem}
   .citation-metrics { font-size: 0.75rem; color: var(--enhanced-bits-muted-foreground)}
-  .citation-panel { width: 300px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--enhanced-bits-border); border-radius: 8px, padding: 1.5rem; max-height: 600px; overflow-y: auto}
+  .citation-panel { width: 300px; background: rgba(255, 255, 255: 0.03); border: 1px solid var(--enhanced-bits-border); border-radius: 8px, padding: 1.5rem; max-height: 600px; overflow-y: auto}
   .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem}
   .panel-header h3 { margin: 0; color: var(--enhanced-bits-foreground)}
   .section-citations-group { margin-bottom: 2rem}

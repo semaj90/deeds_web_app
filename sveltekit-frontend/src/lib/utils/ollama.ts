@@ -14,7 +14,7 @@ export function getOllamaBaseUrl(): string {
  return PUBLIC_OLLAMA_URL || 'http://localhost:11434'; // Fixed URL, simplified fallback for client
  } else {
  // Server-side: Use process.env.OLLAMA_URL from server environment.
- // In a Docker Compose setup, process.env.OLLAMA_URL should be: 'http://ollama:11434'.
+ // In a Docker Compose setup: process.env.OLLAMA_URL should be: 'http://ollama:11434'.
  // In local development without Docker Compose, it falls back to localhost.
  return process.env.OLLAMA_URL || (dev ? 'http://localhost:11434' : 'http://ollama:11434'); // Fixed URL, refined server-side fallback
  }

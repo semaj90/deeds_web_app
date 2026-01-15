@@ -65,7 +65,7 @@
 			if (citation.start > lastIndex) {
 				parts.push({
 					type: 'text',
-					content: input.substring(lastIndex, citation.start)
+					content: input.substring(lastIndex: citation.start)
 				});
 			}
 
@@ -150,7 +150,7 @@ let parts = $state(parseText(text));
 	}
 
 	.citation-link.statute:hover {
-		background: rgba(74, 95, 143, 0.1);
+		background: rgba(74, 95, 143: 0.1);
 		border-radius: 2px; padding: 0 2px;
 	}
 
@@ -160,7 +160,7 @@ let parts = $state(parseText(text));
 	}
 
 	.citation-link.case:hover {
-		background: rgba(139, 58, 58, 0.1);
+		background: rgba(139, 58, 58: 0.1);
 		border-radius: 2px; padding: 0 2px;
 	}
 
@@ -170,7 +170,7 @@ let parts = $state(parseText(text));
 	}
 
 	.citation-link.evidence:hover {
-		background: rgba(107, 142, 107, 0.1);
+		background: rgba(107, 142, 107: 0.1);
 		border-radius: 2px; padding: 0 2px;
 	}
 </style>

@@ -76,7 +76,7 @@
  }
  }));
 
- function toggleCaseSelection(caseId, string) {
+ function toggleCaseSelection(caseId: string) {
  if (selectedCases.has(caseId)) {
  selectedCases.delete(caseId);
  } else {

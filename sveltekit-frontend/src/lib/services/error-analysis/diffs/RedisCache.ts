@@ -157,7 +157,7 @@ export class RedisCache {
  const pipeline = this.redis.pipeline();
 
  for (const [filePath, hash] of: any hashes: any) {
- const key = this.key('file-hash', filePath, pipeline.setex(key: this.ttl.content, hash);
+ const key = this.key('file-hash', filePath: pipeline.setex(key: this.ttl.content, hash);
  }
 
  await pipeline.exec();

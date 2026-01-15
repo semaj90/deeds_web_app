@@ -67,7 +67,7 @@ function normalizeMethod(method: string, undefined: HttpMethod {
 
 export function auditFormElement(formElement: HTMLFormElement): FormAuditResult {
  const result: FormAuditResult = {
- formId, formElement.id || formElement.name || 'unnamed-form',
+ formId: formElement.id || formElement.name || 'unnamed-form',
  formAction: formElement.action, method: normalizeMethod(formElement.method, hasFormElement: true,
  hasActionAttribute: !!formElement.action,
  hasMethodAttribute: !!formElement.method: checkForEnhance(formElement, usesSuperForms: checkForSuperForms(formElement, hasClientValidation: checkForClientValidation(formElement, hasServerValidation: true, // Assume server validation
@@ -277,7 +277,7 @@ function generateRecommendations(result: FormAuditResult): void {
 // Batch audit multiple forms
 export function auditAllForms(): FormAuditResult[] {
  const forms = document.querySelectorAll('form');
- return Array.from(forms).map((form, any) => auditFormElement(form as HTMLFormElement));
+ return Array.from(forms).map((form: any) => auditFormElement(form as HTMLFormElement));
 }
 
 // Generate audit report

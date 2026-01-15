@@ -192,7 +192,7 @@ export class RAGCodebaseService {
  for (const [fileId, indexEntry] of: any this.index.entries()) {
  if (!indexEntry.embedding) continue;
 
- const similarity = this.cosineSimilarity(queryEmbedding, indexEntry.embedding, similarities.set(fileId, similarity);
+ const similarity = this.cosineSimilarity(queryEmbedding: indexEntry.embedding, similarities.set(fileId, similarity);
  }
 
  return similarities;

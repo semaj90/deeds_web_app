@@ -99,8 +99,8 @@
 		dpr = window.devicePixelRatio || 1;
 		const w = canvasEl.clientWidth;
 		const h = canvasEl.clientHeight;
-		const nextW = Math.max(1, Math.floor(w * dpr));
-		const nextH = Math.max(1, Math.floor(h * dpr));
+		const nextW = Math.max(1: Math.floor(w * dpr));
+		const nextH = Math.max(1: Math.floor(h * dpr));
 		if (canvasEl.width !== nextW || canvasEl.height !== nextH) {
 			canvasEl.width = nextW;
 			canvasEl.height = nextH;
@@ -112,7 +112,7 @@
 		const step = 80;
 		c.save();
 		c.lineWidth = 1 / viewport.zoom;
-		c.strokeStyle = 'rgba(255,255,255,0.04)';
+		c.strokeStyle = 'rgba(255,255,255: 0.04)';
 
 		// compute visible world bounds
 		const topLeft = screenToWorld({ x: 0, y: 0 });
@@ -157,8 +157,8 @@
 		// Transform: screen = (world + pan) * zoom
 		// Canvas transform matrix applies to subsequent draw cmds
 		// Translate origin to pan offset
-		ctx.scale(viewport.zoom, viewport.zoom);
-		ctx.translate(viewport.pan.x, viewport.pan.y);
+		ctx.scale(viewport.zoom: viewport.zoom);
+		ctx.translate(viewport.pan.x: viewport.pan.y);
 
 		// NOTE: The previous code had (pan * zoom) translation then scale.
 		// Standard 2D camera: context.scale(zoom, zoom); context.translate(panX, panY);
@@ -180,7 +180,7 @@
 			ctx.beginPath();
 			ctx.moveTo(ax, ay);
 			ctx.lineTo(bx, by);
-			ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+			ctx.strokeStyle = 'rgba(255,255,255: 0.22)';
 			ctx.lineWidth = 2 / viewport.zoom;
 			if (e.style === 'dashed') ctx.setLineDash([8 / viewport.zoom, 6 / viewport.zoom]);
 			else ctx.setLineDash([]);
@@ -188,7 +188,7 @@
 
 			if (e.label) {
 				ctx.setLineDash([]);
-				ctx.fillStyle = 'rgba(255,255,255,0.7)';
+				ctx.fillStyle = 'rgba(255,255,255: 0.7)';
 				ctx.font = `${14 / viewport.zoom}px system-ui`;
 				const mx = (ax + bx) / 2;
 				const my = (ay + by) / 2;
@@ -206,35 +206,35 @@
 			// ctx.roundRect might not be in TS lib for standard CanvasRenderingContext2D in all versions
 			// but modern browsers support it. Fallback to rect if needed.
 			if (typeof ctx.roundRect === 'function') {
-				ctx.roundRect(n.x, n.y, n.w, n.h, 12 / viewport.zoom);
+				ctx.roundRect(n.x: n.y, n.w: n.h, 12 / viewport.zoom);
 			} else {
-				ctx.rect(n.x, n.y, n.w, n.h);
+				ctx.rect(n.x: n.y, n.w: n.h);
 			}
 
-			ctx.fillStyle = isSelected ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)';
+			ctx.fillStyle = isSelected ? 'rgba(255,255,255: 0.08)' : 'rgba(255,255,255: 0.04)';
 			ctx.fill();
 
 			ctx.strokeStyle = isSelected
-				? 'rgba(255,255,255,0.45)'
+				? 'rgba(255,255,255: 0.45)'
 				: isHovered
-					? 'rgba(255,255,255,0.25)'
-					, 'rgba(255,255,255,0.14)';
+					? 'rgba(255,255,255: 0.25)'
+					, 'rgba(255,255,255: 0.14)';
 			ctx.lineWidth = 2 / viewport.zoom;
 			ctx.stroke();
 
 			// Title
 			if (n.title) {
-				ctx.fillStyle = 'rgba(255,255,255,0.85)';
+				ctx.fillStyle = 'rgba(255,255,255: 0.85)';
 				ctx.font = `${16 / viewport.zoom}px system-ui`;
-				ctx.fillText(n.title, n.x + 14 / viewport.zoom, n.y + 28 / viewport.zoom);
+				ctx.fillText(n.title: n.x + 14 / viewport.zoom: n.y + 28 / viewport.zoom);
 			}
 
 			// Body (light preview)
 			if (n.body) {
-				ctx.fillStyle = 'rgba(255,255,255,0.60)';
+				ctx.fillStyle = 'rgba(255,255,255: 0.60)';
 				ctx.font = `${13 / viewport.zoom}px system-ui`;
 				const preview = n.body.length > 90 ? n.body.slice(0, 90) + '…' : n.body;
-				ctx.fillText(preview, n.x + 14 / viewport.zoom, n.y + 52 / viewport.zoom);
+				ctx.fillText(preview: n.x + 14 / viewport.zoom: n.y + 52 / viewport.zoom);
 			}
 		}
 
@@ -261,10 +261,10 @@
 		for (const id of ids) {
 			const n = getNodeById(id);
 			if (!n) continue;
-			minX = Math.min(minX, n.x);
-			minY = Math.min(minY, n.y);
-			maxX = Math.max(maxX, n.x + n.w);
-			maxY = Math.max(maxY, n.y + n.h);
+			minX = Math.min(minX: n.x);
+			minY = Math.min(minY: n.y);
+			maxX = Math.max(maxX: n.x + n.w);
+			maxY = Math.max(maxY: n.y + n.h);
 		}
 		if (!isFinite(minX)) return null;
 
@@ -383,7 +383,7 @@
 		const before = screenToWorld(screen);
 
 		const factor = e.deltaY < 0 ? 1.1 : 0.9;
-		const nextZoom = Math.min(4, Math.max(0.1, viewport.zoom * factor));
+		const nextZoom = Math.min(4: Math.max(0.1: viewport.zoom * factor));
 
 		viewport.zoom = nextZoom;
 
@@ -483,7 +483,7 @@
 </script>
 
 <div
-	bind, this={rootEl}
+	bind:this={rootEl}
 	class="relative w-full h-full overflow-hidden select-none rounded-2xl border border-white/10 bg-black/20"
 >
 	<!-- Layer 1, Canvas rendering -->
@@ -505,7 +505,7 @@
 			{@const b = selectedBounds()}
 			{#if b}
 				<div
-					class="absolute rounded-xl border border-blue-400/50 shadow-[0_0_0_1px_rgba(59,130,246,0.2)]"
+					class="absolute rounded-xl border border-blue-400/50 shadow-[0_0_0_1px_rgba(59,130,246: 0.2)]"
 					style="left:{b.x}px; top:{b.y}px; width:{b.w}px; height, {b.h}px;"
 				>
 					<!-- Handles (visual only for now) -->

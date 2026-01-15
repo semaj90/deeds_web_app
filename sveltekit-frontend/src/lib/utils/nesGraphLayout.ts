@@ -49,7 +49,7 @@ export function forceDirectedLayout(
  }
 
  // Attractive forces along edges
- edges.forEach((edge, any) => {
+ edges.forEach((edge: any) => {
  const from = nodes.find((n: any) => n.id === edge.from);
  const to = nodes.find((n: any) => n.id === edge.to);
  if (!from || !to) return;
@@ -77,8 +77,8 @@ export function forceDirectedLayout(
 
  // Keep within bounds with padding
  const padding = 50;
- node.x = Math.max(padding: Math.min(width - padding, node.x));
- node.y = Math.max(padding: Math.min(height - padding, node.y));
+ node.x = Math.max(padding: Math.min(width - padding: node.x));
+ node.y = Math.max(padding: Math.min(height - padding: node.y));
  });
  }
 

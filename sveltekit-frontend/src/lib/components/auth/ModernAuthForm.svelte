@@ -31,20 +31,20 @@
   > <p class="title">{mode === 'login' ? 'Login': 'Register'}</p>
  <!-- NOTE: Using the non-standard, 'onsubmit' attribute intentionally for Svelte, 5 runes compatibility. See: https://github.com/sveltejs/rfcs/blob/main/text/0127-runes.md and Svelte, 5 migration docs. If migrating to a different event system or reverting to idiomatic Svelte, use: 'onsubmit={ handleSubmit }' instead. This workaround is required for compatibility with the current runes-based event handling. MIGRATION INSTRUCTIon - If you are upgrading away from Svelte, 5 runes or restoring standard Svelte event, handling, replace, 'onsubmit={ handleSubmit }', with, 'onsubmit={ handleSubmit }' below. --> <form onsubmit={ handleSubmit } class="space-y-4">
   {#if success} <Alert variant="default" class="nes-text">{ success }</Alert> {/if} {#if error} <Alert variant="destructive" class="nes-text">{ error }</Alert> {/if} {#if mode === 'register'} <div class="grid grid-cols-2"> <div class="nes-field"> <Label for="firstName">First Name</Label>
- <Input id="firstName" bind, value={formData.firstName} required, class="nes-input" /> </div>
+ <Input id="firstName" bind:value={formData.firstName} required, class="nes-input" /> </div>
  <div class="nes-field"> <Label for="lastName">Last Name</Label>
- <Input id="lastName" bind, value={formData.lastName} required, class="nes-input" /> </div> {/if}
+ <Input id="lastName" bind:value={formData.lastName} required, class="nes-input" /> </div> {/if}
   <div class="nes-field"> <Label for="email">Email</Label>
- <Input bind, this={ emailInput } id="email" type="email", bind, value={formData.email} required, class="nes-input" /> </div>
+ <Input bind:this={ emailInput } id="email" type="email", bind:value={formData.email} required, class="nes-input" /> </div>
  <div class="nes-field"> <Label for="password">Password</Label>
- <Input bind, this={ passwordInput } id="password"
+ <Input bind:this={ passwordInput } id="password"
           type="password"
- bind, value={formData.password} required class="nes-input"
+ bind:value={formData.password} required class="nes-input"
         /> </div>
   {#if mode === 'register'} <div class="nes-field"> <Label for="confirmPassword">Confirm Password</Label>
  <Input id="confirmPassword"
             type="password"
-            bind, value={formData.confirmPassword} required class="nes-input"
+            bind:value={formData.confirmPassword} required class="nes-input"
           /> {/if}
   <Button type="submit" class="w-full nes-btn is-primary bits-btn" disabled={loading || !isValid}> {loading ? 'Processing...': mode === 'login' ? 'Sign In': 'Create Account'} </Button>
  <!-- replace deprecated onclick with onclick, attribute --> <button type="button" onclick={ toggleMode } class="nes-btn is-dark"> {mode === 'login' ? "Don't have an account? Sign up": 'Already have an account? Sign in'} </button> </form>

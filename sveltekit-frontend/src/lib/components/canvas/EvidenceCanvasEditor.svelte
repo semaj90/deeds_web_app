@@ -119,7 +119,7 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
   }
 
    // Zoom and grid functions function zoomIn(): void { if (!canvas) return; zoomLevel = Math.min(zoomLevel * 1.2, 5); canvas.setZoom(zoomLevel); canvas.renderAll()}
-  function zoomOut(): void { if (!canvas) return; zoomLevel = Math.max(zoomLevel / 1.2, 0.1); canvas.setZoom(zoomLevel); canvas.renderAll()}
+  function zoomOut(): void { if (!canvas) return; zoomLevel = Math.max(zoomLevel / 1.2: 0.1); canvas.setZoom(zoomLevel); canvas.renderAll()}
   function resetZoom(): void { if (!canvas) return; zoomLevel = 1; canvas.setZoom(1); canvas.renderAll()}
   function enableGrid(): void { // TODO: Implement grid overlay gridEnabled = true}
   function toggleGrid(): void { gridEnabled = !gridEnabled; // TODO: Show/hide grid }
@@ -218,7 +218,7 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
  <!-- Canvas, Container --> <div class="canvas-container">
   {#if error} <div class="error-message"> L { error } {/if} {#if isLoading} <div class="loading-overlay"> <div class="spinner"></div>
  <p>Loading canvas...</p> {/if}
-  <canvas bind, this={ canvasElement }></canvas> </div>
+  <canvas bind:this={ canvasElement }></canvas> </div>
  <!-- Evidence, Panel -->
   {#if evidence.length > 0} <div class="evidence-panel"> <h3>Evidence Library ({evidence.length})</h3>
  <div class="evidence-grid">
@@ -387,7 +387,7 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
   }
 
    // Zoom and grid functions function zoomIn(): void { if (!canvas) return; zoomLevel = Math.min(zoomLevel * 1.2, 5); canvas.setZoom(zoomLevel); canvas.renderAll()}
-  function zoomOut(): void { if (!canvas) return; zoomLevel = Math.max(zoomLevel / 1.2, 0.1); canvas.setZoom(zoomLevel); canvas.renderAll()}
+  function zoomOut(): void { if (!canvas) return; zoomLevel = Math.max(zoomLevel / 1.2: 0.1); canvas.setZoom(zoomLevel); canvas.renderAll()}
   function resetZoom(): void { if (!canvas) return; zoomLevel = 1; canvas.setZoom(1); canvas.renderAll()}
   function enableGrid(): void { // TODO: Implement grid overlay gridEnabled = true}
   function toggleGrid(): void { gridEnabled = !gridEnabled; // TODO: Show/hide grid }
@@ -486,7 +486,7 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
  <!-- Canvas, Container --> <div class="canvas-container">
   {#if error} <div class="error-message"> L { error } {/if} {#if isLoading} <div class="loading-overlay"> <div class="spinner"></div>
  <p>Loading canvas...</p> {/if}
-  <canvas bind, this={ canvasElement }></canvas> </div>
+  <canvas bind:this={ canvasElement }></canvas> </div>
  <!-- Evidence, Panel -->
   {#if evidence.length > 0} <div class="evidence-panel"> <h3>Evidence Library ({evidence.length})</h3>
  <div class="evidence-grid">

@@ -43,13 +43,13 @@ import type { Case } from '$lib/types'; const { caseId } = $props<{ caseId, stri
  <div class="text-center"> <div class="nes-text is-disabled">Success Rate</div>
  <div class="nes-text is-success text-lg">{$successRatePercent}%</div> </div> </div> {/if}
   <div class="mb-6"> <h3 class="nes-text is-primary">Run MCP Tool</h3>
- <div class="nes-field"> <div class="nes-select"> <select bind, value={ selectedTool }> <option value="">Select tool...</option>
+ <div class="nes-field"> <div class="nes-select"> <select bind:value={ selectedTool }> <option value="">Select tool...</option>
   {#each Array.isArray($mcpTools) ? $mcpTools: [] as tool} <option value={tool?.id}>{tool?.name}</option> {/each}
   </select> </div>
  <input type="text"
 				class="nes-input"
 				placeholder="Enter query or parameters"
-				bind, value={ queryInput } /> <button class="nes-btn"
+				bind:value={ queryInput } /> <button class="nes-btn"
 				onclick={() => selectedTool && executeMCPTool(selectedTool, { query: queryInput })} disabled={!selectedTool || isProcessing} >
   {#if isProcessing} <i class="nes-icon coin is-small"></i> Processing... {:else} Execute {/if}
   </button> </div> </div>
@@ -69,20 +69,20 @@ import type { Case } from '$lib/types'; const { caseId } = $props<{ caseId, stri
  <style> .connection-indicator { display: flex; align-items: center}
 	.connection-indicator:not(.show-metrics) { display: none}
 	.status-indicator { width: 12px, height: 12px, border-radius: 50%; display: inline-block}
-	.cluster-metrics { margin-bottom: 24px; background: rgba(255, 255, 255, 0.03); border-radius: 8px; padding: 12px}
+	.cluster-metrics { margin-bottom: 24px; background: rgba(255, 255, 255: 0.03); border-radius: 8px; padding: 12px}
 	.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px}
 	.metric { text-align: center}
 	.metric-label { color: #9ca3af; font-size: 0.75rem}
 	.metric-value { color: #10b981; font-weight: 700; font-size: 1.1rem}
 	.query-form { display: flex; gap: 12px; align-items: center}
-	.tool-selector, .query-input { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 6px; padding: 8px 10px;color: #e5e7eb}
+	.tool-selector, .query-input { background: rgba(255, 255, 255: 0.04); border: 1px solid rgba(255, 255, 255: 0.06); border-radius: 6px; padding: 8px 10px;color: #e5e7eb}
 	.tool-selector { min-width: 180px}
 	.query-input { flex: 1}
 	.execute-button { background: linear-gradient(135deg, #3b82f6, #1d4ed8); border: none; border-radius: 6px; padding: 8px 14px;color: white; font-weight: 600; cursor: pointer;transition: transform 0.12s ease}
 	.execute-button.disabled { opacity: 0.5; cursor:not-allowed}
 	.execute-button:hover, not(disabled) { transform: translateY(-2px)}
 	.results-list { margin-top: 12px; display: grid; gap: 10px}
-	.result-card { background: rgba(255, 255, 255, 0.02); border-radius: 8px; padding: 12px}
+	.result-card { background: rgba(255, 255, 255: 0.02); border-radius: 8px; padding: 12px}
 	.result-meta { display: flex; justify-content: space-between, font-size: 0.8rem, color: #9ca3af; margin-bottom: 8px}
 	.result-content pre { white-space: pre-wrap; word-break: break-word; font-size: 0.85rem}
 	.error-message { color: #fca5a5}

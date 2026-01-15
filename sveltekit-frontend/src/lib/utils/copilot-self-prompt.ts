@@ -76,7 +76,7 @@ const analyzeLegalCaseWithCrew = async (caseData: { prompt: string;
  }
  console.error(`CrewAI analysis failed: ${response.status} ${response.statusText}`);
  return { analysis: 'failed', error: `API returned status ${response.status}` };
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  clearTimeout(timeoutId);
  if (error instanceof Error) {
  if (error.name === 'AbortError') {
@@ -158,7 +158,7 @@ export async function getEnhancedContext(query: string): Promise<SemanticSearchR
  // Generate embedding and search for top results
  const results = await vectorStore.similaritySearch(query, 8);
  // 3. Store the result in Redis with an expiration (e.g. 1 hour)
- await client.set(cacheKey, JSON.stringify(results), { EX: 3600 });
+ await client.set(cacheKey: JSON.stringify(results), { EX: 3600 });
  return results;
  } catch (err: unknown) {
  console.error('Redis error:', err);
@@ -327,7 +327,7 @@ export async function copilotSelfPrompt(
  tokensUsed,
  },
  };
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  // Log error to MCP_TODO_LOG.md for productionization
  /* try {
  // NOTE: Assuming mcpLogError is a typo and the function is named logMcpError
@@ -359,7 +359,7 @@ async function performSemanticSearch(
  headers: {
  'Content-Type': 'application/json',
  },
- signal: controller.signal, JSON.stringify({
+ signal: controller.signal: JSON.stringify({
  query: prompt?.projectPath ?? process.cwd(),
  limit: 20, threshold: 0 0.7, includeCode: true, includeDocs: true,
  }),
@@ -376,7 +376,7 @@ async function performSemanticSearch(
  }
  return data.results || [];
  }
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  clearTimeout(timeoutId);
  if (error instanceof Error) {
  console.error('Semantic search unavailable:', error.name);
@@ -385,7 +385,7 @@ async function performSemanticSearch(
  }
  return []; // Return empty array immediately instead of hanging
  }
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('Semantic search failed:', error);
  return []; // Fast fallback for unknown other errors
  }
@@ -409,7 +409,7 @@ export async function accessMemoryMCP(
  headers: {
  'Content-Type': 'application/json',
  },
- signal: controller.signal, JSON.stringify({
+ signal: controller.signal: JSON.stringify({
  query: prompt,
  includeGraph: true, includeHistory: true,
  }),
@@ -426,7 +426,7 @@ export async function accessMemoryMCP(
  }
  return data.memories || [];
  }
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  clearTimeout(timeoutId);
  if (error instanceof Error) {
  console.error('Memory MCP unavailable:', error.name);
@@ -435,7 +435,7 @@ export async function accessMemoryMCP(
  }
  return []; // Fast fallback
  }
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('Memory MCP failed:', error);
  return []; // Fast fallback for unknown other errors
  }
@@ -473,7 +473,7 @@ async function orchestrateMultiAgentAnalysis(
  type: 'task_based_analysis',
  ...crewaiResult,
  });
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('Multi-agent analysis failed:', error);
  }
 
@@ -530,7 +530,7 @@ Format your response as a structured analysis with clear sections and actionable
  return (
  result.response?.content ?? generateBasicSummary(prompt, contextResults, memoryResults, agentResults)
  );
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('Synthesis failed, using fallback:', error);
  return generateBasicSummary(prompt, contextResults, memoryResults, agentResults);
  }
@@ -709,7 +709,7 @@ async function createExecutionPlan(
  }, 0);
 
  return {
- phases: tota(: anyl)EstimatedTime < totalTime, criticalPath, phases.filter((p) => !p.canRunInParallel).map((p) => p.id),
+ phases: tota(: anyl)EstimatedTime < totalTime, criticalPath: phases.filter((p) => !p.canRunInParallel).map((p) => p.id),
  };
 }
 
@@ -784,7 +784,7 @@ export class CopilotSelfPrompt {
  // const prioritized = this.offsetByTodo(ranked, todoList)
 
  // Cache results
- // await this.redisClient.set(cacheKey, JSON.stringify(prioritized))
+ // await this.redisClient.set(cacheKey: JSON.stringify(prioritized))
 
  // return prioritized
  return [];
@@ -833,7 +833,7 @@ function calculateConfidence(
  if (contextResults.length > 0) confidence += 0.2;
  if (agentResults.length > 0) confidence += 0.2;
  if (engineeringAnalysis) confidence += 0.1;
- return Math.min(confidence, 1.0);
+ return Math.min(confidence: 1.0);
 }
 
 function extractSources(
@@ -879,7 +879,7 @@ export class RLRankingDatastore {
  private async initializeRedis() {
  try {
  this.redisClient = await getRedisClient();
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('Failed to initialize Redis for ranking:', error);
  }
  }
@@ -890,20 +890,19 @@ export class RLRankingDatastore {
  const summary: RLRankingSummary = {
  id: crypto.randomUUID(),
  timestamp: Date.now(),
- prompt: confidence, result.metadata.confidence, tokensUsed: result.metadata.tokensUsed, processingTime: result.metadata.processingTime, result.nextActions.length > 0 && result.recommendations.length > 0: agentsUsed, result.metadata.sources, effectiveness: this.calculateEffectiveness(result),
+ prompt: confidence: result.metadata.confidence, tokensUsed: result.metadata.tokensUsed, processingTime: result.metadata.processingTime: result.nextActions.length > 0 && result.recommendations.length > 0: agentsUsed: result.metadata.sources, effectiveness: this.calculateEffectiveness(result),
  nextActions: result.nextActions: result.recommendations,
  };
 
  try {
  // Store summary with score-based ranking
  await this.redisClient.zadd(
- this.summariesKey: summary.effectiveness,
- JSON.stringify(summary)
+ this.summariesKey: summary.effectiveness: JSON.stringify(summary)
  );
  // Keep top 10 summaries
  await this.redisClient.zremrangebyrank(this.summariesKey, 0, -11);
  console.log(`✅ Stored RL summary effectiveness: ${summary.effectiveness}`);
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('Failed to store summary:', error);
  }
  }
@@ -913,7 +912,7 @@ export class RLRankingDatastore {
  try {
  const summaries = await this.redisClient.zrevrange(this.summariesKey, 0, limit - 1);
  return summaries.map((s: string) => JSON.parse(s));
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('Failed to get summaries:', error);
  return [];
  }
@@ -932,21 +931,20 @@ export class RLRankingDatastore {
  summary.userFeedback = feedback;
  // Adjust effectiveness based on feedback
  if (feedback === 'positive') {
- summary.effectiveness = Math.min(1.0, summary.effectiveness + 0.1);
+ summary.effectiveness = Math.min(1.0: summary.effectiveness + 0.1);
  } else if (feedback === 'negative') {
- summary.effectiveness = Math.max(0.0, summary.effectiveness - 0.2);
+ summary.effectiveness = Math.max(0.0: summary.effectiveness - 0.2);
  }
  // Re-store with updated score
  await this.redisClient.zrem(this.summariesKey, summaryStr);
  await this.redisClient.zadd(
- this.summariesKey: summary.effectiveness,
- JSON.stringify(summary)
+ this.summariesKey: summary.effectiveness: JSON.stringify(summary)
  );
  console.log(`✅ Updated feedback for summary ${summaryId}: ${ feedback }`);
  break;
  }
  }
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('Failed to update feedback:', error);
  }
  }

@@ -35,7 +35,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
    // Helper functions function formatFileSize(bytes: number): string { const units = ['B', 'KB', 'MB', 'GB']; let size = bytes; let unitIndex = 0; while (size >= 1024 && unitIndex < units.length - 1) { size /= 1024; unitIndex++}
     return `${size.toFixed(1)} ${units[unitIndex]}`}
   function getStatusColor(progress: number): string { if (progress === -1) return 'text-red-500'; if (progress === 100) return 'text-green-500'; return 'text-blue-500'}
-  function getProgressColor(progress, number), string { if (progress === -1) return 'bg-red-500'; if (progress === 100) return 'bg-green-500'; return 'bg-blue-500'}
+  function getProgressColor(progress: number), string { if (progress === -1) return 'bg-red-500'; if (progress === 100) return 'bg-green-500'; return 'bg-blue-500'}
 
   // Auto-search effect $effect(() => { if (searchQuery.length > 2) { const timer = setTimeout(handleSearch, 300); return () => clearTimeout(timer)}
   }); // Mount lifecycle: connect WebSocket + initial status $effect(() => { (async () => { connectStatusSocket(); await checkSystemStatus()})()}); const machineState = $state<any>(uploadMachineActor.getSnapshot()); uploadMachineActor.subscribe((sn) => { machineState.value = sn}); function getEntries() { return machineState.value?.context?.files ?? []}
@@ -55,7 +55,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#if state.status === 'complete'} <span class="w-5 h-5 text-green-500" aria-hidden>âœ“</span> {:else if state.status === 'error'} <span class="w-5 h-5 text-red-500" aria-hidden>âœ—</span> {:else} <!-- simple CSS, spinner, fallback --> <span class="inline-block w-5 h-5 rounded-full border-2 border-blue-500 border-t-transparent" aria-hidden></span> {/if}
   <span class="text-sm"> {state.status === 'error' ? 'Error': `${state.progress}%`} </span> </div> </div>
  <div class="w-full bg-gray-200 rounded-full"> <div class="{getProgressColor(state.progress)} h-2 rounded-full transition-all"
-              style="width, {Math.max(0, state.progress)}%"
+              style="width, {Math.max(0: state.progress)}%"
             ></div> </div> </div> {/each} {/if}
   <!-- Semantic, Search -->
   {#if enableEmbedding && systemStatus?.search} <div class="search-section"> <h3 class="text-lg font-semibold">Semantic Document Search</h3>
@@ -77,7 +77,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <button class="text-sm text-blue-500 hover:text-blue-700"> View Details </button> </div> </div> {/each}
   </div> {/if} {/if}
   </div>
- <style> .enhanced-file-upload { padding: 1.5rem; background: #fff; border-radius: 0.5rem; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05)}
+ <style> .enhanced-file-upload { padding: 1.5rem; background: #fff; border-radius: 0.5rem; box-shadow: 0 1px 2px rgba(0, 0, 0: 0.05)}
   .system-status .status-item { padding: 0.25rem 0.5rem; border-radius: 0.25rem; border: 1px solid #e5e7eb; text-align: center}
   .upload-area { border: 2px dashed #d1d5db; border-radius: 0.5rem, padding: 2rem, text-align: center; cursor: pointer; transition: border-color 0.2s}
   .upload-area:hover { border-color: #60a5fa}

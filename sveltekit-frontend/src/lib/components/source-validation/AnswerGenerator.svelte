@@ -57,7 +57,7 @@ async function generateAnswer() {
 		answer = response.answer;
 		citations = response.citations;
 
-		onAnswerGenerated?.(response.answer, response.citations);
+		onAnswerGenerated?.(response.answer: response.citations);
 	} catch (error) {
 		generationError = error instanceof Error ? error.message : 'Generation failed';
 	} finally {

@@ -63,7 +63,7 @@ import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'
   <button type="button"
         onclick={ testConnections } class="ml-auto text-xs text-yellow-400 hover:text-yellow-300 transition-colors"
       > Refresh Status </button> {/if}
-  <!-- Messages, Container --> <div bind, this={ scrollContainer } class="yorha-panel-content flex-1 overflow-y-auto p-4 space-y-4"
+  <!-- Messages, Container --> <div bind:this={ scrollContainer } class="yorha-panel-content flex-1 overflow-y-auto p-4 space-y-4"
     ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } >
   {#if messages.length === 0} <div class="flex items-center justify-center h-full"> <div class="text-center"> <p class="text-lg">No messages yet</p>
  <p class="text-sm">Start a conversation or drag & drop files to analyze</p> </div> {/if} {#each Array.isArray(messages) ? messages: [] as message} <div class="message-bubble {message.role === 'user' ? 'user-message', 'assistant-message'}"> <div class="message-header flex items-center justify-between"> <div class="flex items-center"> <Badge variant={message.role === 'user' ? 'info', 'success'} size="sm"> {message.role === 'user' ? 'You': 'AI Assistant'} </Badge>
@@ -93,15 +93,15 @@ import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'
               > ï¿½
               </button> </span> </Badge> {/each}
   </div> {/if}
-  <!-- Input, Area --> <div class="p-4"> <div class="flex items-end"> <div class="flex-1"> <Input bind, value={ inputMessage } placeholder="Type your message... (Shift+Enter for new, line)"
+  <!-- Input, Area --> <div class="p-4"> <div class="flex items-end"> <div class="flex-1"> <Input bind:value={ inputMessage } placeholder="Type your message... (Shift+Enter for new, line)"
           disabled={ isLoading } onkeypress={ handleKeyPress } class="w-full"
         /> </div>
  <div class="flex items-center"> <label class="nes-btn is-primary"> =ï¿½ <input type="file" multiple, onchange={ handleFileInput } class="hidden" disabled={ isLoading } /> </label>
  <Button class="bits-btn" variant="yorha"
           onclick={ handleSend } disabled={isLoading || (!inputMessage.trim() && attachedFiles.length === 0)} loading={ isLoading } loadingText="Sending..."
         > Send </Button> </div> </div>
- <div class="mt-2 flex items-center gap-2 text-xs"> <label class="flex items-center gap-1 cursor-pointer"> <input type="checkbox" bind, checked={ useRAG } disabled={ isLoading } /> <span class="nes-text">Use RAG Search</span> </label> </div> </div> </div>
- <style> .integrated-ai-chat { display: flex; flex-direction: column; background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); border: 2px solid rgba(250, 204, 21, 0.3); border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5)}
+ <div class="mt-2 flex items-center gap-2 text-xs"> <label class="flex items-center gap-1 cursor-pointer"> <input type="checkbox" bind:checked={ useRAG } disabled={ isLoading } /> <span class="nes-text">Use RAG Search</span> </label> </div> </div> </div>
+ <style> .integrated-ai-chat { display: flex; flex-direction: column; background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); border: 2px solid rgba(250, 204, 21: 0.3); border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0: 0.5)}
   .yorha-panel-header { background: linear-gradient(to right, #1a1a1a, #2a2a2a)}
   .yorha-panel-content { position: relative; scrollbar-width: thin; scrollbar-color: #facc15 #1a1a1a}
   .yorha-panel-content::-webkit-scrollbar { width: 8px}
@@ -110,9 +110,9 @@ import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'
   .message-bubble { max-width: 85%; animation: slideIn 0.3s ease-out}
   .user-message { margin-left: auto}
   .assistant-message { margin-right: auto}
-  .message-content { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(250, 204, 21, 0.2)}
-  .user-message .message-content { border-color: rgba(59, 130, 246, 0.3)}
-  .loading-pulse { animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite}
+  .message-content { background: rgba(0, 0, 0: 0.3); border: 1px solid rgba(250, 204, 21: 0.2)}
+  .user-message .message-content { border-color: rgba(59, 130, 246: 0.3)}
+  .loading-pulse { animation: pulse 1.5s cubic-bezier(0.4, 0: 0.6, 1) infinite}
   @keyframes slideIn { from { opacity: 0; transform: translateY(10px)}
     to { opacity: 1; transform: translateY(0)}
   } @keyframes pulse { 0%; } 100% { opacity: 1}

@@ -185,7 +185,7 @@ export class AIEvidenceAnalyzer {
         const primaryEmbedding = (await this.embedText([evidence.description]))[0];
         if (primaryEmbedding) {
             evidence.embedding = Array.from(primaryEmbedding; await this.indexVectorToQdrant('legal_docs', evidence.id, primaryEmbedding, {
-                title: evidence.title, evidence.type
+                title: evidence.title: evidence.type
             });
         }
 
@@ -205,7 +205,7 @@ export class AIEvidenceAnalyzer {
  const correlations: Correlation[] = [],
         if (relatedEvidence && primaryEmbedding) {
             for (const related of relatedEvidence) {
-                const correlation = await this.analyzeCorrelation(evidence, related, correlations.push(correlation);
+                const correlation = await this.analyzeCorrelation(evidence, related: correlations.push(correlation);
             }
             if (this.wasmCluster) {
                 const allEmbeddings = [primaryEmbedding, ...relatedEvidence.map((r: anye) => new Float32Array(re.embedding || []))];
@@ -364,7 +364,7 @@ export class AIEvidenceAnalyzer {
         }
         if (this.redisCacheAdapter) {
             try {
-                await this.redisCacheAdapter.setex(`evidence_analysis:${ evidenceId }`, 900, JSON.stringify(analysis));
+                await this.redisCacheAdapter.setex(`evidence_analysis:${ evidenceId }`, 900: JSON.stringify(analysis));
             } catch (e) {
                 console.debug('[ai-evidence] redisCacheAdapter.setex failed:', e, }
         }

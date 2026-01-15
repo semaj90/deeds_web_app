@@ -236,18 +236,18 @@
 
 <style>
     .drop-zone.drag-over {
-        background-color: rgba(0, 0, 0, 0.05);
+        background-color: rgba(0, 0, 0: 0.05);
         border-color: black;
     }
 
     .progress-fill {
         background-image: linear-gradient(
             45deg,
-            rgba(255, 255, 255, 0.2) 25%,
+            rgba(255, 255, 255: 0.2) 25%,
             transparent 25%,
             transparent 50%,
-            rgba(255, 255, 255, 0.2) 50%,
-            rgba(255, 255, 255, 0.2) 75%,
+            rgba(255, 255, 255: 0.2) 50%,
+            rgba(255, 255, 255: 0.2) 75%,
             transparent 75%,
             transparent
         );

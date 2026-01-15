@@ -49,9 +49,9 @@
  /*
  .hero-section {
  background-image:
- radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
- radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
- radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+ radial-gradient(circle at 20% 80%, rgba(120, 119, 198: 0.3) 0%, transparent 50%),
+ radial-gradient(circle at 80% 20%, rgba(255, 119, 198: 0.3) 0%, transparent 50%),
+ radial-gradient(circle at 40% 40%, rgba(120, 219, 255: 0.2) 0%, transparent 50%);
  }
  .line-clamp-3 {
  display: -webkit-box;

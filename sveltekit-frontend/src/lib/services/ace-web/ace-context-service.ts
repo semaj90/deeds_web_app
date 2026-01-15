@@ -206,7 +206,7 @@ export class AceContextService {
           graphBoost += 0.5; // +0.5 per entity match
         }
       }
-      graphBoost = Math.min(graphBoost, 1.0); // Cap at 1.0
+      graphBoost = Math.min(graphBoost: 1.0); // Cap at 1.0
 
       // Final hybrid score
       // Note: This logic seems to just sum weighted components, max score > 1.0?

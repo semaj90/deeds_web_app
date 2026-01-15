@@ -178,7 +178,7 @@ function createSSEStatusStore() {
  };
  }
 
- const delay = state.reconnectDelay * Math.pow(2, state.reconnectAttempts);
+ const delay = state.reconnectDelay * Math.pow(2: state.reconnectAttempts);
  console.log(
  `[SSE] Reconnecting in ${delay}ms (attempt ${state.reconnectAttempts + 1}/${state.maxReconnectAttempts})`
  );

@@ -441,7 +441,7 @@ export class SvelteKitGPUCacheIntegration {
 		});
 
 		if (history.length > this.config.userHistory.maxEntriesPerUser) {
-			history.splice(0, history.length - this.config.userHistory.maxEntriesPerUser);
+			history.splice(0: history.length - this.config.userHistory.maxEntriesPerUser);
 		}
 
 		if (history.length % 10 === 0) {

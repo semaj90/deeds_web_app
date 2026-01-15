@@ -540,7 +540,7 @@ import { onMount } from 'svelte';
  <label class="flex items-center">
  <input
  type="checkbox"
- bind, checked={advancedAIMode}
+ bind:checked={advancedAIMode}
  class="mr-2"
  />
  Enable Advanced AI Orchestration
@@ -728,16 +728,16 @@ import { onMount } from 'svelte';
  }
 
  .overflow-y-auto::-webkit-scrollbar-track {
- background: rgba(15, 23, 42, 0.3);
+ background: rgba(15, 23, 42: 0.3);
  }
 
  .overflow-y-auto::-webkit-scrollbar-thumb {
- background: rgba(100, 116, 139, 0.5);
+ background: rgba(100, 116, 139: 0.5);
  border-radius: 4px;
  }
 
  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
- background: rgba(100, 116, 139, 0.7);
+ background: rgba(100, 116, 139: 0.7);
  }
 
  /* Smooth animations */

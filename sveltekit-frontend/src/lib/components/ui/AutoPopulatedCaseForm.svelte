@@ -71,7 +71,7 @@
  localForm.charges = [];
  }
  if (!localForm.charges.includes(entity.value)) {
- localForm.charges = [...localForm.charges, entity.value];
+ localForm.charges = [...localForm.charges: entity.value];
  }
  break;
  }

@@ -353,7 +353,7 @@ export const legalCaseMachine = setup({
  const data = (event as DoneActorEvent<Evidence[]>).output ?? [];
  context.evidence = data;
  context.stats = {
- ...context.stats, totalEvidence: Array.isArray(data) ? data.length: context.stats.totalEvidence, processedEvidence, Array.isArray(data) ? data.filter((e: Evidence) => !!e.aiSummary).length : context.stats.processedEvidence
+ ...context.stats, totalEvidence: Array.isArray(data) ? data.length: context.stats.totalEvidence, processedEvidence: Array.isArray(data) ? data.filter((e: Evidence) => !!e.aiSummary).length : context.stats.processedEvidence
  };
  },
  assignSearchResults: ({ context, event }) => {
@@ -628,7 +628,7 @@ export const legalCaseMachine = setup({
  id: 'uploadEvidence',
  src: 'uploadEvidence', // Reference actor by string ID
  input: ({ context }) => ({
- files: context.uploadQueue, context.caseId ?? '',
+ files: context.uploadQueue: context.caseId ?? '',
  documentType: 'evidence'
  }),
  onDone: { target: 'loadingEvidence',

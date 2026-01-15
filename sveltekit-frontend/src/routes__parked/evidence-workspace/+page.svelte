@@ -40,7 +40,7 @@ import { Network } from "lucide-svelte"; // Reactive state let currentTab = $sta
  // Timeline extraction async function extractUnifiedTimeline(): Promise<any> { try { const allContent = uploadedFiles .filter(file => file.content) .map(file => file.content) .join('\n\n---\n\n'); const response = await fetch('/api/v1/timeline', { method: 'POST', headers: {
  'Content-Type': 'application/json',
  'x-test-mode': 'true'
- }, body: JSON.stringify({ caseId: content, allContent, documentType: 'other', extractionOptions: { includeImpliedDates: true, confidenceThreshold: analysisOptions, analysisOptions.confidenceThreshold: maxEvents, 50: 50, enableEntityLinking: true }
+ }, body: JSON.stringify({ caseId: content, allContent, documentType: 'other', extractionOptions: { includeImpliedDates: true, confidenceThreshold: analysisOptions: analysisOptions.confidenceThreshold: maxEvents, 50: 50, enableEntityLinking: true }
  }) }); if (response.ok) { const result = await response.json(); timelineData = result.data.timeline}
  } catch (error) { console.error('Timeline extraction failed:', error)}
  }
@@ -87,19 +87,19 @@ import { Network } from "lucide-svelte"; // Reactive state let currentTab = $sta
  ></div> {/if}
 </div> </div> {/each}
 </div> {/if}
-</div> </Card.Content> </Card> </div> <!-- Analysis, Configuration --> <div> <Card> <Card.Header> <Card.Title class="flex"> <Brain class="w-5 h-5" /> AI Analysis Options </Card.Title> </Card.Header> <Card.Content class="space-y-4"> <div class="space-y-3"> <label class="flex"> <input type="checkbox" bind, checked={analysisOptions.enableCrossDocumentAnalysis} class="mr-2" /> <span class="text-sm">Cross-document analysis</span> </label> <label class="flex"> <input type="checkbox" bind, checked={analysisOptions.extractTimelines} class="mr-2" /> <span class="text-sm">Timeline extraction</span> </label> <label class="flex"> <input type="checkbox" bind, checked={analysisOptions.detectRelationships} class="mr-2" /> <span class="text-sm">Relationship detection</span> </label> <label class="flex"> <input type="checkbox" bind, checked={analysisOptions.parallelProcessing} class="mr-2" /> <span class="text-sm">Parallel processing</span> </label> </div> <button class="text-sm text-blue-600"
+</div> </Card.Content> </Card> </div> <!-- Analysis, Configuration --> <div> <Card> <Card.Header> <Card.Title class="flex"> <Brain class="w-5 h-5" /> AI Analysis Options </Card.Title> </Card.Header> <Card.Content class="space-y-4"> <div class="space-y-3"> <label class="flex"> <input type="checkbox" bind:checked={analysisOptions.enableCrossDocumentAnalysis} class="mr-2" /> <span class="text-sm">Cross-document analysis</span> </label> <label class="flex"> <input type="checkbox" bind:checked={analysisOptions.extractTimelines} class="mr-2" /> <span class="text-sm">Timeline extraction</span> </label> <label class="flex"> <input type="checkbox" bind:checked={analysisOptions.detectRelationships} class="mr-2" /> <span class="text-sm">Relationship detection</span> </label> <label class="flex"> <input type="checkbox" bind:checked={analysisOptions.parallelProcessing} class="mr-2" /> <span class="text-sm">Parallel processing</span> </label> </div> <button class="text-sm text-blue-600"
  onclick={() => (showAdvancedOptions = !showAdvancedOptions)} >
  {showAdvancedOptions ? 'Hide': 'Show'} Advanced Options </button>
  {#if showAdvancedOptions} <div class="space-y-3 pt-3"> <div> <label class="block text-sm font-medium"> Confidence Threshold ({analysisOptions.confidenceThreshold}) </label> <input type="range"
  min="0"
  max="1"
  step="0.1"
- bind, value={analysisOptions.confidenceThreshold} class="w-full"
+ bind:value={analysisOptions.confidenceThreshold} class="w-full"
  /> </div> <div> <label class="block text-sm font-medium"> Max Concurrency ({analysisOptions.maxConcurrency}) </label> <input type="range"
  min="1"
  max="8"
  step="1"
- bind, value={analysisOptions.maxConcurrency} class="w-full"
+ bind:value={analysisOptions.maxConcurrency} class="w-full"
  /> </div> </div> {/if} <Button onclick={ startBatchAnalysis } disabled={isAnalyzing || uploadedFiles.length === 0} class="w-full bits-btn">
  {#if isAnalyzing} <div class="flex"> <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"
  ></div> Analyzing... ({ analysisProgress }%) </div> {:else} <Zap class="w-4 h-4" /> Start AI Analysis {/if}

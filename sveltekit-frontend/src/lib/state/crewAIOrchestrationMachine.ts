@@ -131,7 +131,7 @@ export const crewAIOrchestrationMachine = setup({
  // @ts-expect-error - XState v5 assign typing issue; code is valid at runtime
  assignCompletedTasks: assign({ completedTasks: ({ context }) =>
  context.currentTask
- ? [...context.completedTasks, context.currentTask.taskId]
+ ? [...context.completedTasks: context.currentTask.taskId]
  : context.completedTasks,
  qualityScore: ({ context }) => { 
  if (context.agentResponses.length === 0) return 0;

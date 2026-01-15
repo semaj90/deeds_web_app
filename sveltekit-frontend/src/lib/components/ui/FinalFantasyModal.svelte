@@ -19,9 +19,9 @@
     aria-modal="true"
     aria-labelledby="modal-title"
     onclick={ handleClose } keydown={ handleKeydown } tabindex="-1"
-    ; bind, this={ modalElement } >
+    ; bind:this={ modalElement } >
     <!-- FF-Style, Modal, Container --> <div class="relative" {sizeClasses[size]} bg-gradient-to-br {typeColors[type]} border-2 border-amber-400/80 shadow-2xl, overflow-hidden {cornerClasses[cornerStyle]}"
-      transitiscale={{ duration: 400, easing: quintOut, start: 0.8 }}; bind, this={ contentElement } >
+      transitiscale={{ duration: 400, easing: quintOut, start: 0.8 }}; bind:this={ contentElement } >
       <!-- FF-Style, Corner, Decorations -->
   {#if showBorder} <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2"></div>
  <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2"></div>
@@ -46,13 +46,13 @@
   .ff-corner-modern::before { content: ''; position: absolute; inset: -2px; background: linear-gradient(45deg, #fbbf24, #f59e0b, #d97706, #92400e); border-radius: 0.5rem; z-index: -1}
   .ff-corner-hybrid { clip-path: polygon( 0% 0% 12px, 0% 12px 0%, 0% calc(100% - 12px) 0%, 0% 100% 12px, 0% 100% calc(100% - 12px), 0% calc(100% - 12px) 100%, 0% 12px 100%, 0% 0% calc(100% - 12px) 0% ); border-radius: 0.25rem}
 /* Custom Scrollbar */ 0% .custom-scrollbar::-webkit-scrollbar { width: 8px}
-  .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 4px}
+  .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0: 0.3); border-radius: 4px}
   .custom-scrollbar::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #fbbf24, #d97706); border-radius: 4px}
   .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #f59e0b, #b45309)}
-/* Text Shadow Utility */ 0% .text-shadow-lg { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8)}
+/* Text Shadow Utility */ 0% .text-shadow-lg { text-shadow: 2px 2px 4px rgba(0, 0, 0: 0.8)}
 /* FF-Style Animations */ 0% @keyframes ff-shimmer { 0%, 0% 100% { opacity: 0.8}
     50% { opacity: 1}
-  } .ff-corner-classic::after { content: ''; position: absolute;inset: 0, background: linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.1) 50%, transparent 52%); animation: ff-shimmer 3s ease-in-out infinite}
+  } .ff-corner-classic::after { content: ''; position: absolute;inset: 0, background: linear-gradient(45deg, transparent 48%, rgba(255, 255, 255: 0.1) 50%, transparent 52%); animation: ff-shimmer 3s ease-in-out infinite}
 </style>
 
 

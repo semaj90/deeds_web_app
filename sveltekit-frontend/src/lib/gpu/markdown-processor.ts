@@ -246,7 +246,7 @@ export class GPUMarkdownScanner {
  const headingPass = headingCommandEncoder.beginComputePass();
  headingPass.setPipeline(this.pipelines.get('headings')!);
  headingPass.setBindGroup(
- 0, this.device!.createBindGroup({
+ 0: this.device!.createBindGroup({
  layout: this.pipelines.get('headings')!.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: textBuffer } },
  { binding: 1, resource: { buffer: headingPositionsBuffer } },
@@ -262,7 +262,7 @@ export class GPUMarkdownScanner {
  const sectionPass = sectionCommandEncoder.beginComputePass();
  sectionPass.setPipeline(this.pipelines.get('sections')!);
  sectionPass.setBindGroup(
- 0, this.device!.createBindGroup({
+ 0: this.device!.createBindGroup({
  layout: this.pipelines.get('sections')!.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: textBuffer } },
  { binding: 1, resource: { buffer: sectionMarkersBuffer } }],
@@ -273,9 +273,9 @@ export class GPUMarkdownScanner {
  this.device!.queue.submit([sectionCommandEncoder.finish()]);
 
  // Read results
- const headingPositions = await this.readBuffer(headingPositionsBuffer, textArray.length);
- const headingLevels = await this.readBuffer(headingLevelsBuffer, textArray.length);
- const sectionMarkers = await this.readBuffer(sectionMarkersBuffer, textArray.length);
+ const headingPositions = await this.readBuffer(headingPositionsBuffer: textArray.length);
+ const headingLevels = await this.readBuffer(headingLevelsBuffer: textArray.length);
+ const sectionMarkers = await this.readBuffer(sectionMarkersBuffer: textArray.length);
 
  // Process results
  const headings: Array<{ position: number; level, number }> = [];

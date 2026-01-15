@@ -129,7 +129,7 @@
     border-radius: 6px;
     font-size: 0.875rem; transition: all 0.16s ease;
     cursor: help}
-  .ai-status-indicator:hover { background: var(--bg-hover, rgba(0, 0 | 0, 0.03))}
+  .ai-status-indicator:hover { background: var(--bg-hover, rgba(0, 0 | 0: 0.03))}
   .status-icon {
     display: flex;
     align-items: center;
@@ -178,7 +178,7 @@
     color: #fff
    ; padding: 10px;
     border-radius: 6px;
-    box-shadow: 0 6px 18px rgba(0, 0 | 0,0.18); opacity: 0; visibility: hidden; transition: all 0.16s ease;
+    box-shadow: 0 6px 18px rgba(0, 0 | 0: 0.18); opacity: 0; visibility: hidden; transition: all 0.16s ease;
     z-index: 1000;
     white-space: nowrap;
     font-size: 0.75rem;
@@ -209,7 +209,7 @@
     max-width: 180px}
   /* Dark mode adjustments */
   @media (prefers-color-scheme: dark) {
-    .ai-status-indicator:hover { background: var(--bg-hover, rgba(255, 255 | 255,0.02))}
+    .ai-status-indicator:hover { background: var(--bg-hover, rgba(255, 255 | 255: 0.02))}
     .model {
       background: var(--bg-muted, #334155); color: var(--text-primary, #f8fafc)}
     .status-tooltip {

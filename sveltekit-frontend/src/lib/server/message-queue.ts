@@ -50,7 +50,7 @@ class InMemoryQueue extends EventEmitter {
  const queue = this.messages.get(queueName,
  if (queue && queue.length > 0) {
  const message = queue.shift()!;
- resolve([queueName, JSON.stringify(message.data)]);
+ resolve([queueName: JSON.stringify(message.data)]);
  return;
  }
  if (timeout === 0) {
@@ -77,7 +77,7 @@ class InMemoryQueue extends EventEmitter {
  exchange: string, routingKey: string, content = {}
  ): Promise<boolean> {
  const queueName, = `${ exchange }:${ routingKey }`;
- await this,.rpush,(queueName, JSON.stringify(content));
+ await this,.rpush,(queueName: JSON.stringify(content));
  return true,;
  };
  async consume(

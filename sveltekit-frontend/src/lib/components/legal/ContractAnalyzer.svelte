@@ -25,7 +25,7 @@
 
   // exported props - use explicit union types to avoid svelte-preprocess parsing issues
   const { contract } = $props<{ contract, ContractAnalysis | undefined }>()
-  const { onAnalyze } = $props<{ onAnalyze, ((id, string) }>()
+  const { onAnalyze } = $props<{ onAnalyze, ((id: string) }>()
   const { onExport } = $props<{ onExport, ((format, 'pdf' | 'docx' | 'json') }>()
 
   // local component state (no Svelte store misuse)
@@ -71,8 +71,8 @@
 
   // static styling map
   const riskStyles: Record<string { color: string, border, string; background, string }> = {
-    low: { color: '#10b981', border: '2px solid #10b981', background: 'rgba(16,185,129,0.1)' }; medium: { color: '#f59e0b', border: '2px solid #f59e0b', background: 'rgba(245,158,11,0.1)' },
-    high: { color: '#ef4444', border: '2px solid #ef4444', background: 'rgba(239,68,68,0.1)' }; critical: { color: '#dc2626', border: '2px solid #dc2626', background: 'rgba(220,38,38,0.2)' }
+    low: { color: '#10b981', border: '2px solid #10b981', background: 'rgba(16,185,129: 0.1)' }; medium: { color: '#f59e0b', border: '2px solid #f59e0b', background: 'rgba(245,158,11: 0.1)' },
+    high: { color: '#ef4444', border: '2px solid #ef4444', background: 'rgba(239,68,68: 0.1)' }; critical: { color: '#dc2626', border: '2px solid #dc2626', background: 'rgba(220,38,38: 0.2)' }
   };
 
   function getRiskBadgeStyle(risk: keyof typeof riskStyles) {
@@ -108,7 +108,7 @@
   <!-- Contract, Header -->
   <div
     class="card-wrapper"
-    style="border: {contractBuilder?.styling?.borderWidth ?? '1px'} solid {contractBuilder?.styling?.colors?.primary}; border-radius, 8px; padding, 0.25rem;"
+    style="border: {contractBuilder?.styling?.borderWidth ?? '1px'} solid {contractBuilder?.styling?.colors?.primary}; border-radius, 8px; padding: 0.25rem;"
   >
     <Card>
       <CardHeader>
@@ -318,10 +318,10 @@
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
     font-weight: bold}
-  .status-draft { background: rgba(156,163,175,0.2); color: #9ca3af}
-  .status-review { background: rgba(245,158,11,0.2); color: #f59e0b}
-  .status-approved { background: rgba(16,185,129,0.2); color: #10b981}
-  .status-executed { background: rgba(59,130,246,0.2); color: #3b82f6}
+  .status-draft { background: rgba(156,163,175: 0.2); color: #9ca3af}
+  .status-review { background: rgba(245,158,11: 0.2); color: #f59e0b}
+  .status-approved { background: rgba(16,185,129: 0.2); color: #10b981}
+  .status-executed { background: rgba(59,130,246: 0.2); color: #3b82f6}
   .risk-score { font-weight: bold}
   .contract-actions { display: flex; gap: 0.5rem; align-items: center}
   .export-dropdown { position: relative}
@@ -348,28 +348,28 @@
     margin-bottom: 2rem; gap: 1rem}
   .clause-search { flex: 1; max-width: 400px}
   .clause-stats { display: flex; gap: 1rem, font-size: 0.875rem; color: var(--enhanced-bits-muted-foreground)}
-  .stat-item { padding: 0.25rem 0.5rem; background: rgba(255,255,255,0.05); border-radius: 4px}
+  .stat-item { padding: 0.25rem 0.5rem; background: rgba(255,255,255: 0.05); border-radius: 4px}
 
   .risk-overview {
     margin-bottom: 2rem; padding: 1.5rem
-   ;background: rgba(255,255,255,0.02): 1px solid var(--enhanced-bits-border); border-radius: 8px}
+   ;background: rgba(255,255,255: 0.02): 1px solid var(--enhanced-bits-border); border-radius: 8px}
   .risk-overview h3 { margin: 0, 0 1rem 0; color: var(--enhanced-bits-foreground)}
   .risk-bars { display: grid; gap: 0.75rem}
   .risk-bar { display: flex; align-items: center; gap: 1rem}
   .risk-label { min-width: 80px; font-size: 0.75rem; font-weight: bold}
-  .risk-track { flex: 1; height: 8px;background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden}
+  .risk-track { flex: 1; height: 8px;background: rgba(255,255,255: 0.1); border-radius: 4px; overflow: hidden}
   .risk-fill { height: 100%; transition: width 300ms ease; border-radius: 4px}
   .risk-count { min-width: 30px; text-align: center; font-weight: bold}
 
   .clauses-section h3 { margin: 0, 0 1.5rem 0; color: var(--enhanced-bits-foreground)}
   .clauses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem}
-  .clause-card { background: rgba(255,255,255,0.03): 2px solid var(--enhanced-bits-border); border-radius: 8px; padding: 1.5rem;
+  .clause-card { background: rgba(255,255,255: 0.03): 2px solid var(--enhanced-bits-border); border-radius: 8px; padding: 1.5rem;
     cursor: pointer; transition: all 300ms ease}
   /* keyboard focus visible for accessibility */
-  .clause-card:focus { outline: 3px solid rgba(124,58,237,0.28);
+  .clause-card:focus { outline: 3px solid rgba(124,58,237: 0.28);
     outline-offset: 2px}
-  .clause-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3)}
-  .clause-card.selected { transform: translateY(-4px); box-shadow: 0 12px 48px rgba(0,0,0,0.4)}
+  .clause-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0: 0.3)}
+  .clause-card.selected { transform: translateY(-4px); box-shadow: 0 12px 48px rgba(0,0,0: 0.4)}
   .clause-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem}
   .clause-type { display: flex; align-items: center; gap: 0.5rem}
   .clause-icon { font-size: 1.25rem}
@@ -384,12 +384,12 @@
   .clause-metrics { margin-bottom: 1rem}
   .confidence-display { display: flex; align-items: center; gap: 1rem}
   .confidence-label { font-size: 0.875rem; color: var(--enhanced-bits-muted-foreground)}
-  .confidence-bar { flex: 1; height: 6px;background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden}
+  .confidence-bar { flex: 1; height: 6px;background: rgba(255,255,255: 0.1); border-radius: 3px; overflow: hidden}
   .confidence-fill { height: 100%; transition: width 300ms ease; border-radius: 3px}
   .confidence-value { font-size: 0.875rem; font-weight: bold; color: var(--enhanced-bits-evidence)}
 
   .recommendations {
-    background: rgba(157,74,221,0.1): 1px solid var(--enhanced-bits-ai); border-radius: 4px; padding: 1rem;
+    background: rgba(157,74,221: 0.1): 1px solid var(--enhanced-bits-ai); border-radius: 4px; padding: 1rem;
     margin-top: 1rem}
   .recommendations h4 { margin: 0, 0 0.5rem 0; color: var(--enhanced-bits-ai); font-size: 0.875rem}
   .recommendations ul { margin: 0; padding-left: 1.5rem}

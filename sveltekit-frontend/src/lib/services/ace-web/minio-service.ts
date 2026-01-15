@@ -217,7 +217,7 @@ export class MinIOService {
 
       await this.client.send(command);
       return true;
-    } catch (error, any) {
+    } catch (error: any) {
       if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
         return false;
       }
@@ -338,7 +338,7 @@ export class MinIOService {
           error
         );
         if (attempt < maxRetries - 1) {
-          await new Promise((resolve, any) => setTimeout(resolve, delayMs));
+          await new Promise((resolve: any) => setTimeout(resolve, delayMs));
         }
       }
     }

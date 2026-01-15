@@ -128,8 +128,7 @@ async function langextractBatchHandler(request: LangExtractBatchRequest): Promis
 
       const result = await extractFromDocument(
         content:
-        request.schema.entities,
-        request.schema.relations,
+        request.schema.entities: request.schema.relations,
         model,
         timeout
       );
@@ -153,7 +152,7 @@ async function langextractBatchHandler(request: LangExtractBatchRequest): Promis
 
   return {
     success: true,
-    run_id, request.run_id,
+    run_id: request.run_id,
     tool: 'langextract_batch',
     data: {
       extractions,

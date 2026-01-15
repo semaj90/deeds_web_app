@@ -50,7 +50,7 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
  <div class="generation-controls"> <!-- Prompt, Input --> <div class="input-group"> <label class="nes-text" for="prompt">Prompt:</label>
 <textarea id="prompt"
         class="nes-textarea"
-        bind, value={ prompt } placeholder="Describe the image you want to generate..."
+        bind:value={ prompt } placeholder="Describe the image you want to generate..."
         rows="3"
       ></textarea> </div>
  <!-- Legal, Templates --> <div class="template-section"> <label class="nes-text">Legal Templates:</label>
@@ -58,33 +58,33 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
   {#each Array.isArray(legalPromptTemplates) ? legalPromptTemplates: [] as template} <button class="template-btn nes-btn" onclick={() => (prompt = template.prompt)}> {template.name} </button> {/each}
   </div> </div>
  <!-- Style and, Provider, Selection --> <div class="selection-row"> <div class="select-group"> <label class="nes-text">Style:</label>
- <div class="nes-select"> <select bind, value={ selectedStyle }> <option value="realistic">Realistic</option>
+ <div class="nes-select"> <select bind:value={ selectedStyle }> <option value="realistic">Realistic</option>
  <option value="artistic">Artistic</option>
  <option value="anime">Anime</option>
  <option value="sketch">Sketch</option>
  <option value="legal-diagram">Legal Diagram</option>
  <option value="evidence-recreation">Evidence Recreation</option> </select> </div> </div>
  <div class="select-group"> <label class="nes-text">Provider:</label>
- <div class="nes-select"> <select bind, value={ selectedProvider }>
+ <div class="nes-select"> <select bind:value={ selectedProvider }>
   {#each Array.isArray(Array.from(providerStatus.keys())) ? Array.from(providerStatus.keys()): [] as provider} <option value={ provider }> { provider } {providerStatus.get(provider) !== 'internal' ? ' (Available)': ' (Fallback)'} </option> {/each}
   </select> </div> </div> </div>
- <!-- Advanced, Controls --> <div class="advanced-toggle"> <label class="nes-checkbox"> <input type="checkbox" bind, checked={ advancedMode } /> <span>Advanced Settings</span> </label> </div>
+ <!-- Advanced, Controls --> <div class="advanced-toggle"> <label class="nes-checkbox"> <input type="checkbox" bind:checked={ advancedMode } /> <span>Advanced Settings</span> </label> </div>
   {#if advancedMode} <div class="advanced-controls nes-container"> <div class="input-group"> <label class="nes-text" for="negative-prompt">Negative Prompt:</label>
  <textarea id="negative-prompt"
             class="nes-textarea"
-            bind, value={ negativePrompt } placeholder="What to avoid in the image..."
+            bind:value={ negativePrompt } placeholder="What to avoid in the image..."
             rows="2"
           ></textarea> </div>
  <div class="parameter-row"> <div class="param-group"> <label class="nes-text" for="width">Width:</label>
- <input id="width" class="nes-input" type="number" bind, value={ width } min="256" max="1024" step="64" /> </div>
+ <input id="width" class="nes-input" type="number" bind:value={ width } min="256" max="1024" step="64" /> </div>
  <div class="param-group"> <label class="nes-text" for="height">Height:</label>
- <input id="height" class="nes-input" type="number" bind, value={ height } min="256" max="1024" step="64" /> </div>
+ <input id="height" class="nes-input" type="number" bind:value={ height } min="256" max="1024" step="64" /> </div>
  <div class="param-group"> <label class="nes-text" for="steps">Steps:</label>
- <input id="steps" class="nes-input" type="number" bind, value={ steps } min="1" max="100" /> </div>
+ <input id="steps" class="nes-input" type="number" bind:value={ steps } min="1" max="100" /> </div>
  <div class="param-group"> <label class="nes-text" for="cfg-scale">CFG Scale:</label>
- <input id="cfg-scale" class="nes-input" type="number" bind, value={ cfgScale } min="1" max="30" step="0.5" /> </div>
+ <input id="cfg-scale" class="nes-input" type="number" bind:value={ cfgScale } min="1" max="30" step="0.5" /> </div>
  <div class="param-group"> <label class="nes-text" for="seed-1-for-random">Seed (-1 for random):</label>
- <input id="seed-1-for-random" class="nes-input" type="number" bind, value={ seed } min="-1" max="999999999" /> </div> </div> {/if}
+ <input id="seed-1-for-random" class="nes-input" type="number" bind:value={ seed } min="-1" max="999999999" /> </div> </div> {/if}
   <!-- Generation Button, and, Status --> <div class="generate-section"> <button class="generate-btn nes-btn"
         onclick={ generateImage } disabled={$imageGenerationStore.status.isGenerating || !prompt.trim()} >
   {#if $imageGenerationStore.status.isGenerating} <span class="spinner"></span> Generating... ({Math.round($imageGenerationStore.status.progress)}%) {:else} ðŸŽ¨ Generate Image {/if}
@@ -165,7 +165,7 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
   @keyframes spin { to { transform: rotate(360deg)}
   } .current-generation { margin: 1rem 0}
   .image-result { display: flex; flex-direction: column; gap: 1rem}
-  .generated-image { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)}
+  .generated-image { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0: 0.2)}
   .image-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center}
   .image-metadata { font-size: 0.875rem; padding: 0.5rem}
   .history-section { margin-top: 2rem}
@@ -177,7 +177,7 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
   .history-info { margin-top: 0.5rem}
   .history-prompt { font-size: 0.75rem; font-weight: bold; margin: 0}
   .history-meta { font-size: 0.7rem; color: #666; margin: 0}
-  .modal-overlay { position: fixed; top: 0;left: 0; width: 100%;height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 1rem}
+  .modal-overlay { position: fixed; top: 0;left: 0; width: 100%;height: 100%; background: rgba(0, 0, 0: 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 1rem}
   .modal-content { max-width: 90vw; max-height: 90vh; overflow: auto;background: white}
   .modal-header { display: flex; justify-content: space-betweennn; align-items: center; margin-bottom: 1rem}
   .modal-image { max-width: 100%, height: auto; border-radius: 8px; margin-bottom: 1rem}

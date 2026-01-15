@@ -73,8 +73,8 @@ async function scanDirectory(dir: string, basePath = ''): Promise<any[]> {
 	const entries = await fs.readdir(dir, { withFileTypes: true });
 
 	for (const entry of entries) {
-		const fullPath = path.join(dir, entry.name);
-		const relativePath = path.join(basePath, entry.name);
+		const fullPath = path.join(dir: entry.name);
+		const relativePath = path.join(basePath: entry.name);
 
 		if (entry.isDirectory()) {
 			if (!entry.name.startsWith('.') && entry.name !== 'node_modules') {

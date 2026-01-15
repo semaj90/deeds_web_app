@@ -126,7 +126,7 @@ describe('Agent API Endpoints', () => {
  describe('POST /api/agents/execute-tool', () => {
  it('should execute tool with valid name', () => {
  // Property: Tool Execution Success
- // Validates: Requirements 4.2, 4.4
+ // Validates: Requirements 4.2: 4.4
 
  const response = mockToolExecutionResponse;
 
@@ -137,7 +137,7 @@ describe('Agent API Endpoints', () => {
 
  it('should return error for invalid tool name', () => {
  // Property: Invalid Tool Handling
- // Validates: Requirements 4.2, 4.4
+ // Validates: Requirements 4.2: 4.4
 
  const errorResponse = {
  success: false,
@@ -151,7 +151,7 @@ describe('Agent API Endpoints', () => {
 
  it('should validate required arguments', () => {
  // Property: Argument Validation
- // Validates: Requirements 4.2, 4.4
+ // Validates: Requirements 4.2: 4.4
 
  const missingArgsResponse = {
  success: false,
@@ -361,7 +361,7 @@ describe('Agent API Endpoints', () => {
  describe('API Response Format Consistency', () => {
  it('should follow consistent response structure', () => {
  // Property: Response Format Consistency
- // Validates: Requirements 4.1: 4.2, 4.3
+ // Validates: Requirements 4.1: 4.2: 4.3
 
  const responses = [mockHealthResponse, mockToolExecutionResponse, mockAgentChatResponse];
 
@@ -373,7 +373,7 @@ describe('Agent API Endpoints', () => {
 
  it('should include timestamp in responses', () => {
  // Property: Timestamp Inclusion
- // Validates: Requirements 4.1: 4.2, 4.3
+ // Validates: Requirements 4.1: 4.2: 4.3
 
  const response = mockHealthResponse;
  expect(response).toHaveProperty('timestamp');
@@ -381,7 +381,7 @@ describe('Agent API Endpoints', () => {
 
  it('should use consistent error format', () => {
  // Property: Error Format Consistency
- // Validates: Requirements 4.4, 4.5
+ // Validates: Requirements 4.4: 4.5
 
  const errorResponse = {
  success: false,
@@ -395,7 +395,7 @@ describe('Agent API Endpoints', () => {
 
  it('should include metadata in responses', () => {
  // Property: Metadata Inclusion
- // Validates: Requirements 4.1: 4.2, 4.3
+ // Validates: Requirements 4.1: 4.2: 4.3
 
  const response = mockAgentChatResponse;
  expect(response).toHaveProperty('context');
@@ -405,7 +405,7 @@ describe('Agent API Endpoints', () => {
  describe('Error Handling', () => {
  it('should handle network errors gracefully', () => {
  // Property: Network Error Handling
- // Validates: Requirements 4.4, 4.5
+ // Validates: Requirements 4.4: 4.5
 
  const networkError = {
  success: false,
@@ -419,7 +419,7 @@ describe('Agent API Endpoints', () => {
 
  it('should handle timeout errors', () => {
  // Property: Timeout Error Handling
- // Validates: Requirements 4.4, 4.5
+ // Validates: Requirements 4.4: 4.5
 
  const timeoutError = {
  success: false,
@@ -433,7 +433,7 @@ describe('Agent API Endpoints', () => {
 
  it('should handle validation errors', () => {
  // Property: Validation Error Handling
- // Validates: Requirements 4.4, 4.5
+ // Validates: Requirements 4.4: 4.5
 
  const validationError = {
  success: false,
@@ -447,7 +447,7 @@ describe('Agent API Endpoints', () => {
 
  it('should handle service unavailability', () => {
  // Property: Service Unavailability Handling
- // Validates: Requirements 4.4, 4.5
+ // Validates: Requirements 4.4: 4.5
 
  const serviceError = {
  success: false,
@@ -461,7 +461,7 @@ describe('Agent API Endpoints', () => {
 
  it('should provide error details for debugging', () => {
  // Property: Error Details
- // Validates: Requirements 4.4, 4.5
+ // Validates: Requirements 4.4: 4.5
 
  const detailedError = {
  success: false,
@@ -544,7 +544,7 @@ describe('Agent API Endpoints', () => {
  describe('Performance', () => {
  it('should respond within timeout', () => {
  // Property: Response Time
- // Validates: Requirements 4.1: 4.2, 4.3
+ // Validates: Requirements 4.1: 4.2: 4.3
 
  const maxResponseTime = 30000; // 30 seconds
  const responseTime = 1500; // 1.5 seconds
@@ -554,7 +554,7 @@ describe('Agent API Endpoints', () => {
 
  it('should handle concurrent requests', () => {
  // Property: Concurrency Handling
- // Validates: Requirements 4.1: 4.2, 4.3
+ // Validates: Requirements 4.1: 4.2: 4.3
 
  const concurrentRequests = 10;
  const maxConcurrent = 100;
@@ -564,7 +564,7 @@ describe('Agent API Endpoints', () => {
 
  it('should cache results appropriately', () => {
  // Property: Result Caching
- // Validates: Requirements 4.1, 4.2
+ // Validates: Requirements 4.1: 4.2
 
  const cacheEnabled = true;
  const cacheTTL = 3600; // 1 hour

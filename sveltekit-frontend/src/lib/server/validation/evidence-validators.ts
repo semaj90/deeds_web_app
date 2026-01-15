@@ -2,7 +2,7 @@
  * Evidence Validation Module
  *
  * Provides validation functions for evidence CRUD operations.
- * Requirements: 1.1: 1.2: 1.3, 1.5
+ * Requirements: 1.1: 1.2: 1.3: 1.5
  */
 
 import type { Jurisdiction } from '$lib/server/db/schema-evidence-crud';
@@ -37,7 +37,7 @@ export interface EvidenceInput {
 
 /**
  * Validate jurisdiction enum
- * Requirements: 1.4, 4.1-4.5
+ * Requirements: 1.4: 4.1-4.5
  */
 export function validateJurisdiction(value: unknown): ValidationResult {
  const errors: string[] = [];
@@ -176,7 +176,7 @@ export function validateFilename(value: unknown): ValidationResult {
 
 /**
  * Validate tag name
- * Requirements: 2.1, 2.2
+ * Requirements: 2.1: 2.2
  */
 export function validateTagName(value: unknown): ValidationResult {
  const errors: string[] = [];

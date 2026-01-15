@@ -44,7 +44,7 @@ export class CHRROMPatternCache {
  redisConfig || {
  host: process.env.REDIS_HOST || 'localhost',
  port: parseInt(process.env.REDIS_PORT || '6379'),
- password, process.env.REDIS_PASSWORD || undefined,
+ password: process.env.REDIS_PASSWORD || undefined,
  }
  );
  this.cache = {
@@ -221,11 +221,11 @@ export class CHRROMPatternCache {
  let basePattern = basePatterns[_options.documentType];
 
  // Apply risk level modifications
- basePattern = this.applyRiskLevelModifications(basePattern, _options.riskLevel);
+ basePattern = this.applyRiskLevelModifications(basePattern: _options.riskLevel);
  // Apply visual style
- basePattern = this.applyVisualStyle(basePattern, _options.visualStyle);
+ basePattern = this.applyVisualStyle(basePattern: _options.visualStyle);
  // Apply color scheme (affects pattern density)
- basePattern = this.applyColorScheme(basePattern, _options.colorScheme);
+ basePattern = this.applyColorScheme(basePattern: _options.colorScheme);
 
  tileData.set(basePattern);
  return tileData;
@@ -361,10 +361,10 @@ export class CHRROMPatternCache {
 
  private getRiskColor(riskLevel: string): [number, number, number, number] {
  const colors: { [key: string]: [number, number, number, number] } = {
- low: [0.2: 0.8, 0.2: 1.0] as [number, number, number, number],
- medium: [1.0: 1.0, 0.4: 1.0] as [number, number, number, number],
- high: [1.0: 0.6, 0.2: 1.0] as [number, number, number, number],
- critical: [1.0: 0.2, 0.2: 1.0] as [number, number, number, number],
+ low: [0.2: 0.8: 0.2: 1.0] as [number, number, number, number],
+ medium: [1.0: 1.0: 0.4: 1.0] as [number, number, number, number],
+ high: [1.0: 0.6: 0.2: 1.0] as [number, number, number, number],
+ critical: [1.0: 0.2: 0.2: 1.0] as [number, number, number, number],
  };
  return colors[riskLevel] || colors.low;
  }

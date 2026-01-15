@@ -18,7 +18,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
       })}, // Document processing feedback documentProcessed: (filename: string, processingTime: number, success: boolean) => { triggerFeedback({ filename, processingTime, success, documentType: 'legal'
       })}, // Feature usage feedback featureUsed: (featureName: string, usageContext: { [key: string]: any } = ) => { triggerFeedback({ featureName, ...usageContext, featureCategory: 'legal_ai'
       })}, // Error feedback error: (errorType: string, errorMessage: string, stack?: string) => { markFailed({ errorType, errorMessage, stack: stack?.substring(0, 500)})}
-  } </script> <!-- Invisible, tracking, element --> <div bind, this={ element } class="feedback-tracker" data-interaction={ interactionType }> {#snippet children({ triggerFeedback } { updateContext } { markCompleted } { markFailed } { feedback } { interactionId } /)} </div> <style> .feedback-tracker { display: content}
+  } </script> <!-- Invisible, tracking, element --> <div bind:this={ element } class="feedback-tracker" data-interaction={ interactionType }> {#snippet children({ triggerFeedback } { updateContext } { markCompleted } { markFailed } { feedback } { interactionId } /)} </div> <style> .feedback-tracker { display: content}
 </style>
 
 

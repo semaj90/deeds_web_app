@@ -299,7 +299,7 @@
 	.modal-backdrop {
 		position: absolute; top: 0;
 		left: 0; right: 0;
-		bottom: 0; background: rgba(0, 0, 0, 0.8);
+		bottom: 0; background: rgba(0, 0, 0: 0.8);
 	}
 
 	.modal-content {
@@ -329,12 +329,12 @@
 
 	.route-info {
 		margin-bottom: 1rem; padding: 0.5rem;
-		background: rgba(249, 168, 37, 0.1);
+		background: rgba(249, 168, 37: 0.1);
 		border-radius: 4px;
 	}
 
 	.route-info code {
-		background: rgba(0, 0, 0, 0.3);
+		background: rgba(0, 0, 0: 0.3);
 		padding: 2px 8px;
 		border-radius: 4px;
 	}
@@ -342,7 +342,7 @@
 	.stats-bar {
 		display: flex; gap: 1rem;
 		margin-bottom: 1rem; padding: 1rem;
-		background: rgba(0, 0, 0, 0.3);
+		background: rgba(0, 0, 0: 0.3);
 		border-radius: 8px;
 	}
 
@@ -382,18 +382,18 @@
 	.error-item {
 		width: 100%;
 		text-align: left; padding: 0.75rem;
-		background: rgba(255, 255, 255, 0.05);
+		background: rgba(255, 255, 255: 0.05);
 		border: 2px solid #444;
 		cursor: pointer; transition: all 0.2s;
 	}
 
 	.error-item:hover {
-		background: rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255: 0.1);
 		border-color: #fff; transform: translateX(4px);
 	}
 
 	.error-item.selected {
-		background: rgba(0, 120, 215, 0.2);
+		background: rgba(0, 120, 215: 0.2);
 		border-color: #0078d7;
 	}
 
@@ -412,7 +412,7 @@
 	}
 
 	.error-code {
-		background: rgba(0, 0, 0, 0.3);
+		background: rgba(0, 0, 0: 0.3);
 		padding: 2px 8px;
 		border-radius: 4px;
 		font-family: 'Courier New', monospace;
@@ -459,7 +459,7 @@
 
 	.similar-item {
 		margin: 0.5rem 0;
-		padding: 0.75rem; background: rgba(249, 168, 37, 0.1);
+		padding: 0.75rem; background: rgba(249, 168, 37: 0.1);
 	}
 
 	.similarity-score {
@@ -475,7 +475,7 @@
 
 	.ai-suggestion {
 		margin-top: 1rem; padding: 1rem;
-		background: rgba(0, 200, 83, 0.1);
+		background: rgba(0, 200, 83: 0.1);
 		border: 2px solid #00c853;
 	}
 
@@ -501,7 +501,7 @@
 
 	.error-list::-webkit-scrollbar-track,
 	.error-details::-webkit-scrollbar-track {
-		background: rgba(0, 0, 0, 0.3);
+		background: rgba(0, 0, 0: 0.3);
 	}
 
 	.error-list::-webkit-scrollbar-thumb,

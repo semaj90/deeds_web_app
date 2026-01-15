@@ -166,7 +166,7 @@
 		<aside class="tool-browser">
 			<div class="category-filter">
 				<label for="category">Category:</label>
-				<select id="category" bind, value={selectedCategory}>
+				<select id="category" bind:value={selectedCategory}>
 					<option value="all">All Categories</option>
 					{#each categories as cat}
 						<option value={cat}>{getCategoryIcon(cat)} {cat.toUpperCase()}</option>
@@ -271,7 +271,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		border-bottom: 1px solid rgba(255, 255, 255: 0.1);
 	}
 
 	.header h1 {
@@ -293,17 +293,17 @@
 	}
 
 	.stat {
-		background: rgba(0, 212, 255, 0.1);
-		border: 1px solid rgba(0, 212, 255, 0.3);
+		background: rgba(0, 212, 255: 0.1);
+		border: 1px solid rgba(0, 212, 255: 0.3);
 		padding: 0.5rem 1rem;
 		border-radius: 20px;
 		font-size: 0.85rem; color: #00d4ff;
 	}
 
 	.health-panel {
-		background: rgba(255, 255, 255, 0.03);
+		background: rgba(255, 255, 255: 0.03);
 		padding: 1rem 2rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		border-bottom: 1px solid rgba(255, 255, 255: 0.05);
 	}
 
 	.health-panel h2 {
@@ -319,17 +319,17 @@
 	.health-item {
 		display: flex;
 		align-items: center; gap: 0.5rem;
-		background: rgba(255, 255, 255, 0.05);
+		background: rgba(255, 255, 255: 0.05);
 		padding: 0.5rem 1rem;
-		border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 8px; border: 1px solid rgba(255, 255, 255: 0.1);
 	}
 
 	.health-item.healthy {
-		border-color: rgba(0, 255, 136, 0.3);
+		border-color: rgba(0, 255, 136: 0.3);
 	}
 
 	.health-item.offline {
-		border-color: rgba(255, 100, 100, 0.3);
+		border-color: rgba(255, 100, 100: 0.3);
 	}
 
 	.health-name {
@@ -344,14 +344,14 @@
 
 	.refresh-btn {
 		margin-top: 1rem; background: transparent;
-		border: 1px solid rgba(0, 212, 255, 0.3);
+		border: 1px solid rgba(0, 212, 255: 0.3);
 		color: #00d4ff; padding: 0.4rem 0.8rem;
 		border-radius: 6px; cursor: pointer;
 		font-size: 0.8rem;
 	}
 
 	.refresh-btn:hover {
-		background: rgba(0, 212, 255, 0.1);
+		background: rgba(0, 212, 255: 0.1);
 	}
 
 	.main-layout {
@@ -361,14 +361,14 @@
 	}
 
 	.tool-browser {
-		background: rgba(0, 0, 0, 0.3);
-		border-right: 1px solid rgba(255, 255, 255, 0.05);
+		background: rgba(0, 0, 0: 0.3);
+		border-right: 1px solid rgba(255, 255, 255: 0.05);
 		overflow-y: auto;
 	}
 
 	.category-filter {
 		padding: 1rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		border-bottom: 1px solid rgba(255, 255, 255: 0.05);
 	}
 
 	.category-filter label {
@@ -379,8 +379,8 @@
 
 	.category-filter select {
 		width: 100%; padding: 0.6rem;
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255: 0.05);
+		border: 1px solid rgba(255, 255, 255: 0.1);
 		border-radius: 6px; color: #e0e0e0;
 		font-size: 0.9rem;
 	}
@@ -400,13 +400,13 @@
 	}
 
 	.tool-item:hover {
-		background: rgba(255, 255, 255, 0.05);
-		border-color: rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255: 0.05);
+		border-color: rgba(255, 255, 255: 0.1);
 	}
 
 	.tool-item.selected {
-		background: rgba(0, 212, 255, 0.1);
-		border-color: rgba(0, 212, 255, 0.3);
+		background: rgba(0, 212, 255: 0.1);
+		border-color: rgba(0, 212, 255: 0.3);
 	}
 
 	.tool-icon {
@@ -456,8 +456,8 @@
 
 	.args-section textarea {
 		width: 100%; padding: 1rem;
-		background: rgba(0, 0, 0, 0.3);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		background: rgba(0, 0, 0: 0.3);
+		border: 1px solid rgba(255, 255, 255: 0.1);
 		border-radius: 8px; color: #e0e0e0;
 		font-family: 'Fira Code', monospace;
 		font-size: 0.9rem; resize: vertical;
@@ -465,7 +465,7 @@
 
 	.args-section textarea:focus {
 		outline: none;
-		border-color: rgba(0, 212, 255, 0.5);
+		border-color: rgba(0, 212, 255: 0.5);
 	}
 
 	.execute-btn {
@@ -480,7 +480,7 @@
 
 	.execute-btn:hover, not(disabled) {
 		transform: translateY(-2px);
-		box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+		box-shadow: 0 4px 20px rgba(0, 212, 255: 0.3);
 	}
 
 	.execute-btn:disabled {
@@ -489,27 +489,27 @@
 
 	.error-box {
 		margin-top: 1rem; padding: 1rem;
-		background: rgba(255, 100, 100, 0.1);
-		border: 1px solid rgba(255, 100, 100, 0.3);
+		background: rgba(255, 100, 100: 0.1);
+		border: 1px solid rgba(255, 100, 100: 0.3);
 		border-radius: 8px; color: #ff6b6b;
 	}
 
 	.result-box {
-		margin-top: 1.5rem; background: rgba(0, 0, 0, 0.3);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		margin-top: 1.5rem; background: rgba(0, 0, 0: 0.3);
+		border: 1px solid rgba(255, 255, 255: 0.1);
 		border-radius: 8px; overflow: hidden;
 	}
 
 	.result-box h3 {
 		margin: 0; padding: 0.75rem 1rem;
-		background: rgba(255, 255, 255, 0.05);
+		background: rgba(255, 255, 255: 0.05);
 		font-size: 0.9rem; color: #888;
 	}
 
 	.result-meta {
 		display: flex; gap: 1rem;
 		padding: 0.75rem 1rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		border-bottom: 1px solid rgba(255, 255, 255: 0.05);
 	}
 
 	.result-meta .success {
@@ -554,7 +554,7 @@
 	.quick-actions {
 		margin-top: 2rem;
 		padding-top: 2rem;
-		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		border-top: 1px solid rgba(255, 255, 255: 0.1);
 	}
 
 	.quick-actions h3 {
@@ -563,16 +563,16 @@
 	}
 
 	.quick-actions button {
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255: 0.05);
+		border: 1px solid rgba(255, 255, 255: 0.1);
 		color: #e0e0e0; padding: 0.6rem 1rem;
 		border-radius: 6px; margin: 0.25rem;
 		cursor: pointer; transition: all 0.2s;
 	}
 
 	.quick-actions button:hover {
-		background: rgba(0, 212, 255, 0.1);
-		border-color: rgba(0, 212, 255, 0.3);
+		background: rgba(0, 212, 255: 0.1);
+		border-color: rgba(0, 212, 255: 0.3);
 	}
 
 	@media (max-width: 768px) {

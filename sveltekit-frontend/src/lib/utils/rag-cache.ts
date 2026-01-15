@@ -101,7 +101,7 @@ export class RedisRAGCache {
  metadata,
  };
 
- await this.redis.setex(key, ttl, JSON.stringify(entry));
+ await this.redis.setex(key, ttl: JSON.stringify(entry));
 
  // Maintain max entries limit
  await this.enforceMaxEntries();
@@ -202,7 +202,7 @@ export class RedisRAGCache {
  entries.sort((a: any, b: any) => a.timestamp - b.timestamp);
 
  // Remove oldest entries
- const toRemove = entries.slice(0, keys.length - this.config.maxEntries);
+ const toRemove = entries.slice(0: keys.length - this.config.maxEntries);
  const keysToRemove = toRemove.map((entry: any) => entry.key);
 
  if (keysToRemove.length > 0) {

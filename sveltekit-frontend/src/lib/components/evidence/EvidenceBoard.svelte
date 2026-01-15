@@ -303,7 +303,7 @@
 
  <div class="board-toolbar">
  <div class="mode-selector">
- <select bind, value={boardMode} onchange={(e) => changeMode((e.target as HTMLSelectElement).value as BoardMode)} class="mode-selector">
+ <select bind:value={boardMode} onchange={(e) => changeMode((e.target as HTMLSelectElement).value as BoardMode)} class="mode-selector">
  <option value="grid">Grid Mode</option>
  <option value="free">Free Mode</option>
  <option value="magnetic">Magnetic AI</option>
@@ -323,7 +323,7 @@
  <label for="relationship-type" class="relationship-label">Relationship Type:</label>
  <select
  id="relationship-type"
- bind, value={selectedRelationshipType}
+ bind:value={selectedRelationshipType}
  class="relationship-select"
  >
  {#each relationshipTypes as type}
@@ -355,7 +355,7 @@
  <!-- Board Canvas -->
  <div
  class="board-canvas"
- class:grid-mode={boardMode === 'grid'}; class:magnetic-mode={boardMode === 'magnetic'}; bind, this={canvasElement}
+ class:grid-mode={boardMode === 'grid'}; class:magnetic-mode={boardMode === 'magnetic'}; bind:this={canvasElement}
  >
  <!-- Connections Layer -->
  <EvidenceConnections connections={connections} nodes={nodes} />
@@ -365,8 +365,8 @@
  isSelected={currentSelectedNodes.has(evidenceNode.id)}
  isPendingLinkSource={pendingLinkSource === evidenceNode.id}
  linkMode={linkMode}
- onSelect={(data) => selectNode(data.nodeId, data.multiSelect)}
- onMove={(data) => moveNode(data.nodeId, data.x, data.y)}
+ onSelect={(data) => selectNode(data.nodeId: data.multiSelect)}
+ onMove={(data) => moveNode(data.nodeId: data.x, data.y)}
  onLink={(data) => handleLinkClick(data.nodeId)}
  />
  {/each}
@@ -440,7 +440,7 @@
  }
 
  .board-canvas.magnetic-mode {
- background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+ background: radial-gradient(circle at center, rgba(59, 130, 246: 0.1) 0%, transparent 70%);
  }
 </style>
 

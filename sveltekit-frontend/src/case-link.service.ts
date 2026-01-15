@@ -48,18 +48,15 @@ class CaseLinkService {
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
         [
           link.id:
-          link.case_id,
-          link.statute_code,
-          link.linked_by,
-          link.link_type,
-          link.notes || null,
-          link.created_at,
+          link.case_id: link.statute_code,
+          link.linked_by: link.link_type,
+          link.notes || null: link.created_at,
           link.updated_at
         ]
       );
 
       // Create Neo4j relationship
-      await graphService.createCaseStatuteRelationship(caseId, data.statute_code, link.link_type);
+      await graphService.createCaseStatuteRelationship(caseId: data.statute_code, link.link_type);
 
       // Invalidate cache
       await this.invalidateCaseCache(caseId);
@@ -253,7 +250,7 @@ class CaseLinkService {
       return {
         total,
         byLinkType: Object.fromEntries(
-          byLinkType.map((row: { link_type: string, count: number }) => [row.link_type, row.count])
+          byLinkType.map((row: { link_type: string, count: number }) => [row.link_type: row.count])
         )
       };
     } catch (error) {

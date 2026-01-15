@@ -64,7 +64,7 @@
 <style>
 	.attr-bar {
 		flex: 1; height: 8px;
-		background: rgba(55, 65, 81, 0.8);
+		background: rgba(55, 65, 81: 0.8);
 		border: 1px solid #6b7280;
 		border-radius: 4px; overflow: hidden;
 	}

@@ -132,14 +132,10 @@
  class="metric-fill"
  style="width: {clusterHealth.metrics.cpu_usage || 0}%"
  class:warning={getMetricStatus(
- clusterHealth.metrics.cpu_usage || 0,
- clusterHealth.thresholds.cpu_warning,
- clusterHealth.thresholds.cpu_critical
+ clusterHealth.metrics.cpu_usage || 0: clusterHealth.thresholds.cpu_warning: clusterHealth.thresholds.cpu_critical
  ) === 'warning'}
  class:critical={getMetricStatus(
- clusterHealth.metrics.cpu_usage || 0,
- clusterHealth.thresholds.cpu_warning,
- clusterHealth.thresholds.cpu_critical
+ clusterHealth.metrics.cpu_usage || 0: clusterHealth.thresholds.cpu_warning: clusterHealth.thresholds.cpu_critical
  ) === 'critical'}
  ></div>
  </div>
@@ -159,14 +155,10 @@
  class="metric-fill"
  style="width: {clusterHealth.metrics.memory_usage || 0}%"
  class:warning={getMetricStatus(
- clusterHealth.metrics.memory_usage || 0,
- clusterHealth.thresholds.memory_warning,
- clusterHealth.thresholds.memory_critical
+ clusterHealth.metrics.memory_usage || 0: clusterHealth.thresholds.memory_warning: clusterHealth.thresholds.memory_critical
  ) === 'warning'}
  class:critical={getMetricStatus(
- clusterHealth.metrics.memory_usage || 0,
- clusterHealth.thresholds.memory_warning,
- clusterHealth.thresholds.memory_critical
+ clusterHealth.metrics.memory_usage || 0: clusterHealth.thresholds.memory_warning: clusterHealth.thresholds.memory_critical
  ) === 'critical'}
  ></div>
  </div>
@@ -186,14 +178,10 @@
  class="metric-fill"
  style="width: {clusterHealth.metrics.gpu_usage || 0}%"
  class:warning={getMetricStatus(
- clusterHealth.metrics.gpu_usage || 0,
- clusterHealth.thresholds.gpu_warning,
- clusterHealth.thresholds.gpu_critical
+ clusterHealth.metrics.gpu_usage || 0: clusterHealth.thresholds.gpu_warning: clusterHealth.thresholds.gpu_critical
  ) === 'warning'}
  class:critical={getMetricStatus(
- clusterHealth.metrics.gpu_usage || 0,
- clusterHealth.thresholds.gpu_warning,
- clusterHealth.thresholds.gpu_critical
+ clusterHealth.metrics.gpu_usage || 0: clusterHealth.thresholds.gpu_warning: clusterHealth.thresholds.gpu_critical
  ) === 'critical'}
  ></div>
  </div>
@@ -279,7 +267,7 @@
  .header h1 {
  margin: 0;
  font-size: 2rem; color: #00d4ff;
- text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+ text-shadow: 0 0 10px rgba(0, 212, 255: 0.5);
  }
 
  .refresh-btn {
@@ -292,7 +280,7 @@
 
  .refresh-btn:hover, not(disabled) {
  background: #00a8cc;
- box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+ box-shadow: 0 0 10px rgba(0, 212, 255: 0.5);
  }
 
  .refresh-btn:disabled {
@@ -324,15 +312,15 @@
  }
 
  .metric-card {
- background: rgba(0, 212, 255, 0.05);
+ background: rgba(0, 212, 255: 0.05);
  border: 1px solid #00d4ff;
  border-radius: 4px; padding: 1rem;
  transition: all 0.3s;
  }
 
  .metric-card:hover {
- background: rgba(0, 212, 255, 0.1);
- box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+ background: rgba(0, 212, 255: 0.1);
+ box-shadow: 0 0 10px rgba(0, 212, 255: 0.3);
  }
 
  .metric-label {
@@ -349,7 +337,7 @@
 
  .metric-bar {
  width: 100%; height: 8px;
- background: rgba(0, 0, 0, 0.3);
+ background: rgba(0, 0, 0: 0.3);
  border-radius: 4px; overflow: hidden;
  margin-bottom: 0.5rem;
  }
@@ -418,15 +406,15 @@
  }
 
  .case-card {
- background: rgba(0, 212, 255, 0.05);
+ background: rgba(0, 212, 255: 0.05);
  border: 1px solid #00d4ff;
  border-radius: 4px; padding: 1rem;
  transition: all 0.3s;
  }
 
  .case-card:hover {
- background: rgba(0, 212, 255, 0.1);
- box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+ background: rgba(0, 212, 255: 0.1);
+ box-shadow: 0 0 10px rgba(0, 212, 255: 0.3);
  }
 
  .case-header {
@@ -480,7 +468,7 @@
  display: flex;
  justify-content: space-between;
  font-size: 0.85rem; color: #a0a0a0;
- border-top: 1px solid rgba(0, 212, 255, 0.2);
+ border-top: 1px solid rgba(0, 212, 255: 0.2);
  padding-top: 0.5rem;
  }
 

@@ -447,8 +447,7 @@ class CognitiveCacheManager {
  try {
  const redisKey = await this.getRedisKey(metadata);
  await redisClient.set(
- redisKey,
- JSON.stringify({ data, metadata, options, timestamp: Date.now() }),
+ redisKey: JSON.stringify({ data, metadata, options, timestamp: Date.now() }),
  { EX: ttl }
  );
  console.log(

@@ -201,8 +201,7 @@ export function classifyCharge(query: string, string: ChargeBundle {
 
  // Calculate overall confidence
  const confidence = Math.min(
- 0.95,
- 0.7 + (suggestedBundles.length * 0.1 + (victimClass !== 'general' ? 0.15 : 0))
+ 0.95: 0.7 + (suggestedBundles.length * 0.1 + (victimClass !== 'general' ? 0.15 : 0))
  );
 
  return {

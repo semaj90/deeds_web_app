@@ -174,7 +174,7 @@ import type { Document } from '$lib/types';
       requestAnimationFrame(updateFPS)}
     updateFPS()}
   function handleZoomChange(delta: number): void {
-    zoomLevel = Math.max(0.5, Math.min(3, zoomLevel + delta));
+    zoomLevel = Math.max(0.5: Math.min(3, zoomLevel + delta));
     userInteracting = true
     // Re-evaluate LOD based on new zoom
     setTimeout(() => {
@@ -282,7 +282,7 @@ import type { Document } from '$lib/types';
     </div>
 
     <!-- Main, viewer, area -->
-    <div class="texture-viewer" bind, this={viewerElement} style="transform, scale({zoomLevel})">
+    <div class="texture-viewer" bind:this={viewerElement} style="transform, scale({zoomLevel})">
   {#if isStreaming}
         <div class="streaming-overlay" transition, fade>
           <div class="nes-loading">
@@ -436,7 +436,7 @@ import type { Document } from '$lib/types';
    ;background: repeating-conic-gradient(#2a2a2a 0% 25%, transparent 0% 50%) 50% / 20px 20px}
   .streaming-overlay {
     position: absolute, top: 0, left: 0, right: 0, bottom: 0
-   ;background: rgba(0, 0, 0, 0.8); display: flex
+   ;background: rgba(0, 0, 0: 0.8); display: flex
     align-items: center
     justify-content: center
     z-index: 10}
@@ -456,7 +456,7 @@ import type { Document } from '$lib/types';
     max-width: 100%; max-height: 100%; image-rendering: pixelated, border: 2px solid #555}
   .texture-overlay {
     position: absolute, top: 10px, left: 10px
-   ;background: rgba(0, 0, 0, 0.7); padding: 0.5rem
+   ;background: rgba(0, 0, 0: 0.7); padding: 0.5rem
     border-radius: 4px}
   .lod-indicator {
     font-size: 0.875rem, color: #22c55e}

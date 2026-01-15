@@ -74,12 +74,12 @@ export const GET: RequestHandler = async () => {
         nodes,
         edges,
         summary: { totalFiles: nodes.length,
-          totalErrors, nodes.reduce((sum, n) => sum + n.errorCount, 0),
+          totalErrors: nodes.reduce((sum, n) => sum + n.errorCount, 0),
           totalEmbedded: nodes.reduce((sum, n) => sum + n.embeddedCount, 0)
         }
       }
     });
-  } catch (error, any) {
+  } catch (error: any) {
     console.error('Topology error:', error);
     return json({
       topology: { nodes: [],

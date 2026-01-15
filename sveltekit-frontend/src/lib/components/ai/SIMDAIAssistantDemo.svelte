@@ -25,12 +25,12 @@
    const response = await fetch('/api/ai/ollama-simd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!response.ok) { throw new Error(`API request failed: ${response.statusText}`)}
       const result = await response.json(); // Send response into state machine send({ type: 'RESPONSE_RECEIVED', response: result?.response ?? '', metadata: { model: result?.model, tokensPerSecond: result?.performance_metrics?.tokens_per_second, totalDuration: result?.total_duration; simdResults: result?.simd_results }
       }); // handle SIMD visualization if (result?.simd_results?.enabled) { simdResults = result.simd_results; await generateLiveComponents(result.simd_results); addLog(`âœ… SIMD compression ${simdResults.total_compression_ratio.toFixed(1)}:1 ratio`); addLog(`ðŸŽ¨ Generated ${simdResults.instant_ui_components?.length ?? 0} UI components`)}
-      addLog(`âš¡ Response generated: ${Number(result?.performance_metrics?.tokens_per_second ?? 0).toFixed(1)} tokens/sec`); queryInput = ''} catch (error, any) { console.error('Query processing failed:', error); addLog(`âŒ Error: ${error?.message ?? 'Unknown error'}`); send({ type: 'ERROR', error: error?.message ?? 'Unknown error'
+      addLog(`âš¡ Response generated: ${Number(result?.performance_metrics?.tokens_per_second ?? 0).toFixed(1)} tokens/sec`); queryInput = ''} catch (error: any) { console.error('Query processing failed:', error); addLog(`âŒ Error: ${error?.message ?? 'Unknown error'}`); send({ type: 'ERROR', error: error?.message ?? 'Unknown error'
       })}
   }
   async function generateLiveComponents(simdData: any): Promise<any> { if (!simdData?.instant_ui_components) return;
    const components = simdData.instant_ui_components.map((comp: any) => ({ ...comp, timestamp: Date.now(); animated: qualityTier === 'nes'
-    })); liveComponents = [ ...components, ...liveComponents.slice(0, 10) // Keep last, 10 ]; // Inject CSS safely (client-only) components.forEach((comp: any) => { if (typeof document !== 'undefined') { injectComponentCSS(comp.css_styles, comp.id)}
+    })); liveComponents = [ ...components, ...liveComponents.slice(0, 10) // Keep last, 10 ]; // Inject CSS safely (client-only) components.forEach((comp: any) => { if (typeof document !== 'undefined') { injectComponentCSS(comp.css_styles: comp.id)}
     })}
   function injectComponentCSS(css: string, componentId: string) { if (typeof document === 'undefined') return;
    const existingStyle = document.getElementById(`style-${ componentId }`); if (existingStyle) existingStyle.remove();
@@ -72,17 +72,17 @@
  <div class="text-gray-600">Instant rendering</div> </div> </div> </div> </div>
  <!-- Query, Interface --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Legal AI Query Interface</h3> </div>
  <div class="yorha-panel-content"> <!-- Configuration, Controls --> <div class="grid grid-cols-1 md, grid-cols-4 gap-4 p-4 bg-gray-50"> <div> <label class="block text-sm font-medium text-gray-700" for="compression-target">Compression Target</label>
- <select id="compression-target" bind, value={ compressionTarget } class="w-full p-2 border rounded-md"> <option value={ 7 }>7:1 (Ultra Quality)</option>
+ <select id="compression-target" bind:value={ compressionTarget } class="w-full p-2 border rounded-md"> <option value={ 7 }>7:1 (Ultra Quality)</option>
  <option value={ 25 }>25:1 (High Quality)</option>
  <option value={ 50 }>50:1 (Balanced)</option>
  <option value={ 109 }>109:1 (7-bit NES)</option>
  <option value={ 200 }>200:1 (Maximum)</option> </select> </div>
  <div> <label class="block text-sm font-medium text-gray-700" for="quality-tier">Quality Tier</label>
- <select id="quality-tier" bind, value={ qualityTier } class="w-full p-2 border rounded-md"> <option value="nes">NES (8-bit)</option>
+ <select id="quality-tier" bind:value={ qualityTier } class="w-full p-2 border rounded-md"> <option value="nes">NES (8-bit)</option>
  <option value="snes">SNES (16-bit)</option>
  <option value="n64">N64 (64-bit)</option> </select> </div>
  <div class="flex"> <label class="block text-sm font-medium text-gray-700">Options</label>
- <div class="space-y-2"> <label class="flex"> <input type="checkbox" bind, checked={ useWorker } class="rounded" /> <span class="text-sm">Web Worker</span> </label> </div> </div>
+ <div class="space-y-2"> <label class="flex"> <input type="checkbox" bind:checked={ useWorker } class="rounded" /> <span class="text-sm">Web Worker</span> </label> </div> </div>
  <div class="flex"> <Button onclick={ toggleSIMD } variant="ghost" class="w-full text-sm bits-btn bits-btn"> {enableSIMD ? 'ðŸ”§ Disable SIMD': 'âš¡ Enable SIMD'}
 </Button> </div> </div>
  <!-- Query, Input --> <div class="space-y-2"> <div class="flex"> <input type="text"
@@ -158,9 +158,9 @@
   </div>
  <style> .simd-ai-assistant { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif}:global(.rendered-content) { image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge; font-family: 'Courier New', monospace}
   @keyframes processing-pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.7} }
-  .processing { animation: processing-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}
+  .processing { animation: processing-pulse 2s cubic-bezier(0.4, 0: 0.6, 1) infinite}
   .live-component { transition: all 0.3s ease-in-out}
-  .live-component:hover { transform: scale(1.02); background-color: rgba(59, 130, 246, 0.1)}
+  .live-component:hover { transform: scale(1.02); background-color: rgba(59, 130, 246: 0.1)}
   /* Use global selectors for scrollbar pseudo-elements so Svelte's scoping doesn't break them */:global(.bg-black)::-webkit-scrollbar { width: 8px}:global(.bg-black)::-webkit-scrollbar-track { background: #000}:global(.bg-black)::-webkit-scrollbar-thumb { background: #22c55e; border-radius: 4px}:global(.tile-nes) { filter: contrast(1.2) saturate(1.3)}:global(.tile-snes) { filter: contrast(1.1) saturate(1.1)}:global(.tile-n64) { filter: contrast(1.0) saturate(1.0)}
 </style> filter: contrast(1.0) saturate(1.0); </style>
 

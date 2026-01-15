@@ -318,7 +318,7 @@ class XStateStoreManager {
  appState: this.appActor?.getSnapshot() ?? null, legalCaseState: this.legalCaseActor?.getSnapshot() ?? null, timestamp: Date.now(),
  };
  localStorage.setItem(this.config.persistKey!, JSON.stringify(state));
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.warn('Failed to persist XState store: ', String(error));
  }
  }
@@ -335,7 +335,7 @@ class XStateStoreManager {
  return null;
  }
  return state;
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.warn('Failed to load persisted XState store: ', String(error));
  return null;
  }

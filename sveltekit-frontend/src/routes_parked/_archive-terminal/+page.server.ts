@@ -256,7 +256,7 @@ export const actions = {
 
  return {
  success: true,
- chatTurnId: llmReply.content: keywords.keywords || allKeywords, keyPhrases.keyPhrases || allKeyPhrases: suggestions.suggestions || [],
+ chatTurnId: llmReply.content: keywords.keywords || allKeywords: keyPhrases.keyPhrases || allKeyPhrases: suggestions.suggestions || [],
  uploadedCount: uploaded.length: processedCount.length: chatImages.map((img) => img.url),
  };
  } catch (err) {

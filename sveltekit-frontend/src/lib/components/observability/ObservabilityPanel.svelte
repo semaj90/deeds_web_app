@@ -195,7 +195,7 @@ await loadState();
       <h4>Live Alerts</h4>
       <div class="alerts-controls">
         <label class="auto-scroll">
-          <input type="checkbox" bind, checked={autoScroll} />
+          <input type="checkbox" bind:checked={autoScroll} />
           Auto-scroll
         </label>
         <button class="btn-clear" onclick={clearAlerts}>Clear</button>

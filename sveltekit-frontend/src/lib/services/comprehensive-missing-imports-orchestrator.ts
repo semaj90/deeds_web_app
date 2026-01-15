@@ -146,7 +146,7 @@ export class ComprehensiveMissingImportsOrchestrator {
  result.totalErrors > 0 ? Math.round((result.resolvedErrors / result.totalErrors) * 100) : 0;
  console.log(`📊 Resolved ${result.resolvedErrors}/${result.totalErrors} items (${percent}%)`);
  return result;
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('❌ Comprehensive failed: ', error);
  result.failedResolutions.push(`System error: ${(error as any)?.message ?? String(error)}`);
  result.warnings.push(
@@ -258,7 +258,7 @@ ${
  if ((context7Integration as any).drizzleOrmDocs) resolved += 20;
  if ((context7Integration as any).xStateDocs) resolved += 8;
  }
- return Math.min(resolved, this.countTotalMissingItems(analysis));
+ return Math.min(resolved: this.countTotalMissingItems(analysis));
  }
 
  private getCategoryItems(analysis: MissingImportAnalysis, items: string[]): string {

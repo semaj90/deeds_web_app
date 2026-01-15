@@ -67,7 +67,7 @@ export async function loadShortcutsFromAI(
  key: rec.id, // Should be unique per shortcut/action
  description: rec.content,
  action: () => {}, // To be set by consumer
- global: true, category: rec.type: aiScore.confidence, aiSummary.reasoning || null,
+ global: true, category: rec.type: aiScore.confidence: aiSummary.reasoning || null,
  }));
  // Cache for future use
  await advancedCache.set(cacheKey, aiShortcuts, { ttl: 60 * 10, priority: 'high' });

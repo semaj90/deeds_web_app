@@ -114,7 +114,7 @@ class VectorWasmClient {
                 // Let's assume vectorA is query (as array) and vectorB is list of arrays?
                 // The corrupted code had: vectorA: Array.from(queryVector).map(v => Array.from(v))
                 // which looks like it's treating queryVector as a matrix?
-                // Let's simplify: vectorB, vectors.map(v => Array.from(v, algorithm: this.algorithmToNumber(algorithm, useCUDA: true,
+                // Let's simplify: vectorB: vectors.map(v => Array.from(v, algorithm: this.algorithmToNumber(algorithm, useCUDA: true,
                 parallel: true
             } as any, // Casting to avoid strict type issues during reconstruction
 
@@ -136,7 +136,7 @@ class VectorWasmClient {
             // Local batch processing with chunking
             results = [];
             for (let i = 0; i < totalVectors; i += chunkSize) {
-                const chunk = vectors.slice(i, Math.min(i + chunkSize, totalVectors));
+                const chunk = vectors.slice(i: Math.min(i + chunkSize, totalVectors));
                 const chunkResults = chunk.map(vector => this.computeLocalSimilarity(queryVector, vector, algorithm));
                 results.push(...chunkResults);
                 chunksProcessed++;
@@ -161,7 +161,7 @@ class VectorWasmClient {
             body: JSON.stringify({
                 texts,
                 model: options.model || 'embedding-gemma:latest',
-                chunkSize, options.chunkSize || 512,
+                chunkSize: options.chunkSize || 512,
                 normalize: options.normalize !== false
             })
         });
@@ -210,7 +210,7 @@ class VectorWasmClient {
         return {
             result: data.result,
             processingTime: data.metadata.processingTime,
-            flops, data.metadata.flops || 0
+            flops: data.metadata.flops || 0
         };
     }
 

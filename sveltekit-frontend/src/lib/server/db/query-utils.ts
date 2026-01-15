@@ -95,32 +95,32 @@ export class QueryBuilder {
 
  // Case ID filters
  if (filters.caseId && table.caseId) {
- conditions.push(eq(table.caseId, filters.caseId));
+ conditions.push(eq(table.caseId: filters.caseId));
  }
 
  // Evidence type filters
  if (filters.evidenceType && table.evidenceType) {
- conditions.push(eq(table.evidenceType, filters.evidenceType));
+ conditions.push(eq(table.evidenceType: filters.evidenceType));
  }
 
  // Activity type filters
  if (filters.activityType && table.activityType) {
- conditions.push(eq(table.activityType, filters.activityType));
+ conditions.push(eq(table.activityType: filters.activityType));
  }
 
  // Assignment filters
  if (filters.assignedTo && table.assignedTo) {
- conditions.push(eq(table.assignedTo, filters.assignedTo));
+ conditions.push(eq(table.assignedTo: filters.assignedTo));
  }
 
  // Threat level filters
  if (filters.threatLevel && table.threatLevel) {
- conditions.push(eq(table.threatLevel, filters.threatLevel));
+ conditions.push(eq(table.threatLevel: filters.threatLevel));
  }
 
  // User ID filters
  if (filters.userId && table.userId) {
- conditions.push(eq(table.userId, filters.userId));
+ conditions.push(eq(table.userId: filters.userId));
  }
 
  return conditions;
@@ -179,7 +179,7 @@ export class QueryBuilder {
  } else {
  pageParam = undefined;
  }
- const pagination = this.getPaginationParams(pageParam, filters.limit ?? undefined, // Apply pagination
+ const pagination = this.getPaginationParams(pageParam: filters.limit ?? undefined, // Apply pagination
  if (query.limit) query = query.limit(pagination.limit,
  if (query.offset) query = query.offset(pagination.offset, // Execute main query (narrow result to T)
  const data = (await query.execute()) as T;

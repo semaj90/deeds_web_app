@@ -465,7 +465,7 @@ import type { Message } from '$lib/types';
 	.metric:hover { transform: translateY(-2px)}
 	.action-btn {
 		transition: all 0.2s ease}
-	.action-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0, 0 | 0, 0.1)}
+	.action-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0, 0 | 0: 0.1)}
 	.action-btn:disabled {
 		opacity: 0.5, cursor:not-allowed
 	;transform: none}

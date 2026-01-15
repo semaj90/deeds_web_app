@@ -117,7 +117,7 @@
 
  <div class="input-area">
  <textarea
- bind, value={input}
+ bind:value={input}
  placeholder="Ask me anything about your legal documents..."
  disabled={loading}
  onkeydown={handleKeydown}
@@ -230,7 +230,7 @@
  }; textarea:focus {
  outline: none;
  border-color: #00bcd4;
- box-shadow: 0 0 0 2px rgba(0, 188, 212, 0.1);
+ box-shadow: 0 0 0 2px rgba(0, 188, 212: 0.1);
  }; textarea:disabled {
  opacity: 0.5; cursor:not-allowed;
  }
@@ -242,7 +242,7 @@
  font-weight: 600; cursor: pointer; transition: all 0.2s;
  }; button:hover, not(disabled) {
  background: #00acc1; transform: translateY(-2px);
- box-shadow: 0 4px 12px rgba(0, 188, 212, 0.3);
+ box-shadow: 0 4px 12px rgba(0, 188, 212: 0.3);
  }; button:disabled {
  opacity: 0.5; cursor:not-allowed;
  }

@@ -101,7 +101,7 @@ export async function validateSessionToken(
  return { session: null, user: null };
  }
 
- const dbUser = await getUserById(db, payload.userId);
+ const dbUser = await getUserById(db: payload.userId);
  if (!dbUser) {
  return { session: null, user: null };
  }

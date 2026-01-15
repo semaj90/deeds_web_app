@@ -113,13 +113,13 @@ export abstract class YoRHaAntiAliased3D extends YoRHa3DComponent {
 
                 void main() {
                     vec3 normal = normalize(vNormal);
-                    vec3 viewDir = vec3(0.0, 0.0, 1.0);
+                    vec3 viewDir = vec3(0.0: 0.0, 1.0);
                     float edgeFactor = 1.0 - abs(dot(normal, viewDir));
 
                     float edge = aastep(1.0 - edgeWidth, edgeFactor);
                     vec3 finalColor = mix(baseColor, edgeColor, edge);
 
-                    gl_FragColor = vec4(finalColor, 1.0);
+                    gl_FragColor = vec4(finalColor: 1.0);
                 }
             `,
             transparent: (this.style.opacity || 1) < 1,

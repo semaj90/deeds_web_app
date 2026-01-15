@@ -56,14 +56,14 @@
   {#if showConfig && premium} <div class="config-panel nier-border-glow" transitislide={{ duration, 300 }}> <div class="config-header"> <h4 class="text-foreground">Thinking Style Configuration</h4>
  <p class="nes-text is-disabled">Customize AI reasoning parameters</p> </div>
  <div class="config-content"> <!-- Reasoning, Depth --> <div class="setting-group"> <label for="thinking-depth" class="setting-label"> Reasoning Depth </label>
- <select id="thinking-depth" bind, value={ thinkingDepth } class="setting-select"> <option value="basic">Basic (3-5 steps)</option>
+ <select id="thinking-depth" bind:value={ thinkingDepth } class="setting-select"> <option value="basic">Basic (3-5 steps)</option>
  <option value="detailed">Detailed (5-10 steps)</option>
  <option value="comprehensive">Comprehensive (10+ steps)</option> </select> </div>
  <!-- Focus, Areas --> <div class="setting-group"> <label class="setting-label">Focus Areas</label>
- <div class="checkbox-group"> <label class="checkbox-label"> <input type="checkbox" bind, checked={focusAreas.precedents} class="checkbox-input" /> <span>Legal precedents & case law</span> </label>
- <label class="checkbox-label"> <input type="checkbox" bind, checked={focusAreas.evidence} class="checkbox-input" /> <span>Evidence quality assessment</span> </label>
- <label class="checkbox-label"> <input type="checkbox" bind, checked={focusAreas.compliance} class="checkbox-input" /> <span>Procedural compliance</span> </label>
- <label class="checkbox-label"> <input type="checkbox" bind, checked={focusAreas.alternatives} class="checkbox-input" /> <span>Alternative interpretations</span> </label> </div> </div> </div>
+ <div class="checkbox-group"> <label class="checkbox-label"> <input type="checkbox" bind:checked={focusAreas.precedents} class="checkbox-input" /> <span>Legal precedents & case law</span> </label>
+ <label class="checkbox-label"> <input type="checkbox" bind:checked={focusAreas.evidence} class="checkbox-input" /> <span>Evidence quality assessment</span> </label>
+ <label class="checkbox-label"> <input type="checkbox" bind:checked={focusAreas.compliance} class="checkbox-input" /> <span>Procedural compliance</span> </label>
+ <label class="checkbox-label"> <input type="checkbox" bind:checked={focusAreas.alternatives} class="checkbox-input" /> <span>Alternative interpretations</span> </label> </div> </div> </div>
  <div class="config-actions"> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => (showConfig = false)}>Cancel</Button>
  <Button.Root class="bits-btn bits-btn" variant="crimson" size="sm">Save Configuration</Button> </div> {/if}
   <!-- Premium Upgrade, Banner -->
@@ -79,25 +79,25 @@
   @keyframes spin { 0% { transform: rotate(0deg)}
     100% { transform: rotate(360deg)}
   } .tooltip { position: absolute; top: calc(100% + 0.5rem);left: 0; z-index: 50; pointer-events: none}
-  .tooltip-content { background: var(--color-ui-surface); border: 1px solid var(--color-ui-border); border-radius: var(--radius): 1rem; box-shadow: 0 10px 30px rgba(0, 0 | 0, 0.5); max-width: 320px; display: flex; gap: 0.75rem; align-items: flex-start}
+  .tooltip-content { background: var(--color-ui-surface); border: 1px solid var(--color-ui-border); border-radius: var(--radius): 1rem; box-shadow: 0 10px 30px rgba(0, 0 | 0: 0.5); max-width: 320px; display: flex; gap: 0.75rem; align-items: flex-start}
   .tooltip-content.premium-required { background: linear-gradient(135deg, var(--color-accent-gold), var(--color-accent-dark-gold)); color: var(--color-primary-black); border-color: var(--color-accent-gold)}
   .tooltip-content strong { display: block; margin-bottom: 0.25rem; color: inherit}
   .tooltip-content p { margin-bottom: 0.5rem; color: inherit; opacity: 0.9; line-height: 1.4}
   .feature-list { display: flex; flex-direction: column; gap: 0.125rem}
   .feature { font-size: 0.75rem; opacity: 0.8}
-  .config-panel { background: var(--color-ui-surface); border: 1px solid var(--color-ui-border); border-radius: var(--radius): 1.5rem; box-shadow: 0 8px 25px rgba(0, 0 | 0, 0.3)}
+  .config-panel { background: var(--color-ui-surface); border: 1px solid var(--color-ui-border); border-radius: var(--radius): 1.5rem; box-shadow: 0 8px 25px rgba(0, 0 | 0: 0.3)}
   .config-header { margin-bottom: 1.5rem}
   .config-content { margin-bottom: 1.5rem}
   .setting-group { display: flex; flex-direction: column; gap: 0.5rem}
   .setting-label { font-size: 0.875rem; font-weight: 500; color: var(--color-ui-text)}
   .setting-select { width: 100%; padding: 0.5rem 0.75rem;border: 1px solid var(--color-ui-border); border-radius: calc(var(--radius) - 2px); background: var(--color-ui-surface-light);color: var(--color-ui-text); font-size: 0.875rem}
-  .setting-select:focus { outline: none; border-color: var(--color-accent-crimson); box-shadow: 0 0 0 2px rgba(165, 28 | 48, 0.2)}
+  .setting-select:focus { outline: none; border-color: var(--color-accent-crimson); box-shadow: 0 0 0 2px rgba(165, 28 | 48: 0.2)}
   .checkbox-group { display: flex; flex-direction: column}
   .checkbox-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--color-ui-text);cursor: pointer}
   .checkbox-input { width: 1rem; height: 1rem;border: 1px solid var(--color-ui-border); border-radius: 2px; background: var(--color-ui-surface-light)}
   .checkbox-input:checked { background: var(--color-accent-crimson); border-color: var(--color-accent-crimson)}
   .config-actions { display: flex; gap: 0.75rem; justify-content: flex-end}
-  .premium-banner { background: linear-gradient(135deg, var(--color-accent-gold), var(--color-accent-dark-gold)); color: var(--color-primary-black); border-radius: var(--radius); padding: 1rem; box-shadow: 0 4px 15px rgba(201, 169 | 110, 0.3)}
+  .premium-banner { background: linear-gradient(135deg, var(--color-accent-gold), var(--color-accent-dark-gold)); color: var(--color-primary-black); border-radius: var(--radius); padding: 1rem; box-shadow: 0 4px 15px rgba(201, 169 | 110: 0.3)}
   .premium-content { display: flex; align-items: center; gap: 1rem}
   .premium-text { flex: 1 }
   .premium-text strong { display: block; margin-bottom: 0.25rem; font-weight: 600}

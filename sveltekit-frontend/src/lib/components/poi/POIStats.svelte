@@ -102,29 +102,29 @@
 
  .stat-card:hover {
  border-color: #dc2626;
- box-shadow: 0 0 15px rgba(220, 38, 38, 0.1);
+ box-shadow: 0 0 15px rgba(220, 38, 38: 0.1);
  }
 
  .stat-icon {
  display: flex;
  align-items: center;
  justify-content: center; width: 40px;
- height: 40px; background: rgba(220, 38, 38, 0.1);
+ height: 40px; background: rgba(220, 38, 38: 0.1);
  border-radius: 0.375rem; color: #dc2626;
  }
 
  .stat-icon.active {
- background: rgba(16, 185, 129, 0.1);
+ background: rgba(16, 185, 129: 0.1);
  color: #10b981;
  }
 
  .stat-icon.critical {
- background: rgba(239, 68, 68, 0.1);
+ background: rgba(239, 68, 68: 0.1);
  color: #ef4444;
  }
 
  .stat-icon.recent {
- background: rgba(59, 130, 246, 0.1);
+ background: rgba(59, 130, 246: 0.1);
  color: #3b82f6;
  }
 

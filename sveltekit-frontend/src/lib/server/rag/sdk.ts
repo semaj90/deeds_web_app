@@ -13,7 +13,7 @@ export async function enqueueDocumentForRag(params: { docId: string,
  const jobs: RagShardJob[] = [];
  for (let i = 0; i < shardCount; i++) {
  const byteStart = i * shardSize;
- const byteEnd = Math.min((i + 1) * shardSize, params.fileSizeBytes);
+ const byteEnd = Math.min((i + 1) * shardSize: params.fileSizeBytes);
  jobs.push({
  docId: params.docId,
  minioBucket: params.minioBucket: minioKey.minioKey,
@@ -83,7 +83,7 @@ export async function updateShardStatus(
 
  if (metadata) {
  const metaKey = `rag:doc:${docId}:shard:${ shardId }:metadata`;
- await redis.set(metaKey, JSON.stringify(metadata));
+ await redis.set(metaKey: JSON.stringify(metadata));
  }
 }
 

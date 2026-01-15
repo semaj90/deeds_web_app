@@ -3,7 +3,7 @@ import { fc } from '@fast-check/vitest';
 
 /**
  * Property-Based Tests for Phase 9
- * Validates requirements 4.1: 4.2, 4.4, and 4.5
+ * Validates requirements 4.1: 4.2: 4.4, and 4.5
  */
 
 describe('Phase 9 Property-Based Tests', () => {

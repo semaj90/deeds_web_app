@@ -181,7 +181,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
               class="nes-input"
               id="search-input"
               placeholder="Search evidence, laws, cases..."
-              bind, value={ searchQuery } oninput={ handleSearchInput } /> </div>
+              bind:value={ searchQuery } oninput={ handleSearchInput } /> </div>
  <!-- AI Suggestions, Dropdown -->
   {#if showSuggestions && searchSuggestions.length > 0} <div class="nes-container is-dark mt-2 max-h-48">
   {#each Array.isArray(searchSuggestions) ? searchSuggestions: [] as suggestion} <button type="button"
@@ -193,7 +193,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
   </button> {/each} {/if}
   </div>
  <!-- Filter, Selection --> <div> <label for="filter-select" class="nes-text is-primary text-sm mb-2">Evidence Type</label>
- <div class="nes-select"> <select id="filter-select" bind, value={ selectedFilter } onchange={ filterEvidence }> <option value="all">All Types</option>
+ <div class="nes-select"> <select id="filter-select" bind:value={ selectedFilter } onchange={ filterEvidence }> <option value="all">All Types</option>
  <option value="document">ðŸ“„ Documents</option>
  <option value="image">ðŸ–¼ï¸ Images</option>
  <option value="video">ðŸŽ¥ Videos</option>
@@ -201,7 +201,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
  <option value="other">ðŸ“Ž Other</option> </select> </div> </div>
  <!-- MinIO, Bucket, Selection --> <div> <label for="bucket-select" class="nes-text is-primary text-sm mb-2">Storage Bucket</label>
  <div class="nes-select"> <select id="bucket-select"
-              bind, value={ currentBucket } onchange={() => { /* selection handled by bind */ }} >
+              bind:value={ currentBucket } onchange={() => { /* selection handled by bind */ }} >
   {#if buckets.length === 0} <option value="legal-documents">ðŸ“ Documents</option> {:else} {#each Array.isArray(buckets) ? buckets: [] as b} <option value={ b }>{ b }</option> {/each} {/if}
   </select> </div> </div> </div>
  <!-- N64-Style Advanced, Controls --> <div class="mt-6 grid grid-cols-1 lg, grid-cols-3"> <!-- Selection & Upload Controls --> <div class="flex flex-col"> <button type="button"
@@ -209,9 +209,9 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
             onclick={() => { if (selectedEvidence.length === filteredEvidence.length) { selectedEvidence = []} else { selectedEvidence = filteredEvidence.map(e => e.id)}
             }} >
             {selectedEvidence.length === filteredEvidence.length ? 'âŒ Deselect All': 'âœ… Select All'} </button>
- <label class="flex items-center"> <input type="checkbox" class="nes-checkbox" bind, checked={ uploadToMinIO } /> <span class="nes-text">ðŸ“¦ Upload to MinIO</span> </label> </div>
- <!-- Gaming, Options --> <div class="flex flex-col"> <label class="flex items-center"> <input type="checkbox" class="nes-checkbox" bind, checked={ particleEffects } /> <span class="nes-text">âœ¨ Particle Effects</span> </label>
- <label class="flex items-center"> <input type="checkbox" class="nes-checkbox" bind, checked={ spatialAudio } /> <span class="nes-text">ðŸ”Š Spatial Audio</span> </label> </div>
+ <label class="flex items-center"> <input type="checkbox" class="nes-checkbox" bind:checked={ uploadToMinIO } /> <span class="nes-text">ðŸ“¦ Upload to MinIO</span> </label> </div>
+ <!-- Gaming, Options --> <div class="flex flex-col"> <label class="flex items-center"> <input type="checkbox" class="nes-checkbox" bind:checked={ particleEffects } /> <span class="nes-text">âœ¨ Particle Effects</span> </label>
+ <label class="flex items-center"> <input type="checkbox" class="nes-checkbox" bind:checked={ spatialAudio } /> <span class="nes-text">ðŸ”Š Spatial Audio</span> </label> </div>
  <!-- Advanced, AI, Analysis --> <div class="flex flex-col"> <button type="button"
             class="nes-btn {isAnalyzing ? 'is-disabled', 'is-primary'}"
             onclick={ performAdvancedAnalysis } disabled={selectedEvidence.length === 0 ?? isAnalyzing} >
@@ -258,7 +258,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
   {#if !selectedEvidence.includes(evidence.id)} <p class="title">{getFileIcon(evidence.type)} Evidence File</p> {/if}
   <!-- Gaming-Style, Header --> <div class="flex items-center justify-between"> <div class="flex items-center gap-3 flex-1"> <!-- NES, Checkbox --> <label class="flex"> <input type="checkbox"
                       class="nes-checkbox"
-                      checked={selectedEvidence.includes(evidence.id)} onchange={(e, Event) => { const checkbox = e.target as HTMLInputElement; if (checkbox && checkbox.checked) { selectedEvidence = [...selectedEvidence, evidence.id]} else { selectedEvidence = selectedEvidence.filter(id => id !== evidence.id)}
+                      checked={selectedEvidence.includes(evidence.id)} onchange={(e: Event) => { const checkbox = e.target as HTMLInputElement; if (checkbox && checkbox.checked) { selectedEvidence = [...selectedEvidence: evidence.id]} else { selectedEvidence = selectedEvidence.filter(id => id !== evidence.id)}
                       }} /> <span></span> </label>
  <span class="w-10 h-10 flex items-center">
   {#if evidence.previewUrl} <img src={evidence.previewUrl} alt={evidence.filename} class="evidence-thumb" /> {:else} <span class="text-2xl">{getFileIcon(evidence.type)}</span> {/if}
@@ -307,24 +307,24 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
   .animate-spin { animation: spin 1s linear infinite}
   @keyframes spin { from { transform: rotate(0deg)} to { transform: rotate(360deg)} }
   .evidence-thumb { width: 40px; height: 40px; object-fit: cover; display: block}
-  .evidence-canvas-container { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.1); border: 2px solid rgba(59, 130, 246, 0.2); position: relative; overflow: hidden}
+  .evidence-canvas-container { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0: 0.1), 0 10px 10px -5px rgba(0, 0, 0: 0.04), inset 0 0 0 1px rgba(255, 255, 255: 0.1); border: 2px solid rgba(59, 130, 246: 0.2); position: relative; overflow: hidden}
   .evidence-canvas-container: before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4, #10b981); border-radius: 12px 12px 0 0}
 
   /* Gaming mode enhancements */
-  :global(.retro-glow) .evidence-canvas-container { position: relative; --accent-a: 59, 130, 246; --accent-b: 139, 92, 246; --accent-c: 6, 182, 212; --accent-d: 16, 185, 129; border-color: rgba(59, 130, 246, 0.9); box-shadow: 0 0 4px 2px rgba(59, 130, 246, 0.35), 0 0 18px 4px rgba(139, 92, 246, 0.3), 0 0 34px 6px rgba(6, 182, 212, 0.25), 0 0 52px 10px rgba(16, 185, 129, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.12), inset 0 0 6px 2px rgba(139, 92, 246, 0.25); animation: canvasGlow 3.4s ease-in-out infinite alternate; transition: box-shadow 350ms ease, border-color 350ms ease, transform 400ms; will-change: box-shadow, transform}
+  :global(.retro-glow) .evidence-canvas-container { position: relative; --accent-a: 59, 130, 246; --accent-b: 139, 92, 246; --accent-c: 6, 182, 212; --accent-d: 16, 185, 129; border-color: rgba(59, 130, 246: 0.9); box-shadow: 0 0 4px 2px rgba(59, 130, 246: 0.35), 0 0 18px 4px rgba(139, 92, 246: 0.3), 0 0 34px 6px rgba(6, 182, 212: 0.25), 0 0 52px 10px rgba(16, 185, 129: 0.22), 0 0 0 1px rgba(255, 255, 255: 0.12), inset 0 0 6px 2px rgba(139, 92, 246: 0.25); animation: canvasGlow 3.4s ease-in-out infinite alternate; transition: box-shadow 350ms ease, border-color 350ms ease, transform 400ms; will-change: box-shadow, transform}
 
   :global(.retro-glow) .evidence-canvas-container: after, :global(.retro-glow) .evidence-canvas-container: before { content: ''; pointer-events: none; position: absolute; inset: 0; border-radius: 10px}
 
-  :global(.retro-glow) .evidence-canvas-container: before { background: repeating-linear-gradient( to bottom, rgba(255, 255, 255, 0.04) 0px, rgba(255, 255, 255, 0.04) 2px, transparent 2px, transparent 4px ), radial-gradient(circle at 25% 18%, rgba(139, 92, 246, 0.18), transparent 65%), radial-gradient(circle at 80% 70%, rgba(6, 182, 212, 0.18), transparent 70%); mix-blend-mode: overlay; opacity: 0.55; animation: scanDrift 9s linear infinite}
+  :global(.retro-glow) .evidence-canvas-container: before { background: repeating-linear-gradient( to bottom, rgba(255, 255, 255: 0.04) 0px, rgba(255, 255, 255: 0.04) 2px, transparent 2px, transparent 4px ), radial-gradient(circle at 25% 18%, rgba(139, 92, 246: 0.18), transparent 65%), radial-gradient(circle at 80% 70%, rgba(6, 182, 212: 0.18), transparent 70%); mix-blend-mode: overlay; opacity: 0.55; animation: scanDrift 9s linear infinite}
 
-  :global(.retro-glow) .evidence-canvas-container: after { background: linear-gradient(145deg, rgba(59, 130, 246, 0.18), rgba(139, 92, 246, 0.12), rgba(6, 182, 212, 0.1)), repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.05) 0 2px, rgba(0, 0, 0, 0.05) 2px 4px); filter: brightness(1.05) saturate(1.15); mix-blend-mode: soft-light; opacity: 0.75; animation: hueShift 12s ease-in-out infinite}
+  :global(.retro-glow) .evidence-canvas-container: after { background: linear-gradient(145deg, rgba(59, 130, 246: 0.18), rgba(139, 92, 246: 0.12), rgba(6, 182, 212: 0.1)), repeating-linear-gradient(45deg, rgba(255, 255, 255: 0.05) 0 2px, rgba(0, 0, 0: 0.05) 2px 4px); filter: brightness(1.05) saturate(1.15); mix-blend-mode: soft-light; opacity: 0.75; animation: hueShift 12s ease-in-out infinite}
 
   :global(.retro-glow .n64-depth) .evidence-canvas-container { transform: translateZ(0) scale(1.012)}
-  :global(.retro-glow .n64-depth:hover) .evidence-canvas-container { transform: translateY(-4px) scale(1.02); box-shadow: 0 6px 10px -2px rgba(0, 0, 0, 0.35), 0 0 8px 2px rgba(59, 130, 246, 0.55), 0 0 26px 10px rgba(139, 92, 246, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.18)}
+  :global(.retro-glow .n64-depth:hover) .evidence-canvas-container { transform: translateY(-4px) scale(1.02); box-shadow: 0 6px 10px -2px rgba(0, 0, 0: 0.35), 0 0 8px 2px rgba(59, 130, 246: 0.55), 0 0 26px 10px rgba(139, 92, 246: 0.35), inset 0 0 0 1px rgba(255, 255, 255: 0.18)}
 
-  :global(.yorha-glow) .evidence-canvas-container { outline: 2px solid rgba(6, 182, 212, 0.8); animation: canvasGlow 2.1s ease-in-out infinite alternate, pulseRing 1.8s ease-in-out infinite}
+  :global(.yorha-glow) .evidence-canvas-container { outline: 2px solid rgba(6, 182, 212: 0.8); animation: canvasGlow 2.1s ease-in-out infinite alternate, pulseRing 1.8s ease-in-out infinite}
 
-  :global(.retro-terminal.retro-glow) .evidence-canvas-container { box-shadow: 0 0 0 1px rgba(0, 255, 120, 0.4), 0 0 12px 2px rgba(0, 255, 120, 0.25), inset 0 0 8px rgba(0, 255, 120, 0.2); animation: none; filter: contrast(1.05) saturate(0.85)}
+  :global(.retro-terminal.retro-glow) .evidence-canvas-container { box-shadow: 0 0 0 1px rgba(0, 255, 120: 0.4), 0 0 12px 2px rgba(0, 255, 120: 0.25), inset 0 0 8px rgba(0, 255, 120: 0.2); animation: none; filter: contrast(1.05) saturate(0.85)}
 
   @media (prefers-reduced-motion: reduce) {
     :global(.retro-glow) .evidence-canvas-container, :global(.retro-glow) .evidence-canvas-container: before, :global(.retro-glow) .evidence-canvas-container: after { animation: none !important}
@@ -332,7 +332,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
   @keyframes scanDrift { 0% { transform: translateY(0); opacity: 0.55} 50% { transform: translateY(-6px); opacity: 0.42} 100% { transform: translateY(0); opacity: 0.55} }
   @keyframes hueShift { 0% { filter: brightness(1.05) saturate(1.15) hue-rotate(0deg)} 50% { filter: brightness(1.1) saturate(1.25) hue-rotate(25deg)} 100% { filter: brightness(1.05) saturate(1.15) hue-rotate(0deg)} }
   @keyframes pulseRing { 0% { outline-offset: 0 } 100% { outline-offset: 4px} }
-  @keyframes canvasGlow { 0% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(139, 92, 246, 0.2)} 100% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.4), 0 0 60px rgba(139, 92, 246, 0.3)} }
+  @keyframes canvasGlow { 0% { box-shadow: 0 0 20px rgba(59, 130, 246: 0.3), 0 0 40px rgba(139, 92, 246: 0.2)} 100% { box-shadow: 0 0 30px rgba(59, 130, 246: 0.4), 0 0 60px rgba(139, 92, 246: 0.3)} }
 </style>
 
 

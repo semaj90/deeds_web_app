@@ -72,7 +72,7 @@
  <div class="input-area">
  <input
  type="text"
- bind, value={input}
+ bind:value={input}
  placeholder="Ask the AI assistant..."
  onkeydown={(e) => e.key === 'Enter' && sendMessage()}
  disabled={loading}

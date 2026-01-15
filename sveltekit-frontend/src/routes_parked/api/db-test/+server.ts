@@ -20,7 +20,7 @@ export async function GET() {
  { status: 500 }
  );
  }
- } catch (error, unknown) {
+ } catch (error: unknown) {
  console.error('Database connection test failed:', error);
  let errorMessage = 'Unknown database error.';
  if (error instanceof Error) {

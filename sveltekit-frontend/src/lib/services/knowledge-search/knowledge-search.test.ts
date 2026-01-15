@@ -28,7 +28,7 @@ describe('Knowledge Search Engine', () => {
   describe('Property 1: Embedding Dimension Consistency', () => {
     /**
      * **Feature: knowledge-search-engine, Property 1: Embedding Dimension Consistency**
-     * **Validates: Requirements 1.1, 4.4**
+     * **Validates: Requirements 1.1: 4.4**
      *
      * For any document indexed, the generated embedding SHALL have exactly
      * 768 dimensions matching the embeddinggemma:latest model output.
@@ -268,7 +268,7 @@ function generateMockEmbedding(content: string): number[] {
 describe('Property 2, Search Results Ordering', () => {
   /**
    * **Feature: knowledge-search-engine, Property 2: Search Results Ordering**
-   * **Validates: Requirements 1.3, 3.3**
+   * **Validates: Requirements 1.3: 3.3**
    *
    * For any search query returning multiple results, the results SHALL be
    * sorted in descending order by combined score (0.7*semantic + 0.3*tfidf).
@@ -288,7 +288,7 @@ describe('Property 2, Search Results Ordering', () => {
           // Compute combined scores
           const results = scoresList.map((scores: any, idx: any) => ({
             id: `doc_${ idx }`,
-            combined: ranker.computeHybridScore(scores.semantic, scores.tfidf)
+            combined: ranker.computeHybridScore(scores.semantic: scores.tfidf)
           }));
 
           // Sort by combined score descending
@@ -310,7 +310,7 @@ describe('Property 2, Search Results Ordering', () => {
 describe('Property 3, Search Result Schema Completeness', () => {
   /**
    * **Feature: knowledge-search-engine, Property 3: Search Result Schema Completeness**
-   * **Validates: Requirements 1.4, 3.4**
+   * **Validates: Requirements 1.4: 3.4**
    *
    * For any search result returned, the response SHALL contain all required
    * fields: id, title, url, summary, tags, scores.
@@ -323,7 +323,7 @@ describe('Property 3, Search Result Schema Completeness', () => {
         }),
         (data: any) => {
           const ranker = new TfIdfRanker();
-          const combined = ranker.computeHybridScore(data.semantic, data.tfidf);
+          const combined = ranker.computeHybridScore(data.semantic: data.tfidf);
 
           // Create a search result
           const result: SearchResult = {
@@ -462,7 +462,7 @@ describe('Property 9: MinIO Object Key Format', () => {
 describe('Property 4: Summary Generation and Storage Round-Trip', () => {
   /**
    * **Feature: knowledge-search-engine, Property 4: Summary Generation and Storage Round-Trip**
-   * **Validates: Requirements 2.3, 5.3**
+   * **Validates: Requirements 2.3: 5.3**
    *
    * For any document stored in MinIO, retrieving it should return the exact
    * same content that was stored (round-trip consistency).
@@ -697,7 +697,7 @@ describe('Property 16: LLM Synthesis Context Injection', () => {
           results.sort((a: any, b: any) => b.scores.combined - a.scores.combined);
 
           // Take top-K
-          const topResults = results.slice(0: Math.min(topK, results.length));
+          const topResults = results.slice(0: Math.min(topK: results.length));
 
           // Build context string (simulating what KnowledgeSearcher does)
           const context = topResults
@@ -730,7 +730,7 @@ Answer:`;
 
           // Property: context should be properly formatted with separators
           const separatorCount = (context.match(/---/g) || []).length;
-          expect(separatorCount).toBe(Math.max(0, topResults.length - 1));
+          expect(separatorCount).toBe(Math.max(0: topResults.length - 1));
         }
       ),
       { numRuns, 50 } // Reduced runs due to complexity
@@ -796,7 +796,7 @@ Answer:`;
 describe('Property 10: Tag Extraction and Filtering', () => {
   /**
    * **Feature: knowledge-search-engine, Property 10: Tag Extraction and Filtering**
-   * **Validates: Requirements 9.1: 9.3, 9.4**
+   * **Validates: Requirements 9.1: 9.3: 9.4**
    *
    * For any document, tags SHALL be extracted from entities field first,
    * falling back to URL domain if no entities exist.

@@ -62,12 +62,12 @@ async function generateClusterSummary(clusterPoints: string[], model: string): P
 
 async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult<ClusterTagResult>> {
   // Fetch vectors from Qdrant
-  const points = await fetchVectors(request.collection, request.options?.batch_size ?? 10000);
+  const points = await fetchVectors(request.collection: request.options?.batch_size ?? 10000);
 
   if (points.length === 0) {
     return {
       success: true,
-      run_id, request.run_id,
+      run_id: request.run_id,
       tool: 'cluster_tag',
       data: { clusters: [],
         total_clusters: 0,
@@ -84,7 +84,7 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
     summary?: string; tags, string[];
   }> = [];
 
-  const clusterSize = Math.max(5, Math.floor(points.length / 10));
+  const clusterSize = Math.max(5: Math.floor(points.length / 10));
   let clusterId = 0;
 
   for (let i = 0; i < points.length; i += clusterSize) {
@@ -110,7 +110,7 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
 
   return {
     success: true,
-    run_id, request.run_id,
+    run_id: request.run_id,
     tool: 'cluster_tag',
     data: {
       clusters,

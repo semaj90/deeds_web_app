@@ -23,7 +23,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
     }
 
     // Execute tool
-    const result = await toolRegistry.execute(body.tool, body.args);
+    const result = await toolRegistry.execute(body.tool: body.args);
 
     if (!result.success) {
       return json(result, { status: 400 });

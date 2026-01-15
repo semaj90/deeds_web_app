@@ -300,7 +300,7 @@
  </button>
  <select
  class="rounded-lg border border-gray-700 bg-black/60 px-3 py-2 text-sm"
- bind, value={filter}
+ bind:value={filter}
  >
  <option value="all">All results</option>
  <option value="success">Success</option>

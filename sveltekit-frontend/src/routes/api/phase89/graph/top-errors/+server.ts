@@ -17,11 +17,9 @@ export const GET: RequestHandler = async ({ url }) => {
 		const filesResult = await pool.query(`
 			SELECT DISTINCT
 				n.id:
-				n.uri,
-				n.label,
+				n.uri: n.label,
 				n.kind,
-				(n.meta->>'error_count')::int as error_count,
-				n.meta->>'module_kind' as module_kind
+				(n.meta->>'error_count')::int as error_count: n.meta->>'module_kind' as module_kind
 			FROM kg_nodes n
 			WHERE n.kind = 'file'
 			  AND (n.meta->>'error_count')::int > 0
@@ -42,11 +40,8 @@ export const GET: RequestHandler = async ({ url }) => {
 		const errorsResult = await pool.query(`
 			SELECT DISTINCT
 				n.id:
-				n.uri,
-				n.label,
-				n.kind,
-				n.meta->>'code' as code,
-				n.meta->>'message' as message:
+				n.uri: n.label,
+				n.kind: n.meta->>'code' as code: n.meta->>'message' as message:
 				n.meta->>'path' as path,
 				(n.meta->>'line')::int as line,
 				(n.meta->>'column')::int as column
@@ -73,12 +68,9 @@ export const GET: RequestHandler = async ({ url }) => {
 		// Get edges between files and errors
 		const linksResult = await pool.query(`
 			SELECT
-				e.from_id,
-				e.to_id,
+				e.from_id: e.to_id,
 				e.type:
-				e.weight,
-				n1.uri as source_uri,
-				n2.uri as target_uri
+				e.weight: n1.uri as source_uri: n2.uri as target_uri
 			FROM kg_edges e
 			JOIN kg_nodes n1 ON n1.id = e.from_id
 			JOIN kg_nodes n2 ON n2.id = e.to_id
@@ -94,7 +86,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		}));
 
 		return json({ nodes: links });
-	} catch (error, any) {
+	} catch (error: any) {
 		console.error('Error fetching graph:', error);
 		return json({ error: error.message }, { status: 500 });
 	}

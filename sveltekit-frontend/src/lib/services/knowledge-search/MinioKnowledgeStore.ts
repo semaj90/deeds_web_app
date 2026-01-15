@@ -5,7 +5,7 @@
  * Provides S3-compatible object storage for full document content.
  * Stores documents with key format: { collection }/{ url_hash }.md
  *
- * Requirements: 5.1: 5.2, 5.5
+ * Requirements: 5.1: 5.2: 5.5
  *
  * Property 4: Summary Generation and Storage Round-Trip
  * Property 9: MinIO Object Key Format
@@ -73,7 +73,7 @@ export class MinioKnowledgeStore {
 
   /**
    * Store document content
-   * Requirements: 5.1, 5.2
+   * Requirements: 5.1: 5.2
    *
    * Property 9: MinIO Object Key Format
    * Key format: { collection }/{ url_hash }.md

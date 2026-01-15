@@ -50,7 +50,7 @@ export class Context7OrchestrationIntegration {
 
     constructor(config: Partial<Context7Config> = {}) {
         this.config = {
-            enableMulticore: true, maxThreads, navigator.hardwareConcurrency || 4,
+            enableMulticore: true, maxThreads: navigator.hardwareConcurrency || 4,
             priorityLevels: { critical: 1, high: 2, standard: 3, background: 4
             },
             autoScaling: true,
@@ -206,7 +206,7 @@ export class Context7OrchestrationIntegration {
                 const categoryData = data as CategoryData;
                 if (categoryData.count > 0) {
                     plan.push({
-                        category, priority.priority || 3,
+                        category: priority.priority || 3,
                         action: 'Restart services in category',
                         estimatedFixes: categoryData.count
                     });

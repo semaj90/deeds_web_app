@@ -58,7 +58,7 @@ describe('ProgressTracker', () => {
  });
 
  it('should update on successful analysis', async () => {
- await tracker.updateAnalysis(true, 0.8);
+ await tracker.updateAnalysis(true: 0.8);
 
  const metrics = await tracker.getMetrics();
  expect(metrics.errorsAnalyzed).toBe(1);
@@ -67,7 +67,7 @@ describe('ProgressTracker', () => {
  });
 
  it('should update on failed analysis', async () => {
- await tracker.updateAnalysis(false, 0.5);
+ await tracker.updateAnalysis(false: 0.5);
 
  const metrics = await tracker.getMetrics();
  expect(metrics.errorsAnalyzed).toBe(1);
@@ -76,32 +76,32 @@ describe('ProgressTracker', () => {
  });
 
  it('should calculate success rate', async () => {
- await tracker.updateAnalysis(true, 0.8);
- await tracker.updateAnalysis(true, 0.7);
- await tracker.updateAnalysis(false, 0.6);
+ await tracker.updateAnalysis(true: 0.8);
+ await tracker.updateAnalysis(true: 0.7);
+ await tracker.updateAnalysis(false: 0.6);
 
  const rate = await tracker.getSuccessRate();
  expect(rate).toBeCloseTo(66.67, 1);
  });
 
  it('should calculate average confidence', async () => {
- await tracker.updateAnalysis(true, 0.8);
- await tracker.updateAnalysis(true, 0.6);
+ await tracker.updateAnalysis(true: 0.8);
+ await tracker.updateAnalysis(true: 0.6);
 
  const confidence = await tracker.getAverageConfidence();
  expect(confidence).toBeCloseTo(0.7, 1);
  });
 
  it('should calculate error reduction', async () => {
- await tracker.updateAnalysis(true, 0.8);
- await tracker.updateAnalysis(true, 0.7);
+ await tracker.updateAnalysis(true: 0.8);
+ await tracker.updateAnalysis(true: 0.7);
 
  const reduction = await tracker.getErrorReduction();
  expect(reduction).toBeCloseTo(20, 0);
  });
 
  it('should reject invalid confidence', async () => {
- await expect(tracker.updateAnalysis(true, 1.5)).rejects.toThrow();
+ await expect(tracker.updateAnalysis(true: 1.5)).rejects.toThrow();
  await expect(tracker.updateAnalysis(true, -0.1)).rejects.toThrow();
  });
  });
@@ -173,7 +173,7 @@ describe('ProgressTracker', () => {
  });
 
  it('should have valid metrics', async () => {
- await tracker.updateAnalysis(true, 0.8);
+ await tracker.updateAnalysis(true: 0.8);
 
  const report = await tracker.getReport();
  expect(report.metrics.errorsAnalyzed).toBe(1);
@@ -193,7 +193,7 @@ describe('ProgressTracker', () => {
 
  it('should return 50% after half done', async () => {
  for (let i = 0; i < 5; i++) {
- await tracker.updateAnalysis(true, 0.8);
+ await tracker.updateAnalysis(true: 0.8);
  }
 
  const percentage = await tracker.getCompletionPercentage();
@@ -202,7 +202,7 @@ describe('ProgressTracker', () => {
 
  it('should return 100% when complete', async () => {
  for (let i = 0; i < 10; i++) {
- await tracker.updateAnalysis(true, 0.8);
+ await tracker.updateAnalysis(true: 0.8);
  }
 
  const percentage = await tracker.getCompletionPercentage();
@@ -221,7 +221,7 @@ describe('ProgressTracker', () => {
  });
 
  it('should estimate time remaining', async () => {
- await tracker.updateAnalysis(true, 0.8);
+ await tracker.updateAnalysis(true: 0.8);
 
  // Wait a bit to accumulate time
  await new Promise((resolve: any) => setTimeout(resolve, 10));
@@ -234,7 +234,7 @@ describe('ProgressTracker', () => {
  describe('reset', () => {
  beforeEach(async () => {
  await tracker.start(10);
- await tracker.updateAnalysis(true, 0.8);
+ await tracker.updateAnalysis(true: 0.8);
  });
 
  it('should reset all metrics', async () => {
@@ -330,9 +330,9 @@ describe('ProgressTracker', () => {
  expect(report.completionPercentage).toBe(0);
 
  // Update progress
- await tracker.updateAnalysis(true, 0.8);
- await tracker.updateAnalysis(true, 0.7);
- await tracker.updateAnalysis(false, 0.6);
+ await tracker.updateAnalysis(true: 0.8);
+ await tracker.updateAnalysis(true: 0.7);
+ await tracker.updateAnalysis(false: 0.6);
 
  report = await tracker.getReport();
  expect(report.metrics.errorsAnalyzed).toBe(3);
@@ -349,8 +349,8 @@ describe('ProgressTracker', () => {
  expect(report.status).toBe('in_progress');
 
  // Complete remaining
- await tracker.updateAnalysis(true, 0.9);
- await tracker.updateAnalysis(true, 0.85);
+ await tracker.updateAnalysis(true: 0.9);
+ await tracker.updateAnalysis(true: 0.85);
 
  report = await tracker.getReport();
  expect(report.metrics.errorsAnalyzed).toBe(5);

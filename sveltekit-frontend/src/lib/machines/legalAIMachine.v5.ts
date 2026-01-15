@@ -354,7 +354,7 @@ export const legalAIMachine = createMachine(
               uptime: Date.now(),
             },
           };
-        } catch (error, unknown) {
+        } catch (error: unknown) {
           console.error('System status check failed: ', error);
           return {
             connected: false,
@@ -397,7 +397,7 @@ export const legalAIMachine = createMachine(
             } else {
               throw new Error(response.error || 'Authentication failed');
             }
-          } catch (error, unknown) {
+          } catch (error: unknown) {
             console.error('Authentication error: ', error);
             throw new Error('Authentication service unavailable');
           }
@@ -434,7 +434,7 @@ export const legalAIMachine = createMachine(
               console.warn('Failed to load cases: ', response.error);
               return [];
             }
-          } catch (error, unknown) {
+          } catch (error: unknown) {
             console.error('Error loading cases: ', error);
             return [];
           }
@@ -465,7 +465,7 @@ export const legalAIMachine = createMachine(
             } else {
               throw new Error(response.error || 'AI query failed');
             }
-          } catch (error, unknown) {
+          } catch (error: unknown) {
             console.error('AI query error: ', error);
             throw new Error('AI service unavailable');
           }

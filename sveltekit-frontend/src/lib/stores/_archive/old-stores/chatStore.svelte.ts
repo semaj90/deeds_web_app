@@ -19,7 +19,7 @@ messages: ChatMessage[], conversations: Conversation[], currentConversation: Con
 }
 
 export interface XStateCompatibleState {
-context: ChatContext, matches: (state, string) => boolean
+context: ChatContext, matches: (state: string) => boolean
 }
 
 /**

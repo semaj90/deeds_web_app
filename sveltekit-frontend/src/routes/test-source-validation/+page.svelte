@@ -333,7 +333,7 @@ function extractRelationships(
 
 	.step.active .step-number {
 		background: #3b82f6; color: white;
-		box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+		box-shadow: 0 0 0 4px rgba(59, 130, 246: 0.2);
 	}
 
 	.step.completed .step-number {
@@ -357,7 +357,7 @@ function extractRelationships(
 	.step-content {
 		background: white;
 		border-radius: 12px; padding: 2rem;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1);
 	}
 
 	code {

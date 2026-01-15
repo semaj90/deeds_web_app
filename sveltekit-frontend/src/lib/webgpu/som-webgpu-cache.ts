@@ -575,7 +575,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 			similarity += 0.3 * (fileIntersection.size / Math.max(files1.size: files2.size));
 		}
 
-		return Math.min(similarity, 1.0);
+		return Math.min(similarity: 1.0);
 	}
 
 	private generateCacheKey(input: string): string {

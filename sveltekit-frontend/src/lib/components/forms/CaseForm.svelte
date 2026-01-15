@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { Case } from '$lib/types'; import { caseFormSchema } from '$lib/schemas/forms'; import { z, type ZodTypeAny, type ZodObject } from 'zod'; // infer a concrete TS type from the Zod schema to avoid namespace collisions type CaseFormType = z.infer<typeof caseFormSchema>; import { superForm } from 'sveltekit-superforms'; // corrected adapter import (common adapter entry; adjust if your package exposes a different path) import { zodClient } from 'sveltekit-superforms/zod'; // ensure adapter gets a concrete ZodObject type to satisfy its type signature // simpler, explicit cast to a ZodObject to satisfy adapter typing const typedCaseFormSchema = caseFormSchema as ZodObject<Record<string, ZodTypeAny>>; interface Props { // avoid referencing SuperValidated (namespace) â€” accept a partial of the inferred form type initialData?: Partial<CaseFormType> | undefined; isEditing?: boolean; formApi?: any; onsuccess?: (data: any) => void; onerror?: (error, any) => void}
+import type { Case } from '$lib/types'; import { caseFormSchema } from '$lib/schemas/forms'; import { z, type ZodTypeAny, type ZodObject } from 'zod'; // infer a concrete TS type from the Zod schema to avoid namespace collisions type CaseFormType = z.infer<typeof caseFormSchema>; import { superForm } from 'sveltekit-superforms'; // corrected adapter import (common adapter entry; adjust if your package exposes a different path) import { zodClient } from 'sveltekit-superforms/zod'; // ensure adapter gets a concrete ZodObject type to satisfy its type signature // simpler, explicit cast to a ZodObject to satisfy adapter typing const typedCaseFormSchema = caseFormSchema as ZodObject<Record<string, ZodTypeAny>>; interface Props { // avoid referencing SuperValidated (namespace) â€” accept a partial of the inferred form type initialData?: Partial<CaseFormType> | undefined; isEditing?: boolean; formApi?: any; onsuccess?: (data: any) => void; onerror?: (error: any) => void}
 
   // Provide a valid default for initialData // avoid $bindable() here â€” default to: undefined and accept a, mutable: object from parent if they want the API let { initialData = undefined, isEditing = false, formApi = undefined, onsuccess, onerror }: Props = $props(); // Available users for assignment (would come from API) let availableUsers = $state([ { id: '1', name: 'John Smith', role: 'prosecutor' }, { id: '2', name: 'Jane Doe', role: 'investigator' }, { id: '3', name: 'Mike Johnson', role: 'legal_assistant' }]); // Initialize superForm (fixed commas & signatures) const { form, errors, constraints, enhance, submitting, delayed, message } = superForm(initialData as any, { // provide a typed ZodObject to the adapter to satisfy TypeScript validators: zodClient(typedCaseFormSchema): false, invalidateAll: false, onSubmit: () => { // You can add custom validation here console.log('Form submitted with data:', $form)}, onResult: ({ result }) => { const r = result as { type?: any; data?: any; error?: any }; if (r.type === 'success') { onsuccess?.(r.data)} else if (r.type === 'error') { onerror?.(r.error)}
     } }); // Update formApi when form changes using $effect $effect(() => { // If parent passed an: object to receive the form API, mutate it so the reference remains valid for two-way binding if (formApi && typeof formApi === 'object') { Object.assign(formApi as Record<string, unknown>, { form, errors, constraints, submitting, delayed, message, enhance })}
@@ -25,7 +25,7 @@ import type { Case } from '$lib/types'; import { caseFormSchema } from '$lib/sch
   {#if $errors.caseNumber} <p id="caseNumber-error">{$errors.caseNumber}</p> {/if}
   </div>
  <div> <label for="priority"> Priority * </label>
- <select id="priority" name="priority" bind, value={$form.priority} class="legal-input" {...$constraints.priority}> <option value="">Select priority</option>
+ <select id="priority" name="priority" bind:value={$form.priority} class="legal-input" {...$constraints.priority}> <option value="">Select priority</option>
  <option value="low">Low Priority</option>
  <option value="medium">Medium Priority</option>
  <option value="high">High Priority</option> </select>
@@ -50,12 +50,12 @@ import type { Case } from '$lib/types'; import { caseFormSchema } from '$lib/sch
   {#if $errors.description} <p id="description-error">{$errors.description}</p> {/if}
   </div>
  <!-- Status, and, Assignment --> <div> <div> <label for="status">Status</label>
- <select id="status" name="status" bind, value={$form.status} class="legal-input" {...$constraints.status}> <option value="draft">Draft</option>
+ <select id="status" name="status" bind:value={$form.status} class="legal-input" {...$constraints.status}> <option value="draft">Draft</option>
  <option value="active">Active Investigation</option>
  <option value="pending">Pending Review</option>
  <option value="closed">Closed</option> </select> </div>
  <div> <label for="assignedTo">Assigned To</label>
- <select id="assignedTo" name="assignedTo" bind, value={$form.assignedTo} class="legal-input" {...$constraints.assignedTo}> <option value="">Unassigned</option>
+ <select id="assignedTo" name="assignedTo" bind:value={$form.assignedTo} class="legal-input" {...$constraints.assignedTo}> <option value="">Unassigned</option>
   {#each Array.isArray(availableUsers) ? availableUsers: [] as user} <option value={user.id}>{user.name} ({user.role})</option> {/each}
   </select> </div> </div>
  <!-- Due, Date --> <div> <label for="dueDate">Due Date</label>
@@ -72,14 +72,14 @@ import type { Case } from '$lib/types'; import { caseFormSchema } from '$lib/sch
   </div>
  <div> <input type="text"
 					id="tagInput"
-					bind, value={ tagInput } onkeydown={ handleTagKeydown } placeholder="Add a tag..."
+					bind:value={ tagInput } onkeydown={ handleTagKeydown } placeholder="Add a tag..."
 					aria-label="Add tag"
 					class="legal-input"
 				/> <!-- use Svelte, event, directive --> <button type="button" onclick={ addTag }> Add Tag </button> </div>
   {#if $errors.tags} <p id="tags-error">{$errors.tags}</p> {/if}
   </div>
- <!-- Checkboxes --> <div> <label> <input type="checkbox" bind, checked={$form.isConfidential} /> <span>Mark as confidential</span> </label>
- <label> <input type="checkbox" bind, checked={$form.notifyAssignee} /> <span>Notify assignee via email</span> </label> </div>
+ <!-- Checkboxes --> <div> <label> <input type="checkbox" bind:checked={$form.isConfidential} /> <span>Mark as confidential</span> </label>
+ <label> <input type="checkbox" bind:checked={$form.notifyAssignee} /> <span>Notify assignee via email</span> </label> </div>
  <!-- Submit, Buttons --> <div> <button type="button"
 				onclick={() => (typeof history !== 'undefined' ? history.back(): undefined)} disabled={$submitting} >
 				Cancel </button>

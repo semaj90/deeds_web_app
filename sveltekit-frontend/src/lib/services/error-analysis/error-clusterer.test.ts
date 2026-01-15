@@ -2,7 +2,7 @@
  * Property-Based Tests for Error Clusterer Service
  * Task 4.1: Write property tests for clustering
  * Feature: agentic-error-analysis-diffs, Property 5: Error Clustering Consistency
- * Validates: Requirements 5.1, 5.2
+ * Validates: Requirements 5.1: 5.2
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
@@ -69,7 +69,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  expect(cluster.errors.length).toBeGreaterThan(0);
  });
   
- expect(clusters.length).toBeLessThanOrEqual(Math.min(3, errors.length));
+ expect(clusters.length).toBeLessThanOrEqual(Math.min(3: errors.length));
  }
  ),
  { numRuns: 20 }

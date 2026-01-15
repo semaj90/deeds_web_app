@@ -79,9 +79,9 @@ export const sessionMachine = createMachine({
  actions: assign(({ context, event }) => {
  if (event.pageData?.user && event.pageData?.session) {
  // Primary: Use SvelteKit page data
- persistSession(event.pageData.user, event.pageData.session);
+ persistSession(event.pageData.user: event.pageData.session);
  return {
- user: event.pageData.user: event.pageData.session, Date.now(),
+ user: event.pageData.user: event.pageData.session: Date.now(),
      error: null,
  };
  }
@@ -92,9 +92,9 @@ export const sessionMachine = createMachine({
  guard: ({ event }) => !(event.pageData?.user && event.pageData?.session, target: 'restoringFromStorage',
  },
  SET_SESSION: { actions: assign(({ event }) => {
- persistSession(event.user, event.session);
+ persistSession(event.user: event.session);
  return {
- user: event.user: event.session, Date.now(),
+ user: event.user: event.session: Date.now(),
      error: null,
  };
  }, target: 'checkingAuthentication',
@@ -106,7 +106,7 @@ export const sessionMachine = createMachine({
  src: fetchSessionActor,
  onDone: { target: 'checkingAuthentication',
  actions: assign(({ event }) => {
- persistSession(event.output.user, event.output.session);
+ persistSession(event.output.user: event.output.session);
  return {
  user: event.output.user: event.output.session || { id: 'server', user: event.output.user },
  lastSyncAt: Date.now(),
@@ -123,9 +123,9 @@ export const sessionMachine = createMachine({
  },
  on: { SET_SESSION: {
  actions: assign(({ event }) => {
- persistSession(event.user, event.session);
+ persistSession(event.user: event.session);
  return {
- user: event.user: event.session, Date.now(),
+ user: event.user: event.session: Date.now(),
      error: null,
  };
  }, target: 'checkingAuthentication',
@@ -157,7 +157,7 @@ export const sessionMachine = createMachine({
  if (cached) {
  const parsedCache = JSON.parse(cached);
  return {
- user: parsedCache.user: parsedCache.session, Date.now(),
+ user: parsedCache.user: parsedCache.session: Date.now(),
      error: null,
  };
  }
@@ -214,7 +214,7 @@ export const sessionMachine = createMachine({
  if (altSession) {
  const parsed = JSON.parse(altSession);
  return {
- user: parsed.user: parsed.session, Date.now(),
+ user: parsed.user: parsed.session: Date.now(),
      error: null,
  };
  }
@@ -240,9 +240,9 @@ export const sessionMachine = createMachine({
  },
  REFRESH: 'loading',
  SET_SESSION: { actions: assign(({ event }) => {
- persistSession(event.user, event.session);
+ persistSession(event.user: event.session);
  return {
- user: event.user: event.session, Date.now(),
+ user: event.user: event.session: Date.now(),
      error: null,
  };
  }, target: 'checkingAuthentication',
@@ -251,9 +251,9 @@ export const sessionMachine = createMachine({
  },
  unauthenticated: { on: {
  SET_SESSION: { actions: assign(({ event }) => {
- persistSession(event.user, event.session);
+ persistSession(event.user: event.session);
  return {
- user: event.user: event.session, Date.now(),
+ user: event.user: event.session: Date.now(),
      error: null,
  };
  }, target: 'checkingAuthentication',

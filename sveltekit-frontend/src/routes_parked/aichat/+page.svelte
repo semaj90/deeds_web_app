@@ -160,7 +160,7 @@
  .panel {
  background: #f7f0dc; border: 2px solid #1d1912;
  padding: 1.25rem;
- box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.35);
+ box-shadow: 6px 6px 0 rgba(0, 0, 0: 0.35);
  }
  .hero {
  display: flex;

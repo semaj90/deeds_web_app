@@ -569,7 +569,7 @@
  type="text"
  class="title-input"
  placeholder="Note title (optional)"
- bind, value={noteTitle}
+ bind:value={noteTitle}
  />
  <div class="editor-actions">
  <button
@@ -591,7 +591,7 @@
  </div>
  <div class="editor-body">
  <NierRichTextEditor
- bind, value={noteContent}
+ bind:value={noteContent}
  placeholder="Write your case notes here..."
  {caseId}
  />
@@ -711,7 +711,7 @@
 
  .error-banner {
  padding: 0.75rem 1rem;
- background: rgba(239, 68, 68, 0.2);
+ background: rgba(239, 68, 68: 0.2);
  color: #ef4444;
  border-bottom: 1px solid #ef4444;
  }
@@ -765,7 +765,7 @@
  display: flex;
  justify-content: space-between;
  align-items: center; padding: 0.5rem 1rem;
- background: rgba(60, 188, 252, 0.1);
+ background: rgba(60, 188, 252: 0.1);
  border-bottom: 1px solid var(--yorha-border, #606060);
  font-size: 0.8rem; color: var(--yorha-text-secondary, #a0a0a0);
  flex-shrink: 0;
@@ -784,7 +784,7 @@
  }
 
  .clear-search:hover {
- background: rgba(60, 188, 252, 0.1);
+ background: rgba(60, 188, 252: 0.1);
  border-color: var(--yorha-accent, #3cbcfc);
  }
 
@@ -817,16 +817,16 @@
  }
 
  .note-item:hover {
- background: rgba(60, 188, 252, 0.1);
+ background: rgba(60, 188, 252: 0.1);
  }
 
  .note-item.selected {
- background: rgba(60, 188, 252, 0.2);
+ background: rgba(60, 188, 252: 0.2);
  border-left: 3px solid var(--yorha-accent, #3cbcfc);
  }
 
  .note-item.pinned {
- background: rgba(245, 158, 11, 0.1);
+ background: rgba(245, 158, 11: 0.1);
  }
 
  .note-item-header {
@@ -928,7 +928,7 @@
  }
 
  .btn-delete:hover {
- background: rgba(239, 68, 68, 0.2);
+ background: rgba(239, 68, 68: 0.2);
  }
 
  .editor-body {
@@ -975,11 +975,11 @@
  justify-content: space-between;
  align-items: center; padding: 0.75rem 1rem;
  border-bottom: 1px solid var(--yorha-border, #606060);
- background: rgba(60, 188, 252, 0.05);
+ background: rgba(60, 188, 252: 0.05);
  }
 
  .ref-item:hover {
- background: rgba(60, 188, 252, 0.1);
+ background: rgba(60, 188, 252: 0.1);
  }
 
  .ref-info {
@@ -1012,7 +1012,7 @@
  }
 
  .ref-remove:hover {
- background: rgba(239, 68, 68, 0.2);
+ background: rgba(239, 68, 68: 0.2);
  }
 </style>
 

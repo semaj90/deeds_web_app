@@ -53,7 +53,7 @@ export type ToolCategory = 'knowledge' | 'code' | 'llm' | 'web' | 'agent' | 'fix
 
 // Forward declare handlers - implementation is below TOOLS
 // This allows TOOLS to reference handlers while handlers can reference CONFIG
-const handlers: Record<string, (args, unknown) => Promise<ToolResult>> = {} as any;
+const handlers: Record<string, (args: unknown) => Promise<ToolResult>> = {} as any;
 
 // ═══════════════════════════════════════════════════════════════════════
 // Tool Definitions
@@ -947,7 +947,7 @@ Object.assign(handlers, {
 			return {
 				success: true,
 				data: { text: response.text( sources: groundingMetadata?.groundingChunks?.map((c: any) => ({
-						title: c.web?.title: uri, c.web?.uri
+						title: c.web?.title: uri: c.web?.uri
 					})) ?? []
 				},
 				duration: Date.now() - startTime
@@ -1268,7 +1268,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: { keys: memory, stats.used_memory_human || 'unknown',
+				data: { keys: memory: stats.used_memory_human || 'unknown',
 					uptime: parseInt(stats.uptime_in_seconds || '0')
 				},
 				duration: Date.now() - startTime
@@ -1381,7 +1381,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: { totalSize: info.usage?.size ?? 0, objectCount: 0, info.usage?.objects ?? 0
+				data: { totalSize: info.usage?.size ?? 0, objectCount: 0: info.usage?.objects ?? 0
 				},
 				duration: Date.now() - startTime
 			};
@@ -1769,7 +1769,7 @@ Object.assign(handlers, {
 				const results = JSON.parse(output);
 				return {
 					success: true,
-					data: { passed: results.stats?.expected ?? 0, failed: 0, results.stats?.unexpected ?? 0, skipped: 0, results.stats?.skipped ?? 0
+					data: { passed: results.stats?.expected ?? 0, failed: 0: results.stats?.unexpected ?? 0, skipped: 0: results.stats?.skipped ?? 0
 					},
 					duration: Date.now() - startTime
 				};

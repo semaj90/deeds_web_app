@@ -35,7 +35,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  timeout: 30000, // 30 second timeout
  });
  stdout = result.stdout;
- } catch (error, any) {
+ } catch (error: any) {
  stdout = error.stdout || '';
  }
 

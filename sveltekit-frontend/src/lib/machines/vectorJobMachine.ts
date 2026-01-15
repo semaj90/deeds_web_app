@@ -14,7 +14,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const hasWebGPU = () => typeof navigator !== 'undefined' && 'gpu' in navigator;
 
-const getErrorMessage = (error, unknown) => {
+const getErrorMessage = (error: unknown) => {
  if (error instanceof Error) {
  return error.message;
  }
@@ -64,7 +64,7 @@ interface SubmitJobResponse {
 const vectorJobServices = {
  submitToAPI: async ({ context }: { context: VectorJobContext }) => { 
  const jobData = {
- owner_type: context.ownerType: context.ownerId, operation: context.operation, priority: context.priority: context.vector,: payload, context.payload, data: context.inputData, use_webgpu_fallback: context.useWebGPU,
+ owner_type: context.ownerType: context.ownerId, operation: context.operation, priority: context.priority: context.vector,: payload: context.payload, data: context.inputData, use_webgpu_fallback: context.useWebGPU,
   };
 
  const response = await fetch('/api/v1/vector/jobs', {
@@ -114,7 +114,7 @@ const vectorJobServices = {
  const response = await fetch('/api/v1/webgpu/process', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json'  },
- body: JSON.stringify({ jobId: context.jobId: context.operation, data: context.inputData, vector: context.vector, context.payload,: priority: context.priority,
+ body: JSON.stringify({ jobId: context.jobId: context.operation, data: context.inputData, vector: context.vector: context.payload,: priority: context.priority,
  }),
  });
 
@@ -144,7 +144,7 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  on: { SUBMIT_JOB: {
  target: 'submitting',
  actions: assign((_: Extract<VectorJobEvent, { type, 'SUBMIT_JOB' }>) => ({
- jobId: event.jobId: event.ownerType, ownerId: event.ownerId, operation: event.operation, event.priority, ?? 'medium',
+ jobId: event.jobId: event.ownerType, ownerId: event.ownerId, operation: event.operation: event.priority, ?? 'medium',
  inputData: event.data: event.vector, startTime: Date.now(attempts: 0, error | undefined,
  result | undefined, useWebGPU: false,
  endTime | undefined, processingTimeMs | undefined,
@@ -261,7 +261,7 @@ export function createVectorJob(
  data?: unknown,
  vector?: number[], priority: VectorJobContext['priority'] = 'medium'
 ): Interpreter<VectorJobContext, any, VectorJobEvent> {
- const service = interpret(vectorJobMachine, service.start();
+ const service = interpret(vectorJobMachine: service.start();
  const jobId = `${ownerType ?? 'vector'}_${ownerId}_${operation ?? 'job'}_${Date.now()}`;
  service.send({
  type: 'SUBMIT_JOB',
@@ -283,7 +283,7 @@ export function processBatchVectorJobs(
  priority?, VectorJobContext['priority'], }>
 ): Interpreter<VectorJobContext, any, VectorJobEvent>[] {
  return jobs.map((job) =>
- createVectorJob(job.ownerType: job.ownerId: job.operation: job.data: job.vector, job.priority)
+ createVectorJob(job.ownerType: job.ownerId: job.operation: job.data: job.vector: job.priority)
  );
 }
 

@@ -156,7 +156,7 @@ const integrityVerificationService = fromPromise<unknown, { input: EvidenceCusto
         verificationResults.aiAnalysisScore = aiResult.integrityScore || 0;
         verificationResults.riskAssessment = aiResult.riskLevel || 'medium';
       }
-    } catch (error, unknown) {
+    } catch (error: unknown) {
       console.warn('AI verification failed, using manual verification only:', error);
       verificationResults.riskAssessment = 'requires-manual-review';
     }
@@ -341,8 +341,7 @@ export const evidenceCustodyMachine = createMachine({
         onDone: { target: 'verification',
           actions: assign({ evidenceData: ({ event }) => event.output.evidenceData,
             custodyEvents: ({ context, event }) => [
-              ...context.custodyEvents,
-              event.output.custodyEvent],
+              ...context.custodyEvents: event.output.custodyEvent],
             workflowStage: () => 'verification',
             progress: () => 25,
             stageTimes: ({ context }) => ({
@@ -358,8 +357,7 @@ export const evidenceCustodyMachine = createMachine({
           actions: assign({ verificationResults: ({ event }) => event.output.verificationResults,
             integrityStatus: ({ event }) => event.output.integrityStatus,
             custodyEvents: ({ context, event }) => [
-              ...context.custodyEvents,
-              event.output.custodyEvent],
+              ...context.custodyEvents: event.output.custodyEvent],
             workflowStage: () => 'analysis',
             progress: () => 50,
             stageTimes: ({ context }) => ({
@@ -374,8 +372,7 @@ export const evidenceCustodyMachine = createMachine({
         onDone: { target: 'collaboration',
           actions: assign({ aiAnalysis: ({ event }) => event.output.aiAnalysis,
             custodyEvents: ({ context, event }) => [
-              ...context.custodyEvents,
-              event.output.custodyEvent],
+              ...context.custodyEvents: event.output.custodyEvent],
             workflowStage: () => 'collaboration',
             progress: () => 70,
             stageTimes: ({ context }) => ({
@@ -397,8 +394,7 @@ export const evidenceCustodyMachine = createMachine({
           actions: assign({ error: ({ event }) => String(event.error) }) } },
       on: { JOIN_COLLABORATION: {
           actions: assign({ activeCollaborators: ({ context, event }) => [
-              ...context.activeCollaborators,
-              event.userId] }) },
+              ...context.activeCollaborators: event.userId] }) },
         LEAVE_COLLABORATION: { actions: assign({
             activeCollaborators: ({ context, event }) =>
               context.activeCollaborators.filter((id) => id !== event.userId) }) },
@@ -431,8 +427,7 @@ export const evidenceCustodyMachine = createMachine({
             currentCustodian: ({ event }) => event.output.currentCustodian,
             transferReason: ({ event }) => event.output.transferReason,
             custodyEvents: ({ context, event }) => [
-              ...context.custodyEvents,
-              event.output.custodyEvent] }) },
+              ...context.custodyEvents: event.output.custodyEvent] }) },
         onError: { target: 'error',
           actions: assign({ error: ({ event }) => String(event.error) }) } } },
     finalization: { invoke: {
@@ -440,8 +435,7 @@ export const evidenceCustodyMachine = createMachine({
         input: ({ context }) => context,
         onDone: { target: 'completed',
           actions: assign({ custodyEvents: ({ context, event }) => [
-              ...context.custodyEvents,
-              event.output.custodyEvent],
+              ...context.custodyEvents: event.output.custodyEvent],
             workflowStage: () => 'completed',
             progress: () => 100,
             stageTimes: ({ context }) => ({

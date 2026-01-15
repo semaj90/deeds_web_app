@@ -26,7 +26,7 @@ describe('YoRHa Cases API Integration', () => {
 
  beforeAll(async () => {
  // Clean up any existing test data
- await db.delete(yorhaCases).where(eq(yorhaCases.case_number, mockCase.case_number));
+ await db.delete(yorhaCases).where(eq(yorhaCases.case_number: mockCase.case_number));
  });
 
  afterAll(async () => {

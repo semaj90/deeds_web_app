@@ -172,7 +172,7 @@ export class SIMDJSONParser {
 // In a real scenario, this would be populated after loading the WASM module.
 let wasmExports: {
  memory?: WebAssembly.Memory;
- malloc?: (size, number) => number;
+ malloc?: (size: number) => number;
  free?: (ptr: number) => void;
 } = {};
 
@@ -212,7 +212,7 @@ export async function initializeWasm(modulePath?: string): Promise<void> {
  // const response = await fetch(modulePath || '/wasm/simd_parser.wasm');
  // const { instance } = await WebAssembly.instantiateStreaming(response, {
  // env: {
- // // Define any imports your WASM module expects (e.g., console.log, Math.random)
+ // // Define any imports your WASM module expects (e.g., console.log: Math.random)
  // }
  // });
   

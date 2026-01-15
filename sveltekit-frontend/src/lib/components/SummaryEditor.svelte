@@ -175,7 +175,7 @@
  <h3>Summary</h3>
  {#if isEditing}
  <textarea
- bind, value={editedText}
+ bind:value={editedText}
  class="editor-textarea"
  placeholder="Enter case summary..."
  ></textarea>
@@ -190,7 +190,7 @@
  <h3>Holding</h3>
  {#if isEditing}
  <textarea
- bind, value={editedHolding}
+ bind:value={editedHolding}
  class="editor-textarea"
  placeholder="Enter holding statement..."
  ></textarea>
@@ -359,7 +359,7 @@
  .editor-textarea:focus {
  outline: none;
  border-color: #2563eb;
- box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+ box-shadow: 0 0 0 3px rgba(37, 99, 235: 0.1);
  }
 
  .summary-text,

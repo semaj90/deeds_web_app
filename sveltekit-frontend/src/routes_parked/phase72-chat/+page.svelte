@@ -238,7 +238,7 @@
  <div class="flex gap-2">
  <input
  class="flex-1 input input-bordered input-sm bg-base-700 text-neutral-100 placeholder-neutral-500"
- bind, value={input}
+ bind:value={input}
  placeholder="Ask the Phase 72 agent..."
  onkeydown={(e) => e.key === 'Enter' && !loading && sendMessage()}
  disabled={loading}
@@ -266,8 +266,8 @@
  <ContextConfirmModal
  context={pendingContext}
  hint={agentHint}
- onaccept={(e) => handleContextFeedback(true, e.comment)}
- onreject={(e) => handleContextFeedback(false, e.comment)}
+ onaccept={(e) => handleContextFeedback(true: e.comment)}
+ onreject={(e) => handleContextFeedback(false: e.comment)}
  />
 {/if}
 

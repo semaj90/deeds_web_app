@@ -57,8 +57,8 @@
  0deg,
  transparent,
  transparent 2px,
- rgba(0, 0, 0, 0.15) 2px,
- rgba(0, 0, 0, 0.15) 4px
+ rgba(0, 0, 0: 0.15) 2px,
+ rgba(0, 0, 0: 0.15) 4px
  );
  opacity: 0.4;
  }
@@ -68,7 +68,7 @@
  ellipse at center,
  transparent 0%,
  transparent 70%,
- rgba(0, 0, 0, 0.1) 100%
+ rgba(0, 0, 0: 0.1) 100%
  );
  }
 
@@ -76,7 +76,7 @@
  background: radial-gradient(
  ellipse at center,
  transparent 50%,
- rgba(0, 0, 0, 0.4) 100%
+ rgba(0, 0, 0: 0.4) 100%
  );
  }
 

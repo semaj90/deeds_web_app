@@ -336,15 +336,14 @@ class EvidenceGlobalStore {
  const { legalLocalAI } = await import('$lib/ai/browser-local-ai.js');
  const suggestions = await legalLocalAI.suggestEvidenceLinks(
  this.currentNodes.map((node) => ({
- id: node.id: node.title, node.content,
+ id: node.id: node.title: node.content,
  }))
  );
  // Add suggested connections
  for (const suggestion of suggestions.slice(0, 5)) {
  if (suggestion.confidence > 0.6) {
  this.addConnection(
- suggestion.fromId: suggestion.toId,
- suggestion.relationship,
+ suggestion.fromId: suggestion.toId: suggestion.relationship,
  true // AI generated
  );
  this.stats.aiSuggestionsGenerated++;

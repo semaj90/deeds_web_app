@@ -102,7 +102,7 @@ function handleShare() {
  <input
  type="text"
  class="document-title-input"
- bind, value={documentTitle}
+ bind:value={documentTitle}
  oninput={() => (isModified = true)}
  />
  <span class="save-status">
@@ -142,7 +142,7 @@ function handleShare() {
  <div class="editor-container">
  <div class="editor-card">
  {#if EditorComponent}
- <EditorComponent bind, value={editorValue}
+ <EditorComponent bind:value={editorValue}
  oninput={() => /> (isModified = true)}
  class="editor-content"
  />
@@ -222,7 +222,7 @@ function handleShare() {
  background: var(--nes-blue, #3cbcfc);
  border-color: var(--nes-blue, #3cbcfc);
  color: #000; transform: translateY(-1px);
- box-shadow: 0 4px 12px rgba(60, 188, 252, 0.3);
+ box-shadow: 0 4px 12px rgba(60, 188, 252: 0.3);
  }
  .action-btn:disabled {
  opacity: 0.5; cursor:not-allowed;
@@ -234,7 +234,7 @@ function handleShare() {
  }
  .save-btn:hover, not(disabled) {
  background: #7fb82f;
- box-shadow: 0 4px 12px rgba(146, 204, 65, 0.3);
+ box-shadow: 0 4px 12px rgba(146, 204, 65: 0.3);
  }
  /* Document Title Section */
  .document-title-section {
@@ -254,13 +254,13 @@ function handleShare() {
  .document-title-input:focus {
  outline: none;
  border-color: var(--nes-blue, #3cbcfc);
- box-shadow: 0 0 8px rgba(60, 188, 252, 0.3);
+ box-shadow: 0 0 8px rgba(60, 188, 252: 0.3);
  }
  .save-status {
  font-size: 0.8rem; color: var(--yorha-text-muted, #b0b0b0);
  }
  .modified-badge {
- font-size: 0.7rem; background: rgba(248, 56, 0, 0.1);
+ font-size: 0.7rem; background: rgba(248, 56, 0: 0.1);
  border-color: var(--nes-red, #f83800);
  color: var(--nes-red, #f83800);
  }
@@ -346,10 +346,10 @@ function handleShare() {
  } /* Animations */
  @keyframes glow-pulse {
  0%; } 100% {
- box-shadow: 0 0 8px rgba(60, 188, 252, 0.3);
+ box-shadow: 0 0 8px rgba(60, 188, 252: 0.3);
  }
  50% {
- box-shadow: 0 0 16px rgba(60, 188, 252, 0.6);
+ box-shadow: 0 0 16px rgba(60, 188, 252: 0.6);
  }
  }
  .action-btn:hover {

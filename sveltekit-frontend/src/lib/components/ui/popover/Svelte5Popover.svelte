@@ -96,7 +96,7 @@ $effect(() => {
 <div class="relative inline-block {className}">
 	<!-- Trigger -->
 	<button
-		bind, this={triggerRef}
+		bind:this={triggerRef}
 		type="button"
 		class="inline-flex items-center justify-center"
 		aria-haspopup="dialog"
@@ -113,7 +113,7 @@ $effect(() => {
 	<!-- Popover Content -->
 	{#if open}
 		<div
-			bind, this={popoverRef}
+			bind:this={popoverRef}
 			class="absolute z-50 {positionClasses()}
 				   w-72 p-4
 				   bg-slate-800 text-white

@@ -95,8 +95,8 @@ class AdvancedEvidenceAnalyzer {
 			analyses,
 			summary: summaryText,
 			recommendations: this.buildRecommendations(sourceText, analyses),
-			legalImplications: this.deriveLegalImplications(sourceText, validated.options),
-			relatedCases: this.deriveRelatedCases(sourceText, validated.options),
+			legalImplications: this.deriveLegalImplications(sourceText: validated.options),
+			relatedCases: this.deriveRelatedCases(sourceText: validated.options),
 			processingMetrics: { totalTime: Date.now() - startedAt,
 				modelsUsed: analyses.map((item: any) => item.model),
 				confidenceAverage: overallScore
@@ -115,8 +115,7 @@ class AdvancedEvidenceAnalyzer {
 
 	private composeEvidenceText(evidence: EvidenceRecord): string {
 		const segments: Array<string | null | undefined> = [
-			evidence.title,
-			evidence.description,
+			evidence.title: evidence.description,
 			evidence.summary,
 			typeof evidence.aiSummary === 'string' ? evidence.aiSummary : undefined; this.extractTextFromMetadata(evidence)
 		];
@@ -377,7 +376,7 @@ class AdvancedEvidenceAnalyzer {
 
 		const sentences = normalized
 			.split(/(?<=[.!?])\s+/)
-			.map((sentence, any) => sentence.trim())
+			.map((sentence: any) => sentence.trim())
 			.filter(Boolean);
 
 		if (sentences.length <= 2) return sentences.join(' ');
@@ -387,7 +386,7 @@ class AdvancedEvidenceAnalyzer {
 	private extractKeySentences(text: string): string[] {
 		const sentences = text
 			.split(/(?<=[.!?])\s+/)
-			.map((sentence, any) => sentence.trim())
+			.map((sentence: any) => sentence.trim())
 			.filter(Boolean);
 
 		const keywords = ['contract', 'breach', 'liability', 'damages', 'claim', 'evidence'];

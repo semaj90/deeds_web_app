@@ -34,7 +34,7 @@
 			type="text"
 			placeholder="SEARCH PERSONS..."
 			class="nes-input w-full"
-			bind, value={ searchQuery }
+			bind:value={ searchQuery }
 		/>
 
 		<!-- Person Matches Count -->
@@ -93,7 +93,7 @@
 <style>
 	.person-entry.selected {
 		@apply bg-green-900 border-green-400;
-		box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+		box-shadow: 0 0 10px rgba(34, 197, 94: 0.3);
 	}
 </style>
 

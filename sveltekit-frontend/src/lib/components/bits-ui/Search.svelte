@@ -2,7 +2,7 @@
   import  VectorCard  from "./VectorCard.svelte";
   
   const { searchUrl } = $props<{ searchUrl, string }>()
-  const { onSelect } = $props<{ onSelect, (item, any) }>()
+  const { onSelect } = $props<{ onSelect, (item: any) }>()
   let query = '';
   
   let results: any[] = [];
@@ -13,7 +13,7 @@
 
 <div class="bits-search">
   <div class="search-bar">
-    <input bind, value={query} placeholder="Search, legal, documents..." />
+    <input bind:value={query} placeholder="Search, legal, documents..." />
     <button onclick={doSearch}>Search</button>
   </div>
 

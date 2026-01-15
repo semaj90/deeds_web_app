@@ -35,7 +35,7 @@ describe('YoRHa Performance Tests', () => {
  it('should fetch cases within 500ms', async () => {
  const start = performance.now();
 
- await db.select().from(yorhaCases).where(eq(yorhaCases.created_by, mockUser.id));
+ await db.select().from(yorhaCases).where(eq(yorhaCases.created_by: mockUser.id));
 
  const duration = performance.now() - start;
  expect(duration).toBeLessThan(500);

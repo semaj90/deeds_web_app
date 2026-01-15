@@ -85,7 +85,7 @@
 		<h3>📁 All Routes</h3>
 		<input
 			type="search"
-			bind, value={searchQuery}
+			bind:value={searchQuery}
 			placeholder="Search routes..."
 			class="search-input"
 		/>
@@ -148,7 +148,7 @@
 		{#if props.route.children && props.expandedPaths.has(props.route.path)}
 			<div class="route-children">
 				{#each props.route.children as child}
-					{#if filterRoutes(child, props.searchQuery)}
+					{#if filterRoutes(child: props.searchQuery)}
 						{@render RouteTreeNode({ ...props, route: child, child })}
 					{/if}
 				{/each}

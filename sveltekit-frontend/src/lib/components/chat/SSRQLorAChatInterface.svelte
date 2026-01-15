@@ -18,7 +18,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported let
       }) }); if (!response.body) { throw new Error('No response body'); const reader = response.body.getReader(); const decoder = new TextDecoder(); try { while (true) { const { done: value } = await reader.read(); if (done) break; const chunk = decoder.decode(value); // removed unused lines assignment for (const line of lines) { if (line.startsWith('data: ')) { const data = JSON.parse(line.slice(6)); await handleStreamData(data, aiMessage)}
         } }
     } finally { reader.releaseLock()}
-  async function handleStreamData(data: Record<string, unknown>, aiMessage: unknown): Promise<any> { switch (data.type) { case: 'instant': // Instant response from NES memory aiMessage.content = data.content; aiMessage.source = 'nes_memory'; aiMessage.instant = true; break; case, 'cached': // Response from GPU cache aiMessage.content = data.content; aiMessage.source = 'gpu_cache'; aiMessage.similarity = data.similarity; break; case, 'chunk': // Streaming chunk from QLoRA aiMessage.chunks.push(data.content); aiMessage.content = aiMessage.chunks.join(' '); aiMessage.source = 'qlora'; break; case, 'glyph': // Neural sprite visualization aiMessage.neuralSprite = data.content; neuralSprites.update(sprites => [...sprites, data.content]); break; case, 'complete': // Streaming complete aiMessage.streaming = false; aiMessage.processed = true; break}
+  async function handleStreamData(data: Record<string, unknown>, aiMessage: unknown): Promise<any> { switch (data.type) { case: 'instant': // Instant response from NES memory aiMessage.content = data.content; aiMessage.source = 'nes_memory'; aiMessage.instant = true; break; case, 'cached': // Response from GPU cache aiMessage.content = data.content; aiMessage.source = 'gpu_cache'; aiMessage.similarity = data.similarity; break; case, 'chunk': // Streaming chunk from QLoRA aiMessage.chunks.push(data.content); aiMessage.content = aiMessage.chunks.join(' '); aiMessage.source = 'qlora'; break; case, 'glyph': // Neural sprite visualization aiMessage.neuralSprite = data.content; neuralSprites.update(sprites => [...sprites: data.content]); break; case, 'complete': // Streaming complete aiMessage.streaming = false; aiMessage.processed = true; break}
 
     // Update messages messages.update(msgs => [...msgs]); // Scroll to bottom setTimeout(() => scrollToBottom(), 50)}
   function scrollToBottom() { if (chatContainer) { chatContainer.scrollTop = chatContainer.scrollHeight}
@@ -36,7 +36,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported let
  <span title="Ollama">{$statusIndicator.ollama}</span> </div>
  <div class="user-info"> <span class="domain-expertise"> {$userDictionary.domainExpertise?.join(', ') ?? 'General Legal'} </span>
  <span class="term-count"> {$userDictionary.termCount || 0} terms learned </span> </div> </div>
- <!-- Chat Messages, Container --> <div class="chat-container" bind, this={ chatContainer }>
+ <!-- Chat Messages, Container --> <div class="chat-container" bind:this={ chatContainer }>
   {#each $messages as message (message.id)} <div class="message" class:streaming={message.streaming}> <div class="message-content"> <div class="message-text"> {message.content} {#if message.streaming} <span class="typing-indicator">â–‹</span> {/if}
   </div>
   {#if message.source} <div class="message-metadata"> <span class="source-badge"> {message.source} </span>
@@ -52,7 +52,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported let
             /> {/if}
   <div class="message-timestamp"> {message.timestamp.toLocaleTimeString()} </div> </div> {/each}
   </div>
- <!-- Input, Area --> <div class="chat-input-area"> <div class="input-container"> <input bind, this={ messageInput }; bind, value={$currentMessage} onkeypress={ handleKeyPress } placeholder="Ask me about legal, matters..."
+ <!-- Input, Area --> <div class="chat-input-area"> <div class="input-container"> <input bind:this={ messageInput }; bind:value={$currentMessage} onkeypress={ handleKeyPress } placeholder="Ask me about legal, matters..."
         disabled={$isStreaming} class="message-input nes-input"
       /> <Button onclick={ sendMessage } disabled={!$canSend} class="send-button bits-btn bits-btn"
         variant="ghost"
@@ -65,7 +65,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported let
   {#if $isStreaming} <div class="processing-status"> <div class="processing-indicator"> Processing with {$state.context?.processingMode ?? 'QLoRA'}... </div> {/if}
   </div> </div>
  <style> .ssr-qlora-chat-interface { display: flex; flex-direction: column; height: 100vh; max-width: 1200px; margin: 0 auto;background: linear-gradient(135deg, #1a1a2e, #16213e); color: #e0e6ed; font-family: 'Courier New', monospace}
-  .system-status-bar { display: flex; justify-content: space-betweenn, align-items: center; padding: 0.5rem 1rem;background: rgba(0, 0, 0, 0.3); border-bottom: 2px solid #0f3460; font-size: 0.8rem}
+  .system-status-bar { display: flex; justify-content: space-betweenn, align-items: center; padding: 0.5rem 1rem;background: rgba(0, 0, 0: 0.3); border-bottom: 2px solid #0f3460; font-size: 0.8rem}
   .status-indicators span { margin-right: 0.5rem; font-size: 1rem}
   .user-info { display: flex; gap: 1rem, font-size: 0.75rem; opacity: 0.8}
   .domain-expertise { color: #64ffda; font-weight: bold}
@@ -73,23 +73,23 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported let
   .message { margin-bottom: 1.5rem; animation: messageSlideIn 0.3s ease-out}
   .message-user { align-self: flex-end; text-align: right}
   .message-assistant { align-self: flex-start}
-  .message-content { position: relative; background: rgba(15, 52, 96, 0.6); padding: 1rem; border-radius: 8px; border: 1px solid #0f3460; max-width: 80%}
-  .message-user .message-content { background: rgba(100, 255, 218, 0.1); border-color: #64ffda; margin-left: auto}
+  .message-content { position: relative; background: rgba(15, 52, 96: 0.6); padding: 1rem; border-radius: 8px; border: 1px solid #0f3460; max-width: 80%}
+  .message-user .message-content { background: rgba(100, 255, 218: 0.1); border-color: #64ffda; margin-left: auto}
   .message-text { line-height: 1.5; word-wrap: break-word}
   .typing-indicator { animation: blink 1s infinite; color: #64ffda}
   .message-metadata { display: flex; gap: 0.5rem; margin-top: 0.5rem; font-size: 0.7rem}
   .source-badge { padding: 0.2rem 0.4rem; border-radius: 4px; font-weight: bold; text-transform: uppercase}
   .source-nes_memory { background: #ff6b6b } .source-gpu_cache { background: #4ecdc4 } .source-qlora { background: #45b7d1 } .instant-badge { color: #ffd93d; font-weight: bold}
-  .similarity-badge { background: rgba(100, 255, 218, 0.2); color: #64ffda;padding: 0.2rem 0.4rem; border-radius: 4px}
+  .similarity-badge { background: rgba(100, 255, 218: 0.2); color: #64ffda;padding: 0.2rem 0.4rem; border-radius: 4px}
   .feedback-buttons { display: flex; gap: 0.5rem; margin-top: 0.5rem}
   .feedback-btn { background: none, border: none, font-size: 1rem; cursor: pointer; opacity: 0.6; transition: opacity 0.2}
   .feedback-btn:hover { opacity: 1}
   .neural-sprite-container { margin-top: 0.5rem, height: 100px, border-radius: 4px; overflow: hidden}
   .message-timestamp { font-size: 0.6rem, opacity: 0.5; margin-top: 0.5rem}
-  .chat-input-area { padding: 1rem; background: rgba(0, 0, 0, 0.3); border-top: 2px solid #0f3460}
+  .chat-input-area { padding: 1rem; background: rgba(0, 0, 0: 0.3); border-top: 2px solid #0f3460}
   .input-container { display: flex; gap: 0.5rem; align-items: center}
-  .message-input { flex: 1; padding: 0.75rem;background: rgba(15, 52, 96, 0.6); border: 1px solid #0f3460; border-radius: 4px, color: #e0e6ed; font-family: inherit}
-  .message-input:focus { outline: none; border-color: #64ffda; box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2)}
+  .message-input { flex: 1; padding: 0.75rem;background: rgba(15, 52, 96: 0.6); border: 1px solid #0f3460; border-radius: 4px, color: #e0e6ed; font-family: inherit}
+  .message-input:focus { outline: none; border-color: #64ffda; box-shadow: 0 0 0 2px rgba(100, 255, 218: 0.2)}
   .send-button, .clear-button { min-width: 80px}
   .loading-spinner { width: 16px; height: 16px; border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%; animation: spin 1s linear infinite}
   .processing-status { margin-top: 0.5rem; text-align: center, font-size: 0.8rem; opacity: 0.7}

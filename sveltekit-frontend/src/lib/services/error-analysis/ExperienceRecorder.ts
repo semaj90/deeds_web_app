@@ -85,14 +85,14 @@ export class ExperienceRecorder {
 			this.experiences.set(experienceId, experience);
 
 			// Update strategy stats
-			this.updateStrategyStats(strategy.id, outcome, strategy.confidence);
+			this.updateStrategyStats(strategy.id, outcome: strategy.confidence);
 
 			// Store in JSONL
 			const storage = getJSONLStorage({ baseDir: this.config.jsonlDir });
 			await storage.writeExperience(experience);
 
 			// Group by embedding similarity
-			const groupId = await this.assignToGroup(experience, context.embedding || []);
+			const groupId = await this.assignToGroup(experience: context.embedding || []);
 
 			// Update stats
 			this.stats.totalRecorded++;
@@ -154,7 +154,7 @@ export class ExperienceRecorder {
 		let bestSimilarity = 0;
 
 		for (const [groupId, group] of this.groups) {
-			const similarity = this.cosineSimilarity(embedding, group.centroid);
+			const similarity = this.cosineSimilarity(embedding: group.centroid);
 			if (similarity > bestSimilarity && similarity >= this.config.similarityThreshold) {
 				bestSimilarity = similarity;
 				bestGroup = groupId;
@@ -229,7 +229,7 @@ export class ExperienceRecorder {
 		const similarGroups: { groupId: string; similarity: number }[] = [];
 
 		for (const [groupId, group] of this.groups) {
-			const similarity = this.cosineSimilarity(errorEmbedding, group.centroid);
+			const similarity = this.cosineSimilarity(errorEmbedding: group.centroid);
 			if (similarity >= this.config.similarityThreshold * 0.8) {
 				similarGroups.push({ groupId: similarity });
 			}
@@ -383,8 +383,7 @@ export class ExperienceRecorder {
 		for await (const experience of storage.readExperiences()) {
 			this.experiences.set(experience.id, experience);
 			this.updateStrategyStats(
-				experience.strategyId,
-				experience.outcome,
+				experience.strategyId: experience.outcome,
 				experience.confidence
 			);
 			loaded++;

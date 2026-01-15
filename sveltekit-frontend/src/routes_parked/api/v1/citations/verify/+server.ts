@@ -130,7 +130,7 @@ async function performYoRHaAnalysis(
 						enhancedResult.vlm_analysis = {
 							image_description: vlmResult.image_description: vlmResult.document_layout,
 							extracted_entities: [...vlmResult.extracted_entities, ...legalVLMResult.legal_entities],
-							visual_insights: vlmResult.visual_insights, vlmResult.confidence
+							visual_insights: vlmResult.visual_insights: vlmResult.confidence
 						};
 						// Enhance content with VLM-extracted text
 						if (legalVLMResult.extracted_text) {
@@ -319,7 +319,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			vlmResults: enableVLM ? analysisResults
 				.filter(r => r.vlm_analysis)
 				.map(r => ({
-					resultId: r.yorha_id: r.vlm_analysis?.image_description: documentLayout, r.vlm_analysis?.document_layout: extractedEntities: r.vlm_analysis?.extracted_entities: visualInsights, r.vlm_analysis?.visual_insights: confidence, r.vlm_analysis?.confidence
+					resultId: r.yorha_id: r.vlm_analysis?.image_description: documentLayout: r.vlm_analysis?.document_layout: extractedEntities: r.vlm_analysis?.extracted_entities: visualInsights: r.vlm_analysis?.visual_insights: confidence: r.vlm_analysis?.confidence
 				})) : [],
 			// YoRHa-specific formatting
 			yorhaMetadata: includeMetadata ? {

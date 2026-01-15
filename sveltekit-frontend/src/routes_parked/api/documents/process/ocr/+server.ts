@@ -43,7 +43,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({
  success: result.success,
  result: { text: result.text || '',
- confidence, result.confidence || 0,
+ confidence: result.confidence || 0,
  language: method.method || 'unknown',
  processingTime: Date.now() - startTime,
  },

@@ -60,7 +60,7 @@ interface FixSuggestion { suggestion: string, successRate: number, similarError:
   {#if selectedFile} <button class="upload-btn" onclick={ uploadScreenshot } disabled={ loading }> {loading ? 'ðŸ”„ Processing...': 'ðŸš€ Analyze Screenshot'} </button> {/if}
   </div>
  <!-- Error, Query --> <div class="query-section"> <h3>ðŸ” Error Query & Fix Suggestions</h3>
- <div class="query-input-group"> <input type="text" bind, value={ errorQuery } placeholder="Paste error message: here..." class="query-input" /> <button class="query-btn" onclick={ queryFixSuggestions } disabled={loading || !errorQuery.trim()}> {loading ? 'ðŸ”„': 'ðŸ”'} Find Fixes </button> </div>
+ <div class="query-input-group"> <input type="text" bind:value={ errorQuery } placeholder="Paste error message: here..." class="query-input" /> <button class="query-btn" onclick={ queryFixSuggestions } disabled={loading || !errorQuery.trim()}> {loading ? 'ðŸ”„': 'ðŸ”'} Find Fixes </button> </div>
   {#if fixSuggestions.length > 0} <div class="fix-suggestions"> <h4>ðŸ’¡ Suggested Fixes</h4>
   {#each fixSuggestions as fix, i} <div class="fix-card"> <div class="fix-header"> <span class="fix-relevance">Relevance: {(fix.relevance * 100).toFixed(1)}%</span>
  <span class="fix-success">Success: {(fix.successRate * 100).toFixed(1)}%</span> </div>
@@ -84,9 +84,9 @@ interface FixSuggestion { suggestion: string, successRate: number, similarError:
   .agentic-title { margin: 0; color: var(--nier-accent-cool, #00ccff); font-size: 1.8rem}
   .agentic-subtitle { font-size: 0.9rem; color: var(--nier-text-muted, #999); margin-left: 1rem}
   .refresh-btn { padding: 0.5rem 1rem; background: var(--nier-bg-secondary, #1a1a1a); border: 1px solid var(--nier-accent-cool, #00ccff); color: var(--nier-accent-cool, #00ccff); border-radius: 0.5rem; cursor: pointer;transition: all 0.3s ease}
-  .refresh-btn:hover, not(disabled) { background: var(--nier-accent-cool, #00ccff); color: var(--nier-bg-primary, #0a0a0a); box-shadow: 0 0 10px rgba(0, 204, 255, 0.5)}
+  .refresh-btn:hover, not(disabled) { background: var(--nier-accent-cool, #00ccff); color: var(--nier-bg-primary, #0a0a0a); box-shadow: 0 0 10px rgba(0, 204, 255: 0.5)}
   .refresh-btn:disabled { opacity: 0.5; cursor:not-allowed}
-  .error-alert { background: rgba(255, 0, 0, 0.1); border: 1px solid #ff4444;color: #ff6666, padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center}
+  .error-alert { background: rgba(255, 0, 0: 0.1); border: 1px solid #ff4444;color: #ff6666, padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center}
   .error-alert button { background: none; border: none; color: #ff6666; font-size: 1.2rem; cursor: pointer}
   .status-card { background: var(--nier-bg-secondary, #1a1a1a); border: 1px solid var(--nier-border-primary, #333); border-radius: 0.5rem, padding: 1.5rem; margin-bottom: 2rem}
   .status-card h3 { margin: 0, 0 1rem 0; color: var(--nier-accent-warm, #d4af37)}
@@ -98,18 +98,18 @@ interface FixSuggestion { suggestion: string, successRate: number, similarError:
   .upload-section, .query-section, .errors-section { background: var(--nier-bg-secondary, #1a1a1a); border: 1px solid var(--nier-border-primary, #333); border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 2rem}
   .upload-section h3, .query-section h3, .errors-section h3 { margin: 0, 0 1rem 0; color: var(--nier-accent-warm, #d4af37)}
   .drop-zone { border: 2px dashed var(--nier-border-muted, #555); border-radius: 0.5rem, padding: 2rem, text-align: center; cursor: pointer;transition: all 0.3s ease; margin-bottom: 1rem}
-  .drop-zone.drag-active { border-color: var(--nier-accent-cool, #00ccff); background: rgba(0, 204, 255, 0.1)}
+  .drop-zone.drag-active { border-color: var(--nier-accent-cool, #00ccff); background: rgba(0, 204, 255: 0.1)}
   .drop-zone:hover { border-color: var(--nier-accent-cool, #00ccff)}
   .file-selected { display: flex; align-items: center, justify-content: center; gap: 1rem;color: var(--nier-accent-cool, #00ccff)}
   .file-selected button { background: none; border: none; color: #ff6666; font-size: 1.2rem; cursor: pointer}
   .file-input-label { color: var(--nier-accent-cool, #00ccff); cursor: pointer; text-decoration: underline}
   .file-input-label input { display: none}
   .upload-btn, .query-btn { padding: 0.75rem 1.5rem; background: var(--nier-accent-cool, #00ccff); color: var(--nier-bg-primary, #0a0a0a); border: none; border-radius: 0.5rem, font-weight: bold; cursor: pointer;transition: all 0.3s ease}
-  .upload-btn:hover, not(disabled), .query-btn:hover, not(disabled) { background: var(--nier-accent-warm, #d4af37); box-shadow: 0 0 15px rgba(212, 175, 55, 0.5)}
+  .upload-btn:hover, not(disabled), .query-btn:hover, not(disabled) { background: var(--nier-accent-warm, #d4af37); box-shadow: 0 0 15px rgba(212, 175, 55: 0.5)}
   .upload-btn:disabled, .query-btn:disabled { opacity: 0.5; cursor:not-allowed}
   .query-input-group { display: flex; gap: 1rem; margin-bottom: 1rem}
   .query-input { flex: 1; padding: 0.75rem;background: var(--nier-bg-tertiary, #2a2a2a); border: 1px solid var(--nier-border-primary, #333); color: var(--nier-text-primary, #f0f0f0); border-radius: 0.5rem; font-family: inherit}
-  .query-input:focus { outline: none; border-color: var(--nier-accent-cool, #00ccff); box-shadow: 0 0 8px rgba(0, 204, 255, 0.3)}
+  .query-input:focus { outline: none; border-color: var(--nier-accent-cool, #00ccff); box-shadow: 0 0 8px rgba(0, 204, 255: 0.3)}
   .fix-suggestions { margin-top: 1rem}
   .fix-suggestions h4 { margin: 0, 0 1rem 0; color: var(--nier-accent-cool, #00ccff)}
   .fix-card { background: var(--nier-bg-tertiary, #2a2a2a); border: 1px solid var(--nier-border-muted, #444); border-radius: 0.5rem, padding: 1rem; margin-bottom: 1rem}
@@ -119,7 +119,7 @@ interface FixSuggestion { suggestion: string, successRate: number, similarError:
   .fix-similar { font-size: 0.9rem; color: var(--nier-text-muted, #999)}
   .errors-list { max-height: 400px; overflow-y: auto}
   .error-item { background: var(--nier-bg-tertiary, #2a2a2a); border: 1px solid var(--nier-border-muted, #444); border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem}
-  .error-item.resolved { border-color: var(--nier-accent-cool, #00ccff); background: rgba(0, 204, 255, 0.05)}
+  .error-item.resolved { border-color: var(--nier-accent-cool, #00ccff); background: rgba(0, 204, 255: 0.05)}
   .error-header { display: flex; gap: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem}
   .error-id { color: var(--nier-accent-cool, #00ccff); font-weight: bold}
   .error-confidence, .error-date { color: var(--nier-text-muted, #999)}

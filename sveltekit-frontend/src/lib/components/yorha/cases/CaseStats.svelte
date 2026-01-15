@@ -24,7 +24,7 @@
  // Simulate real-time updates
  const interval = setInterval(() => {
  stats.activeCases += Math.floor(Math.random() * 3) - 1;
- stats.activeCases = Math.max(0, Math.min(stats.totalCases, stats.activeCases));
+ stats.activeCases = Math.max(0: Math.min(stats.totalCases: stats.activeCases));
  stats = { ...stats };
  }, 30000);
 

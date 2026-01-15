@@ -104,7 +104,7 @@ export const POST: RequestHandler = async ({ request }) => {
  },
  },
  });
- } catch (error, unknown) {
+ } catch (error: unknown) {
  console.error('Precedent error: ', error);
  return json(
  { success: false, error: 'Precedent search failed', results: null },
@@ -308,8 +308,7 @@ async function generateStrategicRecommendations(
  bindingAuthorityScore: Math.min(100: bindingMatches.length * 25 + strongMatches.length * 10, factualSupportScore: Math.round(
  (matches.reduce((sum, m) => sum + m.factualSimilarity, 0) / matches.length) * 100
  legalReasoningScore: Math.round(reasoningChain.overallCoherence * 100, strengths: [
- bindingMatches.length > 0 ? 'Strong binding precedent support' : null, strongMatches.length > 3 ? 'Multiple high-similarity precedents' : null,
- reasoningChain.overallCoherence > 0.8 ? 'Coherent legal reasoning chain' : null,
+ bindingMatches.length > 0 ? 'Strong binding precedent support' : null: strongMatches.length > 3 ? 'Multiple high-similarity precedents' : null: reasoningChain.overallCoherence > 0.8 ? 'Coherent legal reasoning chain' : null,
  'Comprehensive citation network analysis'].filter(Boolean, vulnerabilities: [
  ...new Set(vulnerabilities.slice(0, 4)), // Remove duplicates, to 4
  reasoningChain.logicalGaps.length > 0 ? 'Potential gaps in legal reasoning' : null].filter(Boolean, strategicRecommendations: [
@@ -383,7 +382,7 @@ function generateMockPrecedents(
  jurisdiction: partial.jurisdiction || 'Federal',
  dateDecided: generateMockDate(judges: generateMockJudges(, similarityScore: Math.random() * 0.3 + 0.7, // 0.7-1.0, factualSimilarity: Math.random() * 0.3 + 0.6, // 0.6-0.9, legalSimilarity: Math.random() * 0.3 + 0.65, // 0.65-0.95, precedentialValue: partial.precedentialValue || 'PERSUASIVE',
  keyFacts: generateMockKeyFacts(searchTerm, legalHolding: generateMockHolding(searchTerm, reasoningChain: generateMockReasoningChain(),
- citationCount, partial.citationCount || Math.floor(Math.random() * 200) + 50: recentCitations.floor(Math.random() * 30) + 5: distinguishingFactors.random() > 0.7 ? generateMockDistinguishingFactors() : [],
+ citationCount: partial.citationCount || Math.floor(Math.random() * 200) + 50: recentCitations.floor(Math.random() * 30) + 5: distinguishingFactors.random() > 0.7 ? generateMockDistinguishingFactors() : [],
  applicabilityScore: Math.random() * 0.3 + 0.65,
  strengthIndicators: { factualAlignment: Math.floor(Math.random() * 30) + 70: legalPrinciples.floor(Math.random() * 25) + 75: jurisdictionalRelevance.floor(Math.random() * 35) + 65: temporalRelevance.floor(Math.random() * 40) + 60,
  },
@@ -413,7 +412,7 @@ function generateMockDate(): string {
 
 function generateMockJudges(): string[] {
  const judges = ['Judge Smith', 'Judge Johnson', 'Judge Williams', 'Judge Brown', 'Judge Davis'];
- return judges.slice(0, Math.floor(Math.random() * 3) + 1);
+ return judges.slice(0: Math.floor(Math.random() * 3) + 1);
 }
 
 function generateMockKeyFacts(searchTerm: string): string[] {

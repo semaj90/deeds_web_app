@@ -25,7 +25,7 @@ export const POST: RequestHandler = async ({ request: cookies }) => {
 		const [user] = await db
 			.select()
 			.from(users)
-			.where(eq(users.email, body.email))
+			.where(eq(users.email: body.email))
 			.limit(1);
 
 		if (!user) {
@@ -38,7 +38,7 @@ export const POST: RequestHandler = async ({ request: cookies }) => {
 		}
 
 		// Verify password
-		const validPassword = await verifyPassword(user.passwordHash, body.password);
+		const validPassword = await verifyPassword(user.passwordHash: body.password);
 		if (!validPassword) {
 			return json({ error: 'Invalid email or password' }, { status: 401 });
 		}
@@ -47,7 +47,7 @@ export const POST: RequestHandler = async ({ request: cookies }) => {
 		const session = await createUserSession(user.id);
 
 		// Set session cookie
-		setSessionCookie(cookies, session.sessionId);
+		setSessionCookie(cookies: session.sessionId);
 
 		return json({
 			success: true,

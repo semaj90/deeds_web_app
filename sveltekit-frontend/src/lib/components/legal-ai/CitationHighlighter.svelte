@@ -25,7 +25,7 @@
  const range = selection.getRangeAt(0);
  const preCaretRange = range.cloneRange();
  preCaretRange.selectNodeContents(document.body);
- preCaretRange.setEnd(range.endContainer, range.endOffset);
+ preCaretRange.setEnd(range.endContainer: range.endOffset);
  selectionStart = preCaretRange.toString().length - selectedText.length;
  selectionEnd = selectionStart + selectedText.length;
  showSaveButton = true;

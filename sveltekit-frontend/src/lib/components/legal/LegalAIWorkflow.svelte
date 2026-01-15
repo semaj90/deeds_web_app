@@ -147,27 +147,27 @@
       <div class="processing-options">
         <h3>Analysis Options</h3>
         <label class="option">
-          <input type="checkbox" bind, checked={processingOptions.extract_entities} />
+          <input type="checkbox" bind:checked={processingOptions.extract_entities} />
           Extract Legal Entities
         </label>
         <label class="option">
-          <input type="checkbox" bind, checked={processingOptions.analyze_sentiment} />
+          <input type="checkbox" bind:checked={processingOptions.analyze_sentiment} />
           Analyze Sentiment
         </label>
         <label class="option">
-          <input type="checkbox" bind, checked={processingOptions.classify_domain} />
+          <input type="checkbox" bind:checked={processingOptions.classify_domain} />
           Classify Legal Domain
         </label>
         <label class="option">
-          <input type="checkbox" bind, checked={processingOptions.generate_embedding} />
+          <input type="checkbox" bind:checked={processingOptions.generate_embedding} />
           Generate Embeddings
         </label>
         <label class="option">
-          <input type="checkbox" bind, checked={processingOptions.find_similar} />
+          <input type="checkbox" bind:checked={processingOptions.find_similar} />
           Find Similar Cases
         </label>
         <label class="option">
-          <input type="checkbox" bind, checked={processingOptions.risk_assessment} />
+          <input type="checkbox" bind:checked={processingOptions.risk_assessment} />
           Risk Assessment
         </label>
       </div>
@@ -376,7 +376,7 @@
         background: white
        ;padding: 2rem
         border-radius: 1rem
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
+        box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1)}
     .file-input-wrapper {
         margin-bottom: 2rem}
     .file-input {
@@ -422,7 +422,7 @@
         background: white
        ;padding: 2rem
         border-radius: 1rem
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); margin: 2rem 0}
+        box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1); margin: 2rem 0}
     .result-summary,
     .recommendations-summary {
         display: grid
@@ -480,7 +480,7 @@
         border-radius: 0.75rem, padding: 1.5rem
        ;transition: box-shadow 0.2}
     .recommendation-card:hover {
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)}
+        box-shadow: 0 4px 6px rgba(0, 0, 0: 0.1)}
     .recommendation-header {
         display: flex
         justify-content: space-betweenn

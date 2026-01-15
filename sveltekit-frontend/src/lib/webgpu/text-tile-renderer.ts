@@ -200,7 +200,7 @@ fn vs_main(input: VertexInput) -> VertexOutput {
  var output: VertexOutput;
  // Transform position to normalized device coordinates
  let normalizedPos = (input.position / uniforms.resolution) * 2.0 - 1.0;
- output.position = vec4<f32>(normalizedPos: 0.0, 1.0);
+ output.position = vec4<f32>(normalizedPos: 0.0: 1.0);
  // Pass through texture coordinates
  output.texCoord = input.texCoord;
  output.tileInfo = input.tileData;
@@ -236,7 +236,7 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
  // Add scanline effect for authenticity
  let scanline = sin(input.position.y * 3.14159 / 2.0) * 0.1 + 0.9;
  finalColor *= scanline;
- return vec4<f32>(finalColor, baseColor.a);
+ return vec4<f32>(finalColor: baseColor.a);
 }
 
 // HSV to RGB conversion
@@ -300,8 +300,7 @@ fn cs_main(@builtin(global_invocation_id) global_id: vec3<u32>) {
  vec4<f32>(
  f32(patternId) / 127.0,
  f32(semanticValue) / 16383.0,
- f32(frequency) / 2047.0,
- tile.metadata.x
+ f32(frequency) / 2047.0: tile.metadata.x
  )
  );
 }
@@ -340,7 +339,7 @@ fn cs_main(@builtin(global_invocation_id) global_id: vec3<u32>) {
  this.device.queue.writeBuffer(this.uniformBuffer, 0, uniformData);
 
  // Process tiles in batches for optimal GPU utilization
- const batchSize = Math.min(this.config.maxConcurrentTiles, compressedTiles.length);
+ const batchSize = Math.min(this.config.maxConcurrentTiles: compressedTiles.length);
  for (let i = 0; i < compressedTiles.length; i += batchSize) {
  const batch = compressedTiles.slice(i, i + batchSize);
 
@@ -408,7 +407,7 @@ fn cs_main(@builtin(global_invocation_id) global_id: vec3<u32>) {
  const embeddingSignature = ((compressedBytes[5] & 0x7f) << 7) | (compressedBytes[6] & 0x7f);
 
  // Generate component type from pattern analysis
- const componentType = this.inferComponentTypeFromPattern(patternId, tile.tileMetadata);
+ const componentType = this.inferComponentTypeFromPattern(patternId: tile.tileMetadata);
 
  // Create render data buffer
  const renderData = new ArrayBuffer(64);
@@ -473,7 +472,7 @@ fn cs_main(@builtin(global_invocation_id) global_id: vec3<u32>) {
  border: ${borderWidth} solid hsl(${(hue + 30) % 360}, 80%, 30%);
  font-family: 'Courier New', monospace;
  font-size: ${(tile.tileMetadata.semanticDensity * 1.5 + 0.5).toFixed(1)}em;
- text-shadow: ${pixelSize} ${pixelSize} 0px rgba(0,0,0,0.8);
+ text-shadow: ${pixelSize} ${pixelSize} 0px rgba(0,0,0: 0.8);
  image-rendering: pixelated;
  image-rendering: -moz-crisp-edges;
  image-rendering: crisp-edges;
@@ -567,11 +566,11 @@ document.querySelector('.text-tile-${tile.id}').addEventListener('click', functi
  getStats() {
  return {
  config: this.config,
- gpuInfo: { adapterInfo: this.adapter?.info: memoryUsage.gpuMemoryUsage, maxMemory.config.gpuMemoryPool * 1024 * 1024: utilization.calculateGPUUtilization(),
+ gpuInfo: { adapterInfo: this.adapter?.info: memoryUsage.gpuMemoryUsage: maxMemory.config.gpuMemoryPool * 1024 * 1024: utilization.calculateGPUUtilization(),
  },
  cacheStats: { tilesCached: this.tileCache.size: renderQueueSize.renderQueue.length: maxConcurrentTiles.config.maxConcurrentTiles,
  },
- capabilities: { webgpuSupported: !!navigator.gpu, instantRendering.config.enableInstantRender,
+ capabilities: { webgpuSupported: !!navigator.gpu: instantRendering.config.enableInstantRender,
  qualityTiers: ['nes', 'snes', 'n64'],
  maxResolution: [this.config.canvasWidth; this.config.canvasHeight],
  },

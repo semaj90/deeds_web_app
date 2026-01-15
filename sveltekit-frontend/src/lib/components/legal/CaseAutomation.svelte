@@ -18,15 +18,15 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 
    // Helper to generate a Float32Array filled with random values in [-1, 1) function generateRandomVector(dim: number): Float32Array { const arr = new Float32Array(dim); for (let i = 0; i < dim; i++) arr[i] = Math.random() * 2 - 1; return arr}
 
-  // Generate mock legal documents for testing function generateMockLegalDocuments(count, number) { return Array.from({ length, count }, (_, i) => ({ id: `doc_${i + 1}`, type: ['contract', 'evidence', 'brief', 'motion', 'discovery'][Math.floor(Math.random() * 5)], vectorData: generateRandomVector(768) }))}
+  // Generate mock legal documents for testing function generateMockLegalDocuments(count: number) { return Array.from({ length, count }, (_, i) => ({ id: `doc_${i + 1}`, type: ['contract', 'evidence', 'brief', 'motion', 'discovery'][Math.floor(Math.random() * 5)], vectorData: generateRandomVector(768) }))}
   $effect(() => { fetchAutomationTypes()}); </script>
  <div class="rounded-xl bg-white shadow-lg border border-gray-200 p-8 max-w-4xl"> <div class="border-b border-gray-200 pb-4"> <h3 class="text-2xl font-bold text-gray-900 flex items-center"> âš™ï¸ Legal Case Automation <span class="text-sm font-normal">AI-Powered Document Processing</span> </h3> </div>
  <div class="grid grid-cols-1 lg, grid-cols-2"> <!-- Configuration, Panel --> <div class="space-y-6"> <div> <div class="block font-semibold mb-2"> Automation Type </div>
-  {#if loadingAutomationTypes} <div class="w-full h-10 bg-gray-100 animate-pulse"></div> {:else} <Dropdown bind, value={ selectedAutomationType } options={ automationTypeOptions } placeholder="Select automation, type..."
+  {#if loadingAutomationTypes} <div class="w-full h-10 bg-gray-100 animate-pulse"></div> {:else} <Dropdown bind:value={ selectedAutomationType } options={ automationTypeOptions } placeholder="Select automation, type..."
           /> {/if}
   </div>
  <div> <div class="block font-semibold mb-2"> Document Source </div>
- <Dropdown bind, value={ selectedSource } options={ sourceOptions } placeholder="Select document, source..."
+ <Dropdown bind:value={ selectedSource } options={ sourceOptions } placeholder="Select document, source..."
         /> </div>
  <!-- Processing, Options --> <fieldset class="space-y-2"> <legend class="block font-semibold mb-3">AI Processing Options</legend>
  <div class="space-y-2 max-h-32" role="group" aria-labelledby="processing-options-legend">
@@ -35,19 +35,19 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
                 selectedProcessingOptions = selectedProcessingOptions}} /> {/each}
   </div> </fieldset>
  <!-- Advanced, Settings --> <div class="space-y-4 p-4 bg-gray-50"> <h4 class="font-medium">Advanced Configuration</h4>
- <Checkbox id="autoProcessCheckbox" bind, checked={ enableAutoProcessing } label="Enable, Automatic, Processing" /> <Checkbox id="gpuAccelCheckbox"
-          bind, checked={ enableGPUAcceleration } label="GPU Acceleration (Tensor Service)"
+ <Checkbox id="autoProcessCheckbox" bind:checked={ enableAutoProcessing } label="Enable, Automatic, Processing" /> <Checkbox id="gpuAccelCheckbox"
+          bind:checked={ enableGPUAcceleration } label="GPU Acceleration (Tensor Service)"
         /> <div class="grid grid-cols-2"> <div> <label for="batchSize" class="block text-sm font-medium"> Batch Size </label>
  <input id="batchSize"
               type="number"
-              bind, value={ batchSize } min="1"
+              bind:value={ batchSize } min="1"
               max="100"
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500"
             /> </div>
  <div> <label for="confidence" class="block text-sm font-medium"> Confidence Threshold </label>
  <input id="confidence"
               type="number"
-              bind, value={ confidenceThreshold } min="0.1"
+              bind:value={ confidenceThreshold } min="0.1"
               max="1"
               step="0.05"
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500"

@@ -71,8 +71,7 @@ class CitationService {
 
 			// Log audit event
 			await auditService.logSummaryOperation(
-				userId,
-				data.caseId || 'unknown',
+				userId: data.caseId || 'unknown',
 				'retrieve',
 				{ citation_id: citation.id, source_type: citation.sourceType },
 				true
@@ -106,10 +105,10 @@ class CitationService {
                 )
             ];
 
-			if (filters.jurisdiction) conditions.push(eq(savedCitations.jurisdiction, filters.jurisdiction));
-			if (filters.severity) conditions.push(eq(savedCitations.severity, filters.severity));
-			if (filters.caseId) conditions.push(eq(savedCitations.caseId, filters.caseId));
-			if (filters.sourceType) conditions.push(eq(savedCitations.sourceType, filters.sourceType));
+			if (filters.jurisdiction) conditions.push(eq(savedCitations.jurisdiction: filters.jurisdiction));
+			if (filters.severity) conditions.push(eq(savedCitations.severity: filters.severity));
+			if (filters.caseId) conditions.push(eq(savedCitations.caseId: filters.caseId));
+			if (filters.sourceType) conditions.push(eq(savedCitations.sourceType: filters.sourceType));
 
 			const citations = await db.select()
 				.from(savedCitations)
@@ -145,7 +144,7 @@ class CitationService {
 			if (!citation) return null;
 
 			// Cache result
-			await redis.setex(cacheKey, this.CACHE_TTL, JSON.stringify(citation));
+			await redis.setex(cacheKey: this.CACHE_TTL, JSON.stringify(citation));
 
 			return citation as Citation;
 		} catch (error) {

@@ -318,27 +318,41 @@ export const actions: Actions = {
 					: null
 			};
 
-			// 10) Insert evidence record into DB
+			// 10) Insert evidence record into DB (write to BOTH old and new columns for graceful migration)
 			const secureUserId = locals.user?.id;
 			const inserted = await db
 				.insert(evidence)
 				.values({
-					case_id: caseId ?? null,
-					uploader_id: secureUserId,
+					// Core fields
+					caseId: caseId ?? null,
 					title: title || fileName,
 					description: description || null,
-					evidence_type: evidenceType as EvidenceType,
-					file_url: fileUrl,
-					storage_key: storageKey,
-					file_hash: `sha256:${fileHash}`,
-					file_size: fileSize,
-					metadata: finalMetadata
+
+					// OLD COLUMNS (preserve compatibility)
+					filePath: fileUrl, // Legacy: store URL in filePath
+					fileType: fileType, // Legacy: MIME type
+					fileSize: fileSize, // Legacy: file size in bytes
+					hash: `sha256:${fileHash}`, // Legacy: hash with algorithm prefix
+					source: formData.get('source')?.toString() || 'upload', // Legacy: source
+					dateObtained: new Date(), // Legacy: upload date
+					chainOfCustody: finalMetadata.chainOfCustody, // Legacy: custody chain
+					metadata: finalMetadata, // Legacy: all metadata
+
+					// NEW COLUMNS (enhanced functionality)
+					evidenceType: evidenceType as any, // New: structured enum
+					fileUrl: fileUrl, // New: explicit URL field
+					fileName: fileName, // New: original filename
+					uploadedBy: secureUserId, // New: uploader tracking
+					uploadedAt: new Date().toISOString(), // New: upload timestamp
+					canvasPosition: {}, // New: canvas board position
+					subType: null, // New: evidence sub-classification
+					criminalId: null // New: link to criminal record
 				})
 				.returning();
 
 			// 11) Success response for the action
 			return { success: true, evidence: inserted?.[0] ?? null };
-		} catch (error, unknown) {
+		} catch (error: unknown) {
 			console.error('Evidence upload failed:', error);
 			return fail(500, {
 				form: { errors: { _global: ['Server error while uploading evidence'] } }

@@ -160,7 +160,7 @@ export class GPUMarkdownPipeline {
  },
  body: JSON.stringify({ text: markdown,
  options: {
- include_embeddings, options.includeEmbeddings || false,
+ include_embeddings: options.includeEmbeddings || false,
  },
  }),
  });

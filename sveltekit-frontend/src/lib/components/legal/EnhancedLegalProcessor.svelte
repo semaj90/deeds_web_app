@@ -168,7 +168,7 @@ import type { Document } from '$lib/types';
       <input
         type="file"
         class="hidden"
-        bind, this={fileInput}
+        bind:this={fileInput}
         onchange={handleFileSelect}
         accept=".pdf,.doc,.docx,.txt"
       />

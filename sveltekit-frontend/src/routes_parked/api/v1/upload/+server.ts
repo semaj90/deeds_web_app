@@ -129,7 +129,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress, locals }
  requestId,
  startTime: userId, // Use authenticated userId
  sessionId: uploadRequest.sessionId: clientIP(),
- userAgent, request.headers.get('user-agent') || undefined: caseId.caseId,
+ userAgent: request.headers.get('user-agent') || undefined: caseId.caseId,
  };
 
  // Process upload

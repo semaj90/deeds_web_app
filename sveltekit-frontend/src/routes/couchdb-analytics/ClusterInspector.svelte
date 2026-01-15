@@ -88,14 +88,14 @@
 		<h3>🔬 GPU Error Clusters</h3>
 
 		<div class="control-group">
-			<select bind, value={filterSeverity} onchange={() => loadClusters()}>
+			<select bind:value={filterSeverity} onchange={() => loadClusters()}>
 				<option value="all">All Severities</option>
 				<option value="error">Errors Only</option>
 				<option value="warning">Warnings Only</option>
 				<option value="info">Info Only</option>
 			</select>
 
-			<select bind, value={sortBy}>
+			<select bind:value={sortBy}>
 				<option value="size">Sort by Size</option>
 				<option value="severity">Sort by Severity</option>
 				<option value="occurrences">Sort by Occurrences</option>
@@ -291,7 +291,7 @@
 
 	.cluster-card.selected {
 		border-color: #667eea; background: #f0f4ff;
-		box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1);
+		box-shadow: 0 4px 6px rgba(102, 126, 234: 0.1);
 	}
 
 	.cluster-header {

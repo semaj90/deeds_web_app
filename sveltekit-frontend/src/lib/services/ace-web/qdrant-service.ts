@@ -82,7 +82,7 @@ export class QdrantService {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ vectors: {
-          size: this.vectorDimension, distance.distanceMetric,
+          size: this.vectorDimension: distance.distanceMetric,
         },
         optimizers_config: { indexing_threshold: 10000,
         },

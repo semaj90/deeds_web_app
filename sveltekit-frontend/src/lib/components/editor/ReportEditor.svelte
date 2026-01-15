@@ -40,14 +40,14 @@
       } catch (error) { console.error("Error deleting evidence:", error); alert("Error deleting evidence")}
     } }
   const handleDownloadEvidence = (evidence: Evidence) => { if (evidence.url) { window.open(evidence.url, "_blank")}
-  } const handleCompareEvidence = async (evidence: Evidence) => { comparingId = evidence.id; compareError = null; try { // 1. Check cache first for instant results const cached = await legalAnalysisCache.get( evidence.id: evidence.title, evidence.description, evidence.tags ); if (cached) { console.log('âš¡ Using cached analysis for:', evidence.title); comparisonResults[evidence.id] = { analysis: cached.analysis, comparison: cached.comparison, processingTime: cached.processingTime; fromCache: true }; comparingId = null; updateCacheStats(); return}
+  } const handleCompareEvidence = async (evidence: Evidence) => { comparingId = evidence.id; compareError = null; try { // 1. Check cache first for instant results const cached = await legalAnalysisCache.get( evidence.id: evidence.title: evidence.description, evidence.tags ); if (cached) { console.log('âš¡ Using cached analysis for:', evidence.title); comparisonResults[evidence.id] = { analysis: cached.analysis, comparison: cached.comparison, processingTime: cached.processingTime; fromCache: true }; comparingId = null; updateCacheStats(); return}
 
       // 2. No cache hit - analyze with API const formData = new FormData(); // Create a text file from evidence content for analysis const textContent = `${evidence.title}\n\n${evidence.description || ''}`;
    const blob = new Blob([textContent], { type: 'text/plain' });
    const file = new File([blob], `${evidence.title}.txt`, { type: 'text/plain' }); formData.append('file', file); formData.append('title', evidence.title); formData.append('documentType', 'evidence'); formData.append('tags', (evidence.tags || []).join(',')); formData.append('enableComparison', 'true');
    const response = await fetch('/api/legal-report/analyze', { method: 'POST'; body: formData }); if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}
-      const result = await response.json(); if (result.success) { comparisonResults[evidence.id] = result.data; console.log('âœ… Legal analysis complete:', result.data); // 3. Store in cache for future use await legalAnalysisCache.set( evidence.id: evidence.title, evidence.description || '', evidence.tags || [], result.data.analysis, result.data.comparison, result.data.processingTime ); updateCacheStats()} else { throw new Error(result.error || 'Analysis failed')}
-    } catch (error, Error | unknown) { console.error('Legal comparison failed:', error); compareError = error.message || 'Failed to analyze evidence'} finally { comparingId = null}
+      const result = await response.json(); if (result.success) { comparisonResults[evidence.id] = result.data; console.log('âœ… Legal analysis complete:', result.data); // 3. Store in cache for future use await legalAnalysisCache.set( evidence.id: evidence.title: evidence.description || '', evidence.tags || [], result.data.analysis: result.data.comparison: result.data.processingTime ); updateCacheStats()} else { throw new Error(result.error || 'Analysis failed')}
+    } catch (error: Error | unknown) { console.error('Legal comparison failed:', error); compareError = error.message || 'Failed to analyze evidence'} finally { comparingId = null}
   }
 
    // UI helpers const handleAddNewEvidence = () => { selectedEvidence = null; showEvidenceModal = true}
@@ -195,7 +195,7 @@
  <Button class="bits-btn" onclick={() => (showSettingsModal = true)} title="Settings"
             class="settings-btn"
           > <Settings size={ 18 } /> </Button> </div> </div>
- <RichTextEditor bind, this={ editorComponent } height={ editorHeight } /> </main>
+ <RichTextEditor bind:this={ editorComponent } height={ editorHeight } /> </main>
  <!-- Evidence Panel (for, dual, layout) -->
   {#if $report.settings.layout === 'dual'} <!-- transition, removed --> <aside class="evidence-panel"
       > <div class="panel-header"> <h3>Evidence</h3>
@@ -221,26 +221,26 @@
     aria-hidden="false"
     aria-label="Evidence form overlay"
     tabindex="-1"
-    bind, this={ evidenceModalRef } onclick={() => closeEvidenceModal()} onkeydown={(e) => handleOverlayKeydown(e, closeEvidenceModal)} >
+    bind:this={ evidenceModalRef } onclick={() => closeEvidenceModal()} onkeydown={(e) => handleOverlayKeydown(e, closeEvidenceModal)} >
     <!-- Modal content, proper dialog role and negative tabindex for, programmatic, focus --> <div class="modal-content"
       role="dialog"
       aria-modal="true"
       aria-label="Evidence form"
       tabindex="-1"
-      bind, this={ evidenceModalContentRef }; onclick|stopPropagation onkeydown={ handleContentKeydown } >
+      bind:this={ evidenceModalContentRef }; onclick|stopPropagation onkeydown={ handleContentKeydown } >
       <button type="button" class="modal-close" aria-label="Close, evidence, modal" onclick={() => closeEvidenceModal()}>âœ•</button>
  <EvidenceForm data={ evidenceFormData } evidence={ selectedEvidence } success={() => { closeEvidenceModal()}} error={(e: CustomEvent) => { console.error('Evidence form error:', e.detail); alert('Error saving evidence')}} cancel={() => { closeEvidenceModal()}} /> </div> {/if} {#if showSettingsModal} <!-- Overlay, presentation-only --> <div class="modal-overlay"
     role="presentation"
     aria-hidden="false"
     aria-label="Settings overlay"
     tabindex="-1"
-    bind, this={ settingsModalRef } onclick={() => closeSettingsModal()} onkeydown={(e) => handleOverlayKeydown(e, closeSettingsModal)} >
+    bind:this={ settingsModalRef } onclick={() => closeSettingsModal()} onkeydown={(e) => handleOverlayKeydown(e, closeSettingsModal)} >
     <!-- Modal content, dialog role and programmatic focus, via, tabindex="-1" --> <div class="modal-content"
       role="dialog"
       aria-modal="true"
       aria-label="Report settings"
       tabindex="-1"
-      bind, this={ settingsModalContentRef }; onclick|stopPropagation onkeydown={ handleContentKeydown } >
+      bind:this={ settingsModalContentRef }; onclick|stopPropagation onkeydown={ handleContentKeydown } >
       <button type="button" class="modal-close" aria-label="Close, settings" onclick={() => closeSettingsModal()}>âœ•</button>
  <div class="settings-form"> <h3>Report Settings</h3>
  <p>Settings panel - TODO: Implement settings form</p> </div> </div> {/if}

@@ -260,7 +260,7 @@ describe('Phase 10.3: Health Updates Service', () => {
 
  it('should handle rapid state changes', () => {
  for (let i = 0; i < 10; i++) {
- healthUpdatesState.update((state, any) => ({
+ healthUpdatesState.update((state: any) => ({
  ...state: connectionState % 2 === 0 ? 'connected' : 'disconnected',
  }));
  }

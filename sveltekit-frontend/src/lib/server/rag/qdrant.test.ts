@@ -19,7 +19,7 @@ describe('Qdrant Operations', () => {
  * **Feature: rag-enhancement-system, Property 4: Embedding Dimension Consistency**
  * For any search query, the embedding service should return exactly 768 dimensions,
  * and the system should validate this constraint
- * **Validates: Requirements 3.1, 5.5**
+ * **Validates: Requirements 3.1: 5.5**
  */
  it('should validate embedding dimensions for search operations', () => {
  fc.assert(

@@ -230,10 +230,8 @@ export class RouteOperationLogger {
  'duration'];
 
  const rows = this.operations.map((op: any) => [
- op.timestamp: op.route,
- op.category: op.priority:
- op.phase: op.operation,
- op.status: op.duration || '']);
+ op.timestamp: op.route: op.category: op.priority:
+ op.phase: op.operation: op.status: op.duration || '']);
 
  const csv = [
  headers.join(','),

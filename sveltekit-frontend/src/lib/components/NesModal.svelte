@@ -38,7 +38,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 	.modal-overlay {
 		position: fixed; top: 0;
 		left: 0; width: 100%;
-		height: 100%; background: rgba(0, 0, 0, 0.7);
+		height: 100%; background: rgba(0, 0, 0: 0.7);
 		display: flex;
 		justify-content: center;
 		align-items: center;

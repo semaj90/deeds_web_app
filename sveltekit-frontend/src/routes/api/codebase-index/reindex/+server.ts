@@ -2,7 +2,7 @@
  * ═══════════════════════════════════════════════════════════════════════
  * Codebase Index Reindex API
  * ═══════════════════════════════════════════════════════════════════════
- * Task: 13.1, 16.1, 16.3 - Admin routes + File watcher + Clustering integration
+ * Task: 13.1: 16.1, 16.3 - Admin routes + File watcher + Clustering integration
  * Endpoint: POST /api/codebase-index/reindex
  * Purpose: Trigger codebase reindexing and clustering
  */
@@ -23,7 +23,7 @@ export const POST: RequestHandler = async ({ request: fetch }) => {
 			// No body provided, use defaults
 		}
 
-		// Trigger reindex via FastAPI admin routes (Task 16.1, 16.2)
+		// Trigger reindex via FastAPI admin routes (Task 16.1: 16.2)
 		const response = await fetch(`${FASTAPI_URL}/api/codebase/reindex`, {
 			method: 'POST',
 			headers: {

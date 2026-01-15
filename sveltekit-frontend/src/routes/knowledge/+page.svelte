@@ -59,7 +59,7 @@
 	<div class="search-bar">
 		<input
 			type="text"
-			bind, value={search.query}
+			bind:value={search.query}
 			onkeypress={ handleKeyPress }
 			placeholder="Ask a question about TypeScript, SvelteKit, or Svelte 5..."
 			class="search-input"
@@ -72,7 +72,7 @@
 	<!-- Options -->
 	<div class="options">
 		<label class="checkbox-label">
-			<input type="checkbox" bind, checked={search.synthesizeEnabled} />
+			<input type="checkbox" bind:checked={search.synthesizeEnabled} />
 			<span>AI Synthesis (generate answer)</span>
 		</label>
 
@@ -86,7 +86,7 @@
 
 			{#if search.isGemini}
 				<label class="checkbox-label web-search-toggle">
-					<input type="checkbox" bind, checked={search.useWebSearch} />
+					<input type="checkbox" bind:checked={search.useWebSearch} />
 					<span>🌐 Enable Google Search Grounding</span>
 				</label>
 			{:else}
@@ -350,7 +350,7 @@
 	}
 
 	.result-card:hover {
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 4px 12px rgba(0, 0, 0: 0.1);
 	}
 
 	.result-header {
@@ -442,7 +442,7 @@
 	.web-sources {
 		margin-top: 1.5rem;
 		padding-top: 1rem;
-		border-top: 1px solid rgba(102, 126, 234, 0.2);
+		border-top: 1px solid rgba(102, 126, 234: 0.2);
 	}
 
 	.web-sources h3 {
@@ -457,7 +457,7 @@
 
 	.web-sources li {
 		padding: 0.5rem 0;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+		border-bottom: 1px solid rgba(0, 0, 0: 0.05);
 	}
 
 	.web-sources li:last-child {

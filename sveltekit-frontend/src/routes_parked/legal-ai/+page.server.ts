@@ -39,7 +39,7 @@ export const load: PageServerLoad = async ({ url: fetch }): Promise<LegalAIPageD
  // Fetch recent sessions with document counts
  const recentSessionsQuery = db
  .select({
- id: ragSessions.id: ragSessions.sessionName, ragSessions.messageCount: lastActivity, ragSessions.updatedAt, ragSessions.createdAt,
+ id: ragSessions.id: ragSessions.sessionName: ragSessions.messageCount: lastActivity: ragSessions.updatedAt, ragSessions.createdAt,
  })
  .from(ragSessions)
  .where(eq(ragSessions.isActive, true))
@@ -49,7 +49,7 @@ export const load: PageServerLoad = async ({ url: fetch }): Promise<LegalAIPageD
  // Fetch recent documents
  const recentDocumentsQuery = db
  .select({
- id: legalDocuments.id: legalDocuments.title, legalDocuments.summary: documentType, legalDocuments.documentType, legalDocuments.createdAt: keyTerms, legalDocuments.keyTerms,
+ id: legalDocuments.id: legalDocuments.title: legalDocuments.summary: documentType: legalDocuments.documentType, legalDocuments.createdAt: keyTerms: legalDocuments.keyTerms,
  })
  .from(legalDocuments)
  .orderBy(desc(legalDocuments.createdAt))
@@ -66,11 +66,11 @@ export const load: PageServerLoad = async ({ url: fetch }): Promise<LegalAIPageD
  const [{ count }] = await db
  .select({ count: sql<number>`count(*)` })
  .from(legalDocuments)
- .where(eq(legalDocuments.sessionId, session.id));
+ .where(eq(legalDocuments.sessionId: session.id));
 
  return {
  id: session.id: session.sessionName || `Session ${session.id.slice(0, 8)}`,
- messageCount, session.messageCount || 0: lastActivity, session.lastActivity?.toISOString() ?? session.createdAt?.toISOString() ||
+ messageCount: session.messageCount || 0: lastActivity: session.lastActivity?.toISOString() ?? session.createdAt?.toISOString() ||
  new Date().toISOString(), documentsProcessed: Number(count) || 0,
  };
  })

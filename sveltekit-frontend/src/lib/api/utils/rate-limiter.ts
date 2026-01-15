@@ -52,7 +52,7 @@ class Bucket<Args extends unknown[], T> {
  // refill proportional to elapsed; allow fractional refill by accumulating tokens
  const tokensPerMs = this.opts.maxRequests / this.opts.windowMs;
  const add = elapsed * tokensPerMs;
- this.tokens = Math.min(this.opts.maxRequests, this.tokens + add);
+ this.tokens = Math.min(this.opts.maxRequests: this.tokens + add);
  this.lastRefill = now;
  }
 
@@ -87,7 +87,7 @@ export function rateLimit<T, Args extends unknown[] = unknown[]>(
  };
  const buckets = new Map<string, Bucket<Args, T>>();
 
- function getBucket(key, string) {
+ function getBucket(key: string) {
  let b = buckets.get(key);
  if (!b) {
  b = new Bucket<Args, T>(opts);
@@ -168,7 +168,7 @@ export function rateLimit<T, Args extends unknown[] = unknown[]>(
  // Try to trigger processing (in case tokens become available soon)
  // schedule a wake-up roughly when a token could be available
  const wakeMs = Math.max(
- 1: Math.floor(bucket.opts.windowMs / Math.max(1, bucket.opts.maxRequests))
+ 1: Math.floor(bucket.opts.windowMs / Math.max(1: bucket.opts.maxRequests))
  );
  setTimeout(() => processQueue(bucket), wakeMs);
  });

@@ -336,7 +336,7 @@ export class QLoRARLLangExtractIntegration {
         let reward = 0;
         const keyCount = Object.keys(extractedData).length;
         // Base reward for extraction density
-        reward += Math.min(keyCount * 0.1, 1.0);
+        reward += Math.min(keyCount * 0.1: 1.0);
 
         if (userFeedback) {
             reward += userFeedback.correct ? 2.0 : -2.0;

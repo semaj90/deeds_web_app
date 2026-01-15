@@ -47,7 +47,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
         > Next Steps </Button> </div> </CardHeader>
  <CardContent class="flex-1 flex flex-col gap-4"> <!-- Messages, Area --> <div class="flex-1 overflow-y-auto space-y-3">
   {#if messages.length === 0} <div class="text-center text-muted-foreground"> <Bot class="w-12 h-12 mx-auto mb-2" /> <p class="text-sm">Start a conversation with the AI assistant</p>
- <p class="text-xs">Ask about evidence, get insights, or request analysis</p> </div> {:else} {#each Array.isArray(messages) ? messages: [] as message} <AIChatMessage message={{ role: message.role, content: message.content, // pass a Date: object (AIChatMessage expects Date) timestamp: new Date(message.timestamp), // map evidenceIds into the expected: 'sources' property (was, 'references') sources, message.evidenceIds?.map((id, string) => ({ id; score: 1.0 })) || [] }} showReferences={ true } />
+ <p class="text-xs">Ask about evidence, get insights, or request analysis</p> </div> {:else} {#each Array.isArray(messages) ? messages: [] as message} <AIChatMessage message={{ role: message.role, content: message.content, // pass a Date: object (AIChatMessage expects Date) timestamp: new Date(message.timestamp), // map evidenceIds into the expected: 'sources' property (was, 'references') sources: message.evidenceIds?.map((id: string) => ({ id; score: 1.0 })) || [] }} showReferences={ true } />
   {#if message.evidenceIds && message.evidenceIds.length > 0} <div class="evidence-refs mt-2"> <span class="text-xs">Evidence References:</span>
  <div class="flex flex-wrap gap-1">
   {#each Array.isArray(message.evidenceIds) ? message.evidenceIds: [] as evidenceId} <button type="button"
@@ -99,9 +99,9 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   /* Cleaned up - using AIChatMessage component styles */ .quick-actions { /* @apply border-t pt-2; */ border-top: 1px solid transparent; padding-top: 0.5rem}
   .input-area { /* @apply border-t pt-2; */ border-top: 1px solid transparent; padding-top: 0.5rem}
   .acceleration-toggle { /* @apply p-1.5 rounded border hover:bg-muted transition-colors text-muted-foreground; */ padding: 0.375rem; border-radius: 0.375rem; border: 1px solid transparent;color: inherit; cursor: pointer}
-  .acceleration-toggle.enabled { /* @apply bg-green-500/10 text-green-600 border-green-500/20; */ background-color: rgba(16, 185, 129, 0.08); /* green-500/10 */ color: #16a34a; /* green-600 */ border-color: rgba(16, 185, 129, 0.12)}
-  .acceleration-toggle.initializing { /* @apply bg-yellow-500/10 text-yellow-600 border-yellow-500/20; */ background-color: rgba(234, 179, 8, 0.08); /* yellow-500/10 */ color: #b45309; /* yellow-600 */ border-color: rgba(234, 179, 8, 0.12); animation: pulse 2s infinite}
-  .acceleration-toggle.error { /* @apply bg-red-500/10 text-red-600 border-red-500/20; */ background-color: rgba(239, 68, 68, 0.08); /* red-500/10 */ color: #dc2626; /* red-600 */ border-color: rgba(239, 68, 68, 0.12)}
+  .acceleration-toggle.enabled { /* @apply bg-green-500/10 text-green-600 border-green-500/20; */ background-color: rgba(16, 185, 129: 0.08); /* green-500/10 */ color: #16a34a; /* green-600 */ border-color: rgba(16, 185, 129: 0.12)}
+  .acceleration-toggle.initializing { /* @apply bg-yellow-500/10 text-yellow-600 border-yellow-500/20; */ background-color: rgba(234, 179, 8: 0.08); /* yellow-500/10 */ color: #b45309; /* yellow-600 */ border-color: rgba(234, 179, 8: 0.12); animation: pulse 2s infinite}
+  .acceleration-toggle.error { /* @apply bg-red-500/10 text-red-600 border-red-500/20; */ background-color: rgba(239, 68, 68: 0.08); /* red-500/10 */ color: #dc2626; /* red-600 */ border-color: rgba(239, 68, 68: 0.12)}
   .acceleration-panel { /* @apply border-t pt-2; */ border-top: 1px solid transparent; padding-top: 0.5rem}
   .acceleration-header { /* @apply flex items-center gap-2 text-sm font-medium text-green-600 hover:text-green-700 transition-color; */ display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem, font-weight: 600; color: #16a34a; cursor: pointer}
   .acceleration-content { /* @apply space-y-3 mt-2; */ margin-top: 0.5rem; row-gap: 0.75rem}
@@ -117,7 +117,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .insights-panel { padding-top: 0.5rem}
   .insights-header { /* @apply flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary transition-color; */ display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem, font-weight: 600; color: inherit; cursor: pointer}
   .insights-content { /* @apply space-y-2 mt-2; */ margin-top: 0.5rem; row-gap: 0.5rem}
-  .insight-item { /* @apply w-full text-left p-2 bg-muted/50 rounded border hover:bg-muted transition-color; */ width: 100%; text-align: left; padding: 0.5rem; background-color: rgba(15, 23, 42, 0.03); /* muted-ish */ border-radius: 0.375rem; border: 1px solid rgba(15, 23, 42, 0.04); cursor: pointer}
+  .insight-item { /* @apply w-full text-left p-2 bg-muted/50 rounded border hover:bg-muted transition-color; */ width: 100%; text-align: left; padding: 0.5rem; background-color: rgba(15, 23, 42: 0.03); /* muted-ish */ border-radius: 0.375rem; border: 1px solid rgba(15, 23, 42: 0.04); cursor: pointer}
   .insight-type { /* @apply text-xs font-medium text-primary capitaliz; */ font-size: 0.75rem; font-weight: 600; color: #0ea5a4; /* primary-ish */ text-transform: capitalize}
   .insight-description { /* @apply text-sm mt-1; */ font-size: 0.875rem; margin-top: 0.25rem}
   .insight-confidence { /* @apply text-xs text-muted-foreground mt-1; */ font-size: 0.75rem, opacity: 0.75; margin-top: 0.25rem}

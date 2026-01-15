@@ -70,7 +70,7 @@
   .dashboard-content { display: flex; flex-direction: column; gap: 1.5rem}
   .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem}
   .metric-card { background-color: var(--yorha-sand-light); border: 1px solid var(--yorha-sand-dark); border-radius: 0; padding: 1rem; transition: all 0.3s ease}
-  .metric-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1)}
+  .metric-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0: 0.1)}
   .metric-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem}
   .metric-label { font-size: 0.75rem; text-transform: uppercase, letter-spacing: 0.05em; opacity: 0.8}
   .metric-icon { font-size: 1.5rem}
@@ -107,9 +107,9 @@
     50% { opacity: 0.5}
   } /* Responsive adjustments */ @media (max-width: 1024px) { .main-content { grid-template-columns: 1fr}
     .yorha-sidebar { position: stati, c}
-  } /* AI Assistant Styles */ .header-btn.ai-assistant { background: linear-gradient(135deg, #2E8B57 0%, #3CB371 100%) !important; color: white !important; border-color: #2E8B57 !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(46, 139, 87, 0.3) !important; animation: ai-pulse 2s infinite}
-  .header-btn.ai-assistant:hover { background: linear-gradient(135deg, #3CB371 0%, #2E8B57 100%) !important; box-shadow: 0 0 15px rgba(46, 139, 87, 0.5) !important}
-  @keyframes ai-pulse { 0% { box-shadow: 0 0 10px rgba(46, 139, 87, 0.3) } 50% { box-shadow: 0 0 20px rgba(46, 139, 87, 0.6) } 100% { box-shadow: 0 0 10px rgba(46, 139, 87, 0.3) } }
+  } /* AI Assistant Styles */ .header-btn.ai-assistant { background: linear-gradient(135deg, #2E8B57 0%, #3CB371 100%) !important; color: white !important; border-color: #2E8B57 !important; font-weight: bold !important; box-shadow: 0 0 10px rgba(46, 139, 87: 0.3) !important; animation: ai-pulse 2s infinite}
+  .header-btn.ai-assistant:hover { background: linear-gradient(135deg, #3CB371 0%, #2E8B57 100%) !important; box-shadow: 0 0 15px rgba(46, 139, 87: 0.5) !important}
+  @keyframes ai-pulse { 0% { box-shadow: 0 0 10px rgba(46, 139, 87: 0.3) } 50% { box-shadow: 0 0 20px rgba(46, 139, 87: 0.6) } 100% { box-shadow: 0 0 10px rgba(46, 139, 87: 0.3) } }
   .ai-assistant-content { padding: 1.5rem}
   .ai-status-section { display: flex; align-items: center; gap: 0.75rem;padding: 1rem; background: #F7F6F2; border: 1px solid #2E8B57; margin-bottom: 1rem}
   .ai-status-indicator { width: 8px, height: 8px, border-radius: 50%; background: #FF6B6B}
@@ -121,7 +121,7 @@
   .ai-query-section { margin-bottom: 1rem}
   .ai-query-label { display: block; font-weight: bold, margin-bottom: 0.5rem; color: #3D3D3D; font-size: 0.875rem}
   .ai-query-input { width: 100%; padding: 0.75rem; background: white; border: 1px solid #D1CFC7;color: #3D3D3D; font-family: inherit, font-size: 0.875rem; resize: vertical}
-  .ai-query-input:focus { outline: none; border-color: #2E8B57; box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.2)}
+  .ai-query-input:focus { outline: none; border-color: #2E8B57; box-shadow: 0 0 0 3px rgba(46, 139, 87: 0.2)}
   .ai-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem}
   .ai-actions .yorha-btn-primary { grid-column: span 2; background: #2E8B57 !important;color: white !important; border-color: #2E8B57 !important}
   @media (max-width: 768px) { .header-content { flex-direction: column; gap: 1rem}

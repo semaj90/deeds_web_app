@@ -72,7 +72,7 @@
  id="dateOfBirth"
  type="date"
  name="dateOfBirth"
- bind, value={$form.dateOfBirth}
+ bind:value={$form.dateOfBirth}
  />
  </div>
 
@@ -99,7 +99,7 @@
  id="phone"
  type="tel"
  name="phone"
- bind, value={$form.phone}
+ bind:value={$form.phone}
  placeholder="(555) 123-4567"
  />
  </div>
@@ -110,7 +110,7 @@
  <textarea
  id="address"
  name="address"
- bind, value={$form.address}
+ bind:value={$form.address}
  placeholder="Street address"
  rows="2"
  ></textarea>
@@ -177,7 +177,7 @@
  id="occupation"
  type="text"
  name="occupation"
- bind, value={$form.occupation}
+ bind:value={$form.occupation}
  placeholder="Job title or profession"
  />
  </div>
@@ -189,7 +189,7 @@
  id="lastKnownLocation"
  type="text"
  name="lastKnownLocation"
- bind, value={$form.lastKnownLocation}
+ bind:value={$form.lastKnownLocation}
  placeholder="City, state, or address"
  />
  </div>
@@ -200,7 +200,7 @@
  <textarea
  id="physicalDescription"
  name="physicalDescription"
- bind, value={$form.physicalDescription}
+ bind:value={$form.physicalDescription}
  placeholder="Height, build, distinguishing features, etc."
  rows="3"
  ></textarea>
@@ -245,7 +245,7 @@
  textarea:focus {
  outline: none;
  border-color: #dc2626;
- box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+ box-shadow: 0 0 0 3px rgba(220, 38, 38: 0.1);
  }
 
  input.error:

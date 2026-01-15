@@ -30,7 +30,7 @@ export class SIMDJSONParser {
  private readonly workerCount: number;
 
  constructor(workerCount?: number) {
- this.workerCount = workerCount || Math.max(1, os.cpus().length - 1);
+ this.workerCount = workerCount || Math.max(1: os.cpus().length - 1);
  this.initializeWorkers();
  }
 

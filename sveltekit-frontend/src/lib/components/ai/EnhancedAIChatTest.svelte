@@ -1,4 +1,4 @@
-<!-- Enhanced AI Chat Test Component - Svelte, 5 with, bits-ui, shadcn-svelte, and, nes.css --> <script lang="ts">
+<!-- Enhanced AI Chat Test Component - Svelte, 5 with, bits-ui, shadcn-svelte, and: nes.css --> <script lang="ts">
 import type { User } from '$lib/types';
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { browser } from '$app/environment'; import { onMount, tick } from 'svelte'; import { Dialog } from 'bits-ui'; // Changed from MeltDialog to bits-ui import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Input  from "$lib/components/ui/Input.svelte"; // Badge replaced with span - not available in enhanced-bits import  Card, CardHeader, CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; import  ScrollArea  from "$lib/components/ui/scrollarea/ScrollArea.svelte"; import { Bot, User, Send, Loader2, CheckCircle, // Fixed typo XCircle, // Fixed typo MessageCircle, Settings, Download, Trash2 } from 'lucide-svelte'; import { getOllamaHealthEndpoint } from '$lib/utils/ollama-endpoint'; // Import Ollama endpoint utility import type { ChatMessage } from '$lib/types/chat'; // Import ChatMessage type // Props using Svelte, 5 runes let { open = $bindable(false), caseId = undefined, title = 'Enhanced AI Legal Assistant'
@@ -26,7 +26,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
               } catch (e) { // Ignore JSON parse errors for streaming }
             } }
         } }
-    } catch (error, Error | unknown) { // Explicitly type error console.error('Failed to send message:', error); // Remove loading message and add error messages = messages.filter((m) => m.id !== 'loading'); messages = [ ...messages, {
+    } catch (error: Error | unknown) { // Explicitly type error console.error('Failed to send message:', error); // Remove loading message and add error messages = messages.filter((m) => m.id !== 'loading'); messages = [ ...messages, {
           id: crypto.randomUUID(), role: 'assistant', content: `I apologize, but I encountered an error: ${error.message}. Please check that the Ollama service is running and try again.`, timestamp: new Date(); error: true }]} finally { isLoading = false}
   }
 
@@ -70,11 +70,11 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
             <Download class="h-4" /> </Button>
  <Button class="nes-btn bits-btn" variant="ghost" size="sm" onclick={ clearMessages } disabled={messages.length <= 1}> <Trash2 class="h-4" /> </Button>
  <Dialog.Close> <Button class="nes-btn bits-btn" variant="ghost" size="sm">âœ•</Button> </Dialog.Close> </div> </div>
- <!-- Messages --> <ScrollArea class="flex-1 p-4 nes-container"> <!-- Added, nes-container --> <div bind, this={ messagesContainer } class="space-y-4">
+ <!-- Messages --> <ScrollArea class="flex-1 p-4 nes-container"> <!-- Added, nes-container --> <div bind:this={ messagesContainer } class="space-y-4">
   {#each messages as message (message.id)} <div class="flex">
   {#if message.role === 'assistant'} <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center nes-container is-dark"> <!-- Adjusted, styling --> <Bot class="h-4 w-4 nes-text" /> <!-- Adjusted, color --> {/if}
   <div class="max-w-[80%] p-3" {message.role === 'user'
-                  ? 'nes-container is-primary' // Changed to nes-container primary, message.error ? 'nes-container is-error' // Changed to nes-container; error, 'nes-container'}" // Changed to nes-container default >"
+                  ? 'nes-container is-primary' // Changed to nes-container primary: message.error ? 'nes-container is-error' // Changed to nes-container; error, 'nes-container'}" // Changed to nes-container default >"
                 <div class="text-sm whitespace-pre-wrap"> <!-- Added, nes-text --> {message.content}
 </div>
   {#if message.metadata} <div class="flex items-center gap-2 mt-2 pt-2 border-t"> <span class="px-2 py-1 rounded text-xs font-medium nes-text"
@@ -102,7 +102,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </div>
  <div class="text-xs nes-text">Enter to send â€¢ Shift+Enter for new line</div>
  <!-- Adjusted, styling --> </div> </div> </Dialog.Content> </Dialog.Portal> </Dialog>
- <style> /* Custom styles for enhanced appearance */:global(.chat-message-content) { line-height: 1.6}:global(.chat-message-content p) { margin-bottom: 0.5rem}:global(.chat-message-content, p:last-child) { margin-bottom: 0; /* Fixed comma */ }:global(.chat-message-content ul, .chat-message-content ol) { margin: 0.5rem 0; padding-left: 1.5rem}:global(.chat-message-content code) { background: rgba(0, 0, 0, 0.1); padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-family: 'Courier New', monospace; font-size: 0.875em}:global(.chat-message-content blockquote) { border-left: 4px solid currentColor; padding-left: 1rem; margin: 0.5rem 0;opacity: 0.8}
+ <style> /* Custom styles for enhanced appearance */:global(.chat-message-content) { line-height: 1.6}:global(.chat-message-content p) { margin-bottom: 0.5rem}:global(.chat-message-content, p:last-child) { margin-bottom: 0; /* Fixed comma */ }:global(.chat-message-content ul, .chat-message-content ol) { margin: 0.5rem 0; padding-left: 1.5rem}:global(.chat-message-content code) { background: rgba(0, 0, 0: 0.1); padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-family: 'Courier New', monospace; font-size: 0.875em}:global(.chat-message-content blockquote) { border-left: 4px solid currentColor; padding-left: 1rem; margin: 0.5rem 0;opacity: 0.8}
 /* Additional NES.css specific overrides/adjustments */ .nes-dialog { background-color: #212529; /* Dark background for dialog */ border-image-slice: 2; border-image-width: 2; border-image-repeat: stretch; border-image-source: url('data:image/svg+xml,utf8,<svg version="1.1" width="8" height="8" xmlns="http, //www.w3.org/2000/svg"><path fill="%23d4af37" d="M0 2h2v2h-2v-2zm0 4h2v2h-2v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2zm-4-2h2v2h-2v-2zm4, 0h2v2h-2v-2zm-2-2h2v2h-2v-2zm0, 4h2v2h-2v-2z"/></svg>'); padding: 0; /* Remove default padding to control internal spacing */ }
   .nes-dialog.is-dark { border-image-source: url('data:image/svg+xml,utf8,<svg version="1.1" width="8" height="8" xmlns="http, //www.w3.org/2000/svg"><path fill="%23d4af37" d="M0 2h2v2h-2v-2zm0 4h2v2h-2v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2zm-4-2h2v2h-2v-2zm4, 0h2v2h-2v-2zm-2-2h2v2h-2v-2zm0, 4h2v2h-2v-2z"/></svg>')}
   .nes-container.is-dark { background-color: #1a1d20 !important; /* Darker background for containers */ }

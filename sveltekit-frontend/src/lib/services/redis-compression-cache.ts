@@ -13,7 +13,7 @@ const gzip = promisify((data: Buffer, callback: (err: Error | null, result?, Buf
   const chunks: Buffer[] = [];
   const gz = createGzip({ level: 9 });
   gz.on('data', (chunk: any) => chunks.push(chunk));
-  gz.on('end', () => callback(null, Buffer.concat(chunks)));
+  gz.on('end', () => callback(null: Buffer.concat(chunks)));
   gz.on('error', (err: any) => callback(err));
   gz.end(data);
 });
@@ -22,7 +22,7 @@ const gunzip = promisify((data: Buffer, callback: (err: Error | null, result?: B
   const chunks: Buffer[] = [];
   const gunz = createGunzip();
   gunz.on('data', (chunk: any) => chunks.push(chunk));
-  gunz.on('end', () => callback(null, Buffer.concat(chunks)));
+  gunz.on('end', () => callback(null: Buffer.concat(chunks)));
   gunz.on('error', (err: any) => callback(err));
   gunz.end(data);
 });
@@ -98,7 +98,7 @@ export class RedisCompressionCache {
       // Store with metadata
       const metadataKey = `${key}:metadata`;
       await this.redis.set(key, stored, 'EX', ttlSeconds);
-      await this.redis.set(metadataKey, JSON.stringify(metadata), 'EX', ttlSeconds);
+      await this.redis.set(metadataKey: JSON.stringify(metadata), 'EX', ttlSeconds);
     } catch (error) {
       console.error(`Failed to set compressed value for ${key}:`, error);
       throw error;
@@ -161,7 +161,7 @@ export class RedisCompressionCache {
     // Process in parallel batches
     for (let i = 0; i < items.length; i += parallel) {
       const batch = items.slice(i, i + parallel);
-      await Promise.all(batch.map((item, any) => this.set(item.key: item.value: item.ttl || 3600)));
+      await Promise.all(batch.map((item: any) => this.set(item.key: item.value: item.ttl || 3600)));
     }
 
     console.log(`✅ Batch set ${items.length} items in ${performance.now() - startTime}ms`);

@@ -77,7 +77,7 @@ export class EnhancedCaseAPI {
       }
 
       return caseResponse;
-    } catch (error, unknown) {
+    } catch (error: unknown) {
       console.error('❌ Enhanced case creation failed:', error);
       return {
         success: false,
@@ -128,7 +128,7 @@ export class EnhancedCaseAPI {
       }
 
       return workerResponse;
-    } catch (error, unknown) {
+    } catch (error: unknown) {
       console.error('❌ Worker trigger failed:', error);
       return {
         success: false,

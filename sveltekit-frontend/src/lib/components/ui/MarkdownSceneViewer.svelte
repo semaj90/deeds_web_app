@@ -83,7 +83,7 @@
  {#if isEditing}
  <textarea
  class="edit-textarea"
- bind, value={editedMarkdown}
+ bind:value={editedMarkdown}
  rows="10"
  ></textarea>
  {:else}
@@ -334,7 +334,7 @@
 
  .validation-info {
  padding: 0.75rem 1.25rem;
- background: rgba(74, 222, 128, 0.1);
+ background: rgba(74, 222, 128: 0.1);
  color: var(--yorha-success, #4ade80);
  font-size: 0.8rem;
  text-align: center;

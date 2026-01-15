@@ -92,7 +92,7 @@
 
 <div class="contextual-chat-modal">
  <!-- Messages Container -->
- <div class="messages-container" bind, this={messagesContainer}>
+ <div class="messages-container" bind:this={messagesContainer}>
  {#if messages.length === 0}
  <div class="empty-state">
  <p>🧠 AI Contextual Chat</p>
@@ -143,7 +143,7 @@
  <!-- Input Area -->
  <div class="input-area">
  <textarea
- bind, value={inputValue}
+ bind:value={inputValue}
  onkeydown={ handleKeydown }
  placeholder="Ask a question about this case... (Shift+Enter for new line)"
  disabled={isLoading}
@@ -244,7 +244,7 @@
  }
 
  .message.error .message-content {
- background: rgba(239, 68, 68, 0.2);
+ background: rgba(239, 68, 68: 0.2);
  border: 1px solid #ef4444;
  color: #ef4444;
  }
@@ -280,7 +280,7 @@
 
  .citations {
  margin-top: 0.5rem; padding: 0.5rem;
- background: rgba(60, 188, 252, 0.1);
+ background: rgba(60, 188, 252: 0.1);
  border-left: 2px solid var(--yorha-accent, #3cbcfc);
  border-radius: 4px;
  }

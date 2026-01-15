@@ -77,7 +77,7 @@
 	let currentStep = $derived(steps.findIndex(s => progress > steps.indexOf(s) * 25 && progress <= (steps.indexOf(s) + 1) * 25));
 
 	// File upload handler
-	function handleFileUpload(event, Event) {
+	function handleFileUpload(event: Event) {
 		const target = event.target as HTMLInputElement;
 		if (target.files && target.files.length > 0) {
 			evidenceFile = target.files[0];
@@ -141,7 +141,7 @@
 			// Show fallback notice
 			const notice = document.createElement('div');
 			notice.innerHTML = '⚠️ Failure, defaulting to mock';
-			notice.style.cssText = 'position: fixed; top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
+			notice.style.cssText = 'position: fixed; top: 20px; right: 20px; background: rgba(220, 53, 69: 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
 			document.body.appendChild(notice);
 			setTimeout(() => notice.remove(), 3000);
 			// Generate mock analysis results
@@ -210,7 +210,7 @@
 			<div class="grid grid-cols-1 md, grid-cols-2 gap-4 mb-4">
 				<div>
 					<Label htmlFor="caseId">Case ID</Label>
-					<Input id="caseId" bind, value={caseId} placeholder="Enter case ID" />
+					<Input id="caseId" bind:value={caseId} placeholder="Enter case ID" />
 				</div>
 				<div>
 					<Label htmlFor="evidenceType">Evidence Type</Label>
@@ -228,7 +228,7 @@
 			</div>
 			<div class="mb-4">
 			<Label htmlFor="evidenceContent">Evidence Content</Label>
-				<textarea id="evidenceContent" bind, value={evidenceContent} placeholder="Paste or upload evidence content here..." rows="6" ></textarea>
+				<textarea id="evidenceContent" bind:value={evidenceContent} placeholder="Paste or upload evidence content here..." rows="6" ></textarea>
 			</div>
 			<div class="mb-4">
 			<Label htmlFor="priority">Priority</Label>
@@ -333,10 +333,10 @@
 	/* Custom animations for progress indicators */
 	@keyframes pulse-glow {
 		0%; } 100% {
-			box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
+			box-shadow: 0 0 5px rgba(59, 130, 246: 0.3);
 		}
 		50% {
-			box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+			box-shadow: 0 0 20px rgba(59, 130, 246: 0.6);
 		}
 	}
 	.animate-pulse-glow {

@@ -170,14 +170,14 @@ https, //svelte.dev/e/js_parse_error -->
  <!-- Main Canvas Area -->
  <div class="canvas-main">
  <EvidenceCanvas
- bind, this={canvas}
+ bind:this={canvas}
  {gpuAccelerationEnabled}
  />
  </div>
 
  <div class="control-panel">
  <GraphControlPanel
- bind, this={controlPanel}
+ bind:this={controlPanel}
  {webgpuSupported}
  {gpuAccelerationEnabled}
  currentPhase={currentPhase}
@@ -224,7 +224,7 @@ https, //svelte.dev/e/js_parse_error -->
  </div>
  {/if}
  <!-- Suggestion Modal -->
- <CaseSuggestionModal bind, this={suggestionModal} show={showModal} />
+ <CaseSuggestionModal bind:this={suggestionModal} show={showModal} />
 </div>
 
 <style>
@@ -247,7 +247,7 @@ https, //svelte.dev/e/js_parse_error -->
  .suggestions-panel {
  position: absolute; bottom: 0;
  left: 0; right: 300px;
- background: rgba(42, 42, 42, 0.95);
+ background: rgba(42, 42, 42: 0.95);
  border-top: 1px solid #444;
  padding: 1rem;
  max-height: 40vh;

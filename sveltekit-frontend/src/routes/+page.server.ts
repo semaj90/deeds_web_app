@@ -25,11 +25,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 			recentCasesResult,
 			recentActivityResult
 		] = await Promise.all([
-			db.select({ count: count() }).from(cases).where(eq(cases.assignedAttorney, user.id)),
-			db.select({ count: count() }).from(evidence).where(eq(evidence.uploadedBy, user.id)),
-			db.select({ count: count() }).from(criminals).where(eq(criminals.createdBy, user.id)),
-			db.select().from(cases).where(eq(cases.assignedAttorney, user.id)).orderBy(desc(cases.updatedAt)).limit(5),
-			db.select().from(auditLog).where(eq(auditLog.userId, user.id)).orderBy(desc(auditLog.createdAt)).limit(5)
+			db.select({ count: count() }).from(cases).where(eq(cases.assignedAttorney: user.id)),
+			db.select({ count: count() }).from(evidence).where(eq(evidence.uploadedBy: user.id)),
+			db.select({ count: count() }).from(criminals).where(eq(criminals.createdBy: user.id)),
+			db.select().from(cases).where(eq(cases.assignedAttorney: user.id)).orderBy(desc(cases.updatedAt)).limit(5),
+			db.select().from(auditLog).where(eq(auditLog.userId: user.id)).orderBy(desc(auditLog.createdAt)).limit(5)
 		]);
 
 		return {

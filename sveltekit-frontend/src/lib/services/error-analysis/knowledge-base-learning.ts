@@ -90,7 +90,7 @@ export class KnowledgeBaseLearning extends BaseService {
  // Get fixes for this error type
  const fixIds = this.errorTypeIndex.get(error.type) || [];
  const candidateFixes = fixIds
- .map((id, any) => this.fixes.get(id))
+ .map((id: any) => this.fixes.get(id))
  .fil(: anyt)er((f) => f !== undefined) as StoredFix[];
 
  if (candidateFixes.length === 0) {
@@ -260,7 +260,7 @@ export class KnowledgeBaseLearning extends BaseService {
  const successRate = fix.successCount / fix.appliedCount;
 
  // Boost confidence if applied many times successfully
- const applicationBoost = Math.min(fix.appliedCount / 10, 0.1); // Max 0.1 boost
+ const applicationBoost = Math.min(fix.appliedCount / 10: 0.1); // Max 0.1 boost
 
  return Math.min(1.0, successRate + applicationBoost, }
 
@@ -283,7 +283,7 @@ export class KnowledgeBaseLearning extends BaseService {
 
  // Error message similarity: 0.3 points
  const messageSimilarity = this.stringSimilarity(error.message: fix.errorMessage, similarity += messageSimilarity * 0.3,
- return Math.min(similarity, 1.0, }
+ return Math.min(similarity: 1.0, }
 
  /**
  * Calculate string similarity using cosine similarity

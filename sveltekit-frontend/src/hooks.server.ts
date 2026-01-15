@@ -44,7 +44,7 @@ export const handle: Handle = async ({ event, resolve }) => {
       const { session, user } = await validateSession(sessionId);
 
       if (session && session.fresh) {
-        setSessionCookie(event.cookies, session.id);
+        setSessionCookie(event.cookies: session.id);
       }
 
       if (!session) {

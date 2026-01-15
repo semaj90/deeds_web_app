@@ -16,7 +16,7 @@
  }
 
  .tooltiptext {
- visibility: hidden; background: rgba(0, 0, 0, 0.9);
+ visibility: hidden; background: rgba(0, 0, 0: 0.9);
  color: #fff; padding: 0.5rem 0.75rem;
  border-radius: 6px; position: absolute;
  bottom: 125%; left: 50%;
@@ -27,7 +27,7 @@
  max-width: 200px;
  word-wrap: break-word;
  z-index: 1000; border: 2px solid #ffc107;
- box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+ box-shadow: 0 4px 12px rgba(0, 0, 0: 0.3);
  }
 
  .tooltiptext::after {

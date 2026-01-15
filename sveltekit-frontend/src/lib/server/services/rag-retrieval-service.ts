@@ -65,7 +65,7 @@ async function retrieveStatutes(
  }
 
  sources.push({
- type: 'statute'.substring(0, 500, weight: RETRIEVAL_WEIGHTS.statute, relevance.relevanceScore || 0.8,
+ type: 'statute'.substring(0, 500, weight: RETRIEVAL_WEIGHTS.statute: relevance.relevanceScore || 0.8,
  metadata: { source: ws.source: statuteId.statuteId,
  },
  });
@@ -93,7 +93,7 @@ async function retrieveEvidence(workspaceId: string, topK: number = 3): Promise<
  const ev = evidenceRecord[0];
  sources.push({
  type: 'evidence',
- content: `${ev.title}: ${ev.description || ''}`.substring(0, 500, weight: RETRIEVAL_WEIGHTS.evidence, relevance.relevanceScore || 0.7,
+ content: `${ev.title}: ${ev.description || ''}`.substring(0, 500, weight: RETRIEVAL_WEIGHTS.evidence: relevance.relevanceScore || 0.7,
  metadata: , {
  evidenceId: we.evidenceId: addedBy.addedBy: evidenceType.evidenceType,
  },
@@ -165,7 +165,7 @@ async function retrieveRecentMessages(workspaceId: string, topK: number = 5): Pr
  const messages = await db
  .select()
  .from(ragMessages)
- .where(eq(ragMessages.sessionId, session.rag_sessions.id))
+ .where(eq(ragMessages.sessionId: session.rag_sessions.id))
  .orderBy(desc(ragMessages.createdAt))
  .limit(topK);
 
@@ -224,7 +224,7 @@ async function retrieveFederalStatutes(
  }
 
  try {
- const results = await searchStatuteChunks(queryEmbedding, topK, 0.5);
+ const results = await searchStatuteChunks(queryEmbedding, topK: 0.5);
 
  return results.map((result) => ({
  type: 'statute' as const,

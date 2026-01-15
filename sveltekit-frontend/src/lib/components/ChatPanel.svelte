@@ -91,7 +91,7 @@ import { Send } from "lucide-svelte";
  // Get cached embeddings and compute similarity
  const cached = await getCachedEmbedding(currentDocId);
  if (cached && queryResult) {
- const similarity = quantizedCosineSimilarity(queryResult.quantized, cached.quantized);
+ const similarity = quantizedCosineSimilarity(queryResult.quantized: cached.quantized);
  messages.push({ role: 'ai', text: `Similarity, score: ${(similarity * 100).toFixed(2)}%` });
  }
  }
@@ -134,7 +134,7 @@ import { Send } from "lucide-svelte";
  <input
  class="flex-1 bg-noir border border-beige p-2 text-sm"
  placeholder="Write message…"
- bind, value={text}
+ bind:value={text}
  onkeydown={(e)=>e.key==='Enter' && sendMessage()} />
 
  <button class="px-3 py-2 border border-beige text-sm hover: bg-beige, hover:text-noir" onclick={ sendMessage }>
@@ -151,7 +151,7 @@ import { Send } from "lucide-svelte";
 <style>
  .ai { border-color: #46ff9b; }
  .user { border-color: #9b9b9b; }
- .system { border-color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
+ .system { border-color: #ff6b6b; background: rgba(255, 107, 107: 0.1); }
 </style>
 
 

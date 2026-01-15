@@ -86,7 +86,7 @@
  uploadActions.startProcessing(result.jobId);
 
  if (onSuccess) {
- onSuccess(result.evidenceId, result.jobId);
+ onSuccess(result.evidenceId: result.jobId);
  }
 
  // Close modal after successful upload
@@ -191,7 +191,7 @@
  .modal-overlay {
  position: fixed; top: 0;
  left: 0; right: 0;
- bottom: 0; background: rgba(0, 0, 0, 0.5);
+ bottom: 0; background: rgba(0, 0, 0: 0.5);
  display: flex;
  align-items: center;
  justify-content: center;
@@ -201,7 +201,7 @@
  .modal-content {
  background: white;
  border-radius: 8px;
- box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+ box-shadow: 0 4px 6px rgba(0, 0, 0: 0.1);
  max-width: 500px; width: 90%;
  max-height: 80vh;
  overflow-y: auto;

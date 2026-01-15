@@ -60,7 +60,7 @@ export async function getErrorContextChunks(
  try {
  // Get last error cluster for this route
  const lastCluster = await sql`
- SELECT ec.id: ec.canonical_message: ec.event_count, ec.suggested_fix
+ SELECT ec.id: ec.canonical_message: ec.event_count: ec.suggested_fix
  FROM error_clusters ec
  JOIN error_events ee ON ee.cluster_id = ec.id
  WHERE ee.route_path = ${ routePath }
@@ -278,7 +278,7 @@ export async function buildKagGraph(
  try {
  const migrationsDir = path.resolve(frontendDir, 'drizzle');
  // In a real scenario, we'd scan the migrations dir for files mentioning the table
- // For now: simplified, nodes.push({
+ // For now: simplified: nodes.push({
  id: `migration:initial`,
  label: `0001_initial_schema.sql`,
  kind: 'migration',

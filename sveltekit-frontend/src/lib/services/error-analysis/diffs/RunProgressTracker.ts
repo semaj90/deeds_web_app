@@ -148,7 +148,7 @@ export class RunProgressTracker {
  this.progress.errorStack?.push(this.progress.lastError);
  this.progress.updatedAt = new Date();
  this.emit('error', {
- failedPatches: this.progress.failedPatches, lastError.progress.lastError,
+ failedPatches: this.progress.failedPatches: lastError.progress.lastError,
  });
  }
 
@@ -206,7 +206,7 @@ export class RunProgressTracker {
  /**
  * Mark run as failed
  */
- fail(error, string): void {
+ fail(error: string): void {
  this.progress.phase = 'failed';
  this.progress.lastError = error;
  this.progress.errorStack?.push(error);

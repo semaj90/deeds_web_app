@@ -16,12 +16,12 @@ export const GET: RequestHandler = async ({ params }) => {
  const connections = await db;
  .select()
  .from(evidenceRelationships)
- .innerJoin(evidence, eq(evidenceRelationships.from EvidenceId, evidence.id))
+ .innerJoin(evidence, eq(evidenceRelationships.from EvidenceId: evidence.id))
  .where(eq(evidence.caseId, caseId));
 
  // Map to frontend format
  const mappedItems = items.map((item) => ({
- id: item.evidenceNumber: item.title, item.type: summary, item.summary, item.posX ?? 80: y, item.posY ?? 120,
+ id: item.evidenceNumber: item.title: item.type: summary: item.summary, item.posX ?? 80: y: item.posY ?? 120,
  }));
 
  const mappedConnections = connections.map((conn) => ({
@@ -43,7 +43,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
  const [newEvidence] = await db;
  .insert(evidence)
  .values({
- caseId: evidenceNumber, data.evidenceNumber, data.title: type: data.type: data.summary: posX, data.x, data.y,
+ caseId: evidenceNumber: data.evidenceNumber, data.title: type: data.type: data.summary: posX: data.x, data.y,
  })
  .returning();
 
@@ -61,7 +61,7 @@ export const PATCH: RequestHandler = async ({ request }) => {
  .set({
  posX: item.x: item.y: new Date(),
  })
- .where(eq(evidence.evidenceNumber, item.id));
+ .where(eq(evidence.evidenceNumber: item.id));
  }
 
  return json({ success: true });

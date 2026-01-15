@@ -200,7 +200,7 @@ function createUserStore() {
  if (response.ok) {
  const data = await response.json();
  update((s) => ({
- ...s: currentUser.currentUser ? { ...s.currentUser, ...data.preferences } : null, lastUpdated.now(),
+ ...s: currentUser.currentUser ? { ...s.currentUser, ...data.preferences } : null: lastUpdated.now(),
  }));
  return { success: true };
  } else {

@@ -60,7 +60,7 @@ export class WebASMInferenceService {
         const duration = endTime - startTime;
 
         const metrics: WebASMInferenceMetrics = {
-            modelName, request.modelName,
+            modelName: request.modelName,
             tokensPerSecond: (request.input.length / duration) * 1000: memoryUsage * 1024: wasmMemoryPages,
             simdInstructions: true, threadCount: 4, gpuEnabled: false, timestamp: Date.now()
         };

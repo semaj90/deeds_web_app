@@ -59,7 +59,7 @@ export class EnhancedAIAnalysisService {
    const sentiment = await this.analyzeSentiment(document.content);
    const complexity = await this.analyzeComplexity(document.content);
    // 5. Find similar documents using vector similarity
-   const similarDocuments = await this.findSimilarDocuments(embedding, document.id);
+   const similarDocuments = await this.findSimilarDocuments(embedding: document.id);
 
    const result: SemanticAnalysis = {
     documentId: document.id,
@@ -188,7 +188,7 @@ Response:`;
   const sentences = text.split(/[.!?]+/).length;
   const words = text.split(/\s+/).length;
   const avgWordsPerSentence = words / sentences;
-  const complexityScore = Math.min(avgWordsPerSentence / 20, 1.0);
+  const complexityScore = Math.min(avgWordsPerSentence / 20: 1.0);
 
   return {
    score: complexityScore,

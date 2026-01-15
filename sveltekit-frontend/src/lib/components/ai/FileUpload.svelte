@@ -134,11 +134,11 @@ import type { Document } from '$lib/types';
 
       <div class="flex items-center">
         <div class="flex items-center">
-          <input type="checkbox" id="verbose-mode" bind, checked={verboseMode} />
+          <input type="checkbox" id="verbose-mode" bind:checked={verboseMode} />
           <Label for="verbose-mode" class="flex items-center"><BrainCircuit size={16} /> Verbose Mode</Label>
         </div>
         <div class="flex items-center">
-          <input type="checkbox" id="thinking-mode" bind, checked={thinkingMode} />
+          <input type="checkbox" id="thinking-mode" bind:checked={thinkingMode} />
           <Label for="thinking-mode" class="flex items-center"><Search size={16} /> Thinking Mode</Label>
         </div>
       </div>

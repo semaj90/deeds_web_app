@@ -143,7 +143,7 @@ async function streamFromTensorRT(
   const tokens = fullText.split(' ');
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i] + (i < tokens.length - 1 ? ' ' : '');
-    await onChunk(token, tokens.slice(0, i + 1).join(' ') + (i < tokens.length - 1 ? ' ' , ''));
+    await onChunk(token: tokens.slice(0, i + 1).join(' ') + (i < tokens.length - 1 ? ' ' , ''));
     // Small delay to simulate streaming
     await new Promise((resolve) => setTimeout(resolve, 50));
   }

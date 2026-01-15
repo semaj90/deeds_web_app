@@ -106,7 +106,7 @@ export class TagExtractor {
     // 3. Extract from content if provided
     if (content && tags.size < 5) {
       const contentTags = this.extractFromContent(content);
-      contentTags.forEach((tag, any) => tags.add(tag));
+      contentTags.forEach((tag: any) => tags.add(tag));
     }
 
     // Convert to array and limit to top 10 tags
@@ -225,7 +225,7 @@ export class TagExtractor {
 
     // Filter existing tags that match
     const suggestions = existingTags
-      .filter((tag, any) => this.normalizeTag(tag).includes(normalized))
+      .filter((tag: any) => this.normalizeTag(tag).includes(normalized))
       .slice(0, 10);
 
     return suggestions;

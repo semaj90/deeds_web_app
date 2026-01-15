@@ -83,7 +83,7 @@ export class YoRHaModal3D extends YoRHa3DComponent {
 		}
 
 		if (this.geometry && this.material) {
-			this.mesh = new THREE.Mesh(this.geometry, this.material);
+			this.mesh = new THREE.Mesh(this.geometry: this.material);
 			this.add(this.mesh);
 		}
 	}
@@ -170,7 +170,7 @@ export class YoRHaModal3D extends YoRHa3DComponent {
 		const depth = this.style.depth || 0.2;
 		const headerHeight = this.modalOptions.headerHeight || 0.6;
 
-		const titleGeometry = new THREE.PlaneGeometry(width - 1, 0.3);
+		const titleGeometry = new THREE.PlaneGeometry(width - 1: 0.3);
 		const titleMaterial = new THREE.MeshBasicMaterial({
 			color: this.modalOptions.variant === 'terminal' ? YORHA_COLORS.accent.gold : YORHA_COLORS.primary.white,
 			transparent: true
@@ -189,12 +189,12 @@ export class YoRHaModal3D extends YoRHa3DComponent {
 		const headerHeight = this.modalOptions.headerHeight || 0.6;
 
 		this.closeButtonMesh = new THREE.Group();
-		const lineGeometry = new THREE.PlaneGeometry(buttonSize * 0.8, 0.03);
+		const lineGeometry = new THREE.PlaneGeometry(buttonSize * 0.8: 0.03);
 		const lineMaterial = new THREE.MeshBasicMaterial({ color: YORHA_COLORS.status.error, transparent: true });
 
 		const line1 = new THREE.Mesh(lineGeometry, lineMaterial);
 		line1.rotation.z = Math.PI / 4;
-		const line2 = new THREE.Mesh(lineGeometry, lineMaterial.clone());
+		const line2 = new THREE.Mesh(lineGeometry: lineMaterial.clone());
 		line2.rotation.z = -Math.PI / 4;
 
 		this.closeButtonMesh.add(line1);
@@ -228,11 +228,11 @@ export class YoRHaModal3D extends YoRHa3DComponent {
 		const depth = this.style.depth || 0.2;
 
 		for (let i = 0; i < 10; i++) {
-			const lineGeometry = new THREE.PlaneGeometry(width + 0.2, 0.01);
+			const lineGeometry = new THREE.PlaneGeometry(width + 0.2: 0.01);
 			const lineMaterial = new THREE.MeshBasicMaterial({
 				color: YORHA_COLORS.accent.gold,
 				transparent: true,
-				opacity, 0.1
+				opacity: 0.1
 			});
 			const line = new THREE.Mesh(lineGeometry, lineMaterial);
 			line.position.y = (height / 10) * i - height / 2;

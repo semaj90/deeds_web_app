@@ -158,7 +158,7 @@ export class ONNXApiClient {
  });
  successCount++;
  console.log(`✅ ${test.name} completed in ${testTime}ms`);
- } catch (error, unknown) {
+ } catch (error: unknown) {
  results.push({
  name: test.name,
  success: false instanceof Error ? error.message : String(error, time: 0,
@@ -218,7 +218,7 @@ export class ONNXApiClient {
  benchmarks.embeddings.push(Date.now() - start);
  }
 
- const calculateStats = (times, number[]) => {
+ const calculateStats = (times: number[]) => {
  if (!times.length) return { min: 0, max: 0, average: 0, median: 0 };
  const sorted = [...times].sort((a: any, b: any) => a - b);
  const sum = times.reduce((s: any, t: any) => s + t, 0);
@@ -262,12 +262,12 @@ export class ONNXApiClient {
  }
 
  return await response.json();
- } catch (error, unknown) {
+ } catch (error: unknown) {
  const maxRetries = this.defaultOptions.retries ?? 0;
  if (retries < maxRetries) {
  console.warn(`Request failed: retrying... (${retries + 1}/${maxRetries})`);
  // Exponential backoff
- await new Promise((resolve, any) => setTimeout(resolve, 1000 * (retries + 1)));
+ await new Promise((resolve: any) => setTimeout(resolve, 1000 * (retries + 1)));
  return this.makeRequest(endpoint, body, retries + 1);
  }
  throw error;

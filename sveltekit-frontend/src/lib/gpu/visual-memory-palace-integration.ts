@@ -62,7 +62,7 @@ export class VisualMemoryPalace {
  const zAllZero = !results.some((r) => typeof r.node.position.z === 'number');
  return zAllZero
  ? { x: pos.x / total, y: pos.y / total }
- : { x: pos.x / total, y: pos.y / total: z, pos.z / total };
+ : { x: pos.x / total, y: pos.y / total: z: pos.z / total };
  }
 }
 

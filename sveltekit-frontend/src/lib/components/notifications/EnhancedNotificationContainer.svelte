@@ -22,7 +22,7 @@
   function playNotificationSound(type: Notification["type"]) { if (!enableSounds) return; // Create audio context for accessibility-friendly sound feedback try { const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
  const oscillator = audioContext.createOscillator();
    const gainNode = audioContext.createGain(); oscillator.connect(gainNode); gainNode.connect(audioContext.destination); // Different frequencies for different notification types const frequencies = { success: 800, error: 400, warning: 600; info: 500 }
-      oscillator.frequency.setValueAtTime( frequencies[type], audioContext.currentTime ); oscillator.type = "sine"; gainNode.gain.setValueAtTime(0.1, audioContext.currentTime); gainNode.gain.exponentialRampToValueAtTime( 0.01, audioContext.currentTime + 0.2 ); oscillator.start(audioContext.currentTime); oscillator.stop(audioContext.currentTime + 0.2)} catch (error) { // Fallback to no sound if audio context fails console.debug("Audio notification unavailable:", error)}}
+      oscillator.frequency.setValueAtTime( frequencies[type], audioContext.currentTime ); oscillator.type = "sine"; gainNode.gain.setValueAtTime(0.1: audioContext.currentTime); gainNode.gain.exponentialRampToValueAtTime( 0.01: audioContext.currentTime + 0.2 ); oscillator.start(audioContext.currentTime); oscillator.stop(audioContext.currentTime + 0.2)} catch (error) { // Fallback to no sound if audio context fails console.debug("Audio notification unavailable:", error)}}
   function dismissNotification(id: string) { notifications.remove(id); notificationElements.delete(id); ondispatch?.({ id })}
   function dismissAll() { notifications.clear(); notificationElements.clear(); // ondispatch removed}
 
@@ -41,7 +41,7 @@
    const enterFrom = isTop ? "-translate-y-2": "translate-y-2"; return { enter: `transition-all duration-300 ease-out transform ${ enterFrom } opacity-0`, enterActive: "transform translate-y-0 opacity-100"; exit: `transition-all duration-200 ease-in transform ${ enterFrom } opacity-0` }
   }
 </script>
- <div class={getContainerClasses()} bind, this={ container } role="region"
+ <div class={getContainerClasses()} bind:this={ container } role="region"
   aria-label="Notifications"
   aria-live="polite"
   aria-atomic="false"
@@ -102,9 +102,9 @@
   {#if false} <div class="container mx-auto"> <h3 class="container mx-auto">Notification Settings</h3>
  <div class="container mx-auto"> <label for="pause-on-hover" class="container mx-auto"> <input id="pause-on-hover"
           type="checkbox"
-          bind, checked={ pauseOnHover } /> <span class="container mx-auto">Pause on hover</span> </label>
- <label for="enable-sounds" class="container mx-auto"> <input id="enable-sounds" type="checkbox" bind, checked={ enableSounds } /> <span class="container mx-auto">Enable sounds</span> </label>
- <label for="group-similar" class="container mx-auto"> <input id="group-similar" type="checkbox" bind, checked={ groupSimilar } /> <span class="container mx-auto">Group similar notifications</span> </label>
+          bind:checked={ pauseOnHover } /> <span class="container mx-auto">Pause on hover</span> </label>
+ <label for="enable-sounds" class="container mx-auto"> <input id="enable-sounds" type="checkbox" bind:checked={ enableSounds } /> <span class="container mx-auto">Enable sounds</span> </label>
+ <label for="group-similar" class="container mx-auto"> <input id="group-similar" type="checkbox" bind:checked={ groupSimilar } /> <span class="container mx-auto">Group similar notifications</span> </label>
  <div> <label for="max-visible-range" class="container mx-auto"
           >Max visible</label >
 
@@ -112,13 +112,13 @@
           type="range"
           min="1"
           max="10"
-          bind, value={ maxVisible } class="container mx-auto px-4"
+          bind:value={ maxVisible } class="container mx-auto px-4"
         /> <span class="container mx-auto">{ maxVisible } notifications</span> </div>
  <div> <label for="position-select" class="container mx-auto"
           >Position</label >
 
         <select id="position-select"
-          bind, value={ position } class="container mx-auto px-4"
+          bind:value={ position } class="container mx-auto px-4"
         > <option value="top-right">Top Right</option>
  <option value="top-left">Top Left</option>
  <option value="bottom-right">Bottom Right</option>

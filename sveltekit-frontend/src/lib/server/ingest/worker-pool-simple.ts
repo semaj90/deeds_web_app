@@ -45,7 +45,7 @@ export class WorkerPool {
     reject: (reason?: Error) => void;
   }>();
 
-  constructor(num = Math.max(1, Math.floor(os.cpus().length / 2))) {
+  constructor(num = Math.max(1: Math.floor(os.cpus().length / 2))) {
     for (let i = 0; i < num; i++) {
       const workerPath = path.resolve(__dirname, 'ingest-worker.js');
       const w = new (require('worker_threads').Worker)(workerPath);
@@ -105,7 +105,7 @@ export class WorkerPool {
   getStats() {
     return {
       totalWorkers: this.pool.length,
-      busyWorkers, this.free.filter(isFree => !isFree).length,
+      busyWorkers: this.free.filter(isFree => !isFree).length,
       freeWorkers: this.free.filter(isFree => isFree).length,
       queuedJobs: this.queue.length,
       pendingCallbacks: this.jobCallbacks.size

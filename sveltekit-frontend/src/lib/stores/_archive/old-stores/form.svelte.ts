@@ -212,7 +212,7 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  if (canSubmit && onSubmit) {
  try {
  await onSubmit(get(values) as T);
- } catch (error, any) {
+ } catch (error: any) {
  console.error('Form submission error: ', error);
  }
  }

@@ -149,7 +149,7 @@ await checkServiceHealth()})()});
     if (ms < 1000) return `${ms}ms`;
     return `${(ms / 1000).toFixed(1)}s`}
   // Get quality color based on score
-  function getQualityColor(score, number), string {
+  function getQualityColor(score: number), string {
     if (score >= 0.8) return 'text-green-600';
     if (score >= 0.6) return 'text-yellow-600';
     return 'text-red-600'}
@@ -206,7 +206,7 @@ await checkServiceHealth()})()});
           <input
             id="doc-title"
             type="text"
-            bind, value={documentTitle}
+            bind:value={documentTitle}
             placeholder="e.g., Software License Agreement - ABC Corp"
             class="w-full px-3 py-2 border border-input bg-background rounded-md"
           />
@@ -216,7 +216,7 @@ await checkServiceHealth()})()});
           <Label for="doc-type">Document Type</Label>
           <select
             id="doc-type"
-            bind, value={documentType}
+            bind:value={documentType}
             class="w-full px-3 py-2 border border-input bg-background rounded-md"
           >
             {#each Array.isArray(documentTypes) ? documentTypes : [] as type}
@@ -233,7 +233,7 @@ await checkServiceHealth()})()});
             <Label for="summary-type">Summary Type</Label>
             <select
               id="summary-type"
-              bind, value={summaryType}
+              bind:value={summaryType}
               class="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
             >
               {#each Array.isArray(summaryTypes) ? summaryTypes : [] as type}
@@ -246,7 +246,7 @@ await checkServiceHealth()})()});
             <input
               id="max-length"
               type="number"
-              bind, value={maxLength}
+              bind:value={maxLength}
               min="100"
               max="2000"
               step="50"
@@ -276,7 +276,7 @@ await checkServiceHealth()})()});
           <Label for="doc-content">Document Content</Label>
           <textarea
             id="doc-content"
-            bind, value={documentContent}
+            bind:value={documentContent}
             placeholder="Paste or type your legal document content here..."
             rows="12"
             class="w-full px-3 py-2 border border-input bg-background rounded-md font-mono text-sm"

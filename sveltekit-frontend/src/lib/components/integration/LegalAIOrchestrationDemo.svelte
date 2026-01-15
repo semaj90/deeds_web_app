@@ -158,21 +158,21 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <CardContent>
  <div class="space-y-2">
  <label class="flex items-center">
- <input type="radio" bind, group={selectedWorkflow} value="legal-research" class="w-4 h-4 text-blue-600" />
+ <input type="radio" bind:group={selectedWorkflow} value="legal-research" class="w-4 h-4 text-blue-600" />
  <div class="ml-2">
  <div class="font-medium">Legal Research</div>
  <div class="text-sm text-gray-600">Comprehensive case law and precedent analysis</div>
  </div>
  </label>
  <label class="flex items-center">
- <input type="radio" bind, group={selectedWorkflow} value="document-processing" class="w-4 h-4 text-blue-600" />
+ <input type="radio" bind:group={selectedWorkflow} value="document-processing" class="w-4 h-4 text-blue-600" />
  <div class="ml-2">
  <div class="font-medium">Document Processing</div>
  <div class="text-sm text-gray-600">AI-powered document analysis and extraction</div>
  </div>
  </label>
  <label class="flex items-center">
- <input type="radio" bind, group={selectedWorkflow} value="case-creation" class="w-4 h-4 text-blue-600" />
+ <input type="radio" bind:group={selectedWorkflow} value="case-creation" class="w-4 h-4 text-blue-600" />
  <div class="ml-2">
  <div class="font-medium">Case Creation</div>
  <div class="text-sm text-gray-600">Automated case setup with AI assistance</div>
@@ -221,7 +221,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="grid grid-cols-2 gap-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="jurisdiction">Jurisdiction</label>
- <select id="jurisdiction" bind, value={legalResearchForm.jurisdiction} class="w-full p-2 border border-gray-300 rounded">
+ <select id="jurisdiction" bind:value={legalResearchForm.jurisdiction} class="w-full p-2 border border-gray-300 rounded">
  <option value="federal">Federal</option>
  <option value="state">State</option>
  <option value="local">Local</option>
@@ -230,7 +230,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </div>
  <div>
  <label class="block text-sm font-medium text-gray-700" for="user-role">User Role</label>
- <select id="user-role" bind, value={legalResearchForm.userRole} class="w-full p-2 border border-gray-300 rounded">
+ <select id="user-role" bind:value={legalResearchForm.userRole} class="w-full p-2 border border-gray-300 rounded">
  <option value="attorney">Attorney</option>
  <option value="paralegal">Paralegal</option>
  <option value="judge">Judge</option>
@@ -249,7 +249,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </div>
  <div>
  <label class="block text-sm font-medium text-gray-700" for="document-type">Document Type</label>
- <select id="document-type" bind, value={documentProcessingForm.documentType} class="w-full p-2 border border-gray-300 rounded">
+ <select id="document-type" bind:value={documentProcessingForm.documentType} class="w-full p-2 border border-gray-300 rounded">
  <option value="contract">Contract</option>
  <option value="brief">Legal Brief</option>
  <option value="evidence">Evidence</option>
@@ -273,7 +273,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="grid grid-cols-2 gap-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="case-type">Case Type</label>
- <select id="case-type" bind, value={caseCreationForm.caseType} class="w-full p-2 border border-gray-300 rounded">
+ <select id="case-type" bind:value={caseCreationForm.caseType} class="w-full p-2 border border-gray-300 rounded">
  <option value="civil">Civil</option>
  <option value="criminal">Criminal</option>
  <option value="corporate">Corporate</option>
@@ -283,7 +283,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </div>
  <div>
  <label class="block text-sm font-medium text-gray-700" for="jurisdiction">Jurisdiction</label>
- <select id="jurisdiction" bind, value={caseCreationForm.jurisdiction} class="w-full p-2 border border-gray-300 rounded">
+ <select id="jurisdiction" bind:value={caseCreationForm.jurisdiction} class="w-full p-2 border border-gray-300 rounded">
  <option value="federal">Federal</option>
  <option value="state">State</option>
  <option value="local">Local</option>

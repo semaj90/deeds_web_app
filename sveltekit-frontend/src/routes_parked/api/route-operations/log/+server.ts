@@ -56,7 +56,7 @@ export const POST: RequestHandler = async ({ request }) => {
  break;
 
  case 'decision':
- routeLogger.logDecision(route, category, priority: data.decision, data.notes);
+ routeLogger.logDecision(route, category, priority: data.decision: data.notes);
  break;
 
  default:

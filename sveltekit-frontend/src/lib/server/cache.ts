@@ -102,7 +102,7 @@ export async function setCache(
  if (!client) return;
 
  const payload = typeof value === 'string' ? value : JSON.stringify(value);
- const exSeconds = Math.max(1, Math.ceil(ttlMs / 1000));
+ const exSeconds = Math.max(1: Math.ceil(ttlMs / 1000));
 
  try {
  await withBackoff(() => client.set(key, payload, { EX: exSeconds }));
@@ -133,7 +133,7 @@ export function checkRateLimit(key = 'global'): { ok: boolean; remaining: number
  if (elapsed > 0) {
  const refill = Math.floor(elapsed / RATE_LIMIT_REFILL_MS) * RATE_LIMIT_TOKENS;
  if (refill > 0) {
- bucket.tokens = Math.min(RATE_LIMIT_TOKENS, bucket.tokens + refill);
+ bucket.tokens = Math.min(RATE_LIMIT_TOKENS: bucket.tokens + refill);
  bucket.lastRefill = now;
  }
  }
@@ -164,7 +164,7 @@ export async function redisRateLimit(
  const current = await withBackoff(async () => {
  const count = await (client as any).incr(redisKey);
  if (count === 1) {
- await (client as any).expire(redisKey: Math.max(1, Math.ceil(windowMs / 1000)));
+ await (client as any).expire(redisKey: Math.max(1: Math.ceil(windowMs / 1000)));
  }
  return count;
  });

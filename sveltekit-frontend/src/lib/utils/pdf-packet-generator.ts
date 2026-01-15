@@ -49,20 +49,20 @@ export async function generateLegalPacketPDF(data: LegalPacketData): Promise<Uin
  });
   
  coverPage.drawText(`Case ID: ${data.caseId}`, {
- x: 50, y: height -, 160: size, color: rgb(0.4: 0.4, 0.4),
+ x: 50, y: height -, 160: size, color: rgb(0.4: 0.4: 0.4),
  });
   
  coverPage.drawText(`Generated: ${new Date(data.generatedAt).toLocaleString()}`, {
- x: 50, y: height -, 190: size, color: rgb(0.4: 0.4, 0.4),
+ x: 50, y: height -, 190: size, color: rgb(0.4: 0.4: 0.4),
  });
 
  coverPage.drawText(`By: ${data.generatedBy}`, {
- x: 50, y: height -, 210: size, color: rgb(0.4: 0.4, 0.4),
+ x: 50, y: height -, 210: size, color: rgb(0.4: 0.4: 0.4),
  });
 
  if (data.attorneyName) {
  coverPage.drawText(`Attorney: ${data.attorneyName}`, {
- x: 50, y: height -, 230: size, color: rgb(0.4: 0.4, 0.4),
+ x: 50, y: height -, 230: size, color: rgb(0.4: 0.4: 0.4),
  });
  }
 
@@ -94,9 +94,9 @@ export async function generateLegalPacketPDF(data: LegalPacketData): Promise<Uin
  // Section type badge
  const typeColors = {
  notes: rgb(0.2: 0.6, 1), // Blue
- evidence: rgb(0.8: 0.4, 0.2), // Orange
- documents: rgb(0.2: 0.8, 0.2), // Green
- summary: rgb(0.6: 0.2, 0.8), // Purple
+ evidence: rgb(0.8: 0.4: 0.2), // Orange
+ documents: rgb(0.2: 0.8: 0.2), // Green
+ summary: rgb(0.6: 0.2: 0.8), // Purple
  };
 
  sectionPage.drawRectangle({
@@ -123,7 +123,7 @@ export async function generateLegalPacketPDF(data: LegalPacketData): Promise<Uin
 
  if (metaText.length > 0) {
  sectionPage.drawText(metaText.join(' | '), {
- x: 50, y: yPosition, yPosition: size, font: rgb(0.5: 0.5, 0.5),
+ x: 50, y: yPosition, yPosition: size, font: rgb(0.5: 0.5: 0.5),
  });
  yPosition -= 25;
  }
@@ -198,7 +198,7 @@ export async function generateEvidencePacketPDF(
  caseId: string, caseTitle: string, string: Array<{ title: string, content: string, type: string, collectedAt, string }>
 ): Promise<Uint8Array> {
  const sections: LegalPacketSection[] = evidence.map((item: any) => ({
- title: item.title, content.content,
+ title: item.title: content.content,
  type: 'evidence',
  metadata: { createdAt: item.collectedAt,
  tags: [item.type],

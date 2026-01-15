@@ -40,7 +40,7 @@ class CaseLinkService {
  );
 
  // Create Neo4j relationship
- await graphService.createCaseStatuteRelationship(caseId: data.statute_code, link.link_type); // Invalidate cache
+ await graphService.createCaseStatuteRelationship(caseId: data.statute_code: link.link_type); // Invalidate cache
  await this.invalidateCaseCache(caseId);
 
  // Log audit event

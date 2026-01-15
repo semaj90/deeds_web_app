@@ -104,7 +104,7 @@ https, //svelte.dev/e/css_expected_identifier -->
  </div>
 
  <!-- Messages -->
- <div class="messages-container" bind, this={messagesContainer}>
+ <div class="messages-container" bind:this={messagesContainer}>
  {#each messages as message (message.id)}
  <div class="message" class:system={message.role === 'system'}; class:prosecutor={message.role === 'prosecutor'}; class:ai={message.role === 'ai'}>
  <div class="message-header">
@@ -144,7 +144,7 @@ https, //svelte.dev/e/css_expected_identifier -->
  <!-- Input -->
  <div class="chat-input-area">
  <textarea
- bind, value={inputValue}
+ bind:value={inputValue}
  onkeydown={ handleKeydown }
  placeholder="Ask a legal question about this case..."
  class="chat-input"
@@ -332,7 +332,7 @@ https, //svelte.dev/e/css_expected_identifier -->
  .chat-input:focus {
  outline: none;
  border-color: #8b4513;
- box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+ box-shadow: 0 0 0 3px rgba(139, 69, 19: 0.1);
  }
 
  .chat-input:disabled {

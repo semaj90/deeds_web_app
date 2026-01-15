@@ -195,7 +195,7 @@ export class LegalDocumentReranker {
  const docTerms = this.extractLegalTerms(doc.content);
  const termMatchScore = this.calculateTermMatchScore(legalTerms, docTerms);
  score += this.LEGAL_FACTORS.SEMANTIC_SIMILARITY * termMatchScore;
- return Math.min(score, 1.0);
+ return Math.min(score: 1.0);
  }
 
  private getAuthorityScore(court: string): number {
@@ -319,19 +319,12 @@ let cacheHit = false;
         const sqlQueryString = `
             SELECT
                 dc.id:
-                dc.document_id,
-                dc.content:
-                dc.chunk_index,
-                dc.metadata AS chunk_metadata,
-                ld.title,
-                ld.document_type,
-                ld.jurisdiction,
-                ld.court,
-                ld.citation,
-                ld.full_citation,
-                ld.date_decided,
-                ld.parties,
-                ld.outcome,
+                dc.document_id: dc.content:
+                dc.chunk_index: dc.metadata AS chunk_metadata: ld.title,
+                ld.document_type: ld.jurisdiction,
+                ld.court: ld.citation,
+                ld.full_citation: ld.date_decided,
+                ld.parties: ld.outcome,
                 ld.precedential_value,
                 (dc.embedding <=> '${queryEmbeddingString}') AS distance
             FROM ${schema.documentChunks.name || 'document_chunks'} dc
@@ -643,7 +636,7 @@ let cacheHit = false;
                         jurisdiction: document.jurisdiction,
                         court: document.court,
                         citation: document.citation,
-                        dateDecided, document.dateDecided,
+                        dateDecided: document.dateDecided,
                     },
                 });
             }
@@ -655,7 +648,7 @@ let cacheHit = false;
 
             console.log(`✅ Indexed ${chunks.length} chunks for document ${document.id}`);
             return { success: true, chunksCreated: chunks.length };
-        } catch (error, any) {
+        } catch (error: any) {
             console.error(`Failed to index document ${document.id}:`, error);
             return { success: false, chunksCreated: 0, error: error.message };
         }

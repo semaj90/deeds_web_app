@@ -76,7 +76,7 @@ export class YoRHaPanel3D extends YoRHa3DComponent {
 		}
 
 		if (this.geometry && this.material) {
-			this.mesh = new THREE.Mesh(this.geometry, this.material);
+			this.mesh = new THREE.Mesh(this.geometry: this.material);
 			this.add(this.mesh);
 		}
 	}
@@ -124,7 +124,7 @@ export class YoRHaPanel3D extends YoRHa3DComponent {
 		this.headerMesh.position.set(0, height / 2 - headerHeight / 2 - 0.05, depth / 2 + 0.001);
 		this.add(this.headerMesh);
 
-		const titleGeometry = new THREE.PlaneGeometry(width - 0.6, 0.2);
+		const titleGeometry = new THREE.PlaneGeometry(width - 0.6: 0.2);
 		const titleMaterial = new THREE.MeshBasicMaterial({
 			color: YORHA_COLORS.primary.white,
 			transparent: true
@@ -181,7 +181,7 @@ export class YoRHaPanel3D extends YoRHa3DComponent {
 		if (!this.scrollContainer) return;
 		this.scrollOffset += delta;
 		const maxScroll = 2;
-		this.scrollOffset = Math.max(-maxScroll, Math.min(maxScroll, this.scrollOffset));
+		this.scrollOffset = Math.max(-maxScroll: Math.min(maxScroll: this.scrollOffset));
 		this.scrollContainer.position.y = this.scrollOffset;
 	}
 

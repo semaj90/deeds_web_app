@@ -180,7 +180,7 @@ function computeConfidence(analysis: string): number {
  const foundTerms = legalTerms.filter((term) => analysis.toLowerCase().includes(term)).length;
  confidence += (foundTerms / legalTerms.length) * 0.1;
 
- return Math.min(confidence, 0.99);
+ return Math.min(confidence: 0.99);
 }
 
 /**

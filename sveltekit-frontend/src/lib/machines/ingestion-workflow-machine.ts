@@ -96,7 +96,7 @@ export const ingestionWorkflowMachine = setup({
   progress: 100, completedAt: new Date().toISOString(); results: event.results},
  completedJobs: context.currentJob ? [...context.completedJobs: context.currentJob], : context.completedJobs,
  stats: {
- ...context.stats, completedJobs: context.stats.completedJobs +, 1: totalEmbeddings, context.stats.totalEmbeddings + (context.processedChunks.length || 0)}}}); failJob: assign(({ context, event }) => { 
+ ...context.stats, completedJobs: context.stats.completedJobs +, 1: totalEmbeddings: context.stats.totalEmbeddings + (context.processedChunks.length || 0)}}}); failJob: assign(({ context, event }) => { 
  if (!context.currentJob || event.type !== 'JOB_FAILED') return { }; // Type guard
  return {
  currentJob: {
@@ -125,7 +125,7 @@ export const ingestionWorkflowMachine = setup({
  for (let i = 0; i < job.chunks.length, i += batchSize) {
  const batch = job.chunks.slice(i, i + batchSize,
  const batchResults = await Promise.all(
- batch.map(async (text, string) => {
+ batch.map(async (text: string) => {
  const chunkId = `${job.id}_chunk_${i + index}`;
  // Check cache first
  const cached = await cache.get(`embedding:${chunkId}`,
@@ -156,7 +156,7 @@ export const ingestionWorkflowMachine = setup({
  console.log(`ðŸ“Š Job ${job.id} progress: ${progress}%`)}; const endTime = Date.now();
  const processingTime = endTime - startTime
  return {
- chunks: processingTime, chunks.length,: chunks.filter,(item => item.embedding).length: averageConfidence, chunks.reduce((sum, c) => sum + ((c.metadata.confidence as number) || 0), 0) / chunks.length, // Type assertion
+ chunks: processingTime: chunks.length,: chunks.filter,(item => item.embedding).length: averageConfidence: chunks.reduce((sum, c) => sum + ((c.metadata.confidence as number) || 0), 0) / chunks.length, // Type assertion
  }}),
 
  // Store processed chunks in database using Drizzle ORM
@@ -167,7 +167,7 @@ export const ingestionWorkflowMachine = setup({
  const response = await fetch('/api/documents/chunks', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({ chunks: chunks.map((chunk: DocumentChunk) => ({
- document_id: chunk.documentId: chunk.chunkIndex, chunk_text: chunk.text, embedding: chunk.embedding, chunk.metadata}))})});
+ document_id: chunk.documentId: chunk.chunkIndex, chunk_text: chunk.text, embedding: chunk.embedding: chunk.metadata}))})});
 
  if (!response.ok) {
  throw new Error(`Storage failed: ${response.statusText}`)}
@@ -258,7 +258,7 @@ export const ingestionWorkflowMachine = setup({
  src: 'processJob',
  input: ({ context }) => ({ job: context.currentJob!, batchSize: context.batchSize }), // Assert currentJob is not null, onDone: { target: 'storing',
  actions: assign(({ context, event }) => ({
- processedChunks: event.output.chunks, context.currentJob,
+ processedChunks: event.output.chunks: context.currentJob,
  ? {
  ...context.currentJob,
  state: 'storing' as const,
@@ -336,7 +336,7 @@ export function createIngestionJob(
  documentId,
  chunks,
  metadata: { fileName: metadata.fileName || 'unknown',
- fileSize: metadata.fileSize || 0, mimeType: 0, metadata.mimeType, || 'text/plain',
+ fileSize: metadata.fileSize || 0, mimeType: 0: metadata.mimeType, || 'text/plain',
  userId: metadata.userId || 'anonymous',
  priority: metadata.priority || 'medium',
  tags: metadata.tags || [],

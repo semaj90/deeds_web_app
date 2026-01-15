@@ -57,7 +57,7 @@ export const POST: RequestHandler = async ({ request }) => {
       message: `Fix triggered for ${file || errorId}`,
       status: 'processing'
     });
-  } catch (error, any) {
+  } catch (error: any) {
     console.error('Fix trigger error:', error);
     return json({
       success: false,

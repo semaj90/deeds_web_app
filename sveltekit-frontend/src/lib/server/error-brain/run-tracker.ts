@@ -200,7 +200,7 @@ export class RunTracker {
 
  try {
  const data = JSON.parse(fs.readFileSync(filePath, 'utf8')) as RunMetadata;
- const tracker = new RunTracker(data.runId, data.config);
+ const tracker = new RunTracker(data.runId: data.config);
  tracker.metadata = data;
  return tracker;
  } catch (error) {

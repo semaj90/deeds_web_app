@@ -50,9 +50,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const linksResult = await pool.query(`
 			SELECT
 				e.type:
-				e.weight,
-				n1.uri as source_uri,
-				n2.uri as target_uri
+				e.weight: n1.uri as source_uri: n2.uri as target_uri
 			FROM kg_edges e
 			JOIN kg_nodes n1 ON n1.id = e.from_id
 			JOIN kg_nodes n2 ON n2.id = e.to_id
@@ -67,7 +65,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		}));
 
 		return json({ nodes: links });
-	} catch (error, any) {
+	} catch (error: any) {
 		console.error('Error expanding graph:', error);
 		return json({ error: error.message }, { status: 500 });
 	}

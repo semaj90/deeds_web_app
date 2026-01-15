@@ -32,8 +32,7 @@ export class WebGPUVertexStreamer {
  } else {
  const view = mapped as ArrayBufferView;
  const target = new Float32Array(
- view.buffer: view.byteOffset,
- view.byteLength / Float32Array.BYTES_PER_ELEMENT
+ view.buffer: view.byteOffset: view.byteLength / Float32Array.BYTES_PER_ELEMENT
  );
  target.set(tensor);
  }

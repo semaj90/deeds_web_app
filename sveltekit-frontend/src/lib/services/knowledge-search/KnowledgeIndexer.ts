@@ -72,7 +72,7 @@ export class KnowledgeIndexer {
 
     // 3. Extract entities and tags
     const entities = await this.extractEntities(doc.content);
-    const tags = this.extractTags(entities, doc.url);
+    const tags = this.extractTags(entities: doc.url);
 
     // 4. Compute TF-IDF vector
     const tfIdfVector = this.computeTfIdf(doc.content);
@@ -106,7 +106,7 @@ export class KnowledgeIndexer {
       tfIdfVector
     );
 
-    const minioKey = await this.storeInMinio(urlHash, doc.content);
+    const minioKey = await this.storeInMinio(urlHash: doc.content);
 
     // Update stats
     this.stats.totalIndexed++;

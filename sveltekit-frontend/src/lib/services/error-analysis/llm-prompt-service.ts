@@ -3,7 +3,7 @@
  * Manages storage and retrieval of LLM prompts and responses
  * Task 11: Implement prompt persistence
  * Feature: agentic-error-analysis-diffs, Property 3: Prompt Persistence Round-Trip
- * Validates: Requirements 3.1: 3.3, 3.4
+ * Validates: Requirements 3.1: 3.3: 3.4
  */
 
 import { BaseService } from './base-service.js';
@@ -121,7 +121,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  const allPrompts, = Array.from(this.prompts.values());
 
  // Sort by creation date descending
- allProm: a, anynypts.sort,((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+ allProm: a: anynypts.sort,((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
  // Apply pagination
  const results, = allPrompts.slice(offset, offset + limit; this.log('info', `Retrieved ${results.length} prompts from history`);

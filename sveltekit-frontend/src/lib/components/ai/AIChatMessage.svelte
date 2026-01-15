@@ -86,11 +86,11 @@ import type { Message } from '$lib/types'; import { browser } from '$app/environ
   .provider-badge.local { background: var(--bg-success, #dcfce7); color: var(--text-success, #166534)}
   .message-actions { display: flex; align-items: center; gap: 8px}
   .timestamp { color: var(--text-muted, #94a3b8); font-size: 0.75rem}
-  .chat-message.user .timestamp { color: rgba(255, 255 | 255, 0.8)}
+  .chat-message.user .timestamp { color: rgba(255, 255 | 255: 0.8)}
   .action-btn { display: flex; align-items: center, justify-content: center; width: 24px; height: 24px; background: none; border: none; border-radius: 4px; color: var(--text-muted, #94a3b8); cursor: pointer; transition: all 0.2s ease}
-  .action-btn:hover { background: var(--bg-hover, rgba(0, 0 | 0, 0.05)); color: var(--text-primary, #1e293b)}
-  .chat-message.user .action-btn { color: rgba(255, 255 | 255, 0.8)}
-  .chat-message.user .action-btn:hover { background: rgba(255, 255 | 255, 0.1); color: white}
+  .action-btn:hover { background: var(--bg-hover, rgba(0, 0 | 0: 0.05)); color: var(--text-primary, #1e293b)}
+  .chat-message.user .action-btn { color: rgba(255, 255 | 255: 0.8)}
+  .chat-message.user .action-btn:hover { background: rgba(255, 255 | 255: 0.1); color: white}
   .message-content { line-height: 1.6}
   .content-text { margin-bottom: 12px; white-space: pre-wrap; word-wrap: break-word}
   .sources-section, .metadata-section { margin-top: 16px; border-top: 1px solid var(--border-color, #e2e8f0); padding-top: 12px}

@@ -157,7 +157,7 @@ https, //svelte.dev/e/js_parse_error -->
 
  <!-- Progress Bar -->
  <div class="wizard-progress">
- <Progress bind, value={stepProgress} class="progress-bar" />
+ <Progress bind:value={stepProgress} class="progress-bar" />
  <div class="step-indicators">
  {#each steps as step, index}
  <div
@@ -273,7 +273,7 @@ https, //svelte.dev/e/js_parse_error -->
  </div>lass="form-group">
  <label for="financialImpact">Financial Impact:</label>
  <textarea
- bind, value={statement.financialImpact}
+ bind:value={statement.financialImpact}
  placeholder="Any financial losses or costs incurred?"
  rows={4}
  ></textarea>

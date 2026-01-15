@@ -151,7 +151,7 @@
 	.dashboard-header h1 {
 		font-size: 2.5rem;
 		margin-bottom: 0.5rem;
-		text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+		text-shadow: 2px 2px 4px rgba(0,0,0: 0.3);
 	}
 
 	.subtitle {
@@ -162,7 +162,7 @@
 		text-align: center; padding: 4rem;
 		background: white;
 		border-radius: 12px;
-		box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+		box-shadow: 0 4px 6px rgba(0,0,0: 0.1);
 	}
 
 	.spinner {
@@ -210,13 +210,13 @@
 	.stat-card {
 		background: white; padding: 1.5rem;
 		border-radius: 12px;
-		box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+		box-shadow: 0 4px 6px rgba(0,0,0: 0.1);
 		text-align: center; transition: transform 0.2s;
 	}
 
 	.stat-card:hover {
 		transform: translateY(-4px);
-		box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+		box-shadow: 0 6px 12px rgba(0,0,0: 0.15);
 	}
 
 	.stat-icon {
@@ -244,7 +244,7 @@
 
 	.tabs button {
 		padding: 0.75rem 1.5rem;
-		background: rgba(255, 255, 255, 0.2);
+		background: rgba(255, 255, 255: 0.2);
 		color: white; border: 2px solid transparent;
 		border-radius: 8px; cursor: pointer;
 		font-weight: 500; transition: all 0.2s;
@@ -252,19 +252,19 @@
 	}
 
 	.tabs button:hover {
-		background: rgba(255, 255, 255, 0.3);
+		background: rgba(255, 255, 255: 0.3);
 	}
 
 	.tabs button.active {
 		background: white; color: #667eea;
 		border-color: white;
-		box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+		box-shadow: 0 4px 6px rgba(0,0,0: 0.1);
 	}
 
 	.tab-content {
 		background: white;
 		border-radius: 12px;
-		box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+		box-shadow: 0 4px 6px rgba(0,0,0: 0.1);
 		padding: 2rem;
 		min-height: 500px;
 	}

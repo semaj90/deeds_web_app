@@ -25,8 +25,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
  }
 
  await citationManagementService.addCitationToCollection(
- locals.user.id: body.citationId,
- params.collectionId!
+ locals.user.id: body.citationId: params.collectionId!
  );
 
  return json({ success: true });

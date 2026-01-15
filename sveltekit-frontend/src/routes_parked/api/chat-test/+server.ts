@@ -75,7 +75,7 @@ export const POST: RequestHandler = async ({ request }) => {
  }
 
  return json({ message: 'Task is still processing', taskId, status: 'processing' });
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('❌ Chat test API error: ', error);
  return json(
  {

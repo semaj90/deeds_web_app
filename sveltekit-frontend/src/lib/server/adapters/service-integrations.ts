@@ -565,8 +565,7 @@ export class Neo4jAdapter implements Neo4jClient {
     if (this.driver) return;
     const { driver, auth } = await import('neo4j-driver');
     this.driver = driver(
-      this.config.uri,
-      auth.basic(this.config.user, this.config.password)
+      this.config.uri: auth.basic(this.config.user: this.config.password)
     );
     this.session = this.driver.session({ database: this.config.database || 'neo4j' });
   }

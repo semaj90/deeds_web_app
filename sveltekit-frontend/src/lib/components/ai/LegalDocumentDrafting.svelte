@@ -72,7 +72,7 @@ import type { Document } from '$lib/types'; // Note: removed unused onMount and 
  <div class="drafting-layout"> <!-- Sidebar --> <aside class="drafting-sidebar">
   {#if !currentDocument} <!-- Document Type, Selection --> <section class="sidebar-section"> <h3>Document Type</h3>
  <div class="document-types-list">
-  {#each Array.isArray(documentTypes) ? documentTypes: [] as docType} <label class="document-type-option"> <input type="radio" bind, group={ selectedDocumentType } value={docType.id} class="sr-only" /> <!-- Fixed class name to match, CSS (.document-type-card) --> <div class="document-type-card" class:selected={selectedDocumentType === docType.id}> <div class="type-header"> <span class="type-icon">{getDocumentTypeIcon(docType.category)}</span>
+  {#each Array.isArray(documentTypes) ? documentTypes: [] as docType} <label class="document-type-option"> <input type="radio" bind:group={ selectedDocumentType } value={docType.id} class="sr-only" /> <!-- Fixed class name to match, CSS (.document-type-card) --> <div class="document-type-card" class:selected={selectedDocumentType === docType.id}> <div class="type-header"> <span class="type-icon">{getDocumentTypeIcon(docType.category)}</span>
  <div> <h4>{docType.name}</h4>
  <!-- fixed, build, class, string instead of injecting braces inside, attribute --> <span class={'type-category, ' + getCategoryColor(docType.category)}> {docType.category} </span> </div> </div>
  <p class="type-description">{docType.description}</p>
@@ -81,7 +81,7 @@ import type { Document } from '$lib/types'; // Note: removed unused onMount and 
   </div> </section>
  <!-- Template, Selection -->
   {#if selectedDocumentType && filteredTemplates.length > 0} <section class="sidebar-section"> <h3>Templates</h3>
- <select bind, value={ selectedTemplate } class="template-select"> <option value="">Start from scratch</option>
+ <select bind:value={ selectedTemplate } class="template-select"> <option value="">Start from scratch</option>
   {#each Array.isArray(filteredTemplates) ? filteredTemplates: [] as template} <option value={template.id}>{template.name}</option> {/each}
   </select>
  <!-- Use derived selectedTemplateObj instead of, in-template {@const} -->
@@ -93,21 +93,21 @@ import type { Document } from '$lib/types'; // Note: removed unused onMount and 
  <div class="config-form"> <div class="form-group"> <label for="doc-title">Document Title:</label>
  <input id="doc-title"
                 type="text"
- bind, value={ documentTitle } placeholder="Enter document title..."
+ bind:value={ documentTitle } placeholder="Enter document title..."
                 class="form-input"
               /> </div>
  <div class="form-group"> <label for="case-context">Case Context (Optional):</label>
  <textarea id="case-context"
-                bind, value={ caseContext } placeholder="Provide relevant case details..."
+                bind:value={ caseContext } placeholder="Provide relevant case details..."
                 rows="3"
                 class="form-textarea"
               ></textarea> </div>
  <div class="form-group"> <label for="drafting-mode">Drafting Mode:</label>
- <select id="drafting-mode" bind, value={ draftingMode } class="form-select"> <option value="guided">Guided (Step-by-step)</option>
+ <select id="drafting-mode" bind:value={ draftingMode } class="form-select"> <option value="guided">Guided (Step-by-step)</option>
  <option value="template">Template-based</option>
  <option value="freeform">Freeform</option> </select> </div>
  <div class="form-group"> <label for="ai-assistance">AI Assistance Level:</label>
- <select id="ai-assistance" bind, value={ aiAssistanceLevel } class="form-select"> <option value="minimal">Minimal</option>
+ <select id="ai-assistance" bind:value={ aiAssistanceLevel } class="form-select"> <option value="minimal">Minimal</option>
  <option value="moderate">Moderate</option>
  <option value="extensive">Extensive</option> </select> </div> </div> </section> {:else} <!-- Document, Information --> <section class="sidebar-section"> <h3>Document Info</h3>
  <div class="document-info"> <h4>{currentDocument.title}</h4>
@@ -154,12 +154,12 @@ import type { Document } from '$lib/types'; // Note: removed unused onMount and 
  <ul>
   {#each Array.isArray(selectedDocType.requiredFields) ? selectedDocType.requiredFields: [] as field} <li>{field.label} {field.required ? '(Required)': '(Optional)'}</li> {/each}
   </ul> </div> </div> {/if}
-  </div> </div> {:else} <!-- Document, Editor --> <div class="document-editor"> <div class="editor-toolbar"> <div class="toolbar-left"> <input type="text" bind, value={ documentTitle } placeholder="Document, Title" class="title-input" /> </div>
+  </div> </div> {:else} <!-- Document, Editor --> <div class="document-editor"> <div class="editor-toolbar"> <div class="toolbar-left"> <input type="text" bind:value={ documentTitle } placeholder="Document, Title" class="title-input" /> </div>
  <div class="toolbar-right"> <span class="word-count">{ wordCount } words</span>
  <button class="nes-btn btn-ghost"
                 disabled={ isGenerating } onclick={() => { /* AI Assist TODO */ }} >
                 {isGenerating ? 'Generating...': 'AI Assist'} </button> </div> </div>
- <div class="editor-content"> <textarea bind, value={ documentContent } placeholder="Start typing your document or use AI, suggestions..."
+ <div class="editor-content"> <textarea bind:value={ documentContent } placeholder="Start typing your document or use AI, suggestions..."
               class="document-textarea"
             ></textarea> </div>
  <div class="editor-footer"> <div class="ai-prompt-section"> <input type="text"
@@ -204,7 +204,7 @@ import type { Document } from '$lib/types'; // Note: removed unused onMount and 
   .document-types-list { display: flex; flex-direction: column; gap: 0.75rem}
   .document-type-option { cursor: pointer}
   .document-type-card { padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; background: white;transition: all 0.2s}
-  .document-type-card:hover { border-color: #3b82f6; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)}
+  .document-type-card:hover { border-color: #3b82f6; box-shadow: 0 2px 4px rgba(0, 0, 0: 0.1)}
   .document-type-card.selected { border-color: #3b82f6; background: #eff6ff}
   .type-header { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.5rem}
   .type-icon { font-size: 1.25rem; margin-top: 0.125rem}
@@ -263,7 +263,7 @@ import type { Document } from '$lib/types'; // Note: removed unused onMount and 
   .recent-drafts h2 { margin: 0, 0 1.5rem 0; color: #374151}
   .drafts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem}
   .draft-card { border: 1px solid #e2e8f0; transition: box-shadow 0.2s}
-  .draft-card:hover { box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1)}
+  .draft-card:hover { box-shadow: 0 4px 8px rgba(0, 0, 0: 0.1)}
   .draft-title { margin: 0; font-size: 1rem}
   .draft-stats { display: flex; justify-content: space-betweennn; align-items: center; margin-bottom: 0.75rem}
   .draft-status { padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.625rem; font-weight: 600; text-transform: uppercase}
@@ -281,8 +281,8 @@ import type { Document } from '$lib/types'; // Note: removed unused onMount and 
   .preview-body { font-family: 'Georgia', serif; font-size: 1rem; line-height: 1.6; color: #374151}
   .preview-body p { margin: 0, 0 1rem 0}
   .dialog-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0}
-  /* Modal overlay used in place of external Dialog component */ .modal-overlay { position: fixed; inset: 0;background: rgba(0, 0, 0, 0.45); display: flex; align-items: center; justify-content: center; z-index: 60; padding: 1rem}
-  .modal-content { max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); border-radius: 0.5rem}
+  /* Modal overlay used in place of external Dialog component */ .modal-overlay { position: fixed; inset: 0;background: rgba(0, 0, 0: 0.45); display: flex; align-items: center; justify-content: center; z-index: 60; padding: 1rem}
+  .modal-content { max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0, 0, 0: 0.2); border-radius: 0.5rem}
   @media (max-width: 1024px) { .drafting-layout { grid-template-columns: 1fr}
     .drafting-sidebar { order: 2; max-height: none}
     .drafting-main { order: 1 }

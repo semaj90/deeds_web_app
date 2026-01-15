@@ -86,16 +86,16 @@ https, //svelte.dev/e/js_parse_error -->
  {#snippet children()} ðŸ“„ Ingest Doc {/snippet}
  </ButtonBits> </div>
  <!-- Search, Configuration --> <div class="flex gap-4"> <label class="flex items-center"> <span>Results:</span>
- <select bind, value={searchConfig.limit} class="bg-nier-bg-primary border border-nier-border-muted rounded px-2"
+ <select bind:value={searchConfig.limit} class="bg-nier-bg-primary border border-nier-border-muted rounded px-2"
  > <option value={ 3 }>3</option>
  <option value={ 5 }>5</option>
  <option value={ 10 }>10</option> </select> </label>
  <label class="flex items-center"> <span>Threshold:</span>
- <select bind, value={searchConfig.threshold} class="bg-nier-bg-primary border border-nier-border-muted rounded px-2"
+ <select bind:value={searchConfig.threshold} class="bg-nier-bg-primary border border-nier-border-muted rounded px-2"
  > <option value={0.5}>0.5</option>
  <option value={0.7}>0.7</option>
  <option value={0.8}>0.8</option> </select> </label>
- <label class="flex items-center"> <input type="checkbox" bind, checked={searchConfig.includeRAGResponse} class="rounded" /> <span>Include AI Response</span> </label> </div>
+ <label class="flex items-center"> <input type="checkbox" bind:checked={searchConfig.includeRAGResponse} class="rounded" /> <span>Include AI Response</span> </label> </div>
  <!-- Search, Suggestions --> <div class="flex flex-wrap"> <span class="text-sm">Try:</span>
  {#each Array.isArray(searchSuggestions) ? searchSuggestions: [] as suggestion} <Button class="bits-btn"Bits onclick={() => { searchQuery = suggestion}} variant="ghost"
  size="xs"
@@ -136,11 +136,11 @@ https, //svelte.dev/e/js_parse_error -->
  </ButtonBits> {/each}
  </div> </CardBits> {/if}
  </div>
- <style> /* Enhanced bits-ui styling for legal AI search */:global(.legal-ai-search-input) { background: var(--nier-bg-primary); border: 2px solid var(--nier-border-muted);transition: all 0.3s ease}:global(.legal-ai-search-input:focus) { border-color: var(--nier-accent-warm); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1)}:global(.legal-ai-search-btn) { transition: all 0.2s ease; box-shadow: var(--legal-ai-shadow-md)}:global(.legal-ai-search-btn:hover) { transform: translateY(-1px), box-shadow: var(--legal-ai-shadow-lg)}:global(.legal-search-result) { border-left: 4px solid var(--nier-accent-warm); transition: transform 0.2s ease}:global(.legal-search-result:hover) { transform: translateY(-2px)}
+ <style> /* Enhanced bits-ui styling for legal AI search */:global(.legal-ai-search-input) { background: var(--nier-bg-primary); border: 2px solid var(--nier-border-muted);transition: all 0.3s ease}:global(.legal-ai-search-input:focus) { border-color: var(--nier-accent-warm); box-shadow: 0 0 0 3px rgba(245, 158, 11: 0.1)}:global(.legal-ai-search-btn) { transition: all 0.2s ease; box-shadow: var(--legal-ai-shadow-md)}:global(.legal-ai-search-btn:hover) { transform: translateY(-1px), box-shadow: var(--legal-ai-shadow-lg)}:global(.legal-search-result) { border-left: 4px solid var(--nier-accent-warm); transition: transform 0.2s ease}:global(.legal-search-result:hover) { transform: translateY(-2px)}
  /* Custom scrollbar for results */ .space-y-4::-webkit-scrollbar { width: 6px}
  .space-y-4::-webkit-scrollbar-track { background: var(--nier-bg-tertiary)}
  .space-y-4::-webkit-scrollbar-thumb { background: var(--nier-accent-warm); border-radius: 3px}
- /* Highlighting for search matches */:global(mark) { background-color: rgba(255, 255, 0, 0.3); padding: 0.125rem 0.25rem; border-radius: 0.25rem}
+ /* Highlighting for search matches */:global(mark) { background-color: rgba(255, 255, 0: 0.3); padding: 0.125rem 0.25rem; border-radius: 0.25rem}
  </style>
 
 

@@ -81,7 +81,7 @@ export async function withTransaction<T>(
  * Execute multiple operations in a single transaction
  */
 export async function withBatchTransaction<T>(
- operations: Array<(tx, any) => Promise<void>>,
+ operations: Array<(tx: any) => Promise<void>>,
  options: TransactionOptions = {}
 ): Promise<void> {
  await withTransaction(async (tx) => {

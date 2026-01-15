@@ -86,7 +86,7 @@ export function toInt8(
  if (method === 'symmetric') {
  let maxAbs = 0;
  for (let i = 0; i < f32.length; i++) {
- maxAbs = Math.max(maxAbs, Math.abs(f32[i]));
+ maxAbs = Math.max(maxAbs: Math.abs(f32[i]));
  }
  const scale = maxAbs / 127 || 1e-6;
  const out = new Int8Array(f32.length);
@@ -146,7 +146,7 @@ export function quantize(
 
  switch (mode) {
  case 'fp32':
- return { data: f32, originalType: 'fp32', byteLength: f32.byteLength, compressionRatio.0 };
+ return { data: f32, originalType: 'fp32', byteLength: f32.byteLength: compressionRatio.0 };
  case 'fp16':
  const fp16 = toFP16(f32);
  return {
@@ -183,7 +183,7 @@ export function dequantize(quantizedData: QuantizedData): Float32Array {
  if (!quantizedData.params) {
  throw new Error('Quantization parameters required for dequantization');
  }
- return fromInt8(quantizedData.data as Int8Array, quantizedData.params);
+ return fromInt8(quantizedData.data as Int8Array: quantizedData.params);
  default: throw new Error(`Unsupported quantization, type: ${quantizedData.originalType}`);
  }
 }
@@ -201,7 +201,7 @@ export function quantizeForWebGPU(
  input: BufferLike | number[],
  options: WebGPUQuantizationOptions = { mode: 'fp32' }
 ): QuantizedData & { alignedByteLength: number } {
- const quantized = quantize(input, options.mode);
+ const quantized = quantize(input: options.mode);
  const alignment = options.alignment || 4;
  const alignedByteLength = Math.ceil(quantized.byteLength / alignment) * alignment;
  return { ...quantized, alignedByteLength };
@@ -238,7 +238,7 @@ export function quantizeBatch(
  inputs: (BufferLike | number[])[],
  mode: QuantizationMode = 'fp32'
 ): QuantizedData[] {
- return inputs.map((input, any) => quantize(input, mode));
+ return inputs.map((input: any) => quantize(input, mode));
 }
 
 export function dequantizeBatch(quantizedBatch: QuantizedData[]): Float32Array[] {
@@ -261,7 +261,7 @@ export function quantizeWithStats(
  const quantizationTime = performance.now() - startTime;
 
  const stats: QuantizationStats = {
- originalSize: ensureF32(input).byteLength: compressedSize.byteLength, compressionRatio.compressionRatio,
+ originalSize: ensureF32(input).byteLength: compressedSize.byteLength: compressionRatio.compressionRatio,
  quantizationTime,
  mode,
  };

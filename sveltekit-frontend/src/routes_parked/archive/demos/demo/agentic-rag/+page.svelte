@@ -99,7 +99,7 @@ import { Upload } from "lucide-svelte";
  } else {
  throw new Error(data.error || 'Unknown error');
  }
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  messages = [
  ...messages,
  {

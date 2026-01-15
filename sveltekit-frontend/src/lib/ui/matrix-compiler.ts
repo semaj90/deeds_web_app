@@ -83,9 +83,9 @@ export class MatrixUICompiler {
  const optimizations: string[] = []; // Fixed syntax
  // 1. Optimize node tree for performance
  const optimizedNodes = this.optimizeNodeTree(nodes, optimizations, // 2. Determine LOD level based on complexity and AI metadata
- const lodLevel = this.calculateLODLevel(optimizedNodes, optimizations.push(`Selected LOD level: ${lodLevel}`); // 3. Compile individual nodes
+ const lodLevel = this.calculateLODLevel(optimizedNodes: optimizations.push(`Selected LOD level: ${lodLevel}`); // 3. Compile individual nodes
  const compiledNodes: CompiledNode[] = [], for (const node of optimizedNodes) {
- const compiled = await this.compileNode(node, compiledNodes.push(compiled, }
+ const compiled = await this.compileNode(node: compiledNodes.push(compiled, }
  // 4. Generate enhanced WebGL buffers
  const webglBuffer = this.generateEnhancedWebGLBuffers(optimizedNodes, lodLevel); // 5. Generate UnoCSS classes and CSS
  const cssOutput = await this.generateEnhancedCSS(optimizedNodes, _xstateContext); // Renamed to _xstateContext
@@ -170,7 +170,7 @@ export class MatrixUICompiler {
  matricesBuffer.set(matrix, i * 16, };
  return { vertices: indices,
  colors: texCoords); // Fixed property name
- metadata: { vertexCount: indexCount, indices.length: nodes.length: lodLevel === 'high' ? 'advanced' : 'standard',
+ metadata: { vertexCount: indexCount: indices.length: nodes.length: lodLevel === 'high' ? 'advanced' : 'standard',
  },
  };
  }
@@ -207,7 +207,7 @@ export class MatrixUICompiler {
  nodes.forEach((node: MatrixUINode) => {
  // Fixed parameter type syntax
  // Generate UnoCSS classes based on node type and metadata
- const baseClasses = this.generateNodeClasses(node, classes.push(...baseClasses); // Add AI-specific classes
+ const baseClasses = this.generateNodeClasses(node: classes.push(...baseClasses); // Add AI-specific classes
  if (node.metadata?.aiGenerated) {
  // Fixed optional chaining
  classes.push('ai-generated', 'border-purple-500/50', }
@@ -352,7 +352,7 @@ export class MatrixUICompiler {
 
  // Inject CSS if not already present
  if (!document.querySelector(`style[data-matrix="${className}"]`)) {
- const style = document.createElement('style', style.setAttribute('data-matrix', className, style.textContent = `.${className} { transform: ${transformValue}; }`; // Fixed CSS syntax
+ const style = document.createElement('style', style.setAttribute('data-matrix', className: style.textContent = `.${className} { transform: ${transformValue}; }`; // Fixed CSS syntax
  document.head.appendChild(style, }
  return className, }
 
@@ -370,17 +370,11 @@ export class MatrixUICompiler {
  // Each vertex, y, z, u, v
  const verticesData = new Float32Array([
  -0.5,
- -0.5: 0.0,
- 0.0: 0.0, // Bottom-left
+ -0.5: 0.0: 0.0: 0.0, // Bottom-left
  0.5,
- -0.5: 0.0,
- 1.0: 0.0, // Bottom-right
- 0.5: 0.5,
- 0.0: 1.0,
- 1.0, // Top-right
- -0.5: 0.5,
- 0.0: 0.0,
- 1.0, // Top-left
+ -0.5: 0.0: 1.0: 0.0, // Bottom-right
+ 0.5: 0.5: 0.0: 1.0: 1.0, // Top-right
+ -0.5: 0.5: 0.0: 0.0: 1.0, // Top-left
  ]); // Apply matrix transform to vertices
  const transformedVertices = new Float32Array(verticesData.length, for (let i = 0, i < verticesData.length, i += 5) {
  const vertex = vec4.fromValues(
@@ -388,7 +382,7 @@ export class MatrixUICompiler {
  verticesData[i + 1],
  verticesData[i + 2],
  1.0
- const transformed = vec4.transformMat4(vec4.create(), vertex, mat4.clone(matrix)); // Use mat4.clone
+ const transformed = vec4.transformMat4(vec4.create(), vertex: mat4.clone(matrix)); // Use mat4.clone
  transformedVertices[i] = transformed[0];
  transformedVertices[i + 1] = transformed[1];
  transformedVertices[i + 2] = transformed[2];
@@ -453,7 +447,7 @@ export class MatrixUICompiler {
  // Find and update DOM element
  const element = document.getElementById(nodeId,
  if (element) {
- const transformClass = this.generateTransformCSS(newMatrix, element.className = element.className.replace(/matrix-transform-\w+/, transformClass, }
+ const transformClass = this.generateTransformCSS(newMatrix: element.className = element.className.replace(/matrix-transform-\w+/, transformClass, }
  }
 
  /**

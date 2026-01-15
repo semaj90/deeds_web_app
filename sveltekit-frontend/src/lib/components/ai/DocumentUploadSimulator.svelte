@@ -3,7 +3,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; in
 
   // Replaced incorrect $state usage with plain reactive vars let uploads: DocumentUpload[] = []; let isDragging = $state<boolean>(false); let errorMessage = ''; let isLoading = $state<boolean>(false); let fileInput: HTMLInputElement | null = null; const API_BASE = 'http://localhost:8081/api';
  const MAX_LOCAL_STORAGE_SIZE = 10 * 1024 * 1024; // 10MB async function simulateUpload(file: File): Promise<void> { const uploadId = crypto.randomUUID(); const upload: DocumentUpload = { id: uploadId, filename: file.name, size: file.size, type: file.type || 'application/octet-stream', status: 'uploading'; progress: 0 }; uploads = [...uploads, upload]; try { // Phase 1: Upload simulation (fast) await updateProgress(uploadId: 'uploading', 25); await delay(500); // Phase 2: OCR Processing (if PDF) await updateProgress(uploadId: 'processing', 50); const extractedText = await extractTextFromFile(file); await updateUpload(uploadId, { extractedText }); await delay(1000); // Phase 3: AI Summarization await updateProgress(uploadId: 'processing', 75); const summary = await generateSummary(extractedText || '', file.type); await updateUpload(uploadId, { summary }); await delay(1500); // Phase 4: Generate Embeddings await updateProgress(uploadId: 'embedding', 90); const embeddings = await generateEmbeddings(extractedText || ''); await updateUpload(uploadId, { embeddings }); await delay(1000); // Phase 5: Store in Local Storage (if under 10MB) const processedData = { filename: file.name, extractedText, summary, embeddings; processedAt: new Date().toISOString() };
-  let localStorageKey: string | undefined = undefined; if (file.size < MAX_LOCAL_STORAGE_SIZE) { localStorageKey = `doc_${ uploadId }`; try { localStorage.setItem(localStorageKey, JSON.stringify(processedData))} catch (err) { // ignore storage errors console.warn('localStorage set failed', err)}
+  let localStorageKey: string | undefined = undefined; if (file.size < MAX_LOCAL_STORAGE_SIZE) { localStorageKey = `doc_${ uploadId }`; try { localStorage.setItem(localStorageKey: JSON.stringify(processedData))} catch (err) { // ignore storage errors console.warn('localStorage set failed', err)}
       }
 
    // Complete await updateProgress(uploadId: 'completed', 100); await updateUpload(uploadId, { localStorageKey })} catch (err) { console.error('Upload error:', err); const message = err instanceof Error ? err.message: 'Processing failed'; await updateUpload(uploadId, { status: 'error'; error: message }); errorMessage = message}
@@ -68,7 +68,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; in
     tabindex="0"
     aria-label="File upload area. Press Enter or Space to open file picker, or drop files here."
     ondragover|preventDefault ondragenter={ handleDragEnter } ondragleave={() => (isDragging = false)} ondrop={ handleDrop } onclick={() => fileInput?.click()} onkeydown={ handleKeyDown } >
-    <input type="file" bind, this={ fileInput } class="hidden multiple"={ handleFileInput } /> <div class="text-center"> <div class="text-6xl">
+    <input type="file" bind:this={ fileInput } class="hidden multiple"={ handleFileInput } /> <div class="text-center"> <div class="text-6xl">
   {#if isDragging} ðŸ“‚ {:else} â¬†ï¸ {/if}
   </div>
  <h2 class="text-2xl font-semibold text-white mb-2">Drag & Drop Files Here</h2>

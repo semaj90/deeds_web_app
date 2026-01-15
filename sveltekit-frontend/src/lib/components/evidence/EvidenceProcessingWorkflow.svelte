@@ -11,7 +11,7 @@ interface MinioStorageInfo { storageUrl: string}
 
 interface EvidenceActorState { context: EvidenceProcessingContext & { streamingUpdates?: StreamingUpdate[],errors: string[], portableArtifact?: PortableArtifactInfo; minioStorage?: MinioStorageInfo; processingTimeMs?: number}; value: string; matches: (state: string) => boolean}
 
-  // Svelte props (exported) interface Props { evidenceId?: string; autoStart?: boolean; neuralSpriteEnabled?: boolean; onCompleted?: ((result: any) => void) | undefined; onError?: ((error, string) => void) | undefined; sessionId?: string | null; endpoint?: string}
+  // Svelte props (exported) interface Props { evidenceId?: string; autoStart?: boolean; neuralSpriteEnabled?: boolean; onCompleted?: ((result: any) => void) | undefined; onError?: ((error: string) => void) | undefined; sessionId?: string | null; endpoint?: string}
   let { evidenceId = `evidence_${Date.now()}`, autoStart = false, neuralSpriteEnabled = true, onCompleted, onError, sessionId = null, endpoint = '/api/evidence/process/stream'
   }: Props = $props(); // Events now handled via props in Svelte, 5 // // xState actor for client-side state management const actor = createActor(evidenceProcessingMachine); // Prepare initial snapshot with safe context access (actor may not have started yet) const rawSnapshot = (actor.getSnapshot && (actor.getSnapshot() as any)) || null;
    const initialSnapshot: any = rawSnapshot || { context: value: 'idle', matches: (_: string) => false}
@@ -107,7 +107,7 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
   <!-- Neural Sprite, Configuration -->
   {#if selectedFile && !isProcessing && !isCompleted} <div class="border rounded-lg p-4 bg-gradient-to-r from-purple-50"> <div class="flex items-center gap-2"> <input type="checkbox"
             id="enable-neural-sprite"
-            bind, checked={neuralSpriteConfig.enable_compression} class="rounded"
+            bind:checked={neuralSpriteConfig.enable_compression} class="rounded"
           /> <label for="enable-neural-sprite" class="text-sm"> ðŸ§¬ Enable Neural Sprite Optimization </label>
  <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1"> ADVANCED </span> </div>
   {#if neuralSpriteConfig.enable_compression} <div class="space-y-3 ml-6 border-l-2 border-purple-200"> <div class="flex items-center"> <label for="compression-ratio" class="text-sm text-gray-600">Compression</label>
@@ -115,18 +115,18 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
                 type="range"
                 min="10"
                 max="100"
-                bind, value={neuralSpriteConfig.target_compression_ratio} class="flex-1"
+                bind:value={neuralSpriteConfig.target_compression_ratio} class="flex-1"
               /> <span class="text-sm font-mono w-12"> {neuralSpriteConfig.target_compression_ratio}:1 </span> </div>
  <div class="flex items-center"> <label for="predictive-frames" class="text-sm text-gray-600">Pred. Frames:</label>
  <input id="predictive-frames"
                 type="range"
                 min="0"
                 max="10"
-                bind, value={neuralSpriteConfig.predictive_frames} class="flex-1"
+                bind:value={neuralSpriteConfig.predictive_frames} class="flex-1"
               /> <span class="text-sm font-mono w-12"> {neuralSpriteConfig.predictive_frames} </span> </div>
  <div class="flex items-center"> <input type="checkbox"
                 id="ui-layout-compression"
-                ; bind, checked={neuralSpriteConfig.ui_layout_compression} class="rounded"
+                ; bind:checked={neuralSpriteConfig.ui_layout_compression} class="rounded"
               /> <label for="ui-layout-compression" class="text-sm"> UI Layout Compression Demo </label> </div> {/if} {/if}
   <!-- Processing, Controls -->
   {#if selectedFile && !isProcessing && !isCompleted && !hasError} <div class="flex"> <button type="button" onclick={ startProcessing } class="px-8 py-3"> ðŸš€ Start Processing Workflow </button> {/if}

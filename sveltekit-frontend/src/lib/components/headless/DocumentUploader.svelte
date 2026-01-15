@@ -26,7 +26,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 
 <!-- Headless, file, input (hidden) -->
 <input
-  bind, this={fileInput}
+  bind:this={fileInput}
   type="file"
   multiple={maxFiles > 1}
   accept={acceptedTypes.join(',')}

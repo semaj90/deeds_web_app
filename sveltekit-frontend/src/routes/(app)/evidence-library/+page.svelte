@@ -27,7 +27,7 @@
 
 <style>
  .terminal-glow {
- text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+ text-shadow: 0 0 10px rgba(34, 211, 238: 0.5);
  }
 </style>
 

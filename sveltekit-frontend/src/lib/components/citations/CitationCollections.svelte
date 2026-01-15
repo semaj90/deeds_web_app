@@ -113,7 +113,7 @@
  <input
  id="collection-name"
  type="text"
- bind, value={newCollectionName}
+ bind:value={newCollectionName}
  placeholder="e.g., Civil Rights Cases"
  onkeydown={(e) => e.key === 'Enter' && handleCreateCollection()}
  />
@@ -253,7 +253,7 @@
  .form-group input:focus {
  outline: none;
  border-color: var(--color-burgundy);
- box-shadow: 0 0 0 3px rgba(139, 35, 50, 0.1);
+ box-shadow: 0 0 0 3px rgba(139, 35, 50: 0.1);
  }
 
  .color-picker {
@@ -344,7 +344,7 @@
 
  .collection-button:hover {
  border-color: var(--color-burgundy);
- box-shadow: 0 2px 6px rgba(139, 35, 50, 0.1);
+ box-shadow: 0 2px 6px rgba(139, 35, 50: 0.1);
  }
 
  .collection-color {

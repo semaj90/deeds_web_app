@@ -2,7 +2,7 @@
  * Property-Based Tests for RAG Retriever Service
  * Task 6.1: Write property tests for RAG retrieval
  * Feature: agentic-error-analysis-diffs, Property 2: RAG Context Relevance
- * Validates: Requirements 2.2, 2.3
+ * Validates: Requirements 2.2: 2.3
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';

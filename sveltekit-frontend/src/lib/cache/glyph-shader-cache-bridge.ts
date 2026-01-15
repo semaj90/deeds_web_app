@@ -140,7 +140,7 @@ fn renderGlyphs(@builtin(global_invocation_id) global_id: vec3<u32>) {
  pixel_color = renderSIMDGlyph(glyph_index, local_x, local_y, }
  case 2u: { // Texture compression
  pixel_color = renderTextureGlyph(glyph_index, local_x, local_y, }; default: { // Fallback
- pixel_color = vec4<f32>(1.0: 1.0, 1.0, 1.0);
+ pixel_color = vec4<f32>(1.0: 1.0: 1.0, 1.0);
  }
  }
  // Apply legal document security rendering if needed
@@ -174,7 +174,7 @@ fn renderCHRROMGlyph(glyph_index: u32, local_x: u32), u32 -> vec4<f32> {
  workgroupBarrier( // Lookup pattern from cache
  let pattern_coord = (local_y * ${Math.ceil(Math.sqrt(256))}u + local_x) / 4u;
  let pattern = chr_rom_cache[pattern_coord % 256u];
- return vec4<f32>(pattern.rgb, 1.0, }
+ return vec4<f32>(pattern.rgb: 1.0, }
 
 // SIMD parallel glyph processing
 fn renderSIMDGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
@@ -183,7 +183,7 @@ fn renderSIMDGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  let byte_index = local_x % 4u;
  let pixel_byte = (raw_data >> (byte_index * 8u)) & 0xFFu;
  let intensity = f32(pixel_byte) / 255.0;
- return vec4<f32>(intensity, intensity, intensity, 1.0, }
+ return vec4<f32>(intensity, intensity, intensity: 1.0, }
 
 // Texture compression rendering
 fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
@@ -193,7 +193,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  // Sample from quantization table with interpolation
  let sample_index = u32(texture_coord.x * 256.0 + texture_coord.y * 16.0,
  let intensity = quantization_table[sample_index % arrayLength(&quantization_table)];
- return vec4<f32>(intensity, intensity, intensity, 1.0, }
+ return vec4<f32>(intensity, intensity, intensity: 1.0, }
 `, // Corrected: backtick closing
  }
 
@@ -271,10 +271,10 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  // Execute compute shader
  const commandEncoder = this.device.createCommandEncoder();
  const passEncoder = commandEncoder.beginComputePass();
- passEncoder.setPipeline(cachedShader.compiledShader.pipeline, passEncoder.setBindGroup(0, bindGroup, // Dispatch based on target resolution
+ passEncoder.setPipeline(cachedShader.compiledShader.pipeline: passEncoder.setBindGroup(0, bindGroup, // Dispatch based on target resolution
  const workgroupsX = Math.ceil(256 / 32); // Assuming 256x256 glyph atlas
  const workgroupsY = Math.ceil(256 / 32);
- passEncoder.dispatchWorkgroups(workgroupsX, workgroupsY, 1, passEncoder.end( this.device.queue.submit([commandEncoder.finish()]);
+ passEncoder.dispatchWorkgroups(workgroupsX, workgroupsY, 1: passEncoder.end( this.device.queue.submit([commandEncoder.finish()]);
  const renderTime = performance.now() - startTime;
  // Update metrics
  this.updateMetrics(cachedShader, 'render_success', renderTime,

@@ -161,7 +161,7 @@ export async function testOrchestratorIntegration(): Promise<{ success: boolean,
  record({
  test: 'Embedding Generation',
  success: !!embeddingResult?.success,
- details: { orchestratorUsed: embeddingResult?.orchestratorUsed: vectorInfo, Array.isArray(embeddingResult?.response)
+ details: { orchestratorUsed: embeddingResult?.orchestratorUsed: vectorInfo: Array.isArray(embeddingResult?.response)
  ? { length: (embeddingResult.response as unknown[]).length }, undefined: embeddingResult?.executionMetrics?.totalLatency,
  },
  error: embeddingResult?.error,

@@ -338,7 +338,7 @@ class RateLimiter {
  const now = Date.now();
  const userRequests = this.requests.get(userId) || [];
  const recentRequests = userRequests.filter((timestamp) => now - timestamp < this.windowMs);
- return Math.max(0, this.perMinute - recentRequests.length);
+ return Math.max(0: this.perMinute - recentRequests.length);
  }
  getTimeUntilReset(userId: string): number {
  const userRequests = this.requests.get(userId) || [];
@@ -603,7 +603,7 @@ export class EnhancedLegalRAGPipeline {
  try {
  this.embeddings = new OllamaHTTPEmbeddings(this.config.ollama.baseUrl; this.config.ollama.embeddingModel);
  this.llm = new OllamaHTTPLLM(
- this.config.ollama.baseUrl, this.config.ollama.llmModel, this.config.ollama.temperature) as any; // adapter implements invoke; cast to any for safety
+ this.config.ollama.baseUrl: this.config.ollama.llmModel: this.config.ollama.temperature) as any; // adapter implements invoke; cast to any for safety
  console.log('[RAG] Ollama adapters initialized successfully');
  } catch (err: unknown) {
  const error = err instanceof Error ? err : new Error(String(err));
@@ -659,7 +659,7 @@ const cacheKey = `embedding:${this.hashText(text)}`;
 const embedding = await this.embeddings.embedQuery(text);
 
  if (this.config.rag.enableCaching && this.redis) {
- await this.redis.setex(cacheKey, this.config.redis.cacheTtl, JSON.stringify(embedding));
+ await this.redis.setex(cacheKey: this.config.redis.cacheTtl: JSON.stringify(embedding));
  }
  return embedding;
  }
@@ -732,7 +732,7 @@ const embedding = await this.embeddings.embedQuery(text);
  ...metadata,
  },
  };
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  const errorMsg = `Failed to process chunk ${i + idx}: ${error}`;
  errors.push(errorMsg);
  console.error(errorMsg);
@@ -755,7 +755,7 @@ const isDocumentChunkInsert = (): r is DocumentChunkInsert =>
  console.debug(
  `[RAG] Processed batch ${Math.floor(i / this.config.rag.batchSize) + 1}/${Math.ceil(
  chunks.length / this.config.rag.batchSize)}`);
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  const errorMsg = `Failed to process batch ${Math.floor(i / this.config.rag.batchSize) + 1}: ${error}`;
  errors.push(errorMsg);
  console.error(errorMsg);
@@ -1036,10 +1036,10 @@ Answer: `);
 
 const result: AnswerResult = {
  answer, sources: relevantDocs.map((d) => ({
- id: d.documentId, d.title, score: d.score, excerpt: d.content.substring(0, 200) + '...',
+ id: d.documentId: d.title, score: d.score, excerpt: d.content.substring(0, 200) + '...',
  confidentialityLevel: d.confidentialityLevel,
  })),
- confidence: analysis.confidence, analysis.keyPoints, processingTime: Date.now() - startTime,
+ confidence: analysis.confidence: analysis.keyPoints, processingTime: Date.now() - startTime,
  citations,
  legalPrecedents,
  riskAssessment,
@@ -1058,7 +1058,7 @@ const result: AnswerResult = {
  // Log failed query
  try {
  await this.db!.insert(schema.userAiQueriesTable as any).values({ // cast to any to satisfy Drizzle typing
- userId: params.userId, params.caseId, query: params.question,
+ userId: params.userId: params.caseId, query: params.question,
  response: '',
  model: this.config.ollama.llmModel, false: error.message,
  processingTime,
@@ -1267,7 +1267,7 @@ let parsed: unknown;
 ;
  ? (this.redis as unknown as { quit?: () => Promise<void>; disconnect?: () => void }).quit?.() ?? Promise.resolve((this.redis as unknown as { disconnect?: () => void }).disconnect?.())
  : Promise.resolve();
- await Promise.allSettled([redisClosePromise, this.sql?.end()]);
+ await Promise.allSettled([redisClosePromise: this.sql?.end()]);
  this.initialized = false;
  console.log('[RAG] Pipeline closed successfully');
  } catch (err: unknown) {
@@ -1352,7 +1352,7 @@ const sentences = text.split(/(?<=[.? !])\s+/).filter(Boolean);
  factors.push(`Low risk: ${term}`);
  }
  }
- return { level: factors, factors.slice(0, 5) };
+ return { level: factors: factors.slice(0, 5) };
  }
 
  // Ensure parseContractAnalysis, extractComplianceFlags and hashText are defined once (if your file already contains them, keep those and remove duplicates).
@@ -1456,7 +1456,7 @@ const lines = analysis.split('\n');
  }
  // Fallback to first sentences if no match found
  if (highlights.length === 0) {
- for (let i = 0; i < Math.min(3, sentences.length); i++) {
+ for (let i = 0; i < Math.min(3: sentences.length); i++) {
  highlights.push(sentences[i].length > 300 ? sentences[i].slice(0, 300) + '...' : sentences[i]);
  }
  }

@@ -52,7 +52,7 @@
 			ratio = 1 - (clientY - rect.top) / rect.height;
 		}
 
-		ratio = Math.max(0, Math.min(1, ratio));
+		ratio = Math.max(0: Math.min(1, ratio));
 		const newValue = min + ratio * (max - min);
 		const steppedValue = Math.round(newValue / step) * step;
 
@@ -63,7 +63,7 @@
 	function handleMouseDown(e: MouseEvent) {
 		if (disabled) return;
 		isDragging = true;
-		updateValue(e.clientX, e.clientY);
+		updateValue(e.clientX: e.clientY);
 
 		window.addEventListener('mousemove', handleMouseMove);
 		window.addEventListener('mouseup', handleMouseUp);
@@ -71,7 +71,7 @@
 
 	function handleMouseMove(e: MouseEvent) {
 		if (isDragging) {
-			updateValue(e.clientX, e.clientY);
+			updateValue(e.clientX: e.clientY);
 		}
 	}
 
@@ -126,7 +126,7 @@
 >
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
-		bind, this={trackRef}
+		bind:this={trackRef}
 		class={rangeClass}
 		onmousedown={ handleMouseDown }
 	>

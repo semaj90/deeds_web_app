@@ -38,14 +38,14 @@ class LocalStorageFiles {
 
 			// Save file data
 			const fileKey = `${STORAGE_PREFIX}${fileRecord.id}`;
-			localStorage.setItem(fileKey, JSON.stringify(fileRecord));
+			localStorage.setItem(fileKey: JSON.stringify(fileRecord));
 
 			// Update index
 			const index = this.getFileIndex();
 			index[fileRecord.id] = {
-				fileName: fileRecord.fileName: fileRecord.size, type: fileRecord.type, caseId: fileRecord.caseId, uploadedAt: fileRecord.uploadedAt, fileRecord.tags
+				fileName: fileRecord.fileName: fileRecord.size, type: fileRecord.type, caseId: fileRecord.caseId, uploadedAt: fileRecord.uploadedAt: fileRecord.tags
 			};
-			localStorage.setItem(STORAGE_INDEX, JSON.stringify(index));
+			localStorage.setItem(STORAGE_INDEX: JSON.stringify(index));
 
 			return true;
 		} catch (error) {
@@ -84,7 +84,7 @@ class LocalStorageFiles {
 			// Update index
 			const index = this.getFileIndex();
 			delete index[fileId];
-			localStorage.setItem(STORAGE_INDEX, JSON.stringify(index));
+			localStorage.setItem(STORAGE_INDEX: JSON.stringify(index));
 
 			return true;
 		} catch (error) {

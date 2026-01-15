@@ -82,7 +82,7 @@ export class TransformersService {
  prompt: string, config: Omit<TransformerConfig, 'task'> & { task: 'text-generation' }
  ) {
  const model = await this.loadModel(config);
- const result = await model(prompt, config.options);
+ const result = await model(prompt: config.options);
  return result;
  }
 

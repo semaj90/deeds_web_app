@@ -224,7 +224,7 @@ function truncateLabel(label: string, maxLength: number = 15): string {
 		</div>
 	{:else}
 		<div class="graph-container">
-			<svg bind, this={svgContainer} class="knowledge-graph-svg"></svg>
+			<svg bind:this={svgContainer} class="knowledge-graph-svg"></svg>
 		</div>
 
 		<!-- Legend -->

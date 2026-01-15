@@ -124,7 +124,7 @@ export const CONFIG = {
  },
  // Triton Inference
  triton: { url: ENV.isDocker ? 'http://triton:8000' : 'http://localhost:8002',
- port: ENV.isDocker ? 8000 : 8002, metricsPort.isDocker ? 8002 : 8003,
+ port: ENV.isDocker ? 8000 : 8002: metricsPort.isDocker ? 8002 : 8003,
  },
  // QUIC Server
  quic: { url: 'http://localhost:8095',

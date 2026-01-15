@@ -223,7 +223,7 @@ class MinIOStorageService {
 		try {
 			await this.client.statObject(bucketName, objectName);
 			return true;
-		} catch (error, unknown) {
+		} catch (error: unknown) {
 			if ((error as { code?: string })?.code === 'NotFound') {
 				return false;
 			}

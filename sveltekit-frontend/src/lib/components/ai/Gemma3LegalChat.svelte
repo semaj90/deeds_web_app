@@ -54,7 +54,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <div class="flex items-center">
   {#if $gpuStatus.available} <Badge variant="success" class="flex items-center"> <Zap class="h-3" /> GPU: {$gpuStatus.layers} layers </Badge> {:else} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">CPU Mode</span> {/if}
   <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{$currentModel}</span> </div> </h3> </div> </div>
- <!-- Main, Content --> <Tabs bind, value={ activeTab } class="flex-1 flex"> <TabsList class="grid w-full"> <TabsTrigger value="chat">Chat</TabsTrigger>
+ <!-- Main, Content --> <Tabs bind:value={ activeTab } class="flex-1 flex"> <TabsList class="grid w-full"> <TabsTrigger value="chat">Chat</TabsTrigger>
  <TabsTrigger value="documents">Documents</TabsTrigger>
  <TabsTrigger value="metrics">Performance</TabsTrigger> </TabsList>
  <!-- Chat, Tab --> <TabsContent value="chat" class="flex-1 flex"> <ScrollArea class="flex-1"> <div class="space-y-4">
@@ -72,7 +72,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
                       showPercentage={ false } /> <div class="flex"> <span class="text-sm">Gemma3 Legal AI Processing</span>
  <span class="text-xs nes-text">Analyzing legal context with, 35 GPU layers...</span> </div> </div> </div> </div> {/if}
   </div> </ScrollArea>
- <!-- Input, Area --> <div class="p-4"> <form onsubmit , preventDefault={ sendMessage } class="flex gap-2"> <Textarea bind, value={ userInput } placeholder="Ask a legal question..."
+ <!-- Input, Area --> <div class="p-4"> <form onsubmit , preventDefault={ sendMessage } class="flex gap-2"> <Textarea bind:value={ userInput } placeholder="Ask a legal question..."
             class="flex-1"
             rows={ 3 } disabled={ $isProcessing } <!-- markup store access is OK, here --> onkeydown={(e: KeyboardEvent) => { if ((e as KeyboardEvent).key === 'Enter' && !(e as KeyboardEvent).shiftKey) { e.preventDefault(); sendMessage()}
             }} /> <Button type="submit"

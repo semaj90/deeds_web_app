@@ -115,7 +115,7 @@ export class Context7Phase8Integrator {
 
  // 6. Apply AI reranking based on current context
  return this.rerankRecommendations(recommendations, query);
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  const msg = error instanceof Error ? error.message : String(error);
  console.error('Context7 Phase 8, error: ', msg);
  return this.getFallbackRecommendations(query);
@@ -364,7 +364,7 @@ const adaptiveLOD = {
  .sort((a: any, b: any) => b.aiConfidence - a.aiConfidence);
 
  return result;
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  const msg = error instanceof Error ? error.message : String(error);
  console.warn('Reranking failed, using order: ', msg);
  // Fallback: return recommendations sorted by original aiConfidence

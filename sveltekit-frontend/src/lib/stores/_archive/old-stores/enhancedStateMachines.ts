@@ -159,12 +159,11 @@ export const evidenceProcessingMachine = setup({
  const processingTime = Date.now() - startTime;
  return {
  evidenceId: input.evidence.id: embeddings.vector || [].tags || [].analysis || {},
- processingTime: confidence, Math.min(
- embeddings.confidence || 0, tags.confidence || 0,
- analysis.confidence || 0
+ processingTime: confidence: Math.min(
+ embeddings.confidence || 0: tags.confidence || 0: analysis.confidence || 0
  timestamp: new Date(),
  };
- } catch (error, any) {
+ } catch (error: any) {
  throw new Error(`AI processing failed: ${(error as Error).message}`);
  }
  }),
@@ -175,12 +174,12 @@ export const evidenceProcessingMachine = setup({
  const response = await fetch('/api/vector/search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ vector: input.embeddings, input.limit || 10: threshold: 0.7,
+ body: JSON.stringify({ vector: input.embeddings: input.limit || 10: threshold: 0.7,
  }),
  });
  if (!response.ok) throw new Error('Vector search failed');
  return await response.json();
- } catch (error, any) {
+ } catch (error: any) {
  // Return empty results on failure
  return { matches: [] };
  }
@@ -198,7 +197,7 @@ export const evidenceProcessingMachine = setup({
  });
  if (!response.ok) throw new Error('Relationship discovery failed');
  return await response.json();
- } catch (error, any) {
+ } catch (error: any) {
  // Return empty relationships on failure
  return { nodes: [], connections: [] };
  }
@@ -219,7 +218,7 @@ export const evidenceProcessingMachine = setup({
  ? 'degraded'
  : 'critical';
  return { health: healthStatus, details: checks };
- } catch (error, any) {
+ } catch (error: any) {
  return { health: 'critical', details: [], error: (error as Error).message };
  }
  }, syncCache: fromPromise(async () => {
@@ -228,7 +227,7 @@ export const evidenceProcessingMachine = setup({
  if (!response.ok) throw new Error('Cache sync failed');
  const result = await response.json();
  return { cacheOperations: (result as { operations?: number }).operations || 0 };
- } catch (error, any) {
+ } catch (error: any) {
  return { cacheOperations: 0, error: (error as Error).message };
  }
  }),
@@ -289,28 +288,28 @@ export const evidenceProcessingMachine = setup({
  id: crypto.randomUUID(evidenceId: event.output.evidenceId,
  type: 'analysis',
  status: 'complete',
- result: event.output: event.output.confidence, event.output.processingTime: new Date(),
+ result: event.output: event.output.confidence: event.output.processingTime: new Date(),
  });
  return newResults;
  },
  embeddings: ({ context, event }) => {
  const newEmbeddings = new Map(context.embeddings);
- newEmbeddings.set(event.output.evidenceId, event.output.embeddings);
+ newEmbeddings.set(event.output.evidenceId: event.output.embeddings);
  return newEmbeddings;
  },
  aiTags: ({ context, event }) => {
  const newTags = new Map(context.aiTags);
- newTags.set(event.output.evidenceId, event.output.tags);
+ newTags.set(event.output.evidenceId: event.output.tags);
  return newTags;
  },
  aiAnalysis: ({ context, event }) => {
  const newAnalysis = new Map(context.aiAnalysis);
- newAnalysis.set(event.output.evidenceId, event.output.analysis);
+ newAnalysis.set(event.output.evidenceId: event.output.analysis);
  return newAnalysis;
  },
  processingTime: ({ context, event }) => {
  const newTimes = new Map(context.processingTime);
- newTimes.set(event.output.evidenceId, event.output.processingTime);
+ newTimes.set(event.output.evidenceId: event.output.processingTime);
  return newTimes;
  },
  }),
@@ -529,7 +528,7 @@ export async function initializeEnhancedMachines(): Promise<any> {
   
  evidenceActor.start();
  return { evidenceActor };
- } catch (error, any) {
+ } catch (error: any) {
  console.error('Failed to initialize enhanced machines: ', error);
  throw error;
  }

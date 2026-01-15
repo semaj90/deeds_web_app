@@ -345,7 +345,7 @@
  <div class="current-question">
  <h3>{prosecutionWorkflow[workflowStep].question}</h3>
  <textarea
- bind, value={workflowAnswers[prosecutionWorkflow[workflowStep].step]}
+ bind:value={workflowAnswers[prosecutionWorkflow[workflowStep].step]}
  placeholder="Enter details..."
  class="workflow-input"
  rows="4"
@@ -449,7 +449,7 @@
  {#if showQuickInput}
  <div class="quick-input-panel" transitionfly={{ y: 20, duration, 300 }}>
  <textarea
- bind, value={quickInput}
+ bind:value={quickInput}
  placeholder="Describe what happened... (e.g., 'Urgent fraud case with missing financial records and uncooperative witness')"
  class="quick-input"
  rows="3"
@@ -486,7 +486,7 @@
  display: flex;
  align-items: center;
  justify-content: space-between; padding: 1rem 2rem;
- background: rgba(15, 23, 42, 0.8);
+ background: rgba(15, 23, 42: 0.8);
  backdrop-filter: blur(10px);
  border-bottom: 1px solid #334155;
  }
@@ -511,7 +511,7 @@
  }
  .nav-item:hover,
  .nav-item.active {
- background: rgba(16, 185, 129, 0.1);
+ background: rgba(16, 185, 129: 0.1);
  border-color: #10b981; color: #10b981;
  }
  .user-info {
@@ -538,7 +538,7 @@
  margin-bottom: 2rem;
  }
  .stat-card {
- background: rgba(15, 23, 42, 0.6);
+ background: rgba(15, 23, 42: 0.6);
  border: 1px solid #334155;
  border-radius: 1rem; padding: 1.5rem;
  text-align: center;
@@ -563,7 +563,7 @@
  }
  .recent-cases,
  .ai-insights {
- background: rgba(15, 23, 42, 0.6);
+ background: rgba(15, 23, 42: 0.6);
  border: 1px solid #334155;
  border-radius: 1rem; padding: 1.5rem;
  }
@@ -573,7 +573,7 @@
  color: #10b981;
  }
  .case-preview {
- background: rgba(30, 41, 59, 0.5);
+ background: rgba(30, 41, 59: 0.5);
  border-radius: 0.5rem; padding: 1rem;
  margin-bottom: 1rem;
  }
@@ -615,7 +615,7 @@
  gap: 1.5rem;
  }
  .case-card {
- background: rgba(15, 23, 42, 0.6);
+ background: rgba(15, 23, 42: 0.6);
  border: 1px solid #334155;
  border-radius: 1rem; padding: 1.5rem;
  backdrop-filter: blur(10px);
@@ -646,7 +646,7 @@
  }
  .metric {
  text-align: center; padding: 0.5rem;
- background: rgba(30, 41, 59, 0.5);
+ background: rgba(30, 41, 59: 0.5);
  border-radius: 0.5rem;
  }
  .metric-label {
@@ -676,14 +676,14 @@
  }
  .btn-primary:hover {
  transform: translateY(-1px);
- box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+ box-shadow: 0 4px 12px rgba(16, 185, 129: 0.4);
  }
  .btn-secondary {
- background: rgba(15, 23, 42, 0.8);
+ background: rgba(15, 23, 42: 0.8);
  color: #cbd5e1; border: 1px solid #334155;
  }
  .btn-secondary:hover {
- background: rgba(30, 41, 59, 0.8);
+ background: rgba(30, 41, 59: 0.8);
  }
  .detective-mode {
  max-width: 800px; margin: 0 auto;
@@ -697,15 +697,15 @@
  display: flex;
  flex-direction: column;
  align-items: center; padding: 1rem;
- border-radius: 1rem; background: rgba(30, 41, 59, 0.3);
+ border-radius: 1rem; background: rgba(30, 41, 59: 0.3);
  border: 2px solid #334155;
  transition: all 0.3s ease;
  }
  .workflow-step.active {
- border-color: #10b981; background: rgba(16, 185, 129, 0.1);
+ border-color: #10b981; background: rgba(16, 185, 129: 0.1);
  }
  .workflow-step.completed {
- border-color: #059669; background: rgba(5, 150, 105, 0.2);
+ border-color: #059669; background: rgba(5, 150, 105: 0.2);
  }
  .step-icon {
  font-size: 1.5rem;
@@ -716,14 +716,14 @@
  font-weight: 600; color: #94a3b8;
  }
  .current-question {
- background: rgba(15, 23, 42, 0.6);
+ background: rgba(15, 23, 42: 0.6);
  border: 1px solid #334155;
  border-radius: 1rem; padding: 2rem;
  text-align: center;
  }
  .workflow-input,
  .quick-input {
- width: 100%; background: rgba(30, 41, 59, 0.5);
+ width: 100%; background: rgba(30, 41, 59: 0.5);
  border: 1px solid #334155;
  border-radius: 0.5rem; padding: 1rem;
  color: #e2e8f0;
@@ -734,16 +734,16 @@
  .quick-input:focus {
  outline: none;
  border-color: #10b981;
- box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+ box-shadow: 0 0 0 2px rgba(16, 185, 129: 0.2);
  }
  .ai-assistant-panel {
  position: fixed; bottom: 2rem;
  right: 2rem; width: 400px;
- background: rgba(15, 23, 42, 0.95);
+ background: rgba(15, 23, 42: 0.95);
  border: 1px solid #334155;
  border-radius: 1rem; padding: 1.5rem;
  backdrop-filter: blur(20px);
- box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+ box-shadow: 0 10px 40px rgba(0, 0, 0: 0.3);
  z-index: 1000;
  }
  .ai-header {
@@ -770,7 +770,7 @@
  right: 2px; width: 12px;
  height: 12px;
  border-radius: 50%; background: #10b981;
- border: 2px solid rgba(15, 23, 42, 0.95);
+ border: 2px solid rgba(15, 23, 42: 0.95);
  transition: all 0.3s ease;
  }
  .status-indicator.active {
@@ -786,7 +786,7 @@
  font-size: 0.75rem;
  }
  .typewriter-container {
- background: rgba(30, 41, 59, 0.5);
+ background: rgba(30, 41, 59: 0.5);
  border-radius: 0.75rem; padding: 1rem;
  margin: 1rem 0;
  min-height: 60px; display: flex;
@@ -821,7 +821,7 @@
  }
  .insight-card {
  display: flex; gap: 0.75rem;
- padding: 1rem; background: rgba(30, 41, 59, 0.5);
+ padding: 1rem; background: rgba(30, 41, 59: 0.5);
  border-radius: 0.5rem;
  margin-bottom: 1rem;
  }

@@ -128,19 +128,19 @@ export class ASTProcessor {
  const suggestions: Autosuggestion[] = [];
 
  // Get symbols in scope
- const symbolsInScope = this.getSymbolsInScope(sourceFile, context.position);
+ const symbolsInScope = this.getSymbolsInScope(sourceFile: context.position);
 
  // Context-aware suggestions based on scope
  if (context.scope === 'global') {
- suggestions.push(...this.generateGlobalSuggestions(symbolsInScope, context.prefix));
+ suggestions.push(...this.generateGlobalSuggestions(symbolsInScope: context.prefix));
  } else if (context.scope === 'class') {
- suggestions.push(...this.generateClassSuggestions(nodeAtPosition, context.prefix));
+ suggestions.push(...this.generateClassSuggestions(nodeAtPosition: context.prefix));
  } else if (context.scope === 'function' || context.scope === 'method') {
- suggestions.push(...this.generateFunctionSuggestions(nodeAtPosition, context.prefix));
+ suggestions.push(...this.generateFunctionSuggestions(nodeAtPosition: context.prefix));
  }
 
  // Add import suggestions
- suggestions.push(...(await this.generateImportSuggestions(sourceFile, context.prefix)));
+ suggestions.push(...(await this.generateImportSuggestions(sourceFile: context.prefix)));
 
  // Add AI-powered suggestions using gemma3-legal
  suggestions.push(...(await this.generateAISuggestions(context)));
@@ -401,7 +401,7 @@ Response:`;
  kind: 'function' as const,
  description: suggestion.description,
  score: 0.6 - index * 0.1, // Decreasing score for AI suggestions
- }));: 'function' as const, description: suggestion.description, 0.6 - index * 0.1, // Decreasing score for AI suggestions
+ }));: 'function' as const, description: suggestion.description: 0.6 - index * 0.1, // Decreasing score for AI suggestions
  }));
  } catch (error) {
  console.warn('AI suggestion failed:', error);
@@ -419,7 +419,7 @@ Response:`;
  const avgScore = suggestions.reduce((sum, s) => sum + s.score, 0) / suggestions.length;
  const contextBonus = context.scope === 'global' ? 0.1 : 0;
 
- return Math.min(avgScore + contextBonus, 1.0);
+ return Math.min(avgScore + contextBonus: 1.0);
  }
 
  /**

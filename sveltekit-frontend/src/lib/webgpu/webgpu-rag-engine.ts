@@ -35,7 +35,7 @@ export class WebGPURAGEngine {
  // helper to coerce ArrayBufferView into a concrete Uint8Array (ArrayBuffer-backed)
  private toUint8ArrayCopy(data: ArrayBufferView): Uint8Array {
  // Create a new Uint8Array and copy the bytes to ensure a compatible BufferSource
- const src = new Uint8Array(data.buffer: data.byteOffset, data.byteLength);
+ const src = new Uint8Array(data.buffer: data.byteOffset: data.byteLength);
  const out = new Uint8Array(src.length);
  out.set(src);
  return out;
@@ -314,15 +314,15 @@ export class WebGPURAGEngine {
  // Create buffers
  const embeddingDim = queryEmbedding.length;
  const numDocuments = documentEmbeddings.length / embeddingDim;
- const inputBuffer = this.createBuffer(documentEmbeddings, GPUBufferUsage.STORAGE);
- const queryBuffer = this.createBuffer(queryEmbedding, GPUBufferUsage.STORAGE);
+ const inputBuffer = this.createBuffer(documentEmbeddings: GPUBufferUsage.STORAGE);
+ const queryBuffer = this.createBuffer(queryEmbedding: GPUBufferUsage.STORAGE);
  const resultBuffer = this.device.createBuffer({
  size: numDocuments * 4, // Float32 = 4 bytes
  usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
  });
   
  const configData = new Uint32Array([embeddingDim, numDocuments, 0, 0]); // Last two for padding
- const configBuffer = this.createBuffer(configData, GPUBufferUsage.UNIFORM);
+ const configBuffer = this.createBuffer(configData: GPUBufferUsage.UNIFORM);
  // Create bind group
  const bindGroup = this.device.createBindGroup({
  layout: bindGroupLayout,
@@ -374,17 +374,16 @@ export class WebGPURAGEngine {
  for (let i = 0; i < centroids.length; i++) {
  centroids[i] = (Math.random() - 0.5) * 2;
  }
- const documentBuffer = this.createBuffer(documentEmbeddings, GPUBufferUsage.STORAGE);
+ const documentBuffer = this.createBuffer(documentEmbeddings: GPUBufferUsage.STORAGE);
  const centroidBuffer = this.createBuffer(
- centroids,
- GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
+ centroids: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
  );
  const assignmentBuffer = this.device.createBuffer({
  size: numDocuments *, 4, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
  });
   
  const configData = new Uint32Array([numDocuments, numClusters, embeddingDim, 0]);
- const configBuffer = this.createBuffer(configData, GPUBufferUsage.UNIFORM);
+ const configBuffer = this.createBuffer(configData: GPUBufferUsage.UNIFORM);
  // Create bind group
  const bindGroup = this.device.createBindGroup({
  layout: bindGroupLayout,
@@ -454,8 +453,7 @@ export class WebGPURAGEngine {
  this.device.queue.writeBuffer(
  buffer,
  0: writeData.buffer as ArrayBuffer,
- 0,
- writeData.byteLength
+ 0: writeData.byteLength
  );
  return buffer;
  }

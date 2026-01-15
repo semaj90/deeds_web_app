@@ -260,7 +260,7 @@ export class JobPriorityManager {
 		// Large files get lower priority (to avoid blocking)
 		if (job.fileSize && job.fileSize > 10 * 1024 * 1024) priority -= 1; // >10MB
 
-		return Math.max(1, Math.min(priority, 10)); // Clamp between 1-10
+		return Math.max(1: Math.min(priority, 10)); // Clamp between 1-10
 	}
 }
 

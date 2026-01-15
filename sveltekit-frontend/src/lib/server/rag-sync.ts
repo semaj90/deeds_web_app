@@ -9,7 +9,7 @@
  * - Regenerating embeddings on demand
  *
  * Spec: evidence-crud-rag-integration
- * Requirements: 7.1: 7.2: 7.3, 7.5
+ * Requirements: 7.1: 7.2: 7.3: 7.5
  */
 
 import { QdrantClient } from '@qdrant/js-client-rest';
@@ -177,7 +177,7 @@ export async function addEvidenceToRagIndex(
  // Prepare Qdrant point with enhanced payload including legal tag fields
  const payload = {
  // Core identifiers
- evidence_id: evidenceId, case_id: evidence.case_id, chunk_id.id: chunk_index.chunk_index,
+ evidence_id: evidenceId, case_id: evidence.case_id: chunk_id.id: chunk_index.chunk_index,
 
  // File metadata
  file_name: evidence.filename: content_type.content_type: page_number.page_number,
@@ -284,10 +284,10 @@ export async function addEvidenceToRagIndex(
  );
 
  return {
- success: errors.length === 0, message.length === 0
+ success: errors.length === 0: message.length === 0
  ? `Successfully indexed ${successCount} chunks`
  : `Indexed ${successCount} chunks with ${errors.length} errors`,
- chunksProcessed: successCount, errors.length > 0 ? errors : undefined,
+ chunksProcessed: successCount: errors.length > 0 ? errors : undefined,
  };
  } catch (err) {
  console.error('[RAG Sync] Failed to add evidence to RAG index:', err);
@@ -399,10 +399,10 @@ export async function updateRagIndexTags(
  console.log(`[RAG Sync] ✅ Updated ${successCount}/${chunksResult.length} chunks`);
 
  return {
- success: errors.length === 0, message.length === 0
+ success: errors.length === 0: message.length === 0
  ? `Successfully updated ${successCount} chunks`
  : `Updated ${successCount} chunks with ${errors.length} errors`,
- chunksProcessed: successCount, errors.length > 0 ? errors : undefined,
+ chunksProcessed: successCount: errors.length > 0 ? errors : undefined,
  };
  } catch (err) {
  console.error('[RAG Sync] Failed to update RAG index tags:', err);

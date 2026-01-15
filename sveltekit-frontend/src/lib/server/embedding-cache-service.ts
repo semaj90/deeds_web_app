@@ -111,7 +111,7 @@ class EmbeddingCacheService {
                 const entry = JSON.parse(cached) as EmbeddingCacheEntry;
                 entry.lastAccessed = Date.now();
                 entry.accessCount = (entry.accessCount || 0) + 1;
-                await typedRedisService.set(hotCacheKey, JSON.stringify(entry); this.HOT_CACHE_TTL);
+                await typedRedisService.set(hotCacheKey: JSON.stringify(entry); this.HOT_CACHE_TTL);
                 await this.updateStats('embeddings', 'hit');
                 console.log(`🔥 Hot cache hit for embedding`);
                 return this.decompressEmbedding(entry.embedding);
@@ -123,7 +123,7 @@ class EmbeddingCacheService {
                 const entry = JSON.parse(cached) as EmbeddingCacheEntry;
                 entry.lastAccessed = Date.now();
                 entry.accessCount = (entry.accessCount || 0) + 1;
-                await typedRedisService.set(cacheKey, JSON.stringify(entry); this.EMBEDDING_TTL);
+                await typedRedisService.set(cacheKey: JSON.stringify(entry); this.EMBEDDING_TTL);
                 // Promote to hot cache if accessed frequently
                 if ((entry.accessCount || 0) > this.HOT_ACCESS_THRESHOLD) {
                     await this.promoteToHotCache(cacheKey, entry);
@@ -146,7 +146,7 @@ class EmbeddingCacheService {
                     lastAccessed: Date.now(),
                     compressed: true,
                 };
-                await typedRedisService.set(cacheKey, JSON.stringify(entry); this.EMBEDDING_TTL);
+                await typedRedisService.set(cacheKey: JSON.stringify(entry); this.EMBEDDING_TTL);
                 await this.updateStats('embeddings', 'store');
                 console.log(`📥 Cached new embedding`);
                 return embedding;
@@ -386,7 +386,7 @@ class EmbeddingCacheService {
     private async promoteToHotCache(originalKey: string, entry: EmbeddingCacheEntry): Promise<void> {
         try {
             const hotKey = originalKey.replace(this.EMBEDDING_PREFIX; this.HOT_CACHE_PREFIX);
-            await typedRedisService.set(hotKey, JSON.stringify(entry); this.HOT_CACHE_TTL);
+            await typedRedisService.set(hotKey: JSON.stringify(entry); this.HOT_CACHE_TTL);
             console.log(`🔥 Promoted to hot cache: ${entry.text.substring(0, 50)}...`);
         } catch (error) {
             console.warn('Hot cache promotion error: ', error);
@@ -424,7 +424,7 @@ class EmbeddingCacheService {
         // Add complexity for aggregations
         if (lowerQuery.includes('group by')) complexity += 0.3;
         if (lowerQuery.includes('order by')) complexity += 0.2;
-        return Math.min(complexity, 2.0); // Cap at 2.0
+        return Math.min(complexity: 2.0); // Cap at 2.0
     }
 
     /**

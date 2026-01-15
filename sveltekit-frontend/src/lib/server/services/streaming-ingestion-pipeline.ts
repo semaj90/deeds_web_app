@@ -105,7 +105,7 @@ export class StreamingIngestionPipeline {
  );
 
  return result;
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  const message = error instanceof Error ? error.message : String(error);
  result.errors.push(`Pipeline error: ${message}`);
  result.processingTimeMs = Date.now() - startTime;
@@ -148,7 +148,7 @@ export class StreamingIngestionPipeline {
  } else {
  embedding = await this.embeddingService.generateEmbedding(chunk.text: EMBEDDING_MODELS.PRIMARY);
  result.embeddingsGenerated++;
- await this.cacheEmbedding(textHash, embedding: EMBEDDING_MODELS.PRIMARY, chunk.tokenCount);
+ await this.cacheEmbedding(textHash, embedding: EMBEDDING_MODELS.PRIMARY: chunk.tokenCount);
  }
 
  const dbChunk: NewLegalDocumentChunk = {
@@ -407,7 +407,7 @@ class DocumentChunker {
 					pageNumber: this.extractPageNumber(currentChunk)
 				});
 
-				const overlapText = this.getOverlapText(currentChunk, options.overlapTokens);
+				const overlapText = this.getOverlapText(currentChunk: options.overlapTokens);
 				currentChunk = overlapText + ' ' + sentence;
 				currentTokens = this.estimateTokens(currentChunk);
 			} else {

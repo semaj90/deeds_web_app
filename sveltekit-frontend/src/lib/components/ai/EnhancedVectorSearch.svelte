@@ -49,7 +49,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
     } catch (error) { console.warn("Failed to load analytics:", error)}
   }
 </script>
- <!-- Main, Search, Interface --> <div class="enhanced-vector-search { className }"> <!-- Search, Header --> <div class="search-header"> <div class="search-input-container"> <div class="relative"> <Search class="search-icon" size={ 20 } /> <Input bind, value={$searchQuery} placeholder="Search legal documents with AI-powered semantic, search..."
+ <!-- Main, Search, Interface --> <div class="enhanced-vector-search { className }"> <!-- Search, Header --> <div class="search-header"> <div class="search-input-container"> <div class="relative"> <Search class="search-icon" size={ 20 } /> <Input bind:value={$searchQuery} placeholder="Search legal documents with AI-powered semantic, search..."
           class="search-input"
           keydown={(e) => e.key === "Enter" && performSearch()} disabled={$isSearching} />
   {#if $isSearching} <Loader2 class="loading-icon" size={ 20 } /> {/if}
@@ -83,24 +83,24 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={ resetFilters }> Reset </h3> </div>
  <div class="yorha-panel-content"> <div class="filter-grid"> <!-- Document, Types --> <div class="filter-group"> <label class="filter-label">Document Types</label>
  <div class="checkbox-group">
-  {#each Array.isArray(documentTypes) ? documentTypes: [] as type} <Checkbox bind, checked={ $searchFilters.documentTypes.includes(type.value } onchange={() => { searchFilters.update((f) => { if (f.documentTypes.includes(type.value)) { f.documentTypes = f.documentTypes.filter( (t) => t !== type.value )} else { f.documentTypes = [...f.documentTypes, type.value]}
+  {#each Array.isArray(documentTypes) ? documentTypes: [] as type} <Checkbox bind:checked={ $searchFilters.documentTypes.includes(type.value } onchange={() => { searchFilters.update((f) => { if (f.documentTypes.includes(type.value)) { f.documentTypes = f.documentTypes.filter( (t) => t !== type.value )} else { f.documentTypes = [...f.documentTypes: type.value]}
                       return f})}} >
                   {type.label}
 </Checkbox> {/each}
   </div> </div>
  <!-- Jurisdictions --> <div class="filter-group"> <label class="filter-label">Jurisdictions</label>
  <div class="checkbox-group">
-  {#each Array.isArray(jurisdictions) ? jurisdictions: [] as jurisdiction} <Checkbox bind, checked={ $searchFilters.jurisdictions.includes(jurisdiction.value } onchange={() => { searchFilters.update((f) => { if (f.jurisdictions.includes(jurisdiction.value)) { f.jurisdictions = f.jurisdictions.filter( (j) => j !== jurisdiction.value )} else { f.jurisdictions = [ ...f.jurisdictions, jurisdiction.value]}
+  {#each Array.isArray(jurisdictions) ? jurisdictions: [] as jurisdiction} <Checkbox bind:checked={ $searchFilters.jurisdictions.includes(jurisdiction.value } onchange={() => { searchFilters.update((f) => { if (f.jurisdictions.includes(jurisdiction.value)) { f.jurisdictions = f.jurisdictions.filter( (j) => j !== jurisdiction.value )} else { f.jurisdictions = [ ...f.jurisdictions: jurisdiction.value]}
                       return f})}} >
                   {jurisdiction.label}
 </Checkbox> {/each}
   </div> </div>
  <!-- Similarity, Threshold --> <div class="filter-group"> <label class="filter-label"> Similarity Threshold: {formatSimilarity( $searchFilters.similarityThreshold )}
 </label>
- <Slider bind, value={$searchFilters.similarityThreshold} min={0.1} max={1.0} step={0.05} class="similarity-slider"
+ <Slider bind:value={$searchFilters.similarityThreshold} min={0.1} max={1.0} step={0.05} class="similarity-slider"
             /> </div>
  <!-- Sort, Options --> <div class="filter-group"> <label class="filter-label">Sort By</label>
- <Select bind, value={$searchFilters.sortBy}> <SelectTrigger> <SelectValue /> </SelectTrigger>
+ <Select bind:value={$searchFilters.sortBy}> <SelectTrigger> <SelectValue /> </SelectTrigger>
  <SelectContent>
   {#each Array.isArray(sortOptions) ? sortOptions: [] as option} <SelectItem value={option.value}>{option.label}
 </SelectItem> {/each}
@@ -208,7 +208,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   } .history-label { font-size: 0.875rem; color: var(--muted-foreground)}
   .history-tags { display: flex; flex-wrap: wrap; gap: 0.5rem}
   .history-tag { height: 1.75rem; padding-left: 0.5rem; padding-right: 0.5rem; font-size: 0.75rem}
-  .filters-panel { border: 2px dashed; border-color: rgba(107, 114, 128, 0.25)}
+  .filters-panel { border: 2px dashed; border-color: rgba(107, 114, 128: 0.25)}
   .filter-grid { display: grid; grid-template-columns: 1fr; gap: 1rem}
   @media (min-width: 768px) { .filter-grid { grid-template-columns: repeat(2, 1fr)}
   } @media (min-width: 1024px) { .filter-grid { grid-template-columns: repeat(4, 1fr)}
@@ -227,7 +227,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .stats-badges { display: flex; flex-wrap: wrap; gap: 0.5rem}
   .results-list { display: flex; flex-direction: column; gap: 0.75rem}
   .result-item { cursor: pointer; transition: box-shadow 0.2}
-  .result-item:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1)}
+  .result-item:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0: 0.1)}
   .result-content { display: flex; flex-direction: column; gap: 0.75rem}
   .result-header { display: flex; align-items: flex-start; justify-content: space-betweenn}
   .result-title-section { flex: 1; min-width: 0 }

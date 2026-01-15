@@ -167,7 +167,7 @@
  </div>
  <!-- Show, password, toggle -->
  <div class="flex">
- <input type="checkbox" id="showPassword" bind, checked={showPassword} disabled={isLoading} class="mr-2" />
+ <input type="checkbox" id="showPassword" bind:checked={showPassword} disabled={isLoading} class="mr-2" />
  <label for="showPassword" class="text-sm"> Show passwords </label>
  </div>
  <!-- Terms -->

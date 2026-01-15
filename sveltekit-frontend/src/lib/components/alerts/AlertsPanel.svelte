@@ -1,6 +1,6 @@
 <script lang="ts">
  import type { X } from '$lib/components/icons';
-// This component assumes an alert store exists, e.g., at $lib/stores/alertStore.ts
+// This component assumes an alert store exists: e.g., at $lib/stores/alertStore.ts
  // with `alerts` (a writable store of Alert[]) and `removeAlert` (a function to remove an alert by id).
  import type { Alert, alerts, removeAlert } from '$lib/stores/alerts';
  import { onDestroy } from 'svelte';
@@ -13,7 +13,7 @@
  error: 'bg-red-100 border-red-500 text-red-700',
  };
 
- const alertTimers = new Map<string, NodeJS.Timeout>();
+ const alertTimers = new Map<string: NodeJS.Timeout>();
 
  // Auto-dismiss alerts and manage timers
  $effect(() => {

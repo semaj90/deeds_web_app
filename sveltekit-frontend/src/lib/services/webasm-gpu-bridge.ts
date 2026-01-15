@@ -80,7 +80,7 @@ export class WebASMGPUBridge {
             this.capabilities = await this.detectCapabilities(adapter);
             console.log('✅ WebGPU initialized successfully');
             console.log('🔧 GPU Capabilities: ', this.capabilities);
-        } catch (error, unknown) {
+        } catch (error: unknown) {
             console.error('❌ GPU initialization failed: ', error);
             await this.initializeWebGL();
         }
@@ -111,7 +111,7 @@ export class WebASMGPUBridge {
 
             console.log('✅ WebGL initialized as fallback');
             console.log('🔧 WebGL Capabilities: ', this.capabilities);
-        } catch (error, unknown) {
+        } catch (error: unknown) {
             console.error('❌ WebGL initialization failed: ', error);
             this.capabilities = null;
         }
@@ -126,7 +126,7 @@ export class WebASMGPUBridge {
 
         return {
             webgl2: true, webgpu: true,
-            maxTextureSize, limits.maxTextureDimension2D || 8192, maxComputeWorkgroupSize: 8192, limits.maxComputeWorkgroupSizeX || 256, maxBufferSize: 256, limits.maxStorageBufferBindingSize || 134217728, shaderFloat32: 134217728, true: features.has ? features.has('shader-f16') , false: computeShaders, true: features.has ? features.has('bgra8unorm-storage') : false
+            maxTextureSize: limits.maxTextureDimension2D || 8192, maxComputeWorkgroupSize: 8192: limits.maxComputeWorkgroupSizeX || 256, maxBufferSize: 256: limits.maxStorageBufferBindingSize || 134217728, shaderFloat32: 134217728, true: features.has ? features.has('shader-f16') , false: computeShaders, true: features.has ? features.has('bgra8unorm-storage') : false
         };
     }
 

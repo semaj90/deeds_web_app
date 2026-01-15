@@ -39,7 +39,7 @@ export class VectorWasmWrapper {
  this.initialized = true;
  console.log('[VectorWASM] Module initialized successfully');
  return true;
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('[VectorWASM] Failed to initialize: ', error);
  return false;
  }
@@ -61,12 +61,12 @@ export class VectorWasmWrapper {
  const ptrB = this.module.__new(bytesPerVector);
  try {
  // Copy data to WASM memory
- const memoryA = new Float32Array(this.module.memory.buffer, ptrA, vectorA.length);
- const memoryB = new Float32Array(this.module.memory.buffer, ptrB, vectorB.length);
+ const memoryA = new Float32Array(this.module.memory.buffer, ptrA: vectorA.length);
+ const memoryB = new Float32Array(this.module.memory.buffer, ptrB: vectorB.length);
  memoryA.set(vectorA);
  memoryB.set(vectorB);
  // Call WASM function
- const similarity = this.module.cosineSimilarity(ptrA, ptrB, vectorA.length);
+ const similarity = this.module.cosineSimilarity(ptrA, ptrB: vectorA.length);
  return similarity;
  } finally {
  // Free allocated memory
@@ -108,8 +108,8 @@ export class VectorWasmWrapper {
  const resultsPtr = this.module.__new(resultsBytes);
  try {
  // Copy data to WASM memory
- new Float32Array(this.module.memory.buffer, queryPtr, query.length).set(query);
- new Float32Array(this.module.memory.buffer, vectorsPtr, flatVectors.length).set(flatVectors);
+ new Float32Array(this.module.memory.buffer, queryPtr: query.length).set(query);
+ new Float32Array(this.module.memory.buffer, vectorsPtr: flatVectors.length).set(flatVectors);
  // Map algorithm name to number
  const algorithmMap = { cosine: 0, euclidean: 1, dot: 2, manhattan: 3 };
  const algNum = algorithmMap[algorithm];
@@ -147,7 +147,7 @@ export class VectorWasmWrapper {
  const embeddingPtr = this.module.__new(dimensions * 4);
  try {
  // Copy text to WASM memory
- new Uint8Array(this.module.memory.buffer, textPtr, textBytes.length).set(textBytes);
+ new Uint8Array(this.module.memory.buffer, textPtr: textBytes.length).set(textBytes);
  // Generate embedding
  this.module.hashEmbedding(textPtr: textBytes.length, embeddingPtr, dimensions);
  // Read results
@@ -171,10 +171,10 @@ export class VectorWasmWrapper {
  const vectorPtr = this.module.__new(vectorBytes);
  try {
  // Copy vector to WASM memory
- const wasmVector = new Float32Array(this.module.memory.buffer, vectorPtr, vector.length);
+ const wasmVector = new Float32Array(this.module.memory.buffer, vectorPtr: vector.length);
  wasmVector.set(vector);
  // Normalize in place
- this.module.normalize(vectorPtr, vector.length);
+ this.module.normalize(vectorPtr: vector.length);
  // Return normalized vector
  return new Float32Array(wasmVector);
  } finally {

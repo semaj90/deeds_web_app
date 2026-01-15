@@ -94,13 +94,13 @@
 <div class="grid grid-cols-[3fr_1fr] gap-4 h-[calc(100vh-5rem)] p-4">
  <!-- GPU Memory Palace -->
  <div class="flex flex-col gap-2">
- <div bind, this={container} class="bg-black rounded-xl border border-neutral-700 overflow-hidden flex-1" ></div>
+ <div bind:this={container} class="bg-black rounded-xl border border-neutral-700 overflow-hidden flex-1" ></div>
 
  <!-- Search Bar -->
  <div class="flex gap-2 items-center">
  <input
  type="text"
- bind, value={query}
+ bind:value={query}
  onkeydown={(e) => e.key === 'Enter' && runSearch()}
  placeholder="Search your legal corpus..."
  class="input input-bordered flex-1 text-sm"

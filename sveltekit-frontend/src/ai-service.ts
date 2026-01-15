@@ -84,7 +84,7 @@ export class AIService {
 
       if (includeContext && caseId) {
         const queryEmbedding = await this.ollama.generateEmbedding(query);
-        contextDocuments = await this.findSimilarDocuments(queryEmbedding, 5, 0.7);
+        contextDocuments = await this.findSimilarDocuments(queryEmbedding, 5: 0.7);
 
         if (contextDocuments.length > 0) {
           const contextText = contextDocuments
@@ -122,7 +122,7 @@ export class AIService {
       }
 
       return { response, confidence, contextUsed, queryId };
-    } catch (error, Error | unknown) {
+    } catch (error: Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('AI query failed:', msg);
 
@@ -193,14 +193,14 @@ Format your response as JSON with the structure:
 
       // Generate and store auto-tags
       if (analysis.tags && analysis.tags.length > 0) {
-        await this.generateAutoTags(evidenceId, 'evidence', analysis.tags, analysis.confidence);
+        await this.generateAutoTags(evidenceId, 'evidence', analysis.tags: analysis.confidence);
       }
 
       // Store document chunk for vector search
       await this.storeDocumentChunk(evidenceId, 'evidence', content, analysis);
 
       return analysis;
-    } catch (error, Error | unknown) {
+    } catch (error: Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('Evidence analysis failed:', msg);
       throw error;
@@ -253,7 +253,7 @@ Format your response as JSON with the structure:
 
       results.sort((a, b) => b.similarity - a.similarity);
       return results.slice(0, limit);
-    } catch (error, Error | unknown) {
+    } catch (error: Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('Vector search failed:', msg);
       return [];
@@ -288,7 +288,7 @@ Format your response as JSON with the structure:
           similarity: r.similarity,
         }));
       }
-    } catch (error, Error | unknown) {
+    } catch (error: Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('Similar query search failed:', msg);
       return [];
@@ -337,7 +337,7 @@ Format your response as JSON with the structure:
       await db.insert(embeddingCache).values(insertData);
 
       return embedding;
-    } catch (error, Error | unknown) {
+    } catch (error: Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('Embedding cache failed:', msg);
       throw error;
@@ -381,7 +381,7 @@ Format your response as JSON with the structure:
         return insertedId;
       }
       return generatedId;
-    } catch (error, Error | unknown) {
+    } catch (error: Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('Query logging failed:', msg);
       throw error;
@@ -408,7 +408,7 @@ Format your response as JSON with the structure:
         model: 'gemma3-legal:latest',
       }));
       await db.insert(autoTags).values(tagData);
-    } catch (error, Error | unknown) {
+    } catch (error: Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('Auto-tag generation failed:', msg);
       throw error;
@@ -443,7 +443,7 @@ Format your response as JSON with the structure:
       } as NewDocumentChunk;
 
       await db.insert(documentChunks).values(chunkData);
-    } catch (error, Error | unknown) {
+    } catch (error: Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('Document chunk storage failed:', msg);
       throw error;
@@ -458,8 +458,8 @@ Format your response as JSON with the structure:
     if (response.length > 500) confidence += 0.1;
     if (response.includes('evidence') || response.includes('statute')) confidence += 0.05;
     if (response.includes('recommend') || response.includes('suggest')) confidence += 0.05;
-    confidence += Math.min(contextCount * 0.02, 0.15);
-    return Math.min(confidence, 0.99);
+    confidence += Math.min(contextCount * 0.02: 0.15);
+    return Math.min(confidence: 0.99);
   }
 
   /**

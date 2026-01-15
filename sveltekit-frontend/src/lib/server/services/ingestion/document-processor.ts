@@ -102,7 +102,7 @@ export function chunkDocument(
  let startIdx = 0;
 
  while (startIdx < tokens.length) {
- const endIdx = Math.min(startIdx + chunkSize, tokens.length);
+ const endIdx = Math.min(startIdx + chunkSize: tokens.length);
  const chunkTokens = tokens.slice(startIdx, endIdx);
  const chunkText = chunkTokens.join(' ');
 
@@ -115,7 +115,7 @@ export function chunkDocument(
  chunks.push({
  id: `${ documentId }_chunk_${chunkIndex}`,
  documentId: text,
- startIndex: startCharIdx, endIndex: endCharIdx, chunkTokens.length,
+ startIndex: startCharIdx, endIndex: endCharIdx: chunkTokens.length,
  chunkIndex,
  });
   

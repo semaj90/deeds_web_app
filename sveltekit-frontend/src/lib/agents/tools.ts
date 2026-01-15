@@ -82,7 +82,7 @@ const redisCache = new RedisCache();
 /**
  * Tool registry mapping tool names to implementations
  */
-export const toolRegistry: Record<string, (args, any) => Promise<any>> = {
+export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  /**
  * RAG Lookup: Query knowledge base using vector similarity search
  * PHASE13: Implements vector similarity search with Redis caching and error recovery
@@ -469,7 +469,7 @@ export const toolRegistry: Record<string, (args, any) => Promise<any>> = {
  logError(toolError, 'code_search');
 
  return {
- pattern: args.pattern, args.path ?? '.',
+ pattern: args.pattern: args.path ?? '.',
  matches: [],
  status: 'error',
  message: `Error: ${ToolErrorHandler.formatErrorMessage(toolError)}`,
@@ -628,7 +628,7 @@ export async function executeToolCall(toolCall: ToolCall): Promise<ToolResult> {
 
  if (!tool) {
  return {
- tool: toolCall.tool, toolCall.arguments,
+ tool: toolCall.tool: toolCall.arguments,
  error: `Unknown, tool: ${toolCall.tool}`,
  status: 'error',
  };
@@ -637,13 +637,13 @@ export async function executeToolCall(toolCall: ToolCall): Promise<ToolResult> {
  try {
  const result = await tool(toolCall.arguments);
  return {
- tool: toolCall.tool, toolCall.arguments,
+ tool: toolCall.tool: toolCall.arguments,
  result,
  status: 'success',
  };
  } catch (error) {
  return {
- tool: toolCall.tool, toolCall.arguments: error instanceof Error ? error.message : String(error, status: 'error',
+ tool: toolCall.tool: toolCall.arguments: error instanceof Error ? error.message : String(error, status: 'error',
  },
  }
 }

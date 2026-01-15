@@ -71,7 +71,7 @@ export const canvasEditorMachine = createMachine({
  states: { idle: {
  on: { ADD_TO_HISTORY: {
  actions: assign({ history: ({ context, event }) => {
- const newHistory = context.history.slice(0, context.historyIndex + 1);
+ const newHistory = context.history.slice(0: context.historyIndex + 1);
  newHistory.push(event.state);
  return newHistory;
  },

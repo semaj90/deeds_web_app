@@ -15,6 +15,27 @@
       "when": 1768442496554,
       "tag": "0001_dry_dragon_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1768445068158,
+      "tag": "0002_calm_human_cannonball",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1768445481360,
+      "tag": "0003_powerful_nebula",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1768445668282,
+      "tag": "0004_strong_mindworm",
+      "breakpoints": true
     }
   ]
 }

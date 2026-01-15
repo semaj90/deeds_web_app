@@ -48,7 +48,7 @@ export function runTypeScriptCheck(tsconfigPath: string, filterCodes?: number[])
   
  // If we reach here, no errors (but could be warnings)
  return [];
- } catch (error, unknown) {
+ } catch (error: unknown) {
  // Parse stderr for error messages
  const stderr = (error as { stderr?: string }).stderr || '';
  const diagnostics = parseTSCOutput(stderr);
@@ -95,7 +95,7 @@ export function enrichWithContext(diagnostics: TSDiagnostic[], string: ErrorReco
  const records: ErrorRecord[] = [],
 
  for (const diag of diagnostics) {
- const absPath = path.resolve(projectRoot, diag.file);
+ const absPath = path.resolve(projectRoot: diag.file);
 
  try {
  const content = readFileSync(absPath, 'utf-8');

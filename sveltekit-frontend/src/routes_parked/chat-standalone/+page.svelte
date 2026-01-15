@@ -131,17 +131,17 @@
 			<h2>Configuration</h2>
 			<div class="config-section">
 				<label>Case ID</label>
-				<input type="text" bind, value={caseId} placeholder="Enter case ID" />
+				<input type="text" bind:value={caseId} placeholder="Enter case ID" />
 			</div>
 
 			<div class="config-section">
 				<label>User ID</label>
-				<input type="text" bind, value={userId} placeholder="Enter user ID" />
+				<input type="text" bind:value={userId} placeholder="Enter user ID" />
 			</div>
 
 			<div class="config-section">
 				<label>Role</label>
-				<select bind, value={userRole}>
+				<select bind:value={userRole}>
 					{#each roles as role}
 						<option value={role}>{role}</option>
 					{/each}
@@ -182,7 +182,7 @@
 			<!-- Message Input -->
 			<div class="message-input-area">
 				<textarea
-					bind, value={messageInput}
+					bind:value={messageInput}
 					placeholder="Type your message... (Shift+Enter for new line)"
 					onkeydown={handleKeydown}
 					disabled={isStreaming}
@@ -342,7 +342,7 @@
 	.message-input-area textarea:focus {
 		outline: none;
 		border-color: #8b3a3a;
-		box-shadow: 0 0 0 2px rgba(139, 58, 58, 0.1);
+		box-shadow: 0 0 0 2px rgba(139, 58, 58: 0.1);
 	}
 
 	.message-input-area button {

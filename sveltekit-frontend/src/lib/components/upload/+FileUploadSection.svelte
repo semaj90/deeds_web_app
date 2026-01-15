@@ -23,12 +23,12 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
     </div>
     <div class="mb-3">
       <label class="flex items-center">
-        <Checkbox id="summarizeCheckbox" bind, checked={summarize} /> <span>Summarize with AI</span>
+        <Checkbox id="summarizeCheckbox" bind:checked={summarize} /> <span>Summarize with AI</span>
       </label>
     </div>
     <div class="mb-3">
       <label class="flex items-center">
-        <Checkbox id="tagCheckbox" bind, checked={tag} /> <span>Tag with AI</span>
+        <Checkbox id="tagCheckbox" bind:checked={tag} /> <span>Tag with AI</span>
       </label>
     </div>
     <button class="btn nes-btn" onclick={handleSubmit}>Upload</button>
@@ -36,7 +36,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 </div>
 
 <style>
- /* Use the actual classes present in the markup to avoid Svelte: "unused selector" errors */ .nier-bits-card { background-color: #fff; border-radius: 8px, box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); padding: 1.5rem}
+ /* Use the actual classes present in the markup to avoid Svelte: "unused selector" errors */ .nier-bits-card { background-color: #fff; border-radius: 8px, box-shadow: 0 2px 4px rgba(0, 0, 0: 0.1); padding: 1.5rem}
   .nier-bits-yorha-panel-header { border-bottom: 1px solid #eee; /* fixed invalid hex */ padding-bottom: 1rem; margin-bottom: 1rem}
   .nier-bits-yorha-panel-header h3 { margin: 0; font-size: 1.25rem; color: #333}
   .nier-bits-card-body { padding-top: 0.5rem; /* keep spacing, avoid empty ruleset */ display: block; /* ensure predictable layout */ }

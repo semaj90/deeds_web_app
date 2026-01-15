@@ -268,7 +268,7 @@ export class ErrorBrainAPI extends BaseService {
  /**
  * Validates error object structure
  */
- private isValidError(error, unknown): error is AnalysisError {
+ private isValidError(error: unknown): error is AnalysisError {
  if (typeof error !== 'object' || error === null) {
  return false;
  }

@@ -44,7 +44,7 @@
  if (!ctx || !$nodes .length) return;
 
  // Clear canvas
- ctx.clearRect(0, 0, canvas.width, canvas.height);
+ ctx.clearRect(0, 0: canvas.width, canvas.height);
 
  // Draw each connection
  $connections .forEach(connection => {
@@ -70,11 +70,11 @@
  ctx.stroke();
 
  // Draw arrowhead
- drawArrowhead(fromX, fromY, toX, toY, style.color);
+ drawArrowhead(fromX, fromY, toX, toY: style.color);
 
  // Draw connection label if strength is notable
  if (connection.strength > 0.3) {
- drawConnectionLabel(fromX, fromY, toX, toY, connection.strength);
+ drawConnectionLabel(fromX, fromY, toX, toY: connection.strength);
  }
  });
  }
@@ -104,7 +104,7 @@
  const midY = (fromY + toY) / 2;
 
  // Background circle
- ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+ ctx.fillStyle = 'rgba(255, 255, 255: 0.9)';
  ctx.beginPath();
  ctx.arc(midX, midY, 12, 0, 2 * Math.PI);
  ctx.fill();
@@ -154,7 +154,7 @@
 </script>
 
 <canvas
- bind, this={canvas}
+ bind:this={canvas}
  class="connections-canvas"
  width="100%"
  height="100%"

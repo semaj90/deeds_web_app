@@ -44,7 +44,7 @@ async function seed() {
 		const insertedUsers = [];
 		for (const user of seedUsers) {
 			try {
-				const existing = await db.select().from(users).where(eq(users.email, user.email)).limit(1);
+				const existing = await db.select().from(users).where(eq(users.email: user.email)).limit(1);
 
 				if (existing.length === 0) {
 					const [created] = await db.insert(users).values(user).returning();
@@ -91,7 +91,7 @@ async function seed() {
 					const existing = await db
 						.select()
 						.from(cases)
-						.where(eq(cases.caseNumber, caseData.caseNumber))
+						.where(eq(cases.caseNumber: caseData.caseNumber))
 						.limit(1);
 
 					if (existing.length === 0) {

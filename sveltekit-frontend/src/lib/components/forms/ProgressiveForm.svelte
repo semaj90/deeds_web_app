@@ -1,6 +1,6 @@
 <!-- ProgressiveForm.svelte - Example of properly progressive enhanced, form --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { enhance } from '$app/forms';
  import { createProgressiveForm, type ProgressiveEnhancementConfig } from '$lib/utils/progressive-enhancement-audit.js';
- import type { SubmitFunction } from '@sveltejs/kit'; // Props for form configuration let { // Form behavior props action = '/api/submit-form', method = 'POST' as 'GET' | 'POST', // Data props initialData = as { [key: string]: unknown }, // Configuration props config = as Partial<ProgressiveEnhancementConfig>, // Event handlers onsubmit = undefined as ((data: FormData) => void) | undefined, onsuccess = undefined as ((result: unknown) => void) | undefined, onerror = undefined as ((error, string) => void) | undefined, // Form styling class: className = '', // Form metadata formId = `form-${Date.now()}`, title = 'Progressive Form', description = ''
+ import type { SubmitFunction } from '@sveltejs/kit'; // Props for form configuration let { // Form behavior props action = '/api/submit-form', method = 'POST' as 'GET' | 'POST', // Data props initialData = as { [key: string]: unknown }, // Configuration props config = as Partial<ProgressiveEnhancementConfig>, // Event handlers onsubmit = undefined as ((data: FormData) => void) | undefined, onsuccess = undefined as ((result: unknown) => void) | undefined, onerror = undefined as ((error: string) => void) | undefined, // Form styling class: className = '', // Form metadata formId = `form-${Date.now()}`, title = 'Progressive Form', description = ''
   } = $props(); // Initialize progressive form utilities const progressiveForm = createProgressiveForm(config); // Form state let formState = $state(progressiveForm.createFormState(initialData));
    let isSubmitting = $state<boolean>(false);
    let submitMessage = $state<string>('');
@@ -19,7 +19,7 @@
     } }
 
   // Validate entire form function validateForm(): boolean { const fields = ['email', 'password', 'confirmPassword', 'firstName', 'lastName', 'terms'];
-   let isValid = true; for (const fieldName of fields) { const error = validateField(fieldName, formState.data[fieldName]); if (error) { formState.errors[fieldName] = error; isValid = false} else { delete formState.errors[fieldName]}
+   let isValid = true; for (const fieldName of fields) { const error = validateField(fieldName: formState.data[fieldName]); if (error) { formState.errors[fieldName] = error; isValid = false} else { delete formState.errors[fieldName]}
     } return isValid}
 
   // Enhanced submit function for SvelteKit const handleEnhancedSubmit: SubmitFunction = ({ formData: cancel }) => { // Client-side validation before submit if (!validateForm()) { cancel(); // Focus first invalid field const firstErrorField = Object.keys(formState.errors)[0]; if (firstErrorField) {
@@ -70,14 +70,14 @@
  <input {...getFieldAria('firstName')} type="text"
           name="firstName"
           class="form-input {hasError('firstName') ? 'error', ''}"
-          bind, value={formState.data.firstName} oninput={e => handleFieldChange('firstName', e.target.value)} onblur={() => (formState.touched.firstName = true)} required />
+          bind:value={formState.data.firstName} oninput={e => handleFieldChange('firstName', e.target.value)} onblur={() => (formState.touched.firstName = true)} required />
   {#if hasError('firstName')} <div id={progressiveForm.generateErrorId(fieldIds.firstName)} class="field-error" role="alert"> {getError('firstName')} {/if}
   </div>
  <div class="form-group"> <label for={fieldIds.lastName} class="form-label"> Last Name </label>
  <input {...getFieldAria('lastName')} type="text"
           name="lastName"
           class="form-input {hasError('lastName') ? 'error', ''}"
-          bind, value={formState.data.lastName} oninput={e => handleFieldChange('lastName', e.target.value)} onblur={() => (formState.touched.lastName = true)} required />
+          bind:value={formState.data.lastName} oninput={e => handleFieldChange('lastName', e.target.value)} onblur={() => (formState.touched.lastName = true)} required />
   {#if hasError('lastName')} <div id={progressiveForm.generateErrorId(fieldIds.lastName)} class="field-error" role="alert"> {getError('lastName')} {/if}
   </div> </div> </fieldset>
  <!-- Account, Information, Fieldset --> <fieldset class="form-section"> <legend>Account Information</legend>
@@ -85,7 +85,7 @@
  <input {...getFieldAria('email')} type="email"
         name="email"
         class="form-input {hasError('email') ? 'error', ''}"
-        bind, value={formState.data.email} oninput={e => handleFieldChange('email', e.target.value)} onblur={() => (formState.touched.email = true)} autocomplete="email"
+        bind:value={formState.data.email} oninput={e => handleFieldChange('email', e.target.value)} onblur={() => (formState.touched.email = true)} autocomplete="email"
         required />
   {#if hasError('email')} <div id={progressiveForm.generateErrorId(fieldIds.email)} class="field-error" role="alert"> {getError('email')} {/if}
   </div>
@@ -93,7 +93,7 @@
  <input {...getFieldAria('password')} type="password"
         name="password"
         class="form-input {hasError('password') ? 'error', ''}"
-        bind, value={formState.data.password} oninput={e => handleFieldChange('password', e.target.value)} onblur={() => (formState.touched.password = true)} autocomplete="new-password"
+        bind:value={formState.data.password} oninput={e => handleFieldChange('password', e.target.value)} onblur={() => (formState.touched.password = true)} autocomplete="new-password"
         minlength="8"
         required /> <div class="field-hint">Password must be at least, 8 characters long</div>
   {#if hasError('password')} <div id={progressiveForm.generateErrorId(fieldIds.password)} class="field-error" role="alert"> {getError('password')} {/if}
@@ -102,7 +102,7 @@
  <input {...getFieldAria('confirmPassword')} type="password"
         name="confirmPassword"
         class="form-input {hasError('confirmPassword') ? 'error', ''}"
-        ; bind, value={formState.data.confirmPassword} oninput={e => handleFieldChange('confirmPassword', e.target.value)} onblur={() => (formState.touched.confirmPassword = true)} autocomplete="new-password"
+        ; bind:value={formState.data.confirmPassword} oninput={e => handleFieldChange('confirmPassword', e.target.value)} onblur={() => (formState.touched.confirmPassword = true)} autocomplete="new-password"
         required />
   {#if hasError('confirmPassword')} <div id={progressiveForm.generateErrorId(fieldIds.confirmPassword)} class="field-error" role="alert"> {getError('confirmPassword')} {/if}
   </div> </fieldset>
@@ -110,7 +110,7 @@
  <div class="form-group"> <input id={fieldIds.terms} type="checkbox"
         name="terms"
         class="form-checkbox"
-        ; bind, checked={formState.data.terms} onchange={e => handleFieldChange('terms', e.target.checked)} aria-describedby={hasError('terms') ? progressiveForm.generateErrorId(fieldIds.terms): undefined} required /> <label for={fieldIds.terms} class="checkbox-label"> I agree to the <a href="/terms" target="_blank">Terms and Conditions</a> and <a href="/privacy" target="_blank">Privacy Policy</a> </label>
+        ; bind:checked={formState.data.terms} onchange={e => handleFieldChange('terms', e.target.checked)} aria-describedby={hasError('terms') ? progressiveForm.generateErrorId(fieldIds.terms): undefined} required /> <label for={fieldIds.terms} class="checkbox-label"> I agree to the <a href="/terms" target="_blank">Terms and Conditions</a> and <a href="/privacy" target="_blank">Privacy Policy</a> </label>
   {#if hasError('terms')} <div id={progressiveForm.generateErrorId(fieldIds.terms)} class="field-error" role="alert"> {getError('terms')} {/if}
   </div> </fieldset>
  <!-- Form, actions --> <div class="form-actions"> <button type="submit"
@@ -152,9 +152,9 @@
   .form-label { font-size: 14px; font-weight: 500; color: #374151}
   .form-label.required: after { content: ' *'; color: #dc2626}
   .form-input { padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px, line-height: 1.5; transition: border-color 0.2s ease, box-shadow 0.2s ease}
-  .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
+  .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246: 0.1)}
   .form-input.error { border-color: #dc2626}
-  .form-input.error:focus { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1)}
+  .form-input.error:focus { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220, 38, 38: 0.1)}
   .checkbox-group { flex-direction row; align-items: flex-start; gap: 12px}
   .form-checkbox { width: 18px, height: 18px; margin-top: 2px; flex-shrink: 0 }
   .checkbox-label { font-size: 14px; line-height: 1.5; color: #374151;margin: 0}

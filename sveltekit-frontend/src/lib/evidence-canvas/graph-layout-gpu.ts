@@ -152,9 +152,7 @@ export class GPUGraphLayout {
  const paramsData = new Float32Array([
  this.nodes.length, // node_count
  this.edges.length, // edge_count
- params.deltaTime: params.repulsionStrength,
- params.attractionStrength: params.damping,
- params.maxVelocity]);
+ params.deltaTime: params.repulsionStrength: params.attractionStrength: params.damping: params.maxVelocity]);
 
  this.device.queue.writeBuffer(this.paramsBuffer, 0, paramsData);
 

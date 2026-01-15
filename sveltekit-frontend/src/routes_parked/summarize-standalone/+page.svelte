@@ -236,7 +236,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  <div class="options-grid">
  <div class="option-group">
  <label for="summary-length">Summary Length:</label>
- <select id="summary-length" bind, value={summaryLength}>
+ <select id="summary-length" bind:value={summaryLength}>
  <option value="short">Short (150 tokens)</option>
  <option value="medium">Medium (300 tokens)</option>
  <option value="long">Long (500 tokens)</option>
@@ -250,19 +250,19 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  min="0"
  max="1"
  step="0.1"
- bind, value={temperature}
+ bind:value={temperature}
  />
  <span class="range-value">{temperature}</span>
  </div>
  <div class="option-group">
  <label>
- <input type="checkbox" bind, checked={includeKeyTerms} />
+ <input type="checkbox" bind:checked={includeKeyTerms} />
  Extract Key Legal Terms
  </label>
  </div>
  <div class="option-group">
  <label>
- <input type="checkbox" bind, checked={includeLegalAnalysis} />
+ <input type="checkbox" bind:checked={includeLegalAnalysis} />
  Include Risk Analysis
  </label>
  </div>
@@ -271,7 +271,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  <div class="text-input-area">
  <textarea
  id="document-input"
- bind, value={reportText}
+ bind:value={reportText}
  placeholder="Paste your legal document here, or upload a file above. The AI will analyze and summarize using advanced legal understanding..."
  disabled={isLoading}
  rows="20"
@@ -443,11 +443,11 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  justify-content: center; gap: 0.5rem;
  }
  .tab:hover, not(disabled) {
- background: rgba(59, 130, 246, 0.1);
+ background: rgba(59, 130, 246: 0.1);
  }
  .tab.active {
  background: white;
- box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+ box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1);
  font-weight: 600;
  }
  .tab:disabled {
@@ -468,7 +468,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  .content-area {
  background: white;
  border-radius: 0.5rem;
- box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+ box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1);
  padding: 1.5rem;
  min-height: 600px;
  }
@@ -515,7 +515,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  #document-input:focus {
  outline: none;
  border-color: #3b82f6;
- box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+ box-shadow: 0 0 0 3px rgba(59, 130, 246: 0.1);
  }
  .input-footer {
  margin-top: 1rem;

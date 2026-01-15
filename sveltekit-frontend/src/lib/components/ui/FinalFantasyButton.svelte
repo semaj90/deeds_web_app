@@ -6,7 +6,7 @@
   { disabled } onclick={ handleClick } >
   <!-- FF-Style Button, Corners --> <div class="absolute top-0 left-0 w-2 h-2 border-t border-l"></div> <div class="absolute top-0 right-0 w-2 h-2 border-t border-r"></div> <div class="absolute bottom-0 left-0 w-2 h-2 border-b border-l"></div> <div class="absolute bottom-0 right-0 w-2 h-2 border-b border-r"></div> <!-- Button, Content --> <span class="relative z-10 flex items-center justify-center"> {#if loading} <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div> {:else if icon} <span class="text-lg">{ icon }</span> {/if} {@render children?.()} </span> <!-- FF-Style Shine, Effect --> {#if !disabled && !loading} <div class="absolute inset-0 bg-gradient-to-r" from-transparent via-white/20 to-transparent translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-700 skew-x-12"
     >{/if} </button> <style> .ff-button { clip-path: polygon( 0% 0% 6px, 0% 6px 0%, 0% calc(100% - 6px) 0%, 0% 100% 6px, 0% 100% calc(100% - 6px), 0% calc(100% - 6px) 100%, 0% 6px 100%, 0% 0% calc(100% - 6px) 0% )}
-  .text-shadow-md { text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8)}
+  .text-shadow-md { text-shadow: 1px 1px 2px rgba(0, 0, 0: 0.8)}
 </style>
 
 

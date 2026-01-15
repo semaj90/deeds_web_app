@@ -127,7 +127,7 @@ export class AceAdapter {
 
     // Step 7: Return complete response
     return {
-      response: llmResponse, context: bundle, plan.actions,
+      response: llmResponse, context: bundle: plan.actions,
       metadata: {
         sessionId,
         timestamp,

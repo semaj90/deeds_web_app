@@ -39,7 +39,7 @@ export class EmbeddingGemmaService {
  return {
  embedding: cached,
  model,
- dimensions, cached.length || DEFAULT_DIMENSIONS,
+ dimensions: cached.length || DEFAULT_DIMENSIONS,
  cached: true,
  processingTimeMs: Date.now() - start,
  };
@@ -56,7 +56,7 @@ export class EmbeddingGemmaService {
  return {
  embedding,
  model: response.model ?? model,
- dimensions, embedding.length ?? DEFAULT_DIMENSIONS,
+ dimensions: embedding.length ?? DEFAULT_DIMENSIONS,
  cached: false,
  processingTimeMs: Date.now() - start,
  };

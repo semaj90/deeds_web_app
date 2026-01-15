@@ -47,7 +47,7 @@ export class CacheService {
  const { ttl = DEFAULT_TTL, namespace = NAMESPACES.summary } = options;
  const cacheKey = this.buildKey(key, namespace);
 
- await redis.setex(cacheKey, ttl, JSON.stringify(value));
+ await redis.setex(cacheKey, ttl: JSON.stringify(value));
  } catch (error) {
  console.error('Cache set error:', error);
  // Don't throw - caching failures shouldn't break the app
@@ -125,14 +125,14 @@ export class CacheService {
  * Get cached summary
  */
  async getSummary(caseId: string): Promise<any | null> {
- return this.get(caseId, NAMESPACES.summary);
+ return this.get(caseId: NAMESPACES.summary);
  }
 
  /**
  * Invalidate summary cache
  */
  async invalidateSummary(caseId: string): Promise<void> {
- await this.delete(caseId, NAMESPACES.summary);
+ await this.delete(caseId: NAMESPACES.summary);
  }
 
  /**
@@ -149,14 +149,14 @@ export class CacheService {
  * Get cached similar cases
  */
  async getSimilarCases(caseId: string): Promise<any[] | null> {
- return this.get(caseId, NAMESPACES.similarCases);
+ return this.get(caseId: NAMESPACES.similarCases);
  }
 
  /**
  * Invalidate similar cases cache
  */
  async invalidateSimilarCases(caseId: string): Promise<void> {
- await this.delete(caseId, NAMESPACES.similarCases);
+ await this.delete(caseId: NAMESPACES.similarCases);
  }
 
  /**
@@ -192,7 +192,7 @@ export class CacheService {
  * Get cached citations
  */
  async getCitations(caseId: string): Promise<any[] | null> {
- return this.get(caseId, NAMESPACES.citations);
+ return this.get(caseId: NAMESPACES.citations);
  }
 
  /**
@@ -209,7 +209,7 @@ export class CacheService {
  * Get cached statutes
  */
  async getStatutes(jurisdiction: string): Promise<any[] | null> {
- return this.get(jurisdiction, NAMESPACES.statutes);
+ return this.get(jurisdiction: NAMESPACES.statutes);
  }
 
  /**

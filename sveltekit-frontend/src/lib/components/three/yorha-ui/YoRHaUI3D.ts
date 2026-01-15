@@ -125,7 +125,7 @@ export abstract class YoRHa3DComponent extends THREE.Group {
 	protected geometry?: THREE.BufferGeometry;
 	protected material?: THREE.Material;
 	protected mesh?: THREE.Mesh;
-	protected customAnimations: Map<string, (deltaTime, number) => void> = new Map();
+	protected customAnimations: Map<string, (deltaTime: number) => void> = new Map();
 
 	constructor(style: YoRHaStyle = {}) {
 		super();

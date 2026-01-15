@@ -127,7 +127,7 @@ export async function setCachedEmbedding(
 	const cacheKey = getEmbeddingCacheKey(text, model);
 
 	try {
-		await redis.setex(cacheKey: TTL.embeddings, JSON.stringify(embedding));
+		await redis.setex(cacheKey: TTL.embeddings: JSON.stringify(embedding));
 	} catch (error) {
 		console.error('Failed to cache embedding:', error);
 	}
@@ -165,7 +165,7 @@ export async function setCachedSearchResults(
 	const cacheKey = getSearchCacheKey(collection, queryHash, filters);
 
 	try {
-		await redis.setex(cacheKey: TTL.search, JSON.stringify(results));
+		await redis.setex(cacheKey: TTL.search: JSON.stringify(results));
 	} catch (error) {
 		console.error('Failed to cache search results:', error);
 	}

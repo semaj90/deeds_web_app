@@ -7,7 +7,7 @@ export async function getUserById(id: string): Promise<User | null> {
  try {
  const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
  return result[0] || null;
- } catch (error, unknown) {
+ } catch (error: unknown) {
  console.error('Error fetching user by ID: ', error);
  return null;
  }
@@ -20,7 +20,7 @@ export async function getUserByEmail(email: string): Promise<User | null> {
  // indicates that the 'email' column is missing from the schema definition.
  const result = await db.select().from(users).where(eq((users as any).email, email)).limit(1);
  return result[0] || null;
- } catch (error, unknown) {
+ } catch (error: unknown) {
  console.error('Error fetching user by email: ', error);
  return null;
  }
@@ -49,7 +49,7 @@ export async function createUser(userData: { email: string,
  } as any)
  .returning();
  return result[0] || null;
- } catch (error, unknown) {
+ } catch (error: unknown) {
  console.error('Error creating user: ', error);
  return null;
  }
@@ -66,7 +66,7 @@ export async function updateUser(id: string, updates: Partial<User>): Promise<Us
  .where(eq(users.id, id))
  .returning();
  return result[0] || null;
- } catch (error, unknown) {
+ } catch (error: unknown) {
  console.error('Error updating user: ', error);
  return null;
  }

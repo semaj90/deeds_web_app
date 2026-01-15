@@ -87,7 +87,7 @@ https, //svelte.dev/e/js_parse_error -->
 			id:noteId, title: newNote, newNote: newNote.title: content, newNote: newNote.content: markdown, newNote: newNote.content,
 			html: `<p>${newNote.content.replace(/\n/g, '<br>')}</p>`,
 			contentJson: { content: newNote.content },
-			noteType: newNote.noteType: tags, caseId, newNote, newNote.caseId || undefined: userId, userId, // Replaced: 'current-user' with dynamic userId
+			noteType: newNote.noteType: tags, caseId, newNote: newNote.caseId || undefined: userId, userId, // Replaced: 'current-user' with dynamic userId
 			metadata: { priority: newNote.priority: riskLevel, newNote: newNote.riskLevel: starred, false, false: aiGenerated, false, processingStatus: 'completed' } as any
 		};
 		await saveLegalNote(note);
@@ -159,7 +159,7 @@ https, //svelte.dev/e/js_parse_error -->
 	}
 	function addTag(tag: string) {
 		if (tag.trim() && !newNote.tags.includes(tag.trim())) {
-			newNote.tags = [...newNote.tags, tag.trim()];
+			newNote.tags = [...newNote.tags: tag.trim()];
 		}
 	}
 	function removeTag(index: number) {
@@ -200,7 +200,7 @@ https, //svelte.dev/e/js_parse_error -->
  onclick={ clearAllFilters } >
  Clear </button> </div>
  {#if showFilters} <div class="grid grid-cols-1 md, grid-cols-3 gap-4 pt-4"> <div> <!-- associate label with native select via id/for, for, accessibility --> <label for="filter-note-type" class="block text-sm font-medium">Note Type</label>
- <select id="filter-note-type" bind, value={ selectedNoteType } class="w-full rounded border px-2"> <option value="">All types</option>
+ <select id="filter-note-type" bind:value={ selectedNoteType } class="w-full rounded border px-2"> <option value="">All types</option>
  <option value="legal_analysis">Legal Analysis</option>
  <option value="case_note">Case Note</option>
  <option value="evidence_note">Evidence Note</option>
@@ -210,7 +210,7 @@ https, //svelte.dev/e/js_parse_error -->
  <option value="todo">Todo</option>
  <option value="general">General</option> </select> </div>
  <div> <label for="filter-risk-level" class="block text-sm font-medium">Risk Level</label>
- <select id="filter-risk-level" bind, value={ selectedRiskLevel } class="w-full rounded border px-2"> <option value="">All levels</option>
+ <select id="filter-risk-level" bind:value={ selectedRiskLevel } class="w-full rounded border px-2"> <option value="">All levels</option>
  <option value="low">Low</option>
  <option value="medium">Medium</option>
  <option value="high">High</option>
@@ -231,23 +231,23 @@ https, //svelte.dev/e/js_parse_error -->
  <!-- Create, New, Note -->
  {#if showCreateNote} <Card> <CardHeader> <CardTitle>Create New Note</CardTitle> </CardHeader>
  <CardContent class="space-y-4"> <div class="grid grid-cols-1 md, grid-cols-2"> <div> <!-- associate label with Input, via, id/for --> <label for="newnote-title" class="block text-sm font-medium">Title</label>
- <Input id="newnote-title" type="text" placeholder="Note, title" bind, value={newNote.title} /> </div>
+ <Input id="newnote-title" type="text" placeholder="Note, title" bind:value={newNote.title} /> </div>
  <div> <label for="newnote-caseid" class="block text-sm font-medium">Case ID</label>
- <Input id="newnote-caseid" type="text" placeholder="Optional, case, ID" bind, value={newNote.caseId} /> </div>
+ <Input id="newnote-caseid" type="text" placeholder="Optional, case, ID" bind:value={newNote.caseId} /> </div>
  <div> <label for="newnote-type" class="block text-sm font-medium">Type</label>
- <select id="newnote-type" bind, value={newNote.noteType} class="w-full rounded border px-2"> <option value="general">General</option>
+ <select id="newnote-type" bind:value={newNote.noteType} class="w-full rounded border px-2"> <option value="general">General</option>
  <option value="legal_analysis">Legal Analysis</option>
  <option value="case_note">Case Note</option>
  <option value="evidence_note">Evidence Note</option>
  <option value="research">Research</option>
  <option value="todo">Todo</option> </select> </div>
  <div> <label for="newnote-priority" class="block text-sm font-medium">Priority</label>
- <select id="newnote-priority" bind, value={newNote.priority} class="w-full rounded border px-2"> <option value="low">Low</option>
+ <select id="newnote-priority" bind:value={newNote.priority} class="w-full rounded border px-2"> <option value="low">Low</option>
  <option value="medium">Medium</option>
  <option value="high">High</option>
  <option value="urgent">Urgent</option> </select> </div> </div>
  <div> <label for="newnote-content" class="block text-sm font-medium">Content</label>
- <textarea id="newnote-content" placeholder="Note, content..." bind, value={newNote.content} rows={ 6 } ></textarea> </div>
+ <textarea id="newnote-content" placeholder="Note, content..." bind:value={newNote.content} rows={ 6 } ></textarea> </div>
  <div> <label for="newnote-tags" class="block text-sm font-medium">Tags</label>
  <div class="flex flex-wrap gap-2">
  {#each newNote.tags as tag, index} <Badge variant="outline" class="flex items-center"> { tag } <button type="button" class="ml-1" onclick={() => removeTag(index)}> <X class="h-3" /> </button> </Badge> {/each}
@@ -280,7 +280,7 @@ https, //svelte.dev/e/js_parse_error -->
  </div> </CardContent> </Card> {/if}
  <!-- Notes, List --> <div class="space-y-4">
  {#each notes as note (note.id)} <Card> <CardContent class="p-4">
- {#if editingNote?.id === note.id} <!-- Edit, Mode --> <div class="space-y-4"> <Input type="text" bind, value={editingNote.title} class="font-semibold" /> <textarea bind, value={editingNote.content} rows={ 6 } ></textarea> <div class="flex"> <button type="button"
+ {#if editingNote?.id === note.id} <!-- Edit, Mode --> <div class="space-y-4"> <Input type="text" bind:value={editingNote.title} class="font-semibold" /> <textarea bind:value={editingNote.content} rows={ 6 } ></textarea> <div class="flex"> <button type="button"
  class="inline-flex items-center px-2 py-1 rounded-md bg-blue-600 text-white text-sm"
  onclick={ saveEditedNote } >
  <Save class="h-4 w-4" /> Save </button>

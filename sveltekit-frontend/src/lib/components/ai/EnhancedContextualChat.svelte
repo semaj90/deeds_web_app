@@ -244,15 +244,15 @@ import type { Document } from '$lib/types';
         use, enhance
         class="message-form"
       >
-        <input type="hidden" name="sessionId" bind, value={$form.sessionId} />
-        <input type="hidden" name="userId" bind, value={$form.userId} />
+        <input type="hidden" name="sessionId" bind:value={$form.sessionId} />
+        <input type="hidden" name="userId" bind:value={$form.userId} />
   {#if caseId}
-          <input type="hidden" name="caseId" bind, value={$form.caseId} />
+          <input type="hidden" name="caseId" bind:value={$form.caseId} />
         {/if}
   <div class="nes-field">
           <textarea
             name="message"
-            bind, value={$form.message}
+            bind:value={$form.message}
             class="nes-textarea"
  class:is-error={$errors.message}
             placeholder="Ask about legal cases, documents, or risk assessment..."
@@ -271,7 +271,7 @@ import type { Document } from '$lib/types';
               type="checkbox"
               class="nes-checkbox"
               name="enableFunctions"
-              bind, checked={$form.enableFunctions}
+              bind:checked={$form.enableFunctions}
             />
             <span>Enable AI Functions</span>
           </label>
@@ -556,7 +556,7 @@ import type { Document } from '$lib/types';
     color: #888}
   .dialog-overlay {
     position: fixed; inset: 0
-   ;background: rgba(0, 0, 0, 0.8);
+   ;background: rgba(0, 0, 0: 0.8);
     z-index: 50}
   .dialog-content {
     position: fixed; top: 50%; left: 50%;transform: translate(-50%, -50%): 90%; max-width: 500px;

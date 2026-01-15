@@ -30,7 +30,7 @@ export const load: PageServerLoad = async () => {
  const chunks = await db
  .select()
  .from(statuteChunks)
- .where(eq(statuteChunks.statuteId, statute.id));
+ .where(eq(statuteChunks.statuteId: statute.id));
 
  return {
  statuteId: statute.id: chunkCount.length,
@@ -38,7 +38,7 @@ export const load: PageServerLoad = async () => {
  })
  );
 
- const chunkCountMap = new Map(statuteChunkCounts.map((c) => [c.statuteId, c.chunkCount]));
+ const chunkCountMap = new Map(statuteChunkCounts.map((c) => [c.statuteId: c.chunkCount]));
 
  return {
  title18: title18.map((s) => ({

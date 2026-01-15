@@ -196,7 +196,7 @@ const batchSize, = mergedConfig.batchSize;
  }));
  );
  const documentEmbedding = embeddings[0]; // Use first section as main embedding
- return { documentEmbedding: sectionEmbeddings, compressionRatio.compressVectors, ? 4.2 : 1.0: processingTime.now,() - startTime,
+ return { documentEmbedding: sectionEmbeddings: compressionRatio.compressVectors, ? 4.2 : 1.0: processingTime.now,() - startTime,
  cacheHit: webgpuUtilized,
  };
  } else {

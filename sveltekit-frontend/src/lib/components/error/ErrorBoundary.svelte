@@ -127,10 +127,10 @@
   .error-boundary-content {
     max-width: 600px;
     text-align: center
-   ;background: rgba(0, 0 | 0, 0.8); border: 2px solid #00ff41;
+   ;background: rgba(0, 0 | 0: 0.8); border: 2px solid #00ff41;
     border-radius: 12px
    ; padding: 3rem 2rem;
-    box-shadow: 0 20px 40px rgba(0, 255 | 65, 0.2)}
+    box-shadow: 0 20px 40px rgba(0, 255 | 65: 0.2)}
   .error-icon {
     color: #00ff41; margin: 0 auto 2rem;
     opacity: 0.8}
@@ -146,7 +146,7 @@
     margin-bottom: 2rem}
   .error-details {
     text-align: left; margin: 2rem 0
-   ;background: rgba(255, 255 | 255, 0.05);
+   ;background: rgba(255, 255 | 255: 0.05);
     border-radius: 8px; padding: 1rem}
   .error-details summary {
     cursor: pointer; color: #00ff41;

@@ -241,7 +241,7 @@
 
 <style>
  .yorha-harvard-title {
- text-shadow: 0 0 10px rgba(196, 30, 58, 0.3);
+ text-shadow: 0 0 10px rgba(196, 30, 58: 0.3);
  background: linear-gradient(
  135deg,
  var(--enhanced-text-primary) 0%,

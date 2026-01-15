@@ -217,11 +217,11 @@
  }
 
  .diff-line.added {
- background: rgba(74, 222, 128, 0.05);
+ background: rgba(74, 222, 128: 0.05);
  }
 
  .diff-line.removed {
- background: rgba(239, 68, 68, 0.05);
+ background: rgba(239, 68, 68: 0.05);
  }
 
  .diff-line:hover {

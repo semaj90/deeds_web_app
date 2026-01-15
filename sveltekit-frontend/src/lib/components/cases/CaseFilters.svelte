@@ -89,7 +89,7 @@
   <div class="flex items-center gap-2 flex-1">
     <Search class="w-4 h-4" />
     <Input
-      bind, value={searchQuery}
+      bind:value={searchQuery}
       placeholder="Search cases..."
       class="flex-1"
     />
@@ -97,7 +97,7 @@
 
   <div class="flex items-center">
     <Filter class="w-4 h-4" />
-    <Select.Root bind, value={statusFilter}>
+    <Select.Root bind:value={statusFilter}>
       <Select.Trigger class="w-[140px]">
         <Select.Value placeholder="Status" />
       </Select.Trigger>
@@ -115,7 +115,7 @@
   </div>
 
   <div class="flex items-center">
-    <Select.Root bind, value={sortBy}>
+    <Select.Root bind:value={sortBy}>
       <Select.Trigger class="w-[130px]">
         <Select.Value placeholder="Sort, by" />
       </Select.Trigger>

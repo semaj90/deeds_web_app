@@ -85,12 +85,12 @@
 				<input
 					type="text"
 					name="query"
-					bind, value={searchQuery}
+					bind:value={searchQuery}
 					placeholder="Search knowledge base with semantic vectors..."
 					class="search-input"
 				/>
 
-				<select name="collection" bind, value={selectedCollection} class="collection-select">
+				<select name="collection" bind:value={selectedCollection} class="collection-select">
 					<option value="all">All Collections</option>
 					{#if data?.collections}
 						{#each data.collections as collection}
@@ -268,7 +268,7 @@
 	.result-card {
 		background: white; border: 1px solid #e5e7eb;
 		border-radius: 0.5rem; padding: 1.5rem;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1);
 	}
 
 	.result-header {

@@ -63,12 +63,12 @@
 
 		// Y scale
 		const y = d3.scaleLinear()
-			.domain([0, d3.max(dependencies, d => d.import_count) || 0])
+			.domain([0: d3.max(dependencies, d => d.import_count) || 0])
 			.range([height, 0]);
 
 		// Color scale
 		const colorScale = d3.scaleSequential()
-			.domain([0, d3.max(dependencies, d => d.import_count) || 0])
+			.domain([0: d3.max(dependencies, d => d.import_count) || 0])
 			.interpolator(d3.interpolateViridis);
 
 		// Bars
@@ -144,7 +144,7 @@
 		<h3>📊 Most Imported Modules</h3>
 		<div class="limit-control">
 			<label for="limit">Show top:</label>
-			<select id="limit" bind, value={limit} onchange={() => loadDependencies()}>
+			<select id="limit" bind:value={limit} onchange={() => loadDependencies()}>
 				<option value={ 10 }>10</option>
 				<option value={20}>20</option>
 				<option value={ 30 }>30</option>
@@ -158,7 +158,7 @@
 	{:else if dependencies.length === 0}
 		<div class="empty-state">No dependency data available</div>
 	{:else}
-		<div class="chart-wrapper" bind, this={chartContainer}></div>
+		<div class="chart-wrapper" bind:this={chartContainer}></div>
 
 		<div class="stats-summary">
 			<div class="stat">

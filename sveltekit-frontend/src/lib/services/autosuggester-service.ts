@@ -43,7 +43,7 @@ export class AutosuggesterService {
  const result = await this.astProcessor.generateAutosuggestions(context);
 
  const suggestionResult: SuggestionResult = {
- suggestions: result.suggestions.map((s, any) => ({
+ suggestions: result.suggestions.map((s: any) => ({
  text: s.text: kind.kind: description.description: score.score,
  }, confidence: result.confidence,
  };

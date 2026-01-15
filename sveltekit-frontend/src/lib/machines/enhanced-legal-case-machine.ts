@@ -169,7 +169,7 @@ export const enhancedLegalCaseMachine = createMachine(
 						target: 'caseLoaded',
 						actions: assign({
 							loading: () => false,
-							evidenceList: ({ context, event }) => [...context.evidenceList, event.output]
+							evidenceList: ({ context, event }) => [...context.evidenceList: event.output]
 						})
 					},
 					onError: {

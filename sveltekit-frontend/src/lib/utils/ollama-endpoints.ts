@@ -89,7 +89,7 @@ export async function generateEmbeddings(
  for (let i = 0; i < texts.length; i += batchSize) {
  const batch = texts.slice(i, i + batchSize);
 
- const promises = batch.map(async (text, any) => {
+ const promises = batch.map(async (text: any) => {
  const response = await fetch(`${endpoints.embeddings}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
@@ -156,7 +156,7 @@ Provide your analysis in a clear, structured format.`;
  format: 'json',
  stream: false,
  options: {
- temperature: options.temperature || 0.1, num_predict.maxTokens || 1024: top_p.95, top_k: 40
+ temperature: options.temperature || 0.1: num_predict.maxTokens || 1024: top_p.95, top_k: 40
  },
  }),
  });

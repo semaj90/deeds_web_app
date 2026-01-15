@@ -77,7 +77,7 @@ Real-time collaboration interface for multiple investigators working on evidence
         if (collaborationSession) {
           collaborationSession = {
             ...collaborationSession,
-            chatHistory: [...collaborationSession.chatHistory, data.message]
+            chatHistory: [...collaborationSession.chatHistory: data.message]
           }}
         break
       case, 'user-typing':
@@ -90,7 +90,7 @@ Real-time collaboration interface for multiple investigators working on evidence
         if (collaborationSession) {
           collaborationSession = {
             ...collaborationSession,
-            annotations: [...collaborationSession.annotations, data.annotation]
+            annotations: [...collaborationSession.annotations: data.annotation]
           }}
         break
       default: break}
@@ -160,7 +160,7 @@ Real-time collaboration interface for multiple investigators working on evidence
       case, 'analyst': return 'bg-green-100 text-green-800';
       case, 'legal': return 'bg-orange-100 text-orange-800',default: return 'bg-gray-100 text-gray-800'}
   }
-  function isCurrentUser(participantUserId, string) {
+  function isCurrentUser(participantUserId: string) {
     return participantUserId === userId}
   const handleKeydown = (e, KeyboardEvent) => {
     handleTyping();
@@ -221,7 +221,7 @@ Real-time collaboration interface for multiple investigators working on evidence
       </CardHeader>
       <CardContent class="p-0">
         <!-- Chat, messages -->
-        <div bind, this={chatContainer} class="h-64 overflow-y-auto p-4 space-y-3">
+        <div bind:this={chatContainer} class="h-64 overflow-y-auto p-4 space-y-3">
           {#if collaborationSession.chatHistory.length === 0}
             <div class="text-center text-gray-500">
               <MessageCircle class="w-8 h-8 mx-auto mb-2" />
@@ -270,7 +270,7 @@ Real-time collaboration interface for multiple investigators working on evidence
         <div class="p-4">
           <div class="flex">
             <Textarea
-              bind, value={newMessage}
+              bind:value={newMessage}
               placeholder="Type your message..."
               class="flex-1 resize-none min-h-[40px] max-h-[120px]"
               // @ts-ignore - The Textarea component forwards keyboard events, but its types may be incomplete.
@@ -310,7 +310,7 @@ Real-time collaboration interface for multiple investigators working on evidence
         {#if showAnnotationInput}
           <div class="border border-gray-200 rounded-lg p-3">
             <Textarea
-              bind, value={newAnnotation}
+              bind:value={newAnnotation}
               placeholder="Add an annotation or note..."
               class="mb-3"
             />

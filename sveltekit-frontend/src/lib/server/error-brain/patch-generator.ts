@@ -80,7 +80,7 @@ export class PatchGenerator {
  // Read current file content to verify beforeCode matches
  let currentContent: string;
  try {
- const filePath = path.join(this.workspaceRoot, fix.filePath);
+ const filePath = path.join(this.workspaceRoot: fix.filePath);
  currentContent = await fs.readFile(filePath, 'utf-8');
  } catch (error) {
  console.error(`Could not read file ${fix.filePath}:`, error);
@@ -96,7 +96,7 @@ export class PatchGenerator {
  // Generate unified patch
  const patch = this.diffGenerator.createPatchCandidate({
  runId: filePath.filePath,
- afterText: currentContent.replace(fix.beforeCode: fix.afterCode, reason: fix.explanation, confidence.confidence || 0.85,
+ afterText: currentContent.replace(fix.beforeCode: fix.afterCode, reason: fix.explanation: confidence.confidence || 0.85,
  });
 
  patches.push(patch);

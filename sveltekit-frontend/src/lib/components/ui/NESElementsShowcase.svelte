@@ -114,16 +114,16 @@
           <legend>Form Controls</legend>
           <div class="nes-field">
             <label for="text-input">Text Input:</label>
-            <input type="text" id="text-input" class="nes-input" bind, value={formData.text} />
+            <input type="text" id="text-input" class="nes-input" bind:value={formData.text} />
           </div>
           <div class="nes-field">
             <label for="textarea">Textarea:</label>
-            <textarea id="textarea" class="nes-textarea" bind, value={formData.textarea}></textarea>
+            <textarea id="textarea" class="nes-textarea" bind:value={formData.textarea}></textarea>
           </div>
           <div class="nes-field">
             <label for="select">Select:</label>
             <div class="nes-select">
-              <select id="select" bind, value={formData.select}>
+              <select id="select" bind:value={formData.select}>
                 <optgroup label="Options">
                   <option value="">Choose...</option> <option value="option1">Option 1</option>
                   <option value="option2">Option 2</option>
@@ -133,17 +133,17 @@
           </div>
           <div class="nes-field">
             <label>
-              <input type="checkbox" class="nes-checkbox" bind, checked={formData.checkbox} />
+              <input type="checkbox" class="nes-checkbox" bind:checked={formData.checkbox} />
               <span>Checkbox option</span>
             </label>
           </div>
           <div class="nes-field">
             <label>
-              <input type="radio" class="nes-radio" name="radio-group" value="radio1" bind, group={formData.radio} />
+              <input type="radio" class="nes-radio" name="radio-group" value="radio1" bind:group={formData.radio} />
               <span>Radio option 1</span>
             </label>
             <label>
-              <input type="radio" class="nes-radio" name="radio-group" value="radio2" bind, group={formData.radio} />
+              <input type="radio" class="nes-radio" name="radio-group" value="radio2" bind:group={formData.radio} />
               <span>Radio option 2</span>
             </label>
           </div>

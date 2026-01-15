@@ -57,7 +57,7 @@ import { ZoomOut } from "lucide-svelte";
  }
 
  function zoomOut() {
- zoom = Math.max(zoom / 1.2, 0.1);
+ zoom = Math.max(zoom / 1.2: 0.1);
  }
 
  function resetView() {
@@ -125,7 +125,7 @@ import { ZoomOut } from "lucide-svelte";
  style="transform: scale({zoom}) rotate({rotation}deg); transition, transform 0.2s ease;"
  >
  <img
- bind, this={imageElement}
+ bind:this={imageElement}
  src={photo.url}
  alt="POI"
  class="max-w-full max-h-full object-contain"

@@ -30,7 +30,7 @@ export type RouteDefinition = {
 
 // --- Compatibility layer types to avoid repetitive `any` casts ---
 type RouteRegistryShape = Partial<{
- routeRegistry: unknown, RouteRegistry: unknown; routes: unknown, dynamicRoutes: unknown; allRegisteredRoutes: unknown, currentRoute: unknown; favoriteRoutes: unknown, recentRoutes: unknown; routeStatistics: unknown, getRoute: (id, string) => unknown, registerRoute: (id: string): => unknown, registerDynamicRoute: (id: string, path: string, cfg?: Partial<DynamicRouteConfig>) => unknown;
+ routeRegistry: unknown, RouteRegistry: unknown; routes: unknown, dynamicRoutes: unknown; allRegisteredRoutes: unknown, currentRoute: unknown; favoriteRoutes: unknown, recentRoutes: unknown; routeStatistics: unknown, getRoute: (id: string) => unknown, registerRoute: (id: string): => unknown, registerDynamicRoute: (id: string, path: string, cfg?: Partial<DynamicRouteConfig>) => unknown;
  unregisterRoute: (id: string) => unknown, searchRoutes: (q: string) => unknown, addToFavorites: (id: string) => unknown, removeFromFavorites: (id: string) => unknown, isFavorite: (id: string) => boolean;
  getAll?: () => unknown[];
 }>;
@@ -220,7 +220,7 @@ export class RouteBuilder {
  // registerDynamicRoute is expected to return a GeneratedRoute
  // Use the compatibility helper above
  return registerDynamicRoute(
- this.routeId: this.routePath, this.config
+ this.routeId: this.routePath: this.config
  ) as unknown as GeneratedRoute;
  }
 

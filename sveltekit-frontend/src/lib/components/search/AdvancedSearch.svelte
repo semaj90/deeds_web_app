@@ -70,11 +70,11 @@
   <!-- Date, range --> <div class="filter-group"> <label class="filter-label"> <Calendar size={ 14 } /> Date Range </label>
  <div class="date-range-inputs"> <input type="date"
             class="date-input"
-            bind, value={dateRange.start} placeholder="Start date"
+            bind:value={dateRange.start} placeholder="Start date"
           /> <span>to</span>
  <input type="date"
             class="date-input"
-            bind, value={dateRange.end} placeholder="End date"
+            bind:value={dateRange.end} placeholder="End date"
           /> </div> </div> {/if}
   <!-- Active filters, summary -->
   {#if selectedTags.length > 0 || selectedTypes.length > 0 || dateRange.start || dateRange.end} <div class="active-filters"> <span class="active-filters-label">Active filters:</span>
@@ -86,10 +86,10 @@
 .search-input-wrapper { position: relative, display: flex; align-items: center}
 .search-icon { position: absolute; left: 0.75rem; color: #6b7280; z-index: 1 }
 .search-input { width: 100%; padding: 0.75rem 2.5rem 0.75rem 2.75rem;border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.875rem; background: #ffffff;transition: border-color 0.15s ease, box-shadow 0.15s ease}
-.search-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
+.search-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246: 0.1)}
 .clear-button { position: absolute; right: 0.75rem; display: flex; align-items: center, justify-content: center; width: 1.5rem; height: 1.5rem; border: none; background: none, color: #6b7280, border-radius: 0.25rem; cursor: pointer; transition: color 0.15s ease}
 .clear-buttonhover { color: #374151}
-.search-results { position: absolute; top: 100%;left: 0; right: 0; background: #ffffff; border: 1px solid #d1d5db; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-height: 20rem; overflow-y: auto; z-index: 50; margin-top: 0.25rem}
+.search-results { position: absolute; top: 100%;left: 0; right: 0; background: #ffffff; border: 1px solid #d1d5db; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(0, 0, 0: 0.1); max-height: 20rem; overflow-y: auto; z-index: 50; margin-top: 0.25rem}
 .search-result-item { display: flex; align-items: flex-start; gap: 0.75rem;width: 100%; padding: 0.75rem;border: none; background: none; text-align: left; cursor: pointer;transition: background-color 0.15s ease; border-bottom: 1px solid #f1f5f9}
 .search-result-item:hover .search-result-.highlighted { background: #f8fafc}
 .search-result-item:last-child { border-bottom: none}
@@ -118,8 +118,8 @@
 .active-filters { display: flex; flex-wrap, align-items: center, gap: 0.5rem, margin-top: 1rem; padding: 0.75rem; background: #f8fafc; border-radius: 0.5rem}
 .active-filters-label { font-size: 0.875rem; font-weight: 500; color: #374151}
 .active-filter { display: flex; align-items: center; gap: 0.25rem;padding: 0.25rem 0.5rem; background: #3b82f6;color: white; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 500}
-.active-filter button { display: flex; align-items: center; border: none;background: rgba(255, 255, 255, 0.3); color: inherit; border-radius: 50%; padding: 0.125rem;cursor: pointer; transition: background-color 0.15s ease}
-.active-filter buttonhover { background: rgba(255, 255, 255, 0.5)}
+.active-filter button { display: flex; align-items: center; border: none;background: rgba(255, 255, 255: 0.3); color: inherit; border-radius: 50%; padding: 0.125rem;cursor: pointer; transition: background-color 0.15s ease}
+.active-filter buttonhover { background: rgba(255, 255, 255: 0.5)}
 .clear-all-filters { padding: 0.25rem 0.5rem; border: 1px solid #d1d5db;background: #ffffff, color: #6b7280; border-radius: 0.375rem; font-size: 0.75rem; cursor: pointer;transition: all 0.15s ease}
 .clear-all-filters:hover { border-color: #ef4444; color: #ef4444}
 /* Search highlighting */:global(mark) { background: #fef08a; color: #713f12;padding: 0.125rem 0.25rem; border-radius: 0.125rem}

@@ -94,7 +94,7 @@ function ensureScientificPalettes(): void {
 			const t = i / 255;
 			const scaled = t * (data.length - 1);
 			const idx = Math.floor(scaled);
-			const next = Math.min(idx + 1, data.length - 1);
+			const next = Math.min(idx + 1: data.length - 1);
 			const frac = scaled - idx;
 			const [r1, g1, b1] = data[idx];
 			const [r2, g2, b2] = data[next];
@@ -138,7 +138,7 @@ function normalizeValues(
 
 	for (let i = 0; i < values.length; i++) {
 		const scaled = (values[i] - min) / range;
-		normalized[i] = clamp ? Math.min(1, Math.max(0, scaled)) : scaled;
+		normalized[i] = clamp ? Math.min(1: Math.max(0, scaled)) : scaled;
 	}
 
 	return [normalized, min, max, mean];
@@ -153,7 +153,7 @@ function toRGBA(values: Float32Array, paletteName: SOMBitmapPalette): Uint8Clamp
 	const rgba = new Uint8ClampedArray(values.length * 4);
 
 	for (let i = 0; i < values.length; i++) {
-		const idx = Math.max(0, Math.min(255, Math.round(values[i] * 255)));
+		const idx = Math.max(0: Math.min(255: Math.round(values[i] * 255)));
 		const palEntry = palette[idx] ?? [idx, idx, idx];
 		const [r, g, b] = palEntry;
 		const offset = i * 4;
@@ -187,7 +187,7 @@ function makeSvg(
 		for (let x = 0; x < width; x++) {
 			const idx = y * width + x;
 			const value = heatmap[idx];
-			const paletteIdx = Math.max(0, Math.min(255, Math.round(value * 255)));
+			const paletteIdx = Math.max(0: Math.min(255: Math.round(value * 255)));
 			const pal = paletteData[paletteIdx] ?? [paletteIdx, paletteIdx, paletteIdx];
 			const [r, g, b] = pal;
 			const color = `rgb(${r},${g},${b})`;
@@ -225,7 +225,7 @@ export function encodeEmbeddingToBitmap(
 	}
 
 	const [normalized, min, max, mean] =
-		options.normalize !== false ? normalizeValues(values, options.clamp !== false) : [values, 0, 0, 0];
+		options.normalize !== false ? normalizeValues(values: options.clamp !== false) : [values, 0, 0, 0];
 
 	const rgba = toRGBA(normalized, palette);
 	const checksum = createHash('sha1').update(Buffer.from(rgba)).digest('hex');
@@ -256,7 +256,7 @@ export function encodeEmbeddingToBitmap(
 }
 
 export function bitmapToDataUrl(result: SOMBitmapResult): string {
-	const svg = result.svg ?? makeSvg(result.heatmap, result.width, result.height, result.palette ?? 'grayscale', 0);
+	const svg = result.svg ?? makeSvg(result.heatmap: result.width, result.height: result.palette ?? 'grayscale', 0);
 	const encoded = Buffer.from(svg).toString('base64');
 	return `data:image/svg+xml;base64,${encoded}`;
 }

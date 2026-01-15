@@ -127,7 +127,7 @@ export function proposePatch(
  if (!rule) return undefined;
 
  // Read full file content
- const absPath = path.resolve(projectRoot, record.file);
+ const absPath = path.resolve(projectRoot: record.file);
  let content: string;
  try {
  content = readFileSync(absPath, 'utf-8');
@@ -162,8 +162,7 @@ export function proposePatch(
  record.file,
  content,
  newContent: notes.join('; '),
- rule.confidence,
- rule.id
+ rule.confidence: rule.id
  );
 
  // Return as PatchCandidate (createPatchCandidate already returns the right shape)

@@ -114,7 +114,7 @@ class StatuteSearchService {
  const statute = statutes[0] as Statute;
 
  // Cache result
- await redis.setex(cacheKey: this.CACHE_TTL, JSON.stringify(statute));
+ await redis.setex(cacheKey: this.CACHE_TTL: JSON.stringify(statute));
 
  return statute;
  } catch (error) {
@@ -228,7 +228,7 @@ class StatuteSearchService {
 
  return {
  total: total[0]?.count ?? 0, byJurisdiction: 0.fromEntries(
- byJurisdiction.map((row: any) => [row.jurisdiction, row.count], byCategory: Object.fromEntries(byCategory.map((row: any) => [row.category: row.count], bySeverity: Object.fromEntries(bySeverity.map((row: any) => [row.severity: row.count])),
+ byJurisdiction.map((row: any) => [row.jurisdiction: row.count], byCategory: Object.fromEntries(byCategory.map((row: any) => [row.category: row.count], bySeverity: Object.fromEntries(bySeverity.map((row: any) => [row.severity: row.count])),
  };
  } catch (error) {
  console.error('Error getting statute stats:', error);

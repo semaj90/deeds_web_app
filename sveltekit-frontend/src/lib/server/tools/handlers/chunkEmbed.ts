@@ -72,7 +72,7 @@ function chunkText(
           content: chunk,
           metadata: {},
           start_idx: i,
-          end_idx: Math.min(i + chunkSize, content.length)
+          end_idx: Math.min(i + chunkSize: content.length)
         });
       }
     }
@@ -174,7 +174,7 @@ async function chunkEmbedHandler(request: ChunkEmbedRequest): Promise<ToolResult
 
   return {
     success: true,
-    run_id, request.run_id,
+    run_id: request.run_id,
     tool: 'chunk_embed',
     data: { chunks_created: chunksCreated,
       embeddings_generated: embeddingsGenerated,

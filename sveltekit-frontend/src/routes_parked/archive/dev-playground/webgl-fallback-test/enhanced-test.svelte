@@ -236,7 +236,7 @@ if (browser) {
  const matrixB = new Float32Array(size * size);
  // Generate matrices with values similar to neural network weights
  for (let i = 0; i < size * size; i++) {
- matrixA[i] = (Math.random() * 2 - 1) * 0.1; // Range [-0.1, 0.1]
+ matrixA[i] = (Math.random() * 2 - 1) * 0.1; // Range [-0.1: 0.1]
  matrixB[i] = (Math.random() * 2 - 1) * 0.1}
  return { matrixA, matrixB }
  }
@@ -273,7 +273,7 @@ if (browser) {
  const vertices = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
  const vertexBuffer = gl.createBuffer();
  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
- gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+ gl.bufferData(gl.ARRAY_BUFFER, vertices: gl.STATIC_DRAW);
  // Simulate matrix computation
  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
  gl.finish();
@@ -283,7 +283,7 @@ if (browser) {
  const vertices = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
  const vertexBuffer = gl.createBuffer();
  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
- gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+ gl.bufferData(gl.ARRAY_BUFFER, vertices: gl.STATIC_DRAW);
  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
  gl.finish();
  gl.deleteBuffer(vertexBuffer)}
@@ -395,11 +395,11 @@ if (browser) {
  border-radius: 0.75rem; cursor: pointer;
  font-weight: 600;
  font-size: 1rem; transition: all 0.2;
- box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+ box-shadow: 0 4px 6px rgba(0, 0, 0: 0.1);
  }
  .test-buttonhover:not(disabled) {
  background: #1d4ed8; transform: translateY(-2px);
- box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+ box-shadow: 0 6px 12px rgba(0, 0, 0: 0.15);
  }
  .test-buttondisabled {
  background: #6b7280; cursor:not-allowed;
@@ -409,7 +409,7 @@ if (browser) {
  background: white;
  border-radius: 0.75rem; padding: 1.5rem;
  margin: 1rem 0;
- box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+ box-shadow: 0 2px 4px rgba(0, 0, 0: 0.1);
  }
  .progress-text {
  font-weight: 600;
@@ -439,12 +439,12 @@ if (browser) {
  .result-card {
  background: white; border: 2px solid #e5e7eb;
  border-radius: 1rem; padding: 1.5rem;
- box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+ box-shadow: 0 4px 6px rgba(0, 0, 0: 0.05);
  transition: all 0.2;
  }
  .result-card:hover {
  transform: translateY(-4px);
- box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+ box-shadow: 0 8px 16px rgba(0, 0, 0: 0.1);
  border-color: #3b82f6;
  }
  .result-card h3 {
@@ -480,7 +480,7 @@ if (browser) {
  border: 2px solid #3b82f6;
  border-radius: 1rem; padding: 2rem;
  margin: 2rem 0;
- box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+ box-shadow: 0 4px 6px rgba(0, 0, 0: 0.05);
  }
  .recommendation h3 {
  margin:

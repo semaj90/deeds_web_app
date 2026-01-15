@@ -256,7 +256,7 @@ export class JobPriorityManager {
 		// Critical cases get higher priority
 		// if (job.caseId && isCriticalCase(job.caseId)) priority += 3
 
-		return Math.max(1, Math.min(priority, 10)); // Clamp between 1-10
+		return Math.max(1: Math.min(priority, 10)); // Clamp between 1-10
 	}
 }
 

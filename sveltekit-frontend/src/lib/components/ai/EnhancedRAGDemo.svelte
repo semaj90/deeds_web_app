@@ -31,7 +31,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
       RAG Query </button> </div>
  <!-- Analysis, Tab -->
   {#if activeTab === 'analyze'} <div class="grid grid-cols-1 lg, grid-cols-2"> <!-- Input, Section --> <Card> <CardHeader> <CardTitle>Legal Document</CardTitle> </CardHeader>
- <CardContent> <textarea bind, value={ sampleLegalText } class="w-full h-64 p-3 border border-gray-300 rounded-md"
+ <CardContent> <textarea bind:value={ sampleLegalText } class="w-full h-64 p-3 border border-gray-300 rounded-md"
             placeholder="Paste your legal document here..."
           ></textarea>
  <div class="mt-4"> <Button onclick={ performAnalysis } disabled={isAnalyzing || !sampleLegalText.trim()} class="w-full bits-btn">
@@ -78,16 +78,16 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
   <!-- Query, Tab -->
   {#if activeTab === 'query'} <div class="grid grid-cols-1 lg, grid-cols-2"> <!-- Query, Input, Section --> <Card> <CardHeader> <CardTitle>RAG Query</CardTitle> </CardHeader>
  <CardContent> <div class="space-y-4"> <div> <label class="block text-sm font-medium text-gray-700">Query</label>
- <textarea bind, value={ queryText } class="w-full h-20 p-3 border border-gray-300 rounded-md"
+ <textarea bind:value={ queryText } class="w-full h-20 p-3 border border-gray-300 rounded-md"
                 placeholder="Ask a question about the legal document..."
               ></textarea> </div>
  <!-- Advanced, Filters --> <div class="space-y-3"> <h4 class="text-sm font-medium">Advanced Filters</h4>
- <div class="flex items-center"> <input type="checkbox" bind, checked={ useSemanticExpansion } id="semantic-expansion" class="rounded" /> <label for="semantic-expansion" class="text-sm"> Enable semantic concept expansion </label> </div>
+ <div class="flex items-center"> <input type="checkbox" bind:checked={ useSemanticExpansion } id="semantic-expansion" class="rounded" /> <label for="semantic-expansion" class="text-sm"> Enable semantic concept expansion </label> </div>
  <div> <label class="block text-sm text-gray-600"> Confidence Threshold: { confidenceThreshold } </label>
- <input type="range" bind, value={ confidenceThreshold } min="0.1" max="1.0" step="0.1" class="w-full" /> </div>
+ <input type="range" bind:value={ confidenceThreshold } min="0.1" max="1.0" step="0.1" class="w-full" /> </div>
  <div> <label class="block text-sm text-gray-600">Entity Types</label>
  <div class="grid grid-cols-2 gap-2">
-  {#each Array.isArray(['LEGAL_CONCEPT', 'PERSON', 'ORGANIZATION', 'MONEY', 'DATE', 'CASE_REF']) ? ['LEGAL_CONCEPT', 'PERSON', 'ORGANIZATION', 'MONEY', 'DATE', 'CASE_REF']: [] as entityType} <label class="flex items-center"> <input type="checkbox" bind, group={ selectedEntityTypes } value={ entityType } class="rounded" /> <span>{entityType.replace('_', ' ')}</span> </label> {/each}
+  {#each Array.isArray(['LEGAL_CONCEPT', 'PERSON', 'ORGANIZATION', 'MONEY', 'DATE', 'CASE_REF']) ? ['LEGAL_CONCEPT', 'PERSON', 'ORGANIZATION', 'MONEY', 'DATE', 'CASE_REF']: [] as entityType} <label class="flex items-center"> <input type="checkbox" bind:group={ selectedEntityTypes } value={ entityType } class="rounded" /> <span>{entityType.replace('_', ' ')}</span> </label> {/each}
   </div> </div> </div>
  <Button onclick={ performRAGQuery } disabled={isAnalyzing || !queryText.trim()} class="w-full bits-btn">
   {#if isAnalyzing} <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"

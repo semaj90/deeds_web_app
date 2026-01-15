@@ -78,7 +78,7 @@ https, //svelte.dev/e/block_unexpected_close -->
 			<input
 				type="text"
 				placeholder="Search statute, code, title, segment…"
-				bind, value={query}
+				bind:value={query}
 				onkeydown={ handleKeydown }
 				disabled={loading}
 				class="search-input"
@@ -355,7 +355,7 @@ https, //svelte.dev/e/block_unexpected_close -->
 
 	.law-card:hover {
 		border-color: #8b0000;
-		box-shadow: 0 2px 8px rgba(139, 0, 0, 0.1);
+		box-shadow: 0 2px 8px rgba(139, 0, 0: 0.1);
 		transform: translateY(-2px);
 	}
 

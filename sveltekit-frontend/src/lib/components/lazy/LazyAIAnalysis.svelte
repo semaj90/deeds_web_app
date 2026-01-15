@@ -33,7 +33,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
           ] }; default: return baseResult}
   }
 
-   // Analysis type icons and colors const analysisConfig = { legal: { icon: 'âš–ï¸', color: '#4f46e5', bgColor: 'rgba(79, 70, 229, 0.1)' }, evidence: { icon: 'ðŸ”', color: '#059669', bgColor: 'rgba(5, 150, 105, 0.1)' }, document: { icon: 'ðŸ“„', color: '#dc2626', bgColor: 'rgba(220, 38, 38, 0.1)' }, caseItem: { icon: 'ðŸ“', color: '#7c2d12'; bgColor: 'rgba(124, 45, 18, 0.1)' } }
+   // Analysis type icons and colors const analysisConfig = { legal: { icon: 'âš–ï¸', color: '#4f46e5', bgColor: 'rgba(79, 70, 229: 0.1)' }, evidence: { icon: 'ðŸ”', color: '#059669', bgColor: 'rgba(5, 150, 105: 0.1)' }, document: { icon: 'ðŸ“„', color: '#dc2626', bgColor: 'rgba(220, 38, 38: 0.1)' }, caseItem: { icon: 'ðŸ“', color: '#7c2d12'; bgColor: 'rgba(124, 45, 18: 0.1)' } }
   const config = analysisConfig[analysisType]; </script>
  <LazyLoader preset="HEAVY_COMPONENT"
   placeholderHeight={ height } placeholderClass="ai-analysis-placeholder"
@@ -77,51 +77,51 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <div class="wave"></div> </div> </div>
  <div class="placeholder-text"> <h3>AI-Powered {analysisType.charAt.toUpperCase() + analysisType.slice(1)} Analysis</h3>
  <p>Advanced neural processing for legal insights</p> </div> </div> </LazyLoader>
- <style> .lazy-ai-analysis { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)}
+ <style> .lazy-ai-analysis { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0: 0.1)}
   .analysis-wrapper { display: flex; flex-direction: column}
   /* Error state */ .analysis-error { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;padding: 32px; text-align: center}
   .analysis-error .error-icon { font-size: 64px; margin-bottom: 16px}
-  .retry-button { margin-top: 16px; padding: 8px 20px;background: rgba(0, 0, 0, 0.1); border: 1px solid rgba(0, 0, 0, 0.2); border-radius: 6px; cursor: pointer; transition: all 0.2s ease}
-  .retry-buttonhover { background: rgba(0, 0, 0, 0.2)}
+  .retry-button { margin-top: 16px; padding: 8px 20px;background: rgba(0, 0, 0: 0.1); border: 1px solid rgba(0, 0, 0: 0.2); border-radius: 6px; cursor: pointer; transition: all 0.2s ease}
+  .retry-buttonhover { background: rgba(0, 0, 0: 0.2)}
   /* Progress state */ .analysis-progress { display: flex; flex-direction: column, justify-content: center; height: 100%; padding: 48px 32px}
   .progress-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px}
   .analysis-icon { font-size: 48px}
   .progress-header h3 { margin: 0; font-size: 24px; font-weight: 600}
-  .progress-bar { width: 100%; height: 8px;background: rgba(0, 0, 0, 0.1); border-radius: 4px, overflow: hidden; margin-bottom: 16px}
+  .progress-bar { width: 100%; height: 8px;background: rgba(0, 0, 0: 0.1); border-radius: 4px, overflow: hidden; margin-bottom: 16px}
   .progress-fill { height: 100%; transition: width 0.3s ease; border-radius: 4px}
   .progress-info { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 32px; font-size: 14px}
   .progress-step { font-weight: 500}
   .progress-percent { font-weight: 600}
   .analysis-meta { display: flex; gap: 24px; flex-wrap}
-  .meta-item { font-size: 12px; color: rgba(0, 0, 0, 0.6)}
+  .meta-item { font-size: 12px; color: rgba(0, 0, 0: 0.6)}
   .meta-item span:first-child { font-weight: 600; margin-right: 4px}
   /* Results display */ .analysis-results { height: 100%; border: 2px solid; border-radius: 8px; overflow: hidden}
-  .results-header { display: flex; align-items: center; gap: 12px;padding: 16px 24px; border-bottom: 1px solid rgba(0, 0, 0, 0.1)}
+  .results-header { display: flex; align-items: center; gap: 12px;padding: 16px 24px; border-bottom: 1px solid rgba(0, 0, 0: 0.1)}
   .header-icon { font-size: 24px}
   .results-header h3 { margin: 0, flex: 1; font-size: 18px; font-weight: 600}
   .confidence-badge { padding: 4px 12px; border-radius: 12px; font-size: 12px, font-weight: 600; color: white}
   .results-body { padding: 24px; height: calc(100% - 68px); overflow-y: auto}
   .result-summary, .result-findings, .result-recommendations { margin-bottom: 24px}
-  .results-body h4 { margin: 0, 0 12px 0; font-size: 16px; font-weight: 600; color: rgba(0, 0, 0, 0.8)}
-  .results-body p { margin: 0; line-height: 1.6; color: rgba(0, 0, 0, 0.7)}
+  .results-body h4 { margin: 0, 0 12px 0; font-size: 16px; font-weight: 600; color: rgba(0, 0, 0: 0.8)}
+  .results-body p { margin: 0; line-height: 1.6; color: rgba(0, 0, 0: 0.7)}
   .results-body ul { margin: 0; padding-left: 20px}
-  .results-body li { margin-bottom: 8px; line-height: 1.5; color: rgba(0, 0, 0, 0.7)}
-  .analysis-metadata { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(0, 0, 0, 0.1)}
+  .results-body li { margin-bottom: 8px; line-height: 1.5; color: rgba(0, 0, 0: 0.7)}
+  .analysis-metadata { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(0, 0, 0: 0.1)}
   .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px}
   .meta-cell { display: flex; flex-direction: column; gap: 4px}
-  .meta-label { font-size: 12px; font-weight: 600; color: rgba(0, 0, 0, 0.5); text-transform: uppercase; letter-spacing: 0.5px}
-  .meta-value { font-size: 14px; color: rgba(0, 0, 0, 0.8); font-family: monospace}
+  .meta-label { font-size: 12px; font-weight: 600; color: rgba(0, 0, 0: 0.5); text-transform: uppercase; letter-spacing: 0.5px}
+  .meta-value { font-size: 14px; color: rgba(0, 0, 0: 0.8); font-family: monospace}
   /* AI Placeholder */ .ai-placeholder-content { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;padding: 48px}
   .placeholder-ai-brain { position: relative; display: flex; align-items: center; justify-content: center}
   .brain-icon { font-size: 72px; z-index: 2; position: relative}
   .brain-waves { position: absolute; width: 120px; height: 120px}
-  .wave { position: absolute; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; animation: brain-wave 2s infinite}
+  .wave { position: absolute; border: 2px solid rgba(255, 255, 255: 0.3); border-radius: 50%; animation: brain-wave 2s infinite}
   .wave-1 { width: 80px; height: 80px; top: 20px, left: 20px; animation-delay: 0 }
   .wave-2 { width: 100px; height: 100px; top: 10px, left: 10px; animation-delay: 0.5 }
   .wave-3 { width: 120px; height: 120px;top: 0, left: 0; animation-delay: 1 }
   .placeholder-text { text-align: center}
-  .placeholder-text h3 { margin: 0, 0 8px 0; font-size: 20px; font-weight: 600; color: rgba(255, 255, 255, 0.9)}
-  .placeholder-text p { margin: 0; color: rgba(255, 255, 255, 0.7); font-size: 14px}
+  .placeholder-text h3 { margin: 0, 0 8px 0; font-size: 20px; font-weight: 600; color: rgba(255, 255, 255: 0.9)}
+  .placeholder-text p { margin: 0; color: rgba(255, 255, 255: 0.7); font-size: 14px}
   /* Animations */ @keyframes brain-wave { 0% { transform: scale(1); opacity: 1}
     100% { transform: scale(1.3); opacity: 0}
   } /* Responsive design */ @media (max-width: 768px) { .analysis-progress, .ai-placeholder-content { padding: 24px 16px}

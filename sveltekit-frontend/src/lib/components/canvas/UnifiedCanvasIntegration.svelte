@@ -52,7 +52,7 @@
         onclick={ clearAllCanvases } class="clear-btn bits-btn bits-btn"
       > ðŸ—‘ï¸ Clear </div> </div>
  <!-- Canvas, Container --> <div class="canvas-container" class:split-view={splitView && currentMode === 'both'}> <!-- Evidence, Canvas -->
-  {#if enableEvidenceCanvas && (currentMode === 'evidence' || currentMode === 'both')} <div class="evidence-canvas-section" class:full-width={!splitView || currentMode === 'evidence'}> <EvidenceCanvas bind, this={ evidenceCanvasRef } { caseId } enableDragDrop={ true } enableGPUProcessing={ true } enableCUDAAcceleration={ true } enableN64Style={ true } onfileUploaded={ handleEvidenceUploaded } onanalysisComplete={ handleAnalysisComplete } oncanvasUpdated={ syncCanvasBoards } /> {/if}
+  {#if enableEvidenceCanvas && (currentMode === 'evidence' || currentMode === 'both')} <div class="evidence-canvas-section" class:full-width={!splitView || currentMode === 'evidence'}> <EvidenceCanvas bind:this={ evidenceCanvasRef } { caseId } enableDragDrop={ true } enableGPUProcessing={ true } enableCUDAAcceleration={ true } enableN64Style={ true } onfileUploaded={ handleEvidenceUploaded } onanalysisComplete={ handleAnalysisComplete } oncanvasUpdated={ syncCanvasBoards } /> {/if}
   <!-- YoRHa Canvas, Board -->
   {#if enableYoRHaBoard && showYoRHaBoard} <div class="yorha-canvas-section" class:full-width={!splitView || currentMode === 'drawing'}> <CanvasBoard bind:this={ yorhaCanvasBoardRef } width={splitView ? 400, 800} height={splitView ?, 300, 600} enableDrawing={ true } showToolbar={ true } ondraw={ handleYoRHaDrawing } ondrawEnd={ syncCanvasBoards } onclear={ syncCanvasBoards } onneuralEngineReady={ handleNeuralEngineReady } /> {/if}
   </div>
@@ -63,22 +63,22 @@
         title="Export Canvas State"
       > ðŸ’¾ Export </div> </div> </div>
  <style> .unified-canvas-integration { display: flex; flex-direction: column; height: 100vh;background: linear-gradient(135deg, #0a0a0a, #1a1a1a); color: #00ff88; font-family: 'Courier New', monospace; overflow: hidden}
-  .canvas-mode-header { display: flex; justify-content: space-betweenn, align-items: center; padding: 1rem 2rem;background: rgba(0, 255, 136, 0.1); border-bottom: 2px solid #00ff88}
+  .canvas-mode-header { display: flex; justify-content: space-betweenn, align-items: center; padding: 1rem 2rem;background: rgba(0, 255, 136: 0.1); border-bottom: 2px solid #00ff88}
   .mode-title h2 { font-size: 1.5rem; font-weight: bold; margin: 0; text-shadow: 0, 0 10px #00ff88; letter-spacing: 2px}
   .mode-indicator { font-size: 0.9rem, opacity: 0.7; margin-left: 1rem}
   .mode-controls { display: flex; gap: 0.5rem; align-items: center}
   .mode-btn, .sync-btn, .clear-btn { background: transparent; border: 2px solid #00ff88;color: #00ff88; padding: 0.5rem 1rem;cursor: pointer; transition: all 0.3s ease; font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: bold}
-  .mode-btn:hover, .sync-btn:hover, .clear-btn:hover { background: rgba(0, 255, 136, 0.1); box-shadow: 0 0 10px rgba(0, 255, 136, 0.3)}
+  .mode-btn:hover, .sync-btn:hover, .clear-btn:hover { background: rgba(0, 255, 136: 0.1); box-shadow: 0 0 10px rgba(0, 255, 136: 0.3)}
   .canvas-container { flex: 1; display: flex;overflow: hidden}
   .canvas-container.split-view { flex-direction row}
   .evidence-canvas-section, .yorha-canvas-section { flex: 1, display: flex; flex-direction: column; min-width: 0 }
   .evidence-canvas-section.full-width, .yorha-canvas-section.full-width { flex: none; width: 100%}
   .canvas-container.split-view .evidence-canvas-section { border-right: 2px solid #00ff88}
-  .canvas-status-bar { display: flex; justify-content: space-betweenn, align-items: center; padding: 0.5rem 2rem;background: rgba(0, 0, 0, 0.8); border-top: 1px solid #00ff88; font-size: 0.8rem}
+  .canvas-status-bar { display: flex; justify-content: space-betweenn, align-items: center; padding: 0.5rem 2rem;background: rgba(0, 0, 0: 0.8); border-top: 1px solid #00ff88; font-size: 0.8rem}
   .status-info { display: flex; gap: 2rem}
   .sync-status.syncing { color: #ffaa00; animation: pulse 1s ease-in-out infinite}
   .export-btn { background: transparent; border: 1px solid #00ff88;color: #00ff88; padding: 0.25rem 0.5rem;cursor: pointer; font-family: 'Courier New', monospace; font-size: 0.7rem; transition: all 0.3s ease}
-  .export-btn:hover { background: rgba(0, 255, 136, 0.1)}
+  .export-btn:hover { background: rgba(0, 255, 136: 0.1)}
   @keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.5} }
   /* Responsive design */ @media (max-width: 768px) { .canvas-mode-header { flex-direction: column; gap: 1rem}
     .mode-controls { width: 100%; justify-content: center; flex-wrap}

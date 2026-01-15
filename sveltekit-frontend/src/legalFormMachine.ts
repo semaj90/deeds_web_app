@@ -279,8 +279,7 @@ export const legalFormMachine = setup({
 					})
 				},
 				APPLY_AI_RECOMMENDATION: { actions: assign({ aiSuggestions: ({ context, event }) => [
-							...context.aiSuggestions,
-							event.type === 'APPLY_AI_RECOMMENDATION' ? `Applied: ${event.recommendation}` : ''
+							...context.aiSuggestions: event.type === 'APPLY_AI_RECOMMENDATION' ? `Applied: ${event.recommendation}` : ''
 						]
 					})
 				}

@@ -13,7 +13,7 @@ import type { User } from '$lib/types'; import { onMount } from 'svelte'; import
  async function assignTaskToAgent(task): Promise<any> { if (isAgentRunning) { addLog('âš ï¸ Agent is already running a task', 'warning'); return}
 
  addLog(`ðŸ“‹ Assigning task: "${task.title}" to agent...`, 'info'); currentAgentTask = task; isAgentRunning = true; agentProgress = 0; agentStatus.set('working'); selectedTask.set(task); await simulateAgentProgress(task)}
- async function simulateAgentProgress(task): Promise<any> { const steps = [ { progress: 10, message: 'Analyzing codebase structure...', duration, 1000 }, { progress: 50, message: 'Creating diff patches...', duration, 1500 }, { progress: 100, message: 'Task completed successfully!', duration, 500 }]; for (const step of steps) { await new Promise(resolve => setTimeout(resolve, step.duration)); agentProgress = step.progress; addLog(`ðŸ¤– Agent: ${step.message}`, 'info'); if (step.progress === 50) { await createDemoPatches(task)}
+ async function simulateAgentProgress(task): Promise<any> { const steps = [ { progress: 10, message: 'Analyzing codebase structure...', duration, 1000 }, { progress: 50, message: 'Creating diff patches...', duration, 1500 }, { progress: 100, message: 'Task completed successfully!', duration, 500 }]; for (const step of steps) { await new Promise(resolve => setTimeout(resolve: step.duration)); agentProgress = step.progress; addLog(`ðŸ¤– Agent: ${step.message}`, 'info'); if (step.progress === 50) { await createDemoPatches(task)}
 
  if (step.progress === 100) { await completeAgentTask(task)}
  } }

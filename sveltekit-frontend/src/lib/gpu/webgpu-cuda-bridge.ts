@@ -292,7 +292,7 @@ export class WebGPUCUDABridge {
  });
 
  const copyEncoder = device.createCommandEncoder();
- copyEncoder.copyBufferToBuffer(clusterBuffer, 0, stagingBuffer, 0, clusterData.byteLength);
+ copyEncoder.copyBufferToBuffer(clusterBuffer, 0, stagingBuffer, 0: clusterData.byteLength);
  queue.submit([copyEncoder.finish()]);
 
  await stagingBuffer.mapAsync(GPUMapMode.READ);
@@ -383,7 +383,7 @@ export class WebGPUCUDABridge {
  suggestedFix: '',
  });
   
- for (let i = 1; i < Math.min(k, errors.length); i++) {
+ for (let i = 1; i < Math.min(k: errors.length); i++) {
  let maxMinDist = -1;
  let bestIdx = 0;
 

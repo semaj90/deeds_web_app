@@ -57,7 +57,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
             name="firstName"
             type="text"
             placeholder="John"
-            bind, value={$form.firstName} disabled={ isLoading } class="input"
+            bind:value={$form.firstName} disabled={ isLoading } class="input"
           />
   {#if getErr('firstName')}<p class="error-text">{getErr('firstName')}</p>{/if}
   </div>
@@ -66,7 +66,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
             name="lastName"
             type="text"
             placeholder="Smith"
-            bind, value={$form.lastName} disabled={ isLoading } class="input"
+            bind:value={$form.lastName} disabled={ isLoading } class="input"
           />
   {#if getErr('lastName')}<p class="error-text">{getErr('lastName')}</p>{/if}
   </div> </div>
@@ -75,12 +75,12 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
           name="email"
           type="email"
           placeholder="john.smith@prosecutor.gov"
-          bind, value={$form.email} disabled={ isLoading } class="input"
+          bind:value={$form.email} disabled={ isLoading } class="input"
         />
   {#if getErr('email')}<p class="error-text">{getErr('email')}</p>{/if}
   </div>
  <!-- Professional, Information --> <div class="grid grid-cols-1 md, grid-cols-2"> <div class="field"> <label for="role" class="label">Professional Role</label>
- <select id="role" name="role" bind, value={$form.role} disabled={ isLoading } class="input"> <option value="" disabled, selected>Select role</option>
+ <select id="role" name="role" bind:value={$form.role} disabled={ isLoading } class="input"> <option value="" disabled, selected>Select role</option>
   {#each Array.isArray(roleOptions) ? roleOptions: [] as option} <option value={option.value}>{option.label}</option> {/each}
   </select>
   {#if getErr('role')}<p class="error-text">{getErr('role')}</p>{/if}
@@ -90,7 +90,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
             name="badgeNumber"
             type="text"
             placeholder="12345"
-            bind, value={$form.badgeNumber} disabled={ isLoading } class="input"
+            bind:value={$form.badgeNumber} disabled={ isLoading } class="input"
           />
   {#if getErr('badgeNumber')}<p class="error-text">{getErr('badgeNumber')}</p>{/if}
   </div> </div>
@@ -99,7 +99,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
             name="department"
             type="text"
             placeholder="District Attorney's Office"'
-            bind, value={$form.department} disabled={ isLoading } class="input"
+            bind:value={$form.department} disabled={ isLoading } class="input"
           />
   {#if getErr('department')}<p class="error-text">{getErr('department')}</p>{/if}
   </div>
@@ -108,7 +108,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
             name="jurisdiction"
             type="text"
             placeholder="Los Angeles County"
-            bind, value={$form.jurisdiction} disabled={ isLoading } class="input"
+            bind:value={$form.jurisdiction} disabled={ isLoading } class="input"
           />
   {#if getErr('jurisdiction')}<p class="error-text">{getErr('jurisdiction')}</p>{/if}
   </div> </div>
@@ -116,7 +116,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
  <div class="relative"> <input id="password"
               name="password"
               type={showPassword ? 'text', 'password'} placeholder="Enter secure password"
-              bind, value={$form.password} disabled={ isLoading } class="input pr-10"
+              bind:value={$form.password} disabled={ isLoading } class="input pr-10"
             /> <button type="button"
               class="pw-toggle"
               onclick={ togglePasswordVisibility } disabled={ isLoading } aria-label="Toggle password visibility"
@@ -132,7 +132,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
  <div class="relative"> <input id="confirmPassword"
               name="confirmPassword"
               type={showConfirmPassword ? 'text', 'password'} placeholder="Confirm your password"
-              bind, value={$form.confirmPassword} disabled={ isLoading } class="input pr-10"
+              bind:value={$form.confirmPassword} disabled={ isLoading } class="input pr-10"
             /> <button type="button"
               class="pw-toggle"
               onclick={ toggleConfirmPasswordVisibility } disabled={ isLoading } aria-label="Toggle confirm password visibility"
@@ -143,11 +143,11 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
   </div> </div>
  <!-- Security, Options --> <div class="space-y-3"> <label class="flex items-center space-x-2"> <Checkbox id="enableTwoFactor"
             name="enableTwoFactor"
-            bind, checked={$form.enableTwoFactor} disabled={ isLoading } /> <span>Enable two-factor authentication (recommended for legal professionals)</span> </label> </div>
- <!-- Terms, and, Privacy --> <div class="space-y-3"> <label class="flex items-center space-x-2"> <Checkbox id="agreeToTerms" name="agreeToTerms" bind, checked={$form.agreeToTerms} disabled={ isLoading } /> <span>I agree to the <a href="/legal/terms" class="text-primary">Terms of Service</a></span> </label>
+            bind:checked={$form.enableTwoFactor} disabled={ isLoading } /> <span>Enable two-factor authentication (recommended for legal professionals)</span> </label> </div>
+ <!-- Terms, and, Privacy --> <div class="space-y-3"> <label class="flex items-center space-x-2"> <Checkbox id="agreeToTerms" name="agreeToTerms" bind:checked={$form.agreeToTerms} disabled={ isLoading } /> <span>I agree to the <a href="/legal/terms" class="text-primary">Terms of Service</a></span> </label>
  <label class="flex items-center space-x-2"> <Checkbox id="agreeToPrivacy"
             name="agreeToPrivacy"
-            bind, checked={$form.agreeToPrivacy} disabled={ isLoading } /> <span>I agree to the <a href="/legal/privacy" class="text-primary">Privacy Policy</a></span> </label> </div>
+            bind:checked={$form.agreeToPrivacy} disabled={ isLoading } /> <span>I agree to the <a href="/legal/privacy" class="text-primary">Privacy Policy</a></span> </label> </div>
  <!-- Submit Button - Enhanced with enhanced-bits-ui, NES, styling, and, a11y --> <button type="submit"
         class="w-full enhanced-bits-btn nes-legal-submit n64-enhanced lod-optimized retro-legal-btn"
         disabled={isLoading || $submitting} aria-label={isLoading || $submitting ? 'Creating your legal professional account, please wait', 'Create legal professional account'} aria-describedby="submit-button-help"
@@ -160,12 +160,12 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
  <!-- Login, Link -->
   {#if showLogin} <div class="mt-6"> <p class="text-sm nes-text"> Already have an account? <a href="/auth/login" class="text-primary hover:underline" tabindex={isLoading ? -1, 0}> Sign in here </a> </p> {/if}
   </section> </div>
- <style> /* NES.css Legal Registration Form Styling */:global(.nes-legal-register-form) { font-family: 'Courier New', monospace; border: 3px solid #000;background: #f8f8f8; box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2)}
+ <style> /* NES.css Legal Registration Form Styling */:global(.nes-legal-register-form) { font-family: 'Courier New', monospace; border: 3px solid #000;background: #f8f8f8; box-shadow: 8px 8px 0px rgba(0, 0, 0: 0.2)}
   /* NES-style form inputs */:global(.nes-legal-register-form input) { border: 2px solid #000; background: #fff; font-family: 'Courier New', monospace; padding: 8px}
-  /* focus styles for inputs/selects/textarea */:global( .nes-legal-register-form, input:focus, .nes-legal-register-form textarea:focus, .nes-legal-register-form select:focus ) { outline: none; box-shadow: 0 0 0 3px rgba(0, 100, 200, 0.3)}
-  /* NES-style buttons */:global(.nes-legal-register-form .nes-btn) { border: 2px solid #000; background: #fff;color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 12px 24px;transition: all 0.1s ease; text-transform: uppercase}:global(.nes-legal-register-form .nes-btn:hover, not(disabled)) { transform: translate(2px, 2px); box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3)}:global(.nes-legal-register-form .nes-btn: active, not(disabled)) { transform: translate(4px, 4px); box-shadow: none}
+  /* focus styles for inputs/selects/textarea */:global( .nes-legal-register-form, input:focus, .nes-legal-register-form textarea:focus, .nes-legal-register-form select:focus ) { outline: none; box-shadow: 0 0 0 3px rgba(0, 100, 200: 0.3)}
+  /* NES-style buttons */:global(.nes-legal-register-form .nes-btn) { border: 2px solid #000; background: #fff;color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 12px 24px;transition: all 0.1s ease; text-transform: uppercase}:global(.nes-legal-register-form .nes-btn:hover, not(disabled)) { transform: translate(2px, 2px); box-shadow: 2px 2px 0px rgba(0, 0, 0: 0.3)}:global(.nes-legal-register-form .nes-btn: active, not(disabled)) { transform: translate(4px, 4px); box-shadow: none}
   /* disabled button state */:global(.nes-legal-register-form .nes-btn:disabled) { opacity: 0.6; cursor:not-allowed}
-  /* Legal priority styling for submit button */:global(.nes-legal-register-form .nes-legal-priority-medium) { background: #3b82f6; color: white; border-color: #1e40af; box-shadow: 0 0 8px rgba(59, 130, 246, 0.3)}:global(.nes-legal-register-form .nes-legal-priority-medium:hover, not(disabled)) { background: #2563eb; box-shadow: 0 0 12px rgba(59, 130, 246, 0.4)}
+  /* Legal priority styling for submit button */:global(.nes-legal-register-form .nes-legal-priority-medium) { background: #3b82f6; color: white; border-color: #1e40af; box-shadow: 0 0 8px rgba(59, 130, 246: 0.3)}:global(.nes-legal-register-form .nes-legal-priority-medium:hover, not(disabled)) { background: #2563eb; box-shadow: 0 0 12px rgba(59, 130, 246: 0.4)}
   /* Password strength indicator NES styling */:global(.nes-legal-register-form .password-strength) { border: 1px solid #000; background: #fff;height: 8px}
   /* Alert styling with NES borders */:global(.nes-legal-register-form .alert-destructive) { border: 2px solid #dc2626; background: #fef2f2;color: #991b1b}:global(.nes-legal-register-form .alert-success) { border: 2px solid #16a34a; background: #f0fdf4;color: #15803d}
   /* Legal professional role icons */:global(.nes-legal-register-form .role-option) { display: flex; align-items: center; gap: 8px;padding: 8px; border: 1px solid transparent; font-family: 'Courier New', monospace}

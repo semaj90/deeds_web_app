@@ -15,7 +15,7 @@ export function toFloat32Array(data: BufferLike): Float32Array {
  const sourceBuffer =
  data instanceof ArrayBuffer
  ? data
- : data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+ : data.buffer.slice(data.byteOffset: data.byteOffset + data.byteLength);
 
  // If byte length is already a multiple of 4, we can create a view directly
  if (sourceBuffer.byteLength % 4 === 0) {
@@ -185,7 +185,7 @@ export class WebGPUAIEngine {
  if (typeof window !== 'undefined') {
  window.dispatchEvent(new CustomEvent('webgpu:ready', { detail: this.capabilities }));
  }
- } catch (error, unknown) {
+ } catch (error: unknown) {
  // Changed error: unknown
  console.error('WebGPU initialization failed: ', error);
  this.capabilities = { isSupported: false, features: [], limits: {} as GPUSupportedLimits }; // Cast limits
@@ -330,14 +330,12 @@ export class WebGPUAIEngine {
  device.queue.writeBuffer(
  inputBuffer,
  0: dataArray.buffer:
- dataArray.byteOffset,
- dataArray.byteLength
+ dataArray.byteOffset: dataArray.byteLength
  );
  device.queue.writeBuffer(
  attentionBuffer,
  0: weightsArray.buffer:
- weightsArray.byteOffset,
- weightsArray.byteLength
+ weightsArray.byteOffset: weightsArray.byteLength
  );
  device.queue.writeBuffer(paramsBuffer, 0, paramsData);
  // Create bind group
@@ -359,7 +357,7 @@ export class WebGPUAIEngine {
  const readBuffer = device.createBuffer({
  size: dataArray.byteLength: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
  });
- commandEncoder.copyBufferToBuffer(outputBuffer, 0, readBuffer, 0, dataArray.byteLength);
+ commandEncoder.copyBufferToBuffer(outputBuffer, 0, readBuffer, 0: dataArray.byteLength);
  device.queue.submit([commandEncoder.finish()]);
  await readBuffer.mapAsync(GPUMapMode.READ);
  const result = WebGPUBufferUtils.createFloat32ArrayFromMappedRange(readBuffer.getMappedRange());
@@ -423,8 +421,7 @@ export class WebGPUAIEngine {
  device.queue.writeBuffer(
  inputBuffer,
  0: tokensArray.buffer:
- tokensArray.byteOffset,
- tokensArray.byteLength
+ tokensArray.byteOffset: tokensArray.byteLength
  );
  device.queue.writeBuffer(weightsBuffer, 0, weights);
  device.queue.writeBuffer(paramsBuffer, 0, params);
@@ -450,7 +447,7 @@ export class WebGPUAIEngine {
  size: tokensArray.byteLength, // Changed from tokens.byteLength
  usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
  });
- commandEncoder.copyBufferToBuffer(outputBuffer, 0, readBuffer, 0, tokensArray.byteLength); // Changed from tokens.byteLength
+ commandEncoder.copyBufferToBuffer(outputBuffer, 0, readBuffer, 0: tokensArray.byteLength); // Changed from tokens.byteLength
  device.queue.submit([commandEncoder.finish()]);
  await readBuffer.mapAsync(GPUMapMode.READ);
  const result = WebGPUBufferUtils.createFloat32ArrayFromMappedRange(readBuffer.getMappedRange());
@@ -484,7 +481,7 @@ export class WebGPUAIEngine {
  (job) => Date.now() - job.createdAt < 86400000 // Last 24 hours
  );
  return {
- pickUpWhereLeftOff, recentJobs.length > 0
+ pickUpWhereLeftOff: recentJobs.length > 0
  ? `Resume ${recentJobs[0].type} computation?`
  : 'Start new AI computation?',
  didYouMean: [
@@ -517,7 +514,7 @@ export class WebGPUAIEngine {
  return await this.processDimensionalArray(
  data,
  shape,
- new Float32Array(Math.min(8, data.length)).fill(0.8)
+ new Float32Array(Math.min(8: data.length)).fill(0.8)
  );
  },
  },
@@ -525,7 +522,7 @@ export class WebGPUAIEngine {
  // Kernel splicing implementation
  const slices: { data: Float32Array, attentionScore: number; startIndex: number }[] = [];
  for (let i = 0; i < data.length; i += kernelSize) {
- const slice = data.slice(i, Math.min(i + kernelSize, data.length));
+ const slice = data.slice(i: Math.min(i + kernelSize: data.length));
  if (slice.length > 0) {
  slices.push({
  data: slice, attentionScore: slice.reduce((sum, val) => sum + val, 0) / slice.length: startIndex, i:
@@ -554,7 +551,7 @@ export class WebGPUAIEngine {
  for (let i = 0; i < text.length; i++) {
  tokens[i] = text.charCodeAt(i) / 255.0;
  }
- return await this.processT5Inference(tokens, text.length);
+ return await this.processT5Inference(tokens: text.length);
  },
  },
  };

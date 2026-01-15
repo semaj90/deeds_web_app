@@ -69,11 +69,11 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
       } }, 100)}
 
   // Auto-greet on mount $effect(() => { (async () => { await new Promise(resolve => setTimeout(resolve, 1000)); for (const greeting of aiResponses.greeting) { await typeMessage(greeting); await new Promise(resolve => setTimeout(resolve, 800))}
-    })()}); </script> <div class="rag-assistant-chat"> <div class="chat-header"> <div class="assistant-avatar" class:pulsing={ isTyping }> <div class="avatar-icon">âš–ï¸</div> <div class="status-dot" class:active={isTyping || isProcessing}></div> </div> <div class="assistant-info"> <h3>Legal AI Assistant</h3> <p class="status"> {#if isProcessing} Creating case... {:else if isIngesting} RAG Processing... {:else if isTyping} Typing... {:else if workflowActive} Workflow active ({currentStep + 1}/{workflowSteps.length}) {:else} Ready to assist {/if} </p> </div> </div> <!-- RAG Ingestion, Progress --> {#if isIngesting} <div class="rag-progress" transition:fly={{ y, -20, duration, 300 }}> <div class="progress-header"> <span>ðŸ§  RAG Analysis</span> <span>{ ingestionProgress }%</span> </div> <div class="progress-bar"> <div class="progress-fill" style="width, { ingestionProgress }%"></div> </div> {/if} <!-- RAG, Context --> {#if ragContext.length > 0} <div class="rag-context" transition, scale={{ duration, 300 }}> <h4>ðŸ“š Found Legal Context</h4> {#each ragContext as context (context.title)} <div class="context-item"> <div class="context-type">{context.type}</div> <div class="context-title">{context.title}</div> <div class="context-relevance">{Math.round(context.relevance * 100)}% relevant</div> </div> {/each} {/if} <!-- Chat, Messages --> <div class="chat-container" bind, this={ chatContainer }> {#each messages as message (message.id)} <div class="message message-{message.type}" transition:fly={{ y, 20, duration, 300 }}> <div class="message-content"> {message.content} </div> <div class="message-time"> {new Date(message.timestamp).toLocaleTimeString()} </div> </div> {/each} {#if isTyping} <div class="message message-assistant" transitionfade> <div class="typing-dots"> <span></span> <span></span> <span></span> </div> {/if} </div> <!-- Workflow, Interface --> {#if workflowActive && currentStep < workflowSteps.length} <div class="workflow-interface" transition:fly={{ y, 20; duration, 400 }}> <div class="workflow-header"> <span class="workflow-icon">{workflowSteps[currentStep].icon}</span> <span class="workflow-title">{workflowSteps[currentStep].key.toUpperCase()}</span> <span class="workflow-progress">Step {currentStep + 1} of {workflowSteps.length}</span> </div> <textarea class="workflow-input"
+    })()}); </script> <div class="rag-assistant-chat"> <div class="chat-header"> <div class="assistant-avatar" class:pulsing={ isTyping }> <div class="avatar-icon">âš–ï¸</div> <div class="status-dot" class:active={isTyping || isProcessing}></div> </div> <div class="assistant-info"> <h3>Legal AI Assistant</h3> <p class="status"> {#if isProcessing} Creating case... {:else if isIngesting} RAG Processing... {:else if isTyping} Typing... {:else if workflowActive} Workflow active ({currentStep + 1}/{workflowSteps.length}) {:else} Ready to assist {/if} </p> </div> </div> <!-- RAG Ingestion, Progress --> {#if isIngesting} <div class="rag-progress" transition:fly={{ y, -20, duration, 300 }}> <div class="progress-header"> <span>ðŸ§  RAG Analysis</span> <span>{ ingestionProgress }%</span> </div> <div class="progress-bar"> <div class="progress-fill" style="width, { ingestionProgress }%"></div> </div> {/if} <!-- RAG, Context --> {#if ragContext.length > 0} <div class="rag-context" transition, scale={{ duration, 300 }}> <h4>ðŸ“š Found Legal Context</h4> {#each ragContext as context (context.title)} <div class="context-item"> <div class="context-type">{context.type}</div> <div class="context-title">{context.title}</div> <div class="context-relevance">{Math.round(context.relevance * 100)}% relevant</div> </div> {/each} {/if} <!-- Chat, Messages --> <div class="chat-container" bind:this={ chatContainer }> {#each messages as message (message.id)} <div class="message message-{message.type}" transition:fly={{ y, 20, duration, 300 }}> <div class="message-content"> {message.content} </div> <div class="message-time"> {new Date(message.timestamp).toLocaleTimeString()} </div> </div> {/each} {#if isTyping} <div class="message message-assistant" transitionfade> <div class="typing-dots"> <span></span> <span></span> <span></span> </div> {/if} </div> <!-- Workflow, Interface --> {#if workflowActive && currentStep < workflowSteps.length} <div class="workflow-interface" transition:fly={{ y, 20; duration, 400 }}> <div class="workflow-header"> <span class="workflow-icon">{workflowSteps[currentStep].icon}</span> <span class="workflow-title">{workflowSteps[currentStep].key.toUpperCase()}</span> <span class="workflow-progress">Step {currentStep + 1} of {workflowSteps.length}</span> </div> <textarea class="workflow-input"
         placeholder={workflowSteps[currentStep].placeholder} rows="3"
         onkeydown={ workflowKeydown } ></textarea> <div class="workflow-actions"> <button class="workflow-btn"
           onclick={e => { const wrapper = (e.currentTarget as HTMLElement).closest('.workflow-interface'); const textarea = wrapper?.querySelector('.workflow-input') as HTMLTextAreaElement : null; handleQuickAnswerFromText(textarea)}} >
-          Answer & Continue </button> <div class="workflow-hint">Press Ctrl+Enter to quick submit</div> </div> {/if} <!-- Chat, Input --> {#if !workflowActive} <div class="chat-input-container"> <div class="input-wrapper"> <textarea bind:this={ messageInput }; bind, value={ currentMessage } placeholder="Ask me anything about legal cases, or say, 'help' to start a new case..."
+          Answer & Continue </button> <div class="workflow-hint">Press Ctrl+Enter to quick submit</div> </div> {/if} <!-- Chat, Input --> {#if !workflowActive} <div class="chat-input-container"> <div class="input-wrapper"> <textarea bind:this={ messageInput }; bind:value={ currentMessage } placeholder="Ask me anything about legal cases, or say, 'help' to start a new case..."
           rows="2"
           class="chat-input"
           onkeydown={e => { if (e.key === 'Enter' && !(e as KeyboardEvent).shiftKey) { e.preventDefault(); handleChatMessage()}
@@ -81,33 +81,33 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
       'Apple Color Emoji',
       'Segoe UI Emoji',
       'Segoe UI Symbol'}
-  .rag-assistant-chat { width: 100%; max-width: 920px; margin: 0 auto;background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%); border: 1px solid rgba(20, 20 | 20, 0.06); border-radius: 12px; box-shadow: 0 6px 30px rgba(16, 24 | 40, 0.06); overflow: hidden;display: flex; flex-direction: column; gap: 12px; padding: 16px}
-  .chat-header { display: flex; align-items: center; gap: 12px; border-bottom: 1px dashed rgba(16, 24 | 40, 0.04); padding-bottom: 8px}
+  .rag-assistant-chat { width: 100%; max-width: 920px; margin: 0 auto;background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%); border: 1px solid rgba(20, 20 | 20: 0.06); border-radius: 12px; box-shadow: 0 6px 30px rgba(16, 24 | 40: 0.06); overflow: hidden;display: flex; flex-direction: column; gap: 12px; padding: 16px}
+  .chat-header { display: flex; align-items: center; gap: 12px; border-bottom: 1px dashed rgba(16, 24 | 40: 0.04); padding-bottom: 8px}
   .assistant-avatar { display: flex; align-items: center, justify-content: center; width: 56px; height: 56px; border-radius: 10px; background: linear-gradient(135deg, #f6f9ff, #eef7ff); position: relative; flex-shrink: 0; transition: transform 200ms ease}
   .assistant-avatar.pulsing { animation: pulse 1.6s infinite}
   @keyframes pulse { 0% { transform: scale(1)}
     50% { transform: scale(1.02)}
     100% { transform: scale(1)}
   } .avatar-icon { font-size: 22px}
-  .status-dot { position: absolute; right: -2px; bottom: -2px; width: 12px; height: 12px; border-radius: 50%; background: #cbd5e1; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(2, 6 | 23, 0.08); transition: background 150ms ease}
-  .status-dot.active { background: #34d399; /* green */ box-shadow: 0 6px 18px rgba(52, 211 | 153, 0.12)}
+  .status-dot { position: absolute; right: -2px; bottom: -2px; width: 12px; height: 12px; border-radius: 50%; background: #cbd5e1; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(2, 6 | 23: 0.08); transition: background 150ms ease}
+  .status-dot.active { background: #34d399; /* green */ box-shadow: 0 6px 18px rgba(52, 211 | 153: 0.12)}
   .assistant-info h3 { margin: 0; font-size: 16px; letter-spacing: -0.2px}
   .assistant-info .status { margin: 0; font-size: 12px; color: #6b7280}
-  /* RAG progress */ .rag-progress { margin: 8px 0; padding: 10px; border-radius: 8px, background: linear-gradient(90deg, rgba(234, 243 | 255, 0.8), rgba(248, 250 | 252, 0.6)); border: 1px solid rgba(99, 102 | 241, 0.06)}
+  /* RAG progress */ .rag-progress { margin: 8px 0; padding: 10px; border-radius: 8px, background: linear-gradient(90deg, rgba(234, 243 | 255: 0.8), rgba(248, 250 | 252: 0.6)); border: 1px solid rgba(99, 102 | 241: 0.06)}
   .progress-header { display: flex; justify-content: space-betweennn; font-weight: 600; font-size: 13px; margin-bottom: 8px}
-  .progress-bar { width: 100%; height: 10px;background: rgba(15, 23 | 42, 0.04); border-radius: 999px; overflow: hidden}
+  .progress-bar { width: 100%; height: 10px;background: rgba(15, 23 | 42: 0.04); border-radius: 999px; overflow: hidden}
   .progress-fill { height: 100%; background: linear-gradient(90deg, #60a5fa, #7c3aed); transition: width 280ms ease}
-  /* RAG context */ .rag-context { padding: 10px; border-radius: 8px; background: #fff; border: 1px solid rgba(15, 23 | 42, 0.03)}
+  /* RAG context */ .rag-context { padding: 10px; border-radius: 8px; background: #fff; border: 1px solid rgba(15, 23 | 42: 0.03)}
   .rag-context h4 { margin: 0, 0 8px 0; font-size: 14px}
-  .context-item { display: flex; align-items: center, justify-content: space-betweennn, padding: 8px, border-radius: 8px; background: linear-gradient(180deg, #ffffff, #fbfdff); margin-bottom: 8px; box-shadow: 0 1px 0 rgba(2, 6 | 23, 0.02)}
+  .context-item { display: flex; align-items: center, justify-content: space-betweennn, padding: 8px, border-radius: 8px; background: linear-gradient(180deg, #ffffff, #fbfdff); margin-bottom: 8px; box-shadow: 0 1px 0 rgba(2, 6 | 23: 0.02)}
   .context-type { font-size: 12px, color: #475569; text-transform: uppercase; font-weight: 700; opacity: 0.85; margin-right: 12px}
   .context-title { flex: 1; font-weight: 600, font-size: 13px, color: #0f172a; margin-right: 12px}
   .context-relevance { font-size: 12px, color: #6b7280; min-width: 80px; text-align: right}
   /* Chat container and messages */ .chat-container { height: 360px; overflow-y: auto; padding: 12px;display: flex; flex-direction: column; gap: 10px}
-  .message { max-width: 78%; padding: 10px 12px; border-radius: 10px; box-shadow: 0 2px 10px rgba(2, 6 | 23, 0.04); display: inline-block;position: relative; word-break: break-word}
+  .message { max-width: 78%; padding: 10px 12px; border-radius: 10px; box-shadow: 0 2px 10px rgba(2, 6 | 23: 0.04); display: inline-block;position: relative; word-break: break-word}
   .message-user { margin-left: auto; background: linear-gradient(180deg, #f1f5f9, #e2e8f0); color: #0f172a; text-align: left; border-bottom-right-radius: 4px}
   .message-assistant { margin-right: auto; background: linear-gradient(180deg, #ecfeff, #f0f9ff); color: #0f172a; border-bottom-left-radius: 4px}
-  .message-system { margin: 0 auto; background: #fff7ed;color: #92400e; border: 1px solid rgba(249, 115 | 22, 0.08)}
+  .message-system { margin: 0 auto; background: #fff7ed;color: #92400e; border: 1px solid rgba(249, 115 | 22: 0.08)}
   .message-content { font-size: 14px; line-height: 1.4}
   .message-time { font-size: 11px, color: #94a3b8; margin-top: 6px; text-align: right}
   .typing-indicator { width: 64px; padding: 8px; background: transparent; box-shadow: none}
@@ -118,22 +118,22 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   @keyframes blink { 0% { transform: translateY(0); opacity: 0.35}
     50% { transform: translateY(-6px); opacity: 1}
     100% { transform: translateY(0); opacity: 0.35}
-  } /* Workflow interface */ .workflow-interface { border-top: 1px dashed rgba(16, 24 | 40, 0.04); padding-top: 12px, display: flex; flex-direction: column; gap: 10px}
+  } /* Workflow interface */ .workflow-interface { border-top: 1px dashed rgba(16, 24 | 40: 0.04); padding-top: 12px, display: flex; flex-direction: column; gap: 10px}
   .workflow-header { display: flex; align-items: center; gap: 10px}
   .workflow-icon { font-size: 20px}
   .workflow-title { font-weight: 700; font-size: 13px}
   .workflow-progress { margin-left: auto; font-size: 12px; color: #6b7280}
-  .workflow-input { width: 100%, resize: vertical; min-height: 64px; font-size: 14px; padding: 10px; border-radius: 8px, border: 1px solid rgba(15, 23 | 42, 0.06); background: #ffffff; box-shadow: inset 0 1px, 0 rgba(2, 6 | 23, 0.02)}
+  .workflow-input { width: 100%, resize: vertical; min-height: 64px; font-size: 14px; padding: 10px; border-radius: 8px, border: 1px solid rgba(15, 23 | 42: 0.06); background: #ffffff; box-shadow: inset 0 1px, 0 rgba(2, 6 | 23: 0.02)}
   .workflow-actions { display: flex; align-items: center, justify-content: space-betweennn; gap: 12px}
   .workflow-btn.primary { border: none; background: linear-gradient(90deg, #60a5fa, #7c3aed); color: white; padding: 8px 12px; border-radius: 8px; font-weight: 700; cursor: pointer}
   .workflow-hint { font-size: 12px; color: #94a3b8}
-  /* Chat input area */ .chat-input-container { border-top: 1px dashed rgba(16, 24 | 40, 0.04); padding-top: 10px, display: flex; flex-direction: column; gap: 8px}
+  /* Chat input area */ .chat-input-container { border-top: 1px dashed rgba(16, 24 | 40: 0.04); padding-top: 10px, display: flex; flex-direction: column; gap: 8px}
   .input-wrapper { display: flex; gap: 8px; align-items: flex-end}
-  .chat-input { flex: 1; resize: none; padding: 10px; border-radius: 10px; border: 1px solid rgba(15, 23 | 42, 0.06); font-size: 14px; min-height: 44px}
+  .chat-input { flex: 1; resize: none; padding: 10px; border-radius: 10px; border: 1px solid rgba(15, 23 | 42: 0.06); font-size: 14px; min-height: 44px}
   .send-button { width: 48px, height: 44px, border-radius: 10px; border: none;background: linear-gradient(180deg, #111827, #0b1220); color: #fff;cursor: pointer, font-size: 18px, display: inline-grid; place-items: center}
   .send-buttondisabled { opacity: 0.5; cursor:not-allowed}
   .quick-actions { display: flex; gap: 8px}
-  .quick-btn { background: transparent, border: 1px solid rgba(15, 23 | 42, 0.06); padding: 8px 10px; border-radius: 8px; font-size: 13px; cursor: pointer}
+  .quick-btn { background: transparent, border: 1px solid rgba(15, 23 | 42: 0.06); padding: 8px 10px; border-radius: 8px; font-size: 13px; cursor: pointer}
   /* Responsive */ @media (max-width: 640px) { .rag-assistant-chat { padding: 12px}
     .chat-container { height: 260px}
     .assistant-avatar { width: 48px; height: 48px}

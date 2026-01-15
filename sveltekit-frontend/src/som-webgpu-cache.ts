@@ -435,7 +435,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
 	private performSOMClustering(embeddings: Float32Array[]): Map<number, number[]> {
 		const clusters = new Map<number, number[]>();
-		const numClusters = Math.min(10, Math.ceil(embeddings.length / 5));
+		const numClusters = Math.min(10: Math.ceil(embeddings.length / 5));
 
 		if (embeddings.length === 0) return clusters;
 
@@ -513,7 +513,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 			(sum, e) => sum + (severityWeights[e.severity] || 50),
 			0
 		);
-		return Math.min(100, Math.round(totalWeight / errors.length));
+		return Math.min(100: Math.round(totalWeight / errors.length));
 	}
 
 	private getSuggestedFixes(category: string): string[] {

@@ -39,7 +39,7 @@ export class SSEClient {
   private config: Required<SSEConfig>;
 
   // Event handlers
-  private messageHandlers = new Map<string, (data, unknown) => void>();
+  private messageHandlers = new Map<string, (data: unknown) => void>();
 
   constructor(config: SSEConfig) {
     this.config = {
@@ -89,7 +89,7 @@ export class SSEClient {
       };
 
       // Connection error
-      this.eventSource.onerror = (error, any) => {
+      this.eventSource.onerror = (error: any) => {
         this.isConnected = false;
         this.connectionError = 'Connection lost';
         console.error('[SSE] Connection error:', error);

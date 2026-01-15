@@ -83,7 +83,7 @@
  <!-- Scanline effect -->
  {#if enableLighting}
  <span class="absolute inset-0 pointer-events-none opacity-20"
- style="background, repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px)">
+ style="background, repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255: 0.1) 2px, rgba(255,255,255: 0.1) 4px)">
  </span>
  {/if}
 

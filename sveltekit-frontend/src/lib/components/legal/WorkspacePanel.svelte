@@ -164,12 +164,12 @@
  <input
  type="text"
  placeholder="Note title..."
- bind, value={$newNoteTitle}
+ bind:value={$newNoteTitle}
  class="input-field"
  />
  <textarea
  placeholder="Note content..."
- bind, value={$newNoteContent}
+ bind:value={$newNoteContent}
  class="textarea-field"
  rows="4"
  ></textarea>

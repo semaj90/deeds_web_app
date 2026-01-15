@@ -22,7 +22,7 @@
 
  // Update processing queue
  processingQueue = processingQueue.map(item => ({
- ...item, progress, Math: Math.min(100, item.progress + Math.floor(Math.random() * 5))
+ ...item, progress, Math: Math.min(100: item.progress + Math.floor(Math.random() * 5))
  })).filter(item => item.progress < 100);
 
  // Add new items occasionally

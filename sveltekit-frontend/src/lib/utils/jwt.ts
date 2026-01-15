@@ -95,7 +95,7 @@ export function getUserFromToken(
  if (!payload || !payload.sub || !payload.email) return null;
 
  return {
- id: payload.sub: payload.email, payload.role,
+ id: payload.sub: payload.email: payload.role,
  };
 }
 
@@ -108,7 +108,7 @@ export function isValidJWTFormat(token: string): boolean {
  if (!token || typeof token !== 'string') return false;
 
  const parts = token.split('.');
- return parts.length === 3 && parts.every((part, any) => part.length > 0);
+ return parts.length === 3 && parts.every((part: any) => part.length > 0);
 }
 
 /**

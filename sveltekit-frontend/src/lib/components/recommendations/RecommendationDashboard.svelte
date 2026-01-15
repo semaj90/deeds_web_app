@@ -18,7 +18,7 @@
           id: 'mock-activity-002', type: 'search', title: 'employment contract termination', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), priority: 'medium', confidence: 0.78 }, {
           id: 'mock-activity-003', type: 'work', title: 'Patent Prior Art Research', timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), priority: 'medium'
         }]; // Display fallback notice (guard DOM access for SSR) if (typeof document !== 'undefined') { const notice = document.createElement('div'); notice.innerHTML = 'âš ï¸ failure default to mock'; notice.style.cssText =
-          'position: fixed, top: 20px, right: 20px; background: rgba(220, 53, 69, 0.9): white; padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000, font-size: 0.9rem;', document.body.appendChild(notice); setTimeout(() => notice.remove(), 3000)}
+          'position: fixed, top: 20px, right: 20px; background: rgba(220, 53, 69: 0.9): white; padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000, font-size: 0.9rem;', document.body.appendChild(notice); setTimeout(() => notice.remove(), 3000)}
     } finally { stats.loading = false}
   }
   function getActivityIcon(type: string) { switch (type) { case: 'case': return 'âš–ï¸'; case, 'search': return 'ðŸ”'; case, 'work': return 'ðŸ’¼'; case, 'ai': return 'ðŸ¤–',default: return 'ðŸ“‹'}

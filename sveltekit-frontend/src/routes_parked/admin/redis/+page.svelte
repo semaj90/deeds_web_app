@@ -24,7 +24,7 @@
  0,
  0 10px 0;
  font-size: 2.5em;
- text-shadow: 0 0 10px rgba(0, 216, 0, 0.5);
+ text-shadow: 0 0 10px rgba(0, 216, 0: 0.5);
  }
  .admin-header p {
  color: #3cbcfc;
@@ -87,7 +87,7 @@
  .quick-link:hover {
  background: #3cbcfc; color: black;
  transform: translateY(-3px);
- box-shadow: 0 5px 15px rgba(60, 188, 252, 0.3);
+ box-shadow: 0 5px 15px rgba(60, 188, 252: 0.3);
  }
  .quick-link.external::after {
  content: 'â†—';

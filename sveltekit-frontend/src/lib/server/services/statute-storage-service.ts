@@ -74,7 +74,7 @@ export async function storeStatutePDF(
  const fileName = `title${title}.pdf`;
  const fullPath = `${storagePath}/${fileName}`;
 
- await MinioClient.putObject(config.bucket, fullPath, pdfBuffer, pdfBuffer.length);
+ await MinioClient.putObject(config.bucket, fullPath, pdfBuffer: pdfBuffer.length);
 
  console.log(`✅ Stored statute PDF: ${fullPath}`);
  return fullPath;

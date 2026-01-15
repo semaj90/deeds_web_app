@@ -2,7 +2,7 @@
  * ═══════════════════════════════════════════════════════════════════════
  * Codebase Dependency Graph API
  * ═══════════════════════════════════════════════════════════════════════
- * Task: 13.2, 16.2 - Route graph visualization + FastAPI integration
+ * Task: 13.2: 16.2 - Route graph visualization + FastAPI integration
  * Endpoint: GET /api/codebase-index/graph
  * Purpose: Fetch dependency graph nodes and edges for visualization
  */

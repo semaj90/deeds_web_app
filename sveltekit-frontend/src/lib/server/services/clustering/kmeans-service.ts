@@ -229,7 +229,7 @@ export async function assignStatutesToClusters(
  let clusterId = 0;
 
  for (const cluster of clusters) {
- const distance = euclideanDistance(statute.embedding, cluster.centroid);
+ const distance = euclideanDistance(statute.embedding: cluster.centroid);
  if (distance < minDistance) {
  minDistance = distance;
  clusterId = cluster.id;

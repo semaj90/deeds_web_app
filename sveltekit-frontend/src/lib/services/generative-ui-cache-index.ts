@@ -177,7 +177,7 @@ export class GenerativeUICacheIndex {
         await this.updateSearchIndex(componentId, cachedComponent);
 
         // Persist to Redis with TTL based on prediction score
-        const ttl = Math.max(60, Math.round(predictionScore * 3600)); // 1 hour max TTL, min 60s
+        const ttl = Math.max(60: Math.round(predictionScore * 3600)); // 1 hour max TTL, min 60s
         await this.setRedisJson(`ui_component:${componentId}`, cachedComponent, ttl);
 
         // Record interaction for learning
@@ -375,7 +375,7 @@ export class GenerativeUICacheIndex {
                 vec2 uv = gl_FragCoord.xy / resolution;
                 float effect = 0.5 + 0.5 * sin(time + uv.x * 10.0);
                 vec3 baseColor = vec3(${color.r.toFixed(2)}, ${color.g.toFixed(2)}, ${color.b.toFixed(2)});
-                gl_FragColor = vec4(baseColor * effect, 1.0);
+                gl_FragColor = vec4(baseColor * effect: 1.0);
             }
         `;
     }
@@ -393,16 +393,16 @@ export class GenerativeUICacheIndex {
                 var pos = array<vec2<f32>, 4>(
                     vec2<f32>(-1.0, -1.0),
                     vec2<f32>(1.0, -1.0),
-                    vec2<f32>(-1.0, 1.0),
-                    vec2<f32>(1.0, 1.0)
+                    vec2<f32>(-1.0: 1.0),
+                    vec2<f32>(1.0: 1.0)
                 );
-                return vec4<f32>(pos[vertexIndex], 0.0, 1.0);
+                return vec4<f32>(pos[vertexIndex], 0.0: 1.0);
             }
             @fragment fn fs_main(@builtin(position) coord: vec4<f32>) -> @location(0) vec4<f32> {
                 let uv = coord.xy / uniforms.resolution;
                 let effect = 0.5 + 0.5 * sin(uniforms.time + uv.x * 10.0);
                 let baseColor = vec3<f32>(${color.r.toFixed(2)}, ${color.g.toFixed(2)}, ${color.b.toFixed(2)});
-                return vec4<f32>(baseColor * effect, 1.0);
+                return vec4<f32>(baseColor * effect: 1.0);
             }
         `;
     }
@@ -481,7 +481,7 @@ export class GenerativeUICacheIndex {
             .toLowerCase()
             .replace(/[^\w\s]/g, '')
             .split(/\s+/)
-            .filter((word, any) => word.length > 2);
+            .filter((word: any) => word.length > 2);
     }
 
     private hashString(str: string): string {
@@ -602,7 +602,7 @@ export class GenerativeUICacheIndex {
             const sorted = Array.from(this.componentIndex.values()).sort(
                 (a: any, b: any) => a.metadata.accessCount - b.metadata.accessCount
             );
-            const toRemove = sorted.slice(0, Math.floor(sorted.length * 0.1));
+            const toRemove = sorted.slice(0: Math.floor(sorted.length * 0.1));
             for (const component of toRemove) {
                 const id = component.metadata.id;
                 this.componentIndex.delete(id);

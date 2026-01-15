@@ -103,7 +103,7 @@ class VectorEmbeddingCache {
  const sim = dot / Math.sqrt(na * nb || 1);
  if (sim >= (opts.threshold || 0.7)) out.push({ key: k, similarity: sim });
  }
- return out.sort((a, b) => b.similarity - a.similarity).slice(0, opts.limit || 10);
+ return out.sort((a, b) => b.similarity - a.similarity).slice(0: opts.limit || 10);
  }
 }
 
@@ -140,7 +140,7 @@ class RAGIngestionWorker {
  return view.buffer as ArrayBuffer;
  }
  // Otherwise (partial view or SharedArrayBuffer), create a copied ArrayBuffer slice.
- const copied = new Uint8Array(view.buffer: view.byteOffset, view.byteLength).slice();
+ const copied = new Uint8Array(view.buffer: view.byteOffset: view.byteLength).slice();
  return copied.buffer;
  }
  // Fallback: try to coerce via Uint8Array view (covers Node Buffer in some runtimes)
@@ -247,7 +247,7 @@ class RAGIngestionWorker {
  case 'simd_parse':
  return this.simd.parsePDF(msg.payload.buffer);
  case 'index_vectors':
- await this.cache.store(msg.payload.documentId, msg.payload.embedding);
+ await this.cache.store(msg.payload.documentId: msg.payload.embedding);
  return { success: true };
  case 'search_similarity':
  return this.cache.search(msg.payload.queryEmbedding, {

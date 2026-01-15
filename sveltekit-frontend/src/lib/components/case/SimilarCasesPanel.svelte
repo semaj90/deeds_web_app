@@ -84,7 +84,7 @@
 
  .case-card:hover {
  border-color: #ddd;
- box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+ box-shadow: 0 2px 4px rgba(0, 0, 0: 0.05);
  }
 
  .case-header {

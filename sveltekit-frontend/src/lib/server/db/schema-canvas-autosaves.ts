@@ -1,8 +1,7 @@
 
 import { index, integer, jsonb, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
-import { sql } from 'drizzle-orm';
-import { users } from './schema-postgres.ts';
 import { canvasStates } from './schema-canvas.ts';
+import { users } from './schema-postgres.ts';
 
 export const canvasAutosaves = pgTable(
 	'canvas_autosaves',
@@ -24,10 +23,10 @@ export const canvasAutosaves = pgTable(
 		version: integer('version').default(1).notNull(),
 		createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
 	},
-	(table) => ([
-		index('canvas_autosaves_canvas_id_idx').on(table.canvasId),
-		index('canvas_autosaves_canvas_created_idx').on(table.canvasId, table.createdAt),
-		index('canvas_autosaves_user_id_idx').on(table.userId)])
+ (table) => ([
+ index('canvas_autosaves_canvas_id_idx').on(table.canvasId),
+ index('canvas_autosaves_canvas_created_idx').on(table.canvasId, table.createdAt),
+ index('canvas_autosaves_user_id_idx').on(table.userId)])
 );
 
 

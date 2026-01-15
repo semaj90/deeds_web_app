@@ -138,10 +138,8 @@ Provide your analysis in this JSON structure:
 			   tags = EXCLUDED.tags,
 			   updated_at = NOW()`,
 			[
-				cluster_id,
-				analysis.pattern_name,
-				analysis.root_cause,
-				analysis.fix_strategy || []
+				cluster_id: analysis.pattern_name,
+				analysis.root_cause: analysis.fix_strategy || []
 			]
 		).catch(console.error);
 

@@ -180,9 +180,7 @@ describe('GET /api/routes/:routeId/errors', () => {
  message: 'Warning 1',
  severity: 'warning',
  createdAt: new Date( resolvedAt: null,
- }] as const,
-
- vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
+ }] as const: vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
  vi.mocked(queries.getErrorClusters).mockResolvedValue(mockErrors as any);
  vi.mocked(queries.getErrorClusterCount).mockResolvedValue(2);
 

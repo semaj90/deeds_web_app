@@ -2,7 +2,7 @@
  * Property-Based Tests for ACE Context Manager Service
  * Task 12.1: Write property tests for ACE context
  * Feature: agentic-error-analysis-diffs, Property 6: ACE Context State Consistency
- * Validates: Requirements 6.1, 6.2
+ * Validates: Requirements 6.1: 6.2
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
@@ -352,7 +352,7 @@ describe('AceContextManager - Property-Based Tests (Task 12.1)', () => {
  expect(page2.length).toBe(5);
 
  // Ensure no overlap
- const page1Ids = page1.map((c, any) => c.sessionId);
+ const page1Ids = page1.map((c: any) => c.sessionId);
  const page2Ids = page2.map((c: any) => c.sessionId);
  const overlap = page1Ids.filter((id: any) => page2Ids.includes(id));
 
@@ -367,7 +367,7 @@ describe('AceContextManager - Property-Based Tests (Task 12.1)', () => {
  contexts.push(c);
 
  // Small delay to ensure different timestamps
- await new Promise((resolve, any) => setTimeout(resolve, 5));
+ await new Promise((resolve: any) => setTimeout(resolve, 5));
  }
 
  const listed = await manager.listContexts(10, 0);

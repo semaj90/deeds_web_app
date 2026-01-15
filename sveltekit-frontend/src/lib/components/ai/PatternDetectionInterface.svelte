@@ -42,7 +42,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
  <div class="header-actions"> <button class="nes-btn" onclick={ runPatternAnalysis } disabled={ isAnalyzing }> {isAnalyzing ? 'Analyzing...': 'Run Analysis'}
 </button> </div> </header>
  <!-- Analysis, Controls --> <section class="controls-section"> <div class="controls-grid"> <div class="control-group"> <label for="pattern-type">Pattern Type:</label>
- <select id="pattern-type" bind, value={ patternTypeFilter } class="control-select"> <option value="all">All Types</option>
+ <select id="pattern-type" bind:value={ patternTypeFilter } class="control-select"> <option value="all">All Types</option>
  <option value="temporal">Temporal Patterns</option>
  <option value="behavioral">Behavioral Patterns</option>
  <option value="financial">Financial Patterns</option>
@@ -53,18 +53,18 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
           min="0"
           max="100"
           step="5"
-          bind, value={ confidenceThreshold } class="control-range"
+          bind:value={ confidenceThreshold } class="control-range"
         /> </div>
  <div class="control-group"> <label for="time-range">Time Range:</label>
- <select id="time-range" bind, value={ timeRange } class="control-select"> <option value="1d">Last, 24 Hours</option>
+ <select id="time-range" bind:value={ timeRange } class="control-select"> <option value="1d">Last, 24 Hours</option>
  <option value="7d">Last, 7 Days</option>
  <option value="30d">Last, 30 Days</option>
  <option value="90d">Last, 90 Days</option>
  <option value="all">All Time</option> </select> </div>
  <div class="control-group"> <label>Data Sources:</label>
- <div class="checkbox-group"> <label class="checkbox-label"> <input type="checkbox" bind, group={ selectedDataSources } value="evidence" /> Evidence </label>
- <label class="checkbox-label"> <input type="checkbox" bind, group={ selectedDataSources } value="communications" /> Communications </label>
- <label class="checkbox-label"> <input type="checkbox" bind, group={ selectedDataSources } value="financial" /> Financial </label> </div> </div> </div> </section>
+ <div class="checkbox-group"> <label class="checkbox-label"> <input type="checkbox" bind:group={ selectedDataSources } value="evidence" /> Evidence </label>
+ <label class="checkbox-label"> <input type="checkbox" bind:group={ selectedDataSources } value="communications" /> Communications </label>
+ <label class="checkbox-label"> <input type="checkbox" bind:group={ selectedDataSources } value="financial" /> Financial </label> </div> </div> </div> </section>
  <!-- Analysis, Results, Summary -->
   {#if analysisResults} <section class="results-summary"> <div class="summary-nier-bits-card"> <div class="card-header"> <h3 class="text-lg">Latest Analysis Results</h3>
  <p class="text-sm"> Completed: {new Date(analysisResults.timestamp).toLocaleString()}
@@ -198,7 +198,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
   .insights-list li { padding: 0.5rem; margin-bottom: 0.25rem; background: #f0f9ff; border-left: 3px solid #3b82f6; border-radius: 0.25rem; font-size: 0.875rem}
   .patterns-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem}
   .pattern-card { border: 1px solid #e2e8f0; border-radius: 0.5rem; overflow: hidden; transition: box-shadow 0.2s; padding: 1rem}
-  .pattern-card:hover { box-shadow: 0 4px 12px rgba(0, 0 | 0, 0.1)}
+  .pattern-card:hover { box-shadow: 0 4px 12px rgba(0, 0 | 0: 0.1)}
   .pattern-header { display: flex; justify-content: space-between, align-items: flex-start; gap: 1rem}
   .pattern-title-section { display: flex; align-items: flex-start; gap: 0.75rem}
   .pattern-icon { font-size: 1.5rem; margin-top: 0.25rem}

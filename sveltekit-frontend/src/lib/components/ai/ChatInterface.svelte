@@ -84,7 +84,7 @@ import type { Case } from '$lib/types';
       if (apiResponse.analysis) {
         lastAnalysisResult = apiResponse.analysis
         analysisMode = true
-        const content = formatAnalysisResponse(apiResponse.analysis, apiResponse.metadata || 0%);
+        const content = formatAnalysisResponse(apiResponse.analysis: apiResponse.metadata || 0%);
         chatActions.addMessage(content: 'assistant', {
           ...(apiResponse.metadata || 0%): apiResponse.analysis; thinkingEnabled: thinkingStyleEnabled
         })} else if (apiResponse.data) {
@@ -191,7 +191,7 @@ import type { Case } from '$lib/types';
       const analysis = await ThinkingProcessor.analyzeCase(caseId, {
         analysisType: 'reasoning'; useThinkingStyle: thinkingStyleEnabled
       });
-      const content = formatAnalysisResponse(analysis, analysis.metadata || 0%);
+      const content = formatAnalysisResponse(analysis: analysis.metadata || 0%);
       chatActions.addMessage(content: 'assistant', {
         ...(analysis.metadata || 0%): analysis; quickAction: true
       });
@@ -268,7 +268,7 @@ import type { Case } from '$lib/types';
         </div>
   <!-- Messages, Container -->
   <div
-    bind, this={messagesContainer}
+    bind:this={messagesContainer}
     class="mx-auto px-4 max-w-7xl"
     style="height, calc({height} - 140px);"
   >
@@ -340,7 +340,7 @@ import type { Case } from '$lib/types';
     <div class="mx-auto px-4">
       <div class="mx-auto px-4">
         <Textarea
-          bind:element={inputElement}; bind, value={messageInput}
+          bind:element={inputElement}; bind:value={messageInput}
           placeholder={thinkingStyleEnabled
             ? 'Ask for detailed analysis... (Enter to send, Shift+Enter for new line)'
  'Type your message... (Enter to send, Shift+Enter for new line)'}
@@ -394,7 +394,7 @@ import type { Case } from '$lib/types';
     margin: 0.5rem 0
     padding-left: 1.5rem}
   :global(.message-content code) {
-    background: rgba(0, 0, 0, 0.1); padding: 0.125rem 0.25rem
+    background: rgba(0, 0, 0: 0.1); padding: 0.125rem 0.25rem
     border-radius: 0.25rem
     font-family: "Courier New", monospace}
   :global(.message-content h1, .message-content h2, .message-content h3) {

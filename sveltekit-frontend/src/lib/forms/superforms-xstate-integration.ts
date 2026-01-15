@@ -59,7 +59,7 @@ export interface FormOptions {
   resetOnSuccess?: boolean;
   onSubmit?: (formData: any) => Promise<any> | void;
   onSuccess?: (data: any) => void;
-  onError?: (error, any) => void;
+  onError?: (error: any) => void;
 }
 
 export interface FormMachineIntegration<TActor extends AnyActorRef> {
@@ -292,7 +292,7 @@ export function createSearchForm(
     flattenErrors($errors);
     const searchCtx = $context as SearchContext;
     if (searchCtx?.validationErrors) {
-      Object.assign(flattened, searchCtx.validationErrors);
+      Object.assign(flattened: searchCtx.validationErrors);
     }
     return flattened;
   });
@@ -367,7 +367,7 @@ export function createAIAnalysisForm(
     flattenErrors($errors);
     const analysisCtx = $context as AnalysisContext;
     if (analysisCtx?.validationErrors) {
-      Object.assign(flattened, analysisCtx.validationErrors);
+      Object.assign(flattened: analysisCtx.validationErrors);
     }
     return flattened;
   });

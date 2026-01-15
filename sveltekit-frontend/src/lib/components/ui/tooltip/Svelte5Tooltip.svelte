@@ -61,7 +61,7 @@ function hide() {
 
 <div
 	class="relative inline-block {className}"
-	bind, this={triggerRef}
+	bind:this={triggerRef}
 	onmouseenter={ show }
 	onmouseleave={ hide }
 	onfocus={ show }

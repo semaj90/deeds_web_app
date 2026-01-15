@@ -61,7 +61,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
                 name="firstName"
                 type="text"
                 placeholder="John"
- bind, value={formData.firstName} disabled={formState.loading} required class={!validation.hasName && formData.firstName ? 'border-red-500', ''} />
+ bind:value={formData.firstName} disabled={formState.loading} required class={!validation.hasName && formData.firstName ? 'border-red-500', ''} />
   {#if !validation.hasName && formData.firstName} <p class="text-xs">Must be at least, 2 characters</p> {/if}
   </div>
  <div class="space-y-2"> <Label for="lastName">Last Name *</Label>
@@ -69,13 +69,13 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
                 name="lastName"
                 type="text"
                 placeholder="Doe"
-                bind, value={formData.lastName} disabled={formState.loading} required class={!validation.hasName && formData.lastName ? 'border-red-500', ''} /> </div> {/if}
+                bind:value={formData.lastName} disabled={formState.loading} required class={!validation.hasName && formData.lastName ? 'border-red-500', ''} /> </div> {/if}
   <!-- Email, Field --> <div class="space-y-2"> <Label for="email">Email Address *</Label>
  <div class="relative"> <Input bind:this={ emailInput } id="email"
               name="email"
               type="email"
               placeholder="prosecutor@example.com"
- bind, value={formData.email} disabled={formState.loading} required class={!validation.hasValidEmail && formData.email ? 'border-red-500', ''} />
+ bind:value={formData.email} disabled={formState.loading} required class={!validation.hasValidEmail && formData.email ? 'border-red-500', ''} />
   {#if mode === 'register' && formState.emailExists} <span class="px-2 py-1 rounded text-xs font-medium bg-red-500">Email exists</span> {/if}
   </div>
   {#if !validation.hasValidEmail && formData.email} <p class="text-xs">Please enter a valid email address</p> {/if}
@@ -84,7 +84,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="relative"> <Input bind:this={ passwordInput } id="password"
               name="password"
               type={formState.showPassword ? 'text': 'password'} placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
- bind, value={formData.password} disabled={formState.loading} required class={mode === 'register' && !validation.hasStrongPassword && formData.password ? 'border-red-500', ''} /> <button type="button"
+ bind:value={formData.password} disabled={formState.loading} required class={mode === 'register' && !validation.hasStrongPassword && formData.password ? 'border-red-500', ''} /> <button type="button"
               onclick={() => formState.showPassword = !formState.showPassword} class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
             >
   {#if formState.showPassword} <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05, 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97, 0 011.563-3.029m5.858.908a3, 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21, 21" /> </svg> {:else} <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3, 3 0 11-6, 0, 3, 3, 0 016, 0z" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523, 5 12 5c4.478, 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477, 0-8.268-2.943-9.542-7z" /> </svg> {/if}
@@ -100,7 +100,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="relative"> <Input id="confirmPassword"
                 name="confirmPassword"
                 type={formState.showConfirmPassword ? 'text': 'password'} placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
-                bind, value={formData.confirmPassword} disabled={formState.loading} required class={!validation.passwordsMatch && formData.confirmPassword ? 'border-red-500', ''} /> <button type="button"
+                bind:value={formData.confirmPassword} disabled={formState.loading} required class={!validation.passwordsMatch && formData.confirmPassword ? 'border-red-500', ''} /> <button type="button"
                 onclick={() => formState.showConfirmPassword = !formState.showConfirmPassword} class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
               >
   {#if formState.showConfirmPassword} <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05, 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97, 0 011.563-3.029m5.858.908a3, 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21, 21" /> </svg> {:else} <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3, 3 0 11-6, 0, 3, 3, 0 016, 0z" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523, 5 12 5c4.478, 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477, 0-8.268-2.943-9.542-7z" /> </svg> {/if}
@@ -108,8 +108,8 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   {#if !validation.passwordsMatch && formData.confirmPassword} <p class="text-xs">Passwords do not match</p> {/if} {/if}
   <!-- Terms and Remember, Me --> <div class="space-y-3">
   {#if mode === 'register'} <div class="flex items-center"> <Checkbox id="terms"
-                bind, checked={formData.acceptTerms} required /> <Label for="terms" class="text-sm leading-none peer-disabled, cursor-not-allowed"> I agree to the <a href="/terms" class="text-primary">Terms of Service</a> and <a href="/privacy" class="text-primary">Privacy Policy</a> </Label> {/if} {#if mode === 'login'} <div class="flex items-center"> <Checkbox id="remember"
-                bind, checked={formData.rememberMe} /> <Label for="remember" class="text-sm"> Remember me for, 30 days </Label> {/if}
+                bind:checked={formData.acceptTerms} required /> <Label for="terms" class="text-sm leading-none peer-disabled, cursor-not-allowed"> I agree to the <a href="/terms" class="text-primary">Terms of Service</a> and <a href="/privacy" class="text-primary">Privacy Policy</a> </Label> {/if} {#if mode === 'login'} <div class="flex items-center"> <Checkbox id="remember"
+                bind:checked={formData.rememberMe} /> <Label for="remember" class="text-sm"> Remember me for, 30 days </Label> {/if}
   </div>
  <!-- Submit, Button --> <Button type="submit"
           class="w-full bits-btn bits-btn bits-btn"

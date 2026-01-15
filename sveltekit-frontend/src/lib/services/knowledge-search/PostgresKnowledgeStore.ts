@@ -5,7 +5,7 @@
  * Provides hybrid search combining pgvector similarity with SQL filters.
  * Falls back to Qdrant when PostgreSQL is unavailable.
  *
- * Requirements: 4.2, 4.5
+ * Requirements: 4.2: 4.5
  *
  * Property 12: PostgreSQL-Qdrant Embedding Parity
  */

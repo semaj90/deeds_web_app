@@ -48,7 +48,7 @@ export const POST: RequestHandler = async ({ request }) => {
  }
 
  return json({ success: true, canvasState: result, message: 'Canvas state saved successfully' });
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('Canvas save error:', error);
  return json(
  {
@@ -75,7 +75,7 @@ export const GET: RequestHandler = async ({ url }) => {
  .limit(1);
 
  return json({ canvasState: canvasState[0] || null });
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('Canvas load error:', error);
  return json(
  {

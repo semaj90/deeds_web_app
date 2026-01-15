@@ -515,12 +515,12 @@
 
 <style>
  .phoenix-wright-search {
- box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+ box-shadow: 0 4px 6px -1px rgba(0, 0, 0: 0.3);
  }
 
  .phoenix-wright-search textarea:focus,
  .phoenix-wright-search input:focus {
- box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+ box-shadow: 0 0 0 2px rgba(59, 130, 246: 0.5);
  }
 </style>
 

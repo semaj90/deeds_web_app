@@ -100,7 +100,7 @@ export class MultiLayerCacheSystem {
  };
 
  layer.set(key, entry);
- this.currentSize.set(targetLayer, this.currentSize.get(targetLayer)! + size);
+ this.currentSize.set(targetLayer: this.currentSize.get(targetLayer)! + size);
  return true;
  }
  async get<T>(key: string, layerName?: string): Promise<T | null> {
@@ -160,7 +160,7 @@ export class MultiLayerCacheSystem {
  if (!entry) return false;
 
  layer.delete(key);
- this.currentSize.set(layerName, this.currentSize.get(layerName)! - entry.size);
+ this.currentSize.set(layerName: this.currentSize.get(layerName)! - entry.size);
  return true;
  }
  private evictEntry(layerName: string): boolean {

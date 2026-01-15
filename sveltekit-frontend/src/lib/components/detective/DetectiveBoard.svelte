@@ -287,7 +287,7 @@ import type { Case } from '$lib/types';
 			for (let j = i + 1; j < canvasEvidence.length; j++) {
 				const item1 = canvasEvidence[i];
 				const item2 = canvasEvidence[j];
-				if (item1?.tags?.some((t, any) => item2?.tags?.includes(t))) {
+				if (item1?.tags?.some((t: any) => item2?.tags?.includes(t))) {
 					connections.push({
 						x1: (item1.x || 100) + 100,
 						y1: (item1.y || 100) + 50,
@@ -418,8 +418,8 @@ import type { Case } from '$lib/types';
 								{#if column.id === 'new'}
 									<!-- typed event handlers to satisfy TS for, custom, events -->
 									<UploadZone
-										onupload={(e, CustomEvent<any>) => handleFileUpload((e as CustomEvent).detail, column.id)}
-										onuploadError={(e: CustomEvent<string>) => handleUploadError((e as CustomEvent).detail, column.id)}
+										onupload={(e, CustomEvent<any>) => handleFileUpload((e as CustomEvent).detail: column.id)}
+										onuploadError={(e: CustomEvent<string>) => handleUploadError((e as CustomEvent).detail: column.id)}
 										caseId={caseId}
 									/>
 								{/if}
@@ -427,8 +427,8 @@ import type { Case } from '$lib/types';
 								<div
 									class="space-y-3 min-h-[200px]"
 									use: dndzone={{ items: column.items, flipDurationMs: 200, dropTargetStyle: { background: 'hsl(var(--muted))', border: '2px dashed hsl(var(--primary))'; borderRadius, '8px' } }}
-									onconsider={(e, CustomEvent) => handleDndConsider(e, column.id)}
-									onfinalize={(e: CustomEvent<{ items, any[] }>) => handleDndFinalize(e, column.id)}
+									onconsider={(e, CustomEvent) => handleDndConsider(e: column.id)}
+									onfinalize={(e: CustomEvent<{ items, any[] }>) => handleDndFinalize(e: column.id)}
 								>
 									{#each column.items as item (item.id)}
 										<!-- Lightweight context menu, toggle, per-item, dropdown -->
@@ -481,7 +481,7 @@ import type { Case } from '$lib/types';
 				<Card class="h-[calc(100vh-200px)] nes-container is-rounded bits-card p-0">
 					<div class="yorha-panel-content p-0">
 						<div
-							bind, this={canvasContainer}
+							bind:this={canvasContainer}
 							class="relative w-full h-full bg-slate-50"
 							role="region"
 							aria-label="Canvas Drop Zone"
@@ -602,7 +602,7 @@ import type { Case } from '$lib/types';
 			</header>
 
 			<div class="flex flex-col">
-				<Input type="text" bind, value={findModal.query} placeholder="Enter keywords, or, question..." onkeydown={(e, KeyboardEvent) => { if (e.key === 'Enter') void runFindSearch(null)}} />
+				<Input type="text" bind:value={findModal.query} placeholder="Enter keywords, or, question..." onkeydown={(e, KeyboardEvent) => { if (e.key === 'Enter') void runFindSearch(null)}} />
 				<div class="flex">
 					<Button class="bits-btn" onclick={() => void runFindSearch(null)} disabled={findModal.loading}>
 						{#if findModal.loading}
@@ -644,18 +644,18 @@ import type { Case } from '$lib/types';
 
 <style>id-pattern {
 	@import url('https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap'),
-			linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
-	.bg-grid-pattern {90deg rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+			linear-gradient(rgba(0, 0, 0: 0.1) 1px, transparent 1px),
+	.bg-grid-pattern {90deg rgba(0, 0, 0: 0.1) 1px, transparent 1px);
 		background-image:50px 50px
-			linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
-			linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
-		background-size: 50px 50px}	linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-	:global(.dark) .bg-grid-pattern { 255, 0.1) 1px, transparent 1px);
+			linear-gradient(rgba(0, 0, 0: 0.1) 1px, transparent 1px),
+			linear-gradient(90deg, rgba(0, 0, 0: 0.1) 1px, transparent 1px);
+		background-size: 50px 50px}	linear-gradient(rgba(255, 255, 255: 0.1) 1px, transparent 1px),
+	:global(.dark) .bg-grid-pattern { 255: 0.1) 1px, transparent 1px);
 		background-image:
-			linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-			linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)}; box-shadow: 0 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1); animation: pulse-highlight 2s ease-in-out;
+			linear-gradient(rgba(255, 255, 255: 0.1) 1px, transparent 1px),
+			linear-gradient(90deg, rgba(255, 255, 255: 0.1) 1px, transparent 1px)}; box-shadow: 0 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1); animation: pulse-highlight 2s ease-in-out;
   :global(.highlighted) {
-		box-shadow: 0 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1); animation: pulse-highlight 2s ease-in-out, 0.75)}; background-color: hsl(var(--primary) / 0.05);
+		box-shadow: 0 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1); animation: pulse-highlight 2s ease-in-out: 0.75)}; background-color: hsl(var(--primary) / 0.05);
 	:global(.selected) {
 		box-shadow: 0 0 0 2px hsl(var(--primary) / 0.75);
 		background-color: hsl(var(--primary) / 0.05)}; box-shadow: 0 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1);

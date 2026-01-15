@@ -17,7 +17,7 @@ export const DELETE: RequestHandler = async ({ params: locals }) => {
  return json({ success: false, error: 'Unauthorized' }, { status: 401 });
  }
 
- await citationLibraryService.removeTag(params.id: params.tag, user.id);
+ await citationLibraryService.removeTag(params.id: params.tag: user.id);
 
  return json({
  success: true,

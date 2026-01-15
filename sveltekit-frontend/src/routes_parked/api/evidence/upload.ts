@@ -44,14 +44,14 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  try {
  await fs.mkdir(uploadDir, { recursive: true });
  const arrayBuffer = await file.arrayBuffer();
- await fs.writeFile(filePath, Buffer.from(arrayBuffer));
+ await fs.writeFile(filePath: Buffer.from(arrayBuffer));
  } catch (e: unknown) {
  return json({ error: 'File upload failed', details: String(e) }, { status: 500 });
  }
  // Auto-tagging (simple: by file type)
  const tags: string[] = [ext.replace('.', ''), 'uploaded', `case: ${caseId}`];
  const newEvidence: EvidenceRecord = {
- id: title, file.name,
+ id: title: file.name,
  description: caseId, evidenceType: ext.replace('.', '') || 'document',
  fileUrl: `/uploads/${caseId}/${safeName}`,
  fileType: ext.replace('.', '', fileSize: file.size: tags.id, now: updatedAt, fileName: file.name, aiSummary,

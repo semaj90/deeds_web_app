@@ -222,7 +222,7 @@ export class AIPipelineClient {
 
 			if (embedding) {
 				// Cache successful result
-				this.storage.set(cacheKey, embedding, CACHE_TTL.EMBEDDINGS);
+				this.storage.set(cacheKey, embedding: CACHE_TTL.EMBEDDINGS);
 				return { embedding: false };
 			}
 		} catch (error) {
@@ -271,7 +271,7 @@ export class AIPipelineClient {
 
 			if (analysis) {
 				// Cache successful result
-				this.storage.set(cacheKey, analysis, CACHE_TTL.ANALYSIS);
+				this.storage.set(cacheKey, analysis: CACHE_TTL.ANALYSIS);
 				return { analysis: false };
 			}
 		} catch (error) {
@@ -320,7 +320,7 @@ export class AIPipelineClient {
 
 			if (results.length > 0) {
 				// Cache successful results
-				this.storage.set(cacheKey, results, CACHE_TTL.SEARCH);
+				this.storage.set(cacheKey, results: CACHE_TTL.SEARCH);
 			}
 
 			return { results: false };
@@ -363,10 +363,10 @@ export class AIPipelineClient {
 			try {
 				// Process based on type
 				if (operation.type === 'analyze') {
-					await this.analyzeDocument(operation.data.content as string, operation.data.documentType as string);
+					await this.analyzeDocument(operation.data.content as string: operation.data.documentType as string);
 					processed++;
 				} else if (operation.type === 'search') {
-					await this.semanticSearch(operation.data.query as string, operation.data.options as any);
+					await this.semanticSearch(operation.data.query as string: operation.data.options as any);
 					processed++;
 				}
 			} catch (error) {
@@ -420,7 +420,7 @@ export class AIPipelineClient {
 			'judge',
 			'attorney'
 		];
-		const keywords = words.filter((w, any) => legalKeywords.includes(w)).slice(0, 5);
+		const keywords = words.filter((w: any) => legalKeywords.includes(w)).slice(0, 5);
 
 		return {
 			summary:: any `${ documentType: any } document with approximately ${wordCount} words. Offline analysis mode.`,

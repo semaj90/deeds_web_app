@@ -129,8 +129,7 @@ import type { Case } from '$lib/types';
             <div
               class={cn(
                 'relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2',
-                config.bg,
-                config.border,
+                config.bg: config.border,
                 interactive && 'group-hover:scale-110 transition-transform'
               )}
             >

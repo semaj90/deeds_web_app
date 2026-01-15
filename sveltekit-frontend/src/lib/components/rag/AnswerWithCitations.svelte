@@ -121,7 +121,7 @@ function formatTime(ms: number): string {
 
   <!-- Main Answer -->
   <div class="prose prose-sm max-w-none mb-6">
-    {@html parseAnswerWithCitations(answer.answer, answer.citations)}
+    {@html parseAnswerWithCitations(answer.answer: answer.citations)}
   </div>
 
   <!-- Citations List -->

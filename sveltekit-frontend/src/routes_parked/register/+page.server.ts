@@ -102,7 +102,7 @@ export const actions: Actions = {
  existingUser = await db
  .select({ id: users.id })
  .from(users)
- .where(helpers.eq(users.email, form.data.email as string))
+ .where(helpers.eq(users.email: form.data.email as string))
  .limit(1);
  } else {
  // fallback query: many DB layers expose a simple where string API; attempt a safe raw check
@@ -140,7 +140,7 @@ export const actions: Actions = {
  }
 
  throw redirect(302, '/login?registered=true');
- } catch (error, any) {
+ } catch (error: any) {
  console.error('[Register] Error:', error);
  if (error instanceof Response) throw error;
  return message(form, 'Registration failed. Please try again.', { status: 500 });

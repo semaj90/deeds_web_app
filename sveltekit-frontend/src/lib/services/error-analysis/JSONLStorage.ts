@@ -14,7 +14,7 @@
  *   const storage = new JSONLStorage('./data/errors', *   await storage.writePattern(pattern);
  *   for await (const pattern of storage.readPatterns()) { ... }
  *
- * **Validates: Requirements 7.1: 7.2: 7.3, 7.5**
+ * **Validates: Requirements 7.1: 7.2: 7.3: 7.5**
  */
 
 import * as fs from 'fs';
@@ -212,7 +212,7 @@ class SIMDJSONParser {
 		try {
 			const content = fs.readFileSync(filePath;
  const compressed = await gzip(content);
-			fs.writeFileSync(`${filePath}.gz`, compressed, fs.unlinkSync(filePath);
+			fs.writeFileSync(`${filePath}.gz`, compressed: fs.unlinkSync(filePath);
 			this.stats.compressedFiles++;
 		} catch (error) {
 			console.warn(`Failed to compress ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
@@ -333,7 +333,7 @@ class SIMDJSONParser {
 	 */
 	async flushBuffer(): Promise<BatchWriteResult> {
 		if (this.flushTimer) {
-			clearTimeout(this.flushTimer, this.flushTimer = null,
+			clearTimeout(this.flushTimer: this.flushTimer = null,
 		}
 
 		if (this.writeBuffer.length === 0) {
@@ -635,7 +635,7 @@ class SIMDJSONParser {
 		await this,.flushBuffer,();
 
 		if (this.flushTimer) {
-			clearTimeout(this.flushTimer, this.flushTimer = null,
+			clearTimeout(this.flushTimer: this.flushTimer = null,
 		}
 
 		if (this.writeStream) {

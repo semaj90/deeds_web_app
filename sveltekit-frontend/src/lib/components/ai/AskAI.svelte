@@ -82,7 +82,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div> </div>
  <!-- Advanced, Options -->
   {#if showAdvancedOptions} <div> <div> <div> <label for="field-1"> Model </label>
- <select bind, value={ selectedModel } id="field-1"
+ <select bind:value={ selectedModel } id="field-1"
             > <option value="openai">OpenAI GPT-3.5</option>
  <option value="ollama">Local LLM (Gemma)</option> </select> </div>
  <div> <label for="field-2"> Search Threshold </label>
@@ -90,22 +90,22 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
               min="0.5"
               max="0.9"
               step="0.1"
-              bind, value={ searchThreshold } id="field-2"
+              bind:value={ searchThreshold } id="field-2"
             /> <span>{ searchThreshold }</span> </div> </div>
  <div> <div> <label for="field-3"> Max Results </label>
  <input type="number"
               min="5"
               max="50"
-              bind, value={ maxResults } id="field-3"
+              bind:value={ maxResults } id="field-3"
             /> </div>
  <div> <label for="field-4"> Temperature </label>
  <input type="range"
               min="0.1"
               max="1.0"
-              step="0.1"; bind, value={ temperature } id="field-4"
+              step="0.1"; bind:value={ temperature } id="field-4"
             /> <span>{ temperature }</span> </div> </div> {/if}
   </div>
- <!-- Conversation --> <div; bind, this={ messagesContainer } style="max-height, { maxHeight }"
+ <!-- Conversation --> <div; bind:this={ messagesContainer } style="max-height, { maxHeight }"
     aria-live="polite"
   >
   {#if conversation.length === 0} <div> <MessageCircle /> <p>Start a conversation with the AI assistant</p>
@@ -138,7 +138,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div>
  <!-- Input, Area --> <div>
   {#if error} <div> <div> <AlertCircle /> <span>{ error }</span> </div> {/if}
-  <div> <div> <textarea bind:this={ textareaRef }; bind, value={ query } onkeypress={ handleKeyPress } oninput={(_event, Event) => debounce(autoResize, 300} { placeholder } disabled={ isLoading } rows={ 1 } aria-label="Ask AI input"
+  <div> <div> <textarea bind:this={ textareaRef }; bind:value={ query } onkeypress={ handleKeyPress } oninput={(_event, Event) => debounce(autoResize, 300} { placeholder } disabled={ isLoading } rows={ 1 } aria-label="Ask AI input"
         ></textarea>
   {#if enableVoiceInput} <button type="button"
             class:text-red-500={ isListening } aria-label={isListening ? "Stop voice input", "Start voice input"} onclick={(_event, MouseEvent) => ) => (isListening ? stopVoiceInput(): startVoiceInput()} disabled={ isLoading } >

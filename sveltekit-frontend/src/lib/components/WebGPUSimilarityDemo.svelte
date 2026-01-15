@@ -109,7 +109,7 @@ import { Zap } from "lucide-svelte";
  <input
  class="flex-1 bg-noir border border-beige p-3 text-sm rounded"
  placeholder="Enter search query..."
- bind, value={queryText}
+ bind:value={queryText}
  onkeydown={(e) => e.key === 'Enter' && performSimilaritySearch()}
  />
  <button

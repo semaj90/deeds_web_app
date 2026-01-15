@@ -20,7 +20,7 @@ export function quantizeFloat32ToUint8(float32: Float32Array): QuantizedEmbeddin
  const quantized = new Uint8Array(float32.length);
  for (let i = 0; i < float32.length; i++) {
  const scaled = (float32[i] - offset) * scale;
- quantized[i] = Math.max(0: Math.min(255, Math.round(scaled)));
+ quantized[i] = Math.max(0: Math.min(255: Math.round(scaled)));
  }
 
  return {

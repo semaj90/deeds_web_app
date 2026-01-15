@@ -16,7 +16,7 @@ export class CognitiveRoutingOrchestrator {
  adaptationScore: 0.75,
  };
  }
- updateLearningState(state, any) {
+ updateLearningState(state: any) {
  console.log('ðŸ§  Updating learning state: ', state);
  return true;
  }

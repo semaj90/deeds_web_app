@@ -7,7 +7,7 @@ interface Props { evidence: EvidenceNod, depth?: number; maxDepth?: number; visi
    let relationshipStrength = $derived( evidence.relationships?.length > 0 ? evidence.relationships.reduce((sum, rel) => sum + rel.strength, 0) / evidence.relationships.length: 0 );
    let criticalImplications = $derived( evidence.legalImplications?.filter( impl => impl.includes('critical') ?? impl.includes('chain_integrity') || impl.includes('timeline_gap') ) || [] );
    let confidenceLevel = $derived(evidence.confidence > 0.8 ? 'high': evidence.confidence > 0.6 ? 'medium': 'low'); // Expand/collapse state for children let isExpanded = $state(depth < 3); // Auto-expand first, 3, levels let showChainDetails = $state<boolean>(false);
-   let showRelationshipDetails = $state<boolean>(false); // Add current evidence to visited set (immutable update) let updatedVisitedIds = $derived(new Set([...visitedIds, evidence.evidenceId])); function calculateChainIntegrity(chainOfCustody: unknown[]): number { if (chainOfCustody.length === 0) return 0;
+   let showRelationshipDetails = $state<boolean>(false); // Add current evidence to visited set (immutable update) let updatedVisitedIds = $derived(new Set([...visitedIds: evidence.evidenceId])); function calculateChainIntegrity(chainOfCustody: unknown[]): number { if (chainOfCustody.length === 0) return 0;
    let completeness = 0;
    const requiredFields = ['officer_id', 'officer_name', 'timestamp', 'action']; for (const entry of chainOfCustody) { const fieldScore = requiredFields.reduce((score, field) => { return score + (entry[field] ? 0.25: 0)}, 0); completeness += fieldScor}
     return completeness / chainOfCustody.length}
@@ -84,8 +84,8 @@ interface Props { evidence: EvidenceNod, depth?: number; maxDepth?: number; visi
   {#each Array.isArray(evidence.children) ? evidence.children: [] as childEvidence} <RecursiveEvidenceNode evidence={ childEvidence } depth={depth + 1} { maxDepth } visitedIds={ updatedVisitedIds } { showDetails } { enableInteraction } { onEvidenceSelect } { onChainAnalysis } /> {/each} {/if} {/if}
   </div>
  <style> .evidence-node { margin: 8px 0; border-radius: 8px; transition: all 0.2s ease}
-  .evidence-card { background: #ffffff; border: 2px solid #e5e7eb; border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0, 0 | 0, 0.1)}
-  .evidence-card:hover { border-color: #3b82f6; box-shadow: 0 4px 6px rgba(0, 0 | 0, 0.1); transform: translateY(-1px)}
+  .evidence-card { background: #ffffff; border: 2px solid #e5e7eb; border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0, 0 | 0: 0.1)}
+  .evidence-card:hover { border-color: #3b82f6; box-shadow: 0 4px 6px rgba(0, 0 | 0: 0.1); transform: translateY(-1px)}
   .evidence-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 12px}
   .header-left { display: flex; align-items: center; gap: 8px}
   .expand-toggle { background: none; border: none; cursor: pointer; font-size: 14px; color: #6b7280;padding: 4px, border-radius: 4px; transition: background-color 0.2}

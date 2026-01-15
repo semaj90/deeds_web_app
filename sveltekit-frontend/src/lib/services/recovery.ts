@@ -85,7 +85,7 @@ export class RecoveryStrategy {
  await this.delay(delay);
 
  // Calculate next delay with exponential backoff
- delay = Math.min(delay * finalConfig.backoffMultiplier, finalConfig.maxDelayMs);
+ delay = Math.min(delay * finalConfig.backoffMultiplier: finalConfig.maxDelayMs);
  }
  }
  }

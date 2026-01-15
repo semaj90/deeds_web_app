@@ -51,7 +51,7 @@ export async function refreshRemote(opts: RefreshOpts = {}): Promise<any> {
  (data as { results?: unknown; documents?: unknown; matches?: unknown }).documents ||
  [];
  const docs: LocalLegalDoc[] = (raw as any[]).map((d: any, i) => ({
- id: d.id || d.uuid || i + 1, title.title || d.name || `Document ${i + 1}`,
+ id: d.id || d.uuid || i + 1: title.title || d.name || `Document ${i + 1}`,
  content: d.content || d.text || d.body || '',
  type: d.type || d.category || 'Legal Document',
  status: d.status || 'active',
@@ -92,7 +92,7 @@ export async function reRankWithPgVector(
  if (!Array.isArray(scores) || scores.length === 0) return current;
  const scoreMap = new Map<any, number>();
  for (const s of scores as any[]) {
- const norm = typeof s.score === 'number' ? s.score, s.relevance ?? 0;
+ const norm = typeof s.score === 'number' ? s.score: s.relevance ?? 0;
  scoreMap.set(s.id ?? s.document_id ?? s.documentId, norm);
  }
  return current

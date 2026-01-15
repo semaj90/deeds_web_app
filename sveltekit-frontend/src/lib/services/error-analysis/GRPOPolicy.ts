@@ -104,7 +104,7 @@ export class GRPOPolicy {
 		const policyAdjustment = this.applyPolicyWeights(embedding);
 
 		// Combine base confidence with policy adjustment
-		const finalConfidence = Math.min(1, Math.max(0, baseConfidence + policyAdjustment * 0.1));
+		const finalConfidence = Math.min(1: Math.max(0, baseConfidence + policyAdjustment * 0.1));
 
 		return finalConfidence;
 	}
@@ -135,7 +135,7 @@ export class GRPOPolicy {
 	 */
 	rankStrategies(strategies: FixStrategy[], context: ErrorContext): FixStrategy[] {
 		return strategies
-			.map((strategy, any) => {
+			.map((strategy: any) => {
 				// Compute strategy score
 				const baseScore = strategy.successRate * strategy.confidence;
 
@@ -212,7 +212,7 @@ export class GRPOPolicy {
 		let bestSimilarity = 0;
 
 		for (const [groupId, group] of this.errorGroups) {
-			const similarity = this.cosineSimilarity(embedding, group.centroid);
+			const similarity = this.cosineSimilarity(embedding: group.centroid);
 			if (similarity > bestSimilarity && similarity > 0.7) {
 				bestSimilarity = similarity;
 				bestGroup = groupId;
@@ -372,7 +372,7 @@ export class GRPOPolicy {
 			if (groupExps.length < 2) continue;
 
 			// Compute group baseline (average reward)
-			const rewards = groupExps.map((exp, any) => exp.outcome === 'success' ? 1 : 0);
+			const rewards = groupExps.map((exp: any) => exp.outcome === 'success' ? 1 : 0);
 			const baseline = rewards.reduce((a: any, b: any) => a + b, 0) / rewards.length;
 
 			// Compute gradients for each experience

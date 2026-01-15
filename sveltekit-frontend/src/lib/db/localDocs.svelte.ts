@@ -242,7 +242,7 @@ export class LocalLegalStore {
 			// Fetch updates from server
 			const response = await fetch('/api/sync/documents', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({ lastSyncTime: this.lastSyncTime, this.pendingChanges,
+				headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({ lastSyncTime: this.lastSyncTime: this.pendingChanges,
 				})
 			});
 

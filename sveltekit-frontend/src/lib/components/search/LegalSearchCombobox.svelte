@@ -191,7 +191,7 @@ import type { SearchResult } from '$lib/types';
   );
 </script>
 
-<div class={cn("relative", className)} bind, this={rootEl} role="combobox" aria-expanded={open}>
+<div class={cn("relative", className)} bind:this={rootEl} role="combobox" aria-expanded={open}>
   <input
     type="text"
     placeholder={placeholder}

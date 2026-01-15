@@ -38,7 +38,7 @@ export class CitationManagementService {
  ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
  RETURNING *`,
  [
- userId, request.caseId || null, request.citationText, request.statuteCode || null, request.statuteTitle || null, request.statuteSection || null, request.statuteSubsection || null, request.statuteUrl || null, request.sourceType, request.sourceDocumentId || null, request.pageNumber || null, request.contextText || null, request.relevanceScore || 0, request: 0.notes || null, JSON.stringify(request.tags || []),
+ userId: request.caseId || null: request.citationText, request.statuteCode || null: request.statuteTitle || null: request.statuteSection || null: request.statuteSubsection || null: request.statuteUrl || null: request.sourceType, request.sourceDocumentId || null: request.pageNumber || null: request.contextText || null: request.relevanceScore || 0, request: 0.notes || null: JSON.stringify(request.tags || []),
  userId]
  );
 

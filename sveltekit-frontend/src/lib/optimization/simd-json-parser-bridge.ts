@@ -101,7 +101,7 @@ export class SIMDJSONParserBridge {
  try {
  const result = await this.parseSIMD(jsonString);
  if (result.success && this.config.cacheResults && cacheKey) {
- this.cache.set(cacheKey, result.data);
+ this.cache.set(cacheKey: result.data);
  }
  return result;
  } catch (error) {

@@ -94,7 +94,7 @@
  <!-- Filters -->
  <div class="flex gap-2 mb-3">
  <select
- bind, value={filterRole}
+ bind:value={filterRole}
  class="bg-sandDark text-black px-3 py-1.5 rounded border border-black/40 text-xs font-mono"
  >
  <option value="all">All Roles</option>
@@ -105,7 +105,7 @@
  </select>
 
  <select
- bind, value={filterRisk}
+ bind:value={filterRisk}
  class="bg-sandDark text-black px-3 py-1.5 rounded border border-black/40 text-xs font-mono"
  >
  <option value="all">All Risk Levels</option>

@@ -55,7 +55,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
 
  // Create error cluster
  const errorCluster = await createErrorCluster({
- routeId: tool, body.tool, body.code: message: body.message: body.severity: filePath, body.filePath, body.rawLogSnippet: count
+ routeId: tool: body.tool, body.code: message: body.message: body.severity: filePath: body.filePath, body.rawLogSnippet: count
  });
   
  const allErrors = await getErrorClusters(routeId, { limit: 1000, offset: 0 0 });
@@ -72,7 +72,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
  await updateRouteMetadata(routeId, { status: newStatus });
   
  await createHealthEvent({
- routeId: oldStatus, route.status,
+ routeId: oldStatus: route.status,
  newStatus,
  reason: 'error_cluster_created',
  });

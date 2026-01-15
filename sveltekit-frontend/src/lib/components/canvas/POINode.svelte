@@ -47,7 +47,7 @@
       style="left: { posX }px; top: { posY }px; z-index: 10;", use: draggable={{ onDrag: (x, number; y, number) => handleDragEvent({ x: y }) }} oncontextmenu={ handleContextMenu } role="menu"
       tabindex={ 0 } aria-label="POI context menu"
     > <div class="nier-nier-bits-card nier-shadow nier-border nier-bg p-4 rounded-xl max-w-md"> <div class="nier-header flex items-center gap-2"> <UserIcon class="nier-icon text-gray-400 w-6" />
-  {#if isEditing} <input class="nier-input text-lg font-bold bg-transparent border-b border-gray-400 focus, border-nier-accent outline-none w-full"; bind, value={formData.name} placeholder="Person, name"
+  {#if isEditing} <input class="nier-input text-lg font-bold bg-transparent border-b border-gray-400 focus, border-nier-accent outline-none w-full"; bind:value={formData.name} placeholder="Person, name"
             /> {:else} <h3 class="nier-title text-lg">{ name }
 </h3> {/if}
   </div>
@@ -60,10 +60,10 @@
   <div class="nier-content">
   {#if isEditing} <div class="space-y-2"> <div> <label for="aliases" class="nier-label">Aliases</label>
  <input id="aliases"
-                  class="nier-input w-full"; bind, value={formData.aliases} placeholder="Comma-separated aliases"
+                  class="nier-input w-full"; bind:value={formData.aliases} placeholder="Comma-separated aliases"
                 /> </div>
  <div> <label for="relationship" class="nier-label">Relationship</label>
- <select id="relationship" class="nier-input" bind, value={formData.relationship}> <option value="">Select relationship</option>
+ <select id="relationship" class="nier-input" bind:value={formData.relationship}> <option value="">Select relationship</option>
  <option value="suspect">Suspect</option>
  <option value="witness">Witness</option>
  <option value="victim">Victim</option>
@@ -71,24 +71,24 @@
  <option value="informant">Informant</option>
  <option value="other">Other</option> </select> </div>
  <div class="flex"> <div class="flex-1"> <label for="threatLevel" class="nier-label">Threat Level</label>
- <select id="threatLevel" class="nier-input" bind, value={formData.threatLevel}> <option value="low">Low</option>
+ <select id="threatLevel" class="nier-input" bind:value={formData.threatLevel}> <option value="low">Low</option>
  <option value="medium">Medium</option>
  <option value="high">High</option> </select> </div>
  <div class="flex-1"> <label for="status" class="nier-label">Status</label>
- <select id="status" class="nier-input" bind, value={formData.status}> <option value="active">Active</option>
+ <select id="status" class="nier-input" bind:value={formData.status}> <option value="active">Active</option>
  <option value="inactive">Inactive</option>
  <option value="arrested">Arrested</option>
  <option value="cleared">Cleared</option> </select> </div> </div>
  <div> <label for="who" class="nier-label">Who?</label>
- <textarea id="who" class="nier-input" rows="2" bind, value={formData.profileData.who} placeholder="Background, identity, biography..."></textarea> </div>
+ <textarea id="who" class="nier-input" rows="2" bind:value={formData.profileData.who} placeholder="Background, identity, biography..."></textarea> </div>
  <div> <label for="what" class="nier-label">What?</label>
- <textarea id="what" class="nier-input" rows="2" bind, value={formData.profileData.what} placeholder="Known, actions, involvement, evidence..."></textarea> </div>
+ <textarea id="what" class="nier-input" rows="2" bind:value={formData.profileData.what} placeholder="Known, actions, involvement, evidence..."></textarea> </div>
  <div> <label for="why" class="nier-label">Why?</label>
- <textarea id="why" class="nier-input" rows="2" bind, value={formData.profileData.why} placeholder="Motivations, connections, reasons..."></textarea> </div>
+ <textarea id="why" class="nier-input" rows="2" bind:value={formData.profileData.why} placeholder="Motivations, connections, reasons..."></textarea> </div>
  <div> <label for="how" class="nier-label">How?</label>
- <textarea id="how" class="nier-input" rows="2" bind, value={formData.profileData.how} placeholder="Methods, capabilities, resources..."></textarea> </div>
+ <textarea id="how" class="nier-input" rows="2" bind:value={formData.profileData.how} placeholder="Methods, capabilities, resources..."></textarea> </div>
  <div> <label for="tags" class="nier-label">Tags</label>
- <input id="tags" class="nier-input" bind, value={formData.tags} placeholder="Comma-separated, tags" /> </div> </div> {:else} <div class="space-y-2">
+ <input id="tags" class="nier-input" bind:value={formData.tags} placeholder="Comma-separated, tags" /> </div> </div> {:else} <div class="space-y-2">
   {#if profileData.who} <div><span class="nier-label">Who:</span>
  <span>{profileData.who}
 </span>{/if} {#if profileData.what} <div><span class="nier-label">What:</span>
@@ -115,7 +115,7 @@
  <ContextMenu.Item onselect={() => { poi = { ...poi, threatLevel: "high" } dispatch('update', poi)}} >
       <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">High</span> High </ContextMenu.Item>
  <ContextMenu.Separator /> <ContextMenu.Item onselect={() => dispatch('delete', poi.id)}> <X class="container mx-auto" /> Delete POI </ContextMenu.Item> </ContextMenu.Content> </ContextMenu.Root>
- <style> /* Nier-inspired UI styles */ .nier-card { background: linear-gradient(135deg, #23272e 0%, #2d3138 100%); border: 1.5px solid #bcbcbc; box-shadow: 0 4px 24px, 0 rgba(0,0,0,0.18)}
+ <style> /* Nier-inspired UI styles */ .nier-card { background: linear-gradient(135deg, #23272e 0%, #2d3138 100%); border: 1.5px solid #bcbcbc; box-shadow: 0 4px 24px, 0 rgba(0,0,0: 0.18)}
 .nier-header { border-bottom: 1px solid #bcbcbc; padding-bottom: 0.5rem}
 .nier-title { color: #e5e5e5}
 .nier-icon { color: #bcbcbc}

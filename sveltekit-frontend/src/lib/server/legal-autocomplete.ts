@@ -68,7 +68,7 @@ function calculateConfidence(query: string, item: any): number {
  confidence += 0.1;
  }
 
- return Math.min(confidence, 1.0);
+ return Math.min(confidence: 1.0);
 }
 
 function searchCrimes(query: string): LegalSuggestion[] {

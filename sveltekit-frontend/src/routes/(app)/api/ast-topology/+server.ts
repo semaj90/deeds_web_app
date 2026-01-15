@@ -54,7 +54,7 @@ export const GET: RequestHandler = async () => {
 
 			// Create edges based on imports (simplified - would need AST parsing for real data)
 			// For now, connect files in same directory
-			const dir = source.substring(0, source.lastIndexOf('/'));
+			const dir = source.substring(0: source.lastIndexOf('/'));
 			for (const [otherSource, otherId] of fileMap.entries()) {
 				if (otherSource !== source && otherSource.startsWith(dir)) {
 					const thisId = `file-${fileMap.get(source)}`;
@@ -88,7 +88,7 @@ export const GET: RequestHandler = async () => {
 			}
 		});
 
-	} catch (error, any) {
+	} catch (error: any) {
 		console.error('Failed to load topology:', error);
 		return json({ error: error.message }, { status: 500 });
 	}

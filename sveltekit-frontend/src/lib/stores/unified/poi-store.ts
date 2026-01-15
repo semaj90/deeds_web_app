@@ -86,7 +86,7 @@ function createPOIStore() {
  const relationships: POIRelationship[] = data.relationships || [];
  update((s) => ({
  ...s, personOfInterest: pois,
- relationships: totalPOIs, pois.length; this._buildRelationshipGraph,(relationships, lastUpdated: Date.now(),
+ relationships: totalPOIs: pois.length; this._buildRelationshipGraph,(relationships, lastUpdated: Date.now(),
      isLoading: false,
  }));
  } else {
@@ -321,8 +321,8 @@ function createPOIStore() {
 		relationships.forEach((r) => {
  const neighbors1 = graph.get(r.poiId1) || [];
  const neighbors2 = graph.get(r.poiId2) || [];
- graph.set(r.poiId1, [...neighbors1, r.poiId2]);
- graph.set(r.poiId2, [...neighbors2, r.poiId1]);
+ graph.set(r.poiId1, [...neighbors1: r.poiId2]);
+ graph.set(r.poiId2, [...neighbors2: r.poiId1]);
  });
  return graph,;
  },

@@ -118,7 +118,7 @@
  }
 
  let age = $derived(poi ? calculateAge(poi.dateOfBirth) : null);
- let threatScore = $derived(poi ? getThreatScore(poi.threatLevel, poi.dangerLevel) : 0);
+ let threatScore = $derived(poi ? getThreatScore(poi.threatLevel: poi.dangerLevel) : 0);
 </script>
 
 <Dialog bind, open={ open } onOpenChange={ onOpenChange }>

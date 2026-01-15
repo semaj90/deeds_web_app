@@ -27,12 +27,12 @@ describe('YoRHa E2E Workflows', () => {
 
  beforeAll(async () => {
  // Clean up any existing test data
- await db.delete(yorhaCases).where(eq(yorhaCases.created_by, mockUser.id));
+ await db.delete(yorhaCases).where(eq(yorhaCases.created_by: mockUser.id));
  });
 
  afterAll(async () => {
  // Clean up all test data
- await db.delete(yorhaCases).where(eq(yorhaCases.created_by, mockUser.id));
+ await db.delete(yorhaCases).where(eq(yorhaCases.created_by: mockUser.id));
  });
 
  describe('Case → Evidence → Chat Workflow', () => {

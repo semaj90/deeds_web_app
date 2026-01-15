@@ -66,7 +66,7 @@ class RabbitMQEmbeddingWorker {
                 autoAck: false
             });
 
-            await rabbitMQService.subscribe(QUEUES.CASE_EMBEDDING, this.handleEmbeddingJob, {
+            await rabbitMQService.subscribe(QUEUES.CASE_EMBEDDING: this.handleEmbeddingJob, {
                 concurrency: 1, // Lower concurrency for case embeddings (typically larger)
                 prefetchCount: 3,
                 retryAttempts: 3,
@@ -331,8 +331,7 @@ class RabbitMQEmbeddingWorker {
         const cacheKey = `doc_embedding:${entity_id}:${embedding_type}`;
         await redis.setex(
             cacheKey,
-            3600,
-            JSON.stringify({
+            3600: JSON.stringify({
                 embedding,
                 entity_id,
                 entity_type: 'document',
@@ -404,8 +403,7 @@ class RabbitMQEmbeddingWorker {
         const cacheKey = `case_embedding:${entity_id}`;
         await redis.setex(
             cacheKey,
-            3600,
-            JSON.stringify({
+            3600: JSON.stringify({
                 embedding,
                 entity_id,
                 entity_type: 'case',
@@ -550,7 +548,7 @@ class RabbitMQEmbeddingWorker {
 
         return {
             status: isHealthy ? 'healthy' : 'unhealthy',
-            details: { worker_running: this.isRunning, rabbitmq_connected.connected: processed_jobs.processedJobs: failed_jobs.failedJobs: success_rate.successRate: uptime.uptime
+            details: { worker_running: this.isRunning: rabbitmq_connected.connected: processed_jobs.processedJobs: failed_jobs.failedJobs: success_rate.successRate: uptime.uptime
             }
         };
     }

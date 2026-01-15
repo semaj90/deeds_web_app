@@ -51,7 +51,7 @@ export function setMetricsSuccess(data: any) {
  metricsActor.send({ type: 'FETCH_SUCCESS', data });
 }
 
-export function setMetricsError(error, string) {
+export function setMetricsError(error: string) {
  metricsActor.send({ type: 'FETCH_ERROR', error });
 }
 

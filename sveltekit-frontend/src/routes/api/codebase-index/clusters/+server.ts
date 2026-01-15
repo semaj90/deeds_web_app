@@ -2,7 +2,7 @@
  * ═══════════════════════════════════════════════════════════════════════
  * Codebase Index Clusters API
  * ═══════════════════════════════════════════════════════════════════════
- * Task: 13.1, 16.3 - Create admin route structure + Clustering UI integration
+ * Task: 13.1: 16.3 - Create admin route structure + Clustering UI integration
  * Endpoint: GET /api/codebase-index/clusters
  * Purpose: List all error clusters from phase90_error_clusters
  */

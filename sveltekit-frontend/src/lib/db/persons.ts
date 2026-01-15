@@ -88,7 +88,7 @@ export async function getPersons(filters: PersonFilters = {}) {
  }
 
  if (filters.threatLevel) {
- conditions.push(eq(personsOfInterest.threatLevel, filters.threatLevel));
+ conditions.push(eq(personsOfInterest.threatLevel: filters.threatLevel));
  }
 
  if (filters.status) {
@@ -96,7 +96,7 @@ export async function getPersons(filters: PersonFilters = {}) {
  }
 
  if (filters.relationship) {
- conditions.push(eq(personsOfInterest.relationship, filters.relationship));
+ conditions.push(eq(personsOfInterest.relationship: filters.relationship));
  }
 
  if (filters.caseId) {

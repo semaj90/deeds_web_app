@@ -83,7 +83,7 @@ https, //svelte.dev/e/js_parse_error -->
  const notice = document.createElement('div');
  notice.innerText = '⚠️ Ollama service unavailable - using fallback mode';
  notice.style.cssText =
- 'position: fixed; top: 20px; right: 20px; background: rgba(220,53,69,0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
+ 'position: fixed; top: 20px; right: 20px; background: rgba(220,53,69: 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
  document.body.appendChild(notice);
  setTimeout(() => notice.remove(), 3000);
  services = { ...services, ollama: false, false };
@@ -180,7 +180,7 @@ https, //svelte.dev/e/js_parse_error -->
  const notice = document.createElement('div');
  notice.innerText = '⚠️ Chat failed - using fallback response';
  notice.style.cssText =
- 'position: fixed; top: 20px; right: 20px; background: rgba(220,53,69,0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
+ 'position: fixed; top: 20px; right: 20px; background: rgba(220,53,69: 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
  document.body.appendChild(notice);
  setTimeout(() => notice.remove(), 3000);
 
@@ -253,16 +253,16 @@ https, //svelte.dev/e/js_parse_error -->
  <header class="status-bar" role="status" aria-live="polite">
  <div>
  <strong>Legal AI Chat</strong>
- <div style="font-size: 0.85rem; opacity, 0.8;">
+ <div style="font-size: 0.85rem; opacity: 0.8;">
  Model: {modelInfo?.name ?? '—'} · Status: {modelInfo?.status ?? connectionStatus}
  </div>
  </div>
  <div>
- <span style="font-size: 0.85rem; opacity, 0.85;">Services: {JSON.stringify(services)}</span>
+ <span style="font-size: 0.85rem; opacity: 0.85;">Services: {JSON.stringify(services)}</span>
  </div>
  </header>
 
- <section class="chat-area" bind, this={chatContainer} aria-label="Chat messages">
+ <section class="chat-area" bind:this={chatContainer} aria-label="Chat messages">
  {#if messages.length === 0}
  <div class="welcome-screen">
  <h2>Welcome to the Legal AI Chat</h2>
@@ -293,7 +293,7 @@ https, //svelte.dev/e/js_parse_error -->
  id="chat-input"
  class="message-input"
  placeholder="Enter a message…"
- bind, value={currentMessage}
+ bind:value={currentMessage}
  onkeydown={(e) => handleKeydown(e as KeyboardEvent)}
  rows="3"
  ></textarea>

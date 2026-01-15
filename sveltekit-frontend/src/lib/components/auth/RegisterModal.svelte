@@ -119,7 +119,7 @@
           type="checkbox"
           id={termsId}
           name="termsAccepted"
-          bind, checked={$form.termsAccepted}
+          bind:checked={$form.termsAccepted}
           class="mt-1 w-4 h-4 border-slate-300 rounded focus:ring-2"
         />
         <label for={termsId} class="text-sm">

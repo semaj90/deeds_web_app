@@ -50,14 +50,14 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
             > <span class="flex items-center">
   {#if $machineContext?.evidenceFiles?.length > 0} <span class="text-green-400">({$machineContext.evidenceFiles.length} files)</span> {/if}
   <span class="text-sm">Evidence Upload</span> </span> </button> </h3>
- <div data-accordion-content class="accordion-content p-4 border-l-4"> <div class="space-y-4"> <div class="file-upload-zone border-2 border-dashed border-gray-600 rounded-lg p-8"> <input bind, this={ fileInput } type="file"
+ <div data-accordion-content class="accordion-content p-4 border-l-4"> <div class="space-y-4"> <div class="file-upload-zone border-2 border-dashed border-gray-600 rounded-lg p-8"> <input bind:this={ fileInput } type="file"
                   multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                   onchange={ handleFileUpload } class="hidden"
                 /> <button onclick={() => fileInput?.click()} class="yorha-button px-6 py-3 bg-blue-600 text-white"> Select Evidence Files </button>
  <p class="text-gray-400 text-sm">Supported: PDF | Images, Documents</p> </div>
  <div class="evidence-type-selector"> <label class="block text-sm font-medium text-gray-300" for="-evidence-type-"> Evidence Type </label>
  <select id="-evidence-type-"
-                  bind, value={ selectedEvidenceType } onchange={() => send({ type: 'SET_EVIDENCE_TYPE', evidenceType: selectedEvidenceType })} class="yorha-select w-full p-2 bg-gray-800 border border-gray-600 rounded"
+                  bind:value={ selectedEvidenceType } onchange={() => send({ type: 'SET_EVIDENCE_TYPE', evidenceType: selectedEvidenceType })} class="yorha-select w-full p-2 bg-gray-800 border border-gray-600 rounded"
                 > <option value="digital">Digital Evidence</option>
  <option value="physical">Physical Evidence</option>
  <option value="testimony">Witness Testimony</option>
@@ -71,7 +71,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   <span class="text-sm">Case Details</span> </span> </button> </h3>
  <div data-accordion-content class="accordion-content p-4 border-l-4"> <div class="space-y-4"> <div> <label class="block text-sm font-medium text-gray-300" for="-case-title-"> Case Title </label>
  <input id="-case-title-"
-                  bind, value={ caseTitle } onblur={ handleCaseDetailsUpdate } type="text"
+                  bind:value={ caseTitle } onblur={ handleCaseDetailsUpdate } type="text"
                   placeholder="Enter case title..."
                   class="yorha-input w-full p-3 bg-gray-800 border border-gray-600 rounded"
                 />
@@ -79,7 +79,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div>
  <div> <label class="block text-sm font-medium text-gray-300" for="-case-description-"> Case Description </label>
  <textarea id="-case-description-"
-                  bind, value={ caseDescription } onblur={ handleCaseDetailsUpdate } rows="4"
+                  bind:value={ caseDescription } onblur={ handleCaseDetailsUpdate } rows="4"
                   placeholder="Detailed case description..."
                   class="yorha-input w-full p-3 bg-gray-800 border border-gray-600 rounded"
                 ></textarea>
@@ -87,7 +87,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div>
  <div> <label class="block text-sm font-medium text-gray-300" for="-priority-level-"> Priority Level </label>
  <select id="-priority-level-"
-                  bind, value={ selectedPriority } onchange={() => send({ type: 'SET_PRIORITY', priority: selectedPriority })} class="yorha-select w-full p-2 bg-gray-800 border border-gray-600 rounded"
+                  bind:value={ selectedPriority } onchange={() => send({ type: 'SET_PRIORITY', priority: selectedPriority })} class="yorha-select w-full p-2 bg-gray-800 border border-gray-600 rounded"
                 > <option value="low">Low Priority</option>
  <option value="medium">Medium Priority</option>
  <option value="high">High Priority</option>
@@ -118,7 +118,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .step-number { width: 1.5rem, height: 1.5rem, background-color: #fbbf24, color: #000, border-radius: 9999px, display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 700}
   .progress-fill { transition: width 0.5s ease-in-out}
   .loading-spinner { width: 2rem; height: 2rem; border: 2px solid #fbbf24; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite}
-  .accordion-trigger[data-accordion-trigger] { background-color: rgba(255, 255, 255, 0.03)}
+  .accordion-trigger[data-accordion-trigger] { background-color: rgba(255, 255, 255: 0.03)}
   .accordion-content { animation: slideDown 0.3s ease-out}
   @keyframes slideDown { from { height: 0; opacity: 0}
     to { height: auto; opacity: 1}

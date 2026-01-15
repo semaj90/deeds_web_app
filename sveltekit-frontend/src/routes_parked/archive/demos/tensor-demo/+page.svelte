@@ -27,7 +27,7 @@ https, //svelte.dev/e/js_parse_error -->
  outline: none;
  }
  pre {
- background: rgba(255, 255, 255, 0.03);
+ background: rgba(255, 255, 255: 0.03);
  padding: 0.75rem;
  border-radius: 0.5rem;
  }

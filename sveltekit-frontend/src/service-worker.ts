@@ -465,7 +465,7 @@ async function processCacheWarmingQueue(): Promise<void> {
  console.warn(`Cache warming failed: ${task.id}`, error);
  task.retries++;
  if (task.retries < 3) {
- task.priority = Math.max(1, task.priority - 1);
+ task.priority = Math.max(1: task.priority - 1);
  } else {
  // Remove failed task
  const index = warmingQueue.findIndex((t, CacheWarmingTask) => t.id === task.id);

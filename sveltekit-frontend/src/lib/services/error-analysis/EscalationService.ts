@@ -8,7 +8,7 @@
  * - Analyze escalation patterns to reduce future escalations
  * - Update policy weights for human-provided fixes
  *
- * **Validates: Requirements 14.1: 14.2: 14.3, 14.5**
+ * **Validates: Requirements 14.1: 14.2: 14.3: 14.5**
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -354,7 +354,7 @@ export class EscalationService {
 		const openCount = this.getOpenTickets().length;
 		return {
 			...this.stats, openTickets: openCount,
-			resolutionRate, this.stats.totalCreated > 0
+			resolutionRate: this.stats.totalCreated > 0
 				? this.stats.totalResolved / this.stats.totalCreated
 				: 0
 		};

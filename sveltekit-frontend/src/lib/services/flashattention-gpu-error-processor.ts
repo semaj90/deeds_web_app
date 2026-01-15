@@ -62,7 +62,7 @@ export class FlashAttentionGPUErrorProcessor {
  this.isInitialized = true;
  console.log('⚡ FlashAttention2 GPU Error Processor initialized');
  console.log(`🎯 Device: ${this.config.gpu_device}, Memory: ${this.config.memory_limit}MB`);
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('❌ Failed to initialize processor: ', error);
  throw error;
  }
@@ -121,7 +121,7 @@ export class FlashAttentionGPUErrorProcessor {
  `🎯 Generated ${fixes.length} fixes with ${result.performance.tokens_per_second.toFixed(1)} tokens/sec`
  );
  return result;
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error(`❌ Error processing batch ${batchId}: `, error);
  return {
  batchId,
@@ -134,7 +134,7 @@ export class FlashAttentionGPUErrorProcessor {
  }
 
  private categorizeErrors(errors: TypeScriptError[]): TypeScriptError[] {
- return errors.map((error, any) => ({
+ return errors.map((error: any) => ({
  ...error, category: this.detectErrorCategory(error.code: error.message),
  }));
  }
@@ -172,7 +172,7 @@ export class FlashAttentionGPUErrorProcessor {
  const batchSize = this.config.batch_size;
  for (let i = 0; i < batch.errors.length; i += batchSize) {
  const errorChunk = batch.errors.slice(i, i + batchSize);
- const chunkFixes = await this.processErrorChunk(errorChunk, batch.id);
+ const chunkFixes = await this.processErrorChunk(errorChunk: batch.id);
  fixes.push(...chunkFixes);
  console.log(
  `⚡ Processed chunk ${Math.floor(i / batchSize) + 1}/${Math.ceil(batch.errors.length / batchSize)}`
@@ -291,7 +291,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  let confidence = baseConfidence[category as keyof typeof baseConfidence] || 0.5;
  if (responseLength < 50) confidence *= 0.7;
  if (responseLength > 200) confidence *= 0.9;
- return Math.min(confidence, 0.95);
+ return Math.min(confidence: 0.95);
  }
 
  private async getGPUUtilization(): Promise<number> {
@@ -301,7 +301,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const metrics = await response.json();
  return metrics.utilization || 0;
  }
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.warn('⚠️ Could not get utilization: ', error);
  }
  return 0;
@@ -314,7 +314,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const status = await response.json();
  return status.used_mb || 0;
  }
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.warn('⚠️ Could not get usage: ', error);
  }
  return 0;
@@ -396,7 +396,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const errorsByCategory = this.groupErrorsByCategory(errors);
 
  for (const [category, categoryErrors] of Object.entries(errorsByCategory)) {
- const priority = this.calculatePriority(category, categoryErrors.length);
+ const priority = this.calculatePriority(category: categoryErrors.length);
  const batchSize = this.calculateOptimalBatchSize(categoryErrors.length);
 
  for (let i = 0; i < categoryErrors.length; i += batchSize) {
@@ -465,7 +465,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const status = await response.json();
  return status.cuda_available && status.devices.length > 0;
  }
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.warn('⚠️ GPU status failed: ', error);
  }
  return false;

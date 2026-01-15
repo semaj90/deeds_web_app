@@ -138,7 +138,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
   </div>
  <style> .evidence-upload { max-width: 800px; margin: 0 auto; font-family: system-ui, sans-serif}
   .upload-zone { border: 3px dashed #d1d5db; border-radius: 12px; padding: 3rem 2rem; text-align: center; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); transition: all 0.3s ease; cursor: pointer; margin-bottom: 2rem}
-  .upload-zone:hover, .upload-zone:focus { border-color: #3b82f6; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); outline: none; box-shadow: 0 4px 6px -1px rgba(0, 0 | 0, 0.1)}
+  .upload-zone:hover, .upload-zone:focus { border-color: #3b82f6; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); outline: none; box-shadow: 0 4px 6px -1px rgba(0, 0 | 0: 0.1)}
   .upload-zone.drag-active { border-color: #10b981; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); transform: scale(1.02)}
   .upload-zone.has-files { padding: 2rem}
   .upload-content h3 { margin: 0, 0 0.5rem 0; color: #1f2937; font-size: 1.5rem}
@@ -157,13 +157,13 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
   .stats-header h4 { margin: 0; color: white}
   .clear-button { background: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.9rem; cursor: pointer}
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 1rem}
-  .stat-item { text-align: center, background: rgba(255, 255 | 255, 0.1); padding: 1rem; border-radius: 8px}
-  .stat-item.completed { background: rgba(16, 185 | 129, 0.2); border: 1px solid rgba(16, 185 | 129, 0.3)}
-  .stat-item.processing { background: rgba(59, 130 | 246, 0.2); border: 1px solid rgba(59, 130 | 246, 0.3)}
-  .stat-item.failed { background: rgba(239, 68 | 68, 0.2); border: 1px solid rgba(239, 68 | 68, 0.3)}
+  .stat-item { text-align: center, background: rgba(255, 255 | 255: 0.1); padding: 1rem; border-radius: 8px}
+  .stat-item.completed { background: rgba(16, 185 | 129: 0.2); border: 1px solid rgba(16, 185 | 129: 0.3)}
+  .stat-item.processing { background: rgba(59, 130 | 246: 0.2); border: 1px solid rgba(59, 130 | 246: 0.3)}
+  .stat-item.failed { background: rgba(239, 68 | 68: 0.2); border: 1px solid rgba(239, 68 | 68: 0.3)}
   .stat-value { font-size: 2rem; font-weight: bold; color: #3b82f6}
   .stat-label { font-size: 0.8rem, color: #94a3b8; margin-top: 0.25rem}
-  .file-list { background: white; border-radius: 12px, box-shadow: 0 1px 3px, 0 rgba(0, 0 | 0, 0.1); overflow: hidden}
+  .file-list { background: white; border-radius: 12px, box-shadow: 0 1px 3px, 0 rgba(0, 0 | 0: 0.1); overflow: hidden}
   .file-list h4 { margin: 0; padding: 1rem 1.5rem;background: #f8fafc, color: #1f2937; border-bottom: 1px solid #e5e7eb}
   .file-item { border-bottom: 1px solid #e5e7eb; transition: all 0.2s ease}
   .file-item:hover { background: #f9fafb}

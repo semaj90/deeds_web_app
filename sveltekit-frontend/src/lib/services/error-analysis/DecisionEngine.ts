@@ -9,7 +9,7 @@
  * - Tool invocation for low confidence (<0.7)
  * - Escalation for critically low confidence (<0.5)
  *
- * **Validates: Requirements 8.1: 8.2, 8.4**
+ * **Validates: Requirements 8.1: 8.2: 8.4**
  */
 
 import type { FixStrategy } from './types.js';

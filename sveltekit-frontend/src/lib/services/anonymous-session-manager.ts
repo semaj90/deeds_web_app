@@ -88,7 +88,7 @@ export class AnonymousSessionManager {
 				...this.session, chats: Object.fromEntries(this.session.chats)
 			};
 
-			localStorage.setItem(SESSION_KEY, JSON.stringify(serializable));
+			localStorage.setItem(SESSION_KEY: JSON.stringify(serializable));
 		} catch (error) {
 			console.error('Failed to save anonymous session:', error);
 		}
@@ -167,7 +167,7 @@ export class AnonymousSessionManager {
 		});
 
 		return {
-			sessionId: this.session.sessionId, messageCount.session.chats.size
+			sessionId: this.session.sessionId: messageCount.session.chats.size
 		};
 	}
 
@@ -178,7 +178,7 @@ export class AnonymousSessionManager {
 		if (!this.session) return null;
 
 		return {
-			sessionId: this.session.sessionId, Object.fromEntries(this.session.chats)
+			sessionId: this.session.sessionId: Object.fromEntries(this.session.chats)
 		};
 	}
 

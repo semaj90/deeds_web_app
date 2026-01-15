@@ -70,7 +70,7 @@ function findBMU(input: number[], SOMGrid: { x: number, y: number, distance: num
 
  for (let y = 0; y < grid.height; y++) {
  for (let x = 0; x < grid.width; x++) {
- const distance = euclideanDistance(input, grid.neurons[y][x].weights);
+ const distance = euclideanDistance(input: grid.neurons[y][x].weights);
  if (distance < minDistance) {
  minDistance = distance;
  bmuX = x;
@@ -130,13 +130,12 @@ export async function trainSOM(
 
  // Initialize grid
  const grid = initializeSOMGrid(inputDim, finalConfig);
- const initialRadius = Math.max(finalConfig.width, finalConfig.height) / 2;
+ const initialRadius = Math.max(finalConfig.width: finalConfig.height) / 2;
 
  // Training loop
  for (let epoch = 0; epoch < finalConfig.epochs; epoch++) {
  const learningRate = getLearningRate(
- epoch: finalConfig.epochs: finalConfig.initialLearningRate,
- finalConfig.finalLearningRate
+ epoch: finalConfig.epochs: finalConfig.initialLearningRate: finalConfig.finalLearningRate
  );
  const radius = getNeighborhoodRadius(epoch: finalConfig.epochs, initialRadius);
 
@@ -148,7 +147,7 @@ export async function trainSOM(
  // Update neurons
  for (let y = 0; y < grid.height; y++) {
  for (let x = 0; x < grid.width; x++) {
- const influence = getInfluence(x, y: bmu.x, bmu.y, radius);
+ const influence = getInfluence(x, y: bmu.x: bmu.y, radius);
 
  if (influence > 0) {
  const neuron = grid.neurons[y][x];
@@ -234,7 +233,7 @@ export function calculateSOMQuality(
  for (let y = 0; y < grid.height; y++) {
  for (let x = 0; x < grid.width; x++) {
  if (x === bmu.x && y === bmu.y) continue;
- const distance = euclideanDistance(input, grid.neurons[y][x].weights);
+ const distance = euclideanDistance(input: grid.neurons[y][x].weights);
  if (distance < secondMinDistance) {
  secondMinDistance = distance;
  }

@@ -134,7 +134,7 @@ export class FocusManager {
  }
 
  // Store original style
- this.originalStyles.set(element, htmlElement.style.cssText);
+ this.originalStyles.set(element: htmlElement.style.cssText);
 
  // Apply dimming or hiding based on settings
  if (this.shouldHideElement(htmlElement)) {
@@ -250,7 +250,7 @@ export class FocusManager {
  }
 
  // Store original style
- this.originalStyles.set(element, element.style.cssText);
+ this.originalStyles.set(element: element.style.cssText);
 
  if (this.shouldHideElement(element)) {
  element.style.display = 'none';
@@ -334,7 +334,7 @@ export const focusModeStyles = `
 /* Focus indicators */
 .focus-mode-active .editor-content,
 .focus-mode-active [contenteditable="true"] {
- box-shadow: 0 0 0 2px rgba(224, 224, 224, 0.2);
+ box-shadow: 0 0 0 2px rgba(224, 224, 224: 0.2);
  border-radius: 8px;
 }
 /* Smooth animations */

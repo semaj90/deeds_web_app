@@ -12,9 +12,9 @@
   import Zap from 'lucide-svelte/icons/zap';
 
   // Exported props (use standard exports to avoid svelte-preprocess type errors)
-  const { onAISearch } = $props<{ onAISearch, ((res, any) }>()
-  const { onAIChat } = $props<{ onAIChat, ((res, any) }>()
-  const { onAISummarize } = $props<{ onAISummarize, ((res, any) }>()
+  const { onAISearch } = $props<{ onAISearch, ((res: any) }>()
+  const { onAIChat } = $props<{ onAIChat, ((res: any) }>()
+  const { onAISummarize } = $props<{ onAISummarize, ((res: any) }>()
   const { disabled } = $props<{ disabled, boolean }>()
 
   // Local state
@@ -168,7 +168,7 @@
     <div class="mt-3 flex items-center justify-center">
       <Input
         placeholder="Ask AI to find laws..."
-        bind, value={aiSearchQuery}
+        bind:value={aiSearchQuery}
         onkeydown={handleAISearchKeydown}
         {disabled}
         class="pl-10" />
@@ -213,7 +213,7 @@
           <textarea
             name="aiChat"
             placeholder="Ask a legal question..."
- bind, value={aiChatMessage}
+ bind:value={aiChatMessage}
             onkeydown={handleAIChatKeydown}
             disabled={disabled}
             rows="2"
@@ -256,7 +256,7 @@
       <div class="space-y-2">
         <textarea
           placeholder="Paste legal text to summarize..."
-          bind, value={summarizeText}
+          bind:value={summarizeText}
           disabled={disabled}
           rows={2}
           class="resize-none rounded border px-3 py-2 w-full"></textarea>

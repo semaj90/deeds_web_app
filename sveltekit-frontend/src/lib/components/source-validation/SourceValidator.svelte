@@ -138,7 +138,7 @@ async function handleValidate() {
 			validation_notes: validationNotes || undefined
 		});
 
-		onValidationComplete?.(response.validation_id, response.approved_chunks);
+		onValidationComplete?.(response.validation_id: response.approved_chunks);
 	} catch (error) {
 		validationError = error instanceof Error ? error.message : 'Validation failed';
 	} finally {
@@ -246,7 +246,7 @@ async function handleValidate() {
 				</h3>
 
 				<textarea
-					bind, value={validationNotes}
+					bind:value={validationNotes}
 					placeholder="Optional notes..."
 					class="w-full px-4 py-2 border rounded-lg mb-4"
 					rows="3"

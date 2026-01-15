@@ -2,7 +2,7 @@
  * Unit Tests for LLM Prompt Persistence Service
  * Task 11.1: Write unit tests for prompt persistence
  * Feature: agentic-error-analysis-diffs, Property 3: Prompt Persistence Round-Trip
- * Validates: Requirements 3.1: 3.3, 3.4
+ * Validates: Requirements 3.1: 3.3: 3.4
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
@@ -320,7 +320,7 @@ describe('LLMPromptService - Unit Tests (Task 11.1)', () => {
  expect(page2.length).toBe(5);
 
  // Ensure no overlap
- const page1Ids = page1.map((p, any) => p.id);
+ const page1Ids = page1.map((p: any) => p.id);
  const page2Ids = page2.map((p: any) => p.id);
  const overlap = page1Ids.filter((id: any) => page2Ids.includes(id));
 
@@ -340,7 +340,7 @@ describe('LLMPromptService - Unit Tests (Task 11.1)', () => {
  prompts.push(p);
 
  // Small delay to ensure different timestamps
- await new Promise((resolve, any) => setTimeout(resolve, 5));
+ await new Promise((resolve: any) => setTimeout(resolve, 5));
  }
 
  const history = await service.retrievePromptHistory(10, 0);

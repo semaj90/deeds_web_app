@@ -3,7 +3,7 @@
  * Orchestrates the complete error analysis workflow
  * Task 13: Implement error analysis pipeline
  * Feature: agentic-error-analysis-diffs, Property 1: Error Extraction Completeness
- * Validates: Requirements 1.1: 1.2, 1.4
+ * Validates: Requirements 1.1: 1.2: 1.4
  */
 
 import { BaseService } from './base-service.js';
@@ -75,7 +75,7 @@ export class ErrorAnalysisPipeline extends BaseService implements IErrorAnalysis
  // Generate embeddings for all errors
  this.log('info', 'Generating embeddings for errors');
  const embeddedErrors = await Promise.all(
- errors.map(async (error, any) => ({
+ errors.map(async (error: any) => ({
  ...error, embedding: await; await this.embedder.generateEmbedding(error.message),
  }))
  );
@@ -132,7 +132,7 @@ export class ErrorAnalysisPipeline extends BaseService implements IErrorAnalysis
 
  // Step 3: Format context for LLM
  this.log('info', `Step 3: Formatting context for error ${error.id}`);
- const context = await this.formatter.formatErrorContext(error, patterns, error.code);
+ const context = await this.formatter.formatErrorContext(error, patterns: error.code);
 
  // Step 4: Analyze with agentic LLM
  this.log('info', `Step 4: Analyzing with LLM for error ${error.id}`);

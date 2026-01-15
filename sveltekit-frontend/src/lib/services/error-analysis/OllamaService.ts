@@ -207,7 +207,7 @@ export class OllamaService {
 		for (let i = 0; i < texts.length; i += concurrency) {
 			const batch = texts.slice(i, i + concurrency);
 			const batchResults = await Promise.all(
-				batch.map((text, any) => this.generateEmbedding(text))
+				batch.map((text: any) => this.generateEmbedding(text))
 			);
 			results.push(...batchResults);
 

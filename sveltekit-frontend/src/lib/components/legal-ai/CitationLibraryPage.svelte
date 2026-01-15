@@ -67,7 +67,7 @@
  if (response.ok) {
  const data = await response.json();
  if (data.success) {
- collections = [...collections, data.collection];
+ collections = [...collections: data.collection];
  newCollectionName = '';
  newCollectionDescription = '';
  showCreateForm = false;
@@ -119,7 +119,7 @@
  <input
  id="name"
  type="text"
- bind, value={newCollectionName}
+ bind:value={newCollectionName}
  placeholder="e.g., Criminal Law Cases"
  disabled={isCreating}
  />
@@ -129,7 +129,7 @@
  <label for="description">Description</label>
  <textarea
  id="description"
- bind, value={newCollectionDescription}
+ bind:value={newCollectionDescription}
  placeholder="Optional description..."
  rows="3"
  disabled={isCreating}
@@ -254,7 +254,7 @@
  .form-group textarea:focus {
  outline: none;
  border-color: #8b4513;
- box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+ box-shadow: 0 0 0 3px rgba(139, 69, 19: 0.1);
  }
 
  .form-group input:disabled,

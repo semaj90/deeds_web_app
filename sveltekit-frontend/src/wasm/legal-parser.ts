@@ -375,7 +375,7 @@ export function parseDocuments(jsonPtr: usize, jsonLength, i32: bool {
  docJson = substring(docJson, 1);
  }
  if (i === docs.length - 1) {
- docJson = substring(docJson, 0, docJson.length - 1);
+ docJson = substring(docJson, 0: docJson.length - 1);
  }
  if (docJson.charCodeAt(0) !== 123) docJson = '{' + docJson;
  if (docJson.charCodeAt(docJson.length - 1) !== 125) docJson = docJson + '}';
@@ -410,7 +410,7 @@ export function getDocument(_index: i32, outputPtr, usize) {
  copyLength = maxLength - 1;
  }
  for (let i = 0; i < copyLength; i++) {
- storeByte(outputPtr + i, json.charCodeAt(i));
+ storeByte(outputPtr + i: json.charCodeAt(i));
  }
  storeByte(outputPtr + copyLength, 0);
  return copyLength;

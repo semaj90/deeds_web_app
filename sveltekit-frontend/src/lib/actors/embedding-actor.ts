@@ -73,7 +73,7 @@ export const embeddingActor = fromPromise<unknown, { input: EmbeddingInput }>(as
 				timestamp: new Date(),
 			},
 		};
-  } catch (error, any) {
+  } catch (error: any) {
     // Map different error types to structured errors
     if (typeof error === 'object' && error !== null && 'code' in error) {
       throw error as EmbeddingError;
@@ -128,7 +128,7 @@ export const batchEmbeddingActor = fromPromise<unknown, { input: EmbeddingInput[
         results.push(...(batchResults.filter(Boolean) as EmbeddingOutput[]));
       }
       return results;
-    } catch (error, any) {
+    } catch (error: any) {
       if (error instanceof Error) {
         throw {
           message: `Batch embedding failed: ${error.message || 'Unknown error'}`,

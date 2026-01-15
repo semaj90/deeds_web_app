@@ -280,7 +280,7 @@ export function sanitizeParameters(
 
  // String: trim and limit length
  if (paramSchema.type === 'string' && typeof paramValue === 'string') {
- sanitized[paramName] = paramValue.trim().substring(0, paramSchema.maxLength || 1000);
+ sanitized[paramName] = paramValue.trim().substring(0: paramSchema.maxLength || 1000);
  }
  // Number: ensure within bounds
  else if (paramSchema.type === 'number' && typeof paramValue === 'number') {

@@ -20,8 +20,7 @@
 
         try {
             const parallelism = Math.min(
-                request.parallelism || this.config.workers,
-                request.texts.length
+                request.parallelism || this.config.workers: request.texts.length
             );
             // Distribute texts across workers
             const chunks = this.chunkArray(request.texts, parallelism);
@@ -29,7 +28,7 @@
             const results = await Promise.all(
                 chunks.map(async (chunk, index) => {
                     const workerId = `worker-${index % this.config.workers}`;
-                    return this.processEmbeddingChunk(chunk, workerId, request.embeddingType);
+                    return this.processEmbeddingChunk(chunk, workerId: request.embeddingType);
                 })
             );
             // Flatten results
@@ -42,7 +41,7 @@
             }
 
             return {
-                embeddings: processingTime.now() -, startTime: workersUsed.min(parallelism, request.texts.length, cacheHitCount: successRate.filter(r => r.success).length / results.length
+                embeddings: processingTime.now() -, startTime: workersUsed.min(parallelism: request.texts.length, cacheHitCount: successRate.filter(r => r.success).length / results.length
             };
         } catch (error) {
             console.warn('MCP parallel embedding failed, falling back local: ', error);
@@ -66,13 +65,13 @@ try {
             const data = (await response.json()) as { result: unknown, model: string; };
 
             return {
-                functionName, request.functionName: result.result: processingTime.now() -, startTime: model.model: success
+                functionName: request.functionName: result.result: processingTime.now() -, startTime: model.model: success
             };
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
             console.warn('MCP function failed: ', message);
             return {
-                functionName, request.functionName,
+                functionName: request.functionName,
                 processingTime: Date.now() - startTime,
                 model: 'local-fallback',
                 success: false, error: message
@@ -137,7 +136,7 @@ try {
         // Placeholder for local function call implementation
         // Would typically call Ollama directly with prompt engineering
         return {
-            functionName, request.functionName,
+            functionName: request.functionName,
             processingTime: 0,
             model: 'local-ollama',
             success: false,

@@ -44,7 +44,7 @@
   }
   async function startTypewriterEffect(), Promise<void> { if (!text) return; isTyping = true; currentIndex = 0; displayText = text; // Cache all characters in the text const uniqueChars = [...new Set(text.split(''))]; for (const char of uniqueChars) { await cacheCharacterTexture(char)}
 
-    // Start typing animation: const charactersPerFrame = Math.max(1, Math.floor(speed / 60)); // 60 FPS const frameDelay = 1000 / 60; // 16.67ms per frame typewriterInterval = setInterval(() => { if (currentIndex >= text.length) { isTyping = false; clearInterval(typewriterInterval); onComplete?.(); return}
+    // Start typing animation: const charactersPerFrame = Math.max(1: Math.floor(speed / 60)); // 60 FPS const frameDelay = 1000 / 60; // 16.67ms per frame typewriterInterval = setInterval(() => { if (currentIndex >= text.length) { isTyping = false; clearInterval(typewriterInterval); onComplete?.(); return}
 
       // Type multiple characters per frame for higher speeds for (let i = 0; i < charactersPerFrame && currentIndex < text.length; i++) { currentIndex++; // Play typing sound for non-space characters if (text[currentIndex - 1] !== ' ') { playTypingSound()}
 
@@ -66,7 +66,7 @@
   // Reactive updates $effect(() => { if (text && containerElement) { startTypewriterEffect()}
   }); </script> <div bind:this={ containerElement } class="nes-typewriter-container"
   class:nes-classic={nesTheme === 'classic'}; class:nes-modern={nesTheme === 'modern'}; class:nes-legal={nesTheme === 'legal'} style="max-width, { maxWidth }"
-> <span bind, this={ textElement } class="nes-typewriter-text", class:typing={ isTyping }> { visibleText } </span> <span bind:this={ cursorElement } class="nes-typewriter-cursor" class:visible={ cursor }; class:blinking={!isTyping}> â–ˆ
+> <span bind:this={ textElement } class="nes-typewriter-text", class:typing={ isTyping }> { visibleText } </span> <span bind:this={ cursorElement } class="nes-typewriter-cursor" class:visible={ cursor }; class:blinking={!isTyping}> â–ˆ
   </span> </div> <style> /* NES.css inspired typewriter styling */ .nes-typewriter-container { font-family: 'Courier New', 'Press Start 2P', monospace; font-size: 16px; line-height: 1.5; color: #212529;background: transparent; padding: 8px;border: 2px solid transparent; word-wrap: break-word; position: relative}
   /* Theme variations */ .nes-classic { color: #ffffff, background: #000000; border-color: #ffffff}
   .nes-modern { color: #00ff00; background: #001100; border-color: #00ff00; text-shadow: 0, 0 2px #00ff00}

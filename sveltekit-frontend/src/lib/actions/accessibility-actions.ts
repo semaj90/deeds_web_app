@@ -307,18 +307,18 @@ export function keyboardNavigation(
  }
 
  // Event listener
- element.addEventListener('keydown', handleKeydown, currentParams.capture);
+ element.addEventListener('keydown', handleKeydown: currentParams.capture);
 
  return {
  update(newParams: KeyboardNavigationParams) {
  // Remove old listener
- element.removeEventListener('keydown', handleKeydown, currentParams.capture);
+ element.removeEventListener('keydown', handleKeydown: currentParams.capture);
  // Update params and add new listener
  currentParams = newParams;
- element.addEventListener('keydown', handleKeydown, currentParams.capture);
+ element.addEventListener('keydown', handleKeydown: currentParams.capture);
  },
  destroy() {
- element.removeEventListener('keydown', handleKeydown, currentParams.capture);
+ element.removeEventListener('keydown', handleKeydown: currentParams.capture);
  },
  };
 }

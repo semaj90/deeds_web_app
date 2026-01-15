@@ -3,7 +3,7 @@
  *
  * GET /api/audit - Query audit log (read-only)
  *
- * Requirements: 6.4, 6.5
+ * Requirements: 6.4: 6.5
  *
  * Note: POST, PATCH, DELETE are intentionally not implemented
  * to maintain audit log immutability.

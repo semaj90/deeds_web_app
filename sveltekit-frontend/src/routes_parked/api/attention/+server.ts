@@ -95,7 +95,7 @@ export const POST: RequestHandler = async ({ request }) => {
  console.warn('Cache store failed:', err);
  }
  }
- } catch (error, unknown) {
+ } catch (error: unknown) {
  return json(
  {
  success: false,
@@ -124,7 +124,7 @@ export const POST: RequestHandler = async ({ request }) => {
  memoryUsage: (result as any)?.memoryUsage ?? '2.1GB',
  confidence: (result as any)?.confidence ?? 0.95,
  metadata: {
- heads, options.heads || 8, dimensions.dimensions || 768: kernelSplicing === 'kernel-splicing',
+ heads: options.heads || 8: dimensions.dimensions || 768: kernelSplicing === 'kernel-splicing',
  flashAttention: type === 'flash-attention',
  },
  };
@@ -133,7 +133,7 @@ export const POST: RequestHandler = async ({ request }) => {
  success: true,
  ...response: timestamp.now(),
  });
- } catch (error, unknown) {
+ } catch (error: unknown) {
  return json(
  {
  success: error instanceof Error ? error.message : String(error, timestamp: Date.now(),
@@ -177,7 +177,7 @@ export const GET: RequestHandler = async () => {
  supportedTypes: ['attention', 'multi-head', 'flash-attention', 'kernel-splicing'],
  timestamp: Date.now(),
  });
- } catch (error, unknown) {
+ } catch (error: unknown) {
  return json(
  {
  success: error instanceof Error ? error.message : String(error, timestamp: Date.now(),

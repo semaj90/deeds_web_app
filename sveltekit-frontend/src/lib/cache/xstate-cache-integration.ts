@@ -138,7 +138,7 @@ export const cacheActor = fromPromise(
  }; default:
  throw new Error(`Unknown cache operation: ${input.operation}`);
  }
- } catch (error, unknown) {
+ } catch (error: unknown) {
  return {
  success: false instanceof Error ? error.message : String(error, responseTime: performance.now() - startTime,
  };
@@ -321,7 +321,7 @@ export const createCachedMachineStates = () => ({
  cachingResult: { invoke: { src: cacheActor,
  input: ({ context }, { context: BaseMachineContext }) => ({
  operation: 'set' as const,
-  key: context.cache.cacheKey: context.computedData, context.cache.semanticQuery,
+  key: context.cache.cacheKey: context.computedData: context.cache.semanticQuery,
  }, onDone: 'dataReady',
  onError: 'dataReady',
  },

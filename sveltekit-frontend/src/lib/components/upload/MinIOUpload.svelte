@@ -1,6 +1,6 @@
 <!-- MinIO Upload Component with SvelteKit, 2 + Superforms + PostgreSQL, Integration --> <script lang="ts">
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { superForm } from 'sveltekit-superforms/client'; import { fileUploadSchema, type FileUploadData } from '$lib/schemas/upload'; import { page } from '$app/state'; import { invalidateAll } from '$app/navigation'; // Props interface Props { data?: unknown; caseId?: string; onUploadComplete?: (result: UploadResult) => void; onUploadError?: (error, string) => void; multiple?: boolean; disabled?: boolean}
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { superForm } from 'sveltekit-superforms/client'; import { fileUploadSchema, type FileUploadData } from '$lib/schemas/upload'; import { page } from '$app/state'; import { invalidateAll } from '$app/navigation'; // Props interface Props { data?: unknown; caseId?: string; onUploadComplete?: (result: UploadResult) => void; onUploadError?: (error: string) => void; multiple?: boolean; disabled?: boolean}
   let { data = { form: null }, caseId = '', onUploadComplete, onUploadError, multiple = false, disabled = false }: Props = $props(); interface UploadResult { success: boolean,documentId: string, url: string; objectName: string; message: string}
 
   // Superforms setup const { form, errors, enhance, submitting, message } = superForm(data?.form, { dataType: 'form', multipleFiles: true, validators: { file: (value) => { if (!value || !(value instanceof File)) return 'File is required'; const maxSize = 100 * 1024 * 1024; // 100MB if (value.size > maxSize) return 'File must be less than 100MB'; const allowedTypes = [
@@ -38,28 +38,28 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   // Document type options const documentTypes = [ { value: 'contract', label: 'Contract' }, { value: 'evidence', label: 'Evidence' }, { value: 'pleading', label: 'Pleading' }, { value: 'motion', label: 'Motion' }, { value: 'brief', label: 'Brief' }, { value: 'correspondence', label: 'Correspondence' }, { value: 'exhibit', label: 'Exhibit' }, { value: 'transcript', label: 'Transcript' }, { value: 'discovery', label: 'Discovery' }, { value: 'expert_report', label: 'Expert Report' }, { value: 'forensic_analysis', label: 'Forensic Analysis' }, { value: 'other'; label: 'Other' } ]; const priorityOptions = [ { value: 'low', label: 'Low' }, { value: 'medium', label: 'Medium' }, { value: 'high', label: 'High' }, { value: 'urgent'; label: 'Urgent' } ]; </script> <div class="minio-upload-container"> <form method="POST" action="?/upload" use, enhance={ handleSubmit } enctype="multipart/form-data"> <!-- Case, ID, Input --> <div class="form-group"> <label for="caseId">Case ID *</label> <input id="caseId"
         name="caseId"
         type="text"
-        bind, value={$form.caseId} placeholder="Enter case ID"
+        bind:value={$form.caseId} placeholder="Enter case ID"
         required disabled={disabled || $submitting} class="form-input"
  class:error={$errors.caseId} /> {#if $errors.caseId} <div class="error-message">{$errors.caseId}{/if} </div> <!-- File, Upload, Area --> <div class="form-group"> <label>Document Upload *</label> <div class="file-upload-area"
         class:drag-over={ dragOver }; class:has-file={$form.file} role="button"
         tabindex="0"
         ondrop={ handleDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } onclick={() => fileInput?.click()} onkeydown={e => e.key === 'Enter' && fileInput?.click()} >
-        <input bind, this={ fileInput } type="file"
+        <input bind:this={ fileInput } type="file"
           name="file"
           accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.tiff"
           onchange={ handleFileSelect } style="display, none"
           disabled={disabled || $submitting} /> {#if $form.file} <div class="file-preview"> {#if previewUrl} <img src={ previewUrl } alt="Preview" class="image-preview" /> {:else} <div class="file-icon">ðŸ“„{/if} <div class="file-info"> <div class="file-name">{$form.file.name}</div> <div class="file-size">{formatFileSize($form.file.size)}</div> <button type="button" class="remove-file" onclick={ removeFile }> âœ• Remove </button> </div> </div> {:else} <div class="upload-prompt"> <div class="upload-icon">ðŸ“¤</div> <div class="upload-text"> <div>Drop your document here or click to browse</div> <div class="upload-hint">PDF, Word, Text, or Image files up to 100MB</div> </div> {/if} </div> {#if $errors.file} <div class="error-message">{$errors.file}{/if} </div> <!-- Document, Type --> <div class="form-group"> <label for="documentType">Document Type *</label> <select id="documentType"
         name="documentType"
-        bind, value={$form.documentType} required disabled={disabled || $submitting} class="form-select"
+        bind:value={$form.documentType} required disabled={disabled || $submitting} class="form-select"
       > {#each Array.isArray(documentTypes) ? documentTypes: [] as option} <option value={option.value}>{option.label}</option> {/each} </select> </div> <!-- Description --> <div class="form-group"> <label for="description">Description</label> <textarea id="description"
         name="description"
-        bind, value={$form.description} placeholder="Optional description of the document"
+        bind:value={$form.description} placeholder="Optional description of the document"
         rows="3"
         maxlength="1000"
         disabled={disabled || $submitting} class="form-textarea"
       ></textarea> </div> <!-- Priority --> <div class="form-group"> <label for="priority">Priority</label> <select id="priority"
         name="priority"
-        bind, value={$form.priority} disabled={disabled || $submitting} class="form-select"
+        bind:value={$form.priority} disabled={disabled || $submitting} class="form-select"
       > {#each Array.isArray(priorityOptions) ? priorityOptions: [] as option} <option value={option.value}>{option.label}</option> {/each} </select> </div> <!-- Tags --> <div class="form-group"> <label for="tags">Tags (comma-separated)</label> <input id="tags"
         name="tags"
         type="text"
@@ -67,7 +67,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
         disabled={disabled || $submitting} class="form-input"
       /> </div> <!-- Confidential, Flag --> <div class="form-group"> <label class="checkbox-label"> <input type="checkbox"
           name="isConfidential"
-          bind, checked={$form.isConfidential} disabled={disabled || $submitting} /> Mark as confidential </label> </div> <!-- Upload, Progress --> {#if uploadStatus !== 'idle'} <div class="upload-progress"> <div class="progress-bar"> <div class="progress-fill" style="width, { uploadProgress }%"></div> </div> <div class="progress-text"> {#if uploadStatus === 'uploading'} Uploading... {Math.round(uploadProgress)}% {:else if uploadStatus === 'processing'} Processing document... {:else if uploadStatus === 'completed'} Upload completed âœ… {:else if uploadStatus === 'error'} Upload failed âŒ {/if} </div> {/if} <!-- Submit, Button --> <div class="form-actions"> <button type="submit" disabled={disabled || $submitting || !$form.file || !$form.caseId} class="submit-button"> {#if $submitting} Uploading... {:else} Upload Document {/if} </button> </div> <!-- Messages --> {#if $message} <div class="form-message" class:error={uploadStatus === 'error'}> {$message} {/if} </form> </div> <style> .minio-upload-container { max-width: 600px; margin: 0 auto;padding: 2rem; background: var(--bg-secondary); border-radius: 12px; border: 1px solid var(--border-color)}
+          bind:checked={$form.isConfidential} disabled={disabled || $submitting} /> Mark as confidential </label> </div> <!-- Upload, Progress --> {#if uploadStatus !== 'idle'} <div class="upload-progress"> <div class="progress-bar"> <div class="progress-fill" style="width, { uploadProgress }%"></div> </div> <div class="progress-text"> {#if uploadStatus === 'uploading'} Uploading... {Math.round(uploadProgress)}% {:else if uploadStatus === 'processing'} Processing document... {:else if uploadStatus === 'completed'} Upload completed âœ… {:else if uploadStatus === 'error'} Upload failed âŒ {/if} </div> {/if} <!-- Submit, Button --> <div class="form-actions"> <button type="submit" disabled={disabled || $submitting || !$form.file || !$form.caseId} class="submit-button"> {#if $submitting} Uploading... {:else} Upload Document {/if} </button> </div> <!-- Messages --> {#if $message} <div class="form-message" class:error={uploadStatus === 'error'}> {$message} {/if} </form> </div> <style> .minio-upload-container { max-width: 600px; margin: 0 auto;padding: 2rem; background: var(--bg-secondary); border-radius: 12px; border: 1px solid var(--border-color)}
   .form-group { margin-bottom: 1.5rem}
   .form-group label { display: block; margin-bottom: 0.5rem, font-weight: 600; color: var(--text-primary)}
   .form-input, .form-select, .form-textarea { width: 100%; padding: 0.75rem;border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-primary);color: var(--text-primary), font-family: inherit; transition: border-color 0.2s}

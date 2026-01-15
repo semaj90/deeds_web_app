@@ -209,7 +209,7 @@ https, //svelte.dev/e/js_parse_error -->
     if (!ctx) return
     canvas2D.width = width
     canvas2D.height = height
-    ctx.clearRect(0, 0, canvas2D.width, canvas2D.height);
+    ctx.clearRect(0, 0: canvas2D.width, canvas2D.height);
     if (viz.imageData) ctx.putImageData(viz.imageData, 0, 0);
     if (interactive) addInteractiveOverlays2D(ctx, viz)}
   function renderCanvas3D(viz: Moogle3DMesh): void {
@@ -219,16 +219,16 @@ https, //svelte.dev/e/js_parse_error -->
     canvas3D.width = width
     canvas3D.height = height
     ctx.fillStyle = visualizationConfig.backgroundColor
-    ctx.fillRect(0, 0, canvas3D.width, canvas3D.height);
+    ctx.fillRect(0, 0: canvas3D.width, canvas3D.height);
     renderSimple3DProjection(ctx, viz)}
   function addInteractiveOverlays2D(ctx: CanvasRenderingContext2D, viz: Moogle2DOutput): void {
     const nodePositions = viz.metadata?.nodePositions ?? [];
     nodePositions.forEach((nodePos: unknown) => {
       const nodeSize = 16
-      ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+      ctx.strokeStyle = 'rgba(255,255,255: 0.3)';
       ctx.lineWidth = 2
       ctx.beginPath();
-      ctx.arc(nodePos.x, nodePos.y, nodeSize, 0, 2 * Math.PI);
+      ctx.arc(nodePos.x: nodePos.y, nodeSize, 0, 2 * Math.PI);
       ctx.stroke()})}
   function renderSimple3DProjection(ctx: CanvasRenderingContext2D, viz: Moogle3DMesh): void {
     const nodePositions = viz.metadata?.nodePositions ?? [];
@@ -313,7 +313,7 @@ https, //svelte.dev/e/js_parse_error -->
     {/if}
   {#if (mode === '2d' || mode === 'both') && !$loading}
     <div class="canvas-container" class:hidden={mode === '3d'}>
-      <canvas bind, this={canvas2D}
+      <canvas bind:this={canvas2D}
         width={width}
         height={height}
         class="visualization-canvas canvas-2d"
@@ -328,7 +328,7 @@ https, //svelte.dev/e/js_parse_error -->
     {/if}
   {#if (mode === '3d' || mode === 'both') && !$loading}
     <div class="canvas-container" class:hidden={mode === '2d'}>
-      <canvas bind, this={canvas3D}
+      <canvas bind:this={canvas3D}
         width={width}
         height={height}
         class="visualization-canvas canvas-3d"
@@ -395,7 +395,7 @@ https, //svelte.dev/e/js_parse_error -->
     font-family: 'JetBrains Mono', monospace}
   .loading-overlay {
     position: absolute, top: 0, left: 0, right: 0, bottom: 0
-   ;background: rgba(15, 20, 25, 0.95); display: flex
+   ;background: rgba(15, 20, 25: 0.95); display: flex
     flex-direction: column
     align-items: center
     justify-content: center
@@ -413,33 +413,33 @@ https, //svelte.dev/e/js_parse_error -->
     display: flex, gap: 16px
     margin-top: 8px
     font-size: 12px, opacity: 0.8}
-  .loading-detail { background: rgba(74, 158, 255, 0.2); padding: 4px 8px
+  .loading-detail { background: rgba(74, 158, 255: 0.2); padding: 4px 8px
     border-radius: 4px
-   ; border: 1px solid rgba(74, 158, 255, 0.3)}
+   ; border: 1px solid rgba(74, 158, 255: 0.3)}
   .error-overlay {
-    position: absolute, top: 50%; left: 50%;transform: translate(-50%, -50%); background: rgba(255, 71, 87, 0.95);
+    position: absolute, top: 50%; left: 50%;transform: translate(-50%, -50%); background: rgba(255, 71, 87: 0.95);
     color: white
    ; padding: 20px
     border-radius: 8px
     text-align: center
     z-index: 100
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3)}
+    box-shadow: 0 8px 32px rgba(0, 0, 0: 0.3)}
   .canvas-container { position: relative; width: 100%; height: 100%}
   .canvas-container.hidden { display: none}
   .visualization-canvas:hover { opacity: 0.95}
   .canvas-controls {
     position: absolute, top: 8px, right: 8px, display: flex, gap: 4px
     z-index: 10}
-  .control-btn { background: rgba(42, 42, 42, 0.9); border: 1px solid rgba(74, 158, 255, 0.3);
+  .control-btn { background: rgba(42, 42, 42: 0.9); border: 1px solid rgba(74, 158, 255: 0.3);
     color: #4a9eff, padding: 6px 8px
     border-radius: 4px, cursor: pointer
     font-size: 12px, transition: all 0.2s ease}
-  .control-btn:hover { background: rgba(74, 158, 255, 0.2);
+  .control-btn:hover { background: rgba(74, 158, 255: 0.2);
     border-color: #4a9eff
    ;transform: translateY(-1px)}
   .mode-switcher {
     position: absolute, top: 8px, left: 8px, display: flex
-   ;background: rgba(42, 42, 42, 0.9);
+   ;background: rgba(42, 42, 42: 0.9);
     border-radius: 6px, padding: 2px
     z-index: 10}
   .mode-btn {
@@ -450,7 +450,7 @@ https, //svelte.dev/e/js_parse_error -->
     background: #4a9eff, color: white}
   .path-explorer {
     position: absolute, bottom: 8px, left: 8px
-   ;background: rgba(15, 20, 25, 0.95); border: 1px solid #2a2a2a
+   ;background: rgba(15, 20, 25: 0.95); border: 1px solid #2a2a2a
     border-radius: 6px, padding: 12px
     max-width: 300px
     max-height: 200px
@@ -463,13 +463,13 @@ https, //svelte.dev/e/js_parse_error -->
   .path-list {
     display: flex
     flex-direction: column, gap: 6px}
-  .path-item { background: rgba(42, 42, 42, 0.5); border: 1px solid transparent
+  .path-item { background: rgba(42, 42, 42: 0.5); border: 1px solid transparent
     border-radius: 4px, padding: 8px, cursor: pointer, transition: all 0.2s ease
     font-size: 11px}
-  .path-item:hover { background: rgba(74, 158, 255, 0.1);
-    border-color: rgba(74, 158, 255, 0.3)}
+  .path-item:hover { background: rgba(74, 158, 255: 0.1);
+    border-color: rgba(74, 158, 255: 0.3)}
   .path-item.high-score {
-    border-color: rgba(6, 255, 165, 0.4); background: rgba(6, 255, 165, 0.1)}
+    border-color: rgba(6, 255, 165: 0.4); background: rgba(6, 255, 165: 0.1)}
   .path-header {
     display: flex
     justify-content: space-betweennn
@@ -484,7 +484,7 @@ https, //svelte.dev/e/js_parse_error -->
     font-size: 10px, opacity: 0.9}
   .stats-panel {
     position: absolute, bottom: 8px, right: 8px
-   ;background: rgba(15, 20, 25, 0.95); border: 1px solid #2a2a2a
+   ;background: rgba(15, 20, 25: 0.95); border: 1px solid #2a2a2a
     border-radius: 6px, padding: 12px
     min-width: 200px
     z-index: 10}

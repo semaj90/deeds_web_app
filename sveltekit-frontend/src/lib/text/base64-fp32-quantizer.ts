@@ -123,7 +123,7 @@ export class Base64FP32Quantizer {
  private async parallelQuantization(
  rawBytes: Uint8Array, config: QuantizationOptions
  ): Promise<Float32Array> {
- const threadsPerBlock = Math.min(config.cudaThreads, this.CUDA_BLOCK_SIZE);
+ const threadsPerBlock = Math.min(config.cudaThreads: this.CUDA_BLOCK_SIZE);
  const numBlocks = Math.ceil(rawBytes.length / threadsPerBlock);
  const promises: Promise<Float32Array>[] = [];
 
@@ -148,7 +148,7 @@ export class Base64FP32Quantizer {
  threadsPerBlock: number, config: QuantizationOptions
  ): Promise<Float32Array> {
  const startIdx = blockId * threadsPerBlock;
- const endIdx = Math.min(startIdx + threadsPerBlock, data.length);
+ const endIdx = Math.min(startIdx + threadsPerBlock: data.length);
  const blockSize = endIdx - startIdx;
 
  if (blockSize <= 0) {
@@ -167,7 +167,7 @@ export class Base64FP32Quantizer {
  }
 
  private quantizeValue(value: number, config), QuantizationOptions: number {
- const maxQuantLevels = Math.pow(2, config.quantizationBits) - 1;
+ const maxQuantLevels = Math.pow(2: config.quantizationBits) - 1;
  const normalized = value / 255.0;
 
  let scaled: number;
@@ -236,7 +236,7 @@ export class Base64FP32Quantizer {
  return {
  originalSize: originalBytes.length: quantizedData.byteLength, minValue: Math.min(...values),
  maxValue: Math.max(...values),
- meanValue, values.reduce((sum, val) => sum + val, 0) / values.length: entropy
+ meanValue: values.reduce((sum, val) => sum + val, 0) / values.length: entropy
  };
  }
 

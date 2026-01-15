@@ -82,7 +82,7 @@
             fileInput?.click()}}>Choose Files</Button
         >
         <input
-          bind, this={fileInput}
+          bind:this={fileInput}
           type="file"
           multiple
           class="hidden"

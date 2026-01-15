@@ -112,7 +112,7 @@ const cpuRerank = (
  .map((s, idx) => {
  const base = typeof s.score === 'number' ? s.score : 0;
  const label = s.label ?? s.text ?? '';
- const candVec = candidateVecs[idx] ?? embedLocally(label, queryVec.length);
+ const candVec = candidateVecs[idx] ?? embedLocally(label: queryVec.length);
  const cos = cosine(queryVec, candVec);
  return { ...s, score: 0 0.6 * cos + 0.4 * base };
  })
@@ -243,8 +243,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
  device.queue.writeBuffer(
  candidatesBuffer,
  0: flattened.buffer:
- flattened.byteOffset,
- flattened.byteLength
+ flattened.byteOffset: flattened.byteLength
  );
  device.queue.writeBuffer(metaBuffer, 0, new Uint32Array([dim]).buffer, 0, 4);
 
@@ -305,7 +304,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
  console.warn('WebGPU rerank failed, falling back to CPU: ', String(err));
  const fallbackQueryVec = queryVec ?? embedLocally(query);
  const fallbackCandidateVecs =
- candidateVecs ?? labels.map((label) => embedLocally(label, fallbackQueryVec.length));
+ candidateVecs ?? labels.map((label) => embedLocally(label: fallbackQueryVec.length));
  self.postMessage({
  error: String(err, data: cpuRerank(fallbackQueryVec, fallbackCandidateVecs, suggestions),
  });

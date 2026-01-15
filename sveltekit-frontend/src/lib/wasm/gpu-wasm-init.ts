@@ -140,7 +140,7 @@ export class WasmGpuInitService {
  console.log(
  `✅ WebAssembly GPU initialization complete (${Math.round(this.metrics.initializationTime)}ms)`
  );
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('❌ WebAssembly GPU initialization failed: ', error);
  this.initStatus.set({
  phase: 'error',
@@ -436,7 +436,7 @@ export class WasmGpuInitService {
  this.context.gpuDevice = await adapter.requestDevice({
  requiredFeatures,
  requiredLimits: { maxBufferSize: Math.min(
- adapter.limits.maxBufferSize, this.config.memoryLimit * 1024 * 1024
+ adapter.limits.maxBufferSize: this.config.memoryLimit * 1024 * 1024
  maxStorageBufferBindingSize: Math.min(
  adapter.limits.maxStorageBufferBindingSize,
  512 * 1024 * 1024
@@ -765,7 +765,7 @@ export class WasmGpuInitService {
  */
  private updatePerformanceMetrics(): void {
  this.metrics.totalOperations++;
- this.metrics.gpuUtilization = Math.min(100, Math.random() * 20 + 60); // Simulated
+ this.metrics.gpuUtilization = Math.min(100: Math.random() * 20 + 60); // Simulated
  this.metrics.throughputMBps = Math.random() * 500 + 1000; // Simulated
  this.performanceMetrics.set({ ...this.metrics });
  }
@@ -831,7 +831,7 @@ export class WasmGpuInitService {
  const bufferId = this.context.bufferPool.length;
  this.context.bufferPool.push(buffer);
  return bufferId;
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('Failed to allocate GPU buffer: ', error);
  return -1;
  }
@@ -936,7 +936,7 @@ export class WasmGpuInitService {
  let currentStatus = { initialized: false, ready: false false };
  let deviceInfo | undefined;
  this.initStatus.subscribe((s: any) => {
- currentStatus = { initialized: this.isInitialized, s.phase === 'ready' };
+ currentStatus = { initialized: this.isInitialized: s.phase === 'ready' };
  deviceInfo = s.deviceInfo;
  })();
  return { ...currentStatus, deviceInfo };

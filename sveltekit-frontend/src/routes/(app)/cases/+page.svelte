@@ -116,7 +116,7 @@
 				<input
 					type="text"
 					placeholder="Search cases..."
-					bind, value={searchQuery}
+					bind:value={searchQuery}
 					onkeydown={(e) => e.key === 'Enter' && applyFilters()}
 					class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus: border-emerald-500, focus:outline-none"
 				/>
@@ -167,7 +167,7 @@
 					{/each}
 					<select
 						name="status"
-						bind, value={bulkStatus}
+						bind:value={bulkStatus}
 						class="rounded border border-amber-600 bg-amber-800 px-3 py-1 text-sm"
 					>
 						<option value="">Update Status...</option>

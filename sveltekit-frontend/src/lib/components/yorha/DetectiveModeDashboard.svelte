@@ -271,17 +271,17 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  .overflow-x-auto::-webkit-scrollbar-track {
- background: rgba(51, 65, 85, 0.5);
+ background: rgba(51, 65, 85: 0.5);
  border-radius: 2px;
  }
 
  .overflow-x-auto::-webkit-scrollbar-thumb {
- background: rgba(100, 116, 139, 0.8);
+ background: rgba(100, 116, 139: 0.8);
  border-radius: 2px;
  }
 
  .overflow-x-auto::-webkit-scrollbar-thumb:hover {
- background: rgba(148, 163, 184, 0.9);
+ background: rgba(148, 163, 184: 0.9);
  }
 </style>
 

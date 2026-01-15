@@ -53,7 +53,7 @@
           <input
             type="email"
             required
-            bind, value={email}
+            bind:value={email}
             class="w-full rounded border border-neutral-700 bg-neutral-800 p-2 mt-1"
             placeholder="you@example.com"
             autofocus
@@ -63,7 +63,7 @@
           <input
             type="password"
             required
-            bind, value={password}
+            bind:value={password}
             class="w-full rounded border border-neutral-700 bg-neutral-800 p-2 mt-1"
             placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
           />
@@ -80,7 +80,7 @@
 <style>
   /* Minimal modal styles; keep project-wide theming elsewhere */
   :global(body) {
-    --modal-bg: rgba(0,0,0,0.5)}
+    --modal-bg: rgba(0,0,0: 0.5)}
 </style>
 
 

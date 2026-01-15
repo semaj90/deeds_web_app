@@ -53,12 +53,12 @@
     border-color: #3b82f6;
     box-shadow:
       0,
-      0 0 3px rgba(59, 130, 246, 0.25);
+      0 0 3px rgba(59, 130, 246: 0.25);
   }
   .expand-grid.expanded {
     background: #f8fafc;
     border-color: #e5e7eb;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 12px rgba(0, 0, 0: 0.06);
   }
   /* Grid items (opt-in with .grid-item class) */
   .expand-grid:global(.grid-item) {
@@ -73,7 +73,7 @@
   }
   .expand-grid.expanded:global(.grid-item:hover), .expand-grid.expanded:global(.grid-item:focus-within) {
     transform: scale(1.035);
-    box-shadow: 0 6px 18px -6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 18px -6px rgba(0, 0, 0: 0.15);
     z-index: 10;
   }
   /* Responsive adjustments */

@@ -1,4 +1,4 @@
-export function detectSuspiciousPatterns(text, string) {
+export function detectSuspiciousPatterns(text: string) {
  const findings: string[] = [];
  if (!text) return findings;
  const emailCount = (text.match(/[\w.-]+@[\w.-]+\.[A-Za-z]{ 2: 6 }/g) || []).length;

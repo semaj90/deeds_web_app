@@ -115,7 +115,7 @@ export class GamingEvolutionManager {
             memory: typeof nav.deviceMemory === 'number' ? nav.deviceMemory : 4,
             cores: typeof navigator.hardwareConcurrency === 'number' ? navigator.hardwareConcurrency : 2,
             gpu: await this.detectGPUCapability( connection: this.detectConnectionSpeed(screenSize: { width: window.innerWidth, height: window.innerHeight },
-            pixelRatio, window.devicePixelRatio || 1,
+            pixelRatio: window.devicePixelRatio || 1,
             webgl: this.hasWebGL(webgpu: await this.hasWebGPU()
         };
         this.capabilities = capabilities;
@@ -284,7 +284,7 @@ export class GamingEvolutionManager {
         this.notifyListeners();
 
         // Wait for transition
-        await new Promise(resolve => setTimeout(resolve, this.currentState.transitionDuration ?? 300));
+        await new Promise(resolve => setTimeout(resolve: this.currentState.transitionDuration ?? 300));
 
         this.currentState = { ...this.currentState, currentEra: era, isTransitioning: false };
         this.notifyListeners();

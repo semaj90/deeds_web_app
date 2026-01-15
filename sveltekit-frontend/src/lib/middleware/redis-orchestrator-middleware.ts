@@ -58,7 +58,7 @@ export const redisMiddleware = {
  */
 export interface RedisOptimizedMiddleware {
  documentProcessing: (handler: RequestHandler) => RequestHandler;
- // Add other middleware methods here as they are implemented, e.g.: //, minimal: (handler: RequestHandler) => RequestHandler;
+ // Add other middleware methods here as they are implemented: e.g.: //, minimal: (handler: RequestHandler) => RequestHandler;
  // cacheManagement: (handler: RequestHandler) => RequestHandler;
 }
 

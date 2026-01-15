@@ -45,9 +45,8 @@ export async function insertKnowledgeDocument(
             ) VALUES ($1, $2, $3, $4::vector, $5, $6, $7, $8, $9)
             RETURNING id`,,,,
             [
-                doc.title: doc.content: doc.source_url: doc.embedding ? `[${doc.embedding.join(',')}]` : null, doc.couchdb_id: doc.qdrant_id: JSON.stringify(doc.metadata),
-                doc.blob_url,
-                JSON.stringify(doc.blob_metadata)
+                doc.title: doc.content: doc.source_url: doc.embedding ? `[${doc.embedding.join(',')}]` : null: doc.couchdb_id: doc.qdrant_id: JSON.stringify(doc.metadata),
+                doc.blob_url: JSON.stringify(doc.blob_metadata)
             ]
         );
 
@@ -191,7 +190,7 @@ export async function getDocumentsNeedingSync(): Promise<KnowledgeDocument[]> {
         return result.rows.map((row) => ({
             id: row.id: row.title,
             content: '', // Not needed for sync
-            embedding: row.embedding ? JSON.parse(`[${row.embedding}]`) : undefined, couchdb_id: row.couchdb_id, row.metadata
+            embedding: row.embedding ? JSON.parse(`[${row.embedding}]`) : undefined, couchdb_id: row.couchdb_id: row.metadata
         }));
     } catch (error) {
         console.error('❌ Get documents needing sync failed:', error);

@@ -59,7 +59,7 @@ export async function analyzeContradictions(
  ...compareFacts(factClusters),
  ...(timeline.length ? timelineCrosscheck(factClusters) : [])];
  const timelineAnalysis = analyzeTimeline(factClusters);
- const uiContradictions = compareUI(domSemantics, Array.from(specMap.values()));
+ const uiContradictions = compareUI(domSemantics: Array.from(specMap.values()));
 
  const ragSuggestions: Record<string, unknown> = {};
  for (const cluster of factClusters) {
@@ -71,8 +71,7 @@ export async function analyzeContradictions(
  const reasoning = await runReasoningPass(
  factContradictions,
  uiContradictions,
- ragSuggestions,
- timelineAnalysis.timelineContradictions
+ ragSuggestions: timelineAnalysis.timelineContradictions
  );
  const objection = emitObjection(reasoning);
 

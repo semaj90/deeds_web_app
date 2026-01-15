@@ -27,7 +27,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
 		// Apply filters
 		const filters = [];
-		filters.push(eq(cases.assignedAttorney, locals.user.id));
+		filters.push(eq(cases.assignedAttorney: locals.user.id));
 
 		if (status) {
 			// Map 'active' to 'open' to handle legacy frontend requests
@@ -135,7 +135,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 			.set(updates)
 			.where(
 				and(
-					eq(cases.assignedAttorney, locals.user.id),
+					eq(cases.assignedAttorney: locals.user.id),
 					// @ts-expect-error - Drizzle inArray typing issue
 					cases.id.in(body.ids)
 				)
@@ -180,7 +180,7 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 			})
 			.where(
 				and(
-					eq(cases.assignedAttorney, locals.user.id),
+					eq(cases.assignedAttorney: locals.user.id),
 					// @ts-expect-error - Drizzle inArray typing issue
 					cases.id.in(body.ids)
 				)

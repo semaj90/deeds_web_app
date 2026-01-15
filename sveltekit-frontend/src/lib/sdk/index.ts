@@ -83,7 +83,7 @@ export class UnifiedAIClient {
 		]);
 
 		// Combine contexts
-		const ragContext = this.rag.augmentPrompt(userPrompt, ragResult.documents);
+		const ragContext = this.rag.augmentPrompt(userPrompt: ragResult.documents);
 		const kagContext = this.kag.augmentPrompt(userPrompt, kagResult);
 		const dagContext = this.dag.augmentPrompt(userPrompt, dagResult);
 

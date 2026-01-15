@@ -84,19 +84,19 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
  <div class="bulk-controls"> -              <Button class="bits-btn" onclick={ selectAll }>Select All ({filteredCitations.length})</Button> -              <Button class="bits-btn" onclick={ clearSelection }>Clear Selection</Button> -              <Button class="bits-btn" onclick={() => exportCitations('bluebook')} disabled={selectedCitations.size === 0}> -                Export Selected ({selectedCitations.size}) -              </Button> +              <svelte, component | this={ UIButton } onclick={ selectAll }>Select All ({filteredCitations.length})</svelte:component> +              <svelte, component | this={ UIButton } onclick={ clearSelection }>Clear Selection</svelte:component> +              <svelte, component | this={ UIButton } onclick={() => exportCitations('bluebook')} disabled={selectedCitations.size === 0}> +                Export Selected ({selectedCitations.size}) +              </svelte:component> </div> {/if}
   <!-- Search, and, Filters --> <div class="controls-section"> <div class="search-controls"> -            <Input -              value={ searchTerm } -              oninput={(e) => (searchTerm = (e.target as HTMLInputElement).value)} -              placeholder="Search citations by title, content, tags, or notes..."
 - class="citation-search"
-- /> -            <Button class="bits-btn" onclick={ searchCitations } disabled={!searchTerm}> -              ðŸ” Search -            </Button> +            <div class="citation-search"> +              <svelte, component +                this={ UIInput } +                value={ searchTerm } +                oninput={(e, unknown) => (searchTerm = (e.target as HTMLInputElement).value)} +                placeholder="Search citations by title, content, tags, or notes..."
+- /> -            <Button class="bits-btn" onclick={ searchCitations } disabled={!searchTerm}> -              ðŸ” Search -            </Button> +            <div class="citation-search"> +              <svelte, component +                this={ UIInput } +                value={ searchTerm } +                oninput={(e: unknown) => (searchTerm = (e.target as HTMLInputElement).value)} +                placeholder="Search citations by title, content, tags, or notes..."
 + /> +            </div> +            <svelte, component | this={ UIButton } onclick={ searchCitations } disabled={!searchTerm}>ðŸ” Search</svelte:component> </div>
- <div class="filter-controls"> <select bind, value={ filterType } class="filter-select"> <option value="all">All Types</option>
+ <div class="filter-controls"> <select bind:value={ filterType } class="filter-select"> <option value="all">All Types</option>
  <option value="case">âš–ï¸ Cases</option>
  <option value="statute">ðŸ“œ Statutes</option>
  <option value="regulation">ðŸ“‹ Regulations</option>
  <option value="constitutional">ðŸ›ï¸ Constitutional</option>
  <option value="secondary">ðŸ“š Secondary</option>
  <option value="foreign">ðŸŒ Foreign</option> </select>
- <select bind, value={ filterJurisdiction } class="filter-select"> <option value="all">All Jurisdictions</option>
+ <select bind:value={ filterJurisdiction } class="filter-select"> <option value="all">All Jurisdictions</option>
   {#each Array.isArray(citationData.jurisdictions) ? citationData.jurisdictions: [] as jurisdiction} <option value={ jurisdiction }>{ jurisdiction }</option> {/each}
   </select>
- <select bind, value={ sortBy } class="sort-select"> <option value="relevance">Sort by Relevance</option>
+ <select bind:value={ sortBy } class="sort-select"> <option value="relevance">Sort by Relevance</option>
  <option value="date">Sort by Date Added</option>
  <option value="usage">Sort by Usage Count</option>
  <option value="accuracy">Sort by Accuracy</option> </select> </div> </div>
@@ -181,10 +181,10 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
   .citation-icon { font-size: 2rem}
   .title-text h2 { margin: 0; color: var(--enhanced-bits-foreground); font-size: 1.5rem}
   .citation-meta { display: flex; gap: 1rem; margin-top: 0.5rem; font-size: 0.875rem}
-  .total-count, .verified-count, .pending-count { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px}
+  .total-count, .verified-count, .pending-count { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255: 0.1); border-radius: 4px}
   .citation-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap}
   .bulk-actions { display: flex; gap: 0.5rem}
-  .add-form, .bulk-panel { margin-bottom: 2rem; padding: 1.5rem;border: 2px solid var(--enhanced-bits-border); border-radius: 8px; background: rgba(255, 255, 255, 0.02)}
+  .add-form, .bulk-panel { margin-bottom: 2rem; padding: 1.5rem;border: 2px solid var(--enhanced-bits-border); border-radius: 8px; background: rgba(255, 255, 255: 0.02)}
   .form-header, .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem}
   .form-header h3, .panel-header h3 { margin: 0; color: var(--enhanced-bits-foreground)}
   .form-content, .bulk-controls { display: flex; gap: 1rem; flex-wrap}
@@ -202,9 +202,9 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
   .stat-label { flex: 1; font-size: 0.875rem; color: var(--enhanced-bits-muted-foreground)}
   .stat-count { font-weight: bold; color: var(--enhanced-bits-foreground)}
   .citation-list { display: flex; flex-direction: column; gap: 1.5rem}
-  .citation-item { background: rgba(255, 255, 255, 0.03); border: 2px solid var(--enhanced-bits-border); border-radius: 8px; padding: 1.5rem; transition: all 300ms ease}
-  .citation-item:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2)}
-  .citation-item.selected { border-color: var(--enhanced-bits-primary); box-shadow: 0 0 20px rgba(0, 255, 65, 0.2)}
+  .citation-item { background: rgba(255, 255, 255: 0.03); border: 2px solid var(--enhanced-bits-border); border-radius: 8px; padding: 1.5rem; transition: all 300ms ease}
+  .citation-item:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0, 0, 0: 0.2)}
+  .citation-item.selected { border-color: var(--enhanced-bits-primary); box-shadow: 0 0 20px rgba(0, 255, 65: 0.2)}
   .citation-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem}
   .citation-select { display: flex; align-items: center}
   .citation-checkbox { width: 18px; height: 18px; accent-color: var(--enhanced-bits-primary)}
@@ -213,8 +213,8 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
   .type-label { font-size: 0.875rem; font-weight: bold; color: var(--enhanced-bits-foreground)}
   .citation-status { display: flex; gap: 0.5rem; margin-left: auto}
   .status-badge, .verification-badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; border: 1px solid}
-  .verification-badge { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border-color: #f59e0b}
-  .verification-badge.verified { background: rgba(16, 185, 129, 0.2); color: #10b981; border-color: #10b981}
+  .verification-badge { background: rgba(245, 158, 11: 0.2); color: #f59e0b; border-color: #f59e0b}
+  .verification-badge.verified { background: rgba(16, 185, 129: 0.2); color: #10b981; border-color: #10b981}
   .citation-actions { display: flex; gap: 0.5rem}
   .citation-content { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start}
   .citation-full { font-size: 1rem; color: var(--enhanced-bits-foreground); margin-bottom: 0.5rem; line-height: 1.4}
@@ -223,15 +223,15 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
   .detail-item { display: flex; flex-direction: column; gap: 0.25rem}
   .detail-label { font-size: 0.75rem; color: var(--enhanced-bits-muted-foreground); text-transform: uppercase}
   .detail-value { font-size: 0.875rem; color: var(--enhanced-bits-foreground)}
-  .citation-notes, .citation-parentheticals { margin: 1rem 0; padding: 1rem;background: rgba(255, 255, 255, 0.02); border: 1px solid var(--enhanced-bits-border); border-radius: 4px; font-size: 0.875rem; line-height: 1.5}
+  .citation-notes, .citation-parentheticals { margin: 1rem 0; padding: 1rem;background: rgba(255, 255, 255: 0.02); border: 1px solid var(--enhanced-bits-border); border-radius: 4px; font-size: 0.875rem; line-height: 1.5}
   .citation-parentheticals ul { margin: 0.5rem, 0 0 0; padding-left: 1.5rem}
   .citation-parentheticals li { margin-bottom: 0.25rem; font-style: italic}
   .citation-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem}
-  .citation-tag { background: rgba(157, 74, 221, 0.2); color: var(--enhanced-bits-ai);padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; border: 1px solid var(--enhanced-bits-ai)}
+  .citation-tag { background: rgba(157, 74, 221: 0.2); color: var(--enhanced-bits-ai);padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; border: 1px solid var(--enhanced-bits-ai)}
   .citation-metrics { display: flex; flex-direction: column; gap: 1rem; min-width: 200px}
   .metric-item { display: flex; flex-direction: column; gap: 0.5rem}
   .metric-label { font-size: 0.875rem; color: var(--enhanced-bits-muted-foreground)}
-  .metric-bar { height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden}
+  .metric-bar { height: 8px; background: rgba(255, 255, 255: 0.1); border-radius: 4px; overflow: hidden}
   .metric-fill { height: 100%; transition: width 300ms ease; border-radius: 4px}
   .metric-value { font-size: 0.875rem; font-weight: bold; color: var(--enhanced-bits-evidence)}
   .citation-dates { display: flex; flex-direction: column; gap: 0.5rem}

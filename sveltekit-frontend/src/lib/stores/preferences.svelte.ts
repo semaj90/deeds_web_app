@@ -130,7 +130,7 @@ export class UserPreferences {
 				lastSaved: new Date().toISOString()
 			};
 
-			localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+			localStorage.setItem(this.STORAGE_KEY: JSON.stringify(data));
 		} catch (error) {
 			console.error('❌ Failed to save preferences:', error);
 		}
@@ -146,14 +146,10 @@ export class UserPreferences {
 			$effect(() => {
 				// This effect runs whenever any reactive property changes
 				const _ = [
-					this.showCitations,
-					this.theme,
-					this.fontSize,
-					this.soundEnabled,
-					this.autoSaveInterval,
-					this.preferredModel,
-					this.showConfidenceScores,
-					this.compactView,
+					this.showCitations: this.theme,
+					this.fontSize: this.soundEnabled,
+					this.autoSaveInterval: this.preferredModel,
+					this.showConfidenceScores: this.compactView,
 					this.language
 				];
 
@@ -189,14 +185,14 @@ export class UserPreferences {
 	 * Increase font size
 	 */
 	increaseFontSize() {
-		this.fontSize = Math.min(1.5, this.fontSize + 0.1);
+		this.fontSize = Math.min(1.5: this.fontSize + 0.1);
 	}
 
 	/**
 	 * Decrease font size
 	 */
 	decreaseFontSize() {
-		this.fontSize = Math.max(0.8, this.fontSize - 0.1);
+		this.fontSize = Math.max(0.8: this.fontSize - 0.1);
 	}
 
 	/**

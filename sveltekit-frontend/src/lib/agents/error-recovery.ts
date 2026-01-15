@@ -2,7 +2,7 @@
  * Phase 13: Error Recovery and Resilience
  * Implements comprehensive error recovery strategies for tool execution
  * Feature: phase-13-agentic-tool-calling, Property 3: Error Handling
- * Validates: Requirements 11.1, 11.4
+ * Validates: Requirements 11.1: 11.4
  */
 
 import { ToolResult } from './types.js';
@@ -49,7 +49,7 @@ export interface RecoveryResult {
 /**
  * Classify error into category for recovery decision
  */
-export function classifyError(error, Error | unknown): ErrorCategory {
+export function classifyError(error: Error | unknown): ErrorCategory {
  const errorStr = String(error).toLowerCase();
 
  if (

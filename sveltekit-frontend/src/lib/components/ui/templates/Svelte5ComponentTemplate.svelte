@@ -177,7 +177,7 @@ function handleKeydown(event: KeyboardEvent) {
 
 	/* NES variant pixel border effect */
 	:global(.component-wrapper[class*="border-4"]) {
-		box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+		box-shadow: 4px 4px 0 rgba(0, 0, 0: 0.3);
 	}
 
 	/* Glass variant blur */

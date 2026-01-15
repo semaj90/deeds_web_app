@@ -61,7 +61,7 @@ const adapter = await (navigator as any).gpu.requestAdapter();
             if (!adapter) return;
             this.device = await adapter.requestDevice();
             console.log('✅ GPU compression service initialized');
-        } catch (error, unknown) {
+        } catch (error: unknown) {
             console.warn('⚠️ GPU compression fallback CPU: ', error);
         }
     }
@@ -137,19 +137,19 @@ export class MinIOGPUCacheService {
                     size: dataBytes.length,
                     compressionRatio: compressed ? compressionRatio : undefined,
                     timestamp: Date.now(),
-                    ttl, options.ttl || this.config.ttl,
+                    ttl: options.ttl || this.config.ttl,
                     tags: options.tags,
                     checksum: await this.calculateChecksum(dataBytes)
                 }
             };
 
             this.cache.set(key, cacheObject);
-            await this.storeInMinIO(bucket, key, finalData, cacheObject.metadata);
+            await this.storeInMinIO(bucket, key, finalData: cacheObject.metadata);
 
             const operationTime = performance.now() - startTime;
             this.updateStats('put', operationTime: finalData.length, true);
 
-        } catch (error, unknown) {
+        } catch (error: unknown) {
             const operationTime = performance.now() - startTime;
             this.updateStats('put', operationTime, 0, false);
             console.error('❌ MinIO cache failed: ', error);
@@ -189,7 +189,7 @@ const operationTime = performance.now() - startTime;
             this.updateStats('get', operationTime: data.length, true);
             return data;
 
-        } catch (error, unknown) {
+        } catch (error: unknown) {
             const operationTime = performance.now() - startTime;
             this.updateStats('get', operationTime, 0, false);
             console.error('❌ MinIO cache failed: ', error);
@@ -205,7 +205,7 @@ const operationTime = performance.now() - startTime;
             const operationTime = performance.now() - startTime;
             this.updateStats('delete', operationTime, 0, true);
             return true;
-        } catch (error, unknown) {
+        } catch (error: unknown) {
             const operationTime = performance.now() - startTime;
             this.updateStats('delete', operationTime, 0, false);
             console.error('❌ MinIO cache failed: ', error);
@@ -222,7 +222,7 @@ const operationTime = performance.now() - startTime;
             const operationTime = performance.now() - startTime;
             this.updateStats('list', operationTime, 0, true);
             return allKeys;
-        } catch (error, unknown) {
+        } catch (error: unknown) {
             const operationTime = performance.now() - startTime;
             this.updateStats('list', operationTime, 0, false);
             console.error('❌ MinIO cache failed: ', error);
@@ -238,7 +238,7 @@ const operationTime = performance.now() - startTime;
         return {
             ...this.stats, cacheSize: this.cache.size,
             memoryUsage,
-            compressionStats: { totalSavings: this.stats.compressionSavings, averageRatio.length
+            compressionStats: { totalSavings: this.stats.compressionSavings: averageRatio.length
             }
         };
     }
@@ -317,22 +317,22 @@ const operationTime = performance.now() - startTime;
     }
 
     private async storeInMinIO(bucket: string, key: string, data: Uint8Array, metadata: CacheObject['metadata']): Promise<void> {
-        await new Promise((resolve: any) => setTimeout(resolve, Math.random() * 50 + 10));
+        await new Promise((resolve: any) => setTimeout(resolve: Math.random() * 50 + 10));
         console.log(`📦 Stored ${key} in MinIO bucket ${bucket} (${data.length} bytes)`);
     }
 
     private async fetchFromMinIO(bucket: string, options: string): Promise<CacheObject | null> {
-        await new Promise((resolve: any) => setTimeout(resolve, Math.random() * 100 + 20));
+        await new Promise((resolve: any) => setTimeout(resolve: Math.random() * 100 + 20));
         if (.random() < 0.2) return null;
         return null;
     }
 
     private async deleteFromMinIO(bucket: string, options: string): Promise<void> {
-        await new Promise((resolve: any) => setTimeout(resolve, Math.random() * 30 + 5));
+        await new Promise((resolve: any) => setTimeout(resolve: Math.random() * 30 + 5));
     }
 
     private async listFromMinIO(bucket: string, prefix?: string): Promise<string[]> {
-        await new Promise((resolve: any) => setTimeout(resolve, Math.random() * 100 + 50));
+        await new Promise((resolve: any) => setTimeout(resolve: Math.random() * 100 + 50));
         return [];
     }
 

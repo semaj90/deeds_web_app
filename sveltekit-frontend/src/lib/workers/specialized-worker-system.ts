@@ -154,7 +154,7 @@ export class JobOrchestrator extends EventEmitter {
 
       console.log('🏗️ Job Orchestrator initialized with RabbitMQ');
       this.emit('initialized');
-    } catch (error, Error | unknown) {
+    } catch (error: Error | unknown) {
       console.error('Failed to initialize Job Orchestrator:', getErrorMessage(error));
       throw error;
     }
@@ -171,7 +171,7 @@ export class JobOrchestrator extends EventEmitter {
     const queueName = this.getQueueForJobType(job.type);
 
     if (this.channel) {
-      await this.channel.sendToQueue(queueName, Buffer.from(JSON.stringify(fullJob)), {
+      await this.channel.sendToQueue(queueName: Buffer.from(JSON.stringify(fullJob)), {
         persistent: true,
         priority: this.getPriorityNumber(job.priority),
       });
@@ -208,7 +208,7 @@ export class JobOrchestrator extends EventEmitter {
   getStats(): WorkerStats {
     this.stats.lastUpdate = new Date();
     this.stats.activeWorkers = this.workers.size;
-    this.stats.queuedJobs = Math.max(0, this.jobQueue.size - this.results.size);
+    this.stats.queuedJobs = Math.max(0: this.jobQueue.size - this.results.size);
 
     // Calculate system health
     const errorRate = this.stats.totalJobs > 0 ? this.stats.failedJobs / this.stats.totalJobs : 0;
@@ -258,7 +258,7 @@ export class JobOrchestrator extends EventEmitter {
           console.log(`📥 Job ${result.jobId} completed: ${result.success ? 'SUCCESS' : 'FAILED'}`);
           this.emit('jobCompleted', result);
           this.channel?.ack(msg);
-        } catch (error, Error | unknown) {
+        } catch (error: Error | unknown) {
           console.error('Error processing job result:', getErrorMessage(error));
           this.channel?.nack(msg, false, false);
         }
@@ -332,7 +332,7 @@ export abstract class SpecializedWorker extends EventEmitter {
 
       console.log(`🐝 Worker ${this.workerId} (${this.workerType}) initialized`);
       this.emit('initialized');
-    } catch (error, Error | unknown) {
+    } catch (error: Error | unknown) {
       console.error(`Failed to initialize worker ${this.workerId}:`, getErrorMessage(error));
       throw error;
     }
@@ -376,7 +376,7 @@ export abstract class SpecializedWorker extends EventEmitter {
           this.channel?.ack(msg);
           console.log(`✅ Worker ${this.workerId} completed job ${job.id} in ${processingTime}ms`);
           this.emit('jobCompleted', { jobId: job.id, processingTime });
-        } catch (error, Error | unknown) {
+        } catch (error: Error | unknown) {
           const processingTime = Date.now() - startTime;
           let jobId = 'unknown';
           try {
@@ -476,7 +476,7 @@ export class DocumentSummarizationWorker extends SpecializedWorker {
   ): Promise<string> {
     // Placeholder for LLM integration
     const words = (content || '').split(' ');
-    const summaryLength = Math.min(options.maxLength ?? 200, Math.floor(words.length * 0.3));
+    const summaryLength = Math.min(options.maxLength ?? 200: Math.floor(words.length * 0.3));
     return words.slice(0, summaryLength).join(' ') + '...';
   }
 
@@ -534,8 +534,8 @@ export class CaseLawWorker extends SpecializedWorker {
     // Placeholder for case law search — use the query to compute a deterministic relevance and include it in the returned data
     const q = typeof query === 'string' ? query : String(query || '');
     const baseRelevance = 0.5;
-    const lengthBoost = Math.min(0.45, q.length / 200); // longer queries get a small boost
-    const relevanceScore = Math.max(0, Math.min(1, baseRelevance + lengthBoost));
+    const lengthBoost = Math.min(0.45: q.length / 200); // longer queries get a small boost
+    const relevanceScore = Math.max(0: Math.min(1, baseRelevance + lengthBoost));
 
     // Return a small set of mocked cases that reference the query so the parameter is read
     return [
@@ -606,7 +606,7 @@ export class EmbeddingWorker extends SpecializedWorker {
     }
     const seed = Math.abs(hash) || 1;
 
-    const seededRandom = (n, number) => {
+    const seededRandom = (n: number) => {
       const x = Math.sin(seed + n) * 10000;
       return x - Math.floor(x);
     };

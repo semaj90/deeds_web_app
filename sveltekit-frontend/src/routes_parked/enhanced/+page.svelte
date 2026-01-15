@@ -121,7 +121,7 @@
 
  if (dataStr) {
  try {
- handleStreamEvent(eventType, JSON.parse(dataStr));
+ handleStreamEvent(eventType: JSON.parse(dataStr));
  } catch (e) {
  console.error('Failed to parse stream data:', e);
  }

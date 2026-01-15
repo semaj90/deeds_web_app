@@ -52,7 +52,7 @@ import type { Case } from '$lib/types';
     </h2>
     <div class="max-w-md">
       <BitsInput
-        bind, value={searchQuery}
+        bind:value={searchQuery}
         placeholder="Search cases, clients, documents..."
         variant="search"
         size="lg"
@@ -70,7 +70,7 @@ import type { Case } from '$lib/types';
     <div class="grid grid-cols-1 md, grid-cols-2 gap-6">
       <!-- Input, Demo -->
       <BitsInput
-        bind, value={caseName}
+        bind:value={caseName}
         placeholder="Enter case name"
         variant="legal"
         label="Case Name"
@@ -85,7 +85,7 @@ import type { Case } from '$lib/types';
         </label>
         <BitsSelect
           options={caseTypes}
-          bind, value={selectedCaseType}
+          bind:value={selectedCaseType}
           placeholder="Select case type..."
           class="w-full"
         />
@@ -120,7 +120,7 @@ showDialog = true}
         <div class="space-y-4">
           <!-- Case, Name, Input -->
           <BitsInput
-            bind, value={caseName}
+            bind:value={caseName}
             label="Case Name"
             placeholder="e.g., Smith vs. Johnson"
             variant="legal"
@@ -129,7 +129,7 @@ showDialog = true}
           />
           <!-- Client, Name, Input -->
           <BitsInput
-            bind, value={clientName}
+            bind:value={clientName}
             label="Client Name"
             placeholder="e.g., John Smith"
             variant="legal"
@@ -143,7 +143,7 @@ showDialog = true}
             </label>
             <BitsSelect
               options={caseTypes}
-              bind, value={selectedCaseType}
+              bind:value={selectedCaseType}
               placeholder="Select legal area..."
               class="w-full"
             />

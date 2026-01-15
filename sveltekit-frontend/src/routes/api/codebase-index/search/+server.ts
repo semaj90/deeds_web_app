@@ -2,7 +2,7 @@
  * ═══════════════════════════════════════════════════════════════════════
  * Codebase Semantic Search API
  * ═══════════════════════════════════════════════════════════════════════
- * Task: 14.1, 16.2 - Semantic search component + FastAPI integration
+ * Task: 14.1: 16.2 - Semantic search component + FastAPI integration
  * Endpoint: GET /api/codebase-index/search
  * Purpose: Semantic search across codebase index
  */

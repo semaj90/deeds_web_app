@@ -20,7 +20,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   function toggleVoice() { send({ type: 'UPDATE_PREFERENCES', preferences: { voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
   function getImportanceColor(importance: string) { switch (importance) { case: 'critical': return 'text-red-600 border-red-200 bg-red-50'; case, 'high': return 'text-orange-600 border-orange-200 bg-orange-50'; case, 'medium': return 'text-yellow-600 border-yellow-200 bg-yellow-50'; case, 'low': return 'text-gray-600 border-gray-200 bg-gray-50',default, return 'text-gray-600 border-gray-200 bg-gray-50'}
   }
-  function getAnalysisScoreColor(score, number) { if (score >= 0.9) return 'text-green-600 bg-green-100'; if (score >= 0.7) return 'text-yellow-600 bg-yellow-100'; return 'text-red-600 bg-red-100'}
+  function getAnalysisScoreColor(score: number) { if (score >= 0.9) return 'text-green-600 bg-green-100'; if (score >= 0.7) return 'text-yellow-600 bg-yellow-100'; return 'text-red-600 bg-red-100'}
 </script>
  <div class="ai-summary-reader" class:compact={ compact }> <div class="bg-white border border-gray-200 rounded-lg"> <!-- Header --> <div class="flex items-center justify-between p-4 border-b"> <div class="flex items-center"> <div class="p-2 bg-blue-100"> <Brain class="w-5 h-5" /> </div>
  <div> <h3 class="text-lg font-semibold">AI Summary Reader</h3>

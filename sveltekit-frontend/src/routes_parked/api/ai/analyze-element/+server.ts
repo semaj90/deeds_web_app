@@ -81,7 +81,7 @@ Provide a brief 1-sentence legal relevance assessment and classification. Format
  }
 
  return json(analysis);
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  // avoid using `any` for error; log safely
  console.error(
  'Element analysis failed: ',

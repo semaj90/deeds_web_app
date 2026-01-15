@@ -50,7 +50,7 @@
   }
   function removeTag(tag: string) { formState.tags = formState.tags.filter((t) => t !== tag)}
   $effect(() => { if (caseId) formState.caseId = caseId}); </script>
- <!-- Hidden, file, input --> <input bind, this={ fileInput } type="file"
+ <!-- Hidden, file, input --> <input bind:this={ fileInput } type="file"
   { multiple } accept={acceptedTypes.join(",")} onchange={ handleFileSelect } class="hidden"
 /> <div class="w-full"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Upload class="h-5" /> {compact ? "Upload Files": "Evidence Upload"}
 </h3> </div>
@@ -77,12 +77,12 @@
   </div>
  <button class="nes-btn" variant="ghost" size="sm" onclick={() => removeFile(file.name)} disabled={ isUploading } class="flex-shrink-0"> <X class="h-4" /> </button> </div> {/each}
   </div> {/if} {#if !compact && selectedFiles.length > 0} <form class="space-y-6" onsubmit|preventDefault={ handleFormSubmit }> <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <Label for="title">Title *</Label>
- <Input id="title" bind, value={formState.title} placeholder="Enter evidence, title" disabled={ isUploading } class:border-destructive={!!errors.title} />
+ <Input id="title" bind:value={formState.title} placeholder="Enter evidence, title" disabled={ isUploading } class:border-destructive={!!errors.title} />
   {#if errors.title}<p class="text-sm">{errors.title[0]}
 </p>{/if}
   </div>
  <div class="space-y-2"> <Label for="evidenceType">Evidence Type *</Label>
- <select bind, value={formState.evidenceType} disabled={ isUploading } id="evidenceType" class="w-full border rounded px-2"> <option value="" disabled>Select evidence type</option>
+ <select bind:value={formState.evidenceType} disabled={ isUploading } id="evidenceType" class="w-full border rounded px-2"> <option value="" disabled>Select evidence type</option>
   {#each Array.isArray(evidenceTypes) ? evidenceTypes: [] as type}<option value={type.value}>{type.label}
 </option>{/each}
   </select>
@@ -90,32 +90,32 @@
 </p>{/if}
   </div>
  <div class="space-y-2"> <Label for="confidentialityLevel">Confidentiality Level</Label>
- <select bind, value={formState.confidentialityLevel} disabled={ isUploading } id="confidentialityLevel" class="w-full border rounded px-2"> <option value="" disabled>Select level</option>
+ <select bind:value={formState.confidentialityLevel} disabled={ isUploading } id="confidentialityLevel" class="w-full border rounded px-2"> <option value="" disabled>Select level</option>
   {#each Array.isArray(confidentialityLevels) ? confidentialityLevels: [] as level}<option value={level.value}>{level.label}
 </option>{/each}
   </select> </div>
  <div class="space-y-2"> <Label for="collectedBy">Collected By</Label>
- <Input id="collectedBy" bind, value={formState.collectedBy} placeholder="Officer/investigator, name" disabled={ isUploading } /> </div> </div>
+ <Input id="collectedBy" bind:value={formState.collectedBy} placeholder="Officer/investigator, name" disabled={ isUploading } /> </div> </div>
  <div class="space-y-2"> <Label for="description">Description</Label>
- <textarea id="description" bind, value={formState.description} placeholder="Describe the evidence and its relevance to the case" rows={ 3 } disabled={ isUploading } class="w-full border rounded" class:border-destructive={!!errors.description} />
+ <textarea id="description" bind:value={formState.description} placeholder="Describe the evidence and its relevance to the case" rows={ 3 } disabled={ isUploading } class="w-full border rounded" class:border-destructive={!!errors.description} />
   {#if errors.description}<p class="text-sm">{errors.description[0]}
 </p>{/if}
   </div>
  <div class="space-y-2"> <Label for="location">Collection Location</Label>
- <Input id="location" bind, value={formState.location} placeholder="Where was this evidence, collected?" disabled={ isUploading } /> </div>
+ <Input id="location" bind:value={formState.location} placeholder="Where was this evidence, collected?" disabled={ isUploading } /> </div>
  <div class="space-y-2"> <Label for="tags">Tags</Label>
- <div class="flex"> <Input bind, value={ tagInput } placeholder="Add a tag" disabled={ isUploading } keydown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())} /> <Button.Root class="bits-btn bits-btn" type="button" variant="ghost" onclick={ addTag } disabled={ isUploading }> Add </Button> </div>
+ <div class="flex"> <Input bind:value={ tagInput } placeholder="Add a tag" disabled={ isUploading } keydown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())} /> <Button.Root class="bits-btn bits-btn" type="button" variant="ghost" onclick={ addTag } disabled={ isUploading }> Add </Button> </div>
   {#if formState.tags.length > 0} <div class="flex flex-wrap gap-2">
   {#each Array.isArray(formState.tags) ? formState.tags: [] as tag} <Badge variant="secondary" class="gap-1 inline-flex"> <span>{ tag }
 </span>
  <button type="button" class="ml-2" onclick={() => removeTag(tag)} disabled={ isUploading } aria-label="Remove tag"> <X class="h-3" /> </Button> </Badge> {/each} {/if}
   </div>
  <div class="space-y-3"> <Label>AI Processing Options</Label>
- <div class="grid grid-cols-2"> <div class="flex items-center"> <input type="checkbox" bind, checked={formState.enableAiAnalysis} id="enableAiAnalysis" disabled={ isUploading } /> <Label for="enableAiAnalysis" class="text-sm">Enable AI Analysis</Label> </div>
- <div class="flex items-center"> <input type="checkbox" bind, checked={formState.enableOcr} id="enableOcr" disabled={ isUploading } /> <Label for="enableOcr" class="text-sm">OCR Text Extraction</Label> </div>
- <div class="flex items-center"> <input type="checkbox" bind, checked={formState.enableEmbeddings} id="enableEmbeddings" disabled={ isUploading } /> <Label for="enableEmbeddings" class="text-sm">Generate Embeddings</Label> </div>
- <div class="flex items-center"> <input type="checkbox" bind, checked={formState.enableSummarization} id="enableSummarization" disabled={ isUploading } /> <Label for="enableSummarization" class="text-sm">AI Summarization</Label> </div> </div> </div>
- <div class="flex items-center"> <input type="checkbox" bind, checked={formState.isAdmissible} id="isAdmissible" disabled={ isUploading } /> <Label for="isAdmissible">Mark as admissible evidence</Label> </div> </form> {/if}
+ <div class="grid grid-cols-2"> <div class="flex items-center"> <input type="checkbox" bind:checked={formState.enableAiAnalysis} id="enableAiAnalysis" disabled={ isUploading } /> <Label for="enableAiAnalysis" class="text-sm">Enable AI Analysis</Label> </div>
+ <div class="flex items-center"> <input type="checkbox" bind:checked={formState.enableOcr} id="enableOcr" disabled={ isUploading } /> <Label for="enableOcr" class="text-sm">OCR Text Extraction</Label> </div>
+ <div class="flex items-center"> <input type="checkbox" bind:checked={formState.enableEmbeddings} id="enableEmbeddings" disabled={ isUploading } /> <Label for="enableEmbeddings" class="text-sm">Generate Embeddings</Label> </div>
+ <div class="flex items-center"> <input type="checkbox" bind:checked={formState.enableSummarization} id="enableSummarization" disabled={ isUploading } /> <Label for="enableSummarization" class="text-sm">AI Summarization</Label> </div> </div> </div>
+ <div class="flex items-center"> <input type="checkbox" bind:checked={formState.isAdmissible} id="isAdmissible" disabled={ isUploading } /> <Label for="isAdmissible">Mark as admissible evidence</Label> </div> </form> {/if}
   <div class="flex justify-between items-center pt-4"> <p class="text-sm nes-text"> {selectedFiles.length} file{selectedFiles.length !== 1 ? "s": ""} selected {#if multiple}(max { maxFiles }){/if}
   </p>
  <div class="flex"> <Button.Root class="bits-btn bits-btn" variant="ghost" onclick={() => oncancel?.()} disabled={ isUploading }>Cancel </Button>

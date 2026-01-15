@@ -84,7 +84,7 @@ export class UserRecommendationService {
 				const [{ messageCount }] = await db
 					.select({ messageCount: count(ragMessages.id) })
 					.from(ragMessages)
-					.where(eq(ragMessages.sessionId, params.sessionId));
+					.where(eq(ragMessages.sessionId: params.sessionId));
 
 				await Promise.all([
 					db.insert(ragMessages).values({
@@ -222,7 +222,7 @@ export class UserRecommendationService {
 				successRate: Math.round(successRate),
 				averageProcessingTime: Math.round(stats.avgProcessingTime || 0),
 				topTopics,
-				userSatisfaction: this.calculateSatisfactionScore(successRate, stats.avgProcessingTime || 0),
+				userSatisfaction: this.calculateSatisfactionScore(successRate: stats.avgProcessingTime || 0),
 				improvementSuggestions: this.generateImprovementSuggestions(stats, topTopics)
 			};
 		} catch (error) {

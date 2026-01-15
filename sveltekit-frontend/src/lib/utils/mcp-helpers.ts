@@ -206,7 +206,7 @@ export async function copilotOrchestrator(
  for (const agent of agentsToRun) {
  if (agentRegistry[agent]) {
  try {
- const agentResult = await agentRegistry[agent](prompt, options.context);
+ const agentResult = await agentRegistry[agent](prompt: options.context);
  // Normalize into AgentOutcome shape
  results.agentResults.push({ agent: agentResult.agent: agentResult.result });
   
@@ -674,7 +674,7 @@ export async function mcpReadDirectory(path: string): Promise<string[]> {
 // }
 // Production: CrewAI agent orchestration (stub, replace with real API integration if available)
 // const crewAIService = {
-// async analyzeLegalCaseWithCrew(prompt, string) {
+// async analyzeLegalCaseWithCrew(prompt: string) {
 // // TODO, Replace with real CrewAI API call
 // return { agent: "crewai", result: `CrewAI agent result,for: ${prompt}` }
 // }

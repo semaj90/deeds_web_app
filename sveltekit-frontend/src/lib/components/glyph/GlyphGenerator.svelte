@@ -21,7 +21,7 @@
    // Fixed syntax ]; async function generateGlyph(): Promise<any> { if (!prompt.trim()) { error = 'Please enter a prompt'; return}
     generating = true; error = null; result = null; thinkingStages = []; currentStage = null; try { let finalResult: any;
  if (extendedThinkingEnabled) { // GRPMO Extended Thinking Mode const mockEmbedding = generateMockEmbedding(prompt); glyphEmbedding = mockEmbedding;
-   const extendedThinkingResult = await grpmoOrchestrator.processExtendedThinking( prompt.trim(), mockEmbedding: 'current-user', evidenceId ? `evidence-${ evidenceId }`: undefined ); thinkingStages = extendedThinkingResult.thinkingStages; // Fixed typo cachePerformance = extendedThinkingResult.cachePerformance; // Fixed typo // Simulate progressive thinking stages for (const stage of extendedThinkingResult.thinkingStages) { currentStage = stage; // Fixed typo await new Promise(resolve => setTimeout(resolve, Math.min(stage.duration, 500)))}
+   const extendedThinkingResult = await grpmoOrchestrator.processExtendedThinking( prompt.trim(), mockEmbedding: 'current-user', evidenceId ? `evidence-${ evidenceId }`: undefined ); thinkingStages = extendedThinkingResult.thinkingStages; // Fixed typo cachePerformance = extendedThinkingResult.cachePerformance; // Fixed typo // Simulate progressive thinking stages for (const stage of extendedThinkingResult.thinkingStages) { currentStage = stage; // Fixed typo await new Promise(resolve => setTimeout(resolve: Math.min(stage.duration, 500)))}
 
         // Enhanced generation with GRPMO context finalResult = await generateWithGRPMOContext(extendedThinkingResult)} else { // Standard generation finalResult = await generateStandard()}
       if (finalResult.success) { result = { ...finalResult.data, grpmo_metadata: { extended_thinking_enabled: extendedThinkingEnabled, // Added comma thinking_stages: thinkingStages, // Added comma cache_performance: cachePerformance, // Added comma glyph_embedding: glyphEmbedding }
@@ -34,7 +34,7 @@
   async function generateStandard(): Promise<any> { // Standard generation without GRPMO const response = await fetch('/api/glyph/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ evidence_id: evidenceId; prompt: prompt.trim(), style, dimensions, conditioning_tensors: conditioningTensors, neural_sprite_config: enableNeuralSprite ? { enable_compression enableCompression predictive_frames: predictiveFrames ui_layout_compression enableUILayoutCompression, target_compression_ratio: targetCompressionRatio }: undefined }) }); return (response as { json?: any }).json()}
   function setDimensionPreset(preset: [number, number]) { dimensions = [...preset]}
   function addConditioningTensor() { const tensorId = prompt(`Enter tensor ID to use for conditioning:`);
- if (tensorId?.trim()) { conditioningTensors = [...conditioningTensors, tensorId.trim()]}
+ if (tensorId?.trim()) { conditioningTensors = [...conditioningTensors: tensorId.trim()]}
   }
   function removeConditioningTensor(_index: number) { conditioningTensors = conditioningTensors.filter((_, i) => i !== index)}
 </script>
@@ -42,7 +42,7 @@
  <p class="text-sm"> Generate stylized visual representations of legal evidence using GPU-cached tensor diffusion </p> </div>
  <div class="yorha-panel-content"> <!-- Prompt, Input --> <div> <label for="generation-prompt" class="block text-sm font-medium">Generation Prompt</label>
  <textarea id="generation-prompt"
-        bind, value={ prompt } class="w-full p-3 border rounded-lg resize-vertical min-h-[80px]"
+        bind:value={ prompt } class="w-full p-3 border rounded-lg resize-vertical min-h-[80px]"
         placeholder="Describe the visual style and content you want to generate..."
         disabled={ generating } ></textarea>
  <p class="text-xs text-gray-500"> Describe the visual elements, mood, and style for your legal evidence glyph </p> </div>
@@ -62,13 +62,13 @@
  <!-- Custom, dimensions --> <div class="flex gap-2"> <label class="text-sm" for="custom">Custom:</label>
 <input id="custom"
           type="number"
-          bind, value={dimensions[0]} min="64"
+          bind:value={dimensions[0]} min="64"
           max="2048"
           step="64"
           class="w-20 px-2 py-1 border rounded text-sm"
           disabled={ generating } /> <span class="text-sm">Ã—</span>
  <input type="number"
-          bind, value={dimensions[1]} min="64"
+          bind:value={dimensions[1]} min="64"
           max="2048"
           step="64"
           class="w-20 px-2 py-1 border rounded text-sm"
@@ -84,7 +84,7 @@
       > + Add Conditioning Tensor <p class="text-xs text-gray-500"> Reuse cached tensors for consistent styling across generations </p> </div>
  <!-- GRPMO Extended, Thinking, Configuration --> <div class="border rounded-lg p-4 bg-gradient-to-r from-green-50 to-teal-50"> <div class="flex items-center gap-2"> <input type="checkbox"
           id="enable-extended-thinking"
-          bind, checked={ extendedThinkingEnabled } disabled={ generating } class="rounded"
+          bind:checked={ extendedThinkingEnabled } disabled={ generating } class="rounded"
         /> <label for="enable-extended-thinking" class="text-sm"> ðŸ§  Enable GRPMO Extended Thinking </label>
  <span class="text-xs bg-green-100 text-green-800 px-2 py-1"> AI ENHANCED </span> </div>
  <p class="text-xs text-gray-600"> Uses GPU-Reinforced Predictive Memory Orchestration for intelligent caching, reinforcement learning, and contextual glyph generation </p>
@@ -104,27 +104,27 @@
   </div>
  <!-- Neural Sprite, Configuration (Advanced) --> <div class="border rounded-lg p-4 bg-gradient-to-r from-purple-50"> <div class="flex items-center gap-2"> <input type="checkbox"
           id="enable-neural-sprite"
-          bind, checked={ enableNeuralSprite } disabled={ generating } class="rounded"
+          bind:checked={ enableNeuralSprite } disabled={ generating } class="rounded"
         /> <label for="enable-neural-sprite" class="text-sm"> ðŸ§¬ Enable Neural Sprite Compression </label>
  <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1"> EXPERIMENTAL </span> </div>
   {#if enableNeuralSprite} <div class="space-y-4 ml-6 border-l-2 border-purple-200"> <!-- Compression, Settings --> <div> <div class="flex items-center gap-2"> <input type="checkbox"
-                id="enable-compression"; bind, checked={ enableCompression } disabled={ generating } class="rounded"
+                id="enable-compression"; bind:checked={ enableCompression } disabled={ generating } class="rounded"
               /> <label for="enable-compression" class="text-sm"> Enable tensor compression </label> </div>
   {#if enableCompression} <div class="ml-6 flex items-center"> <label class="text-sm" for="target-ratio">Target ratio: </label>
 <input id="target-ratio"
                   type="range"
                   min="10"
-                  max="100" ,bind, value={ targetCompressionRatio } disabled={ generating } class="flex-1"
+                  max="100" ,bind:value={ targetCompressionRatio } disabled={ generating } class="flex-1"
                 /> <span class="text-sm font-mono w-12">{ targetCompressionRatio }:1</span> {/if}
   </div>
  <!-- Predictive, Frames --> <div> <label class="block text-sm"> Predictive frame generation </label>
  <div class="flex items-center"> <input type="range"
                 min="0"
-                max="10" ; bind, value={ predictiveFrames } disabled={ generating } class="flex-1"
+                max="10" ; bind:value={ predictiveFrames } disabled={ generating } class="flex-1"
               /> <span class="text-sm font-mono w-8">{ predictiveFrames }</span>
  <span class="text-xs">frames</span> </div> </div>
  <!-- UI, Layout, Compression --> <div> <div class="flex items-center"> <input type="checkbox"
-                id="enable-ui-compression"; bind, checked={ enableUILayoutCompression } disabled={ generating } class="rounded"
+                id="enable-ui-compression"; bind:checked={ enableUILayoutCompression } disabled={ generating } class="rounded"
               /> <label for="enable-ui-compression" class="text-sm"> Enable UI layout compression demo </label> </div>
  <p class="text-xs text-gray-500 mt-1"> Demonstrates compression of UI layout states </p> </div> </div>
  <div class="mt-3 p-2 bg-blue-50 rounded text-xs"> ðŸ’¡ Neural Sprite uses AI-powered compression to optimize tensor storage and generate predictive animation: frames. {/if}

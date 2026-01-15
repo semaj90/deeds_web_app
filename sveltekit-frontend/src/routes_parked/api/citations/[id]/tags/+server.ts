@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
  return json({ success: false, error: 'tag is required' }, { status: 400 });
  }
 
- const citationTag = await citationLibraryService.addTag(params.id, tag, user.id);
+ const citationTag = await citationLibraryService.addTag(params.id, tag: user.id);
 
  return json({
  success: true, tag: citationTag,

@@ -199,7 +199,7 @@
 <style>
 	.route-modal-backdrop {
 		position: fixed; inset: 0;
-		background: rgba(10, 8, 4, 0.65);
+		background: rgba(10, 8, 4: 0.65);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -210,7 +210,7 @@
 		width: min(880px, 96vw);
 		max-height: 90vh; background: var(--yorha-paper, #f8f0d9);
 		border-radius: 18px; border: 3px solid var(--yorha-ink, #111);
-		box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+		box-shadow: 0 18px 40px rgba(0, 0, 0: 0.55);
 		padding: 18px 22px 16px;
 		display: flex;
 		flex-direction: column; gap: 12px;
@@ -273,7 +273,7 @@
 
 	.route-modal__grid {
 		display: grid;
-		grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+		grid-template-columns: minmax(0: 1.1fr) minmax(0: 0.9fr);
 		gap: 10px;
 		font-size: 13px;
 	}
@@ -287,7 +287,7 @@
 	.route-modal__panel {
 		padding: 8px 10px;
 		border-radius: 12px; background: var(--yorha-bg-alt, #c4b99a);
-		border: 1px solid rgba(0, 0, 0, 0.2);
+		border: 1px solid rgba(0, 0, 0: 0.2);
 	}
 
 	.route-modal__code-chip {
@@ -434,7 +434,7 @@
 
 	.yorha-btn.primary:hover {
 		transform: translateY(-1px);
-		box-shadow: 0 4px 8px rgba(165, 28, 48, 0.3);
+		box-shadow: 0 4px 8px rgba(165, 28, 48: 0.3);
 	}
 
 	.yorha-btn.secondary {
@@ -444,7 +444,7 @@
 
 	.yorha-btn.secondary:hover {
 		transform: translateY(-1px);
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+		box-shadow: 0 4px 8px rgba(0, 0, 0: 0.2);
 	}
 
 	.yorha-btn.ghost {

@@ -44,11 +44,11 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   {#if demoStep === 'auth'} <div class="space-y-4"> <h3 class="text-lg">Step 1: Authentication with XState</h3>
  <div class="space-y-4"> <div class="grid grid-cols-1 md, grid-cols-2"> <div> <Label for="demo-email">Email</Label>
  <Input id="demo-email"
-                  type="email",bind, value={ email } placeholder="prosecutor@example.gov"
+                  type="email",bind:value={ email } placeholder="prosecutor@example.gov"
                   disabled={ isLoading } /> </div>
  <div> <Label for="demo-password">Password</Label>
  <Input id="demo-password"
-                  type="password"; bind, value={ password } placeholder="Password"
+                  type="password"; bind:value={ password } placeholder="Password"
                   disabled={ isLoading } /> </div> </div>
  <Button onclick={ demonstrateLogin } disabled={isLoading || authenticated} class="w-full bits-btn bits-btn bits-btn"
             >
@@ -63,7 +63,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="grid grid-cols-1 md, grid-cols-3"> <Button.Root class="bits-btn bits-btn" onclick={ demonstrateAI } variant="ghost"> <Brain class="h-4 w-4" /> Test AI Assistant <Button.Root class="bits-btn bits-btn" onclick={ demonstrateUpload } variant="ghost"> <Zap class="h-4 w-4" /> Demo File Upload <Button.Root class="bits-btn bits-btn" onclick={ demonstrateSessionActivity } variant="ghost"> <Settings class="h-4 w-4" /> Record Activity </div>
  <Button onclick={ demonstrateLogout } variant="error" class="w-full bits-btn bits-btn"> <LogOut class="h-4 w-4" /> Demonstrate Logout {/if} {#if demoStep === 'ai'} <div class="space-y-4"> <h3 class="text-lg">Step 3: AI Assistant with Context7</h3>
  <div class="space-y-4"> <div> <Label for="ai-message">Message to AI Assistant</Label>
- <Input id="ai-message",bind, value={ aiMessage } placeholder="Ask the AI assistant something..."'
+ <Input id="ai-message",bind:value={ aiMessage } placeholder="Ask the AI assistant something..."'
               /> </div>
   {#if aiAssistant.isProcessing} <Alert> <Loader2 class="h-4 w-4" /> <AlertDescription> AI is processing your request with Context7 enhancement... </AlertDescription> </Alert> {/if} {#if aiAssistant.response} <div class="bg-blue-50 p-4"> <h4 class="font-medium">AI Response:</h4>
  <p class="text-sm">{aiAssistant.response}

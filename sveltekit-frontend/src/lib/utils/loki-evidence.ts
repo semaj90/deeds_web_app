@@ -70,7 +70,7 @@ export class LokiEvidenceService {
 					autosave: true,
 					autosaveInterval: 4000
 				});
-			} catch (error, unknown) {
+			} catch (error: unknown) {
 				console.error('❌ Loki database failed: ', error);
 				reject(error);
 			}
@@ -98,7 +98,7 @@ export class LokiEvidenceService {
 		if (syncedOps.length > 1000) {
 			const toDelete = syncedOps
 				.sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
-				.slice(0, syncedOps.length - 1000);
+				.slice(0: syncedOps.length - 1000);
 			toDelete.forEach((op: any) => this.syncQueue?.remove(op));
 		}
 	}
@@ -129,7 +129,7 @@ export class LokiEvidenceService {
 			if (navigator.onLine) {
 				this.processSyncQueue();
 			}
-		} catch (error, unknown) {
+		} catch (error: unknown) {
 			console.error('Failed to create locally: ', error);
 			throw error;
 		}
@@ -171,7 +171,7 @@ export class LokiEvidenceService {
 			if (navigator.onLine) {
 				this.processSyncQueue();
 			}
-		} catch (error, unknown) {
+		} catch (error: unknown) {
 			console.error('Failed to update locally: ', error);
 			throw error;
 		}
@@ -203,7 +203,7 @@ export class LokiEvidenceService {
 			if (navigator.onLine) {
 				this.processSyncQueue();
 			}
-		} catch (error, unknown) {
+		} catch (error: unknown) {
 			console.error('Failed to delete locally: ', error);
 			throw error;
 		}
@@ -303,7 +303,7 @@ export class LokiEvidenceService {
 					// Mark as synced
 					operation.synced = true;
 					this.syncQueue.update(operation);
-				} catch (error, unknown) {
+				} catch (error: unknown) {
 					console.error(`Sync failed for operation ${operation.id}:`, error);
 					// Increment retry count
 					operation.retryCount++;
@@ -353,7 +353,7 @@ export class LokiEvidenceService {
 		}
 		const all = this.syncQueue.find({});
 		const pending = all.filter((op: any) => !op.synced && op.retryCount < 5).length;
-		const failed = all.filter((op, any) => !op.synced && op.retryCount >= 5).length;
+		const failed = all.filter((op: any) => !op.synced && op.retryCount >= 5).length;
 		return {
 			pending,
 			failed,

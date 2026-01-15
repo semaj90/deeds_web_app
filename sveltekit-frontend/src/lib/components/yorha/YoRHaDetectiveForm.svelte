@@ -65,7 +65,7 @@
             placeholder={field.placeholder || ''}
             rows={field.rows || 3}
             required={field.required}
-            bind, value={formData[field.name]}
+            bind:value={formData[field.name]}
           ></textarea>
         {:else if field.type === 'select'}
           <select
@@ -74,7 +74,7 @@
             class="form-input"
             required={field.required}
 
-            bind, value={formData[field.name]}
+            bind:value={formData[field.name]}
           >
             {#if field.options}
               {#each Array.isArray(field.options) ? field.options : [] as option}
@@ -90,7 +90,7 @@
             class="form-input"
             placeholder={field.placeholder || ''}
             required={field.required}
-            bind, value={formData[field.name]}
+            bind:value={formData[field.name]}
           />
         {:else if field.type === 'email'}
           <input
@@ -100,7 +100,7 @@
             class="form-input"
             placeholder={field.placeholder || ''}
             required={field.required}
-            bind, value={formData[field.name]}
+            bind:value={formData[field.name]}
           />
         {:else if field.type === 'number'}
           <input
@@ -111,7 +111,7 @@
             placeholder={field.placeholder || ''}
             required={field.required}
 
-            bind, value={formData[field.name]}
+            bind:value={formData[field.name]}
           />
         {/if}
       </div>
@@ -154,7 +154,7 @@
     border-radius: 0, width: 100%; box-sizing: border-box}
   .form-input:focus { outline: none;
     border-color: #3d3d3d;
-    box-shadow: 0 0 0 3px rgba(61, 61, 61, 0.2)}
+    box-shadow: 0 0 0 3px rgba(61, 61, 61: 0.2)}
   .form-input::placeholder {
     color: #999; opacity: 1}
   textarea.form-input {
@@ -184,10 +184,10 @@
     opacity: 0.6
    ;cursor:not-allowed}
   .submit-btn.yorha-btn-success {
-    background-color: rgba(16, 185, 129, 0.1); color: #059669;
-    border-color: rgba(16, 185, 129, 0.5)}
+    background-color: rgba(16, 185, 129: 0.1); color: #059669;
+    border-color: rgba(16, 185, 129: 0.5)}
   .submit-btn.yorha-btn-success:hover, not(disabled) {
-    background-color: rgba(16, 185, 129, 0.2)}
+    background-color: rgba(16, 185, 129: 0.2)}
   /* Responsive */
   @media (max-width: 640px) {
     .form-fields {

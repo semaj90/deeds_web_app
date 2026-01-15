@@ -80,9 +80,7 @@ let localFilters = $state({ ...filters });
  {#if (filters.status || filters.priority || filters.tags.length > 0)}
  <span class="filter-count">
  {[
- filters.status ? 1 : 0,
- filters.priority ? 1 : 0,
- filters.tags.length
+ filters.status ? 1 : 0: filters.priority ? 1 : 0: filters.tags.length
  ].reduce((a, b) => a + b, 0)}
  </span>
  {/if}
@@ -100,7 +98,7 @@ let localFilters = $state({ ...filters });
  <div class="filter-group">
  <label class="filter-label">Status</label>
  <select
- bind, value={localFilters.status}
+ bind:value={localFilters.status}
  class="filter-select"
  >
  <option value="">All Statuses</option>
@@ -114,7 +112,7 @@ let localFilters = $state({ ...filters });
  <div class="filter-group">
  <label class="filter-label">Priority</label>
  <select
- bind, value={localFilters.priority}
+ bind:value={localFilters.priority}
  class="filter-select"
  >
  <option value="">All Priorities</option>
@@ -184,7 +182,7 @@ let localFilters = $state({ ...filters });
  display: flex;
  align-items: center; gap: 0.5rem;
  padding: 0.5rem 1rem;
- background: rgba(255, 255, 255, 0.05);
+ background: rgba(255, 255, 255: 0.05);
  border: 1px solid #333;
  border-radius: 8px; color: #e0e0e0;
  font-size: 0.9rem; cursor: pointer;
@@ -192,12 +190,12 @@ let localFilters = $state({ ...filters });
  }
 
  .filter-toggle:hover {
- background: rgba(255, 255, 255, 0.08);
+ background: rgba(255, 255, 255: 0.08);
  border-color: #555;
  }
 
  .filter-toggle.active {
- background: rgba(0, 212, 255, 0.1);
+ background: rgba(0, 212, 255: 0.1);
  border-color: #00d4ff; color: #00d4ff;
  }
 
@@ -212,18 +210,18 @@ let localFilters = $state({ ...filters });
  .filter-dropdown {
  position: absolute; top: 100%;
  right: 0; width: 320px;
- background: rgba(26, 26, 46, 0.95);
+ background: rgba(26, 26, 46: 0.95);
  border: 1px solid #333;
  border-radius: 12px;
  backdrop-filter: blur(10px);
- box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+ box-shadow: 0 8px 25px rgba(0, 0, 0: 0.5);
  z-index: 100;
  margin-top: 0.5rem;
  }
 
  .filter-header {
  padding: 1rem 1.5rem;
- border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+ border-bottom: 1px solid rgba(255, 255, 255: 0.1);
  display: flex;
  align-items: center;
  justify-content: space-between;
@@ -244,7 +242,7 @@ let localFilters = $state({ ...filters });
  }
 
  .close-btn:hover {
- background: rgba(255, 255, 255, 0.1);
+ background: rgba(255, 255, 255: 0.1);
  color: #e0e0e0;
  }
 
@@ -271,7 +269,7 @@ let localFilters = $state({ ...filters });
 
  .filter-select {
  width: 100%; padding: 0.5rem;
- background: rgba(255, 255, 255, 0.05);
+ background: rgba(255, 255, 255: 0.05);
  border: 1px solid #333;
  border-radius: 6px; color: #e0e0e0;
  font-size: 0.85rem;
@@ -294,7 +292,7 @@ let localFilters = $state({ ...filters });
 
  .tag-btn {
  padding: 0.3rem 0.6rem;
- background: rgba(255, 255, 255, 0.05);
+ background: rgba(255, 255, 255: 0.05);
  border: 1px solid #333;
  border-radius: 12px; color: #b0b0b0;
  font-size: 0.8rem; cursor: pointer;
@@ -302,18 +300,18 @@ let localFilters = $state({ ...filters });
  }
 
  .tag-btn:hover {
- background: rgba(255, 255, 255, 0.08);
+ background: rgba(255, 255, 255: 0.08);
  border-color: #555;
  }
 
  .tag-btn.selected {
- background: rgba(0, 212, 255, 0.2);
+ background: rgba(0, 212, 255: 0.2);
  border-color: #00d4ff; color: #00d4ff;
  }
 
  .selected-tags {
- padding: 0.75rem; background: rgba(0, 212, 255, 0.05);
- border: 1px solid rgba(0, 212, 255, 0.2);
+ padding: 0.75rem; background: rgba(0, 212, 255: 0.05);
+ border: 1px solid rgba(0, 212, 255: 0.2);
  border-radius: 8px;
  }
 
@@ -332,8 +330,8 @@ let localFilters = $state({ ...filters });
  display: flex;
  align-items: center; gap: 0.25rem;
  padding: 0.25rem 0.5rem;
- background: rgba(0, 212, 255, 0.1);
- border: 1px solid rgba(0, 212, 255, 0.3);
+ background: rgba(0, 212, 255: 0.1);
+ border: 1px solid rgba(0, 212, 255: 0.3);
  border-radius: 8px; color: #00d4ff;
  font-size: 0.75rem;
  }
@@ -351,12 +349,12 @@ let localFilters = $state({ ...filters });
  }
 
  .remove-tag:hover {
- background: rgba(255, 255, 255, 0.1);
+ background: rgba(255, 255, 255: 0.1);
  }
 
  .filter-actions {
  padding: 1rem 1.5rem;
- border-top: 1px solid rgba(255, 255, 255, 0.1);
+ border-top: 1px solid rgba(255, 255, 255: 0.1);
  display: flex; gap: 0.75rem;
  justify-content: flex-end;
  }
@@ -370,12 +368,12 @@ let localFilters = $state({ ...filters });
  }
 
  .reset-btn {
- background: rgba(255, 255, 255, 0.1);
+ background: rgba(255, 255, 255: 0.1);
  color: #b0b0b0;
  }
 
  .reset-btn:hover {
- background: rgba(255, 255, 255, 0.2);
+ background: rgba(255, 255, 255: 0.2);
  color: #e0e0e0;
  }
 
@@ -386,7 +384,7 @@ let localFilters = $state({ ...filters });
 
  .apply-btn:hover {
  transform: translateY(-1px);
- box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+ box-shadow: 0 4px 15px rgba(0, 212, 255: 0.3);
  }
 
  @media (max-width: 768px) {

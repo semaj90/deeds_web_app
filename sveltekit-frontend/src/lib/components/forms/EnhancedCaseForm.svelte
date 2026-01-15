@@ -132,7 +132,7 @@
         <input
           id="title"
           type="text"
-          bind, value={formData.title}
+          bind:value={formData.title}
           placeholder="Enter case title"
  class:error={!!errors.title}
           required
@@ -146,7 +146,7 @@
         <input
           id="caseNumber"
           type="text"
-          bind, value={formData.caseNumber}
+          bind:value={formData.caseNumber}
           placeholder="e.g., CASE-2024-001"
           class:error={errors.caseNumber}
           required
@@ -160,7 +160,7 @@
         <input
           id="name"
           type="text"
-          bind, value={formData.name}
+          bind:value={formData.name}
           placeholder="Alternative case name"
         />
       </div>
@@ -168,7 +168,7 @@
         <label for="description">Description</label>
         <textarea
           id="description"
-          bind, value={formData.description}
+          bind:value={formData.description}
           placeholder="Detailed case description"
           rows="4"
         ></textarea>
@@ -180,7 +180,7 @@
       <div class="container mx-auto">
         <div class="container mx-auto">
           <label for="priority">Priority</label>
-          <select id="priority" bind, value={formData.priority}>
+          <select id="priority" bind:value={formData.priority}>
             <option value="low">Low</option>
             <option value="medium">Medium</option>
             <option value="high">High</option>
@@ -189,7 +189,7 @@
         </div>
         <div class="container mx-auto">
           <label for="status">Status</label>
-          <select id="status" bind, value={formData.status}>
+          <select id="status" bind:value={formData.status}>
             <option value="open">Open</option>
             <option value="active">Active</option>
             <option value="pending">Pending</option>
@@ -203,7 +203,7 @@
         <input
           id="category"
           type="text"
-          bind, value={formData.category}
+          bind:value={formData.category}
           placeholder="e.g., Criminal, Civil, Administrative"
         />
       </div>
@@ -215,7 +215,7 @@
             type="number"
             min="0"
             max="10"
-            bind, value={formData.dangerScore}; class:error={errors.dangerScore}
+            bind:value={formData.dangerScore}; class:error={errors.dangerScore}
           />
           {#if errors.dangerScore}
             <span class="container mx-auto">{errors.dangerScore}</span>
@@ -227,7 +227,7 @@
             id="estimatedValue"
             type="number"
             step="0.01"
-            bind, value={formData.estimatedValue}
+            bind:value={formData.estimatedValue}
             placeholder="0.00"
  class:error={errors.estimatedValue}
           />
@@ -245,7 +245,7 @@
         <input
           id="incidentDate"
           type="date"
-          bind, value={formData.incidentDate}
+          bind:value={formData.incidentDate}
         />
       </div>
       <div class="container mx-auto">
@@ -253,7 +253,7 @@
         <input
           id="location"
           type="text"
-          bind, value={formData.location}
+          bind:value={formData.location}
           placeholder="Incident location"
         />
       </div>
@@ -262,7 +262,7 @@
         <input
           id="jurisdiction"
           type="text"
-          bind, value={formData.jurisdiction}
+          bind:value={formData.jurisdiction}
           placeholder="e.g., City County, State Police"
         />
       </div>
@@ -335,7 +335,7 @@
     background: white
     border-radius: 8px
    ;padding: 2rem
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1)}
+    box-shadow: 0 2px 8px rgba(0, 0, 0: 0.1)}
   .form-grid {
     display: grid, gap: 2rem}
   .form-section h3 { margin: 0, 0 1rem 0
@@ -367,7 +367,7 @@
    ;transition: border-color 0.2s, box-shadow 0.2s}; input: focus; select:focus;
   textarea:focus { outline: none
     border-color: #3b82f6
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
+    box-shadow: 0 0 0 3px rgba(59, 130, 246: 0.1)}
   input.error {
     border-color: #ef4444}
   .field-error {

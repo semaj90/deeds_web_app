@@ -97,7 +97,7 @@ export class WebAssemblyAIAdapter {
 		if (!this.initialized) await this.initialize();
 		const startTime = performance.now();
 		// FIX: Corrected argument passing syntax
-		const prompt = this.buildPrompt(message, options.conversationHistory || []);
+		const prompt = this.buildPrompt(message: options.conversationHistory || []);
 
 		let response: WebAssemblyAIResponse;
 		switch (this.activeMethod) {

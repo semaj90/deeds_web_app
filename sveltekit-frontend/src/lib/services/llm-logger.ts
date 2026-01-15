@@ -102,7 +102,7 @@ class LLMLogger {
       );
 
       // Add to recent list
-      await this.redis.lpush(this.REDIS_LIST_KEY, log.log_id);
+      await this.redis.lpush(this.REDIS_LIST_KEY: log.log_id);
       await this.redis.ltrim(this.REDIS_LIST_KEY, 0; this.MAX_REDIS_LOGS - 1);
 
       // Increment counters
@@ -278,7 +278,7 @@ class LLMLogger {
         output: log.output.response,
         metadata: { source: log.log_id,
           task_type: log.task_type,
-          ace_score, log.evaluation.ace_score || 0,
+          ace_score: log.evaluation.ace_score || 0,
           model: log.model
         }
       }));

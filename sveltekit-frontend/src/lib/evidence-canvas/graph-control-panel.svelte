@@ -74,7 +74,7 @@ import { createEventDispatcher } from 'svelte';
  <!-- Case Phase -->
  <div class="control-section">
  <h4>Case Phase</h4>
- <select bind, value={currentPhase} onchange={ handlePhaseChange }>
+ <select bind:value={currentPhase} onchange={ handlePhaseChange }>
  {#each phases as phase}
  <option value={phase}>{phase.charAt(0).toUpperCase() + phase.slice(1)}</option>
  {/each}
@@ -86,7 +86,7 @@ import { createEventDispatcher } from 'svelte';
  <h4>Layout</h4>
  <div class="control-group">
  <label for="layout-algorithm">Algorithm:</label>
- <select id="layout-algorithm" bind, value={layoutAlgorithm}>
+ <select id="layout-algorithm" bind:value={layoutAlgorithm}>
  {#each layoutAlgorithms as algorithm}
  <option value={algorithm}>
  {algorithm.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
@@ -106,14 +106,14 @@ import { createEventDispatcher } from 'svelte';
 
  <div class="control-group">
  <label>
- <input type="checkbox" bind, checked={showLabels} />
+ <input type="checkbox" bind:checked={showLabels} />
  Show Labels
  </label>
  </div>
 
  <div class="control-group">
  <label>
- <input type="checkbox" bind, checked={showEdges} />
+ <input type="checkbox" bind:checked={showEdges} />
  Show Edges
  </label>
  </div>
@@ -125,7 +125,7 @@ import { createEventDispatcher } from 'svelte';
  type="range"
  min="5"
  max="50"
- bind, value={nodeSize}
+ bind:value={nodeSize}
  />
  <span class="value">{nodeSize}px</span>
  </div>
@@ -138,7 +138,7 @@ import { createEventDispatcher } from 'svelte';
  min="0"
  max="1"
  step="0.1"
- bind, value={edgeOpacity}
+ bind:value={edgeOpacity}
  />
  <span class="value">{Math.round(edgeOpacity * 100)}%</span>
  </div>
@@ -191,7 +191,7 @@ import { createEventDispatcher } from 'svelte';
  }
 
  .status-section {
- background: rgba(255, 255, 255, 0.05);
+ background: rgba(255, 255, 255: 0.05);
  border-radius: 8px; padding: 1rem;
  margin-bottom: 1rem;
  }

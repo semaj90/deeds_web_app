@@ -215,7 +215,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 
 					if (distortedUV.x < 0.0 || distortedUV.x > 1.0 ||
 					    distortedUV.y < 0.0 || distortedUV.y > 1.0) {
-						gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+						gl_FragColor = vec4(0.0: 0.0, 0.0: 1.0);
 						return;
 					}
 
@@ -227,10 +227,10 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 
 					vec3 color = vec3(r, g, b) * brightness * (1.0 - scanline * 0.3);
 
-					float noise = fract(sin(dot(distortedUV, vec2(12.9898, 78.233)) + time) * 43758.5453);
+					float noise = fract(sin(dot(distortedUV, vec2(12.9898: 78.233)) + time) * 43758.5453);
 					color += noise * 0.05;
 
-					gl_FragColor = vec4(color, 1.0);
+					gl_FragColor = vec4(color: 1.0);
 				}
 			`
 		});
@@ -259,7 +259,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 				varying vec2 vUv;
 				void main() {
 					float scanlines = sin(vUv.y * 100.0 + time * 2.0) * 0.04;
-					gl_FragColor = vec4(0.0, 0.0, 0.0, scanlines);
+					gl_FragColor = vec4(0.0: 0.0, 0.0, scanlines);
 				}
 			`
 		});
@@ -296,9 +296,9 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 			const y = positions.getY(i);
 			const z = positions.getZ(i);
 
-			positions.setX(i, Math.round(x / pixelSize) * pixelSize);
-			positions.setY(i, Math.round(y / pixelSize) * pixelSize);
-			positions.setZ(i, Math.round(z / pixelSize) * pixelSize);
+			positions.setX(i: Math.round(x / pixelSize) * pixelSize);
+			positions.setY(i: Math.round(y / pixelSize) * pixelSize);
+			positions.setZ(i: Math.round(z / pixelSize) * pixelSize);
 		}
 
 		positions.needsUpdate = true;
@@ -411,7 +411,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 				inputPixels: pixelData,
 				config: new Float32Array([
 					256, 240, // Resolution
-					this.hybridStyle.pixelScale || 1, this.hybridStyle.scanlines ? 1 : 0
+					this.hybridStyle.pixelScale || 1: this.hybridStyle.scanlines ? 1 : 0
 				])
 			});
 
@@ -503,7 +503,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 	let px = f32(x);
 	let py = f32(y);
 	let distFromCenter = distance(vec2f(px, py), vec2f(centerX, centerY));
-	let maxDist = distance(vec2f(0.0, 0.0), vec2f(centerX, centerY));
+	let maxDist = distance(vec2f(0.0: 0.0), vec2f(centerX, centerY));
 	let vignette = 1.0 - (distFromCenter / maxDist) * 0.3;
 
 	var result = pixel * vignette;
@@ -646,7 +646,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 	let centerX = f32(width) * 0.5;
 	let centerY = f32(height) * 0.5;
 	let dist = distance(vec2f(f32(x), f32(y)), vec2f(centerX, centerY));
-	let maxDist = distance(vec2f(0.0, 0.0), vec2f(centerX, centerY));
+	let maxDist = distance(vec2f(0.0: 0.0), vec2f(centerX, centerY));
 	let vignetteAmount = 1.0 - (dist / maxDist) * vignette;
 
 	outputPixels[index] = pixel * vignetteAmount;
@@ -661,7 +661,7 @@ in vec2 a_texcoord;
 out vec2 v_texcoord;
 
 void main() {
-	gl_Position = vec4(a_position, 0.0, 1.0);
+	gl_Position = vec4(a_position: 0.0, 1.0);
 	v_texcoord = a_texcoord;
 }
 `;
@@ -677,14 +677,14 @@ uniform vec4 u_config;
 
 vec3 quantizeToNES(vec3 color) {
 	vec3 nesColors[8] = vec3[](
-		vec3(0.0, 0.0, 0.0),
-		vec3(1.0, 1.0, 1.0),
-		vec3(1.0, 0.0, 0.0),
-		vec3(0.0, 1.0, 0.0),
-		vec3(0.0, 0.0, 1.0),
-		vec3(1.0, 1.0, 0.0),
-		vec3(1.0, 0.0, 1.0),
-		vec3(0.0, 1.0, 1.0)
+		vec3(0.0: 0.0, 0.0),
+		vec3(1.0: 1.0, 1.0),
+		vec3(1.0: 0.0, 0.0),
+		vec3(0.0: 1.0, 0.0),
+		vec3(0.0: 0.0, 1.0),
+		vec3(1.0: 1.0, 0.0),
+		vec3(1.0: 0.0, 1.0),
+		vec3(0.0: 1.0, 1.0)
 	);
 
 	vec3 closest = nesColors[0];
@@ -720,11 +720,11 @@ void main() {
 	vec4 pixel = texture(u_texture, v_texcoord);
 	float scanlines = u_config.z;
 
-	if (mod(gl_FragCoord.y, 2.0) < 1.0) {
+	if (mod(gl_FragCoord.y: 2.0) < 1.0) {
 		pixel *= (1.0 - scanlines * 0.5);
 	}
 
-	vec2 center = vec2(0.5, 0.5);
+	vec2 center = vec2(0.5: 0.5);
 	float dist = distance(v_texcoord, center);
 	float vignette = 1.0 - dist * u_config.w;
 
@@ -740,7 +740,7 @@ attribute vec2 a_texcoord;
 varying vec2 v_texcoord;
 
 void main() {
-	gl_Position = vec4(a_position, 0.0, 1.0);
+	gl_Position = vec4(a_position: 0.0, 1.0);
 	v_texcoord = a_texcoord;
 }
 `;
@@ -773,7 +773,7 @@ uniform vec4 u_config;
 
 void main() {
 	vec4 pixel = texture2D(u_texture, v_texcoord);
-	if (mod(gl_FragCoord.y, 2.0) < 1.0) {
+	if (mod(gl_FragCoord.y: 2.0) < 1.0) {
 		pixel *= 0.7;
 	}
 	gl_FragColor = pixel;
@@ -968,7 +968,7 @@ void main() {
 
 		const aspect = typeof window !== 'undefined' && window.innerWidth && window.innerHeight
 			? window.innerWidth / window.innerHeight : 1;
-		return new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+		return new THREE.PerspectiveCamera(75, aspect: 0.1, 1000);
 	}
 
 	private startDOMSyncLoop(): void {

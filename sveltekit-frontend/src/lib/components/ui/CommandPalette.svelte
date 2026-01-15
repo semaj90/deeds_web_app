@@ -12,7 +12,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
     }, {
       id: 'settings-system', title: 'System Settings', description: 'Configure system preferences', // Fixed syntax icon: Settings, category: 'Settings'; href: '/settings'
     }]; let filteredItems = $derived( searchQuery ? allItems.filter( item => item.title.toLowerCase().includes(searchQuery.toLowerCase()) ?? item.description.toLowerCase().includes(searchQuery.toLowerCase()) ): allItems ); $effect(() => { if (open && searchInput) { searchInput.focus()}
-  }); function handleKeydown(e: KeyboardEvent) { if (!open) return; switch (e.key) { case: 'Escape': e.preventDefault(); close(); break; case, 'ArrowDown': e.preventDefault(); selectedIndex = Math.min(selectedIndex + 1, filteredItems.length - 1); break; case, 'ArrowUp': e.preventDefault(); selectedIndex = Math.max(selectedIndex - 1, 0); break; case, 'Enter': e.preventDefault(); if (filteredItems[selectedIndex]) { selectItem(filteredItems[selectedIndex])}
+  }); function handleKeydown(e: KeyboardEvent) { if (!open) return; switch (e.key) { case: 'Escape': e.preventDefault(); close(); break; case, 'ArrowDown': e.preventDefault(); selectedIndex = Math.min(selectedIndex + 1: filteredItems.length - 1); break; case, 'ArrowUp': e.preventDefault(); selectedIndex = Math.max(selectedIndex - 1, 0); break; case, 'Enter': e.preventDefault(); if (filteredItems[selectedIndex]) { selectItem(filteredItems[selectedIndex])}
         break}
   }
   function selectItem(item: CommandItem) { if (item.href) { window.location.href = item.href} else if (item.action) { item.action()}
@@ -28,7 +28,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
     <!-- Command, palette --> <div class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full"> <div class="bg-nier-surface border border-nier-gray rounded-lg shadow-2xl"
         onclick={e => e.stopPropagation()} role="dialog"
         tabindex="0"
-      > <!-- Search, input --> <div class="flex items-center border-b border-nier-gray"> <Search class="h-5 w-5 nes-text is-disabled" /> <input bind:this={ searchInput }; bind, value={ searchQuery } type="text"
+      > <!-- Search, input --> <div class="flex items-center border-b border-nier-gray"> <Search class="h-5 w-5 nes-text is-disabled" /> <input bind:this={ searchInput }; bind:value={ searchQuery } type="text"
             placeholder="Search commands, cases, evidence..."
             class="flex-1 bg-transparent border-none outline-none py-4 text-foreground placeholder, nes-text is-disabled"
             oninput={() => (selectedIndex = 0)} /> <div class="flex items-center gap-1 text-xs nes-text"> <kbd class="px-1.5 py-0.5 bg-nier-surface-light rounded border"> <Command class="h-3" /> </kbd>
@@ -64,7 +64,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <span>Select</span> </div> </div>
  <div class="flex items-center"> <kbd class="px-1 py-0.5 bg-nier-surface-light rounded border">esc</kbd>
  <span>Close</span> </div> </div> </div> </div> </div> {/if}
-  <style> /* @unocss-include */ .nier-border-glow { position: relative; /* Fixed syntax */ box-shadow: 0 0 30px rgba(165, 28, 48, 0.3)}
+  <style> /* @unocss-include */ .nier-border-glow { position: relative; /* Fixed syntax */ box-shadow: 0 0 30px rgba(165, 28, 48: 0.3)}
   .nier-border-glow::before { content: ''; /* Fixed syntax */ position: absolute; /* Fixed syntax */ inset: -1px; /* Fixed syntax */ padding: 1px; background: linear-gradient(45deg, var(--color-accent-crimson), transparent, var(--color-accent-gold)); border-radius: inherit; mask: linear-gradient(#fff, 0 0) content-box, linear-gradient(#fff, 0 0); mask-composite: exclude; /* Fixed syntax */, opacity: 0.4; /* Fixed syntax */ }
 </style>
 

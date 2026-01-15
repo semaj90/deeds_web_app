@@ -46,7 +46,7 @@
  <div class="search-input-group flex gap-2 items-center">
  <input
  type="text"
- bind, value={query}
+ bind:value={query}
  onkeydown={ handleKeydown }
  placeholder="Search your legal corpus (Supremacy Clause, AB 32, etc.)"
  class="input input-bordered flex-1"
@@ -76,7 +76,7 @@
  <label class="flex items-center gap-2 cursor-pointer">
  <input
  type="checkbox"
- bind, checked={includeKag}
+ bind:checked={includeKag}
  class="checkbox checkbox-sm"
  disabled={$searchLoading}
  />
@@ -85,7 +85,7 @@
  <label class="flex items-center gap-2 cursor-pointer">
  <input
  type="checkbox"
- bind, checked={includeReasoning}
+ bind:checked={includeReasoning}
  class="checkbox checkbox-sm"
  disabled={$searchLoading}
  />
@@ -203,7 +203,7 @@
  }
 
  .result-chunk:hover {
- box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+ box-shadow: 0 2px 8px rgba(0, 0, 0: 0.1);
  }
 </style>
 

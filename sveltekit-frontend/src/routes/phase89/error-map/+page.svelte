@@ -126,8 +126,8 @@
 		ctx.lineWidth = 1;
 		links.forEach((link: any) => {
 			ctx.beginPath();
-			ctx.moveTo(link.source.x, link.source.y);
-			ctx.lineTo(link.target.x, link.target.y);
+			ctx.moveTo(link.source.x: link.source.y);
+			ctx.lineTo(link.target.x: link.target.y);
 			ctx.stroke();
 		});
   
@@ -137,14 +137,14 @@
 
 			ctx.fillStyle = color;
 			ctx.beginPath();
-			ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
+			ctx.arc(node.x: node.y, radius, 0, 2 * Math.PI);
 			ctx.fill();
 
 			// Label for important nodes
 			if (node.kind === 'file' && node.error_count > 10) {
 				ctx.fillStyle = '#fff';
 				ctx.font = '10px sans-serif';
-				ctx.fillText(node.label.split('/').pop(), node.x + radius + 2, node.y + 3);
+				ctx.fillText(node.label.split('/').pop(), node.x + radius + 2: node.y + 3);
 			}
 		});
 	}
@@ -251,7 +251,7 @@
 					<h2>🔍 Search</h2>
 					<input
 						type="text"
-						bind, value={searchQuery}
+						bind:value={searchQuery}
 						onkeydown={e => e.key === 'Enter' && search()}
 						placeholder="Search files, errors, symbols..."
 						class="search-input"
@@ -265,7 +265,7 @@
 						Expand Depth:
 						<input
 							type="range"
-							bind, value={expandDepth}
+							bind:value={expandDepth}
 							min="1"
 							max="3"
 							step="1"
@@ -289,7 +289,7 @@
 			<main class="center-panel">
 				<h2>🕸️ Knowledge Graph ({nodes.length} nodes, {links.length} edges)</h2>
 				<canvas
-					bind, this={canvas}
+					bind:this={canvas}
 					width={width}
 					height={height}
 					onclick={ handleCanvasClick }

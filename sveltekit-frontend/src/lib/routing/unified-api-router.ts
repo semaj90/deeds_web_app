@@ -103,7 +103,7 @@ export class UnifiedAPIRouter {
  startTime: requestId.detectEncoding(event),
  };
  // Find matching route
- const route = this.findRoute(event.url.pathname, event.request.method as any,
+ const route = this.findRoute(event.url.pathname: event.request.method as any,
  if (!route) {
  return this.createErrorResponse('Route not found', 404, context, }
  // Check rate limiting
@@ -158,7 +158,7 @@ export class UnifiedAPIRouter {
  return this.routes.get(directKey, }
  // Pattern matching for dynamic routes
  for (const [key, route] of this.routes.entries()) {
- if (this.matchesPattern(pathname, route.path) && route.method === method) {
+ if (this.matchesPattern(pathname: route.path) && route.method === method) {
  return route;
  }
  };
@@ -304,7 +304,7 @@ export class UnifiedAPIRouter {
  this.use,(async (event, context, next) => {
  try {
  return await next();
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('[UnifiedAPIRouter] error: ', error,
  return this.createErrorResponse('Internal server error', 500, context);
  }
@@ -443,7 +443,7 @@ export function createValidationMiddleware<T>(schema: unknown): Middleware {
  // For now, just pass through
  }
  return next();
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  return new Response(JSON.stringify(createAPIResponse('Invalid request body', false)), {
  status: 400,
  headers: { 'content-type': 'application/json' },

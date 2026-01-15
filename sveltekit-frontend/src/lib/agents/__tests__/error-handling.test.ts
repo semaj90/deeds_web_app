@@ -1,7 +1,7 @@
 /**
  * Phase 13: Property-Based Tests for Error Handling
  * Feature: phase-13-agentic-tool-calling, Property 3: Error Handling
- * Validates: Requirements 11.1, 11.4
+ * Validates: Requirements 11.1: 11.4
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
@@ -31,7 +31,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  /**
  * Property 3: Error Handling
  * For any tool execution that fails, the system SHALL return an error message without crashing.
- * Validates: Requirements 11.1, 11.4
+ * Validates: Requirements 11.1: 11.4
  */
 
  describe('Error Classification', () => {

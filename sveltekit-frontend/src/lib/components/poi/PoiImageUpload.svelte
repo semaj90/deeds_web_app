@@ -35,7 +35,7 @@
   {#if preview} <Button onclick={ clearPreview } disabled={ uploading } class="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 bits-btn"
           > <X class="w-4" /> </Button> {/if}
   </div> </div> </div>
- <!-- Hidden, file, input --> <input bind, this={ fileInput } type="file"
+ <!-- Hidden, file, input --> <input bind:this={ fileInput } type="file"
     accept="image/jpeg,image/png"
     onchange={ handleFileSelect } style="display, none"
   /> <p class="text-xs"> Images are stored securely in MinIO S3 and cached for, 30 days </p> </div>

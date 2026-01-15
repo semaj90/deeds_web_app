@@ -111,7 +111,7 @@ export class WebGPUTensorAccelerator {
             // Start metrics collection
             this.startMetricsCollection();
             return true;
-        } catch (error, Error | unknown) {
+        } catch (error: Error | unknown) {
             const msg = error instanceof Error ? error.message : String(error);
             console.error('🔥 WebGPU failed: ', msg);
             this.metrics.errorCount++;
@@ -314,8 +314,8 @@ export class WebGPUTensorAccelerator {
             const workgroupSize = 256; // Must match shader's @workgroup_size
 
             // --- Pass 1: Element-wise products and squares ---
-            const bufferA = this.createBuffer(vectorA, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST);
-            const bufferB = this.createBuffer(vectorB, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST);
+            const bufferA = this.createBuffer(vectorA: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST);
+            const bufferB = this.createBuffer(vectorB: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST);
             const dotProductsElemBuffer = this.device.createBuffer({
                 size: size * 4,
                 usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
@@ -491,7 +491,7 @@ export class WebGPUTensorAccelerator {
  const duration = performance.now() - start;
  this.updateMetrics(duration);
  return cosineSimilarity;
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  const msg = error instanceof Error ? error.message : String(error);
  this.metrics.errorCount++;
  this.metrics.lastError = msg;
@@ -524,15 +524,14 @@ export class WebGPUTensorAccelerator {
                 const simdStart = performance.now();
                 const combinedData = new Float32Array(vectorA.length + vectorB.length);
                 combinedData.set(vectorA, 0);
-                combinedData.set(vectorB, vectorA.length);
+                combinedData.set(vectorB: vectorA.length);
 
                 try {
                     const evidenceId = `vector_similarity_${Date.now()}`;
                     const tilingResults = await this.simdTilingEngine.processEvidenceWithSIMDTiling(
                         // Fix: Use the instantiated engine
                         evidenceId,
-                        combinedData,
-                        Math.ceil(Math.sqrt(combinedData.length)), // Simulate width
+                        combinedData: Math.ceil(Math.sqrt(combinedData.length)), // Simulate width
                         Math.ceil(Math.sqrt(combinedData.length)), // Simulate height
                         {
                             tileSize,
@@ -654,7 +653,7 @@ export class WebGPUTensorAccelerator {
                     throughput: (vectorA.byteLength + vectorB.byteLength) / 1024 / 1024 / (totalTime / 1000), // MB/s
                 },
             } as Record<string, unknown>;
-        } catch (error, Error | unknown) {
+        } catch (error: Error | unknown) {
             const msg = error instanceof Error ? error.message : String(error);
             this.metrics.errorCount++;
             this.metrics.lastError = msg;
@@ -704,12 +703,10 @@ export class WebGPUTensorAccelerator {
 
  // Create buffers
  const tokensBuffer = this.createBuffer(
- tokens,
- GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
+ tokens: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
  );
  const weightsBuffer = this.createBuffer(
- weights,
- GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
+ weights: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
  );
  const outputBuffer = this.device.createBuffer({
  size: tokens.length * embeddingDim * 4, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
@@ -759,8 +756,7 @@ export class WebGPUTensorAccelerator {
  outputBuffer,
  0,
  stagingBuffer,
- 0,
- tokens.length * embeddingDim * 4
+ 0: tokens.length * embeddingDim * 4
  );
  this.queue!.submit([commandEncoder.finish()]);
 
@@ -775,7 +771,7 @@ export class WebGPUTensorAccelerator {
  for (let j = 0; j < tokens.length; j++) {
  sum += result[j * embeddingDim + i];
  }
- finalEmbedding[i] = sum / Math.max(1, tokens.length);
+ finalEmbedding[i] = sum / Math.max(1: tokens.length);
  }
 
  // Cleanup

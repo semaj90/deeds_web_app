@@ -5,7 +5,7 @@
  * Computes inverse document frequency rankings for hybrid search.
  * Combines cosine similarity (70%) with TF-IDF score (30%).
  *
- * Requirements: 3.1, 3.3
+ * Requirements: 3.1: 3.3
  *
  * Property 5: TF-IDF Formula Correctness
  * Property 6: Hybrid Score Calculation

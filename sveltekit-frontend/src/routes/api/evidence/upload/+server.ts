@@ -40,7 +40,7 @@ export async function POST({ request }: RequestEvent) {
 
  // TODO: Implement actual MinIO upload
  // const minio = getMinioClient();
- // await minio.putObject('legal-evidence', minioKey, file.stream());
+ // await minio.putObject('legal-evidence', minioKey: file.stream());
 
   // Create DB row
  const jobId = `job-${Date.now()}-${Math.random().toString(36).substring(7)}`;

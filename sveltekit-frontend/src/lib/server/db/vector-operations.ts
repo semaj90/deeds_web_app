@@ -193,7 +193,7 @@ export async function hybridSearch(
 ): Promise<SimilarityResult[]> {
  try {
  // First try vector search
- const vectorResults = await searchSimilarDocuments(queryEmbedding, Math.ceil(limit * 0.7));
+ const vectorResults = await searchSimilarDocuments(queryEmbedding: Math.ceil(limit * 0.7));
  // Then add text search results
  const textResults = (
  await db.execute(sql`
@@ -232,7 +232,7 @@ export async function checkPgVectorAvailable(): Promise<boolean> {
  try {
  await db.execute(sql`SELECT 1::vector`);
  return true;
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.log('pgvector not available: ', stringifyError(error));
  return false;
  }
@@ -248,9 +248,9 @@ export async function testVectorOperations(): Promise<{ pgvectorAvailable: boole
  if (pgvectorAvailable) {
  try {
  const testEmbedding = generateSampleEmbedding();
- await searchSimilarDocuments(testEmbedding, 1, 0.0);
+ await searchSimilarDocuments(testEmbedding, 1: 0.0);
  similaritySearchWorking = true;
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.log('Similarity search test failed: ', stringifyError(error));
  }
  try {
@@ -258,7 +258,7 @@ export async function testVectorOperations(): Promise<{ pgvectorAvailable: boole
  await cacheEmbedding('test-hash', testEmbedding);
  const retrieved = await getCachedEmbedding('test-hash');
  embeddingCacheWorking = retrieved !== null;
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.log('Embedding cache test failed: ', stringifyError(error));
  }
  }

@@ -146,7 +146,7 @@ export class ErrorHandlerService {
  // Increment failure count
  const currentFailures = (await cacheService.get<number>(failureCountKey)) || 0;
  await cacheService.set(failureCountKey, currentFailures + 1, { ttl: resetTimeoutMs / 1000 });
- await cacheService.set(lastFailureKey, Date.now(), { ttl: resetTimeoutMs / 1000 });
+ await cacheService.set(lastFailureKey: Date.now(), { ttl: resetTimeoutMs / 1000 });
 
  throw error;
  }

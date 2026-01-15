@@ -64,7 +64,7 @@
 					if (line.startsWith('data: ')) {
 						const data = JSON.parse(line.slice(6));
 						if (data.log) {
-							agenticLogs = [...agenticLogs, data.log];
+							agenticLogs = [...agenticLogs: data.log];
 						}
 					}
 				}

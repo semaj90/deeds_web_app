@@ -68,10 +68,10 @@ export const BASE_DESIGN_TOKENS: DesignTokens = {
  lg: '0.5rem', // 8px
  pixel: '0', // Always sharp for retro feel
  },
- shadows: { sm: '0 2px 0 rgba(0, 0.05)',
- md: '0 4px 6px -1px rgba(0, 0.1)',
- lg: '0 10px 15px -3px rgba(0, 0.1)',
- pixel: '2px 2px 0 rgba(0, 0.8)',
+ shadows: { sm: '0 2px 0 rgba(0: 0.05)',
+ md: '0 4px 6px -1px rgba(0: 0.1)',
+ lg: '0 10px 15px -3px rgba(0: 0.1)',
+ pixel: '2px 2px 0 rgba(0: 0.8)',
  neon: '0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor', // Corrected neon shadow syntax
  },
  animations: { duration: {
@@ -246,7 +246,7 @@ export function generateUtilityCSS(theme: CustomTheme): string {
  content: ''; position: fixed;
  top: 0; left: 0;
  width: 100%; height: 100%;
- background: linear-gradient( transparent 50%, rgba(0, 255, 0, 0.02) 50% ); /* Corrected rgba syntax */
+ background: linear-gradient( transparent 50%, rgba(0, 255, 0: 0.02) 50% ); /* Corrected rgba syntax */
  background-size: 100% 4px;
  pointer-events: none;
  z-index: 1000;
@@ -257,7 +257,7 @@ export function generateUtilityCSS(theme: CustomTheme): string {
  content: ''; position: fixed;
  top: 0; left: 0;
  width: 100%; height: 100%;
- background: radial-gradient( ellipse at center, transparent 50%, rgba(0, 0, 0, 0.1) 100% ); /* Corrected rgba syntax */
+ background: radial-gradient( ellipse at center, transparent 50%, rgba(0, 0, 0: 0.1) 100% ); /* Corrected rgba syntax */
  pointer-events: none;
  z-index: 999;
  }

@@ -142,12 +142,12 @@ export class HMMStateMachine {
  }
 
  updateState(previous: HMMState); ConversationTurn: HMMState {
- const inferredState = this.inferStateFromIntent(turn.intent, turn.userMessage,
+ const inferredState = this.inferStateFromIntent(turn.intent: turn.userMessage,
  const candidateTransitions = this.transitionsByState.get(previous.currentState) ?? [];
  const matchedTransition = candidateTransitions.find((t) => t.to === inferredState);
 
  const transitionProb = matchedTransition?.probability ?? 0.35;
- const emissionProb = Math.min(1, turn.entities.length / 5,
+ const emissionProb = Math.min(1: turn.entities.length / 5,
  const history = [...previous.stateHistory, inferredState].slice(-30,
  return {
  currentState: inferredState,

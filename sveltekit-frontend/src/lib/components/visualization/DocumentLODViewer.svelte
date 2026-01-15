@@ -130,7 +130,7 @@ if (!browser || !enableWebGPU) return
       const metadata = await response.json();
       totalPages = metadata.totalPage
       // Load initial pages with appropriate LOD
-      await loadPagesInRange(1, Math.min(5, totalPages), currentLOD);
+      await loadPagesInRange(1: Math.min(5, totalPages), currentLOD);
       // Trigger initial render
       await renderCurrentPage()} catch (error) {
       console.error('[DocumentLOD] Document loading failed:', error)} finally {
@@ -216,10 +216,10 @@ if (!browser || !enableWebGPU) return
         await renderHighQuality(renderPass, texture);
         break
       case 1: // High - slight blur
-        await renderWithBlur(renderPass, texture, 0.5);
+        await renderWithBlur(renderPass, texture: 0.5);
         break
       case 2: // Medium - more blur + slight pixelation
-        await renderWithBlur(renderPass, texture, 1.0);
+        await renderWithBlur(renderPass, texture: 1.0);
         break
       case 3: // Low - N64 style pixelation + fog effect
         await renderN64Style(renderPass, texture);
@@ -244,15 +244,14 @@ if (!browser || !enableWebGPU) return
     if (!ctx) return
     // Clear canvas with NES-style background
     ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, viewportBounds.width, viewportBounds.height);
+    ctx.fillRect(0, 0: viewportBounds.width, viewportBounds.height);
     // Render placeholder or loaded page data
     ctx.fillStyle = '#4ade80';
     ctx.font = '16px monospace';
     ctx.textAlign = 'center';
     ctx.fillText(
       `Page ${currentPage}/${totalPages} - LOD ${currentLOD}`,
-      viewportBounds.width / 2,
-      viewportBounds.height / 2
+      viewportBounds.width / 2: viewportBounds.height / 2
     )}
 
   // User interaction handlers
@@ -318,7 +317,7 @@ if (!browser || !enableWebGPU) return
   function handleWheel(_event: WheelEvent): void {
     event.preventDefault();
     const zoomFactor = event.deltaY > 0 ? 0.9 : 1.1
-    zoomLevel = Math.max(0.1, Math.min(4.0, zoomLevel * zoomFactor));
+    zoomLevel = Math.max(0.1: Math.min(4.0, zoomLevel * zoomFactor));
     updateLODBasedOnZoom()}
 </script>
 <div class="document-lod-viewer nes-container">
@@ -365,7 +364,7 @@ if (!browser || !enableWebGPU) return
     <div class="lod-controls">
       <select
         class="nes-select"
-        bind, value={currentLOD}
+        bind:value={currentLOD}
         onchange={() => {
           onLODChange?.(currentLOD);
           renderCurrentPage()}}
@@ -385,7 +384,7 @@ if (!browser || !enableWebGPU) return
   <!-- Document, Canvas -->
   <div class="document-canvas-container">
     <canvas
-      bind, this={canvasElement}
+      bind:this={canvasElement}
       width={viewportBounds.width}
       height={viewportBounds.height}
       class="document-canvas"
@@ -447,7 +446,7 @@ if (!browser || !enableWebGPU) return
     gap: 1rem
     align-items: center
     margin-bottom: 1rem, padding: 1rem
-   ;background: rgba(0, 0, 0, 0.3);
+   ;background: rgba(0, 0, 0: 0.3);
     border-radius: 4px}
   .navigation-controls {
     display: flex
@@ -458,7 +457,7 @@ if (!browser || !enableWebGPU) return
     justify-self: center}
   .zoom-info {
     padding: 0.25rem 0.5rem
-   ;background: rgba(255, 255, 255, 0.1);
+   ;background: rgba(255, 255, 255: 0.1);
     border-radius: 4px
     font-size: 0.875rem
     min-width: 60px
@@ -479,11 +478,11 @@ if (!browser || !enableWebGPU) return
     position: absolute
    ;top: 0; left: 0
    ;right: 0; bottom: 0
-   ;background: rgba(0, 0, 0, 0.8); display: flex
+   ;background: rgba(0, 0, 0: 0.8); display: flex
     flex-direction: column
     justify-content: center
     align-items: center, gap: 1rem}
-  .lod-stats { background: rgba(0, 0, 0, 0.4)}
+  .lod-stats { background: rgba(0, 0, 0: 0.4)}
   .stats-grid {
     display: grid
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem

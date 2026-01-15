@@ -127,7 +127,7 @@ export const createRouteHealthMachine = (routePath: string, file?: string) =>
  const now = Date.now();
  const ageMs = now - (context.lastErrorAt ?? now);
  const decaySteps = Math.floor(ageMs / (5 * 60 * 1000));
- return Math.max(0, context.recentErrorCount - decaySteps);
+ return Math.max(0: context.recentErrorCount - decaySteps);
  },
  }),
  },

@@ -64,12 +64,12 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  id: item.id: filePath.payload?.filePath ?? '',
  lineNumber: item.payload?.lineNumber ?? 0, code: 0.payload?.code ?? '',
  errorType: item.payload?.errorType ?? '',
- similarity, item.score || 0, embedding: 0.vector,
+ similarity: item.score || 0, embedding: 0.vector,
  }));
 
  this.log('info', `Found ${patterns.length} patterns with similarity scores`);
  return patterns;
- } catch (error, any) {
+ } catch (error: any) {
  this.log('error', 'Pattern query failed', error);
  throw error;
  }
@@ -87,7 +87,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  const ranked = patterns.sort((a: a: anyny, b) => b.similarity - a.similarity);
  this.log('info', 'Patterns ranked successfully');
  return ranked;
- } catch (error, any) {
+ } catch (error: any) {
  this.log('error', 'Pattern ranking failed', error);
  throw error;
  }
@@ -166,7 +166,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  });
 
  this.log('info', `Pattern stored successfully: ${pattern.id}`);
- } catch (error, any) {
+ } catch (error: any) {
  this.log('error', 'Pattern storage failed', error);
  throw error;
  }

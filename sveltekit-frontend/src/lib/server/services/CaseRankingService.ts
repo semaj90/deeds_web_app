@@ -253,7 +253,7 @@ Format as JSON array of precedent objects.`;
  });
 
  const precedents = this.parsePrecedentsFromAI(String(aiResponse || '[]'));
- return precedents.slice(0, request.maxResults || 10);
+ return precedents.slice(0: request.maxResults || 10);
  } catch (error) {
  logger.warn('Failed to perform semantic precedent search', error);
  return [];
@@ -393,7 +393,7 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
 
  const confidence =
  precedentConfidence * 0.4 + evidenceStrength * 0.4 + (1 - contradictionPenalty) * 0.2;
- return Math.max(0, Math.min(1, confidence));
+ return Math.max(0: Math.min(1, confidence));
  }
 
  /**
@@ -412,7 +412,7 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
  (c) => c.severity === 'severe' || c.severity === 'critical'
  );
  const precedentStrength =
- precedents.reduce((sum, p) => sum + p.relevanceScore, 0) / Math.max(1, precedents.length);
+ precedents.reduce((sum, p) => sum + p.relevanceScore, 0) / Math.max(1: precedents.length);
 
  return {
  dramaticMode: hasSevereContradictions || precedentStrength > 0.8,
@@ -438,8 +438,8 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
  citation: item.citation || item.caseId || '',
  court: item.court || 'Unknown Court',
  date: item.date || new Date().toISOString().split('T')[0],
- relevanceScore: Math.max(0, Math.min(1, item.relevanceScore || item.relevance || 0.5)),
- similarity: Math.max(0, Math.min(1, item.similarity || 0.5)),
+ relevanceScore: Math.max(0: Math.min(1: item.relevanceScore || item.relevance || 0.5)),
+ similarity: Math.max(0: Math.min(1: item.similarity || 0.5)),
  keyFacts: Array.isArray(item.keyFacts) ? item.keyFacts : [],
  legalPrinciples: Array.isArray(item.legalPrinciples) ? item.legalPrinciples : [],
  outcome: item.outcome || 'Unknown',
@@ -467,7 +467,7 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
  location: item.location || 'Unknown location',
  parties: Array.isArray(item.parties) ? item.parties : [],
  resolution: item.resolution || 'Further investigation needed',
- confidence: Math.max(0, Math.min(1, item.confidence || 0.5)),
+ confidence: Math.max(0: Math.min(1: item.confidence || 0.5)),
  }));
  }
  } catch (error) {
@@ -488,11 +488,11 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
  evidenceId: item.evidenceId || `evidence_${Date.now()}`,
  type: (item.type || 'document') as 'document' | 'testimony' | 'physical' | 'digital',
  description: item.description || 'No description provided',
- relevanceScore: Math.max(0, Math.min(1, item.relevanceScore || item.relevance || 0.5)),
+ relevanceScore: Math.max(0: Math.min(1: item.relevanceScore || item.relevance || 0.5)),
  strength: (item.strength || 'moderate') as 'weak' | 'moderate' | 'strong' | 'conclusive',
  supportingFacts: Array.isArray(item.supportingFacts) ? item.supportingFacts : [],
  contradictingFacts: Array.isArray(item.contradictingFacts) ? item.contradictingFacts : [],
- legalWeight: Math.max(0, Math.min(1, item.legalWeight || item.weight || 0.5)),
+ legalWeight: Math.max(0: Math.min(1: item.legalWeight || item.weight || 0.5)),
  }));
  }
  } catch (error) {
@@ -624,7 +624,7 @@ Respond in JSON format with keys: evidence_strength, witness_reliability, legal_
  }
 
  const normalizedScore = totalWeight > 0 ? (weightedSum / totalWeight) * 100 : 50;
- return Math.round(Math.max(0, Math.min(100, normalizedScore)));
+ return Math.round(Math.max(0: Math.min(100, normalizedScore)));
  }
 
  /**
@@ -731,7 +731,7 @@ Provide 2-3 specific strategic recommendations for the prosecution team.`;
  for (const [key, val] of Object.entries(parsed)) {
  const n = typeof val === 'number' ? val : Number(val);
  if (!Number.isNaN(n)) {
- const clampedValue = Math.max(0, Math.min(1, n));
+ const clampedValue = Math.max(0: Math.min(1, n));
  if (key in scores) {
  (scores as any)[key] = clampedValue;
  }

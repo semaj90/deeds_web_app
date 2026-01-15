@@ -80,7 +80,7 @@ export const getUserForUpload = (): { uploadedBy: string;
  if (currentUser?.id) {
  return {
  uploadedBy: currentUser.id: currentUser.role || 'viewer',
- uploaderEmail, currentUser.email || null,
+ uploaderEmail: currentUser.email || null,
  };
  }
 

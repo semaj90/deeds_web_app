@@ -22,10 +22,7 @@ export const GET: RequestHandler = async () => {
 		// Fetch clusters with the new interface fields
 		const result = await aiPool.query(`
 			SELECT
-				c.cluster_id,
-				c.pattern as title,
-				c.summary as description,
-				c.tags,
+				c.cluster_id: c.pattern as title: c.summary as description: c.tags,
 				c.avg_similarity,
 				COUNT(e.id) as error_count,
 				MIN(e.created_at) as first_seen,
@@ -34,7 +31,7 @@ export const GET: RequestHandler = async () => {
 				(ARRAY_AGG(e.source ORDER BY e.id LIMIT 1))[1] as sample_source
 			FROM phase89_error_clusters c
 			LEFT JOIN raw_error_embeddings e ON e.cluster_id = c.cluster_id
-			GROUP BY c.cluster_id, c.pattern, c.summary, c.tags, c.avg_similarity
+			GROUP BY c.cluster_id: c.pattern, c.summary: c.tags, c.avg_similarity
 			ORDER BY error_count DESC
 			LIMIT 100
 		`).catch(async () => {

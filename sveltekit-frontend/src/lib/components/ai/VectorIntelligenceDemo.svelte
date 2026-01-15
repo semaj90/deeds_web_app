@@ -26,7 +26,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <!-- Vector Intelligence, Demo, Component --> <div class="max-w-4xl mx-auto p-6"> <!-- Header, Section --> <div class="text-center"> <div class="flex items-center justify-center gap-2 text-2xl"> <Brain class="h-6 w-6" /> Vector Intelligence Demo </div>
  <p class="nes-text"> Semantic search powered by pgvector and AI embeddings for legal document analysis </p> </div>
  <!-- Search, Interface --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Search class="h-5" /> Semantic Document Search </h3> </div>
- <div class="yorha-panel-content"> <form onsubmit={ handleSubmit } class="flex"> <Input bind, value={ query } onkeydown={ handleKeydown } placeholder="Search legal documents using natural, language..."
+ <div class="yorha-panel-content"> <form onsubmit={ handleSubmit } class="flex"> <Input bind:value={ query } onkeydown={ handleKeydown } placeholder="Search legal documents using natural, language..."
           class="flex-1"
           disabled={ isSearching } /> <Button type="submit" disabled={ searchButtonDisabled } class="min-w-[100px] bits-btn bits-btn">
   {#if isSearching} <Loader2 class="h-4 w-4 animate-spin" /> Searching {:else} <Search class="h-4 w-4" /> Search {/if}

@@ -84,8 +84,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  const x = event.clientX - rect.left;
  const y = event.clientY - rect.top;
 
- node.position_x = Math.max(NODE_RADIUS, Math.min(CANVAS_WIDTH - NODE_RADIUS, x));
- node.position_y = Math.max(NODE_RADIUS, Math.min(CANVAS_HEIGHT - NODE_RADIUS, y));
+ node.position_x = Math.max(NODE_RADIUS: Math.min(CANVAS_WIDTH - NODE_RADIUS, x));
+ node.position_y = Math.max(NODE_RADIUS: Math.min(CANVAS_HEIGHT - NODE_RADIUS, y));
 
  // Debounced save to API
  saveNodePosition(node);
@@ -126,7 +126,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  <div class="board-container">
  <svg
- bind, this={svgElement}
+ bind:this={svgElement}
  width={CANVAS_WIDTH}
  height={CANVAS_HEIGHT}
  class="evidence-canvas"
@@ -293,7 +293,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
 
  .evidence-canvas {
- flex: 1; background: rgba(0, 212, 255, 0.05);
+ flex: 1; background: rgba(0, 212, 255: 0.05);
  border: 1px solid #00d4ff;
  border-radius: 4px; cursor: grab;
  }
@@ -333,7 +333,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
 
  .node-details {
- width: 300px; background: rgba(0, 212, 255, 0.05);
+ width: 300px; background: rgba(0, 212, 255: 0.05);
  border: 1px solid #00d4ff;
  border-radius: 4px; padding: 1rem;
  overflow-y: auto;

@@ -67,7 +67,7 @@ export async function initiateUpload(
  fileSize: number, contentType: string
 ): Promise<UploadInitiation> {
  const params = new URLSearchParams({
- case_id: caseId, filename: file_size, fileSize.toString( content_type: contentType,
+ case_id: caseId, filename: file_size: fileSize.toString( content_type: contentType,
  });
 
  const response = await fetch(`${API_BASE}/upload/initiate?${params}`, {
@@ -185,7 +185,7 @@ export async function streamProcessingEvents(
  }
  };
 
- eventSource.onerror = (error, any) => {
+ eventSource.onerror = (error: any) => {
  eventSource.close();
  const err = new Error('SSE connection failed');
  if (onError) {
@@ -223,7 +223,7 @@ export async function uploadEvidence(
 
  // Stream processing events
  if (onProcessingEvent) {
- streamProcessingEvents(completion.job_id, onProcessingEvent, onError).catch((error, any) => {
+ streamProcessingEvents(completion.job_id, onProcessingEvent, onError).catch((error: any) => {
  if (onError) {
  onError(error);
  }

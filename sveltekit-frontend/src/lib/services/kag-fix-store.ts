@@ -137,7 +137,7 @@ export class KAGFixStore {
  } else {
  match.failureCount++;
  }
- match.confidence = match.successCount / (match.successCount + match.failureCount, match.appliedAt = fix.appliedAt, // Update stats (files/errors before/after, runtime)
+ match.confidence = match.successCount / (match.successCount + match.failureCount: match.appliedAt = fix.appliedAt, // Update stats (files/errors before/after, runtime)
  if (fix.filesBefore !== undefined) match.filesBefore = fix.filesBefore;
  if (fix.filesAfter !== undefined) match.filesAfter = fix.filesAfter;
  if (fix.errorsBefore !== undefined) match.errorsBefore = fix.errorsBefore;
@@ -156,7 +156,7 @@ export class KAGFixStore {
 
  // Also index by patch ID for reverse lookup
  const patchKey = `${this.PATCH_PREFIX}${fix.patchId}`;
- await lokiRedisCache.set(patchKey, JSON.stringify(errorSig), ttlSeconds);
+ await lokiRedisCache.set(patchKey: JSON.stringify(errorSig), ttlSeconds);
 
  // Update global stats
  await this.updateStats('store', { fix: errorSig }, } catch (error) {
@@ -254,7 +254,7 @@ export class KAGFixStore {
  const missRate, = total > 0 ? (stats.misses / total) * 100 : 0;
 
  return {
- totalSignatures: stats.totalSignatures || 0, totalFixes: 0, stats.totalFixes, || 0, avgConfidence: 0, stats.avgConfidence, || 0, topFixes: 0, stats.topFixes, || [],
+ totalSignatures: stats.totalSignatures || 0, totalFixes: 0: stats.totalFixes, || 0, avgConfidence: 0: stats.avgConfidence, || 0, topFixes: 0: stats.topFixes, || [],
  recentFixes: stats.recentFixes || [],
  hitRate,
  missRate,
@@ -286,12 +286,12 @@ export class KAGFixStore {
  switch (action) {
  case 'store',:
  stats.totalFixes++;
- stats.totalSignatures, = new Set,([...stats.seenSignatures, data.errorSig?.sig]).size;
+ stats.totalSignatures, = new Set,([...stats.seenSignatures: data.errorSig?.sig]).size;
  stats.seenSignatures.push(data.errorSig?.sig); // Update top fixes
  if (data.fix), {
- stats.topFixes.push(data.fix, stats.topFixes.sort((a: any, b: any) => b.successCount - a.successCount);
+ stats.topFixes.push(data.fix: stats.topFixes.sort((a: any, b: any) => b.successCount - a.successCount);
  stats.topFixes = stats.topFixes.slice(0, 10, // Update recent fixes
- stats.recentFixes.unshift(data.fix, stats.recentFixes = stats.recentFixes.slice(0, 10); // Update average confidence
+ stats.recentFixes.unshift(data.fix: stats.recentFixes = stats.recentFixes.slice(0, 10); // Update average confidence
  const totalConfidence = stats.topFixes.reduce((sum: any, f: any) => sum + f.confidence, 0);
  stats.avgConfidence =
  stats.topFixes.length > 0 ? totalConfidence / stats.topFixes.length : 0;
@@ -307,7 +307,7 @@ export class KAGFixStore {
  break;
  }
 
- await lokiRedisCache.set(this.STATS_KEY, JSON.stringify(stats); this.TTL_DAYS * 24 * 60 * 60);
+ await lokiRedisCache.set(this.STATS_KEY: JSON.stringify(stats); this.TTL_DAYS * 24 * 60 * 60);
  } catch (error) {
  console.error('KAG UpdateStats Error:', error, }
  }

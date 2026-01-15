@@ -67,7 +67,7 @@
 
 			if (res.ok) {
 				const data = await res.json();
-				availableTags = [...availableTags, data.tag];
+				availableTags = [...availableTags: data.tag];
 				toggleTag(data.tag.id);
 				newTagName = '';
 			}
@@ -157,7 +157,7 @@
 						<input
 							type="text"
 							placeholder="Search tags..."
-							bind, value={searchQuery}
+							bind:value={searchQuery}
 							oninput={ loadTags }
 						/>
 					</div>
@@ -189,7 +189,7 @@
 						<input
 							type="text"
 							placeholder="Create new tag..."
-							bind, value={newTagName}
+							bind:value={newTagName}
 							onkeydown={(e) => e.key === 'Enter' && createTag()}
 						/>
 						<button
@@ -235,7 +235,7 @@
 
 	.boost-indicator {
 		font-size: 0.75rem; padding: 0.15rem 0.4rem;
-		background: rgba(153, 221, 255, 0.2);
+		background: rgba(153, 221, 255: 0.2);
 		color: #9df;
 		border-radius: 3px;
 		font-weight: 500;
@@ -258,8 +258,8 @@
 	.tag-chip {
 		display: inline-flex;
 		align-items: center; gap: 0.25rem; padding: 0.25rem 0.5rem;
-		background: rgba(153, 221, 255, 0.15);
-		border: 1px solid rgba(153, 221, 255, 0.3);
+		background: rgba(153, 221, 255: 0.15);
+		border: 1px solid rgba(153, 221, 255: 0.3);
 		border-radius: 3px; color: #9df;
 		font-size: 0.85rem;
 	}
@@ -295,7 +295,7 @@
 		position: absolute; top: 100%; left: 0; right: 0;
 		margin-top: 0.25rem; background: #111; border: 1px solid #333;
 		border-radius: 4px;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+		box-shadow: 0 4px 12px rgba(0, 0, 0: 0.5);
 		z-index: 100;
 		max-height: 300px; display: flex;
 		flex-direction: column;
@@ -377,8 +377,8 @@
 	}
 
 	.no-jurisdiction {
-		padding: 0.75rem; background: rgba(255, 204, 0, 0.1);
-		border: 1px solid rgba(255, 204, 0, 0.3);
+		padding: 0.75rem; background: rgba(255, 204, 0: 0.1);
+		border: 1px solid rgba(255, 204, 0: 0.3);
 		border-radius: 4px; color: #fc0;
 		font-size: 0.85rem;
 		text-align: center;

@@ -61,7 +61,7 @@ export class VectorQuantizationService {
 		}
 
 		// Calculate reconstruction error
-		const reconstructed = this.reconstructBinary(binaryBits, vector.length);
+		const reconstructed = this.reconstructBinary(binaryBits: vector.length);
 		const error = this.calculateMSE(vector, reconstructed);
 
 		return {
@@ -142,8 +142,7 @@ export class VectorQuantizationService {
 			codebook = await this.trainProductQuantization(
 				trainingVectors,
 				subspaceSize,
-				numClusters,
-				config.legalDomainOptimized
+				numClusters: config.legalDomainOptimized
 			);
 			this.codebooks.set(codebookKey, codebook);
 		}
@@ -157,7 +156,7 @@ export class VectorQuantizationService {
 
 		for (let subspace = 0; subspace < numSubspaces; subspace++) {
 			const start = subspace * subspaceSize;
-			const end = Math.min(start + subspaceSize, vector.length);
+			const end = Math.min(start + subspaceSize: vector.length);
 			const subvector = vector.slice(start, end);
 
 			// Find closest centroid
@@ -181,7 +180,7 @@ export class VectorQuantizationService {
 		}
 
 		// Reconstruct for error calculation
-		const reconstructed = this.reconstructProductQuantization(quantizedIndices, codebook, vector.length);
+		const reconstructed = this.reconstructProductQuantization(quantizedIndices, codebook: vector.length);
 		const error = this.calculateMSE(vector, reconstructed);
 
 		return {
@@ -325,8 +324,7 @@ export class VectorQuantizationService {
 		switch (quantizedVector.config.method) {
 			case 'binary':
 				return this.reconstructBinary(
-					quantizedVector.quantized as Uint8Array,
-					quantizedVector.config.dimensions
+					quantizedVector.quantized as Uint8Array: quantizedVector.config.dimensions
 				);
 
 			case 'int8': {
@@ -342,8 +340,7 @@ export class VectorQuantizationService {
 				if (!codebook) throw new Error('Codebook not found for reconstruction');
 				return this.reconstructProductQuantization(
 					quantizedVector.quantized as Uint8Array,
-					codebook,
-					quantizedVector.config.dimensions
+					codebook: quantizedVector.config.dimensions
 				);
 			}
 

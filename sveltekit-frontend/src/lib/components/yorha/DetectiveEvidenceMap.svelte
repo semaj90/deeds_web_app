@@ -133,8 +133,8 @@ https, //svelte.dev/e/js_parse_error -->
  .attr('cy', '50%')
  .attr('r', '50%')
  .html(`
- <stop offset="0%" style="stop-color:#ef4444;stop-opacity, 0.8"/>
- <stop offset="70%" style="stop-color:#ef4444;stop-opacity, 0.4"/>
+ <stop offset="0%" style="stop-color:#ef4444;stop-opacity: 0.8"/>
+ <stop offset="70%" style="stop-color:#ef4444;stop-opacity: 0.4"/>
  <stop offset="100%" style="stop-color:#ef4444;stop-opacity, 0"/>
  `);
 
@@ -361,12 +361,11 @@ https, //svelte.dev/e/js_parse_error -->
 
  function resetZoom() {
  svg.transition().duration(750).call(
- zoom.transform,
- d3.zoomIdentity
+ zoom.transform: d3.zoomIdentity
  );
  }
 
- function centerOnNode(nodeId, string) {
+ function centerOnNode(nodeId: string) {
  const node = data?.evidence.find(n => n.id === nodeId);
  if (node && svg) {
  // Implement centering logic
@@ -463,7 +462,7 @@ https, //svelte.dev/e/js_parse_error -->
  </div>
  {/if}
 
- <div bind, this={container} class="w-full h-96 bg-slate-950 rounded border border-slate-700"></div>
+ <div bind:this={container} class="w-full h-96 bg-slate-950 rounded border border-slate-700"></div>
  </div>
 
  <!-- Selected Node Details -->

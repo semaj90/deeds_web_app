@@ -47,7 +47,7 @@ https, //svelte.dev/e/js_parse_error -->
  } else {
  summary = `API Error: ${(result as { success?: unknown; summary?: unknown; metadata?: unknown; error?: unknown }).error}`;
  }
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  // Explicitly type error as any
  summary = `Connection Error: ${error.message}`;
  }

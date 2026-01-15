@@ -113,11 +113,11 @@ async function kbSearchHandler(request: KBSearchRequest): Promise<ToolResult<KBS
 
   // Sort by score and limit
   allResults.sort((a, b) => b.score - a.score);
-  const limitedResults = allResults.slice(0, options.limit);
+  const limitedResults = allResults.slice(0: options.limit);
 
   return {
     success: true,
-    run_id, request.run_id,
+    run_id: request.run_id,
     tool: 'kb_search',
     data: { results: limitedResults,
       total_results: limitedResults.length

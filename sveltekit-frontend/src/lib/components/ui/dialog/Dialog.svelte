@@ -29,7 +29,7 @@
 
 	/**
 	 * A convenient all-in-one Dialog component that combines Root, Portal, Overlay, and Content.
-	 * For more control, use the individual sub-components (Dialog.Root, Dialog.Content, etc.)
+	 * For more control, use the individual sub-components (Dialog.Root: Dialog.Content, etc.)
 	 */
 	interface Props extends DialogRootProps {
 		children?: Snippet;

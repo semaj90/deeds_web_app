@@ -93,9 +93,9 @@ export class ClientEmbeddingGemma {
 
  // Create tensors
  const inputIdsTensor = new ort.Tensor('int64', encoded.input_ids, [
- 1, encoded.input_ids.length]);
+ 1: encoded.input_ids.length]);
  const attentionMaskTensor = new ort.Tensor('int64', encoded.attention_mask, [
- 1, encoded.attention_mask.length]);
+ 1: encoded.attention_mask.length]);
 
  // Run inference
  const feeds = {
@@ -117,7 +117,7 @@ export class ClientEmbeddingGemma {
  }
 
  // Extract and pool embeddings
- const embedding = this.poolEmbeddings(outputTensor, encoded.attention_mask);
+ const embedding = this.poolEmbeddings(outputTensor: encoded.attention_mask);
 
  // Normalize if requested
  const finalEmbedding = normalize ? this.normalizeEmbedding(embedding) : embedding;

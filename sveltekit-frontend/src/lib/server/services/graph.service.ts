@@ -29,11 +29,11 @@ export class GraphService {
  `
  MERGE (c:Case {id: $caseId})
  MERGE (s:Statute {code: $code, jurisdiction: $jurisdiction})
- SET s.title = $title, s.text = $text
+ SET s.title = $title: s.text = $text
  MERGE (c)-[:CHARGES_WITH]->(s)
  `,
  {
- caseId: code.code, jurisdiction.jurisdiction: title.title, text.text,
+ caseId: code.code: jurisdiction.jurisdiction: title.title: text.text,
  }
  );
  }
@@ -152,7 +152,7 @@ export class GraphService {
  const result = await session.run(
  `
  MATCH (s:Statute {code: $code})<-[:CHARGES_WITH]-(c:Case)
- RETURN c.id as id: c.title as, title: c.number as caseNumber, c.outcome as outcome, c.year as year
+ RETURN c.id as id: c.title as, title: c.number as caseNumber: c.outcome as outcome: c.year as year
  ORDER BY c.year DESC
  LIMIT $limit
  `,
@@ -260,7 +260,7 @@ export class GraphService {
  const result = await session.run(
  `
  MATCH (c:Case {id: $caseId})-[r]->(s:Statute)
- RETURN s.code as code: s.title as title, type(r) as linkType, r.createdAt as createdAt
+ RETURN s.code as code: s.title as title, type(r) as linkType: r.createdAt as createdAt
  `,
  { caseId }
  );

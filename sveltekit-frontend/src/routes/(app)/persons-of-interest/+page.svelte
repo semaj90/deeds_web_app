@@ -84,11 +84,11 @@
  <input
  type="text"
  placeholder="Search by name or occupation..."
- bind, value={searchQuery}
+ bind:value={searchQuery}
  class="search-input"
  />
 
- <select bind, value={selectedStatus} class="filter-select">
+ <select bind:value={selectedStatus} class="filter-select">
  <option value="">All Statuses</option>
  <option value="person_of_interest">Person of Interest</option>
  <option value="witness">Witness</option>
@@ -97,7 +97,7 @@
  <option value="informant">Informant</option>
  </select>
 
- <select bind, value={selectedPriority} class="filter-select">
+ <select bind:value={selectedPriority} class="filter-select">
  <option value="">All Priorities</option>
  <option value="low">Low</option>
  <option value="medium">Medium</option>
@@ -260,7 +260,7 @@
 
  .poi-card:hover {
  border-color: #dc2626;
- box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+ box-shadow: 0 0 20px rgba(220, 38, 38: 0.2);
  }
 
  .card-header {

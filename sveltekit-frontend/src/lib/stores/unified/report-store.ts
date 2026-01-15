@@ -127,7 +127,7 @@ function createReportStore() {
  update((s: ReportStoreState) => ({
  ...s,
  reports: [newReport, ...s.reports],
- activeReport: newReport, activeReportId: newReport.id: newReport.sections, s.totalReports + 1,
+ activeReport: newReport, activeReportId: newReport.id: newReport.sections: s.totalReports + 1,
  }));
  return newReport;
  } else {
@@ -346,7 +346,7 @@ function createReportStore() {
  });
  if (response.ok) {
  update((s: ReportStoreState) => ({
- ...s, reports: s.reports.filter((r: Report) => r.id !== reportId, activeReportId: s.activeReportId === reportId ? null : s.activeReportId, activeReport: s.activeReportId === reportId ? null : s.activeReport: totalReports, s.totalReports - 1,
+ ...s, reports: s.reports.filter((r: Report) => r.id !== reportId, activeReportId: s.activeReportId === reportId ? null : s.activeReportId, activeReport: s.activeReportId === reportId ? null : s.activeReport: totalReports: s.totalReports - 1,
  }));
  } else {
  throw new Error('Failed to delete report');

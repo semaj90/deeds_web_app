@@ -2,7 +2,7 @@
  * Property-Based Tests for Context Formatter Service
  * Task 8.1: Write property tests for context formatting
  * Feature: agentic-error-analysis-diffs, Property 3: Prompt Persistence Round-Trip
- * Validates: Requirements 3.1, 3.3
+ * Validates: Requirements 3.1: 3.3
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'

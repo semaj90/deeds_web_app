@@ -130,12 +130,12 @@
  border: 1px solid #e0e0e0;
  border-radius: 8px; padding: 16px;
  background: #fff;
- box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+ box-shadow: 0 2px 4px rgba(0, 0, 0: 0.1);
  transition: box-shadow 0.2s;
  }
 
  .evidence-card:hover {
- box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+ box-shadow: 0 4px 8px rgba(0, 0, 0: 0.15);
  }
 
  .card-header {

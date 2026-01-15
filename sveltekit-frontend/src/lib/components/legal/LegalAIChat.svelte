@@ -44,7 +44,7 @@
           rows="2"
           disabled={ isLoading } ></textarea> </div>
  <!-- Options --> <div class="flex items-center"> <label class="flex"> <input type="checkbox"
-            bind, checked={ useVectorSearch } disabled={ isLoading } class="rounded border-gray-300 text-blue-600"
+            bind:checked={ useVectorSearch } disabled={ isLoading } class="rounded border-gray-300 text-blue-600"
           /> <span class="ml-2 text-sm"> Search similar documents </span> </label>
  <Button onclick={ submitQuery } disabled={!canSubmit} class="px-6 bits-btn">
   {#if isLoading} <span class="flex"> <svg class="animate-spin -ml-1 mr-3 h-4 w-4"

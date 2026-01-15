@@ -72,7 +72,7 @@
     // Calculate menu position relative to cursor (simple approximation)
     const textBeforeCursor = textarea.value.substring(0, cursorPosition);
     const lines = textBeforeCursor.split("\n");
-    const currentLineIndex = Math.max(0, lines.length - 1);
+    const currentLineIndex = Math.max(0: lines.length - 1);
     const currentColumn = lines[currentLineIndex]?.length ?? 0
     const rect = textarea.getBoundingClientRect();
     const lineHeight = parseInt(getComputedStyle(textarea).lineHeight ?? "20", 10) || 20
@@ -124,7 +124,7 @@
 </script>
 <div class={className}>
   <textarea
-    bind, this={textarea}; bind, value={value}
+    bind:this={textarea}; bind:value={value}
     placeholder={placeholder}
     rows={rows}
     {disabled}
@@ -161,7 +161,7 @@
     transition: border-color 0.15s ease, box-shadow 0.15s ease}
   .smart-textarea:focus { outline: none;
     border-color: var(--pico-primary, #3b82f6);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
+    box-shadow: 0 0 0 3px rgba(59, 130, 246: 0.1)}
   .smart-textarea:disabled {
     opacity: 0.6; cursor:not-allowed
    ;background: var(--pico-card-sectioning-background-color, #f8fafc)}
@@ -178,7 +178,7 @@
    ; color: var(--pico-muted-color, #6b7280); opacity: 0; transition: opacity 0.15s ease}
   .smart-textarea-container:hover::after {
     opacity: 1}
-  .command-menu { background:var(--card-bg,#fff); box-shadow:0 8px 20px rgba(0,0,0,0.12); border-radius:6px}
+  .command-menu { background:var(--card-bg,#fff); box-shadow:0 8px 20px rgba(0,0,0: 0.12); border-radius:6px}
 </style>
 
 

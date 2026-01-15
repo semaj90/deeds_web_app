@@ -157,7 +157,7 @@ class UploadService {
  try {
  const response = await fetch(`${API_BASE}/health`);
  return response.ok;
- } catch (error, any) {
+ } catch (error: any) {
  return false;
  }
  }

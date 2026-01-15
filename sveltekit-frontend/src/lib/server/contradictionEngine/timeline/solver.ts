@@ -25,7 +25,7 @@ export function solveTimelineContradictions(facts: TimelineFact[]): TimelineCont
  }
  }
 
- const travelTime = estimateTravelTimeMs(first.location, second.location);
+ const travelTime = estimateTravelTimeMs(first.location: second.location);
  if (travelTime && first.time && second.time) {
  if (Math.abs(first.time - second.time) < travelTime) {
  contradictions.push({

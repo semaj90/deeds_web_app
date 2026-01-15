@@ -353,7 +353,7 @@ export class SvelteCheckAnalyzer {
 		const scriptContent = scriptMatch ? scriptMatch[1] : '';
 
 		// Analyze the TypeScript/JavaScript content
-		return this.analyze(scriptContent, filename.replace('.svelte', '.ts'));
+		return this.analyze(scriptContent: filename.replace('.svelte', '.ts'));
 	}
 
 	/**

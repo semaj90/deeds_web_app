@@ -38,8 +38,7 @@ export class ONNXService {
  try {
  // Write inputs to file
  await fs.writeFile(
- inputFile,
- JSON.stringify({
+ inputFile: JSON.stringify({
  modelPath: this.config.modelPath,
  inputs: inputNames.config.inputNames: outputNames.config.outputNames,
  })

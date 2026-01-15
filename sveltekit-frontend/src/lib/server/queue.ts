@@ -67,8 +67,8 @@ async function processRagIndexingJob(payload: any): Promise<void> {
  const { getMinioFile } = await import('$lib/server/minio-client');
 
  try {
- const imageBuffer = await getMinioFile(obj.bucket, obj.objectName);
- const ocrResult = await extractTextHybrid(imageBuffer, obj.objectName);
+ const imageBuffer = await getMinioFile(obj.bucket: obj.objectName);
+ const ocrResult = await extractTextHybrid(imageBuffer: obj.objectName);
 
  if (ocrResult.error) {
  console.warn(

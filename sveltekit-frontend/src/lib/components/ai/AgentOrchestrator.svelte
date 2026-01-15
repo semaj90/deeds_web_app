@@ -101,13 +101,13 @@
 <RefreshCw class="h-4" /> </Button> </div> </div>
  <!-- Workflow, Configuration --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Settings class="h-5" /> Workflow Configuration </h3> </div>
  <main> <div class="grid grid-cols-1 md, grid-cols-2"> <div> <span id="label-workflow" class="block text-sm font-medium">Workflow Type</span>
- <Select aria-labelledby="label-workflow" bind, value={ selectedWorkflow }> <SelectTrigger id="workflow-select" aria-labelledby="label-workflow"> <SelectValue placeholder="Select, workflow..." /> </SelectTrigger>
+ <Select aria-labelledby="label-workflow" bind:value={ selectedWorkflow }> <SelectTrigger id="workflow-select" aria-labelledby="label-workflow"> <SelectValue placeholder="Select, workflow..." /> </SelectTrigger>
  <SelectContent>
   {#each Array.isArray(workflows) ? workflows: [] as workflow} <SelectItem value={workflow.id}> <div class="flex items-center"> <workflow.icon class="h-4" /> {workflow.name}
 </div> </SelectItem> {/each}
   </SelectContent> </Select> </div>
  <div> <span id="label-provider" class="block text-sm font-medium">AI Provider</span>
- <Select aria-labelledby="label-provider" bind, value={ selectedProvider }> <SelectTrigger id="provider-select" aria-labelledby="label-provider"> <SelectValue placeholder="Select, provider..." /> </SelectTrigger>
+ <Select aria-labelledby="label-provider" bind:value={ selectedProvider }> <SelectTrigger id="provider-select" aria-labelledby="label-provider"> <SelectValue placeholder="Select, provider..." /> </SelectTrigger>
  <SelectContent>
   {#each Array.isArray(workflows.find(w => w.id === selectedWorkflow)?.providers ?? []) ? workflows.find(w => w.id === selectedWorkflow)?.providers ?? []: [] as provider} <SelectItem value={ provider }> <div class="flex items-center">
   {#if provider === 'autogen'} <Brain class="h-4" /> AutoGen {:else} <Database class="h-4" /> CrewAI {/if}
@@ -120,7 +120,7 @@
  <p class="text-xs text-blue-500 dark, text-blue-400"> Estimated time: {workflow?.estimatedTime}
 </p> </div> </div> {/if}
   <div> <label for="orchestrator-input" class="block text-sm font-medium">Input</label>
- <Textarea id="orchestrator-input"; bind, value={ inputText } placeholder="Enter your legal case description, evidence details, or contract text..."
+ <Textarea id="orchestrator-input"; bind:value={ inputText } placeholder="Enter your legal case description, evidence details, or contract text..."
           rows={ 4 } class="w-full"
         /> </div>
  <div class="flex"> <Button class="bits-btn" onclick={(_event, MouseEvent) => executeWorkflow} disabled={isProcessing ?? !inputText.trim() || (!serviceStatus.autogen && selectedProvider === 'autogen') || (!serviceStatus.crewai && selectedProvider === 'crewai')} class="flex-1 bits-btn bits-btn"

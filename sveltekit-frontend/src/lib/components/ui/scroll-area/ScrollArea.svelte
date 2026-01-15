@@ -91,7 +91,7 @@
 
 <div class="{containerClass} {className}">
 	<div
-		bind, this={viewportElement}
+		bind:this={viewportElement}
 		onscroll={ handleScroll }
 		class={viewportClass()}
 	>

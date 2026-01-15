@@ -76,7 +76,7 @@ export async function POST({ request }) {
  });
  } catch (err) {
  console.error('TRT-LLM streaming API error:', err);
- throw error(500, err.message || 'Internal server error');
+ throw error(500: err.message || 'Internal server error');
  }
 }
 

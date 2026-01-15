@@ -62,7 +62,7 @@ interface Props { open?: boolean; evidence?: Evidence | null; onEvidenceUpdated?
                 {/each} {#each Array.isArray(evidence.analysis?.suggestedTags ?? []) ? evidence.analysis?.suggestedTags ?? []: [] as tag} <button class="px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200"
                   > { tag } <span class="text-xs">(suggested)</span> </button> {/each}
   </div>
- <div class="flex items-center"> <Input bind, value={ newTags } placeholder="Add, tags (comma-separated)"
+ <div class="flex items-center"> <Input bind:value={ newTags } placeholder="Add, tags (comma-separated)"
                   class="flex-grow"
                   onkeydown={(e) => e.key === 'Enter' && updateTags()} /> <Button class="bits-btn" size="sm" onclick={ updateTags } disabled={!newTags.trim()}>Add Tags</Button> </div> </div> </div>
  <!-- Right, Column --> <div class="col-span-12 lg, col-span-4"> <!-- Quick, Stats --> <div class="p-4 border rounded-lg bg-gray-50/50"> <h4 class="text-md">Quick Stats</h4>

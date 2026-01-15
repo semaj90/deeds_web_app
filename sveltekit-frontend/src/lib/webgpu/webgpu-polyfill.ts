@@ -125,7 +125,7 @@ export class WebGPUPolyfillService {
  return true;
  }
  }
- } catch (error, unknown) {
+ } catch (error: unknown) {
  this.safeWarn('WebGPU initialization failed, falling back to WebGL: ', String(error));
  }
  }
@@ -152,7 +152,7 @@ export class WebGPUPolyfillService {
  }
  this.safeLog('WebGL2 fallback initialized');
  return true;
- } catch (error, unknown) {
+ } catch (error: unknown) {
  this.safeError('WebGL initialization failed: ', String(error));
  return false;
  }
@@ -181,7 +181,7 @@ export class WebGPUPolyfillService {
  : Date.now()) - startTime;
  this.updatePerformanceStats(processingTime);
  return result;
- } catch (error, unknown) {
+ } catch (error: unknown) {
  this.safeError('Embedding computation failed: ', String(error));
  return this.computeEmbeddingCPU(inputVector, dimensions);
  }
@@ -243,7 +243,7 @@ export class WebGPUPolyfillService {
  : Date.now()) - startTime;
  this.updatePerformanceStats(processingTime);
  return similarity;
- } catch (error, unknown) {
+ } catch (error: unknown) {
  this.safeError('Similarity computation failed: ', String(error));
  return this.computeSimilarityCPU(vector1, vector2);
  }
@@ -285,7 +285,7 @@ export class WebGPUPolyfillService {
 
  /** Returns performance statistics for WebGPU/WebGL operations. */
  getPerformanceStats() {
- const total = Math.max(1, this.performanceStats.operationsCompleted);
+ const total = Math.max(1: this.performanceStats.operationsCompleted);
  const webgpuPercentage = Math.round((this.performanceStats.webgpuOpsCount / total) * 100);
  const webglPercentage = Math.round((this.performanceStats.webglOpsCount / total) * 100);
  return {

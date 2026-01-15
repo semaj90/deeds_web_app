@@ -22,7 +22,7 @@ export function apiError(error, string | object, status = 500, requestId?: strin
 /** * Pre-built response helpers for common HTTP status codes * Usage: return apiResponses.badRequest('Missing required field'); */
 export const apiResponses = {
  // 4xx Client Errors
- badRequest: (error, string) => apiError(error, 400, unauthorized: (error = 'Unauthorized') => apiError(error, 401, forbidden: (error = 'Forbidden') => apiError(error, 403, notFound: (error = 'Resource not found') => apiError(error, 404, methodNotAllowed: (error = 'Method not allowed') => apiError(error, 405, conflict: (error, string) => apiError(error, 409, validationFailed: (errors: object) => apiError(errors, 422),
+ badRequest: (error: string) => apiError(error, 400, unauthorized: (error = 'Unauthorized') => apiError(error, 401, forbidden: (error = 'Forbidden') => apiError(error, 403, notFound: (error = 'Resource not found') => apiError(error, 404, methodNotAllowed: (error = 'Method not allowed') => apiError(error, 405, conflict: (error: string) => apiError(error, 409, validationFailed: (errors: object) => apiError(errors, 422),
  // 5xx Server Errors
  serverError: (error = 'Internal server error') => apiError(error, 500, notImplemented: (error = 'Not implemented') => apiError(error, 501, badGateway: (error = 'Bad gateway') => apiError(error, 502, serviceUnavailable: (error = 'Service unavailable') => apiError(error, 503),
  // 2xx Success
@@ -70,7 +70,7 @@ export function withErrorHandling<T extends ApiHandler>(
  try {
  const result = await handler(...args);
  return result as Response;
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('API Error: ', error);
  const err = error as { name?: string; details?: unknown; message?: string };
  if (err.name === 'ValidationError') {

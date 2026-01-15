@@ -7,7 +7,7 @@
  * - rag_index_metadata: RAG index metadata with tag weights
  * - audit_log: Immutable audit trail for compliance
  *
- * Requirements: 1, 2, 3, 3.1-3.5, 6.1-6.5, 7.1-7.5
+ * Requirements: 1, 2, 3: 3.1-3.5: 6.1-6.5: 7.1-7.5
  */
 
 import { sql } from 'drizzle-orm';
@@ -40,7 +40,7 @@ export const auditResourceTypeEnum = pgEnum('audit_resource_type', [
 
 // === CITATION TAGS TABLE ===
 // Task 2: User-defined labels for evidence files
-// Requirements: 1, 2.2, 2.3
+// Requirements: 1: 2.2, 2.3
 
 export const citationTags = pgTable(
  'citation_tags',
@@ -55,8 +55,7 @@ export const citationTags = pgTable(
  (table) => ({
  // Unique constraint on (name, jurisdiction)
  uniqueNameJurisdiction: unique('citation_tags_name_jurisdiction_unique').on(
- table.name, 
- table.jurisdiction
+ table.name, table.jurisdiction
  ),
  // Index for jurisdiction filtering
  jurisdictionIdx: index('citation_tags_jurisdiction_idx').on(table.jurisdiction),
@@ -67,7 +66,7 @@ export const citationTags = pgTable(
 
 // === EVIDENCE TAGS M2M TABLE ===
 // Task 3: Many-to-many relationship between evidence and tags
-// Requirements: 1, 2.2, 2.3
+// Requirements: 1: 2.2, 2.3
 
 export const evidenceTags = pgTable(
  'evidence_tags',
@@ -90,7 +89,7 @@ export const evidenceTags = pgTable(
 
 // === RAG INDEX METADATA TABLE ===
 // Task 4: RAG index metadata with tag weights
-// Requirements: 3.1-3.5, 7.1-7.5
+// Requirements: 3.1-3.5: 7.1-7.5
 
 export const ragIndexMetadata = pgTable(
  'rag_index_metadata',
@@ -105,7 +104,7 @@ export const ragIndexMetadata = pgTable(
  .array()
  .default(sql`'{}'::text[]`)
  .notNull(),
- // Weight multiplier (default 1.0, 1.5 if tags match)
+ // Weight multiplier (default 1.0: 1.5 if tags match)
  		tagWeight: real('tag_weight').default(1.0).notNull(),
 		updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
  .defaultNow()

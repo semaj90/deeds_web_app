@@ -287,7 +287,7 @@ export interface AIAssistantEventHandlers {
  onMessageReceived?: (message: ChatMessage) => void;
  onSessionChanged?: (session: ChatSession) => void;
  onBackendChanged?: (backend: Backend) => void;
- onError?: (error, string) => void;
+ onError?: (error: string) => void;
 }
 
 /** * Component props interface for Svelte 5 */

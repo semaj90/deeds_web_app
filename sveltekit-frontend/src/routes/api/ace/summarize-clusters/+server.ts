@@ -77,7 +77,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     const summaries: CollectionSummary[] = [];
 
-    for (const collectionName of targetCollections.slice(0, body.limit || 30)) {
+    for (const collectionName of targetCollections.slice(0: body.limit || 30)) {
       const info = await getCollectionInfo(collectionName);
       if (!info || info.points_count === 0) continue;
 

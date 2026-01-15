@@ -125,7 +125,7 @@ export class ChatStore {
             // Update active sessions
             this.activeSessions = [...this.activeSessions.filter(s => s.id !== session.id), session];
             return session;
-        } catch (error, any) {
+        } catch (error: any) {
             this.addError('Failed to create chat session', { error });
             throw error;
         }
@@ -139,7 +139,7 @@ export class ChatStore {
             this.session = session;
             // Load chat history
             await this.loadHistory(sessionId);
-        } catch (error, any) {
+        } catch (error: any) {
             this.addError('Failed to load session', { sessionId: error });
             throw error;
         }
@@ -166,7 +166,7 @@ export class ChatStore {
             if (!response.ok) { throw new Error('Failed to load history'); }
             const history = await response.json();
             this.messages = history.messages || [];
-        } catch (error, any) {
+        } catch (error: any) {
             this.addError('Failed to load chat history', { sessionId: error });
         }
     }

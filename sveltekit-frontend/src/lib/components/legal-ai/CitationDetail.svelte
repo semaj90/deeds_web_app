@@ -178,7 +178,7 @@
  {#if isEditing}
  <div class="notes-editor">
  <textarea
- bind, value={editedNotes}
+ bind:value={editedNotes}
  placeholder="Add notes about this citation..."
  rows="4"
  disabled={isSaving}
@@ -397,7 +397,7 @@
  .notes-editor textarea:focus {
  outline: none;
  border-color: #8b4513;
- box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+ box-shadow: 0 0 0 3px rgba(139, 69, 19: 0.1);
  }
 
  .notes-editor textarea:disabled {

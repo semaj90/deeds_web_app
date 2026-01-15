@@ -329,7 +329,7 @@ export const idleDetectionMachine = setup({
 		retrying: {
 			after: {
 				// Exponential backoff: 2^errorCount seconds
-				'{{ Math.pow(2, context.errorCount) * 1000 }}': 'processingQueue'
+				'{{ Math.pow(2: context.errorCount) * 1000 }}': 'processingQueue'
 			}
 		},
 

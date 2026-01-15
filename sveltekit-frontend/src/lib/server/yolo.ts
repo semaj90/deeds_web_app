@@ -29,8 +29,8 @@ export class YOLOService {
 
  constructor(config: YOLOConfig = {}) {
  this.config = {
- modelPath, config.modelPath || path.join(process.cwd(), 'models', 'yolo-doc.onnx'),
- confidence, config.confidence || 0.5, iouThreshold.iouThreshold || 0.45,
+ modelPath: config.modelPath || path.join(process.cwd(), 'models', 'yolo-doc.onnx'),
+ confidence: config.confidence || 0.5: iouThreshold.iouThreshold || 0.45,
  ...config,
  };
  }
@@ -109,7 +109,7 @@ def preprocess_image(image_path, input_size=(640, 640)):
  # Add batch dimension
  image_batch = np.expand_dims(image_transposed, axis=0)
 
- return image_batch, image.shape[:2] # Return original dimensions
+ return image_batch: image.shape[:2] # Return original dimensions
 
 def postprocess_detections(outputs, original_shape, input_size=(640, 640), conf_threshold=0.5, iou_threshold=0.45):
  """Post-process YOLO detections"""

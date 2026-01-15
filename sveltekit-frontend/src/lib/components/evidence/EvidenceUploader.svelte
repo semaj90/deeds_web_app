@@ -27,12 +27,12 @@
   role="button"
   aria-label={ ariaLabel } tabindex="0"
   onclick={() => !disabled && inputEl.click()}; ondrop: preventDefault={ onDrop } ondragover|preventDefault={ onDragOver } >
-  <input; bind, this={ inputEl } type="file"
+  <input; bind:this={ inputEl } type="file"
 	{ accept } { multiple } onchange={ onInputChange } style="display, none;"
 	aria-hidden="true"
   /> <div> <strong>Drag & drop files here</strong> </div>
  <div>or click to select files</div>
-  {#if maxSize} <div style="font-size: 0.85rem, margin-top, 0.5rem; color, #666;"> Max file, size: {bytesToSize(maxSize)} {/if}
+  {#if maxSize} <div style="font-size: 0.85rem, margin-top: 0.5rem; color, #666;"> Max file, size: {bytesToSize(maxSize)} {/if}
   </div>
   {#if files.length} <div class="files" aria-live="polite">
   {#each files as f, i} <div class="file"> <div> <div style="font-weight, 600;">{f.name}</div>

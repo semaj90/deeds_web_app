@@ -45,8 +45,8 @@ import type { Case } from '$lib/types';
   <div class="component-section">
     <h3>âœ… Checkbox Component</h3>
 
-    <Checkbox bind, checked={acceptTerms} label="I accept the terms, and, conditions" id="terms-checkbox" />
-    <Checkbox bind, checked={urgentCaseOnly} label="Urgent, cases, only" id="urgent-checkbox" />
+    <Checkbox bind:checked={acceptTerms} label="I accept the terms, and, conditions" id="terms-checkbox" />
+    <Checkbox bind:checked={urgentCaseOnly} label="Urgent, cases, only" id="urgent-checkbox" />
     <p class="status">
       Terms: <strong>{acceptTerms ? 'Accepted' : 'Not accepted'}</strong> | Urgent:
       <strong>{urgentCaseOnly ? 'Yes' : 'No'}</strong>
@@ -57,7 +57,7 @@ import type { Case } from '$lib/types';
     <h3>âœ… Enhanced SearchBar Component</h3>
 
     <SearchBar
-      bind, value={searchQuery}
+      bind:value={searchQuery}
       placeholder="Search legal documents and cases..."
       showAdvancedFilters={true}
       onsearch={handleSearch}

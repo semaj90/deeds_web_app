@@ -43,7 +43,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported int
 	.canvas-editor-container { flex: 1, position relative; overflow: hidden}
 	.upload-zone { position absolute; bottom: 20px; left: 20px; right: 20px; z-index: 5; max-width: 400px; opacity: 0.9; transition: opacity 0.3s ease}
 	.upload-zone:hover { opacity: 1}
-	/* Upload Progress Styles */ .upload-progress-container { background: var(--bg-secondary); border: 1px solid var(--border-light); border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1)}
+	/* Upload Progress Styles */ .upload-progress-container { background: var(--bg-secondary); border: 1px solid var(--border-light); border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0: 0.1)}
 	.upload-progress-container h4 { margin: 0, 0 12px 0; font-size: 14px; color: var(--text-primary)}
 	.upload-item { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-light)}
 	.upload-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none}
@@ -55,7 +55,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported int
 	.upload-status { font-size: 12px; color: var(--text-muted); margin-bottom: 4px}
 	.hash-preview { font-size: 11px; color: var(--text-muted); font-family: monospace; background: var(--code-background-color); padding: 4px 6px; border-radius: 4px}
 	.hash-text { color: var(--harvard-crimson)}
-	/* Completed Uploads Styles */ .completed-uploads { background: var(--bg-secondary); border: 1px solid #10b981; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1)}
+	/* Completed Uploads Styles */ .completed-uploads { background: var(--bg-secondary); border: 1px solid #10b981; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(16, 185, 129: 0.1)}
 	.completed-uploads h4 { margin: 0, 0 12px 0; font-size: 14px; color: #10b981}
 	.completed-item { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-light)}
 	.completed-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none}

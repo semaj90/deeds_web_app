@@ -146,13 +146,13 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center; padding: 4rem 2rem;
-		text-align: center; color: rgba(255, 255, 255, 0.4);
+		text-align: center; color: rgba(255, 255, 255: 0.4);
 		grid-column: 1 / -1;
 	}
 
 	.empty-state h3 {
 		font-size: 1.125rem;
-		font-weight: 500; color: rgba(255, 255, 255, 0.6);
+		font-weight: 500; color: rgba(255, 255, 255: 0.6);
 		margin: 1rem 0 0.5rem;
 	}
 
@@ -163,21 +163,21 @@
 	.cluster-card {
 		display: flex;
 		flex-direction: column; gap: 0.75rem;
-		padding: 1.25rem; background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		padding: 1.25rem; background: rgba(255, 255, 255: 0.03);
+		border: 1px solid rgba(255, 255, 255: 0.1);
 		border-radius: 12px; cursor: pointer;
 		transition: all 0.2s ease;
 		text-align: left;
 	}
 
 	.cluster-card:hover {
-		background: rgba(255, 255, 255, 0.05);
-		border-color: rgba(255, 255, 255, 0.15);
+		background: rgba(255, 255, 255: 0.05);
+		border-color: rgba(255, 255, 255: 0.15);
 	}
 
 	.cluster-card.selected {
-		background: rgba(0, 212, 255, 0.1);
-		border-color: rgba(0, 212, 255, 0.3);
+		background: rgba(0, 212, 255: 0.1);
+		border-color: rgba(0, 212, 255: 0.3);
 	}
 
 	.cluster-card.large {
@@ -201,8 +201,8 @@
 		width: 36px; height: 36px;
 		display: flex;
 		align-items: center;
-		justify-content: center; background: rgba(168, 85, 247, 0.1);
-		border: 1px solid rgba(168, 85, 247, 0.3);
+		justify-content: center; background: rgba(168, 85, 247: 0.1);
+		border: 1px solid rgba(168, 85, 247: 0.3);
 		border-radius: 8px; color: #c084fc;
 		flex-shrink: 0;
 	}
@@ -228,18 +228,18 @@
 	}
 
 	.chevron {
-		color: rgba(255, 255, 255, 0.3);
+		color: rgba(255, 255, 255: 0.3);
 		flex-shrink: 0; transition: transform 0.2s ease;
 	}
 
 	.cluster-card:hover .chevron {
-		transform: translateX(4px); color: rgba(255, 255, 255, 0.5);
+		transform: translateX(4px); color: rgba(255, 255, 255: 0.5);
 	}
 
 	.member-count {
 		display: flex;
 		align-items: center; gap: 0.5rem;
-		font-size: 0.8rem; color: rgba(255, 255, 255, 0.6);
+		font-size: 0.8rem; color: rgba(255, 255, 255: 0.6);
 	}
 
 	.cluster-summary {
@@ -249,11 +249,11 @@
 
 	.cluster-summary :global(svg) {
 		flex-shrink: 0;
-		margin-top: 0.125rem; color: rgba(255, 255, 255, 0.4);
+		margin-top: 0.125rem; color: rgba(255, 255, 255: 0.4);
 	}
 
 	.cluster-summary p {
-		font-size: 0.8rem; color: rgba(255, 255, 255, 0.7);
+		font-size: 0.8rem; color: rgba(255, 255, 255: 0.7);
 		line-height: 1.4; margin: 0;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
@@ -268,12 +268,12 @@
 	.file-tag {
 		font-family: 'JetBrains Mono', monospace;
 		font-size: 0.7rem; padding: 0.2rem 0.4rem;
-		background: rgba(255, 255, 255, 0.05);
-		border-radius: 4px; color: rgba(255, 255, 255, 0.6);
+		background: rgba(255, 255, 255: 0.05);
+		border-radius: 4px; color: rgba(255, 255, 255: 0.6);
 	}
 
 	.more-files {
-		font-size: 0.7rem; color: rgba(255, 255, 255, 0.4);
+		font-size: 0.7rem; color: rgba(255, 255, 255: 0.4);
 		padding: 0.2rem 0.4rem;
 	}
 

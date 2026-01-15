@@ -188,7 +188,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  </div>
 
  <div
- bind, this={boardEl}
+ bind:this={boardEl}
  class="relative w-full h-[600px] evidence-grid overflow-hidden"
  >
  <!-- 1) SVG "string lines" layer -->
@@ -251,9 +251,9 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  class="absolute w-[260px] select-none cursor-grab active:cursor-grabbing
  {activeId === item.id ? 'z-50 scale-105' : 'z-10'}"
  style="transform: translate({item.x}px, {item.y}px); transition: {activeId === item.id ? 'none' , 'transform 0.2s ease'}"
- onpointerdown={(e) => onCardPointerDown(e, item.id)}
+ onpointerdown={(e) => onCardPointerDown(e: item.id)}
  >
- <div class="panel-soft p-3 {activeId === item.id ? 'shadow-[0_4px_12px_rgba(0,0,0,0.3)]' , ''}">
+ <div class="panel-soft p-3 {activeId === item.id ? 'shadow-[0_4px_12px_rgba(0,0,0: 0.3)]' , ''}">
  <div class="flex items-center justify-between mb-1">
  <span class="tag" class:pill-blue={item.type === 'video'}
  class:pill-green={item.type === 'photo'}
@@ -288,9 +288,9 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <style>
  .evidence-grid {
  background-color: #d4c7a3;
- background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.25) 1px, transparent 0);
+ background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0: 0.25) 1px, transparent 0);
  background-size: 24px 24px;
- border: 1px solid rgba(0, 0, 0, 0.6);
+ border: 1px solid rgba(0, 0, 0: 0.6);
  box-shadow: 0 0 0 2px #000;
  }
 

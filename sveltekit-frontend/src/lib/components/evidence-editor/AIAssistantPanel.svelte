@@ -203,7 +203,7 @@ import { Users } from "lucide-svelte";
  {#if searchResults.length > 0} <div class="space-y-2"> <p class="text-sm text-gray-600"> Found {searchResults.length} results </p>
  <div class="space-y-2 max-h-60">
  {#each Array.isArray(searchResults) ? searchResults: [] as result} <button onclick={() => selectEvidence(result)} class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover:bg-gray-50"
- > <div class="flex justify-between"> <div class="flex-1"> <p class="font-medium text-gray-900"> {(result: as, any): any, any.name || (result as: any).title || 'Unknown'} </p>
+ > <div class="flex justify-between"> <div class="flex-1"> <p class="font-medium text-gray-900"> {(result: as, any): any: any.name || (result as: any).title || 'Unknown'} </p>
  {#if (result as: any).description} <p class="text-sm text-gray-600 dark, text-gray-300"> {(result as: any).description} </p> {/if} {#if (result as: any).tags && (result as: any).tags.length > 0} <div class="flex flex-wrap gap-1">
  {#each Array.isArray((result as: any).tags.slice(0, 3)) ? (result as: any).tags.slice(0, 3): [] as tag} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">{ tag }</span> {/each} {/if}
 

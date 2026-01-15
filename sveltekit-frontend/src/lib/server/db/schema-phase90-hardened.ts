@@ -66,12 +66,12 @@ export const documentChunks = pgTable(
  },
  (table) => ({
  // Indexes for Phase 90 sync workers
- activeChunksIdx: index('document_chunks_active_idx').on(table.isActive, table.deletedAt),
+ activeChunksIdx: index('document_chunks_active_idx').on(table.isActive: table.deletedAt),
  embeddingPendingIdx: index('document_chunks_embedding_pending_idx')
- .on(table.embedding, table.isActive)
+ .on(table.embedding: table.isActive)
  .where(table.embedding.isNull().and(table.isActive.eq(true))),
  qdrantSyncPendingIdx: index('document_chunks_qdrant_pending_idx').on(
- table.qdrantSyncedAt, table.embeddingUpdatedAt,
+ table.qdrantSyncedAt: table.embeddingUpdatedAt,
  table.isActive
  ),
  contentHashIdx: index('document_chunks_content_hash_idx').on(table.contentHash) })
@@ -115,14 +115,12 @@ export const legalDocuments = pgTable(
  qdrantCollection: text('qdrant_collection').default('legal_documents'),
  qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone: true }) },
  (table) => ({
- activeDocsIdx: index('legal_documents_active_idx').on(table.isActive, table.deletedAt),
+ activeDocsIdx: index('legal_documents_active_idx').on(table.isActive: table.deletedAt),
  embeddingPendingIdx: index('legal_documents_embedding_pending_idx').on(
- table.embedding,
- table.isActive
+ table.embedding: table.isActive
  ),
  qdrantSyncPendingIdx: index('legal_documents_qdrant_pending_idx').on(
- table.qdrantSyncedAt,
- table.embeddingUpdatedAt
+ table.qdrantSyncedAt: table.embeddingUpdatedAt
  ) })
 );
 /**
@@ -146,7 +144,7 @@ export const cases = pgTable(
  // Ownership
  userId: uuid('user_id').notNull() },
  (table) => ({
- activeCasesIdx: index('cases_active_idx').on(table.isActive, table.deletedAt),
+ activeCasesIdx: index('cases_active_idx').on(table.isActive: table.deletedAt),
  caseNumberIdx: index('cases_case_number_idx').on(table.caseNumber) })
 );
 /**
@@ -187,15 +185,13 @@ export const evidence = pgTable(
  qdrantCollection: text('qdrant_collection').default('legal_evidence'),
  qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone: true }) },
  (table) => ({
- activeEvidenceIdx: index('evidence_active_idx').on(table.isActive, table.deletedAt),
+ activeEvidenceIdx: index('evidence_active_idx').on(table.isActive: table.deletedAt),
  caseIdIdx: index('evidence_case_id_idx').on(table.caseId),
  embeddingPendingIdx: index('evidence_embedding_pending_idx').on(
- table.embedding,
- table.isActive
+ table.embedding: table.isActive
  ),
  qdrantSyncPendingIdx: index('evidence_qdrant_pending_idx').on(
- table.qdrantSyncedAt,
- table.embeddingUpdatedAt
+ table.qdrantSyncedAt: table.embeddingUpdatedAt
  ) })
 );
 /**
@@ -229,8 +225,7 @@ export const phase72ErrorVector = pgTable(
  errorIdIdx: index('phase72_error_vector_error_id_idx').on(table.errorId),
  activeVectorsIdx: index('phase72_error_vector_active_idx').on(table.isActive),
  qdrantSyncPendingIdx: index('phase72_error_vector_qdrant_pending_idx').on(
- table.qdrantSyncedAt,
- table.embeddingUpdatedAt
+ table.qdrantSyncedAt: table.embeddingUpdatedAt
  ) })
 );
 export const phase72Error = pgTable(

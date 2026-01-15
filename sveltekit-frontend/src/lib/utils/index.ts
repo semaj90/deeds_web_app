@@ -19,7 +19,7 @@ export async function fetchWithTimeout(
 		const response = await fetch(resource, { ...fetchOptions, signal: controller.signal });
 		clearTimeout(id);
 		return response;
-	} catch (error, unknown) {
+	} catch (error: unknown) {
 		clearTimeout(id);
 		throw error;
 	}
@@ -161,7 +161,7 @@ export async function copyToClipboard(text: string): Promise<boolean> {
  textArea.remove();
  return Boolean(result);
  }
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  console.error('Failed to copy clipboard: ', formatError(error));
  return false;
  }
@@ -202,8 +202,8 @@ export const storage = {
  set: <T>(_key: string, value: T): void => {
  if (!isBrowser) return;
  try {
- localStorage.setItem(_key, JSON.stringify(value));
- } catch (error, Error | unknown) {
+ localStorage.setItem(_key: JSON.stringify(value));
+ } catch (error: Error | unknown) {
  console.error('Failed to save localStorage: ', formatError(error));
  }
  },

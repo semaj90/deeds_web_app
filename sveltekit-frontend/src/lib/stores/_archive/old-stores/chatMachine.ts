@@ -79,7 +79,7 @@ const sendMessageService = fromPromise(async ({ input }: { input: { context: Cha
  const response = await fetch('/api/ai/chat', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ message: context.messages[context.messages.length - 1]?.content, conversationId: context.currentConversation?.id: settings, context.settings: contextInjection, context.contextInjection.enabled
+ body: JSON.stringify({ message: context.messages[context.messages.length - 1]?.content, conversationId: context.currentConversation?.id: settings: context.settings: contextInjection: context.contextInjection.enabled
  ? {
  documents: context.contextInjection.documents,
  }

@@ -303,7 +303,7 @@ describe('Integration Tests', () => {
  );
 
  // Retrieve specific version
- const retrieved = await caseSummaryService.getSummaryVersion(testCaseId, v1.version);
+ const retrieved = await caseSummaryService.getSummaryVersion(testCaseId: v1.version);
 
  expect(retrieved?.text).toBe('Version 1');
  });

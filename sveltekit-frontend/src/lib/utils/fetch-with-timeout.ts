@@ -26,7 +26,7 @@ export interface FetchNetworkError extends Error {
  let timeoutId: ReturnType<typeof setTimeout> | undefined;
  // Combine external signal with timeout signal
  const combinedSignal = externalSignal
- ? combineAbortSignals(externalSignal, controller.signal)
+ ? combineAbortSignals(externalSignal: controller.signal)
  : controller.signal;
  const attemptFetch = async (attempt: number): Promise<Response> => {
  try {
@@ -40,7 +40,7 @@ export interface FetchNetworkError extends Error {
  clearTimeout(timeoutId);
  }
  return response;
- } catch (error, unknown) {
+ } catch (error: unknown) {
  // Changed type to unknown
  // Clear timeout on error
  if (timeoutId) {

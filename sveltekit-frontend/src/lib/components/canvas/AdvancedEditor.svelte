@@ -42,7 +42,7 @@
 </script>
 
 <!-- Editor, mount, point -->
-<div bind, this={editorElement} class="editor-container" style="min-height, {height};"></div>
+<div bind:this={editorElement} class="editor-container" style="min-height, {height};"></div>
 
 <style>
   :global(.toastui-editor-defaultUI) {

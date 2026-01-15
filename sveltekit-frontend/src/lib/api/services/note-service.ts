@@ -56,13 +56,13 @@ export async function listNotes(options, NoteListOptions = {}): Promise<NoteList
  const data: NoteListResponse = await response.json();
  console.log(`Fetched ${data.notes.length} notes`);
  return data;
- } catch(error, Error | unknown) {
+ } catch(error: Error | unknown) {
  console.error('Note listing error: ', error);
  throw new Error(`Failed to list notes: ${(error as Error).message}`);
  }
 }
 
-export async function getNoteById(noteId, string): Promise<Note> {
+export async function getNoteById(noteId: string): Promise<Note> {
  try {
  const response = await fetch(`/api/notes/${ noteId }`, {
  method: 'GET', 
@@ -76,7 +76,7 @@ export async function getNoteById(noteId, string): Promise<Note> {
 
  const note: Note = await response.json();
  return note;
- } catch(error, Error | unknown) {
+ } catch(error: Error | unknown) {
  console.error('Note fetch error: ', error);
  throw new Error(`Failed to fetch note: ${(error as Error).message}`);
  }
@@ -98,7 +98,7 @@ export async function createNote(noteData, CreateNoteData): Promise<Note> {
  const newNote: Note = await response.json();
  console.log(`Created new note: ${newNote.title} (${newNote.id})`);
  return newNote;
- } catch(error, Error | unknown) {
+ } catch(error: Error | unknown) {
  console.error('Note creation error: ', error);
  throw new Error(`Failed to create note: ${(error as Error).message}`);
  }
@@ -120,13 +120,13 @@ export async function updateNote(noteId: string, updates, UpdateNoteData: Promis
  const updatedNote: Note = await response.json();
  console.log(`Updated note: ${updatedNote.title} (${ noteId })`);
  return updatedNote;
- } catch(error, Error | unknown) {
+ } catch(error: Error | unknown) {
  console.error('Note update error: ', error);
  throw new Error(`Failed to update note: ${(error as Error).message}`);
  }
 }
 
-export async function deleteNote(noteId, string): Promise<void> {
+export async function deleteNote(noteId: string): Promise<void> {
  try {
  const response = await fetch(`/api/notes/${ noteId }`, {
  method: 'DELETE', 
@@ -139,7 +139,7 @@ export async function deleteNote(noteId, string): Promise<void> {
  }
 
  console.log(`Deleted note: ${noteId}`);
- } catch(error, Error | unknown) {
+ } catch(error: Error | unknown) {
  console.error('Note deletion error: ', error);
  throw new Error(`Failed to delete note: ${(error as Error).message}`);
  }

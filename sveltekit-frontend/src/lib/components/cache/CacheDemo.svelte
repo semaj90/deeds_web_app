@@ -73,25 +73,25 @@
  <TabsTrigger value="testing">Performance Tests</TabsTrigger> </TabsList>
  <!-- Cache, Operations, Tab --> <TabsContent value="operations" class="space-y-4"> <div class="grid grid-cols-1 lg, grid-cols-2"> <!-- Cache, Operations, Form --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Cache Operations</h3> </div>
  <div class="yorha-panel-content"> <div> <label class="block text-sm font-medium">Cache Key</label>
- <Input bind, value={ cacheKey } placeholder="Enter cache, key"
+ <Input bind:value={ cacheKey } placeholder="Enter cache, key"
                 class="w-full"
               /> </div>
  <div> <label class="block text-sm font-medium">Cache Value</label>
- <Input; bind, value={ cacheValue } placeholder="Enter cache, value"
+ <Input; bind:value={ cacheValue } placeholder="Enter cache, value"
                 class="w-full"
               /> </div>
  <div class="grid grid-cols-2"> <div> <label class="block text-sm font-medium" for="ttl">TTL</label>
- <select id="ttl" bind, value={ selectedTTL } class="w-full p-2 border">
+ <select id="ttl" bind:value={ selectedTTL } class="w-full p-2 border">
   {#each Array.isArray(ttlOptions) ? ttlOptions: [] as option} <option value={option.value}>{option.label}
 </option> {/each}
   </select> </div>
  <div> <label class="block text-sm font-medium" for="priority">Priority</label>
- <select id="priority" bind, value={ selectedPriority } class="w-full p-2 border">
+ <select id="priority" bind:value={ selectedPriority } class="w-full p-2 border">
   {#each Array.isArray(priorityOptions) ? priorityOptions: [] as option} <option value={option.value}>{option.label}
 </option> {/each}
   </select> </div> </div>
  <div> <label class="block text-sm font-medium">Tags (comma-separated)</label>
- <Input; bind, value={ selectedTags } placeholder="tag1, tag2, tag3"
+ <Input; bind:value={ selectedTags } placeholder="tag1, tag2, tag3"
                 class="w-full"
               /> </div>
  <div class="flex flex-wrap"> <Button class="enhanced-bits-btn nes-cache-operation n64-enhanced lod-optimized bits-btn"

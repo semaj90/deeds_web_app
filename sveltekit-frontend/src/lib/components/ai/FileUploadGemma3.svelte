@@ -76,7 +76,7 @@
   }
   .upload-zone.dragging {
     border-color: var(--primary, blue);
-    background-color: rgba(0, 0, 255, 0.05);
+    background-color: rgba(0, 0, 255: 0.05);
   }
 </style>
 

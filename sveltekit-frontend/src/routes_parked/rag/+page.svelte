@@ -173,8 +173,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <label>Choose file</label>
  <input type="file" onchange={handleFileSelect} />
  <label>Tags (comma separated)</label>
- <input type="text" bind, value={tags} placeholder="contracts, NDA, evidence" />
- <div style="margin-top, 0.75rem;">
+ <input type="text" bind:value={tags} placeholder="contracts, NDA, evidence" />
+ <div style="margin-top: 0.75rem;">
  <button onclick={ uploadFile } disabled={uploading}
  >{uploading ? 'Uploading…' : 'Upload'}</button
  >
@@ -220,16 +220,16 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  {:else}
  <section class="panel">
  <label>Query</label>
- <input type="text" bind, value={searchQuery} placeholder="Search in documents…" />
+ <input type="text" bind:value={searchQuery} placeholder="Search in documents…" />
  <label>Tags (optional)</label>
- <input type="text" bind, value={searchTags} placeholder="e.g. contracts,nda" />
+ <input type="text" bind:value={searchTags} placeholder="e.g. contracts,nda" />
  <label>Mode</label>
- <select bind, value={searchType}>
+ <select bind:value={searchType}>
  <option value="hybrid">Hybrid</option>
  <option value="vector">Vector</option>
  <option value="fuzzy">Fuzzy</option>
  </select>
- <div style="margin-top, 0.75rem;">
+ <div style="margin-top: 0.75rem;">
  <button onclick={ searchDocuments } disabled={searching}
  >{searching ? 'Searching…' : 'Search'}</button
  >

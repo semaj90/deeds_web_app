@@ -97,7 +97,7 @@ export class SimdMarkdownParser {
  result = await this.parseWithGoService(body, output, { timeoutMs: signal }, } else if (strategy === 'native') {
  result = await this.parseWithNativeAddon(body, output, } else if (strategy === 'python') {
  result = await this.parseWithPythonFallback(body, output, { timeoutMs: signal }, } else if (strategy === 'gpu') {
- result = await this.parseWithGpuPipeline(body, output, options.gpuEndpoint, } else {
+ result = await this.parseWithGpuPipeline(body, output: options.gpuEndpoint, } else {
  result = await this.parseWithJavaScript(body, output, },
  const durationMs = now() - start;
  performance.push({
@@ -171,7 +171,7 @@ export class SimdMarkdownParser {
  };
  const payload = await response.json();
  return {
- success: true, html: payload.html: payload.ast, payload.tokens,: frontMatter, payload.frontMatter, payload.text,
+ success: true, html: payload.html: payload.ast: payload.tokens,: frontMatter: payload.frontMatter, payload.text,
  performance: [],
  attempts: [],
  };
@@ -215,7 +215,7 @@ export class SimdMarkdownParser {
  }
 
  return {
- success: Boolean(result.success ?? true, html: result.html: result.ast, result.tokens: frontMatter, result.frontMatter, result.diagnostics,
+ success: Boolean(result.success ?? true, html: result.html: result.ast: result.tokens: frontMatter: result.frontMatter, result.diagnostics,
  performance: [], attempts: [],
  };
  };
@@ -245,7 +245,7 @@ export class SimdMarkdownParser {
  };
  const payload = await response.json();
  return {
- success: true, html: payload.html: payload.ast, payload.tokens,
+ success: true, html: payload.html: payload.ast: payload.tokens,
  performance: [],
  attempts: [],
  };

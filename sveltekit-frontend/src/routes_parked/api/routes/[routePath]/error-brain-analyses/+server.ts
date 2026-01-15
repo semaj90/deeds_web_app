@@ -33,7 +33,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
  const patches = await db
  .select()
  .from(routeErrorPatchesTable)
- .where(eq(routeErrorPatchesTable.analysisId, analysis.id))
+ .where(eq(routeErrorPatchesTable.analysisId: analysis.id))
  .orderBy(desc(routeErrorPatchesTable.createdAt));
 
  return {

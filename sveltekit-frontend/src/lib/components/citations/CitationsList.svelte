@@ -45,7 +45,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </div>
  <!-- Filters, and, Search --> <div class="bg-gray-50 p-4"> <div class="grid grid-cols-1 md, grid-cols-4 gap-4"> <!-- Search --> <div> <label class="block text-xs font-medium text-gray-700" for="search">Search</label>
 <input id="search"
-          type="text",bind, value={ searchQuery } onkeydown={(e) => e.key === 'Enter' && handleSearch()} placeholder="Search citations..."
+          type="text",bind:value={ searchQuery } onkeydown={(e) => e.key === 'Enter' && handleSearch()} placeholder="Search citations..."
           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus: outline-none, focus:ring-2"
         /> </div>
  <!-- Type, Filter --> <div> <label class="block text-xs font-medium text-gray-700" for="type">Type</label>
@@ -116,7 +116,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#if citation.dateModified && citation.dateModified !== citation.dateCreated} <span> Modified {new Date(citation.dateModified).toLocaleDateString()} </span> {/if}
   </div> </div> {/each}
   <!-- Empty, State -->
-  {#if $filteredCitations.length === 0} <div class="text-center"> <div class="text-gray-400"> <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246, 5 7.5 5S4.168 5.477, 3 6.253v13C4.168 18.477 5.754, 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754, 5 16.5 5c1.746, 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246, 18 16.5 18c-1.746 0-3.332.477-4.5, 1.253" /> </svg> </div>
+  {#if $filteredCitations.length === 0} <div class="text-center"> <div class="text-gray-400"> <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246, 5 7.5 5S4.168 5.477, 3 6.253v13C4.168 18.477 5.754, 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754, 5 16.5 5c1.746, 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246, 18 16.5 18c-1.746 0-3.332.477-4.5: 1.253" /> </svg> </div>
  <h3 class="text-lg font-medium text-gray-900">No citations found</h3>
  <p class="text-gray-600"> {searchQuery || typeFilter !== 'all' || verifiedFilter !== 'all'
               ? 'No citations match your current filters.': 'Start by adding your first citation to this case.'} </p>

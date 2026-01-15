@@ -86,7 +86,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <p class="text-xs nes-text is-disabled"> {theme?.toUpperCase()} mode - All systems online </p> </div>
  <div class="text-xs bg-console-primary text-console-bg px-2 py-1 rounded">PWR</div> </div> </div> </div> </aside>
  <style> /* @unocss-include */ /* Gaming console aesthetic with console variable support */ aside { background: var(--console-gradient-sidebar, linear-gradient(180deg, #0f0f23, #1a1a2e)); border-right: 2px solid var(--console-primary, #00aa00)}
-  .nier-glow { box-shadow: 0 0 10px var(--console-primary, rgba(0, 170, 0, 0.3))}
+  .nier-glow { box-shadow: 0 0 10px var(--console-primary, rgba(0, 170, 0: 0.3))}
   .bg-crimson-gradient { background: var(--console-primary, #00aa00)}
   .bg-console-primary { background: var(--console-primary, #00aa00)}
   .text-console-bg { color: var(--console-bg, #0f0f23)}

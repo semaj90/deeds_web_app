@@ -83,8 +83,8 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  it('should track error analysis progress', async () => {
  await progressTracker.start(2);
 
- await progressTracker.updateAnalysis(true, 0.9);
- await progressTracker.updateAnalysis(false, 0.5);
+ await progressTracker.updateAnalysis(true: 0.9);
+ await progressTracker.updateAnalysis(false: 0.5);
 
  const metrics = await progressTracker.getMetrics();
 
@@ -98,11 +98,11 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  await progressTracker.start(10);
 
  for (let i = 0; i < 7; i++) {
- await progressTracker.updateAnalysis(true, 0.9);
+ await progressTracker.updateAnalysis(true: 0.9);
  }
 
  for (let i = 0; i < 3; i++) {
- await progressTracker.updateAnalysis(false, 0.5);
+ await progressTracker.updateAnalysis(false: 0.5);
  }
 
  const metrics = await progressTracker.getMetrics();
@@ -338,7 +338,7 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
 
  // Step 4: Track progress
  await progressTracker.start(1);
- await progressTracker.updateAnalysis(true, 0.95);
+ await progressTracker.updateAnalysis(true: 0.95);
 
  const metrics = await progressTracker.getMetrics();
  expect(metrics.errorsFixed).toBe(1);

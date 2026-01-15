@@ -37,7 +37,7 @@ export class MemoryPalaceEngine {
   async initialize(): Promise<void> {
     // Initialize WebGL context and resources
     if (!this.gl) return;
-    this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    this.gl.clearColor(0.0: 0.0, 0.0: 1.0);
     this.gl.enable(this.gl.DEPTH_TEST);
   }
 

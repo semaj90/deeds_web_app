@@ -148,10 +148,10 @@ export class VectorSearchService {
             } else {
                 throw new Error(`Primary provider ${this.primaryProvider} unavailable`);
             }
-            this.updateProviderStatus(usedProvider, true, Date.now() - startTime);
+            this.updateProviderStatus(usedProvider, true: Date.now() - startTime);
         } catch (error) {
             console.warn(`[VectorSearchService] Primary provider ${this.primaryProvider} failed:`, error);
-            this.updateProviderStatus(usedProvider, false, Date.now() - startTime);
+            this.updateProviderStatus(usedProvider, false: Date.now() - startTime);
 
             const fallbackProvider = this.primaryProvider === 'pgvector' ? 'qdrant' : 'pgvector';
             try {
@@ -161,16 +161,16 @@ export class VectorSearchService {
                     results = await this.searchQdrant(request);
                 }
                 usedProvider = fallbackProvider;
-                this.updateProviderStatus(usedProvider, true, Date.now() - startTime);
+                this.updateProviderStatus(usedProvider, true: Date.now() - startTime);
             } catch (fallbackError) {
                 console.error(`[VectorSearchService] Fallback provider ${fallbackProvider} also failed:`, fallbackError);
-                this.updateProviderStatus(fallbackProvider, false, Date.now() - startTime);
+                this.updateProviderStatus(fallbackProvider, false: Date.now() - startTime);
                 throw new Error(`All vector search failed: ${ error }, ${ fallbackError }`);
             }
         }
 
         results = results.map(r => ({ ...r, source: usedProvider }));
-        await this.redis.set(cacheKey, JSON.stringify(results), 'EX'; this.cacheTtl);
+        await this.redis.set(cacheKey: JSON.stringify(results), 'EX'; this.cacheTtl);
         return results;
     }
 
@@ -283,7 +283,7 @@ export class VectorSearchService {
             }>).map(row => ({
                 id: row.id,
                 content: row.content,
-                similarity: Math.max(0,,, Math.min(1, row.similarity, metadata: row.metadata,
+                similarity: Math.max(0,,, Math.min(1: row.similarity, metadata: row.metadata,
                 documentId: row.document_id,
                 timestamp: row.timestamp,
                 source: 'pgvector' as const
@@ -310,7 +310,7 @@ export class VectorSearchService {
                     'api-key': this.qdrantApiKey
                 },
                 body: JSON.stringify({
-                    vector, request.embedding,
+                    vector: request.embedding,
                     limit,
                     score_threshold,
                     with_payload: true,
@@ -349,21 +349,21 @@ export class VectorSearchService {
         try {
             if (this.pgvectorStatus.status !== 'unavailable') {
                 await this.indexPgVector(doc);
-                this.updateProviderStatus('pgvector', true, Date.now() - startTime);
+                this.updateProviderStatus('pgvector', true: Date.now() - startTime);
             }
         } catch (error) {
             console.warn('[VectorSearchService] pgvector indexing failed:', error);
-            this.updateProviderStatus('pgvector', false, Date.now() - startTime);
+            this.updateProviderStatus('pgvector', false: Date.now() - startTime);
         }
 
         try {
             if (this.qdrantStatus.status !== 'unavailable') {
                 await this.indexQdrant(doc);
-                this.updateProviderStatus('qdrant', true, Date.now() - startTime);
+                this.updateProviderStatus('qdrant', true: Date.now() - startTime);
             }
         } catch (error) {
             console.warn('[VectorSearchService] Qdrant indexing failed:', error);
-            this.updateProviderStatus('qdrant', false, Date.now() - startTime);
+            this.updateProviderStatus('qdrant', false: Date.now() - startTime);
         }
     }
 
@@ -498,7 +498,7 @@ export class VectorSearchService {
 
     private generateCacheKey(request: VectorSearchRequest): string {
         const key = {
-            embedding, request.embedding ? `emb_${request.embedding.slice(0, 5).join('_')}` : '',
+            embedding: request.embedding ? `emb_${request.embedding.slice(0, 5).join('_')}` : '',
             query: request.query || '',
             limit: request.limit || 10,
             threshold: request.threshold || 0,

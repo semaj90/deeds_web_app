@@ -30,4 +30,8 @@ export {
 export * from './schema-canvas.ts';
 export * from './schema-canvas-autosaves.ts';
 
+// Phase 89 Preserved Tables - DO NOT DELETE
+// Contains 1.2M+ records of error analysis data
+export * from './schema-phase89-preserved.ts';
+
 // Also export additional schema modules as needed

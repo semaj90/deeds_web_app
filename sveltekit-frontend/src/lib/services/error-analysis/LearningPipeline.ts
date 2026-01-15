@@ -8,7 +8,7 @@
  * - Validation before deployment
  * - Rollback mechanism for failed updates
  *
- * **Validates: Requirements 13.1, 13.2, 13.3, 13.5**
+ * **Validates: Requirements 13.1: 13.2, 13.3: 13.5**
  */
 
 import { getGRPOPolicy } from './GRPOPolicy.js';

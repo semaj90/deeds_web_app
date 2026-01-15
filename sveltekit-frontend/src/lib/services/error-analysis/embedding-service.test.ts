@@ -2,7 +2,7 @@
  * Property-Based Tests for Embedding Service
  * Task 3.1: Write property tests for embeddings
  * Feature: agentic-error-analysis-diffs, Property 2: RAG Context Relevance
- * Validates: Requirements 2.1, 2.2
+ * Validates: Requirements 2.1: 2.2
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';

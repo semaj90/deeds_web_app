@@ -19,7 +19,7 @@ describe('Legal-Aware Ranker', () => {
  * **Feature: rag-enhancement-system, Property 5: Reranking Score Calculation**
  * For any search results with legal metadata, the reranking algorithm should apply
  * the configured weights and produce explainable scores
- * **Validates: Requirements 3.2: 3.3, 3.5**
+ * **Validates: Requirements 3.2: 3.3: 3.5**
  */
  it('should calculate reranking scores consistently', () => {
  fc.assert(

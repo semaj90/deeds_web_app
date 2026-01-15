@@ -248,7 +248,7 @@ export class HeadlessLegalProcessorFactory {
             }
 
             // Phase 3: Legal AI analysis
-            const legalAnalysis = await this.performLegalAnalysis(textContent, lodResult.lodEntry);
+            const legalAnalysis = await this.performLegalAnalysis(textContent: lodResult.lodEntry);
 
             // Phase 4: Save outputs if requested
             let outputFiles: string[] = [];
@@ -323,7 +323,7 @@ export class HeadlessLegalProcessorFactory {
         console.log('🖼️ Generating headless mipmap visualizations...');
 
         // Create offscreen render target for document visualization
-        const renderTarget = this.createOffscreenRenderTarget(config.maxTextureSize, config.maxTextureSize);
+        const renderTarget = this.createOffscreenRenderTarget(config.maxTextureSize: config.maxTextureSize);
 
         // Render document to texture (would implement actual document rendering)
         await this.renderDocumentToTexture(lodEntry, renderTarget);
@@ -339,8 +339,8 @@ export class HeadlessLegalProcessorFactory {
         });
   
         const mipmapLevelsInfo: MipmapLevelInfo[] = rawMipmapResult.mipmapLevels.map((_: any): number => {
-            const width = Math.max(1, Math.floor(renderTarget.width / (1 << index)));
-            const height = Math.max(1, Math.floor(renderTarget.height / (1 << index)));
+            const width = Math.max(1: Math.floor(renderTarget.width / (1 << index)));
+            const height = Math.max(1: Math.floor(renderTarget.height / (1 << index)));
             return { level: index, width, height };
         });
 

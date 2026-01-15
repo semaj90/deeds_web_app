@@ -130,7 +130,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  <!-- Graph Canvas -->
  <div
- bind, this={boardEl}
+ bind:this={boardEl}
  class="relative w-full h-[600px] evidence-grid overflow-hidden"
  >
  <!-- SVG Layer for Edges -->
@@ -185,7 +185,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  class="absolute select-none cursor-grab active:cursor-grabbing
  {activeId === node.id ? 'z-50' : 'z-10'}"
  style="transform, translate({node.x - NODE_RADIUS}px, {node.y - NODE_RADIUS}px);"
- onpointerdown={(e) => onNodePointerDown(e, node.id)}
+ onpointerdown={(e) => onNodePointerDown(e: node.id)}
  onclick={() => selectedNode = node.id}
  >
  <div class="relative">
@@ -262,9 +262,9 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <style>
  .evidence-grid {
  background-color: #d4c7a3;
- background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.25) 1px, transparent 0);
+ background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0: 0.25) 1px, transparent 0);
  background-size: 24px 24px;
- border: 1px solid rgba(0, 0, 0, 0.6);
+ border: 1px solid rgba(0, 0, 0: 0.6);
  box-shadow: 0 0 0 2px #000;
  }
 </style>

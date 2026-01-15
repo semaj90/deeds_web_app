@@ -22,7 +22,7 @@
  display: inline-flex;
  align-items: center; gap: 0.5rem;
  padding: 0.5rem 0.75rem;
- border-radius: 6px; border: 1px solid rgba(0, 0, 0, 0.06);
+ border-radius: 6px; border: 1px solid rgba(0, 0, 0: 0.06);
  background: var(--button-bg, #f7f9fc);
  color: var(--button-fg, #111);
  cursor: pointer;

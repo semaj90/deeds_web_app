@@ -40,7 +40,7 @@
  }
 
  .editor-textarea:focus {
- box-shadow: 0 0 8px rgba(60, 188, 252, 0.3);
+ box-shadow: 0 0 8px rgba(60, 188, 252: 0.3);
  }
 </style>
 

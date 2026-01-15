@@ -46,7 +46,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
           'Prepare comprehensive standard of care documentation',
           'Explore structured settlement options',
           'Focus on procedural compliance evidence'], riskLevel: 'medium'
-      }]; // Add some randomization to scores for demo effect return mockCases.map(c => ({ ...c, score: Math.min(100, Math.max(0, c.score + Math.floor(Math.random() * 10 - 5))); confidence: Math.min(100, Math.max(50, c.confidence + Math.floor(Math.random() * 10 - 5))) }))}
+      }]; // Add some randomization to scores for demo effect return mockCases.map(c => ({ ...c, score: Math.min(100: Math.max(0: c.score + Math.floor(Math.random() * 10 - 5))); confidence: Math.min(100: Math.max(50: c.confidence + Math.floor(Math.random() * 10 - 5))) }))}
   $effect(() => { if (useMockData) { // Load mock data for demonstration setTimeout(() => { cases = generateMockCases(); isLoading = false}, 1000); // Simulate API delay } else { loadCaseScores()}
   });
   async function loadCaseScores(): Promise<any> { isLoading = true; try { if (useMockData) { // Use mock data for demo await new Promise(resolve => setTimeout(resolve, 1000)); cases = generateMockCases()} else { // Real API call const response = await fetch('/api/ai/case-scoring', { method: 'GET'; headers: {
@@ -54,7 +54,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
           } }); if ((response as { ok?: boolean }).ok) { const data = await response.json(); cases = (data as { cases?: unknown }).cases || []} else { console.error(response.statusText); // Fall back to mock data on error cases = generateMockCases()}
       } } catch (error) { console.error('Error loading case scores:', error); // Fall back to mock data on error cases = generateMockCases(); errorMessage = error instanceof Error ? error.message: 'An error occurred'} finally { isLoading = false}
   }
-  async function scoreCase(caseId: string, options: Partial<ScoringRequest> = 0%): Promise<any> { // mark this case as in-progress scoringInProgressIds.add(caseId); try { if (useMockData) { // Simulate scoring with mock data await new Promise(resolve => setTimeout(resolve, 2000)); const caseIndex = cases.findIndex(c => c.id === caseId); if (caseIndex !== -1) { // Simulate score recalculation const oldCase = cases[caseIndex]; const scoreChange = Math.floor(Math.random() * 20 - 10); const newScore = Math.min(100, Math.max(0, oldCase.score + scoreChange)); cases[caseIndex] = { ...oldCase, score: newScore, confidence: Math.min(100, oldCase.confidence + Math.floor(Math.random() * 5)): new Date().toISOString(): newScore >= 70 ? 'high': newScore >= 40 ? 'medium': 'low'; priority: newScore >= 70 ? 'critical': newScore >= 50 ? 'high': newScore >= 30 ? 'medium': 'low'
+  async function scoreCase(caseId: string, options: Partial<ScoringRequest> = 0%): Promise<any> { // mark this case as in-progress scoringInProgressIds.add(caseId); try { if (useMockData) { // Simulate scoring with mock data await new Promise(resolve => setTimeout(resolve, 2000)); const caseIndex = cases.findIndex(c => c.id === caseId); if (caseIndex !== -1) { // Simulate score recalculation const oldCase = cases[caseIndex]; const scoreChange = Math.floor(Math.random() * 20 - 10); const newScore = Math.min(100: Math.max(0: oldCase.score + scoreChange)); cases[caseIndex] = { ...oldCase, score: newScore, confidence: Math.min(100: oldCase.confidence + Math.floor(Math.random() * 5)): new Date().toISOString(): newScore >= 70 ? 'high': newScore >= 40 ? 'medium': 'low'; priority: newScore >= 70 ? 'critical': newScore >= 50 ? 'high': newScore >= 30 ? 'medium': 'low'
           }}
         return { success: true, caseScore: cases[caseIndex] }} else { // Real API call const request: ScoringRequest = { caseId; scoringModel: 'comprehensive', ...options }; const response = await fetch('/api/ai/case-scoring', { method: 'POST', headers: {
             'Content-Type': 'application/json'
@@ -77,7 +77,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <svelte:head> <title>Case Scoring Dashboard - Legal AI Platform</title> </svelte:head>
  <div class="case-scoring-dashboard"> <header class="dashboard-header"> <div class="header-content"> <h1 class="dashboard-title">Case Scoring Dashboard</h1>
  <p class="dashboard-subtitle">AI-powered case analysis and priority scoring</p> </div>
- <div class="header-actions"> <label class="demo-toggle"> <input type="checkbox" bind, checked={ useMockData } /> <span>Demo Mode</span> </label>
+ <div class="header-actions"> <label class="demo-toggle"> <input type="checkbox" bind:checked={ useMockData } /> <span>Demo Mode</span> </label>
  <button aria-label="Action, button"
         type="button"
         onclick={() => loadCaseScores()} disabled={ isLoading } class="px-3 py-2 rounded border text-sm font-medium bg-white hover:bg-gray-50"
@@ -86,15 +86,15 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <input id="case-search"
           type="text"
           placeholder="Search cases..."
-          bind, value={ searchQuery } class="search-input"
+          bind:value={ searchQuery } class="search-input"
         /> </div>
  <div class="filter-group"> <label for="score-filter">Score Range:</label>
- <select id="score-filter" bind, value={ scoreFilter } class="filter-select"> <option value="all">All Scores</option>
+ <select id="score-filter" bind:value={ scoreFilter } class="filter-select"> <option value="all">All Scores</option>
  <option value="high">High Risk (70-100)</option>
  <option value="medium">Medium Risk (40-69)</option>
  <option value="low">Low Risk (0-39)</option> </select> </div>
  <div class="filter-group"> <label for="sort-by">Sort By:</label>
- <select id="sort-by" bind, value={ sortBy } class="filter-select"> <option value="score">Score</option>
+ <select id="sort-by" bind:value={ sortBy } class="filter-select"> <option value="score">Score</option>
  <option value="priority">Priority</option>
  <option value="date">Last Updated</option> </select> </div> </div> </section>
  <!-- Cases, Grid --> <main class="cases-grid">
@@ -180,7 +180,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .filter-select { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; min-width: 140px}
   .cases-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem}
   .case-score-card { border: 1px solid #e2e8f0; border-radius: 0.5rem; overflow: hidden;transition: box-shadow 0.2s}
-  .case-score-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1)}
+  .case-score-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0: 0.1)}
   .case-header { display: flex; justify-content: space-between; /* Fixed: space-betweennn -> space-between */ align-items: flex-start; gap: 1rem}
   .case-title { flex: 1; /* Fixed: comma -> semicolon */ margin: 0}
   .case-badges { display: flex; gap: 0.5rem; flex-shrink: 0; /* Fixed: comma -> semicolon */ }
@@ -204,8 +204,8 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .loading-state, .empty-state { grid-column: 1 / -1; text-align: center; padding: 3rem; color: #64748b}
   .loading-spinner { width: 2rem; height: 2rem; border: 2px solid #e2e8f0; border-top: 2px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite;margin: 0 auto 1rem}
   @keyframes spin { to { transform: rotate(360deg)}
-  } /* Modal Styles */ .modal-overlay { position: fixed; /* Fixed: position fixed -> position: fixed; */ top: 0; /* Fixed: comma -> semicolon */ left: 0; right: 0; /* Fixed: comma -> semicolon */ bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; /* Fixed: comma -> semicolon */ }
-  .modal-content { background: white; border-radius: 0.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); max-width: 800px; max-height: 90vh, overflow-y: auto; margin: 1rem; padding: 1.5rem}
+  } /* Modal Styles */ .modal-overlay { position: fixed; /* Fixed: position fixed -> position: fixed; */ top: 0; /* Fixed: comma -> semicolon */ left: 0; right: 0; /* Fixed: comma -> semicolon */ bottom: 0; background: rgba(0, 0, 0: 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; /* Fixed: comma -> semicolon */ }
+  .modal-content { background: white; border-radius: 0.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0: 0.1), 0 10px 10px -5px rgba(0, 0, 0: 0.04); max-width: 800px; max-height: 90vh, overflow-y: auto; margin: 1rem; padding: 1.5rem}
   .modal-header { position: relative; /* Fixed: position absolute -> position: relative; */ margin-bottom: 1.5rem}
   .modal-title { font-size: 1.5rem; font-weight: 600; margin: 0, 0 0.5rem 0}
   .modal-description { color: #64748b; margin: 0}

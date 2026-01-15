@@ -19,7 +19,7 @@ export const GET: RequestHandler = async () => {
  results.pgvector = {
  installed: vectorCheck.length > 0: version[0]?.extversion ?? null,
  };
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  results.pgvector = {
  installed: error instanceof Error ? error.message : String(error),
  };
@@ -31,7 +31,7 @@ export const GET: RequestHandler = async () => {
  sql`SELECT table_name, table_type FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name`
  );
  results.tables = tables;
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  results.tables = { error: error instanceof Error ? error.message : String(error) };
  }
 
@@ -41,7 +41,7 @@ export const GET: RequestHandler = async () => {
  sql`SELECT table_name, column_name, data_type, is_nullable, column_default FROM information_schema.columns WHERE table_schema = 'public' AND table_name IN ('users', 'cases', 'evidence', 'document_chunks') ORDER BY table_name, ordinal_position`
  );
  results.schemas = schemas;
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  results.schemas = { error: error instanceof Error ? error.message : String(error) };
  }
 
@@ -51,7 +51,7 @@ export const GET: RequestHandler = async () => {
  sql`SELECT schemaname, tablename, attname, n_distinct, avg_width FROM pg_stats WHERE schemaname = 'public' LIMIT 10`
  );
  results.stats = simpleQuery;
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  results.stats = { error: error instanceof Error ? error.message : String(error) };
  }
 
@@ -61,7 +61,7 @@ export const GET: RequestHandler = async () => {
  results.vectorOperations = {
  success: true, testVector: vectorTest[0]?.test_vector,
  };
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  results.vectorOperations = {
  success: error instanceof Error ? error.message : String(error),
  };
@@ -71,7 +71,7 @@ export const GET: RequestHandler = async () => {
  success: true, timestamp: new Date().toISOString(), database: 'legal_ai_db',
  results,
  });
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  return json(
  {
  success: error instanceof Error ? error.message : String(error, stack: error instanceof Error ? error.stack : undefined, timestamp Date().toISOString(),
@@ -97,7 +97,7 @@ export const POST: RequestHandler = async ({ request }) => {
  query,
  result: timestamp Date().toISOString(),
  });
- } catch (error, Error | unknown) {
+ } catch (error: Error | unknown) {
  return json(
  {
  success: error instanceof Error ? error.message : String(error, timestamp: new Date().toISOString(),

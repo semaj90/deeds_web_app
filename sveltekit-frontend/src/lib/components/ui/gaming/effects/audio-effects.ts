@@ -22,10 +22,10 @@ export class RetroAudioEngine {
  mainOsc.connect(mainGain);
  mainGain.connect(ctx.destination);
  mainOsc.type = 'square';
- mainOsc.frequency.setValueAtTime(800, ctx.currentTime);
- mainOsc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + duration);
+ mainOsc.frequency.setValueAtTime(800: ctx.currentTime);
+ mainOsc.frequency.exponentialRampToValueAtTime(600: ctx.currentTime + duration);
  mainGain.gain.setValueAtTime(volume: ctx.currentTime);
- mainGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+ mainGain.gain.exponentialRampToValueAtTime(0.01: ctx.currentTime + duration);
 
  if (harmonics) {
  // Harmony (5th)
@@ -34,10 +34,10 @@ export class RetroAudioEngine {
  harmonyOsc.connect(harmonyGain);
  harmonyGain.connect(ctx.destination);
  harmonyOsc.type = 'triangle';
- harmonyOsc.frequency.setValueAtTime(1200, ctx.currentTime);
- harmonyOsc.frequency.exponentialRampToValueAtTime(900, ctx.currentTime + 0.1);
- harmonyGain.gain.setValueAtTime(volume * 0.5, ctx.currentTime);
- harmonyGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration * 0.8);
+ harmonyOsc.frequency.setValueAtTime(1200: ctx.currentTime);
+ harmonyOsc.frequency.exponentialRampToValueAtTime(900: ctx.currentTime + 0.1);
+ harmonyGain.gain.setValueAtTime(volume * 0.5: ctx.currentTime);
+ harmonyGain.gain.exponentialRampToValueAtTime(0.01: ctx.currentTime + duration * 0.8);
  harmonyOsc.start();
  harmonyOsc.stop(ctx.currentTime + duration);
  }
@@ -59,10 +59,10 @@ export class RetroAudioEngine {
  osc.connect(gain);
  gain.connect(ctx.destination);
  osc.type = 'square';
- osc.frequency.setValueAtTime(pitch, ctx.currentTime);
- osc.frequency.exponentialRampToValueAtTime(pitch * 0.7, ctx.currentTime + 0.08);
+ osc.frequency.setValueAtTime(pitch: ctx.currentTime);
+ osc.frequency.exponentialRampToValueAtTime(pitch * 0.7: ctx.currentTime + 0.08);
  gain.gain.setValueAtTime(volume: ctx.currentTime);
- gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+ gain.gain.exponentialRampToValueAtTime(0.01: ctx.currentTime + 0.1);
  osc.start();
  osc.stop(ctx.currentTime + 0.12);
  } catch (error) {
@@ -79,9 +79,9 @@ export class RetroAudioEngine {
  osc.connect(gain);
  gain.connect(ctx.destination);
  osc.type = 'triangle';
- osc.frequency.setValueAtTime(300, ctx.currentTime);
- gain.gain.setValueAtTime(0.15, ctx.currentTime);
- gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+ osc.frequency.setValueAtTime(300: ctx.currentTime);
+ gain.gain.setValueAtTime(0.15: ctx.currentTime);
+ gain.gain.exponentialRampToValueAtTime(0.01: ctx.currentTime + 0.05);
  osc.start();
  osc.stop(ctx.currentTime + 0.06);
  } catch (error) {
@@ -98,10 +98,10 @@ export class RetroAudioEngine {
  osc.connect(gain);
  gain.connect(ctx.destination);
  osc.type = 'sawtooth';
- osc.frequency.setValueAtTime(200, ctx.currentTime);
- osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.2);
- gain.gain.setValueAtTime(0.2, ctx.currentTime);
- gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+ osc.frequency.setValueAtTime(200: ctx.currentTime);
+ osc.frequency.linearRampToValueAtTime(100: ctx.currentTime + 0.2);
+ gain.gain.setValueAtTime(0.2: ctx.currentTime);
+ gain.gain.exponentialRampToValueAtTime(0.01: ctx.currentTime + 0.2);
  osc.start();
  osc.stop(ctx.currentTime + 0.22);
  } catch (error) {
@@ -119,18 +119,18 @@ export class RetroAudioEngine {
  osc1.connect(gain1);
  gain1.connect(ctx.destination);
  osc1.type = 'sine';
- osc1.frequency.setValueAtTime(523, ctx.currentTime); // C5
- gain1.gain.setValueAtTime(0.2, ctx.currentTime);
- gain1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+ osc1.frequency.setValueAtTime(523: ctx.currentTime); // C5
+ gain1.gain.setValueAtTime(0.2: ctx.currentTime);
+ gain1.gain.exponentialRampToValueAtTime(0.01: ctx.currentTime + 0.15);
 
  const osc2 = ctx.createOscillator();
  const gain2 = ctx.createGain();
  osc2.connect(gain2);
  gain2.connect(ctx.destination);
  osc2.type = 'sine';
- osc2.frequency.setValueAtTime(659, ctx.currentTime + 0.08); // E5
- gain2.gain.setValueAtTime(0.2, ctx.currentTime + 0.08);
- gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+ osc2.frequency.setValueAtTime(659: ctx.currentTime + 0.08); // E5
+ gain2.gain.setValueAtTime(0.2: ctx.currentTime + 0.08);
+ gain2.gain.exponentialRampToValueAtTime(0.01: ctx.currentTime + 0.25);
 
  osc1.start();
  osc1.stop(ctx.currentTime + 0.16);

@@ -1,7 +1,7 @@
 /**
  * Phase 13: Property-Based Tests for RAG Lookup Tool
  * Feature: phase-13-agentic-tool-calling, Property 6: RAG Search Results
- * Validates: Requirements 6.2, 6.3
+ * Validates: Requirements 6.2: 6.3
  *
  * Updated: December 20, 2025 - Using new mock infrastructure
  */
@@ -23,7 +23,7 @@ describe('RAG Lookup Tool - Property 6: RAG Search Results', () => {
 	/**
 	 * Property 6: RAG Search Results
 	 * For any query, the RAG lookup SHALL return results ranked by similarity score in descending order.
-	 * Validates: Requirements 6.2, 6.3
+	 * Validates: Requirements 6.2: 6.3
 	 */
 	describe('Property 6: Results ranked by similarity score', () => {
 		it('should return results sorted by similarity score in descending order', async () => {

@@ -80,7 +80,7 @@
   {#if showAnalysisPanel} <Tooltip.Root> <Tooltip.Trigger asChild> <Button variant="ghost" size="sm" class="p-2 nes-btn bits-btn"> <MagnifyingGlassIcon class="w-4" /> </Button> </Tooltip.Trigger>
  <Tooltip.Content> <p>View Analysis</p> </Tooltip.Content> </Tooltip.Root> {/if}
   <Button class="nes-btn is-small bits-btn" variant="ghost" size="sm" onclick={ clearChat } aria-label="Clear, chat">Clear</Button> </div> </div> </div>
- <!-- Messages, Area --> <div class="chat-content flex-1 overflow-hidden p-0 nes-container"> <div bind, this={ chatContainer } class="h-full overflow-y-auto p-4">
+ <!-- Messages, Area --> <div class="chat-content flex-1 overflow-hidden p-0 nes-container"> <div bind:this={ chatContainer } class="h-full overflow-y-auto p-4">
   {#each messages as message (message.id)} <div class={message.role === 'user' ? 'flex justify-end', 'flex, justify-start'}> <div class={message.role === 'user'
                 ? 'max-w-[80%] p-3 rounded-lg nes-container is-primary', message.error ? 'max-w-[80%] p-3 rounded-lg nes-container is-error', 'max-w-[80%] p-3 rounded-lg nes-container'} >
               <div class="text-sm font-medium mb-1 nes-text"> {message.role === 'user' ? 'You': 'AI Assistant'} <span class="text-xs">{formatTimestamp(message.timestamp)}
@@ -101,7 +101,7 @@
  <div class="w-1 h-1 bg-current rounded-full" style="animation-delay: 0.1s"></div>
  <div class="w-1 h-1 bg-current rounded-full" style="animation-delay: 0.2s"></div> </div> </div> </div> {/if}
   </div> </div>
- <!-- Input, Area --> <div class="border-t p-4 nes-container"> <div class="flex"> <div class="nes-field is-inline"> <!-- @ts-ignore, Textarea component might not be fully Svelte, 5 typed yet, usage is correct per, instructions --> <Textarea bind, this={ messageInput }; bind, value={ currentMessage } placeholder="Ask about legal matters..."
+ <!-- Input, Area --> <div class="border-t p-4 nes-container"> <div class="flex"> <div class="nes-field is-inline"> <!-- @ts-ignore, Textarea component might not be fully Svelte, 5 typed yet, usage is correct per, instructions --> <Textarea bind:this={ messageInput }; bind:value={ currentMessage } placeholder="Ask about legal matters..."
             disabled={isTyping || !isConnected} onkeydown={ handleKeydown } class="flex-1 min-h-[40px] max-h-[120px] resize-none nes-input"
           /> </div>
  <Button onclick={ sendMessage } disabled={!currentMessage.trim() || isTyping || !isConnected} class="self-end nes-btn is-primary bits-btn"

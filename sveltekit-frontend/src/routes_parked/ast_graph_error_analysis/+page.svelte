@@ -33,7 +33,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 		const initializedNodes = initializeNodePositions(rawNodes, 1200, 800);
 
 		// Apply force-directed layout
-		return forceDirectedLayout(initializedNodes, data.astGraph.edges, 1200, 800, 50);
+		return forceDirectedLayout(initializedNodes: data.astGraph.edges, 1200, 800, 50);
 	});
 
 	function handleNodeClick(e: CustomEvent) {
@@ -110,15 +110,15 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 			<div class="nes-control-group">
 				<h3 class="text-xs tracking-[0.2em] uppercase mb-2 text-[#9bbc0f]">FILTERS</h3>
 				<label class="nes-checkbox">
-					<input type="checkbox" bind, checked={showRoutes} />
+					<input type="checkbox" bind:checked={showRoutes} />
 					<span>Show Routes</span>
 				</label>
 				<label class="nes-checkbox">
-					<input type="checkbox" bind, checked={showErrors} />
+					<input type="checkbox" bind:checked={showErrors} />
 					<span>Show Errors</span>
 				</label>
 				<label class="nes-checkbox">
-					<input type="checkbox" bind, checked={showClusters} />
+					<input type="checkbox" bind:checked={showClusters} />
 					<span>Show Clusters</span>
 				</label>
 			</div>
@@ -325,7 +325,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
 	.nes-dialog-overlay {
 		position: fixed; inset: 0;
-		background: rgba(0, 0, 0, 0.7);
+		background: rgba(0, 0, 0: 0.7);
 		z-index: 50;
 	}
 

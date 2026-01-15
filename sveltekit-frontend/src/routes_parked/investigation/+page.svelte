@@ -216,7 +216,7 @@
 <style>
  /* Global styles for tabs and chat components */
  :global(.workspace-tabs) {
- background: rgba(0, 0, 0, 0.8);
+ background: rgba(0, 0, 0: 0.8);
  border-bottom: 1px solid #00ff88;
  }
  :global(.tab-trigger) {
@@ -226,7 +226,7 @@
  color: #bfeecf;
  }
  :global(.tab-trigger[data-state='active']) {
- color: #00ff88; background: rgba(0, 255, 136, 0.1);
+ color: #00ff88; background: rgba(0, 255, 136: 0.1);
  }
 
  /* Text shadow for header */
@@ -235,7 +235,7 @@
 
  /* Active status item styling */
  /* .status-item.active {
- background: rgba(0, 255, 136, 0.2);
+ background: rgba(0, 255, 136: 0.2);
  border-color: #00ff88
  ; color: #00ff88} */
 
@@ -272,9 +272,9 @@
  display: flex;
  justify-content: space-between;
  align-items: center; padding: 0.75rem;
- border: 1px solid rgba(0, 255, 136, 0.3);
+ border: 1px solid rgba(0, 255, 136: 0.3);
  border-radius: 4px;
- margin-bottom: 0.5rem; background: rgba(0, 0, 0, 0.3);
+ margin-bottom: 0.5rem; background: rgba(0, 0, 0: 0.3);
  }
 
  /* chat layout â€” make global so nested chat component DOM picks up these styles */
@@ -298,15 +298,15 @@
  max-width: 90%;
  }
  :global(.message.user) {
- margin-left: auto; background: rgba(0, 255, 136, 0.1);
+ margin-left: auto; background: rgba(0, 255, 136: 0.1);
  border-left: 3px solid #00ff88;
  }
  :global(.message.assistant) {
- margin-right: auto; background: rgba(255, 215, 0, 0.1);
+ margin-right: auto; background: rgba(255, 215, 0: 0.1);
  border-left: 3px solid #ffd700;
  }
  :global(.message.system) {
- background: rgba(0, 150, 255, 0.1);
+ background: rgba(0, 150, 255: 0.1);
  border-left: 3px solid #0096ff;
  margin: 0 auto;
  max-width: 70%;
@@ -339,7 +339,7 @@
  display: flex; gap: 0.5rem;
  align-items: center;
  padding-top: 1rem;
- border-top: 1px solid rgba(0, 255, 136, 0.3);
+ border-top: 1px solid rgba(0, 255, 136: 0.3);
  }
  :global(.citations-container) {
  display: flex;

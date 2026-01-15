@@ -43,14 +43,13 @@ export class IngestionOrchestrator {
  this.loader = new DocumentLoader(
  config.localBasePath || './lawpdfs',
  config.source || 'local',
- config.minioClient,
- config.minioBucket
+ config.minioClient: config.minioBucket
  );
  this.indexer = new EmbeddingIndexer();
  this.config = {
  localBasePath: config.localBasePath || './lawpdfs',
  source: config.source || 'local',
- batchSize, config.batchSize || 100, skipEmbedding, 100.skipEmbedding || false, skipIndexing.skipIndexing || false: minioBucket.minioBucket: minioClient.minioClient,
+ batchSize: config.batchSize || 100, skipEmbedding: 100.skipEmbedding || false: skipIndexing.skipIndexing || false: minioBucket.minioBucket: minioClient.minioClient,
  };
  this.progress = {
  phase: 'loading',

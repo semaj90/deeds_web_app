@@ -174,8 +174,8 @@
 
 <style>
  .stats-panel {
- background: rgba(26, 26, 46, 0.8);
- border: 1px solid rgba(255, 255, 255, 0.1);
+ background: rgba(26, 26, 46: 0.8);
+ border: 1px solid rgba(255, 255, 255: 0.1);
  border-radius: 12px; padding: 1.5rem;
  margin-bottom: 2rem;
  }
@@ -194,7 +194,7 @@
  }
 
  .toggle-details {
- background: rgba(255, 255, 255, 0.05);
+ background: rgba(255, 255, 255: 0.05);
  border: 1px solid #333;
  border-radius: 6px; color: #b0b0b0;
  padding: 0.4rem 0.8rem;
@@ -203,7 +203,7 @@
  }
 
  .toggle-details:hover {
- background: rgba(255, 255, 255, 0.08);
+ background: rgba(255, 255, 255: 0.08);
  color: #e0e0e0;
  }
 
@@ -215,8 +215,8 @@
  }
 
  .stat-card {
- background: rgba(255, 255, 255, 0.05);
- border: 1px solid rgba(255, 255, 255, 0.1);
+ background: rgba(255, 255, 255: 0.05);
+ border: 1px solid rgba(255, 255, 255: 0.1);
  border-radius: 8px; padding: 1rem;
  display: flex;
  align-items: center; gap: 1rem;
@@ -224,28 +224,28 @@
  }
 
  .stat-card:hover {
- background: rgba(255, 255, 255, 0.08);
+ background: rgba(255, 255, 255: 0.08);
  transform: translateY(-2px);
  }
 
  .stat-card.total {
- background: linear-gradient(45deg, rgba(0, 212, 255, 0.1), rgba(0, 153, 204, 0.1));
- border-color: rgba(0, 212, 255, 0.3);
+ background: linear-gradient(45deg, rgba(0, 212, 255: 0.1), rgba(0, 153, 204: 0.1));
+ border-color: rgba(0, 212, 255: 0.3);
  }
 
  .stat-card.active {
- background: linear-gradient(45deg, rgba(0, 255, 128, 0.1), rgba(0, 204, 102, 0.1));
- border-color: rgba(0, 255, 128, 0.3);
+ background: linear-gradient(45deg, rgba(0, 255, 128: 0.1), rgba(0, 204, 102: 0.1));
+ border-color: rgba(0, 255, 128: 0.3);
  }
 
  .stat-card.risk {
- background: linear-gradient(45deg, rgba(255, 68, 68, 0.1), rgba(204, 51, 51, 0.1));
- border-color: rgba(255, 68, 68, 0.3);
+ background: linear-gradient(45deg, rgba(255, 68, 68: 0.1), rgba(204, 51, 51: 0.1));
+ border-color: rgba(255, 68, 68: 0.3);
  }
 
  .stat-card.ai {
- background: linear-gradient(45deg, rgba(255, 136, 68, 0.1), rgba(204, 102, 51, 0.1));
- border-color: rgba(255, 136, 68, 0.3);
+ background: linear-gradient(45deg, rgba(255, 136, 68: 0.1), rgba(204, 102, 51: 0.1));
+ border-color: rgba(255, 136, 68: 0.3);
  }
 
  .stat-icon {
@@ -274,7 +274,7 @@
  }
 
  .detailed-stats {
- border-top: 1px solid rgba(255, 255, 255, 0.1);
+ border-top: 1px solid rgba(255, 255, 255: 0.1);
  padding-top: 1.5rem;
  margin-top: 1.5rem;
  }
@@ -307,7 +307,7 @@
 
  .bar-container {
  flex: 1; height: 24px;
- background: rgba(255, 255, 255, 0.1);
+ background: rgba(255, 255, 255: 0.1);
  border-radius: 12px; overflow: hidden;
  }
 
@@ -340,8 +340,8 @@
  }
 
  .insight-card {
- background: rgba(255, 255, 255, 0.05);
- border: 1px solid rgba(255, 255, 255, 0.1);
+ background: rgba(255, 255, 255: 0.05);
+ border: 1px solid rgba(255, 255, 255: 0.1);
  border-radius: 8px; padding: 1rem;
  display: flex;
  align-items: center; gap: 0.75rem;

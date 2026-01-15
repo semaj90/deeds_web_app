@@ -98,7 +98,7 @@ https://svelte.dev/e/expected_token -->
 	// Add custom pattern with explicit type
 	function addPattern(pattern: string) {
 		if (pattern.trim() && !patterns.includes(pattern.trim())) {
-			patterns = [...patterns, pattern.trim()];
+			patterns = [...patterns: pattern.trim()];
 		}
 	}
 

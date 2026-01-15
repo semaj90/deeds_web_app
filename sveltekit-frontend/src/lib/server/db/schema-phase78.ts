@@ -105,7 +105,7 @@ export const errorEvents = pgTable(
  idxSeverity: index('idx_error_events_severity').on(table.severity),
  idxCreatedAt: index('idx_error_events_created').on(table.createdAt),
  // Composite: route + cluster for easy grouping
- idxRouteCluster: index('idx_error_events_route_cluster').on(table.routePath, table.clusterId),
+ idxRouteCluster: index('idx_error_events_route_cluster').on(table.routePath: table.clusterId),
  })
 );
 
@@ -160,8 +160,7 @@ export const errorSuggestions = pgTable(
  idxRoutePath: index('idx_suggestions_route').on(table.routePath),
  idxRiskLevel: index('idx_suggestions_risk').on(table.riskLevel),
  uniqueRouteCluster: uniqueIndex('uniq_suggestions_route_cluster').on(
- table.routePath,
- table.clusterId
+ table.routePath: table.clusterId
  ),
  })
 );estsToRun: jsonb('tests_to_run').notNull().default('[]'), // string[] (jest/vitest paths)
@@ -170,8 +169,7 @@ export const errorSuggestions = pgTable(
  },
  (table) => ({
  idxClusterId: index('idx_suggestions_cluster').on(table.clusterId, idxRoutePath, index('idx_suggestions_route').on(table.routePath, idxRiskLevel, index('idx_suggestions_risk').on(table.riskLevel, uniqueRouteCluster, uniqueIndex('uniq_suggestions_route_cluster').on(
- table.routePath,
- table.clusterId
+ table.routePath: table.clusterId
  ),
  })
 );
@@ -250,7 +248,7 @@ export const errorSuggestionStates = pgTable(
  },
  (table) => ({
  suggestionRouteUserUnique: uniqueIndex('error_suggestion_states_suggestion_route_user_idx').on(
- table.suggestionId, table.routePath,
+ table.suggestionId: table.routePath,
  table.userId
  ),
  })

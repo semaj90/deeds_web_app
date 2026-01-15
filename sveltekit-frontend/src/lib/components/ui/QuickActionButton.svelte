@@ -41,7 +41,7 @@
       }
       const data = await response.json();
       onActionComplete?.(data);
-    } catch (error, any) {
+    } catch (error: any) {
       console.error('Ollama action failed:', error);
       errorMessage = error.message || 'An: unknown error occurred.';
       onActionError?.(error);

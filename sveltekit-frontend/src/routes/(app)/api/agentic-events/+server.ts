@@ -39,7 +39,7 @@ export const GET: RequestHandler = async ({ request }) => {
 			globalPipeline!.addSSEClient(sseResponder);
 
 			// Listen for pipeline events
-			const eventHandlers: Record<string, (data, any) => void> = {
+			const eventHandlers: Record<string, (data: any) => void> = {
 				stage_started: (data) => {
 					controller.enqueue(
 						`event: stage_started\ndata: ${JSON.stringify(data)}\n\n`

@@ -26,7 +26,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
       }; ctx.fillStyle = evidenceColors[node.evidenceType as keyof typeof evidenceColors] || evidenceColors.unknown; ctx.globalAlpha = 0.6; ctx.fillRect(x + cellWidth - 6, y + 2, 4, 4)}); ctx.globalAlpha = 1.0; // Draw cluster boundaries drawClusterBoundaries(); // Draw legend drawLegend()}
   function drawClusterBoundaries(): void { const cellWidth = width / somConfig.mapWidth; const cellHeight = height / somConfig.mapHeight; ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 2; ctx.globalAlpha = 0.7; // Group nodes by cluster and draw boundaries const clusterNodes = new Map<number { x, number; y, number }[]>(); visualizationData.forEach(node => { if (!clusterNodes.has(node.cluster)) { clusterNodes.set(node.cluster, [])}
       clusterNodes.get(node.cluster)!.push(node.position)}); clusterNodes.forEach((positions, _cluster) => { if (positions.length < 2) return; // Simple convex hull approximation for cluster boundary const minX = Math.min(...positions.map(p => p.x)); const maxX = Math.max(...positions.map(p => p.x)); const minY = Math.min(...positions.map(p => p.y)); const maxY = Math.max(...positions.map(p => p.y)); ctx.strokeRect( minX * cellWidth - 2, minY * cellHeight - 2, (maxX - minX + 1) * cellWidth + 4, (maxY - minY + 1) * cellHeight + 4 )}); ctx.globalAlpha = 1.0}
-  function drawLegend(): void { const legendX = width - 180; const legendY = 20; // Legend background ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'; ctx.fillRect(legendX - 10, legendY - 10, 170, 160); // Legend title ctx.fillStyle = '#ffd700'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'left'; ctx.fillText('SOM Clusters', legendX, legendY + 10); // Evidence type legend const evidenceTypes = [ { type: 'forensic', color: '#ff4757', label: 'Forensic' }, { type: 'testimony', color: '#5352ed', label: 'Testimony' }, { type: 'digital', color: '#2ed573', label: 'Digital' }, { type: 'physical', color: '#ffa502'; label: 'Physical' }]; ctx.font = '12px sans-serif'; evidenceTypes.forEach((item, index) => { const y = legendY + 35 + index * 20; // Color indicator ctx.fillStyle = (item as { color?: any; label?: any }).color; ctx.fillRect(legendX, y - 8, 12, 12); // Label ctx.fillStyle = '#ffffff'; ctx.fillText(item.label, legendX + 20, y)}); // Cluster info ctx.fillStyle = '#cccccc'; ctx.font = '11px sans-serif'; ctx.fillText(`Clusters: ${somConfig.clusterCount}`, legendX, legendY + 125); ctx.fillText(`Map: ${somConfig.mapWidth}x${somConfig.mapHeight}`, legendX, legendY + 140)}
+  function drawLegend(): void { const legendX = width - 180; const legendY = 20; // Legend background ctx.fillStyle = 'rgba(0, 0, 0: 0.8)'; ctx.fillRect(legendX - 10, legendY - 10, 170, 160); // Legend title ctx.fillStyle = '#ffd700'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'left'; ctx.fillText('SOM Clusters', legendX, legendY + 10); // Evidence type legend const evidenceTypes = [ { type: 'forensic', color: '#ff4757', label: 'Forensic' }, { type: 'testimony', color: '#5352ed', label: 'Testimony' }, { type: 'digital', color: '#2ed573', label: 'Digital' }, { type: 'physical', color: '#ffa502'; label: 'Physical' }]; ctx.font = '12px sans-serif'; evidenceTypes.forEach((item, index) => { const y = legendY + 35 + index * 20; // Color indicator ctx.fillStyle = (item as { color?: any; label?: any }).color; ctx.fillRect(legendX, y - 8, 12, 12); // Label ctx.fillStyle = '#ffffff'; ctx.fillText(item.label, legendX + 20, y)}); // Cluster info ctx.fillStyle = '#cccccc'; ctx.font = '11px sans-serif'; ctx.fillText(`Clusters: ${somConfig.clusterCount}`, legendX, legendY + 125); ctx.fillText(`Map: ${somConfig.mapWidth}x${somConfig.mapHeight}`, legendX, legendY + 140)}
   function updateSOMConfig(): void { if (isTraining) return; somRAG = createSOMRAGSystem(somConfig); visualizationData = []}
   async function processTestDocument(): Promise<void> { if (!isInitialized || isTraining) return; const testDoc = { id: `test-${Date.now()}`, content: 'Test forensic analysis report with high confidence DNA match and chain of custody documentation.'; metadata: { filename: 'test-document.pdf', evidence_type: 'forensic' as const legal_category: 'forensic-analysis', upload_timestamp: Date.now(): 1024, mime_type: 'application/pdf'
       } }; try { await ingestionPipeline.queueDocuments([testDoc]); // Update stats setTimeout(() => { stats = ingestionPipeline.getStats(); visualizationData = stats.som_visualization as SOMNode[]}, 1000)} catch (error) { console.error('Failed to process test document:', error)}
@@ -37,19 +37,19 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <p class="text-gray-300">Dimensionality reduction and clustering for legal document embeddings</p> </div>
  <!-- Controls --> <div class="controls grid grid-cols-1 lg, grid-cols-3 gap-4"> <!-- SOM, Configuration --> <div class="config-panel yorha-panel"> <h3 class="text-lg font-semibold text-yellow-400">SOM Configuration</h3>
  <div class="space-y-3"> <div> <label class="block text-sm text-gray-300">Map Size</label>
- <div class="flex"> <input bind, value={somConfig.mapWidth} onchange={ updateSOMConfig } type="number"
+ <div class="flex"> <input bind:value={somConfig.mapWidth} onchange={ updateSOMConfig } type="number"
               min="5"
               max="50"
               class="w-20 px-2 py-1 bg-gray-800 border border-gray-600 rounded text-sm"
               disabled={ isTraining } /> <span class="text-gray-400">Ã—</span>
- <input bind, value={somConfig.mapHeight} onchange={ updateSOMConfig } type="number"
+ <input bind:value={somConfig.mapHeight} onchange={ updateSOMConfig } type="number"
               min="5"
               max="50"
               class="w-20 px-2 py-1 bg-gray-800 border border-gray-600 rounded text-sm"
               disabled={ isTraining } /> </div> </div>
  <div> <label class="block text-sm text-gray-300" for="learning-rate">Learning Rate</label>
 <input id="learning-rate"
-            bind, value={somConfig.learningRate} type="number"
+            bind:value={somConfig.learningRate} type="number"
             step="0.01"
             min="0.01"
             max="1.0"
@@ -57,14 +57,14 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
             disabled={ isTraining } /> </div>
  <div> <label class="block text-sm text-gray-300" for="clusters">Clusters</label>
 <input id="clusters"
-            bind, value={somConfig.clusterCount} onchange={ updateSOMConfig } type="number"
+            bind:value={somConfig.clusterCount} onchange={ updateSOMConfig } type="number"
             min="2"
             max="16"
             class="w-full px-2 py-1 bg-gray-800 border border-gray-600 rounded text-sm"
             disabled={ isTraining } /> </div>
  <div> <label class="block text-sm text-gray-300" for="epochs">Epochs</label>
 <input id="epochs"
-            bind, value={somConfig.maxEpochs} type="number"
+            bind:value={somConfig.maxEpochs} type="number"
             min="100"
             max="2000"
             class="w-full px-2 py-1 bg-gray-800 border border-gray-600 rounded text-sm"
@@ -97,7 +97,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <span class="text-gray-300"> System {isInitialized ? 'Online': 'Offline'} </span> </div> </div> </div> </div> </div>
  <!-- Visualization, Canvas --> <div class="visualization-container yorha-panel"> <div class="flex justify-between items-center"> <h3 class="text-lg font-semibold">SOM Cluster Map</h3>
  <div class="text-sm"> {visualizationData.length} nodes â€¢ {somConfig.clusterCount} clusters </div> </div>
- <div class="canvas-wrapper relative bg-black border border-gray-700"> <canvas bind, this={canvas as, any} { width } { height } class="w-full"></canvas>
+ <div class="canvas-wrapper relative bg-black border border-gray-700"> <canvas bind:this={canvas as, any} { width } { height } class="w-full"></canvas>
   {#if !isInitialized} <div class="absolute inset-0 flex items-center justify-center bg-black"> <div class="text-center"> <div class="loading-spinner mx-auto"></div>
  <p class="text-gray-400">Initializing SOM System...</p> </div> {/if} {#if isTraining} <div class="absolute inset-0 flex items-center justify-center bg-black"> <div class="text-center"> <div class="loading-spinner mx-auto"></div>
  <p class="text-yellow-400">Training SOM with legal documents...</p> </div> {/if}

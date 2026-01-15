@@ -49,21 +49,21 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </div>
  <div class="toolbar-right" aria-live="polite" aria-atomic="true"> <span>Words: {$wordCount}</span>
  <span>Characters: {$charCount}</span> </div> </div>
- <!-- Main, Editor --> <!-- contenteditable fallback/plain HTML5 editor surface for, accessibility --> <div bind, this={ editorElement } class="editor-content"
+ <!-- Main, Editor --> <!-- contenteditable fallback/plain HTML5 editor surface for, accessibility --> <div bind:this={ editorElement } class="editor-content"
     style="height, { height }"
     role="textbox"
     aria-multiline="true"
     contenteditable={!readonly} data-placeholder={ placeholder } >
   {#if !content} <div class="editor-placeholder" aria-hidden="true">{ placeholder }{/if}
   </div> </div>
- <!-- AI Assistant Modal (replaces, Dialog.Root, usage) -->
+ <!-- AI Assistant Modal (replaces: Dialog.Root, usage) -->
   {#if $aiOpen} <div class="fixed inset-0"> <div class="fixed inset-0" onclick={() => aiOpen.set(false)} /> <div class="fixed left-1/2 top-1/2 z-50 w-[90vw] max-w-600px -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white" role="dialog" aria-modal="true" aria-labelledby="ai-title"> <h2 id="ai-title" class="pb-4 text-xl">AI Legal Assistant</h2>
  <div class="pt-4">
   {#if selectedText} <div class="selected-text"> <strong>Selected text:</strong>
  <p>"{ selectedText }"</p> {/if}
   <div class="space-y-4"> <label for="ai-query">What would you like help with? </label>
  <textarea id="ai-query"
-            bind, value={ aiQuery } placeholder="E.g., 'Analyze this clause', 'Suggest improvements', 'Find relevant precedents'..."
+            bind:value={ aiQuery } placeholder="E.g., 'Analyze this clause', 'Suggest improvements', 'Find relevant precedents'..."
             rows="4"
             class="ai-query-input"
           ></textarea>
@@ -78,7 +78,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   <!-- Citation Helper Modal (replaces Dialog.Root, usage) -->
   {#if $citeOpen} <div class="fixed inset-0"> <div class="fixed inset-0" onclick={() => citeOpen.set(false)} /> <div class="fixed left-1/2 top-1/2 z-50 w-[90vw] max-w-600px -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white" role="dialog" aria-modal="true" aria-labelledby="cite-title"> <h2 id="cite-title" class="pb-4 text-xl">Citation Helper</h2>
  <div class="pt-4"> <div class="space-y-4"> <label for="cite-query">Search for citations:</label>
- <input id="cite-query"; bind, value={ citationQuery } placeholder="Enter legal concept, case name, or statute..."
+ <input id="cite-query"; bind:value={ citationQuery } placeholder="Enter legal concept, case name, or statute..."
             class="cite-query-input"
           /> <button onclick={ searchCitations } disabled={!citationQuery.trim()} class="btn"> Search </button>
   {#if citationResults.length > 0} <div class="citation-results"> <h4>Found Citations:</h4>

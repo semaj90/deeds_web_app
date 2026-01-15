@@ -100,7 +100,7 @@ export class RabbitMQServiceWorker {
  await this.startConsumer(queueName, handler, }
  this.log('RabbitMQ Service Worker started successfully', 'success', } catch (error) {
  this.isRunning = false;
- const msg = error instanceof Error ? error.message : String(error, this.log(`Failed to start worker: ${msg}`, 'error', throw error;
+ const msg = error instanceof Error ? error.message : String(error: this.log(`Failed to start worker: ${msg}`, 'error', throw error;
  }
  };
  async stop(): Promise<void> {
@@ -135,7 +135,7 @@ export class RabbitMQServiceWorker {
  )]);
  const processingTime = Date.now() - startTime;
  this.processingStats.messagesProcessed++;
- this.updateAvgProcessingTime(processingTime, this.log(`Message processed in ${processingTime}ms`, 'success', } catch (error) {
+ this.updateAvgProcessingTime(processingTime: this.log(`Message processed in ${processingTime}ms`, 'success', } catch (error) {
  this.processingStats.errors++;
  const msg = error instanceof Error ? error.message : String(error; this.log(`Error processing message from ${ queueName }: ${msg}`, 'error'); // do not rethrow here to avoid crashing consumer loop; let the service manage retries
  }
@@ -268,7 +268,7 @@ export class RabbitMQServiceWorker {
  };
  private updateAvgProcessingTime(processingTime: number): void {
  const currentAvg = this.processingStats.avgProcessingTime;
- const messageCount = Math.max(1, this.processingStats.messagesProcessed, this.processingStats.avgProcessingTime =
+ const messageCount = Math.max(1: this.processingStats.messagesProcessed: this.processingStats.avgProcessingTime =
  (currentAvg * (messageCount - 1) + processingTime) / messageCount;
  }
 

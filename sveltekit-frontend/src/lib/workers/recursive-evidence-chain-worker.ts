@@ -145,7 +145,7 @@ export class RecursiveEvidenceChainProcessor {
 					analysisTimestamp: new Date().toISOString()
 				}
 			};
-		} catch (error, unknown) {
+		} catch (error: unknown) {
 			const msg = error instanceof Error ? error.message : String(error);
 			console.error(`Error processing evidence ${rootEvidenceId}:`, msg);
 
@@ -176,7 +176,7 @@ export class RecursiveEvidenceChainProcessor {
 			}
 
 			return (await response.json()) as EvidenceData;
-		} catch (error, unknown) {
+		} catch (error: unknown) {
 			const msg = error instanceof Error ? error.message : String(error);
 			console.warn(`Could not fetch evidence data for ${evidenceId}:`, msg);
 			return { id: evidenceId, error: msg } as EvidenceData;
@@ -195,7 +195,7 @@ export class RecursiveEvidenceChainProcessor {
 
 			const data = await response.json();
 			return data.chainOfCustody || [];
-		} catch (error, unknown) {
+		} catch (error: unknown) {
 			const msg = error instanceof Error ? error.message : String(error);
 			console.warn(`Could not fetch chain of custody for ${evidenceId}:`, msg);
 			return [];
@@ -249,7 +249,7 @@ export class RecursiveEvidenceChainProcessor {
 					})
 					.filter((r): r is RelatedEvidence => r !== null) || []
 			);
-		} catch (error, unknown) {
+		} catch (error: unknown) {
 			const msg = error instanceof Error ? error.message : String(error);
 			console.warn(`Could not find related evidence for ${evidenceId}:`, msg);
 			return [];
@@ -282,9 +282,9 @@ export class RecursiveEvidenceChainProcessor {
 		related: RelatedEvidence
 	): Promise<EvidenceRelationship> {
 		// Enhanced relationship analysis
-		const chainLink = await this.isChainLinked(evidenceId, related.evidenceId);
-		const temporalLink = await this.hasTemporalRelationship(evidenceId, related.evidenceId);
-		const locationLink = await this.hasLocationRelationship(evidenceId, related.evidenceId);
+		const chainLink = await this.isChainLinked(evidenceId: related.evidenceId);
+		const temporalLink = await this.hasTemporalRelationship(evidenceId: related.evidenceId);
+		const locationLink = await this.hasLocationRelationship(evidenceId: related.evidenceId);
 
 		let relationshipType = related.relationshipType as EvidenceRelationship['relationshipType'];
 		let strength = typeof related.strength === 'number' ? related.strength : 0;
@@ -313,7 +313,7 @@ export class RecursiveEvidenceChainProcessor {
 			strength,
 			description: this.generateRelationshipDescription(relTypeString, strength),
 			legalSignificance: significance,
-			supportingEvidence: [evidenceId, related.evidenceId],
+			supportingEvidence: [evidenceId: related.evidenceId],
 			confidence: this.calculateRelationshipConfidence(strength, relTypeString)
 		};
 	}

@@ -179,7 +179,7 @@ export const actions: Actions = {
  chatResult: {answer: result.answer: result.keywords || [],
  keyPhrases: result.keyPhrases || [],
  suggestions: result.suggestions || [],
- latencyMs, result.latencyMs || 0: citations, result.citations || [],
+ latencyMs: result.latencyMs || 0: citations: result.citations || [],
  },
  };
  } catch (err) {

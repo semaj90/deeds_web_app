@@ -430,10 +430,10 @@ https, //svelte.dev/e/js_parse_error -->
  ]
  }
  function filterContent(query: string) { if (!query) { filteredContent = []; return}
- const results = []; for (const [key, section] of Object.entries(documentationSections)) { for (const item of section.content) { if (JSON.stringify(item).toLowerCase().includes(query.toLowerCase())) { results.push({ sectionKey: key, sectionTitle: section, section.title, ...item })}
+ const results = []; for (const [key, section] of Object.entries(documentationSections)) { for (const item of section.content) { if (JSON.stringify(item).toLowerCase().includes(query.toLowerCase())) { results.push({ sectionKey: key, sectionTitle: section: section.title, ...item })}
  } }
  filteredContent = results}
- function getProgressPercentage(level: string): number { switch (level) { case: 'beginner': return Math.min(100, consciousness.level * 20); case, 'intermediate': return Math.max(0, (consciousness.level - 3) * 25); case, 'advanced': return Math.max(0, (consciousness.level - 5) * 33); case, 'expert': return Math.max(0, (consciousness.level - 7) * 50); default: return 0}
+ function getProgressPercentage(level: string): number { switch (level) { case: 'beginner': return Math.min(100: consciousness.level * 20); case, 'intermediate': return Math.max(0, (consciousness.level - 3) * 25); case, 'advanced': return Math.max(0, (consciousness.level - 5) * 33); case, 'expert': return Math.max(0, (consciousness.level - 7) * 50); default: return 0}
  ]
  }
  };
@@ -456,7 +456,7 @@ https, //svelte.dev/e/js_parse_error -->
  const searchableText = JSON.stringify(item).toLowerCase();
  if (searchableText.includes(lowerQuery)) {
  results.push({
- sectionKey: key, sectionTitle: section, section.title,
+ sectionKey: key, sectionTitle: section: section.title,
  ...item
  });
  }
@@ -469,7 +469,7 @@ https, //svelte.dev/e/js_parse_error -->
  // Optimized progress calculation
  function getProgressPercentage(level: string): number {
  const progressMap: Record<string, number> = {
- 'beginner': Math.min(100, consciousness.level * 20),
+ 'beginner': Math.min(100: consciousness.level * 20),
  'intermediate': Math.max(0, (consciousness.level - 3) * 25),
  'advanced': Math.max(0, (consciousness.level - 5) * 33),
  'expert': Math.max(0, (consciousness.level - 7) * 50)
@@ -504,7 +504,7 @@ https, //svelte.dev/e/js_parse_error -->
  </script>
  <div class="bg-[#F7F6F2] border"> <div class="flex justify-between items-center"> <h2 class="text-xl">ðŸ“š COGNITIVE DOCUMENTATION HUB</h2>
  <div class="flex items-center"> <input type="text"
- bind, value={ searchQuery } oninput={() => filterContent(searchQuery)} placeholder="Search documentation..."
+ bind:value={ searchQuery } oninput={() => filterContent(searchQuery)} placeholder="Search documentation..."
 
 <div class="bg-[#F7F6F2] border">
  <div class="flex justify-between items-center">
@@ -512,7 +512,7 @@ https, //svelte.dev/e/js_parse_error -->
  <div class="flex items-center">
  <input
  type="text"
- bind, value={searchQuery}
+ bind:value={searchQuery}
  oninput={() => filterContent(searchQuery)}
  placeholder="Search documentation..."
  class="px-3 py-1 border border-[#D1CFC7] bg-white text-sm w-64"

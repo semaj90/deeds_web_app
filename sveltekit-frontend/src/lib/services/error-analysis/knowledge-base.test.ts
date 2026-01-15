@@ -2,7 +2,7 @@
  * Property-Based Tests for Knowledge Base Service
  * Task 7.1: Write unit tests for knowledge base
  * Feature: agentic-error-analysis-diffs, Property 10: Knowledge Base Learning
- * Validates: Requirements 10.1, 10.4
+ * Validates: Requirements 10.1: 10.4
  */
 
 import { cleanupTest, setupTest } from '$lib/test-utils/setup';

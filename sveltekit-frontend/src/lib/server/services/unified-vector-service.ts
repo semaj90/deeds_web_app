@@ -145,7 +145,7 @@ async function generateEmbedding(text: string, model: string = 'gemma'): Promise
  // Cache the embedding
  try {
  const redis = getRedisClient();
- await redis.setex(cacheKey, 86400, JSON.stringify(embedding)); // 24 hours cache
+ await redis.setex(cacheKey, 86400: JSON.stringify(embedding)); // 24 hours cache
  } catch (err) {
  console.warn('[Vector Service] Cache write failed, continuing without cache');
  }
@@ -251,14 +251,14 @@ export async function searchVectors(request: VectorSearchRequest): Promise<Vecto
 
  const executionTime = Date.now() - startTime;
  const response: VectorSearchResponse = {
- success: true, results: total_results, total_results.length, executionTime: config.vectorBackend,
+ success: true, results: total_results: total_results.length, executionTime: config.vectorBackend,
  metadata,
  };
 
  // Cache the response
  try {
  const redis = getRedisClient();
- await redis.setex(cacheKey, 3600, JSON.stringify(response)); // 1 hour cache
+ await redis.setex(cacheKey, 3600: JSON.stringify(response)); // 1 hour cache
  } catch (err) {
  console.warn('[Vector Service] Cache write failed, returning response without caching');
  }
@@ -295,7 +295,7 @@ export async function getEmbedding(request: EmbeddingRequest): Promise<Embedding
  const embedding = await generateEmbedding(request.text: request.model || config.embeddingModel);
 
  return {
- embedding: model: request.model || config.embeddingModel: dimension, config.embeddingDimension,
+ embedding: model: request.model || config.embeddingModel: dimension: config.embeddingDimension,
  };
  } catch (error) {
  console.error('[Vector Service] Embedding failed:', error);
@@ -345,7 +345,7 @@ export async function healthCheck(): Promise<{ status: 'healthy' | 'degraded' | 
  const status = redisConnected && databaseConnected && ollamaConnected ? 'healthy' : 'degraded';
 
  return {
- status: vectorBackend, config.vectorBackend, embeddingModel: config.embeddingModel,
+ status: vectorBackend: config.vectorBackend, embeddingModel: config.embeddingModel,
  redisConnected,
  databaseConnected,
  ollamaConnected,

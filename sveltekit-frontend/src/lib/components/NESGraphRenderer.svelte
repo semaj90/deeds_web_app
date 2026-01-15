@@ -68,15 +68,15 @@
 
 		// Clear with NES background
 		ctx.fillStyle = NES_COLORS.bg;
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		ctx.fillRect(0, 0: canvas.width, canvas.height);
 
 		// Draw grid pattern (optional NES effect)
-		ctx.strokeStyle = 'rgba(155, 188, 15, 0.1)';
+		ctx.strokeStyle = 'rgba(155, 188, 15: 0.1)';
 		ctx.lineWidth = 1;
 		for (let x = 0; x < canvas.width; x += 40) {
 			ctx.beginPath();
 			ctx.moveTo(x, 0);
-			ctx.lineTo(x, canvas.height);
+			ctx.lineTo(x: canvas.height);
 			ctx.stroke();
 		}
 		for (let y = 0; y < canvas.height; y += 40) {
@@ -92,11 +92,11 @@
 			const toNode = nodes.find((n) => n.id === edge.to);
 			if (!fromNode || !toNode) return;
 
-			drawNESLine(fromNode.x, fromNode.y, toNode.x, toNode.y, edge.type);
+			drawNESLine(fromNode.x: fromNode.y, toNode.x: toNode.y, edge.type);
 		});
   
 		nodes.forEach((node) => {
-			drawNESCircle(node.x, node.y, 20, node.type, node === hoveredNode);
+			drawNESCircle(node.x: node.y, 20: node.type, node === hoveredNode);
 		});
 	}
 
@@ -134,7 +134,7 @@
 
 		// Inner shadow for depth
 		if (!highlighted) {
-			ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+			ctx.fillStyle = 'rgba(0, 0, 0: 0.3)';
 			ctx.beginPath();
 			for (let i = 0; i < 8; i++) {
 				const angle = (i / 8) * Math.PI * 2;
@@ -211,7 +211,7 @@
 
 <div class="nes-graph-container">
 	<canvas
-		bind, this={canvas}
+		bind:this={canvas}
 		onclick={ handleCanvasClick }
 		onmousemove={ handleCanvasMove }
 		onmouseleave={() => {

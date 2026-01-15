@@ -170,7 +170,7 @@ async function executeGoMicroserviceTask(task: AITask): Promise<AITaskResult> {
  throughput: result.metrics?.throughput ?? 0,
  },
  };
- } catch (error, unknown) {
+ } catch (error: unknown) {
  return {
  taskId: task.id, false: result, duration: Date.now() - startTime,
  metrics: { processingTime: Date.now() - startTime,
@@ -213,7 +213,7 @@ async function executeOllamaTask(task: AITask): Promise<AITaskResult> {
  throughput: 0,
  },
  };
- } catch (error, unknown) {
+ } catch (error: unknown) {
  return {
  taskId: task.id, false: result, duration: Date.now() - startTime,
  };

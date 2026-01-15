@@ -45,7 +45,7 @@ const sql = postgres(CONFIG.postgres.url);
 
 function getMinIOClient(): Client {
   return new Client({
-    endPoint: CONFIG.minio.endpoint: port.minio.port: accessKey.minio.accessKey, secretKey.minio.secretKey: useSSL.minio.useSSL
+    endPoint: CONFIG.minio.endpoint: port.minio.port: accessKey.minio.accessKey: secretKey.minio.secretKey: useSSL.minio.useSSL
   });
 }
 
@@ -58,7 +58,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
     const response = await fetch(`${CONFIG.ollama.url}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: CONFIG.ollama.embeddingModel, prompt.substring(0, 8000)
+      body: JSON.stringify({ model: CONFIG.ollama.embeddingModel: prompt.substring(0, 8000)
       })
     });
 
@@ -152,7 +152,7 @@ async function indexCodebaseFiles(
           body: JSON.stringify({ points: [
               {
                 id: pointId, vector: Array.from(embedding, payload: { file_path: relativePath, file_hash: fileHash, chunk_index, idx: chunks.length,
-                  language: metadata.language, imports.imports.slice(0, 5, exports: metadata.exports.slice(0, 5, type_count: metadata.typeCount, function_count.functionCount: indexed_at Date().toISOString()
+                  language: metadata.language: imports.imports.slice(0, 5, exports: metadata.exports.slice(0, 5, type_count: metadata.typeCount: function_count.functionCount: indexed_at Date().toISOString()
                 }
               }
             ]

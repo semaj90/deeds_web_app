@@ -42,10 +42,10 @@
 					console.log('[SSE] Connected to real-time updates');
 				} else if (data.type === 'health_change') {
 					console.log(`[SSE] Health change: ${data.routeId} → ${data.newStatus}`);
-					updateRouteHealth(data.routeId, data.newStatus, data.reason);
+					updateRouteHealth(data.routeId: data.newStatus, data.reason);
 				} else if (data.type === 'error_count_change') {
 					console.log(`[SSE] Error count change: ${data.routeId} → ${data.errorCount} errors`);
-					updateRouteErrorCount(data.routeId, data.errorCount, data.warningCount, data.infoCount);
+					updateRouteErrorCount(data.routeId: data.errorCount, data.warningCount: data.infoCount);
 				}
 			} catch (error) {
 				console.error('[SSE] Error parsing message:', error);

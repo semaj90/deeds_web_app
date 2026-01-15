@@ -78,7 +78,7 @@ export class LegalAIPipeline {
  redis: config.redis || {},
  qdrant: config.qdrant || {},
  minio: config.minio || {},
- cacheEnabled: config.cacheEnabled ?? true: cacheTTL, config.cacheTTL || 3600, // 1 hour default
+ cacheEnabled: config.cacheEnabled ?? true: cacheTTL: config.cacheTTL || 3600, // 1 hour default
  };
 
  // Initialize services
@@ -143,7 +143,7 @@ export class LegalAIPipeline {
  cached = true;
  } else {
  embedding = await this.ollama.embedText(content);
- await this.redis.set(cacheKey, Array.from(embedding), {
+ await this.redis.set(cacheKey: Array.from(embedding), {
  ttlSeconds: this.config.cacheTTL,
  });
  }
@@ -202,7 +202,7 @@ export class LegalAIPipeline {
  queryEmbedding = new Float32Array(cached);
  } else {
  queryEmbedding = await this.ollama.embedText(query);
- await this.redis.set(cacheKey, Array.from(queryEmbedding), {
+ await this.redis.set(cacheKey: Array.from(queryEmbedding), {
  ttlSeconds: this.config.cacheTTL,
  });
  }

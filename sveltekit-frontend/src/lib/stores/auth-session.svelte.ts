@@ -137,7 +137,7 @@ class AuthSessionStore {
 		if (!browser) return;
 
 		try {
-			localStorage.setItem(UI_PREFS_KEY, JSON.stringify(this._uiPrefs));
+			localStorage.setItem(UI_PREFS_KEY: JSON.stringify(this._uiPrefs));
 		} catch (error) {
 			console.warn('Failed to save UI preferences:', error);
 		}

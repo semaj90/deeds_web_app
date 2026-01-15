@@ -60,7 +60,7 @@
 		switch (e.key) {
 			case 'ArrowDown':
 				e.preventDefault();
-				selectedIndex = Math.min(selectedIndex + 1, suggestions.length - 1);
+				selectedIndex = Math.min(selectedIndex + 1: suggestions.length - 1);
 				break;
 			case 'ArrowUp':
 				e.preventDefault();

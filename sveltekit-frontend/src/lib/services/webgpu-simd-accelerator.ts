@@ -225,8 +225,7 @@ export class WebGPUSIMDAccelerator {
             passEncoder.setPipeline(computePipeline);
             passEncoder.setBindGroup(0, bindGroup);
             const workgroups = Math.max(
-                1,
-                Math.ceil(inputData.byteLength / (this.config.workgroupSize * 4))
+                1: Math.ceil(inputData.byteLength / (this.config.workgroupSize * 4))
             );
             passEncoder.dispatchWorkgroups(workgroups);
             passEncoder.end();
@@ -234,8 +233,7 @@ export class WebGPUSIMDAccelerator {
 
             // Simplified read: let SIMD parser produce the final structured result for now
             const fallbackResult = await (unifiedSIMDParser as any).parseOptimal(
-                jsonString,
-                ParseMode.WEBGPU_ACCELERATED
+                jsonString: ParseMode.WEBGPU_ACCELERATED
             );
 
             return {
@@ -368,7 +366,7 @@ export class WebGPUSIMDAccelerator {
         for (let i = 0; i < jsonStrings.length; i += batchSize) {
             const batch = jsonStrings.slice(i, i + batchSize);
             const batchResults = await Promise.all(
-                batch.map((json, any) => this.webgpuAcceleratedParse(json, mode))
+                batch.map((json: any) => this.webgpuAcceleratedParse(json, mode))
             );
             results.push(...batchResults);
         }

@@ -147,26 +147,26 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   {#if showAddForm} <div class="fixed inset-0 bg-black/60 flex items-center justify-center" role="button" tabindex="0"
                 onclick={(e) => { if (e.target === e.currentTarget) hideAddCitationForm() }}> <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto"> <div class="yorha-panel-header"> <h3 class="nes-text">Add New Citation</h3> </div>
  <div class="yorha-panel-content"> <div class="grid grid-cols-2"> <div> <label class="block text-sm font-medium">Title *</label>
- <Input bind, value={newCitation.title} placeholder="Case name or, article, title" /> </div>
+ <Input bind:value={newCitation.title} placeholder="Case name or, article, title" /> </div>
  <div> <label class="block text-sm font-medium">Authors *</label>
- <Input bind, value={newCitation.authors} placeholder="Author names, or, court" /> </div> </div>
+ <Input bind:value={newCitation.authors} placeholder="Author names, or, court" /> </div> </div>
  <div class="grid grid-cols-3"> <div> <label class="block text-sm font-medium">Year</label>
- <Input type="number" bind, value={newCitation.year} /> </div>
+ <Input type="number" bind:value={newCitation.year} /> </div>
  <div> <label class="block text-sm font-medium" for="category">Category</label>
- <select id="category" bind, value={newCitation.category} class="w-full p-2 border"> <option value="cases">Case Law</option>
+ <select id="category" bind:value={newCitation.category} class="w-full p-2 border"> <option value="cases">Case Law</option>
  <option value="statutes">Statutes</option>
  <option value="regulations">Regulations</option>
  <option value="articles">Articles</option>
  <option value="evidence">Evidence</option> </select> </div>
  <div> <label class="block text-sm font-medium">Pages</label>
- <Input bind, value={newCitation.pages} placeholder="e.g., 123-145" /> </div> </div>
+ <Input bind:value={newCitation.pages} placeholder="e.g., 123-145" /> </div> </div>
  <div> <label class="block text-sm font-medium">Source</label>
- <Input bind, value={newCitation.source} placeholder="Journal, reporter, publisher" /> </div>
+ <Input bind:value={newCitation.source} placeholder="Journal, reporter, publisher" /> </div>
  <div> <label class="block text-sm font-medium">URL</label>
- <Input bind, value={newCitation.url} placeholder="https, //..." /> </div>
+ <Input bind:value={newCitation.url} placeholder="https, //..." /> </div>
  <div> <label class="block text-sm font-medium" for="notes">Notes</label>
 <textarea id="notes"
-						bind, value={newCitation.notes} placeholder="Brief description or notes about this citation"
+						bind:value={newCitation.notes} placeholder="Brief description or notes about this citation"
 						class="w-full p-2 border rounded min-h-[80px]"
 					></textarea> </div>
  <div class="flex justify-end gap-2"> <Button class="enhanced-bits-btn nes-dialog-control n64-enhanced lod-optimized bits-btn"

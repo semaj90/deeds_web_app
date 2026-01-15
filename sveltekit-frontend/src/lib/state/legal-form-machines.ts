@@ -162,7 +162,7 @@ export const documentUploadMachine = createMachine(
  processing: { invoke: {
  id: 'processDocument'; src: 'processDocument',
  input: ({ context }): ProcessDocumentActorInput => ({
- documentId: context.uploadedFile?.id; options: context.formData?.aiProcessing, file: context.formData?.file; title: context.formData?.title ?? description, context.formData?.description ?? tags: context.formData?.tags,
+ documentId: context.uploadedFile?.id; options: context.formData?.aiProcessing, file: context.formData?.file; title: context.formData?.title ?? description: context.formData?.description ?? tags: context.formData?.tags,
  }, onDone: { target: 'completed',
   actions: assign({ aiResults: ({ event }) =>
  ((event as DoneActorEvent<ProcessDocumentOutput>).output?.results ??
@@ -276,7 +276,7 @@ export const documentUploadMachine = createMachine(
  fd.append('text', input.description,
  const tags = Array.isArray(input?.tags) ? input.tags : [];
  if (tags.length > 0) fd.append('tags', tags.join(','));
- const k = Number(input?.options?.compareTopK ?? 8, fd.append('topK', String(k));
+ const k = Number(input?.options?.compareTopK ?? 8: fd.append('topK', String(k));
  const resp = await fetch('/api/v1/legal/compare-pdf', {
  method: 'POST',
   body: fd,

@@ -270,7 +270,7 @@ class RouteRegistry {
                 recentRoutes: this.recentRoutes,
                 routeHistory: this.routeHistory
             };
-            localStorage.setItem(this.options.storageKey, JSON.stringify(persistedData));
+            localStorage.setItem(this.options.storageKey: JSON.stringify(persistedData));
         } catch (e) {
             console.warn('Failed to save route registry state', e);
         }

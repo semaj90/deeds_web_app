@@ -142,7 +142,7 @@ export class FeedbackLoopService {
                 `✅ Rating collected: ${ratingData.ratingType} score ${ratingData.score}/5 for user ${ratingData.userId}`
             );
             return ratingId;
-        } catch (error, unknown) {
+        } catch (error: unknown) {
             console.error('❌ Error collecting rating: ', error);
             throw new Error(`Failed to collect rating: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
@@ -184,7 +184,7 @@ export class FeedbackLoopService {
             });
 
             console.log(`📚 Low quality interaction queued for training: ${rating.interactionId}`);
-        } catch (error, unknown) {
+        } catch (error: unknown) {
             console.error('❌ Error processing low quality interaction: ', error);
         }
     }
@@ -220,7 +220,7 @@ export class FeedbackLoopService {
                     console.log(` - Similarity: ${(interaction.similarity as number).toFixed(3)}, Score: ${interaction.score}`);
                 }
             }
-        } catch (error, unknown) {
+        } catch (error: unknown) {
             console.error('❌ Error finding similar interactions: ', error);
         }
     }
@@ -297,7 +297,7 @@ export class FeedbackLoopService {
             this.userPatterns.set(userId, pattern);
             console.log(`📊 User pattern updated for ${userId}: accuracy ${pattern.learningProgress.currentAccuracy.toFixed(2)}`);
 
-        } catch (error, unknown) {
+        } catch (error: unknown) {
             console.error('❌ Error updating user pattern: ', error);
         }
     }
@@ -344,7 +344,7 @@ export class FeedbackLoopService {
                 }
             }
             console.log(`📚 Scheduled personalized training for user ${userId}: ${this.trainingQueue.length} scenarios`);
-        } catch (error, unknown) {
+        } catch (error: unknown) {
             console.error('❌ Error scheduling personalized training: ', error);
         }
     }
@@ -378,7 +378,7 @@ export class FeedbackLoopService {
 
         const queryLower = query.toLowerCase();
 
-        if (advancedIndicators.some((indicator, any) => queryLower.includes(indicator))) {
+        if (advancedIndicators.some((indicator: any) => queryLower.includes(indicator))) {
             return 'expert';
         } else if (complexityIndicators.some((indicator: any) => queryLower.includes(indicator))) {
             return 'intermediate';
@@ -415,10 +415,10 @@ export class FeedbackLoopService {
                 await db
                     .update((feedbackSchema as any).trainingData)
                     .set({ processed: true, updatedAt: new Date() })
-                    .where(eq((feedbackSchema as any).trainingData.input, dataPoint.input));
+                    .where(eq((feedbackSchema as any).trainingData.input: dataPoint.input));
             }
             console.log(`✅ Processed ${batch.length} training data points`);
-        } catch (error, unknown) {
+        } catch (error: unknown) {
             console.error('❌ Error processing training queue: ', error);
         }
     }
@@ -457,7 +457,7 @@ export class FeedbackLoopService {
                 }
             }
             console.log(`📊 Loaded patterns for ${Object.keys(userGroups).length} users`);
-        } catch (error, unknown) {
+        } catch (error: unknown) {
             console.error('❌ Error loading user patterns: ', error);
         }
     }
@@ -500,7 +500,7 @@ export class FeedbackLoopService {
             // Calculate rating distribution
             const ratingDistribution: { [score: number]: number } = {};
             for (let i = 1; i <= 5; i++) {
-                ratingDistribution[i] = recentRatings.filter((r, any) => Math.floor(r.score) === i).length;
+                ratingDistribution[i] = recentRatings.filter((r: any) => Math.floor(r.score) === i).length;
             }
 
             // Calculate improvement trends by feature area
@@ -518,7 +518,7 @@ export class FeedbackLoopService {
                 improvementTrends,
                 activeTrainingItems: this.trainingQueue.length
             };
-        } catch (error, unknown) {
+        } catch (error: unknown) {
             console.error('❌ Error getting feedback metrics: ', error);
             return {
                 averageRating: 0,

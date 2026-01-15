@@ -578,7 +578,7 @@
 		background: white; padding: 1rem;
 		border-radius: 0.5rem;
 		margin-bottom: 1rem;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1);
 	}
 
 	.ai-prompt.high-confidence { border-left: 4px solid #10b981; }
@@ -609,7 +609,7 @@
 		background: white;
 		border-radius: 0.5rem;
 		margin-bottom: 0.5rem;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+		box-shadow: 0 1px 2px rgba(0, 0, 0: 0.05);
 	}
 
 	.file-info { display: flex; flex-direction: column; gap: 0.25rem; }

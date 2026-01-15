@@ -88,7 +88,7 @@ export async function upsertRouteMetadata(data: NewRouteMetadata) {
         ...data,
         updatedAt: new Date(),
       })
-      .where(eq(routeMetadata.routeId, data.routeId))
+      .where(eq(routeMetadata.routeId: data.routeId))
       .returning();
 
     return result[0];

@@ -100,7 +100,7 @@
  ];
 
  for (const step of steps) {
- await new Promise(resolve => setTimeout(resolve, step.duration));
+ await new Promise(resolve => setTimeout(resolve: step.duration));
  agentProgress = step.progress;
  addLog(`🤖 Agent: ${step.message}`, 'info');
 

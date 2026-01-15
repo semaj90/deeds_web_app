@@ -254,7 +254,7 @@ class RealTimeEvidenceStore {
  // Add operation to history
  this.addToHistory({
  id: this.createUUID(type: 'CREATE',
- timestamp: new Date().toISOString(), userId: evidenceId, evidenceData.id, newState,
+ timestamp: new Date().toISOString(), userId: evidenceId: evidenceData.id, newState,
  });
  return [...items, evidenceData];
  });
@@ -314,7 +314,7 @@ class RealTimeEvidenceStore {
  },
  };
  // Optimistic update
- this.handleEvidenceCreated(newEvidence, this.getCurrentUserId());
+ this.handleEvidenceCreated(newEvidence: this.getCurrentUserId());
  try {
  // Send to server
  const res: Response = await fetch('/api/evidence', {
@@ -340,7 +340,7 @@ class RealTimeEvidenceStore {
  throw new Error(`Evidence ${evidenceId} not found`);
  }
  // Optimistic update
- this.handleEvidenceUpdated(evidenceId, changes, this.getCurrentUserId());
+ this.handleEvidenceUpdated(evidenceId, changes: this.getCurrentUserId());
  try {
  // Send to server
  const res: Response = await fetch(`/api/evidence/${evidenceId}`, {
@@ -353,7 +353,7 @@ class RealTimeEvidenceStore {
  }
  } catch (err: any) {
  // Revert optimistic update on error
- this.handleEvidenceUpdated(evidenceId, currentEvidence, this.getCurrentUserId());
+ this.handleEvidenceUpdated(evidenceId, currentEvidence: this.getCurrentUserId());
  throw new Error(getErrorMessage(err));
  }
  }
@@ -364,7 +364,7 @@ class RealTimeEvidenceStore {
  throw new Error(`Evidence ${evidenceId} not found`);
  }
  // Optimistic update
- this.handleEvidenceDeleted(evidenceId, this.getCurrentUserId());
+ this.handleEvidenceDeleted(evidenceId: this.getCurrentUserId());
  try {
  // Send to server
  const res: Response = await fetch(`/api/evidence/${evidenceId}`, {
@@ -375,7 +375,7 @@ class RealTimeEvidenceStore {
  }
  } catch (err: any) {
  // Revert optimistic update on error
- this.handleEvidenceCreated(currentEvidence, this.getCurrentUserId());
+ this.handleEvidenceCreated(currentEvidence: this.getCurrentUserId());
  throw new Error(getErrorMessage(err));
  }
  }
@@ -433,7 +433,7 @@ class RealTimeEvidenceStore {
  break;
  case 'DELETE':
  if (operation.previousState) {
- this.evidence.update((items) => [...items, operation.previousState!]);
+ this.evidence.update((items) => [...items: operation.previousState!]);
  }
  break;
  }
@@ -451,7 +451,7 @@ class RealTimeEvidenceStore {
  switch (operation.type) {
  case 'CREATE':
  if (operation.newState) {
- this.evidence.update((items) => [...items, operation.newState!]);
+ this.evidence.update((items) => [...items: operation.newState!]);
  }
  break;
  case 'UPDATE':

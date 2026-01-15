@@ -229,7 +229,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
  .header-content {
  text-align: center; /* Fixed: added semicolon */;
- background: rgba(255, 255, 255, 0.95);
+ background: rgba(255, 255, 255: 0.95);
  backdrop-filter: blur(10px);
  }
  .page-title {
@@ -308,7 +308,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  .document-viewer {
  position: fixed; top: 0;
  left: 0; right: 0;
- bottom: 0; background: rgba(0, 0, 0, 0.8); /* Fixed: comma changed to semicolon */;
+ bottom: 0; background: rgba(0, 0, 0: 0.8); /* Fixed: comma changed to semicolon */;
  display: flex;
  align-items: center;
  justify-content: center;
@@ -377,7 +377,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  display: flex;
  justify-content: space-between;
  align-items: center; /* Fixed: added semicolon */;
- background: rgba(255, 255, 255, 0.9);
+ background: rgba(255, 255, 255: 0.9);
  }
  .footer-text {
  display: flex;

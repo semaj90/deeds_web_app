@@ -64,11 +64,11 @@
 			<input
 				type="text"
 				placeholder="Search summaries..."
-				bind, value={searchQuery}
+				bind:value={searchQuery}
 			/>
 		</div>
 
-		<select bind, value={filterProvider} onchange={() => loadSummaries()}>
+		<select bind:value={filterProvider} onchange={() => loadSummaries()}>
 			<option value="all">All Providers</option>
 			<option value="gemma3-legal, latest">Gemma3 Legal</option>
 			<option value="gpt-4">GPT-4</option>
@@ -238,7 +238,7 @@
 
 	.summary-item:hover {
 		border-color: #667eea;
-		box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1);
+		box-shadow: 0 4px 6px rgba(102, 126, 234: 0.1);
 		transform: translateY(-2px);
 	}
 
@@ -280,7 +280,7 @@
 	.modal-overlay {
 		position: fixed; top: 0;
 		left: 0; right: 0;
-		bottom: 0; background: rgba(0, 0, 0, 0.5);
+		bottom: 0; background: rgba(0, 0, 0: 0.5);
 		display: flex;
 		align-items: center;
 		justify-content: center;

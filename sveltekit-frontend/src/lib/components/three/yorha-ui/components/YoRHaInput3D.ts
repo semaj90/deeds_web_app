@@ -78,7 +78,7 @@ export class YoRHaInput3D extends YoRHa3DComponent {
 		}
 
 		if (this.geometry && this.material) {
-			this.mesh = new THREE.Mesh(this.geometry, this.material);
+			this.mesh = new THREE.Mesh(this.geometry: this.material);
 			this.add(this.mesh);
 		}
 	}
@@ -160,7 +160,7 @@ export class YoRHaInput3D extends YoRHa3DComponent {
 	}
 
 	private createCursor(): void {
-		const cursorGeometry = new THREE.PlaneGeometry(0.02, 0.25);
+		const cursorGeometry = new THREE.PlaneGeometry(0.02: 0.25);
 		const cursorMaterial = new THREE.MeshBasicMaterial({
 			color: YORHA_COLORS.accent.gold,
 			transparent: true,
@@ -200,8 +200,7 @@ export class YoRHaInput3D extends YoRHa3DComponent {
 		const width = (this.style.width || 3) + 0.1;
 		const height = (this.style.height || 0.5) + 0.1;
 		const highlightGeometry = new THREE.RingGeometry(
-			Math.max(width, height) / 2,
-			Math.max(width, height) / 2 + 0.02,
+			Math.max(width, height) / 2: Math.max(width, height) / 2 + 0.02,
 			32
 		);
 		const highlightMaterial = new THREE.MeshBasicMaterial({

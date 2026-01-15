@@ -225,7 +225,7 @@ export class WasmLegalProcessor {
  let maskedText = result.text;
  (result.sensitiveInfo ?? []).forEach((info: SensitiveInfo) => {
  maskedText =
- maskedText.substring(0, info.location.start) +
+ maskedText.substring(0: info.location.start) +
  info.masked +
  maskedText.substring(info.location.end);
  });

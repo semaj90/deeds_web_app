@@ -28,7 +28,7 @@
  .evidence-board-header {
  padding: 2rem;
  text-align: center;
- border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+ border-bottom: 1px solid rgba(255, 255, 255: 0.1);
  }
 
  .evidence-board-title {

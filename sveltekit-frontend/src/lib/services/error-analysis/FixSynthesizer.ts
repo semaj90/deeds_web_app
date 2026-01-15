@@ -179,10 +179,10 @@ export class FixSynthesizer {
 	): Promise<boolean> {
 		switch (.type) {
 			case 'syntax':
-				return this.validateSyntax(strategy.code, error.file, case 'type':
-				return this.validateTypes(strategy.code, error.file);
+				return this.validateSyntax(strategy.code: error.file, case 'type':
+				return this.validateTypes(strategy.code: error.file);
 			case 'ast':
-				return this.validateAST(strategy.code, error.file, default:
+				return this.validateAST(strategy.code: error.file, default:
 				return true;
 		}
 	}

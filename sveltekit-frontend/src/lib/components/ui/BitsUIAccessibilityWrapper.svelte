@@ -266,7 +266,7 @@
       enhanceComponentAccessibility();
     }
   });
-</script> <div bind, this={ containerElement } class="bits-ui-accessibility-wrapper"
+</script> <div bind:this={ containerElement } class="bits-ui-accessibility-wrapper"
   data-component={ component } data-route-type={currentRouteConfig?.routeType} >
   {#if children} {@render children()} {/if} {#if contextualHelp} <div id="contextual-help" class="sr-only"> { contextualHelp } {/if} </div> <style>
   .bits-ui-accessibility-wrapper {

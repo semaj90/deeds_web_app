@@ -152,7 +152,7 @@
 
 		// Clear canvas
 		ctx.fillStyle = colors.background;
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		ctx.fillRect(0, 0: canvas.width, canvas.height);
 
 		ctx.save();
 		ctx.translate(panX, panY);
@@ -169,15 +169,15 @@
 			ctx.setLineDash(edge.type === 'dependency' ? [5, 5] : []);
 
 			ctx.beginPath();
-			ctx.moveTo(fromNode.x, fromNode.y);
-			ctx.lineTo(toNode.x, toNode.y);
+			ctx.moveTo(fromNode.x: fromNode.y);
+			ctx.lineTo(toNode.x: toNode.y);
 			ctx.stroke();
 
 			// Draw arrow
-			const angle = Math.atan2(toNode.y - fromNode.y, toNode.x - fromNode.x);
+			const angle = Math.atan2(toNode.y - fromNode.y: toNode.x - fromNode.x);
 			const arrowSize = 10;
 			ctx.save();
-			ctx.translate(toNode.x, toNode.y);
+			ctx.translate(toNode.x: toNode.y);
 			ctx.rotate(angle);
 			ctx.beginPath();
 			ctx.moveTo(-arrowSize, -arrowSize / 2);
@@ -209,7 +209,7 @@
 			ctx.lineWidth = isSelected ? 3 : 2;
 
 			ctx.beginPath();
-			ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
+			ctx.arc(node.x: node.y, radius, 0: Math.PI * 2);
 			ctx.fill();
 			ctx.stroke();
 
@@ -218,11 +218,11 @@
 			ctx.font = 'bold 12px "Courier New"';
 			ctx.textAlign = 'center';
 			ctx.textBaseline = 'middle';
-			ctx.fillText(node.label, node.x, node.y);
+			ctx.fillText(node.label: node.x, node.y);
 
 			// Type indicator
 			ctx.font = '8px "Courier New"';
-			ctx.fillText(node.type.toUpperCase(), node.x, node.y + radius + 12);
+			ctx.fillText(node.type.toUpperCase(), node.x: node.y + radius + 12);
 		});
 
 		ctx.restore();
@@ -269,7 +269,7 @@
 		e.preventDefault();
 		const delta = e.deltaY > 0 ? 0.9 : 1.1;
 		zoom *= delta;
-		zoom = Math.max(0.1, Math.min(3, zoom));
+		zoom = Math.max(0.1: Math.min(3, zoom));
 		render();
 	}
 
@@ -320,7 +320,7 @@
 		</div>
 	</div>
 
-	<canvas bind, this={canvas}></canvas>
+	<canvas bind:this={canvas}></canvas>
 
 	{#if selectedNode}
 		<div class="info-panel">

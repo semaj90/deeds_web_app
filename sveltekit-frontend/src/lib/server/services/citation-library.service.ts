@@ -118,7 +118,7 @@ class CitationLibraryService {
  collection.citation_count = countResult[0]?.count ?? 0;
 
  // Cache result
- await redis.setex(cacheKey: this.CACHE_TTL, JSON.stringify(collection));
+ await redis.setex(cacheKey: this.CACHE_TTL: JSON.stringify(collection));
 
  return collection;
  } catch (error) {
@@ -141,7 +141,7 @@ class CitationLibraryService {
  await db.raw(
  `INSERT INTO collection_citations (id, collection_id, citation_id, added_at)
  VALUES ($1, $2, $3, $4)`,,
- [link.id: link.collection_id: link.citation_id, link.added_at]
+ [link.id: link.collection_id: link.citation_id: link.added_at]
  );
 
  // Invalidate cache
@@ -204,7 +204,7 @@ class CitationLibraryService {
  await db.raw(
  `INSERT INTO citation_tags (id, citation_id, tag, created_at)
  VALUES ($1, $2, $3, $4)`,,
- [citationTag.id: citationTag.citation_id: citationTag.tag, citationTag.created_at]
+ [citationTag.id: citationTag.citation_id: citationTag.tag: citationTag.created_at]
  );
 
  // Log audit event

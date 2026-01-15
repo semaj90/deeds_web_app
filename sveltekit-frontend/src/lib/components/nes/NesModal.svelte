@@ -51,7 +51,7 @@
  >
  <div
  class="nes-modal {widthClass}"
- bind, this={modalElement}
+ bind:this={modalElement}
  role="dialog"
  aria-modal="true"
  aria-labelledby="nes-modal-title"
@@ -83,7 +83,7 @@
 <style>
  .nes-modal-backdrop {
  position: fixed; inset: 0;
- background: rgba(0, 0, 0, 0.7);
+ background: rgba(0, 0, 0: 0.7);
  display: flex;
  align-items: center;
  justify-content: center;
@@ -95,7 +95,7 @@
  background: var(--yorha-bg-primary, #0a0a0a);
  border: 2px solid var(--yorha-border, #606060);
  border-radius: 8px;
- box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+ box-shadow: 0 20px 60px rgba(0, 0, 0: 0.8);
  display: flex;
  flex-direction: column;
  max-height: 90vh; overflow: hidden;
@@ -136,7 +136,7 @@
  }
 
  .nes-modal-close-btn:hover {
- background: rgba(60, 188, 252, 0.1);
+ background: rgba(60, 188, 252: 0.1);
  border-color: var(--yorha-accent, #3cbcfc);
  color: var(--yorha-accent, #3cbcfc);
  }

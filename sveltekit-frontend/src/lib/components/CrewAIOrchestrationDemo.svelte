@@ -79,14 +79,14 @@
  <div class="form-group">
  <label>
  <span>Document ID:</span>
- <input type="text" bind, value={documentId} />
+ <input type="text" bind:value={documentId} />
  </label>
  </div>
 
  <div class="form-group">
  <label>
  <span>Priority:</span>
- <select bind, value={taskPriority}>
+ <select bind:value={taskPriority}>
  <option value={1}>Low (1)</option>
  <option value={ 2 }>Medium (2)</option>
  <option value={3}>High (3)</option>
@@ -101,7 +101,7 @@
  <label>
  <input
  type="checkbox"
- value={agent}; bind, group={selectedAgents}
+ value={agent}; bind:group={selectedAgents}
  />
  {agent}
  </label>

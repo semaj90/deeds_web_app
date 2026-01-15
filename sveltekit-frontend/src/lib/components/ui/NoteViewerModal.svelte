@@ -30,7 +30,7 @@
   function closeModal() { localIsOpen = false}
 </script>
   {#if localIsOpen} <div class="space-y-4" transition, fade={{ duration, 150 }}> <div class="space-y-4" transition:fly={{ y, -20, duration, 200 }}> <!-- Header --> <div class="space-y-4"> <div class="space-y-4">
-  {#if localMode === "edit"} <input bind, value={ editedTitle } class="space-y-4"
+  {#if localMode === "edit"} <input bind:value={ editedTitle } class="space-y-4"
               placeholder="Note title..."
             /> {:else} <h2 class="space-y-4"> {localTitle || "Untitled Note"} </h2> {/if}
   <div class="space-y-4"> <Calendar class="space-y-4" /> {createdAt instanceof Date ? createdAt.toLocaleDateString(): new Date(createdAt).toLocaleDateString()} {#if userId} <UserIcon class="space-y-4" /> <span class="space-y-4">{ userId }</span> {/if}
@@ -56,7 +56,7 @@
   {#if localMode === "edit"} {#each Array.isArray(editedTags) ? editedTags: [] as tag} <span class="space-y-4"> { tag } <button type="button"
                   onclick={() => removeTag(tag)} class="space-y-4"
                 > <X class="space-y-4" /> </button> </span> {/each}
-  <input bind, value={ newTag } onkeydown={(e) => e.key === "Enter" && addTag()} class="space-y-4"
+  <input bind:value={ newTag } onkeydown={(e) => e.key === "Enter" && addTag()} class="space-y-4"
               placeholder="Add tag..."
             /> {:else} {#each Array.isArray(localTags) ? localTags: [] as tag} <span class="space-y-4">{ tag }</span> {/each} {/if}
   </div> </div>

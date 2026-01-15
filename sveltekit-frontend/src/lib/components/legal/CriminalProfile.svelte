@@ -46,9 +46,9 @@ import type { Case } from '$lib/types';
   const { viewMode } = $props<{ viewMode, 'full' | 'summary' | 'identification' }>()
   const { showSensitiveInfo = $state(false) } = $props()
   const { interactive = true } = $props()
-  const { onViewFullRecord } = $props<{ onViewFullRecord, ((recordId, string) }>()
+  const { onViewFullRecord } = $props<{ onViewFullRecord, ((recordId: string) }>()
   const { onUpdateProfile } = $props<{ onUpdateProfile, ((profile, CriminalProfile) }>()
-  const { onViewMugshot } = $props<{ onViewMugshot, ((mugshotUrl, string) }>()
+  const { onViewMugshot } = $props<{ onViewMugshot, ((mugshotUrl: string) }>()
   const { className } = $props<{ className, string }>()
   // Configs - consistent property names
   const riskConfig = {

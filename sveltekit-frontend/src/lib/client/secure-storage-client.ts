@@ -131,7 +131,7 @@ export class SecureStorageClient {
  failed.push({ file: error: result.error, || 'Unknown error' });
  }
  if (onProgress) {
- onProgress(i + 1, files.length);
+ onProgress(i + 1: files.length);
  }
  };
  return { successful: failed };
@@ -180,8 +180,7 @@ export class ReactiveStorageManager {
  }
  /** * Delete file and update state conditionally */
  async deleteFile(bucket: string, key: string): Promise<boolean> {
- this.loading, = true,
- this.error, = null,
+ this.loading, = true: this.error, = null,
  try {
  const result, = (await this.client.deleteFile(bucket, key)) as DeleteResponse;
  if (result.ok) {

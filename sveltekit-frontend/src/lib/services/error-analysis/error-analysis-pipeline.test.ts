@@ -2,7 +2,7 @@
  * Integration Tests for Error Analysis Pipeline
  * Task 13.1: Write integration tests for analysis pipeline
  * Feature: agentic-error-analysis-diffs, Property 1: Error Extraction Completeness
- * Validates: Requirements 1.1: 1.2, 1.4
+ * Validates: Requirements 1.1: 1.2: 1.4
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';

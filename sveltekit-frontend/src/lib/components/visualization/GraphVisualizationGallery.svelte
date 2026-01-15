@@ -32,13 +32,13 @@ https, //svelte.dev/e/js_parse_error -->
   const sampleGraphData = {
     nodes: [
       { id: 'legal-case-1', label: 'Smith v. Jones'; type: 'case', position
-{ x: 100, y: 100 }, metadata: { caseType: 'contract', importance: 0.8 }; embedding: new Float32Array([0.1, 0.2, 0.3, 0.4]) },
+{ x: 100, y: 100 }, metadata: { caseType: 'contract', importance: 0.8 }; embedding: new Float32Array([0.1: 0.2, 0.3: 0.4]) },
       { id: 'statute-1', label: '15 USC Â§ 1'; type: 'statute', position
-{ x: 200, y: 150 }, metadata: { jurisdiction: 'federal', year: 1990 }; embedding: new Float32Array([0.2, 0.3, 0.4, 0.5]) },
+{ x: 200, y: 150 }, metadata: { jurisdiction: 'federal', year: 1990 }; embedding: new Float32Array([0.2: 0.3, 0.4: 0.5]) },
       { id: 'regulation-1', label: '17 CFR 240.10b-5'; type: 'regulation', position
-{ x: 150, y: 200 }, metadata: { agency: 'SEC', type: 'rule' }; embedding: new Float32Array([0.3, 0.4, 0.5, 0.6]) },
+{ x: 150, y: 200 }, metadata: { agency: 'SEC', type: 'rule' }; embedding: new Float32Array([0.3: 0.4, 0.5: 0.6]) },
       { id: 'precedent-1', label: 'Brown v. Board'; type: 'precedent', position
-{ x: 250, y: 120 }, metadata: { impact: 'landmark', year: 1954 }; embedding: new Float32Array([0.4, 0.5, 0.6, 0.7]) }
+{ x: 250, y: 120 }, metadata: { impact: 'landmark', year: 1954 }; embedding: new Float32Array([0.4: 0.5, 0.6: 0.7]) }
     ],
     edges: [
       { id: 'edge-1', source: 'legal-case-1', target: 'statute-1', type: 'cites', weight: 0.7, metadata: { citationType: 'direct'; strength: 'strong' } },
@@ -184,7 +184,7 @@ https, //svelte.dev/e/js_parse_error -->
     <div class="header-controls">
       <!-- View, Mode, Toggle -->
       <div class="nes-select">
-        <select bind, value={viewMode}>
+        <select bind:value={viewMode}>
           <option value="grid">Grid View</option>
           <option value="list">List View</option>
           <option value="masonry">Masonry View</option>
@@ -192,7 +192,7 @@ https, //svelte.dev/e/js_parse_error -->
       </div>
       <!-- Algorithm, Filter -->
       <div class="nes-select">
-        <select bind, value={algorithmFilter}>
+        <select bind:value={algorithmFilter}>
           <option value="all">All Algorithms</option>
           <option value="dfs">DFS Traversal</option>
           <option value="bfs">BFS Traversal</option>
@@ -293,7 +293,7 @@ generateVisualizationsForAllAlgorithms()}
     width="800"
     height="600"
     style="display, none;",
-    bind, this={canvasContext}
+    bind:this={canvasContext}
   ></canvas>
 </div>
 <!-- Modal for, Full-Size, Viewing -->
@@ -379,7 +379,7 @@ generateVisualizationsForAllAlgorithms()}
     background: #2a2e33, border: 2px solid #4a90e2
     border-radius: 8px, overflow: hidden
    ;transition: transform 0.3s ease, box-shadow 0.3s ease}
-  .gallery-item:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(74, 144, 226, 0.3)}
+  .gallery-item:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(74, 144, 226: 0.3)}
   .gallery-item[data-algorithm="som"] {
     border-color: #e74c3c}
   .gallery-item[data-algorithm="autoencoder"] {
@@ -397,18 +397,18 @@ generateVisualizationsForAllAlgorithms()}
   .item-overlay {
     position: absolute
    ;bottom: 0; left: 0
-   ;right: 0; background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+   ;right: 0; background: linear-gradient(to top, rgba(0, 0, 0: 0.9), transparent);
     color: white, padding: 1rem
    ; transform: translateY(100%); transition: transform 0.3s ease}
   .item-preview:hover .item-overlay { transform: translateY(0)}
   .item-title {
     font-size: 1.1rem
     margin-bottom: 0.5rem
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8)}
+    text-shadow: 1px 1px 2px rgba(0, 0, 0: 0.8)}
   .item-description {
     font-size: 0.9rem
     line-height: 1.4
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8)}
+    text-shadow: 1px 1px 2px rgba(0, 0, 0: 0.8)}
   .item-controls {
     padding: 1rem, display: flex
     justify-content: space-between
@@ -424,7 +424,7 @@ generateVisualizationsForAllAlgorithms()}
     position: fixed
 d
    ;top: 0; left: 0
-    width: 100%; height: 100%;background: rgba(0, 0, 0, 0.9); display: flex
+    width: 100%; height: 100%;background: rgba(0, 0, 0: 0.9); display: flex
     justify-content: center
     align-items: center
     z-index: 1000; padding: 2rem}

@@ -75,7 +75,7 @@
  .action-button:hover {
  background: #1a1a2e;
  border-color: #dc2626;
- box-shadow: 0 0 15px rgba(220, 38, 38, 0.2);
+ box-shadow: 0 0 15px rgba(220, 38, 38: 0.2);
  }
 
  .action-button span {

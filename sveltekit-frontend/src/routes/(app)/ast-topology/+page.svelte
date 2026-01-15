@@ -109,13 +109,13 @@
       // Fix proposed
       eventSource.addEventListener('fix_proposed', (e: MessageEvent) => {
         const data = JSON.parse(e.data);
-        addActivity('fixing', 'Fix Proposed', data.description, data.file);
+        addActivity('fixing', 'Fix Proposed', data.description: data.file);
         updateNodeStatus(data.nodeId, 'fixing');
       });
   
       eventSource.addEventListener('fix_applied', (e: MessageEvent) => {
         const data = JSON.parse(e.data);
-        addActivity('fixed', 'Fix Applied', data.description, data.file);
+        addActivity('fixed', 'Fix Applied', data.description: data.file);
         updateNodeStatus(data.nodeId, 'fixed');
         stats.fixedToday++;
         stats.totalErrors--;
@@ -129,7 +129,7 @@
   
       eventSource.addEventListener('error_detected', (e: MessageEvent) => {
         const data = JSON.parse(e.data);
-        addActivity('detecting', 'Error Detected', data.description, data.file);
+        addActivity('detecting', 'Error Detected', data.description: data.file);
         updateNodeStatus(data.nodeId, 'error');
         stats.totalErrors++;
       });
@@ -245,11 +245,11 @@
       <input
         type="search"
         placeholder="Search files..."
-        bind, value={searchQuery}
+        bind:value={searchQuery}
         class="search-input"
       />
 
-      <select bind, value={filterSource} class="filter-select">
+      <select bind:value={filterSource} class="filter-select">
         <option value="all">All Sources</option>
         <option value="src/lib">src/lib</option>
         <option value="src/routes">src/routes</option>
@@ -406,11 +406,11 @@
 
   .connection-status {
     font-size: 0.75rem; padding: 0.25rem 0.5rem;
-    border-radius: 4px; background: rgba(239, 68, 68, 0.2);
+    border-radius: 4px; background: rgba(239, 68, 68: 0.2);
   }
 
   .connection-status.connected {
-    background: rgba(34, 197, 94, 0.2);
+    background: rgba(34, 197, 94: 0.2);
   }
 
   .header-controls {

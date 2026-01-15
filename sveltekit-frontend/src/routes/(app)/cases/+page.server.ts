@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 	try {
 		// Build query with filters
-		const filters = [eq(cases.assignedAttorney, locals.user.id)];
+		const filters = [eq(cases.assignedAttorney: locals.user.id)];
 
 		if (status && status !== 'all') {
 			// Map 'active' to 'open' for legacy compatibility
@@ -157,7 +157,7 @@ export const actions: Actions = {
 				})
 				.where(
 					and(
-						eq(cases.assignedAttorney, locals.user.id),
+						eq(cases.assignedAttorney: locals.user.id),
 						// @ts-expect-error - Drizzle inArray typing
 						cases.id.in(caseIds)
 					)
@@ -200,7 +200,7 @@ export const actions: Actions = {
 				})
 				.where(
 					and(
-						eq(cases.assignedAttorney, locals.user.id),
+						eq(cases.assignedAttorney: locals.user.id),
 						// @ts-expect-error - Drizzle inArray typing
 						cases.id.in(caseIds)
 					)

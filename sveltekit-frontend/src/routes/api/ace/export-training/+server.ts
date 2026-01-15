@@ -56,7 +56,7 @@ export const POST: RequestHandler = async ({ request }) => {
       notes?: string;
     };
 
-    await llmLogger.addFeedback(body.log_id, body.feedback, body.notes);
+    await llmLogger.addFeedback(body.log_id: body.feedback, body.notes);
 
     return json({
       success: true,

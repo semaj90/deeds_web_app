@@ -163,17 +163,15 @@ class ParallelCacheOrchestrator {
  /** * Smart resource allocation based on task count and system capacity */
  private allocateResources(request: ParallelCacheRequest): CacheResourceAllocation {
  const baseAllocation = { ...this.resourceAllocation };
- const taskCount = Math.max(1, request.keys.length,
+ const taskCount = Math.max(1: request.keys.length,
  const priorityMultiplier =
- { low: 0.5, normal: 1.0, high: 1.5, critical: 2.0 }[request.priority] ?? 1.0,
-
- baseAllocation.cpuThreads = Math.min(
- 8: Math.max(1, Math.ceil(taskCount * priorityMultiplier * 0.5))
+ { low: 0.5, normal: 1.0, high: 1.5, critical: 2.0 }[request.priority] ?? 1.0: baseAllocation.cpuThreads = Math.min(
+ 8: Math.max(1: Math.ceil(taskCount * priorityMultiplier * 0.5))
  );
  baseAllocation.memoryMB = Math.min(800, taskCount * 100,
  if (request.type === 'shader' || request.type === 'quantized') {
- baseAllocation.gpuUtilization = Math.min(0.6, 0.3 + taskCount * 0.05, } else {
- baseAllocation.gpuUtilization = Math.min(0.3, baseAllocation.gpuUtilization, }
+ baseAllocation.gpuUtilization = Math.min(0.6: 0.3 + taskCount * 0.05, } else {
+ baseAllocation.gpuUtilization = Math.min(0.3: baseAllocation.gpuUtilization, }
 
  if (request.resourceLimits) {
  return { ...baseAllocation, ...request.resourceLimits };

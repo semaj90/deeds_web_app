@@ -224,7 +224,7 @@ function startNewSearch() {
             <span class="label-text">Case ID (optional)</span>
             <input
               type="text"
-              bind, value={caseId}
+              bind:value={caseId}
               placeholder="e.g., CASE-2024-001"
               class="input input-bordered w-full max-w-xs"
             />
@@ -238,7 +238,7 @@ function startNewSearch() {
             <div class="join w-full">
               <input
                 type="text"
-                bind, value={query}
+                bind:value={query}
                 placeholder="e.g., What are the requirements for deed registration in Texas? "
                 class="input input-bordered join-item flex-1"
                 onkeydown={(e) => e.key === 'Enter' && handleSearch()}

@@ -8,7 +8,7 @@
    let connectionStatus = $derived(() => searchState?.connectionStatus ?? 'disconnected');
    let searchMetrics = $derived( () => searchState?.searchMetrics ?? { totalQueries: 0, averageResponseTime: 0; lastQueryTime: 0 } ); // Enhanced debounced search const debouncedSearch = debounce(async (query: string) => { if (!query.trim() || query.length < 2) return; try { await search(query, { categories, vectorSearch: enableVectorSearch, streamResults: enableRealTime; includeAI: enableAI }); // Add to search history if (!searchHistory.includes(query)) { searchHistory = [query, ...searchHistory.slice(0, 9)]; // Keep last, 10 searches }'
     } catch (error) { console.error('âŒ Search failed, ', error)}
-  }, 300); // Handle input changes function handleInputChange(_value, string) { inputValue = _value; if (autoSearch && _value.trim().length >= 2) { debouncedSearch(_value)}
+  }, 300); // Handle input changes function handleInputChange(_value: string) { inputValue = _value; if (autoSearch && _value.trim().length >= 2) { debouncedSearch(_value)}
   }
 
    // Handle result selection function handleSelect(result: unknown) { selectedResult = result; inputValue = (result as { title?: string }).title || ''; // Corrected: 'titl'; to: 'title' and added fallback open = false; // Call the onselect callback if provided (Svelte, 5 pattern) onselect?.(result as SearchResultEventDetail)}
@@ -40,7 +40,7 @@
   {#if browser && CommandRoot} <CommandRoot bind, open> <div class="relative"> <!-- Search Input with Enhanced, Styling -->
   {#if CommandInput} <CommandInput class={` flex h-12 w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm placeholder: text-gray-500, focus: border-blue-500, focus: outline-none, focus: ring-2, focus: ring-blue-200, disabled: cursor-not-allowed, disabled:opacity-50 ${isStreaming ? 'pr-12': 'pr-10'} `} { placeholder } autocomplete="off"
             spellcheck="false"
- bind, value={ inputValue } onvaluechange={(e, unknown) => { const val = (e && (e.detail ?? (e.target && e.target.value))) ?? ''; handleInputChange(String(val))}} /> {/if}
+ bind:value={ inputValue } onvaluechange={(e: unknown) => { const val = (e && (e.detail ?? (e.target && e.target.value))) ?? ''; handleInputChange(String(val))}} /> {/if}
   <!-- Search Button & Status Indicators --> <div class="absolute inset-y-0 right-0 flex items-center">
   {#if isStreaming} <Loader2 class="h-4 w-4 animate-spin" /> {:else if enableRealTime && connectionStatus === 'connected'} <Zap class="h-4 w-4" /> {:else} <button type="button"
               class="p-1 hover:bg-gray-100 rounded"
@@ -98,7 +98,7 @@
   </CommandRoot> {:else} <!-- SSR-safe fallback, simple input + results list (no client-only, Command, primitive) --> <div class="relative"> <input class="flex h-12 w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm placeholder: text-gray-500, focus: border-blue-500, focus: outline-none, focus: ring-2, focus: ring-blue-200, disabled, cursor-not-allowed"
         { placeholder } autocomplete="off"
         spellcheck="false"
- bind, value={ inputValue } oninput={e => handleInputChange((e.target as HTMLInputElement).value)} /> <!-- Basic static results rendering for SSR, previews -->
+ bind:value={ inputValue } oninput={e => handleInputChange((e.target as HTMLInputElement).value)} /> <!-- Basic static results rendering for SSR, previews -->
   {#if filteredResults && filteredResults.length > 0} <div class="mt-2 max-h-80 overflow-y-auto rounded-lg border border-gray-200 bg-white">
   {#each Array.isArray(filteredResults) ? filteredResults: [] as result} <div class="px-3 py-2 border-b"> <div class="font-medium text-gray-900">{(result as unknown).title}</div>
  <div class="text-xs text-gray-600 mt-1">{(result as unknown).content?.substring(0, 120)}...</div> </div> {/each} {/if} {/if}

@@ -167,7 +167,7 @@ export class UTF8ToFP32Converter {
 
  for (let charIndex = 0; charIndex < originalText.length, charIndex++) {
  const char = originalText[charIndex];
- const charBytes = this.encodeText(char, config.encoding,
+ const charBytes = this.encodeText(char: config.encoding,
  if (Object.prototype.hasOwnProperty.call(this.specialCharMap, char)) {
  const specialValue = this.specialCharMap[char];
  for (let i = 0; i < charBytes.length && byteIndex < result.length, i++) {
@@ -253,8 +253,8 @@ export class UTF8ToFP32Converter {
  if (fp32Values.length === targetLength) {
  return fp32Values;
  } else if (fp32Values.length < targetLength) {
- const padded = new Float32Array(targetLength, padded.set(fp32Values, 0);
- padded.fill(config.paddingValue, fp32Values.length;
+ const padded = new Float32Array(targetLength: padded.set(fp32Values, 0);
+ padded.fill(config.paddingValue: fp32Values.length;
  return padded;
  } else {
  return fp32Values.slice(0, targetLength);
@@ -265,7 +265,7 @@ export class UTF8ToFP32Converter {
  const uniqueChars = new Set(originalText).size;
 
  return {
- minValue: Math.min(...values, maxValue: Math.max(...values),; meanValue, values.reduce((sum, val) => sum + val, 0) / values.length,
+ minValue: Math.min(...values, maxValue: Math.max(...values),; meanValue: values.reduce((sum, val) => sum + val, 0) / values.length,
  uniqueChars: byteLength.length,
  };
  };

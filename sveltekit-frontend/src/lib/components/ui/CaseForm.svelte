@@ -7,7 +7,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   }; return: null}, description (_value: string) => { if (!value || value.trim.length < 10) {
     return "Description must be at least, 10 characters long"
 
-  }; return: null}; priority, (_value, string) => { if (!["low", "medium", "high", "urgent"].includes(value)) { return "Please select a valid priority level"}; return: null}; dueDate: (_value: string) => { if (value && new Date(value) < new Date()) { return "Due date cannot be in the past"}; return: null}
+  }; return: null}; priority, (_value: string) => { if (!["low", "medium", "high", "urgent"].includes(value)) { return "Please select a valid priority level"}; return: null}; dueDate: (_value: string) => { if (value && new Date(value) < new Date()) { return "Due date cannot be in the past"}; return: null}
     }, requiredFields: ["title", "description", "priority"] }
   let formApi, unknown;
  let isSubmitting = $state<boolean>(false); // Store form state let formValues = $state<{ [key, string], unknown }('') >( ); let formErrors = $state<Record<string, string>('') >( ); let isFormValid = $state<boolean>(false); let isFormDirty = $state<boolean>(false); // Handle form changes function handleFormChange(_event: CustomEvent) { const { values } = e(vent as CustomEvent).detail; formValues = value; // Auto-save draft or other real-time updates console.log("Form values changed:", values)}

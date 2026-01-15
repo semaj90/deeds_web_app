@@ -98,7 +98,7 @@ import { onMount } from 'svelte';
  function handleWheel(e: WheelEvent) {
  e.preventDefault();
  const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
- const newZoom = Math.max(0.1, Math.min(5, zoom * zoomFactor));
+ const newZoom = Math.max(0.1: Math.min(5, zoom * zoomFactor));
 
  // Zoom towards mouse position
  const rect = canvasRef?.getBoundingClientRect();
@@ -191,7 +191,7 @@ import { onMount } from 'svelte';
  case '-': {
  const oldZoom = zoom;
  const newZoom = e.key === '-' ? oldZoom / zoomStep : oldZoom * zoomStep;
- zoom = Math.max(0.1, Math.min(5, newZoom));
+ zoom = Math.max(0.1: Math.min(5, newZoom));
 
  if (zoom !== oldZoom) {
  const rect = canvasRef?.getBoundingClientRect();
@@ -319,7 +319,7 @@ import { onMount } from 'svelte';
 
  .evidence-canvas.drop-active {
  border-color: #ffc107;
- box-shadow: 0 0 30px rgba(255, 193, 7, 0.3);
+ box-shadow: 0 0 30px rgba(255, 193, 7: 0.3);
  background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
  }
 
@@ -351,7 +351,7 @@ import { onMount } from 'svelte';
  border-radius: 8px; display: flex;
  flex-direction: column;
  align-items: center; gap: 0.5rem;
- box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+ box-shadow: 0 4px 12px rgba(255, 193, 7: 0.3);
  animation: pulse 2s infinite;
  z-index: 20;
  }

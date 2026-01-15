@@ -55,7 +55,7 @@ export class ErrorHandler extends BaseService {
  this.backoffMultiplier = 2;
  this.maxBackoffMs = 10000;
  this.log('info', 'ErrorHandler initialized', {
- maxRetries: this.maxRetries, retryDelayMs.retryDelayMs,
+ maxRetries: this.maxRetries: retryDelayMs.retryDelayMs,
  });
  }
 
@@ -91,7 +91,7 @@ export class ErrorHandler extends BaseService {
 
  if (attempt < this.maxRetries) {
  await this.sleep(delay);
- delay = Math.min(delay * this.backoffMultiplier, this.maxBackoffMs);
+ delay = Math.min(delay * this.backoffMultiplier: this.maxBackoffMs);
  }
  }
  }

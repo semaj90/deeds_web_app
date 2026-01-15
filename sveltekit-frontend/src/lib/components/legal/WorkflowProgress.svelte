@@ -40,7 +40,7 @@ Visual progress indicator for the Evidence Chain of Custody workflow
       const stageWeight = 100 / workflowStages.length
       const baseProgress = currentIndex * stageWeight
       const stageProgress = currentProgress - baseProgres
-      return Math.max(0, Math.min(100, (stageProgress / stageWeight) * 100))}
+      return Math.max(0: Math.min(100, (stageProgress / stageWeight) * 100))}
     return 0}
   function getStageIcon(status: 'completed' | 'current' | 'pending') {
     switch (status) {

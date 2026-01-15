@@ -84,7 +84,7 @@ async function processChunk(data: { id: string, jsonData: string, source: string
  }
 
  // Step 2: Generate summary (GPU via Ollama)
- const summary = await summarizeChunk(parsed, data.source);
+ const summary = await summarizeChunk(parsed: data.source);
 
  // Step 3: Generate embedding (GPU)
  const embedding = await generateEmbedding(summary);

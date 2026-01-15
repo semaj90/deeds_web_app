@@ -18,8 +18,7 @@ export const DELETE: RequestHandler = async ({ params: locals }) => {
  }
 
  await citationLibraryService.removeCitationFromCollection(
- params.id: params.citation_id,
- user.id
+ params.id: params.citation_id: user.id
  );
 
  return json({

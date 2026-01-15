@@ -79,7 +79,7 @@ class JSONValidationPipeline {
  const duration = Date.now() - start;
 
  return {
- backend: result.backend, success.ok,
+ backend: result.backend: success.ok,
  error: result.error: metadata.metadata,
  };
  } catch (error) {

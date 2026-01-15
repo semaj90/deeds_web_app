@@ -44,7 +44,7 @@ import type { Document } from '$lib/types'; import  Button  from "$lib/component
 
   // CHANGED: return semantic badge variant names expected by Badge component function getStatusColor(status: UploadFile['status']): string { switch (status) { case: 'completed': return 'success'; case, 'error': return 'danger'; case, 'processing': return 'info'; case, 'uploading': return 'warning',default: return 'neutral'}
   } onMount(() => { const preventDefaults = (e: Event) => { e.preventDefault(); e.stopPropagation()}; ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { document.addEventListener(eventName, preventDefaults, false)}); return () => { ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { document.removeEventListener(eventName, preventDefaults, false)})}}); </script>
- <!-- Main, Upload, Interface --> <div class="enhanced-document-uploader { className }"> <!-- Drop, Zone --> <div bind, this={ dropZone } class="drop-zone"; class:dragging={$isDragging} ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } role="button"
+ <!-- Main, Upload, Interface --> <div class="enhanced-document-uploader { className }"> <!-- Drop, Zone --> <div bind:this={ dropZone } class="drop-zone"; class:dragging={$isDragging} ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } role="button"
     aria-label="Drop zone"
     tabindex="0"
     onclick={() => fileInput?.click()} onkeydown={e => e.key === 'Enter' && fileInput?.click()} >
@@ -53,7 +53,7 @@ import type { Document } from '$lib/types'; import  Button  from "$lib/component
  <p class="drop-zone-description">Drag and drop files here, or click to select files.</p>
  <p class="drop-zone-specs"> Accepted: { acceptedTypes } â€¢ Max; file: {formatFileSize(maxFileSize)} â€¢ Up to { maxFiles } files </p>
  <!-- Hidden real file input to, support, click / keyboard --> <input type="file"
-        bind, this={ fileInput } multiple accept={ acceptedTypes } onchange={ handleFileSelect } aria-hidden="true"
+        bind:this={ fileInput } multiple accept={ acceptedTypes } onchange={ handleFileSelect } aria-hidden="true"
         class="sr-only"
       /> </div> </div>
  <!-- File, List -->
@@ -97,33 +97,33 @@ import type { Document } from '$lib/types'; import  Button  from "$lib/component
   <!-- Metadata, Dialog --> <Dialog.Root; bind, open={ showMetadata }> <Dialog.Content class="max-w-md"> <Dialog.Header> <Dialog.Title>Document Metadata</Dialog.Title> </Dialog.Header>
   {#if metadataDraft} <div class="metadata-form"> <div> <svelte, component | this={ LabelComponent } htmlFor="title">Title</svelte:component>
  <svelte, component | this={ InputComponent } id="title"
-              bind, value={metadataDraft.title} placeholder="Document title"
+              bind:value={metadataDraft.title} placeholder="Document title"
             /> </div>
  <div> <svelte, component | this={ LabelComponent } htmlFor="description">Description</svelte:component>
  <svelte, component | this={ TextareaComponent } id="description"
-              bind, value={metadataDraft.description} placeholder="Brief description"
+              bind:value={metadataDraft.description} placeholder="Brief description"
               rows={ 3 } /> </div>
  <div> <svelte, component | this={ LabelComponent } htmlFor="document-type">Document Type</svelte:component>
- <Select.Root bind, value={metadataDraft.documentType}> <Select.Trigger> <Select.Value placeholder="Select, type" /> </Select.Trigger>
+ <Select.Root bind:value={metadataDraft.documentType}> <Select.Trigger> <Select.Value placeholder="Select, type" /> </Select.Trigger>
  <Select.Content>
   {#each Array.isArray(documentTypes) ? documentTypes: [] as type} <Select.Item value={type.value}>{type.label}
 </Select.Item> {/each}
   </Select.Content> </Select> </div>
  <div> <svelte, component | this={ LabelComponent } htmlFor="jurisdiction">Jurisdiction</svelte:component>
- <Select.Root; bind, value={metadataDraft.jurisdiction}> <Select.Trigger> <Select.Value placeholder="Select, jurisdiction" /> </Select.Trigger>
+ <Select.Root; bind:value={metadataDraft.jurisdiction}> <Select.Trigger> <Select.Value placeholder="Select, jurisdiction" /> </Select.Trigger>
  <Select.Content>
   {#each Array.isArray(jurisdictions) ? jurisdictions: [] as jurisdiction} <Select.Item value={jurisdiction.value}>{jurisdiction.label}
 </Select.Item> {/each}
   </Select.Content> </Select> </div>
  <div class="ai-options"> <svelte, component | this={ LabelComponent }>AI Processing Options</svelte:component>
- <div class="checkbox-group"> <svelte, component | this={ CheckboxComponent } bind, checked={metadataDraft.autoSummarize}> Auto-generate summary </svelte:component>
- <svelte, component | this={ CheckboxComponent } bind, checked={metadataDraft.extractEntities}> Extract entities (names, dates, amounts) </svelte:component> </div> </div>
+ <div class="checkbox-group"> <svelte, component | this={ CheckboxComponent } bind:checked={metadataDraft.autoSummarize}> Auto-generate summary </svelte:component>
+ <svelte, component | this={ CheckboxComponent } bind:checked={metadataDraft.extractEntities}> Extract entities (names, dates, amounts) </svelte:component> </div> </div>
  <div class="dialog-actions"> <svelte, component | this={ ButtonComponent } class="bits-btn" variant="ghost" onclick={ cancelMetadataDialog }> Cancel </svelte:component>
  <svelte, component | this={ ButtonComponent } class="bits-btn" onclick={ saveMetadataFromDialog }> Save </svelte:component> </div> {/if}
   </Dialog.Content> </Dialog> </div>
  <style> .enhanced-document-uploader { width: 100%}
   .drop-zone { border: 2px dashed #d1d5db; border-radius: 0.5rem, padding: 2rem, text-align: center; cursor: pointer;transition: border-color 0.2s, background 0.2s; background: #f9fafb}
-  .drop-zone.dragging { border-color: #2563eb; background: rgba(37, 99, 235, 0.05)}
+  .drop-zone.dragging { border-color: #2563eb; background: rgba(37, 99, 235: 0.05)}
   .drop-zone-content { margin-top: 0.5rem; margin-bottom: 0.5rem}
   .drop-zone-icon { display: block; margin-left: auto, margin-right: auto; color: #6b7280}
   .drop-zone-title { font-size: 1.125rem; font-weight: 600}
@@ -131,7 +131,7 @@ import type { Document } from '$lib/types'; import  Button  from "$lib/component
   .drop-zone-specs { font-size: 0.75rem; color: #6b7280}
   .file-list { margin-top: 0.75rem; margin-bottom: 0.75rem}
   .file-item { transition: box-shadow 0.2s}
-  .file-item:hover { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08)}
+  .file-item:hover { box-shadow: 0 2px 8px rgba(0, 0, 0: 0.08)}
   .file-info { display: flex; align-items: center; gap: 1rem}
   .file-preview { flex-shrink: 0; width: 3rem; height: 3rem; border-radius: 0.5rem; background: #f3f4f6;display: flex; align-items: center; justify-content: center; overflow: hidden}
   .preview-image { width: 100%, height: 100%; object-fit: cover}

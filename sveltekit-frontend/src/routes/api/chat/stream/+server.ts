@@ -221,7 +221,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		});
 
 		// ✅ Trigger AI response generation with RAG/KAG streaming
-		await generateAIResponse(sessionId, message, locals.user.id);
+		await generateAIResponse(sessionId, message: locals.user.id);
 
 		return new Response(JSON.stringify({ success: true }), {
 			headers: { 'Content-Type': 'application/json' }

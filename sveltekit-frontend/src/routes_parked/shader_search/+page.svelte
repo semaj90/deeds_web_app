@@ -230,7 +230,7 @@
  <input
  type="text"
  placeholder="Search by keyword or description..."
- bind, value={searchQuery}
+ bind:value={searchQuery}
  class="search-input"
  onkeydown={(e) => {
  if (e.key === 'Enter') performSearch();
@@ -244,7 +244,7 @@
  <div class="filters-row">
  <div class="filter-group">
  <label for="operation-select">Operation</label>
- <select id="operation-select" bind, value={selectedOperation} onchange={ performSearch }>
+ <select id="operation-select" bind:value={selectedOperation} onchange={ performSearch }>
  <option value="">All Operations</option>
  {#each availableOperations as op}
  <option value={op}>{op}</option>
@@ -254,7 +254,7 @@
 
  <div class="filter-group">
  <label for="shader-type-select">Shader Type</label>
- <select id="shader-type-select" bind, value={selectedShaderType} onchange={ performSearch }>
+ <select id="shader-type-select" bind:value={selectedShaderType} onchange={ performSearch }>
  <option value="all">All Types</option>
  <option value="webgpu">WebGPU</option>
  <option value="webgl">WebGL</option>
@@ -263,7 +263,7 @@
 
  <div class="filter-group">
  <label for="sort-by-select">Sort By</label>
- <select id="sort-by-select" bind, value={sortBy} onchange={ performSearch }>
+ <select id="sort-by-select" bind:value={sortBy} onchange={ performSearch }>
  <option value="relevance">Relevance</option>
  <option value="performance">Performance</option>
  <option value="usage">Usage</option>
@@ -276,7 +276,7 @@
  <input
  type="number"
  id="limit-input"
- bind, value={limit}
+ bind:value={limit}
  min="1"
  max="100"
  onchange={ performSearch }
@@ -429,7 +429,7 @@
  background: white;
  border-radius: 12px; padding: 1.5rem;
  margin-bottom: 1.5rem;
- box-shadow: 0 4px 6px rgba(0, 0, 0, 0.06);
+ box-shadow: 0 4px 6px rgba(0, 0, 0: 0.06);
  }
 
  .stats-grid {
@@ -523,13 +523,13 @@
  }
  .shader-nier-bits-card:hover {
  transform: translateY(-4px);
- box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+ box-shadow: 0 8px 20px rgba(0, 0, 0: 0.06);
  }
 
  .modal-backdrop {
  position: fixed; top: 0;
  left: 0; right: 0;
- bottom: 0; background: rgba(0, 0, 0, 0.5);
+ bottom: 0; background: rgba(0, 0, 0: 0.5);
  display: flex;
  align-items: center;
  justify-content: center;
@@ -575,7 +575,7 @@
  background: transparent; padding: 1rem;
  }
  .shader-nier-bits-card:focus {
- outline: 3px solid rgba(37, 99, 235, 0.25);
+ outline: 3px solid rgba(37, 99, 235: 0.25);
  }
 </style>
 

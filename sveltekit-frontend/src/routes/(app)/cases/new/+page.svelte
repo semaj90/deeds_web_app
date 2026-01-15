@@ -111,7 +111,7 @@
   id="title"
   name="title"
   type="text"
-  bind, value={title}
+  bind:value={title}
   placeholder="State v. Doe - Armed Robbery at 7-Eleven"
   class="title-input"
   />
@@ -125,7 +125,7 @@
   </label>
   <textarea
   id="narrative"
-  bind, value={narrative}
+  bind:value={narrative}
   placeholder="On March 15, 2024, Officer Smith responded to a robbery at 7-Eleven on Main St..."
   rows="8"
   class="narrative-box"
@@ -190,7 +190,7 @@
  <input
  id="what"
  type="text"
- bind, value={what}
+ bind:value={what}
  placeholder="Armed robbery of convenience store"
  />
  </div>
@@ -214,7 +214,7 @@
  <input
  id="where"
  type="text"
- bind, value={where}
+ bind:value={where}
  placeholder="7-Eleven, 456 Main St, Springfield"
  />
  </div>
@@ -226,7 +226,7 @@
  <input
  id="why"
  type="text"
- bind, value={why}
+ bind:value={why}
  placeholder="Suspect needed money for drug habit"
  />
  </div>
@@ -238,7 +238,7 @@
  <input
  id="how"
  type="text"
- bind, value={how}
+ bind:value={how}
  placeholder="Displayed firearm, demanded cash, fled in vehicle"
  />
  </div>
@@ -326,7 +326,7 @@
  .narrative-box:focus {
  outline: none;
  border-color: var(--yorha-crimson);
- box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.1);
+ box-shadow: 0 0 0 2px rgba(255, 0, 0: 0.1);
  }
 
  .title-input {
@@ -341,7 +341,7 @@
  .title-input:focus {
  outline: none;
  border-color: var(--yorha-crimson);
- box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.1);
+ box-shadow: 0 0 0 2px rgba(255, 0, 0: 0.1);
  }
 
  .file-drop-zone {
@@ -425,7 +425,7 @@
  .prompt-group input:focus {
  outline: none;
  border-color: var(--yorha-crimson);
- box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.1);
+ box-shadow: 0 0 0 2px rgba(255, 0, 0: 0.1);
  }
 
  .error-message {
@@ -452,7 +452,7 @@
 
  .btn-submit:hover, not(disabled) {
  background: #d32f2f;
- box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+ box-shadow: 0 2px 8px rgba(0, 0, 0: 0.2);
  }
 
  .btn-submit:disabled {

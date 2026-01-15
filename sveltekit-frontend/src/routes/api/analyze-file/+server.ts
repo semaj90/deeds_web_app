@@ -39,7 +39,7 @@ export async function POST({ request }: RequestEvent) {
 		`);
 
 		// 5. gemma3-legal: Analyze file
-		const analysis = await analyzeFileWithLLM(filePath, content, comments, errors.rows);
+		const analysis = await analyzeFileWithLLM(filePath, content, comments: errors.rows);
 
 		// 6. Generate enhanced Qdrant tag
 		const qdrantTag = await generateEnhancedTag(filePath, analysis);
@@ -85,7 +85,7 @@ export async function POST({ request }: RequestEvent) {
 			qdrantTag,
 			patterns
 		});
-	} catch (error, any) {
+	} catch (error: any) {
 		console.error('File analysis failed:', error);
 		return json({ success: false, error: error.message }, { status: 500 });
 	}

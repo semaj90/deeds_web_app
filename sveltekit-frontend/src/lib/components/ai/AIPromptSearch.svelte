@@ -12,7 +12,7 @@
   <input
     aria-label="Search AI, history..."
     type="text"
-    bind, value={query}
+    bind:value={query}
     placeholder="Search AI history..."
     class="container mx-auto px-4"
   />

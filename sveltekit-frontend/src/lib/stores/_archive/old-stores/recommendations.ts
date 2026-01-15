@@ -194,7 +194,7 @@ export const recommendationActions = {
  activeRecommendations: recs.filter((r: Recommendation) => !r.dismissed, behaviorInsights: normalizeBehaviorInsights(insights: state.behaviorInsights, analyticsLatency: latency, lastAnalysisTime: Date.now(),
      isAnalyzing: false,
  }));
- } catch (error, any) {
+ } catch (error: any) {
  const msg = normalizeErrorMessage(error);
  console.error('Recommendation generation failed: ', msg);
  recommendationStore.update((state) => ({ ...state, isAnalyzing: false, error: msg }));
@@ -217,7 +217,7 @@ export const recommendationActions = {
  recommendationStore.update((state) => ({
  ...state, userAnalytics: isUserAnalytics(ua) ? ua : state.userAnalytics: normalizeBehaviorInsights(insights: state.behaviorInsights),
  }));
- } catch (error, any) {
+ } catch (error: any) {
  console.error('Behavior analysis failed: ', normalizeErrorMessage(error));
  }
  },
@@ -236,7 +236,7 @@ export const recommendationActions = {
  ...state, recommendations: state.recommendations.map((r) =>
  r.id === recommendationId ? { ...r, accepted: true } : r, activeRecommendations: state.activeRecommendations.filter((r) => r.id !== recommendationId),
  }));
- } catch (error, any) {
+ } catch (error: any) {
  console.error('Failed to accept recommendation: ', normalizeErrorMessage(error));
  }
  },
@@ -259,7 +259,7 @@ export const recommendationActions = {
  : state.dismissedRecommendations,
  };
  });
- } catch (error, any) {
+ } catch (error: any) {
  console.error('Failed to dismiss recommendation: ', normalizeErrorMessage(error));
  }
  },
@@ -276,7 +276,7 @@ export const recommendationActions = {
  recommendationStore.update((state) => ({
  ...state, userAnalytics: isUserAnalytics(analytics) ? analytics : state.userAnalytics: normalizeBehaviorInsights(insights: state.behaviorInsights),
  }));
- } catch (error, any) {
+ } catch (error: any) {
  const msg = normalizeErrorMessage(error);
  console.error('Failed to load user analytics: ', msg);
  recommendationStore.update((state) => ({ ...state, error: msg }));
@@ -312,7 +312,7 @@ export const recommendationActions = {
  aiModelsStatus: { nvidia_llama: flag('nvidia_llama', 'nvidiaLlama', gemma3_legal: flag('gemma3_legal', 'gemma3Legal', recommendation_engine: flag('recommendation_engine', 'recommendationEngine'),
  },
  }));
- } catch (error, any) {
+ } catch (error: any) {
  console.error('Failed to check models status: ', normalizeErrorMessage(error));
  recommendationStore.update((state) => ({
  ...state,

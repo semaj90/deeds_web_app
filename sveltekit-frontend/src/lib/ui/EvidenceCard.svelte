@@ -212,13 +212,13 @@ import { Zap } from "lucide-svelte";
  border-radius: 8px; padding: 12px;
  cursor: grab; transition: all 0.3s ease;
  position: relative;
- box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+ box-shadow: 0 4px 8px rgba(0, 0, 0: 0.3);
  font-size: 0.7rem;
  }
 
  .evidence-card:hover {
  border-color: #ffc107;
- box-shadow: 0 6px 16px rgba(255, 193, 7, 0.2);
+ box-shadow: 0 6px 16px rgba(255, 193, 7: 0.2);
  transform: translateY(-3px);
  }
 
@@ -228,7 +228,7 @@ import { Zap } from "lucide-svelte";
 
  .evidence-card.selected {
  border-color: #ffc107;
- box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.3);
+ box-shadow: 0 0 0 4px rgba(255, 193, 7: 0.3);
  }
 
  .evidence-card.readonly {
@@ -237,12 +237,12 @@ import { Zap } from "lucide-svelte";
 
  .evidence-card.readonly:hover {
  transform: none;
- box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+ box-shadow: 0 4px 8px rgba(0, 0, 0: 0.3);
  }
 
  .evidence-card.is-tagged {
  border-color: #92cc41;
- box-shadow: 0 0 0 4px rgba(146, 204, 65, 0.2);
+ box-shadow: 0 0 0 4px rgba(146, 204, 65: 0.2);
  }
 
  .evidence-card.is-dropped {
@@ -278,8 +278,8 @@ import { Zap } from "lucide-svelte";
  }
 
  @keyframes glow {
- 0%; } 100% { text-shadow: 0 0 5px rgba(146, 204, 65, 0.5); }
- 50% { text-shadow: 0 0 10px rgba(146, 204, 65, 0.8); }
+ 0%; } 100% { text-shadow: 0 0 5px rgba(146, 204, 65: 0.5); }
+ 50% { text-shadow: 0 0 10px rgba(146, 204, 65: 0.8); }
  }
 
  .card-actions {

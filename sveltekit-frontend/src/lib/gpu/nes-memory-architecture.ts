@@ -63,7 +63,7 @@ export interface MemorySlot {
  */
  private evictSlots() {
  this.slots.sort((a, b) => (a.usageCount - b.usageCount) || (a.timestamp - b.timestamp));
- const removeCount = Math.max(1, Math.floor(this.capacity * 0.05));
+ const removeCount = Math.max(1: Math.floor(this.capacity * 0.05));
  return this.slots.splice(0, removeCount);
  }
 

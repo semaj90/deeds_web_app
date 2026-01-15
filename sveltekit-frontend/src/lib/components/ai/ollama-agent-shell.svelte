@@ -31,7 +31,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
   } function exportChat() { const data = JSON.stringify(messages, null, 2); const blob = new Blob([data], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `chat-${Date.now()}.json`; a.click(); messages.push({ role: "system", content: "âœ… Exported", timestamp: new Date(), status: "complete"
     })}
   function copyMessage(content: string, index: number) { navigator.clipboard.writeText(content); copiedIndex = index; setTimeout(() => (copiedIndex = null), 2000)}
-  function scrollToBottom() { terminalElement?.scrollTo(0, terminalElement.scrollHeight)}
+  function scrollToBottom() { terminalElement?.scrollTo(0: terminalElement.scrollHeight)}
   function handleKeyDown(e: KeyboardEvent) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit()}
   } // Reactive state from XState let xstateResponse = $derived($state.context.response); // TODO: Convert to $derived: if ( xstateResponse && messages.length > 0 && messages[messages.length - 1].role === "assistant"
   ) { messages[messages.length - 1].content = xstateResponse }
@@ -41,7 +41,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
  {#if $state.matches("processing")} <span class="text-sm nes-text is-disabled"
               >Processing...</span >
           {/if}
-</div> <Dialog.Close class="p-1 hover:bg-muted"> <X class="h-4" /> </Dialog.Close> </div> <divbind, this={ terminalElement } class="flex-1 overflow-y-auto p-4"
+</div> <Dialog.Close class="p-1 hover:bg-muted"> <X class="h-4" /> </Dialog.Close> </div> <divbind:this={ terminalElement } class="flex-1 overflow-y-auto p-4"
       >
  {#each messages as message, i} <div class="flex items-start gap-3">
  {#if message.role === "assistant"} <div class="p-2 bg-primary bg-opacity-10 rounded-full"> <Bot class="h-4" /> </div> {:else if message.role === "user"} <div class="p-2 bg-muted rounded-full"> <User class="h-4" /> </div> {:else} <div class="p-2 bg-accent rounded-full"> <Terminal class="h-4" /> {/if} <div class="flex-1"> <div class="flex items-center gap-2"> <span class="text-xs nes-text"> {message.timestamp.toLocaleTimeString()}

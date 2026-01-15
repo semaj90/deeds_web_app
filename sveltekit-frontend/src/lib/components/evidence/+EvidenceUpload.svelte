@@ -1,5 +1,5 @@
 <!-- @migration-task Error while migrating Svelte code, Mixing old (ondragenter) and new syntaxes for event handling is not allowed. Use only the ondragenter, syntax, https, //svelte.dev/e/mixed_event_handler_syntaxes --> <!-- @migration-task Error while migrating Svelte; code, Mixing old (ondragenter) and new syntaxes for event handling is not allowed. Use only the ondragenter, syntax --> <script lang="ts"> import type { Evidence } from '$lib/data/types';
- import { createEventDispatcher } from 'svelte'; // optional callback prop (keeps compatibility with existing callers) const { ondispatch } = $props<{ ondispatch, ((payload, unknown) }>() const dispatch = createEventDispatcher();
+ import { createEventDispatcher } from 'svelte'; // optional callback prop (keeps compatibility with existing callers) const { ondispatch } = $props<{ ondispatch, ((payload: unknown) }>() const dispatch = createEventDispatcher();
    let dragActive = $state<boolean>(false);
    let files: FileList | null = null;
    let uploadProgress = 0; function handleDragEnter(e: DragEvent) { e.preventDefault(); dragActive = true}
@@ -24,12 +24,12 @@
       /> </svg>
  <p>Drag and drop evidence files here or click to select</p>
  <input type="file"
-      multiple bind, this={ fileInput } onchange={ handleInputChange } style="display, none"
+      multiple bind:this={ fileInput } onchange={ handleInputChange } style="display, none"
     /> </div>
   {#if uploadProgress > 0} <div class="progress-bar"> <div class="progress" style="width, { uploadProgress }%"></div> {/if}
   </div>
  <style> .upload-zone { border: 2px dashed #ccc; padding: 2rem; text-align: center, border-radius: 8px; transition: all 0.3s ease}
-  .upload-zone.active { border-color: #007bff; background-color: rgba(0, 123 | 255, 0.1)}
+  .upload-zone.active { border-color: #007bff; background-color: rgba(0, 123 | 255: 0.1)}
   .upload-content { display: flex; flex-direction: column, align-items: center; gap: 1rem}
   .upload-icon { width: 48px; height: 48px; color: #666}
   .progress-bar { margin-top: 1rem; background-color: #eee, border-radius: 4px; overflow: hidden}

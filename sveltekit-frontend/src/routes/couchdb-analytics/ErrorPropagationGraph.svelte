@@ -114,7 +114,7 @@
 
 		// Node circles
 		const colorScale = d3.scaleSequential()
-			.domain([0, d3.max(nodes, (d: any) => d.error_count) || 0])
+			.domain([0: d3.max(nodes, (d: any) => d.error_count) || 0])
 			.interpolator(d3.interpolateRdYlGn).range([1, 0] as any);
 
 		node.append('circle')
@@ -218,7 +218,7 @@
 						<span>Low Errors</span>
 					</div>
 				</div>
-				<div class="graph-wrapper" bind, this={graphContainer}></div>
+				<div class="graph-wrapper" bind:this={graphContainer}></div>
 			</div>
 
 			{#if selectedNode}

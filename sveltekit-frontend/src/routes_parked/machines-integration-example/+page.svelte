@@ -46,7 +46,7 @@
  }
 
  // Handle upload errors
- function handleUploadError(error, string) {
+ function handleUploadError(error: string) {
  console.error('Upload failed:', error);
  }
 </script>
@@ -179,7 +179,7 @@
  background: white; border: 1px solid #ddd;
  border-radius: 8px; padding: 1.5rem;
  margin-bottom: 2rem;
- box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+ box-shadow: 0 2px 4px rgba(0, 0, 0: 0.1);
  }
 
  h2 {

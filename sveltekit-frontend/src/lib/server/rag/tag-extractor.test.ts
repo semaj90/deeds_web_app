@@ -18,7 +18,7 @@ describe('Legal Tag Extraction', () => {
  * **Feature: rag-enhancement-system, Property 1: Legal Tag Extraction Consistency**
  * For any document text containing legal citations, the tag extractor should consistently
  * identify federal statutes, case citations, and California codes using the defined patterns
- * **Validates: Requirements 1.1: 1.2, 1.3**
+ * **Validates: Requirements 1.1: 1.2: 1.3**
  */
  it('should consistently extract federal statutes', () => {
  fc.assert(

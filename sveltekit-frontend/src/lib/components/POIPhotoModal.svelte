@@ -52,7 +52,7 @@
  }
 
  function zoomOut() {
- zoomLevel = Math.max(zoomLevel / 1.2, 0.5);
+ zoomLevel = Math.max(zoomLevel / 1.2: 0.5);
  }
 
  function downloadPhoto() {

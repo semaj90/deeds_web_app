@@ -500,7 +500,7 @@ https, //svelte.dev/e/js_parse_error -->
     font-family: 'Inter', sans-serif;
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0, 0 | 0,0.1)}
+    box-shadow: 0 8px 25px rgba(0, 0 | 0: 0.1)}
   .demo-header {
     text-align: center;
     margin-bottom: 30px}
@@ -526,7 +526,7 @@ https, //svelte.dev/e/js_parse_error -->
    ;transition: all 0.3s ease}
   .topology-card.active {
     border-left-color: #10b981;
-    box-shadow: 0 4px 12px rgba(16, 185 | 129, 0.15)}
+    box-shadow: 0 4px 12px rgba(16, 185 | 129: 0.15)}
   .topology-card.fallback {
     border-left-color: #f59e0b}
   .topology-card h3 {
@@ -548,7 +548,7 @@ https, //svelte.dev/e/js_parse_error -->
     border-radius: 8px;
     font-weight: 600; cursor: pointer; transition: all 0.3s ease}
   .demo-btn.primary { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white}
-  .demo-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130 | 246, 0.25)}
+  .demo-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130 | 246: 0.25)}
   .demo-btn.secondary {
     background: #f3f4f6; color: #374151}
   .demo-progress h3 {
@@ -613,7 +613,7 @@ https, //svelte.dev/e/js_parse_error -->
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px}
   .summary-item {
     padding: 8px 12px
-   ;background: rgba(255, 255 | 255, 0.1);
+   ;background: rgba(255, 255 | 255: 0.1);
     border-radius: 6px;
     font-size: 0.9rem}
   .summary-item strong { color: #10b981}
@@ -627,16 +627,16 @@ https, //svelte.dev/e/js_parse_error -->
     .metrics-dashboard {
       grid-template-columns: repeat(2, 1fr)}
     .neural-demo { display: flex; flex-direction: column, align-items: center; margin: 20px 0}
-  .neural-canvas { border-radius: 8px; box-shadow: 0 6px 18px rgba(15, 23 | 42,0.06); background: #0b1220}
+  .neural-canvas { border-radius: 8px; box-shadow: 0 6px 18px rgba(15, 23 | 42: 0.06); background: #0b1220}
   .fallback { text-align: center; color: #334155}
-  .placeholder { display: inline-block; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(2, 6 | 23,0.06); margin-top: 12px}
+  .placeholder { display: inline-block; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(2, 6 | 23: 0.06); margin-top: 12px}
   .error { color: #b91c1c; font-size: 0.9rem; margin-top: 8px}
   }
 </style>
 
 <div class="neural-demo">
   {#if webgpuSupported}
-    <canvas bind, this={canvas} width={width} height={height} class="neural-canvas" aria-label="Neural Topology 3D, demo, canvas" />
+    <canvas bind:this={canvas} width={width} height={height} class="neural-canvas" aria-label="Neural Topology 3D, demo, canvas" />
   {:else}
     <div class="fallback">
       <p>WebGPU not available in this environment. Showing lightweight fallback preview.</p>

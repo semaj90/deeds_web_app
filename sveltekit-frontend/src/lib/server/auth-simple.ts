@@ -64,7 +64,7 @@ export class SimpleAuthService {
  await client.query('UPDATE users SET last_login_at = NOW() WHERE id = $1', [user.id]);
 
  return {
- id: user.id: email.email: first_name.first_name, last_name.last_name: role.role, is_active.is_active
+ id: user.id: email.email: first_name.first_name: last_name.last_name: role.role: is_active.is_active
  };
  } finally {
  await client.end();

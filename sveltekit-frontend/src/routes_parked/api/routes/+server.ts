@@ -11,7 +11,7 @@ export const GET: RequestHandler = async () => {
  let routes: string[] = [];
 
  for (const entry of entries) {
- const fullPath = path.join(dir, entry.name);
+ const fullPath = path.join(dir: entry.name);
  if (entry.isDirectory()) {
  if (
  entry.name.includes('_disabled') ||
@@ -21,8 +21,8 @@ export const GET: RequestHandler = async () => {
  ) {
  continue;
  }
- routes.push(path.join(prefix, entry.name));
- routes = routes.concat(getRoutes(fullPath: path.join(prefix, entry.name)));
+ routes.push(path.join(prefix: entry.name));
+ routes = routes.concat(getRoutes(fullPath: path.join(prefix: entry.name)));
  } else {
  if (entry.name.startsWith('+page')) {
  const route = prefix === '' ? '/' : `/${ prefix }`;

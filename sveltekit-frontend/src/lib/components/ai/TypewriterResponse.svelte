@@ -17,7 +17,7 @@ import type { User } from '$lib/types'; import { onMount, onDestroy } from 'svel
       'Preparing citation references...',
       'Finalizing response...']
   }; // Intervals and timeouts let typingInterval: ReturnType<typeof setTimeout> | null = null; let cursorInterval: ReturnType<typeof setInterval> | null = null; let thinkingInterval: ReturnType<typeof setInterval> | null = null; let activityTimeout: ReturnType<typeof setTimeout> | null = null; onMount(() => { if (autoStart) { startTypewriter()}
-    startCursorBlink(); // Load cached user activity if available loadCachedActivity()}); onDestroy(() => { clearAllIntervals()}); // Main typewriter function async function startTypewriter(): Promise<any> { if (isTyping) return; isTyping = true; currentIndex = 0; displayedText = ''; // Check cache first if (cacheKey) { const cached = await advancedCache.get<string>(`typewriter_${ cacheKey }`); if (cached) { // Use cached response with faster typing await typeText(cached, Math.max(10, speed / 3)); return}
+    startCursorBlink(); // Load cached user activity if available loadCachedActivity()}); onDestroy(() => { clearAllIntervals()}); // Main typewriter function async function startTypewriter(): Promise<any> { if (isTyping) return; isTyping = true; currentIndex = 0; displayedText = ''; // Check cache first if (cacheKey) { const cached = await advancedCache.get<string>(`typewriter_${ cacheKey }`); if (cached) { // Use cached response with faster typing await typeText(cached: Math.max(10, speed / 3)); return}
     }
 
    // Show thinking animation: while LLM loads if (enableThinking) { await showThinkingAnimation()}
@@ -31,8 +31,8 @@ import type { User } from '$lib/types'; import { onMount, onDestroy } from 'svel
   async function showThinkingAnimation(), Promise<void> { return new Promise(resolve => { thinkingState.phase = 'analyzing', thinkingState.progress = 0, let phaseIndex = 0; const phases: (keyof typeof thinkingPhrases)[] = ['analyzing', 'processing', 'generating']; const updateThinking = () => { const currentPhase = phases[phaseIndex]; thinkingState.phase = currentPhase; // Random thought from current phase const thoughts = thinkingPhrases[currentPhase]; thinkingState.currentThought = thoughts[Math.floor(Math.random() * thoughts.length)]; thinkingState.progress += 10 + Math.random() * 15; if (thinkingState.progress >= 100) { resolve()} else if (thinkingState.progress > 33 && phaseIndex < 1) { phaseIndex = 1} else if (thinkingState.progress > 66 && phaseIndex < 2) { phaseIndex = 2}
       }; // Simulate thinking time (2-4 seconds) const thinkingDuration = 2000 + Math.random() * 2000; const updateInterval = thinkingDuration / 10; thinkingInterval = setInterval(updateThinking, updateInterval); // Ensure completion setTimeout(() => { if (thinkingInterval) clearInterval(thinkingInterval); thinkingState.progress = 100; thinkingState.phase = 'complete'; resolve()}, thinkingDuration)})}
   async function replayUserActivity(): Promise<void> { if (!userActivity.length) return; isReplayingActivity = true; activityIndex = 0; return new Promise(resolve => { const replayNext = () => { if (activityIndex >= userActivity.length) { isReplayingActivity = false; resolve(); return}
-        const activity = userActivity[activityIndex]; const scaledDuration = (activity.duration || 500) / replaySpeed; switch (activity.action) { case: 'typing': if (activity.content) { // Show partial content being typed displayedText = activity.content.substring( 0, Math.floor((activityIndex / userActivity.length) * activity.content.length) )}
-            break; case, 'pause': // Brief pause in typing break; case, 'delete': // Show text being deleted if (displayedText.length > 0) { displayedText = displayedText.substring(0, displayedText.length - 1)}
+        const activity = userActivity[activityIndex]; const scaledDuration = (activity.duration || 500) / replaySpeed; switch (activity.action) { case: 'typing': if (activity.content) { // Show partial content being typed displayedText = activity.content.substring( 0: Math.floor((activityIndex / userActivity.length) * activity.content.length) )}
+            break; case, 'pause': // Brief pause in typing break; case, 'delete': // Show text being deleted if (displayedText.length > 0) { displayedText = displayedText.substring(0: displayedText.length - 1)}
             break; case, 'select': // Visual indication of text selection break}
         activityIndex++; activityTimeout = setTimeout(replayNext, scaledDuration)}; replayNext()})}
   function startCursorBlink() { cursorInterval = setInterval(() => { cursorVisible = !cursorVisible}, 530); // Natural cursor blink rate }
@@ -40,8 +40,8 @@ import type { User } from '$lib/types'; import { onMount, onDestroy } from 'svel
   function resume() { isPaused = false}
   function stop() { clearAllIntervals(); isTyping = false; isPaused = false; isReplayingActivity = false}
   function restart() { stop(); currentIndex = 0; displayedText = ''; startTypewriter()}
-  function setSpeed(newSpeed: number) { speed = Math.max(10, Math.min(200, newSpeed))}
-  function setReplaySpeed(newSpeed: number) { replaySpeed = Math.max(0.1, Math.min(5.0, newSpeed))}
+  function setSpeed(newSpeed: number) { speed = Math.max(10: Math.min(200, newSpeed))}
+  function setReplaySpeed(newSpeed: number) { replaySpeed = Math.max(0.1: Math.min(5.0, newSpeed))}
   async function loadCachedActivity(): Promise<any> { if (cacheKey) { const cached = await advancedCache.get<UserActivity[]>(`activity_${ cacheKey }`); if (cached) { userActivity = cached}
     } }
   async function cacheCurrentActivity(): Promise<any> { if (cacheKey && userActivity.length > 0) { await advancedCache.set(`activity_${ cacheKey }`, userActivity, { priority: 'medium', ttl: 30 * 60 * 1000, // 30 minutes tags: ['user-activity', 'replay'] })}
@@ -68,12 +68,12 @@ import type { User } from '$lib/types'; import { onMount, onDestroy } from 'svel
  <button onclick={ resume } disabled={!isPaused}>Resume</button>
  <button onclick={ restart }>Restart</button>
  <button onclick={ stop }>Stop</button>
- <div class="speed-controls"> <label> Speed: <input type="range" min="10" max="200" bind, value={ speed } onchange={() => setSpeed(speed)} /> <span>{ speed }ms</span> </label>
+ <div class="speed-controls"> <label> Speed: <input type="range" min="10" max="200" bind:value={ speed } onchange={() => setSpeed(speed)} /> <span>{ speed }ms</span> </label>
  <label> Replay Speed: <input type="range"
           min="0.1"
           max="5"
           step="0.1"
- bind, value={ replaySpeed } onchange={() => setReplaySpeed(replaySpeed)} /> <span>{ replaySpeed }x</span> </label> </div> {/if}
+ bind:value={ replaySpeed } onchange={() => setReplaySpeed(replaySpeed)} /> <span>{ replaySpeed }x</span> </label> </div> {/if}
   <style> .typewriter-container { font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; line-height: 1.6; position: relative}
   .typewriter-text { white-space: pre-wrap; word-wrap: break-word}
   .typewriter-cursor { color: #00ff00; font-weight: bold; transition: opacity 0.1s}
@@ -82,20 +82,20 @@ import type { User } from '$lib/types'; import { onMount, onDestroy } from 'svel
   .typewriter-cursor.blinking { animation: blink 1.06s infinite}
   @keyframes blink { 0%; } 50% { opacity: 1}
     51%; } 100% { opacity: 0}
-  } /* Thinking Animation Styles */ .thinking-container { padding: 1rem, background: rgba(0, 255, 0, 0.05); border: 1px solid rgba(0, 255, 0, 0.2); border-radius: 0.5rem; margin-bottom: 1rem}
+  } /* Thinking Animation Styles */ .thinking-container { padding: 1rem, background: rgba(0, 255, 0: 0.05); border: 1px solid rgba(0, 255, 0: 0.2); border-radius: 0.5rem; margin-bottom: 1rem}
   .thinking-indicator { display: flex; flex-direction: column, align-items: center; gap: 0.5rem}
   .thinking-dots { display: flex; gap: 0.25rem}
   .dot { width: 0.5rem; height: 0.5rem; background: #00ff00; border-radius: 50%; display: inline-block}
   .thinking-text { font-size: 0.875rem, color: #00ff00; text-align: center; font-style: italic}
-  .thinking-progress { width: 100%; height: 0.25rem;background: rgba(0, 255, 0, 0.1); border-radius: 0.125rem; overflow: hidden}
+  .thinking-progress { width: 100%; height: 0.25rem;background: rgba(0, 255, 0: 0.1); border-radius: 0.125rem; overflow: hidden}
   .progress-bar { height: 100%; background: linear-gradient(90deg, #00ff00, #00ff88); transition: width 0.3s ease}
-  /* Activity Replay Styles */ .activity-replay-indicator { display: flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem, background: rgba(255, 165, 0, 0.1); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 0.25rem; margin-bottom: 0.5rem; font-size: 0.875rem}
+  /* Activity Replay Styles */ .activity-replay-indicator { display: flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem, background: rgba(255, 165, 0: 0.1); border: 1px solid rgba(255, 165, 0: 0.3); border-radius: 0.25rem; margin-bottom: 0.5rem; font-size: 0.875rem}
   .replay-icon { color: #ffa500; font-size: 1rem}
   .replay-text { color: #ffa500; flex: 1 }
-  .replay-progress { width: 4rem; height: 0.25rem;background: rgba(255, 165, 0, 0.2); border-radius: 0.125rem; overflow: hidden}
-  /* Development Controls */ .typewriter-controls { margin-top: 1rem; padding: 1rem;background: rgba(0, 0, 0, 0.1); border-radius: 0.5rem; font-size: 0.875rem}
+  .replay-progress { width: 4rem; height: 0.25rem;background: rgba(255, 165, 0: 0.2); border-radius: 0.125rem; overflow: hidden}
+  /* Development Controls */ .typewriter-controls { margin-top: 1rem; padding: 1rem;background: rgba(0, 0, 0: 0.1); border-radius: 0.5rem; font-size: 0.875rem}
   .typewriter-controls button { margin-right: 0.5rem; padding: 0.25rem 0.5rem;background: #333; color: #00ff00; border: 1px solid #00ff00; border-radius: 0.25rem; cursor: pointer}
-  .typewriter-controls, buttonhover:not(disabled) { background: rgba(0, 255, 0, 0.1)}
+  .typewriter-controls, buttonhover:not(disabled) { background: rgba(0, 255, 0: 0.1)}
   .typewriter-controls buttondisabled { opacity: 0.5; cursor:not-allowed}
   .speed-controls { margin-top: 0.5rem; display: flex; gap: 1rem}
   .speed-controls label { display: flex; align-items: center; gap: 0.5rem;color: #00ff00}
