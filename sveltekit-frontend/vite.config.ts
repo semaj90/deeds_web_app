@@ -210,11 +210,11 @@ export default defineConfig(({ mode }) => {
           ws: true,
           changeOrigin: true,
         },
-        // Health check proxy
-        '/health': {
-          target: `http://localhost:${wsPort}`,
-          changeOrigin: true,
-        },
+        // Health check proxy - DISABLED: was routing to non-existent service
+        // '/health': {
+        //   target: `http://localhost:${wsPort}`,
+        //   changeOrigin: true,
+        // },
         // Add more WebSocket endpoints as needed
       },
     },

@@ -1,53 +1,42 @@
 /**
- * Enhanced Store Barrel Exports - TypeScript Store Pattern
- * Centralized store management with XState integration
- * Svelte 5 Runes compatible
+ * PHASE 99 - Minimal Store Barrel
+ * Temporarily stripped down to avoid corrupted file imports
+ * Full version saved as index.ts.corrupted-backup
  */
 
-// ============================================
-// Svelte 5 Compatible Stores
-// ============================================
-export { routeRegistry } from '../routing/route-registry.svelte.js';
-export { authStore } from './auth-store.svelte.js';
-export { userStore };
+// Re-export only the essential stores that work
 
-// ============================================
-// Generic Stores (Svelte 5 Runes)
-// ============================================
-    export { AsyncStore as GenericStore } from './generic.svelte';
+// Auth store (if clean)
+// export { authStore } from './auth-store.svelte.js';
 
-// ============================================
-// Phase 76: Barrel Store Pattern (Local-First Architecture)
-// ============================================
-    import { LocalLegalStore } from '../db/clientDB.svelte';
-import { chatStore } from './chat-store.svelte';
-import { UserPreferences } from './preferences.svelte';
-import { TokenTracker } from './tokenUsage.svelte';
-import { userStore } from './user.svelte';
+// User store export
+// export { userStore } from './user.svelte';
 
-// 1. Instantiate Singletons (Global Services)
-export const tokenTracker = new TokenTracker();
-export const localDb = new LocalLegalStore();
-export const userPrefs = new UserPreferences();
-export { chatStore };
+// Minimal app state
+export const appState = {
+    isSidebarOpen: true,
+    globalError: null as string | null,
+    toggleSidebar() { this.isSidebarOpen = !this.isSidebarOpen; }
+};
 
-// 2. Re-export Classes
-    export { CaseManager as CaseWorkflow } from '../logic/caseWorkflow.svelte';
-    export { ChatSession } from '../models/ChatSession.svelte';
-    export { LegalDocument } from '../models/LegalDocument.svelte';
+// Minimal user preferences
+export const userPrefs = {
+    theme: 'dark' as 'light' | 'dark',
+    toggleTheme() { this.theme = this.theme === 'dark' ? 'light' : 'dark'; }
+};
 
-// 3. Define a Global App State
-export { appState } from './appState.svelte';
+// Minimal token tracker
+export const tokenTracker = {
+    used: 0,
+    limit: 100000,
+    get percentageUsed() { return (this.used / this.limit) * 100; }
+};
 
-// 4. Initialize all stores (call from layout)
+// Initialization stubs
 export function initializeStores() {
-    if (typeof window === 'undefined') return; // SSR guard
-    console.log('[Barrel Store] Initialized: tokenTracker, localDb, userPrefs, appState');
+    console.log('[Barrel Store] PHASE 99 - Minimal mode initialized');
 }
 
-// 5. Cleanup (call from layout onDestroy)
 export function cleanupStores() {
     console.log('[Barrel Store] Cleanup complete');
 }
-
-
