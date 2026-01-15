@@ -10,6 +10,9 @@ import { expect, test } from '@playwright/test';
  * 4. Superforms + Zod validation flows
  */
 
+// Configure base URL for all tests
+test.use({ baseURL: 'http://localhost:5175' });
+
 test.describe('Phase 99: Cases Route Production Tests', () => {
   test.beforeEach(async ({ page }) => {
     // Mock backend APIs to prevent network errors
