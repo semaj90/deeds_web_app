@@ -28,14 +28,14 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 			evidenceData = await db
 				.select()
 				.from(evidence)
-				.where(and(eq(evidence.caseId, caseId), eq(evidence.userId: locals.user.id)))
+				.where(and(eq(evidence.caseId, caseId), eq(evidence.userId, locals.user.id)))
 				.limit(100);
 		} else {
 			// Get all user's evidence
 			evidenceData = await db
 				.select()
 				.from(evidence)
-				.where(eq(evidence.userId: locals.user.id))
+				.where(eq(evidence.userId, locals.user.id))
 				.limit(50);
 		}
 
@@ -129,7 +129,7 @@ export const actions: Actions = {
 			// Only delete if owned by user
 			await db
 				.delete(evidence)
-				.where(and(eq(evidence.id, evidenceId), eq(evidence.userId: locals.user.id)));
+				.where(and(eq(evidence.id, evidenceId), eq(evidence.userId, locals.user.id)));
 
 			return { success: true };
 		} catch (err) {
@@ -164,7 +164,7 @@ export const actions: Actions = {
 					description,
 					updatedAt: new Date()
 				})
-				.where(and(eq(evidence.id, evidenceId), eq(evidence.userId: locals.user.id)))
+				.where(and(eq(evidence.id, evidenceId), eq(evidence.userId, locals.user.id)))
 				.returning();
 
 			return {

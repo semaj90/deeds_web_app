@@ -97,7 +97,8 @@ export class ToolInvoker {
 				maxBuffer: 50 * 1024 * 1024
 			});
 
-			const errors = this.parseSvelteCheckOutput(stdout + stderr);
+			const { stdout: svelteStdout, stderr: svelteStderr } = result;
+			const errors = this.parseSvelteCheckOutput(svelteStdout + svelteStderr);
 
 			return {
 				tool: 'svelte-check',
@@ -105,7 +106,7 @@ export class ToolInvoker {
 				errors: errors.filter((e) => e.severity === 'error'),
 				warnings: errors.filter((e) => e.severity === 'warning'),
 				duration: Date.now() - startTime,
-				output: stdout
+				output: svelteStdout
 			};
 		} catch (error: unknown) {
 			// svelte-check exits with non-zero when errors found
@@ -182,13 +183,14 @@ export class ToolInvoker {
 				maxBuffer: 50 * 1024 * 1024
 			});
 
+			const { stdout: tscStdout, stderr: tscStderr } = result;
 			return {
 				tool: 'tsc',
 				success: true,
 				errors: [],
 				warnings: [],
 				duration: Date.now() - startTime,
-				output: stdout + stderr
+				output: tscStdout + tscStderr
 			};
 		} catch (error: unknown) {
 			const execError = error as { stdout?: string; stderr?: string };
@@ -303,7 +305,7 @@ export class ToolInvoker {
 		}
 
 		// Clamp to [0, 1]
-		return Math.max(0: Math.min(1, currentConfidence + adjustment));
+		return Math.max(0, Math.min(1, currentConfidence + adjustment));
 	}
 
 	/**

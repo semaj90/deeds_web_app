@@ -1,5 +1,73 @@
 # Copilot - Phase 78 AST-Aware Error Ranking + Svelte 5 Migration
 
+---
+
+## 🚨 **CRITICAL: Database Migration Safety Protocol**
+
+### ⛔ **DO NOT PROCEED WITH THIS PUSH**
+
+**STOP** if you see warnings like this during `npm run db:push:dev`:
+
+```
+⚠️  Warning  Found data-loss statements:
+· You're about to delete kg_nodes table with 2764 items
+· You're about to delete ts_errors table with 69311 items
+· You're about to delete phase89_embeddings table with 34505 items
+· You're about to delete error_topk_index table with 910413 items
+```
+
+**Answer NO or press Ctrl+C to abort immediately.**
+
+### Why This Happens
+
+Drizzle ORM compares your TypeScript schema files against the actual database. **Tables that exist in the database but aren't defined in your schema files are marked for deletion.**
+
+This would delete **1.2 million+ records** including:
+- **910,413 items** in error_topk_index
+- **69,311 items** in ts_errors
+- **54,384 items** in cpg_edges
+- **40,106 items** in raw_error_embeddings
+- All Phase 89 embeddings, clusters, and analysis data
+
+### ✅ Safe Approaches
+
+**Option 1: Add Missing Tables to Schema** (Recommended)
+```typescript
+// These tables exist in DB but not in schema - add them to prevent deletion
+export const kgNodes = pgTable('kg_nodes', { ... });
+export const tsErrors = pgTable('ts_errors', { ... });
+```
+
+**Option 2: Use `tablesFilter` in drizzle.config.ts**
+```typescript
+export default {
+  tablesFilter: ['!phase89_*', '!kg_*', '!ts_errors', '!error_topk_index'],
+} satisfies Config;
+```
+
+**Option 3: Use `introspect` to Auto-Generate**
+```bash
+npx drizzle-kit introspect
+```
+
+**Option 4: Raw SQL for Simple Changes** (Safest)
+```sql
+ALTER TABLE users ADD COLUMN IF NOT EXISTS hashed_password TEXT;
+```
+
+### 🎯 Pre-Flight Checklist
+
+Before running `npm run db:push:dev`:
+1. ✅ Review migration SQL in `drizzle/*.sql`
+2. ✅ Check for DROP TABLE statements
+3. ✅ Check for DROP COLUMN statements
+4. ✅ Verify schema includes all existing tables
+5. ✅ Test on dev database first
+
+**Remember:** Drizzle will happily delete millions of records if you let it. Always review, always verify, always backup.
+
+---
+
 ## 🎯 Phase 67-68 Error Reduction (January 11, 2026)
 
 ### Massive Reduction Achieved
